@@ -70,7 +70,7 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
   /**
    * {@inheritdoc}
    */
-  public function alter(ContainerBuilder $container) {
+  public function alter(ContainerBuilder $container): void {
     // Switch the http_client_factory service to the test version. This will
     // cause UpdateFetcher's HTTP requests to be sent directly into the HTTP
     // kernel, for update_test module's route to handle and return test data.
