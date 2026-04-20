@@ -551,7 +551,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     FileCacheFactory::setPrefix(Settings::getApcuPrefix('file_cache', $this->root));
 
     $definition = Settings::get('bootstrap_container_definition', []);
-    $definition['services'] = array_merge($definition['services'] ?? [], $this->defaultBootstrapContainerDefinition['services']);
+    $definition['services'] = array_merge($this->defaultBootstrapContainerDefinition['services'], $definition['services'] ?? []);
     // Add the container storage class to the definition if it does not match
     // the default.
     // @phpstan-ignore property.deprecated

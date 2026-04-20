@@ -8,6 +8,8 @@ use Composer\Autoload\ClassLoader;
 use Drupal\Core\Cache\DatabaseBackend;
 use Drupal\Core\Config\ConfigInstallerInterface;
 use Drupal\Core\DependencyInjection\Container;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\DependencyInjection\ContainerStorage\NullContainerStorage;
 use Drupal\Core\DependencyInjection\PhpContainer;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\DrupalKernelInterface;
@@ -22,6 +24,7 @@ use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
 use Prophecy\Argument;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 // cspell:ignore äöüßαβγδεζηθικλμνξοσὠ
@@ -536,8 +539,28 @@ class DrupalKernelTest extends KernelTestBase {
   public function testBootstrapContainerDefinitionMissingServices(): void {
     $kernel = $this->getTestKernel(Request::createFromGlobals(), ['system' => 'system']);
 
+    // Create a custom container storage that records dump() calls via a static
+    // property, proving the custom storage is used by the kernel.
+    $customStorageClass = get_class(new class () extends NullContainerStorage {
+
+      /**
+       * Determines whether the container has been dumped.
+       */
+      public static bool $dumpCalled = FALSE;
+
+      /**
+       * {@inheritdoc}
+       */
+      public function dump(ContainerBuilder $container, string $suffix): ContainerInterface {
+        static::$dumpCalled = TRUE;
+        return $container;
+      }
+
+    });
+
     // Set a custom bootstrap_container_definition that only has the legacy
-    // services (missing all new container storage services).
+    // services (missing all new container storage services) plus our custom
+    // container_storage override.
     $settings = Settings::getAll();
     $settings['bootstrap_container_definition'] = [
       'parameters' => [],
@@ -572,18 +595,22 @@ class DrupalKernelTest extends KernelTestBase {
           'class' => 'Drupal\Component\Datetime\Time',
           'arguments' => ['@request_stack'],
         ],
+        'container_storage' => [
+          'class' => $customStorageClass,
+        ],
       ],
     ];
     new Settings($settings);
 
-    // Shutdown the existing kernel and re-boot it. This triggers boot() which
-    // reads the bootstrap_container_definition from our settings.
+    // Shutdown and reboot the kernel so boot() reads the custom
+    // bootstrap_container_definition from settings.
     $kernel->shutdown();
+    // Preserve the module list.
+    $kernel->updateModules(['system' => 'system']);
+    $this->assertFalse($customStorageClass::$dumpCalled, 'Custom container storage dump() should not have been called yet');
     $kernel->boot();
 
-    $container = $kernel->getContainer();
-    $this->assertInstanceOf(PhpContainer::class, $container);
-    $this->assertNotNull($container->get('settings')->get('bootstrap_container_definition'));
+    $this->assertTrue($customStorageClass::$dumpCalled, 'Custom container storage dump() should have been called');
   }
 
 }
