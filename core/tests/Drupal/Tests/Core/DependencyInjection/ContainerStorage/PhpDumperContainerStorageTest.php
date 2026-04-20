@@ -309,6 +309,80 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
   }
 
   /**
+   * Tests that dump() saves but skips load when class already exists in memory.
+   */
+  public function testDumpSavesButSkipsLoadWhenClassAlreadyExists(): void {
+    $cache = $this->createStub(CacheBackendInterface::class);
+    $savedFiles = [];
+    $loadedFiles = [];
+    $deletedFiles = [];
+    $code = [];
+
+    $phpStorage = $this->createStub(PhpStorageInterface::class);
+    $phpStorage->method('save')
+      ->willReturnCallback(function ($filename, $phpCode) use (&$code, &$savedFiles) {
+        $code[$filename] = $phpCode;
+        $savedFiles[] = $filename;
+        return TRUE;
+      });
+    $phpStorage->method('load')
+      ->willReturnCallback(function ($filename) use (&$code, &$loadedFiles) {
+        $loadedFiles[] = $filename;
+        if (isset($code[$filename])) {
+          $tempFile = tempnam(sys_get_temp_dir(), 'drupal_container_test_');
+          $this->tempFiles[] = $tempFile;
+          file_put_contents($tempFile, $code[$filename]);
+          include_once $tempFile;
+        }
+      });
+    $phpStorage->method('delete')
+      ->willReturnCallback(function ($filename) use (&$code, &$deletedFiles) {
+        unset($code[$filename]);
+        $deletedFiles[] = $filename;
+        return TRUE;
+      });
+    $phpStorage->method('exists')
+      ->willReturnCallback(function ($filename) use (&$code) {
+        return isset($code[$filename]);
+      });
+
+    $storage = new PhpDumperContainerStorage($cache, $phpStorage, Settings::getInstance());
+
+    // First dump: container A.
+    $containerA = new ContainerBuilder();
+    $containerA->setParameter('test_param', 'value_a');
+    $containerA->compile();
+    $resultA1 = $storage->dump($containerA, 'test_suffix');
+
+    // Second dump: container B (different hash).
+    $containerB = new ContainerBuilder();
+    $containerB->setParameter('test_param', 'value_b');
+    $containerB->compile();
+    $resultB = $storage->dump($containerB, 'test_suffix');
+
+    $this->assertNotSame($resultA1::class, $resultB::class);
+
+    // Reset tracking before the critical third dump.
+    $savedFiles = [];
+    $loadedFiles = [];
+    $deletedFiles = [];
+
+    // Third dump: container A again (same hash as first dump). The class
+    // DrupalContainer_<hashA> still exists in memory from the first dump.
+    $resultA2 = $storage->dump($containerA, 'test_suffix');
+
+    // The returned container must be the same class as the first dump.
+    $this->assertSame($resultA1::class, $resultA2::class);
+    // The file must be saved to disk (so future requests can load it).
+    $this->assertCount(1, $savedFiles);
+    // But load() must NOT be called (class already exists, re-including would
+    // cause "Cannot redeclare class").
+    $this->assertCount(0, $loadedFiles);
+    // The old container B file should have been deleted.
+    $this->assertCount(1, $deletedFiles);
+  }
+
+  /**
    * Tests that invalidate() calls deleteAll on the cache backend.
    */
   public function testInvalidateDeletesAllCacheEntries(): void {
