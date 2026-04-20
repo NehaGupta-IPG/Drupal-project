@@ -170,6 +170,13 @@ abstract class OptionsWidgetBase extends WidgetBase {
   }
 
   /**
+   * Resets the options.
+   */
+  protected function resetOptions(): void {
+    unset($this->options);
+  }
+
+  /**
    * Determines selected options from the incoming field values.
    *
    * @param \Drupal\Core\Field\FieldItemListInterface $items
