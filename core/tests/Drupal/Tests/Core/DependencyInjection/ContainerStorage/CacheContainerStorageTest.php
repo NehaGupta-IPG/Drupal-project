@@ -9,26 +9,38 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ContainerStorage\CacheContainerStorage;
-use Drupal\Core\DrupalKernelInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the CacheContainerStorage.
+ *
+ * Tests run in separate processes because the \Drupal\Core\Site\Settings
+ * singleton is used.
  */
 #[CoversClass(CacheContainerStorage::class)]
 #[Group('DependencyInjection')]
+#[RunTestsInSeparateProcesses]
 class CacheContainerStorageTest extends UnitTestCase {
 
   /**
-   * Creates a kernel stub that returns the given app root and site path.
+   * Creates a CacheContainerStorage with default settings.
    */
-  protected function createKernelStub(string $appRoot = '/app/root', string $sitePath = 'sites/default'): DrupalKernelInterface {
-    $kernel = $this->createStub(DrupalKernelInterface::class);
-    $kernel->method('getAppRoot')->willReturn($appRoot);
-    $kernel->method('getSitePath')->willReturn($sitePath);
-    return $kernel;
+  protected function createStorage(CacheBackendInterface $cache): CacheContainerStorage {
+    new Settings([
+      'container_base_class' => Container::class,
+      'container_dumper_class' => OptimizedPhpArrayDumper::class,
+    ]);
+
+    return new CacheContainerStorage(
+      $cache,
+      Settings::getInstance(),
+      '/app/root',
+      'sites/default',
+    );
   }
 
   /**
@@ -41,12 +53,8 @@ class CacheContainerStorageTest extends UnitTestCase {
       ->with('service_container:test_suffix')
       ->willReturn(FALSE);
 
-    $storage = new CacheContainerStorage(
-      $cache,
-      Container::class,
-      OptimizedPhpArrayDumper::class,
-    );
-    $this->assertNull($storage->load('test_suffix', $this->createKernelStub()));
+    $storage = $this->createStorage($cache);
+    $this->assertNull($storage->load('test_suffix'));
   }
 
   /**
@@ -68,12 +76,8 @@ class CacheContainerStorageTest extends UnitTestCase {
       ->with('service_container:test_suffix')
       ->willReturn($cacheItem);
 
-    $storage = new CacheContainerStorage(
-      $cache,
-      Container::class,
-      OptimizedPhpArrayDumper::class,
-    );
-    $container = $storage->load('test_suffix', $this->createKernelStub());
+    $storage = $this->createStorage($cache);
+    $container = $storage->load('test_suffix');
 
     $this->assertInstanceOf(Container::class, $container);
     $this->assertSame('/app/root', $container->getParameter('app.root'));
@@ -98,12 +102,8 @@ class CacheContainerStorageTest extends UnitTestCase {
         $cachedData = $data;
       });
 
-    $storage = new CacheContainerStorage(
-      $cache,
-      Container::class,
-      OptimizedPhpArrayDumper::class,
-    );
-    $result = $storage->dump($container, 'test_suffix', $this->createKernelStub());
+    $storage = $this->createStorage($cache);
+    $result = $storage->dump($container, 'test_suffix');
 
     $this->assertInstanceOf(Container::class, $result);
     // The cached data should not contain app.root and site.path (those are
@@ -128,14 +128,10 @@ class CacheContainerStorageTest extends UnitTestCase {
       ->method('set')
       ->willThrowException(new \Exception('Cache table does not exist'));
 
-    $storage = new CacheContainerStorage(
-      $cache,
-      Container::class,
-      OptimizedPhpArrayDumper::class,
-    );
+    $storage = $this->createStorage($cache);
 
     // Should not throw despite cache exception.
-    $result = $storage->dump($container, 'test_suffix', $this->createKernelStub());
+    $result = $storage->dump($container, 'test_suffix');
     $this->assertInstanceOf(Container::class, $result);
   }
 
@@ -147,11 +143,7 @@ class CacheContainerStorageTest extends UnitTestCase {
     $cache->expects($this->once())
       ->method('deleteAll');
 
-    $storage = new CacheContainerStorage(
-      $cache,
-      Container::class,
-      OptimizedPhpArrayDumper::class,
-    );
+    $storage = $this->createStorage($cache);
     $storage->invalidate();
   }
 

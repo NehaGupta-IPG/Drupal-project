@@ -7,7 +7,8 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ContainerStorageInterface;
 use Drupal\Core\DependencyInjection\Dumper\FileLoaderStub;
-use Drupal\Core\DrupalKernelInterface;
+use Drupal\Core\DependencyInjection\PhpContainer;
+use Drupal\Core\Site\Settings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 
@@ -38,19 +39,19 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
    *   The cache backend for storing the container hash.
    * @param \Drupal\Component\PhpStorage\PhpStorageInterface $phpStorage
    *   The PHP storage for compiled container files.
-   * @param string $baseClass
-   *   The base class for the PHP dumped container.
+   * @param \Drupal\Core\Site\Settings $settings
+   *   The site settings.
    */
   public function __construct(
     protected readonly CacheBackendInterface $cache,
     protected readonly PhpStorageInterface $phpStorage,
-    protected readonly string $baseClass,
+    protected readonly Settings $settings,
   ) {}
 
   /**
    * {@inheritdoc}
    */
-  public function load(string $suffix, DrupalKernelInterface $kernel): ?ContainerInterface {
+  public function load(string $suffix): ?ContainerInterface {
     $cache = $this->cache->get(static::CACHE_PREFIX . $suffix);
     if ($cache && $hash = $cache->data) {
       $containerClass = 'DrupalContainer_' . $hash;
@@ -69,7 +70,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function dump(ContainerBuilder $container, string $suffix, DrupalKernelInterface $kernel): ContainerInterface {
+  public function dump(ContainerBuilder $container, string $suffix): ContainerInterface {
     // Ensure FileLoader::ANONYMOUS_ID_REGEXP is available for PhpDumper.
     // Check both the real dependency (symfony/config FileLoader) and the alias
     // target to avoid "Cannot redeclare class" warnings on repeated dumps.
@@ -79,7 +80,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
 
     // Strip leading backslash so the generated PHP code produces a correct
     // fully qualified class name (the dumper prepends its own backslash).
-    $baseClass = ltrim($this->baseClass, '\\');
+    $baseClass = ltrim($this->settings->get('container_base_class', PhpContainer::class), '\\');
     $dumper = new PhpDumper($container);
     $code = $dumper->dump([
       'class' => 'DrupalContainer',

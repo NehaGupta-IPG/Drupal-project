@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\DependencyInjection;
 
-use Drupal\Core\DrupalKernelInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -13,10 +12,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * ContainerStorageFactory to load cached containers, dump newly compiled ones,
  * and invalidate stale containers.
  *
- * The implementation is swappable via the 'container_storage_class' setting in
- * settings.php, or auto-detected from the 'container_base_class' setting. For
- * example, a site could ship a pre-built container in Git by providing a
- * custom implementation.
+ * The implementation is auto-detected from the 'container_base_class' setting.
+ * Sites that need a custom storage strategy can override the
+ * 'container_storage' service in the bootstrap container definition
+ * via the 'bootstrap_container_definition' setting in settings.php.
  *
  * @see \Drupal\Core\DependencyInjection\ContainerStorage\PhpDumperContainerStorage
  * @see \Drupal\Core\DependencyInjection\ContainerStorage\CacheContainerStorage
@@ -30,13 +29,11 @@ interface ContainerStorageInterface {
    * @param string $suffix
    *   A hash suffix identifying the container version, computed by the kernel
    *   from the environment, service providers, module filenames, etc.
-   * @param \Drupal\Core\DrupalKernelInterface $kernel
-   *   The kernel, which can be used to obtain the app root, site path, etc.
    *
    * @return \Symfony\Component\DependencyInjection\ContainerInterface|null
    *   The loaded container, or NULL if no valid cached container exists.
    */
-  public function load(string $suffix, DrupalKernelInterface $kernel): ?ContainerInterface;
+  public function load(string $suffix): ?ContainerInterface;
 
   /**
    * Dumps a compiled container to persistent storage.
@@ -45,15 +42,13 @@ interface ContainerStorageInterface {
    *   The compiled container builder.
    * @param string $suffix
    *   A hash suffix identifying this container version.
-   * @param \Drupal\Core\DrupalKernelInterface $kernel
-   *   The kernel, which can be used to obtain the app root, site path, etc.
    *
    * @return \Symfony\Component\DependencyInjection\ContainerInterface
    *   The container instance to use at runtime. This may be a new container
    *   instantiated from the dumped representation, or the original
    *   ContainerBuilder if dumping is not possible.
    */
-  public function dump(ContainerBuilder $container, string $suffix, DrupalKernelInterface $kernel): ContainerInterface;
+  public function dump(ContainerBuilder $container, string $suffix): ContainerInterface;
 
   /**
    * Invalidates all stored containers.

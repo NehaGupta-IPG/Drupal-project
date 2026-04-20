@@ -14,8 +14,10 @@ use Drupal\Core\Config\BootstrapConfigStorageFactory;
 use Drupal\Core\Config\NullStorage;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\DependencyInjection\ContainerStorage\CacheContainerStorage;
 use Drupal\Core\DependencyInjection\ContainerStorage\ContainerStorageFactory;
 use Drupal\Core\DependencyInjection\ContainerStorage\NullContainerStorage;
+use Drupal\Core\DependencyInjection\ContainerStorage\PhpDumperContainerStorage;
 use Drupal\Core\DependencyInjection\ContainerStorageInterface;
 use Drupal\Core\DependencyInjection\PhpContainer;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
@@ -80,6 +82,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   protected $defaultBootstrapContainerDefinition = [
     'parameters' => [],
     'services' => [
+      'kernel' => [
+        'synthetic' => TRUE,
+      ],
       'database' => [
         'class' => 'Drupal\Core\Database\Connection',
         'factory' => 'Drupal\Core\Database\Database::getConnection',
@@ -109,6 +114,37 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       ],
       'serialization.phpserialize' => [
         'class' => PhpSerialize::class,
+      ],
+      'settings' => [
+        'class' => 'Drupal\Core\Site\Settings',
+        'factory' => 'Drupal\Core\Site\Settings::getInstance',
+      ],
+      'container_storage' => [
+        'class' => ContainerStorageInterface::class,
+        'factory' => [ContainerStorageFactory::class, 'create'],
+        'arguments' => ['@service_container'],
+      ],
+      'container_storage.cache' => [
+        'class' => CacheContainerStorage::class,
+        'arguments' => [
+          '@cache.container',
+          '@settings',
+          '%app.root%',
+          '%site.path%',
+        ],
+      ],
+      'container_storage.php_dumper' => [
+        'class' => PhpDumperContainerStorage::class,
+        'arguments' => [
+          '@cache.container',
+          '@php_storage.service_container',
+          '@settings',
+        ],
+      ],
+      'php_storage.service_container' => [
+        'class' => 'Drupal\Component\PhpStorage\PhpStorageInterface',
+        'factory' => 'Drupal\Core\PhpStorage\PhpStorageFactory::get',
+        'arguments' => ['service_container'],
       ],
     ],
   ];
@@ -281,14 +317,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @var string
    */
   protected $root;
-
-  /**
-   * The container storage service.
-   *
-   * Responsible for loading, dumping, and invalidating the service container.
-   * Created lazily by getContainerStorage().
-   */
-  protected ?ContainerStorageInterface $containerStorage = NULL;
 
   /**
    * Create a DrupalKernel object from a request.
@@ -526,7 +554,28 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     FileCacheFactory::setConfiguration($configuration);
     FileCacheFactory::setPrefix(Settings::getApcuPrefix('file_cache', $this->root));
 
-    $this->bootstrapContainer = new $this->bootstrapContainerClass(Settings::get('bootstrap_container_definition', $this->defaultBootstrapContainerDefinition));
+    $definition = Settings::get('bootstrap_container_definition', $this->defaultBootstrapContainerDefinition);
+    // Provide backwards compatibility for custom bootstrap container
+    // definitions that do not declare the new container storage services.
+    $requiredServices = [
+      'kernel',
+      'settings',
+      'container_storage',
+      'container_storage.cache',
+      'container_storage.php_dumper',
+      'php_storage.service_container',
+    ];
+    $missingServices = array_diff($requiredServices, array_keys($definition['services'] ?? []));
+    if ($missingServices && Settings::get('bootstrap_container_definition') !== NULL) {
+      @trigger_error(sprintf('The bootstrap_container_definition setting is missing the following services: %s. These services will be added automatically but this is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Update your bootstrap_container_definition in settings.php to include these services. See https://www.drupal.org/node/3585642', implode(', ', $missingServices)), E_USER_DEPRECATED);
+      foreach ($missingServices as $service) {
+        $definition['services'][$service] = $this->defaultBootstrapContainerDefinition['services'][$service];
+      }
+    }
+    $definition['parameters']['app.root'] = $this->getAppRoot();
+    $definition['parameters']['site.path'] = $this->getSitePath();
+    $this->bootstrapContainer = new $this->bootstrapContainerClass($definition);
+    $this->bootstrapContainer->set('kernel', $this);
 
     // Initialize the container.
     $this->initializeContainer();
@@ -1017,12 +1066,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if (!$this->allowDumping) {
       return new NullContainerStorage();
     }
-    elseif (!$this->containerStorage) {
-      $this->containerStorage = ContainerStorageFactory::create(
-        $this->bootstrapContainer->get('cache.container'),
-      );
-    }
-    return $this->containerStorage;
+
+    return $this->bootstrapContainer->get('container_storage');
   }
 
   /**
@@ -1087,13 +1132,13 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // not forcing a rebuild, then try and load the container from storage.
     $container = NULL;
     if (empty($this->moduleList) && !$this->containerNeedsRebuild) {
-      $container = $this->getContainerStorage()->load($suffix, $this);
+      $container = $this->getContainerStorage()->load($suffix);
     }
 
     // If no container was loaded, build a new one from scratch.
     if (!$container) {
       $container = $this->compileContainer();
-      $container = $this->getContainerStorage()->dump($container, $suffix, $this);
+      $container = $this->getContainerStorage()->dump($container, $suffix);
     }
 
     // The container was rebuilt successfully.
