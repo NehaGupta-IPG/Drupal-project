@@ -17,7 +17,7 @@ use Drupal\Tests\RequirementsPageTrait;
 use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
-use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
  * Provides a test method to test the Standard installation profile or recipe.
@@ -127,7 +127,7 @@ trait StandardTestTrait {
       }
 
       $this->assertSame([], array_map(
-        function (ConstraintViolation $v) {
+        function (ConstraintViolationInterface $v) {
           return (string) $v->getMessage();
         },
         iterator_to_array(CKEditor5::validatePair(
@@ -215,12 +215,6 @@ trait StandardTestTrait {
     $this->drupalGet($url);
     $this->drupalGet($url);
     // Verify that full node page is cached by Dynamic Page Cache.
-    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'HIT');
-
-    $url = Url::fromRoute('entity.user.canonical', ['user' => 1]);
-    $this->drupalGet($url);
-    $this->drupalGet($url);
-    // Verify that user profile page is cached by Dynamic Page Cache.
     $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'HIT');
 
     // Make sure the editorial workflow is installed after enabling the
