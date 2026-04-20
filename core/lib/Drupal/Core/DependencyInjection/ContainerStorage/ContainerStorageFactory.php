@@ -16,8 +16,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * container definition via the 'bootstrap_container_definition' setting.
  *
  * @see \Drupal\Core\DrupalKernel::$defaultBootstrapContainerDefinition
+ *
+ * @internal
+ *   To override the container storage service, override the container_storage
+ *   service in the bootstrap container definition.
  */
-class ContainerStorageFactory {
+final class ContainerStorageFactory {
 
   /**
    * Creates the container storage service.
