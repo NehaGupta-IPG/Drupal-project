@@ -55,8 +55,3 @@ services:
     class: Drupal\layout_builder\EventSubscriber\PrepareLayout
   Drupal\layout_builder\EventSubscriber\DefaultContentSubscriber:
     autowire: true
-  layout_builder_test.subscriber:
-    class: Drupal\layout_builder_test\EventSubscriber\LayoutBuilderTestSubscriber
-    arguments: ['@state']
-    tags:
-      - { name: event_subscriber }
