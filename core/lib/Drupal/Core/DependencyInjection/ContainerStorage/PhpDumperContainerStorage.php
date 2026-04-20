@@ -93,7 +93,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
     $hash = hash('xxh128', $code);
 
     $containerClass = 'DrupalContainer_' . $hash;
-    if ($hash !== $this->loadedContainerHash && !class_exists($containerClass, FALSE)) {
+    if ($hash !== $this->loadedContainerHash || !class_exists($containerClass, FALSE)) {
       if ($this->loadedContainerHash) {
         $old_container_hash = $this->loadedContainerHash;
       }
