@@ -31,10 +31,13 @@ class CacheContainerStorage implements ContainerStorageInterface {
    *   The cache backend for storing container definitions.
    * @param \Drupal\Core\Site\Settings $settings
    *   The site settings.
+   * @param string|null $dumperClass
+   *   (optional) The class name of the container dumper to use.
    */
   public function __construct(
     protected readonly CacheBackendInterface $cache,
     protected readonly Settings $settings,
+    protected readonly ?string $dumperClass = OptimizedPhpArrayDumper::class,
   ) {}
 
   /**
@@ -55,8 +58,7 @@ class CacheContainerStorage implements ContainerStorageInterface {
    * {@inheritdoc}
    */
   public function dump(ContainerBuilder $container, string $suffix): ContainerInterface {
-    $dumperClass = $this->settings->get('container_dumper_class', OptimizedPhpArrayDumper::class);
-    $dumper = new $dumperClass($container);
+    $dumper = new $this->dumperClass($container);
     $container_definition = $dumper->getArray();
 
     try {

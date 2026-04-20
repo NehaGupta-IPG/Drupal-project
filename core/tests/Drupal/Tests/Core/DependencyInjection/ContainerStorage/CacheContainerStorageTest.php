@@ -30,10 +30,7 @@ class CacheContainerStorageTest extends UnitTestCase {
    * Creates a CacheContainerStorage with default settings.
    */
   protected function createStorage(CacheBackendInterface $cache): CacheContainerStorage {
-    new Settings([
-      'container_base_class' => Container::class,
-      'container_dumper_class' => OptimizedPhpArrayDumper::class,
-    ]);
+    new Settings(['container_base_class' => Container::class]);
 
     return new CacheContainerStorage(
       $cache,
@@ -121,6 +118,51 @@ class CacheContainerStorageTest extends UnitTestCase {
     // Should not throw despite cache exception.
     $result = $storage->dump($container, 'test_suffix');
     $this->assertInstanceOf(Container::class, $result);
+  }
+
+  /**
+   * Tests that dump() uses a custom dumper class when provided.
+   */
+  public function testDumpUsesCustomDumperClass(): void {
+    $container = new ContainerBuilder();
+    $container->setParameter('test', 'value');
+    $container->compile();
+
+    $cache = $this->createMock(CacheBackendInterface::class);
+    $cachedData = NULL;
+    $cache->expects($this->once())
+      ->method('set')
+      ->willReturnCallback(function ($key, $data) use (&$cachedData) {
+        $cachedData = $data;
+      });
+
+    new Settings([
+      'container_base_class' => Container::class,
+    ]);
+
+    // Use a custom dumper that injects a marker parameter to prove it was used.
+    $customDumperClass = get_class(new class ($container) extends OptimizedPhpArrayDumper {
+
+      public function getArray() {
+        $array = parent::getArray();
+        $array['parameters']['_custom_dumper_marker'] = TRUE;
+        return $array;
+      }
+
+    });
+
+    $storage = new CacheContainerStorage(
+      $cache,
+      Settings::getInstance(),
+      $customDumperClass,
+    );
+    $result = $storage->dump($container, 'test_suffix');
+
+    $this->assertInstanceOf(Container::class, $result);
+    $this->assertIsArray($cachedData);
+    // The marker proves the custom dumper class was used, not the default.
+    $this->assertTrue($cachedData['parameters']['_custom_dumper_marker']);
+    $this->assertTrue($result->getParameter('_custom_dumper_marker'));
   }
 
   /**
