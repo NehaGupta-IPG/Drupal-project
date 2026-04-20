@@ -69,8 +69,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @var string
    *
    * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use the
-   *   'container_dumper_class' setting instead. The container dumper is now
-   *   managed by ContainerStorageInterface implementations.
+   *   bootstrap_container_definition setting to set the class.
    *
    * @see https://www.drupal.org/node/3585642
    */
@@ -553,6 +552,14 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     $definition = Settings::get('bootstrap_container_definition', []);
     $definition['services'] = array_merge($definition['services'] ?? [], $this->defaultBootstrapContainerDefinition['services']);
+    // Add the container storage class to the definition if it does not match
+    // the default.
+    // @phpstan-ignore property.deprecated
+    if ($this->phpArrayDumperClass !== '\Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper') {
+      @trigger_error(__CLASS__ . '::$phpArrayDumperClass is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use the bootstrap_container_definition setting to set the class. See https://www.drupal.org/node/3585642', E_USER_DEPRECATED);
+      // @phpstan-ignore property.deprecated
+      $definition['services']['container_storage.cache']['arguments'][] = $this->phpArrayDumperClass;
+    }
     $this->bootstrapContainer = new $this->bootstrapContainerClass($definition);
 
     // Initialize the container.
