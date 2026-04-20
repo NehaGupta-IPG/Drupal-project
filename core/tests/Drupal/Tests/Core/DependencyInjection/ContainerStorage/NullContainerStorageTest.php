@@ -6,7 +6,6 @@ namespace Drupal\Tests\Core\DependencyInjection\ContainerStorage;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ContainerStorage\NullContainerStorage;
-use Drupal\Core\DrupalKernelInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -23,9 +22,8 @@ class NullContainerStorageTest extends UnitTestCase {
    */
   public function testLoadReturnsNull(): void {
     $storage = new NullContainerStorage();
-    $kernel = $this->createStub(DrupalKernelInterface::class);
-    $this->assertNull($storage->load('any_suffix', $kernel));
-    $this->assertNull($storage->load('another_suffix', $kernel));
+    $this->assertNull($storage->load('any_suffix'));
+    $this->assertNull($storage->load('another_suffix'));
   }
 
   /**
@@ -34,8 +32,7 @@ class NullContainerStorageTest extends UnitTestCase {
   public function testDumpReturnsContainerBuilder(): void {
     $storage = new NullContainerStorage();
     $container = new ContainerBuilder();
-    $kernel = $this->createStub(DrupalKernelInterface::class);
-    $result = $storage->dump($container, 'any_suffix', $kernel);
+    $result = $storage->dump($container, 'any_suffix');
     $this->assertSame($container, $result);
   }
 

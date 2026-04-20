@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\DependencyInjection\ContainerStorage;
 
 use Drupal\Component\DependencyInjection\Container;
-use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\ContainerStorage\CacheContainerStorage;
 use Drupal\Core\DependencyInjection\ContainerStorage\ContainerStorageFactory;
-use Drupal\Core\DependencyInjection\ContainerStorage\NullContainerStorage;
 use Drupal\Core\DependencyInjection\ContainerStorage\PhpDumperContainerStorage;
 use Drupal\Core\DependencyInjection\PhpContainer;
 use Drupal\Core\Site\Settings;
@@ -16,6 +14,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Tests the ContainerStorageFactory.
@@ -29,59 +28,43 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class ContainerStorageFactoryTest extends UnitTestCase {
 
   /**
-   * Tests that CacheContainerStorage is created for the legacy base class.
+   * Tests that CacheContainerStorage is returned for the legacy base class.
    */
   public function testCreatesCacheStorageForLegacyBaseClass(): void {
     new Settings([
-      'hash_salt' => 'test_hash_salt',
       'container_base_class' => Container::class,
     ]);
 
-    $cache = $this->createStub(CacheBackendInterface::class);
-    $storage = ContainerStorageFactory::create($cache);
-    $this->assertInstanceOf(CacheContainerStorage::class, $storage);
+    $cacheStorage = $this->createStub(CacheContainerStorage::class);
+    $container = $this->createStub(ContainerInterface::class);
+    $container->method('get')
+      ->willReturnMap([
+        ['settings', Settings::getInstance()],
+        ['container_storage.cache', $cacheStorage],
+      ]);
+
+    $storage = ContainerStorageFactory::create($container);
+    $this->assertSame($cacheStorage, $storage);
   }
 
   /**
-   * Tests that PhpDumperContainerStorage is created for PhpContainer base.
+   * Tests that PhpDumperContainerStorage is returned for PhpContainer base.
    */
   public function testCreatesPhpDumperStorageForPhpContainerBase(): void {
     new Settings([
-      'hash_salt' => 'test_hash_salt',
       'container_base_class' => PhpContainer::class,
     ]);
 
-    $cache = $this->createStub(CacheBackendInterface::class);
-    $storage = ContainerStorageFactory::create($cache);
-    $this->assertInstanceOf(PhpDumperContainerStorage::class, $storage);
-  }
+    $phpDumperStorage = $this->createStub(PhpDumperContainerStorage::class);
+    $container = $this->createStub(ContainerInterface::class);
+    $container->method('get')
+      ->willReturnMap([
+        ['settings', Settings::getInstance()],
+        ['container_storage.php_dumper', $phpDumperStorage],
+      ]);
 
-  /**
-   * Tests that NullContainerStorage is returned when PhpStorage throws.
-   */
-  public function testFallsBackToNullOnPhpStorageFailure(): void {
-    // Without hash_salt, PhpStorageFactory::get() throws a RuntimeException.
-    new Settings([
-      'container_base_class' => PhpContainer::class,
-    ]);
-
-    $cache = $this->createStub(CacheBackendInterface::class);
-    $storage = ContainerStorageFactory::create($cache);
-    $this->assertInstanceOf(NullContainerStorage::class, $storage);
-  }
-
-  /**
-   * Tests that an explicit container_storage_class setting is respected.
-   */
-  public function testExplicitStorageClassOverride(): void {
-    new Settings([
-      'hash_salt' => 'test_hash_salt',
-      'container_storage_class' => NullContainerStorage::class,
-    ]);
-
-    $cache = $this->createStub(CacheBackendInterface::class);
-    $storage = ContainerStorageFactory::create($cache);
-    $this->assertInstanceOf(NullContainerStorage::class, $storage);
+    $storage = ContainerStorageFactory::create($container);
+    $this->assertSame($phpDumperStorage, $storage);
   }
 
 }
