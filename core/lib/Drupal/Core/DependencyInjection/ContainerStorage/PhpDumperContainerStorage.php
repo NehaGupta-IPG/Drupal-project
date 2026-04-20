@@ -94,7 +94,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
     $containerClass = 'DrupalContainer_' . $hash;
     if ($hash !== $this->loadedContainerHash && !class_exists($containerClass, FALSE)) {
       if ($this->loadedContainerHash) {
-        $this->phpStorage->delete('DrupalContainer_' . $this->loadedContainerHash . '.php');
+        $old_container_hash = $this->loadedContainerHash;
       }
       $filename = $containerClass . '.php';
 
@@ -115,6 +115,13 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
     }
     catch (\Exception) {
       // The cache table may not exist yet (e.g., during install).
+    }
+
+    // Delete the old container file if it exists. This is done after the cache
+    // is set to ensure that the cache is updated before the old container file
+    // is deleted.
+    if (isset($old_container_hash)) {
+      $this->phpStorage->delete('DrupalContainer_' . $old_container_hash . '.php');
     }
 
     return $container;

@@ -231,6 +231,84 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
   }
 
   /**
+   * Tests that cache hash is updated before old container file is deleted.
+   *
+   * This ordering is critical: if the old file is deleted before the cache
+   * points to the new hash, a concurrent request could read the stale hash
+   * from cache and fail to load the (now deleted) old container file.
+   */
+  public function testDumpUpdatesCacheBeforeDeletingOldFile(): void {
+    $operations = [];
+    $code = [];
+
+    // Build a cache mock that records set() calls.
+    $cache = $this->createStub(CacheBackendInterface::class);
+    $cache->method('get')->willReturn(FALSE);
+    $cache->method('set')
+      ->willReturnCallback(function ($key, $hash) use (&$operations) {
+        $operations[] = ['cache_set', $hash];
+      });
+
+    // Build a PhpStorage mock that records save/load/delete calls.
+    $phpStorage = $this->createStub(PhpStorageInterface::class);
+    $phpStorage->method('save')
+      ->willReturnCallback(function ($filename, $phpCode) use (&$code, &$operations) {
+        $code[$filename] = $phpCode;
+        $operations[] = ['save', $filename];
+        return TRUE;
+      });
+    $phpStorage->method('load')
+      ->willReturnCallback(function ($filename) use (&$code) {
+        if (isset($code[$filename])) {
+          $tempFile = tempnam(sys_get_temp_dir(), 'drupal_container_test_');
+          $this->tempFiles[] = $tempFile;
+          file_put_contents($tempFile, $code[$filename]);
+          include_once $tempFile;
+        }
+      });
+    $phpStorage->method('delete')
+      ->willReturnCallback(function ($filename) use (&$code, &$operations) {
+        unset($code[$filename]);
+        $operations[] = ['delete', $filename];
+        return TRUE;
+      });
+    $phpStorage->method('exists')
+      ->willReturnCallback(function ($filename) use (&$code) {
+        return isset($code[$filename]);
+      });
+
+    // First dump.
+    $container1 = new ContainerBuilder();
+    $container1->setParameter('test_param', 'value1');
+    $container1->compile();
+
+    $storage = new PhpDumperContainerStorage($cache, $phpStorage, DumpedContainer::class);
+    $storage->dump($container1, 'test_suffix', $this->createKernelStub());
+
+    // Reset operations log before the second dump.
+    $operations = [];
+
+    // Second dump with different content triggers delete of old file.
+    $container2 = new ContainerBuilder();
+    $container2->setParameter('test_param', 'value2');
+    $container2->compile();
+
+    $storage->dump($container2, 'test_suffix', $this->createKernelStub());
+
+    // Extract operation types in order.
+    $opTypes = array_column($operations, 0);
+
+    // The cache_set (pointing to new hash) must come before the delete
+    // (removing the old file).
+    $cacheSetIndex = array_search('cache_set', $opTypes);
+    $deleteIndex = array_search('delete', $opTypes);
+
+    $this->assertNotFalse($cacheSetIndex, 'cache_set should have been called');
+    $this->assertNotFalse($deleteIndex, 'delete should have been called');
+    $this->assertLessThan($deleteIndex, $cacheSetIndex, 'Cache hash must be updated before old container file is deleted');
+  }
+
+  /**
    * Tests that invalidate() calls deleteAll on the cache backend.
    */
   public function testInvalidateDeletesAllCacheEntries(): void {
