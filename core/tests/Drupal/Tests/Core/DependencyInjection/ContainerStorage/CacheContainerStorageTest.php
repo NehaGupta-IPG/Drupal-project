@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\DependencyInjection\ContainerStorage;
 
+use Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -32,7 +33,7 @@ class CacheContainerStorageTest extends UnitTestCase {
     $storage = new CacheContainerStorage(
       $cache,
       Container::class,
-      '\Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper',
+      OptimizedPhpArrayDumper::class,
       '/app/root',
       'sites/default',
     );
@@ -61,7 +62,7 @@ class CacheContainerStorageTest extends UnitTestCase {
     $storage = new CacheContainerStorage(
       $cache,
       Container::class,
-      '\Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper',
+      OptimizedPhpArrayDumper::class,
       '/app/root',
       'sites/default',
     );
@@ -93,7 +94,7 @@ class CacheContainerStorageTest extends UnitTestCase {
     $storage = new CacheContainerStorage(
       $cache,
       Container::class,
-      '\Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper',
+      OptimizedPhpArrayDumper::class,
       '/app/root',
       'sites/default',
     );
@@ -125,7 +126,7 @@ class CacheContainerStorageTest extends UnitTestCase {
     $storage = new CacheContainerStorage(
       $cache,
       Container::class,
-      '\Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper',
+      OptimizedPhpArrayDumper::class,
       '/app/root',
       'sites/default',
     );
@@ -146,7 +147,7 @@ class CacheContainerStorageTest extends UnitTestCase {
     $storage = new CacheContainerStorage(
       $cache,
       Container::class,
-      '\Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper',
+      OptimizedPhpArrayDumper::class,
       '/app/root',
       'sites/default',
     );

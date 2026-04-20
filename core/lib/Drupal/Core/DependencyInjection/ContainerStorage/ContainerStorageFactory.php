@@ -3,6 +3,7 @@
 namespace Drupal\Core\DependencyInjection\ContainerStorage;
 
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\DependencyInjection\ContainerStorageInterface;
 use Drupal\Core\DependencyInjection\DumpedContainer;
 use Drupal\Core\PhpStorage\PhpStorageFactory;
@@ -39,7 +40,7 @@ class ContainerStorageFactory {
       return new $storageClass($cache, $appRoot, $sitePath);
     }
 
-    $baseClass = Settings::get('container_base_class', '\Drupal\Core\DependencyInjection\Container');
+    $baseClass = Settings::get('container_base_class', Container::class);
 
     if (is_a($baseClass, DumpedContainer::class, TRUE)) {
       try {
