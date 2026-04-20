@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\DependencyInjection\ContainerStorage;
 
+use Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\DependencyInjection\ContainerStorageInterface;
@@ -57,7 +58,7 @@ class ContainerStorageFactory {
     return new CacheContainerStorage(
       $cache,
       $baseClass,
-      Settings::get('container_dumper_class', '\Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper'),
+      Settings::get('container_dumper_class', OptimizedPhpArrayDumper::class),
       $appRoot,
       $sitePath,
     );
