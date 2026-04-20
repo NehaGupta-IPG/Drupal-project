@@ -26,19 +26,15 @@ class ContainerStorageFactory {
    *
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend from the bootstrap container.
-   * @param string $appRoot
-   *   The application root path.
-   * @param string $sitePath
-   *   The site path.
    *
    * @return \Drupal\Core\DependencyInjection\ContainerStorageInterface
    *   The container storage service.
    */
-  public static function create(CacheBackendInterface $cache, string $appRoot, string $sitePath): ContainerStorageInterface {
+  public static function create(CacheBackendInterface $cache): ContainerStorageInterface {
     // Allow explicit override via settings.
     $storageClass = Settings::get('container_storage_class');
     if ($storageClass) {
-      return new $storageClass($cache, $appRoot, $sitePath);
+      return new $storageClass($cache);
     }
 
     $baseClass = Settings::get('container_base_class', Container::class);
@@ -59,8 +55,6 @@ class ContainerStorageFactory {
       $cache,
       $baseClass,
       Settings::get('container_dumper_class', OptimizedPhpArrayDumper::class),
-      $appRoot,
-      $sitePath,
     );
   }
 

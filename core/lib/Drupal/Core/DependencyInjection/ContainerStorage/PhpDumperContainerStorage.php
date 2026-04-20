@@ -7,6 +7,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ContainerStorageInterface;
 use Drupal\Core\DependencyInjection\Dumper\FileLoaderStub;
+use Drupal\Core\DrupalKernelInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 
@@ -49,7 +50,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function load(string $suffix): ?ContainerInterface {
+  public function load(string $suffix, DrupalKernelInterface $kernel): ?ContainerInterface {
     $sentinel = $this->cache->get(static::CACHE_PREFIX . $suffix);
     if ($sentinel && $hash = $sentinel->data) {
       $containerClass = 'DrupalContainer_' . $hash;
@@ -68,7 +69,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function dump(ContainerBuilder $container, string $suffix): ContainerInterface {
+  public function dump(ContainerBuilder $container, string $suffix, DrupalKernelInterface $kernel): ContainerInterface {
     // Ensure FileLoader::ANONYMOUS_ID_REGEXP is available for PhpDumper.
     // Check both the real dependency (symfony/config FileLoader) and the alias
     // target to avoid "Cannot redeclare class" warnings on repeated dumps.

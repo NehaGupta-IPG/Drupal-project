@@ -38,7 +38,7 @@ class ContainerStorageFactoryTest extends UnitTestCase {
     ]);
 
     $cache = $this->createStub(CacheBackendInterface::class);
-    $storage = ContainerStorageFactory::create($cache, '/app/root', 'sites/default');
+    $storage = ContainerStorageFactory::create($cache);
     $this->assertInstanceOf(CacheContainerStorage::class, $storage);
   }
 
@@ -52,7 +52,7 @@ class ContainerStorageFactoryTest extends UnitTestCase {
     ]);
 
     $cache = $this->createStub(CacheBackendInterface::class);
-    $storage = ContainerStorageFactory::create($cache, '/app/root', 'sites/default');
+    $storage = ContainerStorageFactory::create($cache);
     $this->assertInstanceOf(PhpDumperContainerStorage::class, $storage);
   }
 
@@ -66,7 +66,7 @@ class ContainerStorageFactoryTest extends UnitTestCase {
     ]);
 
     $cache = $this->createStub(CacheBackendInterface::class);
-    $storage = ContainerStorageFactory::create($cache, '/app/root', 'sites/default');
+    $storage = ContainerStorageFactory::create($cache);
     $this->assertInstanceOf(NullContainerStorage::class, $storage);
   }
 
@@ -80,7 +80,7 @@ class ContainerStorageFactoryTest extends UnitTestCase {
     ]);
 
     $cache = $this->createStub(CacheBackendInterface::class);
-    $storage = ContainerStorageFactory::create($cache, '/app/root', 'sites/default');
+    $storage = ContainerStorageFactory::create($cache);
     $this->assertInstanceOf(NullContainerStorage::class, $storage);
   }
 

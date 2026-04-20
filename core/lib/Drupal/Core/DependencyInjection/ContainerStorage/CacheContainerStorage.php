@@ -5,6 +5,7 @@ namespace Drupal\Core\DependencyInjection\ContainerStorage;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ContainerStorageInterface;
+use Drupal\Core\DrupalKernelInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -30,28 +31,22 @@ class CacheContainerStorage implements ContainerStorageInterface {
    *   The container class to instantiate from the cached definition.
    * @param string $dumperClass
    *   The PHP array dumper class.
-   * @param string $appRoot
-   *   The application root path.
-   * @param string $sitePath
-   *   The site path.
    */
   public function __construct(
     protected readonly CacheBackendInterface $cache,
     protected readonly string $baseClass,
     protected readonly string $dumperClass,
-    protected readonly string $appRoot,
-    protected readonly string $sitePath,
   ) {}
 
   /**
    * {@inheritdoc}
    */
-  public function load(string $suffix): ?ContainerInterface {
+  public function load(string $suffix, DrupalKernelInterface $kernel): ?ContainerInterface {
     $cache = $this->cache->get(static::CACHE_PREFIX . $suffix);
     if ($cache) {
       $container_definition = $cache->data;
-      $container_definition['parameters']['app.root'] = $this->appRoot;
-      $container_definition['parameters']['site.path'] = $this->sitePath;
+      $container_definition['parameters']['app.root'] = $kernel->getAppRoot();
+      $container_definition['parameters']['site.path'] = $kernel->getSitePath();
       $class = $this->baseClass;
       return new $class($container_definition);
     }
@@ -62,7 +57,7 @@ class CacheContainerStorage implements ContainerStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function dump(ContainerBuilder $container, string $suffix): ContainerInterface {
+  public function dump(ContainerBuilder $container, string $suffix, DrupalKernelInterface $kernel): ContainerInterface {
     $dumperClass = $this->dumperClass;
     $dumper = new $dumperClass($container);
     $container_definition = $dumper->getArray();
@@ -74,8 +69,8 @@ class CacheContainerStorage implements ContainerStorageInterface {
       // The cache table may not exist yet (e.g., during install).
     }
 
-    $container_definition['parameters']['app.root'] = $this->appRoot;
-    $container_definition['parameters']['site.path'] = $this->sitePath;
+    $container_definition['parameters']['app.root'] = $kernel->getAppRoot();
+    $container_definition['parameters']['site.path'] = $kernel->getSitePath();
     $class = $this->baseClass;
     return new $class($container_definition);
   }

@@ -1020,8 +1020,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     elseif (!$this->containerStorage) {
       $this->containerStorage = ContainerStorageFactory::create(
         $this->bootstrapContainer->get('cache.container'),
-        $this->getAppRoot(),
-        $this->getSitePath(),
       );
     }
     return $this->containerStorage;
@@ -1089,13 +1087,13 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // not forcing a rebuild, then try and load the container from storage.
     $container = NULL;
     if (empty($this->moduleList) && !$this->containerNeedsRebuild) {
-      $container = $this->getContainerStorage()->load($suffix);
+      $container = $this->getContainerStorage()->load($suffix, $this);
     }
 
     // If no container was loaded, build a new one from scratch.
     if (!$container) {
       $container = $this->compileContainer();
-      $container = $this->getContainerStorage()->dump($container, $suffix);
+      $container = $this->getContainerStorage()->dump($container, $suffix, $this);
     }
 
     // The container was rebuilt successfully.
