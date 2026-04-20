@@ -1,11 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\Kernel;
 
 use Drupal\layout_builder\Section;
 use Drupal\layout_builder\SectionListInterface;
 use Drupal\layout_builder\SectionListTrait;
 
+/**
+ * A test section list for use in kernel tests.
+ */
 class TestSectionList implements SectionListInterface {
 
   use SectionListTrait {

@@ -1,16 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\layout_builder\Section;
 use Drupal\layout_builder\SectionComponent;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\layout_builder\Section
- *
- * @group layout_builder
+ * Tests third-party integration with the Section render array event system.
  */
+#[CoversClass(Section::class)]
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class SectionThirdPartyIntegrationTest extends KernelTestBase {
 
   /**
@@ -24,9 +30,6 @@ class SectionThirdPartyIntegrationTest extends KernelTestBase {
     'user',
   ];
 
-  /**
-   * @covers ::toRenderArray
-   */
   public function testThirdPartyIntegration(): void {
     $section_data = [
       new Section(

@@ -1,11 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\layout_builder_test\EventSubscriber;
 
 use Drupal\Core\State\StateInterface;
 use Drupal\layout_builder\Event\SectionBuildRegionsRenderArrayEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Test event subscriber for layout builder region render array events.
+ */
 class LayoutBuilderTestSubscriber implements EventSubscriberInterface {
 
   /**
