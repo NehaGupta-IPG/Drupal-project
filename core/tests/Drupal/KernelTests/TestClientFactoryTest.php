@@ -33,7 +33,7 @@ class TestClientFactoryTest extends KernelTestBase implements ServiceModifierInt
   /**
    * {@inheritdoc}
    */
-  public function alter(ContainerBuilder $container) {
+  public function alter(ContainerBuilder $container): void {
     $service_definition = $container->getDefinition('http_client_factory');
     $service_definition->setClass(TestClientFactory::class);
   }
