@@ -21,6 +21,11 @@ use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 class PhpDumperContainerStorage implements ContainerStorageInterface {
 
   /**
+   * The cache prefix used to store container hash.
+   */
+  protected const string CACHE_PREFIX = 'container_hash:';
+
+  /**
    * The hash of the currently loaded container.
    */
   protected ?string $loadedContainerHash = NULL;
@@ -45,7 +50,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
    * {@inheritdoc}
    */
   public function load(string $suffix): ?ContainerInterface {
-    $sentinel = $this->cache->get('container_hash:' . $suffix);
+    $sentinel = $this->cache->get(static::CACHE_PREFIX . $suffix);
     if ($sentinel && $hash = $sentinel->data) {
       $containerClass = 'DrupalContainer_' . $hash;
       if (!class_exists($containerClass, FALSE)) {
@@ -105,7 +110,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
     $container = new $containerClass();
 
     try {
-      $this->cache->set('container_hash:' . $suffix, $hash);
+      $this->cache->set(static::CACHE_PREFIX . $suffix, $hash);
     }
     catch (\Exception) {
       // The cache table may not exist yet (e.g., during install).
