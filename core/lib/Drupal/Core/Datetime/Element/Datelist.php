@@ -37,7 +37,8 @@ class Datelist extends DateElementBase {
       '#theme' => 'datetime_form',
       '#theme_wrappers' => ['datetime_wrapper'],
       '#date_part_order' => ['year', 'month', 'day', 'hour', 'minute'],
-      '#date_year_range' => '1900:2050',
+      // Limit the size of the list by default to a typical range:
+      '#date_year_range' => '-150:+50',
       '#date_increment' => 1,
       '#date_date_callbacks' => [],
     ];
