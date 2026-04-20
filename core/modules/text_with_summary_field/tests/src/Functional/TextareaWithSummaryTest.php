@@ -20,7 +20,7 @@ class TextareaWithSummaryTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['text_test', 'node'];
+  protected static $modules = ['text_with_summary_field', 'text_test', 'node'];
 
   /**
    * {@inheritdoc}

@@ -23,7 +23,7 @@ class TextWithSummaryFieldHooks {
       case 'help.page.text_with_summary_field':
         $output = '';
         $output .= '<h2>' . $this->t('About') . '</h2>';
-        $output .= '<p>' . $this->t('The Text With Summary Field module allows you to create long text fields with optional summaries. See the <a href=":field">Field module help</a> and the <a href=":field_ui">Field UI help</a> pages for general information on fields and how to create and manage them. For more information, see the <a href=":text_documentation">online documentation for the Text module</a>.', [
+        $output .= '<p>' . $this->t('The Text With Summary Field module allows you to create long text fields with optional summaries. See the <a href=":field">Field module help</a> and the <a href=":field_ui">Field UI help</a> pages for general information on fields and how to create and manage them. For more information, see the <a href=":text_documentation">online documentation for the Text With Summary Field module</a>.', [
           ':field' => Url::fromRoute('help.page', [
             'name' => 'field',
           ])->toString(),
