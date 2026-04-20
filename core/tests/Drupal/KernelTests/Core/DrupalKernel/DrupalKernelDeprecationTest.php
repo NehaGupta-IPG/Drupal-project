@@ -1,0 +1,54 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\KernelTests\Core\DrupalKernel;
+
+use Drupal\Core\DrupalKernel;
+use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
+/**
+ * Tests DrupalKernel deprecation notices.
+ */
+#[CoversClass(DrupalKernel::class)]
+#[Group('DrupalKernel')]
+#[RunTestsInSeparateProcesses]
+#[IgnoreDeprecations]
+class DrupalKernelDeprecationTest extends KernelTestBase {
+
+  /**
+   * Tests that getCachedContainerDefinition() triggers a deprecation.
+   */
+  #[IgnoreDeprecations]
+  public function testGetCachedContainerDefinitionDeprecation(): void {
+    $this->expectUserDeprecationMessage('Drupal\Core\DrupalKernel::getCachedContainerDefinition() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Container loading is now handled by ContainerStorageInterface::load(). See https://www.drupal.org/node/3585642');
+    $this->container->get('kernel')->getCachedContainerDefinition();
+  }
+
+  /**
+   * Tests that getContainerCacheKey() triggers a deprecation.
+   */
+  #[IgnoreDeprecations]
+  public function testGetContainerCacheKeyDeprecation(): void {
+    $this->expectUserDeprecationMessage('Drupal\Core\DrupalKernel::getContainerCacheKey() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use getContainerCacheKeySuffix() instead. The cache key prefix is now managed by ContainerStorageInterface implementations. See https://www.drupal.org/node/3585642');
+    $kernel = $this->container->get('kernel');
+    $method = new \ReflectionMethod($kernel, 'getContainerCacheKey');
+    $method->invoke($kernel);
+  }
+
+  /**
+   * Tests that cacheDrupalContainer() triggers a deprecation.
+   */
+  #[IgnoreDeprecations]
+  public function testCacheDrupalContainerDeprecation(): void {
+    $this->expectUserDeprecationMessage('Drupal\Core\DrupalKernel::cacheDrupalContainer() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Container dumping is now handled by ContainerStorageInterface::dump(). See https://www.drupal.org/node/3585642');
+    $kernel = $this->container->get('kernel');
+    $method = new \ReflectionMethod($kernel, 'cacheDrupalContainer');
+    $method->invoke($kernel, []);
+  }
+
+}
