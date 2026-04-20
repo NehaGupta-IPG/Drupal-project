@@ -7,7 +7,6 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ContainerStorageInterface;
-use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Site\Settings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -32,13 +31,10 @@ class CacheContainerStorage implements ContainerStorageInterface {
    *   The cache backend for storing container definitions.
    * @param \Drupal\Core\Site\Settings $settings
    *   The site settings.
-   * @param \Drupal\Core\DrupalKernelInterface $kernel
-   *   The kernel.
    */
   public function __construct(
     protected readonly CacheBackendInterface $cache,
     protected readonly Settings $settings,
-    protected readonly DrupalKernelInterface $kernel,
   ) {}
 
   /**
@@ -48,8 +44,6 @@ class CacheContainerStorage implements ContainerStorageInterface {
     $cache = $this->cache->get(static::CACHE_PREFIX . $suffix);
     if ($cache) {
       $container_definition = $cache->data;
-      $container_definition['parameters']['app.root'] = $this->kernel->getAppRoot();
-      $container_definition['parameters']['site.path'] = $this->kernel->getSitePath();
       $class = $this->settings->get('container_base_class', Container::class);
       return new $class($container_definition);
     }
@@ -72,8 +66,6 @@ class CacheContainerStorage implements ContainerStorageInterface {
       // The cache table may not exist yet (e.g., during install).
     }
 
-    $container_definition['parameters']['app.root'] = $this->kernel->getAppRoot();
-    $container_definition['parameters']['site.path'] = $this->kernel->getSitePath();
     $class = $this->settings->get('container_base_class', Container::class);
     return new $class($container_definition);
   }

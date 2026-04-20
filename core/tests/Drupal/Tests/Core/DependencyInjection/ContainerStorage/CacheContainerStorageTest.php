@@ -9,7 +9,6 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ContainerStorage\CacheContainerStorage;
-use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -36,14 +35,9 @@ class CacheContainerStorageTest extends UnitTestCase {
       'container_dumper_class' => OptimizedPhpArrayDumper::class,
     ]);
 
-    $kernel = $this->createStub(DrupalKernelInterface::class);
-    $kernel->method('getAppRoot')->willReturn('/app/root');
-    $kernel->method('getSitePath')->willReturn('sites/default');
-
     return new CacheContainerStorage(
       $cache,
       Settings::getInstance(),
-      $kernel,
     );
   }
 
@@ -62,9 +56,9 @@ class CacheContainerStorageTest extends UnitTestCase {
   }
 
   /**
-   * Tests that load() returns a container and injects app.root and site.path.
+   * Tests that load() returns a container.
    */
-  public function testLoadReturnsContainerOnHitWithInjectedParameters(): void {
+  public function testLoadReturnsContainerOnHit(): void {
     $definition = [
       'aliases' => [],
       'parameters' => ['some_param' => 'value'],
@@ -84,8 +78,6 @@ class CacheContainerStorageTest extends UnitTestCase {
     $container = $storage->load('test_suffix');
 
     $this->assertInstanceOf(Container::class, $container);
-    $this->assertSame('/app/root', $container->getParameter('app.root'));
-    $this->assertSame('sites/default', $container->getParameter('site.path'));
     $this->assertSame('value', $container->getParameter('some_param'));
   }
 
@@ -110,14 +102,6 @@ class CacheContainerStorageTest extends UnitTestCase {
     $result = $storage->dump($container, 'test_suffix');
 
     $this->assertInstanceOf(Container::class, $result);
-    // The cached data should not contain app.root and site.path (those are
-    // injected at load/dump time).
-    $this->assertIsArray($cachedData);
-    $this->assertArrayNotHasKey('app.root', $cachedData['parameters'] ?? []);
-    $this->assertArrayNotHasKey('site.path', $cachedData['parameters'] ?? []);
-    // But the returned container should have them injected.
-    $this->assertSame('/app/root', $result->getParameter('app.root'));
-    $this->assertSame('sites/default', $result->getParameter('site.path'));
   }
 
   /**
