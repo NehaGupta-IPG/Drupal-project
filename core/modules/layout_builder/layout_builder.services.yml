@@ -53,5 +53,9 @@ services:
   Drupal\layout_builder\InlineBlockUsageInterface: '@inline_block.usage'
   layout_builder.element.prepare_layout:
     class: Drupal\layout_builder\EventSubscriber\PrepareLayout
+  layout_builder.build_section_regions_render_array.subscriber:
+    class: Drupal\layout_builder\EventSubscriber\SectionRegionsRenderArraySubscriber
+    tags:
+      - { name: event_subscriber }
   Drupal\layout_builder\EventSubscriber\DefaultContentSubscriber:
     autowire: true

@@ -13,8 +13,6 @@ class SectionBuildRenderArrayEvent extends Event {
 
   use CacheableResponseTrait;
 
-  const SECTION_BUILD_RENDER_ARRAY = 'section.build.render_array';
-
   /**
    * The section whose regions render array is being built.
    *

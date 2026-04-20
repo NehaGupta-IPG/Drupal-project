@@ -103,7 +103,7 @@ class Section implements ThirdPartySettingsInterface {
     }
 
     $section_build_event = new SectionBuildRenderArrayEvent($this, $build, $contexts, $in_preview);
-    $this->eventDispatcher()->dispatch($section_build_event, SectionBuildRenderArrayEvent::SECTION_BUILD_RENDER_ARRAY);
+    $this->eventDispatcher()->dispatch($section_build_event);
 
     return $section_build_event->getBuild();
   }
