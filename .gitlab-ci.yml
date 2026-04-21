@@ -305,6 +305,7 @@ default:
     - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
     - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
   script:
+    - export EXIT_CODE=0
     - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --keep-results --types "unit" --concurrency "$CONCURRENCY" --repeat "1" --sqlite ":memory:" --verbose --non-html --all || EXIT_CODE=$?
     # Allow failure for the next PHP major.
     - |
@@ -357,6 +358,7 @@ default:
     # Component tests are run via the PHPUnit CLI using a PHPUnit configuration
     # file of its own located in the core/tests/Drupal/Tests/Component
     # directory.
+    - export EXIT_CODE=0
     - vendor/bin/phpunit -c core/tests/Drupal/Tests/Component --testsuite unit-component --colors=always --testdox --log-junit $_ARTIFACTS_DIR/junit.xml --fail-on-deprecation $_FAIL_ON_PHPUNIT_DEPRECATION $_PHPUNIT_COVERAGE || EXIT_CODE=$?
     # Allow failure for the next PHP major.
     - |
