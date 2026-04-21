@@ -253,7 +253,8 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
         $write_cache = FALSE;
       }
       // If this request invalidated the cache, ensure the cache item is
-      // invalidated.
+      // invalidated. This always needs to happen whether the lock was acquired
+      // or not.
       if ($this->cacheInvalidated) {
         $write_cache = FALSE;
         $this->cache->delete($cid);
@@ -273,10 +274,7 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
     foreach ($this->keysToRemove as $delete_key) {
       unset($data[$delete_key]);
     }
-    // Even if we didn't acquire a lock, write the cache item if we're
-    // attempting to invalidate the cache.
-    if ($write_cache) {
-      if ($lock_acquired) {
+    if ($write_cache && $lock_acquired) {
         $this->cache->set($cid, $data, Cache::PERMANENT, $this->tags);
       }
     }
