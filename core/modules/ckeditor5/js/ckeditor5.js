@@ -322,7 +322,7 @@
       // Additional styles that need to be explicity added in addition to the
       // prefixed versions of existing css in `existingCss`.
       const addedCss = [
-        `${prefix} .ck.ck-content * {display:revert;background:revert;color:initial;padding:revert;}`,
+        `${prefix} .ck.ck-content * {display:revert;background:revert;padding:revert;}`,
         `${prefix} .ck.ck-content li {display:list-item}`,
       ];
 
