@@ -7,7 +7,6 @@ namespace Drupal\KernelTests\Core\Plugin\Condition;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests the CurrentThemeCondition plugin.
