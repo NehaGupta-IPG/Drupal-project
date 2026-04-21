@@ -42,7 +42,6 @@ class ResponsiveImageThemeHooks {
         'variables' => [
           'attributes' => [],
           'item' => NULL,
-          'item_attributes' => NULL,
           'url' => NULL,
           'responsive_image_style_id' => NULL,
         ],
@@ -59,7 +58,7 @@ class ResponsiveImageThemeHooks {
    * @param array $variables
    *   An associative array containing:
    *   - item: An ImageItem object.
-   *   - item_attributes: An optional associative array of HTML attributes to be
+   *   - attributes: An optional associative array of HTML attributes to be
    *     placed in the img tag.
    *   - responsive_image_style_id: A responsive image style.
    *   - url: An optional \Drupal\Core\Url object.
@@ -86,10 +85,6 @@ class ResponsiveImageThemeHooks {
       $attributes['title'] = $item->title;
     }
     $attributes['alt'] = $item->alt;
-    // Need to check that item_attributes has a value since it can be NULL.
-    if ($variables['item_attributes']) {
-      $attributes += $variables['item_attributes'];
-    }
     if (($entity = $item->entity) && empty($item->uri)) {
       $variables['responsive_image']['#uri'] = $entity->getFileUri();
     }

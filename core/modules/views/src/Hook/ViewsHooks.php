@@ -221,7 +221,7 @@ class ViewsHooks {
       }
     }
     // Replaces substitutions in filter criteria.
-    _views_query_tag_alter_condition($query, $where, $substitutions);
+    $this->viewsQueryTagAlterCondition($query, $where, $substitutions);
   }
 
   /**
@@ -305,6 +305,45 @@ class ViewsHooks {
   #[Hook('block_delete')]
   public function blockDelete(EntityInterface $entity): void {
     $this->blockUpdate($entity);
+  }
+
+  /**
+   * Replaces the substitutions recursive foreach condition.
+   */
+  protected function viewsQueryTagAlterCondition(AlterableInterface $query, array &$conditions, array $substitutions): void {
+    foreach ($conditions as $condition_id => &$condition) {
+      if (is_numeric($condition_id)) {
+        if (is_string($condition['field'])) {
+          $condition['field'] = str_replace(array_keys($substitutions), array_values($substitutions), $condition['field']);
+        }
+        elseif (is_object($condition['field'])) {
+          $sub_conditions = &$condition['field']->conditions();
+          $this->viewsQueryTagAlterCondition($query, $sub_conditions, $substitutions);
+        }
+        // $condition['value'] is a subquery so alter the subquery recursive.
+        // Therefore make sure to get the metadata of the main query.
+        if (is_object($condition['value'])) {
+          $subquery = $condition['value'];
+          $subquery->addMetaData('views_substitutions', $query->getMetaData('views_substitutions'));
+          \Drupal::moduleHandler()->invoke('views', 'query_views_alter', [$condition['value']]);
+        }
+        elseif (isset($condition['value'])) {
+          // We can not use a simple str_replace() here because it always
+          // returns a string and we have to keep the type of the condition
+          // value intact.
+          if (is_array($condition['value'])) {
+            foreach ($condition['value'] as &$value) {
+              if (is_string($value)) {
+                $value = str_replace(array_keys($substitutions), array_values($substitutions), $value);
+              }
+            }
+          }
+          elseif (is_string($condition['value'])) {
+            $condition['value'] = str_replace(array_keys($substitutions), array_values($substitutions), $condition['value']);
+          }
+        }
+      }
+    }
   }
 
 }

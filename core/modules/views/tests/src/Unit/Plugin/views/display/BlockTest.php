@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Unit\Plugin\views\display;
 
+use Drupal\Core\Block\BlockManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\Plugin\views\display\Block;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -56,7 +58,7 @@ class BlockTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->onlyMethods($methods)
       ->getMock();
-    $this->executable->expects($this->any())
+    $this->executable
       ->method('setDisplay')
       ->with('block_1')
       ->willReturn(TRUE);
@@ -113,7 +115,6 @@ class BlockTest extends UnitTestCase {
     $this->blockDisplay->expects($this->any())
       ->method('calculateConfigurationHash')
       ->willReturn('foobar');
-
     $this->blockDisplay->view = $this->executable;
 
     $this->blockPlugin = $this->getMockBuilder('Drupal\views\Plugin\Block\ViewsBlock')

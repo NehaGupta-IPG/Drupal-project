@@ -9,6 +9,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Tests \Drupal\Core\Session\WriteSafeSessionHandler.
@@ -19,10 +20,8 @@ class WriteSafeSessionHandlerTest extends UnitTestCase {
 
   /**
    * The wrapped session handler.
-   *
-   * @var \SessionHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $wrappedSessionHandler;
+  protected \SessionHandlerInterface&Stub $wrappedSessionHandler;
 
   /**
    * The write safe session handler.
@@ -37,7 +36,15 @@ class WriteSafeSessionHandlerTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->wrappedSessionHandler = $this->createMock('SessionHandlerInterface');
+    $this->wrappedSessionHandler = $this->createStub('SessionHandlerInterface');
+    $this->sessionHandler = new WriteSafeSessionHandler($this->wrappedSessionHandler);
+  }
+
+  /**
+   * Reinitializes the wrapped session handler as a mock object.
+   */
+  protected function setUpMockWrappedSessionHandler(): void {
+    $this->wrappedSessionHandler = $this->createMock(\SessionHandlerInterface::class);
     $this->sessionHandler = new WriteSafeSessionHandler($this->wrappedSessionHandler);
   }
 
@@ -49,6 +56,7 @@ class WriteSafeSessionHandlerTest extends UnitTestCase {
    * @legacy-covers ::write
    */
   public function testConstructWriteSafeSessionHandlerDefaultArgs(): void {
+    $this->setUpMockWrappedSessionHandler();
     $session_id = 'some-id';
     $session_data = 'serialized-session-data';
 
@@ -94,6 +102,7 @@ class WriteSafeSessionHandlerTest extends UnitTestCase {
    * @legacy-covers ::write
    */
   public function testSetSessionWritable(): void {
+    $this->setUpMockWrappedSessionHandler();
     $session_id = 'some-id';
     $session_data = 'serialized-session-data';
 
@@ -138,7 +147,9 @@ class WriteSafeSessionHandlerTest extends UnitTestCase {
    * @legacy-covers ::gc
    */
   #[DataProvider('providerTestOtherMethods')]
-  public function testOtherMethods($method, $expected_result, $args): void {
+  public function testOtherMethods(string $method, bool|string|int $expected_result, array $args): void {
+    $this->setUpMockWrappedSessionHandler();
+
     $invocation = $this->wrappedSessionHandler->expects($this->exactly(2))
       ->method($method)
       ->willReturn($expected_result);

@@ -24,6 +24,7 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\Entity\EntityTestComputedField;
 use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\entity_test\EntityTestHelper;
+use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use PHPUnit\Framework\Attributes\Group;
@@ -480,7 +481,7 @@ class EntityFieldTest extends EntityKernelTestBase {
    * @param string $entity_type
    *   The entity type to run the tests with.
    */
-  protected function doTestIntrospection($entity_type): void {
+  protected function doTestIntrospection(string $entity_type): void {
     // Test getting metadata upfront. The entity types used for this test have
     // a default bundle that is the same as the entity type.
     $definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions($entity_type, $entity_type);
@@ -584,7 +585,7 @@ class EntityFieldTest extends EntityKernelTestBase {
    * @param string $entity_type
    *   The entity type to run the tests with.
    */
-  protected function doTestIterator($entity_type): void {
+  protected function doTestIterator(string $entity_type): void {
     $entity = $this->createTestEntity($entity_type);
 
     foreach ($entity as $name => $field) {
@@ -890,7 +891,7 @@ class EntityFieldTest extends EntityKernelTestBase {
     $this->assertFalse($entity->computed_string_field->isEmpty());
 
     // Test \Drupal\Core\TypedData\ComputedItemListTrait::filter().
-    $filter_callback = function ($item) {
+    $filter_callback = function ($item): bool {
       return !$item->isEmpty();
     };
     $entity = EntityTestComputedField::create([]);
@@ -976,7 +977,7 @@ class EntityFieldTest extends EntityKernelTestBase {
   protected function doTestComputedProperties($entity_type): void {
     $entity = $this->createTestEntity($entity_type);
     $entity->field_test_text->value = "The <strong>text</strong> text to filter.";
-    $entity->field_test_text->format = filter_default_format();
+    $entity->field_test_text->format = \Drupal::service(FilterFormatRepositoryInterface::class)->getDefaultFormat()->id();
 
     $target = "<p>The &lt;strong&gt;text&lt;/strong&gt; text to filter.</p>\n";
     $this->assertSame($target, (string) $entity->field_test_text->processed, "$entity_type: Text is processed with the default filter.");
