@@ -102,19 +102,24 @@ class PhpDumperContainerStorage implements ContainerStorageInterface, Destructab
 
     $containerClass = 'DrupalContainer_' . $hash;
     $class_exists = class_exists($containerClass, FALSE);
-    $hash_changed = $hash !== $this->loadedContainerHash;
+
+    if ($hash === $this->loadedContainerHash) {
+      $container = new $containerClass();
+      return $container;
+    }
+
     // If the hash has already been used and marked for deletion, re-use the
     // container file and class. This can occur when a container is rebuilt
     // multiple times during module installation and a later rebuild produces
     // the same hash as an earlier one.
-    if ($hash_changed && isset($this->oldHashes[$hash]) && $class_exists) {
+    if (isset($this->oldHashes[$hash]) && $class_exists) {
       unset($this->oldHashes[$hash]);
       if ($this->loadedContainerHash) {
         $this->oldHashes[$this->loadedContainerHash] = TRUE;
       }
       $this->loadedContainerHash = $hash;
     }
-    elseif ($hash_changed) {
+    else {
       if ($this->loadedContainerHash) {
         $this->oldHashes[$this->loadedContainerHash] = TRUE;
       }
@@ -142,13 +147,11 @@ class PhpDumperContainerStorage implements ContainerStorageInterface, Destructab
 
     $container = new $containerClass();
 
-    if ($hash_changed) {
-      try {
-        $this->cache->set(static::CACHE_PREFIX . $suffix, $hash);
-      }
-      catch (\Exception) {
-        // The cache table may not exist yet (e.g., during install).
-      }
+    try {
+      $this->cache->set(static::CACHE_PREFIX . $suffix, $hash);
+    }
+    catch (\Exception) {
+      // The cache table may not exist yet (e.g., during install).
     }
 
     return $container;
