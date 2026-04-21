@@ -58,8 +58,7 @@ class NonStableModulesTest extends BrowserTestBase {
     $this->assertSession()->pageTextNotContains('Are you sure you wish to install ');
 
     // Uninstall the module.
-    \Drupal::service('module_installer')->uninstall(['test_page_test']);
-    $this->rebuildAll();
+    $this->uninstallModule('test_page_test');
 
     // Next, test installing an experimental module with no dependencies.
     // There should be a confirmation form with an experimental warning, but no
@@ -89,8 +88,7 @@ class NonStableModulesTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('Experimental Test has been installed.');
 
     // Uninstall the module.
-    \Drupal::service('module_installer')->uninstall(['experimental_module_test']);
-    $this->rebuildAll();
+    $this->uninstallModule('experimental_module_test');
 
     // Test enabling a module that is not itself experimental, but that depends
     // on an experimental module.
@@ -123,11 +121,8 @@ class NonStableModulesTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('2 modules have been installed: Experimental Dependency Test, Experimental Test');
 
     // Uninstall the modules.
-    \Drupal::service('module_installer')->uninstall([
-      'experimental_module_test',
-      'experimental_module_dependency_test',
-    ]);
-    $this->rebuildAll();
+    $this->uninstallModule('experimental_module_dependency_test');
+    $this->uninstallModule('experimental_module_test');
 
     // Finally, check both the module and its experimental dependency. There is
     // still a warning about experimental modules, but no message about
@@ -217,6 +212,22 @@ class NonStableModulesTest extends BrowserTestBase {
     // Enable the module and confirm that it worked.
     $this->submitForm([], 'Continue');
     $assert->pageTextContains('2 modules have been installed: Deprecated module, Experimental Test.');
+  }
+
+  /**
+   * Uninstalls a module via the UI.
+   *
+   * @param string $module
+   *   Module to uninstall.
+   */
+  protected function uninstallModule(string $module): void {
+    $edit = [
+      'uninstall[' . $module . ']' => 1,
+    ];
+    $this->drupalGet('admin/modules/uninstall');
+    $this->submitForm($edit, 'Uninstall');
+    $this->submitForm([], 'Uninstall');
+    $this->assertSession()->pageTextContains('The selected modules have been uninstalled.');
   }
 
 }

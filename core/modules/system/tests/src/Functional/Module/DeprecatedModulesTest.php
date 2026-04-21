@@ -81,8 +81,7 @@ class DeprecatedModulesTest extends BrowserTestBase {
     $assert->pageTextContains('Deprecated module has been installed.');
 
     // Uninstall the module.
-    \Drupal::service('module_installer')->uninstall(['deprecated_module']);
-    $this->rebuildAll();
+    $this->uninstallModule('deprecated_module');
 
     // Test enabling a module that is not itself deprecated, but that depends on
     // a deprecated module.
@@ -114,11 +113,8 @@ class DeprecatedModulesTest extends BrowserTestBase {
     $assert->pageTextContains('2 modules have been installed: Deprecated module dependency, Deprecated module');
 
     // Uninstall the modules.
-    \Drupal::service('module_installer')->uninstall([
-      'deprecated_module',
-      'deprecated_module_dependency',
-    ]);
-    $this->rebuildAll();
+    $this->uninstallModule('deprecated_module');
+    $this->uninstallModule('deprecated_module_dependency');
 
     // Check a deprecated module with a non-deprecated dependency.
     $edit = [];
@@ -154,11 +150,8 @@ class DeprecatedModulesTest extends BrowserTestBase {
     $assert->pageTextContains('2 modules have been installed: Deprecated module with non deprecated dependency, Drupal system listing compatible test.');
 
     // Uninstall the modules.
-    \Drupal::service('module_installer')->uninstall([
-      'deprecated_module_with_non_deprecated_dependency',
-      'drupal_system_listing_compatible_test',
-    ]);
-    $this->rebuildAll();
+    $this->uninstallModule('deprecated_module_with_non_deprecated_dependency');
+    $this->uninstallModule('drupal_system_listing_compatible_test');
 
     // Check both the module and its deprecated dependency. There is still a
     // warning about deprecated modules, but no message about dependencies,
@@ -191,11 +184,8 @@ class DeprecatedModulesTest extends BrowserTestBase {
     $this->submitForm([], 'Continue');
     $assert->pageTextContains('2 modules have been installed: Deprecated module, Deprecated module dependency');
 
-    \Drupal::service('module_installer')->uninstall([
-      'deprecated_module',
-      'deprecated_module_dependency',
-    ]);
-    $this->rebuildAll();
+    $this->uninstallModule('deprecated_module');
+    $this->uninstallModule('deprecated_module_dependency');
 
     // Now, test when installing a non-core deprecated module alone and then
     // with a core deprecated module. First, install 'deprecated_module_test'
@@ -221,6 +211,22 @@ class DeprecatedModulesTest extends BrowserTestBase {
       "modules[deprecated_module][enable]" => TRUE,
     ], 'Install');
     $assert->pageTextContains('Deprecated modules are modules that may be removed from the next major release of Drupal core and the relevant contributed module. Use at your own risk.');
+  }
+
+  /**
+   * Uninstalls a module via the UI.
+   *
+   * @param string $module
+   *   Module to uninstall.
+   */
+  protected function uninstallModule(string $module): void {
+    $edit = [
+      'uninstall[' . $module . ']' => 1,
+    ];
+    $this->drupalGet('admin/modules/uninstall');
+    $this->submitForm($edit, 'Uninstall');
+    $this->submitForm([], 'Uninstall');
+    $this->assertSession()->pageTextContains('The selected modules have been uninstalled.');
   }
 
 }
