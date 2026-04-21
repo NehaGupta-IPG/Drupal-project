@@ -567,13 +567,25 @@ class DrupalKernelTest extends KernelTestBase {
     // back again.
     $kernel = $this->getTestKernel($request);
     $this->assertSame($container_file_with_system, (new \ReflectionClass($kernel->getContainer()))->getFileName());
+    // Sleep 1 second so MTimeProtectedFileStorage advances its mtime-based
+    // directory name. Without this, the second dump of the same hash reuses the
+    // same directory and include_once is a no-op. With it, a new directory is
+    // created and include_once on the new path would trigger "Cannot redeclare
+    // class" if there is no class_exists() guard in dump().
+    sleep(1);
     $kernel->updateModules(['system' => 'system', 'user' => 'user']);
     $container = $kernel->getContainer();
+    // The class was defined at the original path in the first kernel's lifetime
+    // and is reused from memory — not re-included from the new mtime path.
     $this->assertSame($container_file_with_system_and_user, (new \ReflectionClass($container))->getFileName());
-    $this->assertFileExists($container_file_with_system_and_user);
+    // The original mtime-based file (path_B_1) was deleted by kernel 1's
+    // terminate(). The re-save went to a new mtime directory. Use glob on the
+    // class directory to confirm a file for this container exists on disk.
+    $this->assertNotEmpty(glob(dirname($container_file_with_system_and_user) . '/*.php'));
     $this->assertFileExists($container_file_with_system);
     $kernel->terminate($request, new Response());
-    $this->assertFileExists($container_file_with_system_and_user);
+    // The system+user container is the active one — it must not be deleted.
+    $this->assertNotEmpty(glob(dirname($container_file_with_system_and_user) . '/*.php'));
     $this->assertFileDoesNotExist($container_file_with_system);
   }
 

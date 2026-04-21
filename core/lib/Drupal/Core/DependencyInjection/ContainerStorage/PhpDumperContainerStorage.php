@@ -102,10 +102,10 @@ class PhpDumperContainerStorage implements ContainerStorageInterface, Destructab
 
     $containerClass = 'DrupalContainer_' . $hash;
 
-    // If the hash already by used and marked for deletion, re-use the container
-    // file and class. This can occur when a container is rebuilt multiple times
-    // during module installation and a later rebuild produces the same hash as
-    // an earlier one.
+    // If the hash has already been used and marked for deletion, re-use the
+    // container file and class. This can occur when a container is rebuilt
+    // multiple times during module installation and a later rebuild produces
+    // the same hash as an earlier one.
     if ($hash !== $this->loadedContainerHash && isset($this->oldHashes[$hash]) && class_exists($containerClass, FALSE)) {
       unset($this->oldHashes[$hash]);
       if ($this->loadedContainerHash) {
@@ -124,9 +124,16 @@ class PhpDumperContainerStorage implements ContainerStorageInterface, Destructab
         "class $containerClass extends \\$baseClass\n{",
         $code,
       );
-      // Always save the file so it exists on disk for future requests.
+      // Always save so the file exists on disk for future requests.
       $this->phpStorage->save($filename, $code);
-      $this->phpStorage->load($filename);
+      // Only include if the class is not already in memory. If it is, the
+      // class was defined in a prior kernel lifecycle (e.g. the kernel was
+      // booted, terminated, then booted again). MTimeProtectedFileStorage
+      // writes each save() to a new mtime-based directory, so include_once
+      // on that new path would trigger "Cannot redeclare class".
+      if (!class_exists($containerClass, FALSE)) {
+        $this->phpStorage->load($filename);
+      }
       $this->loadedContainerHash = $hash;
     }
 
@@ -156,8 +163,8 @@ class PhpDumperContainerStorage implements ContainerStorageInterface, Destructab
     // Delete any files corresponding to old hashes that have accumulated.
     foreach (array_keys($this->oldHashes) as $hash) {
       $this->phpStorage->delete('DrupalContainer_' . $hash . '.php');
-      unset($this->oldHashes[$hash]);
     }
+    $this->oldHashes = [];
   }
 
 }
