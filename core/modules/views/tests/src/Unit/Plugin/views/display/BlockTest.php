@@ -6,8 +6,14 @@ namespace Drupal\Tests\views\Unit\Plugin\views\display;
 
 use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\KeyValueStore\DatabaseStorage;
+use Drupal\Core\KeyValueStore\KeyValueDatabaseFactory;
+use Drupal\Core\Plugin\Context\ContextHandlerInterface;
+use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
 use Drupal\Tests\UnitTestCase;
+use Drupal\views\Plugin\Block\ViewsBlock;
 use Drupal\views\Plugin\views\display\Block;
+use Drupal\views\ViewExecutable;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -47,79 +53,43 @@ class BlockTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $methods = [
-      'id',
-      'executeDisplay',
-      'setDisplay',
-      'setItemsPerPage',
-      'getRequest',
-    ];
-    $this->executable = $this->getMockBuilder('Drupal\views\ViewExecutable')
+    $this->executable = $this->getMockBuilder(ViewExecutable::class)
       ->disableOriginalConstructor()
-      ->onlyMethods($methods)
+      ->onlyMethods(['id', 'setDisplay', 'setItemsPerPage', 'getRequest'])
       ->getMock();
-    $this->executable
-      ->method('setDisplay')
-      ->with('block_1')
-      ->willReturn(TRUE);
-    $this->executable->expects($this->any())
-      ->method('id')
-      ->willReturn('foo');
-    $this->executable->expects($this->any())
-      ->method('getRequest')
-      ->willReturn(new Request());
+    $this->executable->method('setDisplay')->with('block_1')->willReturn(TRUE);
+    $this->executable->method('id')->willReturn('foo');
+    $this->executable->method('getRequest')->willReturn(new Request());
 
-    $key_value = $this->getMockBuilder('Drupal\Core\KeyValueStore\DatabaseStorage')
-      ->disableOriginalConstructor()
-      ->onlyMethods(['has', 'set', 'getMultiple'])
-      ->getMock();
-    $key_value->expects($this->any())
-      ->method('has')
-      ->willReturn(TRUE);
-    $key_value->expects($this->any())
-      ->method('set')
-      ->willReturn(NULL);
-    $key_value->expects($this->any())
-      ->method('getMultiple')
-      ->willReturn(NULL);
+    $key_value = $this->createStub(DatabaseStorage::class);
+    $key_value->method('has')->willReturn(TRUE);
+    $key_value->method('set')->willReturn(NULL);
+    $key_value->method('getMultiple')->willReturn(NULL);
 
-    $key_value_factory = $this->getMockBuilder('Drupal\Core\KeyValueStore\KeyValueDatabaseFactory')
-      ->disableOriginalConstructor()
-      ->onlyMethods(['get'])
-      ->getMock();
-    $key_value_factory->expects($this->any())
-      ->method('get')
-      ->willReturn($key_value);
+    $key_value_factory = $this->createStub(KeyValueDatabaseFactory::class);
+    $key_value_factory->method('get')->willReturn($key_value);
+
     $args = [
       [],
       'views_block',
       [],
-      $this->getMockBuilder('Drupal\Core\Entity\EntityTypeManagerInterface')
-        ->disableOriginalConstructor()
-        ->getMock(),
-      $this->getMockBuilder('Drupal\Core\Block\BlockManagerInterface')
-        ->disableOriginalConstructor()
-        ->getMock(),
+      $this->createStub(EntityTypeManagerInterface::class),
+      $this->createStub(BlockManagerInterface::class),
       $key_value_factory,
-      $this->getMockBuilder('Drupal\Core\Plugin\Context\ContextRepositoryInterface')
-        ->disableOriginalConstructor()
-        ->getMock(),
-      $this->getMockBuilder('Drupal\Core\Plugin\Context\ContextHandlerInterface')
-        ->disableOriginalConstructor()
-        ->getMock(),
+      $this->createStub(ContextRepositoryInterface::class),
+      $this->createStub(ContextHandlerInterface::class),
     ];
-    $this->blockDisplay = $this->executable->display_handler = $this->getMockBuilder('Drupal\views\Plugin\views\display\Block')
+    $this->blockDisplay = $this->executable->display_handler = $this->getMockBuilder(Block::class)
       ->setConstructorArgs($args)
       ->onlyMethods(['calculateConfigurationHash'])
       ->getMock();
-    $this->blockDisplay->expects($this->any())
+    $this->blockDisplay->expects($this->once())
       ->method('calculateConfigurationHash')
       ->willReturn('foobar');
+
     $this->blockDisplay->view = $this->executable;
 
-    $this->blockPlugin = $this->getMockBuilder('Drupal\views\Plugin\Block\ViewsBlock')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $this->blockPlugin = $this->createMock(ViewsBlock::class);
   }
 
   /**
