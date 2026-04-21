@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Extension;
 
 use Composer\Autoload\ClassLoader;
-use Drupal\Core\Extension\Extension;
+use Drupal\Core\Extension\Theme;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Extension\ThemeHandler;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Tests Drupal\Core\Extension\ThemeHandler.
@@ -28,10 +29,8 @@ class ThemeHandlerTest extends UnitTestCase {
 
   /**
    * The theme listing service.
-   *
-   * @var \Drupal\Core\Extension\ThemeExtensionList|\PHPUnit\Framework\MockObject\Stub
    */
-  protected $themeList;
+  protected ThemeExtensionList&Stub $themeList;
 
   /**
    * The tested theme handler.
@@ -70,7 +69,7 @@ class ThemeHandlerTest extends UnitTestCase {
    * Tests empty libraries in theme.info.yml file.
    */
   public function testThemeLibrariesEmpty(): void {
-    $theme = new Extension($this->root, 'theme', 'core/modules/system/tests/themes/test_theme_libraries_empty', 'test_theme_libraries_empty.info.yml');
+    $theme = new Theme($this->root, 'core/modules/system/tests/themes/test_theme_libraries_empty', [], 'test_theme_libraries_empty.info.yml');
     try {
       $this->themeHandler->addTheme($theme);
       $this->assertTrue(TRUE, 'Empty libraries key in theme.info.yml does not cause PHP warning');
