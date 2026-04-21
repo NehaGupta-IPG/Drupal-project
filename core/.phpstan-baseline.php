@@ -10808,12 +10808,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/block/src/BlockListBuilder.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\block\\\\BlockListBuilder\\:\\:systemRegionList\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block/src/BlockListBuilder.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\block\\\\BlockListBuilder\\:\\:validateForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -10860,12 +10854,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/block/src/EventSubscriber/BlockPageDisplayVariantSubscriber.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\block\\\\Form\\\\BlockDeleteForm\\:\\:systemRegionList\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block/src/Form/BlockDeleteForm.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#2 \\$callback of function uasort expects callable\\(Drupal\\\\Core\\\\Entity\\\\EntityInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface\\)\\: int, Closure\\(Drupal\\\\block\\\\BlockInterface, Drupal\\\\block\\\\BlockInterface\\)\\: int\\<\\-1, 1\\> given\\.$#',
@@ -10944,12 +10932,6 @@ $ignoreErrors[] = [
 	'identifier' => 'variable.undefined',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/block/tests/src/Functional/BlockUiTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block\\\\Functional\\\\BlockWeightUpdateTest\\:\\:testRunUpdates\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block/tests/src/Functional/BlockWeightUpdateTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\block\\\\Functional\\\\Views\\\\DisplayBlockTest\\:\\:assertBlockAppears\\(\\) has no return type specified\\.$#',
@@ -22488,12 +22470,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/search/tests/modules/search_extra_type/src/Plugin/Search/SearchExtraTypeSearch.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\search\\\\Functional\\\\Update\\\\SearchBlockPageIdUpdatePathTest\\:\\:testRunUpdates\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/search/tests/src/Functional/Update/SearchBlockPageIdUpdatePathTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\search\\\\Kernel\\\\SearchMatchTest\\:\\:getText\\(\\) has no return type specified\\.$#',
