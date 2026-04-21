@@ -124,13 +124,12 @@ class State extends CacheCollector implements StateInterface {
     // written to cache yet, then it may already have read the previous value
     // from the database and could write it to the cache at the end of the
     // request. To avoid this race condition, attempt to acquire a lock and
-    // write to the cache immediately after calling parent::set(). This allows
-    // the race condition detection in CacheCollector::updateCache() to work.
-    // We write to the cache whether or not we acquire the lock, because
-    // CacheCollector::updateCache() handles the case where there was no cache
-    // item at the beginning of the request, but one was written by another
-    // request before ::updateCache() is called - the new cache item functions
-    // as a tombstone record in this case.
+    // write to the cache immediately. This allows the race condition detection
+    // in CacheCollector::updateCache() to work. We write to the cache whether
+    // or not we acquire the lock, because CacheCollector::updateCache() handles
+    // the case where there was no cache item at the beginning of the request,
+    // but one was written by another request before ::updateCache() is called
+    // - the new cache item functions as a tombstone record in this case.
     foreach ($data as $key => $value) {
       $this->storage[$key] = $value;
       // The key might have been marked for deletion.
