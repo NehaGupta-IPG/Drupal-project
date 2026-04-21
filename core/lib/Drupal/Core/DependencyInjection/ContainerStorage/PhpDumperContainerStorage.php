@@ -114,15 +114,8 @@ class PhpDumperContainerStorage implements ContainerStorageInterface, Destructab
     // the same hash as an earlier one.
     if (isset($this->oldHashes[$hash]) && $class_exists) {
       unset($this->oldHashes[$hash]);
-      if ($this->loadedContainerHash) {
-        $this->oldHashes[$this->loadedContainerHash] = TRUE;
-      }
-      $this->loadedContainerHash = $hash;
     }
     else {
-      if ($this->loadedContainerHash) {
-        $this->oldHashes[$this->loadedContainerHash] = TRUE;
-      }
       $filename = $containerClass . '.php';
 
       $code = str_replace(
@@ -142,8 +135,14 @@ class PhpDumperContainerStorage implements ContainerStorageInterface, Destructab
       if (!$class_exists) {
         $this->phpStorage->load($filename);
       }
-      $this->loadedContainerHash = $hash;
     }
+
+    // Store the old hash so we can delete the corresponding file in
+    // ::terminate().
+    if ($this->loadedContainerHash) {
+      $this->oldHashes[$this->loadedContainerHash] = TRUE;
+    }
+    $this->loadedContainerHash = $hash;
 
     try {
       $this->cache->set(static::CACHE_PREFIX . $suffix, $hash);
