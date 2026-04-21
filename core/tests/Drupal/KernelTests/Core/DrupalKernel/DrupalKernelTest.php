@@ -552,40 +552,64 @@ class DrupalKernelTest extends KernelTestBase {
     $this->assertFileExists($container_file_with_system_and_user);
     $this->assertFileExists($container_file_with_system);
 
-    $kernel->updateModules(['system' => 'system']);
-    $container = $kernel->getContainer();
-    $this->assertSame($container_file_with_system, (new \ReflectionClass($container))->getFileName());
-    $this->assertFileExists($container_file_with_system_and_user);
+    // Test that dump() skips both save() and load() when the class and file
+    // both already exist. A new kernel instance boots and loads the
+    // system+user container (hash B) from cache. Switching back to
+    // system-only triggers dump(hash A): class A is already in memory and
+    // the file is on disk, so neither save() nor load() is called.
+    $kernel_no_save = $this->getTestKernel($request);
+    $kernel_no_save->updateModules(['system' => 'system']);
+    $container_no_save = $kernel_no_save->getContainer();
+    // Same file path as the original system container (no re-save occurred).
+    $this->assertSame($container_file_with_system, (new \ReflectionClass($container_no_save))->getFileName());
     $this->assertFileExists($container_file_with_system);
-
-    $kernel->terminate($request, new Response());
-    // The unused container will be removed on termination.
+    // terminate() deletes the system+user file (it was in this kernel's
+    // oldHashes) but leaves the system-only file intact.
+    $kernel_no_save->terminate($request, new Response());
     $this->assertFileDoesNotExist($container_file_with_system_and_user);
     $this->assertFileExists($container_file_with_system);
 
-    // Ensure that a container is regenerated and saved properly is we switch
-    // back again.
+    $kernel->updateModules(['system' => 'system']);
+    $container = $kernel->getContainer();
+    $this->assertSame($container_file_with_system, (new \ReflectionClass($container))->getFileName());
+    // The system+user file was already removed by $kernel_no_save->terminate().
+    $this->assertFileDoesNotExist($container_file_with_system_and_user);
+    $this->assertFileExists($container_file_with_system);
+
+    $kernel->terminate($request, new Response());
+    // System+user was already deleted; system-only file is kept as it is the
+    // active container.
+    $this->assertFileDoesNotExist($container_file_with_system_and_user);
+    $this->assertFileExists($container_file_with_system);
+
+    // Ensure that a container is regenerated and saved properly if we switch
+    // back again. Sleep 1 second so MTimeProtectedFileStorage advances its
+    // mtime-based directory name. Without this, re-saving the same container
+    // hash would reuse the same directory and include_once would be a no-op.
+    // With it, a new directory is created and include_once on the new path
+    // would trigger "Cannot redeclare class" if dump() lacked a class_exists()
+    // guard — reproducing the CI environment where kernels span different mtime
+    // windows.
     $kernel = $this->getTestKernel($request);
     $this->assertSame($container_file_with_system, (new \ReflectionClass($kernel->getContainer()))->getFileName());
-    // Sleep 1 second so MTimeProtectedFileStorage advances its mtime-based
-    // directory name. Without this, the second dump of the same hash reuses the
-    // same directory and include_once is a no-op. With it, a new directory is
-    // created and include_once on the new path would trigger "Cannot redeclare
-    // class" if there is no class_exists() guard in dump().
     sleep(1);
     $kernel->updateModules(['system' => 'system', 'user' => 'user']);
     $container = $kernel->getContainer();
-    // The class was defined at the original path in the first kernel's lifetime
-    // and is reused from memory — not re-included from the new mtime path.
+    // The class was defined at its original path and is reused from memory —
+    // load() is skipped to avoid "Cannot redeclare class" on the new mtime
+    // path. The class file path reported by reflection is therefore the
+    // original one, not the newly saved mtime path.
     $this->assertSame($container_file_with_system_and_user, (new \ReflectionClass($container))->getFileName());
-    // The original mtime-based file (path_B_1) was deleted by kernel 1's
-    // terminate(). The re-save went to a new mtime directory. Use glob on the
-    // class directory to confirm a file for this container exists on disk.
-    $this->assertNotEmpty(glob(dirname($container_file_with_system_and_user) . '/*.php'));
+    // The system+user file was previously deleted by $kernel_no_save->terminate().
+    // dump() re-saved it to a new mtime-based path. Use glob on the container
+    // class directory (stable across mtime changes) to confirm a file exists.
+    $this->assertCount(1, glob(dirname($container_file_with_system_and_user) . '/*.php'));
+    $this->assertFileDoesNotExist($container_file_with_system_and_user);
     $this->assertFileExists($container_file_with_system);
+
     $kernel->terminate($request, new Response());
-    // The system+user container is the active one — it must not be deleted.
-    $this->assertNotEmpty(glob(dirname($container_file_with_system_and_user) . '/*.php'));
+    // The system+user container is the active one and must not be deleted.
+    $this->assertCount(1, glob(dirname($container_file_with_system_and_user) . '/*.php'));
     $this->assertFileDoesNotExist($container_file_with_system);
   }
 
