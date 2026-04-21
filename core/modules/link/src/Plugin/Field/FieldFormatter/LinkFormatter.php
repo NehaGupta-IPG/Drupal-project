@@ -118,12 +118,7 @@ class LinkFormatter extends FormatterBase {
     $elements['noreferrer'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Add rel="noreferrer" to links'),
-      '#description' => $this->t('Recommended when "Open link in new window" is checked.'),
-      '#states' => [
-        'visible' => [
-          ':input[name*="target"]' => ['checked' => TRUE],
-        ],
-      ],
+      '#description' => $this->t('Recommended on untrusted links.'),
       '#return_value' => 'noreferrer',
       '#default_value' => $this->getSetting('noreferrer'),
     ];
