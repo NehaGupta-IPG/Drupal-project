@@ -3,10 +3,10 @@
 namespace Drupal\contact\Entity;
 
 use Drupal\contact\ContactMessageAccessControlHandler;
+use Drupal\contact\ContactMessageStorage;
 use Drupal\contact\MessageForm;
 use Drupal\contact\MessageViewBuilder;
 use Drupal\Core\Entity\Attribute\ContentEntityType;
-use Drupal\Core\Entity\ContentEntityNullStorage;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\contact\MessageInterface;
@@ -29,7 +29,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
   ],
   handlers: [
     'access' => ContactMessageAccessControlHandler::class,
-    'storage' => ContentEntityNullStorage::class,
+    'storage' => ContactMessageStorage::class,
     'view_builder' => MessageViewBuilder::class,
     'form' => ['default' => MessageForm::class],
   ],

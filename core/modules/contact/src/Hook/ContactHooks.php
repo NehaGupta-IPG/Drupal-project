@@ -2,6 +2,7 @@
 
 namespace Drupal\contact\Hook;
 
+use Drupal\contact\MessageInterface;
 use Drupal\contact\Plugin\rest\resource\ContactMessageResource;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\user\Entity\User;
@@ -134,10 +135,7 @@ class ContactHooks {
       '@site-name' => \Drupal::config('system.site')->get('name'),
       '@subject' => $contact_message->getSubject(),
       '@form' => !empty($params['contact_form']) ? $params['contact_form']->label() : '',
-      '@form-url' => Url::fromRoute('<current>', [], [
-        'absolute' => TRUE,
-        'language' => $language,
-      ])->toString(),
+      '@form-url' => $this->getContactFormUrl($contact_message, $language),
       '@sender-name' => $sender->getDisplayName(),
     ];
     if ($sender->isAuthenticated()) {
@@ -192,6 +190,34 @@ class ContactHooks {
   #[Hook('rest_resource_alter')]
   public function restResourceAlter(&$definitions): void {
     $definitions['entity:contact_message']['class'] = ContactMessageResource::class;
+  }
+
+  /**
+   * Returns the canonical URL for a contact form.
+   *
+   * @param \Drupal\contact\MessageInterface $message
+   *   The contact message entity.
+   * @param \Drupal\Core\Language\LanguageInterface $language
+   *   The language for the URL.
+   *
+   * @return string
+   *   The absolute URL of the contact form.
+   */
+  private function getContactFormUrl(MessageInterface $message, $language): string {
+    if (!$message->isPersonal()) {
+      $contact_form = $message->getContactForm();
+      if ($contact_form) {
+        return Url::fromRoute('entity.contact_form.canonical', ['contact_form' => $contact_form->id()], [
+          'absolute' => TRUE,
+          'language' => $language,
+        ])->toString();
+      }
+    }
+
+    return Url::fromRoute('<current>', [], [
+      'absolute' => TRUE,
+      'language' => $language,
+    ])->toString();
   }
 
 }

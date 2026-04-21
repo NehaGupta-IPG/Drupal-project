@@ -14,3 +14,10 @@ function contact_removed_post_updates(): array {
     'contact_post_update_set_empty_default_form_to_null' => '11.0.0',
   ];
 }
+
+/**
+ * Clear entity type cache to register ContactMessageStorage handler.
+ */
+function contact_post_update_switch_to_contact_message_storage(): void {
+  // Empty update to trigger cache flush.
+}
