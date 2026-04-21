@@ -60,8 +60,7 @@ class NonStableModulesTest extends BrowserTestBase {
     $this->assertSession()->pageTextNotContains('Are you sure you wish to install ');
 
     // Uninstall the module.
-    \Drupal::service('module_installer')->uninstall(['test_page_test']);
-    $this->rebuildAll();
+    $this->uninstallModule('test_page_test');
 
     // Next, test installing an experimental module with no dependencies.
     // There should be a confirmation form with an experimental warning, but no
@@ -91,8 +90,7 @@ class NonStableModulesTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('Experimental Test has been installed.');
 
     // Uninstall the module.
-    \Drupal::service('module_installer')->uninstall(['experimental_module_test']);
-    $this->rebuildAll();
+    $this->uninstallModule('experimental_module_test');
 
     // Test enabling a module that is not itself experimental, but that depends
     // on an experimental module.
@@ -125,11 +123,8 @@ class NonStableModulesTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('2 modules have been installed: Experimental Dependency Test, Experimental Test');
 
     // Uninstall the modules.
-    \Drupal::service('module_installer')->uninstall([
-      'experimental_module_test',
-      'experimental_module_dependency_test',
-    ]);
-    $this->rebuildAll();
+    $this->uninstallModule('experimental_module_dependency_test');
+    $this->uninstallModule('experimental_module_test');
 
     // Finally, check both the module and its experimental dependency. There is
     // still a warning about experimental modules, but no message about
@@ -216,8 +211,7 @@ class NonStableModulesTest extends BrowserTestBase {
     $assert->pageTextContains('Deprecated module has been installed.');
 
     // Uninstall the module.
-    \Drupal::service('module_installer')->uninstall(['deprecated_module']);
-    $this->rebuildAll();
+    $this->uninstallModule('deprecated_module');
 
     // Test enabling a module that is not itself deprecated, but that depends on
     // a deprecated module.
@@ -249,10 +243,8 @@ class NonStableModulesTest extends BrowserTestBase {
     $assert->pageTextContains('2 modules have been installed: Deprecated module dependency, Deprecated module');
 
     // Uninstall the modules.
-    \Drupal::service('module_installer')->uninstall([
-      'deprecated_module',
-      'deprecated_module_dependency',
-    ]);
+    $this->uninstallModule('deprecated_module_dependency');
+    $this->uninstallModule('deprecated_module');
 
     // Check a deprecated module with a non-deprecated dependency.
     $edit = [];
@@ -288,11 +280,8 @@ class NonStableModulesTest extends BrowserTestBase {
     $assert->pageTextContains('2 modules have been installed: Deprecated module with non deprecated dependency, Drupal system listing compatible test.');
 
     // Uninstall the modules.
-    \Drupal::service('module_installer')->uninstall([
-      'deprecated_module_with_non_deprecated_dependency',
-      'drupal_system_listing_compatible_test',
-    ]);
-    $this->rebuildAll();
+    $this->uninstallModule('deprecated_module_with_non_deprecated_dependency');
+    $this->uninstallModule('drupal_system_listing_compatible_test');
 
     // Check both the module and its deprecated dependency. There is still a
     // warning about deprecated modules, but no message about dependencies,
@@ -325,11 +314,8 @@ class NonStableModulesTest extends BrowserTestBase {
     $this->submitForm([], 'Continue');
     $assert->pageTextContains('2 modules have been installed: Deprecated module, Deprecated module dependency');
 
-    \Drupal::service('module_installer')->uninstall([
-      'deprecated_module',
-      'deprecated_module_dependency',
-    ]);
-    $this->rebuildAll();
+    $this->uninstallModule('deprecated_module_dependency');
+    $this->uninstallModule('deprecated_module');
 
     // Now, test when installing a non-core deprecated module alone and then
     // with a core deprecated module. First, install 'deprecated_module_test'
@@ -399,6 +385,22 @@ class NonStableModulesTest extends BrowserTestBase {
     // Enable the module and confirm that it worked.
     $this->submitForm([], 'Continue');
     $assert->pageTextContains('2 modules have been installed: Deprecated module, Experimental Test.');
+  }
+
+  /**
+   * Uninstalls a module via the UI.
+   *
+   * @param string $module
+   *   Module to uninstall.
+   */
+  protected function uninstallModule(string $module): void {
+    $edit = [
+      'uninstall[' . $module . ']' => 1,
+    ];
+    $this->drupalGet('admin/modules/uninstall');
+    $this->submitForm($edit, 'Uninstall');
+    $this->submitForm([], 'Uninstall');
+    $this->assertSession()->pageTextContains('The selected modules have been uninstalled.');
   }
 
 }
