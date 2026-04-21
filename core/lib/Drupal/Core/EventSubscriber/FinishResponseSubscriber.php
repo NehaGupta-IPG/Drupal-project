@@ -230,7 +230,7 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
    * @param int $max_age
    *   The value for the max-age Cache-Control header.
    */
-  protected function setResponseCacheable(Response $response, Request $request, $max_age) {
+  protected function setResponseCacheable(Response $response, Request $request, int $max_age) {
     // HTTP/1.0 proxies do not support the Vary header, so prevent any caching
     // by sending an Expires date in the past. HTTP/1.1 clients ignore the
     // Expires header if a Cache-Control: max-age directive is specified (see
