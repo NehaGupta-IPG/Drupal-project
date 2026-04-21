@@ -274,7 +274,7 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
     foreach ($this->keysToRemove as $delete_key) {
       unset($data[$delete_key]);
     }
-    if ($write_cache && $lock_acquired) {
+    if ($write_cache && (!$lock || $lock_acquired)) {
       $this->cache->set($cid, $data, Cache::PERMANENT, $this->tags);
     }
     if ($lock_acquired) {
