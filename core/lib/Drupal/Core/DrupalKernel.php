@@ -79,7 +79,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @var array
    */
   protected $defaultBootstrapContainerDefinition = [
-    'parameters' => [],
+    'parameters' => [
+      'kernel.destructable_services' => [
+        'container_storage.php_dumper',
+      ],
+    ],
     'services' => [
       'database' => [
         'class' => 'Drupal\Core\Database\Connection',
@@ -550,6 +554,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     $definition = Settings::get('bootstrap_container_definition', []);
     $definition['services'] = array_merge($this->defaultBootstrapContainerDefinition['services'], $definition['services'] ?? []);
+    $definition['parameters'] = array_merge($this->defaultBootstrapContainerDefinition['parameters'], $definition['parameters'] ?? []);
+
     // Add the container storage class to the definition if it does not match
     // the default.
     // @phpstan-ignore property.deprecated
@@ -771,7 +777,12 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
           $service->destruct();
         }
       }
-
+      foreach ($this->bootstrapContainer->getParameter('kernel.destructable_services') as $id) {
+        if ($this->bootstrapContainer->initialized($id)) {
+          $service = $this->bootstrapContainer->get($id);
+          $service->destruct();
+        }
+      }
       // Pop the request added in \Drupal\Core\DrupalKernel::preHandle() from
       // request stack at the end of the execution cycle.
       if ($this->prepared === TRUE) {

@@ -26,6 +26,7 @@ use PHPUnit\Framework\Attributes\TestWith;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 // cspell:ignore äöüßαβγδεζηθικλμνξοσὠ
 /**
@@ -506,7 +507,8 @@ class DrupalKernelTest extends KernelTestBase {
    * Tests that a container is dumped when the container is invalidated.
    */
   public function testInvalidationDoesNotCauseFurtherContainerBuildsToNotDump(): void {
-    $kernel = $this->getTestKernel(Request::createFromGlobals(), ['system' => 'system']);
+    $request = Request::createFromGlobals();
+    $kernel = $this->getTestKernel($request, ['system' => 'system']);
     $container = $kernel->getContainer();
     $container_file = (new \ReflectionClass($container))->getFileName();
     $kernel->invalidateContainer();
@@ -529,8 +531,50 @@ class DrupalKernelTest extends KernelTestBase {
     $new_container_file = (new \ReflectionClass($kernel->getContainer()))->getFileName();
     $this->assertNotSame($container_file, $new_container_file);
     $this->assertFileExists($new_container_file);
+
+    $kernel->terminate($request, new Response());
     // The old container file should be deleted.
     $this->assertFileDoesNotExist($container_file);
+  }
+
+  /**
+   * Tests that a container is reused when the container hash is matched.
+   */
+  public function testContainerReuse(): void {
+    $request = Request::createFromGlobals();
+    $kernel = $this->getTestKernel($request, ['system' => 'system']);
+    $container = $kernel->getContainer();
+    $container_file_with_system = (new \ReflectionClass($container))->getFileName();
+    $this->assertFileExists($container_file_with_system);
+    $kernel->updateModules(['system' => 'system', 'user' => 'user']);
+    $container = $kernel->getContainer();
+    $container_file_with_system_and_user = (new \ReflectionClass($container))->getFileName();
+    $this->assertFileExists($container_file_with_system_and_user);
+    $this->assertFileExists($container_file_with_system);
+
+    $kernel->updateModules(['system' => 'system']);
+    $container = $kernel->getContainer();
+    $this->assertSame($container_file_with_system, (new \ReflectionClass($container))->getFileName());
+    $this->assertFileExists($container_file_with_system_and_user);
+    $this->assertFileExists($container_file_with_system);
+
+    $kernel->terminate($request, new Response());
+    // The unused container will be removed on termination.
+    $this->assertFileDoesNotExist($container_file_with_system_and_user);
+    $this->assertFileExists($container_file_with_system);
+
+    // Ensure that a container is regenerated and saved properly is we switch
+    // back again.
+    $kernel = $this->getTestKernel($request);
+    $this->assertSame($container_file_with_system, (new \ReflectionClass($kernel->getContainer()))->getFileName());
+    $kernel->updateModules(['system' => 'system', 'user' => 'user']);
+    $container = $kernel->getContainer();
+    $this->assertSame($container_file_with_system_and_user, (new \ReflectionClass($container))->getFileName());
+    $this->assertFileExists($container_file_with_system_and_user);
+    $this->assertFileExists($container_file_with_system);
+    $kernel->terminate($request, new Response());
+    $this->assertFileExists($container_file_with_system_and_user);
+    $this->assertFileDoesNotExist($container_file_with_system);
   }
 
   /**
