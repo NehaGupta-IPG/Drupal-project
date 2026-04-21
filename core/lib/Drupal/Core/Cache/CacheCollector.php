@@ -242,8 +242,8 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
       $lock_acquired = $this->lock->acquire($lock_name);
     }
     // Set and delete operations invalidate the cache item. Try to also load
-    // an eventually invalidated cache entry, only update an invalidated cache
-    // entry if the creation date did not change as this could result in an
+    // an eventually invalidated cache entry. Only update an invalidated cache
+    // entry if the creation date did not change, as this could result in an
     // inconsistent cache.
     if ($cache = $this->cache->get($cid, $this->cacheInvalidated)) {
       // If a cache item exists, but either there wasn't a cache item at the
