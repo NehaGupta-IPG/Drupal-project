@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests\DefaultContent;
 
 use Drupal\Core\DefaultContent\Existing;
-use Drupal\Core\DefaultContent\Finder;
+use Drupal\Core\DefaultContent\DataProvider\Finder;
 use Drupal\Core\DefaultContent\Importer;
 use Drupal\Core\DefaultContent\ImportException;
 use Drupal\Core\File\FileExists;

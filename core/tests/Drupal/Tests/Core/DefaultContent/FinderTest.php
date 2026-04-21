@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\DefaultContent;
 
-use Drupal\Core\DefaultContent\Finder;
+use Drupal\Core\DefaultContent\DataProvider\Finder;
 use Drupal\Core\DefaultContent\ImportException;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;

@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\DefaultContent;
 
-use Drupal\Core\DefaultContent\Finder;
+use Drupal\Core\DefaultContent\DataProvider\Finder;
+use Drupal\Core\DefaultContent\DataProvider\Simple;
 use Drupal\Core\DefaultContent\Importer;
 use Drupal\Core\DefaultContent\PreEntityImportEvent;
 use Drupal\Core\Entity\ContentEntityInterface;
@@ -95,23 +96,21 @@ class ImporterTest extends KernelTestBase implements EventSubscriberInterface {
     $this->setUpCurrentUser(admin: TRUE);
 
     $uuid = 'aaaabbbb-cccc-dddd-eeee-ffffaaaabbbb';
-    $finder = new Finder('/unused', [
-      $uuid => [
-        '_meta' => [
-          'version' => '1.0',
-          'entity_type' => 'entity_test',
-          'uuid' => $uuid,
-          'bundle' => 'entity_test',
-          'default_langcode' => 'en',
-          'path' => '/virtual/path/entity_test/' . $uuid . '.yml',
-        ],
-        'default' => [
-          'name' => [['value' => 'Single Entity Import']],
-          'langcode' => [['value' => 'en']],
-        ],
+    $provider = new Simple([
+      '_meta' => [
+        'version' => '1.0',
+        'entity_type' => 'entity_test',
+        'uuid' => $uuid,
+        'bundle' => 'entity_test',
+        'default_langcode' => 'en',
+        'path' => '/virtual/path/entity_test/' . $uuid . '.yml',
+      ],
+      'default' => [
+        'name' => [['value' => 'Single Entity Import']],
+        'langcode' => [['value' => 'en']],
       ],
     ]);
-    $this->container->get(Importer::class)->importContent($finder);
+    $this->container->get(Importer::class)->importContent($provider);
 
     $entity = $this->container->get(EntityRepositoryInterface::class)
       ->loadEntityByUuid('entity_test', $uuid);
