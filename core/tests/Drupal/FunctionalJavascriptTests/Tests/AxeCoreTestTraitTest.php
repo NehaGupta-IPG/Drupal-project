@@ -178,12 +178,12 @@ TEXT
     // `BASE_URL` is replaced in the test because the global `$base_url` isn't
     // available here.
     yield '`color-contrast` rule disabled via `rules` option' => [
-      [
+      'axe_options' => [
         'rules' => [
           'color-contrast' => ['enabled' => FALSE],
         ],
       ],
-      <<<TEXT
+      'expected_message' => <<<TEXT
 Accessibility test failures (1 total)
 
 1. [critical] Form elements must have labels
@@ -195,10 +195,10 @@ TEXT
     ];
 
     yield '`label` rule disabled via `runOnly` option' => [
-      [
+      'axe_options' => [
         'runOnly' => ['color-contrast'],
       ],
-      <<<TEXT
+      'expected_message' => <<<TEXT
 Accessibility test failures (1 total)
 
 1. [serious] Elements must meet minimum color contrast ratio thresholds
@@ -210,13 +210,13 @@ TEXT
     ];
 
     yield 'tag set that limits results via `runOnly` option' => [
-      [
+      'axe_options' => [
         'runOnly' => [
           'type' => 'tag',
           'values' => ['wcag2a'],
         ],
       ],
-      <<<TEXT
+      'expected_message' => <<<TEXT
 Accessibility test failures (1 total)
 
 1. [critical] Form elements must have labels
