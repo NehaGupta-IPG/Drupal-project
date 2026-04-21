@@ -179,10 +179,12 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
   }
 
   /**
-   * Tests that dump() with same hash skips file rewrite.
+   * Tests that dump() with same hash skips file and cache rewrites.
    */
-  public function testDumpSameHashSkipsRewrite(): void {
-    $cache = $this->createStub(CacheBackendInterface::class);
+  public function testDumpSameHashSkipsRewrites(): void {
+    $cache = $this->createMock(CacheBackendInterface::class);
+    $cache->expects($this->once())->method('set');
+
     $savedFiles = [];
     $phpStorage = $this->createPhpStorage($savedFiles);
 
