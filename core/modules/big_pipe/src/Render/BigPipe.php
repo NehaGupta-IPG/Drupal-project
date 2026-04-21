@@ -480,13 +480,8 @@ class BigPipe {
 
     // A BigPipe response consists of an HTML response plus multiple embedded
     // AJAX responses. To process the attachments of those AJAX responses, we
-    // need a fake request that is identical to the main request, but with
-    // one change: it must have the right Accept header, otherwise the work-
-    // around for a bug in IE9 will cause not JSON, but <textarea>-wrapped JSON
-    // to be returned.
-    // @see \Drupal\Core\EventSubscriber\AjaxResponseSubscriber::onResponse()
+    // clone a fake request that is identical to the main request.
     $fake_request = $this->requestStack->getMainRequest()->duplicate();
-    $fake_request->headers->set('Accept', 'application/vnd.drupal-ajax');
 
     // Create a Fiber for each placeholder.
     $fibers = [];

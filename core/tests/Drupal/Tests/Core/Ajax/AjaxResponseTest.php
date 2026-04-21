@@ -6,15 +6,9 @@ namespace Drupal\Tests\Core\Ajax;
 
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\CommandInterface;
-use Drupal\Core\EventSubscriber\AjaxResponseSubscriber;
-use Drupal\Core\Render\AttachmentsResponseProcessorInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\Stub;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\ResponseEvent;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * Tests Drupal\Core\Ajax\AjaxResponse.
@@ -78,30 +72,6 @@ class AjaxResponseTest extends UnitTestCase {
     $this->assertSame(['command' => 'one'], $commands[1]);
     $this->assertFalse(isset($commands[2]));
     $this->assertSame(['command' => 'three', 'class' => 'test-class'], $commands[0]);
-  }
-
-  /**
-   * Tests the support for IE specific headers in file uploads.
-   *
-   * @cover ::prepareResponse
-   */
-  public function testPrepareResponseForIeFormRequestsWithFileUpload(): void {
-    $request = Request::create('/example', 'POST');
-    $request->headers->set('Accept', 'text/html');
-    $response = new AjaxResponse([]);
-    $response->headers->set('Content-Type', 'application/json; charset=utf-8');
-
-    $ajax_response_attachments_processor = $this->createStub(AttachmentsResponseProcessorInterface::class);
-    $subscriber = new AjaxResponseSubscriber(fn(): AttachmentsResponseProcessorInterface&Stub => $ajax_response_attachments_processor);
-    $event = new ResponseEvent(
-      $this->createStub(HttpKernelInterface::class),
-      $request,
-      HttpKernelInterface::MAIN_REQUEST,
-      $response
-    );
-    $subscriber->onResponse($event);
-    $this->assertEquals('text/html; charset=utf-8', $response->headers->get('Content-Type'));
-    $this->assertEquals('<textarea>[]</textarea>', $response->getContent());
   }
 
   /**
