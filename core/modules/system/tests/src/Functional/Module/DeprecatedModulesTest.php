@@ -82,6 +82,7 @@ class DeprecatedModulesTest extends BrowserTestBase {
 
     // Uninstall the module.
     \Drupal::service('module_installer')->uninstall(['deprecated_module']);
+    $this->rebuildAll();
 
     // Test enabling a module that is not itself deprecated, but that depends on
     // a deprecated module.
@@ -117,6 +118,7 @@ class DeprecatedModulesTest extends BrowserTestBase {
       'deprecated_module',
       'deprecated_module_dependency',
     ]);
+    $this->rebuildAll();
 
     // Check a deprecated module with a non-deprecated dependency.
     $edit = [];
@@ -156,6 +158,7 @@ class DeprecatedModulesTest extends BrowserTestBase {
       'deprecated_module_with_non_deprecated_dependency',
       'drupal_system_listing_compatible_test',
     ]);
+    $this->rebuildAll();
 
     // Check both the module and its deprecated dependency. There is still a
     // warning about deprecated modules, but no message about dependencies,
@@ -192,6 +195,7 @@ class DeprecatedModulesTest extends BrowserTestBase {
       'deprecated_module',
       'deprecated_module_dependency',
     ]);
+    $this->rebuildAll();
 
     // Now, test when installing a non-core deprecated module alone and then
     // with a core deprecated module. First, install 'deprecated_module_test'

@@ -59,6 +59,7 @@ class NonStableModulesTest extends BrowserTestBase {
 
     // Uninstall the module.
     \Drupal::service('module_installer')->uninstall(['test_page_test']);
+    $this->rebuildAll();
 
     // Next, test installing an experimental module with no dependencies.
     // There should be a confirmation form with an experimental warning, but no
@@ -89,6 +90,7 @@ class NonStableModulesTest extends BrowserTestBase {
 
     // Uninstall the module.
     \Drupal::service('module_installer')->uninstall(['experimental_module_test']);
+    $this->rebuildAll();
 
     // Test enabling a module that is not itself experimental, but that depends
     // on an experimental module.
@@ -125,6 +127,7 @@ class NonStableModulesTest extends BrowserTestBase {
       'experimental_module_test',
       'experimental_module_dependency_test',
     ]);
+    $this->rebuildAll();
 
     // Finally, check both the module and its experimental dependency. There is
     // still a warning about experimental modules, but no message about
