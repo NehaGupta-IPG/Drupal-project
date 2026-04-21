@@ -10,7 +10,13 @@ namespace Drupal\Core\DependencyInjection\Dumper;
  * which is not a Drupal runtime dependency. This stub provides just the
  * constant so PhpDumper can function without it.
  *
+ * @internal
+ *
+ * @todo Remove this class when Symfony moves this constant to
+ *   ContainerBuilder.
+ *
  * @see \Symfony\Component\DependencyInjection\Dumper\PhpDumper
+ * @see https://github.com/symfony/symfony/issues/64005
  */
 abstract class FileLoaderStub {
 
