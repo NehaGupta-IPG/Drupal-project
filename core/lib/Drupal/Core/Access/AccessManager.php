@@ -129,6 +129,7 @@ class AccessManager implements AccessManagerInterface {
       && !$route->hasRequirement('_csrf_token')
       && !$route->hasRequirement('_csrf_request_header_token')
       && $route->getRequirement('_access') !== 'TRUE'
+      && $route->getRequirement('_access') !== 'FALSE'
       && $route->getRequirement('_user_is_logged_in') !== 'FALSE'
     ) {
       @trigger_error(
