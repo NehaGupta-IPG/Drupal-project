@@ -396,7 +396,7 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
    *
    * When a new PhpDumperContainerStorage instance encounters a container hash
    * whose class is already defined in memory (e.g. the kernel was booted,
-   * terminated, and booted again), the behaviour depends on whether the file
+   * terminated, and booted again), the behavior depends on whether the file
    * still exists on disk:
    *
    * - Class exists AND file exists: skip both save() and load() — no disk I/O.
