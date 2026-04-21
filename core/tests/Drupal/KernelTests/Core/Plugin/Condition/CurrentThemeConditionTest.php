@@ -36,10 +36,10 @@ class CurrentThemeConditionTest extends KernelTestBase {
     $condition_negated->setConfiguration(['themes' => ['starterkit_theme'], 'negate' => TRUE]);
     /** @var \Drupal\Core\Condition\ConditionInterface $condition_multiple */
     $condition_multiple = $manager->createInstance('current_theme');
-    $condition_multiple->setConfiguration(['themes' => ['starterkit_theme', 'test_subtheme']]);
+    $condition_multiple->setConfiguration(['themes' => ['test_subtheme', 'starterkit_theme']]);
     /** @var \Drupal\Core\Condition\ConditionInterface $condition_multiple_negated */
     $condition_multiple_negated = $manager->createInstance('current_theme');
-    $condition_multiple_negated->setConfiguration(['themes' => ['starterkit_theme', 'test_subtheme'], 'negate' => TRUE]);
+    $condition_multiple_negated->setConfiguration(['themes' => ['test_subtheme', 'starterkit_theme'], 'negate' => TRUE]);
     /** @var \Drupal\Core\Condition\ConditionInterface $condition_any */
     $condition_any = $manager->createInstance('current_theme');
     $condition_any->setConfiguration(['themes' => []]);
@@ -106,7 +106,6 @@ class CurrentThemeConditionTest extends KernelTestBase {
    * Tests whether the old current theme condition 'theme' configuration key
    * still works as expected and throws the defined deprecation message.
    */
-  #[IgnoreDeprecations]
   public function testCurrentThemeDeprecated(): void {
     \Drupal::service('theme_installer')->install(['starterkit_theme', 'test_base_theme']);
 
