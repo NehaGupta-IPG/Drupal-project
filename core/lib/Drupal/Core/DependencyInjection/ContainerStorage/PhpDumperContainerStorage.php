@@ -101,12 +101,13 @@ class PhpDumperContainerStorage implements ContainerStorageInterface, Destructab
     $hash = hash('xxh128', $code);
 
     $containerClass = 'DrupalContainer_' . $hash;
+    $class_exists = class_exists($containerClass, FALSE);
 
     // If the hash has already been used and marked for deletion, re-use the
     // container file and class. This can occur when a container is rebuilt
     // multiple times during module installation and a later rebuild produces
     // the same hash as an earlier one.
-    if ($hash !== $this->loadedContainerHash && isset($this->oldHashes[$hash]) && class_exists($containerClass, FALSE)) {
+    if ($hash !== $this->loadedContainerHash && isset($this->oldHashes[$hash]) && $class_exists) {
       unset($this->oldHashes[$hash]);
       if ($this->loadedContainerHash) {
         $this->oldHashes[$this->loadedContainerHash] = TRUE;
@@ -124,14 +125,16 @@ class PhpDumperContainerStorage implements ContainerStorageInterface, Destructab
         "class $containerClass extends \\$baseClass\n{",
         $code,
       );
-      // Always save so the file exists on disk for future requests.
-      $this->phpStorage->save($filename, $code);
+      if (!$class_exists || !$this->phpStorage->exists($containerClass . '.php')) {
+        // Only save if the file does not exist.
+        $this->phpStorage->save($filename, $code);
+      }
       // Only include if the class is not already in memory. If it is, the
       // class was defined in a prior kernel lifecycle (e.g. the kernel was
       // booted, terminated, then booted again). MTimeProtectedFileStorage
       // writes each save() to a new mtime-based directory, so include_once
       // on that new path would trigger "Cannot redeclare class".
-      if (!class_exists($containerClass, FALSE)) {
+      if (!$class_exists) {
         $this->phpStorage->load($filename);
       }
       $this->loadedContainerHash = $hash;

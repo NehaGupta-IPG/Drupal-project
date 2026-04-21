@@ -390,6 +390,89 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
   }
 
   /**
+   * Tests dump() elseif branch when the class already exists in memory.
+   *
+   * When a new PhpDumperContainerStorage instance encounters a container hash
+   * whose class is already defined in memory (e.g. the kernel was booted,
+   * terminated, and booted again), the behaviour depends on whether the file
+   * still exists on disk:
+   *
+   * - Class exists AND file exists: skip both save() and load() — no disk I/O.
+   * - Class exists AND file missing: call save() to restore the file for future
+   *   requests, but still skip load() to avoid a "Cannot redeclare class" fatal
+   *   that MTimeProtectedFileStorage would trigger by including the class from a
+   *   new mtime-based path.
+   */
+  public function testDumpElseBranchSkipsLoadWhenClassExists(): void {
+    $cache = $this->createStub(CacheBackendInterface::class);
+    $savedFiles = [];
+    $loadedFiles = [];
+    $code = [];
+
+    $phpStorage = $this->createStub(PhpStorageInterface::class);
+    $phpStorage->method('save')
+      ->willReturnCallback(function ($filename, $phpCode) use (&$code, &$savedFiles) {
+        $code[$filename] = $phpCode;
+        $savedFiles[] = $filename;
+        return TRUE;
+      });
+    $phpStorage->method('load')
+      ->willReturnCallback(function ($filename) use (&$code, &$loadedFiles) {
+        $loadedFiles[] = $filename;
+        if (isset($code[$filename])) {
+          $tempFile = tempnam(sys_get_temp_dir(), 'drupal_container_test_');
+          $this->tempFiles[] = $tempFile;
+          file_put_contents($tempFile, $code[$filename]);
+          include_once $tempFile;
+        }
+      });
+    $phpStorage->method('exists')
+      ->willReturnCallback(function ($filename) use (&$code) {
+        return isset($code[$filename]);
+      });
+
+    $containerA = new ContainerBuilder();
+    $containerA->setParameter('test_param', 'value_a');
+    $containerA->compile();
+
+    // First storage instance: dump A to define the class and write the file.
+    $storage1 = new PhpDumperContainerStorage($cache, $phpStorage, Settings::getInstance());
+    $result1 = $storage1->dump($containerA, 'test_suffix');
+    $this->assertCount(1, $savedFiles);
+    $this->assertCount(1, $loadedFiles);
+
+    // Reset tracking before second instance.
+    $savedFiles = [];
+    $loadedFiles = [];
+
+    // Second storage instance: class A exists in memory AND file exists on disk.
+    // Neither save() nor load() should be called — no disk I/O needed.
+    $storage2 = new PhpDumperContainerStorage($cache, $phpStorage, Settings::getInstance());
+    $result2 = $storage2->dump($containerA, 'test_suffix');
+    $this->assertSame($result1::class, $result2::class);
+    $this->assertCount(0, $savedFiles, 'save() must be skipped when class and file both already exist');
+    $this->assertCount(0, $loadedFiles, 'load() must be skipped when class already exists in memory');
+
+    // Delete the file from storage to simulate destruct() having cleaned it up
+    // (e.g. because the active container changed). The class is still in memory.
+    $containerAFilename = $result1::class . '.php';
+    unset($code[$containerAFilename]);
+
+    // Reset tracking before third instance.
+    $savedFiles = [];
+    $loadedFiles = [];
+
+    // Third storage instance: class A exists in memory BUT file no longer
+    // exists on disk. save() MUST be called to restore the file for future
+    // requests. load() must still be skipped.
+    $storage3 = new PhpDumperContainerStorage($cache, $phpStorage, Settings::getInstance());
+    $result3 = $storage3->dump($containerA, 'test_suffix');
+    $this->assertSame($result1::class, $result3::class);
+    $this->assertCount(1, $savedFiles, 'save() must be called when the file is missing even if the class exists');
+    $this->assertCount(0, $loadedFiles, 'load() must be skipped even when file had to be re-saved');
+  }
+
+  /**
    * Tests that invalidate() calls deleteAll on the cache backend.
    */
   public function testInvalidateDeletesAllCacheEntries(): void {
