@@ -225,6 +225,7 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
 
     // Different containers produce different classes.
     $this->assertNotSame($result1::class, $result2::class);
+    $storage->destruct();
     // The old container file should have been deleted.
     $this->assertCount(1, $deletedFiles);
     $this->assertSame($savedFiles[0], $deletedFiles[0]);
@@ -294,6 +295,7 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     $container2->compile();
 
     $storage->dump($container2, 'test_suffix');
+    $storage->destruct();
 
     // Extract operation types in order.
     $opTypes = array_column($operations, 0);
@@ -362,6 +364,10 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
 
     $this->assertNotSame($resultA1::class, $resultB::class);
 
+    $this->assertCount(2, $savedFiles);
+    $this->assertCount(2, $loadedFiles);
+    $this->assertCount(0, $deletedFiles);
+
     // Reset tracking before the critical third dump.
     $savedFiles = [];
     $loadedFiles = [];
@@ -370,12 +376,13 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     // Third dump: container A again (same hash as first dump). The class
     // DrupalContainer_<hashA> still exists in memory from the first dump.
     $resultA2 = $storage->dump($containerA, 'test_suffix');
+    $storage->destruct();
 
     // The returned container must be the same class as the first dump.
     $this->assertSame($resultA1::class, $resultA2::class);
-    // The file must be saved to disk (so future requests can load it).
-    $this->assertCount(1, $savedFiles);
-    // But load() must NOT be called (class already exists, re-including would
+    // The file has already been saved to disk so no need to re-save it.
+    $this->assertCount(0, $savedFiles);
+    // Also load() must NOT be called (class already exists, re-including would
     // cause "Cannot redeclare class").
     $this->assertCount(0, $loadedFiles);
     // The old container B file should have been deleted.

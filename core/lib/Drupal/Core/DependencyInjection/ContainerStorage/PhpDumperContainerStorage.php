@@ -8,6 +8,7 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ContainerStorageInterface;
 use Drupal\Core\DependencyInjection\Dumper\FileLoaderStub;
 use Drupal\Core\DependencyInjection\PhpContainer;
+use Drupal\Core\DestructableInterface;
 use Drupal\Core\Site\Settings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -20,7 +21,7 @@ use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
  * and a hash is kept in the cache backend to map the cache key suffix to the
  * correct container class.
  */
-class PhpDumperContainerStorage implements ContainerStorageInterface {
+class PhpDumperContainerStorage implements ContainerStorageInterface, DestructableInterface {
 
   /**
    * The cache prefix used to store container hash.
@@ -31,6 +32,13 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
    * The hash of the currently loaded container.
    */
   protected ?string $loadedContainerHash = NULL;
+
+  /**
+   * An array of old hashes, keyed by the hash.
+   *
+   * @var true[]
+   */
+  protected array $oldHashes = [];
 
   /**
    * Constructs a PhpDumperContainerStorage.
@@ -93,9 +101,21 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
     $hash = hash('xxh128', $code);
 
     $containerClass = 'DrupalContainer_' . $hash;
-    if ($hash !== $this->loadedContainerHash) {
+
+    // If the hash already by used and marked for deletion, re-use the container
+    // file and class. This can occur when a container is rebuilt multiple times
+    // during module installation and a later rebuild produces the same hash as
+    // an earlier one.
+    if ($hash !== $this->loadedContainerHash && isset($this->oldHashes[$hash]) && class_exists($containerClass, FALSE)) {
+      unset($this->oldHashes[$hash]);
       if ($this->loadedContainerHash) {
-        $old_container_hash = $this->loadedContainerHash;
+        $this->oldHashes[$this->loadedContainerHash] = TRUE;
+      }
+      $this->loadedContainerHash = $hash;
+    }
+    elseif ($hash !== $this->loadedContainerHash) {
+      if ($this->loadedContainerHash) {
+        $this->oldHashes[$this->loadedContainerHash] = TRUE;
       }
       $filename = $containerClass . '.php';
 
@@ -106,17 +126,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
       );
       // Always save the file so it exists on disk for future requests.
       $this->phpStorage->save($filename, $code);
-      // Only include the file if the class is not already defined. The class
-      // may already exist in memory from an earlier load() or dump() in the
-      // same request (e.g., when a container is rebuilt multiple times during
-      // module installation and a later rebuild produces the same hash as an
-      // earlier one). Re-including via phpStorage->load() would use a
-      // different file path (MTimeProtectedFileStorage creates a new mtime
-      // directory on save), causing include_once to treat it as a new file
-      // and triggering a "Cannot redeclare class" fatal error.
-      if (!class_exists($containerClass, FALSE)) {
-        $this->phpStorage->load($filename);
-      }
+      $this->phpStorage->load($filename);
       $this->loadedContainerHash = $hash;
     }
 
@@ -129,13 +139,6 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
       // The cache table may not exist yet (e.g., during install).
     }
 
-    // Delete the old container file if it exists. This is done after the cache
-    // is set to ensure that the cache is updated before the old container file
-    // is deleted.
-    if (isset($old_container_hash)) {
-      $this->phpStorage->delete('DrupalContainer_' . $old_container_hash . '.php');
-    }
-
     return $container;
   }
 
@@ -144,6 +147,17 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
    */
   public function invalidate(): void {
     $this->cache->deleteAll();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function destruct(): void {
+    // Delete any files corresponding to old hashes that have accumulated.
+    foreach (array_keys($this->oldHashes) as $hash) {
+      $this->phpStorage->delete('DrupalContainer_' . $hash . '.php');
+      unset($this->oldHashes[$hash]);
+    }
   }
 
 }
