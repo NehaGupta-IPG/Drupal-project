@@ -151,7 +151,7 @@ class SystemTokensHooks {
             /** @var \Drupal\Core\GeneratedUrl $result */
             $result = Url::fromRoute('<front>', [], $url_options)->toString(TRUE);
             $bubbleable_metadata->addCacheableDependency($result);
-            $replacements[$original] = $result->getGeneratedUrl();
+            $replacements[$original] = rtrim($result->getGeneratedUrl(), '/') . '/';
             break;
 
           case 'url-brief':
