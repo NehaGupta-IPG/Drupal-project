@@ -22,6 +22,7 @@ class InstallerKernel extends DrupalKernel {
    * {@inheritdoc}
    */
   protected function initializeContainer() {
+echo "\n\n" . __METHOD__ . " START \n";
     // Ensure the InstallerKernel's container is not dumped.
     $this->allowDumping = FALSE;
 
@@ -36,11 +37,13 @@ class InstallerKernel extends DrupalKernel {
       && !array_diff_key($extensions['theme'] ?? [], $this->compiledExtensions['theme'] ?? [])
     ) {
       $this->containerNeedsRebuild = FALSE;
+echo "\n\n" . __METHOD__ . " done - no needs rebuild \n";
       return $this->container;
     }
     else {
       $this->containerNeedsRebuild = TRUE;
       $this->compiledExtensions = $extensions;
+echo "\n\n" . __METHOD__ . " done - needs rebuild \n";
       return parent::initializeContainer();
     }
   }

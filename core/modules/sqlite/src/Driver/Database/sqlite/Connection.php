@@ -11,6 +11,8 @@ use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\SupportsTemporaryTablesInterface;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
+use Drupal\Core\Database\Event\StatementEvent;
+use Drupal\Core\Database\Event\TransactionEvent;
 
 /**
  * SQLite implementation of \Drupal\Core\Database\Connection.
@@ -91,6 +93,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
 
     // Regenerate the prefix.
     $this->setPrefix($prefix);
+
+    $this->enableEvents(TransactionEvent::all());
+    $this->enableEvents(StatementEvent::all());
   }
 
   /**
