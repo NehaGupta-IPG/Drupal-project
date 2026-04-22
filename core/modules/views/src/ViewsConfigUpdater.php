@@ -134,7 +134,6 @@ class ViewsConfigUpdater {
     return $changed;
   }
 
-
   /**
    * Checks for unrouted displays with form actions missing link_display.
    *
