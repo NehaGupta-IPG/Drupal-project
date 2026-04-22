@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\event_listener_test\EventListener;
 
 use Drupal\event_listener_test\EventListenerAnotherTestEvent;
