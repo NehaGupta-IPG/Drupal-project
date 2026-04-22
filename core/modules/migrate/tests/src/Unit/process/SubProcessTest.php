@@ -22,13 +22,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 class SubProcessTest extends MigrateProcessTestCase {
 
   /**
-   * The sub_process plugin being tested.
-   *
-   * @var \Drupal\migrate\Plugin\migrate\process\SubProcess
-   */
-  protected $plugin;
-
-  /**
    * The default migration configuration.
    *
    * @var array
@@ -52,14 +45,13 @@ class SubProcessTest extends MigrateProcessTestCase {
     }
     // Set up the key plugins.
     $key_plugin['key'][] = new Get(['source' => '@id'], 'get', []);
-    $migration->expects($this->exactly(2))
+    $migration
       ->method('getProcessPlugins')
       ->willReturnOnConsecutiveCalls(
         $sub_process_plugins,
         $key_plugin,
       );
-    $event_dispatcher = $this->createMock(EventDispatcherInterface::class);
-    $migrate_executable = new MigrateExecutable($migration, $this->createMock(MigrateMessageInterface::class), $event_dispatcher);
+    $migrate_executable = new MigrateExecutable($migration, $this->createStub(MigrateMessageInterface::class), $this->createStub(EventDispatcherInterface::class));
 
     // The current value of the pipeline.
     $current_value = [
@@ -144,14 +136,13 @@ class SubProcessTest extends MigrateProcessTestCase {
       $sub_process_plugins[$destination][] = new Get(['source' => $source], 'get', []);
     }
     $key_plugin['key'][] = new Get(['source' => '@id'], 'get', []);
-    $migration->expects($this->exactly(2))
+    $migration
       ->method('getProcessPlugins')
       ->willReturnOnConsecutiveCalls(
         $sub_process_plugins,
         $key_plugin,
       );
-    $event_dispatcher = $this->createMock(EventDispatcherInterface::class);
-    $migrate_executable = new MigrateExecutable($migration, $this->createMock(MigrateMessageInterface::class), $event_dispatcher);
+    $migrate_executable = new MigrateExecutable($migration, $this->createStub(MigrateMessageInterface::class), $this->createStub(EventDispatcherInterface::class));
 
     // The current value of the pipeline.
     $current_value = [
