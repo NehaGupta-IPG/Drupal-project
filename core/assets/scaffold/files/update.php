@@ -8,6 +8,7 @@
  * See COPYRIGHT.txt and LICENSE.txt files in the "core" directory.
  */
 
+use Drupal\Core\AppContextInterface;
 use Drupal\Core\Update\UpdateKernel;
 
 require_once 'autoload_runtime.php';
@@ -20,6 +21,6 @@ if (drupal_valid_test_ua()) {
   gc_disable();
 }
 
-return static function () {
-  return new UpdateKernel('prod', require 'autoload.php', FALSE);
+return static function (AppContextInterface $app_context) {
+  return new UpdateKernel('prod', require 'autoload.php', FALSE, $app_context);
 };
