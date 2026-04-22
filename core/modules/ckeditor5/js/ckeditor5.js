@@ -475,8 +475,8 @@
             const fieldAriaLabel =
               editor.ui.view.editable.element.closest('.ck-content').ariaLabel;
 
-
-            editor.ui.view.editable.element.closest('.ck-content').ariaLabel = `${labelText}. ${fieldAriaLabel}`;
+            editor.ui.view.editable.element.closest('.ck-content').ariaLabel =
+              `${labelText}. ${fieldAriaLabel}`;
 
             editor.ui.focusTracker.on(
               'change:isFocused',
