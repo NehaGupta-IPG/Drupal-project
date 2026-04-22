@@ -466,8 +466,6 @@ services:
   config.typed:
     class: Drupal\Core\Config\TypedConfigManager
     arguments: ['@config.storage', '@config.storage.schema', '@cache.discovery', '@module_handler', '@class_resolver']
-    tags:
-      - { name: plugin_manager_cache_clear }
     calls:
       - [setValidationConstraintManager, ['@validation.constraint']]
   Drupal\Core\Config\TypedConfigManagerInterface: '@config.typed'
@@ -741,8 +739,6 @@ services:
   entity_type.manager:
     class: Drupal\Core\Entity\EntityTypeManager
     arguments: ['@container.namespaces', '@module_handler', '@cache.discovery', '@string_translation', '@class_resolver', '@entity.last_installed_schema.repository', '@service_container']
-    tags:
-      - { name: plugin_manager_cache_clear }
   Drupal\Core\Entity\EntityTypeManagerInterface: '@entity_type.manager'
   entity_type.repository:
     class: Drupal\Core\Entity\EntityTypeRepository
@@ -1065,14 +1061,10 @@ services:
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@class_resolver']
     calls:
       - [setValidationConstraintManager, ['@validation.constraint']]
-    tags:
-      - { name: plugin_manager_cache_clear }
   Drupal\Core\TypedData\TypedDataManagerInterface: '@typed_data_manager'
   validation.constraint:
     class: Drupal\Core\Validation\ConstraintManager
     parent: default_plugin_manager
-    tags:
-      - { name: plugin_manager_cache_clear }
   validation.basic_recursive_validator_factory:
     class: Drupal\Core\Validation\BasicRecursiveValidatorFactory
     arguments: ['@class_resolver']
@@ -1568,15 +1560,11 @@ services:
     class: Drupal\Core\ImageToolkit\ImageToolkitManager
     autowire: true
     parent: default_plugin_manager
-    tags:
-      - { name: plugin_manager_cache_clear }
   Drupal\Core\ImageToolkit\ImageToolkitManager: '@image.toolkit.manager'
   image.toolkit.operation.manager:
     class: Drupal\Core\ImageToolkit\ImageToolkitOperationManager
     autowire: true
     parent: default_plugin_manager
-    tags:
-      - { name: plugin_manager_cache_clear }
   Drupal\Core\ImageToolkit\ImageToolkitOperationManagerInterface: '@image.toolkit.operation.manager'
   image.factory:
     class: Drupal\Core\Image\ImageFactory
