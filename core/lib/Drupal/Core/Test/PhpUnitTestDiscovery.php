@@ -308,21 +308,26 @@ class PhpUnitTestDiscovery {
     // In PHPUnit 11+, we need to coalesce the groups from individual tests
     // as they may not be available from the test class level (when tests are
     // backed by data providers).
+    // Use groups() rather than metadata()->isGroup() for the emptiness check
+    // because metadata() only includes method-level attributes, while groups()
+    // also inherits class-level #[Group] attributes.
     $tmp = [];
     foreach ($testClass as $test) {
       if ($test instanceof DataProviderTestSuite) {
         foreach ($test as $testWithData) {
-          if ($testWithData->valueObjectForEvents()->metadata()->isGroup()->isEmpty()) {
+          $groups = array_filter($testWithData->groups(), fn(string $g) => !str_starts_with($g, '__phpunit'));
+          if (empty($groups)) {
             throw new MissingGroupException(sprintf('Missing group metadata in test %s', $testWithData->valueObjectForEvents()->id()));
           }
-          $tmp = array_merge($tmp, $testWithData->groups());
+          $tmp = array_merge($tmp, $groups);
         }
       }
       else {
-        if ($test->valueObjectForEvents()->metadata()->isGroup()->isEmpty()) {
+        $groups = array_filter($test->groups(), fn(string $g) => !str_starts_with($g, '__phpunit'));
+        if (empty($groups)) {
           throw new MissingGroupException(sprintf('Missing group metadata in test %s', $test->valueObjectForEvents()->id()));
         }
-        $tmp = array_merge($tmp, $test->groups());
+        $tmp = array_merge($tmp, $groups);
       }
     }
     $groups = array_filter(array_unique($tmp), function (string $value): bool {
