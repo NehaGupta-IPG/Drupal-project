@@ -154,7 +154,7 @@ class IconAutocompleteTest extends KernelTestBase implements FormInterface {
       'icon_limited' => 'core:home',
     ]);
 
-    $form = \Drupal::formBuilder()->buildForm($this, $form_state);
+    \Drupal::formBuilder()->buildForm($this, $form_state);
     \Drupal::formBuilder()->submitForm($this, $form_state);
 
     // No errors should be present.
@@ -172,7 +172,7 @@ class IconAutocompleteTest extends KernelTestBase implements FormInterface {
       'icon_limited' => '',
     ]);
 
-    $form = \Drupal::formBuilder()->buildForm($this, $form_state);
+    \Drupal::formBuilder()->buildForm($this, $form_state);
     \Drupal::formBuilder()->submitForm($this, $form_state);
 
     $errors = $form_state->getErrors();
@@ -191,7 +191,7 @@ class IconAutocompleteTest extends KernelTestBase implements FormInterface {
       'icon_limited' => 'core:home',
     ]);
 
-    $form = \Drupal::formBuilder()->buildForm($this, $form_state);
+    \Drupal::formBuilder()->buildForm($this, $form_state);
     \Drupal::formBuilder()->submitForm($this, $form_state);
 
     $errors = $form_state->getErrors();
@@ -222,7 +222,7 @@ class IconAutocompleteTest extends KernelTestBase implements FormInterface {
       'icon_limited' => 'core:home',
     ]);
 
-    $form = \Drupal::formBuilder()->buildForm($this, $form_state);
+    \Drupal::formBuilder()->buildForm($this, $form_state);
     \Drupal::formBuilder()->submitForm($this, $form_state);
 
     $errors = $form_state->getErrors();
@@ -277,7 +277,7 @@ class IconAutocompleteTest extends KernelTestBase implements FormInterface {
     $form = [
       'icon_custom' => [
         '#type' => 'icon_autocomplete',
-        '#title' => t('Custom max'),
+        '#title' => $this->t('Custom max'),
         '#max_result' => 25,
       ],
     ];

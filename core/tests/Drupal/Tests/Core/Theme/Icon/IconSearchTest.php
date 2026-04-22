@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Theme\Icon;
 
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Theme\Icon\IconSearch;
 use Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface;
 use Drupal\Tests\UnitTestCase;
@@ -32,13 +31,6 @@ class IconSearchTest extends UnitTestCase {
   protected $cache;
 
   /**
-   * The renderer mock.
-   *
-   * @var \Drupal\Core\Render\RendererInterface|\PHPUnit\Framework\MockObject\MockObject
-   */
-  protected $renderer;
-
-  /**
    * The icon search service.
    *
    * @var \Drupal\Core\Theme\Icon\IconSearch
@@ -53,12 +45,10 @@ class IconSearchTest extends UnitTestCase {
 
     $this->iconPackManager = $this->createMock(IconPackManagerInterface::class);
     $this->cache = $this->createMock(CacheBackendInterface::class);
-    $this->renderer = $this->createMock(RendererInterface::class);
 
     $this->iconSearch = new IconSearch(
       $this->iconPackManager,
       $this->cache,
-      $this->renderer
     );
   }
 
@@ -125,11 +115,6 @@ class IconSearchTest extends UnitTestCase {
    * @covers ::search
    */
   public function testSearchWithAllowedIconPacks(): void {
-    $icons = [
-      'core:add' => ['source' => 'add.svg'],
-      'other:add' => ['source' => 'add.svg'],
-    ];
-
     $this->iconPackManager->expects($this->once())
       ->method('getIcons')
       ->with(['core'])

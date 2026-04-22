@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Core\Theme\Icon;
 
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface;
 
 /**
@@ -43,13 +42,10 @@ class IconSearch {
    *   The icon pack manager service.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer service.
    */
   public function __construct(
     private readonly IconPackManagerInterface $pluginManagerIconPack,
     private CacheBackendInterface $cache,
-    private readonly RendererInterface $renderer,
   ) {}
 
   /**
@@ -98,7 +94,7 @@ class IconSearch {
     }
 
     // Apply result callback if provided.
-    if ($result_callback && is_callable($result_callback)) {
+    if ($result_callback !== NULL) {
       $formatted_results = [];
       foreach ($results as $icon_full_id) {
         if ($formatted_result = $result_callback($icon_full_id)) {

@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
  * @internal
  *   This API is experimental.
  */
-class IconAutocompleteController extends ControllerBase {
+final class IconAutocompleteController extends ControllerBase {
 
   /**
    * Constructs an IconAutocompleteController object.
@@ -41,7 +41,7 @@ class IconAutocompleteController extends ControllerBase {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container): static {
-    return new static(
+    return new self(
       $container->get('icon.search'),
       $container->get('plugin.manager.icon_pack'),
       $container->get('renderer')

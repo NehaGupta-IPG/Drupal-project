@@ -2030,5 +2030,4 @@ services:
       [
         '@plugin.manager.icon_pack',
         '@cache.default',
-        '@renderer',
       ]

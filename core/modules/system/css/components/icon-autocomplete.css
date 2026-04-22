@@ -50,8 +50,8 @@
 
 /* Autocomplete dropdown scrollable container */
 .ui-autocomplete:has(.icon-autocomplete-result) {
-  max-height: 400px;
   overflow-y: auto;
+  max-height: 400px;
 }
 
 /* Autocomplete results styling */
