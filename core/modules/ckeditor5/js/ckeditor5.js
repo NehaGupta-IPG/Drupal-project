@@ -365,6 +365,14 @@
         // settings and the "language" plugin.
         language: { ...pluginConfig.language, ...language },
       };
+      // Configure the editor label as the element label.
+      const elementId = element.getAttribute('id');
+      const elementLabel = elementId
+        ? document.querySelector(`label[for=${elementId}]`)
+        : false;
+      if (elementLabel) {
+        editorConfig.label = elementLabel.innerText;
+      }
       // Set the id immediately so that it is available when onChange is called.
       const id = setElementId(element);
       const { ClassicEditor } = editorClassic;
@@ -455,39 +463,6 @@
 
           if (isOffCanvas) {
             offCanvasCss(element);
-          }
-
-          // Prepend aria-label with the value from default textarea label.
-          // @see https://www.drupal.org/project/drupal/issues/3426798
-          // @todo: Update when CKEditor5 will fix issue #15208
-          // @see https://github.com/ckeditor/ckeditor5/issues/15208
-          const fieldId = editor.sourceElement.getAttribute('id');
-
-          const fieldLabel = fieldId
-            ? document.querySelector(`label[for=${fieldId}]`)
-            : false;
-
-          if (fieldLabel) {
-            const labelText = fieldLabel.innerText;
-            editor.sourceElement.parentNode.querySelector(
-              'label.ck-voice-label',
-            ).innerText = labelText;
-            const fieldAriaLabel =
-              editor.ui.view.editable.element.closest('.ck-content').ariaLabel;
-
-            editor.ui.view.editable.element.closest('.ck-content').ariaLabel =
-              `${labelText}. ${fieldAriaLabel}`;
-
-            editor.ui.focusTracker.on(
-              'change:isFocused',
-              (evt, name, isFocused) => {
-                // Because CKEditor5 re-renders aria-label every time on focus/blur,
-                // overwrite the label to appropriate field label value.
-                editor.ui.view.editable.element.closest(
-                  '.ck-content',
-                ).ariaLabel = `${labelText}. ${fieldAriaLabel}`;
-              },
-            );
           }
         })
         .catch((error) => {

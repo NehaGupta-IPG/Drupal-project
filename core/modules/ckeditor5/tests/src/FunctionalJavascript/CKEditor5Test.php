@@ -66,6 +66,7 @@ class CKEditor5Test extends CKEditor5TestBase {
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ck-editor'));
 
     // Test label and aria-label are set to Drupal field label value (not default CKEditor5 label value).
+    // Test that Drupal field label value is prepended to CKEditor aria-label value.
     $ariaLabel = $page->find('css', 'div.ck-content');
     $this->assertSame('Body (Edit summary)', $ariaLabel->getAttribute('aria-label'));
 
