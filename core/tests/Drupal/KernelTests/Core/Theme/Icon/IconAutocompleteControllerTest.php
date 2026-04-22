@@ -74,35 +74,59 @@ class IconAutocompleteControllerTest extends KernelTestBase {
     // from mocking methods that take by-reference parameters.
     $renderer = new class() implements RendererInterface {
 
+      /**
+       * {@inheritdoc}
+       */
       public function renderRoot(&$elements) {
         return Markup::create('');
       }
 
+      /**
+       * {@inheritdoc}
+       */
       public function renderInIsolation(&$elements) {
         return Markup::create('');
       }
 
+      /**
+       * {@inheritdoc}
+       */
       public function renderPlaceholder($placeholder, array $elements) {
         return Markup::create('');
       }
 
+      /**
+       * {@inheritdoc}
+       */
       public function render(array &$elements) {
         return Markup::create('');
       }
 
+      /**
+       * {@inheritdoc}
+       */
       public function hasRenderContext() {
         return FALSE;
       }
 
+      /**
+       * {@inheritdoc}
+       */
       public function executeInRenderContext(RenderContext $context, callable $callable) {
         return $callable();
       }
 
+      /**
+       * {@inheritdoc}
+       */
       public function mergeBubbleableMetadata(array $a, array $b) {
         return BubbleableMetadata::mergeAttachments($a, $b);
       }
 
-      public function addCacheableDependency(array &$elements, $dependency) {}
+      /**
+       * {@inheritdoc}
+       */
+      public function addCacheableDependency(array &$elements, $dependency): void {}
 
     };
     $this->container->set('renderer', $renderer);
