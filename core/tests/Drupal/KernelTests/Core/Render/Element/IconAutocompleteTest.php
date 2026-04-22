@@ -132,16 +132,9 @@ class IconAutocompleteTest extends KernelTestBase implements FormInterface {
    * Tests icon_autocomplete element validation with valid value.
    */
   public function testIconAutocompleteValidationSuccess(): void {
-    $icon_pack_manager = $this->getMockBuilder('Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface')
-      ->disableOriginalConstructor()
-      ->getMock();
-
-    $icon = $this->getMockBuilder('Drupal\Core\Theme\Icon\IconDefinitionInterface')
-      ->disableOriginalConstructor()
-      ->getMock();
-
+    $icon_pack_manager = $this->createStub('Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface');
+    $icon = $this->createStub('Drupal\Core\Theme\Icon\IconDefinitionInterface');
     $icon->method('getPackId')->willReturn('core');
-
     // Return a valid icon for any getIcon call so all fields pass validation.
     $icon_pack_manager->method('getIcon')->willReturn($icon);
 
@@ -202,10 +195,7 @@ class IconAutocompleteTest extends KernelTestBase implements FormInterface {
    * Tests icon_autocomplete element validation with non-existent icon.
    */
   public function testIconAutocompleteValidationNonExistent(): void {
-    $icon_pack_manager = $this->getMockBuilder('Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface')
-      ->disableOriginalConstructor()
-      ->getMock();
-
+    $icon_pack_manager = $this->createStub('Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface');
     // Return NULL for any icon so all fields fail the existence check.
     $icon_pack_manager->method('getIcon')->willReturn(NULL);
 
@@ -230,16 +220,9 @@ class IconAutocompleteTest extends KernelTestBase implements FormInterface {
    * Tests icon_autocomplete element validation with disallowed pack.
    */
   public function testIconAutocompleteValidationDisallowedPack(): void {
-    $icon_pack_manager = $this->getMockBuilder('Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface')
-      ->disableOriginalConstructor()
-      ->getMock();
-
-    $icon = $this->getMockBuilder('Drupal\Core\Theme\Icon\IconDefinitionInterface')
-      ->disableOriginalConstructor()
-      ->getMock();
-
+    $icon_pack_manager = $this->createStub('Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface');
+    $icon = $this->createStub('Drupal\Core\Theme\Icon\IconDefinitionInterface');
     $icon->method('getPackId')->willReturn('other');
-
     // Return the icon for any getIcon call so the pack check can be evaluated.
     $icon_pack_manager->method('getIcon')->willReturn($icon);
 

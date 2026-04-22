@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Theme\Icon;
 
+use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Theme\Icon\IconSearch;
 use Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface;
@@ -68,8 +70,41 @@ class IconAutocompleteControllerTest extends KernelTestBase {
     $this->container->set('plugin.manager.icon_pack', $icon_pack_manager);
     $cache = $this->container->get('cache.default');
     $this->container->set('icon.search', new IconSearch($icon_pack_manager, $cache));
-    $renderer = $this->getMockBuilder(RendererInterface::class)->getMock();
-    $renderer->method('renderInIsolation')->willReturn(Markup::create(''));
+    // Use a concrete implementation instead of a PHPUnit mock to avoid notices
+    // from mocking methods that take by-reference parameters.
+    $renderer = new class() implements RendererInterface {
+
+      public function renderRoot(&$elements) {
+        return Markup::create('');
+      }
+
+      public function renderInIsolation(&$elements) {
+        return Markup::create('');
+      }
+
+      public function renderPlaceholder($placeholder, array $elements) {
+        return Markup::create('');
+      }
+
+      public function render(array &$elements) {
+        return Markup::create('');
+      }
+
+      public function hasRenderContext() {
+        return FALSE;
+      }
+
+      public function executeInRenderContext(RenderContext $context, callable $callable) {
+        return $callable();
+      }
+
+      public function mergeBubbleableMetadata(array $a, array $b) {
+        return BubbleableMetadata::mergeAttachments($a, $b);
+      }
+
+      public function addCacheableDependency(array &$elements, $dependency) {}
+
+    };
     $this->container->set('renderer', $renderer);
     $this->controller = IconAutocompleteController::create($this->container);
   }
@@ -78,18 +113,13 @@ class IconAutocompleteControllerTest extends KernelTestBase {
    * Tests the handleSearchIcons method with query.
    */
   public function testHandleSearchIconsWithQuery(): void {
-    $icon_pack_manager = $this->getMockBuilder(IconPackManagerInterface::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-
     $test_icons = [
       'core:add' => ['source' => 'add.svg'],
       'core:add-new' => ['source' => 'add-new.svg'],
     ];
 
-    $icon = $this->getMockBuilder('Drupal\Core\Theme\Icon\IconDefinitionInterface')
-      ->getMock();
-
+    $icon_pack_manager = $this->createStub(IconPackManagerInterface::class);
+    $icon = $this->createStub('Drupal\Core\Theme\Icon\IconDefinitionInterface');
     $icon_pack_manager->method('getIcons')->willReturn($test_icons);
     $icon_pack_manager->method('getIcon')->willReturn($icon);
 
@@ -125,8 +155,7 @@ class IconAutocompleteControllerTest extends KernelTestBase {
       'core:add' => ['source' => 'add.svg'],
     ];
 
-    $icon = $this->getMockBuilder('Drupal\Core\Theme\Icon\IconDefinitionInterface')
-      ->getMock();
+    $icon = $this->createStub('Drupal\Core\Theme\Icon\IconDefinitionInterface');
 
     // Expect getIcons to be called with the allowed packs.
     $icon_pack_manager->expects($this->once())
@@ -150,18 +179,13 @@ class IconAutocompleteControllerTest extends KernelTestBase {
    * Tests the handleSearchIcons method with max_result parameter.
    */
   public function testHandleSearchIconsWithMaxResult(): void {
-    $icon_pack_manager = $this->getMockBuilder(IconPackManagerInterface::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-
     $test_icons = [];
     for ($i = 0; $i < 100; $i++) {
       $test_icons["core:icon-$i"] = ['source' => "icon-$i.svg"];
     }
 
-    $icon = $this->getMockBuilder('Drupal\Core\Theme\Icon\IconDefinitionInterface')
-      ->getMock();
-
+    $icon_pack_manager = $this->createStub(IconPackManagerInterface::class);
+    $icon = $this->createStub('Drupal\Core\Theme\Icon\IconDefinitionInterface');
     $icon_pack_manager->method('getIcons')->willReturn($test_icons);
     $icon_pack_manager->method('getIcon')->willReturn($icon);
 
@@ -184,17 +208,12 @@ class IconAutocompleteControllerTest extends KernelTestBase {
    * Tests the handleSearchIcons method with whitespace in query.
    */
   public function testHandleSearchIconsTrimsWhitespace(): void {
-    $icon_pack_manager = $this->getMockBuilder(IconPackManagerInterface::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-
     $test_icons = [
       'core:add' => ['source' => 'add.svg'],
     ];
 
-    $icon = $this->getMockBuilder('Drupal\Core\Theme\Icon\IconDefinitionInterface')
-      ->getMock();
-
+    $icon_pack_manager = $this->createStub(IconPackManagerInterface::class);
+    $icon = $this->createStub('Drupal\Core\Theme\Icon\IconDefinitionInterface');
     $icon_pack_manager->method('getIcons')->willReturn($test_icons);
     $icon_pack_manager->method('getIcon')->willReturn($icon);
 
