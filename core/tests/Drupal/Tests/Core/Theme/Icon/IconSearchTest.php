@@ -8,6 +8,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Theme\Icon\IconSearch;
 use Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 
@@ -57,6 +58,7 @@ class IconSearchTest extends UnitTestCase {
   /**
    * Tests search returns empty for a query that is too short.
    */
+  #[AllowMockObjectsWithoutExpectations]
   public function testSearchWithShortQuery(): void {
     $result = $this->iconSearch->search('a');
     $this->assertEmpty($result);
@@ -65,6 +67,7 @@ class IconSearchTest extends UnitTestCase {
   /**
    * Tests search returns empty for an empty query.
    */
+  #[AllowMockObjectsWithoutExpectations]
   public function testSearchWithEmptyQuery(): void {
     $result = $this->iconSearch->search('');
     $this->assertEmpty($result);
