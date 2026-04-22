@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Core\Runtime;
 
 use Symfony\Component\Runtime\Internal\MissingDotenv;
+use Symfony\Component\Runtime\RunnerInterface;
 use Symfony\Component\Runtime\SymfonyRuntime;
 
 /**
@@ -38,6 +39,15 @@ class DrupalRuntime extends SymfonyRuntime {
     }
 
     parent::__construct($options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRunner(?object $application): RunnerInterface {
+    return new RevoltDecoratedRunner(
+      parent::getRunner($application)
+    );
   }
 
 }
