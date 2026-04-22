@@ -5,6 +5,10 @@
  * Post update functions for Views.
  */
 
+use Drupal\Core\Config\Entity\ConfigEntityUpdater;
+use Drupal\views\ViewEntityInterface;
+use Drupal\views\ViewsConfigUpdater;
+
 /**
  * Implements hook_removed_post_updates().
  */
@@ -68,4 +72,3 @@ function views_post_update_unrouted_display_link_display(?array &$sandbox = NULL
     return $view_config_updater->needsUnroutedFormLinkDisplayUpdate($view);
   });
 }
-
