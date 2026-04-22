@@ -4,7 +4,44 @@
  */
 
 (function (Drupal, once, drupalSettings) {
-  'use strict';
+  /**
+   * Updates the icon preview element.
+   *
+   * @param {string} iconId
+   *   The icon ID in format "pack_id:icon_id".
+   * @param {HTMLElement} previewElement
+   *   The preview container element.
+   */
+  function updateIconPreview(iconId, previewElement) {
+    // Clear current preview.
+    previewElement.innerHTML = '';
+
+    if (!iconId || !iconId.includes(':')) {
+      return;
+    }
+
+    const [packId, iconName] = iconId.split(':', 2);
+
+    // Use Drupal's icon render element via AJAX.
+    const baseUrl = drupalSettings.path.baseUrl || '/';
+    fetch(
+      `${baseUrl}system/icon-render?pack_id=${encodeURIComponent(packId)}&icon_id=${encodeURIComponent(iconName)}`,
+    )
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data.svg) {
+          previewElement.innerHTML = data.svg;
+        }
+      })
+      .catch(() => {
+        // Silently fail — preview is non-critical.
+      });
+  }
 
   /**
    * Behavior for icon autocomplete preview.
@@ -62,43 +99,4 @@
       });
     },
   };
-
-  /**
-   * Updates the icon preview element.
-   *
-   * @param {string} iconId
-   *   The icon ID in format "pack_id:icon_id".
-   * @param {HTMLElement} previewElement
-   *   The preview container element.
-   */
-  function updateIconPreview(iconId, previewElement) {
-    // Clear current preview.
-    previewElement.innerHTML = '';
-
-    if (!iconId || !iconId.includes(':')) {
-      return;
-    }
-
-    const [packId, iconName] = iconId.split(':', 2);
-
-    // Use Drupal's icon render element via AJAX.
-    const baseUrl = drupalSettings.path.baseUrl || '/';
-    fetch(
-      `${baseUrl}system/icon-render?pack_id=${encodeURIComponent(packId)}&icon_id=${encodeURIComponent(iconName)}`,
-    )
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        if (data.svg) {
-          previewElement.innerHTML = data.svg;
-        }
-      })
-      .catch(() => {
-        // Silently fail — preview is non-critical.
-      });
-  }
 })(Drupal, once, drupalSettings);

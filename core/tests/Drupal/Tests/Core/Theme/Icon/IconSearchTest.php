@@ -8,12 +8,14 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Theme\Icon\IconSearch;
 use Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Theme\Icon\IconSearch
- * @group Theme
- * @group Icon
+ * Tests Drupal\Core\Theme\Icon\IconSearch.
  */
+#[CoversClass(IconSearch::class)]
+#[Group('icon')]
 class IconSearchTest extends UnitTestCase {
 
   /**
@@ -53,16 +55,15 @@ class IconSearchTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::search
+   * Tests search returns empty for a query that is too short.
    */
   public function testSearchWithShortQuery(): void {
-    // Query too short (less than 2 characters).
     $result = $this->iconSearch->search('a');
     $this->assertEmpty($result);
   }
 
   /**
-   * @covers ::search
+   * Tests search returns empty for an empty query.
    */
   public function testSearchWithEmptyQuery(): void {
     $result = $this->iconSearch->search('');
@@ -70,10 +71,9 @@ class IconSearchTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::search
+   * Tests search returns matching icon IDs.
    */
   public function testSearchReturnsResults(): void {
-    // Mock icon data.
     $icons = [
       'core:add' => ['source' => 'add.svg'],
       'core:add-new' => ['source' => 'add-new.svg'],
@@ -86,33 +86,30 @@ class IconSearchTest extends UnitTestCase {
       ->with([])
       ->willReturn($icons);
 
-    // Cache miss.
     $this->cache->expects($this->once())
       ->method('get')
       ->willReturn(FALSE);
 
-    // Cache set.
     $this->cache->expects($this->once())
       ->method('set')
       ->with(
-        $this->isType('string'),
-        $this->isType('array'),
-        $this->isType('int')
+        $this->isString(),
+        $this->isArray(),
+        CacheBackendInterface::CACHE_PERMANENT,
+        ['icon_pack_plugin']
       );
 
     $result = $this->iconSearch->search('add');
 
-    $this->assertIsArray($result);
     $this->assertNotEmpty($result);
     // Should find 'core:add' and 'core:add-new'.
     $this->assertCount(2, $result);
-    // Results are simple strings (icon IDs).
     $this->assertEquals('core:add', $result[0]);
     $this->assertEquals('core:add-new', $result[1]);
   }
 
   /**
-   * @covers ::search
+   * Tests search respects allowed icon packs.
    */
   public function testSearchWithAllowedIconPacks(): void {
     $this->iconPackManager->expects($this->once())
@@ -134,7 +131,7 @@ class IconSearchTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::search
+   * Tests search respects the max result limit.
    */
   public function testSearchWithMaxResults(): void {
     $icons = [];
@@ -159,7 +156,7 @@ class IconSearchTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::search
+   * Tests search result prioritisation (exact → starts-with → contains).
    */
   public function testSearchPrioritization(): void {
     $icons = [
@@ -182,7 +179,6 @@ class IconSearchTest extends UnitTestCase {
 
     $result = $this->iconSearch->search('home');
 
-    // Verify priority order:
     // 1. Exact match: 'core:home'
     // 2. Starts with: 'core:home-outline'
     // 3. Contains: 'other:my-home', 'pack:has-home-icon'.
@@ -191,24 +187,21 @@ class IconSearchTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::search
+   * Tests search returns cached results without querying icon packs.
    */
   public function testSearchUsesCachedResults(): void {
     $cachedResults = [
       ['value' => 'core:add', 'label' => 'core:add'],
     ];
 
-    // Cache hit.
     $cacheObject = (object) ['data' => $cachedResults];
     $this->cache->expects($this->once())
       ->method('get')
       ->willReturn($cacheObject);
 
-    // Icon pack manager should not be called when cache hits.
     $this->iconPackManager->expects($this->never())
       ->method('getIcons');
 
-    // Cache set should not be called.
     $this->cache->expects($this->never())
       ->method('set');
 
@@ -218,7 +211,7 @@ class IconSearchTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::search
+   * Tests search is case-insensitive.
    */
   public function testSearchCaseInsensitive(): void {
     $icons = [
@@ -237,14 +230,13 @@ class IconSearchTest extends UnitTestCase {
     $this->cache->expects($this->once())
       ->method('set');
 
-    // Search with lowercase should match uppercase icons.
     $result = $this->iconSearch->search('add');
 
     $this->assertCount(2, $result);
   }
 
   /**
-   * @covers ::search
+   * Tests search fuzzy matching (all query words must appear in icon ID).
    */
   public function testSearchFuzzyMatching(): void {
     $icons = [
@@ -263,7 +255,6 @@ class IconSearchTest extends UnitTestCase {
     $this->cache->expects($this->once())
       ->method('set');
 
-    // Search with multiple words should find icons containing all words.
     $result = $this->iconSearch->search('user profile');
 
     $this->assertCount(1, $result);
@@ -271,7 +262,7 @@ class IconSearchTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::search
+   * Tests search result count is capped at SEARCH_RESULT_MAX.
    */
   public function testSearchMaxResultLimit(): void {
     $icons = [];

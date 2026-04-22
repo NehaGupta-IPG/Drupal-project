@@ -7,19 +7,17 @@ namespace Drupal\KernelTests\Core\Theme\Icon;
 use Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\Controller\IconAutocompleteController;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Tests the IconAutocompleteController.
- *
- * @group Theme
- * @group Icon
- *
- * @coversDefaultClass \Drupal\system\Controller\IconAutocompleteController
  */
-#[Group('Theme')]
-#[Group('Icon')]
+#[CoversClass(IconAutocompleteController::class)]
+#[Group('icon')]
+#[RunTestsInSeparateProcesses]
 class IconAutocompleteControllerTest extends KernelTestBase {
 
   /**
@@ -44,8 +42,6 @@ class IconAutocompleteControllerTest extends KernelTestBase {
 
   /**
    * Tests the handleSearchIcons method with empty query.
-   *
-   * @covers ::handleSearchIcons
    */
   public function testHandleSearchIconsEmptyQuery(): void {
     $request = new Request();
@@ -60,8 +56,6 @@ class IconAutocompleteControllerTest extends KernelTestBase {
 
   /**
    * Tests the handleSearchIcons method with query.
-   *
-   * @covers ::handleSearchIcons
    */
   public function testHandleSearchIconsWithQuery(): void {
     $icon_pack_manager = $this->getMockBuilder(IconPackManagerInterface::class)
@@ -99,8 +93,6 @@ class IconAutocompleteControllerTest extends KernelTestBase {
 
   /**
    * Tests the handleSearchIcons method with allowed_icon_pack parameter.
-   *
-   * @covers ::handleSearchIcons
    */
   public function testHandleSearchIconsWithAllowedPacks(): void {
     $icon_pack_manager = $this->getMockBuilder(IconPackManagerInterface::class)
@@ -131,8 +123,6 @@ class IconAutocompleteControllerTest extends KernelTestBase {
 
   /**
    * Tests the handleSearchIcons method with max_result parameter.
-   *
-   * @covers ::handleSearchIcons
    */
   public function testHandleSearchIconsWithMaxResult(): void {
     $icon_pack_manager = $this->getMockBuilder(IconPackManagerInterface::class)
@@ -165,8 +155,6 @@ class IconAutocompleteControllerTest extends KernelTestBase {
 
   /**
    * Tests the handleSearchIcons method with whitespace in query.
-   *
-   * @covers ::handleSearchIcons
    */
   public function testHandleSearchIconsTrimsWhitespace(): void {
     $icon_pack_manager = $this->getMockBuilder(IconPackManagerInterface::class)
@@ -196,8 +184,6 @@ class IconAutocompleteControllerTest extends KernelTestBase {
 
   /**
    * Tests the handleSearchIcons method with short query.
-   *
-   * @covers ::handleSearchIcons
    */
   public function testHandleSearchIconsShortQuery(): void {
     $request = new Request();

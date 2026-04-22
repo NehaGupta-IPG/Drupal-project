@@ -4,21 +4,23 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Render\Element;
 
-use Drupal\Core\Render\Element\IconAutocomplete;
 use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element\IconAutocomplete;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the IconAutocomplete Form API element.
- *
- * @group Form
- * @group Icon
  */
+#[CoversClass(IconAutocomplete::class)]
 #[Group('Form')]
-#[Group('Icon')]
+#[Group('icon')]
+#[RunTestsInSeparateProcesses]
 class IconAutocompleteTest extends KernelTestBase implements FormInterface {
 
   /**
@@ -29,34 +31,34 @@ class IconAutocompleteTest extends KernelTestBase implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'icon_autocomplete_test_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['icon_basic'] = [
       '#type' => 'icon_autocomplete',
-      '#title' => $this->t('Basic icon'),
+      '#title' => new TranslatableMarkup('Basic icon'),
     ];
 
     $form['icon_required'] = [
       '#type' => 'icon_autocomplete',
-      '#title' => $this->t('Required icon'),
+      '#title' => new TranslatableMarkup('Required icon'),
       '#required' => TRUE,
     ];
 
     $form['icon_with_default'] = [
       '#type' => 'icon_autocomplete',
-      '#title' => $this->t('Icon with default'),
+      '#title' => new TranslatableMarkup('Icon with default'),
       '#default_value' => 'core:add',
     ];
 
     $form['icon_limited'] = [
       '#type' => 'icon_autocomplete',
-      '#title' => $this->t('Limited icon'),
+      '#title' => new TranslatableMarkup('Limited icon'),
       '#allowed_icon_pack' => ['core', 'test'],
     ];
 
@@ -71,14 +73,14 @@ class IconAutocompleteTest extends KernelTestBase implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
     // Not needed for this test.
   }
 
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     // Not needed for this test.
   }
 
@@ -130,7 +132,6 @@ class IconAutocompleteTest extends KernelTestBase implements FormInterface {
    * Tests icon_autocomplete element validation with valid value.
    */
   public function testIconAutocompleteValidationSuccess(): void {
-    // Mock icon pack manager to return a valid icon.
     $icon_pack_manager = $this->getMockBuilder('Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface')
       ->disableOriginalConstructor()
       ->getMock();
@@ -204,7 +205,6 @@ class IconAutocompleteTest extends KernelTestBase implements FormInterface {
    * Tests icon_autocomplete element validation with non-existent icon.
    */
   public function testIconAutocompleteValidationNonExistent(): void {
-    // Mock icon pack manager to return NULL for non-existent icon.
     $icon_pack_manager = $this->getMockBuilder('Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface')
       ->disableOriginalConstructor()
       ->getMock();
@@ -235,7 +235,6 @@ class IconAutocompleteTest extends KernelTestBase implements FormInterface {
    * Tests icon_autocomplete element validation with disallowed pack.
    */
   public function testIconAutocompleteValidationDisallowedPack(): void {
-    // Mock icon pack manager.
     $icon_pack_manager = $this->getMockBuilder('Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface')
       ->disableOriginalConstructor()
       ->getMock();
@@ -262,11 +261,8 @@ class IconAutocompleteTest extends KernelTestBase implements FormInterface {
     \Drupal::formBuilder()->submitForm($this, $form_state);
 
     $errors = $form_state->getErrors();
-    /* @phpstan-ignore-next-line */
     $this->assertNotEmpty($errors);
-    /* @phpstan-ignore-next-line */
     $this->assertArrayHasKey('icon_limited', $errors);
-    /* @phpstan-ignore-next-line */
     $this->assertStringContainsString('not in the allowed list', (string) $errors['icon_limited']);
   }
 
@@ -277,14 +273,13 @@ class IconAutocompleteTest extends KernelTestBase implements FormInterface {
     $form = [
       'icon_custom' => [
         '#type' => 'icon_autocomplete',
-        '#title' => $this->t('Custom max'),
+        '#title' => new TranslatableMarkup('Custom max'),
         '#max_result' => 25,
       ],
     ];
 
     $form_state = new FormState();
     $form = \Drupal::service('form_builder')->doBuildForm('test_form', $form, $form_state);
-    /* @phpstan-ignore-next-line */
     $this->assertEquals(25, $form['icon_custom']['#autocomplete_query_parameters']['max_result']);
   }
 
@@ -297,22 +292,18 @@ class IconAutocompleteTest extends KernelTestBase implements FormInterface {
 
     // Test with string input.
     $result = IconAutocomplete::valueCallback($element, 'core:add', $form_state);
-    /* @phpstan-ignore-next-line */
     $this->assertEquals('core:add', $result);
 
     // Test with whitespace.
     $result = IconAutocomplete::valueCallback($element, '  core:add  ', $form_state);
-    /* @phpstan-ignore-next-line */
     $this->assertEquals('core:add', $result);
 
     // Test with NULL.
     $result = IconAutocomplete::valueCallback($element, NULL, $form_state);
-    /* @phpstan-ignore-next-line */
     $this->assertNull($result);
 
     // Test with FALSE.
     $result = IconAutocomplete::valueCallback($element, FALSE, $form_state);
-    /* @phpstan-ignore-next-line */
     $this->assertNull($result);
   }
 
