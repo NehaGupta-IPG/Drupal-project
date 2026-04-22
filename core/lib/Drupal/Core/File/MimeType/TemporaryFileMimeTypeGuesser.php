@@ -15,7 +15,7 @@ class TemporaryFileMimeTypeGuesser implements MimeTypeGuesserInterface {
   public function guessMimeType($path): ?string {
     $part_extension = (new \SplFileInfo($path))->getExtension();
 
-    // If the file is a temporary file and with no extension like /tmp/ksupn
+    // If the file is a temporary file and with no extension like /tmp/foobar
     if ($part_extension === '') {
       static $finfo;
       $finfo ??= new \finfo(FILEINFO_MIME_TYPE);
