@@ -187,7 +187,7 @@ class IconAutocomplete extends FormElementBase {
     $icon = $icon_pack_manager->getIcon($value);
 
     if (!$icon instanceof IconDefinitionInterface) {
-      $form_state->setError($element, new TranslatableMarkup('The icon %icon does not exist. Please select a valid icon from the autocomplete suggestions.', [
+      $form_state->setError($element, new TranslatableMarkup('The icon %icon does not exist. Select a valid icon from the autocomplete suggestions.', [
         '%icon' => $value,
       ]));
       return;

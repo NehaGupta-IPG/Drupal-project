@@ -84,6 +84,7 @@
         // Listen for autocomplete selection using jQuery (Drupal autocomplete
         // uses jQuery).
         if (window.jQuery) {
+          // cspell:ignore autocompleteselect
           jQuery(input).on('autocompleteselect', (event, ui) => {
             // Small delay to ensure value is updated.
             setTimeout(() => {

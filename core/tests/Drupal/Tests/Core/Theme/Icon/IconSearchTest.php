@@ -156,7 +156,7 @@ class IconSearchTest extends UnitTestCase {
   }
 
   /**
-   * Tests search result prioritisation (exact → starts-with → contains).
+   * Tests search result prioritization (exact → starts-with → contains).
    */
   public function testSearchPrioritization(): void {
     $icons = [
