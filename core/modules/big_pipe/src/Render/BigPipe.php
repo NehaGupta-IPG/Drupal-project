@@ -615,7 +615,7 @@ EOF;
           $cumulative_assets->setAlreadyLoadedLibraries(explode(',', $ajax_response->getAttachments()['drupalSettings']['ajaxPageState']['libraries']));
         }
       }
-      catch(\Exception $e) {
+      catch (\Exception $e) {
         if ($this->configFactory->get('system.logging')->get('error_level') === ERROR_REPORTING_DISPLAY_VERBOSE) {
           throw $e;
         }
