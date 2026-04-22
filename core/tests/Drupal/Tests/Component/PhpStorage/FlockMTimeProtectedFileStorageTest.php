@@ -49,7 +49,7 @@ class FlockMTimeProtectedFileStorageTest extends MTimeProtectedFileStorageBase {
    * @phpstan-ignore-next-line phpunit.callParent
    */
   protected function setUp(): void {
-    // Do not call parent::setUp(): it initialises vfsStream, which does not
+    // Do not call parent::setUp(): it initializes vfsStream, which does not
     // support flock(). Use a real temporary directory instead.
     $this->directory = sys_get_temp_dir() . '/drupal_flock_test_' . uniqid('', TRUE);
     mkdir($this->directory, 0777, TRUE);
