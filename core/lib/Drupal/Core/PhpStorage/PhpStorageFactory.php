@@ -11,6 +11,18 @@ use Drupal\Core\StreamWrapper\PublicStream;
 class PhpStorageFactory {
 
   /**
+   * Placeholder value for the 'directory' configuration key.
+   *
+   * When used as a start of a directory in a storage configuration array, the
+   * factory replaces it with the return value of sys_get_temp_dir(). This
+   * directs compiled PHP files to the web server's local temporary directory
+   * rather than the site's public files directory. This is important when the
+   * public files directory is on a shared NFS mount and PHP files are compiled
+   * in a race that can lead to an ever-growing number of stale files.
+   */
+  public const USE_SYS_TEMP = '<sys_temp>';
+
+  /**
    * Instantiates a storage for generated PHP code.
    *
    * By default, this returns an instance of the
@@ -24,17 +36,22 @@ class PhpStorageFactory {
    *   The name for which the storage should be returned. Defaults to 'default'
    *   The name is also used as the storage bin if one is not specified in the
    *   configuration.
+   * @param array $configuration
+   *   Optional default configuration for the storage. Ignored if
+   *   $settings['php_storage'][$name] is set in settings.php (site
+   *   configuration always takes precedence). Recognised keys are the same as
+   *   for any PhpStorageInterface implementation: 'class', 'directory', 'bin',
+   *   and 'secret'.
    *
    * @return \Drupal\Component\PhpStorage\PhpStorageInterface
    *   An instantiated storage for the specified name.
    */
-  public static function get($name) {
-    $configuration = [];
+  public static function get($name, array $configuration = []) {
     $overrides = Settings::get('php_storage');
     if (isset($overrides[$name])) {
       $configuration = $overrides[$name];
     }
-    elseif (isset($overrides['default'])) {
+    elseif (empty($configuration) && isset($overrides['default'])) {
       $configuration = $overrides['default'];
     }
     // Make sure all the necessary configuration values are set.
@@ -44,6 +61,9 @@ class PhpStorageFactory {
     }
     if (!isset($configuration['bin'])) {
       $configuration['bin'] = $name;
+    }
+    if (isset($configuration['directory']) && str_starts_with($configuration['directory'], static::USE_SYS_TEMP)) {
+      $configuration['directory'] = sys_get_temp_dir() . substr($configuration['directory'], strlen(static::USE_SYS_TEMP));
     }
     if (!isset($configuration['directory'])) {
       $configuration['directory'] = PublicStream::basePath() . '/php';
