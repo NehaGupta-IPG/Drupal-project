@@ -523,14 +523,14 @@ system.icon_autocomplete:
   defaults:
     _controller: '\Drupal\system\Controller\IconAutocompleteController::handleSearchIcons'
   requirements:
-    _permission: 'access content'
+    _access: 'TRUE'
 
 system.icon_render:
   path: '/system/icon-render'
   defaults:
     _controller: '\Drupal\system\Controller\IconAutocompleteController::renderIcon'
   requirements:
-    _permission: 'access content'
+    _access: 'TRUE'
 
 route_callbacks:
   - '\Drupal\system\Routing\AssetRoutes::routes'

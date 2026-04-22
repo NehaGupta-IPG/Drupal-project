@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Render\Element;
 
+use Drupal\Core\Render\Markup;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
@@ -127,8 +128,8 @@ class IconAutocomplete extends FormElementBase {
     }
 
     // Add wrapper and preview for the input field.
-    $element['#field_prefix'] = '<div class="icon-wrapper"><span class="icon-preview"></span>';
-    $element['#field_suffix'] = '</div>';
+    $element['#field_prefix'] = Markup::create('<div class="icon-wrapper"><span class="icon-preview"></span>');
+    $element['#field_suffix'] = Markup::create('</div>');
 
     return $element;
   }

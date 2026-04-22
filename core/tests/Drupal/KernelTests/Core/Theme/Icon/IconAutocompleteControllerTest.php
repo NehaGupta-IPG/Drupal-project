@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Theme\Icon;
 
+use Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\Controller\IconAutocompleteController;
 use PHPUnit\Framework\Attributes\Group;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -32,16 +32,14 @@ class IconAutocompleteControllerTest extends KernelTestBase {
    *
    * @var \Drupal\system\Controller\IconAutocompleteController
    */
-  protected $controller;
+  protected IconAutocompleteController $controller;
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-
-    $icon_search = $this->container->get('icon.search');
-    $this->controller = new IconAutocompleteController($icon_search);
+    $this->controller = IconAutocompleteController::create($this->container);
   }
 
   /**
@@ -55,7 +53,7 @@ class IconAutocompleteControllerTest extends KernelTestBase {
 
     $response = $this->controller->handleSearchIcons($request);
 
-    $this->assertInstanceOf(JsonResponse::class, $response);
+    $this->assertSame(200, $response->getStatusCode());
     $data = json_decode($response->getContent(), TRUE);
     $this->assertEmpty($data);
   }
@@ -66,8 +64,7 @@ class IconAutocompleteControllerTest extends KernelTestBase {
    * @covers ::handleSearchIcons
    */
   public function testHandleSearchIconsWithQuery(): void {
-    // Mock the icon pack manager to return test icons.
-    $icon_pack_manager = $this->getMockBuilder('Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface')
+    $icon_pack_manager = $this->getMockBuilder(IconPackManagerInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
 
@@ -80,17 +77,14 @@ class IconAutocompleteControllerTest extends KernelTestBase {
       ->willReturn($test_icons);
 
     $this->container->set('plugin.manager.icon_pack', $icon_pack_manager);
-
-    // Rebuild the controller with the new service.
-    $icon_search = $this->container->get('icon.search');
-    $this->controller = new IconAutocompleteController($icon_search);
+    $this->controller = IconAutocompleteController::create($this->container);
 
     $request = new Request();
     $request->query->set('q', 'add');
 
     $response = $this->controller->handleSearchIcons($request);
 
-    $this->assertInstanceOf(JsonResponse::class, $response);
+    $this->assertSame(200, $response->getStatusCode());
     $data = json_decode($response->getContent(), TRUE);
 
     $this->assertNotEmpty($data);
@@ -109,7 +103,7 @@ class IconAutocompleteControllerTest extends KernelTestBase {
    * @covers ::handleSearchIcons
    */
   public function testHandleSearchIconsWithAllowedPacks(): void {
-    $icon_pack_manager = $this->getMockBuilder('Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface')
+    $icon_pack_manager = $this->getMockBuilder(IconPackManagerInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
 
@@ -124,9 +118,7 @@ class IconAutocompleteControllerTest extends KernelTestBase {
       ->willReturn($test_icons);
 
     $this->container->set('plugin.manager.icon_pack', $icon_pack_manager);
-
-    $icon_search = $this->container->get('icon.search');
-    $this->controller = new IconAutocompleteController($icon_search);
+    $this->controller = IconAutocompleteController::create($this->container);
 
     $request = new Request();
     $request->query->set('q', 'add');
@@ -134,7 +126,7 @@ class IconAutocompleteControllerTest extends KernelTestBase {
 
     $response = $this->controller->handleSearchIcons($request);
 
-    $this->assertInstanceOf(JsonResponse::class, $response);
+    $this->assertSame(200, $response->getStatusCode());
   }
 
   /**
@@ -143,7 +135,7 @@ class IconAutocompleteControllerTest extends KernelTestBase {
    * @covers ::handleSearchIcons
    */
   public function testHandleSearchIconsWithMaxResult(): void {
-    $icon_pack_manager = $this->getMockBuilder('Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface')
+    $icon_pack_manager = $this->getMockBuilder(IconPackManagerInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
 
@@ -156,9 +148,7 @@ class IconAutocompleteControllerTest extends KernelTestBase {
       ->willReturn($test_icons);
 
     $this->container->set('plugin.manager.icon_pack', $icon_pack_manager);
-
-    $icon_search = $this->container->get('icon.search');
-    $this->controller = new IconAutocompleteController($icon_search);
+    $this->controller = IconAutocompleteController::create($this->container);
 
     $request = new Request();
     $request->query->set('q', 'icon');
@@ -166,7 +156,7 @@ class IconAutocompleteControllerTest extends KernelTestBase {
 
     $response = $this->controller->handleSearchIcons($request);
 
-    $this->assertInstanceOf(JsonResponse::class, $response);
+    $this->assertSame(200, $response->getStatusCode());
     $data = json_decode($response->getContent(), TRUE);
 
     // Should be limited to 10 results.
@@ -179,7 +169,7 @@ class IconAutocompleteControllerTest extends KernelTestBase {
    * @covers ::handleSearchIcons
    */
   public function testHandleSearchIconsTrimsWhitespace(): void {
-    $icon_pack_manager = $this->getMockBuilder('Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface')
+    $icon_pack_manager = $this->getMockBuilder(IconPackManagerInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
 
@@ -191,16 +181,14 @@ class IconAutocompleteControllerTest extends KernelTestBase {
       ->willReturn($test_icons);
 
     $this->container->set('plugin.manager.icon_pack', $icon_pack_manager);
-
-    $icon_search = $this->container->get('icon.search');
-    $this->controller = new IconAutocompleteController($icon_search);
+    $this->controller = IconAutocompleteController::create($this->container);
 
     $request = new Request();
     $request->query->set('q', '  add  ');
 
     $response = $this->controller->handleSearchIcons($request);
 
-    $this->assertInstanceOf(JsonResponse::class, $response);
+    $this->assertSame(200, $response->getStatusCode());
     $data = json_decode($response->getContent(), TRUE);
 
     $this->assertNotEmpty($data);
@@ -218,7 +206,7 @@ class IconAutocompleteControllerTest extends KernelTestBase {
 
     $response = $this->controller->handleSearchIcons($request);
 
-    $this->assertInstanceOf(JsonResponse::class, $response);
+    $this->assertSame(200, $response->getStatusCode());
     $data = json_decode($response->getContent(), TRUE);
 
     // Should return empty array for short queries.
@@ -230,7 +218,8 @@ class IconAutocompleteControllerTest extends KernelTestBase {
    */
   public function testControllerInstantiationFromContainer(): void {
     $controller = IconAutocompleteController::create($this->container);
-    $this->assertInstanceOf(IconAutocompleteController::class, $controller);
+    $response = $controller->handleSearchIcons(new Request());
+    $this->assertSame(200, $response->getStatusCode());
   }
 
 }

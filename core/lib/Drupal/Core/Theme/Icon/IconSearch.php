@@ -45,7 +45,7 @@ class IconSearch {
    */
   public function __construct(
     private readonly IconPackManagerInterface $pluginManagerIconPack,
-    private CacheBackendInterface $cache,
+    private readonly CacheBackendInterface $cache,
   ) {}
 
   /**
@@ -79,18 +79,18 @@ class IconSearch {
     // Limit max results.
     $max_result = min($max_result, self::SEARCH_RESULT_MAX);
 
-    // Generate cache key based on search parameters.
-    $cache_key = 'icon_search:' . md5($query . implode(':', $allowed_icon_pack) . $max_result);
+    // Generate a human-readable cache key based on search parameters.
+    $cache_key = 'icon_search:' . $query . ':' . implode('+', $allowed_icon_pack) . ':' . $max_result;
 
     // Try to get cached results.
     if ($cached = $this->cache->get($cache_key)) {
       $results = $cached->data;
     }
     else {
-      // Perform the search.
+      // Perform the search and cache permanently, tagged so results are
+      // invalidated when icon packs change.
       $results = $this->doSearch($query, $allowed_icon_pack, $max_result);
-      // Cache for 1 hour.
-      $this->cache->set($cache_key, $results, time() + 3600);
+      $this->cache->set($cache_key, $results, CacheBackendInterface::CACHE_PERMANENT, ['icon_pack_plugin']);
     }
 
     // Apply result callback if provided.
@@ -135,8 +135,7 @@ class IconSearch {
 
       $icon_id_lower = mb_strtolower($icon_full_id);
 
-      // Check if query matches the icon ID.
-      // Priority 1: Exact match.
+      // Priority 1: Exact match — prepend to put it first.
       if ($icon_id_lower === $query_lower) {
         array_unshift($results, $icon_full_id);
         $count++;
@@ -173,68 +172,6 @@ class IconSearch {
     }
 
     return $results;
-  }
-
-  /**
-   * Create a result entry for list format.
-   *
-   * @param string $icon_full_id
-   *   The full icon ID (pack_id:icon_id).
-   *
-   * @return array|null
-   *   The formatted result entry or NULL if icon not found.
-   */
-  public static function createResultEntry(string $icon_full_id): ?array {
-    $icon_pack_manager = \Drupal::service('plugin.manager.icon_pack');
-    $icon = $icon_pack_manager->getIcon($icon_full_id);
-
-    if (!$icon instanceof IconDefinitionInterface) {
-      return NULL;
-    }
-
-    return [
-      'value' => $icon_full_id,
-      'label' => $icon_full_id,
-    ];
-  }
-
-  /**
-   * Create a result entry for grid format with icon preview.
-   *
-   * @param string $icon_full_id
-   *   The full icon ID (pack_id:icon_id).
-   *
-   * @return array|null
-   *   The formatted result entry with preview or NULL if icon not found.
-   */
-  public static function createResultEntryGrid(string $icon_full_id): ?array {
-    $icon_pack_manager = \Drupal::service('plugin.manager.icon_pack');
-    $renderer = \Drupal::service('renderer');
-    $icon = $icon_pack_manager->getIcon($icon_full_id);
-
-    if (!$icon instanceof IconDefinitionInterface) {
-      return NULL;
-    }
-
-    // Build icon render array.
-    $icon_render = [
-      '#type' => 'icon',
-      '#pack_id' => $icon->getPackId(),
-      '#icon_id' => $icon->getIconId(),
-      '#settings' => [
-        'width' => self::ICON_PREVIEW_SIZE,
-        'height' => self::ICON_PREVIEW_SIZE,
-      ],
-    ];
-
-    // Render the icon.
-    $icon_html = $renderer->renderRoot($icon_render);
-
-    return [
-      'value' => $icon_full_id,
-      'label' => $icon_full_id,
-      'preview' => (string) $icon_html,
-    ];
   }
 
 }

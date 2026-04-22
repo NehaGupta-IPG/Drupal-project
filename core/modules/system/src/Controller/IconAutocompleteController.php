@@ -73,7 +73,7 @@ final class IconAutocompleteController extends ControllerBase {
     // Get max results from query parameter.
     $max_result = (int) $request->query->get('max_result', IconSearch::SEARCH_RESULT);
 
-    // Perform the search without callback to get raw icon IDs.
+    // Perform the search to get raw icon IDs.
     $icon_ids = $this->iconSearch->search(
       $query,
       $allowed_icon_pack,
@@ -121,8 +121,9 @@ final class IconAutocompleteController extends ControllerBase {
       ],
     ];
 
-    // Render the icon as SVG.
-    $icon_svg = $this->renderer->renderRoot($icon_render);
+    // Render in isolation to avoid leaking cache metadata into the JSON
+    // response context.
+    $icon_svg = $this->renderer->renderInIsolation($icon_render);
 
     // Create a formatted label with inline icon + icon name + collection name.
     $label = new FormattableMarkup(
@@ -170,8 +171,9 @@ final class IconAutocompleteController extends ControllerBase {
       '#icon_id' => $icon_id,
     ];
 
-    // Render the icon.
-    $svg = $this->renderer->renderRoot($build);
+    // Render in isolation to avoid leaking cache metadata into the JSON
+    // response context.
+    $svg = $this->renderer->renderInIsolation($build);
 
     return new JsonResponse(['svg' => (string) $svg]);
   }
