@@ -13,9 +13,7 @@ namespace Drupal\Component\PhpStorage;
  *
  * flock() is reliable only on local filesystems. This class must therefore be
  * configured to store files in a local directory such as sys_get_temp_dir(),
- * never on a shared NFS mount. Each web head maintains its own compiled copy;
- * the database cache holds the hash that identifies the current container
- * version across the cluster.
+ * never on a shared NFS mount. Each web head maintains its own compiled copy.
  *
  * @see \Drupal\Core\PhpStorage\PhpStorageFactory::USE_SYS_TEMP
  */
