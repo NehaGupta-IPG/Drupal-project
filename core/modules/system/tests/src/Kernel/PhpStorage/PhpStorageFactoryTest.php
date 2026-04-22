@@ -41,6 +41,15 @@ class PhpStorageFactoryTest extends KernelTestBase {
     $php = PhpStorageFactory::get('test');
     // This should be the default class used.
     $this->assertInstanceOf(MTimeProtectedFileStorage::class, $php);
+
+    // Test that the $configuration parameter is used as the default when no
+    // settings override exists.
+    $php = PhpStorageFactory::get('test', [
+      'class' => MockPhpStorage::class,
+      'directory' => 'tmp://',
+      'secret' => 'test',
+    ]);
+    $this->assertInstanceOf(MockPhpStorage::class, $php);
   }
 
   /**
@@ -50,6 +59,15 @@ class PhpStorageFactoryTest extends KernelTestBase {
     $this->setSettings();
     $php = PhpStorageFactory::get('test');
     $this->assertInstanceOf(MockPhpStorage::class, $php);
+
+    // Test that an explicit $configuration takes precedence over the 'default'
+    // settings entry.
+    $php = PhpStorageFactory::get('test', [
+      'class' => MTimeProtectedFileStorage::class,
+      'directory' => 'tmp://',
+      'secret' => 'test',
+    ]);
+    $this->assertInstanceOf(MTimeProtectedFileStorage::class, $php);
   }
 
   /**
@@ -87,6 +105,26 @@ class PhpStorageFactoryTest extends KernelTestBase {
     $this->setSettings('test', ['secret' => NULL]);
     $php = PhpStorageFactory::get('test');
     $this->assertSame('mock hash salt', $php->getConfigurationValue('secret'), 'The default secret is used if one is not set in the overridden settings.');
+
+    // Test that USE_SYS_TEMP in the directory is replaced with
+    // sys_get_temp_dir().
+    $this->setSettings('test', ['directory' => PhpStorageFactory::USE_SYS_TEMP . '/drupal']);
+    $php = PhpStorageFactory::get('test');
+    $this->assertSame(sys_get_temp_dir() . '/drupal', $php->getConfigurationValue('directory'), 'USE_SYS_TEMP prefix was replaced with sys_get_temp_dir().');
+
+    // Test USE_SYS_TEMP alone (no subdirectory suffix).
+    $this->setSettings('test', ['directory' => PhpStorageFactory::USE_SYS_TEMP]);
+    $php = PhpStorageFactory::get('test');
+    $this->assertSame(sys_get_temp_dir(), $php->getConfigurationValue('directory'), 'USE_SYS_TEMP alone resolves to sys_get_temp_dir().');
+
+    // Test that name-specific settings override the $configuration parameter.
+    $this->setSettings('test');
+    $php = PhpStorageFactory::get('test', [
+      'class' => MTimeProtectedFileStorage::class,
+      'directory' => '/ignored',
+      'secret' => 'ignored',
+    ]);
+    $this->assertInstanceOf(MockPhpStorage::class, $php);
   }
 
   /**
