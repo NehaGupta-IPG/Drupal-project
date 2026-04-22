@@ -64,16 +64,6 @@ class OptionsWidgetsTest extends FieldTestBase {
   protected $float;
 
   /**
-   * A field storage with string values to use in this test class.
-   *
-   * This field storage uses an allowed_values_function instead of a static
-   * list.
-   *
-   * @var \Drupal\field\Entity\FieldStorageConfig
-   */
-  protected $stringAllowedValuesFunction;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
