@@ -17,9 +17,9 @@ use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
  * Container storage using Symfony's PhpDumper and PhpStorage.
  *
  * Compiles the container into a PHP class that benefits from opcache. The
- * compiled file is stored via PhpStorage (typically MTimeProtectedFileStorage)
- * and a hash is kept in the cache backend to map the cache key suffix to the
- * correct container class.
+ * compiled file is stored via PhpStorage (typically
+ * FlockMTimeProtectedFileStorage) and a hash is kept in the cache backend to
+ * map the cache key suffix to the correct container class.
  */
 class PhpDumperContainerStorage implements ContainerStorageInterface, DestructableInterface {
 
@@ -101,7 +101,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface, Destructab
     $hash = hash('xxh128', $code);
 
     $containerClass = 'DrupalContainer_' . $hash;
-    $class_exists = class_exists($containerClass, FALSE);
+    $classExists = class_exists($containerClass, FALSE);
 
     // There is no change from the loaded container, so there is nothing to do.
     if ($hash === $this->loadedContainerHash) {
@@ -112,7 +112,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface, Destructab
     // container file and class. This can occur when a container is rebuilt
     // multiple times during module installation and a later rebuild produces
     // the same hash as an earlier one.
-    if (isset($this->oldHashes[$hash]) && $class_exists) {
+    if (isset($this->oldHashes[$hash]) && $classExists) {
       unset($this->oldHashes[$hash]);
     }
     else {
@@ -123,17 +123,25 @@ class PhpDumperContainerStorage implements ContainerStorageInterface, Destructab
         "class $containerClass extends \\$baseClass\n{",
         $code,
       );
-      if (!$class_exists || !$this->phpStorage->exists($containerClass . '.php')) {
-        // Only save if the file does not exist.
-        $this->phpStorage->save($filename, $code);
+      // Only write the container to disk if it does not already exist.
+      if (!$classExists || !$this->phpStorage->exists($containerClass . '.php')) {
+        $saved = $this->phpStorage->save($filename, $code);
+        if ($saved === FALSE) {
+          // save() failed; another worker may already be writing this file.
+          return $container;
+        }
       }
       // Only include if the class is not already in memory. If it is, the
       // class was defined in a prior kernel lifecycle (e.g. the kernel was
       // booted, terminated, then booted again). MTimeProtectedFileStorage
       // writes each save() to a new mtime-based directory, so include_once
       // on that new path would trigger "Cannot redeclare class".
-      if (!$class_exists) {
-        $this->phpStorage->load($filename);
+      if (!$classExists) {
+        $loaded = $this->phpStorage->load($filename);
+        // If the file was not loaded, it is not yet in memory.
+        if ($loaded === FALSE) {
+          return $container;
+        }
       }
     }
 
