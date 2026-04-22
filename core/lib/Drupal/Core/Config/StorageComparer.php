@@ -415,6 +415,7 @@ class StorageComparer implements StorageComparerInterface {
     $this->changelist = [StorageInterface::DEFAULT_COLLECTION => $this->getEmptyChangelist()];
     $this->sourceNames = $this->targetNames = [];
     // Reset the static configuration data caches.
+    $this->cacheAllCollectionNames = NULL;
     $this->sourceCacheStorage->deleteAll();
     $this->targetCacheStorage->deleteAll();
     return $this->createChangelist();
