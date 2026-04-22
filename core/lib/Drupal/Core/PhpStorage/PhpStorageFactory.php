@@ -39,7 +39,7 @@ class PhpStorageFactory {
    * @param array $configuration
    *   Optional default configuration for the storage. Ignored if
    *   $settings['php_storage'][$name] is set in settings.php (site
-   *   configuration always takes precedence). Recognised keys are the same as
+   *   configuration always takes precedence). Recognized keys are the same as
    *   for any PhpStorageInterface implementation: 'class', 'directory', 'bin',
    *   and 'secret'.
    *
