@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Theme\Icon;
 
+use Drupal\Core\Render\Markup;
+use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Theme\Icon\IconSearch;
 use Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\Controller\IconAutocompleteController;
@@ -55,6 +58,23 @@ class IconAutocompleteControllerTest extends KernelTestBase {
   }
 
   /**
+   * Rebuilds the controller with a mocked icon pack manager.
+   *
+   * Replaces both plugin.manager.icon_pack and icon.search in the container so
+   * that the controller's IconSearch dependency uses the mock. Also replaces the
+   * renderer to avoid requiring real icon templates.
+   */
+  private function rebuildControllerWithMock(IconPackManagerInterface $icon_pack_manager): void {
+    $this->container->set('plugin.manager.icon_pack', $icon_pack_manager);
+    $cache = $this->container->get('cache.default');
+    $this->container->set('icon.search', new IconSearch($icon_pack_manager, $cache));
+    $renderer = $this->getMockBuilder(RendererInterface::class)->getMock();
+    $renderer->method('renderInIsolation')->willReturn(Markup::create(''));
+    $this->container->set('renderer', $renderer);
+    $this->controller = IconAutocompleteController::create($this->container);
+  }
+
+  /**
    * Tests the handleSearchIcons method with query.
    */
   public function testHandleSearchIconsWithQuery(): void {
@@ -67,11 +87,13 @@ class IconAutocompleteControllerTest extends KernelTestBase {
       'core:add-new' => ['source' => 'add-new.svg'],
     ];
 
-    $icon_pack_manager->method('getIcons')
-      ->willReturn($test_icons);
+    $icon = $this->getMockBuilder('Drupal\Core\Theme\Icon\IconDefinitionInterface')
+      ->getMock();
 
-    $this->container->set('plugin.manager.icon_pack', $icon_pack_manager);
-    $this->controller = IconAutocompleteController::create($this->container);
+    $icon_pack_manager->method('getIcons')->willReturn($test_icons);
+    $icon_pack_manager->method('getIcon')->willReturn($icon);
+
+    $this->rebuildControllerWithMock($icon_pack_manager);
 
     $request = new Request();
     $request->query->set('q', 'add');
@@ -103,14 +125,17 @@ class IconAutocompleteControllerTest extends KernelTestBase {
       'core:add' => ['source' => 'add.svg'],
     ];
 
+    $icon = $this->getMockBuilder('Drupal\Core\Theme\Icon\IconDefinitionInterface')
+      ->getMock();
+
     // Expect getIcons to be called with the allowed packs.
     $icon_pack_manager->expects($this->once())
       ->method('getIcons')
       ->with(['core', 'test'])
       ->willReturn($test_icons);
+    $icon_pack_manager->method('getIcon')->willReturn($icon);
 
-    $this->container->set('plugin.manager.icon_pack', $icon_pack_manager);
-    $this->controller = IconAutocompleteController::create($this->container);
+    $this->rebuildControllerWithMock($icon_pack_manager);
 
     $request = new Request();
     $request->query->set('q', 'add');
@@ -134,11 +159,13 @@ class IconAutocompleteControllerTest extends KernelTestBase {
       $test_icons["core:icon-$i"] = ['source' => "icon-$i.svg"];
     }
 
-    $icon_pack_manager->method('getIcons')
-      ->willReturn($test_icons);
+    $icon = $this->getMockBuilder('Drupal\Core\Theme\Icon\IconDefinitionInterface')
+      ->getMock();
 
-    $this->container->set('plugin.manager.icon_pack', $icon_pack_manager);
-    $this->controller = IconAutocompleteController::create($this->container);
+    $icon_pack_manager->method('getIcons')->willReturn($test_icons);
+    $icon_pack_manager->method('getIcon')->willReturn($icon);
+
+    $this->rebuildControllerWithMock($icon_pack_manager);
 
     $request = new Request();
     $request->query->set('q', 'icon');
@@ -165,11 +192,13 @@ class IconAutocompleteControllerTest extends KernelTestBase {
       'core:add' => ['source' => 'add.svg'],
     ];
 
-    $icon_pack_manager->method('getIcons')
-      ->willReturn($test_icons);
+    $icon = $this->getMockBuilder('Drupal\Core\Theme\Icon\IconDefinitionInterface')
+      ->getMock();
 
-    $this->container->set('plugin.manager.icon_pack', $icon_pack_manager);
-    $this->controller = IconAutocompleteController::create($this->container);
+    $icon_pack_manager->method('getIcons')->willReturn($test_icons);
+    $icon_pack_manager->method('getIcon')->willReturn($icon);
+
+    $this->rebuildControllerWithMock($icon_pack_manager);
 
     $request = new Request();
     $request->query->set('q', '  add  ');

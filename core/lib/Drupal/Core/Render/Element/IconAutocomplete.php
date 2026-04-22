@@ -131,6 +131,9 @@ class IconAutocomplete extends FormElementBase {
     $element['#field_prefix'] = Markup::create('<div class="icon-wrapper"><span class="icon-preview"></span>');
     $element['#field_suffix'] = Markup::create('</div>');
 
+    // Add CSS classes so they are available at build time (not just render).
+    static::setAttributes($element, ['form-icon-autocomplete', 'form-text']);
+
     return $element;
   }
 
@@ -146,7 +149,6 @@ class IconAutocomplete extends FormElementBase {
   public static function preRenderIconAutocomplete(array $element): array {
     $element['#attributes']['type'] = 'text';
     Element::setAttributes($element, ['id', 'name', 'value', 'size', 'maxlength', 'placeholder']);
-    static::setAttributes($element, ['form-icon-autocomplete', 'form-text']);
 
     return $element;
   }

@@ -2031,3 +2031,4 @@ services:
         '@plugin.manager.icon_pack',
         '@cache.default',
       ]
+  Drupal\Core\Theme\Icon\IconSearch: '@icon.search'

@@ -142,9 +142,8 @@ class IconAutocompleteTest extends KernelTestBase implements FormInterface {
 
     $icon->method('getPackId')->willReturn('core');
 
-    $icon_pack_manager->method('getIcon')
-      ->with('core:add')
-      ->willReturn($icon);
+    // Return a valid icon for any getIcon call so all fields pass validation.
+    $icon_pack_manager->method('getIcon')->willReturn($icon);
 
     $this->container->set('plugin.manager.icon_pack', $icon_pack_manager);
 
@@ -155,7 +154,6 @@ class IconAutocompleteTest extends KernelTestBase implements FormInterface {
       'icon_limited' => 'core:home',
     ]);
 
-    \Drupal::formBuilder()->buildForm($this, $form_state);
     \Drupal::formBuilder()->submitForm($this, $form_state);
 
     // No errors should be present.
@@ -192,7 +190,6 @@ class IconAutocompleteTest extends KernelTestBase implements FormInterface {
       'icon_limited' => 'core:home',
     ]);
 
-    \Drupal::formBuilder()->buildForm($this, $form_state);
     \Drupal::formBuilder()->submitForm($this, $form_state);
 
     $errors = $form_state->getErrors();
@@ -209,9 +206,8 @@ class IconAutocompleteTest extends KernelTestBase implements FormInterface {
       ->disableOriginalConstructor()
       ->getMock();
 
-    $icon_pack_manager->method('getIcon')
-      ->with('fake:nonexistent')
-      ->willReturn(NULL);
+    // Return NULL for any icon so all fields fail the existence check.
+    $icon_pack_manager->method('getIcon')->willReturn(NULL);
 
     $this->container->set('plugin.manager.icon_pack', $icon_pack_manager);
 
@@ -222,7 +218,6 @@ class IconAutocompleteTest extends KernelTestBase implements FormInterface {
       'icon_limited' => 'core:home',
     ]);
 
-    \Drupal::formBuilder()->buildForm($this, $form_state);
     \Drupal::formBuilder()->submitForm($this, $form_state);
 
     $errors = $form_state->getErrors();
@@ -245,9 +240,8 @@ class IconAutocompleteTest extends KernelTestBase implements FormInterface {
 
     $icon->method('getPackId')->willReturn('other');
 
-    $icon_pack_manager->method('getIcon')
-      ->with('other:icon')
-      ->willReturn($icon);
+    // Return the icon for any getIcon call so the pack check can be evaluated.
+    $icon_pack_manager->method('getIcon')->willReturn($icon);
 
     $this->container->set('plugin.manager.icon_pack', $icon_pack_manager);
 
@@ -270,17 +264,16 @@ class IconAutocompleteTest extends KernelTestBase implements FormInterface {
    * Tests icon_autocomplete element with custom max_result.
    */
   public function testIconAutocompleteWithMaxResult(): void {
-    $form = [
-      'icon_custom' => [
-        '#type' => 'icon_autocomplete',
-        '#title' => new TranslatableMarkup('Custom max'),
-        '#max_result' => 25,
-      ],
+    $element = [
+      '#type' => 'icon_autocomplete',
+      '#title' => new TranslatableMarkup('Custom max'),
+      '#max_result' => 25,
+      '#allowed_icon_pack' => [],
     ];
-
     $form_state = new FormState();
-    $form = \Drupal::service('form_builder')->doBuildForm('test_form', $form, $form_state);
-    $this->assertEquals(25, $form['icon_custom']['#autocomplete_query_parameters']['max_result']);
+    $complete_form = [];
+    IconAutocomplete::processIconAutocomplete($element, $form_state, $complete_form);
+    $this->assertEquals(25, $element['#autocomplete_query_parameters']['max_result']);
   }
 
   /**
