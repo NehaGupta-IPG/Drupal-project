@@ -323,7 +323,7 @@ class EntityDefinitionUpdateProviderTest extends EntityKernelTestBase {
 
     // Check that the initial values have been applied.
     $storage = \Drupal::entityTypeManager()->getStorage('entity_test_update');
-    $entities = $storage->loadMultiple();
+    $entities = $storage->loadMultiple([1, 2]);
     $this->assertEquals('First entity', $entities[1]->get('new_base_field')->value);
     $this->assertEquals('Second entity', $entities[2]->get('new_base_field')->value);
 

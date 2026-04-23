@@ -65,12 +65,12 @@ class ActionTest extends KernelTestBase {
     $name = $this->randomMachineName();
     $user_storage = $this->container->get('entity_type.manager')->getStorage('user');
     $account = $user_storage->create(['name' => $name, 'bundle' => 'user']);
-    $loaded_accounts = $user_storage->loadMultiple();
+    $loaded_accounts = $user_storage->loadByProperties();
     $this->assertCount(0, $loaded_accounts);
 
     // Execute the 'save entity' action.
     $action->execute($account);
-    $loaded_accounts = $user_storage->loadMultiple();
+    $loaded_accounts = $user_storage->loadByProperties();
     $this->assertCount(1, $loaded_accounts);
     $account = reset($loaded_accounts);
     $this->assertEquals($name, $account->label());

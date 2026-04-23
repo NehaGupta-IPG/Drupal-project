@@ -59,7 +59,7 @@ class WorkspaceRepository implements WorkspaceRepositoryInterface {
       }
 
       /** @var \Drupal\workspaces\WorkspaceInterface[] $workspaces */
-      $workspaces = $this->entityTypeManager->getStorage('workspace')->loadMultiple();
+      $workspaces = $this->entityTypeManager->getStorage('workspace')->loadByProperties();
 
       // First, sort everything alphabetically.
       uasort($workspaces, function (WorkspaceInterface $a, WorkspaceInterface $b) {
