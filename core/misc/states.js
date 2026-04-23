@@ -720,7 +720,9 @@
 
       if ($radios.length) {
         const $wrapper = $(e.target).closest('.js-form-item, .js-form-wrapper');
-        const $legendLabel = $wrapper.find('legend .fieldset__label, legend span').first();
+        const $legendLabel = $wrapper
+          .find('legend .fieldset__label, legend span')
+          .first();
         // @todo Find empty _none options by data attribute instead.
         const $emptyRadio = $radios.filter('[value="_none"]');
         const $emptyItem = $emptyRadio.closest('.js-form-item, .form-item');
