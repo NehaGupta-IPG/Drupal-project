@@ -3140,30 +3140,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Config/Entity/Query/Condition.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$entity_type of method Drupal\\\\Core\\\\Config\\\\Entity\\\\Query\\\\QueryFactory\\:\\:deleteConfigKeyStore\\(\\) expects Drupal\\\\Core\\\\Config\\\\Entity\\\\ConfigEntityTypeInterface, Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Config/Entity/Query/QueryFactory.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$entity_type of method Drupal\\\\Core\\\\Config\\\\Entity\\\\Query\\\\QueryFactory\\:\\:updateConfigKeyStore\\(\\) expects Drupal\\\\Core\\\\Config\\\\Entity\\\\ConfigEntityTypeInterface, Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Config/Entity/Query/QueryFactory.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#2 \\$config of method Drupal\\\\Core\\\\Config\\\\Entity\\\\Query\\\\QueryFactory\\:\\:deleteConfigKeyStore\\(\\) expects Drupal\\\\Core\\\\Config\\\\Config, Drupal\\\\Core\\\\Config\\\\StorableConfigBase given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Config/Entity/Query/QueryFactory.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#2 \\$config of method Drupal\\\\Core\\\\Config\\\\Entity\\\\Query\\\\QueryFactory\\:\\:updateConfigKeyStore\\(\\) expects Drupal\\\\Core\\\\Config\\\\Config, Drupal\\\\Core\\\\Config\\\\StorableConfigBase given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Config/Entity/Query/QueryFactory.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\ExportStorageManager\\:\\:replaceStorageContents\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
