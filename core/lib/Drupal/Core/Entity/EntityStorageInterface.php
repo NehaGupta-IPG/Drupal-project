@@ -40,8 +40,8 @@ interface EntityStorageInterface {
    *
    * @param array<string|int>|null $ids
    *   An array of entity IDs, or NULL to load all entities. Loading all
-   *   entities of a content entity type with NULL is deprecated in drupal:11.4.0
-   *   and will throw an exception in drupal:13.0.0.
+   *   entities of a content entity type with NULL is deprecated in
+   *   drupal:11.4.0 and will throw an exception in drupal:13.0.0.
    *
    * @return \Drupal\Core\Entity\EntityInterface[]
    *   An array of successfully loaded objects indexed by their IDs.
