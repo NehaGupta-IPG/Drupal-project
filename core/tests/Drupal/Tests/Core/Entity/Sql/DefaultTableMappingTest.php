@@ -571,7 +571,6 @@ class DefaultTableMappingTest extends UnitTestCase {
    * @param string $expected
    *   The expected table name.
    *
-   * @legacy-covers ::__construct
    */
   #[DataProvider('providerTestConstructorTableNameFallbacks')]
   public function testConstructorTableNameFallbacks(string $table_getter, array $table_names, string $expected): void {
@@ -601,7 +600,7 @@ class DefaultTableMappingTest extends UnitTestCase {
   /**
    * Provides test data for constructor table-name fallbacks.
    *
-   * @return array[]
+   * @return array
    *   A nested array of getter name, entity type table names, and expectation.
    */
   public static function providerTestConstructorTableNameFallbacks(): array {
