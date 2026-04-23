@@ -39,6 +39,7 @@ class DateRangeWidgetBase extends DateTimeWidgetBase {
       '#attributes' => ['class' => ['check_group']],
       '#attached' => [
         'library' => ['datetime_range/datetime_range'],
+        'drupalSettings' => ['datetime_range' => [$items->getFieldDefinition()->getName() => $this->getPluginId()]],
       ],
     ];
 
