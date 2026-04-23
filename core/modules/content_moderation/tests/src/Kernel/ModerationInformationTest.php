@@ -35,6 +35,7 @@ class ModerationInformationTest extends KernelTestBase {
     'workflows',
     'language',
     'content_translation',
+    'workspaces',
   ];
 
   /**
@@ -50,6 +51,7 @@ class ModerationInformationTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installWorkspacesModuleSchema();
     $this->installEntitySchema('entity_test_rev');
     $this->installEntitySchema('entity_test_mulrevpub');
     $this->installEntitySchema('content_moderation_state');

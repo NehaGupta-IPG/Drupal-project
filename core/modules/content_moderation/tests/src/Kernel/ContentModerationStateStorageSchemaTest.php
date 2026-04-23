@@ -33,6 +33,7 @@ class ContentModerationStateStorageSchemaTest extends KernelTestBase {
     'user',
     'workflows',
     'entity_test',
+    'workspaces',
   ];
 
   /**
@@ -41,6 +42,7 @@ class ContentModerationStateStorageSchemaTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installWorkspacesModuleSchema();
     $this->installSchema('node', 'node_access');
     $this->installEntitySchema('node');
     $this->installEntitySchema('entity_test');

@@ -57,6 +57,12 @@ trait QueryTrait {
    * {@inheritdoc}
    */
   public function prepare() {
+    // Do not alter queries specifically instructed to ignore the active
+    // workspace.
+    if ($this->getMetaData('workspace') === FALSE) {
+      return parent::prepare();
+    }
+
     // Latest revision queries have to return the latest workspace-specific
     // revisions, in order to prevent changes done outside the workspace from
     // leaking into the currently active one. For the same reason, latest

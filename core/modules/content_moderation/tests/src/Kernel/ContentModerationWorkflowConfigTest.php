@@ -30,6 +30,7 @@ class ContentModerationWorkflowConfigTest extends KernelTestBase {
     'user',
     'system',
     'workflows',
+    'workspaces',
   ];
 
   /**
@@ -38,6 +39,7 @@ class ContentModerationWorkflowConfigTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installWorkspacesModuleSchema();
     $this->installSchema('node', 'node_access');
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');

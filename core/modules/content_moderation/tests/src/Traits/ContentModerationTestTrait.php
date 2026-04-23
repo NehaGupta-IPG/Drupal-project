@@ -14,6 +14,23 @@ use Drupal\workflows\WorkflowInterface;
 trait ContentModerationTestTrait {
 
   /**
+   * Installs the table schemas needed by the Workspaces module.
+   */
+  protected function installWorkspacesModuleSchema(): void {
+    // @phpstan-ignore method.notFound
+    $this->installEntitySchema('workspace');
+    // @phpstan-ignore method.notFound
+    $this->installSchema('workspaces', ['workspace_association', 'workspace_association_revision']);
+
+    // Install the entity schema for supported entity types to ensure that the
+    // 'workspace' revision metadata field gets created.
+    foreach (array_keys(\Drupal::service('workspaces.information')->getSupportedEntityTypes()) as $entity_type_id) {
+      // @phpstan-ignore method.notFound
+      $this->installEntitySchema($entity_type_id);
+    }
+  }
+
+  /**
    * Creates the editorial workflow.
    *
    * @return \Drupal\workflows\Entity\Workflow

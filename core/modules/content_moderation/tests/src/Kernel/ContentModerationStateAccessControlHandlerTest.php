@@ -26,6 +26,7 @@ class ContentModerationStateAccessControlHandlerTest extends KernelTestBase {
     'content_moderation',
     'workflows',
     'user',
+    'workspaces',
   ];
 
   /**

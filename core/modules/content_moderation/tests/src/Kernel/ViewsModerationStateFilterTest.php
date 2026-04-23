@@ -40,6 +40,7 @@ class ViewsModerationStateFilterTest extends ViewsKernelTestBase {
     'workflow_type_test',
     'entity_test',
     'language',
+    'workspaces',
   ];
 
   /**
@@ -48,6 +49,7 @@ class ViewsModerationStateFilterTest extends ViewsKernelTestBase {
   protected function setUp($import_test_views = TRUE): void {
     parent::setUp(FALSE);
 
+    $this->installWorkspacesModuleSchema();
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
     $this->installEntitySchema('content_moderation_state');

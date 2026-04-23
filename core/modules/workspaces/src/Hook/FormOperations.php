@@ -9,7 +9,6 @@ use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Render\Element;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\workspaces\Entity\Workspace;
 use Drupal\workspaces\Negotiator\QueryParameterWorkspaceNegotiator;
 use Drupal\workspaces\WorkspaceManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -30,21 +29,8 @@ class FormOperations {
    */
   #[Hook('form_alter')]
   public function formAlter(array &$form, FormStateInterface $form_state, $form_id): void {
-    $active_workspace = $this->workspaceManager->getActiveWorkspace();
-
-    // Ensure that the form's initial workspace (if any) is used for the current
-    // request.
-    $form_workspace_id = $form_state->getUserInput()['active_workspace_id'] ?? NULL;
-    $form_workspace = $form_workspace_id
-      ? Workspace::load($form_workspace_id)
-      : NULL;
-    if ($form_workspace && (!$active_workspace || $active_workspace->id() != $form_workspace->id())) {
-      $this->workspaceManager->setActiveWorkspace($form_workspace, FALSE);
-      $active_workspace = $form_workspace;
-    }
-
     // No alterations are needed if we're not in a workspace context.
-    if (!$active_workspace) {
+    if (!$active_workspace = $this->workspaceManager->getActiveWorkspace()) {
       return;
     }
 

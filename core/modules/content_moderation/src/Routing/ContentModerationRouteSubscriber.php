@@ -64,8 +64,18 @@ class ContentModerationRouteSubscriber extends RouteSubscriberBase {
     if (!$entity_form = $route->getDefault('_entity_form')) {
       return;
     }
+
+    // If no operation is provided, use 'default'.
+    $entity_form .= '.default';
+    [$entity_type, $operation] = explode('.', $entity_form);
+
+    // Only set the flag on forms that allow editing a moderated entity.
+    // @see \Drupal\content_moderation\EntityTypeInfo::isModeratedEntityEditForm()
+    if (!in_array($operation, ['edit', 'default', 'layout_builder'], TRUE)) {
+      return;
+    }
+
     // Only set the flag on entity types which are revisionable.
-    [$entity_type] = explode('.', $entity_form, 2);
     if (!isset($this->getModeratedEntityTypes()[$entity_type]) || !$this->getModeratedEntityTypes()[$entity_type]->isRevisionable()) {
       return;
     }

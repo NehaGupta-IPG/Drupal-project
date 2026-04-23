@@ -27,6 +27,7 @@ class ContentModerationSyncingTest extends KernelTestBase {
     'workflows',
     'content_moderation',
     'entity_test',
+    'workspaces',
   ];
 
   /**
@@ -34,6 +35,7 @@ class ContentModerationSyncingTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->installWorkspacesModuleSchema();
     $this->installEntitySchema('workflow');
     $this->installEntitySchema('content_moderation_state');
     $this->installEntitySchema('entity_test_mulrevpub');

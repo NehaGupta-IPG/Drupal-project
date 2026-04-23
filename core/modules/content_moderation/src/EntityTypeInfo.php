@@ -22,6 +22,12 @@ use Drupal\content_moderation\Entity\Handler\ModerationHandler;
 use Drupal\content_moderation\Entity\Handler\NodeModerationHandler;
 use Drupal\content_moderation\Entity\Handler\TaxonomyTermModerationHandler;
 use Drupal\content_moderation\Entity\Routing\EntityModerationRouteProvider;
+use Drupal\Core\TempStore\PrivateTempStoreFactory;
+use Drupal\node\Form\NodePreviewForm;
+use Drupal\workspaces\Negotiator\QueryParameterWorkspaceNegotiator;
+use Drupal\workspaces\Provider\WorkspaceProviderInterface;
+use Drupal\workspaces\WorkspaceInformationInterface;
+use Drupal\workspaces\WorkspaceManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -84,23 +90,18 @@ class EntityTypeInfo implements ContainerInjectionInterface {
     'taxonomy_term' => TaxonomyTermModerationHandler::class,
   ];
 
-  /**
-   * EntityTypeInfo constructor.
-   *
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
-   *   The translation service. for form alters.
-   * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_information
-   *   The moderation information service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   Entity type manager.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info
-   *   Bundle information service.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   Current user.
-   * @param \Drupal\content_moderation\StateTransitionValidationInterface $validator
-   *   State transition validator.
-   */
-  public function __construct(TranslationInterface $translation, ModerationInformationInterface $moderation_information, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $bundle_info, AccountInterface $current_user, StateTransitionValidationInterface $validator) {
+  public function __construct(
+    TranslationInterface $translation,
+    ModerationInformationInterface $moderation_information,
+    EntityTypeManagerInterface $entity_type_manager,
+    EntityTypeBundleInfoInterface $bundle_info,
+    AccountInterface $current_user,
+    StateTransitionValidationInterface $validator,
+    protected PrivateTempStoreFactory $tempStoreFactory,
+    protected WorkspaceManagerInterface $workspaceManager,
+    protected WorkspaceInformationInterface $workspaceInfo,
+    protected WorkspaceProviderInterface $workspaceProvider,
+  ) {
     $this->stringTranslation = $translation;
     $this->moderationInfo = $moderation_information;
     $this->entityTypeManager = $entity_type_manager;
@@ -119,7 +120,11 @@ class EntityTypeInfo implements ContainerInjectionInterface {
       $container->get('entity_type.manager'),
       $container->get('entity_type.bundle.info'),
       $container->get('current_user'),
-      $container->get('content_moderation.state_transition_validation')
+      $container->get('content_moderation.state_transition_validation'),
+      $container->get('tempstore.private'),
+      $container->get('workspaces.manager'),
+      $container->get('workspaces.information'),
+      $container->get(ContentModerationWorkspaceProvider::class),
     );
   }
 
@@ -321,6 +326,26 @@ class EntityTypeInfo implements ContainerInjectionInterface {
       $new_revision->set($revision_key, $new_revision->getLoadedRevisionId());
       $form_object->setEntity($new_revision);
     }
+
+    if ($entity->isNew()
+      && $form_object instanceof ContentEntityFormInterface
+      && $this->moderationInfo->isModeratedEntity($entity)
+      && $this->workspaceInfo->isEntitySupported($entity)
+    ) {
+      // If the entity form is built for the first time, create a temporary
+      // moderation workspace so it can track dependencies created before the
+      // initial form is submitted.
+      if (!$this->workspaceManager->hasActiveWorkspace()) {
+        $workspace = $this->workspaceProvider->createModerationWorkspace($entity, TRUE);
+        $this->workspaceManager->setActiveWorkspace($workspace, FALSE);
+        $form_state->set('temporary_moderation_workspace', $workspace->id());
+      }
+      elseif ($this->workspaceManager->getActiveWorkspace()->id() === $form_state->getUserInput()['temporary_moderation_workspace_id'] ?? NULL) {
+        // If the entity form has been submitted, and the temporary moderation
+        // workspace set in ::formAlter() matches the active workspace.
+        $form_object->getEntity()->_temporaryModerationWorkspace = $this->workspaceManager->getActiveWorkspace()->id();
+      }
+    }
   }
 
   /**
@@ -368,6 +393,22 @@ class EntityTypeInfo implements ContainerInjectionInterface {
       // the current state instead.
       if (isset($form['meta']['published'])) {
         $form['meta']['published']['#markup'] = $this->moderationInfo->getWorkflowForEntity($entity)->getTypePlugin()->getState($entity->moderation_state->value)->label();
+      }
+
+      if ($temporary_moderation_workspace_id = $form_state->get('temporary_moderation_workspace')) {
+        $form['temporary_moderation_workspace_id'] = [
+          '#type' => 'hidden',
+          '#value' => $temporary_moderation_workspace_id,
+        ];
+      }
+    }
+    elseif ($form_object instanceof NodePreviewForm) {
+      /** @var \Drupal\Core\Form\FormStateInterface $node_form_state */
+      $node_form_state = $this->tempStoreFactory->get('node_preview')->get($form['uuid']['#value']);
+      if ($temporary_workspace_id = $node_form_state->getUserInput()['temporary_moderation_workspace_id'] ?? NULL) {
+        // Persist the temporary moderation workspace when going back to the
+        // node form.
+        $form['backlink']['#options']['query'] += QueryParameterWorkspaceNegotiator::getQueryOptions($temporary_workspace_id);
       }
     }
   }

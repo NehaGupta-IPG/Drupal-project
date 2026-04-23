@@ -32,6 +32,7 @@ class EntityTypeInfoTest extends KernelTestBase {
     'workflows',
     'entity_test',
     'user',
+    'workspaces',
   ];
 
   /**
@@ -61,6 +62,7 @@ class EntityTypeInfoTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installWorkspacesModuleSchema();
     $this->entityTypeInfo = $this->container->get('class_resolver')->getInstanceFromDefinition(EntityTypeInfo::class);
     $this->entityTypeManager = $this->container->get('entity_type.manager');
     $this->entityFieldManager = $this->container->get('entity_field.manager');

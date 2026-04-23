@@ -37,6 +37,7 @@ class EntityStateChangeValidationTest extends KernelTestBase {
     'system',
     'language',
     'workflows',
+    'workspaces',
   ];
 
   /**
@@ -52,6 +53,7 @@ class EntityStateChangeValidationTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installWorkspacesModuleSchema();
     $this->installSchema('node', 'node_access');
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');

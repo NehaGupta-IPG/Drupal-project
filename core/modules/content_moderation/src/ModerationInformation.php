@@ -95,6 +95,7 @@ class ModerationInformation implements ModerationInformationInterface {
         // No access check is performed here since this is an API function and
         // should return the same ID regardless of the current user.
         ->accessCheck(FALSE)
+        ->addMetaData('workspace', FALSE)
         ->execute();
       if ($result) {
         return key($result);
@@ -150,7 +151,8 @@ class ModerationInformation implements ModerationInformationInterface {
    */
   public function isDefaultRevisionPublished(ContentEntityInterface $entity) {
     $workflow = $this->getWorkflowForEntity($entity);
-    $default_revision = $this->entityTypeManager->getStorage($entity->getEntityTypeId())->load($entity->id());
+    $default_revision_id = $this->getDefaultRevisionId($entity->getEntityTypeId(), $entity->id());
+    $default_revision = $this->entityTypeManager->getStorage($entity->getEntityTypeId())->loadRevision($default_revision_id);
     // If no default revision could be loaded, the entity has not yet been
     // saved. In this case the moderation_state of the unsaved entity can be
     // used, since once saved it will become the default.
