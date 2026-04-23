@@ -533,13 +533,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public function jsonExpression(string $field, string $path): JsonExpression {
-    return new JsonExpression($this, $field, $path);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function driverTransactionManager(): TransactionManagerInterface {
     return new TransactionManager($this);
   }

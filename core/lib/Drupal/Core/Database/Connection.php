@@ -997,7 +997,14 @@ abstract class Connection {
    * @return \Drupal\Core\Database\Query\JsonExpression
    *   A driver-specific JsonExpression instance.
    */
-  abstract public function jsonExpression(string $field, string $path): JsonExpression;
+  public function jsonExpression(string $field, string $path): JsonExpression {
+    $class = $this->getDriverClass('JsonExpression');
+    if ($class === 'JsonExpression') {
+      @trigger_error('Not implementing JsonExpression in database drivers is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Implement JsonExpression to provide JSON support. See https://www.drupal.org/node/3389682', E_USER_DEPRECATED);
+      throw new \LogicException('Driver does not provide JSON support.');
+    }
+    return new $class($this, $field, $path);
+  }
 
   /**
    * Prepares and returns a CONDITION query object.

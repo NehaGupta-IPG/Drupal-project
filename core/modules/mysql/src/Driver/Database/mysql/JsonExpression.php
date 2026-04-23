@@ -26,7 +26,11 @@ class JsonExpression extends BaseJsonExpression {
   public function toCastSql(JsonCastType $type, ?string $expression = NULL): string {
     $extract = $expression ?? $this->toSql();
     return match ($type) {
-      JsonCastType::Bool, JsonCastType::Int => "CAST({$extract} AS SIGNED)",
+      // MariaDB's CAST(<JSON boolean> AS SIGNED) returns 0 for both true and
+      // false, so compare against the JSON literal 'true' to get a 1/0 result
+      // that works on both MySQL and MariaDB.
+      JsonCastType::Bool => "({$extract} = JSON_EXTRACT('true', '$'))",
+      JsonCastType::Int => "CAST({$extract} AS SIGNED)",
       JsonCastType::Float => "CAST({$extract} AS DOUBLE)",
       JsonCastType::Text => "CAST(JSON_UNQUOTE({$extract}) AS CHAR(255))",
     };

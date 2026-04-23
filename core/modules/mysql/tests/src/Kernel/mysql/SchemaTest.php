@@ -297,6 +297,17 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
   /**
    * {@inheritdoc}
    */
+  protected function doTestJsonIndexCleanup(): void {
+    // MariaDB drops JsonIndex entries, so there's nothing to clean up.
+    if ($this->connection->isMariaDb()) {
+      return;
+    }
+    parent::doTestJsonIndexCleanup();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function doTestJsonIndexAndFieldOperations(): void {
     if ($this->connection->isMariaDb()) {
       return;
