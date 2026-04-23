@@ -138,7 +138,6 @@ class DatabaseStorage implements StorageInterface {
    * {@inheritdoc}
    */
   public function write($name, array $data) {
-    $data = $this->encode($data);
     try {
       return $this->doWrite($name, $data);
     }
@@ -157,16 +156,19 @@ class DatabaseStorage implements StorageInterface {
    *
    * @param string $name
    *   The config name.
-   * @param string $data
-   *   The config data, already dumped to a string.
+   * @param array $data
+   *   The config data.
    *
    * @return bool
    *   TRUE when the write was successful, FALSE otherwise.
    */
-  protected function doWrite($name, $data) {
+  protected function doWrite($name, array $data) {
     return (bool) $this->connection->merge($this->table, $this->options)
       ->keys(['collection', 'name'], [$this->collection, $name])
-      ->fields(['data' => $data])
+      ->fields([
+        'data' => serialize($data),
+        'data_query' => json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR),
+      ])
       ->execute();
   }
 
@@ -223,6 +225,11 @@ class DatabaseStorage implements StorageInterface {
           'type' => 'blob',
           'not null' => FALSE,
           'size' => 'big',
+        ],
+        'data_query' => [
+          'description' => 'A JSON-encoded configuration object for querying.',
+          'type' => 'json',
+          'not null' => FALSE,
         ],
       ],
       'primary key' => ['collection', 'name'],

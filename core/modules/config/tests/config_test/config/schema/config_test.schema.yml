@@ -63,6 +63,9 @@ config_test.query.*:
     number:
       type: integer
       label: 'number'
+    flag:
+      type: boolean
+      label: 'Flag'
 
 config_test.types:
   type: config_object

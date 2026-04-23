@@ -35,6 +35,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
     'label',
     'array',
     'number',
+    'flag',
   ],
 )]
 class ConfigQueryTest extends ConfigTest {
@@ -45,6 +46,13 @@ class ConfigQueryTest extends ConfigTest {
    * @var int
    */
   public $number;
+
+  /**
+   * A boolean used by the boolean condition tests.
+   *
+   * @var bool
+   */
+  public $flag = FALSE;
 
   /**
    * An array used by the wildcard tests.

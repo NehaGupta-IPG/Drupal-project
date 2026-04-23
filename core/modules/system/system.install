@@ -6,6 +6,7 @@
  */
 
 use Drupal\Component\Utility\Crypt;
+use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Update\EquivalentUpdate;
 
@@ -34,6 +35,56 @@ function system_install(): void {
  */
 function system_update_last_removed(): int {
   return 11300;
+}
+
+/**
+ * Convert the config table data column from serialized blob to JSON.
+ */
+function system_update_11400(): void {
+  $connection = \Drupal::database();
+  $schema = $connection->schema();
+
+  $field_spec = [
+    'description' => 'A JSON-encoded configuration object for querying.',
+    'type' => 'json',
+    'not null' => FALSE,
+  ];
+
+  // Add the 'data_query' JSON column if it doesn't exist yet.
+  if (!$schema->fieldExists('config', 'data_query')) {
+    $schema->addField('config', 'data_query', $field_spec);
+  }
+
+  // Populate data_query for all rows that don't have it yet, in batches.
+  $rows = $connection->select('config', 'c')
+    ->fields('c', ['collection', 'name', 'data'])
+    ->isNull('data_query')
+    ->execute()
+    ->fetchAll();
+  foreach (array_chunk($rows, 100) as $batch) {
+    foreach ($batch as $row) {
+      $data = @unserialize($row->data, ['allowed_classes' => FALSE]);
+      $connection->update('config')
+        ->fields([
+          'data_query' => json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR),
+        ])
+        ->condition('collection', $row->collection)
+        ->condition('name', $row->name)
+        ->execute();
+    }
+  }
+}
+
+/**
+ * Remove config entity key-value lookup store entries.
+ */
+function system_update_11401(): void {
+  $update_manager = \Drupal::entityDefinitionUpdateManager();
+  foreach ($update_manager->getEntityTypes() as $entity_type) {
+    if ($entity_type instanceof ConfigEntityTypeInterface) {
+      \Drupal::keyValue('config.entity.key_store.' . $entity_type->id())->deleteAll();
+    }
+  }
 }
 
 /**

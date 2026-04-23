@@ -6,7 +6,7 @@ namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\config_test\Entity\ConfigQueryTest;
 use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
-use Drupal\Core\Config\Entity\Query\QueryFactory;
+use Drupal\Core\Config\Entity\Query\SqlQuery;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -63,6 +63,7 @@ class ConfigEntityQueryTest extends KernelTestBase {
       'label' => 'entity_1',
       'id' => '1',
       'number' => 31,
+      'flag' => TRUE,
       'array' => $array,
     ]);
     $this->entities[] = $entity;
@@ -85,6 +86,7 @@ class ConfigEntityQueryTest extends KernelTestBase {
       'label' => 'test_prefix_entity_3',
       'id' => '3',
       'number' => 59,
+      'flag' => TRUE,
       'array' => $array,
     ]);
     $this->entities[] = $entity;
@@ -107,6 +109,7 @@ class ConfigEntityQueryTest extends KernelTestBase {
       'label' => 'entity_5_TEST_contains_entity_5',
       'id' => '5',
       'number' => 53,
+      'flag' => TRUE,
       'array' => $array,
     ]);
     $this->entities[] = $entity;
@@ -139,6 +142,9 @@ class ConfigEntityQueryTest extends KernelTestBase {
    * Tests basic functionality.
    */
   public function testConfigEntityQuery(): void {
+    // Verify that the query factory returns a SqlQuery instance by default.
+    $this->assertInstanceOf(SqlQuery::class, $this->entityStorage->getQuery());
+
     // Run a test without any condition.
     $this->queryResults = $this->entityStorage->getQuery()
       ->execute();
@@ -677,6 +683,29 @@ class ConfigEntityQueryTest extends KernelTestBase {
       ->notExists('does.not.exist')
       ->execute();
     $this->assertResults(['1', '2', '3', '4', '5', '6', '7']);
+
+    // Wildcard IN matches entities where any expanded value is in the set.
+    // Entities 1, 3 have level1.* = [9, 1]; entities 2, 4 have [9, 2].
+    $this->queryResults = $this->entityStorage->getQuery()
+      ->condition('array.level1.*', [1, 2], 'IN')
+      ->execute();
+    $this->assertResults(['1', '2', '3', '4']);
+    $this->queryResults = $this->entityStorage->getQuery()
+      ->condition('array.level1.*', [3], 'IN')
+      ->execute();
+    $this->assertResults(['5']);
+    $this->queryResults = $this->entityStorage->getQuery()
+      ->condition('array.level1.*', [99], 'IN')
+      ->execute();
+    $this->assertResults([]);
+
+    // Wildcard NOT IN: entities where any expanded value is NOT in the set.
+    // Entities 1-5 have level2a=9 (not in [1,2,3,4]), so they match.
+    // Entity 7 only has level2=4 (in the set), so it doesn't match.
+    $this->queryResults = $this->entityStorage->getQuery()
+      ->condition('array.level1.*', [1, 2, 3, 4], 'NOT IN')
+      ->execute();
+    $this->assertResults(['1', '2', '3', '4', '5']);
   }
 
   /**
@@ -696,64 +725,6 @@ class ConfigEntityQueryTest extends KernelTestBase {
   }
 
   /**
-   * Tests lookup keys are added to the key value store.
-   */
-  public function testLookupKeys(): void {
-    \Drupal::service('state')->set('config_test.lookup_keys', TRUE);
-    \Drupal::entityTypeManager()->clearCachedDefinitions();
-    $key_value = $this->container->get('keyvalue')->get(QueryFactory::CONFIG_LOOKUP_PREFIX . 'config_test');
-
-    $test_entities = [];
-    $storage = \Drupal::entityTypeManager()->getStorage('config_test');
-    $entity = $storage->create([
-      'label' => 'entity_1',
-      'id' => '1',
-      'style' => 'test',
-    ]);
-    $test_entities[$entity->getConfigDependencyName()] = $entity;
-    $entity->enforceIsNew();
-    $entity->save();
-
-    $expected[] = $entity->getConfigDependencyName();
-    $this->assertEquals($expected, $key_value->get('style:test'));
-
-    $entity = $storage->create([
-      'label' => 'entity_2',
-      'id' => '2',
-      'style' => 'test',
-    ]);
-    $test_entities[$entity->getConfigDependencyName()] = $entity;
-    $entity->enforceIsNew();
-    $entity->save();
-    $expected[] = $entity->getConfigDependencyName();
-    $this->assertEquals($expected, $key_value->get('style:test'));
-
-    $entity = $storage->create([
-      'label' => 'entity_3',
-      'id' => '3',
-      'style' => 'blah',
-    ]);
-    $entity->enforceIsNew();
-    $entity->save();
-    // Do not add this entity to the list of expected result as it has a
-    // different value.
-    $this->assertEquals($expected, $key_value->get('style:test'));
-    $this->assertEquals([$entity->getConfigDependencyName()], $key_value->get('style:blah'));
-
-    // Ensure that a delete clears a key.
-    $entity->delete();
-    $this->assertNull($key_value->get('style:blah'));
-
-    // Ensure that delete only clears one key.
-    $entity_id = array_pop($expected);
-    $test_entities[$entity_id]->delete();
-    $this->assertEquals($expected, $key_value->get('style:test'));
-    $entity_id = array_pop($expected);
-    $test_entities[$entity_id]->delete();
-    $this->assertNull($key_value->get('style:test'));
-  }
-
-  /**
    * Test the entity query alter hooks are invoked.
    *
    * @see config_test_entity_query_tag__config_query_test__config_entity_query_alter_hook_test_alter()
@@ -769,6 +740,65 @@ class ConfigEntityQueryTest extends KernelTestBase {
       ->addTag('config_entity_query_alter_hook_test')
       ->execute();
     $this->assertResults(['1', '2', '3', '4', '5', '6']);
+  }
+
+  /**
+   * Tests boolean conditions in config entity queries.
+   */
+  public function testBooleanConditions(): void {
+    // Equality: flag = TRUE matches entities 1, 3, 5.
+    $this->queryResults = $this->entityStorage->getQuery()
+      ->condition('flag', TRUE)
+      ->execute();
+    $this->assertResults(['1', '3', '5']);
+
+    // Equality: flag = FALSE matches entities 2, 4, 6, 7.
+    $this->queryResults = $this->entityStorage->getQuery()
+      ->condition('flag', FALSE)
+      ->execute();
+    $this->assertResults(['2', '4', '6', '7']);
+
+    // IN with boolean array (via loadByProperties pattern).
+    $this->queryResults = $this->entityStorage->getQuery()
+      ->condition('flag', [TRUE], 'IN')
+      ->execute();
+    $this->assertResults(['1', '3', '5']);
+
+    $this->queryResults = $this->entityStorage->getQuery()
+      ->condition('flag', [FALSE], 'IN')
+      ->execute();
+    $this->assertResults(['2', '4', '6', '7']);
+
+    // NOT IN with boolean.
+    $this->queryResults = $this->entityStorage->getQuery()
+      ->condition('flag', [TRUE], 'NOT IN')
+      ->execute();
+    $this->assertResults(['2', '4', '6', '7']);
+
+    // loadByProperties() with a boolean value.
+    $results = $this->entityStorage->loadByProperties(['flag' => TRUE]);
+    $this->assertEquals(['1', '3', '5'], array_keys($results));
+  }
+
+  /**
+   * Tests IN/NOT IN with an empty value array.
+   */
+  public function testEmptyInCondition(): void {
+    // IN with empty array matches nothing.
+    $this->queryResults = $this->entityStorage->getQuery()
+      ->condition('id', [], 'IN')
+      ->execute();
+    $this->assertResults([]);
+
+    // NOT IN with empty array matches everything.
+    $this->queryResults = $this->entityStorage->getQuery()
+      ->condition('id', [], 'NOT IN')
+      ->execute();
+    $this->assertResults(['1', '2', '3', '4', '5', '6', '7']);
+
+    // loadByProperties() with NULL value.
+    $results = $this->entityStorage->loadByProperties(['label' => NULL]);
+    $this->assertEmpty($results);
   }
 
   /**
