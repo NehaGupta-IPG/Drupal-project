@@ -108,7 +108,7 @@ class MenuUiUtility {
       // An existing menu link either points to the canonical or the latest
       // path, in case of a new menu link that was creating while saving as a
       // pending draft.
-      $uri_candidates = ['entity:node/' . $node->id(), 'internal:/node/' . $node->id() . '/latest'];
+      $uri_candidates = ['entity:node/' . $node->id(), 'internal:/node/' . $node->id(), 'internal:/node/' . $node->id() . '/latest'];
 
       if (in_array($menu_name, $type_menus)) {
         $query = $this->entityTypeManager->getStorage('menu_link_content')
