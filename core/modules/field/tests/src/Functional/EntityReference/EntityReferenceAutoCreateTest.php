@@ -106,6 +106,11 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
     $account = $this->drupalCreateUser([
       'access content',
       "create $this->referencingType content",
+      // With auto_create_check_access defaulting to TRUE, autocreating the
+      // referenced node (or taxonomy term, in testMultipleTargetBundles) now
+      // requires create permission on the target bundle too.
+      "create $this->referencedType content",
+      'administer taxonomy',
     ]);
     $this->drupalLogin($account);
   }

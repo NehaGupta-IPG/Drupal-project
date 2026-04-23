@@ -63,8 +63,12 @@ class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements 
 
     Role::create([
       'id' => 'test_role',
-      'label' => 'Can view test entities',
-      'permissions' => ['view test entity'],
+      'label' => 'Can view and create test entities',
+      // Autocreate tests in this class submit input that produces new
+      // entity_test entities via DefaultSelection::createNewEntity(). That
+      // code path enforces create access when auto_create_check_access is
+      // TRUE (the default), so the test role needs create permission too.
+      'permissions' => ['view test entity', 'administer entity_test content'],
     ])->save();
 
     $this->testUser = User::create([
@@ -78,6 +82,11 @@ class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements 
     $this->testAutocreateUser = User::create([
       'name' => 'foobar2',
       'mail' => 'foobar2@example.com',
+      // DefaultSelection::createNewEntity enforces create access for the uid
+      // that will own the autocreated entity. The autocomplete elements in
+      // buildForm() below assign ownership to this user, so they also need
+      // create permission on the target bundle.
+      'roles' => ['test_role'],
     ]);
     $this->testAutocreateUser->save();
 

@@ -3,6 +3,7 @@
 namespace Drupal\Core\Entity\Plugin\EntityReferenceSelection;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Entity\Attribute\EntityReferenceSelection;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
@@ -21,6 +22,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\user\EntityOwnerInterface;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * Default plugin implementation of the Entity Reference Selection plugin.
@@ -408,8 +410,20 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   *   Thrown when 'auto_create_check_access' is enabled and either the current
+   *   user or the account identified by $uid does not have create access for
+   *   the target bundle.
    */
   public function createNewEntity($entity_type_id, $bundle, $label, $uid) {
+    if (!empty($this->configuration['auto_create_check_access'])) {
+      $access = $this->checkAutocreateAccess($bundle, (int) $uid);
+      if (!$access->isAllowed()) {
+        throw new AccessDeniedHttpException();
+      }
+    }
+
     $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
 
     $values = [
@@ -427,6 +441,38 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
     }
 
     return $entity;
+  }
+
+  /**
+   * Checks create access for the current user and the prospective owner.
+   *
+   * This is used by the autocreate flow to ensure both accounts have create
+   * access for the target bundle: the current user (who is submitting the
+   * form) and the account that will own the autocreated entity.
+   *
+   * @param string $bundle
+   *   The bundle of the entity to create.
+   * @param int $uid
+   *   The account ID that will own the autocreated entity.
+   *
+   * @return \Drupal\Core\Access\AccessResultInterface
+   *   The combined access result. The cacheable metadata should be applied by
+   *   the caller to the element or response as appropriate.
+   *
+   * @todo Verify this is the desired behavior for all cases; if the owner
+   *   lacks access but the current user has it, should creation still be
+   *   allowed? Follow-up in a dedicated issue.
+   */
+  protected function checkAutocreateAccess(string $bundle, int $uid): AccessResultInterface {
+    $access_handler = $this->entityTypeManager->getAccessControlHandler($this->configuration['target_type']);
+    $access = $access_handler->createAccess($bundle, $this->currentUser, [], TRUE);
+    if ((int) $this->currentUser->id() !== $uid) {
+      $owner = $this->entityTypeManager->getStorage('user')->load($uid);
+      if ($owner) {
+        $access = $access->andIf($access_handler->createAccess($bundle, $owner, [], TRUE));
+      }
+    }
+    return $access;
   }
 
   /**
