@@ -10,6 +10,7 @@ use Drupal\Core\Render\Element;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Url;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * Base class for implementing system configuration forms.
@@ -33,18 +34,39 @@ abstract class ConfigFormBase extends FormBase {
   protected const CONFIG_KEY_TO_FORM_ELEMENT_MAP = 'config_targets';
 
   /**
+   * The typed config manager.
+   */
+  protected TypedConfigManagerInterface $typedConfigManager;
+
+  /**
    * Constructs a \Drupal\system\ConfigFormBase object.
+   */
+  public function __construct() {
+    if (func_num_args() > 0) {
+      @trigger_error(sprintf('Passing services to ConfigFormBase::__construct() is deprecated in drupal:11.4.0 and will error in drupal:13.0.0. Remove the parent::__construct() call from %s::__construct(). See https://www.drupal.org/node/9999999', static::class), E_USER_DEPRECATED);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  #[Required]
+  public function setConfigFactory(ConfigFactoryInterface $config_factory): self {
+    return parent::setConfigFactory($config_factory);
+  }
+
+  /**
+   * Sets the typed config manager service.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
    * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
    *   The typed config manager.
+   *
+   * @return $this
    */
-  public function __construct(
-    ConfigFactoryInterface $config_factory,
-    protected TypedConfigManagerInterface $typedConfigManager,
-  ) {
-    $this->setConfigFactory($config_factory);
+  #[Required]
+  public function setTypedConfigManager(TypedConfigManagerInterface $typedConfigManager): self {
+    $this->typedConfigManager = $typedConfigManager;
+    return $this;
   }
 
   /**
