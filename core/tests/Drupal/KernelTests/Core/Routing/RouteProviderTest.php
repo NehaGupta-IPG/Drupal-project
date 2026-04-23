@@ -793,16 +793,8 @@ class RouteProviderTest extends KernelTestBase {
     $dumper->addRoutes($collection);
     $dumper->dump();
     $request = Request::create($request_path, 'GET');
-    $provider->getRouteCollectionForRequest($request);
-    $cache = $this->cache->get("route:[language]=en:[query_parameters]=:{$request_path}");
-    $this->assertNotEmpty($cache);
-    $route_collection = $cache->data['routes'];
-    if ($expected_routes == 0) {
-      $this->assertFalse($route_collection);
-    }
-    else {
-      $this->assertEquals($route_collection->count(), $expected_routes);
-    }
+    $routes = $provider->getRouteCollectionForRequest($request);
+    $this->assertCount($expected_routes, $routes);
   }
 
   /**
