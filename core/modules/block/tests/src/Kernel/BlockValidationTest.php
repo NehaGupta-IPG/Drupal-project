@@ -182,17 +182,17 @@ class BlockValidationTest extends ConfigEntityValidationTestBase {
    * Data provider for ::testMenuBlockLevelAndDepth().
    */
   public static function providerMenuBlockLevelAndDepth(): iterable {
-    yield 'OK: entire tree from first level' => [0, NULL, []];
+    yield 'OK: entire tree from first level' => [1, NULL, []];
 
-    yield 'OK: entire tree from third level' => [2, NULL, []];
+    yield 'OK: entire tree from third level' => [3, NULL, []];
 
-    yield 'OK: first three levels' => [0, 3, []];
+    yield 'OK: first three levels' => [1, 3, []];
 
-    yield 'INVALID: level is less than 0' => [
+    yield 'INVALID: level is less than 1' => [
       -2,
       NULL,
       [
-        'settings.level' => 'This value should be between <em class="placeholder">0</em> and <em class="placeholder">9</em>.',
+        'settings.level' => 'This value should be between <em class="placeholder">1</em> and <em class="placeholder">9</em>.',
       ],
     ];
 
@@ -200,31 +200,31 @@ class BlockValidationTest extends ConfigEntityValidationTestBase {
       11,
       NULL,
       [
-        'settings.level' => 'This value should be between <em class="placeholder">0</em> and <em class="placeholder">9</em>.',
+        'settings.level' => 'This value should be between <em class="placeholder">1</em> and <em class="placeholder">9</em>.',
       ],
     ];
 
     yield 'INVALID: depth too high' => [
-      0,
+      1,
       12,
       [
-        'settings.depth' => 'This value should be between <em class="placeholder">1</em> and <em class="placeholder">9</em>.',
+        'settings.depth' => 'This value should be between <em class="placeholder">0</em> and <em class="placeholder">8</em>.',
       ],
     ];
 
     yield 'INVALID: depth too low' => [
-      0,
-      0,
+      1,
+      -1,
       [
-        'settings.depth' => 'This value should be between <em class="placeholder">1</em> and <em class="placeholder">9</em>.',
+        'settings.depth' => 'This value should be between <em class="placeholder">0</em> and <em class="placeholder">8</em>.',
       ],
     ];
 
     yield 'INVALID: start at third level, depth too high' => [
-      2,
+      3,
       9,
       [
-        'settings.depth' => 'This value should be between <em class="placeholder">1</em> and <em class="placeholder">7</em>.',
+        'settings.depth' => 'This value should be between <em class="placeholder">0</em> and <em class="placeholder">6</em>.',
       ],
     ];
 
@@ -234,7 +234,7 @@ class BlockValidationTest extends ConfigEntityValidationTestBase {
       9,
       2,
       [
-        'settings.depth' => 'This value should be between <em class="placeholder">1</em> and <em class="placeholder">1</em>.',
+        'settings.depth' => 'This value should be between <em class="placeholder">0</em> and <em class="placeholder">1</em>.',
       ],
     ];
   }
