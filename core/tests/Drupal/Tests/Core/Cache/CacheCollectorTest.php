@@ -244,7 +244,7 @@ class CacheCollectorTest extends UnitTestCase {
   }
 
   /**
-   * Tests updating the cache when there is a conflict after cache invalidation.
+   * Tests setting to cache when there is a conflict after cache invalidation.
    */
   #[TestWith([TRUE, TRUE, TRUE, TRUE])]
   #[TestWith([TRUE, TRUE, TRUE, FALSE])]
@@ -256,7 +256,7 @@ class CacheCollectorTest extends UnitTestCase {
   #[TestWith([FALSE, FALSE, TRUE, FALSE])]
   #[TestWith([FALSE, TRUE, TRUE, TRUE])]
   #[TestWith([FALSE, TRUE, TRUE, FALSE])]
-  public function testUpdateCacheInvalidatedConflict(bool $lock_acquired, bool $start_cache_item, bool $end_cache_item, ?bool $timestamp_matches): void {
+  public function testSetCacheInvalidatedConflict(bool $lock_acquired, bool $start_cache_item, bool $end_cache_item, ?bool $timestamp_matches): void {
 
     if ($end_cache_item === FALSE && isset($timestamp_matches)) {
       throw new \BadMethodCallException('timestamp_matches is ignored when end_cache_item is FALSE');
@@ -278,7 +278,7 @@ class CacheCollectorTest extends UnitTestCase {
         ] : FALSE,
         $end_cache_item ? (object) [
           'data' => [$key => $value],
-          'created' => (int) $_SERVER['REQUEST_TIME'] + $timestamp_matches ? 0 : 1,
+          'created' => (int) $_SERVER['REQUEST_TIME'] + ($timestamp_matches ? 0 : 1),
         ] : FALSE,
       );
 
@@ -296,6 +296,70 @@ class CacheCollectorTest extends UnitTestCase {
     if ($end_cache_item) {
       $this->cacheBackend->expects($this->once())
         ->method('delete')
+        ->with($this->cid);
+    }
+    if ($lock_acquired) {
+      $this->lock->expects($this->once())
+        ->method('release')
+        ->with($this->cid . ':Drupal\Core\Cache\CacheCollector');
+    }
+    // Destruct the object to trigger the update data process.
+    $this->collector->destruct();
+  }
+
+  /**
+   * Tests updating the cache when there is a conflict after cache invalidation.
+   */
+  #[TestWith([TRUE, TRUE, TRUE, TRUE])]
+  #[TestWith([TRUE, TRUE, TRUE, FALSE])]
+  #[TestWith([TRUE, TRUE, FALSE, NULL])]
+  #[TestWith([TRUE, FALSE, FALSE, NULL])]
+  #[TestWith([TRUE, FALSE, TRUE, FALSE])]
+  #[TestWith([FALSE, FALSE, FALSE, NULL])]
+  #[TestWith([FALSE, TRUE, FALSE, NULL])]
+  #[TestWith([FALSE, FALSE, TRUE, FALSE])]
+  #[TestWith([FALSE, TRUE, TRUE, TRUE])]
+  #[TestWith([FALSE, TRUE, TRUE, FALSE])]
+  public function testUpdateCacheConflict(bool $lock_acquired, bool $start_cache_item, bool $end_cache_item, ?bool $timestamp_matches): void {
+
+    if ($end_cache_item === FALSE && isset($timestamp_matches)) {
+      throw new \BadMethodCallException('timestamp_matches is ignored when end_cache_item is FALSE');
+    }
+    $this->setUpMockCacheBackend();
+    $this->setUpMockLockBackend();
+
+    $key = $this->randomMachineName();
+    $value = $this->randomMachineName();
+
+    $this->collector->setCacheMissData($key, $value);
+    $this->collector->setCacheMissData('another key', 'another value');
+
+    // Set up mock cache get with conflicting entries.
+    $this->cacheBackend->expects($this->exactly(2))
+      ->method('get')
+      ->with($this->cid)
+      ->willReturnOnConsecutiveCalls(
+        $start_cache_item ? (object) [
+          'data' => [],
+          'created' => (int) $_SERVER['REQUEST_TIME'],
+        ] : FALSE,
+        $end_cache_item ? (object) [
+          'data' => ['something completely different' => $value],
+          'created' => (int) $_SERVER['REQUEST_TIME'] + ($timestamp_matches ? 0 : 1),
+        ] : FALSE,
+      );
+
+    $this->collector->get($key);
+
+    // Set up mock objects for the expected calls, first a lock acquire, then
+    // when cache get finds conflicting entries it deletes the cache and aborts.
+    $this->lock->expects($this->once())
+      ->method('acquire')
+      ->with($this->cid . ':Drupal\Core\Cache\CacheCollector')
+      ->willReturn($lock_acquired);
+    if ($end_cache_item && !$timestamp_matches) {
+      $this->cacheBackend->expects($this->never())
+        ->method('set')
         ->with($this->cid);
     }
     if ($lock_acquired) {
