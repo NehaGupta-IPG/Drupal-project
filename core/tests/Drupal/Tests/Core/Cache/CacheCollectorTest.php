@@ -67,6 +67,24 @@ class CacheCollectorTest extends UnitTestCase {
   }
 
   /**
+   * Reinitializes the cache backend as a mock object.
+   */
+  protected function setUpMockCacheBackend(): void {
+    $this->cacheBackend = $this->createMock(CacheBackendInterface::class);
+    $reflection = new \ReflectionProperty($this->collector, 'cache');
+    $reflection->setValue($this->collector, $this->cacheBackend);
+  }
+
+  /**
+   * Reinitializes the lock backend as a mock object.
+   */
+  protected function setUpMockLockBackend(): void {
+    $this->lock = $this->createMock(LockBackendInterface::class);
+    $reflection = new \ReflectionProperty($this->collector, 'lock');
+    $reflection->setValue($this->collector, $this->lock);
+  }
+
+  /**
    * Tests the resolve cache miss function.
    */
   public function testResolveCacheMiss(): void {
