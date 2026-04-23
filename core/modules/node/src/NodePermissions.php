@@ -80,6 +80,10 @@ class NodePermissions implements ContainerInjectionInterface {
         'title' => $this->t('%type_name: Delete revisions', $type_params),
         'description' => $this->t('To delete a revision, you also need permission to delete the content item.'),
       ],
+      "can create new $type_id revision" => [
+        'title' => $this->t('%type_name: Create new revision', $type_params),
+        'description' => $this->t('To create a new revision, you also need permission to edit the content item.'),
+      ],
     ];
   }
 

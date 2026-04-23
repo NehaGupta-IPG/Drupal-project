@@ -223,8 +223,8 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
   /**
    * Gets the names of all fields edited in the form.
    *
-   * If a custom entity form adds some fields to the form (i.e. without using
-   * the form display), it needs to add its fields here and override
+   * If the entity form customly adds some fields to the form (i.e. without
+   * using the form display), it needs to add its fields here and override
    * flagViolations() for displaying the violations.
    *
    * @param \Drupal\Core\Form\FormStateInterface $form_state
@@ -240,8 +240,8 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
   /**
    * Flags violations for the current form.
    *
-   * If a custom entity form adds some fields to the form (i.e. without using
-   * the form display), it needs to add its fields to array returned by
+   * If the entity form customly adds some fields to the form (i.e. without
+   * using the form display), it needs to add its fields to array returned by
    * getEditedFieldNames() and overwrite this method in order to show any
    * violations for those fields; e.g.:
    * @code
@@ -413,6 +413,15 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
 
     $new_revision_default = $this->getNewRevisionDefault();
 
+    // Check revision create permission for type.
+    $type_id = $this->entity->bundle();
+    if (!$this->currentUser()->hasPermission("can create new $type_id revision")) {
+      $new_revision_access = FALSE;
+    }
+    else {
+      $new_revision_access = $new_revision_default && !$this->entity->isNew();
+    }
+
     // Add a log field if the "Create new revision" option is checked, or if the
     // current user has the ability to check that option.
     $form['revision_information'] = [
@@ -422,6 +431,7 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
       '#open' => $new_revision_default,
       '#group' => 'advanced',
       '#weight' => 20,
+      '#access' => $new_revision_access,
       '#optional' => TRUE,
       '#attributes' => [
         'class' => ['entity-content-form-revision-information'],
@@ -435,7 +445,7 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
       '#type' => 'checkbox',
       '#title' => $this->t('Create new revision'),
       '#default_value' => $new_revision_default,
-      '#access' => !$this->entity->isNew(),
+      '#access' => $new_revision_access,
       '#group' => 'revision_information',
     ];
     // Get log message field's key from definition.
