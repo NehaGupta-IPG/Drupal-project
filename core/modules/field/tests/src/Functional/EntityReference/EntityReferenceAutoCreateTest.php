@@ -166,6 +166,48 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
   }
 
   /**
+   * Tests that autocreate skips access when auto_create_check_access is FALSE.
+   *
+   * This is the legacy path preserved by the post_update, which flips the
+   * setting to FALSE on pre-existing fields so that sites upgrading to the
+   * new default (TRUE) keep working.
+   */
+  public function testAutoCreateAccessCheckDisabled(): void {
+    // Flip the field's auto_create_check_access to FALSE.
+    FieldConfig::loadByName('node', $this->referencingType, 'test_field')
+      ->setSetting('handler_settings', [
+        'target_bundles' => [$this->referencedType],
+        'auto_create' => TRUE,
+        'auto_create_check_access' => FALSE,
+      ])
+      ->save();
+
+    // Log in as a user without create access on the referenced bundle.
+    $this->drupalLogin($this->drupalCreateUser([
+      'access content',
+      "create $this->referencingType content",
+    ]));
+
+    $new_title = $this->randomMachineName();
+    $edit = [
+      'title[0][value]' => $this->randomMachineName(),
+      'test_field[0][target_id]' => $new_title,
+    ];
+    $this->drupalGet("node/add/{$this->referencingType}");
+    $this->submitForm($edit, 'Save');
+
+    // The referenced node should have been autocreated despite the user
+    // lacking create access — auto_create_check_access=FALSE bypasses the
+    // widget and server-side checks.
+    $result = \Drupal::entityQuery('node')
+      ->accessCheck(FALSE)
+      ->condition('type', $this->referencedType)
+      ->condition('title', $new_title)
+      ->execute();
+    $this->assertNotEmpty($result, 'Access check bypassed: referenced entity was autocreated.');
+  }
+
+  /**
    * Tests multiple target bundles.
    *
    * Tests if an entity reference field having multiple target bundles is
