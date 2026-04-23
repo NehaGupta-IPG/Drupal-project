@@ -151,7 +151,7 @@ class State extends CacheCollector implements StateInterface {
         $this->cache->set($this->getCid(), [], CacheBackendInterface::CACHE_PERMANENT, $this->tags);
       }
     }
-    else {
+    if ($lock_acquired) {
       // Cache items are stored with millisecond precision, and are compared by
       // created time in CacheCollector. This allows for a race condition where:
       // Process A: writes a cache item.
@@ -172,12 +172,12 @@ class State extends CacheCollector implements StateInterface {
       // CacheCollector.
       // @see https://www.drupal.org/project/drupal/issues/3496328
       usleep(10000);
-    }
-    if ($lock_acquired) {
+      $this->cache->set($this->getCid(), $data, CacheBackendInterface::CACHE_PERMANENT, $this->tags);
+      usleep(10000);
+
       // Because we've updated the cache within a lock here, we don't need to do
       // so again at the end of the request. Other requests can safely start
       // rebuilding the cache after this point.
-      $this->cache->set($this->getCid(), $data, CacheBackendInterface::CACHE_PERMANENT, $this->tags);
       $this->lock->release($lock_name);
       $this->cacheInvalidated = FALSE;
       $this->keysToPersist = [];
