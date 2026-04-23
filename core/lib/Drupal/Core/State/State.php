@@ -41,11 +41,6 @@ class State extends CacheCollector implements StateInterface {
   protected array $keysSetDuringRequest = [];
 
   /**
-   * Whether to write to the cache at the end of the request.
-   */
-  protected bool $writeCache = TRUE;
-
-  /**
    * Constructs a State object.
    *
    * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_factory
@@ -236,15 +231,6 @@ class State extends CacheCollector implements StateInterface {
     $this->keysSetDuringRequest[$key]['value'] = $value;
     if (!array_key_exists('original', $this->keysSetDuringRequest[$key])) {
       $this->keysSetDuringRequest[$key]['original'] = $previousValue;
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function updateCache($lock = TRUE): void {
-    if ($this->writeCache) {
-      parent::updateCache($lock);
     }
   }
 
