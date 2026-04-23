@@ -212,4 +212,19 @@ interface LanguageManagerInterface {
    */
   public static function getStandardLanguageList();
 
+  /**
+   * Sets the current language for the given type.
+   *
+   * @param \Drupal\Core\Language\LanguageInterface $language
+   *   The current language object for the given type of language.
+   * @param string $type
+   *   (optional) The language type; e.g., the interface or the content
+   *   language. Defaults to
+   *   \Drupal\Core\Language\LanguageInterface::TYPE_INTERFACE.
+   */
+  public function setCurrentLanguage(
+    LanguageInterface $language,
+    ?string $type = LanguageInterface::TYPE_INTERFACE,
+  ): void;
+
 }

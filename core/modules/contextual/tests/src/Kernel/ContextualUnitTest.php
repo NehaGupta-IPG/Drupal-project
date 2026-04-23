@@ -38,10 +38,10 @@ class ContextualUnitTest extends KernelTestBase {
           'route_parameters' => [
             'node' => '14031991',
           ],
-          'metadata' => ['langcode' => 'en'],
+          'metadata' => ['langcode' => 'en', 'admin_langcode' => 'en'],
         ],
       ],
-      'node:node=14031991:langcode=en',
+      'node:node=14031991:langcode=en&admin_langcode=en',
       'olivero',
     ];
 
@@ -53,10 +53,10 @@ class ContextualUnitTest extends KernelTestBase {
             'key' => 'baz',
             1 => 'qux',
           ],
-          'metadata' => ['langcode' => 'en'],
+          'metadata' => ['langcode' => 'en', 'admin_langcode' => 'en'],
         ],
       ],
-      'foo:0=bar&key=baz&1=qux:langcode=en',
+      'foo:0=bar&key=baz&1=qux:langcode=en&admin_langcode=en',
       'claro',
     ];
 
@@ -70,10 +70,11 @@ class ContextualUnitTest extends KernelTestBase {
             'location' => 'page',
             'display' => 'page_1',
             'langcode' => 'en',
+            'admin_langcode' => 'en',
           ],
         ],
       ],
-      'views_ui_edit:view=frontpage:location=page&display=page_1&langcode=en',
+      'views_ui_edit:view=frontpage:location=page&display=page_1&langcode=en&admin_langcode=en',
       'olivero',
     ];
 
@@ -83,7 +84,7 @@ class ContextualUnitTest extends KernelTestBase {
           'route_parameters' => [
             'node' => '14031991',
           ],
-          'metadata' => ['langcode' => 'en'],
+          'metadata' => ['langcode' => 'en', 'admin_langcode' => 'en'],
         ],
         'foo' => [
           'route_parameters' => [
@@ -91,14 +92,14 @@ class ContextualUnitTest extends KernelTestBase {
             'key' => 'baz',
             1 => 'qux',
           ],
-          'metadata' => ['langcode' => 'en'],
+          'metadata' => ['langcode' => 'en', 'admin_langcode' => 'en'],
         ],
         'edge' => [
           'route_parameters' => ['20011988'],
-          'metadata' => ['langcode' => 'en'],
+          'metadata' => ['langcode' => 'en', 'admin_langcode' => 'en'],
         ],
       ],
-      'node:node=14031991:langcode=en|foo:0=bar&key=baz&1=qux:langcode=en|edge:0=20011988:langcode=en',
+      'node:node=14031991:langcode=en&admin_langcode=en|foo:0=bar&key=baz&1=qux:langcode=en&admin_langcode=en|edge:0=20011988:langcode=en&admin_langcode=en',
       'claro',
     ];
 

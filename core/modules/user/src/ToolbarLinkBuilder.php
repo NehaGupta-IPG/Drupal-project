@@ -2,10 +2,12 @@
 
 namespace Drupal\user;
 
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
+use Drupal\language\AdminLanguageRender;
 
 /**
  * ToolbarLinkBuilder fills out the placeholders generated in user_toolbar().
@@ -15,20 +17,21 @@ class ToolbarLinkBuilder implements TrustedCallbackInterface {
   use StringTranslationTrait;
 
   /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountProxyInterface
-   */
-  protected $account;
-
-  /**
    * ToolbarHandler constructor.
    *
    * @param \Drupal\Core\Session\AccountProxyInterface $account
    *   The current user.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   *   The module handler.
    */
-  public function __construct(AccountProxyInterface $account) {
-    $this->account = $account;
+  public function __construct(
+    protected AccountProxyInterface $account,
+    protected ?ModuleHandlerInterface $moduleHandler = NULL,
+  ) {
+    if ($this->moduleHandler === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $moduleHandler argument is deprecated in drupal:11.4.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3455774', E_USER_DEPRECATED);
+      $this->moduleHandler = \Drupal::service('module_handler');
+    }
   }
 
   /**
@@ -68,6 +71,11 @@ class ToolbarLinkBuilder implements TrustedCallbackInterface {
         'contexts' => ['user'],
       ],
     ];
+
+    // Support rendering the links in the user's preferred admin language.
+    if ($this->moduleHandler->moduleExists('language')) {
+      $build = AdminLanguageRender::applyTo($build);
+    }
 
     return $build;
   }
