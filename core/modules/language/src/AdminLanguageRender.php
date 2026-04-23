@@ -4,35 +4,15 @@ namespace Drupal\language;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\Security\Attribute\TrustedCallback;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslationManager;
 
 /**
- * The admin language render class.
+ * Provides a render element in the user's preferred admin language.
  */
 class AdminLanguageRender {
-
-  /**
-   * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
-   */
-  protected $languageManager;
-
-  /**
-   * The string translation service.
-   *
-   * @var \Drupal\Core\StringTranslation\TranslationManager
-   */
-  protected $translationManager;
-
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $currentUser;
 
   /**
    * Constructs an AdminLanguageRender object.
@@ -44,11 +24,11 @@ class AdminLanguageRender {
    * @param \Drupal\Core\Session\AccountInterface $currentUser
    *   The current user.
    */
-  public function __construct(LanguageManagerInterface $languageManager, TranslationManager $translationManager, AccountInterface $currentUser) {
-    $this->languageManager = $languageManager;
-    $this->translationManager = $translationManager;
-    $this->currentUser = $currentUser;
-  }
+  public function __construct(
+    protected LanguageManagerInterface $languageManager,
+    protected TranslationManager $translationManager,
+    protected AccountInterface $currentUser,
+  ) {}
 
   /**
    * Adds the render callbacks to a render element.
@@ -69,8 +49,8 @@ class AdminLanguageRender {
     }
     // Switch to the admin language as early as possible and then switch back as
     // late as possible.
-    array_unshift($type['#pre_render'], 'language.admin_language_render:switchToUserAdminLanguage');
-    $type['#post_render'][] = 'language.admin_language_render:restoreLanguage';
+    array_unshift($type['#pre_render'], 'Drupal\language\AdminLanguageRender:switchToUserAdminLanguage');
+    $type['#post_render'][] = 'Drupal\language\AdminLanguageRender:restoreLanguage';
     return $type;
   }
 
@@ -84,7 +64,7 @@ class AdminLanguageRender {
    *   A renderable array.
    */
   #[TrustedCallback]
-  public function switchToUserAdminLanguage(array $element) {
+  public function switchToUserAdminLanguage(array $element): array {
     $userAdminLangcode = $this->currentUser->getPreferredAdminLangcode(FALSE);
 
     if ($userAdminLangcode && ($this->currentUser->hasPermission('access administration pages') || $this->currentUser->hasPermission('view the administration theme'))) {
@@ -114,7 +94,7 @@ class AdminLanguageRender {
    *   Rendered markup.
    */
   #[TrustedCallback]
-  public function restoreLanguage($content, $element) {
+  public function restoreLanguage(Markup $content, array $element): Markup {
     if (isset($element['#original_langcode'])) {
       $langcode = $element['#original_langcode'];
       $language = $this->languageManager->getLanguage($langcode);

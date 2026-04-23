@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\contextual\FunctionalJavascript;
 
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\locale\StringStorageInterface;
+use Drupal\user\UserInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -21,7 +24,7 @@ class ContextualTranslationTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'olivero';
+  protected $defaultTheme = 'stark';
 
   /**
    * {@inheritdoc}
@@ -38,23 +41,23 @@ class ContextualTranslationTest extends WebDriverTestBase {
   /**
    * The admin user.
    *
-   * @var \Drupal\user\Entity\User
+   * @var \Drupal\user\UserInterface
    */
-  protected $adminUser;
+  protected UserInterface $adminUser;
 
   /**
    * The language manager.
    *
    * @var \Drupal\Core\Language\LanguageManagerInterface
    */
-  protected $languageManager;
+  protected LanguageManagerInterface $languageManager;
 
   /**
    * The locale storage.
    *
    * @var \Drupal\locale\StringStorageInterface
    */
-  protected $localeStorage;
+  protected StringStorageInterface $localeStorage;
 
   /**
    * {@inheritdoc}
@@ -105,7 +108,7 @@ class ContextualTranslationTest extends WebDriverTestBase {
 
     // The edit link text should be using the translated string.
     $this->drupalGet($node1->toUrl('canonical'));
-    $this->clickContextualLink('article.node', $edit_translation);
+    $this->clickContextualLink('article', $edit_translation);
     $this->assertSession()->addressEquals($node1->toUrl('edit-form'));
 
     // Change the preferred admin language.
@@ -114,7 +117,7 @@ class ContextualTranslationTest extends WebDriverTestBase {
 
     // The edit link text should be using the english string.
     $this->drupalGet($node1->toUrl('canonical'));
-    $this->clickContextualLink('article.node', 'Edit');
+    $this->clickContextualLink('article', 'Edit');
     $this->assertSession()->addressEquals($node1->toUrl('edit-form'));
   }
 

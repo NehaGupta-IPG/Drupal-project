@@ -23,21 +23,21 @@ class AccountAdminLanguageCacheContext implements CacheContextInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getLabel() {
+  public static function getLabel(): string {
     return t("Account's administration language");
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getContext() {
+  public function getContext(): string {
     return $this->currentUser->getPreferredAdminLangcode(FALSE);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCacheableMetadata() {
+  public function getCacheableMetadata(): CacheableMetadata {
     return new CacheableMetadata();
   }
 

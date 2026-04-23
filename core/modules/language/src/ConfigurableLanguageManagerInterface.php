@@ -103,15 +103,4 @@ interface ConfigurableLanguageManagerInterface extends LanguageManagerInterface 
    */
   public function getNegotiatedLanguageMethod($type = LanguageInterface::TYPE_INTERFACE);
 
-  /**
-   * Sets the current language.
-   *
-   * @param \Drupal\Core\Language\LanguageInterface $language
-   *   The language to set.
-   * @param string|null $type
-   *   (optional) The language type; e.g., the interface or the content
-   *   language.
-   */
-  public function setCurrentLanguage(LanguageInterface $language, ?string $type = LanguageInterface::TYPE_INTERFACE): void;
-
 }

@@ -132,7 +132,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 35,
-      'CacheGetCount' => 99,
+      'CacheGetCount' => 96,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 20,
@@ -140,12 +140,12 @@ class StandardPerformanceTest extends PerformanceTestBase {
         'discovery' => 39,
         'bootstrap' => 10,
         'dynamic_page_cache' => 1,
-        'render' => 14,
+        'render' => 11,
         'default' => 5,
         'entity' => 2,
         'menu' => 3,
       ],
-      'CacheSetCount' => 46,
+      'CacheSetCount' => 43,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 9,
@@ -208,11 +208,11 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 9,
-      'CacheGetCount' => 76,
-      'CacheSetCount' => 19,
+      'CacheGetCount' => 72,
+      'CacheSetCount' => 18,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 6,
+      'CacheTagLookupQueryCount' => 7,
       'CacheTagGroupedLookups' => [
         [
           'route_match',
@@ -232,11 +232,12 @@ class StandardPerformanceTest extends PerformanceTestBase {
           'config:block_list',
           'config:system.site',
         ],
-        ['config:system.menu.account', 'config:system.menu.main'],
+        ['config:system.menu.main'],
+        ['config:system.menu.account'],
         ['config:user.role.anonymous'],
       ],
       'StylesheetCount' => 1,
-      'StylesheetBytes' => 1500,
+      'StylesheetBytes' => 1000,
     ];
     $this->assertMetrics($expected, $performance_data);
 
@@ -262,11 +263,11 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 9,
-      'CacheGetCount' => 61,
-      'CacheSetCount' => 17,
+      'CacheGetCount' => 58,
+      'CacheSetCount' => 15,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 5,
+      'CacheTagLookupQueryCount' => 6,
       'StylesheetCount' => 1,
       'StylesheetBytes' => 1150,
     ];
@@ -307,7 +308,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 3,
-      'CacheGetCount' => 67,
+      'CacheGetCount' => 64,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 11,
@@ -315,7 +316,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
         'discovery' => 21,
         'bootstrap' => 8,
         'dynamic_page_cache' => 2,
-        'render' => 15,
+        'render' => 12,
         'default' => 3,
         'entity' => 1,
         'menu' => 1,
@@ -420,7 +421,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'StylesheetBytes' => 1429,
       'StylesheetCount' => 1,
       'QueryCount' => 17,
-      'CacheGetCount' => 78,
+      'CacheGetCount' => 72,
       'CacheSetCount' => 1,
       'CacheDeleteCount' => 1,
       'CacheTagInvalidationCount' => 0,
@@ -512,7 +513,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 17,
-      'CacheGetCount' => 104,
+      'CacheGetCount' => 99,
       'CacheSetCount' => 1,
       'CacheDeleteCount' => 1,
       'CacheTagInvalidationCount' => 0,
@@ -561,14 +562,14 @@ class StandardPerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 4,
-      'CacheGetCount' => 46,
+      'CacheGetCount' => 44,
       'CacheGetCountByBin' => [
         'config' => 10,
-        'data' => 4,
+        'data' => 5,
         'discovery' => 9,
         'bootstrap' => 8,
         'dynamic_page_cache' => 1,
-        'render' => 13,
+        'render' => 10,
         'menu' => 1,
       ],
       'CacheSetCount' => 2,

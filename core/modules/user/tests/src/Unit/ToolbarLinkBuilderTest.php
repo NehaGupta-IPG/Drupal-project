@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Unit;
 
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\ToolbarLinkBuilder;

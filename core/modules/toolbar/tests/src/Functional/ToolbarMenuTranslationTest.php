@@ -62,8 +62,9 @@ class ToolbarMenuTranslationTest extends BrowserTestBase {
     $langcode = 'es';
 
     // Add Spanish.
+    $edit['predefined_langcode'] = $langcode;
     $this->drupalGet('admin/config/regional/language/add');
-    $this->submitForm(['predefined_langcode' => $langcode], 'Add language');
+    $this->submitForm($edit, 'Add language');
 
     // The menu item 'Structure' in the toolbar will be translated.
     $menu_item = 'Structure';

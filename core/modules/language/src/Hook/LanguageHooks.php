@@ -179,7 +179,6 @@ class LanguageHooks {
       if (isset($type['contextual_links'])) {
         $type['contextual_links'] = AdminLanguageRender::applyTo($type['contextual_links']);
       }
-
     }
   }
 
