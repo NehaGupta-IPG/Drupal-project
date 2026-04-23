@@ -5,6 +5,9 @@
  * Post update functions for System.
  */
 
+use Drupal\Core\Config\Entity\ConfigEntityUpdater;
+use Drupal\field\FieldConfigInterface;
+
 /**
  * Implements hook_removed_post_updates().
  */
@@ -74,4 +77,23 @@ function system_post_update_migrate_compress_setting(): void {
   $performanceConfig->clear('css.gzip');
   $performanceConfig->clear('js.gzip');
   $performanceConfig->save();
+}
+
+/**
+ * Set auto_create_check_access to FALSE on existing entity reference fields.
+ */
+function system_post_update_set_autocreate_check_access(array &$sandbox): void {
+  \Drupal::classResolver(ConfigEntityUpdater::class)
+    ->update($sandbox, 'field_config', function (FieldConfigInterface $field): bool {
+      if ($field->getType() !== 'entity_reference') {
+        return FALSE;
+      }
+      $handler_settings = $field->getSetting('handler_settings');
+      if (is_array($handler_settings) && array_key_exists('auto_create', $handler_settings) && !array_key_exists('auto_create_check_access', $handler_settings)) {
+        $handler_settings['auto_create_check_access'] = FALSE;
+        $field->setSetting('handler_settings', $handler_settings);
+        return TRUE;
+      }
+      return FALSE;
+    });
 }
