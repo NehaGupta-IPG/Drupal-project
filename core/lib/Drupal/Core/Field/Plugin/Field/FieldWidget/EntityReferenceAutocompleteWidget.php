@@ -133,19 +133,9 @@ class EntityReferenceAutocompleteWidget extends WidgetBase {
       ];
 
       if ($this->getSelectionHandlerSetting('auto_create_check_access')) {
-        $access_handler = \Drupal::entityTypeManager()->getAccessControlHandler($this->getFieldSetting('target_type'));
-        // Require create access for both the current user (the account
-        // submitting the form) and the account which will own the
-        // autocreated entity. Checking only the current user could allow
-        // creating an entity for an owner that cannot create that bundle.
-        // @todo Verify this is the desired behavior for all cases; if the
-        //   owner lacks access but the current user has it, should creation
-        //   still be allowed?
-        $access = $access_handler->createAccess($bundle, \Drupal::currentUser(), [], TRUE);
-        $owner = \Drupal::entityTypeManager()->getStorage('user')->load($element['#autocreate']['uid']);
-        if ($owner) {
-          $access = $access->andIf($access_handler->createAccess($bundle, $owner, [], TRUE));
-        }
+        $access = \Drupal::entityTypeManager()
+          ->getAccessControlHandler($this->getFieldSetting('target_type'))
+          ->createAccess($bundle, return_as_object: TRUE);
         CacheableMetadata::createFromObject($access)->applyTo($element);
         if (!$access->isAllowed()) {
           unset($element['#autocreate']);

@@ -140,6 +140,7 @@ class NodeAccessBaseTableTest extends NodeTestBase {
       $simple_users[$i] = $this->drupalCreateUser([
         'access content',
         'create article content',
+        'create terms in tags',
       ]);
     }
     foreach ($simple_users as $this->webUser) {

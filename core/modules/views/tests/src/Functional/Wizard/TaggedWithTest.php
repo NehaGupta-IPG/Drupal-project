@@ -122,6 +122,17 @@ class TaggedWithTest extends WizardTestBase {
         'weight' => 10,
       ])
       ->save();
+
+    // Log in as a user that can also auto-create tag terms, enforced via
+    // `auto_create_check_access` (TRUE by default).
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer views',
+      'administer blocks',
+      'bypass node access',
+      'access user profiles',
+      'view all revisions',
+      'create terms in ' . $this->tagVocabulary->id(),
+    ]));
   }
 
   /**

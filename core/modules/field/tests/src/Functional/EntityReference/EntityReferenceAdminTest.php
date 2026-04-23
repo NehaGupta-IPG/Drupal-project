@@ -74,6 +74,7 @@ class EntityReferenceAdminTest extends BrowserTestBase {
       'administer views',
       'create ' . $type_name . ' content',
       'edit own ' . $type_name . ' content',
+      'administer taxonomy',
     ]);
     $this->drupalLogin($admin_user);
   }
