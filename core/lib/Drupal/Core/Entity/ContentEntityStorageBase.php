@@ -618,7 +618,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       @trigger_error("Using NULL to load all {$this->entityTypeId} entities is deprecated in drupal:11.4.0 and will throw an exception in drupal:13.0.0. Instead, use an entity query and load entities in smaller chunks. See https://www.drupal.org/node/3586374", E_USER_DEPRECATED);
     }
 
-    parent::loadMultiple($ids);
+    return parent::loadMultiple($ids);
   }
 
   /**
