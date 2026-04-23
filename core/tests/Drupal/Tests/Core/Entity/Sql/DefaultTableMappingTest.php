@@ -570,7 +570,6 @@ class DefaultTableMappingTest extends UnitTestCase {
    *   Entity type table names keyed by base, revision, data, and revision_data.
    * @param string $expected
    *   The expected table name.
-   *
    */
   #[DataProvider('providerTestConstructorTableNameFallbacks')]
   public function testConstructorTableNameFallbacks(string $table_getter, array $table_names, string $expected): void {
