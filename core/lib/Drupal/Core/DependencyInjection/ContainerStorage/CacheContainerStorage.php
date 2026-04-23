@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\DependencyInjection\ContainerStorage;
 
 use Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper;
