@@ -58,21 +58,23 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
       'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
       'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = "10" AND "u"."default_langcode" = 1',
       'SELECT "roles_target_id" FROM "user__roles" WHERE "entity_id" = "10"',
+      'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."alias" LIKE "/node" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
+      'SELECT "name", "route", "fit" FROM "router" WHERE "pattern_outline" IN ( "/node" ) AND "number_parts" >= 1',
     ];
     $recorded_queries = $performance_data->getQueries();
     $this->assertSame($expected_queries, $recorded_queries);
 
     $expected = [
-      'QueryCount' => 3,
-      'CacheGetCount' => 34,
+      'QueryCount' => 5,
+      'CacheGetCount' => 33,
       'CacheGetCountByBin' => [
         'config' => 12,
         'bootstrap' => 7,
         'discovery' => 5,
-        'data' => 4,
         'dynamic_page_cache' => 2,
         'render' => 2,
         'routes' => 2,
+        'data' => 3,
       ],
       'CacheSetCount' => 0,
       'CacheDeleteCount' => 0,
@@ -131,21 +133,21 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 273,
-      'CacheGetCount' => 264,
+      'CacheGetCount' => 260,
       'CacheGetCountByBin' => [
         'config' => 60,
         'bootstrap' => 15,
         'discovery' => 75,
-        'data' => 14,
         'entity' => 24,
         'dynamic_page_cache' => 1,
         'default' => 20,
         'routes' => 18,
         'render' => 14,
+        'data' => 10,
         'file_parsing' => 1,
         'menu' => 22,
       ],
-      'CacheSetCount' => 266,
+      'CacheSetCount' => 262,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 29,
