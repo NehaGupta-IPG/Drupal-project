@@ -526,4 +526,56 @@ class EntityReferenceFieldTest extends EntityKernelTestBase {
     $this->assertEquals(['config' => ['field.storage.entity_test.user_reference_field'], 'module' => ['entity_test']], $field->getDependencies());
   }
 
+  /**
+   * Tests auto_create_check_access default value and config schema.
+   */
+  public function testAutocreateCheckAccessDefault(): void {
+    $field_name = 'field_autocreate_access_test';
+    $entity_type = 'entity_test';
+
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => $field_name,
+      'type' => 'entity_reference',
+      'entity_type' => $entity_type,
+      'settings' => [
+        'target_type' => $this->referencedEntityType,
+      ],
+    ]);
+    $field_storage->save();
+
+    $field = FieldConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => $entity_type,
+      'bundle' => $this->bundle,
+      'label' => 'Autocreate access test',
+      'settings' => [
+        'handler' => 'default',
+        'handler_settings' => [
+          'target_bundles' => [$this->bundle],
+          'auto_create' => TRUE,
+          'auto_create_bundle' => $this->bundle,
+          // 'auto_create_check_access' is intentionally omitted here to verify
+          // that the default value is applied when the setting is not stored.
+        ],
+      ],
+    ]);
+    $field->save();
+
+    // Verify auto_create_check_access defaults to TRUE via the selection
+    // handler's merged configuration, even when not explicitly stored.
+    $handler = \Drupal::service('plugin.manager.entity_reference_selection')->getSelectionHandler($field);
+    $handler_config = $handler->getConfiguration();
+    $this->assertTrue($handler_config['auto_create_check_access']);
+
+    // Verify explicit setting is stored and schema validates.
+    $field->setSetting('handler_settings', [
+      'target_bundles' => [$this->bundle],
+      'auto_create' => TRUE,
+      'auto_create_bundle' => $this->bundle,
+      'auto_create_check_access' => TRUE,
+    ]);
+    $field->save();
+    $this->assertConfigSchema(\Drupal::service('config.typed'), 'field.field.' . $field->id(), $field->toArray());
+  }
+
 }

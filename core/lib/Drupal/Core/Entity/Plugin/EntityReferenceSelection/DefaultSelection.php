@@ -140,6 +140,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
       ],
       'auto_create' => FALSE,
       'auto_create_bundle' => NULL,
+      'auto_create_check_access' => TRUE,
     ] + parent::defaultConfiguration();
   }
 
@@ -305,6 +306,18 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
         '#weight' => -1,
       ];
     }
+
+    $form['auto_create_check_access'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Respect create access, only users with the necessary permission can create new entities'),
+      '#default_value' => $configuration['auto_create_check_access'],
+      '#states' => [
+        'visible' => [
+          ':input[name="settings[handler_settings][auto_create]"]' => ['checked' => TRUE],
+        ],
+      ],
+      '#weight' => 0,
+    ];
 
     return $form;
   }

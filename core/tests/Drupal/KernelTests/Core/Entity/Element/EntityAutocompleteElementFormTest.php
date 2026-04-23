@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Entity\Element;
 
 use Drupal\Core\Entity\Element\EntityAutocomplete;
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\Entity\EntityTestStringId;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
@@ -392,6 +395,77 @@ class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements 
     $expected_label = $this->getAutocompleteInput($this->referencedEntities[0]);
     $this->assertSame($expected_label, $form['single']['#value']);
     $this->assertSame($expected_label, $form['single_no_validate']['#value']);
+  }
+
+  /**
+   * Tests that auto_create_check_access controls autocreation based on access.
+   */
+  public function testAutocreateCheckAccess(): void {
+    // Create a field with auto_create and auto_create_check_access enabled.
+    FieldStorageConfig::create([
+      'field_name' => 'field_autocreate_test',
+      'type' => 'entity_reference',
+      'entity_type' => 'entity_test',
+      'settings' => [
+        'target_type' => 'entity_test',
+      ],
+    ])->save();
+
+    FieldConfig::create([
+      'field_name' => 'field_autocreate_test',
+      'entity_type' => 'entity_test',
+      'bundle' => 'entity_test',
+      'label' => 'Autocreate test',
+      'settings' => [
+        'handler' => 'default',
+        'handler_settings' => [
+          'target_bundles' => NULL,
+          'auto_create' => TRUE,
+          'auto_create_bundle' => 'entity_test',
+          'auto_create_check_access' => TRUE,
+        ],
+      ],
+    ])->save();
+
+    EntityFormDisplay::create([
+      'targetEntityType' => 'entity_test',
+      'bundle' => 'entity_test',
+      'mode' => 'default',
+      'status' => TRUE,
+    ])->setComponent('field_autocreate_test', [
+      'type' => 'entity_reference_autocomplete',
+    ])->save();
+
+    // Create two distinct users: one without create access and one with it.
+    // Using two users avoids mutating a shared role mid-test.
+    $user_no_create = $this->createUser([], 'no_create_user');
+    $user_with_create = $this->createUser(['administer entity_test content'], 'with_create_user');
+
+    // @todo EntityTest hardcodes a default user_id of 1 (see EntityTest.php),
+    //   bypassing EntityOwnerTrait's current-user default callback. Pass
+    //   user_id explicitly so the parent entity is owned by a user with
+    //   create access — required by the widget's access check, which covers
+    //   both the current user and the prospective owner.
+    $form_object = \Drupal::entityTypeManager()->getFormObject('entity_test', 'default');
+    $form_object->setEntity(EntityTest::create([
+      'name' => 'test',
+      'user_id' => $user_with_create->id(),
+    ]));
+
+    // Build the form as the user without create access: #autocreate should not
+    // be set because the current-user portion of the access check fails.
+    \Drupal::currentUser()->setAccount($user_no_create);
+    $form = \Drupal::formBuilder()->getForm($form_object);
+    $this->assertEmpty($form['field_autocreate_test']['widget'][0]['target_id']['#autocreate']);
+
+    // Build the form as the user with create access: #autocreate should be set
+    // to the configured bundle, and its uid should match the parent entity
+    // owner (the widget propagates ownership from the host entity).
+    \Drupal::currentUser()->setAccount($user_with_create);
+    $form = \Drupal::formBuilder()->getForm($form_object);
+    $this->assertNotEmpty($form['field_autocreate_test']['widget'][0]['target_id']['#autocreate']);
+    $this->assertSame('entity_test', $form['field_autocreate_test']['widget'][0]['target_id']['#autocreate']['bundle']);
+    $this->assertEquals($form_object->getEntity()->getOwnerId(), $form['field_autocreate_test']['widget'][0]['target_id']['#autocreate']['uid']);
   }
 
   /**
