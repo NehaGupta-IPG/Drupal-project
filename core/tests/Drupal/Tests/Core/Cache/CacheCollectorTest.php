@@ -351,8 +351,8 @@ class CacheCollectorTest extends UnitTestCase {
 
     $this->collector->get($key);
 
-    // Set up mock objects for the expected calls, first a lock acquire, then
-    // when cache get finds conflicting entries it deletes the cache and aborts.
+    // When the cache is being warmed, if the lock can't be acquired, or if the
+    // cache item has changed during the request, nothing should be set.
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with($this->cid . ':Drupal\Core\Cache\CacheCollector')
@@ -367,6 +367,8 @@ class CacheCollectorTest extends UnitTestCase {
         ->method('release')
         ->with($this->cid . ':Drupal\Core\Cache\CacheCollector');
     }
+    $this->cacheBackend->expects($this->never())
+      ->method('delete');
     // Destruct the object to trigger the update data process.
     $this->collector->destruct();
   }
