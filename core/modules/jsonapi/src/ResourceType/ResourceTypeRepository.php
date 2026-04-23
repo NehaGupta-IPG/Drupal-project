@@ -128,12 +128,17 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
     $resource_types = [];
     foreach ($this->entityTypeManager->getDefinitions() as $entity_type) {
       $bundles = array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type->id()));
-      $resource_types = array_reduce($bundles, function ($resource_types, $bundle) use ($entity_type) {
+      $resource_types = array_filter(array_reduce($bundles, function ($resource_types, $bundle) use ($entity_type) {
         $resource_type = $this->createResourceType($entity_type, (string) $bundle);
-        return array_merge($resource_types, [
-          $resource_type->getTypeName() => $resource_type,
-        ]);
-      }, $resource_types);
+        if ($resource_type) {
+          return array_merge($resource_types, [
+            $resource_type->getTypeName() => $resource_type,
+          ]);
+        }
+        else {
+          return array_merge($resource_types, [NULL]);
+        }
+      }, $resource_types));
     }
     foreach ($resource_types as $resource_type) {
       $relatable_resource_types = $this->calculateRelatableResourceTypes($resource_type, $resource_types);
@@ -152,12 +157,15 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
    * @param string $bundle
    *   The entity type bundle to create a JSON:API resource type for.
    *
-   * @return \Drupal\jsonapi\ResourceType\ResourceType
-   *   A JSON:API resource type.
+   * @return \Drupal\jsonapi\ResourceType\ResourceType|null
+   *   A JSON:API resource type or NULL if presudo resource.
    */
   protected function createResourceType(EntityTypeInterface $entity_type, $bundle) {
     $type_name = NULL;
     $raw_fields = $this->getAllFieldNames($entity_type, $bundle);
+    if (!$raw_fields) {
+      return NULL;
+    }
     $internalize_resource_type = $entity_type->isInternal();
     $fields = static::getFields($raw_fields, $entity_type, $bundle);
     if (!$internalize_resource_type) {
@@ -225,6 +233,10 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
    */
   protected function getFields(array $field_names, EntityTypeInterface $entity_type, $bundle) {
     assert(Inspector::assertAllStrings($field_names));
+    // Skip unsupported entity types (e.g. Apigee EdgeEntityType).
+    if (!($entity_type instanceof ContentEntityTypeInterface) && !($entity_type instanceof ConfigEntityTypeInterface)) {
+      return [];
+    }
     assert($entity_type instanceof ContentEntityTypeInterface || $entity_type instanceof ConfigEntityTypeInterface);
     assert(is_string($bundle) && !empty($bundle), 'A bundle ID is required. Bundleless entity types should pass the entity type ID again.');
 
@@ -340,7 +352,7 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
       }
     }
     else {
-      throw new \LogicException("Only content and config entity types are supported.");
+      return NULL;
     }
   }
 
