@@ -10,7 +10,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that a site on 11.4.0 is prevented from downgrading to 12.0.0.
- * Tests that a site on 11.4.0 is prevented from downgrading to 12.0.0.
  *
  * This tests the upgrade path when there is a pair of equivalent updates. The
  * earlier update is 11102 and the latter one is 12001.
