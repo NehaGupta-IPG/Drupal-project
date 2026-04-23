@@ -158,7 +158,7 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
    *   The entity type bundle to create a JSON:API resource type for.
    *
    * @return \Drupal\jsonapi\ResourceType\ResourceType|null
-   *   A JSON:API resource type or NULL if presudo resource.
+   *   A JSON:API resource type or NULL if pseudo resource.
    */
   protected function createResourceType(EntityTypeInterface $entity_type, $bundle) {
     $type_name = NULL;
