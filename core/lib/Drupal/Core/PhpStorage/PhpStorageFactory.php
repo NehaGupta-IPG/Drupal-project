@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\PhpStorage;
 
+use Drupal\Component\FileSystem\FileSystem;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\PublicStream;
 
@@ -63,12 +64,39 @@ class PhpStorageFactory {
       $configuration['bin'] = $name;
     }
     if (isset($configuration['directory']) && str_starts_with($configuration['directory'], static::USE_SYS_TEMP)) {
-      $configuration['directory'] = sys_get_temp_dir() . substr($configuration['directory'], strlen(static::USE_SYS_TEMP));
+      $temp_dir = static::getTempDirectory();
+      if ($temp_dir) {
+        $configuration['directory'] = $temp_dir . substr($configuration['directory'], strlen(static::USE_SYS_TEMP));
+      }
+      else {
+        // Fallback to the public directory if the temporary directory cannot be
+        // written to.
+        unset($configuration['directory']);
+      }
     }
     if (!isset($configuration['directory'])) {
       $configuration['directory'] = PublicStream::basePath() . '/php';
     }
     return new $class($configuration);
+  }
+
+  /**
+   * Gets the temporary directory.
+   *
+   * @see \Drupal\Core\File\FileSystem::getTempDirectory())
+   *
+   * @return string|null
+   *   The temporary directory, or NULL if it cannot be determined.
+   */
+  protected static function getTempDirectory(): ?string {
+    // Use settings.
+    $temporary_directory = Settings::get('file_temp_path');
+    if (!empty($temporary_directory)) {
+      return $temporary_directory;
+    }
+
+    // Fallback to OS default.
+    return FileSystem::getOsTemporaryDirectory() ?: NULL;
   }
 
 }
