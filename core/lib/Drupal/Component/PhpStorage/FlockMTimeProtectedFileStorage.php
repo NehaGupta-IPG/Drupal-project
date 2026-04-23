@@ -8,8 +8,7 @@ namespace Drupal\Component\PhpStorage;
  * MTimeProtectedFileStorage with non-blocking flock()-based locking.
  *
  * Locking uses flock() with LOCK_EX | LOCK_NB, which the OS releases
- * automatically if the holding process terminates for any reason, making stale
- * locks impossible without any cleanup logic.
+ * automatically if the holding process terminates for any reason.
  *
  * flock() is reliable only on local filesystems. This class must therefore be
  * configured to store files in a local directory such as sys_get_temp_dir(),
