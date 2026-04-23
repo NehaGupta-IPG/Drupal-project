@@ -126,22 +126,4 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     }
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function doTestJsonIndexOptimization(): void {
-    $query = $this->connection->select('test_json');
-    $query->jsonCondition('test_field', '$.number', 0);
-    $query->addExpression('id');
-    $explained = $this->connection->query(
-      'EXPLAIN QUERY PLAN ' . $query,
-      $query->getArguments(),
-      // This would normally get pulled through automatically, however since we
-      // are doing EXPLAIN here, we need to re-set it explicitly for _this_
-      // query.
-      ['strict_params' => $query->usesStrictParameters()]
-    )->fetchAssoc();
-    $this->assertStringContainsString('USING INDEX', $explained['detail'], 'Expression index not used in query.');
-  }
-
 }

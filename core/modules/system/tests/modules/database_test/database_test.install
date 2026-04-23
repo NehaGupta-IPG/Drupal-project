@@ -7,9 +7,6 @@
 
 declare(strict_types=1);
 
-use Drupal\Core\Database\Query\JsonCastType;
-use Drupal\Core\Database\Schema\JsonIndex;
-
 /**
  * Implements hook_schema().
  *
@@ -362,10 +359,6 @@ function database_test_schema(): array {
       'test_field' => ['type' => 'json'],
     ],
     'primary key' => ['id'],
-    'indexes' => [
-      'idx_number' => [JsonIndex::on('test_field', '$.number', JsonCastType::Int)],
-      'idx_key' => [JsonIndex::on('test_field', '$.key')],
-    ],
   ];
 
   return $schema;

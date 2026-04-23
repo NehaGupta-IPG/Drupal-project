@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\pgsql\Kernel\pgsql;
 
-use Drupal\Core\Database\Query\JsonCastType;
-use Drupal\Core\Database\Schema\JsonIndex;
 use Drupal\KernelTests\Core\Database\DriverSpecificSchemaTestBase;
 use Drupal\pgsql\Driver\Database\pgsql\Schema;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
-// cSpell:ignore attname attnum attrelid indexdef objid refobjid refobjsubid
-// cSpell:ignore regclass relkind relname seqscan
+// cSpell:ignore attname attnum attrelid objid refobjid refobjsubid regclass
+// cspell:ignore relkind relname
 
 /**
  * Tests schema API for the PostgreSQL driver.
@@ -436,88 +434,6 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
       $actual = json_decode($query->execute()->fetchField());
       $this->assertSame($expected, $actual);
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function doTestJsonIndexOptimization(): void {
-    $explain_query = $this->connection->select('test_json');
-    // @todo Convert this WHERE to use the query builder when https://www.drupal.org/project/drupal/issues/3378275 lands.
-    // Postgres might try to outsmart us and run a table scan instead of using
-    // an index, due to a low number of rows. Explicitly tell the database
-    // to disable sequence scans for small sets. The index will still only be
-    // used if it is properly configured, so this will not result in a
-    // false-positive test result.
-    $this->connection->query('SET enable_seqscan TO off');
-    // Run a query that uses the @? operator to test GIN index compatibility.
-    $explained = implode("\n", $this->connection->query(
-      'EXPLAIN ' . $explain_query . ' WHERE test_field @? \'$.number ? (@ >= 0)\''
-    )->fetchCol());
-    // Ensure the auto-generated index is used.
-    $this->assertMatchesRegularExpression('/Bitmap Index Scan.*idx_number/', $explained);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function doTestJsonIndexAndFieldOperations(): void {
-    // PgSQL uses whole-column GIN indexes for JSON. Multiple JsonIndex entries
-    // on the same column are deduplicated into a single GIN index, so only
-    // the first named index actually exists. Override the base test to check
-    // for the first index name rather than all of them.
-    $this->schema->dropTable('test_json');
-    $spec = static::jsonTableSpecification();
-    unset($spec['indexes']);
-    $this->schema->createTable('test_json', $spec);
-
-    $this->schema->addIndex('test_json', 'idx_number', [JsonIndex::on('test_field', '$.number', JsonCastType::Int)], $spec);
-    $this->assertTrue($this->schema->indexExists('test_json', 'idx_number'));
-
-    // Dropping an unrelated field should not affect GIN indexes.
-    $this->schema->dropTable('test_json');
-    $spec = static::jsonTableSpecification();
-    $spec['fields']['extra_field'] = [
-      'type' => 'varchar',
-      'length' => 64,
-      'not null' => TRUE,
-      'default' => '',
-    ];
-    $this->schema->createTable('test_json', $spec);
-    $this->schema->dropField('test_json', 'extra_field');
-    $this->assertTrue($this->schema->indexExists('test_json', 'idx_number'), 'GIN index should survive unrelated field drop.');
-
-    // Renaming the JSON field should preserve the GIN index.
-    $this->schema->changeField('test_json', 'test_field', 'data_field', ['type' => 'json']);
-    $this->assertTrue($this->schema->fieldExists('test_json', 'data_field'));
-    $this->connection->insert('test_json')
-      ->fields(['data_field' => self::JSON_TEST_VALUE])
-      ->execute();
-    $stored = $this->connection->select('test_json')
-      ->fields('test_json', ['data_field'])
-      ->execute()
-      ->fetchField();
-    $this->assertEquals(
-      json_decode(self::JSON_TEST_VALUE, TRUE),
-      json_decode($stored, TRUE),
-    );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function doTestJsonIndexCleanup(): void {
-    $prefix = $this->connection->getPrefix();
-    $gin_indexes = fn() => array_filter(
-      $this->connection->query(
-        "SELECT indexdef FROM pg_indexes WHERE tablename = :table",
-        [':table' => $prefix . 'test_json'],
-      )->fetchCol(),
-      fn($def) => str_contains($def, 'USING gin'),
-    );
-    $this->assertNotEmpty($gin_indexes(), 'GIN index should exist on the JSON column.');
-    $this->schema->dropField('test_json', 'test_field');
-    $this->assertEmpty($gin_indexes(), 'GIN index should be removed after dropping the JSON field.');
   }
 
 }

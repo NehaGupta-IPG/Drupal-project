@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Database;
 
-use Drupal\Core\Database\Query\JsonCastType;
-use Drupal\Core\Database\Schema\JsonIndex;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Database\Schema;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
+use Drupal\Core\Database\Schema;
 use Drupal\Core\Database\SchemaException;
 use Drupal\Tests\Core\Database\SchemaIntrospectionTestTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -1496,16 +1494,11 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
         'test_field' => ['type' => 'json'],
       ],
       'primary key' => ['id'],
-      'indexes' => [
-        'idx_number' => [JsonIndex::on('test_field', '$.number', JsonCastType::Int)],
-        'idx_key' => [JsonIndex::on('test_field', '$.key')],
-        'idx_float' => [JsonIndex::on('test_field', '$.float', JsonCastType::Float)],
-      ],
     ];
   }
 
   /**
-   * Tests JSON schema type, data round-trip, index optimization, and cleanup.
+   * Tests the JSON schema type and data round-trip.
    */
   public function testJsonSchema(): void {
     $class = $this->connection->getDriverClass('JsonExpression');
@@ -1526,9 +1519,6 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
       ->execute();
 
     $this->doTestJsonRoundTrip();
-    $this->doTestJsonIndexOptimization();
-    $this->doTestJsonIndexCleanup();
-    $this->doTestJsonIndexAndFieldOperations();
   }
 
   /**
@@ -1536,110 +1526,6 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
    */
   protected function doTestJsonRoundTrip(): void {
     // Drivers should override this with driver-specific extraction assertions.
-  }
-
-  /**
-   * Verifies that the query optimizer uses JSON indexes.
-   */
-  protected function doTestJsonIndexOptimization(): void {
-    // Drivers should override this with driver-specific EXPLAIN assertions.
-  }
-
-  /**
-   * Tests that JSON indexes are cleaned up when a JSON field is dropped.
-   */
-  protected function doTestJsonIndexCleanup(): void {
-    // Verify at least one index exists before dropping.
-    $spec = static::jsonTableSpecification();
-    $this->assertTrue($this->schema->indexExists('test_json', array_key_first($spec['indexes'])));
-
-    $this->schema->dropField('test_json', 'test_field');
-    foreach (array_keys($spec['indexes']) as $index_name) {
-      $this->assertFalse($this->schema->indexExists('test_json', $index_name), "Index $index_name should be removed after dropping the JSON field.");
-    }
-  }
-
-  /**
-   * Tests JSON index operations: addIndex, dropField, changeField.
-   */
-  protected function doTestJsonIndexAndFieldOperations(): void {
-    // Adding JSON indexes to an existing table via addIndex().
-    $this->schema->dropTable('test_json');
-    $spec = static::jsonTableSpecification();
-    // Recreate the table without indexes.
-    unset($spec['indexes']);
-    $this->schema->createTable('test_json', $spec);
-
-    // Add a JSON expression index.
-    $this->schema->addIndex('test_json', 'idx_number', [JsonIndex::on('test_field', '$.number', JsonCastType::Int)], $spec);
-    $this->assertTrue($this->schema->indexExists('test_json', 'idx_number'));
-
-    // Add another.
-    $this->schema->addIndex('test_json', 'idx_key', [JsonIndex::on('test_field', '$.key')], $spec);
-    $this->assertTrue($this->schema->indexExists('test_json', 'idx_key'));
-
-    $introspect_index_schema = new \ReflectionMethod(get_class($this->schema), 'introspectIndexSchema');
-    $indexes = $introspect_index_schema->invoke($this->schema, 'test_json')['indexes'];
-    // At least 2 indexes from addIndex(); some drivers (PgSQL) may also have
-    // auto-created indexes on JSON columns.
-    $this->assertGreaterThanOrEqual(2, count($indexes));
-
-    // Dropping an unrelated field should not affect JSON indexes.
-    $this->schema->dropTable('test_json');
-    $spec = static::jsonTableSpecification();
-    $spec['fields']['extra_field'] = [
-      'type' => 'varchar',
-      'length' => 64,
-      'not null' => TRUE,
-      'default' => '',
-    ];
-    $this->schema->createTable('test_json', $spec);
-
-    // Dropping an unrelated field should not affect JSON indexes.
-    $this->schema->dropField('test_json', 'extra_field');
-    $this->assertTrue($this->schema->indexExists('test_json', 'idx_number'), 'JSON index should survive unrelated field drop.');
-    $this->assertTrue($this->schema->indexExists('test_json', 'idx_key'), 'JSON index should survive unrelated field drop.');
-
-    // Renaming the JSON field should update expression indexes.
-    $this->schema->changeField('test_json', 'test_field', 'data_field', ['type' => 'json']);
-    $this->assertTrue($this->schema->fieldExists('test_json', 'data_field'));
-    // Verify data round-trip still works after the rename.
-    $this->connection->insert('test_json')
-      ->fields(['data_field' => self::JSON_TEST_VALUE])
-      ->execute();
-    $stored = $this->connection->select('test_json')
-      ->fields('test_json', ['data_field'])
-      ->execute()
-      ->fetchField();
-    $this->assertEquals(
-      json_decode(self::JSON_TEST_VALUE, TRUE),
-      json_decode($stored, TRUE),
-    );
-
-    // Renaming a non-JSON field whose name appears in a JSON path should
-    // not corrupt expression indexes. The column "number" matches the key
-    // in the $.number JSON path used by the idx_number index.
-    $this->schema->dropTable('test_json');
-    $spec = static::jsonTableSpecification();
-    $spec['fields']['number'] = [
-      'type' => 'int',
-      'not null' => TRUE,
-      'default' => 0,
-    ];
-    $this->schema->createTable('test_json', $spec);
-    $this->schema->changeField('test_json', 'number', 'num', [
-      'type' => 'int',
-      'not null' => TRUE,
-      'default' => 0,
-    ]);
-    // Insert data and verify JSON queries on $.number still work.
-    $this->connection->insert('test_json')
-      ->fields(['test_field' => '{"number": 42}', 'num' => 1])
-      ->execute();
-    $query = $this->connection->select('test_json');
-    $query->addField('test_json', 'id');
-    $query->jsonCondition('test_field', '$.number', 42);
-    $this->assertNotEmpty($query->execute()->fetchCol(), 'JSON query on $.number should work after renaming unrelated "number" column.');
   }
 
 }

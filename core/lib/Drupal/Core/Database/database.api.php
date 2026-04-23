@@ -383,19 +383,7 @@ use Drupal\Core\Database\Query\SelectInterface;
  *  - 'indexes':  An associative array of indexes ('indexname' =>
  *    specification). Each specification is an array of one or more
  *    key column specifiers (see below) that form an index on the
- *    table. For JSON columns, use a JsonIndex object as an element in the
- *    array to create expression indexes on specific JSON paths. JsonIndex
- *    elements can be combined with regular column names for composite indexes:
- *    @code
- *    'indexes' => [
- *      'idx_score'  => [JsonIndex::on('data', '$.score', JsonCastType::Int)],
- *      'idx_composite' => ['status', JsonIndex::on('data', '$.category')],
- *    ],
- *    @endcode
- *    The JsonCastType enum (Text, Int, Float) ensures the index expression
- *    matches the query expression for optimizer use. The specific index
- *    mechanism is driver-specific: MySQL uses functional indexes, SQLite
- *    uses expression indexes, and PostgreSQL uses GIN indexes.
+ *    table.
  *
  * A key column specifier is either a string naming a column or an array of two
  * elements, column name and length, specifying a prefix of the named column.

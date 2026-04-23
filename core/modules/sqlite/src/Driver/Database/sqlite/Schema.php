@@ -2,7 +2,6 @@
 
 namespace Drupal\sqlite\Driver\Database\sqlite;
 
-use Drupal\Core\Database\Schema\JsonIndex;
 use Drupal\Core\Database\SchemaObjectExistsException;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\Schema as DatabaseSchema;
@@ -73,14 +72,7 @@ class Schema extends DatabaseSchema {
     }
     if (!empty($schema['indexes'])) {
       foreach ($schema['indexes'] as $key => $fields) {
-        if (is_string($fields)) {
-          // Expression indexes from introspected schemas are stored as strings.
-          $columns = $fields;
-        }
-        else {
-          $columns = $this->createKeySql($this->resolveJsonIndexElements($fields));
-        }
-        $sql[] = 'CREATE INDEX [' . $info['schema'] . '].[' . $info['table'] . '_' . $key . '] ON [' . $info['table'] . '] (' . $columns . ")\n";
+        $sql[] = 'CREATE INDEX [' . $info['schema'] . '].[' . $info['table'] . '_' . $key . '] ON [' . $info['table'] . '] (' . $this->createKeySql($fields) . ")\n";
       }
     }
     return $sql;
@@ -89,7 +81,7 @@ class Schema extends DatabaseSchema {
   /**
    * Build the SQL expression for creating columns.
    */
-  protected function createColumnsSql($table_name, $schema) {
+  protected function createColumnsSql($tablename, $schema) {
     $sql_array = [];
 
     // Add the SQL statement for each field.
@@ -119,33 +111,11 @@ class Schema extends DatabaseSchema {
       if (is_array($field)) {
         $return[] = '[' . $field[0] . ']';
       }
-      elseif (str_contains($field, '(')) {
-        // Expression indexes (e.g. from resolved JsonIndex).
-        $return[] = $field;
-      }
       else {
         $return[] = '[' . $field . ']';
       }
     }
     return implode(', ', $return);
-  }
-
-  /**
-   * Resolves JsonIndex elements within an index field list to SQL expressions.
-   *
-   * @param array $fields
-   *   The index field list, which may contain JsonIndex objects.
-   *
-   * @return array
-   *   The field list with JsonIndex objects replaced by expression strings.
-   */
-  protected function resolveJsonIndexElements(array $fields): array {
-    foreach ($fields as $key => $element) {
-      if ($element instanceof JsonIndex) {
-        $fields[$key] = $this->connection->jsonExpression($element->field, $element->jsonpath)->toCastSql($element->type);
-      }
-    }
-    return $fields;
   }
 
   /**
@@ -588,30 +558,8 @@ class Schema extends DatabaseSchema {
       // Get index name without prefix.
       $index_name = substr($name, strlen($info['table']) + 1);
       $result = $this->connection->query('PRAGMA [' . $info['schema'] . '].index_info([' . $name . '])');
-      $is_expression_index = FALSE;
-      $columns = [];
       foreach ($result as $row) {
-        if ($row->name === NULL) {
-          $is_expression_index = TRUE;
-        }
-        else {
-          $columns[] = $row->name;
-        }
-      }
-      if ($is_expression_index) {
-        // Expression indexes return NULL for column names in PRAGMA
-        // index_info. Retrieve the expression from sqlite_master and store
-        // it as a string (vs. array for column-based indexes).
-        $create_sql = $this->connection->query(
-          "SELECT sql FROM [{$info['schema']}].sqlite_master WHERE type = 'index' AND name = :name",
-          [':name' => $name]
-        )->fetchField();
-        if ($create_sql && preg_match('/\bON\s+\S+\s*\((.+)\)\s*$/i', $create_sql, $matches)) {
-          $schema['indexes'][$index_name] = trim($matches[1]);
-        }
-      }
-      else {
-        $schema[$index['schema_key']][$index_name] = $columns;
+        $schema[$index['schema_key']][$index_name][] = $row->name;
       }
     }
     return $schema;
@@ -639,17 +587,6 @@ class Schema extends DatabaseSchema {
 
     // Handle possible index changes.
     foreach ($new_schema['indexes'] as $index => $fields) {
-      // Expression indexes (strings) that reference the dropped field.
-      // Match the field name (optionally quoted) as an argument to
-      // json_extract/json_type to avoid false positives from field names
-      // appearing in JSON paths.
-      if (is_string($fields)) {
-        if (preg_match('/\bjson_\w+\(\s*"?' . preg_quote($field, '/') . '"?\b/', $fields)) {
-          unset($new_schema['indexes'][$index]);
-        }
-        continue;
-      }
-      // Column-based indexes (arrays): remove the dropped field.
       foreach ($fields as $key => $field_name) {
         if ($field_name == $field) {
           unset($new_schema['indexes'][$index][$key]);
@@ -697,20 +634,6 @@ class Schema extends DatabaseSchema {
     $new_schema['primary key'] = $this->mapKeyDefinition($new_schema['primary key'], $mapping);
     foreach (['unique keys', 'indexes'] as $k) {
       foreach ($new_schema[$k] as &$key_definition) {
-        // Expression indexes are strings; update the column name that
-        // appears as the first argument to json_extract/json_type etc.
-        // A plain str_replace would corrupt JSON paths containing the
-        // column name (e.g. '$.id' when renaming column 'id').
-        if (is_string($key_definition)) {
-          foreach ($mapping as $new_name => $old_name) {
-            $key_definition = preg_replace(
-              '/(json_\w+\(\s*)"?' . preg_quote($old_name, '/') . '("|\b)/',
-              '${1}"' . $new_name . '"',
-              $key_definition,
-            );
-          }
-          continue;
-        }
         $key_definition = $this->mapKeyDefinition($key_definition, $mapping);
       }
     }

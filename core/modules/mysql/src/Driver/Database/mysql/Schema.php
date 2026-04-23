@@ -3,7 +3,6 @@
 namespace Drupal\mysql\Driver\Database\mysql;
 
 use Drupal\Core\Database\Exception\SchemaPrimaryKeyMustBeDroppedException;
-use Drupal\Core\Database\Schema\JsonIndex;
 use Drupal\Core\Database\SchemaException;
 use Drupal\Core\Database\SchemaObjectExistsException;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;
@@ -290,8 +289,6 @@ class Schema extends DatabaseSchema {
       }
     }
     if (!empty($spec['indexes'])) {
-      // Resolve any JsonIndex objects before normalization.
-      $this->resolveJsonIndexes($spec);
       $indexes = $this->getNormalizedIndexes($spec);
       foreach ($indexes as $index => $fields) {
         $keys[] = 'INDEX [' . $index . '] (' . $this->createKeySql($fields) . ')';
@@ -320,10 +317,6 @@ class Schema extends DatabaseSchema {
     $indexes = $spec['indexes'] ?? [];
     foreach ($indexes as $index_name => $index_fields) {
       foreach ($index_fields as $index_key => $index_field) {
-        // Skip expression strings (resolved from JsonIndex).
-        if (is_string($index_field) && str_contains($index_field, '(')) {
-          continue;
-        }
         // Get the name of the field from the index specification.
         $field_name = is_array($index_field) ? $index_field[0] : $index_field;
         // Check whether the field is defined in the table specification.
@@ -375,16 +368,9 @@ class Schema extends DatabaseSchema {
     $return = [];
     foreach ($fields as $field) {
       if (is_array($field)) {
-        // Column name with prefix length.
         $return[] = '[' . $field[0] . '] (' . $field[1] . ')';
       }
-      elseif (str_contains($field, '(')) {
-        // Expression indexes (e.g. from resolved JsonIndex) use double
-        // parentheses in MySQL.
-        $return[] = '((' . $field . '))';
-      }
       else {
-        // Regular column name.
         $return[] = '[' . $field . ']';
       }
     }
@@ -492,51 +478,6 @@ class Schema extends DatabaseSchema {
   }
 
   /**
-   * Resolves JsonIndex elements within index arrays to expression strings.
-   *
-   * Each element in an index array can be a column name (string), a column
-   * with prefix length (array), or a JsonIndex object. JsonIndex elements are
-   * converted to expression strings that the driver uses for functional
-   * indexes.
-   *
-   * @param array $table
-   *   Table schema definition, modified by reference.
-   */
-  protected function resolveJsonIndexes(array &$table): void {
-    if (empty($table['indexes'])) {
-      return;
-    }
-
-    foreach ($table['indexes'] as $index_name => $index_fields) {
-      if (!is_array($index_fields)) {
-        continue;
-      }
-      $resolved = [];
-      foreach ($index_fields as $element) {
-        if ($element instanceof JsonIndex) {
-          // MariaDB does not support functional indexes, so drop JsonIndex
-          // elements entirely. An index composed only of JsonIndex entries
-          // ends up empty and is unset below.
-          // @see https://jira.mariadb.org/browse/MDEV-35853
-          if ($this->connection->isMariaDb()) {
-            continue;
-          }
-          $resolved[] = $this->connection->jsonExpression($element->field, $element->jsonpath)->toCastSql($element->type);
-        }
-        else {
-          $resolved[] = $element;
-        }
-      }
-      if (empty($resolved)) {
-        unset($table['indexes'][$index_name]);
-      }
-      else {
-        $table['indexes'][$index_name] = $resolved;
-      }
-    }
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function dropField($table, $field) {
@@ -554,18 +495,6 @@ class Schema extends DatabaseSchema {
     $primary_key = $this->findPrimaryKeyColumns($table);
     if ((count($primary_key) > 1) && in_array($field, $primary_key, TRUE)) {
       $this->dropPrimaryKey($table);
-    }
-
-    // Drop functional indexes that reference the field being dropped.
-    // MySQL does not auto-drop functional indexes when the column they
-    // reference is removed, so we must do it explicitly.
-    $result = $this->connection->query('SHOW INDEX FROM {' . $table . '}');
-    $dropped = [];
-    foreach ($result as $row) {
-      if ($row->Expression !== NULL && !isset($dropped[$row->Key_name]) && str_contains($row->Expression, '`' . $field . '`')) {
-        $this->dropIndex($table, $row->Key_name);
-        $dropped[$row->Key_name] = TRUE;
-      }
     }
 
     $this->executeDdlStatement('ALTER TABLE {' . $table . '} DROP [' . $field . ']');
@@ -657,15 +586,8 @@ class Schema extends DatabaseSchema {
     }
 
     $spec['indexes'][$name] = $fields;
-    $this->resolveJsonIndexes($spec);
-
-    // Index may have been removed (e.g. MariaDB doesn't support functional
-    // indexes).
-    if (!isset($spec['indexes'][$name])) {
-      return;
-    }
-
     $indexes = $this->getNormalizedIndexes($spec);
+
     $this->executeDdlStatement('ALTER TABLE {' . $table . '} ADD INDEX [' . $name . '] (' . $this->createKeySql($indexes[$name]) . ')');
   }
 
@@ -703,10 +625,6 @@ class Schema extends DatabaseSchema {
       elseif ($row->Non_unique == 0) {
         $index_schema['unique keys'][$row->Key_name][] = $row->Column_name;
       }
-      elseif ($row->Column_name === NULL && !empty($row->Expression)) {
-        // Functional indexes have NULL Column_name and an Expression column.
-        $index_schema['indexes'][$row->Key_name] = $row->Expression;
-      }
       else {
         $index_schema['indexes'][$row->Key_name][] = $row->Column_name;
       }
@@ -729,32 +647,11 @@ class Schema extends DatabaseSchema {
       $this->ensureNotNullPrimaryKey($keys_new['primary key'], [$field_new => $spec]);
     }
 
-    // MySQL 8 blocks renaming columns used in functional indexes. Drop those
-    // indexes first, then recreate them with the updated column name.
-    $restored_indexes = [];
-    if ($field !== $field_new) {
-      $existing = $this->introspectIndexSchema($table);
-      foreach ($existing['indexes'] as $index_name => $index_def) {
-        if (is_string($index_def) && preg_match('/\b' . preg_quote($field, '/') . '\b/', $index_def)) {
-          $this->dropIndex($table, $index_name);
-          // MySQL's SHOW INDEX returns expressions with backslash-escaped
-          // single quotes; unescape them for use in DDL statements.
-          $expression = stripslashes($index_def);
-          $restored_indexes[$index_name] = str_replace('`' . $field . '`', '`' . $field_new . '`', $expression);
-        }
-      }
-    }
-
     $sql = 'ALTER TABLE {' . $table . '} CHANGE [' . $field . '] ' . $this->createFieldSql($field_new, $this->processField($spec));
     if ($keys_sql = $this->createKeysSql($keys_new)) {
       $sql .= ', ADD ' . implode(', ADD ', $keys_sql);
     }
     $this->executeDdlStatement($sql);
-
-    // Recreate functional indexes with the new column name.
-    foreach ($restored_indexes as $index_name => $expression) {
-      $this->executeDdlStatement('ALTER TABLE {' . $table . '} ADD INDEX [' . $index_name . '] ((' . $expression . '))');
-    }
 
     if ($spec['type'] === 'serial') {
       $max = $this->connection->query('SELECT MAX(`' . $field_new . '`) FROM {' . $table . '}')->fetchField();

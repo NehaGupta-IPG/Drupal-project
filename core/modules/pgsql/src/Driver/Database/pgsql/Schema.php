@@ -2,7 +2,6 @@
 
 namespace Drupal\pgsql\Driver\Database\pgsql;
 
-use Drupal\Core\Database\Schema\JsonIndex;
 use Drupal\Core\Database\SchemaObjectExistsException;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\Schema as DatabaseSchema;
@@ -11,7 +10,7 @@ use Drupal\Core\Database\Schema as DatabaseSchema;
 // cSpell:ignore attrelid atttypid atttypmod bigserial conkey conname conrelid
 // cSpell:ignore contype fillfactor indexname indexrelid indisprimary indkey
 // cSpell:ignore indrelid nextval nspname regclass relkind relname relnamespace
-// cSpell:ignore schemaname setval regtype tsvector
+// cSpell:ignore schemaname setval
 
 /**
  * @addtogroup schemaapi
@@ -329,50 +328,9 @@ EOD;
     $sql .= "\n)";
     $statements[] = $sql;
 
-    $indexed_full_columns = [];
     if (isset($table['indexes']) && is_array($table['indexes'])) {
-      // PgSQL uses whole-column GIN indexes for JSON, which cover all
-      // containment (@>), existence (?), and path (@?) operators regardless
-      // of the specific jsonpath or cast type. This is more general than the
-      // per-path expression indexes used by MySQL/SQLite. Multiple JsonIndex
-      // entries on the same column are deduplicated into a single GIN index.
-      $json_gin_columns = [];
-      foreach ($table['indexes'] as $key_name => $spec) {
-        // Separate JsonIndex elements from regular column specs.
-        $json_elements = $regular_columns = [];
-        foreach ($spec as $element) {
-          if ($element instanceof JsonIndex) {
-            $json_elements[] = $element;
-          }
-          else {
-            $regular_columns[] = $element;
-            if (is_string($element)) {
-              $indexed_full_columns[] = $element;
-            }
-          }
-        }
-        // Use the index name directly for JSON-only indexes, append '_gin'
-        // for composite indexes that also have regular columns.
-        $gin_name = !empty($regular_columns) ? $key_name . '_gin' : $key_name;
-        foreach ($json_elements as $json_index) {
-          if (!in_array($json_index->field, $json_gin_columns, TRUE)) {
-            $json_gin_columns[] = $json_index->field;
-            $indexed_full_columns[] = $json_index->field;
-            $statements[] = $this->_createGinIndexSql($name, $gin_name, $json_index->field);
-          }
-        }
-        if (!empty($regular_columns)) {
-          $statements[] = $this->_createIndexSql($name, $key_name, $regular_columns);
-        }
-      }
-    }
-    foreach ($table['fields'] as $field_name => $field) {
-      if (!in_array($field_name, $indexed_full_columns) && $sql = $this->createAutoJsonIndexSql($name, $field_name, $field)) {
-        // This JSON data field is not explicitly indexed, however Postgres
-        // provides powerful indexing via GIN for these columns without
-        // pre-configuring JSON path queries to optimize. Adding an index on
-        // this column provides zero-configuration performance enhancement.
-        $statements[] = $sql;
+      foreach ($table['indexes'] as $key_name => $key) {
+        $statements[] = $this->_createIndexSql($name, $key_name, $key);
       }
     }
 
@@ -389,25 +347,6 @@ EOD;
     }
 
     return $statements;
-  }
-
-  /**
-   * Creates a GIN index for a JSON field, if applicable.
-   *
-   * @param string $table
-   *   Table name.
-   * @param string $field_name
-   *   Field name.
-   * @param array $spec
-   *   Field spec.
-   *
-   * @return string|null
-   *   Index creation SQL or NULL if unnecessary.
-   */
-  protected function createAutoJsonIndexSql(string $table, string $field_name, array $spec): ?string {
-    return !empty($spec['type']) && $spec['type'] === 'json'
-      ? $this->_createGinIndexSql($table, 'auto_gin_' . $field_name, $field_name)
-      : NULL;
   }
 
   /**
@@ -779,9 +718,6 @@ EOD;
     if (!empty($spec['description'])) {
       $this->executeDdlStatement('COMMENT ON COLUMN {' . $table . '}.' . $field . ' IS ' . $this->prepareComment($spec['description']));
     }
-    if ($sql = $this->createAutoJsonIndexSql($table, $field, $spec)) {
-      $this->executeDdlStatement($sql);
-    }
     $this->resetTableInformation($table);
   }
 
@@ -942,39 +878,8 @@ EOD;
       throw new SchemaObjectExistsException("Cannot add index '$name' to table '$table': index already exists.");
     }
 
-    // Extract JsonIndex elements for GIN index creation, keep regular columns
-    // for a standard index.
-    $regular_columns = array_filter($fields, fn($e) => !$e instanceof JsonIndex);
-
-    // Use the index name directly for JSON-only indexes, append '_gin' for
-    // composite indexes that also have regular columns.
-    $gin_name = !empty($regular_columns) ? $name . '_gin' : $name;
-    foreach ($fields as $element) {
-      if ($element instanceof JsonIndex) {
-        $this->executeDdlStatement($this->_createGinIndexSql($table, $gin_name, $element->field));
-      }
-    }
-    if (!empty($regular_columns)) {
-      $this->executeDdlStatement($this->_createIndexSql($table, $name, $regular_columns));
-    }
+    $this->executeDdlStatement($this->_createIndexSql($table, $name, $fields));
     $this->resetTableInformation($table);
-  }
-
-  /**
-   * Creates a GIN index statement for a single column.
-   *
-   * @param string $table
-   *   Table name.
-   * @param string $name
-   *   Index name.
-   * @param string $column
-   *   Column name.
-   *
-   * @return string
-   *   The CREATE INDEX statement.
-   */
-  protected function _createGinIndexSql(string $table, string $name, string $column): string {
-    return 'CREATE INDEX ' . $this->ensureIdentifiersLength($table, $name, 'idx') . ' ON {' . $table . '} USING GIN ("' . $column . '")';
   }
 
   /**
