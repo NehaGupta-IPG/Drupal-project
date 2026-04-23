@@ -108,4 +108,22 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     $this->assertEquals($table_specification, $index_schema);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function doTestJsonRoundTrip(): void {
+    foreach (self::JSON_TEST_DATA as $path => $expected) {
+      $query = $this->connection->select('test_json');
+      // JSON_EXTRACT() in SQLite has some unique behavior, which is abstracted
+      // in the driver's JsonExpression class. The syntax here ensures we're
+      // only testing our basic integration with the schema API; the abstraction
+      // is tested elsewhere.
+      $query->addExpression('json_extract([test_field], :path, "$._")', NULL, [
+        ':path' => $path,
+      ]);
+      $actual = json_decode($query->execute()->fetchField(), TRUE)[0];
+      $this->assertSame($expected, $actual);
+    }
+  }
+
 }

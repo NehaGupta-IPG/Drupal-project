@@ -7,6 +7,7 @@ namespace Drupal\Tests\Core\Database\Stub;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\ExceptionHandler;
 use Drupal\Core\Database\Log;
+use Drupal\Core\Database\Query\JsonExpression;
 use Drupal\Core\Database\StatementWrapperIterator;
 use Drupal\Tests\Core\Database\Stub\Driver\Schema;
 
@@ -117,6 +118,13 @@ class StubConnection extends Connection {
       $this->schema = new Schema();
     }
     return $this->schema;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function jsonExpression(string $field, string $path): JsonExpression {
+    throw new \LogicException('Not implemented.');
   }
 
   /**

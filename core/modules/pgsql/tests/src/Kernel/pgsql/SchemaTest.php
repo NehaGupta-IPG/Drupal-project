@@ -422,4 +422,18 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     $this->assertTrue($this->schema->tableExists($table_name));
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function doTestJsonRoundTrip(): void {
+    foreach (self::JSON_TEST_DATA as $path => $expected) {
+      $query = $this->connection->select('test_json');
+      $query->addExpression('jsonb_path_query(test_field, :path)', NULL, [
+        ':path' => $path,
+      ]);
+      $actual = json_decode($query->execute()->fetchField());
+      $this->assertSame($expected, $actual);
+    }
+  }
+
 }

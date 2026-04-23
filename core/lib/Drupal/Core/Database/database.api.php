@@ -324,9 +324,9 @@ use Drupal\Core\Database\Query\SelectInterface;
  *       brackets. For example, the users_data table 'uid' field description
  *       might contain "The {users}.uid this record affects."
  *     - 'type': The generic datatype: 'char', 'varchar', 'text', 'blob', 'int',
- *       'float', 'numeric', or 'serial'. Most types just map to the according
- *       database engine specific data types. Use 'serial' for auto incrementing
- *       fields. This will expand to 'INT auto_increment' on MySQL.
+ *       'float', 'numeric', 'serial', or 'json'. Most types just map to the
+ *       according database engine specific data types. Use 'serial' for auto
+ *       incrementing fields. This will expand to 'INT auto_increment' on MySQL.
  *       A special 'varchar_ascii' type is also available for limiting machine
  *       name field to US ASCII characters.
  *     - 'mysql_type', 'pgsql_type', 'sqlite_type', etc.: If you need to

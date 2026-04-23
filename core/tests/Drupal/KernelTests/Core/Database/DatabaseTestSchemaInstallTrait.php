@@ -27,6 +27,7 @@ trait DatabaseTestSchemaInstallTrait {
         'TEST_UPPERCASE',
         'select',
         'virtual',
+        'json',
       ]
     );
   }
