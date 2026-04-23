@@ -3,4 +3,5 @@ datetime_range:
     js/datetime_range.js: {}
   dependencies:
    - core/drupal
-   - core/jquery
+   - core/drupalSettings
+   - core/once
