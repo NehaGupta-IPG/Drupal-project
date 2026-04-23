@@ -43,11 +43,15 @@ class PhpStorageFactory {
    *   configuration always takes precedence). Recognized keys are the same as
    *   for any PhpStorageInterface implementation: 'class', 'directory', 'bin',
    *   and 'secret'.
+   * @param string|null $site_path
+   *   (optional) The site path to use for the storage directory. Defaults to
+   *   the site's public files directory. Only necessary if the factory is used
+   *   prior to the container being initialized.
    *
    * @return \Drupal\Component\PhpStorage\PhpStorageInterface
    *   An instantiated storage for the specified name.
    */
-  public static function get($name, array $configuration = []) {
+  public static function get($name, array $configuration = [], ?string $site_path = NULL) {
     $overrides = Settings::get('php_storage');
     if (isset($overrides[$name])) {
       $configuration = $overrides[$name];
@@ -75,7 +79,7 @@ class PhpStorageFactory {
       }
     }
     if (!isset($configuration['directory'])) {
-      $configuration['directory'] = PublicStream::basePath() . '/php';
+      $configuration['directory'] = PublicStream::basePath($site_path) . '/php';
     }
     return new $class($configuration);
   }
