@@ -222,9 +222,6 @@ class CacheCollectorTest extends UnitTestCase {
   /**
    * Tests setting to cache when there is a conflict after cache invalidation.
    */
-<<<<<<< HEAD
-  public function testUpdateCacheInvalidatedConflict(): void {
-=======
   #[TestWith([TRUE, TRUE, TRUE, TRUE])]
   #[TestWith([TRUE, TRUE, TRUE, FALSE])]
   #[TestWith([TRUE, TRUE, FALSE, NULL])]
@@ -243,7 +240,6 @@ class CacheCollectorTest extends UnitTestCase {
     $this->setUpMockCacheBackend();
     $this->setUpMockLockBackend();
 
->>>>>>> 8d660fef314 (fix: #3496257 Race conditions in CacheCollector/State (again))
     $key = $this->randomMachineName();
     $value = $this->randomMachineName();
 
@@ -424,11 +420,8 @@ class CacheCollectorTest extends UnitTestCase {
    * Tests deleting the cache after a delete.
    */
   public function testUpdateCacheDelete(): void {
-<<<<<<< HEAD
-=======
     $this->setUpMockCacheBackend();
     $this->setUpMockLockBackend();
->>>>>>> 8d660fef314 (fix: #3496257 Race conditions in CacheCollector/State (again))
     $key = $this->randomMachineName();
     $value = $this->randomMachineName();
 
