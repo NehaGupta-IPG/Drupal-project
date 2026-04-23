@@ -5,6 +5,10 @@
  * Post update functions for Views.
  */
 
+use Drupal\Core\Config\Entity\ConfigEntityUpdater;
+use Drupal\views\ViewEntityInterface;
+use Drupal\views\ViewsConfigUpdater;
+
 /**
  * Implements hook_removed_post_updates().
  */
@@ -54,7 +58,6 @@ function views_removed_post_updates(): array {
     'views_post_update_add_date_default_arguments' => '12.0.0',
   ];
 }
-
 
 /**
  * Add default min_label and max_label to exposed numeric-type filters.

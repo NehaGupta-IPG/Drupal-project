@@ -133,7 +133,6 @@ class ViewsConfigUpdater {
     return $changed;
   }
 
-
   /**
    * Checks if a filter's expose section is missing min_label or max_label.
    *
@@ -176,6 +175,5 @@ class ViewsConfigUpdater {
     }
     return FALSE;
   }
-
 
 }
