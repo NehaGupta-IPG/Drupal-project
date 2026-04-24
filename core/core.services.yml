@@ -1106,9 +1106,12 @@ services:
     tags:
       - { name: backend_overridable }
   Drupal\Core\Routing\RouteProviderInterface: '@router.route_provider'
+  cache.container:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    synthetic: true
   route_storage:
     class: Drupal\Core\Routing\RouteStorage\PhpDumperRouteStorage
-    arguments: ['@cache.bootstrap', '@php_storage.routes']
+    arguments: ['@cache.container', '@php_storage.routes']
     tags:
       - { name: needs_destruction }
   Drupal\Core\Routing\RouteStorage\RouteStorageInterface: '@route_storage'

@@ -1535,6 +1535,15 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     // Set the class loader which was registered as a synthetic service.
     $container->set('class_loader', $this->classLoader);
+
+    try {
+      $container->set('cache.container', $this->bootstrapContainer->get('cache.container'));
+    }
+    catch (\Throwable) {
+      // Ignore failures during the installer where the database is not yet
+      // available.
+    }
+
     return $container;
   }
 

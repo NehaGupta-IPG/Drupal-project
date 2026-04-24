@@ -17,19 +17,10 @@ use Symfony\Component\Routing\RouteCollection;
  * - PhpStorage holds each head's local copy of the compiled file, named
  *   by a content hash so independent heads with identical route data
  *   converge on the same filename.
- * - A shared cache backend (typically `cache.bootstrap`, which is
- *   chainedfast-backed so APCu reads are invalidated automatically across
- *   heads via the bin's last-write timestamp) records the current content
- *   hash under a fixed cache key. After head A rebuilds, head B's next
- *   request reads the new hash, finds its local file missing, and
- *   rebuilds locally — producing the same file and hash.
- *
- * A fixed cache key is sufficient because per-site isolation is already
- * provided at the database level: each Drupal site has its own DB (or DB
- * prefix), and therefore its own `cache_bootstrap` table. A cache flush
- * (`drush cr`) wipes the bin; the rebuild-on-miss path in
- * \Drupal\Core\Routing\CompiledRouteProvider repopulates it on the next
- * request.
+ * - A shared cache backend records the current content hash under a fixed
+ *   cache key. After head A rebuilds, head B's next request reads the new
+ *   hash, finds its local file missing, and rebuilds locally — producing
+ *   the same file and hash.
  *
  * The compiled file returns an array with four keys:
  * - 'routes'  : name => serialize()'d Route or Alias
