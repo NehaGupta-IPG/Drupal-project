@@ -10,7 +10,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\file\Entity\File;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
-use Drupal\Tests\ApiRequestTrait;
+use Drupal\Tests\jsonapi\Functional\JsonApiRequestTestTrait;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\image\Kernel\ImageFieldCreationTrait;
@@ -28,9 +28,7 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
   use EntityReferenceFieldCreationTrait;
   use GetDocumentFromResponseTrait;
   use ImageFieldCreationTrait;
-  use ApiRequestTrait {
-    makeApiRequest as request;
-  }
+  use JsonApiRequestTestTrait;
 
   const IS_MULTILINGUAL = TRUE;
   const IS_NOT_MULTILINGUAL = FALSE;
