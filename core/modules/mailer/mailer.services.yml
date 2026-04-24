@@ -52,10 +52,6 @@ services:
   plugin.manager.email:
     class: Drupal\Core\Mailer\EmailManager
     autowire: true
-  Drupal\Core\Mailer\EmailManager:
-    autowire: true
+  Drupal\Core\Mailer\EmailManager: '@plugin.manager.mail'
   Drupal\Core\Mailer\EventSubscriber\OriginatorSubscriber:
     autowire: true
-  plugin.manager.email:
-    class: Drupal\Core\Mailer\EmailManager
-    arguments: ['@container.namespaces', '@module_handler', '@renderer', '@Symfony\Component\Mailer\Mailer', '@theme.registry', '@cache.discovery']
