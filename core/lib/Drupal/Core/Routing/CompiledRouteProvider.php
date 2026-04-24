@@ -7,50 +7,54 @@ namespace Drupal\Core\Routing;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\DrupalKernelInterface;
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\PathProcessor\InboundPathProcessorInterface;
 use Drupal\Core\Routing\RouteStorage\CompiledRouterData;
 use Drupal\Core\Routing\RouteStorage\RouteStorageInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Alias;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
-use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Route provider backed by a compiled-PHP route storage.
  *
- * Loads a CompiledRouterData from a RouteStorageInterface implementation and
- * answers all RouteProviderInterface requests from it, using Symfony's
- * CompiledUrlMatcher for request matching and an in-memory map for
- * name-based lookups.
+ * Extends the database-backed RouteProvider purely for code reuse — the
+ * caching/cache-ID helpers, the Alias-aware alias resolution, and the
+ * event-subscriber wiring are identical. The subclass overrides the
+ * handful of methods that actually read from the database so they instead
+ * consume a CompiledRouterData snapshot loaded via a RouteStorageInterface.
+ *
+ * RouteProvider's protected properties are untyped, so the child constructor
+ * skips parent::__construct() and only assigns the subset we actually use.
+ * Parent properties left uninitialised (connection, state, tableName) are
+ * never read from, because every code path that would read them has been
+ * overridden here.
  */
-class CompiledRouteProvider implements CacheableRouteProviderInterface, PreloadableRouteProviderInterface, EventSubscriberInterface {
+class CompiledRouteProvider extends RouteProvider {
 
   /**
-   * Cached router data for this request.
+   * The router snapshot for the current request.
    */
   protected ?CompiledRouterData $data = NULL;
-
-  /**
-   * Extra cache key parts registered by the language/query providers.
-   *
-   * @var string[]
-   */
-  protected array $extraCacheKeyParts = [];
 
   public function __construct(
     protected readonly RouteStorageInterface $storage,
     protected readonly DrupalKernelInterface $kernel,
-    protected readonly CurrentPathStack $currentPath,
-    protected readonly CacheBackendInterface $cache,
-    protected readonly InboundPathProcessorInterface $pathProcessor,
-    protected readonly CacheTagsInvalidatorInterface $cacheTagInvalidator,
-    protected readonly LanguageManagerInterface $languageManager,
-  ) {}
+    CurrentPathStack $currentPath,
+    CacheBackendInterface $cache,
+    InboundPathProcessorInterface $pathProcessor,
+    CacheTagsInvalidatorInterface $cacheTagInvalidator,
+    LanguageManagerInterface $languageManager,
+  ) {
+    // Deliberately skip parent::__construct(): RouteProvider's constructor
+    // requires a Connection and StateInterface that this subclass does not
+    // use, because every method that would read them is overridden here.
+    // Set only the parent's properties our inherited code paths reference.
+    $this->currentPath = $currentPath;
+    $this->cache = $cache;
+    $this->pathProcessor = $pathProcessor;
+    $this->cacheTagInvalidator = $cacheTagInvalidator;
+    $this->languageManager = $languageManager;
+  }
 
   /**
    * Loads (or returns) the compiled router data for this request.
@@ -64,83 +68,35 @@ class CompiledRouteProvider implements CacheableRouteProviderInterface, Preloada
 
   /**
    * {@inheritdoc}
-   */
-  public function getRouteByName($name) {
-    $data = $this->getData();
-    if ($data === NULL) {
-      throw new RouteNotFoundException(sprintf('Route "%s" does not exist.', $name));
-    }
-    $route = $data->getRoute($name);
-    if ($route === NULL) {
-      throw new RouteNotFoundException(sprintf('Route "%s" does not exist.', $name));
-    }
-    return $route;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getRoutesByNames($names) {
-    $data = $this->getData();
-    if ($data === NULL) {
-      return [];
-    }
-    return $data->getRoutesByNames($names);
-  }
-
-  /**
-   * {@inheritdoc}
+   *
+   * Populates the parent's in-memory serializedRoutes cache straight from
+   * the compiled snapshot — no DB query, no cache-backend round trip.
    */
   public function preLoadRoutes($names): void {
-    // No-op: all routes are already loaded from the compiled file. This is
-    // only retained for interface compatibility.
     if (empty($names)) {
       throw new \InvalidArgumentException('You must specify the route names to load');
     }
+    $data = $this->getData();
+    if ($data === NULL) {
+      return;
+    }
+    $toLoad = array_diff($names, array_keys($this->routes), array_keys($this->serializedRoutes));
+    foreach ($toLoad as $name) {
+      $entry = $data->getSerializedEntry($name);
+      if ($entry !== NULL) {
+        $this->serializedRoutes[$name] = $entry;
+      }
+    }
   }
 
   /**
    * {@inheritdoc}
-   */
-  public function getRouteCollectionForRequest(Request $request) {
-    // Mirror RouteProvider::getRouteCollectionForRequest()'s caching behaviour
-    // so downstream code (e.g. language negotiation) observes identical keys.
-    $cid = $this->getRouteCollectionCacheId($request);
-    if ($cached = $this->cache->get($cid)) {
-      $this->currentPath->setPath($cached->data['path'], $request);
-      $request->query->replace($cached->data['query']);
-      if ($cached->data['routes'] === FALSE) {
-        return new RouteCollection();
-      }
-      return $cached->data['routes'];
-    }
-
-    $path = $request->getPathInfo();
-    $path = $path === '/' ? $path : rtrim($path, '/');
-    $path = $this->pathProcessor->processInbound($path, $request);
-    $this->currentPath->setPath($path, $request);
-    $queryParameters = $request->query->all();
-
-    $routes = $this->matchPath($path, $request);
-    $cacheValue = [
-      'path' => $path,
-      'query' => $queryParameters,
-      'routes' => $routes->count() === 0 ? FALSE : $routes,
-    ];
-    $this->cache->set($cid, $cacheValue, CacheBackendInterface::CACHE_PERMANENT, ['route_match']);
-    return $routes;
-  }
-
-  /**
-   * Returns every route whose pattern outline could match the given path.
    *
-   * Mirrors RouteProvider::getRoutesByPath() but sources its data from the
-   * compiled outline index instead of a SQL query: for each candidate
-   * outline derived from the request path, look up all routes sharing that
-   * outline and collect them. Matches are returned sorted by fit (most
-   * specific first, ties broken by name).
+   * Uses the outline index from the compiled snapshot in place of the
+   * legacy router-table query. Mirrors the legacy sort semantics (most
+   * specific fit first, ties broken by name).
    */
-  protected function matchPath(string $path, Request $request): RouteCollection {
+  protected function getRoutesByPath($path) {
     $collection = new RouteCollection();
     $data = $this->getData();
     if ($data === NULL) {
@@ -149,7 +105,7 @@ class CompiledRouteProvider implements CacheableRouteProviderInterface, Preloada
 
     $parts = preg_split('@/+@', mb_strtolower($path), -1, PREG_SPLIT_NO_EMPTY) ?: [];
     $numberParts = count($parts);
-    $outlines = static::getCandidateOutlines($parts, $data->getNumberPartsMasks());
+    $outlines = $this->getCandidateOutlines($parts);
     if (empty($outlines)) {
       return $collection;
     }
@@ -160,48 +116,36 @@ class CompiledRouteProvider implements CacheableRouteProviderInterface, Preloada
         if ($entry['numParts'] < $numberParts) {
           continue;
         }
-        $route = $data->getRoute($entry['name']);
-        if ($route === NULL) {
-          continue;
-        }
-        $candidates[] = [
-          'name' => $entry['name'],
-          'route' => $route,
-          'fit' => $entry['fit'],
-        ];
+        $candidates[$entry['name']] = $entry;
       }
     }
 
-    usort($candidates, static function (array $a, array $b): int {
-      if ($a['fit'] === $b['fit']) {
-        return strcmp($a['name'], $b['name']);
-      }
-      return (int) $b['fit'] <=> (int) $a['fit'];
-    });
+    usort($candidates, [$this, 'routeProviderRouteCompare']);
 
-    foreach ($candidates as $candidate) {
-      $collection->add($candidate['name'], $candidate['route']);
+    $names = array_column($candidates, 'name');
+    if (!empty($names)) {
+      $this->preLoadRoutes($names);
+    }
+    foreach ($names as $name) {
+      if (isset($this->serializedRoutes[$name])) {
+        $this->routes[$name] = unserialize($this->serializedRoutes[$name]);
+        unset($this->serializedRoutes[$name]);
+      }
+      if (isset($this->routes[$name])) {
+        $collection->add($name, $this->routes[$name]);
+      }
     }
 
     return $collection;
   }
 
   /**
-   * Generates candidate pattern outlines for a path's parts.
+   * {@inheritdoc}
    *
-   * Returns the outlines that could match the given path, filtered through
-   * the fit-bitmask set supplied by the compiled data so we only probe
-   * shapes that actually exist.
-   *
-   * @param string[] $parts
-   *   The path exploded on '/', with empty segments removed.
-   * @param list<int> $masks
-   *   The set of fit bitmasks in use across the route set.
-   *
-   * @return string[]
-   *   The candidate outlines.
+   * Sourced from the compiled bitmask set instead of the routing.menu_masks
+   * state entry.
    */
-  protected static function getCandidateOutlines(array $parts, array $masks): array {
+  protected function getCandidateOutlines(array $parts) {
     $numberParts = count($parts);
     if ($numberParts === 0) {
       return [];
@@ -214,7 +158,7 @@ class CompiledRouteProvider implements CacheableRouteProviderInterface, Preloada
       $candidateMasks = range($end, 1);
     }
     else {
-      $candidateMasks = $masks;
+      $candidateMasks = $this->getData()?->getNumberPartsMasks() ?? [];
     }
 
     $length = $numberParts - 1;
@@ -240,86 +184,23 @@ class CompiledRouteProvider implements CacheableRouteProviderInterface, Preloada
 
   /**
    * {@inheritdoc}
-   */
-  public function getRoutesByPattern($pattern) {
-    return $this->getRoutesByPath($pattern);
-  }
-
-  /**
-   * Finds all routes whose pattern outline matches the given path.
    *
-   * This is the cold-path equivalent of RouteProvider::getRoutesByPath(): it
-   * is used by a handful of callers (notably Views local task derivatives)
-   * during cache warm-up, so the linear walk over all routes is acceptable.
-   *
-   * Matching uses the pattern outline so the provider works regardless of
-   * the compiler class attached to each Route.
-   */
-  protected function getRoutesByPath(string $path): RouteCollection {
-    $collection = new RouteCollection();
-    $data = $this->getData();
-    if ($data === NULL) {
-      return $collection;
-    }
-
-    $outline = RouteCompiler::getPatternOutline($path);
-    $candidates = [];
-    foreach ($data->getAllRouteNames() as $name) {
-      $route = $data->getRoute($name);
-      if ($route === NULL) {
-        continue;
-      }
-      if (RouteCompiler::getPatternOutline($route->getPath()) === $outline) {
-        $fit = $this->getCompiledFit($route);
-        $candidates[] = [
-          'name' => $name,
-          'route' => $route,
-          'fit' => $fit,
-        ];
-      }
-    }
-
-    usort($candidates, static function (array $a, array $b): int {
-      if ($a['fit'] === $b['fit']) {
-        return strcmp($a['name'], $b['name']);
-      }
-      return (int) $b['fit'] <=> (int) $a['fit'];
-    });
-
-    foreach ($candidates as $candidate) {
-      $collection->add($candidate['name'], $candidate['route']);
-    }
-
-    return $collection;
-  }
-
-  /**
-   * Returns the Drupal fit value for a route, or 0 if unavailable.
-   */
-  protected function getCompiledFit(Route $route): int {
-    $compiled = $route->compile();
-    if ($compiled instanceof CompiledRoute) {
-      return (int) $compiled->getFit();
-    }
-    return 0;
-  }
-
-  /**
-   * {@inheritdoc}
+   * @todo Large route sets pay a per-call unserialize tax here. Consider
+   *   returning a generator that unserializes on iteration.
    */
   public function getAllRoutes() {
     $data = $this->getData();
     if ($data === NULL) {
       return new \ArrayIterator();
     }
-    $result = [];
-    foreach ($data->getAllRouteNames() as $name) {
-      $route = $data->getRoute($name);
-      if ($route !== NULL) {
-        $result[$name] = $route;
+    $routes = [];
+    foreach ($data->getRouteNames() as $name) {
+      $entry = $data->getSerializedEntry($name);
+      if ($entry !== NULL) {
+        $routes[$name] = unserialize($entry);
       }
     }
-    return (new \ArrayObject($result))->getIterator();
+    return (new \ArrayObject($routes))->getIterator();
   }
 
   /**
@@ -327,22 +208,7 @@ class CompiledRouteProvider implements CacheableRouteProviderInterface, Preloada
    */
   public function reset(): void {
     $this->data = NULL;
-    $this->cacheTagInvalidator->invalidateTags(['routes']);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getSubscribedEvents(): array {
-    $events[RoutingEvents::FINISHED][] = ['reset'];
-    return $events;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function addExtraCacheKeyPart($cache_key_provider, $cache_key_part): void {
-    $this->extraCacheKeyParts[$cache_key_provider] = $cache_key_part;
+    parent::reset();
   }
 
   /**
@@ -353,64 +219,11 @@ class CompiledRouteProvider implements CacheableRouteProviderInterface, Preloada
     if ($data === NULL) {
       return [];
     }
-    $result = [];
-    foreach ($data->getAliasNamesFor($route_name) as $aliasName) {
-      // Rehydrating a live Alias object requires walking the underlying
-      // RouteCollection, which we do not retain post-compile. Return a
-      // structurally equivalent Alias that points at the same target. Callers
-      // (RouteProvider::getRouteByName()) only consume ::getId() and
-      // deprecation metadata.
-      $result[$aliasName] = new Alias($route_name);
+    $aliasNames = $data->getAliasNamesFor($route_name);
+    if (empty($aliasNames)) {
+      return [];
     }
-    return $result;
-  }
-
-  /**
-   * Builds the cache ID for per-request route collection caching.
-   */
-  protected function getRouteCollectionCacheId(Request $request): string {
-    $this->addExtraCacheKeyPart('language', $this->getCurrentLanguageCacheIdPart());
-    $this->addExtraCacheKeyPart('query_parameters', $this->getQueryParametersCacheIdPart($request));
-
-    ksort($this->extraCacheKeyParts);
-    $keyParts = [];
-    foreach ($this->extraCacheKeyParts as $provider => $part) {
-      $keyParts[] = '[' . $provider . ']=' . $part;
-    }
-    return 'route:' . implode(':', $keyParts) . ':' . $request->getPathInfo();
-  }
-
-  /**
-   * Returns the current language identifier for the cache ID.
-   */
-  protected function getCurrentLanguageCacheIdPart(): string {
-    return $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_URL)->getId();
-  }
-
-  /**
-   * Returns the normalised query parameters for the cache ID.
-   */
-  protected function getQueryParametersCacheIdPart(Request $request): string {
-    $recursiveSort = function (array &$array) use (&$recursiveSort): void {
-      foreach ($array as &$v) {
-        if (is_array($v)) {
-          $recursiveSort($v);
-        }
-      }
-      ksort($array);
-    };
-
-    $sortedResolved = $request->query->all();
-    $recursiveSort($sortedResolved);
-    $sortedOriginal = Request::create('/?' . $request->getQueryString())->query->all();
-    $recursiveSort($sortedOriginal);
-
-    $resolvedHash = $sortedResolved ? sha1(http_build_query($sortedResolved)) : NULL;
-
-    return implode(',', array_filter([
-      http_build_query($sortedOriginal),
-      $resolvedHash,
-    ]));
+    return $this->getRoutesByNames($aliasNames);
   }
 
 }

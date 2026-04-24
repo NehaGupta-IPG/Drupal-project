@@ -22,12 +22,6 @@ use Drupal\Core\Database\Connection;
 
 /**
  * A Route Provider front-end for all Drupal-stored routes.
- *
- * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
- *   \Drupal\Core\Routing\CompiledRouteProvider instead, which reads routes
- *   from a PhpStorage-backed compiled file rather than the database.
- *
- * @see https://www.drupal.org/node/9999999
  */
 class RouteProvider implements CacheableRouteProviderInterface, PreloadableRouteProviderInterface, EventSubscriberInterface {
 

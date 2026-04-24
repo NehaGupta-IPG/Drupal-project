@@ -12,72 +12,87 @@ use Symfony\Component\Routing\RouteCollection;
  * Value object holding a compiled router snapshot.
  *
  * Holds the data the routing stack needs at runtime:
- * - a name-indexed map of serialized Route objects;
- * - the alias map;
- * - an index grouping routes by pattern outline (so
+ * - a name-indexed map of serialize()'d entries (Route or Alias); both types
+ *   round-trip through serialize(), so a single map supports
+ *   RouteProvider::getRouteByName()'s alias-resolution recursion unchanged;
+ * - an alias-name => target-name index for cheap getRouteAliases() queries;
+ * - an index grouping routes by pattern outline, so
  *   getRouteCollectionForRequest() can return every candidate for a given
- *   path without scanning the full route set);
- * - the set of path-length bitmasks that actually correspond to routes.
+ *   path without a full scan;
+ * - the set of fit bitmasks that actually correspond to routes.
  *
- * Routes are held serialized until requested, so the initial materialisation
- * is cheap; unserialize happens lazily per route.
+ * Entries are held serialized until requested; unserialize happens lazily.
  */
 final class CompiledRouterData {
 
   /**
-   * Unserialized Route objects, keyed by name.
-   *
-   * @var array<string, \Symfony\Component\Routing\Route>
-   */
-  private array $routes = [];
-
-  /**
-   * @param array<string, string> $serializedRoutes
-   *   A map of route name to serialize()d Route instance.
+   * @param array<string, string> $serializedEntries
+   *   Map of name to serialize()'d Route or Alias.
    * @param array<string, string> $aliases
-   *   A map of alias name to target route name.
+   *   Map of alias name to target route name.
    * @param array<string, list<array{name: string, fit: int, numParts: int}>> $outlineIndex
    *   Pattern outlines mapped to the list of routes sharing that outline.
    * @param list<int> $numberPartsMasks
    *   The fit bitmasks that are actually used by at least one route.
    */
   public function __construct(
-    private readonly array $serializedRoutes,
+    private readonly array $serializedEntries,
     private readonly array $aliases,
     private readonly array $outlineIndex,
     private readonly array $numberPartsMasks,
   ) {}
 
   /**
-   * Looks up a Route by name, resolving aliases.
+   * Returns the serialized entry (Route or Alias) for a name.
    *
-   * @return \Symfony\Component\Routing\Route|null
-   *   The Route, or NULL if it does not exist.
+   * Consumers (notably a RouteProvider::preLoadRoutes() override) pass the
+   * result straight into their local serialized-routes cache.
+   *
+   * @return string|null
+   *   The serialized entry, or NULL if the name is unknown.
    */
-  public function getRoute(string $name): ?Route {
-    $name = $this->aliases[$name] ?? $name;
-    if (!isset($this->serializedRoutes[$name])) {
-      return NULL;
-    }
-    if (!isset($this->routes[$name])) {
-      $this->routes[$name] = unserialize($this->serializedRoutes[$name]);
-    }
-    return $this->routes[$name];
+  public function getSerializedEntry(string $name): ?string {
+    return $this->serializedEntries[$name] ?? NULL;
   }
 
   /**
-   * Looks up multiple Routes by name.
+   * Looks up a Route by name, following alias chains.
+   *
+   * @return \Symfony\Component\Routing\Route|null
+   *   The resolved Route, or NULL if nothing is found. Aliases without a
+   *   valid target resolve to NULL.
+   */
+  public function getRoute(string $name): ?Route {
+    $seen = [];
+    while (isset($this->aliases[$name])) {
+      if (isset($seen[$name])) {
+        // Alias cycle — bail out rather than loop forever.
+        return NULL;
+      }
+      $seen[$name] = TRUE;
+      $name = $this->aliases[$name];
+    }
+    if (!isset($this->serializedEntries[$name])) {
+      return NULL;
+    }
+    $entry = unserialize($this->serializedEntries[$name]);
+    return $entry instanceof Route ? $entry : NULL;
+  }
+
+  /**
+   * Looks up multiple Routes by name, following alias chains.
    *
    * @param string[] $names
    *   The route names.
    *
    * @return array<string, \Symfony\Component\Routing\Route>
-   *   Keyed by name. Missing names are omitted.
+   *   Keyed by name. Names that resolve to nothing are omitted.
    */
   public function getRoutesByNames(array $names): array {
     $result = [];
     foreach ($names as $name) {
-      if ($route = $this->getRoute($name)) {
+      $route = $this->getRoute($name);
+      if ($route !== NULL) {
         $result[$name] = $route;
       }
     }
@@ -85,40 +100,23 @@ final class CompiledRouterData {
   }
 
   /**
-   * Returns the names of every defined route (excluding aliases).
+   * Returns every known name (both Routes and Aliases).
    *
    * @return string[]
-   *   The route names.
+   *   The full name list.
    */
-  public function getAllRouteNames(): array {
-    return array_keys($this->serializedRoutes);
+  public function getAllNames(): array {
+    return array_keys($this->serializedEntries);
   }
 
   /**
-   * Returns the raw name => serialize()'d Route map.
+   * Returns only the names that correspond to Route objects.
    *
-   * @return array<string, string>
-   *   Serialized route map, as stored on disk.
-   *
-   * @internal
-   *   Exposed so storage implementations can dump the map without touching
-   *   the unserialize path.
+   * @return string[]
+   *   The route names (aliases excluded).
    */
-  public function getSerializedRoutes(): array {
-    return $this->serializedRoutes;
-  }
-
-  /**
-   * Returns the outline-to-routes index.
-   *
-   * @return array<string, list<array{name: string, fit: int, numParts: int}>>
-   *   The outline index, as stored on disk.
-   *
-   * @internal
-   *   Exposed so storage implementations can dump the index.
-   */
-  public function getOutlineIndex(): array {
-    return $this->outlineIndex;
+  public function getRouteNames(): array {
+    return array_keys(array_diff_key($this->serializedEntries, $this->aliases));
   }
 
   /**
@@ -152,34 +150,64 @@ final class CompiledRouterData {
   }
 
   /**
-   * Returns the alias map.
+   * Returns the full alias-name => target-name map.
    *
    * @return array<string, string>
-   *   Alias name keyed to target route name.
+   *   The alias map.
    */
   public function getAliases(): array {
     return $this->aliases;
   }
 
   /**
+   * Serializes this data to an opcache-friendly array.
+   *
+   * Keys are stable and form the on-disk contract for the compiled file.
+   *
+   * @return array<string, mixed>
+   *   The payload.
+   */
+  public function toPayload(): array {
+    return [
+      'entries' => $this->serializedEntries,
+      'aliases' => $this->aliases,
+      'outlines' => $this->outlineIndex,
+      'masks' => $this->numberPartsMasks,
+    ];
+  }
+
+  /**
+   * Reconstructs a CompiledRouterData from a payload produced by toPayload().
+   */
+  public static function fromPayload(array $payload): self {
+    return new self(
+      $payload['entries'] ?? [],
+      $payload['aliases'] ?? [],
+      $payload['outlines'] ?? [],
+      $payload['masks'] ?? [],
+    );
+  }
+
+  /**
    * Builds a CompiledRouterData directly from a RouteCollection.
    *
    * Used when writing to disk and by NullRouteStorage to satisfy the current
-   * request without writing anything. The collection is iterated twice:
-   * routes are serialized for the name map, and each route is compiled with
-   * Drupal's RouteCompiler so we can group by pattern outline.
+   * request without writing anything. Routes are cloned before mutation to
+   * avoid mutating collection state held by callers.
    */
   public static function fromCollection(RouteCollection $routes): self {
-    $serialized = [];
+    $entries = [];
     $outlineIndex = [];
     $masks = [];
 
-    // Prime each route with Drupal's RouteCompiler *before* serialising. The
-    // Route's internal compile cache and options are included in __serialize,
-    // so setting compiler_class here ensures that when the routes are
-    // unserialised later and any consumer calls $route->compile() they get a
-    // Drupal CompiledRoute with getFit(), getPatternOutline(), etc.
     foreach ($routes->all() as $name => $route) {
+      // Prime each route with Drupal's RouteCompiler *before* serialising.
+      // The Route's internal compile cache and options are included in
+      // __serialize(), so setting compiler_class here ensures that when the
+      // routes are unserialised later and a consumer calls $route->compile()
+      // they get a Drupal CompiledRoute with getFit(), getPatternOutline(),
+      // etc. Clone so the caller's collection remains pristine.
+      $route = clone $route;
       $route->setOption('compiler_class', RouteCompiler::class);
       $compiled = RouteCompiler::compile($route);
 
@@ -194,18 +222,21 @@ final class CompiledRouterData {
       ];
       $masks[$fit] = TRUE;
 
-      $serialized[$name] = serialize($route);
+      $entries[$name] = serialize($route);
     }
 
     $aliases = [];
     foreach ($routes->getAliases() as $name => $alias) {
+      // Serialize the full Alias object so parent RouteProvider's
+      // deprecation-aware alias resolution in getRouteByName() still works.
+      $entries[$name] = serialize($alias);
       $aliases[$name] = $alias->getId();
     }
 
     $masks = array_keys($masks);
     rsort($masks);
 
-    return new self($serialized, $aliases, $outlineIndex, $masks);
+    return new self($entries, $aliases, $outlineIndex, $masks);
   }
 
 }

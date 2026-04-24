@@ -84,7 +84,6 @@ class RouteBuilder implements RouteBuilderInterface, DestructableInterface {
   protected array $deprecatedProperties = [
     'controllerResolver' => 'controller_resolver',
     'moduleHandler' => 'module_handler',
-    'dumper' => 'router.dumper',
   ];
 
   /**

@@ -14,12 +14,6 @@ use Drupal\Core\Database\Connection;
  * Dumps Route information to a database table.
  *
  * @see \Drupal\Core\Routing\RouteProvider
- *
- * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. The
- *   router-table based dumper has been superseded by
- *   \Drupal\Core\Routing\RouteStorage\PhpDumperRouteStorage.
- *
- * @see https://www.drupal.org/node/9999999
  */
 class MatcherDumper implements MatcherDumperInterface {
 

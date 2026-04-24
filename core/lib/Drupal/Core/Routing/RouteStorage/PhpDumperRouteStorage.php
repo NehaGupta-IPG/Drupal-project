@@ -86,12 +86,7 @@ class PhpDumperRouteStorage implements RouteStorageInterface, DestructableInterf
       return NULL;
     }
 
-    $data = new CompiledRouterData(
-      $payload['routes'] ?? [],
-      $payload['aliases'] ?? [],
-      $payload['outlines'] ?? [],
-      $payload['masks'] ?? [],
-    );
+    $data = CompiledRouterData::fromPayload($payload);
     $this->dataByHash[$hash] = $data;
     $this->loadedHash = $hash;
     return $data;
@@ -159,13 +154,7 @@ class PhpDumperRouteStorage implements RouteStorageInterface, DestructableInterf
    * Renders the compiled data to PHP source.
    */
   protected function generateCode(CompiledRouterData $data): string {
-    $payload = [
-      'routes' => $data->getSerializedRoutes(),
-      'aliases' => $data->getAliases(),
-      'outlines' => $data->getOutlineIndex(),
-      'masks' => $data->getNumberPartsMasks(),
-    ];
-    return "<?php\n\n// This file is auto-generated.\n\nreturn " . var_export($payload, TRUE) . ";\n";
+    return "<?php\n\n// This file is auto-generated.\n\nreturn " . var_export($data->toPayload(), TRUE) . ";\n";
   }
 
   /**
