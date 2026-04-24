@@ -32,6 +32,19 @@ class RouteTest extends KernelTestBase {
   protected static $modules = ['user', 'system'];
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+
+    // We have to configure a front page since
+    // PathProcessorFront::processInbound relies on it for missing paths.
+    $this->config('system.site')
+      ->set('page.front', 'user')
+      ->save();
+  }
+
+  /**
    * Tests Route plugin based on providerTestRoute() values.
    *
    * @param mixed $value
@@ -53,141 +66,150 @@ class RouteTest extends KernelTestBase {
    *   process plugin, and the second is the expected results.
    */
   public static function providerTestRoute() {
-    // Internal link tests.
-    // Valid link path and options.
-    $values[0] = [
-      'user/login',
-      [
-        'attributes' => [
-          'title' => 'Test menu link 1',
-        ],
-      ],
-    ];
-    $expected[0] = [
-      'route_name' => 'user.login',
-      'route_parameters' => [],
-      'options' => [
-        'query' => [],
-        'attributes' => [
-          'title' => 'Test menu link 1',
-        ],
-      ],
-      'url' => NULL,
-    ];
-
-    // Valid link path and empty options.
-    $values[1] = [
-      'user/login',
-      [],
-    ];
-    $expected[1] = [
-      'route_name' => 'user.login',
-      'route_parameters' => [],
-      'options' => [
-        'query' => [],
-      ],
-      'url' => NULL,
-    ];
-
-    // Valid link path and no options.
-    $values[2] = 'user/login';
-    $expected[2] = [
-      'route_name' => 'user.login',
-      'route_parameters' => [],
-      'options' => [
-        'query' => [],
-      ],
-      'url' => NULL,
-    ];
-
-    // Invalid link path.
-    $values[3] = 'users';
-    $expected[3] = [];
-
-    // Valid link path with parameter.
-    $values[4] = [
-      'system/timezone/nzdt',
-      [
-        'attributes' => [
-          'title' => 'Show NZDT',
-        ],
-      ],
-    ];
-    $expected[4] = [
-      'route_name' => 'system.timezone',
-      'route_parameters' => [
-        'abbreviation' => 'nzdt',
-        'offset' => -1,
-        'is_daylight_saving_time' => NULL,
-      ],
-      'options' => [
-        'query' => [],
-        'attributes' => [
-          'title' => 'Show NZDT',
-        ],
-      ],
-      'url' => NULL,
-    ];
-
-    // External link tests.
-    // Valid external link path and options.
-    $values[5] = [
-      'https://www.drupal.org',
-      [
-        'attributes' => [
-          'title' => 'Drupal',
-        ],
-      ],
-    ];
-    $expected[5] = [
-      'route_name' => NULL,
-      'route_parameters' => [],
-      'options' => [
-        'attributes' => [
-          'title' => 'Drupal',
-        ],
-      ],
-      'url' => 'https://www.drupal.org',
-    ];
-
-    // Valid external link path and options.
-    $values[6] = [
-      'https://www.drupal.org/user/1/edit?pass-reset-token=QgtDKcRV4e4fjg6v2HTa6CbWx-XzMZ5XBZTufinqsM73qIhscIuU_BjZ6J2tv4dQI6N50ZJOag',
-      [
-        'attributes' => [
-          'title' => 'Drupal password reset',
-        ],
-      ],
-    ];
-    $expected[6] = [
-      'route_name' => NULL,
-      'route_parameters' => [],
-      'options' => [
-        'attributes' => [
-          'title' => 'Drupal password reset',
-        ],
-      ],
-      'url' => 'https://www.drupal.org/user/1/edit?pass-reset-token=QgtDKcRV4e4fjg6v2HTa6CbWx-XzMZ5XBZTufinqsM73qIhscIuU_BjZ6J2tv4dQI6N50ZJOag',
-    ];
-
     return [
-      // Test data for internal paths.
-      // Test with valid link path and options.
-      [$values[0], $expected[0]],
-      // Test with valid link path and empty options.
-      [$values[1], $expected[1]],
-      // Test with valid link path and no options.
-      [$values[2], $expected[2]],
-      // Test with Invalid link path.
-      [$values[3], $expected[3]],
-      // Test with Valid link path with query options and parameters.
-      [$values[4], $expected[4]],
-
-      // Test data for external paths.
-      // Test with external link path and options.
-      [$values[5], $expected[5]],
-      // Test with valid link path and query options.
-      [$values[6], $expected[6]],
+      'Valid internal link path and options' => [
+        'data' => [
+          'user/login',
+          [
+            'attributes' => [
+              'title' => 'Test menu link 1',
+            ],
+          ],
+        ],
+        'expected' => [
+          'route_name' => 'user.login',
+          'route_parameters' => [],
+          'options' => [
+            'query' => [],
+            'attributes' => [
+              'title' => 'Test menu link 1',
+            ],
+          ],
+          'url' => NULL,
+        ],
+      ],
+      'Valid internal link path and empty options' => [
+        'data' => [
+          'user/login',
+          [],
+        ],
+        'expected' => [
+          'route_name' => 'user.login',
+          'route_parameters' => [],
+          'options' => [
+            'query' => [],
+          ],
+          'url' => NULL,
+        ],
+      ],
+      'Valid internal link path and no options' => [
+        'data' => 'user/login',
+        'expected' => [
+          'route_name' => 'user.login',
+          'route_parameters' => [],
+          'options' => [
+            'query' => [],
+          ],
+          'url' => NULL,
+        ],
+      ],
+      'Valid internal link path and non-array options' => [
+        'data' => [
+          'user/login',
+          'options',
+        ],
+        'expected' => [
+          'route_name' => 'user.login',
+          'route_parameters' => [],
+          'options' => [
+            'query' => [],
+          ],
+          'url' => NULL,
+        ],
+      ],
+      'Invalid internal link path' => [
+        'data' => 'users',
+        'expected' => [],
+      ],
+      'Valid internal link path with parameter' => [
+        'data' => [
+          'system/timezone/nzdt',
+          [
+            'attributes' => [
+              'title' => 'Show NZDT',
+            ],
+          ],
+        ],
+        'expected' => [
+          'route_name' => 'system.timezone',
+          'route_parameters' => [
+            'abbreviation' => 'nzdt',
+            'offset' => -1,
+            'is_daylight_saving_time' => NULL,
+          ],
+          'options' => [
+            'query' => [],
+            'attributes' => [
+              'title' => 'Show NZDT',
+            ],
+          ],
+          'url' => NULL,
+        ],
+      ],
+      'Valid external link path and options' => [
+        'data' => [
+          'https://www.drupal.org',
+          [
+            'attributes' => [
+              'title' => 'Drupal',
+            ],
+          ],
+        ],
+        'expected' => [
+          'route_name' => NULL,
+          'route_parameters' => [],
+          'options' => [
+            'attributes' => [
+              'title' => 'Drupal',
+            ],
+          ],
+          'url' => 'https://www.drupal.org',
+        ],
+      ],
+      'Valid external link path with query string and options' => [
+        'data' => [
+          'https://www.drupal.org/user/1/edit?pass-reset-token=QgtDKcRV4e4fjg6v2HTa6CbWx-XzMZ5XBZTufinqsM73qIhscIuU_BjZ6J2tv4dQI6N50ZJOag',
+          [
+            'attributes' => [
+              'title' => 'Drupal password reset',
+            ],
+          ],
+        ],
+        'expected' => [
+          'route_name' => NULL,
+          'route_parameters' => [],
+          'options' => [
+            'attributes' => [
+              'title' => 'Drupal password reset',
+            ],
+          ],
+          'url' => 'https://www.drupal.org/user/1/edit?pass-reset-token=QgtDKcRV4e4fjg6v2HTa6CbWx-XzMZ5XBZTufinqsM73qIhscIuU_BjZ6J2tv4dQI6N50ZJOag',
+        ],
+      ],
+      'Null link path with options' => [
+        'data' => [
+          NULL,
+          NULL,
+        ],
+        'expected' => [
+          'route_name' => 'user.page',
+          'route_parameters' => [],
+          'options' => [
+            'query' => [],
+          ],
+          'url' => NULL,
+        ],
+      ],
     ];
   }
 

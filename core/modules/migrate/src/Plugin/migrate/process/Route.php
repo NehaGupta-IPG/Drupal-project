@@ -131,7 +131,9 @@ class Route extends ProcessPluginBase implements ContainerFactoryPluginInterface
           $options['query'] = $route['options']['query'] + $old_query;
           unset($route['options']['query']);
         }
-        $route['options'] = $route['options'] + $options;
+        if (is_array($options)) {
+          $route['options'] += $options;
+        }
         $route['url'] = NULL;
       }
     }
