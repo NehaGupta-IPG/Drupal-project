@@ -51,7 +51,6 @@ class SearchExactTest extends BrowserTestBase {
     }
     // Create another node and save it for later.
     $settings['body'] = [['value' => 'Druplicon']];
-    $node = $this->drupalCreateNode($settings);
 
     // Update the search index.
     $this->container->get('plugin.manager.search')->createInstance('node_search')->updateIndex();
