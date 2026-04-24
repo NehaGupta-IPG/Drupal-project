@@ -14,7 +14,7 @@ use Symfony\Component\Mime\Email;
  */
 class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
 
-  protected array $params;
+  protected array $parameters;
 
   protected array $headers;
 
@@ -58,18 +58,30 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
     return (string) $this->pluginDefinition['key'];
   }
 
+/**
+   * {@inheritdoc}
+   */
   public function getLangcode(): ?string {
     return $this->environment['langcode'] ?? NULL;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getHtmlBodyTemplate(): ?string {
     return $this->pluginDefinition['html_body_template'];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getTextBodyTemplate(): ?string {
     return $this->pluginDefinition['text_body_template'];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function htmlBody(): RenderableInterface|array|null {
     if ($template_id = $this->getHtmlBodyTemplate()) {
       return [
@@ -80,6 +92,9 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
     return NULL;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function textBody(): RenderableInterface|array|null {
     if ($template_id = $this->getTextBodyTemplate()) {
       return [
@@ -90,14 +105,23 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
     return NULL;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getDefaultSubject(): \Stringable|string|null {
     return $this->pluginDefinition['default_subject'] ?? NULL;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getDefaultRecipients(): ?array {
     return $this->pluginDefinition['default_recipients'] ?? NULL;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function preBuild(): static {
     if ($this->getHeader('Subject') === NULL && $default_subject = $this->getDefaultSubject()) {
       $this->subject($default_subject);
@@ -115,56 +139,92 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getHeaders(): array {
     return $this->headers;
   }
 
-  public function getHeader(string $key) {
+  /**
+   * {@inheritdoc}
+   */
+  public function getHeader(string $key): mixed {
     return $this->headers[$key] ?? NULL;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setHeader(string $key, mixed $value): static {
     $this->headers[$key] = $value;
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setHeaders(array $headers): static {
     $this->headers = $headers;
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getEnvironment(): array {
     return $this->environment;
   }
 
-  public function setEnvironmentParameter(string $key, $value): static {
+  /**
+   * {@inheritdoc}
+   */
+  public function setEnvironmentParameter(string $key, mixed $value): static {
     $this->environment[$key] = $value;
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setEnvironment(array $environment): static {
     $this->environment = $environment;
     return $this;
   }
 
-  public function getParams(): array {
-    return $this->params;
+  /**
+   * {@inheritdoc}
+   */
+  public function getParameters(): array {
+    return $this->parameters;
   }
 
-  public function setParams(array $params): static {
-    $this->params = $params;
+  /**
+   * {@inheritdoc}
+   */
+  public function setParameters(array $parameters): static {
+    $this->parameters = $parameters;
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getParam(string $key): mixed {
-    return $this->params[$key] ?? NULL;
+    return $this->parameters[$key] ?? NULL;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setParam(string $key, mixed $value): static {
-    $this->params[$key] = $value;
+    $this->parameters[$key] = $value;
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function subject(\Stringable|string $subject): static {
     $this->setHeader('Subject', $subject);
     return $this;
@@ -202,31 +262,49 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function sender(Address|string $address): static {
     $this->setHeader('Sender', $address);
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function from(Address|string $address): static {
     $this->setHeader('From', $address);
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function contentType(string $content_type): static {
     $this->setHeader('Content-Type', $content_type);
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function langcode(string $langcode): static {
     $this->setEnvironmentParameter('langcode', $langcode);
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setSend(bool $send): static {
     $this->send = $send;
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function shouldSend(): bool {
     return $this->send;
   }
