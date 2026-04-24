@@ -731,7 +731,7 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
    * @param string ...$config_names
    *   One or more config names. Does not support config entities.
    */
-  protected function installSpecificConfig(string $module, string ...$config_names) {
+  protected function installSpecificConfig(string $module, string ...$config_names): void {
     $default_install_path = $this->container->get('extension.path.resolver')->getPath('module', $module) . '/' . InstallStorage::CONFIG_INSTALL_DIRECTORY;
     $storage = new FileStorage($default_install_path, StorageInterface::DEFAULT_COLLECTION);
 
