@@ -91,6 +91,12 @@ class OverrideDisplaysTest extends UITestBase {
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains($new_title);
     $this->assertSession()->pageTextContains($original_title);
+    $edit = [];
+    $edit['css_class'] = $this->randomMachineName();
+    $this->drupalGet("admin/structure/views/nojs/display/{$view['id']}/page_1/css_class");
+    $this->submitForm($edit, 'Apply');
+    $this->assertSession()->linkExists('Page*');
+    $this->assertSession()->linkExists('Block*');
   }
 
   /**

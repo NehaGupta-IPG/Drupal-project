@@ -21,6 +21,7 @@ use Drupal\views\Plugin\views\area\AreaPluginBase;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\PluginBase;
 use Drupal\views\Views;
+use Drupal\views_ui\ViewUI;
 
 /**
  * Base class for views display plugins.
@@ -1944,6 +1945,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     }
 
     $section = $form_state->get('section');
+    $views_ui = $form_state->getStorage();
     switch ($section) {
       case 'display_id':
         if ($form_state->hasValue('display_id')) {
@@ -1953,42 +1955,42 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
 
       case 'display_title':
         $this->display['display_title'] = $form_state->getValue('display_title');
-        $this->setOption('display_description', $form_state->getValue('display_description'));
+        $this->setOptionUI('display_description', $form_state->getValue('display_description'), $views_ui['view']);
         break;
 
       case 'query':
         $plugin = $this->getPlugin('query');
         if ($plugin) {
           $plugin->submitOptionsForm($form['query']['options'], $form_state);
-          $this->setOption('query', $form_state->getValue($section));
+          $this->setOptionUI('query', $form_state->getValue($section), $views_ui['view']);
         }
         break;
 
       case 'link_display':
-        $this->setOption('link_url', $form_state->getValue('link_url'));
+        $this->setOptionUI('link_url', $form_state->getValue('link_url'), $views_ui['view']);
       case 'title':
       case 'css_class':
       case 'display_comment':
       case 'distinct':
       case 'group_by':
-        $this->setOption($section, $form_state->getValue($section));
+        $this->setOptionUI($section, $form_state->getValue($section), $views_ui['view']);
         break;
 
       case 'rendering_language':
-        $this->setOption('rendering_language', $form_state->getValue('rendering_language'));
+        $this->setOptionUI('rendering_language', $form_state->getValue('rendering_language'), $views_ui['view']);
         break;
 
       case 'use_ajax':
       case 'hide_attachment_summary':
       case 'show_admin_links':
       case 'exposed_block':
-        $this->setOption($section, (bool) $form_state->getValue($section));
+        $this->setOptionUI($section, (bool) $form_state->getValue($section), $views_ui['view']);
         break;
 
       case 'use_more':
-        $this->setOption($section, intval($form_state->getValue($section)));
-        $this->setOption('use_more_always', intval($form_state->getValue('use_more_always')));
-        $this->setOption('use_more_text', $form_state->getValue('use_more_text'));
+        $this->setOptionUI($section, intval($form_state->getValue($section)), $views_ui['view']);
+        $this->setOptionUI('use_more_always', intval($form_state->getValue('use_more_always')), $views_ui['view']);
+        $this->setOptionUI('use_more_text', $form_state->getValue('use_more_text'), $views_ui['view']);
         break;
 
       case 'access':
@@ -2010,7 +2012,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
               'options' => $plugin->options,
             ];
             $plugin->filterByDefinedOptions($plugin_options['options']);
-            $this->setOption($plugin_type, $plugin_options);
+            $this->setOptionUI($plugin_type, $plugin_options, $views_ui['view']);
             if ($plugin->usesOptions()) {
               $form_state->get('view')->addFormToStack('display', $this->display['id'], $plugin_type . '_options');
             }
@@ -2031,7 +2033,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
           $plugin_options = $this->getOption($plugin_type);
           $plugin->submitOptionsForm($form[$plugin_type . '_options'], $form_state);
           $plugin_options['options'] = $form_state->getValue($section);
-          $this->setOption($plugin_type, $plugin_options);
+          $this->setOptionUI($plugin_type, $plugin_options, $views_ui['view']);
         }
         break;
     }
@@ -2043,7 +2045,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       $plugin_id = $extender->getPluginId();
       $extender_options[$plugin_id] = $extender->options;
     }
-    $this->setOption('display_extenders', $extender_options);
+    $this->setOptionUI('display_extenders', $extender_options, $views_ui['view']);
   }
 
   /**
@@ -2775,6 +2777,33 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
    */
   public function getExtenders() {
     return $this->extenders;
+  }
+
+  /**
+   * Sets an option on a display from within the View UI.
+   *
+   * The function updates the $view_ui object to track the changed displays
+   * during editing.
+   *
+   * @param string $option
+   *   The name of the option used to set the value.
+   * @param mixed $value
+   *   The value to be set.
+   * @param \Drupal\views_ui\ViewUI $view_ui
+   *   The View UI object.
+   *
+   * @return mixed
+   *   The value that was set on the display.
+   */
+  protected function setOptionUI($option, $value, ViewUI $view_ui) {
+    if ($this->isDefaulted($option)) {
+      foreach ($this->view->displayHandlers as $display_id => $display) {
+        if ($display->isDefaulted($option) || $display_id == 'default') {
+          $view_ui->changed_display[$display_id] = TRUE;
+        }
+      }
+    }
+    return $this->setOption($option, $value);
   }
 
   /**
