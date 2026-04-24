@@ -1062,6 +1062,13 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function getRoutesCacheKeySuffix(): string {
+    return $this->getContainerCacheKeySuffix();
+  }
+
+  /**
    * Returns the container storage service.
    *
    * The container storage is responsible for loading, dumping, and invalidating

@@ -39,6 +39,8 @@ class InstallerServiceProvider extends NormalInstallerServiceProvider implements
       ->register('path_processor_manager', 'Drupal\Core\PathProcessor\NullPathProcessorManager');
     $container
       ->register('router.dumper', 'Drupal\Core\Routing\NullMatcherDumper');
+    $container
+      ->register('route_storage', 'Drupal\Core\Routing\RouteStorage\NullRouteStorage');
 
     // Prevent the static route builders from core from listening to the event.
     // @todo Convert installer steps into routes; add an installer.routing.yml.
