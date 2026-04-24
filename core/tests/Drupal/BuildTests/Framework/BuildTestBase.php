@@ -324,6 +324,7 @@ abstract class BuildTestBase extends TestCase {
       ->setTimeout(360)
       ->setIdleTimeout(360);
     $this->commandProcess->run();
+    dump($this->commandProcess->getOutput(), $this->commandProcess->getErrorOutput());
     return $this->commandProcess;
   }
 
