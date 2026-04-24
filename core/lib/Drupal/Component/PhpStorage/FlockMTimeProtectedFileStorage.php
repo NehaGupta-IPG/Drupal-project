@@ -55,6 +55,8 @@ class FlockMTimeProtectedFileStorage extends MTimeProtectedFileStorage implement
    *
    * @return bool
    *   TRUE if the lock was acquired, FALSE if another caller holds it.
+   *
+   * @see \Symfony\Component\HttpKernel\Kernel::initializeContainer()
    */
   protected function createLock(string $name): bool {
     $name = $this->getLockName($name);
@@ -63,12 +65,22 @@ class FlockMTimeProtectedFileStorage extends MTimeProtectedFileStorage implement
     if ($fd === FALSE) {
       return FALSE;
     }
-    if (flock($fd, LOCK_EX | LOCK_NB)) {
-      $this->lockHandles[$name] = $fd;
-      return TRUE;
+
+    // Try a non-blocking exclusive lock first. If it fails because another
+    // process holds the lock ($wouldBlock is true), bail out immediately —
+    // another writer is active and we must not queue behind it. If it fails
+    // for any other reason ($wouldBlock is false), retry with a blocking
+    // exclusive lock. This handles NFS and other filesystems where LOCK_NB
+    // can fail.
+    if (!flock($fd, \LOCK_EX | \LOCK_NB, $wouldBlock)) {
+      if ($wouldBlock || !flock($fd, \LOCK_EX)) {
+        fclose($fd);
+        return FALSE;
+      }
     }
-    fclose($fd);
-    return FALSE;
+
+    $this->lockHandles[$name] = $fd;
+    return TRUE;
   }
 
   /**
@@ -76,19 +88,14 @@ class FlockMTimeProtectedFileStorage extends MTimeProtectedFileStorage implement
    *
    * @param string $name
    *   The same identifier passed to createLock().
-   *
-   * @return bool
-   *   TRUE on success, FALSE if the lock cannot be released.
    */
-  protected function releaseLock(string $name): bool {
+  protected function releaseLock(string $name): void {
     $name = $this->getLockName($name);
-    if (!isset($this->lockHandles[$name])) {
-      return FALSE;
+    if (isset($this->lockHandles[$name])) {
+      flock($this->lockHandles[$name], LOCK_UN);
+      fclose($this->lockHandles[$name]);
+      unset($this->lockHandles[$name]);
     }
-    $result = flock($this->lockHandles[$name], LOCK_UN);
-    fclose($this->lockHandles[$name]);
-    unset($this->lockHandles[$name]);
-    return $result;
   }
 
   /**
