@@ -68,9 +68,7 @@ class ViewsConfigUpdater {
    *   Whether the view was updated.
    */
   public function updateAll(ViewEntityInterface $view) {
-    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type, $key, $display_id) use ($view) {
-      return $this->processTaxonomyTermViewsFilterUpdate($view);
-    });
+    return $this->processTaxonomyTermViewsFilterUpdate($view);
   }
 
   /**
@@ -164,7 +162,7 @@ class ViewsConfigUpdater {
     foreach ($displays as &$display) {
       $filters = $display['display_options']['filters'] ?? [];
       foreach ($filters as $id => $filter) {
-        if ($filter['plugin_id'] === 'taxonomy_index_tid' && isset($filter['value'])) {
+        if (isset($filter['plugin_id']) && $filter['plugin_id'] === 'taxonomy_index_tid' && isset($filter['value'])) {
           // Filter all the IDs and UUIDs.
           // If someone has applied that patch, we can already have UUIDs.
           $valid_uuids = array_filter($filter['value'], fn($v) => Uuid::isValid($v));
