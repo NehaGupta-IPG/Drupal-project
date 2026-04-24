@@ -56,10 +56,10 @@ class CurrentThemeConditionTest extends KernelTestBase {
 
     $this->assertEquals('The current theme is: Starterkit theme', $condition->summary());
     $this->assertEquals('The current theme is not: Starterkit theme', $condition_negated->summary());
-    $this->assertEquals('The current theme is one of the following: Theme test subtheme, Starterkit theme', $condition_multiple->summary());
-    $this->assertEquals('The current theme is not one of the following: Theme test subtheme, Starterkit theme', $condition_multiple_negated->summary());
-    $this->assertEquals('The current theme is one of the following: Theme test base theme, Stable 9, Theme test subtheme, Starterkit theme', $condition_any->summary());
-    $this->assertEquals('The current theme is not one of the following: Theme test base theme, Stable 9, Theme test subtheme, Starterkit theme', $condition_any_negated->summary());
+    $this->assertEquals('The current theme is one of the following: Starterkit theme, Theme test subtheme', $condition_multiple->summary());
+    $this->assertEquals('The current theme is not one of the following: Starterkit theme, Theme test subtheme', $condition_multiple_negated->summary());
+    $this->assertEquals('The current theme is one of the following: Starterkit theme, Theme test base theme, Theme test subtheme', $condition_any->summary());
+    $this->assertEquals('The current theme is not one of the following: Starterkit theme, Theme test base theme, Theme test subtheme', $condition_any_negated->summary());
 
     $this->assertTrue($condition->execute());
     $this->assertFalse($condition_negated->execute());
@@ -100,7 +100,7 @@ class CurrentThemeConditionTest extends KernelTestBase {
   }
 
   /**
-   * Tests the old deprecated current theme defintion.
+   * Tests the old deprecated current theme definition.
    *
    * Tests whether the old current theme condition 'theme' configuration key
    * still works as expected and throws the defined deprecation message.
@@ -115,7 +115,7 @@ class CurrentThemeConditionTest extends KernelTestBase {
     $condition_deprecated_config = $manager->createInstance('current_theme');
     $condition_deprecated_config->setConfiguration(['theme' => 'starterkit_theme']);
 
-    $this->expectUserDeprecationMessage("The 'theme' condition.plugin config schema is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use the 'themes' config schema instead. See https://www.drupal.org/node/3523553.");
+    $this->expectUserDeprecationMessage('The "theme" configuration key is deprecated in drupal:12.0.0 and will be removed in drupal:13.0.0. Use "themes" instead. See https://www.drupal.org/node/3523553');
 
     // Check whether the deprecated config still functions as expected:
     $this->assertFalse($condition_deprecated_config->execute());
