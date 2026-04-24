@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Component\PhpStorage;
 
+use Drupal\Component\FileSystem\FileSystem;
 use Drupal\Component\PhpStorage\FlockMTimeProtectedFileStorage;
 use Drupal\Component\PhpStorage\LockingPhpStorageInterface;
 use Drupal\Component\Utility\Random;
@@ -51,7 +52,7 @@ class FlockMTimeProtectedFileStorageTest extends MTimeProtectedFileStorageBase {
   protected function setUp(): void {
     // Do not call parent::setUp(): it initializes vfsStream, which does not
     // support flock(). Use a real temporary directory instead.
-    $this->directory = sys_get_temp_dir() . '/drupal_flock_test_' . uniqid('', TRUE);
+    $this->directory = FileSystem::getOsTemporaryDirectory() . '/drupal_flock_test_' . uniqid('', TRUE);
     mkdir($this->directory, 0777, TRUE);
 
     $random = new Random();

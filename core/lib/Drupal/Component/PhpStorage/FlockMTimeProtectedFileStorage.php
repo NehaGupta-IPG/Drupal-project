@@ -14,7 +14,7 @@ namespace Drupal\Component\PhpStorage;
  * configured to store files in a local directory such as sys_get_temp_dir(),
  * never on a shared NFS mount. Each web head maintains its own compiled copy.
  *
- * @see \Drupal\Core\PhpStorage\PhpStorageFactory::USE_SYS_TEMP
+ * @see \Drupal\Core\PhpStorage\PhpStorageFactory
  */
 class FlockMTimeProtectedFileStorage extends MTimeProtectedFileStorage implements LockingPhpStorageInterface {
 

@@ -151,7 +151,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
           'service_container',
           [
             'class' => FlockMTimeProtectedFileStorage::class,
-            'directory' => PhpStorageFactory::USE_SYS_TEMP . '/drupal',
+            'directory' => 'temporary://drupal',
           ],
         ],
       ],

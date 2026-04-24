@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Kernel\PhpStorage;
 
+use Drupal\Component\FileSystem\FileSystem;
 use Drupal\Component\PhpStorage\MTimeProtectedFileStorage;
 use Drupal\Core\PhpStorage\PhpStorageFactory;
 use Drupal\Core\Site\Settings;
@@ -106,16 +107,16 @@ class PhpStorageFactoryTest extends KernelTestBase {
     $php = PhpStorageFactory::get('test');
     $this->assertSame('mock hash salt', $php->getConfigurationValue('secret'), 'The default secret is used if one is not set in the overridden settings.');
 
-    // Test that USE_SYS_TEMP in the directory is replaced with
-    // sys_get_temp_dir().
-    $this->setSettings('test', ['directory' => PhpStorageFactory::USE_SYS_TEMP . '/drupal']);
+    // Test that temporary:// in the directory is replaced with
+    // FileSystem::getOsTemporaryDirectory().
+    $this->setSettings('test', ['directory' => 'temporary://drupal']);
     $php = PhpStorageFactory::get('test');
-    $this->assertSame(sys_get_temp_dir() . '/drupal', $php->getConfigurationValue('directory'), 'USE_SYS_TEMP prefix was replaced with sys_get_temp_dir().');
+    $this->assertSame(FileSystem::getOsTemporaryDirectory() . '/drupal', $php->getConfigurationValue('directory'), 'temporary:// prefix was replaced with FileSystem::getOsTemporaryDirectory().');
 
-    // Test USE_SYS_TEMP alone (no subdirectory suffix).
-    $this->setSettings('test', ['directory' => PhpStorageFactory::USE_SYS_TEMP]);
+    // Test temporary:// alone (no subdirectory suffix).
+    $this->setSettings('test', ['directory' => 'temporary://']);
     $php = PhpStorageFactory::get('test');
-    $this->assertSame(sys_get_temp_dir(), $php->getConfigurationValue('directory'), 'USE_SYS_TEMP alone resolves to sys_get_temp_dir().');
+    $this->assertSame(FileSystem::getOsTemporaryDirectory(), $php->getConfigurationValue('directory'), 'temporary:// alone resolves to FileSystem::getOsTemporaryDirectory().');
 
     // Test that name-specific settings override the $configuration parameter.
     $this->setSettings('test');

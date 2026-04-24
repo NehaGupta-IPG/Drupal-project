@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\DependencyInjection\ContainerStorage;
 
+use Drupal\Component\FileSystem\FileSystem;
 use Drupal\Component\PhpStorage\PhpStorageInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -79,7 +80,7 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     $phpStorage->method('load')
       ->willReturnCallback(function ($filename) use (&$code) {
         if (isset($code[$filename])) {
-          $tempFile = tempnam(sys_get_temp_dir(), 'drupal_container_test_');
+          $tempFile = tempnam(FileSystem::getOsTemporaryDirectory(), 'drupal_container_test_');
           $this->tempFiles[] = $tempFile;
           // Write the code to a temporary file so it can be included. There's
           // no way to define a named class from a string at runtime in PHP
@@ -263,7 +264,7 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     $phpStorage->method('load')
       ->willReturnCallback(function ($filename) use (&$code) {
         if (isset($code[$filename])) {
-          $tempFile = tempnam(sys_get_temp_dir(), 'drupal_container_test_');
+          $tempFile = tempnam(FileSystem::getOsTemporaryDirectory(), 'drupal_container_test_');
           $this->tempFiles[] = $tempFile;
           file_put_contents($tempFile, $code[$filename]);
           include_once $tempFile;
@@ -333,7 +334,7 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
       ->willReturnCallback(function ($filename) use (&$code, &$loadedFiles) {
         $loadedFiles[] = $filename;
         if (isset($code[$filename])) {
-          $tempFile = tempnam(sys_get_temp_dir(), 'drupal_container_test_');
+          $tempFile = tempnam(FileSystem::getOsTemporaryDirectory(), 'drupal_container_test_');
           $this->tempFiles[] = $tempFile;
           file_put_contents($tempFile, $code[$filename]);
           include_once $tempFile;
@@ -422,7 +423,7 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
       ->willReturnCallback(function ($filename) use (&$code, &$loadedFiles) {
         $loadedFiles[] = $filename;
         if (isset($code[$filename])) {
-          $tempFile = tempnam(sys_get_temp_dir(), 'drupal_container_test_');
+          $tempFile = tempnam(FileSystem::getOsTemporaryDirectory(), 'drupal_container_test_');
           $this->tempFiles[] = $tempFile;
           file_put_contents($tempFile, $code[$filename]);
           include_once $tempFile;
