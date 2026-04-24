@@ -55,11 +55,11 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
     $this->assertSession()->pageTextContains('quiche');
 
     $expected = [
-      'QueryCount' => 219,
-      'CacheGetCount' => 235,
-      'CacheSetCount' => 232,
+      'QueryCount' => 215,
+      'CacheGetCount' => 232,
+      'CacheSetCount' => 231,
       'CacheDeleteCount' => 0,
-      'CacheTagLookupQueryCount' => 24,
+      'CacheTagLookupQueryCount' => 23,
       'CacheTagInvalidationCount' => 0,
       'ScriptCount' => 1,
       'ScriptBytes' => 12000,
@@ -118,12 +118,12 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
     $this->assertSession()->pageTextContains('quiche');
 
     $expected = [
-      'QueryCount' => 77,
-      'CacheGetCount' => 171,
-      'CacheSetCount' => 59,
+      'QueryCount' => 75,
+      'CacheGetCount' => 167,
+      'CacheSetCount' => 58,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 20,
+      'CacheTagLookupQueryCount' => 19,
       'ScriptCount' => 1,
       'ScriptBytes' => 12000,
       'StylesheetCount' => 2,
@@ -219,22 +219,22 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 59,
-      'CacheGetCount' => 166,
+      'CacheGetCount' => 163,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 34,
         'bootstrap' => 12,
         'discovery' => 67,
-        'data' => 6,
+        'data' => 7,
         'entity' => 21,
         'dynamic_page_cache' => 1,
-        'render' => 21,
+        'render' => 17,
         'default' => 3,
       ],
       'CacheSetCount' => 41,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 20,
+      'CacheTagLookupQueryCount' => 19,
       'CacheTagGroupedLookups' => [
         [
           'entity_types',
@@ -278,10 +278,7 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
           'taxonomy_term:31',
         ],
         [
-          'CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form',
           'config:block_list',
-        ],
-        [
           'config:system.site',
         ],
         [
