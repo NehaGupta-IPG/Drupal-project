@@ -439,7 +439,7 @@ system.timezone:
     _controller: '\Drupal\system\Controller\TimezoneController::getTimezone'
     abbreviation: ''
     offset: -1
-    is_daylight_saving_time: NULL
+    is_daylight_saving_time: -1
   requirements:
     _access: 'TRUE'
     abbreviation: '0|([A-Z]{3,5})'
