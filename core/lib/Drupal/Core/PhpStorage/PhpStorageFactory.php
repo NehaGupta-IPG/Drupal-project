@@ -27,7 +27,7 @@ class PhpStorageFactory {
    * @see \Drupal\Core\PhpStorage\PhpStorageFactory::getTempDirectory()
    * @see \Drupal\Core\StreamWrapper\TemporaryStream
    */
-  public const SYSTEM_TEMPORARY = 'temporary://';
+  protected const SYSTEM_TEMPORARY = 'temporary://';
 
   /**
    * Instantiates a storage for generated PHP code.
