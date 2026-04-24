@@ -21,6 +21,13 @@ final class CallsDestructableServiceController extends ControllerBase {
    */
   protected $destructable;
 
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container): static {
+    return new static($container->get(Destructable::class));
+  }
+
   public function __construct(Destructable $destructable) {
     $this->destructable = $destructable;
   }

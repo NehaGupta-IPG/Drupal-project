@@ -16,14 +16,14 @@ class ConfirmFormArrayPathTestForm extends ConfirmFormTestForm {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_confirm_array_path_test_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCancelUrl() {
+  public function getCancelUrl(): Url {
     return new Url('form_test.route6', [], [
       'query' => [
         'destination' => 'admin/config',

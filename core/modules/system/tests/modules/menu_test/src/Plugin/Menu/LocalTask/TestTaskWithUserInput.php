@@ -15,7 +15,7 @@ class TestTaskWithUserInput extends LocalTaskDefault {
   /**
    * {@inheritdoc}
    */
-  public function getTitle(?Request $request = NULL) {
+  public function getTitle(?Request $request = NULL): string {
     return "<script>alert('Welcome to the jungle!')</script>";
   }
 

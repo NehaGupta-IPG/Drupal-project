@@ -18,7 +18,7 @@ class TestController {
    * @return array
    *   Render array for display in modal.
    */
-  public function modalContent() {
+  public function modalContent(): array {
     return [
       '#type' => 'markup',
       '#markup' => 'Look at me in a modal!',
@@ -31,7 +31,7 @@ class TestController {
    * @return array
    *   Render array for display in modal.
    */
-  public function modalContentLink() {
+  public function modalContentLink(): array {
     return [
       '#type' => 'container',
       'text' => [
@@ -51,7 +51,7 @@ class TestController {
    * @return array
    *   Render array for display in modal.
    */
-  public function modalContentInput() {
+  public function modalContentInput(): array {
     return [
       '#type' => 'container',
       'text' => [
@@ -74,7 +74,7 @@ class TestController {
    * @return array
    *   Render array with links.
    */
-  public function linksDisplay() {
+  public function linksDisplay(): array {
     return [
       'normal_modal' => [
         '#title' => 'Normal Modal!',
@@ -247,7 +247,7 @@ class TestController {
    * @return array
    *   Render array with links.
    */
-  public function collapsedOpener() {
+  public function collapsedOpener(): array {
     return [
       '#markup' => '<h2>Honk</h2>',
       'dropbutton' => [

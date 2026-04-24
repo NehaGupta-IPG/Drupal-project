@@ -28,7 +28,7 @@ class TestSettingsValidationBlock extends BlockBase {
   /**
    * {@inheritdoc}
    */
-  public function blockValidate($form, FormStateInterface $form_state) {
+  public function blockValidate($form, FormStateInterface $form_state): void {
     if (!ctype_digit($form_state->getValue('digits'))) {
       $form_state->setErrorByName('digits', $this->t('Only digits are allowed'));
     }
@@ -37,7 +37,7 @@ class TestSettingsValidationBlock extends BlockBase {
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public function build(): array {
     return ['#markup' => 'foo'];
   }
 

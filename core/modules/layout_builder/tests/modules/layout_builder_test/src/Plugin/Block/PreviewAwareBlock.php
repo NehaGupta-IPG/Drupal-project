@@ -21,7 +21,7 @@ class PreviewAwareBlock extends BlockBase {
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public function build(): array {
     $markup = $this->t('This block is being rendered normally.');
 
     if ($this->inPreview) {

@@ -24,7 +24,7 @@ class TestMultipleFormsBlock extends BlockBase {
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public function build(): array {
     return [];
   }
 

@@ -27,7 +27,7 @@ class TestTasksSettingsSub1 extends LocalTaskDefault {
   /**
    * {@inheritdoc}
    */
-  public function getCacheTags() {
+  public function getCacheTags(): array {
     return ['kittens:ragdoll'];
   }
 

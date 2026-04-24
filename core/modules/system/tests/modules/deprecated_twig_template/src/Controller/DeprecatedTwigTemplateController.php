@@ -17,7 +17,7 @@ class DeprecatedTwigTemplateController extends ControllerBase {
    * @return array
    *   Render array containing the deprecated template.
    */
-  public function deprecatedTwigTemplate() {
+  public function deprecatedTwigTemplate(): array {
     return [
       '#theme' => 'deprecated_template',
       '#message' => 'This is a deprecated template. Use an alternative template.',

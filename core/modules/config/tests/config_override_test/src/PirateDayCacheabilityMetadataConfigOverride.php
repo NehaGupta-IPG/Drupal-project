@@ -40,21 +40,21 @@ class PirateDayCacheabilityMetadataConfigOverride implements ConfigFactoryOverri
   /**
    * {@inheritdoc}
    */
-  public function getCacheSuffix() {
+  public function getCacheSuffix(): string {
     return 'PirateDayConfigOverrider';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function createConfigObject($name, $collection = StorageInterface::DEFAULT_COLLECTION) {
+  public function createConfigObject($name, $collection = StorageInterface::DEFAULT_COLLECTION): null {
     return NULL;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCacheableMetadata($name) {
+  public function getCacheableMetadata($name): CacheableMetadata {
     $metadata = new CacheableMetadata();
     $metadata
       ->setCacheContexts(['pirate_day'])

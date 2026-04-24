@@ -66,7 +66,7 @@ class BigPipeTestController implements TrustedCallbackInterface {
    * @return array
    *   List of all BigPipe placeholder test cases.
    */
-  public static function nope() {
+  public static function nope(): array {
     return ['#markup' => '<p>Nope.</p>'];
   }
 
@@ -78,7 +78,7 @@ class BigPipeTestController implements TrustedCallbackInterface {
    * @return array
    *   Render array with multiple placeholders using a lazy builder.
    */
-  public function multiOccurrence() {
+  public function multiOccurrence(): array {
     return [
       'item1' => [
         '#lazy_builder' => [static::class . '::counter', []],
@@ -103,7 +103,7 @@ class BigPipeTestController implements TrustedCallbackInterface {
    *   - 'user_container': Loads the user’s display name via a lazy builder.
    *   - 'user_links_container': Loads user links with a placeholder preview.
    */
-  public function placeholderPreview() {
+  public function placeholderPreview(): array {
     return [
       'user_container' => [
         '#type' => 'container',
@@ -140,7 +140,7 @@ class BigPipeTestController implements TrustedCallbackInterface {
    *   A render array containing a <time> element with a predefined date
    *   and disabled caching for dynamic rendering.
    */
-  public static function currentTime() {
+  public static function currentTime(): array {
     return [
       '#markup' => '<time datetime="' . date('Y-m-d', 668948400) . '"></time>',
       '#cache' => ['max-age' => 0],
@@ -178,7 +178,7 @@ class BigPipeTestController implements TrustedCallbackInterface {
    *   A render array with a marquee message using BigPipeMarkup,
    *   with caching disabled and a custom cache tag.
    */
-  public static function helloOrHi() {
+  public static function helloOrHi(): array {
     return [
       '#markup' => BigPipeMarkup::create('<marquee>llamas forever!</marquee>'),
       '#cache' => [
@@ -193,7 +193,7 @@ class BigPipeTestController implements TrustedCallbackInterface {
    *
    * @throws \Exception
    */
-  public static function exception() {
+  public static function exception(): never {
     throw new \Exception('You are not allowed to say llamas are not cool!');
   }
 
@@ -205,7 +205,7 @@ class BigPipeTestController implements TrustedCallbackInterface {
    * @return array
    *   A render array with plain text for testing BigPipe error handling.
    */
-  public static function responseException() {
+  public static function responseException(): array {
     return ['#plain_text' => BigPipeTestSubscriber::CONTENT_TRIGGER_EXCEPTION];
   }
 
@@ -217,7 +217,7 @@ class BigPipeTestController implements TrustedCallbackInterface {
    * @return array
    *   The render array.
    */
-  public static function counter() {
+  public static function counter(): array {
     // Lazy builders are not allowed to build their own state like this function
     // does, but in this case we're intentionally doing that for testing
     // purposes: so we can ensure that each lazy builder is only ever called
@@ -291,7 +291,7 @@ class BigPipeTestController implements TrustedCallbackInterface {
   /**
    * {@inheritdoc}
    */
-  public static function trustedCallbacks() {
+  public static function trustedCallbacks(): array {
     return [
       'currentTime',
       'piggy',

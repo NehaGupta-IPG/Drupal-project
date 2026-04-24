@@ -20,14 +20,14 @@ class MissingSchema extends ConditionPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function evaluate() {
+  public function evaluate(): bool {
     return FALSE;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function summary() {
+  public function summary(): string {
     return 'Summary';
   }
 

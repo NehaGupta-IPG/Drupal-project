@@ -16,14 +16,14 @@ class FakeViewModeContext implements ContextProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRuntimeContexts(array $unqualified_context_ids) {
+  public function getRuntimeContexts(array $unqualified_context_ids): array {
     return ['view_mode' => new Context(new ContextDefinition('string'), 'default')];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getAvailableContexts() {
+  public function getAvailableContexts(): array {
     return $this->getRuntimeContexts([]);
   }
 

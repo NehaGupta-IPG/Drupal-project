@@ -17,14 +17,14 @@ class FormTestGroupVerticalTabsForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_group_vertical_tabs';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['vertical_tabs'] = [
       '#type' => 'vertical_tabs',
     ];
@@ -56,7 +56,7 @@ class FormTestGroupVerticalTabsForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
     if ($form_state->getValue('element_2') === 'bad') {
       $form_state->setErrorByName('element_2', $this->t('there was an error'));
     }

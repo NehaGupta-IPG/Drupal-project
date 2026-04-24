@@ -17,14 +17,14 @@ class FormTestValidateRequiredNoTitleForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_validate_required_form_no_title';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['textfield'] = [
       '#type' => 'textfield',
       '#required' => TRUE,
@@ -37,7 +37,7 @@ class FormTestValidateRequiredNoTitleForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->messenger()->addStatus('The form_test_validate_required_form_no_title form was submitted successfully.');
   }
 

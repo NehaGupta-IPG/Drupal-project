@@ -17,14 +17,14 @@ class FormTestClickedButtonForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_clicked_button';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $first = NULL, $second = NULL, $third = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, $first = NULL, $second = NULL, $third = NULL): array {
     // A single text field. In IE, when a form has only one non-button input
     // field and the ENTER key is pressed while that field has focus, the form
     // is submitted without any information identifying the button responsible
@@ -82,7 +82,7 @@ class FormTestClickedButtonForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
     if ($triggering_element = $form_state->getTriggeringElement()) {
       $this->messenger()->addStatus($this->t('The clicked button is %name.', ['%name' => $triggering_element['#name']]));
     }
@@ -94,7 +94,7 @@ class FormTestClickedButtonForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->messenger()->addStatus('Submit handler for form_test_clicked_button executed.');
   }
 

@@ -19,14 +19,14 @@ class AjaxTestFocusFirstForm implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'ajax_test_focus_first_command_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['first_input'] = [
       '#type' => 'textfield',
     ];

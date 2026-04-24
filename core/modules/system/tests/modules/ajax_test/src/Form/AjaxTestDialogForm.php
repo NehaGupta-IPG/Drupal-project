@@ -23,14 +23,14 @@ class AjaxTestDialogForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'ajax_test_dialog_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['button1'] = [
       '#type' => 'submit',
       '#name' => 'button1',
@@ -69,28 +69,28 @@ class AjaxTestDialogForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $form_state->setRedirect('ajax_test.dialog_contents');
   }
 
   /**
    * AJAX callback handler for AjaxTestDialogForm.
    */
-  public function modal(&$form, FormStateInterface $form_state) {
+  public function modal(&$form, FormStateInterface $form_state): AjaxResponse {
     return $this->dialog(TRUE);
   }
 
   /**
    * AJAX callback handler for Url modal, AjaxTestDialogForm.
    */
-  public function modalFromUrl(&$form, FormStateInterface $form_state) {
+  public function modalFromUrl(&$form, FormStateInterface $form_state): AjaxResponse {
     return $this->dialog(TRUE, TRUE);
   }
 
   /**
    * AJAX callback handler for AjaxTestDialogForm.
    */
-  public function nonModal(&$form, FormStateInterface $form_state) {
+  public function nonModal(&$form, FormStateInterface $form_state): AjaxResponse {
     return $this->dialog(FALSE);
   }
 
@@ -105,7 +105,7 @@ class AjaxTestDialogForm extends FormBase {
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   An ajax response object.
    */
-  protected function dialog(bool $is_modal = FALSE, bool $is_url = FALSE) {
+  protected function dialog(bool $is_modal = FALSE, bool $is_url = FALSE): AjaxResponse {
     $content = AjaxTestController::dialogContents();
     $response = new AjaxResponse();
     $title = $this->t('AJAX Dialog & contents');

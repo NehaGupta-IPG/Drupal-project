@@ -17,7 +17,7 @@ class TestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['test_table'] = [
       '#type' => 'table',
       '#header' => ['Column 1', 'Column 2', 'Column 3'],
@@ -97,14 +97,14 @@ class TestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'test_page_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     // Empty on purpose, we just want to test the rendered form elements.
   }
 

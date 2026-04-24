@@ -18,7 +18,7 @@ class AjaxFormsTestCommandsForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'ajax_forms_test_ajax_commands_form';
   }
 

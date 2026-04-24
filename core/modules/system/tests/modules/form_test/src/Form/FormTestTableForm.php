@@ -16,14 +16,14 @@ class FormTestTableForm extends FormTestTableSelectFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return '_form_test_table_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['table'] = [
       '#type' => 'table',
       '#tableselect' => TRUE,

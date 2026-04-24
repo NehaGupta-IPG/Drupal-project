@@ -18,14 +18,14 @@ class FormTestMachineNameForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_machine_name';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['machine_name_1_label'] = [
       '#type' => 'textfield',
       '#title' => 'Machine name 1 label',
@@ -76,7 +76,7 @@ class FormTestMachineNameForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $form_state->setResponse(new JsonResponse($form_state->getValues()));
   }
 
@@ -89,7 +89,7 @@ class FormTestMachineNameForm extends FormBase {
    * @return bool
    *   TRUE if the machine name is a duplicate, FALSE otherwise.
    */
-  public function load($machine_name) {
+  public function load($machine_name): bool {
     return str_contains($machine_name, 'duplicate');
   }
 

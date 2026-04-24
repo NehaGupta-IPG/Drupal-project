@@ -24,7 +24,7 @@ class EntityTestReferenceCustomCacheTagFormatter extends EntityReferenceFormatte
   /**
    * {@inheritdoc}
    */
-  public function viewElements(FieldItemListInterface $items, $langcode) {
+  public function viewElements(FieldItemListInterface $items, $langcode): array {
     return ['#cache' => ['tags' => ['custom_cache_tag']]];
   }
 

@@ -27,7 +27,7 @@ class RenderPlaceholderMessageTestController implements TrustedCallbackInterface
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('renderer'),
     );
@@ -79,7 +79,7 @@ class RenderPlaceholderMessageTestController implements TrustedCallbackInterface
    * @return array
    *   A renderable array containing only messages.
    */
-  public function queuedMessages() {
+  public function queuedMessages(): array {
     return ['#type' => 'status_messages'];
   }
 
@@ -132,7 +132,7 @@ class RenderPlaceholderMessageTestController implements TrustedCallbackInterface
    * @return array
    *   A renderable array containing the message.
    */
-  public static function setAndLogMessage($message) {
+  public static function setAndLogMessage($message): array {
     // Ensure that messages are rendered last even when earlier placeholders
     // suspend the Fiber, this will cause BigPipe::renderPlaceholders() to loop
     // around all of the fibers before resuming this one, then finally rendering
@@ -150,7 +150,7 @@ class RenderPlaceholderMessageTestController implements TrustedCallbackInterface
   /**
    * {@inheritdoc}
    */
-  public static function trustedCallbacks() {
+  public static function trustedCallbacks(): array {
     return ['setAndLogMessage'];
   }
 

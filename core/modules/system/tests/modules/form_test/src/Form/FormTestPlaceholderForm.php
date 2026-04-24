@@ -17,14 +17,14 @@ class FormTestPlaceholderForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_placeholder_test';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     foreach (['textfield', 'textarea', 'url', 'password', 'search', 'tel', 'email', 'number'] as $type) {
       $form[$type] = [
         '#type' => $type,

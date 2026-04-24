@@ -16,7 +16,7 @@ class RenderArrayNonHtmlSubscriberTestController extends ControllerBase {
    * @return string
    *   The value of raw string.
    */
-  public function rawString() {
+  public function rawString(): Response {
     return new Response((string) $this->t('Raw controller response.'));
   }
 
@@ -24,7 +24,7 @@ class RenderArrayNonHtmlSubscriberTestController extends ControllerBase {
    * @return array
    *   The value of render array.
    */
-  public function renderArray() {
+  public function renderArray(): array {
     return [
       '#type' => 'html_tag',
       '#tag' => 'p',

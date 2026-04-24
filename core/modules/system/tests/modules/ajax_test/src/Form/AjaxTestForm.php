@@ -20,14 +20,14 @@ class AjaxTestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'ajax_test_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
 
     $form['#action'] = Url::fromRoute('ajax_test.dialog')->toString();
 
@@ -75,7 +75,7 @@ class AjaxTestForm extends FormBase {
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   An AJAX response.
    */
-  public function helloWorld(array &$form, FormStateInterface $form_state) {
+  public function helloWorld(array &$form, FormStateInterface $form_state): AjaxResponse {
     $response = new AjaxResponse();
     $response->addCommand(new MessageCommand('Hello world!'));
     return $response;

@@ -20,14 +20,14 @@ class BaloneySpam extends ConditionPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function evaluate() {
+  public function evaluate(): bool {
     return TRUE;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function summary() {
+  public function summary(): string {
     return 'Summary';
   }
 

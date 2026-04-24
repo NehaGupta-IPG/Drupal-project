@@ -18,14 +18,14 @@ class FormTestCheckboxesZeroForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_checkboxes_zero';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $json = TRUE) {
+  public function buildForm(array $form, FormStateInterface $form_state, $json = TRUE): array {
     $form_state->set('json', $json);
     $form['checkbox_off'] = [
       '#title' => $this->t('Checkbox off'),
@@ -54,7 +54,7 @@ class FormTestCheckboxesZeroForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     if ($form_state->get('json')) {
       $form_state->setResponse(new JsonResponse($form_state->getValues()));
     }

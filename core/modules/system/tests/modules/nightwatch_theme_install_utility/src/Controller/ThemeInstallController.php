@@ -34,6 +34,16 @@ class ThemeInstallController extends ControllerBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container): static {
+    return new static(
+      $container->get('config.factory'),
+      $container->get('theme_installer')
+    );
+  }
+
+  /**
    * Install a theme as default.
    *
    * @param string $theme
@@ -42,7 +52,7 @@ class ThemeInstallController extends ControllerBase {
    * @return array
    *   A render array confirming installation.
    */
-  public function installDefault(string $theme) {
+  public function installDefault(string $theme): array {
     return $this->installTheme($theme, 'default');
   }
 
@@ -55,7 +65,7 @@ class ThemeInstallController extends ControllerBase {
    * @return array
    *   A render array confirming installation.
    */
-  public function installAdmin($theme) {
+  public function installAdmin($theme): array {
     return $this->installTheme($theme, 'admin');
   }
 

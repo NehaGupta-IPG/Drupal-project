@@ -24,7 +24,7 @@ class ConfigOverrideIntegrationTestCacheContext implements CacheContextInterface
   /**
    * {@inheritdoc}
    */
-  public function getContext() {
+  public function getContext(): string {
     // Default to the 'disabled' state.
     $state = \Drupal::state()->get('config_override_integration_test.enabled', FALSE) ? 'yes' : 'no';
     return 'config_override_integration_test.' . $state;
@@ -33,7 +33,7 @@ class ConfigOverrideIntegrationTestCacheContext implements CacheContextInterface
   /**
    * {@inheritdoc}
    */
-  public function getCacheableMetadata() {
+  public function getCacheableMetadata(): CacheableMetadata {
     // Since this depends on State this can change at any time and is not
     // cacheable.
     $metadata = new CacheableMetadata();

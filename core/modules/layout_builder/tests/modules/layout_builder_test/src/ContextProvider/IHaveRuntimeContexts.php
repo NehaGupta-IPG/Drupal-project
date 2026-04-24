@@ -16,7 +16,7 @@ class IHaveRuntimeContexts implements ContextProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRuntimeContexts(array $unqualified_context_ids) {
+  public function getRuntimeContexts(array $unqualified_context_ids): array {
     return [
       'runtime_contexts' => new Context(new ContextDefinition('string', 'Do you have runtime contexts?'), 'for sure you can'),
     ];
@@ -25,7 +25,7 @@ class IHaveRuntimeContexts implements ContextProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getAvailableContexts() {
+  public function getAvailableContexts(): array {
     return [
       'runtime_contexts' => new Context(new ContextDefinition('string', 'Do you have runtime contexts?')),
     ];

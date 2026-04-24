@@ -17,14 +17,14 @@ class FormTestProgrammaticForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_programmatic_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['textfield'] = [
       '#title' => 'Textfield',
       '#type' => 'textfield',
@@ -88,7 +88,7 @@ class FormTestProgrammaticForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
     if ($form_state->isValueEmpty('textfield')) {
       $form_state->setErrorByName('textfield', $this->t('Textfield is required.'));
     }
@@ -97,7 +97,7 @@ class FormTestProgrammaticForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $form_state->set('programmatic_form_submit', $form_state->getValues());
   }
 

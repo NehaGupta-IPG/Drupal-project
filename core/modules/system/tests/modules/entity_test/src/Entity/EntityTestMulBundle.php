@@ -75,7 +75,7 @@ class EntityTestMulBundle extends ConfigEntityBundleBase implements EntityDescri
   /**
    * {@inheritdoc}
    */
-  public function setDescription($description) {
+  public function setDescription($description): static {
     $this->description = $description;
     return $this;
   }

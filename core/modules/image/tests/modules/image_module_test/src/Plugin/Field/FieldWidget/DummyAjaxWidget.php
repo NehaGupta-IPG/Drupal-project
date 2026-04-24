@@ -25,7 +25,7 @@ class DummyAjaxWidget extends WidgetBase {
   /**
    * {@inheritdoc}
    */
-  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
+  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state): array {
     $element['select_widget'] = [
       '#type' => 'select',
       '#title' => $this->t('Dummy select'),
@@ -51,7 +51,7 @@ class DummyAjaxWidget extends WidgetBase {
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   Ajax response.
    */
-  public static function dummyAjaxCallback(array &$form, FormStateInterface $form_state) {
+  public static function dummyAjaxCallback(array &$form, FormStateInterface $form_state): AjaxResponse {
     return new AjaxResponse();
   }
 

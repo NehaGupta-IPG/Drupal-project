@@ -18,14 +18,14 @@ class FormTestRadiosCheckedForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_radios_checked';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['radios'] = [
       '#type' => 'radios',
       '#title' => 'Radios',
@@ -148,7 +148,7 @@ class FormTestRadiosCheckedForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $form_state->setResponse(new JsonResponse($form_state->getValues()));
   }
 

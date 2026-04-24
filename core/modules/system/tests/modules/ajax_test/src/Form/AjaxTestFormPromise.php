@@ -20,14 +20,14 @@ class AjaxTestFormPromise extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'ajax_test_form_promise';
   }
 
   /**
    * Form for testing the addition of various types of elements via Ajax.
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['#attached']['library'][] = 'ajax_test/command_promise';
     $form['custom']['#prefix'] = '<div id="ajax_test_form_promise_wrapper">';
     $form['custom']['#suffix'] = '</div>';
@@ -52,7 +52,7 @@ class AjaxTestFormPromise extends FormBase {
   /**
    * Ajax callback for the "Execute commands button" button.
    */
-  public static function executeCommands(array $form, FormStateInterface $form_state) {
+  public static function executeCommands(array $form, FormStateInterface $form_state): AjaxResponse {
     $selector = '#ajax_test_form_promise_wrapper';
     $response = new AjaxResponse();
 
@@ -68,7 +68,7 @@ class AjaxTestFormPromise extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     // An empty implementation, as we never submit the actual form.
   }
 

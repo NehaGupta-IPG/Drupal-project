@@ -17,21 +17,21 @@ class FormTestArgumentsObject extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_form_test_arguments_object';
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getEditableConfigNames() {
+  protected function getEditableConfigNames(): array {
     return ['form_test.object'];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $arg = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, $arg = NULL): array {
     $form['element'] = ['#markup' => 'The FormTestArgumentsObject::buildForm() method was used for this form.'];
 
     $form['bananas'] = [
@@ -51,14 +51,14 @@ class FormTestArgumentsObject extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
     $this->messenger()->addStatus($this->t('The FormTestArgumentsObject::validateForm() method was used for this form.'));
   }
 
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->messenger()->addStatus($this->t('The FormTestArgumentsObject::submitForm() method was used for this form.'));
     $this->config('form_test.object')
       ->set('bananas', $form_state->getValue('bananas'))

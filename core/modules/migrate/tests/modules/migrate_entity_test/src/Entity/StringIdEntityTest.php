@@ -26,7 +26,7 @@ class StringIdEntityTest extends ContentEntityBase {
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type): array {
     return [
       'id' => BaseFieldDefinition::create('integer')
         ->setSetting('size', 'big')

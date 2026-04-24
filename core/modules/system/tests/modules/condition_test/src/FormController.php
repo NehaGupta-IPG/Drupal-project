@@ -34,7 +34,7 @@ class FormController implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'condition_node_type_test_form';
   }
 
@@ -50,7 +50,7 @@ class FormController implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['#tree'] = TRUE;
     $form['entity_bundle'] = [];
     $subformState = SubformState::createForSubform($form['entity_bundle'], $form, $form_state);
@@ -70,7 +70,7 @@ class FormController implements FormInterface {
   /**
    * Implements \Drupal\Core\Form\FormInterface::validateForm().
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
     $subformState = SubformState::createForSubform($form['entity_bundle'], $form, $form_state);
     $this->condition->validateConfigurationForm($form['entity_bundle'], $subformState);
   }
@@ -78,7 +78,7 @@ class FormController implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $subformState = SubformState::createForSubform($form['entity_bundle'], $form, $form_state);
     $this->condition->submitConfigurationForm($form['entity_bundle'], $subformState);
     $subformState = SubformState::createForSubform($form['current_theme'], $form, $form_state);

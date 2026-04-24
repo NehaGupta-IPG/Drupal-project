@@ -19,7 +19,7 @@ class TestController {
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   The Json response value.
    */
-  public function simple() {
+  public function simple(): JsonResponse {
     return new JsonResponse(['some' => 'data']);
   }
 
@@ -29,7 +29,7 @@ class TestController {
    * @return array
    *   A render array with only '#markup'.
    */
-  public function html() {
+  public function html(): array {
     return [
       '#markup' => 'here',
     ];
@@ -44,7 +44,7 @@ class TestController {
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response.
    */
-  public function format(Request $request) {
+  public function format(Request $request): JsonResponse|Response {
     switch ($request->getRequestFormat()) {
       case 'json':
         return new JsonResponse(['some' => 'data']);
@@ -66,7 +66,7 @@ class TestController {
    * @return array
    *   The render array
    */
-  public function variable($plugin_id) {
+  public function variable($plugin_id): array {
     return [
       '#markup' => $plugin_id,
     ];

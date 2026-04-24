@@ -68,7 +68,7 @@ class TestFieldWidgetMultiple extends WidgetBase {
   /**
    * {@inheritdoc}
    */
-  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
+  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state): array {
     $values = [];
     foreach ($items as $item) {
       $values[] = $item->value;
@@ -84,14 +84,14 @@ class TestFieldWidgetMultiple extends WidgetBase {
   /**
    * {@inheritdoc}
    */
-  public function errorElement(array $element, ConstraintViolationInterface $violation, array $form, FormStateInterface $form_state) {
+  public function errorElement(array $element, ConstraintViolationInterface $violation, array $form, FormStateInterface $form_state): array {
     return $element;
   }
 
   /**
    * Element validation helper.
    */
-  public static function multipleValidate($element, FormStateInterface $form_state) {
+  public static function multipleValidate($element, FormStateInterface $form_state): void {
     $values = array_map('trim', explode(',', $element['#value']));
     $items = [];
     foreach ($values as $value) {
@@ -112,7 +112,7 @@ class TestFieldWidgetMultiple extends WidgetBase {
    *
    * @see \Drupal\Tests\field\Functional\EntityReference\EntityReferenceAdminTest::testAvailableFormatters
    */
-  public static function isApplicable(FieldDefinitionInterface $field_definition) {
+  public static function isApplicable(FieldDefinitionInterface $field_definition): bool {
     // Returns FALSE if machine name of the field equals field_onewidgetfield.
     return $field_definition->getName() != "field_onewidgetfield";
   }

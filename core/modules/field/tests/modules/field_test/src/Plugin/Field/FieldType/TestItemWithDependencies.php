@@ -26,7 +26,7 @@ class TestItemWithDependencies extends TestItem {
   /**
    * {@inheritdoc}
    */
-  public static function calculateDependencies(FieldDefinitionInterface $field_definition) {
+  public static function calculateDependencies(FieldDefinitionInterface $field_definition): array {
     return ['content' => ['node:article:uuid']];
   }
 

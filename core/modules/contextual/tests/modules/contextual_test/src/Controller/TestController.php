@@ -25,7 +25,7 @@ class TestController implements ContainerInjectionInterface {
    * @return array
    *   Render array.
    */
-  public function render() {
+  public function render(): array {
     return [
       '#type' => 'markup',
       '#markup' => 'Everything is contextual!',

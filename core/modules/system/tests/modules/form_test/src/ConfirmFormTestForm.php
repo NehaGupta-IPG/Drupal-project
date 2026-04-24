@@ -18,7 +18,7 @@ class ConfirmFormTestForm extends ConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_confirm_test_form';
   }
 
@@ -32,7 +32,7 @@ class ConfirmFormTestForm extends ConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getCancelUrl() {
+  public function getCancelUrl(): Url {
     return new Url('form_test.route8');
   }
 
@@ -69,7 +69,7 @@ class ConfirmFormTestForm extends ConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->messenger()->addStatus($this->t('The ConfirmFormTestForm::submitForm() method was used for this form.'));
     $form_state->setRedirect('<front>');
   }

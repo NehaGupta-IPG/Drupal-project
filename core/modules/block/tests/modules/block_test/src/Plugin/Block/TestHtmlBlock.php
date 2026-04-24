@@ -20,7 +20,7 @@ class TestHtmlBlock extends BlockBase {
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public function build(): array {
     return [
       '#attributes' => \Drupal::keyvalue('block_test')->get('attributes'),
       '#children' => \Drupal::keyValue('block_test')->get('content'),

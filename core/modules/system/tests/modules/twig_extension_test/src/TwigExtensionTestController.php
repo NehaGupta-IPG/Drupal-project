@@ -15,7 +15,7 @@ class TwigExtensionTestController {
   /**
    * Menu callback for testing Twig filters in a Twig template.
    */
-  public function testFilterRender() {
+  public function testFilterRender(): array {
     return [
       '#theme' => 'twig_extension_test_filter',
       '#message' => 'Every animal is not a mineral.',
@@ -30,7 +30,7 @@ class TwigExtensionTestController {
   /**
    * Menu callback for testing Twig functions in a Twig template.
    */
-  public function testFunctionRender() {
+  public function testFunctionRender(): array {
     return ['#theme' => 'twig_extension_test_function'];
   }
 

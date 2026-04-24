@@ -18,18 +18,18 @@ class DummyRemoteStreamWrapper extends PublicStream {
   /**
    * {@inheritdoc}
    */
-  public function getName() {
+  public function getName(): string {
     return 'Dummy files (remote)';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getDescription() {
+  public function getDescription(): string {
     return 'Dummy wrapper for testing (remote).';
   }
 
-  public function realpath() {
+  public function realpath(): bool {
     return FALSE;
   }
 

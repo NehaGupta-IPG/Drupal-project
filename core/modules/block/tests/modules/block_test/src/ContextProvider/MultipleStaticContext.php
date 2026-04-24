@@ -45,7 +45,7 @@ class MultipleStaticContext implements ContextProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRuntimeContexts(array $unqualified_context_ids) {
+  public function getRuntimeContexts(array $unqualified_context_ids): array {
     $current_user = $this->userStorage->load($this->account->id());
 
     $context1 = EntityContext::fromEntity($current_user, 'User A');
@@ -66,7 +66,7 @@ class MultipleStaticContext implements ContextProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getAvailableContexts() {
+  public function getAvailableContexts(): array {
     return $this->getRuntimeContexts([]);
   }
 

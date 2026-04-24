@@ -18,14 +18,14 @@ class FormTestTextareaForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return '_test_textarea_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
 
     foreach (['vertical', 'horizontal', 'both', 'none'] as $resizableMode) {
       $id = 'textarea_resizable_' . $resizableMode;

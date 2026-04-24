@@ -52,12 +52,23 @@ class MenuTestController extends ControllerBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container): static {
+    return new static(
+      $container->get('theme.manager'),
+      $container->get('theme.negotiator'),
+      $container->get('current_route_match')
+    );
+  }
+
+  /**
    * Some known placeholder content which can be used for testing.
    *
    * @return string
    *   A string that can be used for comparison.
    */
-  public function menuTestCallback() {
+  public function menuTestCallback(): array {
     return ['#markup' => 'This is the menuTestCallback content.'];
   }
 
@@ -72,7 +83,7 @@ class MenuTestController extends ControllerBase {
    * @return string
    *   The route title.
    */
-  public function titleCallback(array $_title_arguments = [], $_title = '') {
+  public function titleCallback(array $_title_arguments = [], $_title = ''): string {
     $_title_arguments += ['case_number' => '2', 'title' => $_title];
     // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
     return $this->t($_title_arguments['title']) . ' - Case ' . $_title_arguments['case_number'];
@@ -90,7 +101,7 @@ class MenuTestController extends ControllerBase {
    *   theme being used
    *   for the current page request.
    */
-  public function themePage($inherited) {
+  public function themePage($inherited): array {
     $theme_key = $this->themeManager->getActiveTheme()->getName();
     // Now we check what the theme negotiator service returns.
     $active_theme = $this->themeNegotiator
@@ -108,7 +119,7 @@ class MenuTestController extends ControllerBase {
    * @return string
    *   A string that can be used for comparison.
    */
-  public function breadcrumbTitleCallback() {
+  public function breadcrumbTitleCallback(): string {
     return '<script>alert(123);</script>';
   }
 

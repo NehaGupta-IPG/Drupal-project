@@ -19,43 +19,43 @@ class TestControllers {
 
   const LONG_TEXT = 'This is text long enough to trigger Apache mod_deflate to add a `vary: accept-encoding` header to the response.';
 
-  public function test() {
+  public function test(): Response {
     return new Response('test');
   }
 
-  public function test1() {
+  public function test1(): Response {
     return new Response(self::LONG_TEXT);
   }
 
-  public function test2() {
+  public function test2(): array {
     return ['#markup' => "test2"];
   }
 
-  public function test3($value) {
+  public function test3($value): array {
     return ['#markup' => $value];
   }
 
-  public function test4($value) {
+  public function test4($value): array {
     return ['#markup' => $value];
   }
 
-  public function test5() {
+  public function test5(): array {
     return ['#markup' => "test5"];
   }
 
-  public function test6() {
+  public function test6(): Response {
     return new Response('test6');
   }
 
-  public function test7() {
+  public function test7(): Response {
     return new Response('test7text');
   }
 
-  public function test8() {
+  public function test8(): Response {
     return new Response('test8');
   }
 
-  public function test9($uid) {
+  public function test9($uid): Response {
     $text = 'Route not matched.';
     try {
       $match = \Drupal::service('router.no_access_checks')->match('/user/' . $uid);
@@ -74,12 +74,12 @@ class TestControllers {
    * Passes unsafe HTML as an argument to a method which throws an exception.
    * This can be used to test if the generated backtrace is properly escaped.
    */
-  public function test10() {
+  public function test10(): void {
     $this->removeExceptionLogger();
     $this->throwException('<script>alert(\'xss\')</script>');
   }
 
-  public function test18() {
+  public function test18(): array {
     return [
       '#cache' => [
         'contexts' => ['url'],
@@ -92,20 +92,20 @@ class TestControllers {
     ];
   }
 
-  public function test21() {
+  public function test21(): CacheableResponse {
     return new CacheableResponse('test21');
   }
 
-  public function test23() {
+  public function test23(): Psr7Response {
     return new Psr7Response(200, [], 'test23');
   }
 
-  public function test24() {
+  public function test24(): void {
     $this->removeExceptionLogger();
     throw new \Exception('Escaped content: <p> <br> <h3>');
   }
 
-  public function test25() {
+  public function test25(): array {
     return [
       '#cache' => [
         'url',
@@ -114,7 +114,7 @@ class TestControllers {
     ];
   }
 
-  public function testRouteName(Request $request) {
+  public function testRouteName(Request $request): array {
     return [
       '#markup' => $request->attributes->get(RouteObjectInterface::ROUTE_NAME),
     ];
@@ -129,7 +129,7 @@ class TestControllers {
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response.
    */
-  public function rejectsQueryStrings(Request $request) {
+  public function rejectsQueryStrings(Request $request): Response {
     return new Response('', $request->query->keys() ? Response::HTTP_BAD_REQUEST : Response::HTTP_OK);
   }
 
@@ -142,7 +142,7 @@ class TestControllers {
    * @throws \Exception
    *   Always thrown.
    */
-  protected function throwException($message) {
+  protected function throwException($message): never {
     throw new \Exception($message);
   }
 

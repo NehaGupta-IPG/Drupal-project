@@ -17,14 +17,14 @@ class FilterTestFormatForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'filter_test_format_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     // This ensures that the parent array key makes it into the HTML ID of the
     // form elements.
     $form['#tree'] = TRUE;

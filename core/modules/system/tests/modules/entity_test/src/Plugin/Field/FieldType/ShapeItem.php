@@ -75,7 +75,7 @@ class ShapeItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public function isEmpty() {
+  public function isEmpty(): bool {
     $item = $this->getValue();
     return empty($item['shape']) && empty($item['color']);
   }
@@ -83,7 +83,7 @@ class ShapeItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public static function mainPropertyName() {
+  public static function mainPropertyName(): string {
     return 'shape';
   }
 

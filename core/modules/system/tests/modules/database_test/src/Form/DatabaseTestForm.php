@@ -21,14 +21,14 @@ class DatabaseTestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'database_test_theme_tablesort';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $header = [
       'username' => ['data' => $this->t('Username'), 'field' => 'u.name'],
       'status' => ['data' => $this->t('Status'), 'field' => 'u.status'],

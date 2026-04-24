@@ -17,14 +17,14 @@ class FormTestFormStateValuesCleanAdvancedForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_form_state_clean_values_advanced_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     // Build an example form containing a managed file and a submit form
     // element.
     $form['image'] = [
@@ -43,7 +43,7 @@ class FormTestFormStateValuesCleanAdvancedForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $form_state->cleanValues();
     print $this->t('You WIN!');
     exit;

@@ -12,7 +12,7 @@ class BasicAuthTestController {
   /**
    * @see \Drupal\basic_auth\Tests\Authentication\BasicAuthTest::testControllerNotCalledBeforeAuth()
    */
-  public function modifyState() {
+  public function modifyState(): array {
     \Drupal::state()->set('basic_auth_test.state.controller_executed', TRUE);
     return ['#markup' => 'Done'];
   }
@@ -20,7 +20,7 @@ class BasicAuthTestController {
   /**
    * @see \Drupal\basic_auth\Tests\Authentication\BasicAuthTest::testControllerNotCalledBeforeAuth()
    */
-  public function readState() {
+  public function readState(): array {
     // Mark this page as being uncacheable.
     \Drupal::service('page_cache_kill_switch')->trigger();
 

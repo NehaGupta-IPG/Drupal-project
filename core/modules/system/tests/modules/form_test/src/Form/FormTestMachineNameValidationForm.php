@@ -15,14 +15,14 @@ class FormTestMachineNameValidationForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_machine_name_validation_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     // Disable client-side validation so that we can test AJAX requests with
     // invalid input.
     $form['#attributes']['novalidate'] = 'novalidate';
@@ -101,14 +101,14 @@ class FormTestMachineNameValidationForm extends FormBase {
   /**
    * Validate callback that forces a form rebuild.
    */
-  public function buildAjaxSnackConfigureFormValidate(array $form, FormStateInterface $form_state) {
+  public function buildAjaxSnackConfigureFormValidate(array $form, FormStateInterface $form_state): void {
     $form_state->set('id', $form_state->getValue('id'));
   }
 
   /**
    * Submit callback that forces a form rebuild.
    */
-  public function buildAjaxSnackConfigureFormSubmit(array $form, FormStateInterface $form_state) {
+  public function buildAjaxSnackConfigureFormSubmit(array $form, FormStateInterface $form_state): void {
     $form_state->setRebuild();
   }
 
@@ -128,7 +128,7 @@ class FormTestMachineNameValidationForm extends FormBase {
    * @return bool
    *   TRUE if the machine name is a duplicate, FALSE otherwise.
    */
-  public function load($machine_name) {
+  public function load($machine_name): bool {
     if (str_contains($machine_name, 'duplicate')) {
       return TRUE;
     }
@@ -139,7 +139,7 @@ class FormTestMachineNameValidationForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->messenger()->addStatus('The form_test_machine_name_validation_form form has been submitted successfully.');
   }
 

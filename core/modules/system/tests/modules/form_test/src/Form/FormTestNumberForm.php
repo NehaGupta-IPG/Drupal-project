@@ -17,14 +17,14 @@ class FormTestNumberForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_number';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $element = 'number') {
+  public function buildForm(array $form, FormStateInterface $form_state, $element = 'number'): array {
     $base = [
       '#type' => $element,
     ];

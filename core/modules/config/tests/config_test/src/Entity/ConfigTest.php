@@ -111,7 +111,7 @@ class ConfigTest extends ConfigEntityBase implements ConfigTestInterface {
   /**
    * {@inheritdoc}
    */
-  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+  public function postSave(EntityStorageInterface $storage, $update = TRUE): void {
     // Used to test secondary writes during config sync.
     if ($this->id() == 'primary') {
       $secondary = $storage->create([
@@ -129,7 +129,7 @@ class ConfigTest extends ConfigEntityBase implements ConfigTestInterface {
   /**
    * {@inheritdoc}
    */
-  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+  public static function postDelete(EntityStorageInterface $storage, array $entities): void {
     parent::postDelete($storage, $entities);
     foreach ($entities as $entity) {
       if ($entity->id() == 'dependency') {
@@ -142,7 +142,7 @@ class ConfigTest extends ConfigEntityBase implements ConfigTestInterface {
   /**
    * {@inheritdoc}
    */
-  public function calculateDependencies() {
+  public function calculateDependencies(): static {
     parent::calculateDependencies();
     if ($module = \Drupal::state()->get('config_test_new_dependency', FALSE)) {
       $this->addDependency('module', $module);
@@ -193,7 +193,7 @@ class ConfigTest extends ConfigEntityBase implements ConfigTestInterface {
    *
    * @see \Drupal\Core\Config\Entity\ConfigDependencyManager
    */
-  public function setEnforcedDependencies(array $dependencies) {
+  public function setEnforcedDependencies(array $dependencies): static {
     $this->dependencies['enforced'] = $dependencies;
     return $this;
   }
@@ -201,7 +201,7 @@ class ConfigTest extends ConfigEntityBase implements ConfigTestInterface {
   /**
    * {@inheritdoc}
    */
-  public function isInstallable() {
+  public function isInstallable(): bool {
     return $this->id != 'is_installable' || \Drupal::state()->get('config_test.is_installable');
   }
 

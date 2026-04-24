@@ -17,7 +17,7 @@ class PositionShimTestController extends ControllerBase {
    * @return array
    *   The render array.
    */
-  public function build() {
+  public function build(): array {
     return [
       'reference1' => [
         '#type' => 'container',

@@ -23,7 +23,7 @@ class TestBlockInstantiation extends BlockBase {
   /**
    * {@inheritdoc}
    */
-  public function defaultConfiguration() {
+  public function defaultConfiguration(): array {
     return [
       'display_message' => 'no message set',
     ];
@@ -51,14 +51,14 @@ class TestBlockInstantiation extends BlockBase {
   /**
    * {@inheritdoc}
    */
-  public function blockSubmit($form, FormStateInterface $form_state) {
+  public function blockSubmit($form, FormStateInterface $form_state): void {
     $this->configuration['display_message'] = $form_state->getValue('display_message');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public function build(): array {
     return [
       '#children' => $this->configuration['display_message'],
     ];

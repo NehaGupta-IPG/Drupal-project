@@ -30,7 +30,7 @@ class LayoutTestPlugin extends LayoutDefault implements PluginFormInterface {
   /**
    * {@inheritdoc}
    */
-  public function defaultConfiguration() {
+  public function defaultConfiguration(): array {
     return [
       'setting_1' => 'Default',
     ];
@@ -39,7 +39,7 @@ class LayoutTestPlugin extends LayoutDefault implements PluginFormInterface {
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
     $form['setting_1'] = [
       '#type' => 'textfield',
       '#title' => 'Blah',
@@ -51,7 +51,7 @@ class LayoutTestPlugin extends LayoutDefault implements PluginFormInterface {
   /**
    * {@inheritdoc}
    */
-  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
+  public function validateConfigurationForm(array &$form, FormStateInterface $form_state): void {
     if ($form_state->getValue('setting_1') === 'Test Validation Error Message') {
       $form_state->setErrorByName('setting_1', 'Validation Error Message');
     }
@@ -60,7 +60,7 @@ class LayoutTestPlugin extends LayoutDefault implements PluginFormInterface {
   /**
    * {@inheritdoc}
    */
-  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
     $this->configuration['setting_1'] = $form_state->getValue('setting_1');
   }
 

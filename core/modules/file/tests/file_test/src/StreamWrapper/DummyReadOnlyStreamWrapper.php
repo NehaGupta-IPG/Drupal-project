@@ -16,18 +16,18 @@ class DummyReadOnlyStreamWrapper extends LocalReadOnlyStream {
   /**
    * {@inheritdoc}
    */
-  public function getName() {
+  public function getName(): string {
     return 'Dummy files (readonly)';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getDescription() {
+  public function getDescription(): string {
     return 'Dummy wrapper for testing (readonly).';
   }
 
-  public function getDirectoryPath() {
+  public function getDirectoryPath(): string {
     return \Drupal::getContainer()->getParameter('site.path') . '/files';
   }
 
@@ -36,7 +36,7 @@ class DummyReadOnlyStreamWrapper extends LocalReadOnlyStream {
    *
    * Return a dummy path for testing.
    */
-  public function getInternalUri() {
+  public function getInternalUri(): string {
     return '/dummy/example.txt';
   }
 
@@ -45,7 +45,7 @@ class DummyReadOnlyStreamWrapper extends LocalReadOnlyStream {
    *
    * Return the HTML URI of a public file.
    */
-  public function getExternalUrl() {
+  public function getExternalUrl(): string {
     return '/dummy/example.txt';
   }
 

@@ -17,14 +17,14 @@ class FormTestDetailsForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_details_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['meta'] = [
       '#type' => 'details',
       '#title' => 'Details element',
@@ -37,7 +37,7 @@ class FormTestDetailsForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
     $form_state->setErrorByName('meta', 'I am an error on the details element.');
   }
 

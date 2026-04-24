@@ -32,7 +32,7 @@ class TestController extends ControllerBase {
    * @return string[]
    *   A render array.
    */
-  public function showModuleInfo(string $module, string $function) {
+  public function showModuleInfo(string $module, string $function): array {
     $module_handler = \Drupal::moduleHandler();
     $module_message = $module . ': ';
     if ($module_handler->moduleExists($module)) {
@@ -55,7 +55,7 @@ class TestController extends ControllerBase {
    * @return array
    *   A render array.
    */
-  public function containerReset() {
+  public function containerReset(): array {
     $this->messenger()->addMessage($this->t('Before the container was reset.'));
     $this->kernel->resetContainer();
     // The container has been reset, therefore we need to get the new service.

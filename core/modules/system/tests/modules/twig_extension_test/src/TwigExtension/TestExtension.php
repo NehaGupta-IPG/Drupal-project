@@ -61,7 +61,7 @@ class TestExtension extends AbstractExtension {
    * @return string
    *   A unique identifier for this Twig extension.
    */
-  public function getName() {
+  public function getName(): string {
     return 'twig_extension_test.test_extension';
   }
 
@@ -82,7 +82,7 @@ class TestExtension extends AbstractExtension {
    *
    * @see \Drupal\system\Tests\Theme\TwigExtensionTest::testTwigExtensionFunction()
    */
-  public static function testFunction($upperCase = FALSE) {
+  public static function testFunction($upperCase = FALSE): string {
     $string = "The quick brown box jumps over the lazy dog 123.";
     if ($upperCase == TRUE) {
       return strtoupper($string);
@@ -103,7 +103,7 @@ class TestExtension extends AbstractExtension {
    *
    * @see \Drupal\system\Tests\Theme\TwigExtensionTest::testTwigExtensionFilter()
    */
-  public static function testFilter($string) {
+  public static function testFilter($string): string {
     return str_replace(['animal'], ['plant'], $string);
   }
 

@@ -17,7 +17,7 @@ class TestPageTestController {
   /**
    * Returns a test page and sets the title.
    */
-  public function testPage() {
+  public function testPage(): array {
     $link_text = $this->t('Visually identical test links');
     return [
       '#title' => $this->t('Test page'),
@@ -33,7 +33,7 @@ class TestPageTestController {
   /**
    * Returns a test page and with the call to the dump() function.
    */
-  public function testPageVarDump() {
+  public function testPageVarDump(): array {
     $role = Role::create(['id' => 'test_role', 'label' => 'Test role']);
     dump($role);
     return [

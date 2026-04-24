@@ -27,14 +27,14 @@ class FormTestValidateForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_validate_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $object = new Callbacks();
 
     $form['name'] = [
@@ -54,7 +54,7 @@ class FormTestValidateForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
     if ($form_state->getValue('name') == 'validate') {
       // Alter the form element.
       $form['name']['#value'] = '#value changed by #validate';

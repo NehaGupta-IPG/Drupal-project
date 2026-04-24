@@ -54,7 +54,7 @@ class AjaxTestController {
    * @return array
    *   Renderable array of AJAX response contents.
    */
-  public function renderTypes($type) {
+  public function renderTypes($type): array {
     return [
       '#title' => '<em>AJAX Dialog & contents</em>',
       'content' => [
@@ -176,7 +176,7 @@ class AjaxTestController {
    * Verifies that the response incorporates JavaScript settings generated
    * during the page request by adding a dummy setting.
    */
-  public function render() {
+  public function render(): array {
     return [
       '#attached' => [
         'library' => [
@@ -192,7 +192,7 @@ class AjaxTestController {
   /**
    * Returns the used theme.
    */
-  public function theme() {
+  public function theme(): array {
     return [
       '#markup' => 'Current theme: ' . \Drupal::theme()->getActiveTheme()->getName(),
     ];
@@ -203,7 +203,7 @@ class AjaxTestController {
    *
    * Helps verifying AjaxResponse reorders commands to ensure correct execution.
    */
-  public function order() {
+  public function order(): AjaxResponse {
     $response = new AjaxResponse();
     // HTML insertion command.
     $response->addCommand(new HtmlCommand('body', 'Hello, world!'));
@@ -222,7 +222,7 @@ class AjaxTestController {
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   The JSON response object.
    */
-  public function renderError(Request $request) {
+  public function renderError(Request $request): AjaxResponse {
     $message = '';
     $query = $request->query;
     if ($query->has('message')) {
@@ -344,7 +344,7 @@ class AjaxTestController {
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   The JSON response object.
    */
-  public function dialogClose() {
+  public function dialogClose(): AjaxResponse {
     $response = new AjaxResponse();
     $response->addCommand(new CloseDialogCommand('#ajax-test-dialog-wrapper-1'));
     return $response;
@@ -394,7 +394,7 @@ class AjaxTestController {
    * @return array
    *   The render array.
    */
-  public function globalEvents() {
+  public function globalEvents(): array {
     return [
       '#attached' => [
         'library' => [
@@ -415,7 +415,7 @@ class AjaxTestController {
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   The JSON response object.
    */
-  public function globalEventsClearLog() {
+  public function globalEventsClearLog(): AjaxResponse {
     $response = new AjaxResponse();
     $response->addCommand(new HtmlCommand('#test_global_events_log', ''));
     return $response;
@@ -427,7 +427,7 @@ class AjaxTestController {
    * @throws \Exception
    *   The expected exception.
    */
-  public function throwException() {
+  public function throwException(): never {
     throw new \Exception('This is an exception.');
   }
 
@@ -437,7 +437,7 @@ class AjaxTestController {
    * @return array
    *   The Ajax link.
    */
-  public function exceptionLink() {
+  public function exceptionLink(): array {
     return [
       '#type' => 'link',
       '#url' => Url::fromRoute('ajax_test.throw_exception'),

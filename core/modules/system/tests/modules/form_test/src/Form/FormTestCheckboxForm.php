@@ -18,14 +18,14 @@ class FormTestCheckboxForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return '_test_checkbox_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     // A required checkbox.
     $form['required_checkbox'] = [
       '#type' => 'checkbox',
@@ -93,7 +93,7 @@ class FormTestCheckboxForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $form_state->setResponse(new JsonResponse($form_state->getValues()));
   }
 

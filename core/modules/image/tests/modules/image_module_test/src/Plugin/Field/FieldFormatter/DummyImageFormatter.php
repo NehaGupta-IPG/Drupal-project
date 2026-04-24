@@ -24,7 +24,7 @@ class DummyImageFormatter extends FormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function viewElements(FieldItemListInterface $items, $langcode) {
+  public function viewElements(FieldItemListInterface $items, $langcode): array {
     return [
       ['#markup' => 'Dummy'],
     ];

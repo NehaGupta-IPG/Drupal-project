@@ -42,14 +42,14 @@ class TestLazyPluginCollection extends LazyPluginCollection {
   /**
    * {@inheritdoc}
    */
-  public function getConfiguration() {
+  public function getConfiguration(): array {
     return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setConfiguration($configuration) {
+  public function setConfiguration($configuration): static {
     return $this;
   }
 

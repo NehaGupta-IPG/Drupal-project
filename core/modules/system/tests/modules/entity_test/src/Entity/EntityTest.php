@@ -64,7 +64,7 @@ class EntityTest extends ContentEntityBase implements EntityOwnerInterface {
   /**
    * {@inheritdoc}
    */
-  public static function preCreate(EntityStorageInterface $storage, array &$values) {
+  public static function preCreate(EntityStorageInterface $storage, array &$values): void {
     parent::preCreate($storage, $values);
     if (empty($values['type'])) {
       $values['type'] = $storage->getEntityTypeId();
@@ -136,7 +136,7 @@ class EntityTest extends ContentEntityBase implements EntityOwnerInterface {
   /**
    * {@inheritdoc}
    */
-  public function setOwnerId($uid) {
+  public function setOwnerId($uid): static {
     $this->set('user_id', $uid);
     return $this;
   }
@@ -144,7 +144,7 @@ class EntityTest extends ContentEntityBase implements EntityOwnerInterface {
   /**
    * {@inheritdoc}
    */
-  public function setOwner(UserInterface $account) {
+  public function setOwner(UserInterface $account): static {
     $this->set('user_id', $account->id());
     return $this;
   }
@@ -157,7 +157,7 @@ class EntityTest extends ContentEntityBase implements EntityOwnerInterface {
    *
    * @return $this
    */
-  public function setName($name) {
+  public function setName($name): static {
     $this->set('name', $name);
     return $this;
   }

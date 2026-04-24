@@ -32,6 +32,13 @@ class TestController extends ControllerBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container): static {
+    return new static($container->get('token'));
+  }
+
+  /**
    * Provides a token replacement with a node as well as the current user.
    *
    * This controller passes an explicit bubbleable metadata object to

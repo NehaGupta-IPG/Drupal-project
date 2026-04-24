@@ -17,14 +17,14 @@ class FormTestGroupFieldsetForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_group_fieldset';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $required = FALSE) {
+  public function buildForm(array $form, FormStateInterface $form_state, $required = FALSE): array {
     $form['fieldset'] = [
       '#type' => 'fieldset',
       '#title' => 'Fieldset',

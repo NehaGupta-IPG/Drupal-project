@@ -18,14 +18,14 @@ class FormTestEmailForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_email';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['email'] = [
       '#type' => 'email',
       '#title' => 'Email address',
@@ -47,7 +47,7 @@ class FormTestEmailForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $form_state->setResponse(new JsonResponse($form_state->getValues()));
   }
 

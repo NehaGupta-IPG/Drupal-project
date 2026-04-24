@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\router_test;
 
+use Symfony\Component\HttpFoundation\Response;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\user\UserInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,9 +30,16 @@ class TestContent extends ControllerBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container): static {
+    return new static($container->get('http_kernel'));
+  }
+
+  /**
    * Provides example content for testing route enhancers.
    */
-  public function test1() {
+  public function test1(): array {
     return ['#markup' => 'abcde'];
   }
 
@@ -41,12 +49,12 @@ class TestContent extends ControllerBase {
    * @return string
    *   The user name of the current logged in user.
    */
-  public function test11() {
+  public function test11(): array {
     $account = $this->currentUser();
     return ['#markup' => $account->getAccountName()];
   }
 
-  public function testAccount(UserInterface $user) {
+  public function testAccount(UserInterface $user): array {
     $current_user_name = $this->currentUser()->getAccountName();
     $this->currentUser()->setAccount($user);
     return ['#markup' => $current_user_name . ':' . $user->getAccountName()];
@@ -55,7 +63,7 @@ class TestContent extends ControllerBase {
   /**
    * Uses a subrequest to determine the content.
    */
-  public function subrequestTest(UserInterface $user) {
+  public function subrequestTest(UserInterface $user): Response {
     $request = \Drupal::request();
     $request = Request::create('/router_test/test13/' . $user->id(), 'GET', $request->query->all(), $request->cookies->all(), [], $request->server->all());
 

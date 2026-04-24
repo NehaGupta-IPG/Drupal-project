@@ -25,7 +25,7 @@ class TestHtmlMailCollector extends TestMailCollector {
   /**
    * {@inheritdoc}
    */
-  public function format(array $message) {
+  public function format(array $message): array {
     // Join the body array into one string.
     $message['body'] = implode(PHP_EOL, $message['body']);
     // Wrap the mail body for sending.

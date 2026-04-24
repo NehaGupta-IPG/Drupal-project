@@ -274,7 +274,7 @@ class SessionTestController extends ControllerBase {
       'primary key' => ['sid'],
     ]);
 
-    drupal_register_shutdown_function(function () {
+    drupal_register_shutdown_function(function (): void {
       $schema = \Drupal::database()->schema();
       $schema->dropTable('sessions');
       $schema->renameTable('sessions_tmp', 'sessions');

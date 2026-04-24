@@ -15,14 +15,14 @@ class TwigThemeTestController {
   /**
    * Menu callback for testing PHP variables in a Twig template.
    */
-  public function phpVariablesRender() {
+  public function phpVariablesRender(): array {
     return ['#markup' => \Drupal::theme()->render('twig_theme_test_php_variables', [])];
   }
 
   /**
    * Menu callback for testing translation blocks in a Twig template.
    */
-  public function transBlockRender() {
+  public function transBlockRender(): array {
     return [
       '#theme' => 'twig_theme_test_trans',
     ];
@@ -31,7 +31,7 @@ class TwigThemeTestController {
   /**
    * Controller for testing the twig placeholder filter outside of {% trans %}.
    */
-  public function placeholderOutsideTransRender() {
+  public function placeholderOutsideTransRender(): array {
     return [
       '#theme' => 'twig_theme_test_placeholder_outside_trans',
       '#var' => '<script>alert(123);</script>',
@@ -41,7 +41,7 @@ class TwigThemeTestController {
   /**
    * Renders for testing url_generator functions in a Twig template.
    */
-  public function urlGeneratorRender() {
+  public function urlGeneratorRender(): array {
     return [
       '#theme' => 'twig_theme_test_url_generator',
     ];
@@ -50,7 +50,7 @@ class TwigThemeTestController {
   /**
    * Renders for testing link_generator functions in a Twig template.
    */
-  public function linkGeneratorRender() {
+  public function linkGeneratorRender(): array {
     return [
       '#theme' => 'twig_theme_test_link_generator',
       '#test_url' => new Url('user.register', [], ['absolute' => TRUE]),
@@ -64,7 +64,7 @@ class TwigThemeTestController {
   /**
    * Renders a URL to a string.
    */
-  public function urlToStringRender() {
+  public function urlToStringRender(): array {
     return [
       '#theme' => 'twig_theme_test_url_to_string',
       '#test_url' => Url::fromRoute('user.register'),
@@ -74,7 +74,7 @@ class TwigThemeTestController {
   /**
    * Renders for testing file_url functions in a Twig template.
    */
-  public function fileUrlRender() {
+  public function fileUrlRender(): array {
     return [
       '#theme' => 'twig_theme_test_file_url',
     ];
@@ -83,7 +83,7 @@ class TwigThemeTestController {
   /**
    * Renders for testing attach_library functions in a Twig template.
    */
-  public function attachLibraryRender() {
+  public function attachLibraryRender(): array {
     return [
       '#theme' => 'twig_theme_test_attach_library',
     ];
@@ -92,14 +92,14 @@ class TwigThemeTestController {
   /**
    * Menu callback for testing the Twig registry loader.
    */
-  public function registryLoaderRender() {
+  public function registryLoaderRender(): array {
     return ['#theme' => 'twig_registry_loader_test'];
   }
 
   /**
    * Controller for testing a renderable inside a template.
    */
-  public function renderable() {
+  public function renderable(): array {
     return [
       '#theme' => 'twig_theme_test_renderable',
       '#renderable' => new ExampleRenderable(),
@@ -109,14 +109,14 @@ class TwigThemeTestController {
   /**
    * Renders for testing the embed tag in a Twig template.
    */
-  public function embedTagRender() {
+  public function embedTagRender(): array {
     return ['#theme' => 'twig_theme_test_embed_tag'];
   }
 
   /**
    * Renders for testing drupal_dump function.
    */
-  public function dump() {
+  public function dump(): array {
     return ['#theme' => 'twig_theme_test_dump'];
   }
 

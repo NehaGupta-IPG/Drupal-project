@@ -60,6 +60,19 @@ class AjaxFormBlock extends BlockBase implements FormInterface, ContainerFactory
   /**
    * {@inheritdoc}
    */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('form_builder'),
+      $container->get('messenger')
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function build() {
     return $this->formBuilder->getForm($this);
   }
@@ -67,14 +80,14 @@ class AjaxFormBlock extends BlockBase implements FormInterface, ContainerFactory
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'ajax_forms_test_block';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['test1'] = [
       '#type' => 'select',
       '#title' => $this->t('Test 1'),
@@ -129,7 +142,7 @@ class AjaxFormBlock extends BlockBase implements FormInterface, ContainerFactory
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->messenger->addStatus('Submission successful.');
   }
 

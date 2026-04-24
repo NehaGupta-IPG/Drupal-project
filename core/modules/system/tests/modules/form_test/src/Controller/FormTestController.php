@@ -45,7 +45,7 @@ class FormTestController extends ControllerBase {
    * testing whether \Drupal::formBuilder()->setCache() prevents resaving of
    * immutable forms.
    */
-  public function storageLegacyHandler($form_build_id) {
+  public function storageLegacyHandler($form_build_id): JsonResponse {
     $form_state = new FormState();
     $form = $this->formBuilder()->getCache($form_build_id, $form_state);
     $result = [

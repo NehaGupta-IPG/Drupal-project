@@ -17,14 +17,14 @@ class FormTestVerticalTabsWithSummaryForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return '_form_test_vertical_tabs_with_summary_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
 
     $form['information'] = [
       '#type' => 'vertical_tabs',

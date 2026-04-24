@@ -19,14 +19,14 @@ class FormTestDescriptionForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_description_display';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['form_textfield_test_description_before'] = [
       '#type' => 'textfield',
       '#title' => 'Textfield test for description before element',
@@ -57,7 +57,7 @@ class FormTestDescriptionForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     // The test that uses this form does not submit the form so this is empty.
   }
 

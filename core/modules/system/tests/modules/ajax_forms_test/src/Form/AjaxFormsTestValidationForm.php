@@ -18,14 +18,14 @@ class AjaxFormsTestValidationForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'ajax_forms_test_validation_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['driver_text'] = [
       '#title' => $this->t('AJAX-enabled textfield.'),
       '#description' => $this->t("When this one AJAX-triggers and the spare required field is empty, you should not get an error."),
@@ -69,7 +69,7 @@ class AjaxFormsTestValidationForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->messenger()->addStatus($this->t("Validation form submitted"));
   }
 

@@ -18,14 +18,14 @@ class AjaxFormsTestAjaxElementsForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'ajax_forms_test_ajax_elements_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['date'] = [
       '#type' => 'date',
       '#ajax' => [

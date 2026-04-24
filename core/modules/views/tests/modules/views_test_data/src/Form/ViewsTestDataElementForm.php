@@ -17,14 +17,14 @@ class ViewsTestDataElementForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'views_test_data_element_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['view'] = [
       '#type' => 'view',
       '#name' => 'test_view_embed',

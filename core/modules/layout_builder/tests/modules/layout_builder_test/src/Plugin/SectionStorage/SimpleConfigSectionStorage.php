@@ -64,6 +64,18 @@ class SimpleConfigSectionStorage extends PluginBase implements SectionStorageInt
   /**
    * {@inheritdoc}
    */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('config.factory')
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getStorageType() {
     return $this->getPluginId();
   }
@@ -103,7 +115,7 @@ class SimpleConfigSectionStorage extends PluginBase implements SectionStorageInt
   /**
    * {@inheritdoc}
    */
-  protected function setSections(array $sections) {
+  protected function setSections(array $sections): static {
     $this->sections = array_values($sections);
     return $this;
   }
@@ -125,7 +137,7 @@ class SimpleConfigSectionStorage extends PluginBase implements SectionStorageInt
   /**
    * {@inheritdoc}
    */
-  public function buildRoutes(RouteCollection $collection) {
+  public function buildRoutes(RouteCollection $collection): void {
     $this->buildLayoutRoutes($collection, $this->getPluginDefinition(), 'layout-builder-test-simple-config/{id}');
   }
 
@@ -194,7 +206,7 @@ class SimpleConfigSectionStorage extends PluginBase implements SectionStorageInt
   /**
    * {@inheritdoc}
    */
-  public function isApplicable(RefinableCacheableDependencyInterface $cacheability) {
+  public function isApplicable(RefinableCacheableDependencyInterface $cacheability): bool {
     return TRUE;
   }
 

@@ -34,7 +34,7 @@ class Service {
    * @return bool
    *   TRUE if the services is decorated, FALSE if not.
    */
-  public function isDecorated() {
+  public function isDecorated(): bool {
     return isset($this->inner);
   }
 

@@ -15,7 +15,7 @@ class TestLocalAction5 extends LocalActionDefault {
   /**
    * {@inheritdoc}
    */
-  public function getTitle(?Request $request = NULL) {
+  public function getTitle(?Request $request = NULL): string {
     return "<script>alert('Welcome to the jungle!')</script>";
   }
 

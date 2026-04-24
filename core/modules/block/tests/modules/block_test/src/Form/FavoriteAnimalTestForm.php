@@ -17,14 +17,14 @@ class FavoriteAnimalTestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'block_test_form_favorite_animal_test';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['favorite_animal'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Your favorite animal.'),
@@ -41,7 +41,7 @@ class FavoriteAnimalTestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->messenger()->addStatus($this->t('Your favorite animal is: @favorite_animal', ['@favorite_animal' => $form['favorite_animal']['#value']]));
   }
 

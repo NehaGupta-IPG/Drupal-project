@@ -17,14 +17,14 @@ class FormTestAutocompleteForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_autocomplete';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['autocomplete_1'] = [
       '#type' => 'textfield',
       '#title' => 'Autocomplete 1',

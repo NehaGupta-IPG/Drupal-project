@@ -39,7 +39,16 @@ class EarlyRenderingTestController extends ControllerBase {
     $this->renderer = $renderer;
   }
 
-  protected function earlyRenderContent() {
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container): static {
+    return new static(
+      $container->get('renderer')
+    );
+  }
+
+  protected function earlyRenderContent(): array {
     return [
       '#markup' => 'Hello world!',
       '#cache' => [
@@ -50,7 +59,7 @@ class EarlyRenderingTestController extends ControllerBase {
     ];
   }
 
-  public function renderArray() {
+  public function renderArray(): array {
     return [
       '#pre_render' => [
         function () {
@@ -61,77 +70,77 @@ class EarlyRenderingTestController extends ControllerBase {
     ];
   }
 
-  public function renderArrayEarly() {
+  public function renderArrayEarly(): array {
     $render_array = $this->earlyRenderContent();
     return [
       '#markup' => $this->renderer->render($render_array),
     ];
   }
 
-  public function ajaxResponse() {
+  public function ajaxResponse(): AjaxResponse {
     $response = new AjaxResponse();
     $response->addCommand(new InsertCommand(NULL, $this->renderArray()));
     return $response;
   }
 
-  public function ajaxResponseEarly() {
+  public function ajaxResponseEarly(): AjaxResponse {
     $response = new AjaxResponse();
     $response->addCommand(new InsertCommand(NULL, $this->renderArrayEarly()));
     return $response;
   }
 
-  public function response() {
+  public function response(): Response {
     return new Response('Hello world!');
   }
 
-  public function responseEarly() {
+  public function responseEarly(): Response {
     $render_array = $this->earlyRenderContent();
     return new Response((string) $this->renderer->render($render_array));
   }
 
-  public function responseWithAttachments() {
+  public function responseWithAttachments(): AttachmentsTestResponse {
     return new AttachmentsTestResponse('Hello world!');
   }
 
-  public function responseWithAttachmentsEarly() {
+  public function responseWithAttachmentsEarly(): AttachmentsTestResponse {
     $render_array = $this->earlyRenderContent();
     return new AttachmentsTestResponse((string) $this->renderer->render($render_array));
   }
 
-  public function cacheableResponse() {
+  public function cacheableResponse(): CacheableTestResponse {
     return new CacheableTestResponse('Hello world!');
   }
 
-  public function cacheableResponseEarly() {
+  public function cacheableResponseEarly(): CacheableTestResponse {
     $render_array = $this->earlyRenderContent();
     return new CacheableTestResponse((string) $this->renderer->render($render_array));
   }
 
-  public function domainObject() {
+  public function domainObject(): TestDomainObject {
     return new TestDomainObject();
   }
 
-  public function domainObjectEarly() {
+  public function domainObjectEarly(): TestDomainObject {
     $render_array = $this->earlyRenderContent();
     $this->renderer->render($render_array);
     return new TestDomainObject();
   }
 
-  public function domainObjectWithAttachments() {
+  public function domainObjectWithAttachments(): AttachmentsTestDomainObject {
     return new AttachmentsTestDomainObject();
   }
 
-  public function domainObjectWithAttachmentsEarly() {
+  public function domainObjectWithAttachmentsEarly(): AttachmentsTestDomainObject {
     $render_array = $this->earlyRenderContent();
     $this->renderer->render($render_array);
     return new AttachmentsTestDomainObject();
   }
 
-  public function cacheableDomainObject() {
+  public function cacheableDomainObject(): CacheableTestDomainObject {
     return new CacheableTestDomainObject();
   }
 
-  public function cacheableDomainObjectEarly() {
+  public function cacheableDomainObjectEarly(): CacheableTestDomainObject {
     $render_array = $this->earlyRenderContent();
     $this->renderer->render($render_array);
     return new CacheableTestDomainObject();

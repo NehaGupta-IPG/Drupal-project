@@ -19,14 +19,14 @@ class NestedConfigTargetForm extends TreeConfigTargetForm {
   /**
    * {@inheritdoc}
    */
-  protected function getEditableConfigNames() {
+  protected function getEditableConfigNames(): array {
     return ['form_test.object'];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_nested_config_target_form';
   }
 
@@ -61,7 +61,7 @@ class NestedConfigTargetForm extends TreeConfigTargetForm {
         'favorite_fruits.1',
         fn (?string $second_favorite_fruit) : string => $second_favorite_fruit ?? 'Orange',
         // The "toConfig" callable for the first choice sets all choices.
-        fn () => ToConfig::NoOp,
+        fn (): ToConfig => ToConfig::NoOp,
       ),
     ];
     $form['could_not_live_without'] = [

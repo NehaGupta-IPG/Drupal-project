@@ -17,7 +17,7 @@ class TabbingManagerTestController extends ControllerBase {
    * @return array
    *   The render array.
    */
-  public function build() {
+  public function build(): array {
     return [
       'container' => [
         '#type' => 'container',

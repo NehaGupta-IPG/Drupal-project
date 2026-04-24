@@ -17,7 +17,7 @@ class FileModuleTestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'file_module_test_form';
   }
 
@@ -37,7 +37,7 @@ class FileModuleTestForm extends FormBase {
    * @param string $default_fids
    *   (optional) Any default file IDs to use.
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $tree = TRUE, $extended = TRUE, $multiple = FALSE, $default_fids = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, $tree = TRUE, $extended = TRUE, $multiple = FALSE, $default_fids = NULL): array {
     $form['#tree'] = (bool) $tree;
 
     $form['nested']['file'] = [
@@ -71,7 +71,7 @@ class FileModuleTestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     if ($form['#tree']) {
       $uploads = $form_state->getValue(['nested', 'file']);
     }

@@ -23,6 +23,13 @@ class PagerTestController extends ControllerBase implements TrustedCallbackInter
   protected $pagerParams;
 
   /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container): static {
+    return new static($container->get('pager.parameters'));
+  }
+
+  /**
    * Construct a new PagerTestController object.
    *
    * @param \Drupal\Core\Pager\PagerParametersInterface $pager_params
@@ -43,7 +50,7 @@ class PagerTestController extends ControllerBase implements TrustedCallbackInter
    * @return array
    *   A render array.
    */
-  protected function buildTestTable($element, $limit) {
+  protected function buildTestTable($element, $limit): array {
     $header = [
       ['data' => 'wid'],
       ['data' => 'type'],
@@ -145,7 +152,7 @@ class PagerTestController extends ControllerBase implements TrustedCallbackInter
    *
    * This function is assigned as a #pre_render callback.
    */
-  public static function showPagerCacheContext(array $pager) {
+  public static function showPagerCacheContext(array $pager): array {
     \Drupal::messenger()->addStatus(\Drupal::service('cache_contexts_manager')->convertTokensToKeys(['url.query_args.pagers:' . $pager['#element']])->getKeys()[0]);
     return $pager;
   }
@@ -153,7 +160,7 @@ class PagerTestController extends ControllerBase implements TrustedCallbackInter
   /**
    * {@inheritdoc}
    */
-  public static function trustedCallbacks() {
+  public static function trustedCallbacks(): array {
     return ['showPagerCacheContext'];
   }
 

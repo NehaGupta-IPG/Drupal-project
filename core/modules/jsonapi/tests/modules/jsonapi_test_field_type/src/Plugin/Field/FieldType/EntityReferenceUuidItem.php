@@ -67,14 +67,14 @@ class EntityReferenceUuidItem extends EntityReferenceItem {
   /**
    * {@inheritdoc}
    */
-  public static function mainPropertyName() {
+  public static function mainPropertyName(): string {
     return 'target_uuid';
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function schema(FieldStorageDefinitionInterface $field_definition) {
+  public static function schema(FieldStorageDefinitionInterface $field_definition): array {
     $columns = [
       'target_uuid' => [
         'description' => 'The UUID of the target entity.',
@@ -164,7 +164,7 @@ class EntityReferenceUuidItem extends EntityReferenceItem {
   /**
    * {@inheritdoc}
    */
-  public function isEmpty() {
+  public function isEmpty(): bool {
     // Avoid loading the entity by first checking the 'target_uuid'.
     if ($this->target_uuid !== NULL) {
       return FALSE;
@@ -234,7 +234,7 @@ class EntityReferenceUuidItem extends EntityReferenceItem {
    * @return bool
    *   TRUE if the item holds an unsaved entity.
    */
-  public function hasNewEntity() {
+  public function hasNewEntity(): bool {
     return !$this->isEmpty() && $this->target_uuid === NULL && $this->entity->isNew();
   }
 

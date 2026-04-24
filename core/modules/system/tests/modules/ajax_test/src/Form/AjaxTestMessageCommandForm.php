@@ -19,14 +19,14 @@ class AjaxTestMessageCommandForm implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'ajax_test_message_command_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['alternate-message-container'] = [
       '#type' => 'container',
       '#id' => 'alternate-message-container',

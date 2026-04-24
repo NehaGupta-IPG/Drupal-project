@@ -17,14 +17,14 @@ class FormTestGroupDetailsForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_group_details';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $required = FALSE) {
+  public function buildForm(array $form, FormStateInterface $form_state, $required = FALSE): array {
     $form['details'] = [
       '#type' => 'details',
       '#title' => 'Root element',

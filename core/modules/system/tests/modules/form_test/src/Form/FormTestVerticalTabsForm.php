@@ -18,14 +18,14 @@ class FormTestVerticalTabsForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return '_form_test_vertical_tabs_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $tab_count = 3;
 
     $form['vertical_tabs'] = [
@@ -53,7 +53,7 @@ class FormTestVerticalTabsForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $form_state->cleanValues();
     // This won't have a proper JSON header, but Drupal doesn't check for that
     // anyway so this is fine until it's replaced with a JsonResponse.

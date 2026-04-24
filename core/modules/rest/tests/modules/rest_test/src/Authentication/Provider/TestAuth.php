@@ -15,14 +15,14 @@ class TestAuth implements AuthenticationProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function applies(Request $request) {
+  public function applies(Request $request): bool {
     return $request->headers->has('REST-test-auth');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function authenticate(Request $request) {
+  public function authenticate(Request $request): null {
     return NULL;
   }
 

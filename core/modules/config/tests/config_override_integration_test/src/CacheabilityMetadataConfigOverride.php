@@ -35,21 +35,21 @@ class CacheabilityMetadataConfigOverride implements ConfigFactoryOverrideInterfa
   /**
    * {@inheritdoc}
    */
-  public function getCacheSuffix() {
+  public function getCacheSuffix(): string {
     return 'config_override_integration_test';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function createConfigObject($name, $collection = StorageInterface::DEFAULT_COLLECTION) {
+  public function createConfigObject($name, $collection = StorageInterface::DEFAULT_COLLECTION): null {
     return NULL;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCacheableMetadata($name) {
+  public function getCacheableMetadata($name): CacheableMetadata {
     $metadata = new CacheableMetadata();
     if ($name === 'block.block.config_override_test') {
       $metadata

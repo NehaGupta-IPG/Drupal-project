@@ -18,14 +18,14 @@ class SessionTestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'session_test_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['input'] = [
       '#type' => 'textfield',
       '#title' => 'Input',
@@ -44,7 +44,7 @@ class SessionTestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->messenger()->addStatus(new FormattableMarkup('Ok: @input', ['@input' => $form_state->getValue('input')]));
   }
 

@@ -17,14 +17,14 @@ class HtmxTestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'htmx_form_builder_test';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, ?string $type = NULL, ?string $selected = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, ?string $type = NULL, ?string $selected = NULL): array {
     $type = $type ?? '';
     $selected = $selected ?? '';
     $formUrl = Url::fromRoute('<current>');

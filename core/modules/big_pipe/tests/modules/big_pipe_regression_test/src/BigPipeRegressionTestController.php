@@ -20,7 +20,7 @@ class BigPipeRegressionTestController implements TrustedCallbackInterface {
   /**
    * @see \Drupal\Tests\big_pipe\FunctionalJavascript\BigPipeRegressionTest::testMultipleBodies_2678662()
    */
-  public function regression2678662() {
+  public function regression2678662(): array {
     return [
       '#markup' => BigPipeMarkup::create(self::MARKER_2678662),
     ];
@@ -29,7 +29,7 @@ class BigPipeRegressionTestController implements TrustedCallbackInterface {
   /**
    * @see \Drupal\Tests\big_pipe\FunctionalJavascript\BigPipeRegressionTest::testMultipleBodies_2678662()
    */
-  public function regression2802923() {
+  public function regression2802923(): array {
     return [
       '#prefix' => BigPipeMarkup::create('<p>Hi, my train will arrive at '),
       'time' => [
@@ -45,7 +45,7 @@ class BigPipeRegressionTestController implements TrustedCallbackInterface {
    *
    * @see \Drupal\Tests\big_pipe\FunctionalJavascript\BigPipeRegressionTest::testBigPipeLargeContent
    */
-  public function largeContent() {
+  public function largeContent(): array {
     return [
       'item1' => [
         '#lazy_builder' => [static::class . '::largeContentBuilder', []],
@@ -86,7 +86,7 @@ class BigPipeRegressionTestController implements TrustedCallbackInterface {
    *
    * @see \Drupal\Tests\big_pipe\FunctionalJavascript\BigPipeRegressionTest::testBigPipeLargeContent
    */
-  public static function largeContentBuilder() {
+  public static function largeContentBuilder(): array {
     return [
       '#theme' => 'big_pipe_test_large_content',
       '#cache' => ['max-age' => 0],
@@ -101,7 +101,7 @@ class BigPipeRegressionTestController implements TrustedCallbackInterface {
    * @return array
    *   Render array with a <time> markup with current time and cache settings.
    */
-  public static function currentTime() {
+  public static function currentTime(): array {
     return [
       '#markup' => '<time datetime="' . date('Y-m-d', time()) . '"></time>',
       '#cache' => ['max-age' => 0],
@@ -139,7 +139,7 @@ class BigPipeRegressionTestController implements TrustedCallbackInterface {
   /**
    * {@inheritdoc}
    */
-  public static function trustedCallbacks() {
+  public static function trustedCallbacks(): array {
     return ['currentTime', 'largeContentBuilder', 'renderRandomSentence', 'inlineScript'];
   }
 

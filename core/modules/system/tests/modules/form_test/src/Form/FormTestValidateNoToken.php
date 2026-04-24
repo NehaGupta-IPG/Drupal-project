@@ -17,14 +17,14 @@ class FormTestValidateNoToken extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_validate_no_token';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['#token'] = FALSE;
     $form['submit'] = [
       '#type' => 'submit',
@@ -36,7 +36,7 @@ class FormTestValidateNoToken extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->messenger()->addStatus('The form_test_validate_no_token form has been submitted successfully.');
   }
 

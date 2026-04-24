@@ -43,7 +43,7 @@ class TestSessionBag implements SessionBagInterface {
   /**
    * Sets the test flag.
    */
-  public function setFlag() {
+  public function setFlag(): void {
     $this->attributes['test_flag'] = TRUE;
   }
 
@@ -53,14 +53,14 @@ class TestSessionBag implements SessionBagInterface {
    * @return bool
    *   TRUE when flag is set, FALSE otherwise.
    */
-  public function hasFlag() {
+  public function hasFlag(): bool {
     return !empty($this->attributes['test_flag']);
   }
 
   /**
    * Clears the test flag.
    */
-  public function clearFlag() {
+  public function clearFlag(): void {
     unset($this->attributes['test_flag']);
   }
 

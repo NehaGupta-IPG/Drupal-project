@@ -33,7 +33,7 @@ class ViewsTestDataController implements TrustedCallbackInterface {
    *
    * This function is assigned as a #lazy_builder callback.
    */
-  public static function placeholderLazyBuilder() {
+  public static function placeholderLazyBuilder(): array {
     // No-op.
     return [];
   }
@@ -55,7 +55,7 @@ class ViewsTestDataController implements TrustedCallbackInterface {
   /**
    * {@inheritdoc}
    */
-  public static function trustedCallbacks() {
+  public static function trustedCallbacks(): array {
     return ['placeholderLazyBuilder', 'preRender'];
   }
 

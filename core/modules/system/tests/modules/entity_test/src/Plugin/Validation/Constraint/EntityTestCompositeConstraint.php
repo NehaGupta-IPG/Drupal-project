@@ -30,7 +30,7 @@ class EntityTestCompositeConstraint extends CompositeConstraintBase {
   /**
    * {@inheritdoc}
    */
-  public function coversFields() {
+  public function coversFields(): array {
     return ['name', 'type'];
   }
 

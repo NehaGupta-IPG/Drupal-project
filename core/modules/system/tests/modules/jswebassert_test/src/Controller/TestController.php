@@ -11,7 +11,7 @@ use Drupal\Core\Render\Markup;
  */
 class TestController {
 
-  public function page() {
+  public function page(): array {
     $markup = <<<JS
 <script>
 var timesRun = 0;

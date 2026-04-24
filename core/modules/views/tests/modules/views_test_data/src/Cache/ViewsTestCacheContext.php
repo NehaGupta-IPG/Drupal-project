@@ -31,7 +31,7 @@ class ViewsTestCacheContext implements CacheContextInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCacheableMetadata() {
+  public function getCacheableMetadata(): CacheableMetadata {
     return new CacheableMetadata();
   }
 

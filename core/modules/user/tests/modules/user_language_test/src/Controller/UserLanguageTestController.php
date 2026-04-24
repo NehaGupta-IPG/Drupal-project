@@ -12,7 +12,7 @@ class UserLanguageTestController {
   /**
    * Builds the response.
    */
-  public function buildPostResponse() {
+  public function buildPostResponse(): array {
     return ['#markup' => 'It works!'];
   }
 
