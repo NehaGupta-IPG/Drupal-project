@@ -132,8 +132,8 @@ class BooleanFormatterSettingsTest extends BrowserTestBase {
 
       // Test that the settings summary are present in the correct format.
       $this->drupalGet('admin/structure/types/manage/' . $this->bundle . '/display');
-      $this->assertSession()->elementExists('xpath', "//div[contains(@class, 'field-plugin-summary')]");
-      $this->assertSession()->elementTextEquals('xpath', "//div[contains(@class, 'field-plugin-summary')]", "Display: {$values[0]} / {$values[1]}");
+      $this->assertSession()->elementExists('xpath', "//div[contains(@class, 'field-ui__plugin-summary')]");
+      $this->assertSession()->elementTextEquals('xpath', "//div[contains(@class, 'field-ui__plugin-summary')]", "Display: {$values[0]} / {$values[1]}");
     }
   }
 

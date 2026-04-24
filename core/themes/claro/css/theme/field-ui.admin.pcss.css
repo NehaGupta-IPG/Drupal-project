@@ -12,22 +12,25 @@
 }
 
 /* 'Manage form display' and 'Manage display' overview */
-.field-plugin-summary {
+.field-ui__plugin-summary {
   float: left; /* LTR */
   font-size: var(--font-size-s);
+
+  @nest [dir="rtl"] & {
+    float: right;
+  }
 }
-[dir="rtl"] .field-plugin-summary {
-  float: right;
-}
-.field-plugin-summary-cell .warning {
+
+.field-ui__plugin-summary-wrapper .warning {
   display: block;
   float: left; /* LTR */
-  margin-right: 0.5em; /* LTR */
-}
-[dir="rtl"] .field-plugin-summary-cell .warning {
-  float: right;
-  margin-right: 0;
-  margin-left: 0.5em;
+  margin-inline-end: 0.5em; /* LTR */
+
+  @nest [dir="rtl"] & {
+    float: right;
+    margin-inline-start: 0.5em;
+    margin-inline-end: 0;
+  }
 }
 
 /* Settings edit. */

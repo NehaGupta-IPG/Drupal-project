@@ -149,7 +149,7 @@ class NumberFieldTest extends WebDriverTestBase {
       $page->fillField($name, $value);
     }
     $page->pressButton("{$float_field}_plugin_settings_update");
-    $assert_session->waitForElement('css', '.field-plugin-summary-cell > .ajax-new-content');
+    $assert_session->waitForElement('css', '.field-ui__plugin-summary-cell > .ajax-new-content');
     $this->submitForm([], 'Save');
 
     // Check number_decimal and number_unformatted formatters behavior.
@@ -179,7 +179,7 @@ class NumberFieldTest extends WebDriverTestBase {
       $page->fillField($name, $value);
     }
     $page->pressButton("{$integer_field}_plugin_settings_update");
-    $assert_session->waitForElement('css', '.field-plugin-summary-cell > .ajax-new-content');
+    $assert_session->waitForElement('css', '.field-ui__plugin-summary-cell > .ajax-new-content');
     $this->submitForm([], 'Save');
 
     // Check number_integer formatter behavior.

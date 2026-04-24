@@ -90,7 +90,7 @@ class ResponsiveImageFieldUiTest extends WebDriverTestBase {
     $field_image_type = $page->findField('fields[field_image][type]');
     $field_image_type->setValue('responsive_image');
 
-    $summary_text = $assert_session->waitForElement('xpath', $this->cssSelectToXpath('#field-image .ajax-new-content .field-plugin-summary'));
+    $summary_text = $assert_session->waitForElement('xpath', $this->cssSelectToXpath('#field-image .ajax-new-content .field-ui__plugin-summary'));
     $this->assertEquals('Select a responsive image style. Loading attribute: lazy', $summary_text->getText());
 
     $page->pressButton('Save');

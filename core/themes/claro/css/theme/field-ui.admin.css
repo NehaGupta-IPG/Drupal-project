@@ -22,25 +22,25 @@
 
 /* 'Manage form display' and 'Manage display' overview */
 
-.field-plugin-summary {
+.field-ui__plugin-summary {
   float: left; /* LTR */
   font-size: var(--font-size-s);
 }
 
-[dir="rtl"] .field-plugin-summary {
+[dir="rtl"] .field-ui__plugin-summary {
   float: right;
 }
 
-.field-plugin-summary-cell .warning {
+.field-ui__plugin-summary-wrapper .warning {
   display: block;
   float: left; /* LTR */
-  margin-right: 0.5em; /* LTR */
+  margin-inline-end: 0.5em; /* LTR */
 }
 
-[dir="rtl"] .field-plugin-summary-cell .warning {
+[dir="rtl"] :is(.field-ui__plugin-summary-wrapper .warning) {
   float: right;
-  margin-right: 0;
-  margin-left: 0.5em;
+  margin-inline-start: 0.5em;
+  margin-inline-end: 0;
 }
 
 /* Settings edit. */

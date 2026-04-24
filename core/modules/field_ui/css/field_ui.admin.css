@@ -27,22 +27,22 @@
 }
 
 /* 'Manage form display' and 'Manage display' overview */
-.field-ui-overview .field-plugin-summary-cell {
+.field-ui-overview .field-ui__plugin-summary-wrapper {
   line-height: 1em;
 }
-.field-ui-overview .field-plugin-summary {
+.field-ui-overview .field-ui__plugin-summary {
   float: left; /* LTR */
   font-size: 0.9em;
 }
-[dir="rtl"] .field-ui-overview .field-plugin-summary {
+[dir="rtl"] .field-ui-overview .field-ui__plugin-summary {
   float: right;
 }
-.field-ui-overview .field-plugin-summary-cell .warning {
+.field-ui-overview .field-ui__plugin-summary-wrapper .warning {
   display: block;
   float: left; /* LTR */
   margin-right: 0.5em;
 }
-[dir="rtl"] .field-ui-overview .field-plugin-summary-cell .warning {
+[dir="rtl"] .field-ui-overview .field-ui__plugin-summary-wrapper .warning {
   float: right;
 }
 .field-ui-overview .field-plugin-settings-edit-wrapper {
@@ -57,10 +57,10 @@
 [dir="rtl"] .field-ui-overview .field-plugin-settings-edit {
   float: left;
 }
-.field-ui-overview .field-plugin-settings-editing td {
+.field-ui-overview .field-ui__edit-plugin-settings td {
   vertical-align: top;
 }
-.field-ui-overview .field-plugin-settings-editing .field-plugin-type {
+.field-ui-overview .field-ui__edit-plugin-settings .field-plugin-type {
   display: none;
 }
 .field-ui-overview .field-plugin-settings-edit-form .plugin-name {

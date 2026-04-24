@@ -61,7 +61,7 @@ class EntityViewDisplayEditForm extends EntityDisplayFormBase {
     $field_row['plugin']['#title'] = $this->t('Formatter for @title', ['@title' => $field_definition->getLabel()]);
     if (!empty($field_row['plugin']['settings_edit_form']) && ($plugin = $this->entity->getRenderer($field_name))) {
       $plugin_type_info = $plugin->getPluginDefinition();
-      $field_row['plugin']['settings_edit_form']['label']['#markup'] = $this->t('Format settings:') . ' <span class="plugin-name">' . $plugin_type_info['label'] . '</span>';
+      $field_row['plugin']['settings_edit_form']['label']['#markup'] = $this->t('Format settings:') . ' <span class="field-ui__plugin-name">' . $plugin_type_info['label'] . '</span>';
     }
 
     return $field_row;

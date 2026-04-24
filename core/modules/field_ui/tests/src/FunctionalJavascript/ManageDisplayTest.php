@@ -175,7 +175,7 @@ class ManageDisplayTest extends WebDriverTestBase {
     // Confirm the format element retains focus after the AJAX update completes.
     $this->assertJsCondition('document.activeElement === document.querySelector("[name=\'fields[field_test][type]\']")');
 
-    $plugin_summary = $page->find('css', '#field-test .field-plugin-summary');
+    $plugin_summary = $page->find('css', '#field-test .field-ui__plugin-summary');
     $this->assertStringContainsString("test_formatter_setting_multiple: dummy test string", $plugin_summary->getText(), 'The expected summary is displayed.');
 
     // Submit the form and assert that
