@@ -3,11 +3,12 @@
 namespace Drupal\search;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Config\Entity\StatusInterface;
 
 /**
  * Provides an interface defining a search page entity.
  */
-interface SearchPageInterface extends ConfigEntityInterface {
+interface SearchPageInterface extends ConfigEntityInterface, StatusInterface {
 
   /**
    * Returns the search plugin.

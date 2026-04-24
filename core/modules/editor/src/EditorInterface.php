@@ -3,11 +3,12 @@
 namespace Drupal\editor;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Config\Entity\StatusInterface;
 
 /**
  * Provides an interface defining a text editor entity.
  */
-interface EditorInterface extends ConfigEntityInterface {
+interface EditorInterface extends ConfigEntityInterface, StatusInterface {
 
   /**
    * Returns whether this text editor has an associated filter format.

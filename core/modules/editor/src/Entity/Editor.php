@@ -8,6 +8,7 @@ use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\editor\EditorAccessControlHandler;
+use Drupal\Core\Config\Entity\StatusTrait;
 use Drupal\editor\EditorInterface;
 
 /**
@@ -47,6 +48,7 @@ use Drupal\editor\EditorInterface;
   ],
 )]
 class Editor extends ConfigEntityBase implements EditorInterface {
+  use StatusTrait;
 
   /**
    * Machine name of the text format for this configured text editor.

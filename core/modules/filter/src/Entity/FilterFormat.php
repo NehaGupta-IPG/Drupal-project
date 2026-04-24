@@ -6,6 +6,7 @@ use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Config\Action\Attribute\ActionMethod;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
+use Drupal\Core\Config\Entity\StatusTrait;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -67,6 +68,7 @@ use Drupal\user\RoleInterface;
   ],
 )]
 class FilterFormat extends ConfigEntityBase implements FilterFormatInterface, EntityWithPluginCollectionInterface {
+  use StatusTrait;
 
   /**
    * Unique machine name of the format.
@@ -200,7 +202,7 @@ class FilterFormat extends ConfigEntityBase implements FilterFormatInterface, En
       throw new \LogicException("The fallback text format '{$this->id()}' cannot be disabled.");
     }
 
-    parent::disable();
+    $this->status = FALSE;
 
     // Allow modules to react on text format deletion.
     \Drupal::moduleHandler()->invokeAll('filter_format_disable', [$this]);

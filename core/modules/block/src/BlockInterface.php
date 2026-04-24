@@ -3,11 +3,12 @@
 namespace Drupal\block;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Config\Entity\StatusInterface;
 
 /**
  * Provides an interface defining a block entity.
  */
-interface BlockInterface extends ConfigEntityInterface {
+interface BlockInterface extends ConfigEntityInterface, StatusInterface {
 
   /**
    * Returns the plugin instance.
