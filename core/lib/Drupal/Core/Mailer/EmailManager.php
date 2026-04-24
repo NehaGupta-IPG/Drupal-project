@@ -177,7 +177,7 @@ class EmailManager extends DefaultPluginManager {
 
       $context = [
         'email' => $email,
-        'body' => $body,
+        'body' => $email_data['body'],
         'cacheable_metadata' => $metadata,
       ];
       $this->moduleHandler->alter('email_post_render', $symfony_email, $context);
