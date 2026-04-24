@@ -47,7 +47,7 @@ class PhpStorageFactoryTest extends KernelTestBase {
     // settings override exists.
     $php = PhpStorageFactory::get('test', [
       'class' => MockPhpStorage::class,
-      'directory' => 'tmp://',
+      'directory' => 'temporary://',
       'secret' => 'test',
     ]);
     $this->assertInstanceOf(MockPhpStorage::class, $php);
@@ -65,7 +65,7 @@ class PhpStorageFactoryTest extends KernelTestBase {
     // settings entry.
     $php = PhpStorageFactory::get('test', [
       'class' => MTimeProtectedFileStorage::class,
-      'directory' => 'tmp://',
+      'directory' => 'temporary://',
       'secret' => 'test',
     ]);
     $this->assertInstanceOf(MTimeProtectedFileStorage::class, $php);
@@ -118,6 +118,20 @@ class PhpStorageFactoryTest extends KernelTestBase {
     $php = PhpStorageFactory::get('test');
     $this->assertSame(FileSystem::getOsTemporaryDirectory(), $php->getConfigurationValue('directory'), 'temporary:// alone resolves to FileSystem::getOsTemporaryDirectory().');
 
+    // Test that file_temp_path takes priority over the OS temporary directory
+    // when resolving the temporary:// prefix.
+    $custom_temp = '/custom_tmp/' . $this->randomMachineName();
+    $this->setSettings('test', ['directory' => 'temporary://drupal']);
+    $this->setSetting('file_temp_path', $custom_temp);
+    $php = PhpStorageFactory::get('test');
+    $this->assertSame($custom_temp . '/drupal', $php->getConfigurationValue('directory'), 'file_temp_path setting takes priority over OS temporary directory.');
+
+    // Test temporary:// alone (no subdirectory) with file_temp_path set.
+    $this->setSettings('test', ['directory' => 'temporary://']);
+    $this->setSetting('file_temp_path', $custom_temp);
+    $php = PhpStorageFactory::get('test');
+    $this->assertSame($custom_temp, $php->getConfigurationValue('directory'), 'temporary:// alone resolves to file_temp_path when set.');
+
     // Test that name-specific settings override the $configuration parameter.
     $this->setSettings('test');
     $php = PhpStorageFactory::get('test', [
@@ -139,7 +153,7 @@ class PhpStorageFactoryTest extends KernelTestBase {
   protected function setSettings($name = 'default', array $configuration = []): void {
     $settings['php_storage'][$name] = $configuration + [
       'class' => 'Drupal\system\PhpStorage\MockPhpStorage',
-      'directory' => 'tmp://',
+      'directory' => 'temporary://',
       'secret' => $this->randomString(),
       'bin' => 'test',
     ];
