@@ -1105,7 +1105,6 @@ services:
     arguments: ['@route_storage', '@router.builder', '@path.current', '@cache.data', '@path_processor_manager', '@cache_tags.invalidator', '@language_manager']
     tags:
       - { name: backend_overridable }
-      - { name: event_subscriber }
   Drupal\Core\Routing\RouteProviderInterface: '@router.route_provider'
   route_storage:
     class: Drupal\Core\Routing\RouteStorage\PhpDumperRouteStorage
