@@ -18,9 +18,9 @@ class RouteProvider implements PreloadableRouteProviderInterface {
   use DependencySerializationTrait;
 
   /**
-   * The route provider service.
+   * Whether the initial router rebuild has been triggered.
    */
-  protected PreloadableRouteProviderInterface $service;
+  protected bool $rebuilt = FALSE;
 
   /**
    * Loads the real route provider from the container and rebuilds the router.
@@ -29,13 +29,12 @@ class RouteProvider implements PreloadableRouteProviderInterface {
    *   The route provider.
    */
   protected function lazyLoadItself(): PreloadableRouteProviderInterface {
-    if (!isset($this->service)) {
-      $container = \Drupal::getContainer();
-      $this->service = $container->get('test.router.route_provider');
+    $container = \Drupal::getContainer();
+    if (!$this->rebuilt) {
+      $this->rebuilt = TRUE;
       $container->get('router.builder')->rebuild();
     }
-
-    return $this->service;
+    return $container->get('test.router.route_provider');
   }
 
   /**

@@ -38,11 +38,6 @@ use Symfony\Component\Routing\RouteCollection;
 class CompiledRouteProvider extends RouteProvider {
 
   /**
-   * The router snapshot for the current request.
-   */
-  protected ?CompiledRouterData $data = NULL;
-
-  /**
    * TRUE while a rebuild is in progress, to prevent re-entry.
    */
   protected bool $rebuilding = FALSE;
@@ -73,29 +68,22 @@ class CompiledRouteProvider extends RouteProvider {
   }
 
   /**
-   * Loads (or returns) the compiled router data for this request.
-   *
-   * On storage miss, triggers a local rebuild so multi-web-head
-   * deployments converge after any one head updates the shared cache
-   * pointer. Guarded against re-entry by $this->rebuilding.
+   * Loads the compiled router data for this request.
    */
   protected function getData(): ?CompiledRouterData {
-    if ($this->data !== NULL) {
-      return $this->data;
-    }
-    $this->data = $this->storage->load();
-    if ($this->data === NULL && !$this->rebuilding && !$this->rebuildAttempted) {
+    $data = $this->storage->load();
+    if ($data === NULL && !$this->rebuilding && !$this->rebuildAttempted) {
       $this->rebuildAttempted = TRUE;
       $this->rebuilding = TRUE;
       try {
         $this->routeBuilder->rebuild();
-        $this->data = $this->storage->load();
+        $data = $this->storage->load();
       }
       finally {
         $this->rebuilding = FALSE;
       }
     }
-    return $this->data;
+    return $data;
   }
 
   /**
@@ -239,7 +227,6 @@ class CompiledRouteProvider extends RouteProvider {
    * {@inheritdoc}
    */
   public function reset(): void {
-    $this->data = NULL;
     $this->rebuildAttempted = FALSE;
     parent::reset();
   }
