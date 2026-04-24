@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Datetime;
 
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Core\Cache\CacheableJsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -53,11 +56,23 @@ class TimeZoneAbbreviationRouteTest extends BrowserTestBase {
    */
   #[DataProvider('providerAbbreviationConversion')]
   public function testAbbreviationConversion($path, $expectedResponse = NULL, $expectInvalidRequest = FALSE): void {
-    $response = $this->drupalGet('system/timezone/' . $path);
-    if (isset($expectedResponse)) {
-      $this->assertEquals($response, $expectedResponse);
+    $request = Request::create('system/timezone/' . $path);
+    $request->query->set('_format', 'json');
+    $request->setRequestFormat('json');
+
+    /** @var \Symfony\Component\HttpKernel\HttpKernelInterface $kernel */
+    $kernel = \Drupal::getContainer()->get('http_kernel');
+    $response = $kernel->handle($request);
+
+    $this->assertEquals($expectInvalidRequest ? Response::HTTP_NOT_FOUND : Response::HTTP_OK, $response->getStatusCode());
+    $this->assertEquals('application/json', $response->headers->get('Content-type'));
+
+    if ($expectedResponse) {
+      $this->assertInstanceOf(CacheableJsonResponse::class, $response);
+      /** @var \Drupal\Core\Cache\CacheableJsonResponse $response */
+      $this->assertContains('route', $response->getCacheableMetadata()->getCacheContexts());
+      $this->assertEquals($expectedResponse, $response->getContent());
     }
-    $this->assertSession()->statusCodeEquals($expectInvalidRequest ? 404 : 200);
   }
 
   /**
