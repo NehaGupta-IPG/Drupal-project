@@ -304,6 +304,13 @@ class NodeAccessControlHandler extends EntityAccessControlHandler implements Nod
   /**
    * {@inheritdoc}
    */
+  public function deleteDefaultGrant() {
+    $this->grantStorage->deleteDefault();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function deleteGrants() {
     $this->grantStorage->delete();
   }
