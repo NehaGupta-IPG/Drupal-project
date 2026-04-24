@@ -50,7 +50,6 @@ class MenuUiContentTranslationTest extends BrowserTestBase {
     $this->drupalCreateContentType([
       'type' => 'page',
       'name' => 'Basic page',
-      'display_submitted' => FALSE,
     ]);
 
     // Add a second language.

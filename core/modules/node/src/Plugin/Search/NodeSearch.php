@@ -322,13 +322,10 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
       // without taking cacheability metadata into account. So we have to do it
       // explicitly here.
       $this->addCacheableDependency($node->getOwner());
-
-      if ($type->displaySubmitted()) {
-        $result += [
-          'user' => $this->renderer->renderInIsolation($username),
-          'date' => $node->getChangedTime(),
-        ];
-      }
+      $result += [
+        'user' => $this->renderer->renderInIsolation($username),
+        'date' => $node->getChangedTime(),
+      ];
 
       $results[] = $result;
 

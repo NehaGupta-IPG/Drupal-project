@@ -75,7 +75,6 @@ abstract class NodeAccessTestBase extends KernelTestBase {
     $this->drupalCreateContentType([
       'type' => 'page',
       'name' => 'Basic page',
-      'display_submitted' => FALSE,
     ]);
   }
 

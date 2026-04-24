@@ -38,7 +38,6 @@ class NodePreviewAnonymousTest extends BrowserTestBase {
     $this->drupalCreateContentType([
       'type' => 'page',
       'name' => 'Basic page',
-      'display_submitted' => FALSE,
     ]);
 
     // Grant create and editing permissions to anonymous user:

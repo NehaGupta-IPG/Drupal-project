@@ -175,12 +175,6 @@ class NodeTypeForm extends BundleEntityFormBase {
       '#title' => $this->t('Display settings'),
       '#group' => 'additional_settings',
     ];
-    $form['display']['display_submitted'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Display author and date information'),
-      '#default_value' => $type->displaySubmitted(),
-      '#description' => $this->t('Author username and publish date will be displayed.'),
-    ];
 
     return $this->protectBundleIdElement($form);
   }

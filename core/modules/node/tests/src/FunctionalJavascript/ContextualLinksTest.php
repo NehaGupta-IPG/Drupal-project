@@ -47,7 +47,6 @@ class ContextualLinksTest extends WebDriverTestBase {
     $this->drupalCreateContentType([
       'type' => 'page',
       'name' => 'Basic page',
-      'display_submitted' => FALSE,
     ]);
 
     // Create initial node.

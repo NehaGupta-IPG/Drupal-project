@@ -25,7 +25,6 @@
  * - date: (optional) Themed creation date field.
  * - author_name: (optional) Themed author name field.
  * - url: Direct URL of the current node.
- * - display_submitted: Whether submission information should be displayed.
  * - attributes: HTML attributes for the containing element.
  *   The attributes.class element may contain one or more of the following
  *   classes:
@@ -76,7 +75,6 @@
   author_name,
   content,
   date,
-  display_submitted,
   label,
   metadata,
   title_attributes,
@@ -90,13 +88,11 @@
     {{ title_suffix }}
   {% endblock %}
   {% block meta %}
-    {% if display_submitted %}
-      <div class="node__meta">
-        <span{{ author_attributes }}>
-          {{ 'By'|t }} <span class="node__author">{{- author_name -}}</span>, {{ date }}
-        </span>
-      </div>
-    {% endif %}
+    <div class="node__meta">
+      <span{{ author_attributes }}>
+        {{ 'By'|t }} <span class="node__author">{{- author_name -}}</span>, {{ date }}
+      </span>
+    </div>
   {% endblock %}
   {% block image %}{{~ content.field_image ~}}{% endblock %}
   {% block title %}

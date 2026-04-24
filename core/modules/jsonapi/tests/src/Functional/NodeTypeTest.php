@@ -93,7 +93,6 @@ class NodeTypeTest extends ConfigEntityResourceTestBase {
         'attributes' => [
           'dependencies' => [],
           'description' => 'Camelids are large, strictly herbivorous animals with slender necks and long legs.',
-          'display_submitted' => TRUE,
           'help' => NULL,
           'langcode' => 'en',
           'name' => 'Camelids',

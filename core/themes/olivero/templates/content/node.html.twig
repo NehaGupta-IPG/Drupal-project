@@ -25,7 +25,6 @@
  * - date: (optional) Themed creation date field.
  * - author_name: (optional) Themed author name field.
  * - url: Direct URL of the current node.
- * - display_submitted: Whether submission information should be displayed.
  * - attributes: HTML attributes for the containing element.
  *   The attributes.class element may contain one or more of the following
  *   classes:
@@ -80,18 +79,16 @@
       </h2>
     {% endif %}
     {{ title_suffix }}
-    {% if display_submitted %}
-      <div class="node__meta">
-      {% if author_picture %}
-        <div class="node__author-image">
-          {{ author_picture }}
-        </div>
-      {% endif %}
-        <span{{ author_attributes }}>
-          {{ 'By'|t }} <span class="node__author">{{- author_name -}}</span>, {{ date }}
-        </span>
+    <div class="node__meta">
+    {% if author_picture %}
+      <div class="node__author-image">
+        {{ author_picture }}
       </div>
     {% endif %}
+      <span{{ author_attributes }}>
+        {{ 'By'|t }} <span class="node__author">{{- author_name -}}</span>, {{ date }}
+      </span>
+    </div>
   </header>
   <div{{ content_attributes.addClass('node__content', layout) }}>
     {# Comments not part of content, so they won't inherit .text-content styles. #}
