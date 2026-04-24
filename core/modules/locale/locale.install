@@ -7,17 +7,14 @@
 
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\locale\StreamWrapper\TranslationsStream;
 
 /**
  * Implements hook_install().
  */
 function locale_install(): void {
   // Create the interface translations directory and ensure it's writable.
-  if (!$directory = \Drupal::config('locale.settings')->get('translation.path')) {
-    $site_path = \Drupal::getContainer()->getParameter('site.path');
-    $directory = $site_path . '/files/translations';
-    \Drupal::configFactory()->getEditable('locale.settings')->set('translation.path', $directory)->save();
-  }
+  $directory = TranslationsStream::basePath();
   \Drupal::service('file_system')->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
 }
 
@@ -231,6 +228,13 @@ function locale_schema(): array {
         'description' => 'Unix timestamp of the imported file.',
         'size' => 'big',
       ],
+      'hash' => [
+        'type' => 'varchar_ascii',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'The hash of the imported file.',
+      ],
       'last_checked' => [
         'type' => 'int',
         'not null' => FALSE,
@@ -248,66 +252,22 @@ function locale_schema(): array {
  * Implements hook_update_last_removed().
  */
 function locale_update_last_removed(): int {
-  return 10100;
+  return 10300;
 }
 
 /**
- * Add an index on locales_location on type and name.
+ * Add a hash column to the {locale_file} table.
  */
-function locale_update_10300(): void {
-  $spec = [];
-  $spec['locales_location'] = [
-    'description' => 'Location information for source strings.',
-    'fields' => [
-      'lid' => [
-        'type' => 'serial',
-        'not null' => TRUE,
-        'description' => 'Unique identifier of this location.',
-      ],
-      'sid' => [
-        'type' => 'int',
-        'not null' => TRUE,
-        'description' => 'Unique identifier of this string.',
-      ],
-      'type' => [
-        'type' => 'varchar_ascii',
-        'length' => 50,
-        'not null' => TRUE,
-        'default' => '',
-        'description' => 'The location type (file, config, path, etc).',
-      ],
-      'name' => [
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
-        'description' => 'Type dependent location information (file name, path, etc).',
-      ],
-      'version' => [
-        'type' => 'varchar_ascii',
-        'length' => 20,
-        'not null' => TRUE,
-        'default' => 'none',
-        'description' => 'Version of Drupal where the location was found.',
-      ],
-    ],
-    'primary key' => ['lid'],
-    'foreign keys' => [
-      'locales_source' => [
-        'table' => 'locales_source',
-        'columns' => ['sid' => 'lid'],
-      ],
-    ],
-    'indexes' => [
-      'string_type' => ['sid', 'type'],
-      'type_name' => ['type', 'name'],
-    ],
+function locale_update_11401(): void {
+  $spec = [
+    'type' => 'varchar_ascii',
+    'length' => 32,
+    'not null' => TRUE,
+    'default' => '',
+    'description' => 'The hash of the imported file.',
   ];
   $schema = \Drupal::database()->schema();
-  // If the update has been manually applied, recreate the index using the
-  // current schema.
-  if ($schema->indexExists('locales_location', 'type_name')) {
-    $schema->dropIndex('locales_location', 'type_name');
+  if (!$schema->fieldExists('locale_file', 'hash')) {
+    $schema->addField('locale_file', 'hash', $spec);
   }
-  $schema->addIndex('locales_location', 'type_name', ['type', 'name'], $spec['locales_location']);
 }

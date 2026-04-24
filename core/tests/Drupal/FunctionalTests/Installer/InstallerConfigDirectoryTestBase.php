@@ -57,7 +57,7 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function prepareEnvironment() {
+  protected function prepareEnvironment(): void {
     parent::prepareEnvironment();
 
     if ($this->profile === NULL) {
@@ -139,7 +139,7 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function installParameters() {
+  protected function installParameters(): array {
     $parameters = parent::installParameters();
 
     // The options that change configuration are disabled when installing from
@@ -172,7 +172,7 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
   /**
    * Installer step: Select installation profile.
    */
-  protected function setUpProfile() {
+  protected function setUpProfile(): void {
     if ($this->existingSyncDirectory) {
       $edit = [
         'profile' => SelectProfileForm::CONFIG_INSTALL_PROFILE_KEY,
