@@ -165,15 +165,4 @@ interface DrupalKernelInterface extends HttpKernelInterface {
    */
   public function loadLegacyIncludes();
 
-  /**
-   * Returns a cache key suffix that uniquely identifies this kernel build.
-   *
-   * The same suffix is used for both the container and compiled routes so
-   * that a rebuild of one implies a rebuild of the other.
-   *
-   * @return string
-   *   A unique suffix for the current kernel build.
-   */
-  public function getRoutesCacheKeySuffix(): string;
-
 }

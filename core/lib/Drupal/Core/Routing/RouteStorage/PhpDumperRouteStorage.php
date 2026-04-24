@@ -12,45 +12,54 @@ use Symfony\Component\Routing\RouteCollection;
 /**
  * Route storage that writes a compiled PHP file via PhpStorage.
  *
+ * Two-level design so multi-web-head deployments stay consistent across
+ * route rebuilds:
+ * - PhpStorage holds each head's local copy of the compiled file, named
+ *   by a content hash so independent heads with identical route data
+ *   converge on the same filename.
+ * - A shared cache backend (typically `cache.bootstrap`, which is
+ *   chainedfast-backed so APCu reads are invalidated automatically across
+ *   heads via the bin's last-write timestamp) records the current content
+ *   hash under a fixed cache key. After head A rebuilds, head B's next
+ *   request reads the new hash, finds its local file missing, and
+ *   rebuilds locally — producing the same file and hash.
+ *
+ * A fixed cache key is sufficient because per-site isolation is already
+ * provided at the database level: each Drupal site has its own DB (or DB
+ * prefix), and therefore its own `cache_bootstrap` table. A cache flush
+ * (`drush cr`) wipes the bin; the rebuild-on-miss path in
+ * \Drupal\Core\Routing\CompiledRouteProvider repopulates it on the next
+ * request.
+ *
  * The compiled file returns an array with four keys:
- * - 'routes'  : name => serialize()'d Route
+ * - 'routes'  : name => serialize()'d Route or Alias
  * - 'aliases' : alias name => target name
  * - 'outlines': pattern outline => [['name' => string, 'fit' => int,
  *               'numParts' => int]]
  * - 'masks'   : sorted list of fit bit masks that actually correspond to
  *               routes
- *
- * Mirroring the container-storage pattern, the file's hash is stored in a
- * cache backend so the next request can locate it, and stale files are
- * cleaned up on destruct().
  */
 class PhpDumperRouteStorage implements RouteStorageInterface, DestructableInterface {
 
   /**
-   * The cache prefix used to store the compiled-routes hash.
+   * The cache key used to record the compiled-routes hash.
    */
-  protected const string CACHE_PREFIX = 'routes_hash:';
+  protected const string CACHE_KEY = 'routes_hash';
 
   /**
-   * CompiledRouterData instances currently loaded in this request.
-   *
-   * Keyed by hash; lets a rebuilt-in-the-same-request container reuse the
-   * last dump without re-reading from disk.
+   * CompiledRouterData instances materialized this request, keyed by hash.
    *
    * @var array<string, \Drupal\Core\Routing\RouteStorage\CompiledRouterData>
    */
   protected array $dataByHash = [];
 
   /**
-   * The hash of the currently loaded router data set.
+   * Hash of the data most recently loaded or dumped.
    */
   protected ?string $loadedHash = NULL;
 
   /**
    * Hashes of stale files to delete on destruct().
-   *
-   * Files become stale when a subsequent dump produces a different hash in
-   * the same request.
    *
    * @var array<string, true>
    */
@@ -64,12 +73,12 @@ class PhpDumperRouteStorage implements RouteStorageInterface, DestructableInterf
   /**
    * {@inheritdoc}
    */
-  public function load(string $suffix): ?CompiledRouterData {
-    $cache = $this->cache->get(static::CACHE_PREFIX . $suffix);
-    if (!$cache || !$cache->data) {
+  public function load(): ?CompiledRouterData {
+    $cached = $this->cache->get(static::CACHE_KEY);
+    if (!$cached || !$cached->data) {
       return NULL;
     }
-    $hash = $cache->data;
+    $hash = $cached->data;
 
     if (isset($this->dataByHash[$hash])) {
       $this->loadedHash = $hash;
@@ -80,7 +89,6 @@ class PhpDumperRouteStorage implements RouteStorageInterface, DestructableInterf
     if (!$this->phpStorage->exists($filename)) {
       return NULL;
     }
-
     $payload = $this->includeFile($filename);
     if (!is_array($payload)) {
       return NULL;
@@ -95,7 +103,7 @@ class PhpDumperRouteStorage implements RouteStorageInterface, DestructableInterf
   /**
    * {@inheritdoc}
    */
-  public function dump(RouteCollection $routes, string $suffix): CompiledRouterData {
+  public function dump(RouteCollection $routes): CompiledRouterData {
     $data = CompiledRouterData::fromCollection($routes);
     $code = $this->generateCode($data);
     $hash = hash('xxh128', $code);
@@ -105,13 +113,15 @@ class PhpDumperRouteStorage implements RouteStorageInterface, DestructableInterf
       return $this->dataByHash[$hash];
     }
 
+    // If this hash was pending deletion from a prior dump in the same
+    // request, reclaim it — the file is still on disk.
     if (isset($this->oldHashes[$hash]) && $this->phpStorage->exists($filename)) {
       unset($this->oldHashes[$hash]);
     }
     elseif (!$this->phpStorage->exists($filename)) {
       if ($this->phpStorage->save($filename, $code) === FALSE) {
-        // Another worker may have written the file; fall through to the
-        // in-memory representation for this request.
+        // Another worker may have written the file concurrently; continue
+        // with the in-memory representation for this request.
         $this->dataByHash[$hash] = $data;
         return $data;
       }
@@ -124,10 +134,11 @@ class PhpDumperRouteStorage implements RouteStorageInterface, DestructableInterf
     $this->dataByHash[$hash] = $data;
 
     try {
-      $this->cache->set(static::CACHE_PREFIX . $suffix, $hash);
+      $this->cache->set(static::CACHE_KEY, $hash);
     }
     catch (\Exception) {
-      // The cache bin may not exist yet (e.g. during install).
+      // The cache backend may not be available yet (e.g. during install).
+      // Subsequent requests will rebuild locally on cache miss.
     }
 
     return $data;
@@ -137,7 +148,7 @@ class PhpDumperRouteStorage implements RouteStorageInterface, DestructableInterf
    * {@inheritdoc}
    */
   public function invalidate(): void {
-    $this->cache->deleteAll();
+    $this->cache->delete(static::CACHE_KEY);
   }
 
   /**
@@ -175,7 +186,7 @@ class PhpDumperRouteStorage implements RouteStorageInterface, DestructableInterf
   }
 
   /**
-   * Returns the filename used for a given hash.
+   * Returns the filename used for a given content hash.
    */
   protected function fileName(string $hash): string {
     return 'DrupalRoutes_' . $hash . '.php';

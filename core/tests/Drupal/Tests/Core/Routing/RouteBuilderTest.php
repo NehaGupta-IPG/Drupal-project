@@ -8,7 +8,6 @@ use Drupal\Core\Access\CheckProviderInterface;
 use Drupal\Core\Controller\ControllerResolverInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Discovery\YamlDiscovery;
-use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Routing\RouteBuilder;
@@ -46,11 +45,6 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
    * The route storage.
    */
   protected RouteStorageInterface&Stub $storage;
-
-  /**
-   * The kernel (used to obtain the routes cache-key suffix).
-   */
-  protected DrupalKernelInterface&Stub $kernel;
 
   /**
    * The mocked lock backend.
@@ -108,8 +102,6 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
     $this->storage = $this->createStub(RouteStorageInterface::class);
     $this->storage->method('dump')
       ->willReturn(CompiledRouterData::fromCollection(new RouteCollection()));
-    $this->kernel = $this->createStub(DrupalKernelInterface::class);
-    $this->kernel->method('getRoutesCacheKeySuffix')->willReturn('test-suffix');
     $this->lock = $this->createMock('Drupal\Core\Lock\LockBackendInterface');
     $this->dispatcher = new EventDispatcher();
     $this->moduleHandler = $this->createStub(ModuleHandlerInterface::class);
@@ -124,7 +116,7 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
 
     $this->dispatcher->addSubscriber($this);
     $this->dispatcher->addSubscriber($yamlRouteDiscovery);
-    $this->routeBuilder = new RouteBuilder($this->storage, $this->kernel, $this->lock, $this->dispatcher, $this->checkProvider);
+    $this->routeBuilder = new RouteBuilder($this->storage, $this->lock, $this->dispatcher, $this->checkProvider);
   }
 
   /**
@@ -227,7 +219,7 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
     // Ensure that the final collection is handed to the storage.
     $this->storage->expects($this->once())
       ->method('dump')
-      ->with($route_collection, 'test-suffix')
+      ->with($route_collection)
       ->willReturn(CompiledRouterData::fromCollection($route_collection));
 
     $this->assertTrue($this->routeBuilder->rebuild());
@@ -291,7 +283,7 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
     // Ensure that the final collection is handed to the storage.
     $this->storage->expects($this->once())
       ->method('dump')
-      ->with($route_collection_filled, 'test-suffix')
+      ->with($route_collection_filled)
       ->willReturn(CompiledRouterData::fromCollection($route_collection_filled));
 
     $this->assertTrue($this->routeBuilder->rebuild());

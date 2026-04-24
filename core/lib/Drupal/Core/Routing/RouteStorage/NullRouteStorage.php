@@ -18,14 +18,14 @@ class NullRouteStorage implements RouteStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function load(string $suffix): ?CompiledRouterData {
+  public function load(): ?CompiledRouterData {
     return NULL;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function dump(RouteCollection $routes, string $suffix): CompiledRouterData {
+  public function dump(RouteCollection $routes): CompiledRouterData {
     return CompiledRouterData::fromCollection($routes);
   }
 

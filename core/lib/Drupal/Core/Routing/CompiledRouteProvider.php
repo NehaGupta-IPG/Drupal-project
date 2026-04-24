@@ -6,7 +6,6 @@ namespace Drupal\Core\Routing;
 
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
-use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\PathProcessor\InboundPathProcessorInterface;
@@ -28,6 +27,13 @@ use Symfony\Component\Routing\RouteCollection;
  * Parent properties left uninitialized (connection, state, tableName) are
  * never read from, because every code path that would read them has been
  * overridden here.
+ *
+ * When the storage returns NULL (first request after install, or any
+ * multi-web-head scenario where this head's local PhpStorage does not yet
+ * hold the file referenced by the shared cache entry) the provider
+ * triggers RouteBuilder::rebuild() to re-dump and re-load locally. A
+ * rebuild flag prevents re-entering the build from within event
+ * subscribers that look up routes during that same build.
  */
 class CompiledRouteProvider extends RouteProvider {
 
@@ -36,9 +42,19 @@ class CompiledRouteProvider extends RouteProvider {
    */
   protected ?CompiledRouterData $data = NULL;
 
+  /**
+   * TRUE while a rebuild is in progress, to prevent re-entry.
+   */
+  protected bool $rebuilding = FALSE;
+
+  /**
+   * TRUE once a miss-triggered rebuild has been attempted this request.
+   */
+  protected bool $rebuildAttempted = FALSE;
+
   public function __construct(
     protected readonly RouteStorageInterface $storage,
-    protected readonly DrupalKernelInterface $kernel,
+    protected readonly RouteBuilderInterface $routeBuilder,
     CurrentPathStack $currentPath,
     CacheBackendInterface $cache,
     InboundPathProcessorInterface $pathProcessor,
@@ -58,10 +74,26 @@ class CompiledRouteProvider extends RouteProvider {
 
   /**
    * Loads (or returns) the compiled router data for this request.
+   *
+   * On storage miss, triggers a local rebuild so multi-web-head
+   * deployments converge after any one head updates the shared cache
+   * pointer. Guarded against re-entry by $this->rebuilding.
    */
   protected function getData(): ?CompiledRouterData {
-    if ($this->data === NULL) {
-      $this->data = $this->storage->load($this->kernel->getRoutesCacheKeySuffix());
+    if ($this->data !== NULL) {
+      return $this->data;
+    }
+    $this->data = $this->storage->load();
+    if ($this->data === NULL && !$this->rebuilding && !$this->rebuildAttempted) {
+      $this->rebuildAttempted = TRUE;
+      $this->rebuilding = TRUE;
+      try {
+        $this->routeBuilder->rebuild();
+        $this->data = $this->storage->load();
+      }
+      finally {
+        $this->rebuilding = FALSE;
+      }
     }
     return $this->data;
   }
@@ -208,6 +240,7 @@ class CompiledRouteProvider extends RouteProvider {
    */
   public function reset(): void {
     $this->data = NULL;
+    $this->rebuildAttempted = FALSE;
     parent::reset();
   }
 

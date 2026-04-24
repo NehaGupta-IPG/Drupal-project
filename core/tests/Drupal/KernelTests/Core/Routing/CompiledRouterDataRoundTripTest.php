@@ -59,11 +59,11 @@ class CompiledRouterDataRoundTripTest extends KernelTestBase {
     ]);
     $storage = new PhpDumperRouteStorage($cache, $phpStorage);
 
-    $dumped = $storage->dump($collection, 'kernel-suffix');
+    $dumped = $storage->dump($collection);
     $this->assertSame('/foo', $dumped->getRoute('simple')?->getPath());
 
     // Re-instantiate to force a load from disk.
-    $loaded = (new PhpDumperRouteStorage($cache, $phpStorage))->load('kernel-suffix');
+    $loaded = (new PhpDumperRouteStorage($cache, $phpStorage))->load();
     $this->assertNotNull($loaded);
 
     foreach ($collection->all() as $name => $expected) {

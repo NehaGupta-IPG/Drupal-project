@@ -5,7 +5,6 @@ namespace Drupal\Core\Routing;
 use Drupal\Core\Access\CheckProviderInterface;
 use Drupal\Core\DependencyInjection\DeprecatedServicePropertyTrait;
 use Drupal\Core\Discovery\YamlDiscovery;
-use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\DestructableInterface;
 use Drupal\Core\Routing\RouteStorage\RouteStorageInterface;
@@ -28,11 +27,6 @@ class RouteBuilder implements RouteBuilderInterface, DestructableInterface {
    * The route storage to which compiled routes are dumped.
    */
   protected RouteStorageInterface $storage;
-
-  /**
-   * The kernel — used to obtain the current cache-key suffix.
-   */
-  protected DrupalKernelInterface $kernel;
 
   /**
    * The used lock backend instance.
@@ -89,9 +83,8 @@ class RouteBuilder implements RouteBuilderInterface, DestructableInterface {
   /**
    * Constructs the RouteBuilder.
    */
-  public function __construct(RouteStorageInterface $storage, DrupalKernelInterface $kernel, LockBackendInterface $lock, EventDispatcherInterface $dispatcher, CheckProviderInterface $check_provider) {
+  public function __construct(RouteStorageInterface $storage, LockBackendInterface $lock, EventDispatcherInterface $dispatcher, CheckProviderInterface $check_provider) {
     $this->storage = $storage;
-    $this->kernel = $kernel;
     $this->lock = $lock;
     $this->dispatcher = $dispatcher;
     $this->checkProvider = $check_provider;
@@ -138,7 +131,7 @@ class RouteBuilder implements RouteBuilderInterface, DestructableInterface {
 
     $this->checkProvider->setChecks($collection);
 
-    $this->storage->dump($collection, $this->kernel->getRoutesCacheKeySuffix());
+    $this->storage->dump($collection);
 
     $this->lock->release('router_rebuild');
     $this->dispatcher->dispatch(new Event(), RoutingEvents::FINISHED);

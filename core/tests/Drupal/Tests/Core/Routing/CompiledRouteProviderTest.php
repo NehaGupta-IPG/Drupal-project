@@ -6,12 +6,12 @@ namespace Drupal\Tests\Core\Routing;
 
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
-use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\PathProcessor\InboundPathProcessorInterface;
 use Drupal\Core\Routing\CompiledRouteProvider;
+use Drupal\Core\Routing\RouteBuilderInterface;
 use Drupal\Core\Routing\RouteStorage\CompiledRouterData;
 use Drupal\Core\Routing\RouteStorage\RouteStorageInterface;
 use Drupal\Tests\UnitTestCase;
@@ -35,9 +35,6 @@ class CompiledRouteProviderTest extends UnitTestCase {
     $storage = $this->createStub(RouteStorageInterface::class);
     $storage->method('load')->willReturn($data);
 
-    $kernel = $this->createStub(DrupalKernelInterface::class);
-    $kernel->method('getRoutesCacheKeySuffix')->willReturn('suffix');
-
     $language = $this->createStub(LanguageInterface::class);
     $language->method('getId')->willReturn('en');
     $languageManager = $this->createStub(LanguageManagerInterface::class);
@@ -45,7 +42,7 @@ class CompiledRouteProviderTest extends UnitTestCase {
 
     return new CompiledRouteProvider(
       $storage,
-      $kernel,
+      $this->createStub(RouteBuilderInterface::class),
       $this->createStub(CurrentPathStack::class),
       $this->createStub(CacheBackendInterface::class),
       $this->createStub(InboundPathProcessorInterface::class),

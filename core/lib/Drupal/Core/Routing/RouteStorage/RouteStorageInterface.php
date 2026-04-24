@@ -9,9 +9,8 @@ use Symfony\Component\Routing\RouteCollection;
 /**
  * Interface for loading, dumping, and invalidating compiled routes.
  *
- * The implementation is auto-detected from the 'route_storage_class' setting.
- * Sites that need a custom storage strategy can override the 'route_storage'
- * service in a service provider.
+ * Implementations are responsible for their own cache-key derivation;
+ * callers do not supply one.
  *
  * @see \Drupal\Core\Routing\RouteStorage\PhpDumperRouteStorage
  * @see \Drupal\Core\Routing\RouteStorage\NullRouteStorage
@@ -19,16 +18,12 @@ use Symfony\Component\Routing\RouteCollection;
 interface RouteStorageInterface {
 
   /**
-   * Attempts to load a previously stored compiled router data set.
-   *
-   * @param string $suffix
-   *   A hash suffix identifying the router version, computed by the kernel
-   *   from the environment, enabled modules, etc.
+   * Attempts to load the compiled router data for this site.
    *
    * @return \Drupal\Core\Routing\RouteStorage\CompiledRouterData|null
    *   The loaded router data, or NULL if no valid cached data exists.
    */
-  public function load(string $suffix): ?CompiledRouterData;
+  public function load(): ?CompiledRouterData;
 
   /**
    * Dumps a compiled route collection to persistent storage.
@@ -36,14 +31,12 @@ interface RouteStorageInterface {
    * @param \Symfony\Component\Routing\RouteCollection $routes
    *   The final route collection to compile. Callers must have dispatched all
    *   static/dynamic/alter events and installed access checks before calling.
-   * @param string $suffix
-   *   A hash suffix identifying this router version.
    *
    * @return \Drupal\Core\Routing\RouteStorage\CompiledRouterData
    *   The compiled router data, suitable for immediate use in the same
    *   request.
    */
-  public function dump(RouteCollection $routes, string $suffix): CompiledRouterData;
+  public function dump(RouteCollection $routes): CompiledRouterData;
 
   /**
    * Invalidates all stored compiled route data.

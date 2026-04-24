@@ -1102,7 +1102,7 @@ services:
   Drupal\Core\Routing\AdminContext: '@router.admin_context'
   router.route_provider:
     class: Drupal\Core\Routing\CompiledRouteProvider
-    arguments: ['@route_storage', '@kernel', '@path.current', '@cache.data', '@path_processor_manager', '@cache_tags.invalidator', '@language_manager']
+    arguments: ['@route_storage', '@router.builder', '@path.current', '@cache.data', '@path_processor_manager', '@cache_tags.invalidator', '@language_manager']
     tags:
       - { name: backend_overridable }
       - { name: event_subscriber }
@@ -1189,7 +1189,7 @@ services:
   Drupal\Core\Routing\MatcherDumperInterface: '@router.dumper'
   router.builder:
     class: Drupal\Core\Routing\RouteBuilder
-    arguments: ['@route_storage', '@kernel', '@lock', '@event_dispatcher', '@access_manager.check_provider']
+    arguments: ['@route_storage', '@lock', '@event_dispatcher', '@access_manager.check_provider']
     lazy: true
     tags:
       - { name: needs_destruction }
