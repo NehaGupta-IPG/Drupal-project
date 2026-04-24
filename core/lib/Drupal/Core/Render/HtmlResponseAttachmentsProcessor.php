@@ -14,6 +14,7 @@ use Drupal\Core\Form\EnforcedResponseException;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Processes attachments of HTML responses.
@@ -64,6 +65,8 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
    */
   public function processAttachments(AttachmentsInterface $response) {
     assert($response instanceof HtmlResponse);
+
+    $this->sendEarlyHints($response);
 
     // First, render the actual placeholders; this may cause additional
     // attachments to be added to the response, which the attachment
@@ -129,7 +132,7 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
       // them to #attached['html_head_link'].
       $fonts = $this->assetResolver->getFontAssets($assets, $this->languageManager->getCurrentLanguage());
       foreach ($fonts as $font) {
-        if ($font['preload']) {
+        if (!empty($font['preload'])) {
           $extension = pathinfo($font['data'], PATHINFO_EXTENSION);
           $attached['html_head_link'][] = [
             [
@@ -194,6 +197,39 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     $response->setAttachments($attached);
 
     return $response;
+  }
+
+  /**
+   * Sends early hints for attached assets.
+   *
+   * @param AttachmentsInterface $response
+   *   The response object.
+   */
+  protected function sendEarlyHints(AttachmentsInterface $response): void {
+    $attached = $response->getAttachments();
+    $assets = AttachedAssets::createFromRenderArray(['#attached' => $attached]);
+    // Take Ajax page state into account, to allow for something like
+    // Turbolinks to be implemented without altering core.
+    // @see https://github.com/rails/turbolinks/
+    $ajax_page_state = $this->requestStack->getCurrentRequest()->attributes->get('ajax_page_state');
+    $assets->setAlreadyLoadedLibraries(isset($ajax_page_state) ? explode(',', $ajax_page_state['libraries']) : []);
+
+    // Collect fonts from libraries, and if they include fonts to preload, add
+    // them to #attached['html_head_link'].
+    $fonts = $this->assetResolver->getFontAssets($assets, $this->languageManager->getCurrentLanguage());
+
+    $links = [];
+    foreach ($fonts as $font) {
+      if (!empty($font['preload']) && !empty($font['early hint'])) {
+        $extension = pathinfo($font['data'], PATHINFO_EXTENSION);
+        $links[] = '<' . $this->fileUrlGenerator->generate($font['data'])->toString() . '>; rel=preload as=font type=font/' . $extension . ' crossorigin=anonymous';
+      }
+    }
+    if ($links) {
+      $early_hints_response = new Response();
+      $early_hints_response->headers->set('Link', implode(', ', $links));
+      $early_hints_response->sendHeaders(103);
+    }
   }
 
   /**
