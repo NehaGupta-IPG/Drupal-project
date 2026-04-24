@@ -26,6 +26,14 @@ interface RouteStorageInterface {
   public function load(): ?CompiledRouterData;
 
   /**
+   * Whether compiled router data should be loadable, even if it isn't.
+   *
+   * @return bool
+   *   TRUE if the router data should exist, FALSE otherwise.
+   */
+  public function shouldExist(): bool;
+
+  /**
    * Dumps a compiled route collection to persistent storage.
    *
    * @param \Symfony\Component\Routing\RouteCollection $routes

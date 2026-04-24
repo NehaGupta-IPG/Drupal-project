@@ -147,6 +147,14 @@ class PhpDumperRouteStorage implements RouteStorageInterface, DestructableInterf
   /**
    * {@inheritdoc}
    */
+  public function shouldExist(): bool {
+    $cached = $this->cache->get(static::CACHE_KEY);
+    return $cached !== FALSE && !empty($cached->data);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function invalidate(): void {
     $this->cache->delete(static::CACHE_KEY);
   }

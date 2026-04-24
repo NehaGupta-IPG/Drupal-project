@@ -15,25 +15,6 @@ use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Route provider backed by a compiled-PHP route storage.
- *
- * Extends the database-backed RouteProvider purely for code reuse — the
- * caching/cache-ID helpers, the Alias-aware alias resolution, and the
- * event-subscriber wiring are identical. The subclass overrides the
- * handful of methods that actually read from the database so they instead
- * consume a CompiledRouterData snapshot loaded via a RouteStorageInterface.
- *
- * RouteProvider's protected properties are untyped, so the child constructor
- * skips parent::__construct() and only assigns the subset we actually use.
- * Parent properties left uninitialized (connection, state, tableName) are
- * never read from, because every code path that would read them has been
- * overridden here.
- *
- * When the storage returns NULL (first request after install, or any
- * multi-web-head scenario where this head's local PhpStorage does not yet
- * hold the file referenced by the shared cache entry) the provider
- * triggers RouteBuilder::rebuild() to re-dump and re-load locally. A
- * rebuild flag prevents re-entering the build from within event
- * subscribers that look up routes during that same build.
  */
 class CompiledRouteProvider extends RouteProvider {
 
@@ -69,10 +50,14 @@ class CompiledRouteProvider extends RouteProvider {
 
   /**
    * Loads the compiled router data for this request.
+   *
+   * On a cache hit with a missing local file (multi-head miss) triggers a
+   * local rebuild. On a cache miss (site never built), returns NULL —
+   * letting pre-install requests 404 and get redirected to the installer.
    */
   protected function getData(): ?CompiledRouterData {
     $data = $this->storage->load();
-    if ($data === NULL && !$this->rebuilding && !$this->rebuildAttempted) {
+    if ($data === NULL && !$this->rebuilding && !$this->rebuildAttempted && $this->storage->shouldExist()) {
       $this->rebuildAttempted = TRUE;
       $this->rebuilding = TRUE;
       try {
@@ -84,6 +69,14 @@ class CompiledRouteProvider extends RouteProvider {
       }
     }
     return $data;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function reset(): void {
+    $this->rebuildAttempted = FALSE;
+    parent::reset();
   }
 
   /**
@@ -221,14 +214,6 @@ class CompiledRouteProvider extends RouteProvider {
       }
     }
     return (new \ArrayObject($routes))->getIterator();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function reset(): void {
-    $this->rebuildAttempted = FALSE;
-    parent::reset();
   }
 
   /**

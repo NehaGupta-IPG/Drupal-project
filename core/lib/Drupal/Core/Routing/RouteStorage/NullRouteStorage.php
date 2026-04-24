@@ -32,6 +32,13 @@ class NullRouteStorage implements RouteStorageInterface {
   /**
    * {@inheritdoc}
    */
+  public function shouldExist(): bool {
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function invalidate(): void {
     // No-op.
   }
