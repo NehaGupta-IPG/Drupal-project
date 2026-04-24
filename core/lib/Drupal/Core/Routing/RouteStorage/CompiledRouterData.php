@@ -19,7 +19,7 @@ use Symfony\Component\Routing\RouteCollection;
  * - an index grouping routes by pattern outline, so
  *   getRouteCollectionForRequest() can return every candidate for a given
  *   path without a full scan;
- * - the set of fit bitmasks that actually correspond to routes.
+ * - the set of fit bit masks that actually correspond to routes.
  *
  * Entries are held serialized until requested; unserialize happens lazily.
  */
@@ -33,7 +33,7 @@ final class CompiledRouterData {
    * @param array<string, list<array{name: string, fit: int, numParts: int}>> $outlineIndex
    *   Pattern outlines mapped to the list of routes sharing that outline.
    * @param list<int> $numberPartsMasks
-   *   The fit bitmasks that are actually used by at least one route.
+   *   The fit bit masks that are actually used by at least one route.
    */
   public function __construct(
     private readonly array $serializedEntries,
@@ -130,10 +130,10 @@ final class CompiledRouterData {
   }
 
   /**
-   * Returns the set of path-length bitmasks in use.
+   * Returns the set of path-length bit masks in use.
    *
    * @return list<int>
-   *   The fit bitmasks, sorted in descending order.
+   *   The fit bit masks, sorted in descending order.
    */
   public function getNumberPartsMasks(): array {
     return $this->numberPartsMasks;
@@ -201,10 +201,10 @@ final class CompiledRouterData {
     $masks = [];
 
     foreach ($routes->all() as $name => $route) {
-      // Prime each route with Drupal's RouteCompiler *before* serialising.
+      // Prime each route with Drupal's RouteCompiler *before* serializing.
       // The Route's internal compile cache and options are included in
       // __serialize(), so setting compiler_class here ensures that when the
-      // routes are unserialised later and a consumer calls $route->compile()
+      // routes are unserialized later and a consumer calls $route->compile()
       // they get a Drupal CompiledRoute with getFit(), getPatternOutline(),
       // etc. Clone so the caller's collection remains pristine.
       $route = clone $route;

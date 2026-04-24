@@ -25,7 +25,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * RouteProvider's protected properties are untyped, so the child constructor
  * skips parent::__construct() and only assigns the subset we actually use.
- * Parent properties left uninitialised (connection, state, tableName) are
+ * Parent properties left uninitialized (connection, state, tableName) are
  * never read from, because every code path that would read them has been
  * overridden here.
  */

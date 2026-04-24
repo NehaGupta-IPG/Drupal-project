@@ -33,7 +33,7 @@ class CompiledRouterDataRoundTripTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->phpStorageDir = $this->siteDirectory . '/phpstorage';
+    $this->phpStorageDir = $this->siteDirectory . '/php_storage';
     mkdir($this->phpStorageDir, 0777, TRUE);
   }
 

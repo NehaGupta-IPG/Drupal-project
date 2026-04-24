@@ -87,7 +87,7 @@ class PhpDumperRouteStorageTest extends UnitTestCase {
   }
 
   /**
-   * Creates an in-memory cache stub that roundtrips set() and get().
+   * Creates an in-memory cache stub that round-trips set() and get().
    */
   protected function createInMemoryCache(?object &$cached = NULL): CacheBackendInterface {
     $cached = NULL;

@@ -17,7 +17,7 @@ use Symfony\Component\Routing\RouteCollection;
  * - 'aliases' : alias name => target name
  * - 'outlines': pattern outline => [['name' => string, 'fit' => int,
  *               'numParts' => int]]
- * - 'masks'   : sorted list of fit bitmasks that actually correspond to
+ * - 'masks'   : sorted list of fit bit masks that actually correspond to
  *               routes
  *
  * Mirroring the container-storage pattern, the file's hash is stored in a
@@ -160,10 +160,10 @@ class PhpDumperRouteStorage implements RouteStorageInterface, DestructableInterf
   /**
    * Includes the compiled-routes file and returns its array payload.
    *
-   * PhpStorageInterface::load() boolifies the file's return value, so we
-   * include the path directly. This is safe because
-   * MTimeProtectedFileStorage::exists() has already validated the mtime-based
-   * integrity of the file.
+   * PhpStorageInterface::load() casts the file's return value to a bool, so
+   * we include the path directly to keep the returned array. This is safe
+   * because MTimeProtectedFileStorage::exists() has already validated the
+   * mtime-based integrity of the file.
    */
   protected function includeFile(string $filename): ?array {
     $path = $this->phpStorage->getFullPath($filename);
