@@ -66,6 +66,14 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
   public function processAttachments(AttachmentsInterface $response) {
     assert($response instanceof HtmlResponse);
 
+    // Before placeholders are rendered, there will already be some libraries
+    // attached to the response, particularly libraries specified by the theme
+    // to load on every request. By sending early hints for assets at this
+    // point, the browser will be able to start downloading those assets while
+    // there is still potentially 10s or 100s of milliseconds before the HTML
+    // response itself being sent. While more assets will be available after
+    // placeholders are rendered, this happens just before the response itself
+    // so early hints are unlikely to make a difference there.
     $this->sendEarlyHints($response);
 
     // First, render the actual placeholders; this may cause additional
@@ -204,6 +212,8 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
    *
    * @param AttachmentsInterface $response
    *   The response object.
+   *
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/103
    */
   protected function sendEarlyHints(AttachmentsInterface $response): void {
     $attached = $response->getAttachments();
