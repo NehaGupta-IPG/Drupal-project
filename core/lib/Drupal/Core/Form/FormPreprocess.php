@@ -22,7 +22,8 @@ class FormPreprocess {
    * @param array $variables
    *   An associative array containing:
    *   - element: An associative array containing the properties of the element.
-   *     Properties used: #action, #method, #attributes, #children.
+   *     Properties used: #action, #method, #attributes, #children,
+   *     and #show_required_legend.
    */
   public function preprocessForm(array &$variables): void {
     $element = $variables['element'];
@@ -33,6 +34,8 @@ class FormPreprocess {
     if (empty($element['#attributes']['accept-charset'])) {
       $element['#attributes']['accept-charset'] = "UTF-8";
     }
+    // Optional legend for required fields.
+    $variables['show_required_legend'] = !empty($element['#show_required_legend']);
     $variables['attributes'] = $element['#attributes'];
     $variables['children'] = $element['#children'];
   }
