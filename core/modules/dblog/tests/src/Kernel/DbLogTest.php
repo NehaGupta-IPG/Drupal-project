@@ -31,7 +31,7 @@ class DbLogTest extends KernelTestBase {
     parent::setUp();
 
     $this->installSchema('dblog', ['watchdog']);
-    $this->installConfig(['system']);
+    $this->installSpecificConfig('system', 'system.cron');
   }
 
   /**
