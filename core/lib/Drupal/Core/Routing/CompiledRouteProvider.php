@@ -247,6 +247,17 @@ class CompiledRouteProvider extends RouteProvider {
   /**
    * {@inheritdoc}
    */
+  public static function getSubscribedEvents(): array {
+    // reset() must run at a higher priority than MenuRouterRebuildSubscriber
+    // (which runs at 100) to ensure that the route data is cleared before it
+    // is queried during the same rebuild.
+    $events[RoutingEvents::FINISHED][] = ['reset', 200];
+    return $events;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getRouteAliases(string $route_name): iterable {
     $data = $this->getData();
     if ($data === NULL) {
