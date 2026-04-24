@@ -89,8 +89,9 @@ class Datetime extends DateElementBase {
         $time_format = $element['#date_time_element'] != 'none' && $element['#date_time_format'] != 'none' ? static::getHtml5TimeFormat($element) : '';
       }
 
-      // Seconds will be omitted in a post in case there's no entry.
-      if (!empty($time_input) && strlen($time_input) == 5) {
+      // Ensure the time has a seconds portion in case it was omitted or
+      // stripped out by the browser.
+      if (!empty($time_input) && $element['#date_time_element'] === 'time' && strlen($time_input) == 5) {
         $time_input .= ':00';
       }
 

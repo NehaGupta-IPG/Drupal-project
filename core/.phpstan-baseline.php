@@ -24382,6 +24382,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/tests/modules/form_test/src/Form/FormTestColorForm.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\form_test\\\\Form\\\\FormTestDatetimeTimeTest\\:\\:submitForm\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/tests/modules/form_test/src/Form/FormTestDatetimeTimeTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\form_test\\\\Form\\\\FormTestDescriptionForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
