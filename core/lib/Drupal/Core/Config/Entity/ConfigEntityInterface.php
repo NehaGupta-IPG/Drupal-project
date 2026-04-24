@@ -18,10 +18,10 @@ interface ConfigEntityInterface extends EntityInterface, ThirdPartySettingsInter
    *
    * @return $this
    *
-   * @deprecated in 11.4.0 and will removed in 13.0.0. Use
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
    *   \Drupal\Core\Config\Entity\StatusInterface and
-   *   \Drupal\Core\Config\Entity\StatusTrait instead, see
-   *   https://www.drupal.org/node/2872193.
+   *   \Drupal\Core\Config\Entity\StatusTrait instead.
+   * @see https://www.drupal.org/node/2872193
    */
   public function enable();
 
@@ -30,10 +30,10 @@ interface ConfigEntityInterface extends EntityInterface, ThirdPartySettingsInter
    *
    * @return $this
    *
-   * @deprecated in 11.4.0 and will removed in 13.0.0. Use
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
    *   \Drupal\Core\Config\Entity\StatusInterface and
-   *   \Drupal\Core\Config\Entity\StatusTrait instead, see
-   *   https://www.drupal.org/node/2872193.
+   *   \Drupal\Core\Config\Entity\StatusTrait instead.
+   * @see https://www.drupal.org/node/2872193
    */
   public function disable();
 
@@ -45,10 +45,10 @@ interface ConfigEntityInterface extends EntityInterface, ThirdPartySettingsInter
    *
    * @return $this
    *
-   * @deprecated in 11.4.0 and will removed in 13.0.0. Use
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
    *   \Drupal\Core\Config\Entity\StatusInterface and
-   *   \Drupal\Core\Config\Entity\StatusTrait instead, see
-   *   https://www.drupal.org/node/2872193.
+   *   \Drupal\Core\Config\Entity\StatusTrait instead.
+   * @see https://www.drupal.org/node/2872193
    */
   public function setStatus($status);
 
@@ -67,10 +67,10 @@ interface ConfigEntityInterface extends EntityInterface, ThirdPartySettingsInter
    * @return bool
    *   Whether the entity is enabled or not.
    *
-   * @deprecated in 11.4.0 and will removed in 13.0.0. Use
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
    *   \Drupal\Core\Config\Entity\StatusInterface and
-   *   \Drupal\Core\Config\Entity\StatusTrait instead, see
-   *   https://www.drupal.org/node/2872193.
+   *   \Drupal\Core\Config\Entity\StatusTrait instead.
+   * @see https://www.drupal.org/node/2872193
    */
   public function status();
 

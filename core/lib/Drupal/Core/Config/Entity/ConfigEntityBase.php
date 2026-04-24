@@ -44,9 +44,9 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
   /**
    * The enabled/disabled status of the configuration entity.
    *
-   * @todo Move to \Drupal\Core\Config\Entity\StatusTrait in Drupal 13.0.0.
-   *
    * @var bool
+   *
+   * @todo Move to \Drupal\Core\Config\Entity\StatusTrait in Drupal 13.0.0.
    *
    * @see \Drupal\Core\Config\Entity\StatusInterface
    * @see \Drupal\Core\Config\Entity\StatusTrait
