@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Plugin\Condition;
 
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -105,6 +106,7 @@ class CurrentThemeConditionTest extends KernelTestBase {
    * Tests whether the old current theme condition 'theme' configuration key
    * still works as expected and throws the defined deprecation message.
    */
+  #[IgnoreDeprecations]
   public function testCurrentThemeDeprecated(): void {
     \Drupal::service('theme_installer')->install(['starterkit_theme', 'test_base_theme']);
 
