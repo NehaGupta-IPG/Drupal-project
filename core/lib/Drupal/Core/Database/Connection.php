@@ -8,6 +8,7 @@ use Drupal\Core\Database\Exception\EventException;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\Query\Delete;
 use Drupal\Core\Database\Query\Insert;
+use Drupal\Core\Database\Query\JsonExpression;
 use Drupal\Core\Database\Query\Merge;
 use Drupal\Core\Database\Query\Select;
 use Drupal\Core\Database\Query\Truncate;
@@ -266,6 +267,10 @@ abstract class Connection {
    *   database type. In rare cases, such as creating an SQL function, []
    *   characters might be needed and can be allowed by changing this option to
    *   TRUE.
+   * - strict_params: By default, parameters are bound as strings, which most
+   *   database servers will coerce as necessary. Some types of queries may
+   *   require strict comparison, e.g. on values in JSON-backed columns. When
+   *   set to TRUE, Drupal will bind parameters strictly (if supported).
    * - pdo: By default, queries will execute with the client connection options
    *   set on the connection. In particular cases, it could be necessary to
    *   override the driver options on the statement level. In such case, pass
@@ -280,6 +285,7 @@ abstract class Connection {
       'fetch' => FetchAs::Object,
       'allow_delimiter_in_query' => FALSE,
       'allow_square_brackets' => FALSE,
+      'strict_params' => FALSE,
       'pdo' => [],
     ];
   }
@@ -362,7 +368,26 @@ abstract class Connection {
    *   The properly-prefixed string.
    */
   public function prefixTables($sql) {
-    return str_replace(['{', '}'], $this->tablePlaceholderReplacements, $sql);
+    // A simple str_replace() would mangle JSON strings embedded in
+    // single-quoted SQL literals, e.g. '{"key": 1}' would have its curly
+    // braces replaced. The regex below skips single-quoted strings entirely,
+    // then replaces {table} patterns only outside of them.
+    return preg_replace_callback(
+      "/'([^'\\\\]*(?:\\\\.[^'\\\\]*)*)'|(?'simple'\{(\w+)\})/",
+      function ($matches) {
+        return match (TRUE) {
+          // {table} outside single quotes — apply prefix.
+          array_key_exists('simple', $matches) => "{$this->tablePlaceholderReplacements[0]}{$matches[3]}{$this->tablePlaceholderReplacements[1]}",
+          // BC layer: historically, '{table}' inside single quotes was valid.
+          // Replace {word} patterns only when the quoted string is not valid
+          // JSON, so '{"key": 1}' is preserved but '{table}' is expanded.
+          preg_match('/\{\w+\}/', $matches[1]) && !json_validate($matches[1]) => preg_replace_callback('/\{(\w+)\}/', fn($m) => "{$this->tablePlaceholderReplacements[0]}{$m[1]}{$this->tablePlaceholderReplacements[1]}", $matches[0]),
+          // Single-quoted string without {word} patterns — return as-is.
+          default => $matches[0],
+        };
+      },
+      $sql
+    );
   }
 
   /**
@@ -386,7 +411,19 @@ abstract class Connection {
    *   This method should only be called by database API code.
    */
   public function quoteIdentifiers($sql) {
-    return str_replace(['[', ']'], $this->identifierQuotes, $sql);
+    // A simple str_replace() would mangle SQL array constructors like
+    // ARRAY['a','b'] used by JSON expressions. The regex below skips
+    // single-quoted strings entirely, then replaces [identifier] patterns
+    // only outside of them.
+    return preg_replace_callback(
+      "/'[^'\\\\]*(?:\\\\.[^'\\\\]*)*'|(\[(\w+)])/",
+      function ($matches) {
+        return count($matches) > 1
+          ? "{$this->identifierQuotes[0]}{$matches[2]}{$this->identifierQuotes[1]}"
+          : $matches[0];
+      },
+      $sql
+    );
   }
 
   /**
@@ -948,6 +985,26 @@ abstract class Connection {
    *   The database Schema object for this connection.
    */
   abstract public function schema();
+
+  /**
+   * Creates a JsonExpression for extracting a value from a JSON column.
+   *
+   * @param string $field
+   *   The column name, optionally table-qualified (e.g. "t.data").
+   * @param string $path
+   *   The JSONPath expression (e.g. "$.status").
+   *
+   * @return \Drupal\Core\Database\Query\JsonExpression
+   *   A driver-specific JsonExpression instance.
+   */
+  public function jsonExpression(string $field, string $path): JsonExpression {
+    $class = $this->getDriverClass('JsonExpression');
+    if ($class === 'JsonExpression') {
+      @trigger_error('Not implementing JsonExpression in database drivers is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Implement JsonExpression to provide JSON support. See https://www.drupal.org/node/3389682', E_USER_DEPRECATED);
+      throw new \LogicException('Driver does not provide JSON support.');
+    }
+    return new $class($this, $field, $path);
+  }
 
   /**
    * Prepares and returns a CONDITION query object.

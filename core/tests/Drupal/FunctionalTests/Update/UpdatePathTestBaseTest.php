@@ -174,7 +174,10 @@ class UpdatePathTestBaseTest extends UpdatePathTestBase {
    */
   public function testSchemaChecking(): void {
     // Create some configuration that should be skipped.
-    $this->config('config_schema_test.no_schema')->set('foo', 'bar')->save();
+    \Drupal::database()->merge('config')
+      ->keys(['collection' => '', 'name' => 'config_schema_test.no_schema'])
+      ->fields(['data' => serialize(['foo' => 'bar'])])
+      ->execute();
     $this->runUpdates();
     $this->assertSame('bar', $this->config('config_schema_test.no_schema')->get('foo'));
 

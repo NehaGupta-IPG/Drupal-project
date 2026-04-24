@@ -257,6 +257,22 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  protected function doTestJsonRoundTrip(): void {
+    foreach (static::JSON_TEST_DATA as $path => $expected) {
+      $query = $this->connection->select('test_json');
+      // While MySQL supports -> and ->> syntax, MariaDB does not.
+      // JSON_EXTRACT() is the common denominator.
+      $query->addExpression('JSON_EXTRACT(test_field, :path)', NULL, [
+        ':path' => $path,
+      ]);
+      $actual = json_decode($query->execute()->fetchField());
+      $this->assertSame($expected, $actual);
+    }
+  }
+
+  /**
    * Tests SchemaTableKeyTooLargeException.
    */
   public function testSchemaTableKeyTooLargeException(): void {

@@ -14,6 +14,7 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\UpdatePathTestTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -162,6 +163,16 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
       }
       require $file;
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function initConfig(ContainerInterface $container): void {
+    // Only create the private directory. Do not write test-specific config to
+    // the database because the config table schema from the dump may not match
+    // what the current code expects.
+    \Drupal::service('file_system')->prepareDirectory($this->privateFilesDirectory, FileSystemInterface::CREATE_DIRECTORY);
   }
 
   /**

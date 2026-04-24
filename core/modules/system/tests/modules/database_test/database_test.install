@@ -353,5 +353,13 @@ function database_test_schema(): array {
 
   $schema['TEST_UPPERCASE'] = $schema['test'];
 
+  $schema['json'] = [
+    'fields' => [
+      'id' => ['type' => 'serial', 'not null' => TRUE],
+      'test_field' => ['type' => 'json'],
+    ],
+    'primary key' => ['id'],
+  ];
+
   return $schema;
 }

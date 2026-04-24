@@ -28,13 +28,6 @@ class Query extends QueryBase implements QueryInterface {
   protected $configFactory;
 
   /**
-   * The key value factory.
-   *
-   * @var \Drupal\Core\KeyValueStore\KeyValueFactoryInterface
-   */
-  protected $keyValueFactory;
-
-  /**
    * Constructs a Query object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
@@ -44,15 +37,16 @@ class Query extends QueryBase implements QueryInterface {
    *   - OR: at least one of the conditions on the query need to match.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_factory
-   *   The key value factory.
    * @param array $namespaces
    *   List of potential namespaces of the classes belonging to this query.
    */
-  public function __construct(EntityTypeInterface $entity_type, $conjunction, ConfigFactoryInterface $config_factory, KeyValueFactoryInterface $key_value_factory, array $namespaces) {
+  public function __construct(EntityTypeInterface $entity_type, $conjunction, ConfigFactoryInterface $config_factory, $namespaces) {
+    if ($namespaces instanceof KeyValueFactoryInterface) {
+      @trigger_error('Passing a KeyValueFactoryInterface to ' . __CLASS__ . '::__construct() is deprecated in drupal:11.4.0 and will be removed in drupal:12.0.0. See https://www.drupal.org/node/3578326', E_USER_DEPRECATED);
+      $namespaces = func_get_arg(4);
+    }
     parent::__construct($entity_type, $conjunction, $namespaces);
     $this->configFactory = $config_factory;
-    $this->keyValueFactory = $key_value_factory;
   }
 
   /**
@@ -137,7 +131,6 @@ class Query extends QueryBase implements QueryInterface {
     $id_condition = NULL;
     $id_key = $this->entityType->getKey('id');
     if ($this->condition->getConjunction() == 'AND') {
-      $lookup_keys = $this->entityType->getLookupKeys();
       $conditions = $this->condition->conditions();
       foreach ($conditions as $condition_key => $condition) {
         $operator = $condition['operator'] ?: (is_array($condition['value']) ? 'IN' : '=');
@@ -149,18 +142,6 @@ class Query extends QueryBase implements QueryInterface {
             $filter_by_names[] = array_map(static function ($id) use ($prefix) {
               return $prefix . $id;
             }, $ids);
-          }
-          elseif (in_array($condition['field'], $lookup_keys)) {
-            $has_added_restrictions = TRUE;
-            // If we don't find anything then there are no matches. No point in
-            // listing anything.
-            $keys = (array) $condition['value'];
-            $keys = array_map(static function ($value) use ($condition) {
-              return $condition['field'] . ':' . $value;
-            }, $keys);
-            foreach ($this->getConfigKeyStore()->getMultiple($keys) as $list) {
-              $filter_by_names[] = $list;
-            }
           }
         }
         // Save the first ID condition that is not an 'IN' or '=' for narrowing
@@ -232,16 +213,6 @@ class Query extends QueryBase implements QueryInterface {
       $records[substr($config->getName(), $prefix_length)] = $config->get();
     }
     return $records;
-  }
-
-  /**
-   * Gets the key value store used to store fast lookups.
-   *
-   * @return \Drupal\Core\KeyValueStore\KeyValueStoreInterface
-   *   The key value store used to store fast lookups.
-   */
-  protected function getConfigKeyStore() {
-    return $this->keyValueFactory->get(QueryFactory::CONFIG_LOOKUP_PREFIX . $this->entityTypeId);
   }
 
 }
