@@ -14,15 +14,15 @@ use Symfony\Component\Mime\Email;
  */
 class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
 
-  protected array $parameters;
+  protected array $parameters = [];
 
-  protected array $headers;
+  protected array $headers = [];
 
   protected array|RenderableInterface|null $htmlBody = NULL;
 
   protected array|RenderableInterface|null $textBody = NULL;
 
-  protected array $environment;
+  protected array $environment = [];
 
   protected ?Email $email = NULL;
 
