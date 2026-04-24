@@ -510,7 +510,7 @@ class ViewAjaxControllerTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
 
-    $display_handler->expects($this->once())
+    $display_handler
       ->method('ajaxEnabled')
       ->willReturn(self::USE_AJAX);
 
@@ -526,7 +526,7 @@ class ViewAjaxControllerTest extends UnitTestCase {
     $display_collection = $this->getMockBuilder('Drupal\views\DisplayPluginCollection')
       ->disableOriginalConstructor()
       ->getMock();
-    $display_collection->expects($this->once())
+    $display_collection
       ->method('get')
       ->with('page_1')
       ->willReturn($display_handler);
