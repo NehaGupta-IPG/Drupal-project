@@ -24,7 +24,7 @@ class RouteCompiler extends SymfonyRouteCompiler implements RouteCompilerInterfa
    * stored as a varchar(255). It's therefore impossible to have a route with
    * this many actual parts.
    */
-  private const NUM_PARTS_UNLIMITED = 256;
+  protected const int NUM_PARTS_UNLIMITED = 256;
 
   /**
    * Compiles the current route instance.
