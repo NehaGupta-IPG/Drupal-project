@@ -82,6 +82,7 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
       'nested' => ['baz' => TRUE],
     ];
 
+    // Prime the database table before inserting a raw legacy row.
     $backend->set('legacy_php_serialized_setup', 'setup');
     $backend->delete('legacy_php_serialized_setup');
 
