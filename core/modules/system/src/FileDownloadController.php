@@ -50,7 +50,7 @@ class FileDownloadController extends ControllerBase {
    */
   public function download(Request $request, $scheme = 'private') {
     $target = $request->query->get('file');
-    return $this->download($target, $scheme);
+    return $this->downloadPath($target, $scheme);
   }
 
   /**
