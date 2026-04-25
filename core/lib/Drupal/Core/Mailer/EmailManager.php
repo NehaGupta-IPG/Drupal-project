@@ -9,6 +9,7 @@ use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Mailer\Attribute\Email as EmailAttribute;
+use Drupal\Core\Mailer\Plugin\Email\EmailPluginDefault;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\AttributeClassDiscovery;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
@@ -20,7 +21,6 @@ use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Theme\Registry;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 
@@ -36,7 +36,7 @@ use Symfony\Component\Mime\Email;
  *     description: STRING
  * @endcode
  *
- * @see \Drupal\Core\Mailer\EmailPluginDefault
+ * @see \Drupal\Core\Mailer\Plugin\Email\EmailPluginDefault
  * @see \Drupal\Core\Mailer\EmailPluginInterface
  */
 class EmailManager extends DefaultPluginManager {
@@ -83,7 +83,8 @@ class EmailManager extends DefaultPluginManager {
     RendererInterface $renderer,
     MailerInterface $mailer,
     #[Autowire(service: 'cache.discovery')]
-    CacheBackendInterface $cache_backend) {
+    CacheBackendInterface $cache_backend,
+  ) {
     parent::__construct('Plugin/Email', $namespaces, $module_handler, EmailPluginInterface::class, EmailAttribute::class);
     $this->factory = new ContainerFactory($this, EmailPluginInterface::class);
     $this->moduleHandler = $module_handler;
@@ -125,6 +126,9 @@ class EmailManager extends DefaultPluginManager {
     }
   }
 
+  /**
+   *
+   */
   protected function build(EmailPluginInterface $email): Email {
     $this->moduleHandler->alter('email_pre_build', $email);
 
@@ -158,8 +162,7 @@ class EmailManager extends DefaultPluginManager {
         'email' => $email,
         'cacheable_metadata' => $metadata,
       ];
-      $this->moduleHandler->alter('email_pre_render', $email_data, $context);
-
+      // $this->moduleHandler->alter('email_pre_render', $email_data, $context);
       $symfony_email = new $email_data['symfony_email_class']();
 
       foreach ($email_data['headers'] as $name => $value) {
@@ -187,9 +190,9 @@ class EmailManager extends DefaultPluginManager {
   }
 
   /**
-   * @param EmailPluginInterface $email
+   * @param \Symfony\Component\Mime\EmailPluginInterface $email
    * @return bool
-   * @throws TransportExceptionInterface
+   * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
    */
   public function send(EmailPluginInterface $email): bool {
     $symfony_email = $this->build($email);

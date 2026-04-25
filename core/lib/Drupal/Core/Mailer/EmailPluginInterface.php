@@ -8,7 +8,6 @@ use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\RenderableInterface;
 use Symfony\Component\Mime\Address;
-use Symfony\Component\Mime\Email;
 
 /**
  * Interface for email plugins.
@@ -143,12 +142,12 @@ interface EmailPluginInterface extends PluginInspectionInterface, ContainerFacto
   /**
    * Sets multiple email parameters.
    *
-   * @param array $params
+   * @param array $parameters
    *   An associative array of parameters.
    *
    * @return static
    */
-  public function setParameters(array $params): static;
+  public function setParameters(array $parameters): static;
 
   /**
    * Returns a specific parameter value.
@@ -159,7 +158,7 @@ interface EmailPluginInterface extends PluginInspectionInterface, ContainerFacto
    * @return mixed
    *   The parameter value or NULL if not set.
    */
-  public function getParam(string $key): mixed;
+  public function getParameter(string $key): mixed;
 
   /**
    * Sets a single parameter.
@@ -171,7 +170,7 @@ interface EmailPluginInterface extends PluginInspectionInterface, ContainerFacto
    *
    * @return static
    */
-  public function setParam(string $key, mixed $value): static;
+  public function setParameter(string $key, mixed $value): static;
 
   /**
    * Returns the language code.

@@ -12,7 +12,7 @@ use Symfony\Component\Mime\Email;
 /**
  * Default class used for emails plugins.
  */
-class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
+abstract class EmailPluginBase extends PluginBase implements EmailPluginInterface {
 
   protected array $parameters = [];
 
@@ -27,7 +27,6 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
   protected ?Email $email = NULL;
 
   protected bool $send = TRUE;
-
 
   /**
    * {@inheritdoc}
@@ -58,7 +57,7 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
     return (string) $this->pluginDefinition['key'];
   }
 
-/**
+  /**
    * {@inheritdoc}
    */
   public function getLangcode(): ?string {
@@ -82,26 +81,12 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
   /**
    * {@inheritdoc}
    */
-  public function htmlBody(): RenderableInterface|array|null {
-    if ($template_id = $this->getHtmlBodyTemplate()) {
-      return [
-        '#theme' => $template_id,
-        '#email' => $this,
-      ];
-    }
-    return NULL;
-  }
+  abstract public function htmlBody(): RenderableInterface|array|null;
 
   /**
    * {@inheritdoc}
    */
   public function textBody(): RenderableInterface|array|null {
-    if ($template_id = $this->getTextBodyTemplate()) {
-      return [
-        '#theme' => $template_id,
-        '#email' => $this,
-      ];
-    }
     return NULL;
   }
 
@@ -210,14 +195,14 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
   /**
    * {@inheritdoc}
    */
-  public function getParam(string $key): mixed {
+  public function getParameter(string $key): mixed {
     return $this->parameters[$key] ?? NULL;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setParam(string $key, mixed $value): static {
+  public function setParameter(string $key, mixed $value): static {
     $this->parameters[$key] = $value;
     return $this;
   }
@@ -308,6 +293,5 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
   public function shouldSend(): bool {
     return $this->send;
   }
-
 
 }
