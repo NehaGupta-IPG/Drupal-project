@@ -36,7 +36,7 @@ abstract class EmailPluginBase extends PluginBase implements EmailPluginInterfac
   protected array|RenderableInterface|null $htmlBody = NULL;
 
   /**
-   * The text body (unuseds).
+   * The text body (unused).
    *
    * @var array|RenderableInterface|null
    */

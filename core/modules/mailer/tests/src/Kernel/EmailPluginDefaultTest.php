@@ -119,7 +119,7 @@ class EmailPluginDefaultTest extends KernelTestBase {
     $email
       ->subject('Email with both body')
       ->setParameters([
-        'name' => '佐藤 (Satō)',
+        'name' => '佐藤',
         'bill_amount' => '¥500',
       ]);
     $this->assertTrue($emailManager->send($email->to('foobar@example.com')));
@@ -129,12 +129,12 @@ class EmailPluginDefaultTest extends KernelTestBase {
 
     $sentEmail = $sentEmails[0];
     $htmlLines = [
-      '<p>Hello 佐藤 (Satō),</p>',
+      '<p>Hello 佐藤,</p>',
       '<p>Your bill for this month is <strong>¥500</strong>.</p>',
       '',
     ];
     $textLines = [
-      'Hello 佐藤 (Satō),',
+      'Hello 佐藤,',
       '',
       'Your bill for this month is ¥500.',
       '',
