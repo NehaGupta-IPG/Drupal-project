@@ -6,8 +6,8 @@ namespace Drupal\language\Environment;
 
 use Drupal\Core\Environment\SubstitutionApplyTrait;
 use Drupal\Core\Environment\SubstitutionInterface;
-use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageDefault;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\StringTranslation\TranslationManager;
 
@@ -29,14 +29,14 @@ class StringTranslationSubstitution extends LanguageSubstitutionBase implements 
   /**
    * {@inheritdoc}
    */
-  protected function getOriginalLanguage(): Language {
+  protected function getOriginalLanguage(): LanguageInterface {
     return $this->languageDefault->get();
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function overrideLanguage(Language $overrideLanguage): void {
+  protected function overrideLanguage(LanguageInterface $overrideLanguage): void {
     $this->translationManager->setDefaultLangcode($overrideLanguage->getId());
     $this->translationManager->reset();
   }
@@ -44,7 +44,7 @@ class StringTranslationSubstitution extends LanguageSubstitutionBase implements 
   /**
    * {@inheritdoc}
    */
-  protected function restoreLanguage(Language $originalLanguage): void {
+  protected function restoreLanguage(LanguageInterface $originalLanguage): void {
     $this->translationManager->setDefaultLangcode($originalLanguage->getId());
     $this->translationManager->reset();
   }

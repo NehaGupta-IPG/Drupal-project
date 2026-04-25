@@ -6,7 +6,7 @@ namespace Drupal\language\Environment;
 
 use Drupal\Core\Environment\EnvironmentParameter;
 use Drupal\Core\Environment\SubstitutionInterface;
-use Drupal\Core\Language\Language;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 
 /**
@@ -22,17 +22,17 @@ abstract class LanguageSubstitutionBase implements SubstitutionInterface {
   /**
    * Returns the original language.
    */
-  abstract protected function getOriginalLanguage(): Language;
+  abstract protected function getOriginalLanguage(): LanguageInterface;
 
   /**
    * Sets the override language.
    */
-  abstract protected function overrideLanguage(Language $overrideLanguage): void;
+  abstract protected function overrideLanguage(LanguageInterface $overrideLanguage): void;
 
   /**
    * Restores the original language.
    */
-  abstract protected function restoreLanguage(Language $originalLanguage): void;
+  abstract protected function restoreLanguage(LanguageInterface $originalLanguage): void;
 
   /**
    * {@inheritdoc}

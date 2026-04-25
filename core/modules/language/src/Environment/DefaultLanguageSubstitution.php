@@ -6,8 +6,8 @@ namespace Drupal\language\Environment;
 
 use Drupal\Core\Environment\SubstitutionApplyTrait;
 use Drupal\Core\Environment\SubstitutionInterface;
-use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageDefault;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 
 /**
@@ -27,21 +27,21 @@ class DefaultLanguageSubstitution extends LanguageSubstitutionBase implements Su
   /**
    * {@inheritdoc}
    */
-  protected function getOriginalLanguage(): Language {
+  protected function getOriginalLanguage(): LanguageInterface {
     return $this->languageDefault->get();
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function overrideLanguage(Language $overrideLanguage): void {
+  protected function overrideLanguage(LanguageInterface $overrideLanguage): void {
     $this->languageDefault->set($overrideLanguage);
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function restoreLanguage(Language $originalLanguage): void {
+  protected function restoreLanguage(LanguageInterface $originalLanguage): void {
     $currentLanguage = $this->languageDefault->get();
     if ($currentLanguage->getId() !== $originalLanguage->getId()) {
       $this->languageDefault->set($originalLanguage);

@@ -6,7 +6,7 @@ namespace Drupal\language\Environment;
 
 use Drupal\Core\Environment\SubstitutionApplyTrait;
 use Drupal\Core\Environment\SubstitutionInterface;
-use Drupal\Core\Language\Language;
+use Drupal\Core\Language\LanguageInterface;
 
 /**
  * Switches the config override language.
@@ -18,21 +18,21 @@ class ConfigOverrideLanguageSubstitution extends LanguageSubstitutionBase implem
   /**
    * {@inheritdoc}
    */
-  protected function getOriginalLanguage(): Language {
+  protected function getOriginalLanguage(): LanguageInterface {
     return $this->languageManager->getConfigOverrideLanguage();
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function overrideLanguage(Language $overrideLanguage): void {
+  protected function overrideLanguage(LanguageInterface $overrideLanguage): void {
     $this->languageManager->setConfigOverrideLanguage($overrideLanguage);
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function restoreLanguage(Language $originalLanguage): void {
+  protected function restoreLanguage(LanguageInterface $originalLanguage): void {
     $currentLanguage = $this->languageManager->getConfigOverrideLanguage();
     if ($currentLanguage->getId() !== $originalLanguage->getId()) {
       $this->languageManager->setConfigOverrideLanguage($originalLanguage);
