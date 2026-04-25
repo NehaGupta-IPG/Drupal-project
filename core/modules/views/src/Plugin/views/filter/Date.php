@@ -178,7 +178,7 @@ class Date extends NumericFilter {
     elseif ($operators[$operator]['values'] == 2) {
       // When the operator is either between or not between the input contains
       // two values.
-      if ($this->value['min'] == '' || $this->value['max'] == '') {
+      if (empty($this->value['min']) && empty($this->value['max'])) {
         return FALSE;
       }
     }
