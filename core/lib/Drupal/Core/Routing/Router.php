@@ -111,7 +111,7 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
   public function matchRequest(Request $request): array {
     $collection = $this->getInitialRouteCollection($request);
     if ($collection->count() === 0) {
-      throw new ResourceNotFoundException(sprintf('No routes found for "%s".', $this->currentPath->getPath()));
+      throw new ResourceNotFoundException(sprintf('No routes found for "%s".', $this->currentPath->getPath($request)));
     }
     $collection = $this->applyRouteFilters($collection, $request);
     $collection = $this->applyFitOrder($collection);
@@ -133,7 +133,7 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
     if ($match === NULL) {
       throw 0 < count($this->allow)
         ? new MethodNotAllowedException(array_unique($this->allow))
-        : new ResourceNotFoundException(sprintf('No routes found for "%s".', $this->currentPath->getPath()));
+        : new ResourceNotFoundException(sprintf('No routes found for "%s".', $pathinfo));
     }
     return $match;
   }
