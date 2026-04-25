@@ -20,7 +20,6 @@ use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Theme\Registry;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 
@@ -41,10 +40,9 @@ use Symfony\Component\Mime\Email;
  */
 class EmailManager extends DefaultPluginManager {
 
-  protected RendererInterface $renderer;
-
-  protected MailerInterface $mailer;
-
+  /**
+   * The theme registry (unused)
+   */
   protected Registry $themeRegistry;
 
   /**
@@ -80,13 +78,13 @@ class EmailManager extends DefaultPluginManager {
     #[Autowire(service: 'container.namespaces')]
     \Traversable $namespaces,
     ModuleHandlerInterface $module_handler,
-    RendererInterface $renderer,
-    MailerInterface $mailer,
+    protected RendererInterface $renderer,
+    protected MailerInterface $mailer,
     #[Autowire(service: 'cache.discovery')]
-    CacheBackendInterface $cache_backend) {
+    CacheBackendInterface $cache_backend,
+  ) {
     parent::__construct('Plugin/Email', $namespaces, $module_handler, EmailPluginInterface::class, EmailAttribute::class);
     $this->factory = new ContainerFactory($this, EmailPluginInterface::class);
-    $this->moduleHandler = $module_handler;
     $this->renderer = $renderer;
     $this->mailer = $mailer;
     $this->alterInfo('email_info');
@@ -125,6 +123,9 @@ class EmailManager extends DefaultPluginManager {
     }
   }
 
+  /**
+   * Builds and renders the email body and returns the resulting symfony email.
+   */
   protected function build(EmailPluginInterface $email): Email {
     $this->moduleHandler->alter('email_pre_build', $email);
 
@@ -187,9 +188,12 @@ class EmailManager extends DefaultPluginManager {
   }
 
   /**
-   * @param EmailPluginInterface $email
-   * @return bool
-   * @throws TransportExceptionInterface
+   * Composes and optionally sends an email message.
+   *
+   * @param \Drupal\Core\Mailer\EmailPluginInterface $email
+   *   The email plugin instance defining the email to be sent.
+   *
+   * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
    */
   public function send(EmailPluginInterface $email): bool {
     $symfony_email = $this->build($email);

@@ -8,7 +8,6 @@ use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\RenderableInterface;
 use Symfony\Component\Mime\Address;
-use Symfony\Component\Mime\Email;
 
 /**
  * Interface for email plugins.

@@ -1,6 +1,6 @@
 <?php
-namespace Drupal\mailer\Plugin\Email;
 
+namespace Drupal\mailer\Plugin\Email;
 
 use Drupal\Core\Mailer\Attribute\Email;
 use Drupal\Core\Mailer\EmailPluginDefault;
@@ -8,6 +8,9 @@ use Drupal\Core\Mailer\EmailPluginInterface;
 use Drupal\Core\Render\RenderableInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
+/**
+ * Simple email plugin.
+ */
 #[Email(
   id: 'mailer.default',
   label: new TranslatableMarkup('Default'),
@@ -15,6 +18,9 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 )]
 class DefaultEmail extends EmailPluginDefault implements EmailPluginInterface {
 
+  /**
+   * {@inheritdoc}
+   */
   public function htmlBody(): RenderableInterface|array|null {
     if ($body = $this->getParam('html')) {
       return $body;
@@ -22,12 +28,14 @@ class DefaultEmail extends EmailPluginDefault implements EmailPluginInterface {
     return NULL;
   }
 
-  public function textBody(): RenderableInterface|array|null{
+  /**
+   * {@inheritdoc}
+   */
+  public function textBody(): RenderableInterface|array|null {
     if ($body = $this->getParam('text')) {
       return $body;
     }
     return NULL;
   }
-
 
 }
