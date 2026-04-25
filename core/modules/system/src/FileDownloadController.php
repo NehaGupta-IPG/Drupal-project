@@ -33,14 +33,7 @@ class FileDownloadController extends ControllerBase {
   }
 
   /**
-   * Handles private file transfers.
-   *
-   * Call modules that implement hook_file_download() to find out if a file is
-   * accessible and what headers it should be transferred with. If one or more
-   * modules returned headers the download will start with the returned headers.
-   * If a module returns -1 an AccessDeniedHttpException will be thrown. If the
-   * file exists but no modules responded an AccessDeniedHttpException will be
-   * thrown. If the file does not exist a NotFoundHttpException will be thrown.
+   * Handles file downloads through the file query parameter.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
@@ -54,10 +47,38 @@ class FileDownloadController extends ControllerBase {
    *   Thrown when the requested file does not exist.
    * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
    *   Thrown when the user does not have access to the file.
+   */
+  public function download(Request $request, $scheme = 'private') {
+    $target = $request->query->get('file');
+    return $this->download($target, $scheme);
+  }
+
+  /**
+   * Handles private file transfers.
+   *
+   * Call modules that implement hook_file_download() to find out if a file is
+   * accessible and what headers it should be transferred with. If one or more
+   * modules returned headers the download will start with the returned headers.
+   * If a module returns -1 an AccessDeniedHttpException will be thrown. If the
+   * file exists but no modules responded an AccessDeniedHttpException will be
+   * thrown. If the file does not exist a NotFoundHttpException will be thrown.
+   *
+   * @param string $filepath
+   *   The file path.
+   * @param string $scheme
+   *   The file scheme, defaults to 'private'.
+   *
+   * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+   *   The transferred file as response.
+   *
+   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   *   Thrown when the requested file does not exist.
+   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   *   Thrown when the user does not have access to the file.
    *
    * @see hook_file_download()
    */
-  public function download(string $filepath, $scheme = 'private') {
+  public function downloadPath(string $filepath, string $scheme = 'private'): BinaryFileResponse {
     // Merge remaining path arguments into relative file path.
     $uri = $this->streamWrapperManager->normalizeUri($scheme . '://' . $filepath);
 
