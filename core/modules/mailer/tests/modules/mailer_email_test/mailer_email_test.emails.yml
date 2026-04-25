@@ -1,0 +1,26 @@
+mailer_email_test.with_html_body:
+  label: 'Email with html body'
+  html_body_template: 'mailer_email_test_html_body'
+
+mailer_email_test.with_text_body:
+  label: 'Email with html body'
+  text_body_template: 'mailer_email_test_text_body'
+
+mailer_email_test.with_both_body:
+  label: 'Email with html/text body'
+  html_body_template: 'mailer_email_test_html_body'
+  text_body_template: 'mailer_email_test_text_body'
+
+mailer_email_test.with_default_headers:
+  label: 'Email with default headers'
+  html_body_template: 'mailer_email_test_html_body'
+  default_subject: 'Default subject from YAML'
+  default_recipients:
+    to:
+      - simple@example.com
+      - Jane Smith <jane.smith@example.org>
+      - user.name+tag+sorting@example.com
+    cc:
+      - Admin from YAML <admin@localhost>
+    bcc:
+      - user-@example.org
