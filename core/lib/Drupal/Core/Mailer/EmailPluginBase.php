@@ -14,18 +14,49 @@ use Symfony\Component\Mime\Email;
  */
 abstract class EmailPluginBase extends PluginBase implements EmailPluginInterface {
 
+  /**
+   * A list of template parameters.
+   *
+   * @var mixed[]
+   */
   protected array $parameters = [];
 
+  /**
+   * A map of headers, keyed by proper cased header name.
+   *
+   * @var array<string, mixed>
+   */
   protected array $headers = [];
 
+  /**
+   * The html body (unused).
+   *
+   * @var array|RenderableInterface|null
+   */
   protected array|RenderableInterface|null $htmlBody = NULL;
 
+  /**
+   * The text body (unuseds).
+   *
+   * @var array|RenderableInterface|null
+   */
   protected array|RenderableInterface|null $textBody = NULL;
 
+  /**
+   * Key-value pairs defining the environment to use to render the email body.
+   *
+   * @var array<string, mixed>
+   */
   protected array $environment = [];
 
+  /**
+   * The symfony email object (unused).
+   */
   protected ?Email $email = NULL;
 
+  /**
+   * A flag indicating whether or not the built mail should be sent.
+   */
   protected bool $send = TRUE;
 
   /**
