@@ -8,6 +8,9 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore Highwater
+
+use Drupal\migrate\Plugin\MigrationInterface;
+
 /**
  * Tests migration high water property.
  */
@@ -82,6 +85,20 @@ class HighWaterTest extends MigrateTestBase {
     $this->installSchema('node', 'node_access');
 
     $this->executeMigration('high_water_test');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function prepareMigration(MigrationInterface $migration) {
+    // Simulate that the source and destination DB are on different hosts and
+    // are hence not joinable.
+    // @see \Drupal\migrate\Plugin\migrate\source\SqlBase::mapJoinable()
+    $source = $migration->getSourceConfiguration();
+    if ($source['plugin'] === 'high_water_test') {
+      $source['ignore_map'] = TRUE;
+      $migration->set('source', $source);
+    }
   }
 
   /**
@@ -261,6 +278,49 @@ class HighWaterTest extends MigrateTestBase {
     // Item with greater high water should be updated.
     $this->assertNodeExists('Item 3 updated');
     $this->assertNodeDoesNotExist('Item 3');
+  }
+
+  /**
+   * Tests high water property of SqlBase when some source rows are unprocessed.
+   *
+   * Asserts that all unprocessed rows are detected, regardless of whether they
+   * are below or above water.
+   */
+  public function testHighWaterUnprocessed() {
+    // Add two more item to the source database:
+    // 1. one that is unprocessed due to some undetected failure mode when the
+    //   migration first ran. Therefore, this one is below water.
+    // 2. one that is unprocessed simply because it is new: it is above water.
+    $this->sourceDatabase->insert('high_water_node')
+      ->fields([
+        'title',
+        'changed',
+      ])
+      ->values([
+        'title' => 'Item 5 (unprocessed and above water)',
+        'changed' => 4,
+      ])
+      ->values([
+        'title' => 'Item 4 (unprocessed and below water)',
+        'changed' => 2,
+      ])
+      ->execute();
+
+    // Assert that only 3 of the 4 rows have been imported.
+    $this->assertNodeExists('Item 1');
+    $this->assertNodeExists('Item 2');
+    $this->assertNodeExists('Item 3');
+    $this->assertNodeDoesNotExist('Item 4 (unprocessed and below water)');
+    $this->assertNodeDoesNotExist('Item 5 (unprocessed and above water)');
+
+    // Execute migration again.
+    $this->executeMigration('high_water_test');
+
+    // The previously unprocessed rows must have been detected and processed.
+    // We first assert the above water one because this is more likely to pass
+    // tests. (The assertion order here helps simplify finding the root cause.)
+    $this->assertNodeExists('Item 5 (unprocessed and above water)');
+    $this->assertNodeExists('Item 4 (unprocessed and below water)');
   }
 
   /**

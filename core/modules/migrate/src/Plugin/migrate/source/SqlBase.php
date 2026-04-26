@@ -316,7 +316,7 @@ abstract class SqlBase extends SourcePluginBase implements ContainerFactoryPlugi
         $high_water = $this->getHighWater();
         // We check against NULL because 0 is an acceptable value for the high
         // water mark.
-        if ($high_water !== NULL) {
+        if ($this->mapJoinable() && $high_water !== NULL) {
           $conditions->condition($high_water_field, $high_water, '>');
           $condition_added = TRUE;
         }
