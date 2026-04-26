@@ -9,6 +9,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\StringTranslation\TranslationManager;
 use Drupal\Core\Url;
 use Drupal\language\Config\LanguageConfigFactoryOverrideInterface;
 use Drupal\language\ConfigurableLanguageManager;
@@ -108,6 +109,7 @@ class ConfigurableLanguageManagerSwitchLinksTest extends UnitTestCase {
       $this->createStub(LanguageConfigFactoryOverrideInterface::class),
       $requestStack,
       $this->createStub(CacheBackendInterface::class),
+      $this->createStub(TranslationManager::class),
     );
     $languageManager->setNegotiator($negotiator);
     // Initialize the negotiated languages.

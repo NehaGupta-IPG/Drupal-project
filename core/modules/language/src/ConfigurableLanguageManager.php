@@ -535,7 +535,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
    * {@inheritdoc}
    */
   public function setRenderOverrideLanguage(?LanguageInterface $language = NULL, $type = LanguageInterface::TYPE_INTERFACE): static {
-    $renderOverrideLanguages[$type] = $language;
+    $this->renderOverrideLanguages[$type] = $language;
     if ($type === LanguageInterface::TYPE_INTERFACE) {
       $this->translationManager->setDefaultLangcode($language?->getId() ?? $this->getDefaultLanguage()->getId());
     }
@@ -546,7 +546,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
    * {@inheritdoc}
    */
   public function getRenderOverrideLanguage($type = LanguageInterface::TYPE_INTERFACE): ?LanguageInterface {
-    return $renderOverrideLanguages[$type] ?? NULL;
+    return $this->renderOverrideLanguages[$type] ?? NULL;
   }
 
   /**
