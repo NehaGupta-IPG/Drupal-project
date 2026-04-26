@@ -102,6 +102,7 @@ class ConfigurableLanguageManagerSwitchLinksTest extends UnitTestCase {
       ->willReturn($this->createStub(Request::class));
 
     // Instantiate the language manager and initialize the negotiator.
+    $translationManager = $this->createStub(TranslationManager::class);
     $languageManager = new ConfigurableLanguageManager(
       $defaultLanguage,
       $configFactory,
@@ -109,7 +110,7 @@ class ConfigurableLanguageManagerSwitchLinksTest extends UnitTestCase {
       $this->createStub(LanguageConfigFactoryOverrideInterface::class),
       $requestStack,
       $this->createStub(CacheBackendInterface::class),
-      $this->createStub(TranslationManager::class),
+      fn() => $translationManager,
     );
     $languageManager->setNegotiator($negotiator);
     // Initialize the negotiated languages.

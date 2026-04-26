@@ -128,10 +128,10 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
    *   The request stack object.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
    *   The cache backend.
-   * @param \Drupal\Core\StringTranslation\TranslationManager $translationManager
-   *   The translation manager.
+   * @param \Closure(): \Drupal\Core\StringTranslation\TranslationManager $translationManagerClosure
+   *   The translation manager service closure.
    */
-  public function __construct(LanguageDefault $default_language, ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, LanguageConfigFactoryOverrideInterface $config_override, RequestStack $request_stack, protected CacheBackendInterface $cacheBackend, protected readonly TranslationManager $translationManager) {
+  public function __construct(LanguageDefault $default_language, ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, LanguageConfigFactoryOverrideInterface $config_override, RequestStack $request_stack, protected CacheBackendInterface $cacheBackend, protected readonly \Closure $translationManagerClosure) {
     $this->defaultLanguage = $default_language;
     $this->configFactory = $config_factory;
     $this->moduleHandler = $module_handler;
@@ -537,7 +537,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
   public function setRenderOverrideLanguage(?LanguageInterface $language = NULL, $type = LanguageInterface::TYPE_INTERFACE): static {
     $this->renderOverrideLanguages[$type] = $language;
     if ($type === LanguageInterface::TYPE_INTERFACE) {
-      $this->translationManager->setDefaultLangcode($language?->getId() ?? $this->getDefaultLanguage()->getId());
+      ($this->translationManagerClosure)()->setDefaultLangcode($language?->getId() ?? $this->getDefaultLanguage()->getId());
     }
     return $this;
   }
