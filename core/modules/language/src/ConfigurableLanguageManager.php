@@ -10,6 +10,7 @@ use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\StringTranslation\TranslationManager;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\FiberResumeType;
 use Drupal\language\Config\LanguageConfigFactoryOverrideInterface;
@@ -127,8 +128,10 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
    *   The request stack object.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
    *   The cache backend.
+   * @param \Drupal\Core\StringTranslation\TranslationManager $translationManager
+   *   The translation manager.
    */
-  public function __construct(LanguageDefault $default_language, ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, LanguageConfigFactoryOverrideInterface $config_override, RequestStack $request_stack, protected CacheBackendInterface $cacheBackend) {
+  public function __construct(LanguageDefault $default_language, ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, LanguageConfigFactoryOverrideInterface $config_override, RequestStack $request_stack, protected CacheBackendInterface $cacheBackend, protected readonly TranslationManager $translationManager) {
     $this->defaultLanguage = $default_language;
     $this->configFactory = $config_factory;
     $this->moduleHandler = $module_handler;
@@ -533,6 +536,9 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
    */
   public function setRenderOverrideLanguage(?LanguageInterface $language = NULL, $type = LanguageInterface::TYPE_INTERFACE): static {
     $renderOverrideLanguages[$type] = $language;
+    if ($type === LanguageInterface::TYPE_INTERFACE) {
+      $this->translationManager->setDefaultLangcode($language?->getId() ?? $this->getDefaultLanguage()->getId());
+    }
     return $this;
   }
 
