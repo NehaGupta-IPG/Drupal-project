@@ -85,6 +85,13 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
   protected $negotiatedMethods;
 
   /**
+   * An array of language objects keyed by language type.
+   *
+   * @var \Drupal\Core\Language\LanguageInterface[]
+   */
+  protected $renderOverrideLanguages;
+
+  /**
    * Whether or not the language manager has been initialized.
    *
    * @var bool
@@ -212,9 +219,9 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
   }
 
   /**
-   * {@inheritdoc}
+   * Returns the negotiated language for the given type.
    */
-  public function getCurrentLanguage($type = LanguageInterface::TYPE_INTERFACE) {
+  public function getNegotiatedLanguage($type = LanguageInterface::TYPE_INTERFACE): LanguageInterface {
     if (!isset($this->negotiatedLanguages[$type])) {
       // Ensure we have a valid value for this language type.
       $this->negotiatedLanguages[$type] = $this->getDefaultLanguage();
@@ -240,6 +247,13 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
     }
 
     return $this->negotiatedLanguages[$type];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCurrentLanguage($type = LanguageInterface::TYPE_INTERFACE) {
+    return $this->getRenderOverrideLanguage($type) ?? $this->getNegotiatedLanguage($type);
   }
 
   /**
@@ -512,6 +526,21 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
    */
   public function getLanguageConfigOverrideStorage($langcode) {
     return $this->configFactoryOverride->getStorage($langcode);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRenderOverrideLanguage(?LanguageInterface $language = NULL, $type = LanguageInterface::TYPE_INTERFACE): static {
+    $renderOverrideLanguages[$type] = $language;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRenderOverrideLanguage($type = LanguageInterface::TYPE_INTERFACE): ?LanguageInterface {
+    return $renderOverrideLanguages[$type] ?? NULL;
   }
 
   /**

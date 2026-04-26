@@ -38,6 +38,11 @@ interface LanguageManagerInterface {
   public function getDefinedLanguageTypesInfo();
 
   /**
+   * Returns the negotiated language for the given type.
+   */
+  public function getNegotiatedLanguage($type = LanguageInterface::TYPE_INTERFACE): LanguageInterface;
+
+  /**
    * Returns the current language for the given type.
    *
    * @param string $type
@@ -196,6 +201,32 @@ interface LanguageManagerInterface {
    *   The current configuration override language.
    */
   public function getConfigOverrideLanguage();
+
+  /**
+   * Temporary enforces the render language.
+   *
+   * @param \Drupal\Core\Language\LanguageInterface $language
+   *   The language to use while rendering.
+   * @param string $type
+   *   (optional) The language type; e.g., the interface or the content
+   *   language. Defaults to
+   *   \Drupal\Core\Language\LanguageInterface::TYPE_INTERFACE.
+   *
+   * @return $this
+   */
+  public function setRenderOverrideLanguage(?LanguageInterface $language = NULL, $type = LanguageInterface::TYPE_INTERFACE): static;
+
+  /**
+   * Returns a temporary enforced render language.
+   *
+   * @param string $type
+   *   (optional) The language type; e.g., the interface or the content
+   *   language. Defaults to
+   *   \Drupal\Core\Language\LanguageInterface::TYPE_INTERFACE.
+   *
+   * @return $this
+   */
+  public function getRenderOverrideLanguage($type = LanguageInterface::TYPE_INTERFACE): ?LanguageInterface;
 
   /**
    * Some common languages with their English and native names.
