@@ -487,7 +487,7 @@ function install_begin_request($class_loader, &$install_state): void {
   if (isset($install_state['parameters']['langcode'])) {
     $default_language = new Language(['id' => $install_state['parameters']['langcode']]);
     $container->get('language.default')->set($default_language);
-    \Drupal::translation()->setDefaultLangcode($install_state['parameters']['langcode']);
+    $language_manager->setRenderOverrideLanguage($default_language);
   }
 
   // Load all modules and perform request related initialization.

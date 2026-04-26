@@ -14,8 +14,6 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Render\RenderContext;
-use Drupal\Core\StringTranslation\TranslationManager;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Provides the help topics list section for the help page.
@@ -62,9 +60,6 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
    *   The default language object.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
-   * @param \Drupal\Core\StringTranslation\TranslationManager $translationManager
-   *   The translation manager. We are using a method that doesn't exist on an
-   *   interface, so require this class.
    */
   public function __construct(
     array $configuration,
@@ -74,8 +69,6 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
     protected RendererInterface $renderer,
     protected LanguageDefault $defaultLanguage,
     protected LanguageManagerInterface $languageManager,
-    #[Autowire(service: 'string_translation')]
-    protected TranslationManager $translationManager,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
@@ -171,8 +164,7 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
     try {
       if ($old_language->getId() !== $language->getId()) {
         $this->defaultLanguage->set($language);
-        $this->translationManager->setDefaultLangcode($language->getId());
-        $this->languageManager->reset();
+        $this->languageManager->setRenderOverrideLanguage($language);
       }
       $topic = [];
 
@@ -208,8 +200,7 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
       // Restore the original language.
       if ($old_language->getId() !== $language->getId()) {
         $this->defaultLanguage->set($old_language);
-        $this->translationManager->setDefaultLangcode($old_language->getId());
-        $this->languageManager->reset();
+        $this->languageManager->setRenderOverrideLanguage();
       }
     }
 
