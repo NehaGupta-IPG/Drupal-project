@@ -34,74 +34,74 @@ class AccessibilityTest extends AccessibilityTestBase {
   public static function provider(): \Generator {
 
     yield 'User Edit' => [
-      '/user/1/edit',
-      TRUE,
+      'path' => '/user/1/edit',
+      'admin' => TRUE,
     ];
 
     yield 'Create Article' => [
-      '/node/add/article',
-      TRUE,
+      'path' => '/node/add/article',
+      'admin' => TRUE,
     ];
 
     yield 'Create Page' => [
-      '/node/add/page',
-      TRUE,
+      'path' => '/node/add/page',
+      'admin' => TRUE,
     ];
 
     yield 'Content Page' => [
-      '/admin/content',
-      TRUE,
+      'path' => '/admin/content',
+      'admin' => TRUE,
     ];
 
     yield 'Structure Page' => [
-      '/admin/structure',
-      TRUE,
+      'path' => '/admin/structure',
+      'admin' => TRUE,
     ];
 
     yield 'Add content type' => [
-      '/admin/structure/types/add',
-      TRUE,
+      'path' => '/admin/structure/types/add',
+      'admin' => TRUE,
     ];
 
     yield 'Add vocabulary' => [
-      '/admin/structure/taxonomy/add',
-      TRUE,
+      'path' => '/admin/structure/taxonomy/add',
+      'admin' => TRUE,
     ];
 
     // @todo remove the skipped rules below in https://drupal.org/i/3318394.
     yield 'Structure | Block' => [
-      '/admin/structure/block',
-      TRUE,
-        [
-          'rules' => [
-            'color-contrast' => ['enabled' => FALSE],
-            'duplicate-id-active' => ['enabled' => FALSE],
-            'region' => ['enabled' => FALSE],
-          ],
+      'path' => '/admin/structure/block',
+      'admin' => TRUE,
+      'axe_options' => [
+        'rules' => [
+          'color-contrast' => ['enabled' => FALSE],
+          'duplicate-id-active' => ['enabled' => FALSE],
+          'region' => ['enabled' => FALSE],
         ],
+      ],
     ];
 
     // Tests long breadcrumb for https://drupal.org/i/3223147.
     yield 'Manage text format, mobile' => [
-      '/admin/config/content/formats/manage/restricted_html',
-      TRUE,
-        [
-          // This is the only way to add WCAG 2.2 tags to defaults.
-          // See https://github.com/dequelabs/axe-core/issues/4717.
-          'runOnly' => [
-            'type' => 'tag',
-            'values' => [
-              'wcag2a',
-              'wcag2aa',
-              'wcag21a',
-              'wcag21aa',
-              'best-practice',
-              'wcag22a',
-              'wcag22aa',
-            ],
+      'path' => '/admin/config/content/formats/manage/restricted_html',
+      'admin' => TRUE,
+      'axe_options' => [
+        // This is the only way to add WCAG 2.2 tags to defaults.
+        // See https://github.com/dequelabs/axe-core/issues/4717.
+        'runOnly' => [
+          'type' => 'tag',
+          'values' => [
+            'wcag2a',
+            'wcag2aa',
+            'wcag21a',
+            'wcag21aa',
+            'best-practice',
+            'wcag22a',
+            'wcag22aa',
           ],
         ],
-      'setupManageTextFormatMobile',
+      ],
+      'setup_callback' => 'setupManageTextFormatMobile',
     ];
   }
 
