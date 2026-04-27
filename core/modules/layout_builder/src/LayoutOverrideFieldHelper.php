@@ -53,9 +53,15 @@ class LayoutOverrideFieldHelper implements ContainerInjectionInterface {
         // Get the entity currently in the tempstore's entity context.
         $stored_entity = $override_temp_store->getContextValue('entity');
 
-        // Update the tempstore entity context with a copy of the new entity,
-        // but retain the value of the layout field from the tempstore.
-        $updated_entity = $entity;
+        // Reload the entity from storage to ensure revision metadata
+        // (revision ID, original values, loaded revision tracking) is
+        // consistent with the database. Using the post-save entity directly
+        // can cause revision mismatches when reverting layout overrides
+        // after a new content revision is created.
+        $entity_storage = \Drupal::entityTypeManager()
+          ->getStorage($entity->getEntityTypeId());
+
+        $updated_entity = $entity_storage->load($entity->id());
         $updated_entity->{OverridesSectionStorage::FIELD_NAME} = $stored_entity->{OverridesSectionStorage::FIELD_NAME};
 
         $override_temp_store->setContextValue('entity', $updated_entity);
