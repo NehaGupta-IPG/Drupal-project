@@ -19,6 +19,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 class GarbageCollectionTest extends KernelTestBase {
 
+  protected static $modules = ['system'];
+
   /**
    * Tests garbage collection.
    */
@@ -55,6 +57,7 @@ class GarbageCollectionTest extends KernelTestBase {
       \Drupal::service('queue'),
       \Drupal::service('file.htaccess_writer'),
       \Drupal::service('config.factory'),
+      \Drupal::service('system.sa_fetcher'),
     );
     $systemCron->cron();
 
