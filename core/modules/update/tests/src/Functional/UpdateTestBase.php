@@ -111,8 +111,14 @@ abstract class UpdateTestBase extends BrowserTestBase {
    *   The type of update message expected.
    * @param string $update_element_css_locator
    *   The CSS locator for the page element that contains the security updates.
+   * @param bool $multiple_security_no_insecure
+   *   A flag to indicate that there are multiple security releases and none of
+   *   tagged is 'Insecure'. That is an edge case that should not happen. When
+   *   there are multiple security releases all but the latest one should be
+   *   tagged 'Insecure'. This flag allows testing of this edge case. Defaults
+   *   to FALSE.
    */
-  protected function assertSecurityUpdates($project_path_part, array $expected_security_releases, $expected_update_message_type, $update_element_css_locator) {
+  protected function assertSecurityUpdates($project_path_part, array $expected_security_releases, $expected_update_message_type, $update_element_css_locator, $multiple_security_no_insecure = FALSE): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $this->standardTests();
@@ -142,8 +148,14 @@ abstract class UpdateTestBase extends BrowserTestBase {
         $this->assertContains($release_url, $all_security_release_urls, "Release $release_url is a security release link.");
         $assert_session->linkByHrefExists($release_url);
       }
-      // Ensure no other links are shown as security releases.
-      $this->assertEquals([], array_diff($all_security_release_urls, $expected_release_urls));
+      if ($multiple_security_no_insecure) {
+        // There should be 2 security releases.
+        $this->assertCount(2, array_diff($all_security_release_urls, $expected_release_urls));
+      }
+      else {
+        // Ensure no other links are shown as security releases.
+        $this->assertEquals([], array_diff($all_security_release_urls, $expected_release_urls));
+      }
     }
     else {
       // Ensure there were no security links.

@@ -33,7 +33,12 @@ trait UpdateSemverTestSecurityAvailabilityTrait {
   protected function doTestSecurityUpdateAvailability($site_patch_version, array $expected_security_releases, $expected_update_message_type, $fixture): void {
     $this->setProjectInstalledVersion("8.$site_patch_version");
     $this->refreshUpdateStatus([$this->updateProject => $fixture]);
-    $this->assertSecurityUpdates("{$this->updateProject}-8", $expected_security_releases, $expected_update_message_type, $this->updateTableLocator);
+    $multiple_security_no_insecure = FALSE;
+    if ($fixture == 'sec.8.0.0_8.0.2') {
+      // This is testing an edge case.
+      $multiple_security_no_insecure = TRUE;
+    }
+    $this->assertSecurityUpdates("{$this->updateProject}-8", $expected_security_releases, $expected_update_message_type, $this->updateTableLocator, $multiple_security_no_insecure);
   }
 
   /**
@@ -41,6 +46,10 @@ trait UpdateSemverTestSecurityAvailabilityTrait {
    *
    * These test cases rely on the following fixtures containing the following
    * releases:
+   * - [::$updateProject].sec.8.0.0.0_0.2.xml
+   *   - 8.0.2 Security update, Insecure
+   *   - 8.0.1 Security update, Insecure
+   *   - 8.0.0 Insecure
    * - [::$updateProject].sec.8.0.1_0.2.xml
    *   - 8.0.2 Security update
    *   - 8.0.1 Security update, Insecure
@@ -193,6 +202,14 @@ trait UpdateSemverTestSecurityAvailabilityTrait {
         'expected_security_releases' => ['1.2', '2.0-rc2'],
         'expected_update_message_type' => static::SECURITY_UPDATE_REQUIRED,
         'fixture' => 'sec.8.2.0-rc2',
+      ],
+      // Security releases available for site minor release 0.
+      // Neither security release is marked secure.
+      '0.0, 0.2, secure, insecure' => [
+        'site_patch_version' => '0.0',
+        'expected_security_releases' => ['0.2'],
+        'expected_update_message_type' => static::UPDATE_AVAILABLE,
+        'fixture' => 'sec.8.0.0_8.0.2',
       ],
     ];
     $pre_releases = [
