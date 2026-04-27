@@ -3668,24 +3668,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/DependencyInjection/ServiceProviderInterface.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\DependencyInjection\\\\YamlFileLoader\\:\\:load\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/DependencyInjection/YamlFileLoader.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\DependencyInjection\\\\YamlFileLoader\\:\\:parseDefinition\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/DependencyInjection/YamlFileLoader.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\DependencyInjection\\\\YamlFileLoader\\:\\:parseDefinitions\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/DependencyInjection/YamlFileLoader.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\DestructableInterface\\:\\:destruct\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,

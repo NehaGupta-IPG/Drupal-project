@@ -14,6 +14,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -94,7 +95,7 @@ YAML;
  * Tests exceptions.
  */
   #[DataProvider('providerTestExceptions')]
-  public function testExceptions(string $yml, string $message): void {
+  public function testExceptions(string $yml, string $message, string $exception = \InvalidArgumentException::class): void {
     vfsStream::setup('drupal', NULL, [
       'modules' => [
         'example' => [
@@ -106,7 +107,7 @@ YAML;
     $builder = new ContainerBuilder();
     $yaml_file_loader = new YamlFileLoader($builder);
 
-    $this->expectException(\InvalidArgumentException::class);
+    $this->expectException($exception);
     $this->expectExceptionMessageIs($message);
     $yaml_file_loader->load('vfs://drupal/modules/example/example.yml');
   }
@@ -124,14 +125,14 @@ services:
   _defaults:
     invalid: string
 YAML,
-        'The configuration key "invalid" cannot be used to define a default value in "vfs://drupal/modules/example/example.yml". Allowed keys are "public", "tags", "autowire", "autoconfigure".',
+        'The configuration key "invalid" cannot be used to define a default value in "vfs://drupal/modules/example/example.yml". Allowed keys are "public", "tags", "resource_tags", "autowire", "autoconfigure", "bind".',
       ],
       'default tags must be an array' => [<<<YAML
 services:
   _defaults:
     tags: string
 YAML,
-        'Parameter "tags" in "_defaults" must be an array in "vfs://drupal/modules/example/example.yml". Check your YAML syntax.',
+        'Parameter "tags" in "_defaults" must be an array in "vfs://drupal/modules/example/example.yml".',
       ],
       'default tags must have a name' => [<<<YAML
 services:
@@ -157,20 +158,12 @@ services:
 YAML,
         'The tag name in "_defaults" must be a non-empty string in "vfs://drupal/modules/example/example.yml".',
       ],
-      'default tag attribute must be scalar' => [<<<YAML
-services:
-  _defaults:
-    tags:
-      - { name: tag, value: [] }
-YAML,
-        'Tag "tag", attribute "value" in "_defaults" must be of a scalar-type in "vfs://drupal/modules/example/example.yml". Check your YAML syntax.',
-      ],
       'tags must be an array' => [<<<YAML
 services:
   service:
     tags: string
 YAML,
-        'Parameter "tags" must be an array for service "service" in "vfs://drupal/modules/example/example.yml". Check your YAML syntax.',
+        'Parameter "tags" must be an array for service "service" in "vfs://drupal/modules/example/example.yml".',
       ],
       'tags must have a name' => [<<<YAML
 services:
@@ -188,19 +181,11 @@ services:
 YAML,
         'The tag name for service "service" in "vfs://drupal/modules/example/example.yml" must be a non-empty string.',
       ],
-      'tag attribute must be scalar' => [<<<YAML
-services:
-  service:
-    tags:
-      - { name: tag, value: [] }
-YAML,
-        'A "tags" attribute must be of a scalar-type for service "service", tag "tag", attribute "value" in "vfs://drupal/modules/example/example.yml". Check your YAML syntax.',
-      ],
       'service must be array or @service' => [<<<YAML
 services:
   service: string
 YAML,
-        'A service definition must be an array or a string starting with "@" but string found for service "service" in vfs://drupal/modules/example/example.yml. Check your YAML syntax.',
+        'A service definition must be an array or a string starting with "@" but "string" found for service "service" in "vfs://drupal/modules/example/example.yml".',
       ],
       'YAML must be valid' => [<<<YAML
    do not:
@@ -208,11 +193,12 @@ YAML,
 YAML,
         'The file "vfs://drupal/modules/example/example.yml" does not contain valid YAML: Unable to parse at line 1 (near "   do not:").',
       ],
-      'YAML must have expected keys' => [<<<YAML
+      'unknown root key rejected by upstream' => [<<<YAML
       "do not":
         do: this
       YAML,
-        'The service file "vfs://drupal/modules/example/example.yml" is not valid: it contains invalid root key(s) "do not". Services have to be added under "services" and Parameters under "parameters".',
+        'Container extension "do not" is not registered.',
+        LogicException::class,
       ],
       'decorates must be without @' => [<<<YAML
       services:
@@ -244,7 +230,21 @@ YAML,
           decorates: example_service_1
           decoration_on_invalid: foo
       YAML,
-        'Invalid value "foo" for attribute "decoration_on_invalid" on service "example_decoration". Did you mean "exception", "ignore" or null in "vfs://drupal/modules/example/example.yml"?',
+        'Invalid value "foo" for attribute "decoration_on_invalid" on service "example_decoration". Did you mean "exception", "ignore" or "null" in "vfs://drupal/modules/example/example.yml"?',
+      ],
+      'resource: rejected' => [<<<YAML
+services:
+  Drupal\Example\:
+    resource: '../src/*'
+YAML,
+        'PSR-4 service prototypes ("resource"/"namespace") are not supported in "vfs://drupal/modules/example/example.yml".',
+      ],
+      'imports: rejected' => [<<<YAML
+imports:
+  - { resource: other.yml }
+services: {}
+YAML,
+        'The "imports" key is not supported in "vfs://drupal/modules/example/example.yml".',
       ],
     ];
   }

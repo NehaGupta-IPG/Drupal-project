@@ -28,6 +28,7 @@ parameters:
 
   bootstrapFiles:
     # Load aliases.
+    - lib/Drupal/Core/DependencyInjection/YamlFileLoader.php
     - lib/Drupal/Core/Serialization/Yaml.php
 
   excludePaths:
