@@ -47,8 +47,6 @@ class BigPipeResponseAttachmentsProcessor extends HtmlResponseAttachmentsProcess
   public function processAttachments(AttachmentsInterface $response) {
     assert($response instanceof HtmlResponse);
 
-    $this->sendEarlyHints($response);
-
     // First, render the actual placeholders; this will cause the BigPipe
     // placeholder strategy to generate BigPipe placeholders. We need those to
     // exist already so that we can extract BigPipe placeholders. This is hence

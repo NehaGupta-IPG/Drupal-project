@@ -155,9 +155,11 @@ class BigPipeResponseAttachmentsProcessorTest extends UnitTestCase {
    *   The BigPipeResponseAttachmentsProcessor to test.
    */
   protected function createBigPipeResponseAttachmentsProcessor(ObjectProphecy $decorated_html_response_attachments_processor) {
+    $asset_resolver = $this->createStub(AssetResolverInterface::class);
+    $asset_resolver->method('getFontAssets')->willReturn([]);
     return new BigPipeResponseAttachmentsProcessor(
       $decorated_html_response_attachments_processor->reveal(),
-      $this->prophesize(AssetResolverInterface::class)->reveal(),
+      $asset_resolver,
       $this->prophesize(ConfigFactoryInterface::class)->reveal(),
       $this->prophesize(AssetCollectionRendererInterface::class)->reveal(),
       $this->prophesize(AssetCollectionRendererInterface::class)->reveal(),

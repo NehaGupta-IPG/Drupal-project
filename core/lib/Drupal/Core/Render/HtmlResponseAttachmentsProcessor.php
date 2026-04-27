@@ -218,12 +218,6 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
   protected function sendEarlyHints(AttachmentsInterface $response): void {
     $attached = $response->getAttachments();
     $assets = AttachedAssets::createFromRenderArray(['#attached' => $attached]);
-    // Take Ajax page state into account, to allow for something like
-    // Turbolinks to be implemented without altering core.
-    // @see https://github.com/rails/turbolinks/
-    $ajax_page_state = $this->requestStack->getCurrentRequest()->attributes->get('ajax_page_state');
-    $assets->setAlreadyLoadedLibraries(isset($ajax_page_state) ? explode(',', $ajax_page_state['libraries']) : []);
-
     // Collect fonts from libraries, and if they include fonts to preload, add
     // them to #attached['html_head_link'].
     $fonts = $this->assetResolver->getFontAssets($assets, $this->languageManager->getCurrentLanguage());
