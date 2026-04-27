@@ -75,7 +75,10 @@ class RouteSubscriber extends RouteSubscriberBase {
    */
   public static function getSubscribedEvents(): array {
     $events = parent::getSubscribedEvents();
-    $events[RoutingEvents::FINISHED] = ['routeRebuildFinished'];
+    // Run after Drupal\Core\EventSubscriber\MenuRouterRebuildSubscriber
+    // so altered routes are set.
+    $events[RoutingEvents::FINISHED] = ['routeRebuildFinished', 101];
+
     // Ensure to run after the entity resolver subscriber.
     // @see \Drupal\Core\EventSubscriber\EntityRouteAlterSubscriber
     $events[RoutingEvents::ALTER] = ['onAlterRoutes', -175];
@@ -145,7 +148,7 @@ class RouteSubscriber extends RouteSubscriberBase {
             foreach ($view_route_names as $id_display => $route_name) {
               $view_route_name = $this->viewsDisplayPairs[$id_display];
               unset($this->viewsDisplayPairs[$id_display]);
-              $collection->remove("views.$view_route_name");
+              $collection->remove("view.$view_route_name");
             }
           }
         }
