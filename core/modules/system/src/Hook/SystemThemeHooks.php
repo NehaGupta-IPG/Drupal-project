@@ -279,12 +279,6 @@ class SystemThemeHooks {
     // toolbar cache should be invalidated any time the default or admin theme
     // changes.
     $variables['#cache']['tags'][] = 'config:system.theme';
-    // If Claro is the admin theme but not the active theme, still include
-    // Claro's toolbar preprocessing.
-    if (_system_is_claro_admin_and_not_active()) {
-      require_once DRUPAL_ROOT . '/core/themes/claro/claro.theme';
-      claro_preprocess_toolbar($variables, $hook, $info);
-    }
   }
 
   /**
@@ -401,12 +395,7 @@ class SystemThemeHooks {
    */
   #[Hook('library_info_alter')]
   public function libraryInfoAlter(&$libraries, $extension): void {
-    // If Claro is the admin theme but not the active theme, grant Claro the
-    // ability to override the toolbar library with its own assets.
-    if ($extension === 'toolbar' && _system_is_claro_admin_and_not_active()) {
-      require_once DRUPAL_ROOT . '/core/themes/claro/claro.theme';
-      claro_system_module_invoked_library_info_alter($libraries, $extension);
-    }
+
   }
 
   /**
@@ -414,12 +403,6 @@ class SystemThemeHooks {
    */
   #[Hook('theme_registry_alter')]
   public function themeRegistryAlter(array &$theme_registry): void {
-    // If Claro is the admin theme but not the active theme, use Claro's toolbar
-    // templates.
-    if (_system_is_claro_admin_and_not_active()) {
-      require_once DRUPAL_ROOT . '/core/themes/claro/claro.theme';
-      claro_system_module_invoked_theme_registry_alter($theme_registry);
-    }
   }
 
   /**
