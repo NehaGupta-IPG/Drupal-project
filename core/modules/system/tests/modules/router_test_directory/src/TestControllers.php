@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Drupal\router_test;
 
 use Drupal\Core\Cache\CacheableResponse;
+use Drupal\Core\EventSubscriber\ExceptionLoggingSubscriber;
 use Drupal\Core\ParamConverter\ParamNotConvertedException;
 use Drupal\user\UserInterface;
 use Drupal\Core\Routing\RouteObjectInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use GuzzleHttp\Psr7\Response as Psr7Response;
@@ -16,6 +18,18 @@ use GuzzleHttp\Psr7\Response as Psr7Response;
  * Controller routines for testing the routing system.
  */
 class TestControllers {
+
+  /**
+   * Constructs a new TestControllers.
+   *
+   * The event dispatcher and exception logger are only required for
+   * ::test10() and ::test24(), which detach the exception logger before
+   * throwing. Other methods do not need these dependencies.
+   */
+  public function __construct(
+    protected ?EventDispatcherInterface $eventDispatcher = NULL,
+    protected ?ExceptionLoggingSubscriber $exceptionLogger = NULL,
+  ) {}
 
   const LONG_TEXT = 'This is text long enough to trigger Apache mod_deflate to add a `vary: accept-encoding` header to the response.';
 
@@ -151,9 +165,7 @@ class TestControllers {
     // throw an exception to check if it is properly escaped when rendered as a
     // backtrace. The exception logger does a call to error_log() which is not
     // handled by the test error handler and would cause a test failure.
-    $event_dispatcher = \Drupal::service('event_dispatcher');
-    $exception_logger = \Drupal::service('exception.logger');
-    $event_dispatcher->removeSubscriber($exception_logger);
+    $this->eventDispatcher->removeSubscriber($this->exceptionLogger);
   }
 
 }

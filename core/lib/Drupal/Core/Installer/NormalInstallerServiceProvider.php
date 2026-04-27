@@ -86,6 +86,7 @@ class NormalInstallerServiceProvider implements ServiceProviderInterface {
         ->setDecoratedService('router.route_provider')
         ->addArgument(new Reference('router.route_provider.installer.inner'))
         ->addArgument(new Reference('router.builder'))
+        ->addTag('container.public')
         ->addTag('event_subscriber');
     }
 

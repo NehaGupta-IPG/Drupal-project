@@ -412,6 +412,7 @@ services:
     class: Drupal\Core\Config\ConfigFactory
     tags:
       - { name: service_collector, tag: 'config.factory.override', call: addOverride }
+      - { name: container.public }
     arguments: ['@config.storage', '@event_dispatcher', '@config.typed']
   Drupal\Core\Config\ConfigFactoryInterface: '@config.factory'
   Drupal\Core\Config\ConfigImporterFactory:
@@ -435,6 +436,8 @@ services:
   config.storage.checkpoint:
     class: Drupal\Core\Config\Checkpoint\CheckpointStorage
     arguments: [ '@config.storage', '@config.checkpoints', '@keyvalue' ]
+    tags:
+      - { name: container.public }
   Drupal\Core\Config\Checkpoint\CheckpointStorageInterface: '@config.storage.checkpoint'
   config.checkpoints:
     class: Drupal\Core\Config\Checkpoint\LinearHistory
@@ -502,6 +505,8 @@ services:
   database.replica_kill_switch:
     class: Drupal\Core\Database\ReplicaKillSwitch
     arguments: ['@settings', '@datetime.time', '@session']
+    tags:
+      - { name: container.public }
   Drupal\Core\Database\ReplicaKillSwitch: '@database.replica_kill_switch'
   Drupal\Core\Database\EventSubscriber\StatementExecutionSubscriber: ~
   datetime.time:
@@ -1105,10 +1110,13 @@ services:
     arguments: ['@database', '@state', '@path.current', '@cache.data', '@path_processor_manager', '@cache_tags.invalidator', 'router', '@language_manager']
     tags:
       - { name: backend_overridable }
+      - { name: container.public }
   Drupal\Core\Routing\RouteProviderInterface: '@router.route_provider'
   router.route_provider.lazy_builder:
     class: Drupal\Core\Routing\RouteProviderLazyBuilder
     arguments: ['@router.route_provider', '@router.builder']
+    tags:
+      - { name: container.public }
   router.route_preloader:
     class: Drupal\Core\Routing\RoutePreloader
     arguments: ['@router.route_provider', '@state']
@@ -1155,6 +1163,8 @@ services:
   entity.query.config:
     class: Drupal\Core\Config\Entity\Query\QueryFactory
     arguments: ['@config.factory', '@keyvalue', '@config.manager']
+    tags:
+      - { name: container.public }
   entity.query.sql:
     class: Drupal\Core\Entity\Query\Sql\QueryFactory
     arguments: ['@database']
@@ -1918,6 +1928,8 @@ services:
   update.post_update_registry:
     class: Drupal\Core\Update\UpdateRegistry
     arguments: ['%app.root%', '%site.path%', '%container.modules%', '@update.key_value.post_update', '@theme_handler', 'post_update']
+    tags:
+      - { name: container.public }
   update.key_value.post_update:
     class: Drupal\Core\KeyValueStore\KeyValueStoreInterface
     factory: ['@keyvalue', 'get']

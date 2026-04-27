@@ -22,6 +22,7 @@ services:
     autowire: true
     tags:
       - { name: backend_overridable }
+      - { name: container.public }
   Drupal\workspaces\WorkspaceTrackerInterface: '@workspaces.tracker'
   workspaces.repository:
     class: Drupal\workspaces\WorkspaceRepository

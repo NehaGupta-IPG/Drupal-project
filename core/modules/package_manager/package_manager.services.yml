@@ -45,7 +45,9 @@ services:
   Drupal\package_manager\PathLocator:
     arguments:
       $appRoot: '%app.root%'
-  Drupal\package_manager\FailureMarker: {}
+  Drupal\package_manager\FailureMarker:
+    tags:
+      - { name: container.public }
   Drupal\package_manager\EventSubscriber\UpdateDataSubscriber: {}
   Drupal\package_manager\EventSubscriber\ChangeLogger:
     calls:

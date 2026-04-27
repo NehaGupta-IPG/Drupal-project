@@ -10,6 +10,7 @@ use Drupal\entity_test\Entity\EntityTestComputedField;
 use Drupal\jsonapi\EventSubscriber\ResourceObjectNormalizationCacher;
 use Drupal\jsonapi\JsonApiResource\ResourceObject;
 use Drupal\jsonapi\Normalizer\Value\CacheableNormalization;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -62,6 +63,17 @@ class ResourceObjectNormalizerCacherTest extends KernelTestBase {
    * @var \Drupal\jsonapi\EventSubscriber\ResourceObjectNormalizationCacher
    */
   protected $cacher;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function register(ContainerBuilder $container): void {
+    parent::register($container);
+    // This test accesses jsonapi.normalization_cacher directly from the
+    // container.
+    $container->getDefinition('jsonapi.normalization_cacher')
+      ->addTag('container.public');
+  }
 
   /**
    * {@inheritdoc}

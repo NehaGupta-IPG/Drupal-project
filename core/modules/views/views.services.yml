@@ -108,6 +108,8 @@ services:
   Drupal\views\Analyzer: '@views.analyzer'
   views.route_subscriber:
     class: Drupal\views\EventSubscriber\RouteSubscriber
+    tags:
+      - { name: container.public }
   views.exposed_form_cache:
     class: Drupal\views\ExposedFormCache
   Drupal\views\ExposedFormCache: '@views.exposed_form_cache'
