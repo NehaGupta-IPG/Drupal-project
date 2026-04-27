@@ -22,38 +22,35 @@ class AccessibilityTest extends AccessibilityTestBase {
   public static function provider(): \Generator {
 
     yield 'Homepage' => [
-      '<front>',
-      FALSE,
-          // @todo remove the disabled 'region' rule in https://drupal.org/i/3318396.
-          [
-            'rules' => [
-              'region' => ['enabled' => FALSE],
-            ],
-          ],
+      'path' => '<front>',
+      // @todo remove the disabled 'region' rule in https://drupal.org/i/3318396.
+      'axe_options' => [
+        'rules' => [
+          'region' => ['enabled' => FALSE],
+        ],
+      ],
     ];
 
     yield 'Login' => [
-      '/user/login',
-      FALSE,
-          // @todo remove the disabled 'region' rule in https://drupal.org/i/3318396.
-          [
-            'rules' => [
-              'region' => ['enabled' => FALSE],
-            ],
-          ],
+      'path' => '/user/login',
+      // @todo remove the disabled 'region' rule in https://drupal.org/i/3318396.
+      'axe_options' => [
+        'rules' => [
+          'region' => ['enabled' => FALSE],
+        ],
+      ],
     ];
 
     yield 'Search' => [
-      '/search/node',
-      FALSE,
-          // @todo remove the heading and duplicate id rules below in
-          //   https://drupal.org/i/3318398.
-          [
-            'rules' => [
-              'heading-order' => ['enabled' => FALSE],
-              'duplicate-id-aria' => ['enabled' => FALSE],
-            ],
-          ],
+      'path' => '/search/node',
+      // @todo remove the heading and duplicate id rules below in
+      //   https://drupal.org/i/3318398.
+      'axe_options' => [
+        'rules' => [
+          'heading-order' => ['enabled' => FALSE],
+          'duplicate-id-aria' => ['enabled' => FALSE],
+        ],
+      ],
     ];
   }
 
