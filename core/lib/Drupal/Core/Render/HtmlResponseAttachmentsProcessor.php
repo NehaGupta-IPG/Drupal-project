@@ -217,7 +217,13 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
    */
   protected function sendEarlyHints(AttachmentsInterface $response): void {
     $attached = $response->getAttachments();
+    if (!isset($attached['library']) || !is_array($attached['library'])) {
+      return;
+    }
     $assets = AttachedAssets::createFromRenderArray(['#attached' => $attached]);
+    $ajax_page_state = $this->requestStack->getCurrentRequest()?->attributes->get('ajax_page_state');
+    $assets->setAlreadyLoadedLibraries(isset($ajax_page_state) ? explode(',', $ajax_page_state['libraries']) : []);
+
     // Collect fonts from libraries, and if they include fonts to preload, add
     // them to #attached['html_head_link'].
     $fonts = $this->assetResolver->getFontAssets($assets, $this->languageManager->getCurrentLanguage());
