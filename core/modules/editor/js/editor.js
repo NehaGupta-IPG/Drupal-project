@@ -110,7 +110,7 @@
    */
   function onTextFormatChange(event) {
     const select = event.target;
-    const field = event.data.field;
+    const { field } = event.data;
     const activeFormatID = field.getAttribute('data-editor-active-text-format');
     const newFormatID = select.value;
 
@@ -301,7 +301,17 @@
   Drupal.editorAttach = function (field, format) {
     if (format.editor) {
       // Attach the text editor.
-      Drupal.editors[format.editor].attach(field, format);
+      Promise.resolve(Drupal.editors[format.editor].attach(field, format))
+        .then((editor) => {
+          const event = new CustomEvent('editor:attached', {
+            detail: [editor],
+          });
+          document.dispatchEvent(event);
+        })
+        .catch((error) => {
+          // eslint-disable-next-line no-console
+          console.log(`Failed to attach editor.\n${error}`);
+        });
 
       // Ensures form.js' 'formUpdated' event is triggered even for changes that
       // happen within the text editor.
