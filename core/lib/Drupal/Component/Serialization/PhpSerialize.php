@@ -20,13 +20,16 @@ class PhpSerialize implements ObjectAwareSerializationInterface {
    * {@inheritdoc}
    */
   public static function decode($raw) {
-    // Suppress warnings and errors from unserialize.
-    $decoded = @unserialize($raw, ['allowed_classes' => TRUE]);
+    $error = NULL;
+    set_error_handler(static function (int $errno, string $errstr) use (&$error): bool {
+      $error = $errstr;
+      return TRUE;
+    });
+    $decoded = unserialize($raw, ['allowed_classes' => TRUE]);
+    restore_error_handler();
 
-    // Check if unserialize returned FALSE.
-    if ($decoded === FALSE && $raw !== 'b:0;') {
-      $error = error_get_last();
-      throw new InvalidDataTypeException('Failed to unserialize data: ' . ($error['message'] ?? 'Unknown error'));
+    if ($decoded === FALSE && $raw !== serialize(FALSE)) {
+      throw new InvalidDataTypeException($error ?? 'Failed to unserialize data');
     }
 
     return $decoded;
