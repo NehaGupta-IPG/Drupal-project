@@ -116,7 +116,6 @@ class DirectoryTest extends FileTestBase {
       \Drupal::service('queue'),
       \Drupal::service('file.htaccess_writer'),
       \Drupal::service('config.factory'),
-      \Drupal::service('system.sa_fetcher'),
     );
     $systemCron->cron();
     $this->assertFileExists($default_scheme . '://.htaccess');

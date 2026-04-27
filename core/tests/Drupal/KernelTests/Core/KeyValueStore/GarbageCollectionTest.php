@@ -55,7 +55,6 @@ class GarbageCollectionTest extends KernelTestBase {
       \Drupal::service('queue'),
       \Drupal::service('file.htaccess_writer'),
       \Drupal::service('config.factory'),
-      \Drupal::service('system.sa_fetcher'),
     );
     $systemCron->cron();
 
