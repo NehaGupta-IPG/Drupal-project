@@ -205,11 +205,11 @@ class ExtensionDiscovery {
     }
 
     $files = [];
-    foreach ($search_dirs as $dir) {
+    foreach ($search_dirs as $key => $dir) {
       // Discover all extensions in the directory, unless we did already.
       if (!isset(static::$files[$this->root][$dir][$include_tests])) {
         static::$files[$this->root][$dir][$include_tests] = $this->scanDirectory($dir, $include_tests);
-        if (isset($legacy_directories[$dir]) && !empty(static::$files[$this->root][$dir][$include_tests])) {
+        if (isset($legacy_directories[$key]) && !empty(static::$files[$this->root][$dir][$include_tests])) {
           @trigger_error('Placing extensions in the sites directory is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3587130', E_USER_DEPRECATED);
         }
       }
