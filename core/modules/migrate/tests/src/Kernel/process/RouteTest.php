@@ -118,7 +118,7 @@ class RouteTest extends KernelTestBase {
       'route_parameters' => [
         'abbreviation' => 'nzdt',
         'offset' => -1,
-        'is_daylight_saving_time' => NULL,
+        'is_daylight_saving_time' => -1,
       ],
       'options' => [
         'query' => [],
