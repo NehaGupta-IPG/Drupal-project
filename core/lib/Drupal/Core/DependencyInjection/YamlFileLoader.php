@@ -7,11 +7,9 @@ namespace Drupal\Core\DependencyInjection;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\FileCache\FileCacheInterface;
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
-use Drupal\Core\DependencyInjection\SymfonyConfigShim\FileLocator as DrupalFileLocator;
 use Drupal\Core\DependencyInjection\SymfonyConfigShim\FileLocatorInterface as DrupalFileLocatorInterface;
 use Drupal\Core\DependencyInjection\SymfonyConfigShim\Loader\FileLoader as DrupalFileLoader;
 use Drupal\Core\Serialization\Yaml;
-use Symfony\Component\Config\FileLocator as SymfonyFileLocator;
 use Symfony\Component\Config\FileLocatorInterface as SymfonyFileLocatorInterface;
 use Symfony\Component\Config\Loader\FileLoader as SymfonyFileLoader;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -19,9 +17,6 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader as SymfonyYamlFi
 
 if (!interface_exists(SymfonyFileLocatorInterface::class)) {
   class_alias(DrupalFileLocatorInterface::class, SymfonyFileLocatorInterface::class);
-}
-if (!class_exists(SymfonyFileLocator::class)) {
-  class_alias(DrupalFileLocator::class, SymfonyFileLocator::class);
 }
 if (!class_exists(SymfonyFileLoader::class)) {
   class_alias(DrupalFileLoader::class, SymfonyFileLoader::class);
@@ -46,7 +41,17 @@ class YamlFileLoader extends SymfonyYamlFileLoader {
   protected FileCacheInterface $fileCache;
 
   public function __construct(ContainerBuilder $container) {
-    parent::__construct($container, new SymfonyFileLocator());
+    $locator = new class() implements SymfonyFileLocatorInterface {
+
+      /**
+       * {@inheritdoc}
+       */
+      public function locate(string $name, ?string $currentPath = NULL, bool $first = TRUE): string|array {
+        return $name;
+      }
+
+    };
+    parent::__construct($container, $locator);
     $this->fileCache = FileCacheFactory::get('container_yaml_loader');
   }
 
