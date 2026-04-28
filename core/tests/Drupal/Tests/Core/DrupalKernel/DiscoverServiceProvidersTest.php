@@ -67,8 +67,6 @@ class DiscoverServiceProvidersTest extends UnitTestCase {
 
   /**
    * Tests discovery with user defined container yaml.
-   *
-   * @covers ::discoverServiceProviders
    */
   public function testDiscoverServiceCustomWithRoot() {
     new Settings([
