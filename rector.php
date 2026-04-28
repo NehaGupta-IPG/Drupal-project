@@ -30,13 +30,13 @@ return Rector\Config\RectorConfig::configure()
 #    PHPUnitSetList::PHPUNIT_CODE_QUALITY,
 #  ])
   ->withPreparedSets(typeDeclarations: true)
-  ->withSkip([
-    TypedPropertyFromCreateMockAssignRector::class,
+#  ->withSkip([
+#    TypedPropertyFromCreateMockAssignRector::class,
 #    TypedPropertyFromDocblockSetUpDefinedRector::class,
 #    TypedPropertyFromAssignsRector::class,
 #    TypedPropertyFromStrictConstructorRector::class,
 #    TypedPropertyFromStrictSetUpRector::class,
-  ])
+#  ])
   ->withImportNames(
     importDocBlockNames: false,
     importShortClasses: false,
