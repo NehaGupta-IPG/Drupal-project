@@ -156,9 +156,6 @@ services:
     class: Drupal\jsonapi\Access\EntityAccessChecker
     public: false
     arguments: ['@jsonapi.resource_type.repository', '@router.no_access_checks', '@current_user', '@entity.repository']
-    calls:
-      # This is a temporary measure. JSON:API should not need to be aware of the Content Moderation module.
-      - [setLatestRevisionCheck, ['@?access_check.latest_revision']] # This is only injected when the service is available.
   Drupal\jsonapi\Access\EntityAccessChecker: '@jsonapi.entity_access_checker'
   access_check.jsonapi.relationship_route_access:
     class: Drupal\jsonapi\Access\RelationshipRouteAccessCheck

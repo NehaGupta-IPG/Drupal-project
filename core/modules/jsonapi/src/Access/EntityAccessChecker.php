@@ -2,13 +2,10 @@
 
 namespace Drupal\jsonapi\Access;
 
-use Drupal\content_moderation\Access\LatestRevisionCheck;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultReasonInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
-use Drupal\Core\Entity\RevisionableInterface;
-use Drupal\Core\Routing\RouteMatch;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\jsonapi\Exception\EntityAccessDeniedHttpException;
 use Drupal\jsonapi\JsonApiResource\LabelOnlyResourceObject;
@@ -61,17 +58,6 @@ class EntityAccessChecker {
   protected $entityRepository;
 
   /**
-   * The latest revision check service.
-   *
-   * This will be NULL unless the content_moderation module is installed. This
-   * is a temporary measure. JSON:API should not need to be aware of the
-   * Content Moderation module.
-   *
-   * @var \Drupal\content_moderation\Access\LatestRevisionCheck
-   */
-  protected $latestRevisionCheck = NULL;
-
-  /**
    * EntityAccessChecker constructor.
    *
    * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resource_type_repository
@@ -88,21 +74,6 @@ class EntityAccessChecker {
     $this->router = $router;
     $this->currentUser = $account;
     $this->entityRepository = $entity_repository;
-  }
-
-  /**
-   * Sets the media revision access check service.
-   *
-   * This is only called when content_moderation module is installed.
-   *
-   * @param \Drupal\content_moderation\Access\LatestRevisionCheck $latest_revision_check
-   *   The latest revision access check service provided by the
-   *   content_moderation module.
-   *
-   * @see self::$latestRevisionCheck
-   */
-  public function setLatestRevisionCheck(LatestRevisionCheck $latest_revision_check) {
-    $this->latestRevisionCheck = $latest_revision_check;
   }
 
   /**
@@ -161,7 +132,7 @@ class EntityAccessChecker {
       $access = AccessResult::neutral()->addCacheContexts(['url.query_args:' . JsonApiSpec::VERSION_QUERY_PARAMETER])->orIf($access);
       if (!$entity->isDefaultRevision()) {
         assert($operation === 'view', 'JSON:API does not yet support mutable operations on revisions.');
-        $revision_access = $this->checkRevisionViewAccess($entity, $account);
+        $revision_access = $entity->access('view revision', $account, TRUE);
         $access = $access->andIf($revision_access);
         // The revision access reason should trump the primary access reason.
         if (!$access->isAllowed()) {
@@ -169,45 +140,6 @@ class EntityAccessChecker {
           $access->setReason(trim('The user does not have access to the requested version. ' . $reason));
         }
       }
-    }
-    return $access;
-  }
-
-  /**
-   * Checks access to the given revision entity.
-   *
-   * This should only be called for non-default revisions.
-   *
-   * There is no standardized API for revision access checking in Drupal core
-   * and this method shims that missing API.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The revised entity for which to check access.
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   (optional) The account with which access should be checked. Defaults to
-   *   the current user.
-   *
-   * @return \Drupal\Core\Access\AccessResultInterface|\Drupal\Core\Access\AccessResultReasonInterface
-   *   The access check result.
-   */
-  protected function checkRevisionViewAccess(EntityInterface $entity, AccountInterface $account) {
-    assert($entity instanceof RevisionableInterface);
-    assert(!$entity->isDefaultRevision(), 'It is not necessary to check revision access when the entity is the default revision.');
-    $entity_type = $entity->getEntityType();
-    $access = $entity->access('view all revisions', $account, TRUE);
-    // Apply content_moderation's additional access logic.
-    // @see \Drupal\content_moderation\Access\LatestRevisionCheck::access()
-    if ($entity_type->getLinkTemplate('latest-version') && $entity->isLatestRevision() && isset($this->latestRevisionCheck)) {
-      // The latest revision access checker only expects to be invoked by the
-      // routing system, which makes it necessary to fake a route match.
-      $routes = $this->router->getRouteCollection();
-      $resource_type = $this->resourceTypeRepository->get($entity->getEntityTypeId(), $entity->bundle());
-      $route_name = sprintf('jsonapi.%s.individual', $resource_type->getTypeName());
-      $route = $routes->get($route_name);
-      $route->setOption('_content_moderation_entity_type', 'entity');
-      $route_match = new RouteMatch($route_name, $route, ['entity' => $entity], ['entity' => $entity->uuid()]);
-      $moderation_access_result = $this->latestRevisionCheck->access($route, $route_match, $account);
-      $access = $access->andIf($moderation_access_result);
     }
     return $access;
   }
