@@ -40,18 +40,6 @@ class AccessibilityTest extends AccessibilityTestBase {
         ],
       ],
     ];
-
-    yield 'Search' => [
-      'path' => '/search/node',
-      // @todo remove the heading and duplicate id rules below in
-      //   https://drupal.org/i/3318398.
-      'axe_options' => [
-        'rules' => [
-          'heading-order' => ['enabled' => FALSE],
-          'duplicate-id-aria' => ['enabled' => FALSE],
-        ],
-      ],
-    ];
   }
 
 }
