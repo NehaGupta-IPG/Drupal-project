@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\navigation\FunctionalJavascript;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\FunctionalJavascriptTests\AccessibilityTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -32,13 +33,20 @@ class AccessibilityTest extends AccessibilityTestBase {
       800
     );
 
-    $create_button = $session->getPage()->find('css', '#admin-toolbar')->findButton('Create');
+    // Wait for and click 'Expand sidebar' button.
+    $this
+      ->assertSession()
+      ->waitForElementVisible('named', ['button', 'Expand sidebar'])
+      ->click();
 
-    $this->assertFalse($create_button->isVisible());
-    $session->getPage()->pressButton('Expand sidebar');
-    // Wait for CSS transition.
-    $session->wait(500);
-    $this->assertTrue($create_button->isVisible());
+    // Wait for toolbar 'Create' button to become visible after CSS transition.
+    $session
+      ->getPage()
+      ->find('css', '#admin-toolbar')
+      ->findButton('Create')
+      ->waitFor(5, function (NodeElement $element) {
+        return $element->isVisible();
+      });
   }
 
   /**
