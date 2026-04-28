@@ -998,7 +998,6 @@ function hook_update_last_removed(): int {
  *   'value'?: \Drupal\Core\StringTranslation\TranslatableMarkup|array<string, mixed>|string,
  *   'description'?: \Drupal\Core\StringTranslation\TranslatableMarkup|array<string, mixed>,
  *   'severity'?: \Drupal\Core\Extension\Requirement\RequirementSeverity,
- *   'weight'?: int,
  * }>
  * phpcs:enable
  *   An associative array where the keys are arbitrary but must be unique (it
@@ -1012,7 +1011,6 @@ function hook_update_last_removed(): int {
  *   - severity: (optional) The requirement's severity. Defaults to
  *     RequirementSeverity::OK when installing, or RequirementSeverity::Info
  *     otherwise.
- *   - weight: (optional) no longer used, included for legacy purposes.
  */
 function hook_requirements($phase): array {
   $requirements = [];

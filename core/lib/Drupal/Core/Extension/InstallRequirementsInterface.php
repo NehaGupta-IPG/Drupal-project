@@ -13,7 +13,6 @@ namespace Drupal\Core\Extension;
  *   'description'?: \Drupal\Core\StringTranslation\TranslatableMarkup
  *      | array<string, mixed>,
  *   'severity'?: \Drupal\Core\Extension\Requirement\RequirementSeverity,
- *   'weight'?: int,
  * }
  */
 interface InstallRequirementsInterface {
@@ -52,7 +51,6 @@ interface InstallRequirementsInterface {
    *   - severity: (optional) An instance of
    *     \Drupal\Core\Extension\Requirement\RequirementSeverity enum. Defaults
    *     to RequirementSeverity::OK when installing.
-   *   - weight: (optional) no longer used, included for legacy purposes.
    */
   public static function getRequirements(): array;
 
