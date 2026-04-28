@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Mailer;
 
-use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Core\DependencyInjection\YamlFileLoader;
+use Drupal\Core\Experimental\MailerServicesTrait;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Mailer\EventSubscriber\OriginatorSubscriber;
 use Drupal\Core\State\StateInterface;
@@ -29,6 +28,7 @@ use Symfony\Component\Mime\Header\UnstructuredHeader;
 #[Group('mailer')]
 #[RunTestsInSeparateProcesses]
 class OriginatorSubscriberTest extends KernelTestBase {
+  use MailerServicesTrait;
 
   /**
    * {@inheritdoc}
@@ -50,14 +50,6 @@ class OriginatorSubscriberTest extends KernelTestBase {
       ->set('mail', 'site-mail@example.com')
       ->set('name', 'Example Site')
       ->save();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function register(ContainerBuilder $container): void {
-    $yaml_loader = new YamlFileLoader($container);
-    $yaml_loader->load($this->root . '/core/experimental/mailer.services.yml');
   }
 
   /**

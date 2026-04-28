@@ -32,19 +32,7 @@ class MailerCaptureTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['mailer_capture', 'mailer_capture_test'];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function prepareSettings(): void {
-    parent::prepareSettings();
-
-    // Load the mailer.services.yml file.
-    $filename = $this->siteDirectory . '/settings.php';
-    $line = "\n\$settings['container_yamls'][] = '" . $this->root . "/core/experimental/mailer.services.yml';\n";
-    file_put_contents($filename, $line, FILE_APPEND);
-  }
+  protected static $modules = ['core_mailer_services_test', 'mailer_capture', 'mailer_capture_test'];
 
   /**
    * Tests collecting mail sent in the test runner.

@@ -21,6 +21,7 @@ class TransportServiceFactoryTest extends BrowserTestBase {
    */
   protected static $modules = [
     'system',
+    'core_mailer_services_test',
     'mailer_transport_factory_functional_test',
   ];
 
@@ -28,18 +29,6 @@ class TransportServiceFactoryTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function prepareSettings(): void {
-    parent::prepareSettings();
-
-    // Load the mailer.services.yml file.
-    $filename = $this->siteDirectory . '/settings.php';
-    $line = "\n\$settings['container_yamls'][] = '" . $this->root . "/core/experimental/mailer.services.yml';\n";
-    file_put_contents($filename, $line, FILE_APPEND);
-  }
 
   /**
    * Test that the transport is set to null://null by default in the child site.
