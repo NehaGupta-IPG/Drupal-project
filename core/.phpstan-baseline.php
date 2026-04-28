@@ -17540,6 +17540,24 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/media/tests/src/Functional/UrlResolverTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\media_oembed_discovery\\\\Functional\\\\DiscoveringUrlResolverTest\\:\\:hijackProviderEndpoints\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/media/tests/src/Traits/OEmbedTestTrait.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\media_oembed_discovery\\\\Functional\\\\DiscoveringUrlResolverTest\\:\\:lockHttpClientToFixtures\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/media/tests/src/Traits/OEmbedTestTrait.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\media_oembed_discovery\\\\Functional\\\\DiscoveringUrlResolverTest\\:\\:useFixtureProviders\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/media/tests/src/Traits/OEmbedTestTrait.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\FunctionalJavascript\\\\MediaEmbedFilterTestBase\\:\\:showHiddenFields\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,

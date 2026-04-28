@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media\Functional;
 
+use Drupal\media\OEmbed\ResourceException;
 use Drupal\media\OEmbed\UrlResolver;
 use Drupal\Tests\media\Traits\OEmbedTestTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -102,44 +103,12 @@ class UrlResolverTest extends MediaFunctionalTestBase {
   }
 
   /**
-   * Data provider for testUrlDiscovery().
-   *
-   * @see ::testUrlDiscovery()
-   *
-   * @return array
-   *   An array of test data.
+   * Tests a URL only resolvable via discovery.
    */
-  public static function providerUrlDiscovery(): array {
-    return [
-      'JSON resource' => [
-        'video_vimeo.html',
-        'https://vimeo.com/api/oembed.json?url=video_vimeo.html',
-      ],
-      'XML resource' => [
-        'video_dailymotion.html',
-        'https://www.dailymotion.com/services/oembed?url=video_dailymotion.html',
-      ],
-    ];
-  }
-
-  /**
-   * Tests URL resolution when the URL is discovered by scanning the asset.
-   *
-   * @param string $url
-   *   The asset URL to resolve.
-   * @param string $resource_url
-   *   The expected oEmbed resource URL of the asset.
-   *
-   * @legacy-covers ::discoverResourceUrl
-   * @legacy-covers ::getProviderByUrl
-   * @legacy-covers ::getResourceUrl
-   */
-  #[DataProvider('providerUrlDiscovery')]
-  public function testUrlDiscovery(string $url, string $resource_url): void {
-    $this->assertSame(
-      $this->container->get('media.oembed.url_resolver')->getResourceUrl($url),
-      $resource_url
-    );
+  public function testDiscoveryDisabledByDefault(): void {
+    $this->expectException(ResourceException::class);
+    $this->container->get('media.oembed.url_resolver')
+      ->getResourceUrl('video_vimeo.html');
   }
 
 }

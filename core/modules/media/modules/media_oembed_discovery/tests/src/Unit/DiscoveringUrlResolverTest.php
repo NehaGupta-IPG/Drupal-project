@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\media\Unit;
+namespace Drupal\Tests\media_oembed_discovery\Unit;
 
 use Drupal\Core\Cache\NullBackend;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\media\OEmbed\ProviderRepositoryInterface;
 use Drupal\media\OEmbed\ResourceFetcherInterface;
-use Drupal\media\OEmbed\UrlResolver;
+use Drupal\media_oembed_discovery\OEmbed\DiscoveringUrlResolver;
 use Drupal\Tests\UnitTestCase;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
@@ -18,34 +18,35 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
- * Tests the oEmbed URL resolver.
+ * Tests the discovering oEmbed URL resolver.
  */
-#[CoversClass(UrlResolver::class)]
-#[Group('media')]
-class UrlResolverTest extends UnitTestCase {
+#[CoversClass(DiscoveringUrlResolver::class)]
+#[Group('media_oembed_discovery')]
+class DiscoveringUrlResolverTest extends UnitTestCase {
 
   /**
-   * Creates a UrlResolver with exposed protected methods for testing.
+   * Creates a DiscoveringUrlResolver with exposed protected methods.
    *
    * @param \GuzzleHttp\Client $client
    *   The HTTP client.
    *
-   * @return \Drupal\media\OEmbed\UrlResolver
-   *   A UrlResolver instance with a public discoverResourceUrl method.
+   * @return \Drupal\media_oembed_discovery\OEmbed\DiscoveringUrlResolver
+   *   A DiscoveringUrlResolver instance with a public discoverResourceUrl
+   *   method.
    */
-  protected function createTestableUrlResolver(Client $client): UrlResolver {
+  protected function createTestableUrlResolver(Client $client): DiscoveringUrlResolver {
     return new class (
       $this->createStub(ProviderRepositoryInterface::class),
       $this->createStub(ResourceFetcherInterface::class),
       $client,
       $this->createStub(ModuleHandlerInterface::class),
       new NullBackend('default'),
-    ) extends UrlResolver {
+    ) extends DiscoveringUrlResolver {
 
       /**
        * {@inheritdoc}
        */
-      public function discoverResourceUrl($url): string|false {
+      public function discoverResourceUrl(string $url): string|false {
         return parent::discoverResourceUrl($url);
       }
 
