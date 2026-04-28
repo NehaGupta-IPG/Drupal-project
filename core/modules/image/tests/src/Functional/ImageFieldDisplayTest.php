@@ -496,7 +496,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $instance = $this->createImageField($field_name, 'node', 'article', [], $field_settings);
 
     // Go to manage display page.
-    $this->drupalGet('admin/structure/types/manage/article/display');
+    $this->drupalGet('admin/structure/types/manage/article/display/default');
 
     // Test for existence of link to image styles configuration.
     $this->submitForm([], "{$field_name}_settings_edit");
@@ -509,7 +509,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     user_role_change_permissions(reset($admin_user_roles), ['administer image styles' => FALSE]);
 
     // Go to manage display page again.
-    $this->drupalGet('admin/structure/types/manage/article/display');
+    $this->drupalGet('admin/structure/types/manage/article/display/default');
 
     // Test for absence of link to image styles configuration.
     $this->submitForm([], "{$field_name}_settings_edit");
