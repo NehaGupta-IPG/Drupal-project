@@ -73,7 +73,7 @@ final class Importer implements LoggerAwareInterface {
    *     $existing is \Drupal\Core\DefaultContent\Existing::Error.
    */
   public function importContent(iterable $content, Existing $existing = Existing::Error, ?AccountInterface $account = NULL): void {
-    $event = new PreImportEvent(existing: $existing);
+    $event = new PreImportEvent($existing);
     $skip = $this->eventDispatcher->dispatch($event)->getSkipList();
 
     if ($account !== NULL) {

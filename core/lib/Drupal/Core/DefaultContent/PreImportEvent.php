@@ -26,23 +26,12 @@ final class PreImportEvent extends Event {
   /**
    * Constructs a PreImportEvent object.
    *
-   * @param \Drupal\Core\DefaultContent\Finder|null $finder
-   *   (optional) Deprecated. Passing a $finder is deprecated in
-   *   drupal:10.4.0 and is removed from drupal:12.0.0. Do not pass this
-   *   argument.
    * @param \Drupal\Core\DefaultContent\Existing $existing
    *   What the importer will do when importing an entity that already exists.
-   *
-   * @see https://www.drupal.org/node/3585238
    */
   public function __construct(
-    public readonly ?Finder $finder = NULL,
-    public readonly Existing $existing = Existing::Error,
-  ) {
-    if ($finder !== NULL) {
-      @trigger_error('Passing a $finder argument to ' . __CLASS__ . '::__construct() is deprecated in drupal:10.4.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3585238', E_USER_DEPRECATED);
-    }
-  }
+    public readonly Existing $existing,
+  ) {}
 
   /**
    * Adds an entity UUID to the skip list.
