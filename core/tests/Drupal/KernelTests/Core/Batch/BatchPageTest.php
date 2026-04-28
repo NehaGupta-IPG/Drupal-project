@@ -49,7 +49,7 @@ class BatchPageTest extends KernelTestBase {
 
     batch_set([
       'operations' => [
-        [[static::class, 'noop'], []],
+        [static::class . ':noop', []],
       ],
     ]);
 
