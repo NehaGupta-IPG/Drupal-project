@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Core\DefaultContent;
 
-use Drupal\Core\DefaultContent\DataProvider\DataProviderInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -27,16 +26,22 @@ final class PreImportEvent extends Event {
   /**
    * Constructs a PreImportEvent object.
    *
-   * @param \Drupal\Core\DefaultContent\DataProvider\DataProviderInterface $dataProvider
-   *   The data provider, which has information on the entities to create
-   *   in the necessary dependency order.
+   * @param \Drupal\Core\DefaultContent\Finder|null $finder
+   *   Deprecated. Do not pass this argument.
    * @param \Drupal\Core\DefaultContent\Existing $existing
    *   What the importer will do when importing an entity that already exists.
+   *
+   * @deprecated $finder is deprecated in drupal:10.4.0 and is removed from
+   *   drupal:12.0.0. See https://www.drupal.org/node/3585238
    */
   public function __construct(
-    public readonly DataProviderInterface $dataProvider,
-    public readonly Existing $existing,
-  ) {}
+    public readonly ?Finder $finder = NULL,
+    public readonly Existing $existing = Existing::Error,
+  ) {
+    if ($finder !== NULL) {
+      @trigger_error('Passing a $finder argument to ' . __CLASS__ . '::__construct() is deprecated in drupal:10.4.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3585238', E_USER_DEPRECATED);
+    }
+  }
 
   /**
    * Adds an entity UUID to the skip list.
@@ -45,17 +50,9 @@ final class PreImportEvent extends Event {
    *   The UUID of an entity that should not be imported.
    * @param string|\Stringable|null $reason
    *   (optional) A reason why the entity is being skipped. Defaults to NULL.
-   *
-   * @throws \InvalidArgumentException
-   *   If the given UUID is not one of the ones being imported.
    */
   public function skip(string $uuid, string|\Stringable|null $reason = NULL): void {
-    if (array_key_exists($uuid, $this->dataProvider->getData())) {
-      $this->skip[$uuid] = $reason;
-    }
-    else {
-      throw new \InvalidArgumentException("Content entity '$uuid' cannot be skipped, because it is not one of the entities being imported.");
-    }
+    $this->skip[$uuid] = $reason;
   }
 
   /**
