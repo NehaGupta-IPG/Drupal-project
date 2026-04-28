@@ -14,6 +14,7 @@ use Drupal\Core\Form\EnforcedResponseException;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Processes attachments of HTML responses.
@@ -64,6 +65,16 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
    */
   public function processAttachments(AttachmentsInterface $response) {
     assert($response instanceof HtmlResponse);
+
+    // Before placeholders are rendered, there will already be some libraries
+    // attached to the response, particularly libraries specified by the theme
+    // to load on every request. By sending early hints for assets at this
+    // point, the browser will be able to start downloading those assets while
+    // there is still potentially 10s or 100s of milliseconds before the HTML
+    // response itself being sent. While more assets will be available after
+    // placeholders are rendered, this happens just before the response itself
+    // so early hints are unlikely to make a difference there.
+    $this->sendEarlyHints($response);
 
     // First, render the actual placeholders; this may cause additional
     // attachments to be added to the response, which the attachment
@@ -129,7 +140,7 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
       // them to #attached['html_head_link'].
       $fonts = $this->assetResolver->getFontAssets($assets, $this->languageManager->getCurrentLanguage());
       foreach ($fonts as $font) {
-        if ($font['preload']) {
+        if (!empty($font['preload'])) {
           $extension = pathinfo($font['data'], PATHINFO_EXTENSION);
           $attached['html_head_link'][] = [
             [
@@ -194,6 +205,41 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     $response->setAttachments($attached);
 
     return $response;
+  }
+
+  /**
+   * Sends early hints for attached assets.
+   *
+   * @param AttachmentsInterface $response
+   *   The response object.
+   *
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/103
+   */
+  protected function sendEarlyHints(AttachmentsInterface $response): void {
+    $attached = $response->getAttachments();
+    if (!isset($attached['library']) || !is_array($attached['library'])) {
+      return;
+    }
+    $assets = AttachedAssets::createFromRenderArray(['#attached' => $attached]);
+    $ajax_page_state = $this->requestStack->getCurrentRequest()?->attributes->get('ajax_page_state');
+    $assets->setAlreadyLoadedLibraries(isset($ajax_page_state) ? explode(',', $ajax_page_state['libraries']) : []);
+
+    // Collect fonts from libraries, and if they include fonts to preload, add
+    // them to #attached['html_head_link'].
+    $fonts = $this->assetResolver->getFontAssets($assets, $this->languageManager->getCurrentLanguage());
+
+    $links = [];
+    foreach ($fonts as $font) {
+      if (!empty($font['preload']) && !empty($font['early hint'])) {
+        $extension = pathinfo($font['data'], PATHINFO_EXTENSION);
+        $links[] = '<' . $this->fileUrlGenerator->generate($font['data'])->toString() . '>; rel=preload as=font type=font/' . $extension . ' crossorigin=anonymous';
+      }
+    }
+    if ($links) {
+      $early_hints_response = new Response();
+      $early_hints_response->headers->set('Link', implode(', ', $links));
+      $early_hints_response->sendHeaders(103);
+    }
   }
 
   /**

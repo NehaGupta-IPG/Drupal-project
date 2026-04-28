@@ -44,10 +44,13 @@ global:
   fonts:
     fonts/source-sans-pro-v21-latin-regular.woff2:
       preload: true
+      early hint: true
     fonts/scope-one-v14-latin-regular.woff2:
       preload: true
+      early hint: true
     fonts/source-sans-pro-v21-latin-700.woff2:
       preload: true
+      early hint: true
 
 messages:
   css:
