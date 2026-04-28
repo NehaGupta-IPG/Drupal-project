@@ -32,8 +32,10 @@ class LinkExternalProtocolsConstraintValidator extends ConstraintValidator {
     catch (\InvalidArgumentException) {
       return;
     }
+
     // Disallow external URLs using untrusted protocols.
-    if ($url->isExternal() && !in_array(parse_url($url->getUri(), PHP_URL_SCHEME), UrlHelper::getAllowedProtocols())) {
+    // Ignore telephone links because parse_url fails on three digit numbers like 911.
+    if ($url->isExternal() && !in_array(parse_url($url->getUri(), PHP_URL_SCHEME), UrlHelper::getAllowedProtocols()) && !str_starts_with($url->getUri(), 'tel:')) {
       $this->context->buildViolation($constraint->message, ['@uri' => $value->uri])
         ->atPath('uri')
         ->addViolation();
