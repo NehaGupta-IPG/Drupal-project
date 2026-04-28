@@ -286,7 +286,7 @@ class NodeTest extends ResourceTestBase {
   public function testPatchPath(): void {
     $this->setUpAuthorization('GET');
     $this->setUpAuthorization('PATCH');
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
 
     // @todo Remove line below in favor of commented line in https://www.drupal.org/project/drupal/issues/2878463.
     $url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $this->entity->uuid()]);
@@ -411,7 +411,7 @@ class NodeTest extends ResourceTestBase {
       ->get(['node--camelids', $this->entity->uuid(), $this->entity->language()->getId()], new CacheableMetadata());
     $cached_fields = $cache->data['fields'];
     $this->assertSameSize($field_names, $cached_fields);
-    array_walk($field_names, function ($field_name) use ($cached_fields) {
+    array_walk($field_names, function (string $field_name) use ($cached_fields): void {
       $this->assertInstanceOf(
         CacheableNormalization::class,
         $cached_fields[$field_name]
@@ -459,7 +459,7 @@ class NodeTest extends ResourceTestBase {
    */
   public function testPostNonExistingAuthor(): void {
     $this->setUpAuthorization('POST');
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
     $this->grantPermissionsToTestedRole(['administer nodes']);
 
     $random_uuid = \Drupal::service('uuid')->generate();

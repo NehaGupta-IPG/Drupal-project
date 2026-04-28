@@ -13,6 +13,7 @@ use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests InfoParser class and exception.
@@ -62,7 +63,7 @@ class InfoParserUnitTest extends UnitTestCase {
    *   The expected exception message.
    */
   #[DataProvider('providerInfoException')]
-  public function testInfoException($yaml, $expected_exception_message): void {
+  public function testInfoException(string $yaml, string $expected_exception_message): void {
 
     vfsStream::setup('modules');
     vfsStream::create([
@@ -119,6 +120,18 @@ dependencies:
 YML,
         'Missing required keys (type, name) in',
       ],
+      'version is not scalar' => [
+      <<<YML
+package: Core
+type: module
+name: Broken
+core_version_requirement: '*'
+version:
+  - Not
+  - Scalar
+YML,
+        "The 'version' value must be a scalar in",
+      ],
     ];
   }
 
@@ -174,6 +187,55 @@ MISSING_CORE_VERSION_REQUIREMENT;
     ]);
     $info_values = $this->infoParser->parse(vfsStream::url('modules/fixtures/missing_core_version_requirement.info.txt'));
     $this->assertSame($info_values['core_version_requirement'], \Drupal::VERSION);
+  }
+
+  /**
+   * Tests a version string that looks like a float.
+   *
+   * @legacy-covers ::parse
+   */
+  public function testFloatLikeVersion(): void {
+    $float_like_version = <<<VERSION_TEST
+core_version_requirement: '*'
+name: 'Float-like version'
+type: module
+version: '1.0'
+VERSION_TEST;
+
+    vfsStream::setup('modules');
+    vfsStream::create([
+      'fixtures' => [
+        'float_like_version.info.txt' => $float_like_version,
+      ],
+    ]);
+    $info_values = $this->infoParser->parse(vfsStream::url('modules/fixtures/float_like_version.info.txt'));
+    $this->assertSame('1.0', $info_values['version'], 'Version that looks like a float should be a string');
+  }
+
+  /**
+   * Tests a version string that is a float.
+   *
+   * @legacy-covers ::parse
+   */
+  #[IgnoreDeprecations]
+  public function testFloatVersion(): void {
+    $float_version = <<<VERSION_TEST
+core_version_requirement: '*'
+name: 'Float version'
+type: module
+version: 1.1
+VERSION_TEST;
+
+    vfsStream::setup('modules');
+    vfsStream::create([
+      'fixtures' => [
+        'float_version.info.txt' => $float_version,
+      ],
+    ]);
+    $this->expectUserDeprecationMessage("Using a non-string as the 'version' value in vfs://modules/fixtures/float_version.info.txt is deprecated in drupal:11.4.0 and will be a fatal error in drupal:13.0.0. Instead, wrap the version value in single quotes. See https://www.drupal.org/node/3576311");
+
+    $info_values = $this->infoParser->parse(vfsStream::url('modules/fixtures/float_version.info.txt'));
+    $this->assertSame('1.1', $info_values['version'], 'Floating point version should be cast to a string');
   }
 
   /**
@@ -242,7 +304,7 @@ CORE;
    * @legacy-covers ::parse
    */
   #[DataProvider('providerCoreIncompatibility')]
-  public function testCoreIncompatibility($test_case, $constraint, $expected): void {
+  public function testCoreIncompatibility(string $test_case, string $constraint, bool $expected): void {
     $core_incompatibility = <<<CORE_INCOMPATIBILITY
 core_version_requirement: $constraint
 name: common_test
@@ -354,7 +416,7 @@ UNPARSABLE_CORE_VERSION_REQUIREMENT;
    * @legacy-covers ::parse
    */
   #[DataProvider('providerValidLifecycle')]
-  public function testValidLifecycle($lifecycle, $expected): void {
+  public function testValidLifecycle(string $lifecycle, string $expected): void {
     $info = <<<INFO
 package: Core
 core_version_requirement: '*'
@@ -413,7 +475,7 @@ INFO;
    * @legacy-covers ::parse
    */
   #[DataProvider('providerInvalidLifecycle')]
-  public function testInvalidLifecycle($lifecycle, $exception_message): void {
+  public function testInvalidLifecycle(string $lifecycle, string $exception_message): void {
     $info = <<<INFO
 package: Core
 core_version_requirement: '*'
@@ -461,7 +523,7 @@ INFO;
    * @legacy-covers ::parse
    */
   #[DataProvider('providerLifecycleLink')]
-  public function testLifecycleLink($lifecycle, $lifecycle_link = NULL, $exception_message = NULL): void {
+  public function testLifecycleLink(string $lifecycle, ?string $lifecycle_link = NULL, ?string $exception_message = NULL): void {
     $info = <<<INFO
 package: Core
 core_version_requirement: '*'

@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Controller;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Extension\ExtensionLifecycle;
@@ -13,9 +14,11 @@ use Drupal\Core\Link;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Theme\ThemeAccessCheck;
+use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Url;
 use Drupal\system\SystemManager;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\Cookie;
 
 /**
  * Returns responses for System routes.
@@ -24,79 +27,18 @@ class SystemController extends ControllerBase {
 
   use ModuleDependencyMessageTrait;
 
-  /**
-   * System Manager Service.
-   *
-   * @var \Drupal\system\SystemManager
-   */
-  protected $systemManager;
-
-  /**
-   * The theme access checker service.
-   *
-   * @var \Drupal\Core\Theme\ThemeAccessCheck
-   */
-  protected $themeAccess;
-
-  /**
-   * The form builder service.
-   *
-   * @var \Drupal\Core\Form\FormBuilderInterface
-   */
-  protected $formBuilder;
-
-  /**
-   * The menu link tree service.
-   *
-   * @var \Drupal\Core\Menu\MenuLinkTreeInterface
-   */
-  protected $menuLinkTree;
-
-  /**
-   * The module extension list.
-   *
-   * @var \Drupal\Core\Extension\ModuleExtensionList
-   */
-  protected $moduleExtensionList;
-
-  /**
-   * The theme extension list.
-   *
-   * @var \Drupal\Core\Extension\ThemeExtensionList
-   */
-  protected ThemeExtensionList $themeExtensionList;
-
-  /**
-   * Constructs a new SystemController.
-   *
-   * @param \Drupal\system\SystemManager $systemManager
-   *   System manager service.
-   * @param \Drupal\Core\Theme\ThemeAccessCheck $theme_access
-   *   The theme access checker service.
-   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
-   *   The form builder.
-   * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menu_link_tree
-   *   The menu link tree service.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $module_extension_list
-   *   The module extension list.
-   * @param \Drupal\Core\Extension\ThemeExtensionList $theme_extension_list
-   *   The theme extension list.
-   */
   public function __construct(
-    SystemManager $systemManager,
+    protected SystemManager $systemManager,
     #[Autowire(service: 'access_check.theme')]
-    ThemeAccessCheck $theme_access,
+    protected ThemeAccessCheck $themeAccess,
     FormBuilderInterface $form_builder,
-    MenuLinkTreeInterface $menu_link_tree,
-    ModuleExtensionList $module_extension_list,
-    ThemeExtensionList $theme_extension_list,
+    protected MenuLinkTreeInterface $menuLinkTree,
+    protected ModuleExtensionList $moduleExtensionList,
+    protected ThemeExtensionList $themeExtensionList,
+    protected ThemeManagerInterface $themeManager,
+    readonly protected TimeInterface $time,
   ) {
-    $this->systemManager = $systemManager;
-    $this->themeAccess = $theme_access;
     $this->formBuilder = $form_builder;
-    $this->menuLinkTree = $menu_link_tree;
-    $this->moduleExtensionList = $module_extension_list;
-    $this->themeExtensionList = $theme_extension_list;
   }
 
   /**
@@ -176,8 +118,14 @@ class SystemController extends ControllerBase {
    *   A redirect response to the front page.
    */
   public function compactPage($mode) {
-    user_cookie_save(['admin_compact_mode' => ($mode == 'on')]);
-    return $this->redirect('<front>');
+    $response = $this->redirect('<front>');
+    if ($mode === 'on') {
+      $response->headers->setCookie(new Cookie('Drupal.visitor.admin_compact_mode', '1', $this->time->getRequestTime() + 31536000));
+    }
+    else {
+      $response->headers->clearCookie('Drupal.visitor.admin_compact_mode');
+    }
+    return $response;
   }
 
   /**
@@ -257,7 +205,7 @@ class SystemController extends ControllerBase {
         // Confirm that all base themes are available.
         $theme->incompatible_base = (isset($theme->info['base theme']) && !($theme->base_themes === array_filter($theme->base_themes)));
         // Confirm that the theme engine is available.
-        $theme->incompatible_engine = isset($theme->info['engine']) && !isset($theme->owner);
+        $theme->incompatible_engine = isset($theme->info['engine']) && !$this->themeManager->getThemeEngine($theme->info['engine']);
         // Confirm that module dependencies are available.
         $theme->incompatible_module = FALSE;
         // Confirm that the user has permission to enable modules.
@@ -384,7 +332,17 @@ class SystemController extends ControllerBase {
       $theme_group_titles['uninstalled'] = $this->formatPlural(count($theme_groups['uninstalled']), 'Uninstalled theme', 'Uninstalled themes');
     }
 
-    uasort($theme_groups['installed'], 'system_sort_themes');
+    $sortThemes = static function ($a, $b) {
+      if ($a->is_default) {
+        return -1;
+      }
+      if ($b->is_default) {
+        return 1;
+      }
+      return strcasecmp($a->info['name'], $b->info['name']);
+    };
+
+    uasort($theme_groups['installed'], $sortThemes);
     $this->moduleHandler()->alter('system_themes_page', $theme_groups);
 
     $build = [];

@@ -69,7 +69,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $instance = $this->createImageField($field_name, 'node', 'article', ['uri_scheme' => $scheme], $field_settings);
 
     // Go to manage display page.
-    $this->drupalGet("admin/structure/types/manage/article/display");
+    $this->drupalGet("admin/structure/types/manage/article/display/default");
 
     // Test for existence of link to image styles configuration.
     $this->submitForm([], "{$field_name}_settings_edit");
@@ -80,7 +80,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     user_role_change_permissions(reset($admin_user_roles), ['administer image styles' => FALSE]);
 
     // Go to manage display page again.
-    $this->drupalGet("admin/structure/types/manage/article/display");
+    $this->drupalGet("admin/structure/types/manage/article/display/default");
 
     // Test for absence of link to image styles configuration.
     $this->submitForm([], "{$field_name}_settings_edit");
@@ -240,7 +240,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     ];
     $display = \Drupal::service('entity_display.repository')->getViewDisplay('node', $node->getType(), 'default');
     $display->setComponent($field_name, $display_options)->save();
-    $this->drupalGet("admin/structure/types/manage/" . $node->getType() . "/display");
+    $this->drupalGet("admin/structure/types/manage/" . $node->getType() . "/display/default");
     $this->assertSession()->responseContains('Image style: Thumbnail (100×100)');
   }
 
@@ -376,7 +376,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $instance = $this->createImageField($field_name, 'node', 'article', [], $field_settings);
 
     // Go to manage display page.
-    $this->drupalGet("admin/structure/types/manage/article/display");
+    $this->drupalGet("admin/structure/types/manage/article/display/default");
 
     // Test for existence of link to image styles configuration.
     $this->submitForm([], "{$field_name}_settings_edit");
@@ -387,7 +387,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     user_role_change_permissions(reset($admin_user_roles), ['administer image styles' => FALSE]);
 
     // Go to manage display page again.
-    $this->drupalGet("admin/structure/types/manage/article/display");
+    $this->drupalGet("admin/structure/types/manage/article/display/default");
 
     // Test for absence of link to image styles configuration.
     $this->submitForm([], "{$field_name}_settings_edit");

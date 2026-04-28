@@ -169,10 +169,10 @@ class HelpTestTwigNodeVisitor implements NodeVisitorInterface {
    *     each rendering run.
    *   - return_chunk: Chunk index to keep intact for translated_chunk
    *     processing. All others are removed.
-   * @param int $value
+   * @param int|string $value
    *   Value to set for $key.
    */
-  public static function setStateValue(string $key, $value) {
+  public static function setStateValue(string $key, $value): void {
     $state = \Drupal::state();
     $values = $state->get(static::STATE_NAME, ['manner' => 0]);
     $values[$key] = $value;

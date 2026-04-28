@@ -13,7 +13,6 @@ use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Security\UntrustedCallbackException;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -115,7 +114,6 @@ class DatelistElementFormTest extends KernelTestBase implements FormInterface, T
   /**
    * Tests that exceptions are raised if untrusted callbacks are used.
    */
-  #[IgnoreDeprecations]
   public function testDatelistElementUntrustedCallbacks() : void {
     $this->expectException(UntrustedCallbackException::class);
     $this->expectExceptionMessage(sprintf(
@@ -123,6 +121,23 @@ class DatelistElementFormTest extends KernelTestBase implements FormInterface, T
       Variable::callableToString([$this, 'datelistDateCallback'])
     ));
     \Drupal::formBuilder()->getForm($this, 'datelistDateCallback');
+  }
+
+  /**
+   * Tests proper timezone handling of the Datelist element.
+   */
+  public function testTimezoneHandling(): void {
+    // Render the form once with the site's timezone.
+    $form = \Drupal::formBuilder()->getForm($this);
+    $this->render($form);
+    $this->assertEquals('Australia/Sydney', $form['datelist_element']['#date_timezone']);
+
+    // Mimic a user with a different timezone than Australia/Sydney.
+    date_default_timezone_set('UTC');
+
+    $form = \Drupal::formBuilder()->getForm($this);
+    $this->render($form);
+    $this->assertEquals('UTC', $form['datelist_element']['#date_timezone']);
   }
 
   /**

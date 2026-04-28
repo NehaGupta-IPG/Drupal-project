@@ -30,7 +30,6 @@ use Symfony\Component\Process\Process;
  * @see \Drupal\TestSite\Commands\TestSiteTearDownCommand
  */
 #[Group('Setup')]
-#[Group('#slow')]
 #[PreserveGlobalState(FALSE)]
 #[CoversNothing]
 #[RunTestsInSeparateProcesses]
@@ -289,7 +288,7 @@ class TestSiteApplicationTest extends KernelTestBase {
    * @return string
    *   The database key of the added connection.
    */
-  protected function addTestDatabase($db_prefix): string {
+  protected function addTestDatabase(string $db_prefix): string {
     $database = Database::convertDbUrlToConnectionInfo(getenv('SIMPLETEST_DB'));
     $database['prefix'] = $db_prefix;
     $target = __CLASS__ . $db_prefix;

@@ -108,7 +108,7 @@ class ImageThemeHooks {
       'image_formatter' => [
         'variables' => [
           'item' => NULL,
-          'item_attributes' => NULL,
+          'attributes' => NULL,
           'url' => NULL,
           'image_style' => NULL,
           'image_preload' => FALSE,
@@ -147,7 +147,7 @@ class ImageThemeHooks {
    * @param array $variables
    *   An associative array containing:
    *   - item: An ImageItem object.
-   *   - item_attributes: An optional associative array of html attributes to be
+   *   - attributes: An optional associative array of html attributes to be
    *     placed in the img tag.
    *   - image_style: An optional image style.
    *   - image_preload: Determine whether we need to add preload link.
@@ -165,7 +165,7 @@ class ImageThemeHooks {
         '#theme' => 'image',
       ];
     }
-    $variables['image']['#attributes'] = $variables['item_attributes'];
+    $variables['image']['#attributes'] = $variables['attributes'];
     $variables['image']['#image_preload'] = $variables['image_preload'];
 
     $item = $variables['item'];
