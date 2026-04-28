@@ -25,6 +25,7 @@ class ResponsiveImagePreloadUpdateTest extends UpdatePathTestBase {
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-11.3.0.filled.standard.php.gz',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/install-search-help.php',
       __DIR__ . '/../../../fixtures/update/responsive_image.php',
       __DIR__ . '/../../../fixtures/update/responsive_image-loading-attribute.php',
     ];
