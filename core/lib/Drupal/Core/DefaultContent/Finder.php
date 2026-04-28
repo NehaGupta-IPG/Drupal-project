@@ -89,7 +89,10 @@ final class Finder implements \IteratorAggregate {
     $this->data = $entities;
   }
 
-  public function getIterator(): \ArrayObject {
+  /**
+   * {@inheritdoc}
+   */
+  public function getIterator(): \ArrayObject<string, array<mixed>> {
     return new \ArrayObject($this->data);
   }
 
