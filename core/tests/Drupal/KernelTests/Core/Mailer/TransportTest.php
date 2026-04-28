@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Mailer;
 
+use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\DependencyInjection\YamlFileLoader;
 use Drupal\Core\Mailer\TransportServiceFactory;
 use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
@@ -29,7 +31,15 @@ class TransportTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['mailer', 'system'];
+  protected static $modules = ['system'];
+
+  /**
+   * {@inheritdoc}
+   */
+  public function register(ContainerBuilder $container): void {
+    $yaml_loader = new YamlFileLoader($container);
+    $yaml_loader->load($this->root . '/core/experimental/mailer.services.yml');
+  }
 
   /**
    * Sets up a mailer DSN config override.

@@ -1,3 +1,7 @@
+# Experimental mailer services.
+# To enable this feature, add:
+#   $settings['container_yamls'][] = $app_root . '/core/experimental/mailer.services.yml';
+# to your settings.php.
 parameters:
   mailer.skip_procedural_hook_scan: true
 
