@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\mailer\Functional;
+namespace Drupal\FunctionalTests\Mailer;
 
 use Drupal\Core\Test\MailerCaptureTrait;
 use Drupal\Tests\BrowserTestBase;
