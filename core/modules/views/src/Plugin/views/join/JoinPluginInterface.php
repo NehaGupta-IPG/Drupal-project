@@ -13,7 +13,7 @@ interface JoinPluginInterface {
    * Builds the SQL for the join this object represents.
    *
    * When possible, try to use table alias instead of table names.
-   * Implementations typically call `SelectInterface::addJoin()` one or more
+   * Implementations typically call SelectInterface::addJoin() one or more
    * times to append the actual SQL join(s) to the in-progress Views query.
    *
    * @param \Drupal\Core\Database\Query\SelectInterface $select_query
@@ -29,10 +29,9 @@ interface JoinPluginInterface {
    *   - num: Incremental occurrence index for this table.
    *   - alias: The SQL alias to use in join conditions.
    *   - join: The ViewsJoin plugin instance that produced this table entry.
-   *   - relationship: The relationship context key used while queuing this
-   *     table. If a table is queued through a Views relationship path, this is
-   *     the active relationship alias/context key. If no relationship is
-   *     active, this is the View base table context key.
+   *   - relationship: The key that identifies from which relationship path this
+   *     table was added: the active relationship alias, or the View base table
+   *     key when no relationship is active.
    *   Non-SQL query plugins may provide a different structure.
    * @param \Drupal\views\Plugin\views\query\QueryPluginBase $view_query
    *   The source Views query plugin.
