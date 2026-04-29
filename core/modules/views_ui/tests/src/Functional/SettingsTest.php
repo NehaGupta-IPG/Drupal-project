@@ -42,7 +42,7 @@ class SettingsTest extends UITestBase {
   public function testEditUI(): void {
     // The element with missing `#title` is for a fieldset and is not easily
     // hidden.
-    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "extenders][display_extenders" of #type "checkboxes" from form "views_ui_admin_settings_advanced" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:11.4.0 and is required in drupal:13.0.0. Form element "extenders][display_extenders" of #type "checkboxes" from form "views_ui_admin_settings_advanced" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
 
     $this->drupalLogin($this->adminUser);
 

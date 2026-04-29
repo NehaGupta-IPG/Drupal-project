@@ -1095,7 +1095,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       // For buttons with missing #value declarations, #value will be '' here.
       // trim() is used for simple check against accidental strings of spaces.
       if (!strlen(trim($element[$title_key] ?? ''))) {
-        @trigger_error(sprintf('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "%s" of #type "%s" from form "%s" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004', implode('][', $element['#array_parents']), $element['#type'], $form_id), E_USER_DEPRECATED);
+        @trigger_error(sprintf('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:11.4.0 and is required in drupal:13.0.0. Form element "%s" of #type "%s" from form "%s" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004', implode('][', $element['#array_parents']), $element['#type'], $form_id), E_USER_DEPRECATED);
       }
     }
 
