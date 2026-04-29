@@ -1,6 +1,5 @@
 langcode: en
 status: true
-dependencies:
 id: node.field_added_for_rebuild_test
 field_name: field_added_for_rebuild_test
 entity_type: node

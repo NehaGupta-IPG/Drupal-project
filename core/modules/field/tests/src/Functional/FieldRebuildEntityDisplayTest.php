@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Drupal\Tests\field\Functional;
 
@@ -127,7 +128,7 @@ class FieldRebuildEntityDisplayTest extends BrowserTestBase {
     $default_data = $config->getOriginal('', FALSE);
 
     $this->assertSame(
-      "Field Rebuild Entity Diplay Test - English Label",
+      "Field Rebuild Entity Display Test - English Label",
       $default_data['third_party_settings']['language']['label']
     );
 
@@ -137,7 +138,7 @@ class FieldRebuildEntityDisplayTest extends BrowserTestBase {
       ->get();
 
     $this->assertSame(
-      'Field Rebuild Entity Diplay Test - German Label',
+      'Field Rebuild Entity Display Test - German Label',
       $de_override['third_party_settings']['language']['label']
     );
 
@@ -154,7 +155,7 @@ class FieldRebuildEntityDisplayTest extends BrowserTestBase {
     $default_data = $config->getOriginal('', FALSE);
 
     $this->assertSame(
-      "Field Rebuild Entity Diplay Test - English Label",
+      "Field Rebuild Entity Display Test - English Label",
       $default_data['third_party_settings']['language']['label']
     );
 
@@ -164,7 +165,7 @@ class FieldRebuildEntityDisplayTest extends BrowserTestBase {
       ->get();
 
     $this->assertSame(
-      'Field Rebuild Entity Diplay Test - German Label',
+      'Field Rebuild Entity Display Test - German Label',
       $de_override['third_party_settings']['language']['label'],
     );
   }

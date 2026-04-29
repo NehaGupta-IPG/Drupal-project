@@ -1,6 +1,17 @@
 <?php
+declare(strict_types=1);
 
-function field_rebuild_b_test_uninstall() {
+use Drupal\node\Entity\NodeType;
+
+/**
+ * @file
+ * Install, update and uninstall functions for the field_rebuild_b_test module.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function field_rebuild_b_test_uninstall(): void {
   $configs_to_delete = [
     'field.field.node.language_rebuild_a_test.field_added_for_rebuild_test',
     'field.storage.node.field_added_for_rebuild_test',

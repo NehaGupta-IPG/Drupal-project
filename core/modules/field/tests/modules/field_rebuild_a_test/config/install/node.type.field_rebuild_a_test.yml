@@ -1,6 +1,5 @@
 langcode: en
 status: true
-dependencies:
 name: 'Field Rebuild Entity Test Node'
 type: field_rebuild_a_test
 description: null

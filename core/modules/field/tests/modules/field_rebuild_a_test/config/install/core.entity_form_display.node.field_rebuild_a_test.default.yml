@@ -11,6 +11,5 @@ bundle: field_rebuild_a_test
 mode: default
 third_party_settings:
   language:
-    label: 'Field Rebuild Entity Diplay Test - English Label'
+    label: 'Field Rebuild Entity Display Test - English Label'
 hidden: { }
-

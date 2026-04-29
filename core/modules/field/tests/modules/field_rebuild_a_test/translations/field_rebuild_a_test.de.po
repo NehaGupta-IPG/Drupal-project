@@ -11,5 +11,5 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "Field Rebuild Entity Diplay Test - English Label"
-msgstr "Field Rebuild Entity Diplay Test - German Label"
+msgid "Field Rebuild Entity Display Test - English Label"
+msgstr "Field Rebuild Entity Display Test - German Label"
