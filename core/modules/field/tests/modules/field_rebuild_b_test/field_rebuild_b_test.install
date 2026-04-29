@@ -1,8 +1,9 @@
 <?php
-function language_rebuild_b_test_uninstall() {
+
+function field_rebuild_b_test_uninstall() {
   $configs_to_delete = [
-    'field.field.node.language_rebuild_a_test.field_field_b',
-    'field.storage.node.field_field_b',
+    'field.field.node.language_rebuild_a_test.field_added_for_rebuild_test',
+    'field.storage.node.field_added_for_rebuild_test',
   ];
 
   foreach ($configs_to_delete as $config_id) {

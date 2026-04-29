@@ -1,10 +1,8 @@
 langcode: en
 status: true
 dependencies:
-  module:
-    - node
-id: node.field_field_a
-field_name: field_field_a
+id: node.field_added_for_rebuild_test
+field_name: field_added_for_rebuild_test
 entity_type: node
 type: string
 settings: {  }

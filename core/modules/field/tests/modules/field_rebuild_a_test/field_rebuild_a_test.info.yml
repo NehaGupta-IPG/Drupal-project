@@ -1,5 +1,5 @@
-name: Module A
-description: Module A
+name: Field Rebuild Entity Display A Test
+description: Support module A for the Field Rebuild Entity Display tests.
 type: module
 core_version_requirement: ^10 | ^11 | ^12
 version: 4.x-dev

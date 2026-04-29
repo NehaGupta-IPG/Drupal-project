@@ -2,13 +2,13 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.node.field_field_b
+    - field.storage.node.field_added_for_rebuild_test
     - node.type.field_rebuild_a_test
-id: node.field_rebuild_a_test.field_field_b
-field_name: field_field_b
+id: node.field_rebuild_a_test.field_added_for_rebuild_test
+field_name: field_added_for_rebuild_test
 entity_type: node
 bundle: field_rebuild_a_test
-label: 'Field B'
+label: 'Added Field To Field Rebuild A Test'
 description: ''
 required: false
 translatable: false

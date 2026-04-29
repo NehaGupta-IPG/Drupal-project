@@ -1,7 +1,7 @@
 langcode: en
 status: true
 dependencies:
-name: 'Module A'
+name: 'Field Rebuild Entity Test Node'
 type: field_rebuild_a_test
 description: null
 help: null
