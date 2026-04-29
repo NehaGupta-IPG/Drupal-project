@@ -8,8 +8,8 @@ use Drupal\Component\Assertion\Inspector;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Random;
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Cache\CacheRedirect;
 use Drupal\Core\Entity\ContentEntityNullStorage;
 use Drupal\Core\Entity\EntityInterface;
@@ -481,7 +481,25 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
       $this->assertResourceErrorResponse(403, $this->getExpectedUnauthorizedAccessMessage('GET'), $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), 'MISS', FALSE);
     }
     else {
-      $this->assertResourceErrorResponse(404, 'No route found for "GET ' . $this->getEntityResourceUrl()->setAbsolute()->toString() . '"', $response);
+      $this->assertResourceErrorResponse(
+        404,
+        'No route found for "GET ' . $this->getEntityResourceUrl()->setAbsolute()->toString() . '"',
+        $response,
+        ['4xx-response', 'http_response'],
+        [],
+        'MISS',
+      );
+
+      // DX: Repeating the 404 request yields a cache hit.
+      $response = $this->request('GET', $url, $request_options);
+      $this->assertResourceErrorResponse(
+        404,
+        'No route found for "GET ' . $this->getEntityResourceUrl()->setAbsolute()->toString() . '"',
+        $response,
+        ['4xx-response', 'http_response'],
+        [],
+        'HIT',
+      );
     }
 
     $this->provisionEntityResource();
@@ -633,13 +651,13 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     if ($this->entity->getEntityType()->getLinkTemplates()) {
       $this->assertArrayHasKey('Link', $response->getHeaders());
       $link_relation_type_manager = $this->container->get('plugin.manager.link_relation_type');
-      $expected_link_relation_headers = array_map(function ($relation_name) use ($link_relation_type_manager) {
+      $expected_link_relation_headers = array_map(function (int|string $relation_name) use ($link_relation_type_manager) {
         $link_relation_type = $link_relation_type_manager->createInstance($relation_name);
         return $link_relation_type->isRegistered()
           ? $link_relation_type->getRegisteredName()
           : $link_relation_type->getExtensionUri();
       }, array_keys($this->entity->getEntityType()->getLinkTemplates()));
-      $parse_rel_from_link_header = function ($value) {
+      $parse_rel_from_link_header = function ($value): string|false {
         $matches = [];
         if (preg_match('/rel="([^"]+)"/', $value, $matches) === 1) {
           return $matches[1];
@@ -663,7 +681,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
       'Transfer-Encoding',
       'Vary',
     ];
-    $header_cleaner = function ($headers) use ($ignored_headers) {
+    $header_cleaner = function (array $headers) use ($ignored_headers): array {
       foreach ($headers as $header => $value) {
         if (str_starts_with($header, 'X-Drupal-Assertion-') || in_array($header, $ignored_headers)) {
           unset($headers[$header]);
@@ -786,7 +804,13 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
 
     // DX: 404 when resource not provisioned.
     $response = $this->request('POST', $url, $request_options);
-    $this->assertResourceErrorResponse(404, 'No route found for "POST ' . $this->getEntityResourcePostUrl()->setAbsolute()->toString() . '"', $response);
+    $this->assertResourceErrorResponse(
+      404,
+      'No route found for "POST ' . $this->getEntityResourcePostUrl()->setAbsolute()->toString() . '"',
+      $response,
+      ['4xx-response', 'http_response'],
+      [],
+    );
 
     $this->provisionEntityResource();
     // Simulate the developer again forgetting the ?_format query string.
@@ -983,7 +1007,13 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
       $this->assertResourceErrorResponse(405, 'No route found for "PATCH ' . $this->getEntityResourceUrl()->setAbsolute()->toString() . '": Method Not Allowed (Allow: GET, POST, HEAD)', $response);
     }
     else {
-      $this->assertResourceErrorResponse(404, 'No route found for "PATCH ' . $this->getEntityResourceUrl()->setAbsolute()->toString() . '"', $response);
+      $this->assertResourceErrorResponse(
+        404,
+        'No route found for "PATCH ' . $this->getEntityResourceUrl()->setAbsolute()->toString() . '"',
+        $response,
+        ['4xx-response', 'http_response'],
+        [],
+      );
     }
 
     $this->provisionEntityResource();
@@ -1210,7 +1240,13 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
       $this->assertResourceErrorResponse(405, 'No route found for "DELETE ' . $this->getEntityResourceUrl()->setAbsolute()->toString() . '": Method Not Allowed (Allow: GET, POST, HEAD)', $response);
     }
     else {
-      $this->assertResourceErrorResponse(404, 'No route found for "DELETE ' . $this->getEntityResourceUrl()->setAbsolute()->toString() . '"', $response);
+      $this->assertResourceErrorResponse(
+        404,
+        'No route found for "DELETE ' . $this->getEntityResourceUrl()->setAbsolute()->toString() . '"',
+        $response,
+        ['4xx-response', 'http_response'],
+        [],
+      );
     }
 
     $this->provisionEntityResource();
@@ -1274,7 +1310,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
    * Asserts structure of $patchProtectedFieldNames.
    */
   protected function assertPatchProtectedFieldNamesStructure() {
-    $is_null_or_string = function ($value) {
+    $is_null_or_string = function ($value): bool {
       return is_null($value) || is_string($value);
     };
     $this->assertTrue(
@@ -1514,7 +1550,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
    * @param array $actual
    *   The object to test.
    */
-  protected function assertEntityArraySubset($expected, $actual) {
+  protected function assertEntityArraySubset($expected, array $actual) {
     foreach ($expected as $key => $value) {
       if (is_array($value)) {
         $this->assertEntityArraySubset($value, $actual[$key]);

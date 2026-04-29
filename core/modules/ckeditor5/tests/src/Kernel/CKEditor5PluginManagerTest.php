@@ -24,6 +24,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Yaml\Yaml;
 
 // cspell:ignore layercake everytextcontainer justheading
@@ -1151,11 +1152,6 @@ PHP,
       'ckeditor5/internal.drupal.ckeditor5',
       'ckeditor5/internal.drupal.ckeditor5.emphasis',
       'ckeditor5/internal.drupal.ckeditor5.htmlEngine',
-      'core/ckeditor5.autoformat',
-      'core/ckeditor5.basic',
-      'core/ckeditor5.essentials',
-      'core/ckeditor5.htmlSupport',
-      'core/ckeditor5.pasteFromOffice',
     ];
     $this->assertSame($default_libraries, $this->manager->getEnabledLibraries($editor));
 
@@ -1235,7 +1231,6 @@ PHP,
       'ckeditor5/internal.drupal.ckeditor5.media',
       'ckeditor5/internal.drupal.ckeditor5.mediaAlign',
       'ckeditor5_test/layercake',
-      'core/ckeditor5.table',
     ]);
     sort($expected_libraries);
     $this->assertSame($expected_libraries, $this->manager->getEnabledLibraries($editor));
@@ -1251,10 +1246,6 @@ PHP,
     ]);
     sort($expected_plugins);
     $this->assertSame(array_values($expected_plugins), $plugin_ids);
-    $expected_libraries = array_merge($expected_libraries, [
-      'core/ckeditor5.alignment',
-    ]);
-    sort($expected_libraries);
     $this->assertSame($expected_libraries, $this->manager->getEnabledLibraries($editor));
 
     // Case 8: GHS is enabled for Full HTML (or any other text format that has
@@ -1277,11 +1268,6 @@ PHP,
       'ckeditor5/internal.drupal.ckeditor5',
       'ckeditor5/internal.drupal.ckeditor5.emphasis',
       'ckeditor5/internal.drupal.ckeditor5.htmlEngine',
-      'core/ckeditor5.autoformat',
-      'core/ckeditor5.basic',
-      'core/ckeditor5.essentials',
-      'core/ckeditor5.htmlSupport',
-      'core/ckeditor5.pasteFromOffice',
     ];
     $this->assertSame($default_libraries, $this->manager->getEnabledLibraries($editor));
   }
@@ -1325,7 +1311,7 @@ PHP,
     );
     // @todo Remove in https://www.drupal.org/project/drupal/issues/3361534, which moves this into ::assertConfigSchema()
     $this->assertSame([], array_map(
-      fn ($v) => sprintf("[%s] %s", $v->getPropertyPath(), (string) $v->getMessage()),
+      fn (ConstraintViolationInterface $v): string => sprintf("[%s] %s", $v->getPropertyPath(), (string) $v->getMessage()),
       iterator_to_array($this->typedConfig->createFromNameAndData($text_editor->getConfigDependencyName(), $text_editor->toArray())->validate())
     ));
 
@@ -1561,7 +1547,7 @@ PHP,
   /**
    * Provides use cases for findPluginSupportingElement().
    */
-  public static function providerTestPluginSupportingElement() {
+  public static function providerTestPluginSupportingElement(): array {
     return [
       'tag that belongs to a superset' => [
         'tag' => 'h2',
