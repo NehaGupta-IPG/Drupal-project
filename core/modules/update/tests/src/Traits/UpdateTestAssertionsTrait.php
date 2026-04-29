@@ -111,7 +111,7 @@ trait UpdateTestAssertionsTrait {
    * @param string $update_element_css_locator
    *   The CSS locator for the page element that contains the security updates.
    */
-  protected function assertSecurityUpdates($project_path_part, array $expected_security_releases, string $expected_update_message_type, $update_element_css_locator) {
+  protected function assertSecurityUpdates(string $project_path_part, array $expected_security_releases, string $expected_update_message_type, string $update_element_css_locator): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $this->standardTests();

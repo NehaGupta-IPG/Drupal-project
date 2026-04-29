@@ -899,7 +899,7 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
    *
    * @see \Drupal\update_test\Controller\UpdateTestController::updateTest()
    */
-  protected function refreshUpdateStatus($xml_map, $url = 'update-test'): void {
+  protected function refreshUpdateStatus(array $xml_map, string $url = 'update-test'): void {
     // Tell the Update Status module to fetch from the URL provided by
     // update_test module.
     $this->config('update.settings')->set('fetch.url', Url::fromUri('base:' . $url, ['absolute' => TRUE])->toString())->save();
