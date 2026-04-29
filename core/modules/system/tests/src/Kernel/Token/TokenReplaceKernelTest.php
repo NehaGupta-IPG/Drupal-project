@@ -187,4 +187,34 @@ class TokenReplaceKernelTest extends TokenReplaceKernelTestBase {
     }
   }
 
+  /**
+   * Tests that [site:url] includes a trailing slash with language path prefix.
+   */
+  public function testSiteUrlTokenTrailingSlash(): void {
+    $this->enableModules(['language', 'language_test']);
+    $this->installConfig(['language']);
+    $this->installEntitySchema('configurable_language');
+
+    $this->container->get('entity_type.manager')
+      ->getStorage('configurable_language')
+      ->create(['id' => 'fr', 'label' => 'French'])
+      ->save();
+
+    $this->config('language.negotiation')
+      ->set('url.prefixes', ['en' => '', 'fr' => 'fr'])
+      ->save();
+
+    $this->container->get('kernel')->rebuildContainer();
+
+    $url_options = ['absolute' => TRUE, 'language' => $this->interfaceLanguage];
+
+    $en_replaced = $this->tokenService->replace('[site:url]user/points', [], ['langcode' => 'en']);
+    $this->assertEquals(Url::fromRoute('<front>', [], $url_options)->toString() . 'user/points', $en_replaced);
+
+    $french_language = $this->container->get('language_manager')->getLanguage('fr');
+    $french_url_options = ['absolute' => TRUE, 'language' => $french_language];
+    $fr_replaced = $this->tokenService->replace('[site:url]user/points', [], ['langcode' => 'fr']);
+    $this->assertEquals(Url::fromRoute('<front>', [], $french_url_options)->toString() . '/user/points', $fr_replaced);
+  }
+
 }
