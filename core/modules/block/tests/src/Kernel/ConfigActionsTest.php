@@ -134,23 +134,49 @@ class ConfigActionsTest extends KernelTestBase {
     $this->assertSame($expected_theme, $block->getTheme());
     $this->assertSame($expected_region, $block->getRegion());
 
+    // Test that exception appears when `region` is an array.
     $this->expectException(ConfigActionException::class);
     $this->expectExceptionMessageIs('Cannot determine which region to place this block into, because no default region was provided.');
     $this->configActionManager->applyAction($action, 'block.block.no_region', [
       'plugin' => 'system_powered_by_block',
       'region' => [],
     ]);
+
+    // Test that exception appears when `region` is not set.
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessage('Cannot determine which region to place this block into, because no default region was provided.');
+    $this->configActionManager->applyAction($action, 'block.block.no_region', [
+      'plugin' => 'system_powered_by_block',
+    ]);
   }
 
   /**
- * Tests place block in static region.
- */
+   * Tests place block in static region.
+   */
   #[TestWith(["placeBlockInDefaultTheme", "stark"])]
   #[TestWith(["placeBlockInAdminTheme", "claro"])]
   public function testPlaceBlockInStaticRegion(string $action, string $expected_theme): void {
     $this->configActionManager->applyAction($action, 'block.block.test_block', [
       'plugin' => 'system_powered_by_block',
       'region' => 'content',
+    ]);
+
+    $block = Block::load('test_block');
+    $this->assertInstanceOf(Block::class, $block);
+    $this->assertSame('system_powered_by_block', $block->getPluginId());
+    $this->assertSame($expected_theme, $block->getTheme());
+    $this->assertSame('content', $block->getRegion());
+  }
+
+  /**
+   * Tests place block in static region using `default_region`.
+   */
+  #[TestWith(["placeBlockInDefaultTheme", "olivero"])]
+  #[TestWith(["placeBlockInAdminTheme", "claro"])]
+  public function testPlaceBlockInStaticDefaultRegion(string $action, string $expected_theme): void {
+    $this->configActionManager->applyAction($action, 'block.block.test_block', [
+      'plugin' => 'system_powered_by_block',
+      'default_region' => 'content',
     ]);
 
     $block = Block::load('test_block');
