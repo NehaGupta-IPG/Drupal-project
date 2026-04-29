@@ -148,14 +148,18 @@ class FormattableMarkup implements MarkupInterface, \Countable {
    *   and formatting depends on the first character of the key:
    *   - @variable: Use as the default choice for anything displayed on the
    *     site. Do not use within the "<" and ">" of an HTML tag, such as in
-   *     HTML attribute values. Doing so is a security risk.
+   *     HTML attribute values. Doing so is a security risk. NULL values will
+   *     cause an AssertionError in development environments and be converted
+   *     to empty strings in production.
    *   - %variable: Use when @variable would be appropriate, but you want the
    *     placeholder value to be wrapped in an <em> tag with a placeholder
    *     class. As with @variable, do not use within the "<" and ">" of an HTML
    *     tag, such as in HTML attribute values. Doing so is a security risk.
+   *     NULL values will cause an AssertionError in development environments
+   *     and be converted to empty strings in production.
    *   - :variable: Use when the return value is to be used as a URL value of an
-   *     HTML attribute. Only the "href" attribute is supported. The return
-   *     value is escaped with
+   *     HTML attribute. Only the "href" attribute is supported. Null values are
+   *     silently converted to empty strings. The return value is escaped with
    *     \Drupal\Component\Utility\Html::escape() and filtered for dangerous
    *     protocols using UrlHelper::stripDangerousProtocols(). Use this when
    *     using the "href" attribute, ensuring the value is always wrapped in
@@ -175,6 +179,15 @@ class FormattableMarkup implements MarkupInterface, \Countable {
   protected static function placeholderFormat($string, array $args) {
     // Transform arguments before inserting them.
     foreach ($args as $key => $value) {
+      // Null values are not valid for @ and % placeholders. In development
+      // environments (zend.assertions=1) this throws an AssertionError so
+      // the problem is immediately visible. In production (zend.assertions=-1)
+      // the assert() call is compiled out and execution falls through to the
+      // empty string fallback so the page continues to render.
+      if ($value === NULL && ($key[0] === '@' || $key[0] === '%')) {
+        assert(FALSE, sprintf('Passing NULL as a placeholder value is not supported. Use an empty string instead. Placeholder: %s, String: "%s".', $key, $string));
+        $value = '';
+      }
       switch ($key[0]) {
         case '@':
           // Escape if the value is not an object from a class that implements
@@ -188,8 +201,9 @@ class FormattableMarkup implements MarkupInterface, \Countable {
           break;
 
         case ':':
-          // Strip URL protocols that can be XSS vectors.
-          $value = UrlHelper::stripDangerousProtocols($value);
+          // Strip URL protocols that can be XSS vectors. Convert NULL to an
+          // empty string to avoid PHP warnings.
+          $value = UrlHelper::stripDangerousProtocols($value ?? '');
           // Escape unconditionally, without checking whether the value is an
           // instance of \Drupal\Component\Render\MarkupInterface. This forces
           // characters that are unsafe for use in an "href" HTML attribute to
@@ -229,12 +243,14 @@ class FormattableMarkup implements MarkupInterface, \Countable {
    * Escapes a placeholder replacement value if needed.
    *
    * @param string|\Drupal\Component\Render\MarkupInterface $value
-   *   A placeholder replacement value.
+   *   A placeholder replacement value. Must not be NULL; use an empty string
+   *   instead. NULL values should be caught in placeholderFormat() before
+   *   this method is called.
    *
    * @return string
    *   The properly escaped replacement value.
    */
-  protected static function placeholderEscape($value) {
+  protected static function placeholderEscape($value): string {
     return $value instanceof MarkupInterface ? (string) $value : Html::escape($value);
   }
 

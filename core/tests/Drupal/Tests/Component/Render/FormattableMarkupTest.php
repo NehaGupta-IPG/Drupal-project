@@ -13,25 +13,11 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Tests the TranslatableMarkup class.
+ * Tests the FormattableMarkup class.
  */
 #[CoversClass(FormattableMarkup::class)]
 #[Group('utility')]
 class FormattableMarkupTest extends TestCase {
-
-  /**
-   * The error message of the last error in the error handler.
-   *
-   * @var string
-   */
-  protected $lastErrorMessage;
-
-  /**
-   * The error number of the last error in the error handler.
-   *
-   * @var int
-   */
-  protected $lastErrorNumber;
 
   /**
    * @legacy-covers ::__toString
@@ -65,9 +51,11 @@ class FormattableMarkupTest extends TestCase {
     // exception conversion as __toString is never allowed to leak any kind of
     // exception.
     // https://github.com/sebastianbergmann/phpunit/issues/487
-    set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline): bool {
-      $this->lastErrorNumber = $errno;
-      $this->lastErrorMessage = $errstr;
+    $last_error_number = NULL;
+    $last_error_message = '';
+    set_error_handler(function (int $errno, string $errstr) use (&$last_error_number, &$last_error_message): bool {
+      $last_error_number = $errno;
+      $last_error_message = $errstr;
       return TRUE;
     });
     // We want this to trigger an error.
@@ -77,8 +65,8 @@ class FormattableMarkupTest extends TestCase {
     restore_error_handler();
     // The string should not change.
     $this->assertEquals($string, $output);
-    $this->assertEquals($error_number, $this->lastErrorNumber);
-    $this->assertEquals($error_message, $this->lastErrorMessage);
+    $this->assertEquals($error_number, $last_error_number);
+    $this->assertEquals($error_message, $last_error_message);
   }
 
   /**
@@ -117,13 +105,11 @@ class FormattableMarkupTest extends TestCase {
    *   The arguments to replace.
    * @param string $expected_key
    *   The placeholder key expected in the AssertionError message.
-   * @param string $expected
-   *   Unused in this variant; kept for shared provider compatibility.
    *
    * @legacy-covers ::__toString
    */
   #[DataProvider('providerTestNullPlaceholderAssertion')]
-  public function testNullPlaceholderAssertionError(string $string, array $arguments, string $expected_key, string $expected): void {
+  public function testNullPlaceholderAssertionError(string $string, array $arguments, string $expected_key): void {
     ini_set('zend.assertions', 1);
     $this->expectException(\AssertionError::class);
     $this->expectExceptionMessageMatches('/' . preg_quote($expected_key, '/') . '/');
