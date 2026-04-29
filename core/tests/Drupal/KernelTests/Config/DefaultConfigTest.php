@@ -20,7 +20,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests that the installed config matches the default config.
  */
 #[Group('Config')]
-#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class DefaultConfigTest extends KernelTestBase {
 
@@ -219,7 +218,7 @@ class DefaultConfigTest extends KernelTestBase {
         $result = $config_manager->diff($default_config_storage, $active_config_storage, $config_name);
         // ::assertConfigDiff will throw an exception if the configuration is
         // different.
-        $this->assertNull($this->assertConfigDiff($result, $config_name, static::$skippedConfig));
+        $this->assertConfigDiff($result, $config_name, static::$skippedConfig);
       }
       else {
         $data = $default_config_storage->read($config_name);

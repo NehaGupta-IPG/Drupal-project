@@ -39,6 +39,7 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\locale\LocaleDefaultOptions;
 use Drupal\locale\LocaleFetch;
+use Drupal\locale\File\LocaleFileManager;
 use Psr\Http\Client\ClientExceptionInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
@@ -482,12 +483,6 @@ function install_begin_request($class_loader, &$install_state): void {
     }
   }
 
-  // Before having installed the system module and being able to do a module
-  // rebuild, prime the module list static cache with the system module's
-  // location.
-  // @todo Remove as part of https://www.drupal.org/node/2186491
-  $module_list->setPathname('system', 'core/modules/system/system.info.yml');
-
   // Use the language from profile configuration if available.
   if (!empty($install_state['config_install_path']) && $install_state['config']['system.site']) {
     $install_state['parameters']['langcode'] = $install_state['config']['system.site']['default_langcode'];
@@ -508,9 +503,7 @@ function install_begin_request($class_loader, &$install_state): void {
   // Load all modules and perform request related initialization.
   $kernel->preHandle($request);
 
-  // Initialize a route on this legacy request similar to
-  // \Drupal\Core\DrupalKernel::prepareLegacyRequest() since normal routing
-  // will not happen.
+  // A route is required for route matching.
   $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, new Route('<none>'));
   $request->attributes->set(RouteObjectInterface::ROUTE_NAME, '<none>');
 
@@ -1836,7 +1829,7 @@ function _install_prepare_import($langcodes, $server_pattern): void {
 
   foreach ($langcodes as $langcode) {
     // Get the translation files located in the translations directory.
-    $files = locale_translate_get_interface_translation_files(['drupal'], [$langcode]);
+    $files = \Drupal::service(LocaleFileManager::class)->getInterfaceTranslationFiles(['drupal'], [$langcode]);
     // Pick the first file which matches the language, if any.
     $file = reset($files);
     if (is_object($file)) {
