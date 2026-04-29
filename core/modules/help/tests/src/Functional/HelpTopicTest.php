@@ -6,12 +6,14 @@ namespace Drupal\Tests\help\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Menu\AssertBreadcrumbTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Verifies help topic display and user access to help based on permissions.
- *
- * @group help
  */
+#[Group('help')]
+#[RunTestsInSeparateProcesses]
 class HelpTopicTest extends BrowserTestBase {
   use AssertBreadcrumbTrait;
 
@@ -252,7 +254,7 @@ class HelpTopicTest extends BrowserTestBase {
    *   - name: Displayed name.
    *   - tags: Cache tags to test for.
    */
-  protected function getTopicList() {
+  protected function getTopicList(): array {
     return [
       'help_topics_test.test' => [
         'name' => 'ABC Help Test module',

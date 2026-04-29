@@ -6,12 +6,16 @@ namespace Drupal\Tests\pgsql\Unit;
 
 use Drupal\pgsql\Driver\Database\pgsql\Schema;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 
 /**
- * @coversDefaultClass \Drupal\pgsql\Driver\Database\pgsql\Schema
- * @group Database
+ * Tests Drupal\pgsql\Driver\Database\pgsql\Schema.
  */
+#[CoversClass(Schema::class)]
+#[Group('Database')]
 class SchemaTest extends UnitTestCase {
 
   /**
@@ -24,10 +28,10 @@ class SchemaTest extends UnitTestCase {
    * @param string $expected
    *   The expected computed constraint name.
    *
-   * @covers ::constraintExists
-   * @dataProvider providerComputedConstraintName
+   * @legacy-covers ::constraintExists
    */
-  public function testComputedConstraintName($table_name, $name, $expected): void {
+  #[DataProvider('providerComputedConstraintName')]
+  public function testComputedConstraintName(string $table_name, string $name, string $expected): void {
     $max_identifier_length = 63;
 
     $connection = $this->prophesize('\Drupal\pgsql\Driver\Database\pgsql\Connection');
@@ -49,7 +53,7 @@ class SchemaTest extends UnitTestCase {
   /**
    * Data provider for ::testComputedConstraintName().
    */
-  public static function providerComputedConstraintName() {
+  public static function providerComputedConstraintName(): array {
     return [
       ['user_field_data', 'pkey', 'user_field_data____pkey'],
       ['user_field_data', 'name__key', 'user_field_data__name__key'],

@@ -6,12 +6,14 @@ namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests how translations are handled when a project gets updated.
- *
- * @group locale
  */
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocaleTranslationChangeProjectVersionTest extends LocaleUpdateBase {
 
   /**
@@ -39,11 +41,11 @@ class LocaleTranslationChangeProjectVersionTest extends LocaleUpdateBase {
       ->set('translation.use_source', LOCALE_TRANSLATION_USE_SOURCE_LOCAL)
       ->save();
 
-    // This test uses .po files for the old translation file instead of the ._po
-    // files because locale_translate_get_interface_translation_files() (used to
-    // delete old translation files) only works with .po files.
-    // The new translation file uses _po.
-    // Old version: 8.x-1.0; New version: 8.x-1.1.
+    // This test uses .po files for the old translation file instead of the
+    // ._po files because
+    // \Drupal\locale\File\LocaleFileManager::getInterfaceTranslationFiles() (used
+    // to delete old translation files) only works with .po files. The new
+    // translation file uses _po.  Old version: 8.x-1.0; New version: 8.x-1.1.
     $this->makePoFile('remote/all/contrib_module_one', 'contrib_module_one-8.x-1.0.de.po', $this->timestampOld, []);
     $this->makePoFile('remote/all/contrib_module_one', 'contrib_module_one-8.x-1.1.de._po', $this->timestampNew, []);
     $this->makePoFile('local', 'contrib_module_one-8.x-1.0.de.po', $this->timestampOld, []);

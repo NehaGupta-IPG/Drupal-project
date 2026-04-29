@@ -275,7 +275,7 @@ class Xss {
    * @param string $attributes
    *   The html attribute to process.
    *
-   * @return string
+   * @return array
    *   Cleaned up version of the HTML attributes.
    */
   protected static function attributes($attributes) {
@@ -295,7 +295,7 @@ class Xss {
           if (preg_match('/^([-a-zA-Z][-a-zA-Z0-9]*)/', $attributes, $match)) {
             $attribute_name = strtolower($match[1]);
             $skip = (
-              $attribute_name == 'style' ||
+              in_array($attribute_name, ['style', 'srcdoc']) ||
               str_starts_with($attribute_name, 'on') ||
               str_starts_with($attribute_name, '-') ||
               // Ignore long attributes to avoid unnecessary processing

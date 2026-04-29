@@ -20,18 +20,22 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 class UniqueLabelInListConstraint extends SymfonyConstraint {
 
   /**
-   * The default violation message.
-   *
-   * @var string
-   */
-  public $message = 'The label %label is not unique.';
-
-  /**
    * The key of the label that this validation constraint should check.
    *
    * @var null|string
    */
   public $labelKey = NULL;
+
+  public function __construct(
+    mixed $options = NULL,
+    ?string $labelKey = NULL,
+    public $message = 'The label %label is not unique.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct($options, $groups, $payload);
+    $this->labelKey = $labelKey ?? $this->labelKey;
+  }
 
   /**
    * {@inheritdoc}
