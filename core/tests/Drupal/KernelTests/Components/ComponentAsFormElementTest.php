@@ -46,17 +46,20 @@ class ComponentAsFormElementTest extends ComponentKernelTestBase implements Form
 
     $form['sdc_input'] = [
       '#type' => 'component',
+      '#title' => 'sdc_input',
       '#component' => 'sdc_theme_test:input',
     ];
 
     $form['sdc_input_basic'] = [
       '#type' => 'component',
+      '#title' => 'sdc_input_basic',
       '#component' => 'sdc_theme_test:input',
       '#default_value' => 'test_data_default_value_basic',
     ];
 
     $form['sdc_input_with_label'] = [
       '#type' => 'component',
+      '#title' => 'sdc_input_with_label',
       '#component' => 'sdc_theme_test:input',
       '#slots' => [
         'label' => [
@@ -74,18 +77,21 @@ class ComponentAsFormElementTest extends ComponentKernelTestBase implements Form
 
     $form['sdc_input_with_default_value'] = [
       '#type' => 'component',
+      '#title' => 'sdc_input_with_default_value',
       '#component' => 'sdc_theme_test:input',
       '#default_value' => 'test_data_default_value',
     ];
 
     $form['sdc_input_with_value'] = [
       '#type' => 'component',
+      '#title' => 'sdc_input_with_value',
       '#component' => 'sdc_theme_test:input',
       '#value' => 'test_data_value',
     ];
 
     $form['sdc_input_with_value_and_default_value'] = [
       '#type' => 'component',
+      '#title' => 'sdc_input_with_value_and_default_value',
       '#component' => 'sdc_theme_test:input',
       '#default_value' => 'test_data_default_value',
       '#value' => 'test_data_value',
@@ -93,12 +99,14 @@ class ComponentAsFormElementTest extends ComponentKernelTestBase implements Form
 
     $form['sdc_input_with_required'] = [
       '#type' => 'component',
+      '#title' => 'sdc_input_with_required',
       '#component' => 'sdc_theme_test:input',
       '#required' => TRUE,
     ];
 
     $form['sdc_input_with_id_as_prop'] = [
       '#type' => 'component',
+      '#title' => 'sdc_input_with_id_as_prop',
       '#component' => 'sdc_theme_test:input',
       '#props' => [
         'id' => 'test_sdc_input_prop_id',
@@ -107,6 +115,7 @@ class ComponentAsFormElementTest extends ComponentKernelTestBase implements Form
 
     $form['sdc_input_with_id_as_prop_attributes'] = [
       '#type' => 'component',
+      '#title' => 'sdc_input_with_id_as_prop_attributes',
       '#component' => 'sdc_theme_test:input',
       '#props' => [
         'attributes' => new Attribute(
@@ -119,6 +128,7 @@ class ComponentAsFormElementTest extends ComponentKernelTestBase implements Form
 
     $form['sdc_input_with_validation'] = [
       '#type' => 'component',
+      '#title' => 'sdc_input_with_validation',
       '#component' => 'sdc_theme_test:input',
       '#default_value' => 'test_data_valid_value',
       '#element_validate' => [
