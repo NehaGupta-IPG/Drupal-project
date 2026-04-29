@@ -42,6 +42,7 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
   protected function doTestFrontPageAuthenticatedWarmCache(): void {
     $user = $this->drupalCreateUser();
     $this->drupalLogin($user);
+    sleep(2);
     $this->drupalGet('<front>');
     sleep(2);
     $this->drupalGet('<front>');
