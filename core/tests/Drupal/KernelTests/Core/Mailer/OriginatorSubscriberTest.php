@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Mailer;
 
-use Drupal\Core\Experimental\MailerServicesTrait;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Mailer\EventSubscriber\OriginatorSubscriber;
 use Drupal\Core\State\StateInterface;
@@ -28,7 +27,6 @@ use Symfony\Component\Mime\Header\UnstructuredHeader;
 #[Group('mailer')]
 #[RunTestsInSeparateProcesses]
 class OriginatorSubscriberTest extends KernelTestBase {
-  use MailerServicesTrait;
 
   /**
    * {@inheritdoc}
@@ -37,6 +35,7 @@ class OriginatorSubscriberTest extends KernelTestBase {
     'language',
     'locale',
     'system',
+    'core_mailer_services_test',
     'mailer_event_subscriber_test',
   ];
 
