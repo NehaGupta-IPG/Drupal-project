@@ -8,6 +8,7 @@ use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('form')]
 #[Group('legacy')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class FormElementMissingTitleDeprecationTest extends KernelTestBase implements FormInterface {
 
@@ -145,13 +147,13 @@ class FormElementMissingTitleDeprecationTest extends KernelTestBase implements F
    * Ensures that missing #title property triggers deprecation message.
    */
   public function testDeprecationMessage(): void {
-    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:11.4.0 and is required in drupal:13.0.0. Form element "textfield_missing_title" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
-    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:11.4.0 and is required in drupal:13.0.0. Form element "textfield_title_is_empty_string" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
-    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:11.4.0 and is required in drupal:13.0.0. Form element "textfield_title_is_space" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
-    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:11.4.0 and is required in drupal:13.0.0. Form element "textfield_title_is_false" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
-    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:11.4.0 and is required in drupal:13.0.0. Form element "button_missing_value" of #type "button" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
-    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:11.4.0 and is required in drupal:13.0.0. Form element "submit_missing_value" of #type "submit" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
-    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:11.4.0 and is required in drupal:13.0.0. Form element "fieldset" of #type "fieldset" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:11.4.0 and is required in drupal:13.0.0. Form element "textfield_missing_title" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:11.4.0 and is required in drupal:13.0.0. Form element "textfield_title_is_empty_string" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:11.4.0 and is required in drupal:13.0.0. Form element "textfield_title_is_space" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:11.4.0 and is required in drupal:13.0.0. Form element "textfield_title_is_false" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:11.4.0 and is required in drupal:13.0.0. Form element "button_missing_value" of #type "button" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:11.4.0 and is required in drupal:13.0.0. Form element "submit_missing_value" of #type "submit" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:11.4.0 and is required in drupal:13.0.0. Form element "fieldset" of #type "fieldset" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
 
     $this->container->get('form_builder')->getForm($this);
   }
