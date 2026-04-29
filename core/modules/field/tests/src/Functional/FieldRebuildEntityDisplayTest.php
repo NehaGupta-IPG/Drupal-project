@@ -5,6 +5,7 @@ namespace Drupal\Tests\field\Functional;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationSelected;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
+use Drupal\locale\Gettext;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -78,12 +79,40 @@ class FieldRebuildEntityDisplayTest extends BrowserTestBase {
       ->set('url.prefixes.de', 'de')
       ->save();
 
-    $this->getSession()->visit($this->getAbsoluteUrl('/de/admin/modules'));
-    $this->submitForm([
-      'modules[field_rebuild_a_test][enable]' => TRUE,
-    ], 'Install');
+    $this->container
+      ->get('module_installer')
+      ->install(['field_rebuild_a_test']);
 
-    $this->rebuildContainer();
+    $this->container = \Drupal::getContainer();
+
+    $module_path = $this->container
+      ->get('extension.list.module')
+      ->getPath('field_rebuild_a_test');
+
+    $file = (object) [
+      'uri' => $module_path . '/translations/field_rebuild_a_test.de.po',
+      'langcode' => 'de',
+    ];
+
+    Gettext::fileToDatabase(
+      $file,
+      [
+        'langcode' => 'de',
+        'overwrite_options' => [
+          'not_customized' => TRUE,
+          'customized' => TRUE,
+        ],
+        'customized' => LOCALE_NOT_CUSTOMIZED,
+      ]
+    );
+
+    $this->container = \Drupal::getContainer();
+
+    $this->container
+      ->get('locale.config_manager')
+      ->updateConfigTranslations([
+        'core.entity_form_display.node.field_rebuild_a_test.default',
+      ], ['de']);
   }
 
   /**
