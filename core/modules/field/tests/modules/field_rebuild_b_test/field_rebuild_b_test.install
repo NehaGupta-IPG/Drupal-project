@@ -1,12 +1,13 @@
 <?php
-declare(strict_types=1);
-
-use Drupal\node\Entity\NodeType;
 
 /**
  * @file
  * Install, update and uninstall functions for the field_rebuild_b_test module.
  */
+
+declare(strict_types=1);
+
+use Drupal\node\Entity\NodeType;
 
 /**
  * Implements hook_uninstall().
