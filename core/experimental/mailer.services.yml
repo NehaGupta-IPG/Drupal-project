@@ -1,7 +1,9 @@
 # Experimental mailer services.
-# To enable this feature, add:
-#   $settings['container_yamls'][] = $app_root . '/core/experimental/mailer.services.yml';
-# to your settings.php.
+# To enable this feature, either:
+#  - Add the following code to your settings.php.
+#      $settings['container_yamls'][] = $app_root . '/core/experimental/mailer.services.yml';
+#  - Add a service provider to a module like
+#    \Drupal\core_mailer_services_test\CoreMailerServicesTestServiceProvider,
 services:
   _defaults:
     autoconfigure: true
