@@ -47,6 +47,8 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
     sleep(2);
     $this->drupalGet('<front>');
     sleep(2);
+    $this->drupalGet('<front>');
+    sleep(2);
 
     $performance_data = $this->collectPerformanceData(function () {
       $this->drupalGet('<front>');
