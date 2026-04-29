@@ -108,4 +108,140 @@ class FormattableMarkupTest extends TestCase {
     ];
   }
 
+  /**
+   * Tests NULL values in @ and % placeholders throw AssertionError in dev.
+   *
+   * @param string $string
+   *   A string to be formatted.
+   * @param array $arguments
+   *   The arguments to replace.
+   * @param string $expected_key
+   *   The placeholder key expected in the AssertionError message.
+   * @param string $expected
+   *   Unused in this variant; kept for shared provider compatibility.
+   *
+   * @legacy-covers ::__toString
+   */
+  #[DataProvider('providerTestNullPlaceholderAssertion')]
+  public function testNullPlaceholderAssertionError(string $string, array $arguments, string $expected_key, string $expected): void {
+    ini_set('zend.assertions', 1);
+    $this->expectException(\AssertionError::class);
+    $this->expectExceptionMessageMatches('/' . preg_quote($expected_key, '/') . '/');
+    $markup = new FormattableMarkup($string, $arguments);
+    (string) $markup;
+  }
+
+  /**
+   * Tests NULL @ and % placeholders fall back to empty string in production.
+   *
+   * @param string $string
+   *   A string to be formatted.
+   * @param array $arguments
+   *   The arguments to replace.
+   * @param string $expected_key
+   *   Unused in this variant; kept for shared provider compatibility.
+   * @param string $expected
+   *   Expected output.
+   *
+   * @legacy-covers ::__toString
+   */
+  #[DataProvider('providerTestNullPlaceholderAssertion')]
+  public function testNullPlaceholderProductionFallback(string $string, array $arguments, string $expected_key, string $expected): void {
+    ini_set('zend.assertions', 0);
+    $markup = new FormattableMarkup($string, $arguments);
+    $output = (string) $markup;
+    ini_set('zend.assertions', 1);
+    $this->assertEquals($expected, $output);
+  }
+
+  /**
+   * Data provider for NULL placeholder assertion/fallback tests.
+   */
+  public static function providerTestNullPlaceholderAssertion(): array {
+    return [
+      'at-placeholder' => [
+        'String with @placeholder',
+        ['@placeholder' => NULL],
+        '@placeholder',
+        'String with ',
+      ],
+      'percent-placeholder' => [
+        'String with %placeholder',
+        ['%placeholder' => NULL],
+        '%placeholder',
+        'String with <em class="placeholder"></em>',
+      ],
+      'multiple-at' => [
+        '@first and @second',
+        ['@first' => NULL, '@second' => 'value'],
+        '@first',
+        ' and value',
+      ],
+      'mixed-types' => [
+        'User @name with id %id',
+        ['@name' => NULL, '%id' => '123'],
+        '@name',
+        'User  with id <em class="placeholder">123</em>',
+      ],
+    ];
+  }
+
+  /**
+   * Tests multiple NULL placeholders throw on the first in dev mode.
+   *
+   * @legacy-covers ::__toString
+   */
+  public function testMultipleNullPlaceholders(): void {
+    ini_set('zend.assertions', 1);
+    $this->expectException(\AssertionError::class);
+    $this->expectExceptionMessageMatches('/@first/');
+    (string) new FormattableMarkup('@first and @second', ['@first' => NULL, '@second' => NULL]);
+  }
+
+  /**
+   * Tests multiple NULL placeholders both fall back to empty string in production.
+   *
+   * @legacy-covers ::__toString
+   */
+  public function testMultipleNullPlaceholdersProductionFallback(): void {
+    ini_set('zend.assertions', 0);
+    $output = (string) new FormattableMarkup('@first and @second', ['@first' => NULL, '@second' => NULL]);
+    ini_set('zend.assertions', 1);
+    $this->assertEquals(' and ', $output);
+  }
+
+  /**
+   * Tests NULL values in : placeholders are silently converted to empty string.
+   *
+   * @param string $string
+   *   A string to be formatted.
+   * @param array $arguments
+   *   The arguments to replace.
+   * @param string $expected
+   *   Expected result.
+   *
+   * @legacy-covers ::__toString
+   */
+  #[DataProvider('providerTestNullColonPlaceholderSilent')]
+  public function testNullColonPlaceholderSilent(string $string, array $arguments, string $expected): void {
+    $markup = new FormattableMarkup($string, $arguments);
+    $output = (string) $markup;
+    $this->assertEquals($expected, $output);
+  }
+
+  /**
+   * Data provider for testNullColonPlaceholderSilent().
+   */
+  public static function providerTestNullColonPlaceholderSilent(): array {
+    return [
+      'colon-url' => ['<a href=":url">Link</a>', [':url' => NULL], '<a href="">Link</a>'],
+      'colon-src' => ['<img src=":src" alt="Image">', [':src' => NULL], '<img src="" alt="Image">'],
+      'colon-multiple' => [
+        '<a href=":url" data-id=":id">Link</a>',
+        [':url' => NULL, ':id' => NULL],
+        '<a href="" data-id="">Link</a>',
+      ],
+    ];
+  }
+
 }
