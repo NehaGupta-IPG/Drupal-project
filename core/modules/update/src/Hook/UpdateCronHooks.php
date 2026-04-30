@@ -89,7 +89,7 @@ class UpdateCronHooks {
         foreach ($notify_list as $target) {
           $users = $this->entityTypeManager
             ->getStorage('user')
-            ->loadByProperties(['mail' => $mail]);
+            ->loadByProperties(['mail' => $target]);
           $target_user = !empty($users) ? reset($users) : NULL;
           if ($target_user instanceof UserInterface) {
             $target_langcode = $target_user->getPreferredLangcode();
