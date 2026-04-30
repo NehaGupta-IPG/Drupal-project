@@ -403,7 +403,7 @@ class ExposedFormTest extends ViewTestBase {
   /**
    * Tests required exposed filters.
    */
-  public function testRequiredExposedFilters() {
+  public function testRequiredExposedFilters(): void {
     $this->drupalGet('test_exposed_form_required_filters');
     $this->assertSession()->statusCodeEquals(200);
 
