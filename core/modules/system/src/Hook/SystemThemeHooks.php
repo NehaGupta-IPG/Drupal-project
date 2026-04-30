@@ -17,7 +17,7 @@ use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\AdminContext;
 use Drupal\Core\Path\PathMatcherInterface;
-use Drupal\Core\PathProcessor\PathProcessorManager;
+use Drupal\Core\PathProcessor\OutboundPathProcessorInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Messenger\MessengerInterface;
@@ -42,7 +42,7 @@ class SystemThemeHooks {
     private RouteMatchInterface $routeMatch,
     private CurrentPathStack $currentPath,
     private PathMatcherInterface $pathMatcher,
-    private PathProcessorManager $pathProcessorManager,
+    private OutboundPathProcessorInterface $pathProcessorManager,
     private AdminContext $adminContext,
     private AccountProxyInterface $currentUser,
     private ConfigFactoryInterface $configFactory,

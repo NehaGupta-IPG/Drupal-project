@@ -28,7 +28,6 @@ use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Drupal\Core\Update\UpdateRegistry;
 use Drupal\Core\Update\UpdateHookRegistry;
@@ -42,6 +41,7 @@ use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\File\HtaccessWriterInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Requirements hook implementations for system module.
@@ -64,11 +64,15 @@ class SystemRequirementsHooks {
     protected ModuleExtensionList $moduleExtensionList,
     protected ThemeExtensionList $themeExtensionList,
     protected UpdateHookRegistry $updateHookRegistry,
+    #[Autowire(service: 'update.post_update_registry')]
     protected UpdateRegistry $postUpdateRegistry,
     protected RendererInterface $renderer,
     protected FileSystemInterface $fileSystem,
     protected HtaccessWriterInterface $htaccessWriter,
-    protected ParameterBagInterface $parameterBag,
+    #[Autowire(value: '%site.path%')]
+    private string $sitePath,
+    #[Autowire(value: '%password.algorithm%')]
+    private string|int $passwordAlgorithm,
   ) {}
 
   /**
@@ -603,7 +607,7 @@ class SystemRequirementsHooks {
       // Find the site path. Kernel service is not always available at this
       // point, but is preferred, when available.
       if (\Drupal::hasService('kernel')) {
-        $site_path = $this->parameterBag->get('site.path');
+        $site_path = $this->sitePath;
       }
       else {
         $site_path = DrupalKernel::findSitePath(Request::createFromGlobals());
@@ -1579,7 +1583,8 @@ class SystemRequirementsHooks {
    */
   protected function checkPasswordHashing(): array {
     $availableAlgorithms = password_algos();
-    $hashingAlgorithm = $this->parameterBag->get('password.algorithm') ?? PASSWORD_DEFAULT;
+    $hashingAlgorithm = $this->passwordAlgorithm ?? PASSWORD_DEFAULT;
+
 
     if (!in_array($hashingAlgorithm, $availableAlgorithms, TRUE)) {
       return [
