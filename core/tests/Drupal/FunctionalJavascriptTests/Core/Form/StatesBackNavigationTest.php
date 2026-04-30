@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\FunctionalJavascriptTests\Core\Form;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunInSeparateProcesses;
 
 /**
  * Tests that #states visibility is correct after browser back-navigation.
@@ -15,10 +17,10 @@ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
  * causes Drupal's states.js to display stale visibility because it only
  * evaluates conditions on initial page load and in response to change events.
  *
- * @group javascript
- *
  * @see https://www.drupal.org/project/drupal/issues/3587011
  */
+#[Group('javascript')]
+#[RunInSeparateProcesses]
 class StatesBackNavigationTest extends WebDriverTestBase {
 
   /**
@@ -70,19 +72,19 @@ class StatesBackNavigationTest extends WebDriverTestBase {
   /**
    * Simulates browser back-navigation form restoration behavior.
    *
-   * When a browser navigates back without using bfcache, it:
+   * When a browser navigates back without using the back-forward cache, it:
    * 1. Restores form element values from session history without firing
    *    change events.
    * 2. Fires the "pageshow" event with persisted=true.
    *
    * This simulation is necessary because headless Chrome uses a synthetic
-   * bfcache that restores the entire page state (including JavaScript and
-   * DOM) on back-navigation. This masks the bug entirely — states.js never
-   * needs to re-evaluate because the pre-navigation state is perfectly
-   * preserved. In real-world usage, browsers frequently skip bfcache (due to
-   * Cache-Control headers, unload listeners, etc.) and instead perform a
-   * fresh page load while restoring form values silently. This method
-   * replicates that real-world sequence.
+   * back-forward cache that restores the entire page state (including
+   * JavaScript and DOM) on back-navigation. This masks the bug entirely —
+   * states.js never needs to re-evaluate because the pre-navigation state is
+   * perfectly preserved. In real-world usage, browsers frequently skip the
+   * back-forward cache (due to Cache-Control headers, unload listeners, etc.)
+   * and instead perform a fresh page load while restoring form values
+   * silently. This method replicates that real-world sequence.
    */
   private function simulateBrowserBackNavigation(): void {
     // Step 1: Browser restores the form value without firing a change event.
