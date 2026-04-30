@@ -30,7 +30,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Drupal\Core\Update\UpdateRegistryInterface;
+use Drupal\Core\Update\UpdateRegistry;
 use Drupal\Core\Update\UpdateHookRegistry;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
@@ -64,7 +64,7 @@ class SystemRequirementsHooks {
     protected ModuleExtensionList $moduleExtensionList,
     protected ThemeExtensionList $themeExtensionList,
     protected UpdateHookRegistry $updateHookRegistry,
-    protected UpdateRegistryInterface $postUpdateRegistry,
+    protected UpdateRegistry $postUpdateRegistry,
     protected RendererInterface $renderer,
     protected FileSystemInterface $fileSystem,
     protected HtaccessWriterInterface $htaccessWriter,

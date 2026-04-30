@@ -17,7 +17,7 @@ use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\AdminContext;
 use Drupal\Core\Path\PathMatcherInterface;
-use Drupal\Core\PathProcessor\PathProcessorManagerInterface;
+use Drupal\Core\PathProcessor\PathProcessorManager;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Messenger\MessengerInterface;
@@ -38,22 +38,22 @@ class SystemThemeHooks {
   use StringTranslationTrait;
 
   public function __construct(
-    RequestStack $requestStack,
-    RouteMatchInterface $routeMatch,
-    CurrentPathStack $currentPath,
-    PathMatcherInterface $pathMatcher,
-    PathProcessorManagerInterface $pathProcessorManager,
-    AdminContext $adminContext,
-    AccountProxyInterface $currentUser,
-    ConfigFactoryInterface $configFactory,
-    ModuleHandlerInterface $moduleHandler,
-    ThemeManagerInterface $themeManager,
-    ThemeHandlerInterface $themeHandler,
-    LibraryDependencyResolverInterface $libraryDependencyResolver,
-    MessengerInterface $messenger,
-    CsrfTokenGenerator $csrfToken,
-    LanguageManagerInterface $languageManager,
-    SecurityAdvisoriesFetcher $securityAdvisoriesFetcher,
+    private RequestStack $requestStack,
+    private RouteMatchInterface $routeMatch,
+    private CurrentPathStack $currentPath,
+    private PathMatcherInterface $pathMatcher,
+    private PathProcessorManager $pathProcessorManager,
+    private AdminContext $adminContext,
+    private AccountProxyInterface $currentUser,
+    private ConfigFactoryInterface $configFactory,
+    private ModuleHandlerInterface $moduleHandler,
+    private ThemeManagerInterface $themeManager,
+    private ThemeHandlerInterface $themeHandler,
+    private LibraryDependencyResolverInterface $libraryDependencyResolver,
+    private MessengerInterface $messenger,
+    private CsrfTokenGenerator $csrfToken,
+    private LanguageManagerInterface $languageManager,
+    private SecurityAdvisoriesFetcher $securityAdvisoriesFetcher,
   ) {}
 
   /**
