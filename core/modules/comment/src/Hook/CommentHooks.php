@@ -18,6 +18,19 @@ use Drupal\comment\Entity\CommentType;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\comment\CommentManagerInterface;
+use Drupal\comment\CommentStatisticsInterface;
+use Drupal\Core\Datetime\DateFormatterInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\State\StateInterface;
+use Drupal\Core\Utility\Token;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\comment\CommentLinkBuilderInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Session\AccountProxyInterface;
 
 /**
  * Hook implementations for comment.
@@ -25,6 +38,20 @@ use Drupal\Core\Hook\Attribute\Hook;
 class CommentHooks {
 
   use StringTranslationTrait;
+
+  public function __construct(
+    private readonly EntityTypeManagerInterface $entityTypeManager,
+    private readonly CommentManagerInterface $commentManager,
+    private readonly CommentStatisticsInterface $commentStatistics,
+    private readonly RendererInterface $renderer,
+    private readonly StateInterface $state,
+    private readonly LanguageManagerInterface $languageManager,
+    private readonly LoggerChannelFactoryInterface $loggerFactory,
+    private readonly ModuleHandlerInterface $moduleHandler,
+    private readonly CommentLinkBuilderInterface $commentLinkBuilder,
+    private readonly ConfigFactoryInterface $configFactory,
+    private readonly AccountProxyInterface $currentUser,
+  ) {}
 
   /**
    * Implements hook_help().
@@ -39,11 +66,11 @@ class CommentHooks {
         $output .= '<dl>';
         $output .= '<dt>' . $this->t('Enabling commenting') . '</dt>';
         $output .= '<dd>' . $this->t('Comment functionality can be enabled for any entity sub-type (for example, a <a href=":content-type">content type</a>) by adding a <em>Comments</em> field on its <em>Manage fields page</em>. Adding or removing commenting for an entity through the user interface requires the <a href=":field_ui">Field UI</a> module to be installed, even though the commenting functionality works without it. For more information on fields and entities, see the <a href=":field">Field module help page</a>.', [
-          ':content-type' => \Drupal::moduleHandler()->moduleExists('node') ? Url::fromRoute('entity.node_type.collection')->toString() : '#',
+          ':content-type' => $this->moduleHandler->moduleExists('node') ? Url::fromRoute('entity.node_type.collection')->toString() : '#',
           ':field' => Url::fromRoute('help.page', [
             'name' => 'field',
           ])->toString(),
-          ':field_ui' => \Drupal::moduleHandler()->moduleExists('field_ui') ? Url::fromRoute('help.page', [
+          ':field_ui' => $this->moduleHandler->moduleExists('field_ui') ? Url::fromRoute('help.page', [
             'name' => 'field_ui',
           ])->toString() : '#',
         ]) . '</dd>';
@@ -125,7 +152,7 @@ class CommentHooks {
     if ($field->getType() == 'comment') {
       // Comment field settings also affects the rendering of *comment*
       // entities, not only the *commented* entities.
-      \Drupal::entityTypeManager()->getViewBuilder('comment')->resetCache();
+      $this->entityTypeManager->getViewBuilder('comment')->resetCache();
     }
   }
 
@@ -136,7 +163,7 @@ class CommentHooks {
   public function fieldStorageConfigInsert(FieldStorageConfigInterface $field_storage): void {
     if ($field_storage->getType() == 'comment') {
       // Check that the target entity type uses an integer ID.
-      $entity_type = \Drupal::entityTypeManager()->getDefinition($field_storage->getTargetEntityTypeId());
+      $entity_type = $this->entityTypeManager->getDefinition($field_storage->getTargetEntityTypeId());
       if (!$entity_type->hasIntegerId()) {
         throw new \UnexpectedValueException('You cannot attach a comment field to an entity with a non-integer ID field');
       }
@@ -150,11 +177,14 @@ class CommentHooks {
   public function fieldConfigDelete(FieldConfigInterface $field): void {
     if ($field->getType() == 'comment') {
       // Delete all comments that used by the entity bundle.
-      $entity_query = \Drupal::entityQuery('comment')->accessCheck(FALSE);
+      $entity_query = $this->entityTypeManager
+        ->getStorage('comment')
+        ->getQuery()
+        ->accessCheck(FALSE);
       $entity_query->condition('entity_type', $field->getEntityTypeId());
       $entity_query->condition('field_name', $field->getName());
       $cids = $entity_query->execute();
-      $comment_storage = \Drupal::entityTypeManager()->getStorage('comment');
+      $comment_storage = $this->entityTypeManager->getStorage('comment');
       $comments = $comment_storage->loadMultiple($cids);
       $comment_storage->delete($comments);
     }
@@ -170,7 +200,7 @@ class CommentHooks {
     // you can do so by implementing a new field formatter.
     // @todo Make this configurable from the formatter. See
     //   https://www.drupal.org/node/1901110.
-    $comment_links = \Drupal::service('comment.link_builder')->buildCommentedEntityLinks($node, $context);
+    $comment_links = $this->commentLinkBuilder->buildCommentedEntityLinks($node, $context);
     $links += $comment_links;
   }
 
@@ -181,7 +211,7 @@ class CommentHooks {
   public function entityView(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode): void {
     if ($entity instanceof FieldableEntityInterface && $view_mode == 'rss' && $display->getComponent('links')) {
       /** @var \Drupal\comment\CommentManagerInterface $comment_manager */
-      $comment_manager = \Drupal::service('comment.manager');
+      $comment_manager = $this->commentManager;
       $fields = $comment_manager->getFields($entity->getEntityTypeId());
       foreach ($fields as $field_name => $detail) {
         if ($entity->hasField($field_name) && $entity->get($field_name)->status != CommentingStatus::Hidden->value) {
@@ -202,7 +232,7 @@ class CommentHooks {
    */
   #[Hook('field_info_entity_type_ui_definitions_alter')]
   public function fieldInfoEntityTypeUiDefinitionsAlter(array &$ui_definitions, string $entity_type_id): void {
-    $entity_type = \Drupal::entityTypeManager()->getDefinition($entity_type_id);
+    $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
     if (!$entity_type->hasIntegerId()) {
       unset($ui_definitions['comment']);
     }
@@ -216,17 +246,17 @@ class CommentHooks {
   #[Hook('entity_storage_load')]
   public function entityStorageLoad($entities, $entity_type): void {
     // Comments can only be attached to content entities, so skip others.
-    if (!\Drupal::entityTypeManager()->getDefinition($entity_type)->entityClassImplements(FieldableEntityInterface::class)) {
+    if (!$this->entityTypeManager->getDefinition($entity_type)->entityClassImplements(FieldableEntityInterface::class)) {
       return;
     }
-    if (!\Drupal::service('comment.manager')->getFields($entity_type)) {
+    if (!$this->commentManager->getFields($entity_type)) {
       // Do not query database when entity has no comment fields.
       return;
     }
     // Load comment information from the database and update the entity's
     // comment statistics properties, which are defined on each CommentItem
     // field.
-    $result = \Drupal::service('comment.statistics')->read($entities, $entity_type);
+    $result = $this->commentStatistics->read($entities, $entity_type);
     foreach ($result as $record) {
       // Skip fields that entity does not have.
       if (!$entities[$record->entity_id]->hasField($record->field_name)) {
@@ -248,8 +278,10 @@ class CommentHooks {
   public function entityInsert(EntityInterface $entity): void {
     // Allow bulk updates and inserts to temporarily disable the
     // maintenance of the {comment_entity_statistics} table.
-    if (\Drupal::state()->get('comment.maintain_entity_statistics') && ($fields = \Drupal::service('comment.manager')->getFields($entity->getEntityTypeId()))) {
-      \Drupal::service('comment.statistics')->create($entity, $fields);
+    if ($this->state->get('comment.maintain_entity_statistics') &&
+      ($fields = $this->commentManager->getFields($entity->getEntityTypeId()))
+    ) {
+      $this->commentStatistics->create($entity, $fields);
     }
   }
 
@@ -265,14 +297,17 @@ class CommentHooks {
     // an entity type that has an integer ID, $entity->id() might be a string
     // containing a number), and then cast it to an integer when querying.
     if ($entity instanceof FieldableEntityInterface && is_numeric($entity->id())) {
-      $entity_query = \Drupal::entityQuery('comment')->accessCheck(FALSE);
+      $entity_query = $this->entityTypeManager
+        ->getStorage('comment')
+        ->getQuery()
+        ->accessCheck(FALSE);
       $entity_query->condition('entity_id', (int) $entity->id());
       $entity_query->condition('entity_type', $entity->getEntityTypeId());
       $cids = $entity_query->execute();
-      $comment_storage = \Drupal::entityTypeManager()->getStorage('comment');
+      $comment_storage = $this->entityTypeManager->getStorage('comment');
       $comments = $comment_storage->loadMultiple($cids);
       $comment_storage->delete($comments);
-      \Drupal::service('comment.statistics')->delete($entity);
+      $this->commentStatistics->delete($entity);
     }
   }
 
@@ -293,7 +328,7 @@ class CommentHooks {
       // edit could change the security situation so it is not safe to index the
       // comments.
       $index_comments = TRUE;
-      $roles = \Drupal::entityTypeManager()->getStorage('user_role')->loadMultiple();
+      $roles = $this->entityTypeManager->getStorage('user_role')->loadMultiple();
       $authenticated_can_access = $roles[RoleInterface::AUTHENTICATED_ID]->hasPermission('access comments');
       foreach ($roles as $rid => $role) {
         if ($role->hasPermission('search content') && !$role->hasPermission('access comments')) {
@@ -306,7 +341,7 @@ class CommentHooks {
     }
     $build = [];
     if ($index_comments) {
-      foreach (\Drupal::service('comment.manager')->getFields('node') as $field_name => $info) {
+      foreach ($this->commentManager->getFields('node') as $field_name => $info) {
         // Skip fields that entity does not have.
         if (!$node->hasField($field_name)) {
           continue;
@@ -315,14 +350,14 @@ class CommentHooks {
         $mode = $field_definition->getSetting('default_mode');
         $comments_per_page = $field_definition->getSetting('per_page');
         if ($node->get($field_name)->status) {
-          $comments = \Drupal::entityTypeManager()->getStorage('comment')->loadThread($node, $field_name, $mode, $comments_per_page);
+          $comments = $this->entityTypeManager->getStorage('comment')->loadThread($node, $field_name, $mode, $comments_per_page);
           if ($comments) {
-            $build[] = \Drupal::entityTypeManager()->getViewBuilder('comment')->viewMultiple($comments);
+            $build[] = $this->entityTypeManager->getViewBuilder('comment')->viewMultiple($comments);
           }
         }
       }
     }
-    return \Drupal::service('renderer')->renderInIsolation($build);
+    return $this->renderer->renderInIsolation($build);
   }
 
   /**
@@ -332,7 +367,11 @@ class CommentHooks {
   public function cron(): void {
     // Store the maximum possible comments per thread (used for node search
     // ranking by reply count).
-    \Drupal::state()->set('comment.node_comment_statistics_scale', 1.0 / max(1, \Drupal::service('comment.statistics')->getMaximumCount('node')));
+    $max = max(1, $this->commentStatistics->getMaximumCount('node'));
+    $this->state->set(
+      'comment.node_comment_statistics_scale',
+      1.0 / $max
+    );
   }
 
   /**
@@ -343,7 +382,7 @@ class CommentHooks {
    */
   #[Hook('node_search_result')]
   public function nodeSearchResult(EntityInterface $node): array {
-    $comment_fields = \Drupal::service('comment.manager')->getFields('node');
+    $comment_fields = $this->commentManager->getFields('node');
     $comments = 0;
     $open = FALSE;
     foreach ($comment_fields as $field_name => $info) {
@@ -353,7 +392,7 @@ class CommentHooks {
       }
       // Do not make a string if comments are hidden.
       $status = CommentingStatus::tryFrom((int) $node->get($field_name)->status);
-      if (\Drupal::currentUser()->hasPermission('access comments') && $status != CommentingStatus::Hidden) {
+      if ($this->currentUser->hasPermission('access comments') && $status != CommentingStatus::Hidden) {
         if ($status == CommentingStatus::Open) {
           // At least one comment field is open.
           $open = TRUE;
@@ -365,7 +404,11 @@ class CommentHooks {
     // or all comment fields are hidden.
     if ($comments > 0 || $open) {
       return [
-        'comment' => \Drupal::translation()->formatPlural($comments, '1 comment', '@count comments'),
+        'comment' => $this->stringTranslation->formatPlural(
+          $comments,
+          '1 comment',
+          '@count comments'
+        ),
       ];
     }
     return [];
@@ -378,7 +421,7 @@ class CommentHooks {
   public function userCancel($edit, UserInterface $account, $method): void {
     switch ($method) {
       case 'user_cancel_block_unpublish':
-        $comments = \Drupal::entityTypeManager()->getStorage('comment')->loadByProperties(['uid' => $account->id()]);
+        $comments = $this->entityTypeManager->getStorage('comment')->loadByProperties(['uid' => $account->id()]);
         foreach ($comments as $comment) {
           $comment->setUnpublished();
           $comment->save();
@@ -387,7 +430,7 @@ class CommentHooks {
 
       case 'user_cancel_reassign':
         /** @var \Drupal\comment\CommentInterface[] $comments */
-        $comments = \Drupal::entityTypeManager()->getStorage('comment')->loadByProperties(['uid' => $account->id()]);
+        $comments = $this->entityTypeManager->getStorage('comment')->loadByProperties(['uid' => $account->id()]);
         foreach ($comments as $comment) {
           $langcodes = array_keys($comment->getTranslationLanguages());
           // For efficiency manually set the original comment before applying
@@ -396,7 +439,7 @@ class CommentHooks {
           foreach ($langcodes as $langcode) {
             $comment_translated = $comment->getTranslation($langcode);
             $comment_translated->setOwnerId(0);
-            $comment_translated->setAuthorName(\Drupal::config('user.settings')->get('anonymous'));
+            $comment_translated->setAuthorName($this->configFactory->get('user.settings')->get('anonymous'));
           }
           $comment->save();
         }
@@ -409,10 +452,13 @@ class CommentHooks {
    */
   #[Hook('user_predelete')]
   public function userPredelete($account): void {
-    $entity_query = \Drupal::entityQuery('comment')->accessCheck(FALSE);
+    $entity_query = $this->entityTypeManager
+      ->getStorage('comment')
+      ->getQuery()
+      ->accessCheck(FALSE);
     $entity_query->condition('uid', $account->id());
     $cids = $entity_query->execute();
-    $comment_storage = \Drupal::entityTypeManager()->getStorage('comment');
+    $comment_storage = $this->entityTypeManager->getStorage('comment');
     $comments = $comment_storage->loadMultiple($cids);
     $comment_storage->delete($comments);
   }
@@ -422,7 +468,7 @@ class CommentHooks {
    */
   #[Hook('node_search_ranking')]
   public function ranking(): array {
-    return \Drupal::service('comment.statistics')->getRankingInfo();
+    return $this->commentStatistics->getRankingInfo();
   }
 
   /**
@@ -434,7 +480,7 @@ class CommentHooks {
     if ($display->isNew() || $display->getTargetEntityTypeId() !== 'comment' || $display->status()) {
       return;
     }
-    $storage = \Drupal::entityTypeManager()->getStorage('entity_view_display');
+    $storage = $this->entityTypeManager->getStorage('entity_view_display');
     if (!$storage->loadUnchanged($display->getOriginalId())->status()) {
       return;
     }
@@ -455,7 +501,7 @@ class CommentHooks {
               '@display' => $mode->label(),
               '@mode' => $display->getMode(),
             ];
-            \Drupal::logger('system')->warning("View display '@id': Comment field formatter '@name' was disabled because it is using the comment view display '@display' (@mode) that was just disabled.", $arguments);
+            $this->loggerFactory->get('system')->warning("View display '@id': Comment field formatter '@name' was disabled because it is using the comment view display '@display' (@mode) that was just disabled.", $arguments);
             $changed = TRUE;
           }
         }
