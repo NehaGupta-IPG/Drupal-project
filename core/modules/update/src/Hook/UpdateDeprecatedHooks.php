@@ -38,7 +38,13 @@ class UpdateDeprecatedHooks {
   public function verifyUpdateArchive($project, $archive_file, $directory): array {
     $errors = [];
     // Make sure this isn't a tarball of Drupal core.
-    if (file_exists("{$directory}/{$project}/index.php") && file_exists("{$directory}/{$project}/core/install.php") && file_exists("{$directory}/{$project}/core/includes/bootstrap.inc") && file_exists("{$directory}/{$project}/core/modules/node/node.module") && file_exists("{$directory}/{$project}/core/modules/system/system.module")) {
+    if (
+      file_exists("{$directory}/{$project}/index.php") &&
+      file_exists("{$directory}/{$project}/core/install.php") &&
+      file_exists("{$directory}/{$project}/core/includes/bootstrap.inc") &&
+      file_exists("{$directory}/{$project}/core/modules/node/node.module") &&
+      file_exists("{$directory}/{$project}/core/modules/system/system.module")
+    ) {
       return [
         'no-core' => $this->t('Automatic updating of Drupal core is not supported. See the <a href=":update-guide">Updating Drupal guide</a> for information on how to update Drupal core manually.', [
           ':update-guide' => 'https://www.drupal.org/docs/updating-drupal',
@@ -69,11 +75,17 @@ class UpdateDeprecatedHooks {
       $errors[] = $this->t('%archive_file does not contain any .info.yml files.', ['%archive_file' => $this->fileSystem->basename($archive_file)]);
     }
     elseif (!$compatible_project) {
-      $errors[] = $this->translation->formatPlural(count($incompatible), '%archive_file contains a version of %names that is not compatible with Drupal @version.', '%archive_file contains versions of modules or themes that are not compatible with Drupal @version: %names', [
-        '@version' => \Drupal::VERSION,
-        '%archive_file' => $this->fileSystem->basename($archive_file),
-        '%names' => implode(', ', $incompatible),
-      ]);
+      $errors[] = $this->translation->formatPlural(
+        count($incompatible),
+        '%archive_file contains a version of %names that is not compatible with Drupal @version.',
+        '%archive_file contains versions of modules or themes that are not compatible with Drupal @version: %names',
+        [
+          '@version' => \Drupal::VERSION,
+          '%archive_file' => $this->fileSystem
+            ->basename($archive_file),
+          '%names' => implode(', ', $incompatible),
+        ],
+      );
     }
     return $errors;
   }
