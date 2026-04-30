@@ -79,7 +79,7 @@ class UpdateDeprecatedHooks {
       }
     }
     if (empty($files)) {
-      $errors[] = $this->t('%archive_file does not contain any .info.yml files.', ['%archive_file' => $this->fileSystem->basename($archive_file)]);
+      $errors[] = $this->t('%archive_file does not contain any .info.yml files.', ['%archive_file' => basename($archive_file)]);
     }
     elseif (!$compatible_project) {
       $errors[] = $this->translation->formatPlural(
@@ -88,8 +88,7 @@ class UpdateDeprecatedHooks {
         '%archive_file contains versions of modules or themes that are not compatible with Drupal @version: %names',
         [
           '@version' => \Drupal::VERSION,
-          '%archive_file' => $this->fileSystem
-            ->basename($archive_file),
+          '%archive_file' => basename($archive_file),
           '%names' => implode(', ', $incompatible),
         ],
       );

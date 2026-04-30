@@ -17,7 +17,7 @@ use PHPUnit\Framework\Attributes\Group;
  * Tests text of update email.
  */
 #[Group('update')]
-#[CoversMethod(UpdateHooks::class, 'mail')]
+#[CoversMethod(UpdateMailHooks::class, 'mail')]
 class UpdateMailTest extends UnitTestCase {
 
   /**

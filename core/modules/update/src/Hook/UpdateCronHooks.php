@@ -11,6 +11,8 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Mail\MailManagerInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\update\UpdateManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\user\UserInterface;
 
 /**
  * Cron hook implementations for the update module.
@@ -18,6 +20,7 @@ use Drupal\update\UpdateManagerInterface;
 class UpdateCronHooks {
 
   public function __construct(
+    protected readonly EntityTypeManagerInterface $entityTypeManager,
     protected readonly StateInterface $state,
     protected readonly TimeInterface $time,
     protected readonly ModuleHandlerInterface $moduleHandler,
@@ -84,7 +87,11 @@ class UpdateCronHooks {
         $default_langcode = $this->languageManager->getDefaultLanguage()->getId();
         $request_time = $this->time->getRequestTime();
         foreach ($notify_list as $target) {
-          if ($target_user = user_load_by_mail($target)) {
+          $users = $this->entityTypeManager
+            ->getStorage('user')
+            ->loadByProperties(['mail' => $mail]);
+          $target_user = !empty($users) ? reset($users) : NULL;
+          if ($target_user instanceof UserInterface) {
             $target_langcode = $target_user->getPreferredLangcode();
           }
           else {
