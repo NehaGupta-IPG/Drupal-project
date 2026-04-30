@@ -284,6 +284,8 @@ JS;
       $this->drupalGet('ajax-test/http-status-link/' . $code);
       $this->clickLink('Ajax HTTP status');
       $this->assertSession()->statusMessageContainsAfterWait($expectedMessage, 'error');
+      // This is needed to avoid an unfinished AJAX request error from tearDown()
+      // because this test intentionally does not complete all AJAX requests.
       $this->getSession()->executeScript('window.drupalActiveXhrCount = 0;');
     }
 
@@ -299,6 +301,8 @@ JS);
       'Something went wrong (network error). Try again later.',
       'error',
     );
+    // This is needed to avoid an unfinished AJAX request error from tearDown()
+    // because this test intentionally does not complete all AJAX requests.
     $this->getSession()->executeScript('window.drupalActiveXhrCount = 0;');
 
     // Test non-error status code (e.g. 200 with invalid response body).
@@ -314,6 +318,8 @@ JS);
       'Something went wrong. Try again later.',
       'error',
     );
+    // This is needed to avoid an unfinished AJAX request error from tearDown()
+    // because this test intentionally does not complete all AJAX requests.
     $this->getSession()->executeScript('window.drupalActiveXhrCount = 0;');
   }
 

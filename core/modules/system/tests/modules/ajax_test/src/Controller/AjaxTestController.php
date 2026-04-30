@@ -13,7 +13,6 @@ use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Provides content for dialog tests.
@@ -459,19 +458,18 @@ class AjaxTestController {
   /**
    * Returns an empty response with the given HTTP status code.
    *
+   * Test-only endpoint: callers are expected to pass a valid HTTP
+   * status code. Out-of-range values bubble up as Symfony's own
+   * \InvalidArgumentException from Response::setStatusCode(), which is
+   * the right place to surface the test-input bug.
+   *
    * @param int $code
-   *   HTTP status code between 100 and 599.
+   *   HTTP status code.
    *
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response.
-   *
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-   *   If the code is outside the valid HTTP status code range.
    */
   public function httpStatus(int $code): Response {
-    if ($code < 100 || $code > 599) {
-      throw new NotFoundHttpException();
-    }
     return new Response('', $code);
   }
 
