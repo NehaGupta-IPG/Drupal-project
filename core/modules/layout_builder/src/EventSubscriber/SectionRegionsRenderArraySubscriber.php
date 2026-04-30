@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\layout_builder\EventSubscriber;
 
 use Drupal\layout_builder\Event\SectionBuildRegionsRenderArrayEvent;
@@ -18,7 +20,7 @@ class SectionRegionsRenderArraySubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents(): array {
     return [
-      SectionBuildRegionsRenderArrayEvent::class => ['onBuildRegionsRenderArray', 100],
+      SectionBuildRegionsRenderArrayEvent::class => ['onBuildRegionsRenderArray'],
     ];
   }
 

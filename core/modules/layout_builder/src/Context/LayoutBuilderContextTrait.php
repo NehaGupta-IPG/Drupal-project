@@ -45,7 +45,7 @@ trait LayoutBuilderContextTrait {
    * @return \Drupal\Core\Plugin\Context\ContextInterface[]
    *   The array of context objects.
    */
-  protected function getPopulatedContexts(SectionStorageInterface $section_storage, ?int $delta = NULL): array {
+  protected function getPopulatedContexts(SectionStorageInterface $section_storage, int $delta): array {
     // Get all known globally available contexts IDs.
     $available_context_ids = array_keys($this->contextRepository()->getAvailableContexts());
     // Filter to those that are populated.
@@ -58,9 +58,6 @@ trait LayoutBuilderContextTrait {
 
     if ($delta !== NULL) {
       $contexts['section_delta'] = new Context(new ContextDefinition('integer'), $delta);
-    }
-    else {
-      @trigger_error('Calling LayoutBuilderContextTrait::getPopulatedContexts() without the $delta argument is deprecated in drupal:11.4.0 and the $delta argument will be required in drupal:12.0.0. See https://www.drupal.org/node/3210520', E_USER_DEPRECATED);
     }
 
     return $contexts;

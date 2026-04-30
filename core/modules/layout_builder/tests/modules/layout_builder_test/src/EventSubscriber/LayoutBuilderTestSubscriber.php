@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\layout_builder_test\EventSubscriber;
 
-use Drupal\Core\State\StateInterface;
 use Drupal\layout_builder\Event\SectionBuildRegionsRenderArrayEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -14,21 +13,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class LayoutBuilderTestSubscriber implements EventSubscriberInterface {
 
   /**
-   * The state service.
-   *
-   * @var \Drupal\Core\State\StateInterface
+   * Whether the subscriber is active.
    */
-  protected $state;
-
-  /**
-   * Constructs a new event subscriber instance.
-   *
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state service.
-   */
-  public function __construct(StateInterface $state) {
-    $this->state = $state;
-  }
+  private bool $active = FALSE;
 
   /**
    * {@inheritdoc}
@@ -38,10 +25,20 @@ class LayoutBuilderTestSubscriber implements EventSubscriberInterface {
     // @see \Drupal\layout_builder\EventSubscriber\SectionRegionsRenderArraySubscriber
     return [
       SectionBuildRegionsRenderArrayEvent::class => [
-        ['beforeBuildRegionsRenderArray', 200],
-        ['afterBuildRegionsRenderArray', 0],
+        ['beforeBuildRegionsRenderArray', 1],
+        ['afterBuildRegionsRenderArray', -1],
       ],
     ];
+  }
+
+  /**
+   * Activates or deactivates the subscriber.
+   *
+   * @param bool $active
+   *   Whether to activate the subscriber.
+   */
+  public function setActive(bool $active): void {
+    $this->active = $active;
   }
 
   /**
@@ -51,7 +48,7 @@ class LayoutBuilderTestSubscriber implements EventSubscriberInterface {
    *   The event object.
    */
   public function beforeBuildRegionsRenderArray(SectionBuildRegionsRenderArrayEvent $event): void {
-    if ($this->isActivated()) {
+    if ($this->active) {
       $regions = $event->getRegions();
       $regions['main']['before'] = [
         '#markup' => '3rd party: before',
@@ -67,7 +64,7 @@ class LayoutBuilderTestSubscriber implements EventSubscriberInterface {
    *   The event object.
    */
   public function afterBuildRegionsRenderArray(SectionBuildRegionsRenderArrayEvent $event): void {
-    if ($this->isActivated()) {
+    if ($this->active) {
       $regions = $event->getRegions();
       $regions['main']['after'] = [
         '#markup' => '3rd party: after',
@@ -76,16 +73,6 @@ class LayoutBuilderTestSubscriber implements EventSubscriberInterface {
       $regions['main']['first-uuid']['content']['#markup'] = '3rd party: replaced';
       $event->setRegions($regions);
     }
-  }
-
-  /**
-   * Checks if the subscriber is activated.
-   *
-   * @return bool
-   *   If the subscriber is active.
-   */
-  protected function isActivated(): bool {
-    return $this->state->get('layout_builder_test.subscriber.active', FALSE);
   }
 
 }

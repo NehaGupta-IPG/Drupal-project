@@ -22,7 +22,7 @@ class TestSectionList implements SectionListInterface {
    *
    * @var \Drupal\layout_builder\Section[]
    */
-  protected $sections;
+  protected array $sections;
 
   /**
    * TestSectionList constructor.
@@ -38,7 +38,7 @@ class TestSectionList implements SectionListInterface {
   /**
    * {@inheritdoc}
    */
-  protected function setSections(array $sections) {
+  protected function setSections(array $sections): array {
     $this->sections = array_values($sections);
     return $sections;
   }
@@ -46,7 +46,7 @@ class TestSectionList implements SectionListInterface {
   /**
    * {@inheritdoc}
    */
-  public function getSections() {
+  public function getSections(): array {
     return $this->sections;
   }
 

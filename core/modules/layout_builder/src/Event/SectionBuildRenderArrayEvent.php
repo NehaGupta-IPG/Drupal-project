@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\layout_builder\Event;
 
 use Drupal\Component\EventDispatcher\Event;
@@ -14,34 +16,6 @@ class SectionBuildRenderArrayEvent extends Event {
   use CacheableResponseTrait;
 
   /**
-   * The section whose regions render array is being built.
-   *
-   * @var \Drupal\layout_builder\Section
-   */
-  protected $section;
-
-  /**
-   * The available contexts.
-   *
-   * @var \Drupal\Core\Plugin\Context\ContextInterface[]
-   */
-  protected $contexts;
-
-  /**
-   * Whether the section is in preview mode or not.
-   *
-   * @var bool
-   */
-  protected $inPreview;
-
-  /**
-   * The section render array being built by the event subscribers.
-   *
-   * @var array
-   */
-  protected $build = [];
-
-  /**
    * Constructs a new event instance.
    *
    * @param \Drupal\layout_builder\Section $section
@@ -53,12 +27,12 @@ class SectionBuildRenderArrayEvent extends Event {
    * @param bool $in_preview
    *   Whether the section is in preview mode or not.
    */
-  public function __construct(Section $section, array $build, array $contexts, bool $in_preview) {
-    $this->section = $section;
-    $this->build = $build;
-    $this->contexts = $contexts;
-    $this->inPreview = $in_preview;
-  }
+  public function __construct(
+    protected Section $section,
+    protected array $build,
+    protected readonly array $contexts,
+    protected readonly bool $in_preview,
+  ) {}
 
   /**
    * Gets the section whose regions render array is being built.

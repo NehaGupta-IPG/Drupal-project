@@ -6,6 +6,7 @@ namespace Drupal\Tests\layout_builder\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\layout_builder\Section;
+use Drupal\layout_builder_test\EventSubscriber\LayoutBuilderTestSubscriber;
 use Drupal\layout_builder\SectionComponent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -58,8 +59,7 @@ class SectionThirdPartyIntegrationTest extends KernelTestBase {
     $this->assertSame('Powered by Drupal', strip_tags($region['first-uuid']['content']['#markup']));
 
     // Activate regions altering by third-party and recreate the render array.
-    // @see \Drupal\layout_builder_test\EventSubscriber\LayoutBuilderTestSubscriber::isSubscriberEnabled()
-    $this->container->get('state')->set('layout_builder_test.subscriber.active', TRUE);
+    $this->container->get(LayoutBuilderTestSubscriber::class)->setActive(TRUE);
     $region = $section_storage->getSection(0)->toRenderArray()['main'];
 
     // Check that that 'main' region render array has been altered.
