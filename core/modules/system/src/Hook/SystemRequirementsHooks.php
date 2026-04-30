@@ -1585,7 +1585,6 @@ class SystemRequirementsHooks {
     $availableAlgorithms = password_algos();
     $hashingAlgorithm = $this->passwordAlgorithm ?? PASSWORD_DEFAULT;
 
-
     if (!in_array($hashingAlgorithm, $availableAlgorithms, TRUE)) {
       return [
         'title' => $this->t('Password hashing'),
