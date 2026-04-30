@@ -25,7 +25,6 @@ use Drupal\Core\Utility\PhpRequirements;
 use Drupal\system\Install\Requirements\SystemRequirements;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\Extension\ModuleExtensionList;
-use Drupal\Core\Extension\ExtensionList;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
@@ -603,7 +602,6 @@ class SystemRequirementsHooks {
       $conf_errors = [];
       // Find the site path. Kernel service is not always available at this
       // point, but is preferred, when available.
-      // @todo: fix this.
       if (\Drupal::hasService('kernel')) {
         $site_path = $this->parameterBag->get('site.path');
       }
