@@ -94,7 +94,7 @@ class BreakpointTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getMediaQuery
+   * Tests get a media query with various inputs.
    */
   #[DataProvider('providerGetMediaQueryHandlesVariousInputs')]
   public function testGetMediaQueryHandlesVariousInputs($input, $expected): void {
