@@ -13,6 +13,22 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Path\CurrentPathStack;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Routing\AdminContext;
+use Drupal\Core\Path\PathMatcherInterface;
+use Drupal\Core\PathProcessor\PathProcessorManagerInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Theme\ThemeManagerInterface;
+use Drupal\Core\Access\CsrfTokenGenerator;
+use Drupal\Core\Asset\LibraryDependencyResolverInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Extension\ThemeHandlerInterface;
+use Drupal\system\SecurityAdvisories\SecurityAdvisoriesFetcher;
 
 /**
  * Hook implementations for system.
@@ -20,6 +36,25 @@ use Drupal\Core\Hook\Attribute\Hook;
 class SystemThemeHooks {
 
   use StringTranslationTrait;
+
+  public function __construct(
+    RequestStack $requestStack,
+    RouteMatchInterface $routeMatch,
+    CurrentPathStack $currentPath,
+    PathMatcherInterface $pathMatcher,
+    PathProcessorManagerInterface $pathProcessorManager,
+    AdminContext $adminContext,
+    AccountProxyInterface $currentUser,
+    ConfigFactoryInterface $configFactory,
+    ModuleHandlerInterface $moduleHandler,
+    ThemeManagerInterface $themeManager,
+    ThemeHandlerInterface $themeHandler,
+    LibraryDependencyResolverInterface $libraryDependencyResolver,
+    MessengerInterface $messenger,
+    CsrfTokenGenerator $csrfToken,
+    LanguageManagerInterface $languageManager,
+    SecurityAdvisoriesFetcher $securityAdvisoriesFetcher,
+  ) {}
 
   /**
    * Implements hook_theme().
@@ -171,7 +206,7 @@ class SystemThemeHooks {
    */
   #[Hook('theme_suggestions_html')]
   public function themeSuggestionsHtml(array $variables): array {
-    $path_args = explode('/', trim(\Drupal::service('path.current')->getPath(), '/'));
+    $path_args = explode('/', trim($this->currentPath->getPath(), '/'));
     return theme_get_suggestions($path_args, 'html');
   }
 
@@ -180,14 +215,14 @@ class SystemThemeHooks {
    */
   #[Hook('theme_suggestions_page')]
   public function themeSuggestionsPage(array $variables): array {
-    $path_args = explode('/', trim(\Drupal::service('path.current')->getPath(), '/'));
+    $path_args = explode('/', trim($this->currentPath->getPath(), '/'));
     $suggestions = theme_get_suggestions($path_args, 'page');
     $supported_http_error_codes = [
       401,
       403,
       404,
     ];
-    $exception = \Drupal::requestStack()->getCurrentRequest()->attributes->get('exception');
+    $exception = $this->requestStack->getCurrentRequest()->attributes->get('exception');
     if ($exception instanceof HttpExceptionInterface && in_array($exception->getStatusCode(), $supported_http_error_codes, TRUE)) {
       $suggestions[] = 'page__4xx';
       $suggestions[] = 'page__' . $exception->getStatusCode();
@@ -205,7 +240,7 @@ class SystemThemeHooks {
     // allow themers to override the page and the content completely.
     $offline = defined('MAINTENANCE_MODE');
     try {
-      \Drupal::service('path.matcher')->isFrontPage();
+      $this->pathMatcher->isFrontPage();
     }
     catch (\Exception) {
       // The database is not yet available.
@@ -299,12 +334,12 @@ class SystemThemeHooks {
     //   Response in which we must send the list of extra asset libraries that
     //   are being added in this AJAX Response.
     /** @var \Drupal\Core\Asset\LibraryDependencyResolver $library_dependency_resolver */
-    $library_dependency_resolver = \Drupal::service('library.dependency_resolver');
+    $library_dependency_resolver = $this->libraryDependencyResolver;
     if (isset($settings['ajaxPageState']) || in_array('core/drupal.ajax', $library_dependency_resolver->getLibrariesWithDependencies($assets->getAlreadyLoadedLibraries()))) {
       // Provide the page with information about the theme that's used, so that
       // a later AJAX request can be rendered using the same theme.
       // @see \Drupal\Core\Theme\AjaxBasePageNegotiator
-      $theme_key = \Drupal::theme()->getActiveTheme()->getName();
+      $theme_key = $this->themeManager->getActiveTheme()->getName();
       $settings['ajaxPageState']['theme'] = $theme_key;
     }
   }
@@ -319,27 +354,27 @@ class SystemThemeHooks {
   public function jsSettingsAlter(&$settings, AttachedAssetsInterface $assets): void {
     // As this is being output in the final response always use the main
     // request.
-    $request = \Drupal::requestStack()->getMainRequest();
+    $request = $this->requestStack->getMainRequest();
     $current_query = $request->query->all();
     // Let output path processors set a prefix.
-    /** @var \Drupal\Core\PathProcessor\OutboundPathProcessorInterface $path_processor */
-    $path_processor = \Drupal::service('path_processor_manager');
+    $path_processor = $this->pathProcessorManager;
     $options = ['prefix' => ''];
     $path_processor->processOutbound('/', $options);
     $pathPrefix = $options['prefix'];
-    $route_match = \Drupal::routeMatch();
+    $route_match = $this->routeMatch;
     if ($route_match instanceof StackedRouteMatchInterface) {
       $route_match = $route_match->getMasterRouteMatch();
     }
     $current_path = $route_match->getRouteName() ? Url::fromRouteMatch($route_match)->getInternalPath() : '';
-    $current_path_is_admin = \Drupal::service('router.admin_context')->isAdminRoute($route_match->getRouteObject());
+    $current_path_is_admin = $this->adminContext->isAdminRoute($route_match->getRouteObject());
     $path_settings = [
       'baseUrl' => $request->getBaseUrl() . '/',
       'pathPrefix' => $pathPrefix,
       'currentPath' => $current_path,
       'currentPathIsAdmin' => $current_path_is_admin,
-      'isFront' => \Drupal::service('path.matcher')->isFrontPage(),
-      'currentLanguage' => \Drupal::languageManager()->getCurrentLanguage(LanguageInterface::TYPE_URL)->getId(),
+      'isFront' => $this->pathMatcher->isFrontPage(),
+      'currentLanguage' => $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_URL)->getId(),
+
     ];
     if (!empty($current_query)) {
       ksort($current_query);
@@ -356,8 +391,7 @@ class SystemThemeHooks {
     }
     // Add the theme token to ajaxPageState, ensuring the database is available
     // before doing so. Also add the loaded libraries to ajaxPageState.
-    /** @var \Drupal\Core\Asset\LibraryDependencyResolver $library_dependency_resolver */
-    $library_dependency_resolver = \Drupal::service('library.dependency_resolver');
+    $library_dependency_resolver = $this->libraryDependencyResolver;
     $loaded_libraries = [];
     if (!isset($settings['ajaxPageState'])) {
       $loaded_libraries = $library_dependency_resolver->getLibrariesWithDependencies($assets->getAlreadyLoadedLibraries());
@@ -367,9 +401,9 @@ class SystemThemeHooks {
         // The theme token is only validated when the theme requested is not the
         // default, so don't generate it unless necessary.
         // @see \Drupal\Core\Theme\AjaxBasePageNegotiator::determineActiveTheme()
-        $active_theme_key = \Drupal::theme()->getActiveTheme()->getName();
-        if ($active_theme_key !== \Drupal::service('theme_handler')->getDefault()) {
-          $settings['ajaxPageState']['theme_token'] = \Drupal::csrfToken()->get($active_theme_key);
+        $active_theme_key = $this->themeManager->getActiveTheme()->getName();
+        if ($active_theme_key !== $this->themeHandler->getDefault()) {
+          $settings['ajaxPageState']['theme_token'] = $this->csrfToken->get($active_theme_key);
         }
       }
       // Provide the page with information about the individual asset libraries
@@ -410,17 +444,15 @@ class SystemThemeHooks {
    */
   #[Hook('page_top')]
   public function pageTop(): void {
-    /** @var \Drupal\Core\Routing\AdminContext $admin_context */
-    $admin_context = \Drupal::service('router.admin_context');
-    if ($admin_context->isAdminRoute() && \Drupal::currentUser()->hasPermission('administer site configuration')) {
-      $route_match = \Drupal::routeMatch();
+    $admin_context = $this->adminContext;
+    if ($admin_context->isAdminRoute() && $this->currentUser->hasPermission('administer site configuration')) {
+      $route_match = $this->routeMatch;
       $route_name = $route_match->getRouteName();
-      if ($route_name !== 'system.status' && \Drupal::config('system.advisories')->get('enabled')) {
-        /** @var \Drupal\system\SecurityAdvisories\SecurityAdvisoriesFetcher $fetcher */
-        $fetcher = \Drupal::service('system.sa_fetcher');
+      if ($route_name !== 'system.status' && $this->configFactory->get('system.advisories')->get('enabled')) {
+        $fetcher = $this->securityAdvisoriesFetcher;
         $advisories = $fetcher->getSecurityAdvisories(FALSE);
         if ($advisories) {
-          $messenger = \Drupal::messenger();
+          $messenger = $this->messenger;
           $display_as_errors = FALSE;
           $links = [];
           foreach ($advisories as $advisory) {
@@ -436,7 +468,7 @@ class SystemThemeHooks {
           foreach ($links as $link) {
             $display_as_errors ? $messenger->addError($link) : $messenger->addWarning($link);
           }
-          if (\Drupal::moduleHandler()->moduleExists('help')) {
+          if ($this->moduleHandler->moduleExists('help')) {
             $help_link = $this->t('(<a href=":system-help">What are critical security announcements?</a>)', [
               ':system-help' => Url::fromRoute('help.page', [
                 'name' => 'system',
