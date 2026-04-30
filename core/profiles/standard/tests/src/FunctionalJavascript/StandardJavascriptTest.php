@@ -48,9 +48,9 @@ class StandardJavascriptTest extends WebDriverTestBase {
     $this->drupalGet('');
     $this->assertBigPipePlaceholderReplacementCount(0);
 
-    // Node page: Five placeholders.
+    // Node page: Six placeholders.
     $this->drupalGet($node->toUrl());
-    $this->assertBigPipePlaceholderReplacementCount(5);
+    $this->assertBigPipePlaceholderReplacementCount(6);
 
     // Node page second request: Zero placeholders (no comment form on test content type).
     $this->drupalGet($node->toUrl());
