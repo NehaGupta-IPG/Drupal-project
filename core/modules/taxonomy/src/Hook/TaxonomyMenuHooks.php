@@ -3,7 +3,6 @@
 namespace Drupal\taxonomy\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\node\NodeInterface;
 
 /**
  * Menu hook implementations for taxonomy.
