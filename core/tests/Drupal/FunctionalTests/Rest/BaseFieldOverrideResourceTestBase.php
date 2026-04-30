@@ -8,6 +8,9 @@ use Drupal\Core\Field\Entity\BaseFieldOverride;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
 
+/**
+ * Resource test base for BaseFieldOverride entity.
+ */
 abstract class BaseFieldOverrideResourceTestBase extends ConfigEntityResourceTestBase {
 
   /**
@@ -28,7 +31,7 @@ abstract class BaseFieldOverrideResourceTestBase extends ConfigEntityResourceTes
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer node fields']);
   }
 

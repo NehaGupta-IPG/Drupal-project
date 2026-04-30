@@ -6,12 +6,14 @@ namespace Drupal\Tests\block_content\Functional;
 
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\Tests\content_translation\Functional\ContentTranslationUITestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the block content translation UI.
- *
- * @group block_content
  */
+#[Group('block_content')]
+#[RunTestsInSeparateProcesses]
 class BlockContentTranslationUITest extends ContentTranslationUITestBase {
 
   /**
@@ -72,7 +74,7 @@ class BlockContentTranslationUITest extends ContentTranslationUITestBase {
   /**
    * {@inheritdoc}
    */
-  public function getTranslatorPermissions() {
+  public function getTranslatorPermissions(): array {
     return array_merge(parent::getTranslatorPermissions(), [
       'translate any entity',
       'access administration pages',

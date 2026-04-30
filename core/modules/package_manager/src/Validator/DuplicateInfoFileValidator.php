@@ -30,7 +30,7 @@ final class DuplicateInfoFileValidator implements EventSubscriberInterface {
    */
   public function validate(PreApplyEvent $event): void {
     $active_dir = $this->pathLocator->getProjectRoot();
-    $stage_dir = $event->stage->getStageDirectory();
+    $stage_dir = $event->sandboxManager->getSandboxDirectory();
     $active_info_files = $this->findInfoFiles($active_dir);
     $stage_info_files = $this->findInfoFiles($stage_dir);
 
@@ -100,7 +100,6 @@ final class DuplicateInfoFileValidator implements EventSubscriberInterface {
       array_keys($duplicate_aware_extension_discovery->scan('module', FALSE)),
       array_keys($duplicate_aware_extension_discovery->scan('theme', FALSE)),
       array_keys($duplicate_aware_extension_discovery->scan('profile', FALSE)),
-      array_keys($duplicate_aware_extension_discovery->scan('theme_engine', FALSE)),
     );
 
     $info_files = [];

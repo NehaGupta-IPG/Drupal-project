@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\FunctionalJavascriptTests\Ajax;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Performs tests on AJAX framework commands.
- *
- * @group Ajax
  */
+#[Group('Ajax')]
+#[RunTestsInSeparateProcesses]
 class CommandsTest extends WebDriverTestBase {
 
   /**
@@ -48,7 +50,7 @@ class CommandsTest extends WebDriverTestBase {
     // Tests the 'alert' command.
     $page->pressButton("AJAX 'Alert': Click to alert");
     // Wait for the alert to appear.
-    $page->waitFor(10, function () use ($session) {
+    $page->waitFor(10, function () use ($session): bool {
       try {
         $session->getDriver()->getWebDriverSession()->alert()->getText();
         return TRUE;
@@ -101,7 +103,7 @@ class CommandsTest extends WebDriverTestBase {
 
     // Tests the 'data' command.
     $page->pressButton("AJAX data command: Issue command.");
-    $this->assertTrue($page->waitFor(10, function () use ($session) {
+    $this->assertTrue($page->waitFor(10, function () use ($session): bool {
       return 'test_value' === $session->evaluateScript('window.jQuery("#data_div").data("test_key")');
     }));
 
@@ -154,7 +156,7 @@ JS;
    */
   protected function assertWaitPageContains(string $text): void {
     $page = $this->getSession()->getPage();
-    $page->waitFor(10, function () use ($page, $text) {
+    $page->waitFor(10, function () use ($page, $text): bool {
       return stripos($page->getContent(), $text) !== FALSE;
     });
     $this->assertStringContainsString($text, $page->getContent());

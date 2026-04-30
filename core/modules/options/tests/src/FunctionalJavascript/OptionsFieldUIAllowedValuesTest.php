@@ -4,17 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\options\FunctionalJavascript;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\field_ui\Traits\FieldUiJSTestTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Options field allowed values UI functionality.
- *
- * @group options
- * @group #slow
  */
+#[Group('options')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class OptionsFieldUIAllowedValuesTest extends WebDriverTestBase {
 
   use FieldUiJSTestTrait;
@@ -26,6 +30,7 @@ class OptionsFieldUIAllowedValuesTest extends WebDriverTestBase {
     'node',
     'options',
     'field_ui',
+    'block',
   ];
 
   /**
@@ -66,6 +71,7 @@ class OptionsFieldUIAllowedValuesTest extends WebDriverTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->drupalPlaceBlock('local_actions_block');
 
     // Create test user.
     $admin_user = $this->drupalCreateUser([
@@ -82,9 +88,8 @@ class OptionsFieldUIAllowedValuesTest extends WebDriverTestBase {
 
   /**
    * Tests option types allowed values.
-   *
-   * @dataProvider providerTestOptionsAllowedValues
    */
+  #[DataProvider('providerTestOptionsAllowedValues')]
   public function testOptionsAllowedValues($option_type, $options, $is_string_option, string $add_row_method): void {
     $assert = $this->assertSession();
     $this->fieldName = 'field_options_text';
@@ -170,7 +175,8 @@ class OptionsFieldUIAllowedValuesTest extends WebDriverTestBase {
       $this->assertHasFocusByAttribute('name', $key_element_name);
       $this->assertAllowValuesRowCount($expected_rows);
     }
-    $page->pressButton('Save');
+    $page->pressButton('Save settings');
+    $this->assertTrue($this->assertSession()->waitForText('Saved field_options_text configuration.'));
 
     $option_labels = array_values($options);
     $this->assertCount(3, $option_labels);
@@ -188,7 +194,8 @@ class OptionsFieldUIAllowedValuesTest extends WebDriverTestBase {
     // Change the order the items appear.
     $drag_handle->dragTo($target);
     $this->assertOrder([$option_labels[1], $option_labels[2], $option_labels[0], ''], $is_string_option);
-    $page->pressButton('Save');
+    $page->pressButton('Save settings');
+    $this->assertTrue($this->assertSession()->waitForText('Saved field_options_text configuration.'));
 
     $this->drupalGet($this->nodeFormPath);
     $this->assertNodeFormOrder(['- None -', $option_labels[1], $option_labels[2], $option_labels[0]]);
@@ -202,7 +209,8 @@ class OptionsFieldUIAllowedValuesTest extends WebDriverTestBase {
     $page->pressButton('remove_row_button__1');
     $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertOrder([$option_labels[1], $option_labels[0], ''], $is_string_option);
-    $page->pressButton('Save');
+    $page->pressButton('Save settings');
+    $this->assertTrue($this->assertSession()->waitForText('Saved field_options_text configuration.'));
 
     $this->drupalGet($this->nodeFormPath);
     $this->assertNodeFormOrder(['- None -', $option_labels[1], $option_labels[0]]);
@@ -243,7 +251,7 @@ class OptionsFieldUIAllowedValuesTest extends WebDriverTestBase {
    */
   protected function assertNodeFormOrder($expected) {
     $elements = $this->assertSession()->selectExists('field_options_text')->findAll('css', 'option');
-    $elements = array_map(function ($element) {
+    $elements = array_map(function (NodeElement $element) {
       return $element->getText();
     }, $elements);
     $this->assertSame($expected, $elements);
@@ -302,7 +310,7 @@ JS;
    *   - The method which should be used to add another row to the table. The
    *     possible values are 'Press button', 'Enter button' or 'Enter element'.
    */
-  public static function providerTestOptionsAllowedValues() {
+  public static function providerTestOptionsAllowedValues(): array {
     $type_cases = [
       'List integer' => [
         'list_integer',
@@ -316,13 +324,7 @@ JS;
       ],
       'List string' => [
         'list_string',
-        ['first' => 'First', 'second' => 'Second', 'third' => 'Third'],
-        TRUE,
-      ],
-      // Example with empty key and label values like string '0'.
-      'List string with 0 value' => [
-        'list_string',
-        ['0' => '0', '1' => '1', '2' => '2'],
+        ['0' => '0', '1' => '1', 'two' => 'two'],
         TRUE,
       ],
     ];

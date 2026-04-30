@@ -8,12 +8,14 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Create a node and test saving it.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeCreationTest extends NodeTestBase {
 
   use ContentTypeCreationTrait;
@@ -183,8 +185,9 @@ class NodeCreationTest extends NodeTestBase {
     // Confirm that the node was created.
     $this->assertSession()->pageTextContains('Basic page ' . $edit['title[0][value]'] . ' has been created.');
 
-    // Verify that the creation message contains a link to a node.
-    $this->assertSession()->elementExists('xpath', '//div[@data-drupal-messages]//a[contains(@href, "node/")]');
+    // Verify that the creation message doesn't contain a link to a node since
+    // the user cannot view unpublished nodes.
+    $this->assertSession()->elementNotExists('xpath', '//div[@data-drupal-messages]//a[contains(@href, "node/")]');
   }
 
   /**
@@ -307,6 +310,21 @@ class NodeCreationTest extends NodeTestBase {
     $this->drupalGet('node/add');
 
     $this->assertSession()->linkByHrefExists('/admin/structure/types/add');
+  }
+
+  /**
+   * Tests exception handling when saving a node through the form.
+   */
+  public function testNodeCreateExceptionHandling(): void {
+    $this->drupalGet('node/add/page');
+
+    $this->submitForm([
+      'title[0][value]' => 'testing_transaction_exception',
+      'body[0][value]' => $this->randomMachineName(16),
+    ], 'Save');
+
+    $this->assertSession()->pageTextNotContains('The website encountered an unexpected error.');
+    $this->assertSession()->pageTextContains('The content could not be saved. Contact the site administrator if the problem persists.');
   }
 
   /**
