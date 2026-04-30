@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Functional\Update;
 
+use Drupal\Core\Database\Database;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -22,15 +23,42 @@ class RemoveStaleFileThresholdTest extends UpdatePathTestBase {
    */
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
-      __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-10.3.0.bare.standard.php.gz',
+      __DIR__ . '/../../../fixtures/update/drupal-11.3.0.bare.standard.php.gz',
     ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+
+    // Inject the orphan stale_file_threshold key directly into the config
+    // table to simulate sites that carry it forward from a pre-10.2 install.
+    // The schema has not declared this key since #3425419 landed in 11.0,
+    // so the regular ConfigFactory::save() path would reject it as
+    // unsupported under strict typed-config validation. Writing directly
+    // to the config table bypasses that gate, which is precisely the
+    // condition this update hook exists to clean up.
+    $connection = Database::getConnection();
+    $serialized = $connection->select('config', 'c')
+      ->fields('c', ['data'])
+      ->condition('name', 'system.performance')
+      ->execute()
+      ->fetchField();
+    $data = unserialize($serialized);
+    $data['stale_file_threshold'] = 2592000;
+    $connection->update('config')
+      ->fields(['data' => serialize($data)])
+      ->condition('name', 'system.performance')
+      ->execute();
+    \Drupal::configFactory()->reset('system.performance');
   }
 
   /**
    * Tests that the orphan stale_file_threshold key is removed.
    */
   public function testRunUpdates(): void {
-    // The 10.3.0 fixture has stale_file_threshold set to its default value.
     $this->assertSame(2592000, \Drupal::config('system.performance')->get('stale_file_threshold'));
     $this->runUpdates();
     $this->assertNull(\Drupal::config('system.performance')->get('stale_file_threshold'));
