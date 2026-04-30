@@ -72,7 +72,7 @@ class SystemRequirementsHooks {
     #[Autowire(value: '%site.path%')]
     private string $sitePath,
     #[Autowire(value: '%password.algorithm%')]
-    private string|int $passwordAlgorithm,
+    private string|int|null $passwordAlgorithm,
   ) {}
 
   /**
