@@ -124,7 +124,7 @@ class SystemRequirementsHooks {
 
       // Display the currently active installation profile, if the site
       // is not running the default installation profile.
-      $profile = $this->moduleExtensionList->getProfile();
+      $profile = $this->configFactory->get('core.extension')->get('profile') ?? 'standard';
       if ($profile != 'standard' && !empty($profile)) {
         $info = $module_extension_list->getExtensionInfo($profile);
         $requirements['install_profile'] = [
