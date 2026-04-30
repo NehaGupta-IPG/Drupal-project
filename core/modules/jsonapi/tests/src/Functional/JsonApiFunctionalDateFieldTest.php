@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Component\Serialization\Json;
@@ -7,12 +9,14 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\NodeInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * JSON:API integration test for the "Date" field.
- *
- * @group jsonapi
  */
+#[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class JsonApiFunctionalDateFieldTest extends JsonApiFunctionalTestBase {
 
   /**
@@ -53,13 +57,13 @@ class JsonApiFunctionalDateFieldTest extends JsonApiFunctionalTestBase {
   /**
    * Tests the GET method.
    */
-  public function testRead() {
+  public function testRead(): void {
     /** @var \Drupal\Core\Datetime\DateFormatterInterface $date_formatter */
     $date_formatter = $this->container->get('date.formatter');
 
-    $timestamp_1 = '5000000';
-    $timestamp_2 = '6000000';
-    $timestamp_3 = '7000000';
+    $timestamp_1 = 5000000;
+    $timestamp_2 = 6000000;
+    $timestamp_3 = 7000000;
     // Expected: node 1.
     $timestamp_smaller_than_value = $timestamp_2;
     // Expected: node 1 and node 2.
@@ -102,7 +106,7 @@ class JsonApiFunctionalDateFieldTest extends JsonApiFunctionalTestBase {
       'query' => ['filter' => $filter],
     ]));
     $this->assertSession()->statusCodeEquals(200);
-    $output_uuids = array_map(function ($result) {
+    $output_uuids = array_map(function (array $result) {
       return $result['id'];
     }, $output['data']);
     $this->assertCount(1, $output_uuids);
@@ -124,7 +128,7 @@ class JsonApiFunctionalDateFieldTest extends JsonApiFunctionalTestBase {
       'query' => ['filter' => $filter],
     ]));
     $this->assertSession()->statusCodeEquals(200);
-    $output_uuids = array_map(function ($result) {
+    $output_uuids = array_map(function (array $result) {
       return $result['id'];
     }, $output['data']);
     $this->assertCount(2, $output_uuids);
@@ -147,7 +151,7 @@ class JsonApiFunctionalDateFieldTest extends JsonApiFunctionalTestBase {
       'query' => ['filter' => $filter],
     ]));
     $this->assertSession()->statusCodeEquals(200);
-    $output_uuids = array_map(function ($result) {
+    $output_uuids = array_map(function (array $result) {
       return $result['id'];
     }, $output['data']);
     $this->assertCount(1, $output_uuids);
@@ -169,7 +173,7 @@ class JsonApiFunctionalDateFieldTest extends JsonApiFunctionalTestBase {
       'query' => ['filter' => $filter],
     ]));
     $this->assertSession()->statusCodeEquals(200);
-    $output_uuids = array_map(function ($result) {
+    $output_uuids = array_map(function (array $result) {
       return $result['id'];
     }, $output['data']);
     $this->assertCount(2, $output_uuids);

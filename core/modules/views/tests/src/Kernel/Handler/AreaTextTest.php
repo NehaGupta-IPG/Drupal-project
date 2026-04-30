@@ -1,18 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
+use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the core views_handler_area_text handler.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\area\Text
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class AreaTextTest extends ViewsKernelTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['system', 'user', 'filter'];
 
   /**
@@ -32,13 +41,16 @@ class AreaTextTest extends ViewsKernelTestBase {
     $this->installEntitySchema('user');
   }
 
-  public function testAreaText() {
+  /**
+   * Tests the rendering of a text area.
+   */
+  public function testAreaText(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $view = Views::getView('test_view');
     $view->setDisplay();
 
-    // add a text header
+    // Add a text header.
     $string = $this->randomMachineName();
     $view->displayHandlers->get('default')->overrideOption('header', [
       'area' => [
@@ -58,7 +70,7 @@ class AreaTextTest extends ViewsKernelTestBase {
     $build = $view->display_handler->handlers['header']['area']->render();
     $this->assertEquals('', $renderer->renderRoot($build), 'Nonexistent format should return empty markup.');
 
-    $view->display_handler->handlers['header']['area']->options['content']['format'] = filter_default_format();
+    $view->display_handler->handlers['header']['area']->options['content']['format'] = \Drupal::service(FilterFormatRepositoryInterface::class)->getDefaultFormat()->id();
     $build = $view->display_handler->handlers['header']['area']->render();
     $this->assertEquals(check_markup($string), $renderer->renderRoot($build), 'Existent format should return something');
 

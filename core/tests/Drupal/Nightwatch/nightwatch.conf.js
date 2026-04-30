@@ -1,4 +1,5 @@
-const path = require('path');
+// cspell:ignore testcases
+const path = require('node:path');
 const { globSync } = require('glob');
 
 // Find directories which have Nightwatch tests in them.
@@ -14,6 +15,7 @@ const defaultIgnore = ['vendor/**'];
 
 globSync('**/tests/**/Nightwatch/**/*.js', {
   cwd: path.resolve(process.cwd(), `../${searchDirectory}`),
+  follow: true,
   ignore: process.env.DRUPAL_NIGHTWATCH_IGNORE_DIRECTORIES
     ? process.env.DRUPAL_NIGHTWATCH_IGNORE_DIRECTORIES.split(',').concat(
         defaultIgnore,
@@ -67,7 +69,7 @@ module.exports = {
         browserName: 'chrome',
         acceptSslCerts: true,
         'goog:chromeOptions': {
-          w3c: false,
+          w3c: !!process.env.DRUPAL_TEST_WEBDRIVER_W3C,
           args: process.env.DRUPAL_TEST_WEBDRIVER_CHROME_ARGS
             ? process.env.DRUPAL_TEST_WEBDRIVER_CHROME_ARGS.split(' ')
             : [],
@@ -94,7 +96,7 @@ module.exports = {
         browserName: 'chrome',
         acceptSslCerts: true,
         'goog:chromeOptions': {
-          w3c: false,
+          w3c: !!process.env.DRUPAL_TEST_WEBDRIVER_W3C,
           args: process.env.DRUPAL_TEST_WEBDRIVER_CHROME_ARGS
             ? process.env.DRUPAL_TEST_WEBDRIVER_CHROME_ARGS.split(' ')
             : [],

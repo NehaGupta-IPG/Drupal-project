@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\TestSite\Commands;
 
 use Drupal\Core\DrupalKernel;
@@ -29,7 +31,7 @@ class TestSiteUserLoginCommand extends Command {
   /**
    * {@inheritdoc}
    */
-  protected function configure() {
+  protected function configure(): void {
     $this->setName('user-login')
       ->setDescription('Generate a one time login link for an user.')
       ->addArgument('uid', InputArgument::REQUIRED, 'The ID of the user for whom the link will be generated')

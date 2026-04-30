@@ -8,12 +8,13 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\Extension;
 use Drupal\Tests\Core\Menu\LocalTaskIntegrationTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests existence of system local tasks.
- *
- * @group system
  */
+#[Group('system')]
 class SystemLocalTasksTest extends LocalTaskIntegrationTestBase {
 
   /**
@@ -38,12 +39,12 @@ class SystemLocalTasksTest extends LocalTaskIntegrationTestBase {
     $theme = new Extension($this->root, 'theme', 'core/themes/olivero', 'olivero.info.yml');
     $theme->status = 1;
     $theme->info = ['name' => 'olivero'];
-    $this->themeHandler->expects($this->any())
+    $this->themeHandler->expects($this->once())
       ->method('listInfo')
       ->willReturn([
         'olivero' => $theme,
       ]);
-    $this->themeHandler->expects($this->any())
+    $this->themeHandler->expects($this->once())
       ->method('hasUi')
       ->with('olivero')
       ->willReturn(TRUE);
@@ -54,9 +55,9 @@ class SystemLocalTasksTest extends LocalTaskIntegrationTestBase {
       ->expects($this->once())
       ->method('hasLinkTemplate')
       ->with('version-history')
-      ->will($this->returnValue(TRUE));
-    $entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
-    $entityTypeManager->expects($this->any())
+      ->willReturn(TRUE);
+    $entityTypeManager = $this->createStub(EntityTypeManagerInterface::class);
+    $entityTypeManager
       ->method('getDefinitions')
       ->willReturn([
         'foo' => $fooEntityDefinition,
@@ -66,17 +67,16 @@ class SystemLocalTasksTest extends LocalTaskIntegrationTestBase {
 
   /**
    * Tests local task existence.
-   *
-   * @dataProvider getSystemAdminRoutes
    */
-  public function testSystemAdminLocalTasks($route, $expected) {
+  #[DataProvider('getSystemAdminRoutes')]
+  public function testSystemAdminLocalTasks(string $route, array $expected): void {
     $this->assertLocalTasks($route, $expected);
   }
 
   /**
    * Provides a list of routes to test.
    */
-  public function getSystemAdminRoutes() {
+  public static function getSystemAdminRoutes(): array {
     return [
       ['system.admin_content', [['system.admin_content']]],
       [

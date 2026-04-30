@@ -8,19 +8,22 @@ use Drupal\content_moderation\ContentPreprocess;
 use Drupal\Core\Routing\CurrentRouteMatch;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\content_moderation\ContentPreprocess
- *
- * @group content_moderation
+ * Tests Drupal\content_moderation\ContentPreprocess.
  */
+#[CoversClass(ContentPreprocess::class)]
+#[Group('content_moderation')]
 class ContentPreprocessTest extends UnitTestCase {
 
   /**
-   * @covers ::isLatestVersionPage
-   * @dataProvider routeNodeProvider
+   * Tests is latest version page.
    */
-  public function testIsLatestVersionPage($route_name, $route_nid, $check_nid, $result, $message) {
+  #[DataProvider('routeNodeProvider')]
+  public function testIsLatestVersionPage(string $route_name, int $route_nid, int $check_nid, bool $result, string $message): void {
     $content_preprocess = new ContentPreprocess($this->setupCurrentRouteMatch($route_name, $route_nid));
     $node = $this->setupNode($check_nid);
     $this->assertEquals($result, $content_preprocess->isLatestVersionPage($node), $message);
@@ -29,7 +32,7 @@ class ContentPreprocessTest extends UnitTestCase {
   /**
    * Data provider for self::testIsLatestVersionPage().
    */
-  public function routeNodeProvider() {
+  public static function routeNodeProvider(): array {
     return [
       ['entity.node.canonical', 1, 1, FALSE, 'Not on the latest version tab route.'],
       ['entity.node.latest_version', 1, 1, TRUE, 'On the latest version tab route, with the route node.'],

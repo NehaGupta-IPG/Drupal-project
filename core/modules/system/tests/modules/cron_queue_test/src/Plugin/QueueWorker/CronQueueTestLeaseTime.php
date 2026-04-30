@@ -1,22 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\cron_queue_test\Plugin\QueueWorker;
 
+use Drupal\Core\Queue\Attribute\QueueWorker;
 use Drupal\Core\Queue\QueueWorkerBase;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
- * @QueueWorker(
- *   id = "cron_queue_test_lease_time",
- *   title = @Translation("Lease time test"),
- *   cron = {"time" = 100}
- * )
+ * A queue worker for testing lease time.
  */
+#[QueueWorker(
+  id: 'cron_queue_test_lease_time',
+  title: new TranslatableMarkup('Lease time test'),
+  cron: ['time' => 100]
+)]
 class CronQueueTestLeaseTime extends QueueWorkerBase {
 
   /**
    * {@inheritdoc}
    */
-  public function processItem($data) {
+  public function processItem($data): void {
     $state = \Drupal::state();
     $count = $state->get('cron_queue_test_lease_time', 0);
     $count++;

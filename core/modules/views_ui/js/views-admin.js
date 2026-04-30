@@ -221,7 +221,7 @@
         this.target.each(function (i) {
           // Ensure that the maxlength is not exceeded by prepopulating the field.
           const maxlength = $(this).attr('maxlength') - suffix.length;
-          this.value = transliterated.substr(0, maxlength) + suffix;
+          this.value = transliterated.substring(0, maxlength) + suffix;
         });
       },
 
@@ -347,8 +347,13 @@
     // Perhaps we should precache the text div, too.
     this.$selected_div
       .find('.views-selected-options')
-      .html(this.checkedItems.join(', '))
-      .trigger('dialogContentResize');
+      .html(this.checkedItems.join(', '));
+
+    this.$selected_div
+      ?.get(0)
+      ?.dispatchEvent(
+        new CustomEvent('dialogContentResize', { bubbles: true }),
+      );
   };
 
   /**
@@ -380,7 +385,9 @@
           'Add',
         )}</a><ul class="action-list" style="display:none;"></ul></li>`,
       );
-      const $displayButtons = $menu.nextAll('input.add-display').detach();
+      const $displayButtons = $menu
+        .nextAll('input.add-display, button.add-display')
+        .detach();
       $displayButtons
         .appendTo($addDisplayDropdown.find('.action-list'))
         .wrap('<li>')
@@ -570,7 +577,7 @@
         // Search through the search texts in the form for matching text.
         this.options.forEach((option) => {
           function hasWord(word) {
-            return option.searchText.indexOf(word) !== -1;
+            return option.searchText.includes(word);
           }
 
           let found = true;
@@ -587,7 +594,9 @@
         });
 
         // Adapt dialog to content size.
-        $(event.target).trigger('dialogContentResize');
+        event.target?.dispatchEvent(
+          new CustomEvent('dialogContentResize', { bubbles: true }),
+        );
       },
     },
   );
@@ -1242,7 +1251,6 @@
         context,
       ).forEach((dropdown) => {
         // Closures! :(
-        const $context = $(context);
         const submit = context.querySelector('[id^=edit-submit]');
         const oldValue = submit ? submit.value : '';
 
@@ -1266,8 +1274,10 @@
             } else {
               submit.value = Drupal.t('Apply (this display)');
             }
-            const $dialog = $context.closest('.ui-dialog-content');
-            $dialog.trigger('dialogButtonsChange');
+            if (context !== document) {
+              const dialog = context.closest('.ui-dialog-content');
+              dialog?.dispatchEvent(new CustomEvent('dialogButtonsChange'));
+            }
           })
           .trigger('change');
       });
@@ -1325,8 +1335,7 @@
     attach(context) {
       // Only act on the rearrange filter form.
       if (
-        typeof Drupal.tableDrag === 'undefined' ||
-        typeof Drupal.tableDrag['views-rearrange-filters'] === 'undefined'
+        typeof Drupal?.tableDrag?.['views-rearrange-filters'] === 'undefined'
       ) {
         return;
       }

@@ -1,13 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\ajax_test\Form;
 
 use Drupal\ajax_test\Controller\AjaxTestController;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Ajax\AjaxResponse;
-use Drupal\Core\Ajax\OpenModalDialogCommand;
 use Drupal\Core\Ajax\OpenDialogCommand;
+use Drupal\Core\Ajax\OpenModalDialogCommand;
+use Drupal\Core\Ajax\OpenModalDialogWithUrl;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 
 /**
  * Dummy form for testing DialogRenderer with _form routes.
@@ -43,6 +47,14 @@ class AjaxTestDialogForm extends FormBase {
         'callback' => '::nonModal',
       ],
     ];
+    $form['button3'] = [
+      '#type' => 'submit',
+      '#name' => 'button3',
+      '#value' => 'Button 3 (modal from url)',
+      '#ajax' => [
+        'callback' => '::modalFromUrl',
+      ],
+    ];
 
     return $form;
   }
@@ -57,7 +69,7 @@ class AjaxTestDialogForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $form_state->setRedirect('ajax_test.dialog_contents');
   }
 
@@ -66,6 +78,13 @@ class AjaxTestDialogForm extends FormBase {
    */
   public function modal(&$form, FormStateInterface $form_state) {
     return $this->dialog(TRUE);
+  }
+
+  /**
+   * AJAX callback handler for Url modal, AjaxTestDialogForm.
+   */
+  public function modalFromUrl(&$form, FormStateInterface $form_state) {
+    return $this->dialog(TRUE, TRUE);
   }
 
   /**
@@ -80,11 +99,13 @@ class AjaxTestDialogForm extends FormBase {
    *
    * @param bool $is_modal
    *   (optional) TRUE if modal, FALSE if plain dialog. Defaults to FALSE.
+   * @param bool $is_url
+   *   (optional) True if modal is from a URL, Defaults to FALSE.
    *
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   An ajax response object.
    */
-  protected function dialog($is_modal = FALSE) {
+  protected function dialog(bool $is_modal = FALSE, bool $is_url = FALSE) {
     $content = AjaxTestController::dialogContents();
     $response = new AjaxResponse();
     $title = $this->t('AJAX Dialog & contents');
@@ -94,7 +115,12 @@ class AjaxTestDialogForm extends FormBase {
     $content['#attached']['library'][] = 'core/drupal.dialog.ajax';
 
     if ($is_modal) {
-      $response->addCommand(new OpenModalDialogCommand($title, $content));
+      if ($is_url) {
+        $response->addCommand(new OpenModalDialogWithUrl(Url::fromRoute('ajax_test.dialog_form')->toString(), []));
+      }
+      else {
+        $response->addCommand(new OpenModalDialogCommand($title, $content));
+      }
     }
     else {
       $selector = '#ajax-test-dialog-wrapper-1';

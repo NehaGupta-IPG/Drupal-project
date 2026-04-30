@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\file\Entity\File;
 use Drupal\Tests\BrowserTestBase;
@@ -44,9 +47,7 @@ abstract class LocaleUpdateBase extends BrowserTestBase {
   protected $timestampNow;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['locale', 'locale_test'];
 
@@ -57,10 +58,10 @@ abstract class LocaleUpdateBase extends BrowserTestBase {
     parent::setUp();
 
     // Setup timestamps to identify old and new translation sources.
-    $this->timestampOld = REQUEST_TIME - 300;
-    $this->timestampMedium = REQUEST_TIME - 200;
-    $this->timestampNew = REQUEST_TIME - 100;
-    $this->timestampNow = REQUEST_TIME;
+    $this->timestampOld = \Drupal::time()->getRequestTime() - 300;
+    $this->timestampMedium = \Drupal::time()->getRequestTime() - 200;
+    $this->timestampNew = \Drupal::time()->getRequestTime() - 100;
+    $this->timestampNow = \Drupal::time()->getRequestTime();
 
     // Enable import of translations. By default this is disabled for automated
     // tests.
@@ -79,7 +80,14 @@ abstract class LocaleUpdateBase extends BrowserTestBase {
    */
   protected function setTranslationsDirectory($path) {
     \Drupal::service('file_system')->prepareDirectory($path, FileSystemInterface::CREATE_DIRECTORY);
-    $this->config('locale.settings')->set('translation.path', $path)->save();
+    $settings['settings']['locale_translation_path'] = (object) [
+      'value' => $path,
+      'required' => TRUE,
+    ];
+    $this->writeSettings($settings);
+    $settings = Settings::getAll();
+    $settings['locale_translation_path'] = $path;
+    new Settings($settings);
   }
 
   /**
@@ -110,8 +118,8 @@ abstract class LocaleUpdateBase extends BrowserTestBase {
    *   singular strings are supported, no plurals. No double quotes are allowed
    *   in source and translations strings.
    */
-  protected function makePoFile($path, $filename, $timestamp = NULL, array $translations = []) {
-    $timestamp = $timestamp ? $timestamp : REQUEST_TIME;
+  protected function makePoFile($path, string $filename, $timestamp = NULL, array $translations = []) {
+    $timestamp = $timestamp ?: \Drupal::time()->getRequestTime();
     $path = 'public://' . $path;
     $text = '';
     $po_header = <<<EOF
@@ -119,7 +127,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Type: text/plain; charset=utf-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\\n"
 

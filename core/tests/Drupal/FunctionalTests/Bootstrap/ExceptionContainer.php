@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Bootstrap;
 
 use Drupal\Core\DependencyInjection\Container;
@@ -13,7 +15,7 @@ class ExceptionContainer extends Container {
   /**
    * {@inheritdoc}
    */
-  public function get($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): ?object {
+  public function get(string $id, int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): ?object {
     if ($id === 'http_kernel') {
       throw new \Exception('Thrown exception during Container::get');
     }

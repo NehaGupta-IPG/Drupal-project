@@ -1,28 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\filter\Kernel;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Render\RenderContext;
+use Drupal\Core\Template\TwigThemeEngine;
 use Drupal\editor\EditorXssFilter\Standard;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\filter\FilterPluginCollection;
+use Drupal\filter\Plugin\Filter\FilterAutoP;
+use Drupal\filter\Plugin\Filter\FilterUrl;
 use Drupal\filter\Plugin\FilterInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore outro
+// cspell:ignore toolongdomainexampledomainexampledomainexampledomainexampledomain
 /**
  * Tests Filter module filters individually.
- *
- * @group filter
  */
+#[Group('filter')]
+#[RunTestsInSeparateProcesses]
 class FilterKernelTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'filter'];
 
@@ -46,7 +52,7 @@ class FilterKernelTest extends KernelTestBase {
   /**
    * Tests the align filter.
    */
-  public function testAlignFilter() {
+  public function testAlignFilter(): void {
     $filter = $this->filters['filter_align'];
 
     $test = function ($input) use ($filter) {
@@ -101,7 +107,7 @@ class FilterKernelTest extends KernelTestBase {
   /**
    * Tests the caption filter.
    */
-  public function testCaptionFilter() {
+  public function testCaptionFilter(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
     $filter = $this->filters['filter_caption'];
@@ -329,7 +335,7 @@ class FilterKernelTest extends KernelTestBase {
   /**
    * Tests the combination of the align and caption filters.
    */
-  public function testAlignAndCaptionFilters() {
+  public function testAlignAndCaptionFilters(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
     $align_filter = $this->filters['filter_align'];
@@ -404,7 +410,7 @@ class FilterKernelTest extends KernelTestBase {
   /**
    * Tests the line break filter.
    */
-  public function testLineBreakFilter() {
+  public function testLineBreakFilter(): void {
     // Get FilterAutoP object.
     $filter = $this->filters['filter_autop'];
 
@@ -436,6 +442,20 @@ class FilterKernelTest extends KernelTestBase {
       "One. <!-- comment --> Two.\n<!--\nThree.\n-->\n" => [
         '<!-- comment -->' => TRUE,
         "<!--\nThree.\n-->" => TRUE,
+      ],
+      // Do not add paragraph tags around Twig theme debugging.
+      "<p>Text here\n<!-- THEME DEBUG -->\n<!-- THEME HOOK: 'html' -->\n<!-- FILE NAME SUGGESTIONS:\n* html--node.html.twig\nx html.html.twig\n-->\n<!-- BEGIN OUTPUT from 'core/themes/olivero/templates/layout/html.html.twig' -->\n<span>Test</span></p>" => [
+        "<p>Text here" => TRUE,
+        "<p>Text here</p>" => FALSE,
+        "<span>Test</span></p>" => TRUE,
+        "<p><span>Test</span></p>" => FALSE,
+      ],
+      // Do not add paragraph tags around custom template Twig theme debugging.
+      "<p>Text here\n<!-- THEME DEBUG -->\n<!-- THEME HOOK: 'html' -->\n<!-- FILE NAME SUGGESTIONS:\n* html--node.html.twig\nx html.html.twig\n-->\n<!-- 💡 BEGIN CUSTOM TEMPLATE OUTPUT from 'custom/themes/custom-theme/templates/layout/html.html.twig' -->\n<span>Test</span></p>" => [
+        "<p>Text here" => TRUE,
+        "<p>Text here</p>" => FALSE,
+        "<span>Test</span></p>" => TRUE,
+        "<p><span>Test</span></p>" => FALSE,
       ],
       // Resulting HTML should produce matching paragraph tags.
       '<p><div>  </div></p>' => [
@@ -477,8 +497,51 @@ class FilterKernelTest extends KernelTestBase {
     // Very long string hitting PCRE limits.
     $limit = max((int) ini_get('pcre.backtrack_limit'), (int) ini_get('pcre.recursion_limit'));
     $source = $this->randomMachineName($limit);
-    $result = _filter_autop($source);
-    $this->assertEquals($result, '<p>' . $source . "</p>\n", 'Line break filter can process very long strings.');
+
+    $plugin = \Drupal::service('plugin.manager.filter')->createInstance('filter_autop');
+    assert($plugin instanceof FilterAutoP);
+
+    $result = $plugin->process($source, 'en');
+    $this->assertEquals($result->getProcessedText(), '<p>' . $source . "</p>\n", 'Line break filter can process very long strings.');
+  }
+
+  /**
+   * Tests that the line break filter does not apply to twig debug.
+   */
+  public function testLineBreakFilterTwigDebug(): void {
+
+    // Enable twig theme debug to ensure that any
+    // changes to theme debugging format force checking
+    // that the auto paragraph filter continues to be applied
+    // correctly.
+    $twig = \Drupal::service('twig');
+    $twig->enableDebug();
+
+    // Manually render a template in its simplest form.
+    $variables = [
+      'theme_hook_original' => 'container',
+      'directory' => '',
+      'children' => 'Test two',
+    ];
+    $render = (string) \Drupal::service(TwigThemeEngine::class)->renderTemplate('container', $variables);
+    $render = trim($render);
+
+    // Render text before applying the auto paragraph filter.
+    $this->assertSame("<!-- THEME DEBUG -->
+<!-- THEME HOOK: 'container' -->
+<!-- 💡 BEGIN CUSTOM TEMPLATE OUTPUT from 'container.html.twig' -->
+<div>Test two</div>
+
+<!-- END CUSTOM TEMPLATE OUTPUT from 'container.html.twig' -->", $render);
+    $plugin = \Drupal::service('plugin.manager.filter')->createInstance('filter_autop');
+    assert($plugin instanceof FilterAutoP);
+    $result = $plugin->process($render, 'en');
+
+    // After auto-p is applied, the theme debug should no longer have
+    // line breaks but the true line breaks should still.
+    $this->assertSame("<!-- THEME DEBUG --><!-- THEME HOOK: 'container' --><!-- 💡 BEGIN CUSTOM TEMPLATE OUTPUT from 'container.html.twig' --><div>Test two</div>
+
+<!-- END CUSTOM TEMPLATE OUTPUT from 'container.html.twig' -->", $result->getProcessedText());
   }
 
   /**
@@ -495,7 +558,7 @@ class FilterKernelTest extends KernelTestBase {
    * @todo Class, id, name and xmlns should be added to the list of forbidden
    *   attributes, or, better yet, use an allowed attribute list.
    */
-  public function testHtmlFilter() {
+  public function testHtmlFilter(): void {
     // Get FilterHtml object.
     $filter = $this->filters['filter_html'];
     $filter->setConfiguration([
@@ -595,7 +658,7 @@ class FilterKernelTest extends KernelTestBase {
   /**
    * Tests the spam deterrent.
    */
-  public function testNoFollowFilter() {
+  public function testNoFollowFilter(): void {
     // Get FilterHtml object.
     $filter = $this->filters['filter_html'];
     $filter->setConfiguration([
@@ -628,7 +691,7 @@ class FilterKernelTest extends KernelTestBase {
   /**
    * Tests the HTML escaping filter.
    */
-  public function testHtmlEscapeFilter() {
+  public function testHtmlEscapeFilter(): void {
     // Get FilterHtmlEscape object.
     $filter = $this->filters['filter_html_escape'];
 
@@ -645,7 +708,7 @@ class FilterKernelTest extends KernelTestBase {
   /**
    * Tests the URL filter.
    */
-  public function testUrlFilter() {
+  public function testUrlFilter(): void {
     // Get FilterUrl object.
     $filter = $this->filters['filter_url'];
     $filter->setConfiguration([
@@ -679,15 +742,15 @@ class FilterKernelTest extends KernelTestBase {
         '<a href="mailto:' . $email_with_plus_sign . '">' . $email_with_plus_sign . '</a>' => TRUE,
       ],
       // URI parts and special characters.
-      'http://trailingslash.com/ or www.trailingslash.com/
+      'http://trailing-slash.com/ or www.trailing-slash.com/
       http://host.com/some/path?query=foo&bar[baz]=beer#fragment or www.host.com/some/path?query=foo&bar[baz]=beer#fragment
       http://twitter.com/#!/example/status/22376963142324226
       http://example.com/@user/
       ftp://user:pass@ftp.example.com/~home/dir1
       sftp://user@nonstandardport:222/dir
       ssh://192.168.0.100/srv/git/drupal.git' => [
-        '<a href="http://trailingslash.com/">http://trailingslash.com/</a>' => TRUE,
-        '<a href="http://www.trailingslash.com/">www.trailingslash.com/</a>' => TRUE,
+        '<a href="http://trailing-slash.com/">http://trailing-slash.com/</a>' => TRUE,
+        '<a href="http://www.trailing-slash.com/">www.trailing-slash.com/</a>' => TRUE,
         '<a href="http://host.com/some/path?query=foo&amp;bar[baz]=beer#fragment">http://host.com/some/path?query=foo&amp;bar[baz]=beer#fragment</a>' => TRUE,
         '<a href="http://www.host.com/some/path?query=foo&amp;bar[baz]=beer#fragment">www.host.com/some/path?query=foo&amp;bar[baz]=beer#fragment</a>' => TRUE,
         '<a href="http://twitter.com/#!/example/status/22376963142324226">http://twitter.com/#!/example/status/22376963142324226</a>' => TRUE,
@@ -726,9 +789,11 @@ class FilterKernelTest extends KernelTestBase {
         'http://www.toolong' => FALSE,
         '<a href="mailto:me@me.tv">me@me.tv</a>' => TRUE,
       ],
-      // Absolute URL protocols.
-      // The list to test is found in the beginning of _filter_url() at
-      // $protocols = \Drupal::getContainer()->getParameter('filter_protocols').
+      // Absolute URL protocols. The list to test is found at the beginning of
+      // \Drupal\filter\Plugin\Filter\FilterUrl::process() at
+      // @code
+      // $protocols = $this->container->getParameter('filter_protocols').
+      // @endcode
       'https://example.com,
       ftp://ftp.example.com,
       news://example.net,
@@ -766,7 +831,7 @@ class FilterKernelTest extends KernelTestBase {
       Absolute URL and query string with 2 different punctuation characters (http://www.example.com/q=abc).
       Partial URL with brackets in the URL as well as surrounded brackets (www.foo.com/more_(than)_one_(parens)).
       Absolute URL with square brackets in the URL as well as surrounded brackets [https://www.drupal.org/?class[]=1]
-      Absolute URL with quotes "https://www.drupal.org/sample"' => [
+      Absolute URL with quotes "https://www.example.org/sample"' => [
         'period <a href="http://www.partial.com">www.partial.com</a>.' => TRUE,
         'comma <a href="mailto:person@example.com">person@example.com</a>,' => TRUE,
         'question <a href="http://www.absolute.com">http://www.absolute.com</a>?' => TRUE,
@@ -776,7 +841,7 @@ class FilterKernelTest extends KernelTestBase {
         'characters (<a href="http://www.example.com/q=abc">http://www.example.com/q=abc</a>).' => TRUE,
         'brackets (<a href="http://www.foo.com/more_(than)_one_(parens)">www.foo.com/more_(than)_one_(parens)</a>).' => TRUE,
         'brackets [<a href="https://www.drupal.org/?class[]=1">https://www.drupal.org/?class[]=1</a>]' => TRUE,
-        'quotes "<a href="https://www.drupal.org/sample">https://www.drupal.org/sample</a>"' => TRUE,
+        'quotes "<a href="https://www.example.org/sample">https://www.example.org/sample</a>"' => TRUE,
       ],
       '(www.parenthesis.com/dir?a=1&b=2#a)' => [
         '(<a href="http://www.parenthesis.com/dir?a=1&amp;b=2#a">www.parenthesis.com/dir?a=1&amp;b=2#a</a>)' => TRUE,
@@ -849,11 +914,11 @@ class FilterKernelTest extends KernelTestBase {
       '<script>
       <!--
         // @see www.example.com
-        var exampleurl = "http://example.net";
+        var example_url = "http://example.net";
       -->
       <!--//--><![CDATA[//><!--
         // @see www.example.com
-        var exampleurl = "http://example.net";
+        var example_url = "http://example.net";
       //--><!]]>
       </script>' => [
         'href="http://www.example.com"' => FALSE,
@@ -925,12 +990,12 @@ class FilterKernelTest extends KernelTestBase {
    *   strings and whose values are Booleans indicating whether the output is
    *   expected or not. For example:
    *   @code
-   *   $tests = array(
-   *     'Input string' => array(
+   *   $tests = [
+   *     'Input string' => [
    *       '<p>Input string</p>' => TRUE,
    *       'Input string<br' => FALSE,
-   *     ),
-   *   );
+   *     ],
+   *   ];
    *   @endcode
    *
    * @internal
@@ -940,18 +1005,18 @@ class FilterKernelTest extends KernelTestBase {
       $result = $filter->process($source, $filter)->getProcessedText();
       foreach ($tasks as $value => $is_expected) {
         if ($is_expected) {
-          $this->assertStringContainsString($value, $result, new FormattableMarkup('@source: @value found. Filtered result: @result.', [
-            '@source' => var_export($source, TRUE),
-            '@value' => var_export($value, TRUE),
-            '@result' => var_export($result, TRUE),
-          ]));
+          $this->assertStringContainsString($value, $result, sprintf('%s: %s found. Filtered result: %s.',
+            var_export($source, TRUE),
+            var_export($value, TRUE),
+            var_export($result, TRUE),
+          ));
         }
         else {
-          $this->assertStringNotContainsString($value, $result, new FormattableMarkup('@source: @value not found. Filtered result: @result.', [
-            '@source' => var_export($source, TRUE),
-            '@value' => var_export($value, TRUE),
-            '@result' => var_export($result, TRUE),
-          ]));
+          $this->assertStringNotContainsString($value, $result, sprintf('%s: %s not found. Filtered result: %s.',
+            var_export($source, TRUE),
+            var_export($value, TRUE),
+            var_export($result, TRUE),
+          ));
         }
       }
     }
@@ -975,7 +1040,7 @@ class FilterKernelTest extends KernelTestBase {
    * - Mix of absolute and partial URLs, and email addresses in one content.
    * - Input that exceeds PCRE backtracking limit.
    */
-  public function testUrlFilterContent() {
+  public function testUrlFilterContent(): void {
     // Get FilterUrl object.
     $filter = $this->filters['filter_url'];
     $filter->setConfiguration([
@@ -985,25 +1050,32 @@ class FilterKernelTest extends KernelTestBase {
     ]);
     $path = __DIR__ . '/../..';
 
+    $plugin = \Drupal::service('plugin.manager.filter')->createInstance('filter_url', [
+      'settings' => ['filter_url_length' => 72],
+    ]);
+    assert($plugin instanceof FilterUrl);
+
     $input = file_get_contents($path . '/filter.url-input.txt');
     $expected = file_get_contents($path . '/filter.url-output.txt');
-    $result = _filter_url($input, $filter);
-    $this->assertSame($expected, $result, 'Complex HTML document was correctly processed.');
+    $result = $plugin->process($input, 'en');
+    $this->assertSame($expected, $result->getProcessedText(), 'Complex HTML document was correctly processed.');
 
     $pcre_backtrack_limit = ini_get('pcre.backtrack_limit');
     // Setting this limit to the smallest possible value should cause PCRE
-    // errors and break the various preg_* functions used by _filter_url().
+    // errors and break the various preg_* functions used by
+    // \Drupal\filter\Plugin\Filter\FilterUrl::process().
     ini_set('pcre.backtrack_limit', 1);
 
-    // If PCRE errors occur, _filter_url() should return the exact same text.
+    // If PCRE errors occur, Drupal\filter\Plugin\Filter\FilterUrl::process()
+    // should return the exact same text.
     // Case of a small and simple HTML document.
     $input = $expected = '<p>www.test.com</p>';
-    $result = _filter_url($input, $filter);
-    $this->assertSame($expected, $result, 'Simple HTML document was left intact when PCRE errors occurred.');
+    $result = $plugin->process($input, 'en');
+    $this->assertSame($expected, $result->getProcessedText(), 'Simple HTML document was left intact when PCRE errors occurred.');
     // Case of a complex HTML document.
     $input = $expected = file_get_contents($path . '/filter.url-input.txt');
-    $result = _filter_url($input, $filter);
-    $this->assertSame($expected, $result, 'Complex HTML document was left intact when PCRE errors occurred.');
+    $result = $plugin->process($input, 'en');
+    $this->assertSame($expected, $result->getProcessedText(), 'Complex HTML document was left intact when PCRE errors occurred.');
 
     // Setting limit back to default.
     ini_set('pcre.backtrack_limit', $pcre_backtrack_limit);
@@ -1014,7 +1086,7 @@ class FilterKernelTest extends KernelTestBase {
    *
    * @todo This test could really use some validity checking function.
    */
-  public function testHtmlCorrectorFilter() {
+  public function testHtmlCorrectorFilter(): void {
     // Tag closing.
     $f = Html::normalize('<p>text');
     $this->assertEquals('<p>text</p>', $f, 'HTML corrector -- tag closing at the end of input.');
@@ -1124,7 +1196,7 @@ class FilterKernelTest extends KernelTestBase {
 body {color:red}
 /*]]>*/
 </style></p>';
-    $this->assertEquals($html, Html::normalize($html), new FormattableMarkup('HTML corrector -- Existing cdata section @pattern_name properly escaped', ['@pattern_name' => '/*<![CDATA[*/']));
+    $this->assertEquals($html, Html::normalize($html), 'HTML corrector -- Existing cdata section /*<![CDATA[*/ properly escaped');
 
     $html = '<p><style>
 /*<![CDATA[*/
@@ -1132,28 +1204,28 @@ body {color:red}
   body {color:red}
 /*]]>*/
 </style></p>';
-    $this->assertEquals($html, Html::normalize($html), new FormattableMarkup('HTML corrector -- Existing cdata section @pattern_name properly escaped', ['@pattern_name' => '<!--/*--><![CDATA[/* ><!--*/']));
+    $this->assertEquals($html, Html::normalize($html), 'HTML corrector -- Existing cdata section <!--/*--><![CDATA[/* ><!--*/ properly escaped');
 
     $html = '<p><script>
 //<![CDATA[
   alert("test");
 //]]>
 </script></p>';
-    $this->assertEquals($html, Html::normalize($html), new FormattableMarkup('HTML corrector -- Existing cdata section @pattern_name properly escaped', ['@pattern_name' => '<!--//--><![CDATA[// ><!--']));
+    $this->assertEquals($html, Html::normalize($html), 'HTML corrector -- Existing cdata section <!--//--><![CDATA[// ><!-- properly escaped');
 
     $html = '<p><script>
 // <![CDATA[
   alert("test");
 //]]>
 </script></p>';
-    $this->assertEquals($html, Html::normalize($html), new FormattableMarkup('HTML corrector -- Existing cdata section @pattern_name properly escaped', ['@pattern_name' => '// <![CDATA[']));
+    $this->assertEquals($html, Html::normalize($html), 'HTML corrector -- Existing cdata section // <![CDATA[ properly escaped');
 
     $html = '<p><script>
 // <![CDATA[![CDATA[![CDATA[
   alert("test");
 //]]]]]]>
 </script></p>';
-    $this->assertEquals($html, Html::normalize($html), new FormattableMarkup('HTML corrector -- Existing cdata section @pattern_name properly escaped', ['@pattern_name' => '// <![CDATA[![CDATA[![CDATA[']));
+    $this->assertEquals($html, Html::normalize($html), 'HTML corrector -- Existing cdata section // <![CDATA[![CDATA[![CDATA[ properly escaped');
 
     // Test calling Html::normalize() twice.
     $html = '<p><script>
@@ -1161,7 +1233,7 @@ body {color:red}
   alert("test");
 //]]]]]]>
 </script></p>';
-    $this->assertEquals($html, Html::normalize(Html::normalize($html)), new FormattableMarkup('HTML corrector -- Existing cdata section @pattern_name properly escaped', ['@pattern_name' => '// <![CDATA[![CDATA[![CDATA[']));
+    $this->assertEquals($html, Html::normalize(Html::normalize($html)), 'HTML corrector -- Existing cdata section // <![CDATA[![CDATA[![CDATA[ properly escaped');
   }
 
   /**

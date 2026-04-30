@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\early_rendering_controller_test;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -18,7 +20,7 @@ class TestDomainObjectViewSubscriber implements EventSubscriberInterface {
    * @param \Symfony\Component\HttpKernel\Event\ViewEvent $event
    *   The event to process.
    */
-  public function onViewTestDomainObject(ViewEvent $event) {
+  public function onViewTestDomainObject(ViewEvent $event): void {
     $result = $event->getControllerResult();
 
     if ($result instanceof TestDomainObject) {

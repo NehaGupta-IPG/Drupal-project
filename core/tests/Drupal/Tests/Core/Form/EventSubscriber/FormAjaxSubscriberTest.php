@@ -8,10 +8,15 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Form\EventSubscriber\FormAjaxSubscriber;
 use Drupal\Core\Form\Exception\BrokenPostRequestException;
 use Drupal\Core\Form\FormAjaxException;
+use Drupal\Core\Form\FormAjaxResponseBuilderInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -19,9 +24,10 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
- * @coversDefaultClass \Drupal\Core\Form\EventSubscriber\FormAjaxSubscriber
- * @group EventSubscriber
+ * Tests Drupal\Core\Form\EventSubscriber\FormAjaxSubscriber.
  */
+#[CoversClass(FormAjaxSubscriber::class)]
+#[Group('EventSubscriber')]
 class FormAjaxSubscriberTest extends UnitTestCase {
 
   /**
@@ -30,14 +36,14 @@ class FormAjaxSubscriberTest extends UnitTestCase {
   protected $subscriber;
 
   /**
-   * @var \Drupal\Core\Form\FormAjaxResponseBuilderInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The form AJAX response builder mock.
    */
-  protected $formAjaxResponseBuilder;
+  protected FormAjaxResponseBuilderInterface&MockObject $formAjaxResponseBuilder;
 
   /**
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The HTTP kernel mock.
    */
-  protected $httpKernel;
+  protected HttpKernelInterface&Stub $httpKernel;
 
   /**
    * The mocked string translation.
@@ -47,11 +53,9 @@ class FormAjaxSubscriberTest extends UnitTestCase {
   protected $stringTranslation;
 
   /**
-   * The mocked messenger.
-   *
-   * @var \Drupal\Core\Messenger\MessengerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The messenger.
    */
-  protected $messenger;
+  protected MessengerInterface&Stub $messenger;
 
   /**
    * The event used to derive the response.
@@ -66,17 +70,17 @@ class FormAjaxSubscriberTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->httpKernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+    $this->httpKernel = $this->createStub(HttpKernelInterface::class);
     $this->formAjaxResponseBuilder = $this->createMock('Drupal\Core\Form\FormAjaxResponseBuilderInterface');
     $this->stringTranslation = $this->getStringTranslationStub();
-    $this->messenger = $this->createMock(MessengerInterface::class);
+    $this->messenger = $this->createStub(MessengerInterface::class);
     $this->subscriber = new FormAjaxSubscriber($this->formAjaxResponseBuilder, $this->stringTranslation, $this->messenger);
   }
 
   /**
-   * @covers ::onException
+   * Tests on exception.
    */
-  public function testOnException() {
+  public function testOnException(): void {
     $form = ['#type' => 'form', '#build_id' => 'the_build_id'];
     $expected_form = $form + [
       '#build_id_old' => 'the_build_id',
@@ -99,9 +103,9 @@ class FormAjaxSubscriberTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::onException
+   * Tests on exception new build id.
    */
-  public function testOnExceptionNewBuildId() {
+  public function testOnExceptionNewBuildId(): void {
     $form = ['#type' => 'form', '#build_id' => 'the_build_id'];
     $expected_form = $form + [
       '#build_id_old' => 'a_new_build_id',
@@ -124,9 +128,9 @@ class FormAjaxSubscriberTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::onException
+   * Tests on exception other class.
    */
-  public function testOnExceptionOtherClass() {
+  public function testOnExceptionOtherClass(): void {
     $request = new Request();
     $exception = new \Exception();
 
@@ -137,9 +141,9 @@ class FormAjaxSubscriberTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::onException
+   * Tests on exception response builder exception.
    */
-  public function testOnExceptionResponseBuilderException() {
+  public function testOnExceptionResponseBuilderException(): void {
     $form = ['#type' => 'form', '#build_id' => 'the_build_id'];
     $expected_form = $form + [
       '#build_id_old' => 'the_build_id',
@@ -160,12 +164,13 @@ class FormAjaxSubscriberTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::onException
+   * Tests on exception broken post request.
    */
-  public function testOnExceptionBrokenPostRequest() {
+  public function testOnExceptionBrokenPostRequest(): void {
     $this->formAjaxResponseBuilder->expects($this->never())
       ->method('buildResponse');
 
+    $this->messenger = $this->createMock(MessengerInterface::class);
     $this->messenger->expects($this->once())
       ->method('addError');
 
@@ -178,7 +183,7 @@ class FormAjaxSubscriberTest extends UnitTestCase {
     $renderer->expects($this->once())
       ->method('renderRoot')
       ->with()
-      ->willReturnCallback(function (&$elements) use ($rendered_output) {
+      ->willReturnCallback(function (array &$elements) use ($rendered_output): string {
         $elements['#attached'] = [];
         return $rendered_output;
       });
@@ -206,10 +211,12 @@ class FormAjaxSubscriberTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::onException
-   * @covers ::getFormAjaxException
+   * Tests on exception nested exception.
+   *
+   * @legacy-covers ::onException
+   * @legacy-covers ::getFormAjaxException
    */
-  public function testOnExceptionNestedException() {
+  public function testOnExceptionNestedException(): void {
     $form = ['#type' => 'form', '#build_id' => 'the_build_id'];
     $expected_form = $form + [
       '#build_id_old' => 'the_build_id',
@@ -231,9 +238,11 @@ class FormAjaxSubscriberTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getFormAjaxException
+   * Tests on exception nested wrong exception.
+   *
+   * @legacy-covers ::getFormAjaxException
    */
-  public function testOnExceptionNestedWrongException() {
+  public function testOnExceptionNestedWrongException(): void {
     $nested_exception = new \Exception();
     $exception = new \Exception('', 0, $nested_exception);
     $request = new Request();

@@ -2,6 +2,7 @@
 
 namespace Drupal\user\Form;
 
+use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -17,40 +18,18 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class UserPermissionsForm extends FormBase {
 
   /**
-   * The permission handler.
-   *
-   * @var \Drupal\user\PermissionHandlerInterface
-   */
-  protected $permissionHandler;
-
-  /**
-   * The role storage.
-   *
-   * @var \Drupal\user\RoleStorageInterface
-   */
-  protected $roleStorage;
-
-  /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
    * Constructs a new UserPermissionsForm.
    *
-   * @param \Drupal\user\PermissionHandlerInterface $permission_handler
+   * @param \Drupal\user\PermissionHandlerInterface $permissionHandler
    *   The permission handler.
-   * @param \Drupal\user\RoleStorageInterface $role_storage
+   * @param \Drupal\user\RoleStorageInterface $roleStorage
    *   The role storage.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
+   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
+   *   The module extension list.
    */
-  public function __construct(PermissionHandlerInterface $permission_handler, RoleStorageInterface $role_storage, ModuleHandlerInterface $module_handler) {
-    $this->permissionHandler = $permission_handler;
-    $this->roleStorage = $role_storage;
-    $this->moduleHandler = $module_handler;
+  public function __construct(protected PermissionHandlerInterface $permissionHandler, protected RoleStorageInterface $roleStorage, protected ModuleHandlerInterface $moduleHandler, protected ModuleExtensionList $moduleExtensionList) {
   }
 
   /**
@@ -60,7 +39,8 @@ class UserPermissionsForm extends FormBase {
     return new static(
       $container->get('user.permissions'),
       $container->get('entity_type.manager')->getStorage('user_role'),
-      $container->get('module_handler')
+      $container->get('module_handler'),
+      $container->get('extension.list.module'),
     );
   }
 
@@ -78,7 +58,7 @@ class UserPermissionsForm extends FormBase {
    *   An array of role objects.
    */
   protected function getRoles() {
-    return $this->roleStorage->loadMultiple();
+    return $this->roleStorage->loadMultipleOverrideFree();
   }
 
   /**
@@ -165,6 +145,7 @@ class UserPermissionsForm extends FormBase {
 
     $form['permissions'] = [
       '#type' => 'table',
+      '#empty' => $this->t('No permissions found.'),
       '#header' => [$this->t('Permission')],
       '#id' => 'permissions',
       '#attributes' => ['class' => ['permissions', 'js-permissions']],
@@ -179,14 +160,14 @@ class UserPermissionsForm extends FormBase {
 
     foreach ($this->permissionsByProvider() as $provider => $permissions) {
       // Module name.
-      $form['permissions'][$provider] = [
+      $form['permissions']['module_' . $provider] = [
         [
           '#wrapper_attributes' => [
             'colspan' => count($role_names) + 1,
             'class' => ['module'],
             'id' => 'module-' . $provider,
           ],
-          '#markup' => $this->moduleHandler->getName($provider),
+          '#markup' => $this->moduleExtensionList->getName($provider),
         ],
       ];
       foreach ($permissions as $perm => $perm_item) {

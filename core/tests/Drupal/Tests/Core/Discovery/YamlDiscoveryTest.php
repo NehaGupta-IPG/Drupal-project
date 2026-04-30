@@ -10,13 +10,13 @@ use Drupal\Core\Discovery\YamlDiscovery;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use org\bovigo\vfs\vfsStreamWrapper;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
  * YamlDiscovery component unit tests.
- *
- * @group Discovery
  */
+#[Group('Discovery')]
 class YamlDiscoveryTest extends TestCase {
 
   /**
@@ -30,7 +30,7 @@ class YamlDiscoveryTest extends TestCase {
   /**
    * Tests if filename is output for a broken YAML file.
    */
-  public function testFilenameForBrokenYml() {
+  public function testFilenameForBrokenYml(): void {
     vfsStreamWrapper::register();
     $root = new vfsStreamDirectory('modules');
     vfsStreamWrapper::setRoot($root);

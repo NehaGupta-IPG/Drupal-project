@@ -1,17 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Component\Serialization\Yaml;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cSpell:ignore Anónimo Aplicar
-
 /**
  * Verifies that installing from existing configuration works.
- *
- * @group Installer
  */
-class InstallerExistingConfigSyncDirectoryMultilingualTest extends InstallerExistingConfigTestBase {
+#[Group('Installer')]
+#[RunTestsInSeparateProcesses]
+class InstallerExistingConfigSyncDirectoryMultilingualTest extends InstallerConfigDirectoryTestBase {
 
   /**
    * {@inheritdoc}
@@ -31,24 +34,24 @@ class InstallerExistingConfigSyncDirectoryMultilingualTest extends InstallerExis
   /**
    * Installer step: Select installation profile.
    */
-  protected function setUpProfile() {
+  protected function setUpProfile(): void {
     // Ensure the site name 'Multilingual' appears as expected in the 'Use
     // existing configuration' radio description.
     $this->assertSession()->pageTextContains('Install Multilingual using existing configuration.');
-    return parent::setUpProfile();
+    parent::setUpProfile();
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getConfigTarball() {
-    return __DIR__ . '/../../../fixtures/config_install/multilingual.tar.gz';
+  protected function getConfigLocation(): string {
+    return __DIR__ . '/../../../fixtures/config_install/multilingual';
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function prepareEnvironment() {
+  protected function prepareEnvironment(): void {
     parent::prepareEnvironment();
     // Place custom local translations in the translations directory and fix up
     // configuration.
@@ -56,14 +59,13 @@ class InstallerExistingConfigSyncDirectoryMultilingualTest extends InstallerExis
     file_put_contents($this->publicFilesDirectory . '/translations/drupal-8.0.0.es.po', $this->getPo('es'));
     $locale_settings = Yaml::decode(file_get_contents($this->siteDirectory . '/config/sync/locale.settings.yml'));
     $locale_settings['translation']['use_source'] = 'local';
-    $locale_settings['translation']['path'] = $this->publicFilesDirectory . '/translations';
     file_put_contents($this->siteDirectory . '/config/sync/locale.settings.yml', Yaml::encode($locale_settings));
   }
 
   /**
    * Confirms that the installation installed the configuration correctly.
    */
-  public function testConfigSync() {
+  public function testConfigSync(): void {
     $comparer = $this->configImporter()->getStorageComparer();
     $expected_changelist_default_collection = [
       'create' => [],
@@ -193,7 +195,7 @@ PO;
    * @return string
    *   Contents for the test .po file.
    */
-  protected function getPo($langcode) {
+  protected function getPo($langcode): string {
     return <<<PO
 msgid ""
 msgstr ""

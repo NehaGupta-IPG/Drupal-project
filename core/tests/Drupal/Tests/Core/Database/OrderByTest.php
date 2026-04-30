@@ -8,12 +8,13 @@ use Drupal\Core\Database\Query\Select;
 use Drupal\Tests\Core\Database\Stub\StubConnection;
 use Drupal\Tests\Core\Database\Stub\StubPDO;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
+// cspell:ignore tablenode
 /**
  * Tests the orderBy() method of select queries.
- *
- * @group Database
  */
+#[Group('Database')]
 class OrderByTest extends UnitTestCase {
 
   /**
@@ -29,7 +30,7 @@ class OrderByTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $mockPdo = $this->createMock(StubPDO::class);
+    $mockPdo = $this->createStub(StubPDO::class);
     $connection = new StubConnection($mockPdo, []);
     $this->query = new Select($connection, 'test', NULL);
   }
@@ -37,7 +38,7 @@ class OrderByTest extends UnitTestCase {
   /**
    * Checks that invalid sort directions in ORDER BY get converted to ASC.
    */
-  public function testInvalidDirection() {
+  public function testInvalidDirection(): void {
     $this->query->orderBy('test', 'invalid direction');
     $order_bys = $this->query->getOrderBy();
     $this->assertEquals('ASC', $order_bys['test'], 'Invalid order by direction is converted to ASC.');
@@ -46,7 +47,7 @@ class OrderByTest extends UnitTestCase {
   /**
    * Tests that fields passed for ordering get escaped properly.
    */
-  public function testFieldEscaping() {
+  public function testFieldEscaping(): void {
     $this->query->orderBy('x; DROP table node; --');
     $sql = $this->query->__toString();
     $this->assertStringEndsWith('ORDER BY xDROPtablenode ASC', $sql, 'Order by field is escaped correctly.');

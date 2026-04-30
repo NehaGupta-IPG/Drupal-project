@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\views_ui\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the admin UI AJAX interactions.
- *
- * @group views_ui
  */
+#[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class AdminAjaxTest extends WebDriverTestBase {
 
   /**
@@ -39,7 +41,7 @@ class AdminAjaxTest extends WebDriverTestBase {
   /**
    * Confirms that form_alter is triggered after AJAX rebuilds.
    */
-  public function testAjaxRebuild() {
+  public function testAjaxRebuild(): void {
     \Drupal::service('theme_installer')->install(['views_ui_test_theme']);
 
     $this->config('system.theme')
@@ -64,7 +66,7 @@ class AdminAjaxTest extends WebDriverTestBase {
   /**
    * Tests body scroll.
    */
-  public function testBodyScroll() {
+  public function testBodyScroll(): void {
     $this->drupalGet('admin/structure/views/view/user_admin_people');
     $page = $this->getSession()->getPage();
     foreach (['name[views.nothing]', 'name[views.dropbutton]'] as $field) {

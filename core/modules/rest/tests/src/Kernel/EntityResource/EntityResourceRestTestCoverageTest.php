@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\rest\Kernel\EntityResource;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
@@ -7,6 +9,8 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Checks that all core content/config entity types have REST test coverage.
@@ -16,9 +20,10 @@ use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
  * - every authentication provider in core (anon, cookie, basic_auth)
  *
  * Additionally, every entity type must have the correct parent test class.
- *
- * @group rest
  */
+#[Group('rest')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class EntityResourceRestTestCoverageTest extends KernelTestBase {
 
   /**
@@ -39,8 +44,9 @@ class EntityResourceRestTestCoverageTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installConfig('system');
     $all_modules = $this->container->get('extension.list.module')->getList();
-    $stable_core_modules = array_filter($all_modules, function ($module) {
+    $stable_core_modules = array_filter($all_modules, function ($module): bool {
       // Filter out contrib, hidden, testing, deprecated and experimental
       // modules. We also don't need to enable modules that are already enabled.
       return $module->origin === 'core' &&
@@ -48,7 +54,8 @@ class EntityResourceRestTestCoverageTest extends KernelTestBase {
         $module->status == FALSE &&
         $module->info['package'] !== 'Testing' &&
         $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] !== ExtensionLifecycle::DEPRECATED &&
-        $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] !== ExtensionLifecycle::EXPERIMENTAL;
+        $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] !== ExtensionLifecycle::EXPERIMENTAL &&
+        $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] !== ExtensionLifecycle::OBSOLETE;
     });
 
     $this->container->get('module_installer')->install(array_keys($stable_core_modules));
@@ -57,7 +64,7 @@ class EntityResourceRestTestCoverageTest extends KernelTestBase {
 
     // Entity types marked as "internal" are not exposed by the entity REST
     // resource plugin and hence also don't need test coverage.
-    $this->definitions = array_filter($this->definitions, function (EntityTypeInterface $entity_type) {
+    $this->definitions = array_filter($this->definitions, function (EntityTypeInterface $entity_type): bool {
       return !$entity_type->isInternal();
     });
   }
@@ -65,7 +72,7 @@ class EntityResourceRestTestCoverageTest extends KernelTestBase {
   /**
    * Tests that all core content/config entity types have REST test coverage.
    */
-  public function testEntityTypeRestTestCoverage() {
+  public function testEntityTypeRestTestCoverage(): void {
     $tests = [
       // Test coverage for formats provided by the 'serialization' module.
       'serialization' => [
@@ -94,13 +101,16 @@ class EntityResourceRestTestCoverageTest extends KernelTestBase {
         foreach ($info['class suffix'] as $postfix) {
           $class = str_replace(['PROVIDER', 'CLASS'], [$module_name, $class_name], $path . $postfix);
           $class_alternative = str_replace("\\Drupal\\Tests\\$module_name\\Functional", '\Drupal\FunctionalTests', $class);
-          if (class_exists($class) || class_exists($class_alternative)) {
+          // For entities defined in the system module with Jsonapi tests in
+          // another module.
+          $class_entity_in_system_alternative = str_replace(['PROVIDER', 'CLASS'], [$entity_type_id, $class_name], $path . $postfix);
+          if (class_exists($class) || class_exists($class_alternative) || class_exists($class_entity_in_system_alternative)) {
             continue;
           }
           $missing_tests[] = $postfix;
         }
         if (!empty($missing_tests)) {
-          $missing_tests_list = implode(', ', array_map(function ($missing_test) use ($class_name) {
+          $missing_tests_list = implode(', ', array_map(function (string $missing_test) use ($class_name): string {
             return $class_name . $missing_test;
           }, $missing_tests));
           $which_normalization = $module === 'serialization' ? 'default' : $module;
@@ -109,7 +119,9 @@ class EntityResourceRestTestCoverageTest extends KernelTestBase {
       }
 
       $config_entity = is_subclass_of($class_name_full, ConfigEntityInterface::class);
-      $config_test = is_subclass_of($class, ConfigEntityResourceTestBase::class) || is_subclass_of($class_alternative, ConfigEntityResourceTestBase::class);
+      $config_test = is_subclass_of($class, ConfigEntityResourceTestBase::class)
+        || is_subclass_of($class_alternative, ConfigEntityResourceTestBase::class)
+        || is_subclass_of($class_entity_in_system_alternative, ConfigEntityResourceTestBase::class);
       if ($config_entity && !$config_test) {
         $problems[] = "$entity_type_id: $class_name is a config entity, but the test is for content entities.";
       }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\system_test\Form;
 
 use Drupal\Core\Form\FormBase;
@@ -45,7 +47,7 @@ class CopyFieldValueTestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     // We are only testing the JavaScript part of form. We are not submitting
     // form.
   }

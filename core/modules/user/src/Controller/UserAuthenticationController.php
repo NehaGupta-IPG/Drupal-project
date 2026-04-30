@@ -6,7 +6,7 @@ use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
-use Drupal\user\UserAuthInterface;
+use Drupal\user\UserAuthenticationInterface;
 use Drupal\user\UserFloodControlInterface;
 use Drupal\user\UserInterface;
 use Drupal\user\UserStorageInterface;
@@ -21,6 +21,10 @@ use Symfony\Component\Serializer\Serializer;
 
 /**
  * Provides controllers for login, login status and logout via HTTP requests.
+ *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use
+ * \Drupal\rest\Controller\RestAuthenticationController instead.
+ * @see https://www.drupal.org/node/3552724
  */
 class UserAuthenticationController extends ControllerBase implements ContainerInjectionInterface {
 
@@ -29,14 +33,14 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    *
    * @var string
    */
-  const LOGGED_IN = 1;
+  const LOGGED_IN = '1';
 
   /**
    * String sent in responses, to describe the user as being logged out.
    *
    * @var string
    */
-  const LOGGED_OUT = 0;
+  const LOGGED_OUT = '0';
 
   /**
    * The user flood control service.
@@ -62,7 +66,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
   /**
    * The user authentication.
    *
-   * @var \Drupal\user\UserAuthInterface
+   * @var \Drupal\user\UserAuthenticationInterface
    */
   protected $userAuth;
 
@@ -103,7 +107,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    *   The user storage.
    * @param \Drupal\Core\Access\CsrfTokenGenerator $csrf_token
    *   The CSRF token generator.
-   * @param \Drupal\user\UserAuthInterface $user_auth
+   * @param \Drupal\user\UserAuthenticationInterface $user_auth
    *   The user authentication.
    * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
    *   The route provider.
@@ -114,7 +118,8 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
    */
-  public function __construct(UserFloodControlInterface $user_flood_control, UserStorageInterface $user_storage, CsrfTokenGenerator $csrf_token, UserAuthInterface $user_auth, RouteProviderInterface $route_provider, Serializer $serializer, array $serializer_formats, LoggerInterface $logger) {
+  public function __construct(UserFloodControlInterface $user_flood_control, UserStorageInterface $user_storage, CsrfTokenGenerator $csrf_token, UserAuthenticationInterface $user_auth, RouteProviderInterface $route_provider, Serializer $serializer, array $serializer_formats, LoggerInterface $logger) {
+    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use \Drupal\rest\Controller\RestAuthenticationController instead. See https://www.drupal.org/node/3552724', E_USER_DEPRECATED);
     $this->userFloodControl = $user_flood_control;
     $this->userStorage = $user_storage;
     $this->csrfToken = $csrf_token;
@@ -178,36 +183,37 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
 
     $this->floodControl($request, $credentials['name']);
 
-    if ($this->userIsBlocked($credentials['name'])) {
-      throw new BadRequestHttpException('The user has not been activated or is blocked.');
-    }
-
-    if ($uid = $this->userAuth->authenticate($credentials['name'], $credentials['pass'])) {
-      $this->userFloodControl->clear('user.http_login', $this->getLoginFloodIdentifier($request, $credentials['name']));
-      /** @var \Drupal\user\UserInterface $user */
-      $user = $this->userStorage->load($uid);
-      $this->userLoginFinalize($user);
-
-      // Send basic metadata about the logged in user.
-      $response_data = [];
-      if ($user->get('uid')->access('view', $user)) {
-        $response_data['current_user']['uid'] = $user->id();
+    $account = $this->userAuth->lookupAccount($credentials['name']);
+    if ($account) {
+      if ($account->isBlocked()) {
+        throw new BadRequestHttpException('The user has not been activated or is blocked.');
       }
-      if ($user->get('roles')->access('view', $user)) {
-        $response_data['current_user']['roles'] = $user->getRoles();
-      }
-      if ($user->get('name')->access('view', $user)) {
-        $response_data['current_user']['name'] = $user->getAccountName();
-      }
-      $response_data['csrf_token'] = $this->csrfToken->get('rest');
+      $authenticated = $this->userAuth->authenticateAccount($account, $credentials['pass']) && $account->id();
+      if ($authenticated) {
+        $this->userFloodControl->clear('user.http_login', $this->getLoginFloodIdentifier($request, $credentials['name']));
+        $this->userLoginFinalize($account);
 
-      $logout_route = $this->routeProvider->getRouteByName('user.logout.http');
-      // Trim '/' off path to match \Drupal\Core\Access\CsrfAccessCheck.
-      $logout_path = ltrim($logout_route->getPath(), '/');
-      $response_data['logout_token'] = $this->csrfToken->get($logout_path);
+        // Send basic metadata about the logged in user.
+        $response_data = [];
+        if ($account->get('uid')->access('view', $account)) {
+          $response_data['current_user']['uid'] = $account->id();
+        }
+        if ($account->get('roles')->access('view', $account)) {
+          $response_data['current_user']['roles'] = $account->getRoles();
+        }
+        if ($account->get('name')->access('view', $account)) {
+          $response_data['current_user']['name'] = $account->getAccountName();
+        }
+        $response_data['csrf_token'] = $this->csrfToken->get('rest');
 
-      $encoded_response_data = $this->serializer->encode($response_data, $format);
-      return new Response($encoded_response_data);
+        $logout_route = $this->routeProvider->getRouteByName('user.logout.http');
+        // Trim '/' off path to match \Drupal\Core\Access\CsrfAccessCheck.
+        $logout_path = ltrim($logout_route->getPath(), '/');
+        $response_data['logout_token'] = $this->csrfToken->get($logout_path);
+
+        $encoded_response_data = $this->serializer->encode($response_data, $format);
+        return new Response($encoded_response_data);
+      }
     }
 
     $flood_config = $this->config('user.flood');
@@ -216,7 +222,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
     }
     // Always register an IP-based failed login event.
     $this->userFloodControl->register('user.failed_login_ip', $flood_config->get('ip_window'));
-    throw new BadRequestHttpException('Sorry, unrecognized username or password.');
+    throw new BadRequestHttpException('Unrecognized username or password.');
   }
 
   /**
@@ -250,10 +256,10 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
       $users = $this->userStorage->loadByProperties(['mail' => trim($identifier)]);
     }
 
-    /** @var \Drupal\Core\Session\AccountInterface $account */
+    /** @var \Drupal\user\UserInterface $account */
     $account = reset($users);
     if ($account && $account->id()) {
-      if ($this->userIsBlocked($account->getAccountName())) {
+      if ($account->isBlocked()) {
         $this->logger->error('Unable to send password reset email for blocked or not yet activated user %identifier.', [
           '%identifier' => $identifier,
         ]);
@@ -266,7 +272,10 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
         throw new BadRequestHttpException('Unable to send email. Contact the site administrator if the problem persists.');
       }
       else {
-        $this->logger->info('Password reset instructions mailed to %name at %email.', ['%name' => $account->getAccountName(), '%email' => $account->getEmail()]);
+        $this->logger->info('Password reset instructions mailed to %name at %email.', [
+          '%name' => $account->getAccountName(),
+          '%email' => $account->getEmail(),
+        ]);
         return new Response();
       }
     }
@@ -276,19 +285,6 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
       '%identifier' => $identifier,
     ]);
     return new Response();
-  }
-
-  /**
-   * Verifies if the user is blocked.
-   *
-   * @param string $name
-   *   The username.
-   *
-   * @return bool
-   *   TRUE if the user is blocked, otherwise FALSE.
-   */
-  protected function userIsBlocked($name) {
-    return user_is_blocked($name);
   }
 
   /**
@@ -348,7 +344,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
   protected function getRequestFormat(Request $request) {
     $format = $request->getRequestFormat();
     if (!in_array($format, $this->serializerFormats)) {
-      throw new BadRequestHttpException("Unrecognized format: $format.");
+      throw new BadRequestHttpException("Unrecognized format.");
     }
     return $format;
   }
