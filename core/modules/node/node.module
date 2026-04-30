@@ -64,10 +64,18 @@ function node_get_type_label(NodeInterface $node) {
 function node_is_page(NodeInterface $node) {
   @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no replacement, check the view mode instead during rendering. See https://www.drupal.org/node/3531945', E_USER_DEPRECATED);
   $route_match = \Drupal::routeMatch();
-  if ($route_match->getRouteName() == 'entity.node.canonical') {
+  if ($route_match->getRouteName() == 'entity.node.canonical' || $route_match->getRouteName() == 'entity.node.revision') {
     $page_node = $route_match->getParameter('node');
+    // The Node's node parameter is typically a Node object.
+    if (is_a($page_node, 'Drupal\node\Entity\Node')) {
+      $nid = $page_node->id();
+    }
+    // The Node Revision's node parameter is typically a string.
+    elseif (is_string($page_node)) {
+      $nid = $page_node;
+    }
   }
-  return (!empty($page_node) ? $page_node->id() == $node->id() : FALSE);
+  return (!empty($nid) ? $nid == $node->id() : FALSE);
 }
 
 /**
