@@ -6,12 +6,13 @@ namespace Drupal\Tests\user\Unit\Menu;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Tests\Core\Menu\LocalTaskIntegrationTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests user local tasks.
- *
- * @group user
  */
+#[Group('user')]
 class UserLocalTasksTest extends LocalTaskIntegrationTestBase {
 
   /**
@@ -22,8 +23,8 @@ class UserLocalTasksTest extends LocalTaskIntegrationTestBase {
     parent::setUp();
 
     // Add services required for user local tasks.
-    $entity_type_manager = $this->createMock(EntityTypeManagerInterface::class);
-    $entity_type_manager->expects($this->any())
+    $entity_type_manager = $this->createStub(EntityTypeManagerInterface::class);
+    $entity_type_manager
       ->method('getDefinitions')
       ->willReturn([]);
     $this->container->set('entity_type.manager', $entity_type_manager);
@@ -32,17 +33,16 @@ class UserLocalTasksTest extends LocalTaskIntegrationTestBase {
 
   /**
    * Tests local task existence.
-   *
-   * @dataProvider getUserAdminRoutes
    */
-  public function testUserAdminLocalTasks($route, $expected): void {
+  #[DataProvider('getUserAdminRoutes')]
+  public function testUserAdminLocalTasks(string $route, array $expected): void {
     $this->assertLocalTasks($route, $expected);
   }
 
   /**
    * Provides a list of routes to test.
    */
-  public static function getUserAdminRoutes() {
+  public static function getUserAdminRoutes(): array {
     return [
       [
         'entity.user.collection',
@@ -83,10 +83,9 @@ class UserLocalTasksTest extends LocalTaskIntegrationTestBase {
 
   /**
    * Checks user listing local tasks.
-   *
-   * @dataProvider getUserLoginRoutes
    */
-  public function testUserLoginLocalTasks($route): void {
+  #[DataProvider('getUserLoginRoutes')]
+  public function testUserLoginLocalTasks(string $route): void {
     $tasks = [
       0 => ['user.register', 'user.pass', 'user.login'],
     ];
@@ -96,7 +95,7 @@ class UserLocalTasksTest extends LocalTaskIntegrationTestBase {
   /**
    * Provides a list of routes to test.
    */
-  public static function getUserLoginRoutes() {
+  public static function getUserLoginRoutes(): array {
     return [
       ['user.login'],
       ['user.register'],
@@ -106,10 +105,9 @@ class UserLocalTasksTest extends LocalTaskIntegrationTestBase {
 
   /**
    * Checks user listing local tasks.
-   *
-   * @dataProvider getUserPageRoutes
    */
-  public function testUserPageLocalTasks($route, $subtask = []): void {
+  #[DataProvider('getUserPageRoutes')]
+  public function testUserPageLocalTasks(string $route, $subtask = []): void {
     $tasks = [
       0 => ['entity.user.canonical', 'entity.user.edit_form'],
     ];
@@ -122,7 +120,7 @@ class UserLocalTasksTest extends LocalTaskIntegrationTestBase {
   /**
    * Provides a list of routes to test.
    */
-  public static function getUserPageRoutes() {
+  public static function getUserPageRoutes(): array {
     return [
       ['entity.user.canonical'],
       ['entity.user.edit_form'],

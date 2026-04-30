@@ -5,13 +5,17 @@ declare(strict_types=1);
 namespace Drupal\Tests\breakpoint\Unit;
 
 use Drupal\breakpoint\Breakpoint;
-use Drupal\Tests\UnitTestCase;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\breakpoint\Breakpoint
- * @group Breakpoint
+ * Tests Drupal\breakpoint\Breakpoint.
  */
+#[CoversClass(Breakpoint::class)]
+#[Group('Breakpoint')]
 class BreakpointTest extends UnitTestCase {
 
   /**
@@ -40,7 +44,7 @@ class BreakpointTest extends UnitTestCase {
   /**
    * The mocked translator.
    *
-   * @var \Drupal\Core\StringTranslation\TranslationInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\StringTranslation\TranslationInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $stringTranslation;
 
@@ -50,7 +54,7 @@ class BreakpointTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->stringTranslation = $this->createMock('Drupal\Core\StringTranslation\TranslationInterface');
+    $this->stringTranslation = $this->getStringTranslationStub();
   }
 
   /**
@@ -62,7 +66,7 @@ class BreakpointTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getLabel
+   * Tests get label.
    */
   public function testGetLabel(): void {
     $this->pluginDefinition['label'] = 'Test label';
@@ -71,7 +75,7 @@ class BreakpointTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getWeight
+   * Tests get weight.
    */
   public function testGetWeight(): void {
     $this->pluginDefinition['weight'] = '4';
@@ -81,7 +85,7 @@ class BreakpointTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getMediaQuery
+   * Tests get media query.
    */
   public function testGetMediaQuery(): void {
     $this->pluginDefinition['mediaQuery'] = 'only screen and (min-width: 1220px)';
@@ -91,8 +95,8 @@ class BreakpointTest extends UnitTestCase {
 
   /**
    * @covers ::getMediaQuery
-   * @dataProvider providerGetMediaQueryHandlesVariousInputs
    */
+  #[DataProvider('providerGetMediaQueryHandlesVariousInputs')]
   public function testGetMediaQueryHandlesVariousInputs($input, $expected): void {
     $this->pluginDefinition['mediaQuery'] = $input;
     $this->setupBreakpoint();
@@ -100,7 +104,7 @@ class BreakpointTest extends UnitTestCase {
   }
 
   /**
-   * Test cases for ::testGetMediaQueryHandlesVariousInputs.
+   * Data provider for testGetMediaQueryHandlesVariousInputs().
    */
   public static function providerGetMediaQueryHandlesVariousInputs(): array {
     return [
@@ -115,7 +119,7 @@ class BreakpointTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getMultipliers
+   * Tests get multipliers.
    */
   public function testGetMultipliers(): void {
     $this->pluginDefinition['multipliers'] = ['1x', '2x'];
@@ -124,7 +128,7 @@ class BreakpointTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getProvider
+   * Tests get provider.
    */
   public function testGetProvider(): void {
     $this->pluginDefinition['provider'] = 'Breakpoint';
@@ -133,7 +137,7 @@ class BreakpointTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getGroup
+   * Tests get group.
    */
   public function testGetGroup(): void {
     $this->pluginDefinition['group'] = 'Breakpoint';

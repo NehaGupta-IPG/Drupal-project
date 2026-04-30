@@ -6,13 +6,15 @@ namespace Drupal\Tests\content_moderation\Functional;
 
 use Drupal\node\NodeInterface;
 use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test content_moderation functionality with localization and translation.
- *
- * @group content_moderation
- * @group #slow
  */
+#[Group('content_moderation')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class ModerationLocaleTest extends ModerationStateTestBase {
 
   use ContentTranslationTestTrait;
@@ -675,7 +677,7 @@ class ModerationLocaleTest extends ModerationStateTestBase {
    * @return bool
    *   TRUE if the moderation form could be find in the page, FALSE otherwise.
    */
-  public function hasModerationForm() {
+  public function hasModerationForm(): bool {
     return (bool) $this->xpath('//ul[@class="entity-moderation-form"]');
   }
 

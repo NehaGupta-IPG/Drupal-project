@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Routing\CurrentRouteMatch;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Helper service to detect entity routes.
@@ -27,19 +28,11 @@ class EntityRouteHelper {
    */
   protected array $contentEntityPaths;
 
-  /**
-   * EntityRouteHelper constructor.
-   *
-   * @param \Drupal\Core\Routing\CurrentRouteMatch $routeMatch
-   *   The route match.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
-   *   The cache backend.
-   */
   public function __construct(
+    #[Autowire(service: 'current_route_match')]
     protected CurrentRouteMatch $routeMatch,
     protected EntityTypeManagerInterface $entityTypeManager,
+    #[Autowire(service: 'cache.discovery')]
     protected CacheBackendInterface $cacheBackend,
   ) {
   }
@@ -55,7 +48,12 @@ class EntityRouteHelper {
   }
 
   public function getContentEntityFromRoute(): ?ContentEntityInterface {
-    $path = $this->routeMatch->getRouteObject()->getPath();
+    $route = $this->routeMatch->getRouteObject();
+    if (!$route) {
+      return NULL;
+    }
+
+    $path = $route->getPath();
     if (!$entity_type = $this->getContentEntityPaths()[$path] ?? NULL) {
       return NULL;
     }
@@ -88,7 +86,10 @@ class EntityRouteHelper {
     }
 
     $this->contentEntityPaths = $this->doGetContentEntityPaths();
-    $this->cacheBackend->set(static::ENTITY_ROUTE_CID, $this->contentEntityPaths, CacheBackendInterface::CACHE_PERMANENT, ['entity_types', 'routes']);
+    $this->cacheBackend->set(static::ENTITY_ROUTE_CID, $this->contentEntityPaths, CacheBackendInterface::CACHE_PERMANENT, [
+      'entity_types',
+      'routes',
+    ]);
 
     return $this->contentEntityPaths;
   }
