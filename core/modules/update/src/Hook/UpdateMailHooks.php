@@ -45,13 +45,31 @@ class UpdateMailHooks {
     foreach ($params as $msg_type => $msg_reason) {
       $message['body'][] = _update_message_text($msg_type, $msg_reason, $langcode);
     }
-    $message['body'][] = $this->t('See the available updates page for more information:', [], ['langcode' => $langcode]) . "\n" . Url::fromRoute('update.status', [], ['absolute' => TRUE, 'language' => $language])->toString();
+    $update_url = Url::fromRoute(
+      'update.status',
+      [],
+      [
+        'absolute' => TRUE,
+        'language' => $language,
+      ],
+    )->toString();
+    $message['body'][] = $this->t(
+      'See the available updates page for more information:',
+      [],
+      ['langcode' => $langcode],
+    ) . "\n" . $update_url;
     $settings_url = Url::fromRoute('update.settings', [], ['absolute' => TRUE])->toString();
     if ($this->configFactory->get('update.settings')->get('notification.threshold') == 'all') {
-      $message['body'][] = $this->t('Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, @url.', ['@url' => $settings_url]);
+      $message['body'][] = $this->t(
+        'Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, @url.',
+        ['@url' => $settings_url]
+      );
     }
     else {
-      $message['body'][] = $this->t('Your site is currently configured to send these emails only when security updates are available. To get notified for any available updates, @url.', ['@url' => $settings_url]);
+      $message['body'][] = $this->t(
+        'Your site is currently configured to send these emails only when security updates are available. To get notified for any available updates, @url.',
+        ['@url' => $settings_url]
+      );
     }
   }
 

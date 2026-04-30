@@ -58,7 +58,14 @@ class UpdateDeprecatedHooks {
     // functionality).
     $compatible_project = FALSE;
     $incompatible = [];
-    $files = $this->fileSystem->scanDirectory("{$directory}/{$project}", '/.*\.info.yml$/', ['key' => 'name', 'min_depth' => 0]);
+    $files = $this->fileSystem->scanDirectory(
+      "{$directory}/{$project}",
+      '/.*\.info.yml$/',
+      [
+        'key' => 'name',
+        'min_depth' => 0,
+      ],
+    );
     foreach ($files as $file) {
       // Get the .info.yml file for the module or theme this file belongs to.
       $info = $this->infoParser->parse($file->uri);
