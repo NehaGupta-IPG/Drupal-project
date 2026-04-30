@@ -34,7 +34,14 @@ class UpdateMailHooks {
   public function mail($key, &$message, $params): void {
     $langcode = $message['langcode'];
     $language = $this->languageManager->getLanguage($langcode);
-    $message['subject'] .= $this->t('New release(s) available for @site_name', ['@site_name' => $this->configFactory->get('system.site')->get('name')], ['langcode' => $langcode]);
+    $site_name = $this->configFactory
+      ->get('system.site')
+      ->get('name');
+    $message['subject'] .= $this->t(
+      'New release(s) available for @site_name',
+      ['@site_name' => $site_name],
+      ['langcode' => $langcode],
+    );
     foreach ($params as $msg_type => $msg_reason) {
       $message['body'][] = _update_message_text($msg_type, $msg_reason, $langcode);
     }
