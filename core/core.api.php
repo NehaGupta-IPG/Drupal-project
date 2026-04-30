@@ -2020,23 +2020,34 @@
  *
  * To annotate a class as a plugin, add code similar to the following to the
  * end of the documentation block immediately preceding the class declaration.
- * Below is an example of an annotation using various data types:
- * Note: Any classes must be preceded with the initial "\" (i.e. \Drupal\Core\...)
+ * The example below shows several of the data types commonly used in
+ * annotations: strings, booleans, translatable strings, arrays, and class
+ * references.
  * @code
  * * @ContentEntityType(
  * *   id = "comment",
  * *   label = @Translation("Comment"),
- * *   description = @Translation("This field manages configuration and
- * *   presentation of comments on an entity."),
- * *   login_required = FALSE,
- * *   list_class = "\Drupal\comment\CommentFieldItemList",
  * *   base_table = "comment",
- * *   cardinality = 1
+ * *   data_table = "comment_field_data",
+ * *   translatable = TRUE,
+ * *   entity_keys = {
+ * *     "id" = "cid",
+ * *     "bundle" = "comment_type",
+ * *     "label" = "subject",
+ * *     "uuid" = "uuid",
+ * *   },
+ * *   handlers = {
+ * *     "access" = "\Drupal\comment\CommentAccessControlHandler",
+ * *     "storage" = "\Drupal\comment\CommentStorage",
+ * *   },
  * * )
  * @endcode
  *
  * Note that you must use double quotes; single quotes will not work in
  * annotations.
+ *
+ * Class references must be fully-qualified and start with a leading
+ * backslash, for example "\Drupal\comment\CommentStorage".
  *
  * Some annotation types, which extend the "@ PluginID" annotation class, have
  * only a single 'id' key in their annotation. For these, it is possible to use
