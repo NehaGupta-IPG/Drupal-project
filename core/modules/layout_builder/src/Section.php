@@ -4,7 +4,7 @@ namespace Drupal\layout_builder;
 
 use Drupal\Core\Config\Entity\ThirdPartySettingsInterface;
 use Drupal\Core\Plugin\PreviewAwarePluginInterface;
-use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Render\Element;
 use Drupal\layout_builder\Event\SectionBuildRegionsRenderArrayEvent;
 use Drupal\layout_builder\Event\SectionBuildRenderArrayEvent;
@@ -90,7 +90,7 @@ class Section implements ThirdPartySettingsInterface {
     $event = new SectionBuildRegionsRenderArrayEvent($this, $contexts, $in_preview);
     $this->eventDispatcher()->dispatch($event);
     $regions = $event->getRegions();
-    $metadata = BubbleableMetadata::createFromRenderArray($regions);
+    $metadata = CacheableMetadata::createFromRenderArray($regions);
     $metadata->merge($event->getCacheableMetadata())->applyTo($regions);
 
     $layout = $this->getLayout($contexts);
