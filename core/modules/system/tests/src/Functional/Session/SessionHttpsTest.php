@@ -8,15 +8,17 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\BrowserTestBase;
 use GuzzleHttp\Cookie\CookieJar;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Ensure that when running under HTTPS two session cookies are generated.
- *
- * @group Session
  */
+#[Group('Session')]
+#[RunTestsInSeparateProcesses]
 class SessionHttpsTest extends BrowserTestBase {
 
   /**
@@ -268,26 +270,26 @@ class SessionHttpsTest extends BrowserTestBase {
   /**
    * Builds a URL for submitting a mock HTTPS request to HTTP test environments.
    *
-   * @param $url
+   * @param string $url
    *   A Drupal path such as 'user/login'.
    *
    * @return string
    *   URL prepared for the https.php mock front controller.
    */
-  protected function httpsUrl($url): string {
+  protected function httpsUrl(string $url): string {
     return 'core/modules/system/tests/https.php/' . $url;
   }
 
   /**
    * Builds a URL for submitting a mock HTTP request to HTTPS test environments.
    *
-   * @param $url
+   * @param string $url
    *   A Drupal path such as 'user/login'.
    *
    * @return string
    *   URL prepared for the http.php mock front controller.
    */
-  protected function httpUrl($url): string {
+  protected function httpUrl(string $url): string {
     return 'core/modules/system/tests/http.php/' . $url;
   }
 
@@ -297,7 +299,7 @@ class SessionHttpsTest extends BrowserTestBase {
    * @return \GuzzleHttp\Cookie\CookieJar
    *   The Guzzle CookieJar.
    */
-  protected function getGuzzleCookieJar() {
+  protected function getGuzzleCookieJar(): CookieJar {
     // @todo Add xdebug cookie.
     $cookies = $this->extractCookiesFromRequest(\Drupal::request());
     foreach ($cookies as $cookie_name => $values) {

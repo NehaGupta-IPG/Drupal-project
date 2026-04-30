@@ -5,27 +5,32 @@ declare(strict_types=1);
 namespace Drupal\Tests\jsonapi\Kernel\ResourceType;
 
 use Drupal\Core\Database\Database;
-use Drupal\Tests\jsonapi\Kernel\JsonapiKernelTestBase;
+use Drupal\jsonapi\ResourceType\ResourceType;
+use Drupal\jsonapi\ResourceType\ResourceTypeRepository;
 use Drupal\node\Entity\NodeType;
+use Drupal\Tests\jsonapi\Kernel\JsonapiKernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\jsonapi\ResourceType\ResourceType
- * @coversClass \Drupal\jsonapi\ResourceType\ResourceTypeRepository
- * @group jsonapi
+ * Tests Drupal\jsonapi\ResourceType\ResourceType.
  *
  * @internal
  */
+#[CoversClass(ResourceType::class)]
+#[CoversClass(ResourceTypeRepository::class)]
+#[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class RelatedResourceTypesTest extends JsonapiKernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'file',
     'node',
-    'jsonapi',
     'serialization',
-    'system',
     'user',
     'field',
     'dblog',
@@ -37,20 +42,6 @@ class RelatedResourceTypesTest extends JsonapiKernelTestBase {
    * @var \Drupal\jsonapi\ResourceType\ResourceTypeRepository
    */
   protected $resourceTypeRepository;
-
-  /**
-   * The JSON:API resource type for `node--foo`.
-   *
-   * @var \Drupal\jsonapi\ResourceType\ResourceType
-   */
-  protected $fooType;
-
-  /**
-   * The JSON:API resource type for `node--bar`.
-   *
-   * @var \Drupal\jsonapi\ResourceType\ResourceType
-   */
-  protected $barType;
 
   /**
    * {@inheritdoc}
@@ -112,10 +103,10 @@ class RelatedResourceTypesTest extends JsonapiKernelTestBase {
   }
 
   /**
-   * @covers ::getRelatableResourceTypes
-   * @dataProvider getRelatableResourceTypesProvider
+   * Tests get relatable resource types.
    */
-  public function testGetRelatableResourceTypes($resource_type_name, $relatable_type_names): void {
+  #[DataProvider('getRelatableResourceTypesProvider')]
+  public function testGetRelatableResourceTypes(string $resource_type_name, array $relatable_type_names): void {
     // We're only testing the fields that we set up.
     $test_fields = [
       'field_ref_foo',
@@ -145,10 +136,12 @@ class RelatedResourceTypesTest extends JsonapiKernelTestBase {
   }
 
   /**
-   * @covers ::getRelatableResourceTypes
-   * @dataProvider getRelatableResourceTypesProvider
+   * Tests get relatable resource types provider.
+   *
+   * @legacy-covers ::getRelatableResourceTypes
    */
-  public static function getRelatableResourceTypesProvider() {
+  #[DataProvider('getRelatableResourceTypesProvider')]
+  public static function getRelatableResourceTypesProvider(): array {
     return [
       [
         'node--foo',
@@ -163,10 +156,10 @@ class RelatedResourceTypesTest extends JsonapiKernelTestBase {
   }
 
   /**
-   * @covers ::getRelatableResourceTypesByField
-   * @dataProvider getRelatableResourceTypesByFieldProvider
+   * Tests get relatable resource types by field.
    */
-  public function testGetRelatableResourceTypesByField($entity_type_id, $bundle, $field): void {
+  #[DataProvider('getRelatableResourceTypesByFieldProvider')]
+  public function testGetRelatableResourceTypesByField(string $entity_type_id, string $bundle, string $field): void {
     $resource_type = $this->resourceTypeRepository->get($entity_type_id, $bundle);
     $relatable_types = $resource_type->getRelatableResourceTypes();
     $this->assertSame(
@@ -178,7 +171,7 @@ class RelatedResourceTypesTest extends JsonapiKernelTestBase {
   /**
    * Provides cases to test getRelatableTypesByField.
    */
-  public static function getRelatableResourceTypesByFieldProvider() {
+  public static function getRelatableResourceTypesByFieldProvider(): array {
     return [
       ['node', 'foo', 'field_ref_foo'],
       ['node', 'foo', 'field_ref_bar'],
@@ -189,11 +182,11 @@ class RelatedResourceTypesTest extends JsonapiKernelTestBase {
   /**
    * Ensure a graceful failure when a field can references a missing bundle.
    *
-   * @covers \Drupal\jsonapi\ResourceType\ResourceTypeRepository::all
-   * @covers \Drupal\jsonapi\ResourceType\ResourceTypeRepository::calculateRelatableResourceTypes
-   * @covers \Drupal\jsonapi\ResourceType\ResourceTypeRepository::getRelatableResourceTypesFromFieldDefinition
    *
    * @link https://www.drupal.org/project/drupal/issues/2996114
+   * @legacy-covers \Drupal\jsonapi\ResourceType\ResourceTypeRepository::all
+   * @legacy-covers \Drupal\jsonapi\ResourceType\ResourceTypeRepository::calculateRelatableResourceTypes
+   * @legacy-covers \Drupal\jsonapi\ResourceType\ResourceTypeRepository::getRelatableResourceTypesFromFieldDefinition
    */
   public function testGetRelatableResourceTypesFromFieldDefinition(): void {
     $field_config_storage = $this->container->get('entity_type.manager')->getStorage('field_config');

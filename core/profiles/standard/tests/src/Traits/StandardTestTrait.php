@@ -6,7 +6,6 @@ namespace Drupal\Tests\standard\Traits;
 
 use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
 use Drupal\Component\Utility\Html;
-use Drupal\contact\Entity\ContactForm;
 use Drupal\Core\Url;
 use Drupal\dynamic_page_cache\EventSubscriber\DynamicPageCacheSubscriber;
 use Drupal\editor\Entity\Editor;
@@ -18,7 +17,7 @@ use Drupal\Tests\RequirementsPageTrait;
 use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
-use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
  * Provides a test method to test the Standard installation profile or recipe.
@@ -44,6 +43,7 @@ trait StandardTestTrait {
 
     // Test anonymous user can access 'Main navigation' block.
     $this->adminUser = $this->drupalCreateUser([
+      'administer nodes',
       'administer blocks',
       'administer block content',
       'post comments',
@@ -94,6 +94,15 @@ trait StandardTestTrait {
     $this->assertSession()->responseContains('Foobar');
     $this->assertSession()->responseNotContains('Then she picked out two somebodies, Sally and me');
 
+    // Test promote and sticky fields are hidden by default for the page content
+    // type and visible for the article content type.
+    $this->drupalGet('node/add/page');
+    $this->assertSession()->fieldNotExists('promote[value]');
+    $this->assertSession()->fieldNotExists('sticky[value]');
+    $this->drupalGet('node/add/article');
+    $this->assertSession()->fieldExists('promote[value]');
+    $this->assertSession()->fieldExists('sticky[value]');
+
     // Ensure block body exists.
     $this->drupalGet('block/add');
     $this->assertSession()->fieldExists('body[0][value]');
@@ -118,7 +127,7 @@ trait StandardTestTrait {
       }
 
       $this->assertSame([], array_map(
-        function (ConstraintViolation $v) {
+        function (ConstraintViolationInterface $v) {
           return (string) $v->getMessage();
         },
         iterator_to_array(CKEditor5::validatePair(
@@ -147,10 +156,6 @@ trait StandardTestTrait {
     \Drupal::service('module_installer')->uninstall(['editor', 'ckeditor5']);
     $this->rebuildContainer();
     \Drupal::service('module_installer')->install(['editor']);
-    /** @var \Drupal\contact\ContactFormInterface $contact_form */
-    $contact_form = ContactForm::load('feedback');
-    $recipients = $contact_form->getRecipients();
-    $this->assertEquals(['simpletest@example.com'], $recipients);
 
     $role = Role::create([
       'id' => 'admin_theme',
@@ -192,18 +197,13 @@ trait StandardTestTrait {
     foreach (ImageStyle::loadMultiple() as $style) {
       $effects = $style->getEffects()->getInstanceIds();
       $last = $style->getEffects()->get(end($effects));
-      $this->assertSame('image_convert', $last->getConfiguration()['id']);
+      $this->assertSame('image_convert_avif', $last->getConfiguration()['id']);
       $this->assertSame('webp', $last->getConfiguration()['data']['extension']);
     }
 
     // Verify certain routes' responses are cacheable by Dynamic Page Cache, to
     // ensure these responses are very fast for authenticated users.
     $this->drupalLogin($this->adminUser);
-    $url = Url::fromRoute('contact.site_page');
-    $this->drupalGet($url);
-    // Verify that site-wide contact page cannot be cached by Dynamic Page
-    // Cache.
-    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'UNCACHEABLE (poor cacheability)');
 
     $url = Url::fromRoute('<front>');
     $this->drupalGet($url);
@@ -215,12 +215,6 @@ trait StandardTestTrait {
     $this->drupalGet($url);
     $this->drupalGet($url);
     // Verify that full node page is cached by Dynamic Page Cache.
-    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'HIT');
-
-    $url = Url::fromRoute('entity.user.canonical', ['user' => 1]);
-    $this->drupalGet($url);
-    $this->drupalGet($url);
-    // Verify that user profile page is cached by Dynamic Page Cache.
     $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'HIT');
 
     // Make sure the editorial workflow is installed after enabling the
@@ -254,7 +248,6 @@ trait StandardTestTrait {
     $role->save();
     $this->adminUser->addRole($role->id())->save();
     $assert_session = $this->assertSession();
-    $page = $this->getSession()->getPage();
     /** @var \Drupal\media\Entity\MediaType $media_type */
     foreach (MediaType::loadMultiple() as $media_type) {
       $media_type_machine_name = $media_type->id();
@@ -278,7 +271,7 @@ trait StandardTestTrait {
       if (is_a($media_type->getSource(), Image::class, TRUE)) {
         // Assert the default entity view display is configured with an image
         // style.
-        $this->drupalGet('/admin/structure/media/manage/' . $media_type->id() . '/display');
+        $this->drupalGet('/admin/structure/media/manage/' . $media_type->id() . '/display/default');
         $assert_session->fieldValueEquals('fields[field_media_image][type]', 'image');
         $assert_session->elementTextContains('css', 'tr[data-drupal-selector="edit-fields-field-media-image"]', 'Image style: Large (480×480)');
         // By default for media types with an image source, only the image

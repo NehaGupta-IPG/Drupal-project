@@ -4,16 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Functional;
 
-use Drupal\Tests\BrowserTestBase;
+use Drupal\Core\Entity\Controller\VersionHistoryController;
 use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\VocabularyInterface;
+use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Taxonomy term version history test.
- *
- * @group taxonomy
- * @coversDefaultClass \Drupal\Core\Entity\Controller\VersionHistoryController
  */
+#[CoversClass(VersionHistoryController::class)]
+#[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class TaxonomyRevisionVersionHistoryTest extends BrowserTestBase {
 
   use TaxonomyTestTrait;
@@ -42,10 +47,8 @@ class TaxonomyRevisionVersionHistoryTest extends BrowserTestBase {
 
   /**
    * Vocabulary for testing.
-   *
-   * @var \Drupal\taxonomy\VocabularyInterface
    */
-  private $vocabulary;
+  private VocabularyInterface $vocabulary;
 
   /**
    * {@inheritdoc}

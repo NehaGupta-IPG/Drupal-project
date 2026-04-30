@@ -80,16 +80,21 @@ const assetsFolder = `${coreFolder}/assets/vendor`;
       files: ['backbone.js', 'backbone-min.js', 'backbone-min.js.map'],
     },
     {
+      pack: 'htmx.org',
+      folder: 'htmx',
+      library: 'htmx',
+      files: [
+        { from: 'dist/htmx.min.js', to: 'htmx.min.js' },
+        { from: 'dist/htmx.js', to: 'htmx.js' },
+      ],
+    },
+    {
       pack: 'jquery',
       files: [
         { from: 'dist/jquery.js', to: 'jquery.js' },
         { from: 'dist/jquery.min.js', to: 'jquery.min.js' },
         { from: 'dist/jquery.min.map', to: 'jquery.min.map' },
       ],
-    },
-    {
-      pack: 'js-cookie',
-      files: [{ from: 'dist/js.cookie.min.js', to: 'js.cookie.min.js' }],
     },
     {
       pack: 'normalize.css',

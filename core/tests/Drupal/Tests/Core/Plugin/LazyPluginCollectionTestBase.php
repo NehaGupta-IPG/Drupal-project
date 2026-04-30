@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Plugin;
 
+use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Plugin\DefaultLazyPluginCollection;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\MockObject\Rule\InvocationOrder;
@@ -16,9 +17,13 @@ abstract class LazyPluginCollectionTestBase extends UnitTestCase {
   /**
    * The mocked plugin manager.
    *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   *   Could actually be PluginManagerInterface&MockObject or
+   *   PluginManagerInterface&Stub.
+   *
+   * @todo split the variable to allow proper type.
    */
-  protected $pluginManager;
+  protected PluginManagerInterface $pluginManager;
 
   /**
    * The tested plugin collection.
@@ -51,11 +56,21 @@ abstract class LazyPluginCollectionTestBase extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->pluginManager = $this->createMock('Drupal\Component\Plugin\PluginManagerInterface');
-    $this->pluginManager->expects($this->any())
+    $this->pluginManager = $this->createStub(PluginManagerInterface::class);
+    $this->pluginManager
       ->method('getDefinitions')
       ->willReturn($this->getPluginDefinitions());
 
+  }
+
+  /**
+   * Reinitializes the plugin manager as a mock object.
+   */
+  protected function setUpMockPluginManager(): void {
+    $this->pluginManager = $this->createMock(PluginManagerInterface::class);
+    $this->pluginManager
+      ->method('getDefinitions')
+      ->willReturn($this->getPluginDefinitions());
   }
 
   /**
@@ -63,10 +78,12 @@ abstract class LazyPluginCollectionTestBase extends UnitTestCase {
    *
    * @param \PHPUnit\Framework\MockObject\Rule\InvocationOrder|null $create_count
    *   (optional) The number of times that createInstance() is expected to be
-   *   called. For example, $this->any(), $this->once(), $this->exactly(6).
-   *   Defaults to $this->never().
+   *   called. For example, $this->once(), $this->exactly(6). Defaults to
+   *   $this->never().
    */
   protected function setupPluginCollection(?InvocationOrder $create_count = NULL) {
+    $this->setUpMockPluginManager();
+
     $this->pluginInstances = [];
     $map = [];
     foreach ($this->getPluginDefinitions() as $plugin_id => $definition) {
@@ -105,11 +122,12 @@ abstract class LazyPluginCollectionTestBase extends UnitTestCase {
    *   The plugin definition.
    *
    * @return \Drupal\Component\Plugin\PluginInspectionInterface|\PHPUnit\Framework\MockObject\MockObject
+   *   The mocked plugin object.
    */
   protected function getPluginMock($plugin_id, array $definition) {
     // Create a mock plugin instance.
     $mock = $this->createMock('Drupal\Component\Plugin\PluginInspectionInterface');
-    $mock->expects($this->any())
+    $mock
       ->method('getPluginId')
       ->willReturn($plugin_id);
     return $mock;

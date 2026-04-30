@@ -12,6 +12,7 @@ use Drupal\Core\Database\Query\Merge;
 use Drupal\Core\Database\Query\Select;
 use Drupal\Core\Database\Query\Truncate;
 use Drupal\Core\Database\Query\Update;
+use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 use Drupal\Core\Pager\PagerManagerInterface;
 
@@ -250,11 +251,10 @@ abstract class Connection {
    * A given query can be customized with a number of option flags in an
    * associative array:
    * - fetch: This element controls how rows from a result set will be
-   *   returned. Legal values include \PDO::FETCH_ASSOC, \PDO::FETCH_BOTH,
-   *   \PDO::FETCH_OBJ, \PDO::FETCH_NUM, or a string representing the name of a
-   *   class. If a string is specified, each record will be fetched into a new
-   *   object of that class. The behavior of all other values is defined by PDO.
-   *   See http://php.net/manual/pdostatement.fetch.php
+   *   returned. Legal values include one of the enumeration cases of FetchAs or
+   *   a string representing the name of a class. If a string is specified, each
+   *   record will be fetched into a new object of that class. The behavior of
+   *   all other values is described in the FetchAs enum.
    * - allow_delimiter_in_query: By default, queries which have the ; delimiter
    *   any place in them will cause an exception. This reduces the chance of SQL
    *   injection attacks that terminate the original query and add one or more
@@ -277,7 +277,7 @@ abstract class Connection {
    */
   protected function defaultOptions() {
     return [
-      'fetch' => \PDO::FETCH_OBJ,
+      'fetch' => FetchAs::Object,
       'allow_delimiter_in_query' => FALSE,
       'allow_square_brackets' => FALSE,
       'pdo' => [],
@@ -325,7 +325,8 @@ abstract class Connection {
   /**
    * Returns the prefix of the tables.
    *
-   * @return string $prefix
+   * @return string
+   *   The table prefix.
    */
   public function getPrefix(): string {
     return $this->prefix;
@@ -395,6 +396,7 @@ abstract class Connection {
    *   The name of the table in question.
    *
    * @return string
+   *   The fully qualified table name.
    */
   public function getFullQualifiedTableName($table) {
     $options = $this->getConnectionOptions();
@@ -430,6 +432,7 @@ abstract class Connection {
    */
   public function prepareStatement(string $query, array $options, bool $allow_row_count = FALSE): StatementInterface {
     assert(!isset($options['return']), 'Passing "return" option to prepareStatement() has no effect. See https://www.drupal.org/node/3185520');
+    assert(!isset($options['fetch']) || $options['fetch'] instanceof FetchAs || is_string($options['fetch']), 'The "fetch" option passed to prepareStatement() must contain a FetchAs enum case or a string. See https://www.drupal.org/node/3488338');
 
     try {
       $query = $this->preprocessStatement($query, $options);
@@ -648,6 +651,7 @@ abstract class Connection {
     assert(is_string($query), 'The \'$query\' argument to ' . __METHOD__ . '() must be a string');
     assert(!isset($options['return']), 'Passing "return" option to query() has no effect. See https://www.drupal.org/node/3185520');
     assert(!isset($options['target']), 'Passing "target" option to query() has no effect. See https://www.drupal.org/node/2993033');
+    assert(!isset($options['fetch']) || $options['fetch'] instanceof FetchAs || is_string($options['fetch']), 'The "fetch" option passed to query() must contain a FetchAs enum case or a string. See https://www.drupal.org/node/3488338');
 
     // Use default values if not already set.
     $options += $this->defaultOptions();
@@ -781,7 +785,7 @@ abstract class Connection {
    *   for query_alter hook implementations.
    * @param string $alias
    *   (optional) The alias of the base table of this query.
-   * @param $options
+   * @param array $options
    *   An array of options on the query.
    *
    * @return \Drupal\Core\Database\Query\SelectInterface
@@ -1104,6 +1108,7 @@ abstract class Connection {
    * \Drupal\Core\Database\Transaction\TransactionManagerBase, and instantiate
    * it here.
    *
+   * phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn
    * @return \Drupal\Core\Database\Transaction\TransactionManagerInterface
    *   The transaction manager.
    *
@@ -1185,6 +1190,7 @@ abstract class Connection {
    * override this method.
    *
    * @return string
+   *   The version of the database server.
    */
   public function version() {
     return $this->connection->getAttribute(\PDO::ATTR_SERVER_VERSION);
@@ -1197,6 +1203,7 @@ abstract class Connection {
    * override this method.
    *
    * @return string
+   *   The version of the database client.
    */
   public function clientVersion() {
     return $this->connection->getAttribute(\PDO::ATTR_CLIENT_VERSION);
@@ -1219,6 +1226,7 @@ abstract class Connection {
    * Returns the name of the database engine accessed by this driver.
    *
    * @return string
+   *   The database engine name.
    */
   abstract public function databaseType();
 
@@ -1260,7 +1268,7 @@ abstract class Connection {
    *   (optional) Provides a data type hint for drivers that have alternate
    *   quoting styles. Defaults to \PDO::PARAM_STR.
    *
-   * @return string|bool
+   * @return string|false
    *   A quoted string that is theoretically safe to pass into an SQL statement.
    *   Returns FALSE if the driver does not support quoting in this way.
    *
@@ -1274,7 +1282,7 @@ abstract class Connection {
    * Extracts the SQLSTATE error from a PDOException.
    *
    * @param \Exception $e
-   *   The exception
+   *   The exception.
    *
    * @return string
    *   The five character error code.
@@ -1302,9 +1310,6 @@ abstract class Connection {
    *
    * @param string $url
    *   The URL.
-   * @param string $root
-   *   The root directory of the Drupal installation. Some database drivers,
-   *   like for example SQLite, need this information.
    *
    * @return array
    *   The connection options.
@@ -1319,7 +1324,7 @@ abstract class Connection {
    *
    * @see \Drupal\Core\Database\Database::convertDbUrlToConnectionInfo()
    */
-  public static function createConnectionOptionsFromUrl($url, $root) {
+  public static function createConnectionOptionsFromUrl($url) {
     $url_components = parse_url($url);
     if (!isset($url_components['scheme'], $url_components['host'], $url_components['path'])) {
       throw new \InvalidArgumentException("The database connection URL '$url' is invalid. The minimum requirement is: 'driver://host/database'");
@@ -1429,7 +1434,7 @@ abstract class Connection {
     // The namespace for Drupal modules is Drupal\MODULE_NAME, and the module
     // name must be all lowercase. Second-level namespaces containing uppercase
     // letters (e.g., "Core", "Component", "Driver") are not modules.
-    // @see \Drupal\Core\DrupalKernel::getModuleNamespacesPsr4()
+    // @see \Drupal\Core\DrupalKernel::getExtensionNamespacesPsr4()
     // @see https://www.drupal.org/docs/8/creating-custom-modules/naming-and-placing-your-drupal-8-module#s-name-your-module
     return ($first === 'Drupal' && strtolower($second) === $second) ? $second : 'core';
   }
