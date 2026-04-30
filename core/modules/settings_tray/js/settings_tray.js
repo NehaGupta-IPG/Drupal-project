@@ -23,7 +23,7 @@
    */
   function preventClick(event) {
     // Do not prevent contextual links.
-    if ($(event.target).closest('.contextual-links').length) {
+    if ($(event.target).closest('.js-contextual-links').length) {
       return;
     }
     event.preventDefault();

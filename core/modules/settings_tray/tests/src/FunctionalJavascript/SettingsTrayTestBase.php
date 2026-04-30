@@ -44,7 +44,7 @@ abstract class SettingsTrayTestBase extends OffCanvasTestBase {
     }
     // Ensure that contextual link element is present because this is required
     // to open the off-canvas dialog in edit mode.
-    $contextual_link = $this->assertSession()->waitForElement('css', "$contextual_link_container .contextual-links a");
+    $contextual_link = $this->assertSession()->waitForElement('css', "$contextual_link_container .contextual-links.js-contextual-links a");
     $this->assertNotEmpty($contextual_link);
     // When page first loads Edit Mode is not triggered until first contextual
     // link is added.
@@ -80,7 +80,7 @@ abstract class SettingsTrayTestBase extends OffCanvasTestBase {
    * Press the toolbar Edit button provided by the contextual module.
    */
   protected function pressToolbarEditButton() {
-    $this->assertSession()->waitForElement('css', '[data-contextual-id] .contextual-links a');
+    $this->assertSession()->waitForElement('css', '[data-contextual-id] .contextual-links.js-contextual-links a');
     $edit_button = $this->getSession()
       ->getPage()
       ->find('css', static::TOOLBAR_EDIT_LINK_SELECTOR);

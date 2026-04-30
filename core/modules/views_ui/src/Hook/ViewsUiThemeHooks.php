@@ -650,7 +650,12 @@ class ViewsUiThemeHooks {
       $build = [
         '#theme' => 'links__contextual',
         '#links' => $links,
-        '#attributes' => ['class' => ['contextual-links']],
+        '#attributes' => [
+          'class' => [
+            'contextual-links',
+            'js-contextual-links',
+          ],
+        ],
         '#attached' => [
           'library' => ['contextual/drupal.contextual-links'],
         ],
