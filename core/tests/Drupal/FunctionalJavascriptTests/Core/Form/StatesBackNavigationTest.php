@@ -6,7 +6,7 @@ namespace Drupal\FunctionalJavascriptTests\Core\Form;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunInSeparateProcesses;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that #states visibility is correct after browser back-navigation.
@@ -20,7 +20,7 @@ use PHPUnit\Framework\Attributes\RunInSeparateProcesses;
  * @see https://www.drupal.org/project/drupal/issues/3587011
  */
 #[Group('javascript')]
-#[RunInSeparateProcesses]
+#[RunTestsInSeparateProcesses]
 class StatesBackNavigationTest extends WebDriverTestBase {
 
   /**
