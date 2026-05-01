@@ -268,4 +268,39 @@ class LayoutBuilderOverridesTest extends LayoutBuilderTestBase {
     $assert_session->pageTextNotContains('The first node body');
   }
 
+  /**
+   * Tests reverting to default with an active tempstore.
+   */
+  public function testRevertWithActiveTempstore(): void {
+    $assert_session = $this->assertSession();
+    $page = $this->getSession()->getPage();
+
+    $this->drupalLogin($this->drupalCreateUser([
+      'configure any layout',
+      'administer node display',
+      'edit any bundle_with_section_field content',
+    ]));
+
+    $field_ui_prefix = 'admin/structure/types/manage/bundle_with_section_field';
+    // Enable overrides.
+    $this->drupalGet("{$field_ui_prefix}/display/default");
+    $this->submitForm(['layout[enabled]' => TRUE], 'Save');
+    $this->drupalGet("{$field_ui_prefix}/display/default");
+    $this->submitForm(['layout[allow_custom]' => TRUE], 'Save');
+
+    // Create an active tempstore by going to the layout form.
+    $this->drupalGet('node/1/layout');
+    $assert_session->pageTextContains('The first node body');
+
+    // Save the entity with the active tempstore.
+    $this->drupalGet('node/1/edit');
+    $this->submitForm([], 'Save');
+
+    // Revert the override.
+    $this->drupalGet('node/1/layout');
+    $page->pressButton('Revert to defaults');
+    $page->pressButton('Revert');
+    $assert_session->pageTextContains('The first node body');
+  }
+
 }
