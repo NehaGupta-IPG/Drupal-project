@@ -7,8 +7,6 @@ use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\field\FieldStorageConfigInterface;
-use Drupal\field\FieldConfigInterface;
 use Drupal\comment\Entity\CommentType;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\comment\CommentManagerInterface;
@@ -18,16 +16,16 @@ use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\user\UserInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Entity hook implementations for comment.
  */
 class CommentEntityHooks {
 
+  use StringTranslationTrait;
+
   public function __construct(
-    private readonly EntityTypeManagerInterface $entityTypeManager,
-    private readonly CommentManagerInterface $commentManager,
-    private readonly CommentStatisticsInterface $commentStatistics,
     private readonly StateInterface $state,
     private readonly LoggerChannelFactoryInterface $loggerFactory,
     private readonly ConfigFactoryInterface $configFactory,
@@ -209,6 +207,7 @@ class CommentEntityHooks {
           $comment->save();
         }
         break;
+
       case 'user_cancel_reassign':
         /** @var \Drupal\comment\CommentInterface[] $comments */
         $comments = $this->entityTypeManager->getStorage('comment')->loadByProperties(['uid' => $account->id()]);
