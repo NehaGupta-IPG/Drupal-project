@@ -9,9 +9,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass \Drupal\Component\Utility\InsertArray
- * @group Utility
+ * Tests Drupal\Component\Utility\InsertArray.
  */
+#[CoversClass(InsertArray::class)]
+#[Group('Utility')]
 class InsertArrayTest extends TestCase {
 
   /**
