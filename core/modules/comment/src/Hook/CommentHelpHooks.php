@@ -1,5 +1,7 @@
 <?php
 
+namespace Drupal\comment\Hook;
+
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
