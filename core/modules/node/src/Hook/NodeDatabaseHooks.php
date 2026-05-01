@@ -91,7 +91,7 @@ class NodeDatabaseHooks {
 
     $renderer = \Drupal::service('renderer');
     if ($renderer->hasRenderContext()) {
-      $build = ['#cache' => ['contexts' => ['user.node_grants:' . $op]]];
+      $build = ['#cache' => ['contexts' => $contexts]];
       $renderer->render($build);
     }
   }
