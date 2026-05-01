@@ -234,7 +234,7 @@ class ResponsiveImageBuilder {
     if (count(array_unique($derivative_mime_types)) == 1) {
       $source_attributes->setAttribute('type', $derivative_mime_types[0]);
     }
-    $loading = $variables['attributes']['loading'];
+    $loading = $variables['attributes']['loading'] ?? NULL;
     if (isset($loading) && $loading == 'lazy') {
       array_unshift($sizes, 'auto');
     }
