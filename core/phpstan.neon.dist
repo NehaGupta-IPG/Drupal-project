@@ -10,6 +10,7 @@ parameters:
 
   level: 3
 
+  checkFunctionArgumentTypes: true
   checkInternalClassCaseSensitivity: true
 
   parallel:
@@ -60,21 +61,17 @@ parameters:
     - "#^Class .* extends @internal class#"
     - identifier: missingType.iterableValue
 
-  disallowedMethodCalls:
-    # Remove this when PHPUnit is upgraded to a version >=12.5.0.
-    -
-        method: 'PHPUnit\Framework\TestCase::any()'
-        message: 'any() will be deprecated in PHPUnit 12.5.0 and should not be used.'
-        errorTip: 'See https://www.drupal.org/node/3573259.'
-
 rules:
+  # The rules below are Drupal custom ones.
   - Drupal\PHPStan\Rules\ComponentTestDoesNotExtendCoreTest
   - Drupal\PHPStan\Rules\TestClassClassMetadata
   - Drupal\PHPStan\Rules\TestClassMethodMetadata
-  - PHPStan\Rules\Functions\MissingFunctionReturnTypehintRule
-  - PHPStan\Rules\Methods\MissingMethodReturnTypehintRule
+  # ----------------------------------------------------------
   # The rule below can be removed when we increase level to 2.
   - PHPStan\Rules\Classes\AccessPrivateConstantThroughStaticRule
+  # The rules below can be removed when we increase level to 6.
+  - PHPStan\Rules\Functions\MissingFunctionReturnTypehintRule
+  - PHPStan\Rules\Methods\MissingMethodReturnTypehintRule
 
 services:
   errorFormatter.multiplex:

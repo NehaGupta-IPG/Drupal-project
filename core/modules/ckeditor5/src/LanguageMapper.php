@@ -6,6 +6,7 @@ namespace Drupal\ckeditor5;
 
 use Drupal\Core\Cache\BackendChain;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -19,16 +20,27 @@ class LanguageMapper {
    */
   protected BackendChain $cache;
 
+  /**
+   * The config factory service.
+   */
+  protected ConfigFactoryInterface $configFactory;
+
   public function __construct(
     #[Autowire('@cache.discovery')]
     CacheBackendInterface $persistent_cache,
     #[Autowire('@cache.memory')]
     CacheBackendInterface $memory_cache,
     protected ModuleHandlerInterface $moduleHandler,
+    ?ConfigFactoryInterface $config_factory = NULL,
   ) {
     $this->cache = new BackendChain();
     $this->cache->appendBackend($memory_cache);
     $this->cache->appendBackend($persistent_cache);
+    if (!$config_factory) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $config_factory argument is deprecated in drupal:11.4.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3566774', E_USER_DEPRECATED);
+      $config_factory = \Drupal::configFactory();
+    }
+    $this->configFactory = $config_factory;
   }
 
   /**
@@ -49,10 +61,10 @@ class LanguageMapper {
     if (empty($langcodes)) {
       $langcodes = [];
       // Collect languages included with CKEditor 5 based on file listing.
-      $files = scandir('core/assets/vendor/ckeditor5/ckeditor5-dll/translations');
+      $files = scandir('core/assets/vendor/ckeditor5/translations');
       foreach ($files as $file) {
-        if (str_ends_with($file, '.js')) {
-          $langcode = basename($file, '.js');
+        if (str_ends_with($file, '.umd.js')) {
+          $langcode = basename($file, '.umd.js');
           $langcodes[$langcode] = $langcode;
         }
       }
@@ -63,7 +75,7 @@ class LanguageMapper {
     // Get language mapping if available to map to Drupal language codes.
     // This is configurable in the user interface and not expensive to get, so
     // we don't include it in the cached language list.
-    $language_mappings = $this->moduleHandler->moduleExists('language') ? language_get_browser_drupal_langcode_mappings() : [];
+    $language_mappings = $this->moduleHandler->moduleExists('language') ? $this->configFactory->get('language.mappings')->get('map') : [];
     foreach ($langcodes as $langcode) {
       // If this language code is available in a Drupal mapping, use that to
       // compute a possibility for matching from the Drupal langcode to the
