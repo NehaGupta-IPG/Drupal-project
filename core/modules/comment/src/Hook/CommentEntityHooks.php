@@ -14,6 +14,9 @@ use Drupal\Core\State\StateInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\user\UserInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\comment\CommentManagerInterface;
+use Drupal\comment\CommentStatisticsInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
  * Entity hook implementations for comment.
@@ -26,6 +29,9 @@ class CommentEntityHooks {
     private readonly StateInterface $state,
     private readonly LoggerChannelFactoryInterface $loggerFactory,
     private readonly ConfigFactoryInterface $configFactory,
+    private readonly CommentManagerInterface $commentManager,
+    private readonly CommentStatisticsInterface $commentStatistics,
+    private readonly EntityTypeManagerInterface $entityTypeManager,
   ) {}
 
   /**
