@@ -16,7 +16,7 @@ use Drupal\Core\Utility\Token;
 use Drupal\comment\CommentManagerInterface;
 
 /**
- * Hook implementations for comment.
+ * Token hook implementations for comment.
  */
 class CommentTokensHooks {
 

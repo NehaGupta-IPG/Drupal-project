@@ -9,7 +9,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\comment\CommentManagerInterface;
 
 /**
- * Hook implementations for comment.
+ * View hook implementations for comment.
  */
 class CommentViewsHooks {
 
