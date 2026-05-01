@@ -162,4 +162,11 @@ class SystemBrandingBlock extends BlockBase implements ContainerFactoryPluginInt
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function createPlaceholder(): bool {
+    return TRUE;
+  }
+
 }

@@ -109,4 +109,11 @@ class HelpBlock extends BlockBase implements ContainerFactoryPluginInterface {
     return Cache::mergeContexts(parent::getCacheContexts(), ['route']);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function createPlaceholder(): bool {
+    return TRUE;
+  }
+
 }
