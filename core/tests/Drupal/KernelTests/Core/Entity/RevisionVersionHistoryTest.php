@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Drupal\FunctionalTests\Entity;
+namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Entity\Controller\VersionHistoryController;
 use Drupal\entity_test\Entity\EntityTestMulRev;
 use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog;
-use Drupal\Tests\BrowserTestBase;
+use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -18,14 +19,12 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[CoversClass(VersionHistoryController::class)]
 #[Group('Entity')]
-#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
-class RevisionVersionHistoryTest extends BrowserTestBase {
+class RevisionVersionHistoryTest extends KernelTestBase {
 
-  /**
-   * {@inheritdoc}
-   */
-  protected $defaultTheme = 'stark';
+  use UserCreationTrait {
+    createUser as drupalCreateUser;
+  }
 
   /**
    * {@inheritdoc}
@@ -34,12 +33,24 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
     'entity_test',
     'entity_test_revlog',
     'user',
+    'system',
   ];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+    $this->installEntitySchema('entity_test_rev');
+    $this->installEntitySchema('entity_test_revlog');
+    $this->installEntitySchema('user');
+    $this->installConfig(['system']);
+  }
 
   /**
    * Test all revisions appear, in order of revision creation.
    */
-  public function testOrderAndDescription(): void {
+  public function testOrder(): void {
     /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $entity */
     $entity = EntityTestWithRevisionLog::create(['type' => 'entity_test_revlog']);
     // Need label to be able to assert order.
@@ -65,55 +76,20 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
     $this->assertSession()->elementTextContains('css', 'table tbody tr:nth-child(1)', 'third revision');
     $this->assertSession()->elementTextContains('css', 'table tbody tr:nth-child(2)', 'second revision');
     $this->assertSession()->elementTextContains('css', 'table tbody tr:nth-child(3)', 'first revision');
-    $entity->setName('view all revisions');
-    $user = $this->drupalCreateUser([], 'fourth revision');
-    $entity->setRevisionUser($user);
-    $entity->setRevisionCreationTime((new \DateTime('2 February 2013 4:00:00pm'))->getTimestamp());
-    $entity->save();
-
-    $this->drupalGet($entity->toUrl('version-history'));
-    $this->assertSession()->elementTextContains('css', 'table tbody tr:nth-child(1)', '2 Feb 2013 - 16:00');
-    $this->assertSession()->elementTextContains('css', 'table tbody tr:nth-child(1)', $user->getAccountName());
   }
 
   /**
-   * Test description with entity implementing revision log, with empty values.
+   * Test current revision is indicated.
    *
-   * @legacy-covers ::getRevisionDescription
+   * @legacy-covers \Drupal\Core\Entity\Controller\VersionHistoryController::revisionOverview
    */
-  public function testDescriptionRevLogNullValues(): void {
-    $entity = EntityTestWithRevisionLog::create(['type' => 'entity_test_revlog']);
-    $entity->setName('view all revisions')->save();
-
-    // Check entity values are still null after saving; they did not receive
-    // values from currentUser or some other global context.
-    $this->assertNull($entity->getRevisionUser());
-    $this->assertNull($entity->getRevisionUserId());
-    $this->assertNull($entity->getRevisionLogMessage());
-
-    $this->drupalGet($entity->toUrl('version-history'));
-    $this->assertSession()->elementTextContains('css', 'table tbody tr:nth-child(1)', 'by Anonymous (not verified)');
-  }
-
-  /**
-   * Test description with entity, without revision log, label access.
-   *
-   * @legacy-covers ::getRevisionDescription
-   */
-  public function testDescriptionNoRevLog(): void {
+  public function testCurrentRevision(): void {
     /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
     $entity = EntityTestRev::create(['type' => 'entity_test_rev']);
+    // Need label to be able to assert order.
     $entity->setName('view all revisions');
+    $entity->setNewRevision();
     $entity->save();
-
-    $this->drupalGet($entity->toUrl('version-history'));
-    $this->assertSession()->elementTextContains('css', 'table tbody tr:nth-child(1)', '- Restricted access -');
-    $this->assertSession()->elementTextNotContains('css', 'table tbody tr:nth-child(1)', $entity->getName());
-    // Permission grants 'view label' access.
-    $this->drupalLogin($this->createUser(['view test entity']));
-    $this->drupalGet($entity->toUrl('version-history'));
-    $this->assertSession()->elementTextContains('css', 'table tbody tr:nth-child(1)', $entity->getName());
-    $this->assertSession()->elementTextNotContains('css', 'table tbody tr:nth-child(1)', '- Restricted access -');
 
     $entity->setNewRevision();
     $entity->save();
@@ -129,6 +105,80 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
     $this->assertSession()->elementTextNotContains('css', 'table tbody tr:nth-child(3)', 'Current revision');
     // Current revision row has 'revision-current' class.
     $this->assertSession()->elementAttributeContains('css', 'table tbody tr:nth-child(1)', 'class', 'revision-current');
+  }
+
+  /**
+   * Test description with entity implementing revision log.
+   *
+   * @legacy-covers ::getRevisionDescription
+   */
+  public function testDescriptionRevLog(): void {
+    /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $entity */
+    $entity = EntityTestWithRevisionLog::create(['type' => 'entity_test_revlog']);
+    $entity->setName('view all revisions');
+    $user = $this->drupalCreateUser([], $this->randomMachineName());
+    $entity->setRevisionUser($user);
+    $entity->setRevisionCreationTime((new \DateTime('2 February 2013 4:00:00pm'))->getTimestamp());
+    $entity->save();
+
+    $this->drupalGet($entity->toUrl('version-history'));
+    $this->assertSession()->elementTextContains('css', 'table tbody tr:nth-child(1)', '2 Feb 2013 - 16:00');
+    $this->assertSession()->elementTextContains('css', 'table tbody tr:nth-child(1)', $user->getAccountName());
+  }
+
+  /**
+   * Test description with entity implementing revision log, with empty values.
+   *
+   * @legacy-covers ::getRevisionDescription
+   */
+  public function testDescriptionRevLogNullValues(): void {
+    $this->installConfig(['user']);
+    $entity = EntityTestWithRevisionLog::create(['type' => 'entity_test_revlog']);
+    $entity->setName('view all revisions')->save();
+
+    // Check entity values are still null after saving; they did not receive
+    // values from currentUser or some other global context.
+    $this->assertNull($entity->getRevisionUser());
+    $this->assertNull($entity->getRevisionUserId());
+    $this->assertNull($entity->getRevisionLogMessage());
+
+    $this->drupalGet($entity->toUrl('version-history'));
+    $this->assertSession()->elementTextContains('css', 'table tbody tr:nth-child(1)', 'by Anonymous (not verified)');
+  }
+
+  /**
+   * Test description with entity, without revision log, no label access.
+   *
+   * @legacy-covers ::getRevisionDescription
+   */
+  public function testDescriptionNoRevLogNoLabelAccess(): void {
+    /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
+    $entity = EntityTestRev::create(['type' => 'entity_test_rev']);
+    $entity->setName('view all revisions');
+    $entity->save();
+
+    $this->drupalGet($entity->toUrl('version-history'));
+    $this->assertSession()->elementTextContains('css', 'table tbody tr:nth-child(1)', '- Restricted access -');
+    $this->assertSession()->elementTextNotContains('css', 'table tbody tr:nth-child(1)', $entity->getName());
+  }
+
+  /**
+   * Test description with entity, without revision log, with label access.
+   *
+   * @legacy-covers ::getRevisionDescription
+   */
+  public function testDescriptionNoRevLogWithLabelAccess(): void {
+    // Permission grants 'view label' access.
+    $this->setCurrentUser($this->createUser(['view test entity']));
+
+    /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
+    $entity = EntityTestRev::create(['type' => 'entity_test_rev']);
+    $entity->setName('view all revisions');
+    $entity->save();
+
+    $this->drupalGet($entity->toUrl('version-history'));
+    $this->assertSession()->elementTextContains('css', 'table tbody tr:nth-child(1)', $entity->getName());
+    $this->assertSession()->elementTextNotContains('css', 'table tbody tr:nth-child(1)', '- Restricted access -');
   }
 
   /**
@@ -279,6 +329,7 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
    * Test revisions are paginated.
    */
   public function testRevisionsPagination(): void {
+    $this->installEntitySchema('entity_test_mulrev');
     /** @var \Drupal\entity_test\Entity\EntityTestMulRev $entity */
     $entity = EntityTestMulRev::create([
       'type' => 'entity_test_mulrev',
@@ -314,7 +365,6 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
     // We should see everything up to the second revision, but not the first.
     $this->assertSession()->linkByHrefExists($secondRevision->toUrl('revision')->toString());
     $this->assertSession()->linkByHrefNotExists($firstRevision->toUrl('revision')->toString());
-    // The next page should show just the first revision.
     $this->clickLink('Go to next page');
     $this->assertSession()->elementsCount('css', 'table tbody tr', 1);
     $this->assertSession()->elementExists('css', '.pager');
