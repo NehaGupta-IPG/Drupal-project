@@ -28,6 +28,7 @@ use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\DependencyInjection\ClassResolverInterface;
+use Drupal\Core\Plugin\PluginManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
@@ -49,12 +50,12 @@ class FieldHooks {
     protected readonly LoggerChannelFactoryInterface $loggerFactory,
     protected readonly ClassResolverInterface $classResolver,
     #[Autowire(service: 'plugin.manager.field.widget')]
-    protected readonly \Drupal\Core\Plugin\PluginManagerInterface $fieldWidgetManager,
+    protected readonly PluginManagerInterface $fieldWidgetManager,
     protected readonly FieldTypePluginManagerInterface $fieldTypeManager,
     #[Autowire(service: 'plugin.manager.field.formatter')]
-    protected readonly \Drupal\Core\Plugin\PluginManagerInterface $fieldFormatterManager,
+    protected readonly PluginManagerInterface $fieldFormatterManager,
     #[Autowire(service: 'plugin.manager.entity_reference_selection')]
-    protected readonly \Drupal\Core\Plugin\PluginManagerInterface $entityReferenceSelectionManager,
+    protected readonly PluginManagerInterface $entityReferenceSelectionManager,
   ) {
 
   }
