@@ -3,6 +3,8 @@
 namespace Drupal\field\Hook;
 
 use Drupal\field\FieldConfigInterface;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\field\Entity\FieldConfig;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Entity\DynamicallyFieldableEntityStorageInterface;
