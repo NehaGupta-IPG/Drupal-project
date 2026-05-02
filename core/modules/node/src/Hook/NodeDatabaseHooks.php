@@ -88,6 +88,12 @@ class NodeDatabaseHooks {
     if ($query instanceof RefinableCacheableDependencyInterface) {
       $query->addCacheContexts($contexts);
     }
+
+    $renderer = \Drupal::service('renderer');
+    if ($renderer->hasRenderContext()) {
+      $build = ['#cache' => ['contexts' => $contexts]];
+      $renderer->render($build);
+    }
   }
 
 }

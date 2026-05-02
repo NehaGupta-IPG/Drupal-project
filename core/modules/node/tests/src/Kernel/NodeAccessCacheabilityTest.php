@@ -76,11 +76,7 @@ class NodeAccessCacheabilityTest extends NodeAccessTestBase {
 
     $anonymousUser = User::getAnonymousUser();
     $this->setCurrentUser($anonymousUser);
-    // When early rendering is enabled, then pass route parameter so that the
-    // query cacheable metadata is not applied to the render array. If early
-    // rendering is disabled, pass route parameter so that the query cacheable
-    // metadata is applied to the render array.
-    $this->drupalGet(new Url('node_access_test_auto_bubbling', ['capture_cache' => $disable_early_render])->toString());
+    $this->drupalGet(new Url('node_access_test_auto_bubbling')->toString());
     $this->assertCacheContext('user.node_grants:view');
     // The controller includes markup indicating whether it ran within a render
     // context. The render context is provided by the early rendering subscriber
@@ -97,7 +93,7 @@ class NodeAccessCacheabilityTest extends NodeAccessTestBase {
     // grants cache context is not added or bubbled to the response header.
     $bypassUser = $this->createUser(['bypass node access']);
     $this->setCurrentUser($bypassUser);
-    $this->drupalGet(new Url('node_access_test_auto_bubbling', ['capture_cache' => $disable_early_render])->toString());
+    $this->drupalGet(new Url('node_access_test_auto_bubbling')->toString());
     $this->assertNoCacheContext('user.node_grants:view');
     $this->setCurrentUser($anonymousUser);
     if (!$disable_early_render) {
@@ -113,7 +109,7 @@ class NodeAccessCacheabilityTest extends NodeAccessTestBase {
     // Because there are no node grants defined, the node grants cache context
     // is not added or bubbled to the response header.
     $this->setCurrentUser($anonymousUser);
-    $this->drupalGet(new Url('node_access_test_auto_bubbling', ['capture_cache' => $disable_early_render])->toString());
+    $this->drupalGet(new Url('node_access_test_auto_bubbling')->toString());
     $this->assertNoCacheContext('user.node_grants:view');
     if (!$disable_early_render) {
       $this->assertSession()->pageTextContains('Executed within a render context.');

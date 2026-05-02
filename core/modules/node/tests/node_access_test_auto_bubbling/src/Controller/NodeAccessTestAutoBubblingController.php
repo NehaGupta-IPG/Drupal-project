@@ -22,13 +22,10 @@ class NodeAccessTestAutoBubblingController extends ControllerBase {
   /**
    * Lists the three latest published node IDs.
    *
-   * @param bool $capture_cache
-   *   Whether capture the cacheable metadata to the render array.
-   *
    * @return array
    *   A render array.
    */
-  public function latest(bool $capture_cache): array {
+  public function latest() {
     // Add markup to the response indicating whether this method and the entity
     // query is run within a render context. The render context is provided by
     // the early rendering subscriber to capture cacheability at build time.
@@ -46,11 +43,9 @@ class NodeAccessTestAutoBubblingController extends ControllerBase {
       ->range(0, 3);
     $nids = $query->execute();
     $build[] = ['#markup' => $this->t('The three latest nodes are: @nids.', ['@nids' => implode(', ', $nids)])];
-    if ($capture_cache) {
-      BubbleableMetadata::createFromRenderArray($build)
-        ->addCacheableDependency($query)
-        ->applyTo($build);
-    }
+    BubbleableMetadata::createFromRenderArray($build)
+      ->addCacheableDependency($query)
+      ->applyTo($build);
     return $build;
   }
 

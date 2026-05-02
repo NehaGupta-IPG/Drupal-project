@@ -2,10 +2,8 @@
 
 namespace Drupal\Core\Database\Query;
 
-use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Render\RendererInterface;
 
 /**
  * Query builder for SELECT statements.
@@ -528,17 +526,6 @@ class Select extends Query implements SelectInterface {
       return NULL;
     }
 
-    $renderer = \Drupal::service(RendererInterface::class);
-    if ($renderer->hasRenderContext()) {
-      $build = [
-        '#cache' => [
-          'contexts' => $this->getCacheContexts(),
-          'tags' => $this->getCacheTags(),
-          'max-age' => $this->getCacheMaxAge(),
-        ],
-      ];
-      $renderer->render($build);
-    }
     $args = $this->getArguments();
     return $this->connection->query((string) $this, $args, $this->queryOptions);
   }
