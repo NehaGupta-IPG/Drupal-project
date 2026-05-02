@@ -1,7 +1,8 @@
 node_access_test_auto_bubbling:
-  path: '/node_access_test_auto_bubbling'
+  path: '/node_access_test_auto_bubbling/{capture_cache}'
   defaults:
     _controller: '\Drupal\node_access_test_auto_bubbling\Controller\NodeAccessTestAutoBubblingController::latest'
+    capture_cache: false
   requirements:
     _access: 'TRUE'
 node_access_test_auto_bubbling.node_access:
