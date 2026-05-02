@@ -77,7 +77,7 @@ class FormPreprocess {
    *   because titles (names) on form elements are important for accessibility
    *   and proper form validation error messages.
    *
-   * (deprecated) If the #title property is not set, then the label and any
+   * (deprecated) If the #title attribute is not set, then the label and any
    * required marker will not be output, regardless of the #title_display or
    * #required values.
    *

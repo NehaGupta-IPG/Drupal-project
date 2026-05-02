@@ -1089,13 +1089,13 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       'password_confirm',
     ];
     // `fieldset` elements must have a `legend`, and therefore a `#title`.
-    if (isset($element['#type']) && !in_array($element['#type'], $types_to_skip) && ($element['#type'] == 'fieldset' || !empty($element['#input'])) && empty($element['#attributes']['aria-label']) && empty($element['#attributes']['aria-labelledby'])) {
+    if (isset($element['#type']) && !in_array($element['#type'], $types_to_skip) && ($element['#type'] == 'fieldset' || !empty($element['#input']))) {
       $title_key = in_array($element['#type'], ['button', 'submit']) ? '#value' : '#title';
       // Check for empty or unset value.
       // For buttons with missing #value declarations, #value will be '' here.
       // trim() is used for simple check against accidental strings of spaces.
       if (!strlen(trim($element[$title_key] ?? ''))) {
-        @trigger_error(sprintf('Support for form elements without accessible names is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "%s" of #type "%s" from form "%s" is missing a #title and other attributes that specify accessible names. See https://www.drupal.org/project/drupal/issues/933004', implode('][', $element['#array_parents']), $element['#type'], $form_id), E_USER_DEPRECATED);
+        @trigger_error(sprintf('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "%s" of #type "%s" from form "%s" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004', implode('][', $element['#array_parents']), $element['#type'], $form_id), E_USER_DEPRECATED);
       }
     }
 

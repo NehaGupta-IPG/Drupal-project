@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests the the deprecation message for empty #title property.
+ * Tests the the deprecation message for empty #title attribute.
  */
 #[Group('form')]
 #[Group('legacy')]
@@ -144,16 +144,16 @@ class FormElementMissingTitleDeprecationTest extends KernelTestBase implements F
   public function validateForm(array &$form, FormStateInterface $form_state): void {}
 
   /**
-   * Ensures that missing #title property triggers deprecation message.
+   * Ensures that missing #title attribute triggers deprecation message.
    */
   public function testDeprecationMessage(): void {
-    $this->expectUserDeprecationMessage('Support for form elements without accessible names is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "textfield_missing_title" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title and other attributes that specify accessible names. See https://www.drupal.org/project/drupal/issues/933004');
-    $this->expectUserDeprecationMessage('Support for form elements without accessible names is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "textfield_title_is_empty_string" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title and other attributes that specify accessible names. See https://www.drupal.org/project/drupal/issues/933004');
-    $this->expectUserDeprecationMessage('Support for form elements without accessible names is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "textfield_title_is_space" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title and other attributes that specify accessible names. See https://www.drupal.org/project/drupal/issues/933004');
-    $this->expectUserDeprecationMessage('Support for form elements without accessible names is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "textfield_title_is_false" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title and other attributes that specify accessible names. See https://www.drupal.org/project/drupal/issues/933004');
-    $this->expectUserDeprecationMessage('Support for form elements without accessible names is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "button_missing_value" of #type "button" from form "form_test_element_missing_title_deprecation" is missing a #title and other attributes that specify accessible names. See https://www.drupal.org/project/drupal/issues/933004');
-    $this->expectUserDeprecationMessage('Support for form elements without accessible names is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "submit_missing_value" of #type "submit" from form "form_test_element_missing_title_deprecation" is missing a #title and other attributes that specify accessible names. See https://www.drupal.org/project/drupal/issues/933004');
-    $this->expectUserDeprecationMessage('Support for form elements without accessible names is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "fieldset" of #type "fieldset" from form "form_test_element_missing_title_deprecation" is missing a #title and other attributes that specify accessible names. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "textfield_missing_title" of #type "textfield" from form "form_test_element_missing_title_deprecation" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "textfield_title_is_empty_string" of #type "textfield" from form "form_test_element_missing_title_deprecation" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "textfield_title_is_space" of #type "textfield" from form "form_test_element_missing_title_deprecation" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "textfield_title_is_false" of #type "textfield" from form "form_test_element_missing_title_deprecation" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "button_missing_value" of #type "button" from form "form_test_element_missing_title_deprecation" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "submit_missing_value" of #type "submit" from form "form_test_element_missing_title_deprecation" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "fieldset" of #type "fieldset" from form "form_test_element_missing_title_deprecation" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
 
     $this->container->get('form_builder')->getForm($this);
   }
