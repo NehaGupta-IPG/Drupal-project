@@ -6,7 +6,6 @@ use Drupal\field\FieldStorageConfigInterface;
 use Drupal\field\EntityDisplayRebuilder;
 use Drupal\field\FieldConfigInterface;
 use Drupal\field\Entity\FieldConfig;
-use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
