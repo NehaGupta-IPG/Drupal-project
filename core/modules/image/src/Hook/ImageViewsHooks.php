@@ -19,6 +19,7 @@ class ImageViewsHooks {
   public function __construct(
     protected readonly EntityFieldManagerInterface $entityFieldManager,
     protected readonly EntityTypeManagerInterface $entityTypeManager,
+    protected readonly ?FieldViewsDataProvider $fieldViewsDataProvider = NULL,
   ) {}
 
   /**
@@ -31,8 +32,10 @@ class ImageViewsHooks {
    */
   #[Hook('field_views_data')]
   public function fieldViewsData(FieldStorageConfigInterface $field_storage): array {
-    $field_views_data_provider = new FieldViewsDataProvider();
-    $data = $field_views_data_provider->defaultFieldImplementation($field_storage);
+    if (!$this->fieldViewsDataProvider) {
+      return [];
+    }
+    $data = $this->fieldViewsDataProvider->defaultFieldImplementation($field_storage);
     foreach ($data as $table_name => $table_data) {
       // Add the relationship only on the target_id field.
       $data[$table_name][$field_storage->getName() . '_target_id']['relationship'] = [
