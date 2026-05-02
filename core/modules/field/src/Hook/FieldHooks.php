@@ -15,10 +15,19 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\DynamicallyFieldableEntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Extension\ModuleExtensionList;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Field\FieldTypePluginManagerInterface;
+use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
@@ -31,6 +40,21 @@ class FieldHooks {
   public function __construct(
     #[Autowire(service: 'cache.memory')]
     protected readonly CacheBackendInterface $memoryCache,
+    protected readonly ModuleHandlerInterface $moduleHandler,
+    protected readonly EntityTypeManagerInterface $entityTypeManager,
+    protected readonly RendererInterface $renderer,
+    protected readonly ModuleExtensionList $moduleExtensionList,
+    protected readonly EntityFieldManagerInterface $entityFieldManager,
+    protected readonly MessengerInterface $messenger,
+    protected readonly LoggerChannelFactoryInterface $loggerFactory,
+    protected readonly ClassResolverInterface $classResolver,
+    #[Autowire(service: 'plugin.manager.field.widget')]
+    protected readonly \Drupal\Core\Plugin\PluginManagerInterface $fieldWidgetManager,
+    protected readonly FieldTypePluginManagerInterface $fieldTypeManager,
+    #[Autowire(service: 'plugin.manager.field.formatter')]
+    protected readonly \Drupal\Core\Plugin\PluginManagerInterface $fieldFormatterManager,
+    #[Autowire(service: 'plugin.manager.entity_reference_selection')]
+    protected readonly \Drupal\Core\Plugin\PluginManagerInterface $entityReferenceSelectionManager,
   ) {
 
   }
@@ -80,7 +104,7 @@ class FieldHooks {
   public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.field':
-        $field_ui_url = \Drupal::moduleHandler()->moduleExists('field_ui') ? Url::fromRoute('help.page', ['name' => 'field_ui'])->toString() : '#';
+        $field_ui_url = $this->moduleHandler->moduleExists('field_ui') ? Url::fromRoute('help.page', ['name' => 'field_ui'])->toString() : '#';
         $output = '';
         $output .= '<h2>' . $this->t('About') . '</h2>';
         $output .= '<p>' . $this->t('The Field module allows custom data fields to be defined for <em>entity</em> types (see below). The Field module takes care of storing, loading, editing, and rendering field data. Most users will not interact with the Field module directly, but will instead use the <a href=":field-ui-help">Field UI module</a> user interface. Module developers can use the Field API to make new entity types "fieldable" and thus allow fields to be attached to them. For more information, see the <a href=":field">online documentation for the Field module</a>.', [
@@ -112,23 +136,22 @@ class FieldHooks {
         // enabled, ordered by displayed module name (module names are not
         // translated).
         $items = [];
-        $modules = \Drupal::moduleHandler()->getModuleList();
-        $widgets = \Drupal::service('plugin.manager.field.widget')->getDefinitions();
-        $field_types = \Drupal::service('plugin.manager.field.field_type')->getUiDefinitions();
-        $formatters = \Drupal::service('plugin.manager.field.formatter')->getDefinitions();
+        $modules = $this->moduleHandler->getModuleList();
+        $widgets = $this->fieldWidgetManager->getDefinitions();
+        $field_types = $this->fieldTypeManager->getUiDefinitions();
+        $formatters = $this->fieldFormatterManager->getDefinitions();
         $providers = [];
         foreach (array_merge($field_types, $widgets, $formatters) as $plugin) {
           $providers[] = $plugin['provider'];
         }
         $providers = array_unique($providers);
         sort($providers);
-        $module_extension_list = \Drupal::service('extension.list.module');
         foreach ($providers as $provider) {
           // Skip plugins provided by core components as they do not implement
           // hook_help().
           if (isset($modules[$provider])) {
-            $display = $module_extension_list->getName($provider);
-            if (\Drupal::moduleHandler()->hasImplementations('help', $provider)) {
+            $display = $this->moduleExtensionList->getName($provider);
+            if ($this->moduleHandler->hasImplementations('help', $provider)) {
               $items[] = Link::fromTextAndUrl($display, Url::fromRoute('help.page', ['name' => $provider]))->toRenderable();
             }
             else {
@@ -140,7 +163,7 @@ class FieldHooks {
           $output .= '<dt>' . $this->t('Provided by modules') . '</dt>';
           $output .= '<dd>' . $this->t('Here is a list of the currently installed field, formatter, and widget modules:');
           $item_list = ['#theme' => 'item_list', '#items' => $items];
-          $output .= \Drupal::service('renderer')->renderInIsolation($item_list);
+          $output .= $this->renderer->renderInIsolation($item_list);
           $output .= '</dd>';
         }
         $output .= '<dt>' . $this->t('Provided by Drupal core') . '</dt>';
@@ -178,10 +201,10 @@ class FieldHooks {
    */
   #[Hook('entity_field_storage_info')]
   public function entityFieldStorageInfo(EntityTypeInterface $entity_type): array {
-    if (\Drupal::entityTypeManager()->getStorage($entity_type->id()) instanceof DynamicallyFieldableEntityStorageInterface) {
+    if ($this->entityTypeManager->getStorage($entity_type->id()) instanceof DynamicallyFieldableEntityStorageInterface) {
       // Query by filtering on the ID as this is more efficient than filtering
       // on the entity_type property directly.
-      $ids = \Drupal::entityQuery('field_storage_config')->condition('id', $entity_type->id() . '.', 'STARTS_WITH')->execute();
+      $ids = $this->entityTypeManager->getStorage('field_storage_config')->getQuery('AND')->condition('id', $entity_type->id() . '.', 'STARTS_WITH')->execute();
       // Fetch all fields and key them by field name.
       $field_storages = FieldStorageConfig::loadMultiple($ids);
       $result = [];
@@ -198,7 +221,7 @@ class FieldHooks {
    */
   #[Hook('entity_bundle_field_info')]
   public function entityBundleFieldInfo(EntityTypeInterface $entity_type, $bundle, array $base_field_definitions): array {
-    if (\Drupal::entityTypeManager()->getStorage($entity_type->id()) instanceof DynamicallyFieldableEntityStorageInterface) {
+    if ($this->entityTypeManager->getStorage($entity_type->id()) instanceof DynamicallyFieldableEntityStorageInterface) {
       $cid = 'field_bundle_field_info:' . $entity_type->id();
       if ($cached = $this->memoryCache->get($cid)) {
         $fields = $cached->data;
@@ -207,7 +230,7 @@ class FieldHooks {
         $fields = [];
         // Query by filtering on the ID as this is more efficient than filtering
         // on the entity_type property directly.
-        $ids = \Drupal::entityQuery('field_config')->condition('id', $entity_type->id() . '.', 'STARTS_WITH')->execute();
+        $ids = $this->entityTypeManager->getStorage('field_config')->getQuery('AND')->condition('id', $entity_type->id() . '.', 'STARTS_WITH')->execute();
         // Fetch all fields and key them by field name.
         $field_configs = FieldConfig::loadMultiple($ids);
         foreach ($field_configs as $field_instance) {
@@ -236,7 +259,7 @@ class FieldHooks {
    */
   #[Hook('entity_bundle_delete')]
   public function entityBundleDelete($entity_type_id, $bundle): void {
-    $storage = \Drupal::entityTypeManager()->getStorage('field_config');
+    $storage = $this->entityTypeManager->getStorage('field_config');
     // Get the fields on the bundle.
     $fields = $storage->loadByProperties(['entity_type' => $entity_type_id, 'bundle' => $bundle]);
     // This deletes the data for the field as well as the field themselves. This
@@ -253,7 +276,7 @@ class FieldHooks {
     // because we need to take into account bundles that are not provided by a
     // config entity type so they are not part of the config dependencies.
     // Gather a list of all entity reference fields.
-    $map = \Drupal::service('entity_field.manager')->getFieldMapByFieldType('entity_reference');
+    $map = $this->entityFieldManager->getFieldMapByFieldType('entity_reference');
     $ids = [];
     foreach ($map as $type => $info) {
       foreach ($info as $name => $data) {
@@ -313,7 +336,7 @@ class FieldHooks {
         foreach ($field_storages as $field) {
           $field_labels[] = $field->label();
         }
-        \Drupal::messenger()->addWarning(\Drupal::translation()->formatPlural(count($field_storages), 'This synchronization will delete data from the field %fields.', 'This synchronization will delete data from the fields: %fields.', ['%fields' => implode(', ', $field_labels)]));
+        $this->messenger->addWarning($this->formatPlural(count($field_storages), 'This synchronization will delete data from the field %fields.', 'This synchronization will delete data from the fields: %fields.', ['%fields' => implode(', ', $field_labels)]));
       }
     }
   }
@@ -330,7 +353,7 @@ class FieldHooks {
     // Allow other view modes to update their configuration for the new field.
     // Otherwise, configuration for view modes won't get updated until the mode
     // is used for the first time, creating noise in config diffs.
-    \Drupal::classResolver(EntityDisplayRebuilder::class)->rebuildEntityTypeDisplays($field->getTargetEntityTypeId(), $field->getTargetBundle());
+    $this->classResolver->getInstanceFromDefinition(EntityDisplayRebuilder::class)->rebuildEntityTypeDisplays($field->getTargetEntityTypeId(), $field->getTargetBundle());
   }
 
   /**
@@ -346,10 +369,8 @@ class FieldHooks {
       return;
     }
     // Act on all sub-types of the entity_reference field type.
-    /** @var \Drupal\Core\Field\FieldTypePluginManager $field_type_manager */
-    $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
     $item_class = 'Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem';
-    $class = $field_type_manager->getPluginClass($field_storage->getType());
+    $class = $this->fieldTypeManager->getPluginClass($field_storage->getType());
     if ($class !== $item_class && !is_subclass_of($class, $item_class)) {
       return;
     }
@@ -379,10 +400,8 @@ class FieldHooks {
       return;
     }
     // Act on all sub-types of the entity_reference field type.
-    /** @var \Drupal\Core\Field\FieldTypePluginManager $field_type_manager */
-    $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
     $item_class = 'Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem';
-    $class = $field_type_manager->getPluginClass($field->getType());
+    $class = $this->fieldTypeManager->getPluginClass($field->getType());
     if ($class !== $item_class && !is_subclass_of($class, $item_class)) {
       return;
     }
@@ -393,9 +412,8 @@ class FieldHooks {
     }
     // Make sure the selection handler plugin is the correct derivative for the
     // target entity type.
-    $selection_manager = \Drupal::service('plugin.manager.entity_reference_selection');
     [$current_handler] = explode(':', $field->getSetting('handler'), 2);
-    $field->setSetting('handler', $selection_manager->getPluginId($target_type, $current_handler));
+    $field->setSetting('handler', $this->entityReferenceSelectionManager->getPluginId($target_type, $current_handler));
   }
 
   /**
@@ -411,10 +429,8 @@ class FieldHooks {
     }
     $this->fieldConfigCreate($field);
     // Act on all sub-types of the entity_reference field type.
-    /** @var \Drupal\Core\Field\FieldTypePluginManager $field_type_manager */
-    $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
     $item_class = 'Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem';
-    $class = $field_type_manager->getPluginClass($field->getType());
+    $class = $this->fieldTypeManager->getPluginClass($field->getType());
     if ($class !== $item_class && !is_subclass_of($class, $item_class)) {
       return;
     }
@@ -424,7 +440,7 @@ class FieldHooks {
     // critical message because the field will not function correctly anymore.
     $handler_settings = $field->getSetting('handler_settings');
     if (isset($handler_settings['target_bundles']) && $handler_settings['target_bundles'] === []) {
-      \Drupal::logger('entity_reference')->critical('The %field_name entity reference field (entity_type: %entity_type, bundle: %bundle) no longer has any valid bundle it can reference. The field is not working correctly anymore and has to be adjusted.', [
+      $this->loggerFactory->get('entity_reference')->critical('The %field_name entity reference field (entity_type: %entity_type, bundle: %bundle) no longer has any valid bundle it can reference. The field is not working correctly anymore and has to be adjusted.', [
         '%field_name' => $field->getName(),
         '%entity_type' => $field->getTargetEntityTypeId(),
         '%bundle' => $field->getTargetBundle(),
