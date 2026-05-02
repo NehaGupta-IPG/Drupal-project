@@ -50,7 +50,6 @@ class ComponentInFormTest extends ComponentKernelTestBase implements FormInterfa
     // component.
     $form['banner'] = [
       '#type' => 'component',
-      '#title' => 'banner',
       '#component' => 'sdc_test:my-banner',
       '#props' => [
         'ctaText' => 'Click me!',
@@ -59,7 +58,6 @@ class ComponentInFormTest extends ComponentKernelTestBase implements FormInterfa
       ],
       'banner_body' => [
         '#type' => 'component',
-        '#title' => 'banner_body',
         '#component' => 'sdc_theme_test:my-card',
         '#props' => [
           'header' => 'Card header',
