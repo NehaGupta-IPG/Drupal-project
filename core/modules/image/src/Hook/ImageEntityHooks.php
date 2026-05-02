@@ -3,9 +3,9 @@
 namespace Drupal\image\Hook;
 
 use Drupal\Core\Entity\EntityRepositoryInterface;
-use Drupal\Core\File\FileRepositoryInterface;
+use Drupal\file\FileRepositoryInterface;
 use Drupal\Core\File\FileSystemInterface;
-use Drupal\Core\File\FileUsageInterface;
+use Drupal\file\FileUsage\FileUsageInterface;
 use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\field\FieldConfigInterface;
