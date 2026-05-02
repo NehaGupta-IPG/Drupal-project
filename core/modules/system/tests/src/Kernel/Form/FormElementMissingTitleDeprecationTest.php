@@ -15,7 +15,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests the the deprecation message for empty #title attribute.
  */
 #[Group('form')]
-#[Group('legacy')]
 #[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class FormElementMissingTitleDeprecationTest extends KernelTestBase implements FormInterface {

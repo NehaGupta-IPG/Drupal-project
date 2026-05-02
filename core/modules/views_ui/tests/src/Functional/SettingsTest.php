@@ -39,7 +39,6 @@ class SettingsTest extends UITestBase {
   /**
    * Tests the settings for the edit ui.
    */
-  #[Group('legacy')]
   #[IgnoreDeprecations]
   public function testEditUI(): void {
     // The element with missing `#title` is for a fieldset and is not easily
