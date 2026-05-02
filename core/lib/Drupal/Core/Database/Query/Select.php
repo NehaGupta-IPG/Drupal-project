@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Database\Query;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Render\RendererInterface;
