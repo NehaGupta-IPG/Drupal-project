@@ -12,7 +12,6 @@ use Drupal\field\FieldConfigInterface;
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\file\FileInterface;
-use Drupal\image\Controller\ImageStyleDownloadController;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\image\ImageDerivativeUtilities;
