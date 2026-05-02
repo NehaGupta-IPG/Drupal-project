@@ -10,6 +10,7 @@ use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Template\Attribute;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -194,7 +195,20 @@ class ComponentAsFormElementTest extends ComponentKernelTestBase implements Form
   /**
    * Tests that fields validation messages are sorted in the fields order.
    */
+  #[IgnoreDeprecations]
   public function testFormRenderingAndSubmission(): void {
+    // @todo Determine best way to resolve this. Should some components have #title?
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "sdc_input" of #type "component" from form "component_as_form_element_in_form_test" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "sdc_input_basic" of #type "component" from form "component_as_form_element_in_form_test" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "sdc_input_with_label" of #type "component" from form "component_as_form_element_in_form_test" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "sdc_input_with_default_value" of #type "component" from form "component_as_form_element_in_form_test" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "sdc_input_with_value" of #type "component" from form "component_as_form_element_in_form_test" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "sdc_input_with_value_and_default_value" of #type "component" from form "component_as_form_element_in_form_test" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "sdc_input_with_required" of #type "component" from form "component_as_form_element_in_form_test" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "sdc_input_with_id_as_prop" of #type "component" from form "component_as_form_element_in_form_test" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "sdc_input_with_id_as_prop_attributes" of #type "component" from form "component_as_form_element_in_form_test" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "sdc_input_with_validation" of #type "component" from form "component_as_form_element_in_form_test" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+
     /** @var \Drupal\Core\Form\FormBuilderInterface $form_builder */
     $form_builder = \Drupal::service('form_builder');
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
@@ -246,7 +260,20 @@ class ComponentAsFormElementTest extends ComponentKernelTestBase implements Form
   /**
    * Tests that #element_validate works as expected.
    */
+  #[IgnoreDeprecations]
   public function testElementValidateCallback(): void {
+    // @todo Determine best way to resolve this. Should some components have #title?
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "sdc_input" of #type "component" from form "component_as_form_element_in_form_test" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "sdc_input_basic" of #type "component" from form "component_as_form_element_in_form_test" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "sdc_input_with_label" of #type "component" from form "component_as_form_element_in_form_test" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "sdc_input_with_default_value" of #type "component" from form "component_as_form_element_in_form_test" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "sdc_input_with_value" of #type "component" from form "component_as_form_element_in_form_test" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "sdc_input_with_value_and_default_value" of #type "component" from form "component_as_form_element_in_form_test" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "sdc_input_with_required" of #type "component" from form "component_as_form_element_in_form_test" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "sdc_input_with_id_as_prop" of #type "component" from form "component_as_form_element_in_form_test" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "sdc_input_with_id_as_prop_attributes" of #type "component" from form "component_as_form_element_in_form_test" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "sdc_input_with_validation" of #type "component" from form "component_as_form_element_in_form_test" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+
     /** @var \Drupal\Core\Form\FormBuilderInterface $form_builder */
     $form_builder = \Drupal::service('form_builder');
 
