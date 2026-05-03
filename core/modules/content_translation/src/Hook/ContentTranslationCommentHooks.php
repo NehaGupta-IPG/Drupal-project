@@ -19,10 +19,8 @@ readonly class ContentTranslationCommentHooks {
 
   public function __construct(
     private readonly ContentTranslationManagerInterface $contentTranslationManager,
-    TranslationInterface $stringTranslation,
-  ) {
-    $this->stringTranslation = $stringTranslation;
-  }
+    protected readonly TranslationInterface $stringTranslation,
+  ) {}
 
   /**
    * Implements hook_comment_links_alter().

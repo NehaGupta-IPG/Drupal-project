@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\content_translation\Hook;
 
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\content_translation\ContentTranslationManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -19,6 +20,7 @@ readonly class ContentTranslationViewsHooks {
   public function __construct(
     private readonly ContentTranslationManagerInterface $contentTranslationManager,
     private readonly EntityTypeManagerInterface $entityTypeManager,
+    protected readonly TranslationInterface $stringTranslation,
   ) {}
 
   /**

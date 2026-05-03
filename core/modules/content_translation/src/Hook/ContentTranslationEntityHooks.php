@@ -38,10 +38,8 @@ readonly class ContentTranslationEntityHooks {
     private readonly FieldTranslationSynchronizerInterface $fieldTranslationSynchronizer,
     private readonly EntityFieldManagerInterface $entityFieldManager,
     private readonly EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager,
-    TranslationInterface $stringTranslation,
-  ) {
-    $this->stringTranslation = $stringTranslation;
-  }
+    protected readonly TranslationInterface $stringTranslation,
+  ) {}
 
   /**
    * Implements hook_entity_type_alter().

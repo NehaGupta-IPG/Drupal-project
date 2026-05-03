@@ -22,10 +22,8 @@ readonly class ContentTranslationHelpHooks {
   public function __construct(
     private readonly ModuleHandlerInterface $moduleHandler,
     private readonly LanguageManagerInterface $languageManager,
-    TranslationInterface $stringTranslation,
-  ) {
-    $this->stringTranslation = $stringTranslation;
-  }
+    protected readonly TranslationInterface $stringTranslation,
+  ) {}
 
   /**
    * Implements hook_help().
