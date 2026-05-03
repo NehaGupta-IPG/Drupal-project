@@ -13,7 +13,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 /**
  * Hook implementations for content_translation.
  */
-readonly class ContentTranslationViewsHooks {
+class ContentTranslationViewsHooks {
 
   use StringTranslationTrait;
 
