@@ -10,7 +10,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\content_translation\ContentTranslationManagerInterface;
 
 /**
- * Hook implementations for content_translation comments.
+ * Comment hook implementations for content_translation.
  */
 class ContentTranslationCommentHooks {
 

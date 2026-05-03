@@ -21,7 +21,7 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Form hook implementations for content_translation.
+ * Language form hook implementations for content_translation.
  *
  * This is separate from the other form hook class to reduce the number of
  * dependencies. These hooks are only invoked on the language edit form.

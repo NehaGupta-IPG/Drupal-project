@@ -15,7 +15,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Path\PathMatcherInterface;
 
 /**
- * Hook implementations for content_translation.
+ * Theme hook implementations for content_translation.
  */
 class ContentTranslationThemeHooks {
 

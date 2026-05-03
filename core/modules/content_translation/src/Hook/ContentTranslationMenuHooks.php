@@ -8,7 +8,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Hook\Attribute\Hook;
 
 /**
- * Hook implementations for content_translation.
+ * Menu hook implementations for content_translation.
  */
 readonly class ContentTranslationMenuHooks {
 

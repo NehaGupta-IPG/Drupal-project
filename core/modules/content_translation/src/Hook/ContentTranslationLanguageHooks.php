@@ -10,7 +10,7 @@ use Drupal\content_translation\ContentTranslationManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
- * Hook implementations for content_translation.
+ * Language hook implementations for content_translation.
  */
 readonly class ContentTranslationLanguageHooks {
 

@@ -12,7 +12,7 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Url;
 
 /**
- * Hook implementations for content_translation.
+ * Help hook implementations for content_translation.
  */
 class ContentTranslationHelpHooks {
 

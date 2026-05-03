@@ -7,7 +7,7 @@ namespace Drupal\content_translation\Hook;
 use Drupal\Core\Hook\Attribute\Hook;
 
 /**
- * Hook implementations for content_translation.
+ * Field hook implementations for content_translation.
  */
 readonly class ContentTranslationFieldHooks {
 

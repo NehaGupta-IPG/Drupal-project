@@ -22,7 +22,7 @@ use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Order\Order;
 
 /**
- * Hook implementations for content_translation.
+ * Entity hook implementations for content_translation.
  */
 class ContentTranslationEntityHooks {
 
