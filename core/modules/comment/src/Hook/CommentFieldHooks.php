@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Drupal\comment\Hook;
 
 use Drupal\Core\Field\FieldTypeCategoryManagerInterface;
-use Drupal\comment\CommentingStatus;
-use Drupal\field\FieldStorageConfigInterface;
-use Drupal\field\FieldConfigInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
