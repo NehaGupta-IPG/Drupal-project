@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\content_translation\Hook;
 
-use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\content_translation\ContentTranslationManagerInterface;
@@ -38,7 +37,6 @@ readonly class ContentTranslationLanguageHooks {
    */
   #[Hook('language_fallback_candidates_entity_view_alter')]
   public function languageFallbackCandidatesEntityViewAlter(&$candidates, $context): void {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $context['data'];
     $entity_type_id = $entity->getEntityTypeId();
     /** @var \Drupal\content_translation\ContentTranslationManagerInterface $manager */
