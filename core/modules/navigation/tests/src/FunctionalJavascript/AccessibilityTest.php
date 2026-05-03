@@ -33,13 +33,17 @@ class AccessibilityTest extends AccessibilityTestBase {
       800
     );
 
-    $this->assertFalse($create_button->isVisible());
+    // Wait and assert menu button is hidden.
+    $this->assertTrue($create_button->waitFor(2, function ($create_button): bool {
+      return !$create_button->isVisible();
+    }));
 
     $session->getPage()->pressButton('Expand sidebar');
 
-    // Wait for CSS transition.
-    $session->wait(500);
-    $this->assertTrue($create_button->isVisible());
+    // Wait and assert menu button is visible.
+    $this->assertTrue($create_button->waitFor(2, function ($create_button): bool {
+      return $create_button->isVisible();
+    }));
   }
 
   /**
