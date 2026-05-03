@@ -89,8 +89,6 @@ class FormPreprocess {
    *   - element: An associative array containing the properties of the element.
    *     Properties used: #title, #title_display, #description, #id, #required,
    *     #children, #type, #name, #label_for.
-   *
-   * @see https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html
    */
   public function preprocessFormElement(array &$variables): void {
     $element = &$variables['element'];
