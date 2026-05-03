@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\field\Hook;
 
 use Drupal\field\ConfigImporterFieldPurger;
@@ -7,9 +9,9 @@ use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Hook\Attribute\Hook;
 
 /**
- * Config hook implementations for field.
+ * Core hook implementations for field.
  */
-class FieldConfigHooks {
+class FieldCoreHooks {
 
   /**
    * Implements hook_config_import_steps_alter().

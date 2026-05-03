@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\field\Hook;
 
 use Drupal\Core\StringTranslation\StringTranslationTrait;
