@@ -301,7 +301,7 @@ class CommentEntityHooks {
         }
       }
     }
-    return $this->renderer->renderInIsolation($build);
+    return (string) $this->renderer->renderInIsolation($build);
   }
 
   /**
