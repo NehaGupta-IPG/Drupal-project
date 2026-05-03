@@ -15,7 +15,7 @@ use Drupal\Core\Url;
 /**
  * Hook implementations for content_translation.
  */
-readonly class ContentTranslationHelpHooks {
+class ContentTranslationHelpHooks {
 
   use StringTranslationTrait;
 

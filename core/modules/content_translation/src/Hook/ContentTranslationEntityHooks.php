@@ -25,7 +25,7 @@ use Drupal\Core\Hook\Order\Order;
 /**
  * Hook implementations for content_translation.
  */
-readonly class ContentTranslationEntityHooks {
+class ContentTranslationEntityHooks {
 
   use StringTranslationTrait;
 

@@ -13,7 +13,7 @@ use Drupal\content_translation\ContentTranslationManagerInterface;
 /**
  * Hook implementations for content_translation comments.
  */
-readonly class ContentTranslationCommentHooks {
+class ContentTranslationCommentHooks {
 
   use StringTranslationTrait;
 
