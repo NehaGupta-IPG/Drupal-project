@@ -10,7 +10,6 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\content_translation\BundleTranslationSettingsInterface;
 use Drupal\language\ContentLanguageSettingsInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\content_translation\ContentTranslationManagerInterface;
@@ -38,7 +37,6 @@ class ContentTranslationEntityHooks {
     private readonly FieldTranslationSynchronizerInterface $fieldTranslationSynchronizer,
     private readonly EntityFieldManagerInterface $entityFieldManager,
     private readonly EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager,
-    protected readonly TranslationInterface $stringTranslation,
   ) {}
 
   /**
