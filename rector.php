@@ -29,7 +29,10 @@ return Rector\Config\RectorConfig::configure()
 #    PHPUnitSetList::PHPUNIT_120,
 #    PHPUnitSetList::PHPUNIT_CODE_QUALITY,
 #  ])
-  ->withPreparedSets(typeDeclarations: true)
+  ->withPreparedSets(
+    deadCode: true,
+    typeDeclarations: true,
+  )
 #  ->withSkip([
 #    TypedPropertyFromCreateMockAssignRector::class,
 #    TypedPropertyFromDocblockSetUpDefinedRector::class,
