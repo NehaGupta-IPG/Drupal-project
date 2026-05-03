@@ -15,7 +15,6 @@ use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\field\EntityDisplayRebuilder;
-use Drupal\field\Entity\FieldConfig;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\DependencyInjection\ClassResolverInterface;
