@@ -10,12 +10,13 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\content_translation\BundleTranslationSettingsInterface;
 use Drupal\language\ContentLanguageSettingsInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\content_translation\ContentTranslationManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface;
-use Drupal\content_translation\ContentTranslationSynchronizerInterface;
+use Drupal\content_translation\FieldTranslationSynchronizerInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -34,10 +35,13 @@ readonly class ContentTranslationEntityHooks {
     private readonly ContentTranslationManagerInterface $contentTranslationManager,
     private readonly EntityTypeManagerInterface $entityTypeManager,
     private readonly EntityLastInstalledSchemaRepositoryInterface $schemaRepository,
-    private readonly ContentTranslationSynchronizerInterface $contentTranslationSynchronizer,
+    private readonly FieldTranslationSynchronizerInterface $fieldTranslationSynchronizer,
     private readonly EntityFieldManagerInterface $entityFieldManager,
     private readonly EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager,
-  ) {}
+    TranslationInterface $stringTranslation,
+  ) {
+    $this->stringTranslation = $stringTranslation;
+  }
 
   /**
    * Implements hook_entity_type_alter().
@@ -313,7 +317,35 @@ readonly class ContentTranslationEntityHooks {
       }
       $langcode = $entity->language()->getId();
       $source_langcode = !$entity->getOriginal()->hasTranslation($langcode) ? $manager->getTranslationMetadata($entity)->getSource() : NULL;
-      $this->contentTranslationSynchronizer->synchronizeFields($entity, $langcode, $source_langcode);
+      $this->fieldTranslationSynchronizer->synchronizeFields($entity, $langcode, $source_langcode);
+    }
+  }
+
+  /**
+   * Installs Content Translation's fields for a given entity type.
+   *
+   * @param string $entity_type_id
+   *   The entity type ID.
+   *
+   * @todo Generalize this code in https://www.drupal.org/node/2346013.
+   */
+  public function installFieldStorageDefinitions(string $entity_type_id): void {
+    /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager */
+    $field_manager = $this->entityFieldManager;
+
+    /** @var \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $schema_repository */
+    $schema_repository = $this->schemaRepository;
+    $definition_update_manager = $this->entityDefinitionUpdateManager;
+
+    $field_manager->useCaches();
+    $storage_definitions = $field_manager->getFieldStorageDefinitions($entity_type_id);
+    $field_manager->useCaches(TRUE);
+    $installed_storage_definitions = $schema_repository->getLastInstalledFieldStorageDefinitions($entity_type_id);
+    foreach (array_diff_key($storage_definitions, $installed_storage_definitions) as $storage_definition) {
+      /** @var \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition */
+      if ($storage_definition->getProvider() == 'content_translation') {
+        $definition_update_manager->installFieldStorageDefinition($storage_definition->getName(), $entity_type_id, 'content_translation', $storage_definition);
+      }
     }
   }
 

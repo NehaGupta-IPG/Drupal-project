@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\content_translation\Hook;
 
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -21,7 +22,10 @@ readonly class ContentTranslationHelpHooks {
   public function __construct(
     private readonly ModuleHandlerInterface $moduleHandler,
     private readonly LanguageManagerInterface $languageManager,
-  ) {}
+    TranslationInterface $stringTranslation,
+  ) {
+    $this->stringTranslation = $stringTranslation;
+  }
 
   /**
    * Implements hook_help().

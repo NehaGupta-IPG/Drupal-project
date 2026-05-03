@@ -6,8 +6,9 @@ namespace Drupal\content_translation\Hook;
 
 use Drupal\comment\CommentInterface;
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\content_translation\ContentTranslationManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslationInterface;
+use Drupal\content_translation\ContentTranslationManagerInterface;
 
 /**
  * Hook implementations for content_translation comments.
@@ -18,7 +19,10 @@ readonly class ContentTranslationCommentHooks {
 
   public function __construct(
     private readonly ContentTranslationManagerInterface $contentTranslationManager,
-  ) {}
+    TranslationInterface $stringTranslation,
+  ) {
+    $this->stringTranslation = $stringTranslation;
+  }
 
   /**
    * Implements hook_comment_links_alter().
