@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\comment\Hook;
 
 use Drupal\comment\CommentingStatus;
@@ -17,6 +19,9 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\comment\CommentManagerInterface;
 use Drupal\comment\CommentStatisticsInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\user\RoleInterface;
+use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Session\AccountProxyInterface;
 
 /**
  * Entity hook implementations for comment.
@@ -32,6 +37,8 @@ class CommentEntityHooks {
     private readonly CommentManagerInterface $commentManager,
     private readonly CommentStatisticsInterface $commentStatistics,
     private readonly EntityTypeManagerInterface $entityTypeManager,
+    private readonly RendererInterface $renderer,
+    private readonly AccountProxyInterface $currentUser,
   ) {}
 
   /**
@@ -244,6 +251,170 @@ class CommentEntityHooks {
     $comment_storage = $this->entityTypeManager->getStorage('comment');
     $comments = $comment_storage->loadMultiple($cids);
     $comment_storage->delete($comments);
+  }
+
+  /**
+   * Implements hook_node_update_index().
+   */
+  #[Hook('node_update_index')]
+  public function nodeUpdateIndex(EntityInterface $node): string {
+    $index_comments =& drupal_static('comment_node_update_index');
+    if ($index_comments === NULL) {
+      // Do not index in the following three cases:
+      // 1. 'Authenticated user' can search content but can't access comments.
+      // 2. 'Anonymous user' can search content but can't access comments.
+      // 3. Any role can search content but can't access comments and access
+      // comments is not granted by the 'authenticated user' role. In this case
+      // all users might have both permissions from various roles but it is also
+      // possible to set up a user to have only search content and so a user
+      // edit could change the security situation so it is not safe to index the
+      // comments.
+      $index_comments = TRUE;
+      $roles = $this->entityTypeManager->getStorage('user_role')->loadMultiple();
+      $authenticated_can_access = $roles[RoleInterface::AUTHENTICATED_ID]->hasPermission('access comments');
+      foreach ($roles as $rid => $role) {
+        if ($role->hasPermission('search content') && !$role->hasPermission('access comments')) {
+          if ($rid == RoleInterface::AUTHENTICATED_ID || $rid == RoleInterface::ANONYMOUS_ID || !$authenticated_can_access) {
+            $index_comments = FALSE;
+            break;
+          }
+        }
+      }
+    }
+    $build = [];
+    if ($index_comments) {
+      foreach ($this->commentManager->getFields('node') as $field_name => $info) {
+        // Skip fields that entity does not have.
+        if (!$node->hasField($field_name)) {
+          continue;
+        }
+        $field_definition = $node->getFieldDefinition($field_name);
+        $mode = $field_definition->getSetting('default_mode');
+        $comments_per_page = $field_definition->getSetting('per_page');
+        if ($node->get($field_name)->status) {
+          $comments = $this->entityTypeManager->getStorage('comment')->loadThread($node, $field_name, $mode, $comments_per_page);
+          if ($comments) {
+            $build[] = $this->entityTypeManager->getViewBuilder('comment')->viewMultiple($comments);
+          }
+        }
+      }
+    }
+    return $this->renderer->renderInIsolation($build);
+  }
+
+  /**
+   * Implements hook_node_search_result().
+   *
+   * Formats a comment count string and returns it, for display with search
+   * results.
+   */
+  #[Hook('node_search_result')]
+  public function nodeSearchResult(EntityInterface $node): array {
+    $comment_fields = $this->commentManager->getFields('node');
+    $comments = 0;
+    $open = FALSE;
+    foreach ($comment_fields as $field_name => $info) {
+      // Skip fields that entity does not have.
+      if (!$node->hasField($field_name)) {
+        continue;
+      }
+      // Do not make a string if comments are hidden.
+      $status = CommentingStatus::tryFrom((int) $node->get($field_name)->status);
+      if ($this->currentUser->hasPermission('access comments') && $status != CommentingStatus::Hidden) {
+        if ($status == CommentingStatus::Open) {
+          // At least one comment field is open.
+          $open = TRUE;
+        }
+        $comments += $node->get($field_name)->comment_count;
+      }
+    }
+    // Do not make a string if there are no comment fields, or no comments exist
+    // or all comment fields are hidden.
+    if ($comments > 0 || $open) {
+      return [
+        'comment' => $this->stringTranslation->formatPlural(
+          $comments,
+          '1 comment',
+          '@count comments'
+        ),
+      ];
+    }
+    return [];
+  }
+
+  /**
+   * Implements hook_node_search_ranking().
+   */
+  #[Hook('node_search_ranking')]
+  public function ranking(): array {
+    return $this->commentStatistics->getRankingInfo();
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_create() for 'field_config'.
+   */
+  #[Hook('field_config_create')]
+  public function fieldConfigCreate(FieldConfigInterface $field): void {
+    if ($field->getType() == 'comment' && !$field->isSyncing()) {
+      // Assign default values for the field.
+      $default_value = $field->getDefaultValueLiteral();
+      $default_value += [[]];
+      $default_value[0] += [
+        'status' => CommentingStatus::Open->value,
+        'cid' => 0,
+        'last_comment_timestamp' => 0,
+        'last_comment_name' => '',
+        'last_comment_uid' => 0,
+        'comment_count' => 0,
+      ];
+      $field->setDefaultValue($default_value);
+    }
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_update() for 'field_config'.
+   */
+  #[Hook('field_config_update')]
+  public function fieldConfigUpdate(FieldConfigInterface $field): void {
+    if ($field->getType() == 'comment') {
+      // Comment field settings also affects the rendering of *comment*
+      // entities, not only the *commented* entities.
+      $this->entityTypeManager->getViewBuilder('comment')->resetCache();
+    }
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_insert() for 'field_storage_config'.
+   */
+  #[Hook('field_storage_config_insert')]
+  public function fieldStorageConfigInsert(FieldStorageConfigInterface $field_storage): void {
+    if ($field_storage->getType() == 'comment') {
+      // Check that the target entity type uses an integer ID.
+      $entity_type = $this->entityTypeManager->getDefinition($field_storage->getTargetEntityTypeId());
+      if (!$entity_type->hasIntegerId()) {
+        throw new \UnexpectedValueException('You cannot attach a comment field to an entity with a non-integer ID field');
+      }
+    }
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_delete() for 'field_config'.
+   */
+  #[Hook('field_config_delete')]
+  public function fieldConfigDelete(FieldConfigInterface $field): void {
+    if ($field->getType() == 'comment') {
+      // Delete all comments that used by the entity bundle.
+      $entity_query = $this->entityTypeManager
+        ->getStorage('comment')
+        ->getQuery()
+        ->accessCheck(FALSE);
+      $entity_query->condition('entity_type', $field->getEntityTypeId());
+      $entity_query->condition('field_name', $field->getName());
+      $cids = $entity_query->execute();
+      $comment_storage = $this->entityTypeManager->getStorage('comment');
+      $comments = $comment_storage->loadMultiple($cids);
+      $comment_storage->delete($comments);
+    }
   }
 
 }

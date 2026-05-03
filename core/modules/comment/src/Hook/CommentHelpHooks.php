@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\comment\Hook;
 
 use Drupal\Core\Url;
