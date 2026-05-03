@@ -26,16 +26,17 @@ class AccessibilityTest extends AccessibilityTestBase {
    */
   protected function setupClaroPageMobileSidebarOpen(): void {
     $session = $this->getSession();
+    $create_button = $session->getPage()->find('css', '#admin-toolbar')->findButton('Create');
 
     $session->resizeWindow(
       500,
       800
     );
 
-    $create_button = $session->getPage()->find('css', '#admin-toolbar')->findButton('Create');
-
     $this->assertFalse($create_button->isVisible());
+
     $session->getPage()->pressButton('Expand sidebar');
+
     // Wait for CSS transition.
     $session->wait(500);
     $this->assertTrue($create_button->isVisible());
