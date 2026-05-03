@@ -11,18 +11,12 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
- * Implements the default batch processor.
+ * Defines the BatchProcessor service.
  *
  * @internal
  */
 class BatchProcessor {
 
-  /**
-   * Creates a new BatchProcessor.
-   *
-   * @param string $root
-   *   The app root.
-   */
   public function __construct(
     #[Autowire(param: 'app.root')]
     protected readonly string $root,
@@ -48,7 +42,55 @@ class BatchProcessor {
    *
    * @param array $batch_definition
    *   An associative array defining the batch. The array can be built by using
-   *   toArray() method of a populated \Drupal\Core\Batch\BatchBuilder object.
+   *   the toArray() method of a populated \Drupal\Core\Batch\BatchBuilder
+   *   object. It contains the following elements (all are optional except as
+   *   noted):
+   *   - operations: (required) Array of operations to be performed, where each
+   *     item is an array consisting of the name of an implementation of
+   *     callback_batch_operation() and an array of parameter.
+   *     Example:
+   *     @code
+   *     [
+   *       ['callback_batch_operation_1', [$arg1]],
+   *       ['callback_batch_operation_2', [$arg2_1, $arg2_2]],
+   *     ]
+   *     @endcode
+   *   - title: A safe, translated string to use as the title for the progress
+   *     page. Defaults to t('Processing').
+   *   - init_message: Message displayed while the processing is initialized.
+   *     Defaults to t('Initializing.').
+   *   - progress_message: Message displayed while processing the batch. Available
+   *     placeholders are "@current", "@remaining", "@total", "@percentage",
+   *     phpcs:ignore Drupal.Commenting.FunctionComment.ParamCommentFullStop
+   *     "@estimate" and "@elapsed". Defaults to "t('Completed @current of
+   *     @total.')".
+   *   - error_message: Message displayed if an error occurred while processing
+   *     the batch. Defaults to t('An error has occurred.').
+   *   - finished: Name of an implementation of callback_batch_finished(). This is
+   *     executed after the batch has completed. This should be used to perform
+   *     any result massaging that may be needed, and possibly save data in
+   *     the session for display after final page redirection.
+   *   - file: Path to the file containing the definitions of the 'operations' and
+   *     'finished' functions, for instance if they don't reside in the main
+   *     .module file. The path should be relative to base_path(), and thus should
+   *     be built using ModuleExtensionList::getPath().
+   *   - library: An array of batch-specific CSS and JS libraries.
+   *   - url_options: options passed to the \Drupal\Core\Url object when
+   *     constructing redirect URLs for the batch.
+   *   - progressive: A Boolean that indicates whether or not the batch needs to
+   *     run progressively. TRUE indicates that the batch will run in more than
+   *     one run. FALSE (default) indicates that the batch will finish in a single
+   *     run.
+   *   - queue: An override of the default queue (with name and class fields
+   *     optional). An array containing two elements:
+   *     - name: Unique identifier for the queue.
+   *     - class: The name of a class that implements
+   *       \Drupal\Core\Queue\QueueInterface, including the full namespace but not
+   *       starting with a backslash. It must have a constructor with two
+   *       arguments: $name and a \Drupal\Core\Database\Connection object.
+   *       Typically, the class will either be \Drupal\Core\Queue\Batch or
+   *       \Drupal\Core\Queue\BatchMemory. Defaults to Batch if progressive is
+   *       TRUE, or to BatchMemory if progressive is FALSE.
    */
   public function queue(array $batch_definition): self {
     batch_set($batch_definition);
@@ -79,8 +121,8 @@ class BatchProcessor {
    *   automatically by the standard batch processing pipeline (and which takes
    *   precedence over this parameter).
    * @param \Drupal\Core\Url|null $url
-   *   (optional) URL of the batch processing page.
-   *   Should only be used for separate scripts like update.php.
+   *   (optional) URL of the batch processing page. Should only be used for
+   *   separate scripts like update.php.
    * @param string|null $redirect_callback
    *   (optional) Specify a function to be called to redirect to the progressive
    *   processing page.
