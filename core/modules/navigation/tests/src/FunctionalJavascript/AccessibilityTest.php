@@ -26,7 +26,7 @@ class AccessibilityTest extends AccessibilityTestBase {
    */
   protected function setupClaroPageMobileSidebarOpen(): void {
     $session = $this->getSession();
-    $create_button = $session->getPage()->find('css', '#admin-toolbar')->findButton('Create');
+    $menu_button = $session->getPage()->find('css', '#admin-toolbar')->findButton('Create');
 
     $session->resizeWindow(
       500,
@@ -34,15 +34,15 @@ class AccessibilityTest extends AccessibilityTestBase {
     );
 
     // Wait and assert menu button is hidden.
-    $this->assertTrue($create_button->waitFor(2, function ($create_button): bool {
-      return !$create_button->isVisible();
+    $this->assertTrue($menu_button->waitFor(2, function ($menu_button): bool {
+      return !$menu_button->isVisible();
     }));
 
     $session->getPage()->pressButton('Expand sidebar');
 
     // Wait and assert menu button is visible.
-    $this->assertTrue($create_button->waitFor(2, function ($create_button): bool {
-      return $create_button->isVisible();
+    $this->assertTrue($menu_button->waitFor(2, function ($menu_button): bool {
+      return $menu_button->isVisible();
     }));
   }
 
