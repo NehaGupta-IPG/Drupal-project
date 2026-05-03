@@ -18,6 +18,8 @@ use Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface;
 use Drupal\content_translation\ContentTranslationSynchronizerInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
+use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Hook\Order\Order;
 
 /**
  * Hook implementations for content_translation.
@@ -208,7 +210,11 @@ readonly class ContentTranslationEntityHooks {
     // Drupal\content_translation\ContentTranslationManager::isPendingRevisionSupportEnabled()
     // since that depends on entity bundle information to be completely built.
     if ($this->moduleHandler->moduleExists('content_moderation')) {
-      foreach (Workflow::loadMultipleByType('content_moderation') as $workflow) {
+      /** @var \Drupal\workflows\WorkflowInterface[] $workflows */
+      $workflows = $this->entityTypeManager
+        ->getStorage('workflow')
+        ->loadByProperties(['type' => 'content_moderation']);
+      foreach ($workflows as $workflow) {
         /** @var \Drupal\content_moderation\Plugin\WorkflowType\ContentModeration $plugin */
         $plugin = $workflow->getTypePlugin();
         foreach ($plugin->getEntityTypes() as $entity_type_id) {

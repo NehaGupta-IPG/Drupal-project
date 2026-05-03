@@ -10,6 +10,9 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\content_translation\ContentTranslationEnableTranslationPerBundle;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Url;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Path\PathMatcherInterface;
 
 /**
  * Hook implementations for content_translation.
@@ -21,6 +24,8 @@ class ContentTranslationThemeHooks {
   public function __construct(
     protected readonly RendererInterface $renderer,
     protected readonly AccountInterface $currentUser,
+    protected readonly RouteMatchInterface $routeMatch,
+    protected readonly PathMatcherInterface $pathMatcher,
   ) {}
 
   /**
