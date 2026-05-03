@@ -61,8 +61,8 @@ class ConvertTest extends BrowserTestBase {
   }
 
   /**
-  * Tests that excluded extensions bypass conversion.
-  */
+   * Tests that excluded extensions bypass conversion.
+   */
   public function testExcludedExtensionSkipsConversion(): void {
     $image_style = ImageStyle::create([
       'name' => 'image_effect_skip_test',
