@@ -60,10 +60,10 @@ class ConvertTest extends BrowserTestBase {
     $this->assertFileExists($derivative_uri);
   }
 
- /**
+  /**
   * Tests that excluded extensions bypass conversion.
   */
- public function testExcludedExtensionSkipsConversion(): void {
+  public function testExcludedExtensionSkipsConversion(): void {
     $image_style = ImageStyle::create([
       'name' => 'image_effect_skip_test',
       'label' => 'Image Effect Skip Test',
