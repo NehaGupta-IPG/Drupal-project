@@ -38,6 +38,7 @@ class AccessibilityTest extends AccessibilityTestBase {
       return !$menu_button->isVisible();
     }));
 
+    // Expand sidebar.
     $session->getPage()->pressButton('Expand sidebar');
 
     // Wait and assert menu button is visible.
