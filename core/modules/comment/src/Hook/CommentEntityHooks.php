@@ -22,6 +22,8 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\user\RoleInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\field\FieldStorageConfigInterface;
+use Drupal\field\FieldConfigInterface;
 
 /**
  * Entity hook implementations for comment.
