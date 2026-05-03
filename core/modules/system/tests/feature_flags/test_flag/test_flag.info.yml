@@ -1,0 +1,4 @@
+name: 'Test flag'
+type: feature_flag
+description: 'Feature flag for testing the extension system'
+version: VERSION

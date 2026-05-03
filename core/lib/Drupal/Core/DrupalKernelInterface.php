@@ -127,6 +127,17 @@ interface DrupalKernelInterface extends HttpKernelInterface {
   public function updateThemes(array $register_themes = []): void;
 
   /**
+   * Updates the kernel's list of feature flags to the new list.
+   *
+   * The kernel needs to update its list and container to match the new
+   * list.
+   *
+   * array<string, \Drupal\Core\Extension\Extension> $register_flags
+   *   List of feature flag extensions, keyed by flag name.
+   */
+  public function updateFeatureFlags(array $register_themes = []): void;
+
+  /**
    * Force a container rebuild.
    *
    * @return \Symfony\Component\DependencyInjection\ContainerInterface

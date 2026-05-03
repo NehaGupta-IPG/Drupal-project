@@ -20,4 +20,5 @@ module:
   testing_config_install_multilingual: 1000
 theme:
   stark: 0
+feature_flag: {}
 profile: testing_config_install_multilingual

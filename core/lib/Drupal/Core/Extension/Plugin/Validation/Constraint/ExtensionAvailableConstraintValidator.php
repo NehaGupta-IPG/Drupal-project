@@ -10,6 +10,7 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Extension\ExtensionList;
+use Drupal\Core\Extension\FeatureFlagExtensionList;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ProfileExtensionList;
 use Drupal\Core\Extension\ThemeExtensionList;
@@ -42,6 +43,8 @@ class ExtensionAvailableConstraintValidator extends ConstraintValidator implemen
    *   The theme extension list.
    * @param \Drupal\Core\Extension\ProfileExtensionList $profileExtensionList
    *   The profile extension list.
+   * @param \Drupal\Core\Extension\FeatureFlagExtensionList $flagExtensionList
+   *   The feature flag extension list.
    * @param string $appRoot
    *   The app root.
    * @param string|false|null $installProfile
@@ -53,6 +56,7 @@ class ExtensionAvailableConstraintValidator extends ConstraintValidator implemen
     protected ModuleExtensionList $moduleExtensionList,
     protected ThemeExtensionList $themeExtensionList,
     protected ProfileExtensionList $profileExtensionList,
+    protected readonly FeatureFlagExtensionList $flagExtensionList,
     protected string $appRoot,
     protected $installProfile,
     protected string $sitePath,
@@ -67,6 +71,7 @@ class ExtensionAvailableConstraintValidator extends ConstraintValidator implemen
       $container->get('extension.list.module'),
       $container->get('extension.list.theme'),
       $container->get('extension.list.profile'),
+      $container->get(FeatureFlagExtensionList::class),
       $container->getParameter('app.root'),
       $container->getParameter('install_profile'),
       $container->getParameter('site.path'),
@@ -142,6 +147,13 @@ class ExtensionAvailableConstraintValidator extends ConstraintValidator implemen
           $message = $constraint->type . 'NotExistsMessage';
           assert(property_exists($constraint, $message));
           $this->context->addViolation($constraint->$message, $variables);
+        }
+
+        break;
+
+      case 'feature_flag':
+        if (!$this->flagExtensionList->exists($extension_name)) {
+          $this->context->addViolation($constraint->flagNotExistsMessage, $variables);
         }
 
         break;

@@ -180,6 +180,22 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   protected array $themeExtensions = [];
 
+  /**
+   * Holds the list of enabled feature flags from core.extension config.
+   *
+   * @var array|null
+   *   An associative array whose keys are flag names and whose values are
+   *   ignored.
+   */
+  protected ?array $flagList;
+
+  /**
+   * List of available feature flags.
+   *
+   * @var \Drupal\Core\Extension\Extension[]
+   */
+  protected array $flagExtensions = [];
+
 
   /**
    * The class loader object.
@@ -219,10 +235,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * List of discovered services.yml path names.
    *
-   * This is a nested array whose top-level keys are 'app' and 'site', denoting
-   * the origin of a service provider. Site-specific providers have to be
-   * collected separately, because they need to be processed last, so as to be
-   * able to override services from application service providers.
+   * This is a nested array whose top-level keys are 'app', 'flag' and 'site',
+   * denoting the origin of a service provider. Site-specific providers have to
+   * be collected separately, because they need to be processed last, so as to
+   * be able to override services from application service providers.
    *
    * @var array
    */
@@ -558,6 +574,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $this->moduleData = [];
     $this->themeList = NULL;
     $this->themeExtensions = [];
+    $this->flagList = NULL;
+    $this->flagExtensions = [];
   }
 
   /**
@@ -638,6 +656,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   public function discoverServiceProviders() {
     $this->serviceYamls = [
       'app' => [],
+      'flag' => [],
       'site' => [],
     ];
     $this->serviceProviderClasses = [
@@ -648,7 +667,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $this->serviceProviderClasses['app']['core'] = 'Drupal\Core\CoreServiceProvider';
 
     // Retrieve enabled modules and register their namespaces.
-    if (!isset($this->moduleList) || !isset($this->themeList)) {
+    if (!isset($this->moduleList) || !isset($this->themeList) || !isset($this->flagList)) {
       $extensions = $this->getExtensions();
       // The module list is manipulated in the TestRunnerKernel, so we should
       // only set it if it is not set.
@@ -671,6 +690,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       }
 
       $this->themeList = $extensions['theme'] ?? [];
+      $this->flagList = $extensions['feature_flags'] ?? [];
     }
 
     $module_filenames = $this->getExtensionFileNames($this->moduleList, [$this, 'moduleData']);
@@ -689,6 +709,15 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $filename = dirname($filename) . "/$module.services.yml";
       if (is_file($filename)) {
         $this->serviceYamls['app'][$module] = $filename;
+      }
+    }
+
+    // Load each flags's services yaml file.
+    $flag_filenames = $this->getExtensionFileNames($this->flagList, $this->flagExtension(...));
+    foreach ($flag_filenames as $flag => $filename) {
+      $filename = dirname($filename) . "/$flag.services.yml";
+      if (is_file($filename)) {
+        $this->serviceYamls['flag'][$flag] = $filename;
       }
     }
 
@@ -818,7 +847,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * Sets extension data to class properties using ExtensionDiscovery.
    *
    * This function is expensive to call as it scans the filesystem for
-   * extensions. Use ::moduleData() and ::themeExtensions() instead.
+   * extensions. Use ::moduleData(), ::flagExtension() and ::themeExtensions()
+   * instead.
    */
   private function setExtensionData(): void {
     // First, find profiles.
@@ -837,6 +867,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     // Now find themes.
     $this->themeExtensions = $listing->scan('theme');
+
+    // Now find feature flags.
+    $this->flagExtensions = $listing->scan('feature_flag');
   }
 
   /**
@@ -940,6 +973,42 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         $additional_class_loader->register();
       }
 
+      $this->initializeContainer();
+    }
+  }
+
+  /**
+   * Returns feature flag data on the filesystem.
+   *
+   * @param string $flag
+   *   The name of the feature flag.
+   *
+   * @return \Drupal\Core\Extension\Extension|false
+   *   Returns an Extension object if the flag is found, FALSE otherwise.
+   */
+  protected function flagExtension(string $flag): Extension|FALSE {
+    if (!$this->flagExtensions) {
+      $this->setExtensionData();
+    }
+    return $this->flagExtensions[$flag] ?? FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function updateFeatureFlags(array $register_flags = []): void {
+    $this->flagList = $register_flags;
+    foreach ($register_flags as $name => $extension) {
+      $this->flagExtensions[$name] = $extension;
+    }
+
+    // If we haven't yet booted, we don't need to do anything: the new theme
+    // list will take effect when boot() is called. However we set a
+    // flag that the container needs a rebuild, so that a potentially cached
+    // container is not used. If we have already booted, then rebuild the
+    // container in order to refresh the serviceProvider list and container.
+    $this->containerNeedsRebuild = TRUE;
+    if ($this->booted) {
       $this->initializeContainer();
     }
   }
@@ -1295,6 +1364,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $this->moduleData = [];
     $this->themeList = NULL;
     $this->themeExtensions = [];
+    $this->flagList = NULL;
+    $this->flagExtensions = [];
     $this->containerNeedsRebuild = TRUE;
     $container = $this->initializeContainer();
     // ThemeManager::render() fails without this. Normally ::preHandle() has
@@ -1472,6 +1543,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $container->setParameter('container.themes', $this->getExtensionsParameter(
       $this->themeList ?? [], [$this, 'themeExtensions'])
     );
+    $container->setParameter('container.feature_flags', $this->getExtensionsParameter(
+      $this->flagList ?? [], $this->flagExtension(...))
+    );
     $container->setParameter('install_profile', $this->getInstallProfile());
 
     // Get a list of namespaces and put it onto the container.
@@ -1531,6 +1605,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       if ($provider instanceof ServiceProviderInterface) {
         $provider->register($container);
       }
+    }
+    // Register feature flage services.
+    foreach ($this->serviceYamls['flag'] as $filename) {
+      $yaml_loader->load($filename);
     }
     // Register site-specific service overrides.
     foreach ($this->serviceYamls['site'] as $filename) {
