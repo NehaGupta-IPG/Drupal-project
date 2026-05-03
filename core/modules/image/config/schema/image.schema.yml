@@ -54,6 +54,7 @@ image.effect.image_convert:
     excluded_extension:
       label: 'Excluded extension'
       type: string
+      nullable: true
 
 image.effect.image_convert_avif:
   type: image.effect.image_convert
