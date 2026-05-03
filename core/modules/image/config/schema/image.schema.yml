@@ -51,6 +51,9 @@ image.effect.image_convert:
       constraints:
         Choice:
           callback: 'Drupal\Core\ImageToolkit\ImageToolkitManager::getAllValidExtensions'
+    excluded_extension:
+      label: 'Excluded extension'
+      type: string
 
 image.effect.image_convert_avif:
   type: image.effect.image_convert

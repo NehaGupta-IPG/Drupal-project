@@ -60,4 +60,35 @@ class ConvertTest extends BrowserTestBase {
     $this->assertFileExists($derivative_uri);
   }
 
+ /**
+  * Tests that excluded extensions bypass conversion.
+  */
+ public function testExcludedExtensionSkipsConversion(): void {
+    $image_style = ImageStyle::create([
+      'name' => 'image_effect_skip_test',
+      'label' => 'Image Effect Skip Test',
+    ]);
+    $this->assertEquals(SAVED_NEW, $image_style->save());
+    $image_style->addImageEffect([
+      'id' => 'image_convert',
+      'data' => [
+        'extension' => 'webp',
+        'excluded_extension' => 'gif',
+      ],
+    ]);
+    $this->assertEquals(SAVED_UPDATED, $image_style->save());
+
+    $test_uri = 'public://image-test-skip.gif';
+    \Drupal::service('file_system')->copy('core/tests/fixtures/files/image-test.gif', $test_uri, FileExists::Replace);
+    $this->assertFileExists($test_uri);
+
+    $derivative_uri = 'public://styles/image_effect_skip_test/public/image-test-skip.gif';
+    $this->assertFileDoesNotExist($derivative_uri);
+    $url = \Drupal::service('file_url_generator')->transformRelative($image_style->buildUrl($test_uri));
+    $this->drupalGet($this->getAbsoluteUrl($url));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertFileExists($derivative_uri);
+    $this->assertFileDoesNotExist('public://styles/image_effect_skip_test/public/image-test-skip.gif.webp');
+  }
+
 }
