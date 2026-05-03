@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\system\Hook;
 
 use Drupal\Core\Cache\Cache;
