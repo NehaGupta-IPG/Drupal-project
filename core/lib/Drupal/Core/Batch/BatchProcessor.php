@@ -59,34 +59,35 @@ class BatchProcessor {
    *     page. Defaults to t('Processing').
    *   - init_message: Message displayed while the processing is initialized.
    *     Defaults to t('Initializing.').
-   *   - progress_message: Message displayed while processing the batch. Available
-   *     placeholders are "@current", "@remaining", "@total", "@percentage",
+   *   - progress_message: Message displayed while processing the batch.
+   *     Available placeholders are "@current", "@remaining", "@total",
+   *     "@percentage",
    *     phpcs:ignore Drupal.Commenting.FunctionComment.ParamCommentFullStop
    *     "@estimate" and "@elapsed". Defaults to "t('Completed @current of
    *     @total.')".
-   *   - error_message: Message displayed if an error occurred while processing
-   *     the batch. Defaults to t('An error has occurred.').
-   *   - finished: Name of an implementation of callback_batch_finished(). This is
-   *     executed after the batch has completed. This should be used to perform
-   *     any result massaging that may be needed, and possibly save data in
-   *     the session for display after final page redirection.
-   *   - file: Path to the file containing the definitions of the 'operations' and
-   *     'finished' functions, for instance if they don't reside in the main
-   *     .module file. The path should be relative to base_path(), and thus should
-   *     be built using ModuleExtensionList::getPath().
+   *   - error_message: Message displayed if an error occurred while
+   *     processing the batch. Defaults to t('An error has occurred.').
+   *   - finished: Name of an implementation of callback_batch_finished(). This
+   *     is executed after the batch has completed. This should be used to
+   *     perform any result massaging that may be needed, and possibly save
+   *     data in the session for display after final page redirection.
+   *   - file: Path to the file containing the definitions of the 'operations'
+   *     and 'finished' functions, for instance if they don't reside in the
+   *     main .module file. The path should be relative to base_path(), and
+   *     thus should be built using ModuleExtensionList::getPath().
    *   - library: An array of batch-specific CSS and JS libraries.
    *   - url_options: options passed to the \Drupal\Core\Url object when
    *     constructing redirect URLs for the batch.
-   *   - progressive: A Boolean that indicates whether or not the batch needs to
-   *     run progressively. TRUE indicates that the batch will run in more than
-   *     one run. FALSE (default) indicates that the batch will finish in a single
-   *     run.
+   *   - progressive: A Boolean that indicates whether or not the batch needs
+   *     to run progressively. TRUE indicates that the batch will run in more
+   *     than one run. FALSE (default) indicates that the batch will finish in
+   *     a single run.
    *   - queue: An override of the default queue (with name and class fields
    *     optional). An array containing two elements:
    *     - name: Unique identifier for the queue.
    *     - class: The name of a class that implements
-   *       \Drupal\Core\Queue\QueueInterface, including the full namespace but not
-   *       starting with a backslash. It must have a constructor with two
+   *       \Drupal\Core\Queue\QueueInterface, including the full namespace but
+   *       not starting with a backslash. It must have a constructor with two
    *       arguments: $name and a \Drupal\Core\Database\Connection object.
    *       Typically, the class will either be \Drupal\Core\Queue\Batch or
    *       \Drupal\Core\Queue\BatchMemory. Defaults to Batch if progressive is
