@@ -1164,13 +1164,6 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       // a response header.
       $element['#attached']['drupalSettings']['ajaxTrustedUrl'][$element['#action']] = TRUE;
 
-      // If there are buttons, but no 'triggering_element' has
-      // been identified yet, set a form error.
-      $buttons = $form_state->getButtons();
-      if (!$form_state->isProgrammed() && !$form_state->getTriggeringElement() && !empty($buttons)) {
-        $form_state->setError($element, new TranslatableMarkup('The form submission is invalid.'));
-      }
-
       $triggering_element = $form_state->getTriggeringElement();
       // If the triggering element specifies "button-level" validation and
       // submit handlers to run instead of the default form-level ones, then add
