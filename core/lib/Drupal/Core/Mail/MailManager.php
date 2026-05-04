@@ -49,10 +49,8 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
 
   /**
    * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
    */
-  protected $languageManager;
+  protected LanguageManagerInterface $languageManager;
 
   /**
    * The renderer.
@@ -86,10 +84,10 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
    *   The string translation service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param \Drupal\Core\Language\LanguageManagerInterface|null $language_manager
    *   The language manager.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, LoggerChannelFactoryInterface $logger_factory, TranslationInterface $string_translation, RendererInterface $renderer, LanguageManagerInterface $language_manager) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, LoggerChannelFactoryInterface $logger_factory, TranslationInterface $string_translation, RendererInterface $renderer, ?LanguageManagerInterface $language_manager = NULL) {
     parent::__construct('Plugin/Mail', $namespaces, $module_handler, MailInterface::class, Mail::class, 'Drupal\Core\Annotation\Mail');
     $this->alterInfo('mail_backend_info');
     $this->setCacheBackend($cache_backend, 'mail_backend_plugins');
@@ -97,6 +95,10 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
     $this->loggerFactory = $logger_factory;
     $this->stringTranslation = $string_translation;
     $this->renderer = $renderer;
+    if ($language_manager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $language_manager argument is deprecated in drupal:11.4.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3588300', E_USER_DEPRECATED);
+      $language_manager = \Drupal::service('language_manager');
+    }
     $this->languageManager = $language_manager;
   }
 

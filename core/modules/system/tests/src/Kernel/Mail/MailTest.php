@@ -139,7 +139,6 @@ class MailTest extends KernelTestBase {
    * Checks the From: and Reply-to: headers.
    */
   public function testFromAndReplyToHeader(): void {
-    /** @var \Drupal\Core\Mail\MailManagerInterface $mail_service */
     $mail_service = \Drupal::service('plugin.manager.mail');
     $langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
 
@@ -402,7 +401,7 @@ class MailTest extends KernelTestBase {
       ->set('name', 'My site')
       ->save();
 
-    // Add French and provide a translated site name for it.
+    // Add the French language and provide a translated site name for it.
     \Drupal::service('module_installer')->install(['language']);
     ConfigurableLanguage::createFromLangcode('fr')->save();
     \Drupal::languageManager()
@@ -416,7 +415,7 @@ class MailTest extends KernelTestBase {
     $sent_message = end($captured_emails);
 
     // The From header must use the FR site name, not the EN one.
-    $this->assertEquals('Mon site <mailtest@example.com>', $sent_message['headers']['From']);
+    $this->assertSame('Mon site <mailtest@example.com>', $sent_message['headers']['From']);
   }
 
   /**
