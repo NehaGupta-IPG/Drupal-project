@@ -24,6 +24,8 @@ use Drupal\Core\PhpStorage\PhpStorageFactory;
 class PhpBackend implements CacheBackendInterface {
 
   /**
+   * The cache bin.
+   *
    * @var string
    */
   protected $bin;

@@ -15,6 +15,8 @@ use Drupal\Core\Config\StorageInterface;
 final class AllowListConfigStorage implements StorageInterface {
 
   /**
+   * Constructs the read-only storage wrapper.
+   *
    * @param \Drupal\Core\Config\StorageInterface $decorated
    *   A config storage backend to wrap around.
    * @param string[] $allowList

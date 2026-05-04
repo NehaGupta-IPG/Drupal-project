@@ -16,6 +16,8 @@ use Drupal\Core\Config\StorageInterface;
 final class RecipeConfigStorageWrapper implements StorageInterface {
 
   /**
+   * Constructs the configuration storage wrapper for recipes.
+   *
    * @param \Drupal\Core\Config\StorageInterface $storageA
    *   First config storage to wrap.
    * @param \Drupal\Core\Config\StorageInterface $storageB

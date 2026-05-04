@@ -13,6 +13,8 @@ namespace Drupal\Core\Recipe;
 final class UnknownRecipeException extends \RuntimeException {
 
   /**
+   * Constructs a recipe exception.
+   *
    * @param string $recipe
    *   The recipe's name.
    * @param string $searchPath

@@ -16,6 +16,8 @@ use Drupal\user\RoleInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Defines the 'permissions per bundle' configuration action.
+ *
  * @internal
  *   This API is experimental.
  */

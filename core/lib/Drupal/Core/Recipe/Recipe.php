@@ -31,6 +31,8 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Validation;
 
 /**
+ * Represents a Drupal recipe used for site configuration and installation.
+ *
  * @internal
  *   This API is experimental.
  */
@@ -39,6 +41,8 @@ final class Recipe {
   const COMPOSER_PROJECT_TYPE = 'drupal-recipe';
 
   /**
+   * Constructs a recipe.
+   *
    * @param string $name
    *   The human-readable name of the recipe.
    * @param string $description

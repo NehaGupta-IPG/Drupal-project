@@ -31,6 +31,8 @@ class UpdateRegistry implements EventSubscriberInterface {
   protected $logFilename;
 
   /**
+   * A list of installed extensions.
+   *
    * @var string[]
    */
   protected $enabledExtensions;
@@ -286,6 +288,8 @@ class UpdateRegistry implements EventSubscriberInterface {
   }
 
   /**
+   * Determines if themes need to be updated.
+   *
    * @return bool
    *   TRUE if themes are to be updated, FALSE otherwise.
    */

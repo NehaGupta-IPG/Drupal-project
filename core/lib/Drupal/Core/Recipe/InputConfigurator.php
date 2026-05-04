@@ -32,6 +32,8 @@ final class InputConfigurator {
   private ?array $values = NULL;
 
   /**
+   * Constructs the input configurator.
+   *
    * @param array<string, array<string, mixed>> $definitions
    *   The recipe's input definitions, keyed by name. This is an array of arrays
    *   where each sub-array has, at minimum:

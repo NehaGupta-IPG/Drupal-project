@@ -49,6 +49,8 @@ class DatabaseBackend implements CacheBackendInterface {
   protected $maxRows;
 
   /**
+   * The cache bin.
+   *
    * @var string
    */
   protected $bin;

@@ -17,6 +17,8 @@ use Drupal\Core\TypedData\DataReferenceDefinitionInterface;
 class Tables implements TablesInterface {
 
   /**
+   * The build SQL select query.
+   *
    * @var \Drupal\Core\Database\Query\SelectInterface
    */
   protected $sqlQuery;
@@ -65,6 +67,8 @@ class Tables implements TablesInterface {
   protected $caseSensitiveFields = [];
 
   /**
+   * Construct the table object.
+   *
    * @param \Drupal\Core\Database\Query\SelectInterface $sql_query
    *   The SQL query.
    */

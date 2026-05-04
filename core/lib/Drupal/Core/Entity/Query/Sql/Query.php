@@ -50,6 +50,8 @@ class Query extends QueryBase implements QueryInterface {
   protected $sqlGroupBy = [];
 
   /**
+   * The database connection.
+   *
    * @var \Drupal\Core\Database\Connection
    */
   protected $connection;

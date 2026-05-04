@@ -44,6 +44,8 @@ class FormattedDateDiff implements RenderableInterface, CacheableDependencyInter
   }
 
   /**
+   * Gets the formatted time difference.
+   *
    * @return string
    *   The actual formatted time difference.
    */

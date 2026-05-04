@@ -184,6 +184,8 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
   public function hasHandlerClass($handler_type, $nested = FALSE);
 
   /**
+   * Gets the handlers for a type.
+   *
    * @param string $handler_type
    *   The handler type to get.
    * @param string|false $nested

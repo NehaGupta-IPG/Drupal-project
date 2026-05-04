@@ -36,6 +36,8 @@ class ExtensionAvailableConstraintValidator extends ConstraintValidator implemen
   protected static ?bool $inTestEnvironment;
 
   /**
+   * Constructs an ExtensionAvailableConstraintValidator object.
+   *
    * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
    *   The module extension list.
    * @param \Drupal\Core\Extension\ThemeExtensionList $themeExtensionList

@@ -19,6 +19,7 @@ class Datetime extends DateElementBase {
 
   use DoTrustedCallbackTrait;
 
+  // phpcs:ignore Drupal.Commenting.DocComment.MissingShort
   /**
    * {@inheritdoc}
    */

@@ -10,6 +10,8 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AccountSwitcherInterface;
 
 /**
+ * Provides an administrative account switcher for default content workflows.
+ *
  * @internal
  *   This API is experimental.
  */

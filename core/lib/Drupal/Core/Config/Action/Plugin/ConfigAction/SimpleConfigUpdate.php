@@ -14,6 +14,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Defines the 'simple configuration update' configuration action.
+ *
  * @internal
  *   This API is experimental.
  */

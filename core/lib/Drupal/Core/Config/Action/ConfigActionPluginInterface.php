@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Core\Config\Action;
 
 /**
+ * Defines an interface for config action plugins.
+ *
  * @internal
  *   This API is experimental.
  */

@@ -15,6 +15,8 @@ use Drupal\Core\Config\StorageInterface;
 final class RecipeOverrideConfigStorage implements StorageInterface {
 
   /**
+   * Constructs the override configuration storage for a recipe.
+   *
    * @param \Drupal\Core\Config\StorageInterface $recipeStorage
    *   The recipe's configuration storage.
    * @param \Drupal\Core\Config\StorageInterface $wrappedStorage
