@@ -13,8 +13,8 @@ use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Theme\Icon\IconSearch;
 use Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Defines a route controller for icon autocomplete form elements.
@@ -41,17 +41,6 @@ final class IconAutocompleteController extends ControllerBase {
   ) {}
 
   /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container): static {
-    return new self(
-      $container->get('icon.search'),
-      $container->get('plugin.manager.icon_pack'),
-      $container->get('renderer')
-    );
-  }
-
-  /**
    * Autocomplete callback for icon selection.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
@@ -60,6 +49,7 @@ final class IconAutocompleteController extends ControllerBase {
    * @return \Drupal\Core\Cache\CacheableJsonResponse
    *   The matched icons as a JSON response.
    */
+  #[Route('/system/icon-autocomplete', name: 'system.icon_autocomplete', requirements: ['_access' => 'TRUE'])]
   public function handleSearchIcons(Request $request): CacheableJsonResponse {
     $query = trim((string) $request->query->get('q', ''));
 
@@ -158,6 +148,7 @@ final class IconAutocompleteController extends ControllerBase {
    * @return \Drupal\Core\Cache\CacheableJsonResponse
    *   A JSON response containing the rendered SVG.
    */
+  #[Route('/system/icon-render', name: 'system.icon_render', requirements: ['_access' => 'TRUE'])]
   public function renderIcon(Request $request): CacheableJsonResponse {
     $pack_id = $request->query->get('pack_id', '');
     $icon_id = $request->query->get('icon_id', '');

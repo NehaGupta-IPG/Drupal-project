@@ -518,20 +518,6 @@ system.linkset_settings:
   requirements:
     _permission: 'administer site configuration'
 
-system.icon_autocomplete:
-  path: '/system/icon-autocomplete'
-  defaults:
-    _controller: '\Drupal\system\Controller\IconAutocompleteController::handleSearchIcons'
-  requirements:
-    _access: 'TRUE'
-
-system.icon_render:
-  path: '/system/icon-render'
-  defaults:
-    _controller: '\Drupal\system\Controller\IconAutocompleteController::renderIcon'
-  requirements:
-    _access: 'TRUE'
-
 route_callbacks:
   - '\Drupal\system\Routing\AssetRoutes::routes'
   - '\Drupal\system\Routing\MenuLinksetRoutes::routes'
