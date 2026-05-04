@@ -33,4 +33,11 @@ class DefaultStyle extends StylePluginBase {
    */
   protected $usesRowClass = TRUE;
 
+  /**
+   * Should grouping fields use a wrapping element tag.
+   *
+   * @var bool
+   */
+  protected bool $usesGroupingLabelElement = TRUE;
+
 }

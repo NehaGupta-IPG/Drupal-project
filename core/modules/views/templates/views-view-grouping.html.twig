@@ -10,11 +10,20 @@
  * - title: The group heading.
  * - content: The content to be grouped.
  * - rows: The rows returned from the view.
+ * - grouping_label_element: The HTML heading element used to wrap the group label.
  *
  * @see template_preprocess_views_view_grouping()
  *
  * @ingroup themeable
  */
 #}
-{{ title }}
+
+{% if title %}
+  {% if grouping_label_element is empty %}
+    {{ title }}
+  {% else %}
+    <{{ grouping_label_element }}>{{ title }}</{{ grouping_label_element }}>
+  {% endif %}
+{% endif %}
+
 {{ content }}

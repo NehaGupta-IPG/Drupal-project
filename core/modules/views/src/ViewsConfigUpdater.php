@@ -84,6 +84,9 @@ class ViewsConfigUpdater {
       if ($this->processRssViewModeUpdate($view)) {
         $changed = TRUE;
       }
+      if ($this->addGroupingLabelElement($handler, $handler_type, $view)) {
+        $changed = TRUE;
+      }
       return $changed;
     });
   }
@@ -467,6 +470,53 @@ class ViewsConfigUpdater {
 
     if ($changed) {
       $view->set('display', $displays);
+    }
+
+    return $changed;
+  }
+
+  /**
+   * Perform grouping label element update.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The View being updated.
+   */
+  public function updateGroupingLabelElement(ViewEntityInterface $view): bool {
+    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type) use ($view) {
+      $changed = FALSE;
+      if ($this->addGroupingLabelElement($handler, $handler_type, $view)) {
+        $changed = TRUE;
+      }
+      return $changed;
+    });
+  }
+
+  /**
+   * Add Grouping Label to views without one.
+   *
+   * @param array $handler
+   *   A display handler.
+   * @param string $handler_type
+   *   The handler type.
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The View being updated.
+   *
+   * @return bool
+   *   Whether the handler was updated.
+   */
+  public function addGroupingLabelElement(array &$handler, string $handler_type, ViewEntityInterface $view): bool {
+    $changed = FALSE;
+    // Only add grouping_label_element if this is a style handler of the
+    // correct type and it is missing.
+    if (
+      $handler_type === 'style'
+      && isset($handler['plugin_id'], $handler['type'])
+      && $handler['plugin_id'] === 'style'
+      && in_array($handler['type'], ['Grid', 'HtmlList', 'GridResponsive', 'DefaultStyle'], TRUE)
+      && (!isset($handler['style']['grouping_label_element']))
+    ) {
+      $handler['style']['grouping_label_element'] = NULL;
+      $changed = TRUE;
     }
 
     return $changed;

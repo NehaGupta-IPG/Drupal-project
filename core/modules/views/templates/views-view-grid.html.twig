@@ -20,6 +20,7 @@
  *   - content: A list of columns or rows. Each row or column contains:
  *     - attributes: HTML attributes for each row or column.
  *     - content: The row or column contents.
+ * - grouping_label_element: The HTML heading element used to wrap the group label.
  *
  * @see template_preprocess_views_view_grid()
  *
@@ -51,7 +52,11 @@
   %}
 {% endif %}
 {% if title %}
-  <h3>{{ title }}</h3>
+  {% if grouping_label_element is empty %}
+    {{ title }}
+  {% else %}
+    <{{ grouping_label_element }}>{{ title }}</{{ grouping_label_element }}>
+  {% endif %}
 {% endif %}
 <div{{ attributes.addClass(classes) }}>
   {% if options.alignment == 'horizontal' %}
