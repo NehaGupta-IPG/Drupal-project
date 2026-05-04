@@ -44,7 +44,7 @@ class UpdateRequirements {
    * is up to date or not.
    *
    * @see _update_message_text()
-   * @see _update_cron_notify()
+   * @see \Drupal\update\Hook\UpdateCronHooks::notify()
    * @see \Drupal\update\UpdateManagerInterface
    */
   #[Hook('runtime_requirements')]

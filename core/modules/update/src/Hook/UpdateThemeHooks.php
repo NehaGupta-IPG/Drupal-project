@@ -6,6 +6,7 @@ use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Link;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\State\StateInterface;
@@ -17,7 +18,7 @@ use Drupal\update\UpdateFetcherInterface;
 use Drupal\update\UpdateManagerInterface;
 
 /**
- * Theme hooks for update module.
+ * Theme hooks for the update module.
  */
 class UpdateThemeHooks {
 
@@ -29,9 +30,8 @@ class UpdateThemeHooks {
     protected ModuleHandlerInterface $moduleHandler,
     protected AccountInterface $currentUser,
     protected RedirectDestinationInterface $redirectDestination,
-  ) {
-
-  }
+    protected MessengerInterface $messenger,
+  ) {}
 
   /**
    * Implements hook_theme().

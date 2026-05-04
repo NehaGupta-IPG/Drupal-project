@@ -7,7 +7,7 @@ namespace Drupal\Tests\update\Unit;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Session\AccountProxy;
 use Drupal\Tests\UnitTestCase;
-use Drupal\update\Hook\UpdateHooks;
+use Drupal\update\Hook\UpdateMailHooks;
 use Drupal\update\UpdateManagerInterface;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -17,7 +17,7 @@ use PHPUnit\Framework\Attributes\Group;
  * Tests text of update email.
  */
 #[Group('update')]
-#[CoversMethod(UpdateHooks::class, 'mail')]
+#[CoversMethod(UpdateMailHooks::class, 'mail')]
 class UpdateMailTest extends UnitTestCase {
 
   /**
@@ -137,7 +137,7 @@ class UpdateMailTest extends UnitTestCase {
     \Drupal::setContainer($this->container);
 
     // Generate the email message.
-    $updateMail = new UpdateHooks();
+    $updateMail = new UpdateMailHooks($this->languageManager, $this->configFactory);
     $updateMail->mail($key, $message, $params);
 
     // Confirm the subject.
