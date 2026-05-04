@@ -142,8 +142,12 @@ class Table extends StylePluginBase implements CacheableDependencyInterface {
     // Store the $sort for later use.
     $this->active = $sort;
 
-    // Tell the field to click sort.
-    $this->view->field[$sort]->clickSort($this->order);
+    // Tell the field to click sort only if it is technically capable of
+    // sorting, and the Table view style has opted into sorting.
+    $sortable = $this->options['info'][$sort]['sortable'] ?? FALSE;
+    if ($sortable && $this->view->field[$sort]->clickSortable()) {
+      $this->view->field[$sort]->clickSort($this->order);
+    }
   }
 
   /**
