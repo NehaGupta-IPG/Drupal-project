@@ -12,6 +12,7 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
@@ -47,6 +48,13 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
   protected $loggerFactory;
 
   /**
+   * The language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
    * The renderer.
    *
    * @var \Drupal\Core\Render\RendererInterface
@@ -78,8 +86,10 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
    *   The string translation service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, LoggerChannelFactoryInterface $logger_factory, TranslationInterface $string_translation, RendererInterface $renderer) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, LoggerChannelFactoryInterface $logger_factory, TranslationInterface $string_translation, RendererInterface $renderer, LanguageManagerInterface $language_manager) {
     parent::__construct('Plugin/Mail', $namespaces, $module_handler, MailInterface::class, Mail::class, 'Drupal\Core\Annotation\Mail');
     $this->alterInfo('mail_backend_info');
     $this->setCacheBackend($cache_backend, 'mail_backend_plugins');
@@ -87,6 +97,7 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
     $this->loggerFactory = $logger_factory;
     $this->stringTranslation = $string_translation;
     $this->renderer = $renderer;
+    $this->languageManager = $language_manager;
   }
 
   /**
@@ -178,7 +189,17 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
     // to ensure it doesn't leak into the render context for the HTTP response
     // to the current request.
     return $this->renderer->executeInRenderContext(new RenderContext(), function () use ($module, $key, $to, $langcode, $params, $reply, $send) {
-      return $this->doMail($module, $key, $to, $langcode, $params, $reply, $send);
+      $original_language = $this->languageManager->getConfigOverrideLanguage();
+      if ($langcode && ($language = $this->languageManager->getLanguage($langcode))) {
+        $this->languageManager->setConfigOverrideLanguage($language);
+      }
+
+      try {
+        return $this->doMail($module, $key, $to, $langcode, $params, $reply, $send);
+      }
+      finally {
+        $this->languageManager->setConfigOverrideLanguage($original_language);
+      }
     });
   }
 

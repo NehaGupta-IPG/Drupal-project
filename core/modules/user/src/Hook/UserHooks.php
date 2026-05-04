@@ -225,17 +225,12 @@ class UserHooks {
   #[Hook('mail')]
   public function mail($key, &$message, $params): void {
     $token_service = \Drupal::token();
-    $language_manager = \Drupal::languageManager();
     $langcode = $message['langcode'];
     $variables = ['user' => $params['account']];
-    $language = $language_manager->getLanguage($langcode);
-    $original_language = $language_manager->getConfigOverrideLanguage();
-    $language_manager->setConfigOverrideLanguage($language);
     $mail_config = \Drupal::config('user.mail');
     $token_options = ['langcode' => $langcode, 'callback' => 'user_mail_tokens', 'clear' => TRUE];
     $message['subject'] .= PlainTextOutput::renderFromHtml($token_service->replace($mail_config->get($key . '.subject'), $variables, $token_options));
     $message['body'][] = $token_service->replacePlain($mail_config->get($key . '.body'), $variables, $token_options);
-    $language_manager->setConfigOverrideLanguage($original_language);
   }
 
   /**

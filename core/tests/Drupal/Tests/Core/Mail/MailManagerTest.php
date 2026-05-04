@@ -8,6 +8,7 @@ use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Mail\MailManager;
 use Drupal\Core\Render\RenderContext;
@@ -132,8 +133,9 @@ class MailManagerTest extends UnitTestCase {
     $logger_factory = $this->createStub(LoggerChannelFactoryInterface::class);
     $string_translation = $this->getStringTranslationStub();
     $this->renderer = $this->createMock(RendererInterface::class);
+    $language_manager = $this->createStub(LanguageManagerInterface::class);
     // Construct the manager object and override its discovery.
-    $this->mailManager = new TestMailManager(new \ArrayObject(), $this->cache, $this->moduleHandler, $this->configFactory, $logger_factory, $string_translation, $this->renderer);
+    $this->mailManager = new TestMailManager(new \ArrayObject(), $this->cache, $this->moduleHandler, $this->configFactory, $logger_factory, $string_translation, $this->renderer, $language_manager);
     $this->mailManager->setDiscovery($this->discovery);
 
     $this->request = new Request();
