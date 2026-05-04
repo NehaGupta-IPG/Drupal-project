@@ -56,6 +56,13 @@ class MockRouteProvider implements RouteProviderInterface {
   /**
    * {@inheritdoc}
    */
+  public function routeExists(string $name): bool {
+    return !empty($this->getRoutesByNames([$name]));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function preLoadRoutes($names) {
     // Nothing to do.
   }

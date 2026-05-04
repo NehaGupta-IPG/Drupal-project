@@ -86,6 +86,13 @@ class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface, Eve
   /**
    * {@inheritdoc}
    */
+  public function routeExists(string $name): bool {
+    return $this->getRouteProvider()->routeExists($name);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function preLoadRoutes($names) {
     return $this->getRouteProvider()->preLoadRoutes($names);
   }
