@@ -756,7 +756,9 @@ EDITED, file_get_contents($theme_path_absolute . '/src/TestCustomThemePreRender.
   }
 
   private function runCommand(array $input): CommandTester {
-    $tester = new CommandTester(new GenerateTheme(NULL, $this->getWorkspaceDirectory()));
+    $classloader = require_once 'autoload.php';
+
+    $tester = new CommandTester(new GenerateTheme($classloader, NULL, $this->getWorkspaceDirectory()));
     $tester->execute($input, [
       'capture_stderr_separately' => TRUE,
     ]);

@@ -72,11 +72,13 @@ class InstallCommand extends Command {
       return 1;
     }
 
+    $kernel = new DrupalKernel('prod', $this->classLoader, FALSE);
+
     // Change the directory to the Drupal root.
-    chdir(dirname(__DIR__, 5));
+    chdir($kernel->getAppRoot());
 
     // Check whether there is already an installation.
-    if ($this->isDrupalInstalled()) {
+    if ($this->isDrupalInstalled($kernel)) {
       // Do not fail if the site is already installed so this command can be
       // chained with ServerCommand.
       $output->writeln('<info>Drupal is already installed.</info> If you want to reinstall, remove sites/default/files and sites/default/settings.php.');
@@ -125,12 +127,14 @@ class InstallCommand extends Command {
   /**
    * Returns whether there is already an existing Drupal installation.
    *
+   * @param \Drupal\Core\DrupalKernel $kernel
+   *   The Drupal kernel.
+   *
    * @return bool
    *   Returns TRUE if Drupal is installed, FALSE otherwise.
    */
-  protected function isDrupalInstalled() {
+  protected function isDrupalInstalled(DrupalKernel $kernel) {
     try {
-      $kernel = new DrupalKernel('prod', $this->classLoader, FALSE);
       $kernel::bootEnvironment();
       $kernel->setSitePath($this->getSitePath());
       Settings::initialize($kernel->getAppRoot(), $kernel->getSitePath(), $this->classLoader);

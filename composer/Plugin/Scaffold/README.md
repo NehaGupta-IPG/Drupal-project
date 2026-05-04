@@ -229,6 +229,42 @@ directory is changed for any reason, and the `autoload.php` file has been
 committed to the repository, manually delete it and then run `composer install`
 to update it.
 
+### DrupalInstalled file
+
+The DrupalInstalled file is a PHP class file which this plugin writes
+automatically. The class holds the location of the Drupal application root (that
+is, the location of Drupal's index.php file).
+
+Because it is an autoloadable file, any code that has included the Composer
+autoloader may use \Drupal\DrupalInstalled::getAppRoot() to get the filepath
+where Drupal core is installed.
+
+#### API
+
+Code that is part of a project's own codebase, and therefore can guarantee the
+presence of this plugin, can use \Drupal\DrupalInstalled::getAppRoot() to get
+the filepath where Drupal core is installed. Because this is an autoloadable
+file, any code that has included the Composer autoloader may use this.
+
+If your code is not part of a project, but is a package that may be included in
+projects, it can either require this plugin, or use
+\Drupal\Core\DrupalKernel::getApplicationRoot().
+
+#### Background
+
+The DrupalLocation file is necessary because Drupal core is installed in a
+Composer project in a custom location, unlike normal Composer packages. The
+location of the Drupal core package is defined in the project's composer.json,
+and for example, is '/web' when using the drupal/recommended-project Composer
+project template.
+
+Without this file, Drupal core's custom location means that web requests to
+Drupal core PHP files must guess how to reach the Composer autoloader in the
+project root, and script files in normal Composer packages must guess how to
+reach Drupal core. Using the `__DIR__` constant and other filepath manipulation
+is not always reliable, for example, in a development project where Drupal core
+is installed with a symlink from a local path repository.
+
 ## Specifications
 
 Reference section for the configuration directives for the "drupal-scaffold"

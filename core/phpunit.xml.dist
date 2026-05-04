@@ -37,6 +37,11 @@
      reachable from your host machine here. This will allow you to follow them
      directly and view the output. -->
     <env name="BROWSERTEST_OUTPUT_BASE_URL" value=""/>
+    <!-- To run tests in a nonstandard installation structure, uncomment the next two settings. -->
+    <!-- Example PROJECT_ROOT value: /path/to/project -->
+    <!-- <env name="PROJECT_ROOT" value=""/> -->
+    <!-- Example DRUPAL_APP_ROOT value: /path/to/project/web -->
+    <!-- <env name="DRUPAL_APP_ROOT" value=""/> -->
     <!-- The environment variable SYMFONY_DEPRECATIONS_HELPER is used to configure
       the behavior of the deprecation tests.
       Drupal core's testing framework is setting this variable to its defaults.

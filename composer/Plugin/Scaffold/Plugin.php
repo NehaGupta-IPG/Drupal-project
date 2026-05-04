@@ -17,6 +17,7 @@ use Composer\Script\ScriptEvents;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Util\Filesystem;
 use Drupal\Composer\Plugin\Scaffold\CommandProvider as ScaffoldCommandProvider;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * Composer plugin for handling drupal scaffold.
@@ -158,6 +159,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
   public static function preAutoloadDump(Event $event): void {
     // Get the configured vendor directory.
     $vendor_dir = $event->getComposer()->getConfig()->get('vendor-dir');
+    // var_dump($vendor_dir);
+    // var_dump(getcwd());
 
     // We need the root_package package so we can add our classmaps to its
     // loader.
@@ -201,6 +204,22 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
       $autoload['classmap'][] = $vendor_dir . '/psr/container/src/ContainerInterface.php';
     }
 
+    // Get the web root defined in composer.json.
+    $manage_options = new ManageOptions($event->getComposer());
+    $relative_web_root = $manage_options->getOptions()->getLocation('web-root');
+    $relative_web_root = trim($relative_web_root, '/');
+
+    // Composer changes the current directory to the project root, even if it
+    // run in a subdirectory.
+    $absolute_project_root = getcwd();
+
+    $relative_vendor_dir = Path::makeRelative($vendor_dir, $absolute_project_root);
+
+    // Determine how many path components to remove from the __DIR__ of the
+    // DrupalInstalled class file: this is the number of components in the
+    // relative vendor dir, plus one for the 'drupal' part of the path.
+    $trim_count_from_installed_file = substr_count($relative_vendor_dir, '/') + 2;
+
     $filesystem = new Filesystem();
     // Do not remove double realpath() calls.
     // Fixes failing Windows realpath() implementation.
@@ -208,7 +227,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
     $vendor_path = realpath(realpath($vendor_dir));
     $filesystem->ensureDirectoryExists($vendor_path . '/drupal');
     // Create the Drupal\DrupalInstalled class.
-    file_put_contents($vendor_path . '/drupal/DrupalInstalled.php', DrupalInstalledTemplate::getCode($package, $repository));
+    file_put_contents($vendor_path . '/drupal/DrupalInstalled.php', DrupalInstalledTemplate::getCode($package, $repository, $relative_web_root, $trim_count_from_installed_file));
     $autoload['classmap'][] = $vendor_dir . '/drupal/DrupalInstalled.php';
 
     $package->setAutoload($autoload);

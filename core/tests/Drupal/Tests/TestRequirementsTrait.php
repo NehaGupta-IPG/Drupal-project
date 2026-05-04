@@ -20,7 +20,7 @@ trait TestRequirementsTrait {
    *   The Drupal root directory.
    */
   protected static function getDrupalRoot(): string {
-    return dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__)), 2);
+    return $_ENV['DRUPAL_APP_ROOT'] ?? dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__)), 2);
   }
 
 }

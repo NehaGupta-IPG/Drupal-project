@@ -9,9 +9,22 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Defines a kernel used for running Functional tests and run-tests.sh.
  *
+ * This allows setting the app root with a public static property, which must be
+ * set before the class is instantiated.
+ *
  * @internal
  */
 class TestRunnerKernel extends DrupalKernel {
+
+  /**
+   * The app root.
+   *
+   * This is public to allow it to be set by test code. This must be done before
+   * the kernel is instantiated.
+   *
+   * @var string
+   */
+  public static $appRoot;
 
   /**
    * {@inheritdoc}
@@ -28,6 +41,26 @@ class TestRunnerKernel extends DrupalKernel {
     // always have to rebuild its container, and potentially avoid isolation
     // issues against the tests.
     parent::__construct($environment, $class_loader, FALSE, $app_root);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getApplicationRoot() {
+    // Override the normal app root logic with the static app root if set.
+    if (!empty(static::$appRoot)) {
+      return static::$appRoot;
+    }
+
+    return parent::getApplicationRoot();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __destruct() {
+    // Unset the app root to prevent pollution in later tests.
+    static::$appRoot = NULL;
   }
 
   /**

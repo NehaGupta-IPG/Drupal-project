@@ -16,7 +16,6 @@
 use Drupal\Core\Command\GenerateProxyClassApplication;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\ProxyBuilder\ProxyBuilder;
-use Drupal\Core\Site\Settings;
 use Symfony\Component\HttpFoundation\Request;
 
 if (PHP_SAPI !== 'cli') {
@@ -24,9 +23,8 @@ if (PHP_SAPI !== 'cli') {
 }
 
 // Bootstrap.
-$autoloader = require __DIR__ . '/../../autoload.php';
+$autoloader = require_once 'autoload.php';
 $request = Request::createFromGlobals();
-Settings::initialize(dirname(__DIR__, 2), DrupalKernel::findSitePath($request), $autoloader);
 DrupalKernel::createFromRequest($request, $autoloader, 'prod')->boot();
 
 // Run the database dump command.

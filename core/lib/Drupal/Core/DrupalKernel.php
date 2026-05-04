@@ -296,8 +296,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *   (optional) FALSE to stop the container from being written to or read
    *   from disk. Defaults to TRUE.
    * @param string $app_root
-   *   (optional) The path to the application root as a string. If not supplied,
-   *   the application root will be computed.
+   *   (deprecated) (optional) The path to the application root as a string.
+   *   Specifying the Drupal application root $app_root to createFromRequest()
+   *   is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Omit
+   *   the parameter.
    *
    * @return static
    *
@@ -305,6 +307,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *   In case the host name in the request is not trusted.
    */
   public static function createFromRequest(Request $request, $class_loader, $environment, $allow_dumping = TRUE, $app_root = NULL) {
+    if ($app_root) {
+      @trigger_error('Calling ' . __METHOD__ . '() with the $app_root argument is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3267862', E_USER_DEPRECATED);
+    }
+
     $kernel = new static($environment, $class_loader, $allow_dumping, $app_root);
     static::bootEnvironment($app_root);
     $kernel->initializeSettings($request);
@@ -323,31 +329,65 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *   (optional) FALSE to stop the container from being written to or read
    *   from disk. Defaults to TRUE.
    * @param string $app_root
-   *   (optional) The path to the application root as a string. If not supplied,
-   *   the application root will be computed.
+   *   (deprecated) (optional) The path to the application root as a string.
+   *   Specifying the Drupal app root $app_root to __construct is deprecated in
+   *   drupal:11.1.0 and is removed from drupal:12.0.0. Omit the parameter.
    */
   public function __construct($environment, $class_loader, $allow_dumping = TRUE, $app_root = NULL) {
     $this->environment = $environment;
     $this->classLoader = $class_loader;
     $this->allowDumping = $allow_dumping;
+
+    if ($app_root) {
+      @trigger_error('Specifying the Drupal app root $app_root is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Omit the parameter. See https://www.drupal.org/node/3267862', E_USER_DEPRECATED);
+    }
+
     if ($app_root === NULL) {
-      $app_root = static::guessApplicationRoot();
+      $app_root = static::getApplicationRoot();
     }
     $this->root = $app_root;
   }
 
   /**
-   * Determine the application root directory based on this file's location.
+   * Returns the application root directory.
+   *
+   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use
+   *   getApplicationRoot() instead.
+   *
+   * @see https://www.drupal.org/node/3267862
+   */
+  protected static function guessApplicationRoot() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use getApplicationRoot() instead. See https://www.drupal.org/node/3267862', E_USER_DEPRECATED);
+
+    return static::getApplicationRoot();
+  }
+
+  /**
+   * Returns the application root directory.
+   *
+   * This uses the constant written in \Drupal\Locations\DrupalLocation by the
+   * drupal/core-composer-scaffold Composer plugin.
+   *
+   * For backwards compatibility with installations that do not use Composer,
+   * the fallback is to determine the app root from this file's location, which
+   * is not always reliable in a nonstandard installation structure.
    *
    * @return string
    *   The application root.
+   *
+   * @see \Drupal\Composer\Plugin\Scaffold\GenerateAutoloadReferenceFile
    */
-  protected static function guessApplicationRoot() {
-    // Determine the application root by:
-    // - Removing the namespace directories from the path.
-    // - Getting the path to the directory two levels up from the path
-    //   determined in the previous step.
-    return dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__)), 2);
+  protected static function getApplicationRoot() {
+    if (class_exists(DrupalInstalled::class)) {
+      return DrupalInstalled::getAppRoot();
+    }
+    else {
+      // Determine the application root by:
+      // - Removing the namespace directories from the path.
+      // - Getting the path to the directory two levels up from the path
+      //   determined in the previous step.
+      return dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__)), 2);
+    }
   }
 
   /**
@@ -412,7 +452,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     }
 
     if ($app_root === NULL) {
-      $app_root = static::guessApplicationRoot();
+      $app_root = static::getApplicationRoot();
     }
 
     // Check for a test override.
@@ -1125,17 +1165,23 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * correctly for security or just saneness.
    *
    * @param string $app_root
-   *   (optional) The path to the application root as a string. If not supplied,
-   *   the application root will be computed.
+   *   (deprecated) (optional) The path to the application root as a string. If
+   *   not supplied, the application root will be computed. Specifying the
+   *   Drupal app root $app_root to bootEnvironment() is deprecated in
+   *   drupal:11.1.0 and is removed from drupal:12.0.0. Omit the parameter.
    */
   public static function bootEnvironment($app_root = NULL) {
+    if ($app_root) {
+      @trigger_error('Calling ' . __METHOD__ . '() with the $app_root argument is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3267862', E_USER_DEPRECATED);
+    }
+
     if (static::$isEnvironmentInitialized) {
       return;
     }
 
     // Determine the application root if it's not supplied.
     if ($app_root === NULL) {
-      $app_root = static::guessApplicationRoot();
+      $app_root = static::getApplicationRoot();
     }
 
     error_reporting(E_ALL);

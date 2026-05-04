@@ -116,13 +116,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Drupal\\Core\\Composer\\": "core/lib/Drupal/Core/Composer",
-            "Drupal\\Composer\\": "composer"
+            "Drupal\\Core\\Composer\\": "core/lib/Drupal/Core/Composer"
         }
     },
     "autoload-dev": {
         "psr-4": {
             "Drupal\\PHPStan\\ErrorFormatter\\": "core/tests/PHPStan/ErrorFormatter",
+            "Drupal\\Composer\\": "composer",
             "Drupal\\PHPStan\\Rules\\": "core/tests/PHPStan/Rules"
         }
     },
