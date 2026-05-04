@@ -16,25 +16,19 @@
     // Clear current preview.
     previewElement.innerHTML = '';
 
-    if (!iconId || !iconId.includes(':')) {
+    const [packId, iconName] = (iconId || '').split(':', 2);
+    if (!packId || !iconName) {
       return;
     }
-
-    const [packId, iconName] = iconId.split(':', 2);
 
     // Use Drupal's icon render element via AJAX.
     const baseUrl = drupalSettings.path.baseUrl || '/';
     fetch(
       `${baseUrl}system/icon-render?pack_id=${encodeURIComponent(packId)}&icon_id=${encodeURIComponent(iconName)}`,
     )
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
+      .then((response) => response.ok ? response.json() : null)
       .then((data) => {
-        if (data.svg) {
+        if (data?.svg) {
           previewElement.innerHTML = data.svg;
         }
       })
@@ -76,9 +70,13 @@
           }, 300);
         });
 
-        // Update preview on blur (when user leaves field).
+        // Update preview on blur only if value changed since last preview.
+        let lastPreviewedValue = input.value;
         input.addEventListener('blur', () => {
-          updateIconPreview(input.value, preview);
+          if (input.value !== lastPreviewedValue) {
+            lastPreviewedValue = input.value;
+            updateIconPreview(input.value, preview);
+          }
         });
 
         // Listen for autocomplete selection using jQuery (Drupal autocomplete
@@ -88,6 +86,7 @@
           jQuery(input).on('autocompleteselect', (event, ui) => {
             // Small delay to ensure value is updated.
             setTimeout(() => {
+              lastPreviewedValue = ui.item.value;
               updateIconPreview(ui.item.value, preview);
             }, 100);
           });

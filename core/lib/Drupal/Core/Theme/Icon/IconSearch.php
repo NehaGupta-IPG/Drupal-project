@@ -57,17 +57,14 @@ class IconSearch {
    *   Array of allowed icon pack IDs to limit search.
    * @param int $max_result
    *   Maximum number of results to return.
-   * @param callable|null $result_callback
-   *   Optional callback to format results.
    *
    * @return array
-   *   Array of matching icon results.
+   *   Array of matching icon IDs.
    */
   public function search(
     string $query,
     array $allowed_icon_pack = [],
     int $max_result = self::SEARCH_RESULT,
-    ?callable $result_callback = NULL,
   ): array {
     $query = trim($query);
 
@@ -84,25 +81,13 @@ class IconSearch {
 
     // Try to get cached results.
     if ($cached = $this->cache->get($cache_key)) {
-      $results = $cached->data;
-    }
-    else {
-      // Perform the search and cache permanently, tagged so results are
-      // invalidated when icon packs change.
-      $results = $this->doSearch($query, $allowed_icon_pack, $max_result);
-      $this->cache->set($cache_key, $results, CacheBackendInterface::CACHE_PERMANENT, ['icon_pack_plugin']);
+      return $cached->data;
     }
 
-    // Apply result callback if provided.
-    if ($result_callback !== NULL) {
-      $formatted_results = [];
-      foreach ($results as $icon_full_id) {
-        if ($formatted_result = $result_callback($icon_full_id)) {
-          $formatted_results[] = $formatted_result;
-        }
-      }
-      return $formatted_results;
-    }
+    // Perform the search and cache permanently, tagged so results are
+    // invalidated when icon packs change.
+    $results = $this->doSearch($query, $allowed_icon_pack, $max_result);
+    $this->cache->set($cache_key, $results, CacheBackendInterface::CACHE_PERMANENT, ['icon_pack_plugin']);
 
     return $results;
   }
@@ -123,13 +108,12 @@ class IconSearch {
   private function doSearch(string $query, array $allowed_icon_pack, int $max_result): array {
     $query_lower = mb_strtolower($query);
     $results = [];
-    $count = 0;
 
     // Get all icons from allowed packs.
     $icons = $this->pluginManagerIconPack->getIcons($allowed_icon_pack);
 
     foreach ($icons as $icon_full_id => $icon_data) {
-      if ($count >= $max_result) {
+      if (\count($results) >= $max_result) {
         break;
       }
 
@@ -138,21 +122,18 @@ class IconSearch {
       // Priority 1: Exact match — prepend to put it first.
       if ($icon_id_lower === $query_lower) {
         array_unshift($results, $icon_full_id);
-        $count++;
         continue;
       }
 
       // Priority 2: Starts with query.
       if (str_starts_with($icon_id_lower, $query_lower)) {
         $results[] = $icon_full_id;
-        $count++;
         continue;
       }
 
       // Priority 3: Contains query.
       if (str_contains($icon_id_lower, $query_lower)) {
         $results[] = $icon_full_id;
-        $count++;
         continue;
       }
 
@@ -167,7 +148,6 @@ class IconSearch {
       }
       if ($all_words_match) {
         $results[] = $icon_full_id;
-        $count++;
       }
     }
 

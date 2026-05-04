@@ -18,13 +18,9 @@
 }
 
 .icon-wrapper .form-item {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   margin: unset;
-}
-
-.icon-wrapper .form-item > div,
-.icon-wrapper .form-item > div input {
-  width: 100%;
 }
 
 .icon-preview {
@@ -38,11 +34,7 @@
   background-color: var(--color-gray-050);
 }
 
-.icon-preview svg {
-  width: auto;
-  height: 30px;
-}
-
+.icon-preview svg,
 .icon-preview img {
   width: auto;
   height: 30px;
@@ -72,5 +64,5 @@
 .icon-autocomplete-result .icon-autocomplete-pack {
   margin-left: auto;
   color: #849fdc;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
