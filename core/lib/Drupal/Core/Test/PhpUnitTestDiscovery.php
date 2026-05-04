@@ -11,7 +11,6 @@ use PHPUnit\Framework\DataProviderTestSuite;
 use PHPUnit\Framework\Test;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestSuite;
-use PHPUnit\Metadata\Parser\Registry as MetadataRegistry;
 use PHPUnit\TextUI\Configuration\Builder;
 use PHPUnit\TextUI\Configuration\TestSuiteBuilder;
 
@@ -309,33 +308,19 @@ class PhpUnitTestDiscovery {
     // In PHPUnit 11+, we need to coalesce the groups from individual tests
     // as they may not be available from the test class level (when tests are
     // backed by data providers).
-    // Use forClassAndMethod() to check for explicit #[Group] attributes at
-    // both the class and method level. This is more reliable than groups()
-    // which includes PHPUnit's auto-assigned groups (e.g. 'default'), or
-    // metadata()->isGroup() which only covers method-level attributes.
     $tmp = [];
     foreach ($testClass as $test) {
       if ($test instanceof DataProviderTestSuite) {
         foreach ($test as $testWithData) {
-          $vo = $testWithData->valueObjectForEvents();
-          $hasGroup = !MetadataRegistry::parser()
-            ->forClassAndMethod($vo->className(), $vo->methodName())
-            ->isGroup()
-            ->isEmpty();
-          if (!$hasGroup) {
-            throw new MissingGroupException(sprintf('Missing group metadata in test %s', $vo->id()));
+          if ($testWithData->valueObjectForEvents()->metadata()->isGroup()->isEmpty()) {
+            throw new MissingGroupException(sprintf('Missing group metadata in test %s', $testWithData->valueObjectForEvents()->id()));
           }
           $tmp = array_merge($tmp, $testWithData->groups());
         }
       }
       else {
-        $vo = $test->valueObjectForEvents();
-        $hasGroup = !MetadataRegistry::parser()
-          ->forClassAndMethod($vo->className(), $vo->methodName())
-          ->isGroup()
-          ->isEmpty();
-        if (!$hasGroup) {
-          throw new MissingGroupException(sprintf('Missing group metadata in test %s', $vo->id()));
+        if ($test->valueObjectForEvents()->metadata()->isGroup()->isEmpty()) {
+          throw new MissingGroupException(sprintf('Missing group metadata in test %s', $test->valueObjectForEvents()->id()));
         }
         $tmp = array_merge($tmp, $test->groups());
       }

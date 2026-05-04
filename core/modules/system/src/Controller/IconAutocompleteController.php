@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace Drupal\system\Controller;
 
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Cache\CacheableJsonResponse;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Theme\Icon\IconSearch;
 use Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -54,14 +57,14 @@ final class IconAutocompleteController extends ControllerBase {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object that contains the typed string.
    *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   * @return \Drupal\Core\Cache\CacheableJsonResponse
    *   The matched icons as a JSON response.
    */
-  public function handleSearchIcons(Request $request): JsonResponse {
+  public function handleSearchIcons(Request $request): CacheableJsonResponse {
     $query = trim((string) $request->query->get('q', ''));
 
     if (empty($query)) {
-      return new JsonResponse([]);
+      return new CacheableJsonResponse([]);
     }
 
     // Get allowed icon packs from query parameter.
@@ -80,15 +83,20 @@ final class IconAutocompleteController extends ControllerBase {
       $max_result,
     );
 
-    // Format results with inline SVG previews.
+    // Format results, collecting cache metadata from each icon render.
     $results = [];
+    $cacheability = (new CacheableMetadata())
+      ->addCacheTags(['icon_pack_plugin'])
+      ->addCacheContexts(['url.query_args']);
     foreach ($icon_ids as $icon_full_id) {
-      if ($formatted = $this->formatResultWithPreview($icon_full_id)) {
+      if ($formatted = $this->formatResultWithPreview($icon_full_id, $cacheability)) {
         $results[] = $formatted;
       }
     }
 
-    return new JsonResponse($results);
+    $response = new CacheableJsonResponse($results);
+    $response->addCacheableDependency($cacheability);
+    return $response;
   }
 
   /**
@@ -96,11 +104,13 @@ final class IconAutocompleteController extends ControllerBase {
    *
    * @param string $icon_full_id
    *   The full icon ID (pack_id:icon_id).
+   * @param \Drupal\Core\Cache\CacheableMetadata $cacheability
+   *   Cacheability metadata accumulator; updated in place with render metadata.
    *
    * @return array|null
    *   The formatted result with value and label, or NULL if icon not found.
    */
-  protected function formatResultWithPreview(string $icon_full_id): ?array {
+  protected function formatResultWithPreview(string $icon_full_id, CacheableMetadata $cacheability): ?array {
     $icon = $this->iconPackManager->getIcon($icon_full_id);
 
     if (!$icon) {
@@ -121,9 +131,8 @@ final class IconAutocompleteController extends ControllerBase {
       ],
     ];
 
-    // Render in isolation to avoid leaking cache metadata into the JSON
-    // response context.
     $icon_svg = $this->renderer->renderInIsolation($icon_render);
+    $cacheability->addCacheableDependency(CacheableMetadata::createFromRenderArray($icon_render));
 
     // Create a formatted label with inline icon + icon name + collection name.
     $label = new FormattableMarkup(
@@ -146,22 +155,22 @@ final class IconAutocompleteController extends ControllerBase {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object containing pack_id and icon_id parameters.
    *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   * @return \Drupal\Core\Cache\CacheableJsonResponse
    *   A JSON response containing the rendered SVG.
    */
-  public function renderIcon(Request $request): JsonResponse {
+  public function renderIcon(Request $request): CacheableJsonResponse {
     $pack_id = $request->query->get('pack_id', '');
     $icon_id = $request->query->get('icon_id', '');
 
     if (empty($pack_id) || empty($icon_id)) {
-      return new JsonResponse(['error' => 'Missing pack_id or icon_id'], 400);
+      return new CacheableJsonResponse(['error' => 'Missing pack_id or icon_id'], 400);
     }
 
     $icon_full_id = $pack_id . ':' . $icon_id;
     $icon = $this->iconPackManager->getIcon($icon_full_id);
 
     if (!$icon) {
-      return new JsonResponse(['error' => 'Icon not found'], 404);
+      return new CacheableJsonResponse(['error' => 'Icon not found'], 404);
     }
 
     // Build the icon render array.
@@ -171,11 +180,20 @@ final class IconAutocompleteController extends ControllerBase {
       '#icon_id' => $icon_id,
     ];
 
-    // Render in isolation to avoid leaking cache metadata into the JSON
-    // response context.
-    $svg = $this->renderer->renderInIsolation($build);
+    $context = new RenderContext();
+    $svg = $this->renderer->executeInRenderContext($context, function () use (&$build) {
+      return $this->renderer->render($build);
+    });
 
-    return new JsonResponse(['svg' => (string) $svg]);
+    $response = new CacheableJsonResponse(['svg' => (string) $svg]);
+    $response->addCacheableDependency(CacheableMetadata::createFromRenderArray($build));
+    $response->addCacheableDependency((new CacheableMetadata())->addCacheContexts(['url.query_args']));
+    if (!$context->isEmpty()) {
+      $bubbleable = $context->pop();
+      assert($bubbleable instanceof BubbleableMetadata);
+      $response->addCacheableDependency($bubbleable);
+    }
+    return $response;
   }
 
 }
