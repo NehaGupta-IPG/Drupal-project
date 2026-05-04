@@ -17,6 +17,7 @@ use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Symfony\Component\HttpFoundation\FileBag;
@@ -1163,15 +1164,11 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       // a response header.
       $element['#attached']['drupalSettings']['ajaxTrustedUrl'][$element['#action']] = TRUE;
 
-      // If a form contains a single textfield, and the ENTER key is pressed
-      // within it, Internet Explorer submits the form with no POST data
-      // identifying any submit button. Other browsers submit POST data as
-      // though the user clicked the first button. Therefore, to be as
-      // consistent as we can be across browsers, if no 'triggering_element' has
-      // been identified yet, default it to the first button.
+      // If there are buttons, but no 'triggering_element' has
+      // been identified yet, set a form error.
       $buttons = $form_state->getButtons();
       if (!$form_state->isProgrammed() && !$form_state->getTriggeringElement() && !empty($buttons)) {
-        $form_state->setTriggeringElement($buttons[0]);
+        $form_state->setError($element, new TranslatableMarkup('The form submission is invalid.'));
       }
 
       $triggering_element = $form_state->getTriggeringElement();
