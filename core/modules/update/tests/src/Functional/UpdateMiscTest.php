@@ -6,6 +6,7 @@ namespace Drupal\Tests\update\Functional;
 
 use Drupal\Core\Url;
 use Drupal\Tests\Traits\Core\CronRunTrait;
+use GuzzleHttp\Exception\ClientException;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -51,6 +52,18 @@ class UpdateMiscTest extends UpdateTestBase {
     ]);
     $this->drupalLogin($admin_user);
     $this->refreshUpdateStatus([], '503-error');
+    $this->dbLogReader
+      ->withLocationLike('%/503-error/%')
+      ->assertReadFailure(channel: 'page not found');
+    foreach (['/admin/reports/updates', '/batch'] as $location) {
+      $this->dbLogReader
+        ->withLocation("%$location%", 'LIKE')
+        ->assertReadLoggedException(
+          'update',
+          ClientException::class,
+          pattern: '#^Client error: `GET .*/503-error/drupal/current.*` resulted in a `404 Not Found` response#',
+        );
+    }
     // Ensure that no "Warning: SimpleXMLElement..." parse errors are found.
     $this->assertSession()->pageTextNotContains('SimpleXMLElement');
     $this->assertSession()->pageTextContainsOnce('Failed to get available update data for one project.');

@@ -247,9 +247,6 @@ function _drupal_log_error($error, $fatal = FALSE): void {
         $message = new FormattableMarkup(Error::DEFAULT_ERROR_MESSAGE, $error);
       }
       else {
-        // With verbose logging, we will also include a backtrace.
-        // First trace is the error itself, already contained in the message.
-        array_shift($backtrace);
         // Strip arguments from the backtrace.
         $error['@backtrace'] = Error::formatBacktrace(array_map(function ($trace) {
           unset($trace['args']);
@@ -365,6 +362,7 @@ function _drupal_error_header($message, $type, $function, $file, $line): void {
       'function' => $function,
       'file' => $file,
       'line' => $line,
+      'backtrace' => (new \Exception())->getTraceAsString(),
     ],
   ];
   // For non-fatal errors (e.g. PHP notices) _drupal_log_error can be called

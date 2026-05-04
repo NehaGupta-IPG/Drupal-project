@@ -7,6 +7,8 @@ namespace Drupal\FunctionalTests;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Exception\ExpectationException;
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\Logger\RfcLogLevel;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\Traits\Core\CronRunTrait;
@@ -233,7 +235,20 @@ class BrowserTestBaseTest extends BrowserTestBase {
   public function testError(): void {
     $this->expectException('\Exception');
     $this->expectExceptionMessage('User notice: foo');
-    $this->drupalGet('test-error');
+    try {
+      $this->drupalGet('test-error');
+    }
+    finally {
+      $this->dbLogReader->assertReadFailure(
+        RfcLogLevel::NOTICE,
+        'php',
+        '%type: @message in %function (line %line of %file) @backtrace_string.',
+        [
+          '%type' => 'User notice',
+          '@message' => Markup::create('foo'),
+        ],
+      );
+    }
   }
 
   /**

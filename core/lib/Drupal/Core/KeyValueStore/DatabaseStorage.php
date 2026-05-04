@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\KeyValueStore;
 
+use Drupal\Component\Reporting\YamlReport;
 use Drupal\Component\Serialization\SerializationInterface;
 use Drupal\Core\Database\Query\Merge;
 use Drupal\Core\Database\Connection;
@@ -130,6 +131,9 @@ class DatabaseStorage extends StorageBase {
    *   The key of the data to store.
    * @param mixed $value
    *   The data to store.
+   *
+   * @throws \Drupal\Core\Database\DatabaseException
+   *   The database query failed.
    */
   protected function doSet($key, $value) {
     $this->connection->merge($this->table)
@@ -147,16 +151,27 @@ class DatabaseStorage extends StorageBase {
   public function set($key, $value) {
     try {
       $this->doSet($key, $value);
+      return;
     }
     catch (\Exception $e) {
-      // If there was an exception, try to create the table.
+      // Let the code below handle the exception.
+    }
+    // If there was an exception, try to create the table.
+    try {
       if ($this->ensureTableExists()) {
         $this->doSet($key, $value);
-      }
-      else {
-        throw $e;
+        return;
       }
     }
+    catch (\Exception $ee) {
+      $e = $ee;
+    }
+    throw new \Exception(sprintf(
+      "Failed to set a value for %s in %s. Value:\n\n%s",
+      var_export($key, TRUE),
+      var_export($this->collection, TRUE),
+      YamlReport::format($value),
+    ), previous: $e);
   }
 
   /**

@@ -8,6 +8,7 @@ use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Logger\LogMessageParserInterface;
 use Drupal\Core\Logger\RfcLoggerTrait;
+use Drupal\dblog\DbLogHelper;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -61,21 +62,22 @@ class DbLog implements LoggerInterface {
     // style, so they can be translated too in runtime.
     $message_placeholders = $this->parser->parseMessagePlaceholders($message, $context);
 
+    $record = [
+      'uid' => $context['uid'],
+      'type' => mb_substr($context['channel'], 0, 64),
+      'message' => $message,
+      'variables' => serialize($message_placeholders),
+      'severity' => $level,
+      'link' => $context['link'],
+      'location' => $context['request_uri'],
+      'referer' => $context['referer'],
+      'hostname' => mb_substr($context['ip'], 0, 128),
+      'timestamp' => $context['timestamp'],
+    ];
     try {
       $this->connection
         ->insert('watchdog')
-        ->fields([
-          'uid' => $context['uid'],
-          'type' => mb_substr($context['channel'], 0, 64),
-          'message' => $message,
-          'variables' => serialize($message_placeholders),
-          'severity' => $level,
-          'link' => $context['link'],
-          'location' => $context['request_uri'],
-          'referer' => $context['referer'],
-          'hostname' => mb_substr($context['ip'], 0, 128),
-          'timestamp' => $context['timestamp'],
-        ])
+        ->fields($record)
         ->execute();
     }
     catch (\Exception $e) {
@@ -104,7 +106,7 @@ class DbLog implements LoggerInterface {
         $this->log($level, $message, $context);
       }
       else {
-        throw $e;
+        throw new \RuntimeException("Failed to log in dblog.\n\n" . DbLogHelper::formatRecordAsYaml($record), previous: $e);
       }
     }
   }

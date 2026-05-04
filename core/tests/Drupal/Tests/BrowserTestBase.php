@@ -18,6 +18,7 @@ use Drupal\Core\Test\FunctionalTestSetupTrait;
 use Drupal\Core\Test\TestSetupTrait;
 use Drupal\Core\Utility\Error;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
+use Drupal\Tests\dblog\Traits\DbLogReaderTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
@@ -26,6 +27,7 @@ use Drupal\TestTools\Extension\Dump\DebugDump;
 use GuzzleHttp\Cookie\CookieJar;
 use PHPUnit\Framework\Attributes\BeforeClass;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\RequestInterface;
 use Symfony\Component\VarDumper\VarDumper;
 
 /**
@@ -52,6 +54,7 @@ use Symfony\Component\VarDumper\VarDumper;
  */
 abstract class BrowserTestBase extends TestCase {
 
+  use DbLogReaderTrait;
   use DrupalTestCaseTrait;
   use FunctionalTestSetupTrait;
   use UiHelperTrait {
@@ -201,6 +204,25 @@ abstract class BrowserTestBase extends TestCase {
       // performed in the test.
       $handler_stack = $client->getConfig('handler');
       $handler_stack->push($this->getResponseLogHandler());
+      $handler_stack->push(function (callable $handler): \Closure {
+        return function (RequestInterface $request, array $options) use ($handler) {
+          if (!$this->dbLogReader->isAvailable()) {
+            return $handler($request, $options);
+          }
+          $this->dbLogReader->bookmark(sprintf("BEGIN Request %s to %s", $request->getMethod(), $request->getUri()->__toString()));
+          /** @var \GuzzleHttp\Promise\Promise $promise */
+          $promise = $handler($request, $options);
+          $promise->then(
+            function ($value) use ($request) {
+              $this->dbLogReader->bookmark(sprintf("SUCCESS Request %s to %s with %s", $request->getMethod(), $request->getUri()->__toString(), get_debug_type($value)));
+            },
+            function ($value) use ($request) {
+              $this->dbLogReader->bookmark(sprintf("FAIL Request %s to %s with %s", $request->getMethod(), $request->getUri()->__toString(), get_debug_type($value)));
+            },
+          );
+          return $promise;
+        };
+      });
 
       $driver->getClient()->setClient($client);
     }

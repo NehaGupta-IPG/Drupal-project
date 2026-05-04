@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Theme;
 
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -239,6 +240,11 @@ class TwigTransTest extends BrowserTestBase {
         ];
         $this->drupalGet('admin/config/regional/translate/import');
         $this->submitForm($options, 'Import');
+        $this->dbLogReader
+          ->withChannel('locale')
+          ->withSeverity(RfcLogLevel::WARNING)
+          ->withMessage('No configuration objects have been updated.')
+          ->markAllAsRead();
         $file_system->unlink($filename);
       }
     }

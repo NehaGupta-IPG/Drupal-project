@@ -2,7 +2,7 @@
 
 namespace Drupal\Core\Test\HttpClientMiddleware;
 
-use Drupal\Core\Utility\Error;
+use Drupal\Component\Reporting\YamlReport;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -27,7 +27,7 @@ class TestHttpClientMiddleware {
           $request = $request->withHeader('User-Agent', $user_agent);
         }
         return $handler($request, $options)
-          ->then(function (ResponseInterface $response) {
+          ->then(function (ResponseInterface $response) use ($request) {
             if (!drupal_valid_test_ua()) {
               return $response;
             }
@@ -44,14 +44,30 @@ class TestHttpClientMiddleware {
                 foreach ($header_values as $header_value) {
                   $parameters = unserialize(urldecode($header_value));
                   if (count($parameters) === 3) {
+                    [$message, $type, $info] = $parameters;
+                    $report = YamlReport::format([
+                      'type' => $type,
+                      'message' => $message,
+                      ...$info,
+                    ]);
                     if ($parameters[1] === 'User deprecated function') {
                       // Fire the same deprecation message to allow it to be
                       // collected by PHPUnit.
                       // phpcs:ignore Drupal.Semantics.FunctionTriggerError
-                      @trigger_error((string) $parameters[0], E_USER_DEPRECATED);
+                      @trigger_error(sprintf(
+                        "A deprecation occurred in %s %s:\n\n%s",
+                        $request->getMethod(),
+                        $request->getUri()->__toString(),
+                        $report,
+                      ), E_USER_DEPRECATED);
                     }
                     else {
-                      throw new \Exception($parameters[1] . ': ' . $parameters[0] . "\n" . Error::formatBacktrace([$parameters[2]]));
+                      throw new \Exception(sprintf(
+                        "An error occurred in %s %s:\n\n%s",
+                        $request->getMethod(),
+                        $request->getUri()->__toString(),
+                        $report,
+                      ));
                     }
                   }
                   else {
