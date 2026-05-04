@@ -119,6 +119,7 @@ class MenuLinkContentTest extends ResourceTestBase {
             'uri' => 'https://nl.wikipedia.org/wiki/Llama',
             'title' => NULL,
             'options' => [],
+            'target_uuid' => NULL,
           ],
           'changed' => (new \DateTime())->setTimestamp($this->entity->getChangedTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
           'default_langcode' => TRUE,

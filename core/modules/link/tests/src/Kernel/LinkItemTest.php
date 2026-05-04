@@ -178,6 +178,15 @@ class LinkItemTest extends FieldKernelTestBase {
     $entity->field_test_external->generateSampleItems();
     $entity->field_test_internal->generateSampleItems();
     $this->entityValidateAndSave($entity);
+
+    // Tests target_uuid computed property.
+    $linked_entity = EntityTest::create();
+    $linked_entity->save();
+    $entity = EntityTest::create();
+    $entity->field_test_internal->uri = 'entity:entity_test/' . $linked_entity->id();
+    $this->assertEquals($linked_entity->uuid(), $entity->field_test_internal->target_uuid);
+    $entity->field_test_internal->uri = NULL;
+    $this->assertNotNull($entity->field_test_internal->target_uuid);
   }
 
 }

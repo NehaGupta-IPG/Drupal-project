@@ -133,6 +133,7 @@ abstract class MenuLinkContentResourceTestBase extends EntityResourceTestBase {
         [
           'uri' => 'https://nl.wikipedia.org/wiki/Llama',
           'title' => NULL,
+          'target_uuid' => NULL,
           'options' => [
             'fragment' => 'a-fragment',
             'attributes' => [

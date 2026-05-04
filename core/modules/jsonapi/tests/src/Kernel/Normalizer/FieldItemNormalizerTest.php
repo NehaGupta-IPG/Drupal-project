@@ -112,6 +112,7 @@ class FieldItemNormalizerTest extends JsonapiKernelTestBase {
       'options' => [
         'query' => 'foo=bar',
       ],
+      'target_uuid' => NULL,
     ], $result->getNormalization());
 
     // Verify a field with one public property and one internal only returns the

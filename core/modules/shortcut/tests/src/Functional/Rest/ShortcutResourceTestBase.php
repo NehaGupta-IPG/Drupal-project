@@ -104,6 +104,7 @@ abstract class ShortcutResourceTestBase extends EntityResourceTestBase {
         [
           'uri' => 'internal:/admin/content/comment',
           'title' => NULL,
+          'target_uuid' => NULL,
           'options' => [
             'fragment' => 'new',
           ],

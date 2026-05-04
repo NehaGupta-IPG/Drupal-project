@@ -14,6 +14,7 @@ use Drupal\Core\TypedData\MapDataDefinition;
 use Drupal\Core\Url;
 use Drupal\link\LinkItemInterface;
 use Drupal\link\LinkTitleVisibility;
+use Drupal\link\LinkTargetEntityUuid;
 
 /**
  * Plugin implementation of the 'link' field type.
@@ -56,6 +57,12 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
 
     $properties['options'] = MapDataDefinition::create()
       ->setLabel(new TranslatableMarkup('Options'));
+
+    $properties['target_uuid'] = DataDefinition::create('string')
+      ->setLabel(t('The UUID of the linked entity, if the link points to an entity.'))
+      ->setComputed(TRUE)
+      ->setInternal(FALSE)
+      ->setClass(LinkTargetEntityUuid::class);
 
     return $properties;
   }
