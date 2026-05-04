@@ -2024,11 +2024,17 @@ services:
       - { name: needs_destruction }
   Drupal\Core\Extension\ThemeSettingsProvider:
     autowire: true
+  cache.icon:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin }
+    factory: ['@cache_factory', 'get']
+    arguments: [icon]
   icon.search:
     class: Drupal\Core\Theme\Icon\IconSearch
     arguments:
       [
         '@plugin.manager.icon_pack',
-        '@cache.default',
+        '@cache.icon',
       ]
   Drupal\Core\Theme\Icon\IconSearch: '@icon.search'

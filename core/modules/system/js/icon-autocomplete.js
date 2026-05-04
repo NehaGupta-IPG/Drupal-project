@@ -26,7 +26,7 @@
     fetch(
       `${baseUrl}system/icon-render?pack_id=${encodeURIComponent(packId)}&icon_id=${encodeURIComponent(iconName)}`,
     )
-      .then((response) => response.ok ? response.json() : null)
+      .then((response) => (response.ok ? response.json() : null))
       .then((data) => {
         if (data?.svg) {
           previewElement.innerHTML = data.svg;
