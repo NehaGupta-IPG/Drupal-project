@@ -13,4 +13,4 @@ use Drupal\a_module_that_does_not_exist\Plugin\CustomInterface;
   id: "discovery_test_missing_interface",
   title: "Discovery test plugin missing interface"
 )]
-class AttributeDiscoveryTestMissingInterface implements CustomInterface {}
+class AttributeDiscoveryTestMissingInterfacePlugin implements CustomInterface {}

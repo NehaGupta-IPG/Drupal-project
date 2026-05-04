@@ -96,6 +96,13 @@ class AttributeClassDiscovery implements DiscoveryInterface {
           foreach ($iterator as $fileinfo) {
             assert($fileinfo instanceof \SplFileInfo);
             if ($fileinfo->getExtension() === 'php') {
+              $basename = $fileinfo->getBasename('.php');
+              if (str_ends_with($basename, 'Trait') || str_ends_with($basename, 'Interface')) {
+                // Skip parsing interfaces and traits and do not add entry for
+                // them in file cache.
+                continue;
+              }
+
               if ($cached = $this->fileCache->get($fileinfo->getPathName())) {
                 if (isset($cached['id'])) {
                   // Explicitly unserialize this to create a new object
@@ -110,7 +117,7 @@ class AttributeClassDiscovery implements DiscoveryInterface {
 
               $sub_path = $iterator->getSubIterator()->getSubPath();
               $sub_path = $sub_path ? str_replace(DIRECTORY_SEPARATOR, '\\', $sub_path) . '\\' : '';
-              $class = $namespace . '\\' . $sub_path . $fileinfo->getBasename('.php');
+              $class = $namespace . '\\' . $sub_path . $basename;
               // Plugins may rely on Attribute classes defined by modules that
               // are not installed. In such a case, a 'class not found' error
               // may be thrown from reflection. However, this is an unavoidable
