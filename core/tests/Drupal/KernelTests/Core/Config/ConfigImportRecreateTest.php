@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Config;
 
-use Drupal\Core\Config\ConfigImporterFactory;
-use Drupal\Core\Config\StorageComparer;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
@@ -22,13 +20,6 @@ class ConfigImportRecreateTest extends KernelTestBase {
   use ContentTypeCreationTrait;
 
   /**
-   * Config Importer object used for testing.
-   *
-   * @var \Drupal\Core\Config\ConfigImporter
-   */
-  protected $configImporter;
-
-  /**
    * {@inheritdoc}
    */
   protected static $modules = ['system', 'field', 'text', 'user', 'node'];
@@ -43,13 +34,6 @@ class ConfigImportRecreateTest extends KernelTestBase {
     $this->installConfig(['system', 'field', 'node']);
 
     $this->copyConfig($this->container->get('config.storage'), $this->container->get('config.storage.sync'));
-
-    // Set up the ConfigImporter object for testing.
-    $storage_comparer = new StorageComparer(
-      $this->container->get('config.storage.sync'),
-      $this->container->get('config.storage')
-    );
-    $this->configImporter = $this->container->get(ConfigImporterFactory::class)->get($storage_comparer->createChangelist());
   }
 
   /**
@@ -79,20 +63,21 @@ class ConfigImportRecreateTest extends KernelTestBase {
       'name' => 'Node type two',
     ]);
 
-    $this->configImporter->reset();
     // A node type, a field, an entity view display and an entity form display
     // will be recreated.
-    $creates = $this->configImporter->getUnprocessedConfiguration('create');
-    $deletes = $this->configImporter->getUnprocessedConfiguration('delete');
+    $configImporter = $this->configImporter();
+    $creates = $configImporter->getUnprocessedConfiguration('create');
+    $deletes = $configImporter->getUnprocessedConfiguration('delete');
     $this->assertCount(5, $creates, 'There are 5 configuration items to create.');
     $this->assertCount(5, $deletes, 'There are 5 configuration items to delete.');
-    $this->assertCount(0, $this->configImporter->getUnprocessedConfiguration('update'), 'There are no configuration items to update.');
+    $this->assertCount(0, $configImporter->getUnprocessedConfiguration('update'), 'There are no configuration items to update.');
     $this->assertSame($creates, array_reverse($deletes), 'Deletes and creates contain the same configuration names in opposite orders due to dependencies.');
 
-    $this->configImporter->import();
+    $configImporter = $this->configImporter();
+    $configImporter->import();
 
     // Verify that there is nothing more to import.
-    $this->assertFalse($this->configImporter->reset()->hasUnprocessedConfigurationChanges());
+    $this->assertFalse($configImporter->hasUnprocessedConfigurationChanges());
     $content_type = NodeType::load($type_name);
     $this->assertEquals('Node type one', $content_type->label());
   }

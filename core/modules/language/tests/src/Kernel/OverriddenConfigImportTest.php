@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\language\Kernel;
 
-use Drupal\Core\Config\ConfigImporterFactory;
-use Drupal\Core\Config\StorageComparer;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -16,13 +14,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('language')]
 #[RunTestsInSeparateProcesses]
 class OverriddenConfigImportTest extends KernelTestBase {
-
-  /**
-   * Config Importer object used for testing.
-   *
-   * @var \Drupal\Core\Config\ConfigImporter
-   */
-  protected $configImporter;
 
   /**
    * {@inheritdoc}
@@ -37,13 +28,6 @@ class OverriddenConfigImportTest extends KernelTestBase {
 
     $this->installConfig(['system']);
     $this->copyConfig($this->container->get('config.storage'), $this->container->get('config.storage.sync'));
-
-    // Set up the ConfigImporter object for testing.
-    $storage_comparer = new StorageComparer(
-      $this->container->get('config.storage.sync'),
-      $this->container->get('config.storage')
-    );
-    $this->configImporter = $this->container->get(ConfigImporterFactory::class)->get($storage_comparer->createChangelist());
   }
 
   /**
@@ -78,7 +62,7 @@ class OverriddenConfigImportTest extends KernelTestBase {
     $this->assertTrue($override->isNew());
 
     // Start the import of the new configuration.
-    $this->configImporter->reset()->import();
+    $this->configImporter()->import();
 
     // Verify the new site name in the default language.
     $config = $this->config('system.site')->getRawData();

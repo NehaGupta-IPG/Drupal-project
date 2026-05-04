@@ -85,11 +85,15 @@ abstract class BrowserTestBase extends TestCase {
    */
   protected $timeLimit = 500;
 
-
   /**
    * The config importer that can be used in a test.
    *
    * @var \Drupal\Core\Config\ConfigImporter
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+   *   the configImporter() method instead which returns a fresh ConfigImporter.
+   *
+   * @see https://www.drupal.org/node/3570442
    */
   protected $configImporter;
 

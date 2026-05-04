@@ -23,16 +23,17 @@ trait ConfigTestTrait {
    *   The config importer object.
    */
   protected function configImporter() {
-    if (!$this->configImporter) {
-      // Set up the ConfigImporter object for testing.
-      $storage_comparer = new StorageComparer(
-        $this->container->get('config.storage.sync'),
-        $this->container->get('config.storage')
-      );
-      $this->configImporter = $this->container->get(ConfigImporterFactory::class)->get($storage_comparer);
-    }
-    // Always recalculate the changelist when called.
-    return $this->configImporter->reset();
+    $storage_comparer = new StorageComparer(
+      $this->container->get('config.storage.sync'),
+      $this->container->get('config.storage')
+    );
+    $configImporter = $this->container->get(ConfigImporterFactory::class)->get($storage_comparer);
+
+    // Set the deprecated property for backwards compatibility.
+    // @phpstan-ignore property.deprecated
+    $this->configImporter = $configImporter;
+
+    return $configImporter->reset();
   }
 
   /**
