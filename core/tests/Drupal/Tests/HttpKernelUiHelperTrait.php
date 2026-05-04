@@ -10,6 +10,7 @@ use Behat\Mink\Mink;
 use Behat\Mink\Selector\SelectorsHandler;
 use Behat\Mink\Session;
 use Drupal\Core\Url;
+use Drupal\KernelTests\AssertContentTrait;
 use Symfony\Component\HttpKernel\HttpKernelBrowser;
 
 /**
@@ -28,6 +29,7 @@ use Symfony\Component\HttpKernel\HttpKernelBrowser;
 trait HttpKernelUiHelperTrait {
 
   use BrowserHtmlDebugTrait;
+  use AssertContentTrait;
 
   /**
    * Mink session manager.
@@ -83,16 +85,17 @@ trait HttpKernelUiHelperTrait {
 
     $session->visit($path);
 
-    $out = $session->getPage()->getContent();
+    // Set the content for methods in \Drupal\KernelTests\AssertContentTrait.
+    $this->content = $session->getPage()->getContent();
 
     if ($this->htmlOutputEnabled) {
       $html_output = 'GET request to: ' . $path;
-      $html_output .= '<hr />' . $out;
+      $html_output .= '<hr />' . $this->content;
       $html_output .= $this->getHtmlOutputHeaders();
       $this->htmlOutput($html_output);
     }
 
-    return $out;
+    return $this->content;
   }
 
   /**

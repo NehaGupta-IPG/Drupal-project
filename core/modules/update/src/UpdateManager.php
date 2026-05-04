@@ -190,4 +190,13 @@ class UpdateManager implements UpdateManagerInterface {
     }
   }
 
+  /**
+   * Resets the project list.
+   *
+   * This is only used by Kernel tests.
+   */
+  public function reset(): void {
+    $this->projects = [];
+  }
+
 }
