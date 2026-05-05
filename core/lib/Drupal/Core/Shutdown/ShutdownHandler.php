@@ -37,7 +37,7 @@ class ShutdownHandler {
    *   during batch processing, which breaks batch handling.
    */
   protected function __construct(
-    protected CallbackStack $callbackStack = new CallbackStack()
+    protected CallbackStack $callbackStack = new CallbackStack(),
   ) {}
 
   /**
@@ -89,8 +89,6 @@ class ShutdownHandler {
    * Register internal shutdown function.
    *
    * Only register the internal shutdown function once.
-   *
-   * @return void
    */
   protected function register(): void {
     if (!$this->isRegistered) {
@@ -101,6 +99,7 @@ class ShutdownHandler {
 
   /**
    * Executes registered shutdown functions.
+   *
    * @internal
    */
   public function shutdown(): void {

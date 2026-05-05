@@ -18,7 +18,6 @@ use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Shutdown\ShutdownHandler;
-use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

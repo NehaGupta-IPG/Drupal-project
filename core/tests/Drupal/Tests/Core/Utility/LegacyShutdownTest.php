@@ -6,15 +6,19 @@ namespace Drupal\Tests\Core\Utility;
 
 use Drupal\Core\Shutdown\ShutdownHandler;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test legacy drupal_register_shutdown_function() function.
  *
  * Tests deprecation message.
- *
- * @group Utility
- * @group legacy
  */
+#[Group('Utility')]
+#[Group('legacy')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class LegacyShutdownTest extends UnitTestCase {
 
   /**
@@ -22,12 +26,13 @@ class LegacyShutdownTest extends UnitTestCase {
    */
   public function testDrupalRegisterShutdownFunction(): void {
     $a = static function (int $b = 0): int {
-      static $a;
-      return $a += $b;
+      static $counter = 0;
+      $counter += $b;
+      return $counter;
     };
     $add = 10;
     $count = 0;
-    $this->expectDeprecation('drupal_register_shutdown_function() is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Shutdown\ShutdownHandler::get() or \Drupal\Core\Shutdown\ShutdownHandler::add() or \Drupal\Core\Shutdown\ShutdownHandler::reset() instead. See https://www.drupal.org/node/3053808');
+    $this->expectUserDeprecationMessage('drupal_register_shutdown_function() is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Shutdown\ShutdownHandler::get() or \Drupal\Core\Shutdown\ShutdownHandler::add() or \Drupal\Core\Shutdown\ShutdownHandler::reset() instead. See https://www.drupal.org/node/3053808');
     $this->assertCount(++$count, drupal_register_shutdown_function($a, $add));
     $this->assertCount(++$count, $callbacks = &drupal_register_shutdown_function($a, $add));
     foreach ($callbacks as $callback_array) {
