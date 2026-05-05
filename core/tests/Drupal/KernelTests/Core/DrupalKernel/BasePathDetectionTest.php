@@ -5,6 +5,7 @@ namespace Drupal\KernelTests\Core\DrupalKernel;
 use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -14,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
  * the generated URLs incorrectly include /index.php/ prefix.
  */
 #[Group("DrupalKernel")]
+#[RunInSeparateProcesses]
 class BasePathDetectionTest extends KernelTestBase {
 
   /**
@@ -26,7 +28,7 @@ class BasePathDetectionTest extends KernelTestBase {
    *
    * This is the main test that demonstrates the bug.
    */
-  public function testIndexPhpBaseUrlBug() {
+  public function testIndexPhpBaseUrlBug() : void {
     // Test 1: Clean URL access (baseline - what we expect)
     $clean_request = Request::create('http://example.com/node/1');
     $this->setCurrentRequest($clean_request);
@@ -51,7 +53,7 @@ class BasePathDetectionTest extends KernelTestBase {
    *
    * This shows how the bug affects links generated for various routes.
    */
-  public function testGeneratedLinksImpact() {
+  public function testGeneratedLinksImpact() : void {
     // Set up /index.php context.
     $index_request = Request::create('http://example.com/index.php');
     $index_request->server->set('SCRIPT_FILENAME', '/var/www/html/index.php');
@@ -64,7 +66,7 @@ class BasePathDetectionTest extends KernelTestBase {
   /**
    * Helper method to set current request in the container.
    */
-  protected function setCurrentRequest(Request $request) {
+  protected function setCurrentRequest(Request $request) : void {
     // Get the current request from parent class to preserve session.
     $current_request = \Drupal::request();
     if ($current_request && $current_request->hasSession()) {
