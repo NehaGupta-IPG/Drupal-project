@@ -3,7 +3,6 @@
 namespace Drupal\Core\Cache;
 
 use Drupal\Component\Assertion\Inspector;
-use Drupal\Component\Datetime\TimeInterface;
 
 /**
  * Stores cache items in the Alternative PHP Cache User Cache (APCu).
