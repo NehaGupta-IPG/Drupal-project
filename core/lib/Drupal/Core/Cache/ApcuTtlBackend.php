@@ -56,7 +56,7 @@ class ApcuTtlBackend extends ApcuBackend {
   /**
    * {@inheritdoc}
    */
-  public function set($cid, $data, $expire = CacheBackendInterface::CACHE_PERMANENT, array $tags = []) {
+  public function set($cid, $data, $expire = CacheBackendInterface::CACHE_PERMANENT, array $tags = []): void {
     // Set a TTL to either the time since the first write timestamp or 10
     // seconds, whichever is greater.This will result in progressively longer
     // TTLs as the time since first write progresses.
