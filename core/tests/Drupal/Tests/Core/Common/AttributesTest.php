@@ -21,7 +21,7 @@ class AttributesTest extends UnitTestCase {
    * @return array
    *   An array of attributes, expected output, and descriptions.
    */
-  public static function providerTestAttributeData() {
+  public static function providerTestAttributeData(): array {
     return [
       // Verify that special characters are HTML encoded.
       [['&"\'<>' => 'value'], ' &amp;&quot;&#039;&lt;&gt;="value"', 'HTML encode attribute names.'],
@@ -55,7 +55,7 @@ class AttributesTest extends UnitTestCase {
    * @see \Drupal\Core\Template\Attribute::__toString()
    */
   #[DataProvider('providerTestAttributeData')]
-  public function testDrupalAttributes($attributes, $expected, $message): void {
+  public function testDrupalAttributes(array $attributes, string $expected, string $message): void {
     $this->assertSame($expected, (string) new Attribute($attributes), $message);
   }
 

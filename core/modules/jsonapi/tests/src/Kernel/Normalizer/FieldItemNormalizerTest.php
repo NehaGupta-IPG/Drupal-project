@@ -39,7 +39,7 @@ class FieldItemNormalizerTest extends JsonapiKernelTestBase {
    *
    * @var \Drupal\jsonapi\Normalizer\FieldItemNormalizer
    */
-  private $normalizer;
+  private FieldItemNormalizer $normalizer;
 
   /**
    * {@inheritdoc}
@@ -60,8 +60,6 @@ class FieldItemNormalizerTest extends JsonapiKernelTestBase {
 
   /**
    * Tests a field item that has no properties.
-   *
-   * @legacy-covers ::normalize
    */
   public function testNormalizeFieldItemWithoutProperties(): void {
     $item = $this->prophesize(FieldItemInterface::class);

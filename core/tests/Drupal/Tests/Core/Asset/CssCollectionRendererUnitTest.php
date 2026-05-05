@@ -38,13 +38,13 @@ class CssCollectionRendererUnitTest extends UnitTestCase {
     parent::setUp();
     $assetQueryString = $this->prophesize(AssetQueryStringInterface::class);
     $file_url_generator = $this->createMock(FileUrlGeneratorInterface::class);
-    $file_url_generator->expects($this->any())
+    $file_url_generator
       ->method('generateString')
-      ->with($this->isType('string'))
-      ->willReturnCallback(function ($uri) {
+      ->with($this->isString())
+      ->willReturnCallback(function (string $uri): string {
          return 'generated-relative-url:' . $uri;
       });
-    $assetQueryString->get()->shouldBeCalledOnce()->willReturn('');
+    $assetQueryString->get()->willReturn('');
     $this->renderer = new CssCollectionRenderer($assetQueryString->reveal(), $file_url_generator);
     $this->fileCssGroup = [
       'group' => -100,
@@ -79,8 +79,8 @@ class CssCollectionRendererUnitTest extends UnitTestCase {
    *
    * @see testRender
    */
-  public static function providerTestRender() {
-    $create_link_element = function ($href, $media = 'all', $custom_attributes = []) {
+  public static function providerTestRender(): array {
+    $create_link_element = function ($href, $media = 'all', $custom_attributes = []): array {
       $attributes = [
         'rel' => 'stylesheet',
         'media' => $media,
@@ -93,19 +93,29 @@ class CssCollectionRendererUnitTest extends UnitTestCase {
       ];
     };
 
-    $create_file_css_asset = function ($data, $media = 'all', $preprocess = TRUE) {
+    $create_file_css_asset = function ($data, $media = 'all', $preprocess = TRUE): array {
       return ['group' => 0, 'type' => 'file', 'media' => $media, 'preprocess' => $preprocess, 'data' => $data];
     };
 
-    // cspell:disable-next-line
-    $custom_attributes = ['integrity' => 'sha384-psK1OYPAYjYUhtDYW+Pj2yc', 'crossorigin' => 'anonymous', 'random-attribute' => 'test'];
+    $custom_attributes = [
+      // cspell:disable-next-line
+      'integrity' => 'sha384-psK1OYPAYjYUhtDYW+Pj2yc',
+      'crossorigin' => 'anonymous',
+      'random-attribute' => 'test',
+    ];
 
     return [
       // Single external CSS asset.
       0 => [
         // CSS assets.
         [
-          0 => ['group' => 0, 'type' => 'external', 'media' => 'all', 'preprocess' => TRUE, 'data' => 'http://example.com/popular.js'],
+          0 => [
+            'group' => 0,
+            'type' => 'external',
+            'media' => 'all',
+            'preprocess' => TRUE,
+            'data' => 'http://example.com/popular.js',
+          ],
         ],
         // Render elements.
         [
@@ -115,7 +125,13 @@ class CssCollectionRendererUnitTest extends UnitTestCase {
       // Single file CSS asset.
       1 => [
         [
-          0 => ['group' => 0, 'type' => 'file', 'media' => 'all', 'preprocess' => TRUE, 'data' => 'public://css/file-all'],
+          0 => [
+            'group' => 0,
+            'type' => 'file',
+            'media' => 'all',
+            'preprocess' => TRUE,
+            'data' => 'public://css/file-all',
+          ],
         ],
         [
           0 => $create_link_element('generated-relative-url:public://css/file-all?', 'all'),
@@ -124,7 +140,14 @@ class CssCollectionRendererUnitTest extends UnitTestCase {
       // Single file CSS asset with custom attributes.
       2 => [
         [
-          0 => ['group' => 0, 'type' => 'file', 'media' => 'all', 'preprocess' => TRUE, 'data' => 'public://css/file-all', 'attributes' => $custom_attributes],
+          0 => [
+            'group' => 0,
+            'type' => 'file',
+            'media' => 'all',
+            'preprocess' => TRUE,
+            'data' => 'public://css/file-all',
+            'attributes' => $custom_attributes,
+          ],
         ],
         [
           0 => $create_link_element('generated-relative-url:public://css/file-all?', 'all', $custom_attributes),

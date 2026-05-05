@@ -15,11 +15,12 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class LinkExternalProtocolsConstraint extends SymfonyConstraint {
 
-  /**
-   * The error message.
-   *
-   * @var string
-   */
-  public $message = "The path '@uri' is invalid.";
+  public function __construct(
+    public string $message = "The path '@uri' is invalid.",
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct(groups: $groups, payload: $payload);
+  }
 
 }

@@ -70,7 +70,7 @@ class XssTest extends TestCase {
    *   \Drupal\Component\Utility\Xss::filter().
    */
   #[DataProvider('providerTestFilterXssNormalized')]
-  public function testFilterXssNormalized($value, $expected, $message, ?array $allowed_tags = NULL): void {
+  public function testFilterXssNormalized(string $value, string $expected, string $message, ?array $allowed_tags = NULL): void {
     if ($allowed_tags === NULL) {
       $value = Xss::filter($value);
     }
@@ -93,7 +93,7 @@ class XssTest extends TestCase {
    *     - (optional) The allowed HTML tags array that should be passed to
    *       \Drupal\Component\Utility\Xss::filter().
    */
-  public static function providerTestFilterXssNormalized() {
+  public static function providerTestFilterXssNormalized(): array {
     return [
       [
         "Who&#039;s Online",
@@ -137,7 +137,7 @@ class XssTest extends TestCase {
    *   \Drupal\Component\Utility\Xss::filter().
    */
   #[DataProvider('providerTestFilterXssNotNormalized')]
-  public function testFilterXssNotNormalized($value, $expected, $message, ?array $allowed_tags = NULL): void {
+  public function testFilterXssNotNormalized($value, string $expected, string $message, ?array $allowed_tags = NULL): void {
     if ($allowed_tags === NULL) {
       $value = Xss::filter($value);
     }
@@ -160,7 +160,7 @@ class XssTest extends TestCase {
    *     - (optional) The allowed HTML tags array that should be passed to
    *       \Drupal\Component\Utility\Xss::filter().
    */
-  public static function providerTestFilterXssNotNormalized() {
+  public static function providerTestFilterXssNotNormalized(): array {
     $cases = [
       // Tag stripping, different ways to work around removal of HTML tags.
       [
@@ -455,7 +455,7 @@ class XssTest extends TestCase {
    *   The assertion message to display upon failure.
    */
   #[DataProvider('providerTestInvalidMultiByte')]
-  public function testInvalidMultiByte($value, $expected, $message): void {
+  public function testInvalidMultiByte(string $value, string $expected, string $message): void {
     $this->assertEquals(Xss::filter($value), $expected, $message);
   }
 
@@ -470,7 +470,7 @@ class XssTest extends TestCase {
    *     - The value to expect after filtering.
    *     - The assertion message.
    */
-  public static function providerTestInvalidMultiByte() {
+  public static function providerTestInvalidMultiByte(): array {
     return [
       ["Foo\xC0barbaz", '', 'Xss::filter() accepted invalid sequence "Foo\xC0barbaz"'],
       ["Fooÿñ", "Fooÿñ", 'Xss::filter() rejects valid sequence Fooÿñ"'],
@@ -492,7 +492,7 @@ class XssTest extends TestCase {
    * @legacy-covers ::attributes
    */
   #[DataProvider('providerTestAttributes')]
-  public function testAttribute($value, $expected, $message, $allowed_tags = NULL): void {
+  public function testAttribute(string $value, string $expected, string $message, ?array $allowed_tags = NULL): void {
     $value = Xss::filter($value, $allowed_tags);
     $this->assertEquals($expected, $value, $message);
   }
@@ -500,7 +500,7 @@ class XssTest extends TestCase {
   /**
    * Data provider for testFilterXssAdminNotNormalized().
    */
-  public static function providerTestAttributes() {
+  public static function providerTestAttributes(): array {
     return [
       [
         '<img src="http://example.com/foo.jpg" title="Example: title" alt="Example: alt" class="md:block">',
@@ -590,7 +590,7 @@ class XssTest extends TestCase {
    *   The assertion message to display upon failure.
    */
   #[DataProvider('providerTestFilterXssAdminNotNormalized')]
-  public function testFilterXssAdminNotNormalized($value, $expected, $message): void {
+  public function testFilterXssAdminNotNormalized(string $value, string $expected, string $message): void {
     $this->assertNotNormalized(Xss::filterAdmin($value), $expected, $message);
   }
 
@@ -605,7 +605,7 @@ class XssTest extends TestCase {
    *     - The value to expect after filtering.
    *     - The assertion message.
    */
-  public static function providerTestFilterXssAdminNotNormalized() {
+  public static function providerTestFilterXssAdminNotNormalized(): array {
     return [
       // DRUPAL-SA-2008-044.
       ['<object />', 'object', 'Admin HTML filter -- should not allow object tag.'],

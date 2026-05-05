@@ -84,12 +84,7 @@ class AssetResolver implements AssetResolverInterface {
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
    *   The theme handler service.
    */
-  public function __construct(LibraryDiscoveryInterface $library_discovery, LibraryDependencyResolverInterface $library_dependency_resolver, ModuleHandlerInterface $module_handler, ThemeManagerInterface $theme_manager, LanguageManagerInterface $language_manager, CacheBackendInterface $cache, ?ThemeHandlerInterface $theme_handler = NULL) {
-    if ($theme_handler === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $theme_handler argument is deprecated in drupal:11.1.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3451667', E_USER_DEPRECATED);
-      $theme_handler = \Drupal::service('theme_handler');
-    }
-
+  public function __construct(LibraryDiscoveryInterface $library_discovery, LibraryDependencyResolverInterface $library_dependency_resolver, ModuleHandlerInterface $module_handler, ThemeManagerInterface $theme_manager, LanguageManagerInterface $language_manager, CacheBackendInterface $cache, ThemeHandlerInterface $theme_handler) {
     $this->libraryDiscovery = $library_discovery;
     $this->libraryDependencyResolver = $library_dependency_resolver;
     $this->moduleHandler = $module_handler;
@@ -178,6 +173,42 @@ class AssetResolver implements AssetResolverInterface {
       }
     }
     return $libraries;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFontAssets(AttachedAssetsInterface $assets, ?LanguageInterface $language = NULL): array {
+    if (!$assets->getLibraries()) {
+      return [];
+    }
+    // Get the complete list of libraries to load including dependencies.
+    $libraries_to_load = $this->getLibrariesToLoad($assets, 'fonts');
+
+    if (!$libraries_to_load) {
+      return [];
+    }
+    if (!isset($language)) {
+      $language = $this->languageManager->getCurrentLanguage();
+    }
+    // Add the active theme name to the cache key since active themes may
+    // implement hook_library_info_alter().
+    $active_theme = $this->themeManager->getActiveTheme()->getName();
+    $cid = 'fonts:' . $active_theme . ':' . $language->getId() . Crypt::hashBase64(serialize($libraries_to_load));
+    if ($cached = $this->cache->get($cid)) {
+      return $cached->data;
+    }
+    $fonts = [];
+    foreach ($libraries_to_load as $library) {
+      [$extension, $name] = explode('/', $library, 2);
+      $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
+      foreach ($definition['fonts'] as $font) {
+        $fonts[] = $font;
+      }
+    }
+    $this->cache->set($cid, $fonts, CacheBackendInterface::CACHE_PERMANENT, ['library_info']);
+
+    return $fonts;
   }
 
   /**
