@@ -21,7 +21,6 @@ use Drupal\Component\Assertion\Inspector;
  * be no opportunity for APCu to evict items older than the TTL. Or where the
  * number and size of frequently accessed cache entries exceeds the available
  * space.
- *
  */
 class ApcuTtlBackend extends ApcuBackend {
 
@@ -29,7 +28,6 @@ class ApcuTtlBackend extends ApcuBackend {
    * A start time for the first recorded write to APCu.
    */
   protected ?int $apcuFirstWrite = NULL;
-
 
   /**
    * Gets the APCu first write timestamp.
