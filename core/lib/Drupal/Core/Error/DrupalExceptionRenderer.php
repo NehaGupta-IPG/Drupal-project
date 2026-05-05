@@ -73,14 +73,14 @@ final class DrupalExceptionRenderer {
     $response = new Response();
 
     if (PHP_SAPI === 'cli') {
-      $response->setContent(html_entity_decode(strip_tags(new FormattableMarkup(Error::DEFAULT_ERROR_MESSAGE, $error))) . "\n");
+      $response->setContent(html_entity_decode(strip_tags((string) new FormattableMarkup(Error::DEFAULT_ERROR_MESSAGE, $error))) . "\n");
       $response->send();
       exit(1);
     }
 
     if (\Drupal::hasRequest() && \Drupal::request()->isXmlHttpRequest()) {
       if (ErrorDisplayLevel::resolve()->isDisplayable($error)) {
-        $response->setContent(new FormattableMarkup(Error::DEFAULT_ERROR_MESSAGE, $error));
+        $response->setContent((string) new FormattableMarkup(Error::DEFAULT_ERROR_MESSAGE, $error));
         $response->send();
       }
       exit;
