@@ -1432,6 +1432,8 @@ services:
     class: Drupal\Core\Site\MaintenanceMode
     arguments: ['@state', '@config.factory']
   Drupal\Core\Site\MaintenanceModeInterface: '@maintenance_mode'
+  Drupal\Core\Site\MaintenanceModeResolver:
+    class: Drupal\Core\Site\MaintenanceModeResolver
   maintenance_mode_subscriber:
     class: Drupal\Core\EventSubscriber\MaintenanceModeSubscriber
     autowire: true
