@@ -107,7 +107,7 @@ class ErrorLevelsTest extends UnitTestCase {
    * Tests getLegacyLevels() returns the format matching drupal_error_levels().
    */
   public function testGetLegacyLevels(): void {
-    $this->expectUserDeprecationMessage('Drupal\Core\Error\ErrorLevels::getLegacyLevels() is deprecated in drupal:11.2.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Error\ErrorLevels::getSeverity() or \Drupal\Core\Error\ErrorLevels::LEVELS instead. See https://www.drupal.org/node/3000229');
+    $this->expectUserDeprecationMessage('Drupal\Core\Error\ErrorLevels::getLegacyLevels() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Error\ErrorLevels::getSeverity() or \Drupal\Core\Error\ErrorLevels::LEVELS instead. See https://www.drupal.org/node/3000229');
     $legacy = ErrorLevels::getLegacyLevels();
 
     // Verify structure: keyed by E_* constant, value is [label, RfcLogLevel].

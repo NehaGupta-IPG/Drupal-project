@@ -138,13 +138,13 @@ final class ErrorLevels {
    * @return array<int, array{0: string, 1: int}>
    *   The error levels in legacy format.
    *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:13.0.0. Use
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
    *   \Drupal\Core\Error\ErrorLevels::getSeverity() or
    *   \Drupal\Core\Error\ErrorLevels::LEVELS instead.
    * @see https://www.drupal.org/node/3000229
    */
   public static function getLegacyLevels(): array {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Error\ErrorLevels::getSeverity() or \Drupal\Core\Error\ErrorLevels::LEVELS instead. See https://www.drupal.org/node/3000229', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Error\ErrorLevels::getSeverity() or \Drupal\Core\Error\ErrorLevels::LEVELS instead. See https://www.drupal.org/node/3000229', E_USER_DEPRECATED);
     $levels = [];
     foreach (self::LEVELS as $errorLevel => $info) {
       $levels[$errorLevel] = [$info['label'], $info['rfcLevel']];
