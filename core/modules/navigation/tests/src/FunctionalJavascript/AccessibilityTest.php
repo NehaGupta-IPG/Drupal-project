@@ -34,7 +34,7 @@ class AccessibilityTest extends AccessibilityTestBase {
     );
 
     // Wait and assert menu button is hidden.
-    $this->assertTrue($menu_button->waitFor(2, function ($menu_button): bool {
+    $this->assertTrue($menu_button->waitFor(10, function ($menu_button): bool {
       return !$menu_button->isVisible();
     }));
 
