@@ -39,6 +39,19 @@ class LoggingForm extends ConfigFormBase {
       '#description' => $this->t('It is recommended that sites running on production environments do not display any errors.'),
     ];
 
+    $form['advanced'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Advanced error handling'),
+      '#open' => FALSE,
+    ];
+
+    $form['advanced']['throw_recoverable'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Throw recoverable errors as exceptions'),
+      '#config_target' => 'system.logging:throw_recoverable',
+      '#description' => $this->t('When enabled, recoverable fatal errors (E_RECOVERABLE_ERROR) will be thrown as exceptions instead of being logged. This can help identify type errors in development but may cause unexpected failures on production sites.'),
+    ];
+
     return parent::buildForm($form, $form_state);
   }
 

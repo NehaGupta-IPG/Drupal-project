@@ -135,6 +135,33 @@ final class DrupalErrorHandler {
 
     // Clear the buffering logger reference.
     $this->bufferingLogger = NULL;
+
+    // Apply configuration from the container now that it's available.
+    $this->applyConfiguration();
+  }
+
+  /**
+   * Applies logging configuration from system.logging.
+   *
+   * Reads the `throw_recoverable` setting and configures the Symfony
+   * ErrorHandler accordingly. When enabled, recoverable fatal errors
+   * (E_RECOVERABLE_ERROR) will be thrown as \ErrorException instead of
+   * being logged and treated as fatal.
+   */
+  private function applyConfiguration(): void {
+    try {
+      $throwRecoverable = \Drupal::config('system.logging')->get('throw_recoverable');
+      if ($throwRecoverable) {
+        // Enable throwing for E_RECOVERABLE_ERROR. Symfony's throwAt() always
+        // includes E_RECOVERABLE_ERROR | E_USER_ERROR by design, but when this
+        // setting is off we use throwAt(0, true) which still forces those.
+        // When on, we explicitly set the bit to make the intent clear.
+        $this->symfonyHandler->throwAt(E_RECOVERABLE_ERROR, true);
+      }
+    }
+    catch (\Exception) {
+      // Config may not be available (e.g. during install). Silently skip.
+    }
   }
 
   /**
