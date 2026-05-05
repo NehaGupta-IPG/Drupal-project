@@ -7,6 +7,7 @@ use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableResponse;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Error\ErrorDisplayLevel;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Utility\Error;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -187,22 +188,20 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
    *   TRUE when verbose reporting is enabled, FALSE otherwise.
    */
   protected function isErrorLevelVerbose() {
-    return $this->getErrorLevel() === ERROR_REPORTING_DISPLAY_VERBOSE;
+    return ErrorDisplayLevel::tryFrom($this->getErrorLevel())?->isVerbose() ?? FALSE;
   }
 
   /**
-   * Wrapper for error_displayable().
+   * Determines whether an error should be displayed.
    *
    * @param array $error
-   *   Optional error to examine for ERROR_REPORTING_DISPLAY_SOME.
+   *   Optional error to examine for the Some display level.
    *
    * @return bool
    *   TRUE if an error should be displayed, FALSE otherwise.
-   *
-   * @see \error_displayable
    */
   protected function isErrorDisplayable($error) {
-    return error_displayable($error);
+    return ErrorDisplayLevel::resolve()->isDisplayable($error);
   }
 
   /**
