@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Core\Error;
 
 use Drupal\Core\Installer\InstallerKernel;
+use Drupal\Core\Site\MaintenanceModeResolver;
 
 /**
  * Error display level configuration.
@@ -98,7 +99,14 @@ enum ErrorDisplayLevel: string {
    */
   public function isDisplayable(?array $error = NULL): bool {
     // In maintenance mode, always display errors.
-    if (defined('MAINTENANCE_MODE')) {
+    try {
+      $inMaintenance = \Drupal::service(MaintenanceModeResolver::class)->isMaintenance();
+    }
+    catch (\Exception) {
+      // Fall back to constant check if the container is not available.
+      $inMaintenance = defined('MAINTENANCE_MODE');
+    }
+    if ($inMaintenance) {
       return TRUE;
     }
 
