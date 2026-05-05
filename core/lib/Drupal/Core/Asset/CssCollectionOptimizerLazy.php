@@ -155,7 +155,7 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
       // Ensure license information is available as a comment after
       // optimization.
       if ($css_asset['license'] !== $current_license) {
-        $data .= "/* @license " . $css_asset['license']['name'] . " " . $css_asset['license']['url'] . " */\n";
+        $data .= "/* @license " . ($css_asset['license']['name'] ?? '') . " " . ($css_asset['license']['url'] ?? '') . " */\n";
       }
       $current_license = $css_asset['license'];
 
