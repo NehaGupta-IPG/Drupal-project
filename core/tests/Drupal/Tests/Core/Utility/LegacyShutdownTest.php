@@ -32,7 +32,7 @@ class LegacyShutdownTest extends UnitTestCase {
     };
     $add = 10;
     $count = 0;
-    $this->expectUserDeprecationMessage('drupal_register_shutdown_function() is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Shutdown\ShutdownHandler::get() or \Drupal\Core\Shutdown\ShutdownHandler::add() or \Drupal\Core\Shutdown\ShutdownHandler::reset() instead. See https://www.drupal.org/node/3053808');
+    $this->expectUserDeprecationMessage('drupal_register_shutdown_function() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Shutdown\ShutdownHandler::get() or \Drupal\Core\Shutdown\ShutdownHandler::add() or \Drupal\Core\Shutdown\ShutdownHandler::reset() instead. See https://www.drupal.org/node/3053808');
     $this->assertCount(++$count, drupal_register_shutdown_function($a, $add));
     $this->assertCount(++$count, $callbacks = &drupal_register_shutdown_function($a, $add));
     foreach ($callbacks as $callback_array) {

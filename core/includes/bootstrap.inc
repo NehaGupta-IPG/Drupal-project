@@ -466,7 +466,7 @@ function drupal_static_reset($name = NULL): void {
  * @ingroup php_wrappers
  */
 function &drupal_register_shutdown_function($callback = NULL, ...$args) {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Shutdown\ShutdownHandler::get() or \Drupal\Core\Shutdown\ShutdownHandler::add() or \Drupal\Core\Shutdown\ShutdownHandler::reset() instead. See https://www.drupal.org/node/3053808', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Shutdown\ShutdownHandler::get() or \Drupal\Core\Shutdown\ShutdownHandler::add() or \Drupal\Core\Shutdown\ShutdownHandler::reset() instead. See https://www.drupal.org/node/3053808', E_USER_DEPRECATED);
   $handler = ShutdownHandler::getInstance();
   if (isset($callback)) {
     // Save callback and arguments
@@ -479,14 +479,14 @@ function &drupal_register_shutdown_function($callback = NULL, ...$args) {
 /**
  * Executes registered shutdown functions.
  *
- * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. See
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. See
  *   \Drupal\Core\Shutdown\ShutdownHandler. As internal API, function may also
  *   be removed in a minor release.
  *
  * @see https://www.drupal.org/node/3053808
  */
 function _drupal_shutdown_function(): void {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. See \Drupal\Core\Utility\ShutdownHandler. As internal API, ' . __FUNCTION__ . '() may also be removed in a minor release. See https://www.drupal.org/node/3053808', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. See \Drupal\Core\Utility\ShutdownHandler. As internal API, ' . __FUNCTION__ . '() may also be removed in a minor release. See https://www.drupal.org/node/3053808', E_USER_DEPRECATED);
   ShutdownHandler::getInstance()->shutdown();
 }
 
@@ -496,7 +496,7 @@ function _drupal_shutdown_function(): void {
  * @param \Exception|\Throwable $exception
  *   The exception object that was thrown.
  *
- * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
  *   \Drupal\Core\Utility\Error::shutdownExceptionHandler() instead. As internal
  *   API, function may also be removed in a minor release.
  *
@@ -504,6 +504,6 @@ function _drupal_shutdown_function(): void {
  * @see _drupal_shutdown_function()
  */
 function _drupal_shutdown_function_handle_exception($exception): void {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Utility\Error::shutdownExceptionHandler() instead. As internal API, ' . __FUNCTION__ . '() may also be removed in a minor release. See https://www.drupal.org/node/3053808', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Utility\Error::shutdownExceptionHandler() instead. As internal API, ' . __FUNCTION__ . '() may also be removed in a minor release. See https://www.drupal.org/node/3053808', E_USER_DEPRECATED);
   Error::shutdownExceptionHandler($exception);
 }
