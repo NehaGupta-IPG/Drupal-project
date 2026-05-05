@@ -56,6 +56,11 @@ final class DrupalErrorHandler {
   private ?BufferingLogger $bufferingLogger;
 
   /**
+   * Whether Symfony error enhancers are enabled.
+   */
+  private bool $errorEnhancersEnabled = FALSE;
+
+  /**
    * Constructs a DrupalErrorHandler.
    *
    * Use DrupalErrorHandler::register() instead of constructing directly.
@@ -143,14 +148,14 @@ final class DrupalErrorHandler {
   /**
    * Applies logging configuration from system.logging.
    *
-   * Reads the `throw_recoverable` setting and configures the Symfony
-   * ErrorHandler accordingly. When enabled, recoverable fatal errors
-   * (E_RECOVERABLE_ERROR) will be thrown as \ErrorException instead of
-   * being logged and treated as fatal.
+   * Reads the `throw_recoverable` and `error_enhancers` settings and
+   * configures the handler accordingly.
    */
   private function applyConfiguration(): void {
     try {
-      $throwRecoverable = \Drupal::config('system.logging')->get('throw_recoverable');
+      $config = \Drupal::config('system.logging');
+
+      $throwRecoverable = $config->get('throw_recoverable');
       if ($throwRecoverable) {
         // Enable throwing for E_RECOVERABLE_ERROR. Symfony's throwAt() always
         // includes E_RECOVERABLE_ERROR | E_USER_ERROR by design, but when this
@@ -158,6 +163,14 @@ final class DrupalErrorHandler {
         // When on, we explicitly set the bit to make the intent clear.
         $this->symfonyHandler->throwAt(E_RECOVERABLE_ERROR, true);
       }
+
+      // Store error_enhancers flag. When TRUE, Symfony's error enhancers
+      // (ClassNotFoundErrorEnhancer, UndefinedFunctionErrorEnhancer,
+      // UndefinedMethodErrorEnhancer) will enhance exception messages.
+      // This is controlled via ErrorHandler::enhanceError() which is always
+      // called during handleException(). The flag is stored for use by
+      // DrupalExceptionRenderer and other consumers.
+      $this->errorEnhancersEnabled = (bool) $config->get('error_enhancers');
     }
     catch (\Exception) {
       // Config may not be available (e.g. during install). Silently skip.
@@ -186,6 +199,16 @@ final class DrupalErrorHandler {
    */
   public function getDrupalErrorLogger(): DrupalErrorLogger {
     return $this->drupalErrorLogger;
+  }
+
+  /**
+   * Returns whether error enhancers are enabled.
+   *
+   * @return bool
+   *   TRUE if error enhancers are enabled.
+   */
+  public function isErrorEnhancersEnabled(): bool {
+    return $this->errorEnhancersEnabled;
   }
 
   /**

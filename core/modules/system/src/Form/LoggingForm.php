@@ -52,6 +52,13 @@ class LoggingForm extends ConfigFormBase {
       '#description' => $this->t('When enabled, recoverable fatal errors (E_RECOVERABLE_ERROR) will be thrown as exceptions instead of being logged. This can help identify type errors in development but may cause unexpected failures on production sites.'),
     ];
 
+    $form['advanced']['error_enhancers'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enable error message enhancers'),
+      '#config_target' => 'system.logging:error_enhancers',
+      '#description' => $this->t('When enabled, Symfony error enhancers provide more helpful error messages by suggesting corrections for class-not-found, undefined-function, and undefined-method errors. Recommended for development environments.'),
+    ];
+
     return parent::buildForm($form, $form_state);
   }
 
