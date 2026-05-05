@@ -12,7 +12,6 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * This test demonstrates that when accessing Drupal via /index.php,
  * the generated URLs incorrectly include /index.php/ prefix.
- *
  */
 #[Group("DrupalKernel")]
 class BasePathDetectionTest extends KernelTestBase {
@@ -21,13 +20,6 @@ class BasePathDetectionTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = ['system', 'user'];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-  }
 
   /**
    * Tests that accessing via /index.php causes incorrect base URL.
@@ -43,7 +35,7 @@ class BasePathDetectionTest extends KernelTestBase {
     $this->assertEquals('/', $url, 'Clean URL access should generate "/" for front page');
 
     // Test 2: Access via /index.php (demonstrates the bug)
-    // When we access the site via /index.php, Drupal incorrectly sets the base URL
+    // When accessing via /index.php, Drupal incorrectly sets the base URL.
     $index_request = Request::create('http://example.com/index.php');
     $index_request->server->set('SCRIPT_FILENAME', '/var/www/html/index.php');
     $this->setCurrentRequest($index_request);
@@ -60,7 +52,7 @@ class BasePathDetectionTest extends KernelTestBase {
    * This shows how the bug affects links generated for various routes.
    */
   public function testGeneratedLinksImpact() {
-    // Set up /index.php context
+    // Set up /index.php context.
     $index_request = Request::create('http://example.com/index.php');
     $index_request->server->set('SCRIPT_FILENAME', '/var/www/html/index.php');
     $this->setCurrentRequest($index_request);
