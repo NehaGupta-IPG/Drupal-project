@@ -292,8 +292,8 @@ abstract class CachePluginBase extends PluginBase {
     // Clone each row object and remove any loaded entities, to keep the
     // original result rows intact.
     foreach ($result as $key => $row) {
-      $clone = clone $row;
-      if ($clone instanceof ResultRow) {
+      if ($row instanceof ResultRow) {
+        $clone = clone $row;
         $clone->resetEntityData();
         $return[$key] = $clone;
       }

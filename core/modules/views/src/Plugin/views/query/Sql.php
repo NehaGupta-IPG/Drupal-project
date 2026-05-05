@@ -8,7 +8,6 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
@@ -161,13 +160,6 @@ class Sql extends QueryPluginBase {
   protected $messenger;
 
   /**
-   * The views logger channel.
-   *
-   * @var \Drupal\Core\Logger\LoggerChannelInterface
-   */
-  protected $logger;
-
-  /**
    * The count field definition.
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
@@ -188,10 +180,8 @@ class Sql extends QueryPluginBase {
    *   The database-specific date handler.
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger.
-   * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
-   *   The logger.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, DateSqlInterface $date_sql, MessengerInterface $messenger, ?LoggerChannelInterface $logger = NULL) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, DateSqlInterface $date_sql, MessengerInterface $messenger) {
     // By default, use AND operator to connect WHERE groups.
     $this->groupOperator = 'AND';
 
@@ -200,11 +190,6 @@ class Sql extends QueryPluginBase {
     $this->entityTypeManager = $entity_type_manager;
     $this->dateSql = $date_sql;
     $this->messenger = $messenger;
-    if (!$logger) {
-      @trigger_error('Calling Sql::__construct() with the $logger argument is deprecated in drupal:11.4.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3561291', E_USER_DEPRECATED);
-      $logger = \Drupal::service('logger.channel.views');
-    }
-    $this->logger = $logger;
   }
 
   /**
@@ -217,8 +202,7 @@ class Sql extends QueryPluginBase {
       $plugin_definition,
       $container->get('entity_type.manager'),
       $container->get('views.date_sql'),
-      $container->get('messenger'),
-      $container->get('logger.channel.views')
+      $container->get('messenger')
     );
   }
 
@@ -1726,10 +1710,7 @@ class Sql extends QueryPluginBase {
           // where the entity was deleted since the query was executed or the
           // database is inconsistent. Drop that row and log an warning.
           if ($relationship_id == 'none') {
-            $this->logger->warning('Failed to load entity @id for view @view. If this warning persists then it indicates that the database has inconsistent entity data.', [
-              '@id' => $id,
-              '@view' => $this->view->id(),
-            ]);
+            @trigger_error("Failed to load entity {$id} for view {$this->view->id()}. If this warning persists then it indicates that the database has inconsistent entity data.", E_USER_WARNING);
             unset($results[$index]);
             break;
           }
@@ -1785,15 +1766,17 @@ class Sql extends QueryPluginBase {
   protected function getAllEntities() {
     $entities = [];
     foreach ($this->view->result as $row) {
-      if ($row->_entity) {
+      if ($row->_entity instanceof EntityInterface) {
         $entities[] = $row->_entity;
       }
       foreach ($row->_relationship_entities as $entity) {
-        $entities[] = $entity;
+        if ($entity instanceof EntityInterface) {
+          $entities[] = $entity;
+        }
       }
     }
 
-    return array_filter($entities);
+    return $entities;
   }
 
   /**
