@@ -44,7 +44,7 @@ class ConfigSingleExportForm extends FormBase {
    */
   public function __construct(
     EntityTypeManagerInterface $entity_type_manager,
-    StorageInterface $config_storage
+    StorageInterface $config_storage,
   ) {
     $this->entityTypeManager = $entity_type_manager;
     $this->configStorage = $config_storage;
@@ -74,7 +74,7 @@ class ConfigSingleExportForm extends FormBase {
     array $form,
     FormStateInterface $form_state,
     string $config_type = '',
-    string $config_name = ''
+    string $config_name = '',
   ): array {
 
     $request = \Drupal::request();
@@ -126,7 +126,7 @@ class ConfigSingleExportForm extends FormBase {
         'hx-include' => 'closest form',
         'hx-target' => '#config-export-form',
         'hx-select' => '#config-export-form',
-        'hx-swap' => 'outerHTML'
+        'hx-swap' => 'outerHTML',
       ],
     ];
 
@@ -153,7 +153,7 @@ class ConfigSingleExportForm extends FormBase {
         'hx-include' => 'closest form',
         'hx-target' => '#config-export-form',
         'hx-select' => '#config-export-form',
-        'hx-swap' => 'outerHTML'
+        'hx-swap' => 'outerHTML',
       ],
     ];
 
@@ -188,10 +188,12 @@ class ConfigSingleExportForm extends FormBase {
     return $form;
   }
 
-  /* ------------------------------------------------------------------
-   * Helpers
-   * ------------------------------------------------------------------ */
-
+  /**
+   * Gets config type options.
+   *
+   * @return array
+   *   An array of configuration type options.
+   */
   protected function getConfigTypeOptions(): array {
     $options = [
       'system.simple' => $this->t('Simple configuration'),
@@ -199,7 +201,7 @@ class ConfigSingleExportForm extends FormBase {
 
     foreach ($this->entityTypeManager->getDefinitions() as $id => $definition) {
       if ($definition->entityClassImplements(ConfigEntityInterface::class)) {
-        $options[$id] = $definition->getLabel()." (".$definition->id().")";
+        $options[$id] = $definition->getLabel() . " (" . $definition->id() . ")";
       }
     }
 
@@ -243,7 +245,7 @@ class ConfigSingleExportForm extends FormBase {
 
     // For a given entity type, load all entities.
     foreach ($storage->loadMultiple() as $entity) {
-      $names[$entity->id()] = $entity->label() ? $entity->label()." (".$entity->id().")" : $entity->id();
+      $names[$entity->id()] = $entity->label() ? $entity->label() . " (" . $entity->id() . ")" : $entity->id();
     }
 
     return $names;
