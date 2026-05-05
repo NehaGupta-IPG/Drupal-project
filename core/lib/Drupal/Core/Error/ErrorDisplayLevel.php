@@ -103,7 +103,10 @@ enum ErrorDisplayLevel: string {
       $inMaintenance = \Drupal::service(MaintenanceModeResolver::class)->isMaintenance();
     }
     catch (\Exception) {
-      // Fall back to constant check if the container is not available.
+      // @todo Remove this constant fallback in drupal:13.0.0 once update.php
+      //   and install.php no longer rely on defining MAINTENANCE_MODE, and the
+      //   MaintenanceModeResolver service is always available.
+      //   @see https://www.drupal.org/project/drupal/issues/3000229
       $inMaintenance = defined('MAINTENANCE_MODE');
     }
     if ($inMaintenance) {
