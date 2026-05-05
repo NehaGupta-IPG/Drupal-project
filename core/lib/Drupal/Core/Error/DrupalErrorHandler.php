@@ -148,8 +148,8 @@ final class DrupalErrorHandler {
   /**
    * Applies logging configuration from system.logging.
    *
-   * Reads the `throw_recoverable` and `error_enhancers` settings and
-   * configures the handler accordingly.
+   * Reads the `throw_recoverable`, `error_enhancers`, and `log_silenced`
+   * settings and configures the handler accordingly.
    */
   private function applyConfiguration(): void {
     try {
@@ -171,6 +171,13 @@ final class DrupalErrorHandler {
       // called during handleException(). The flag is stored for use by
       // DrupalExceptionRenderer and other consumers.
       $this->errorEnhancersEnabled = (bool) $config->get('error_enhancers');
+
+      // When log_silenced is enabled, configure Symfony to log errors that
+      // are suppressed with the @-operator. This uses Symfony's "scream"
+      // feature which ignores the @-operator for logging purposes.
+      if ($config->get('log_silenced')) {
+        $this->symfonyHandler->screamAt(E_ALL, true);
+      }
     }
     catch (\Exception) {
       // Config may not be available (e.g. during install). Silently skip.

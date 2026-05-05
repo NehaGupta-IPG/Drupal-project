@@ -192,6 +192,10 @@ system.logging:
       type: boolean
       label: 'Enable error message enhancers'
       requiredKey: false
+    log_silenced:
+      type: boolean
+      label: 'Log silenced errors'
+      requiredKey: false
 
 system.performance:
   type: config_object

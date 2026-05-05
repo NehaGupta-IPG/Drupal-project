@@ -59,6 +59,13 @@ class LoggingForm extends ConfigFormBase {
       '#description' => $this->t('When enabled, Symfony error enhancers provide more helpful error messages by suggesting corrections for class-not-found, undefined-function, and undefined-method errors. Recommended for development environments.'),
     ];
 
+    $form['advanced']['log_silenced'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Log silenced errors'),
+      '#config_target' => 'system.logging:log_silenced',
+      '#description' => $this->t('When enabled, errors suppressed with the @-operator will still be logged. This helps identify problematic error suppression in code. Not recommended for production as it may generate significant log volume.'),
+    ];
+
     return parent::buildForm($form, $form_state);
   }
 
