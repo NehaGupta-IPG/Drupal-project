@@ -456,7 +456,7 @@ function drupal_static_reset($name = NULL): void {
  * @return iterable
  *   Array of shutdown functions to be executed.
  *
- * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
  *    \Drupal\Core\Shutdown\ShutdownHandler::get() or
  *    \Drupal\Core\Shutdown\ShutdownHandler::add() or
  *    \Drupal\Core\Shutdown\ShutdownHandler::reset() instead.
