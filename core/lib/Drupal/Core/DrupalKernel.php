@@ -589,6 +589,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     require_once $this->root . '/core/includes/module.inc';
     require_once $this->root . '/core/includes/theme.inc';
     require_once $this->root . '/core/includes/form.inc';
+    // @todo Remove errors.inc include in drupal:13.0.0 once all procedural
+    //   error handler functions are removed. The OOP replacements are in the
+    //   Drupal\Core\Error namespace.
+    //   @see https://www.drupal.org/project/drupal/issues/3000229
     require_once $this->root . '/core/includes/errors.inc';
   }
 
