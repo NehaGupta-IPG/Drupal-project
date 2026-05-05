@@ -708,7 +708,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
     $response->addCommand(new UpdateSelectionCommand($media_ids));
     $media_id_to_focus = array_pop($media_ids);
     $response->addCommand(new ReplaceCommand('#media-library-add-form-wrapper', $this->buildMediaLibraryUi($form_state)));
-    $response->addCommand(new InvokeCommand("#media-library-content [value=$media_id_to_focus]", 'focus'));
+    $response->addCommand(new InvokeCommand("#media-library-content [value=\"$media_id_to_focus\"]", 'focus'));
     $available_slots = $this->getMediaLibraryState($form_state)->getAvailableSlots();
     if ($available_slots > 0 && $selected_count > $available_slots) {
       $warning = $this->formatPlural($selected_count - $available_slots, 'There are currently @total items selected. The maximum number of items for the field is @max. Remove @count item from the selection.', 'There are currently @total items selected. The maximum number of items for the field is @max. Remove @count items from the selection.', [

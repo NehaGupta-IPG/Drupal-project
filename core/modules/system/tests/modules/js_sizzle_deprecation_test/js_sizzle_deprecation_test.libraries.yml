@@ -1,0 +1,7 @@
+sizzle_deprecation_test:
+  version: VERSION
+  js:
+    js/js_sizzle_deprecation_test.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupal.ajax

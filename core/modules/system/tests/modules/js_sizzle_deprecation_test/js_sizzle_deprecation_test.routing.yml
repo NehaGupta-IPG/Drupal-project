@@ -1,0 +1,7 @@
+js_sizzle_deprecation_test.test:
+  path: '/js_sizzle_deprecation_test'
+  defaults:
+    _controller: '\Drupal\js_sizzle_deprecation_test\Controller\JsSizzleDeprecationTestController::test'
+    _title: 'JsSizzleDeprecationTest'
+  requirements:
+    _access: 'TRUE'
