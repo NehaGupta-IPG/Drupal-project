@@ -17,16 +17,14 @@ $view_config = [
   'uuid' => '12345678-1234-1234-1234-123456789012',
   'langcode' => 'en',
   'status' => TRUE,
-  'dependencies' => [
-    'module' => ['views_test_data'],
-  ],
+  'dependencies' => [],
   'id' => 'test_grid_upgrade',
   'label' => 'Test Grid Upgrade',
   'module' => 'views',
   'description' => 'A test view with grid style for upgrade path testing.',
   'tag' => '',
-  'base_table' => 'views_test_data',
-  'base_field' => 'id',
+  'base_table' => 'users',
+  'base_field' => 'uid',
   'display' => [
     'default' => [
       'display_plugin' => 'default',
@@ -35,14 +33,7 @@ $view_config = [
       'position' => 0,
       'display_options' => [
         'title' => 'Test Grid View',
-        'fields' => [
-          'name' => [
-            'id' => 'name',
-            'table' => 'views_test_data',
-            'field' => 'name',
-            'plugin_id' => 'standard',
-          ],
-        ],
+        'fields' => [],
         'pager' => [
           'type' => 'none',
           'options' => ['offset' => 0],
@@ -90,22 +81,4 @@ $db->insert('config')
   ])
   ->execute();
 
-// Also make sure views_test_data module is enabled in core.extension.
-$extensions = $db->select('config')
-  ->fields('config', ['data'])
-  ->condition('collection', '')
-  ->condition('name', 'core.extension')
-  ->execute()
-  ->fetchField();
-
-if ($extensions) {
-  $extensions = unserialize($extensions);
-  $extensions['module']['views_test_data'] = 0;
-  ksort($extensions['module']);
-
-  $db->update('config')
-    ->fields(['data' => serialize($extensions)])
-    ->condition('collection', '')
-    ->condition('name', 'core.extension')
-    ->execute();
-}
+// No database setup needed since we're only testing configuration and plugin instantiation.

@@ -98,7 +98,7 @@ function views_post_update_add_views_grid_dependencies(): void {
         sort($module_dependencies);
         $dependencies['module'] = $module_dependencies;
         $config->set('dependencies', $dependencies);
-        $config->save(TRUE);
+        $config->save();
       }
     }
   }

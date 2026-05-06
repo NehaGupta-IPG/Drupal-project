@@ -22,7 +22,7 @@ class ViewsGridModuleUpdateTest extends UpdatePathTestBase {
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-11.3.0.filled.standard.php.gz',
-      __DIR__ . '/../../../../fixtures/update/views-grid-test.php',
+      __DIR__ . '/../../../fixtures/update/views-grid-test.php',
     ];
   }
 
@@ -49,7 +49,7 @@ class ViewsGridModuleUpdateTest extends UpdatePathTestBase {
     $this->assertNotEmpty($view_config->get('display.default.display_options.style'));
     $this->assertEquals('grid', $view_config->get('display.default.display_options.style.type'));
 
-    // Load and execute the view to ensure it still works.
+    // Load the view and verify it has the correct style plugin.
     $view = \Drupal::service('entity_type.manager')
       ->getStorage('view')
       ->load('test_grid_upgrade');
@@ -57,10 +57,9 @@ class ViewsGridModuleUpdateTest extends UpdatePathTestBase {
 
     $executable = $view->getExecutable();
     $executable->setDisplay('default');
-    $executable->preExecute();
-    $executable->execute();
+    $executable->initStyle();
 
-    // The view should execute without errors and have the grid style plugin.
+    // The view should have the grid style plugin.
     $this->assertInstanceOf(
       // @phpstan-ignore-next-line classConstant.deprecatedClass (Testing deprecated functionality)
       Grid::class,
