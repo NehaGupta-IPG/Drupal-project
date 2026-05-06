@@ -17,7 +17,7 @@ class ViewsGridHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match): ?string {
+  public function help($route_name, RouteMatchInterface $route_match): string|\Stringable|array|null {
     switch ($route_name) {
       case 'help.page.views_grid':
         $output = '<h3>' . $this->t('About') . '</h3>';
@@ -37,6 +37,7 @@ class ViewsGridHooks {
         $output .= '<p>' . $this->t('For more information, see the <a href=":url">online documentation for the Views Grid (deprecated) module</a>.', [':url' => 'https://www.drupal.org/docs/core-modules-and-themes/core-modules/views-module']) . '</p>';
         return $output;
     }
+    return NULL;
   }
 
 }
