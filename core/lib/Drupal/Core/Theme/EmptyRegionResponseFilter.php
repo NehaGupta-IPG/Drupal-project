@@ -45,27 +45,31 @@ class EmptyRegionResponseFilter implements EventSubscriberInterface {
    * Filters empty theme regions from HTML responses.
    */
   public static function filterEmptyRegions($html_markup): string {
+    if (!str_contains($html_markup, 'data-filter-empty-region')) {
+      return $html_markup;
+    }
     $dom = new \DOMDocument();
     @$dom->loadHTML($html_markup);
 
     $dom_xpath = new \DOMXPath($dom);
 
     $all_attributes = $dom_xpath->query('//@data-filter-empty-region');
-
-    foreach ($all_attributes as $attribute) {
-      $region = $attribute->parentElement;
-      // The region may include line breaks, so compare against a trimmed
-      // version of the element contentl
-      if (trim($region->nodeValue) === '') {
-        $region->remove();
+    if ($all_attributes) {
+      foreach ($all_attributes as $attribute) {
+        $region = $attribute->parentElement;
+        // The region may include line breaks, so compare against a trimmed
+        // version of the element contentl
+        if (trim($region->nodeValue) === '') {
+          $region->remove();
+        }
+        else {
+          // If we're not removing the region, remove the attribute.
+          $region->removeAttribute('data-filter-empty-region');
+        }
       }
-      else {
-        // If we're not removing the region, remove the attribute.
-        $region->removeAttribute('data-filter-empty-region');
-      }
+      return $dom->saveHtml();
     }
-
-    return $dom->saveHtml();
+    return $html_markup;
   }
 
   /**
