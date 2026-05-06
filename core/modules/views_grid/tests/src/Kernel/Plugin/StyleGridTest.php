@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\views_grid\Kernel\Plugin;
 
 use Drupal\Tests\views\Kernel\Plugin\PluginKernelTestBase;
+use Drupal\views\Tests\ViewTestData;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
@@ -40,6 +41,16 @@ class StyleGridTest extends PluginKernelTestBase {
    * @var array
    */
   protected $alignmentsTested = [];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp($import_test_views = TRUE): void {
+    parent::setUp(FALSE);
+
+    // Import test views from the views_grid_test_config module.
+    ViewTestData::createTestViews(static::class, ['views_grid_test_config']);
+  }
 
   /**
    * Tests the grid style.

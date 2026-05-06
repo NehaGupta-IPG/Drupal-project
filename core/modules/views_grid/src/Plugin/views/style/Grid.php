@@ -34,7 +34,7 @@ class Grid extends StylePluginBase {
   /**
    * {@inheritdoc}
    */
-  protected function defineOptions() {
+  protected function defineOptions(): array {
     $options = parent::defineOptions();
     $options['columns'] = ['default' => '4'];
     $options['automatic_width'] = ['default' => TRUE];

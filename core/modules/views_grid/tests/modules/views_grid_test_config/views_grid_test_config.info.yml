@@ -9,3 +9,4 @@ hidden: true
 dependencies:
   - drupal:views
   - drupal:views_test_data
+  - drupal:views_grid
