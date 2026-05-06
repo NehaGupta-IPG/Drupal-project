@@ -503,8 +503,8 @@ default:
   parallel: 4
   variables:
     TESTSUITE: kernel
-    KUBERNETES_CPU_REQUEST: "10"
-    CONCURRENCY: "20"
+    KUBERNETES_CPU_REQUEST: "12"
+    CONCURRENCY: "24"
   services:
     - <<: *with-database
 
