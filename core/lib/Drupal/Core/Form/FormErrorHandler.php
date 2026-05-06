@@ -60,11 +60,14 @@ class FormErrorHandler implements FormErrorHandlerInterface {
     // Loop through all form errors and sets an ID & error messages.
     foreach ($errors as $name => $error) {
       $form_element = FormElementHelper::getElementByName($name, $form);
-      if (isset($form_element['#id'])) {
+      $error_id = $form_element['#error_id'] ?? (isset($form_element['#id']) ? $form_element['#id'] . '--error-message' : NULL);
+      if ($error_id) {
         // Render the error messages as HTML.
         $message = [
-          '#prefix' => '<div id="' . $form_element['#id'] . '--error-message">',
-          '#suffix' => '</div>',
+          '#type' => 'container',
+          '#attributes' => [
+            'id' => $error_id,
+          ],
           'message' => [
             '#markup' => $error,
           ],
@@ -197,10 +200,18 @@ class FormErrorHandler implements FormErrorHandlerInterface {
     // Store the errors for this element on the element directly.
     $elements['#errors'] = $form_state->getError($elements);
 
-    // Add aria-describedby attribute to the form element.
+    // Add aria-errormessage and aria-describedby attributes to the form element.
     if (($elements['#errors']) !== NULL) {
-      $elements['#attributes']['aria-errormessage'] = $elements['#id'] . '--error-message';
+      $error_id = $elements['#error_id'] ?? ($elements['#id'] . '--error-message');
+      $elements['#attributes']['aria-errormessage'] = $error_id;
       $elements['#attributes']['aria-invalid'] = TRUE;
+      // Also add to aria-describedby for broader assistive technology support,
+      // since aria-errormessage is not yet supported by all AT/browser
+      // combinations (e.g. VoiceOver+Safari, TalkBack).
+      $existing = $elements['#attributes']['aria-describedby'] ?? '';
+      if (!str_contains($existing, $error_id)) {
+        $elements['#attributes']['aria-describedby'] = trim($existing . ' ' . $error_id);
+      }
     }
   }
 

@@ -52,17 +52,17 @@
     {% if description_display == 'before' and description.content %}
       <div{{ description.attributes.addClass('description') }}>{{ description.content }}</div>
     {% endif %}
-    {% if errors %}
-      <div id="{{ element['#id'] }}--error-message" class="form-item--error-message">
-        {{ errors }}
-      </div>
-    {% endif %}
     {% if prefix %}
       <span class="field-prefix">{{ prefix }}</span>
     {% endif %}
     {{ children }}
     {% if suffix %}
       <span class="field-suffix">{{ suffix }}</span>
+    {% endif %}
+    {% if errors %}
+      <div{{ create_attribute({id: error_id, class: ['form-item--error-message']}) }}>
+        {{ errors }}
+      </div>
     {% endif %}
     {% if description_display in ['after', 'invisible'] and description.content %}
       <div{{ description.attributes.addClass('description') }}>{{ description.content }}</div>

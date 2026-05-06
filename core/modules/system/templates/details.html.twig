@@ -28,8 +28,11 @@
     <summary{{ summary_attributes.addClass(summary_classes) }}>{{ title }}</summary>
   {%- endif -%}
 
+  {{ children }}
+  {{ value }}
+
   {% if errors %}
-    <div>
+    <div{{ create_attribute({id: error_id, class: ['form-item--error-message']}) }}>
       {{ errors }}
     </div>
   {% endif %}
@@ -38,7 +41,4 @@
     {% set description_attributes = create_attribute({id: attributes['aria-describedby']}) %}
     <div{{ description_attributes }}>{{ description }}</div>
   {%- endif -%}
-
-  {{ children }}
-  {{ value }}
 </details>
