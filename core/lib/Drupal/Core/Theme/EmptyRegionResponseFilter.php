@@ -58,7 +58,7 @@ class EmptyRegionResponseFilter implements EventSubscriberInterface {
       foreach ($all_attributes as $attribute) {
         $region = $attribute->parentElement;
         // The region may include line breaks, so compare against a trimmed
-        // version of the element contentl
+        // version of the element content.
         if (trim($region->nodeValue) === '') {
           $region->remove();
         }
