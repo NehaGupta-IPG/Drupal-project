@@ -97,4 +97,3 @@ function views_post_update_enable_views_grid_module(): void {
     \Drupal::messenger()->addStatus('The Views Grid module has been automatically enabled because your site has views using the deprecated grid style plugin.');
   }
 }
-

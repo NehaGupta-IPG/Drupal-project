@@ -6,4 +6,4 @@ version: VERSION
 dependencies:
   - drupal:views
 lifecycle: deprecated
-lifecycle_link: 'https://www.drupal.org/node/[NODE_ID]'
+lifecycle_link: 'https://www.drupal.org/node/3301811'

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Functional\Update;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use Drupal\views_grid\Plugin\views\style\Grid;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -61,7 +62,7 @@ class ViewsGridModuleUpdateTest extends UpdatePathTestBase {
 
     // The view should execute without errors and have the grid style plugin.
     $this->assertInstanceOf(
-      \Drupal\views_grid\Plugin\views\style\Grid::class,
+      Grid::class,
       $executable->style_plugin
     );
   }

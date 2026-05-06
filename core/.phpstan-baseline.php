@@ -30712,10 +30712,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/src/Plugin/views/style/EntityReference.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\style\\\\Grid\\:\\:buildOptionsForm\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\views_grid\\\\Plugin\\\\views\\\\style\\\\Grid\\:\\:buildOptionsForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/views/src/Plugin/views/style/Grid.php',
+	'path' => __DIR__ . '/modules/views_grid/src/Plugin/views/style/Grid.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\style\\\\GridResponsive\\:\\:buildOptionsForm\\(\\) has no return type specified\\.$#',

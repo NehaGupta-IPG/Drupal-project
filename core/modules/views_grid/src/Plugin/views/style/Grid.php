@@ -13,7 +13,7 @@ use Drupal\views\Plugin\views\style\StylePluginBase;
  *
  * @deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use the
  *   responsive grid style plugin instead.
- * @see https://www.drupal.org/node/[NODE_ID]
+ * @see https://www.drupal.org/node/3301811
  *
  * @ingroup views_style_plugins
  */

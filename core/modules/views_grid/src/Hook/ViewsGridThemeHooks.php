@@ -2,8 +2,6 @@
 
 namespace Drupal\views_grid\Hook;
 
-use Drupal\Component\Utility\Html;
-use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Template\Attribute;
 
 /**

@@ -880,7 +880,6 @@ class ViewsThemeHooks {
     }
   }
 
-
   /**
    * Prepares variables for views grid - responsive style templates.
    *
