@@ -103,4 +103,3 @@ function views_post_update_add_views_grid_dependencies(): void {
     }
   }
 }
-
