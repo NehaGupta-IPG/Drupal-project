@@ -281,7 +281,10 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
     $edit[$name] = $this->container->get('file_system')->realpath($this->drupalGetTestFiles('image')[0]->uri);
     $this->drupalGet('node/' . $default_language_node->id() . '/edit');
     $this->submitForm($edit, 'Save');
-    $edit = [$this->fieldName . '[0][alt]' => 'Lost in translation image', $this->fieldName . '[0][title]' => 'Lost in translation image title'];
+    $edit = [
+      $this->fieldName . '[0][alt]' => 'Lost in translation image',
+      $this->fieldName . '[0][title]' => 'Lost in translation image title',
+    ];
     $this->submitForm($edit, 'Save');
     $first_fid = $this->getLastFileId();
 
@@ -291,7 +294,10 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
     // Translate the properties of the file.
     $edit = [];
     $edit['title[0][value]'] = 'Scarlett Johansson';
-    $edit = [$this->fieldName . '[0][alt]' => 'Scarlett Johansson image', $this->fieldName . '[0][title]' => 'Scarlett Johansson image title'];
+    $edit = [
+      $this->fieldName . '[0][alt]' => 'Scarlett Johansson image',
+      $this->fieldName . '[0][title]' => 'Scarlett Johansson image title',
+    ];
     $this->submitForm($edit, 'Save (this translation)');
     // This inspects the HTML after the translation is posted. The image should
     // be displayed on the original node.
@@ -347,7 +353,10 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
     $edit[$name] = $this->container->get('file_system')->realpath($this->drupalGetTestFiles('image')[0]->uri);
     $this->drupalGet('node/' . $default_language_node->id() . '/edit');
     $this->submitForm($edit, 'Save');
-    $edit = [$this->fieldName . '[0][alt]' => 'Lost in translation image', $this->fieldName . '[0][title]' => 'Lost in translation image title'];
+    $edit = [
+      $this->fieldName . '[0][alt]' => 'Lost in translation image',
+      $this->fieldName . '[0][title]' => 'Lost in translation image title',
+    ];
     $this->submitForm($edit, 'Save');
 
     // Translate the node into French.
@@ -355,7 +364,10 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
     // Translate the properties of the file.
     $edit = [];
     $edit['title[0][value]'] = 'Scarlett Johansson';
-    $edit = [$this->fieldName . '[0][alt]' => 'Scarlett Johansson image', $this->fieldName . '[0][title]' => 'Scarlett Johansson image title'];
+    $edit = [
+      $this->fieldName . '[0][alt]' => 'Scarlett Johansson image',
+      $this->fieldName . '[0][title]' => 'Scarlett Johansson image title',
+    ];
     $this->submitForm($edit, 'Save (this translation)');
 
     // This inspects the HTML after the translation is posted. The image should
@@ -387,7 +399,10 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
     // Translate the properties of a file with moderation.
     $edit = [];
     $edit['title[0][value]'] = 'Moderate Scarlett Johansson';
-    $edit = [$this->fieldName . '[0][alt]' => 'Moderate Scarlett Johansson image', $this->fieldName . '[0][title]' => 'Moderate Scarlett Johansson image title'];
+    $edit = [
+      $this->fieldName . '[0][alt]' => 'Moderate Scarlett Johansson image',
+      $this->fieldName . '[0][title]' => 'Moderate Scarlett Johansson image title',
+    ];
     $this->submitForm($edit, 'Save (this translation)');
 
     // View the translated node.
