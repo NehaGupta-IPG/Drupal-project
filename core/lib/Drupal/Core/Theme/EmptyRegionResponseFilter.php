@@ -62,9 +62,11 @@ class EmptyRegionResponseFilter implements EventSubscriberInterface {
       foreach ($all_attributes as $attribute) {
         $region = $attribute->parentElement;
         $before_markup = $dom->saveHtml($region);
-        // The region may include line breaks, so compare against a trimmed
-        // version of the element content.
-        if (trim($region->nodeValue) === '') {
+        // If the region has no child elements, it may still have a text
+        // element, and that text element may consist of only whitespace. Ensure
+        // that we don't replace regions with content but also that any
+        // whitespace is trimmed.
+        if ($region->childElementCount === 0 && trim($region->nodeValue) === '') {
           $html_markup = str_replace($before_markup, '', $html_markup);
         }
       }
