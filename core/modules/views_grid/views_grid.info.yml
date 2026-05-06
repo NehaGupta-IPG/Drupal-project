@@ -1,0 +1,9 @@
+name: 'Views Grid (deprecated)'
+type: module
+description: 'Provides the deprecated grid style plugin for Views. Use the responsive grid style plugin instead.'
+package: Core
+version: VERSION
+dependencies:
+  - drupal:views
+lifecycle: deprecated
+lifecycle_link: 'https://www.drupal.org/node/[NODE_ID]'

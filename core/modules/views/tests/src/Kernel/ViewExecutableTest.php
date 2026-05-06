@@ -18,7 +18,6 @@ use Drupal\views\Plugin\views\query\QueryPluginBase;
 use Drupal\views\Plugin\views\query\Sql;
 use Drupal\views\Plugin\views\row\Fields;
 use Drupal\views\Plugin\views\style\DefaultStyle;
-use Drupal\views\Plugin\views\style\Grid;
 use Drupal\views\ViewExecutable;
 use Drupal\views\ViewExecutableFactory;
 use Drupal\views\Views;
@@ -267,7 +266,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
 
     $view->setDisplay('page_2');
     $view->initStyle();
-    $this->assertInstanceOf(Grid::class, $view->style_plugin);
+    $this->assertInstanceOf(DefaultStyle::class, $view->style_plugin);
     // @todo Change this rowPlugin type too.
     $this->assertInstanceOf(Fields::class, $view->rowPlugin);
 

@@ -1,0 +1,5 @@
+views_grid:
+  version: VERSION
+  css:
+    theme:
+      css/views-grid.css: {}

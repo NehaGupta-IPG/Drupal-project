@@ -61,3 +61,40 @@ function views_removed_post_updates(): array {
 function views_post_update_counter_field_not_sortable(): void {
   // Empty update to trigger a cache rebuild so updated Views data is applied.
 }
+
+/**
+ * Enable views_grid module for sites using the grid style plugin.
+ */
+function views_post_update_enable_views_grid_module(): void {
+  $config_factory = \Drupal::configFactory();
+  $module_installer = \Drupal::service('module_installer');
+
+  // Check if views_grid module is already enabled.
+  if (\Drupal::moduleHandler()->moduleExists('views_grid')) {
+    return;
+  }
+
+  // Find all view configs that use the grid style plugin.
+  $has_grid_views = FALSE;
+  $view_configs = $config_factory->listAll('views.view.');
+
+  foreach ($view_configs as $config_name) {
+    $config = $config_factory->get($config_name);
+    $displays = $config->get('display') ?? [];
+
+    foreach ($displays as $display) {
+      $style = $display['display_options']['style']['type'] ?? NULL;
+      if ($style === 'grid') {
+        $has_grid_views = TRUE;
+        break 2;
+      }
+    }
+  }
+
+  // If any views use the grid style, enable the views_grid module.
+  if ($has_grid_views) {
+    $module_installer->install(['views_grid']);
+    \Drupal::messenger()->addStatus('The Views Grid module has been automatically enabled because your site has views using the deprecated grid style plugin.');
+  }
+}
+

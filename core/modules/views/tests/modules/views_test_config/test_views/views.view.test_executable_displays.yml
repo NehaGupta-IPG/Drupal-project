@@ -28,4 +28,4 @@ display:
       defaults:
         style: false
       style:
-        type: grid
+        type: default

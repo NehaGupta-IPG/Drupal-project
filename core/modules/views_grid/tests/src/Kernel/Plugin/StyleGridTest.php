@@ -2,21 +2,30 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\views\Kernel\Plugin;
+namespace Drupal\Tests\views_grid\Kernel\Plugin;
 
+use Drupal\Tests\views\Kernel\Plugin\PluginKernelTestBase;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests the grid style plugin.
+ * Tests the deprecated grid style plugin.
  *
- * @see \Drupal\views\Plugin\views\style\Grid
+ * @see \Drupal\views_grid\Plugin\views\style\Grid
  */
-#[Group('views')]
+#[Group('views_grid')]
 #[RunTestsInSeparateProcesses]
 class StyleGridTest extends PluginKernelTestBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static $modules = [
+    'views_grid',
+    'views_grid_test_config',
+  ];
 
   /**
    * Views used by this test.

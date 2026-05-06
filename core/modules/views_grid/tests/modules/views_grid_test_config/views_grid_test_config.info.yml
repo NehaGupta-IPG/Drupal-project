@@ -1,0 +1,11 @@
+name: 'Views Grid Test Config'
+type: module
+description: 'Provides test views for views_grid module.'
+package: Testing
+version: VERSION
+core_version_requirement: ^12
+hidden: true
+
+dependencies:
+  - drupal:views
+  - drupal:views_test_data
