@@ -54,21 +54,23 @@ class EmptyRegionResponseFilter implements EventSubscriberInterface {
     $dom_xpath = new \DOMXPath($dom);
 
     $all_attributes = $dom_xpath->query('//@data-filter-empty-region');
+
+    // While we use the DOM to find the correct HTML to replace, string
+    // replacement is done directly against the HTML string to minimize changes
+    // to the document as a whole.
     if ($all_attributes) {
       foreach ($all_attributes as $attribute) {
         $region = $attribute->parentElement;
+        $before_markup = $dom->saveHtml($region);
         // The region may include line breaks, so compare against a trimmed
         // version of the element content.
         if (trim($region->nodeValue) === '') {
-          $region->remove();
-        }
-        else {
-          // If we're not removing the region, remove the attribute.
-          $region->removeAttribute('data-filter-empty-region');
+          $html_markup = str_replace($before_markup, '', $html_markup);
         }
       }
-      return $dom->saveHtml();
     }
+    // Once all empty regions have been removed, also remove the data attribute.
+    $html_markup = str_replace('data-filter-empty-region', '', $html_markup);
     return $html_markup;
   }
 
