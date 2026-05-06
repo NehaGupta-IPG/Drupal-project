@@ -48,10 +48,9 @@ class EmptyRegionResponseFilter implements EventSubscriberInterface {
     if (!str_contains($html_markup, 'data-filter-empty-region')) {
       return $html_markup;
     }
-    $dom = new \DOMDocument();
-    @$dom->loadHTML($html_markup);
+    $dom = \Dom\HTMLDocument::createFromString($html_markup, LIBXML_NOERROR);
 
-    $dom_xpath = new \DOMXPath($dom);
+    $dom_xpath = new \Dom\XPath($dom);
 
     $all_attributes = $dom_xpath->query('//@data-filter-empty-region');
 
@@ -66,7 +65,7 @@ class EmptyRegionResponseFilter implements EventSubscriberInterface {
         // element, and that text element may consist of only whitespace. Ensure
         // that we don't replace regions with content but also that any
         // whitespace is trimmed.
-        if ($region->childElementCount === 0 && trim($region->nodeValue) === '') {
+        if ($region->childElementCount === 0 && trim($region->textContent) === '') {
           $html_markup = str_replace($before_markup, '', $html_markup);
         }
       }
