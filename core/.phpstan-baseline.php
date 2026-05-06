@@ -14958,7 +14958,7 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#2 \\$max_resolution of method Drupal\\\\Tests\\\\image\\\\Functional\\\\ImageFieldValidateTest\\:\\:getFieldSettings\\(\\) expects array\\<int\\>, array\\<string, int\\|null\\> given\\.$#',
 	'identifier' => 'argument.type',
-	'count' => 1,
+	'count' => 2,
 	'path' => __DIR__ . '/modules/image/tests/src/Functional/ImageFieldValidateTest.php',
 ];
 $ignoreErrors[] = [
