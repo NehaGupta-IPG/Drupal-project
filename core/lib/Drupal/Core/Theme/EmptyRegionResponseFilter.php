@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Theme;
 
+use Dom\HTMLDocument;
+use Dom\XPath;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -48,9 +50,10 @@ class EmptyRegionResponseFilter implements EventSubscriberInterface {
     if (!str_contains($html_markup, 'data-filter-empty-region')) {
       return $html_markup;
     }
-    $dom = \Dom\HTMLDocument::createFromString($html_markup, LIBXML_NOERROR);
+    // cspell:ignore NOERROR
+    $dom = HTMLDocument::createFromString($html_markup, LIBXML_NOERROR);
 
-    $dom_xpath = new \Dom\XPath($dom);
+    $dom_xpath = new XPath($dom);
 
     $all_attributes = $dom_xpath->query('//@data-filter-empty-region');
 
