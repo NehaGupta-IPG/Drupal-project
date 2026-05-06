@@ -63,37 +63,44 @@ function views_post_update_counter_field_not_sortable(): void {
 }
 
 /**
- * Enable views_grid module for sites using the grid style plugin.
+ * Update config dependencies for views using the grid style plugin.
  */
-function views_post_update_enable_views_grid_module(): void {
-  $config_factory = \Drupal::configFactory();
-  $module_installer = \Drupal::service('module_installer');
-
-  // Check if views_grid module is already enabled.
-  if (\Drupal::moduleHandler()->moduleExists('views_grid')) {
+function views_post_update_add_views_grid_dependencies(): void {
+  // Only run if views_grid module is enabled.
+  if (!\Drupal::moduleHandler()->moduleExists('views_grid')) {
     return;
   }
 
-  // Find all view configs that use the grid style plugin.
-  $has_grid_views = FALSE;
+  $config_factory = \Drupal::configFactory();
   $view_configs = $config_factory->listAll('views.view.');
 
   foreach ($view_configs as $config_name) {
-    $config = $config_factory->get($config_name);
+    $config = $config_factory->getEditable($config_name);
     $displays = $config->get('display') ?? [];
+    $has_grid_in_view = FALSE;
 
+    // Check if this view uses the grid style plugin.
     foreach ($displays as $display) {
       $style = $display['display_options']['style']['type'] ?? NULL;
       if ($style === 'grid') {
-        $has_grid_views = TRUE;
-        break 2;
+        $has_grid_in_view = TRUE;
+        break;
+      }
+    }
+
+    // Update dependencies if the view uses grid style.
+    if ($has_grid_in_view) {
+      $dependencies = $config->get('dependencies') ?? [];
+      $module_dependencies = $dependencies['module'] ?? [];
+
+      if (!in_array('views_grid', $module_dependencies)) {
+        $module_dependencies[] = 'views_grid';
+        sort($module_dependencies);
+        $dependencies['module'] = $module_dependencies;
+        $config->set('dependencies', $dependencies);
+        $config->save(TRUE);
       }
     }
   }
-
-  // If any views use the grid style, enable the views_grid module.
-  if ($has_grid_views) {
-    $module_installer->install(['views_grid']);
-    \Drupal::messenger()->addStatus('The Views Grid module has been automatically enabled because your site has views using the deprecated grid style plugin.');
-  }
 }
+
