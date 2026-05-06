@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Fixture file to test views_post_update_enable_views_grid_module().
+ * Fixture file to test views_update_11401().
  *
  * Creates a test view that uses the grid style plugin to verify the
  * automatic enabling of the views_grid module during updates.
