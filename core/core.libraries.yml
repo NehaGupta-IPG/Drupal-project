@@ -197,22 +197,11 @@ drupal:
   js:
     misc/drupal.js: {}
     misc/drupal.init.js: {}
-  css:
-    base:
-      misc/js.module.css: {}
   dependencies:
     - core/drupalSettings
+    - core/drupal.js-show-hide
   drupalSettings:
     suppressDeprecationErrors: true
-  moved_files:
-    system/base:
-      deprecation_version: 11.4.0
-      removed_version: 12.0.0
-      deprecation_link: https://www.drupal.org/node/3432346
-      css:
-        base:
-          misc/js.module.css:
-            base: css/components/js.module.css
 
 drupalSettings:
   aggregate_target:
@@ -230,6 +219,21 @@ drupalSettings:
       isFront: null
       currentLanguage: null
     pluralDelimiter: null
+
+
+drupal.js-show-hide:
+  css:
+    base:
+      misc/js.module.css: {}
+  moved_files:
+    system/base:
+      deprecation_version: 11.4.0
+      removed_version: 12.0.0
+      deprecation_link: https://www.drupal.org/node/3432346
+      css:
+        base:
+          misc/js.module.css:
+            base: css/components/js.module.css
 
 drupal.active-link:
   version: VERSION
