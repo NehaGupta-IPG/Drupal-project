@@ -22,10 +22,10 @@
   ]
 %}
 
-{% if content %}
+{% if content -%}
   <div{{ attributes.addClass(classes) }}>
     <div class="region--{{ region }}__inner">
-      {{ content }}
+      {{- content -}}
     </div>
   </div>
-{% endif %}
+{%- endif %}

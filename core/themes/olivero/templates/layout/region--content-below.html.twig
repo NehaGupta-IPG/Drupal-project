@@ -21,8 +21,8 @@
 
 {{ attach_library('olivero/content-below') }}
 
-{% if content %}
+{% if content -%}
   <div{{ attributes.addClass(classes) }}>
-    {{ content }}
+    {{- content -}}
   </div>
-{% endif %}
+{%- endif %}

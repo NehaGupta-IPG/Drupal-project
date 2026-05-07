@@ -55,6 +55,6 @@
 /**
  * Hide empty regions.
  */
-[data-filter-empty-regions]:empty {
+[data-filter-empty-region]:empty {
   display: none;
 }

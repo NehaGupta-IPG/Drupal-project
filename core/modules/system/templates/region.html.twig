@@ -14,6 +14,8 @@
  * @ingroup themeable
  */
 #}
-{% if content %}
-<div{{ attributes }}>{{ content | trim }}</div>
-{% endif %}
+{% if content -%}
+  <div{{ attributes }}>
+    {{- content -}}
+  </div>
+{%- endif %}

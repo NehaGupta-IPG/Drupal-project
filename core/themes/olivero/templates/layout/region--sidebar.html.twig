@@ -21,8 +21,8 @@
 
 {{ attach_library('olivero/sidebar') }}
 
-{% if content %}
+{% if content -%}
   <aside{{ attributes.addClass(classes) }}>
-    {{ content }}
+    {{- content -}}
   </aside>
-{% endif %}
+{%- endif %}
