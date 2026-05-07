@@ -6,11 +6,13 @@ namespace Drupal\Tests\inline_form_errors\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Validation test for inline_form_errors.
  */
 #[Group('inline_form_errors')]
+#[RunTestsInSeparateProcesses]
 class InlineErrorFormTest extends BrowserTestBase {
 
   /**
