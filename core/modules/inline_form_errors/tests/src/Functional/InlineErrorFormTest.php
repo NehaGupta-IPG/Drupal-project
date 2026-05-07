@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\inline_form_errors\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Validation test for inline_form_errors.
- *
- * @group inline_form_errors
- * @phpstan-ignore testClass.missingAttribute.Group, testClass.missingAttribute.RunInSeparateProcesses
  */
+#[Group('inline_form_errors')]
 class InlineErrorFormTest extends BrowserTestBase {
 
   /**

@@ -200,7 +200,8 @@ class FormErrorHandler implements FormErrorHandlerInterface {
     // Store the errors for this element on the element directly.
     $elements['#errors'] = $form_state->getError($elements);
 
-    // Add aria-errormessage and aria-describedby attributes to the form element.
+    // Add aria-errormessage and aria-describedby attributes to the
+    // form element.
     if (($elements['#errors']) !== NULL) {
       $error_id = $elements['#error_id'] ?? ($elements['#id'] . '--error-message');
       $elements['#attributes']['aria-errormessage'] = $error_id;
