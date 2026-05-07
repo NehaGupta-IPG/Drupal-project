@@ -65,8 +65,8 @@ use JsonSchema\Validator;
  *     - `html`: The style is applicable on the html tag only.
  *     - `body`: The style is applicable on the body tag only.
  *     - `meta`: When applied, the style will generate a meta tag.
- *     - empty string/not specified: The style is applicable on any tag.
- *       Default value.
+ *     - `any`/empty string/not specified: The style is applicable on any tag.
+ *         Default value.
  *   library: (string) Drupal library machine name to include.
  * @endcode
  * For example:
@@ -85,8 +85,8 @@ use JsonSchema\Validator;
  *       label: "Primary"
  *       value: "bg-primary"
  *     secondary:
- *        label: "Secondary"
- *        value: "bg-secondary"
+ *       label: "Secondary"
+ *       value: "bg-secondary"
  *     ...
  *   library: "my_theme/my_lib"
  *   weight: 50
