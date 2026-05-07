@@ -405,12 +405,12 @@ class ContentModerationHooks {
     // Add the revision status after the first column.
     array_splice($build['entity_revisions_table']['#header'], 1, 0, [$this->t('Moderation state')]);
 
-    $displayed_revisions = $context['displayed_revisions'];
+    $all_revisions = $context['all_revisions'];
     foreach ($build['entity_revisions_table']['#rows'] as &$row) {
       // The table rows are keyed numerically, whereas the array of revisions is
       // keyed by the vid. So the only way to get the revision for a row is to
       // rely on the two arrays being in the same order.
-      $row_revision = array_shift($displayed_revisions);
+      $row_revision = array_shift($all_revisions);
       $revision_state = $row_revision->moderation_state->value;
 
       // A table row either is an array of cells, or has a 'data' array which

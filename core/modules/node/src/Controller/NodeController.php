@@ -144,7 +144,6 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
 
     $rows = [];
     $all_revisions = [];
-    $displayed_revisions = [];
     $current_revision_displayed = FALSE;
 
     foreach ($this->getRevisionIds($node, $node_storage) as $vid) {
@@ -257,7 +256,6 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
 
     $context = [
       'all_revisions' => $all_revisions,
-      'displayed_revisions' => $displayed_revisions,
     ];
     $this->moduleHandler()->alter(['entity_revision_overview', 'entity_node_revision_overview'], $build, $node, $context);
 
