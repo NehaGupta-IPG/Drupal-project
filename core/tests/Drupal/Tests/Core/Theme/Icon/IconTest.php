@@ -5,18 +5,20 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Theme\Icon;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Render\Element\Icon;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Theme\Icon\IconDefinition;
 use Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Render\Element\Icon
- *
- * @group icon
+ * Tests Drupal\Core\Render\Element\Icon.
  */
+#[CoversClass(Icon::class)]
+#[Group('icon')]
 class IconTest extends UnitTestCase {
 
   use IconTestTrait;
@@ -42,7 +44,7 @@ class IconTest extends UnitTestCase {
    * Test the Icon::getInfo method.
    */
   public function testGetInfo(): void {
-    $icon = new Icon([], 'test', 'test', elementInfoManager: $this->createStub(ElementInfoManagerInterface::class));
+    $icon = new Icon([], 'test', 'test');
     $info = $icon->getInfo();
 
     $this->assertArrayHasKey('#pre_render', $info);
@@ -187,9 +189,8 @@ class IconTest extends UnitTestCase {
    *   The icon data.
    * @param array $expected
    *   The result expected.
-   *
-   * @dataProvider providerPreRenderIcon
    */
+  #[DataProvider('providerPreRenderIcon')]
   public function testPreRenderIcon(array $data, array $expected): void {
     $icon = $this->createTestIcon($data);
     $icon_full_id = IconDefinition::createIconId($data['pack_id'], $data['icon_id']);

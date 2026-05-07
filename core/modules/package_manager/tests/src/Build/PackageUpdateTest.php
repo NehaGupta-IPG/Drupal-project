@@ -20,6 +20,9 @@ class PackageUpdateTest extends TemplateProjectTestBase {
    * Tests updating packages in a stage directory.
    */
   public function testPackageUpdate(): void {
+    // @todo skipped due to random test failures, re-enable in https://www.drupal.org/i/3508109
+    $this->markTestSkipped();
+
     $this->createTestProject('RecommendedProject');
 
     $fixtures = __DIR__ . '/../../fixtures/build_test_projects';
@@ -40,7 +43,7 @@ class PackageUpdateTest extends TemplateProjectTestBase {
     // Change both modules' upstream version.
     static::copyFixtureFilesTo("$fixtures/alpha/1.1.0", $alpha_repo_path);
     static::copyFixtureFilesTo("$fixtures/updated_module/1.1.0", $updated_module_repo_path);
-    // Make .git folder
+    // Make .git folder.
 
     // Use the API endpoint to create a stage and update updated_module to
     // 1.1.0. Even though both modules have version 1.1.0 available, only

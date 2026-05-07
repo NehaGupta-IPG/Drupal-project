@@ -8,6 +8,7 @@ use Drupal\Core\Url;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\views_ui\Traits\FilterEntityReferenceTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests views creation wizard.
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @see \Drupal\views\Plugin\views\filter\EntityReference
  */
 #[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class FilterEntityReferenceTest extends WebDriverTestBase {
 
   use FilterEntityReferenceTrait;
@@ -92,7 +94,7 @@ class FilterEntityReferenceTest extends WebDriverTestBase {
       ->isVisible());
     $this->assertTrue($page->findField('options[widget]')->isVisible());
 
-    // Ensure that disabled form elements from selection handler do not show up
+    // Ensure that disabled form elements from selection handler do not show up.
     // @see \Drupal\views\Plugin\views\filter\EntityReference method
     // buildExtraOptionsForm.
     $this->assertFalse($page->hasField('options[reference_default:node][target_bundles_update]'));

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Core\Test;
 
 use Drupal\Core\Test\Exception\MissingGroupException;
-use Drupal\TestTools\PhpUnitCompatibility\RunnerVersion;
 use PHPUnit\Event\EventFacadeIsSealedException;
 use PHPUnit\Event\Facade as EventFacade;
 use PHPUnit\Framework\DataProviderTestSuite;
@@ -18,7 +17,13 @@ use PHPUnit\TextUI\Configuration\TestSuiteBuilder;
 /**
  * Discovers available tests using the PHPUnit API.
  *
+ * @phpstan-type TestClassInfo array{name: class-string, description: string, group: string|int, groups: list<string|int>, type: string, file: string, tests_count: positive-int}
+ * @phpstan-type TestClassInfoList array<class-string,TestClassInfo>
+ * @phpstan-type GroupedTestClassInfoList array<string|int,TestClassInfoList>
+ *
  * @internal
+ *
+ * @final
  */
 class PhpUnitTestDiscovery {
 
@@ -28,27 +33,6 @@ class PhpUnitTestDiscovery {
    * @var \Drupal\Core\Test\PhpUnitTestDiscovery|null
    */
   private static ?self $instance = NULL;
-
-  /**
-   * The map of legacy test suite identifiers to phpunit.xml ones.
-   *
-   * @var array<string,string>
-   */
-  private array $map = [
-    'PHPUnit-FunctionalJavascript' => 'functional-javascript',
-    'PHPUnit-Functional' => 'functional',
-    'PHPUnit-Kernel' => 'kernel',
-    'PHPUnit-Unit' => 'unit',
-    'PHPUnit-Unit-Component' => 'unit-component',
-    'PHPUnit-Build' => 'build',
-  ];
-
-  /**
-   * The reverse map of legacy test suite identifiers to phpunit.xml ones.
-   *
-   * @var array<string,string>
-   */
-  private array $reverseMap;
 
   /**
    * Path to PHPUnit's configuration file.
@@ -63,7 +47,6 @@ class PhpUnitTestDiscovery {
   private array $warnings = [];
 
   private function __construct() {
-    $this->reverseMap = array_flip($this->map);
     try {
       EventFacade::instance()->registerTracer(new PhpUnitTestDiscoveryTracer($this));
       EventFacade::instance()->seal();
@@ -101,7 +84,7 @@ class PhpUnitTestDiscovery {
    * @param string|null $directory
    *   (optional) Limit discovered tests to a specific directory.
    *
-   * @return array<string<array<class-string, array{name: class-string, description: string, group: string|int, groups: list<string|int>, type: string, file: string, tests_count: positive-int}>>>
+   * @return GroupedTestClassInfoList
    *   An array of test groups keyed by the group name. Each test group is an
    *   array of test class information arrays as returned by
    *   ::getTestClassInfo(), keyed by test class. If a test class belongs to
@@ -113,20 +96,15 @@ class PhpUnitTestDiscovery {
     $args = ['--configuration', $this->configurationFilePath];
 
     if (!empty($testSuites)) {
-      // Convert $testSuites from Drupal's legacy syntax to the syntax used in
-      // phpunit.xml, that is necessary to PHPUnit to be able to apply the
-      // test suite filter. For example, 'PHPUnit-Unit' to 'unit'.
-      $tmp = [];
-      foreach ($testSuites as $i) {
-        if (!is_string($i)) {
+      foreach ($testSuites as $testSuite) {
+        if (!is_string($testSuite)) {
           throw new \InvalidArgumentException("Test suite must be a string");
         }
-        if (str_contains($i, ' ')) {
-          throw new \InvalidArgumentException("Test suite name '{$i}' is invalid");
+        if (str_contains($testSuite, ' ')) {
+          throw new \InvalidArgumentException("Test suite name '{$testSuite}' is invalid");
         }
-        $tmp[] = $this->map[$i] ?? $i;
       }
-      $args[] = '--testsuite=' . implode(',', $tmp);
+      $args[] = '--testsuite=' . implode(',', $testSuites);
     }
 
     if ($directory !== NULL) {
@@ -219,7 +197,7 @@ class PhpUnitTestDiscovery {
    * @param string|null $extension
    *   The name of an extension to limit discovery to; e.g., 'node'.
    *
-   * @return array<string<array<class-string, array{name: class-string, description: string, group: string|int, groups: list<string|int>, type: string, file: string, tests_count: positive-int}>>>
+   * @return GroupedTestClassInfoList
    *   An array of test groups keyed by the group name. Each test group is an
    *   array of test class information arrays as returned by
    *   ::getTestClassInfo(), keyed by test class. If a test class belongs to
@@ -237,10 +215,7 @@ class PhpUnitTestDiscovery {
           continue;
         }
 
-        $item = $this->getTestClassInfo(
-          $testClass,
-          $this->reverseMap[$testSuite->name()] ?? $testSuite->name(),
-        );
+        $item = $this->getTestClassInfo($testClass, $testSuite->name());
 
         foreach ($item['groups'] as $group) {
           $list[$group][$item['name']] = $item;
@@ -260,7 +235,7 @@ class PhpUnitTestDiscovery {
    * @param list<string> $testSuites
    *   An array of PHPUnit test suites to filter the discovery for.
    *
-   * @return array<string<array<class-string, array{name: class-string, description: string, group: string|int, groups: list<string|int>, type: string, file: string, tests_count: positive-int}>>>
+   * @return GroupedTestClassInfoList
    *   An array of test groups keyed by the group name. Each test group is an
    *   array of test class information arrays as returned by
    *   ::getTestClassInfo(), keyed by test class. If a test class belongs to
@@ -280,7 +255,7 @@ class PhpUnitTestDiscovery {
       }
 
       // Take the test suite name from the class namespace.
-      $testSuite = 'PHPUnit-' . TestDiscovery::getPhpunitTestSuite($phpUnitTestSuite->name());
+      $testSuite = self::getPhpunitTestSuite($phpUnitTestSuite->name());
       if (!empty($testSuites) && !in_array($testSuite, $testSuites, TRUE)) {
         return [];
       }
@@ -305,7 +280,7 @@ class PhpUnitTestDiscovery {
       }
 
       // Take the test suite name from the class namespace.
-      $testSuite = 'PHPUnit-' . TestDiscovery::getPhpunitTestSuite($testClass->name());
+      $testSuite = self::getPhpunitTestSuite($testClass->name());
       if (!empty($testSuites) && !in_array($testSuite, $testSuites, TRUE)) {
         continue;
       }
@@ -328,42 +303,36 @@ class PhpUnitTestDiscovery {
    * @param string $testSuite
    *   The test suite of this test class.
    *
-   * @return array{name: class-string, description: string, group: string|int, groups: list<string|int>, type: string, file: string, tests_count: positive-int}
+   * phpcs:ignore Drupal.Commenting.DataTypeNamespace.DataTypeNamespace
+   * @return TestClassInfo
    *   The test class information.
    */
   private function getTestClassInfo(Test $testClass, string $testSuite): array {
     $reflection = new \ReflectionClass($testClass->name());
 
-    // Let PHPUnit API return the groups, as it will deal transparently with
-    // annotations or attributes, but skip groups generated by PHPUnit
-    // internally and starting with a double underscore prefix.
-    if (RunnerVersion::getMajor() < 11) {
-      $groups = array_filter($testClass->groups(), function (string $value): bool {
-        return !str_starts_with($value, '__phpunit');
-      });
-    }
-    else {
-      // In PHPUnit 11+, we need to coalesce the groups from individual tests
-      // as they may not be available from the test class level (when tests are
-      // backed by data providers).
-      $tmp = [];
-      foreach ($testClass as $test) {
-        if ($test instanceof DataProviderTestSuite) {
-          foreach ($test as $testWithData) {
-            $tmp = array_merge($tmp, $testWithData->groups());
+    // In PHPUnit 11+, we need to coalesce the groups from individual tests
+    // as they may not be available from the test class level (when tests are
+    // backed by data providers).
+    $tmp = [];
+    foreach ($testClass as $test) {
+      if ($test instanceof DataProviderTestSuite) {
+        foreach ($test as $testWithData) {
+          if ($testWithData->valueObjectForEvents()->metadata()->isGroup()->isEmpty()) {
+            throw new MissingGroupException(sprintf('Missing group metadata in test %s', $testWithData->valueObjectForEvents()->id()));
           }
-        }
-        else {
-          $tmp = array_merge($tmp, $test->groups());
+          $tmp = array_merge($tmp, $testWithData->groups());
         }
       }
-      $groups = array_filter(array_unique($tmp), function (string $value): bool {
-        return !str_starts_with($value, '__phpunit');
-      });
+      else {
+        if ($test->valueObjectForEvents()->metadata()->isGroup()->isEmpty()) {
+          throw new MissingGroupException(sprintf('Missing group metadata in test %s', $test->valueObjectForEvents()->id()));
+        }
+        $tmp = array_merge($tmp, $test->groups());
+      }
     }
-    if (empty($groups)) {
-      throw new MissingGroupException(sprintf('Missing group metadata in test class %s', $testClass->name()));
-    }
+    $groups = array_filter(array_unique($tmp), function (string $value): bool {
+      return !str_starts_with($value, '__phpunit');
+    });
 
     // Let PHPUnit API return the class coverage information.
     $test = $testClass;
@@ -373,11 +342,8 @@ class PhpUnitTestDiscovery {
     if (($metadata = $test->valueObjectForEvents()->metadata()->isCoversClass()) && $metadata->isNotEmpty()) {
       $description = sprintf('Tests %s.', $metadata->asArray()[0]->className());
     }
-    elseif (($metadata = $test->valueObjectForEvents()->metadata()->isCoversDefaultClass()) && $metadata->isNotEmpty()) {
-      $description = sprintf('Tests %s.', $metadata->asArray()[0]->className());
-    }
     else {
-      $description = TestDiscovery::parseTestClassSummary($reflection->getDocComment());
+      $description = self::parseTestClassSummary($reflection->getDocComment() ?: '');
     }
 
     // Find the test cases count.
@@ -402,6 +368,70 @@ class PhpUnitTestDiscovery {
       'file' => $reflection->getFileName(),
       'tests_count' => $count,
     ];
+  }
+
+  /**
+   * Parses the phpDoc summary line of a test class.
+   *
+   * @param string $doc_comment
+   *   The documentation comment.
+   *
+   * @return string
+   *   The parsed phpDoc summary line. An empty string is returned if no summary
+   *   line can be parsed.
+   */
+  private static function parseTestClassSummary(string $doc_comment): string {
+    // Normalize line endings.
+    $doc_comment = preg_replace('/\r\n|\r/', '\n', $doc_comment);
+    // Strip leading and trailing doc block lines.
+    $doc_comment = substr($doc_comment, 4, -4);
+
+    $lines = explode("\n", $doc_comment);
+    $summary = [];
+    // Add every line to the summary until the first empty line or annotation
+    // is found.
+    foreach ($lines as $line) {
+      if (preg_match('/^[ ]*\*$/', $line) || preg_match('/^[ ]*\* \@/', $line)) {
+        break;
+      }
+      $summary[] = trim($line, ' *');
+    }
+    return implode(' ', $summary);
+  }
+
+  /**
+   * Determines the phpunit testsuite for a given classname, based on namespace.
+   *
+   * @param string $classname
+   *   The test classname.
+   *
+   * @return string|false
+   *   The testsuite name or FALSE if its not a phpunit test.
+   */
+  public static function getPhpunitTestSuite(string $classname): string|false {
+    if (preg_match('/Drupal\\\\Tests\\\\(\w+)\\\\(\w+)/', $classname, $matches)) {
+      if ($matches[1] === 'Component') {
+        return 'unit-component';
+      }
+      // This could be an extension test, in which case the first match will be
+      // the extension name. We assume that lower-case strings are module names.
+      if (strtolower($matches[1]) == $matches[1]) {
+        return match ($matches[2]) {
+          'FunctionalJavascript' => 'functional-javascript',
+          default => strtolower($matches[2]),
+        };
+      }
+      return 'unit';
+    }
+    // Core tests.
+    elseif (preg_match('/Drupal\\\\(\w*)Tests\\\\/', $classname, $matches)) {
+      return match ($matches[1]) {
+        '' => 'unit',
+        'FunctionalJavascript' => 'functional-javascript',
+        default => strtolower($matches[1]),
+      };
+    }
+    return FALSE;
   }
 
 }

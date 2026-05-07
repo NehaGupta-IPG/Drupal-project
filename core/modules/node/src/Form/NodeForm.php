@@ -11,6 +11,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\TempStore\PrivateTempStoreFactory;
 use Drupal\Core\Utility\Error;
+use Drupal\node\NodePreviewMode;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -125,7 +126,7 @@ class NodeForm extends ContentEntityForm {
 
     if ($this->operation == 'edit') {
       $form['#title'] = $this->t('<em>Edit @type</em> @title', [
-        '@type' => node_get_type_label($node),
+        '@type' => $node->getBundleEntity()->label(),
         '@title' => $node->label(),
       ]);
     }
@@ -168,7 +169,9 @@ class NodeForm extends ContentEntityForm {
       '#wrapper_attributes' => ['class' => ['entity-meta__author']],
     ];
 
-    $form['status']['#group'] = 'footer';
+    if (isset($form['status'])) {
+      $form['status']['#group'] = 'footer';
+    }
 
     // Node author information for administrators.
     $form['author'] = [
@@ -177,9 +180,6 @@ class NodeForm extends ContentEntityForm {
       '#group' => 'advanced',
       '#attributes' => [
         'class' => ['node-form-author'],
-      ],
-      '#attached' => [
-        'library' => ['node/drupal.node'],
       ],
       '#weight' => 90,
       '#optional' => TRUE,
@@ -201,9 +201,6 @@ class NodeForm extends ContentEntityForm {
       '#attributes' => [
         'class' => ['node-form-options'],
       ],
-      '#attached' => [
-        'library' => ['node/drupal.node'],
-      ],
       '#weight' => 95,
       '#optional' => TRUE,
     ];
@@ -216,7 +213,7 @@ class NodeForm extends ContentEntityForm {
       $form['sticky']['#group'] = 'options';
     }
 
-    $form['#attached']['library'][] = 'node/form';
+    $form['#attached']['library'][] = 'node/drupal.node';
 
     return $form;
   }
@@ -227,13 +224,13 @@ class NodeForm extends ContentEntityForm {
   protected function actions(array $form, FormStateInterface $form_state) {
     $element = parent::actions($form, $form_state);
     $node = $this->entity;
-    $preview_mode = $node->type->entity->getPreviewMode();
+    $preview_mode = $node->type->entity->getPreviewMode(FALSE);
 
-    $element['submit']['#access'] = $preview_mode != DRUPAL_REQUIRED || $form_state->get('has_been_previewed');
+    $element['submit']['#access'] = $preview_mode != NodePreviewMode::Required || $form_state->get('has_been_previewed');
 
     $element['preview'] = [
       '#type' => 'submit',
-      '#access' => $preview_mode != DRUPAL_DISABLED && ($node->access('create') || $node->access('update')),
+      '#access' => $preview_mode != NodePreviewMode::Disabled && ($node->access('create') || $node->access('update')),
       '#value' => $this->t('Preview'),
       '#weight' => 20,
       '#submit' => ['::submitForm', '::preview'],
@@ -284,7 +281,10 @@ class NodeForm extends ContentEntityForm {
       $node->save();
       $node_link = $node->toLink($this->t('View'))->toString();
       $context = ['@type' => $node->getType(), '%title' => $node->label(), 'link' => $node_link];
-      $t_args = ['@type' => node_get_type_label($node), '%title' => $node->access('view') ? $node->toLink()->toString() : $node->label()];
+      $t_args = [
+        '@type' => $node->getBundleEntity()->label(),
+        '%title' => $node->access('view') ? $node->toLink()->toString() : $node->label(),
+      ];
 
       if ($insert) {
         $this->logger('content')->info('@type: added %title.', $context);

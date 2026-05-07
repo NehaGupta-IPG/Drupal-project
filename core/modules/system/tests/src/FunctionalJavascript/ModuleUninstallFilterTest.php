@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\FunctionalJavascript;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the JavaScript functionality of the module uninstall filter.
  */
 #[Group('system')]
+#[RunTestsInSeparateProcesses]
 class ModuleUninstallFilterTest extends WebDriverTestBase {
 
   /**
@@ -91,8 +94,8 @@ class ModuleUninstallFilterTest extends WebDriverTestBase {
    * @return \Behat\Mink\Element\NodeElement[]
    *   An array of node elements that are visible.
    */
-  protected function filterVisibleElements($elements) {
-    $elements = array_filter($elements, function ($element) {
+  protected function filterVisibleElements($elements): array {
+    $elements = array_filter($elements, function (NodeElement $element) {
       return $element->isVisible();
     });
     return $elements;

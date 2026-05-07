@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests\Core\Recipe;
 
 use Drupal\Core\Extension\ModuleExtensionList;
-use Drupal\shortcut\Entity\Shortcut;
 use Drupal\Tests\standard\Functional\StandardTest;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Standard recipe installation expectations.
  */
 #[Group('#slow')]
 #[Group('Recipe')]
+#[RunTestsInSeparateProcesses]
 class StandardRecipeTest extends StandardTest {
 
   use RecipeTestTrait;
@@ -42,7 +43,7 @@ class StandardRecipeTest extends StandardTest {
     $database_modules[] = \Drupal::database()->getProvider();
     $keep = array_merge(['user', 'system', 'path_alias'], $database_modules);
     $uninstall = array_diff(array_keys(\Drupal::moduleHandler()->getModuleList()), $keep);
-    foreach (['shortcut', 'field_config', 'filter_format', 'field_storage_config'] as $entity_type) {
+    foreach (['field_config', 'filter_format', 'field_storage_config'] as $entity_type) {
       $storage = \Drupal::entityTypeManager()->getStorage($entity_type);
       $storage->delete($storage->loadMultiple());
     }
@@ -121,17 +122,20 @@ class StandardRecipeTest extends StandardTest {
 
     // Ensure we have truly rebuilt the standard profile using recipes.
     // Uncomment the code below to see the differences in a single file.
-    // phpcs:ignore Drupal.Files.LineLength
+    // phpcs:ignore Drupal.Commenting.InlineComment.InvalidEndChar, Drupal.Files.LineLength
     // $this->assertSame($sync->read('node.settings'), $active->read('node.settings'));
     $comparer = $this->configImporter()->getStorageComparer();
     $expected_list = $comparer->getEmptyChangelist();
+    $expected_list['create'] = [
+      'core.entity_view_mode.node.search_result',
+      'core.entity_view_mode.node.search_index',
+    ];
     // We expect core.extension to be different because standard is no longer
     // installed.
-    $expected_list['update'] = ['core.extension'];
+    $expected_list['update'] = [
+      'core.extension',
+    ];
     $this->assertSame($expected_list, $comparer->getChangelist());
-
-    // Standard ships two shortcuts; ensure they exist.
-    $this->assertCount(2, Shortcut::loadMultiple());
 
     parent::testStandard();
   }

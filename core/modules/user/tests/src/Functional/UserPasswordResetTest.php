@@ -11,12 +11,14 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Ensure that password reset methods work as expected.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserPasswordResetTest extends BrowserTestBase {
 
   use AssertMailTrait {
@@ -306,7 +308,7 @@ class UserPasswordResetTest extends BrowserTestBase {
    * @return array
    *   An array of scenarios.
    */
-  protected function languagePrefixTestProvider() {
+  protected function languagePrefixTestProvider(): array {
     return [
       'Test language prefix set as \'\', visiting default with preferred language as en' => [
         'setPreferredLangcode' => 'en',
@@ -338,7 +340,7 @@ class UserPasswordResetTest extends BrowserTestBase {
   /**
    * Retrieves password reset email and extracts the login link.
    */
-  public function getResetURL() {
+  public function getResetURL(): string {
     // Assume the most recent email.
     $_emails = $this->drupalGetMails();
     $email = end($_emails);
