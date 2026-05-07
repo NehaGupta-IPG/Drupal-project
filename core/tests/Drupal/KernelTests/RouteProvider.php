@@ -6,7 +6,6 @@ namespace Drupal\KernelTests;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Routing\PreloadableRouteProviderInterface;
-use Drupal\Core\Routing\RouteProvider as RouteProviderBase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -19,24 +18,23 @@ class RouteProvider implements PreloadableRouteProviderInterface {
   use DependencySerializationTrait;
 
   /**
-   * The route provider service.
+   * Whether the initial router rebuild has been triggered.
    */
-  protected RouteProviderBase $service;
+  protected bool $rebuilt = FALSE;
 
   /**
    * Loads the real route provider from the container and rebuilds the router.
    *
-   * @return \Drupal\Core\Routing\PreloadableRouteProviderInterface|\Symfony\Component\EventDispatcher\EventSubscriberInterface
+   * @return \Drupal\Core\Routing\PreloadableRouteProviderInterface
    *   The route provider.
    */
-  protected function lazyLoadItself(): RouteProviderBase {
-    if (!isset($this->service)) {
-      $container = \Drupal::getContainer();
-      $this->service = $container->get('test.router.route_provider');
+  protected function lazyLoadItself(): PreloadableRouteProviderInterface {
+    $container = \Drupal::getContainer();
+    if (!$this->rebuilt) {
+      $this->rebuilt = TRUE;
       $container->get('router.builder')->rebuild();
     }
-
-    return $this->service;
+    return $container->get('test.router.route_provider');
   }
 
   /**
@@ -70,13 +68,6 @@ class RouteProvider implements PreloadableRouteProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCandidateOutlines(array $parts) {
-    return $this->lazyLoadItself()->getCandidateOutlines($parts);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getRoutesByPattern($pattern): RouteCollection {
     return $this->lazyLoadItself()->getRoutesByPattern($pattern);
   }
@@ -84,14 +75,7 @@ class RouteProvider implements PreloadableRouteProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function routeProviderRouteCompare(array $a, array $b) {
-    return $this->lazyLoadItself()->routeProviderRouteCompare($a, $b);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getAllRoutes(): array {
+  public function getAllRoutes(): \Traversable {
     return $this->lazyLoadItself()->getAllRoutes();
   }
 

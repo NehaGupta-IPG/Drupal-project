@@ -5,9 +5,9 @@ namespace Drupal\Core\Routing;
 use Drupal\Core\Access\CheckProviderInterface;
 use Drupal\Core\DependencyInjection\DeprecatedServicePropertyTrait;
 use Drupal\Core\Discovery\YamlDiscovery;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\DestructableInterface;
+use Drupal\Core\Routing\RouteStorage\RouteStorageInterface;
 use Drupal\Component\EventDispatcher\Event;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RouteCollection;
@@ -24,11 +24,9 @@ class RouteBuilder implements RouteBuilderInterface, DestructableInterface {
   use DeprecatedServicePropertyTrait;
 
   /**
-   * The dumper to which we should send collected routes.
-   *
-   * @var \Drupal\Core\Routing\MatcherDumperInterface
+   * The route storage to which compiled routes are dumped.
    */
-  protected $dumper;
+  protected RouteStorageInterface $storage;
 
   /**
    * The used lock backend instance.
@@ -83,19 +81,12 @@ class RouteBuilder implements RouteBuilderInterface, DestructableInterface {
   ];
 
   /**
-   * Constructs the RouteBuilder using the passed MatcherDumperInterface.
+   * Constructs the RouteBuilder.
    */
-  public function __construct(MatcherDumperInterface $dumper, LockBackendInterface $lock, EventDispatcherInterface $dispatcher, CheckProviderInterface|ModuleHandlerInterface $check_provider) {
-    $this->dumper = $dumper;
+  public function __construct(RouteStorageInterface $storage, LockBackendInterface $lock, EventDispatcherInterface $dispatcher, CheckProviderInterface $check_provider) {
+    $this->storage = $storage;
     $this->lock = $lock;
     $this->dispatcher = $dispatcher;
-    if ($check_provider instanceof ModuleHandlerInterface && count(func_get_args()) === 6) {
-      $check_provider = func_get_arg(5);
-      @trigger_error('Calling ' . __METHOD__ . '() with the module handler and controller resolver services is deprecated in drupal:11.4.0 and will be removed in drupal:12.0.0. See https://www.drupal.org/node/3324751', E_USER_DEPRECATED);
-    }
-    if (!$check_provider instanceof CheckProviderInterface) {
-      throw new \InvalidArgumentException();
-    }
     $this->checkProvider = $check_provider;
   }
 
@@ -140,8 +131,7 @@ class RouteBuilder implements RouteBuilderInterface, DestructableInterface {
 
     $this->checkProvider->setChecks($collection);
 
-    $this->dumper->addRoutes($collection);
-    $this->dumper->dump();
+    $this->storage->dump($collection);
 
     $this->lock->release('router_rebuild');
     $this->dispatcher->dispatch(new Event(), RoutingEvents::FINISHED);

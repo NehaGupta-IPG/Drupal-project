@@ -10,19 +10,18 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Discovery\YamlDiscovery;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Lock\LockBackendInterface;
-use Drupal\Core\Routing\MatcherDumperInterface;
 use Drupal\Core\Routing\RouteBuilder;
 use Drupal\Core\Routing\RouteBuildEvent;
 use Drupal\Core\Routing\RouteCompiler;
+use Drupal\Core\Routing\RouteStorage\CompiledRouterData;
+use Drupal\Core\Routing\RouteStorage\RouteStorageInterface;
 use Drupal\Core\Routing\RoutingEvents;
 use Drupal\Core\Routing\YamlRouteDiscovery;
 use Drupal\Tests\UnitTestCase;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Route;
@@ -43,9 +42,9 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
   protected $routeBuilder;
 
   /**
-   * The matcher dumper.
+   * The route storage.
    */
-  protected MatcherDumperInterface&Stub $dumper;
+  protected RouteStorageInterface&Stub $storage;
 
   /**
    * The mocked lock backend.
@@ -100,7 +99,9 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
   protected function setUp(): void {
     parent::setUp();
 
-    $this->dumper = $this->createStub(MatcherDumperInterface::class);
+    $this->storage = $this->createStub(RouteStorageInterface::class);
+    $this->storage->method('dump')
+      ->willReturn(CompiledRouterData::fromCollection(new RouteCollection()));
     $this->lock = $this->createMock('Drupal\Core\Lock\LockBackendInterface');
     $this->dispatcher = new EventDispatcher();
     $this->moduleHandler = $this->createStub(ModuleHandlerInterface::class);
@@ -115,16 +116,16 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
 
     $this->dispatcher->addSubscriber($this);
     $this->dispatcher->addSubscriber($yamlRouteDiscovery);
-    $this->routeBuilder = new RouteBuilder($this->dumper, $this->lock, $this->dispatcher, $this->checkProvider);
+    $this->routeBuilder = new RouteBuilder($this->storage, $this->lock, $this->dispatcher, $this->checkProvider);
   }
 
   /**
-   * Reinitializes the matcher dumper as a mock object.
+   * Reinitializes the route storage as a mock object with strict expectations.
    */
-  protected function setUpMockMatcherDumper(): void {
-    $this->dumper = $this->createMock(MatcherDumperInterface::class);
-    $reflection = new \ReflectionProperty($this->routeBuilder, 'dumper');
-    $reflection->setValue($this->routeBuilder, $this->dumper);
+  protected function setUpMockStorage(): void {
+    $this->storage = $this->createMock(RouteStorageInterface::class);
+    $reflection = new \ReflectionProperty($this->routeBuilder, 'storage');
+    $reflection->setValue($this->routeBuilder, $this->storage);
   }
 
   /**
@@ -190,7 +191,7 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
    */
   public function testRebuildWithStaticModuleRoutes(): void {
     $this->setUpMockCheckProvider();
-    $this->setUpMockMatcherDumper();
+    $this->setUpMockStorage();
 
     $this->lock->expects($this->once())
       ->method('acquire')
@@ -215,13 +216,11 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
       ->method('setChecks')
       ->with($route_collection);
 
-    // Ensure that the routes are set to the dumper and dumped.
-    $this->dumper->expects($this->once())
-      ->method('addRoutes')
-      ->with($route_collection);
-    $this->dumper->expects($this->once())
+    // Ensure that the final collection is handed to the storage.
+    $this->storage->expects($this->once())
       ->method('dump')
-      ->with();
+      ->with($route_collection)
+      ->willReturn(CompiledRouterData::fromCollection($route_collection));
 
     $this->assertTrue($this->routeBuilder->rebuild());
     $this->assertTrue($this->dynamicFired);
@@ -235,7 +234,7 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
    */
   public function testRebuildWithProviderBasedRoutes(): void {
     $this->setUpMockCheckProvider();
-    $this->setUpMockMatcherDumper();
+    $this->setUpMockStorage();
 
     $this->lock->expects($this->once())
       ->method('acquire')
@@ -281,12 +280,11 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
       ->method('setChecks')
       ->with($route_collection_filled);
 
-    // Ensure that the routes are set to the dumper and dumped.
-    $this->dumper->expects($this->once())
-      ->method('addRoutes')
-      ->with($route_collection_filled);
-    $this->dumper->expects($this->once())
-      ->method('dump');
+    // Ensure that the final collection is handed to the storage.
+    $this->storage->expects($this->once())
+      ->method('dump')
+      ->with($route_collection_filled)
+      ->willReturn(CompiledRouterData::fromCollection($route_collection_filled));
 
     $this->assertTrue($this->routeBuilder->rebuild());
     $this->assertTrue($this->dynamicFired);
@@ -364,13 +362,6 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
     $this->assertTrue($this->routeBuilder->rebuild());
     $this->assertTrue($this->dynamicFired);
     $this->assertTrue($this->alterFired);
-  }
-
-  #[IgnoreDeprecations]
-  #[AllowMockObjectsWithoutExpectations]
-  public function testDeprecatedConstructorArgs(): void {
-    $this->expectUserDeprecationMessage('Calling Drupal\Core\Routing\RouteBuilder::__construct() with the module handler and controller resolver services is deprecated in drupal:11.4.0 and will be removed in drupal:12.0.0. See https://www.drupal.org/node/3324751');
-    new RouteBuilder($this->dumper, $this->lock, $this->dispatcher, $this->moduleHandler, $this->controllerResolver, $this->checkProvider);
   }
 
   public function onRouteDynamic(RouteBuildEvent $event): void {

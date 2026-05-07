@@ -44,6 +44,8 @@ class ThemeInstallerTest extends KernelTestBase {
     // rebuild and dump routes.
     $container
       ->register('router.dumper', 'Drupal\Core\Routing\NullMatcherDumper');
+    $container
+      ->register('route_storage', 'Drupal\Core\Routing\RouteStorage\NullRouteStorage');
   }
 
   /**

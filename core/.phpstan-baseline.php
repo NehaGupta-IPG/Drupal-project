@@ -4022,18 +4022,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/DrupalKernel.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$container might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 2,
-	'path' => __DIR__ . '/lib/Drupal/Core/DrupalKernel.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$container_definition might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/DrupalKernel.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\DrupalKernelInterface\\:\\:invalidateContainer\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -33934,12 +33922,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/KernelTestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\KernelTests\\\\RouteProvider\\:\\:getCandidateOutlines\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/RouteProvider.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\KernelTests\\\\RouteProvider\\:\\:preLoadRoutes\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -33947,12 +33929,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\KernelTests\\\\RouteProvider\\:\\:reset\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/RouteProvider.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\KernelTests\\\\RouteProvider\\:\\:routeProviderRouteCompare\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/RouteProvider.php',
