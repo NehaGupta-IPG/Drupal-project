@@ -343,8 +343,8 @@ class FormPreprocess {
     $variables['error_id'] = NULL;
     if (!empty($element['#errors']) && empty($element['#error_no_message'])) {
       $variables['errors'] = $element['#errors'];
-      if (!empty($element['#attributes']['id'])) {
-        $variables['error_id'] = $element['#attributes']['id'] . '--error-message';
+      if (!empty($element['#id'])) {
+        $variables['error_id'] = $element['#id'] . '--error-message';
       }
     }
   }

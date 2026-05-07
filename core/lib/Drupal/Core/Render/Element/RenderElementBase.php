@@ -148,13 +148,15 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
     }
     if (isset($element['#parents']) && isset($element['#errors']) && !empty($element['#validated'])) {
       $element['#attributes']['class'][] = 'error';
-      $element['#attributes']['aria-invalid'] = 'true';
-      if (isset($element['#id']) && empty($element['#error_no_message'])) {
-        $error_id = $element['#error_id'] ?? ($element['#id'] . '--error-message');
-        $element['#attributes']['aria-errormessage'] = $error_id;
-        $existing = $element['#attributes']['aria-describedby'] ?? '';
-        if (!str_contains($existing, $error_id)) {
-          $element['#attributes']['aria-describedby'] = trim($existing . ' ' . $error_id);
+      if (empty($element['#error_no_message'])) {
+        $element['#attributes']['aria-invalid'] = 'true';
+        if (isset($element['#id'])) {
+          $error_id = $element['#error_id'] ?? ($element['#id'] . '--error-message');
+          $element['#attributes']['aria-errormessage'] = $error_id;
+          $existing = $element['#attributes']['aria-describedby'] ?? '';
+          if (!str_contains($existing, $error_id)) {
+            $element['#attributes']['aria-describedby'] = trim($existing . ' ' . $error_id);
+          }
         }
       }
     }
