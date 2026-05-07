@@ -268,8 +268,10 @@ try {
     foreach ($contents['skips'] as $key => $count) {
       $tmp[$key] = isset($tmp[$key]) ? $tmp[$key] + $count : $count;
     }
-    foreach ($contents['tests'] as $key => $count) {
-      $tmp_test[$key] = $count;
+    foreach ($contents['tests'] as $testId => $data) {
+      if ($data['ignoreDeprecations'] || isset($data['reported'])) {
+        $tmp_test[$testId] = $data;
+      }
     }
   }
 

@@ -248,7 +248,9 @@ final class DeprecationHandler implements Extension {
         $stats['skips'][$stat['ignore-pattern']] = isset($stats['skips'][$stat['ignore-pattern']]) ? $stats['skips'][$stat['ignore-pattern']] + 1 : 1;
       }
       if ($stat['status'] === 'test_stats') {
-        $stats['tests'][$stat['test']] = $stat['ignoredByPhpunit'];
+        $testId = $stat['testId'];
+        unset($stat['testId'], $stat['status']);
+        $stats['tests'][$testId] = $stat;
       }
     }
     // @todo echo "\n********\n";.
@@ -306,7 +308,7 @@ final class DeprecationHandler implements Extension {
         if (Configuration::collectStatsEnabled()) {
           $stat = [];
           if ($testMethod !== NULL) {
-            $stat['test'] = $testMethod;
+            $stat['testId'] = $testMethod;
           }
           $stat['message'] = $deprecationMessage;
           $stat['ignore-pattern'] = $pattern;
@@ -387,20 +389,19 @@ final class DeprecationHandler implements Extension {
 
   public function testFinished(): void {
     assert(Configuration::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
-
-    if (self::$currentTest['testIgnoresDeprecations']) {
-      $stat = [];
-      $stat['test'] = self::$currentTest['testId'];
-      $stat['ignoreDeprecations'] = self::$currentTest['testIgnoresDeprecations'];
-      if (isset(self::$currentTest['ignored_by_project'])) {
-        $stat['ignoredByProject'] = count(self::$currentTest['ignored_by_project']);
-      }
-      $stat['ignoredByPhpunit'] = isset(self::$currentTest['ignored_by_phpunit']) ? count(self::$currentTest['ignored_by_phpunit']) : 0;
-      if (isset(self::$currentTest['reported'])) {
-        $stat['reported'] = count(self::$currentTest['reported']);
-      }
-      $this->writeStatisticEntry('test_stats', $stat);
+    $stat = [];
+    $stat['testId'] = self::$currentTest['testId'];
+    $stat['ignoreDeprecations'] = self::$currentTest['testIgnoresDeprecations'];
+    if (isset(self::$currentTest['ignored_by_project'])) {
+      $stat['ignoredByProject'] = self::$currentTest['ignored_by_project'];
     }
+    if (isset(self::$currentTest['ignored_by_phpunit'])) {
+      $stat['ignoredByPhpunit'] = self::$currentTest['ignored_by_phpunit'];
+    }
+    if (isset(self::$currentTest['reported'])) {
+      $stat['reported'] = self::$currentTest['reported'];
+    }
+    $this->writeStatisticEntry('test_stats', $stat);
     self::$currentTest = [];
   }
 
