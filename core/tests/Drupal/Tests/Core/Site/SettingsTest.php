@@ -117,7 +117,7 @@ class SettingsTest extends UnitTestCase {
   /**
    * Ensures settings cannot be serialized.
    *
-   * @legacy-covers ::__sleep
+   * @legacy-covers ::__serialize
    */
   public function testSerialize(): void {
     $this->expectException(\LogicException::class);

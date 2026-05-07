@@ -53,7 +53,7 @@ class DependencyTest extends UnitTestCase {
   /**
    * Ensures that constraint objects are not serialized.
    *
-   * @legacy-covers ::__sleep
+   * @legacy-covers ::__serialize
    */
   public function testSerialization(): void {
     $dependency = new Dependency('paragraphs_demo', 'paragraphs', '>8.x-1.1');

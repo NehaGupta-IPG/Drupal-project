@@ -281,6 +281,6 @@ class PagerPluginBaseTest extends UnitTestCase {
  *
  * As StatementInterface extends \Traversable, which though always needs
  * an additional interface. The Statement class itself can't be mocked because
- * of its __wakeup function.
+ * of its __unserialize function.
  */
 interface TestStatementInterface extends StatementInterface, \Iterator {}

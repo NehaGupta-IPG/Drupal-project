@@ -354,8 +354,8 @@ class ContentEntityCloneTest extends EntityKernelTestBase {
       // assertion fails and the property for some reasons contains the entity
       // object e.g. the "typedData" property then the property will be
       // serialized, but this will cause exceptions because the entity is
-      // modified in a non-consistent way and ContentEntityBase::__sleep() will
-      // not be able to properly access all properties and this will cause
+      // modified in a non-consistent way and ContentEntityBase::__serialize()
+      // will not be able to properly access all properties and this will cause
       // exceptions without a proper backtrace.
       if (in_array($property->getName(), $translation_unique_properties)) {
         $this->assertEquals('default-value', $property->getValue($entity), "Entity property $property_name is not cloned properly.");

@@ -227,7 +227,7 @@ class ExtensionAvailableConstraintValidator extends ConstraintValidator implemen
 
     // @see \Drupal\Core\CoreServiceProvider::registerTest()
     $in_functional_test = drupal_valid_test_ua();
-    // @see \Drupal\Core\DependencyInjection\DependencySerializationTrait::__wakeup()
+    // @see \Drupal\Core\DependencyInjection\DependencySerializationTrait::__unserialize()
     $in_kernel_test = isset($GLOBALS['__PHPUNIT_BOOTSTRAP']);
     // @see \Drupal\BuildTests\Framework\BuildTestBase::setUp()
     $in_build_test = str_contains(__FILE__, DrupalFilesystem::getOsTemporaryDirectory() . '/build_workspace_');

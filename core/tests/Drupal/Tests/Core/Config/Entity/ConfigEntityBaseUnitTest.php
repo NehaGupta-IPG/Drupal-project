@@ -611,11 +611,11 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
   }
 
   /**
-   * Tests sleep with plugin collections.
+   * Tests serialize with plugin collections.
    *
-   * @legacy-covers ::__sleep
+   * @legacy-covers ::__serialize
    */
-  public function testSleepWithPluginCollections(): void {
+  public function testSerializeWithPluginCollections(): void {
     $instance_id = 'the_instance_id';
     $instance = new TestConfigurablePlugin([], $instance_id, []);
 
