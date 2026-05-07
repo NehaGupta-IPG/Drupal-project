@@ -514,8 +514,8 @@ default:
   parallel: 4
   variables:
     TESTSUITE: kernel
-    KUBERNETES_CPU_REQUEST: "10"
-    CONCURRENCY: "20"
+    KUBERNETES_CPU_REQUEST: "12"
+    CONCURRENCY: "24"
     DRUPAL_TEST_CONTEXT_KEYS: "php-version,phpunit-testsuite,database-driver,database-version"
   services:
     - <<: *with-database
