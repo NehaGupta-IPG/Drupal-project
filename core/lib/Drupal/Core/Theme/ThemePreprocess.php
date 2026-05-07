@@ -434,6 +434,9 @@ class ThemePreprocess {
     // Create the $content variable that templates expect.
     $variables['content'] = $variables['elements']['#children'];
     $variables['region'] = $variables['elements']['#region'];
+    $variables['attributes'] = [
+      'data-filter-empty-region' => TRUE,
+    ];
   }
 
   /**
