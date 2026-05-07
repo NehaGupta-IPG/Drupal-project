@@ -177,4 +177,13 @@ class OliveroTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('Community carpentry');
   }
 
+  /**
+   * Tests region with an empty lazily built block is completely empty.
+   */
+  public function testEmptyRegion(): void {
+    $this->drupalGet('');
+    $element = $this->assertSession()->elementExists('css', '.region--breadcrumb');
+    $this->assertSame('', $element->getHtml());
+  }
+
 }

@@ -159,6 +159,21 @@ class ThemeTest extends BrowserTestBase {
   }
 
   /**
+   * Tests region with an empty lazily built block is completely empty.
+   */
+  public function testEmptyRegion(): void {
+    \Drupal::service('module_installer')->install(['block']);
+
+    // Place a block that is lazy loaded.
+    $this->drupalPlaceBlock('system_breadcrumb_block', [
+      'region' => 'sidebar_first',
+    ]);
+    $this->drupalGet('');
+    $element = $this->assertSession()->elementExists('css', '.region-sidebar-first');
+    $this->assertSame('', $element->getHtml());
+  }
+
+  /**
    * Ensures suggestion preprocess functions run for default implementations.
    *
    * The theme hook used by this test has its base preprocess function in a
