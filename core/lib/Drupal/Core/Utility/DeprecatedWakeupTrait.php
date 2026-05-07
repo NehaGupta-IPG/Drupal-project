@@ -80,4 +80,28 @@ trait DeprecatedWakeupTrait {
     return FALSE;
   }
 
+  /**
+   * Normalizes serialized property keys for backward compatibility.
+   *
+   * @param mixed $key
+   *   Serialized key.
+   *
+   * @return string|null
+   *   Normalized property name, or NULL when key cannot map to a property.
+   */
+  protected function normalizeSerializedKey(mixed $key): ?string {
+    if (!is_string($key)) {
+      return NULL;
+    }
+    // Legacy serialized payloads may contain mangled protected/private keys:
+    // "\0*\0property" or "\0Class\0property".
+    if ($key !== '' && $key[0] === "\0") {
+      $pos = strrpos($key, "\0");
+      if ($pos !== FALSE) {
+        return substr($key, $pos + 1);
+      }
+    }
+    return $key;
+  }
+
 }
