@@ -61,7 +61,7 @@ foreach ($files as $file) {
   }
   foreach ($contents['tests'] as $testId => $data) {
     if ($data['ignoreDeprecations']) {
-      $tmp_test[$testId] = count($data['ignoredByPhpunit']);
+      $tmp_test[$testId] = isset($data['ignoredByPhpunit']) ? count($data['ignoredByPhpunit']) : 0;
     }
     $tmp_deprecation[] = $data;
   }
