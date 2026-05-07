@@ -233,12 +233,13 @@ class FormTest extends BrowserTestBase {
       // Ensure errors are wrapped with an ID that can be referenced by aria-errormessages
       $error_id = $form[$key]['#id'] . '--error-message';
       $session->elementExists('css', '.messages--error #' . $error_id);
-      // Make sure form element references error.
+      // Make sure form element references error. For composite elements
+      // (checkboxes, radios), aria-errormessage is on the fieldset wrapper,
+      // not on individual child inputs.
       $type = match ($form[$key]['#type']) {
         'textfield' => 'input',
-        'checkboxes' => 'checkbox',
+        'checkboxes', 'radios' => 'fieldset',
         'select' => 'select',
-        'radios' => 'radio',
       };
       $session->elementExists('css', $type . '[aria-errormessage=' . $error_id . ']');
     }
