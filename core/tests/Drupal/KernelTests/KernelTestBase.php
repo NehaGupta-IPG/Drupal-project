@@ -1010,7 +1010,7 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
    *
    * @see vendor/phpunit/phpunit/src/Util/PHP/Template/TestCaseMethod.tpl.dist
    */
-  public function __sleep(): array {
+  public function __serialize(): array {
     return [];
   }
 

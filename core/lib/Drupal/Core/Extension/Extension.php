@@ -2,6 +2,9 @@
 
 namespace Drupal\Core\Extension;
 
+use Drupal\Core\Utility\DeprecatedSleepTrait;
+use Drupal\Core\Utility\DeprecatedWakeupTrait;
+
 /**
  * Defines an extension (file) object.
  *
@@ -12,6 +15,9 @@ namespace Drupal\Core\Extension;
  */
 #[\AllowDynamicProperties]
 class Extension {
+
+  use DeprecatedSleepTrait;
+  use DeprecatedWakeupTrait;
 
   /**
    * The type of the extension (e.g., 'module').
@@ -181,25 +187,25 @@ class Extension {
   }
 
   /**
-   * Magic method implementation to serialize the extension object.
-   *
-   * @return array
-   *   The names of all variables that should be serialized.
+   * {@inheritdoc}
    */
-  public function __sleep(): array {
+  protected function doSerialize(): array {
     // @todo \Drupal\Core\Extension\ThemeExtensionList is adding custom
     //   properties to the Extension object.
     $properties = get_object_vars($this);
     // Don't serialize the app root, since this could change if the install is
     // moved. Don't serialize splFileInfo because it can not be.
     unset($properties['splFileInfo'], $properties['root']);
-    return array_keys($properties);
+    return $properties;
   }
 
   /**
-   * Magic method implementation to unserialize the extension object.
+   * {@inheritdoc}
    */
-  public function __wakeup(): void {
+  protected function doUnserialize(array $vars): void {
+    foreach ($vars as $property => $value) {
+      $this->$property = $value;
+    }
     // Get the app root from the container. While compiling the container we
     // have to discover all the extension service files in
     // \Drupal\Core\DrupalKernel::initializeServiceProviders(). This results in

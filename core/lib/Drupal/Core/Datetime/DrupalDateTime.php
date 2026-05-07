@@ -26,6 +26,7 @@ class DrupalDateTime extends DateTimePlus {
   use StringTranslationTrait;
   use DependencySerializationTrait {
     __sleep as defaultSleep;
+    doSerialize as defaultDoSerialize;
   }
 
   /**
@@ -182,8 +183,10 @@ class DrupalDateTime extends DateTimePlus {
   /**
    * {@inheritdoc}
    */
-  public function __sleep(): array {
-    return array_diff($this->defaultSleep(), ['formatTranslationCache']);
+  public function doSerialize(): array {
+    $vars = $this->defaultDoSerialize();
+    unset($vars['formatTranslationCache']);
+    return $vars;
   }
 
 }

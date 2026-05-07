@@ -3,11 +3,14 @@
 namespace Drupal\Core\Extension;
 
 use Drupal\Component\Version\Constraint;
+use Drupal\Core\Utility\DeprecatedSleepTrait;
 
 /**
  * A value object representing dependency information.
  */
 class Dependency {
+
+  use DeprecatedSleepTrait;
 
   /**
    * The name of the dependency.
@@ -136,13 +139,15 @@ class Dependency {
   }
 
   /**
-   * Prevents unnecessary serialization of constraint objects.
-   *
-   * @return array
-   *   The properties to serialize.
+   * {@inheritdoc}
    */
-  public function __sleep(): array {
-    return ['name', 'project', 'constraintString'];
+  protected function doSerialize(): array {
+    // Prevents unnecessary serialization of constraint objects.
+    return [
+      'name' => $this->name,
+      'project' => $this->project,
+      'constraintString' => $this->constraintString,
+    ];
   }
 
 }

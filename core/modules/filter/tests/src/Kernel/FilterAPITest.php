@@ -521,13 +521,13 @@ class FilterAPITest extends EntityKernelTestBase {
   /**
    * Tests that format entities are serialized without their plugin collection.
    */
-  public function testSleep(): void {
+  public function testSerialize(): void {
     $filter_format = FilterFormat::load('filtered_html');
 
     $this->assertNull($filter_format->get('filterCollection'));
-    $vars = $filter_format->__sleep();
-    $this->assertContains('filters', $vars);
-    $this->assertNotContains('filterCollection', $vars);
+    $vars = $filter_format->__serialize();
+    $this->assertArrayHasKey('filters', $vars);
+    $this->assertArrayNotHasKey('filterCollection', $vars);
   }
 
 }

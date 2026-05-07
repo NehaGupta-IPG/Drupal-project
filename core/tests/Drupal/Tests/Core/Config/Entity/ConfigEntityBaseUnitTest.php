@@ -647,9 +647,9 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
     $this->assertSame($expected_plugin_config, $entity->get('the_plugin_collection_config'));
 
     // Ensure the plugin collection and manager is not stored.
-    $vars = $entity->__sleep();
-    $this->assertNotContains('pluginCollection', $vars);
-    $this->assertNotContains('pluginManager', $vars);
+    $vars = $entity->__serialize();
+    $this->assertArrayNotHasKey('pluginCollection', $vars);
+    $this->assertArrayNotHasKey('pluginManager', $vars);
     $this->assertSame(['pluginManager' => 'plugin.manager.foo'], $entity->get('_serviceIds'));
 
     $expected_plugin_config = [$instance_id => ['id' => $instance_id, 'foo' => 'new_value']];

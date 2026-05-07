@@ -356,29 +356,25 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
   /**
    * {@inheritdoc}
    */
-  public function __sleep(): array {
-    $keys_to_unset = [];
-    if ($this instanceof EntityWithPluginCollectionInterface) {
-      // Get the plugin collections first, so that the properties are
-      // initialized in $vars and can be found later.
-      $plugin_collections = $this->getPluginCollections();
-      $vars = get_object_vars($this);
-      foreach ($plugin_collections as $plugin_config_key => $plugin_collection) {
-        // Save any changes to the plugin configuration to the entity.
-        $this->set($plugin_config_key, $plugin_collection->getConfiguration());
-        // If the plugin collections are stored as properties on the entity,
-        // mark them to be unset.
-        $keys_to_unset += array_filter($vars, function ($value) use ($plugin_collection) {
-          return $plugin_collection === $value;
-        });
-      }
+  protected function doSerialize(): array {
+    if (!$this instanceof EntityWithPluginCollectionInterface) {
+      return parent::doSerialize();
     }
 
-    $vars = parent::__sleep();
-
-    if (!empty($keys_to_unset)) {
-      $vars = array_diff($vars, array_keys($keys_to_unset));
+    // Get the plugin collections first, so that the properties are
+    // initialized in $vars and can be found later.
+    $plugin_collections = $this->getPluginCollections();
+    $vars = parent::doSerialize();
+    foreach ($plugin_collections as $plugin_config_key => $plugin_collection) {
+      // Store any changes to the plugin configuration.
+      $configuration = $plugin_collection->getConfiguration();
+      $this->set($plugin_config_key, $configuration);
+      $vars[$plugin_config_key] = $configuration;
+      // If the plugin collections are stored as properties on the entity,
+      // mark them to be unset.
+      $vars = array_filter($vars, fn ($value) => $plugin_collection !== $value);
     }
+
     return $vars;
   }
 

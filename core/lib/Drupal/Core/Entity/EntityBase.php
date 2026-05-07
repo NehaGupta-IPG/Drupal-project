@@ -24,6 +24,7 @@ abstract class EntityBase implements EntityInterface {
 
   use DependencySerializationTrait {
     __sleep as traitSleep;
+    doSerialize as traitDoSerialize;
   }
 
   /**
@@ -670,9 +671,9 @@ abstract class EntityBase implements EntityInterface {
   /**
    * {@inheritdoc}
    */
-  public function __sleep(): array {
+  protected function doSerialize(): array {
     $this->typedData = NULL;
-    return $this->traitSleep();
+    return $this->traitDoSerialize();
   }
 
   /**

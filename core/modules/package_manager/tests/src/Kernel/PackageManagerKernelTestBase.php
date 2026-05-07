@@ -466,7 +466,7 @@ class TestSandboxManager extends SandboxManagerBase {
    *
    * @see https://www.drupal.org/node/3312619#comment-14801308
    */
-  public function __sleep(): array {
+  public function __serialize(): array {
     return [];
   }
 

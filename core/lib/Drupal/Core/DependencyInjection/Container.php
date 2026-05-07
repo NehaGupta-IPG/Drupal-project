@@ -3,18 +3,21 @@
 namespace Drupal\Core\DependencyInjection;
 
 use Drupal\Component\DependencyInjection\Container as DrupalContainer;
+use Drupal\Core\Utility\DeprecatedSleepTrait;
 
 /**
  * Extends the container to prevent serialization.
  */
 class Container extends DrupalContainer {
 
+  use DeprecatedSleepTrait;
+
   /**
    * {@inheritdoc}
    */
-  public function __sleep(): array {
+  protected function doSerialize(): array {
     assert(FALSE, 'The container was serialized.');
-    return array_keys(get_object_vars($this));
+    return get_object_vars($this);
   }
 
 }

@@ -4,6 +4,8 @@ namespace Drupal\Core\Database\Query;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Utility\DeprecatedSleepTrait;
+use Drupal\Core\Utility\DeprecatedWakeupTrait;
 
 /**
  * Base class for query builders.
@@ -12,6 +14,9 @@ use Drupal\Core\Database\Connection;
  * query object into a prepared statement.
  */
 abstract class Query implements PlaceholderInterface {
+
+  use DeprecatedSleepTrait;
+  use DeprecatedWakeupTrait;
 
   /**
    * The connection object on which to run this query.
@@ -81,18 +86,21 @@ abstract class Query implements PlaceholderInterface {
   }
 
   /**
-   * Implements the magic __sleep function to disconnect from the database.
+   * {@inheritdoc}
    */
-  public function __sleep(): array {
+  protected function doSerialize(): array {
     $keys = get_object_vars($this);
     unset($keys['connection']);
-    return array_keys($keys);
+    return $keys;
   }
 
   /**
-   * Implements the magic __wakeup function to reconnect to the database.
+   * {@inheritdoc}
    */
-  public function __wakeup(): void {
+  protected function doUnserialize(array $vars): void {
+    foreach ($vars as $property => $value) {
+      $this->$property = $value;
+    }
     $this->connection = Database::getConnection($this->connectionTarget, $this->connectionKey);
   }
 
