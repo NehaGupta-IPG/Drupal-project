@@ -59,6 +59,12 @@ class ClaroTest extends BrowserTestBase {
 
     $this->drupalGet('admin/modules');
     $this->assertSession()->elementExists('css', '#block-claro-help');
+    $element = $this->assertSession()->elementExists('css', '.region-help');
+    $this->assertNotSame('', $element->getHtml());
+
+    $this->drupalGet('admin');
+    $element = $this->assertSession()->elementExists('css', '.region-help');
+    $this->assertSame('', $element->getHtml());
   }
 
   /**
