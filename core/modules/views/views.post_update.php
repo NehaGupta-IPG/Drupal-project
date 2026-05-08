@@ -60,6 +60,13 @@ function views_removed_post_updates(): array {
 }
 
 /**
+ * Clear cache to apply non-sortable counter field change.
+ */
+function views_post_update_counter_field_not_sortable(): void {
+  // Empty update to trigger a cache rebuild so updated Views data is applied.
+}
+
+/**
  * Adds a default config value for 'not' on string-based arguments.
  *
  * This config appears in the user interface as 'exclude'.

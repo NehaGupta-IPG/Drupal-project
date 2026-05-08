@@ -473,13 +473,6 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
   /**
    * {@inheritdoc}
    */
-  public function getOriginalClass() {
-    return $this->originalClass ?: $this->class;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getDecoratedClasses(): array {
     return $this->decoratedClasses;
   }
