@@ -39,6 +39,13 @@ trait HttpKernelUiHelperTrait {
   protected ?Mink $mink;
 
   /**
+   * The current raw content.
+   *
+   * @var string
+   */
+  protected $content;
+
+  /**
    * Retrieves a Drupal path.
    *
    * Requests are sent to the HTTP kernel.
@@ -92,11 +99,8 @@ trait HttpKernelUiHelperTrait {
       $this->htmlOutput($html_output);
     }
 
-    // If $this->content exists, set it for the benefit of all the methods in
-    // \Drupal\KernelTests\AssertContentTrait.
-    if (property_exists($this, 'content')) {
-      $this->content = $out;
-    }
+    // Set the content for use with \Drupal\KernelTests\AssertContentTrait.
+    $this->content = $out;
 
     return $out;
   }
