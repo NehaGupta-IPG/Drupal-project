@@ -15,6 +15,9 @@ use Symfony\Component\HttpKernel\HttpKernelBrowser;
 /**
  * Provides UI helper methods using the HTTP kernel to make requests.
  *
+ * Assertions and helpers from Drupal\KernelTests\AssertContentTrait can be
+ * used.
+ *
  * This is for use by Kernel tests, with the following limitations:
  * - There is no logged in user. Use \Drupal\Tests\user\Traits\UserCreationTrait
  *   to set a current user.
