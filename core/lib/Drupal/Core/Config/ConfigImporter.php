@@ -1179,10 +1179,10 @@ class ConfigImporter {
         // the old container and passes them to the new one. So __serialize()
         // will recognize the old services and then __unserialize() will restore
         // them from the new container.
-        $vars = $this->__serialize();
-        $this->__unserialize($vars);
-        $vars = $this->storageComparer->__serialize();
-        $this->storageComparer->__unserialize($vars);
+        $data = $this->__serialize();
+        $this->__unserialize($data);
+        $comparer_data = $this->storageComparer->__serialize();
+        $this->storageComparer->__unserialize($comparer_data);
       }
     }
   }

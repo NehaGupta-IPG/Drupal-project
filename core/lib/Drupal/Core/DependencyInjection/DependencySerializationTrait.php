@@ -76,20 +76,14 @@ trait DependencySerializationTrait {
   /**
    * {@inheritdoc}
    */
-  protected function doUnserialize(array $vars): void {
-    $service_ids = $vars['_serviceIds'] ?? [];
-    unset($vars['_serviceIds']);
+  protected function doUnserialize(array $data): void {
+    $service_ids = $data['_serviceIds'] ?? [];
+    unset($data['_serviceIds']);
     $this->_serviceIds = [];
-    $entity_storages = $vars['_entityStorages'] ?? [];
-    unset($vars['_entityStorages']);
+    $entity_storages = $data['_entityStorages'] ?? [];
+    unset($data['_entityStorages']);
     $this->_entityStorages = [];
-    foreach ($vars as $property => $value) {
-      $normalized = $this->normalizeSerializedKey($property);
-      if ($normalized === NULL) {
-        continue;
-      }
-      $this->$normalized = $value;
-    }
+    $this->populateProperties($data);
     // Avoid trying to repopulate from container if there's nothing to do.
     if (empty($service_ids) && empty($entity_storages)) {
       return;

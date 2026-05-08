@@ -2552,10 +2552,8 @@ class ViewExecutable {
   /**
    * {@inheritdoc}
    */
-  public function doUnserialize(array $vars): void {
-    foreach ($vars as $property => $value) {
-      $this->$property = $value;
-    }
+  public function doUnserialize(array $data): void {
+    $this->populateProperties($data);
     $reflection = new \ReflectionClass($this);
     $defaults = $reflection->getDefaultProperties();
     foreach ($reflection->getProperties() as $property) {

@@ -26,7 +26,7 @@ trait DeprecatedWakeupTrait {
   /**
    * {@inheritdoc}
    */
-  public function __unserialize(array $vars): void {
+  public function __unserialize(array $data): void {
     if ($this->overridesWakeup()) {
       // If an extending class its own __wakeup() method, make sure it gets
       // called, otherwise PHP will ignore __wakeup() in any class that has
@@ -37,7 +37,7 @@ trait DeprecatedWakeupTrait {
       return;
     }
 
-    $this->doUnserialize($vars);
+    $this->doUnserialize($data);
   }
 
   /**
@@ -55,10 +55,10 @@ trait DeprecatedWakeupTrait {
   /**
    * Helper that repopulates class properties from container on unserialize.
    *
-   * @param array<string, mixed> $vars
+   * @param array<string, mixed> $data
    *   Key-value map as expected to be returned from __serialize().
    */
-  abstract protected function doUnserialize(array $vars): void;
+  abstract protected function doUnserialize(array $data): void;
 
   /**
    * Checks whether a class using this trait overrides __wakeup().
@@ -78,6 +78,23 @@ trait DeprecatedWakeupTrait {
       // Do nothing on invalid methods.
     }
     return FALSE;
+  }
+
+  /**
+   * Populate class properties from values passed in during unserialization.
+   *
+   * @param array<string, mixed> $data
+   *   Array of key/value pairs that represent the serialized form of the object
+   *   as passed to __unserialize().
+   */
+  protected function populateProperties(array $data): void {
+    foreach ($data as $property => $value) {
+      $normalized = $this->normalizeSerializedKey($property);
+      if ($normalized === NULL) {
+        continue;
+      }
+      $this->$normalized = $value;
+    }
   }
 
   /**

@@ -97,10 +97,8 @@ abstract class Query implements PlaceholderInterface {
   /**
    * {@inheritdoc}
    */
-  protected function doUnserialize(array $vars): void {
-    foreach ($vars as $property => $value) {
-      $this->$property = $value;
-    }
+  protected function doUnserialize(array $data): void {
+    $this->populateProperties($data);
     $this->connection = Database::getConnection($this->connectionTarget, $this->connectionKey);
   }
 

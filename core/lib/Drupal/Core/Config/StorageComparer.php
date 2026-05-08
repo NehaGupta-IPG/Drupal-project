@@ -521,8 +521,8 @@ class StorageComparer implements StorageComparerInterface {
   /**
    * {@inheritdoc}
    */
-  protected function doUnserialize(array $vars): void {
-    $this->defaultDoUnserialize($vars);
+  protected function doUnserialize(array $data): void {
+    $this->defaultDoUnserialize($data);
     $this->targetStorages = [];
     $this->targetCacheStorage->deleteAll();
   }

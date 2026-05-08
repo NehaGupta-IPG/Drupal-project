@@ -575,10 +575,10 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
   /**
    * {@inheritdoc}
    */
-  protected function doUnserialize(array $vars): void {
+  protected function doUnserialize(array $data): void {
     // Run those values through the __construct(), as if they came from a
     // regular entity load.
-    $this->__construct($vars, $vars['entityTypeId']);
+    $this->__construct($data, $data['entityTypeId']);
   }
 
   /**

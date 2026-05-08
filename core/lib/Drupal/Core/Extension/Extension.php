@@ -202,10 +202,8 @@ class Extension {
   /**
    * {@inheritdoc}
    */
-  protected function doUnserialize(array $vars): void {
-    foreach ($vars as $property => $value) {
-      $this->$property = $value;
-    }
+  protected function doUnserialize(array $data): void {
+    $this->populateProperties($data);
     // Get the app root from the container. While compiling the container we
     // have to discover all the extension service files in
     // \Drupal\Core\DrupalKernel::initializeServiceProviders(). This results in

@@ -442,8 +442,8 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
   /**
    * {@inheritdoc}
    */
-  protected function doUnserialize(array $vars): void {
-    parent::doUnserialize($vars);
+  protected function doUnserialize(array $data): void {
+    parent::doUnserialize($data);
     // Initialize static caches.
     $this->ancestors = [];
     $this->treeChildren = [];
