@@ -731,7 +731,7 @@ class EntityFieldManager implements EntityFieldManagerInterface, PreWarmableInte
   }
 
   /**
-   * {@inheritdoc}.
+   * {@inheritdoc}
    */
   public function getFieldBundles(string $entity_type, string $field_name): array {
     $bundles = [];

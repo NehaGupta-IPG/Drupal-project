@@ -150,9 +150,8 @@ interface EntityFieldManagerInterface {
    *
    * @return string[]
    *   An array of bundle names on which the field appears.
-   *
    */
-  public function getFieldLabels(string $entity_type, string $field_name): array;
+  public function getFieldBundles(string $entity_type, string $field_name): array;
 
   /**
    * Returns the labels used for a field on an entity type.
