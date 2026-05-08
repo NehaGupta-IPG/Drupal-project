@@ -3,6 +3,7 @@
 namespace Drupal\menu_linkset\Routing;
 
 use Drupal\Core\Routing\RouteSubscriberBase;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -26,7 +27,10 @@ class MenuLinksetRoutes extends RouteSubscriberBase {
    * @param string[] $authenticationProviders
    *   An array of authentication providers, keyed by ID.
    */
-  public function __construct(array $authenticationProviders) {
+  public function __construct(
+    #[Autowire(param: 'authentication_providers')]
+    array $authenticationProviders,
+  ) {
     $this->providerIds = array_keys($authenticationProviders);
   }
 
