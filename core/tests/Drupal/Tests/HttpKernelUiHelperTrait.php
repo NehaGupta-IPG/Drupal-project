@@ -25,8 +25,9 @@ use Symfony\Component\HttpKernel\HttpKernelBrowser;
  *   theme and then set it as active.
  * - Session semantics differ from normal page requests. Do not rely on session
  *   state beyond its existence (no persistence or regeneration).
- * - Page caching modules will not work. See \Drupal\Tests\Traits\Core\Cache\PageCachePolicyTrait
- *   for how to set them up.
+ * - Page caching modules will not work. See
+ *   \Drupal\Tests\Traits\Core\Cache\PageCachePolicyTrait for how to set them
+ *   up.
  */
 trait HttpKernelUiHelperTrait {
 
