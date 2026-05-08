@@ -89,10 +89,9 @@ final class Importer implements LoggerAwareInterface {
     try {
       /** @var array{_meta: array<mixed>} $decoded */
       foreach ($content->data as $decoded) {
-        ['uuid' => $uuid, 'entity_type' => $entity_type_id, 'path' => $path] = $decoded['_meta'];
+        ['uuid' => $uuid, 'entity_type' => $entity_type_id] = $decoded['_meta'];
         assert(is_string($uuid));
         assert(is_string($entity_type_id));
-        assert(is_string($path));
 
         // The event subscribers asked to skip importing this entity. If they
         // explained why, log that.
@@ -107,44 +106,75 @@ final class Importer implements LoggerAwareInterface {
           continue;
         }
 
-        $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
-        /** @var \Drupal\Core\Entity\EntityTypeInterface $entity_type */
-        if (!$entity_type->entityClassImplements(ContentEntityInterface::class)) {
-          throw new ImportException("Content entity $uuid is a '$entity_type_id', which is not a content entity type.");
-        }
-
-        $entity = $this->entityRepository->loadEntityByUuid($entity_type_id, $uuid);
-        if ($entity) {
-          if ($existing === Existing::Skip) {
-            continue;
-          }
-          else {
-            throw new ImportException("$entity_type_id $uuid already exists.");
-          }
-        }
-
-        $entity = $this->toEntity($decoded)->enforceIsNew()->setSyncing(TRUE);
-
-        // Ensure that the entity is not owned by the anonymous user.
-        if ($entity instanceof EntityOwnerInterface && empty($entity->getOwnerId())) {
-          $entity->setOwnerId($account->id());
-        }
-
-        // If a file exists in the same folder, copy it to the designated
-        // target URI.
-        if ($entity instanceof FileInterface) {
-          $this->copyFileAssociatedWithEntity(dirname($path), $entity);
-        }
-        $violations = $entity->validate();
-        if (count($violations) > 0) {
-          throw new InvalidEntityException($violations, $path);
-        }
-        $entity->save();
+        $this->importEntity($decoded, $existing, $account);
       }
     }
     finally {
       $this->accountSwitcher->switchBack();
     }
+  }
+
+  /**
+   * Imports a single entity from its decoded data array.
+   *
+   * @param array $data
+   *   The decoded entity data array, as produced by the content Finder.
+   * @param \Drupal\Core\DefaultContent\Existing $existing
+   *   What to do if the entity already exists: skip (return early) or error.
+   * @param \Drupal\Core\Session\AccountInterface|null $account
+   *   (optional) The account to attribute ownership to when the entity has no
+   *   owner. If NULL, anonymous-owned entities will not have their owner
+   *   overridden.
+   * @param bool $dry_run
+   *   (optional) If TRUE, the entity is built and validated but not saved.
+   *
+   * @return \Drupal\Core\Entity\ContentEntityInterface|null
+   *   The imported entity, or NULL if the entity already existed and was
+   *   skipped.
+   *
+   * @throws \Drupal\Core\DefaultContent\ImportException
+   * @throws \Drupal\Core\DefaultContent\InvalidEntityException
+   */
+  public function importEntity(array $data, Existing $existing = Existing::Error, ?AccountInterface $account = NULL, bool $dry_run = FALSE): ?ContentEntityInterface {
+    ['entity_type' => $entity_type_id, 'uuid' => $uuid, 'path' => $path] = $data['_meta'];
+    assert(is_string($entity_type_id));
+    assert(is_string($uuid));
+    assert(is_string($path));
+
+    $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
+    /** @var \Drupal\Core\Entity\EntityTypeInterface $entity_type */
+    if (!$entity_type->entityClassImplements(ContentEntityInterface::class)) {
+      throw new ImportException("Content entity $uuid is a '$entity_type_id', which is not a content entity type.");
+    }
+
+    $loaded_entity = $this->entityRepository->loadEntityByUuid($entity_type_id, $uuid);
+    if ($loaded_entity) {
+      if ($existing === Existing::Skip) {
+        return NULL;
+      }
+      throw new ImportException("$entity_type_id $uuid already exists.");
+    }
+
+    $entity = $this->toEntity($data)->enforceIsNew()->setSyncing(TRUE);
+
+    // Ensure that the entity is not owned by the anonymous user.
+    if ($account !== NULL && $entity instanceof EntityOwnerInterface && ($entity->getOwnerId() ?? 0) === 0) {
+      $entity->setOwnerId($account->id());
+    }
+
+    // If a file exists in the same folder, copy it to the designated
+    // target URI.
+    if ($entity instanceof FileInterface) {
+      $this->copyFileAssociatedWithEntity(dirname($path), $entity);
+    }
+    $violations = $entity->validate();
+    if (count($violations) > 0) {
+      throw new InvalidEntityException($violations, $path);
+    }
+    if (!$dry_run) {
+      $entity->save();
+    }
+    return $entity;
   }
 
   /**
