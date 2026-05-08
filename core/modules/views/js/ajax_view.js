@@ -86,10 +86,11 @@
       queryString = queryString.slice(1);
 
       // Remove current exposed filters.
-      const params = decodeURI(queryString)
+      const params = queryString
         .split('&')
         .filter((param) => {
-          const [name, value] = param.split('=');
+          const [encodedName] = param.split('=');
+          const name = decodeURIComponent(encodedName)
           return (
             this.$exposed_form.find(`input[name="${name}"]`).length === 0 &&
             /*
@@ -99,7 +100,7 @@
             !['page', 'reset', 'sort', 'order', 'q', 'render'].includes(name)
           );
         });
-      queryString = encodeURI(params.join('&'));
+        queryString = params.join('&');
       // If there is a '?' in ajaxPath, clean URL are on and & should be
       // used to add parameters.
       if (queryString !== '') {
