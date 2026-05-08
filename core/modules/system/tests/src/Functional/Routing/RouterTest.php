@@ -52,7 +52,7 @@ class RouterTest extends BrowserTestBase {
     // Check expected headers from FinishResponseSubscriber.
     $this->assertSession()->responseHeaderEquals('Content-language', 'en');
     $this->assertSession()->responseHeaderEquals('X-Content-Type-Options', 'nosniff');
-    $this->assertSession()->responseHeaderEquals('X-Frame-Options', 'SAMEORIGIN');
+    $this->assertSession()->responseHeaderEquals('Content-Security-Policy', "script-src * 'unsafe-inline'; object-src 'none'; frame-ancestors 'self'");
     if (strcasecmp($session->getResponseHeader('vary'), 'accept-encoding') !== 0) {
       $this->assertSession()->responseHeaderDoesNotExist('Vary');
     }

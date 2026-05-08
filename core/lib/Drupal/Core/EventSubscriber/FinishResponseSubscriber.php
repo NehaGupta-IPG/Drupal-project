@@ -46,6 +46,8 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
    *   The time service.
    * @param bool $debugCacheabilityHeaders
    *   (optional) Whether to send cacheability headers for debugging purposes.
+   * @param string[] $contentSecurityPolicy
+   *   (optional) Content Security Policy header values.
    */
   public function __construct(
     protected LanguageManagerInterface $languageManager,
@@ -55,8 +57,13 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
     protected CacheContextsManager $cacheContextsManager,
     protected TimeInterface $time,
     protected bool $debugCacheabilityHeaders = FALSE,
+    protected array $contentSecurityPolicy = [],
   ) {
     $this->config = $config_factory->get('system.performance');
+    $this->contentSecurityPolicy = $contentSecurityPolicy + [
+      'report_only' => '',
+      'enforced' => '',
+    ];
   }
 
   /**
@@ -96,7 +103,17 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
     // XSS and other vulnerabilities.
     // https://owasp.org/www-project-secure-headers
     $response->headers->set('X-Content-Type-Options', 'nosniff');
-    if (!$response->headers->has('X-Frame-Options')) {
+
+    // Apply Content Security Policy Headers.
+    if (!empty($this->contentSecurityPolicy['report_only'])) {
+      $response->headers->set('Content-Security-Policy-Report-Only', $this->contentSecurityPolicy['report_only']);
+    }
+    if (!empty($this->contentSecurityPolicy['enforced'])) {
+      $response->headers->set('Content-Security-Policy', $this->contentSecurityPolicy['enforced']);
+    }
+    // @todo Remove in Drupal 12.0.0. See https://www.drupal.org/project/drupal/issues/3472502
+    elseif (!$response->headers->has('X-Frame-Options')) {
+      // This will be translated to a CSP header by onRespondSetCspPolicy().
       $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
     }
 
@@ -156,6 +173,56 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
       // header declaring the response as not cacheable.
       $this->setResponseNotCacheable($response, $request);
     }
+  }
+
+  /**
+   * Translate X-Frame-Options header to Content Security Policy for BC.
+   *
+   * @todo Remove in Drupal 12.0.0. See https://www.drupal.org/project/drupal/issues/3472502
+   *
+   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
+   *   The event to process.
+   *
+   * @internal
+   */
+  public function onRespondSetCspPolicy(ResponseEvent $event) {
+    if (!$event->isMainRequest()) {
+      return;
+    }
+    $response = $event->getResponse();
+
+    $frameOptions = $response->headers->get('X-Frame-Options');
+    // Always remove the deprecated header.
+    $response->headers->remove('X-Frame-Options');
+
+    // Policy set through services parameter or a module takes priority.
+    if ($response->headers->has('Content-Security-Policy')) {
+      return;
+    }
+
+    $policy = 'script-src * \'unsafe-inline\'; object-src \'none\'';
+
+    // Translate to a frame ancestors source.
+    if ($frameOptions) {
+      if ($frameOptions === 'SAMEORIGIN') {
+        $policy .= '; frame-ancestors \'self\'';
+      }
+      else {
+        // Only values other than SAMEORIGIN need a deprecation warning because
+        // 'self' will be the default in 12.0.0.
+        @trigger_error('X-Frame-Options header is deprecated in drupal:11.1.0 and will be replaced with Content-Security-Policy frame-ancestors in drupal:12.0.0. See https://www.drupal.org/node/3472498', E_USER_DEPRECATED);
+
+        if ($frameOptions === 'DENY') {
+          $policy .= '; frame-ancestors \'none\'';
+        }
+        // ALLOW-FROM is ignored in modern browsers.
+        elseif (str_starts_with($frameOptions, 'ALLOW-FROM')) {
+          $policy .= '; frame-ancestors ' . substr($frameOptions, 11);
+        }
+      }
+    }
+
+    $response->headers->set('Content-Security-Policy', $policy);
   }
 
   /**
@@ -292,6 +359,11 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
     // There is no specific reason for choosing 16 beside it should be executed
     // before ::onRespond().
     $events[KernelEvents::RESPONSE][] = ['onAllResponds', 16];
+
+    // Execute late to act on X-Frame-Options set by any other subscriber.
+    // @todo Remove in Drupal 12.0.0. See https://www.drupal.org/project/drupal/issues/3472502
+    $events[KernelEvents::RESPONSE][] = ['onRespondSetCspPolicy', -16];
+
     return $events;
   }
 

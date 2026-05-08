@@ -171,6 +171,10 @@ parameters:
   # environments.
   # @default false
   http.response.debug_cacheability_headers: false
+  # Content Security Policy.
+  http.response.content_security_policy:
+    report_only: ''
+    enforced: ''
   factory.keyvalue: {}
   # Default key/value storage service to use.
   # @default keyvalue.database

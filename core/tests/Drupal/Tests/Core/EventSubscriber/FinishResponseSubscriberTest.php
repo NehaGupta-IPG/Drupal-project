@@ -97,7 +97,6 @@ class FinishResponseSubscriberTest extends UnitTestCase {
 
     $this->assertEquals(['en'], $response->headers->all('Content-language'));
     $this->assertEquals(['nosniff'], $response->headers->all('X-Content-Type-Options'));
-    $this->assertEquals(['SAMEORIGIN'], $response->headers->all('X-Frame-Options'));
   }
 
   /**
@@ -133,6 +132,148 @@ class FinishResponseSubscriberTest extends UnitTestCase {
     // 'X-Content-Type-Options' will be unconditionally set by core.
     $this->assertEquals(['nosniff'], $response->headers->all('X-Content-Type-Options'));
     $this->assertEquals(['DENY'], $response->headers->all('X-Frame-Options'));
+  }
+
+  /**
+   * CSP headers should be set from services parameter values.
+   *
+   * @covers ::onRespond
+   */
+  public function testConfiguredCspHeaders(): void {
+    $finishSubscriber = new FinishResponseSubscriber(
+      $this->languageManager,
+      $this->getConfigFactoryStub(),
+      $this->requestPolicy,
+      $this->responsePolicy,
+      $this->cacheContextsManager,
+      $this->time,
+      FALSE,
+      [
+        'report_only' => "default-src 'self'",
+        'enforced' => "script-src * 'unsafe-inline'",
+      ]
+    );
+
+    $this->languageManager->method('getCurrentLanguage')
+      ->willReturn(new Language(['id' => 'en']));
+
+    $request = $this->createMock(Request::class);
+    $response = $this->createMock(Response::class);
+    $response->headers = new ResponseHeaderBag();
+    $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
+
+    $finishSubscriber->onRespond($event);
+
+    $this->assertEquals(["default-src 'self'"], $response->headers->all('Content-Security-Policy-Report-Only'));
+    $this->assertEquals(["script-src * 'unsafe-inline'"], $response->headers->all('Content-Security-Policy'));
+  }
+
+  /**
+   * Data Provider for testing conversion of X-Frame-Options to CSP header.
+   *
+   * @todo Remove in Drupal 12.0.0. See https://www.drupal.org/project/drupal/issues/3472502
+   *
+   * @return array
+   */
+  public static function xFrameOptionsProvider(): array {
+    return [
+      'not set' => [
+        '',
+        "script-src * 'unsafe-inline'; object-src 'none'",
+      ],
+      'sameorigin' => [
+        'SAMEORIGIN',
+        "script-src * 'unsafe-inline'; object-src 'none'; frame-ancestors 'self'",
+      ],
+      'deny' => [
+        'DENY',
+        "script-src * 'unsafe-inline'; object-src 'none'; frame-ancestors 'none'",
+      ],
+      'domain' => [
+        'ALLOW-FROM https://example.com',
+        "script-src * 'unsafe-inline'; object-src 'none'; frame-ancestors https://example.com",
+      ],
+    ];
+  }
+
+  /**
+   * X-Frame-Options should be converted to a CSP header.
+   *
+   * @todo Remove in Drupal 12.0.0. See https://www.drupal.org/project/drupal/issues/3472502
+   *
+   * @dataProvider xFrameOptionsProvider
+   *
+   * @covers ::onRespondSetCspPolicy
+   *
+   * @group legacy
+   */
+  public function testConvertingXFrameOptionsHeader(string $xFrameOptionsValue, string $expected): void {
+    $finishSubscriber = new FinishResponseSubscriber(
+      $this->languageManager,
+      $this->getConfigFactoryStub(),
+      $this->requestPolicy,
+      $this->responsePolicy,
+      $this->cacheContextsManager,
+      $this->time,
+      FALSE,
+      [
+        'report_only' => '',
+        'enforced' => '',
+      ]
+    );
+
+    $this->languageManager->method('getCurrentLanguage')
+      ->willReturn(new Language(['id' => 'en']));
+
+    $request = $this->createMock(Request::class);
+    $response = $this->createMock(Response::class);
+    $response->headers = new ResponseHeaderBag();
+    $response->headers->set('X-Frame-Options', $xFrameOptionsValue);
+    $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
+
+    $finishSubscriber->onRespondSetCspPolicy($event);
+
+    $this->assertEquals([$expected], $response->headers->all('Content-Security-Policy'));
+  }
+
+  /**
+   * Existing CSP header should not be altered by X-Frame-Options.
+   *
+   * @todo Remove in Drupal 12.0.0. See https://www.drupal.org/project/drupal/issues/3472502
+   *
+   * @covers ::onRespond
+   * @covers ::onRespondSetCspPolicy
+   *
+   * @group legacy
+   */
+  public function testConvertingXFrameOptionsHeaderWithCsp(): void {
+    $finishSubscriber = new FinishResponseSubscriber(
+      $this->languageManager,
+      $this->getConfigFactoryStub(),
+      $this->requestPolicy,
+      $this->responsePolicy,
+      $this->cacheContextsManager,
+      $this->time,
+      FALSE,
+      [
+        'report_only' => '',
+        'enforced' => "default-src 'self'",
+      ]
+    );
+
+    $this->languageManager->method('getCurrentLanguage')
+      ->willReturn(new Language(['id' => 'en']));
+
+    $request = $this->createMock(Request::class);
+    $response = $this->createMock(Response::class);
+    $response->headers = new ResponseHeaderBag();
+    $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+    $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
+
+    $finishSubscriber->onRespond($event);
+    $finishSubscriber->onRespondSetCspPolicy($event);
+
+    $this->assertEquals(["default-src 'self'"], $response->headers->all('Content-Security-Policy'));
   }
 
 }
