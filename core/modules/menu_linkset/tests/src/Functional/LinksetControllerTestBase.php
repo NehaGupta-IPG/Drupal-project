@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\system\Functional\Menu;
+namespace Drupal\Tests\menu_linkset\Functional;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Cache\CacheableDependencyInterface;
@@ -38,6 +38,7 @@ abstract class LinksetControllerTestBase extends BrowserTestBase {
    */
   protected static $modules = [
     'system',
+    'menu_linkset',
     'basic_auth',
     'link',
     'path_alias',
@@ -91,7 +92,7 @@ abstract class LinksetControllerTestBase extends BrowserTestBase {
    * @param \GuzzleHttp\Psr7\Response $response
    *   The response on which to assert cacheability.
    */
-  protected function assertDrupalResponseCacheability($expect_cache, CacheableDependencyInterface $expected_metadata, Response $response) {
+  protected function assertDrupalResponseCacheability($expect_cache, CacheableDependencyInterface $expected_metadata, Response $response): void {
     $this->assertTrue(in_array($expect_cache, ['HIT', 'MISS', FALSE], TRUE), 'Cache is HIT, MISS, FALSE.');
     $this->assertSame(\Drupal::service('cache_contexts_manager')->optimizeTokens($expected_metadata->getCacheContexts()), explode(' ', $response->getHeaderLine('X-Drupal-Cache-Contexts')));
     $this->assertSame($expected_metadata->getCacheTags(), explode(' ', $response->getHeaderLine('X-Drupal-Cache-Tags')));
@@ -134,21 +135,6 @@ abstract class LinksetControllerTestBase extends BrowserTestBase {
   }
 
   /**
-   * Enables or disables the menu linkset endpoint.
-   *
-   * @param bool $enabled
-   *   Whether the endpoint should be enabled.
-   */
-  protected function enableEndpoint(bool $enabled) {
-    $this->config('system.feature_flags')
-      ->set('linkset_endpoint', $enabled)
-      ->save();
-    // Using rebuildIfNeeded here to implicitly test that router is only rebuilt
-    // when necessary.
-    \Drupal::service('router.builder')->rebuildIfNeeded();
-  }
-
-  /**
    * Retrieve reference linkset controller output adjusted for proper base URL.
    *
    * @param string $filename
@@ -166,15 +152,6 @@ abstract class LinksetControllerTestBase extends BrowserTestBase {
       $item['href'] = Url::fromUri('base:' . $item['href'])->toString();
     }
     return $data;
-  }
-
-  /**
-   * Rebuild the router only if needed.
-   */
-  public function rebuildIfNeeded(): void {
-    /** @var \Drupal\Core\Routing\RouteBuilderInterface $router_builder */
-    $router_builder = $this->container->get('router.builder');
-    $router_builder->rebuildIfNeeded();
   }
 
 }

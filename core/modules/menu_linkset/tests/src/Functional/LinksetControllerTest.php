@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\system\Functional\Menu;
+namespace Drupal\Tests\menu_linkset\Functional;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Cache\CacheableMetadata;
@@ -157,8 +157,7 @@ final class LinksetControllerTest extends LinksetControllerTestBase {
    * @throws \Exception
    */
   public function testBasicFunctions(): void {
-    $this->enableEndpoint(TRUE);
-    $expected_linkset = $this->getReferenceLinksetDataFromFile(__DIR__ . '/../../../fixtures/linkset/linkset-menu-main.json');
+    $expected_linkset = $this->getReferenceLinksetDataFromFile(__DIR__ . '/../../fixtures/linkset/linkset-menu-main.json');
     $response = $this->doRequest('GET', Url::fromUri('base:/system/menu/main/linkset'));
     $this->assertSame('application/linkset+json', $response->getHeaderLine('content-type'));
     $this->assertSame($expected_linkset, Json::decode((string) $response->getBody()));
@@ -175,7 +174,6 @@ final class LinksetControllerTest extends LinksetControllerTestBase {
    * cached response is properly invalidated.
    */
   public function testCacheability(): void {
-    $this->enableEndpoint(TRUE);
     $expected_cacheability = new CacheableMetadata();
     $expected_cacheability->addCacheContexts([
       'user.permissions',
@@ -219,7 +217,6 @@ final class LinksetControllerTest extends LinksetControllerTestBase {
    * does not have access (if it can be determined).
    */
   public function testAccess(): void {
-    $this->enableEndpoint(TRUE);
     $expected_cacheability = new CacheableMetadata();
     $expected_cacheability->addCacheContexts(['user.permissions']);
     $expected_cacheability->addCacheTags([
@@ -276,7 +273,6 @@ final class LinksetControllerTest extends LinksetControllerTestBase {
    * ("Log in/out")
    */
   public function testUserAccountMenu(): void {
-    $this->enableEndpoint(TRUE);
     $expected_cacheability = new CacheableMetadata();
     $expected_cacheability->addCacheContexts([
       'user.roles:authenticated',
@@ -319,20 +315,12 @@ final class LinksetControllerTest extends LinksetControllerTestBase {
    * Tests that menu items can use a custom link relation.
    */
   public function testCustomLinkRelation(): void {
-    $this->enableEndpoint(TRUE);
     $this->assertTrue($this->container->get('module_installer')->install(['decoupled_menus_test'], TRUE), 'Installed modules.');
     $response = $this->doRequest('GET', Url::fromUri('base:/system/menu/account/linkset'), 200, $this->authorAccount);
     $link_context_object = Json::decode((string) $response->getBody())['linkset'][0];
     $this->assertContains('authenticated-as', array_keys($link_context_object));
     $my_account_link = $link_context_object['authenticated-as'][0];
     $this->assertSame('My account', $my_account_link['title']);
-  }
-
-  /**
-   * Test that api route does not exist if the config option is disabled.
-   */
-  public function testDisabledEndpoint(): void {
-    $this->doRequest('GET', Url::fromUri('base:/system/menu/main/linkset'), 404);
   }
 
 }

@@ -75,3 +75,14 @@ function system_post_update_migrate_compress_setting(): void {
   $performanceConfig->clear('js.gzip');
   $performanceConfig->save();
 }
+
+/**
+ * Move the menu linkset endpoint to the menu_linkset module.
+ */
+function system_post_update_move_linkset_to_module(): void {
+  $config = \Drupal::configFactory()->getEditable('system.feature_flags');
+  if ($config->get('linkset_endpoint')) {
+    \Drupal::service('module_installer')->install(['menu_linkset']);
+  }
+  $config->delete();
+}
