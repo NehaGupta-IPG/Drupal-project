@@ -19,7 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  *
  * @see https://tools.ietf.org/html/draft-ietf-httpapi-linkset-00
  */
-#[Group('decoupled_menus')]
+#[Group('menu_linkset')]
 #[RunTestsInSeparateProcesses]
 final class LinksetControllerMultiLingualTest extends LinksetControllerTestBase {
 
