@@ -33,7 +33,7 @@ trait DeprecatedSleepTrait {
     // If an extending implements its own __sleep() method, make sure it gets
     // called, otherwise PHP will ignore __sleep() in any class that has
     // __serialize().
-    @trigger_error('Implementing ' . __CLASS__ . '::__sleep() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Implement __serialize() instead. See https://www.drupal.org/node/3578423', E_USER_DEPRECATED);
+    @trigger_error('Implementing __sleep() in a subclass of ' . __CLASS__ . ' is deprecated in drupal:11.4.0 and is not supported in drupal:13.0.0. Implement __serialize() instead. See https://www.drupal.org/node/3578423', E_USER_DEPRECATED);
     // @phpstan-ignore method.deprecated
     $keys = $this->__sleep();
     $map = [];
