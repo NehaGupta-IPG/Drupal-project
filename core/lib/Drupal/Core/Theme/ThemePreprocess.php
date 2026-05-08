@@ -435,8 +435,9 @@ class ThemePreprocess {
     $variables['content'] = $variables['elements']['#children'];
     $variables['region'] = $variables['elements']['#region'];
     $variables['attributes'] = [
-      'data-filter-empty-region' => TRUE,
+      'data-filter-empty-container' => TRUE,
     ];
+    $variables['#attached']['library'][] = 'core/filter-empty-container';
   }
 
   /**

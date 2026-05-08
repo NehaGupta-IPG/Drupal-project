@@ -51,10 +51,3 @@
 .invisible {
   visibility: hidden;
 }
-
-/**
- * Hide empty regions.
- */
-[data-filter-empty-region]:empty {
-  display: none;
-}
