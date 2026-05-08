@@ -226,7 +226,7 @@ abstract class BrowserTestBase extends DrupalTestCase {
    */
   protected function initFrontPage() {
     $session = $this->getSession();
-    $session->visit($this->baseUrl);
+    $session->visit($this->baseUrl . '/core/misc/druplicon.png');
   }
 
   /**
