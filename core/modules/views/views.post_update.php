@@ -60,6 +60,13 @@ function views_removed_post_updates(): array {
 }
 
 /**
+ * Clear cache to apply non-sortable counter field change.
+ */
+function views_post_update_counter_field_not_sortable(): void {
+  // Empty update to trigger a cache rebuild so updated Views data is applied.
+}
+
+/**
  * Add default min_label and max_label to exposed numeric-type filters.
  */
 function views_post_update_filter_min_max_labels(?array &$sandbox = NULL): void {
