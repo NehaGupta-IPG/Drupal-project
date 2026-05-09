@@ -89,6 +89,7 @@ class FieldStorageConfigTest extends ConfigEntityResourceTestBase {
         ],
         'attributes' => [
           'cardinality' => 1,
+          'cardinality_display' => 1,
           'custom_storage' => FALSE,
           'dependencies' => [
             'module' => [

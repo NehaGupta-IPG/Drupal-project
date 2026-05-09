@@ -14,6 +14,7 @@ settings:
 module: core
 locked: false
 cardinality: -1
+cardinality_display: 1
 translatable: true
 indexes: {  }
 persist_with_no_fields: false

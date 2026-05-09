@@ -142,6 +142,15 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
   protected $cardinality = 1;
 
   /**
+   * The field cardinality display.
+   *
+   * The number of inputs to be displayed by default.
+   *
+   * @var int
+   */
+  protected $cardinality_display = 1;
+
+  /**
    * Flag indicating whether the field is translatable.
    *
    * Defaults to TRUE.
@@ -679,6 +688,29 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
    */
   public function setCardinality($cardinality) {
     $this->cardinality = $cardinality;
+    return $this;
+  }
+
+  /**
+   * Return the quantity of items to be displayed by default.
+   *
+   * @return int
+   *   The quantity of items to display.
+   */
+  public function getCardinalityDisplay() {
+    return $this->cardinality_display;
+  }
+
+  /**
+   * Set how many items to display by default.
+   *
+   * @param int $cardinalityDisplay
+   *   Number of items to be displayed.
+   *
+   * @return $this
+   */
+  public function setCardinalityDisplay($cardinalityDisplay) {
+    $this->cardinality_display = $cardinalityDisplay;
     return $this;
   }
 

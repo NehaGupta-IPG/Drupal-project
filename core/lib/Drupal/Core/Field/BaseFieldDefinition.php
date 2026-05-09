@@ -281,6 +281,31 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
   }
 
   /**
+   * Get the number of inputs to be displayed.
+   *
+   * @return int
+   *   Quantity of inputs to be displayed.
+   */
+  public function getCardinalityDisplay() {
+    return isset($this->definition['cardinality_display'])
+      ? (int) $this->definition['cardinality_display']
+      : 1;
+  }
+
+  /**
+   * Set the quantity of inputs to be displayed.
+   *
+   * @param int $cardinalityDisplay
+   *   Number of items to be displayed.
+   *
+   * @return $this
+   */
+  public function setCardinalityDisplay($cardinalityDisplay) {
+    $this->definition['cardinality_display'] = $cardinalityDisplay;
+    return $this;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function isMultiple() {

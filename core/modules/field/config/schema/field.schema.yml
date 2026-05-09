@@ -46,6 +46,9 @@ field.storage.*.*:
     cardinality:
       type: integer
       label: 'Maximum number of values users can enter'
+    cardinality_display:
+      type: integer
+      label: 'Number of extra inputs to be displayed.'
     translatable:
       type: boolean
       label: 'Translatable'

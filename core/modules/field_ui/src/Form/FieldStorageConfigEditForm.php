@@ -163,6 +163,7 @@ class FieldStorageConfigEditForm extends EntityForm {
     else {
       $form['#element_validate'][] = [$this, 'validateCardinality'];
       $cardinality = $this->entity->getCardinality();
+      $cardinality_display = $this->entity->getCardinalityDisplay();
       $form['cardinality'] = [
         '#type' => 'select',
         '#title' => $this->t('Allowed number of values'),
@@ -173,6 +174,26 @@ class FieldStorageConfigEditForm extends EntityForm {
         ],
         '#default_value' => ($cardinality == FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED) ? FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED : 'number',
       ];
+      $form['cardinality_display'] = [
+        '#type' => 'number',
+        '#min' => 0,
+        '#title' => $this->t('Extra inputs to display'),
+        "#description" => $this->t("<ul>
+          <li><strong>0</strong>: None extra input will be displayed for the user. In add form only the input will be displayed and none extra input on the edit form.</li>
+          <li><strong>Default 1</strong>: An extra input will be displayed for the user on add/edit form.</li>
+          <li><strong>More than 1</strong>: The quantity of input that will be displayed on add form. In edit form if field is empty display the quantity defined, otherwise the inputs values with none extra input.</li>
+        </ul>"),
+        '#default_value' => $cardinality_display ?? 1,
+        '#states' => [
+          'visible' => [
+            ':input[name="cardinality"]' => ['value' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED],
+          ],
+          'disabled' => [
+            ':input[name="cardinality"]' => ['value' => 'number'],
+          ],
+        ],
+      ];
+
       $form['cardinality_number'] = [
         '#type' => 'number',
         '#default_value' => $cardinality != FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED ? $cardinality : 1,
