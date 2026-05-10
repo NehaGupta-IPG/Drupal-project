@@ -7,6 +7,7 @@ use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableResponse;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Error\DrupalErrorHandler;
 use Drupal\Core\Error\ErrorDisplayLevel;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Utility\Error;
@@ -83,6 +84,15 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
    */
   public function onException(ExceptionEvent $event) {
     $exception = $event->getThrowable();
+
+    // When error enhancers are enabled, run Symfony's error enhancers to
+    // produce better error messages (e.g. "Did you mean bundle()?").
+    $handler = DrupalErrorHandler::getInstance();
+    if ($handler?->isErrorEnhancersEnabled()) {
+      $exception = $handler->getSymfonyHandler()->enhanceError($exception);
+      $event->setThrowable($exception);
+    }
+
     $error = Error::decodeException($exception);
 
     // Display the message if the current error reporting level allows this type
