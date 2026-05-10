@@ -181,7 +181,7 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
       ]),
     ];
 
-    // Footgun warning: scan all available styles so the warning can be driven
+    // Warning: scan all available styles so the warning can be driven
     // purely by client-side #states without a page reload. Collect IDs of every
     // style whose breakpoints are not mutually exclusive.
     $non_exclusive_style_ids = [];
@@ -379,16 +379,16 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
   }
 
   /**
-   * Extracts media conditions from sizes attribute values in image style mappings.
+   * Extracts media conditions from sizes attribute in image style mappings.
    *
-   * A sizes value like "(min-width: 700px) 700px, (min-width: 400px) 400px, 100vw"
+   * A sizes value like "(min-width: 700px) 700px, 100vw"
    * contains two explicit conditions. The trailing fallback ("100vw") has no
    * condition and is skipped. The conditions are parsed by matching balanced
    * parentheses so that compound expressions like "(not (max-width: 560px))"
    * are handled correctly.
    *
    * @param array $keyed_mappings
-   *   Return value of ResponsiveImageStyleInterface::getKeyedImageStyleMappings().
+   *   Value of ResponsiveImageStyleInterface::getKeyedImageStyleMappings().
    *
    * @return string[]
    *   Unique media condition strings (e.g. "(min-width: 700px) 700px").
@@ -432,7 +432,7 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
    *   Media query strings from the responsive image style's breakpoints.
    *
    * @return bool
-   *   TRUE when the set is non-exclusive (a preload footgun), FALSE otherwise.
+   *   TRUE when the set is non-exclusive, FALSE otherwise.
    */
   public static function hasNonExclusiveBreakpoints(array $media_queries): bool {
     $non_empty = array_filter(array_map('trim', $media_queries), fn($q) => !empty($q));
