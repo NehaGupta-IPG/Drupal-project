@@ -643,4 +643,73 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
     ];
   }
 
+  /**
+   * Tests that preload link media attributes match the breakpoint media queries.
+   *
+   * Each <link rel="preload"> tag generated for a responsive image source must
+   * carry the same media query that the corresponding <source> element uses.
+   * This parity ensures the browser applies the same matching logic for both
+   * preloading and rendering.
+   */
+  public function testResponsiveImagePreloadMediaQueryParity(): void {
+    // Use three breakpoints that each carry a non-empty media query.
+    // Test module defines: mobile=(min-width: 0px), narrow=(min-width: 560px),
+    // wide=(min-width: 851px).
+    $this->responsiveImgStyle
+      ->addImageStyleMapping('responsive_image_test_module.mobile', '1x', [
+        'image_mapping_type' => 'image_style',
+        'image_mapping' => 'thumbnail',
+      ])
+      ->addImageStyleMapping('responsive_image_test_module.narrow', '1x', [
+        'image_mapping_type' => 'image_style',
+        'image_mapping' => 'medium',
+      ])
+      ->addImageStyleMapping('responsive_image_test_module.wide', '1x', [
+        'image_mapping_type' => 'image_style',
+        'image_mapping' => 'large',
+      ])
+      ->save();
+
+    $field_name = $this->randomMachineName();
+    $this->createImageField($field_name, 'node', 'article', ['uri_scheme' => 'public']);
+    $test_image = current($this->getTestFiles('image', 39325));
+    $nid = $this->uploadNodeImage($test_image, $field_name, 'article', $this->randomMachineName());
+
+    \Drupal::service('entity_display.repository')
+      ->getViewDisplay('node', 'article')
+      ->setComponent($field_name, [
+        'type' => 'responsive_image',
+        'settings' => [
+          'image_link' => '',
+          'responsive_image_style' => 'style_one',
+          'image_loading' => [
+            'preload' => TRUE,
+            'attribute' => 'lazy',
+          ],
+        ],
+      ])
+      ->save();
+
+    $this->drupalGet('node/' . $nid);
+
+    // Each breakpoint's media query must appear as the media attribute on
+    // exactly one preload link and on the matching <source> element.
+    $breakpoint_media_queries = [
+      '(min-width: 0px)',
+      '(min-width: 560px)',
+      '(min-width: 851px)',
+    ];
+    foreach ($breakpoint_media_queries as $media_query) {
+      $this->assertPageHead('link', [
+        'rel' => 'preload',
+        'as' => 'image',
+        'media' => $media_query,
+      ], 1);
+      $this->assertSession()->responseContains('media="' . $media_query . '"');
+    }
+
+    // Exactly one preload link per breakpoint (three total).
+    $this->assertPageHead('link', ['rel' => 'preload', 'as' => 'image'], 3);
+  }
+
 }

@@ -2,6 +2,7 @@
 
 namespace Drupal\responsive_image\Plugin\Field\FieldFormatter;
 
+use Drupal\breakpoint\BreakpointManagerInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\Attribute\FieldFormatter;
@@ -56,6 +57,13 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
   protected $linkGenerator;
 
   /**
+   * The breakpoint manager.
+   *
+   * @var \Drupal\breakpoint\BreakpointManagerInterface
+   */
+  protected $breakpointManager;
+
+  /**
    * Constructs a ResponsiveImageFormatter object.
    *
    * @param string $plugin_id
@@ -80,14 +88,17 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
    *   The link generator service.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
+   * @param \Drupal\breakpoint\BreakpointManagerInterface $breakpoint_manager
+   *   The breakpoint manager.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityStorageInterface $responsive_image_style_storage, EntityStorageInterface $image_style_storage, LinkGeneratorInterface $link_generator, AccountInterface $current_user) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityStorageInterface $responsive_image_style_storage, EntityStorageInterface $image_style_storage, LinkGeneratorInterface $link_generator, AccountInterface $current_user, BreakpointManagerInterface $breakpoint_manager) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
 
     $this->responsiveImageStyleStorage = $responsive_image_style_storage;
     $this->imageStyleStorage = $image_style_storage;
     $this->linkGenerator = $link_generator;
     $this->currentUser = $current_user;
+    $this->breakpointManager = $breakpoint_manager;
   }
 
   /**
@@ -105,7 +116,8 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
       $container->get('entity_type.manager')->getStorage('responsive_image_style'),
       $container->get('entity_type.manager')->getStorage('image_style'),
       $container->get('link_generator'),
-      $container->get('current_user')
+      $container->get('current_user'),
+      $container->get('breakpoint.manager')
     );
   }
 
@@ -163,11 +175,58 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
       '#type' => 'checkbox',
       '#title' => $this->t('Preload'),
       '#default_value' => $image_loading['preload'] ?? FALSE,
-      '#description' => $this->t('Preload to optimize the loading of late-discovered resources. Normally large or hero images below the fold. <a href=":link_preload">Learn more about preload</a> and see <a href=":link_examples">examples for images</a>', [
+      '#description' => $this->t('Preload to optimize the loading of late-discovered resources. Normally large or hero images below the fold. <a href=":link_preload">Learn more about preload</a> and see <a href=":link_examples">examples for images</a>. When using a responsive image style, each breakpoint must be bounded by both <code>min-width</code> and <code>max-width</code> to ensure breakpoints are mutually exclusive. Breakpoints using only <code>min-width</code>, only <code>max-width</code>, or no width constraint at all can match simultaneously at some viewport sizes, causing multiple image variants to download at once.', [
         ':link_preload' => 'https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/rel/preload',
         ':link_examples' => 'https://html.spec.whatwg.org/multipage/semantics.html#attr-link-imagesrcset',
       ]),
     ];
+
+    // Footgun warning: scan all available styles so the warning can be driven
+    // purely by client-side #states without a page reload. Collect IDs of every
+    // style whose breakpoints are not mutually exclusive.
+    $non_exclusive_style_ids = [];
+    foreach ($responsive_image_styles as $candidate_id => $candidate) {
+      if (!$candidate->hasImageStyleMappings()) {
+        continue;
+      }
+      // Only inspect breakpoints that have actual style mappings.
+      $breakpoints = $this->breakpointManager->getBreakpointsByGroup($candidate->getBreakpointGroup());
+      $used_breakpoint_ids = array_keys($candidate->getKeyedImageStyleMappings());
+      $media_queries = array_map(
+        fn($bp) => $bp->getMediaQuery(),
+        array_intersect_key($breakpoints, array_flip($used_breakpoint_ids)),
+      );
+      // When no used breakpoint carries a media query, fall back to checking
+      // the media conditions embedded in any sizes attribute values.
+      $non_empty = array_filter(array_map('trim', $media_queries), fn($q) => !empty($q));
+      if (empty($non_empty)) {
+        $media_queries = static::extractSizesConditions($candidate->getKeyedImageStyleMappings());
+      }
+      if (static::hasNonExclusiveBreakpoints($media_queries)) {
+        $non_exclusive_style_ids[] = $candidate_id;
+      }
+    }
+    if (!empty($non_exclusive_style_ids)) {
+      $elements['image_loading']['preload_non_exclusive_warning'] = [
+        '#type' => 'container',
+        '#attributes' => ['class' => ['messages', 'messages--warning']],
+        // Show when preload is checked AND the selected style is non-exclusive.
+        // Multiple style IDs are evaluated as OR by the states API.
+        '#states' => [
+          'visible' => [
+            ':input[name*="preload"]' => ['checked' => TRUE],
+            ':input[name*="responsive_image_style"]' => array_map(
+              fn($id) => ['value' => $id],
+              $non_exclusive_style_ids,
+            ),
+          ],
+        ],
+        'message' => [
+          '#markup' => $this->t('The selected responsive image style contains breakpoints that are not mutually exclusive: one or more media queries use only <code>min-width</code>, only <code>max-width</code>, or no width constraint. With preload enabled, multiple image variants may download simultaneously at certain viewport sizes. Each breakpoint must be bounded by both <code>min-width</code> and <code>max-width</code> for correct preload behavior.'),
+        ],
+      ];
+    }
+
     $elements['image_loading']['attribute_pre_description'] = [
       '#type' => 'container',
       'description' => [
@@ -317,6 +376,77 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
       ];
     }
     return $elements;
+  }
+
+  /**
+   * Extracts media conditions from sizes attribute values in image style mappings.
+   *
+   * A sizes value like "(min-width: 700px) 700px, (min-width: 400px) 400px, 100vw"
+   * contains two explicit conditions. The trailing fallback ("100vw") has no
+   * condition and is skipped. The conditions are parsed by matching balanced
+   * parentheses so that compound expressions like "(not (max-width: 560px))"
+   * are handled correctly.
+   *
+   * @param array $keyed_mappings
+   *   Return value of ResponsiveImageStyleInterface::getKeyedImageStyleMappings().
+   *
+   * @return string[]
+   *   Unique media condition strings (e.g. "(min-width: 700px) 700px").
+   */
+  protected static function extractSizesConditions(array $keyed_mappings): array {
+    $sizes = [];
+    foreach ($keyed_mappings as $multipliers) {
+      foreach ($multipliers as $mapping) {
+        if ($mapping['image_mapping_type'] !== 'sizes' || empty($mapping['image_mapping']['sizes'])) {
+          continue;
+        }
+        $sizes = array_merge($sizes, explode(',', $mapping['image_mapping']['sizes']));
+      }
+    }
+    return $sizes;
+  }
+
+  /**
+   * Checks whether a set of media queries is non-exclusive (cumulative).
+   *
+   * For preload to work correctly, at most one breakpoint may match any given
+   * viewport width. A breakpoint is non-exclusive when its media query is not
+   * bounded on both sides with min-width and max-width. Three problematic
+   * patterns exist:
+   *
+   * - min-width only: cumulative on wider viewports — every screen wider than
+   *   the lower bound matches, so multiple breakpoints fire simultaneously on
+   *   larger screens.
+   * - max-width only: cumulative on smaller viewports — every screen narrower
+   *   than the upper bound matches, so multiple breakpoints fire simultaneously
+   *   on smaller screens.
+   * - neither min-width nor max-width: not bounded by width at all (e.g.
+   *   orientation or color queries) — can overlap with any width-based
+   *   breakpoint.
+   *
+   * When a set has two or more non-empty media queries and any one of them
+   * falls into one of the patterns above, concurrent preload downloads become
+   * likely, so the set is considered non-exclusive.
+   *
+   * @param string[] $media_queries
+   *   Media query strings from the responsive image style's breakpoints.
+   *
+   * @return bool
+   *   TRUE when the set is non-exclusive (a preload footgun), FALSE otherwise.
+   */
+  public static function hasNonExclusiveBreakpoints(array $media_queries): bool {
+    $non_empty = array_filter(array_map('trim', $media_queries), fn($q) => !empty($q));
+    if (count($non_empty) <= 1) {
+      return FALSE;
+    }
+    foreach ($non_empty as $query) {
+      $has_min = str_contains($query, 'min-width');
+      $has_max = str_contains($query, 'max-width');
+      if (!$has_min || !$has_max) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
   /**
