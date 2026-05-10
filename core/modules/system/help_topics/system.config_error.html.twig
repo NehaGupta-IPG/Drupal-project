@@ -14,6 +14,7 @@ related:
 <p>{% trans %}When a user visits a web page, the web server sends a response code in addition to the page content. A normal, non-error response has code 200. If the page does not exist on the site, the response code is 404. If the page exists, but the user is not authorized to visit the page, the response code is 403. The core software provides default responses for both 403 and 404 codes, but if you prefer, you can create your own pages for each.{% endtrans %}</p>
 <h2>{% trans %}What other errors can occur?{% endtrans %}</h2>
 <p>{% trans %}Under some situations, your site can generate error messages. These can be due to user errors (such as entering invalid values in a form, or incorrect configuration), PHP runtime errors, or software bugs. Some errors may result in a <em>white screen of death</em> (a totally blank web page response); less drastic errors will generate error messages. You can configure what happens when an error message is generated.{% endtrans %}</p>
+<p>{% trans %}Advanced settings also allow you to enable <em>error message enhancers</em>, which provide more helpful suggestions for common programming errors, and <em>logging of silenced errors</em>, which records errors even if they were suppressed in the code with the @-operator.{% endtrans %}</p>
 <h2>{% trans %}Steps {% endtrans %}</h2>
 <ol>
   <li>{% trans %}If desired, create pages to use for 403 and 404 responses. Note the URLs for these pages.{% endtrans %}</li>
@@ -22,5 +23,6 @@ related:
   <li>{% trans %}Click <em>Save configuration</em>. You should see a message indicating that the settings were saved.{% endtrans %}</li>
   <li>{% trans %}In the <em>Manage</em> administrative menu, navigate to <em>Configuration</em> &gt; <em>Development</em> &gt; <em>{{ log_settings_link }}</em>.{% endtrans %}</li>
   <li>{% trans %}For a production site, select <em>None</em> under <em>Error messages to display</em>. For a site that is in development, select one of the other options, so that you are more aware of the errors the site is generating.{% endtrans %}</li>
+  <li>{% trans %}If desired, expand the <em>Advanced error handling</em> section to enable error message enhancers or to log silenced errors. These are typically used only on development or staging environments.{% endtrans %}</li>
   <li>{% trans %}Click <em>Save configuration</em>. You should see a message indicating that the settings were saved.{% endtrans %}</li>
 </ol>
