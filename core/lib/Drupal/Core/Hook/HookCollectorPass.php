@@ -274,13 +274,12 @@ class HookCollectorPass implements CompilerPassInterface {
       foreach (array_keys($hookImplementations) as $identifier) {
         $parts = explode('::', $identifier, 2);
         if (isset($parts[1])) {
-          // OOP Hook class implementations are prefixed with 'hook.', so that
-          // the service ID will have a "hook." prefix. This will allow a class
-          // that is already registered as a service to be registered separately
-          // with a different 'hook.' ID to be used specifically for hooks
-          // implementations. This will ensure that hook definitions defined in
-          // the class will always run, regardless if the original service is
-          // altered or decorated.
+          // Hook implementations in registered services will have their class
+          // prefixed with 'hook.', so that the class can be registered
+          // separately with a different 'hook.' ID to be used specifically for
+          // hook implementations. This will ensure that hook definitions
+          // defined in the class will always run, regardless if the original
+          // service is altered or decorated.
           $class = str_starts_with($parts[0], 'hook.') ? substr($parts[0], 5) : $parts[0];
           $classesMap[$parts[0]] = $class;
         }
@@ -496,7 +495,7 @@ class HookCollectorPass implements CompilerPassInterface {
 
       $subPath = implode(DIRECTORY_SEPARATOR, $parts);
       $filename = $providerPath . DIRECTORY_SEPARATOR . $subPath . DIRECTORY_SEPARATOR . $filename;
-      $this->collectHookImplementationsFromClassFile($filename, $class, $provider, $hook_file_cache);
+      $this->collectHookImplementationsFromClassFile($filename, $class, $provider, $hook_file_cache, TRUE);
     }
   }
 
@@ -535,8 +534,10 @@ class HookCollectorPass implements CompilerPassInterface {
    *   The name of module the class file is in.
    * @param \Drupal\Component\FileCache\FileCacheInterface $cache
    *   The cache of hook attribute data associated with file paths.
+   * @param bool $isRegistered
+   *   Whether this class is an already registered service.
    */
-  protected function collectHookImplementationsFromClassFile(string $filename, string $class, string $module, FileCacheInterface $cache): void {
+  protected function collectHookImplementationsFromClassFile(string $filename, string $class, string $module, FileCacheInterface $cache, bool $isRegistered = FALSE): void {
     $cached = $cache->get($filename);
     if ($cached) {
       $class = $cached['class'];
@@ -589,28 +590,31 @@ class HookCollectorPass implements CompilerPassInterface {
       foreach ($methodAttributes as $attribute) {
         if ($attribute instanceof Hook) {
           self::checkForProceduralOnlyHooks($attribute, $class);
-          // Add a 'hook.' prefix to the class so that the service ID can be
-          // namespaced.
+          // If the class has already been registered as a service, add a
+          // 'hook.' prefix to the class to be used as a separate service ID.
           // @see ::registerHookServices()
-          $this->oopImplementations[$attribute->hook]['hook.' . $class . '::' . ($attribute->method ?: $method)] = $attribute->module ?? $module;
+          $serviceClass = $isRegistered ? 'hook.' . $class : $class;
+          $this->oopImplementations[$attribute->hook][$serviceClass . '::' . ($attribute->method ?: $method)] = $attribute->module ?? $module;
           if ($attribute->order !== NULL) {
             // Use a lower weight for order operations that are declared
             // together with the hook listener they apply to.
-            $this->orderOperations[$attribute->hook][0][] = $attribute->order->getOperation("$class::$method");
+            $this->orderOperations[$attribute->hook][0][] = $attribute->order->getOperation("$serviceClass::$method");
           }
         }
         elseif ($attribute instanceof ReorderHook) {
+          $serviceClass = $isRegistered ? 'hook.' . $attribute->class : $attribute->class;
           $identifier = $attribute->class === ProceduralCall::class
             ? $attribute->method
-            : $attribute->class . '::' . $attribute->method;
+            : $serviceClass . '::' . $attribute->method;
           // Use a higher weight for order operations that target other hook
           // listeners.
           $this->orderOperations[$attribute->hook][1][] = $attribute->order->getOperation($identifier);
         }
         elseif ($attribute instanceof RemoveHook) {
+          $serviceClass = $isRegistered ? 'hook.' . $attribute->class : $attribute->class;
           $identifier = $attribute->class === ProceduralCall::class
             ? $attribute->method
-            : $attribute->class . '::' . $attribute->method;
+            : $serviceClass . '::' . $attribute->method;
           $this->removeHookIdentifiers[$attribute->hook][] = $identifier;
         }
       }

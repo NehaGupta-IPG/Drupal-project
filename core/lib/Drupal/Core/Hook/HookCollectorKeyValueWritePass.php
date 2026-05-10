@@ -30,7 +30,7 @@ class HookCollectorKeyValueWritePass implements CompilerPassInterface {
       $definition = $container->getDefinition($id);
       $class = str_starts_with($id, 'hook.') ? substr($id, 5) : $id;
       if ($definition->getClass() !== $class || !empty($definition->getDecoratedService())) {
-        throw new \LogicException(sprintf('Hook service "%s" can not be decorated', $id));
+        throw new \LogicException(sprintf('Hook service "%s" can not be altered or decorated', $id));
       }
     }
 
