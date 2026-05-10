@@ -8,6 +8,7 @@ use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\UserInterface;
 use PHPUnit\Framework\Attributes\Group;
@@ -23,7 +24,7 @@ class UserRegistrationTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['field_test'];
+  protected static $modules = ['field_test', 'language'];
 
   /**
    * {@inheritdoc}
@@ -420,6 +421,52 @@ class UserRegistrationTest extends BrowserTestBase {
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'config:field.field.user.user.test_user_field');
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'config:field.storage.user.test_user_field');
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'config:user.settings');
+  }
+
+  /**
+   * Tests username suspicious characters constraint on user registration.
+   *
+   * @see \Drupal\user\Plugin\Validation\Constraint\UserNameNoSuspiciousCharacters
+   */
+  public function testNoSuspiciousCharacters(): void {
+    // Duplicated non-spacing mark.
+    $edit = ['mail' => 'test@example.com', 'name' => 'à̀'];
+    $this->drupalGet('user/register');
+    $this->submitForm($edit, 'Create new account');
+    $this->assertSession()->pageTextContains('Using invisible characters is not allowed.');
+
+    // Hidden combining character
+    $edit = ['mail' => 'test@example.com', 'name' => 'i̇'];
+    $this->drupalGet('user/register');
+    $this->submitForm($edit, 'Create new account');
+    $this->assertSession()->pageTextContains('Using hidden overlay characters is not allowed.');
+
+    // Mix of Cyrillic and Latin characters.
+    $edit = ['mail' => 'test@example.com', 'name' => 'Рa'];
+    $this->drupalGet('user/register');
+    $this->submitForm($edit, 'Create new account');
+    $this->assertSession()->pageTextContains('This value contains characters that are not allowed by the current restriction-level.');
+
+    // Only Cyrillic characters.
+    $edit = ['mail' => 'test@example.com', 'name' => 'Ра'];
+    $this->drupalGet('user/register');
+    $this->submitForm($edit, 'Create new account');
+    $this->assertSession()->pageTextContains('This value contains characters that are not allowed by the current restriction-level.');
+
+    // Only Cyrillic characters on a Russian website.
+    $russianLanguage = ConfigurableLanguage::createFromLangcode('ru');
+    $russianLanguage->save();
+    $this->drupalGet('user/register');
+    $this->submitForm($edit, 'Create new account');
+    $this->assertSession()->pageTextNotContains('This value contains characters that are not allowed by the current restriction-level.');
+
+    // Different numbering systems.
+    $bengaliLanguage = ConfigurableLanguage::createFromLangcode('bn');
+    $bengaliLanguage->save();
+    $edit = ['mail' => 'test@example.com', 'name' => '8৪'];
+    $this->drupalGet('user/register');
+    $this->submitForm($edit, 'Create new account');
+    $this->assertSession()->pageTextContains('Mixing numbers from different scripts is not allowed.');
   }
 
 }
