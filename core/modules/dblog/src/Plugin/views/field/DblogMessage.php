@@ -60,6 +60,11 @@ class DblogMessage extends FieldPluginBase {
 
     if ($this->options['replace_variables']) {
       $variables = unserialize($this->getvalue($values, 'variables'));
+      // Ensure NULL values won't cause problems by replacing them with the
+      // string "NULL".
+      $variables = array_map(function ($value) {
+        return $value ?? 'NULL';
+      }, $variables);
       return new FormattableMarkup($value, (array) $variables);
     }
     else {
