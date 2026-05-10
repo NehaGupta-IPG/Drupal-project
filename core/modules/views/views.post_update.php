@@ -60,6 +60,13 @@ function views_removed_post_updates(): array {
 }
 
 /**
+ * Clear cache to apply non-sortable counter field change.
+ */
+function views_post_update_counter_field_not_sortable(): void {
+  // Empty update to trigger a cache rebuild so updated Views data is applied.
+}
+
+/**
  * Add lazy load options to all image type field configurations.
  */
 function views_post_update_image_preload(?array &$sandbox = NULL): void {
