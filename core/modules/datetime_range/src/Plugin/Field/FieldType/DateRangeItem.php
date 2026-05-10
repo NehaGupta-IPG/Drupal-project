@@ -92,7 +92,7 @@ class DateRangeItem extends DateTimeItem {
     $descriptions = [
       'datetime' => $this->t('Stored as UTC date and time values (Example: 2026-05-09T19:44:00 to 2026-05-09T20:44:00).'),
       'date' => $this->t('Stored as calendar dates only, without time or timezone information (Example: 2026-05-09 to 2026-05-10).'),
-      'allday' => $this->t('Stored as a full-day range in the current user\'s timezone, from midnight to 11:59:59 PM (Example: 2026-05-09T04:00:00 to 2026-05-11T03:59:59).'),
+      'allday' => $this->t("Stored as a full-day range in the current user's timezone, from midnight to 11:59:59 PM (Example: 2026-05-09T04:00:00 to 2026-05-11T03:59:59)."),
     ];
 
     $type = $element['datetime_type']['#default_value'] ?? 'datetime';
