@@ -365,6 +365,12 @@ class DbLogController extends ControllerBase {
       }
       // Message to translate with injected variables.
       else {
+        // Ensure NULL values won't cause problems by replacing them with the
+        // string "NULL".
+        $variables = array_map(function ($value) {
+          return $value ?? 'NULL';
+        }, $variables);
+
         // Ensure backtrace strings are properly formatted.
         if (isset($variables['@backtrace_string'])) {
           $variables['@backtrace_string'] = new FormattableMarkup(
@@ -375,6 +381,7 @@ class DbLogController extends ControllerBase {
             $row->backtrace = $variables['@backtrace_string'];
           }
         }
+
         // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
         $message = $this->t(Xss::filterAdmin($row->message), $variables);
       }
