@@ -206,6 +206,14 @@ class ViewsIntegrationTest extends ViewsKernelTestBase {
         'link' => '<a href="' . Url::fromRoute('<front>')->toString() . '"><object>Link</object></a>',
       ],
     ];
+    // Setup a watchdog entry with a token that has a NULL value.
+    $entries[] = [
+      'message' => '@null',
+      'variables' => [
+        '@null' => NULL,
+      ],
+    ];
+
     // Setup a watchdog entry with severity WARNING.
     $entries[] = [
       'message' => 'Warning message',
