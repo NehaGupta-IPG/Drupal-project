@@ -6,20 +6,14 @@
  */
 
 use Drupal\Component\Utility\OpCodeCache;
+use Drupal\Core\Error\DrupalErrorHandler;
+use Drupal\Core\Site\MaintenanceModeResolver;
 
 // Change the directory to the Drupal root.
 chdir('..');
 // Store the Drupal root path.
 $root_path = realpath('');
 
-/**
- * Global flag to indicate the site is in installation mode.
- *
- * The constant is defined using define() instead of const so that PHP
- * versions prior to 5.3 can display proper PHP requirements instead of causing
- * a fatal error.
- */
-define('MAINTENANCE_MODE', 'install');
 
 // Exit early if an incompatible PHP version is in use, so that the user sees a
 // helpful error message rather than a white screen from any fatal errors due to
@@ -37,6 +31,9 @@ if (version_compare(PHP_VERSION, '8.1.0') < 0) {
 // Initialize the autoloader.
 $class_loader = require_once $root_path . '/autoload.php';
 
+// Enable maintenance mode.
+(new MaintenanceModeResolver())->enableMaintenance('install');
+
 // If OPcache is in use, ensure opcache.save_comments is enabled.
 if (OpCodeCache::isEnabled() && !ini_get('opcache.save_comments')) {
   print 'Systems with OPcache installed must have <a href="http://php.net/manual/opcache.configuration.php#ini.opcache.save-comments">opcache.save_comments</a> enabled.';
@@ -44,9 +41,7 @@ if (OpCodeCache::isEnabled() && !ini_get('opcache.save_comments')) {
 }
 
 // Set the Drupal custom error handler.
-require_once $root_path . '/core/includes/errors.inc';
-set_error_handler('_drupal_error_handler');
-set_exception_handler('_drupal_exception_handler');
+DrupalErrorHandler::register();
 
 // Start the installer.
 require_once $root_path . '/core/includes/install.core.inc';

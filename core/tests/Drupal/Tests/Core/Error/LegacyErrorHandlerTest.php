@@ -6,13 +6,20 @@ namespace Drupal\Tests\Core\Error;
 
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that deprecated error handler functions trigger deprecation notices.
  */
 #[Group('Error')]
 #[Group('legacy')]
+#[RunTestsInSeparateProcesses]
 class LegacyErrorHandlerTest extends UnitTestCase {
+
+  protected function setUp(): void {
+    parent::setUp();
+    require_once $this->getDrupalRoot() . '/core/includes/errors.inc';
+  }
 
   /**
    * Tests that _drupal_error_handler() is deprecated.

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Site;
 
 use Drupal\Core\Site\MaintenanceModeResolver;
+use Drupal\Core\Site\MaintenanceType;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -77,6 +78,50 @@ class MaintenanceModeResolverTest extends UnitTestCase {
     // Disabling via the second instance clears it for all.
     $resolver2->disableMaintenance();
     $this->assertFalse($resolver1->isMaintenance());
+  }
+
+  /**
+   * Tests that maintenance types are correctly resolved.
+   */
+  public function testMaintenanceTypes(): void {
+    $resolver = new MaintenanceModeResolver();
+
+    // Default is TRUE (bool), which resolves to Regular enum.
+    $resolver->enableMaintenance();
+    $this->assertTrue($resolver->isMaintenance());
+    $this->assertSame(MaintenanceType::Regular, $resolver->getMaintenanceType());
+    $this->assertTrue($resolver->is(MaintenanceType::Regular));
+    $this->assertTrue($resolver->is('regular'));
+
+    // Enum type Install.
+    $resolver->enableMaintenance(MaintenanceType::Install);
+    $this->assertTrue($resolver->isMaintenance());
+    $this->assertSame(MaintenanceType::Install, $resolver->getMaintenanceType());
+    $this->assertTrue($resolver->is(MaintenanceType::Install));
+    $this->assertTrue($resolver->is('install'));
+
+    // String type 'install'.
+    $resolver->enableMaintenance('install');
+    $this->assertTrue($resolver->isMaintenance());
+    $this->assertSame(MaintenanceType::Install, $resolver->getMaintenanceType());
+    $this->assertTrue($resolver->is(MaintenanceType::Install));
+
+    // String type 'update'.
+    $resolver->enableMaintenance('update');
+    $this->assertTrue($resolver->isMaintenance());
+    $this->assertSame(MaintenanceType::Update, $resolver->getMaintenanceType());
+    $this->assertTrue($resolver->is(MaintenanceType::Update));
+
+    // Custom maintenance type.
+    $resolver->enableMaintenance('custom_type');
+    $this->assertTrue($resolver->isMaintenance());
+    $this->assertSame('custom_type', $resolver->getMaintenanceType());
+    $this->assertTrue($resolver->is('custom_type'));
+    $this->assertFalse($resolver->is(MaintenanceType::Regular));
+
+    $resolver->disableMaintenance();
+    $this->assertNull($resolver->getMaintenanceType());
+    $this->assertFalse($resolver->is(MaintenanceType::Regular));
   }
 
 }

@@ -6,13 +6,20 @@ namespace Drupal\Tests\Core\Error;
 
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that deprecated errors.inc functions trigger deprecation notices.
  */
 #[Group('Error')]
 #[Group('legacy')]
+#[RunTestsInSeparateProcesses]
 class LegacyErrorLevelsTest extends UnitTestCase {
+
+  protected function setUp(): void {
+    parent::setUp();
+    require_once $this->getDrupalRoot() . '/core/includes/errors.inc';
+  }
 
   /**
    * Tests that drupal_error_levels() is deprecated.

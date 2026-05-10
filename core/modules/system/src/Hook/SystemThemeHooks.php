@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Hook;
 
+use Drupal\Core\Site\MaintenanceModeResolver;
 use Drupal\Core\Theme\ThemeCommonElements;
 use Drupal\system\Theme\SystemAdminThemePreprocess;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -194,7 +195,7 @@ class SystemThemeHooks {
     $suggestions = [];
     // Dead databases will show error messages so supplying this template will
     // allow themers to override the page and the content completely.
-    $offline = defined('MAINTENANCE_MODE');
+    $offline = \Drupal::service(MaintenanceModeResolver::class)->isMaintenance();
     try {
       \Drupal::service('path.matcher')->isFrontPage();
     }

@@ -26,8 +26,10 @@ class MaintenanceModeResolver {
    * Static so the override persists across all instances within the same
    * PHP process (e.g. container rebuilds). This mirrors the process-global
    * behavior of define('MAINTENANCE_MODE', ...).
+   *
+   * @var \Drupal\Core\Site\MaintenanceType|string|bool|null
    */
-  private static ?bool $override = NULL;
+  private static MaintenanceType|string|bool|null $override = NULL;
 
   /**
    * Determines whether the system is currently in maintenance mode.
@@ -40,9 +42,19 @@ class MaintenanceModeResolver {
    *   TRUE if the system is in maintenance mode.
    */
   public function isMaintenance(): bool {
+    return (bool) $this->getMaintenanceType();
+  }
+
+  /**
+   * Returns the current maintenance type.
+   *
+   * @return \Drupal\Core\Site\MaintenanceType|string|null
+   *   The maintenance type.
+   */
+  public function getMaintenanceType(): MaintenanceType|string|null {
     // Check programmatic override first.
     if (self::$override !== NULL) {
-      return self::$override;
+      return $this->toMaintenanceType(self::$override);
     }
 
     // Check the constant — set by update.php, install.php, etc.
@@ -50,17 +62,58 @@ class MaintenanceModeResolver {
     //   install.php use enableMaintenance() instead.
     //   @see https://www.drupal.org/project/drupal/issues/3000229
     if (defined('MAINTENANCE_MODE')) {
-      return TRUE;
+      return $this->toMaintenanceType(constant('MAINTENANCE_MODE'));
     }
 
     // Check the state value set via the admin UI.
     try {
-      return (bool) \Drupal::state()->get('system.maintenance_mode', FALSE);
+      return \Drupal::state()->get('system.maintenance_mode', FALSE) ? MaintenanceType::Regular : NULL;
     }
     catch (\Exception) {
       // State service may not be available during early boot.
+      return NULL;
+    }
+  }
+
+  /**
+   * Checks if the system is in a specific maintenance type.
+   *
+   * @param \Drupal\Core\Site\MaintenanceType|string $type
+   *   The maintenance type to check.
+   *
+   * @return bool
+   *   TRUE if the system is in the specified maintenance type.
+   */
+  public function is(MaintenanceType|string $type): bool {
+    $current = $this->getMaintenanceType();
+    if ($current === NULL) {
       return FALSE;
     }
+
+    if ($type instanceof MaintenanceType) {
+      return $current === $type;
+    }
+
+    return $current instanceof MaintenanceType ? $current->value === $type : $current === $type;
+  }
+
+  /**
+   * Converts a raw value to a MaintenanceType enum if possible.
+   *
+   * @param \Drupal\Core\Site\MaintenanceType|string|bool $value
+   *   The raw value.
+   *
+   * @return \Drupal\Core\Site\MaintenanceType|string
+   *   The converted value.
+   */
+  private function toMaintenanceType(MaintenanceType|string|bool $value): MaintenanceType|string {
+    if ($value instanceof MaintenanceType) {
+      return $value;
+    }
+    if ($value === TRUE || $value === 'regular') {
+      return MaintenanceType::Regular;
+    }
+    return MaintenanceType::tryFrom((string) $value) ?? (string) $value;
   }
 
   /**
@@ -71,10 +124,13 @@ class MaintenanceModeResolver {
    * takes effect immediately and persists for the lifetime of the
    * current PHP process.
    *
+   * @param \Drupal\Core\Site\MaintenanceType|string|bool $type
+   *   (optional) The maintenance type. Defaults to TRUE.
+   *
    * @return $this
    */
-  public function enableMaintenance(): static {
-    self::$override = TRUE;
+  public function enableMaintenance(MaintenanceType|string|bool $type = TRUE): static {
+    self::$override = $type;
     return $this;
   }
 

@@ -14,6 +14,8 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Site\MaintenanceModeResolver;
+use Drupal\Core\Site\MaintenanceType;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
@@ -37,7 +39,12 @@ class ThemePreprocess {
     protected RouteMatchInterface $routeMatch,
     protected ThemeManagerInterface $themeManager,
     protected ThemeSettingsProvider $themeSettingsProvider,
+    protected ?MaintenanceModeResolver $maintenanceModeResolver = NULL,
   ) {
+    if ($this->maintenanceModeResolver === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $maintenanceModeResolver argument is deprecated in drupal:11.4.0 and will be required in drupal:13.0.0. See https://www.drupal.org/project/drupal/issues/3000229', E_USER_DEPRECATED);
+      $this->maintenanceModeResolver = \Drupal::service(MaintenanceModeResolver::class);
+    }
   }
 
   /**
@@ -404,7 +411,7 @@ class ThemePreprocess {
    */
   public function preprocessInstallPage(array &$variables): void {
     $installer_active_task = NULL;
-    if (defined('MAINTENANCE_MODE') && MAINTENANCE_MODE === 'install' && InstallerKernel::installationAttempted()) {
+    if ($this->maintenanceModeResolver->is(MaintenanceType::Install) && InstallerKernel::installationAttempted()) {
       $installer_active_task = $GLOBALS['install_state']['active_task'];
     }
 

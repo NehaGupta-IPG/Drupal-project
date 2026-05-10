@@ -6,6 +6,8 @@
  */
 
 use Drupal\Core\Installer\InstallerKernel;
+use Drupal\Core\Site\MaintenanceModeResolver;
+use Drupal\Core\Site\MaintenanceType;
 use Drupal\Core\Site\Settings;
 
 /**
@@ -29,7 +31,8 @@ function _drupal_maintenance_theme(): void {
 
   // Install and update pages are treated differently to prevent theming
   // overrides.
-  if (defined('MAINTENANCE_MODE') && (MAINTENANCE_MODE == 'install' || MAINTENANCE_MODE == 'update')) {
+  $resolver = new MaintenanceModeResolver();
+  if ($resolver->is(MaintenanceType::Install) || $resolver->is(MaintenanceType::Update)) {
     if (InstallerKernel::installationAttempted()) {
       $custom_theme = $GLOBALS['install_state']['theme'];
     }

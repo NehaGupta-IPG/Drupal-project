@@ -11,6 +11,8 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\Lock\LockBackendInterface;
+use Drupal\Core\Site\MaintenanceModeResolver;
+use Drupal\Core\Site\MaintenanceType;
 use Drupal\Core\Update\UpdateKernel;
 use Drupal\Core\Utility\ThemeRegistry;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -136,7 +138,12 @@ class Registry implements DestructableInterface {
     protected ModuleExtensionList $moduleList,
     protected HttpKernelInterface $kernel,
     protected KeyValueFactoryInterface $keyValueFactory,
+    protected ?MaintenanceModeResolver $maintenanceModeResolver = NULL,
   ) {
+    if (!isset($maintenanceModeResolver)) {
+      $this->maintenanceModeResolver = \Drupal::service(MaintenanceModeResolver::class);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $maintenanceModeResolver argument is deprecated in drupal:11.4.0 and will be required in drupal:13.0.0. See https://www.drupal.org/project/drupal/issues/3000229', E_USER_DEPRECATED);
+    }
   }
 
   /**
@@ -323,7 +330,7 @@ class Registry implements DestructableInterface {
         self::PREPROCESS_INVOKES => [],
       ];
       $cache[self::GLOBAL_PREPROCESS] = $this->collectModulePreprocess($cache, 'preprocess');
-      if (defined('MAINTENANCE_MODE') && constant('MAINTENANCE_MODE') === 'install') {
+      if ($this->maintenanceModeResolver->is(MaintenanceType::Install)) {
         // System is still set here so preprocess can be updated in install.
         $this->processExtension($cache, 'system', 'install', 'system', $this->moduleList->getPath('system'));
       }

@@ -10,6 +10,7 @@ use Drupal\Component\Utility\Xss;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Site\MaintenanceModeResolver;
 use Drupal\Core\Utility\Error;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -128,7 +129,7 @@ function _drupal_error_handler_real($error_level, $message, $filename, $line): v
  */
 function error_displayable($error = NULL) {
   @trigger_error('error_displayable() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Error\ErrorDisplayLevel::resolve()->isDisplayable() instead. See https://www.drupal.org/project/drupal/issues/3000229', E_USER_DEPRECATED);
-  if (defined('MAINTENANCE_MODE')) {
+  if ((new MaintenanceModeResolver())->isMaintenance()) {
     return TRUE;
   }
   $error_level = _drupal_get_error_level();
