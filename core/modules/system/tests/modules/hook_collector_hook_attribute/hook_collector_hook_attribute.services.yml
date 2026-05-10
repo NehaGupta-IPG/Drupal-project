@@ -1,0 +1,12 @@
+services:
+  _defaults:
+    autowire: true
+
+  # This service ID is purposely not a FQCN, to test that look up of existing
+  # hook services in HookCollectorRegisterServicesPass works correctly.
+  hook_collector_hook_attribute.hook_registered_service:
+    class: 'Drupal\hook_collector_hook_attribute\Hook\HookRegisteredService'
+
+  Drupal\hook_collector_hook_attribute\ServiceWithHook: ~
+
+  Drupal\hook_collector_hook_attribute\AnotherServiceWithHook: ~

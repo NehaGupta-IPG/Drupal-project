@@ -24,6 +24,16 @@ class HookCollectorKeyValueWritePass implements CompilerPassInterface {
    * {@inheritdoc}
    */
   public function process(ContainerBuilder $container): void {
+    // First validate that no hook services have been altered or decorated.
+    $hookServiceIds = array_keys($container->findTaggedServiceIds('hook'));
+    foreach ($hookServiceIds as $id) {
+      $definition = $container->getDefinition($id);
+      $class = str_starts_with($id, 'hook.') ? substr($id, 5) : $id;
+      if ($definition->getClass() !== $class || !empty($definition->getDecoratedService())) {
+        throw new \LogicException(sprintf('Hook service "%s" can not be decorated', $id));
+      }
+    }
+
     $hookData = $container->getParameter('.hook_data');
     if ($container->hasParameter('.theme_hook_data')) {
       $themeHookData = $container->getParameter('.theme_hook_data');

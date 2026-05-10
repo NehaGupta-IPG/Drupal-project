@@ -1,5 +1,5 @@
 name: 'Test Hook attribute'
 type: module
-description: 'Test Hook attribute with named arguments, and class with invoke method'
+description: 'Test Hook attribute with named arguments, and class with invoke method, and declared services.'
 package: Testing
 version: VERSION
