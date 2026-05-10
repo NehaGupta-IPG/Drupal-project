@@ -184,10 +184,6 @@ system.logging:
             - 'some'
             - 'all'
             - 'verbose'
-    throw_recoverable:
-      type: boolean
-      label: 'Throw recoverable errors as exceptions'
-      requiredKey: false
     error_enhancers:
       type: boolean
       label: 'Enable error message enhancers'

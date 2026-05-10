@@ -148,28 +148,18 @@ final class DrupalErrorHandler {
   /**
    * Applies logging configuration from system.logging.
    *
-   * Reads the `throw_recoverable`, `error_enhancers`, and `log_silenced`
-   * settings and configures the handler accordingly.
+   * Reads the `error_enhancers` and `log_silenced` settings and configures
+   * the handler accordingly.
    */
   private function applyConfiguration(): void {
     try {
       $config = \Drupal::config('system.logging');
 
-      $throwRecoverable = $config->get('throw_recoverable');
-      if ($throwRecoverable) {
-        // Enable throwing for E_RECOVERABLE_ERROR. Symfony's throwAt() always
-        // includes E_RECOVERABLE_ERROR | E_USER_ERROR by design, but when this
-        // setting is off we use throwAt(0, true) which still forces those.
-        // When on, we explicitly set the bit to make the intent clear.
-        $this->symfonyHandler->throwAt(E_RECOVERABLE_ERROR, true);
-      }
-
       // Store error_enhancers flag. When TRUE, Symfony's error enhancers
       // (ClassNotFoundErrorEnhancer, UndefinedFunctionErrorEnhancer,
       // UndefinedMethodErrorEnhancer) will enhance exception messages.
-      // This is controlled via ErrorHandler::enhanceError() which is always
-      // called during handleException(). The flag is stored for use by
-      // DrupalExceptionRenderer and other consumers.
+      // This is controlled via ErrorHandler::enhanceError() which is called
+      // by FinalExceptionSubscriber when this flag is enabled.
       $this->errorEnhancersEnabled = (bool) $config->get('error_enhancers');
 
       // When log_silenced is enabled, configure Symfony to log errors that
