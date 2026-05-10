@@ -274,6 +274,13 @@ class HookCollectorPass implements CompilerPassInterface {
       foreach (array_keys($hookImplementations) as $identifier) {
         $parts = explode('::', $identifier, 2);
         if (isset($parts[1])) {
+          // OOP Hook class implementations are prefixed with 'hook.', so that
+          // the service ID will have a "hook." prefix. This will allow a class
+          // that is already registered as a service to be registered separately
+          // with a different 'hook.' ID to be used specifically for hooks
+          // implementations. This will ensure that hook definitions defined in
+          // the class will always run, regardless if the original service is
+          // altered or decorated.
           $class = str_starts_with($parts[0], 'hook.') ? substr($parts[0], 5) : $parts[0];
           $classesMap[$parts[0]] = $class;
         }
@@ -285,6 +292,8 @@ class HookCollectorPass implements CompilerPassInterface {
         $container
           ->register($id, $class)
           ->setAutowired(TRUE)
+          // Prevent hook service from being picked up as an event subscriber.
+          ->setAutoconfigured(FALSE)
           ->addTag('hook');
       }
     }
@@ -580,7 +589,10 @@ class HookCollectorPass implements CompilerPassInterface {
       foreach ($methodAttributes as $attribute) {
         if ($attribute instanceof Hook) {
           self::checkForProceduralOnlyHooks($attribute, $class);
-          $this->oopImplementations[$attribute->hook][$class . '::' . ($attribute->method ?: $method)] = $attribute->module ?? $module;
+          // Add a 'hook.' prefix to the class so that the service ID can be
+          // namespaced.
+          // @see ::registerHookServices()
+          $this->oopImplementations[$attribute->hook]['hook.' . $class . '::' . ($attribute->method ?: $method)] = $attribute->module ?? $module;
           if ($attribute->order !== NULL) {
             // Use a lower weight for order operations that are declared
             // together with the hook listener they apply to.

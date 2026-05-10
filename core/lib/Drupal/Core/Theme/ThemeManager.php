@@ -256,15 +256,27 @@ class ThemeManager implements ThemeManagerInterface {
 
     // Invoke initial preprocess callbacks.
     if (!empty($info['initial preprocess'])) {
-      $callable = $info['initial preprocess'];
-      try {
-        if (!is_callable($callable)) {
-          $callable = $this->callableResolver->getCallableFromDefinition($callable);
-        }
-        $callable($variables, $hook, $info);
+      $callables = [];
+      $initial_preprocess = $info['initial preprocess'];
+      if (is_string($initial_preprocess) && str_contains($info['initial preprocess'], ':')) {
+        // If preprocess is defined as '{service class}:method' or '{service
+        // class}::method', then it is highly likely that the hook class was
+        // registered with a service ID having a 'hook.' prefix, so try that
+        // first.
+        $callables[] = 'hook.' . $info['initial preprocess'];
       }
-      catch (\InvalidArgumentException $e) {
-        \Drupal::logger('theme')->warning('Preprocess callback is not valid: %error.', ['%error' => $e->getMessage()]);
+      $callables[] = $info['initial preprocess'];
+      foreach ($callables as $callable) {
+        try {
+          if (!is_callable($callable)) {
+            $callable = $this->callableResolver->getCallableFromDefinition($callable);
+          }
+          $callable($variables, $hook, $info);
+          break;
+        }
+        catch (\InvalidArgumentException $e) {
+          \Drupal::logger('theme')->warning('Preprocess callback is not valid: %error.', ['%error' => $e->getMessage()]);
+        }
       }
     }
 
