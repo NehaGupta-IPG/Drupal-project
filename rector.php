@@ -21,7 +21,6 @@ return Rector\Config\RectorConfig::configure()
   ->withSkip([
     '*/*ixture*/*',
     '*/Annotation/Doctrine/*',
-    'core/tests/Drupal/Tests/TestTools/ErrorHandler/DrupalDebugClassLoaderTest.php'
   ])
 #  ->withSets([
 #    PHPUnitSetList::PHPUNIT_100,
