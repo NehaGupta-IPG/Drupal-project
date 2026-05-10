@@ -37,6 +37,8 @@ final class DrupalErrorHandler {
 
   /**
    * The singleton instance.
+   *
+   * @var self|null
    */
   private static ?self $instance = NULL;
 
@@ -53,7 +55,7 @@ final class DrupalErrorHandler {
   /**
    * The buffering logger used during early boot.
    */
-  private ?BufferingLogger $bufferingLogger;
+  private ?BufferingLogger $bufferingLogger = NULL;
 
   /**
    * Whether Symfony error enhancers are enabled.
@@ -66,16 +68,9 @@ final class DrupalErrorHandler {
    * Use DrupalErrorHandler::register() instead of constructing directly.
    */
   private function __construct() {
-    // Create a buffering logger to capture errors before the container boots.
-    $this->bufferingLogger = new BufferingLogger();
     $this->drupalErrorLogger = new DrupalErrorLogger();
-
-    // Register Symfony's ErrorHandler. This replaces both set_error_handler()
-    // and set_exception_handler() in a single call.
-    $this->symfonyHandler = ErrorHandler::register(null, true);
-
-    // Set the buffering logger as default for all error levels.
-    $this->symfonyHandler->setDefaultLogger($this->bufferingLogger);
+    $this->symfonyHandler = ErrorHandler::register(NULL, TRUE);
+    $this->symfonyHandler->setDefaultLogger($this->drupalErrorLogger);
 
     // Configure Drupal's exception renderer as the exception handler.
     $this->symfonyHandler->setExceptionHandler(
@@ -87,10 +82,10 @@ final class DrupalErrorHandler {
     // Note: Symfony always forces E_RECOVERABLE_ERROR | E_USER_ERROR to be
     // thrown regardless of this setting. This matches Drupal's treatment of
     // recoverable errors as fatal.
-    $this->symfonyHandler->throwAt(0, true);
+    $this->symfonyHandler->throwAt(0, TRUE);
 
     // Disable scoped errors (local variable preservation) for performance.
-    $this->symfonyHandler->scopeAt(0, true);
+    $this->symfonyHandler->scopeAt(0, TRUE);
   }
 
   /**
@@ -103,11 +98,18 @@ final class DrupalErrorHandler {
    *   The registered handler instance.
    */
   public static function register(): self {
-    if (self::$instance !== NULL) {
-      return self::$instance;
+    if (self::$instance === NULL) {
+      self::$instance = new self();
     }
 
-    self::$instance = new self();
+    // Check if a Symfony ErrorHandler is already registered.
+    $current = get_error_handler();
+    $isRegistered = is_array($current) && $current[0] instanceof ErrorHandler;
+
+    if (!$isRegistered && !defined('PHPUNIT_COMPOSER_INSTALL') && !defined('__PHPUNIT_PHAR__')) {
+      ErrorHandler::register(self::$instance->symfonyHandler);
+    }
+
     return self::$instance;
   }
 
@@ -136,7 +138,7 @@ final class DrupalErrorHandler {
 
     // Replace the buffering logger with the Drupal error logger on the
     // Symfony handler. This automatically replays buffered early-boot errors.
-    $this->symfonyHandler->setDefaultLogger($this->drupalErrorLogger, null, true);
+    $this->symfonyHandler->setDefaultLogger($this->drupalErrorLogger, NULL, TRUE);
 
     // Clear the buffering logger reference.
     $this->bufferingLogger = NULL;
@@ -166,7 +168,7 @@ final class DrupalErrorHandler {
       // are suppressed with the @-operator. This uses Symfony's "scream"
       // feature which ignores the @-operator for logging purposes.
       if ($config->get('log_silenced')) {
-        $this->symfonyHandler->screamAt(E_ALL, true);
+        $this->symfonyHandler->screamAt(E_ALL, TRUE);
       }
     }
     catch (\Exception) {
@@ -179,7 +181,7 @@ final class DrupalErrorHandler {
    *
    * This allows advanced configuration such as:
    * - $handler->getSymfonyHandler()->throwAt(E_RECOVERABLE_ERROR) for opt-in
-   * - $handler->getSymfonyHandler()->screamAt(E_ALL) for logging silenced errors
+   * - $handler->getSymfonyHandler()->screamAt(E_ALL) to log silenced errors
    *
    * @return \Symfony\Component\ErrorHandler\ErrorHandler
    *   The Symfony ErrorHandler instance.

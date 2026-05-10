@@ -19,24 +19,16 @@ use Drupal\Core\Site\MaintenanceModeResolver;
  */
 enum ErrorDisplayLevel: string {
 
-  /**
-   * Display no errors.
-   */
+  // Display no errors.
   case Hide = 'hide';
 
-  /**
-   * Display errors and warnings only.
-   */
+  // Display errors and warnings only.
   case Some = 'some';
 
-  /**
-   * Display all messages.
-   */
+  // Display all messages.
   case All = 'all';
 
-  /**
-   * Display all messages, plus backtrace information.
-   */
+  // Display all messages, plus backtrace information.
   case Verbose = 'verbose';
 
   /**

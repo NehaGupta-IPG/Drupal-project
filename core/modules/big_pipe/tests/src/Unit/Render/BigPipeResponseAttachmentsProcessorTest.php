@@ -17,6 +17,7 @@ use Drupal\Core\Render\AttachmentsInterface;
 use Drupal\Core\Render\AttachmentsResponseProcessorInterface;
 use Drupal\Core\Render\HtmlResponse;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Site\MaintenanceModeResolver;
 use Drupal\Tests\UnitTestCase;
 use Drupal\TestTools\Random;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -165,7 +166,8 @@ class BigPipeResponseAttachmentsProcessorTest extends UnitTestCase {
       $this->prophesize(RendererInterface::class)->reveal(),
       $this->prophesize(ModuleHandlerInterface::class)->reveal(),
       $this->prophesize(LanguageManagerInterface::class)->reveal(),
-      $this->prophesize(FileUrlGeneratorInterface::class)->reveal()
+      $this->prophesize(FileUrlGeneratorInterface::class)->reveal(),
+      $this->prophesize(MaintenanceModeResolver::class)->reveal()
     );
   }
 

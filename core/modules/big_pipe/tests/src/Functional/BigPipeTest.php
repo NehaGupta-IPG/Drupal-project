@@ -12,6 +12,7 @@ use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Error\ErrorDisplayLevel;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
@@ -145,7 +146,7 @@ class BigPipeTest extends BrowserTestBase {
    */
   public function testBigPipe(): void {
     // Simulate production.
-    $this->config('system.logging')->set('error_level', ERROR_REPORTING_HIDE)->save();
+    $this->config('system.logging')->set('error_level', ErrorDisplayLevel::Hide->value)->save();
 
     $this->drupalLogin($this->rootUser);
     $this->assertSessionCookieExists('1');
@@ -210,7 +211,7 @@ class BigPipeTest extends BrowserTestBase {
     // Simulate development.
     // Verifying BigPipe provides useful error output when an error occurs
     // while rendering a placeholder if verbose error logging is enabled.
-    $this->config('system.logging')->set('error_level', ERROR_REPORTING_DISPLAY_VERBOSE)->save();
+    $this->config('system.logging')->set('error_level', ErrorDisplayLevel::Verbose->value)->save();
     $this->drupalGet(Url::fromRoute('big_pipe_test'));
     // The 'edge_case__html_exception' case throws an exception.
     $this->assertSession()->pageTextContains('The website encountered an unexpected error. Try again later');
@@ -244,7 +245,7 @@ class BigPipeTest extends BrowserTestBase {
    */
   public function testBigPipeNoJs(): void {
     // Simulate production.
-    $this->config('system.logging')->set('error_level', ERROR_REPORTING_HIDE)->save();
+    $this->config('system.logging')->set('error_level', ErrorDisplayLevel::Hide->value)->save();
 
     $this->drupalLogin($this->rootUser);
     $this->assertSessionCookieExists('1');
@@ -292,7 +293,7 @@ class BigPipeTest extends BrowserTestBase {
     // Simulate development.
     // Verifying BigPipe provides useful error output when an error occurs
     // while rendering a placeholder if verbose error logging is enabled.
-    $this->config('system.logging')->set('error_level', ERROR_REPORTING_DISPLAY_VERBOSE)->save();
+    $this->config('system.logging')->set('error_level', ErrorDisplayLevel::Verbose->value)->save();
     $this->drupalGet(Url::fromRoute('big_pipe_test'));
     // The 'edge_case__html_exception' case throws an exception.
     $this->assertSession()->pageTextContains('The website encountered an unexpected error. Try again later');

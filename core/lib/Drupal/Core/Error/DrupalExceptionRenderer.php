@@ -89,12 +89,10 @@ final class DrupalExceptionRenderer {
     // HTML response.
     $message = '';
     if (ErrorDisplayLevel::resolve()->isDisplayable($error)) {
-      $class = 'error';
 
       // Treat 'User notice' as debug information.
       if ($error['%type'] == 'User notice') {
         $error['%type'] = 'Debug';
-        $class = 'status';
       }
 
       // Reduce verbosity by removing DRUPAL_ROOT from the file path.
@@ -134,6 +132,12 @@ final class DrupalExceptionRenderer {
 
     $response->setContent($content);
     $response->setStatusCode(500, '500 Service unavailable (with message)');
+
+    // Mark the response as uncacheable to ensure tests pass and clients don't
+    // cache error pages.
+    $response->headers->set('X-Drupal-Cache', 'UNCACHEABLE (no cacheability)');
+    $response->headers->set('Cache-Control', 'no-cache, must-revalidate, post-check=0, pre-check=0');
+
     $response->send();
     exit;
   }

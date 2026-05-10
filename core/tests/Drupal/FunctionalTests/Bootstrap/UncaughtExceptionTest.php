@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests\Bootstrap;
 
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Error\ErrorDisplayLevel;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -51,7 +52,7 @@ class UncaughtExceptionTest extends BrowserTestBase {
 
     $settings = [];
     $settings['config']['system.logging']['error_level'] = (object) [
-      'value' => ERROR_REPORTING_DISPLAY_VERBOSE,
+      'value' => ErrorDisplayLevel::Verbose->value,
       'required' => TRUE,
     ];
     $this->writeSettings($settings);
@@ -66,7 +67,7 @@ class UncaughtExceptionTest extends BrowserTestBase {
 
     $settings = [];
     $settings['config']['system.logging']['error_level'] = (object) [
-      'value' => ERROR_REPORTING_HIDE,
+      'value' => ErrorDisplayLevel::Hide->value,
       'required' => TRUE,
     ];
     $this->writeSettings($settings);
@@ -78,7 +79,7 @@ class UncaughtExceptionTest extends BrowserTestBase {
 
     $settings = [];
     $settings['config']['system.logging']['error_level'] = (object) [
-      'value' => ERROR_REPORTING_DISPLAY_ALL,
+      'value' => ErrorDisplayLevel::All->value,
       'required' => TRUE,
     ];
     $this->writeSettings($settings);

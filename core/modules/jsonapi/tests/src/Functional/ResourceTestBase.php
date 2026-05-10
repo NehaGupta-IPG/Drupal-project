@@ -11,6 +11,7 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultReasonInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Error\ErrorDisplayLevel;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Cache\CacheRedirect;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
@@ -229,7 +230,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
 
     $this->serializer = $this->container->get('jsonapi.serializer');
 
-    $this->config('system.logging')->set('error_level', ERROR_REPORTING_HIDE)->save();
+    $this->config('system.logging')->set('error_level', ErrorDisplayLevel::Hide->value)->save();
 
     $this->revokePermissions();
 

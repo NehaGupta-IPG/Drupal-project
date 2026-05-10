@@ -26,6 +26,7 @@ class LegacyErrorHandlerTest extends UnitTestCase {
    */
   public function testDrupalErrorHandlerDeprecation(): void {
     $this->expectUserDeprecationMessage('_drupal_error_handler() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Error handling is now managed by \Drupal\Core\Error\DrupalErrorHandler. See https://www.drupal.org/project/drupal/issues/3000229');
+    // @phpstan-ignore-next-line
     _drupal_error_handler(E_USER_NOTICE, 'Test notice', __FILE__, __LINE__);
   }
 
@@ -36,6 +37,7 @@ class LegacyErrorHandlerTest extends UnitTestCase {
     $this->expectUserDeprecationMessage('_drupal_exception_handler_additional() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Error\DrupalExceptionRenderer::renderException() instead. See https://www.drupal.org/project/drupal/issues/3000229');
     // Suppress any output from this function.
     ob_start();
+    // @phpstan-ignore-next-line
     _drupal_exception_handler_additional(
       new \Exception('Original'),
       new \Exception('Additional'),

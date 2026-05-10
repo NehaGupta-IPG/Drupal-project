@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Site')]
 #[RunTestsInSeparateProcesses]
 class MaintenanceModeResolverTest extends UnitTestCase {
+
   /**
    * {@inheritdoc}
    */
@@ -103,6 +104,7 @@ class MaintenanceModeResolverTest extends UnitTestCase {
     // String type 'install'.
     $resolver->enableMaintenance('install');
     $this->assertTrue($resolver->isMaintenance());
+    // @phpstan-ignore argument.unresolvableType
     $this->assertSame(MaintenanceType::Install, $resolver->getMaintenanceType());
     $this->assertTrue($resolver->is(MaintenanceType::Install));
 

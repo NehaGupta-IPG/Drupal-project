@@ -15,6 +15,7 @@ use Psr\Log\LogLevel;
  * Tests the ErrorLevels class.
  */
 #[Group('Error')]
+#[Group('legacy')]
 class ErrorLevelsTest extends UnitTestCase {
 
   /**
@@ -108,6 +109,7 @@ class ErrorLevelsTest extends UnitTestCase {
    */
   public function testGetLegacyLevels(): void {
     $this->expectUserDeprecationMessage('Drupal\Core\Error\ErrorLevels::getLegacyLevels() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Error\ErrorLevels::getSeverity() or \Drupal\Core\Error\ErrorLevels::LEVELS instead. See https://www.drupal.org/node/3000229');
+    // @phpstan-ignore-next-line
     $legacy = ErrorLevels::getLegacyLevels();
 
     // Verify structure: keyed by E_* constant, value is [label, RfcLogLevel].

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Error;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Utility\Error;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
@@ -66,6 +67,9 @@ final class DrupalErrorLogger extends AbstractLogger {
 
     // Log to Drupal's logger system if available.
     $this->logToDrupal($error, $severity);
+
+    // Display the error to the user if configured to do so.
+    $this->displayToUser($error);
   }
 
   /**
@@ -84,11 +88,18 @@ final class DrupalErrorLogger extends AbstractLogger {
     // Symfony ErrorHandler provides structured context. Map it to Drupal's
     // error array format.
     if (isset($context['exception']) && $context['exception'] instanceof \Throwable) {
-      return Error::decodeException($context['exception']);
+      $error = Error::decodeException($context['exception']);
+      if ($context['exception'] instanceof \ErrorException) {
+        $error['%type'] = ErrorLevels::getSeverity($context['exception']->getSeverity())['label'];
+      }
+      return $error;
     }
 
+    $type = $context['type'] ?? \E_ERROR;
+    $severity_info = ErrorLevels::getSeverity($type);
+
     return [
-      '%type' => $context['type_label'] ?? 'Error',
+      '%type' => $severity_info['label'],
       '@message' => (string) $message,
       '%function' => $context['function'] ?? 'unknown',
       '%file' => $context['file'] ?? 'unknown',
@@ -155,6 +166,56 @@ final class DrupalErrorLogger extends AbstractLogger {
       // We can't log, for example because the database connection is not
       // available. At least try to log to PHP error log.
       error_log(strtr('Failed to log error: ' . Error::DEFAULT_ERROR_MESSAGE . ' @backtrace_string', $error));
+    }
+  }
+
+  /**
+   * Displays an error to the user via Drupal's messenger service.
+   *
+   * @param array $error
+   *   The Drupal error array.
+   */
+  private function displayToUser(array $error): void {
+    // Only display errors if the container and messenger are available.
+    if (!\Drupal::hasContainer() || !\Drupal::hasService('messenger')) {
+      return;
+    }
+
+    $displayLevel = ErrorDisplayLevel::resolve();
+    if (!$displayLevel->isDisplayable($error)) {
+      return;
+    }
+
+    // Map error type to messenger type.
+    $class = 'error';
+    if ($error['%type'] === 'User notice' || $error['%type'] === 'Debug') {
+      $error['%type'] = 'Debug';
+      $class = 'status';
+    }
+
+    // Build the message.
+    if (!$displayLevel->isVerbose()) {
+      $message = new FormattableMarkup(Error::DEFAULT_ERROR_MESSAGE, $error);
+    }
+    else {
+      // With verbose logging, include a backtrace.
+      $backtrace = $error['backtrace'] ?? [];
+      // First trace is the error itself, already in the message.
+      if ($backtrace) {
+        array_shift($backtrace);
+      }
+      $error['@backtrace'] = Error::formatBacktrace(array_map(function ($trace) {
+        unset($trace['args']);
+        return $trace;
+      }, $backtrace));
+      $message = new FormattableMarkup('<details class="error-with-backtrace"><summary>' . Error::DEFAULT_ERROR_MESSAGE . '</summary><pre class="backtrace">@backtrace</pre></details>', $error);
+    }
+
+    try {
+      \Drupal::messenger()->addMessage($message, $class, TRUE);
+    }
+    catch (\Throwable) {
+      // If messenger fails, don't crash.
     }
   }
 

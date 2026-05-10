@@ -9,19 +9,13 @@ namespace Drupal\Core\Site;
  */
 enum MaintenanceType: string {
 
-  /**
-   * Site is being installed.
-   */
+  // Site is being installed.
   case Install = 'install';
 
-  /**
-   * Site is being updated.
-   */
+  // Site is being updated.
   case Update = 'update';
 
-  /**
-   * Site is in regular maintenance mode.
-   */
+  // Site is in regular maintenance mode.
   case Regular = 'regular';
 
 }

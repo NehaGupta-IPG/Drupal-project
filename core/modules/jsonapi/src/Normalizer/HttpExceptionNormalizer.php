@@ -4,6 +4,7 @@ namespace Drupal\jsonapi\Normalizer;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Error\ErrorDisplayLevel;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\jsonapi\Normalizer\Value\HttpExceptionNormalizerValue;
 use Symfony\Component\HttpFoundation\Response;
@@ -62,7 +63,7 @@ class HttpExceptionNormalizer extends NormalizerBase {
       $cacheability->setCacheMaxAge(0);
     }
 
-    $is_verbose_reporting = \Drupal::config('system.logging')->get('error_level') === ERROR_REPORTING_DISPLAY_VERBOSE;
+    $is_verbose_reporting = \Drupal::config('system.logging')->get('error_level') === ErrorDisplayLevel::Verbose->value;
     $cacheability->addCacheTags(['config:system.logging']);
 
     $site_report_access = $this->currentUser->hasPermission('access site reports');
@@ -111,7 +112,7 @@ class HttpExceptionNormalizer extends NormalizerBase {
       $error['code'] = (string) $exception->getCode();
     }
 
-    $is_verbose_reporting = \Drupal::config('system.logging')->get('error_level') === ERROR_REPORTING_DISPLAY_VERBOSE;
+    $is_verbose_reporting = \Drupal::config('system.logging')->get('error_level') === ErrorDisplayLevel::Verbose->value;
     $site_report_access = $this->currentUser->hasPermission('access site reports');
     if ($site_report_access && $is_verbose_reporting) {
       // The following information may contain sensitive information. Only show

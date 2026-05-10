@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Error\ErrorDisplayLevel;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
@@ -69,7 +70,7 @@ class RestJsonApiUnsupportedTest extends ResourceTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->config('system.logging')->set('error_level', ERROR_REPORTING_HIDE)->save();
+    $this->config('system.logging')->set('error_level', ErrorDisplayLevel::Hide->value)->save();
 
     // Create a "Camelids" node type.
     NodeType::create([

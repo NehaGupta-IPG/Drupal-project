@@ -28,7 +28,7 @@ use Symfony\Component\HttpFoundation\Response;
  * @see https://www.drupal.org/project/drupal/issues/3000229
  */
 function drupal_error_levels(): array {
-  @trigger_error('drupal_error_levels() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Error\ErrorLevels::LEVELS or \Drupal\Core\Error\ErrorLevels::getSeverity() instead. See https://www.drupal.org/project/drupal/issues/3000229', E_USER_DEPRECATED);
+  @trigger_error('drupal_error_levels() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Error\ErrorLevels::LEVELS or \Drupal\Core\Error\ErrorLevels::getSeverity() instead. See https://www.drupal.org/node/3000229', E_USER_DEPRECATED);
   $types = [
     E_ERROR => ['Error', RfcLogLevel::ERROR],
     E_WARNING => ['Warning', RfcLogLevel::WARNING],
@@ -66,7 +66,7 @@ function drupal_error_levels(): array {
  * @see https://www.drupal.org/project/drupal/issues/3000229
  */
 function _drupal_error_handler_real($error_level, $message, $filename, $line): void {
-  @trigger_error('_drupal_error_handler_real() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Error handling is now managed by \Drupal\Core\Error\DrupalErrorHandler. See https://www.drupal.org/project/drupal/issues/3000229', E_USER_DEPRECATED);
+  @trigger_error('_drupal_error_handler_real() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Error handling is now managed by \Drupal\Core\Error\DrupalErrorHandler. See https://www.drupal.org/node/3000229', E_USER_DEPRECATED);
   if ($error_level & error_reporting()) {
     $types = drupal_error_levels();
     [$severity_msg, $severity_level] = $types[$error_level];
@@ -128,7 +128,7 @@ function _drupal_error_handler_real($error_level, $message, $filename, $line): v
  * @see https://www.drupal.org/project/drupal/issues/3000229
  */
 function error_displayable($error = NULL) {
-  @trigger_error('error_displayable() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Error\ErrorDisplayLevel::resolve()->isDisplayable() instead. See https://www.drupal.org/project/drupal/issues/3000229', E_USER_DEPRECATED);
+  @trigger_error('error_displayable() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Error\ErrorDisplayLevel::resolve()->isDisplayable() instead. See https://www.drupal.org/node/3000229', E_USER_DEPRECATED);
   if ((new MaintenanceModeResolver())->isMaintenance()) {
     return TRUE;
   }
@@ -164,7 +164,7 @@ function error_displayable($error = NULL) {
  * @see https://www.drupal.org/project/drupal/issues/3000229
  */
 function _drupal_log_error($error, $fatal = FALSE): void {
-  @trigger_error('_drupal_log_error() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Error\DrupalErrorLogger for logging and \Drupal\Core\Error\DrupalExceptionRenderer for fatal error rendering. See https://www.drupal.org/project/drupal/issues/3000229', E_USER_DEPRECATED);
+  @trigger_error('_drupal_log_error() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Error\DrupalErrorLogger for logging and \Drupal\Core\Error\DrupalExceptionRenderer for fatal error rendering. See https://www.drupal.org/node/3000229', E_USER_DEPRECATED);
   $is_installer = InstallerKernel::installationAttempted() && \Drupal::hasContainer();
 
   // Backtrace, exception and 'severity_level' are not valid replacement values
@@ -341,7 +341,7 @@ function _drupal_log_error($error, $fatal = FALSE): void {
  * @see https://www.drupal.org/project/drupal/issues/3000229
  */
 function _drupal_get_error_level() {
-  @trigger_error('_drupal_get_error_level() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Error\ErrorDisplayLevel::resolve() instead. See https://www.drupal.org/project/drupal/issues/3000229', E_USER_DEPRECATED);
+  @trigger_error('_drupal_get_error_level() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Error\ErrorDisplayLevel::resolve() instead. See https://www.drupal.org/node/3000229', E_USER_DEPRECATED);
   // Raise the error level to maximum for the installer, so users are able to
   // file proper bug reports for installer errors. The returned value is
   // different to the one below, because the installer actually has a
@@ -387,7 +387,7 @@ function _drupal_get_error_level() {
  * @see https://www.drupal.org/project/drupal/issues/3000229
  */
 function _drupal_error_header($message, $type, $function, $file, $line): void {
-  @trigger_error('_drupal_error_header() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Error\DrupalErrorLogger::emitTestHeaders() instead. See https://www.drupal.org/project/drupal/issues/3000229', E_USER_DEPRECATED);
+  @trigger_error('_drupal_error_header() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Error\DrupalErrorLogger::emitTestHeaders() instead. See https://www.drupal.org/node/3000229', E_USER_DEPRECATED);
   // $number does not use drupal_static as it should not be reset
   // as it uniquely identifies each PHP error.
   static $number = 0;

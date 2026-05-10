@@ -114,6 +114,7 @@ class DrupalErrorLoggerTest extends UnitTestCase {
       ->willThrowException(new \RuntimeException('Database gone'));
 
     $logger = new DrupalErrorLogger($drupalLogger);
+    $this->expectOutputRegex('/Failed to log error/');
 
     // Should not throw — falls back to error_log().
     $logger->log(RfcLogLevel::ERROR, 'Test error', [

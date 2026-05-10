@@ -8,6 +8,7 @@
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\Core\Utility\Error;
+use Drupal\Core\Error\ErrorDisplayLevel;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 // cspell:ignore htkey
@@ -545,8 +546,7 @@ function _drupal_shutdown_function_handle_exception($exception): void {
   if (!function_exists('fastcgi_finish_request')) {
     // If we are displaying errors, then do so with no possibility of a
     // further uncaught exception being thrown.
-    require_once __DIR__ . '/errors.inc';
-    if (error_displayable()) {
+    if (ErrorDisplayLevel::resolve()->isDisplayable()) {
       print '<h1>Uncaught exception thrown in shutdown function.</h1>';
       print '<p>' . Error::renderExceptionSafe($exception) . '</p><hr />';
     }

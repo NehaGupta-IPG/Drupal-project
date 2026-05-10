@@ -8,6 +8,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Config\ImmutableConfig;
+use Drupal\Core\Error\ErrorDisplayLevel;
 use Drupal\Core\Http\Exception\CacheableAccessDeniedHttpException;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\jsonapi\Normalizer\HttpExceptionNormalizer;
@@ -38,7 +39,7 @@ class HttpExceptionNormalizerTest extends UnitTestCase {
     $container = $this->prophesize(ContainerInterface::class);
     $container->get('request_stack')->willReturn($request_stack->reveal());
     $config = $this->prophesize(ImmutableConfig::class);
-    $config->get('error_level')->willReturn(ERROR_REPORTING_DISPLAY_VERBOSE);
+    $config->get('error_level')->willReturn(ErrorDisplayLevel::Verbose->value);
     $config_factory = $this->prophesize(ConfigFactory::class);
     $config_factory->get('system.logging')->willReturn($config->reveal());
     $container->get('config.factory')->willReturn($config_factory->reveal());

@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Routing;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Cache\CacheableJsonResponse;
+use Drupal\Core\Error\ErrorDisplayLevel;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -168,7 +169,7 @@ class ExceptionHandlingTest extends KernelTestBase {
    */
   public function testBacktraceEscaping(): void {
     // Enable verbose error logging.
-    $this->config('system.logging')->set('error_level', ERROR_REPORTING_DISPLAY_VERBOSE)->save();
+    $this->config('system.logging')->set('error_level', ErrorDisplayLevel::Verbose->value)->save();
 
     $request = Request::create('/router_test/test17');
     $request->setFormat('html', ['text/html']);
@@ -190,7 +191,7 @@ class ExceptionHandlingTest extends KernelTestBase {
    */
   public function testExceptionEscaping(): void {
     // Enable verbose error logging.
-    $this->config('system.logging')->set('error_level', ERROR_REPORTING_DISPLAY_VERBOSE)->save();
+    $this->config('system.logging')->set('error_level', ErrorDisplayLevel::Verbose->value)->save();
 
     // Using \Drupal\Component\Render\FormattableMarkup.
     $request = Request::create('/router_test/test24');

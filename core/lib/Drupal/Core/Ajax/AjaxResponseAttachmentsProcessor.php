@@ -49,6 +49,8 @@ class AjaxResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
    *   The module handler.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
+   * @param \Drupal\Core\Site\MaintenanceModeResolver|null $maintenanceModeResolver
+   *   The maintenance mode resolver.
    */
   public function __construct(
     protected AssetResolverInterface $assetResolver,

@@ -223,18 +223,7 @@ $ignoreErrors[] = [
 	'count' => 1,
 	'path' => __DIR__ . '/includes/update.inc',
 ];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$callback of function set_error_handler expects \\(callable\\(int, string, string, int\\)\\: bool\\)\\|null, \'_drupal_error…\' given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/includes/utility.inc',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$callback of function set_error_handler expects \\(callable\\(int, string, string, int\\)\\: bool\\)\\|null, \'_drupal_error…\' given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/install.php',
-];
+
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\:\\:setContainer\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
@@ -4015,12 +4004,7 @@ $ignoreErrors[] = [
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/DrupalKernel.php',
 ];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$callback of function set_error_handler expects \\(callable\\(int, string, string, int\\)\\: bool\\)\\|null, \'_drupal_error…\' given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/DrupalKernel.php',
-];
+
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$container might not be defined\\.$#',
 	'identifier' => 'variable.undefined',

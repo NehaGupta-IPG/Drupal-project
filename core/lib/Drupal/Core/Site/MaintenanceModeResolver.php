@@ -100,6 +100,10 @@ class MaintenanceModeResolver {
   /**
    * Converts a raw value to a MaintenanceType enum if possible.
    *
+   * Standard string values ('install', 'update', 'regular') and TRUE are
+   * converted to their respective MaintenanceType enum cases. Custom strings
+   * are preserved as-is to allow for extension.
+   *
    * @param \Drupal\Core\Site\MaintenanceType|string|bool $value
    *   The raw value.
    *
