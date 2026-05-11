@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\hook_collector_hook_attribute\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Test\TrackHookInvocationsTrait;
 
 /**
  * Test Hook class that is also a declared service.
@@ -18,13 +19,21 @@ use Drupal\Core\Hook\Attribute\Hook;
 #[Hook('test_hook_1')]
 class HookRegisteredService {
 
+  use TrackHookInvocationsTrait;
+
   /**
    * Implements hook_test_hook_1().
    */
   public function __invoke(array &$invocations): void {
-    $key = get_class($this) . '::' . __FUNCTION__;
-    $invocations[$key] ??= 0;
-    $invocations[$key]++;
+    $this->trackInvocation($invocations, __FUNCTION__);
+  }
+
+  /**
+   * Implements hook_test_hook_alter().
+   */
+  #[Hook('test_hook_alter')]
+  public function testHookAlter(array &$invocations): void {
+    $this->trackInvocation($invocations, __FUNCTION__);
   }
 
 }

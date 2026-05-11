@@ -90,6 +90,13 @@ class HookCollectorPass implements CompilerPassInterface {
   protected array $preprocessForSuggestions = [];
 
   /**
+   * A map of names of classes that contain hooks to their service IDs.
+   *
+   * @var array<class-string, string>
+   */
+  protected array $hookClassToServiceIdMap = [];
+
+  /**
    * Constructor.
    *
    * @param list<string> $modules
@@ -185,7 +192,8 @@ class HookCollectorPass implements CompilerPassInterface {
     // List of hooks and modules formatted for hook_module_implements_alter().
     $moduleImplementsMap = [];
     foreach ($implementationsByHookOrig as $hook => $hookImplementations) {
-      foreach (array_intersect($this->modules, $hookImplementations) as $module) {
+      $modules = array_merge($this->modules, ['core']);
+      foreach (array_intersect($modules, $hookImplementations) as $module) {
         $moduleImplementsMap[$hook][$module] = '';
       }
     }
@@ -206,6 +214,24 @@ class HookCollectorPass implements CompilerPassInterface {
       self::applyOrderOperations($implementationsByHook[$hook], $order_operations);
     }
 
+    // Use the correct service IDs in the hook list in the callable identifiers.
+    // This is done after ordering, so that ordering by identifiers using the
+    // actual class names works.
+    foreach ($implementationsByHook as &$implementation) {
+      foreach ($implementation as $identifier => $module) {
+        // Remove the implementation so that the array can be rebuilt in the
+        // same order, though with possibly new keys.
+        unset($implementation[$identifier]);
+        $parts = explode('::', $identifier, 2);
+        if (isset($parts[1])) {
+          $class = $parts[0];
+          if (isset($this->hookClassToServiceIdMap[$class])) {
+            $identifier = $this->hookClassToServiceIdMap[$class] . '::' . $parts[1];
+          }
+        }
+        $implementation[$identifier] = $module;
+      }
+    }
     return $implementationsByHook;
   }
 
@@ -218,11 +244,12 @@ class HookCollectorPass implements CompilerPassInterface {
   protected function getOrderOperations(): array {
     $implementationsByHook = $this->getFilteredImplementations();
     $operations_by_hook = [];
+    $modules = array_merge($this->modules, ['core']);
     foreach ($this->orderOperations as $hook => $order_operations_by_weight) {
       ksort($order_operations_by_weight);
       $order_operations = array_merge(...$order_operations_by_weight);
       foreach ($order_operations as $key => $operation) {
-        if (!isset($implementationsByHook[$hook][$operation->identify()]) || !in_array($implementationsByHook[$hook][$operation->identify()], $this->modules)) {
+        if (!isset($implementationsByHook[$hook][$operation->identify()]) || !in_array($implementationsByHook[$hook][$operation->identify()], $modules)) {
           unset($order_operations[$key]);
         }
       }
@@ -296,7 +323,7 @@ class HookCollectorPass implements CompilerPassInterface {
           ->addTag('hook');
       }
       else {
-        $container->getDefinition('id')->addTag('hook');
+        $container->getDefinition($id)->addTag('hook');
       }
     }
   }
@@ -484,6 +511,7 @@ class HookCollectorPass implements CompilerPassInterface {
         continue;
       }
       elseif ($provider === 'Core') {
+        $provider = 'core';
         $providerPath = 'core/lib/Drupal/Core';
       }
       // Ignore any services in a "Hook" namespace, because they are discovered
@@ -595,29 +623,29 @@ class HookCollectorPass implements CompilerPassInterface {
           self::checkForProceduralOnlyHooks($attribute, $class);
           // If the class has already been registered as a service, add a
           // 'hook.' prefix to the class to be used as a separate service ID.
-          // @see ::registerHookServices()
-          $serviceClass = $isRegistered ? 'hook.' . $class : $class;
-          $this->oopImplementations[$attribute->hook][$serviceClass . '::' . ($attribute->method ?: $method)] = $attribute->module ?? $module;
+          // @see ::calculateImplementations()
+          if ($isRegistered) {
+            $this->hookClassToServiceIdMap[$class] = 'hook.' . $class;
+          }
+          $this->oopImplementations[$attribute->hook][$class . '::' . ($attribute->method ?: $method)] = $attribute->module ?? $module;
           if ($attribute->order !== NULL) {
             // Use a lower weight for order operations that are declared
             // together with the hook listener they apply to.
-            $this->orderOperations[$attribute->hook][0][] = $attribute->order->getOperation("$serviceClass::$method");
+            $this->orderOperations[$attribute->hook][0][] = $attribute->order->getOperation("$class::$method");
           }
         }
         elseif ($attribute instanceof ReorderHook) {
-          $serviceClass = $isRegistered ? 'hook.' . $attribute->class : $attribute->class;
           $identifier = $attribute->class === ProceduralCall::class
             ? $attribute->method
-            : $serviceClass . '::' . $attribute->method;
+            : $attribute->class . '::' . $attribute->method;
           // Use a higher weight for order operations that target other hook
           // listeners.
           $this->orderOperations[$attribute->hook][1][] = $attribute->order->getOperation($identifier);
         }
         elseif ($attribute instanceof RemoveHook) {
-          $serviceClass = $isRegistered ? 'hook.' . $attribute->class : $attribute->class;
           $identifier = $attribute->class === ProceduralCall::class
             ? $attribute->method
-            : $serviceClass . '::' . $attribute->method;
+            : $attribute->class . '::' . $attribute->method;
           $this->removeHookIdentifiers[$attribute->hook][] = $identifier;
         }
       }
