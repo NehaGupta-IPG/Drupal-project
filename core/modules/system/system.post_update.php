@@ -7,9 +7,6 @@
 
 use Drupal\block\BlockInterface;
 use Drupal\Core\Config\Entity\ConfigEntityUpdater;
-use Drupal\Core\Entity\EntityFormModeInterface;
-use Drupal\views\ViewEntityInterface;
-use Drupal\views\ViewsConfigUpdater;
 
 /**
  * Implements hook_removed_post_updates().
