@@ -7,7 +7,6 @@ namespace Drupal\KernelTests\Core\Hook;
 use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Test\Hook\TestHookService;
-
 use Drupal\hook_collector_hook_attribute\DeprecatedServiceWithHook;
 use Drupal\hook_collector_hook_attribute\Hook\HookRegisteredService;
 use Drupal\hook_collector_hook_attribute\Random\Test\Namespace\AnotherServiceWithHook;
