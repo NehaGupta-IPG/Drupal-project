@@ -23,7 +23,7 @@ class HideUntranslatedMenuUpdateTest extends UpdatePathTestBase {
    */
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
-      __DIR__ . '/../../../fixtures/update/drupal-10.3.0.bare.standard.php.gz',
+      __DIR__ . '/../../../fixtures/update/drupal-11.3.0.bare.standard.php.gz',
     ];
   }
 
