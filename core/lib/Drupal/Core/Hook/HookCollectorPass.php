@@ -295,6 +295,9 @@ class HookCollectorPass implements CompilerPassInterface {
           ->setAutoconfigured(FALSE)
           ->addTag('hook');
       }
+      else {
+        $container->getDefinition('id')->addTag('hook');
+      }
     }
   }
 
@@ -452,13 +455,13 @@ class HookCollectorPass implements CompilerPassInterface {
   protected function collectRegisteredServicesHookImplementations(array $namespaces, array $definitions, FileCacheInterface $hook_file_cache): void {
     foreach ($definitions as $id => $definition) {
       // Hook discovery is not done on abstract services, synthetic services,
-      // services defined with a factory, and services that decorate other
-      // services. Service decorators are skipped so that the Hook attribute
-      // 'order' property and RemoveHook attribute are the only API to alter
-      // other hooks. Skipping service decorators also removes the complexity of
-      // what the expected result is for ordering and removing hooks by class
-      // name when service classes can be changed by decoration.
-      if ($definition->isAbstract() || $definition->isSynthetic() || !empty($definition->getFactory()) || !empty($definition->getDecoratedService())) {
+      // deprecated services, services defined with a factory, and services
+      // that decorate other services. Service decorators are skipped so that
+      // the Hook attribute 'order' property and RemoveHook attribute are the
+      // only API to alter other hooks. Skipping service decorators also removes
+      // the complexity of what the expected result is for ordering and removing
+      // hooks by class name when service classes can be changed by decoration.
+      if ($definition->isAbstract() || $definition->isDeprecated() || $definition->isSynthetic() || !empty($definition->getFactory()) || !empty($definition->getDecoratedService())) {
         continue;
       }
 
