@@ -31,6 +31,7 @@ use Drupal\TestTools\TestRunner\Event\RunnerTestsExecutionPoll;
 use Drupal\TestTools\TestRunner\Event\RunnerTestsExecutionStart;
 use Drupal\TestTools\TestRunner\Event\TestExecutionFinished;
 use Drupal\TestTools\TestRunner\Event\TestExecutionStart;
+use Drupal\TestTools\TestRunner\EventSubscriber\ExecutionProgress;
 use Drupal\TestTools\TestRunner\EventSubscriber\ExecutionProgressDebug;
 use Drupal\TestTools\TestRunner\Configuration as Config;
 use Drupal\TestTools\TestRunner\WorkAllocator;
@@ -101,7 +102,9 @@ simpletest_script_init($autoloader);
 
 // Register the event subscriber.
 $eventDispatcher = \Drupal::service(EventDispatcherInterface::class);
-$executionProgress = new ExecutionProgressDebug($console_output, Config::instance());
+$executionProgress = Config::get('debug-execution') ?
+  new ExecutionProgressDebug($console_output, Config::instance()) :
+  new ExecutionProgress($console_output, Config::instance());
 $eventDispatcher->addSubscriber($executionProgress);
 
 if (!class_exists(TestCase::class)) {
