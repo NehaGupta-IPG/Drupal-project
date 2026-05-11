@@ -13,6 +13,7 @@ use Drupal\Core\Session\UserSession;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\Core\Menu\MenuLinkMock;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -292,6 +293,7 @@ class MenuLinkTreeTest extends KernelTestBase {
    * Tests transforming a link tree.
    */
   #[Group('legacy')]
+  #[IgnoreDeprecations]
   public function testTransformWithoutContext(): void {
     /** @var \Drupal\system\MenuStorage $storage */
     $storage = \Drupal::entityTypeManager()->getStorage('menu');
