@@ -63,20 +63,6 @@ interface MenuLinkTreeInterface {
   public function load($menu_name, MenuTreeParameters $parameters);
 
   /**
-   * Sorts a menu link tree by weight, title, and plugin ID.
-   *
-   * This method exists for callers that insert additional elements after
-   * load() and need to restore display order. Array keys are preserved.
-   *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
-   *   The menu link tree to sort.
-   *
-   * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
-   *   The sorted menu link tree.
-   */
-  public function sort(array $tree): array;
-
-  /**
    * Applies access checks to a menu link tree.
    *
    * Delegates to the 'menu.tree_access_check' service. Decorate that service

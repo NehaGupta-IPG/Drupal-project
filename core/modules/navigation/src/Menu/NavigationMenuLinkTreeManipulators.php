@@ -153,7 +153,8 @@ class NavigationMenuLinkTreeManipulators {
     $link = new MenuLinkDefault([], $element->link->getPluginId() . '.navigation_overview', $definition, $this->overrides);
     $overview_element = new MenuLinkTreeElement($link, FALSE, $element->depth + 1, $element->inActiveTrail, []);
     $overview_element->access = $element->access ? clone $element->access : NULL;
-    $element->subtree[$element->link->getPluginId() . '.navigation_overview'] = $overview_element;
+    $key = $element->link->getPluginId() . '.navigation_overview';
+    $element->subtree = [$key => $overview_element] + $element->subtree;
   }
 
 }

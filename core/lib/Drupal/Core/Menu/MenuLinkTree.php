@@ -83,9 +83,15 @@ class MenuLinkTree implements MenuLinkTreeInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Sorts a tree by menu link weight, title, and plugin ID, preserving keys.
+   *
+   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
+   *   The menu link tree to sort.
+   *
+   * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
+   *   The sorted menu link tree.
    */
-  public function sort(array $tree): array {
+  protected function sort(array $tree): array {
     foreach ($tree as $key => $element) {
       if ($element->subtree) {
         $tree[$key]->subtree = $this->sort($element->subtree);

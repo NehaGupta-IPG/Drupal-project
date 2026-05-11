@@ -92,11 +92,7 @@ final class NavigationMenuBlock extends SystemMenuBlock implements ContainerFact
       ->onlyEnabledLinks();
     $tree = $this->menuTree->load($menu_name, $parameters);
     $tree = $this->menuTree->checkAccess($tree);
-    // Insert overview links for second-level items with children; re-sort
-    // afterwards so the inserted links (weight: -1000) appear first within
-    // their parent's subtree.
     $tree = $this->navigationMenuLinkTreeManipulators->addSecondLevelOverviewLinks($tree);
-    $tree = $this->menuTree->sort($tree);
     $build = $this->menuTree->build($tree);
     if (!empty($build)) {
       $build['#title'] = $this->configuration['label'];
