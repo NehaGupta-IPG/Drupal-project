@@ -618,7 +618,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // Initialize legacy request globals.
     $this->initializeRequestGlobals($request);
 
-    // Put the request on the stack.
+    // Put the request on the stack. Main requests will be popped in
+    // \Drupal\Core\DrupalKernel::terminate() and sub requests will be popped in
+    // \Drupal\Core\StackMiddleware\KernelPreHandle::handle().
     $this->container->get('request_stack')->push($request);
 
     // Set the allowed protocols.
@@ -726,6 +728,12 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
           $service = $this->container->get($id);
           $service->destruct();
         }
+      }
+
+      // Pop the request added in \Drupal\Core\DrupalKernel::preHandle() from
+      // request stack at the end of the execution cycle.
+      if ($this->prepared === TRUE) {
+        $this->container->get('request_stack')->pop();
       }
     }
   }
@@ -985,11 +993,19 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $this->containerNeedsDumping = FALSE;
     $session_started = FALSE;
     $all_messages = [];
+    $config_is_syncing = FALSE;
+    $source_storage = NULL;
+    $stream_wrappers_registered = FALSE;
     if (isset($this->container)) {
       // Save the id of the currently logged in user.
       if ($this->container->initialized('current_user')) {
         $current_user_id = $this->container->get('current_user')->id();
       }
+
+      if ($this->container->initialized('stream_wrapper_manager') && !empty($this->container->get('stream_wrapper_manager')->getWrappers())) {
+        $stream_wrappers_registered = TRUE;
+      }
+
       // After rebuilding the container some objects will have stale services.
       // Record a map of objects to service IDs prior to rebuilding the
       // container in order to ensure
@@ -1008,6 +1024,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       }
 
       $all_messages = $this->container->get('messenger')->all();
+      $config_is_syncing = $this->container->get('config.installer')->isSyncing();
+      $source_storage = $this->container->get('config.installer')->getSourceStorage();
     }
 
     // If the module list hasn't already been set in updateModules and we are
@@ -1050,6 +1068,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $this->container->get('session')->start();
     }
 
+    if ($stream_wrappers_registered) {
+      // Re-register the stream wrappers with the manager service.
+      $this->container->get('stream_wrapper_manager')->register();
+    }
+
     // The request stack is preserved across container rebuilds. Re-inject the
     // new session into the main request if one was present before.
     if (($request_stack = $this->container->get('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE))) {
@@ -1067,6 +1090,15 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     foreach ($all_messages as $type => $messages) {
       foreach ($messages as $message) {
         $this->container->get('messenger')->addMessage($message, $type);
+      }
+    }
+
+    // Restore syncing flag, as this is often set when modules or themes
+    // are installed which triggers a container rebuild.
+    if ($config_is_syncing) {
+      $this->container->get('config.installer')->setSyncing(TRUE);
+      if ($source_storage) {
+        $this->container->get('config.installer')->setSourceStorage($source_storage);
       }
     }
 
@@ -1282,6 +1314,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $session_started = FALSE;
     $subrequest = FALSE;
     $reload_module_handler = FALSE;
+    $stream_wrappers_registered = FALSE;
 
     // Save the id of the currently logged in user.
     if ($this->container->initialized('current_user')) {
@@ -1290,6 +1323,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     if ($this->container->initialized('module_handler') && $this->container->get('module_handler')->isLoaded()) {
       $reload_module_handler = TRUE;
+    }
+
+    if ($this->container->initialized('stream_wrapper_manager') && !empty($this->container->get('stream_wrapper_manager')->getWrappers())) {
+      $stream_wrappers_registered = TRUE;
     }
 
     // After rebuilding the container some objects will have stale services.
@@ -1311,14 +1348,30 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     $all_messages = $this->container->get('messenger')->all();
 
+    // Track the config installer syncing flag for when multiple modules are
+    // installed and container is reset.
+    $config_is_syncing = $this->container->get('config.installer')->isSyncing();
+    $source_storage = $this->container->get('config.installer')->getSourceStorage();
     $persist = $this->getServicesToPersist($this->container);
     $this->container->reset();
     $this->persistServices($this->container, $persist);
+    // Restore syncing flag to new container.
+    if ($config_is_syncing) {
+      $this->container->get('config.installer')->setSyncing(TRUE);
+      if ($source_storage) {
+        $this->container->get('config.installer')->setSourceStorage($source_storage);
+      }
+    }
 
     $this->container->set('kernel', $this);
 
     // Set the class loader which was registered as a synthetic service.
     $this->container->set('class_loader', $this->classLoader);
+
+    if ($stream_wrappers_registered) {
+      // Re-register the stream wrappers with the manager service.
+      $this->container->get('stream_wrapper_manager')->register();
+    }
 
     if ($reload_module_handler) {
       $this->container->get('module_handler')->reload();

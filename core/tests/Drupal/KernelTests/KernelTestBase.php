@@ -20,8 +20,11 @@ use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Test\EventSubscriber\FieldStorageCreateCheckSubscriber;
 use Drupal\Core\Test\TestDatabase;
+use Drupal\Tests\BrowserHtmlDebugTrait;
 use Drupal\Tests\ConfigTestTrait;
+use Drupal\Tests\DrupalTestCaseTrait;
 use Drupal\Tests\ExtensionListTestTrait;
+use Drupal\Tests\HttpKernelUiHelperTrait;
 use Drupal\Tests\PhpUnitCompatibilityTrait;
 use Drupal\Tests\RandomGeneratorTrait;
 use Drupal\Tests\TestRequirementsTrait;
@@ -96,6 +99,7 @@ use Symfony\Component\VarDumper\VarDumper;
  */
 abstract class KernelTestBase extends TestCase implements ServiceProviderInterface {
 
+  use DrupalTestCaseTrait;
   use AssertContentTrait;
   use RandomGeneratorTrait;
   use ConfigTestTrait;
@@ -104,6 +108,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   use PhpUnitCompatibilityTrait;
   use ProphecyTrait;
   use ExpectDeprecationTrait;
+  use BrowserHtmlDebugTrait;
+  use HttpKernelUiHelperTrait;
 
   /**
    * {@inheritdoc}
@@ -538,8 +544,6 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $this->container = $container;
 
     $container
-      ->register('datetime.time', 'Drupal\Component\Datetime\Time');
-    $container
       ->register('flood', 'Drupal\Core\Flood\MemoryBackend')
       ->addArgument(new Reference('request_stack'));
     $container
@@ -599,10 +603,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
       ->addTag('event_subscriber');
 
     // Relax the password hashing cost in tests to avoid performance issues.
-    if ($container->hasDefinition('password')) {
-      $container->getDefinition('password')
-        ->setArguments([PASSWORD_BCRYPT, ['cost' => 4]]);
-    }
+    $container->setParameter('password.algorithm', PASSWORD_BCRYPT);
+    $container->setParameter('password.options', ['cost' => 4]);
 
     // Add the on demand rebuild route provider service.
     $route_provider_service_name = 'router.route_provider';
@@ -673,7 +675,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * {@inheritdoc}
    */
   protected function tearDown(): void {
-    if ($this->container) {
+    if ($this->container?->get('request_stack')->getCurrentRequest() !== NULL) {
       // Clean up mock session started in DrupalKernel::preHandle().
       /** @var \Symfony\Component\HttpFoundation\Session\Session $session */
       $session = $this->container->get('request_stack')->getSession();

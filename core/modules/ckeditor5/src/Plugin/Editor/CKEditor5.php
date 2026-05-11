@@ -25,6 +25,7 @@ use Drupal\Core\Validation\Plugin\Validation\Constraint\PrimitiveTypeConstraint;
 use Drupal\editor\Attribute\Editor;
 use Drupal\editor\EditorInterface;
 use Drupal\editor\Entity\Editor as EditorEntity;
+use Drupal\editor\Hook\EditorHooks;
 use Drupal\editor\Plugin\EditorBase;
 use Drupal\filter\FilterFormatInterface;
 use Psr\Log\LoggerInterface;
@@ -610,7 +611,7 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
       // If this plugin is configurable but it has empty default configuration,
       // that means the configuration must be stored out of band.
       // @see \Drupal\ckeditor5\Plugin\CKEditor5Plugin\Image
-      // @see editor_image_upload_settings_form()
+      // @see \Drupal\editor\EditorImageUploadSettings::getForm()
       $default_configuration = $plugin->defaultConfiguration();
       $configuration_stored_out_of_band = empty($default_configuration);
       // If this plugin is configurable but has not yet had user interaction,
@@ -665,7 +666,7 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
 
       // Special case: AJAX updates that do not submit the form (that cannot
       // result in configuration being saved).
-      if (in_array('editor_form_filter_admin_format_editor_configure', $form_state->getSubmitHandlers(), TRUE)) {
+      if (in_array(EditorHooks::class . ':editorFormFilterAdminFormatEditorConfigure', $form_state->getSubmitHandlers(), TRUE)) {
         // Ensure that plugins' validation constraints do not immediately
         // trigger a validation error: the user may choose to configure other
         // CKEditor 5 aspects first.
@@ -911,9 +912,10 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
     // @see ::validateConfigurationForm()
     $editor = $form_state->get('editor');
 
-    // Prepare the editor settings for editor_form_filter_admin_format_submit().
+    // Prepare settings for EditorHooks::editorFormFilterAdminFormatSubmit().
     // This strips away unwanted form values too, because those never can exist
     // in the already validated Editor config entity.
+    // @see \Drupal\editor\Hook\EditorHooks::editorFormFilterAdminFormatSubmit()
     $form_state->setValues($editor->getSettings());
 
     parent::submitConfigurationForm($form, $form_state);

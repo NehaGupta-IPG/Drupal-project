@@ -11,6 +11,7 @@ use Drupal\entity_test\Entity\EntityTestMulRevPub;
 use Drupal\form_test\Form\FormTestAlterForm;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\node\NodeAccessRebuild;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
@@ -18,6 +19,7 @@ use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\views\Tests\ViewResultAssertionTrait;
 use Drupal\views\Views;
 use Drupal\workspaces\Entity\Workspace;
+use Drupal\workspaces\Event\WorkspaceSwitchEvent;
 use Drupal\workspaces\WorkspacePublishException;
 use PHPUnit\Framework\Attributes\DataProvider;
 // cspell:ignore differring
@@ -861,6 +863,35 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     // Check that the 'stage' workspace was not persisted by the workspace
     // manager.
     $this->assertNull($this->workspaceManager->getActiveWorkspace());
+
+    // Register an event listener to capture isTemporary values from the switch
+    // events.
+    $switch_events = [];
+    $this->container->get('event_dispatcher')->addListener(
+      WorkspaceSwitchEvent::class,
+      function (WorkspaceSwitchEvent $event) use (&$switch_events) {
+        $switch_events[] = $event->isTemporary();
+      }
+    );
+
+    // Persistent switches should dispatch non-temporary events.
+    $this->switchToWorkspace('stage');
+    $this->assertSame([FALSE], $switch_events);
+
+    $this->workspaceManager->switchToLive();
+    $this->assertSame([FALSE, FALSE], $switch_events);
+
+    // executeInWorkspace() should dispatch temporary events (switch in + switch
+    // back).
+    $switch_events = [];
+    $this->workspaceManager->executeInWorkspace('stage', function () {});
+    $this->assertSame([TRUE, TRUE], $switch_events);
+
+    // executeOutsideWorkspace() should also dispatch temporary events.
+    $this->switchToWorkspace('stage');
+    $switch_events = [];
+    $this->workspaceManager->executeOutsideWorkspace(function () {});
+    $this->assertSame([TRUE, TRUE], $switch_events);
   }
 
   /**
@@ -1156,7 +1187,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
   public function testNodeAccessDifferringRevisionIdsOnTarget(): void {
     $this->initializeWorkspacesModule();
     \Drupal::service('module_installer')->install(['node_access_test']);
-    node_access_rebuild();
+    \Drupal::service(NodeAccessRebuild::class)->rebuild();
 
     // Edit node 1 in 'stage'.
     $this->switchToWorkspace('stage');

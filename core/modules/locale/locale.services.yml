@@ -47,3 +47,7 @@ services:
     autowire: true
   Drupal\locale\LocaleSource:
     autowire: true
+  Drupal\locale\LocaleFetch:
+    autowire: true
+  Drupal\locale\File\LocaleFileManager:
+    autowire: true
