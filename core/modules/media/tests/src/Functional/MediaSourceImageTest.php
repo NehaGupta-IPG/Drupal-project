@@ -65,7 +65,7 @@ class MediaSourceImageTest extends MediaFunctionalTestBase {
 
     // Custom name should stay.
     $this->drupalGet($media->toUrl('edit-form'));
-    $assert_session->fieldValueEquals('name[0][value]', 'image-test.png');
+    $assert_session->fieldValueEquals('name[0][value]', 'Custom name');
 
     // Remove image and attach a new one.
     $this->submitForm([], 'Remove');
@@ -122,15 +122,17 @@ class MediaSourceImageTest extends MediaFunctionalTestBase {
     // Explicit name should NOT be overridden on initial save.
     $this->drupalGet($media->toUrl('edit-form'));
     $assert_session->fieldValueEquals('name[0][value]', 'Initial name');
+    $assert_session->fieldValueEquals('field_media_image[0][alt]', 'Initial alt');
 
     // Change only the alt text.
     $this->submitForm([
       'field_media_image[0][alt]' => 'Updated alt',
     ], 'Save');
 
-    // Name should now reflect updated alt text.
+    // Name should be left intact, with only the alt text being updated.
     $this->drupalGet($media->toUrl('edit-form'));
-    $assert_session->fieldValueEquals('name[0][value]', 'Updated alt');
+    $assert_session->fieldValueEquals('name[0][value]', 'Initial name');
+    $assert_session->fieldValueEquals('field_media_image[0][alt]', 'Updated alt');
   }
 
 }

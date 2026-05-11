@@ -213,11 +213,19 @@ interface MediaSourceInterface extends PluginInspectionInterface, ConfigurableIn
    * Individual source plugins may override this method in order to specify
    * source-specific criteria indicating whether the source has changed.
    *
+   * @param \Drupal\media\MediaInterface $media
+   *   The updated media entity.
+   * @param \Drupal\media\MediaInterface $original
+   *   The original media entity.
+   * @param bool $additional_properties
+   *   Whether to check additional properties in the source field for changes.
+   *   For example, the alt text attached to the Image source.
+   *
    * @return bool
    *   TRUE if the source changed, FALSE otherwise.
    *
    * @internal
    */
-  public function hasChanged(MediaInterface $media, MediaInterface $original);
+  public function hasChanged(MediaInterface $media, MediaInterface $original, bool $additional_properties = FALSE): bool;
 
 }

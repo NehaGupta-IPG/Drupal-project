@@ -330,7 +330,7 @@ abstract class MediaSourceBase extends PluginBase implements MediaSourceInterfac
   /**
    * {@inheritdoc}
    */
-  public function hasChanged(MediaInterface $media, MediaInterface $original) {
+  public function hasChanged(MediaInterface $media, MediaInterface $original, bool $additional_properties = FALSE): bool {
     return $this->getSourceFieldValue($media) !== $this->getSourceFieldValue($original);
   }
 

@@ -334,6 +334,32 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
   }
 
   /**
+   * Determines if the source field value has changed.
+   *
+   * The comparison uses MediaSourceInterface::getSourceFieldValue() to ensure
+   * that the correct property from the source field is used.
+   *
+   * @param bool $additional_properties
+   *   Specifies whether additional properties in the source field should be
+   *   checked for changes. For example, the alt text within image sources.
+   *
+   * @return bool
+   *   TRUE if the source field value changed, FALSE otherwise.
+   *
+   * @see \Drupal\media\MediaSourceInterface::getSourceFieldValue()
+   *
+   * @internal
+   */
+  protected function hasSourceFieldChanged(bool $additional_properties = FALSE) {
+    $original = $this->getOriginal();
+    if (empty($original)) {
+      return FALSE;
+    }
+    $source = $this->getSource();
+    return $source->hasChanged($this, $original, $additional_properties);
+  }
+
+  /**
    * Determines if the thumbnail should be updated for a media item.
    *
    * @param bool $is_new
@@ -344,10 +370,8 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
    */
   protected function shouldUpdateThumbnail($is_new = FALSE) {
     // Update thumbnail if we don't have a thumbnail yet or when the source
-    // field value changes.
-    return !$this->get('thumbnail')->entity
-      || $is_new
-      || (!empty($this->original) && $this->getSource()->hasChanged($this, $this->original));
+    // field value (and any extra dependant properties) have changes.
+    return !$this->get('thumbnail')->entity || $is_new || $this->hasSourceFieldChanged(TRUE);
   }
 
   /**
@@ -453,8 +477,7 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
             $new_source_field_empty = $media_source->getSourceFieldValue($translation) === NULL;
             if (!$original_source_field_empty &&
                 !$new_source_field_empty &&
-                (!empty($this->original) && $this->original->hasTranslation($langcode) && $translation->getSource()->hasChanged($translation, $this->original->getTranslation($langcode)))
-            ) {
+                $translation->hasSourceFieldChanged()) {
               $set_metadata = TRUE;
             }
           }

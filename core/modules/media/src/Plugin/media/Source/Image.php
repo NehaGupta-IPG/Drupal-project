@@ -169,10 +169,15 @@ class Image extends File {
   /**
    * {@inheritdoc}
    */
-  public function hasChanged(MediaInterface $media, MediaInterface $original): bool {
+  public function hasChanged(MediaInterface $media, MediaInterface $original, bool $additional_properties = FALSE): bool {
     // Preserve base behavior: compare source field main property.
-    if (parent::hasChanged($media, $original)) {
+    if (parent::hasChanged($media, $original, $additional_properties)) {
       return TRUE;
+    }
+
+    // Not interested in any other additional properties.
+    if (!$additional_properties) {
+      return FALSE;
     }
 
     // Alt comparison is optional and only applies when supported.
