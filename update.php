@@ -8,6 +8,7 @@
  * See COPYRIGHT.txt and LICENSE.txt files in the "core" directory.
  */
 
+use Composer\Autoload\ClassLoader;
 use Drupal\Core\Update\UpdateKernel;
 
 require_once 'autoload_runtime.php';
@@ -20,6 +21,6 @@ if (drupal_valid_test_ua()) {
   gc_disable();
 }
 
-return static function () {
-  return new UpdateKernel('prod', require 'autoload.php', FALSE);
+return static function (string $environment, ClassLoader $class_loader) {
+  return new UpdateKernel($environment, $class_loader, FALSE);
 };
