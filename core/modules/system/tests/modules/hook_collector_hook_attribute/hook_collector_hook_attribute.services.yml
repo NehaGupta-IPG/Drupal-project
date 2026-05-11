@@ -29,10 +29,6 @@ services:
 
   Drupal\hook_collector_hook_attribute\DeprecatedServiceWithHook:
     class: Drupal\hook_collector_hook_attribute\DeprecatedServiceWithHook
-    # Set autoconfigure and autowire false, so that deprecations do not trigger
-    # on module install.
-    autoconfigure: false
-    autowire: false
     deprecated: The "%service_id%" service is deprecated.
 
   Drupal\hook_collector_hook_attribute\EventSubscriber\EventSubscriberWithHook: ~

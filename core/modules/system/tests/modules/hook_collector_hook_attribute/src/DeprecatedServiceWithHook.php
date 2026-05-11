@@ -7,14 +7,11 @@ namespace Drupal\hook_collector_hook_attribute;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Test\Hook\TrackHookInvocationsTrait;
 
-// phpcs:ignore Drupal.Semantics.FunctionTriggerError
-@trigger_error(__NAMESPACE__ . '\DeprecatedServiceWithHook is deprecated.', E_USER_DEPRECATED);
-
 /**
  * Fixture for HookCollectorRegisteredServicesPassTest.
  *
- * This class is arbitrarily deprecated in order to test container service
- * deprecations.
+ * This service is arbitrarily deprecated in order to test that hook discovery
+ * skips deprecated services.
  */
 class DeprecatedServiceWithHook {
 
