@@ -380,6 +380,10 @@ function simpletest_script_init(ClassLoader $autoloader): void {
   $_SERVER['PHP_SELF'] = $path . '/index.php';
   $_SERVER['HTTP_USER_AGENT'] = 'Drupal command line';
 
+  if (Config::get('color')) {
+    $_SERVER['FORCE_COLOR'] = '1';
+  }
+
   if (Config::get('concurrency') > 1) {
     $directory = FileSystem::getOsTemporaryDirectory();
     $test_symlink = @symlink(__FILE__, $directory . '/test_symlink');
