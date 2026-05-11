@@ -81,9 +81,16 @@ class TestSiteInstallCommand extends Command {
   protected $langcode = 'en';
 
   /**
+   * The Drupal root directory.
+   *
+   * @var string
+   */
+  protected $root;
+
+  /**
    * {@inheritdoc}
    */
-  protected function configure() {
+  protected function configure(): void {
     $this->setName('install')
       ->setDescription('Creates a test Drupal site')
       ->setHelp('The details to connect to the test site created will be displayed upon success. It will contain the database prefix and the user agent.')
@@ -193,7 +200,7 @@ class TestSiteInstallCommand extends Command {
    * @param string $root
    *   The Drupal root.
    */
-  protected function ensureDirectory($root) {
+  protected function ensureDirectory(string $root) {
     if (!is_writable($root . '/sites/simpletest')) {
       if (!@mkdir($root . '/sites/simpletest')) {
         throw new \RuntimeException($root . '/sites/simpletest must exist and be writable to install a test site');
@@ -273,7 +280,7 @@ class TestSiteInstallCommand extends Command {
   /**
    * {@inheritdoc}
    */
-  protected function installParameters() {
+  protected function installParameters(): array {
     $parameters = $this->installParametersTrait();
     $parameters['parameters']['langcode'] = $this->langcode;
     return $parameters;

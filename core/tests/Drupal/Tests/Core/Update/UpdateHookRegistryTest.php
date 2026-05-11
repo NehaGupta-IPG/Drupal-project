@@ -10,6 +10,7 @@ use Drupal\Core\Update\UpdateHookRegistry;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Simulates a hook_update_N function.
@@ -67,28 +68,28 @@ function under_test_update_1234_failed(): void {
 class UpdateHookRegistryTest extends UnitTestCase {
 
   /**
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The key/value store.
    */
-  protected $keyValueStore;
+  protected KeyValueStoreInterface&Stub $keyValueStore;
 
   /**
-   * @var \Drupal\Core\KeyValueStore\KeyValueFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The key/value factory.
    */
-  protected $keyValueFactory;
+  protected KeyValueFactoryInterface&Stub $keyValueFactory;
 
   /**
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The equivalent updates store.
    */
-  protected KeyValueStoreInterface $equivalentUpdatesStore;
+  protected KeyValueStoreInterface&Stub $equivalentUpdatesStore;
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->keyValueFactory = $this->createMock(KeyValueFactoryInterface::class);
-    $this->keyValueStore = $this->createMock(KeyValueStoreInterface::class);
-    $this->equivalentUpdatesStore = $this->createMock(KeyValueStoreInterface::class);
+    $this->keyValueFactory = $this->createStub(KeyValueFactoryInterface::class);
+    $this->keyValueStore = $this->createStub(KeyValueStoreInterface::class);
+    $this->equivalentUpdatesStore = $this->createStub(KeyValueStoreInterface::class);
 
     $this->keyValueFactory
       ->method('get')
@@ -132,12 +133,12 @@ class UpdateHookRegistryTest extends UnitTestCase {
 
     $this->keyValueStore
       ->method('getAll')
-      ->willReturnCallback(static function () use (&$versions) {
+      ->willReturnCallback(static function () use (&$versions): array {
         return $versions;
       });
     $this->keyValueStore
       ->method('get')
-      ->willReturnCallback(static function ($key) use (&$versions) {
+      ->willReturnCallback(static function ($key) use (&$versions): int {
         return $versions[$key];
       });
     $this->keyValueStore

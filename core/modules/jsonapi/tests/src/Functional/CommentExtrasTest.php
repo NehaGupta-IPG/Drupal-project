@@ -45,7 +45,7 @@ class CommentExtrasTest extends CommentTest {
    */
   public function testPostIndividualDxWithoutCriticalBaseFields(): void {
     $this->setUpAuthorization('POST');
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
 
     $url = Url::fromRoute(sprintf('jsonapi.%s.collection.post', static::$resourceTypeName));
     $request_options = [];
@@ -53,7 +53,7 @@ class CommentExtrasTest extends CommentTest {
     $request_options[RequestOptions::HEADERS]['Content-Type'] = 'application/vnd.api+json';
     $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions());
 
-    $remove_field = function (array $normalization, $type, $attribute_name) {
+    $remove_field = function (array $normalization, $type, $attribute_name): array {
       unset($normalization['data'][$type][$attribute_name]);
       return $normalization;
     };
@@ -85,7 +85,7 @@ class CommentExtrasTest extends CommentTest {
    */
   public function testPostIndividualSkipCommentApproval(): void {
     $this->setUpAuthorization('POST');
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
 
     // Create request.
     $request_options = [];

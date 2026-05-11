@@ -6,12 +6,20 @@ namespace Drupal\Tests\Core\Render;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Render\ElementInfoManagerInterface;
+use Drupal\Core\Render\PlaceholderGeneratorInterface;
+use Drupal\Core\Render\PlaceholderingRenderCache;
+use Drupal\Core\Render\Renderer;
+use Drupal\Core\Theme\ThemeManagerInterface;
+use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Tests Drupal\Core\Render\BubbleableMetadata.
@@ -42,21 +50,22 @@ class BubbleableMetadataTest extends UnitTestCase {
     // BubbleableMetadata object, that BubbleableMetadata::merge() doesn't
     // attempt to merge assets.
     if (!$b instanceof BubbleableMetadata) {
-      $renderer = $this->getMockBuilder('Drupal\Core\Render\Renderer')
-        ->disableOriginalConstructor()
-        ->getMock();
+      $renderer = $this->createStub(Renderer::class);
     }
     // Otherwise, let the original ::mergeAttachments() method be executed.
     else {
-      $renderer = $this->getMockBuilder('Drupal\Core\Render\Renderer')
-        ->disableOriginalConstructor()
-        ->onlyMethods([])
-        ->getMock();
+      $renderer = new Renderer(
+        $this->createStub(CallableResolver::class),
+        $this->createStub(ThemeManagerInterface::class),
+        $this->createStub(ElementInfoManagerInterface::class),
+        $this->createStub(PlaceholderGeneratorInterface::class),
+        $this->createStub(PlaceholderingRenderCache::class),
+        new RequestStack(),
+        [],
+      );
     }
 
-    $cache_contexts_manager = $this->getMockBuilder('Drupal\Core\Cache\Context\CacheContextsManager')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $cache_contexts_manager = $this->createStub(CacheContextsManager::class);
     $cache_contexts_manager->method('assertValidTokens')->willReturn(TRUE);
     $container = new ContainerBuilder();
     $container->set('cache_contexts_manager', $cache_contexts_manager);
@@ -182,7 +191,7 @@ class BubbleableMetadataTest extends UnitTestCase {
    * @legacy-covers ::setAttachments
    */
   #[DataProvider('providerTestAddAttachments')]
-  public function testAddAttachments(BubbleableMetadata $initial, $attachments, BubbleableMetadata $expected): void {
+  public function testAddAttachments(BubbleableMetadata $initial, array $attachments, BubbleableMetadata $expected): void {
     $test = $initial;
     $test->addAttachments($attachments);
     $this->assertEquals($expected, $test);
@@ -493,7 +502,7 @@ class BubbleableMetadataTest extends UnitTestCase {
    * Tests html_head asset merging.
    */
   #[DataProvider('providerTestMergeAttachmentsHtmlHeadMerging')]
-  public function testMergeAttachmentsHtmlHeadMerging($a, $b, $expected): void {
+  public function testMergeAttachmentsHtmlHeadMerging(array $a, array $b, array $expected): void {
     $this->assertSame($expected, BubbleableMetadata::mergeAttachments($a, $b));
   }
 
@@ -564,7 +573,7 @@ class BubbleableMetadataTest extends UnitTestCase {
    * Tests html_head_link asset merging.
    */
   #[DataProvider('providerTestMergeAttachmentsHtmlHeadLinkMerging')]
-  public function testMergeAttachmentsHtmlHeadLinkMerging($a, $b, $expected): void {
+  public function testMergeAttachmentsHtmlHeadLinkMerging(array $a, array $b, array $expected): void {
     $this->assertSame($expected, BubbleableMetadata::mergeAttachments($a, $b));
   }
 
@@ -628,7 +637,7 @@ class BubbleableMetadataTest extends UnitTestCase {
    * Tests http_header asset merging.
    */
   #[DataProvider('providerTestMergeAttachmentsHttpHeaderMerging')]
-  public function testMergeAttachmentsHttpHeaderMerging($a, $b, $expected): void {
+  public function testMergeAttachmentsHttpHeaderMerging(array $a, array $b, array $expected): void {
     $this->assertSame($expected, BubbleableMetadata::mergeAttachments($a, $b));
   }
 
@@ -693,10 +702,8 @@ class BubbleableMetadataTest extends UnitTestCase {
    * @see \Drupal\Tests\Core\Cache\CacheContextsTest
    */
   #[DataProvider('providerTestMerge')]
-  public function testAddCacheableDependency(BubbleableMetadata $a, $b, BubbleableMetadata $expected): void {
-    $cache_contexts_manager = $this->getMockBuilder('Drupal\Core\Cache\Context\CacheContextsManager')
-      ->disableOriginalConstructor()
-      ->getMock();
+  public function testAddCacheableDependency(BubbleableMetadata $a, CacheableMetadata $b, BubbleableMetadata $expected): void {
+    $cache_contexts_manager = $this->createStub(CacheContextsManager::class);
     $cache_contexts_manager->method('assertValidTokens')->willReturn(TRUE);
     $container = new ContainerBuilder();
     $container->set('cache_contexts_manager', $cache_contexts_manager);
