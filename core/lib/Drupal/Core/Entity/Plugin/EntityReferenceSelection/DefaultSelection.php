@@ -384,6 +384,21 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
     if ($ids) {
       $target_type = $this->configuration['target_type'];
       $entity_type = $this->entityTypeManager->getDefinition($target_type);
+      // Filter out IDs that are incompatible with the entity's ID field type
+      // to prevent database errors on PostgreSQL (e.g., passing a non-numeric
+      // string such as "test" to a bigint column causes an
+      // "invalid input syntax for type bigint" error).
+      $id_key = $entity_type->getKey('id');
+      if ($id_key) {
+        $field_storage_definitions = $this->entityFieldManager->getFieldStorageDefinitions($target_type);
+        if (isset($field_storage_definitions[$id_key])
+          && $field_storage_definitions[$id_key]->getType() === 'integer') {
+          $ids = array_values(array_filter($ids, 'ctype_digit'));
+        }
+      }
+      if (!$ids) {
+        return [];
+      }
       $query = $this->buildEntityQuery();
       $result = $query
         ->condition($entity_type->getKey('id'), $ids, 'IN')
