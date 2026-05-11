@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\jsonapi_test_field_type;
 
-use Drupal\jsonapi_test_field_type\Exception\GadgetWakeupException;
-
 /**
  * A test gadget class for verifying that object injection is blocked.
  *
