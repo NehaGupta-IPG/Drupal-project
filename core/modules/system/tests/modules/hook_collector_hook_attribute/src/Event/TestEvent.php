@@ -7,7 +7,7 @@ namespace Drupal\hook_collector_hook_attribute\Event;
 use Drupal\Component\EventDispatcher\Event;
 
 /**
- * A test event class that can be displatched.
+ * A test event class that can be dispatched.
  */
 class TestEvent extends Event {
 
