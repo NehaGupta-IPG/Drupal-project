@@ -8,16 +8,18 @@ use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 use Drupal\image\Entity\ImageStyle;
+use Drupal\image\ImageDerivativeUtilities;
 use Drupal\image\ImageStyleInterface;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests creation, deletion, and editing of image styles and effects.
- *
- * @group image
- * @group #slow
  */
+#[Group('image')]
+#[RunTestsInSeparateProcesses]
 class ImageAdminStylesTest extends ImageFieldTestBase {
 
   use TestFileCreationTrait {
@@ -50,7 +52,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
   /**
    * Count the number of images currently create for a style.
    */
-  public function getImageCount(ImageStyleInterface $style) {
+  public function getImageCount(ImageStyleInterface $style): int {
     $count = 0;
     if (is_dir('public://styles/' . $style->id())) {
       $count = count(\Drupal::service('file_system')->scanDirectory('public://styles/' . $style->id(), '/.*/'));
@@ -71,7 +73,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     $this->drupalGet('admin/config/media/image-styles/add');
     $this->submitForm($edit, 'Create new style');
     $this->assertSession()->statusMessageContains("Style {$style_label} was created.", 'status');
-    $options = image_style_options();
+    $options = \Drupal::service(ImageDerivativeUtilities::class)->styleOptions();
     $this->assertArrayHasKey($style_name, $options);
   }
 
@@ -535,7 +537,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     $style->save();
 
     // Build the derivative preview image file with the Image Style.
-    // @see template_preprocess_image_style_preview()
+    // @see \Drupal\image\Hook\ImageThemeHooks::preprocessImageStylePreview()
     $preview_file = $style->buildUri($original_path);
     $style->createDerivative($original_path, $preview_file);
 

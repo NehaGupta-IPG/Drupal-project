@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\layout_builder_test\Plugin\SectionStorage;
 
 use Drupal\Core\Access\AccessResult;
@@ -19,7 +21,7 @@ use Drupal\layout_builder\Routing\LayoutBuilderRoutesTrait;
 use Drupal\layout_builder\Section;
 use Drupal\layout_builder\SectionListTrait;
 use Drupal\layout_builder\SectionStorageInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\layout_builder\SupportAwareSectionStorageInterface;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -31,7 +33,7 @@ use Symfony\Component\Routing\RouteCollection;
     label: new TranslatableMarkup("Configuration ID"),
   ),
 ])]
-class SimpleConfigSectionStorage extends PluginBase implements SectionStorageInterface, SectionStorageLocalTaskProviderInterface, ContainerFactoryPluginInterface {
+class SimpleConfigSectionStorage extends PluginBase implements SectionStorageInterface, SectionStorageLocalTaskProviderInterface, ContainerFactoryPluginInterface, SupportAwareSectionStorageInterface {
 
   use ContextAwarePluginTrait;
   use LayoutBuilderRoutesTrait;
@@ -62,18 +64,6 @@ class SimpleConfigSectionStorage extends PluginBase implements SectionStorageInt
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('config.factory')
-    );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getStorageType() {
     return $this->getPluginId();
   }
@@ -95,7 +85,7 @@ class SimpleConfigSectionStorage extends PluginBase implements SectionStorageInt
   /**
    * Returns the name to be used to store in the config system.
    */
-  protected function getConfigName() {
+  protected function getConfigName(): string {
     return 'layout_builder_test.' . $this->getStorageType() . '.' . $this->getStorageId();
   }
 
@@ -135,7 +125,7 @@ class SimpleConfigSectionStorage extends PluginBase implements SectionStorageInt
   /**
    * {@inheritdoc}
    */
-  public function buildRoutes(RouteCollection $collection) {
+  public function buildRoutes(RouteCollection $collection): void {
     $this->buildLayoutRoutes($collection, $this->getPluginDefinition(), 'layout-builder-test-simple-config/{id}');
   }
 
@@ -206,6 +196,13 @@ class SimpleConfigSectionStorage extends PluginBase implements SectionStorageInt
    */
   public function isApplicable(RefinableCacheableDependencyInterface $cacheability) {
     return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isSupported(string $entity_type_id, string $bundle, string $view_mode): bool {
+    return FALSE;
   }
 
 }

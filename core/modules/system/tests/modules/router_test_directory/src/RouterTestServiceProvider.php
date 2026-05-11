@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\router_test;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -13,7 +15,7 @@ class RouterTestServiceProvider implements ServiceProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     $container->register('router_test.subscriber', 'Drupal\router_test\RouteTestSubscriber')
       ->addTag('event_subscriber');
     $container->register('access_check.router_test', 'Drupal\router_test\Access\TestAccessCheck')

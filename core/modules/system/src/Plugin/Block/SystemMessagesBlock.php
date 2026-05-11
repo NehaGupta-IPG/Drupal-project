@@ -24,7 +24,7 @@ class SystemMessagesBlock extends BlockBase implements MessagesBlockPluginInterf
    */
   public function defaultConfiguration() {
     return [
-      'label_display' => FALSE,
+      'label_display' => '0',
     ];
   }
 
@@ -46,6 +46,13 @@ class SystemMessagesBlock extends BlockBase implements MessagesBlockPluginInterf
     // block itself *is* cacheable because it uses a #lazy_builder callback and
     // hence the block has a globally cacheable render array.
     return Cache::PERMANENT;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createPlaceholder(): bool {
+    return TRUE;
   }
 
 }

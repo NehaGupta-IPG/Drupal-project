@@ -15,6 +15,13 @@ use Drupal\Core\Validation\Plugin\Validation\Constraint\UniqueFieldConstraint;
 )]
 class UserMailUnique extends UniqueFieldConstraint {
 
-  public $message = 'The email address %value is already taken.';
+  public function __construct(
+    bool $caseSensitive = FALSE,
+    $message = 'The email address %value is already taken.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct($caseSensitive, $message, $groups, $payload);
+  }
 
 }

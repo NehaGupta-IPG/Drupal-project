@@ -78,8 +78,8 @@
     }
 
     const term = autocomplete.extractLastTerm(event.target.value);
-    // Abort search if the first character is in firstCharacterBlacklist.
-    if (term.length > 0 && options.firstCharacterBlacklist.includes(term[0])) {
+    // Abort search if the first character is in firstCharacterDenyList.
+    if (term.length > 0 && options.firstCharacterDenyList.includes(term[0])) {
       return false;
     }
     // Only search when the term is at least the minimum length.
@@ -148,7 +148,7 @@
   }
 
   /**
-   * Handles an autocompletefocus event.
+   * Handles an autocomplete focus event.
    *
    * @return {boolean}
    *   Always returns false.
@@ -158,7 +158,7 @@
   }
 
   /**
-   * Handles an autocompleteselect event.
+   * Handles an autocomplete select event.
    *
    * @param {jQuery.Event} event
    *   The event triggered.
@@ -211,12 +211,11 @@
       once('autocomplete', 'input.form-autocomplete', context).forEach(
         (element) => {
           const $autocomplete = $(element);
-          // Allow options to be overridden per instance.
-          const blacklist = $autocomplete.attr(
-            'data-autocomplete-first-character-blacklist',
+          const denyList = $autocomplete.attr(
+            'data-autocomplete-first-character-denylist',
           );
           $.extend(autocomplete.options, {
-            firstCharacterBlacklist: blacklist || '',
+            firstCharacterDenyList: denyList,
           });
           // Use jQuery UI Autocomplete on the textfield.
           $autocomplete.autocomplete(autocomplete.options).each(function () {
@@ -268,7 +267,7 @@
       renderItem,
       minLength: 1,
       // Custom options, used by Drupal.autocomplete.
-      firstCharacterBlacklist: '',
+      firstCharacterDenyList: '',
       // Custom options, indicate IME usage status.
       isComposing: false,
     },

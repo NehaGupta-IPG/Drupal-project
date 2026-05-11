@@ -7,21 +7,22 @@ namespace Drupal\Tests\field\Functional;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests deleting field storage when a module in uninstalled through the UI.
  *
- * @group field
  * @see \Drupal\field\ConfigImporterFieldPurger
- * @see field_config_import_steps_alter()
- * @see field_form_config_admin_import_form_alter()
+ * @see \Drupal\field\Hook\FieldHooks::configImportStepsAlter()
+ * @see \Drupal\field\Hook\FieldHooks::formConfigAdminImportFormAlter()
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class FieldImportDeleteUninstallUiTest extends FieldTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'entity_test',
@@ -125,9 +126,9 @@ class FieldImportDeleteUninstallUiTest extends FieldTestBase {
     $this->rebuildContainer();
     $this->assertFalse(\Drupal::moduleHandler()->moduleExists('telephone'));
     $this->assertNull(\Drupal::service('entity.repository')->loadEntityByUuid('field_storage_config', $field_storage->uuid()), 'The telephone field has been deleted by the configuration synchronization');
-    $deleted_storages = \Drupal::state()->get('field.storage.deleted', []);
-    $this->assertFalse(isset($deleted_storages[$field_storage->uuid()]), 'Telephone field has been completed removed from the system.');
-    $this->assertFalse(isset($deleted_storages[$field_storage->uuid()]), 'Text field has been completed removed from the system.');
+    $deleted_storage_definitions = \Drupal::service('entity_field.deleted_fields_repository')->getFieldStorageDefinitions();
+    $this->assertFalse(isset($deleted_storage_definitions[$field_storage->uuid()]), 'Telephone field has been completed removed from the system.');
+    $this->assertFalse(isset($deleted_storage_definitions[$field_storage->uuid()]), 'Text field has been completed removed from the system.');
   }
 
   /**

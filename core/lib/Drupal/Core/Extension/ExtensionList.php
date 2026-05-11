@@ -148,6 +148,7 @@ abstract class ExtensionList {
    * Returns the extension discovery.
    *
    * @return \Drupal\Core\Extension\ExtensionDiscovery
+   *   The extension discovery.
    */
   protected function getExtensionDiscovery() {
     return new ExtensionDiscovery($this->root);
@@ -172,14 +173,11 @@ abstract class ExtensionList {
     try {
       $this->state->delete($this->getPathNamesCacheId());
     }
-    catch (DatabaseExceptionWrapper $e) {
+    catch (DatabaseExceptionWrapper) {
       // Ignore exceptions caused by a non existing {key_value} table in the
       // early installer.
     }
 
-    // @todo In the long run it would be great to add the reset, but the early
-    //   installer fails due to that. https://www.drupal.org/node/2719315 could
-    //   help to resolve with that.
     return $this;
   }
 
@@ -313,15 +311,29 @@ abstract class ExtensionList {
     $extensions = $this->doScanExtensions();
 
     // Read info files for each extension.
-    foreach ($extensions as $extension) {
+    foreach ($extensions as $name => $extension) {
       $extension->info = $this->createExtensionInfo($extension);
-
+      $extension = $this->subClassExtension($extension);
+      $extensions[$name] = $extension;
       // Invoke hook_system_info_alter() to give installed modules a chance to
       // modify the data in the .info.yml files if necessary.
       $this->moduleHandler->alter('system_info', $extension->info, $extension, $this->type);
     }
 
     return $extensions;
+  }
+
+  /**
+   * Allows subclasses to convert the extension into a specific subclass.
+   *
+   * @param \Drupal\Core\Extension\Extension $extension
+   *   The extension.
+   *
+   * @return \Drupal\Core\Extension\Extension
+   *   Either the unchanged Extension object or a subclass of Extension.
+   */
+  protected function subClassExtension(Extension $extension): Extension {
+    return $extension;
   }
 
   /**
@@ -411,6 +423,8 @@ abstract class ExtensionList {
    * Returns a list of extension file paths keyed by machine name.
    *
    * @return string[]
+   *   An associative array of extension file paths, keyed by the extension
+   *   machine name.
    */
   public function getPathNames() {
     if ($this->pathNames === NULL) {
@@ -472,7 +486,7 @@ abstract class ExtensionList {
    * only returned if the file exists.
    *
    * This function plays a key role in allowing Drupal's extensions (modules,
-   * themes, profiles, theme_engines, etc.) to be located in different places
+   * themes, profiles, etc.) to be located in different places
    * depending on a site's configuration. For example, a module 'foo' may
    * legally be located in any of these four places:
    *

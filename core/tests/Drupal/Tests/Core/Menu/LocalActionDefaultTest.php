@@ -5,14 +5,20 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Menu;
 
 use Drupal\Core\Menu\LocalActionDefault;
+use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @coversDefaultClass \Drupal\Core\Menu\LocalActionDefault
- * @group Menu
+ * Tests Drupal\Core\Menu\LocalActionDefault.
  */
+#[CoversClass(LocalActionDefault::class)]
+#[Group('Menu')]
 class LocalActionDefaultTest extends UnitTestCase {
 
   /**
@@ -47,17 +53,8 @@ class LocalActionDefaultTest extends UnitTestCase {
 
   /**
    * The mocked translator.
-   *
-   * @var \Drupal\Core\StringTranslation\TranslationInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $stringTranslation;
-
-  /**
-   * The mocked route provider.
-   *
-   * @var \Drupal\Core\Routing\RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-   */
-  protected $routeProvider;
+  protected TranslationInterface&MockObject $stringTranslation;
 
   /**
    * {@inheritdoc}
@@ -66,14 +63,13 @@ class LocalActionDefaultTest extends UnitTestCase {
     parent::setUp();
 
     $this->stringTranslation = $this->createMock('Drupal\Core\StringTranslation\TranslationInterface');
-    $this->routeProvider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
   }
 
   /**
    * Setups the local action default.
    */
-  protected function setupLocalActionDefault() {
-    $this->localActionDefault = new LocalActionDefault($this->config, $this->pluginId, $this->pluginDefinition, $this->routeProvider);
+  protected function setupLocalActionDefault(): void {
+    $this->localActionDefault = new LocalActionDefault($this->config, $this->pluginId, $this->pluginDefinition, $this->createStub(RouteProviderInterface::class));
   }
 
   /**

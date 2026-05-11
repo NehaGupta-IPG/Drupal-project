@@ -7,7 +7,7 @@ use Drupal\Core\Routing\RoutingEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Alters user authentication routes to support additional serialization formats.
+ * Alters user authentication routes to support added serialization formats.
  */
 class UserRouteAlterSubscriber implements EventSubscriberInterface {
 
@@ -48,10 +48,14 @@ class UserRouteAlterSubscriber implements EventSubscriberInterface {
       'user.login.http',
       'user.logout.http',
       'user.pass.http',
+      'rest.login_status',
+      'rest.login',
+      'rest.logout',
+      'rest.pass',
     ];
     $routes = $event->getRouteCollection();
     foreach ($route_names as $route_name) {
-      if ($route = $routes->get($route_name)) {
+      if (($route = $routes->get($route_name)) && $route->hasRequirement('_format')) {
         $formats = explode('|', $route->getRequirement('_format'));
         $formats = array_unique(array_merge($formats, $this->serializerFormats));
         $route->setRequirement('_format', implode('|', $formats));

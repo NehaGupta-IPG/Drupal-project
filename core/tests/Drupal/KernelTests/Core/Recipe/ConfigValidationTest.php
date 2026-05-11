@@ -9,10 +9,14 @@ use Drupal\Core\Recipe\InvalidConfigException;
 use Drupal\Core\Recipe\Recipe;
 use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @group Recipe
+ * Tests Config Validation.
  */
+#[Group('Recipe')]
+#[RunTestsInSeparateProcesses]
 class ConfigValidationTest extends KernelTestBase {
 
   /**
@@ -21,7 +25,7 @@ class ConfigValidationTest extends KernelTestBase {
    * This test depends on us being able to create invalid config, so we can
    * ensure that validatable config is validated by the recipe runner.
    */
-  protected $strictConfigSchema = FALSE;
+  protected bool $strictConfigSchema = FALSE;
 
   /**
    * Creates a recipe with invalid config data in a particular file.

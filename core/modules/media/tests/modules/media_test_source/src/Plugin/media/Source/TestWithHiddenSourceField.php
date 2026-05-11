@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\media_test_source\Plugin\media\Source;
 
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
@@ -22,14 +24,14 @@ class TestWithHiddenSourceField extends Test {
   /**
    * {@inheritdoc}
    */
-  public function prepareViewDisplay(MediaTypeInterface $type, EntityViewDisplayInterface $display) {
+  public function prepareViewDisplay(MediaTypeInterface $type, EntityViewDisplayInterface $display): void {
     $display->removeComponent($this->getSourceFieldDefinition($type)->getName());
   }
 
   /**
    * {@inheritdoc}
    */
-  public function prepareFormDisplay(MediaTypeInterface $type, EntityFormDisplayInterface $display) {
+  public function prepareFormDisplay(MediaTypeInterface $type, EntityFormDisplayInterface $display): void {
     $display->removeComponent($this->getSourceFieldDefinition($type)->getName());
   }
 

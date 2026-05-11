@@ -6,6 +6,7 @@ namespace Drupal\Tests\system\Kernel\Mail;
 
 use Drupal\Component\Utility\Random;
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Mail\MailFormatHelper;
 use Drupal\Core\Mail\Plugin\Mail\TestMailCollector;
 use Drupal\Core\Messenger\MessengerInterface;
@@ -14,14 +15,15 @@ use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system_mail_failure_test\Plugin\Mail\TestPhpMailFailure;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore drépal
-
 /**
  * Performs tests on the pluggable mailing framework.
- *
- * @group Mail
  */
+#[Group('Mail')]
+#[RunTestsInSeparateProcesses]
 class MailTest extends KernelTestBase {
 
   /**
@@ -29,8 +31,6 @@ class MailTest extends KernelTestBase {
    */
   protected static $modules = [
     'file',
-    'image',
-    'mail_cancel_test',
     'mail_html_test',
     'system',
     'system_mail_failure_test',
@@ -69,10 +69,10 @@ class MailTest extends KernelTestBase {
     $this->assertInstanceOf(TestPhpMailFailure::class, $mail_backend);
 
     // Add a module-specific mail backend.
-    $this->config('system.mail')->set('interface.my_module_testkey', 'test_mail_collector')->save();
+    $this->config('system.mail')->set('interface.my_module_test_key', 'test_mail_collector')->save();
 
     // Get the added MailInterface class instance.
-    $mail_backend = \Drupal::service('plugin.manager.mail')->getInstance(['module' => 'my_module', 'key' => 'testkey']);
+    $mail_backend = \Drupal::service('plugin.manager.mail')->getInstance(['module' => 'my_module', 'key' => 'test_key']);
 
     // Assert whether the added mail backend is an instance of the expected
     // class.
@@ -99,9 +99,23 @@ class MailTest extends KernelTestBase {
   }
 
   /**
+   * Implements hook_mail_alter().
+   *
+   * Aborts sending of messages with ID 'mail_cancel_test_cancel_test'.
+   *
+   * @see ::testCancelMessage()
+   */
+  #[Hook('mail_alter')]
+  public function mailAlter(array &$message): void {
+    if ($message['id'] == 'mail_cancel_test_cancel_test') {
+      $message['send'] = FALSE;
+    }
+  }
+
+  /**
    * Tests that message sending may be canceled.
    *
-   * @see mail_cancel_test_mail_alter()
+   * @see ::mailAlter()
    */
   public function testCancelMessage(): void {
     $language_interface = \Drupal::languageManager()->getCurrentLanguage();
@@ -387,7 +401,7 @@ class MailTest extends KernelTestBase {
    * @param string $mail_interface
    *   The mail interface to configure.
    */
-  protected function configureDefaultMailInterface($mail_interface) {
+  protected function configureDefaultMailInterface($mail_interface): void {
     $GLOBALS['config']['system.mail']['interface']['default'] = $mail_interface;
   }
 

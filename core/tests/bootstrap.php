@@ -7,11 +7,12 @@
  * @see phpunit.xml.dist
  */
 
+declare(strict_types=1);
+
 use Drupal\TestTools\ErrorHandler\BootstrapErrorHandler;
+use Drupal\TestTools\ErrorHandler\DrupalDebugClassLoader;
 use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
-use Drupal\TestTools\Extension\HtmlLogging\HtmlOutputLogger;
 use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
-use Symfony\Component\ErrorHandler\DebugClassLoader;
 
 /**
  * Finds all valid extension directories recursively within a given directory.
@@ -23,7 +24,7 @@ use Symfony\Component\ErrorHandler\DebugClassLoader;
  *   An associative array of extension directories found within the scanned
  *   directory, keyed by extension name.
  */
-function drupal_phpunit_find_extension_directories($scan_directory) {
+function drupal_phpunit_find_extension_directories($scan_directory): array {
   $extensions = [];
   $dirs = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($scan_directory, \RecursiveDirectoryIterator::FOLLOW_SYMLINKS));
   foreach ($dirs as $dir) {
@@ -47,7 +48,7 @@ function drupal_phpunit_find_extension_directories($scan_directory) {
  * @return array
  *   An array of directories under which contributed extensions may exist.
  */
-function drupal_phpunit_contrib_extension_directory_roots($root = NULL) {
+function drupal_phpunit_contrib_extension_directory_roots($root = NULL): array {
   if ($root === NULL) {
     $root = dirname(__DIR__, 2);
   }
@@ -82,7 +83,7 @@ function drupal_phpunit_contrib_extension_directory_roots($root = NULL) {
  * @return array
  *   An associative array of extension directories, keyed by their namespace.
  */
-function drupal_phpunit_get_extension_namespaces($dirs) {
+function drupal_phpunit_get_extension_namespaces($dirs): array {
   $namespaces = [];
   foreach ($dirs as $extension => $dir) {
     if (is_dir($dir . '/src')) {
@@ -143,7 +144,7 @@ function drupal_phpunit_populate_class_loader() {
 }
 
 // Do class loader population.
-$loader = drupal_phpunit_populate_class_loader();
+drupal_phpunit_populate_class_loader();
 class_alias('\Drupal\Tests\DocumentElement', '\Behat\Mink\Element\DocumentElement', TRUE);
 
 // Set sane locale settings, to ensure consistent string, dates, times and
@@ -163,7 +164,7 @@ mb_language('uni');
 date_default_timezone_set('Australia/Sydney');
 
 // Bootstrap the DeprecationHandler extension and the DebugClassloader to report
-// deprecations in PHPUnit 10+.
+// deprecations.
 if ($deprecationBridgeConfiguration = DeprecationHandler::getConfiguration()) {
   DeprecationHandler::init($deprecationBridgeConfiguration['ignoreFile'] ?? NULL);
 
@@ -175,11 +176,5 @@ if ($deprecationBridgeConfiguration = DeprecationHandler::getConfiguration()) {
 
   // Enable the DebugClassLoader to get deprecations for methods' signature
   // changes.
-  DebugClassLoader::enable();
-}
-
-// Functional tests HTML output logging.
-$browserTestOutputDirectory = getenv('BROWSERTEST_OUTPUT_DIRECTORY');
-if ($browserTestOutputDirectory !== FALSE) {
-  HtmlOutputLogger::init($browserTestOutputDirectory, (bool) getenv('BROWSERTEST_OUTPUT_VERBOSE') ?? FALSE);
+  DrupalDebugClassLoader::enable();
 }

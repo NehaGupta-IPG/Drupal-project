@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\Core\Language\LanguageInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests node type initial language settings.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeTypeInitialLanguageTest extends NodeTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['language', 'field_ui'];
 
@@ -53,7 +53,8 @@ class NodeTypeInitialLanguageTest extends NodeTestBase {
     $this->assertTrue($this->assertSession()->optionExists('edit-language-configuration-langcode', LanguageInterface::LANGCODE_SITE_DEFAULT)->isSelected());
     $this->assertSession()->checkboxNotChecked('edit-language-configuration-language-alterable');
 
-    // Tests if the language field cannot be rearranged on the manage fields tab.
+    // Tests if the language field cannot be rearranged on the manage fields
+    // tab.
     $this->drupalGet('admin/structure/types/manage/article/fields');
     $this->assertSession()->elementNotExists('xpath', '//*[@id="field-overview"]/*[@id="language"]');
 
@@ -92,7 +93,7 @@ class NodeTypeInitialLanguageTest extends NodeTestBase {
     $this->assertSession()->elementExists('xpath', '//*[@id="langcode"]');
 
     // Tests if the language field can be rearranged on the manage display tab.
-    $this->drupalGet('admin/structure/types/manage/article/display');
+    $this->drupalGet('admin/structure/types/manage/article/display/default');
     $this->assertSession()->elementExists('xpath', '//*[@id="langcode"]');
 
     // Tests if the language field is hidden by default.
@@ -131,9 +132,9 @@ class NodeTypeInitialLanguageTest extends NodeTestBase {
       'fields[langcode][type]' => 'language',
       'fields[langcode][region]' => 'content',
     ];
-    $this->drupalGet('admin/structure/types/manage/article/display');
+    $this->drupalGet('admin/structure/types/manage/article/display/default');
     $this->submitForm($edit, 'Save');
-    $this->drupalGet('admin/structure/types/manage/article/display');
+    $this->drupalGet('admin/structure/types/manage/article/display/default');
     $this->assertTrue($this->assertSession()->optionExists('edit-fields-langcode-type', 'language')->isSelected());
 
     // Loads node page and check if Language field is shown.

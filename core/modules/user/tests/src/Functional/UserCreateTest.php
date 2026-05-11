@@ -8,12 +8,14 @@ use Drupal\Core\Test\AssertMailTrait;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the create user administration page.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserCreateTest extends BrowserTestBase {
 
   use AssertMailTrait {
@@ -21,9 +23,7 @@ class UserCreateTest extends BrowserTestBase {
   }
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['image'];
 
@@ -120,7 +120,10 @@ class UserCreateTest extends BrowserTestBase {
 
       $this->drupalGet('admin/people');
       $this->assertSession()->pageTextContains($edit['name']);
-      $user = user_load_by_name($name);
+      $users = \Drupal::entityTypeManager()
+        ->getStorage('user')
+        ->loadByProperties(['name' => $name]);
+      $user = reset($users);
       $this->assertTrue($user->isActive(), 'User is not blocked');
     }
 

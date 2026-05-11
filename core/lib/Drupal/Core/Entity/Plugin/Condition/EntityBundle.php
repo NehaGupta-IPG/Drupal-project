@@ -8,7 +8,6 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\Plugin\Condition\Deriver\EntityBundle as EntityBundleDeriver;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides the 'Entity Bundle' condition.
@@ -35,7 +34,7 @@ class EntityBundle extends ConditionPluginBase implements ContainerFactoryPlugin
    *   initialize the defined contexts by setting it to an array of context
    *   values keyed by context names.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
@@ -49,24 +48,11 @@ class EntityBundle extends ConditionPluginBase implements ContainerFactoryPlugin
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('entity_type.bundle.info')
-    );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $bundles = $this->entityTypeBundleInfo->getBundleInfo($this->getDerivativeId());
     $form['bundles'] = [
       '#title' => $this->pluginDefinition['label'],
       '#type' => 'checkboxes',
-      '#options' => array_combine(array_keys($bundles), array_column($bundles, 'label')),
+      '#options' => $this->entityTypeBundleInfo->getBundleLabels($this->getDerivativeId()),
       '#default_value' => $this->configuration['bundles'],
     ];
     return parent::buildConfigurationForm($form, $form_state);

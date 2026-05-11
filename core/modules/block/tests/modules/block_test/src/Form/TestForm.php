@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\block_test\Form;
 
 use Drupal\Core\Form\FormBase;
@@ -39,7 +41,7 @@ class TestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
     if (!str_contains($form_state->getValue('email'), '.com')) {
       $form_state->setErrorByName('email', $this->t('This is not a .com email address.'));
     }
@@ -48,7 +50,7 @@ class TestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->messenger()->addStatus($this->t('Your email address is @email', ['@email' => $form['email']['#value']]));
   }
 
