@@ -21,7 +21,7 @@ final class Configuration {
    *
    * phpcs:ignore Drupal.Commenting.VariableComment.MissingVar
    */
-  protected static ?self $instance = NULL;
+  private static ?self $instance = NULL;
 
   protected function __construct(
     private array $options,
@@ -30,14 +30,24 @@ final class Configuration {
   }
 
   /**
-   * Gets a config element.
+   * Returns the singleton instance.
+   *
+   * @return self
+   *   The singleton instance.
    */
-  public static function get(string $name): mixed {
+  public static function instance(): self {
     if (self::$instance === NULL) {
       throw new \RuntimeException("Configuration is not yet created");
     }
-    if (array_key_exists($name, self::$instance->options)) {
-      return self::$instance->options[$name];
+    return self::$instance;
+  }
+
+  /**
+   * Gets a config element.
+   */
+  public static function get(string $name): mixed {
+    if (array_key_exists($name, self::instance()->options)) {
+      return self::instance()->options[$name];
     }
     throw new \RuntimeException("There is no '{$name}' element in config");
   }
@@ -46,14 +56,14 @@ final class Configuration {
    * Gets the tests to execute.
    */
   public static function getTests(): array {
-    return self::$instance->arguments['tests'];
+    return self::instance()->arguments['tests'];
   }
 
   /**
    * Sets a config element.
    */
   public static function set(string $name, mixed $value): void {
-    self::$instance->options[$name] = $value;
+    self::instance()->options[$name] = $value;
   }
 
   /**
@@ -61,7 +71,7 @@ final class Configuration {
    */
   public static function createFromCommandLine(array $arguments): self {
     if (self::$instance) {
-      return self::$instance;
+      return self::instance();
     }
 
     if (count($arguments) < 2) {
@@ -91,7 +101,7 @@ final class Configuration {
 
     self::$instance = new self($input->getOptions(), $input->getArguments());
 
-    return self::$instance;
+    return self::instance();
   }
 
   /**
@@ -167,7 +177,7 @@ final class Configuration {
       'concurrency',
       NULL,
       InputOption::VALUE_REQUIRED,
-      "Run tests in parallel, up to [num] tests at a time.",
+      "Run tests in parallel, up to [CONCURRENCY] tests at a time, or limits the auto-detected concurrency to [CONCURRENCY].",
       1,
     ));
     $inputDefinition->addOption(new InputOption(
@@ -280,6 +290,12 @@ final class Configuration {
       NULL,
       InputOption::VALUE_NONE,
       'If provided, dumps detailed information on the tests selected for execution, before the execution starts.'
+    ));
+    $inputDefinition->addOption(new InputOption(
+      'debug-execution',
+      NULL,
+      InputOption::VALUE_NONE,
+      'If provided, dumps detailed information about state during execution.'
     ));
 
     $inputDefinition->addArgument(new InputArgument(

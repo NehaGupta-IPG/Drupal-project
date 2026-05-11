@@ -15,11 +15,6 @@ class TestRun {
   protected string $databasePrefix;
 
   /**
-   * The latest class under test.
-   */
-  protected string $testClass;
-
-  /**
    * The time the test run started.
    */
   protected float $startExecutionTime;
@@ -35,26 +30,36 @@ class TestRun {
    * @param \Drupal\Core\Test\TestRunResultsStorageInterface $testRunResultsStorage
    *   The test run results storage.
    * @param int|string $testId
-   *   A unique test run id.
+   *   The unique test run id.
+   * @param ?int $sequence
+   *   The test run sequence.
+   * @param ?class-string $testClass
+   *   The class under test.
    */
   public function __construct(
-    protected TestRunResultsStorageInterface $testRunResultsStorage,
+    private readonly TestRunResultsStorageInterface $testRunResultsStorage,
     protected int|string $testId,
+    public readonly ?int $sequence = NULL,
+    protected ?string $testClass = NULL,
   ) {
   }
 
   /**
    * Returns a new test run object.
    *
+   * @param int $sequence
+   *   The test run sequence.
+   * @param string $testClass
+   *   The class under test.
    * @param \Drupal\Core\Test\TestRunResultsStorageInterface $test_run_results_storage
    *   The test run results storage.
    *
    * @return self
    *   The new test run object.
    */
-  public static function createNew(TestRunResultsStorageInterface $test_run_results_storage): TestRun {
+  public static function createNew(int $sequence, string $testClass, TestRunResultsStorageInterface $test_run_results_storage): TestRun {
     $test_id = $test_run_results_storage->createNew();
-    return new static($test_run_results_storage, $test_id);
+    return new static($test_run_results_storage, $test_id, $sequence, $testClass);
   }
 
   /**
