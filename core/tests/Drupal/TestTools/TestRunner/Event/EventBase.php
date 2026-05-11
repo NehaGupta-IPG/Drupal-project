@@ -7,7 +7,7 @@ namespace Drupal\TestTools\TestRunner\Event;
 use Drupal\Component\EventDispatcher\Event;
 
 /**
- * The base class for the test runeer events.
+ * The base class for the test runner events.
  *
  * @internal
  */

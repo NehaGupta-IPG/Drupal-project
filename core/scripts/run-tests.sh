@@ -43,7 +43,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Process\PhpExecutableFinder;
 
-// cspell:ignore exitcode testbots wwwrun parallelisation cpus LNCH FNSH
+// cspell:ignore wwwrun
 
 // Define some colors for display.
 // A nice calming green.

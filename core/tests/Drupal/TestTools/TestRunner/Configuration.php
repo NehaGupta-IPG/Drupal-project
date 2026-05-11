@@ -177,7 +177,7 @@ final class Configuration {
       'concurrency',
       NULL,
       InputOption::VALUE_REQUIRED,
-      "Run tests in parallel, up to [CONCURRENCY] tests at a time, or limits the auto-detected concurrency to [CONCURRENCY].",
+      "Run tests in parallel, up to [num] tests at a time.",
       1,
     ));
     $inputDefinition->addOption(new InputOption(
