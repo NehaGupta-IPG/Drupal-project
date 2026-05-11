@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
 class AttributeBridgeDecoratorTest extends TestCase {
 
   /**
-   * @legacy-covers ::getDefinitions
+   * Tests get definitions.
    */
   public function testGetDefinitions(): void {
     // Normally the attribute classes would be autoloaded.
@@ -34,8 +34,8 @@ class AttributeBridgeDecoratorTest extends TestCase {
       'id' => 'bar',
       'class' => 'com\example\PluginNamespace\AttributeDiscoveryTest1',
     ];
-    $discovery = $this->createMock(DiscoveryInterface::class);
-    $discovery->expects($this->any())
+    $discovery = $this->createStub(DiscoveryInterface::class);
+    $discovery
       ->method('getDefinitions')
       ->willReturn($definitions);
 

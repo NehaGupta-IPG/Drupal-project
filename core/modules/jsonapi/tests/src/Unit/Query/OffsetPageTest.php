@@ -39,11 +39,9 @@ class OffsetPageTest extends UnitTestCase {
 
   /**
    * Tests create from query parameter.
-   *
-   * @legacy-covers ::createFromQueryParameter
    */
   #[DataProvider('parameterProvider')]
-  public function testCreateFromQueryParameter($original, $expected): void {
+  public function testCreateFromQueryParameter(array $original, array $expected): void {
     $actual = OffsetPage::createFromQueryParameter($original);
     $this->assertEquals($expected['offset'], $actual->getOffset());
     $this->assertEquals($expected['limit'], $actual->getSize());
@@ -52,7 +50,7 @@ class OffsetPageTest extends UnitTestCase {
   /**
    * Data provider for testCreateFromQueryParameter.
    */
-  public static function parameterProvider() {
+  public static function parameterProvider(): array {
     return [
       [['offset' => 12, 'limit' => 20], ['offset' => 12, 'limit' => 20]],
       [['offset' => 12, 'limit' => 60], ['offset' => 12, 'limit' => 50]],
@@ -64,8 +62,6 @@ class OffsetPageTest extends UnitTestCase {
 
   /**
    * Tests create from query parameter fail.
-   *
-   * @legacy-covers ::createFromQueryParameter
    */
   public function testCreateFromQueryParameterFail(): void {
     $this->expectException(BadRequestHttpException::class);

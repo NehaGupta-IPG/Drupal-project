@@ -2,16 +2,11 @@
 
 namespace Drupal\comment;
 
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
-use Drupal\Core\DependencyInjection\DeprecatedServicePropertyTrait;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Url;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Defines a class for building markup for comment links on a commented entity.
@@ -20,18 +15,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  */
 class CommentLinkBuilder implements CommentLinkBuilderInterface {
 
-  use DeprecatedServicePropertyTrait;
   use StringTranslationTrait;
-
-  /**
-   * Deprecated service properties.
-   *
-   * @see https://www.drupal.org/node/3544527
-   */
-  protected array $deprecatedProperties = [
-    'moduleHandler' => 'module_handler',
-    'entityTypeManager' => 'entity_type.manager',
-  ];
 
   /**
    * Current user.
@@ -54,22 +38,14 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
    *   Current user.
    * @param \Drupal\comment\CommentManagerInterface $comment_manager
    *   Comment manager service.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface|\Drupal\Core\Extension\ModuleHandlerInterface $string_translation
+   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   String translation service.
    */
   public function __construct(
     AccountInterface $current_user,
     CommentManagerInterface $comment_manager,
-    #[Autowire(service: TranslationInterface::class)]
-    TranslationInterface|ModuleHandlerInterface $string_translation,
+    TranslationInterface $string_translation,
   ) {
-    if ($string_translation instanceof ModuleHandlerInterface) {
-      @trigger_error('Passing the $module_handler argument to ' . __METHOD__ . '() is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. See https://www.drupal.org/node/3544527', E_USER_DEPRECATED);
-      $string_translation = \Drupal::service(TranslationInterface::class);
-    }
-    if (array_any(func_get_args(), fn ($arg) => $arg instanceof EntityTypeManagerInterface)) {
-      @trigger_error('Passing the $entity_type_manager argument to ' . __METHOD__ . '() is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. See https://www.drupal.org/node/3544527', E_USER_DEPRECATED);
-    }
     $this->currentUser = $current_user;
     $this->commentManager = $comment_manager;
     $this->stringTranslation = $string_translation;
@@ -97,8 +73,8 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
         continue;
       }
       $links = [];
-      $commenting_status = $entity->get($field_name)->status;
-      if ($commenting_status != CommentItemInterface::HIDDEN) {
+      $commenting_status = CommentingStatus::tryFrom((int) $entity->get($field_name)->status);
+      if ($commenting_status != CommentingStatus::Hidden) {
         // Entity has commenting status open or closed.
         $field_definition = $entity->getFieldDefinition($field_name);
         if ($view_mode == 'teaser') {
@@ -116,8 +92,8 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
             }
           }
           // Provide a link to new comment form.
-          if ($commenting_status == CommentItemInterface::OPEN) {
-            $comment_form_location = $field_definition->getSetting('form_location');
+          if ($commenting_status == CommentingStatus::Open) {
+            $comment_form_location = FormLocation::tryFrom((int) $field_definition->getSetting('form_location'));
             if ($this->currentUser->hasPermission('post comments')) {
               $links['comment-add'] = [
                 'title' => $this->t('Add new comment'),
@@ -125,7 +101,7 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
                 'attributes' => ['title' => $this->t('Share your thoughts and opinions.')],
                 'fragment' => 'comment-form',
               ];
-              if ($comment_form_location == CommentItemInterface::FORM_SEPARATE_PAGE) {
+              if ($comment_form_location == FormLocation::SeparatePage) {
                 $links['comment-add']['url'] = Url::fromRoute('comment.reply', [
                   'entity_type' => $entity->getEntityTypeId(),
                   'entity' => $entity->id(),
@@ -147,18 +123,18 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
           // Entity in other view modes: add a "post comment" link if the user
           // is allowed to post comments and if this entity is allowing new
           // comments.
-          if ($commenting_status == CommentItemInterface::OPEN) {
-            $comment_form_location = $field_definition->getSetting('form_location');
+          if ($commenting_status == CommentingStatus::Open) {
+            $comment_form_location = FormLocation::tryFrom((int) $field_definition->getSetting('form_location'));
             if ($this->currentUser->hasPermission('post comments')) {
               // Show the "post comment" link if the form is on another page, or
               // if there are existing comments that the link will skip past.
-              if ($comment_form_location == CommentItemInterface::FORM_SEPARATE_PAGE || (!empty($entity->get($field_name)->comment_count) && $this->currentUser->hasPermission('access comments'))) {
+              if ($comment_form_location == FormLocation::SeparatePage || (!empty($entity->get($field_name)->comment_count) && $this->currentUser->hasPermission('access comments'))) {
                 $links['comment-add'] = [
                   'title' => $this->t('Add new comment'),
                   'attributes' => ['title' => $this->t('Share your thoughts and opinions.')],
                   'fragment' => 'comment-form',
                 ];
-                if ($comment_form_location == CommentItemInterface::FORM_SEPARATE_PAGE) {
+                if ($comment_form_location == FormLocation::SeparatePage) {
                   $links['comment-add']['url'] = Url::fromRoute('comment.reply', [
                     'entity_type' => $entity->getEntityTypeId(),
                     'entity' => $entity->id(),

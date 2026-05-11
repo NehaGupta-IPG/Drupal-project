@@ -29,7 +29,7 @@ class MappingTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $configSchemaCheckerExclusions = [
+  protected static array $configSchemaCheckerExclusions = [
     'config_schema_deprecated_test.settings',
   ];
 
@@ -189,6 +189,7 @@ class MappingTest extends KernelTestBase {
         'level',
         'depth',
         'expand_all_items',
+        'ignore_active_trail',
         'hide_untranslated_menu_links',
       ],
       'block.settings.local_tasks_block' => [
@@ -406,14 +407,15 @@ class MappingTest extends KernelTestBase {
         // @see core/config/schema/core.data_types.schema.yml
         'id',
         'negate',
-        'uuid',
         'context_mapping',
         // Keys defined locally, in `type: condition.plugin.response_status`.
         // @see core/modules/system/config/schema/system.schema.yml
         'status_codes',
       ],
-      [],
-      // Note the presence of `id`, `negate`, `uuid` and `context_mapping` here.
+      // This key is optional, see `type: condition.plugin`.
+      // @see core.data_types.schema.yml
+      ['context_mapping'],
+      // Note the presence of `id`, `negate`, and `context_mapping` here.
       // That's because there is no `condition.plugin.*` type that specifies
       // defaults. Each individual condition plugin has the freedom to deviate
       // from this approach!
@@ -421,28 +423,24 @@ class MappingTest extends KernelTestBase {
         'condition.plugin.entity_bundle:*' => [
           'id',
           'negate',
-          'uuid',
           'context_mapping',
           'bundles',
         ],
         'condition.plugin.request_path' => [
           'id',
           'negate',
-          'uuid',
           'context_mapping',
           'pages',
         ],
         'condition.plugin.response_status' => [
           'id',
           'negate',
-          'uuid',
           'context_mapping',
           'status_codes',
         ],
         'condition.plugin.current_theme' => [
           'id',
           'negate',
-          'uuid',
           'context_mapping',
           'theme',
         ],
@@ -458,14 +456,15 @@ class MappingTest extends KernelTestBase {
         // @see core/config/schema/core.data_types.schema.yml
         'id',
         'negate',
-        'uuid',
         'context_mapping',
         // Keys defined locally, in `type: condition.plugin.response_status`.
         // @see core/modules/system/config/schema/system.schema.yml
         'status_codes',
       ],
-      [],
-      // Note the ABSENCE of `id`, `negate`, `uuid` and `context_mapping`
+      // This key is optional, see `type: condition.plugin`.
+      // @see core.data_types.schema.yml
+      ['context_mapping'],
+      // Note the ABSENCE of `id`, `negate`, and `context_mapping`
       // compared to the previous test case, because now the
       // `condition.plugin.*` type does exist.
       [

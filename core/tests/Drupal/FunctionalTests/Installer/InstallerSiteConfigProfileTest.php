@@ -41,24 +41,28 @@ class InstallerSiteConfigProfileTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function installParameters() {
+  protected function installParameters(): array {
     $parameters = parent::installParameters();
 
     // Don't override the site email address, allowing it to default to the one
     // from our install profile.
     unset($parameters['forms']['install_configure_form']['site_mail']);
 
+    // Set 'enable_update_status_module' flag to test that
+    // SiteConfigureForm::submit() handles the container rebuild correctly after
+    // the Update Status module is installed.
+    $parameters['forms']['install_configure_form']['enable_update_status_module'] = TRUE;
     return $parameters;
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function setUpSite() {
+  protected function setUpSite(): void {
     $this->assertSession()->fieldValueEquals('site_mail', self::EXPECTED_SITE_MAIL);
     $this->assertSession()->fieldValueEquals('date_default_timezone', self::EXPECTED_TIMEZONE);
 
-    return parent::setUpSite();
+    parent::setUpSite();
   }
 
   /**
@@ -67,6 +71,7 @@ class InstallerSiteConfigProfileTest extends InstallerTestBase {
   public function testInstaller(): void {
     $this->assertEquals(self::EXPECTED_SITE_MAIL, $this->config('system.site')->get('mail'));
     $this->assertEquals(self::EXPECTED_TIMEZONE, $this->config('system.date')->get('timezone.default'));
+    $this->assertTrue(\Drupal::moduleHandler()->moduleExists('update'));
   }
 
 }

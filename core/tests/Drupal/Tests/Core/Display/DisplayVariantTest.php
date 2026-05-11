@@ -10,7 +10,6 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests Drupal\Core\Display\VariantBase.
@@ -27,20 +26,15 @@ class DisplayVariantTest extends UnitTestCase {
    * @param array $definition
    *   The plugin definition array.
    *
-   * @return \Drupal\Core\Display\VariantBase|\PHPUnit\Framework\MockObject\MockObject
+   * @return \Drupal\Core\Display\StubVariantBase
    *   A mocked display variant plugin.
    */
-  public function setUpDisplayVariant($configuration = [], $definition = []): VariantBase&MockObject {
-    return $this->getMockBuilder(VariantBase::class)
-      ->setConstructorArgs([$configuration, 'test', $definition])
-      ->onlyMethods(['build'])
-      ->getMock();
+  public function setUpDisplayVariant($configuration = [], $definition = []): StubVariantBase {
+    return new StubVariantBase($configuration, 'test', $definition);
   }
 
   /**
    * Tests the label() method.
-   *
-   * @legacy-covers ::label
    */
   public function testLabel(): void {
     $display_variant = $this->setUpDisplayVariant(['label' => 'foo']);
@@ -49,8 +43,6 @@ class DisplayVariantTest extends UnitTestCase {
 
   /**
    * Tests the label() method using a default value.
-   *
-   * @legacy-covers ::label
    */
   public function testLabelDefault(): void {
     $display_variant = $this->setUpDisplayVariant();
@@ -59,8 +51,6 @@ class DisplayVariantTest extends UnitTestCase {
 
   /**
    * Tests the getWeight() method.
-   *
-   * @legacy-covers ::getWeight
    */
   public function testGetWeight(): void {
     $display_variant = $this->setUpDisplayVariant(['weight' => 5]);
@@ -69,8 +59,6 @@ class DisplayVariantTest extends UnitTestCase {
 
   /**
    * Tests the getWeight() method using a default value.
-   *
-   * @legacy-covers ::getWeight
    */
   public function testGetWeightDefault(): void {
     $display_variant = $this->setUpDisplayVariant();
@@ -79,8 +67,6 @@ class DisplayVariantTest extends UnitTestCase {
 
   /**
    * Tests the getConfiguration() method.
-   *
-   * @legacy-covers ::getConfiguration
    */
   #[DataProvider('providerTestGetConfiguration')]
   public function testGetConfiguration($configuration, $expected): void {
@@ -126,8 +112,6 @@ class DisplayVariantTest extends UnitTestCase {
 
   /**
    * Tests the access() method.
-   *
-   * @legacy-covers ::access
    */
   public function testAccess(): void {
     $display_variant = $this->setUpDisplayVariant();
@@ -136,8 +120,6 @@ class DisplayVariantTest extends UnitTestCase {
 
   /**
    * Tests the submitConfigurationForm() method.
-   *
-   * @legacy-covers ::submitConfigurationForm
    */
   public function testSubmitConfigurationForm(): void {
     $display_variant = $this->setUpDisplayVariant();
@@ -149,6 +131,20 @@ class DisplayVariantTest extends UnitTestCase {
     $form_state->setValue('label', $label);
     $display_variant->submitConfigurationForm($form, $form_state);
     $this->assertSame($label, $display_variant->label());
+  }
+
+}
+
+/**
+ * Provides a basic class extending VariantBase.
+ */
+class StubVariantBase extends VariantBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function build(): array {
+    return [];
   }
 
 }
