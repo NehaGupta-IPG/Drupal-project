@@ -77,9 +77,6 @@ $autoloader->addPsr4('Drupal\\TestTools\\', __DIR__ . '/../tests/Drupal/TestTool
 // Start overall timer.
 Timer::start('run-tests');
 
-// Setup console output.
-$console_output = new ConsoleOutput();
-
 // Get the configuration from the command line.
 $script_basename = basename($_SERVER['argv'][0]);
 try {
@@ -90,6 +87,9 @@ catch (\RuntimeException $e) {
   simpletest_script_print(Config::commandLineDefinition()->getSynopsis(), SIMPLETEST_SCRIPT_COLOR_PASS);
   exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
 }
+
+// Setup console output.
+$console_output = new ConsoleOutput();
 
 // If --help requested, show it and exit.
 if (Config::get('help')) {
@@ -379,10 +379,6 @@ function simpletest_script_init(ClassLoader $autoloader): void {
   $_SERVER['SCRIPT_FILENAME'] = $path . '/index.php';
   $_SERVER['PHP_SELF'] = $path . '/index.php';
   $_SERVER['HTTP_USER_AGENT'] = 'Drupal command line';
-
-  if (Config::get('color')) {
-    $_SERVER['FORCE_COLOR'] = '1';
-  }
 
   if (Config::get('concurrency') > 1) {
     $directory = FileSystem::getOsTemporaryDirectory();

@@ -80,6 +80,10 @@ final class Configuration {
 
     $input = new ArgvInput($arguments, self::commandLineDefinition());
 
+    if ($input->getOption('color')) {
+      $_SERVER['FORCE_COLOR'] = '1';
+    }
+
     $concurrency = $input->getOption('concurrency');
     if (!is_numeric($concurrency) || $concurrency <= 0) {
       throw new \RuntimeException("--concurrency must be a strictly positive integer.");
