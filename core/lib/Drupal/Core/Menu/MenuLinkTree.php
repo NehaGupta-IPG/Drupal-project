@@ -139,6 +139,7 @@ class MenuLinkTree implements MenuLinkTreeInterface {
    * {@inheritdoc}
    */
   public function transform(array $tree, array $manipulators) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use ' . MenuLinkTreeInterface::class . '::checkAccess() for access checks. Call other manipulator methods on their service directly. See https://www.drupal.org/node/9999999', E_USER_DEPRECATED);
     foreach ($manipulators as $manipulator) {
       $callable = $this->callableResolver->getCallableFromDefinition($manipulator['callable']);
       // Prepare the arguments for the menu tree manipulator callable; the first
