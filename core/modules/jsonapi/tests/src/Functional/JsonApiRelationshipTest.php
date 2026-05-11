@@ -8,7 +8,6 @@ use Drupal\Core\Url;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\jsonapi_test_field_type\Exception\GadgetWakeupException;
 use Drupal\jsonapi_test_field_type\TestGadget;
 use GuzzleHttp\RequestOptions;
 use PHPUnit\Framework\Attributes\Group;
