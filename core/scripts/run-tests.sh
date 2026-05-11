@@ -631,20 +631,14 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
           $child['test_run'],
           $child['class'],
         );
-        if ($process_outcome['error_output']) {
-          echo 'ERROR: ' . implode("\n", $process_outcome['error_output']);
-        }
         if (in_array($process_outcome['status'], [SIMPLETEST_SCRIPT_EXIT_FAILURE, SIMPLETEST_SCRIPT_EXIT_ERROR])) {
           $total_status = max($process_outcome['status'], $total_status);
         }
         elseif ($process_outcome['status']) {
-          $message = 'FATAL ' . $child['class'] . ': test runner returned an unexpected error code (' . $process_outcome['status'] . ').';
-          echo $message . "\n";
           $total_status = max(SIMPLETEST_SCRIPT_EXIT_EXCEPTION, $total_status);
           if (Config::get('die-on-fail')) {
             $test_db = new TestDatabase($child['test_run']->getDatabasePrefix());
-            $test_directory = $test_db->getTestSitePath();
-            echo 'Test database and files kept and test exited immediately on fail so should be reproducible if you change settings.php to use the database prefix ' . $child['test_run']->getDatabasePrefix() . ' and config directories in ' . $test_directory . "\n";
+            $process_outcome['test_directory'] = $test_db->getTestSitePath();
             Config::set('keep-results', TRUE);
             // Exit repeat loop immediately.
             Config::set('repeat', -1);

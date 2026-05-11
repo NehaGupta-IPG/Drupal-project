@@ -113,9 +113,19 @@ class ExecutionProgress implements EventSubscriberInterface {
   public function onTestExecutionFinished(TestExecutionFinished $event): void {
     $this->printSummary(
       $event->testRun->getTestClass(),
-      $event->result['summaries'][$event->testRun->getTestClass()],
+      $event->result['summaries'][$event->testRun->getTestClass()] ?? [],
       $event->testRun->duration(),
     );
+    if ($event->result['error_output']) {
+      $this->io->writeln('<error>ERROR: ' . implode("\n", $event->result['error_output']) . '</>');
+    }
+    if ($event->result['status'] && !in_array($event->result['status'], [\SIMPLETEST_SCRIPT_EXIT_FAILURE, \SIMPLETEST_SCRIPT_EXIT_ERROR])) {
+      $message = 'FATAL ' . $event->testRun->getTestClass() . ': test runner returned an unexpected error code (' . $event->result['status'] . ').';
+      $this->io->writeln('<error>' . $message . '</>');
+      if ($this->config->get('die-on-fail')) {
+        $this->io->writeln('Test database and files kept and test exited immediately on fail so should be reproducible if you change settings.php to use the database prefix ' . $event->testRun->getDatabasePrefix() . ' and config directories in ' . $event->result['test_directory']);
+      }
+    }
   }
 
   /**
