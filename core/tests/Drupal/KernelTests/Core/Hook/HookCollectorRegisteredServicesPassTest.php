@@ -8,6 +8,8 @@ use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Test\Hook\TestHookService;
 use Drupal\hook_collector_hook_attribute\DeprecatedServiceWithHook;
+use Drupal\hook_collector_hook_attribute\Event\TestEvent;
+use Drupal\hook_collector_hook_attribute\EventSubscriber\EventSubscriberWithHook;
 use Drupal\hook_collector_hook_attribute\Hook\HookRegisteredService;
 use Drupal\hook_collector_hook_attribute\Random\Test\Namespace\AnotherServiceWithHook;
 use Drupal\hook_collector_hook_attribute\ServiceWithHook;
@@ -16,6 +18,7 @@ use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Test hook implementations in declared services.
@@ -39,6 +42,7 @@ class HookCollectorRegisteredServicesPassTest extends KernelTestBase {
 
       TestHookService::class . '::testHook1' => 1,
       HookRegisteredService::class . '::__invoke' => 1,
+      EventSubscriberWithHook::class . '::testHook1' => 1,
       AnotherServiceWithHook::class . '::testHook1' => 1,
       ServiceWithHook::class . '::testHook1' => 1,
     ], $invocations);
@@ -91,6 +95,17 @@ class HookCollectorRegisteredServicesPassTest extends KernelTestBase {
     $this->assertTrue(method_exists($decoratedService, 'testHookInDecorator'));
     \Drupal::moduleHandler()->invokeAll('test_hook_in_decorator', [&$invocations]);
     $this->assertEmpty($invocations);
+
+    // Confirm that an event subscriber service that contains a hook
+    // implementation will not have its event handlers fired more than once,
+    // even though HookCollectorPass will register another service for the same
+    // class.
+    $invocations = [];
+    $event = new TestEvent($invocations);
+    \Drupal::service(EventDispatcherInterface::class)->dispatch($event);
+    $invocations = $event->getInvocations();
+    $this->assertSame([EventSubscriberWithHook::class . '::onEvent' => 1], $invocations);
+    $this->assertSame(get_class(\Drupal::service(EventSubscriberWithHook::class)), get_class(\Drupal::service('hook.' . EventSubscriberWithHook::class)));
 
     $this->expectExceptionMessage('Hook service "Drupal\hook_collector_hook_attribute\Hook\HookRegisteredService" can not be altered or decorated');
     $this->expectException(\LogicException::class);
