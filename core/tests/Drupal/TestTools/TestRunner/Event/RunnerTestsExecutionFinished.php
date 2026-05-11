@@ -9,5 +9,5 @@ namespace Drupal\TestTools\TestRunner\Event;
  *
  * @internal
  */
-final class RunnerTestsExecutionFinished {
+final class RunnerTestsExecutionFinished extends EventBase {
 }

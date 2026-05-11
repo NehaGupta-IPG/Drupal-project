@@ -11,17 +11,7 @@ use Drupal\Core\Test\TestRun;
  *
  * @internal
  */
-final class TestExecutionFinished {
-
-  /**
-   * The time of the poll event.
-   */
-  public readonly float $time;
-
-  /**
-   * The amount of memory currently in use.
-   */
-  public readonly int $memory;
+final class TestExecutionFinished extends EventBase {
 
   /**
    * Constructor.
@@ -30,13 +20,15 @@ final class TestExecutionFinished {
    *   The count of completed cycles in the main loop.
    * @param \Drupal\Core\Test\TestRun $testRun
    *   The test run.
+   * @param array $result
+   *   The test run results.
    */
   public function __construct(
     public readonly int $cycle,
     public readonly TestRun $testRun,
+    public readonly array $result,
   ) {
-    $this->time = microtime(TRUE);
-    $this->memory = memory_get_usage(TRUE);
+    parent::__construct();
   }
 
 }

@@ -31,7 +31,7 @@ use Drupal\TestTools\TestRunner\Event\RunnerTestsExecutionPoll;
 use Drupal\TestTools\TestRunner\Event\RunnerTestsExecutionStart;
 use Drupal\TestTools\TestRunner\Event\TestExecutionFinished;
 use Drupal\TestTools\TestRunner\Event\TestExecutionStart;
-use Drupal\TestTools\TestRunner\EventSubscriber\EventSubscriber;
+use Drupal\TestTools\TestRunner\EventSubscriber\ExecutionProgressDebug;
 use Drupal\TestTools\TestRunner\Configuration as Config;
 use Drupal\TestTools\TestRunner\WorkAllocator;
 use PHPUnit\Framework\TestCase;
@@ -101,8 +101,8 @@ simpletest_script_init($autoloader);
 
 // Register the event subscriber.
 $eventDispatcher = \Drupal::service(EventDispatcherInterface::class);
-$eventSubscriber = new EventSubscriber($console_output, Config::instance());
-$eventDispatcher->addSubscriber($eventSubscriber);
+$executionProgress = new ExecutionProgressDebug($console_output, Config::instance());
+$eventDispatcher->addSubscriber($executionProgress);
 
 if (!class_exists(TestCase::class)) {
   echo "\nrun-tests.sh requires the PHPUnit testing framework. Use 'composer install' to ensure that it is present.\n\n";
@@ -537,7 +537,7 @@ function simpletest_script_setup_test_run_results_storage() {
  * Execute a batch of tests.
  */
 function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_run_results_storage, $test_classes) {
-  global $test_ids, $total_time, $eventDispatcher, $eventSubscriber;
+  global $test_ids, $total_time, $eventDispatcher, $executionProgress;
 
   $total_status = SIMPLETEST_SCRIPT_EXIT_SUCCESS;
   $total_time = 0;
@@ -552,7 +552,7 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
   $children = [];
   while (!empty($test_classes) || !empty($children)) {
     // Polling.
-    $e_time = microtime(TRUE) - $eventSubscriber->timeAtTestsExecutionStart;
+    $e_time = microtime(TRUE) - $executionProgress->timeAtTestsExecutionStart;
     if ($e_time > ($p_watermark + $p_frequency)) {
       $eventDispatcher->dispatch(new RunnerTestsExecutionPoll(
         cycle: $cycles,
@@ -560,7 +560,7 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
         terminated: $t_count,
         active: count($children),
       ));
-      while (($p_watermark + $p_frequency) < (microtime(TRUE) - $eventSubscriber->timeAtTestsExecutionStart)) {
+      while (($p_watermark + $p_frequency) < (microtime(TRUE) - $executionProgress->timeAtTestsExecutionStart)) {
         $p_watermark += $p_frequency;
       }
     }
@@ -628,11 +628,6 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
           $child['test_run'],
           $child['class'],
         );
-        simpletest_script_reporter_display_summary(
-          $child['class'],
-          $process_outcome['summaries'][$child['class']],
-          $child['test_run']->duration()
-        );
         if ($process_outcome['error_output']) {
           echo 'ERROR: ' . implode("\n", $process_outcome['error_output']);
         }
@@ -661,6 +656,7 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
         $eventDispatcher->dispatch(new TestExecutionFinished(
           cycle: $cycles,
           testRun: $child['test_run'],
+          result: $process_outcome,
         ));
       }
     }

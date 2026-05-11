@@ -9,7 +9,7 @@ namespace Drupal\TestTools\TestRunner\Event;
  *
  * @internal
  */
-final class RunnerTestsExecutionStart {
+final class RunnerTestsExecutionStart extends EventBase {
 
   /**
    * Constructor.
@@ -20,6 +20,7 @@ final class RunnerTestsExecutionStart {
   public function __construct(
     public readonly array $testsToRun,
   ) {
+    parent::__construct();
   }
 
 }

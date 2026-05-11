@@ -9,17 +9,7 @@ namespace Drupal\TestTools\TestRunner\Event;
  *
  * @internal
  */
-final class RunnerTestsExecutionPoll {
-
-  /**
-   * The time of the poll event.
-   */
-  public readonly float $time;
-
-  /**
-   * The amount of memory currently in use.
-   */
-  public readonly int $memory;
+final class RunnerTestsExecutionPoll extends EventBase {
 
   /**
    * Constructor.
@@ -39,8 +29,7 @@ final class RunnerTestsExecutionPoll {
     public readonly int $terminated,
     public readonly int $active,
   ) {
-    $this->time = microtime(TRUE);
-    $this->memory = memory_get_usage(TRUE);
+    parent::__construct();
   }
 
 }

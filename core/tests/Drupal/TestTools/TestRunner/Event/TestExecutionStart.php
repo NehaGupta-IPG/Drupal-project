@@ -11,17 +11,7 @@ use Drupal\Core\Test\TestRun;
  *
  * @internal
  */
-final class TestExecutionStart {
-
-  /**
-   * The time of the poll event.
-   */
-  public readonly float $time;
-
-  /**
-   * The amount of memory currently in use.
-   */
-  public readonly int $memory;
+final class TestExecutionStart extends EventBase {
 
   /**
    * Constructor.
@@ -38,8 +28,7 @@ final class TestExecutionStart {
     public readonly int $sequence,
     public readonly TestRun $testRun,
   ) {
-    $this->time = microtime(TRUE);
-    $this->memory = memory_get_usage(TRUE);
+    parent::__construct();
   }
 
 }

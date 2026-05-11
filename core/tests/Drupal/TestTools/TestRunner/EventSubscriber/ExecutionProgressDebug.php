@@ -24,7 +24,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @internal
  */
-final class EventSubscriber implements EventSubscriberInterface {
+final class ExecutionProgressDebug implements EventSubscriberInterface {
 
   /**
    * The total amount of memory available to PHP, or null if not specified.
@@ -90,8 +90,8 @@ final class EventSubscriber implements EventSubscriberInterface {
    *   The event.
    */
   public function onRunnerTestsExecutionStart(RunnerTestsExecutionStart $event): void {
-    $this->timeAtTestsExecutionStart = microtime(TRUE);
-    $this->memoryAtTestsExecutionStart = memory_get_usage(TRUE);
+    $this->timeAtTestsExecutionStart = $event->time;
+    $this->memoryAtTestsExecutionStart = $event->memory;
     $this->testsToRun = $event->testsToRun;
   }
 
@@ -126,8 +126,8 @@ final class EventSubscriber implements EventSubscriberInterface {
    *   The event.
    */
   public function onRunnerTestsExecutionFinished(RunnerTestsExecutionFinished $event): void {
-    $this->timeAtTestsExecutionFinish = microtime(TRUE);
-    $this->memoryAtTestsExecutionFinish = memory_get_usage(TRUE);
+    $this->timeAtTestsExecutionFinish = $event->time;
+    $this->memoryAtTestsExecutionFinish = $event->memory;
   }
 
   /**
@@ -139,7 +139,7 @@ final class EventSubscriber implements EventSubscriberInterface {
   public function onTestExecutionStart(TestExecutionStart $event): void {
     if ($this->config->get('debug-execution')) {
       echo sprintf(
-        ">>START c=%d t=%f Seq=%d Test=%s\n",
+        ">>START c=%d t=%f Seq=%d %s\n",
         $event->cycle,
         $event->time - $this->timeAtTestsExecutionStart,
         $event->sequence,
@@ -157,11 +157,14 @@ final class EventSubscriber implements EventSubscriberInterface {
   public function onTestExecutionFinished(TestExecutionFinished $event): void {
     if ($this->config->get('debug-execution')) {
       echo sprintf(
-        "<<STOP  c=%d t=%f Seq=%d Test=%s Duration=%f\n",
+       "<<STOP  c=%d t=%f Seq=%d ",
         $event->cycle,
         $event->time - $this->timeAtTestsExecutionStart,
         $event->testRun->sequence,
+      );
+      \simpletest_script_reporter_display_summary(
         $event->testRun->getTestClass(),
+        $event->result['summaries'][$event->testRun->getTestClass()],
         $event->testRun->duration(),
       );
     }
