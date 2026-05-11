@@ -874,51 +874,6 @@ function simpletest_script_reporter_init(): void {
 }
 
 /**
- * Displays the assertion result summary for a single test class.
- *
- * @param string $class
- *   The test class name that was run.
- * @param array $results
- *   The assertion results using #pass, #fail, #exception, #debug array keys.
- * @param float|null $duration
- *   The time taken for the test to complete.
- */
-function simpletest_script_reporter_display_summary($class, $results, $duration = NULL): void {
-  // Output all test results vertically aligned.
-  $summary = [str_pad($results['#pass'], 4, " ", STR_PAD_LEFT) . ' passed'];
-  if ($results['#fail']) {
-    $summary[] = $results['#fail'] . ' failed';
-  }
-  if ($results['#error']) {
-    $summary[] = $results['#error'] . ' errored';
-  }
-  if ($results['#skipped']) {
-    $summary[] = $results['#skipped'] . ' skipped';
-  }
-  if ($results['#exception']) {
-    $summary[] = $results['#exception'] . ' exception(s)';
-  }
-  if ($results['#debug']) {
-    $summary[] = $results['#debug'] . ' log(s)';
-  }
-
-  if ($results['#cli_fail']) {
-    $summary[] = 'exit code ' . $results['#exit_code'];
-  }
-
-  // The key $results['#time'] holds the sum of the tests execution times,
-  // without taking into account the process spawning time and the setup
-  // times of the tests themselves. So for reporting to be consistent with
-  // PHPUnit CLI reported execution time, we report here the overall time of
-  // execution of the spawned process.
-  $time = sprintf('%8.3fs', $duration);
-
-  $output = vsprintf('%s %s %s', [$time, trim_with_ellipsis($class, 70, STR_PAD_LEFT), implode(', ', $summary)]);
-  $status = ($results['#fail'] || $results['#cli_fail'] || $results['#exception'] || $results['#error'] ? 'fail' : 'pass');
-  simpletest_script_print($output . "\n", simpletest_script_color_code($status));
-}
-
-/**
  * Display jUnit XML test results.
  */
 function simpletest_script_reporter_write_xml_results(TestRunResultsStorageInterface $test_run_results_storage): void {
@@ -1153,6 +1108,26 @@ function simpletest_script_color_code($status) {
     'skipped' => SIMPLETEST_SCRIPT_COLOR_YELLOW,
     'debug' => SIMPLETEST_SCRIPT_COLOR_CYAN,
     default => 0,
+  };
+}
+
+/**
+ * Get the Console color tag associated with the specified status.
+ *
+ * @param string $status
+ *   The status string to get code for. Special cases are: 'pass', 'fail', or
+ *   'exception'.
+ *
+ * @return ?string
+ *   Color tag.
+ */
+function simpletest_script_color_console_tag(string $status): ?string {
+  return match ($status) {
+    'pass' => '<fg=green>',
+    'fail', 'cli_fail', 'error', 'exception' => '<error>',
+    'skipped' => '<fg=yellow>',
+    'debug' => '<fg=cyan>',
+    default => NULL,
   };
 }
 

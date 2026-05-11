@@ -39,8 +39,8 @@ class ExecutionProgressDebug extends ExecutionProgress {
    *   The event.
    */
   public function onRunnerTestsExecutionPoll(RunnerTestsExecutionPoll $event): void {
-    echo sprintf(
-      "**POLL  c=%d t=%f Launched=%d Terminated=%d/%d=%d%% Active=%d/%d=%d%% Memory=%s\n",
+    $this->io->writeln(sprintf(
+      "**POLL  c=%d t=%f Launched=%d Terminated=%d/%d=%d%% Active=%d/%d=%d%% Memory=%s",
       $event->cycle,
       $event->time - $this->timeAtTestsExecutionStart,
       $event->launched,
@@ -51,7 +51,7 @@ class ExecutionProgressDebug extends ExecutionProgress {
       Config::get('concurrency'),
       (int) round($event->active / Config::get('concurrency') * 100),
       $this->totalMemoryAvailable === NULL ? ByteSizeMarkup::create($event->memory) : ByteSizeMarkup::create($event->memory) . '/' . ByteSizeMarkup::create($this->totalMemoryAvailable),
-    );
+    ));
   }
 
   /**
@@ -61,13 +61,13 @@ class ExecutionProgressDebug extends ExecutionProgress {
    *   The event.
    */
   public function onTestExecutionStart(TestExecutionStart $event): void {
-    echo sprintf(
-      ">>START c=%d t=%f Seq=%d %s\n",
+    $this->io->writeln(sprintf(
+      ">>START c=%d t=%f Seq=%d %s",
       $event->cycle,
       $event->time - $this->timeAtTestsExecutionStart,
       $event->sequence,
       $event->testRun->getTestClass(),
-    );
+    ));
   }
 
   /**
@@ -77,12 +77,12 @@ class ExecutionProgressDebug extends ExecutionProgress {
    *   The event.
    */
   public function onTestExecutionFinished(TestExecutionFinished $event): void {
-    echo sprintf(
+    $this->io->write(sprintf(
       "<<STOP  c=%d t=%f Seq=%d ",
       $event->cycle,
       $event->time - $this->timeAtTestsExecutionStart,
       $event->testRun->sequence,
-    );
+    ));
     parent::onTestExecutionFinished($event);
   }
 

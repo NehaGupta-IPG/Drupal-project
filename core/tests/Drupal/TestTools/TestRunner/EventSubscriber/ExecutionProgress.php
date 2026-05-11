@@ -59,7 +59,7 @@ class ExecutionProgress implements EventSubscriberInterface {
   public protected(set) float $timeAtTestsExecutionFinish;
 
   public function __construct(
-    protected ConsoleOutput $consoleOutput,
+    protected ConsoleOutput $io,
     protected Config $config,
   ) {
     $tot_memory = NULL;
@@ -111,11 +111,57 @@ class ExecutionProgress implements EventSubscriberInterface {
    *   The event.
    */
   public function onTestExecutionFinished(TestExecutionFinished $event): void {
-    \simpletest_script_reporter_display_summary(
+    $this->printSummary(
       $event->testRun->getTestClass(),
       $event->result['summaries'][$event->testRun->getTestClass()],
       $event->testRun->duration(),
     );
+  }
+
+  /**
+   * Displays the assertion result summary for a single test class.
+   *
+   * @param string $class
+   *   The test class name that was run.
+   * @param array $results
+   *   The assertion results using #pass, #fail, #exception, #debug array keys.
+   * @param float|null $duration
+   *   The time taken for the test to complete.
+   */
+  private function printSummary(string $class, array $results, ?float $duration = NULL): void {
+    // Output all test results vertically aligned.
+    $summary = [str_pad((string) $results['#pass'], 4, " ", STR_PAD_LEFT) . ' passed'];
+    if ($results['#fail']) {
+      $summary[] = $results['#fail'] . ' failed';
+    }
+    if ($results['#error']) {
+      $summary[] = $results['#error'] . ' errored';
+    }
+    if ($results['#skipped']) {
+      $summary[] = $results['#skipped'] . ' skipped';
+    }
+    if ($results['#exception']) {
+      $summary[] = $results['#exception'] . ' exception(s)';
+    }
+    if ($results['#debug']) {
+      $summary[] = $results['#debug'] . ' log(s)';
+    }
+
+    if ($results['#cli_fail']) {
+      $summary[] = 'exit code ' . $results['#exit_code'];
+    }
+
+    // The key $results['#time'] holds the sum of the tests execution times,
+    // without taking into account the process spawning time and the setup
+    // times of the tests themselves. So for reporting to be consistent with
+    // PHPUnit CLI reported execution time, we report here the overall time of
+    // execution of the spawned process.
+    $time = sprintf('%8.3fs', $duration);
+
+    $output = vsprintf('%s %s %s', [$time, \trim_with_ellipsis($class, 70, STR_PAD_LEFT), implode(', ', $summary)]);
+    $status = ($results['#fail'] || $results['#cli_fail'] || $results['#exception'] || $results['#error'] ? 'fail' : 'pass');
+    $tag = \simpletest_script_color_console_tag($status);
+    $this->io->writeln($tag ? $tag . $output ."</>" : $output);
   }
 
 }
