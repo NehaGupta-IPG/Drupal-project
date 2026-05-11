@@ -229,7 +229,7 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
     }
 
     $tree = $this->menuTree->load($menu_name, $parameters);
-    $tree = $this->menuTree->transform($tree);
+    $tree = $this->menuTree->checkAccess($tree);
     return $this->menuTree->build($tree);
   }
 

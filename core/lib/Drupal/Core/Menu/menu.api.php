@@ -175,14 +175,10 @@
  *   default set of parameters, and then customize them to suit your needs.
  * - Call \Drupal\Core\MenuLinkTree::load() with your menu link tree parameters,
  *   this will return a menu link tree.
- * - Pass the menu tree to \Drupal\Core\Menu\MenuLinkTree::transform() to apply
- *   menu link tree manipulators that transform the tree. You will almost always
- *   want to apply access checking. The manipulators that you will typically
- *   need can be found in \Drupal\Core\Menu\DefaultMenuLinkTreeManipulators.
- * - Potentially write a custom menu tree manipulator, see
- *   \Drupal\Core\Menu\DefaultMenuLinkTreeManipulators for examples. This is
- *   only necessary if you want to do things like adding extra metadata to
- *   rendered links to display icons next to them.
+ * - Apply access checking by calling
+ *   \Drupal\Core\Menu\MenuLinkTreeInterface::checkAccess() on the loaded tree;
+ *   this populates the access property on each element. To override access
+ *   decisions, decorate the 'menu.tree_access_check' service.
  * - Pass the menu tree to \Drupal\Core\Menu\MenuLinkTree::build(), this will
  *   build a renderable array.
  *
@@ -194,19 +190,13 @@
  * // Build the typical default set of menu tree parameters.
  * $parameters = $menu_tree->getCurrentRouteMenuTreeParameters($menu_name);
  *
- * // Load the tree based on this set of parameters.
+ * // Load the tree.
  * $tree = $menu_tree->load($menu_name, $parameters);
  *
- * // Transform the tree using the manipulators you want.
- * $manipulators = [
- *   // Only show links that are accessible for the current user.
- *   ['callable' => 'menu.default_tree_manipulators:checkAccess'],
- *   // Use the default sorting of menu links.
- *   ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
- * ];
- * $tree = $menu_tree->transform($tree, $manipulators);
+ * // Apply access checks.
+ * $tree = $menu_tree->checkAccess($tree);
  *
- * // Finally, build a renderable array from the transformed tree.
+ * // Finally, build a renderable array from the access-checked tree.
  * $menu = $menu_tree->build($tree);
  *
  * $menu_html = \Drupal::service('renderer')->render($menu);

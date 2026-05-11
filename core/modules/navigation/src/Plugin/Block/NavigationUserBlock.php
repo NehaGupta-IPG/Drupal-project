@@ -83,7 +83,7 @@ final class NavigationUserBlock extends BlockBase {
     $link = MenuLinkDefault::create(\Drupal::getContainer(), [], 'navigation.user_links.user.wrapper', $menu_definition);
     $tree = new MenuLinkTreeElement($link, TRUE, 1, FALSE, $subtree);
 
-    $tree = $menu_tree->transform([$tree]);
+    $tree = $menu_tree->checkAccess([$tree]);
     $build = $menu_tree->build($tree);
     $build['#title'] = $label;
     $build['#cache']['contexts'][] = 'user';

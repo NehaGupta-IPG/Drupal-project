@@ -16,14 +16,6 @@ use Drupal\Core\Utility\CallableResolver;
 class MenuLinkTree implements MenuLinkTreeInterface {
 
   /**
-   * The default menu link tree manipulators applied when none are specified.
-   */
-  protected const array DEFAULT_MANIPULATORS = [
-    ['callable' => 'menu.default_tree_manipulators:checkAccess'],
-    ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
-  ];
-
-  /**
    * Constructs a \Drupal\Core\Menu\MenuLinkTree object.
    *
    * @param \Drupal\Core\Menu\MenuTreeStorageInterface $treeStorage
@@ -36,6 +28,8 @@ class MenuLinkTree implements MenuLinkTreeInterface {
    *   The active menu trail service.
    * @param \Drupal\Core\Utility\CallableResolver $callableResolver
    *   The callable resolver.
+   * @param \Drupal\Core\Menu\MenuLinkTreeAccessCheckInterface|null $accessCheck
+   *   The menu link tree access check service.
    */
   public function __construct(
     protected MenuTreeStorageInterface $treeStorage,
@@ -43,7 +37,19 @@ class MenuLinkTree implements MenuLinkTreeInterface {
     protected RouteProviderInterface $routeProvider,
     protected MenuActiveTrailInterface $menuActiveTrail,
     protected CallableResolver $callableResolver,
+    protected ?MenuLinkTreeAccessCheckInterface $accessCheck = NULL,
   ) {
+    if ($this->accessCheck === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $accessCheck argument is deprecated in drupal:11.4.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/9999999', E_USER_DEPRECATED);
+      $this->accessCheck = \Drupal::service('menu.tree_access_check');
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function checkAccess(array $tree): array {
+    return $this->accessCheck->checkAccess($tree);
   }
 
   /**
@@ -73,7 +79,24 @@ class MenuLinkTree implements MenuLinkTreeInterface {
     if ($data['route_names'] && $this->routeProvider instanceof PreloadableRouteProviderInterface) {
       $this->routeProvider->getRoutesByNames($data['route_names']);
     }
-    return $this->createInstances($data['tree']);
+    return $this->sort($this->createInstances($data['tree']));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function sort(array $tree): array {
+    foreach ($tree as $key => $element) {
+      if ($element->subtree) {
+        $tree[$key]->subtree = $this->sort($element->subtree);
+      }
+    }
+    uasort($tree, fn($a, $b) =>
+      ($a->link->getWeight() <=> $b->link->getWeight())
+        ?: ((string) $a->link->getTitle() <=> (string) $b->link->getTitle())
+        ?: ($a->link->getPluginId() <=> $b->link->getPluginId())
+    );
+    return $tree;
   }
 
   /**
@@ -109,8 +132,7 @@ class MenuLinkTree implements MenuLinkTreeInterface {
   /**
    * {@inheritdoc}
    */
-  public function transform(array $tree, ?array $manipulators = NULL) {
-    $manipulators ??= static::DEFAULT_MANIPULATORS;
+  public function transform(array $tree, array $manipulators) {
     foreach ($manipulators as $manipulator) {
       $callable = $this->callableResolver->getCallableFromDefinition($manipulator['callable']);
       // Prepare the arguments for the menu tree manipulator callable; the first

@@ -62,7 +62,7 @@ class ModuleAdminLinksHelper {
         ->excludeRoot()
         ->onlyEnabledLinks();
       $menuTree = $this->menuLinkTree->load('system.admin', $parameters);
-      $menuTree = $this->menuLinkTree->transform($menuTree);
+      $menuTree = $this->menuLinkTree->checkAccess($menuTree);
       $menuTree = $this->defaultMenuLinkTreeManipulators->flatten($menuTree);
       $this->memoryCache->set(self::ADMIN_LINKS_MENU_TREE, $menuTree);
     }

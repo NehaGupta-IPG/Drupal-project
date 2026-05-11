@@ -63,6 +63,36 @@ interface MenuLinkTreeInterface {
   public function load($menu_name, MenuTreeParameters $parameters);
 
   /**
+   * Sorts a menu link tree by weight, title, and plugin ID.
+   *
+   * This method exists for callers that insert additional elements after
+   * load() and need to restore display order. Array keys are preserved.
+   *
+   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
+   *   The menu link tree to sort.
+   *
+   * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
+   *   The sorted menu link tree.
+   */
+  public function sort(array $tree): array;
+
+  /**
+   * Applies access checks to a menu link tree.
+   *
+   * Delegates to the 'menu.tree_access_check' service. Decorate that service
+   * to override access decisions for menu trees.
+   *
+   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
+   *   The menu link tree to access-check.
+   *
+   * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
+   *   The access-checked menu link tree.
+   *
+   * @see \Drupal\Core\Menu\MenuLinkTreeAccessCheckInterface
+   */
+  public function checkAccess(array $tree): array;
+
+  /**
    * Applies menu link tree manipulators to transform the given tree.
    *
    * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
@@ -72,20 +102,17 @@ interface MenuLinkTreeInterface {
    *   - callable: a callable or a string that can be resolved to a callable
    *     by Drupal\Core\Utility\CallableResolver::getCallableFromDefinition()
    *   - args: optional array of arguments to pass to the callable after $tree.
-   *   For example, to sort and check access:
-   *   @code
-   *   $manipulators = [
-   *     ['callable' => 'menu.default_tree_manipulators:checkNodeAccess'],
-   *     ['callable' => 'menu.default_tree_manipulators:checkAccess'],
-   *     ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
-   *   ];
-   *   @endcode
-   *   If NULL, the default set of manipulators is applied.
    *
    * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
    *   The manipulated menu link tree.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+   *   ::checkAccess() for access checks. Call other manipulator methods on
+   *   their service directly.
+   *
+   * @see https://www.drupal.org/node/9999999
    */
-  public function transform(array $tree, ?array $manipulators = NULL);
+  public function transform(array $tree, array $manipulators);
 
   /**
    * Builds a renderable array from a menu tree.

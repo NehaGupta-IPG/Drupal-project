@@ -88,7 +88,7 @@ class ToolbarController extends ControllerBase implements TrustedCallbackInterfa
     $parameters->setMinDepth(2)->setMaxDepth(2)->onlyEnabledLinks();
     // @todo Make the menu configurable in https://www.drupal.org/node/1869638.
     $tree = $menu_tree->load('admin', $parameters);
-    $tree = $menu_tree->transform($tree);
+    $tree = $menu_tree->checkAccess($tree);
     $tree = toolbar_menu_navigation_links($tree);
     $element['administration_menu'] = $menu_tree->build($tree);
     return $element;
@@ -111,7 +111,7 @@ class ToolbarController extends ControllerBase implements TrustedCallbackInterfa
     $parameters->setMinDepth(2)->setMaxDepth(4)->onlyEnabledLinks();
     // @todo Make the menu configurable in https://www.drupal.org/node/1869638.
     $tree = $menu_tree->load('admin', $parameters);
-    $tree = $menu_tree->transform($tree);
+    $tree = $menu_tree->checkAccess($tree);
     $tree = toolbar_menu_navigation_links($tree);
     $subtrees = [];
     // Calculated the combined cacheability of all subtrees.

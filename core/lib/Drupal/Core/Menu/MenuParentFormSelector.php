@@ -39,22 +39,15 @@ class MenuParentFormSelector implements MenuParentFormSelectorInterface {
    *   The entity type manager service.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
-   * @param \Drupal\Core\Menu\DefaultMenuLinkTreeManipulators|null $defaultMenuLinkTreeManipulators
-   *   The default menu link tree manipulators service.
    */
   public function __construct(
     MenuLinkTreeInterface $menu_link_tree,
     EntityTypeManagerInterface $entity_type_manager,
     TranslationInterface $string_translation,
-    protected ?DefaultMenuLinkTreeManipulators $defaultMenuLinkTreeManipulators = NULL,
   ) {
     $this->menuLinkTree = $menu_link_tree;
     $this->entityTypeManager = $entity_type_manager;
     $this->stringTranslation = $string_translation;
-    if ($this->defaultMenuLinkTreeManipulators === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $defaultMenuLinkTreeManipulators argument is deprecated in drupal:11.4.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/9999999', E_USER_DEPRECATED);
-      $this->defaultMenuLinkTreeManipulators = \Drupal::service('menu.default_tree_manipulators');
-    }
   }
 
   /**
@@ -73,8 +66,7 @@ class MenuParentFormSelector implements MenuParentFormSelectorInterface {
       $parameters = new MenuTreeParameters();
       $parameters->setMaxDepth($depth_limit);
       $tree = $this->menuLinkTree->load($menu_name, $parameters);
-      $tree = $this->defaultMenuLinkTreeManipulators->checkNodeAccess($tree);
-      $tree = $this->menuLinkTree->transform($tree);
+      $tree = $this->menuLinkTree->checkAccess($tree);
       $this->parentSelectOptionsTreeWalk($tree, $menu_name, '--', $options, $id, $depth_limit, $cacheability);
     }
     return $options;

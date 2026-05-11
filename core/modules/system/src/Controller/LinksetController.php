@@ -264,7 +264,7 @@ final class LinksetController extends ControllerBase {
     $parameters->onlyEnabledLinks();
     $parameters->setMinDepth(0);
     $tree = $this->menuTree->load($menu->id(), $parameters);
-    return $this->menuTree->transform($tree);
+    return $this->menuTree->checkAccess($tree);
   }
 
 }

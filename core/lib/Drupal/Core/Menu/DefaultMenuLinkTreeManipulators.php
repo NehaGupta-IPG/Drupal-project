@@ -3,11 +3,9 @@
 namespace Drupal\Core\Menu;
 
 use Drupal\Core\Access\AccessManagerInterface;
-use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\node\NodeInterface;
 
 /**
  * Provides a couple of menu link tree manipulators.
@@ -43,152 +41,42 @@ class DefaultMenuLinkTreeManipulators {
   /**
    * Performs access checks of a menu tree.
    *
-   * Sets the 'access' property to AccessResultInterface objects on menu link
-   * tree elements. Descends into subtrees if the root of the subtree is
-   * accessible. Inaccessible subtrees are deleted, except the top-level
-   * inaccessible link, to be compatible with render caching.
-   *
-   * (This means that top-level inaccessible links are *not* removed; it is up
-   * to the code doing something with the tree to exclude inaccessible links,
-   * just like MenuLinkTree::build() does. This allows those things to specify
-   * the necessary cacheability metadata.)
-   *
-   * This is compatible with render caching, because of cache context bubbling:
-   * conditionally defined cache contexts (i.e. subtrees that are only
-   * accessible to some users) will bubble just like they do for render arrays.
-   * This is why inaccessible subtrees are deleted, except at the top-level
-   * inaccessible link: if we didn't keep the first (depth-wise) inaccessible
-   * link, we wouldn't be able to know which cache contexts would cause those
-   * subtrees to become accessible again, thus forcing us to conclude that the
-   * subtree is unconditionally inaccessible.
-   *
    * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
    *   The menu link tree to manipulate.
    *
    * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
-   *   The manipulated menu link tree.
+   *   The access-checked menu link tree.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Call the
+   *   'menu.tree_access_check' service, or use
+   *   \Drupal\Core\Menu\MenuLinkTreeInterface::checkAccess(). The batched
+   *   node-link access optimization that previously required calling
+   *   ::checkNodeAccess() first is now applied automatically.
+   *
+   * @see https://www.drupal.org/node/9999999
    */
   public function checkAccess(array $tree) {
-    foreach ($tree as $key => $element) {
-      // Other menu tree manipulators may already have calculated access, do not
-      // overwrite the existing value in that case.
-      if (!isset($element->access)) {
-        $tree[$key]->access = $this->menuLinkCheckAccess($element->link);
-      }
-      if ($tree[$key]->access->isAllowed()) {
-        if ($tree[$key]->subtree) {
-          $tree[$key]->subtree = $this->checkAccess($tree[$key]->subtree);
-        }
-      }
-      else {
-        // Replace the link with an InaccessibleMenuLink object, so that if it
-        // is accidentally rendered, no sensitive information is divulged.
-        $tree[$key]->link = new InaccessibleMenuLink($tree[$key]->link);
-        // Always keep top-level inaccessible links: their cacheability metadata
-        // that indicates why they're not accessible by the current user must be
-        // bubbled. Otherwise, those subtrees will not be varied by any cache
-        // contexts at all, therefore forcing them to remain empty for all users
-        // unless some other part of the menu link tree accidentally varies by
-        // the same cache contexts.
-        // For deeper levels, we *can* remove the subtrees and therefore also
-        // not perform access checking on the subtree, thanks to bubbling/cache
-        // redirects. This therefore allows us to still do significantly less
-        // work in case of inaccessible subtrees, which is the entire reason why
-        // this deletes subtrees in the first place.
-        $tree[$key]->subtree = [];
-      }
-    }
-    return $tree;
+    return \Drupal::service('menu.tree_access_check')->checkAccess($tree);
   }
 
   /**
    * Performs access checking for nodes in an optimized way.
    *
-   * This manipulator should be added before the generic ::checkAccess() one,
-   * because it provides a performance optimization for ::checkAccess().
-   *
    * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
    *   The menu link tree to manipulate.
    *
    * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
    *   The manipulated menu link tree.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. The
+   *   batched node-link access optimization is now applied automatically by
+   *   the 'menu.tree_access_check' service; call its ::checkAccess() (or
+   *   \Drupal\Core\Menu\MenuLinkTreeInterface::checkAccess()) instead.
+   *
+   * @see https://www.drupal.org/node/9999999
    */
   public function checkNodeAccess(array $tree) {
-    $node_links = [];
-    $this->collectNodeLinks($tree, $node_links);
-    if ($node_links) {
-      $nids = array_keys($node_links);
-
-      $query = $this->entityTypeManager->getStorage('node')->getQuery();
-      $query->accessCheck(TRUE);
-      $query->condition('nid', $nids, 'IN');
-
-      // Allows admins to view all nodes, by both disabling node_access
-      // query rewrite as well as not checking for the node status. The
-      // 'view own unpublished nodes' permission is ignored to not require cache
-      // entries per user.
-      $access_result = AccessResult::allowed()->cachePerPermissions();
-      if ($this->account->hasPermission('bypass node access')) {
-        $query->accessCheck(FALSE);
-      }
-      else {
-        $access_result->addCacheContexts(['user.node_grants:view']);
-        if (!$this->moduleHandler->hasImplementations('node_grants') && !$this->account->hasPermission('view any unpublished content')) {
-          $query->condition('status', NodeInterface::PUBLISHED);
-        }
-      }
-
-      $nids = $query->execute();
-      foreach ($nids as $nid) {
-        foreach ($node_links[$nid] as $key => $link) {
-          $node_links[$nid][$key]->access = $access_result;
-        }
-      }
-    }
-
-    return $tree;
-  }
-
-  /**
-   * Collects the node links in the menu tree.
-   *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
-   *   The menu link tree to manipulate.
-   * @param array $node_links
-   *   Stores references to menu link elements to effectively set access.
-   */
-  protected function collectNodeLinks(array &$tree, array &$node_links) {
-    foreach ($tree as $key => &$element) {
-      if ($element->link->getRouteName() == 'entity.node.canonical') {
-        $nid = $element->link->getRouteParameters()['node'];
-        $node_links[$nid][$key] = $element;
-        // Deny access by default. checkNodeAccess() will re-add it.
-        $element->access = AccessResult::neutral();
-      }
-      if ($element->hasChildren) {
-        $this->collectNodeLinks($element->subtree, $node_links);
-      }
-    }
-  }
-
-  /**
-   * Checks access for one menu link instance.
-   *
-   * @param \Drupal\Core\Menu\MenuLinkInterface $instance
-   *   The menu link instance.
-   *
-   * @return \Drupal\Core\Access\AccessResultInterface
-   *   The access result.
-   */
-  protected function menuLinkCheckAccess(MenuLinkInterface $instance) {
-    $url = $instance->getUrlObject();
-
-    if ($url->isRouted()) {
-      return $this->accessManager->checkNamedRoute($url->getRouteName(), $url->getRouteParameters(), $this->account, TRUE);
-    }
-
-    // Must be an external link.
-    return AccessResult::allowed();
+    return \Drupal::service('menu.tree_access_check')->checkAccess($tree);
   }
 
   /**

@@ -153,7 +153,7 @@ class SystemManager {
     $parameters = new MenuTreeParameters();
     $parameters->setRoot($link_id)->excludeRoot()->setTopLevelOnly()->onlyEnabledLinks();
     $tree = $this->menuTree->load(NULL, $parameters);
-    $tree = $this->menuTree->transform($tree);
+    $tree = $this->menuTree->checkAccess($tree);
     foreach ($tree as $key => $element) {
       // Only render accessible links.
       if (!$element->access->isAllowed()) {
