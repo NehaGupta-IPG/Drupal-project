@@ -288,4 +288,17 @@ class MenuLinkTreeTest extends KernelTestBase {
     $this->assertSame(1337, $render_array['#cache']['max-age']);
   }
 
+  /**
+   * Tests transforming a link tree.
+   */
+  #[Group('legacy')]
+  public function testTransformWithoutContext(): void {
+    /** @var \Drupal\system\MenuStorage $storage */
+    $storage = \Drupal::entityTypeManager()->getStorage('menu');
+    $storage->create(['id' => 'menu1', 'label' => 'Menu 1'])->save();
+    $output = $this->linkTree->load('menu1', new MenuTreeParameters());
+    $this->expectUserDeprecationMessage('Transforming menu links without $context is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3380512');
+    $this->linkTree->transform($output, []);
+  }
+
 }
