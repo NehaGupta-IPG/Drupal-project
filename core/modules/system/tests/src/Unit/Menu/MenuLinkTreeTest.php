@@ -11,6 +11,7 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Menu\MenuActiveTrailInterface;
 use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Menu\MenuLinkTree;
+use Drupal\Core\Menu\MenuLinkTreeAccessCheckInterface;
 use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Core\Menu\MenuTreeStorageInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
@@ -48,7 +49,8 @@ class MenuLinkTreeTest extends UnitTestCase {
       $this->createStub(MenuLinkManagerInterface::class),
       $this->createStub(RouteProviderInterface::class),
       $this->createStub(MenuActiveTrailInterface::class),
-      $this->createStub(CallableResolver::class)
+      $this->createStub(CallableResolver::class),
+      $this->createStub(MenuLinkTreeAccessCheckInterface::class),
     );
 
     $cache_contexts_manager = $this->createStub(CacheContextsManager::class);

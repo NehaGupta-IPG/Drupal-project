@@ -3,9 +3,11 @@
 namespace Drupal\Core\Menu;
 
 use Drupal\Core\Access\AccessManagerInterface;
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\node\NodeInterface;
 
 /**
  * Provides a couple of menu link tree manipulators.
@@ -56,7 +58,21 @@ class DefaultMenuLinkTreeManipulators {
    * @see https://www.drupal.org/node/9999999
    */
   public function checkAccess(array $tree) {
-    return \Drupal::service('menu.tree_access_check')->checkAccess($tree);
+    foreach ($tree as $key => $element) {
+      if (!isset($element->access)) {
+        $tree[$key]->access = $this->menuLinkCheckAccess($element->link);
+      }
+      if ($tree[$key]->access->isAllowed()) {
+        if ($tree[$key]->subtree) {
+          $tree[$key]->subtree = $this->checkAccess($tree[$key]->subtree);
+        }
+      }
+      else {
+        $tree[$key]->link = new InaccessibleMenuLink($tree[$key]->link);
+        $tree[$key]->subtree = [];
+      }
+    }
+    return $tree;
   }
 
   /**
@@ -76,7 +92,69 @@ class DefaultMenuLinkTreeManipulators {
    * @see https://www.drupal.org/node/9999999
    */
   public function checkNodeAccess(array $tree) {
-    return \Drupal::service('menu.tree_access_check')->checkAccess($tree);
+    $node_links = [];
+    $this->collectNodeLinks($tree, $node_links);
+    if ($node_links) {
+      $nids = array_keys($node_links);
+      $query = $this->entityTypeManager->getStorage('node')->getQuery();
+      $query->accessCheck(TRUE);
+      $query->condition('nid', $nids, 'IN');
+      $access_result = AccessResult::allowed()->cachePerPermissions();
+      if ($this->account->hasPermission('bypass node access')) {
+        $query->accessCheck(FALSE);
+      }
+      else {
+        $access_result->addCacheContexts(['user.node_grants:view']);
+        if (!$this->moduleHandler->hasImplementations('node_grants') && !$this->account->hasPermission('view any unpublished content')) {
+          $query->condition('status', NodeInterface::PUBLISHED);
+        }
+      }
+      $nids = $query->execute();
+      foreach ($nids as $nid) {
+        foreach ($node_links[$nid] as $key => $link) {
+          $node_links[$nid][$key]->access = $access_result;
+        }
+      }
+    }
+    return $tree;
+  }
+
+  /**
+   * Collects node link elements for batched access checking.
+   *
+   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
+   *   The menu link tree to inspect.
+   * @param array $node_links
+   *   Output: collected node links grouped by node ID.
+   */
+  protected function collectNodeLinks(array &$tree, array &$node_links): void {
+    foreach ($tree as $key => &$element) {
+      if ($element->link->getRouteName() === 'entity.node.canonical') {
+        $nid = $element->link->getRouteParameters()['node'];
+        $node_links[$nid][$key] = $element;
+        $element->access = AccessResult::neutral();
+      }
+      if ($element->hasChildren) {
+        $this->collectNodeLinks($element->subtree, $node_links);
+      }
+    }
+  }
+
+  /**
+   * Performs the access check for a single menu link.
+   *
+   * @param \Drupal\Core\Menu\MenuLinkInterface $instance
+   *   The menu link instance.
+   *
+   * @return \Drupal\Core\Access\AccessResultInterface
+   *   The access result.
+   */
+  protected function menuLinkCheckAccess(MenuLinkInterface $instance) {
+    $url = $instance->getUrlObject();
+    if ($url->isRouted()) {
+      return $this->accessManager->checkNamedRoute($url->getRouteName(), $url->getRouteParameters(), $this->account, TRUE);
+    }
+    return AccessResult::allowed();
   }
 
   /**
