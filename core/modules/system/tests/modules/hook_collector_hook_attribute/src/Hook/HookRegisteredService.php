@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\hook_collector_hook_attribute\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Test\TrackHookInvocationsTrait;
+use Drupal\Core\Test\Hook\TrackHookInvocationsTrait;
 
 /**
  * Test Hook class that is also a declared service.

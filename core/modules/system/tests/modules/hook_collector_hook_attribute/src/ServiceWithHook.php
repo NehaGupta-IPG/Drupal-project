@@ -6,8 +6,8 @@ namespace Drupal\hook_collector_hook_attribute;
 
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Order\OrderAfter;
-use Drupal\Core\Test\TestHookService;
-use Drupal\Core\Test\TrackHookInvocationsTrait;
+use Drupal\Core\Test\Hook\TestHookService;
+use Drupal\Core\Test\Hook\TrackHookInvocationsTrait;
 
 /**
  * Service class with Hook attribute.

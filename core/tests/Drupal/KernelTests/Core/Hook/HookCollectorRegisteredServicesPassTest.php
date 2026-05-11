@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Hook;
 
-use Drupal\Core\Test\TestHookService;
+use Drupal\Core\Test\Hook\TestHookService;
 use Drupal\hook_collector_hook_attribute\AnotherServiceWithHook;
 use Drupal\hook_collector_hook_attribute\Hook\HookRegisteredService;
 use Drupal\hook_collector_hook_attribute\ServiceWithHook;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Core\Test;
+namespace Drupal\Core\Test\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Order\OrderBefore;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Core\Test;
+namespace Drupal\Core\Test\Hook;
 
 /**
  * Trait that provides a method to track many times a method has been invoked.
