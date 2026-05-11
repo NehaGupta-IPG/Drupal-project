@@ -10,6 +10,7 @@ use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Layout\LayoutDefinition;
 use Drupal\Core\Layout\LayoutInterface;
 use Drupal\Core\Layout\LayoutPluginManagerInterface;
@@ -19,7 +20,6 @@ use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Drupal\Core\Render\PreviewFallbackInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\layout_builder\EventSubscriber\BlockComponentRenderArray;
-use Drupal\layout_builder\EventSubscriber\SectionRegionsRenderArraySubscriber;
 use Drupal\layout_builder\Section;
 use Drupal\layout_builder\SectionComponent;
 use Drupal\Tests\UnitTestCase;
@@ -77,13 +77,6 @@ class SectionRenderTest extends UnitTestCase {
   protected $contextRepository;
 
   /**
-   * The event dispatcher.
-   *
-   * @var \Symfony\Component\EventDispatcher\EventDispatcher
-   */
-  protected $eventDispatcher;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -94,13 +87,23 @@ class SectionRenderTest extends UnitTestCase {
     $this->contextHandler = $this->prophesize(ContextHandlerInterface::class);
     $this->contextRepository = $this->prophesize(ContextRepositoryInterface::class);
     // @todo Refactor this into some better tests in https://www.drupal.org/node/2942605.
-    $this->eventDispatcher = (new \ReflectionClass(EventDispatcher::class))->newInstanceWithoutConstructor();
+    $event_dispatcher = (new \ReflectionClass(EventDispatcher::class))->newInstanceWithoutConstructor();
 
     $this->account = $this->prophesize(AccountInterface::class);
     $component_subscriber = new BlockComponentRenderArray($this->account->reveal());
-    $section_subscriber = new SectionRegionsRenderArraySubscriber();
-    $this->eventDispatcher->addSubscriber($component_subscriber);
-    $this->eventDispatcher->addSubscriber($section_subscriber);
+    $event_dispatcher->addSubscriber($component_subscriber);
+
+    $module_handler = $this->createStub(ModuleHandlerInterface::class);
+    $module_handler->method('alter')
+      ->willReturnCallback(function (string|array $hook, mixed &$data, mixed &$context1 = NULL, mixed &$context2 = NULL): void {
+        if ($hook === 'layout_builder_section_regions_render_array') {
+          foreach ($context1->getComponents() as $component) {
+            if ($output = $component->toRenderArray($context2['contexts'], $context2['in_preview'])) {
+              $data[$component->getRegion()][$component->getUuid()] = $output;
+            }
+          }
+        }
+      });
 
     $layout = $this->prophesize(LayoutInterface::class);
     $layout->getPluginDefinition()->willReturn(new LayoutDefinition([]));
@@ -113,7 +116,8 @@ class SectionRenderTest extends UnitTestCase {
     $container->set('plugin.manager.core.layout', $layout_plugin_manager->reveal());
     $container->set('context.handler', $this->contextHandler->reveal());
     $container->set('context.repository', $this->contextRepository->reveal());
-    $container->set('event_dispatcher', $this->eventDispatcher);
+    $container->set('event_dispatcher', $event_dispatcher);
+    $container->set('module_handler', $module_handler);
     \Drupal::setContainer($container);
   }
 
@@ -156,7 +160,7 @@ class SectionRenderTest extends UnitTestCase {
       'content' => [
         'some_uuid' => $render_array,
       ],
-    ] + static::CACHE_DEFAULT;
+    ];
     $result = (new Section('layout_onecol', [], $section))->toRenderArray();
     $this->assertEquals($expected, $result);
   }
@@ -182,7 +186,7 @@ class SectionRenderTest extends UnitTestCase {
       'content' => [
         'some_uuid' => static::CACHE_DEFAULT,
       ],
-    ] + static::CACHE_DEFAULT;
+    ];
     $result = (new Section('layout_onecol', [], $section))->toRenderArray();
     $this->assertEquals($expected, $result);
   }
@@ -232,7 +236,7 @@ class SectionRenderTest extends UnitTestCase {
       'content' => [
         'some_uuid' => $render_array,
       ],
-    ] + static::CACHE_DEFAULT;
+    ];
     $result = (new Section('layout_onecol', [], $section))->toRenderArray([], TRUE);
     $this->assertEquals($expected, $result);
   }
@@ -242,7 +246,7 @@ class SectionRenderTest extends UnitTestCase {
    */
   public function testToRenderArrayEmpty(): void {
     $section = [];
-    $expected = static::CACHE_DEFAULT;
+    $expected = [];
     $result = (new Section('layout_onecol', [], $section))->toRenderArray();
     $this->assertEquals($expected, $result);
   }
@@ -291,7 +295,7 @@ class SectionRenderTest extends UnitTestCase {
       'content' => [
         'some_uuid' => $render_array,
       ],
-    ] + static::CACHE_DEFAULT;
+    ];
     $result = (new Section('layout_onecol', [], $section))->toRenderArray();
     $this->assertEquals($expected, $result);
   }

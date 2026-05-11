@@ -6,4 +6,3 @@ services:
     class: Drupal\layout_builder_test\ContextProvider\IHaveRuntimeContexts
     tags:
       - { name: 'context_provider' }
-  Drupal\layout_builder_test\EventSubscriber\LayoutBuilderTestSubscriber: ~

@@ -53,4 +53,3 @@ services:
   Drupal\layout_builder\InlineBlockUsageInterface: '@inline_block.usage'
   layout_builder.element.prepare_layout:
     class: Drupal\layout_builder\EventSubscriber\PrepareLayout
-  Drupal\layout_builder\EventSubscriber\SectionRegionsRenderArraySubscriber: ~
