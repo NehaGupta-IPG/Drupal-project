@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\system;
 
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
+use Drupal\Core\Menu\DefaultMenuLinkTreeManipulators;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
 
@@ -25,11 +26,19 @@ class ModuleAdminLinksHelper {
    *   The menu link tree service.
    * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memoryCache
    *   The memory cache.
+   * @param \Drupal\Core\Menu\DefaultMenuLinkTreeManipulators|null $defaultMenuLinkTreeManipulators
+   *   The default menu link tree manipulators service.
    */
   public function __construct(
     protected MenuLinkTreeInterface $menuLinkTree,
     protected MemoryCacheInterface $memoryCache,
-  ) {}
+    protected ?DefaultMenuLinkTreeManipulators $defaultMenuLinkTreeManipulators = NULL,
+  ) {
+    if ($this->defaultMenuLinkTreeManipulators === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $defaultMenuLinkTreeManipulators argument is deprecated in drupal:11.4.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/9999999', E_USER_DEPRECATED);
+      $this->defaultMenuLinkTreeManipulators = \Drupal::service('menu.default_tree_manipulators');
+    }
+  }
 
   /**
    * Generates a list of admin tasks offered by a specified module.
@@ -53,12 +62,8 @@ class ModuleAdminLinksHelper {
         ->excludeRoot()
         ->onlyEnabledLinks();
       $menuTree = $this->menuLinkTree->load('system.admin', $parameters);
-      $manipulators = [
-        ['callable' => 'menu.default_tree_manipulators:checkAccess'],
-        ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
-        ['callable' => 'menu.default_tree_manipulators:flatten'],
-      ];
-      $menuTree = $this->menuLinkTree->transform($menuTree, $manipulators);
+      $menuTree = $this->menuLinkTree->transform($menuTree);
+      $menuTree = $this->defaultMenuLinkTreeManipulators->flatten($menuTree);
       $this->memoryCache->set(self::ADMIN_LINKS_MENU_TREE, $menuTree);
     }
 
