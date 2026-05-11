@@ -14,6 +14,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Tests Drupal\Core\File\FileSystem.
@@ -36,10 +37,8 @@ class FileSystemTest extends UnitTestCase {
 
   /**
    * The stream wrapper manager.
-   *
-   * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $streamWrapperManager;
+  protected StreamWrapperManagerInterface&Stub $streamWrapperManager;
 
   /**
    * {@inheritdoc}
@@ -48,7 +47,7 @@ class FileSystemTest extends UnitTestCase {
     parent::setUp();
 
     $settings = new Settings([]);
-    $this->streamWrapperManager = $this->createMock(StreamWrapperManagerInterface::class);
+    $this->streamWrapperManager = $this->createStub(StreamWrapperManagerInterface::class);
     $this->fileSystem = new FileSystem($this->streamWrapperManager, $settings);
   }
 
@@ -92,6 +91,9 @@ class FileSystemTest extends UnitTestCase {
    * Tests unlink.
    */
   public function testUnlink(): void {
+    $this->streamWrapperManager = $this->createMock(StreamWrapperManagerInterface::class);
+    $this->fileSystem = new FileSystem($this->streamWrapperManager, new Settings([]));
+
     vfsStream::setup('dir');
     vfsStream::create(['test.txt' => 'asdf']);
     $uri = 'vfs://dir/test.txt';

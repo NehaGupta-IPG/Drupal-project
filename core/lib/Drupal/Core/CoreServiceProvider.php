@@ -31,10 +31,10 @@ use Drupal\Core\Hook\ThemeHookCollectorPass;
 use Drupal\Core\Plugin\PluginManagerPass;
 use Drupal\Core\PreWarm\PreWarmableInterface;
 use Drupal\Core\Queue\QueueFactoryInterface;
-use Drupal\Core\Render\MainContent\MainContentRenderersPass;
 use Drupal\Core\Site\Settings;
 use Psr\Log\LoggerAwareInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\Compiler\RemoveBuildParametersPass;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -66,6 +66,10 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
     $container->addCompilerPass(new HookCollectorPass());
     $container->addCompilerPass(new ThemeHookCollectorPass());
     $container->addCompilerPass(new HookCollectorKeyValueWritePass(), PassConfig::TYPE_OPTIMIZE);
+    // Remove dot-prefixed build parameters (e.g. '.hook_data',
+    // '.theme_hook_data') that are used to pass data between compiler
+    // passes but should not leak into the cached container.
+    $container->addCompilerPass(new RemoveBuildParametersPass(), PassConfig::TYPE_REMOVE);
     // Add the compiler pass that lets service providers modify existing
     // service definitions. This pass must come before all passes operating on
     // services so that later list-building passes are operating on the
@@ -85,8 +89,6 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
     $container->addCompilerPass(new StackedKernelPass());
 
     $container->addCompilerPass(new StackedSessionHandlerPass());
-
-    $container->addCompilerPass(new MainContentRenderersPass());
 
     // Collect tagged handler services as method calls on consumer services.
     $container->addCompilerPass(new TaggedHandlersPass());

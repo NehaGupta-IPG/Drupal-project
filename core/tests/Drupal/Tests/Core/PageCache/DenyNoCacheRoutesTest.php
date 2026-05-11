@@ -11,6 +11,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Route;
@@ -46,10 +47,8 @@ class DenyNoCacheRoutesTest extends UnitTestCase {
 
   /**
    * The current route match.
-   *
-   * @var \Drupal\Core\Routing\RouteMatch|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $routeMatch;
+  protected RouteMatchInterface&MockObject $routeMatch;
 
   /**
    * {@inheritdoc}
@@ -69,7 +68,7 @@ class DenyNoCacheRoutesTest extends UnitTestCase {
    * @legacy-covers ::check
    */
   #[DataProvider('providerDenyNoCacheRoutesPolicy')]
-  public function testDenyNoCacheRoutesPolicy($expected_result, ?Route $route): void {
+  public function testDenyNoCacheRoutesPolicy(?string $expected_result, ?Route $route): void {
     $this->routeMatch->expects($this->once())
       ->method('getRouteObject')
       ->willReturn($route);

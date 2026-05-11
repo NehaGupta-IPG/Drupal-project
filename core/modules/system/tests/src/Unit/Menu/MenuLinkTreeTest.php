@@ -6,9 +6,14 @@ namespace Drupal\Tests\system\Unit\Menu;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Menu\MenuActiveTrailInterface;
+use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Menu\MenuLinkTree;
 use Drupal\Core\Menu\MenuLinkTreeElement;
+use Drupal\Core\Menu\MenuTreeStorageInterface;
+use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\CallableResolver;
@@ -39,16 +44,14 @@ class MenuLinkTreeTest extends UnitTestCase {
     parent::setUp();
 
     $this->menuLinkTree = new MenuLinkTree(
-      $this->createMock('\Drupal\Core\Menu\MenuTreeStorageInterface'),
-      $this->createMock('\Drupal\Core\Menu\MenuLinkManagerInterface'),
-      $this->createMock('\Drupal\Core\Routing\RouteProviderInterface'),
-      $this->createMock('\Drupal\Core\Menu\MenuActiveTrailInterface'),
-      $this->createMock(CallableResolver::class)
+      $this->createStub(MenuTreeStorageInterface::class),
+      $this->createStub(MenuLinkManagerInterface::class),
+      $this->createStub(RouteProviderInterface::class),
+      $this->createStub(MenuActiveTrailInterface::class),
+      $this->createStub(CallableResolver::class)
     );
 
-    $cache_contexts_manager = $this->getMockBuilder('Drupal\Core\Cache\Context\CacheContextsManager')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $cache_contexts_manager = $this->createStub(CacheContextsManager::class);
     $cache_contexts_manager->method('assertValidTokens')->willReturn(TRUE);
     $container = new ContainerBuilder();
     $container->set('cache_contexts_manager', $cache_contexts_manager);
@@ -102,7 +105,7 @@ class MenuLinkTreeTest extends UnitTestCase {
    * @see \Drupal\menu_link_content\Tests\MenuLinkContentCacheabilityBubblingTest
    */
   #[DataProvider('providerTestBuildCacheability')]
-  public function testBuildCacheability($description, $tree, $expected_build, $access, array $access_cache_contexts = []): void {
+  public function testBuildCacheability(string $description, array $tree, $expected_build, $access, array $access_cache_contexts = []): void {
     if ($access !== NULL) {
       $access->addCacheContexts($access_cache_contexts);
     }
@@ -118,7 +121,7 @@ class MenuLinkTreeTest extends UnitTestCase {
    *
    * @see testBuildCacheability
    */
-  public static function providerTestBuildCacheability() {
+  public static function providerTestBuildCacheability(): array {
     $base_expected_build_empty = [
       '#cache' => [
         'contexts' => [],
@@ -142,7 +145,7 @@ class MenuLinkTreeTest extends UnitTestCase {
       ],
     ];
 
-    $get_built_element = function (MenuLinkTreeElement $element) {
+    $get_built_element = function (MenuLinkTreeElement $element): array {
       $return = [
         'attributes' => new Attribute(),
         'title' => $element->link->getTitle(),
