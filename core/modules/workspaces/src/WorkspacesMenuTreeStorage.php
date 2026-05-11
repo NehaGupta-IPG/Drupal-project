@@ -33,6 +33,8 @@ class WorkspacesMenuTreeStorage extends CoreMenuTreeStorage {
    *   The cache tags invalidator.
    * @param string $table
    *   A database table name to store configuration data in.
+   * @param \Drupal\Core\Routing\RouteProviderInterface|array|null $route_provider
+   *   Route provider.
    * @param array $options
    *   (optional) Any additional database connection options to use in queries.
    */
@@ -44,9 +46,10 @@ class WorkspacesMenuTreeStorage extends CoreMenuTreeStorage {
     CacheBackendInterface $menu_cache_backend,
     CacheTagsInvalidatorInterface $cache_tags_invalidator,
     string $table,
+    $route_provider = NULL,
     array $options = [],
   ) {
-    parent::__construct($connection, $menu_cache_backend, $cache_tags_invalidator, $table, $options);
+    parent::__construct($connection, $menu_cache_backend, $cache_tags_invalidator, $table, $route_provider, $options);
   }
 
   /**

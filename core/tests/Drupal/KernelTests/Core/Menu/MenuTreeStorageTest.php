@@ -8,8 +8,11 @@ use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Menu\MenuTreeStorage;
+use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore mlid
@@ -42,7 +45,7 @@ class MenuTreeStorageTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->treeStorage = new MenuTreeStorage($this->container->get('database'), $this->container->get('cache.menu'), $this->container->get('cache_tags.invalidator'), 'menu_tree');
+    $this->treeStorage = new MenuTreeStorage($this->container->get('database'), $this->container->get('cache.menu'), $this->container->get('cache_tags.invalidator'), 'menu_tree', $this->container->get('router.route_provider'));
     $this->connection = $this->container->get('database');
   }
 
@@ -67,7 +70,7 @@ class MenuTreeStorageTest extends KernelTestBase {
   protected function doTestTable(): void {
     // Test that we can create a tree storage with an arbitrary table name and
     // that selecting from the storage creates the table.
-    $tree_storage = new MenuTreeStorage($this->container->get('database'), $this->container->get('cache.menu'), $this->container->get('cache_tags.invalidator'), 'test_menu_tree');
+    $tree_storage = new MenuTreeStorage($this->container->get('database'), $this->container->get('cache.menu'), $this->container->get('cache_tags.invalidator'), 'test_menu_tree', $this->container->get('router.route_provider'));
     $this->assertFalse($this->connection->schema()->tableExists('test_menu_tree'), 'Test table is not yet created');
     $tree_storage->countMenuLinks();
     $this->assertTrue($this->connection->schema()->tableExists('test_menu_tree'), 'Test table was created');
@@ -484,6 +487,39 @@ class MenuTreeStorageTest extends KernelTestBase {
     }
     // Verify that the child IDs match.
     $this->assertEqualsCanonicalizing($children, array_keys($this->treeStorage->loadAllChildren($id)));
+  }
+
+  /**
+   * Tests backwards compatibility layer.
+   */
+  #[IgnoreDeprecations]
+  #[DataProvider('providerBackwardsCompatibilityLayer')]
+  public function testBackwardsCompatibilityLayer(bool $pass_options = FALSE): void {
+    $this->expectUserDeprecationMessage('Calling Drupal\Core\Menu\MenuTreeStorage::__construct() without the $route_provider argument is deprecated in drupal:11.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3364323');
+    $options = ['some' => 'options'];
+    $storage = new MenuTreeStorage($this->container->get('database'), $this->container->get('cache.menu'), $this->container->get('cache_tags.invalidator'), 'menu_tree', $pass_options ? $options : NULL);
+    $reflection = new \ReflectionProperty(MenuTreeStorage::class, 'routeProvider');
+    $reflection->setAccessible(TRUE);
+    $this->assertInstanceOf(RouteProviderInterface::class, $reflection->getValue($storage));
+    if (!$pass_options) {
+      return;
+    }
+    $reflection = new \ReflectionProperty(MenuTreeStorage::class, 'options');
+    $reflection->setAccessible(TRUE);
+    $this->assertEquals($options, $reflection->getValue($storage));
+  }
+
+  /**
+   * Data provider for ::testBackwardsCompatibilityLayer.
+   *
+   * @return array
+   *   Test cases.
+   */
+  public static function providerBackwardsCompatibilityLayer(): array {
+    return [
+      'Without options' => [],
+      'With options' => [TRUE],
+    ];
   }
 
 }

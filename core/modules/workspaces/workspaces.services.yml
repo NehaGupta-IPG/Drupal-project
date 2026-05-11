@@ -73,7 +73,7 @@ services:
   workspaces.menu.tree_storage:
     decorates: menu.tree_storage
     class: Drupal\workspaces\WorkspacesMenuTreeStorage
-    arguments: ['@workspaces.manager', '@workspaces.tracker', '@entity_type.manager', '@database', '@cache.menu', '@cache_tags.invalidator', 'menu_tree']
+    arguments: ['@workspaces.manager', '@workspaces.tracker', '@entity_type.manager', '@database', '@cache.menu', '@cache_tags.invalidator', 'menu_tree', '@router.route_provider']
     public: false
     decoration_priority: 50
     tags:
