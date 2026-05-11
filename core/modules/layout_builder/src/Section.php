@@ -2,7 +2,6 @@
 
 namespace Drupal\layout_builder;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Entity\ThirdPartySettingsInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\PreviewAwarePluginInterface;
