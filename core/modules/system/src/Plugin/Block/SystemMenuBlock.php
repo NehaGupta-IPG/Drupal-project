@@ -63,7 +63,7 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
     $this->menuActiveTrail = $menu_active_trail;
 
     if ($this->languageManager === NULL) {
-      @trigger_error('Calling SystemMenuBlock::__construct() without the $languageManager argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3392737', E_USER_DEPRECATED);
+      @trigger_error('Calling SystemMenuBlock::__construct() without the $languageManager argument is deprecated in drupal:12.0.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3392737', E_USER_DEPRECATED);
       $this->languageManager = \Drupal::service('language_manager');
     }
   }
