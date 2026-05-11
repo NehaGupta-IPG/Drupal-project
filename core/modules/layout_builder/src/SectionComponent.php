@@ -68,7 +68,7 @@ class SectionComponent implements ThirdPartySettingsInterface {
    *
    * @var mixed[]
    */
-  protected $thirdPartySettings = [];
+  protected array $thirdPartySettings = [];
 
   /**
    * Constructs a new SectionComponent.
@@ -81,10 +81,10 @@ class SectionComponent implements ThirdPartySettingsInterface {
    *   The plugin configuration.
    * @param mixed[] $additional
    *   (optional) Additional values.
-   * @param array[] $third_party_settings
+   * @param array[] $thirdPartySettings
    *   (optional) Any third party settings.
    */
-  public function __construct($uuid, $region, array $configuration = [], array $additional = [], array $third_party_settings = []) {
+  public function __construct($uuid, $region, array $configuration = [], array $additional = [], array $thirdPartySettings = []) {
     $this->uuid = $uuid;
     $this->region = $region;
     $this->configuration = $configuration;
@@ -93,7 +93,7 @@ class SectionComponent implements ThirdPartySettingsInterface {
     if ($additional !== []) {
       @trigger_error('Setting additional properties is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Additional component properties should be set via ::setThirdPartySetting(). See https://www.drupal.org/node/3100177', E_USER_DEPRECATED);
     }
-    $this->thirdPartySettings = $third_party_settings;
+    $this->thirdPartySettings = $thirdPartySettings;
   }
 
   /**
