@@ -19,22 +19,25 @@ class ServiceWithHookDecorator extends ServiceWithHook {
   public function __construct(protected readonly ServiceWithHook $inner) {}
 
   /**
-   * Implements hook_test_hook_1().
+   * Implements hook_test_hook_in_decorator().
    */
-  #[Hook('test_hook_1')]
-  public function testHook1(array &$invocations): void {
-    // This method should not be invoked, because it is in a service decorator.
+  #[Hook('test_hook_decorator')]
+  public function testHookInDecorator(array &$invocations): void {
+    // This is an implementation of a hook method in a service that decorates
+    // another class. Even though this hook is not implemented in the original
+    // service class, services that decorate other services are ignored in all
+    // hook discovery.
     $this->trackInvocation($invocations, __FUNCTION__);
   }
 
   /**
    * {@inheritdoc}
    */
-  #[Hook('test_hook_2')]
-  public function testHook2(array &$invocations): void {
+  #[Hook('test_hook_decorated')]
+  public function testHookDecorated(array &$invocations): void {
     // This is an implementation of a hook method on the decorated class that
     // should not be invoked, because it is in a service decorator.
-    $this->inner->testHook2($invocations);
+    $this->inner->testHookDecorated($invocations);
 
     $this->trackInvocation($invocations, __FUNCTION__);
   }

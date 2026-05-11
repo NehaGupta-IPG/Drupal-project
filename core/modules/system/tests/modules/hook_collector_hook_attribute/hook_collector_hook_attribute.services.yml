@@ -6,20 +6,26 @@ services:
   # implementations in Hook-namespaced classes are not invoked more than once.
   Drupal\hook_collector_hook_attribute\Hook\HookRegisteredService: ~
 
-  # This service ID is purposely not a FQCN, to test that look up of existing
-  # hook services in HookCollectorPass works correctly.
-  hook_collector_hook_attribute.hook_registered_service:
-    class: 'Drupal\hook_collector_hook_attribute\Hook\HookRegisteredService'
-
   Drupal\hook_collector_hook_attribute\ServiceWithHook: ~
 
-  Drupal\hook_collector_hook_attribute\AnotherServiceWithHook: ~
+  # This service ID is purposely not a FQCN, to test that look up of existing
+  # hook services
+  hook_collector_hook_attribute.another_service:
+    class: Drupal\hook_collector_hook_attribute\Random\Test\Namespace\AnotherServiceWithHook
+
+  # Adding a service alias should not register a class's hook implementations to
+  # run more than once.
+  Drupal\hook_collector_hook_attribute\Random\Test\Namespace\AnotherServiceWithHook: '@hook_collector_hook_attribute.another_service'
 
   # Provide a service definition for a class in core namespace, so it can hook
   # discovery can run on it.
-  Drupal\Core\Test\TestHookService: ~
+  Drupal\Core\Test\Hook\TestHookService: ~
 
   Drupal\hook_collector_hook_attribute\ServiceWithHookDecorator:
     class: Drupal\hook_collector_hook_attribute\ServiceWithHookDecorator
     public: false
     decorates: Drupal\hook_collector_hook_attribute\ServiceWithHook
+
+  Drupal\hook_collector_hook_attribute\DeprecatedServiceWithHook:
+    class: Drupal\hook_collector_hook_attribute\DeprecatedServiceWithHook
+    deprecated: The "%service_id%" service is deprecated.
