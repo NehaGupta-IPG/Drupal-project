@@ -2013,10 +2013,17 @@
  * Annotations for class discovery and metadata description.
  *
  * The Drupal plugin system has a set of reusable components that developers
- * can use, override, and extend in their modules. Most of the plugins use
- * annotations, which let classes register themselves as plugins and describe
- * their metadata. (Annotations can also be used for other purposes, though
- * at the moment, Drupal only uses them for the plugin system.)
+ * can use, override, and extend in their modules. Historically, plugins were
+ * registered with annotations, which let classes register themselves as
+ * plugins and describe their metadata. (Annotations can also be used for
+ * other purposes, though Drupal only uses them for the plugin system.)
+ *
+ * New plugins should use PHP attributes instead of annotations; see the
+ * official @link https://www.php.net/manual/en/language.attributes.php PHP
+ * attributes documentation @endlink for syntax, and the @link plugin_api
+ * Plugin API topic @endlink for Drupal's overall plugin system. The
+ * information below applies to existing annotation-based plugins, which are
+ * still supported.
  *
  * To annotate a class as a plugin, add code similar to the following to the
  * end of the documentation block immediately preceding the class declaration.
