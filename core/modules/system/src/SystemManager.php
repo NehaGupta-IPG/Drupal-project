@@ -153,11 +153,7 @@ class SystemManager {
     $parameters = new MenuTreeParameters();
     $parameters->setRoot($link_id)->excludeRoot()->setTopLevelOnly()->onlyEnabledLinks();
     $tree = $this->menuTree->load(NULL, $parameters);
-    $manipulators = [
-      ['callable' => 'menu.default_tree_manipulators:checkAccess'],
-      ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
-    ];
-    $tree = $this->menuTree->transform($tree, $manipulators);
+    $tree = $this->menuTree->transform($tree);
     foreach ($tree as $key => $element) {
       // Only render accessible links.
       if (!$element->access->isAllowed()) {

@@ -95,7 +95,7 @@ final class NavigationMenuLinkTree extends MenuLinkTree {
   /**
    * {@inheritdoc}
    */
-  public function transform(array $tree, array $manipulators) {
+  public function transform(array $tree, ?array $manipulators = NULL) {
     $tree = parent::transform($tree, $manipulators);
     $this->moduleHandler->alter('navigation_menu_link_tree', $tree);
     return $tree;
