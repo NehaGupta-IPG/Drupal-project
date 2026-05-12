@@ -76,12 +76,10 @@ abstract class BuildTestBase extends TestCase {
   /**
    * The process that's running the HTTP server.
    *
-   * @var \Symfony\Component\Process\Process
-   *
    * @see self::standUpServer()
    * @see self::stopServer()
    */
-  private $serverProcess = NULL;
+  private ?Process $serverProcess = NULL;
 
   /**
    * Default to destroying build artifacts after a test finishes.
@@ -98,10 +96,8 @@ abstract class BuildTestBase extends TestCase {
    * This stores the last docroot directory used to start the server process. We
    * keep this information so we can restart the server if the desired docroot
    * changes.
-   *
-   * @var string
    */
-  private $serverDocroot = NULL;
+  private ?string $serverDocroot = NULL;
 
   /**
    * Our native host name, used by PHP when it starts up the server.
@@ -197,7 +193,7 @@ abstract class BuildTestBase extends TestCase {
    * @return string
    *   The full path to the working directory within the workspace directory.
    */
-  protected function getWorkingPath($working_dir = NULL) {
+  protected function getWorkingPath(?string $working_dir = NULL): string {
     $full_path = $this->getWorkspaceDirectory();
     if ($working_dir) {
       $full_path .= '/' . $working_dir;
@@ -215,7 +211,7 @@ abstract class BuildTestBase extends TestCase {
    * @return \Behat\Mink\Session
    *   The Mink session.
    */
-  protected function initMink() {
+  protected function initMink(): Session {
     $client = new DrupalTestBrowser();
     $client->followMetaRefresh(TRUE);
     $driver = new BrowserKitDriver($client);
@@ -236,7 +232,7 @@ abstract class BuildTestBase extends TestCase {
    * @return \Behat\Mink\Mink
    *   The Mink object.
    */
-  public function getMink() {
+  public function getMink(): Mink {
     return $this->mink;
   }
 
@@ -248,7 +244,7 @@ abstract class BuildTestBase extends TestCase {
    * @return string
    *   Full path to the workspace where this test can build.
    */
-  public function getWorkspaceDirectory() {
+  public function getWorkspaceDirectory(): string {
     return $this->workspaceDir;
   }
 
@@ -300,7 +296,7 @@ abstract class BuildTestBase extends TestCase {
    * @param int $expected_code
    *   The expected process exit code.
    */
-  public function assertCommandExitCode($expected_code): void {
+  public function assertCommandExitCode(int $expected_code): void {
     $this->assertEquals($expected_code, $this->commandProcess->getExitCode(),
       'COMMAND: ' . $this->commandProcess->getCommandLine() . "\n" .
       'OUTPUT: ' . $this->commandProcess->getOutput() . "\n" .
@@ -320,7 +316,7 @@ abstract class BuildTestBase extends TestCase {
    * @return \Symfony\Component\Process\Process
    *   The process object.
    */
-  public function executeCommand(string $command_line, $working_dir = NULL) {
+  public function executeCommand(string $command_line, ?string $working_dir = NULL) {
     $this->commandProcess = Process::fromShellCommandline($command_line);
     $this->commandProcess->setWorkingDirectory($this->getWorkingPath($working_dir))
       ->setTimeout(360)
@@ -358,7 +354,7 @@ abstract class BuildTestBase extends TestCase {
    * @throws \InvalidArgumentException
    *   Thrown when $request_uri does not start with a slash.
    */
-  public function visit(string $request_uri = '/', $working_dir = NULL): Mink {
+  public function visit(string $request_uri = '/', ?string $working_dir = NULL): Mink {
     if ($request_uri[0] !== '/') {
       throw new \InvalidArgumentException('URI: ' . $request_uri . ' must be relative. Example: /some/path?foo=bar');
     }
@@ -379,10 +375,10 @@ abstract class BuildTestBase extends TestCase {
    *   (optional) Server docroot relative to the workspace file system. Defaults
    *   to the workspace directory.
    */
-  protected function standUpServer($working_dir = NULL) {
+  protected function standUpServer(?string $working_dir = NULL): void {
     // If the user wants to test a new docroot, we have to shut down the old
     // server process and generate a new port number.
-    if ($working_dir !== $this->serverDocroot && !empty($this->serverProcess)) {
+    if ($working_dir !== $this->serverDocroot && $this->serverProcess instanceof Process) {
       $this->stopServer();
     }
     // If there's not a server at this point, make one.
@@ -415,7 +411,7 @@ abstract class BuildTestBase extends TestCase {
    * @throws \RuntimeException
    *   Thrown if we were unable to start a web server.
    */
-  protected function instantiateServer($port, $working_dir = NULL): Process {
+  protected function instantiateServer(int $port, ?string $working_dir = NULL): Process {
     $finder = new PhpExecutableFinder();
     $working_path = $this->getWorkingPath($working_dir);
     $server = [
@@ -447,8 +443,8 @@ abstract class BuildTestBase extends TestCase {
   /**
    * Stop the HTTP server, zero out all necessary variables.
    */
-  protected function stopServer() {
-    if (!empty($this->serverProcess)) {
+  protected function stopServer(): void {
+    if ($this->serverProcess instanceof Process) {
       $this->serverProcess->stop();
     }
     $this->serverProcess = NULL;
@@ -549,7 +545,7 @@ abstract class BuildTestBase extends TestCase {
    *   (optional) Relative path within the test workspace file system that will
    *   contain the copy of the codebase. Defaults to the workspace directory.
    */
-  public function copyCodebase(?\Iterator $iterator = NULL, $working_dir = NULL): void {
+  public function copyCodebase(?\Iterator $iterator = NULL, ?string $working_dir = NULL): void {
     $working_path = $this->getWorkingPath($working_dir);
 
     if ($iterator === NULL) {
@@ -577,7 +573,7 @@ abstract class BuildTestBase extends TestCase {
    * @return \Symfony\Component\Finder\Finder
    *   A Finder object ready to iterate over core codebase.
    */
-  public function getCodebaseFinder() {
+  public function getCodebaseFinder(): Finder {
     $drupal_root = $this->getWorkingPathDrupalRoot() ?? '';
     $finder = new Finder();
     $finder->files()
@@ -599,7 +595,7 @@ abstract class BuildTestBase extends TestCase {
    * @return string
    *   The full path to the root of this Drupal codebase.
    */
-  public function getDrupalRoot() {
+  public function getDrupalRoot(): string {
     return self::getDrupalRootStatic();
   }
 
@@ -609,7 +605,7 @@ abstract class BuildTestBase extends TestCase {
    * @return string
    *   The full path to the root of this Drupal codebase.
    */
-  public static function getDrupalRootStatic() {
+  public static function getDrupalRootStatic(): string {
     // Given this code is in the drupal/core package, $core cannot be NULL.
     /** @var string $core */
     $core = InstalledVersions::getInstallPath('drupal/core');
