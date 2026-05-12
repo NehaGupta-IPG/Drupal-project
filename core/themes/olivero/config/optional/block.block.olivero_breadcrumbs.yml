@@ -16,4 +16,9 @@ settings:
   label: Breadcrumbs
   label_display: '0'
   provider: system
-visibility: {  }
+visibility:
+  response_status:
+    id: response_status
+    negate: false
+    status_codes:
+      - 200
