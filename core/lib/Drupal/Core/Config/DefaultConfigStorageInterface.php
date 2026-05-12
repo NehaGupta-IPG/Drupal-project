@@ -4,15 +4,6 @@ namespace Drupal\Core\Config;
 
 /**
  * Provides access to default configuration for locale integration.
- *
- * Allows unified access to default configuration from multiple sources:
- * - Required default configuration (config/install/*)
- * - Optional default configuration (config/optional/*)
- * - Configuration provided by Recipes (config/recipes/*)
- *
- * These sources are considered equal in terms of how locale module interacts
- * with them for translation. Their translatable source strings are exposed
- * for interface translation and participate in remote translation updates.
  */
 interface DefaultConfigStorageInterface {
 

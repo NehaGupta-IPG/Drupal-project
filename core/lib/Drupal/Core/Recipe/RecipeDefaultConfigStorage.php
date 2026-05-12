@@ -5,9 +5,7 @@ namespace Drupal\Core\Recipe;
 use Drupal\Core\Config\DefaultConfigStorageInterface;
 
 /**
- * Provides access to default configuration for locale integration.
- *
- * Provides a wrapper around existing default config storage to add as recipe
+ * Provides a wrapper around existing default config storage to add a recipe
  * config storage as a configuration source. This allows locale system to read
  * configuration from the recipe when determining translatability.
  * 
