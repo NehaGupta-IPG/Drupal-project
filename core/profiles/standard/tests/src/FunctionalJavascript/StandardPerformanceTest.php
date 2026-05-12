@@ -59,6 +59,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
    */
   public function testStandardPerformance(): void {
     $this->testAnonymous();
+    $this->test404Page();
     $this->testCacheInvalidation();
     $this->testLogin();
     $this->testLoginBlock();
@@ -265,6 +266,84 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'CacheTagLookupQueryCount' => 6,
       'StylesheetCount' => 1,
       'StylesheetBytes' => 1150,
+    ];
+    $this->assertMetrics($expected, $performance_data);
+  }
+
+  /**
+   * Tests performance of 404 pages.
+   */
+  protected function test404Page(): void {
+
+    // Warm asset aggregates and image derivatives for the page we're going to
+    // test then clear caches.
+    $this->drupalGet('bar');
+    sleep(2);
+    $this->clearCaches();
+
+    // Now warm a different 404 page so that any 404-specific caches are warmed.
+    $this->drupalGet('foo');
+    sleep(1);
+    $this->drupalGet('foo');
+    sleep(1);
+    $this->assertSession()->pageTextContains('Not found');
+
+    // Now visit another 404 page.
+    $performance_data = $this->collectPerformanceData(function () {
+      $this->drupalGet('baz');
+    }, 'NotFound');
+    $this->assertSession()->pageTextContains('Not found');
+
+    $expected = [
+      'QueryCount' => 5,
+      'CacheGetCount' => 23,
+      'CacheGetCountByBin' => [
+        'page' => 1,
+        'config' => 5,
+        'data' => 5,
+        'bootstrap' => 4,
+        'dynamic_page_cache' => 2,
+        'discovery' => 3,
+        'menu' => 1,
+        'render' => 2,
+      ],
+      'CacheSetCount' => 3,
+      'CacheDeleteCount' => 0,
+      'CacheTagInvalidationCount' => 0,
+      'CacheTagLookupQueryCount' => 5,
+      'CacheTagGroupedLookups' => [
+        [
+          'route_match',
+          'access_policies',
+          'routes',
+          'router',
+          'entity_types',
+          'entity_field_info',
+          'entity_bundles',
+          'local_task',
+          'library_info',
+          'http_response',
+        ],
+        [
+          'config:block_list',
+          'rendered',
+        ],
+        [
+          'config:system.menu.account',
+          'config:system.menu.main',
+        ],
+        [
+          'config:system.site',
+        ],
+        [
+          '4xx-response',
+          'config:user.role.anonymous',
+        ],
+      ],
+      'ScriptCount' => 0,
+      'ScriptBytes' => 0,
+      'StylesheetCount' => 1,
+      'StylesheetBytes' => 1001,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
@@ -607,6 +686,15 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertEmpty($settings, 'drupalSettings is not set.');
     $this->assertSession()->responseNotMatches('/\.js/');
     $this->assertSame(0, $performance_data->getScriptCount());
+  }
+
+  /**
+   * Clear caches.
+   */
+  protected function clearCaches(): void {
+    foreach (Cache::getBins() as $bin) {
+      $bin->deleteAll();
+    }
   }
 
   /**
