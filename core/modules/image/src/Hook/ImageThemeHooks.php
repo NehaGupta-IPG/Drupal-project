@@ -355,7 +355,7 @@ class ImageThemeHooks {
     if (!$style) {
       // Inform the site builders why their image didn't work.
       ($this->imageLogger)()->warning('Image style (@style) missing for @image. Add the missing style under /admin/config/media/image-styles.', [
-        '@style' => $variables["style_name"],
+        '@style' => $variables['style_name'],
         '@image' => $variables['uri'],
       ]);
     }
