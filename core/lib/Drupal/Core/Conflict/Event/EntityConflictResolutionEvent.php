@@ -22,6 +22,7 @@ class EntityConflictResolutionEvent extends EntityConflictDiscoveryEvent {
   ) {
     parent::__construct($localEntity, $remoteEntity, $baseEntity, $context);
     \assert($resultEntity->getEntityTypeId() === $localEntity->getEntityTypeId());
+    \assert($resultEntity->id() === $localEntity->id());
     $this->conflicts = $conflicts;
   }
 
@@ -50,7 +51,7 @@ class EntityConflictResolutionEvent extends EntityConflictDiscoveryEvent {
   }
 
   /**
-   * Removes a conflict.
+   * Resolves a conflict by removing it from the list of unresolved conflicts.
    *
    * This method should be called when a conflict has been resolved or the
    * property value on the resulting entity satisfies the merge strategy.
@@ -58,7 +59,7 @@ class EntityConflictResolutionEvent extends EntityConflictDiscoveryEvent {
    * @param string $property
    *   The conflicting property.
    */
-  public function removeConflict(string $property): static {
+  public function resolveConflict(string $property): static {
     unset($this->conflicts[$property]);
     return $this;
   }

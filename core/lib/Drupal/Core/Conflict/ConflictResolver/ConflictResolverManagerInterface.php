@@ -39,8 +39,8 @@ interface ConflictResolverManagerInterface {
    *   any resolution.
    *
    * @return array<string, \Drupal\Core\Conflict\ConflictTypeInterface>
-   *   An associative array keyed by the conflicting properties, having as
-   *   values the corresponding conflict type.
+   *   An associative array keyed by the conflicting top-level properties,
+   *   having as values the corresponding conflict type.
    */
   public function resolveConflicts(
     EntityInterface $local,
@@ -68,8 +68,8 @@ interface ConflictResolverManagerInterface {
    *   (optional) The context parameter bag.
    *
    * @return array<string, \Drupal\Core\Conflict\ConflictTypeInterface>
-   *   An associative array keyed by the conflicting properties, having as
-   *   values the corresponding conflict type.
+   *   An associative array keyed by the conflicting top-level properties,
+   *   having as values the corresponding conflict type.
    */
   public function getConflicts(
     EntityInterface $local,

@@ -66,23 +66,6 @@ class DefaultConflictStrategyTest extends KernelTestBase {
   }
 
   /**
-   * Remote entity changed.
-   */
-  public function testRemoteChange(): void {
-    $base = EntityTest::create(['name' => 'A']);
-    $local = EntityTest::create(['name' => 'A']);
-    $remote = EntityTest::create(['name' => 'B']);
-
-    /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
-    $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
-
-    $conflicts = $conflict_resolver->getConflicts($local, $remote, $base);
-    $this->assertEquals([
-      'name' => ConflictType::Remote,
-    ], $conflicts);
-  }
-
-  /**
    * Both entities changed.
    */
   public function testBothChanged(): void {
@@ -100,7 +83,7 @@ class DefaultConflictStrategyTest extends KernelTestBase {
   }
 
   /**
-   * If only the remote changed, auto-resolve the conflict.
+   * Tests that a remote-only change is detected and then auto-resolved.
    */
   public function testResolveRemoteOnlyChange(): void {
     $base = EntityTest::create(['name' => 'A']);
@@ -111,13 +94,20 @@ class DefaultConflictStrategyTest extends KernelTestBase {
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
     $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
 
+    // Verify the conflict is detected as Remote.
+    $conflicts = $conflict_resolver->getConflicts($local, $remote, $base);
+    $this->assertEquals([
+      'name' => ConflictType::Remote,
+    ], $conflicts);
+
+    // Verify the merge strategy auto-resolves it.
     $conflicts = $conflict_resolver->resolveConflicts($local, $remote, $base, $result);
     $this->assertEquals([], $conflicts);
     $this->assertEquals('C', $result->get('name')->value);
   }
 
   /**
-   * If both entities changed, don't auto-resolve the conflict.
+   * Tests that LocalRemote conflicts are not auto-resolved.
    */
   public function testResolveLocalRemoteChange(): void {
     $base = EntityTest::create(['name' => 'A']);

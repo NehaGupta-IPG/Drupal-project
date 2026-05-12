@@ -31,6 +31,7 @@ class EntityConflictDiscoveryEvent extends Event {
     protected ParameterBag $context = new ParameterBag(),
   ) {
     \assert($localEntity->getEntityTypeId() === $remoteEntity->getEntityTypeId() && $remoteEntity->getEntityTypeId() === $baseEntity->getEntityTypeId());
+    \assert($localEntity->id() === $remoteEntity->id() && $remoteEntity->id() === $baseEntity->id());
   }
 
   /**

@@ -9,7 +9,7 @@ use Drupal\Core\Conflict\Event\EntityConflictResolutionEvent;
 use Drupal\Core\Entity\ContentEntityInterface;
 
 /**
- * Defines a merge strategy that privileges remote-only changes.
+ * Merge-based conflict resolution strategy that privileges remote-only changes.
  */
 class MergeRemoteOnlyChanges extends MergeStrategyBase {
 
@@ -23,7 +23,7 @@ class MergeRemoteOnlyChanges extends MergeStrategyBase {
   /**
    * {@inheritdoc}
    */
-  protected function resolveContentEntityConflicts(EntityConflictResolutionEvent $event): void {
+  protected function doResolveConflicts(EntityConflictResolutionEvent $event): void {
     $remote_entity = $event->getRemoteEntity();
     if (!$remote_entity instanceof ContentEntityInterface) {
       return;
@@ -35,7 +35,7 @@ class MergeRemoteOnlyChanges extends MergeStrategyBase {
     foreach ($event->getConflicts() as $property => $conflict_type) {
       if ($conflict_type === ConflictType::Remote) {
         $result_entity->set($property, $remote_entity->get($property)->getValue());
-        $event->removeConflict($property);
+        $event->resolveConflict($property);
       }
     }
   }

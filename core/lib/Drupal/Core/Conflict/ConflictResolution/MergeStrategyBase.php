@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Drupal\Core\Conflict\ConflictResolution;
 
 use Drupal\Core\Conflict\Event\EntityConflictResolutionEvent;
-use Drupal\Core\Entity\ContentEntityInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Defines a base class for conflict merge strategies.
+ * Defines a base class for merge-based conflict resolution strategies.
  */
 abstract class MergeStrategyBase implements EventSubscriberInterface {
 
@@ -25,22 +24,19 @@ abstract class MergeStrategyBase implements EventSubscriberInterface {
   abstract protected function getMergeStrategyId() : string;
 
   /**
-   * Resolves conflicts on content entities.
+   * Resolves conflicts on entities.
    *
    * @param \Drupal\Core\Conflict\Event\EntityConflictResolutionEvent $event
-   *   The entity conflict discovery event.
+   *   The entity conflict resolution event.
    */
-  abstract protected function resolveContentEntityConflicts(EntityConflictResolutionEvent $event): void;
+  abstract protected function doResolveConflicts(EntityConflictResolutionEvent $event): void;
 
   /**
    * {@inheritdoc}
    */
   public function resolveConflicts(EntityConflictResolutionEvent $event): void {
     if ($this->isEnabled($event)) {
-      $local_entity = $event->getLocalEntity();
-      if ($local_entity instanceof ContentEntityInterface) {
-        $this->resolveContentEntityConflicts($event);
-      }
+      $this->doResolveConflicts($event);
     }
   }
 

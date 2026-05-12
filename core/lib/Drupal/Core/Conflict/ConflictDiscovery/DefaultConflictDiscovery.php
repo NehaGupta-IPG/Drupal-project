@@ -42,7 +42,7 @@ class DefaultConflictDiscovery extends ConflictDiscoveryBase {
       }
 
       $field_definition = $field_items_local->getFieldDefinition();
-      // There cannot be conflicts on read only fields.
+      // There cannot be conflicts on read-only fields.
       if ($field_definition->isReadOnly()) {
         continue;
       }
@@ -50,14 +50,11 @@ class DefaultConflictDiscovery extends ConflictDiscoveryBase {
       $field_items_remote = $remote_entity->get($field_name);
       $field_items_base = $base_entity->get($field_name);
 
-      // Check for changes between the local and the remote entity versions.
-      if (!$field_items_local->equals($field_items_remote)) {
-        // Check for changes between the remote and the base entity versions.
-        if (!$field_items_remote->equals($field_items_base)) {
-          // Check for changes between the local and the base entity versions.
-          $conflict_type = $field_items_local->equals($field_items_base) ? ConflictType::Remote : ConflictType::LocalRemote;
-          $event->addConflict($field_name, $conflict_type);
-        }
+      // Check for changes between the local, the remote and the entity versions.
+      if (!$field_items_local->equals($field_items_remote) && !$field_items_remote->equals($field_items_base)) {
+        // Check for changes between the local and the base entity versions.
+        $conflict_type = $field_items_local->equals($field_items_base) ? ConflictType::Remote : ConflictType::LocalRemote;
+        $event->addConflict($field_name, $conflict_type);
       }
     }
   }

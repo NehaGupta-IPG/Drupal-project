@@ -314,7 +314,7 @@ class NoResolution extends MergeStrategyBase {
     return 'no-op';
   }
 
-  protected function resolveContentEntityConflicts(EntityConflictResolutionEvent $event): void {
+  protected function doResolveConflicts(EntityConflictResolutionEvent $event): void {
   }
 
 }
@@ -325,8 +325,8 @@ class ResolveFoo extends MergeStrategyBase {
     return 'foo';
   }
 
-  protected function resolveContentEntityConflicts(EntityConflictResolutionEvent $event): void {
-    $event->removeConflict('foo');
+  protected function doResolveConflicts(EntityConflictResolutionEvent $event): void {
+    $event->resolveConflict('foo');
   }
 
 }
@@ -337,8 +337,8 @@ class ResolveBar extends MergeStrategyBase {
     return 'bar';
   }
 
-  protected function resolveContentEntityConflicts(EntityConflictResolutionEvent $event): void {
-    $event->removeConflict('bar');
+  protected function doResolveConflicts(EntityConflictResolutionEvent $event): void {
+    $event->resolveConflict('bar');
   }
 
 }
@@ -349,8 +349,8 @@ class ResolveNameAsBar extends MergeStrategyBase {
     return 'foo-as-bar';
   }
 
-  protected function resolveContentEntityConflicts(EntityConflictResolutionEvent $event): void {
-    $event->removeConflict('foo');
+  protected function doResolveConflicts(EntityConflictResolutionEvent $event): void {
+    $event->resolveConflict('foo');
     $event->getResultEntity()->set('name', 'bar');
   }
 
