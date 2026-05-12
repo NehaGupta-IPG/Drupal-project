@@ -502,16 +502,37 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
    */
   protected function updateMappedMetadata(MediaInterface $translation, $overwrite_existing = FALSE): void {
     $media_source = $this->getSource();
+    $original = $this->getOriginal();
     foreach ($translation->bundle->entity->getFieldMap() as $metadata_attribute_name => $entity_field_name) {
       if (!$translation->hasField($entity_field_name)) {
         continue;
       }
-
+      $set_metadata = FALSE;
       // Populate the field value in one of these scenarios:
-      // - The caller of this function asked for it explicitly.
+      // - The caller asked for it explicitly.
       // - The entity field is empty.
-      // - The media source field has changed.
-      if ($overwrite_existing || $translation->get($entity_field_name)->isEmpty() || $translation->hasSourceFieldChanged()) {
+      // - The source field changed from one non-empty value to another
+      //   non-empty value.
+      if ($overwrite_existing) {
+        // 1st scenario: explicitly set the metadata.
+        $set_metadata = TRUE;
+      }
+      elseif ($translation->get($entity_field_name)->isEmpty()) {
+        // 2nd scenario: field is empty, safely store metadata there.
+        $set_metadata = TRUE;
+      }
+      else {
+        // 3rd scenario: field is not empty, but the source field has
+        // changed between two non-empty values.
+        $original_source_field_empty = ($original instanceof MediaInterface) && $media_source->getSourceFieldValue($original) === NULL;
+        $new_source_field_empty = $media_source->getSourceFieldValue($translation) === NULL;
+        if (!$original_source_field_empty &&
+          !$new_source_field_empty &&
+          $translation->hasSourceFieldChanged()) {
+          $set_metadata = TRUE;
+        }
+      }
+      if ($set_metadata) {
         $translation->set($entity_field_name, $media_source->getMetadata($translation, $metadata_attribute_name));
       }
     }

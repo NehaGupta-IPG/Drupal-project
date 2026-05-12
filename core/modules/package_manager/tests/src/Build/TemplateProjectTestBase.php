@@ -83,7 +83,9 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
    * {@inheritdoc}
    */
   protected function tearDown(): void {
-    $this->metadataServer?->stop();
+    if (isset($this->metadataServer)) {
+      $this->metadataServer?->stop();
+    }
     parent::tearDown();
   }
 
@@ -343,7 +345,7 @@ END;
 
     // Ensure Package Manager logs Composer Stager's process output to a file
     // named for the current test.
-    $log = $this->getDrupalRoot() . '/sites/simpletest/browser_output';
+    $log = $this->root . '/sites/simpletest/browser_output';
     @mkdir($log, recursive: TRUE);
     $this->assertDirectoryIsWritable($log);
     $log .= '/' . str_replace('\\', '_', static::class) . '-' . $this->name();
