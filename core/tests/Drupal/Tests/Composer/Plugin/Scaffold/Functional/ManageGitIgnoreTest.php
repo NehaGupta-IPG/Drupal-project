@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Drupal\Tests\Composer\Plugin\Scaffold\Functional;
 
 use Composer\Util\Filesystem;
-use Drupal\Tests\Composer\Plugin\Scaffold\Fixtures;
-use Drupal\Tests\Composer\Plugin\Scaffold\AssertUtilsTrait;
 use Drupal\Tests\Composer\Plugin\ExecTrait;
+use Drupal\Tests\Composer\Plugin\Scaffold\AssertUtilsTrait;
+use Drupal\Tests\Composer\Plugin\Scaffold\Fixtures;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -16,9 +17,8 @@ use PHPUnit\Framework\TestCase;
  * The purpose of this test file is to run a scaffold operation and
  * confirm that the files that were scaffolded are added to the
  * repository's .gitignore file.
- *
- * @group Scaffold
  */
+#[Group('Scaffold')]
 class ManageGitIgnoreTest extends TestCase {
   use ExecTrait;
   use AssertUtilsTrait;
@@ -82,7 +82,7 @@ class ManageGitIgnoreTest extends TestCase {
    * @return string
    *   The path to the fixture directory.
    */
-  protected function createSutWithGit($fixture_name): string {
+  protected function createSutWithGit(string $fixture_name): string {
     $this->fixturesDir = $this->fixtures->tmpDir($this->name());
     $sut = $this->fixturesDir . '/' . $fixture_name;
     $replacements = ['SYMLINK' => 'false', 'PROJECT_ROOT' => $this->projectRoot];
@@ -122,6 +122,7 @@ class ManageGitIgnoreTest extends TestCase {
 /.gitattributes
 /.ht.router.php
 /autoload.php
+/autoload_runtime.php
 /index.php
 /robots.txt
 /update.php

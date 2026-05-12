@@ -12,20 +12,19 @@ use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\migrate\destination\EntityContentBase;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Row;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 
 /**
  * Tests base entity migration destination functionality.
- *
- * @coversDefaultClass \Drupal\migrate\Plugin\migrate\destination\EntityContentBase
- * @group migrate
  */
+#[CoversClass(EntityContentBase::class)]
+#[Group('migrate')]
 class EntityContentBaseTest extends EntityTestBase {
 
   /**
    * Tests basic entity save.
-   *
-   * @covers ::import
    */
   public function testImport(): void {
     $bundles = [];
@@ -59,8 +58,6 @@ class EntityContentBaseTest extends EntityTestBase {
 
   /**
    * Tests row skipping when we can't get an entity to save.
-   *
-   * @covers ::import
    */
   public function testImportEntityLoadFailure(): void {
     $bundles = [];
@@ -139,7 +136,7 @@ class EntityTestDestination extends EntityContentBase {
   /**
    * Gets the test entity ID.
    */
-  public static function getEntityTypeId($plugin_id) {
+  public static function getEntityTypeId($plugin_id): string {
     return 'foo';
   }
 

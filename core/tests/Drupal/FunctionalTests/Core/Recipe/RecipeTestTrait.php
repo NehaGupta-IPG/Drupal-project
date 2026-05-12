@@ -68,7 +68,7 @@ trait RecipeTestTrait {
       ...$options,
       $path,
     ]);
-    $this->assertSame($expected_exit_code, $process->getExitCode(), $process->getErrorOutput());
+    $this->assertSame($expected_exit_code, $process->getExitCode(), sprintf("Process exit code mismatch.\nExpected: %d\nActual: %d\n\nSTDOUT:\n%s\n\nSTDERR:\n%s", $expected_exit_code, $process->getExitCode(), $process->getOutput(), $process->getErrorOutput()));
     // Applying a recipe:
     // - creates new checkpoints, hence the "state" service in the test runner
     //   is outdated
@@ -85,19 +85,22 @@ trait RecipeTestTrait {
   /**
    * Runs the `core/scripts/drupal` script with the given arguments.
    *
-   * @param string[] $arguments
+   * @param array<string|int> $arguments
    *   The arguments and options to pass to the script.
+   * @param int $timeout
+   *   (optional) How long the command should run before timing out, in seconds.
+   *   Defaults to 500.
    *
    * @return \Symfony\Component\Process\Process
    *   The started process.
    */
-  protected function runDrupalCommand(array $arguments): Process {
+  protected function runDrupalCommand(array $arguments, int $timeout = 500): Process {
     assert($this instanceof BrowserTestBase);
 
     array_unshift($arguments, (new PhpExecutableFinder())->find(), 'core/scripts/drupal');
 
     $process = (new Process($arguments))
-      ->setWorkingDirectory($this->getDrupalRoot())
+      ->setWorkingDirectory($this->root)
       ->setEnv([
         'DRUPAL_DEV_SITE_PATH' => $this->siteDirectory,
         // Ensure that the command boots Drupal into a state where it knows it's
@@ -105,7 +108,7 @@ trait RecipeTestTrait {
         // @see drupal_valid_test_ua()
         'HTTP_USER_AGENT' => drupal_generate_test_ua($this->databasePrefix),
       ])
-      ->setTimeout(500);
+      ->setTimeout($timeout);
 
     $process->run();
     return $process;

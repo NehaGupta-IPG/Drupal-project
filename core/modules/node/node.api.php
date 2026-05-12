@@ -56,10 +56,10 @@ use Drupal\Component\Utility\Xss;
  *   $grants['example_realm'] = [888];
  * }
  * @endcode
- * If you decide to do this, be aware that the node_access_rebuild() function
- * will erase any node ID 0 entry when it is called, so you will need to make
- * sure to restore your {node_access} record after node_access_rebuild() is
- * called.
+ * If you decide to do this, be aware that
+ * \Drupal\node\NodeAccessRebuild::rebuild() will erase any node ID 0 entry when
+ * it is called, so you will need to make sure to restore your {node_access}
+ * record after \Drupal\node\NodeAccessRebuild::rebuild() is called.
  *
  * @param \Drupal\Core\Session\AccountInterface $account
  *   The account object whose grants are requested.
@@ -70,8 +70,8 @@ use Drupal\Component\Utility\Xss;
  *   An array whose keys are "realms" of grants, and whose values are arrays of
  *   the grant IDs within this realm that this user is being granted.
  *
- * @see node_access_view_all_nodes()
- * @see node_access_rebuild()
+ * @see \Drupal\node\NodeGrantDatabaseStorage::checkAllGrants()
+ * @see \Drupal\node\NodeAccessRebuild::rebuild()
  * @ingroup node_access
  */
 function hook_node_grants(AccountInterface $account, $operation): array {
@@ -296,7 +296,7 @@ function hook_node_grants_alter(&$grants, AccountInterface $account, $operation)
  *   the post information (last updated, author) in the default search result
  *   theming.
  *
- * @see template_preprocess_search_result()
+ * @see \Drupal\search\Hook\SearchThemeHooks::preprocessSearchResult()
  * @see search-result.html.twig
  *
  * @ingroup entity_crud
@@ -372,7 +372,7 @@ function hook_node_update_index(NodeInterface $node): string|\Stringable {
  *
  * @ingroup entity_crud
  */
-function hook_ranking(): array {
+function hook_node_search_ranking(): array {
   $data = [];
   // If voting is disabled, we can avoid returning the array, no hard feelings.
   if (\Drupal::config('vote.settings')->get('node_enabled')) {

@@ -11,11 +11,13 @@ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Ensure that password reset methods work as expected.
  */
 #[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserPasswordResetTest extends WebDriverTestBase {
 
   use AssertMailTrait {
@@ -118,7 +120,7 @@ class UserPasswordResetTest extends WebDriverTestBase {
   /**
    * Retrieves password reset email and extracts the login link.
    */
-  public function getResetURL() {
+  public function getResetURL(): string {
     // Assume the most recent email.
     $_emails = $this->drupalGetMails();
     $email = end($_emails);

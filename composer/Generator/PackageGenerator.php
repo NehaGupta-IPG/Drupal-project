@@ -70,6 +70,7 @@ class PackageGenerator {
     return [
       DrupalCoreRecommendedBuilder::class,
       DrupalDevDependenciesBuilder::class,
+      // @phpstan-ignore classConstant.deprecatedClass
       DrupalPinnedDevDependenciesBuilder::class,
     ];
   }
@@ -101,7 +102,7 @@ class PackageGenerator {
       return FALSE;
     }
 
-    // Warn the user that a metapackage file has been updated..
+    // Warn the user that a metapackage file has been updated.
     $io->write("Updated metapackage file <info>composer/Metapackage/$relative_path</info>.");
 
     // Write the composer.json file back to disk.

@@ -13,6 +13,7 @@ use Drupal\Tests\ckeditor5\Traits\CKEditor5TestTrait;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 // cspell:ignore esque māori sourceediting splitbutton upcasted
@@ -22,6 +23,7 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
  * @internal
  */
 #[Group('ckeditor5')]
+#[RunTestsInSeparateProcesses]
 class CKEditor5MarkupTest extends CKEditor5TestBase {
 
   use TestFileCreationTrait;
@@ -68,7 +70,7 @@ class CKEditor5MarkupTest extends CKEditor5TestBase {
       ],
     ])->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -144,6 +146,7 @@ class CKEditor5MarkupTest extends CKEditor5TestBase {
     $this->waitForEditor();
     $page->pressButton('Save');
 
+    $this->assertNotEmpty($assert_session->waitForText('Hello World'));
     // cSpell:disable-next-line
     $assert_session->responseContains('<p dir="ltr" lang="en">Hello World</p><p dir="rtl" lang="ar">مرحبا بالعالم</p>');
   }
@@ -174,7 +177,7 @@ class CKEditor5MarkupTest extends CKEditor5TestBase {
       ],
     ])->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -191,6 +194,7 @@ class CKEditor5MarkupTest extends CKEditor5TestBase {
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ck-editor'));
     $page->pressButton('Save');
 
+    $this->assertNotEmpty($assert_session->waitForText('This is a test!'));
     $assert_session->responseContains('<!-- Hamsters, alpacas, llamas, and kittens are cute! --><p>This is a <em>test!</em></p>');
   }
 
@@ -319,7 +323,7 @@ class CKEditor5MarkupTest extends CKEditor5TestBase {
       ],
     ])->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(

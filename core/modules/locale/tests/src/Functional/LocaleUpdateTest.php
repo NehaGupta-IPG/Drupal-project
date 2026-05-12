@@ -7,14 +7,16 @@ namespace Drupal\Tests\locale\Functional;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\locale\LocaleProjectRepository;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore extraday lundi
-
 /**
  * Tests for updating the interface translations of projects.
- *
- * @group locale
  */
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocaleUpdateTest extends LocaleUpdateBase {
 
   use StringTranslationTrait;
@@ -30,7 +32,6 @@ class LocaleUpdateTest extends LocaleUpdateBase {
   protected function setUp(): void {
     parent::setUp();
     $module_handler = \Drupal::moduleHandler();
-    $module_handler->loadInclude('locale', 'inc', 'locale.compare');
     $module_handler->loadInclude('locale', 'inc', 'locale.fetch');
     $admin_user = $this->drupalCreateUser([
       'administer modules',
@@ -116,7 +117,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
    *
    * Test conditions:
    *  - Source: remote and local files
-   *  - Import overwrite: all existing translations
+   *  - Import overwrite: all existing translations.
    */
   public function testUpdateImportSourceRemote(): void {
     $config = $this->config('locale.settings');
@@ -187,7 +188,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
    *
    * Test conditions:
    *  - Source: local files only
-   *  - Import overwrite: all existing translations
+   *  - Import overwrite: all existing translations.
    */
   public function testUpdateImportSourceLocal(): void {
     $config = $this->config('locale.settings');
@@ -247,7 +248,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
    *
    * Test conditions:
    *  - Source: remote and local files
-   *  - Import overwrite: only overwrite non-customized translations
+   *  - Import overwrite: only overwrite non-customized translations.
    */
   public function testUpdateImportModeNonCustomized(): void {
     $config = $this->config('locale.settings');
@@ -287,7 +288,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
    *
    * Test conditions:
    *  - Source: remote and local files
-   *  - Import overwrite: don't overwrite any existing translation
+   *  - Import overwrite: don't overwrite any existing translation.
    */
   public function testUpdateImportModeNone(): void {
     $config = $this->config('locale.settings');
@@ -354,7 +355,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
     // Check if the file data is removed from the database.
     $history = locale_translation_get_file_history();
     $this->assertFalse(isset($history['locale_test_translate']), 'Project removed from the file history');
-    $projects = locale_translation_get_projects();
+    $projects = \Drupal::service(LocaleProjectRepository::class)->getAll();
     $this->assertFalse(isset($projects['locale_test_translate']), 'Project removed from the project list');
   }
 

@@ -8,6 +8,10 @@ use Drupal\Core\Cache\NullBackend;
 use Drupal\Core\Extension\DatabaseDriverList;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -16,18 +20,17 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * These tests run in isolation since we don't want the database static to
  * affect other tests. We also use a fake root directory to avoid the failing
  * module to get into normal extensions discovery.
- *
- * @coversDefaultClass \Drupal\Core\Extension\DatabaseDriverList
- *
- * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
- *
- * @group Database
  */
+#[CoversClass(DatabaseDriverList::class)]
+#[Group('Database')]
+#[PreserveGlobalState(FALSE)]
+#[RunTestsInSeparateProcesses]
 class DriverModuleMissingDependenciesTest extends UnitTestCase {
 
   /**
-   * @covers ::get
+   * Tests determine drivers autoloading failing on missing dependency.
+   *
+   * @legacy-covers ::get
    */
   public function testDetermineDriversAutoloadingFailingOnMissingDependency(): void {
     $root = realpath(dirname(__FILE__) . '/fixtures');
@@ -35,18 +38,18 @@ class DriverModuleMissingDependenciesTest extends UnitTestCase {
     // Mock the container so we don't need to mock drupal_valid_test_ua().
     // @see \Drupal\Core\Extension\ExtensionDiscovery::scan()
     $container = $this->createMock(ContainerInterface::class);
-    $container->expects($this->any())
+    $container
       ->method('has')
       ->with('kernel')
       ->willReturn(TRUE);
-    $container->expects($this->any())
+    $container
       ->method('getParameter')
       ->with()
       ->willReturnMap([
           ['install_profile', ''],
           ['site.path', ''],
       ]);
-    $container->expects($this->any())
+    $container
       ->method('get')
       ->with('extension.list.database_driver')
       ->willReturn(new DatabaseDriverList($root, 'database_driver', new NullBackend('database_driver')));

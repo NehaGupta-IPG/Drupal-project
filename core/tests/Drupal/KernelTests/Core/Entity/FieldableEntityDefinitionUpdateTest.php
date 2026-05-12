@@ -4,19 +4,22 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Entity\EntityDefinitionUpdateManager;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Site\Settings;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests EntityDefinitionUpdateManager's fieldable entity update functionality.
- *
- * @coversDefaultClass \Drupal\Core\Entity\EntityDefinitionUpdateManager
- *
- * @group Entity
  */
+#[CoversClass(EntityDefinitionUpdateManager::class)]
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
 
   use EntityDefinitionTestTrait;
@@ -81,7 +84,6 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'content_translation',
     'entity_test_update',
     'language',
   ];
@@ -557,6 +559,7 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
     }
     // Allow other tests to be performed after the exception has been thrown.
     finally {
+      assert(isset($e));
       $this->assertSame('Peekaboo!', $e->getPrevious()->getMessage());
 
       // Check that the last installed entity type definition is kept as
@@ -578,6 +581,7 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
       $new_entity_schema_data = $this->installedStorageSchema->get('entity_test_update.entity_schema_data', []);
       $this->assertEquals($original_entity_schema_data, $new_entity_schema_data);
 
+      $new_field_schema_data = [];
       foreach ($new_storage_definitions as $storage_definition) {
         $new_field_schema_data[$storage_definition->getName()] = $this->installedStorageSchema->get('entity_test_update.field_schema_data.' . $storage_definition->getName(), []);
       }

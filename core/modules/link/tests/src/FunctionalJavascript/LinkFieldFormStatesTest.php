@@ -7,12 +7,14 @@ namespace Drupal\Tests\link\FunctionalJavascript;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests link field form states functionality.
  */
 #[Group('link')]
 #[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class LinkFieldFormStatesTest extends WebDriverTestBase {
 
   /**
@@ -67,7 +69,7 @@ class LinkFieldFormStatesTest extends WebDriverTestBase {
   /**
    * Provides data for ::testLinkFieldJSFormStates.
    */
-  public static function linkFieldFormStatesData() {
+  public static function linkFieldFormStatesData(): array {
     return [
       'Fill uri, keep title empty' => [
         'https://example.com',

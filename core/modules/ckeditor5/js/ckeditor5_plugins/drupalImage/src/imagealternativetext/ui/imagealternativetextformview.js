@@ -13,11 +13,12 @@ import {
   View,
   ViewCollection,
   createLabeledInputText,
-  injectCssTransitionDisabler,
   submitHandler,
-} from 'ckeditor5/src/ui';
-import { FocusTracker, KeystrokeHandler } from 'ckeditor5/src/utils';
-import { IconCheck, IconCancel } from '@ckeditor/ckeditor5-icons';
+  FocusTracker,
+  KeystrokeHandler,
+  IconCheck,
+  IconCancel,
+} from 'ckeditor5';
 
 /**
  * A class rendering alternative text form view.
@@ -158,8 +159,6 @@ export default class ImageAlternativeTextFormView extends View {
         this.cancelButtonView,
       ],
     });
-
-    injectCssTransitionDisabler(this);
   }
 
   /**

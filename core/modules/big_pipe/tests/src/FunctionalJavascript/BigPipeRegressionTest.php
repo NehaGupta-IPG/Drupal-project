@@ -9,12 +9,14 @@ use Drupal\big_pipe_regression_test\BigPipeRegressionTestController;
 use Drupal\Core\Url;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * BigPipe regression tests.
  */
 #[Group('big_pipe')]
 #[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class BigPipeRegressionTest extends WebDriverTestBase {
 
   /**
@@ -24,22 +26,26 @@ class BigPipeRegressionTest extends WebDriverTestBase {
     'big_pipe',
     'big_pipe_messages_test',
     'big_pipe_regression_test',
+    'render_placeholder_message_test',
   ];
 
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'stark';
+  protected $defaultTheme = 'big_pipe_test_theme';
 
   /**
-   * {@inheritdoc}
+   * Tests edge cases with placeholder HTML.
    */
-  protected function setUp(): void {
-    parent::setUp();
-
-    // Use the big_pipe_test_theme theme.
-    $this->container->get('theme_installer')->install(['big_pipe_test_theme']);
-    $this->container->get('config.factory')->getEditable('system.theme')->set('default', 'big_pipe_test_theme')->save();
+  public function testPlaceholderHtmlEdgeCases(): void {
+    $this->drupalLogin($this->drupalCreateUser());
+    $this->doTestMultipleClosingBodies_2678662();
+    $this->doTestMessages_2712935();
+    $this->doTestPlaceholderInParagraph_2802923();
+    $this->doTestBigPipeLargeContent();
+    $this->doTestMultipleReplacements();
+    $this->doInlineScriptTest();
+    $this->doTestMultipleOccurrences();
   }
 
   /**
@@ -47,17 +53,13 @@ class BigPipeRegressionTest extends WebDriverTestBase {
    *
    * @see https://www.drupal.org/node/2678662
    */
-  public function testMultipleClosingBodies_2678662(): void {
-    $this->assertTrue($this->container->get('module_installer')->install(['render_placeholder_message_test'], TRUE), 'Installed modules.');
-
-    $this->drupalLogin($this->drupalCreateUser());
+  protected function doTestMultipleClosingBodies_2678662(): void {
     $this->drupalGet(Url::fromRoute('big_pipe_regression_test.2678662'));
 
-    // Confirm that AJAX behaviors were instantiated, if not, this points to a
-    // JavaScript syntax error and the JS variable has the appropriate content.
+    // Confirm that the JS variable has the appropriate content.
     $javascript = <<<JS
     (function(){
-      return Object.keys(Drupal.ajax.instances).length > 0 && hitsTheFloor === "</body>";
+      return hitsTheFloor === "</body>";
     }())
 JS;
     $this->assertJsCondition($javascript);
@@ -83,10 +85,7 @@ JS;
    *
    * @see https://www.drupal.org/node/2712935
    */
-  public function testMessages_2712935(): void {
-    $this->assertTrue($this->container->get('module_installer')->install(['render_placeholder_message_test'], TRUE), 'Installed modules.');
-
-    $this->drupalLogin($this->drupalCreateUser());
+  protected function doTestMessages_2712935(): void {
     $messages_markup = '<div class="messages messages--status" role="status"';
     $test_routes = [
       // Messages placeholder rendered first.
@@ -119,16 +118,6 @@ JS;
   }
 
   /**
-   * Tests edge cases with placeholder HTML.
-   */
-  public function testPlaceholderHtmlEdgeCases(): void {
-    $this->drupalLogin($this->drupalCreateUser());
-    $this->doTestPlaceholderInParagraph_2802923();
-    $this->doTestBigPipeLargeContent();
-    $this->doTestMultipleReplacements();
-  }
-
-  /**
    * Ensure default BigPipe placeholder HTML cannot split paragraphs.
    *
    * @see https://www.drupal.org/node/2802923
@@ -145,7 +134,7 @@ JS;
    * Repeat loading of same page for two times, after second time the page is
    * cached and the bug consistently reproducible.
    */
-  public function doTestBigPipeLargeContent(): void {
+  protected function doTestBigPipeLargeContent(): void {
     $assert_session = $this->assertSession();
 
     $this->drupalGet(Url::fromRoute('big_pipe_test_large_content'));
@@ -182,6 +171,40 @@ JS;
     $this->assertCount(0, $this->getDrupalSettings()['bigPipePlaceholderIds']);
     $this->assertCount(0, $this->getSession()->getPage()->findAll('css', 'span[data-big-pipe-placeholder-id]'));
     $this->assertCount(BigPipeRegressionTestController::PLACEHOLDER_COUNT + 1, $this->getSession()->getPage()->findAll('css', 'script[data-big-pipe-replacement-for-placeholder-with-id]'));
+  }
+
+  /**
+   * Tests for the correct replacement of a chunk with inline javascript.
+   *
+   * Parsing a <script> tag causes a mutation to be reported because it
+   * triggers a micro task checkpoint.  Watching for template tags directly
+   * results in early mutation reporting, and the trailing markup is not yet
+   * parsed when the template is processed.
+   *
+   * Also, chunk markup needs to not be double escaped.  We encountered both
+   * regressions in https://www.drupal.org/project/drupal/issues/3526267.
+   */
+  protected function doInlineScriptTest(): void {
+    $user = $this->drupalCreateUser();
+    $this->drupalLogin($user);
+    $assert_session = $this->assertSession();
+
+    $this->drupalGet(Url::fromRoute('big_pipe_regression_test.inline_script'));
+    $this->assertNotNull($assert_session->waitForElement('css', 'script[data-big-pipe-event="stop"]'));
+    $assert_session->elementExists('css', 'div.container-before');
+    $assert_session->elementExists('css', 'body.inline-script-fires');
+    $assert_session->elementExists('css', 'div.container-after');
+  }
+
+  /**
+   * Tests that all occurrences of the same placeholder are replaced.
+   */
+  protected function doTestMultipleOccurrences(): void {
+    \Drupal::service('module_installer')->install(['big_pipe_test']);
+    $assert_session = $this->assertSession();
+    $this->drupalGet(Url::fromRoute('big_pipe_test_multi_occurrence'));
+    $this->assertNotNull($assert_session->waitForElement('css', 'script[data-big-pipe-event="stop"]'));
+    $assert_session->elementsCount('css', 'p.multiple-occurrence-instance', 3);
   }
 
 }

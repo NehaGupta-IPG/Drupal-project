@@ -15,12 +15,15 @@ use Drupal\media_library\MediaLibraryState;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the media library access.
- *
- * @group media_library
  */
+#[Group('media_library')]
+#[RunTestsInSeparateProcesses]
 class MediaLibraryAccessTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -131,16 +134,17 @@ class MediaLibraryAccessTest extends KernelTestBase {
   }
 
   /**
-   * @covers \Drupal\media_library\MediaLibraryEditorOpener::checkAccess
+   * Tests editor opener access.
    *
    * @param bool $media_embed_enabled
    *   Whether to test with media_embed filter enabled on the text format.
    * @param bool $can_use_format
    *   Whether the logged in user is allowed to use the text format.
    *
-   * @dataProvider editorOpenerAccessProvider
+   * @legacy-covers \Drupal\media_library\MediaLibraryEditorOpener::checkAccess
    */
-  public function testEditorOpenerAccess($media_embed_enabled, $can_use_format): void {
+  #[DataProvider('editorOpenerAccessProvider')]
+  public function testEditorOpenerAccess(bool $media_embed_enabled, bool $can_use_format): void {
     $format = $this->container
       ->get('entity_type.manager')
       ->getStorage('filter_format')->create([
@@ -183,7 +187,7 @@ class MediaLibraryAccessTest extends KernelTestBase {
   /**
    * Data provider for ::testEditorOpenerAccess.
    */
-  public static function editorOpenerAccessProvider() {
+  public static function editorOpenerAccessProvider(): array {
     return [
       'media_embed filter enabled' => [
         TRUE,
@@ -282,9 +286,8 @@ class MediaLibraryAccessTest extends KernelTestBase {
    *
    * @param string $field_type
    *   The field type.
-   *
-   * @dataProvider providerFieldWidgetEntityFieldAccess
    */
+  #[DataProvider('providerFieldWidgetEntityFieldAccess')]
   public function testFieldWidgetEntityFieldAccess(string $field_type): void {
     $field_storage = FieldStorageConfig::create([
       'type' => $field_type,

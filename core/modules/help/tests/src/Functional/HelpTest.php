@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\help\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Verify help display and user access to help based on permissions.
- *
- * @group help
  */
+#[Group('help')]
+#[RunTestsInSeparateProcesses]
 class HelpTest extends BrowserTestBase {
 
   /**
@@ -29,7 +31,6 @@ class HelpTest extends BrowserTestBase {
     'help',
     'help_page_test',
     'help_test',
-    'history',
   ];
 
   /**
@@ -88,11 +89,11 @@ class HelpTest extends BrowserTestBase {
     $this->assertSession()->responseContains('For more information, refer to the help listed on this page or to the <a href="https://www.drupal.org/documentation">online documentation</a> and <a href="https://www.drupal.org/support">support</a> pages at <a href="https://www.drupal.org">drupal.org</a>.');
 
     // Verify that hook_help() section title and description appear.
-    $this->assertSession()->responseContains('<h2>Module overviews</h2>');
+    $this->assertSession()->responseContains('<h2 id="hook-help">Module overviews</h2>');
     $this->assertSession()->responseContains('<p>Module overviews are provided by modules. Overviews available for your installed modules:</p>');
 
     // Verify that an empty section is handled correctly.
-    $this->assertSession()->responseContains('<h2>Empty section</h2>');
+    $this->assertSession()->responseContains('<h2 id="empty-section">Empty section</h2>');
     $this->assertSession()->responseContains('<p>This description should appear.</p>');
     $this->assertSession()->pageTextContains('There is currently nothing in this section.');
 
@@ -114,7 +115,7 @@ class HelpTest extends BrowserTestBase {
     $page_text = $this->getTextContent();
     $start = strpos($page_text, 'Module overviews');
     $pos = $start;
-    $list = ['Block', 'Block Content', 'Breakpoint', 'History', 'Text Editor'];
+    $list = ['Block', 'Block Content', 'Breakpoint', 'Text Editor'];
     foreach ($list as $name) {
       $this->assertSession()->linkExists($name);
       $new_pos = strpos($page_text, $name, $start);
@@ -184,12 +185,12 @@ class HelpTest extends BrowserTestBase {
    * @return array
    *   A list of enabled modules.
    */
-  protected function getModuleList() {
+  protected function getModuleList(): array {
     $modules = [];
     $module_data = $this->container->get('extension.list.module')->getList();
     \Drupal::moduleHandler()->invokeAllWith(
       'help',
-      function (callable $hook, string $module) use (&$modules, $module_data) {
+      function (callable $hook, string $module) use (&$modules, $module_data): void {
         $modules[$module] = $module_data[$module]->info['name'];
       }
     );

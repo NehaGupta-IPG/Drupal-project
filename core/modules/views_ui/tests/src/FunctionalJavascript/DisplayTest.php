@@ -11,12 +11,14 @@ use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\views\Entity\View;
 use Drupal\views\Tests\ViewTestData;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cSpell:ignore Blokk hozzáadása
 /**
  * Tests the display UI.
  */
 #[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class DisplayTest extends WebDriverTestBase {
 
   use NodeCreationTrait;
@@ -194,7 +196,7 @@ class DisplayTest extends WebDriverTestBase {
   /**
    * Helper function for adding interface text translations.
    */
-  private function addTranslation($langcode, $source_string, $translation_string): void {
+  private function addTranslation(string $langcode, string $source_string, string $translation_string): void {
     $storage = \Drupal::service('locale.storage');
     $string = $storage->findString(['source' => $source_string]);
     if (is_null($string)) {
