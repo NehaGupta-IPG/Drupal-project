@@ -429,9 +429,11 @@ slatkin
 smacss
 smalldatetime
 smtps
+spaze
 squaresmall
 squiz
 squizlabs
+srclang
 srcset
 ssess
 starterkit

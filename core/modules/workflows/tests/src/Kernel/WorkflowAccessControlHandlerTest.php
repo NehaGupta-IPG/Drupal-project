@@ -22,7 +22,6 @@ use Prophecy\Prophet;
  */
 #[CoversClass(WorkflowAccessControlHandler::class)]
 #[Group('workflows')]
-#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class WorkflowAccessControlHandlerTest extends KernelTestBase {
 
@@ -130,7 +129,7 @@ class WorkflowAccessControlHandlerTest extends KernelTestBase {
    * @return array
    *   An array of test data.
    */
-  public static function checkAccessProvider() {
+  public static function checkAccessProvider(): array {
     $originalContainer = \Drupal::hasContainer() ? \Drupal::getContainer() : NULL;
 
     $container = new ContainerBuilder();
