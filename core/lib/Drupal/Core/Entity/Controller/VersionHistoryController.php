@@ -230,7 +230,7 @@ class VersionHistoryController extends ControllerBase {
       ->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)
       ->getId();
     foreach ($entityStorage->loadMultipleRevisions(array_keys($result)) as $revision) {
-      yield ($translatable ? $revision->getTranslation($currentLangcode) : $revision);
+      yield ($translatable && $revision->hasTranslation($currentLangcode) ? $revision->getTranslation($currentLangcode) : $revision);
     }
   }
 
