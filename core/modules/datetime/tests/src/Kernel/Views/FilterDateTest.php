@@ -144,6 +144,37 @@ class FilterDateTest extends DateTimeHandlerTestBase {
       $this->assertIdenticalResultset($view, $expected_result, $this->map);
       $view->destroy();
 
+      // Test offset for between operator when only max is set. Only 'tomorrow'
+      // node should appear.
+      $view->initHandlers();
+      $view->filter[$field]->operator = 'between';
+      $view->filter[$field]->value['type'] = 'offset';
+      $view->filter[$field]->value['max'] = '';
+      $view->filter[$field]->value['min'] = '+1 day';
+      $view->setDisplay('default');
+      $this->executeView($view);
+      $expected_result = [
+        ['nid' => $this->nodes[0]->id()],
+      ];
+      $this->assertIdenticalResultset($view, $expected_result, $this->map);
+      $view->destroy();
+
+      // Test offset for between operator when only min is set. 'Yesterday' and
+      // 'today' node should appear.
+      $view->initHandlers();
+      $view->filter[$field]->operator = 'between';
+      $view->filter[$field]->value['type'] = 'offset';
+      $view->filter[$field]->value['max'] = 'now';
+      $view->filter[$field]->value['min'] = '';
+      $view->setDisplay('default');
+      $this->executeView($view);
+      $expected_result = [
+        ['nid' => $this->nodes[1]->id()],
+        ['nid' => $this->nodes[2]->id()],
+      ];
+      $this->assertIdenticalResultset($view, $expected_result, $this->map);
+      $view->destroy();
+
       // Test the empty operator.
       $view->initHandlers();
       $view->filter[$field]->operator = 'empty';

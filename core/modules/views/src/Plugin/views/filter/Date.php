@@ -194,6 +194,8 @@ class Date extends NumericFilter {
           $this->value['type'] = 'offset';
           return TRUE;
         }
+      }
+      if ($this->value['min'] == '' && $this->value['max'] == '') {
         return FALSE;
       }
     }
@@ -205,20 +207,41 @@ class Date extends NumericFilter {
    * {@inheritdoc}
    */
   protected function opBetween($field) {
-    $a = intval(strtotime($this->value['min'], 0));
-    $b = intval(strtotime($this->value['max'], 0));
+    if (!empty($this->value['min']) && !empty($this->value['max'])) {
+      $a = intval(strtotime($this->value['min'], 0));
+      $b = intval(strtotime($this->value['max'], 0));
 
-    if ($this->value['type'] == 'offset') {
-      // Keep sign.
-      $a = '***CURRENT_TIME***' . sprintf('%+d', $a);
-      // Keep sign.
-      $b = '***CURRENT_TIME***' . sprintf('%+d', $b);
+      if ($this->value['type'] === 'offset') {
+        // Keep sign.
+        $a = '***CURRENT_TIME***' . sprintf('%+d', $a);
+        // Keep sign.
+        $b = '***CURRENT_TIME***' . sprintf('%+d', $b);
+      }
+      // This is safe because we are manually scrubbing the values.
+      // It is necessary to do it this way because $a and $b are formulas when using an offset.
+      $operator = strtoupper($this->operator);
+      $this->query->addWhereExpression($this->options['group'], "$field $operator $a AND $b");
     }
-    // This is safe because we are manually scrubbing the values. It is
-    // necessary to do it this way because $a and $b are formulas when using an
-    // offset.
-    $operator = strtoupper($this->operator);
-    $this->query->addWhereExpression($this->options['group'], "$field $operator $a AND $b");
+    elseif (empty($this->value['max'])) {
+      $a = intval(strtotime($this->value['min'], 0));
+
+      if ($this->value['type'] === 'offset') {
+        // Keep sign.
+        $a = '***CURRENT_TIME***' . sprintf('%+d', $a);
+      }
+      $operator = $this->operator === 'between' ? '>=' : '<';
+      $this->query->addWhere($this->options['group'], $field, $a, $operator);
+    }
+    elseif (empty($this->value['min'])) {
+      $b = intval(strtotime($this->value['max'], 0));
+
+      if ($this->value['type'] === 'offset') {
+        // Keep sign.
+        $b = '***CURRENT_TIME***' . sprintf('%+d', $b);
+      }
+      $operator = $this->operator === 'between' ? '<=' : '>';
+      $this->query->addWhere($this->options['group'], $field, $b, $operator);
+    }
   }
 
   /**

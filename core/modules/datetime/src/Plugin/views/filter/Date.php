@@ -142,21 +142,33 @@ class Date extends NumericDate implements ContainerFactoryPluginInterface {
     $timezone = $this->getTimezone();
     $origin_offset = $this->getOffset($this->value['min'], $timezone);
 
-    // Although both 'min' and 'max' values are required, default empty 'min'
-    // value as UNIX timestamp 0.
-    $min = (!empty($this->value['min'])) ? $this->value['min'] : '@0';
-
     // Convert to ISO format and format for query. UTC timezone is used since
     // dates are stored in UTC.
-    $a = new DateTimePlus($min, new \DateTimeZone($timezone));
-    $a = $this->query->getDateFormat($this->query->getDateField("'" . $this->dateFormatter->format($a->getTimestamp() + $origin_offset, 'custom', DateTimeItemInterface::DATETIME_STORAGE_FORMAT, DateTimeItemInterface::STORAGE_TIMEZONE) . "'", TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
-    $b = new DateTimePlus($this->value['max'], new \DateTimeZone($timezone));
-    $b = $this->query->getDateFormat($this->query->getDateField("'" . $this->dateFormatter->format($b->getTimestamp() + $origin_offset, 'custom', DateTimeItemInterface::DATETIME_STORAGE_FORMAT, DateTimeItemInterface::STORAGE_TIMEZONE) . "'", TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
+    if (!empty($this->value['min']) && !empty($this->value['max'])) {
+      $a = new DateTimePlus($this->value['min'], new \DateTimeZone($timezone));
+      $a = $this->query->getDateFormat($this->query->getDateField("'" . $this->dateFormatter->format($a->getTimestamp() + $origin_offset, 'custom', DateTimeItemInterface::DATETIME_STORAGE_FORMAT, DateTimeItemInterface::STORAGE_TIMEZONE) . "'", TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
+      $b = new DateTimePlus($this->value['max'], new \DateTimeZone($timezone));
+      $b = $this->query->getDateFormat($this->query->getDateField("'" . $this->dateFormatter->format($b->getTimestamp() + $origin_offset, 'custom', DateTimeItemInterface::DATETIME_STORAGE_FORMAT, DateTimeItemInterface::STORAGE_TIMEZONE) . "'", TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
 
-    // This is safe because we are manually scrubbing the values.
-    $operator = strtoupper($this->operator);
-    $field = $this->query->getDateFormat($this->query->getDateField($field, TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
-    $this->query->addWhereExpression($this->options['group'], "$field $operator $a AND $b");
+      // This is safe because we are manually scrubbing the values.
+      $operator = strtoupper($this->operator);
+      $field = $this->query->getDateFormat($this->query->getDateField($field, TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
+      $this->query->addWhereExpression($this->options['group'], "$field $operator $a AND $b");
+    }
+    elseif (empty($this->value['max'])) {
+      $a = new DateTimePlus($this->value['min'], new \DateTimeZone($timezone));
+      $a = $this->query->getDateFormat($this->query->getDateField("'" . $this->dateFormatter->format($a->getTimestamp() + $origin_offset, 'custom', DateTimeItemInterface::DATETIME_STORAGE_FORMAT, DateTimeItemInterface::STORAGE_TIMEZONE) . "'", TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
+
+      $operator = $this->operator === 'between' ? '>=' : '<';
+      $this->query->addWhereExpression($this->options['group'], "$field $operator $a");
+    }
+    elseif (empty($this->value['min'])) {
+      $b = new DateTimePlus($this->value['max'], new \DateTimeZone($timezone));
+      $b = $this->query->getDateFormat($this->query->getDateField("'" . $this->dateFormatter->format($b->getTimestamp() + $origin_offset, 'custom', DateTimeItemInterface::DATETIME_STORAGE_FORMAT, DateTimeItemInterface::STORAGE_TIMEZONE) . "'", TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
+
+      $operator = $this->operator === 'between' ? '<=' : '>';
+      $this->query->addWhereExpression($this->options['group'], "$field $operator $b");
+    }
   }
 
   /**
