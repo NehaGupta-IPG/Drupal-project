@@ -102,7 +102,7 @@ class EntityTypeManagerTest extends UnitTestCase {
    *   (optional) An array of entity type definitions.
    */
   protected function setUpEntityTypeDefinitions(array $definitions = []): void {
-    $class = get_class($this->createMock(EntityInterface::class));
+    $class = get_class($this->createStub(EntityInterface::class));
     foreach ($definitions as $key => $entity_type) {
       // \Drupal\Core\Entity\EntityTypeInterface::getLinkTemplates() is called
       // by \Drupal\Core\Entity\EntityTypeManager::processDefinition() so it
@@ -112,6 +112,7 @@ class EntityTypeManagerTest extends UnitTestCase {
       // Give the entity type a legitimate class to return.
       $entity_type->getClass()->willReturn($class);
       $entity_type->setClass($class)->willReturn($entity_type->reveal());
+      $entity_type->get('entity_bundle_info')->willReturn(NULL);
 
       $definitions[$key] = $entity_type->reveal();
     }
