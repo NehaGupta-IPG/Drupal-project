@@ -110,13 +110,12 @@ class NodeTypeTest extends NodeTestBase {
     $assert->pageTextContains('Body');
 
     // Rename the title field.
-    $edit = [
-      'title_label' => 'Foo',
-      'page_display' => FALSE,
-    ];
     $this->drupalGet('admin/structure/types/manage/page');
     $this->assertSession()->checkboxChecked('page_display');
-    $this->submitForm($edit, 'Save');
+    $this->submitForm([
+      'title_label' => 'Foo',
+      'page_display' => FALSE,
+    ], 'Save');
 
     // Assert page display is disabled.
     $this->drupalGet($node->toUrl());
@@ -137,14 +136,13 @@ class NodeTypeTest extends NodeTestBase {
     $this->assertSession()->addressEquals(Url::fromRoute('system.admin_content'));
 
     // Change the name and the description.
-    $edit = [
+    $this->drupalGet('admin/structure/types/manage/page');
+    $this->assertSession()->checkboxNotChecked('page_display');
+    $this->submitForm([
       'name' => 'Bar',
       'description' => 'Lorem ipsum.',
       'page_display' => TRUE,
-    ];
-    $this->drupalGet('admin/structure/types/manage/page');
-    $this->assertSession()->checkboxNotChecked('page_display');
-    $this->submitForm($edit, 'Save');
+    ], 'Save');
 
     $this->drupalGet('node/add');
     $assert->pageTextContains('Bar');
