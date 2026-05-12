@@ -195,14 +195,17 @@ class JsonApiRelationshipTest extends JsonApiFunctionalTestBase {
   public function testRelationshipPatchMetaDataDoesNotAllowObjectInjection(): void {
     $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
     $user = $this->drupalCreateUser([
-      'administer entity_test content',
       'view test entity',
+      'edit own entity_test content',
     ]);
 
     $storage = $this->container->get('entity_type.manager')
       ->getStorage($this->entityTypeId);
 
-    $parentEntity = $storage->create(['type' => $this->bundle]);
+    $parentEntity = $storage->create([
+      'type' => $this->bundle,
+      'user_id' => $user->id(),
+    ]);
     $parentEntity->save();
 
     $targetEntity = $storage->create(['type' => $this->bundle]);

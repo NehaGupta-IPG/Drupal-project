@@ -8,9 +8,8 @@ namespace Drupal\jsonapi_test_field_type;
  * A test gadget class for verifying that object injection is blocked.
  *
  * If unserialize() is called without allowed_classes: false, this class will
- * be instantiated and __wakeup() will throw a GadgetWakeupException, which
- * will appear in the response body and cause the security regression test to
- * fail.
+ * be instantiated and __wakeup() will throw an Exception. The presence of the
+ * Exception proves that Object Injection was successful.
  *
  * @internal
  */
