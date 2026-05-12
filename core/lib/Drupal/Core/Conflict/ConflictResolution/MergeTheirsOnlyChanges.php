@@ -9,23 +9,23 @@ use Drupal\Core\Conflict\Event\EntityConflictResolutionEvent;
 use Drupal\Core\Entity\ContentEntityInterface;
 
 /**
- * Merge-based conflict resolution strategy that privileges remote-only changes.
+ * Merge-based conflict resolution strategy that privileges theirs-only changes.
  */
-class MergeRemoteOnlyChanges extends MergeStrategyBase {
+class MergeTheirsOnlyChanges extends MergeStrategyBase {
 
   /**
    * {@inheritdoc}
    */
   protected function getMergeStrategyId() : string {
-    return 'conflict.merge_remote_only_changes';
+    return 'conflict.merge_theirs_only_changes';
   }
 
   /**
    * {@inheritdoc}
    */
   protected function doResolveConflicts(EntityConflictResolutionEvent $event): void {
-    $remote_entity = $event->getRemoteEntity();
-    if (!$remote_entity instanceof ContentEntityInterface) {
+    $theirs_entity = $event->getTheirsEntity();
+    if (!$theirs_entity instanceof ContentEntityInterface) {
       return;
     }
     $result_entity = $event->getResultEntity();
@@ -33,8 +33,8 @@ class MergeRemoteOnlyChanges extends MergeStrategyBase {
     \assert($result_entity instanceof ContentEntityInterface);
 
     foreach ($event->getConflicts() as $property => $conflict_type) {
-      if ($conflict_type === ConflictType::Remote) {
-        $result_entity->set($property, $remote_entity->get($property)->getValue());
+      if ($conflict_type === ConflictType::Theirs) {
+        $result_entity->set($property, $theirs_entity->get($property)->getValue());
         $event->resolveConflict($property);
       }
     }

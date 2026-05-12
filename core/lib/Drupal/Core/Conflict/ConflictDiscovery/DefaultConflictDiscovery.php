@@ -17,43 +17,43 @@ class DefaultConflictDiscovery extends ConflictDiscoveryBase {
    * {@inheritdoc}
    */
   public function discoverContentEntityConflicts(EntityConflictDiscoveryEvent $event): void {
-    $local_entity = $event->getLocalEntity();
-    if (!$local_entity instanceof ContentEntityInterface) {
+    $ours_entity = $event->getOursEntity();
+    if (!$ours_entity instanceof ContentEntityInterface) {
       return;
     }
-    $remote_entity = $event->getRemoteEntity();
+    $theirs_entity = $event->getTheirsEntity();
     $base_entity = $event->getBaseEntity();
     // This is enforced by the event constructor.
-    \assert($remote_entity instanceof ContentEntityInterface && $base_entity instanceof ContentEntityInterface);
+    \assert($theirs_entity instanceof ContentEntityInterface && $base_entity instanceof ContentEntityInterface);
 
-    $langcode = $local_entity->language()->getId();
-    $remote_entity = $remote_entity->getTranslation($langcode);
+    $langcode = $ours_entity->language()->getId();
+    $theirs_entity = $theirs_entity->getTranslation($langcode);
     $base_entity = $base_entity->getTranslation($langcode);
 
     // The revision metadata fields are updated constantly, and they will always
     // cause conflicts, therefore we skip them here.
     // @see \Drupal\Core\Entity\ContentEntityForm::buildEntity().
-    $skip_fields = array_flip($local_entity->getEntityType()->getRevisionMetadataKeys());
+    $skip_fields = array_flip($ours_entity->getEntityType()->getRevisionMetadataKeys());
 
     // Iterate over the entity fields to find conflicting properties.
-    foreach ($local_entity->getFields() as $field_name => $field_items_local) {
+    foreach ($ours_entity->getFields() as $field_name => $field_items_ours) {
       if (isset($skip_fields[$field_name])) {
         continue;
       }
 
-      $field_definition = $field_items_local->getFieldDefinition();
+      $field_definition = $field_items_ours->getFieldDefinition();
       // There cannot be conflicts on read-only fields.
       if ($field_definition->isReadOnly()) {
         continue;
       }
 
-      $field_items_remote = $remote_entity->get($field_name);
+      $field_items_theirs = $theirs_entity->get($field_name);
       $field_items_base = $base_entity->get($field_name);
 
-      // Check for changes between the local, the remote and the entity versions.
-      if (!$field_items_local->equals($field_items_remote) && !$field_items_remote->equals($field_items_base)) {
-        // Check for changes between the local and the base entity versions.
-        $conflict_type = $field_items_local->equals($field_items_base) ? ConflictType::Remote : ConflictType::LocalRemote;
+      // Check for changes between ours, theirs and base versions.
+      if (!$field_items_ours->equals($field_items_theirs) && !$field_items_theirs->equals($field_items_base)) {
+        // Check for changes between the ours and the base entity versions.
+        $conflict_type = $field_items_ours->equals($field_items_base) ? ConflictType::Theirs : ConflictType::OursTheirs;
         $event->addConflict($field_name, $conflict_type);
       }
     }

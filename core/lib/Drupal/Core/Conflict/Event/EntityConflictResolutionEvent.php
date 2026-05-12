@@ -13,16 +13,16 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 class EntityConflictResolutionEvent extends EntityConflictDiscoveryEvent {
 
   public function __construct(
-    EntityInterface $localEntity,
-    EntityInterface $remoteEntity,
+    EntityInterface $oursEntity,
+    EntityInterface $theirsEntity,
     EntityInterface $baseEntity,
     protected EntityInterface $resultEntity,
     array $conflicts,
     ParameterBag $context = new ParameterBag(),
   ) {
-    parent::__construct($localEntity, $remoteEntity, $baseEntity, $context);
-    \assert($resultEntity->getEntityTypeId() === $localEntity->getEntityTypeId());
-    \assert($resultEntity->id() === $localEntity->id());
+    parent::__construct($oursEntity, $theirsEntity, $baseEntity, $context);
+    \assert($resultEntity->getEntityTypeId() === $oursEntity->getEntityTypeId());
+    \assert($resultEntity->id() === $oursEntity->id());
     $this->conflicts = $conflicts;
   }
 
@@ -37,7 +37,7 @@ class EntityConflictResolutionEvent extends EntityConflictDiscoveryEvent {
    * @return static
    */
   public static function createFromConflictDiscoveryEvent(EntityConflictDiscoveryEvent $event, EntityInterface $result): static {
-    return new static($event->localEntity, $event->remoteEntity, $event->baseEntity, $result, $event->conflicts, $event->context);
+    return new static($event->oursEntity, $event->theirsEntity, $event->baseEntity, $result, $event->conflicts, $event->context);
   }
 
   /**

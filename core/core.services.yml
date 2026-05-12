@@ -464,7 +464,7 @@ services:
     autowire: true
     class: Drupal\Core\Conflict\ConflictResolver\ConflictResolverManager
   Drupal\Core\Conflict\ConflictDiscovery\DefaultConflictDiscovery: ~
-  Drupal\Core\Conflict\ConflictResolution\MergeRemoteOnlyChanges: ~
+  Drupal\Core\Conflict\ConflictResolution\MergeTheirsOnlyChanges: ~
   context.handler:
     class: Drupal\Core\Plugin\Context\ContextHandler
   Drupal\Core\Plugin\Context\ContextHandlerInterface: '@context.handler'

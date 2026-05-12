@@ -24,19 +24,19 @@ class ConflictResolverManager implements ConflictResolverManagerInterface {
    * {@inheritdoc}
    */
   public function resolveConflicts(
-    EntityInterface $local,
-    EntityInterface $remote,
+    EntityInterface $ours,
+    EntityInterface $theirs,
     EntityInterface $base,
     ?EntityInterface $result = NULL,
     ParameterBag $context = new ParameterBag(),
     ?array $conflicts = NULL,
   ) : array {
     // If there are no passed conflicts given, attempt to discover them.
-    $conflicts ??= $this->getConflicts($local, $remote, $base, $context);
+    $conflicts ??= $this->getConflicts($ours, $theirs, $base, $context);
 
     if (\count($conflicts) > 0) {
-      $result ??= $local;
-      $event = new EntityConflictResolutionEvent($local, $remote, $base, $result, $conflicts, $context);
+      $result ??= $ours;
+      $event = new EntityConflictResolutionEvent($ours, $theirs, $base, $result, $conflicts, $context);
       // Fire an event to allow listeners to automatically resolve conflicts.
       $this->eventDispatcher->dispatch($event);
       $conflicts = $event->getConflicts();
@@ -49,12 +49,12 @@ class ConflictResolverManager implements ConflictResolverManagerInterface {
    * {@inheritdoc}
    */
   public function getConflicts(
-    EntityInterface $local,
-    EntityInterface $remote,
+    EntityInterface $ours,
+    EntityInterface $theirs,
     EntityInterface $base,
     ParameterBag $context = new ParameterBag(),
   ) : array {
-    $event = new EntityConflictDiscoveryEvent($local, $remote, $base, $context);
+    $event = new EntityConflictDiscoveryEvent($ours, $theirs, $base, $context);
     // Fire an event to allow listeners to build a list of conflicting
     // properties.
     $this->eventDispatcher->dispatch($event);

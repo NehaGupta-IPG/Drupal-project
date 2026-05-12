@@ -25,8 +25,8 @@ abstract class ConflictDiscoveryBase implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public function discoverConflicts(EntityConflictDiscoveryEvent $event): void {
-    $local_entity = $event->getLocalEntity();
-    if ($local_entity instanceof ContentEntityInterface) {
+    $ours_entity = $event->getOursEntity();
+    if ($ours_entity instanceof ContentEntityInterface) {
       $this->discoverContentEntityConflicts($event);
     }
   }

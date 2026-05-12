@@ -40,28 +40,28 @@ class DefaultConflictStrategyTest extends KernelTestBase {
    */
   public function testNoChange(): void {
     $base = EntityTest::create(['name' => 'A']);
-    $local = EntityTest::create(['name' => 'A']);
-    $remote = EntityTest::create(['name' => 'A']);
+    $ours = EntityTest::create(['name' => 'A']);
+    $theirs = EntityTest::create(['name' => 'A']);
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
     $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
 
-    $conflicts = $conflict_resolver->getConflicts($local, $remote, $base);
+    $conflicts = $conflict_resolver->getConflicts($ours, $theirs, $base);
     $this->assertEquals([], $conflicts);
   }
 
   /**
-   * Only the local entity changed.
+   * Only the ours entity changed.
    */
-  public function testLocalChange(): void {
+  public function testOursChange(): void {
     $base = EntityTest::create(['name' => 'A']);
-    $local = EntityTest::create(['name' => 'B']);
-    $remote = EntityTest::create(['name' => 'A']);
+    $ours = EntityTest::create(['name' => 'B']);
+    $theirs = EntityTest::create(['name' => 'A']);
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
     $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
 
-    $conflicts = $conflict_resolver->getConflicts($local, $remote, $base);
+    $conflicts = $conflict_resolver->getConflicts($ours, $theirs, $base);
     $this->assertEquals([], $conflicts);
   }
 
@@ -70,57 +70,57 @@ class DefaultConflictStrategyTest extends KernelTestBase {
    */
   public function testBothChanged(): void {
     $base = EntityTest::create(['name' => 'B']);
-    $local = EntityTest::create(['name' => 'A']);
-    $remote = EntityTest::create(['name' => 'C']);
+    $ours = EntityTest::create(['name' => 'A']);
+    $theirs = EntityTest::create(['name' => 'C']);
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
     $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
 
-    $conflicts = $conflict_resolver->getConflicts($local, $remote, $base);
+    $conflicts = $conflict_resolver->getConflicts($ours, $theirs, $base);
     $this->assertEquals([
-      'name' => ConflictType::LocalRemote,
+      'name' => ConflictType::OursTheirs,
     ], $conflicts);
   }
 
   /**
-   * Tests that a remote-only change is detected and then auto-resolved.
+   * Tests that a theirs-only change is detected and then auto-resolved.
    */
-  public function testResolveRemoteOnlyChange(): void {
+  public function testResolveTheirsOnlyChange(): void {
     $base = EntityTest::create(['name' => 'A']);
-    $local = EntityTest::create(['name' => 'A']);
-    $remote = EntityTest::create(['name' => 'C']);
+    $ours = EntityTest::create(['name' => 'A']);
+    $theirs = EntityTest::create(['name' => 'C']);
     $result = EntityTest::create();
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
     $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
 
-    // Verify the conflict is detected as Remote.
-    $conflicts = $conflict_resolver->getConflicts($local, $remote, $base);
+    // Verify the conflict is detected as Theirs.
+    $conflicts = $conflict_resolver->getConflicts($ours, $theirs, $base);
     $this->assertEquals([
-      'name' => ConflictType::Remote,
+      'name' => ConflictType::Theirs,
     ], $conflicts);
 
     // Verify the merge strategy auto-resolves it.
-    $conflicts = $conflict_resolver->resolveConflicts($local, $remote, $base, $result);
+    $conflicts = $conflict_resolver->resolveConflicts($ours, $theirs, $base, $result);
     $this->assertEquals([], $conflicts);
     $this->assertEquals('C', $result->get('name')->value);
   }
 
   /**
-   * Tests that LocalRemote conflicts are not auto-resolved.
+   * Tests that OursTheirs conflicts are not auto-resolved.
    */
-  public function testResolveLocalRemoteChange(): void {
+  public function testResolveOursTheirsChange(): void {
     $base = EntityTest::create(['name' => 'A']);
-    $local = EntityTest::create(['name' => 'B']);
-    $remote = EntityTest::create(['name' => 'C']);
+    $ours = EntityTest::create(['name' => 'B']);
+    $theirs = EntityTest::create(['name' => 'C']);
     $result = EntityTest::create();
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
     $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
 
-    $conflicts = $conflict_resolver->resolveConflicts($local, $remote, $base, $result);
+    $conflicts = $conflict_resolver->resolveConflicts($ours, $theirs, $base, $result);
     $this->assertEquals([
-      'name' => ConflictType::LocalRemote,
+      'name' => ConflictType::OursTheirs,
     ], $conflicts);
   }
 

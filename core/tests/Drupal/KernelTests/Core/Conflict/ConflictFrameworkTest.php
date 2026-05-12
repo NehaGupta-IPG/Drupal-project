@@ -6,7 +6,7 @@ namespace Drupal\KernelTests\Core\Conflict;
 
 use Drupal\Core\Conflict\ConflictDiscovery\ConflictDiscoveryBase;
 use Drupal\Core\Conflict\ConflictDiscovery\DefaultConflictDiscovery;
-use Drupal\Core\Conflict\ConflictResolution\MergeRemoteOnlyChanges;
+use Drupal\Core\Conflict\ConflictResolution\MergeTheirsOnlyChanges;
 use Drupal\Core\Conflict\ConflictResolution\MergeStrategyBase;
 use Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface;
 use Drupal\Core\Conflict\ConflictTypeInterface;
@@ -74,7 +74,7 @@ class ConflictFrameworkTest extends KernelTestBase implements EventSubscriberInt
     $container->get(EventDispatcherInterface::class)->addSubscriber($this);
     // Remove the default implementations for the sake of this test.
     $container->removeDefinition(DefaultConflictDiscovery::class);
-    $container->removeDefinition(MergeRemoteOnlyChanges::class);
+    $container->removeDefinition(MergeTheirsOnlyChanges::class);
   }
 
   /**
@@ -82,15 +82,15 @@ class ConflictFrameworkTest extends KernelTestBase implements EventSubscriberInt
    */
   public function testDiscoverNoConflicts(): void {
     $base = EntityTest::create(['name' => 'A']);
-    $local = EntityTest::create(['name' => 'B']);
-    $remote = EntityTest::create(['name' => 'C']);
+    $ours = EntityTest::create(['name' => 'B']);
+    $theirs = EntityTest::create(['name' => 'C']);
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
     $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
     $this->conflictDiscoveryA = new NoConflict();
     $this->conflictDiscoveryB = new NoConflict();
 
-    $conflicts = $conflict_resolver->getConflicts($local, $remote, $base);
+    $conflicts = $conflict_resolver->getConflicts($ours, $theirs, $base);
     self::assertCount(0, $conflicts);
   }
 
@@ -99,8 +99,8 @@ class ConflictFrameworkTest extends KernelTestBase implements EventSubscriberInt
    */
   public function testDiscoverOneConflict(): void {
     $base = EntityTest::create(['name' => 'A']);
-    $local = EntityTest::create(['name' => 'B']);
-    $remote = EntityTest::create(['name' => 'C']);
+    $ours = EntityTest::create(['name' => 'B']);
+    $theirs = EntityTest::create(['name' => 'C']);
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
     $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
@@ -108,7 +108,7 @@ class ConflictFrameworkTest extends KernelTestBase implements EventSubscriberInt
     $this->conflictDiscoveryA = new CustomConflict();
     $this->conflictDiscoveryB = new NoConflict();
 
-    $conflicts = $conflict_resolver->getConflicts($local, $remote, $base);
+    $conflicts = $conflict_resolver->getConflicts($ours, $theirs, $base);
     self::assertEquals(['name' => CustomFooBarConflictType::Custom], $conflicts);
   }
 
@@ -117,8 +117,8 @@ class ConflictFrameworkTest extends KernelTestBase implements EventSubscriberInt
    */
   public function testDiscoverMultipleConflicts(): void {
     $base = EntityTest::create(['name' => 'A']);
-    $local = EntityTest::create(['name' => 'B']);
-    $remote = EntityTest::create(['name' => 'C']);
+    $ours = EntityTest::create(['name' => 'B']);
+    $theirs = EntityTest::create(['name' => 'C']);
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
     $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
@@ -126,7 +126,7 @@ class ConflictFrameworkTest extends KernelTestBase implements EventSubscriberInt
     $this->conflictDiscoveryA = new FooConflict();
     $this->conflictDiscoveryB = new BarConflict();
 
-    $conflicts = $conflict_resolver->getConflicts($local, $remote, $base);
+    $conflicts = $conflict_resolver->getConflicts($ours, $theirs, $base);
     self::assertEquals([
       'foo' => CustomFooBarConflictType::Foo,
       'bar' => CustomFooBarConflictType::Bar,
@@ -138,8 +138,8 @@ class ConflictFrameworkTest extends KernelTestBase implements EventSubscriberInt
    */
   public function testNoResolution(): void {
     $base = EntityTest::create(['name' => 'A']);
-    $local = EntityTest::create(['name' => 'B']);
-    $remote = EntityTest::create(['name' => 'C']);
+    $ours = EntityTest::create(['name' => 'B']);
+    $theirs = EntityTest::create(['name' => 'C']);
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
     $conflict_resolver = $this->container->get(ConflictResolverManagerInterface::class);
@@ -150,7 +150,7 @@ class ConflictFrameworkTest extends KernelTestBase implements EventSubscriberInt
     $this->conflictResolutionA = new NoResolution();
     $this->conflictResolutionB = new NoResolution();
 
-    $conflicts = $conflict_resolver->resolveConflicts($local, $remote, $base);
+    $conflicts = $conflict_resolver->resolveConflicts($ours, $theirs, $base);
     self::assertEquals([
       'foo' => CustomFooBarConflictType::Foo,
     ], $conflicts);
@@ -161,8 +161,8 @@ class ConflictFrameworkTest extends KernelTestBase implements EventSubscriberInt
    */
   public function testSimpleResolution(): void {
     $base = EntityTest::create(['name' => 'A']);
-    $local = EntityTest::create(['name' => 'B']);
-    $remote = EntityTest::create(['name' => 'C']);
+    $ours = EntityTest::create(['name' => 'B']);
+    $theirs = EntityTest::create(['name' => 'C']);
     $result = EntityTest::create(['name' => 'X']);
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
@@ -174,7 +174,7 @@ class ConflictFrameworkTest extends KernelTestBase implements EventSubscriberInt
     $this->conflictResolutionA = new ResolveNameAsBar();
     $this->conflictResolutionB = new NoResolution();
 
-    $conflicts = $conflict_resolver->resolveConflicts($local, $remote, $base, $result);
+    $conflicts = $conflict_resolver->resolveConflicts($ours, $theirs, $base, $result);
     self::assertEquals([], $conflicts);
     self::assertEquals('bar', $result->get('name')->value);
   }
@@ -184,8 +184,8 @@ class ConflictFrameworkTest extends KernelTestBase implements EventSubscriberInt
    */
   public function testMultipleResolutions(): void {
     $base = EntityTest::create(['name' => 'A']);
-    $local = EntityTest::create(['name' => 'B']);
-    $remote = EntityTest::create(['name' => 'C']);
+    $ours = EntityTest::create(['name' => 'B']);
+    $theirs = EntityTest::create(['name' => 'C']);
     $result = EntityTest::create(['name' => 'X']);
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
@@ -196,10 +196,10 @@ class ConflictFrameworkTest extends KernelTestBase implements EventSubscriberInt
 
     $this->conflictResolutionA = new ResolveFoo();
     $this->conflictResolutionB = new ResolveBar();
-    $conflicts = $conflict_resolver->getConflicts($local, $remote, $base);
+    $conflicts = $conflict_resolver->getConflicts($ours, $theirs, $base);
     self::assertCount(2, $conflicts);
 
-    $conflicts = $conflict_resolver->resolveConflicts($local, $remote, $base, $result);
+    $conflicts = $conflict_resolver->resolveConflicts($ours, $theirs, $base, $result);
     self::assertEquals([], $conflicts);
   }
 
@@ -210,8 +210,8 @@ class ConflictFrameworkTest extends KernelTestBase implements EventSubscriberInt
    */
   public function testDisabledResolution(): void {
     $base = EntityTest::create(['name' => 'A']);
-    $local = EntityTest::create(['name' => 'B']);
-    $remote = EntityTest::create(['name' => 'C']);
+    $ours = EntityTest::create(['name' => 'B']);
+    $theirs = EntityTest::create(['name' => 'C']);
     $result = EntityTest::create(['name' => 'X']);
 
     /** @var \Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface $conflict_resolver */
@@ -226,7 +226,7 @@ class ConflictFrameworkTest extends KernelTestBase implements EventSubscriberInt
     $parameters = new ParameterBag();
     $parameters->set('merge_strategy.disabled', ['bar']);
 
-    $conflicts = $conflict_resolver->resolveConflicts($local, $remote, $base, $result, $parameters);
+    $conflicts = $conflict_resolver->resolveConflicts($ours, $theirs, $base, $result, $parameters);
     $this->assertEquals([
       'bar' => CustomFooBarConflictType::Bar,
     ], $conflicts);

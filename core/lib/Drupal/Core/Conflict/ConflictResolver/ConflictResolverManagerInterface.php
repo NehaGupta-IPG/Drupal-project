@@ -15,20 +15,20 @@ interface ConflictResolverManagerInterface {
   /**
    * Resolves the conflicts between two entities based on their common parent.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $local
-   *   The local part of the comparison - for example the entity built of the
+   * @param \Drupal\Core\Entity\EntityInterface $ours
+   *   The ours part of the comparison - for example the entity built of the
    *   user input on an entity form submission. This is basically the active
    *   entity object.
-   * @param \Drupal\Core\Entity\EntityInterface $remote
-   *   The remote part of the comparison - for example the current version of
-   *   the entity from the storage or from a remote branch.
+   * @param \Drupal\Core\Entity\EntityInterface $theirs
+   *   The theirs part of the comparison - for example the current version of
+   *   the entity from the storage or from another branch.
    * @param \Drupal\Core\Entity\EntityInterface $base
    *   The initial entity version in concurrent editing or the lowest common
    *   ancestor in a revision tree scenario.
    * @param ?\Drupal\Core\Entity\EntityInterface $result
    *   (optional) The result entity, on which to apply the result. Usually this
-   *   will be the active entity object - the local entity. If none given, then
-   *   the conflict resolutions will be applied on the local entity.
+   *   will be the active entity object - the ours entity. If none given, then
+   *   the conflict resolutions will be applied on the ours entity.
    * @param \Symfony\Component\HttpFoundation\ParameterBag $context
    *   (optional) The context parameter bag.
    * @param null|array<string, \Drupal\Core\Conflict\ConflictTypeInterface> $conflicts
@@ -43,8 +43,8 @@ interface ConflictResolverManagerInterface {
    *   having as values the corresponding conflict type.
    */
   public function resolveConflicts(
-    EntityInterface $local,
-    EntityInterface $remote,
+    EntityInterface $ours,
+    EntityInterface $theirs,
     EntityInterface $base,
     ?EntityInterface $result = NULL,
     ParameterBag $context = new ParameterBag(),
@@ -54,12 +54,12 @@ interface ConflictResolverManagerInterface {
   /**
    * Returns the conflicts between two entities based on their common parent.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $local
-   *   The local part of the comparison - for example the entity built of the
+   * @param \Drupal\Core\Entity\EntityInterface $ours
+   *   The ours part of the comparison - for example the entity built of the
    *   user input on an entity form submission. This is basically the active
    *   entity object.
-   * @param \Drupal\Core\Entity\EntityInterface $remote
-   *   The remote part of the comparison - for example the current version of
+   * @param \Drupal\Core\Entity\EntityInterface $theirs
+   *   The theirs part of the comparison - for example the current version of
    *   the entity from the storage.
    * @param \Drupal\Core\Entity\EntityInterface $base
    *   The initial entity version in concurrent editing or the lowest common
@@ -72,8 +72,8 @@ interface ConflictResolverManagerInterface {
    *   having as values the corresponding conflict type.
    */
   public function getConflicts(
-    EntityInterface $local,
-    EntityInterface $remote,
+    EntityInterface $ours,
+    EntityInterface $theirs,
     EntityInterface $base,
     ParameterBag $context = new ParameterBag(),
   ) : array;

@@ -25,33 +25,33 @@ class EntityConflictDiscoveryEvent extends Event {
   protected array $conflicts = [];
 
   public function __construct(
-    protected EntityInterface $localEntity,
-    protected EntityInterface $remoteEntity,
+    protected EntityInterface $oursEntity,
+    protected EntityInterface $theirsEntity,
     protected EntityInterface $baseEntity,
     protected ParameterBag $context = new ParameterBag(),
   ) {
-    \assert($localEntity->getEntityTypeId() === $remoteEntity->getEntityTypeId() && $remoteEntity->getEntityTypeId() === $baseEntity->getEntityTypeId());
-    \assert($localEntity->id() === $remoteEntity->id() && $remoteEntity->id() === $baseEntity->id());
+    \assert($oursEntity->getEntityTypeId() === $theirsEntity->getEntityTypeId() && $theirsEntity->getEntityTypeId() === $baseEntity->getEntityTypeId());
+    \assert($oursEntity->id() === $theirsEntity->id() && $theirsEntity->id() === $baseEntity->id());
   }
 
   /**
-   * Return the local entity.
+   * Return the ours entity.
    *
    * @return \Drupal\Core\Entity\EntityInterface
-   *   Local entity.
+   *   Ours entity.
    */
-  public function getLocalEntity() : EntityInterface {
-    return $this->localEntity;
+  public function getOursEntity() : EntityInterface {
+    return $this->oursEntity;
   }
 
   /**
-   * Returns the remote entity.
+   * Returns the theirs entity.
    *
    * @return \Drupal\Core\Entity\EntityInterface
-   *   Remote entity.
+   *   Theirs entity.
    */
-  public function getRemoteEntity() : EntityInterface {
-    return $this->remoteEntity;
+  public function getTheirsEntity() : EntityInterface {
+    return $this->theirsEntity;
   }
 
   /**
