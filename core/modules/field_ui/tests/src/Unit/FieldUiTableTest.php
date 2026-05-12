@@ -19,18 +19,16 @@ class FieldUiTableTest extends UnitTestCase {
 
   /**
    * Tests reduce order.
-   *
-   * @legacy-covers ::reduceOrder
    */
   #[DataProvider('providerTestReduceOrder')]
-  public function testReduceOrder($array, $expected): void {
+  public function testReduceOrder(array $array, array $expected): void {
     $this->assertSame($expected, array_reduce($array, ['Drupal\field_ui\Element\FieldUiTable', 'reduceOrder']));
   }
 
   /**
    * Provides test data for testReduceOrder().
    */
-  public static function providerTestReduceOrder() {
+  public static function providerTestReduceOrder(): array {
     return [
       'Flat' => [
         'array' => [

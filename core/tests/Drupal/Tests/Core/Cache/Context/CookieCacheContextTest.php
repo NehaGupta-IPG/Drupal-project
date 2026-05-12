@@ -21,11 +21,9 @@ class CookieCacheContextTest extends UnitTestCase {
 
   /**
    * Tests get context.
-   *
-   * @legacy-covers ::getContext
    */
   #[DataProvider('providerTestGetContext')]
-  public function testGetContext($cookies, $cookie_name, $context): void {
+  public function testGetContext(array $cookies, ?string $cookie_name, int|string $context): void {
     $request_stack = new RequestStack();
     $request = Request::create('/', 'GET');
     foreach ($cookies as $cookie => $value) {

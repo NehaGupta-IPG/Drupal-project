@@ -91,9 +91,9 @@ trait EntityDefinitionTestTrait {
    * @param string $op
    *   The operation to perform, possible values are static::DEFINITION_CREATED,
    *   static::DEFINITION_UPDATED or static::DEFINITION_DELETED.
-   * @param array|null $storage_definition
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
    *   The new field storage definition.
-   * @param array|null $original_storage_definition
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $original_storage_definition
    *   The original field storage definition.
    */
   protected function doFieldUpdate($op, $storage_definition = NULL, $original_storage_definition = NULL): void {
@@ -235,7 +235,7 @@ trait EntityDefinitionTestTrait {
    *   (optional) If the base field should be translatable or not. Defaults to
    *   FALSE.
    */
-  protected function addBaseField($type = 'string', $entity_type_id = 'entity_test_update', $is_revisionable = FALSE, $set_label = TRUE, $is_translatable = FALSE): void {
+  protected function addBaseField($type = 'string', string $entity_type_id = 'entity_test_update', $is_revisionable = FALSE, $set_label = TRUE, $is_translatable = FALSE): void {
     $definitions['new_base_field'] = BaseFieldDefinition::create($type)
       ->setName('new_base_field')
       ->setRevisionable($is_revisionable)
@@ -300,7 +300,7 @@ trait EntityDefinitionTestTrait {
    * @param string $entity_type_id
    *   (optional) The entity type ID the base field should be attached to.
    */
-  protected function removeBaseField($entity_type_id = 'entity_test_update'): void {
+  protected function removeBaseField(string $entity_type_id = 'entity_test_update'): void {
     $this->state->delete($entity_type_id . '.additional_base_field_definitions');
   }
 
@@ -437,7 +437,7 @@ trait EntityDefinitionTestTrait {
    * @return \Drupal\Core\Entity\EntityTypeInterface
    *   An entity type definition.
    */
-  protected function getUpdatedEntityTypeDefinition($revisionable = FALSE, $translatable = FALSE) {
+  protected function getUpdatedEntityTypeDefinition($revisionable = FALSE, $translatable = FALSE): object {
     $entity_type = clone \Drupal::entityTypeManager()->getDefinition('entity_test_update');
 
     if ($revisionable) {

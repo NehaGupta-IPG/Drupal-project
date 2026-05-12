@@ -376,7 +376,7 @@ class MenuAccessTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function drupalGet($path, array $options = [], array $headers = []) {
+  protected function drupalGet($path, array $options = [], array $headers = []): string {
     $return = parent::drupalGet($path, $options, $headers);
     $this->assertSession()->pageTextNotContains('You do not have any administrative items.');
     return $return;
@@ -415,7 +415,7 @@ class MenuAccessTest extends BrowserTestBase {
 
       }
     }
-    $debug = fn($accessibleRoutes, $inaccessibleRoutes) => "\nAccessible routes: " . implode(', ', $accessibleRoutes) . "\nInaccessible routes: " . implode(', ', $inaccessibleRoutes);
+    $debug = fn($accessibleRoutes, $inaccessibleRoutes): string => "\nAccessible routes: " . implode(', ', $accessibleRoutes) . "\nInaccessible routes: " . implode(', ', $inaccessibleRoutes);
     $expected = $debug($expectedAccessibleRoutes, $expectedInaccessibleRoutes);
     $actual = $debug($actualAccessibleRoutes, $actualInaccessibleRoutes);
     $this->assertSession()->assert($expected === $actual, "Routes do not match. \nExpected routes:$expected\nActual routes: $actual");
