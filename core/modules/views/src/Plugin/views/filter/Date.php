@@ -189,8 +189,8 @@ class Date extends NumericFilter {
         // If the filter was not submitted but has default offset values,
         // apply them so backends receive resolved dates.
         if ((!empty($this->options['value']['min']) || !empty($this->options['value']['max'])) && $this->options['value']['type'] === 'offset') {
-          $this->value['min'] = $this->options['value']['min'];
-          $this->value['max'] = $this->options['value']['max'];
+          $this->value['min'] = $this->value['min'] ?: $this->options['value']['min'];
+          $this->value['max'] = $this->value['max'] ?: $this->options['value']['max'];
           $this->value['type'] = 'offset';
           return TRUE;
         }
