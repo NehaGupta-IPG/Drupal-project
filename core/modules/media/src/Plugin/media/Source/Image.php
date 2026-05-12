@@ -169,9 +169,24 @@ class Image extends File {
   /**
    * {@inheritdoc}
    */
-  public function hasChanged(MediaInterface $media, MediaInterface $original, bool $additional_properties = FALSE): bool {
-    // Preserve base behavior: compare source field main property.
-    if (parent::hasChanged($media, $original, $additional_properties)) {
+  public function shouldUpdateThumbnail(MediaInterface $media, bool $is_new = FALSE): bool {
+    if (parent::shouldUpdateThumbnail($media, $is_new)) {
+      return TRUE;
+    }
+    $original = $media->getOriginal();
+    if (empty($original)) {
+      return FALSE;
+    }
+
+    // The thumbnail should also be updated when the alt text is.
+    return $this->hasAltTextChanged($media, $original);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasSourceFieldChanged(MediaInterface $media, MediaInterface $original, bool $additional_properties = FALSE): bool {
+    if (parent::hasSourceFieldChanged($media, $original, $additional_properties)) {
       return TRUE;
     }
 
@@ -180,7 +195,21 @@ class Image extends File {
       return FALSE;
     }
 
-    // Alt comparison is optional and only applies when supported.
+    return $this->hasAltTextChanged($media, $original);
+  }
+
+  /**
+   * Returns if the alt text value has changed.
+   *
+   * @param \Drupal\media\MediaInterface $media
+   *   The updated media entity.
+   * @param \Drupal\media\MediaInterface $original
+   *   The original media entity.
+   *
+   * @return bool
+   *   TRUE if the alt text changed, FALSE otherwise.
+   */
+  protected function hasAltTextChanged(MediaInterface $media, MediaInterface $original): bool {
     $source_field = $this->configuration['source_field'] ?? NULL;
     if (!$source_field || !$media->hasField($source_field) || !$original->hasField($source_field)) {
       return FALSE;
@@ -189,7 +218,6 @@ class Image extends File {
     $items = $media->get($source_field);
     $original_items = $original->get($source_field);
 
-    // Ensure both have values and support alt.
     if ($items->isEmpty() || $original_items->isEmpty() || !isset($items->alt)) {
       return FALSE;
     }
