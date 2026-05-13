@@ -246,7 +246,7 @@ class LinkFieldTest extends BrowserTestBase {
    *
    * @param string $field_name
    *   The field name.
-   * @param array $valid_entries
+   * @param array<string, string> $valid_entries
    *   An array of valid URL entries.
    *
    * @internal
@@ -270,7 +270,7 @@ class LinkFieldTest extends BrowserTestBase {
    *
    * @param string $field_name
    *   The field name.
-   * @param array $invalid_entries
+   * @param array<string, string> $invalid_entries
    *   An array of invalid URL entries.
    *
    * @internal
@@ -398,7 +398,7 @@ class LinkFieldTest extends BrowserTestBase {
     ];
     $this->submitForm($edit, 'Save');
     preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
-    $id = $match[1];
+    $id = (int) $match[1];
     $this->assertSession()->statusMessageContains('entity_test ' . $id . ' has been created.', 'status');
 
     $output = $this->renderTestEntity($id);
