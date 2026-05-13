@@ -36,11 +36,27 @@ final class RecipeRunner {
    *   The recipe to apply.
    */
   public static function processRecipe(Recipe $recipe): void {
+    static::validateRecipe($recipe);
     static::processRecipes($recipe->recipes);
     static::processInstall($recipe->install, $recipe->config->getConfigStorage());
     static::processConfiguration($recipe);
     static::processContent($recipe->content);
     static::triggerEvent($recipe);
+  }
+
+  /**
+   * Validates a recipe before applying it.
+   *
+   * @param \Drupal\Core\Recipe\Recipe $recipe
+   *   The recipe to validate.
+   * @param array<mixed>|null $context
+   *   The batch context if called by a batch.
+   */
+  public static function validateRecipe(Recipe $recipe, ?array &$context = NULL): void {
+    $strict_mismatches = $recipe->config->getStrictMismatches();
+    if (!empty($strict_mismatches)) {
+      throw new RecipePreExistingConfigException($strict_mismatches);
+    }
   }
 
   /**
@@ -198,7 +214,9 @@ final class RecipeRunner {
     if (in_array($recipe->path, $recipes, TRUE)) {
       return [];
     }
-    $steps = [];
+    $steps = [
+      [[RecipeRunner::class, 'validateRecipe'], [$recipe]],
+    ];
     $recipes[] = $recipe->path;
 
     foreach ($recipe->recipes->recipes as $sub_recipe) {

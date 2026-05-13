@@ -114,9 +114,11 @@ class ConfigConfiguratorTest extends KernelTestBase {
       $data['config']['strict'] = ['node.type.page'];
       return $data;
     });
-    // If we try to instantiate this recipe, we should an exception.
+    $recipe = Recipe::createFromDirectory($clone_dir);
+    $this->assertSame(['node.type.page'], $recipe->config->getStrictMismatches());
+
     try {
-      Recipe::createFromDirectory($clone_dir);
+      RecipeRunner::processRecipe($recipe);
       $this->fail('Expected an exception but none was thrown.');
     }
     catch (RecipePreExistingConfigException $e) {
@@ -161,10 +163,56 @@ class ConfigConfiguratorTest extends KernelTestBase {
       $data['config']['strict'] = TRUE;
       return $data;
     });
-    // If we try to instantiate this recipe, we should an exception.
+    $recipe = Recipe::createFromDirectory($clone_dir);
+    $this->assertNotEmpty($recipe->config->getStrictMismatches());
+    $this->assertContains('node.type.page', $recipe->config->getStrictMismatches());
+
     $this->expectException(RecipePreExistingConfigException::class);
-    $this->expectExceptionMessage("The configuration 'node.type.page' exists already and does not match the recipe's configuration");
-    Recipe::createFromDirectory($clone_dir);
+    $this->expectExceptionMessageMatches('/node\\.type\\.page/');
+    RecipeRunner::processRecipe($recipe);
+  }
+
+  /**
+   * Tests strict mismatch list aggregation.
+   */
+  public function testStrictMismatchListAggregation(): void {
+    $recipe = Recipe::createFromDirectory('core/recipes/page_content_type');
+    RecipeRunner::processRecipe($recipe);
+
+    NodeType::load('page')
+      ->set('description', 'And now for something completely different.')
+      ->save();
+
+    $this->container->get(EntityDisplayRepositoryInterface::class)
+      ->getFormDisplay('node', 'page')
+      ->removeComponent('uid')
+      ->save();
+
+    $clone_dir = $this->cloneRecipe($recipe->path);
+    $this->alterRecipe($clone_dir, function (array $data): array {
+      $data['config']['strict'] = [
+        'node.type.page',
+        'core.entity_form_display.node.page.default',
+      ];
+      return $data;
+    });
+
+    $recipe = Recipe::createFromDirectory($clone_dir);
+    $this->assertSame([
+      'node.type.page',
+      'core.entity_form_display.node.page.default',
+    ], $recipe->config->getStrictMismatches());
+
+    try {
+      RecipeRunner::processRecipe($recipe);
+      $this->fail('Expected an exception but none was thrown.');
+    }
+    catch (RecipePreExistingConfigException $e) {
+      $this->assertSame([
+        'node.type.page',
+        'core.entity_form_display.node.page.default',
+      ], $e->configNames);
+    }
   }
 
   /**

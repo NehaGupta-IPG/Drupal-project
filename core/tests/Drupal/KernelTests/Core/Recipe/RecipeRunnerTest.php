@@ -121,9 +121,12 @@ class RecipeRunnerTest extends KernelTestBase {
     $type->setNewRevision(FALSE);
     $type->save();
 
+    $recipe = Recipe::createFromDirectory('core/tests/fixtures/recipes/install_node_with_config');
+    $this->assertContains('node.type.test', $recipe->config->getStrictMismatches());
+
     $this->expectException(RecipePreExistingConfigException::class);
     $this->expectExceptionMessage("The configuration 'node.type.test' exists already and does not match the recipe's configuration");
-    Recipe::createFromDirectory('core/tests/fixtures/recipes/install_node_with_config');
+    RecipeRunner::processRecipe($recipe);
   }
 
   /**
@@ -302,17 +305,16 @@ YAML;
     $this->assertSame('Another test content type', NodeType::load('another_test')?->label());
 
     $operations = RecipeRunner::toBatchOperations($recipe);
-    $this->assertSame('triggerEvent', $operations[2][0][1]);
-    $this->assertSame('Install node with config', $operations[2][1][0]->name);
-    $this->assertStringEndsWith('core/tests/fixtures/recipes/install_node_with_config', $operations[2][1][0]->path);
+    $trigger_operations = array_values(array_filter($operations, static fn (array $operation): bool => $operation[0][1] === 'triggerEvent'));
 
-    $this->assertSame('triggerEvent', $operations[5][0][1]);
-    $this->assertSame('Recipe include', $operations[5][1][0]->name);
-    $this->assertStringEndsWith('core/tests/fixtures/recipes/recipe_include', $operations[5][1][0]->path);
+    $this->assertSame('Install node with config', $trigger_operations[0][1][0]->name);
+    $this->assertStringEndsWith('core/tests/fixtures/recipes/install_node_with_config', $trigger_operations[0][1][0]->path);
 
-    $this->assertSame('triggerEvent', $operations[7][0][1]);
-    $this->assertSame('Recipe include', $operations[7][1][0]->name);
-    $this->assertSame($this->siteDirectory . '/recipes/recipe_include', $operations[7][1][0]->path);
+    $this->assertSame('Recipe include', $trigger_operations[1][1][0]->name);
+    $this->assertStringEndsWith('core/tests/fixtures/recipes/recipe_include', $trigger_operations[1][1][0]->path);
+
+    $this->assertSame('Recipe include', $trigger_operations[2][1][0]->name);
+    $this->assertSame($this->siteDirectory . '/recipes/recipe_include', $trigger_operations[2][1][0]->path);
   }
 
 }
