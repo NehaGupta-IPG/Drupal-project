@@ -20,6 +20,7 @@ drupalorg
 druplicon
 drush
 fapi
+fidry
 fieldable
 fulldate
 groupby
