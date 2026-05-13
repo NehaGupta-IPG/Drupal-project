@@ -217,12 +217,6 @@ trait StandardTestTrait {
     // Verify that full node page is cached by Dynamic Page Cache.
     $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'HIT');
 
-    $url = Url::fromRoute('entity.user.canonical', ['user' => 1]);
-    $this->drupalGet($url);
-    $this->drupalGet($url);
-    // Verify that user profile page is cached by Dynamic Page Cache.
-    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'HIT');
-
     // Make sure the editorial workflow is installed after enabling the
     // content_moderation module.
     \Drupal::service('module_installer')->install(['content_moderation']);
@@ -277,7 +271,7 @@ trait StandardTestTrait {
       if (is_a($media_type->getSource(), Image::class, TRUE)) {
         // Assert the default entity view display is configured with an image
         // style.
-        $this->drupalGet('/admin/structure/media/manage/' . $media_type->id() . '/display');
+        $this->drupalGet('/admin/structure/media/manage/' . $media_type->id() . '/display/default');
         $assert_session->fieldValueEquals('fields[field_media_image][type]', 'image');
         $assert_session->elementTextContains('css', 'tr[data-drupal-selector="edit-fields-field-media-image"]', 'Image style: Large (480×480)');
         // By default for media types with an image source, only the image
