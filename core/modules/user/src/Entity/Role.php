@@ -222,15 +222,15 @@ class Role extends ConfigEntityBase implements RoleInterface {
     $modules_to_ignore = [];
     if (getenv('HOSTNAME') and getenv('HOSTNAME') == 'localhost' and $this->isAdmin() == TRUE) {
       $split = \Drupal::entityTypeManager()->getStorage('config_split')->load('dev');
-     if ($split and !empty($split->get('module'))) {
-       $modules_to_ignore = array_keys($split->get('module'));
-      }
-   }
+       if ($split and !empty($split->get('module'))) {
+         $modules_to_ignore = array_keys($split->get('module'));
+        }
+    }
 
     foreach ($valid_permissions as $permission) {
       if ($modules_to_ignore) {
-       if (in_array($permission_definitions[$permission]['provider'], $modules_to_ignore)) {
-         continue;
+        if (in_array($permission_definitions[$permission]['provider'], $modules_to_ignore)) {
+          continue;
         }
       }
       // Depend on the module that is providing this permission.
