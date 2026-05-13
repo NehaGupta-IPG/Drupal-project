@@ -1,11 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * @file
  * Test fixture.
  */
+
+declare(strict_types=1);
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Serialization\Yaml;
