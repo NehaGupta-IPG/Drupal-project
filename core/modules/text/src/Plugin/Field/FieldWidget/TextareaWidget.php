@@ -50,22 +50,6 @@ class TextareaWidget extends StringTextareaWidget {
   /**
    * {@inheritdoc}
    */
-  public function massageFormValues(array $values, array $form, FormStateInterface $form_state): array {
-    // On regular entity forms, clear the format for empty text values so that
-    // filterEmptyItems() correctly treats them as empty.
-    if (!$this->isDefaultValueWidget($form_state)) {
-      foreach ($values as &$value) {
-        if (!isset($value['value']) || $value['value'] === '') {
-          $value['format'] = NULL;
-        }
-      }
-    }
-    return $values;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function errorElement(array $element, ConstraintViolationInterface $violation, array $form, FormStateInterface $form_state) {
     if (isset($element['format']['#access']) && !$element['format']['#access'] && preg_match('/^[0-9]*\.format$/', $violation->getPropertyPath())) {
       // Ignore validation errors for formats if formats may not be changed,
