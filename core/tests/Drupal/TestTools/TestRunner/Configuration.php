@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\TestTools\TestRunner;
 
+use Fidry\CpuCoreCounter\CpuCoreCounter;
+use Fidry\CpuCoreCounter\NumberOfCpuCoreNotFound;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 
-// cspell:ignore testbots
+// cspell:ignore testbots parallelisation Cpus
 
 /**
  * Helper class to manage run-tests.sh configuration.
@@ -21,7 +23,7 @@ final class Configuration {
    *
    * phpcs:ignore Drupal.Commenting.VariableComment.MissingVar
    */
-  protected static ?self $instance = NULL;
+  private static ?self $instance = NULL;
 
   protected function __construct(
     private array $options,
@@ -30,14 +32,24 @@ final class Configuration {
   }
 
   /**
-   * Gets a config element.
+   * Returns the singleton instance.
+   *
+   * @return self
+   *   The singleton instance.
    */
-  public static function get(string $name): mixed {
+  public static function instance(): self {
     if (self::$instance === NULL) {
       throw new \RuntimeException("Configuration is not yet created");
     }
-    if (array_key_exists($name, self::$instance->options)) {
-      return self::$instance->options[$name];
+    return self::$instance;
+  }
+
+  /**
+   * Gets a config element.
+   */
+  public static function get(string $name): mixed {
+    if (array_key_exists($name, self::instance()->options)) {
+      return self::instance()->options[$name];
     }
     throw new \RuntimeException("There is no '{$name}' element in config");
   }
@@ -46,14 +58,14 @@ final class Configuration {
    * Gets the tests to execute.
    */
   public static function getTests(): array {
-    return self::$instance->arguments['tests'];
+    return self::instance()->arguments['tests'];
   }
 
   /**
    * Sets a config element.
    */
   public static function set(string $name, mixed $value): void {
-    self::$instance->options[$name] = $value;
+    self::instance()->options[$name] = $value;
   }
 
   /**
@@ -61,7 +73,7 @@ final class Configuration {
    */
   public static function createFromCommandLine(array $arguments): self {
     if (self::$instance) {
-      return self::$instance;
+      return self::instance();
     }
 
     if (count($arguments) < 2) {
@@ -70,9 +82,17 @@ final class Configuration {
 
     $input = new ArgvInput($arguments, self::commandLineDefinition());
 
+    if ($input->getOption('auto-concurrency')) {
+      $autoConcurrency = self::getAvailableCpuCount();
+    }
+
     $concurrency = $input->getOption('concurrency');
     if (!is_numeric($concurrency) || $concurrency <= 0) {
       throw new \RuntimeException("--concurrency must be a strictly positive integer.");
+    }
+
+    if (isset($autoConcurrency)) {
+      $input->setOption('concurrency', $concurrency == 1 ? $autoConcurrency : min($concurrency, $autoConcurrency));
     }
 
     if ($input->getArgument('tests')) {
@@ -91,7 +111,7 @@ final class Configuration {
 
     self::$instance = new self($input->getOptions(), $input->getArguments());
 
-    return self::$instance;
+    return self::instance();
   }
 
   /**
@@ -164,10 +184,16 @@ final class Configuration {
       "(deprecated) Unused.",
     ));
     $inputDefinition->addOption(new InputOption(
+      'auto-concurrency',
+      NULL,
+      InputOption::VALUE_NONE,
+      "Auto-detects the number of CPUs available for parallelization, reserve one for the main process (if there are at least 4 CPUs available), and put the remaining ones for concurrency.",
+    ));
+    $inputDefinition->addOption(new InputOption(
       'concurrency',
       NULL,
       InputOption::VALUE_REQUIRED,
-      "Run tests in parallel, up to [num] tests at a time.",
+      "Run tests in parallel, up to [CONCURRENCY] tests at a time, or limits the auto-detected concurrency to [CONCURRENCY].",
       1,
     ));
     $inputDefinition->addOption(new InputOption(
@@ -281,6 +307,12 @@ final class Configuration {
       InputOption::VALUE_NONE,
       'If provided, dumps detailed information on the tests selected for execution, before the execution starts.'
     ));
+    $inputDefinition->addOption(new InputOption(
+      'debug-execution',
+      NULL,
+      InputOption::VALUE_NONE,
+      'If provided, dumps detailed information about state during execution.'
+    ));
 
     $inputDefinition->addArgument(new InputArgument(
       'tests',
@@ -289,6 +321,22 @@ final class Configuration {
     ));
 
     return $inputDefinition;
+  }
+
+  /**
+   * Returns the number of CPUs available for parallelisation.
+   */
+  private static function getAvailableCpuCount(): int {
+    // Get the number of available CPUs, we try to reserve 1 for the main
+    // process. That will do for total cores above 4; otherwise we use the main
+    // CPU too.
+    try {
+      $result = (new CpuCoreCounter())->getAvailableForParallelisation(reservedCpus: 1);
+      return $result->totalCoresCount > 4 ? $result->availableCpus : $result->totalCoresCount;
+    }
+    catch (NumberOfCpuCoreNotFound) {
+      return 1;
+    }
   }
 
 }
