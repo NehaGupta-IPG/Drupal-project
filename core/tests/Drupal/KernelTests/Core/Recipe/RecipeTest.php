@@ -65,8 +65,11 @@ class RecipeTest extends KernelTestBase {
     $this->container->get('module_installer')->install(['node']);
     $this->assertTrue($this->config('node.settings')->get('use_admin_theme'), 'The node.settings:use_admin_theme is set to TRUE');
 
+    $recipe = Recipe::createFromDirectory('core/tests/fixtures/recipes/install_node_with_config');
+    $this->assertSame(['node.settings'], $recipe->config->getStrictMismatches());
+
     try {
-      Recipe::createFromDirectory('core/tests/fixtures/recipes/install_node_with_config');
+      RecipeRunner::processRecipe($recipe);
       $this->fail('Expected exception not thrown');
     }
     catch (RecipePreExistingConfigException $e) {

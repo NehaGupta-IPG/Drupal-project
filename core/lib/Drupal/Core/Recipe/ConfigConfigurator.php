@@ -26,6 +26,13 @@ final class ConfigConfigurator {
   private readonly bool|array $strict;
 
   /**
+   * The list of strict configuration names that do not match active config.
+   *
+   * @var string[]
+   */
+  private readonly array $strictMismatches;
+
+  /**
    * @param array $config
    *   Config options for a recipe.
    * @param string $recipe_directory
@@ -37,6 +44,7 @@ final class ConfigConfigurator {
     $this->recipeConfigDirectory = is_dir($recipe_directory . '/config') ? $recipe_directory . '/config' : NULL;
     // @todo Consider defaulting this to FALSE in https://drupal.org/i/3478669.
     $this->strict = $config['strict'] ?? TRUE;
+    $strict_mismatches = [];
 
     $recipe_storage = $this->getConfigStorage();
     if ($this->strict === TRUE) {
@@ -66,10 +74,11 @@ final class ConfigConfigurator {
         SortArray::sortByKeyRecursive($active_data);
         SortArray::sortByKeyRecursive($recipe_data);
         if ($active_data !== $recipe_data) {
-          throw new RecipePreExistingConfigException($config_name, sprintf("The configuration '%s' exists already and does not match the recipe's configuration", $config_name));
+          $strict_mismatches[] = $config_name;
         }
       }
     }
+    $this->strictMismatches = $strict_mismatches;
   }
 
   /**
@@ -143,6 +152,16 @@ final class ConfigConfigurator {
    */
   public function hasTasks(): bool {
     return $this->recipeConfigDirectory !== NULL || count($this->config);
+  }
+
+  /**
+   * Gets strict config names that do not match active config.
+   *
+   * @return string[]
+   *   The strict config names that mismatch active config.
+   */
+  public function getStrictMismatches(): array {
+    return $this->strictMismatches;
   }
 
 }
