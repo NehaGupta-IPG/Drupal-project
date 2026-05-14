@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\entity_test\Entity;
 
-use Drupal\content_translation\ContentTranslationHandler;
 use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider;
 use Drupal\Core\Field\FieldDefinition;
