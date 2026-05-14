@@ -121,6 +121,7 @@ class TaxonomyIndexTid extends ManyToOne {
 
     $options['type'] = ['default' => 'textfield'];
     $options['limit'] = ['default' => TRUE];
+    $options['hide_unpublished'] = ['default' => FALSE];
     $options['vid'] = ['default' => ''];
     $options['hierarchy'] = ['default' => FALSE];
     $options['error_message'] = ['default' => TRUE];
@@ -161,6 +162,12 @@ class TaxonomyIndexTid extends ManyToOne {
       '#title' => $this->t('Selection type'),
       '#options' => ['select' => $this->t('Dropdown'), 'textfield' => $this->t('Autocomplete')],
       '#default_value' => $this->options['type'],
+    ];
+
+    $form['hide_unpublished'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Hide unpublished terms'),
+      '#default_value' => $this->options['hide_unpublished'],
     ];
 
     $form['hierarchy'] = [
@@ -210,7 +217,7 @@ class TaxonomyIndexTid extends ManyToOne {
 
         if ($tree) {
           foreach ($tree as $term) {
-            if (!$term->isPublished() && !$this->currentUser->hasPermission('administer taxonomy')) {
+            if (!$term->isPublished() && ($this->options['hide_unpublished'] || !$this->currentUser->hasPermission('administer taxonomy'))) {
               continue;
             }
             $choice = new \stdClass();
@@ -228,7 +235,7 @@ class TaxonomyIndexTid extends ManyToOne {
           ->sort('weight')
           ->sort('name')
           ->addTag('taxonomy_term_access');
-        if (!$this->currentUser->hasPermission('administer taxonomy')) {
+        if ($this->options['hide_unpublished'] || !$this->currentUser->hasPermission('administer taxonomy')) {
           $query->condition('status', 1);
         }
         if ($this->options['limit']) {
