@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Database;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StaticAppContextProvider;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -35,8 +36,10 @@ class ReplicaKillSwitchTest extends KernelTestBase {
     $service = \Drupal::service('database.replica_kill_switch');
     $service->trigger();
     $class_loader = require $this->root . '/autoload.php';
-    $kernel = new DrupalKernel('testing', $class_loader, FALSE);
-    $event = new RequestEvent($kernel, Request::create('http://example.com'), HttpKernelInterface::MAIN_REQUEST);
+    $request = Request::create('http://example.com');
+    $app_context = StaticAppContextProvider::getAppContext($request);
+    $kernel = new DrupalKernel('testing', $class_loader, FALSE, $app_context);
+    $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
     $service->checkReplicaServer($event);
 
     $db1 = Database::getConnection('default', 'default');

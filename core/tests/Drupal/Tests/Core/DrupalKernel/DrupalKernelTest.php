@@ -6,6 +6,7 @@ namespace Drupal\Tests\Core\DrupalKernel;
 
 use Composer\Autoload\ClassLoader;
 use Drupal\Core\DrupalKernel;
+use Drupal\Core\StaticAppContextProvider;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -153,7 +154,8 @@ EOD;
    */
   #[RunInSeparateProcess]
   public function testUnBootedTerminate(): void {
-    $kernel = new DrupalKernel('test', new ClassLoader());
+    $app_context = StaticAppContextProvider::getAppContext();
+    $kernel = new DrupalKernel('test', new ClassLoader(), TRUE, $app_context);
     $kernel->terminate(new Request(), new Response());
     $this->assertTrue(TRUE, "\Drupal\Core\DrupalKernel::terminate() called without error on kernel which has not booted");
   }
