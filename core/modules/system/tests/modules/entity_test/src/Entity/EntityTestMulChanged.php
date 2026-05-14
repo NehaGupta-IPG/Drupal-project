@@ -42,7 +42,6 @@ use Drupal\views\EntityViewsData;
     'route_provider' => [
       'html' => DefaultHtmlRouteProvider::class,
     ],
-    'translation' => ContentTranslationHandler::class,
     'views_data' => EntityViewsData::class,
   ],
   links: [
