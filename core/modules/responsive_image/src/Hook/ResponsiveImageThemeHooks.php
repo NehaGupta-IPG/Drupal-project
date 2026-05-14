@@ -132,7 +132,17 @@ class ResponsiveImageThemeHooks {
     // execution.
     if (!$responsive_image_style) {
       $variables['img_element'] = [];
-      ($this->loggerClosure)()->error('Failed to load responsive image style: “@style“ while displaying responsive image.', ['@style' => $variables['responsive_image_style_id']]);
+      ($this->loggerClosure)()->error('Failed to load responsive image style: “@style” while displaying responsive image.', ['@style' => $variables['responsive_image_style_id']]);
+      return;
+    }
+    // Gracefully handle zero-byte or otherwise unreadable image files to avoid
+    // fatal errors when the image toolkit tries to parse them.
+    if (!$this->responsiveImageBuilder->isImageValid($variables['uri'])) {
+      $variables['img_element'] = [];
+      ($this->loggerClosure)()->warning('Image file is not valid (possibly zero bytes) for URI “@uri”. Responsive image style “@style” was not applied.', [
+        '@uri' => $variables['uri'],
+        '@style' => $variables['responsive_image_style_id'],
+      ]);
       return;
     }
     // Retrieve all breakpoints and multipliers and reverse order of

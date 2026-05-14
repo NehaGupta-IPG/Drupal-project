@@ -11,6 +11,7 @@ use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\file\Entity\File;
 use Drupal\responsive_image\Entity\ResponsiveImageStyle;
 use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -100,6 +101,42 @@ class ResponsiveImageFormatterTest extends FieldKernelTestBase {
         'image_link' => 'content',
       ],
     ])->save();
+  }
+
+  /**
+   * Tests that zero-byte image files are rendered gracefully without errors.
+   */
+  public function testZeroByteImageRendersGracefully(): void {
+    // Create a zero-byte file, simulating a failed remote download during
+    // migration.
+    $uri = 'public://zero-byte-test.jpg';
+    file_put_contents($uri, '');
+    $file = File::create([
+      'uri' => $uri,
+      'filename' => 'zero-byte-test.jpg',
+      'filemime' => 'image/jpeg',
+      'status' => 1,
+    ]);
+    $file->save();
+
+    $entity = EntityTest::create([
+      'name' => $this->randomMachineName(),
+      $this->fieldName => [
+        'target_id' => $file->id(),
+        'alt' => 'Test image',
+      ],
+    ]);
+    $entity->save();
+
+    // Rendering must not throw an exception.
+    $build = $this->display->build($entity);
+    /** @var \Drupal\Core\Render\RendererInterface $renderer */
+    $renderer = $this->container->get('renderer');
+    $output = (string) $renderer->renderRoot($build[$this->fieldName][0]);
+
+    // A zero-byte image should not produce an img or source element.
+    $this->assertStringNotContainsString('<img', $output);
+    $this->assertStringNotContainsString('<source', $output);
   }
 
   /**
