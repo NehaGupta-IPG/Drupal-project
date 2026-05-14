@@ -79,21 +79,35 @@ class DrupalRuntime extends SymfonyRuntime {
       return $_SERVER[$this->options['env_var_name']] ?? 'prod';
     }
 
-    if ($type === ClassLoader::class) {
-      return $this->getClassLoader();
+    // In Symfony 8.1 and later SymfonyRuntime::getArgument will call
+    // resolveType for us, before that we need to do it ourselves.
+    if (!method_exists(SymfonyRuntime::class, 'resolveType')) {
+      return $this->resolveType($type) ?? parent::getArgument($parameter, $type);
     }
-
     return parent::getArgument($parameter, $type);
   }
 
   /**
-   * Get the composer classloader for this project.
+   * Resolves for the value of a specific type.
    *
-   * @return \Composer\Autoload\ClassLoader
-   *   The composer autoloader.
+   * Ensures that types that may be provided by getArgument but also used in the
+   * runtime can be instantiated only once, without having a lot of individual
+   * getter methods or duplicated static var with elvis patterns.
+   *
+   * @param string|null $type
+   *   The type of the variable to retrieve.
+   *
+   * @return mixed
+   *   The value for the resolved type or NULL if the type has no associated
+   *   value.
    */
-  protected function getClassLoader() : ClassLoader {
-    return require $this->getProjectDir() . "/vendor/autoload.php";
+  protected function resolveType(?string $type) {
+    return match ($type) {
+      ClassLoader::class => require $this->getProjectDir() . "/vendor/autoload.php",
+      // Until https://github.com/phpstan/phpstan/issues/9592 is fixed.
+      // @phpstan-ignore-next-line staticMethod.notFound
+      default => method_exists(SymfonyRuntime::class, 'resolveType') ? parent::resolveType($type) : NULL,
+    };
   }
 
   /**
