@@ -236,23 +236,44 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
 
     $routes_to_load = array_diff($names, array_keys($this->routes), array_keys($this->serializedRoutes));
     if ($routes_to_load) {
-
       $cid = static::ROUTE_LOAD_CID_PREFIX . hash('sha512', serialize($routes_to_load));
       if ($cache = $this->cache->get($cid)) {
-        $routes = $cache->data;
-      }
-      else {
-        try {
-          $result = $this->connection->query('SELECT [name], [route] FROM {' . $this->connection->escapeTable($this->tableName) . '} WHERE [name] IN ( :names[] )', [':names[]' => $routes_to_load]);
-          $routes = $result->fetchAllKeyed();
+        $this->serializedRoutes += $routes;
+        return;
+       }
+       // This runs directly in the critical path for every HTML request, and
+       // because it's via an event listener for the kernel.request event,
+       // before the controller is executed, it is one of the very first caches
+       // to be requested and built. Therefore, if we get a cache miss here,
+       // we're almost certainly in a cold cache situation for the entire site.
+       // DrupalKernel::handleRequest() executes request handling in a Fiber,
+       // and if a Fiber suspends, it calls the cache prewarming API in an
+       // attempt to distribute the warming of different caches in the case of
+       // a potential cache stampede. Therefore, detect if we're being executed
+       // inside a Fiber, and if so, suspend, to allow other caches to be
+       // prewarmed prior to moving on. If this isn't a stampede situation, it
+       // merely results in later caches being built out of order, but
+       // PreWarmableInterface implementations should ensure they protect
+       // against caches being built twice in a request.
+       if (\Fiber::getCurrent() !== NULL) {
+         \Fiber::suspend();
+         // Check for the cache item again in case it was set while we
+         // were suspended.
+         if ($cache = $this->cache->get($cid)) {
+          $routes = $cache->data;
+          $this->serializedRoutes += $routes;
+          return;
+         }
+       }
+      try {
+        $result = $this->connection->query('SELECT [name], [route] FROM {' . $this->connection->escapeTable($this->tableName) . '} WHERE [name] IN ( :names[] )', [':names[]' => $routes_to_load]);
+        $routes = $result->fetchAllKeyed();
 
-          $this->cache->set($cid, $routes, Cache::PERMANENT, ['routes']);
-        }
-        catch (\Exception) {
-          $routes = [];
-        }
+        $this->cache->set($cid, $routes, Cache::PERMANENT, ['routes']);
       }
-
+      catch (\Exception $e) {
+        $routes = [];
+      }
       $this->serializedRoutes += $routes;
     }
   }

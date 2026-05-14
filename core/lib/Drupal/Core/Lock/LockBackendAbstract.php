@@ -45,16 +45,27 @@ abstract class LockBackendAbstract implements LockBackendInterface {
     // Begin sleeping at 25ms.
     $sleep = 25000;
     while ($delay > 0) {
-      // This function should only be called by a request that failed to get a
-      // lock, so we sleep first to give the parallel request a chance to finish
-      // and release the lock.
+      // Check if we're executing inside a Fiber. If so, before sleeping,
+      // suspend the fiber in case some other code can run in the meantime. By
+      // the time that code has finished running, the lock may already be
+      // available.
+      // @see Drupal\Core\Prewarm\CachePrewarmer
+      if (\Fiber::getCurrent() !== NULL) {
+        \Fiber::suspend();
+      }
+      if ($this->lockMayBeAvailable($name)) {
+        // No longer need to wait.
+        return FALSE;
+      }
+      // If the lock is still not available, it's possible that the parent
+      // process immediately resumed the Fiber we're running in, so sleep
+      // to avoid a lock stampede.
       usleep($sleep);
-      // After each sleep, increase the value of $sleep until it reaches
-      // 500ms, to reduce the potential for a lock stampede.
+      // Also to avoid a lock stampede, slowly increase the value of $sleep
+      // the longer we wait, until it reaches 500ms.
       $delay = $delay - $sleep;
       $sleep = min(500000, $sleep + 25000, $delay);
       if ($this->lockMayBeAvailable($name)) {
-        // No longer need to wait.
         return FALSE;
       }
     }
