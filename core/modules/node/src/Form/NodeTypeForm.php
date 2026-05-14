@@ -3,9 +3,11 @@
 namespace Drupal\node\Form;
 
 use Drupal\Core\Entity\BundleEntityFormBase;
+use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Routing\RouteBuilderInterface;
 use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\node\NodePreviewMode;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -17,29 +19,21 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class NodeTypeForm extends BundleEntityFormBase {
 
-  /**
-   * The entity field manager.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
-   */
-  protected $entityFieldManager;
-
-  /**
-   * Constructs the NodeTypeForm object.
-   *
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   The entity field manager.
-   */
-  public function __construct(EntityFieldManagerInterface $entity_field_manager) {
-    $this->entityFieldManager = $entity_field_manager;
+  public function __construct(
+    protected EntityFieldManagerInterface $entityFieldManager,
+    protected EntityDisplayRepositoryInterface $entityDisplayRepository,
+    protected RouteBuilderInterface $routeBuilder,
+  ) {
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     return new static(
-      $container->get('entity_field.manager')
+      $container->get(EntityFieldManagerInterface::class),
+      $container->get(EntityDisplayRepositoryInterface::class),
+      $container->get(RouteBuilderInterface::class),
     );
   }
 
@@ -175,6 +169,18 @@ class NodeTypeForm extends BundleEntityFormBase {
       '#title' => $this->t('Display settings'),
       '#group' => 'additional_settings',
     ];
+    $full_display = NULL;
+    if (!$type->isNew()) {
+      $full_display = $this->entityDisplayRepository->getViewDisplay('node', $type->id(), 'full');
+    }
+    $form['display']['page_display'] = [
+      // @todo Move this to the entity view display edit form in
+      // https://www.drupal.org/project/drupal/issues/3484255
+      '#type' => 'checkbox',
+      '#title' => $this->t('Create page display'),
+      '#default_value' => $full_display === NULL || $full_display->hasPageDisplay() || $full_display->isNew(),
+      '#description' => $this->t('Enable this to give each content item its own page and URL.'),
+    ];
     $form['display']['display_submitted'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Display author and date information'),
@@ -225,6 +231,19 @@ class NodeTypeForm extends BundleEntityFormBase {
     $type->set('name', trim($type->label()));
 
     $status = $type->save();
+
+    // @todo Move this to the entity view display edit form in
+    // https://www.drupal.org/project/drupal/issues/3484255
+    $full_display = $this->entityDisplayRepository->getViewDisplay('node', $type->id(), 'full');
+    $original_display = $full_display->hasPageDisplay();
+    $new_display = (bool) $form_state->getValue('page_display');
+    // Save this if the value changed, or if the full display is new and we're
+    // turning off the display.
+    if (($full_display->isNew() && !$new_display)
+      || $original_display !== $new_display) {
+      $full_display->setPageDisplay($new_display)->save();
+      $this->routeBuilder->setRebuildNeeded();
+    }
 
     $t_args = ['%name' => $type->label()];
 

@@ -59,3 +59,4 @@ content:
     region: content
 hidden:
   name: true
+pageDisplay: false

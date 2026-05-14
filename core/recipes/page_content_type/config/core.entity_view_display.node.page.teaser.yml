@@ -25,3 +25,4 @@ content:
     weight: 101
     region: content
 hidden: {  }
+pageDisplay: false

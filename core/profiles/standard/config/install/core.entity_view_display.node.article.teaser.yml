@@ -50,3 +50,4 @@ content:
     region: content
 hidden:
   comment: true
+pageDisplay: false

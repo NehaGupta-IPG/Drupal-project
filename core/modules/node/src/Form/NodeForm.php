@@ -5,12 +5,15 @@ namespace Drupal\node\Form;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\ContentEntityForm;
+use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\TempStore\PrivateTempStoreFactory;
+use Drupal\Core\Url;
 use Drupal\Core\Utility\Error;
+use Drupal\node\NodeInterface;
 use Drupal\node\NodePreviewMode;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -274,6 +277,7 @@ class NodeForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
+    /** @var \Drupal\node\NodeInterface $node */
     $node = $this->entity;
     $insert = $node->isNew();
 
@@ -297,16 +301,7 @@ class NodeForm extends ContentEntityForm {
 
       $form_state->setValue('nid', $node->id());
       $form_state->set('nid', $node->id());
-      if ($node->access('view')) {
-        $form_state->setRedirect(
-          'entity.node.canonical',
-          ['node' => $node->id()],
-          ['language' => $node->language()]
-        );
-      }
-      else {
-        $form_state->setRedirect('<front>');
-      }
+      $form_state->setRedirectUrl($this->buildRedirectUrl($node));
 
       // Remove the preview entry from the temp store, if any.
       $store = $this->tempStoreFactory->get('node_preview');
@@ -323,6 +318,39 @@ class NodeForm extends ContentEntityForm {
       \Drupal::logger('node')->error('%type saving node form: @message in %function (line %line of %file) @backtrace_string.', Error::decodeException($e));
       $form_state->setRebuild();
     }
+  }
+
+  /**
+   * Builds the redirect URL after submitting the node form.
+   *
+   * If the full view mode for this node type is disabled, then redirecting to
+   * the canonical URL will result in a 404 Not Found. In that case we attempt
+   * to redirect to the collection URL.
+   *
+   * If the user doesn't have access to the canonical or collection URLs, we
+   * redirect to the front page.
+   *
+   * @param \Drupal\node\NodeInterface $node
+   *   The node being edited.
+   *
+   * @return \Drupal\Core\Url
+   *   The redirect URL.
+   */
+  protected function buildRedirectUrl(NodeInterface $node): Url {
+    try {
+      $node_url = $node->toUrl();
+
+      if ($node_url->access()) {
+        return $node_url;
+      }
+      if ($this->currentUser->hasPermission('access content overview')) {
+        return Url::fromRoute('system.admin_content');
+      }
+    }
+    catch (EntityMalformedException) {
+    }
+
+    return Url::fromRoute('<front>');
   }
 
 }

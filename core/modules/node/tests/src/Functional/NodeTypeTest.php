@@ -93,11 +93,16 @@ class NodeTypeTest extends NodeTestBase {
       'bypass node access',
       'administer content types',
       'administer node fields',
+      'access content overview',
     ]);
     $this->drupalLogin($web_user);
 
     $field = FieldConfig::loadByName('node', 'page', 'body');
     $this->assertEquals('Body', $field->getLabel(), 'Body field was found.');
+
+    $node = $this->drupalCreateNode(['type' => 'page']);
+    $this->drupalGet($node->toUrl());
+    $this->assertSession()->statusCodeEquals(200);
 
     // Verify that title and body fields are displayed.
     $this->drupalGet('node/add/page');
@@ -105,23 +110,39 @@ class NodeTypeTest extends NodeTestBase {
     $assert->pageTextContains('Body');
 
     // Rename the title field.
-    $edit = [
-      'title_label' => 'Foo',
-    ];
     $this->drupalGet('admin/structure/types/manage/page');
-    $this->submitForm($edit, 'Save');
+    $this->assertSession()->checkboxChecked('page_display');
+    $this->submitForm([
+      'title_label' => 'Foo',
+      'page_display' => FALSE,
+    ], 'Save');
+
+    // Assert page display is disabled.
+    $this->drupalGet($node->toUrl());
+    $this->assertSession()->statusCodeEquals(404);
 
     $this->drupalGet('node/add/page');
     $assert->pageTextContains('Foo');
     $assert->pageTextNotContains('Title');
+    $node_title = $this->randomMachineName();
+    $this->submitForm([
+      'title[0][value]' => $node_title,
+      'body[0][value]' => $this->randomMachineName(),
+    ], 'Save');
+    $node = $this->drupalGetNodeByTitle($node_title);
+    self::assertNotNull($node);
+    // Saving a node with no page display should return to the collection.
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->addressEquals(Url::fromRoute('system.admin_content'));
 
     // Change the name and the description.
-    $edit = [
+    $this->drupalGet('admin/structure/types/manage/page');
+    $this->assertSession()->checkboxNotChecked('page_display');
+    $this->submitForm([
       'name' => 'Bar',
       'description' => 'Lorem ipsum.',
-    ];
-    $this->drupalGet('admin/structure/types/manage/page');
-    $this->submitForm($edit, 'Save');
+      'page_display' => TRUE,
+    ], 'Save');
 
     $this->drupalGet('node/add');
     $assert->pageTextContains('Bar');

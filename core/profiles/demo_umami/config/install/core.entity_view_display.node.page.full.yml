@@ -82,3 +82,4 @@ content:
 hidden:
   langcode: true
   layout_builder__layout: true
+pageDisplay: true

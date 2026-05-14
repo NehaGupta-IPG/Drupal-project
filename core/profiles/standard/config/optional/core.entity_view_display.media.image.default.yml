@@ -28,3 +28,4 @@ hidden:
   thumbnail: true
   uid: true
   name: true
+pageDisplay: false

@@ -26,3 +26,4 @@ hidden:
   field_media_test_oembed_video: true
   name: true
   uid: true
+pageDisplay: false

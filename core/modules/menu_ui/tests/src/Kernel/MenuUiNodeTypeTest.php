@@ -59,7 +59,7 @@ class MenuUiNodeTypeTest extends KernelTestBase {
     Menu::create(['id' => 'a', 'label' => 'Z'])->save();
     Menu::create(['id' => 'b', 'label' => 'X'])->save();
     Menu::create(['id' => 'c', 'label' => 'Y'])->save();
-    $this->assertMenuNamesAreSorted(NodeType::create());
+    $this->assertMenuNamesAreSorted(NodeType::create(['type' => $this->randomMachineName()]));
     $this->assertMenuNamesAreSorted($this->createContentType());
   }
 

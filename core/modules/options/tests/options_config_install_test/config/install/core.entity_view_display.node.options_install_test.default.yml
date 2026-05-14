@@ -17,3 +17,4 @@ content:
     region: content
 hidden:
   langcode: true
+pageDisplay: false

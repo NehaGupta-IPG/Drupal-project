@@ -27,3 +27,4 @@ content:
     weight: 0
     region: content
 hidden: {  }
+pageDisplay: false

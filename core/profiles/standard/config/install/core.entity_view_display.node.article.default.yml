@@ -60,3 +60,4 @@ content:
     weight: 100
     region: content
 hidden: {  }
+pageDisplay: false

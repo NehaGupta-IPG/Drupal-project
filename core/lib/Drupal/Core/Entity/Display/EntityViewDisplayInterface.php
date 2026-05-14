@@ -46,4 +46,31 @@ interface EntityViewDisplayInterface extends EntityDisplayInterface {
    */
   public function buildMultiple(array $entities);
 
+  /**
+   * True if this entity view display has a page display.
+   *
+   * Support for this functionality is limited to the 'node' entity-type and the
+   * 'full' view mode. Support for other entity-types will be added in
+   * https://www.drupal.org/project/drupal/issues/3484255.
+   *
+   * @return bool
+   *   TRUE when this view display is routed.
+   */
+  public function hasPageDisplay(): bool;
+
+  /**
+   * Set has page display.
+   *
+   * Support for this functionality is limited to the 'node' entity-type and the
+   * 'full' view mode. Support for other entity-types will be added in
+   * https://www.drupal.org/project/drupal/issues/3484255.
+   *
+   * @param bool $hasPageDisplay
+   *   TRUE to enable a page display for this view mode.
+   *
+   * @return bool
+   *   TRUE when this view display is routed.
+   */
+  public function setPageDisplay(bool $hasPageDisplay = TRUE): static;
+
 }

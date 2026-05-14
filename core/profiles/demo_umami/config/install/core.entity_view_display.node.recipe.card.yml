@@ -52,3 +52,4 @@ hidden:
   langcode: true
   layout_builder__layout: true
   links: true
+pageDisplay: false

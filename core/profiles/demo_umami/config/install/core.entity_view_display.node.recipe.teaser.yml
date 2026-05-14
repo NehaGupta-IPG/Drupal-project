@@ -39,3 +39,4 @@ hidden:
   field_tags: true
   langcode: true
   layout_builder__layout: true
+pageDisplay: false

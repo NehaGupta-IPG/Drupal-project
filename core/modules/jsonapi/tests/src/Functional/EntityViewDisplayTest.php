@@ -122,6 +122,7 @@ class EntityViewDisplayTest extends ConfigEntityResourceTestBase {
           'status' => TRUE,
           'targetEntityType' => 'node',
           'drupal_internal__id' => 'node.camelids.default',
+          'pageDisplay' => FALSE,
         ],
       ],
     ];

@@ -40,6 +40,7 @@ class EntityViewDisplayAccessControlHandlerTest extends EntityFormDisplayAccessC
       'mode' => 'default',
       'id' => 'foobar.new_bundle.default',
       'uuid' => '6f2f259a-f3c7-42ea-bdd5-111ad1f85ed1',
+      'pageDisplay' => FALSE,
     ], 'entity_display');
     $this->accessControlHandler = new EntityViewDisplayAccessControlHandler($this->entity->getEntityType());
     $this->accessControlHandler->setModuleHandler($this->moduleHandler);

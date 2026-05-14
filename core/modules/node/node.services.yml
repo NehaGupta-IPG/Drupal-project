@@ -6,6 +6,7 @@ services:
     autoconfigure: true
     autowire: true
   node.route_subscriber:
+    autowire: true
     class: Drupal\node\Routing\RouteSubscriber
   Drupal\node\NodeGrantsHelper: ~
   node.grant_storage:

@@ -88,6 +88,9 @@ core.entity_view_display.*.*.*:
       sequence:
         type: boolean
         label: 'Value'
+    pageDisplay:
+      type: boolean
+      label: 'Add a page display for this view mode'
 
 field_formatter:
   type: mapping

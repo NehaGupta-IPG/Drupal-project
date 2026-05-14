@@ -34,3 +34,4 @@ hidden:
   created: true
   name: true
   uid: true
+pageDisplay: false
