@@ -87,7 +87,7 @@ class NavigationHooks {
     }
     $this->navigationRenderer->removeToolbar($page_top);
     $this->navigationRenderer->buildNavigation($page_top);
-    $this->navigationRenderer->buildTopBar($page_top);
+    // $this->navigationRenderer->buildTopBar($page_top);
   }
 
   /**
@@ -108,7 +108,7 @@ class NavigationHooks {
     if ($this->currentUser->hasPermission('access navigation') &&
       array_key_exists('page_actions', $this->topBarItemManager->getDefinitions())
     ) {
-      $this->navigationRenderer->removeLocalTasks($build, $block);
+      // $this->navigationRenderer->removeLocalTasks($build, $block);
     }
   }
 
