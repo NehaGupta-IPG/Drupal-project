@@ -185,10 +185,10 @@ function locale_translate_batch_import($file, array $options, &$context): void {
         }
       }
     }
-    catch (Exception) {
+    catch (Exception $e) {
       // Import failed. Store the data of the failing file.
       $context['results']['failed_files'][] = $file;
-      \Drupal::logger('locale')->notice('Unable to import translations file: @file', ['@file' => $file->uri]);
+      \Drupal::logger('locale')->notice('Unable to import translations file: @file because: @message', ['@file' => $file->uri, '@message' => $e->getMessage()]);
     }
   }
 }
