@@ -187,4 +187,16 @@ abstract class FormatterBase extends PluginSettingsBase implements FormatterInte
     return TRUE;
   }
 
+  /**
+   * Adds a warning message if the format is not available.
+   *
+   * @param \Drupal\Core\Field\FieldItemListInterface $items
+   *   The field items.
+   */
+  protected function addInvalidFormatWarning(FieldItemListInterface $items): void {
+    $this->messenger()->addWarning($this->t('The %field field is not displayed because the text format used is not available. You may need to edit this content and select a different text format.', [
+      '%field' => $items->getFieldDefinition()->getLabel(),
+    ]));
+  }
+
 }

@@ -108,4 +108,47 @@ class TextItemBaseTest extends KernelTestBase {
     ], $field->getDependencies());
   }
 
+  /**
+   * Tests onDependencyRemoval method when a filter format is deleted.
+   */
+  public function testOnDependencyRemoval(): void {
+    $this->installEntitySchema('user');
+    $this->installEntitySchema('entity_test');
+    // Create a filter format.
+    $format = FilterFormat::create([
+      'format' => 'test_format',
+      'name' => 'Test format',
+    ]);
+    $format->save();
+
+    // Create a text field with the filter format as an allowed format.
+    $field_name = $this->randomMachineName();
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'entity_test',
+      'type' => 'text',
+    ]);
+    $field_storage->save();
+    $field = FieldConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'entity_test',
+      'bundle' => 'entity_test',
+      'settings' => [
+        'allowed_formats' => [$format->id()],
+      ],
+    ]);
+    $field->save();
+
+    // Verify the filter format is in the dependencies and remove it.
+    $dependencies = $field->getDependencies();
+    $this->assertContains('filter.format.test_format', $dependencies['config']);
+    $format->delete();
+
+    // Assert that the field still exists after deleting the filter format
+    // and that the allowed_formats setting is updated.
+    $field_after_deletion = FieldConfig::loadByName('entity_test', 'entity_test', $field_name);
+    $this->assertNotNull($field_after_deletion, 'Field should still exist after filter format deletion');
+    $this->assertEmpty($field_after_deletion->getSetting('allowed_formats'));
+  }
+
 }

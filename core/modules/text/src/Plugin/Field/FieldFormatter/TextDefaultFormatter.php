@@ -6,6 +6,7 @@ use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\filter\Entity\FilterFormat;
 
 /**
  * Plugin implementation of the 'text_default' formatter.
@@ -26,10 +27,18 @@ class TextDefaultFormatter extends FormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
+    $warning = FALSE;
 
     // The ProcessedText element already handles cache context & tag bubbling.
     // @see \Drupal\filter\Element\ProcessedText::preRenderText()
     foreach ($items as $delta => $item) {
+      if ($item->format && !$warning) {
+        $format = FilterFormat::load($item->format);
+        if ((!$format || !$format->status())) {
+          $this->addInvalidFormatWarning($items);
+          $warning = TRUE;
+        }
+      }
       $elements[$delta] = [
         '#type' => 'processed_text',
         '#text' => $item->value,

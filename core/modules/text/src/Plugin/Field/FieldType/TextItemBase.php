@@ -8,6 +8,8 @@ use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\field\FieldConfigInterface;
+use Drupal\filter\FilterFormatInterface;
 use Drupal\filter\FilterFormatRepositoryInterface;
 
 /**
@@ -69,6 +71,35 @@ abstract class TextItemBase extends FieldItemBase {
     $config = $dependencies['config'] ?? [];
     $dependencies['config'] = array_merge($config, $format_dependencies);
     return $dependencies;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function onDependencyRemoval(FieldDefinitionInterface $field_definition, array $dependencies): bool {
+    $changed = parent::onDependencyRemoval($field_definition, $dependencies);
+
+    if (!$field_definition instanceof FieldConfigInterface || !isset($dependencies['config'])) {
+      return $changed;
+    }
+
+    foreach ($dependencies['config'] as $config) {
+      if (!$config instanceof FilterFormatInterface) {
+        continue;
+      }
+      $settings = $field_definition->getSettings();
+      $allowed_formats = $settings['allowed_formats'] ?? [];
+      if (!in_array($config->id(), $allowed_formats, TRUE)) {
+        continue;
+      }
+      // Remove deleted filter format from allowed_formats so that the field
+      // configuration entity is not deleted.
+      $settings['allowed_formats'] = array_diff($allowed_formats, [$config->id()]);
+      $field_definition->set('settings', $settings);
+      $changed = TRUE;
+    }
+
+    return $changed;
   }
 
   /**
