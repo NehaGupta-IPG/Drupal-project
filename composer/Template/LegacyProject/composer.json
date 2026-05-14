@@ -1,5 +1,6 @@
 {
     "name": "drupal/legacy-project",
+    "abandoned": "drupal/recommended-project",
     "description": "Project template for Drupal projects with composer following drupal/drupal layout",
     "type": "project",
     "license": "GPL-2.0-or-later",
@@ -40,7 +41,8 @@
             "phpstan/extension-installer": true,
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "php-http/discovery": true,
-            "php-tuf/composer-integration": true
+            "php-tuf/composer-integration": true,
+            "symfony/runtime": true
         },
         "sort-packages": true
     },

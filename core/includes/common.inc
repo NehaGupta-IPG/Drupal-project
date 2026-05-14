@@ -54,16 +54,6 @@ const SAVED_NEW = 1;
 const SAVED_UPDATED = 2;
 
 /**
- * Return status for saving which deleted an existing item.
- *
- * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
- *   There is no replacement.
- *
- * @see https://www.drupal.org/node/3328750
- */
-const SAVED_DELETED = 3;
-
-/**
  * The default aggregation group for CSS files added to the page.
  */
 const CSS_AGGREGATE_DEFAULT = 0;
@@ -289,14 +279,8 @@ function drupal_attach_tabledrag(&$element, array $options): void {
 /**
  * Hides an element from later rendering.
  *
- * The first time render() or RenderInterface::render() is called on an element
- * tree, as each element in the tree is rendered, it is marked with a #printed
- * flag and the rendered children of the element are cached. Subsequent calls to
- * render() or RenderInterface::render() will not traverse the child tree of
- * this element again: they will just use the cached children. So if you want to
- * hide an element, be sure to call hide() on the element before its parent tree
- * is rendered for the first time, as it will have no effect on subsequent
- * renderings of the parent tree.
+ * Refer to \Drupal\Core\Render\RendererInterface::render()
+ * for additional documentation.
  *
  * @param array $element
  *   The element to be hidden.
@@ -304,11 +288,15 @@ function drupal_attach_tabledrag(&$element, array $options): void {
  * @return array
  *   The element.
  *
- * @see \Drupal\Core\Render\RendererInterface
- * @see render()
- * @see show()
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. To hide form
+ *   elements, use ['#access'] = FALSE. For render elements, use
+ *   ['#printed'] = TRUE.
+ *
+ * @see https://www.drupal.org/node/3261271
+ * @see \Drupal\Core\Render\RendererInterface::render()
  */
 function hide(&$element) {
+  @trigger_error("The global hide() function is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. To hide form elements, use ['#access'] = FALSE. For render elements, use ['#printed'] = TRUE. See https://www.drupal.org/node/3261271", E_USER_DEPRECATED);
   $element['#printed'] = TRUE;
   return $element;
 }
@@ -316,17 +304,8 @@ function hide(&$element) {
 /**
  * Shows a hidden element for later rendering.
  *
- * You can also use render($element), which shows the element while rendering
- * it.
- *
- * The first time render() or RenderInterface::render() is called on an element
- * tree, as each element in the tree is rendered, it is marked with a #printed
- * flag and the rendered children of the element are cached. Subsequent calls to
- * render() or RenderInterface::render() will not traverse the child tree of
- * this element again: they will just use the cached children. So if you want to
- * show an element, be sure to call show() on the element before its parent tree
- * is rendered for the first time, as it will have no effect on subsequent
- * renderings of the parent tree.
+ * Refer to \Drupal\Core\Render\RendererInterface::render()
+ * for additional documentation.
  *
  * @param array $element
  *   The element to be shown.
@@ -334,11 +313,15 @@ function hide(&$element) {
  * @return array
  *   The element.
  *
- * @see \Drupal\Core\Render\RendererInterface
- * @see render()
- * @see hide()
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. To show form
+ *   elements, use ['#access'] = TRUE. For render elements, use
+ *   ['#printed'] = FALSE.
+ *
+ * @see https://www.drupal.org/node/3261271
+ * @see \Drupal\Core\Render\RendererInterface::render()
  */
 function show(&$element) {
+  @trigger_error("The global show() function is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. To show form elements, use ['#access'] = TRUE. For render elements, use ['#printed'] = FALSE. See https://www.drupal.org/node/3261271", E_USER_DEPRECATED);
   $element['#printed'] = FALSE;
   return $element;
 }
@@ -440,9 +423,8 @@ function drupal_flush_all_caches($kernel = NULL): void {
   // Wipe the Twig PHP Storage cache.
   \Drupal::service('twig')->invalidate();
 
-  // Rebuild profile, profile, theme_engine and theme data.
+  // Rebuild profile and theme data.
   \Drupal::service('extension.list.profile')->reset();
-  \Drupal::service('extension.list.theme_engine')->reset();
   \Drupal::service('theme_handler')->refreshInfo();
   // In case the active theme gets requested later in the same request we need
   // to reset the theme manager.

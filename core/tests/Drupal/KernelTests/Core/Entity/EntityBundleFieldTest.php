@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Field\FieldPurger;
 use Drupal\entity_test\EntityTestHelper;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -21,13 +22,6 @@ class EntityBundleFieldTest extends EntityKernelTestBase {
   protected static $modules = ['entity_schema_test', 'entity_test_update'];
 
   /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
    * The database connection used.
    *
    * @var \Drupal\Core\Database\Connection
@@ -41,7 +35,6 @@ class EntityBundleFieldTest extends EntityKernelTestBase {
     parent::setUp();
     $this->installSchema('user', ['users_data']);
     $this->installEntitySchema('entity_test_update');
-    $this->moduleHandler = $this->container->get('module_handler');
     $this->database = $this->container->get('database');
   }
 
@@ -69,7 +62,6 @@ class EntityBundleFieldTest extends EntityKernelTestBase {
     // Ensure that the field exists in the field map.
     $field_map = \Drupal::service('entity_field.manager')->getFieldMap();
     $this->assertEquals(['type' => 'string', 'bundles' => ['custom' => 'custom']], $field_map['entity_test_update']['custom_bundle_field']);
-
     $entity->custom_bundle_field->value = 'swanky';
     $entity->save();
     $storage->resetCache();
@@ -112,7 +104,7 @@ class EntityBundleFieldTest extends EntityKernelTestBase {
 
     // Purge field data, and check that the storage definition has been
     // completely removed once the data is purged.
-    field_purge_batch(10);
+    \Drupal::service(FieldPurger::class)->purgeBatch(10);
     $this->assertFalse($this->database->schema()->tableExists($table), 'Custom field table was deleted');
   }
 

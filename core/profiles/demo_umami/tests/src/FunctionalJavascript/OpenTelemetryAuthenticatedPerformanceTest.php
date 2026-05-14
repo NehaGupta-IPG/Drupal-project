@@ -61,12 +61,12 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 3,
-      'CacheGetCount' => 33,
+      'CacheGetCount' => 34,
       'CacheGetCountByBin' => [
         'config' => 12,
         'bootstrap' => 7,
         'discovery' => 5,
-        'data' => 5,
+        'data' => 6,
         'dynamic_page_cache' => 2,
         'render' => 2,
       ],
@@ -100,7 +100,6 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
       'access site reports',
       'administer users',
       'access navigation',
-      'administer shortcuts',
       'administer media',
       'access files overview',
       'administer blocks',
@@ -127,26 +126,26 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
     }, 'administratorNodePage');
 
     $expected = [
-      'QueryCount' => 295,
-      'CacheGetCount' => 283,
+      'QueryCount' => 261,
+      'CacheGetCount' => 251,
       'CacheGetCountByBin' => [
-        'config' => 66,
+        'config' => 60,
         'bootstrap' => 16,
-        'discovery' => 85,
-        'data' => 23,
-        'entity' => 25,
+        'discovery' => 75,
+        'data' => 20,
+        'entity' => 24,
         'dynamic_page_cache' => 1,
-        'default' => 22,
-        'render' => 23,
+        'default' => 20,
+        'render' => 13,
         'menu' => 22,
       ],
-      'CacheSetCount' => 280,
+      'CacheSetCount' => 255,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 30,
-      'ScriptCount' => 5,
-      'ScriptBytes' => 198900,
-      'StylesheetCount' => 8,
+      'CacheTagLookupQueryCount' => 28,
+      'ScriptCount' => 4,
+      'ScriptBytes' => 200400,
+      'StylesheetCount' => 7,
       'StylesheetBytes' => 79412,
     ];
     $this->assertMetrics($expected, $performance_data);

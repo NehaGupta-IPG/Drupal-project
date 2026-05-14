@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\editor\Unit\EditorXssFilter;
 
 use Drupal\editor\EditorXssFilter\Standard;
+use Drupal\filter\Entity\FilterFormat;
 use Drupal\filter\Plugin\FilterInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -24,7 +25,7 @@ class StandardTest extends UnitTestCase {
   /**
    * The mocked text format configuration entity.
    *
-   * @var \Drupal\filter\Entity\FilterFormat|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\filter\Entity\FilterFormat|\PHPUnit\Framework\MockObject\Stub
    */
   protected $format;
 
@@ -35,10 +36,8 @@ class StandardTest extends UnitTestCase {
     parent::setUp();
 
     // Mock text format configuration entity object.
-    $this->format = $this->getMockBuilder('\Drupal\filter\Entity\FilterFormat')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->format->expects($this->any())
+    $this->format = $this->createStub(FilterFormat::class);
+    $this->format
       ->method('getFilterTypes')
       ->willReturn([FilterInterface::TYPE_HTML_RESTRICTOR]);
     $restrictions = [
@@ -51,7 +50,7 @@ class StandardTest extends UnitTestCase {
         ],
       ],
     ];
-    $this->format->expects($this->any())
+    $this->format
       ->method('getHtmlRestrictions')
       ->willReturn($restrictions);
   }
@@ -61,7 +60,7 @@ class StandardTest extends UnitTestCase {
    *
    * @see \Drupal\Tests\editor\Unit\editor\EditorXssFilter\StandardTest::testFilterXss()
    */
-  public static function providerTestFilterXss() {
+  public static function providerTestFilterXss(): array {
     $data = [];
     $data[] = [
       '<p>Hello, world!</p><unknown>Pink Fairy Armadillo</unknown>',
@@ -752,7 +751,7 @@ xss:ex/*XSS*//*/*/pression(alert("XSS"))\'>',
    *   \Drupal\Component\Utility\Xss::filter().
    */
   #[DataProvider('providerTestDisallowMode')]
-  public function testDisallowMode($value, $expected, $message, array $disallowed_tags): void {
+  public function testDisallowMode(string $value, string $expected, string $message, array $disallowed_tags): void {
     $value = Standard::filter($value, $disallowed_tags);
     $this->assertSame($expected, $value, $message);
   }
@@ -770,7 +769,7 @@ xss:ex/*XSS*//*/*/pression(alert("XSS"))\'>',
    *     - (optional) The disallowed HTML tags to be passed to
    *       \Drupal\Component\Utility\Xss::filter().
    */
-  public static function providerTestDisallowMode() {
+  public static function providerTestDisallowMode(): array {
     return [
       [
         '<unknown style="visibility:hidden">Pink Fairy Armadillo</unknown><video src="gerenuk.mp4"><script>alert(0)</script>',

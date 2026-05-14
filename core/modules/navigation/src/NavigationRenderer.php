@@ -2,6 +2,7 @@
 
 namespace Drupal\navigation;
 
+use Drupal\big_pipe\Render\Placeholder\BigPipeStrategy;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Block\BlockPluginInterface;
@@ -130,23 +131,8 @@ final class NavigationRenderer {
       ->addCacheableDependency($this->configFactory->get('navigation.block_layout'));
     $cacheability->applyTo($build);
 
-    $module_path = $this->requestStack->getCurrentRequest()->getBasePath() . '/' . $this->moduleExtensionList->getPath('navigation');
-    $asset_url = $module_path . '/assets/fonts/inter-var.woff2';
-
     $defaults = [
       '#settings' => ['hide_logo' => $logo_provider === self::LOGO_PROVIDER_HIDE],
-      '#attached' => [
-        'html_head_link' => [
-          [
-            [
-              'rel' => 'preload',
-              'href' => $asset_url,
-              'as' => 'font',
-              'crossorigin' => 'anonymous',
-            ],
-          ],
-        ],
-      ],
     ];
     $build[0] = NestedArray::mergeDeepArray([$build[0], $defaults]);
 
@@ -212,6 +198,9 @@ final class NavigationRenderer {
           'max-age' => CacheBackendInterface::CACHE_PERMANENT,
         ],
         '#lazy_builder' => ['navigation.renderer:doBuildTopBar', []],
+        '#placeholder_strategy_denylist' => [
+          BigPipeStrategy::class => TRUE,
+        ],
         '#create_placeholder' => TRUE,
       ];
     }

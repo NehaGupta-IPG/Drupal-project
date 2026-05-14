@@ -391,7 +391,7 @@ class BlockTest extends BlockTestBase {
    *   The machine name of the theme region to move the block to, for example
    *   'header' or 'sidebar_first'.
    */
-  public function moveBlockToRegion(array $block, $region): void {
+  public function moveBlockToRegion(array $block, string $region): void {
     // Set the created block to a specific region.
     $block += ['theme' => $this->config('system.theme')->get('default')];
     $edit = [];
@@ -641,6 +641,25 @@ class BlockTest extends BlockTestBase {
     $this->clickLink('Disable');
     $elements = $this->xpath('//table/tbody/tr//td[contains(@class, "block")]');
     $this->assertEquals("$title (disabled)", $elements[0]->getText());
+  }
+
+  /**
+   * Tests a combined page title, content, and messages block.
+   */
+  public function testTitleContentMessagesSingleBlock(): void {
+    // Place block which implements MainContentBlockPluginInterface,
+    // TitleBlockPluginInterface, and MessagesBlockPluginInterface.
+    $this->drupalPlaceBlock('test_title_content_message_block');
+    $this->drupalGet('');
+
+    // Ensure the block's setTitle function was called.
+    $this->assertSession()->pageTextContains('Page title has been placed in the block.');
+
+    // Ensure the block's setMainContent function was called.
+    $this->assertSession()->pageTextContains('Main content has been placed in the block.');
+
+    // Ensure the status message is shown.
+    $this->assertSession()->statusMessageContains('This is a status message.', 'status');
   }
 
 }

@@ -8,7 +8,6 @@ use Drupal\Component\Utility\Number;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -31,7 +30,7 @@ class NumberTest extends TestCase {
    *   Expected return value from Number::validStep().
    */
   #[DataProvider('providerTestValidStep')]
-  public function testValidStep($value, $step, $expected): void {
+  public function testValidStep(float|int $value, float|int $step, bool $expected): void {
     $return = Number::validStep($value, $step);
     $this->assertEquals($expected, $return);
   }
@@ -49,7 +48,7 @@ class NumberTest extends TestCase {
    *   Expected return value from Number::validStep().
    */
   #[DataProvider('providerTestValidStepOffset')]
-  public function testValidStepOffset($value, $step, $offset, $expected): void {
+  public function testValidStepOffset(float|int $value, float|int $step, int|float $offset, bool $expected): void {
     $return = Number::validStep($value, $step, $offset);
     $this->assertEquals($expected, $return);
   }
@@ -128,7 +127,7 @@ class NumberTest extends TestCase {
    * @legacy-covers ::alphadecimalToInt
    */
   #[DataProvider('providerTestConversions')]
-  public function testConversions($value, $expected): void {
+  public function testConversions(int $value, string $expected): void {
     $this->assertSame(Number::intToAlphadecimal($value), $expected);
     $this->assertSame($value, Number::alphadecimalToInt($expected));
   }
@@ -165,21 +164,6 @@ class NumberTest extends TestCase {
     $this->expectException(\InvalidArgumentException::class);
     $nonAlphanumericChar = '#';
     Number::alphadecimalToInt($nonAlphanumericChar);
-  }
-
-  /**
-   * Tests the alphadecimal conversion function keeps backward compatibility.
-   *
-   * Many tests and code rely on Number::alphadecimalToInt() returning 0
-   * for degenerate values '' and NULL. We must ensure they are accepted.
-   */
-  #[IgnoreDeprecations]
-  public function testAlphadecimalToIntReturnsZeroWithNullAndEmptyString(): void {
-    $deprecationMessage = 'Passing NULL or an empty string to Drupal\Component\Utility\Number::alphadecimalToInt() is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. See https://www.drupal.org/node/3494472';
-    $this->expectUserDeprecationMessage($deprecationMessage);
-    $this->assertSame(0, Number::alphadecimalToInt(NULL));
-    $this->expectUserDeprecationMessage($deprecationMessage);
-    $this->assertSame(0, Number::alphadecimalToInt(''));
   }
 
 }
