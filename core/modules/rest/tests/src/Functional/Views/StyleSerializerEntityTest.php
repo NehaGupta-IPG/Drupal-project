@@ -504,7 +504,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
     $storage = $this->container->get('entity_type.manager')->getStorage('entity_test');
 
     // Update the name for each to include a script tag.
-    foreach ($storage->loadMultiple() as $entity_test) {
+    foreach ($storage->loadByProperties() as $entity_test) {
       $name = $entity_test->name->value;
       $entity_test->set('name', "<script>$name</script>");
       $entity_test->save();

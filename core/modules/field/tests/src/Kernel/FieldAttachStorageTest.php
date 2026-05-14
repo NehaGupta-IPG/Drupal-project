@@ -140,7 +140,7 @@ class FieldAttachStorageTest extends FieldKernelTestBase {
     // Check that a single load correctly loads field values for both entities.
     $controller = \Drupal::entityTypeManager()->getStorage($entity->getEntityTypeId());
     $controller->resetCache();
-    $entities = $controller->loadMultiple();
+    $entities = $controller->loadByProperties();
     foreach ($entities as $index => $entity) {
       foreach ($field_names as $field_name) {
         if (!$entity->hasField($field_name)) {

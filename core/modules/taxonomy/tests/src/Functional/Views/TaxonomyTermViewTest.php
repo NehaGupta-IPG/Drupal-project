@@ -136,9 +136,9 @@ class TaxonomyTermViewTest extends TaxonomyTestBase {
 
     // We also have to remove the nodes created by the parent ::setUp() method
     // if we want to be able to uninstall the Content Translation module.
-    foreach (Node::loadMultiple() as $node) {
-      $node->delete();
-    }
+    $storage = \Drupal::entityTypeManager()->getStorage('node');
+    $storage->delete($storage->loadByProperties());
+
     \Drupal::service('module_installer')->uninstall(['content_translation', 'language']);
 
     $view = Views::getView('taxonomy_term');
