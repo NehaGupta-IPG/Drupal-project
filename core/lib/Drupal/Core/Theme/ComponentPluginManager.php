@@ -37,7 +37,10 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
 
   use CategorizingPluginManagerTrait;
 
-  const MAXIMUM_RECURSION_LEVEL = 10;
+  /**
+   * Maximum recursion depth for the JSON schema reference resolver.
+   */
+  private const int MAXIMUM_RECURSION_LEVEL = 5;
 
   /**
    * JSON schema storage utility used for resolving references.
@@ -583,18 +586,15 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
    *   JSON schema of a component, with references resolved.
    */
   private function doResolveJsonSchemaReferences(string|int $key, array $schema, array $required, int $depth = 0): array {
-    if ($depth > self::MAXIMUM_RECURSION_LEVEL) {
-      return $schema;
+    if (isset($schema['$ref']) && is_string($schema['$ref'])) {
+      $depth++;
     }
-
-    $depth++;
 
     try {
       $schema = BaseConstraint::arrayToObjectRecursive($schema);
       $refSchema = (array) $this->schemaStorage->resolveRefSchema($schema);
       $schema = (array) $schema;
       unset($schema['$ref']);
-
       // Merge referenced schema into the current schema.
       $schema += $refSchema;
     }
@@ -607,7 +607,14 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
       $schema = (array) $schema;
     }
 
-    // Recursively resolve nested objects.
+    if ($depth > self::MAXIMUM_RECURSION_LEVEL) {
+      // If we reach the limit, we keep only the `type` property as the leaf.
+      return isset($schema['type']) ? [
+        'type' => $schema['type'],
+      ] : [];
+    }
+
+    // Recursively resolve nested levels.
     foreach ($schema as $next_key => $value) {
       if (is_object($value)) {
         if (isset($schema['type']) && $schema['type'] === 'object') {

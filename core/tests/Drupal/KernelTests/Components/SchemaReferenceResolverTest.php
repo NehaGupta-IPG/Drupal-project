@@ -44,9 +44,9 @@ class SchemaReferenceResolverTest extends ComponentKernelTestBase {
    */
   protected function getExpectations(): array {
     $expectations = [];
+    $system = self::getDataFromJson('theme', 'sdc_theme_test_references', 'schema.json');
     // $ref: theme://image/schema.json#image
-    $expectations['image'] = $this->getDataFromJson('theme', 'sdc_theme_test_references', 'schema.json')['image'];
-    $system = $this->getDataFromJson('theme', 'sdc_theme_test_references', 'schema.json');
+    $expectations['image'] = $system['image'];
     // $ref: theme://system/schema.json#attributes
     $expectations['attributes'] = $system['attributes'];
     // Test with nested references.
@@ -59,6 +59,37 @@ class SchemaReferenceResolverTest extends ComponentKernelTestBase {
     $expectations['unresolvable'] = [
       '$ref' => 'non-existing-schema://whatever',
     ];
+    $expectations['recursive'] = [
+      // Level 1.
+      'type' => 'object',
+      'properties' => [
+        'foo' => [
+          // Level 2.
+          'type' => 'array',
+          'items' => [
+            // Level 3.
+            'type' => 'object',
+            'properties' => [
+              'foo' => [
+                // Level 4.
+                'type' => 'array',
+                'items' => [
+                  // Level 5.
+                  'type' => 'object',
+                  'properties' => [
+                    'foo' => [
+                      // Level 6, bigger than MAXIMUM_RECURSION_LEVEL.
+                      'type' => 'array',
+                    ],
+                  ],
+                ],
+              ],
+            ],
+          ],
+        ],
+      ],
+    ];
+
     return $expectations;
   }
 
@@ -75,7 +106,7 @@ class SchemaReferenceResolverTest extends ComponentKernelTestBase {
    * @return array
    *   Data from the JSON file.
    */
-  protected function getDataFromJson(string $extension_type, string $extension, string $path): array {
+  protected static function getDataFromJson(string $extension_type, string $extension, string $path): array {
     $extensionList = \Drupal::service('extension.list.module');
     if ($extension_type == 'theme') {
       $extensionList = \Drupal::service('extension.list.theme');
