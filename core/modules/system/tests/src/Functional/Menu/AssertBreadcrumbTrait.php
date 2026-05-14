@@ -112,15 +112,20 @@ trait AssertBreadcrumbTrait {
    */
   protected function getBreadcrumbParts(): array {
     $parts = [];
+    // If there is more than one breadcrumb, we will retrieve all <a> elements
+    // inside <li> within <ol>.
     $elements = $this->xpath('//nav[@aria-labelledby="system-breadcrumb"]//ol/li/a');
-    if (!empty($elements)) {
-      foreach ($elements as $element) {
-        $parts[] = [
-          'text' => $element->getText(),
-          'href' => $element->getAttribute('href'),
-          'title' => $element->getAttribute('title'),
-        ];
-      }
+    if (empty($elements)) {
+      // If there is more than one breadcrumb, we will retrieve all <a>
+      // elements inside <div> within <span>.
+      $elements = $this->xpath('//nav[@aria-labelledby="system-breadcrumb"]//div/span/a');
+    }
+    foreach ($elements as $element) {
+      $parts[] = [
+        'text' => $element->getText(),
+        'href' => $element->getAttribute('href'),
+        'title' => $element->getAttribute('title'),
+      ];
     }
     return $parts;
   }

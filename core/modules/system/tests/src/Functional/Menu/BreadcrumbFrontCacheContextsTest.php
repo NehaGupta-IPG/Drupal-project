@@ -40,6 +40,13 @@ class BreadcrumbFrontCacheContextsTest extends BrowserTestBase {
   protected $nodeWithAlias;
 
   /**
+   * An administrative user.
+   *
+   * @var \Drupal\user\UserInterface
+   */
+  protected $adminUser;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -48,6 +55,8 @@ class BreadcrumbFrontCacheContextsTest extends BrowserTestBase {
     $this->drupalPlaceBlock('system_breadcrumb_block');
 
     $user = $this->drupalCreateUser();
+    $perms = array_keys(\Drupal::service('user.permissions')->getPermissions());
+    $this->adminUser = $this->drupalCreateUser($perms);
 
     $this->drupalCreateContentType([
       'type' => 'page',
@@ -90,9 +99,16 @@ class BreadcrumbFrontCacheContextsTest extends BrowserTestBase {
     // (which is not set as front page).
     $this->drupalGet($this->nodeWithAlias->path->alias);
     $breadcrumbs = $this->assertSession()->elementExists('css', '.block-system-breadcrumb-block');
-    $crumbs = $breadcrumbs->findAll('css', 'ol li');
+    $crumbs = $breadcrumbs->findAll('css', 'div span');
     $this->assertCount(1, $crumbs);
     $this->assertSame('Home', $crumbs[0]->getText());
+
+    // Verify that breadcrumb appears correctly for more then one breadcrumb.
+    $this->drupalLogin($this->adminUser);
+    $this->drupalGet('/admin/structure');
+    $breadcrumbs = $this->assertSession()->elementExists('css', '.block-system-breadcrumb-block');
+    $crumbs = $breadcrumbs->findAll('css', 'ol li');
+    $this->assertCount(2, $crumbs);
   }
 
 }
