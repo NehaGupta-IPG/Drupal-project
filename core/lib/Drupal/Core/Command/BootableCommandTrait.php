@@ -51,7 +51,7 @@ trait BootableCommandTrait {
       $app_context->getBasePath(),
     );
     $kernel = new DrupalKernel('prod', $this->classLoader, TRUE, $app_context);
-    $kernel::bootEnvironment();
+    $kernel::bootEnvironment($app_context->getAppRoot());
     Settings::initialize($app_context->getAppRoot(), $app_context->getSitePath(), $this->classLoader);
     $kernel->boot();
 
