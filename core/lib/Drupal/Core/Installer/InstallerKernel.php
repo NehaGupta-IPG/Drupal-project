@@ -168,11 +168,11 @@ class InstallerKernel extends DrupalKernel {
     $base_themes = [];
 
     // Find all the available themes.
-    $listing = new ExtensionDiscovery($this->root);
+    $listing = new ExtensionDiscovery($this->appContext->getAppRoot());
     $listing->setProfileDirectories([$profile->getName() => $profile->getPath()]);
     $themes = $listing->scan('theme');
 
-    $info_parser = new InfoParser($this->root);
+    $info_parser = new InfoParser($this->appContext->getAppRoot());
     $theme_info = $info_parser->parse($themes[$theme]->getPathname());
     $base_theme = $theme_info['base theme'] ?? FALSE;
 
@@ -221,7 +221,7 @@ class InstallerKernel extends DrupalKernel {
       return $profile;
     }
 
-    $info_parser = new InfoParser($this->root);
+    $info_parser = new InfoParser($this->appContext->getAppRoot());
 
     if ($profile instanceof Extension) {
       $profile->info = $info_parser->parse($profile->getPathname());

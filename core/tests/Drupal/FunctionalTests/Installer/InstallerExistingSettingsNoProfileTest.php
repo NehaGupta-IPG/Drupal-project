@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Core\Database\Database;
-use Drupal\Core\DrupalKernel;
+use Drupal\Core\StaticAppContextProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
@@ -50,7 +50,7 @@ class InstallerExistingSettingsNoProfileTest extends InstallerTestBase {
 
     // Pre-configure config directories.
     $this->settings['settings']['config_sync_directory'] = (object) [
-      'value' => DrupalKernel::findSitePath(Request::createFromGlobals()) . '/files/config_sync',
+      'value' => StaticAppContextProvider::findSitePath(Request::createFromGlobals()) . '/files/config_sync',
       'required' => TRUE,
     ];
     mkdir($this->settings['settings']['config_sync_directory']->value, 0777, TRUE);

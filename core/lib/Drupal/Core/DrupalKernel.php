@@ -267,8 +267,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * The application context.
    *
    * Contains information about the Drupal directories and the site URL.
+   *
+   * @todo Promote readonly property in Drupal 12 when setSitePath is removed.
+   * @readonly
    */
-  protected readonly AppContextInterface $appContext;
+  protected AppContextInterface $appContext;
 
   /**
    * The site path directory.
@@ -280,7 +283,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *
    * @var string
    *
-   * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use
+   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use
    *     getSitePath() on appContext property instead.
    */
   protected $sitePath;
@@ -290,7 +293,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *
    * @var string
    *
-   * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use
+   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use
    *    getAppRoot() on appContext property instead.
    */
   protected $root;
@@ -349,11 +352,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $this->classLoader = $class_loader;
     $this->allowDumping = $allow_dumping;
     if ($app_context === NULL) {
-      @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use getExtensionsParameter() instead. See https://www.drupal.org/node/', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __CLASS__ . '::' . __FUNCTION__ . '() with `$app_context = NULL` is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use the runtime to retrieve an AppContext or instantiate AppContext yourself instead. See https://www.drupal.org/node/', E_USER_DEPRECATED);
       $app_context = StaticAppContextProvider::getAppContext();
     }
     if (is_string($app_context)) {
-      @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use getExtensionsParameter() instead. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __CLASS__ . '::' . __FUNCTION__ . '() with `$app_context = NULL` is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use the runtime to retrieve an AppContext or instantiate AppContext yourself instead. See https://www.drupal.org/node/', E_USER_DEPRECATED);
       $request = Request::createFromGlobals();
       [
         'base_path' => $base_path,
@@ -383,7 +386,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *   The application root.
    */
   protected static function guessApplicationRoot() {
-    @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use getExtensionsParameter() instead. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
+    @trigger_error(__CLASS__ . "::" . __FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use getExtensionsParameter() instead. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
     return StaticAppContextProvider::guessApplicationRoot();
   }
 
@@ -438,13 +441,17 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
    *   In case the host name in the request is invalid.
    *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0.
+   *   Use \Drupal\Core\StaticAppContextProvider::findSitePath() instead.
+   * @see https://www.drupal.org/node/
+   *
    * @see \Drupal\Core\DrupalKernelInterface::getSitePath()
    * @see \Drupal\Core\DrupalKernelInterface::setSitePath()
    * @see default.settings.php
    * @see example.sites.php
    */
   public static function findSitePath(Request $request, $require_settings = TRUE, $app_root = NULL) {
-    @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use getExtensionsParameter() instead. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
+    @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use \Drupal\Core\StaticAppContextProvider::findSitePath() instead. See https://www.drupal.org/node/', E_USER_DEPRECATED);
     return StaticAppContextProvider::findSitePath($request, $app_root, $require_settings);
   }
 
@@ -455,24 +462,29 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if ($this->booted && $path !== $this->sitePath) {
       throw new \LogicException('Site path cannot be changed after calling boot()');
     }
-    @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Provide the site path through AppContext for the kernel instead. See https://www.drupal.org/node/', E_USER_DEPRECATED);
-    // @phpstan-ignore property.deprecated
+    @trigger_error(__CLASS__ . "::" . __FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Provide the site path through AppContext for the kernel instead. See https://www.drupal.org/node/', E_USER_DEPRECATED);
     $this->sitePath = $path;
+    // Ensure our appContext stays in sync.
+    $this->appContext = new AppContext(
+      $this->appContext->getAppRoot(),
+      $path,
+      $this->appContext->getBaseUrl(),
+      $this->appContext->getBasePath(),
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function getSitePath() {
-    // @phpstan-ignore property.deprecated
-    return $this->sitePath;
+    return $this->appContext->getSitePath();
   }
 
   /**
    * {@inheritdoc}
    */
   public function getAppRoot() {
-    return $this->root;
+    return $this->appContext->getAppRoot();
   }
 
   /**
@@ -503,7 +515,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       }
     }
     FileCacheFactory::setConfiguration($configuration);
-    FileCacheFactory::setPrefix(Settings::getApcuPrefix('file_cache', $this->root));
+    FileCacheFactory::setPrefix(Settings::getApcuPrefix('file_cache', $this->appContext->getAppRoot()));
 
     $this->bootstrapContainer = new $this->bootstrapContainerClass(Settings::get('bootstrap_container_definition', $this->defaultBootstrapContainerDefinition));
 
@@ -516,7 +528,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       // class_exists() checks to determine functionality.
       $installed_extensions = array_keys($this->container->getParameter('container.modules') + $this->container->getParameter('container.themes'));
       $id = 'class_loader:' . crc32(implode(':', $installed_extensions));
-      $prefix = Settings::getApcuPrefix($id, $this->root);
+      $prefix = Settings::getApcuPrefix($id, $this->appContext->getAppRoot());
       $this->classLoader->setApcuPrefix($prefix);
     }
 
@@ -571,11 +583,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * {@inheritdoc}
    */
   public function loadLegacyIncludes() {
-    require_once $this->root . '/core/includes/common.inc';
-    require_once $this->root . '/core/includes/module.inc';
-    require_once $this->root . '/core/includes/theme.inc';
-    require_once $this->root . '/core/includes/form.inc';
-    require_once $this->root . '/core/includes/errors.inc';
+    require_once $this->appContext->getAppRoot() . '/core/includes/common.inc';
+    require_once $this->appContext->getAppRoot() . '/core/includes/module.inc';
+    require_once $this->appContext->getAppRoot() . '/core/includes/theme.inc';
+    require_once $this->appContext->getAppRoot() . '/core/includes/form.inc';
+    require_once $this->appContext->getAppRoot() . '/core/includes/errors.inc';
   }
 
   /**
@@ -809,7 +821,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   private function setExtensionData(): void {
     // First, find profiles.
-    $listing = new ExtensionDiscovery($this->root);
+    $listing = new ExtensionDiscovery($this->appContext->getAppRoot());
     $listing->setProfileDirectories([]);
     $all_profiles = $listing->scan('profile');
     $profiles = array_intersect_key($all_profiles, $this->moduleList);
@@ -1042,8 +1054,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if (isset($container_definition)) {
       // Drupal provides two dynamic parameters to access specific paths that
       // are determined from the request.
-      $container_definition['parameters']['app.root'] = $this->getAppRoot();
-      $container_definition['parameters']['site.path'] = $this->getSitePath();
+      $container_definition['parameters']['app.root'] = $this->appContext->getAppRoot();
+      $container_definition['parameters']['site.path'] = $this->appContext->getSitePath();
       $class = Settings::get('container_base_class', '\Drupal\Core\DependencyInjection\Container');
       $container = new $class($container_definition);
     }
@@ -1452,7 +1464,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     foreach (['Core', 'Component'] as $parent_directory) {
       $path = 'core/lib/Drupal/' . $parent_directory;
       $parent_namespace = 'Drupal\\' . $parent_directory;
-      foreach (new \DirectoryIterator($this->root . '/' . $path) as $component) {
+      foreach (new \DirectoryIterator($this->appContext->getAppRoot() . '/' . $path) as $component) {
         /** @var \DirectoryIterator $component */
         $pathname = $component->getPathname();
         if (!$component->isDot() && $component->isDir() && (
@@ -1522,8 +1534,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     }
     $container->setParameter('persist_ids', $persist_ids);
 
-    $container->setParameter('app.root', $this->getAppRoot());
-    $container->setParameter('site.path', $this->getSitePath());
+    $container->setParameter('app.root', $this->appContext->getAppRoot());
+    $container->setParameter('site.path', $this->appContext->getSitePath());
 
     $container->compile();
     return $container;
@@ -1702,11 +1714,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     foreach ($namespaces as $prefix => $paths) {
       if (is_array($paths)) {
         foreach ($paths as $key => $value) {
-          $paths[$key] = $this->root . '/' . $value;
+          $paths[$key] = $this->appContext->getAppRoot() . '/' . $value;
         }
       }
       elseif (is_string($paths)) {
-        $paths = $this->root . '/' . $paths;
+        $paths = $this->appContext->getAppRoot() . '/' . $paths;
       }
       $class_loader->addPsr4($prefix . '\\', $paths);
     }

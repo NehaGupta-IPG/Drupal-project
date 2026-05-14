@@ -6,6 +6,7 @@
  */
 
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\AppContext;
 use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\Cache\NullBackend;
 use Drupal\Core\Config\ConfigImporterException;
@@ -13,7 +14,6 @@ use Drupal\Core\Config\ConfigImporterFactory;
 use Drupal\Core\Config\Importer\ConfigImporterBatch;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\StorageComparer;
-use Drupal\Core\DrupalKernel;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\ExtensionDiscovery;
@@ -30,6 +30,7 @@ use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\Recipe\Recipe;
 use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StaticAppContextProvider;
 use Drupal\Core\StringTranslation\Translator\FileTranslation;
 use Drupal\Core\StackMiddleware\ReverseProxyMiddleware;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -344,8 +345,17 @@ function install_begin_request($class_loader, &$install_state): void {
     date_default_timezone_set('Australia/Sydney');
   }
 
-  $site_path = empty($install_state['site_path']) ? DrupalKernel::findSitePath($request, FALSE) : $install_state['site_path'];
-  Settings::initialize(dirname(__DIR__, 2), $site_path, $class_loader);
+  [
+    'base_path' => $base_path,
+    'base_url' => $base_url,
+  ] = StaticAppContextProvider::getBaseUrlAndPath($request);
+  $app_context = new AppContext(
+    dirname(__DIR__, 2),
+    empty($install_state['site_path']) ? StaticAppContextProvider::findSitePath($request, FALSE) : $install_state['site_path'],
+    $base_url,
+    $base_path,
+  );
+  Settings::initialize($app_context->getAppRoot(), $app_context->getSitePath(), $class_loader);
 
   // Ensure that procedural dependencies are loaded as early as possible,
   // since the error/exception handlers depend on them.
@@ -393,7 +403,7 @@ function install_begin_request($class_loader, &$install_state): void {
   catch (Exception) {
     $install_state['config_verified'] = FALSE;
   }
-  $install_state['database_verified'] = install_verify_database_settings($site_path);
+  $install_state['database_verified'] = install_verify_database_settings($app_context->getSitePath());
   // A valid settings.php has database settings and a hash_salt value. Other
   // settings will be checked by \Drupal\system\Install\SystemRequirements.
   $install_state['settings_verified'] = $install_state['config_verified'] && $install_state['database_verified'] && (bool) Settings::get('hash_salt', FALSE);
@@ -436,15 +446,14 @@ function install_begin_request($class_loader, &$install_state): void {
 
   // Note, InstallerKernel::createFromRequest() is not used because Settings is
   // already initialized.
-  $kernel = new InstallerKernel($environment, $class_loader, FALSE);
-  $kernel::bootEnvironment();
+  $kernel = new InstallerKernel($environment, $class_loader, FALSE, $app_context);
+  $kernel::bootEnvironment($app_context->getAppRoot());
 
   // Add list of all available profiles to the installation state.
-  $listing = new ExtensionDiscovery($kernel->getAppRoot(), FALSE);
+  $listing = new ExtensionDiscovery($app_context->getAppRoot(), FALSE);
   $listing->setProfileDirectories([]);
   $install_state['profiles'] += $listing->scan('profile');
 
-  $kernel->setSitePath($site_path);
   $kernel->boot();
   // Get the new version of the container from the kernel. This is now a
   // complete container with all services.
@@ -457,7 +466,7 @@ function install_begin_request($class_loader, &$install_state): void {
     $directory = $GLOBALS['config']['locale.settings']['translation']['path'];
   }
   else {
-    $directory = $site_path . '/files/translations';
+    $directory = $app_context->getSitePath() . '/files/translations';
   }
   /** @var \Drupal\Core\File\FileSystemInterface $file_system */
   $file_system = $container->get('file_system');
@@ -2308,7 +2317,7 @@ function install_check_requirements($install_state) {
     // before running the Drupal installer.
     if ($database = Database::getConnectionInfo()) {
       $request = Request::createFromGlobals();
-      $site_path = empty($install_state['site_path']) ? DrupalKernel::findSitePath($request, FALSE) : $install_state['site_path'];
+      $site_path = empty($install_state['site_path']) ? StaticAppContextProvider::findSitePath($request, FALSE) : $install_state['site_path'];
       $database = $database['default'];
       $settings_file = './' . $site_path . '/settings.php';
 

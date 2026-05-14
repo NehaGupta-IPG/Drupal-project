@@ -13,6 +13,7 @@
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StaticAppContextProvider;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,7 +29,7 @@ $request = Request::createFromGlobals();
 DrupalKernel::bootEnvironment();
 
 try {
-  Settings::initialize(dirname(__DIR__), DrupalKernel::findSitePath($request), $autoloader);
+  Settings::initialize(dirname(__DIR__), StaticAppContextProvider::findSitePath($request), $autoloader);
 }
 catch (HttpExceptionInterface $e) {
   $response = new Response('', $e->getStatusCode());

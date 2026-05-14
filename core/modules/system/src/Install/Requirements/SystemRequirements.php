@@ -10,11 +10,11 @@ use Drupal\Component\Utility\Environment;
 use Drupal\Component\Utility\OpCodeCache;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\Database;
-use Drupal\Core\DrupalKernel;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StaticAppContextProvider;
 use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\Error;
@@ -394,7 +394,7 @@ class SystemRequirements implements InstallRequirementsInterface {
       // If we are installing Drupal, the settings.php file might not exist
       // yet in the intended site directory, so don't require it.
       $request = Request::createFromGlobals();
-      $site_path = DrupalKernel::findSitePath($request);
+      $site_path = StaticAppContextProvider::findSitePath($request);
       $directories[] = $site_path . '/files';
     }
     if ($file_private_path = Settings::get('file_private_path')) {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\DrupalKernel;
 
 use Composer\Autoload\ClassLoader;
+use Drupal\Core\AppContext;
 use Drupal\Core\Config\ConfigInstallerInterface;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\DrupalKernelInterface;
@@ -223,6 +224,9 @@ class DrupalKernelTest extends KernelTestBase {
     $kernel = $this->getTestKernel($request, $modules_enabled);
     $pass = FALSE;
     try {
+      // This tests specific behavior of the deprecated method so it can not be
+      // removed yet.
+      // @phpstan-ignore-next-line method.deprecated
       $kernel->setSitePath('/dev/null');
     }
     catch (\LogicException) {
@@ -232,7 +236,13 @@ class DrupalKernelTest extends KernelTestBase {
 
     // Ensure no LogicException if DrupalKernel::setSitePath() is called with
     // identical path after boot.
+    // This tests specific behavior of the deprecated method so it can not be
+    // removed yet.
+    // @phpstan-ignore-next-line method.deprecated
     $path = $kernel->getSitePath();
+    // This tests specific behavior of the deprecated method so it can not be
+    // removed yet.
+    // @phpstan-ignore-next-line method.deprecated
     $kernel->setSitePath($path);
   }
 
@@ -294,8 +304,13 @@ class DrupalKernelTest extends KernelTestBase {
     }
 
     // Create a kernel suitable for testing.
-    $kernel = new DrupalKernel('test', $classloader->reveal(), FALSE, vfsStream::url('root'));
-    $kernel->setSitePath(vfsStream::url('root/sites/default'));
+    $app_context = new AppContext(
+      vfsStream::url('root'),
+      vfsStream::url('root/sites/default'),
+      '',
+      '/',
+    );
+    $kernel = new DrupalKernel('test', $classloader->reveal(), FALSE, $app_context);
     $kernel->boot();
   }
 

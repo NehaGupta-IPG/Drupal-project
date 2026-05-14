@@ -3,12 +3,14 @@
 namespace Drupal\Core\Command;
 
 use Drupal\Component\Utility\Crypt;
+use Drupal\Core\AppContext;
 use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Extension\InfoParserDynamic;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StaticAppContextProvider;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -130,10 +132,16 @@ class InstallCommand extends Command {
    */
   protected function isDrupalInstalled() {
     try {
-      $kernel = new DrupalKernel('prod', $this->classLoader, FALSE);
+      $app_context = StaticAppContextProvider::getAppContext();
+      $app_context = new AppContext(
+        $app_context->getAppRoot(),
+        $this->getSitePath(),
+        $app_context->getBaseUrl(),
+        $app_context->getBasePath(),
+      );
+      $kernel = new DrupalKernel('prod', $this->classLoader, FALSE, $app_context);
       $kernel::bootEnvironment();
-      $kernel->setSitePath($this->getSitePath());
-      Settings::initialize($kernel->getAppRoot(), $kernel->getSitePath(), $this->classLoader);
+      Settings::initialize($app_context->getAppRoot(), $app_context->getSitePath(), $this->classLoader);
       $kernel->boot();
     }
     catch (ConnectionNotDefinedException) {

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\TestSite\Commands;
 
+use Drupal\Core\AppContext;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StaticAppContextProvider;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -48,10 +50,16 @@ class TestSiteUserLoginCommand extends Command {
     chdir($root);
 
     $this->classLoader = require 'autoload.php';
-    $kernel = new DrupalKernel('prod', $this->classLoader, FALSE);
+    $app_context = StaticAppContextProvider::getAppContext();
+    $app_context = new AppContext(
+      $app_context->getAppRoot(),
+      $input->getOption('site-path'),
+      $app_context->getBaseUrl(),
+      $app_context->getBasePath(),
+    );
+    $kernel = new DrupalKernel('prod', $this->classLoader, FALSE, $app_context);
     $kernel::bootEnvironment();
-    $kernel->setSitePath($input->getOption('site-path'));
-    Settings::initialize($kernel->getAppRoot(), $kernel->getSitePath(), $this->classLoader);
+    Settings::initialize($app_context->getAppRoot(), $app_context->getSitePath(), $this->classLoader);
 
     $request = Request::createFromGlobals();
 

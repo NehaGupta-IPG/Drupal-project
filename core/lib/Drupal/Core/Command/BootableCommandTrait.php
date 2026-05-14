@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Command;
 
+use Drupal\Core\AppContext;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StaticAppContextProvider;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface as ComponentEventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,15 +38,23 @@ trait BootableCommandTrait {
    *   Exception thrown if kernel does not boot.
    */
   protected function boot(): DrupalKernelInterface {
-    $kernel = new DrupalKernel('prod', $this->classLoader);
-    $kernel::bootEnvironment();
-    $kernel->setSitePath($this->getSitePath());
-    Settings::initialize($kernel->getAppRoot(), $kernel->getSitePath(), $this->classLoader);
-    $kernel->boot();
+    $site_path = $this->getSitePath();
     // The request needs to be created with a URL that, even if not actually
     // reachable, at least has a valid *form*, so that Drupal can correctly
     // generate links and URLs.
-    $request = Request::create('http://' . basename($kernel->getSitePath()) . '/core/scripts/drupal');
+    $request = Request::create('http://' . basename($site_path) . '/core/scripts/drupal');
+    $app_context = StaticAppContextProvider::getAppContext($request);
+    $app_context = new AppContext(
+      $app_context->getAppRoot(),
+      $site_path,
+      $app_context->getBaseUrl(),
+      $app_context->getBasePath(),
+    );
+    $kernel = new DrupalKernel('prod', $this->classLoader, TRUE, $app_context);
+    $kernel::bootEnvironment();
+    Settings::initialize($app_context->getAppRoot(), $app_context->getSitePath(), $this->classLoader);
+    $kernel->boot();
+
     $kernel->preHandle($request);
 
     // Try to register an event listener to properly terminate the Drupal kernel

@@ -19,7 +19,7 @@ interface AppContextInterface {
    * @return string
    *   The path of the application root.
    */
-  public function getAppRoot() : string ;
+  public function getAppRoot() : string;
 
   /**
    * Gets the site path directory.
@@ -32,7 +32,7 @@ interface AppContextInterface {
    * @return string
    *   The current site path directory.
    */
-  public function getSitePath() : string ;
+  public function getSitePath() : string;
 
   /**
    * Returns the base URL of the application.

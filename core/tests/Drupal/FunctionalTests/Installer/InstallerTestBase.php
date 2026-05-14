@@ -9,6 +9,7 @@ use Drupal\Core\DrupalKernel;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Session\UserSession;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StaticAppContextProvider;
 use Drupal\Core\Test\HttpClientMiddleware\TestHttpClientMiddleware;
 use Drupal\Core\Utility\PhpRequirements;
 use Drupal\Tests\BrowserTestBase;
@@ -182,7 +183,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
       // Import new settings.php written by the installer.
       $request = Request::createFromGlobals();
       $class_loader = require $this->container->getParameter('app.root') . '/autoload.php';
-      Settings::initialize($this->container->getParameter('app.root'), DrupalKernel::findSitePath($request), $class_loader);
+      Settings::initialize($this->container->getParameter('app.root'), StaticAppContextProvider::findSitePath($request), $class_loader);
 
       // After writing settings.php, the installer removes write permissions
       // from the site directory. To allow drupal_generate_test_ua() to write

@@ -19,6 +19,17 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  */
 trait AppContextTrait {
 
+  /**
+   * Get the application context for a request.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request being served.
+   * @param bool $enable_multisite
+   *   Whether Drupal multi-site support should be enabled.
+   *
+   * @return \Drupal\Core\AppContextInterface
+   *   The application context.
+   */
   protected function getAppContext(Request $request, bool $enable_multisite = TRUE) : AppContextInterface {
     $app_root = $this->guessApplicationRoot();
     $site_path = "sites/default";
@@ -50,7 +61,7 @@ trait AppContextTrait {
     // - Removing the namespace directories from the path.
     // - Getting the path to the directory two levels up from the path
     //   determined in the previous step.
-    return dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__)), 3);
+    return dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__)), 2);
   }
 
   /**
@@ -94,10 +105,10 @@ trait AppContextTrait {
    *   The path to the application root as a string. If not supplied, the
    *   application root will be computed.
    * @param bool $require_settings
-   *    Only directories with an existing settings.php file will be recognized.
-   *    Defaults to TRUE. During initial installation, this is set to FALSE so
-   *    that Drupal can detect a matching directory, then create a new
-   *    settings.php file in it.
+   *   Only directories with an existing settings.php file will be recognized.
+   *   Defaults to TRUE. During initial installation, this is set to FALSE so
+   *   that Drupal can detect a matching directory, then create a new
+   *   settings.php file in it.
    *
    * @return string
    *   The path of the matching directory.
@@ -165,7 +176,6 @@ trait AppContextTrait {
     return 'sites/default';
   }
 
-
   /**
    * Validates the hostname supplied from the HTTP request.
    *
@@ -192,7 +202,6 @@ trait AppContextTrait {
     return TRUE;
   }
 
-
   /**
    * Validates a hostname length.
    *
@@ -206,16 +215,24 @@ trait AppContextTrait {
     // Limit the length of the host name to 1000 bytes to prevent DoS attacks
     // with long host names.
     return strlen($host) <= 1000
-      // Limit the number of subdomains and port separators to prevent DoS attacks
-      // in findSitePath().
+      // Limit the number of subdomains and port separators to prevent DoS
+      // attacks in findSitePath().
       && substr_count($host, '.') <= 100
       && substr_count($host, ':') <= 100;
   }
 
   /**
+   * Get the base URL and path from a request.
+   *
+   * Ensures that the returned base URL and path are according to Drupal's
+   * conventions, where these concepts differ slightly from Symfony's request
+   * object.
+   *
    * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The symfony request.
    *
    * @return array{base_url: string, base_path: string}
+   *   The URL and path information as an associative array.
    */
   protected function getBaseUrlAndPath(Request $request) : array {
     // Create base URL.
@@ -259,6 +276,5 @@ trait AppContextTrait {
   private function realpath(string $path): string {
     return realpath($path);
   }
-
 
 }
