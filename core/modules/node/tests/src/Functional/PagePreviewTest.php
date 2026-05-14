@@ -77,13 +77,6 @@ class PagePreviewTest extends NodeTestBase {
     parent::setUp();
     $this->addDefaultCommentField('node', 'page');
 
-    $web_user = $this->drupalCreateUser([
-      'edit own page content',
-      'create page content',
-      'administer menu',
-    ]);
-    $this->drupalLogin($web_user);
-
     // Add a vocabulary so we can test different view modes.
     $vocabulary = Vocabulary::create([
       'name' => $this->randomMachineName(),
@@ -93,6 +86,14 @@ class PagePreviewTest extends NodeTestBase {
       'help' => '',
     ]);
     $vocabulary->save();
+
+    $web_user = $this->drupalCreateUser([
+      'edit own page content',
+      'create page content',
+      'administer menu',
+      'create terms in ' . $vocabulary->id(),
+    ]);
+    $this->drupalLogin($web_user);
 
     // Add a term to the vocabulary.
     $term = Term::create([

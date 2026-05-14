@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Field\Plugin\Field\FieldWidget;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
@@ -130,6 +131,16 @@ class EntityReferenceAutocompleteWidget extends WidgetBase {
         'bundle' => $bundle,
         'uid' => ($entity instanceof EntityOwnerInterface) ? $entity->getOwnerId() : \Drupal::currentUser()->id(),
       ];
+
+      if ($this->getSelectionHandlerSetting('auto_create_check_access')) {
+        $access = \Drupal::entityTypeManager()
+          ->getAccessControlHandler($this->getFieldSetting('target_type'))
+          ->createAccess($bundle, return_as_object: TRUE);
+        CacheableMetadata::createFromObject($access)->applyTo($element);
+        if (!$access->isAllowed()) {
+          unset($element['#autocreate']);
+        }
+      }
     }
 
     return ['target_id' => $element];

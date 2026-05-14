@@ -25,4 +25,5 @@ settings:
       direction: asc
     auto_create: false
     auto_create_bundle: ''
+    auto_create_check_access: true
 field_type: entity_reference

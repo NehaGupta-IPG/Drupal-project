@@ -24,4 +24,5 @@ settings:
       field: _none
     auto_create: true
     auto_create_bundle: ''
+    auto_create_check_access: true
 field_type: entity_reference

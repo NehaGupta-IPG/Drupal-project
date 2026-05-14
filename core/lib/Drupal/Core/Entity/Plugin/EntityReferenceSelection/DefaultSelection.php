@@ -21,6 +21,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\user\EntityOwnerInterface;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * Default plugin implementation of the Entity Reference Selection plugin.
@@ -140,6 +141,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
       ],
       'auto_create' => FALSE,
       'auto_create_bundle' => NULL,
+      'auto_create_check_access' => TRUE,
     ] + parent::defaultConfiguration();
   }
 
@@ -306,6 +308,18 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
       ];
     }
 
+    $form['auto_create_check_access'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Respect create access, only users with the necessary permission can create new entities'),
+      '#default_value' => $configuration['auto_create_check_access'],
+      '#states' => [
+        'visible' => [
+          ':input[name="settings[handler_settings][auto_create]"]' => ['checked' => TRUE],
+        ],
+      ],
+      '#weight' => 0,
+    ];
+
     return $form;
   }
 
@@ -395,8 +409,19 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   *   Thrown when 'auto_create_check_access' is enabled and the current user
+   *   does not have create access for the target bundle.
    */
   public function createNewEntity($entity_type_id, $bundle, $label, $uid) {
+    if (!empty($this->configuration['auto_create_check_access'])) {
+      $access_handler = $this->entityTypeManager->getAccessControlHandler($this->configuration['target_type']);
+      if (!$access_handler->createAccess($bundle, $this->currentUser)) {
+        throw new AccessDeniedHttpException();
+      }
+    }
+
     $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
 
     $values = [

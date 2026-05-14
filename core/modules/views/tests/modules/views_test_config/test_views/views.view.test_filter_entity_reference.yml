@@ -192,6 +192,7 @@ display:
               direction: ASC
             auto_create: false
             auto_create_bundle: ''
+            auto_create_check_access: true
           widget: select
           plugin_id: entity_reference
         field_test_config_target_id:
@@ -239,6 +240,7 @@ display:
           sub_handler_settings:
             target_bundles: null
             auto_create: false
+            auto_create_check_access: true
       sorts:
         created:
           id: created
