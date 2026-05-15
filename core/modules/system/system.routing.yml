@@ -317,3 +317,10 @@ system.linkset_settings:
 route_callbacks:
   - '\Drupal\system\Routing\AssetRoutes::routes'
   - '\Drupal\system\Routing\MenuLinksetRoutes::routes'
+system.admin.config.system.feature_flags:
+  path: /admin/config/system/feature-flags
+  defaults:
+    _title: Feature flags
+    _form: '\Drupal\system\Form\FeatureFlagsForm'
+  requirements:
+    _permission: administer site configuration

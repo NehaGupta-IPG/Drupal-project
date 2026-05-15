@@ -162,3 +162,6 @@ system.linkset_settings:
   parent: system.admin_config_services
   route_name: system.linkset_settings
   weight: 10
+system.admin.config.system.feature_flags:
+  title: Feature flags
+  route_name: system.admin.config.system.feature_flags
