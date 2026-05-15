@@ -71,7 +71,7 @@ tr .form-item,
 .fieldset__label.form-required::after {
   display: inline-block;
   margin-inline: 0.15em;
-  content: "*";
+  content: "*" / "";
   color: var(--color-maximumred);
   font-size: 0.875rem;
 }
