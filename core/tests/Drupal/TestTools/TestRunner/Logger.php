@@ -8,6 +8,8 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 
 /**
  * Helper class to manage run-tests.sh internal logging.
+ *
+ * @internal
  */
 final class Logger {
 
@@ -49,7 +51,7 @@ final class Logger {
    */
   public function deprecation(string $message): void {
     if (!$this->hasDeprecations) {
-      $this->info('Deprecations are reported. Add the --suppress-deprecations command line to silence.');
+      $this->info('Deprecations are reported. Add the --suppress-deprecations option in the command line to silence.');
       $this->hasDeprecations = TRUE;
     }
     $this->log[] = [
@@ -62,7 +64,46 @@ final class Logger {
    * Prints the log.
    */
   public function print(): void {
-    dump($this->log);
+    if ($this->log === []) {
+      return;
+    }
+
+    $this->io->writeln("--------------------------------------------------------------------------------");
+    $this->io->writeln("Problems detected during the execution of the script");
+
+    $sections = [
+      [LogLevel::Info, 'Info:'],
+      [LogLevel::Deprecation, 'Deprecation(s):'],
+    ];
+
+    foreach ($sections as $section) {
+      $tmp = [];
+      foreach ($this->log as $entry) {
+        if ($entry['level'] === $section[0]) {
+          $tmp[] = $entry['message'];
+        }
+      }
+      if (count($tmp)) {
+        $this->io->writeln("");
+        $this->io->writeln($section[1]);
+        foreach ($tmp as $message) {
+          $this->io->writeln("* " . wordwrap($message, 78, "\n  "));
+        }
+      }
+    }
+
+    $this->io->writeln("--------------------------------------------------------------------------------");
+  }
+
+
+  /**
+   * Returns the internal error status of the runner.
+   *
+   * @return int
+   *   The internal error status of the runner.
+   */
+  public function internalStatus(): int {
+    return $this->hasDeprecations ? \SIMPLETEST_SCRIPT_EXIT_FAILURE : \SIMPLETEST_SCRIPT_EXIT_SUCCESS;
   }
 
 }

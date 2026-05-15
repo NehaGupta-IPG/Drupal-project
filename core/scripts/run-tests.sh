@@ -280,7 +280,7 @@ if (!Config::get('keep-results')) {
 $logger->print();
 
 // Test complete, exit.
-exit($status);
+exit(max($status, $logger->internalStatus()));
 
 /**
  * Print help text.

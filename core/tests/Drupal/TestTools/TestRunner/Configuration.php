@@ -74,9 +74,6 @@ final class Configuration {
     if ($input->getOption('php') && !$input->getOption('suppress-deprecations')) {
       $logger->deprecation('The --php command line option is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. There is no need to specify the PHP executable.');
     }
-    if ($input->getOption('all') && !$input->getOption('suppress-deprecations')) {
-      $logger->deprecation('The --all command line option is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. There is no need to specify it.');
-    }
 
     $concurrency = $input->getOption('concurrency');
     if (!is_numeric($concurrency) || $concurrency <= 0) {
@@ -169,7 +166,7 @@ final class Configuration {
       'php',
       NULL,
       InputOption::VALUE_REQUIRED,
-      "(deprecated) Unused.",
+      "(deprecated in drupal:12.0.0 and removed from drupal:13.0.0) Unused. There is no need to specify the PHP executable.",
     ));
     $inputDefinition->addOption(new InputOption(
       'concurrency',
