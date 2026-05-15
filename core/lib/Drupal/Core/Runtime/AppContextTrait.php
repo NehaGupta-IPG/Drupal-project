@@ -33,9 +33,11 @@ trait AppContextTrait {
    */
   protected function getAppContext(Request $request, bool $enable_multisite = TRUE) : AppContextInterface {
     $app_root = $this->getApplicationRoot();
-    // @todo BEFORE MERGE TO MAIN Because this is now routed to InstallCommand it should respect DRUPAL_DEV_SITE_PATH.
-    $site_path = "sites/default";
-    if ($enable_multisite) {
+    // Tests may use the DRUPAL_DEV_SITE_PATH environment variable to install
+    // into the simpletest folder. In that case we skip multi site path finding.
+    $dev_site_path = getenv('DRUPAL_DEV_SITE_PATH');
+    $site_path = $dev_site_path ?: "sites/default";
+    if (!$dev_site_path && $enable_multisite) {
       $site_path = $this->findSitePath($request, $app_root);
     }
 

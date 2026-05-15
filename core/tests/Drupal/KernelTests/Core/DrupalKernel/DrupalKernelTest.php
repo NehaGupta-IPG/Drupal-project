@@ -9,6 +9,7 @@ use Drupal\Core\AppContext;
 use Drupal\Core\Config\ConfigInstallerInterface;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\DrupalKernelInterface;
+use Drupal\Core\Runtime\AppContextTrait;
 use Drupal\KernelTests\KernelTestBase;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -29,6 +30,10 @@ use Symfony\Component\HttpFoundation\Request;
 #[Group('DrupalKernel')]
 #[RunTestsInSeparateProcesses]
 class DrupalKernelTest extends KernelTestBase {
+
+  use AppContextTrait {
+    getBaseUrlAndPath as private;
+  }
 
   /**
    * {@inheritdoc}
@@ -65,7 +70,17 @@ class DrupalKernelTest extends KernelTestBase {
   protected function getTestKernel(Request $request, ?array $modules_enabled = NULL) {
     // Manually create kernel to avoid replacing settings.
     $class_loader = require $this->root . '/autoload.php';
-    $kernel = DrupalKernel::createFromRequest($request, $class_loader, 'testing');
+    [
+      'base_path' => $base_path,
+      'base_url' => $base_url,
+    ] = $this->getBaseUrlAndPath($request);
+    $app_context = new AppContext(
+      $this->root,
+      $this->siteDirectory,
+      $base_url,
+      $base_path,
+    );
+    $kernel = DrupalKernel::createFromRequest($request, $class_loader, 'testing', TRUE, $app_context);
     $this->setSetting('container_yamls', []);
     $this->setSetting('hash_salt', $this->databasePrefix);
     if (isset($modules_enabled)) {
@@ -194,6 +209,16 @@ class DrupalKernelTest extends KernelTestBase {
   public function testRepeatedBootWithDifferentEnvironment(): void {
     $request = Request::createFromGlobals();
     $class_loader = require $this->root . '/autoload.php';
+    [
+      'base_path' => $base_path,
+      'base_url' => $base_url,
+    ] = $this->getBaseUrlAndPath($request);
+    $app_context = new AppContext(
+      $this->root,
+      $this->siteDirectory,
+      $base_url,
+      $base_path,
+    );
 
     $environments = [
       'testing1',
@@ -203,7 +228,7 @@ class DrupalKernelTest extends KernelTestBase {
     ];
 
     foreach ($environments as $environment) {
-      $kernel = DrupalKernel::createFromRequest($request, $class_loader, $environment);
+      $kernel = DrupalKernel::createFromRequest($request, $class_loader, $environment, TRUE, $app_context);
       $this->setSetting('container_yamls', []);
       $this->setSetting('hash_salt', $this->databasePrefix);
       $this->assertInstanceOf(DrupalKernelInterface::class, $kernel->boot(), "Environment $environment should boot.");

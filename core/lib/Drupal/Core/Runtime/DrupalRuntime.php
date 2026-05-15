@@ -91,7 +91,7 @@ class DrupalRuntime extends SymfonyRuntime {
    */
   protected function resolveType(?string $type) {
     return match ($type) {
-      AppContextInterface::class => $this->getAppContext($this->resolveType(Request::class), !$this->options['disable_multisite']),
+      AppContextInterface::class => $this->getAppContext($this->resolveType(Request::class), !($this->options['disable_multisite'] ?? FALSE)),
       // This can be removed in symfony/runtime 8.1 as it is then included in
       // SymfonyRuntime::resolveType.
       Request::class => $this->request ??= Request::createFromGlobals(),
