@@ -11,4 +11,8 @@ use Drupal\Component\Plugin\PluginBase;
  */
 class FeatureFlag extends PluginBase implements FeatureFlagInterface {
 
+  public function getLabel(): string {
+    return $this->getPluginDefinition()['label'];
+  }
+
 }
