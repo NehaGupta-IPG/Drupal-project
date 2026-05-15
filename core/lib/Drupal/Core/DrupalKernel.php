@@ -391,7 +391,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   protected static function guessApplicationRoot() {
     @trigger_error(__CLASS__ . "::" . __FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use getExtensionsParameter() instead. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
-    return StaticAppContextProvider::guessApplicationRoot();
+    return StaticAppContextProvider::getApplicationRoot();
   }
 
   /**
@@ -1139,7 +1139,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // Determine the application root if it's not supplied.
     if ($app_root === NULL) {
       @trigger_error('Calling ' . __CLASS__ . '::' . __FUNCTION__ . '() with `$app_context = NULL` is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Provide the app_root from AppContext instead. See https://www.drupal.org/node/', E_USER_DEPRECATED);
-      $app_root = StaticAppContextProvider::guessApplicationRoot();
+      $app_root = StaticAppContextProvider::getApplicationRoot();
     }
 
     error_reporting(E_ALL);

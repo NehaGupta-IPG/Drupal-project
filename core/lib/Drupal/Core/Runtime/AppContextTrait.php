@@ -7,6 +7,7 @@ namespace Drupal\Core\Runtime;
 use Drupal\Core\AppContext;
 use Drupal\Core\AppContextInterface;
 use Drupal\Core\Test\TestDatabase;
+use Drupal\DrupalInstalled;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -31,7 +32,7 @@ trait AppContextTrait {
    *   The application context.
    */
   protected function getAppContext(Request $request, bool $enable_multisite = TRUE) : AppContextInterface {
-    $app_root = $this->guessApplicationRoot();
+    $app_root = $this->getApplicationRoot();
     $site_path = "sites/default";
     if ($enable_multisite) {
       $site_path = $this->findSitePath($request, $app_root);
@@ -51,12 +52,26 @@ trait AppContextTrait {
   }
 
   /**
-   * Determine the application root directory based on this file's location.
+   * Returns the application root directory.
+   *
+   * This uses the constant written in \Drupal\Locations\DrupalLocation by the
+   * drupal/core-composer-scaffold Composer plugin.
+   *
+   * For backwards compatibility with installations that do not use Composer,
+   * the fallback is to determine the app root from this file's location, which
+   * is not always reliable in a nonstandard installation structure.
    *
    * @return string
    *   The application root.
+   *
+   * @see \Drupal\Composer\Plugin\Scaffold\GenerateAutoloadReferenceFile
+   * @see https://www.drupal.org/i/1792310
    */
-  protected function guessApplicationRoot() : string {
+  protected function getApplicationRoot() : string {
+    // Forward compatibility with https://www.drupal.org/i/1792310.
+    if (class_exists(DrupalInstalled::class) && method_exists(DrupalInstalled::class, "getAppRoot")) {
+      return DrupalInstalled::getAppRoot();
+    }
     // Determine the application root by:
     // - Removing the namespace directories from the path.
     // - Getting the path to the directory two levels up from the path

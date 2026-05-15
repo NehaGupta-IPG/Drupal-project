@@ -323,7 +323,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
       'base_url' => $base_url,
     ] = StaticAppContextProvider::getBaseUrlAndPath($request);
     $app_context = new AppContext(
-      StaticAppContextProvider::guessApplicationRoot(),
+      StaticAppContextProvider::getApplicationRoot(),
       $this->siteDirectory,
       $base_url,
       $base_path,

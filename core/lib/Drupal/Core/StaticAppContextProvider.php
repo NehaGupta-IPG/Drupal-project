@@ -19,7 +19,7 @@ final class StaticAppContextProvider {
 
   use AppContextTrait {
     getAppContext as getAppContextBase;
-    guessApplicationRoot as guessApplicationRootBase;
+    getApplicationRoot as getApplicationRootBase;
     findSitePath as findSitePathBase;
     getBaseUrlAndPath as getBaseUrlAndPathBase;
   }
@@ -39,15 +39,15 @@ final class StaticAppContextProvider {
   /**
    * {@inheritdoc}
    */
-  public static function guessApplicationRoot() : string {
-    return self::getInstance()->guessApplicationRootBase();
+  public static function getApplicationRoot() : string {
+    return self::getInstance()->getApplicationRootBase();
   }
 
   /**
    * {@inheritdoc}
    */
   public static function findSitePath(Request $request, $app_root = NULL, $require_settings = TRUE) : string {
-    $app_root ??= self::guessApplicationRoot();
+    $app_root ??= self::getApplicationRoot();
     return self::getInstance()->findSitePathBase($request, $app_root, $require_settings);
   }
 
