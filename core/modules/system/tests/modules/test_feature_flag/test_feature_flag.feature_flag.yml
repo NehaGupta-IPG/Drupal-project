@@ -2,11 +2,15 @@
 # 13.0.0 so they get the new cake.
 test_feature_flag.new_cake:
   label: New Cake
+  default_state: FALSE
   removal_state: TRUE
-  removal: 13.0.0
+  removal_version: 13.0.0
+  info: http://example.com/new_cake
 # The Stale Cake feature flag. Sites must disable this before they upgrade to
 # 13.0.0 so they stop using the stale cake.
 test_feature_flag.stale_cake:
   label: Stale Cake
+  default_state: TRUE
   removal_state: FALSE
-  removal: 13.0.0
+  removal_version: 13.0.0
+  info: http://example.com/stale_cake
