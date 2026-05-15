@@ -6,6 +6,7 @@
  */
 
 use Drupal\Component\Utility\Crypt;
+use Drupal\Core\StaticAppContextProvider;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\Core\Utility\Error;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -42,7 +43,7 @@ const DRUPAL_EXTENSION_NAME_MAX_LENGTH = 50;
  *
  * This strips two levels of directories off the current directory.
  */
-define('DRUPAL_ROOT', dirname(__DIR__, 2));
+define('DRUPAL_ROOT', StaticAppContextProvider::getApplicationRoot());
 
 /**
  * Translates a string to the current language or to a given language.
