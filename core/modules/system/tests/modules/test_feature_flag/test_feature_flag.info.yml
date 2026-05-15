@@ -1,0 +1,5 @@
+name: 'Test feature flags'
+type: module
+description: 'Contains test feature flags.'
+package: Testing
+version: VERSION

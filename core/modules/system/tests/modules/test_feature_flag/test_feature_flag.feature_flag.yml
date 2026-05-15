@@ -1,0 +1,12 @@
+# The New Cake feature flag. Sites must enable this before they upgrade to
+# 13.0.0 so they get the new cake.
+test_feature_flag.new_cake:
+  title: New Cake
+  removal_state: TRUE
+  removal: 13.0.0
+# The Stale Cake feature flag. Sites must disable this before they upgrade to
+# 13.0.0 so they stop using the stale cake.
+test_feature_flag.stale_cake:
+  title: Stale Cake
+  removal_state: FALSE
+  removal: 13.0.0
