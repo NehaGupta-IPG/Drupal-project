@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Command;
 
-use Drupal\Core\AppContext;
 use Drupal\Core\AppContextInterface;
 use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\DrupalKernel;
@@ -93,7 +92,7 @@ class ServerCommand extends Command {
    */
   protected function boot() {
     $request = Request::createFromGlobals();
-    $app_context = StaticAppContextProvider::getAppContext($request, $this->getSitePath());
+    $app_context = StaticAppContextProvider::getAppContextWithSitePath($request, $this->getSitePath());
     $kernel = new DrupalKernel('prod', $this->classLoader, FALSE, $app_context);
     $kernel::bootEnvironment($app_context->getAppRoot());
     Settings::initialize($app_context->getAppRoot(), $app_context->getSitePath(), $this->classLoader);
