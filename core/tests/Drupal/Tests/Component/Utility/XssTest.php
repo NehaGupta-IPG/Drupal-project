@@ -568,6 +568,12 @@ class XssTest extends TestCase {
         'Time with datetime attribute',
         ['time'],
       ],
+      [
+        '<a href="https://www.drupal.org/" title="This < or this > should not be a problem in an attribute"></a>',
+        '<a href="https://www.drupal.org/" title="This < or this > should not be a problem in an attribute"></a>',
+        'Link tag with angle brackets in an attribute',
+        ['a'],
+      ],
     ];
   }
 
