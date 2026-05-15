@@ -47,7 +47,6 @@ class FeatureFlagManager extends DefaultPluginManager {
     // discovery.
     $this->moduleHandler = $module_handler;
 
-    $this->alterInfo('feature_flag_info');
     $this->setCacheBackend($cache_backend, 'feature_flag_plugins');
   }
 
