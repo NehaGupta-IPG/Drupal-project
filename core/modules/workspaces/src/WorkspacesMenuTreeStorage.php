@@ -56,6 +56,7 @@ class WorkspacesMenuTreeStorage extends CoreMenuTreeStorage {
     // Add the active workspace as a menu tree condition parameter in order to
     // include it in the cache ID.
     if ($active_workspace = $this->workspaceManager->getActiveWorkspace()) {
+      $parameters->removeCondition('enabled');
       $parameters->conditions['workspace'] = $active_workspace->id();
     }
     return parent::loadTreeData($menu_name, $parameters);
