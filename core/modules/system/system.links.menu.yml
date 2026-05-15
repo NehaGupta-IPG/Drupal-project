@@ -125,6 +125,12 @@ system.cron_settings:
   description: 'Manage automatic site maintenance tasks.'
   route_name: system.cron_settings
   weight: 20
+system.feature_flags:
+  title: Feature flags
+  parent: system.admin_config_system
+  description: 'Manage feature flags TODO better description!'
+  route_name: system.feature_flags
+  weight: 30
 system.admin_config_ui:
   title: 'User interface'
   route_name: system.admin_config_ui
@@ -162,6 +168,3 @@ system.linkset_settings:
   parent: system.admin_config_services
   route_name: system.linkset_settings
   weight: 10
-system.admin.config.system.feature_flags:
-  title: Feature flags
-  route_name: system.admin.config.system.feature_flags

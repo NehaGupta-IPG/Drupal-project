@@ -29,6 +29,7 @@ class FeatureFlagsForm extends FormBase {
     $form['feature_flags'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t("Feature Flags"),
+      '#options' => [],
     ];
 
     $form['submit'] = [
