@@ -50,13 +50,7 @@ class TestSiteUserLoginCommand extends Command {
     chdir($root);
 
     $this->classLoader = require 'autoload.php';
-    $app_context = StaticAppContextProvider::getAppContext();
-    $app_context = new AppContext(
-      $app_context->getAppRoot(),
-      $input->getOption('site-path'),
-      $app_context->getBaseUrl(),
-      $app_context->getBasePath(),
-    );
+    $app_context = StaticAppContextProvider::getAppContextWithSitePath(NULL, $input->getOption('site-path'));
     $kernel = new DrupalKernel('prod', $this->classLoader, FALSE, $app_context);
     $kernel::bootEnvironment($app_context->getAppRoot());
     Settings::initialize($app_context->getAppRoot(), $app_context->getSitePath(), $this->classLoader);

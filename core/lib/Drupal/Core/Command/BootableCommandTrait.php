@@ -43,13 +43,7 @@ trait BootableCommandTrait {
     // reachable, at least has a valid *form*, so that Drupal can correctly
     // generate links and URLs.
     $request = Request::create('http://' . basename($site_path) . '/core/scripts/drupal');
-    $app_context = StaticAppContextProvider::getAppContext($request);
-    $app_context = new AppContext(
-      $app_context->getAppRoot(),
-      $site_path,
-      $app_context->getBaseUrl(),
-      $app_context->getBasePath(),
-    );
+    $app_context = StaticAppContextProvider::getAppContextWithSitePath($request, $site_path);
     $kernel = new DrupalKernel('prod', $this->classLoader, TRUE, $app_context);
     $kernel::bootEnvironment($app_context->getAppRoot());
     Settings::initialize($app_context->getAppRoot(), $app_context->getSitePath(), $this->classLoader);

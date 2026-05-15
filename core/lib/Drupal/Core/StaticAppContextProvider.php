@@ -19,6 +19,7 @@ final class StaticAppContextProvider {
 
   use AppContextTrait {
     getAppContext as getAppContextBase;
+    getAppContextWithSitePath as getAppContextWithSitePathBase;
     getApplicationRoot as getApplicationRootBase;
     findSitePath as findSitePathBase;
     getBaseUrlAndPath as getBaseUrlAndPathBase;
@@ -34,6 +35,14 @@ final class StaticAppContextProvider {
   public static function getAppContext(?Request $request = NULL, bool $enable_multisite = TRUE) : AppContext {
     $request ??= Request::createFromGlobals();
     return self::getInstance()->getAppContextBase($request, $enable_multisite);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getAppContextWithSitePath(?Request $request, string $site_path) : AppContextInterface {
+    $request ??= Request::createFromGlobals();
+    return self::getInstance()->getAppContextWithSitePathBase($request, $site_path);
   }
 
   /**

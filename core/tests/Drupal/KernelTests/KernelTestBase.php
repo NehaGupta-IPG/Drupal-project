@@ -318,16 +318,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
 
     // Bootstrap the kernel. Do not use createFromRequest() to retain Settings.
     $request = Request::create('/');
-    [
-      'base_path' => $base_path,
-      'base_url' => $base_url,
-    ] = StaticAppContextProvider::getBaseUrlAndPath($request);
-    $app_context = new AppContext(
-      StaticAppContextProvider::getApplicationRoot(),
-      $this->siteDirectory,
-      $base_url,
-      $base_path,
-    );
+    $app_context = StaticAppContextProvider::getAppContextWithSitePath($request, $this->siteDirectory);
     $kernel = new DrupalKernel('testing', $this->classLoader, FALSE, $app_context);
     // Boot a new one-time container from scratch. Set the module list upfront
     // to avoid a subsequent rebuild or setting the kernel into the

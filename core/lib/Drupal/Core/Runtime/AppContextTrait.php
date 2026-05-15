@@ -52,6 +52,35 @@ trait AppContextTrait {
   }
 
   /**
+   * Get the application context for a request with a fixed site path.
+   *
+   * Primarily useful in tests where the site path is pre-determined.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request being served.
+   * @param string $site_path
+   *   The site path that should be used.
+   *
+   * @return \Drupal\Core\AppContextInterface
+   *   The application context.
+   */
+  protected function getAppContextWithSitePath(Request $request, string $site_path) : AppContextInterface {
+    $app_root = $this->getApplicationRoot();
+
+    [
+      'base_path' => $base_path,
+      'base_url' => $base_url,
+    ] = $this->getBaseUrlAndPath($request);
+
+    return new AppContext(
+      $app_root,
+      $site_path,
+      $base_url,
+      $base_path
+    );
+  }
+
+  /**
    * Returns the application root directory.
    *
    * This uses the constant written in \Drupal\Locations\DrupalLocation by the

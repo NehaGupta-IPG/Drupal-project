@@ -345,16 +345,9 @@ function install_begin_request($class_loader, &$install_state): void {
     date_default_timezone_set('Australia/Sydney');
   }
 
-  [
-    'base_path' => $base_path,
-    'base_url' => $base_url,
-  ] = StaticAppContextProvider::getBaseUrlAndPath($request);
-  $app_context = new AppContext(
-    dirname(__DIR__, 2),
-    empty($install_state['site_path']) ? StaticAppContextProvider::findSitePath($request, FALSE) : $install_state['site_path'],
-    $base_url,
-    $base_path,
-  );
+  $app_context = empty($install_state['site_path'])
+    ? StaticAppContextProvider::getAppContext($request)
+    : StaticAppContextProvider::getAppContextWithSitePath($request, $install_state['site_path']);
   Settings::initialize($app_context->getAppRoot(), $app_context->getSitePath(), $class_loader);
 
   // Ensure that procedural dependencies are loaded as early as possible,

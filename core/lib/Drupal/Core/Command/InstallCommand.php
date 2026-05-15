@@ -132,13 +132,7 @@ class InstallCommand extends Command {
    */
   protected function isDrupalInstalled() {
     try {
-      $app_context = StaticAppContextProvider::getAppContext();
-      $app_context = new AppContext(
-        $app_context->getAppRoot(),
-        $this->getSitePath(),
-        $app_context->getBaseUrl(),
-        $app_context->getBasePath(),
-      );
+      $app_context = StaticAppContextProvider::getAppContextWithSitePath(NULL, $this->getSitePath());
       $kernel = new DrupalKernel('prod', $this->classLoader, FALSE, $app_context);
       $kernel::bootEnvironment($app_context->getAppRoot());
       Settings::initialize($app_context->getAppRoot(), $app_context->getSitePath(), $this->classLoader);

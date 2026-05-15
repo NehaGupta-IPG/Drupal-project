@@ -356,7 +356,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $app_context = StaticAppContextProvider::getAppContext();
     }
     if (is_string($app_context)) {
-      @trigger_error('Calling ' . __CLASS__ . '::' . __FUNCTION__ . '() with `$app_context = NULL` is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use the runtime to retrieve an AppContext or instantiate AppContext yourself instead. See https://www.drupal.org/node/', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __CLASS__ . '::' . __FUNCTION__ . '() with `string $app_context` is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use the runtime to retrieve an AppContext or instantiate AppContext yourself instead. See https://www.drupal.org/node/', E_USER_DEPRECATED);
       $request = Request::createFromGlobals();
       [
         'base_path' => $base_path,
