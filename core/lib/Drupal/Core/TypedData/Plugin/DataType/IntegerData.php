@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\TypedData\Plugin\DataType;
 
+use Drupal\Component\Utility\IntegerLike;
 use Drupal\Core\Serialization\Attribute\JsonSchema;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\Attribute\DataType;
@@ -26,6 +27,16 @@ class IntegerData extends PrimitiveBase implements IntegerInterface {
   #[JsonSchema(['type' => 'integer'])]
   public function getCastedValue() {
     return (int) $this->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setValue($value, $notify = TRUE) {
+    // Currently this needs to support NULL, and even '', because this is how it
+    // is used.
+    $value = IntegerLike::toIntegerIfPossible($value, $this->getPropertyPath(...));
+    parent::setValue($value, $notify);
   }
 
 }
