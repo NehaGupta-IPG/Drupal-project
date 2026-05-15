@@ -116,7 +116,8 @@ class AllowedValuesConstraintValidatorTest extends KernelTestBase {
 
     $this->expectException(\TypeError::class);
     $this->expectExceptionMessage('Symfony\Component\Validator\Constraints\Choice::__construct(): Argument #3 ($callback) must be of type callable|string|null, array given');
-    $typed_data->validate();
+    $violations = $typed_data->validate();
+    $this->assertCount(0, $violations);
   }
 
 }

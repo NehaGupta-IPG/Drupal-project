@@ -262,7 +262,8 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
       // We must clone the definition because the instance is modified when
       // processing.
       // @see \Drupal\Core\Config\Schema\Mapping::processRequiredKeyFlags()
-      $typed_config->create(clone $definition, 2501)->validate();
+      $violations = $typed_config->create(clone $definition, 2501)->validate();
+      $this->assertCount(0, $violations);
       $this->fail('Expected an exception but none was raised.');
     }
     catch (UnexpectedTypeException $e) {
@@ -353,7 +354,8 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
     $config->getDataDefinition()
       ->addConstraint('ValidKeys', ['allowedKeys' => 'infer']);
     $this->expectExceptionMessage("'infer' is not a valid set of allowed keys.");
-    $config->validate();
+    $violations = $config->validate();
+    $this->assertCount(0, $violations);
   }
 
   /**

@@ -42,7 +42,8 @@ class ImmutablePropertiesConstraintValidatorTest extends KernelTestBase {
       ->create($definition, 39);
     $this->expectException(UnexpectedValueException::class);
     $this->expectExceptionMessage('Expected argument of type "' . ConfigEntityInterface::class . '", "int" given');
-    $data->validate();
+    $violations = $data->validate();
+    $this->assertCount(0, $violations);
   }
 
   /**
@@ -62,9 +63,10 @@ class ImmutablePropertiesConstraintValidatorTest extends KernelTestBase {
 
     $this->expectException(LogicException::class);
     $this->expectExceptionMessage("The entity does not have a 'non_existent' property.");
-    $this->container->get(TypedDataManagerInterface::class)
+    $violations = $this->container->get(TypedDataManagerInterface::class)
       ->create($definition, $entity)
       ->validate();
+    $this->assertCount(0, $violations);
   }
 
   /**
@@ -82,7 +84,8 @@ class ImmutablePropertiesConstraintValidatorTest extends KernelTestBase {
       ->create($definition, $entity->reveal());
     $this->expectException(LogicException::class);
     $this->expectExceptionMessage('The entity does not have an ID.');
-    $data->validate();
+    $violations = $data->validate();
+    $this->assertCount(0, $violations);
   }
 
   /**
