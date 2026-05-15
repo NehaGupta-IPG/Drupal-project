@@ -134,6 +134,8 @@ display:
             image_style: thumbnail
             image_loading:
               attribute: lazy
+            image_decoding:
+              attribute: auto
           group_column: ''
           group_columns: {  }
           group_rows: true

@@ -26,6 +26,8 @@ content:
       image_style: medium_8_7
       image_loading:
         attribute: lazy
+      image_decoding:
+        attribute: auto
     third_party_settings: {  }
     weight: 1
     region: content

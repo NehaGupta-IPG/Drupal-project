@@ -74,6 +74,9 @@ class ImageFormatter extends ImageFormatterBase {
       'image_loading' => [
         'attribute' => 'lazy',
       ],
+      'image_decoding' => [
+        'attribute' => 'auto',
+      ],
     ] + parent::defaultSettings();
   }
 
@@ -133,6 +136,31 @@ class ImageFormatter extends ImageFormatterBase {
     $element['image_loading']['attribute']['lazy']['#description'] = $this->t('Delays loading the image until that section of the page is visible in the browser. When in doubt, lazy loading is recommended.');
     $element['image_loading']['attribute']['eager']['#description'] = $this->t('Force browsers to download an image as soon as possible. This is the browser default for legacy reasons. Only use this option when the image is always expected to render.');
 
+    $decoding = $this->getSetting('image_decoding');
+    $element['image_decoding'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Image decoding'),
+      '#weight' => 10,
+      '#description' => $this->t('The decoding property allows you to control whether the browser is allowed to try to parallelize loading your image. If doing so would cause problems, you can specify sync to disable asynchronous loading. This can be useful when applied to <img> elements, but may be even more so when used for offscreen image objects.'),
+    ];
+    $decoding_attribute_options = [
+      'auto' => $this->t('Auto (<em>decoding="auto"</em>)'),
+      'sync' => $this->t('Sync (<em>decoding="sync"</em>)'),
+      'async' => $this->t('Async (<em>decoding="async"</em>)'),
+    ];
+    $element['image_decoding']['attribute'] = [
+      '#title' => $this->t('Decoding attribute'),
+      '#type' => 'radios',
+      '#default_value' => $decoding['attribute'],
+      '#options' => $decoding_attribute_options,
+      '#description' => $this->t('Select the decoding attribute for images. <a href=":link">Learn more about the decoding attribute for images.</a>', [
+        ':link' => 'https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/decoding',
+      ]),
+    ];
+    $element['image_decoding']['attribute']['sync']['#description'] = $this->t('Decode the image synchronously for atomic presentation with other content.');
+    $element['image_decoding']['attribute']['async']['#description'] = $this->t('Decode the image asynchronously to reduce delay in presenting other content.');
+    $element['image_decoding']['attribute']['auto']['#description'] = $this->t('Default mode, which indicates no preference for the decoding mode. The browser decides what is best for the user.');
+
     return $element;
   }
 
@@ -168,6 +196,11 @@ class ImageFormatter extends ImageFormatterBase {
     $image_loading = $this->getSetting('image_loading');
     $summary[] = $this->t('Image loading: @attribute', [
       '@attribute' => $image_loading['attribute'],
+    ]);
+
+    $decoding = $this->getSetting('image_decoding');
+    $summary[] = $this->t('Image decoding value: @attribute', [
+      '@attribute' => $decoding['attribute'],
     ]);
 
     return array_merge($summary, parent::settingsSummary());
@@ -222,6 +255,9 @@ class ImageFormatter extends ImageFormatterBase {
 
       $image_loading_settings = $this->getSetting('image_loading');
       $attributes['loading'] = $image_loading_settings['attribute'];
+
+      $image_decoding_settings = $this->getSetting('image_decoding');
+      $item_attributes['decoding'] = $image_decoding_settings['attribute'];
 
       $elements[$delta] = [
         '#theme' => 'image_formatter',

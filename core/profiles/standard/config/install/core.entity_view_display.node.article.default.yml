@@ -43,6 +43,8 @@ content:
       image_style: wide
       image_loading:
         attribute: eager
+      image_decoding:
+        attribute: auto
     third_party_settings: {  }
     weight: -1
     region: content

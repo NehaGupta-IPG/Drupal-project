@@ -64,7 +64,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $element = parent::settingsForm($form, $form_state);
 
-    unset($element['image_link'], $element['image_loading']);
+    unset($element['image_link'], $element['image_loading'], $element['image_decoding']);
 
     $image_styles = $this->imageDerivativeUtilities->styleOptions(FALSE);
     $description_link = Link::fromTextAndUrl(
