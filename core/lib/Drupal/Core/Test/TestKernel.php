@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Test;
 
-use Drupal\Core\AppContext;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Core\DrupalKernel;

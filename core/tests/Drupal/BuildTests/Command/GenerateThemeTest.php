@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Drupal\BuildTests\Command;
 
 use Drupal\BuildTests\QuickStart\QuickStartTestBase;
+use Drupal\Core\AppContext;
 use Drupal\Core\Command\GenerateTheme;
 use Drupal\Core\Serialization\Yaml;
+use Drupal\Core\StaticAppContextProvider;
 use Drupal\sqlite\Driver\Database\sqlite\Install\Tasks;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -756,7 +758,14 @@ EDITED, file_get_contents($theme_path_absolute . '/src/TestCustomThemePreRender.
   }
 
   private function runCommand(array $input): CommandTester {
-    $tester = new CommandTester(new GenerateTheme(NULL, $this->getWorkspaceDirectory()));
+    $app_context = StaticAppContextProvider::getAppContext();
+    $app_context = new AppContext(
+      $this->getWorkspaceDirectory(),
+      $app_context->getSitePath(),
+      $app_context->getBaseUrl(),
+      $app_context->getBasePath(),
+    );
+    $tester = new CommandTester(new GenerateTheme(NULL, $app_context));
     $tester->execute($input, [
       'capture_stderr_separately' => TRUE,
     ]);

@@ -285,6 +285,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *
    * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use
    *     getSitePath() on appContext property instead.
+   * @see https://www.drupal.org/node/3590362
    */
   protected $sitePath;
 
@@ -295,6 +296,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *
    * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use
    *    getAppRoot() on appContext property instead.
+   * @see https://www.drupal.org/node/3590362
    */
   protected $root;
 
@@ -352,21 +354,18 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $this->classLoader = $class_loader;
     $this->allowDumping = $allow_dumping;
     if ($app_context === NULL) {
-      @trigger_error('Calling ' . __CLASS__ . '::' . __FUNCTION__ . '() with `$app_context = NULL` is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use the runtime to retrieve an AppContext or instantiate AppContext yourself instead. See https://www.drupal.org/node/', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __CLASS__ . '::' . __FUNCTION__ . '() with `$app_context = NULL` is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use the runtime to retrieve an AppContext or instantiate AppContext yourself instead. See https://www.drupal.org/node/3590362', E_USER_DEPRECATED);
       $app_context = StaticAppContextProvider::getAppContext();
     }
     if (is_string($app_context)) {
-      @trigger_error('Calling ' . __CLASS__ . '::' . __FUNCTION__ . '() with `string $app_context` is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use the runtime to retrieve an AppContext or instantiate AppContext yourself instead. See https://www.drupal.org/node/', E_USER_DEPRECATED);
-      $request = Request::createFromGlobals();
-      [
-        'base_path' => $base_path,
-        'base_url' => $base_url,
-      ] = StaticAppContextProvider::getBaseUrlAndPath($request);
+      @trigger_error('Calling ' . __CLASS__ . '::' . __FUNCTION__ . '() with `string $app_context` is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use the runtime to retrieve an AppContext or instantiate AppContext yourself instead. See https://www.drupal.org/node/3590362', E_USER_DEPRECATED);
+      $app_root = $app_context;
+      $app_context = StaticAppContextProvider::getAppContext();
       $app_context = new AppContext(
-        $app_context,
-        StaticAppContextProvider::findSitePath($request, $app_context),
-        $base_url,
-        $base_path,
+        $app_root,
+        $app_context->getSitePath(),
+        $app_context->getBaseUrl(),
+        $app_context->getBasePath(),
       );
     }
     $this->appContext = $app_context;
@@ -387,7 +386,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *
    * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0.
    *    Use AppContext::getAppRoot() instead.
-   * @see https://www.drupal.org/node/
+   * @see https://www.drupal.org/node/3590362
    */
   protected static function guessApplicationRoot() {
     @trigger_error(__CLASS__ . "::" . __FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use getExtensionsParameter() instead. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
@@ -447,7 +446,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *
    * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0.
    *   Use \Drupal\Core\StaticAppContextProvider::findSitePath() instead.
-   * @see https://www.drupal.org/node/
+   * @see https://www.drupal.org/node/3590362
    *
    * @see \Drupal\Core\DrupalKernelInterface::getSitePath()
    * @see \Drupal\Core\DrupalKernelInterface::setSitePath()
@@ -455,7 +454,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @see example.sites.php
    */
   public static function findSitePath(Request $request, $require_settings = TRUE, $app_root = NULL) {
-    @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use \Drupal\Core\StaticAppContextProvider::findSitePath() instead. See https://www.drupal.org/node/', E_USER_DEPRECATED);
+    @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use \Drupal\Core\StaticAppContextProvider::findSitePath() instead. See https://www.drupal.org/node/3590362', E_USER_DEPRECATED);
     return StaticAppContextProvider::findSitePath($request, $app_root, $require_settings);
   }
 
@@ -466,7 +465,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if ($this->booted && $path !== $this->sitePath) {
       throw new \LogicException('Site path cannot be changed after calling boot()');
     }
-    @trigger_error(__CLASS__ . "::" . __FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Provide the site path through AppContext for the kernel instead. See https://www.drupal.org/node/', E_USER_DEPRECATED);
+    @trigger_error(__CLASS__ . "::" . __FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Provide the site path through AppContext for the kernel instead. See https://www.drupal.org/node/3590362', E_USER_DEPRECATED);
     $this->sitePath = $path;
     // Ensure our appContext stays in sync.
     $this->appContext = new AppContext(
@@ -1138,7 +1137,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     // Determine the application root if it's not supplied.
     if ($app_root === NULL) {
-      @trigger_error('Calling ' . __CLASS__ . '::' . __FUNCTION__ . '() with `$app_context = NULL` is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Provide the app_root from AppContext instead. See https://www.drupal.org/node/', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __CLASS__ . '::' . __FUNCTION__ . '() with `$app_context = NULL` is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Provide the app_root from AppContext instead. See https://www.drupal.org/node/3590362', E_USER_DEPRECATED);
       $app_root = StaticAppContextProvider::getApplicationRoot();
     }
 

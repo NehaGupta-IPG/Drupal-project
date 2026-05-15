@@ -3,14 +3,13 @@
 namespace Drupal\Core\Command;
 
 use Drupal\Component\Utility\Crypt;
-use Drupal\Core\AppContext;
+use Drupal\Core\AppContextInterface;
 use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Extension\InfoParserDynamic;
 use Drupal\Core\Site\Settings;
-use Drupal\Core\StaticAppContextProvider;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -41,8 +40,13 @@ class InstallCommand extends Command {
    *
    * @param object $class_loader
    *   The class loader.
+   * @param \Drupal\Core\AppContextInterface $appContext
+   *   The application context.
    */
-  public function __construct($class_loader) {
+  public function __construct(
+    $class_loader,
+    protected AppContextInterface $appContext,
+  ) {
     parent::__construct('install');
     $this->classLoader = $class_loader;
   }
@@ -75,7 +79,7 @@ class InstallCommand extends Command {
     }
 
     // Change the directory to the Drupal root.
-    chdir(dirname(__DIR__, 5));
+    chdir($this->appContext->getAppRoot());
 
     // Check whether there is already an installation.
     if ($this->isDrupalInstalled()) {
@@ -132,10 +136,9 @@ class InstallCommand extends Command {
    */
   protected function isDrupalInstalled() {
     try {
-      $app_context = StaticAppContextProvider::getAppContextWithSitePath(NULL, $this->getSitePath());
-      $kernel = new DrupalKernel('prod', $this->classLoader, FALSE, $app_context);
-      $kernel::bootEnvironment($app_context->getAppRoot());
-      Settings::initialize($app_context->getAppRoot(), $app_context->getSitePath(), $this->classLoader);
+      $kernel = new DrupalKernel('prod', $this->classLoader, FALSE, $this->appContext);
+      $kernel::bootEnvironment($this->appContext->getAppRoot());
+      Settings::initialize($this->appContext->getAppRoot(), $this->appContext->getSitePath(), $this->classLoader);
       $kernel->boot();
     }
     catch (ConnectionNotDefinedException) {

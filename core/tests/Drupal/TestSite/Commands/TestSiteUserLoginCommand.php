@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\TestSite\Commands;
 
-use Drupal\Core\AppContext;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StaticAppContextProvider;

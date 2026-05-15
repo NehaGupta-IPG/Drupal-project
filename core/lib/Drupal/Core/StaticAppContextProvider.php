@@ -22,9 +22,15 @@ final class StaticAppContextProvider {
     getAppContextWithSitePath as getAppContextWithSitePathBase;
     getApplicationRoot as getApplicationRootBase;
     findSitePath as findSitePathBase;
-    getBaseUrlAndPath as getBaseUrlAndPathBase;
   }
 
+  /**
+   * The singleton instance of this class.
+   *
+   * Allows the trait's non-static functions to be called.
+   *
+   * @var \Drupal\Core\StaticAppContextProvider|null
+   */
   private static ?self $instance = NULL;
 
   private function __construct() {}
@@ -58,13 +64,6 @@ final class StaticAppContextProvider {
   public static function findSitePath(Request $request, $app_root = NULL, $require_settings = TRUE) : string {
     $app_root ??= self::getApplicationRoot();
     return self::getInstance()->findSitePathBase($request, $app_root, $require_settings);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getBaseUrlAndPath(Request $request) : array {
-    return self::getInstance()->getBaseUrlAndPathBase($request);
   }
 
   /**

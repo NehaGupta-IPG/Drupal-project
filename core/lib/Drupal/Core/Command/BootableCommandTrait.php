@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Command;
 
-use Drupal\Core\AppContext;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Site\Settings;

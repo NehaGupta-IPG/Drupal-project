@@ -5,8 +5,8 @@ namespace Drupal\Core\Command;
 use Drupal\Core\AppContextInterface;
 use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\DrupalKernel;
+use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Site\Settings;
-use Drupal\Core\StaticAppContextProvider;
 use Drupal\user\Entity\User;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -38,8 +38,13 @@ class ServerCommand extends Command {
    *
    * @param object $class_loader
    *   The class loader.
+   * @param \Drupal\Core\AppContextInterface $appContext
+   *   The application context.
    */
-  public function __construct($class_loader) {
+  public function __construct(
+    $class_loader,
+    protected AppContextInterface $appContext,
+  ) {
     parent::__construct('server');
     $this->classLoader = $class_loader;
   }
@@ -72,30 +77,29 @@ class ServerCommand extends Command {
     }
 
     try {
-      $app_context = $this->boot();
+      $kernel = $this->boot();
     }
     catch (ConnectionNotDefinedException) {
       $io->getErrorStyle()->error("No installation found. Use the 'install' command.");
       return 1;
     }
-    return $this->start($host, $port, $app_context, $input, $io);
+    return $this->start($host, $port, $kernel, $input, $io);
   }
 
   /**
    * Boots up a Drupal environment.
    *
-   * @return \Drupal\Core\AppContextInterface
-   *   The context in which the Drupal application runs.
+   * @return \Drupal\Core\DrupalKernel
+   *   The Drupal Kernel.
    *
    * @throws \Exception
    *   Exception thrown if kernel does not boot.
    */
   protected function boot() {
     $request = Request::createFromGlobals();
-    $app_context = StaticAppContextProvider::getAppContextWithSitePath($request, $this->getSitePath());
-    $kernel = new DrupalKernel('prod', $this->classLoader, FALSE, $app_context);
-    $kernel::bootEnvironment($app_context->getAppRoot());
-    Settings::initialize($app_context->getAppRoot(), $app_context->getSitePath(), $this->classLoader);
+    $kernel = new DrupalKernel('prod', $this->classLoader, FALSE, $this->appContext);
+    $kernel::bootEnvironment($this->appContext->getAppRoot());
+    Settings::initialize($this->appContext->getAppRoot(), $this->appContext->getSitePath(), $this->classLoader);
     $kernel->boot();
     // Some services require a request to work. For example, CommentManager.
     // This is needed as generating the URL fires up entity load hooks.
@@ -103,7 +107,7 @@ class ServerCommand extends Command {
       ->get('request_stack')
       ->push($request);
 
-    return $app_context;
+    return $kernel;
   }
 
   /**
@@ -199,8 +203,8 @@ class ServerCommand extends Command {
    *   The hostname of the webserver.
    * @param int $port
    *   The port to start the webserver on.
-   * @param \Drupal\Core\DrupalKernelInterface $appContext
-   *   The application context.
+   * @param \Drupal\Core\DrupalKernelInterface $kernel
+   *   The Drupal kernel.
    * @param \Symfony\Component\Console\Input\InputInterface $input
    *   The input.
    * @param \Symfony\Component\Console\Style\SymfonyStyle $io
@@ -209,7 +213,7 @@ class ServerCommand extends Command {
    * @return int
    *   The exit status of the PHP in-built webserver command.
    */
-  protected function start($host, $port, AppContextInterface $appContext, InputInterface $input, SymfonyStyle $io) {
+  protected function start($host, $port, DrupalKernelInterface $kernel, InputInterface $input, SymfonyStyle $io) {
     $finder = new PhpExecutableFinder();
     $binary = $finder->find();
     if ($binary === FALSE) {
@@ -234,7 +238,7 @@ class ServerCommand extends Command {
       '-S',
       $host . ':' . $port,
       '.ht.router.php',
-    ], $appContext->getAppRoot(), [], NULL, NULL);
+    ], $this->appContext->getAppRoot(), [], NULL, NULL);
     if ($io->isVerbose()) {
       $io->writeln("<info>Server command:</info> {$process->getCommandLine()}");
     }
@@ -244,7 +248,7 @@ class ServerCommand extends Command {
     $descriptors[0] = STDIN;
     $descriptors[1] = ['pipe', 'w'];
     $descriptors[2] = ['pipe', 'w'];
-    $server = proc_open($process->getCommandLine(), $descriptors, $pipes, $appContext->getAppRoot());
+    $server = proc_open($process->getCommandLine(), $descriptors, $pipes, $this->appContext->getAppRoot());
     if (is_resource($server)) {
       if ($io->isVerbose()) {
         // Write a blank line so that server output and the useful information

@@ -6,6 +6,7 @@
  * Provides CLI commands for Drupal.
  */
 
+use Drupal\Core\AppContextInterface;
 use Drupal\Core\Command\GenerateTheme;
 use Drupal\Core\Command\QuickStartCommand;
 use Drupal\Core\Command\InstallCommand;
@@ -21,15 +22,15 @@ if (PHP_SAPI !== 'cli') {
 
 require_once __DIR__ . '/../../autoload_runtime.php';
 
-return static function () {
+return static function (AppContextInterface $app_context) {
   $classloader = require __DIR__ . '/../../autoload.php';
 
   $application = new Application('drupal', \Drupal::VERSION);
 
   $application->addCommand(new QuickStartCommand());
-  $application->addCommand(new InstallCommand($classloader));
-  $application->addCommand(new ServerCommand($classloader));
-  $application->addCommand(new GenerateTheme());
+  $application->addCommand(new InstallCommand($classloader, $app_context));
+  $application->addCommand(new ServerCommand($classloader, $app_context));
+  $application->addCommand(new GenerateTheme(NULL, $app_context));
   $application->addCommand(new RecipeCommand($classloader));
   $application->addCommand(new RecipeInfoCommand($classloader));
   $application->addCommand(new ContentExportCommand($classloader));
