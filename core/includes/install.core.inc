@@ -2309,7 +2309,7 @@ function install_check_requirements($install_state) {
     // before running the Drupal installer.
     if ($database = Database::getConnectionInfo()) {
       $request = Request::createFromGlobals();
-      $site_path = empty($install_state['site_path']) ? StaticAppContextProvider::findSitePath($request, FALSE) : $install_state['site_path'];
+      $site_path = empty($install_state['site_path']) ? StaticAppContextProvider::findSitePath($request, NULL, FALSE) : $install_state['site_path'];
       $database = $database['default'];
       $settings_file = './' . $site_path . '/settings.php';
 
