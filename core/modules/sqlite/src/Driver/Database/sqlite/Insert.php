@@ -47,14 +47,7 @@ class Insert extends QueryInsert {
       else {
         // Inserting multiple rows requires a transaction to be atomic, and
         // executes faster as a single transaction.
-        try {
-          $transaction = $this->connection->startTransaction();
-        }
-        catch (\PDOException $e) {
-          // $this->connection->exceptionHandler()->handleExecutionException()
-          // requires a $statement argument, so we cannot use that.
-          throw new DatabaseExceptionWrapper($e->getMessage(), 0, $e);
-        }
+        $transaction = $this->connection->startTransaction();
         foreach ($this->insertValues as $insert_values) {
           try {
             $stmt->execute($insert_values, $this->queryOptions);
