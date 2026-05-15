@@ -95,7 +95,6 @@ final class Logger {
     $this->io->writeln("--------------------------------------------------------------------------------");
   }
 
-
   /**
    * Returns the internal error status of the runner.
    *
