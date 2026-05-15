@@ -6,15 +6,17 @@
  */
 
 /**
- * Implements hook_install().
- */
-function views_install(): void {
-  module_set_weight('views', 10);
-}
-
-/**
  * Implements hook_update_last_removed().
  */
 function views_update_last_removed(): int {
   return 11201;
+}
+
+/**
+ * Reset views module weight.
+ */
+function views_update_11202(): void {
+  if (\Drupal::configFactory()->getEditable('core.extension')->get('module.views') == 10) {
+    module_set_weight('views', 0);
+  }
 }
