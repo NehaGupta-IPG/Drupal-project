@@ -132,6 +132,11 @@ services:
     arguments: ['@request_stack']
     tags:
       - { name: cache.context }
+  cache_context.ajax:
+    class: Drupal\Core\Cache\Context\AjaxCacheContext
+    arguments: ['@request_stack']
+    tags:
+      - { name: cache.context }
   cache_context.url:
     class: Drupal\Core\Cache\Context\UrlCacheContext
     arguments: ['@request_stack']

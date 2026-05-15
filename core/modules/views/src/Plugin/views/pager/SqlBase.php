@@ -425,7 +425,7 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
   public function getCacheContexts() {
     // The rendered link needs to play well with any other query parameter used
     // on the page, like other pagers and exposed filter.
-    return ['url.query_args'];
+    return ['url.query_args:items_per_page', 'url.query_args:offset'];
   }
 
   /**
