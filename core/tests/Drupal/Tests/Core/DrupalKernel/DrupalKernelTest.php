@@ -12,6 +12,7 @@ use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -117,6 +118,7 @@ class DrupalKernelTest extends UnitTestCase {
    * This test is run in a separate process since it defines DRUPAL_ROOT. This
    * stops any possible pollution of other tests.
    */
+  #[IgnoreDeprecations]
   #[RunInSeparateProcess]
   public function testFindSitePath(): void {
     $vfs_root = vfsStream::setup('drupal_root');
@@ -139,11 +141,7 @@ EOD;
     $request->server->set('SERVER_NAME', 'www.example.org');
     $request->server->set('SERVER_PORT', '8888');
     $request->server->set('SCRIPT_NAME', '/index.php');
-    // Testing of deprecated method.
-    // @phpstan-ignore-next-line staticMethod.deprecated
     $this->assertEquals('sites/example', DrupalKernel::findSitePath($request, TRUE, $vfs_root->url()));
-    // Testing of deprecated method.
-    // @phpstan-ignore-next-line staticMethod.deprecated
     $this->assertEquals('sites/example', DrupalKernel::findSitePath($request, FALSE, $vfs_root->url()));
   }
 
