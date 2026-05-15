@@ -253,6 +253,61 @@ class Query extends QueryBase implements QueryInterface {
   }
 
   /**
+   * {@inheritdoc}
+   *
+   * Overrides the default to defer the COUNT query. The COUNT is only
+   * executed in finalizePager() if the data query fills the page limit.
+   */
+  protected function initializePager(): void {
+    if ($this->pager && !empty($this->pager['limit']) && !$this->count) {
+      $page = \Drupal::service('pager.parameters')->findPage($this->pager['element']);
+      // Clone must happen before range() is applied, otherwise the COUNT
+      // query would include the LIMIT and return a wrong total.
+      $this->pager['count_query'] = clone $this;
+      $this->pager['page'] = $page;
+      $this->pager['start'] = $page * $this->pager['limit'];
+      $this->range($this->pager['start'], $this->pager['limit']);
+    }
+  }
+
+  /**
+   * Finalizes the pager after the data query has returned results.
+   *
+   * If the result count is less than the page limit, the total is calculated
+   * without a COUNT query. Otherwise, the saved COUNT query is executed.
+   *
+   * @param int $result_count
+   *   The number of results returned by the data query.
+   */
+  protected function finalizePager(int $result_count): void {
+    if (!isset($this->pager['count_query'])) {
+      return;
+    }
+
+    $page = $this->pager['page'];
+    $limit = $this->pager['limit'];
+    $on_last_page = $result_count < $limit;
+    $out_of_range = $page > 0 && $result_count === 0;
+
+    // When the data query returns fewer rows than the page limit, we are on
+    // the last page and already know the total, so the COUNT query can be
+    // skipped. The exception is when no results are returned on any page
+    // after the first, which means the requested page is beyond the result
+    // set. The COUNT query is still needed so the pager can show the correct
+    // total.
+    if ($on_last_page && !$out_of_range) {
+      $total = ($page * $limit) + $result_count;
+    }
+    else {
+      $total = $this->pager['count_query']->count()->execute();
+    }
+
+    $this->pager['total'] = $total;
+    \Drupal::service('pager.manager')->createPager($total, $limit, $this->pager['element']);
+    unset($this->pager['count_query']);
+  }
+
+  /**
    * Finish the query by adding fields, GROUP BY and range.
    *
    * @return $this
@@ -285,7 +340,9 @@ class Query extends QueryBase implements QueryInterface {
     // Return a keyed array of results. The key is either the revision_id or
     // the entity_id depending on whether the entity type supports revisions.
     // The value is always the entity id.
-    return $this->sqlQuery->execute()->fetchAllKeyed();
+    $results = $this->sqlQuery->execute()->fetchAllKeyed();
+    $this->finalizePager(count($results));
+    return $results;
   }
 
   /**

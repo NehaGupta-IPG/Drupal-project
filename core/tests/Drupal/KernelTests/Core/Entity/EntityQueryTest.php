@@ -6,6 +6,8 @@ namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\Query\QueryException;
+use Drupal\Core\Entity\Query\QueryInterface;
+use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\Entity\EntityTestMulRev;
 use Drupal\entity_test\EntityTestHelper;
@@ -547,15 +549,22 @@ class EntityQueryTest extends EntityKernelTestBase {
     ]);
     $request->setSession(new Session(new MockArraySessionStorage()));
     \Drupal::getContainer()->get('request_stack')->push($request);
-    $this->queryResults = $this->storage
+    $counter = (object) ['count' => 0];
+    $query = $this->storage
       ->getQuery()
       ->accessCheck(FALSE)
       ->sort("$figures.color")
       ->sort("$greetings.format")
       ->sort('id')
       ->pager(4, 1)
-      ->execute();
+      ->addTag('pager_count')
+      ->addMetaData('execution_count', $counter);
+    $this->queryResults = $query->execute();
     $this->assertResult(15, 6, 7, 1);
+    // There should have been 2 queries that executed, because this is not the
+    // last page. One query to get the results for the page, and one count query
+    // to get the total number of results.
+    $this->assertSame(2, $query->getMetaData('execution_count')->count);
 
     // Now test the reversed order.
     $query = $this->storage
@@ -568,6 +577,43 @@ class EntityQueryTest extends EntityKernelTestBase {
     $this->assertSame(15, $count_query->count()->execute());
     $this->queryResults = $query->execute();
     $this->assertResult(15, 13, 7, 5, 11, 9, 3, 1, 14, 6, 10, 2, 12, 4, 8);
+
+    // Test the pager by setting element #1 to page 3 with a page size of 4.
+    // Results will be #13-15 from above.
+    $counter->count = 0;
+    $request = Request::createFromGlobals();
+    $request->query->replace([
+      'page' => '0,3',
+    ]);
+    $request->setSession(new Session(new MockArraySessionStorage()));
+    \Drupal::getContainer()->get('request_stack')->push($request);
+    $query = $this->storage
+      ->getQuery()
+      ->accessCheck(FALSE)
+      ->sort("$figures.color")
+      ->sort("$greetings.format")
+      ->sort('id')
+      ->pager(4, 1)
+      ->addTag('pager_count')
+      ->addMetaData('execution_count', $counter);
+    $this->queryResults = $query->execute();
+    $this->assertResult(9, 13, 5);
+    // There should have been only 1 query that executed, because this is the
+    // last page. One query to get the results for the page. The count query is
+    // not run because the total number can be determined without it when
+    // running on the last page.
+    $this->assertSame(1, $query->getMetaData('execution_count')->count);
+  }
+
+  /**
+   * Implements hook_entity_query_tag__TAG_alter().
+   */
+  #[Hook('entity_query_tag__pager_count_alter')]
+  public function pagerCountQueryAlter(QueryInterface $query): void {
+    // Increments a counter every time an entity query tagged 'pager_count' is
+    // executed.
+    $counter = $query->getMetaData('execution_count') ?? (object) ['count' => 0];
+    $counter->count++;
   }
 
   /**
