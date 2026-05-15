@@ -384,7 +384,7 @@ function install_begin_request($class_loader, &$install_state): void {
   // Register the database driver extension list provider.
   $container
     ->register('extension.list.database_driver', 'Drupal\Core\Extension\DatabaseDriverList')
-    ->addArgument(dirname(__DIR__, 2))
+    ->addArgument($app_context->getAppRoot())
     ->addArgument('database_driver')
     ->addArgument(new NullBackend('database_driver'));
 
