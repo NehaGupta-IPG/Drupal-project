@@ -519,7 +519,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $this->assertCount(2, $errors);
     $this->assertEquals('This entity (node: ' . Html::escape($unsaved_unpublished_node_title) . ') cannot be referenced.', $errors[0]->getMessage());
     $this->assertEquals('field_test_node.0.entity', $errors[0]->getPropertyPath());
-    $this->assertEquals('This entity (node: ' . Html::escape($saved_unpublished_node->id()) . ') cannot be referenced.', $errors[1]->getMessage());
+    $this->assertEquals('This entity (node: ' . Html::escape((string) $saved_unpublished_node->id()) . ') cannot be referenced.', $errors[1]->getMessage());
     $this->assertEquals('field_test_node.1.target_id', $errors[1]->getPropertyPath());
 
     // Publish one of the nodes and try again.

@@ -11,6 +11,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountSwitcherInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\IntegerLikeAssert;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -53,8 +54,8 @@ class AdminAccountSwitcherTest extends KernelTestBase {
     /** @var \Drupal\Core\Session\AccountInterface $account */
     $account = $this->createUser(admin: TRUE);
 
-    $this->assertSame($account->id(), $this->container->get(AdminAccountSwitcher::class)->switchToAdministrator()->id());
-    $this->assertSame($account->id(), $this->container->get('current_user')->id());
+    IntegerLikeAssert::same($account->id(), $this->container->get(AdminAccountSwitcher::class)->switchToAdministrator()->id());
+    IntegerLikeAssert::same($account->id(), $this->container->get('current_user')->id());
   }
 
   /**
@@ -96,7 +97,7 @@ class AdminAccountSwitcherTest extends KernelTestBase {
     $account = $this->createUser();
     $switcher = $this->container->get(AdminAccountSwitcher::class);
     $this->assertSame($switcher, $switcher->switchTo($account));
-    $this->assertSame($account->id(), $this->container->get('current_user')->id());
+    IntegerLikeAssert::same($account->id(), $this->container->get('current_user')->id());
 
     $this->assertSame($switcher, $switcher->switchBack());
     $this->assertTrue($this->container->get('current_user')->isAnonymous());

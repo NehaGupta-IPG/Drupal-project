@@ -125,10 +125,10 @@ class TypedDataTest extends KernelTestBase {
     // Negative numbers and zero work fine.
     $this->assertTypedDataSetValue($typed_data, -123);
     $this->assertTypedDataSetValue($typed_data, 0);
-    // Integer-like strings pass validation, but they are not cast to integer.
-    $this->assertTypedDataSetValue($typed_data, '123');
-    $this->assertTypedDataSetValue($typed_data, '-123');
-    $this->assertTypedDataSetValue($typed_data, '0');
+    // Integer-like strings are cast to integer.
+    $this->assertTypedDataSetValue($typed_data, '123', get_value: 123);
+    $this->assertTypedDataSetValue($typed_data, '-123', get_value: -123);
+    $this->assertTypedDataSetValue($typed_data, '0', get_value: 0);
     // Float or float-like string fail validation.
     $this->assertTypedDataSetValue($typed_data, 7.5, 1);
     $this->assertTypedDataSetValue($typed_data, '7.5', 1);

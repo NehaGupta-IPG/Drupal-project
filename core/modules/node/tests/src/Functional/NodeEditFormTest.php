@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\node\NodeInterface;
+use Drupal\TestTools\IntegerLikeAssert;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -191,7 +192,7 @@ class NodeEditFormTest extends NodeTestBase {
 
     // Check that the node was authored by the currently logged in user.
     $node = $this->drupalGetNodeByTitle($edit['title[0][value]']);
-    $this->assertSame($this->adminUser->id(), $node->getOwnerId(), 'Node authored by admin user.');
+    IntegerLikeAssert::same($this->adminUser->id(), $node->getOwnerId(), 'Node authored by admin user.');
 
     $this->checkVariousAuthoredByValues($node, 'uid[0][target_id]');
 
@@ -219,7 +220,7 @@ class NodeEditFormTest extends NodeTestBase {
     $this->drupalGet('node/' . $node->id() . '/edit');
     $this->submitForm([], 'Save');
     $node = $this->nodeStorage->load($node->id());
-    $this->assertSame($this->webUser->id(), $node->getOwner()->id());
+    IntegerLikeAssert::same($this->webUser->id(), $node->getOwner()->id());
 
     $this->checkVariousAuthoredByValues($node, 'uid[target_id]');
 
@@ -231,7 +232,7 @@ class NodeEditFormTest extends NodeTestBase {
     $this->drupalGet('node/' . $node->id() . '/edit');
     $this->submitForm([], 'Save');
     $node = $this->nodeStorage->load($node->id());
-    $this->assertSame($this->webUser->id(), $node->getOwner()->id());
+    IntegerLikeAssert::same($this->webUser->id(), $node->getOwner()->id());
   }
 
   /**
@@ -327,7 +328,7 @@ class NodeEditFormTest extends NodeTestBase {
     $edit[$form_element_name] = $this->webUser->getAccountName();
     $this->submitForm($edit, 'Save');
     $node = $this->nodeStorage->load($node->id());
-    $this->assertSame($this->webUser->id(), $node->getOwnerId(), 'Node authored by normal user.');
+    IntegerLikeAssert::same($this->webUser->id(), $node->getOwnerId(), 'Node authored by normal user.');
   }
 
 }
