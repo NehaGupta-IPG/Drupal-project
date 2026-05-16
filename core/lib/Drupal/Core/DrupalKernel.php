@@ -324,10 +324,22 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *   In case the host name in the request is not trusted.
    */
   public static function createFromRequest(Request $request, $class_loader, $environment, $allow_dumping = TRUE, $app_context = NULL) {
-    $kernel = new static($environment, $class_loader, $allow_dumping, $app_context);
     if ($app_context === NULL) {
+      @trigger_error('Calling ' . __CLASS__ . '::' . __FUNCTION__ . '() with `$app_context = NULL` is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use the runtime to retrieve an AppContext or instantiate AppContext yourself instead. See https://www.drupal.org/node/3590362', E_USER_DEPRECATED);
       $app_context = StaticAppContextProvider::getAppContext($request);
     }
+    if (is_string($app_context)) {
+      @trigger_error('Calling ' . __CLASS__ . '::' . __FUNCTION__ . '() with `string $app_context` is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use the runtime to retrieve an AppContext or instantiate AppContext yourself instead. See https://www.drupal.org/node/3590362', E_USER_DEPRECATED);
+      $app_root = $app_context;
+      $app_context = StaticAppContextProvider::getAppContext();
+      $app_context = new AppContext(
+        $app_root,
+        $app_context->getSitePath(),
+        $app_context->getBaseUrl(),
+        $app_context->getBasePath(),
+      );
+    }
+    $kernel = new static($environment, $class_loader, $allow_dumping, $app_context);
     static::bootEnvironment($app_context instanceof AppContext ? $app_context->getAppRoot() : $app_context);
     $kernel->initializeSettings($request);
     return $kernel;
