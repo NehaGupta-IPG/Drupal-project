@@ -137,7 +137,7 @@
               element.closest('[data-toolbar-popover]'),
             );
             if (elements?.length > 0) {
-              elements[elements.length - 1].focus();
+              elements.at(-1).focus();
             }
           };
 
