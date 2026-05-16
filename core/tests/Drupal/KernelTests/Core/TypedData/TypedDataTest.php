@@ -122,6 +122,24 @@ class TypedDataTest extends KernelTestBase {
     $typed_data->setValue(NULL);
     $this->assertNull($typed_data->getValue(), 'Integer wrapper is null-able.');
     $this->assertEquals(0, $typed_data->validate()->count());
+    // Negative numbers and zero work fine.
+    $this->assertTypedDataSetValue($typed_data, -123);
+    $this->assertTypedDataSetValue($typed_data, 0);
+    // Integer-like strings pass validation, but they are not cast to integer.
+    $this->assertTypedDataSetValue($typed_data, '123');
+    $this->assertTypedDataSetValue($typed_data, '-123');
+    $this->assertTypedDataSetValue($typed_data, '0');
+    // Float or float-like string fail validation.
+    $this->assertTypedDataSetValue($typed_data, 7.5, 1);
+    $this->assertTypedDataSetValue($typed_data, '7.5', 1);
+    // Empty string fails validation.
+    $this->assertTypedDataSetValue($typed_data, '', 1);
+    // Behavior of IntegerData for booleans might appear unexpected:
+    // - ->toString() returns '' for FALSE, '1' for TRUE.
+    //   This is simply the result of (string) FALSE and (string) TRUE.
+    // - Validation fails for FALSE, but passes for TRUE.
+    $this->assertTypedDataSetValue($typed_data, FALSE, 1, get_string: '');
+    $this->assertTypedDataSetValue($typed_data, TRUE, get_string: '1');
     $typed_data->setValue('invalid');
     $this->assertEquals(1, $typed_data->validate()->count(), 'Validation detected invalid value.');
 
@@ -723,6 +741,62 @@ class TypedDataTest extends KernelTestBase {
     // Check behavior with an empty list.
     $typed_data = $this->createTypedData(ListDataDefinition::create('string'), []);
     $this->assertNull($typed_data->last(), 'Empty list should return NULL.');
+  }
+
+  /**
+   * Asserts some values on typed data after ->setValue().
+   *
+   * @param \Drupal\Core\TypedData\TypedDataInterface $typed_data
+   *   The typed data object to check.
+   * @param mixed $set_value
+   *   The value to pass to ->setValue().
+   * @param int $error_count
+   *   The expected result of ->validate()->count().
+   * @param mixed $get_value
+   *   The expected result of ->getValue().
+   *   Omit to use the same as for ->setValue().
+   * @param string|null $get_string
+   *   The expected result of ->getString(), or NULL for (string) $get.
+   */
+  protected function assertTypedDataSetValue(
+    TypedDataInterface $typed_data,
+    mixed $set_value,
+    int $error_count = 0,
+    mixed $get_value = '(same)',
+    string|null $get_string = NULL,
+  ): void {
+    $typed_data->setValue($set_value);
+    // In a test, it is ok to use a custom string as sentinel value.
+    // This allows treating NULL as a regular value.
+    if ($get_value === '(same)') {
+      $get_value = $set_value;
+    }
+    $this->assertTypedData($typed_data, $get_value, $error_count, $get_string);
+  }
+
+  /**
+   * Asserts some values on a given typed data object.
+   *
+   * @param \Drupal\Core\TypedData\TypedDataInterface $typed_data
+   *   The typed data object to check.
+   * @param mixed $get_value
+   *   The expected result of ->getValue().
+   * @param int $error_count
+   *   The expected result of ->validate()->count().
+   * @param string|null $get_string
+   *   The expected result of ->getString(), or NULL for (string) $get.
+   */
+  protected function assertTypedData(
+    TypedDataInterface $typed_data,
+    mixed $get_value,
+    int $error_count = 0,
+    string|null $get_string = NULL,
+  ): void {
+    $this->assertSame($get_value, $typed_data->getValue());
+    $this->assertCount($error_count, $typed_data->validate());
+    // Assert ->getValue() before and after validation, to detect side effects.
+    $this->assertSame($get_value, $typed_data->getValue());
+    $this->assertSame($get_string ?? (string) $get_value, $typed_data->getString());
   }
 
 }
