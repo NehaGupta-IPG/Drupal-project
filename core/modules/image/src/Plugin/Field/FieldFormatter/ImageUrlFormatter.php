@@ -16,6 +16,7 @@ use Drupal\Core\Url;
 use Drupal\file\FileUrlType;
 use Drupal\file\Trait\UrlSuggestionTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\image\ImageDerivativeUtilities;
 
 /**
  * Plugin implementation of the 'image_url' formatter.
@@ -38,45 +39,19 @@ class ImageUrlFormatter extends ImageFormatterBase {
    */
   protected $imageStyleStorage;
 
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $currentUser;
-
-  /**
-   * The file URL generator.
-   *
-   * @var \Drupal\Core\File\FileUrlGeneratorInterface|null
-   */
-  protected ?FileUrlGeneratorInterface $fileUrlGenerator;
-
-  /**
-   * Constructs an ImageFormatter object.
-   *
-   * @param string $plugin_id
-   *   The plugin ID for the formatter.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
-   *   The definition of the field to which the formatter is associated.
-   * @param array $settings
-   *   The formatter settings.
-   * @param string $label
-   *   The formatter label display setting.
-   * @param string $view_mode
-   *   The view mode.
-   * @param array $third_party_settings
-   *   Any third party settings.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   * @param \Drupal\Core\File\FileUrlGeneratorInterface|null $fileUrlGenerator
-   *   The file URL generator.
-   */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, AccountInterface $current_user, protected ?FileUrlGeneratorInterface $fileUrlGenerator = NULL) {
+  public function __construct(
+    $plugin_id,
+    $plugin_definition,
+    FieldDefinitionInterface $field_definition,
+    array $settings,
+    $label,
+    $view_mode,
+    array $third_party_settings,
+    EntityTypeManagerInterface $entity_type_manager,
+    protected AccountInterface $currentUser,
+    protected readonly ImageDerivativeUtilities $imageDerivativeUtilities,
+    , protected ?FileUrlGeneratorInterface $fileUrlGenerator = NULL
+  ) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
     $this->imageStyleStorage = $entity_type_manager->getStorage('image_style');
     $this->currentUser = $current_user;
@@ -84,24 +59,6 @@ class ImageUrlFormatter extends ImageFormatterBase {
       @trigger_error('Calling ' . __METHOD__ . ' without the $file_url_generator argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3410078', E_USER_DEPRECATED);
       $this->fileUrlGenerator = \Drupal::service('file_url_generator');
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $plugin_id,
-      $plugin_definition,
-      $configuration['field_definition'],
-      $configuration['settings'],
-      $configuration['label'],
-      $configuration['view_mode'],
-      $configuration['third_party_settings'],
-      $container->get('entity_type.manager')->getStorage('image_style'),
-      $container->get('current_user'),
-      $container->get('file_url_generator')
-    );
   }
 
   /**
@@ -124,7 +81,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
 
     unset($element['image_link'], $element['image_loading']);
 
-    $image_styles = image_style_options(FALSE);
+    $image_styles = $this->imageDerivativeUtilities->styleOptions(FALSE);
     $description_link = Link::fromTextAndUrl(
       $this->t('Configure Image Styles'),
       Url::fromRoute('entity.image_style.collection')
@@ -149,7 +106,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
   public function settingsSummary() {
     $summary = [];
 
-    $image_styles = image_style_options(FALSE);
+    $image_styles = $this->imageDerivativeUtilities->styleOptions(FALSE);
     // Unset possible 'No defined styles' option.
     unset($image_styles['']);
     // Styles could be lost because of enabled/disabled modules that defines

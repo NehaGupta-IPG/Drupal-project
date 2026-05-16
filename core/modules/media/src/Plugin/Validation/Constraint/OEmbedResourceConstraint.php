@@ -21,15 +21,14 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 class OEmbedResourceConstraint extends SymfonyConstraint {
 
   public function __construct(
-    mixed $options = NULL,
     public $unknownProviderMessage = 'The given URL does not match any known oEmbed providers.',
-    public $disallowedProviderMessage = 'Sorry, the @name provider is not allowed.',
+    public $disallowedProviderMessage = 'The @name provider is not allowed.',
     public $invalidResourceMessage = 'The provided URL does not represent a valid oEmbed resource.',
     public $providerErrorMessage = 'An error occurred while trying to retrieve the oEmbed provider database.',
     ?array $groups = NULL,
     mixed $payload = NULL,
   ) {
-    parent::__construct($options, $groups, $payload);
+    parent::__construct(groups: $groups, payload: $payload);
   }
 
 }

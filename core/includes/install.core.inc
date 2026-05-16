@@ -39,6 +39,11 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\locale\LocaleDefaultOptions;
 use Drupal\locale\LocaleFetch;
+use Drupal\locale\File\LocaleFileManager;
+use Drupal\locale\LocaleConfigBatch;
+use Drupal\locale\LocaleProjectChecker;
+use Drupal\locale\LocaleProjectRepository;
+use Drupal\locale\LocaleTranslatableProject;
 use Psr\Http\Client\ClientExceptionInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
@@ -482,12 +487,6 @@ function install_begin_request($class_loader, &$install_state): void {
     }
   }
 
-  // Before having installed the system module and being able to do a module
-  // rebuild, prime the module list static cache with the system module's
-  // location.
-  // @todo Remove as part of https://www.drupal.org/node/2186491
-  $module_list->setPathname('system', 'core/modules/system/system.info.yml');
-
   // Use the language from profile configuration if available.
   if (!empty($install_state['config_install_path']) && $install_state['config']['system.site']) {
     $install_state['parameters']['langcode'] = $install_state['config']['system.site']['default_langcode'];
@@ -508,9 +507,7 @@ function install_begin_request($class_loader, &$install_state): void {
   // Load all modules and perform request related initialization.
   $kernel->preHandle($request);
 
-  // Initialize a route on this legacy request similar to
-  // \Drupal\Core\DrupalKernel::prepareLegacyRequest() since normal routing
-  // will not happen.
+  // A route is required for route matching.
   $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, new Route('<none>'));
   $request->attributes->set(RouteObjectInterface::ROUTE_NAME, '<none>');
 
@@ -1227,7 +1224,11 @@ function install_database_errors($database, $settings_file) {
     $errors = $driverExtension->getInstallTasks()->runTasks();
   }
   catch (UnknownExtensionException) {
-    $errors['driver'] = t("In your %settings_file file you have configured @drupal to use a %driver server, however your PHP installation currently does not support this database type.", ['%settings_file' => $settings_file, '@drupal' => drupal_install_profile_distribution_name(), '%driver' => $database['driver']]);
+    $errors['driver'] = t("In your %settings_file file you have configured @drupal to use a %driver server, however your PHP installation currently does not support this database type.", [
+      '%settings_file' => $settings_file,
+      '@drupal' => drupal_install_profile_distribution_name(),
+      '%driver' => $database['driver'],
+    ]);
   }
   return $errors;
 }
@@ -1798,12 +1799,12 @@ function install_import_translations(&$install_state) {
     foreach ($languages as $language) {
       if (locale_translation_use_remote_source()) {
         $batch_builder->addOperation(
-          'locale_translation_batch_fetch_download',
+          LocaleFetch::class . ':batchDownload',
           ['drupal', $language->getId()],
         );
       }
       $batch_builder->addOperation(
-        'locale_translation_batch_fetch_import',
+        LocaleFetch::class . ':batchImport',
         ['drupal', $language->getId(), []],
       );
     }
@@ -1812,7 +1813,7 @@ function install_import_translations(&$install_state) {
       ->setTitle(t('Updating translations.'))
       ->setProgressMessage('')
       ->setErrorMessage(t('Error importing translation files'))
-      ->setFinishCallback('locale_translation_batch_fetch_finished');
+      ->setFinishCallback(LocaleFetch::class . ':batchFinished');
     return $batch_builder->toArray();
   }
 }
@@ -1832,7 +1833,7 @@ function _install_prepare_import($langcodes, $server_pattern): void {
 
   foreach ($langcodes as $langcode) {
     // Get the translation files located in the translations directory.
-    $files = locale_translate_get_interface_translation_files(['drupal'], [$langcode]);
+    $files = \Drupal::service(LocaleFileManager::class)->getInterfaceTranslationFiles(['drupal'], [$langcode]);
     // Pick the first file which matches the language, if any.
     $file = reset($files);
     if (is_object($file)) {
@@ -1845,18 +1846,18 @@ function _install_prepare_import($langcodes, $server_pattern): void {
         // Picking the first file does not necessarily result in the right file.
         // So we check if at least the major version number is available.
         if ($info['major']) {
-          $core = $info['major'] . '.x';
-          $data = [
-            'name' => 'drupal',
-            'project_type' => 'module',
-            'core' => $core,
-            'version' => $version,
-            'server_pattern' => $server_pattern,
-            'status' => 1,
-          ];
-          \Drupal::service('locale.project')->set($data['name'], $data);
+          $project = new LocaleTranslatableProject(
+            name: 'drupal',
+            type: 'module',
+            core: $info['major'] . '.x',
+            version: $version,
+            server_pattern: $server_pattern,
+            langcode: $langcode,
+            status: TRUE,
+          );
+          \Drupal::service(LocaleProjectRepository::class)->set($project);
           $module_handler->loadInclude('locale', 'inc', 'locale.compare');
-          locale_translation_check_projects_local(['drupal'], [$langcode]);
+          \Drupal::service(LocaleProjectChecker::class)->checkLocalProjects(['drupal'], [$langcode]);
         }
       }
     }
@@ -1883,12 +1884,12 @@ function install_finish_translations(&$install_state): array {
   // Build a fresh list of installed projects. When more projects than core are
   // installed, their translations will be downloaded (if required) and imported
   // using a batch.
-  $projects = locale_translation_build_projects();
+  $projects = \Drupal::service(LocaleProjectRepository::class)->buildProjects();
   $languages = \Drupal::languageManager()->getLanguages();
   $batches = [];
   if (count($projects) > 1) {
     $options = LocaleDefaultOptions::updateOptions();
-    if ($batch = \Drupal::service(LocaleFetch::class)->batchUpdateBuild([], array_keys($languages), $options)) {
+    if ($batch = \Drupal::service(LocaleFetch::class)->buildUpdateBatch([], array_keys($languages), $options)) {
       $batches[] = $batch;
     }
   }
@@ -1900,7 +1901,7 @@ function install_finish_translations(&$install_state): array {
   }
 
   // Creates configuration translations.
-  $batches[] = locale_config_batch_update_components([], array_keys($languages), [], TRUE);
+  $batches[] = \Drupal::service(LocaleConfigBatch::class)->buildBatch([], array_keys($languages), [], TRUE);
   return $batches;
 }
 
@@ -1991,7 +1992,7 @@ function install_check_translations($langcode, $server_pattern): array {
   $version = \Drupal::VERSION;
   // For dev releases, remove the '-dev' part and trust the translation server
   // to fall back to the latest stable release for that branch.
-  // @see locale_translation_build_projects()
+  // @see \Drupal\locale\LocaleProjectRepository::buildProjects()
   if (preg_match("/^(\d+\.\d+\.).*-dev$/", $version, $matches)) {
     // Example match: 8.0.0-dev => 8.0.x (Drupal core)
     $version = $matches[1] . 'x';
@@ -2031,7 +2032,10 @@ function install_check_translations($langcode, $server_pattern): array {
       'title'       => t('Translations directory'),
       'value'       => t('The translations directory does not exist.'),
       'severity'    => RequirementSeverity::Error,
-      'description' => t('The installer requires that you create a translations directory as part of the installation process. Create the directory %translations_directory . More details about installing Drupal are available in <a href=":install_txt">INSTALL.txt</a>.', ['%translations_directory' => $translations_directory, ':install_txt' => base_path() . 'core/INSTALL.txt']),
+      'description' => t('The installer requires that you create a translations directory as part of the installation process. Create the directory %translations_directory . More details about installing Drupal are available in <a href=":install_txt">INSTALL.txt</a>.', [
+        '%translations_directory' => $translations_directory,
+        ':install_txt' => base_path() . 'core/INSTALL.txt',
+      ]),
     ];
   }
   else {
@@ -2045,7 +2049,10 @@ function install_check_translations($langcode, $server_pattern): array {
         'title'       => t('Translations directory'),
         'value'       => t('The translations directory is not readable.'),
         'severity'    => RequirementSeverity::Error,
-        'description' => t('The installer requires read permissions to %translations_directory at all times. The <a href=":handbook_url">webhosting issues</a> documentation section offers help on this and other topics.', ['%translations_directory' => $translations_directory, ':handbook_url' => 'https://www.drupal.org/server-permissions']),
+        'description' => t('The installer requires read permissions to %translations_directory at all times. The <a href=":handbook_url">webhosting issues</a> documentation section offers help on this and other topics.', [
+          '%translations_directory' => $translations_directory,
+          ':handbook_url' => 'https://www.drupal.org/server-permissions',
+        ]),
       ];
     }
     // If translations directory is not writable, throw an error.
@@ -2054,7 +2061,10 @@ function install_check_translations($langcode, $server_pattern): array {
         'title'       => t('Translations directory'),
         'value'       => t('The translations directory is not writable.'),
         'severity'    => RequirementSeverity::Error,
-        'description' => t('The installer requires write permissions to %translations_directory during the installation process. The <a href=":handbook_url">webhosting issues</a> documentation section offers help on this and other topics.', ['%translations_directory' => $translations_directory, ':handbook_url' => 'https://www.drupal.org/server-permissions']),
+        'description' => t('The installer requires write permissions to %translations_directory during the installation process. The <a href=":handbook_url">webhosting issues</a> documentation section offers help on this and other topics.', [
+          '%translations_directory' => $translations_directory,
+          ':handbook_url' => 'https://www.drupal.org/server-permissions',
+        ]),
       ];
     }
     else {
@@ -2071,7 +2081,10 @@ function install_check_translations($langcode, $server_pattern): array {
       'title'       => t('Internet'),
       'value'       => t('The translation server is offline.'),
       'severity'    => RequirementSeverity::Error,
-      'description' => t('The installer requires to contact the translation server to download a translation file. Check your internet connection and verify that your website can reach the translation server at <a href=":server_url">@server_url</a>.', [':server_url' => $server_url, '@server_url' => $server_url]),
+      'description' => t('The installer requires to contact the translation server to download a translation file. Check your internet connection and verify that your website can reach the translation server at <a href=":server_url">@server_url</a>.', [
+        ':server_url' => $server_url,
+        '@server_url' => $server_url,
+      ]),
     ];
   }
   else {
@@ -2086,7 +2099,10 @@ function install_check_translations($langcode, $server_pattern): array {
         'title'       => t('Translation'),
         'value'       => t('The %language translation is not available.', ['%language' => $language]),
         'severity'    => RequirementSeverity::Error,
-        'description' => t('The %language translation file is not available at the translation server. <a href=":url">Choose a different language</a> or select English and translate your website later.', ['%language' => $language, ':url' => $_SERVER['SCRIPT_NAME']]),
+        'description' => t('The %language translation file is not available at the translation server. <a href=":url">Choose a different language</a> or select English and translate your website later.', [
+          '%language' => $language,
+          ':url' => $_SERVER['SCRIPT_NAME'],
+        ]),
       ];
     }
     else {
@@ -2105,7 +2121,10 @@ function install_check_translations($langcode, $server_pattern): array {
         'title'       => t('Translation'),
         'value'       => t('The %language translation could not be downloaded.', ['%language' => $language]),
         'severity'    => RequirementSeverity::Error,
-        'description' => t('The %language translation file could not be downloaded. <a href=":url">Choose a different language</a> or select English and translate your website later.', ['%language' => $language, ':url' => $_SERVER['SCRIPT_NAME']]),
+        'description' => t('The %language translation file could not be downloaded. <a href=":url">Choose a different language</a> or select English and translate your website later.', [
+          '%language' => $language,
+          ':url' => $_SERVER['SCRIPT_NAME'],
+        ]),
       ];
     }
   }
@@ -2338,7 +2357,10 @@ function install_display_requirements($install_state, $requirements) {
       $build['report']['#requirements'] = $requirements;
       if ($severity == RequirementSeverity::Warning) {
         $build['#title'] = t('Requirements review');
-        $build['#suffix'] = t('Check the messages and <a href=":retry">retry</a>, or you may choose to <a href=":cont">continue anyway</a>.', [':retry' => drupal_requirements_url(RequirementSeverity::Error), ':cont' => drupal_requirements_url($severity)]);
+        $build['#suffix'] = t('Check the messages and <a href=":retry">retry</a>, or you may choose to <a href=":cont">continue anyway</a>.', [
+          ':retry' => drupal_requirements_url(RequirementSeverity::Error),
+          ':cont' => drupal_requirements_url($severity),
+        ]);
       }
       else {
         $build['#title'] = t('Requirements problem');
