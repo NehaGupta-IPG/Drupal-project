@@ -8,7 +8,7 @@ use Drupal\Core\ImageToolkit\Attribute\ImageToolkitOperation;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\system\Plugin\ImageToolkit\Operation\gd\GDImageToolkitOperationBase;
 
-@trigger_error('Drupal\\image_test\\Plugin\\ImageToolkit\\Operation\\gd\\StatefulScaleAndCrop is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+@trigger_error('Drupal\\image_test\\Plugin\\ImageToolkit\\Operation\\gd\\StatefulScaleAndCrop is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
 
 /**
  * Legacy stateful GD2 Scale and crop operation.
@@ -16,7 +16,7 @@ use Drupal\system\Plugin\ImageToolkit\Operation\gd\GDImageToolkitOperationBase;
  * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
  *    whack-a-mole instead.
  *
- * @see https://www.drupal.org/node/7654123
+ * @see https://www.drupal.org/node/3590417
  */
 #[ImageToolkitOperation(
   id: "gd_stateful_scale_and_crop",

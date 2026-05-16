@@ -29,7 +29,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
    *    whack-a-mole instead.
    *
-   * @see https://www.drupal.org/node/7654123
+   * @see https://www.drupal.org/node/3590417
    */
   public protected(set) bool $isClone = FALSE;
 
@@ -39,7 +39,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
    *    whack-a-mole instead.
    *
-   * @see https://www.drupal.org/node/7654123
+   * @see https://www.drupal.org/node/3590417
    */
   public bool $isStateful {
     get => TRUE;
@@ -53,7 +53,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
    *    whack-a-mole instead.
    *
-   * @see https://www.drupal.org/node/7654123
+   * @see https://www.drupal.org/node/3590417
    */
   public ?ImageInterface $backfillImage {
     // @phpstan-ignore property.deprecated
@@ -79,16 +79,16 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
    *    whack-a-mole instead.
    *
-   * @see https://www.drupal.org/node/7654123
+   * @see https://www.drupal.org/node/3590417
    */
   protected $source {
     get {
-      @trigger_error('Getting ' . __CLASS__ . '::$source is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+      @trigger_error('Getting ' . __CLASS__ . '::$source is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
       // @phpstan-ignore property.deprecated,property.deprecated
       return isset($this->backfillImage) ? $this->backfillImage->getSource() : '';
     }
     set($source) {
-      @trigger_error('Setting ' . __CLASS__ . '::$source is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+      @trigger_error('Setting ' . __CLASS__ . '::$source is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
       // @phpstan-ignore property.deprecated
       $this->backfillImage->setSource($source);
     }
@@ -127,7 +127,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
    *    whack-a-mole instead.
    *
-   * @see https://www.drupal.org/node/7654123
+   * @see https://www.drupal.org/node/3590417
    */
   public function __clone(): void {
     if ($this->isStateful) {
@@ -145,7 +145,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    * {@inheritdoc}
    */
   public function setSource($source) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
     $this->source = $source;
     return $this;
   }
@@ -154,7 +154,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    * {@inheritdoc}
    */
   public function getSource() {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
     return $this->source;
   }
 

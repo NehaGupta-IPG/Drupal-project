@@ -28,7 +28,7 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
    * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
    *    whack-a-mole instead.
    *
-   * @see https://www.drupal.org/node/7654123
+   * @see https://www.drupal.org/node/3590417
    */
   public bool $needsToolkitInjection {
     get => TRUE;
@@ -42,7 +42,7 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
    * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
    *    whack-a-mole instead.
    *
-   * @see https://www.drupal.org/node/7654123
+   * @see https://www.drupal.org/node/3590417
    */
   protected ImageToolkitInterface $toolkit;
 
@@ -90,7 +90,7 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
    * {@inheritdoc}
    */
   public function setToolkit(ImageToolkitInterface $toolkit): void {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
     if (!$this->needsToolkitInjection) {
       throw new ImageToolkitException("No toolkit can be injected in image toolkit operation '{$this->getPluginId()}'");
     }
@@ -111,10 +111,10 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
    * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
    *    whack-a-mole instead.
    *
-   * @see https://www.drupal.org/node/7654123
+   * @see https://www.drupal.org/node/3590417
    */
   protected function getToolkit() {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
     if (!$this->needsToolkitInjection) {
       throw new ImageToolkitException("No toolkit injected in image toolkit operation '{$this->getPluginId()}'");
     }
