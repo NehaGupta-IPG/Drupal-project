@@ -5,6 +5,7 @@
  * Post update functions for File.
  */
 
+use Drupal\Core\Config\Entity\ConfigEntityUpdater;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\file\FileUrlType;

@@ -30,10 +30,7 @@ trait UrlSuggestionTrait {
       '#type' => 'radios',
       '#title' => $this->t('Show link as'),
       '#default_value' => $this->getSetting('show_link_as'),
-      '#options' => [
-        FileUrlType::Absolute->value => $this->t('Absolute URL'),
-        FileUrlType::Relative->value => $this->t('Relative URL'),
-      ],
+      '#options' => FileUrlType::asOptions(),
     ];
     $form['absolute_url_suggestion'] = $this->absoluteUrlSuggestion();
     $form['absolute_url_suggestion']['#states'] = [
