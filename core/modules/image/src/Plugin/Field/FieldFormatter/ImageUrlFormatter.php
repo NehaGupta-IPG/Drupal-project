@@ -15,7 +15,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\file\FileUrlType;
 use Drupal\file\Trait\UrlSuggestionTrait;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\image\ImageDerivativeUtilities;
 
 /**
@@ -50,11 +49,10 @@ class ImageUrlFormatter extends ImageFormatterBase {
     EntityTypeManagerInterface $entity_type_manager,
     protected AccountInterface $currentUser,
     protected readonly ImageDerivativeUtilities $imageDerivativeUtilities,
-    , protected ?FileUrlGeneratorInterface $fileUrlGenerator = NULL
+    protected ?FileUrlGeneratorInterface $fileUrlGenerator = NULL,
   ) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
     $this->imageStyleStorage = $entity_type_manager->getStorage('image_style');
-    $this->currentUser = $current_user;
     if ($fileUrlGenerator === NULL) {
       @trigger_error('Calling ' . __METHOD__ . ' without the $file_url_generator argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3410078', E_USER_DEPRECATED);
       $this->fileUrlGenerator = \Drupal::service('file_url_generator');
