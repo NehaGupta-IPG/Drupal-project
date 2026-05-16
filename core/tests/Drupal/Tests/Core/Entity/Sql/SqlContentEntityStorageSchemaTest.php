@@ -1345,6 +1345,9 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
    * @param array $expected
    *   (optional) An associative array describing the expected entity schema to
    *   be created. Defaults to expecting nothing.
+   * @param int $createTableCallCount
+   *   (optional) The number of expected calls to the ::createTable method.
+   *   Defaults to 0.
    */
   protected function setUpStorageSchema(array $expected = [], int $createTableCallCount = 0): void {
     $this->entityTypeManager

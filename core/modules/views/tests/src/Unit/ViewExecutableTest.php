@@ -748,6 +748,8 @@ class ViewExecutableTest extends UnitTestCase {
    *   Whether the display to test should be enabled.
    * @param bool $expected_result
    *   The expected result when calling execute().
+   * @param int $getPluginCallCount
+   *   The number of expected calls to the ::getPlugin method.
    */
   #[DataProvider('providerExecuteReturn')]
   public function testExecuteReturn($display_enabled, bool $expected_result, int $getPluginCallCount): void {
