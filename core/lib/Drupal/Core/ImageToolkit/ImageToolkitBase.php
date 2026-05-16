@@ -26,8 +26,8 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
   /**
    * BC layer.
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
-   *    whack-a-mole instead.
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Only
+   *   introduced to support backwards compatibility; there is no replacement.
    *
    * @see https://www.drupal.org/node/3590417
    */
@@ -36,8 +36,8 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
   /**
    * BC layer.
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
-   *    whack-a-mole instead.
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Only
+   *   introduced to support backwards compatibility; there is no replacement.
    *
    * @see https://www.drupal.org/node/3590417
    */
@@ -50,8 +50,8 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
   /**
    * An ImageInterface object to be used for BC.
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
-   *    whack-a-mole instead.
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Only
+   *   introduced to support backwards compatibility; there is no replacement.
    *
    * @see https://www.drupal.org/node/3590417
    */
@@ -76,19 +76,19 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    *
    * @var string
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
-   *    whack-a-mole instead.
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Access
+   *   image source path from the ImageInterface object directly.
    *
    * @see https://www.drupal.org/node/3590417
    */
   protected $source {
     get {
-      @trigger_error('Getting ' . __CLASS__ . '::$source is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+      @trigger_error('Getting ' . __CLASS__ . '::$source is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Access image source path from the ImageInterface object directly. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
       // @phpstan-ignore property.deprecated,property.deprecated
       return isset($this->backfillImage) ? $this->backfillImage->getSource() : '';
     }
     set($source) {
-      @trigger_error('Setting ' . __CLASS__ . '::$source is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+      @trigger_error('Setting ' . __CLASS__ . '::$source is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Access image source path from the ImageInterface object directly. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
       // @phpstan-ignore property.deprecated
       $this->backfillImage->setSource($source);
     }
@@ -124,8 +124,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
   /**
    * BC layer.
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
-   *    whack-a-mole instead.
+   * @todo remove from drupal:43.0.0.
    *
    * @see https://www.drupal.org/node/3590417
    */
@@ -145,7 +144,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    * {@inheritdoc}
    */
   public function setSource($source) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Set image source path via ImageInterface::setSource() instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
     $this->source = $source;
     return $this;
   }
@@ -154,7 +153,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    * {@inheritdoc}
    */
   public function getSource() {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Get image source path via ImageInterface::getSource() instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
     return $this->source;
   }
 

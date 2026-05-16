@@ -25,8 +25,8 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
   /**
    * BC layer.
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
-   *    whack-a-mole instead.
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Only
+   *   introduced to support backwards compatibility; there is no replacement.
    *
    * @see https://www.drupal.org/node/3590417
    */
@@ -39,8 +39,8 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
   /**
    * The image toolkit.
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
-   *    whack-a-mole instead.
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Stateless
+   *   toolkits must not be injected to the toolkit operation.
    *
    * @see https://www.drupal.org/node/3590417
    */
@@ -90,7 +90,7 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
    * {@inheritdoc}
    */
   public function setToolkit(ImageToolkitInterface $toolkit): void {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Stateless toolkits must not be injected to the toolkit operation. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
     if (!$this->needsToolkitInjection) {
       throw new ImageToolkitException("No toolkit can be injected in image toolkit operation '{$this->getPluginId()}'");
     }
@@ -108,13 +108,13 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
    * @return \Drupal\Core\ImageToolkit\ImageToolkitInterface
    *   The image toolkit in use.
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
-   *    whack-a-mole instead.
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Stateless
+   *   toolkits must not be injected to the toolkit operation.
    *
    * @see https://www.drupal.org/node/3590417
    */
   protected function getToolkit() {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Stateless toolkits must not be injected to the toolkit operation. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
     if (!$this->needsToolkitInjection) {
       throw new ImageToolkitException("No toolkit injected in image toolkit operation '{$this->getPluginId()}'");
     }

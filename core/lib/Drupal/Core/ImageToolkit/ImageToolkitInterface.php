@@ -58,8 +58,8 @@ interface ImageToolkitInterface extends ContainerFactoryPluginInterface, PluginI
    * @throws \BadMethodCallException
    *   After being set initially, the source image cannot be changed.
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
-   *    whack-a-mole instead.
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Set image
+   *   source path via ImageInterface::setSource() instead.
    *
    * @see https://www.drupal.org/node/3590417
    */
@@ -72,8 +72,8 @@ interface ImageToolkitInterface extends ContainerFactoryPluginInterface, PluginI
    *   The source path of the image file, or an empty string if the source is
    *   not set.
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
-   *    whack-a-mole instead.
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Get image
+   *   source path via ImageInterface::getSource() instead.
    *
    * @see https://www.drupal.org/node/3590417
    */

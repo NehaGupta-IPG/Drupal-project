@@ -37,19 +37,19 @@ class GDToolkit extends ImageToolkitBase {
   /**
    * A GD image.
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
-   *    whack-a-mole instead.
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Access
+   *   GdImageWrapper::$gdImage through its getter/setter instead.
    *
    * @see https://www.drupal.org/node/3590417
    */
   protected ?\GdImage $image {
     get {
-      @trigger_error('Getting ' . __CLASS__ . '::$image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+      @trigger_error('Getting ' . __CLASS__ . '::$image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Access GdImageWrapper::$gdImage through its getter/setter instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
       // @phpstan-ignore property.deprecated
       return $this->backfillImage->getGdImageObject();
     }
     set(?\GdImage $image) {
-      @trigger_error('Setting ' . __CLASS__ . '::$image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+      @trigger_error('Setting ' . __CLASS__ . '::$image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Access GdImageWrapper::$gdImage through its getter/setter instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
       // @phpstan-ignore property.deprecated
       $this->backfillImage->setGdImageObject($image);
     }
@@ -60,19 +60,19 @@ class GDToolkit extends ImageToolkitBase {
    *
    * @var int
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
-   *    whack-a-mole instead.
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Access
+   *   GdImageWrapper::$type through its getter/setter instead.
    *
    * @see https://www.drupal.org/node/3590417
    */
   protected $type {
     get {
-      @trigger_error('Getting ' . __CLASS__ . '::$type is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+      @trigger_error('Getting ' . __CLASS__ . '::$type is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Access GdImageWrapper::$type through its getter/setter instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
       // @phpstan-ignore property.deprecated
       return $this->backfillImage->getType();
     }
     set($type) {
-      @trigger_error('Setting ' . __CLASS__ . '::$type is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+      @trigger_error('Setting ' . __CLASS__ . '::$type is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Access GdImageWrapper::$type through its getter/setter instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
       // @phpstan-ignore property.deprecated
       $this->backfillImage->setType($type);
     }
@@ -91,8 +91,8 @@ class GDToolkit extends ImageToolkitBase {
    * @see \Drupal\system\Plugin\ImageToolkit\GDToolkit::setImage()
    * @see http://php.net/manual/function.getimagesize.php
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
-   *    whack-a-mole instead.
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Access
+   *   GdImageWrapper::$preLoadInfo through its getter/setter instead.
    *
    * @see https://www.drupal.org/node/3590417
    */
@@ -150,13 +150,13 @@ class GDToolkit extends ImageToolkitBase {
    * @return $this
    *   An instance of the current toolkit object.
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
-   *    whack-a-mole instead.
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
+   *   GdImageWrapper::setGdImageObject() instead.
    *
    * @see https://www.drupal.org/node/3590417
    */
   public function setImage(?\GdImage $image): static {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use GdImageWrapper::setGdImageObject() instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
     $this->image = $image;
     return $this;
   }
@@ -167,13 +167,13 @@ class GDToolkit extends ImageToolkitBase {
    * @return \GdImage|null
    *   The GD image object, or NULL if not available.
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
-   *    whack-a-mole instead.
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
+   *   GdImageWrapper::getGdImageObject() instead.
    *
    * @see https://www.drupal.org/node/3590417
    */
   public function getImage(): ?\GdImage {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use GdImageWrapper::getGdImageObject() instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
     return $this->image;
   }
 
@@ -211,7 +211,7 @@ class GDToolkit extends ImageToolkitBase {
   public function load($image = NULL) {
     // @phpstan-ignore property.deprecated
     if (!$image && $this->backfillImage) {
-      @trigger_error(__METHOD__ . '() not receiving the Image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+      @trigger_error(__METHOD__ . '() not receiving the Image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Always pass an ImageInterface object. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
       // @phpstan-ignore property.deprecated
       $image = $this->backfillImage;
     }
@@ -281,7 +281,7 @@ class GDToolkit extends ImageToolkitBase {
   public function isValid($image = NULL) {
     // @phpstan-ignore property.deprecated
     if (!$image && $this->backfillImage) {
-      @trigger_error(__METHOD__ . '() not receiving the Image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+      @trigger_error(__METHOD__ . '() not receiving the Image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Always pass an ImageInterface object. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
       // @phpstan-ignore property.deprecated
       $image = $this->backfillImage;
     }
@@ -296,7 +296,7 @@ class GDToolkit extends ImageToolkitBase {
   public function save($destination = NULL, $image = NULL) {
     // @phpstan-ignore property.deprecated
     if (!$image && $this->backfillImage) {
-      @trigger_error(__METHOD__ . '() not receiving the Image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+      @trigger_error(__METHOD__ . '() not receiving the Image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Always pass an ImageInterface object. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
       // @phpstan-ignore property.deprecated
       $image = $this->backfillImage;
     }
@@ -376,7 +376,7 @@ class GDToolkit extends ImageToolkitBase {
   public function parseFile($image = NULL) {
     // @phpstan-ignore property.deprecated
     if (!$image && $this->backfillImage) {
-      @trigger_error(__METHOD__ . '() not receiving the Image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+      @trigger_error(__METHOD__ . '() not receiving the Image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Always pass an ImageInterface object. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
       // @phpstan-ignore property.deprecated
       $image = $this->backfillImage;
     }
@@ -400,7 +400,7 @@ class GDToolkit extends ImageToolkitBase {
   public function getTransparentColor($image = NULL) {
     // @phpstan-ignore property.deprecated
     if (!$image && $this->backfillImage) {
-      @trigger_error(__METHOD__ . '() not receiving the Image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+      @trigger_error(__METHOD__ . '() not receiving the Image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Always pass an ImageInterface object. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
       // @phpstan-ignore property.deprecated
       $image = $this->backfillImage;
     }
@@ -450,7 +450,7 @@ class GDToolkit extends ImageToolkitBase {
   public function getWidth($image = NULL) {
     // @phpstan-ignore property.deprecated
     if (!$image && $this->backfillImage) {
-      @trigger_error(__METHOD__ . '() not receiving the Image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+      @trigger_error(__METHOD__ . '() not receiving the Image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Always pass an ImageInterface object. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
       // @phpstan-ignore property.deprecated
       $image = $this->backfillImage;
     }
@@ -473,7 +473,7 @@ class GDToolkit extends ImageToolkitBase {
   public function getHeight($image = NULL) {
     // @phpstan-ignore property.deprecated
     if (!$image && $this->backfillImage) {
-      @trigger_error(__METHOD__ . '() not receiving the Image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+      @trigger_error(__METHOD__ . '() not receiving the Image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Always pass an ImageInterface object. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
       // @phpstan-ignore property.deprecated
       $image = $this->backfillImage;
     }
@@ -497,13 +497,13 @@ class GDToolkit extends ImageToolkitBase {
    *   The image type represented by a PHP IMAGETYPE_* constant (e.g.
    *   IMAGETYPE_JPEG).
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
-   *    whack-a-mole instead.
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
+   *   GdImageWrapper::getType() instead.
    *
    * @see https://www.drupal.org/node/3590417
    */
   public function getType() {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use GdImageWrapper::getType() instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
     return $this->type;
   }
 
@@ -516,13 +516,13 @@ class GDToolkit extends ImageToolkitBase {
    *
    * @return $this
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
-   *    whack-a-mole instead.
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
+   *   GdImageWrapper::setType() instead.
    *
    * @see https://www.drupal.org/node/3590417
    */
   public function setType($type) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use GdImageWrapper::setType() instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
     $this->type = $type;
     return $this;
   }
@@ -533,7 +533,7 @@ class GDToolkit extends ImageToolkitBase {
   public function getMimeType($image = NULL) {
     // @phpstan-ignore property.deprecated
     if (!$image && $this->backfillImage) {
-      @trigger_error(__METHOD__ . '() not receiving the Image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+      @trigger_error(__METHOD__ . '() not receiving the Image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Always pass an ImageInterface object. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
       // @phpstan-ignore property.deprecated
       $image = $this->backfillImage;
     }

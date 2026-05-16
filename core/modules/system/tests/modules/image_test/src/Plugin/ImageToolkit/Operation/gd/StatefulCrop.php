@@ -8,13 +8,13 @@ use Drupal\Core\ImageToolkit\Attribute\ImageToolkitOperation;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\system\Plugin\ImageToolkit\Operation\gd\GDImageToolkitOperationBase;
 
-@trigger_error('Drupal\\image_test\\Plugin\\ImageToolkit\\Operation\\gd\\StatefulCrop is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+@trigger_error('Drupal\\image_test\\Plugin\\ImageToolkit\\Operation\\gd\\StatefulCrop is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Only introduced to test backwards compatibility; there is no replacement. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
 
 /**
  * Legacy stateful GD2 Crop operation.
  *
- * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
- *    whack-a-mole instead.
+ * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Only
+ *   introduced to test backwards compatibility; there is no replacement.
  *
  * @see https://www.drupal.org/node/3590417
  */
