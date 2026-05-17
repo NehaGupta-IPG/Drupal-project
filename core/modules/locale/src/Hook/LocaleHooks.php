@@ -13,7 +13,10 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\locale\LocaleDefaultOptions;
 use Drupal\locale\LocaleFetch;
+use Drupal\locale\LocaleTranslatableProject;
 use Drupal\locale\StreamWrapper\TranslationsStream;
+use Drupal\locale\File\LocaleFileManager;
+use Drupal\locale\LocaleProjectRepository;
 
 /**
  * Hook implementations for locale.
@@ -128,7 +131,7 @@ class LocaleHooks {
     \Drupal::service('locale.storage')->deleteTranslations(['language' => $language->id()]);
     // Remove interface translation files.
     \Drupal::moduleHandler()->loadInclude('locale', 'inc', 'locale.bulk');
-    locale_translate_delete_translation_files([], [$language->id()]);
+    \Drupal::service(LocaleFileManager::class)->deleteTranslationFiles([], [$language->id()]);
     // Remove translated configuration objects.
     \Drupal::service('locale.config_manager')->deleteLanguageTranslations($language->id());
     // Changing the language settings impacts the interface:
@@ -192,10 +195,8 @@ class LocaleHooks {
       // Determine which project+language should be updated.
       $request_time = \Drupal::time()->getRequestTime();
       $last = $request_time - $config->get('translation.update_interval_days') * 3600 * 24;
-      $projects = \Drupal::service('locale.project')->getAll();
-      $projects = array_filter($projects, function ($project) {
-        return $project['status'] == 1;
-      });
+      $projects = \Drupal::service(LocaleProjectRepository::class)->getAll();
+      $projects = array_filter($projects, fn(LocaleTranslatableProject $project): bool => $project->getStatus());
       $connection = \Drupal::database();
       $files = $connection->select('locale_file', 'f')
         ->condition('f.project', array_keys($projects), 'IN')
@@ -222,7 +223,7 @@ class LocaleHooks {
         $queue = \Drupal::queue('locale_translation', TRUE);
 
         foreach ($updates as $project => $languages) {
-          $batch = \Drupal::service(LocaleFetch::class)->batchUpdateBuild([$project], $languages, $options);
+          $batch = \Drupal::service(LocaleFetch::class)->buildUpdateBatch([$project], $languages, $options);
           foreach ($batch['operations'] as $item) {
             $queue->createItem($item);
           }
