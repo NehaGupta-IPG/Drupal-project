@@ -45,7 +45,7 @@ class ImagePreprocess {
    *   - sizes: The sizes attribute for viewport-based selection of images.
    *     phpcs:ignore
    *     - http://www.whatwg.org/specs/web-apps/current-work/multipage/embedded-content.html#introduction-3:viewport-based-selection-2
-   *   - image_preload: Determine whether we need to add preload link.
+   *   - preload: Determine whether we need to add preload link.
    */
   public function preprocessImage(array &$variables): void {
     $image_src = '';
@@ -87,21 +87,21 @@ class ImagePreprocess {
     // As a result, only mark images as lazy load that have dimensions.
     if (isset($variables['width'], $variables['height'])
       && !isset($variables['attributes']['loading'])
-      && !$variables['image_preload']
+      && !$variables['preload']
     ) {
       $variables['attributes']['loading'] = 'lazy';
     }
 
-    if ($image_src !== '' && $variables['image_preload']) {
+    if ($image_src !== '' && $variables['preload']) {
       // Make sure that we don't have loading attribute when we use preload.
       unset($variables['attributes']['loading']);
 
       // Prepare head links.
       $html_heads = [];
-      if (is_array($variables['image_preload'])) {
+      if (is_array($variables['preload'])) {
         // The case when image preload was prepared earlier.
         // @see template_preprocess_responsive_image().
-        $html_heads = $variables['image_preload'];
+        $html_heads = $variables['preload'];
       }
       else {
         // Prepare link attributes.
@@ -123,7 +123,7 @@ class ImagePreprocess {
         $key = hash('xxh32', serialize($image_src));
         $html_heads[] = [
           ['#tag' => 'link', '#attributes' => $attributes],
-          'image_preload_' . $key,
+          'preload_' . $key,
         ];
       }
 

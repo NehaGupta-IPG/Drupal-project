@@ -132,7 +132,7 @@ class MediaThumbnailFormatter extends ImageFormatter {
       $elements[$delta] = [
         '#theme' => 'image_formatter',
         '#item' => $media->get('thumbnail')->first(),
-        '#image_preload' => $image_loading_settings['preload'] ?? FALSE,
+        '#preload' => $image_loading_settings['preload'] ?? FALSE,
         '#attributes' => $attributes,
         '#image_style' => $this->getSetting('image_style'),
         '#url' => $this->getMediaThumbnailUrl($media, $items->getEntity()),

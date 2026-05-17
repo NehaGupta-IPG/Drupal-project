@@ -67,9 +67,9 @@ function views_post_update_counter_field_not_sortable(): void {
 }
 
 /**
- * Add lazy load options to all image type field configurations.
+ * Add preload load options to all image type field configurations.
  */
-function views_post_update_image_preload(?array &$sandbox = NULL): void {
+function views_post_update_preload(?array &$sandbox = NULL): void {
   /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
   $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
   \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {

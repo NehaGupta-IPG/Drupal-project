@@ -329,7 +329,7 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
         '#attributes' => $attributes,
         '#responsive_image_style_id' => $responsive_image_style ? $responsive_image_style->id() : '',
         '#url' => $url,
-        '#image_preload' => $image_loading_settings['preload'] ?? FALSE,
+        '#preload' => $image_loading_settings['preload'] ?? FALSE,
         '#cache' => [
           'tags' => $cache_tags,
         ],

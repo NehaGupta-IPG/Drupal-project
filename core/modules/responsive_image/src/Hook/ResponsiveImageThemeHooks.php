@@ -36,7 +36,7 @@ class ResponsiveImageThemeHooks {
           'responsive_image_style_id' => [],
           'height' => NULL,
           'width' => NULL,
-          'image_preload' => FALSE,
+          'preload' => FALSE,
         ],
         'initial preprocess' => static::class . ':preprocessResponsiveImage',
       ],
@@ -46,7 +46,7 @@ class ResponsiveImageThemeHooks {
           'item' => NULL,
           'url' => NULL,
           'responsive_image_style_id' => NULL,
-          'image_preload' => FALSE,
+          'preload' => FALSE,
         ],
         'initial preprocess' => static::class . ':preprocessResponsiveImageFormatter',
       ],
@@ -65,7 +65,7 @@ class ResponsiveImageThemeHooks {
    *     placed in the img tag.
    *   - responsive_image_style_id: A responsive image style.
    *   - url: An optional \Drupal\Core\Url object.
-   *   - image_preload: Determine whether we need to add preload link.
+   *   - preload: Determine whether we need to add preload link.
    */
   public function preprocessResponsiveImageFormatter(&$variables): void {
     // Provide fallback to standard image if valid responsive image style is not
@@ -103,7 +103,7 @@ class ResponsiveImageThemeHooks {
       $variables['responsive_image']["#$key"] = $item->$key;
     }
     $variables['responsive_image']['#attributes'] = $attributes;
-    $variables['responsive_image']['#image_preload'] = $variables['image_preload'];
+    $variables['responsive_image']['#preload'] = $variables['preload'];
   }
 
   /**
@@ -119,7 +119,7 @@ class ResponsiveImageThemeHooks {
    *   - attributes: Associative array of attributes to be placed in the img
    *     tag.
    *   - responsive_image_style_id: The ID of the responsive image style.
-   *   - image_preload: Determine whether we need to add preload link.
+   *   - preload: Determine whether we need to add preload link.
    */
   public function preprocessResponsiveImage(array &$variables): void {
     // Make sure that width and height are proper values, if they exist we'll
@@ -213,12 +213,12 @@ class ResponsiveImageThemeHooks {
     }
 
     // Prepare preload links.
-    if ($variables['image_preload']) {
+    if ($variables['preload']) {
       $html_head = [];
       foreach ($variables['sources'] as $source) {
         $html_head[] = $this->responsiveImagePrepareHeaderLink($variables['uri'], $source);
       }
-      $variables['img_element']['#image_preload'] = $html_head;
+      $variables['img_element']['#preload'] = $html_head;
     }
   }
 
@@ -265,7 +265,7 @@ class ResponsiveImageThemeHooks {
         '#tag' => 'link',
         '#attributes' => $attrs,
       ],
-      'responsive_image_preload_' . $type . '_' . $key,
+      'responsive_preload_' . $type . '_' . $key,
     ];
   }
 

@@ -262,7 +262,7 @@ class ImageFormatter extends ImageFormatterBase {
         '#attributes' => $attributes,
         '#image_style' => $image_style_setting,
         '#url' => $url,
-        '#image_preload' => $image_loading_settings['preload'] ?? FALSE,
+        '#preload' => $image_loading_settings['preload'] ?? FALSE,
         '#cache' => [
           'tags' => $cache_tags,
         ],

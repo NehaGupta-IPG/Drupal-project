@@ -99,7 +99,7 @@ class ThemeCommonElements {
           'height' => NULL,
           'alt' => '',
           'title' => NULL,
-          'image_preload' => FALSE,
+          'preload' => FALSE,
           'attributes' => [],
           'sizes' => NULL,
           'srcset' => [],

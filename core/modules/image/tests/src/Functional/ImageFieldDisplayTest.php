@@ -117,7 +117,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       '#width' => 40,
       '#height' => 20,
       '#alt' => $alt,
-      '#image_preload' => FALSE,
+      '#preload' => FALSE,
       '#attributes' => ['loading' => 'lazy'],
     ];
     $default_output = str_replace("\n", '', (string) $renderer->renderRoot($image));
@@ -139,7 +139,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       '#width' => 40,
       '#height' => 20,
       '#alt' => $alt,
-      '#image_preload' => FALSE,
+      '#preload' => FALSE,
       '#attributes' => ['loading' => 'lazy'],
     ];
     $default_output = '<a href="' . $file->createFileUrl() . '">' . (string) $renderer->renderRoot($image) . '</a>';
@@ -199,7 +199,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       '#height' => 20,
       '#style_name' => 'thumbnail',
       '#alt' => $alt,
-      '#image_preload' => FALSE,
+      '#preload' => FALSE,
       '#attributes' => ['loading' => 'lazy'],
     ];
     $default_output = (string) $renderer->renderRoot($image_style);
@@ -310,7 +310,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       '#title' => $this->randomMachineName(),
       '#width' => 40,
       '#height' => 20,
-      '#image_preload' => FALSE,
+      '#preload' => FALSE,
       '#attributes' => ['loading' => 'lazy'],
     ];
     $edit = [
@@ -424,7 +424,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       '#width' => 40,
       '#height' => 20,
       '#alt' => $alt,
-      '#image_preload' => FALSE,
+      '#preload' => FALSE,
       '#attributes' => ['loading' => 'lazy'],
     ];
     $default_output = str_replace("\n", '', (string) $renderer->renderRoot($image));
@@ -436,7 +436,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       'settings' => [
         'image_link' => '',
         'image_style' => '',
-        'image_preload' => FALSE,
+        'preload' => FALSE,
         'image_loading' => ['attribute' => 'eager'],
       ],
     ];
@@ -451,7 +451,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       '#width' => 40,
       '#height' => 20,
       '#alt' => $alt,
-      '#image_preload' => FALSE,
+      '#preload' => FALSE,
       '#attributes' => ['loading' => 'eager'],
     ];
     $default_output = (string) $renderer->renderRoot($image);
@@ -474,7 +474,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       '#height' => 20,
       '#style_name' => 'thumbnail',
       '#alt' => $alt,
-      '#image_preload' => FALSE,
+      '#preload' => FALSE,
       '#attributes' => ['loading' => 'eager'],
     ];
     $default_output = (string) $renderer->renderRoot($image_style);
@@ -565,12 +565,12 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       '#width' => 40,
       '#height' => 20,
       '#alt' => $alt,
-      '#image_preload' => $preload,
+      '#preload' => $preload,
       '#attributes' => ['loading' => 'lazy'],
     ];
     $default_output = $renderer->renderRoot($image);
     $this->drupalGet('node/' . $nid);
-    // Regardless of image_preload, the image must be on the page.
+    // Regardless of preload, the image must be on the page.
     $this->assertSession()->responseContains($default_output);
     // Check preload head link tag.
     $this->assertPageHead('link', [
@@ -595,12 +595,12 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       '#height' => 20,
       '#style_name' => 'thumbnail',
       '#alt' => $alt,
-      '#image_preload' => $preload,
+      '#preload' => $preload,
       '#attributes' => ['loading' => 'lazy'],
     ];
     $default_output = $renderer->renderRoot($image_style);
     $this->drupalGet('node/' . $nid);
-    // Regardless of image_preload, the image must be on the page.
+    // Regardless of preload, the image must be on the page.
     $this->assertSession()->responseContains($default_output);
     // Prepare expected image URL.
     // @see template_preprocess_image()
@@ -662,7 +662,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       '#title' => $title,
       '#width' => 40,
       '#height' => 20,
-      '#image_preload' => FALSE,
+      '#preload' => FALSE,
       '#attributes' => ['loading' => 'lazy'],
     ];
     $default_output = str_replace("\n", '', (string) $renderer->renderRoot($image));
@@ -688,7 +688,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       '#width' => 40,
       '#height' => 20,
       '#alt' => $alt,
-      '#image_preload' => FALSE,
+      '#preload' => FALSE,
       '#attributes' => ['loading' => 'lazy'],
     ];
     $image_output = str_replace("\n", '', (string) $renderer->renderRoot($image));
@@ -744,7 +744,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       '#title' => $title,
       '#width' => 40,
       '#height' => 20,
-      '#image_preload' => FALSE,
+      '#preload' => FALSE,
       '#attributes' => ['loading' => 'lazy'],
     ];
     $default_output = str_replace("\n", '', (string) $renderer->renderRoot($image));
