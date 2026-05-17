@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\rest\Functional\EntityResource;
 
 use Drupal\Component\Assertion\Inspector;
-use Drupal\Component\Serialization\ObjectAwareSerializationInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Random;
 use Drupal\Core\Cache\Cache;
@@ -633,7 +632,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
       $this->assertLessThanOrEqual(2, count($cache_items));
       $found_cached_200_response = FALSE;
       $other_cached_responses_are_4xx = TRUE;
-      $serializer = $this->container->get(ObjectAwareSerializationInterface::class);
+      $serializer = $this->container->get('serialization.cache_data');
       foreach ($cache_items as $cache_item) {
         $cached_response = $serializer::decode($cache_item->data);
         if (!$cached_response instanceof CacheRedirect) {

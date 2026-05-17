@@ -266,7 +266,7 @@ services:
       - [setContainer, ['@service_container']]
   cache.backend.database:
     class: Drupal\Core\Cache\DatabaseBackendFactory
-    arguments: ['@database', '@cache_tags.invalidator.checksum', '@settings', '@Drupal\Component\Serialization\ObjectAwareSerializationInterface', '@datetime.time']
+    arguments: ['@database', '@cache_tags.invalidator.checksum', '@settings', '@serialization.cache_data', '@datetime.time']
     tags:
       - { name: backend_overridable }
   cache.backend.apcu:
@@ -556,7 +556,7 @@ services:
   Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface: '@keyvalue.expirable'
   keyvalue.expirable.database:
     class: Drupal\Core\KeyValueStore\KeyValueDatabaseExpirableFactory
-    arguments: ['@Drupal\Component\Serialization\ObjectAwareSerializationInterface', '@database', '@datetime.time']
+    arguments: ['@serialization.phpserialize', '@database', '@datetime.time']
   logger.factory:
     class: Drupal\Core\Logger\LoggerChannelFactory
     arguments: ['@request_stack', '@current_user']
@@ -607,11 +607,11 @@ services:
 
   serialization.json:
     class: Drupal\Component\Serialization\Json
-  serialization.igbinary:
+  serialization.cache_data:
     class: Drupal\Component\Serialization\IgbinarySerialize
   serialization.phpserialize:
     class: Drupal\Component\Serialization\PhpSerialize
-  Drupal\Component\Serialization\ObjectAwareSerializationInterface: '@serialization.igbinary'
+  Drupal\Component\Serialization\ObjectAwareSerializationInterface: '@serialization.phpserialize'
   serialization.yaml:
     class: Drupal\Component\Serialization\Yaml
 

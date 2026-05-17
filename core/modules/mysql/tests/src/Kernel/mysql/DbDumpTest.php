@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\mysql\Kernel\mysql;
 
 use Drupal\Component\Datetime\TimeInterface;
-use Drupal\Component\Serialization\ObjectAwareSerializationInterface;
 use Drupal\Core\Command\DbDumpApplication;
 use Drupal\Core\Config\DatabaseStorage;
 use Drupal\Core\Database\Database;
@@ -79,7 +78,7 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
       ->addArgument(new Reference('database'))
       ->addArgument(new Reference('cache_tags.invalidator.checksum'))
       ->addArgument(new Reference('settings'))
-      ->addArgument(new Reference(ObjectAwareSerializationInterface::class))
+      ->addArgument(new Reference('serialization.cache_data'))
       ->addArgument(new Reference(TimeInterface::class));
   }
 

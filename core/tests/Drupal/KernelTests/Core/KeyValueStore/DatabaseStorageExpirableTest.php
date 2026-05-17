@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\KeyValueStore;
 
-use Drupal\Component\Serialization\IgbinarySerialize;
-use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\KeyValueStore\KeyValueFactory;
 use PHPUnit\Framework\Attributes\Group;
@@ -162,65 +160,6 @@ class DatabaseStorageExpirableTest extends StorageTestBase {
     $this->assertNull($stores[0]->get('yesterday'));
     $stores[0]->setWithExpireIfNotExists('yesterday', 'Oh, yesterday came suddenly', $day);
     $this->assertSame('Oh, yesterday came suddenly', $stores[0]->get('yesterday'));
-  }
-
-  /**
-   * Tests that legacy PHP-serialized expirable rows remain readable.
-   */
-  public function testLegacyPhpSerializedDataRemainsReadable(): void {
-    $collection = $this->randomMachineName();
-    $key = $this->randomMachineName();
-    $data = [
-      'foo' => 'bar',
-      'nested' => ['baz' => TRUE],
-    ];
-    $store = $this->container->get('keyvalue.expirable.database')->get($collection);
-
-    $store->set('setup', 'setup');
-    $store->delete('setup');
-
-    Database::getConnection()
-      ->merge('key_value_expire')
-      ->keys([
-        'collection' => $collection,
-        'name' => $key,
-      ])
-      ->fields([
-        'value' => serialize($data),
-        'expire' => \Drupal::time()->getRequestTime() + 3600,
-      ])
-      ->execute();
-
-    $this->assertSame($data, $store->get($key));
-  }
-
-  /**
-   * Tests that new expirable rows use the igbinary serializer when available.
-   */
-  public function testIgbinaryPayloadsAreWrittenWhenAvailable(): void {
-    if (!function_exists('igbinary_serialize')) {
-      $this->markTestSkipped('Requires the igbinary extension.');
-    }
-
-    $collection = $this->randomMachineName();
-    $key = $this->randomMachineName();
-    $data = [
-      'foo' => 'bar',
-      'nested' => ['baz' => TRUE],
-    ];
-    $store = $this->container->get('keyvalue.expirable.database')->get($collection);
-
-    $store->setWithExpire($key, $data, 3600);
-
-    $row = Database::getConnection()
-      ->select('key_value_expire', 'kve')
-      ->fields('kve', ['value'])
-      ->condition('collection', $collection)
-      ->condition('name', $key)
-      ->execute()
-      ->fetchAssoc();
-
-    $this->assertSame(IgbinarySerialize::encode($data), $row['value']);
   }
 
 }

@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Cache;
 
-use Drupal\Component\Serialization\IgbinarySerialize;
-use Drupal\Component\Serialization\ObjectAwareSerializationInterface;
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Component\Serialization\IgbinarySerialize;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\DatabaseBackend;
 use PHPUnit\Framework\Attributes\Group;
@@ -37,7 +36,7 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
       $this->container->get('database'),
       $this->container->get('cache_tags.invalidator.checksum'),
       $bin,
-      $this->container->get(ObjectAwareSerializationInterface::class),
+      $this->container->get('serialization.cache_data'),
       \Drupal::service(TimeInterface::class),
       static::$maxRows,
     );
