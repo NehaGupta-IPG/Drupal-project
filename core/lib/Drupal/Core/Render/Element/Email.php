@@ -97,24 +97,23 @@ class Email extends FormElementBase {
    * already.
    */
   public static function validateEmail(&$element, FormStateInterface $form_state, &$complete_form) {
-    $value = trim($element['#value']);
-
-    // Skip validation if the value is empty.
-    if ($value === '') {
-      $form_state->setValueForElement($element, $value);
-      return;
-    }
-
     // Create an array of email addresses so each one can be validated
     // individually. Email addresses can be only comma-separated.
     // @see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/multiple#email_input
     $multiple = $element['#multiple'];
     $emails = $multiple
-      ? array_map('trim', explode(',', $value))
-      : [$value];
+      ? explode(',', $element['#value'])
+      : [$element['#value']];
 
-    // Display an error when an email address is empty.
+    $emails = array_map('trim', $emails);
+
     if (in_array('', $emails, TRUE)) {
+      // Skip validation if there is a single empty value.
+      if (count($emails) === 1) {
+        $form_state->setValueForElement($element, '');
+        return;
+      }
+      // Display an error when there are multiple empty email addresses.
       $form_state->setError($element, t('All email addresses must be non-empty.'));
       return;
     }
@@ -124,9 +123,6 @@ class Email extends FormElementBase {
     $validator = \Drupal::service('email.validator');
     $invalid_emails = [];
     foreach ($emails as $email) {
-      if (empty($email)) {
-        continue;
-      }
       if (!$validator->isValid($email)) {
         $invalid_emails[] = $email;
       }
