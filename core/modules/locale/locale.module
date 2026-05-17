@@ -16,6 +16,7 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Component\Utility\Crypt;
 use Drupal\locale\CurrentImport;
+use Drupal\Core\StringTranslation\PluralIndexInterface;
 use Drupal\locale\LocaleDefaultOptions;
 use Drupal\locale\LocaleEvent;
 use Drupal\locale\LocaleEvents;
@@ -167,7 +168,7 @@ function locale_translatable_language_list() {
  *   plural formula.
  */
 function locale_get_plural($count, $langcode = NULL) {
-  return \Drupal::translation()->getPluralIndex($count, $langcode);
+  return \Drupal::service(PluralIndexInterface::class )->getPluralIndex($count, $langcode);
 }
 
 /**

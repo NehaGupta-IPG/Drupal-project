@@ -16907,13 +16907,13 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\locale\\\\LocaleTranslationManager\\:\\:reset\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/locale/src/LocaleTranslationManager.php',
+	'path' => __DIR__ . '/modules/locale/src/LocalePluralIndex.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\locale\\\\LocaleTranslationManager\\:\\:setDefaultLangcode\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/locale/src/LocaleTranslationManager.php',
+	'path' => __DIR__ . '/modules/locale/src/LocalePluralIndex.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\locale\\\\Plugin\\\\QueueWorker\\\\LocaleTranslation\\:\\:processItem\\(\\) has no return type specified\\.$#',

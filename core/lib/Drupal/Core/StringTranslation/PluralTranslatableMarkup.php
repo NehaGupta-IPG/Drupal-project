@@ -53,7 +53,7 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
    *
    * @see \Drupal\Component\Render\FormattableMarkup::placeholderFormat()
    */
-  public function __construct($count, $singular, $plural, array $args = [], array $options = [], ?TranslationInterface $string_translation = NULL) {
+  public function __construct($count, $singular, $plural, array $args = [], array $options = [], ?TranslationInterface $string_translation = NULL, protected ?PluralIndexInterface $pluralIndex = NULL) {
     $this->count = $count;
     $translatable_string = implode(PoItem::DELIMITER, [$singular, $plural]);
     parent::__construct($translatable_string, $args, $options, $string_translation);
@@ -127,8 +127,11 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
    *   count combination. Defaults to -1 when the language was not found or does
    *   not have a plural formula.
    */
-  protected function getPluralIndex() {
-    return $this->getStringTranslation()->getPluralIndex($this->count, $this->getOption('langcode'));
+  protected function getPluralIndex(): int {
+    if ($this->pluralIndex) {
+      return $this->pluralIndex->getPluralIndex($this->count, $this->getOption('langcode'));
+    }
+    return \Drupal::service(PluralIndexInterface::class)->getPluralIndex($this->count, $this->getOption('langcode'));
   }
 
   /**
