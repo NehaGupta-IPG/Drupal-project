@@ -76,6 +76,17 @@ class EmailTest extends BrowserTestBase {
     $this->assertEquals('foo@example.com', $values['email']);
     $this->assertEquals('example@drupal.org', $values['email_required']);
     $this->assertEquals('foo.bar@example.com,bar.bar@example.com', $values['email_multiple']);
+
+    $edit = [];
+    $edit['email'] = '   ';
+    $edit['email_required'] = 'example@drupal.org';
+    $edit['email_multiple'] = '   ';
+    $this->drupalGet('form-test/email');
+    $this->submitForm($edit, 'Submit');
+    $values = Json::decode($this->getSession()->getPage()->getContent());
+    $this->assertEquals('', $values['email']);
+    $this->assertEquals('example@drupal.org', $values['email_required']);
+    $this->assertEquals('', $values['email_multiple']);
   }
 
 }
