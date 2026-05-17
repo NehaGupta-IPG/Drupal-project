@@ -47,7 +47,7 @@ trait HttpKernelUiHelperTrait {
    *
    * @var string
    */
-  protected $content;
+  protected string $content;
 
   /**
    * Retrieves a Drupal path.
