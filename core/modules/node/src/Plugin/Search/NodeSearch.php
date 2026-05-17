@@ -176,9 +176,8 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
    * This method can assume that $this->isSearchExecutable() has already been
    * checked and returned TRUE.
    *
-   * @return \Drupal\Core\Database\StatementInterface|null
-   *   Results from search query execute() method, or NULL if the search
-   *   failed.
+   * @return array
+   *   Results from search query execute() method.
    */
   protected function findResults() {
     $keys = $this->keywords;
