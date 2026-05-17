@@ -39,6 +39,12 @@ services:
     class: Drupal\locale\LocaleConfigSubscriber
   locale.locale_translation_cache_tag:
     class: Drupal\locale\EventSubscriber\LocaleTranslationCacheTag
+  locale.string_translation:
+    class: Drupal\locale\LocaleTranslationManager
+    decorates: string_translation
+    # Pass the old service as an argument.
+    arguments: ['@locale.string_translation.inner', '@locale.plural.formula', '@language_manager']
+    public:    false
   Drupal\locale\EventSubscriber\ConfigSubscriber: ~
   Drupal\locale\LocaleSource: ~
   Drupal\locale\LocaleFetch: ~

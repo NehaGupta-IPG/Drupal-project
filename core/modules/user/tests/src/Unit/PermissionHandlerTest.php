@@ -437,4 +437,11 @@ class TestTranslationManager implements TranslationInterface {
     return new PluralTranslatableMarkup($count, $singular, $plural, $args, $options, $this);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getPluralIndex($count, $langcode = NULL) {
+    return -1;
+  }
+
 }

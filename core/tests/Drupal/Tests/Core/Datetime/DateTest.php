@@ -80,13 +80,13 @@ class DateTest extends UnitTestCase {
     $this->languageManager
       ->method('getCurrentLanguage')
       ->willReturn(new Language(['id' => $this->randomMachineName(2)]));
-    $this->stringTranslation = $this->createStub(TranslationInterface::class);
+    $this->stringTranslation = $this->getStringTranslationStub();
     $this->requestStack = $this->createStub(RequestStack::class);
 
     $config_factory = $this->getConfigFactoryStub(['system.date' => ['country' => ['default' => 'GB']]]);
     $container = new ContainerBuilder();
     $container->set('config.factory', $config_factory);
-    $container->set('string_translation', $this->getStringTranslationStub());
+    $container->set('string_translation', $this->stringTranslation);
     $container->set('language_manager', $this->languageManager);
     \Drupal::setContainer($container);
 

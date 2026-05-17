@@ -31,13 +31,7 @@ class StringTranslationTraitTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    // Prepare a mock translation service to pass to the trait.
-    $translation = $this->prophesize(TranslationInterface::class);
-    $translation->translate(Argument::cetera())->shouldNotBeCalled();
-    $translation->formatPlural(Argument::cetera())->shouldNotBeCalled();
-    $translation->translateString(Argument::cetera())->will(function ($args) {
-      return $args[0]->getUntranslatedString();
-    });
+    $translation = $this->getStringTranslationStub();
 
     // Set up the object under test.
     $this->testObject = new class() {
@@ -45,7 +39,7 @@ class StringTranslationTraitTest extends UnitTestCase {
       use StringTranslationTrait;
 
     };
-    $this->testObject->setStringTranslation($translation->reveal());
+    $this->testObject->setStringTranslation($translation);
   }
 
   /**

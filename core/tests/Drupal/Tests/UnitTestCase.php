@@ -144,6 +144,9 @@ abstract class UnitTestCase extends TestCase {
         $wrapper = new PluralTranslatableMarkup($count, $singular, $plural, $args, $options, $translation);
         return $wrapper;
       });
+    $translation
+      ->method('getPluralIndex')
+      ->willReturn(-1);
     return $translation;
   }
 

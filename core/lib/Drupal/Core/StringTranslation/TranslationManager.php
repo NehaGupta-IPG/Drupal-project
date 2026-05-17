@@ -150,6 +150,13 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function getPluralIndex($count, $langcode = NULL) {
+    return -1;
+  }
+
+  /**
    * Sets the default langcode.
    *
    * @param string $langcode
