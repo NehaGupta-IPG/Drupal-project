@@ -43,19 +43,16 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
    */
   protected $defaultLangcode;
 
+  /**
+   * The plural index service.
+   */
   protected PluralIndexInterface $pluralIndex;
 
-  /**
-   * Constructs a TranslationManager object.
-   *
-   * @param \Drupal\Core\Language\LanguageDefault $default_language
-   *   The default language.
-   */
   public function __construct(LanguageDefault $default_language, ?PluralIndexInterface $plural_index = NULL) {
     $this->defaultLangcode = $default_language->get()->getId();
     if (!isset($plural_index)) {
       $plural_index = \Drupal::service(PluralIndexInterface::class);
-      @trigger_error('Constructing TranslationManager without the plural_index parameter is deprecated in drupal:11.4.0 and the argument will be required in drupal:13.0.0. See https://www.drupal.org/project/drupal/issues/3366561', E_USER_DEPRECATED);
+      @trigger_error('Constructing TranslationManager without the plural_index parameter is deprecated in drupal:11.4.0 and the argument will be required in drupal:13.0.0. See https://www.drupal.org/node/3590542', E_USER_DEPRECATED);
     }
     $this->pluralIndex = $plural_index;
   }

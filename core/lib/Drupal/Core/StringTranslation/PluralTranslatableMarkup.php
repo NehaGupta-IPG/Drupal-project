@@ -50,6 +50,8 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
    *   allowed keys.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   (optional) The string translation service.
+   * @param \Drupal\Core\StringTranslation\PluralIndexInterface|null $pluralIndex
+   *   The plural index service.
    *
    * @see \Drupal\Component\Render\FormattableMarkup::placeholderFormat()
    */

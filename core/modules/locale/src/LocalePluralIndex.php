@@ -5,9 +5,6 @@ namespace Drupal\locale;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\StringTranslation\PluralIndexInterface;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\StringTranslation\TranslationManager;
-use Drupal\Core\StringTranslation\Translator\TranslatorInterface;
 
 /**
  * Plural index implementation.
@@ -25,6 +22,7 @@ class LocalePluralIndex implements PluralIndexInterface {
 
   public function __construct(protected PluralFormulaInterface $pluralFormula, protected LanguageManagerInterface $languageManager) {
   }
+
   /**
    * {@inheritdoc}
    */
@@ -61,7 +59,7 @@ class LocalePluralIndex implements PluralIndexInterface {
   /**
    * Reset plural index.
    */
-  public function reset() {
+  public function reset(): void {
     $this->pluralIndexes = [];
   }
 
