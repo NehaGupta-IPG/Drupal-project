@@ -7,7 +7,7 @@ use Symfony\Component\Mime\MimeTypeGuesserInterface;
 /**
  * Makes possible to guess the MIME type of file without its extension.
  */
-class TemporaryFileMimeTypeGuesser implements MimeTypeGuesserInterface {
+class ContentBasedMimeTypeGuesser implements MimeTypeGuesserInterface {
 
   /**
    * {@inheritdoc}
@@ -17,10 +17,12 @@ class TemporaryFileMimeTypeGuesser implements MimeTypeGuesserInterface {
 
     // If the file is a temporary file and with no extension like /tmp/foobar
     if ($part_extension === '') {
-      static $finfo;
-      $finfo ??= new \finfo(FILEINFO_MIME_TYPE);
-      $mime = $finfo->file($path);
-      return ($mime !== FALSE) ? $mime : NULL;
+      if (!is_file($path) || !is_readable($path)) {
+        return NULL;
+      }
+
+      $finfo = new \finfo(FILEINFO_MIME_TYPE);
+      return $finfo->file($path);
     }
 
     return NULL;
@@ -30,7 +32,7 @@ class TemporaryFileMimeTypeGuesser implements MimeTypeGuesserInterface {
    * {@inheritdoc}
    */
   public function isGuesserSupported(): bool {
-    return function_exists('finfo_open');
+    return extension_loaded('fileinfo');
   }
 
 }

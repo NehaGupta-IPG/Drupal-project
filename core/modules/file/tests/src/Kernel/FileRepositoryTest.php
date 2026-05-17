@@ -87,7 +87,9 @@ class FileRepositoryTest extends FileManagedUnitTestBase {
     $this->assertEquals('public', $stream_wrapper_manager::getScheme($result->getFileUri()), "File was placed in Drupal's files directory.");
     $this->assertEquals($existing->getFilename(), $result->getFilename(), 'Filename was set to the basename of the source, rather than that of the renamed file.');
     $this->assertEquals($contents, file_get_contents($result->getFileUri()), 'Contents of the file are correct.');
-    $this->assertEquals('application/octet-stream', $result->getMimeType(), 'A MIME type was set.');
+    // The MIME type is detected from the file contents via the
+    // file.mime_type.guesser.content service, since the file has no extension.
+    $this->assertEquals('text/plain', $result->getMimeType(), 'A MIME type was set.');
     $this->assertTrue($result->isPermanent(), "The file's status was set to permanent.");
 
     // Check that the correct hooks were called.
@@ -119,7 +121,9 @@ class FileRepositoryTest extends FileManagedUnitTestBase {
     $this->assertEquals('public', $stream_wrapper_manager::getScheme($result->getFileUri()), "File was placed in Drupal's files directory.");
     $this->assertEquals($existing->getFilename(), $result->getFilename(), 'Filename was set to the basename of the existing file, rather than preserving the original name.');
     $this->assertEquals($contents, file_get_contents($result->getFileUri()), 'Contents of the file are correct.');
-    $this->assertEquals('application/octet-stream', $result->getMimeType(), 'A MIME type was set.');
+    // The MIME type is detected from the file contents via the
+    // file.mime_type.guesser.content service, since the file has no extension.
+    $this->assertEquals('text/plain', $result->getMimeType(), 'A MIME type was set.');
     $this->assertTrue($result->isPermanent(), "The file's status was set to permanent.");
 
     // Check that the correct hooks were called.

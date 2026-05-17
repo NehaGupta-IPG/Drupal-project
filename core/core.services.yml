@@ -1866,10 +1866,10 @@ services:
     arguments: ['@Drupal\Core\File\MimeType\MimeTypeMapInterface']
     tags:
       - { name: mime_type_guesser }
-  file.mime_type.guesser.without_extension:
-    class: Drupal\Core\File\MimeType\TemporaryFileMimeTypeGuesser
+  file.mime_type.guesser.content:
+    class: Drupal\Core\File\MimeType\ContentBasedMimeTypeGuesser
     tags:
-      - { name: mime_type_guesser, priority: 1 }
+      - { name: mime_type_guesser, priority: -10 }
   Drupal\Core\File\MimeType\MimeTypeMapFactory:
     autowire: true
     public: false
