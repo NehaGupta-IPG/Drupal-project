@@ -7,11 +7,9 @@ namespace Drupal\Tests\Core\StringTranslation;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use Prophecy\Argument;
 
 /**
  * Tests Drupal\Core\StringTranslation\StringTranslationTrait.

@@ -16904,6 +16904,18 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/locale/src/LocaleTranslation.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\locale\\\\LocaleTranslationManager\\:\\:reset\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/locale/src/LocaleTranslationManager.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\locale\\\\LocaleTranslationManager\\:\\:setDefaultLangcode\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/locale/src/LocaleTranslationManager.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\locale\\\\Plugin\\\\QueueWorker\\\\LocaleTranslation\\:\\:processItem\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
