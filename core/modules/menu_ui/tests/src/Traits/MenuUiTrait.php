@@ -63,8 +63,8 @@ trait MenuUiTrait {
     }
 
     foreach ($expected_item as $key => $value) {
-      $this->assertNotNull($definition[$key]);
-      $this->assertSame($value, $definition[$key]);
+      $this->assertNotNull($definition[$key], $key);
+      $this->assertSame($value, $definition[$key], $key);
     }
   }
 
