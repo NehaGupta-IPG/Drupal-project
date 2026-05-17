@@ -2,6 +2,7 @@
 
 namespace Drupal\workspaces;
 
+use Drupal\Component\Utility\IntegerLike;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -115,7 +116,7 @@ class WorkspaceInformation implements WorkspaceInformationInterface {
   public function isEntityDeletable(EntityInterface $entity, WorkspaceInterface $workspace): bool {
     $initial_revisions = $this->workspaceTracker->getTrackedInitialRevisions($workspace->id(), $entity->getEntityTypeId());
 
-    return in_array($entity->id(), $initial_revisions, TRUE);
+    return IntegerLike::inArray($entity->id(), $initial_revisions);
   }
 
 }
