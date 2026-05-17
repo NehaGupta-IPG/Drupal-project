@@ -101,6 +101,7 @@ class Email extends FormElementBase {
 
     // Skip validation if the value is empty.
     if ($value === '') {
+      $form_state->setValueForElement($element, $value);
       return;
     }
 
