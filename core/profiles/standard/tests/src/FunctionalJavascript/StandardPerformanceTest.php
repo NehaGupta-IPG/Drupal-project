@@ -195,7 +195,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'SELECT "name", "value" FROM "key_value" WHERE "name" IN ( "theme:stark" ) AND "collection" = "config.entity.key_store.block"',
       'SELECT "menu_tree"."menu_name" AS "menu_name", "menu_tree"."route_name" AS "route_name", "menu_tree"."route_parameters" AS "route_parameters", "menu_tree"."url" AS "url", "menu_tree"."title" AS "title", "menu_tree"."description" AS "description", "menu_tree"."parent" AS "parent", "menu_tree"."weight" AS "weight", "menu_tree"."options" AS "options", "menu_tree"."expanded" AS "expanded", "menu_tree"."enabled" AS "enabled", "menu_tree"."provider" AS "provider", "menu_tree"."metadata" AS "metadata", "menu_tree"."class" AS "class", "menu_tree"."form_class" AS "form_class", "menu_tree"."id" AS "id" FROM "menu_tree" "menu_tree" WHERE ("route_name" = "entity.node.canonical") AND ("route_param_key" = "node=1") AND ("menu_name" = "main") ORDER BY "depth" ASC, "weight" ASC, "id" ASC',
       'SELECT "menu_tree"."menu_name" AS "menu_name", "menu_tree"."route_name" AS "route_name", "menu_tree"."route_parameters" AS "route_parameters", "menu_tree"."url" AS "url", "menu_tree"."title" AS "title", "menu_tree"."description" AS "description", "menu_tree"."parent" AS "parent", "menu_tree"."weight" AS "weight", "menu_tree"."options" AS "options", "menu_tree"."expanded" AS "expanded", "menu_tree"."enabled" AS "enabled", "menu_tree"."provider" AS "provider", "menu_tree"."metadata" AS "metadata", "menu_tree"."class" AS "class", "menu_tree"."form_class" AS "form_class", "menu_tree"."id" AS "id" FROM "menu_tree" "menu_tree" WHERE ("route_name" = "entity.node.canonical") AND ("route_param_key" = "node=1") AND ("menu_name" = "account") ORDER BY "depth" ASC, "weight" ASC, "id" ASC',
-      'SELECT "base_table"."vid" AS "vid", "base_table"."nid" AS "nid" FROM "node_revision" "base_table" INNER JOIN (SELECT "subquery_base_table"."nid" AS "nid", MAX(subquery_base_table.vid) AS "maximum_revision_id" FROM "node_revision" "subquery_base_table" WHERE "nid" = "1" GROUP BY "subquery_base_table"."nid") "sq_base_table" ON base_table.nid = sq_base_table.nid AND base_table.vid = sq_base_table.maximum_revision_id INNER JOIN "node_field_data" "node_field_data" ON "node_field_data"."nid" = "base_table"."nid" WHERE "node_field_data"."nid" = "1"',
+      'SELECT "base_table"."vid" AS "vid", "base_table"."nid" AS "nid" FROM "node_revision" "base_table" INNER JOIN (SELECT "subquery_base_table"."nid" AS "nid", MAX(subquery_base_table.vid) AS "maximum_revision_id" FROM "node_revision" "subquery_base_table" WHERE "nid" = 1 GROUP BY "subquery_base_table"."nid") "sq_base_table" ON base_table.nid = sq_base_table.nid AND base_table.vid = sq_base_table.maximum_revision_id INNER JOIN "node_field_data" "node_field_data" ON "node_field_data"."nid" = "base_table"."nid" WHERE "node_field_data"."nid" = 1',
     ];
     $recorded_queries = $performance_data->getQueries();
     $this->assertSame($expected_queries, $recorded_queries);
@@ -391,13 +391,13 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'SELECT COUNT(*) AS "expression" FROM (SELECT 1 AS "expression" FROM "flood" "f" WHERE ("event" = "user.failed_login_ip") AND ("identifier" = "CLIENT_IP") AND ("timestamp" > "TIMESTAMP")) "subquery"',
       'SELECT "base_table"."uid" AS "uid", "base_table"."uid" AS "base_table_uid" FROM "users" "base_table" INNER JOIN "users_field_data" "users_field_data" ON "users_field_data"."uid" = "base_table"."uid" WHERE ("users_field_data"."name" IN ("ACCOUNT_NAME")) AND ("users_field_data"."default_langcode" IN (1))',
       'SELECT COUNT(*) AS "expression" FROM (SELECT 1 AS "expression" FROM "flood" "f" WHERE ("event" = "user.failed_login_user") AND ("identifier" = "CLIENT_IP") AND ("timestamp" > "TIMESTAMP")) "subquery"',
-      'INSERT INTO "watchdog" ("uid", "type", "message", "variables", "severity", "link", "location", "referer", "hostname", "timestamp") VALUES ("2", "user", "Session opened for %name.", "WATCHDOG_DATA", 6, "", "LOCATION", "REFERER", "CLIENT_IP", "TIMESTAMP")',
-      'UPDATE "users_field_data" SET "login"="TIMESTAMP" WHERE "uid" = "2"',
+      'INSERT INTO "watchdog" ("uid", "type", "message", "variables", "severity", "link", "location", "referer", "hostname", "timestamp") VALUES (2, "user", "Session opened for %name.", "WATCHDOG_DATA", 6, "", "LOCATION", "REFERER", "CLIENT_IP", "TIMESTAMP")',
+      'UPDATE "users_field_data" SET "login"="TIMESTAMP" WHERE "uid" = 2',
       'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
       'SELECT 1 AS "expression" FROM "sessions" "sessions" WHERE "sid" = "SESSION_ID"',
-      'INSERT INTO "sessions" ("sid", "uid", "hostname", "session", "timestamp") VALUES ("SESSION_ID", "2", "CLIENT_IP", "SESSION_DATA", "TIMESTAMP")',
+      'INSERT INTO "sessions" ("sid", "uid", "hostname", "session", "timestamp") VALUES ("SESSION_ID", 2, "CLIENT_IP", "SESSION_DATA", "TIMESTAMP")',
       'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
-      'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = "2" AND "u"."default_langcode" = 1',
+      'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = 2 AND "u"."default_langcode" = 1',
       'SELECT "roles_target_id" FROM "user__roles" WHERE "entity_id" = "2"',
       'SELECT "base"."uid" AS "uid", "base"."uuid" AS "uuid", "base"."langcode" AS "langcode" FROM "users" "base" WHERE "base"."uid" IN (2)',
       'SELECT "users_field_data".*, "users_field_data"."langcode" AS "users_field_data__langcode", "user__user_picture"."user_picture_target_id" AS "user_picture_target_id", "user__user_picture"."user_picture_alt" AS "user_picture_alt", "user__user_picture"."user_picture_title" AS "user_picture_title", "user__user_picture"."user_picture_width" AS "user_picture_width", "user__user_picture"."user_picture_height" AS "user_picture_height" FROM "users_field_data" "users_field_data" LEFT OUTER JOIN "user__user_picture" "user__user_picture" ON "user__user_picture"."entity_id" = "users_field_data"."uid" AND "user__user_picture"."langcode" = "users_field_data"."langcode" AND "user__user_picture"."deleted" = 0 WHERE "users_field_data"."uid" IN (2)',
@@ -489,13 +489,13 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'SELECT "users_field_data".*, "users_field_data"."langcode" AS "users_field_data__langcode", "user__user_picture"."user_picture_target_id" AS "user_picture_target_id", "user__user_picture"."user_picture_alt" AS "user_picture_alt", "user__user_picture"."user_picture_title" AS "user_picture_title", "user__user_picture"."user_picture_width" AS "user_picture_width", "user__user_picture"."user_picture_height" AS "user_picture_height" FROM "users_field_data" "users_field_data" LEFT OUTER JOIN "user__user_picture" "user__user_picture" ON "user__user_picture"."entity_id" = "users_field_data"."uid" AND "user__user_picture"."langcode" = "users_field_data"."langcode" AND "user__user_picture"."deleted" = 0 WHERE "users_field_data"."uid" IN (2)',
       'SELECT "users_field_data".*, "users_field_data"."langcode" AS "users_field_data__langcode", "user__roles"."roles_target_id" AS "roles_target_id", "user__roles"."delta" AS "roles_delta" FROM "users_field_data" "users_field_data" LEFT OUTER JOIN "user__roles" "user__roles" ON "user__roles"."entity_id" = "users_field_data"."uid" AND "user__roles"."langcode" = "users_field_data"."langcode" AND "user__roles"."deleted" = 0 WHERE "users_field_data"."uid" IN (2)',
       'SELECT COUNT(*) AS "expression" FROM (SELECT 1 AS "expression" FROM "flood" "f" WHERE ("event" = "user.failed_login_user") AND ("identifier" = "CLIENT_IP") AND ("timestamp" > "TIMESTAMP")) "subquery"',
-      'INSERT INTO "watchdog" ("uid", "type", "message", "variables", "severity", "link", "location", "referer", "hostname", "timestamp") VALUES ("2", "user", "Session opened for %name.", "WATCHDOG_DATA", 6, "", "LOCATION", "REFERER", "CLIENT_IP", "TIMESTAMP")',
-      'UPDATE "users_field_data" SET "login"="TIMESTAMP" WHERE "uid" = "2"',
+      'INSERT INTO "watchdog" ("uid", "type", "message", "variables", "severity", "link", "location", "referer", "hostname", "timestamp") VALUES (2, "user", "Session opened for %name.", "WATCHDOG_DATA", 6, "", "LOCATION", "REFERER", "CLIENT_IP", "TIMESTAMP")',
+      'UPDATE "users_field_data" SET "login"="TIMESTAMP" WHERE "uid" = 2',
       'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
       'SELECT 1 AS "expression" FROM "sessions" "sessions" WHERE "sid" = "SESSION_ID"',
-      'INSERT INTO "sessions" ("sid", "uid", "hostname", "session", "timestamp") VALUES ("SESSION_ID", "2", "CLIENT_IP", "SESSION_DATA", "TIMESTAMP")',
+      'INSERT INTO "sessions" ("sid", "uid", "hostname", "session", "timestamp") VALUES ("SESSION_ID", 2, "CLIENT_IP", "SESSION_DATA", "TIMESTAMP")',
       'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
-      'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = "2" AND "u"."default_langcode" = 1',
+      'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = 2 AND "u"."default_langcode" = 1',
       'SELECT "roles_target_id" FROM "user__roles" WHERE "entity_id" = "2"',
     ];
     $recorded_queries = $performance_data->getQueries();
@@ -542,7 +542,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
 
     $expected_queries = [
       'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
-      'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = "3" AND "u"."default_langcode" = 1',
+      'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = 3 AND "u"."default_langcode" = 1',
       'SELECT "roles_target_id" FROM "user__roles" WHERE "entity_id" = "3"',
       'SELECT "name", "value" FROM "key_value" WHERE "name" IN ( "theme:stark" ) AND "collection" = "config.entity.key_store.block"',
     ];
