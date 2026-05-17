@@ -130,7 +130,7 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
    *   not have a plural formula.
    */
   protected function getPluralIndex(): int {
-    if ($this->pluralIndex) {
+    if (isset($this->pluralIndex)) {
       return $this->pluralIndex->getPluralIndex($this->count, $this->getOption('langcode'));
     }
     return \Drupal::service(PluralIndexInterface::class)->getPluralIndex($this->count, $this->getOption('langcode'));
