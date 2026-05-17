@@ -705,7 +705,7 @@ class WebAssert extends MinkWebAssert {
    * @param string|int $value
    *   The hidden field value that needs to be checked.
    *   Integer is allowed for convenience, and will be cast to string.
-   * @param \Behat\Mink\Element\TraversableElement $container
+   * @param \Behat\Mink\Element\TraversableElement|null $container
    *   (optional) The document to check against. Defaults to the current page.
    *
    * @throws \Behat\Mink\Exception\ElementNotFoundException
@@ -727,7 +727,7 @@ class WebAssert extends MinkWebAssert {
    * @param string|int $value
    *   The hidden field value that needs to be checked.
    *   Integer is allowed for convenience, and will be cast to string.
-   * @param \Behat\Mink\Element\TraversableElement $container
+   * @param \Behat\Mink\Element\TraversableElement|null $container
    *   (optional) The document to check against. Defaults to the current page.
    *
    * @throws \Behat\Mink\Exception\ElementNotFoundException
