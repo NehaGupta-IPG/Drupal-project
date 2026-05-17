@@ -45,7 +45,7 @@ class IntegerItem extends NumericItemBase {
    */
   public function writePropertyValue($property_name, $value) {
     if ($property_name === 'value') {
-      $value = IntegerLike::toIntegerIfPossible($value, $this->getName());
+      $value = IntegerLike::toIntegerIfIntLikeString($value);
     }
     parent::writePropertyValue($property_name, $value);
   }

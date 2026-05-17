@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\layout_builder_element_test\EventSubscriber;
 
+use Drupal\Component\Utility\IntegerLike;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\layout_builder\Event\PrepareLayoutEvent;
@@ -88,7 +89,7 @@ class TestPrepareLayout implements EventSubscriberInterface {
       }
 
       // Node 2: Stop event propagation.
-      if ($entity->id() === '2') {
+      if (IntegerLike::same($entity->id(), 2)) {
         $event->stopPropagation();
       }
     }

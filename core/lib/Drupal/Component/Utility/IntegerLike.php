@@ -10,6 +10,46 @@ namespace Drupal\Component\Utility;
 class IntegerLike {
 
   /**
+   * Compares two values that may be integer-like.
+   *
+   * @param mixed $a
+   *   First value.
+   * @param mixed $b
+   *   Second value.
+   *
+   * @return bool
+   *   TRUE if the values are the same, or if they are integer-like and have the
+   *   same integer value. E.g. '123' and 123.
+   */
+  public static function same(mixed $a, mixed $b): bool {
+    return $a === $b ||
+      is_int($a) && (string) $a === $b ||
+      is_int($b) && (string) $b === $a;
+  }
+
+  /**
+   * Checks if a value exists in an array, using integer-like comparison.
+   *
+   * @param mixed $needle
+   *   The value to search.
+   * @param array $haystack
+   *   The array.
+   *
+   * @return bool
+   *   TRUE if the value or its string or int equivalent is in the haystack.
+   *
+   * @see \in_array()
+   */
+  public static function inArray(mixed $needle, array $haystack): bool {
+    return match (TRUE) {
+      in_array($needle, $haystack, TRUE) => TRUE,
+      is_int($needle) => in_array((string) $needle, $haystack, TRUE),
+      is_string($needle) => (string) (int) $needle === $needle && in_array((int) $needle, $haystack, TRUE),
+      default => FALSE,
+    };
+  }
+
+  /**
    * Validates and casts a value as integer.
    *
    * @param mixed $value
@@ -33,19 +73,20 @@ class IntegerLike {
   }
 
   /**
-   * Casts a value as integer, if possible.
+   * Casts a value as integer, if it is an integer-like string.
+   *
+   * This can be used instead of a regular cast, if values like NULL or FALSE
+   * or non-integer strings like 'abc' should be preserved.
    *
    * @param mixed $value
    *   A value which may be coming from the database or user input.
-   * @param string|(\Closure(): string)|null $where
-   *   A string describing where the value was meant to be used.
    *
    * @return mixed
-   *   The integer value, or the original value if a clean cast is not possible.
+   *   The integer value, or the original value if it was not an integer string.
    *
    * @phpstan-return !decimal-int-string
    */
-  public static function toIntegerIfPossible(mixed $value, string|\Closure|null $where = NULL): mixed {
+  public static function toIntegerIfIntLikeString(mixed $value): mixed {
     return match (TRUE) {
       is_string($value) && (string) (int) $value === $value => (int) $value,
       default => $value,

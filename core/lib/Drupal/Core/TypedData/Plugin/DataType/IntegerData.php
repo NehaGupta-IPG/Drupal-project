@@ -35,7 +35,7 @@ class IntegerData extends PrimitiveBase implements IntegerInterface {
   public function setValue($value, $notify = TRUE) {
     // Currently this needs to support NULL, and even '', because this is how it
     // is used.
-    $value = IntegerLike::toIntegerIfPossible($value, $this->getPropertyPath(...));
+    $value = IntegerLike::toIntegerIfIntLikeString($value);
     parent::setValue($value, $notify);
   }
 

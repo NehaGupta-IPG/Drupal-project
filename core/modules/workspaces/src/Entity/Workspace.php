@@ -2,6 +2,7 @@
 
 namespace Drupal\workspaces\Entity;
 
+use Drupal\Component\Utility\IntegerLike;
 use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
@@ -205,7 +206,7 @@ class Workspace extends ContentEntityBase implements WorkspaceInterface {
 
     // Disable the currently active workspace if it has been deleted.
     if ($workspace_manager->hasActiveWorkspace()
-      && in_array($workspace_manager->getActiveWorkspace()->id(), $workspaces_ids, TRUE)
+      && IntegerLike::inArray($workspace_manager->getActiveWorkspace()->id(), $workspaces_ids)
     ) {
       $workspace_manager->switchToLive();
     }
