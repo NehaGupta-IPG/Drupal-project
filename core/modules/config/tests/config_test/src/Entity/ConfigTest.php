@@ -125,14 +125,6 @@ class ConfigTest extends ConfigEntityBase implements ConfigTestInterface {
   /**
    * {@inheritdoc}
    */
-  public static function sortEntities(array &$entities): bool {
-    \Drupal::state()->set('config_entity_sortEntities', TRUE);
-    return parent::sortEntities($entities);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function postSave(EntityStorageInterface $storage, $update = TRUE): void {
     // Used to test secondary writes during config sync.
     if ($this->id() == 'primary') {
