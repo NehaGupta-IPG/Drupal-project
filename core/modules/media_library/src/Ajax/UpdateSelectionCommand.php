@@ -2,6 +2,7 @@
 
 namespace Drupal\media_library\Ajax;
 
+use Drupal\Component\Utility\IntegerLike;
 use Drupal\Core\Ajax\CommandInterface;
 
 /**
@@ -46,7 +47,8 @@ class UpdateSelectionCommand implements CommandInterface {
   public function render() {
     return [
       'command' => 'updateMediaLibrarySelection',
-      'mediaIds' => $this->mediaIds,
+      // For media_library.ui.js, the values need to be stringified.
+      'mediaIds' => array_map(IntegerLike::toStringIfInteger(...), $this->mediaIds),
     ];
   }
 
