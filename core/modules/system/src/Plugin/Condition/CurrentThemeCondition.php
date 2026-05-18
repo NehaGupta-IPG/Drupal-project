@@ -105,8 +105,6 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
     if (empty($configuredThemes)) {
       return TRUE;
     }
-    // We want to have the machine names as values, get the keys only:
-    $configuredThemes = array_keys($configuredThemes);
     // Return whether the current theme is in the currently configured themes:
     return in_array($this->themeManager->getActiveTheme()->getName(), $configuredThemes, TRUE);
   }
