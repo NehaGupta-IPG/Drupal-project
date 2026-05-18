@@ -81,7 +81,7 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
    *   automatically for the plural cases.
    * @param array $options
    *   An associative array of additional options. See t() for allowed keys.
-   * @param \Drupal\Core\StringTranslation\PluralIndexInterface|null $pluralIndex
+   * @param \Drupal\Core\StringTranslation\PluralIndexInterface|null $plural_index
    *   The plural index service.
    *
    * @return static
