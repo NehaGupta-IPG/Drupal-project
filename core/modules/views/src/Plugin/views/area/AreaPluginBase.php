@@ -95,34 +95,14 @@ abstract class AreaPluginBase extends HandlerBase {
     ];
 
     $form['area_id']['area_id'] = [
-      '#type' => 'textfield',
+      '#type' => 'machine_name',
       '#title' => $this->t('Machine name of the area'),
       '#default_value' => $this->options['new_id'] ?? $form_state->get('id'),
       '#required' => TRUE,
-      '#size' => 64,
+      '#machine_name' => [
+        'exists' => [$this, 'exists'],
+      ],
     ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function validateOptionsForm(&$form, FormStateInterface $form_state): void {
-    $area_id = $form_state->getValue(['options', 'area_id', 'area_id']);
-    if ($area_id) {
-      if (preg_match('/[^a-z0-9_]/', $form_state->getValue(['options', 'area_id', 'area_id']))) {
-        $form_state->setError($form['area_id'], $this->t(
-          'Area id must contain only lowercase letters, numbers, or underscores.'
-        ));
-      }
-
-      if ($area_id != $form_state->get('id')
-        && array_key_exists($area_id, $this->displayHandler->getHandlers($this->areaType))
-      ) {
-        $form_state->setError($form['area_id'], $this->t(
-          'Area id should be unique.'
-        ));
-      }
-    }
   }
 
   /**
@@ -170,6 +150,22 @@ abstract class AreaPluginBase extends HandlerBase {
    */
   public function isEmpty() {
     return empty($this->options['empty']);
+  }
+
+  /**
+   * @param string $area_id
+   * @return bool
+   */
+  public function exists(string $area_id): bool {
+    $handlers = $this->displayHandler->getHandlers($this->areaType);
+
+    // Make sure no another handler is already using the id, or being renamed, using the same id.
+    return array_key_exists($area_id, $handlers) || !empty(
+      array_filter(
+        $handlers,
+        fn ($handler) => isset($handler->options['new_id']) && $handler->options['new_id'] == $area_id
+      )
+    );
   }
 
 }
