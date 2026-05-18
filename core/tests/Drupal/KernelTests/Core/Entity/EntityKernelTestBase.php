@@ -59,8 +59,8 @@ abstract class EntityKernelTestBase extends KernelTestBase {
     $this->entityTypeManager = $this->container->get('entity_type.manager');
     $this->state = $this->container->get('state');
 
-    $this->installEntitySchema('user');
-    $this->installEntitySchema('entity_test');
+    @$this->installEntitySchema('user');
+    @$this->installEntitySchema('entity_test');
 
     // If the concrete test sub-class installs the Node or Comment modules,
     // ensure that the node and comment entity schema are created before the
@@ -74,10 +74,10 @@ abstract class EntityKernelTestBase extends KernelTestBase {
         $rp = new \ReflectionProperty($class, 'modules');
         if ($rp->class == $class) {
           foreach (array_intersect(['node', 'comment'], $class::$modules) as $module) {
-            $this->installEntitySchema($module);
+            @$this->installEntitySchema($module);
           }
           if (in_array('taxonomy', $class::$modules, TRUE)) {
-            $this->installEntitySchema('taxonomy_term');
+            @$this->installEntitySchema('taxonomy_term');
           }
         }
       }
