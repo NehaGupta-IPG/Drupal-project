@@ -18,8 +18,15 @@
  * the database (files, system table, etc.) this will ensure the paths are
  * correct when the site is deployed to a live server.
  *
- * To activate this feature, copy and rename it such that its path plus
- * filename is 'sites/sites.php'.
+ * Aliases can also be used to access a test site that was created by a
+ * browser test. The test site may be accessed by setting a site directory to
+ * the site directory created by the test. The directory is in the form
+ * 'simpletest/TEST_PREFIX', where 'TEST_PREFIX' is the numeric prefix of the
+ * test. To preserve the site see the documentation in the core/phpunit.xml.dist
+ * file.
+ *
+ * To activate multi-site support and directory aliasing, copy and rename this
+ * file such that its path plus filename is 'sites/sites.php'.
  *
  * Aliases are defined in an associative array named $sites. The array is
  * written in the format: '<port>.<domain>.<path>' => 'directory'. As an

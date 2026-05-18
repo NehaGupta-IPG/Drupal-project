@@ -154,6 +154,26 @@ abstract class BrowserTestBase extends TestCase {
   protected $mink;
 
   /**
+   * Whether to preserve test site database and directory when the test has run.
+   *
+   * Saving the test site database and directory is useful for debugging and
+   * development. It allows the test site that was created by the test to to be
+   * accessed with a browser after the test has completed.
+   *
+   * To use this feature:
+   * - Set this variable to TRUE or set the BROWSERTEST_PRESERVE_SITE
+   *   environment variable to true.
+   * - To access the test site, create an entry for the site in sites.php to
+   *   return the test site directory.
+   * - Log in to the test with username 'admin' and password 'admin'
+   *
+   * @see core/phpunit.xml.dist
+   * @see sites/example.sites.php
+   * @see \Drupal\Core\DrupalKernel::findSitePath()
+   */
+  protected $preserveSite = FALSE;
+
+  /**
    * The base URL.
    *
    * @var string
@@ -390,6 +410,11 @@ abstract class BrowserTestBase extends TestCase {
    * {@inheritdoc}
    */
   protected function tearDown(): void {
+    if ($this->preserveSite || getenv('BROWSERTEST_PRESERVE_SITE')) {
+      $site_id = filter_var(drupal_valid_test_ua(), FILTER_SANITIZE_NUMBER_INT);
+      print "Test site is preserved with site ID $site_id.\n";
+    }
+
     // Close any mink sessions as early as possible to free a new browser
     // session up for the next test method or test.
     if ($this->mink) {
@@ -423,7 +448,9 @@ abstract class BrowserTestBase extends TestCase {
 
     // Destroy the testing kernel.
     if (isset($this->kernel)) {
-      $this->cleanupEnvironment();
+      if (!($this->preserveSite || getenv('BROWSERTEST_PRESERVE_SITE'))) {
+        $this->cleanupEnvironment();
+      }
       $this->kernel->shutdown();
     }
 

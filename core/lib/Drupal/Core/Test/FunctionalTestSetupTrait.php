@@ -404,7 +404,14 @@ trait FunctionalTestSetupTrait {
    * Initializes user 1 for the site to be installed.
    */
   protected function initUserSession() {
-    $password = $this->randomMachineName();
+    // If the site is being preserved use a simple password.
+    if (!empty($this->preserveSite) || getenv('BROWSERTEST_PRESERVE_SITE')) {
+      $password = 'admin';
+    }
+    else {
+      $password = $this->randomMachineName();
+    }
+
     // Define information about the user 1 account.
     $this->rootUser = new UserSession([
       'uid' => 1,
