@@ -182,6 +182,36 @@ class DatetimeFormElementTest extends EntityKernelTestBase implements FormInterf
     $this->assertArrayHasKey('max', $result['date']['#attributes']);
     $this->assertEquals('2050-12-31T23:59:59', $result['date']['#attributes']['max']);
     $this->assertArrayNotHasKey('time', $result);
+    $this->assertEquals('Start Date', $result['date']['#title']);
+
+    // Now trigger End Date.
+    $form = [
+      'datetime_local_picker' => [
+        '#type' => 'datetime',
+        '#date_date_element' => 'datetime-local',
+        '#date_date_format' => 'Y-m-d',
+        '#date_time_element' => 'none',
+        '#date_time_format' => 'H:i:s',
+        '#value' => [
+          'object' => new DrupalDateTime('2025-02-18T12:00'),
+          'date' => '2025-02-18',
+          'time' => '12:00:00',
+        ],
+        '#date_year_range' => '1900:2050',
+        '#id' => 'test-picker-end-value',
+        '#attributes' => [],
+        '#required' => TRUE,
+      ],
+      'submit' => [
+        '#type' => 'submit',
+        '#value' => 'Submit',
+      ],
+    ];
+    $element = $form['datetime_local_picker'];
+    $form_state = new FormState();
+    $form_state->setValue('datetime_local_picker', ['date' => '2025-02-18T12:00']);
+    $result = Datetime::processDatetime($element, $form_state, $form);
+    $this->assertEquals('End Date', $result['date']['#title']);
   }
 
   /**
