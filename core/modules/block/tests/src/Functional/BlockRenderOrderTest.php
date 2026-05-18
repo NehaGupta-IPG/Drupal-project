@@ -89,6 +89,13 @@ class BlockRenderOrderTest extends BrowserTestBase {
     // Verify that blocks with identical weight are rendered in alphabetical
     // order.
     $this->assertLessThan($position['stark_by'], $position['stark_drupal']);
+
+    // Test Block::sort function deprecation.
+    foreach ($controller->loadMultiple() as $return_block) {
+      $this->expectUserDeprecationMessage('Drupal\block\Entity\Block::sort is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use Drupal\block\Entity\Block::sortEntities() instead. See https://www.drupal.org/project/drupal/issues/2265487');
+      $return_block->sort($return_block, $return_block);
+      break;
+    }
   }
 
 }
