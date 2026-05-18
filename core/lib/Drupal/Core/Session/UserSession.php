@@ -89,7 +89,8 @@ class UserSession implements AccountInterface {
    * {@inheritdoc}
    */
   public function id() {
-    // Cast integer-like strings to integer.
+    // Cast integer-like strings to integer, but leave all other values
+    // unchanged for BC.
     if (is_string($this->uid) && (string) (int) $this->uid === $this->uid) {
       return (int) $this->uid;
     }
