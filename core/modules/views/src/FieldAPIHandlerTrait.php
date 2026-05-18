@@ -60,7 +60,15 @@ trait FieldAPIHandlerTrait {
   protected function getFieldStorageDefinition() {
     if (!$this->fieldStorageDefinition) {
       $field_storage_definitions = $this->getEntityFieldManager()->getFieldStorageDefinitions($this->definition['entity_type']);
-      $this->fieldStorageDefinition = $field_storage_definitions[$this->definition['field_name']];
+      if (isset($field_storage_definitions[$this->definition['field_name']])) {
+        $this->fieldStorageDefinition = $field_storage_definitions[$this->definition['field_name']];
+      }
+      elseif (isset($this->definition['bundle'])) {
+        $bundle_field_definitions = $this->getEntityFieldManager()->getFieldDefinitions($this->definition['entity_type'], $this->definition['bundle']);
+        if (isset($bundle_field_definitions[$this->definition['field_name']])) {
+          $this->fieldStorageDefinition = $bundle_field_definitions[$this->definition['field_name']];
+        }
+      }
     }
     return $this->fieldStorageDefinition;
   }
