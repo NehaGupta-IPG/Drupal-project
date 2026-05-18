@@ -88,6 +88,11 @@ class AccountProxy implements AccountProxyInterface {
    * {@inheritdoc}
    */
   public function id() {
+    // Cast integer-like strings to integer, but leave all other values
+    // unchanged for BC.
+    if (is_string($this->id) && (string) (int) $this->id === $this->id) {
+      return (int) $this->id;
+    }
     return $this->id;
   }
 
