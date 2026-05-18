@@ -74,7 +74,9 @@ class ImageToolkitManager extends DefaultPluginManager {
       return $this->activeToolkits[$id];
     }
     $toolkit = $this->createInstance($id);
-    if (!$toolkit->isStateful) {
+    // @todo remove the condition below in drupal:43.0.0, when all toolkits are
+    // stateless and provide an imageClass.
+    if (isset($toolkit->getPluginDefinition()['imageClass'])) {
       $this->activeToolkits[$id] = $toolkit;
     }
     return $toolkit;

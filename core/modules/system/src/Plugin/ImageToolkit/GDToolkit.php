@@ -98,15 +98,6 @@ class GDToolkit extends ImageToolkitBase {
    */
   protected $preLoadInfo = NULL;
 
-  // phpcs:disable
-  /**
-   * {@inheritdoc}
-   */
-  public bool $isStateful {
-    get => FALSE;
-  }
-  // phpcs:enable
-
   /**
    * Constructs a GDToolkit object.
    *

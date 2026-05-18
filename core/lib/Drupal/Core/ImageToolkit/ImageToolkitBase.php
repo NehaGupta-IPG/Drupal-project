@@ -34,20 +34,6 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
   public protected(set) bool $isClone = FALSE;
 
   /**
-   * BC layer.
-   *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Only
-   *   introduced to support backwards compatibility; there is no replacement.
-   *
-   * @see https://www.drupal.org/node/3590417
-   */
-  public bool $isStateful {
-    get => TRUE;
-    // @phpstan-ignore property.deprecated
-    set => throw new ImageToolkitException('Cannot set $isStateful');
-  }
-
-  /**
    * An ImageInterface object to be used for BC.
    *
    * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Only
@@ -59,8 +45,8 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
     // @phpstan-ignore property.deprecated
     get => $this->backfillImage ?? NULL;
     set(?ImageInterface $image) {
-      // @phpstan-ignore property.deprecated,property.deprecated
-      if (!$this->isStateful && !$this->isClone) {
+      // @phpstan-ignore property.deprecated
+      if (isset($this->getPluginDefinition()['imageClass']) && !$this->isClone) {
         throw new ImageToolkitException('Cannot set $backfillImage in the toolkit singleton');
       }
       if ($image === NULL) {
@@ -129,8 +115,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    * @see https://www.drupal.org/node/3590417
    */
   public function __clone(): void {
-    // @phpstan-ignore property.deprecated
-    if ($this->isStateful) {
+    if (!isset($this->getPluginDefinition()['imageClass'])) {
       throw new ImageToolkitException('Cannot clone a stateful toolkit');
     }
     // @phpstan-ignore property.deprecated

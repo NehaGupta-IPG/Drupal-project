@@ -134,8 +134,8 @@ class Image implements ImageInterface {
    */
   public function getToolkit() {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ::toolkit() on stateless toolkits instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
-    if (!$this->toolkit()->isStateful && !$this->toolkit()->isClone) {
-      // When accessing this method, for BC stateless toolkits should get a
+    if (isset($this->toolkit->getPluginDefinition()['imageClass']) && !$this->toolkit()->isClone) {
+      // When accessing this method, stateless toolkits for BC should get a
       // clone of the toolkit singleton, that would have the backfill image
       // available.
       $this->toolkit = clone $this->toolkit;
