@@ -239,7 +239,7 @@ class Block extends ConfigEntityBase implements BlockInterface, EntityWithPlugin
     if (isset($collator)) {
       return $collator->compare($a->label(), $b->label());
     }
-    else{
+    else {
       return strnatcasecmp($a->label(), $b->label());
     }
   }

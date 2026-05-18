@@ -194,7 +194,7 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
   /**
    * Helper callback for uasort() to compare configuration entities.
    */
-  public static function compare(ShortcutInterface $a, ShortcutInterface $b, \Collator $collator): int {
+  public static function compare(ShortcutInterface $a, ShortcutInterface $b, ?\Collator $collator): int {
     $a_weight = $a->getWeight();
     $b_weight = $b->getWeight();
     if ($a_weight == $b_weight) {
