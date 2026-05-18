@@ -74,10 +74,10 @@ abstract class EntityKernelTestBase extends KernelTestBase {
         $rp = new \ReflectionProperty($class, 'modules');
         if ($rp->class == $class) {
           foreach (array_intersect(['node', 'comment'], $class::$modules) as $module) {
-            @$this->installEntitySchema($module);
+            $this->installEntitySchema($module);
           }
           if (in_array('taxonomy', $class::$modules, TRUE)) {
-            @$this->installEntitySchema('taxonomy_term');
+            $this->installEntitySchema('taxonomy_term');
           }
         }
       }

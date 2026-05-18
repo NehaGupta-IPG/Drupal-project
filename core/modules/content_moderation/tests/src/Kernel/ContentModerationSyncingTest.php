@@ -34,8 +34,6 @@ class ContentModerationSyncingTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->expectUserDeprecationMessage('installEntitySchema() is deprecated in drupal:10.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/project/drupal/issues/3343518');
-    $this->installEntitySchema('workflow');
     $this->installEntitySchema('content_moderation_state');
     $this->installEntitySchema('entity_test_mulrevpub');
 
