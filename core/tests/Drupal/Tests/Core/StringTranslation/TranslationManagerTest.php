@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\StringTranslation;
 
 use Drupal\Component\Render\MarkupInterface;
+use Drupal\Core\StringTranslation\FixedPluralIndex;
 use Drupal\Core\StringTranslation\TranslationManager;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -112,6 +113,7 @@ class TranslationManagerTest extends UnitTestCase {
 class TestTranslationManager extends TranslationManager {
 
   public function __construct() {
+    $this->pluralIndex = new FixedPluralIndex();
   }
 
 }

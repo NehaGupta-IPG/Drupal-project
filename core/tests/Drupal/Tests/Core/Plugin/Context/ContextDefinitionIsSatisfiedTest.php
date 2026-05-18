@@ -11,6 +11,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Plugin\Context\Context;
 use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\StringTranslation\FixedPluralIndex;
 use Drupal\Core\StringTranslation\TranslationManager;
 use Drupal\Core\TypedData\TypedDataManager;
 use Drupal\Core\Validation\ConstraintManager;
@@ -51,7 +52,7 @@ class ContextDefinitionIsSatisfiedTest extends UnitTestCase {
     $type_data_manager = new TypedDataManager($namespaces, $cache_backend, $module_handler->reveal(), $class_resolver->reveal());
     $type_data_manager->setValidationConstraintManager(new ConstraintManager($namespaces, $cache_backend, $module_handler->reveal()));
 
-    $string_translation = new TranslationManager(new LanguageDefault([]));
+    $string_translation = new TranslationManager(new LanguageDefault([]), new FixedPluralIndex());
 
     $container = new ContainerBuilder();
     $container->set('typed_data_manager', $type_data_manager);

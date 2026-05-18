@@ -25,11 +25,11 @@ final class ByteSizeMarkup {
    * @throws \LogicException
    *   Thrown when an invalid unit size is used.
    */
-  public static function create(float|int $size, ?string $langcode = NULL, ?TranslationInterface $stringTranslation = NULL): TranslatableMarkup {
+  public static function create(float|int $size, ?string $langcode = NULL, ?TranslationInterface $stringTranslation = NULL, ?PluralIndexInterface $plural_index = NULL): TranslatableMarkup {
     $options = ['langcode' => $langcode];
     $absolute_size = abs($size);
     if ($absolute_size < Bytes::KILOBYTE) {
-      return new PluralTranslatableMarkup($size, '1 byte', '@count bytes', [], $options, $stringTranslation);
+      return new PluralTranslatableMarkup($size, '1 byte', '@count bytes', [], $options, $stringTranslation, $plural_index);
     }
     // Create a multiplier to preserve the sign of $size.
     $sign = $absolute_size / $size;

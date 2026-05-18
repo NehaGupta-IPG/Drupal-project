@@ -81,12 +81,14 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
    *   automatically for the plural cases.
    * @param array $options
    *   An associative array of additional options. See t() for allowed keys.
+   * @param \Drupal\Core\StringTranslation\PluralIndexInterface|null $pluralIndex
+   *   The plural index service.
    *
    * @return static
    *   A PluralTranslatableMarkup object.
    */
-  public static function createFromTranslatedString($count, $translated_string, array $args = [], array $options = []) {
-    $plural = new static($count, '', '', $args, $options);
+  public static function createFromTranslatedString($count, $translated_string, array $args = [], array $options = [], ?PluralIndexInterface $plural_index = NULL) {
+    $plural = new static($count, '', '', $args, $options, NULL, $plural_index);
     $plural->translatedString = $translated_string;
     return $plural;
   }
