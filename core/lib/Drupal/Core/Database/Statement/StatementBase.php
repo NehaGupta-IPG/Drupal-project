@@ -31,7 +31,7 @@ use Drupal\Core\Database\StatementIteratorTrait;
  * PHP memory (that an \IteratorAggregate implementation would force) and
  * therefore optimize memory usage while iterating the resultset.
  */
-abstract class StatementBase implements \Iterator, StatementInterface {
+abstract class StatementBase implements StatementInterface {
 
   use FetchModeTrait;
   use StatementIteratorTrait;

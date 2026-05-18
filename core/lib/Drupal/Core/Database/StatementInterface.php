@@ -15,12 +15,12 @@ use Drupal\Core\Database\Statement\FetchAs;
  * to implement either the \Iterator or \IteratorAggregate interface before
  * Drupal\Core\Database\StatementInterface:
  * @code
- * class \Drupal\my_module\Driver\Database\my_driver\Statement implements \Iterator, \Drupal\Core\Database\StatementInterface {}
+ * class \Drupal\my_module\Driver\Database\my_driver\Statement implements \Drupal\Core\Database\StatementInterface {}
  * @endcode
  *
  * @ingroup database
  */
-interface StatementInterface extends \Traversable {
+interface StatementInterface {
 
   /**
    * Executes a prepared statement.
