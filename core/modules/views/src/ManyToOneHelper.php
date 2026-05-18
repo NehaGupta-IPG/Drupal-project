@@ -307,8 +307,28 @@ class ManyToOneHelper {
         $operator = 'IN';
       }
       else {
-        $value = is_array($value) ? array_pop($value) : $value;
-        $operator = '=';
+        if (!empty($options['value_operator'])) {
+          $value = is_array($value) ? array_pop($value) : $value;
+          $info = $this->handler->valueOperators()[$options['value_operator']];
+          $operator = $info['operator'];
+          if (!empty($info['method'])) {
+            $value = $this->handler->{$info['method']}($value);
+          }
+        }
+        else {
+          if (!empty($options['value_operator'])) {
+            $value = is_array($value) ? array_pop($value) : $value;
+            $info = $this->handler->valueOperators()[$options['value_operator']];
+            $operator = $info['operator'];
+            if (!empty($info['method'])) {
+              $value = $this->handler->{$info['method']}($value);
+            }
+          }
+          else {
+            $value = is_array($value) ? array_pop($value) : $value;
+            $operator = '=';
+          }
+        }
       }
       $add_condition = FALSE;
     }

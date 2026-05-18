@@ -79,7 +79,9 @@ views.argument.string:
     require_value:
       type: boolean
       label: 'Do not display items with no value in summary'
-
+    value_operator:
+      type: string
+      label: 'Operator'
 
 views.argument.broken:
   type: views_argument
