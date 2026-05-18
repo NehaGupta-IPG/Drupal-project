@@ -161,6 +161,25 @@ class ThemeInstaller implements ThemeInstallerInterface {
       if (!isset($installed_themes[$key])) {
         // Install default configuration of the theme.
         $this->configInstaller->installDefaultConfig('theme', $key);
+
+        // Remove any third party settings for modules that are not installed.
+        $theme_config = $this->configFactory->getEditable($key . '.settings');
+        if (!$theme_config->isNew()) {
+          $original_settings = $theme_config->get('third_party_settings') ?? [];
+          $third_party_settings = array_filter(
+            $original_settings,
+            fn ($module) => !$this->moduleHandler->moduleExists($module),
+            ARRAY_FILTER_USE_KEY
+          );
+          if ($third_party_settings !== $original_settings) {
+            if (empty($third_party_settings)) {
+              $theme_config->clear('third_party_settings')->save();
+            }
+            else {
+              $theme_config->set('third_party_settings', $third_party_settings)->save();
+            }
+          }
+        }
       }
 
       $themes_installed[] = $key;
