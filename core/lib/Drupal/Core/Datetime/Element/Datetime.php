@@ -265,9 +265,10 @@ class Datetime extends DateElementBase {
         ];
       }
 
+      $end = str_contains($element['#id'], 'end-value');
       $element['date'] = [
         '#type' => 'date',
-        '#title' => t('Date'),
+        '#title' => $end ? t('End Date') : t('Start Date'),
         '#title_display' => 'invisible',
         '#value' => $date_value,
         '#attributes' => $element['#attributes'] + $extra_attributes,
@@ -298,7 +299,7 @@ class Datetime extends DateElementBase {
       ];
       $element['time'] = [
         '#type' => 'date',
-        '#title' => t('Time'),
+        '#title' => $end ? t('End Time') : t('Start Time'),
         '#title_display' => 'invisible',
         '#value' => $time_value,
         '#attributes' => $element['#attributes'] + $extra_attributes,
