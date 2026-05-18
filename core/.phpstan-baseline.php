@@ -10826,6 +10826,14 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/block/tests/modules/block_test/src/Plugin/Condition/MissingSchema.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method sort\\(\\) of class Drupal\\\\block\\\\Entity\\\\Block\\:
+in drupal\\:12\\.0\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
+\\\\Drupal\\\\Core\\\\Config\\\\Entity\\\\ConfigEntityBase\\:\\:sortEntities\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/block/tests/src/Functional/BlockRenderOrderTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Variable \\$position might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
 	'count' => 4,
