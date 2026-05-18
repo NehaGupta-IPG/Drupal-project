@@ -79,6 +79,9 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
       if ($entity_type instanceof ContentEntityTypeInterface) {
         $this->installEntitySchema($entity_type_id);
       }
+      else {
+        $this->container->get('entity_type.listener')->onEntityTypeCreate($entity_type);
+      }
     }
   }
 

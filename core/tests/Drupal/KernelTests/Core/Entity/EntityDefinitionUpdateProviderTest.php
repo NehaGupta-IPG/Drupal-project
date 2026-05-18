@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Database\Statement\FetchAs;
+use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityDefinitionUpdateManager;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldPurger;
@@ -55,8 +56,13 @@ class EntityDefinitionUpdateProviderTest extends EntityKernelTestBase {
 
     // Install every entity type's schema that wasn't installed in the parent
     // method.
-    foreach (array_diff_key($this->entityTypeManager->getDefinitions(), array_flip(['user'])) as $entity_type_id => $entity_type) {
-      $this->installEntitySchema($entity_type_id);
+    foreach (array_diff_key($this->entityTypeManager->getDefinitions(), array_flip(['user', 'entity_test'])) as $entity_type_id => $entity_type) {
+      if ($entity_type instanceof ContentEntityTypeInterface) {
+        $this->installEntitySchema($entity_type_id);
+      }
+      else {
+        $this->container->get('entity_type.listener')->onEntityTypeCreate($entity_type);
+      }
     }
   }
 
