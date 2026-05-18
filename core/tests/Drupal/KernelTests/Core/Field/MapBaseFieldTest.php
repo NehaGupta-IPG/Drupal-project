@@ -8,12 +8,14 @@ use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\entity_test_update\Entity\EntityTestUpdate;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests map base fields.
- *
- * @group Field
  */
+#[Group('Field')]
+#[RunTestsInSeparateProcesses]
 class MapBaseFieldTest extends EntityKernelTestBase {
 
   /**

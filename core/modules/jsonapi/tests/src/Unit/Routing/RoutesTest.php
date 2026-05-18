@@ -5,20 +5,24 @@ declare(strict_types=1);
 namespace Drupal\Tests\jsonapi\Unit\Routing;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\jsonapi\ResourceType\ResourceTypeRelationship;
 use Drupal\jsonapi\ResourceType\ResourceTypeRepository;
 use Drupal\jsonapi\Routing\Routes;
 use Drupal\Tests\UnitTestCase;
-use Drupal\Core\Routing\RouteObjectInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * @coversDefaultClass \Drupal\jsonapi\Routing\Routes
- * @group jsonapi
+ * Tests Drupal\jsonapi\Routing\Routes.
  *
  * @internal
  */
+#[CoversClass(Routes::class)]
+#[Group('jsonapi')]
 class RoutesTest extends UnitTestCase {
 
   /**
@@ -66,7 +70,7 @@ class RoutesTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::routes
+   * Tests routes collection.
    */
   public function testRoutesCollection(): void {
     // Get the route collection and start making assertions.
@@ -102,7 +106,7 @@ class RoutesTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::routes
+   * Tests routes individual.
    */
   public function testRoutesIndividual(): void {
     // Get the route collection and start making assertions.
@@ -145,7 +149,7 @@ class RoutesTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::routes
+   * Tests routes related.
    */
   public function testRoutesRelated(): void {
     // Get the route collection and start making assertions.
@@ -166,7 +170,7 @@ class RoutesTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::routes
+   * Tests routes relationships.
    */
   public function testRoutesRelationships(): void {
     // Get the route collection and start making assertions.
@@ -188,17 +192,16 @@ class RoutesTest extends UnitTestCase {
 
   /**
    * Ensures that the expected routes are created or not created.
-   *
-   * @dataProvider expectedRoutes
    */
-  public function testRoutes($route): void {
+  #[DataProvider('expectedRoutes')]
+  public function testRoutes(string $route): void {
     $this->assertArrayHasKey($route, $this->routes['ok']->routes()->all());
   }
 
   /**
    * Lists routes which should have been created.
    */
-  public static function expectedRoutes() {
+  public static function expectedRoutes(): array {
     return [
       ['jsonapi.entity_type_1--bundle_1_1.individual'],
       ['jsonapi.entity_type_1--bundle_1_1.collection'],
@@ -222,17 +225,16 @@ class RoutesTest extends UnitTestCase {
 
   /**
    * Ensures that no routes are created for internal resources.
-   *
-   * @dataProvider notExpectedRoutes
    */
-  public function testInternalRoutes($route): void {
+  #[DataProvider('notExpectedRoutes')]
+  public function testInternalRoutes(string $route): void {
     $this->assertArrayNotHasKey($route, $this->routes['ok']->routes()->all());
   }
 
   /**
    * Lists routes which should have been created.
    */
-  public static function notExpectedRoutes() {
+  public static function notExpectedRoutes(): array {
     return [
       ['jsonapi.entity_type_2--bundle_2_1.individual'],
       ['jsonapi.entity_type_2--bundle_2_1.collection'],

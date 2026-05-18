@@ -49,10 +49,7 @@ use Drupal\migrate\Row;
  * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
  * @see \Drupal\migrate\Plugin\migrate\source\SourcePluginBase
  */
-#[MigrateSource(
-  id: 'config_entity',
-  source_module: 'system',
-)]
+#[MigrateSource('config_entity')]
 class ConfigEntity extends SqlBase {
 
   /**
@@ -74,7 +71,8 @@ class ConfigEntity extends SqlBase {
    * {@inheritdoc}
    */
   public function prepareRow(Row $row) {
-    $row->setSourceProperty('data', unserialize($row->getSourceProperty('data')));
+    // @see \Drupal\Core\Config\DatabaseStorage::decode()
+    $row->setSourceProperty('data', unserialize($row->getSourceProperty('data'), ['allowed_classes' => FALSE]));
     return parent::prepareRow($row);
   }
 

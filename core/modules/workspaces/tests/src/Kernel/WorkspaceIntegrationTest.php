@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\workspaces\Kernel;
 
-// cspell:ignore differring
-
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Session\AnonymousUserSession;
@@ -13,6 +11,7 @@ use Drupal\entity_test\Entity\EntityTestMulRevPub;
 use Drupal\form_test\Form\FormTestAlterForm;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\node\NodeAccessRebuild;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
@@ -20,13 +19,19 @@ use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\views\Tests\ViewResultAssertionTrait;
 use Drupal\views\Views;
 use Drupal\workspaces\Entity\Workspace;
+use Drupal\workspaces\Event\WorkspaceSwitchEvent;
 use Drupal\workspaces\WorkspacePublishException;
+use PHPUnit\Framework\Attributes\DataProvider;
+// cspell:ignore differring
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests a complete publishing scenario across different workspaces.
- *
- * @group workspaces
  */
+#[Group('workspaces')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class WorkspaceIntegrationTest extends KernelTestBase {
 
   use ContentTypeCreationTrait;
@@ -71,7 +76,6 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     'views',
     'language',
     'content_translation',
-    'path_alias',
     'form_test',
   ];
 
@@ -110,12 +114,14 @@ class WorkspaceIntegrationTest extends KernelTestBase {
       'body' => 'node 1',
       'created' => $this->createdTimestamp++,
       'status' => TRUE,
+      'promote' => TRUE,
     ]);
     $this->nodes[] = $this->createNode([
       'title' => 'live - 2 - r2 - unpublished',
       'body' => 'node 2',
       'created' => $this->createdTimestamp++,
       'status' => FALSE,
+      'promote' => TRUE,
     ]);
 
     $translation = $this->nodes[0]->addTranslation('de');
@@ -355,6 +361,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
       'title' => 'stage - 4 - r6 - published',
       'created' => $this->createdTimestamp++,
       'status' => TRUE,
+      'promote' => TRUE,
     ]);
     $this->assertWorkspaceStatus($test_scenarios['add_published_node_in_stage'], 'node');
     $this->assertWorkspaceAssociation($expected_workspace_association['add_published_node_in_stage'], 'node');
@@ -392,10 +399,10 @@ class WorkspaceIntegrationTest extends KernelTestBase {
   /**
    * Tests the workspace association data integrity for entity CRUD operations.
    *
-   * @covers \Drupal\workspaces\Hook\EntityOperations::entityPresave
-   * @covers \Drupal\workspaces\Hook\EntityOperations::entityInsert
-   * @covers \Drupal\workspaces\Hook\EntityOperations::entityDelete
-   * @covers \Drupal\workspaces\Hook\EntityOperations::entityRevisionDelete
+   * @legacy-covers \Drupal\workspaces\Hook\EntityOperations::entityPresave
+   * @legacy-covers \Drupal\workspaces\Hook\EntityOperations::entityInsert
+   * @legacy-covers \Drupal\workspaces\Hook\EntityOperations::entityDelete
+   * @legacy-covers \Drupal\workspaces\Hook\EntityOperations::entityRevisionDelete
    */
   public function testWorkspaceAssociationDataIntegrity(): void {
     $this->initializeWorkspacesModule();
@@ -703,10 +710,9 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
   /**
    * Tests CREATE operations for unsupported entity types.
-   *
-   * @dataProvider providerTestAllowedEntityCrudInNonDefaultWorkspace
    */
-  public function testDisallowedEntityCreateInNonDefaultWorkspace($entity_type_id, $allowed): void {
+  #[DataProvider('providerTestAllowedEntityCrudInNonDefaultWorkspace')]
+  public function testDisallowedEntityCreateInNonDefaultWorkspace(string $entity_type_id, bool $allowed): void {
     $this->initializeWorkspacesModule();
     /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
     $storage = $this->entityTypeManager->getStorage($entity_type_id);
@@ -729,10 +735,9 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
   /**
    * Tests UPDATE operations for unsupported entity types.
-   *
-   * @dataProvider providerTestAllowedEntityCrudInNonDefaultWorkspace
    */
-  public function testDisallowedEntityUpdateInNonDefaultWorkspace($entity_type_id, $allowed): void {
+  #[DataProvider('providerTestAllowedEntityCrudInNonDefaultWorkspace')]
+  public function testDisallowedEntityUpdateInNonDefaultWorkspace(string $entity_type_id, bool $allowed): void {
     $this->initializeWorkspacesModule();
     /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
     $storage = $this->entityTypeManager->getStorage($entity_type_id);
@@ -760,10 +765,9 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
   /**
    * Tests DELETE operations for unsupported entity types.
-   *
-   * @dataProvider providerTestAllowedEntityCrudInNonDefaultWorkspace
    */
-  public function testDisallowedEntityDeleteInNonDefaultWorkspace($entity_type_id, $allowed): void {
+  #[DataProvider('providerTestAllowedEntityCrudInNonDefaultWorkspace')]
+  public function testDisallowedEntityDeleteInNonDefaultWorkspace(string $entity_type_id, bool $allowed): void {
     $this->initializeWorkspacesModule();
     /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
     $storage = $this->entityTypeManager->getStorage($entity_type_id);
@@ -790,7 +794,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
   /**
    * Data provider for allowed entity CRUD operations.
    */
-  public static function providerTestAllowedEntityCrudInNonDefaultWorkspace() {
+  public static function providerTestAllowedEntityCrudInNonDefaultWorkspace(): array {
     return [
       'workspace-provided non-internal entity type' => [
         'entity_type_id' => 'workspace',
@@ -808,7 +812,9 @@ class WorkspaceIntegrationTest extends KernelTestBase {
   }
 
   /**
-   * @covers \Drupal\workspaces\WorkspaceManager::executeInWorkspace
+   * Tests execute in workspace context.
+   *
+   * @legacy-covers \Drupal\workspaces\WorkspaceManager::executeInWorkspace
    */
   public function testExecuteInWorkspaceContext(): void {
     $this->initializeWorkspacesModule();
@@ -842,7 +848,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     $this->assertEquals([$live_node->getRevisionId() => $node->id()], $result);
 
     // Try the same assertions in the context of the 'stage' workspace.
-    $this->workspaceManager->executeInWorkspace('stage', function () use ($node, $storage) {
+    $this->workspaceManager->executeInWorkspace('stage', function () use ($node, $storage): void {
       $this->assertEquals('stage', $this->workspaceManager->getActiveWorkspace()->id());
 
       $stage_node = $storage->load($node->id());
@@ -857,7 +863,36 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
     // Check that the 'stage' workspace was not persisted by the workspace
     // manager.
-    $this->assertFalse($this->workspaceManager->getActiveWorkspace());
+    $this->assertNull($this->workspaceManager->getActiveWorkspace());
+
+    // Register an event listener to capture isTemporary values from the switch
+    // events.
+    $switch_events = [];
+    $this->container->get('event_dispatcher')->addListener(
+      WorkspaceSwitchEvent::class,
+      function (WorkspaceSwitchEvent $event) use (&$switch_events): void {
+        $switch_events[] = $event->isTemporary();
+      }
+    );
+
+    // Persistent switches should dispatch non-temporary events.
+    $this->switchToWorkspace('stage');
+    $this->assertSame([FALSE], $switch_events);
+
+    $this->workspaceManager->switchToLive();
+    $this->assertSame([FALSE, FALSE], $switch_events);
+
+    // executeInWorkspace() should dispatch temporary events (switch in + switch
+    // back).
+    $switch_events = [];
+    $this->workspaceManager->executeInWorkspace('stage', function (): void {});
+    $this->assertSame([TRUE, TRUE], $switch_events);
+
+    // executeOutsideWorkspace() should also dispatch temporary events.
+    $this->switchToWorkspace('stage');
+    $switch_events = [];
+    $this->workspaceManager->executeOutsideWorkspace(function (): void {});
+    $this->assertSame([TRUE, TRUE], $switch_events);
   }
 
   /**
@@ -888,11 +923,11 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
       // Check that the 'Frontpage' view only shows published content that is
       // also considered as the default revision in the given workspace.
-      $expected_frontpage = array_filter($expected_values, function ($expected_value) {
+      $expected_frontpage = array_filter($expected_values, function (array $expected_value): bool {
         return $expected_value['status'] === TRUE && $expected_value['default_revision'] === TRUE;
       });
       // The 'Frontpage' view will output nodes in reverse creation order.
-      usort($expected_frontpage, function ($a, $b) {
+      usort($expected_frontpage, function (array $a, array $b): int|float {
         return $b['nid'] - $a['nid'];
       });
       $view = Views::getView('frontpage');
@@ -927,7 +962,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
    */
   protected function assertEntityLoad(array $expected_values, string $entity_type_id): void {
     // Filter the expected values so we can check only the default revisions.
-    $expected_default_revisions = array_filter($expected_values, function ($expected_value) {
+    $expected_default_revisions = array_filter($expected_values, function (array $expected_value): bool {
       return $expected_value['default_revision'] === TRUE;
     });
 
@@ -1016,7 +1051,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     $published_key = $entity_keys['published'];
 
     // Filter the expected values so we can check only the default revisions.
-    $expected_default_revisions = array_filter($expected_values, function ($expected_value) {
+    $expected_default_revisions = array_filter($expected_values, function (array $expected_value): bool {
       return $expected_value['default_revision'] === TRUE;
     });
 
@@ -1153,7 +1188,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
   public function testNodeAccessDifferringRevisionIdsOnTarget(): void {
     $this->initializeWorkspacesModule();
     \Drupal::service('module_installer')->install(['node_access_test']);
-    node_access_rebuild();
+    \Drupal::service(NodeAccessRebuild::class)->rebuild();
 
     // Edit node 1 in 'stage'.
     $this->switchToWorkspace('stage');
@@ -1182,6 +1217,24 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     // Check that there are no more revisions to push after publishing.
     $this->workspaces['stage']->publish();
     $this->assertEmpty($workspace_publisher->getDifferringRevisionIdsOnTarget());
+  }
+
+  /**
+   * Tests that cron runs outside of workspace context.
+   */
+  public function testCronRunsOutsideWorkspace(): void {
+    $this->initializeWorkspacesModule();
+    \Drupal::service('module_installer')->install(['workspaces_test']);
+
+    // Switch to a workspace.
+    $this->switchToWorkspace('stage');
+
+    // Run cron while in the 'stage' workspace.
+    \Drupal::service('cron')->run();
+
+    // Check that cron ran without an active workspace.
+    $recorded_workspace_id = \Drupal::keyValue('ws_test')->get('cron_active_workspace');
+    $this->assertFalse($recorded_workspace_id, 'Cron should run without an active workspace.');
   }
 
 }

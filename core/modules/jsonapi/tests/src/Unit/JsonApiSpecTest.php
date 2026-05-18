@@ -6,32 +6,36 @@ namespace Drupal\Tests\jsonapi\Unit;
 
 use Drupal\jsonapi\JsonApiSpec;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore kitt
-
 /**
- * @coversDefaultClass \Drupal\jsonapi\JsonApiSpec
- * @group jsonapi
+ * Tests Drupal\jsonapi\JsonApiSpec.
  *
  * @internal
  */
+#[CoversClass(JsonApiSpec::class)]
+#[Group('jsonapi')]
 class JsonApiSpecTest extends UnitTestCase {
 
   /**
    * Ensures that member names are properly validated.
-   *
-   * @dataProvider providerTestIsValidMemberName
-   * @covers ::isValidMemberName
    */
+  #[DataProvider('providerTestIsValidMemberName')]
   public function testIsValidMemberName($member_name, $expected): void {
     $this->assertSame($expected, JsonApiSpec::isValidMemberName($member_name));
   }
 
   /**
    * Data provider for testIsValidMemberName.
+   *
+   * @return mixed[]
+   *   The data.
    */
-  public static function providerTestIsValidMemberName() {
-    // Copied from http://jsonapi.org/format/upcoming/#document-member-names.
+  public static function providerTestIsValidMemberName(): array {
+    // Copied from https://jsonapi.org/format/upcoming/#document-member-names.
     $data = [];
     $data['alphanumeric-lowercase'] = ['12kittens', TRUE];
     $data['alphanumeric-uppercase'] = ['12KITTENS', TRUE];
@@ -100,10 +104,10 @@ class JsonApiSpecTest extends UnitTestCase {
   /**
    * Provides test cases.
    *
-   * @dataProvider providerTestIsValidCustomQueryParameter
-   * @covers ::isValidCustomQueryParameter
-   * @covers ::isValidMemberName
+   * @legacy-covers ::isValidCustomQueryParameter
+   * @legacy-covers ::isValidMemberName
    */
+  #[DataProvider('providerTestIsValidCustomQueryParameter')]
   public function testIsValidCustomQueryParameter($custom_query_parameter, $expected): void {
     $this->assertSame($expected, JsonApiSpec::isValidCustomQueryParameter($custom_query_parameter));
   }

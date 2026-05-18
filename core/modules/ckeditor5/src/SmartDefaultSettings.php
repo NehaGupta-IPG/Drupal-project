@@ -17,6 +17,7 @@ use Drupal\editor\EditorInterface;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\FilterFormatInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Generates CKEditor 5 settings for existing text editors/formats.
@@ -28,55 +29,16 @@ final class SmartDefaultSettings {
 
   use StringTranslationTrait;
 
-  /**
-   * The CKEditor 5 plugin manager.
-   *
-   * @var \Drupal\ckeditor5\Plugin\CKEditor5PluginManagerInterface
-   */
-  protected $pluginManager;
+  public function __construct(
+    protected CKEditor5PluginManagerInterface $pluginManager,
+    #[Autowire(service: 'logger.channel.ckeditor5')]
+    protected LoggerInterface $logger,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected AccountInterface $currentUser,
+  ) {}
 
   /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $currentUser;
-
-  /**
-   * A logger instance.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
-   * Constructs a SmartDefaultSettings object.
-   *
-   * @param \Drupal\ckeditor5\Plugin\CKEditor5PluginManagerInterface $plugin_manager
-   *   The CKEditor 5 plugin manager.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   A logger instance.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   */
-  public function __construct(CKEditor5PluginManagerInterface $plugin_manager, LoggerInterface $logger, ModuleHandlerInterface $module_handler, AccountInterface $current_user) {
-    $this->pluginManager = $plugin_manager;
-    $this->logger = $logger;
-    $this->moduleHandler = $module_handler;
-    $this->currentUser = $current_user;
-  }
-
-  /**
-   * Computes the closest possible equivalent settings for switching to CKEditor 5.
+   * Computes the closest equivalent settings for switching to CKEditor 5.
    *
    * @param \Drupal\editor\EditorInterface|null $text_editor
    *   The editor being reconfigured for CKEditor 5; infer the settings based on
@@ -765,7 +727,10 @@ final class SmartDefaultSettings {
         $plugin_definition = $this->pluginManager->getDefinition($plugin_id);
         assert($plugin_definition instanceof CKEditor5PluginDefinition);
         if ($plugin_definition->hasToolbarItems()) {
-          $prospective_editor_settings['toolbar']['items'] = [...$prospective_editor_settings['toolbar']['items'], ...array_keys($plugin_definition->getToolbarItems())];
+          $prospective_editor_settings['toolbar']['items'] = [
+            ...$prospective_editor_settings['toolbar']['items'],
+            ...array_keys($plugin_definition->getToolbarItems()),
+          ];
         }
         if ($plugin_definition->isConfigurable()) {
           $prospective_editor_settings['plugins'][$plugin_id] = $this->pluginManager->createInstance($plugin_id)->defaultConfiguration();
