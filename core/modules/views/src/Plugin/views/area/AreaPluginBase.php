@@ -153,13 +153,19 @@ abstract class AreaPluginBase extends HandlerBase {
   }
 
   /**
+   * Determines if the handler id is already taken.
+   *
    * @param string $area_id
+   *   The handler id.
+   *
    * @return bool
+   *   TRUE if the id is taken, FALSE otherwise.
    */
   public function exists(string $area_id): bool {
     $handlers = $this->displayHandler->getHandlers($this->areaType);
 
-    // Make sure no another handler is already using the id, or being renamed, using the same id.
+    // Make sure no another handler is already using the id, or being renamed,
+    // using the same id.
     return array_key_exists($area_id, $handlers) || !empty(
       array_filter(
         $handlers,
