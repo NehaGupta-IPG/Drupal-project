@@ -119,7 +119,7 @@ class AreaTest extends ViewTestBase {
 
       // Test form validation for invalid area ids.
       $edit_path = 'admin/structure/views/nojs/handler/test_example_area/default/' . $type . '/' . $new_id;
-      $error_text = 'Area id must contain only lowercase letters, numbers, or underscores.';
+      $error_text = 'The machine-readable name must contain only lowercase letters, numbers, and underscores.';
 
       $this->drupalGet($edit_path);
       $this->submitForm(['options[area_id][area_id]' => 'test 1'], 'Apply');
@@ -132,7 +132,7 @@ class AreaTest extends ViewTestBase {
       // Test using a non-unique area id.
       $this->drupalGet($edit_path);
       $this->submitForm(['options[area_id][area_id]' => 'test_example_2'], 'Apply');
-      $this->assertSession()->pageTextContains('Area id should be unique.');
+      $this->assertSession()->pageTextContains('The machine-readable name is already in use. It must be unique.');
     }
   }
 
