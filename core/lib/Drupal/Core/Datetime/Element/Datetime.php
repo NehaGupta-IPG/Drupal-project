@@ -222,6 +222,7 @@ class Datetime extends DateElementBase {
     $formats = DateFormat::loadMultiple(['html_date', 'html_time']);
     $date_format = $formats['html_date']->getPattern();
     $time_format = $formats['html_time']->getPattern();
+    $end = str_contains($element['#id'], 'end-value');
 
     $element += [
       '#date_date_format' => $date_format,
@@ -265,7 +266,6 @@ class Datetime extends DateElementBase {
         ];
       }
 
-      $end = str_contains($element['#id'], 'end-value') ?? FALSE;
       $element['date'] = [
         '#type' => 'date',
         '#title' => $end ? t('End Date') : t('Start Date'),
