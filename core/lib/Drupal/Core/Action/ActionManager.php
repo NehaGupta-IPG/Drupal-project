@@ -46,19 +46,20 @@ class ActionManager extends DefaultPluginManager implements CategorizingPluginMa
   ) {
     parent::__construct('Plugin/Action', $namespaces, $module_handler, ActionInterface::class, Action::class, 'Drupal\Core\Annotation\Action');
     $this->alterInfo('action_info');
+    $cache_key = 'action_info';
     if ($this->languageManager === NULL) {
       @trigger_error('Calling ' . __METHOD__ . '() without the $languageManager argument is deprecated in drupal:11.4.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3589007', E_USER_DEPRECATED);
-      $this->setCacheBackend($cache_backend, 'action_info');
     }
     else {
-      $this->setCacheBackend($cache_backend, 'action_info:' . $this->languageManager->getCurrentLanguage()->getId());
+      $cache_key .= ':' . $this->languageManager->getCurrentLanguage()->getId();
     }
+    $this->setCacheBackend($cache_backend, $cache_key);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function clearCachedDefinitions() {
+  public function clearCachedDefinitions(): void {
     if ($this->languageManager === NULL) {
       parent::clearCachedDefinitions();
       return;
