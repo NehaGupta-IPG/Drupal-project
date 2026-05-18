@@ -59,8 +59,8 @@ abstract class EntityKernelTestBase extends KernelTestBase {
     $this->entityTypeManager = $this->container->get('entity_type.manager');
     $this->state = $this->container->get('state');
 
-    @$this->installEntitySchema('user');
-    @$this->installEntitySchema('entity_test');
+    $this->installEntitySchema('user');
+    $this->installEntitySchema('entity_test');
 
     // If the concrete test sub-class installs the Node or Comment modules,
     // ensure that the node and comment entity schema are created before the

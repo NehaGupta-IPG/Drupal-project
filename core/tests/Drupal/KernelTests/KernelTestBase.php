@@ -80,9 +80,9 @@ use Symfony\Component\Routing\Route;
  * KernelTestBase::enableModules().
  *
  * Some modules can be brought into a fully-installed state using
- * KernelTestBase::installConfig() and KernelTestBase::installSchema().
- * Alternately, tests which need modules to be fully installed could inherit
- * from \Drupal\Tests\BrowserTestBase.
+ * * KernelTestBase::installConfig(), KernelTestBase::installSchema(), and
+ * * KernelTestBase::installEntitySchema(). Alternately, tests which need modules
+ * * to be fully installed could inherit from \Drupal\Tests\BrowserTestBase.
  *
  * Using Symfony's dump() function in Kernel tests will produce output on the
  * command line, whether the call to dump() is in test code or site code.
