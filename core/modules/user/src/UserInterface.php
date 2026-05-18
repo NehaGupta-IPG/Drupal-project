@@ -55,8 +55,9 @@ interface UserInterface extends ContentEntityInterface, EntityChangedInterface, 
    *
    * @return int|null
    *   The user ID, or NULL for a stub user entity that was not saved yet.
+   *   An id of zero represents the anonymous user.
    *
-   * @phpstan-return positive-int|null
+   * @phpstan-return non-negative-int|null
    */
   public function id();
 
