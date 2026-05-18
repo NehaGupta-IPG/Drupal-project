@@ -3,8 +3,10 @@
 namespace Drupal\Core\DependencyInjection;
 
 use Drupal\Component\DependencyInjection\ReverseContainer;
+use Drupal\Core\DependencyInjection\Attribute\ServiceClosure;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides dependency injection friendly methods for serialization.
@@ -18,6 +20,27 @@ trait DependencySerializationTrait {
    */
   // phpcs:ignore Drupal.Classes.PropertyDeclaration, Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $_serviceIds = [];
+
+  /**
+   * An array of service IDs keyed by property name used for serialization.
+   *
+   * This tracks the services that are returned by class properties which are
+   * closures.
+   *
+   * @var array
+   */
+  // phpcs:ignore Drupal.Classes.PropertyDeclaration, Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  protected $_serviceIdsForClosurePropertyNames = [];
+
+  /**
+   * An array of service IDs keyed by identifiers for service closures.
+   *
+   * This maps the service closures objects to service IDs.
+   *
+   * @var array
+   */
+  // phpcs:ignore Drupal.Classes.PropertyDeclaration, Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  protected static $_serviceIdsForClosureObjects = [];
 
   /**
    * An array of entity type IDs keyed by the property name of their storages.
@@ -58,6 +81,17 @@ trait DependencySerializationTrait {
           $this->_serviceIds[$key] = $service_id;
           unset($vars[$key]);
         }
+        elseif (
+          $value instanceof \Closure
+          && SerializableServiceClosure::check($value)
+        ) {
+          // If a class member is a closure that returns a service object, only
+          // store its ID so it can be used to create a new closure that returns
+          // the service object on unserialization.
+          $service_closure_id = $reverse_container->getId(($value)());
+          $this->_serviceIdsForClosurePropertyNames[$key] = $service_closure_id;
+          unset($vars[$key]);
+        }
       }
     }
     catch (ContainerNotInitializedException) {
@@ -80,6 +114,11 @@ trait DependencySerializationTrait {
       $this->$key = $container->get($service_id);
     }
     $this->_serviceIds = [];
+
+    foreach ($this->_serviceIdsForClosurePropertyNames as $key => $service_closure_id) {
+      $this->$key = SerializableServiceClosure::create($service_closure_id, $container);
+    }
+    $this->_serviceIdsForClosurePropertyNames = [];
 
     if ($this->_entityStorages) {
       /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager */

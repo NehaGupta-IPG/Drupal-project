@@ -317,6 +317,8 @@ class ContentEntityCloneTest extends EntityKernelTestBase {
       'cacheTags',
       'cacheMaxAge',
       '_serviceIds',
+      '_serviceIdsForClosurePropertyNames',
+      '$_serviceIdsForClosureObjects',
       '_entityStorages',
       'enforceDefaultTranslation',
     ];

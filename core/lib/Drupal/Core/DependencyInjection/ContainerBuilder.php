@@ -3,7 +3,9 @@
 namespace Drupal\Core\DependencyInjection;
 
 use Drupal\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\DependencyInjection\Attribute\ServiceClosure;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder as SymfonyContainerBuilder;
 use Symfony\Component\DependencyInjection\Container as SymfonyContainer;
 use Symfony\Component\DependencyInjection\Definition;
@@ -78,6 +80,24 @@ class ContainerBuilder extends SymfonyContainerBuilder implements ContainerInter
   public function __sleep(): array {
     assert(FALSE, 'The container was serialized.');
     return array_keys(get_object_vars($this));
+  }
+
+  /**
+   * Resolve service definition.
+   *
+   * Fork this piece of code of the called method to add our ServiceClosure
+   * attribute to the function, which gets picked up in serialization.
+   *
+   * @todo Do the same w/ ServiceIterator.
+   *   Note that ServiceLocator does not need an attribute added.
+   * @todo Upstream this change to symfony.
+   */
+  public function resolveServices(mixed $value): mixed {
+    if ($value instanceof ServiceClosureArgument) {
+      $reference = $value->getValues()[0];
+      $value = SerializableServiceClosure::create($reference, $this);
+    }
+    return parent::resolveServices($value);
   }
 
 }
