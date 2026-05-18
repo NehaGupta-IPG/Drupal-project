@@ -67,6 +67,13 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
   protected $entityFieldManager;
 
   /**
+   * The entity bundle info.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   */
+  protected $entityTypeBundleInfo;
+
+  /**
    * Constructs an EntityViewsData object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
@@ -81,14 +88,21 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
    *   The translation manager.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface|null $entityTypeBundleInfo
+   *   The entity type bundle info.
    */
-  public function __construct(EntityTypeInterface $entity_type, SqlEntityStorageInterface $storage_controller, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, TranslationInterface $translation_manager, EntityFieldManagerInterface $entity_field_manager) {
+  public function __construct(EntityTypeInterface $entity_type, SqlEntityStorageInterface $storage_controller, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, TranslationInterface $translation_manager, EntityFieldManagerInterface $entity_field_manager, ?EntityTypeBundleInfoInterface $entityTypeBundleInfo = NULL) {
     $this->entityType = $entity_type;
     $this->entityTypeManager = $entity_type_manager;
     $this->storage = $storage_controller;
     $this->moduleHandler = $module_handler;
     $this->setStringTranslation($translation_manager);
     $this->entityFieldManager = $entity_field_manager;
+    if ($entityTypeBundleInfo === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $entityTypeBundleInfo argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/2898635', E_USER_DEPRECATED);
+      $entityTypeBundleInfo = \Drupal::service('entity_type.bundle.info');
+    }
+    $this->entityTypeBundleInfo = $entityTypeBundleInfo;
   }
 
   /**
@@ -101,7 +115,8 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
       $container->get('entity_type.manager'),
       $container->get('module_handler'),
       $container->get('string_translation'),
-      $container->get('entity_field.manager')
+      $container->get('entity_field.manager'),
+      $container->get('entity_type.bundle.info')
     );
   }
 
@@ -293,6 +308,20 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
     // Load all typed data definitions of all fields. This should cover each of
     // the entity base, revision, data tables.
     $field_definitions = $this->entityFieldManager->getBaseFieldDefinitions($this->entityType->id());
+
+    $field_storage_definitions = array_map(function (FieldDefinitionInterface $definition) {
+      return $definition->getFieldStorageDefinition();
+    }, $field_definitions);
+
+    // Add any bundle fields defined in code.
+    if ($this->entityType->hasKey('bundle')) {
+      $bundle_field_definitions = [];
+      foreach ($this->entityTypeBundleInfo->getBundleInfo($this->entityType->id()) as $bundle_id => $bundle_info) {
+        $bundle_field_definitions += $this->entityFieldManager->getFieldDefinitions($this->entityType->id(), $bundle_id);
+      }
+
+      $field_definitions += $bundle_field_definitions;
+    }
 
     $field_storage_definitions = array_map(function (FieldDefinitionInterface $definition) {
       return $definition->getFieldStorageDefinition();
@@ -543,6 +572,7 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
             $views_field['sort']['id'] = 'standard';
             break;
 
+          case 'blob':
           case 'char':
           case 'string':
           case 'varchar':
@@ -574,6 +604,14 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
     $process_method = 'processViewsDataFor' . Container::camelize($field_type);
     if (method_exists($this, $process_method)) {
       $this->{$process_method}($table, $field_definition, $views_field, $column_name);
+    }
+
+    $target_bundle = $field_definition->getTargetBundle();
+    if (!empty($target_bundle)) {
+      $views_field['field']['bundle'] = $field_definition->getTargetBundle();
+      $views_field['filter']['bundle'] = $field_definition->getTargetBundle();
+      $views_field['sort']['bundle'] = $field_definition->getTargetBundle();
+      $views_field['argument']['bundle'] = $field_definition->getTargetBundle();
     }
 
     return $views_field;
