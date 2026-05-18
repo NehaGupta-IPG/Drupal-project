@@ -96,7 +96,12 @@ class User extends ContentEntityBase implements UserInterface {
    */
   public function id() {
     $id = parent::id();
-    return is_string($id) ? (int) $id : $id;
+    // Cast integer-like strings to integer, but leave all other values
+    // unchanged for BC.
+    if (is_string($id) && (string) (int) $id === $id) {
+      return (int) $id;
+    }
+    return $id;
   }
 
   /**
