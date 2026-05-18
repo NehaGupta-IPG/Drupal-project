@@ -60,17 +60,17 @@ abstract class EntityDisplayModeBase extends ConfigEntityBase implements EntityD
   /**
    * Callback for uasort() to compare configuration entities.
    */
-  public static function compare(ConfigEntityInterface $a, ConfigEntityInterface $b, \Collator $collator): int {
+  public static function compare(ConfigEntityInterface $a, ConfigEntityInterface $b, ?\Collator $collator): int {
     /** @var \Drupal\Core\Entity\EntityDisplayModeInterface $a */
     /** @var \Drupal\Core\Entity\EntityDisplayModeInterface $b */
     // Sort by the type of entity the view mode is used for.
     $a_type = $a->getTargetType();
     $b_type = $b->getTargetType();
-    if (!extension_loaded('intl')) {
-      $type_order = strnatcasecmp($a_type, $b_type);
+    if (isset($collator)) {
+      $type_order = $collator->compare($a_type, $b_type);
     }
     else {
-      $type_order = $collator->compare($a_type, $b_type);
+      $type_order = strnatcasecmp($a_type, $b_type);
     }
     return $type_order != 0 ? $type_order : parent::compare($a, $b, $collator);
   }
@@ -78,13 +78,13 @@ abstract class EntityDisplayModeBase extends ConfigEntityBase implements EntityD
   /**
    * Helper callback for uasort() to sort configuration entities.
    *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use
+   * @deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use
    * \Drupal\Core\Config\Entity\ConfigEntityBase::sortEntities() instead.
    *
    * @see https://www.drupal.org/project/drupal/issues/2265487
    */
   public static function sort(ConfigEntityInterface $a, ConfigEntityInterface $b) {
-    @trigger_error(__CLASS__ . '::' . __FUNCTION__ . ' is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use ' . __CLASS__ . '::sortEntities() instead. See https://www.drupal.org/project/drupal/issues/2265487', E_USER_DEPRECATED);
+    @trigger_error(__CLASS__ . '::' . __FUNCTION__ . ' is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use ' . __CLASS__ . '::sortEntities() instead. See https://www.drupal.org/project/drupal/issues/2265487', E_USER_DEPRECATED);
     /** @var \Drupal\Core\Entity\EntityDisplayModeInterface $a */
     /** @var \Drupal\Core\Entity\EntityDisplayModeInterface $b */
     // Sort by the type of entity the view mode is used for.

@@ -364,11 +364,11 @@
         },
         {
             "name": "drupal/core",
-            "version": "dev-main",
+            "version": "11.x-dev",
             "dist": {
                 "type": "path",
                 "url": "core",
-                "reference": "43966aa5630bad0281289256dab92910607216f0"
+                "reference": "2770a205b2802708949771817fefa7011f7b0682"
             },
             "require": {
                 "asm89/stack-cors": "^2.3",
@@ -412,7 +412,6 @@
                 "symfony/mailer": "^8.0",
                 "symfony/mime": "^8.0",
                 "symfony/polyfill-iconv": "^1.32",
-                "symfony/polyfill-intl-icu": "^1.34",
                 "symfony/polyfill-php86": "^1.37",
                 "symfony/process": "^8.0",
                 "symfony/psr-http-message-bridge": "^8.0",
@@ -457,7 +456,7 @@
                 "drupal/core-version": "self.version"
             },
             "suggest": {
-                "ext-intl": "Needed to extend symfony/polyfill-intl-icu capability with the sorting of non-english languages."
+                "ext-intl": "Needed to improve the sorting of non-english languages."
             },
             "type": "drupal-core",
             "extra": {
@@ -546,7 +545,7 @@
         },
         {
             "name": "drupal/core-composer-scaffold",
-            "version": "dev-main",
+            "version": "11.x-dev",
             "dist": {
                 "type": "path",
                 "url": "composer/Plugin/Scaffold",
@@ -588,7 +587,7 @@
         },
         {
             "name": "drupal/core-project-message",
-            "version": "dev-main",
+            "version": "11.x-dev",
             "dist": {
                 "type": "path",
                 "url": "composer/Plugin/ProjectMessage",
@@ -624,7 +623,7 @@
         },
         {
             "name": "drupal/core-recipe-unpack",
-            "version": "dev-main",
+            "version": "11.x-dev",
             "dist": {
                 "type": "path",
                 "url": "composer/Plugin/RecipeUnpack",
@@ -663,7 +662,7 @@
         },
         {
             "name": "drupal/core-vendor-hardening",
-            "version": "dev-main",
+            "version": "11.x-dev",
             "dist": {
                 "type": "path",
                 "url": "composer/Plugin/VendorHardening",
@@ -3367,94 +3366,6 @@
                 }
             ],
             "time": "2025-06-27T09:58:17+00:00"
-        },
-        {
-            "name": "symfony/polyfill-intl-icu",
-            "version": "v1.37.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/polyfill-intl-icu.git",
-                "reference": "3510b63d07376b04e57e27e82607d468bb134f78"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-intl-icu/zipball/3510b63d07376b04e57e27e82607d468bb134f78",
-                "reference": "3510b63d07376b04e57e27e82607d468bb134f78",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.2"
-            },
-            "suggest": {
-                "ext-intl": "For best performance and support of other locales than \"en\""
-            },
-            "type": "library",
-            "extra": {
-                "thanks": {
-                    "url": "https://github.com/symfony/polyfill",
-                    "name": "symfony/polyfill"
-                }
-            },
-            "autoload": {
-                "files": [
-                    "bootstrap.php"
-                ],
-                "psr-4": {
-                    "Symfony\\Polyfill\\Intl\\Icu\\": ""
-                },
-                "classmap": [
-                    "Resources/stubs"
-                ],
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony polyfill for intl's ICU-related data and classes",
-            "homepage": "https://symfony.com",
-            "keywords": [
-                "compatibility",
-                "icu",
-                "intl",
-                "polyfill",
-                "portable",
-                "shim"
-            ],
-            "support": {
-                "source": "https://github.com/symfony/polyfill-intl-icu/tree/v1.37.0"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://github.com/nicolas-grekas",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2026-04-10T16:50:15+00:00"
         },
         {
             "name": "symfony/polyfill-intl-idn",
@@ -10431,10 +10342,10 @@
     },
     "prefer-stable": true,
     "prefer-lowest": false,
-    "platform": {},
-    "platform-dev": {},
+    "platform": [],
+    "platform-dev": [],
     "platform-overrides": {
         "php": "8.5.0"
     },
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }

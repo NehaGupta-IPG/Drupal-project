@@ -181,7 +181,11 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
     // En is hardcoded because Symfony\Polyfill\Intl\Icu\Collator::create() is
     // throwing an exception, if locale is not en. It is the only implemented
     // language in the polyfill.
-    $collator = \Collator::create((!extension_loaded('intl')) ? ('en') : (\Drupal::service('language_manager')->getCurrentLanguage()->getId()));
+    $collator = NULL;
+    if (extension_loaded('intl')) {
+      $collator = \Collator::create(\Drupal::service('language_manager')->getCurrentLanguage()->getId());
+      $collator->setAttribute(\Collator::NUMERIC_COLLATION, \Collator::ON);
+    }
     return uasort($entities, function ($a, $b) use ($collator) {
       return static::compare($a, $b, $collator);
     });
@@ -194,10 +198,12 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
     $a_weight = $a->getWeight();
     $b_weight = $b->getWeight();
     if ($a_weight == $b_weight) {
-      if (!extension_loaded('intl')) {
+      if (isset($collator)) {
+        return $collator->compare($a->getTitle(), $b->getTitle());
+      }
+      else {
         return strnatcasecmp($a->getTitle(), $b->getTitle());
       }
-      return $collator->compare($a->getTitle(), $b->getTitle());
     }
     return $a_weight <=> $b_weight;
   }
@@ -205,7 +211,7 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
   /**
    * Helper callback for uasort() to sort configuration entities.
    *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use
+   * @deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use
    * \Drupal\Core\Config\Entity\ConfigEntityBase::sortEntities() instead.
    *
    * @return int
@@ -214,7 +220,7 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
    * @see https://www.drupal.org/project/drupal/issues/2265487
    */
   public static function sort(ShortcutInterface $a, ShortcutInterface $b) {
-    @trigger_error(__CLASS__ . '::' . __FUNCTION__ . ' is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use ' . __CLASS__ . '::sortEntities() instead. See https://www.drupal.org/project/drupal/issues/2265487', E_USER_DEPRECATED);
+    @trigger_error(__CLASS__ . '::' . __FUNCTION__ . ' is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use ' . __CLASS__ . '::sortEntities() instead. See https://www.drupal.org/project/drupal/issues/2265487', E_USER_DEPRECATED);
     $a_weight = $a->getWeight();
     $b_weight = $b->getWeight();
     if ($a_weight == $b_weight) {

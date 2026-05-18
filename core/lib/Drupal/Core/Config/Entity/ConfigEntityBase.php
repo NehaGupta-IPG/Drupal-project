@@ -246,7 +246,11 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
     // En is hardcoded because Symfony\Polyfill\Intl\Icu\Collator::create() is
     // throwing an exception, if locale is not en. It is the only implemented
     // language in the polyfill.
-    $collator = \Collator::create((!extension_loaded('intl')) ? ('en') : (\Drupal::service('language_manager')->getCurrentLanguage()->getId()));
+    $collator = NULL;
+    if (extension_loaded('intl')) {
+      $collator = \Collator::create(\Drupal::service('language_manager')->getCurrentLanguage()->getId());
+      $collator->setAttribute(\Collator::NUMERIC_COLLATION, \Collator::ON);
+    }
     return uasort($entities, function ($a, $b) use ($collator) {
       return static::compare($a, $b, $collator);
     });
@@ -255,16 +259,18 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
   /**
    * Callback for uasort() to compare configuration entities.
    */
-  public static function compare(ConfigEntityInterface $a, ConfigEntityInterface $b, \Collator $collator): int {
+  public static function compare(ConfigEntityInterface $a, ConfigEntityInterface $b, ?\Collator $collator): int {
     $a_weight = $a->weight ?? 0;
     $b_weight = $b->weight ?? 0;
     if ($a_weight == $b_weight) {
       $a_label = $a->label() ?? '';
       $b_label = $b->label() ?? '';
-      if (!extension_loaded('intl')) {
+      if (isset($collator)) {
+        return $collator->compare($a_label, $b_label);
+      }
+      else {
         return strnatcasecmp($a_label, $b_label);
       }
-      return $collator->compare($a_label, $b_label);
     }
     return $a_weight <=> $b_weight;
   }
@@ -272,13 +278,13 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
   /**
    * Callback for uasort() to sort configuration entities by weight and label.
    *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use
+   * @deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use
    * \Drupal\Core\Config\Entity\ConfigEntityBase::sortEntities() instead.
    *
    * @see https://www.drupal.org/project/drupal/issues/2265487
    */
   public static function sort(ConfigEntityInterface $a, ConfigEntityInterface $b) {
-    @trigger_error(__CLASS__ . '::' . __FUNCTION__ . ' is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use ' . __CLASS__ . '::sortEntities() instead. See https://www.drupal.org/project/drupal/issues/2265487', E_USER_DEPRECATED);
+    @trigger_error(__CLASS__ . '::' . __FUNCTION__ . ' is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use ' . __CLASS__ . '::sortEntities() instead. See https://www.drupal.org/project/drupal/issues/2265487', E_USER_DEPRECATED);
     $a_weight = $a->weight ?? 0;
     $b_weight = $b->weight ?? 0;
     if ($a_weight == $b_weight) {
