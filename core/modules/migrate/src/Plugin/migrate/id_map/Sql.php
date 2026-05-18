@@ -147,6 +147,11 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
   protected $currentKey = [];
 
   /**
+   * The current result delta.
+   */
+  protected int $currentDelta = 0;
+
+  /**
    * The migration plugin manager.
    *
    * @var \Drupal\migrate\Plugin\MigrationPluginManagerInterface
@@ -910,6 +915,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
    * This is called before beginning a foreach loop.
    */
   public function rewind(): void {
+    $this->currentDelta = 0;
     $this->currentRow = NULL;
     $fields = [];
     foreach ($this->sourceIdFields() as $field) {
@@ -921,7 +927,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
     $this->result = $this->getDatabase()->select($this->mapTableName(), 'map')
       ->fields('map', $fields)
       ->orderBy('destid1')
-      ->execute();
+      ->execute()->fetchAll(FetchAs::Associative);
     $this->next();
   }
 
@@ -986,7 +992,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
    * from rewind().
    */
   public function next(): void {
-    $this->currentRow = $this->result->fetchAssoc();
+    $this->currentRow = $this->result[$this->currentDelta] ?? FALSE;
     $this->currentKey = [];
     if ($this->currentRow) {
       foreach ($this->sourceIdFields() as $map_field) {
@@ -995,6 +1001,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
         unset($this->currentRow[$map_field]);
       }
     }
+    $this->currentDelta++;
   }
 
   /**
