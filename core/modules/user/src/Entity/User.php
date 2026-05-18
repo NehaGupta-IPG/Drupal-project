@@ -89,10 +89,7 @@ class User extends ContentEntityBase implements UserInterface {
   protected static $anonymousUser;
 
   /**
-   * Returns the user ID.
-   *
-   * @return int|null
-   *   The user ID.
+   * {@inheritdoc}
    */
   public function id() {
     $id = parent::id();
