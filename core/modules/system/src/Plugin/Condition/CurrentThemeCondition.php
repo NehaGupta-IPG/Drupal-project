@@ -93,7 +93,22 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
    * {@inheritdoc}
    */
   public function evaluate() {
-    return $this->currentThemeAllowed();
+    $configuredThemes = $this->configuration['themes'];
+
+    // Handle deprecated 'theme' configuration option.
+    if (empty($configuredThemes) && !empty($this->configuration['theme'])) {
+      @trigger_error('The "theme" configuration key is deprecated in drupal:12.0.0 and will be removed in drupal:13.0.0. Use "themes" instead. See https://www.drupal.org/node/3523553', E_USER_DEPRECATED);
+      $configuredThemes = [$this->configuration['theme']];
+    }
+
+    // If no themes are configured, the condition always evaluates to TRUE.
+    if (empty($configuredThemes)) {
+      return TRUE;
+    }
+    // We want to have the machine names as values, get the keys only:
+    $availableThemes = array_keys($this->getAllAvailableThemeOptions());
+    // Return whether the current theme is in the currently available themes:
+    return in_array($this->themeManager->getActiveTheme()->getName(), $availableThemes, TRUE);
   }
 
   /**
@@ -127,39 +142,13 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
   }
 
   /**
-   * Checks if the current theme is allowed.
-   *
-   * @return bool
-   *   TRUE if the current theme is allowed, FALSE otherwise.
-   */
-  protected function currentThemeAllowed() {
-    $configuredThemes = $this->configuration['themes'];
-
-    // Handle deprecated 'theme' configuration option.
-    if (empty($configuredThemes) && !empty($this->configuration['theme'])) {
-      @trigger_error('The "theme" configuration key is deprecated in drupal:12.0.0 and will be removed in drupal:13.0.0. Use "themes" instead. See https://www.drupal.org/node/3523553', E_USER_DEPRECATED);
-      $configuredThemes = [$this->configuration['theme']];
-    }
-
-    // If no themes are configured, the condition always evaluates to TRUE.
-    if (empty($configuredThemes)) {
-      return TRUE;
-    }
-    // We want to have the machine names as values, get the keys only:
-    $allThemes = array_keys($this->getAllAvailableThemeOptions());
-    // Return whether the current theme is in the currently allowed themes:
-    $allowedThemes = array_intersect($allThemes, $configuredThemes);
-    return in_array($this->themeManager->getActiveTheme()->getName(), $allowedThemes);
-  }
-
-  /**
    * Retrieves a list of all available themes.
    *
    * @return array
    *   An associative array of themes, where the keys are the theme
    *   machine names and the values are the displayed theme names.
    */
-  protected function getAllAvailableThemeOptions() {
+  protected function getAllAvailableThemeOptions(): array {
     return array_map(function ($theme_info) {
       return $theme_info->info['name'];
     }, $this->themeHandler->listInfo());
