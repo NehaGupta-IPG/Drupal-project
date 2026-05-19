@@ -81,6 +81,7 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
       '#type' => 'container',
       '#attributes' => [
         'id' => 'media-library-messages',
+        'class' => ['media-library-messages'],
       ],
       '#weight' => -10,
     ];
@@ -165,7 +166,7 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
     $selected_count = count(array_filter(explode(',', $current_selection)));
     if ($selected_count === 0) {
       $response = new AjaxResponse();
-      $error = t('No items selected. Consider closing the dialog instead.');
+      $error = t('No items selected.');
       $response->addCommand(new MessageCommand($error, '#media-library-messages', ['type' => 'error']));
       return $response;
     }

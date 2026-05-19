@@ -174,7 +174,7 @@ class WidgetOverflowTest extends MediaLibraryTestBase {
     // Clicking "Insert selected" with nothing selected should show an error
     // message instead of closing the dialog.
     $this->pressInsertSelected(NULL, FALSE);
-    $this->waitForElementTextContains('.messages--error', 'No items selected. Consider closing the dialog instead.');
+    $this->waitForElementTextContains('.messages--error', 'No items selected.');
     $assert_session->elementExists('css', '.ui-dialog-buttonpane');
 
     // Close the dialog via its title bar close button and verify it closes.
