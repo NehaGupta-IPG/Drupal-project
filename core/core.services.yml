@@ -356,6 +356,10 @@ services:
       - { name: cache.bin.memory, default_backend: cache.backend.memory.memory }
     factory: ['@cache_factory', 'get']
     arguments: [memory]
+  cache.file_parsing:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    factory: ['@cache_factory', 'get']
+    arguments: [file_parsing]
   cache_prewarmer:
     class: Drupal\Core\PreWarm\CachePreWarmer
     arguments: ['@class_resolver']
@@ -1776,8 +1780,13 @@ services:
   Drupal\Core\Asset\LibraryDiscoveryInterface: '@library.discovery'
   library.discovery.parser:
     class: Drupal\Core\Asset\LibraryDiscoveryParser
-    arguments: ['%app.root%', '@module_handler', '@theme.manager', '@stream_wrapper_manager', '@library.libraries_directory_file_finder', '@extension.path.resolver', '@plugin.manager.sdc']
+    arguments: ['%app.root%', '@module_handler', '@theme.manager', '@stream_wrapper_manager', '@library.libraries_directory_file_finder', '@extension.path.resolver', '@plugin.manager.sdc', '@library.parsing_cache']
   Drupal\Core\Asset\LibraryDiscoveryParser: '@library.discovery.parser'
+  library.parsing_cache:
+    class: Drupal\Core\Utility\YamlCacheCollector
+    arguments: ['library.parsing_cache', '@cache.file_parsing', '@lock']
+    tags:
+      - { name: needs_destruction }
   library.libraries_directory_file_finder:
     class: Drupal\Core\Asset\LibrariesDirectoryFileFinder
     arguments: ['%app.root%', '%site.path%', '@extension.list.profile', '%install_profile%']
