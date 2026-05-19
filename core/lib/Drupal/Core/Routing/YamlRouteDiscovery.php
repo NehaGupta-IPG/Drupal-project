@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Drupal\Core\Routing;
 
 use Drupal\Core\Controller\ControllerResolverInterface;
-use Drupal\Core\Discovery\YamlDiscovery;
+use Drupal\Core\Discovery\YamlCacheCollectorDiscovery;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Utility\YamlCacheCollector;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -90,7 +91,8 @@ class YamlRouteDiscovery extends StaticRouteDiscoveryBase {
   protected function getRouteDefinitions() {
     // Always instantiate a new YamlDiscovery object so that we always search on
     // the up-to-date list of modules.
-    $discovery = new YamlDiscovery('routing', $this->moduleHandler->getModuleDirectories());
+    $cache_collector = new YamlCacheCollector('route_discovery', \Drupal::service('cache.file_parsing'), \Drupal::service('lock'));
+    $discovery = new YamlCacheCollectorDiscovery('routing', $this->moduleHandler->getModuleDirectories(), $cache_collector);
     return $discovery->findAll();
   }
 

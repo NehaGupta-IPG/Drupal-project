@@ -1,0 +1,49 @@
+<?php
+
+namespace Drupal\Core\Discovery;
+
+use Drupal\Component\Discovery\YamlDiscovery as ComponentYamlDiscovery;
+use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
+use Drupal\Core\Serialization\Yaml;
+use Drupal\Core\Utility\YamlCacheCollector;
+
+/**
+ * Provides discovery for YAML files within a given set of directories.
+ *
+ * This overrides the Component file decoding with the Core YAML implementation.
+ */
+class YamlCacheCollectorDiscovery extends YamlDiscovery {
+
+  /**
+   * Constructs a YamlDiscovery object.
+   *
+   * @param string $name
+   *   The base filename to look for in each directory. The format will be
+   *   $provider.$name.yml.
+   * @param array $directories
+   *   An array of directories to scan, keyed by the provider.
+   * @param CacheCollectorInterface $yamlParsingCacheCollector
+   *   An instance of YamlParsinCacheCollector
+   */
+  public function __construct($name, array $directories, protected YamlCacheCollector $yamlCacheCollector) {
+    parent::__construct($name, $directories);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function decode($file) {
+
+    try {
+      return $this->yamlCacheCollector->get($file);
+    }
+    catch (InvalidDataTypeException $e) {
+      throw new InvalidDataTypeException($file . ': ' . $e->getMessage(), $e->getCode(), $e);
+    }
+  }
+
+  public function __destruct() {
+    $this->yamlCacheCollector->destruct();
+  }
+
+}
