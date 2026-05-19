@@ -19,9 +19,8 @@ use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
  * Container storage using Symfony's PhpDumper and PhpStorage.
  *
  * Compiles the container into a PHP class that benefits from opcache. The
- * compiled file is stored via PhpStorage (typically
- * FlockMTimeProtectedFileStorage) and a hash is kept in the cache backend to
- * map the cache key suffix to the correct container class.
+ * compiled file is stored via PhpStorage and a hash is kept in the cache
+ * backend to map the cache key suffix to the correct container class.
  */
 class PhpDumperContainerStorage implements ContainerStorageInterface, DestructableInterface {
 

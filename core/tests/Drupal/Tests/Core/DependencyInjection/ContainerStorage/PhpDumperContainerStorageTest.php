@@ -489,11 +489,6 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
 
   /**
    * Tests that dump() returns the original container when save() fails.
-   *
-   * Covers the case where a LockingPhpStorageInterface implementation (such as
-   * FlockMTimeProtectedFileStorage) returns FALSE from save() because another
-   * worker on the same web head is already writing the file, or a write error
-   * occurs.
    */
   public function testDumpReturnsFallbackContainerWhenSaveFails(): void {
     $cache = $this->createMock(CacheBackendInterface::class);

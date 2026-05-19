@@ -6,7 +6,6 @@ use Composer\Autoload\ClassLoader;
 use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Component\EventDispatcher\Event;
 use Drupal\Component\FileCache\FileCacheFactory;
-use Drupal\Component\PhpStorage\FlockMTimeProtectedFileStorage;
 use Drupal\Component\PhpStorage\PhpStorageInterface;
 use Drupal\Component\Serialization\PhpSerialize;
 use Drupal\Component\Utility\UrlHelper;
@@ -143,16 +142,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       'php_storage.service_container' => [
         'class' => PhpStorageInterface::class,
         'factory' => [PhpStorageFactory::class, 'get'],
-        // FlockMTimeProtectedFileStorage stores the compiled container
-        // in each web head's local temporary directory. This avoids race
-        // conditions on NFS mounts and between multiple PHP workers on the same
-        // web head.
         'arguments' => [
           'service_container',
-          [
-            'class' => FlockMTimeProtectedFileStorage::class,
-            'directory' => 'temporary://drupal',
-          ],
         ],
       ],
     ],
@@ -568,7 +559,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $definition['parameters'] = array_merge($this->defaultBootstrapContainerDefinition['parameters'], $definition['parameters'] ?? []);
     // Pass the site path to the php storage service container so the fallback
     // so the \Drupal\Core\StreamWrapper\PublicStream::basePath() works.
-    $definition['services']['php_storage.service_container']['arguments'][] = $this->sitePath;
+    $definition['services']['php_storage.service_container']['arguments']['site_path'] = $this->sitePath;
 
     // Add the container storage class to the definition if it does not match
     // the default.
