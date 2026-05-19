@@ -27,7 +27,7 @@ class PhpContainerRequirementsTest extends BrowserTestBase {
     $admin_user = $this->drupalCreateUser(['administer site configuration']);
     $this->drupalLogin($admin_user);
     // Need to wait for opcache to be in place.
-    sleep(1);
+    sleep(3);
     $this->drupalGet('admin/reports/status');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains('PHP OPcode container cached');
