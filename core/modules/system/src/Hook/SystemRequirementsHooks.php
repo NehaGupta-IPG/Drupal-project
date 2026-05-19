@@ -317,6 +317,7 @@ class SystemRequirementsHooks {
     }
 
     if ($phase == 'runtime') {
+      $container = \Drupal::getContainer();
       // Check to see if OPcache is installed.
       if (!OpCodeCache::isEnabled()) {
         $requirements['php_opcache'] = [
@@ -329,7 +330,6 @@ class SystemRequirementsHooks {
         $requirements['php_opcache']['value'] = $this->t('Enabled');
 
         // Check if the container file is cached in OPcache.
-        $container = \Drupal::getContainer();
         if ($container instanceof PhpContainer) {
           $container_file = (new \ReflectionClass($container))->getFileName();
           if ($container_file && opcache_is_script_cached($container_file)) {
@@ -352,6 +352,18 @@ class SystemRequirementsHooks {
         }
       }
       $requirements['php_opcache']['title'] = $this->t('PHP OPcode caching');
+
+      if (is_a(Settings::get('container_base_class'), PhpContainer::class, TRUE) && !(is_a($container, PhpContainer::class, TRUE))) {
+        $requirements['php_compiled_container'] = [
+          'title' => $this->t('PHP compiled container'),
+          'value' => $this->t('Not written to disk'),
+          'severity' => RequirementSeverity::Error,
+          'description' => $this->t(
+            'The service container PHP file is not written to disk. Check file permissions and php_storage configuration.',
+            [':drupal-php' => 'https://www.drupal.org/docs/system-requirements/php-requirements']
+          ),
+        ];
+      }
     }
 
     // Check to see if APCu is installed and configured correctly.
