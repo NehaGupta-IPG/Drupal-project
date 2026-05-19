@@ -35,8 +35,8 @@ class GridResponsive extends StylePluginBase {
     $options['cell_min_width'] = ['default' => '100'];
     $options['grid_gutter'] = ['default' => '10'];
     $options['alignment'] = ['default' => 'horizontal'];
-    $options['col_class_custom'] = ['default' => ''];
-    $options['row_class_custom'] = ['default' => ''];
+    $options['grid_wrapper_class_custom'] = ['default' => ''];
+    $options['grid_cell_class_custom'] = ['default' => ''];
     return $options;
   }
 
@@ -81,32 +81,32 @@ class GridResponsive extends StylePluginBase {
       '#default_value' => $this->options['alignment'],
       '#description' => $this->t('Horizontal alignment will place items starting in the upper left and moving right. Vertical alignment will place items starting in the upper left and moving down.'),
     ];
-    $form['col_class_custom'] = [
-      '#title' => $this->t('Custom column class'),
-      '#description' => $this->t('Additional classes to provide on each column. Separated by a space.'),
+    $form['grid_wrapper_class_custom'] = [
+      '#title' => $this->t('Custom grid wrapper class'),
+      '#description' => $this->t('Additional classes to provide on each grid wrapper. Separated by a space.'),
       '#type' => 'textfield',
-      '#default_value' => $this->options['col_class_custom'],
+      '#default_value' => $this->options['grid_wrapper_class_custom'],
     ];
-    $form['row_class_custom'] = [
-      '#title' => $this->t('Custom row class'),
-      '#description' => $this->t('Additional classes to provide on each row. Separated by a space.'),
+    $form['grid_cell_class_custom'] = [
+      '#title' => $this->t('Custom grid cell class'),
+      '#description' => $this->t('Additional classes to provide on each cell. Separated by a space.'),
       '#type' => 'textfield',
-      '#default_value' => $this->options['row_class_custom'],
+      '#default_value' => $this->options['grid_cell_class_custom'],
     ];
     if ($this->usesFields()) {
       $token_description = ' ' . $this->t('You may use field tokens as per the "Replacement patterns" used in "Rewrite the output of this field" for all fields.');
-      $form['row_class_custom']['#description'] .= $token_description;
-      $form['col_class_custom']['#description'] .= $token_description;
+      $form['grid_wrapper_class_custom']['#description'] .= $token_description;
+      $form['grid_cell_class_custom']['#description'] .= $token_description;
     }
   }
 
   /**
-   * Return the token-replaced row or column classes for the specified result.
+   * Return the token-replaced wrapper or cell classes for the specified result.
    *
    * @param int $result_index
    *   The delta of the result item to get custom classes for.
    * @param string $type
-   *   The type of custom grid class to return, either "row" or "col".
+   *   The type of custom grid class, either "grid_wrapper" or "grid_wrapper".
    *
    * @return string
    *   A space-delimited string of classes.

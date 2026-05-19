@@ -168,12 +168,12 @@ class ViewsConfigUpdater {
         && isset($display['display_options']['style']['options'])
       ) {
         $options = &$display['display_options']['style']['options'];
-        if (!isset($options['row_class_custom'])) {
-          $options['row_class_custom'] = '';
+        if (!isset($options['grid_wrapper_class_custom'])) {
+          $options['grid_wrapper_class_custom'] = '';
           $changed = TRUE;
         }
-        if (!isset($options['col_class_custom'])) {
-          $options['col_class_custom'] = '';
+        if (!isset($options['grid_cell_class_custom'])) {
+          $options['grid_cell_class_custom'] = '';
           $changed = TRUE;
         }
       }

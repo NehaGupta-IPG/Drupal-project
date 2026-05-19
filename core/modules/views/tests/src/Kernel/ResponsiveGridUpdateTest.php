@@ -35,8 +35,8 @@ class ResponsiveGridUpdateTest extends ViewsKernelTestBase {
     $view = View::load('test_grid_responsive');
     $display = &$view->getDisplay('default');
 
-    unset($display['display_options']['style']['options']['row_class_custom']);
-    unset($display['display_options']['style']['options']['col_class_custom']);
+    unset($display['display_options']['style']['options']['grid_wrapper_class_custom']);
+    unset($display['display_options']['style']['options']['grid_cell_class_custom']);
     $view->save();
 
     // Enable strict validation for the update process.
@@ -52,10 +52,10 @@ class ResponsiveGridUpdateTest extends ViewsKernelTestBase {
     $view = View::load('test_grid_responsive');
     $options = $view->getDisplay('default')['display_options']['style']['options'];
 
-    $this->assertArrayHasKey('row_class_custom', $options);
-    $this->assertArrayHasKey('col_class_custom', $options);
-    $this->assertSame('', $options['row_class_custom']);
-    $this->assertSame('', $options['col_class_custom']);
+    $this->assertArrayHasKey('grid_wrapper_class_custom', $options);
+    $this->assertArrayHasKey('grid_cell_class_custom', $options);
+    $this->assertSame('', $options['grid_wrapper_class_custom']);
+    $this->assertSame('', $options['grid_cell_class_custom']);
   }
 
 }

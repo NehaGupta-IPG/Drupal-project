@@ -5,6 +5,10 @@
  * Post update functions for Views.
  */
 
+use Drupal\Core\Config\Entity\ConfigEntityUpdater;
+use Drupal\views\ViewEntityInterface;
+use Drupal\views\ViewsConfigUpdater;
+
 /**
  * Implements hook_removed_post_updates().
  */

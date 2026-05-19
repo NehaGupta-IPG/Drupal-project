@@ -64,12 +64,12 @@ views.style.grid_responsive:
     alignment:
       type: string
       label: 'Alignment'
-    row_class_custom:
+    grid_wrapper_class_custom:
       type: string
-      label: 'Custom row classes'
-    col_class_custom:
+      label: 'Custom grid wrapper class'
+    grid_cell_class_custom:
       type: string
-      label: 'Custom column classes'
+      label: 'Custom grid cell class'
 
 views.style.table:
   type: views_style

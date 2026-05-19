@@ -13,8 +13,8 @@
  *   - columns: A number representing the max number of columns.
  *   - cell_min_width: A number representing the minimum width of the grid cell.
  *   - grid_gutter: A number representing the space between the grid cells.
- *   - row_class_custom: Additional row classes provided by the user.
- *   - col_class_custom: Additional column classes provided by the user.
+ *   - grid_wrapper_class_custom: Additional row classes provided by the user.
+ *   - grid_cell_class_custom: Additional column classes provided by the user.
  * - items: A list of grid items.
  *   - attributes: HTML attributes for each row or column.
  *   - content: A list of columns or rows. Each row or column contains:
@@ -33,14 +33,14 @@
   set classes = [
     'views-view-responsive-grid',
     'views-view-responsive-grid--' ~ options.alignment,
-    options.row_class_custom,
+    options.grid_wrapper_class_custom,
   ]
 %}
 
 {%
   set column_classes = [
     'views-view-responsive-grid__item',
-    options.col_class_custom,
+    options.grid_cell_class_custom,
   ]
 %}
 
