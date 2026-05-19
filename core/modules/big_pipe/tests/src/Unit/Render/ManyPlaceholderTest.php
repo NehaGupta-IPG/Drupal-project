@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Drupal\Tests\big_pipe\Unit\Render;
 
 use Drupal\big_pipe\Render\BigPipe;
+use Drupal\big_pipe\Render\BigPipeMarkup;
 use Drupal\big_pipe\Render\BigPipeResponse;
+use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Render\HtmlResponse;
 use Drupal\Core\Render\RendererInterface;
@@ -15,7 +18,9 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -70,6 +75,158 @@ class ManyPlaceholderTest extends UnitTestCase {
     $result = ob_get_clean();
 
     $this->assertNotEmpty($result);
+  }
+
+  /**
+   * Tests that duplicate libraries from no-JS placeholders are deduplicated.
+   *
+   * Two no-JS placeholders both attach the same library. Without the fix,
+   * cumulative already-loaded libraries accumulate duplicates, which triggers
+   * an AssertionError in LibraryDependencyResolver. With the fix, the list
+   * stays unique.
+   *
+   * @legacy-covers \Drupal\big_pipe\Render\BigPipe::sendNoJsPlaceholders
+   */
+  public function testNoJsPlaceholdersDeduplicateLibraries(): void {
+    $session = $this->prophesize(SessionInterface::class);
+    $session->save()->shouldBeCalled();
+
+    $request_stack = $this->prophesize(RequestStack::class);
+    $request_stack->getMainRequest()->willReturn(new Request());
+
+    $bigpipe = new class(
+      $this->prophesize(RendererInterface::class)->reveal(),
+      $session->reveal(),
+      $request_stack->reveal(),
+      $this->prophesize(HttpKernelInterface::class)->reveal(),
+      $this->prophesize(EventDispatcherInterface::class)->reveal(),
+      $this->prophesize(ConfigFactoryInterface::class)->reveal(),
+      $this->prophesize(MessengerInterface::class)->reveal(),
+      $this->prophesize(RequestContext::class)->reveal(),
+      $this->prophesize(LoggerInterface::class)->reveal(),
+    ) extends BigPipe {
+
+      /**
+       * Libraries captured after no-JS placeholder rendering.
+       *
+       * @var array
+       */
+      public array $capturedLibraries = [];
+
+      /**
+       * {@inheritdoc}
+       */
+      protected function renderPlaceholder($placeholder, array $placeholder_render_array): array {
+        return ['#markup' => BigPipeMarkup::create(''), '#attached' => []];
+      }
+
+      /**
+       * {@inheritdoc}
+       */
+      protected function filterEmbeddedResponse(Request $fake_request, Response $embedded_response): Response {
+        $response = new HtmlResponse();
+        $response->setAttachments(['library' => ['core/jquery'], 'drupalSettings' => []]);
+        return $response;
+      }
+
+      /**
+       * {@inheritdoc}
+       */
+      protected function sendPlaceholders(array $placeholders, array $placeholder_order, AttachedAssetsInterface $cumulative_assets): void {
+        $this->capturedLibraries = $cumulative_assets->getAlreadyLoadedLibraries();
+      }
+
+    };
+
+    $response = new BigPipeResponse(new HtmlResponse());
+    $response->setAttachments([
+      'library' => [],
+      'big_pipe_nojs_placeholders' => [
+        'placeholder_1' => ['#markup' => ''],
+        'placeholder_2' => ['#markup' => ''],
+      ],
+    ]);
+    // Both placeholder strings must appear in the pre-scripts-bottom HTML so
+    // that sendNoJsPlaceholders() actually renders them.
+    $response->setContent('<html><body>placeholder_1placeholder_2<drupal-big-pipe-scripts-bottom-marker>scripts<drupal-big-pipe-scripts-bottom-marker></body></html>');
+
+    ob_start();
+    $bigpipe->sendContent($response);
+    ob_end_clean();
+
+    // Each placeholder attached core/jquery; the list must contain it once.
+    $this->assertSame(['core/jquery'], $bigpipe->capturedLibraries);
+  }
+
+  /**
+   * Tests that a \Throwable from a no-JS placeholder is caught, not rethrown.
+   *
+   * An AssertionError (a \Error subclass) thrown during placeholder rendering
+   * must be caught by the catch (\Throwable) block and passed to
+   * trigger_error(), not allowed to escape sendContent() uncaught.
+   *
+   * @legacy-covers \Drupal\big_pipe\Render\BigPipe::sendNoJsPlaceholders
+   */
+  public function testThrowableFromNoJsPlaceholderIsCaughtAndLogged(): void {
+    $session = $this->prophesize(SessionInterface::class);
+    $session->save()->shouldBeCalled();
+
+    $config = $this->prophesize(ImmutableConfig::class);
+    $config->get('error_level')->willReturn('hide');
+    $config_factory = $this->prophesize(ConfigFactoryInterface::class);
+    $config_factory->get('system.logging')->willReturn($config->reveal());
+
+    $bigpipe = new class(
+      $this->prophesize(RendererInterface::class)->reveal(),
+      $session->reveal(),
+      $this->prophesize(RequestStack::class)->reveal(),
+      $this->prophesize(HttpKernelInterface::class)->reveal(),
+      $this->prophesize(EventDispatcherInterface::class)->reveal(),
+      $config_factory->reveal(),
+      $this->prophesize(MessengerInterface::class)->reveal(),
+      $this->prophesize(RequestContext::class)->reveal(),
+      $this->prophesize(LoggerInterface::class)->reveal(),
+    ) extends BigPipe {
+
+      /**
+       * {@inheritdoc}
+       */
+      protected function renderPlaceholder($placeholder, array $placeholder_render_array): array {
+        throw new \AssertionError('$libraries cannot contain duplicate items');
+      }
+
+      /**
+       * {@inheritdoc}
+       */
+      protected function sendPlaceholders(array $placeholders, array $placeholder_order, AttachedAssetsInterface $cumulative_assets): void {}
+
+    };
+
+    $response = new BigPipeResponse(new HtmlResponse());
+    $response->setAttachments([
+      'library' => [],
+      'big_pipe_nojs_placeholders' => [
+        'placeholder_1' => ['#markup' => ''],
+      ],
+    ]);
+    $response->setContent('<html><body>placeholder_1<drupal-big-pipe-scripts-bottom-marker>scripts<drupal-big-pipe-scripts-bottom-marker></body></html>');
+
+    $triggered_errors = [];
+    set_error_handler(static function (int $errno, string $errstr) use (&$triggered_errors): bool {
+      $triggered_errors[] = $errstr;
+      return TRUE;
+    }, E_USER_WARNING);
+
+    try {
+      ob_start();
+      $bigpipe->sendContent($response);
+      ob_end_clean();
+    }
+    finally {
+      restore_error_handler();
+    }
+
+    $this->assertNotEmpty($triggered_errors, 'A \Throwable thrown during no-JS placeholder rendering must be caught and passed to trigger_error().');
   }
 
 }
