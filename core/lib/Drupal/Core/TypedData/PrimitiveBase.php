@@ -32,4 +32,11 @@ abstract class PrimitiveBase extends TypedData implements PrimitiveInterface {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getCastedValue() {
+    return $this->getValue();
+  }
+
 }
