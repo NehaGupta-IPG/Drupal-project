@@ -460,7 +460,7 @@ INFO;
     // Install Olivero and set it as the default theme.
     $theme_installer->install(['olivero']);
     $this->drupalGet('admin/appearance');
-    $this->clickLink('Set as default');
+    $this->click('A[title="Set Olivero as default theme"]');
     $this->assertEquals('olivero', $this->config('system.theme')->get('default'));
 
     // Test the default theme on the secondary links (blocks admin page).
@@ -470,7 +470,7 @@ INFO;
     // cleared.
     $this->drupalGet('admin/appearance');
     // Stark is the first 'Set as default' link.
-    $this->clickLink('Set as default');
+    $this->click('A[title="Set Stark as default theme"]');
     $this->drupalGet('admin/structure/block');
     $this->assertSession()->pageTextContains('Stark');
   }

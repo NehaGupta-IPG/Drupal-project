@@ -26,3 +26,5 @@ services:
     class: Drupal\language\LanguageConverter
     tags:
       - { name: paramconverter }
+  Drupal\language\AdminLanguageRender:
+    arguments: ['@language_manager', '@string_translation', '@current_user']
