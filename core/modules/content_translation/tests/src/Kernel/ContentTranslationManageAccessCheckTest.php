@@ -7,12 +7,12 @@ namespace Drupal\Tests\content_translation\Kernel;
 use Drupal\content_translation\Access\ContentTranslationManageAccessCheck;
 use Drupal\Core\Routing\RouteMatch;
 use Drupal\Core\Session\AnonymousUserSession;
+use Drupal\entity_test\Entity\EntityTestMul;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use Symfony\Component\Routing\Route;
 
 /**
  * Kernel tests for ContentTranslationManageAccessCheck.
@@ -43,6 +43,7 @@ class ContentTranslationManageAccessCheckTest extends KernelTestBase {
     ConfigurableLanguage::createFromLangcode('fr')->save();
     $this->container->get('content_translation.manager')->setEnabled('entity_test_mul', 'entity_test_mul', TRUE);
     $this->container->get('entity_type.manager')->clearCachedDefinitions();
+    $this->container->get('router.builder')->rebuild();
   }
 
   /**
@@ -51,18 +52,13 @@ class ContentTranslationManageAccessCheckTest extends KernelTestBase {
    * @legacy-covers ::access
    */
   public function testCreateAccessWithNullSourceOrTarget(): void {
-    $entity = $this->container->get('entity_type.manager')
-      ->getStorage('entity_test_mul')
-      ->create(['langcode' => 'en']);
+    $entity = EntityTestMul::create(['langcode' => 'en']);
     $entity->save();
 
-    $entity_type = $this->container->get('entity_type.manager')->getDefinition('entity_test_mul');
-    $route = new Route($entity_type->getLinkTemplate('drupal:content-translation-add'));
-    $route->setRequirement('_access_content_translation_manage', 'create');
-
-    $route_match = new RouteMatch('test', $route, ['entity_test_mul' => $entity]);
+    $route_name = 'entity.entity_test_mul.content_translation_add';
+    $route = $this->container->get('router.route_provider')->getRouteByName($route_name);
+    $route_match = new RouteMatch($route_name, $route, ['entity_test_mul' => $entity]);
     $account = new AnonymousUserSession();
-
     $check = $this->container->get('content_translation.manage_access');
 
     // Source set, target absent (e.g. breadcrumb checking /translations/add/en).
