@@ -40,15 +40,21 @@ readonly class ContextualLinksSerializer {
    */
   public function linksToId(array $contextualLinks): string {
     $ids = [];
-
-    $langcode = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_URL)->getId();
+    $langcode = \Drupal::languageManager()
+     ->getCurrentLanguage(LanguageInterface::TYPE_URL)
+     ->getId();
+    $admin_langcode = \Drupal::currentUser()->getPreferredAdminLangcode();
     foreach ($contextualLinks as $group => $args) {
       $routeParameters = UrlHelper::buildQuery($args['route_parameters']);
       $args += ['metadata' => []];
       // Add the current URL language to metadata so a different ID will be
       // computed when URLs vary by language. This allows to store different
-      // language-aware contextual links on the client side.
-      $args['metadata'] += ['langcode' => $langcode];
+      // language-aware contextual links on the client side. Add the admin
+      // language as the link text can vary by that.
+      $args['metadata'] += [
+        'langcode' => $langcode,
+        'admin_langcode' => $admin_langcode,
+      ];
       $metadata = UrlHelper::buildQuery($args['metadata']);
       $ids[] = "$group:$routeParameters:$metadata";
     }
