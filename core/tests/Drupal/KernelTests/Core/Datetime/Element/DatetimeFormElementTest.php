@@ -192,6 +192,7 @@ class DatetimeFormElementTest extends EntityKernelTestBase implements FormInterf
         '#date_date_format' => 'Y-m-d',
         '#date_time_element' => 'none',
         '#date_time_format' => 'H:i:s',
+        '#is_range' => TRUE,
         '#value' => [
           'object' => new DrupalDateTime('2025-02-18T12:00'),
           'date' => '2025-02-18',
