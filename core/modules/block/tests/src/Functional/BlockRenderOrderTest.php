@@ -30,7 +30,7 @@ class BlockRenderOrderTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $test_blocks = [
+  protected $testBlocks = [
     'stark_powered' => [
       'weight' => -3,
       'id' => 'stark_powered',
@@ -61,9 +61,8 @@ class BlockRenderOrderTest extends BrowserTestBase {
     // Enable test blocks and place them in the same region.
     $region = 'header';
 
-
     // Place the test blocks.
-    foreach ($this->test_blocks as $test_block) {
+    foreach ($this->testBlocks as $test_block) {
       $this->drupalPlaceBlock('system_powered_by_block', [
         'label' => $test_block['label'],
         'region' => $region,
@@ -84,8 +83,8 @@ class BlockRenderOrderTest extends BrowserTestBase {
     foreach ($controller->loadMultiple() as $return_block) {
       $id = $return_block->id();
       if ($return_block_weight = $return_block->getWeight()) {
-        $this->assertSame((int) $this->test_blocks[$id]['weight'], $return_block_weight, 'Block weight is set as "' . $return_block_weight . '" for ' . $id . ' block.');
-        $position[$id] = strpos($test_content, Html::getClass('block-' . $this->test_blocks[$id]['id']));
+        $this->assertSame((int) $this->testBlocks[$id]['weight'], $return_block_weight, 'Block weight is set as "' . $return_block_weight . '" for ' . $id . ' block.');
+        $position[$id] = strpos($test_content, Html::getClass('block-' . $this->testBlocks[$id]['id']));
       }
     }
     // Verify that blocks with different weight are rendered in the correct
@@ -102,7 +101,6 @@ class BlockRenderOrderTest extends BrowserTestBase {
   #[IgnoreDeprecations]
   public function testBlockSortDeprecation(): void {
     $this->drupalGet('');
-    $test_content = $this->getSession()->getPage()->getContent();
 
     $controller = $this->container->get('entity_type.manager')->getStorage('block');
     $return_block = $controller->load('stark_powered');
