@@ -131,9 +131,9 @@ class PhpDumperContainerStorage implements ContainerStorageInterface, Destructab
       }
       // Only write the container to disk if it does not already exist.
       if (!$classExists || !$this->phpStorage->exists($containerClass . '.php')) {
-        $saved = $this->phpStorage->save($filename, $code);
-        if ($saved === FALSE) {
-          // save() failed; another worker may already be writing this file.
+        if (!$this->phpStorage->save($filename, $code)) {
+          // Calling save() failed; another worker may already be writing this
+          // file.
           return $container;
         }
       }
@@ -143,9 +143,8 @@ class PhpDumperContainerStorage implements ContainerStorageInterface, Destructab
       // writes each save() to a new mtime-based directory, so include_once
       // on that new path would trigger "Cannot redeclare class".
       if (!$classExists) {
-        $loaded = $this->phpStorage->load($filename);
-        // If the file was not loaded, it is not yet in memory.
-        if ($loaded === FALSE) {
+        if (!$this->phpStorage->load($filename)) {
+          // If the file was not loaded, it is not yet in memory.
           return $container;
         }
       }
