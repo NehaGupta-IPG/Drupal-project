@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Routing;
 
+use Drupal\Component\Datetime\Time;
 use Drupal\Core\Access\CheckProviderInterface;
+use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\Controller\ControllerResolverInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Discovery\YamlDiscovery;
@@ -110,7 +112,11 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
       ->getMock();
     $this->checkProvider = $this->createStub(CheckProviderInterface::class);
 
-    $yamlRouteDiscovery = new TestYamlRouteDiscovery($this->moduleHandler, $this->controllerResolver);
+    $time = new Time();
+
+    $cache_backend = new MemoryBackend($time, 'file_parsing');
+
+    $yamlRouteDiscovery = new TestYamlRouteDiscovery($this->moduleHandler, $this->controllerResolver, $cache_backend, $this->lock);
     $yamlRouteDiscovery->setYamlDiscovery($this->yamlDiscovery);
 
     $this->dispatcher->addSubscriber($this);

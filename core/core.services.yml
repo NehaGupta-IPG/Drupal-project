@@ -1195,7 +1195,7 @@ services:
     arguments: ['@container.namespaces']
   router.builder.yaml:
     class: Drupal\Core\Routing\YamlRouteDiscovery
-    arguments: ['@module_handler', '@controller_resolver']
+    arguments: ['@module_handler', '@controller_resolver', '@cache.file_parsing', '@lock']
   menu.rebuild_subscriber:
     class: Drupal\Core\EventSubscriber\MenuRouterRebuildSubscriber
     arguments: ['@lock', '@plugin.manager.menu.link', '@database', '@database.replica_kill_switch', '@logger.channel.menu']

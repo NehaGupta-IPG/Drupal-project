@@ -2,9 +2,7 @@
 
 namespace Drupal\Core\Discovery;
 
-use Drupal\Component\Discovery\YamlDiscovery as ComponentYamlDiscovery;
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
-use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\Utility\YamlCacheCollector;
 
 /**
@@ -22,13 +20,12 @@ class YamlCacheCollectorDiscovery extends YamlDiscovery {
    *   $provider.$name.yml.
    * @param array $directories
    *   An array of directories to scan, keyed by the provider.
-   * @param CacheCollectorInterface $yamlParsingCacheCollector
-   *   An instance of YamlParsinCacheCollector
+   * @param CacheCollectorInterface $yamlCacheCollector
+   *   An instance of YamlCacheCollector.
    */
   public function __construct($name, array $directories, protected YamlCacheCollector $yamlCacheCollector) {
     parent::__construct($name, $directories);
   }
-
 
   /**
    * {@inheritdoc}
@@ -56,6 +53,9 @@ class YamlCacheCollectorDiscovery extends YamlDiscovery {
     }
   }
 
+  /**
+   * Calls cache collector ::destruct() method when this goes out of scope.
+   */
   public function __destruct() {
     $this->yamlCacheCollector->destruct();
   }
