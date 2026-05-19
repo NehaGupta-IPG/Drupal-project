@@ -210,7 +210,6 @@ class DirectoryTest extends FileTestBase {
   public function testOpenBaseDirDirectoryCreation(): void {
     /** @var \Drupal\Core\File\FileSystemInterface $file_system */
     $file_system = $this->container->get('file_system');
-    $site_path = $this->container->getParameter('site.path');
     $project_path = $file_system->realpath('..');
 
     $include_path = ini_get('include_path');
