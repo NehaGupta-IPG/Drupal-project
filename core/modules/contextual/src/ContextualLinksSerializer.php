@@ -41,8 +41,8 @@ readonly class ContextualLinksSerializer {
   public function linksToId(array $contextualLinks): string {
     $ids = [];
     $langcode = \Drupal::languageManager()
-     ->getCurrentLanguage(LanguageInterface::TYPE_URL)
-     ->getId();
+      ->getCurrentLanguage(LanguageInterface::TYPE_URL)
+      ->getId();
     $admin_langcode = \Drupal::currentUser()->getPreferredAdminLangcode();
     foreach ($contextualLinks as $group => $args) {
       $routeParameters = UrlHelper::buildQuery($args['route_parameters']);
