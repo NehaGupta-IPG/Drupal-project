@@ -22,7 +22,7 @@ class YamlCacheCollector extends CacheCollector {
   /**
    * {@inheritdoc}
    */
-  public function has($key): bool{
+  public function has($key): bool {
     $this->get($key);
     return \array_key_exists($key, $this->storage) && filemtime($key) === $this->storage[$key]['mtime'];
   }
@@ -32,7 +32,7 @@ class YamlCacheCollector extends CacheCollector {
    */
   public function get($key): array {
     $this->lazyLoadCache();
-    if (isset($this->storage[$key])) {
+    if (isset($this->storage[$key]) && file_exists($key)) {
       if ($this->storage[$key]['mtime'] === filemtime($key)) {
         return $this->storage[$key]['decoded'];
       }
@@ -44,13 +44,19 @@ class YamlCacheCollector extends CacheCollector {
    * {@inheritdoc}
    */
   public function resolveCacheMiss($key): array {
-    $mtime = filemtime($key);
-    $this->storage[$key] = [
-      'mtime' => $mtime,
-      'decoded' => Yaml::decode(file_get_contents($key)) ?? [],
-    ];
-    $this->persist($key);
-    return $this->storage[$key]['decoded'];
+    if (file_exists($key)) {
+      $mtime = filemtime($key);
+      $this->storage[$key] = [
+        'mtime' => $mtime,
+        'decoded' => Yaml::decode(file_get_contents($key)) ?? [],
+      ];
+      $this->persist($key);
+      return $this->storage[$key]['decoded'];
+    }
+    if (isset($this->storage[$key])) {
+      $this->delete($key);
+    }
+    return [];
   }
 
 }
