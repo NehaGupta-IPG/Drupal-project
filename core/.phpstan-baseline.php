@@ -10826,12 +10826,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/block/tests/modules/block_test/src/Plugin/Condition/MissingSchema.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$position might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 4,
-	'path' => __DIR__ . '/modules/block/tests/src/Functional/BlockRenderOrderTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Variable \\$edit might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
 	'count' => 1,
