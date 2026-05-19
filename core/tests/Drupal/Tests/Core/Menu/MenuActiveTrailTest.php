@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Menu;
 
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
+use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Menu\MenuActiveTrail;
+use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Path\PathMatcherInterface;
 use Drupal\Core\Routing\CurrentRouteMatch;
 use Drupal\Core\Routing\RouteObjectInterface;
@@ -15,7 +18,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\DependencyInjection\Container;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -51,37 +54,23 @@ class MenuActiveTrailTest extends UnitTestCase {
 
   /**
    * The mocked menu link manager.
-   *
-   * @var \Drupal\Core\Menu\MenuLinkManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $menuLinkManager;
+  protected MenuLinkManagerInterface&MockObject $menuLinkManager;
 
   /**
-   * The mocked cache backend.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The cache backend.
    */
-  protected $cache;
+  protected CacheBackendInterface&Stub $cache;
 
   /**
-   * The mocked lock.
-   *
-   * @var \Drupal\Core\Lock\LockBackendInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The lock.
    */
-  protected $lock;
-
+  protected LockBackendInterface&Stub $lock;
 
   /**
-   * The mocked path matcher.
+   * The path matcher.
    */
-  protected PathMatcherInterface $pathMatcher;
-
-  /**
-   * The mocked cache tags invalidator.
-   *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface|\PHPUnit\Framework\MockObject\MockObject
-   */
-  protected CacheTagsInvalidatorInterface|MockObject $cacheTagsInvalidator;
+  protected PathMatcherInterface&Stub $pathMatcher;
 
   /**
    * {@inheritdoc}
@@ -91,17 +80,21 @@ class MenuActiveTrailTest extends UnitTestCase {
 
     $this->requestStack = new RequestStack();
     $this->currentRouteMatch = new CurrentRouteMatch($this->requestStack);
-    $this->menuLinkManager = $this->createMock('Drupal\Core\Menu\MenuLinkManagerInterface');
-    $this->cache = $this->createMock('\Drupal\Core\Cache\CacheBackendInterface');
-    $this->lock = $this->createMock('\Drupal\Core\Lock\LockBackendInterface');
-    $this->pathMatcher = $this->createMock('\Drupal\Core\Path\PathMatcherInterface');
-    $this->cacheTagsInvalidator = $this->createMock('\Drupal\Core\Cache\CacheTagsInvalidatorInterface');
+    $this->menuLinkManager = $this->createMock(MenuLinkManagerInterface::class);
+    $this->cache = $this->createStub(CacheBackendInterface::class);
+    $this->lock = $this->createStub(LockBackendInterface::class);
+    $this->pathMatcher = $this->createStub(PathMatcherInterface::class);
 
     $this->menuActiveTrail = new MenuActiveTrail($this->menuLinkManager, $this->currentRouteMatch, $this->cache, $this->lock, $this->pathMatcher);
+  }
 
-    $container = new Container();
-    $container->set('cache_tags.invalidator', $this->cacheTagsInvalidator);
-    \Drupal::setContainer($container);
+  /**
+   * Reinitializes the cache backend as a mock object.
+   */
+  protected function setUpMockCacheBackend(): void {
+    $this->cache = $this->createMock(CacheBackendInterface::class);
+    $reflection = new \ReflectionProperty($this->menuActiveTrail, 'cache');
+    $reflection->setValue($this->menuActiveTrail, $this->cache);
   }
 
   /**
@@ -221,6 +214,10 @@ class MenuActiveTrailTest extends UnitTestCase {
         ->with('baby_llama')
         ->willReturn($links);
     }
+    else {
+      $this->menuLinkManager->expects($this->never())
+        ->method('loadLinksByRoute');
+    }
     // Test with menu name.
     $this->assertSame($expected_link, $this->menuActiveTrail->getActiveLink($menu_name));
     // Test without menu name.
@@ -252,7 +249,7 @@ class MenuActiveTrailTest extends UnitTestCase {
       'title' => 'Home',
       'parent' => NULL,
     ]);
-    $this->menuLinkManager
+    $this->menuLinkManager->expects($this->atLeastOnce())
       ->method('loadLinksByRoute')
       ->willReturnCallback(function ($route_name) use ($home_link): array {
         return match ($route_name) {
@@ -271,6 +268,9 @@ class MenuActiveTrailTest extends UnitTestCase {
    */
   #[DataProvider('provider')]
   public function testGetActiveTrailIds(Request $request, array|false $links, string $menu_name, ?MenuLinkMock $expected_link, array $expected_trail): void {
+    $cacheTagsInvalidator = $this->createMock(CacheTagsInvalidatorInterface::class);
+    \Drupal::setContainer($this->getContainerWithCacheTagsInvalidator($cacheTagsInvalidator));
+
     $expected_trail_ids = array_combine($expected_trail, $expected_trail);
 
     $this->requestStack->push($request);
@@ -289,12 +289,16 @@ class MenuActiveTrailTest extends UnitTestCase {
           ]);
       }
     }
+    else {
+      $this->menuLinkManager->expects($this->never())
+        ->method('loadLinksByRoute');
+    }
 
     // Call out the same twice in order to ensure that static caching works.
     $this->assertSame($expected_trail_ids, $this->menuActiveTrail->getActiveTrailIds($menu_name));
     $this->assertSame($expected_trail_ids, $this->menuActiveTrail->getActiveTrailIds($menu_name));
 
-    $this->cacheTagsInvalidator->expects($this->exactly(2))
+    $cacheTagsInvalidator->expects($this->exactly(2))
       ->method('invalidateTags')
       ->willReturnCallback(fn($tags): NULL =>
         match($tags) {
@@ -320,6 +324,8 @@ class MenuActiveTrailTest extends UnitTestCase {
    * Tests getCid()
    */
   public function testGetCid(): void {
+    $this->setUpMockCacheBackend();
+
     $data = $this->provider()[1];
     /** @var \Symfony\Component\HttpFoundation\Request $request */
     $request = $data[0];
@@ -329,7 +335,7 @@ class MenuActiveTrailTest extends UnitTestCase {
     $request->attributes->get('_raw_variables')->add(['b' => 1, 'a' => 0]);
     $this->requestStack->push($request);
 
-    $this->menuLinkManager->expects($this->any())
+    $this->menuLinkManager
       ->method('loadLinksByRoute')
       ->with('baby_llama')
       ->willReturn($data[1]);
@@ -338,7 +344,7 @@ class MenuActiveTrailTest extends UnitTestCase {
     $expected_trail = $data[4];
     $expected_trail_ids = array_combine($expected_trail, $expected_trail);
 
-    $this->menuLinkManager->expects($this->any())
+    $this->menuLinkManager
       ->method('getParentIds')
       ->willReturnMap([
         [$expected_link->getPluginId(), $expected_trail_ids],
@@ -350,7 +356,7 @@ class MenuActiveTrailTest extends UnitTestCase {
       ->method('set')
       // Ensure we normalize the serialized data by sorting them.
       ->with('active-trail:route:baby_llama:route_parameters:' . serialize(['a' => 0, 'b' => 1]));
-    $this->lock->expects($this->any())
+    $this->lock
       ->method('acquire')
       ->willReturn(TRUE);
     $this->menuActiveTrail->destruct();

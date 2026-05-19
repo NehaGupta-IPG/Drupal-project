@@ -127,13 +127,10 @@ class SiteConfigureForm extends ConfigFormBase {
       '#weight' => -20,
       '#access' => empty($install_state['config_install_path']),
     ];
-    // Use the default site mail if one is already configured, or fall back to
-    // PHP's configured sendmail_from.
-    $default_site_mail = $this->config('system.site')->get('mail') ?: ini_get('sendmail_from');
     $form['site_information']['site_mail'] = [
       '#type' => 'email',
       '#title' => $this->t('Site email address'),
-      '#default_value' => $default_site_mail,
+      '#default_value' => $this->config('system.site')->get('mail'),
       '#description' => $this->t("Automated emails, such as registration information, will be sent from this address. Use an address ending in your site's domain to help prevent these emails from being flagged as spam."),
       '#required' => TRUE,
       '#weight' => -15,
@@ -248,11 +245,11 @@ class SiteConfigureForm extends ConfigFormBase {
       $this->config('system.site')
         ->set('name', (string) $form_state->getValue('site_name'))
         ->set('mail', (string) $form_state->getValue('site_mail'))
-        ->save(TRUE);
+        ->save();
 
       $this->config('system.date')
         ->set('timezone.default', (string) $form_state->getValue('date_default_timezone'))
-        ->save(TRUE);
+        ->save();
     }
 
     $account_values = $form_state->getValue('account');
@@ -270,7 +267,7 @@ class SiteConfigureForm extends ConfigFormBase {
       $email_update_status_emails = $form_state->getValue('enable_update_status_emails');
       if ($email_update_status_emails) {
         // Reset the configuration so it is updated with the new module.
-        $this->config('update.settings')->set('notification.emails', [$account_values['mail']])->save(TRUE);
+        $this->config('update.settings')->set('notification.emails', [$account_values['mail']])->save();
       }
     }
 

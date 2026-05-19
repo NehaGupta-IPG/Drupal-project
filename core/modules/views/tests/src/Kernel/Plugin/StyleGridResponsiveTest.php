@@ -87,7 +87,7 @@ class StyleGridResponsiveTest extends PluginKernelTestBase {
    * @return array
    *   Array containing options for the style plugin and expected values.
    */
-  public static function providerTestResponsiveGrid() {
+  public static function providerTestResponsiveGrid(): array {
     return [
       'horizontal' => [
         'options' => [

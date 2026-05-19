@@ -63,7 +63,10 @@ class LocaleUpdateCronTest extends LocaleUpdateBase {
     // Prepare for test: Simulate new translations being available.
     // Change the last updated timestamp of a translation file.
     $contrib_module_two_uri = 'public://local/contrib_module_two-8.x-2.0-beta4.de._po';
-    touch(\Drupal::service('file_system')->realpath($contrib_module_two_uri), \Drupal::time()->getRequestTime());
+    $file = \Drupal::service('file_system')->realpath($contrib_module_two_uri);
+    touch(\Drupal::service('file_system')->realpath($file), \Drupal::time()->getRequestTime());
+    // Change the hash of the file by adding a new line.
+    file_put_contents($file, "\n", FILE_APPEND);
 
     // Prepare for test: Simulate that the file has not been checked for a long
     // time. Set the last_check timestamp to zero.
@@ -103,9 +106,9 @@ class LocaleUpdateCronTest extends LocaleUpdateBase {
 
     // Check whether tasks are added to the queue.
     // Expected tasks:
-    // - locale_translation_batch_version_check
-    // - locale_translation_batch_status_check
-    // - locale_translation_batch_status_finished.
+    // - \Drupal\locale\LocaleFetch::batchVersionCheck()
+    // - \Drupal\locale\LocaleFetch::batchStatusCheck()
+    // - \Drupal\locale\LocaleProjectChecker::batchFinished()
     $queue = \Drupal::queue('locale_translation', TRUE);
     $this->assertEquals(3, $queue->numberOfItems(), 'Queue holds tasks for one project.');
     $item = $queue->claimItem();
