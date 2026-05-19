@@ -558,7 +558,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $definition['services'] = array_merge($this->defaultBootstrapContainerDefinition['services'], $definition['services'] ?? []);
     $definition['parameters'] = array_merge($this->defaultBootstrapContainerDefinition['parameters'], $definition['parameters'] ?? []);
     // Pass the site path to the php storage service container so the fallback
-    // so the \Drupal\Core\StreamWrapper\PublicStream::basePath() works.
+    // to \Drupal\Core\StreamWrapper\PublicStream::basePath() works.
     $definition['services']['php_storage.service_container']['arguments']['site_path'] = $this->sitePath;
 
     // Add the container storage class to the definition if it does not match

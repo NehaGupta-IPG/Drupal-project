@@ -33,13 +33,13 @@ class CacheContainerStorage implements ContainerStorageInterface {
    *   The cache backend for storing container definitions.
    * @param \Drupal\Core\Site\Settings $settings
    *   The site settings.
-   * @param string|null $dumperClass
+   * @param string $dumperClass
    *   (optional) The class name of the container dumper to use.
    */
   public function __construct(
     protected readonly CacheBackendInterface $cache,
     protected readonly Settings $settings,
-    protected readonly ?string $dumperClass = OptimizedPhpArrayDumper::class,
+    protected readonly string $dumperClass = OptimizedPhpArrayDumper::class,
   ) {}
 
   /**

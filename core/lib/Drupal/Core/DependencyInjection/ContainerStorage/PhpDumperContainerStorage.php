@@ -119,11 +119,16 @@ class PhpDumperContainerStorage implements ContainerStorageInterface, Destructab
     else {
       $filename = $containerClass . '.php';
 
+      $replace_count = 0;
       $code = str_replace(
         "class DrupalContainer extends \\$baseClass\n{",
         "class $containerClass extends \\$baseClass\n{",
         $code,
+        $replace_count,
       );
+      if ($replace_count !== 1) {
+        throw new \RuntimeException(sprintf('Expected to replace 1 occurrence of "DrupalContainer" with "%s" in the dumped container code.', $containerClass));
+      }
       // Only write the container to disk if it does not already exist.
       if (!$classExists || !$this->phpStorage->exists($containerClass . '.php')) {
         $saved = $this->phpStorage->save($filename, $code);
