@@ -29,6 +29,20 @@ class YamlCacheCollectorDiscovery extends YamlDiscovery {
     parent::__construct($name, $directories);
   }
 
+
+  /**
+   * {@inheritdoc}
+   */
+  public function findAll() {
+    $all = [];
+
+    $files = $this->findFiles();
+    foreach ($files as $provider => $file) {
+      $all[$provider] = $this->yamlCacheCollector->get($file);
+    }
+    return $all;
+  }
+
   /**
    * {@inheritdoc}
    */
