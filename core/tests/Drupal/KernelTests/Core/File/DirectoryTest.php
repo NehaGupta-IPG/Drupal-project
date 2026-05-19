@@ -213,13 +213,9 @@ class DirectoryTest extends FileTestBase {
     $site_path = $this->container->getParameter('site.path');
     $project_path = $file_system->realpath('..');
 
-    $realpath = $file_system->realpath($site_path);
     $include_path = ini_get('include_path');
     $sys_temp_dir = sys_get_temp_dir();
     ini_set('open_basedir', "{$sys_temp_dir}:{$include_path}:{$project_path}");
-
-    // mkdir() recursion should work with or without a trailing slash.
-    $dir = $this->siteDirectory . '/files';
 
     // Creating one immediate directory defined with stream wrapper
     $files_dir_stream_wrapper = 'public://foo/';
