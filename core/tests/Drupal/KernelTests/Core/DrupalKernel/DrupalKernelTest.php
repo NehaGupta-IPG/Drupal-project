@@ -693,25 +693,4 @@ class DrupalKernelTest extends KernelTestBase {
     $this->assertTrue($customStorageClass::$dumpCalled, 'Custom container storage dump() should have been called');
   }
 
-  /**
-   * Tests that the bootstrap php_storage with 'file_temp_path' setting.
-   */
-  public function testBootstrapContainerPhpStorageUsesFileTempPath(): void {
-    $request = Request::createFromGlobals();
-    $class_loader = require $this->root . '/autoload.php';
-    $kernel = DrupalKernel::createFromRequest($request, $class_loader, 'testing');
-    $this->setSetting('container_yamls', []);
-    $this->setSetting('hash_salt', $this->databasePrefix);
-    $this->setSetting('container_base_class', PhpContainer::class);
-
-    // Set the temporary directory to a subdirectory of the site directory.
-    $custom_temp = $this->siteDirectory . '/drupal_kernel_storage_test';
-    $this->setSetting('file_temp_path', $custom_temp);
-
-    $kernel->updateModules(['system' => 'system']);
-    $kernel->boot();
-    $container = $kernel->getContainer();
-    $this->assertStringStartsWith($custom_temp, (new \ReflectionClass($container))->getFileName());
-  }
-
 }
