@@ -59,4 +59,16 @@ class YamlCacheCollector extends CacheCollector {
     return [];
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function updateCache($lock = TRUE): void {
+    $two_years_ago = time() - (365 * 86400 * 2);
+    foreach ($this->storage as $key => $item) {
+      if ($item['mtime'] <= $two_years_ago) {
+        $this->delete($key);
+      }
+    }
+  }
+
 }
