@@ -6,6 +6,7 @@ use Drupal\Component\Datetime\DateTimePlus;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
+use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\PageCache\RequestPolicyInterface;
@@ -45,18 +46,11 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
   protected const string RESPONSE_HEADER_CACHE_ITEM_SEPARATOR = ' ';
 
   /**
-   * A config object for the system performance configuration.
-   *
-   * @var \Drupal\Core\Config\Config
-   */
-  protected $config;
-
-  /**
    * Constructs a FinishResponseSubscriber object.
    *
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager object for retrieving the correct language code.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   A config factory for retrieving required config objects.
    * @param \Drupal\Core\PageCache\RequestPolicyInterface $requestPolicy
    *   A policy rule determining the cacheability of a request.
@@ -71,14 +65,20 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
    */
   public function __construct(
     protected LanguageManagerInterface $languageManager,
-    ConfigFactoryInterface $config_factory,
+    protected ConfigFactoryInterface $configFactory,
     protected RequestPolicyInterface $requestPolicy,
     protected ResponsePolicyInterface $responsePolicy,
     protected CacheContextsManager $cacheContextsManager,
     protected TimeInterface $time,
     protected bool $debugCacheabilityHeaders = FALSE,
   ) {
-    $this->config = $config_factory->get('system.performance');
+  }
+
+  /**
+   * Returns the system.performance config, loading it only when needed.
+   */
+  protected function getPerformanceConfig(): Config {
+    return $this->configFactory->get('system.performance');
   }
 
   /**
@@ -161,7 +161,7 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
 
     // Add headers necessary to specify whether the response should be cached by
     // proxies and/or the browser.
-    if ($is_cacheable && $this->config->get('cache.page.max_age') > 0) {
+    if ($is_cacheable && $this->getPerformanceConfig()->get('cache.page.max_age') > 0) {
       if (!$this->isCacheControlCustomized($response)) {
         // Only add the default Cache-Control header if the controller did not
         // specify one on the response.
@@ -250,7 +250,7 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
       $this->setExpiresNoCache($response);
     }
 
-    $max_age = $this->config->get('cache.page.max_age');
+    $max_age = $this->getPerformanceConfig()->get('cache.page.max_age');
     $response->headers->set('Cache-Control', 'public, max-age=' . $max_age);
 
     // In order to support HTTP cache-revalidation, ensure that there is a
