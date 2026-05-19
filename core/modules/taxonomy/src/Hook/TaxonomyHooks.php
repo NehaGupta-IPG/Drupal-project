@@ -37,7 +37,7 @@ class TaxonomyHooks {
    *
    * @param string $route_name
    *   Current route name.
-   * @param Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   Current route match.
    *
    * @return string|\Stringable|array|null
@@ -280,13 +280,13 @@ class TaxonomyHooks {
   *
   * @param array $form
   *   Nested array of form elements that comprise the form.
-  * @param Drupal\Core\Form\FormStateInterface $form_state
+  * @param \Drupal\Core\Form\FormStateInterface $form_state
   *   Current state of the form.
   * @param string $form_id
   *   String representation of form name.
   */
   #[Hook('form_taxonomy_term_form_alter')]
-  public function taxonomyTermFormAlter(&$form, FormStateInterface $form_state, $form_id): void {
+  public function taxonomyTermFormAlter(array &$form, FormStateInterface $form_state, string $form_id): void {
     /** @var \Drupal\taxonomy\TermStorageInterface $taxonomy_storage */
     $taxonomy_storage = $this->entityTypeManager->getStorage('taxonomy_term');
 
