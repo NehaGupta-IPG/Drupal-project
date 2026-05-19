@@ -9,6 +9,7 @@ use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Route;
 
@@ -21,17 +22,13 @@ class LazyRouteCollectionTest extends UnitTestCase {
 
   /**
    * The route provider.
-   *
-   * @var \Drupal\Core\Routing\RouteProviderInterface
    */
-  private $routeProvider;
+  private RouteProviderInterface&MockObject $routeProvider;
 
   /**
    * Array of routes indexed by name.
-   *
-   * @var array
    */
-  private $testRoutes;
+  private array $testRoutes;
 
   /**
    * {@inheritdoc}
@@ -63,8 +60,6 @@ class LazyRouteCollectionTest extends UnitTestCase {
 
   /**
    * Tests count.
-   *
-   * @legacy-covers ::count
    */
   public function testCount(): void {
     $this->routeProvider
@@ -77,8 +72,6 @@ class LazyRouteCollectionTest extends UnitTestCase {
 
   /**
    * Search for a both an existing and a non-existing route.
-   *
-   * @legacy-covers ::get
    */
   public function testGetName(): void {
     // Hit.

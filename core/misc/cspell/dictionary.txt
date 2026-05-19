@@ -429,9 +429,11 @@ slatkin
 smacss
 smalldatetime
 smtps
+spaze
 squaresmall
 squiz
 squizlabs
+srclang
 srcset
 ssess
 starterkit
@@ -527,6 +529,7 @@ trgm
 truecolor
 twistie
 twocol
+ufffd
 uids
 unban
 uncacheable

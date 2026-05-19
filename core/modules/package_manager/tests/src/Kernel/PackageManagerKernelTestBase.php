@@ -18,9 +18,9 @@ use Drupal\package_manager\Event\SandboxValidationEvent;
 use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\FailureMarker;
 use Drupal\package_manager\PathLocator;
+use Drupal\package_manager\SandboxManagerBase;
 use Drupal\package_manager\StatusCheckTrait;
 use Drupal\package_manager\Validator\DiskSpaceValidator;
-use Drupal\package_manager\SandboxManagerBase;
 use Drupal\Tests\package_manager\Traits\AssertPreconditionsTrait;
 use Drupal\Tests\package_manager\Traits\ComposerStagerTestTrait;
 use Drupal\Tests\package_manager\Traits\FixtureManipulatorTrait;
@@ -58,11 +58,9 @@ abstract class PackageManagerKernelTestBase extends KernelTestBase {
    * We need to preserve this as a class property so that we can re-inject it
    * into the container when a rebuild is triggered by module installation.
    *
-   * @var \GuzzleHttp\Client
-   *
    * @see ::register()
    */
-  private $client;
+  private ?Client $client = NULL;
 
   /**
    * {@inheritdoc}
@@ -472,7 +470,7 @@ class TestSandboxManager extends SandboxManagerBase {
    * will fail, because PHPUnit will want to serialize all arguments in the call
    * stack.
    *
-   * @see https://www.drupal.org/project/automatics_updates/issues/3312619#comment-14801308
+   * @see https://www.drupal.org/node/3312619#comment-14801308
    */
   public function __sleep(): array {
     return [];

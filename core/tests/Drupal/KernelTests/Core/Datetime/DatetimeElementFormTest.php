@@ -14,7 +14,6 @@ use Drupal\Core\Security\UntrustedCallbackException;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -32,7 +31,17 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function setUp(): void {
+    parent::setUp();
+
+    $this->installEntitySchema('date_format');
+    $this->installConfig(['system']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFormId(): string {
     return 'test_datetime_element';
   }
 
@@ -79,7 +88,7 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, string $date_callback = 'datetimeDateCallbackTrusted', string $time_callback = 'datetimeTimeCallbackTrusted') {
+  public function buildForm(array $form, FormStateInterface $form_state, string $date_callback = 'datetimeDateCallbackTrusted', string $time_callback = 'datetimeTimeCallbackTrusted'): array {
 
     $form['datetime_element'] = [
       '#title' => 'datelist test',
@@ -148,7 +157,7 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {}
+  public function submitForm(array &$form, FormStateInterface $form_state): void {}
 
   /**
    * Form validation handler.
@@ -158,7 +167,7 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {}
+  public function validateForm(array &$form, FormStateInterface $form_state): void {}
 
   /**
    * Tests that default handlers are added even if custom are specified.
@@ -186,7 +195,6 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
    *   NULL if otherwise.
    */
   #[DataProvider('providerUntrusted')]
-  #[IgnoreDeprecations]
   public function testDatetimeElementUntrustedCallbacks(string $date_callback = 'datetimeDateCallbackTrusted', string $time_callback = 'datetimeTimeCallbackTrusted', ?string $expected_exception = NULL) : void {
     if ($expected_exception) {
       $this->expectException(UntrustedCallbackException::class);
@@ -291,7 +299,7 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
   /**
    * {@inheritdoc}
    */
-  public static function trustedCallbacks() {
+  public static function trustedCallbacks(): array {
     return [
       'datetimeDateCallbackTrusted',
       'datetimeTimeCallbackTrusted',

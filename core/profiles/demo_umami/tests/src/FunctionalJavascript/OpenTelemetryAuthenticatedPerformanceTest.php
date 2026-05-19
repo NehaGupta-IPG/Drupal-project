@@ -28,9 +28,9 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
    * Logs authenticated tracing data.
    */
   public function testAuthenticatedPerformance(): void {
-    // Replace toolbar with navigation and uninstall history to avoid AJAX
-    // requests while recording performance data.
-    \Drupal::service('module_installer')->uninstall(['toolbar', 'history']);
+    // Replace toolbar with navigation to avoid AJAX requests while recording
+    // performance data.
+    \Drupal::service('module_installer')->uninstall(['toolbar']);
     \Drupal::service('module_installer')->install(['navigation']);
     $this->doTestFrontPageAuthenticatedWarmCache();
     $this->doTestNodePageAdministrator();
@@ -66,15 +66,14 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
         'config' => 12,
         'bootstrap' => 7,
         'discovery' => 5,
-        'data' => 5,
+        'data' => 6,
         'dynamic_page_cache' => 2,
-        'menu' => 1,
         'render' => 2,
       ],
       'CacheSetCount' => 0,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 5,
+      'CacheTagLookupQueryCount' => 4,
       'ScriptCount' => 1,
       'ScriptBytes' => 13150,
       'StylesheetCount' => 2,
@@ -101,7 +100,6 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
       'access site reports',
       'administer users',
       'access navigation',
-      'administer shortcuts',
       'administer media',
       'access files overview',
       'administer blocks',
@@ -128,27 +126,27 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
     }, 'administratorNodePage');
 
     $expected = [
-      'QueryCount' => 354,
-      'CacheGetCount' => 349,
+      'QueryCount' => 259,
+      'CacheGetCount' => 250,
       'CacheGetCountByBin' => [
-        'config' => 91,
-        'bootstrap' => 16,
-        'discovery' => 108,
-        'data' => 23,
-        'entity' => 25,
+        'config' => 60,
+        'bootstrap' => 15,
+        'discovery' => 75,
+        'data' => 20,
+        'entity' => 24,
         'dynamic_page_cache' => 1,
-        'default' => 22,
-        'render' => 39,
-        'menu' => 24,
+        'default' => 20,
+        'render' => 13,
+        'menu' => 22,
       ],
-      'CacheSetCount' => 341,
+      'CacheSetCount' => 254,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 32,
-      'ScriptCount' => 5,
-      'ScriptBytes' => 198900,
-      'StylesheetCount' => 8,
-      'StylesheetBytes' => 78297,
+      'CacheTagLookupQueryCount' => 28,
+      'ScriptCount' => 4,
+      'ScriptBytes' => 200400,
+      'StylesheetCount' => 7,
+      'StylesheetBytes' => 79412,
     ];
     $this->assertMetrics($expected, $performance_data);
   }

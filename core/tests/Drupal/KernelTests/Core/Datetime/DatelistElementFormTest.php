@@ -13,7 +13,6 @@ use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Security\UntrustedCallbackException;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -31,7 +30,7 @@ class DatelistElementFormTest extends KernelTestBase implements FormInterface, T
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'test_datelist_element';
   }
 
@@ -58,7 +57,7 @@ class DatelistElementFormTest extends KernelTestBase implements FormInterface, T
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, string $date_callback = 'datelistDateCallbackTrusted') {
+  public function buildForm(array $form, FormStateInterface $form_state, string $date_callback = 'datelistDateCallbackTrusted'): array {
 
     $form['datelist_element'] = [
       '#title' => 'datelist test',
@@ -88,7 +87,7 @@ class DatelistElementFormTest extends KernelTestBase implements FormInterface, T
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {}
+  public function submitForm(array &$form, FormStateInterface $form_state): void {}
 
   /**
    * Form validation handler.
@@ -98,7 +97,7 @@ class DatelistElementFormTest extends KernelTestBase implements FormInterface, T
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {}
+  public function validateForm(array &$form, FormStateInterface $form_state): void {}
 
   /**
    * Tests that trusted callbacks are executed.
@@ -115,7 +114,6 @@ class DatelistElementFormTest extends KernelTestBase implements FormInterface, T
   /**
    * Tests that exceptions are raised if untrusted callbacks are used.
    */
-  #[IgnoreDeprecations]
   public function testDatelistElementUntrustedCallbacks() : void {
     $this->expectException(UntrustedCallbackException::class);
     $this->expectExceptionMessage(sprintf(
@@ -126,9 +124,26 @@ class DatelistElementFormTest extends KernelTestBase implements FormInterface, T
   }
 
   /**
+   * Tests proper timezone handling of the Datelist element.
+   */
+  public function testTimezoneHandling(): void {
+    // Render the form once with the site's timezone.
+    $form = \Drupal::formBuilder()->getForm($this);
+    $this->render($form);
+    $this->assertEquals('Australia/Sydney', $form['datelist_element']['#date_timezone']);
+
+    // Mimic a user with a different timezone than Australia/Sydney.
+    date_default_timezone_set('UTC');
+
+    $form = \Drupal::formBuilder()->getForm($this);
+    $this->render($form);
+    $this->assertEquals('UTC', $form['datelist_element']['#date_timezone']);
+  }
+
+  /**
    * {@inheritdoc}
    */
-  public static function trustedCallbacks() {
+  public static function trustedCallbacks(): array {
     return [
       'datelistDateCallbackTrusted',
     ];

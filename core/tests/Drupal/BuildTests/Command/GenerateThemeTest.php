@@ -19,6 +19,7 @@ use Symfony\Component\Process\Process;
  * Tests the generate-theme commands.
  */
 #[Group('Command')]
+#[Group('#slow')]
 #[RequiresPhpExtension('pdo_sqlite')]
 class GenerateThemeTest extends QuickStartTestBase {
 
@@ -43,6 +44,110 @@ class GenerateThemeTest extends QuickStartTestBase {
     $this->copyCodebase();
     $this->executeCommand('COMPOSER_DISCARD_CHANGES=true composer install --no-dev --no-interaction');
     chdir($this->getWorkingPath());
+  }
+
+  /**
+   * Tests generating theme from a simple named Starterkit enabled theme.
+   */
+  public function testSimpleStarterkitTheme(): void {
+    $starterkit_theme_path_relative = 'themes/simple';
+    $starterkit_theme_path_absolute = $this->getWorkspaceDirectory() . '/' . $starterkit_theme_path_relative;
+    mkdir($starterkit_theme_path_absolute);
+    file_put_contents($starterkit_theme_path_absolute . '/simple.info.yml', Yaml::encode([
+      'name' => 'Simple',
+      'type' => 'theme',
+      'base theme' => FALSE,
+      'core_version_requirement' => '*',
+    ]));
+    file_put_contents($starterkit_theme_path_absolute . '/simple.starterkit.yml', Yaml::encode([
+      'ignore' => ['/simple.starterkit.yml'],
+      'no_edit' => [],
+      'no_rename' => [],
+      'info' => [
+        'version' => '1.0.0',
+      ],
+    ]));
+    mkdir($starterkit_theme_path_absolute . '/src');
+    file_put_contents($starterkit_theme_path_absolute . '/src/SimpleUtility.php', <<<PHP
+<?php
+
+namespace Drupal\simple;
+
+final class SimpleUtility {
+
+  public const MACHINE_NAME = 'simple';
+  public const MACHINE_CLASS_NAME = 'Simple';
+
+}
+PHP);
+    file_put_contents($starterkit_theme_path_absolute . '/simple.theme', <<<PHP
+<?php
+
+/**
+ * @file
+ * Drupal theme functions for Simple.
+ */
+
+function simple_preprocess_html(array &\$variables): void {
+  \$variables['#attached']['drupalSettings']['simple'] = 'simple';
+}
+PHP);
+    $fixture = <<<FIXTURE
+#@starterkit:machine_name
+simple
+#@starterkit:label
+A Simple Theme
+#@starterkit:machine_class_name
+Simple
+#@starterkit:label_class_name
+Simple
+FIXTURE;
+    file_put_contents($starterkit_theme_path_absolute . '/README.md', $fixture);
+
+    $this->assertFileExists($starterkit_theme_path_absolute . '/simple.info.yml');
+    $this->assertThemeExists($starterkit_theme_path_relative);
+
+    $tester = $this->runCommand([
+      'machine-name' => 'simple_theme',
+      '--name' => 'My Simple Theme',
+      '--description' => 'Custom theme generated from a Simple Starterkit theme',
+      '--starterkit' => 'simple',
+    ]);
+
+    $tester->assertCommandIsSuccessful();
+    $theme_path_relative = 'themes/simple_theme';
+    $this->assertThemeExists($theme_path_relative);
+
+    $info = $this->assertThemeExists($theme_path_relative);
+    self::assertEquals('My Simple Theme', $info['name']);
+    $readme_file = $this->getWorkspaceDirectory() . "/$theme_path_relative/README.md";
+    $this->assertFileExists($readme_file);
+    $fixture = <<<FIXTURE
+#@starterkit:machine_name
+simple_theme
+#@starterkit:label
+My Simple Theme
+#@starterkit:machine_class_name
+SimpleTheme
+#@starterkit:label_class_name
+SimpleTheme
+FIXTURE;
+    $this->assertSame($fixture, file_get_contents($readme_file));
+
+    // The .theme file should be renamed and contain updated machine and label
+    // values.
+    $dot_theme_path = $this->getWorkspaceDirectory() . "/$theme_path_relative/simple_theme.theme";
+    $this->assertFileExists($dot_theme_path);
+    $dot_theme_contents = file_get_contents($dot_theme_path);
+    self::assertStringContainsString("\$variables['#attached']['drupalSettings']['simple_theme']", $dot_theme_contents);
+    // Ensure content replacements respect the namespace and class fragments.
+    $utility_file = $this->getWorkspaceDirectory() . "/$theme_path_relative/src/SimpleThemeUtility.php";
+    $this->assertFileExists($utility_file);
+    $utility_contents = file_get_contents($utility_file);
+    self::assertStringContainsString('namespace Drupal\\simple_theme;', $utility_contents);
+    self::assertStringContainsString('class SimpleThemeUtility', $utility_contents);
+    self::assertStringContainsString("public const MACHINE_NAME = 'simple_theme'", $utility_contents);
+    self::assertStringContainsString("public const MACHINE_CLASS_NAME = 'SimpleTheme'", $utility_contents);
   }
 
   /**
@@ -121,14 +226,14 @@ class GenerateThemeTest extends QuickStartTestBase {
     // Ensure that a new theme cannot be generated when the destination
     // directory already exists.
     $theme_path_absolute = $this->getWorkspaceDirectory() . "/$theme_path_relative";
-    $this->assertFileExists($theme_path_absolute . '/test_custom_theme.theme');
-    unlink($theme_path_absolute . '/test_custom_theme.theme');
+    $this->assertFileExists($theme_path_absolute . '/src/Hook/TestCustomThemeHooks.php');
+    unlink($theme_path_absolute . '/src/Hook/TestCustomThemeHooks.php');
     $process = $this->generateThemeFromStarterkit();
     $result = $process->run();
     $this->assertStringContainsString('Theme could not be generated because the destination directory', $process->getErrorOutput());
     $this->assertStringContainsString($theme_path_relative, $process->getErrorOutput());
     $this->assertSame(1, $result);
-    $this->assertFileDoesNotExist($theme_path_absolute . '/test_custom_theme.theme');
+    $this->assertFileDoesNotExist($theme_path_absolute . '/src/Hook/TestCustomThemeHooks.php');
   }
 
   /**
@@ -171,8 +276,8 @@ YAML
     $this->assertSame(0, $exit_code);
 
     // Confirm new .theme file.
-    $dot_theme_file = $this->getWorkspaceDirectory() . '/themes/generated_from_another_theme/generated_from_another_theme.theme';
-    $this->assertStringContainsString('function generated_from_another_theme_preprocess_image_widget(array &$variables): void {', file_get_contents($dot_theme_file));
+    $dot_theme_file = $this->getWorkspaceDirectory() . '/themes/generated_from_another_theme/src/Hook/GeneratedFromAnotherThemeHooks.php';
+    $this->assertStringContainsString('public function preprocessImageWidget(array &$variables): void {', file_get_contents($dot_theme_file));
   }
 
   /**
@@ -395,7 +500,6 @@ SH;
     $theme_path_absolute = $this->getWorkspaceDirectory() . '/themes/test_custom_theme';
     self::assertDirectoryExists($theme_path_absolute);
     self::assertFileDoesNotExist($theme_path_absolute . '/src/StarterKit.php');
-    self::assertDirectoryDoesNotExist($theme_path_absolute . '/src');
   }
 
   public function testNoEditMissingFilesWarning(): void {
@@ -478,13 +582,13 @@ SH;
       ],
     ]);
     $fixture = <<<FIXTURE
-# machine_name
+#@starterkit:machine_name
 starterkit_theme
-# label
+#@starterkit:label
 Starterkit theme
-# machine_class_name
+#@starterkit:machine_class_name
 StarterkitTheme
-# label_class_name
+#@starterkit:label_class_name
 StarterkitTheme
 FIXTURE;
 
@@ -523,13 +627,13 @@ PHP);
     self::assertEquals($fixture, file_get_contents($theme_path_absolute . '/no_edit_fixture.txt'));
     self::assertFileExists($theme_path_absolute . '/edit_fixture.txt');
     self::assertEquals(<<<EDITED
-# machine_name
+#@starterkit:machine_name
 test_custom_theme
-# label
+#@starterkit:label
 Test custom starterkit theme
-# machine_class_name
+#@starterkit:machine_class_name
 TestCustomTheme
-# label_class_name
+#@starterkit:label_class_name
 TestCustomTheme
 EDITED, file_get_contents($theme_path_absolute . '/edit_fixture.txt'));
 
@@ -597,6 +701,51 @@ EDITED, file_get_contents($theme_path_absolute . '/src/TestCustomThemePreRender.
     // Verify that the .gitignore file is present in the generated theme.
     $theme_path_absolute = $this->getWorkspaceDirectory() . '/themes/test_custom_theme';
     self::assertFileExists($theme_path_absolute . '/.gitignore');
+  }
+
+  public function testIgnoredDotFiles(): void {
+    $this->writeStarterkitConfig([
+      'ignore' => [
+        '/.npmrc',
+      ],
+    ]);
+
+    file_put_contents($this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/.npmrc', '*.map');
+    $tester = $this->runCommand(
+      [
+        'machine-name' => 'test_custom_theme',
+        '--name' => 'Test custom starterkit theme',
+        '--description' => 'Custom theme generated from a starterkit theme',
+      ]
+    );
+
+    $tester->assertCommandIsSuccessful($tester->getErrorOutput());
+    $this->assertThemeExists('themes/test_custom_theme');
+
+    // Verify that the .npmrc file is not present in the generated theme.
+    $theme_path_absolute = $this->getWorkspaceDirectory() . '/themes/test_custom_theme';
+    self::assertFileDoesNotExist($theme_path_absolute . '/.npmrc');
+  }
+
+  public function testExcludedGitFolder(): void {
+    $path = $this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/.git';
+    mkdir($path);
+    file_put_contents($path . '/config', '*.map');
+
+    $tester = $this->runCommand(
+      [
+        'machine-name' => 'test_custom_theme',
+        '--name' => 'Test custom starterkit theme',
+        '--description' => 'Custom theme generated from a starterkit theme',
+      ]
+    );
+
+    $tester->assertCommandIsSuccessful($tester->getErrorOutput());
+    $this->assertThemeExists('themes/test_custom_theme');
+
+    // Verify that the .git folder is not present in the generated theme.
+    $theme_path_absolute = $this->getWorkspaceDirectory() . '/themes/test_custom_theme';
+    self::assertFileDoesNotExist($theme_path_absolute . '/.git');
   }
 
   private function writeStarterkitConfig(array $config): void {
