@@ -16,7 +16,7 @@ class LayoutBuilderTestSectionHooks {
   /**
    * Whether the hooks are active.
    */
-  private bool $active = FALSE;
+  protected bool $active = FALSE;
 
   /**
    * Activates or deactivates the hooks.
