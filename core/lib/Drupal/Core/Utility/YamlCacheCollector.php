@@ -63,9 +63,11 @@ class YamlCacheCollector extends CacheCollector {
    * {@inheritdoc}
    */
   public function updateCache($lock = TRUE): void {
-    $two_years_ago = time() - (365 * 86400 * 2);
+    // Look for files cached longer than three months ago and remove them from
+    // the cache item if they no longer exist.
+    $three_months_ago = time() - (90 * 86400);
     foreach ($this->storage as $key => $item) {
-      if ($item['mtime'] <= $two_years_ago) {
+      if ($item['mtime'] <= $three_months_ago && !file_exists($key)) {
         $this->delete($key);
       }
     }
