@@ -27,11 +27,13 @@ trait DraggableListBuilderTrait {
   protected $entities = [];
 
   /**
-   * Name of the entity's weight field or FALSE if no field is provided.
+   * Gets the name of the entity's weight field, or FALSE if none.
    *
-   * @var string|bool
+   * @return string|false
    */
-  protected $weightKey = FALSE;
+  protected function getWeightKey(): string|false {
+    return FALSE;
+  }
 
   /**
    * The form builder.
@@ -73,7 +75,7 @@ trait DraggableListBuilderTrait {
    */
   public function buildHeader() {
     $header = [];
-    if (!empty($this->weightKey)) {
+    if (!empty($this->getWeightKey())) {
       $header['weight'] = t('Weight');
     }
     return $header + parent::buildHeader();
@@ -92,7 +94,7 @@ trait DraggableListBuilderTrait {
    */
   public function buildRow(EntityInterface $entity) {
     $row = [];
-    if (!empty($this->weightKey)) {
+    if (!empty($this->getWeightKey())) {
       // Override default values to markup elements.
       $row['#attributes']['class'][] = 'draggable';
       $row['#weight'] = $this->getWeight($entity);
@@ -117,7 +119,7 @@ trait DraggableListBuilderTrait {
    * @see \Drupal\Core\Entity\EntityListBuilder::render()
    */
   public function render() {
-    if (!empty($this->weightKey)) {
+    if (!empty($this->getWeightKey())) {
       return $this->formBuilder->getForm($this);
     }
     return parent::render();
@@ -153,7 +155,7 @@ trait DraggableListBuilderTrait {
     $this->entities = $this->load();
     $delta = 10;
     // Change the delta of the weight field if there are more than 20 entities.
-    if (!empty($this->weightKey)) {
+    if (!empty($this->getWeightKey())) {
       $count = count($this->entities);
       if ($count > 20) {
         $delta = ceil($count / 2);
