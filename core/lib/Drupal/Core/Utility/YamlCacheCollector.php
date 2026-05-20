@@ -18,14 +18,6 @@ class YamlCacheCollector extends CacheCollector {
   /**
    * {@inheritdoc}
    */
-  public function has($key): bool {
-    $this->get($key);
-    return \array_key_exists($key, $this->storage) && filemtime($key) === $this->storage[$key]['mtime'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function get($key): array {
     $this->lazyLoadCache();
     if (isset($this->storage[$key]) && file_exists($key)) {
