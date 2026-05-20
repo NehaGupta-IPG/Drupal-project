@@ -595,14 +595,11 @@ class FieldTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
     $query->expects($this->never())
-      ->method('ensureTable')
-      ->with('test_entity_table', NULL)
-      ->willReturn('test_entity_table');
+      ->method('ensureTable');
     // Ensure that we add the title field to the query, if we group by some
     // other field in the view.
     $query->expects($this->never())
-      ->method('addField')
-      ->with('test_entity_table', 'title');
+      ->method('addField');
 
     $this->executable->query = $query;
 
@@ -933,10 +930,16 @@ class FieldTest extends UnitTestCase {
       'table' => 'test_entity__body',
     ];
     $handler->init($this->executable, $this->display, $options);
-    $handler->query = $this->getMockBuilder('Drupal\views\Plugin\views\query\Sql')
+    $query = $this->getMockBuilder('Drupal\views\Plugin\views\query\Sql')
       ->disableOriginalConstructor()
       ->getMock();
 
+    $query->expects($this->never())
+      ->method('ensureTable');
+    $query->expects($this->never())
+      ->method('addField');
+
+    $this->executable->query = $query;
     $handler->additional_fields = ['alt', 'title'];
     $handler->query(TRUE);
 
