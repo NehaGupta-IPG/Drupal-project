@@ -67,6 +67,7 @@ class YamlCacheCollector extends CacheCollector {
         $this->delete($key);
       }
     }
+    parent::updateCache($lock);
   }
 
 }
