@@ -116,7 +116,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
     $this->extensionPathResolver = $this->createMock(ExtensionPathResolver::class);
     $this->componentPluginManager = $this->createStub(ComponentPluginManager::class);
 
-    $this->yamlCacheCollector = new YamlCacheCollector('library.yaml_parser', new MemoryCache(new Time()), new NullLockBackend());
+    $this->yamlCacheCollector = new YamlCacheCollector('library.yaml_parser', new MemoryCache(new Time()), new NullLockBackend(), new Time());
     $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager, $this->yamlCacheCollector);
   }
 

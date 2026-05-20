@@ -31,7 +31,7 @@ class LibraryDiscoveryParser {
     protected ExtensionPathResolver $extensionPathResolver,
     protected ComponentPluginManager $componentPluginManager,
     protected ?YamlCacheCollector $yamlCacheCollector = NULL,
-) {
+  ) {
     if (!isset($yamlCacheCollector)) {
       $this->yamlCacheCollector = \Drupal::service('libraries.parsing_cache');
       @trigger_error('Calling ' . __METHOD__ . '() without the $yamlCacheCollector argument is deprecated in drupal:11.4.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3486503', E_USER_DEPRECATED);
