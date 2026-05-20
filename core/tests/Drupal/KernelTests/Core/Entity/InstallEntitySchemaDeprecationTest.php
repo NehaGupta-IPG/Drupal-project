@@ -15,7 +15,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('entity')]
 #[RunTestsInSeparateProcesses]
 #[IgnoreDeprecations]
-#[RunTestsInSeparateProcesses]
 class InstallEntitySchemaDeprecationTest extends KernelTestBase {
 
   /**
