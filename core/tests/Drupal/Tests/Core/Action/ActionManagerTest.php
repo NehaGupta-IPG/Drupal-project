@@ -22,11 +22,6 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 class ActionManagerTest extends UnitTestCase {
 
   /**
-   * The cache backend used by the action manager under test.
-   */
-  protected CacheBackendInterface $cacheBackend;
-
-  /**
    * The module handler used by the action manager under test.
    */
   protected ModuleHandlerInterface $moduleHandler;
@@ -44,7 +39,6 @@ class ActionManagerTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->cacheBackend = $this->createMock(CacheBackendInterface::class);
     $this->moduleHandler = $this->createStub(ModuleHandlerInterface::class);
     $this->namespaces = new \ArrayObject();
   }
@@ -53,10 +47,10 @@ class ActionManagerTest extends UnitTestCase {
    * Tests the cache key is suffixed with the current interface langcode.
    */
   public function testConstructWithLanguageManagerKeysCacheByLanguage(): void {
-    $language_manager = $this->createMock(LanguageManagerInterface::class);
+    $language_manager = $this->createStub(LanguageManagerInterface::class);
     $language_manager->method('getCurrentLanguage')->willReturn(new Language(['id' => 'de']));
 
-    $manager = new ActionManager($this->namespaces, $this->cacheBackend, $this->moduleHandler, $language_manager);
+    $manager = new ActionManager($this->namespaces, $this->createStub(CacheBackendInterface::class), $this->moduleHandler, $language_manager);
 
     $cache_key = (new \ReflectionProperty($manager, 'cacheKey'))->getValue($manager);
     $this->assertSame('action_info:de', $cache_key);
@@ -66,7 +60,7 @@ class ActionManagerTest extends UnitTestCase {
    * Tests clearing cached definitions removes the bin for every language.
    */
   public function testClearCachedDefinitionsDeletesPerLanguageCids(): void {
-    $language_manager = $this->createMock(LanguageManagerInterface::class);
+    $language_manager = $this->createStub(LanguageManagerInterface::class);
     $language_manager->method('getCurrentLanguage')->willReturn(new Language(['id' => 'en']));
     $language_manager->method('getLanguages')->willReturn([
       'en' => new Language(['id' => 'en']),
@@ -74,11 +68,12 @@ class ActionManagerTest extends UnitTestCase {
       'fr' => new Language(['id' => 'fr']),
     ]);
 
-    $this->cacheBackend->expects($this->once())
+    $cache_backend = $this->createMock(CacheBackendInterface::class);
+    $cache_backend->expects($this->once())
       ->method('deleteMultiple')
       ->with(['action_info:en', 'action_info:de', 'action_info:fr']);
 
-    $manager = new ActionManager($this->namespaces, $this->cacheBackend, $this->moduleHandler, $language_manager);
+    $manager = new ActionManager($this->namespaces, $cache_backend, $this->moduleHandler, $language_manager);
     $manager->clearCachedDefinitions();
   }
 
@@ -88,7 +83,7 @@ class ActionManagerTest extends UnitTestCase {
   #[IgnoreDeprecations]
   public function testConstructWithoutLanguageManagerIsDeprecated(): void {
     $this->expectUserDeprecationMessage('Calling Drupal\Core\Action\ActionManager::__construct() without the $languageManager argument is deprecated in drupal:11.4.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3589007');
-    new ActionManager($this->namespaces, $this->cacheBackend, $this->moduleHandler);
+    new ActionManager($this->namespaces, $this->createStub(CacheBackendInterface::class), $this->moduleHandler);
   }
 
 }
