@@ -294,7 +294,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
    */
   public function add_field_table($use_group_by) {
     // Grouping is enabled.
-    if ($use_group_by) {
+    if ($use_group_by && !empty($this->options['group_column'])) {
       return TRUE;
     }
     // This a multiple value field, but "group multiple values" is not checked.
