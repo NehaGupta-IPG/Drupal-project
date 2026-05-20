@@ -763,7 +763,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $entity_type = $entity_type_manager->getDefinition($entity_type_id);
 
     if ($entity_type instanceof ConfigEntityTypeInterface) {
-      @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/project/drupal/issues/3343518', E_USER_DEPRECATED);
+      @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/project/drupal/issues/3343518', E_USER_DEPRECATED);
     }
 
     \Drupal::service('entity_type.listener')->onEntityTypeCreate($entity_type);
