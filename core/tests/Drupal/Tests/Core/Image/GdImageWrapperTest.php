@@ -121,14 +121,16 @@ class GdImageWrapperTest extends UnitTestCase {
   protected function getToolkitOperationMock(string $class_name, GDToolkit $toolkit, bool $needsToolkitInjection): GDImageToolkitOperationBase&MockObject {
     $mock_builder = $this->getMockBuilder($class_name);
     $operation = $mock_builder
-      ->onlyMethods(['execute'])
+      ->onlyMethods(['execute', 'getPluginDefinition'])
       ->setConstructorArgs([[], '', [], $this->createStub(LoggerInterface::class)])
       ->getMock();
     $operation
-      ->method(PropertyHook::get('needsToolkitInjection'))
-      ->willReturn($needsToolkitInjection);
+      ->method('getPluginDefinition')
+      ->willReturn([
+        'needsToolkitInjection' => $needsToolkitInjection,
+      ]);
 
-    if ($operation->needsToolkitInjection) {
+    if ($operation->getPluginDefinition()['needsToolkitInjection']) {
       $operation->setToolkit($toolkit);
     }
 

@@ -18,15 +18,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 )]
 class Desaturate extends GDImageToolkitOperationBase {
 
-  // phpcs:disable
-  /**
-   * {@inheritdoc}
-   */
-  public bool $needsToolkitInjection {
-    get => FALSE;
-  }
-  // phpcs:enable
-
   /**
    * {@inheritdoc}
    */

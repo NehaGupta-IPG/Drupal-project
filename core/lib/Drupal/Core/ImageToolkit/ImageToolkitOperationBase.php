@@ -19,23 +19,6 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  */
 abstract class ImageToolkitOperationBase extends PluginBase implements ImageToolkitOperationInterface, ContainerFactoryPluginInterface {
 
-  // @todo remove ignoreFile once PHPCS can parse property hooks.
-  // phpcs:ignoreFile
-
-  /**
-   * BC layer.
-   *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Only
-   *   introduced to support backwards compatibility; there is no replacement.
-   *
-   * @see https://www.drupal.org/node/3590417
-   */
-  public bool $needsToolkitInjection {
-    get => TRUE;
-    // @phpstan-ignore property.deprecated
-    set => throw new ImageToolkitException('Cannot set $needsToolkitInjection');
-  }
-
   /**
    * The image toolkit.
    *
@@ -91,7 +74,7 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
    */
   public function setToolkit(ImageToolkitInterface $toolkit): void {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Stateless toolkits must not be injected to the toolkit operation. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
-    if (!$this->needsToolkitInjection) {
+    if (!$this->getPluginDefinition()['needsToolkitInjection']) {
       throw new ImageToolkitException("No toolkit can be injected in image toolkit operation '{$this->getPluginId()}'");
     }
     $this->toolkit = $toolkit;
@@ -115,7 +98,7 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
    */
   protected function getToolkit() {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Stateless toolkits must not be injected to the toolkit operation. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
-    if (!$this->needsToolkitInjection) {
+    if (!$this->getPluginDefinition()['needsToolkitInjection']) {
       throw new ImageToolkitException("No toolkit injected in image toolkit operation '{$this->getPluginId()}'");
     }
     return $this->toolkit;
@@ -233,7 +216,7 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
     }
     $arguments = $this->prepareArguments($arguments);
     // @phpstan-ignore property.deprecated
-    if ($this->needsToolkitInjection) {
+    if ($this->getPluginDefinition()['needsToolkitInjection']) {
       if ($image) {
         // @phpstan-ignore property.deprecated
         $this->toolkit->backfillImage = $image;

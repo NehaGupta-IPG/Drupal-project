@@ -19,15 +19,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 )]
 class Rotate extends GDImageToolkitOperationBase {
 
-  // phpcs:disable
-  /**
-   * {@inheritdoc}
-   */
-  public bool $needsToolkitInjection {
-    get => FALSE;
-  }
-  // phpcs:enable
-
   /**
    * {@inheritdoc}
    */

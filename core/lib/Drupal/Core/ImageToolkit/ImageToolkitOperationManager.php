@@ -150,7 +150,7 @@ class ImageToolkitOperationManager extends DefaultPluginManager implements Image
     }
     $plugin_id = $this->getToolkitOperationPluginId($toolkit, $operation);
     $instance = $this->createInstance($plugin_id, []);
-    if ($instance->needsToolkitInjection) {
+    if ($instance->getPluginDefinition()['needsToolkitInjection']) {
       $instance->setToolkit($toolkit->getPluginDefinition()['isStateless'] ? clone $toolkit : $toolkit);
     }
     else {
