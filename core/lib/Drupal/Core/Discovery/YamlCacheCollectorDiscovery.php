@@ -30,7 +30,7 @@ class YamlCacheCollectorDiscovery extends YamlDiscovery {
   /**
    * {@inheritdoc}
    */
-  public function findAll() {
+  public function findAll(): array {
     $all = [];
 
     $files = $this->findFiles();
@@ -43,7 +43,7 @@ class YamlCacheCollectorDiscovery extends YamlDiscovery {
   /**
    * {@inheritdoc}
    */
-  protected function decode($file) {
+  protected function decode($file): array {
 
     try {
       return $this->yamlCacheCollector->get($file);

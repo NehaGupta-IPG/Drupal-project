@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\Utility;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheCollector;
 use Drupal\Core\Lock\LockBackendInterface;
@@ -11,13 +14,6 @@ use Drupal\Core\Serialization\Yaml;
  * Caches YAML parsing in a cache collector.
  */
 class YamlCacheCollector extends CacheCollector {
-
-  public function __construct($cid, CacheBackendInterface $cache, LockBackendInterface $lock, $tags = []) {
-    $this->cid = $cid;
-    $this->cache = $cache;
-    $this->lock = $lock;
-    $this->tags = $tags;
-  }
 
   /**
    * {@inheritdoc}

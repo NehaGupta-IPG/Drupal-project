@@ -113,9 +113,7 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
     $this->checkProvider = $this->createStub(CheckProviderInterface::class);
 
     $time = new Time();
-
     $cache_backend = new MemoryBackend($time);
-
     $yamlRouteDiscovery = new TestYamlRouteDiscovery($this->moduleHandler, $this->controllerResolver, $cache_backend, $this->lock);
     $yamlRouteDiscovery->setYamlDiscovery($this->yamlDiscovery);
 
