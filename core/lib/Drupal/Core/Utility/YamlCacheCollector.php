@@ -15,6 +15,16 @@ use Drupal\Core\Serialization\Yaml;
  */
 class YamlCacheCollector extends CacheCollector {
 
+  public function __construct(
+    $cid,
+    CacheBackendInterface $cache,
+    LockBackendInterface $lock,
+    protected TimeInterface $time,
+    array $tags = [],
+  ) {
+    parent::__construct($cid, $cache, $lock, $tags);
+  }
+
   /**
    * {@inheritdoc}
    */
@@ -53,9 +63,9 @@ class YamlCacheCollector extends CacheCollector {
   public function updateCache($lock = TRUE): void {
     // Look for files cached longer than three months ago and remove them from
     // the cache item if they no longer exist.
-    $three_months_ago = time() - (90 * 86400);
+    $three_months_ago = $this->time->getCurrentTime() - (90 * 86400);
     foreach ($this->storage as $key => $item) {
-      if ($item['mtime'] <= $three_months_ago && !file_exists($key)) {
+      if (($item['mtime'] <= $three_months_ago) && !file_exists($key)) {
         $this->delete($key);
       }
     }

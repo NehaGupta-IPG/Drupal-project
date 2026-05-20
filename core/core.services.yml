@@ -1195,7 +1195,7 @@ services:
     arguments: ['@container.namespaces']
   router.builder.yaml:
     class: Drupal\Core\Routing\YamlRouteDiscovery
-    arguments: ['@module_handler', '@controller_resolver', '@cache.file_parsing', '@lock']
+    arguments: ['@module_handler', '@controller_resolver', '@cache.file_parsing', '@lock', '@datetime.time']
   menu.rebuild_subscriber:
     class: Drupal\Core\EventSubscriber\MenuRouterRebuildSubscriber
     arguments: ['@lock', '@plugin.manager.menu.link', '@database', '@database.replica_kill_switch', '@logger.channel.menu']
@@ -1784,7 +1784,7 @@ services:
   Drupal\Core\Asset\LibraryDiscoveryParser: '@library.discovery.parser'
   library.parsing_cache:
     class: Drupal\Core\Utility\YamlCacheCollector
-    arguments: ['library.parsing_cache', '@cache.file_parsing', '@lock']
+    arguments: ['library.parsing_cache', '@cache.file_parsing', '@lock', '@datetime.time']
     tags:
       - { name: needs_destruction }
   library.libraries_directory_file_finder:
