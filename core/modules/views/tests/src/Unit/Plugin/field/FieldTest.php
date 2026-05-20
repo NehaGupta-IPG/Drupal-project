@@ -523,9 +523,9 @@ class FieldTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::query
+   * Tests query with group by for base field with failure.
    */
-  public function testQueryWithGroupByForBaseFieldFailure() {
+  public function testQueryWithGroupByForBaseFieldFailure(): void {
     $definition = [
       'entity_type' => 'test_entity',
       'field_name' => 'title',
@@ -650,7 +650,7 @@ class FieldTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::query
+   * Tests query with group by for config field with failure.
    */
   public function testQueryWithGroupByForConfigFieldFailure(): void {
     $definition = [
@@ -889,7 +889,7 @@ class FieldTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::add_field_table
+   * Tests query for additional field.
    */
   public function testAddAdditionalFieldTable(): void {
     $definition = [
