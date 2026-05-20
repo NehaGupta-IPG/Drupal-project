@@ -30,6 +30,7 @@ trait DraggableListBuilderTrait {
    * Gets the name of the entity's weight field, or FALSE if none.
    *
    * @return string|false
+   *   The name of the weight field, or FALSE if the entity has no weight field.
    */
   protected function getWeightKey(): string|false {
     return FALSE;
