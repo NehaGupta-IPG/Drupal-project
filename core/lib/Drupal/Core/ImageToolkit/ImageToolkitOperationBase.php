@@ -215,7 +215,6 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
       $image = NULL;
     }
     $arguments = $this->prepareArguments($arguments);
-    // @phpstan-ignore property.deprecated
     if ($this->getPluginDefinition()['needsToolkitInjection']) {
       if ($image) {
         // @phpstan-ignore property.deprecated
