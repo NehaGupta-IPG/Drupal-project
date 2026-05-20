@@ -75,8 +75,8 @@ class EntityViewController implements ContainerInjectionInterface, TrustedCallba
    *   The changed page render array.
    */
   public function buildTitle(array $page) {
-    $entity_type = $page['#entity_type'];
-    $entity = $page['#' . $entity_type];
+    $entity_type = $page['#entity_type'] ?? NULL;
+    $entity = $entity_type ? $page['#' . $entity_type] : NULL;
 
     // If the entity has a label field, build the page title based on it.
     if ($entity instanceof FieldableEntityInterface) {
