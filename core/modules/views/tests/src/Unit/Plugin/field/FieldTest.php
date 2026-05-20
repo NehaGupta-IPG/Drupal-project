@@ -916,10 +916,8 @@ class FieldTest extends UnitTestCase {
       ]);
 
     $table_mapping = $this->createMock(TableMappingInterface::class);
-    $table_mapping->expects($this->once())
-      ->method('getFieldColumnName')
-      ->with($field_storage, 'value')
-      ->willReturn('body_value');
+    $table_mapping->expects($this->never())
+      ->method('getFieldColumnName');
     $entity_storage = $this->createStub(SqlEntityStorageInterface::class);
     $entity_storage
       ->method('getTableMapping')
