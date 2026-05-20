@@ -76,7 +76,7 @@ class ImageToolkitManager extends DefaultPluginManager {
     $toolkit = $this->createInstance($id);
     // @todo remove the condition below in drupal:43.0.0, when all toolkits are
     // stateless and provide an imageClass.
-    if (isset($toolkit->getPluginDefinition()['imageClass'])) {
+    if ($toolkit->getPluginDefinition()['isStateless']) {
       $this->activeToolkits[$id] = $toolkit;
     }
     return $toolkit;
@@ -148,6 +148,20 @@ class ImageToolkitManager extends DefaultPluginManager {
    */
   public static function getAllValidExtensions(): array {
     return \Drupal::service('image.toolkit.manager')->getDefaultToolkit()->getSupportedExtensions();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function findDefinitions(): array {
+    // BC layer, add a 'isStateless' key to the definition if the toolkit
+    // provides its own ImageInterface implementation class.
+    // @todo remove in drupal:43.0.0.
+    $definitions = parent::findDefinitions();
+    foreach ($definitions as &$plugin_definition) {
+      $plugin_definition['isStateless'] = isset($plugin_definition['imageClass']);
+    }
+    return $definitions;
   }
 
 }

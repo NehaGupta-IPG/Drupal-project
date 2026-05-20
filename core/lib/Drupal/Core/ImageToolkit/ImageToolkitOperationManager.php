@@ -6,6 +6,7 @@ use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Image\ImageInterface;
 use Drupal\Core\ImageToolkit\Attribute\ImageToolkitOperation;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Psr\Log\LoggerInterface;
@@ -150,12 +151,40 @@ class ImageToolkitOperationManager extends DefaultPluginManager implements Image
     $plugin_id = $this->getToolkitOperationPluginId($toolkit, $operation);
     $instance = $this->createInstance($plugin_id, []);
     if ($instance->needsToolkitInjection) {
-      $instance->setToolkit(isset($toolkit->getPluginDefinition()['imageClass']) ? clone $toolkit : $toolkit);
+      $instance->setToolkit($toolkit->getPluginDefinition()['isStateless'] ? clone $toolkit : $toolkit);
     }
     else {
       $this->activeToolkitOperations[$toolkit->getPluginId()][$operation] = $instance;
     }
     return $instance;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function findDefinitions(): array {
+    // BC layer, add a 'needsToolkitInjection' key to the definition if the
+    // toolkit operation can receive an ImageInterface argument and therefore
+    // work with stateless toolkits.
+    // @todo remove in drupal:43.0.0.
+    $definitions = parent::findDefinitions();
+    foreach ($definitions as &$plugin_definition) {
+      $plugin_definition['needsToolkitInjection'] = TRUE;
+      $reflectedExecute = new \ReflectionMethod($plugin_definition['class'], 'execute');
+      $parameters = $reflectedExecute->getParameters();
+      $rawType = $parameters[0]?->getType();
+      $types = match (get_class($rawType)) {
+        \ReflectionUnionType::class, \ReflectionIntersectionType::class => $rawType->getTypes(),
+        default => [$rawType],
+      };
+      foreach ($types as $type) {
+        if (is_a((string) $type, ImageInterface::class, TRUE)) {
+          $plugin_definition['needsToolkitInjection'] = FALSE;
+          break;
+        }
+      }
+    }
+    return $definitions;
   }
 
 }

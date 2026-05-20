@@ -46,7 +46,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
     get => $this->backfillImage ?? NULL;
     set(?ImageInterface $image) {
       // @phpstan-ignore property.deprecated
-      if (isset($this->getPluginDefinition()['imageClass']) && !$this->isClone) {
+      if ($this->getPluginDefinition()['isStateless'] && !$this->isClone) {
         throw new ImageToolkitException('Cannot set $backfillImage in the toolkit singleton');
       }
       if ($image === NULL) {
@@ -115,7 +115,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    * @see https://www.drupal.org/node/3590417
    */
   public function __clone(): void {
-    if (!isset($this->getPluginDefinition()['imageClass'])) {
+    if (!$this->getPluginDefinition()['isStateless']) {
       throw new ImageToolkitException('Cannot clone a stateful toolkit');
     }
     // @phpstan-ignore property.deprecated
