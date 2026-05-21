@@ -15,7 +15,7 @@ class YamlCacheCollector extends FileParsingCacheCollectorBase {
    * {@inheritdoc}
    */
   protected function parseFile($file): array {
-    return Yaml::decode($file);
+    return Yaml::decode($file) ?? [];
   }
 
 }
