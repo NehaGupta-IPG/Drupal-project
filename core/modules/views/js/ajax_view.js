@@ -128,8 +128,8 @@
     once(
       'ajax-pager',
       this.$view
-        // Don't attach to nested views. Doing so would attach multiple behaviors
-        // to a given element.
+        // Don't attach to nested views. Doing so would attach multiple
+        // behaviors to a given element.
         .filter(this.filterNestedViews.bind(this)),
     ).forEach(this.attachPagerAjax.bind(this));
 

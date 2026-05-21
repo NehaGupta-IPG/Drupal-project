@@ -8,7 +8,8 @@
   /**
    * Handles the transition from mobile navigation to desktop navigation.
    *
-   * @param {Element} navWrapper - The primary navigation's top-level <ul> element.
+   * @param {Element} navWrapper
+   *   The primary navigation's top-level <ul> element.
    * @param {Element} navItem - The first item within the primary navigation.
    */
   function transitionToDesktopNavigation(navWrapper, navItem) {
@@ -59,7 +60,8 @@
    * Set up Resize Observer to listen for changes to the size of the primary
    * navigation.
    *
-   * @param {Element} primaryNav - The primary navigation's top-level <ul> element.
+   * @param {Element} primaryNav
+   *  The primary navigation's top-level <ul> element.
    */
   function init(primaryNav) {
     const resizeObserver = new ResizeObserver(checkIfDesktopNavigationWraps);

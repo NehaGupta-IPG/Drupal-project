@@ -189,8 +189,8 @@
      * @param {object} [options]
      *   An optional object with additional options.
      * @param {number} [options.granularity=2]
-     *   An integer value that signals how many different units to display in the
-     *   string. Defaults to 2.
+     *   An integer value that signals how many different units to display in
+     *   the string. Defaults to 2.
      * @param {boolean} [options.strict=false]
      *   A boolean value indicating whether or not, a negative diff should be
      *   rendered as "0 seconds". If the time difference is negative (i.e. the

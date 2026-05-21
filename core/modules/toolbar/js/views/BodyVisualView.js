@@ -7,7 +7,8 @@
   Drupal.toolbar.BodyVisualView = Backbone.View.extend(
     /** @lends Drupal.toolbar.BodyVisualView# */ {
       /**
-       * Adjusts the body element with the toolbar position and dimension changes.
+       * Adjusts the body element with the toolbar position and dimension
+       * changes.
        *
        * @constructs
        *
@@ -38,9 +39,9 @@
        */
       render() {
         $('body')
-          // Toggle the toolbar-tray-open class on the body element. The class is
-          // applied when a toolbar tray is active. Padding might be applied to
-          // the body element to prevent the tray from overlapping content.
+          // Toggle the toolbar-tray-open class on the body element. The class
+          // is applied when a toolbar tray is active. Padding might be applied
+          // to the body element to prevent the tray from overlapping content.
           .toggleClass('toolbar-tray-open', !!this.model.get('activeTray'));
       },
     },

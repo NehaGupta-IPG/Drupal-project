@@ -212,7 +212,8 @@
           if (toolbarBar) {
             toolbarBar.style.marginTop = '0';
 
-            // When off-canvas is positioned in top, toolbar has to be moved down.
+            // When off-canvas is positioned in top, toolbar has to be moved
+            // down.
             if (settings.drupalOffCanvasPosition === 'top') {
               const height = Drupal.offCanvas
                 .getContainer($element)

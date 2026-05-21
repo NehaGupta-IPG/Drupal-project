@@ -7,10 +7,14 @@ const buttonSubMenuId = 'primary-menu-item-12';
  * Sends arbitrary number of tab keys, and then checks that the last focused
  * element is within the given parent selector.
  *
- * @param {object} browser - Nightwatch Browser object
- * @param {string} parentSelector - Selector to which to test focused element against.
- * @param {number} tabCount - Amount of tab presses to send to browser
- * @param {boolean} [tabBackwards] - Hold down the SHIFT key when sending tabs
+ * @param {object} browser
+ *   Nightwatch Browser object
+ * @param {string} parentSelector
+ *   Selector to which to test focused element against.
+ * @param {number} tabCount
+ *   Amount of tab presses to send to browser
+ * @param {boolean} [tabBackwards]
+ *   Hold down the SHIFT key when sending tabs
  */
 const focusTrapCheck = (browser, parentSelector, tabCount, tabBackwards) => {
   if (tabBackwards === true) {

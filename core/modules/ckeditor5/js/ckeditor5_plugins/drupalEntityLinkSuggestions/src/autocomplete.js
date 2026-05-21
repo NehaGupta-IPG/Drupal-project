@@ -150,7 +150,8 @@ export default function initializeAutocomplete(element, settings) {
     $auto.autocomplete('search', $auto[0].value);
   });
 
-  // Use CompositionEvent to handle IME inputs. It requests remote server on "compositionend" event only.
+  // Use CompositionEvent to handle IME inputs. It requests remote server on
+  // "compositionend" event only.
   $auto.on('compositionstart.autocomplete', () => {
     options.isComposing = true;
   });

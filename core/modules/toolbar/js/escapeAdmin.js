@@ -28,7 +28,8 @@
    * @type {Drupal~behavior}
    *
    * @prop {Drupal~behaviorAttach} attach
-   *   Attaches the replacement functionality to the toolbar-escape-admin element.
+   *   Attaches the replacement functionality to the toolbar-escape-admin
+   *   element.
    */
   Drupal.behaviors.escapeAdmin = {
     attach() {

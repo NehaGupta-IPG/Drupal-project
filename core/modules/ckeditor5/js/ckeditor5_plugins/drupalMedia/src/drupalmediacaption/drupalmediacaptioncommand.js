@@ -118,7 +118,8 @@ export default class ToggleDrupalMediaCaptionCommand extends Command {
     const selectedMedia = getClosestSelectedDrupalMediaElement(selection);
     const savedCaption = mediaCaptionEditing._getSavedCaption(selectedMedia);
 
-    // Try restoring the caption from the DrupalMediaCaptionEditing plugin storage.
+    // Try restoring the caption from the DrupalMediaCaptionEditing plugin
+    // storage.
     const newCaptionElement = savedCaption || writer.createElement('caption');
 
     writer.append(newCaptionElement, selectedMedia);

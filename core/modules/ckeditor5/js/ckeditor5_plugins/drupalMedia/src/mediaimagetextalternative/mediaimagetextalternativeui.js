@@ -99,7 +99,8 @@ export default class MediaImageTextAlternativeUi extends Plugin {
     this._balloon = this.editor.plugins.get('ContextualBalloon');
 
     /**
-     * A form containing a textarea and buttons, used to change the `alt` text value.
+     * A form containing a textarea and buttons, used to change the `alt` text
+     * value.
      */
     this._form = new (CssTransitionDisablerMixin(TextAlternativeFormView))(
       editor.locale,
@@ -183,10 +184,11 @@ export default class MediaImageTextAlternativeUi extends Plugin {
     // text), or can be designated decorative (represented by double quotes).
     decorativeToggle.isOn = command.value === '""';
 
-    // Make sure that each time the panel shows up, the field remains in sync with the value of
-    // the command. If the user typed in the input, then canceled the balloon (`labeledInput#value`
-    // stays unaltered) and re-opened it without changing the value of the command, they would see the
-    // old value instead of the actual value of the command.
+    // Make sure that each time the panel shows up, the field remains in sync
+    // with the value of the command. If the user typed in the input, then
+    // canceled the balloon (`labeledInput#value` stays unaltered) and
+    // re-opened it without changing the value of the command, they would see
+    // the old value instead of the actual value of the command.
     // https://github.com/ckeditor/ckeditor5-image/issues/114
     labeledInput.fieldView.element.value = command.value || '';
     labeledInput.fieldView.value = labeledInput.fieldView.element.value;
@@ -222,7 +224,8 @@ export default class MediaImageTextAlternativeUi extends Plugin {
   /**
    * Removes the {@link #_form} from the {@link #_balloon}.
    *
-   * @param {Boolean} [focusEditable=false] Controls whether the editing view is focused afterwards.
+   * @param {Boolean} [focusEditable=false]
+   *   Controls whether the editing view is focused afterwards.
    * @private
    */
   _hideForm(focusEditable) {
@@ -230,8 +233,8 @@ export default class MediaImageTextAlternativeUi extends Plugin {
       return;
     }
 
-    // Blur the input element before removing it from DOM to prevent issues in some browsers.
-    // See https://github.com/ckeditor/ckeditor5/issues/1501.
+    // Blur the input element before removing it from DOM to prevent issues in
+    // some browsers. See https://github.com/ckeditor/ckeditor5/issues/1501.
     if (this._form.focusTracker.isFocused) {
       this._form.saveButtonView.focus();
     }

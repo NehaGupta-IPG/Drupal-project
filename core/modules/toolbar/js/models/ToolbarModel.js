@@ -39,8 +39,8 @@
         activeTab: null,
 
         /**
-         * Represents whether a tray is open or not. Stored as an ID selector e.g.
-         * '#toolbar-item--1-tray'.
+         * Represents whether a tray is open or not. Stored as an ID selector
+         * e.g. '#toolbar-item--1-tray'.
          *
          * @type {string}
          */
@@ -63,8 +63,8 @@
         isFixed: false,
 
         /**
-         * Menu subtrees are loaded through an AJAX request only when the Toolbar
-         * is set to a vertical orientation.
+         * Menu subtrees are loaded through an AJAX request only when the
+         * Toolbar is set to a vertical orientation.
          *
          * @type {boolean}
          */
@@ -89,8 +89,8 @@
         /**
          * A tray is locked if a user toggled it to vertical. Otherwise a tray
          * will switch between vertical and horizontal orientation based on the
-         * configured breakpoints. The locked state will be maintained across page
-         * loads.
+         * configured breakpoints. The locked state will be maintained across
+         * page loads.
          *
          * @type {boolean}
          */
@@ -111,9 +111,9 @@
         height: null,
 
         /**
-         * The current viewport offsets determined by {@link Drupal.displace}. The
-         * offsets suggest how a module might position is components relative to
-         * the viewport.
+         * The current viewport offsets determined by {@link Drupal.displace}.
+         * The offsets suggest how a module might position is components
+         * relative to the viewport.
          *
          * @type {object}
          *
@@ -142,8 +142,8 @@
        *   Returns an error message if validation failed.
        */
       validate(attributes, options) {
-        // Prevent the orientation being set to horizontal if it is locked, unless
-        // override has not been passed as an option.
+        // Prevent the orientation being set to horizontal if it is locked,
+        // unless override has not been passed as an option.
         if (
           attributes.orientation === 'horizontal' &&
           this.get('locked') &&

@@ -222,8 +222,8 @@
         .find('tr.region-message')
         .each(function () {
           const $this = $(this);
-          // If the dragged row is in this region, but above the message row, swap
-          // it down one space.
+          // If the dragged row is in this region, but above the message row,
+          // swap it down one space.
           if (
             $this.prev('tr').get(0) ===
             rowObject.group[rowObject.group.length - 1]

@@ -13,7 +13,8 @@ exports.command = function drupalUninstall(callback) {
   const self = this;
   const prefix = this.globals.drupalDbPrefix;
 
-  // Check for any existing errors, because running this will cause Nightwatch to hang.
+  // Check for any existing errors, because running this will cause Nightwatch
+  // to hang.
   if (!this.currentTest.results.errors && !this.currentTest.results.failed) {
     const dbOption =
       process.env.DRUPAL_TEST_DB_URL.length > 0

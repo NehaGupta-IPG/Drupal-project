@@ -49,7 +49,8 @@
            * Toggles the button's aria-expanded attribute and updates its text.
            * This is only one function which change state of button.
            *
-           * @param {boolean} state The button state it should be expanded or collapsed.
+           * @param {boolean} state
+           *   The button state it should be expanded or collapsed.
            */
           const toggleButtonState = (state) => {
             button.setAttribute('aria-expanded', state);

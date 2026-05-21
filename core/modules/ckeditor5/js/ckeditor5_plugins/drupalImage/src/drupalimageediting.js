@@ -569,9 +569,9 @@ function downcastBlockImageLink() {
       writer.createPositionAt(linkElement, 0),
     );
 
-    // Modified alternative implementation of GHS' addBlockImageLinkAttributeConversion().
-    // This is happening here as well to avoid a race condition with the link
-    // element not yet existing.
+    // Modified alternative implementation of GHS'
+    // addBlockImageLinkAttributeConversion(). This is happening here as well to
+    // avoid a race condition with the link element not yet existing.
     if (
       conversionApi.consumable.consume(
         data.item,
@@ -593,7 +593,8 @@ function downcastBlockImageLink() {
 }
 
 /**
- * Modified alternative implementation of linkimageediting.js' downcastImageLink.
+ * Modified alternative implementation of linkimageediting.js'
+ * downcastImageLink.
  *
  * @return {function}
  *  Callback that binds an event to its parameter.
@@ -645,9 +646,9 @@ function dataDowncastBlockImageLink() {
       writer.createPositionAt(linkElement, 0),
     );
 
-    // Modified alternative implementation of GHS' addBlockImageLinkAttributeConversion().
-    // This is happening here as well to avoid a race condition with the link
-    // element not yet existing.
+    // Modified alternative implementation of GHS'
+    // addBlockImageLinkAttributeConversion(). This is happening here as well to
+    // avoid a race condition with the link element not yet existing.
     if (
       conversionApi.consumable.consume(
         data.item,
@@ -732,7 +733,8 @@ export default class DrupalImageEditing extends Plugin {
         model: {
           key: 'resizedWidth',
           value: (viewElement) => {
-            // Support resizing using pixels and (the HTML 4.01-only) percentages.
+            // Support resizing using pixels and (the HTML 4.01-only)
+            // percentages.
             if (isNumberString(viewElement.getAttribute('width'))) {
               return `${parseInt(viewElement.getAttribute('width'), 10)}px`;
             }
@@ -749,7 +751,8 @@ export default class DrupalImageEditing extends Plugin {
         model: {
           key: 'resizedHeight',
           value: (viewElement) => {
-            // Support resizing using pixels and (the HTML 4.01-only) percentages.
+            // Support resizing using pixels and (the HTML 4.01-only)
+            // percentages.
             if (isNumberString(viewElement.getAttribute('height'))) {
               return `${parseInt(viewElement.getAttribute('height'), 10)}px`;
             }
@@ -790,8 +793,8 @@ export default class DrupalImageEditing extends Plugin {
       .add(dataDowncastBlockImageLink())
 
       // ⚠️ Everything below this point is copy/pasted directly from https://github.com/ckeditor/ckeditor5/pull/15222,
-      // to continue to use the `width` and `height` attributes to indicate resized width and height. This is necessary
-      // since CKEditor 5 v40.0.0.
+      // to continue to use the `width` and `height` attributes to indicate
+      // resized width and height. This is necessary since CKEditor 5 v40.0.0.
       // @see https://github.com/ckeditor/ckeditor5/releases/tag/v40.0.0
       // Exceptions are:
       // - reformatting to comply with Drupal's eslint-enforced coding standards
@@ -844,7 +847,8 @@ export default class DrupalImageEditing extends Plugin {
         converterPriority: 'high',
       })
 
-      // Natural width should be used only if resizedWidth is not specified (is equal to natural width).
+      // Natural width should be used only if resizedWidth is not specified (is
+      // equal to natural width).
       .attributeToAttribute({
         model: {
           name: 'imageBlock',
@@ -852,12 +856,14 @@ export default class DrupalImageEditing extends Plugin {
         },
         view: (attributeValue, { consumable }, data) => {
           if (data.item.hasAttribute('resizedWidth')) {
-            // Natural width consumed and not down-casted (because resizedWidth was used to downcast to the width attribute).
+            // Natural width consumed and not down-casted (because resizedWidth
+            // was used to downcast to the width attribute).
             consumable.consume(data.item, 'attribute:width');
 
             return null;
           }
-          // There is no resizedWidth so downcast natural width to the attribute in data.
+          // There is no resizedWidth so downcast natural width to the attribute
+          // in data.
           return {
             key: 'width',
             value: attributeValue,
@@ -872,12 +878,14 @@ export default class DrupalImageEditing extends Plugin {
         },
         view: (attributeValue, { consumable }, data) => {
           if (data.item.hasAttribute('resizedWidth')) {
-            // Natural width consumed and not down-casted (because resizedWidth was used to downcast to the width attribute).
+            // Natural width consumed and not down-casted (because resizedWidth
+            // was used to downcast to the width attribute).
             consumable.consume(data.item, 'attribute:width');
 
             return null;
           }
-          // There is no resizedWidth so downcast natural width to the attribute in data.
+          // There is no resizedWidth so downcast natural width to the attribute
+          // in data.
           return {
             key: 'width',
             value: attributeValue,
@@ -886,7 +894,8 @@ export default class DrupalImageEditing extends Plugin {
         converterPriority: 'high',
       })
 
-      // Natural height converted to resized height attribute (based on aspect ratio and resized width if available).
+      // Natural height converted to resized height attribute (based on aspect
+      // ratio and resized width if available).
       .attributeToAttribute({
         model: {
           name: 'imageBlock',
@@ -903,7 +912,8 @@ export default class DrupalImageEditing extends Plugin {
                 value: data.item.getAttribute('resizedWidth'),
               };
             }
-            // The resizedWidth is present so calculate height from aspect ratio.
+            // The resizedWidth is present so calculate height from aspect
+            // ratio.
             const resizedWidth = parseInt(
               data.item.getAttribute('resizedWidth'),
               10,
@@ -941,7 +951,8 @@ export default class DrupalImageEditing extends Plugin {
                 value: data.item.getAttribute('resizedWidth'),
               };
             }
-            // The resizedWidth is present so calculate height from aspect ratio.
+            // The resizedWidth is present so calculate height from aspect
+            // ratio.
             const resizedWidth = parseInt(
               data.item.getAttribute('resizedWidth'),
               10,
@@ -964,7 +975,8 @@ export default class DrupalImageEditing extends Plugin {
         converterPriority: 'high',
       });
 
-    // Waiting for any new images loaded, so we can set their natural width and height.
+    // Waiting for any new images loaded, so we can set their natural width and
+    // height.
     // @see https://github.com/ckeditor/ckeditor5/pull/15222
     editor.editing.view.addObserver(ImageLoadObserver);
     const imageUtils = editor.plugins.get('ImageUtils');

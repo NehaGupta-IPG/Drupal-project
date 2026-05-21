@@ -1,6 +1,7 @@
 /**
  * @file
- * Overriding core's message functions to add icon and a remove button to each message.
+ * Overriding core's message functions to add icon and a remove button to each
+ * message.
  */
 
 ((Drupal) => {

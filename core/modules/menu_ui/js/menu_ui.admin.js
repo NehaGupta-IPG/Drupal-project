@@ -48,7 +48,8 @@
         const selected = $select[0].value;
         // Remove all existing options from dropdown.
         $select.children().remove();
-        // Add new options to dropdown. Keep a count of options for testing later.
+        // Add new options to dropdown. Keep a count of options for testing
+        // later.
         let totalOptions = 0;
         Object.keys(options || {}).forEach((machineName) => {
           const selectContents = document.createElement('option');

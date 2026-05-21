@@ -115,7 +115,8 @@
   /**
    * Displays and initializes the color scheme selector.
    *
-   * @param {HTMLSelectElement} selectElement div[data-drupal-selector="edit-color-scheme"]
+   * @param {HTMLSelectElement} selectElement
+   *   div[data-drupal-selector="edit-color-scheme"]
    */
   function initColorSchemeSelect(selectElement) {
     selectElement.closest('[style*="display:none;"]').style.display = '';

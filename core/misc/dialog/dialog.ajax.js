@@ -39,11 +39,11 @@
           }
 
           setTimeout(function () {
-            // Account for pre-existing focus handling that may have already moved
-            // the focus inside the dialog.
+            // Account for pre-existing focus handling that may have already
+            // moved the focus inside the dialog.
             if (!dialog.contains(document.activeElement)) {
-              // Move focus to the first focusable element in the next event loop
-              // to allow dialog buttons to be changed first.
+              // Move focus to the first focusable element in the next event
+              // loop to allow dialog buttons to be changed first.
 
               // Replicate the autofocus behavior of jQuery UI Dialog.
 

@@ -56,7 +56,8 @@ const inputTypes = [
     type: 'url',
     api: 'url',
   },
-  // TODO - Cover datetime-local, month, week - no test form input examples are easily available
+  // TODO - Cover datetime-local, month, week - no test form input examples
+  // are easily available
 ];
 
 const booleanInputTypes = [

@@ -810,8 +810,16 @@ module.exports = {
            *   Offset configuration in jQuery UI Position format.
            * @param {Element} element
            *   The element being positioned.
-           * @return {{horizontal: (*|string), verticalOffset: number, vertical: (*|string), horizontalOffset: number}}
-           *   The horizontal and vertical alignment and offset values for the element.
+           * @return {
+           *   {
+           *     horizontal: (*|string),
+           *     verticalOffset: number,
+           *     vertical: (*|string),
+           *     horizontalOffset: number
+           *   }
+           * }
+           *   The horizontal and vertical alignment and offset values for the
+           *   element.
            *
            * @see core/misc/position.js
            */

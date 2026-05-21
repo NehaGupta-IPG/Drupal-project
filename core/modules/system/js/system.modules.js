@@ -7,8 +7,8 @@
   /**
    * Filters the module list table by a text input search string.
    *
-   * Additionally accounts for multiple tables being wrapped in "package" details
-   * elements.
+   * Additionally accounts for multiple tables being wrapped in "package"
+   * details elements.
    *
    * Text search input: input.table-filter-text
    * Target table:      input.table-filter-text[data-table]
@@ -68,7 +68,8 @@
             .attr('data-drupal-system-state', 'forced-open');
 
           // Hide the package <details> if they don't have any visible rows.
-          // Note that we first show() all <details> to be able to use ':visible'.
+          // Note that we first show() all <details> to be able to use
+          // ':visible'.
           $details.attr('open', true).each(hidePackageDetails);
 
           Drupal.announce(

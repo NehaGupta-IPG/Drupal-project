@@ -72,7 +72,8 @@ module.exports = {
           );
         },
       )
-      // Assert that search form is still visible when focus is on disclosure button.
+      // Assert that search form is still visible when focus is on disclosure
+      // button.
       .perform(function () {
         return this.actions()
           .keyDown(browser.Keys.SHIFT)
@@ -80,7 +81,8 @@ module.exports = {
       })
       .pause(50)
       .isVisible(searchWideSelector)
-      // Assert that search form is NOT visible when focus moves back to menu item.
+      // Assert that search form is NOT visible when focus moves back to menu
+      // item.
       .perform(function () {
         return this.actions().sendKeys(browser.Keys.TAB);
       })

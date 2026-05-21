@@ -14,7 +14,8 @@ exports.command = function drupalInstallModule(module, force, callback) {
   const self = this;
   this.drupalLoginAsAdmin(() => {
     this.drupalRelativeURL('/admin/modules')
-      // Filter module list to ensure that collapsable <details> elements are expanded.
+      // Filter module list to ensure that collapsable <details> elements are
+      // expanded.
       .updateValue(
         'form.system-modules [data-drupal-selector="edit-text"]',
         module,

@@ -153,8 +153,8 @@
           this.stack[i].deactivate();
         }
 
-        // The "active tabbing set" are the elements tabbing should be constrained
-        // to.
+        // The "active tabbing set" are the elements tabbing should be
+        // constrained to.
         let tabbableElements = [];
         $(elements).each((index, rootElement) => {
           tabbableElements = [...tabbableElements, ...tabbable(rootElement)];
@@ -173,8 +173,8 @@
 
         this.stack.push(tabbingContext);
 
-        // Activates the tabbingContext; this will manipulate the DOM to constrain
-        // tabbing.
+        // Activates the tabbingContext; this will manipulate the DOM to
+        // constrain tabbing.
         tabbingContext.activate();
 
         // Allow modules to respond to the constrain event.
@@ -187,8 +187,9 @@
        * Restores a former tabbingContext when an active one is released.
        *
        * The TabbingManager stack of tabbingContext instances will be unwound
-       * from the top-most released tabbingContext down to the first non-released
-       * tabbingContext instance. This non-released instance is then activated.
+       * from the top-most released tabbingContext down to the first
+       * non-released tabbingContext instance. This non-released instance is
+       * then activated.
        */
       release() {
         // Unwind as far as possible: find the topmost non-released
@@ -199,7 +200,8 @@
         }
 
         // Delete all tabbingContexts after the to be activated one. They have
-        // already been deactivated, so their effect on the DOM has been reversed.
+        // already been deactivated, so their effect on the DOM has been
+        // reversed.
         this.stack.splice(toActivate + 1);
 
         // Get topmost tabbingContext, if one exists, and activate it.

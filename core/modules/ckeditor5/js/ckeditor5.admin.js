@@ -367,10 +367,10 @@
           // triggering the event, the event could trigger changes in the state.
           // Changes to the state trigger re-rendering of the admin UI, which
           // means that for consistent navigation, each action modifying state
-          // needs to set focus back on the button that is being moved. The state
-          // change also triggers an AJAX request which re-renders parts of the
-          // form, and moves the focus to the triggering form element, meaning
-          // that focus needs to be set back on the button again.
+          // needs to set focus back on the button that is being moved. The
+          // state change also triggers an AJAX request which re-renders parts
+          // of the form, and moves the focus to the triggering form element,
+          // meaning that focus needs to be set back on the button again.
           const supportedKeys = [
             'ArrowLeft',
             'ArrowRight',
@@ -395,8 +395,8 @@
                     event.currentTarget,
                     announceChange,
                   );
-                  // Focus the last button since new button is always added to the
-                  // end of the list.
+                  // Focus the last button since new button is always added to
+                  // the end of the list.
                   root
                     .querySelector(
                       '[data-button-list="ckeditor5-toolbar-active-buttons"] li:last-child',
@@ -421,9 +421,9 @@
                     event.currentTarget,
                     leftOffset,
                   );
-                  // Move focus to left or right from the current index depending
-                  // on current language direction. Use index instead of the
-                  // data-id because dividers don't have a unique ID.
+                  // Move focus to left or right from the current index
+                  // depending on current language direction. Use index instead
+                  // of the data-id because dividers don't have a unique ID.
                   root
                     .querySelectorAll(
                       '[data-button-list="ckeditor5-toolbar-active-buttons"] li',
@@ -438,9 +438,9 @@
                     event.currentTarget,
                     rightOffset,
                   );
-                  // Move focus to right or left from the current index depending
-                  // on current language direction. Use index instead of the
-                  // data-id because dividers don't have a unique ID.
+                  // Move focus to right or left from the current index
+                  // depending on current language direction. Use index instead
+                  // of the data-id because dividers don't have a unique ID.
                   root
                     .querySelectorAll(
                       '[data-button-list="ckeditor5-toolbar-active-buttons"] li',
@@ -463,8 +463,8 @@
                     announceChange,
                   );
                   // Focus only if the button wasn't a divider because dividers
-                  // are simply removed from the active buttons instead of moving
-                  // to another list.
+                  // are simply removed from the active buttons instead of
+                  // moving to another list.
                   if (
                     !dividerButtons.find(
                       (dividerButton) =>
@@ -502,8 +502,8 @@
                     event.currentTarget,
                     announceChange,
                   );
-                  // Focus the last button since new button is always added to the
-                  // end of the list.
+                  // Focus the last button since new button is always added to
+                  // the end of the list.
                   root
                     .querySelector(
                       '[data-button-list="ckeditor5-toolbar-active-buttons"] li:last-child',
@@ -642,10 +642,12 @@
       });
 
       /**
-       * Updates the UI state info in the form's 'data-drupal-ui-state' attribute.
+       * Updates the UI state info in the form's 'data-drupal-ui-state'
+       * attribute.
        *
        * @param {object} states
-       *   An object with one or more items with the structure { ui-property: stored-value }
+       *   An object with one or more items with the structure
+       *   { ui-property:stored-value }
        */
       const updateUiStateStorage = (states) => {
         const form = document.querySelector(

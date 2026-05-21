@@ -60,7 +60,8 @@ export default class DrupalElementStyleCommand extends Command {
     this.isEnabled = !!element;
 
     if (this.isEnabled) {
-      // Assign value to be corresponding command value based on the element's modelAttribute.
+      // Assign value to be corresponding command value based on the element's
+      // modelAttribute.
       this.value = this.getValue(element);
     } else {
       this.value = false;

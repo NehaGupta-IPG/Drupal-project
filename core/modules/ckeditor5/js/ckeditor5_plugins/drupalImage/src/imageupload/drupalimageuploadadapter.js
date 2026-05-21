@@ -101,8 +101,8 @@ export default class DrupalImageUploadAdapter {
       if (!response || response.error) {
         return reject(response?.error?.message || genericErrorText);
       }
-      // Resolve with the `urls` property and pass the response
-      // to allow customizing the behavior of features relying on the upload adapters.
+      // Resolve with the `urls` property and pass the response to allow
+      // customizing the behavior of features relying on the upload adapters.
       resolve({
         response,
         urls: { default: response.url },

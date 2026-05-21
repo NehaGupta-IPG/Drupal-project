@@ -12,7 +12,9 @@ import { METADATA_ERROR } from './utils';
  */
 export default class MediaImageTextAlternativeCommand extends Command {
   /**
-   * The command value: `false` if there is no `alt` attribute, otherwise the value of the `alt` attribute.
+   * The command value: `false` if there is no `alt` attribute, otherwise the
+   * value of the `alt` attribute.
+   */
 
   /**
    * @inheritdoc
@@ -37,7 +39,8 @@ export default class MediaImageTextAlternativeCommand extends Command {
    *
    * @param {Object} options
    *   An options object.
-   * @param {String} options.newValue The new value of the `alt` attribute to set.
+   * @param {String} options.newValue
+   *   The new value of the `alt` attribute to set.
    */
   execute(options) {
     const { model } = this.editor;

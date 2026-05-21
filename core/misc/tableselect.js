@@ -111,8 +111,8 @@
         $(this).closest('tr').toggleClass('selected', this.checked);
 
         // If this is a shift click, we need to highlight everything in the
-        // range. Also make sure that we are actually checking checkboxes
-        // over a range and that a checkbox has been checked or unchecked before.
+        // range. Also make sure that we are actually checking checkboxes over
+        // a range and that a checkbox has been checked or unchecked before.
         if (e.shiftKey && lastChecked && lastChecked !== e.target) {
           // We use the checkbox's parent <tr> to do our range searching.
           Drupal.tableSelectRange(
@@ -122,8 +122,8 @@
           );
         }
 
-        // If all checkboxes are checked, make sure the select-all one is checked
-        // too, otherwise keep unchecked.
+        // If all checkboxes are checked, make sure the select-all one is
+        // checked too, otherwise keep unchecked.
         updateSelectAll(
           checkboxes.length === checkboxes.filter(':checked').length,
         );

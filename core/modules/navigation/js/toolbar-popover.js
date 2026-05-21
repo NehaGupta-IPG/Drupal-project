@@ -16,7 +16,8 @@ const POPOVER_NO_CLICK_DELAY = 500;
     /**
      * Attaches the behavior to the context element.
      *
-     * @param {HTMLElement} context The context element to attach the behavior to.
+     * @param {HTMLElement} context
+     *   The context element to attach the behavior to.
      */
     attach: (context) => {
       once(
