@@ -19,7 +19,6 @@ use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\RenderableInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
-use Drupal\Core\Theme\Registry;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -40,11 +39,6 @@ use Symfony\Component\Mime\Email;
  * @see \Drupal\Core\Mailer\EmailPluginInterface
  */
 class EmailManager extends DefaultPluginManager {
-
-  /**
-   * The theme registry (unused)
-   */
-  protected Registry $themeRegistry;
 
   /**
    * {@inheritdoc}
@@ -86,8 +80,6 @@ class EmailManager extends DefaultPluginManager {
   ) {
     parent::__construct('Plugin/Email', $namespaces, $module_handler, EmailPluginInterface::class, EmailAttribute::class);
     $this->factory = new ContainerFactory($this, EmailPluginInterface::class);
-    $this->renderer = $renderer;
-    $this->mailer = $mailer;
     $this->alterInfo('email_info');
     $this->setCacheBackend($cache_backend, 'email_plugins');
   }
