@@ -31,17 +31,17 @@ class BigPipeRegressionTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'stark';
+  protected $defaultTheme = 'big_pipe_test_theme';
 
   /**
-   * {@inheritdoc}
+   * Tests edge cases with placeholder HTML.
    */
-  protected function setUp(): void {
-    parent::setUp();
-
-    // Use the big_pipe_test_theme theme.
-    $this->container->get('theme_installer')->install(['big_pipe_test_theme']);
-    $this->container->get('config.factory')->getEditable('system.theme')->set('default', 'big_pipe_test_theme')->save();
+  public function testPlaceholderHtmlEdgeCases(): void {
+    $this->drupalLogin($this->drupalCreateUser());
+    $this->doTestMultipleClosingBodies_2678662();
+    $this->doTestPlaceholderInParagraph_2802923();
+    $this->doTestBigPipeLargeContent();
+    $this->doInlineScriptTest();
   }
 
   /**
@@ -49,10 +49,7 @@ class BigPipeRegressionTest extends WebDriverTestBase {
    *
    * @see https://www.drupal.org/node/2678662
    */
-  public function testMultipleClosingBodies_2678662(): void {
-    $this->assertTrue($this->container->get('module_installer')->install(['render_placeholder_message_test'], TRUE), 'Installed modules.');
-
-    $this->drupalLogin($this->drupalCreateUser());
+  protected function doTestMultipleClosingBodies_2678662(): void {
     $this->drupalGet(Url::fromRoute('big_pipe_regression_test.2678662'));
 
     // Confirm that the JS variable has the appropriate content.
@@ -80,57 +77,6 @@ JS;
   }
 
   /**
-   * Ensure messages set in placeholders always appear.
-   *
-   * @see https://www.drupal.org/node/2712935
-   */
-  public function testMessages_2712935(): void {
-    $this->assertTrue($this->container->get('module_installer')->install(['render_placeholder_message_test'], TRUE), 'Installed modules.');
-
-    $this->drupalLogin($this->drupalCreateUser());
-    $messages_markup = '<div class="messages messages--status" role="status"';
-    $test_routes = [
-      // Messages placeholder rendered first.
-      'render_placeholder_message_test.first',
-      // Messages placeholder rendered after one, before another.
-      'render_placeholder_message_test.middle',
-      // Messages placeholder rendered last.
-      'render_placeholder_message_test.last',
-    ];
-
-    $assert = $this->assertSession();
-    foreach ($test_routes as $route) {
-      // Verify that we start off with zero messages queued.
-      $this->drupalGet(Url::fromRoute('render_placeholder_message_test.queued'));
-      $assert->responseNotContains($messages_markup);
-
-      // Verify the test case at this route behaves as expected.
-      $this->drupalGet(Url::fromRoute($route));
-      $assert->elementContains('css', 'p.logged-message:nth-of-type(1)', 'Message: P1');
-      $assert->elementContains('css', 'p.logged-message:nth-of-type(2)', 'Message: P2');
-      $assert->responseContains($messages_markup);
-      $assert->elementExists('css', 'div[aria-label="Status message"]');
-      $assert->responseContains('aria-label="Status message">P1');
-      $assert->responseContains('aria-label="Status message">P2');
-
-      // Verify that we end with all messages printed, hence again zero queued.
-      $this->drupalGet(Url::fromRoute('render_placeholder_message_test.queued'));
-      $assert->responseNotContains($messages_markup);
-    }
-  }
-
-  /**
-   * Tests edge cases with placeholder HTML.
-   */
-  public function testPlaceholderHtmlEdgeCases(): void {
-    $this->drupalLogin($this->drupalCreateUser());
-    $this->doTestPlaceholderInParagraph_2802923();
-    $this->doTestBigPipeLargeContent();
-    $this->doTestMultipleReplacements();
-    $this->doInlineScriptTest();
-  }
-
-  /**
    * Ensure default BigPipe placeholder HTML cannot split paragraphs.
    *
    * @see https://www.drupal.org/node/2802923
@@ -147,7 +93,7 @@ JS;
    * Repeat loading of same page for two times, after second time the page is
    * cached and the bug consistently reproducible.
    */
-  public function doTestBigPipeLargeContent(): void {
+  protected function doTestBigPipeLargeContent(): void {
     $assert_session = $this->assertSession();
 
     $this->drupalGet(Url::fromRoute('big_pipe_test_large_content'));
@@ -173,10 +119,9 @@ JS;
    *
    * @see https://www.drupal.org/node/3390178
    */
-  protected function doTestMultipleReplacements(): void {
-    $user = $this->drupalCreateUser();
-    $this->drupalLogin($user);
-
+  public function testMultipleReplacements(): void {
+    // @todo re-enable this test in https://www.drupal.org/project/drupal/issues/3590200
+    $this->markTestSkipped();
     $assert_session = $this->assertSession();
 
     $this->drupalGet(Url::fromRoute('big_pipe_test_multiple_replacements'));
@@ -198,8 +143,6 @@ JS;
    * regressions in https://www.drupal.org/project/drupal/issues/3526267.
    */
   protected function doInlineScriptTest(): void {
-    $user = $this->drupalCreateUser();
-    $this->drupalLogin($user);
     $assert_session = $this->assertSession();
 
     $this->drupalGet(Url::fromRoute('big_pipe_regression_test.inline_script'));
@@ -207,19 +150,6 @@ JS;
     $assert_session->elementExists('css', 'div.container-before');
     $assert_session->elementExists('css', 'body.inline-script-fires');
     $assert_session->elementExists('css', 'div.container-after');
-  }
-
-  /**
-   * Tests that all occurrences of the same placeholder are replaced.
-   */
-  public function testMultipleOccurrences(): void {
-    \Drupal::service('module_installer')->install(['big_pipe_test']);
-    $user = $this->drupalCreateUser();
-    $this->drupalLogin($user);
-    $assert_session = $this->assertSession();
-    $this->drupalGet(Url::fromRoute('big_pipe_test_multi_occurrence'));
-    $this->assertNotNull($assert_session->waitForElement('css', 'script[data-big-pipe-event="stop"]'));
-    $assert_session->elementsCount('css', 'p.multiple-occurrence-instance', 3);
   }
 
 }

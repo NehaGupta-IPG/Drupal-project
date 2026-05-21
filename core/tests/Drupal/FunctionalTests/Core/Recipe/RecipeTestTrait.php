@@ -85,7 +85,7 @@ trait RecipeTestTrait {
   /**
    * Runs the `core/scripts/drupal` script with the given arguments.
    *
-   * @param string[] $arguments
+   * @param array<string|int> $arguments
    *   The arguments and options to pass to the script.
    * @param int $timeout
    *   (optional) How long the command should run before timing out, in seconds.
@@ -100,7 +100,7 @@ trait RecipeTestTrait {
     array_unshift($arguments, (new PhpExecutableFinder())->find(), 'core/scripts/drupal');
 
     $process = (new Process($arguments))
-      ->setWorkingDirectory($this->getDrupalRoot())
+      ->setWorkingDirectory($this->root)
       ->setEnv([
         'DRUPAL_DEV_SITE_PATH' => $this->siteDirectory,
         // Ensure that the command boots Drupal into a state where it knows it's

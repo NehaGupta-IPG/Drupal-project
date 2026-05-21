@@ -26,8 +26,8 @@ class ShortcutLocalTasksTest extends LocalTaskIntegrationTestBase {
     parent::setUp();
 
     // Add services required for user local tasks.
-    $entity_type_manager = $this->createMock(EntityTypeManagerInterface::class);
-    $entity_type_manager->expects($this->any())
+    $entity_type_manager = $this->createStub(EntityTypeManagerInterface::class);
+    $entity_type_manager
       ->method('getDefinitions')
       ->willReturn([]);
     $this->container->set('entity_type.manager', $entity_type_manager);
@@ -38,7 +38,7 @@ class ShortcutLocalTasksTest extends LocalTaskIntegrationTestBase {
    * Checks shortcut listing local tasks.
    */
   #[DataProvider('getShortcutPageRoutes')]
-  public function testShortcutPageLocalTasks($route): void {
+  public function testShortcutPageLocalTasks(string $route): void {
     $tasks = [
       0 => ['shortcut.set_switch', 'entity.user.canonical', 'entity.user.edit_form'],
     ];
@@ -48,7 +48,7 @@ class ShortcutLocalTasksTest extends LocalTaskIntegrationTestBase {
   /**
    * Provides a list of routes to test.
    */
-  public static function getShortcutPageRoutes() {
+  public static function getShortcutPageRoutes(): array {
     return [
       ['entity.user.canonical'],
       ['entity.user.edit_form'],
