@@ -35,16 +35,6 @@ interface EmailPluginInterface extends PluginInspectionInterface, ContainerFacto
   public function getKey(): string;
 
   /**
-   * Returns the HTML body template ID.
-   */
-  public function getHtmlBodyTemplate(): ?string;
-
-  /**
-   * Returns the text body template ID.
-   */
-  public function getTextBodyTemplate(): ?string;
-
-  /**
    * Returns the email HTML body.
    */
   public function htmlBody(): RenderableInterface|array|null;
