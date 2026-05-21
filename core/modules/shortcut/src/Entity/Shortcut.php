@@ -178,9 +178,6 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
    * Sorts entities using collator.
    */
   public static function sortEntities(array &$entities): bool {
-    // En is hardcoded because Symfony\Polyfill\Intl\Icu\Collator::create() is
-    // throwing an exception, if locale is not en. It is the only implemented
-    // language in the polyfill.
     $collator = NULL;
     if (extension_loaded('intl')) {
       $collator = \Collator::create(\Drupal::service('language_manager')->getCurrentLanguage()->getId());
