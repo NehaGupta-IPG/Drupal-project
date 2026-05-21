@@ -244,6 +244,59 @@ abstract class Connection {
     return $this->connection;
   }
 
+  final public function reconnect(): void {
+    // Getting connection will open the connection again.
+    $newConnection = Database::getConnection();
+
+    // All the other references to this service instance will be retained, so
+    // hot-swap the new connection into this instance.
+    // The protected property since this is the same class.
+    $this->connection = $newConnection->connection;
+  }
+
+  final public function close(): void {
+    // Forcibly close the PDO connection.
+    // https://www.php.net/manual/en/pdo.connections.php#example-1058
+    $this->connection = NULL;
+
+    Database::closeConnection();
+  }
+
+  /**
+   * Checks if connection is alive and re-attempts connection when disconnected.
+   *
+   * Sends a dummy query to check if the database connection is available. The
+   * query is simple enough to never fail, unless there is a database or other
+   * infrastructure problem. When a problem is detected, an attempt to recreate
+   * the connection will be made. If an error persists, the associated exception
+   * will be bubbled up.
+   *
+   * @throws \PDOException
+   *   When the server is not available after a new attempt to create a
+   *   connection.
+   */
+  final public function ping(): void {
+    // When the connection is forcibly closed by close(), avoid the dummy SQL
+    // and try connecting.
+    if ($this->connection === NULL) {
+      $this->reconnect();
+      return;
+    }
+
+    $dummySql = $this->getDummySelectSQL();
+    try {
+      $this->connection->query($dummySql);
+    }
+    catch (\PDOException) {
+      $this->close();
+      $this->reconnect();
+
+      // If the connection is truly gone, this will throw the now-uncaught
+      // exception again.
+      $this->connection->query($dummySql);
+    }
+  }
+
   /**
    * Returns the default query options for any given query.
    *
@@ -1610,6 +1663,15 @@ abstract class Connection {
     // @todo Allow a backtrace including all arguments as an option.
     //   https://www.drupal.org/project/drupal/issues/3401906
     return debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+  }
+
+  /**
+   * A query guaranteed to complete if the connection and database is healthy.
+   *
+   * This query has no side effects.
+   */
+  public function getDummySelectSQL(): string {
+    return 'SELECT 1';
   }
 
 }
