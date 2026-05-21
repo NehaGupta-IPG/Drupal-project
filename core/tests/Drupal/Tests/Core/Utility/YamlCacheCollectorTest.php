@@ -6,11 +6,9 @@ namespace Drupal\Tests\Core\Cache;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Datetime\Time;
-use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\Cache\CacheCollector;
-use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Lock\NullLockBackend;
 use Drupal\Core\Utility\YamlCacheCollector;
@@ -35,6 +33,9 @@ class YamlCacheCollectorTest extends UnitTestCase {
    */
   protected LockBackendInterface $lock;
 
+  /**
+   * The time instance that should be used.
+   */
   protected TimeInterface $time;
 
   /**
@@ -67,7 +68,7 @@ class YamlCacheCollectorTest extends UnitTestCase {
   /**
    * Tests the ::updateCache() function.
    */
-  public function testUpdatecache(): void {
+  public function testUpdateCache(): void {
     $this->cacheBackend->set('key', [
       '/foo/bar/foo_bar.txt' => [
         'data' => [TRUE],
