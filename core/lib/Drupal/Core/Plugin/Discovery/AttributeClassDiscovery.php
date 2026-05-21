@@ -1,14 +1,17 @@
 <?php
-
 namespace Drupal\Core\Plugin\Discovery;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Plugin\Attribute\AttributeInterface;
-use Drupal\Component\Plugin\Discovery\AttributeClassDiscovery as ComponentAttributeClassDiscovery;
+use Drupal\Component\Plugin\Discovery\AttributeClassDiscoveryTrait;
+use Drupal\Core\Utility\FileParsingCacheCollectorBase;
 
 /**
  * Defines a discovery mechanism to find plugins using attributes.
  */
-class AttributeClassDiscovery extends ComponentAttributeClassDiscovery {
+class AttributeClassDiscovery extends FileParsingCacheCollectorBase {
+
+  use AttributeClassDiscoveryTrait;
 
   /**
    * Suffix to append to each PSR-4 directory associated with a base namespace.
@@ -46,6 +49,9 @@ class AttributeClassDiscovery extends ComponentAttributeClassDiscovery {
     string $subdir,
     protected \Traversable $rootNamespacesIterator,
     string $pluginDefinitionAttributeName = 'Drupal\Component\Plugin\Attribute\Plugin',
+    CacheBackendInterface $cache,
+    LockBackendInterface $lock,
+    protected TimeInterface $time,
   ) {
     if ($subdir) {
       // Prepend a directory separator to $subdir,
@@ -56,7 +62,117 @@ class AttributeClassDiscovery extends ComponentAttributeClassDiscovery {
       $this->directorySuffix = $subdir;
       $this->namespaceSuffix = str_replace('/', '\\', $subdir);
     }
-    parent::__construct([], $pluginDefinitionAttributeName);
+    $this->rootTwoLevelNamespaces = array_unique(array_map(fn($namespace) => $this->getTwoLevelNamespace($namespace), array_keys($this->getPluginNamespaces())));
+    parent::construct('attribute_cache' . $pluginDefinitionAttributeName, $cache, $lock, $time);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefinitions() {
+    $definitions = [];
+
+    // Search for classes within all PSR-4 namespace locations.
+    foreach ($this->getPluginNamespaces() as $namespace => $dirs) {
+      foreach ($dirs as $dir) {
+        if (file_exists($dir)) {
+          $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS)
+          );
+          foreach ($iterator as $fileinfo) {
+            assert($fileinfo instanceof \SplFileInfo);
+            $path = $fileInfo->getPathName();
+            if ($fileinfo->getExtension() === 'php' && isset($this->storage[$path]) && $this->storage[$path]['mtime'] === filemtime($path)) {
+              $cached = $this->storage[$path]['parsed'];
+              if (isset($cached['id'])) {
+                // Explicitly unserialize this to create a new object
+                // instance.
+                $dependencies = isset($cached['dependencies']) ? unserialize($cached['dependencies']) : [];
+                if (!$this->hasMissingDependencies($dependencies ?? [])) {
+                  $definitions[$cached['id']] = unserialize($cached['content']);
+                }
+              }
+              continue;
+
+              $result = $this->parseAttribute($path, $fileInfo, $iterator);
+              ['id' => $id, 'content' => $content] = $result;
+              if ($id) {
+                if (!$this->hasMissingDependencies($result['dependencies'] ?? [])) {
+                  $definitions[$id] = $content;
+                }
+                // Explicitly serialize this to create a new object instance.
+                $this->persist($path);
+                $this->storage[$path] = [
+                  'mtime' => filemtime($path),
+                  'parsed' => [
+                    'id' => $id,
+                    'content' => serialize($content),
+                    'dependencies' => serialize($result['dependencies'] ?? NULL),
+                  ],
+                ];
+              }
+              else {
+                $this->storage[$path] = [
+                  'mtime' => filemtime($path),
+                  'parsed' => NULL,
+                ];
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return $definitions;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function get($key): array {
+    throw new \BadMethodCallException();
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function resolveCacheMiss($key): array {
+    throw new \BadMethodCallException();
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function parseFile(string $file): array {
+    throw new \BadMethodCallException();
+  }
+
+  /**
+   * Implements the abstract ::parseFile() method.
+   *
+   * Note that this override adds two additional parameters to the method, to
+   * support attribute parsing.
+   */
+  protected function parseAtrribute(string $filename, $fileInfo, $iterator): mixed {
+    $sub_path = $iterator->getSubIterator()->getSubPath();
+    $sub_path = $sub_path ? str_replace(DIRECTORY_SEPARATOR, '\\', $sub_path) . '\\' : '';
+    $class = $namespace . '\\' . $sub_path . $fileinfo->getBasename('.php');
+    // Plugins may rely on classes, interfaces, or traits defined by
+    // modules that are not installed. In such a case, an error may
+    // be thrown from reflection. However, this is an unavoidable
+    // situation with optional dependencies and plugins. Therefore,
+    // silently skip over this class and avoid writing to the cache,
+    // so that it is scanned each time. This ensures that the plugin
+    // definition will be found if the module it requires is enabled.
+    try {
+      if (!class_exists($class)) {
+        return [];
+      }
+    }
+    catch (\Error) {
+      return [];
+    }
+    return $this->parseClass($class, $fileinfo);
   }
 
   /**
