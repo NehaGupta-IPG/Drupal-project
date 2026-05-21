@@ -96,14 +96,14 @@ abstract class EmailPluginBase extends PluginBase implements EmailPluginInterfac
   }
 
   /**
-   * {@inheritdoc}
+   * Returns the email HTML body.
    */
   public function getHtmlBodyTemplate(): ?string {
     return $this->pluginDefinition['html_body_template'];
   }
 
   /**
-   * {@inheritdoc}
+   * Returns the email text body.
    */
   public function getTextBodyTemplate(): ?string {
     return $this->pluginDefinition['text_body_template'];
