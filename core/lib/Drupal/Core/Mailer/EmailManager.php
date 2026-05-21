@@ -171,14 +171,18 @@ class EmailManager extends DefaultPluginManager {
         $assets = AttachedAssets::createFromRenderArray($email_data['body']['html']);
       }
       if (isset($email_data['body']['text'])) {
-        $symfony_email->text((string) $this->renderer->render($email_data['body']['text']));
-        $metadata = $metadata->merge(BubbleableMetadata::createFromRenderArray($email_data['body']['text']));
+        if (is_array($email_data['body']['text'])) {
+          $symfony_email->text((string) $this->renderer->render($email_data['body']['text']));
+          $metadata = $metadata->merge(BubbleableMetadata::createFromRenderArray($email_data['body']['text']));
+        }
+        else {
+          $symfony_email->text((string) $email_data['body']['text']);
+        }
       }
 
       $context = [
         'email' => $email,
         'body' => $email_data['body'],
-        'cacheable_metadata' => $metadata,
         'assets' => $assets,
       ];
       $this->moduleHandler->alter('email_post_render', $symfony_email, $context);

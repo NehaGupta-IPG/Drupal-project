@@ -117,7 +117,7 @@ abstract class EmailPluginBase extends PluginBase implements EmailPluginInterfac
   /**
    * {@inheritdoc}
    */
-  public function textBody(): RenderableInterface|array|null {
+  public function textBody(): RenderableInterface|\Stringable|array|null {
     return NULL;
   }
 

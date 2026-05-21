@@ -52,7 +52,7 @@ interface EmailPluginInterface extends PluginInspectionInterface, ContainerFacto
   /**
    * Returns the email text body.
    */
-  public function textBody(): RenderableInterface|array|null;
+  public function textBody(): RenderableInterface|\Stringable|array|null;
 
   /**
    * Returns the default email subject.
