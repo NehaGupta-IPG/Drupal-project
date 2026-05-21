@@ -6,6 +6,7 @@ namespace Drupal\Core\Mailer;
 
 use Drupal\Component\Plugin\Discovery\AttributeBridgeDecorator;
 use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
+use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Mailer\Attribute\Email as EmailAttribute;
@@ -163,9 +164,11 @@ class EmailManager extends DefaultPluginManager {
         $symfony_email->getHeaders()->addHeader($name, $value);
       }
 
+      $assets = new AttachedAssets();
       if (isset($email_data['body']['html'])) {
         $symfony_email->html((string) $this->renderer->render($email_data['body']['html']));
         $metadata = $metadata->merge(BubbleableMetadata::createFromRenderArray($email_data['body']['html']));
+        $assets = AttachedAssets::createFromRenderArray($email_data['body']['html']);
       }
       if (isset($email_data['body']['text'])) {
         $symfony_email->text((string) $this->renderer->render($email_data['body']['text']));
@@ -176,6 +179,7 @@ class EmailManager extends DefaultPluginManager {
         'email' => $email,
         'body' => $email_data['body'],
         'cacheable_metadata' => $metadata,
+        'assets' => $assets,
       ];
       $this->moduleHandler->alter('email_post_render', $symfony_email, $context);
 
