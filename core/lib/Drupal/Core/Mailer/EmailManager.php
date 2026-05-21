@@ -165,11 +165,11 @@ class EmailManager extends DefaultPluginManager {
 
       if (isset($email_data['body']['html'])) {
         $symfony_email->html((string) $this->renderer->render($email_data['body']['html']));
-        $metadata->merge(BubbleableMetadata::createFromRenderArray($email_data['body']['html']));
+        $metadata = $metadata->merge(BubbleableMetadata::createFromRenderArray($email_data['body']['html']));
       }
       if (isset($email_data['body']['text'])) {
         $symfony_email->text((string) $this->renderer->render($email_data['body']['text']));
-        $metadata->merge(BubbleableMetadata::createFromRenderArray($email_data['body']['text']));
+        $metadata = $metadata->merge(BubbleableMetadata::createFromRenderArray($email_data['body']['text']));
       }
 
       $context = [
