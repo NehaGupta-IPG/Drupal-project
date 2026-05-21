@@ -92,7 +92,7 @@ class UserTemplateTest extends KernelTestBase {
       '#account' => $this->user,
     ];
     $this->setRawContent($this->renderer->renderRoot($build));
-    $this->assertEscaped($this->t('- Restricted access -'), 'Account does not have permission to view user name.');
+    $this->assertEscaped((string) $this->t('- Restricted access -'), 'Account does not have permission to view user name.');
   }
 
   /**
