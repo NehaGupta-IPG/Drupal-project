@@ -188,7 +188,7 @@ class WorkspacesContentModerationStateTest extends ContentModerationStateTest {
       $this->fail('The expected exception was not thrown.');
     }
     catch (WorkspacePublishException $e) {
-      $this->assertStringStartsWith('The Stage workspace can not be published because it contains 1 item in an unpublished moderation state.', $e->getMessage());
+      $this->assertStringStartsWith('The Stage workspace can not be published because it contains 1 item in an unpublished moderation state:', $e->getMessage());
     }
 
     // Get the $article_draft node to a publishable state and try again.
