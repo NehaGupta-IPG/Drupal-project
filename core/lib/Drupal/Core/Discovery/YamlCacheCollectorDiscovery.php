@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\Discovery;
 
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
@@ -23,7 +25,7 @@ class YamlCacheCollectorDiscovery extends YamlDiscovery {
    * @param CacheCollectorInterface $yamlCacheCollector
    *   An instance of YamlCacheCollector.
    */
-  public function __construct($name, array $directories, protected YamlCacheCollector $yamlCacheCollector) {
+  public function __construct(string $name, array $directories, protected YamlCacheCollector $yamlCacheCollector) {
     parent::__construct($name, $directories);
   }
 
