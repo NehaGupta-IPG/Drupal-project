@@ -122,14 +122,14 @@ abstract class EmailPluginBase extends PluginBase implements EmailPluginInterfac
   }
 
   /**
-   * {@inheritdoc}
+   * Returns the default email subject.
    */
   public function getDefaultSubject(): \Stringable|string|null {
     return $this->pluginDefinition['default_subject'] ?? NULL;
   }
 
   /**
-   * {@inheritdoc}
+   * Returns the default recipients.
    */
   public function getDefaultRecipients(): ?array {
     return $this->pluginDefinition['default_recipients'] ?? NULL;

@@ -45,16 +45,6 @@ interface EmailPluginInterface extends PluginInspectionInterface, ContainerFacto
   public function textBody(): RenderableInterface|\Stringable|array|null;
 
   /**
-   * Returns the default email subject.
-   */
-  public function getDefaultSubject(): \Stringable|string|null;
-
-  /**
-   * Returns the default recipients.
-   */
-  public function getDefaultRecipients(): ?array;
-
-  /**
    * Performs pre-build operations.
    */
   public function preBuild(): static;
