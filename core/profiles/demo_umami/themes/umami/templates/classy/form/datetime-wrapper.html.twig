@@ -21,12 +21,7 @@
   ]
 %}
 {% if title %}
-  <h4{{ title_attributes.addClass(title_classes) }}>
-    {{- title -}}
-    {%- if required -%}
-      <span aria-hidden="true" class="hidden"> {{ '(required)'|t }}</span>
-    {%- endif -%}
-  </h4>
+  <h4{{ title_attributes.addClass(title_classes) }}>{{ title }}</h4>
 {% endif %}
 {{ content }}
 {% if errors %}

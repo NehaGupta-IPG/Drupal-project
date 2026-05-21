@@ -68,9 +68,6 @@
     %}
     <summary{{ summary_attributes.addClass(summary_classes) }}>
       {{- title -}}
-      {%- if required -%}
-        <span aria-hidden="true" class="hidden"> {{ '(required)'|t }}</span>
-      {%- endif -%}
       <span class="required-mark"></span>
       {% if show_description_toggle %}
         {{ attach_library('default_admin/description_toggle') }}

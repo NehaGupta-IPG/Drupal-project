@@ -73,12 +73,7 @@
   {# Always wrap fieldset legends in a <span> for CSS positioning. #}
   {% if legend.title %}
     <legend{{ legend.attributes.addClass(legend_classes) }}>
-      <span{{ legend_span.attributes.addClass(legend_span_classes) }}>
-        {{- legend.title -}}
-        {%- if required -%}
-          <span aria-hidden="true" class="hidden"> {{ '(required)'|t }}</span>
-        {%- endif -%}
-      </span>
+      <span{{ legend_span.attributes.addClass(legend_span_classes) }}>{{ legend.title }}</span>
     </legend>
   {% endif %}
   {% if show_description_toggle %}
