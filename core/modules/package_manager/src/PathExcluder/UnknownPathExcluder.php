@@ -32,7 +32,7 @@ use Symfony\Component\Filesystem\Path;
  *
  * This excluder can be disabled by changing the config setting
  * `package_manager.settings:include_unknown_files_in_project_root` to ["*"].
- * A more specific pattern can be used to include only certain files. This may
+ * Specific top-level paths can be used to include only certain files. This may
  * be needed for sites that have files outside the web root (besides the vendor
  * directory) which are nonetheless needed in order for Composer to assemble
  * the code base correctly; a classic example would be a directory of patch
@@ -174,7 +174,7 @@ final class UnknownPathExcluder implements EventSubscriberInterface, LoggerAware
     if ($excluded_paths) {
       sort($excluded_paths);
 
-      $message = $this->t("The following paths in @project_root aren't recognized as part of your Drupal site, so to be safe, Package Manager is excluding them from all stage operations. If these files are not needed for Composer to work properly in your site, no action is needed. Otherwise, you can disable this behavior by setting the <code>package_manager.settings:include_unknown_files_in_project_root</code> config setting to <code>TRUE</code>.\n\n@list", [
+      $message = $this->t("The following paths in @project_root aren't recognized as part of your Drupal site, so to be safe, Package Manager is excluding them from all stage operations. If these files are not needed for Composer to work properly in your site, no action is needed. Otherwise, you can disable this behavior by setting the <code>package_manager.settings:include_unknown_files_in_project_root</code> config setting to <code>*</code>.\n\n@list", [
         '@project_root' => $this->pathLocator->getProjectRoot(),
         '@list' => implode("\n", $excluded_paths),
       ]);

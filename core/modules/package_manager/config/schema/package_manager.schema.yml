@@ -18,10 +18,10 @@ package_manager.settings:
         label: 'Trusted composer plugin'
     include_unknown_files_in_project_root:
       type: sequence
-      label: 'Path patterns to include in the project root in staging operations'
+      label: 'Top-level paths to include in the project root in staging operations'
       sequence:
         type: string
-        label: 'Path pattern'
+        label: 'Top-level path'
         constraints:
           NotBlank: []
     log:

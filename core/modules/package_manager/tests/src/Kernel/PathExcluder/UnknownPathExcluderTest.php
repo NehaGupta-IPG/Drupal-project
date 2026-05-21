@@ -174,7 +174,7 @@ class UnknownPathExcluderTest extends PackageManagerKernelTestBase {
         ->addLogger($logger);
 
       $this->runStatusCheck($stage);
-      $this->assertTrue($logger->hasRecordThatContains("The following paths in $active_dir aren't recognized as part of your Drupal site, so to be safe, Package Manager is excluding them from all stage operations. If these files are not needed for Composer to work properly in your site, no action is needed. Otherwise, you can disable this behavior by setting the <code>package_manager.settings:include_unknown_files_in_project_root</code> config setting to <code>TRUE</code>.", RfcLogLevel::INFO));
+      $this->assertTrue($logger->hasRecordThatContains("The following paths in $active_dir aren't recognized as part of your Drupal site, so to be safe, Package Manager is excluding them from all stage operations. If these files are not needed for Composer to work properly in your site, no action is needed. Otherwise, you can disable this behavior by setting the <code>package_manager.settings:include_unknown_files_in_project_root</code> config setting to <code>*</code>.", RfcLogLevel::INFO));
       foreach ($unknown_files as $unknown_file) {
         // If $unknown_file is in a subdirectory, only the subdirectory is going
         // to be logged as an excluded path. The excluder doesn't recurse into
@@ -233,11 +233,12 @@ class UnknownPathExcluderTest extends PackageManagerKernelTestBase {
     $this->assertFileExists($stage->getSandboxDirectory() . '/unknown/file.txt');
     $stage->destroy();
 
-    $config->set('include_unknown_files_in_project_root', ['known/*.txt'])->save();
+    $config->set('include_unknown_files_in_project_root', ['known'])->save();
     $this->assertFileExists($project_root . '/unknown/file.txt');
     $stage->create();
     $this->assertFileExists($stage->getSandboxDirectory() . '/known/file.txt');
     $this->assertFileDoesNotExist($stage->getSandboxDirectory() . '/unknown/file.txt');
+    $stage->destroy();
 
     $config->set('include_unknown_files_in_project_root', [])->save();
     $this->assertFileExists($project_root . '/known/file.txt');
