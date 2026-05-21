@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceSafeFormInterface;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\Url;
 use Drupal\workspaces\WorkspaceAccessException;
 use Drupal\workspaces\WorkspaceInterface;
@@ -150,7 +151,7 @@ class WorkspacePublishForm extends ConfirmFormBase implements ContainerInjection
       $this->messenger()->addMessage($this->t('Successful publication.'));
     }
     catch (WorkspaceAccessException $e) {
-      $this->messenger()->addMessage($e->getMessage(), 'error');
+      $this->messenger()->addMessage(Markup::create($e->getMessage()), 'error');
     }
     catch (\Exception $e) {
       $this->messenger()->addMessage($this->t('Publication failed. All errors have been logged.'), 'error');
