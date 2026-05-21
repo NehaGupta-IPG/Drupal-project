@@ -19,14 +19,15 @@ class TimezoneController {
    *   time zone corresponding to abbreviation is returned. Otherwise exact
    *   offset is searched and only if not found then the first time zone with
    *   any offset is returned.
-   * @param null|int $is_daylight_saving_time
+   * @param int $is_daylight_saving_time
    *   Daylight saving time indicator. If abbreviation does not exist then the
-   *   time zone is searched solely by offset and is DST.
+   *   time zone is searched solely by offset and is DST. Defaults to -1 which
+   *   means that any DST value is accepted.
    *
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   The time zone identifier or 'false' in JsonResponse object.
    */
-  public function getTimezone($abbreviation = '', $offset = -1, $is_daylight_saving_time = NULL) {
+  public function getTimezone($abbreviation = '', $offset = -1, $is_daylight_saving_time = -1) {
     $offset = intval($offset);
     // Out of bounds check for offset. Offset +/- UTC is typically no
     // smaller/larger than -12/+14.
@@ -34,13 +35,12 @@ class TimezoneController {
       return new JsonResponse(FALSE);
     }
 
-    if (isset($is_daylight_saving_time)) {
-      $original = intval($is_daylight_saving_time);
-      $is_daylight_saving_time = min(1, max(-1, intval($is_daylight_saving_time)));
-      // Catch if out of boundary.
-      if ($original !== $is_daylight_saving_time) {
-        return new JsonResponse(FALSE);
-      }
+    $is_daylight_saving_time = $is_daylight_saving_time ?? -1;
+    $original = intval($is_daylight_saving_time);
+    $is_daylight_saving_time = min(1, max(-1, $original));
+    // Catch if out of boundary.
+    if ($original !== $is_daylight_saving_time) {
+      return new JsonResponse(FALSE);
     }
 
     // An abbreviation of "0" passed in the callback arguments should be
