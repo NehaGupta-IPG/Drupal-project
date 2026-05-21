@@ -91,8 +91,9 @@ class EmailManager extends DefaultPluginManager {
     if (!isset($this->discovery)) {
       $this->discovery = new AttributeClassDiscovery($this->subdir, $this->namespaces, $this->pluginDefinitionAttributeName);
       $this->discovery = new YamlDiscoveryDecorator($this->discovery, 'emails', $this->moduleHandler->getModuleDirectories());
-      $this->discovery->addTranslatableProperty('label', 'label_context');
-      $this->discovery->addTranslatableProperty('description', 'description_context');
+      $this->discovery->addTranslatableProperty('label')
+        ->addTranslatableProperty('description')
+        ->addTranslatableProperty('default_subject');
       $this->discovery = new AttributeBridgeDecorator($this->discovery, $this->pluginDefinitionAttributeName);
       $this->discovery = new ContainerDerivativeDiscoveryDecorator($this->discovery);
     }
