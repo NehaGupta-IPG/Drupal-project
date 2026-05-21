@@ -61,7 +61,7 @@ class RevisionsTabsUiTest extends WebDriverTestBase {
       $node->title = $this->randomMachineName();
       $node->body = [
         'value' => $this->randomMachineName(32),
-        'format' => \Drupal::service('filter.format.repository')->getDefaultFormat()->id(),
+        'format' => \Drupal::service(FilterFormatRepositoryInterface::class)->getDefaultFormat()->id(),
       ];
       $node->setNewRevision();
 
