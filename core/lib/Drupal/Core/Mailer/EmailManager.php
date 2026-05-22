@@ -128,8 +128,6 @@ class EmailManager extends DefaultPluginManager {
     $this->moduleHandler->alter('email_pre_build', $email);
 
     return $this->renderer->executeInRenderContext(new RenderContext(), function () use ($email) {
-      $metadata = new BubbleableMetadata();
-
       // Call preBuild to set defaults from the plugin class.
       $email->preBuild();
 
@@ -155,7 +153,6 @@ class EmailManager extends DefaultPluginManager {
       ];
       $context = [
         'email' => $email,
-        'cacheable_metadata' => $metadata,
       ];
       // $this->moduleHandler->alter('email_pre_render', $email_data, $context);
       $symfony_email = new $email_data['symfony_email_class']();
@@ -167,13 +164,11 @@ class EmailManager extends DefaultPluginManager {
       $assets = new AttachedAssets();
       if (isset($email_data['body']['html'])) {
         $symfony_email->html((string) $this->renderer->render($email_data['body']['html']));
-        $metadata = $metadata->merge(BubbleableMetadata::createFromRenderArray($email_data['body']['html']));
         $assets = AttachedAssets::createFromRenderArray($email_data['body']['html']);
       }
       if (isset($email_data['body']['text'])) {
         if (is_array($email_data['body']['text'])) {
           $symfony_email->text((string) $this->renderer->render($email_data['body']['text']));
-          $metadata = $metadata->merge(BubbleableMetadata::createFromRenderArray($email_data['body']['text']));
         }
         else {
           $symfony_email->text((string) $email_data['body']['text']);
