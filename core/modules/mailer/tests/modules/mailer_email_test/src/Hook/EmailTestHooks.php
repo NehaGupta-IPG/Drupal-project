@@ -24,7 +24,7 @@ class EmailTestHooks {
   #[Hook('email_pre_build_alter')]
   public function emailPreBuildAlter(EmailPluginInterface $plugin): void {
     foreach ($this->state->get('email_pre_build_alter.set_params', []) as $key => $value) {
-      $plugin->setParam($key, $value);
+      $plugin->setParameter($key, $value);
     }
 
     if (($langcode = $this->state->get('email_pre_build_alter.set_langcode', NULL))) {
@@ -41,8 +41,8 @@ class EmailTestHooks {
 
   #[Hook('email_post_render_alter')]
   public function emailPostRenderAlter(Email $symfonyEmail, array $context): void {
-    if ($this->state->get('email_post_render_alter.capture_render_metadata')) {
-      $this->state->set('email_post_render_alter.render_metadata', $context['cacheable_metadata']);
+    if ($this->state->get('email_post_render_alter.capture_assets')) {
+      $this->state->set('email_post_render_alter.assets', $context['assets']);
     }
   }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\mailer\Kernel;
 
+use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Mailer\EmailManager;
 use Drupal\Core\Mailer\EmailPluginInterface;
 use Drupal\Core\Render\BubbleableMetadata;
@@ -172,7 +173,7 @@ class EmailHooksTest extends KernelTestBase {
         ],
       ],
     ]);
-    \Drupal::state()->set('email_post_render_alter.capture_render_metadata', TRUE);
+    \Drupal::state()->set('email_post_render_alter.capture_assets', TRUE);
 
     $email = $emailManager->createInstance('mailer_email_test.html');
     assert($email instanceof EmailPluginInterface);
@@ -181,16 +182,10 @@ class EmailHooksTest extends KernelTestBase {
     $sentEmails = $this->getEmails();
     $this->assertCount(1, $sentEmails);
 
-    $metadata = \Drupal::state()->get('email_post_render_alter.render_metadata');
-    assert($metadata instanceof BubbleableMetadata);
-    $this->assertEquals([
-      'library' => [
-        'core/drupal.message',
-      ],
-      'drupalSettings' => [
-        'test' => 'setting',
-      ],
-    ], $metadata->getAttachments());
+    $assets = \Drupal::state()->get('email_post_render_alter.assets');
+    assert($assets instanceof AttachedAssets);
+    $this->assertEquals(['core/drupal.message'], $assets->getLibraries());
+    $this->assertEquals(['test' => 'setting'], $assets->getSettings());
   }
 
 }
