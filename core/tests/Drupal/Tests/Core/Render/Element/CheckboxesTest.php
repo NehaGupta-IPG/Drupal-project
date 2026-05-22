@@ -12,6 +12,9 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
+/**
+ * @covers \Drupal\Core\Render\Element\Checkboxes
+ */
 #[CoversClass(Checkboxes::class)]
 #[Group('Render')]
 class CheckboxesTest extends UnitTestCase {
