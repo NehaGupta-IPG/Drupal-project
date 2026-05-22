@@ -182,8 +182,24 @@ class RouteSubscriber extends RouteSubscriberBase {
         );
         $collection->add("entity.entity_form_display.{$entity_type_id}.form_mode", $route);
 
+        // Overview route for displaying all display modes.
         $route = new Route(
           "$path/display",
+          [
+            '_controller' => '\Drupal\field_ui\Controller\EntityViewDisplayOverviewController::overview',
+            '_title' => 'Manage display',
+          ] + $defaults,
+          [
+            '_field_ui_view_mode_access' => 'administer ' . $entity_type_id . ' display',
+            '_csrf_token' => 'FALSE',
+          ],
+          $options
+        );
+        $collection->add("entity.entity_view_display_overview.{$entity_type_id}", $route);
+
+        // Default display mode route.
+        $route = new Route(
+          "$path/display/default",
           [
             '_entity_form' => 'entity_view_display.edit',
             '_title' => 'Manage display',
@@ -194,6 +210,7 @@ class RouteSubscriber extends RouteSubscriberBase {
         );
         $collection->add("entity.entity_view_display.{$entity_type_id}.default", $route);
 
+        // Other view mode routes.
         $route = new Route(
           "$path/display/{view_mode_name}",
           [
@@ -204,6 +221,22 @@ class RouteSubscriber extends RouteSubscriberBase {
           $options
         );
         $collection->add("entity.entity_view_display.{$entity_type_id}.view_mode", $route);
+
+        // Enable/disable routes for AJAX.
+        $route = new Route(
+          "$path/display/{view_mode_name}/{operation}",
+          [
+            '_controller' => '\Drupal\field_ui\Controller\EntityViewDisplayStatusController::toggleStatus',
+            '_title' => 'Toggle display status',
+          ] + $defaults,
+          [
+            '_permission' => 'administer ' . $entity_type_id . ' display',
+            '_csrf_token' => 'TRUE',
+            'operation' => 'enable|disable',
+          ],
+          $options
+        );
+        $collection->add("entity.entity_view_display.{$entity_type_id}.toggle_status", $route);
       }
     }
   }
