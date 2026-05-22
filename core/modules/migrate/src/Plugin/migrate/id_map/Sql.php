@@ -573,16 +573,12 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
    * {@inheritdoc}
    */
   public function getRowsNeedingUpdate($count) {
-    $rows = [];
-    $result = $this->getDatabase()->select($this->mapTableName(), 'map')
+    return $this->getDatabase()->select($this->mapTableName(), 'map')
       ->fields('map')
       ->condition('source_row_status', MigrateIdMapInterface::STATUS_NEEDS_UPDATE)
       ->range(0, $count)
-      ->execute();
-    foreach ($result as $row) {
-      $rows[] = $row;
-    }
-    return $rows;
+      ->execute()
+      ->fetchAll();
   }
 
   /**

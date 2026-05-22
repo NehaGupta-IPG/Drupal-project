@@ -491,7 +491,7 @@ class Schema extends DatabaseSchema {
     ];
 
     $info = $this->getPrefixInfo($table);
-    $result = $this->connection->query('PRAGMA [' . $info['schema'] . '].table_info([' . $info['table'] . '])');
+    $result = $this->connection->query('PRAGMA [' . $info['schema'] . '].table_info([' . $info['table'] . '])')->fetchAll();
     foreach ($result as $row) {
       if (preg_match('/^([^(]+)\((.*)\)$/', $row->type, $matches)) {
         $type = $matches[1];
@@ -547,7 +547,7 @@ class Schema extends DatabaseSchema {
     $schema['primary key'] = array_values($schema['primary key']);
 
     $indexes = [];
-    $result = $this->connection->query('PRAGMA [' . $info['schema'] . '].index_list([' . $info['table'] . '])');
+    $result = $this->connection->query('PRAGMA [' . $info['schema'] . '].index_list([' . $info['table'] . '])')->fetchAll();
     foreach ($result as $row) {
       if (!str_starts_with($row->name, 'sqlite_autoindex_')) {
         $indexes[] = [
