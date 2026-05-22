@@ -70,11 +70,4 @@ class PdoResult extends ResultBase {
     return $this->clientFetch($mode);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function fetchAll(FetchAs $mode, array $fetchOptions): array {
-    return $this->clientFetchAll($mode, $fetchOptions['column'] ?? $fetchOptions['class'] ?? NULL, $fetchOptions['constructor_args'] ?? NULL);
-  }
-
 }
