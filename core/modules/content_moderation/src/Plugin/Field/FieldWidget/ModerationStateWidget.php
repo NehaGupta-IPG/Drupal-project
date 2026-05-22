@@ -121,7 +121,8 @@ class ModerationStateWidget extends OptionsSelectWidget {
       /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
       $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
       /** @var \Drupal\Core\Entity\ContentEntityInterface $original_entity */
-      $original_entity = $storage->loadRevision($entity->getLoadedRevisionId());
+      $revision_id = $entity->getLoadedRevisionId();
+      $original_entity = $revision_id ? ($storage->loadRevision($revision_id) ?? $entity) : $entity;
       if (!$entity->isDefaultTranslation() && $original_entity->hasTranslation($entity->language()->getId())) {
         $original_entity = $original_entity->getTranslation($entity->language()->getId());
       }

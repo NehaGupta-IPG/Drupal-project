@@ -244,7 +244,8 @@ class ModerationInformation implements ModerationInformationInterface {
   protected function isFirstTimeModeration(ContentEntityInterface $entity) {
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
-    $original_entity = $storage->loadRevision($storage->getLatestRevisionId($entity->id()));
+    $latest_revision_id = $storage->getLatestRevisionId($entity->id());
+    $original_entity = $latest_revision_id ? $storage->loadRevision($latest_revision_id) : NULL;
 
     if ($original_entity) {
       $original_id = $original_entity->moderation_state;
