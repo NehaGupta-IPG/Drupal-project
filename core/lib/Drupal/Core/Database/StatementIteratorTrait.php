@@ -111,7 +111,7 @@ trait StatementIteratorTrait {
    * @internal This method should not be called directly.
    */
   public function next(): void {
-    $this->fetch();
+    $this->fetch($this->fetchMode, $this->fetchOptions);
   }
 
   /**
@@ -126,7 +126,7 @@ trait StatementIteratorTrait {
    */
   public function valid(): bool {
     if ($this->isResultsetIterable && $this->resultsetKey === -1) {
-      $this->fetch();
+      $this->fetch($this->fetchMode, $this->fetchOptions);
     }
     return $this->isResultsetIterable;
   }
