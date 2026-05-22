@@ -4,6 +4,8 @@ namespace Drupal\Core\Plugin\Discovery;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Plugin\Attribute\AttributeInterface;
 use Drupal\Component\Plugin\Discovery\AttributeClassDiscoveryTrait;
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Utility\FileParsingCacheCollectorBase;
 
 /**
@@ -11,7 +13,11 @@ use Drupal\Core\Utility\FileParsingCacheCollectorBase;
  */
 class AttributeClassDiscovery extends FileParsingCacheCollectorBase {
 
-  use AttributeClassDiscoveryTrait;
+  use AttributeClassDiscoveryTrait {
+    prepareAttributeDefinition as traitPrepareAttributeDefinition;
+    getClassDependencies as traitGetClassDependencies;
+    hasMissingDependencies as traitHasMissingDependencies;
+  }
 
   /**
    * Suffix to append to each PSR-4 directory associated with a base namespace.
@@ -48,7 +54,7 @@ class AttributeClassDiscovery extends FileParsingCacheCollectorBase {
   public function __construct(
     string $subdir,
     protected \Traversable $rootNamespacesIterator,
-    string $pluginDefinitionAttributeName = 'Drupal\Component\Plugin\Attribute\Plugin',
+    protected string $pluginDefinitionAttributeName = 'Drupal\Component\Plugin\Attribute\Plugin',
     CacheBackendInterface $cache,
     LockBackendInterface $lock,
     protected TimeInterface $time,
@@ -63,7 +69,7 @@ class AttributeClassDiscovery extends FileParsingCacheCollectorBase {
       $this->namespaceSuffix = str_replace('/', '\\', $subdir);
     }
     $this->rootTwoLevelNamespaces = array_unique(array_map(fn($namespace) => $this->getTwoLevelNamespace($namespace), array_keys($this->getPluginNamespaces())));
-    parent::construct('attribute_cache' . $pluginDefinitionAttributeName, $cache, $lock, $time);
+    parent::__construct('attribute_cache' . $pluginDefinitionAttributeName, $cache, $lock, $time);
   }
 
   /**
@@ -81,20 +87,22 @@ class AttributeClassDiscovery extends FileParsingCacheCollectorBase {
           );
           foreach ($iterator as $fileinfo) {
             assert($fileinfo instanceof \SplFileInfo);
-            $path = $fileInfo->getPathName();
-            if ($fileinfo->getExtension() === 'php' && isset($this->storage[$path]) && $this->storage[$path]['mtime'] === filemtime($path)) {
-              $cached = $this->storage[$path]['parsed'];
-              if (isset($cached['id'])) {
-                // Explicitly unserialize this to create a new object
-                // instance.
-                $dependencies = isset($cached['dependencies']) ? unserialize($cached['dependencies']) : [];
-                if (!$this->hasMissingDependencies($dependencies ?? [])) {
-                  $definitions[$cached['id']] = unserialize($cached['content']);
+            $path = $fileinfo->getPathName();
+            if ($fileinfo->getExtension() === 'php') {
+              if (isset($this->storage[$path]) && $this->storage[$path]['mtime'] === filemtime($path)) {
+                $cached = $this->storage[$path]['parsed'];
+                if (isset($cached['id'])) {
+                  // Explicitly unserialize this to create a new object
+                  // instance.
+                  $dependencies = isset($cached['dependencies']) ? unserialize($cached['dependencies']) : [];
+                  if (!$this->hasMissingDependencies($dependencies ?? [])) {
+                    $definitions[$cached['id']] = unserialize($cached['content']);
+                  }
                 }
+                continue;
               }
-              continue;
 
-              $result = $this->parseAttribute($path, $fileInfo, $iterator);
+              $result = $this->parseAttribute($path, $fileinfo, $iterator, $namespace);
               ['id' => $id, 'content' => $content] = $result;
               if ($id) {
                 if (!$this->hasMissingDependencies($result['dependencies'] ?? [])) {
@@ -153,7 +161,7 @@ class AttributeClassDiscovery extends FileParsingCacheCollectorBase {
    * Note that this override adds two additional parameters to the method, to
    * support attribute parsing.
    */
-  protected function parseAtrribute(string $filename, $fileInfo, $iterator): mixed {
+  protected function parseAttribute(string $filename, $fileinfo, $iterator, $namespace): mixed {
     $sub_path = $iterator->getSubIterator()->getSubPath();
     $sub_path = $sub_path ? str_replace(DIRECTORY_SEPARATOR, '\\', $sub_path) . '\\' : '';
     $class = $namespace . '\\' . $sub_path . $fileinfo->getBasename('.php');
@@ -179,7 +187,7 @@ class AttributeClassDiscovery extends FileParsingCacheCollectorBase {
    * {@inheritdoc}
    */
   protected function prepareAttributeDefinition(AttributeInterface $attribute, string $class): void {
-    parent::prepareAttributeDefinition($attribute, $class);
+    $this->traitPrepareAttributeDefinition($attribute, $class);
 
     if (!$attribute->getProvider()) {
       $attribute->setProvider($this->getProviderFromNamespace($class));
@@ -241,7 +249,7 @@ class AttributeClassDiscovery extends FileParsingCacheCollectorBase {
    * {@inheritdoc}
    */
   protected function getClassDependencies(\ReflectionClass $reflection_class): ?array {
-    if (!($dependencies = parent::getClassDependencies($reflection_class))) {
+    if (!($dependencies = $this->traitGetClassDependencies($reflection_class))) {
       return NULL;
     }
 
@@ -279,7 +287,7 @@ class AttributeClassDiscovery extends FileParsingCacheCollectorBase {
 
     // Convert providers to two-level namespaces to check for availability.
     $dependencies['provider'] = array_map(static fn ($provider) => "Drupal\\$provider", $dependencies['provider']);
-    return parent::hasMissingDependencies($dependencies);
+    return $this->traitHasMissingDependencies($dependencies);
   }
 
 }

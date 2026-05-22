@@ -307,7 +307,11 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
   protected function getDiscovery() {
     if (!$this->discovery) {
       if (isset($this->pluginDefinitionAttributeName) && isset($this->pluginDefinitionAnnotationName)) {
-        $discovery = new AttributeDiscoveryWithAnnotations($this->subdir, $this->namespaces, $this->pluginDefinitionAttributeName, $this->pluginDefinitionAnnotationName, $this->additionalAnnotationNamespaces);
+        // @todo: proper dependency injection and bc.
+        $cache = \Drupal::service('cache.file_parsing');
+        $lock = \Drupal::service('lock');
+        $time = \Drupal::service('datetime.time');
+        $discovery = new AttributeDiscoveryWithAnnotations($this->subdir, $this->namespaces, $this->pluginDefinitionAttributeName, $this->pluginDefinitionAnnotationName, $cache, $lock, $time, $this->additionalAnnotationNamespaces);
       }
       elseif (isset($this->pluginDefinitionAttributeName)) {
         // @todo: proper dependency injection and bc.
