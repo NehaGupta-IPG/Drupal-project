@@ -46,15 +46,15 @@ class AttributeDiscoveryWithAnnotations extends AttributeClassDiscovery {
   public function __construct(
     string $subdir,
     \Traversable $rootNamespaces,
-    string $pluginDefinitionAttributeName = 'Drupal\Component\Plugin\Attribute\Plugin',
-    protected readonly string $pluginDefinitionAnnotationName = 'Drupal\Component\Annotation\Plugin',
     CacheBackendInterface $cache,
     LockBackendInterface $lock,
     protected TimeInterface $time,
+    string $pluginDefinitionAttributeName = 'Drupal\Component\Plugin\Attribute\Plugin',
+    protected readonly string $pluginDefinitionAnnotationName = 'Drupal\Component\Annotation\Plugin',
     protected readonly array $additionalNamespaces = [],
 
   ) {
-    parent::__construct($subdir, $rootNamespaces, $pluginDefinitionAttributeName, $cache, $lock, $time);
+    parent::__construct($subdir, $rootNamespaces, $cache, $lock, $time, $pluginDefinitionAttributeName);
   }
 
   /**

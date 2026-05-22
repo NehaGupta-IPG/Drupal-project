@@ -311,14 +311,14 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
         $cache = \Drupal::service('cache.file_parsing');
         $lock = \Drupal::service('lock');
         $time = \Drupal::service('datetime.time');
-        $discovery = new AttributeDiscoveryWithAnnotations($this->subdir, $this->namespaces, $this->pluginDefinitionAttributeName, $this->pluginDefinitionAnnotationName, $cache, $lock, $time, $this->additionalAnnotationNamespaces);
+        $discovery = new AttributeDiscoveryWithAnnotations($this->subdir, $this->namespaces, $cache, $lock, $time, $this->pluginDefinitionAttributeName, $this->pluginDefinitionAnnotationName, $this->additionalAnnotationNamespaces);
       }
       elseif (isset($this->pluginDefinitionAttributeName)) {
         // @todo: proper dependency injection and bc.
         $cache = \Drupal::service('cache.file_parsing');
         $lock = \Drupal::service('lock');
         $time = \Drupal::service('datetime.time');
-        $discovery = new AttributeClassDiscovery($this->subdir, $this->namespaces, $this->pluginDefinitionAttributeName, $cache, $lock, $time);
+        $discovery = new AttributeClassDiscovery($this->subdir, $this->namespaces, $cache, $lock, $time, $this->pluginDefinitionAttributeName);
       }
       else {
         $discovery = new AnnotatedClassDiscovery($this->subdir, $this->namespaces, $this->pluginDefinitionAnnotationName, $this->additionalAnnotationNamespaces);

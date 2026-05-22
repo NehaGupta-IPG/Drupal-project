@@ -4,6 +4,7 @@ namespace Drupal\Core\Plugin\Discovery;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Plugin\Attribute\AttributeInterface;
 use Drupal\Component\Plugin\Discovery\AttributeClassDiscoveryTrait;
+use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Utility\FileParsingCacheCollectorBase;
@@ -11,7 +12,7 @@ use Drupal\Core\Utility\FileParsingCacheCollectorBase;
 /**
  * Defines a discovery mechanism to find plugins using attributes.
  */
-class AttributeClassDiscovery extends FileParsingCacheCollectorBase {
+class AttributeClassDiscovery extends FileParsingCacheCollectorBase implements DiscoveryInterface {
 
   use AttributeClassDiscoveryTrait {
     prepareAttributeDefinition as traitPrepareAttributeDefinition;
@@ -54,10 +55,10 @@ class AttributeClassDiscovery extends FileParsingCacheCollectorBase {
   public function __construct(
     string $subdir,
     protected \Traversable $rootNamespacesIterator,
-    protected string $pluginDefinitionAttributeName = 'Drupal\Component\Plugin\Attribute\Plugin',
     CacheBackendInterface $cache,
     LockBackendInterface $lock,
     protected TimeInterface $time,
+    protected string $pluginDefinitionAttributeName = 'Drupal\Component\Plugin\Attribute\Plugin',
   ) {
     if ($subdir) {
       // Prepend a directory separator to $subdir,
@@ -103,28 +104,29 @@ class AttributeClassDiscovery extends FileParsingCacheCollectorBase {
               }
 
               $result = $this->parseAttribute($path, $fileinfo, $iterator, $namespace);
-              ['id' => $id, 'content' => $content] = $result;
-              if ($id) {
-                if (!$this->hasMissingDependencies($result['dependencies'] ?? [])) {
-                  $definitions[$id] = $content;
+              if ($result) {
+                ['id' => $id, 'content' => $content] = $result;
+                if ($id) {
+                  if (!$this->hasMissingDependencies($result['dependencies'] ?? [])) {
+                    $definitions[$id] = $content;
+                  }
+                  // Explicitly serialize this to create a new object instance.
+                  $this->persist($path);
+                  $this->storage[$path] = [
+                    'mtime' => filemtime($path),
+                    'parsed' => [
+                      'id' => $id,
+                      'content' => serialize($content),
+                      'dependencies' => serialize($result['dependencies'] ?? NULL),
+                    ],
+                  ];
+                  continue;
                 }
-                // Explicitly serialize this to create a new object instance.
-                $this->persist($path);
-                $this->storage[$path] = [
-                  'mtime' => filemtime($path),
-                  'parsed' => [
-                    'id' => $id,
-                    'content' => serialize($content),
-                    'dependencies' => serialize($result['dependencies'] ?? NULL),
-                  ],
-                ];
               }
-              else {
-                $this->storage[$path] = [
-                  'mtime' => filemtime($path),
-                  'parsed' => NULL,
-                ];
-              }
+              $this->storage[$path] = [
+                'mtime' => filemtime($path),
+                'parsed' => NULL,
+              ];
             }
           }
         }
@@ -132,27 +134,6 @@ class AttributeClassDiscovery extends FileParsingCacheCollectorBase {
     }
 
     return $definitions;
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public function get($key): array {
-    throw new \BadMethodCallException();
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public function resolveCacheMiss($key): array {
-    throw new \BadMethodCallException();
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public function parseFile(string $file): array {
-    throw new \BadMethodCallException();
   }
 
   /**

@@ -80,6 +80,8 @@ abstract class FileParsingCacheCollectorBase extends CacheCollector {
    * @return mixed
    *   The result of the file parsing.
    */
-  abstract protected function parseFile(string $file): mixed;
+  protected function parseFile(string $file): mixed {
+    throw \BadMethodCallException;
+  }
 
 }
