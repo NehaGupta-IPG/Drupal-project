@@ -289,14 +289,12 @@ class ThemeManager implements ThemeManagerInterface {
     // renderer.
     $theme_engine = $active_theme->getEngine();
     if (isset($theme_engine)) {
-      if ($info['type'] != 'module') {
-        if (function_exists($theme_engine . '_render_template')) {
-          $render_function = $theme_engine . '_render_template';
-        }
-        $extension_function = $theme_engine . '_extension';
-        if (function_exists($extension_function)) {
-          $extension = $extension_function();
-        }
+      if (function_exists($theme_engine . '_render_template')) {
+        $render_function = $theme_engine . '_render_template';
+      }
+      $extension_function = $theme_engine . '_extension';
+      if (function_exists($extension_function)) {
+        $extension = $extension_function();
       }
     }
 
