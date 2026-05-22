@@ -82,7 +82,7 @@ class JsonApiRelationshipTest extends JsonApiFunctionalTestBase {
    * @see https://www.drupal.org/project/drupal/issues/3476224
    */
   public function testPatchHandleUUIDPropertyReferenceFieldIssue3127883(): void {
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
+    $this->container->get('module_installer')->install(['jsonapi_write']);
     $user = $this->drupalCreateUser([
       'administer entity_test content',
       'view test entity',

@@ -1385,7 +1385,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->doTestRelationshipGet($request_options);
 
     // Test POST.
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
+    $this->container->get('module_installer')->install(['jsonapi_write']);
     $this->doTestRelationshipMutation($request_options);
     // Grant entity-level edit access.
     $this->setUpAuthorization('PATCH');
@@ -2017,11 +2017,11 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->doTestPostIndividual();
     $this->entity = $this->resaveEntity($this->entity, $this->account);
     $this->revokePermissions();
-    $this->config('jsonapi.settings')->set('read_only', TRUE)->save();
+    $this->container->get('module_installer')->uninstall(['jsonapi_write']);
     $this->doTestPatchIndividual();
     $this->entity = $this->resaveEntity($this->entity, $this->account);
     $this->revokePermissions();
-    $this->config('jsonapi.settings')->set('read_only', TRUE)->save();
+    $this->container->get('module_installer')->uninstall(['jsonapi_write']);
     $this->doTestDeleteIndividual();
   }
 
@@ -2057,7 +2057,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
 
     // DX: 405 when read-only mode is enabled.
     $response = $this->request('POST', $url, $request_options);
-    $this->assertResourceErrorResponse(405, sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromUri('base:/admin/config/services/jsonapi')->setAbsolute()->toString(TRUE)->getGeneratedUrl()), $url, $response);
+    $this->assertResourceErrorResponse(405, 'JSON:API is configured to accept only read operations. Install the JSON:API Write module to enable write operations.', $url, $response);
     if ($this->resourceType->isLocatable()) {
       $this->assertSame(['GET'], $response->getHeader('Allow'));
     }
@@ -2065,7 +2065,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->assertSame([''], $response->getHeader('Allow'));
     }
 
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
+    $this->container->get('module_installer')->install(['jsonapi_write']);
 
     // DX: 415 when no Content-Type request header.
     $response = $this->request('POST', $url, $request_options);
@@ -2290,10 +2290,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
 
     // DX: 405 when read-only mode is enabled.
     $response = $this->request('PATCH', $url, $request_options);
-    $this->assertResourceErrorResponse(405, sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromUri('base:/admin/config/services/jsonapi')->setAbsolute()->toString(TRUE)->getGeneratedUrl()), $url, $response);
+    $this->assertResourceErrorResponse(405, 'JSON:API is configured to accept only read operations. Install the JSON:API Write module to enable write operations.', $url, $response);
     $this->assertSame(['GET'], $response->getHeader('Allow'));
 
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
+    $this->container->get('module_installer')->install(['jsonapi_write']);
 
     // DX: 415 when no Content-Type request header.
     $response = $this->request('PATCH', $url, $request_options);
@@ -2592,10 +2592,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
 
     // DX: 405 when read-only mode is enabled.
     $response = $this->request('DELETE', $url, $request_options);
-    $this->assertResourceErrorResponse(405, sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromUri('base:/admin/config/services/jsonapi')->setAbsolute()->toString(TRUE)->getGeneratedUrl()), $url, $response);
+    $this->assertResourceErrorResponse(405, 'JSON:API is configured to accept only read operations. Install the JSON:API Write module to enable write operations.', $url, $response);
     $this->assertSame(['GET'], $response->getHeader('Allow'));
 
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
+    $this->container->get('module_installer')->install(['jsonapi_write']);
 
     // DX: 403 when unauthorized.
     $response = $this->request('DELETE', $url, $request_options);
@@ -3308,7 +3308,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->assertResourceResponse(200, $expected_document, $actual_response, $expected_cache_tags, $expected_cacheability->getCacheContexts(), NULL, TRUE);
     }
 
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
+    $this->container->get('module_installer')->install(['jsonapi_write']);
 
     // Ensures that PATCH and DELETE on individual resources with a
     // `resourceVersion` query parameter is not supported.

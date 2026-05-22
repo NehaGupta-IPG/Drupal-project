@@ -163,7 +163,7 @@ services:
     public: false
     class: Drupal\jsonapi\Routing\ReadOnlyModeMethodFilter
     decorates: method_filter
-    arguments: ['@method_filter.jsonapi.inner', '@config.factory']
+    arguments: ['@method_filter.jsonapi.inner', '@module_handler']
 
   # Controller.
   jsonapi.entity_resource:

@@ -2,44 +2,24 @@
 
 namespace Drupal\jsonapi\Routing;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Routing\FilterInterface;
-use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Filters routes based on the HTTP method and JSON:API's read-only mode.
+ *
+ * Write operations (POST, PATCH, DELETE) are only available when the
+ * jsonapi_write module is installed.
  */
 class ReadOnlyModeMethodFilter implements FilterInterface {
 
-  /**
-   * The decorated method filter.
-   *
-   * @var \Drupal\Core\Routing\FilterInterface
-   */
-  protected $inner;
-
-  /**
-   * Whether JSON:API's read-only mode is enabled.
-   *
-   * @var bool
-   */
-  protected $readOnlyModeIsEnabled;
-
-  /**
-   * ReadOnlyModeMethodFilter constructor.
-   *
-   * @param \Drupal\Core\Routing\FilterInterface $inner
-   *   The decorated method filter.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The configuration factory.
-   */
-  public function __construct(FilterInterface $inner, ConfigFactoryInterface $config_factory) {
-    $this->inner = $inner;
-    $this->readOnlyModeIsEnabled = $config_factory->get('jsonapi.settings')->get('read_only');
-  }
+  public function __construct(
+    protected FilterInterface $inner,
+    protected ModuleHandlerInterface $moduleHandler,
+  ) {}
 
   /**
    * {@inheritdoc}
@@ -53,7 +33,7 @@ class ReadOnlyModeMethodFilter implements FilterInterface {
     $all_supported_methods = array_merge(...$all_supported_methods);
     $collection = $this->inner->filter($collection, $request);
 
-    if (!$this->readOnlyModeIsEnabled) {
+    if ($this->moduleHandler->moduleExists('jsonapi_write')) {
       return $collection;
     }
 
@@ -73,7 +53,7 @@ class ReadOnlyModeMethodFilter implements FilterInterface {
     if (count($collection)) {
       return $collection;
     }
-    throw new MethodNotAllowedHttpException(array_intersect($all_supported_methods, $read_only_methods), sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromRoute('jsonapi.settings')->setAbsolute()->toString(TRUE)->getGeneratedUrl()));
+    throw new MethodNotAllowedHttpException(array_intersect($all_supported_methods, $read_only_methods), 'JSON:API is configured to accept only read operations. Install the JSON:API Write module to enable write operations.');
   }
 
 }
