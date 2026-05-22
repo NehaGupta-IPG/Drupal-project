@@ -20,7 +20,7 @@ class UserRouteAlterTest extends KernelTestBase {
    */
   protected static $modules = [
     'serialization',
-    'user',
+    'rest',
     'user_route_alter_test',
   ];
 
@@ -31,18 +31,18 @@ class UserRouteAlterTest extends KernelTestBase {
     /** @var \Drupal\Core\Routing\RouteProviderInterface $route_provider */
     $route_provider = $this->container->get('router.route_provider');
 
-    // Ensure '_format' is set for the 'user.login.http' route.
-    $requirements = $route_provider->getRouteByName('user.login.http')->getRequirements();
-    $this->assertArrayHasKey('_format', $requirements, 'user.login.http route has "_format" requirement');
-    $this->assertEquals('json|xml', $requirements['_format'], 'user.login.http route "_format" requirement is "json|xml"');
+    // Ensure '_format' is set for the rest.login' route.
+    $requirements = $route_provider->getRouteByName('rest.login')->getRequirements();
+    $this->assertArrayHasKey('_format', $requirements, 'rest.login route has "_format" requirement');
+    $this->assertEquals('json|xml', $requirements['_format'], 'rest.login route "_format" requirement is "json|xml"');
 
-    // Ensure the '_access' requirement is set to FALSE for the 'user.pass.http'
+    // Ensure the '_access' requirement is set to FALSE for the 'rest.pass'
     // route.
-    $requirements = $route_provider->getRouteByName('user.pass.http')->getRequirements();
-    $this->assertArrayHasKey('_access', $requirements, 'user.pass.http route has "_access" requirement');
-    $this->assertEquals('FALSE', $requirements['_access'], 'user.pass.http route "_access" requirement is "FALSE"');
-    // Ensure '_format' is not set for the 'user.pass.http' route.
-    $this->assertArrayNotHasKey('_format', $requirements, 'user.pass.http route does not have "_format" requirement');
+    $requirements = $route_provider->getRouteByName('rest.pass')->getRequirements();
+    $this->assertArrayHasKey('_access', $requirements, 'rest.pass route has "_access" requirement');
+    $this->assertEquals('FALSE', $requirements['_access'], 'rest.pass route "_access" requirement is "FALSE"');
+    // Ensure '_format' is not set for the 'rest.pass' route.
+    $this->assertArrayNotHasKey('_format', $requirements, 'rest.pass route does not have "_format" requirement');
   }
 
 }

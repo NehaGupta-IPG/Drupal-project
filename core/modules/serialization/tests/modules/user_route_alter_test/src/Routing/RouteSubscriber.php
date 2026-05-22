@@ -9,7 +9,7 @@ use Drupal\Core\Routing\RoutingEvents;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * Alter the 'user.pass.http' route.
+ * Alter the 'rest.pass' route.
  */
 class RouteSubscriber extends RouteSubscriberBase {
 
@@ -17,7 +17,7 @@ class RouteSubscriber extends RouteSubscriberBase {
    * {@inheritdoc}
    */
   protected function alterRoutes(RouteCollection $collection): void {
-    if ($route = $collection->get('user.pass.http')) {
+    if ($route = $collection->get('rest.pass')) {
       $route->setRequirements([]);
       $route->setRequirement('_access', 'FALSE');
     }
