@@ -224,7 +224,8 @@ interface LanguageManagerInterface {
    *   language. Defaults to
    *   \Drupal\Core\Language\LanguageInterface::TYPE_INTERFACE.
    *
-   * @return $this
+   * @return \Drupal\Core\Language\LanguageInterface|null
+   *   the current render override language.
    */
   public function getRenderOverrideLanguage($type = LanguageInterface::TYPE_INTERFACE): ?LanguageInterface;
 
