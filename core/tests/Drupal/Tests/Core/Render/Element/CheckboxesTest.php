@@ -13,7 +13,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @covers \Drupal\Core\Render\Element\Checkboxes
+ * Tests the Checkboxes render element.
  */
 #[CoversClass(Checkboxes::class)]
 #[Group('Render')]
