@@ -1354,8 +1354,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
 
     $is_not_null = fn($value) => !is_null($value);
 
-    foreach ($results as $row) {
-      $row = (array) $row;
+    while ($row = $results->fetch(FetchAs::Associative)) {
       $value_key = $row[$base_id_key];
       $bundle = $this->bundleKey ? $values[$value_key][$this->bundleKey][LanguageInterface::LANGCODE_DEFAULT] : $this->entityTypeId;
       // Field values in default language are stored with
@@ -1435,8 +1434,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
 
       $results = $query->execute();
 
-      foreach ($results as $row) {
-        $row = (array) $row;
+      while ($row = $results->fetch(FetchAs::Associative)) {
         $value_key = $row[$base_id_key];
         // Field values in default language are stored with
         // LanguageInterface::LANGCODE_DEFAULT as key.

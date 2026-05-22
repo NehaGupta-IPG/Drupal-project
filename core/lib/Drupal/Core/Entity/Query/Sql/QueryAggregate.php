@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Entity\Query\Sql;
 
+use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Entity\Query\QueryAggregateInterface;
 
 /**
@@ -171,11 +172,7 @@ class QueryAggregate extends Query implements QueryAggregateInterface {
     if ($this->count) {
       return parent::result();
     }
-    $return = [];
-    foreach ($this->sqlQuery->execute() as $row) {
-      $return[] = (array) $row;
-    }
-    return $return;
+    return $this->sqlQuery->execute()->fetchAll(FetchAs::Associative);
   }
 
 }
