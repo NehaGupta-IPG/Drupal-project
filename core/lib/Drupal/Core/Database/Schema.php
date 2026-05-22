@@ -233,7 +233,7 @@ abstract class Schema implements PlaceholderInterface {
     // couldn't use \Drupal::database()->select() here because it would prefix
     // information_schema.tables and the query would fail.
     // Don't use {} around information_schema.tables table.
-    $results = $this->connection->query("SELECT table_name AS table_name FROM information_schema.tables WHERE " . (string) $condition, $condition->arguments())->ferchAll();
+    $results = $this->connection->query("SELECT table_name AS table_name FROM information_schema.tables WHERE " . (string) $condition, $condition->arguments())->fetchAll();
     foreach ($results as $table) {
       if ($prefix && substr($table->table_name, 0, $prefix_length) !== $prefix) {
         // This table name does not start the prefix, which means that it is
