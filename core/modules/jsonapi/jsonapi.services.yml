@@ -15,11 +15,6 @@ services:
     class: Drupal\jsonapi\Normalizer\HttpExceptionNormalizer
     tags:
       - { name: jsonapi_normalizer }
-  serializer.normalizer.unprocessable_entity_exception.jsonapi:
-    class: Drupal\jsonapi\Normalizer\UnprocessableHttpEntityExceptionNormalizer
-    tags:
-      # This must have a higher priority than the 'serializer.normalizer.http_exception.jsonapi' to take effect.
-      - { name: jsonapi_normalizer, priority: 1 }
   serializer.normalizer.entity_access_exception.jsonapi:
     class: Drupal\jsonapi\Normalizer\EntityAccessDeniedHttpExceptionNormalizer
     tags:
@@ -50,14 +45,6 @@ services:
     calls:
       - ['setVariationCache', ['@variation_cache.jsonapi_normalizations']]
       - ['setRequestStack', ['@request_stack']]
-  serializer.normalizer.content_entity.jsonapi:
-    class: Drupal\jsonapi\Normalizer\ContentEntityDenormalizer
-    tags:
-      - { name: jsonapi_normalizer }
-  serializer.normalizer.config_entity.jsonapi:
-    class: Drupal\jsonapi\Normalizer\ConfigEntityDenormalizer
-    tags:
-      - { name: jsonapi_normalizer }
   serializer.normalizer.jsonapi_document_toplevel.jsonapi:
     class: Drupal\jsonapi\Normalizer\JsonApiDocumentTopLevelNormalizer
     tags:
@@ -158,20 +145,10 @@ services:
     tags:
       - { name: access_check, applies_to: _jsonapi_relationship_route_access }
 
-  # Route filters.
-  method_filter.jsonapi:
-    public: false
-    class: Drupal\jsonapi\Routing\ReadOnlyModeMethodFilter
-    decorates: method_filter
-    arguments: ['@method_filter.jsonapi.inner', '@module_handler']
-
   # Controller.
   jsonapi.entity_resource:
     class: Drupal\jsonapi\Controller\EntityResource
   Drupal\jsonapi\Controller\EntityResource: '@jsonapi.entity_resource'
-  jsonapi.file_upload:
-    class: Drupal\jsonapi\Controller\FileUpload
-  Drupal\jsonapi\Controller\FileUpload: '@jsonapi.file_upload'
 
   # Event subscribers.
   jsonapi.custom_query_parameter_names_validator.subscriber:

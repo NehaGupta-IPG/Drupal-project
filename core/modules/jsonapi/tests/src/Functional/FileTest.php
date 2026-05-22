@@ -206,12 +206,12 @@ class FileTest extends ResourceTestBase {
    * Tests POST/PATCH/DELETE for an individual resource.
    */
   public function testIndividual(): void {
+    $this->container->get('module_installer')->install(['jsonapi_write']);
     // @todo https://www.drupal.org/node/1927648
     // Add doTestPostIndividual().
     $this->doTestPatchIndividual();
     $this->entity = $this->resaveEntity($this->entity, $this->account);
     $this->revokePermissions();
-    $this->container->get('module_installer')->uninstall(['jsonapi_write']);
     $this->doTestDeleteIndividual();
   }
 

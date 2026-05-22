@@ -254,11 +254,6 @@ class UserTest extends ResourceTestBase {
     $normalization['data']['attributes']['mail'] = 'new-email@example.com';
     $request_options[RequestOptions::BODY] = Json::encode($normalization);
 
-    // DX: 405 when read-only mode is enabled.
-    $response = $this->request('PATCH', $url, $request_options);
-    $this->assertResourceErrorResponse(405, 'JSON:API is configured to accept only read operations. Install the JSON:API Write module to enable write operations.', $url, $response);
-    $this->assertSame(['GET'], $response->getHeader('Allow'));
-
     $this->container->get('module_installer')->install(['jsonapi_write']);
 
     // DX: 422 when changing email without providing the password.
@@ -371,11 +366,6 @@ class UserTest extends ResourceTestBase {
     $normalization = $original_normalization;
     $normalization['data']['attributes']['mail'] = 'new-email@example.com';
     $request_options[RequestOptions::BODY] = Json::encode($normalization);
-
-    // DX: 405 when read-only mode is enabled.
-    $response = $this->request('PATCH', $url, $request_options);
-    $this->assertResourceErrorResponse(405, 'JSON:API is configured to accept only read operations. Install the JSON:API Write module to enable write operations.', $url, $response);
-    $this->assertSame(['GET'], $response->getHeader('Allow'));
 
     $this->container->get('module_installer')->install(['jsonapi_write']);
 
