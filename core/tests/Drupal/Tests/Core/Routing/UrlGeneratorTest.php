@@ -96,12 +96,14 @@ class UrlGeneratorTest extends UnitTestCase {
     $third_route = new Route('/test/two/');
     $fourth_route = new Route('/test/four', [], [], [], '', ['https']);
     $none_route = new Route('', [], [], ['_no_path' => TRUE]);
+    $fifth_route = new Route('/test/five/{a}/{b}/{c}');
 
     $routes->add('test_1', $first_route);
     $routes->add('test_2', $second_route);
     $routes->add('test_3', $third_route);
     $routes->add('test_4', $fourth_route);
     $routes->add('<none>', $none_route);
+    $routes->add('test_5', $fifth_route);
 
     // Create a route provider stub.
     $provider = $this->createStub(RouteProvider::class);
@@ -129,6 +131,10 @@ class UrlGeneratorTest extends UnitTestCase {
       [
         'route_name' => '<none>',
         'return' => $none_route,
+      ],
+      [
+        'route_name' => 'test_5',
+        'return' => $fifth_route,
       ],
     ];
     foreach ($return_map_values as $values) {
@@ -631,6 +637,49 @@ class UrlGeneratorTest extends UnitTestCase {
 
     $options = [];
     $this->assertGenerateFromRoute('test_1', ['node' => 1], $options, '/hello/world?node=1', (new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT));
+  }
+
+  /**
+   * Tests that dot path segments are encoded in generated URLs.
+   *
+   * @legacy-covers ::generateFromRoute
+   */
+  #[DataProvider('providerTestDotSegmentEncoding')]
+  public function testDotSegmentEncoding(string $route_name, array $route_parameters, string $expected): void {
+    $this->assertGenerateFromRoute($route_name, $route_parameters, [], $expected, (new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT));
+  }
+
+  /**
+   * Data provider for ::testDotSegmentEncoding().
+   */
+  public static function providerTestDotSegmentEncoding(): array {
+    return [
+      'single dot segment' => [
+        'test_5',
+        ['a' => '.', 'b' => 'x', 'c' => 'y'],
+        '/test/five/%2E/x/y',
+      ],
+      'single double-dot segment' => [
+        'test_5',
+        ['a' => '..', 'b' => 'x', 'c' => 'y'],
+        '/test/five/%2E%2E/x/y',
+      ],
+      'trailing double-dot segment' => [
+        'test_5',
+        ['a' => 'x', 'b' => 'y', 'c' => '..'],
+        '/test/five/x/y/%2E%2E',
+      ],
+      'three consecutive double-dot segments' => [
+        'test_5',
+        ['a' => '..', 'b' => '..', 'c' => '..'],
+        '/test/five/%2E%2E/%2E%2E/%2E%2E',
+      ],
+      'double-dot segments with normal segment between' => [
+        'test_5',
+        ['a' => '..', 'b' => 'x', 'c' => '..'],
+        '/test/five/%2E%2E/x/%2E%2E',
+      ],
+    ];
   }
 
 }

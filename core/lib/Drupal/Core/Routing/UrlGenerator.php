@@ -324,13 +324,14 @@ class UrlGenerator implements UrlGeneratorInterface {
       // them as they are not used for this purpose here otherwise we would
       // generate a URI that, when followed by a user agent (e.g. browser), does
       // not match this route.
-      $path = strtr($path, ['/../' => '/%2E%2E/', '/./' => '/%2E/']);
-      if (str_ends_with($path, '/..')) {
-        $path = substr($path, 0, -2) . '%2E%2E';
-      }
-      elseif (str_ends_with($path, '/.')) {
-        $path = substr($path, 0, -1) . '%2E';
-      }
+      $path = implode('/', array_map(
+        static fn(string $segment): string => match ($segment) {
+          '..' => '%2E%2E',
+          '.' => '%2E',
+          default => $segment,
+        },
+        explode('/', $path),
+      ));
     }
 
     if (!empty($options['prefix'])) {
