@@ -8,16 +8,14 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Render\Element\Checkboxes;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
-/**
- * @coversDefaultClass \Drupal\Core\Render\Element\Checkboxes
- * @group Render
- */
+#[CoversClass(Checkboxes::class)]
+#[Group('Render')]
 class CheckboxesTest extends UnitTestCase {
 
-  /**
-   * @covers ::getInfo
-   */
   public function testGetInfo(): void {
     $checkboxes = new Checkboxes([], 'test', 'test');
     $info = $checkboxes->getInfo();
@@ -27,11 +25,7 @@ class CheckboxesTest extends UnitTestCase {
     $this->assertArrayHasKey('#theme_wrappers', $info);
   }
 
-  /**
-   * @covers ::valueCallback
-   *
-   * @dataProvider providerTestValueCallback
-   */
+  #[DataProvider('providerTestValueCallback')]
   public function testValueCallback($expected, $input): void {
     $element = [];
     $form_state = $this->prophesize(FormStateInterface::class)->reveal();
@@ -41,7 +35,7 @@ class CheckboxesTest extends UnitTestCase {
   /**
    * Data provider for testValueCallback().
    */
-  public static function providerTestValueCallback() {
+  public static function providerTestValueCallback(): array {
     $data = [];
     $data[] = [[], FALSE];
     $data[] = [[], NULL];
@@ -52,9 +46,6 @@ class CheckboxesTest extends UnitTestCase {
     return $data;
   }
 
-  /**
-   * @covers ::processCheckboxes
-   */
   public function testProcessCheckboxes(): void {
     $form_state = new FormState();
     // Create a Checkboxes form element and process it.
