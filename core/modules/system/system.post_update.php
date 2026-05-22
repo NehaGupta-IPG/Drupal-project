@@ -65,6 +65,18 @@ function system_removed_post_updates(): array {
 }
 
 /**
+ * Migrate to new compress setting.
+ */
+function system_post_update_migrate_compress_setting(): void {
+  $performanceConfig = \Drupal::configFactory()->getEditable('system.performance');
+  $performanceConfig->set('css.compress', (bool) $performanceConfig->get('css.gzip'));
+  $performanceConfig->set('js.compress', (bool) $performanceConfig->get('js.gzip'));
+  $performanceConfig->clear('css.gzip');
+  $performanceConfig->clear('js.gzip');
+  $performanceConfig->save();
+}
+
+/**
  * Set max-age for 4xx responses to null.
  */
 function system_post_update_set_max_age_4xx(): void {
