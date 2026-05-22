@@ -51,7 +51,6 @@ class Checkboxes extends FormElementBase {
         [static::class, 'preRenderCompositeFormElement'],
       ],
       '#theme_wrappers' => ['checkboxes'],
-      '#attributes' => [],
     ];
   }
 
@@ -66,7 +65,7 @@ class Checkboxes extends FormElementBase {
         $element['#default_value'] = [];
       }
       $weight = 0;
-      $child_attributes = $element['#attributes'];
+      $child_attributes = $element['#attributes'] ?? [];
       // Prevent child elements from inheriting an aria-describedby attribute.
       // The individual children won't have descriptions and the attribute will
       // be invalid.
