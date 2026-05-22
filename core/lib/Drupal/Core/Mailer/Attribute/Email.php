@@ -32,6 +32,8 @@ class Email extends Plugin {
    * @param string|null $key
    *   (optional) The email key used to identify different emails sent from a
    *   module.
+   * @param class-string $class
+   *   (optional) The email plugin class.
    * @param string|null $html_body_template
    *   (optional) The name of a template which is used to render the HTML body.
    * @param string|null $text_body_template
