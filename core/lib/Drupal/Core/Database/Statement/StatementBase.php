@@ -30,7 +30,7 @@ use Drupal\Core\Database\StatementInterface;
  * PHP memory (that an \IteratorAggregate implementation would force) and
  * therefore optimize memory usage while iterating the resultset.
  */
-abstract class StatementBase implements StatementInterface {
+abstract class StatementBase implements StatementInterface, \IteratorAggregate {
 
   use FetchModeTrait;
 
@@ -61,6 +61,10 @@ abstract class StatementBase implements StatementInterface {
     'constructor_args' => [],
     'column' => 0,
   ];
+
+  public function getIterator(): \Traversable {
+    throw new \LogicException("Do not iterate on StatementInterface objects");
+  }
 
   /**
    * Constructor.
