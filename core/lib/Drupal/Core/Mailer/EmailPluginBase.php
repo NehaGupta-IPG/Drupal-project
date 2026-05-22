@@ -12,7 +12,7 @@ use Symfony\Component\Mime\Email;
 /**
  * Default class used for emails plugins.
  */
-abstract class EmailPluginBase extends PluginBase implements EmailPluginInterface {
+class EmailPluginBase extends PluginBase implements EmailPluginInterface {
 
   /**
    * A list of template parameters.
@@ -27,20 +27,6 @@ abstract class EmailPluginBase extends PluginBase implements EmailPluginInterfac
    * @var array<string, mixed>
    */
   protected array $headers = [];
-
-  /**
-   * The html body (unused).
-   *
-   * @var array|RenderableInterface|null
-   */
-  protected array|RenderableInterface|null $htmlBody = NULL;
-
-  /**
-   * The text body (unused).
-   *
-   * @var array|RenderableInterface|null
-   */
-  protected array|RenderableInterface|null $textBody = NULL;
 
   /**
    * Key-value pairs defining the environment to use to render the email body.
@@ -112,12 +98,29 @@ abstract class EmailPluginBase extends PluginBase implements EmailPluginInterfac
   /**
    * {@inheritdoc}
    */
-  abstract public function htmlBody(): RenderableInterface|array|null;
+  public function htmlBody(): RenderableInterface|array|null {
+    if ($template_id = $this->getHtmlBodyTemplate()) {
+      return [
+        '#theme' => $template_id,
+        '#email' => $this,
+      ];
+    }
+    return NULL;
+  }
 
   /**
    * {@inheritdoc}
    */
   public function textBody(): RenderableInterface|\Stringable|array|null {
+    if ($template_id = $this->getTextBodyTemplate()) {
+      return [
+        '#theme' => $template_id,
+        '#email' => $this,
+      ];
+    }
+    if (array_key_exists('text', $this->parameters) && $this->parameters['text']) {
+      return ['#markup' => $this->parameters['text']];
+    }
     return NULL;
   }
 
