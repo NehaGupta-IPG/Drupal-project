@@ -143,6 +143,7 @@ class EmailHooksTest extends KernelTestBase {
 
     $email = $emailManager->createInstance('mailer_email_test.minimal');
     assert($email instanceof EmailPluginInterface);
+    $email->langcode('en');
     $this->assertTrue($emailManager->send($email->to('foobar@example.com')));
 
     $sentEmails = $this->getEmails();

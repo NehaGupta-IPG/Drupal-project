@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\mailer_email_test\Plugin\Email;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Mailer\Attribute\Email;
 use Drupal\Core\Mailer\EmailPluginBase;
 use Drupal\Core\Render\RenderableInterface;
@@ -33,15 +34,18 @@ class MinimalTestEmail extends EmailPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function textBody(): RenderableInterface|array|null {
+  public function textBody(): \Stringable {
     $id = $this->getPluginId();
     $module = $this->getModule();
     $key = $this->getKey();
     $langcode = $this->getLangcode();
-    return [
-      '#type' => 'markup',
-      '#markup' => sprintf('%s(id: %s, module: %s, key: %s, langcode: %s)', __METHOD__, $id, $module, $key, $langcode),
-    ];
+    return new FormattableMarkup('@method(id: @id, module: @module, key: @key, langcode: @langcode)', [
+      '@method' => __METHOD__,
+      '@id' => $id,
+      '@module' => $module,
+      '@key' => $key,
+      '@langcode' => $langcode,
+    ]);
   }
 
 }
