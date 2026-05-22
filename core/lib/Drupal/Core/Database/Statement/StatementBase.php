@@ -62,6 +62,9 @@ abstract class StatementBase implements StatementInterface, \IteratorAggregate {
     'column' => 0,
   ];
 
+  /**
+   * Gets the iterator.
+   */
   public function getIterator(): \Traversable {
     throw new \LogicException("Do not iterate on StatementInterface objects");
   }
