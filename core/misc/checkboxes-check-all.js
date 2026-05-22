@@ -17,19 +17,13 @@
 
             if (!clickedBtn) return;
 
-            const checkboxes = container.querySelectorAll(
-              'input[type="checkbox"]',
-            );
-            let checkedAmount = 0;
-            checkboxes.forEach(function (checkbox) {
-              if (checkbox.checked) {
-                checkedAmount++;
-              }
-            });
-            // If not all are checked, we should check all.
-            const checkAll = checkedAmount < checkboxes.length;
-            checkboxes.forEach(function (checkbox) {
-              checkbox.checked = checkAll;
+            const checkboxes = [
+              ...container.querySelectorAll('input[type="checkbox"]'),
+            ];
+            // If not all are checked, check all; otherwise uncheck all.
+            const checkAll = checkboxes.some((cb) => !cb.checked);
+            checkboxes.forEach((cb) => {
+              cb.checked = checkAll;
             });
           });
         },
