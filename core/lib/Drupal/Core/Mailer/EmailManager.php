@@ -154,7 +154,7 @@ class EmailManager extends DefaultPluginManager {
       $context = [
         'email' => $email,
       ];
-      // $this->moduleHandler->alter('email_pre_render', $email_data, $context);
+      $this->moduleHandler->alter('email_pre_render', $email_data, $context);
       $symfony_email = new $email_data['symfony_email_class']();
 
       foreach ($email_data['headers'] as $name => $value) {
