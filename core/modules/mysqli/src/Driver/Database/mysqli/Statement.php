@@ -108,7 +108,7 @@ class Statement extends StatementBase {
         $this->getClientStatement()->get_result(),
         $this->clientConnection,
       );
-      $this->markResultsetIterable($return);
+      $this->result->markResultsetIterable($return);
     }
     catch (\Exception $e) {
       $this->dispatchStatementExecutionFailureEvent($startEvent, $e);

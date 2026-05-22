@@ -92,7 +92,7 @@ class StatementPrefetchIterator extends StatementBase {
     );
     // @phpstan-ignore unset.possiblyHookedProperty
     unset($this->clientStatement);
-    $this->markResultsetIterable($return);
+    $this->result->markResultsetIterable($return);
 
     if (isset($options['fetch'])) {
       if (is_string($options['fetch'])) {

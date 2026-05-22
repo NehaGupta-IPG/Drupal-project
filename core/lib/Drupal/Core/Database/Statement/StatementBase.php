@@ -11,7 +11,6 @@ use Drupal\Core\Database\Event\StatementExecutionStartEvent;
 use Drupal\Core\Database\FetchModeTrait;
 use Drupal\Core\Database\RowCountException;
 use Drupal\Core\Database\StatementInterface;
-use Drupal\Core\Database\StatementIteratorTrait;
 
 /**
  * StatementInterface base implementation.
@@ -34,7 +33,6 @@ use Drupal\Core\Database\StatementIteratorTrait;
 abstract class StatementBase implements StatementInterface {
 
   use FetchModeTrait;
-  use StatementIteratorTrait;
 
   /**
    * The client database Statement object.
@@ -242,11 +240,11 @@ abstract class StatementBase implements StatementInterface {
     $row = $this->result->fetch($mode ?? $this->fetchMode, $this->fetchOptions);
 
     if ($row === FALSE) {
-      $this->markResultsetFetchingComplete();
+      $this->result->markResultsetFetchingComplete();
       return FALSE;
     }
 
-    $this->setResultsetCurrentRow($row);
+    $this->result->setResultsetCurrentRow($row);
     return $row;
   }
 
@@ -262,11 +260,11 @@ abstract class StatementBase implements StatementInterface {
       ]);
 
     if ($row === FALSE) {
-      $this->markResultsetFetchingComplete();
+      $this->result->markResultsetFetchingComplete();
       return FALSE;
     }
 
-    $this->setResultsetCurrentRow($row);
+    $this->result->setResultsetCurrentRow($row);
     return $row;
   }
 
@@ -284,11 +282,11 @@ abstract class StatementBase implements StatementInterface {
     $column = $this->result->fetch(FetchAs::Column, ['column' => $index]);
 
     if ($column === FALSE) {
-      $this->markResultsetFetchingComplete();
+      $this->result->markResultsetFetchingComplete();
       return FALSE;
     }
 
-    $this->setResultsetCurrentRow($column);
+    $this->result->setResultsetCurrentRow($column);
     return $column;
   }
 
@@ -306,7 +304,7 @@ abstract class StatementBase implements StatementInterface {
 
     $return = $this->result->fetchAll($fetchMode, $this->fetchOptions);
 
-    $this->markResultsetFetchingComplete();
+    $this->result->markResultsetFetchingComplete();
 
     return $return;
   }
@@ -323,7 +321,7 @@ abstract class StatementBase implements StatementInterface {
    */
   public function fetchAllAssoc(string $key, ?FetchAs $fetch = NULL) {
     $result = $this->result->fetchAllAssoc($key, $fetch ?? $this->fetchMode, $this->fetchOptions);
-    $this->markResultsetFetchingComplete();
+    $this->result->markResultsetFetchingComplete();
     return $result;
   }
 
@@ -332,7 +330,7 @@ abstract class StatementBase implements StatementInterface {
    */
   public function fetchAllKeyed(int $keyIndex = 0, int $valueIndex = 1) {
     $result = $this->result->fetchAllKeyed($keyIndex, $valueIndex);
-    $this->markResultsetFetchingComplete();
+    $this->result->markResultsetFetchingComplete();
     return $result;
   }
 

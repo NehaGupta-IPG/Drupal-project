@@ -34,7 +34,7 @@ trait StatementIteratorTrait {
    * @param bool $valid
    *   The result of the execution of the client statement.
    */
-  protected function markResultsetIterable(bool $valid): void {
+  public function markResultsetIterable(bool $valid): void {
     $this->isResultsetIterable = $valid;
     $this->resultsetRow = NULL;
     if ($valid === TRUE) {
@@ -48,25 +48,15 @@ trait StatementIteratorTrait {
    * @param mixed $row
    *   The last row fetched from the client statement.
    */
-  protected function setResultsetCurrentRow(mixed $row): void {
+  public function setResultsetCurrentRow(mixed $row): void {
     $this->resultsetRow = $row;
     $this->resultsetKey++;
   }
 
   /**
-   * Returns the row index of the current element in the resultset.
-   *
-   * @return int
-   *   The row index of the current element in the resultset.
-   */
-  protected function getResultsetCurrentRowIndex(): int {
-    return $this->resultsetKey;
-  }
-
-  /**
    * Informs the iterator that no more rows can be fetched from the resultset.
    */
-  protected function markResultsetFetchingComplete(): void {
+  public function markResultsetFetchingComplete(): void {
     $this->markResultsetIterable(FALSE);
   }
 
