@@ -22,9 +22,7 @@ class SetMaxAge4xxTest extends UpdatePathTestBase {
    */
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
-      __DIR__ . '/../../../fixtures/update/drupal-10.3.0.bare.standard.php.gz',
-      __DIR__ . '/../../../fixtures/update/uninstall-history.php',
-      __DIR__ . '/../../../fixtures/update/uninstall-contact.php',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-11.3.0.bare.standard.php.gz',
     ];
   }
 
