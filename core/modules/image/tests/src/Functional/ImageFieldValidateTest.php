@@ -183,7 +183,7 @@ class ImageFieldValidateTest extends ImageFieldTestBase {
     $this->uploadNodeImage($image, $field_name, 'article');
 
     // Look for form-required for the alt text.
-    $this->assertSession()->elementExists('xpath', '//label[@for="edit-' . $field_name . '-0-alt" and @class="js-form-required form-required"]/following-sibling::input[@id="edit-' . $field_name . '-0-alt"]');
+    $this->assertSession()->elementExists('xpath', '//label[@for="edit-' . $field_name . '-0-alt" and @class="js-form-required form-required"]/following-sibling::div/textarea[@id="edit-' . $field_name . '-0-alt"]');
     $this->assertSession()->elementExists('xpath', '//label[@for="edit-' . $field_name . '-0-title" and @class="js-form-required form-required"]/following-sibling::input[@id="edit-' . $field_name . '-0-title"]');
     $this->assertSession()->statusMessageContains('Alternative text field is required.', 'error');
     $this->assertSession()->statusMessageContains('Title field is required.', 'error');

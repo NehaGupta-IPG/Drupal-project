@@ -468,7 +468,8 @@ class ImageItem extends FileItem {
       '#upload_validators' => $this->getUploadValidators(),
     ];
     $element['default_image']['alt'] = [
-      '#type' => 'textfield',
+      '#type' => 'textarea',
+      '#rows' => 3,
       '#title' => $this->t('Alternative text'),
       '#description' => $this->t('Short description of the image used by screen readers and displayed when the image is not loaded. This is important for accessibility.'),
       '#default_value' => $settings['default_image']['alt'],
