@@ -10,11 +10,13 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\PermissionHandler;
+use Drupal\user\PermissionProviderInterface;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use org\bovigo\vfs\vfsStreamWrapper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -201,6 +203,7 @@ EOF
    * @legacy-covers ::getPermissions
    * @legacy-covers ::buildPermissionsYaml
    */
+  #[IgnoreDeprecations]
   public function testBuildPermissionsYamlCallback(): void {
     vfsStreamWrapper::register();
     $root = new vfsStreamDirectory('modules');
@@ -274,6 +277,7 @@ EOF
   /**
    * Tests a YAML file containing both static permissions and a callback.
    */
+  #[IgnoreDeprecations]
   public function testPermissionsYamlStaticAndCallback(): void {
     vfsStreamWrapper::register();
     $root = new vfsStreamDirectory('modules');
@@ -324,6 +328,73 @@ EOF
   }
 
   /**
+   * Tests permissions provided by services implementing the provider interface.
+   */
+  public function testBuildPermissionsFromProviders(): void {
+    vfsStreamWrapper::register();
+    $root = new vfsStreamDirectory('modules');
+    vfsStreamWrapper::setRoot($root);
+
+    $this->moduleHandler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
+    $this->moduleHandler->expects($this->once())
+      ->method('getModuleDirectories')
+      ->willReturn([
+        'module_a' => vfsStream::url('modules/module_a'),
+      ]);
+    $url = vfsStream::url('modules');
+    mkdir($url . '/module_a');
+    file_put_contents($url . '/module_a/module_a.permissions.yml', <<<EOF
+'static permission':
+  title: 'Static'
+'shared key':
+  title: 'YAML wins'
+EOF
+    );
+
+    $this->moduleHandler
+      ->method('getModuleList')
+      ->willReturn(['module_a' => 0, 'module_b' => 0]);
+
+    $module_extension_list = $this->createStub(ModuleExtensionList::class);
+    $module_extension_list->method('getName')
+      ->willReturnMap([
+        ['module_a', 'Module a'],
+        ['module_b', 'Module b'],
+      ]);
+
+    $this->callableResolver->expects($this->never())
+      ->method('getCallableFromDefinition');
+
+    $providers = [
+      new TestPermissionProvider(),
+    ];
+
+    $this->permissionHandler = new PermissionHandler(
+      $this->moduleHandler,
+      $this->stringTranslation,
+      $this->callableResolver,
+      $module_extension_list,
+      $providers,
+    );
+
+    $actual_permissions = $this->permissionHandler->getPermissions();
+
+    // Both provider permissions appear, and 'provider' explicitly set on the
+    // returned array wins over namespace inference.
+    $this->assertEquals('Dynamic A', $actual_permissions['dynamic permission a']['title']);
+    $this->assertEquals('module_a', $actual_permissions['dynamic permission a']['provider']);
+    $this->assertEquals('Dynamic B', $actual_permissions['dynamic permission b']['title']);
+    $this->assertEquals('module_b', $actual_permissions['dynamic permission b']['provider']);
+    // YAML-declared permissions take precedence over provider-declared ones
+    // sharing the same key.
+    $this->assertEquals('YAML wins', (string) $actual_permissions['shared key']['title']);
+    $this->assertEquals('module_a', $actual_permissions['shared key']['provider']);
+
+    $this->assertTrue($this->permissionHandler->moduleProvidesPermissions('module_a'));
+    $this->assertTrue($this->permissionHandler->moduleProvidesPermissions('module_b'));
+  }
+
+  /**
    * Checks that the permissions are like expected.
    *
    * @param array $actual_permissions
@@ -341,6 +412,33 @@ EOF
     $this->assertEquals('module_c', $actual_permissions['access_module_c']['provider']);
     $this->assertTrue($actual_permissions['access_module_c']['restrict access']);
     $this->assertEquals('module_a', $actual_permissions['access module a via module b']['provider']);
+  }
+
+}
+
+/**
+ * Implements PermissionProviderInterface for testing.
+ */
+class TestPermissionProvider implements PermissionProviderInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPermissions(): array {
+    return [
+      'dynamic permission a' => [
+        'title' => 'Dynamic A',
+        'provider' => 'module_a',
+      ],
+      'dynamic permission b' => [
+        'title' => 'Dynamic B',
+        'provider' => 'module_b',
+      ],
+      'shared key' => [
+        'title' => 'Provider value (should lose to YAML)',
+        'provider' => 'module_a',
+      ],
+    ];
   }
 
 }
