@@ -7,7 +7,6 @@ namespace Drupal\Tests\mailer\Kernel;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Mailer\EmailManager;
 use Drupal\Core\Mailer\EmailPluginInterface;
-use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Test\MailerCaptureTrait;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
