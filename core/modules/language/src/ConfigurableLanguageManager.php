@@ -536,7 +536,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
   public function setRenderOverrideLanguage(?LanguageInterface $language = NULL, $type = LanguageInterface::TYPE_INTERFACE): static {
     $this->renderOverrideLanguages[$type] = $language;
     if ($type === LanguageInterface::TYPE_INTERFACE) {
-      ($this->translationManagerClosure)()->setDefaultLangcode($language?->getId() ?? $this->getDefaultLanguage()->getId());
+      ($this->translationManagerClosure)()->setDefaultLangcode($language?->getId() ?? $this->getNegotiatedLanguage($type)->getId());
     }
     return $this;
   }
