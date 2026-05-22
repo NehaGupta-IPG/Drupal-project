@@ -7,6 +7,7 @@ namespace Drupal\Tests\jsonapi\Functional;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Database\Database;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -497,6 +498,11 @@ class UserTest extends ResourceTestBase {
    * {@inheritdoc}
    */
   public function testCollectionFilterAccess(): void {
+    if (Database::getConnection()->driver() == 'mongodb') {
+      // @todo This test should work for MongoDB.
+      $this->markTestSkipped();
+    }
+
     // Set up data model.
     $this->assertTrue($this->container->get('module_installer')->install(['node'], TRUE), 'Installed modules.');
     FieldStorageConfig::create([

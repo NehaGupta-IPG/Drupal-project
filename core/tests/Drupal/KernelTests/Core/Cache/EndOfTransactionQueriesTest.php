@@ -67,6 +67,10 @@ class EndOfTransactionQueriesTest extends KernelTestBase {
    * Tests an entity save.
    */
   public function testEntitySave(): void {
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $this->markTestSkipped('The MongoDB database driver does not support savepoints.');
+    }
+
     \Drupal::cache()->set('test_cache_pretransaction_foobar', 'something', Cache::PERMANENT, ['foobar']);
     \Drupal::cache()->set('test_cache_pretransaction_entity_test_list', 'something', Cache::PERMANENT, ['entity_test_list']);
 
@@ -119,6 +123,10 @@ class EndOfTransactionQueriesTest extends KernelTestBase {
    * Tests an entity save rollback.
    */
   public function testEntitySaveRollback(): void {
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $this->markTestSkipped('The MongoDB database driver does not support savepoints.');
+    }
+
     \Drupal::cache()
       ->set('test_cache_pretransaction_entity_test_list', 'something', Cache::PERMANENT, ['entity_test_list']);
     \Drupal::cache()

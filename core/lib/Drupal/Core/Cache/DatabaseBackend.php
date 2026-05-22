@@ -8,6 +8,9 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
+use Drupal\mongodb\Driver\Database\mongodb\Statement;
+use MongoDB\BSON\Binary;
+use MongoDB\BSON\Decimal128;
 
 /**
  * Defines a default cache implementation.
@@ -69,6 +72,15 @@ class DatabaseBackend implements CacheBackendInterface {
   protected $checksumProvider;
 
   /**
+   * Indicator for the existence of the database table.
+   *
+   * This variable is only used by the database driver for MongoDB.
+   *
+   * @var bool
+   */
+  protected $tableExists = FALSE;
+
+  /**
    * Constructs a DatabaseBackend object.
    *
    * @param \Drupal\Core\Database\Connection $connection
@@ -128,7 +140,23 @@ class DatabaseBackend implements CacheBackendInterface {
     // ::select() is a much smaller proportion of the request.
     $result = [];
     try {
-      $result = $this->connection->query('SELECT [cid], [data], [created], [expire], [serialized], [tags], [checksum] FROM {' . $this->connection->escapeTable($this->bin) . '} WHERE [cid] IN ( :cids[] ) ORDER BY [cid]', [':cids[]' => array_keys($cid_mapping)]);
+      if ($this->connection->driver() == 'mongodb') {
+        $prefixed_table = $this->connection->getPrefix() . $this->bin;
+        $cursor = $this->connection->getConnection()->selectCollection($prefixed_table)->find(
+          ['cid' => ['$in' => array_keys($cid_mapping)]],
+          [
+            'projection' => ['cid' => 1, 'data' => 1, 'created' => 1, 'expire' => 1, 'serialized' => 1, 'tags' => 1, 'checksum' => 1, '_id' => 0],
+            'sort' => ['cid' => 1],
+            'session' => $this->connection->getMongodbSession(),
+          ]
+        );
+
+        $statement = new Statement($this->connection, $cursor, ['cid', 'data', 'created', 'expire', 'serialized', 'tags', 'checksum']);
+        $result = $statement->execute()->fetchAll();
+      }
+      else {
+        $result = $this->connection->query('SELECT [cid], [data], [created], [expire], [serialized], [tags], [checksum] FROM {' . $this->connection->escapeTable($this->bin) . '} WHERE [cid] IN ( :cids[] ) ORDER BY [cid]', [':cids[]' => array_keys($cid_mapping)]);
+      }
     }
     catch (\Exception) {
       // Nothing to do.
@@ -205,22 +233,33 @@ class DatabaseBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function setMultiple(array $items) {
-    $try_again = FALSE;
-    try {
-      // The bin might not yet exist.
-      $this->doSetMultiple($items);
-    }
-    catch (\Exception $e) {
-      // If there was an exception, try to create the bins.
-      if (!$try_again = $this->ensureBinExists()) {
-        // If the exception happened for other reason than the missing bin
-        // table, propagate the exception.
-        throw $e;
+    if ($this->connection->driver() == 'mongodb') {
+      // For MongoDB the table need to exists. Otherwise MongoDB creates one
+      // without the correct validation.
+      if (!$this->tableExists) {
+        $this->tableExists = $this->ensureBinExists();
       }
-    }
-    // Now that the bin has been created, try again if necessary.
-    if ($try_again) {
+
       $this->doSetMultiple($items);
+    }
+    else {
+      $try_again = FALSE;
+      try {
+        // The bin might not yet exist.
+        $this->doSetMultiple($items);
+      }
+      catch (\Exception $e) {
+        // If there was an exception, try to create the bins.
+        if (!$try_again = $this->ensureBinExists()) {
+          // If the exception happened for other reason than the missing bin
+          // table, propagate the exception.
+          throw $e;
+        }
+      }
+      // Now that the bin has been created, try again if necessary.
+      if ($try_again) {
+        $this->doSetMultiple($items);
+      }
     }
   }
 
@@ -264,14 +303,29 @@ class DatabaseBackend implements CacheBackendInterface {
           continue;
         }
 
-        if (!is_string($item['data'])) {
-          $fields['data'] = $this->serializer->encode($item['data']);
-          $fields['serialized'] = 1;
+        if ($this->connection->driver() == 'mongodb') {
+          $fields['created'] = new Decimal128($fields['created']);
+
+          if (!is_string($item['data'])) {
+            $fields['data'] = new Binary(serialize($item['data']), Binary::TYPE_GENERIC);
+            $fields['serialized'] = TRUE;
+          }
+          else {
+            $fields['data'] = new Binary($item['data'], Binary::TYPE_GENERIC);
+            $fields['serialized'] = FALSE;
+          }
         }
         else {
-          $fields['data'] = $item['data'];
-          $fields['serialized'] = 0;
+          if (!is_string($item['data'])) {
+            $fields['data'] = $this->serializer->encode($item['data']);
+            $fields['serialized'] = 1;
+          }
+          else {
+            $fields['data'] = $item['data'];
+            $fields['serialized'] = 0;
+          }
         }
+
         $values[] = $fields;
       }
 
@@ -308,6 +362,12 @@ class DatabaseBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function deleteMultiple(array $cids) {
+    if (($this->connection->driver() == 'mongodb') && !$this->tableExists) {
+      // For MongoDB the table needs to exist. Otherwise MongoDB creates one
+      // without the correct validation.
+      $this->tableExists = $this->ensureBinExists();
+    }
+
     $cids = array_values(array_map([$this, 'normalizeCid'], $cids));
     try {
       // Delete in chunks when a large array is passed.
@@ -331,6 +391,12 @@ class DatabaseBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function deleteAll() {
+    if (($this->connection->driver() == 'mongodb') && !$this->tableExists) {
+      // For MongoDB the table needs to exist. Otherwise MongoDB creates one
+      // without the correct validation.
+      $this->tableExists = $this->ensureBinExists();
+    }
+
     try {
       $this->connection->truncate($this->bin)->execute();
     }
@@ -357,6 +423,15 @@ class DatabaseBackend implements CacheBackendInterface {
   public function invalidateMultiple(array $cids) {
     $cids = array_values(array_map([$this, 'normalizeCid'], $cids));
     try {
+      if ($this->connection->driver() == 'mongodb') {
+        $session = $this->connection->getMongodbSession();
+        $session_started = FALSE;
+        if (!$session->isInTransaction()) {
+          $session->startTransaction();
+          $session_started = TRUE;
+        }
+      }
+
       // Update in chunks when a large array is passed.
       $requestTime = $this->time->getRequestTime();
       foreach (array_chunk($cids, 1000) as $cids_chunk) {
@@ -365,9 +440,18 @@ class DatabaseBackend implements CacheBackendInterface {
           ->condition('cid', $cids_chunk, 'IN')
           ->execute();
       }
+
+      if (isset($session) && $session->isInTransaction() && $session_started) {
+        $session->commitTransaction();
+      }
     }
     catch (\Exception $e) {
-      $this->catchException($e);
+      if (isset($session) && $session->isInTransaction() && $session_started) {
+        $session->abortTransaction();
+      }
+      else {
+        $this->catchException($e);
+      }
     }
   }
 
@@ -394,12 +478,16 @@ class DatabaseBackend implements CacheBackendInterface {
       if ($this->maxRows !== static::MAXIMUM_NONE) {
         $first_invalid_create_time = $this->connection->select($this->bin)
           ->fields($this->bin, ['created'])
-          ->orderBy("{$this->bin}.created", 'DESC')
+          ->orderBy('created', 'DESC')
           ->range($this->maxRows, 1)
           ->execute()
           ->fetchField();
 
         if ($first_invalid_create_time) {
+          if ($this->connection->driver() == 'mongodb') {
+            // The created field is saved in MongoDB as Decimal128.
+            $first_invalid_create_time = new Decimal128($first_invalid_create_time);
+          }
           $this->connection->delete($this->bin)
             ->condition('created', $first_invalid_create_time, '<=')
             ->execute();
@@ -562,6 +650,18 @@ class DatabaseBackend implements CacheBackendInterface {
       ],
       'primary key' => ['cid'],
     ];
+
+    if ($this->connection->driver() == 'mongodb') {
+      // The date field cannot be transformed to a real date field, because it can
+      // be set to infinity with the value -1.
+      $schema['fields']['serialized'] = [
+        'description' => 'A flag to indicate whether content is serialized (TRUE) or not (FALSE).',
+        'type' => 'bool',
+        'not null' => TRUE,
+        'default' => FALSE,
+      ];
+    }
+
     return $schema;
   }
 

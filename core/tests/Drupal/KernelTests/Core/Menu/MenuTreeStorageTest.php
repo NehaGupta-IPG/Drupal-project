@@ -8,6 +8,7 @@ use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Menu\MenuTreeStorage;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\mongodb\Menu\MenuTreeStorage as MongodbMenuTreeStorage;
 
 // cspell:ignore mlid
 
@@ -40,8 +41,15 @@ class MenuTreeStorageTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->treeStorage = new MenuTreeStorage($this->container->get('database'), $this->container->get('cache.menu'), $this->container->get('cache_tags.invalidator'), 'menu_tree');
     $this->connection = $this->container->get('database');
+
+    // MongoDB has its own implementation of MenuTreeStorage.
+    if ($this->connection->driver() == 'mongodb') {
+      $this->treeStorage = new MongodbMenuTreeStorage($this->container->get('database'), $this->container->get('cache.menu'), $this->container->get('cache_tags.invalidator'), 'menu_tree');
+    }
+    else {
+      $this->treeStorage = new MenuTreeStorage($this->container->get('database'), $this->container->get('cache.menu'), $this->container->get('cache_tags.invalidator'), 'menu_tree');
+    }
   }
 
   /**
@@ -65,7 +73,14 @@ class MenuTreeStorageTest extends KernelTestBase {
   protected function doTestTable(): void {
     // Test that we can create a tree storage with an arbitrary table name and
     // that selecting from the storage creates the table.
-    $tree_storage = new MenuTreeStorage($this->container->get('database'), $this->container->get('cache.menu'), $this->container->get('cache_tags.invalidator'), 'test_menu_tree');
+
+    // MongoDB has its own implementation of MenuTreeStorage.
+    if ($this->connection->driver() == 'mongodb') {
+      $tree_storage = new MongodbMenuTreeStorage($this->container->get('database'), $this->container->get('cache.menu'), $this->container->get('cache_tags.invalidator'), 'test_menu_tree');
+    }
+    else {
+      $tree_storage = new MenuTreeStorage($this->container->get('database'), $this->container->get('cache.menu'), $this->container->get('cache_tags.invalidator'), 'test_menu_tree');
+    }
     $this->assertFalse($this->connection->schema()->tableExists('test_menu_tree'), 'Test table is not yet created');
     $tree_storage->countMenuLinks();
     $this->assertTrue($this->connection->schema()->tableExists('test_menu_tree'), 'Test table was created');
@@ -424,6 +439,9 @@ class MenuTreeStorageTest extends KernelTestBase {
     $query->fields('menu_tree');
     $query->condition('id', $id);
     foreach ($expected_properties as $field => $value) {
+      if (($this->connection->driver() == 'mongodb') && in_array($field, ['enabled', 'discovered', 'expanded', 'has_children'])) {
+        $value = (bool) $value;
+      }
       $query->condition($field, $value);
     }
     $all = $query->execute()->fetchAll(\PDO::FETCH_ASSOC);

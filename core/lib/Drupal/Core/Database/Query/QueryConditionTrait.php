@@ -31,6 +31,14 @@ trait QueryConditionTrait {
   /**
    * {@inheritdoc}
    */
+  public function compare($field, $field2, $operator = '=') {
+    $this->condition->compare($field, $field2, $operator);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isNull($field) {
     $this->condition->isNull($field);
     return $this;

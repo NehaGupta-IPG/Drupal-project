@@ -57,15 +57,32 @@ class MenuRouterRebuildSubscriber implements EventSubscriberInterface {
   protected function menuLinksRebuild() {
     if ($this->lock->acquire(__FUNCTION__)) {
       try {
-        $transaction = $this->connection->startTransaction();
+        if ($this->connection->driver() == 'mongodb') {
+          $session = $this->connection->getMongodbSession();
+          $session_started = FALSE;
+          if (!$session->isInTransaction()) {
+            $session->startTransaction();
+            $session_started = TRUE;
+          }
+        }
+        else {
+          $transaction = $this->connection->startTransaction();
+        }
         // Ensure the menu links are up to date.
         $this->menuLinkManager->rebuild();
         // Ignore any database replicas temporarily.
         $this->replicaKillSwitch->trigger();
+
+        if (isset($session) && $session->isInTransaction() && $session_started) {
+          $session->commitTransaction();
+        }
       }
       catch (\Exception $e) {
         if (isset($transaction)) {
           $transaction->rollBack();
+        }
+        if (isset($session) && $session->isInTransaction() && $session_started) {
+          $session->abortTransaction();
         }
         Error::logException($this->logger, $e);
       }

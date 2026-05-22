@@ -143,7 +143,7 @@ class CommentLanguageTest extends BrowserTestBase {
         // Check that comment language matches the current content language.
         $cids = \Drupal::entityQuery('comment')
           ->accessCheck(FALSE)
-          ->condition('entity_id', $node->id())
+          ->condition('entity_id', (int) $node->id())
           ->condition('entity_type', 'node')
           ->condition('field_name', 'comment')
           ->sort('cid', 'DESC')

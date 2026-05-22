@@ -7,6 +7,8 @@ namespace Drupal\Core\Recipe;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\NullStorage;
 use Drupal\Core\Config\StorageInterface;
+use Drupal\Core\Database\Connection;
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 
 /**
  * @internal
@@ -14,9 +16,18 @@ use Drupal\Core\Config\StorageInterface;
  */
 final class ConfigConfigurator {
 
+  use DependencySerializationTrait;
+
   public readonly ?string $recipeConfigDirectory;
 
   private readonly bool|array $strict;
+
+  /**
+   * The database connection.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected Connection $connection;
 
   /**
    * @param array $config
@@ -25,11 +36,14 @@ final class ConfigConfigurator {
    *   The path to the recipe.
    * @param \Drupal\Core\Config\StorageInterface $active_configuration
    *   The active configuration storage.
+   * @param \Drupal\Core\Database\Connection $connection
+   *   The database connection.
    */
-  public function __construct(public readonly array $config, string $recipe_directory, StorageInterface $active_configuration) {
+  public function __construct(public readonly array $config, string $recipe_directory, StorageInterface $active_configuration, Connection $connection) {
     $this->recipeConfigDirectory = is_dir($recipe_directory . '/config') ? $recipe_directory . '/config' : NULL;
     // @todo Consider defaulting this to FALSE in https://drupal.org/i/3478669.
     $this->strict = $config['strict'] ?? TRUE;
+    $this->connection = $connection;
 
     $recipe_storage = $this->getConfigStorage();
     if ($this->strict === TRUE) {
@@ -96,6 +110,17 @@ final class ConfigConfigurator {
     $storages = [];
 
     if ($this->recipeConfigDirectory) {
+      $directories = explode('/', $this->recipeConfigDirectory);
+      array_pop($directories);
+      $key = array_pop($directories);
+
+      /** @var \Drupal\Core\Extension\ModuleExtensionList $module_list */
+      $module_list = \Drupal::service('extension.list.module');
+      $database_override_path = $module_list->getPath($this->connection->getProvider()) . '/config/overrides/recipes/' . $key;
+      if (is_dir($database_override_path)) {
+        $storages[] = new FileStorage($database_override_path);
+      }
+
       // Config provided by the recipe should take priority over config from
       // extensions.
       $storages[] = new FileStorage($this->recipeConfigDirectory);
@@ -117,10 +142,25 @@ final class ConfigConfigurator {
           default => throw new \RuntimeException("$extension is not a theme or module")
         };
 
-        $storage = new RecipeConfigStorageWrapper(
-          new FileStorage($path . '/config/install'),
-          new FileStorage($path . '/config/optional'),
-        );
+        // Config item can be overridden by the current database driver. Those
+        // overridden config items are stored in the module of the current
+        // database driver in the "config/override" directory.
+        $database_override_path = $module_list->getPath($this->connection->getProvider()) . '/config/overrides/' . $extension;
+        if (is_dir($database_override_path)) {
+          $storage = new RecipeConfigStorageWrapper(
+            new FileStorage($path . '/config/install'),
+            new FileStorage($path . '/config/optional'),
+            new FileStorage($database_override_path . '/install'),
+            new FileStorage($database_override_path . '/optional'),
+          );
+        }
+        else {
+          $storage = new RecipeConfigStorageWrapper(
+            new FileStorage($path . '/config/install'),
+            new FileStorage($path . '/config/optional'),
+          );
+        }
+
         // If we get here, $names is either '*', or a list of config names
         // provided by the current extension. In the latter case, we only want
         // to import the config that is in the list, so use an

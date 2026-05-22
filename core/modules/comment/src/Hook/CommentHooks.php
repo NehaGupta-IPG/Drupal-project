@@ -430,7 +430,7 @@ class CommentHooks {
   public function userCancel($edit, UserInterface $account, $method) {
     switch ($method) {
       case 'user_cancel_block_unpublish':
-        $comments = \Drupal::entityTypeManager()->getStorage('comment')->loadByProperties(['uid' => $account->id()]);
+        $comments = \Drupal::entityTypeManager()->getStorage('comment')->loadByProperties(['uid' => (int) $account->id()]);
         foreach ($comments as $comment) {
           $comment->setUnpublished();
           $comment->save();
@@ -439,7 +439,7 @@ class CommentHooks {
 
       case 'user_cancel_reassign':
         /** @var \Drupal\comment\CommentInterface[] $comments */
-        $comments = \Drupal::entityTypeManager()->getStorage('comment')->loadByProperties(['uid' => $account->id()]);
+        $comments = \Drupal::entityTypeManager()->getStorage('comment')->loadByProperties(['uid' => (int) $account->id()]);
         foreach ($comments as $comment) {
           $langcodes = array_keys($comment->getTranslationLanguages());
           // For efficiency manually save the original comment before applying any
@@ -462,7 +462,7 @@ class CommentHooks {
   #[Hook('user_predelete')]
   public function userPredelete($account) {
     $entity_query = \Drupal::entityQuery('comment')->accessCheck(FALSE);
-    $entity_query->condition('uid', $account->id());
+    $entity_query->condition('uid', (int) $account->id());
     $cids = $entity_query->execute();
     $comment_storage = \Drupal::entityTypeManager()->getStorage('comment');
     $comments = $comment_storage->loadMultiple($cids);

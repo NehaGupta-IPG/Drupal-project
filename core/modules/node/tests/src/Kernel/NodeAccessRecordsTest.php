@@ -33,7 +33,7 @@ class NodeAccessRecordsTest extends NodeAccessTestBase {
     $connection = Database::getConnection();
     $records = $connection->select('node_access', 'na')
       ->fields('na', ['realm', 'gid'])
-      ->condition('nid', $node1->id())
+      ->condition('nid', (int) $node1->id())
       ->execute()
       ->fetchAll();
     $this->assertCount(1, $records, 'Returned the correct number of rows.');
@@ -47,7 +47,7 @@ class NodeAccessRecordsTest extends NodeAccessTestBase {
     // Check to see if grants added by node_test_node_access_records made it in.
     $records = $connection->select('node_access', 'na')
       ->fields('na', ['realm', 'gid'])
-      ->condition('nid', $node2->id())
+      ->condition('nid', (int) $node2->id())
       ->execute()
       ->fetchAll();
     $this->assertCount(1, $records, 'Returned the correct number of rows.');
@@ -61,7 +61,7 @@ class NodeAccessRecordsTest extends NodeAccessTestBase {
     // Check to see if grants added by node_test_node_access_records made it in.
     $records = $connection->select('node_access', 'na')
       ->fields('na', ['realm', 'gid'])
-      ->condition('nid', $node3->id())
+      ->condition('nid', (int) $node3->id())
       ->execute()
       ->fetchAll();
     $this->assertCount(1, $records, 'Returned the correct number of rows.');
@@ -76,7 +76,7 @@ class NodeAccessRecordsTest extends NodeAccessTestBase {
     // by node_test_node_access_records_alter.
     $records = $connection->select('node_access', 'na')
       ->fields('na', ['realm', 'gid'])
-      ->condition('nid', $node4->id())
+      ->condition('nid', (int) $node4->id())
       ->execute()
       ->fetchAll();
     $this->assertCount(1, $records, 'Returned the correct number of rows.');
@@ -99,7 +99,7 @@ class NodeAccessRecordsTest extends NodeAccessTestBase {
     $node6 = $this->drupalCreateNode(['status' => 0, 'disable_node_access' => TRUE]);
     $records = $connection->select('node_access', 'na')
       ->fields('na', ['realm', 'gid'])
-      ->condition('nid', $node6->id())
+      ->condition('nid', (int) $node6->id())
       ->execute()
       ->fetchAll();
     $this->assertCount(0, $records, 'Returned no records for unpublished node.');

@@ -41,7 +41,12 @@ class ServiceProviderTest extends KernelTestBase {
    * Tests that services provided by module service providers get registered to the DIC.
    */
   public function testServiceProviderRegistration(): void {
-    $definition = $this->container->getDefinition('file.usage');
+    if ($this->container->get('database')->driver() == 'mongodb') {
+      $definition = $this->container->getDefinition('mongodb.file.usage');
+    }
+    else {
+      $definition = $this->container->getDefinition('file.usage');
+    }
     $this->assertSame('Drupal\\service_provider_test\\TestFileUsage', $definition->getClass(), 'Class has been changed');
     $this->assertTrue(\Drupal::hasService('service_provider_test_class'), 'The service_provider_test_class service has been registered to the DIC');
   }

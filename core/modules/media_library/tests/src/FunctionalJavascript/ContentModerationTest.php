@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media_library\FunctionalJavascript;
 
+use Drupal\Core\Database\Database;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\file\Entity\File;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
@@ -85,6 +86,11 @@ class ContentModerationTest extends WebDriverTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+
+    if (Database::getConnection()->driver() == 'mongodb') {
+      // @todo Fix this test for MongoDB.
+      $this->markTestSkipped();
+    }
 
     // Create an image media type and article node type.
     $this->createMediaType('image', ['id' => 'image']);

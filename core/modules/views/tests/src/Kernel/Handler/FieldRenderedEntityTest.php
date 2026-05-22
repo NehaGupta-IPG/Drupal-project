@@ -200,7 +200,7 @@ class FieldRenderedEntityTest extends ViewsKernelTestBase {
     $storage->calculateDependencies();
     $this->assertEquals([
       'config' => ['core.entity_view_mode.entity_test.foobar'],
-      'module' => ['entity_test'],
+      'module' => ['entity_test', 'mongodb'],
     ], $storage->getDependencies());
   }
 

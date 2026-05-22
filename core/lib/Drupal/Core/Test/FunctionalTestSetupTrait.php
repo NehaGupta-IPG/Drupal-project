@@ -26,6 +26,8 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Routing\Route;
 
+// cspell:ignore replicaset
+
 /**
  * Defines a trait for shared functional test setup functionality.
  */
@@ -554,6 +556,33 @@ trait FunctionalTestSetupTrait {
       unset($formInput['password']);
       unset($formInput['host']);
       unset($formInput['port']);
+    }
+
+    if ($driverName == "mongodb") {
+      // The MongoDB connection string uses the key "replicaSet" and Drupal has
+      // all form keys in lowercase.
+      if (isset($formInput['replicaSet'])) {
+        $formInput['replicaset'] = $formInput['replicaSet'];
+        unset($formInput['replicaSet']);
+      }
+
+      // Change the array of hosts to the FORM API values.
+      if (isset($formInput['hosts']) && is_array($formInput['hosts'])) {
+        foreach ($formInput['hosts'] as $key => $value) {
+          if (isset($value['port'])) {
+            $formInput['host' . ($key + 1)] = [
+              'host' => $value['host'],
+              'port' => $value['port'],
+            ];
+          }
+          else {
+            $formInput['host' . ($key + 1)] = [
+              'host' => $value['host'],
+            ];
+          }
+        }
+        unset($formInput['hosts']);
+      }
     }
 
     $parameters = [

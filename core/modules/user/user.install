@@ -5,6 +5,8 @@
  * Install, update and uninstall functions for the user module.
  */
 
+use Drupal\mongodb\Driver\Database\mongodb\Statement;
+
 /**
  * Implements hook_schema().
  */
@@ -62,6 +64,14 @@ function user_schema(): array {
     ],
   ];
 
+  if (\Drupal::database()->driver() == 'mongodb') {
+    $schema['users_data']['fields']['serialized'] = [
+      'description' => 'Whether value is serialized.',
+      'type' => 'bool',
+      'default' => FALSE,
+    ];
+  }
+
   return $schema;
 }
 
@@ -116,12 +126,58 @@ function user_requirements($phase): array {
     ];
   }
 
-  $query = \Drupal::database()->select('users_field_data');
-  $query->addExpression('LOWER(mail)', 'lower_mail');
-  $query->isNotNull('mail');
-  $query->groupBy('lower_mail');
-  $query->having('COUNT(uid) > :matches', [':matches' => 1]);
-  $conflicts = $query->countQuery()->execute()->fetchField();
+  $connection = \Drupal::database();
+  if ($connection->driver() === 'mongodb') {
+    $prefixed_table = $connection->getPrefix() . 'users';
+    $cursor = $connection->getConnection()->selectCollection($prefixed_table)->aggregate(
+      [
+        [
+          '$unwind' => ['path' => '$user_translations'],
+        ],
+        [
+          '$replaceRoot' => [
+            'newRoot' => [
+              '$mergeObjects' => [
+                '$$ROOT',
+                '$user_translations',
+              ],
+            ],
+          ],
+        ],
+        [
+          '$match' => [
+            'mail' => ['$ne' => NULL],
+          ],
+        ],
+        [
+          '$addFields' => [
+            'lower_mail' => ['$toLower' => '$mail'],
+          ],
+        ],
+        [
+          '$group' => [
+            '_id' => '$lower_mail',
+            'mail_count' => ['$sum' => 1],
+          ],
+        ],
+        [
+          '$match' => [
+            'mail_count' => ['$gt' => 1],
+          ],
+        ],
+      ],
+    );
+    $statement = new Statement($connection, $cursor, ['mail_count']);
+    $conflicts = $statement->execute()->fetchField();
+  }
+  else {
+    $query = \Drupal::database()->select('users_field_data');
+    $query->addExpression('LOWER(mail)', 'lower_mail');
+    $query->isNotNull('mail');
+    $query->groupBy('lower_mail');
+    $query->having('COUNT(uid) > :matches', [':matches' => 1]);
+    $conflicts = $query->countQuery()->execute()->fetchField();
+  }
 
   if ($conflicts > 0) {
     $return['conflicting emails'] = [

@@ -1,0 +1,85 @@
+services:
+  # MongoDB Services.
+  mongodb.sequences:
+    class: Drupal\mongodb\Driver\Database\mongodb\Sequences
+    arguments: ['@database']
+  Drupal\mongodb\Driver\Database\mongodb\Sequences: '@mongodb.sequences'
+
+  mongodb.table_information:
+    class: Drupal\mongodb\Driver\Database\mongodb\TableInformation
+    arguments: ['@database']
+  Drupal\mongodb\Driver\Database\mongodb\TableInformation: '@mongodb.table_information'
+
+  mongodb.translate_sql:
+    class: Drupal\mongodb\Driver\Database\mongodb\TranslateSql
+  Drupal\mongodb\Driver\Database\mongodb\TranslateSql: '@mongodb.translate_sql'
+
+  # MongoDB overrides EntityQuery.
+  mongodb.entity.query.sql:
+    class: Drupal\mongodb\EntityQuery\QueryFactory
+    arguments: ['@database']
+  entity.query.sql:
+    alias: mongodb.entity.query.sql
+
+  # MongoDB overrides Lock.
+  mongodb.lock:
+    class: Drupal\mongodb\Lock\DatabaseLockBackend
+    arguments: ['@database']
+  lock:
+    alias: mongodb.lock
+
+  mongodb.lock.persistent:
+    class: Drupal\mongodb\Lock\PersistentDatabaseLockBackend
+    arguments: ['@database']
+  lock.persistent:
+    alias: mongodb.lock.persistent
+
+  # MongoDB overrides Menu.
+  mongodb.menu.tree_storage:
+    class: Drupal\mongodb\Menu\MenuTreeStorage
+    arguments: ['@database', '@cache.menu', '@cache_tags.invalidator', 'menu_tree']
+    public: false
+  menu.tree_storage:
+    alias: mongodb.menu.tree_storage
+
+  # MongoDB overrides module ban.
+  mongodb.ban.ip_manager:
+    class: Drupal\mongodb\modules\ban\BanIpManager
+    arguments: ['@database']
+  ban.ip_manager:
+    alias: mongodb.ban.ip_manager
+
+  # MongoDB overrides module comment.
+  mongodb.comment.statistics:
+    class: Drupal\mongodb\modules\comment\CommentStatistics
+    arguments: ['@database', '@current_user', '@entity_type.manager', '@state', '@datetime.time', '@database.replica']
+  comment.statistics:
+    alias: mongodb.comment.statistics
+
+  # MongoDB overrides module file.
+  mongodb.file.usage:
+    class: Drupal\mongodb\modules\file\DatabaseFileUsageBackend
+    arguments: ['@config.factory', '@database', 'file_usage']
+
+  # MongoDB overrides module locale.
+  mongodb.locale.storage:
+    class: Drupal\mongodb\modules\locale\StringDatabaseStorage
+    arguments: ['@database']
+  locale.storage:
+    alias: mongodb.locale.storage
+
+  # MongoDB overrides module user.
+  mongodb.user.data:
+    class: Drupal\mongodb\modules\user\UserData
+    arguments: ['@database']
+
+  # MongoDB overrides module views.
+  mongodb.views.date_sql:
+    class: Drupal\mongodb\Plugin\views\query\DateSql
+    arguments: ['@database']
+    public: false
+
+  mongodb.views.cast_sql:
+    class: Drupal\mongodb\Plugin\views\query\CastSql
+    arguments: ['@database']
+    public: false

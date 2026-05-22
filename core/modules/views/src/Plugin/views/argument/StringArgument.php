@@ -167,9 +167,16 @@ class StringArgument extends ArgumentPluginBase {
     }
     else {
       // Add the field.
-      $formula = $this->getFormula();
-      $this->base_alias = $this->query->addField(NULL, $formula, $this->field . '_truncated');
-      $this->query->setCountField(NULL, $formula, $this->field, $this->field . '_truncated');
+      if ($this->view->getDatabaseDriver() == 'mongodb') {
+        $this->base_alias = $this->field . '_truncated';
+        $this->query->addSubstringField($this->base_alias, $this->field, 0, intval($this->options['limit']));
+      }
+      else {
+        // Add the field.
+        $formula = $this->getFormula();
+        $this->base_alias = $this->query->addField(NULL, $formula, $this->field . '_truncated');
+        $this->query->setCountField(NULL, $formula, $this->field, $this->field . '_truncated');
+      }
     }
 
     $this->summaryNameField();
@@ -238,7 +245,12 @@ class StringArgument extends ArgumentPluginBase {
     $this->ensureMyTable();
     $formula = FALSE;
     if (empty($this->options['glossary'])) {
-      $field = "$this->tableAlias.$this->realField";
+      if (($this->view->getDatabaseDriver() == 'mongodb') && ($this->table == $this->view->storage->get('base_table'))) {
+        $field = $this->realField;
+      }
+      else {
+        $field = "$this->tableAlias.$this->realField";
+      }
     }
     else {
       $formula = TRUE;
@@ -264,10 +276,20 @@ class StringArgument extends ArgumentPluginBase {
       $placeholders = [
         $placeholder => $argument,
       ];
-      $this->query->addWhereExpression(0, $field, $placeholders);
+      if ($this->view->getDatabaseDriver() == 'mongodb') {
+        $this->query->addSubstringField($this->realField . '_truncated', $field, 0, intval($this->options['limit']));
+      }
+      else {
+        $this->query->addWhereExpression(0, $field, $placeholders);
+      }
     }
     else {
-      $this->query->addWhere(0, $field, $argument, $operator);
+      if ($this->view->getDatabaseDriver() == 'mongodb') {
+        $this->query->addCondition(0, $field, $argument, $operator);
+      }
+      else {
+        $this->query->addWhere(0, $field, $argument, $operator);
+      }
     }
   }
 

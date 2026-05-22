@@ -1,4 +1,4 @@
-# cspell:ignore drupaltestbot drupaltestbotpw Dwebdriver logfile XVFB
+# cspell:ignore drupaltestbot drupaltestbotpw Dwebdriver logfile XVFB dbrs
 
 stages:
   - 🗜️ Test
@@ -20,14 +20,14 @@ variables:
   stage: 🗜️ Test
   interruptible: true
   image:
-    name: $_CONFIG_DOCKERHUB_ROOT/php-$_TARGET_PHP-apache:production
+    name: $_CONFIG_DOCKERHUB_ROOT/php-$_TARGET_PHP-apache:dev
   rules:
     - if: $CI_PIPELINE_SOURCE == "parent_pipeline" && $PERFORMANCE_TEST != "1"
   needs:
     - pipeline: $PARENT_PIPELINE_ID
       job: '🧹 PHP Coding standards (PHPCS)'
   services:
-    - name: $_CONFIG_DOCKERHUB_ROOT/$_TARGET_DB:production
+    - name: $_CONFIG_DOCKERHUB_ROOT/$_TARGET_DB:dev
       alias: database
     - name: selenium/standalone-chrome:latest
       alias: selenium
@@ -38,11 +38,13 @@ variables:
         SE_START_XVFB: "false"
         SE_START_VNC: "false"
   before_script:
+    - docker-php-ext-enable mongodb
     - |
       [[ $_TARGET_DB == sqlite* ]] && export SIMPLETEST_DB=sqlite://localhost/$CI_PROJECT_DIR/sites/default/files/db.sqlite?module=sqlite
       [[ $_TARGET_DB == mysql* ]] && export SIMPLETEST_DB=mysql://$MYSQL_USER:$MYSQL_PASSWORD@database/$MYSQL_DATABASE?module=mysql
       [[ $_TARGET_DB == mariadb* ]] && export SIMPLETEST_DB=mysql://$MYSQL_USER:$MYSQL_PASSWORD@database/$MYSQL_DATABASE?module=mysql
       [[ $_TARGET_DB == pgsql* ]] && export SIMPLETEST_DB=pgsql://$POSTGRES_USER:$POSTGRES_PASSWORD@database/$POSTGRES_DB?module=pgsql
+      [[ $_TARGET_DB == mongodb* ]] && export SIMPLETEST_DB=mongodb://db:db@database:27017/db?module=mongodb&replicaSet=dbrs
     - $CI_PROJECT_DIR/.gitlab-ci/scripts/server-setup.sh
   script:
     - $CI_PROJECT_DIR/.gitlab-ci/scripts/test-only.sh

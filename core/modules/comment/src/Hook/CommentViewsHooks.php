@@ -25,13 +25,22 @@ class CommentViewsHooks {
         'no group by' => TRUE,
       ],
     ];
+
+    // Get the database driver.
+    $driver = \Drupal::database()->driver();
+
     // Provides an integration for each entity type except comment.
     foreach (\Drupal::entityTypeManager()->getDefinitions() as $entity_type_id => $entity_type) {
       if ($entity_type_id == 'comment' || !$entity_type->entityClassImplements(ContentEntityInterface::class) || !$entity_type->getBaseTable()) {
         continue;
       }
       $fields = \Drupal::service('comment.manager')->getFields($entity_type_id);
-      $base_table = $entity_type->getDataTable() ?: $entity_type->getBaseTable();
+      if ($entity_type->getDataTable() && ($driver != 'mongodb')) {
+        $base_table = $entity_type->getDataTable();
+      }
+      else {
+        $base_table = $entity_type->getBaseTable();
+      }
       $args = ['@entity_type' => $entity_type_id];
       if ($fields) {
         $data[$base_table]['comments_link'] = [
@@ -42,7 +51,7 @@ class CommentViewsHooks {
           ],
         ];
         // Multilingual properties are stored in data table.
-        if (!($table = $entity_type->getDataTable())) {
+        if (!($table = $entity_type->getDataTable()) || ($driver == 'mongodb')) {
           $table = $entity_type->getBaseTable();
         }
         $data[$table]['uid_touch'] = [
@@ -75,19 +84,19 @@ class CommentViewsHooks {
             'relationship' => [
               'group' => t('Comment'),
               'label' => t('Comments'),
-              'base' => 'comment_field_data',
+              'base' => $base_table,
               'base field' => 'entity_id',
               'relationship field' => $entity_type->getKey('id'),
               'id' => 'standard',
               'extra' => [
-                        [
-                          'field' => 'entity_type',
-                          'value' => $entity_type_id,
-                        ],
-                        [
-                          'field' => 'field_name',
-                          'value' => $field_name,
-                        ],
+                [
+                  'field' => 'entity_type',
+                  'value' => $entity_type_id,
+                ],
+                [
+                  'field' => 'field_name',
+                  'value' => $field_name,
+                ],
               ],
             ],
           ];

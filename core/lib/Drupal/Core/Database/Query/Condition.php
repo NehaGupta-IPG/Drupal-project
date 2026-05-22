@@ -130,6 +130,51 @@ class Condition implements ConditionInterface, \Countable {
   /**
    * {@inheritdoc}
    */
+  public function compare(string $field, string $field2, ?string $operator = '=') {
+    if (!in_array($operator, ['=', '<', '>', '>=', '<=', '<>'], TRUE)) {
+      throw new InvalidQueryException(sprintf("In a query compare '%s %s %s' the operator must be one of the following: '=', '<', '>', '>=', '<=', '<>'.", $field, $operator, $field2));
+    }
+
+    $this->conditions[] = [
+      'field' => $field,
+      'field2' => $field2,
+      'operator' => $operator,
+    ];
+
+    $this->changed = TRUE;
+
+    return $this;
+  }
+
+  /**
+   * Update the alias placeholder in the condition and its children.
+   *
+   * @param string $placeholder
+   *   The value of the placeholder.
+   * @param string $alias
+   *   The value to replace the placeholder.
+   *
+   * @internal
+   */
+  public function updateAliasPlaceholder(string $placeholder, string $alias): void {
+    foreach ($this->conditions as &$condition) {
+      if (isset($condition['field']) && $condition['field'] instanceof ConditionInterface) {
+        $condition['field']->updateAliasPlaceholder($placeholder, $alias);
+      }
+      else {
+        if (isset($condition['field'])) {
+          $condition['field'] = str_replace($placeholder, $alias, $condition['field']);
+        }
+        if (isset($condition['field2'])) {
+          $condition['field2'] = str_replace($placeholder, $alias, $condition['field2']);
+        }
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function where($snippet, $args = []) {
     $this->conditions[] = [
       'field' => $snippet,
@@ -226,6 +271,12 @@ class Condition implements ConditionInterface, \Countable {
           // default value as defined over there) it is assumed to be a valid
           // condition on its own: ignore the operator and value parts.
           $ignore_operator = $condition['operator'] === '=' && $condition['value'] === NULL;
+        }
+        elseif (isset($condition['field2'])) {
+          // The key field2 is only set when we are comparing 2 fields with each
+          // other.
+          $condition_fragments[] = trim(implode(' ', [$connection->escapeField($condition['field']), $condition['operator'], $connection->escapeField($condition['field2'])]));
+          continue;
         }
         elseif (!isset($condition['operator'])) {
           // Left hand part is a literal string added with the
@@ -361,7 +412,7 @@ class Condition implements ConditionInterface, \Countable {
         if ($condition['field'] instanceof ConditionInterface) {
           $this->conditions[$key]['field'] = clone($condition['field']);
         }
-        if ($condition['value'] instanceof SelectInterface) {
+        if (isset($condition['value']) && ($condition['value'] instanceof SelectInterface)) {
           $this->conditions[$key]['value'] = clone($condition['value']);
         }
       }

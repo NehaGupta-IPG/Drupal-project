@@ -25,7 +25,7 @@ class UpdateComplexTest extends DatabaseTestBase {
     $this->assertSame(2, $num_updated, 'Updated 2 records.');
 
     $num_matches = $this->connection->query('SELECT COUNT(*) FROM {test} WHERE [job] = :job', [':job' => 'Musician'])->fetchField();
-    $this->assertSame('2', $num_matches, 'Updated fields successfully.');
+    $this->assertSame(2, $num_matches, 'Updated fields successfully.');
   }
 
   /**
@@ -39,7 +39,7 @@ class UpdateComplexTest extends DatabaseTestBase {
     $this->assertSame(2, $num_updated, 'Updated 2 records.');
 
     $num_matches = $this->connection->query('SELECT COUNT(*) FROM {test} WHERE [job] = :job', [':job' => 'Musician'])->fetchField();
-    $this->assertSame('2', $num_matches, 'Updated fields successfully.');
+    $this->assertSame(2, $num_matches, 'Updated fields successfully.');
   }
 
   /**
@@ -55,7 +55,7 @@ class UpdateComplexTest extends DatabaseTestBase {
     $this->assertSame(1, $num_updated, 'Updated 1 record.');
 
     $num_matches = $this->connection->query('SELECT COUNT(*) FROM {test} WHERE [job] = :job', [':job' => 'Musician'])->fetchField();
-    $this->assertSame('1', $num_matches, 'Updated fields successfully.');
+    $this->assertSame(1, $num_matches, 'Updated fields successfully.');
   }
 
   /**
@@ -69,7 +69,7 @@ class UpdateComplexTest extends DatabaseTestBase {
     $this->assertSame(2, $num_updated, 'Updated 2 records.');
 
     $num_matches = $this->connection->query('SELECT COUNT(*) FROM {test} WHERE [job] = :job', [':job' => 'Musician'])->fetchField();
-    $this->assertSame('2', $num_matches, 'Updated fields successfully.');
+    $this->assertSame(2, $num_matches, 'Updated fields successfully.');
   }
 
   /**
@@ -83,7 +83,7 @@ class UpdateComplexTest extends DatabaseTestBase {
     $this->assertSame(1, $num_updated, 'Updated 1 record.');
 
     $num_matches = $this->connection->query('SELECT COUNT(*) FROM {test} WHERE [job] = :job', [':job' => 'Musician'])->fetchField();
-    $this->assertSame('1', $num_matches, 'Updated fields successfully.');
+    $this->assertSame(1, $num_matches, 'Updated fields successfully.');
   }
 
   /**
@@ -99,7 +99,7 @@ class UpdateComplexTest extends DatabaseTestBase {
     $this->assertSame(1, $num_updated, 'Updated 1 record.');
 
     $num_matches = $this->connection->query('SELECT COUNT(*) FROM {test} WHERE [job] = :job', [':job' => 'Musician'])->fetchField();
-    $this->assertSame('1', $num_matches, 'Updated fields successfully.');
+    $this->assertSame(1, $num_matches, 'Updated fields successfully.');
 
     $person = $this->connection->query('SELECT * FROM {test} WHERE [name] = :name', [':name' => 'Ringo'])->fetch();
     $this->assertEquals('Ringo', $person->name, 'Name set correctly.');
@@ -126,6 +126,10 @@ class UpdateComplexTest extends DatabaseTestBase {
    * Tests UPDATE with a subselect value.
    */
   public function testSubSelectUpdate(): void {
+    if ($this->connection->driver() == 'mongodb') {
+      $this->markTestSkipped('The MongoDB database driver does not support subqueries.');
+    }
+
     $subselect = $this->connection->select('test_task', 't');
     $subselect->addExpression('MAX([priority]) + :increment', 'max_priority', [':increment' => 30]);
     // Clone this to make sure we are running a different query when

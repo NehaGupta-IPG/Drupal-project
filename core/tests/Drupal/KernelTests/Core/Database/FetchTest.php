@@ -165,20 +165,38 @@ class FetchTest extends DatabaseTestBase {
    * Tests ::fetchAllAssoc().
    */
   public function testQueryFetchAllAssoc(): void {
-    $expected_result = [
-      "Singer" => [
-        "id" => "2",
-        "name" => "George",
-        "age" => "27",
-        "job" => "Singer",
-      ],
-      "Drummer" => [
-        "id" => "3",
-        "name" => "Ringo",
-        "age" => "28",
-        "job" => "Drummer",
-      ],
-    ];
+    if ($this->connection->driver() == 'mongodb') {
+      $expected_result = [
+        "Singer" => [
+          "name" => "George",
+          "age" => 27,
+          "job" => "Singer",
+          "id" => 2,
+        ],
+        "Drummer" => [
+          "name" => "Ringo",
+          "age" => 28,
+          "job" => "Drummer",
+          "id" => 3,
+        ],
+      ];
+    }
+    else {
+      $expected_result = [
+        "Singer" => [
+          "id" => "2",
+          "name" => "George",
+          "age" => "27",
+          "job" => "Singer",
+        ],
+        "Drummer" => [
+          "id" => "3",
+          "name" => "Ringo",
+          "age" => "28",
+          "job" => "Drummer",
+        ],
+      ];
+    }
 
     $statement = $this->connection->query('SELECT * FROM {test} WHERE [age] > :age', [':age' => 26]);
     $result = $statement->fetchAllAssoc('job', \PDO::FETCH_ASSOC);

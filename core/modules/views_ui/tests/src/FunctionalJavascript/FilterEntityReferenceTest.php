@@ -68,13 +68,17 @@ class FilterEntityReferenceTest extends WebDriverTestBase {
     // Wait for the popup to open and the search field to be available.
     $assert->waitForField('override[controls][options_search]');
 
+    if (\Drupal::database()->driver() == 'mongodb') {
+      $field = 'name[node.field_test_target_id]';
+    }
+    else {
+      $field = 'name[node__field_test.field_test_target_id]';
+    }
+
     // Test that the both entity_reference and numeric options are visible.
-    $this->assertTrue($page->findField('name[node__field_test.field_test_target_id]')
-      ->isVisible());
-    $this->assertTrue($page->findField('name[node__field_test.field_test_target_id]')
-      ->isVisible());
-    $page->findField('name[node__field_test.field_test_target_id]')
-      ->click();
+    $this->assertTrue($page->findField($field)->isVisible());
+    $this->assertTrue($page->findField($field)->isVisible());
+    $page->findField($field)->click();
     $this->assertTrue($page->find('css', 'button.button.button--primary.form-submit.ui-button')
       ->isVisible());
     $page->find('css', 'button.button.button--primary.form-submit.ui-button')
@@ -190,9 +194,16 @@ class FilterEntityReferenceTest extends WebDriverTestBase {
     // Wait for the popup to open and the search field to be available.
     $assert->waitForField('override[controls][group]');
 
+    if (\Drupal::database()->driver() == 'mongodb') {
+      $field = 'name[node.field_test_config_target_id]';
+    }
+    else {
+      $field = 'name[node__field_test_config.field_test_config_target_id]';
+    }
+
     // Test that the entity_reference option is visible.
-    $this->assertTrue($page->findField('name[node__field_test_config.field_test_config_target_id]')->isVisible());
-    $page->findField('name[node__field_test_config.field_test_config_target_id]')->click();
+    $this->assertTrue($page->findField($field)->isVisible());
+    $page->findField($field)->click();
     $submitButton = $page->find('css', 'button.button.button--primary.form-submit.ui-button');
     $this->assertTrue($submitButton->isVisible());
     $submitButton->click();

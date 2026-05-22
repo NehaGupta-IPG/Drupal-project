@@ -101,6 +101,11 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
     // Create config/sync directory and extract tarball contents to it.
     mkdir($config_sync_directory, 0777, TRUE);
     $this->copyDirectory($this->getConfigLocation(), $config_sync_directory);
+    $driver = Database::getConnection()->driver();
+    $override_directory = $this->getConfigLocation() . '/' . $driver;
+    if (is_dir($override_directory)) {
+      $this->copyDirectory($override_directory, $config_sync_directory);
+    }
 
     // Add the module that is providing the database driver to the list of
     // modules that can not be uninstalled in the core.extension configuration.

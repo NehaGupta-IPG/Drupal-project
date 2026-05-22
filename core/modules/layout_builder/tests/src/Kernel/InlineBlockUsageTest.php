@@ -94,7 +94,7 @@ class InlineBlockUsageTest extends KernelTestBase {
     $this->inlineBlockUsage->removeByLayoutEntity($this->entity);
     $results = $this->database->select('inline_block_usage')
       ->fields('inline_block_usage')
-      ->condition('block_content_id', '1')
+      ->condition('block_content_id', 1)
       ->isNull('layout_entity_id')
       ->isNull('layout_entity_type')
       ->execute()

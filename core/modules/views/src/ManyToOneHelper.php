@@ -65,7 +65,12 @@ class ManyToOneHelper {
       return $this->handler->getFormula();
     }
     else {
-      return $this->handler->tableAlias . '.' . $this->handler->realField;
+      if (($this->handler->view->getDatabaseDriver() == 'mongodb') && ($this->handler->table == $this->handler->view->storage->get('base_table'))) {
+        return $this->handler->realField;
+      }
+      else {
+        return $this->handler->tableAlias . '.' . $this->handler->realField;
+      }
     }
   }
 
@@ -330,18 +335,44 @@ class ManyToOneHelper {
           $placeholder .= '[]';
 
           if ($operator == 'IS NULL') {
-            $this->handler->query->addWhereExpression($options['group'], "$field $operator");
+            if ($this->handler->view->getDatabaseDriver() == 'mongodb') {
+              $condition = $this->handler->view->getDatabaseCondition('AND');
+              $condition->condition($field, $this->handler->value, 'NOT IN');
+              $this->handler->query->addCondition($options['group'], $condition);
+            }
+            else {
+              $this->handler->query->addWhereExpression($options['group'], "$field $operator");
+            }
           }
           else {
-            $this->handler->query->addWhereExpression($options['group'], "$field $operator($placeholder)", [$placeholder => $value]);
+            if ($this->handler->view->getDatabaseDriver() == 'mongodb') {
+              $condition = $this->handler->view->getDatabaseCondition('AND');
+              $condition->condition($field, $this->handler->value, 'IN');
+              $this->handler->query->addCondition($options['group'], $condition);
+            }
+            else {
+              $this->handler->query->addWhereExpression($options['group'], "$field $operator($placeholder)", [$placeholder => $value]);
+            }
           }
         }
         else {
           if ($operator == 'IS NULL') {
-            $this->handler->query->addWhereExpression($options['group'], "$field $operator");
+            if ($this->handler->view->getDatabaseDriver() == 'mongodb') {
+              $condition = $this->handler->view->getDatabaseCondition('AND');
+              $condition->condition($field, $this->handler->value, 'NOT IN');
+              $this->handler->query->addCondition($options['group'], $condition);
+            }
+            else {
+              $this->handler->query->addWhereExpression($options['group'], "$field $operator");
+            }
           }
           else {
-            $this->handler->query->addWhereExpression($options['group'], "$field $operator $placeholder", [$placeholder => $value]);
+            if ($this->handler->view->getDatabaseDriver() == 'mongodb') {
+              $this->handler->query->addCondition($options['group'], $field, $value, $operator);
+            }
+            else {
+              $this->handler->query->addWhereExpression($options['group'], "$field $operator $placeholder", [$placeholder => $value]);
+            }
           }
         }
       }
@@ -351,11 +382,22 @@ class ManyToOneHelper {
       $field = $this->handler->realField;
       $clause = $operator == 'or' ? $this->handler->query->getConnection()->condition('OR') : $this->handler->query->getConnection()->condition('AND');
       foreach ($this->handler->tableAliases as $value => $alias) {
-        $clause->condition("$alias.$field", $value);
+        if ($this->handler->view->getDatabaseDriver() == 'mongodb' && (in_array($alias, [NULL, $this->handler->table, $this->handler->tableAlias], TRUE))) {
+          $clause->condition($field, $value);
+        }
+        else {
+          $clause->condition("$alias.$field", $value);
+        }
       }
 
-      // Implode on either AND or OR.
-      $this->handler->query->addWhere($options['group'], $clause);
+      if ($this->handler->view->getDatabaseDriver() == 'mongodb') {
+        $clause->useElementMatch(FALSE);
+        $this->handler->query->addCondition($options['group'], $clause);
+      }
+      else {
+        // Implode on either AND or OR.
+        $this->handler->query->addWhere($options['group'], $clause);
+      }
     }
   }
 

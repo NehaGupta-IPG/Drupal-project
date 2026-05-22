@@ -122,8 +122,8 @@ class TermIndexTest extends TaxonomyTestBase {
     $node = $this->drupalGetNodeByTitle($edit['title[0][value]']);
     $connection = Database::getConnection();
     $index_count = $connection->select('taxonomy_index')
-      ->condition('nid', $node->id())
-      ->condition('tid', $term_1->id())
+      ->condition('nid', (int) $node->id())
+      ->condition('tid', (int) $term_1->id())
       ->countQuery()
       ->execute()
       ->fetchField();
@@ -136,15 +136,15 @@ class TermIndexTest extends TaxonomyTestBase {
 
     // Check that both terms are indexed.
     $index_count = $connection->select('taxonomy_index')
-      ->condition('nid', $node->id())
-      ->condition('tid', $term_1->id())
+      ->condition('nid', (int) $node->id())
+      ->condition('tid', (int) $term_1->id())
       ->countQuery()
       ->execute()
       ->fetchField();
     $this->assertEquals(1, $index_count, 'Term 1 is indexed.');
     $index_count = $connection->select('taxonomy_index')
-      ->condition('nid', $node->id())
-      ->condition('tid', $term_2->id())
+      ->condition('nid', (int) $node->id())
+      ->condition('tid', (int) $term_2->id())
       ->countQuery()
       ->execute()
       ->fetchField();
@@ -157,15 +157,15 @@ class TermIndexTest extends TaxonomyTestBase {
 
     // Check that only one term is indexed.
     $index_count = $connection->select('taxonomy_index')
-      ->condition('nid', $node->id())
-      ->condition('tid', $term_1->id())
+      ->condition('nid', (int) $node->id())
+      ->condition('tid', (int) $term_1->id())
       ->countQuery()
       ->execute()
       ->fetchField();
     $this->assertEquals(0, $index_count, 'Term 1 is not indexed.');
     $index_count = $connection->select('taxonomy_index')
-      ->condition('nid', $node->id())
-      ->condition('tid', $term_2->id())
+      ->condition('nid', (int) $node->id())
+      ->condition('tid', (int) $term_2->id())
       ->countQuery()
       ->execute()
       ->fetchField();
@@ -181,15 +181,15 @@ class TermIndexTest extends TaxonomyTestBase {
 
     // Check that the index was not changed.
     $index_count = $connection->select('taxonomy_index')
-      ->condition('nid', $node->id())
-      ->condition('tid', $term_1->id())
+      ->condition('nid', (int) $node->id())
+      ->condition('tid', (int) $term_1->id())
       ->countQuery()
       ->execute()
       ->fetchField();
     $this->assertEquals(0, $index_count, 'Term 1 is not indexed.');
     $index_count = $connection->select('taxonomy_index')
-      ->condition('nid', $node->id())
-      ->condition('tid', $term_2->id())
+      ->condition('nid', (int) $node->id())
+      ->condition('tid', (int) $term_2->id())
       ->countQuery()
       ->execute()
       ->fetchField();
@@ -201,15 +201,15 @@ class TermIndexTest extends TaxonomyTestBase {
 
     // Check that both terms are indexed.
     $index_count = $connection->select('taxonomy_index')
-      ->condition('nid', $node->id())
-      ->condition('tid', $term_1->id())
+      ->condition('nid', (int) $node->id())
+      ->condition('tid', (int) $term_1->id())
       ->countQuery()
       ->execute()
       ->fetchField();
     $this->assertEquals(1, $index_count, 'Term 1 is indexed.');
     $index_count = $connection->select('taxonomy_index')
-      ->condition('nid', $node->id())
-      ->condition('tid', $term_2->id())
+      ->condition('nid', (int) $node->id())
+      ->condition('tid', (int) $term_2->id())
       ->countQuery()
       ->execute()
       ->fetchField();
@@ -221,15 +221,15 @@ class TermIndexTest extends TaxonomyTestBase {
 
     // Check that only one term is indexed.
     $index_count = $connection->select('taxonomy_index')
-      ->condition('nid', $node->id())
-      ->condition('tid', $term_1->id())
+      ->condition('nid', (int) $node->id())
+      ->condition('tid', (int) $term_1->id())
       ->countQuery()
       ->execute()
       ->fetchField();
     $this->assertEquals(1, $index_count, 'Term 1 is indexed once.');
     $index_count = $connection->select('taxonomy_index')
-      ->condition('nid', $node->id())
-      ->condition('tid', $term_2->id())
+      ->condition('nid', (int) $node->id())
+      ->condition('tid', (int) $term_2->id())
       ->countQuery()
       ->execute()
       ->fetchField();

@@ -57,7 +57,7 @@ function locale_translate_batch_import_files(array $options, $force = FALSE) {
   if (!$force) {
     $result = \Drupal::database()->select('locale_file', 'lf')
       ->fields('lf', ['langcode', 'uri', 'timestamp'])
-      ->condition('langcode', $langcodes)
+      ->condition('langcode', $langcodes, 'IN')
       ->execute()
       ->fetchAllAssoc('uri');
     foreach ($result as $uri => $info) {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Functional\Plugin;
 
+use Drupal\Core\Database\Database;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
 use Drupal\views_test_data\Plugin\views\filter\FilterTest as FilterPlugin;
@@ -81,12 +82,25 @@ class FilterTest extends ViewTestBase {
 
     $this->executeView($view);
 
-    // Make sure the query have where data.
-    $this->assertNotEmpty($view->query->where);
+    if (Database::getConnection()->driver() == 'mongodb') {
+      // Make sure the query have where data.
+      $this->assertNotEmpty($view->query->condition);
 
-    // Check the data added.
-    $where = $view->query->where;
-    $this->assertSame('views_test_data.name', $where[0]['conditions'][0]['field'], 'Where condition field matches');
+      // Check the data added.
+      $where = $view->query->condition;
+
+      $expected_field = 'name';
+    }
+    else {
+      // Make sure the query have where data.
+      $this->assertNotEmpty($view->query->where);
+
+      // Check the data added.
+      $where = $view->query->where;
+
+      $expected_field = 'views_test_data.name';
+    }
+    $this->assertSame($expected_field, $where[0]['conditions'][0]['field'], 'Where condition field matches');
     $this->assertSame('John', $where[0]['conditions'][0]['value'], 'Where condition value matches');
     $this->assertSame('=', $where[0]['conditions'][0]['operator'], 'Where condition operator matches');
 
@@ -158,7 +172,12 @@ class FilterTest extends ViewTestBase {
     $row['row[type]'] = 'fields';
     $this->drupalGet('admin/structure/views/nojs/display/test_filter_in_operator_ui/default/row');
     $this->submitForm($row, 'Apply');
-    $field['name[node_field_data.nid]'] = TRUE;
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $field['name[node.nid]'] = TRUE;
+    }
+    else {
+      $field['name[node_field_data.nid]'] = TRUE;
+    }
     $this->drupalGet('admin/structure/views/nojs/add-handler/test_filter_in_operator_ui/default/field');
     $this->submitForm($field, 'Add and configure fields');
     $this->drupalGet('admin/structure/views/nojs/handler/test_filter_in_operator_ui/default/field/nid');

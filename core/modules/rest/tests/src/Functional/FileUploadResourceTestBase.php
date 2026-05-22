@@ -219,7 +219,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
     $this->assertSame([
       [
         'target_id' => '1',
-        'display' => NULL,
+        'display' => ($this->container->get('database')->driver() == 'mongodb' ? 1 : NULL),
         'description' => "The most fascinating file ever!",
       ],
     ], EntityTest::load(2)->get('field_rest_file_test')->getValue());

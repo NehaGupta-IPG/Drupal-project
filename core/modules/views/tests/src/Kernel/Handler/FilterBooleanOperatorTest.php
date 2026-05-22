@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Handler;
 
+use Drupal\Core\Database\Database;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
 
@@ -78,12 +79,22 @@ class FilterBooleanOperatorTest extends ViewsKernelTestBase {
     ]);
     $this->executeView($view);
 
-    $expected_result = [
-      ['id' => 2],
-      ['id' => 4],
-    ];
+    // All values for the column are TRUE or FALSE.
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $expected_result = [
+        ['id' => 2],
+        ['id' => 4],
+        ['id' => 6],
+      ];
+    }
+    else {
+      $expected_result = [
+        ['id' => 2],
+        ['id' => 4],
+      ];
+    }
 
-    $this->assertCount(2, $view->result);
+    $this->assertCount(count($expected_result), $view->result);
     $this->assertIdenticalResultset($view, $expected_result, $this->columnMap);
 
     $view->destroy();
@@ -152,11 +163,21 @@ class FilterBooleanOperatorTest extends ViewsKernelTestBase {
     ]);
     $this->executeView($view);
 
-    $expected_result = [
-      ['id' => 6],
-    ];
+    // All values for the column are TRUE or FALSE.
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $expected_result = [
+        ['id' => 2],
+        ['id' => 4],
+        ['id' => 6],
+      ];
+    }
+    else {
+      $expected_result = [
+        ['id' => 6],
+      ];
+    }
 
-    $this->assertCount(1, $view->result);
+    $this->assertCount(count($expected_result), $view->result);
     $this->assertIdenticalResultset($view, $expected_result, $this->columnMap);
 
     $view->destroy();
@@ -173,15 +194,25 @@ class FilterBooleanOperatorTest extends ViewsKernelTestBase {
     ]);
     $this->executeView($view);
 
-    $expected_result = [
-      ['id' => 1],
-      ['id' => 2],
-      ['id' => 3],
-      ['id' => 4],
-      ['id' => 5],
-    ];
+    // All values for the column are TRUE or FALSE.
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $expected_result = [
+        ['id' => 1],
+        ['id' => 3],
+        ['id' => 5],
+      ];
+    }
+    else {
+      $expected_result = [
+        ['id' => 1],
+        ['id' => 2],
+        ['id' => 3],
+        ['id' => 4],
+        ['id' => 5],
+      ];
+    }
 
-    $this->assertCount(5, $view->result);
+    $this->assertCount(count($expected_result), $view->result);
     $this->assertIdenticalResultset($view, $expected_result, $this->columnMap);
 
     $view->destroy();
@@ -216,12 +247,23 @@ class FilterBooleanOperatorTest extends ViewsKernelTestBase {
 
     $this->executeView($view);
 
-    $expected_result = [
-      ['id' => 2],
-      ['id' => 4],
-    ];
+    // All values for the column are TRUE or FALSE.
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $expected_result = [
+        ['id' => 2],
+        ['id' => 4],
+        ['id' => 6],
+      ];
+    }
+    else {
+      $expected_result = [
+        ['id' => 2],
+        ['id' => 4],
+      ];
+    }
 
-    $this->assertCount(2, $view->result);
+    $this->assertCount(count($expected_result), $view->result);
+
     $this->assertIdenticalResultset($view, $expected_result, $this->columnMap);
 
     $view->destroy();

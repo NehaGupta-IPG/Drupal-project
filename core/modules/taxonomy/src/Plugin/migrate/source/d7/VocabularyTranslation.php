@@ -24,8 +24,8 @@ class VocabularyTranslation extends Vocabulary {
    */
   public function query() {
     $query = parent::query();
-    $query->leftJoin('i18n_string', 'i18n', 'CAST ([v].[vid] AS CHAR(222)) = [i18n].[objectid]');
-    $query->innerJoin('locales_target', 'lt', '[lt].[lid] = [i18n].[lid]');
+    $query->leftJoin('i18n_string', 'i18n', $query->joinCondition()->where('CAST ([v].[vid] AS CHAR(222)) = [i18n].[objectid]'));
+    $query->innerJoin('locales_target', 'lt', $query->joinCondition()->compare('lt.lid', 'i18n.lid'));
     $query
       ->condition('type', 'vocabulary')
       ->fields('lt')

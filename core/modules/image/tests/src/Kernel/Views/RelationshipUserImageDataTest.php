@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\image\Kernel\Views;
 
+use Drupal\Core\Database\Database;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\file\Entity\File;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
@@ -93,20 +94,43 @@ class RelationshipUserImageDataTest extends ViewsKernelTestBase {
 
     $view = Views::getView('test_image_user_image_data');
     // Tests \Drupal\taxonomy\Plugin\views\relationship\NodeTermData::calculateDependencies().
-    $expected = [
-      'module' => [
-        'file',
-        'user',
-      ],
-    ];
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $expected = [
+        'module' => [
+          'mongodb',
+          'user',
+        ],
+      ];
+    }
+    else {
+      $expected = [
+        'module' => [
+          'file',
+          'user',
+        ],
+      ];
+    }
     $this->assertSame($expected, $view->getDependencies());
     $this->executeView($view);
-    $expected_result = [
-      [
-        'file_managed_user__user_picture_fid' => '2',
-      ],
-    ];
-    $column_map = ['file_managed_user__user_picture_fid' => 'file_managed_user__user_picture_fid'];
+    if (Database::getConnection()->driver() == 'mongodb') {
+      // For MongoDB is all entity data stored is the same document. A join is
+      // for this view not necessary. There is no filter, so all users are in
+      // the result.
+      $expected_result = [
+        [
+          'uid' => '1',
+        ],
+      ];
+      $column_map = ['uid' => 'uid'];
+    }
+    else {
+      $expected_result = [
+        [
+          'file_managed_user__user_picture_fid' => '2',
+        ],
+      ];
+      $column_map = ['file_managed_user__user_picture_fid' => 'file_managed_user__user_picture_fid'];
+    }
     $this->assertIdenticalResultset($view, $expected_result, $column_map);
   }
 

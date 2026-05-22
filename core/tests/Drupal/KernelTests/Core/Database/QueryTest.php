@@ -72,16 +72,20 @@ class QueryTest extends DatabaseTestBase {
   public function testConditionOperatorArgumentsSQLInjection(): void {
     $injection = "IS NOT NULL) ;INSERT INTO {test} (name) VALUES ('test12345678'); -- ";
 
-    try {
-      $result = $this->connection->select('test', 't')
-        ->fields('t')
-        ->condition('name', 1, $injection)
-        ->execute();
-      $this->fail('Should not be able to attempt SQL injection via condition operator.');
-    }
-    catch (InvalidQueryException $e) {
-      $this->assertSame("Invalid characters in query operator: $injection", $e->getMessage());
-      // Expected exception; just continue testing.
+    // MongoDB does not support SQL queries. Therefor SQL injection is not a
+    // problem for MongoDB.
+    if ($this->connection->driver() != 'mongodb') {
+      try {
+        $result = $this->connection->select('test', 't')
+          ->fields('t')
+          ->condition('name', 1, $injection)
+          ->execute();
+        $this->fail('Should not be able to attempt SQL injection via condition operator.');
+      }
+      catch (InvalidQueryException $e) {
+        $this->assertSame("Invalid characters in query operator: $injection", $e->getMessage());
+        // Expected exception; just continue testing.
+      }
     }
 
     // Test that the insert query that was used in the SQL injection attempt did
@@ -101,16 +105,18 @@ class QueryTest extends DatabaseTestBase {
       ->execute();
     $injection = "= 1 UNION ALL SELECT password FROM user WHERE uid =";
 
-    try {
-      $result = $this->connection->select('test', 't')
-        ->fields('t', ['name', 'name'])
-        ->condition('name', 1, $injection)
-        ->execute();
-      $this->fail('Should not be able to attempt SQL injection via operator.');
-    }
-    catch (InvalidQueryException $e) {
-      $this->assertSame("Invalid characters in query operator: $injection", $e->getMessage());
-      // Expected exception; just continue testing.
+    if ($this->connection->driver() != 'mongodb') {
+      try {
+        $result = $this->connection->select('test', 't')
+          ->fields('t', ['name', 'name'])
+          ->condition('name', 1, $injection)
+          ->execute();
+        $this->fail('Should not be able to attempt SQL injection via operator.');
+      }
+      catch (InvalidQueryException $e) {
+        $this->assertSame("Invalid characters in query operator: $injection", $e->getMessage());
+        // Expected exception; just continue testing.
+      }
     }
 
     // Attempt SQLi via union query - uppercase tablename.
@@ -119,16 +125,18 @@ class QueryTest extends DatabaseTestBase {
       ->execute();
     $injection = "IS NOT NULL) UNION ALL SELECT name FROM {TEST_UPPERCASE} -- ";
 
-    try {
-      $result = $this->connection->select('test', 't')
-        ->fields('t', ['name'])
-        ->condition('name', 1, $injection)
-        ->execute();
-      $this->fail('Should not be able to attempt SQL injection via operator.');
-    }
-    catch (InvalidQueryException $e) {
-      $this->assertSame("Invalid characters in query operator: $injection", $e->getMessage());
-      // Expected exception; just continue testing.
+    if ($this->connection->driver() != 'mongodb') {
+      try {
+        $result = $this->connection->select('test', 't')
+          ->fields('t', ['name'])
+          ->condition('name', 1, $injection)
+          ->execute();
+        $this->fail('Should not be able to attempt SQL injection via operator.');
+      }
+      catch (InvalidQueryException $e) {
+        $this->assertSame("Invalid characters in query operator: $injection", $e->getMessage());
+        // Expected exception; just continue testing.
+      }
     }
   }
 

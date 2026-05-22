@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Plugin;
 
+use Drupal\Core\Database\Database;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\user\Entity\User;
 use Drupal\views\Views;
@@ -68,13 +69,20 @@ abstract class RelationshipJoinTestBase extends PluginKernelTestBase {
    * Adds a relationship for the uid column.
    */
   protected function viewsData() {
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $users_table = 'users';
+    }
+    else {
+      $users_table = 'users_field_data';
+    }
+
     $data = parent::viewsData();
     $data['views_test_data']['uid'] = [
       'title' => new TranslatableMarkup('UID'),
       'help' => new TranslatableMarkup('The test data UID'),
       'relationship' => [
         'id' => 'standard',
-        'base' => 'users_field_data',
+        'base' => $users_table,
         'base field' => 'uid',
       ],
     ];

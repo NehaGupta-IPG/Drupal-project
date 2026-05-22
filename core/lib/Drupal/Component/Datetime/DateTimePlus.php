@@ -3,6 +3,7 @@
 namespace Drupal\Component\Datetime;
 
 use Drupal\Component\Utility\ToStringTrait;
+use MongoDB\BSON\UTCDateTime;
 
 /**
  * Wraps DateTime().
@@ -203,6 +204,12 @@ class DateTimePlus {
    *   If the timestamp is not numeric.
    */
   public static function createFromTimestamp($timestamp, $timezone = NULL, $settings = []) {
+    // In MongoDB timestamp are stored as instances of MongoDB\BSON\UTCDateTime.
+    if ($timestamp instanceof UTCDateTime) {
+      $timestamp = (int) $timestamp->__toString();
+      $timestamp = $timestamp / 1000;
+      $timestamp = (string) $timestamp;
+    }
     if (!is_numeric($timestamp)) {
       throw new \InvalidArgumentException('The timestamp must be numeric.');
     }

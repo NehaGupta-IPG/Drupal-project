@@ -204,7 +204,7 @@ class LocaleImportFunctionalTest extends BrowserTestBase {
     // The database should now contain 6 customized strings (two imported
     // strings are not translated).
     $count = Database::getConnection()->select('locales_target')
-      ->condition('customized', 1)
+      ->condition('customized', TRUE)
       ->countQuery()
       ->execute()
       ->fetchField();

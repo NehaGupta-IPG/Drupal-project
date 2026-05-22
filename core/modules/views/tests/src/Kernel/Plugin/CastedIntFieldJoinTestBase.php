@@ -117,7 +117,9 @@ abstract class CastedIntFieldJoinTestBase extends DriverSpecificKernelTestBase {
     $this->assertSame($join_info['join type'], 'LEFT');
     $this->assertSame($join_info['table'], $configuration['table']);
     $this->assertSame($join_info['alias'], 'users_field_data');
-    $this->assertSame($join_info['condition'], "views_test_data.uid = CAST(users_field_data.uid AS $this->castingType)");
+    $condition = $join_info['condition'];
+    $condition->compile($view->getQuery()->getConnection(), $view->getQuery()->query());
+    $this->assertSame($condition->__toString(), "(views_test_data.uid = CAST(users_field_data.uid AS $this->castingType))");
 
     // Set a different alias and make sure table info is as expected.
     $join_info = $this->buildJoin($view, $configuration, 'users1');
@@ -144,10 +146,12 @@ abstract class CastedIntFieldJoinTestBase extends DriverSpecificKernelTestBase {
       ],
     ];
     $join_info = $this->buildJoin($view, $configuration, 'users3');
-    $this->assertStringContainsString("CAST(views_test_data.uid AS $this->castingType) = users3.uid", $join_info['condition']);
-    $this->assertStringContainsString('users3.name = :views_join_condition_0', $join_info['condition']);
-    $this->assertStringContainsString('users3.name <> :views_join_condition_1', $join_info['condition']);
-    $this->assertSame(array_values($join_info['arguments']), [$random_name_1, $random_name_2]);
+    $condition = $join_info['condition'];
+    $condition->compile($view->getQuery()->getConnection(), $view->getQuery()->query());
+    $this->assertStringContainsString("CAST(views_test_data.uid AS $this->castingType) = users3.uid", $condition->__toString());
+    $this->assertStringContainsString('"users3"."name" = :db_condition_placeholder_0', $condition->__toString());
+    $this->assertStringContainsString('"users3"."name" <> :db_condition_placeholder_1', $condition->__toString());
+    $this->assertSame(array_values($condition->arguments()), [$random_name_1, $random_name_2]);
 
     // Test that 'IN' conditions are properly built.
     $random_name_1 = $this->randomMachineName();
@@ -166,10 +170,12 @@ abstract class CastedIntFieldJoinTestBase extends DriverSpecificKernelTestBase {
       ],
     ];
     $join_info = $this->buildJoin($view, $configuration, 'users4');
-    $this->assertStringContainsString("views_test_data.uid = CAST(users4.uid AS $this->castingType)", $join_info['condition']);
-    $this->assertStringContainsString('users4.name = :views_join_condition_0', $join_info['condition']);
-    $this->assertStringContainsString('users4.name IN ( :views_join_condition_1[] )', $join_info['condition']);
-    $this->assertSame($join_info['arguments'][':views_join_condition_1[]'], [$random_name_2, $random_name_3, $random_name_4]);
+    $condition = $join_info['condition'];
+    $condition->compile($view->getQuery()->getConnection(), $view->getQuery()->query());
+    $this->assertStringContainsString("views_test_data.uid = CAST(users4.uid AS $this->castingType)", $condition->__toString());
+    $this->assertStringContainsString('"users4"."name" = :db_condition_placeholder_0', $condition->__toString());
+    $this->assertStringContainsString('"users4"."name" IN (:db_condition_placeholder_1, :db_condition_placeholder_2, :db_condition_placeholder_3)', $condition->__toString());
+    $this->assertSame(array_values($condition->arguments()), [$random_name_1, $random_name_2, $random_name_3, $random_name_4]);
   }
 
   /**

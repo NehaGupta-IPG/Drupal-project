@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Functional\Handler;
 
+use Drupal\Core\Database\Database;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -118,7 +119,12 @@ class FieldGroupRowsWebTest extends ViewTestBase {
     foreach ($result as $row) {
       $rendered_value[] = $row->getText();
     }
-    $this->assertEquals(['a', 'b', 'c'], $rendered_value);
+    if (Database::getConnection()->databaseType() == 'mongodb') {
+      $this->assertEquals(['a, b, c'], $rendered_value);
+    }
+    else {
+      $this->assertEquals(['a', 'b', 'c'], $rendered_value);
+    }
   }
 
 }

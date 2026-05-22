@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Plugin\Derivative;
 
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -48,6 +49,13 @@ class ViewsEntityRow implements ContainerDeriverInterface {
   protected $viewsData;
 
   /**
+   * The database connection.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $connection;
+
+  /**
    * Constructs a ViewsEntityRow object.
    *
    * @param string $base_plugin_id
@@ -56,11 +64,14 @@ class ViewsEntityRow implements ContainerDeriverInterface {
    *   The entity type manager.
    * @param \Drupal\views\ViewsData $views_data
    *   The views data service.
+   * @param \Drupal\Core\Database\Connection $connection
+   *   The database connection.
    */
-  public function __construct($base_plugin_id, EntityTypeManagerInterface $entity_type_manager, ViewsData $views_data) {
+  public function __construct($base_plugin_id, EntityTypeManagerInterface $entity_type_manager, ViewsData $views_data, Connection $connection) {
     $this->basePluginId = $base_plugin_id;
     $this->entityTypeManager = $entity_type_manager;
     $this->viewsData = $views_data;
+    $this->connection = $connection;
   }
 
   /**
@@ -70,7 +81,8 @@ class ViewsEntityRow implements ContainerDeriverInterface {
     return new static(
       $base_plugin_id,
       $container->get('entity_type.manager'),
-      $container->get('views.views_data')
+      $container->get('views.views_data'),
+      $container->get('database')
     );
   }
 
@@ -102,6 +114,9 @@ class ViewsEntityRow implements ContainerDeriverInterface {
           'display_types' => ['normal'],
           'class' => $base_plugin_definition['class'],
         ];
+        if ($this->connection->driver() == 'mongodb') {
+          $this->derivatives[$entity_type_id]['base'] = [$entity_type->getBaseTable()];
+        }
       }
     }
 

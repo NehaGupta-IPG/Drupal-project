@@ -299,27 +299,29 @@ abstract class QueryPluginBase extends PluginBase implements CacheableDependency
 
     // Include all relationships.
     foreach ((array) $this->view->relationship as $relationship_id => $relationship) {
-      $table_data = $views_data->get($relationship->definition['base']);
-      if (isset($table_data['table']['entity type'])) {
+      if (isset($relationship->definition['base'])) {
+        $table_data = $views_data->get($relationship->definition['base']);
+        if (isset($table_data['table']['entity type'])) {
 
-        // If this is not one of the entity base tables, skip it.
-        $entity_type = \Drupal::entityTypeManager()->getDefinition($table_data['table']['entity type']);
-        $entity_base_tables = [$entity_type->getBaseTable(), $entity_type->getDataTable(), $entity_type->getRevisionTable(), $entity_type->getRevisionDataTable()];
-        if (!in_array($relationship->definition['base'], $entity_base_tables)) {
-          continue;
-        }
+          // If this is not one of the entity base tables, skip it.
+          $entity_type = \Drupal::entityTypeManager()->getDefinition($table_data['table']['entity type']);
+          $entity_base_tables = [$entity_type->getBaseTable(), $entity_type->getDataTable(), $entity_type->getRevisionTable(), $entity_type->getRevisionDataTable()];
+          if (!in_array($relationship->definition['base'], $entity_base_tables)) {
+            continue;
+          }
 
-        $entity_tables[$relationship_id . '__' . $relationship->tableAlias] = [
-          'base' => $relationship->definition['base'],
-          'relationship_id' => $relationship_id,
-          'alias' => $relationship->alias,
-          'entity_type' => $table_data['table']['entity type'],
-          'revision' => $table_data['table']['entity revision'],
-        ];
+          $entity_tables[$relationship_id . '__' . $relationship->tableAlias] = [
+            'base' => $relationship->definition['base'],
+            'relationship_id' => $relationship_id,
+            'alias' => $relationship->alias,
+            'entity_type' => $table_data['table']['entity type'],
+            'revision' => $table_data['table']['entity revision'],
+          ];
 
-        // Include the entity provider.
-        if (!empty($table_data['table']['provider'])) {
-          $entity_tables[$relationship_id . '__' . $relationship->tableAlias]['provider'] = $table_data['table']['provider'];
+          // Include the entity provider.
+          if (!empty($table_data['table']['provider'])) {
+            $entity_tables[$relationship_id . '__' . $relationship->tableAlias]['provider'] = $table_data['table']['provider'];
+          }
         }
       }
     }

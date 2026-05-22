@@ -410,7 +410,7 @@ class SearchQuery extends SelectExtender {
     $this->condition($or);
 
     // Add keyword normalization information to the query.
-    $this->join('search_total', 't', '[i].[word] = [t].[word]');
+    $this->join('search_total', 't', $this->joinCondition()->compare('i.word', 't.word'));
     $this
       ->condition('i.type', $this->type)
       ->groupBy('i.type')
@@ -430,7 +430,12 @@ class SearchQuery extends SelectExtender {
     // For complex search queries, add the LIKE conditions; if the query is
     // simple, we do not need them for normalization.
     if (!$this->simple) {
-      $normalize_query->join('search_dataset', 'd', '[i].[sid] = [d].[sid] AND [i].[type] = [d].[type] AND [i].[langcode] = [d].[langcode]');
+      $normalize_query->join('search_dataset', 'd',
+        $normalize_query->joinCondition()
+          ->compare('i.sid', 'd.sid')
+          ->compare('i.type', 'd.type')
+          ->compare('i.langcode', 'd.langcode')
+      );
       if (count($this->conditions)) {
         $normalize_query->condition($this->conditions);
       }
@@ -552,7 +557,12 @@ class SearchQuery extends SelectExtender {
     }
 
     // Add conditions to the query.
-    $this->join('search_dataset', 'd', '[i].[sid] = [d].[sid] AND [i].[type] = [d].[type] AND [i].[langcode] = [d].[langcode]');
+    $this->join('search_dataset', 'd',
+      $this->joinCondition()
+        ->compare('i.sid', 'd.sid')
+        ->compare('i.type', 'd.type')
+        ->compare('i.langcode', 'd.langcode')
+    );
     if (count($this->conditions)) {
       $this->condition($this->conditions);
     }
@@ -610,7 +620,11 @@ class SearchQuery extends SelectExtender {
     $inner = clone $this->query;
 
     // Add conditions to query.
-    $inner->join('search_dataset', 'd', '[i].[sid] = [d].[sid] AND [i].[type] = [d].[type]');
+    $inner->join('search_dataset', 'd',
+      $inner->joinCondition()
+        ->compare('i.sid', 'd.sid')
+        ->compare('i.type', 'd.type')
+    );
     if (count($this->conditions)) {
       $inner->condition($this->conditions);
     }
@@ -626,7 +640,7 @@ class SearchQuery extends SelectExtender {
     $count = $this->connection->select($inner->fields('i', ['sid']), NULL);
 
     // Add the COUNT() expression.
-    $count->addExpression('COUNT(*)');
+    $count->addExpressionCountAll();
 
     return $count;
   }

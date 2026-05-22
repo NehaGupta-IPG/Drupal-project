@@ -54,7 +54,7 @@ class UpdateTest extends DatabaseTestBase {
     $this->assertSame(2, $num_updated, 'Updated 2 records.');
 
     $num_matches = $this->connection->query('SELECT COUNT(*) FROM {test} WHERE [job] = :job', [':job' => 'Musician'])->fetchField();
-    $this->assertSame('2', $num_matches, 'Updated fields successfully.');
+    $this->assertSame(2, $num_matches, 'Updated fields successfully.');
   }
 
   /**
@@ -68,13 +68,17 @@ class UpdateTest extends DatabaseTestBase {
     $this->assertSame(2, $num_updated, 'Updated 2 records.');
 
     $num_matches = $this->connection->query('SELECT COUNT(*) FROM {test} WHERE [job] = :job', [':job' => 'Musician'])->fetchField();
-    $this->assertSame('2', $num_matches, 'Updated fields successfully.');
+    $this->assertSame(2, $num_matches, 'Updated fields successfully.');
   }
 
   /**
    * Confirms that we can update multiple records with a where call.
    */
   public function testWhereUpdate(): void {
+    if ($this->connection->driver() == 'mongodb') {
+      $this->markTestSkipped('MongoDB does not support queries with the use of the method where().');
+    }
+
     $num_updated = $this->connection->update('test')
       ->fields(['job' => 'Musician'])
       ->where('[age] > :age', [':age' => 26])
@@ -89,6 +93,10 @@ class UpdateTest extends DatabaseTestBase {
    * Confirms that we can stack condition and where calls.
    */
   public function testWhereAndConditionUpdate(): void {
+    if ($this->connection->driver() == 'mongodb') {
+      $this->markTestSkipped('MongoDB does not support queries with the use of the method where().');
+    }
+
     $update = $this->connection->update('test')
       ->fields(['job' => 'Musician'])
       ->where('[age] > :age', [':age' => 26])
@@ -104,6 +112,10 @@ class UpdateTest extends DatabaseTestBase {
    * Tests updating with expressions.
    */
   public function testExpressionUpdate(): void {
+    if ($this->connection->driver() == 'mongodb') {
+      $this->markTestSkipped('MongoDB does not support queries with the use of the method expression().');
+    }
+
     // Ensure that expressions are handled properly. This should set every
     // record's age to a square of itself.
     $num_rows = $this->connection->update('test')
@@ -152,6 +164,13 @@ class UpdateTest extends DatabaseTestBase {
    * Updating a not existing table throws a DatabaseExceptionWrapper.
    */
   public function testUpdateNonExistingTable(): void {
+    if ($this->connection->driver() == 'mongodb') {
+      // The MongoDB database driver does throw this exception by default.
+      // Adding this functionality will require to do a table exists on every
+      // update query. The performance will be greatly reduced.
+      $this->markTestSkipped('The MongoDB database driver does throw this exception.');
+    }
+
     $this->expectException(DatabaseExceptionWrapper::class);
     $this->connection->update('a-table-that-does-not-exist')
       ->fields([
@@ -176,6 +195,9 @@ class UpdateTest extends DatabaseTestBase {
    * Tests the Update::__toString() method.
    */
   public function testToString(): void {
+    // @todo MongoDB does not support update queries as a string.
+    $this->markTestSkipped();
+
     // Prepare query for testing.
     $query = $this->connection->update('test')
       ->fields(['a' => 27, 'b' => 42])

@@ -21,7 +21,7 @@ class DatabaseTestHooks {
       $query->range(0, 2);
     }
     if ($query->hasTag('database_test_alter_add_join')) {
-      $people_alias = $query->join('test', 'people', "[test_task].[pid] = [%alias].[id]");
+      $people_alias = $query->join('test', 'people', $query->joinCondition()->compare('test_task.pid', '%alias.id'));
       $query->addField($people_alias, 'name', 'name');
       $query->condition($people_alias . '.id', 2);
     }

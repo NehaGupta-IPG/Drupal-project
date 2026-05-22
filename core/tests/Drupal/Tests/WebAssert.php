@@ -982,7 +982,7 @@ class WebAssert extends MinkWebAssert {
   /**
    * {@inheritdoc}
    */
-  public function fieldValueEquals(string $field, $value, ?TraversableElement $container = NULL) {
+  public function fieldValueEquals($field, $value, ?TraversableElement $container = NULL) {
     if (!is_string($value)) {
       // @todo Trigger deprecation in
       //   https://www.drupal.org/project/drupal/issues/3421105.

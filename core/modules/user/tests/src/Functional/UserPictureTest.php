@@ -94,7 +94,7 @@ class UserPictureTest extends BrowserTestBase {
       ->fields([
         'changed' => \Drupal::time()->getRequestTime() - ($this->config('system.file')->get('temporary_maximum_age') + 1),
       ])
-      ->condition('fid', $file->id())
+      ->condition('fid', (int) $file->id())
       ->execute();
     \Drupal::service('cron')->run();
 

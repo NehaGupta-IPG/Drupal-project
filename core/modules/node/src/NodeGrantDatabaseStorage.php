@@ -83,18 +83,25 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
 
     // Check the database for potential access grants.
     $query = $this->database->select('node_access');
-    $query->addExpression('1');
-    // Only interested for granting in the current operation.
-    $query->condition('grant_' . $operation, 1, '>=');
+    if ($this->database->driver() == 'mongodb') {
+      $query->fields('node_access', ['nid', 'langcode', 'gid', 'realm']);
+      // Only interested for granting in the current operation.
+      $query->condition('grant_' . $operation, TRUE);
+    }
+    else {
+      $query->addExpressionConstant('1');
+      // Only interested for granting in the current operation.
+      $query->condition('grant_' . $operation, TRUE, '>=');
+    }
     // Check for grants for this node and the correct langcode. New translations
     // do not yet have a langcode and must check the fallback node record.
     $nids = $query->andConditionGroup()
-      ->condition('nid', $node->id());
+      ->condition('nid', (int) $node->id());
     if (!$node->isNewTranslation()) {
       $nids->condition('langcode', $node->language()->getId());
     }
     else {
-      $nids->condition('fallback', 1);
+      $nids->condition('fallback', TRUE);
     }
     // If the node is published, also take the default grant into account. The
     // default is saved with a node ID of 0.
@@ -127,7 +134,15 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
       return $access_result;
     };
 
-    if ($query->execute()->fetchField()) {
+    if ($this->database->driver() == 'mongodb') {
+      $count = $query->execute()->fetchAll();
+      $query_result = count($count);
+    }
+    else {
+      $query_result = $query->execute()->fetchField();
+    }
+
+    if ($query_result) {
       return $set_cacheability(AccessResult::allowed());
     }
     else {
@@ -140,17 +155,32 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
    */
   public function checkAll(AccountInterface $account) {
     $query = $this->database->select('node_access');
-    $query->addExpression('COUNT(*)');
-    $query
-      ->condition('nid', 0)
-      ->condition('grant_view', 1, '>=');
+    if ($this->database->driver() == 'mongodb') {
+      $query->fields('node_access', ['nid', 'langcode', 'gid', 'realm']);
+      $query
+        ->condition('nid', 0)
+        ->condition('grant_view', TRUE);
+    }
+    else {
+      $query->addExpressionCountAll();
+      $query
+        ->condition('nid', 0)
+        ->condition('grant_view', TRUE, '>=');
+    }
 
     $grants = $this->buildGrantsQueryCondition(node_access_grants('view', $account));
 
     if (count($grants) > 0) {
       $query->condition($grants);
     }
-    return $query->execute()->fetchField();
+
+    if ($this->database->driver() == 'mongodb') {
+      $count = $query->execute()->fetchAll();
+      return count($count);
+    }
+    else {
+      return $query->execute()->fetchField();
+    }
   }
 
   /**
@@ -174,46 +204,71 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
     foreach ($tables as $table_alias => $tableinfo) {
       $table = $tableinfo['table'];
       if (!($table instanceof SelectInterface) && $table == $base_table) {
-        // Set the subquery.
-        $subquery = $this->database->select('node_access', 'na')
-          ->fields('na', ['nid']);
-
-        // Attach conditions to the sub-query for nodes.
-        if ($grants_exist) {
-          $subquery->condition($grant_conditions);
-        }
-        $subquery->condition('na.grant_' . $operation, 1, '>=');
-
-        // Add langcode-based filtering if this is a multilingual site.
-        if ($is_multilingual) {
-          // If no specific langcode to check for is given, use the grant entry
-          // which is set as a fallback.
-          // If a specific langcode is given, use the grant entry for it.
-          if ($langcode === FALSE) {
-            $subquery->condition('na.fallback', 1, '=');
+        if ($this->database->driver() == 'mongodb') {
+          // Attach conditions to the sub-query for nodes.
+          if ($grants_exist) {
+            $query->condition($grant_conditions);
           }
-          else {
-            $subquery->condition('na.langcode', $langcode, '=');
+
+          $query->condition('grant_' . $operation, TRUE);
+
+          if ($is_multilingual) {
+            // If no specific langcode to check for is given, use the grant entry
+            // which is set as a fallback.
+            // If a specific langcode is given, use the grant entry for it.
+            if ($langcode === FALSE) {
+              $query->condition('fallback', TRUE);
+            }
+            else {
+              $query->condition('langcode', $langcode);
+            }
           }
-        }
 
-        $field = 'nid';
-        // Now handle entities.
-        $subquery->where("[$table_alias].[$field] = [na].[nid]");
-
-        if (empty($tableinfo['join type'])) {
-          $query->exists($subquery);
+          $query->addJoin('INNER', 'node_access', 'na', $query->joinCondition()->compare('na.nid', "$base_table.nid"));
+          $query->unwindJoinAndAddFields('na', ['nid', 'langcode', 'fallback', 'gid', 'realm', 'grant_' . $operation]);
         }
         else {
-          // If this is a join, add the node access check to the join condition.
-          // This requires using $query->getTables() to alter the table
-          // information.
-          $join_cond = $query
-            ->andConditionGroup()
-            ->exists($subquery);
-          $join_cond->where($tableinfo['condition'], $query->getTables()[$table_alias]['arguments']);
-          $query->getTables()[$table_alias]['arguments'] = [];
-          $query->getTables()[$table_alias]['condition'] = $join_cond;
+          // Set the subquery.
+          $subquery = $this->database->select('node_access', 'na')
+            ->fields('na', ['nid']);
+
+          // Attach conditions to the sub-query for nodes.
+          if ($grants_exist) {
+            $subquery->condition($grant_conditions);
+          }
+          $subquery->condition('na.grant_' . $operation, TRUE, '>=');
+
+          // Add langcode-based filtering if this is a multilingual site.
+          if ($is_multilingual) {
+            // If no specific langcode to check for is given, use the grant entry
+            // which is set as a fallback.
+            // If a specific langcode is given, use the grant entry for it.
+            if ($langcode === FALSE) {
+              $subquery->condition('na.fallback', TRUE);
+            }
+            else {
+              $subquery->condition('na.langcode', $langcode);
+            }
+          }
+
+          $field = 'nid';
+          // Now handle entities.
+          $subquery->where("[$table_alias].[$field] = [na].[nid]");
+
+          if (empty($tableinfo['join type'])) {
+            $query->exists($subquery);
+          }
+          else {
+            // If this is a join, add the node access check to the join condition.
+            // This requires using $query->getTables() to alter the table
+            // information.
+            $join_cond = $query
+              ->andConditionGroup()
+              ->exists($subquery);
+            $join_cond->where($tableinfo['condition'], $query->getTables()[$table_alias]['arguments']);
+            $query->getTables()[$table_alias]['arguments'] = [];
+            $query->getTables()[$table_alias]['condition'] = $join_cond;
+          }
         }
       }
     }
@@ -224,7 +279,7 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
    */
   public function write(NodeInterface $node, array $grants, $realm = NULL, $delete = TRUE) {
     if ($delete) {
-      $query = $this->database->delete('node_access')->condition('nid', $node->id());
+      $query = $this->database->delete('node_access')->condition('nid', (int) $node->id());
       if ($realm) {
         $query->condition('realm', [$realm, 'all'], 'IN');
       }
@@ -293,13 +348,25 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
    * {@inheritdoc}
    */
   public function count() {
-    return $this->database->query('SELECT COUNT(*) FROM {node_access}')->fetchField();
+    if ($this->database->driver() == 'mongodb') {
+      $prefixed_table = $this->database->getPrefix() . 'node_access';
+
+      return (string) $this->database->getConnection()->selectCollection($prefixed_table)->count([], ['session' => $this->database->getMongodbSession()]);
+    }
+    else {
+      return $this->database->query('SELECT COUNT(*) FROM {node_access}')->fetchField();
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function deleteNodeRecords(array $nids) {
+    // Make sure that all $nids have an integer value.
+    foreach ($nids as &$nid) {
+      $nid = (int) $nid;
+    }
+
     $this->database->delete('node_access')
       ->condition('nid', $nids, 'IN')
       ->execute();
@@ -320,6 +387,9 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
     $grants = $this->database->condition('OR');
     foreach ($node_access_grants as $realm => $gids) {
       if (!empty($gids)) {
+        foreach ($gids as &$gid) {
+          $gid = (int) $gid;
+        }
         $and = $this->database->condition('AND');
         $grants->condition($and
           ->condition('gid', $gids, 'IN')

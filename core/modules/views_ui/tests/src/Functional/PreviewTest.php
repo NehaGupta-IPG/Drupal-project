@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views_ui\Functional;
 
+use Drupal\Core\Database\Database;
+
 /**
  * Tests the UI preview functionality.
  *
@@ -123,12 +125,19 @@ class PreviewTest extends UITestBase {
     $this->assertSession()->pageTextContains('Query execute time');
     $this->assertSession()->pageTextContains('View render time');
     $this->assertSession()->responseContains('<strong>Query</strong>');
-    $query_string = <<<SQL
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $query_string = <<<SQL
+SELECT WITH AGGREGATE PIPELINE: a:4:{i:0;a:1:{s:6:"\$match";a:1:{s:2:"id";a:1:{s:3:"\$eq";i:100;}}}i:1;a:1:{s:8:"\$project";a:2:{s:20:"views_test_data_name";s:5:"\$name";s:3:"_id";i:0;}}i:2;a:1:{s:5:"\$skip";i:0;}i:3;a:1:{s:6:"\$limit";i:10;}}
+SQL;
+    }
+    else {
+      $query_string = <<<SQL
 SELECT "views_test_data"."name" AS "views_test_data_name"
 FROM
 {views_test_data} "views_test_data"
 WHERE (views_test_data.id = '100')
 SQL;
+    }
     $this->assertSession()->assertEscaped($query_string);
 
     // Test that the statistics and query are rendered above the preview.

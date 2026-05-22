@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\taxonomy\Functional\Rest;
 
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Database\Database;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase;
@@ -102,6 +103,8 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function getExpectedNormalizedEntity() {
+    $connection = Database::getConnection();
+
     // We test with multiple parent terms, and combinations thereof.
     // @see ::createEntity()
     // @see ::testGet()
@@ -209,7 +212,7 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
       ],
       'default_langcode' => [
         [
-          'value' => TRUE,
+          'value' => ($connection->driver() == 'mongodb' && static::$format == 'xml' ? '1' : TRUE),
         ],
       ],
       'path' => [
@@ -235,7 +238,7 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
       'revision_user' => [],
       'revision_translation_affected' => [
         [
-          'value' => TRUE,
+          'value' => ($connection->driver() == 'mongodb' && static::$format == 'xml' ? '1' : TRUE),
         ],
       ],
     ];

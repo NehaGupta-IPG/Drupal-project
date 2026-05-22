@@ -113,6 +113,13 @@ class UpsertTest extends DatabaseTestBase {
    * Upsert on a not existing table throws a DatabaseExceptionWrapper.
    */
   public function testUpsertNonExistingTable(): void {
+    if ($this->connection->driver() == 'mongodb') {
+      // The MongoDB database driver does throw this exception by default.
+      // Adding this functionality will require to do a table exists on every
+      // upsert query. The performance will be greatly reduced.
+      $this->markTestSkipped('The MongoDB database driver does throw this exception.');
+    }
+
     $this->expectException(DatabaseExceptionWrapper::class);
     $upsert = $this->connection->upsert('a-table-that-does-not-exist')
       ->key('id')

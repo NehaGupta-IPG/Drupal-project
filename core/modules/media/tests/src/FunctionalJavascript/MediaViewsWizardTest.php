@@ -47,12 +47,20 @@ class MediaViewsWizardTest extends MediaJavascriptTestBase {
     $view->initHandlers();
     $row = $view->display_handler->getOption('row');
     $this->assertSame($row['type'], 'fields');
+
+    if (\Drupal::database()->driver() == 'mongodb') {
+      $table = 'media';
+    }
+    else {
+      $table = 'media_field_data';
+    }
+
     // Check for the default filters.
-    $this->assertSame($view->filter['status']->table, 'media_field_data');
+    $this->assertSame($view->filter['status']->table, $table);
     $this->assertSame($view->filter['status']->field, 'status');
     $this->assertSame($view->filter['status']->value, '1');
     // Check for the default fields.
-    $this->assertSame($view->field['name']->table, 'media_field_data');
+    $this->assertSame($view->field['name']->table, $table);
     $this->assertSame($view->field['name']->field, 'name');
 
   }
@@ -81,15 +89,22 @@ class MediaViewsWizardTest extends MediaJavascriptTestBase {
     $row = $view->display_handler->getOption('row');
     $this->assertSame($row['type'], 'fields');
 
+    if (\Drupal::database()->driver() == 'mongodb') {
+      $table = 'media';
+    }
+    else {
+      $table = 'media_field_revision';
+    }
+
     // Check for the default filters.
-    $this->assertSame($view->filter['status']->table, 'media_field_revision');
+    $this->assertSame($view->filter['status']->table, $table);
     $this->assertSame($view->filter['status']->field, 'status');
     $this->assertSame($view->filter['status']->value, '1');
 
     // Check for the default fields.
-    $this->assertSame($view->field['name']->table, 'media_field_revision');
+    $this->assertSame($view->field['name']->table, $table);
     $this->assertSame($view->field['name']->field, 'name');
-    $this->assertSame($view->field['changed']->table, 'media_field_revision');
+    $this->assertSame($view->field['changed']->table, $table);
     $this->assertSame($view->field['changed']->field, 'changed');
   }
 

@@ -108,7 +108,7 @@ function user_is_blocked($name) {
   return (bool) \Drupal::entityQuery('user')
     ->accessCheck(FALSE)
     ->condition('name', $name)
-    ->condition('status', 0)
+    ->condition('status', FALSE)
     ->execute();
 }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Handler;
 
+use Drupal\Core\Database\Database;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
 
@@ -36,7 +37,13 @@ class AreaViewTest extends ViewsKernelTestBase {
     $view = Views::getView('test_area_view');
 
     // Tests \Drupal\views\Plugin\views\area\View::calculateDependencies().
-    $this->assertSame(['config' => ['views.view.test_simple_argument'], 'module' => ['views_test_data']], $view->getDependencies());
+    $this->assertSame(
+      [
+        'config' => ['views.view.test_simple_argument'],
+        'module' => (Database::getConnection()->driver() == 'mongodb' ? ['mongodb', 'views_test_data'] : ['views_test_data']),
+      ],
+      $view->getDependencies(),
+    );
 
     $this->executeView($view);
     $output = $view->render();

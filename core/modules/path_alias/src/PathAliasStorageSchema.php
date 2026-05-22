@@ -22,10 +22,12 @@ class PathAliasStorageSchema extends SqlContentEntityStorageSchema {
       'path_alias__alias_langcode_id_status' => ['alias', 'langcode', 'id', 'status'],
       'path_alias__path_langcode_id_status' => ['path', 'langcode', 'id', 'status'],
     ];
-    $schema[$revision_table]['indexes'] += [
-      'path_alias_revision__alias_langcode_id_status' => ['alias', 'langcode', 'id', 'status'],
-      'path_alias_revision__path_langcode_id_status' => ['path', 'langcode', 'id', 'status'],
-    ];
+    if ($revision_table) {
+      $schema[$revision_table]['indexes'] += [
+        'path_alias_revision__alias_langcode_id_status' => ['alias', 'langcode', 'id', 'status'],
+        'path_alias_revision__path_langcode_id_status' => ['path', 'langcode', 'id', 'status'],
+      ];
+    }
 
     // Unset the path_alias__status index as it is slower than the above
     // indexes and MySQL 5.7 chooses to use it even though it is suboptimal.

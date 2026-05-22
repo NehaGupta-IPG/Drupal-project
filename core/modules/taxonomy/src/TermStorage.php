@@ -198,7 +198,7 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
   public function getChildren(TermInterface $term) {
     $query = \Drupal::entityQuery('taxonomy_term')
       ->accessCheck(TRUE)
-      ->condition('parent', $term->id());
+      ->condition('parent', (int) $term->id());
     return static::loadMultiple($query->execute());
   }
 
@@ -214,21 +214,61 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
         $this->treeChildren[$vid] = [];
         $this->treeParents[$vid] = [];
         $this->treeTerms[$vid] = [];
-        $query = $this->database->select($this->getDataTable(), 't');
-        $query->join('taxonomy_term__parent', 'p', '[t].[tid] = [p].[entity_id]');
-        $query->addExpression('[parent_target_id]', 'parent');
-        $result = $query
-          ->addTag('taxonomy_term_access')
-          ->fields('t')
-          ->condition('t.vid', $vid)
-          ->condition('t.default_langcode', 1)
-          ->orderBy('t.weight')
-          ->orderBy('t.name')
-          ->execute();
-        foreach ($result as $term) {
-          $this->treeChildren[$vid][$term->parent][] = $term->tid;
-          $this->treeParents[$vid][$term->tid][] = $term->parent;
-          $this->treeTerms[$vid][$term->tid] = $term;
+
+        if ($this->database->driver() == 'mongodb') {
+          $query = $this->database->select($this->getBaseTable(), 't')
+            ->fields('t', ['tid', 'taxonomy_term_current_revision'])
+            ->addTag('taxonomy_term_access')
+            ->condition('taxonomy_term_current_revision.vid', $vid)
+            ->condition('taxonomy_term_current_revision.default_langcode', TRUE)
+            ->orderBy('taxonomy_term_current_revision.weight')
+            ->orderBy('taxonomy_term_current_revision.name');
+
+          $result = $query->execute()->fetchAll();
+          foreach ($result as $row) {
+            foreach ($row->taxonomy_term_current_revision as $current_revision) {
+              $term = new \stdClass();
+              $term->name = $current_revision['name'] ?? '';
+              $term->depth = 0;
+              $term->tid = $current_revision['tid'];
+              $term->vid = $current_revision['vid'];
+              $term->weight = $current_revision['weight'];
+
+              if (is_array($current_revision['taxonomy_term_current_revision__parent'])) {
+                foreach ($current_revision['taxonomy_term_current_revision__parent'] as $current_revision_parent) {
+                  $term->parent = NULL;
+                  if (isset($current_revision_parent['parent_target_id'])) {
+                    $term->parent = $current_revision_parent['parent_target_id'];
+                  }
+                  if (!is_null($term->parent)) {
+                    $this->treeChildren[$vid][$term->parent][] = $term->tid;
+                    $this->treeParents[$vid][$term->tid][] = $term->parent;
+                    $this->treeTerms[$vid][$term->tid] = $term;
+                  }
+                }
+              }
+            }
+            unset($term->taxonomy_term_current_revision);
+          }
+        }
+        else {
+          $query = $this->database->select($this->getDataTable(), 't');
+          $query->join('taxonomy_term__parent', 'p', $query->joinCondition()
+            ->compare('t.tid', 'p.entity_id'));
+          $query->addExpressionField('parent_target_id', 'parent');
+          $result = $query
+            ->addTag('taxonomy_term_access')
+            ->fields('t')
+            ->condition('t.vid', $vid)
+            ->condition('t.default_langcode', 1)
+            ->orderBy('t.weight')
+            ->orderBy('t.name')
+            ->execute();
+          foreach ($result as $term) {
+            $this->treeChildren[$vid][$term->parent][] = $term->tid;
+            $this->treeParents[$vid][$term->tid][] = $term->parent;
+            $this->treeTerms[$vid][$term->tid] = $term;
+          }
         }
       }
 
@@ -306,48 +346,118 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
    * {@inheritdoc}
    */
   public function nodeCount($vid) {
-    $query = $this->database->select('taxonomy_index', 'ti');
-    $query->addExpression('COUNT(DISTINCT [ti].[nid])');
-    $query->leftJoin($this->getBaseTable(), 'td', '[ti].[tid] = [td].[tid]');
-    $query->condition('td.vid', $vid);
-    $query->addTag('vocabulary_node_count');
-    return $query->execute()->fetchField();
+    if ($this->database->driver() == 'mongodb') {
+      // @todo There is too little testing for this. Why is there a join in this
+      // query.
+      // @see \Drupal\Tests\taxonomy\Functional\TokenReplaceTest.
+      $query = $this->database->select('taxonomy_index', 'ti');
+      $query->addJoin('LEFT', 'taxonomy_term_data', 'td', $query->joinCondition()->compare('ti.tid', 'td.tid')->condition('taxonomy_term_current_revision.vid', $vid));
+      $query->addTag('vocabulary_node_count');
+      $results = $query->execute()->fetchAll();
+      $nids = [];
+      foreach ($results as $result) {
+        if (isset($result->nid) && !in_array($result->nid, $nids)) {
+          $nids[] = $result->nid;
+        }
+      }
+      return count($nids);
+    }
+    else {
+      $query = $this->database->select('taxonomy_index', 'ti');
+      $query->addExpressionCountDistinct('ti.nid');
+      $query->leftJoin($this->getBaseTable(), 'td', $query->joinCondition()->compare('ti.tid', 'td.tid'));
+      $query->condition('td.vid', $vid);
+      $query->addTag('vocabulary_node_count');
+      return $query->execute()->fetchField();
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function resetWeights($vid) {
-    $this->database->update($this->getDataTable())
-      ->fields(['weight' => 0])
-      ->condition('vid', $vid)
-      ->execute();
+    if ($this->database->driver() == 'mongodb') {
+      $prefixed_table = $this->database->getPrefix() . 'taxonomy_term_data';
+      $this->database->getConnection()->selectCollection($prefixed_table)->updateMany(
+        [
+          'vid' => $vid,
+        ],
+        [
+          '$set' => [
+            'weight' => 0,
+            "taxonomy_term_current_revision.$[translation].weight" => 0,
+          ],
+        ],
+        [
+          'arrayFilters' => [
+            ["translation.vid" => $vid],
+          ],
+          'session' => $this->database->getMongodbSession(),
+        ],
+      );
+    }
+    else {
+      $this->database->update($this->getDataTable())
+        ->fields(['weight' => 0])
+        ->condition('vid', $vid)
+        ->execute();
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function getNodeTerms(array $nids, array $vids = [], $langcode = NULL) {
-    $query = $this->database->select($this->getDataTable(), 'td');
-    $query->innerJoin('taxonomy_index', 'tn', '[td].[tid] = [tn].[tid]');
-    $query->fields('td', ['tid']);
-    $query->addField('tn', 'nid', 'node_nid');
-    $query->orderby('td.weight');
-    $query->orderby('td.name');
-    $query->condition('tn.nid', $nids, 'IN');
-    $query->addTag('taxonomy_term_access');
-    if (!empty($vids)) {
-      $query->condition('td.vid', $vids, 'IN');
-    }
-    if (!empty($langcode)) {
-      $query->condition('td.langcode', $langcode);
-    }
+    if ($this->database->driver() == 'mongodb') {
+      $query = $this->database->select('taxonomy_term_data', 'td');
+      foreach ($nids as &$nid) {
+        $nid = (int) $nid;
+      }
+      $query->addJoin('INNER', 'taxonomy_index', 'tn', $query->joinCondition()->compare('tn.tid', 'td.tid'));
+      $query->fields('td', ['tid']);
+      $query->addField('tn', 'nid', 'node_nid');
+      $query->condition('tn.nid', $nids, 'IN');
+      $query->orderby('taxonomy_term_current_revision.weight');
+      $query->orderby('taxonomy_term_current_revision.name');
+      $query->addTag('taxonomy_term_access');
+      if (!empty($vids)) {
+        $query->condition('taxonomy_term_current_revision.vid', $vids, 'IN');
+      }
+      if (!empty($langcode)) {
+        $query->condition('taxonomy_term_current_revision.langcode', $langcode);
+      }
 
-    $results = [];
-    $all_tids = [];
-    foreach ($query->execute() as $term_record) {
-      $results[$term_record->node_nid][] = $term_record->tid;
-      $all_tids[] = $term_record->tid;
+      $results = [];
+      $all_tids = [];
+      foreach ($query->execute() as $term_record) {
+        if (isset($term_record->tid) && isset($term_record->node_nid)) {
+          $results[$term_record->node_nid][] = $term_record->tid;
+          $all_tids[] = $term_record->tid;
+        }
+      }
+    }
+    else {
+      $query = $this->database->select($this->getDataTable(), 'td');
+      $query->innerJoin('taxonomy_index', 'tn', $query->joinCondition()->compare('td.tid', 'tn.tid'));
+      $query->fields('td', ['tid']);
+      $query->addField('tn', 'nid', 'node_nid');
+      $query->orderby('td.weight');
+      $query->orderby('td.name');
+      $query->condition('tn.nid', $nids, 'IN');
+      $query->addTag('taxonomy_term_access');
+      if (!empty($vids)) {
+        $query->condition('td.vid', $vids, 'IN');
+      }
+      if (!empty($langcode)) {
+        $query->condition('td.langcode', $langcode);
+      }
+
+      $results = [];
+      $all_tids = [];
+      foreach ($query->execute() as $term_record) {
+        $results[$term_record->node_nid][] = $term_record->tid;
+        $all_tids[] = $term_record->tid;
+      }
     }
 
     $all_terms = $this->loadMultiple($all_tids);
@@ -371,25 +481,59 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
     $langcode_field = $table_mapping->getColumnNames($this->entityType->getKey('langcode'))['value'];
     $revision_default_field = $table_mapping->getColumnNames($this->entityType->getRevisionMetadataKey('revision_default'))['value'];
 
-    $query = $this->database->select($this->getRevisionDataTable(), 'tfr');
-    $query->fields('tfr', [$id_field]);
-    $query->addExpression("MAX([tfr].[$revision_field])", $revision_field);
+    if ($this->database->driver() == 'mongodb') {
+      $latest_revision_table = $this->getJsonStorageLatestRevisionTable();
 
-    $query->join($this->getRevisionTable(), 'tr', "[tfr].[$revision_field] = [tr].[$revision_field] AND [tr].[$revision_default_field] = 0");
+      $results = $this->database->select($this->getBaseTable(), 't')
+        ->fields('t', [$id_field, $latest_revision_table])
+        ->execute()
+        ->fetchAll();
 
-    $inner_select = $this->database->select($this->getRevisionDataTable(), 't');
-    $inner_select->condition("t.$rta_field", '1');
-    $inner_select->fields('t', [$id_field, $langcode_field]);
-    $inner_select->addExpression("MAX([t].[$revision_field])", $revision_field);
-    $inner_select
-      ->groupBy("t.$id_field")
-      ->groupBy("t.$langcode_field");
+      $term_ids_with_pending_revisions = [];
+      foreach ($results as $result) {
+        $latest_revision = $result->{$latest_revision_table};
+        $revision_id = NULL;
+        foreach ($latest_revision as $latest_revision_language) {
+          if (($latest_revision_language[$rta_field] === TRUE) && ($latest_revision_language[$revision_default_field] === FALSE)) {
+            $revision_id = $latest_revision_language[$revision_field];
+          }
+        }
+        if (!is_null($revision_id)) {
+          $term_ids_with_pending_revisions[$result->{$id_field}] = $revision_id;
+        }
+      }
 
-    $query->join($inner_select, 'mr', "[tfr].[$revision_field] = [mr].[$revision_field] AND [tfr].[$langcode_field] = [mr].[$langcode_field]");
+      return $term_ids_with_pending_revisions;
+    }
+    else {
+      $query = $this->database->select($this->getRevisionDataTable(), 'tfr');
+      $query->fields('tfr', [$id_field]);
+      $query->addExpressionMax("tfr.$revision_field", $revision_field);
 
-    $query->groupBy("tfr.$id_field");
+      $query->join($this->getRevisionTable(), 'tr',
+        $query->joinCondition()
+          ->compare("tfr.$revision_field", "tr.$revision_field")
+          ->condition("tr.$revision_default_field", 0)
+      );
 
-    return $query->execute()->fetchAllKeyed(1, 0);
+      $inner_select = $this->database->select($this->getRevisionDataTable(), 't');
+      $inner_select->condition("t.$rta_field", '1');
+      $inner_select->fields('t', [$id_field, $langcode_field]);
+      $inner_select->addExpressionMax("t.$revision_field", $revision_field);
+      $inner_select
+        ->groupBy("t.$id_field")
+        ->groupBy("t.$langcode_field");
+
+      $query->join($inner_select, 'mr',
+        $query->joinCondition()
+          ->compare("tfr.$revision_field", "mr.$revision_field")
+          ->compare("tfr.$langcode_field", "mr.$langcode_field")
+      );
+
+      $query->groupBy("tfr.$id_field");
+
+      return $query->execute()->fetchAllKeyed(1, 0);
+    }
   }
 
   /**
@@ -407,12 +551,53 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
     $target_id_column = $table_mapping->getFieldColumnName($parent_field_storage, 'target_id');
     $delta_column = $table_mapping->getFieldColumnName($parent_field_storage, TableMappingInterface::DELTA);
 
-    $query = $this->database->select($table_mapping->getFieldTableName('parent'), 'p');
-    $query->addExpression("MAX([$target_id_column])", 'max_parent_id');
-    $query->addExpression("MAX([$delta_column])", 'max_delta');
-    $query->condition('bundle', $vid);
+    if ($this->database->driver() == 'mongodb') {
+      $all_revisions_table = $table_mapping->getJsonStorageAllRevisionsTable(0);
+      $parent_table = $table_mapping->getJsonStorageDedicatedTableName($parent_field_storage, $all_revisions_table);
 
-    $result = $query->execute()->fetchAll();
+      $rows = $this->database->select($this->getBaseTable())
+        ->fields($this->getBaseTable(), [$all_revisions_table])
+        ->condition("$all_revisions_table.vid", $vid)
+        ->execute()
+        ->fetchAll();
+
+      $max_parent_id = 0;
+      $max_delta = 0;
+      foreach ($rows as $row) {
+        if (isset($row->{$all_revisions_table})) {
+          foreach ($row->{$all_revisions_table} as $taxonomy_term_revision) {
+            if (isset($taxonomy_term_revision[$parent_table])) {
+              foreach ($taxonomy_term_revision[$parent_table] as $parent_table_row) {
+                $parent_id = (int) $parent_table_row['parent_target_id'];
+                if ($parent_id > $max_parent_id) {
+                  $max_parent_id = (int) $parent_id;
+                }
+                $delta = (int) $parent_table_row['delta'];
+                if ($delta > $max_delta) {
+                  $max_delta = (int) $delta;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Create the result as it is created for a relational database.
+      $result = [
+        0 => (object) [
+          'max_parent_id' => $max_parent_id,
+          'max_delta' => $max_delta,
+        ],
+      ];
+    }
+    else {
+      $query = $this->database->select($table_mapping->getFieldTableName('parent'), 'p');
+      $query->addExpressionMax("$target_id_column", 'max_parent_id');
+      $query->addExpressionMax("$delta_column", 'max_delta');
+      $query->condition('bundle', $vid);
+
+      $result = $query->execute()->fetchAll();
+    }
 
     // If all the terms have the same parent, the parent can only be root (0).
     if ((int) $result[0]->max_parent_id === 0) {

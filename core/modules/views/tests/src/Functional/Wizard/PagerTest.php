@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Functional\Wizard;
 
+use Drupal\Core\Database\Database;
+
 /**
  * Tests the ability of the views wizard to create views without a pager.
  *
@@ -55,7 +57,12 @@ class PagerTest extends WizardTestBase {
     $view = [];
     $view['label'] = $this->randomMachineName(16);
     $view['id'] = $this->randomMachineName(16);
-    $view['show[sort]'] = 'node_field_data-created:ASC';
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $view['show[sort]'] = 'node-created:ASC';
+    }
+    else {
+      $view['show[sort]'] = 'node_field_data-created:ASC';
+    }
     $view['page[create]'] = 1;
     $view['page[title]'] = $this->randomMachineName(16);
     $view['page[path]'] = $path;

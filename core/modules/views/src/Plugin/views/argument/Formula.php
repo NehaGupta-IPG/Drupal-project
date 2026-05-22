@@ -43,12 +43,19 @@ class Formula extends ArgumentPluginBase {
    */
   protected function summaryQuery() {
     $this->ensureMyTable();
-    // Now that our table is secure, get our formula.
-    $formula = $this->getFormula();
 
-    // Add the field.
-    $this->base_alias = $this->name_alias = $this->query->addField(NULL, $formula, $this->field);
-    $this->query->setCountField(NULL, $formula, $this->field);
+    if ($this->view->getDatabaseDriver() == 'mongodb') {
+      $this->query->addDateDateFormattedField($this->field, $this->realField, $this->getDateFormat($this->argFormat));
+      $this->base_alias = $this->name_alias = $this->query->addField(NULL, $this->realField, $this->field);
+    }
+    else {
+      // Now that our table is secure, get our formula.
+      $formula = $this->getFormula();
+
+      // Add the field.
+      $this->base_alias = $this->name_alias = $this->query->addField(NULL, $formula, $this->field);
+      $this->query->setCountField(NULL, $formula, $this->field);
+    }
 
     return $this->summaryBasics(FALSE);
   }
@@ -58,13 +65,32 @@ class Formula extends ArgumentPluginBase {
    */
   public function query($group_by = FALSE) {
     $this->ensureMyTable();
-    // Now that our table is secure, get our formula.
-    $placeholder = $this->placeholder();
-    $formula = $this->getFormula() . ' = ' . $placeholder;
-    $placeholders = [
-      $placeholder => $this->argument,
-    ];
-    $this->query->addWhere(0, $formula, $placeholders, 'formula');
+
+    if ($this->view->getDatabaseDriver() == 'mongodb') {
+      if ($this->relationship) {
+        $field = "$this->tableAlias.$this->realField";
+      }
+      else {
+        $field = $this->realField;
+      }
+
+      $values = [
+        'format' => $this->getDateFormat($this->argFormat),
+        'value' => $this->argument,
+        'timezone' => $this->query->setupTimezone(),
+      ];
+
+      $this->query->addCondition(0, $field, $values, $this->mongodbOperator);
+    }
+    else {
+      // Now that our table is secure, get our formula.
+      $placeholder = $this->placeholder();
+      $formula = $this->getFormula() . ' = ' . $placeholder;
+      $placeholders = [
+        $placeholder => $this->argument,
+      ];
+      $this->query->addWhere(0, $formula, $placeholders, 'formula');
+    }
   }
 
 }

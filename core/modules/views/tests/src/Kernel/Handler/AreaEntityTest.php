@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Handler;
 
+use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
@@ -196,7 +197,7 @@ class AreaEntityTest extends ViewsKernelTestBase {
     $this->assertEquals([
       'config' => ['block.block.test_block'],
       'content' => ['entity_test:entity_test:aa0c61cb-b7bb-4795-972a-493dabcf529c'],
-      'module' => ['views_test_data'],
+      'module' => (Database::getConnection()->driver() == 'mongodb' ? ['mongodb', 'views_test_data'] : ['views_test_data']),
     ], $dependencies);
   }
 

@@ -86,15 +86,30 @@ class FieldTranslationSqlStorageTest extends EntityLanguageTestBase {
 
     foreach ($fields as $field_name) {
       $field_storage = FieldStorageConfig::loadByName($entity_type, $field_name);
-      $table = $table_mapping->getDedicatedDataTableName($field_storage);
+      if (\Drupal::database()->driver() == 'mongodb') {
+        $base_table = $table_mapping->getBaseTable();
+        $translations_table = $table_mapping->getJsonStorageTranslationsTable();
+        $dedicated_table = $table_mapping->getJsonStorageDedicatedTableName($field_storage, $translations_table);
 
-      $record = \Drupal::database()
-        ->select($table, 'f')
-        ->fields('f')
-        ->condition('f.entity_id', $id)
-        ->condition('f.revision_id', $id)
-        ->execute()
-        ->fetchObject();
+        $record = \Drupal::database()
+          ->select($base_table, 'f')
+          ->fields('f')
+          ->condition("$translations_table.$dedicated_table.entity_id", (int) $id)
+          ->condition("$translations_table.$dedicated_table.revision_id", (int) $id)
+          ->execute()
+          ->fetchObject();
+      }
+      else {
+        $table = $table_mapping->getDedicatedDataTableName($field_storage);
+
+        $record = \Drupal::database()
+          ->select($table, 'f')
+          ->fields('f')
+          ->condition('f.entity_id', $id)
+          ->condition('f.revision_id', $id)
+          ->execute()
+          ->fetchObject();
+      }
 
       if ($record->langcode != $langcode) {
         $status = FALSE;

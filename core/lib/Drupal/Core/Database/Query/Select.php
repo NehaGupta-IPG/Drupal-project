@@ -604,6 +604,79 @@ class Select extends Query implements SelectInterface {
   /**
    * {@inheritdoc}
    */
+  public function addExpressionConstant(string $constant, ?string $alias = NULL) {
+    return $this->addExpression($constant, $alias);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addExpressionField(string $field, ?string $alias = NULL) {
+    $field = '[' . str_replace('.', '].[', $field) . ']';
+    return $this->addExpression($field, $alias);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addExpressionMax(string $field, ?string $alias = NULL) {
+    $field = '[' . str_replace('.', '].[', $field) . ']';
+    return $this->addExpression('MAX(' . $field . ')', $alias);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addExpressionMin(string $field, ?string $alias = NULL) {
+    $field = '[' . str_replace('.', '].[', $field) . ']';
+    return $this->addExpression('MIN(' . $field . ')', $alias);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addExpressionSum(string $field, ?string $alias = NULL) {
+    $field = '[' . str_replace('.', '].[', $field) . ']';
+    return $this->addExpression('SUM(' . $field . ')', $alias);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addExpressionCount(string $field, ?string $alias = NULL) {
+    $field = '[' . str_replace('.', '].[', $field) . ']';
+    return $this->addExpression('COUNT(' . $field . ')', $alias);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addExpressionCountAll(?string $alias = NULL) {
+    return $this->addExpression('COUNT(*)', $alias);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addExpressionCountDistinct(string $field, ?string $alias = NULL) {
+    $field = '[' . str_replace('.', '].[', $field) . ']';
+    return $this->addExpression('COUNT(DISTINCT(' . $field . '))', $alias);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addExpressionCoalesce(array $fields, ?string $alias = NULL) {
+    foreach ($fields as &$field) {
+      $field = '[' . str_replace('.', '].[', $field) . ']';
+    }
+    $expression = 'COALESCE(' . implode(', ', $fields) . ')';
+    return $this->addExpression($expression, $alias);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function join($table, $alias = NULL, $condition = NULL, $arguments = []) {
     return $this->addJoin('INNER', $table, $alias, $condition, $arguments);
   }
@@ -645,6 +718,9 @@ class Select extends Query implements SelectInterface {
     if (is_string($condition)) {
       $condition = str_replace('%alias', $alias, $condition);
     }
+    if ($condition instanceof ConditionInterface) {
+      $condition->updateAliasPlaceholder('%alias', $alias);
+    }
 
     $this->tables[$alias] = [
       'join type' => $type,
@@ -655,6 +731,13 @@ class Select extends Query implements SelectInterface {
     ];
 
     return $alias;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function joinCondition(string $conjunction = 'AND') {
+    return $this->connection->condition($conjunction);
   }
 
   /**
@@ -724,7 +807,7 @@ class Select extends Query implements SelectInterface {
     $count = $this->prepareCountQuery();
 
     $query = $this->connection->select($count, NULL, $this->queryOptions);
-    $query->addExpression('COUNT(*)');
+    $query->addExpressionCountAll();
 
     return $query;
   }
@@ -770,7 +853,7 @@ class Select extends Query implements SelectInterface {
 
     // If we've just removed all fields from the query, make sure there is at
     // least one so that the query still runs.
-    $count->addExpression('1');
+    $count->addExpressionConstant('1');
 
     // Ordering a count query is a waste of cycles, and breaks on some
     // databases anyway.

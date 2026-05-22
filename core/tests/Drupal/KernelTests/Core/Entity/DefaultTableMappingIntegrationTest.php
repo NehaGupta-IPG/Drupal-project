@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -31,6 +32,13 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
   protected $tableMapping;
 
   /**
+   * The database connection.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $connection;
+
+  /**
    * {@inheritdoc}
    */
   protected static $modules = ['entity_test_extra'];
@@ -54,6 +62,8 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+
+    $this->connection = Database::getConnection();
 
     // Setup some fields for entity_test_extra to create.
     $definitions['multivalued_base_field'] = BaseFieldDefinition::create('string')
@@ -86,12 +96,22 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
 
     // Test the field table name for a translatable and revisionable base field,
     // which is stored in the entity's data table.
-    $expected = 'entity_test_mulrev_property_data';
+    if ($this->connection->driver() == 'mongodb') {
+      $expected = 'entity_test_mulrev_current_revision';
+    }
+    else {
+      $expected = 'entity_test_mulrev_property_data';
+    }
     $this->assertEquals($this->tableMapping->getFieldTableName('name'), $expected);
 
     // Test the field table name for a multi-valued base field, which is stored
     // in a dedicated table.
-    $expected = 'entity_test_mulrev__multivalued_base_field';
+    if ($this->connection->driver() == 'mongodb') {
+      $expected = 'entity_test_mulrev_current_revision__multivalued_base_field';
+    }
+    else {
+      $expected = 'entity_test_mulrev__multivalued_base_field';
+    }
     $this->assertEquals($this->tableMapping->getFieldTableName('multivalued_base_field'), $expected);
   }
 
@@ -100,35 +120,90 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
    */
   public function testGetAllFieldTableNames(): void {
     // Check a field that is stored in all the shared tables.
-    $expected = [
-      'entity_test_mulrev',
-      'entity_test_mulrev_property_data',
-      'entity_test_mulrev_revision',
-      'entity_test_mulrev_property_revision',
-    ];
+    if ($this->connection->driver() == 'mongodb') {
+      $expected = [
+        'entity_test_mulrev',
+        'entity_test_mulrev_all_revisions',
+        'entity_test_mulrev_current_revision',
+        'entity_test_mulrev_latest_revision',
+      ];
+    }
+    else {
+      $expected = [
+        'entity_test_mulrev',
+        'entity_test_mulrev_property_data',
+        'entity_test_mulrev_revision',
+        'entity_test_mulrev_property_revision',
+      ];
+    }
     $this->assertEquals($expected, $this->tableMapping->getAllFieldTableNames('id'));
 
     // Check a field that is stored only in the base table.
-    $expected = ['entity_test_mulrev'];
+    if ($this->connection->driver() == 'mongodb') {
+      // Mongodb stores UUID on all shared tables to make entity queries
+      // possible.
+      $expected = [
+        'entity_test_mulrev',
+        'entity_test_mulrev_all_revisions',
+        'entity_test_mulrev_current_revision',
+        'entity_test_mulrev_latest_revision',
+      ];
+    }
+    else {
+      $expected = ['entity_test_mulrev'];
+    }
     $this->assertEquals($expected, $this->tableMapping->getAllFieldTableNames('uuid'));
 
     // Check a field that is stored only in the revision table.
-    $expected = ['entity_test_mulrev_revision'];
+    if ($this->connection->driver() == 'mongodb') {
+      // Mongodb stores UUID on all shared tables to make entity queries
+      // possible.
+      $expected = [
+        'entity_test_mulrev_all_revisions',
+        'entity_test_mulrev_current_revision',
+        'entity_test_mulrev_latest_revision',
+      ];
+    }
+    else {
+      $expected = ['entity_test_mulrev_revision'];
+    }
     $this->assertEquals($expected, $this->tableMapping->getAllFieldTableNames('revision_default'));
 
     // Check a field that field that is stored in the data and revision data
     // tables.
-    $expected = [
-      'entity_test_mulrev_property_data',
-      'entity_test_mulrev_property_revision',
-    ];
+    if ($this->connection->driver() == 'mongodb') {
+      // Mongodb stores UUID on all shared tables to make entity queries
+      // possible.
+      $expected = [
+        'entity_test_mulrev_all_revisions',
+        'entity_test_mulrev_current_revision',
+        'entity_test_mulrev_latest_revision',
+      ];
+    }
+    else {
+      $expected = [
+        'entity_test_mulrev_property_data',
+        'entity_test_mulrev_property_revision',
+      ];
+    }
     $this->assertEquals($expected, $this->tableMapping->getAllFieldTableNames('name'));
 
     // Check a field that is stored in dedicated data and revision data tables.
-    $expected = [
-      'entity_test_mulrev__multivalued_base_field',
-      'entity_test_mulrev_r__f86e511394',
-    ];
+    if ($this->connection->driver() == 'mongodb') {
+      // Mongodb stores UUID on all shared tables to make entity queries
+      // possible.
+      $expected = [
+        'entity_test_mulrev_current_revision__multivalued_base_field',
+        'entity_test_mulrev_all_revisions__multivalued_base_field',
+        'entity_test_mulrev_latest_revision__multivalued_base_field',
+      ];
+    }
+    else {
+      $expected = [
+        'entity_test_mulrev__multivalued_base_field',
+        'entity_test_mulrev_r__f86e511394',
+      ];
+    }
     $this->assertEquals($expected, $this->tableMapping->getAllFieldTableNames('multivalued_base_field'));
   }
 
@@ -138,26 +213,54 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
    * @covers ::getTableNames
    */
   public function testGetTableNames(): void {
-    $storage_definitions = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions('entity_test_mulrev');
-    $dedicated_data_table = $this->tableMapping->getDedicatedDataTableName($storage_definitions['multivalued_base_field']);
-    $dedicated_revision_table = $this->tableMapping->getDedicatedRevisionTableName($storage_definitions['multivalued_base_field']);
-
     // Check that both the data and the revision tables exist for a multi-valued
     // base field.
     $database_schema = \Drupal::database()->schema();
-    $this->assertTrue($database_schema->tableExists($dedicated_data_table));
-    $this->assertTrue($database_schema->tableExists($dedicated_revision_table));
+    $storage_definitions = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions('entity_test_mulrev');
+    if ($this->connection->driver() == 'mongodb') {
+      $dedicated_all_revisions_table = $this->tableMapping->getJsonStorageDedicatedTableName($storage_definitions['multivalued_base_field'], $this->tableMapping->getJsonStorageAllRevisionsTable());
+      $dedicated_current_revision_table = $this->tableMapping->getJsonStorageDedicatedTableName($storage_definitions['multivalued_base_field'], $this->tableMapping->getJsonStorageCurrentRevisionTable());
+      $dedicated_latest_revision_table = $this->tableMapping->getJsonStorageDedicatedTableName($storage_definitions['multivalued_base_field'], $this->tableMapping->getJsonStorageLatestRevisionTable());
 
-    // Check that the table mapping contains both the data and the revision
-    // tables exist for a multi-valued base field.
-    $expected = [
-      'entity_test_mulrev',
-      'entity_test_mulrev_property_data',
-      'entity_test_mulrev_revision',
-      'entity_test_mulrev_property_revision',
-      $dedicated_data_table,
-      $dedicated_revision_table,
-    ];
+      // Check that the all revisions, the current revision and the latest
+      // revision tables exist for a multi-valued base field.
+      $this->assertTrue($database_schema->tableExists($dedicated_all_revisions_table));
+      $this->assertTrue($database_schema->tableExists($dedicated_current_revision_table));
+      $this->assertTrue($database_schema->tableExists($dedicated_latest_revision_table));
+
+      // Check that the table mapping contains both the data and the revision
+      // tables exist for a multi-valued base field.
+      $expected = [
+        'entity_test_mulrev',
+        'entity_test_mulrev_all_revisions',
+        'entity_test_mulrev_current_revision',
+        'entity_test_mulrev_latest_revision',
+        $dedicated_current_revision_table,
+        $dedicated_all_revisions_table,
+        $dedicated_latest_revision_table,
+      ];
+    }
+    else {
+      $dedicated_data_table = $this->tableMapping->getDedicatedDataTableName($storage_definitions['multivalued_base_field']);
+      $dedicated_revision_table = $this->tableMapping->getDedicatedRevisionTableName($storage_definitions['multivalued_base_field']);
+
+      // Check that both the data and the revision tables exist for a multi-valued
+      // base field.
+      $this->assertTrue($database_schema->tableExists($dedicated_data_table));
+      $this->assertTrue($database_schema->tableExists($dedicated_revision_table));
+
+      // Check that the table mapping contains both the data and the revision
+      // tables exist for a multi-valued base field.
+      $expected = [
+        'entity_test_mulrev',
+        'entity_test_mulrev_property_data',
+        'entity_test_mulrev_revision',
+        'entity_test_mulrev_property_revision',
+        $dedicated_data_table,
+        $dedicated_revision_table,
+      ];
+    }
+
     $this->assertEquals($expected, $this->tableMapping->getTableNames());
   }
 

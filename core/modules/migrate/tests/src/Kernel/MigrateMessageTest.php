@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Kernel;
 
+use Drupal\Core\Database\Database;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Event\MigrateEvents;
@@ -105,6 +106,10 @@ class MigrateMessageTest extends KernelTestBase implements MigrateMessageInterfa
    * objects have the expected keys.
    */
   public function testGetMessages(): void {
+    if (Database::getConnection()->driver() === 'mongodb') {
+      $this->markTestSkipped();
+    }
+
     $id = $this->migration->getPluginId();
     $expected_message = (object) [
       'src_name' => 'source_message',

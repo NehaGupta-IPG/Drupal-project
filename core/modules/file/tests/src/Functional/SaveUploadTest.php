@@ -85,10 +85,16 @@ class SaveUploadTest extends FileManagedTestBase {
     $this->phpFile = current($this->drupalGetTestFiles('php'));
     $this->assertFileExists($this->phpFile->uri);
 
-    $this->maxFidBefore = (int) \Drupal::entityQueryAggregate('file')
+    $result = \Drupal::entityQueryAggregate('file')
       ->accessCheck(FALSE)
       ->aggregate('fid', 'max')
-      ->execute()[0]['fid_max'];
+      ->execute();
+    if (isset($result[0]['fid_max'])) {
+      $this->maxFidBefore = (int) $result[0]['fid_max'];
+    }
+    else {
+      $this->maxFidBefore = 0;
+    }
 
     // Upload with replace to guarantee there's something there.
     $edit = [
@@ -111,10 +117,17 @@ class SaveUploadTest extends FileManagedTestBase {
    * Tests the file_save_upload() function.
    */
   public function testNormal(): void {
-    $max_fid_after = (int) \Drupal::entityQueryAggregate('file')
+    $result = \Drupal::entityQueryAggregate('file')
       ->accessCheck(FALSE)
       ->aggregate('fid', 'max')
-      ->execute()[0]['fid_max'];
+      ->execute();
+    if (isset($result[0]['fid_max'])) {
+      $max_fid_after = (int) $result[0]['fid_max'];
+    }
+    else {
+      $max_fid_after = 0;
+    }
+
     // Verify that a new file was created.
     $this->assertGreaterThan($this->maxFidBefore, $max_fid_after);
     $file1 = File::load($max_fid_after);
@@ -132,10 +145,16 @@ class SaveUploadTest extends FileManagedTestBase {
     $this->submitForm($edit, 'Submit');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains("You WIN!");
-    $max_fid_after = (int) \Drupal::entityQueryAggregate('file')
+    $result = \Drupal::entityQueryAggregate('file')
       ->accessCheck(FALSE)
       ->aggregate('fid', 'max')
-      ->execute()[0]['fid_max'];
+      ->execute();
+    if (isset($result[0]['fid_max'])) {
+      $max_fid_after = (int) $result[0]['fid_max'];
+    }
+    else {
+      $max_fid_after = 0;
+    }
 
     // Check that the correct hooks were called.
     $this->assertFileHooksCalled(['validate', 'insert']);
@@ -174,10 +193,16 @@ class SaveUploadTest extends FileManagedTestBase {
     $edit = ['files[file_test_upload]' => \Drupal::service('file_system')->realpath($image1->uri)];
     $this->drupalGet('file-test/upload');
     $this->submitForm($edit, 'Submit');
-    $max_fid_after = (int) \Drupal::entityQueryAggregate('file')
+    $result = \Drupal::entityQueryAggregate('file')
       ->accessCheck(FALSE)
       ->aggregate('fid', 'max')
-      ->execute()[0]['fid_max'];
+      ->execute();
+    if (isset($result[0]['fid_max'])) {
+      $max_fid_after = (int) $result[0]['fid_max'];
+    }
+    else {
+      $max_fid_after = 0;
+    }
     $file1 = File::load($max_fid_after);
 
     // Simulate a race condition where two files are uploaded at almost the same
@@ -194,10 +219,16 @@ class SaveUploadTest extends FileManagedTestBase {
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains("The file {$file1->getFileUri()} already exists. Enter a unique file URI.");
     $max_fid_before_duplicate = $max_fid_after;
-    $max_fid_after = (int) \Drupal::entityQueryAggregate('file')
+    $result = \Drupal::entityQueryAggregate('file')
       ->accessCheck(FALSE)
       ->aggregate('fid', 'max')
-      ->execute()[0]['fid_max'];
+      ->execute();
+    if (isset($result[0]['fid_max'])) {
+      $max_fid_after = (int) $result[0]['fid_max'];
+    }
+    else {
+      $max_fid_after = 0;
+    }
     $this->assertEquals($max_fid_before_duplicate, $max_fid_after, 'A new managed file was not created.');
   }
 

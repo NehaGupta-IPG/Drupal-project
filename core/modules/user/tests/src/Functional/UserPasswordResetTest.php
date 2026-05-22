@@ -74,7 +74,7 @@ class UserPasswordResetTest extends BrowserTestBase {
     $account->login = \Drupal::time()->getRequestTime() - mt_rand(10, 100000);
     Database::getConnection()->update('users_field_data')
       ->fields(['login' => $account->getLastLoginTime()])
-      ->condition('uid', $account->id())
+      ->condition('uid', (int) $account->id())
       ->execute();
   }
 
@@ -623,7 +623,7 @@ class UserPasswordResetTest extends BrowserTestBase {
     // change that is to update it directly in the database.
     Database::getConnection()->update('users_field_data')
       ->fields(['pass' => NULL])
-      ->condition('uid', [$user1->id(), $user2->id()], 'IN')
+      ->condition('uid', [(int) $user1->id(), (int) $user2->id()], 'IN')
       ->execute();
     \Drupal::entityTypeManager()->getStorage('user')->resetCache();
     $user1 = User::load($user1->id());

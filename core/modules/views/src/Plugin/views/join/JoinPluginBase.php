@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Plugin\views\join;
 
+use Drupal\Component\Assertion\Inspector;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Plugin\PluginBase;
 
@@ -311,15 +312,20 @@ class JoinPluginBase extends PluginBase implements JoinPluginInterface {
       $left_table = NULL;
     }
 
-    $condition = "$left_field " . $this->configuration['operator'] . " $table[alias].$this->field";
     $arguments = [];
+    if ($this->leftFormula || is_null($this->leftTable)) {
+      $condition = $select_query->joinCondition()->where("$left_field " . $this->configuration['operator'] . " $table[alias].$this->field");
+    }
+    else {
+      $condition = $select_query->joinCondition()->compare($left_field, "$table[alias].$this->field", $this->configuration['operator']);
+    }
 
     // Tack on the extra.
     if (isset($this->extra)) {
       $this->joinAddExtra($arguments, $condition, $table, $select_query, $left_table);
     }
 
-    $select_query->addJoin($this->type, $right_table, $table['alias'], $condition, $arguments);
+    $select_query->addJoin($this->type, $right_table, $table['alias'], $condition);
   }
 
   /**
@@ -340,15 +346,40 @@ class JoinPluginBase extends PluginBase implements JoinPluginInterface {
     if (is_array($this->extra)) {
       $extras = [];
       foreach ($this->extra as $info) {
-        $extras[] = $this->buildExtra($info, $arguments, $table, $select_query, $left_table);
+        $extras[] = $this->buildExtra($info, $arguments, $table, $select_query, $left_table, is_string($condition));
       }
 
       if ($extras) {
         if (count($extras) == 1) {
-          $condition .= ' AND ' . array_shift($extras);
+          $extra = array_shift($extras);
+          if (is_string($extra)) {
+            $condition .= ' AND ' . $extra;
+          }
+          else {
+            if (isset($extra['field2'])) {
+              $condition->compare($extra['field'], $extra['field2'], $extra['operator']);
+            }
+            else {
+              $condition->condition($extra['field'], $extra['value'], $extra['operator']);
+            }
+          }
         }
         else {
-          $condition .= ' AND (' . implode(' ' . $this->extraOperator . ' ', $extras) . ')';
+          if (Inspector::assertAllStrings($extras)) {
+            $condition .= ' AND (' . implode(' ' . $this->extraOperator . ' ', $extras) . ')';
+          }
+          else {
+            $inner_condition = $select_query->getConnection()->condition($this->extraOperator);
+            foreach ($extras as $extra) {
+              if (isset($extra['field2'])) {
+                $inner_condition->compare($extra['field'], $extra['field2'], $extra['operator']);
+              }
+              else {
+                $inner_condition->condition($extra['field'], $extra['value'], $extra['operator']);
+              }
+            }
+            $condition->condition($inner_condition);
+          }
         }
       }
     }
@@ -370,11 +401,13 @@ class JoinPluginBase extends PluginBase implements JoinPluginInterface {
    *   The current select query being built.
    * @param array $left
    *   The left table.
+   * @param bool $condition_as_string
+   *   (optional) Return the condition as a string value.
    *
-   * @return string
+   * @return array|string
    *   The extra condition
    */
-  protected function buildExtra($info, &$arguments, $table, SelectInterface $select_query, $left) {
+  protected function buildExtra($info, &$arguments, $table, SelectInterface $select_query, $left, $condition_as_string = FALSE) {
     // Do not require 'value' to be set; allow for field syntax instead.
     $info += [
       'value' => NULL,
@@ -414,26 +447,51 @@ class JoinPluginBase extends PluginBase implements JoinPluginInterface {
       $operator = !empty($info['operator']) ? $info['operator'] : '=';
       $placeholder = $placeholder_sql = ':views_join_condition_' . $select_query->nextPlaceholder();
     }
+
     // Set 'field' as join table field if available or set 'left field' as
     // join table field is not set.
     if (isset($info['field'])) {
       $join_table_field = "$join_table$info[field]";
       // Allow the value to be set either with the 'value' element or
-      // with 'left_field'.
+      // with 'left_field' or 'field2'.
       if (isset($info['left_field'])) {
-        $placeholder_sql = "$left[alias].$info[left_field]";
+        $field2 = $placeholder_sql = "$left[alias].$info[left_field]";
       }
-      else {
+      elseif ($condition_as_string) {
         $arguments[$placeholder] = $info['value'];
+      }
+      if (isset($info['field2'])) {
+        if (isset($left['alias'])) {
+          $field2 = "$left[alias].$info[field2]";
+        }
+        else {
+          $field2 = "$info[field2]";
+        }
       }
     }
     // Set 'left field' as join table field is not set.
     else {
       $join_table_field = "$left[alias].$info[left_field]";
-      $arguments[$placeholder] = $info['value'];
     }
-    // Render out the SQL fragment with parameters.
-    return "$join_table_field $operator $placeholder_sql";
+
+    if ($condition_as_string) {
+      // Render out the SQL fragment with parameters.
+      return "$join_table_field $operator $placeholder_sql";
+    }
+    elseif (isset($field2)) {
+      return [
+        'field' => $join_table_field,
+        'field2' => $field2,
+        'operator' => $operator,
+      ];
+    }
+    else {
+      return [
+        'field' => $join_table_field,
+        'value' => $info['value'],
+        'operator' => $operator,
+      ];
+    }
   }
 
 }

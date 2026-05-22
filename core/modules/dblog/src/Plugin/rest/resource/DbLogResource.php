@@ -7,6 +7,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\rest\Attribute\RestResource;
 use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\ResourceResponse;
+use MongoDB\BSON\Binary;
+use MongoDB\BSON\UTCDateTime;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -42,10 +44,19 @@ class DbLogResource extends ResourceBase {
     if ($id) {
       $record = Database::getConnection()->select('watchdog', 'w')
         ->fields('w')
-        ->condition('wid', $id)
+        ->condition('wid', (int) $id)
         ->execute()
         ->fetchAssoc();
       if (!empty($record)) {
+        if (isset($record['timestamp']) && ($record['timestamp'] instanceof UTCDateTime)) {
+          $record['timestamp'] = (int) $record['timestamp']->__toString();
+          $record['timestamp'] = $record['timestamp'] / 1000;
+          $record['timestamp'] = (string) $record['timestamp'];
+        }
+        if (isset($record['variables']) && ($record['variables'] instanceof Binary)) {
+          $record['variables'] = $record['variables']->getData();
+        }
+
         return new ResourceResponse($record);
       }
 

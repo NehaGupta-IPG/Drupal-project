@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\node\Functional\Views;
 
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Database\Database;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
@@ -62,16 +63,20 @@ class FrontPageTest extends ViewTestBase {
 
     $view = Views::getView('frontpage');
 
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $modules = ['mongodb', 'node', 'user'];
+    }
+    else {
+      $modules = ['node', 'user'];
+    }
+
     // Tests \Drupal\node\Plugin\views\row\RssPluginBase::calculateDependencies().
     $expected = [
       'config' => [
         'core.entity_view_mode.node.rss',
         'core.entity_view_mode.node.teaser',
       ],
-      'module' => [
-        'node',
-        'user',
-      ],
+      'module' => $modules,
     ];
     $this->assertSame($expected, $view->getDependencies());
 

@@ -6,7 +6,7 @@ namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\Sql\TableMappingInterface;
 use Drupal\entity_test_revlog\Entity\EntityTestMulWithRevisionLog;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
@@ -40,7 +40,8 @@ class RevisionableContentEntityBaseTest extends EntityKernelTestBase {
    */
   public function testRevisionableContentEntity(): void {
     $entity_type = 'entity_test_mul_revlog';
-    $definition = \Drupal::entityTypeManager()->getDefinition($entity_type);
+    $table_mapping = \Drupal::entityTypeManager()->getStorage('entity_test_mul_revlog')->getTableMapping();
+
     $user = User::create(['name' => 'test name']);
     $user->save();
     /** @var \Drupal\entity_test_revlog\Entity\EntityTestMulWithRevisionLog $entity */
@@ -51,7 +52,7 @@ class RevisionableContentEntityBaseTest extends EntityKernelTestBase {
     // Save the entity, this creates the first revision.
     $entity->save();
     $revision_ids[] = $entity->getRevisionId();
-    $this->assertItemsTableCount(1, $definition);
+    $this->assertItemsTableCount(1, $table_mapping);
 
     // Create the second revision.
     $entity->setNewRevision(TRUE);
@@ -72,7 +73,7 @@ class RevisionableContentEntityBaseTest extends EntityKernelTestBase {
     // Create the third revision.
     $random_timestamp = rand(100_000_000, 200_000_000);
     $this->createRevision($entity, $user, $random_timestamp, 'This is my log message');
-    $this->assertItemsTableCount(3, $definition);
+    $this->assertItemsTableCount(3, $table_mapping);
     $revision_ids[] = $entity->getRevisionId();
 
     // Create another 3 revisions.
@@ -81,7 +82,7 @@ class RevisionableContentEntityBaseTest extends EntityKernelTestBase {
       $this->createRevision($entity, $user, $timestamp, 'This is my log message number: ' . $count);
       $revision_ids[] = $entity->getRevisionId();
     }
-    $this->assertItemsTableCount(6, $definition);
+    $this->assertItemsTableCount(6, $table_mapping);
 
     $this->assertCount(6, $revision_ids);
 
@@ -91,7 +92,7 @@ class RevisionableContentEntityBaseTest extends EntityKernelTestBase {
     }
 
     // We should have only data for three revisions.
-    $this->assertItemsTableCount(3, $definition);
+    $this->assertItemsTableCount(3, $table_mapping);
   }
 
   /**
@@ -143,7 +144,12 @@ class RevisionableContentEntityBaseTest extends EntityKernelTestBase {
     foreach ([TRUE, FALSE, TRUE, FALSE] as $index => $expected) {
       /** @var \Drupal\entity_test_revlog\Entity\EntityTestMulWithRevisionLog $revision */
       $revision = $storage->loadRevision($index + 1);
-      $this->assertEquals($expected, $revision->wasDefaultRevision());
+      if (Database::getConnection()->driver() != 'mongodb') {
+        // Mongodb Does not support the method wasDefaultRevision(). The entity
+        // key "revision_default" is set to FALSE for older revisions when there
+        // is a new current revision.
+        $this->assertEquals($expected, $revision->wasDefaultRevision());
+      }
     }
 
     // Check that the default revision is flagged correctly.
@@ -168,18 +174,24 @@ class RevisionableContentEntityBaseTest extends EntityKernelTestBase {
    *
    * @param int $count
    *   The number of items expected to be in revisions related tables.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $definition
-   *   The definition and metadata of the entity being tested.
+   * @param \Drupal\Core\Entity\Sql\TableMappingInterface $table_mapping
+   *   The table mapping of the entity being tested.
    *
    * @internal
    */
-  protected function assertItemsTableCount(int $count, EntityTypeInterface $definition): void {
+  protected function assertItemsTableCount(int $count, TableMappingInterface $table_mapping): void {
     $connection = Database::getConnection();
-    $this->assertEquals(1, (int) $connection->select($definition->getBaseTable())->countQuery()->execute()->fetchField());
-    $this->assertEquals(1, (int) $connection->select($definition->getDataTable())->countQuery()->execute()->fetchField());
-    $this->assertEquals($count, (int) $connection->select($definition->getRevisionTable())->countQuery()->execute()->fetchField());
-    $this->assertEquals($count, (int) $connection->select($definition->getRevisionDataTable())->countQuery()->execute()->fetchField());
-
+    $this->assertEquals(1, (int) $connection->select($table_mapping->getBaseTable())->countQuery()->execute()->fetchField());
+    if ($connection->driver() == 'mongodb') {
+      $this->assertEquals($count, $connection->select($table_mapping->getBaseTable())->countQuery()->embeddedTableToUseAsBaseTable($table_mapping->getJsonStorageAllRevisionsTable())->execute()->fetchField());
+      $this->assertEquals(1, $connection->select($table_mapping->getBaseTable())->countQuery()->embeddedTableToUseAsBaseTable($table_mapping->getJsonStorageCurrentRevisionTable())->execute()->fetchField());
+      $this->assertEquals(1, $connection->select($table_mapping->getBaseTable())->countQuery()->embeddedTableToUseAsBaseTable($table_mapping->getJsonStorageLatestRevisionTable())->execute()->fetchField());
+    }
+    else {
+      $this->assertEquals(1, (int) $connection->select($table_mapping->getDataTable())->countQuery()->execute()->fetchField());
+      $this->assertEquals($count, (int) $connection->select($table_mapping->getRevisionTable())->countQuery()->execute()->fetchField());
+      $this->assertEquals($count, (int) $connection->select($table_mapping->getRevisionDataTable())->countQuery()->execute()->fetchField());
+    }
   }
 
   /**

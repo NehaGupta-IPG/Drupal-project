@@ -30,7 +30,7 @@ class NodeSelection extends DefaultSelection {
     // modules in use on the site. As long as one access control module is there,
     // it is supposed to handle this check.
     if (!$this->currentUser->hasPermission('bypass node access') && !$this->moduleHandler->hasImplementations('node_grants')) {
-      $query->condition('status', NodeInterface::PUBLISHED);
+      $query->condition('status', (bool) NodeInterface::PUBLISHED);
     }
     return $query;
   }

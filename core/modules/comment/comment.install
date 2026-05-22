@@ -108,6 +108,10 @@ function comment_schema(): array {
     ],
   ];
 
+  if (\Drupal::database()->driver() == 'mongodb') {
+    $schema['comment_entity_statistics']['fields']['last_comment_timestamp']['type'] = 'date';
+  }
+
   return $schema;
 }
 

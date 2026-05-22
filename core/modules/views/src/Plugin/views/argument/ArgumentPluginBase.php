@@ -1022,7 +1022,18 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
    */
   public function query($group_by = FALSE) {
     $this->ensureMyTable();
-    $this->query->addWhere(0, "$this->tableAlias.$this->realField", $this->argument);
+    if ($this->view->getDatabaseDriver() == 'mongodb') {
+      if ($this->table == $this->view->storage->get('base_table')) {
+        $field = $this->realField;
+      }
+      else {
+        $field = "$this->tableAlias.$this->realField";
+      }
+      $this->query->addCondition(0, $field, $this->argument);
+    }
+    else {
+      $this->query->addWhere(0, "$this->tableAlias.$this->realField", $this->argument);
+    }
   }
 
   /**

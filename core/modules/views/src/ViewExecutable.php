@@ -495,6 +495,13 @@ class ViewExecutable {
   protected $serializationData;
 
   /**
+   * The database connection. Needed for MongoDB.
+   *
+   * @var \Drupal\Core\Database\Connection|false
+   */
+  protected $database;
+
+  /**
    * Constructs a new ViewExecutable object.
    *
    * @param \Drupal\views\ViewEntityInterface $storage
@@ -520,6 +527,37 @@ class ViewExecutable {
       $this->displayPluginManager = \Drupal::service('plugin.manager.views.display');
     }
 
+  }
+
+  /**
+   * Returns the database driver. Needed for MongoDB.
+   *
+   * @return string
+   *   The database driver.
+   */
+  public function getDatabaseDriver() {
+    if (empty($this->database)) {
+      $this->database = \Drupal::service('database');
+    }
+
+    return $this->database->driver();
+  }
+
+  /**
+   * Returns a new database condition object.
+   *
+   * @param string $conjunction
+   *   The operator to use to combine conditions: 'AND' or 'OR'.
+   *
+   * @return Drupal\Core\Database\Query\Condition
+   *   A new database condition object.
+   */
+  public function getDatabaseCondition($conjunction) {
+    if (empty($this->database)) {
+      $this->database = \Drupal::service('database');
+    }
+
+    return $this->database->condition($conjunction);
   }
 
   /**
@@ -2137,6 +2175,8 @@ class ViewExecutable {
     foreach ($defaults as $property => $default) {
       $this->{$property} = $default;
     }
+
+    $this->database = NULL;
   }
 
   /**
@@ -2537,6 +2577,8 @@ class ViewExecutable {
    *   The names of all variables that should be serialized.
    */
   public function __sleep(): array {
+    $this->database = NULL;
+
     // Limit to only the required data which is needed to properly restore the
     // state during unserialization.
     $this->serializationData = [

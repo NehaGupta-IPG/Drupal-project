@@ -70,6 +70,14 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
    */
   protected function setUp(): void {
     parent::setUp();
+
+    if (\Drupal::database()->driver() == 'mongodb') {
+      // There are no Drupal 6 or Drupal 7 sites that have MongoDB are their
+      // main database. Therefor the database driver for MongoDB does not
+      // support migrations.
+      $this->markTestSkipped('The MongoDB database driver does not support migrations.');
+    }
+
     $this->createMigrationConnection();
     $this->sourceDatabase = Database::getConnection('default', 'migrate');
     // Attach the original test prefix as a database, for SQLite to attach its

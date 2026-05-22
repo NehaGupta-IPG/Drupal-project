@@ -16,28 +16,35 @@ class CommentViewsData extends EntityViewsData {
   public function getViewsData() {
     $data = parent::getViewsData();
 
-    $data['comment_field_data']['table']['base']['help'] = $this->t('Comments are responses to content.');
-    $data['comment_field_data']['table']['base']['access query tag'] = 'comment_access';
+    if ($this->connection->driver() == 'mongodb') {
+      $data_table = 'comment';
+    }
+    else {
+      $data_table = 'comment_field_data';
+    }
 
-    $data['comment_field_data']['table']['wizard_id'] = 'comment';
+    $data[$data_table]['table']['base']['help'] = $this->t('Comments are responses to content.');
+    $data[$data_table]['table']['base']['access query tag'] = 'comment_access';
 
-    $data['comment_field_data']['subject']['title'] = $this->t('Title');
-    $data['comment_field_data']['subject']['help'] = $this->t('The title of the comment.');
-    $data['comment_field_data']['subject']['field']['default_formatter'] = 'comment_permalink';
+    $data[$data_table]['table']['wizard_id'] = 'comment';
 
-    $data['comment_field_data']['name']['title'] = $this->t('Author');
-    $data['comment_field_data']['name']['help'] = $this->t("The name of the comment's author. Can be rendered as a link to the author's homepage.");
-    $data['comment_field_data']['name']['field']['default_formatter'] = 'comment_username';
+    $data[$data_table]['subject']['title'] = $this->t('Title');
+    $data[$data_table]['subject']['help'] = $this->t('The title of the comment.');
+    $data[$data_table]['subject']['field']['default_formatter'] = 'comment_permalink';
 
-    $data['comment_field_data']['homepage']['title'] = $this->t("Author's website");
-    $data['comment_field_data']['homepage']['help'] = $this->t("The website address of the comment's author. Can be rendered as a link. Will be empty if the author is a registered user.");
+    $data[$data_table]['name']['title'] = $this->t('Author');
+    $data[$data_table]['name']['help'] = $this->t("The name of the comment's author. Can be rendered as a link to the author's homepage.");
+    $data[$data_table]['name']['field']['default_formatter'] = 'comment_username';
 
-    $data['comment_field_data']['mail']['help'] = $this->t('Email of user that posted the comment. Will be empty if the author is a registered user.');
+    $data[$data_table]['homepage']['title'] = $this->t("Author's website");
+    $data[$data_table]['homepage']['help'] = $this->t("The website address of the comment's author. Can be rendered as a link. Will be empty if the author is a registered user.");
 
-    $data['comment_field_data']['created']['title'] = $this->t('Post date');
-    $data['comment_field_data']['created']['help'] = $this->t('Date and time of when the comment was created.');
+    $data[$data_table]['mail']['help'] = $this->t('Email of user that posted the comment. Will be empty if the author is a registered user.');
 
-    $data['comment_field_data']['created_fulldata'] = [
+    $data[$data_table]['created']['title'] = $this->t('Post date');
+    $data[$data_table]['created']['help'] = $this->t('Date and time of when the comment was created.');
+
+    $data[$data_table]['created_fulldata'] = [
       'title' => $this->t('Created date'),
       'help' => $this->t('Date in the form of CCYYMMDD.'),
       'argument' => [
@@ -46,7 +53,7 @@ class CommentViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['comment_field_data']['created_year_month'] = [
+    $data[$data_table]['created_year_month'] = [
       'title' => $this->t('Created year + month'),
       'help' => $this->t('Date in the form of YYYYMM.'),
       'argument' => [
@@ -55,7 +62,7 @@ class CommentViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['comment_field_data']['created_year'] = [
+    $data[$data_table]['created_year'] = [
       'title' => $this->t('Created year'),
       'help' => $this->t('Date in the form of YYYY.'),
       'argument' => [
@@ -64,7 +71,7 @@ class CommentViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['comment_field_data']['created_month'] = [
+    $data[$data_table]['created_month'] = [
       'title' => $this->t('Created month'),
       'help' => $this->t('Date in the form of MM (01 - 12).'),
       'argument' => [
@@ -73,7 +80,7 @@ class CommentViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['comment_field_data']['created_day'] = [
+    $data[$data_table]['created_day'] = [
       'title' => $this->t('Created day'),
       'help' => $this->t('Date in the form of DD (01 - 31).'),
       'argument' => [
@@ -82,7 +89,7 @@ class CommentViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['comment_field_data']['created_week'] = [
+    $data[$data_table]['created_week'] = [
       'title' => $this->t('Created week'),
       'help' => $this->t('Date in the form of WW (01 - 53).'),
       'argument' => [
@@ -91,10 +98,10 @@ class CommentViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['comment_field_data']['changed']['title'] = $this->t('Updated date');
-    $data['comment_field_data']['changed']['help'] = $this->t('Date and time of when the comment was last updated.');
+    $data[$data_table]['changed']['title'] = $this->t('Updated date');
+    $data[$data_table]['changed']['help'] = $this->t('Date and time of when the comment was last updated.');
 
-    $data['comment_field_data']['changed_fulldata'] = [
+    $data[$data_table]['changed_fulldata'] = [
       'title' => $this->t('Changed date'),
       'help' => $this->t('Date in the form of CCYYMMDD.'),
       'argument' => [
@@ -103,7 +110,7 @@ class CommentViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['comment_field_data']['changed_year_month'] = [
+    $data[$data_table]['changed_year_month'] = [
       'title' => $this->t('Changed year + month'),
       'help' => $this->t('Date in the form of YYYYMM.'),
       'argument' => [
@@ -112,7 +119,7 @@ class CommentViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['comment_field_data']['changed_year'] = [
+    $data[$data_table]['changed_year'] = [
       'title' => $this->t('Changed year'),
       'help' => $this->t('Date in the form of YYYY.'),
       'argument' => [
@@ -121,7 +128,7 @@ class CommentViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['comment_field_data']['changed_month'] = [
+    $data[$data_table]['changed_month'] = [
       'title' => $this->t('Changed month'),
       'help' => $this->t('Date in the form of MM (01 - 12).'),
       'argument' => [
@@ -130,7 +137,7 @@ class CommentViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['comment_field_data']['changed_day'] = [
+    $data[$data_table]['changed_day'] = [
       'title' => $this->t('Changed day'),
       'help' => $this->t('Date in the form of DD (01 - 31).'),
       'argument' => [
@@ -139,7 +146,7 @@ class CommentViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['comment_field_data']['changed_week'] = [
+    $data[$data_table]['changed_week'] = [
       'title' => $this->t('Changed week'),
       'help' => $this->t('Date in the form of WW (01 - 53).'),
       'argument' => [
@@ -148,10 +155,10 @@ class CommentViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['comment_field_data']['status']['title'] = $this->t('Approved status');
-    $data['comment_field_data']['status']['help'] = $this->t('Whether the comment is approved (or still in the moderation queue).');
-    $data['comment_field_data']['status']['filter']['label'] = $this->t('Approved comment status');
-    $data['comment_field_data']['status']['filter']['type'] = 'yes-no';
+    $data[$data_table]['status']['title'] = $this->t('Approved status');
+    $data[$data_table]['status']['help'] = $this->t('Whether the comment is approved (or still in the moderation queue).');
+    $data[$data_table]['status']['filter']['label'] = $this->t('Approved comment status');
+    $data[$data_table]['status']['filter']['type'] = 'yes-no';
 
     $data['comment']['approve_comment'] = [
       'field' => [
@@ -169,8 +176,8 @@ class CommentViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['comment_field_data']['entity_id']['field']['id'] = 'commented_entity';
-    unset($data['comment_field_data']['entity_id']['relationship']);
+    $data[$data_table]['entity_id']['field']['id'] = 'commented_entity';
+    unset($data[$data_table]['entity_id']['relationship']);
 
     $data['comment']['comment_bulk_form'] = [
       'title' => $this->t('Comment operations bulk form'),
@@ -180,18 +187,18 @@ class CommentViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['comment_field_data']['thread']['field'] = [
+    $data[$data_table]['thread']['field'] = [
       'title' => $this->t('Depth'),
       'help' => $this->t('Display the depth of the comment if it is threaded.'),
       'id' => 'comment_depth',
     ];
-    $data['comment_field_data']['thread']['sort'] = [
+    $data[$data_table]['thread']['sort'] = [
       'title' => $this->t('Thread'),
       'help' => $this->t('Sort by the threaded order. This will keep child comments together with their parents.'),
       'id' => 'comment_thread',
     ];
-    unset($data['comment_field_data']['thread']['filter']);
-    unset($data['comment_field_data']['thread']['argument']);
+    unset($data[$data_table]['thread']['filter']);
+    unset($data[$data_table]['thread']['argument']);
 
     $entities_types = \Drupal::entityTypeManager()->getDefinitions();
 
@@ -201,20 +208,34 @@ class CommentViewsData extends EntityViewsData {
         continue;
       }
       if (\Drupal::service('comment.manager')->getFields($type)) {
-        $data['comment_field_data'][$type] = [
+        if ($this->connection->driver() == 'mongodb') {
+          $base = $entity_type->getBaseTable();
+          $relationship_field = 'comment_translations.entity_id';
+          $left_field = 'comment_translations.entity_type';
+        }
+        else {
+          $base = $entity_type->getDataTable() ?: $entity_type->getBaseTable();
+          $relationship_field = 'entity_id';
+          $left_field = 'entity_type';
+        }
+
+        $data[$data_table][$type] = [
           'relationship' => [
             'title' => $entity_type->getLabel(),
             'help' => $this->t('The @entity_type to which the comment is a reply to.', ['@entity_type' => $entity_type->getLabel()]),
-            'base' => $entity_type->getDataTable() ?: $entity_type->getBaseTable(),
+            'base' => $base,
             'base field' => $entity_type->getKey('id'),
-            'relationship field' => 'entity_id',
+            'relationship field' => $relationship_field,
             'id' => 'standard',
             'label' => $entity_type->getLabel(),
             'extra' => [
               [
-                'field' => 'entity_type',
+                // The left table in this join is comment and
+                // the field entity_type is from that table therefore it Should
+                // be "left_field" and not "field".
+                'left_field' => $left_field,
                 'value' => $type,
-                'table' => 'comment_field_data',
+                'table' => $data_table,
               ],
             ],
           ],
@@ -222,16 +243,16 @@ class CommentViewsData extends EntityViewsData {
       }
     }
 
-    $data['comment_field_data']['uid']['title'] = $this->t('Author uid');
-    $data['comment_field_data']['uid']['help'] = $this->t('If you need more fields than the uid add the comment: author relationship');
-    $data['comment_field_data']['uid']['relationship']['title'] = $this->t('Author');
-    $data['comment_field_data']['uid']['relationship']['help'] = $this->t("The User ID of the comment's author.");
-    $data['comment_field_data']['uid']['relationship']['label'] = $this->t('author');
+    $data[$data_table]['uid']['title'] = $this->t('Author uid');
+    $data[$data_table]['uid']['help'] = $this->t('If you need more fields than the uid add the comment: author relationship');
+    $data[$data_table]['uid']['relationship']['title'] = $this->t('Author');
+    $data[$data_table]['uid']['relationship']['help'] = $this->t("The User ID of the comment's author.");
+    $data[$data_table]['uid']['relationship']['label'] = $this->t('author');
 
-    $data['comment_field_data']['pid']['title'] = $this->t('Parent CID');
-    $data['comment_field_data']['pid']['relationship']['title'] = $this->t('Parent comment');
-    $data['comment_field_data']['pid']['relationship']['help'] = $this->t('The parent comment');
-    $data['comment_field_data']['pid']['relationship']['label'] = $this->t('parent');
+    $data[$data_table]['pid']['title'] = $this->t('Parent CID');
+    $data[$data_table]['pid']['relationship']['title'] = $this->t('Parent comment');
+    $data[$data_table]['pid']['relationship']['help'] = $this->t('The parent comment');
+    $data[$data_table]['pid']['relationship']['label'] = $this->t('parent');
 
     // Define the base group of this table. Fields that don't have a group defined
     // will go into this field by default.
@@ -242,6 +263,13 @@ class CommentViewsData extends EntityViewsData {
       if ($type == 'comment' || !$entity_type->entityClassImplements(ContentEntityInterface::class) || !$entity_type->getBaseTable()) {
         continue;
       }
+      if ($this->connection->driver() == 'mongodb') {
+        $entity_type_table = $entity_type->getBaseTable();
+      }
+      else {
+        $entity_type_table = $entity_type->getDataTable() ?: $entity_type->getBaseTable();
+      }
+
       // This relationship does not use the 'field id' column, if the entity has
       // multiple comment-fields, then this might introduce duplicates, in which
       // case the site-builder should enable aggregation and SUM the comment_count
@@ -249,7 +277,7 @@ class CommentViewsData extends EntityViewsData {
       // {comment_entity_statistics} for each field as multiple joins between
       // the same two tables is not supported.
       if (\Drupal::service('comment.manager')->getFields($type)) {
-        $data['comment_entity_statistics']['table']['join'][$entity_type->getDataTable() ?: $entity_type->getBaseTable()] = [
+        $data['comment_entity_statistics']['table']['join'][$entity_type_table] = [
           'type' => 'LEFT',
           'left_field' => $entity_type->getKey('id'),
           'field' => 'entity_id',

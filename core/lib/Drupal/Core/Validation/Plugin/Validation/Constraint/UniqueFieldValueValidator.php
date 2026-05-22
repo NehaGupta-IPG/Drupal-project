@@ -53,8 +53,11 @@ class UniqueFieldValueValidator extends ConstraintValidator implements Container
     $field_label = $items->getFieldDefinition()->getLabel();
     $field_storage_definitions = $this->entityFieldManager->getFieldStorageDefinitions($entity_type_id);
     $property_name = $field_storage_definitions[$field_name]->getMainPropertyName();
+    $property_schema = $field_storage_definitions[$field_name]->getSchema();
+    $property_type = $property_schema['columns'][$property_name]['type'] ?? NULL;
 
     $id_key = $entity_type->getKey('id');
+    $id_key_type = $field_storage_definitions[$id_key]->getType();
     $is_multiple = $field_storage_definitions[$field_name]->isMultiple();
     $is_new = $entity->isNew();
     $item_values = array_column($items->getValue(), $property_name);
@@ -66,7 +69,12 @@ class UniqueFieldValueValidator extends ConstraintValidator implements Container
       ->accessCheck(FALSE)
       ->groupBy("$field_name.$property_name");
     if (!$is_new) {
-      $entity_id = $entity->id();
+      if ($id_key_type == 'integer') {
+        $entity_id = (int) $entity->id();
+      }
+      else {
+        $entity_id = $entity->id();
+      }
       $query->condition($id_key, $entity_id, '<>');
     }
 
@@ -76,7 +84,12 @@ class UniqueFieldValueValidator extends ConstraintValidator implements Container
     else {
       $or_group = $query->orConditionGroup();
       foreach ($item_values as $item_value) {
-        $or_group->condition($field_name, \Drupal::database()->escapeLike($item_value), 'LIKE');
+        if ($property_type === 'int') {
+          $or_group->condition($field_name, $item_value);
+        }
+        else {
+          $or_group->condition($field_name, \Drupal::database()->escapeLike($item_value), 'LIKE');
+        }
       }
       $query->condition($or_group);
     }

@@ -15,6 +15,10 @@ class SelectCloneTest extends DatabaseTestBase {
    * Tests that subqueries as value within conditions are cloned properly.
    */
   public function testSelectConditionSubQueryCloning(): void {
+    if ($this->connection->driver() == 'mongodb') {
+      $this->markTestSkipped('The MongoDB database driver does not support subqueries.');
+    }
+
     $subquery = $this->connection->select('test', 't');
     $subquery->addField('t', 'id', 'id');
     $subquery->condition('age', 28, '<');
@@ -44,6 +48,10 @@ class SelectCloneTest extends DatabaseTestBase {
    * Tests that nested SELECT queries are cloned properly.
    */
   public function testNestedQueryCloning(): void {
+    if ($this->connection->driver() == 'mongodb') {
+      $this->markTestSkipped('The MongoDB database driver does not support subqueries.');
+    }
+
     $sub_query = $this->connection->select('test', 't');
     $sub_query->addField('t', 'id', 'id');
     $sub_query->condition('age', 28, '<');

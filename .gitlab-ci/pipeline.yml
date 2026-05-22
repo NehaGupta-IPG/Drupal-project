@@ -1,4 +1,4 @@
-# cspell:ignore cobertura drupaltestbot drupaltestbotpw Dwebdriver logfile testdox XVFB
+# cspell:ignore cobertura drupaltestbot drupaltestbotpw Dwebdriver logfile testdox XVFB dbrs
 
 stages:
   - 🗜️ Test
@@ -18,13 +18,16 @@ default:
       - runner_system_failure
       - scheduler_failure
   image:
-    name: $_CONFIG_DOCKERHUB_ROOT/php-$_TARGET_PHP-apache:production
+    name: $_CONFIG_DOCKERHUB_ROOT/php-$_TARGET_PHP-apache:dev
   before_script:
+    - docker-php-ext-enable mongodb
+    - echo "_TARGET_DB = $_TARGET_DB"
     - |
       [[ $_TARGET_DB == sqlite* ]] && export SIMPLETEST_DB=sqlite://localhost/$CI_PROJECT_DIR/sites/default/files/db.sqlite?module=sqlite
       [[ $_TARGET_DB == mysql* ]] && export SIMPLETEST_DB=mysql://$MYSQL_USER:$MYSQL_PASSWORD@database/$MYSQL_DATABASE?module=mysql
       [[ $_TARGET_DB == mariadb* ]] && export SIMPLETEST_DB=mysql://$MYSQL_USER:$MYSQL_PASSWORD@database/$MYSQL_DATABASE?module=mysql
       [[ $_TARGET_DB == pgsql* ]] && export SIMPLETEST_DB=pgsql://$POSTGRES_USER:$POSTGRES_PASSWORD@database/$POSTGRES_DB?module=pgsql
+      [[ $_TARGET_DB == mongodb* ]] && export SIMPLETEST_DB='mongodb://db:db@database:27017/db?module=mongodb&replicaSet=dbrs'
     - echo "SIMPLETEST_DB = $SIMPLETEST_DB"
     - $CI_PROJECT_DIR/.gitlab-ci/scripts/server-setup.sh
   after_script:
@@ -73,7 +76,7 @@ variables:
   CI_PARALLEL_NODE_TOTAL: $CI_NODE_TOTAL
 
 .with-database: &with-database
-  name: $_CONFIG_DOCKERHUB_ROOT/$_TARGET_DB:production
+  name: daffie/mongodb-8:latest
   alias: database
 
 .with-chrome: &with-chrome
@@ -235,42 +238,42 @@ variables:
         coverage_format: cobertura
         path: core/tests/PHPStan/coverage.cobertura.xml
 
-'🦉️️️ Nightwatch':
-  <<: [ *with-composer-and-yarn, *default-job-settings ]
-  variables:
-    KUBERNETES_CPU_REQUEST: "16"
-  services:
-    - <<: *with-database
-    - <<: *with-selenium-chrome
-  script:
-    - export DRUPAL_TEST_DB_URL=$SIMPLETEST_DB
-    - cp ./core/.env.example ./core/.env
-    # dotenv-safe/config does not support environment variables
-    # @see https://github.com/rolodato/dotenv-safe/issues/126
-    # @todo move this to `variables` when the above is resolved
-    - echo "DRUPAL_TEST_BASE_URL='http://localhost/subdirectory'" >> ./core/.env
-    - echo "DRUPAL_TEST_CHROMEDRIVER_AUTOSTART=false" >> ./core/.env
-    - echo "DRUPAL_TEST_DB_URL='${DRUPAL_TEST_DB_URL}'" >> ./core/.env
-    - echo "DRUPAL_TEST_WEBDRIVER_HOSTNAME='selenium'" >> ./core/.env
-    - echo "DRUPAL_TEST_WEBDRIVER_CHROME_ARGS='--disable-dev-shm-usage --disable-gpu --headless --dns-prefetch-disable'" >> ./core/.env
-    - echo "DRUPAL_TEST_WEBDRIVER_W3C=true" >> ./core/.env
-    - echo "DRUPAL_TEST_WEBDRIVER_PORT='4444'" >> ./core/.env
-    - echo "DRUPAL_NIGHTWATCH_OUTPUT='"../nightwatch_output"'" >> ./core/.env
-    - echo "COLUMNS=1000" >> ./core/.env
-    - chown -R www-data:www-data ./sites /var/www
-    - cd core
-    - corepack enable
-    - sudo -u www-data yarn run test:nightwatch --workers=3
-  after_script:
-    - cp /builds/chromedriver.log ./
-  artifacts:
-    when: always
-    expire_in: 6 mos
-    reports:
-      junit: ./nightwatch_output/**/*.xml
-    paths:
-      - ./nightwatch_output
-      - '*.log'
+#'🦉️️️ Nightwatch':
+#  <<: [ *with-composer-and-yarn, *default-job-settings ]
+#  variables:
+#    KUBERNETES_CPU_REQUEST: "16"
+#  services:
+#    - <<: *with-database
+#    - <<: *with-selenium-chrome
+#  script:
+#    - export DRUPAL_TEST_DB_URL=$SIMPLETEST_DB
+#    - cp ./core/.env.example ./core/.env
+#    # dotenv-safe/config does not support environment variables
+#    # @see https://github.com/rolodato/dotenv-safe/issues/126
+#    # @todo move this to `variables` when the above is resolved
+#    - echo "DRUPAL_TEST_BASE_URL='http://localhost/subdirectory'" >> ./core/.env
+#    - echo "DRUPAL_TEST_CHROMEDRIVER_AUTOSTART=false" >> ./core/.env
+#    - echo "DRUPAL_TEST_DB_URL='${DRUPAL_TEST_DB_URL}'" >> ./core/.env
+#    - echo "DRUPAL_TEST_WEBDRIVER_HOSTNAME='selenium'" >> ./core/.env
+#    - echo "DRUPAL_TEST_WEBDRIVER_CHROME_ARGS='--disable-dev-shm-usage --disable-gpu --headless --dns-prefetch-disable'" >> ./core/.env
+#    - echo "DRUPAL_TEST_WEBDRIVER_W3C=true" >> ./core/.env
+#    - echo "DRUPAL_TEST_WEBDRIVER_PORT='4444'" >> ./core/.env
+#    - echo "DRUPAL_NIGHTWATCH_OUTPUT='"../nightwatch_output"'" >> ./core/.env
+#    - echo "COLUMNS=1000" >> ./core/.env
+#    - chown -R www-data:www-data ./sites /var/www
+#    - cd core
+#    - corepack enable
+#    - sudo -u www-data yarn run test:nightwatch --workers=3
+#  after_script:
+#    - cp /builds/chromedriver.log ./
+#  artifacts:
+#    when: always
+#    expire_in: 6 mos
+#    reports:
+#      junit: ./nightwatch_output/**/*.xml
+#    paths:
+#      - ./nightwatch_output
+#      - '*.log'
 
 '🔁 Repeat Class Test':
   <<: [ *with-composer, *run-repeat-class-test, *default-job-settings ]

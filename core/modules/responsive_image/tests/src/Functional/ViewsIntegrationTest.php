@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\responsive_image\Functional;
 
+use Drupal\Core\Database\Database;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\responsive_image\Entity\ResponsiveImageStyle;
@@ -101,7 +102,13 @@ class ViewsIntegrationTest extends ViewTestBase {
     // Add the image field to the View.
     $this->drupalGet('admin/structure/views/nojs/add-handler/entity_test_row/default/field');
     $this->drupalGet('admin/structure/views/nojs/add-handler/entity_test_row/default/field');
-    $this->submitForm(['name[entity_test__bar.bar]' => TRUE], 'Add and configure field');
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $name = 'name[entity_test.bar]';
+    }
+    else {
+      $name = 'name[entity_test__bar.bar]';
+    }
+    $this->submitForm([$name => TRUE], 'Add and configure field');
     // Set the formatter to 'Responsive image'.
     $this->submitForm(['options[type]' => 'responsive_image'], 'Apply');
     $this->assertSession()

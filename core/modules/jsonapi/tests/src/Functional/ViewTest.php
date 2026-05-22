@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
+use Drupal\Core\Database\Database;
 use Drupal\Core\Url;
 use Drupal\views\Entity\View;
 
@@ -65,7 +66,7 @@ class ViewTest extends ConfigEntityResourceTestBase {
    */
   protected function getExpectedDocument(): array {
     $self_url = Url::fromUri('base:/jsonapi/view/view/' . $this->entity->uuid())->setAbsolute()->toString(TRUE)->getGeneratedUrl();
-    return [
+    $return = [
       'jsonapi' => [
         'meta' => [
           'links' => [
@@ -116,6 +117,16 @@ class ViewTest extends ConfigEntityResourceTestBase {
         ],
       ],
     ];
+
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $return['data']['attributes']['dependencies'] = [
+        'module' => [
+          'mongodb',
+        ],
+      ];
+    }
+
+    return $return;
   }
 
   /**

@@ -8,6 +8,7 @@ use Drupal\Core\Database\Database;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\user\Entity\User;
+use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
 
 /**
@@ -35,7 +36,7 @@ class HistoryTimestampTest extends ViewsKernelTestBase {
    * {@inheritdoc}
    */
   protected function setUp($import_test_views = TRUE): void {
-    parent::setUp($import_test_views);
+    parent::setUp(FALSE);
 
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');
@@ -44,6 +45,10 @@ class HistoryTimestampTest extends ViewsKernelTestBase {
     // be easily targeted with xpath.
     \Drupal::service('theme_installer')->install(['history_test_theme']);
     \Drupal::theme()->setActiveTheme(\Drupal::service('theme.initialization')->initTheme('history_test_theme'));
+
+    // For MongoDB to update the views correctly the views must be loaded after
+    // the creation of the fields.
+    ViewTestData::createTestViews(static::class, ['views_test_config']);
   }
 
   /**
@@ -84,9 +89,28 @@ class HistoryTimestampTest extends ViewsKernelTestBase {
         'timestamp' => $requestTime + 100,
       ])->execute();
 
-    $column_map = [
-      'nid' => 'nid',
-    ];
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $expected_result = [
+        [
+          'vid' => $nodes[0]->id(),
+        ],
+      ];
+
+      $column_map = [
+        'vid' => 'vid',
+      ];
+    }
+    else {
+      $expected_result = [
+        [
+          'nid' => $nodes[0]->id(),
+        ],
+      ];
+
+      $column_map = [
+        'nid' => 'nid',
+      ];
+    }
 
     // Test the history field.
     $view = Views::getView('test_history');
@@ -103,7 +127,7 @@ class HistoryTimestampTest extends ViewsKernelTestBase {
     $view->setDisplay('page_2');
     $this->executeView($view);
     $this->assertCount(1, $view->result);
-    $this->assertIdenticalResultset($view, [['nid' => $nodes[0]->id()]], $column_map);
+    $this->assertIdenticalResultset($view, $expected_result, $column_map);
 
     // Install Comment module and make sure that content types without comment
     // field will not break the view.

@@ -93,19 +93,78 @@ class Cookie implements AuthenticationProviderInterface, EventSubscriberInterfac
    */
   protected function getUserFromSession(SessionInterface $session) {
     if ($uid = $session->get('uid')) {
-      // @todo Load the User entity in SessionHandler so we don't need queries.
-      // @see https://www.drupal.org/node/2345611
-      $values = $this->connection
-        ->query('SELECT * FROM {users_field_data} [u] WHERE [u].[uid] = :uid AND [u].[default_langcode] = 1', [':uid' => $uid])
-        ->fetchAssoc();
+      if ($this->connection->driver() == 'mongodb') {
+        $prefixed_table = $this->connection->getPrefix() . 'users';
+        $result = $this->connection->getConnection()->selectCollection($prefixed_table)->findOne(
+          ['uid' => ['$eq' => (int) $uid]],
+          [
+            'projection' => ['user_translations' => 1, '_id' => 0],
+            'session' => $this->connection->getMongodbSession(),
+          ],
+        );
 
-      // Check if the user data was found and the user is active.
-      if (!empty($values) && $values['status'] == 1) {
-        // Add the user's roles.
-        $rids = $this->connection
-          ->query('SELECT [roles_target_id] FROM {user__roles} WHERE [entity_id] = :uid', [':uid' => $values['uid']])
-          ->fetchCol();
-        $values['roles'] = array_merge([AccountInterface::AUTHENTICATED_ROLE], $rids);
+        $values = [];
+        if (isset($result->user_translations)) {
+          $user_translations = (array) $result->user_translations;
+          foreach ($user_translations as $user_translation) {
+            if (isset($user_translation->default_langcode) && ($user_translation->default_langcode === TRUE)) {
+              if (isset($user_translation->uid)) {
+                $values['uid'] = (string) $user_translation->uid;
+              }
+              if (isset($user_translation->access)) {
+                $values['access'] = (int) $user_translation->access->__toString();
+                $values['access'] = $values['access'] / 1000;
+                $values['access'] = (string) $values['access'];
+              }
+              if (isset($user_translation->name)) {
+                $values['name'] = $user_translation->name;
+              }
+              if (isset($user_translation->preferred_langcode)) {
+                $values['preferred_langcode'] = $user_translation->preferred_langcode;
+              }
+              if (isset($user_translation->preferred_admin_langcode)) {
+                $values['preferred_admin_langcode'] = $user_translation->preferred_admin_langcode;
+              }
+              if (isset($user_translation->mail)) {
+                $values['mail'] = $user_translation->mail;
+              }
+              if (isset($user_translation->timezone)) {
+                $values['timezone'] = $user_translation->timezone;
+              }
+
+              // Add the user role authenticated.
+              $values['roles'] = [AccountInterface::AUTHENTICATED_ROLE];
+              if (isset($user_translation->user_translations__roles)) {
+                $user_translations__roles = (array) $user_translation->user_translations__roles;
+                foreach ($user_translations__roles as $user_translations__role) {
+                  if (isset($user_translations__role->roles_target_id)) {
+                    $values['roles'][] = $user_translations__role->roles_target_id;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        if (!empty($values)) {
+          return new UserSession($values);
+        }
+      }
+      else {
+        // @todo Load the User entity in SessionHandler so we don't need queries.
+        // @see https://www.drupal.org/node/2345611
+        $values = $this->connection
+          ->query('SELECT * FROM {users_field_data} [u] WHERE [u].[uid] = :uid AND [u].[default_langcode] = 1', [':uid' => $uid])
+          ->fetchAssoc();
+
+        // Check if the user data was found and the user is active.
+        if (!empty($values) && $values['status'] == 1) {
+          // Add the user's roles.
+          $rids = $this->connection
+            ->query('SELECT [roles_target_id] FROM {user__roles} WHERE [entity_id] = :uid', [':uid' => $values['uid']])
+            ->fetchCol();
+          $values['roles'] = array_merge([AccountInterface::AUTHENTICATED_ROLE], $rids);
+        }
 
         return new UserSession($values);
       }

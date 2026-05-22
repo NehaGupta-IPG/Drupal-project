@@ -420,7 +420,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    */
   protected function getLoginFloodIdentifier(Request $request, $username) {
     $flood_config = $this->config('user.flood');
-    $accounts = $this->userStorage->loadByProperties(['name' => $username, 'status' => 1]);
+    $accounts = $this->userStorage->loadByProperties(['name' => $username, 'status' => TRUE]);
     if ($account = reset($accounts)) {
       if ($flood_config->get('uid_only')) {
         // Register flood events based on the uid only, so they apply for any

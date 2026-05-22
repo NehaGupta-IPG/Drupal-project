@@ -11,6 +11,20 @@
  *   List of uniquely defined database log message types.
  */
 function _dblog_get_message_types() {
-  return \Drupal::database()->query('SELECT DISTINCT([type]) FROM {watchdog} ORDER BY [type]')
-    ->fetchAllKeyed(0, 0);
+  $connection = \Drupal::database();
+  if ($connection->driver() == 'mongodb') {
+    $types = $connection->select('watchdog')
+      ->fields('watchdog', ['type'])
+      ->execute()
+      ->fetchCol();
+
+    $types = array_unique($types);
+    sort($types);
+
+    return array_combine($types, $types);
+  }
+  else {
+    return $connection->query('SELECT DISTINCT([type]) FROM {watchdog} ORDER BY [type]')
+      ->fetchAllKeyed(0, 0);
+  }
 }

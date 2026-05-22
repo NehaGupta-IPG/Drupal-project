@@ -146,12 +146,26 @@ class WorkspaceAssociationTest extends KernelTestBase {
     // latest one (9) is being merged into 'stage'.
     $expected_all_revisions['stage'] = [3, 4, 5, 6, 7, 9];
 
+    if (\Drupal::database()->driver() == 'mongodb') {
+      $expected_all_revisions['dev'] = $expected_all_revisions['stage'];
+    }
+
     // Revision 7 was both an initial and latest revision in 'dev', so it is now
     // considered an initial revision in 'stage'.
-    $expected_initial_revisions['stage'] = [4, 5, 7];
+    if (\Drupal::database()->driver() == 'mongodb') {
+      $expected_initial_revisions['stage'] = [4, 5, 7, 9];
+    }
+    else {
+      $expected_initial_revisions['stage'] = [4, 5, 7];
+    }
 
     // Which leaves revision 8 as the only remaining initial revision in 'dev'.
-    $expected_initial_revisions['dev'] = [8];
+    if (\Drupal::database()->driver() == 'mongodb') {
+      $expected_initial_revisions['dev'] = [];
+    }
+    else {
+      $expected_initial_revisions['dev'] = [8];
+    }
 
     $this->assertWorkspaceAssociations($entity_type_id, $expected_latest_revisions, $expected_all_revisions, $expected_initial_revisions);
 

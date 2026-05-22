@@ -411,7 +411,11 @@ class ViewsQueryAlter implements ContainerInjectionInterface {
     if ($entity_type->isTranslatable() && $this->languageManager->isMultilingual()) {
       $langcode_field = $entity_type->getKey('langcode');
       $definition['extra'] = [
-        ['field' => $langcode_field, 'left_field' => $langcode_field],
+        [
+          'field' => $langcode_field,
+          'field2' => "$relationship.$langcode_field",
+          'operator' => '=',
+        ],
       ];
     }
 

@@ -41,4 +41,21 @@ class InstallerExistingConfigTest extends InstallerConfigDirectoryTestBase {
     return __DIR__ . '/../../../fixtures/config_install/testing_config_install';
   }
 
+  /**
+   * Confirms that the installation installed the configuration correctly.
+   */
+  public function testConfigSync(): void {
+    // After installation there is no snapshot and nothing to import.
+    $change_list = $this->configImporter()->getStorageComparer()->getChangelist();
+    $expected = [
+      'create' => [],
+      // The system.mail is changed configuration because the test system
+      // changes it to ensure that mails are not sent.
+      'update' => ['system.mail'],
+      'delete' => [],
+      'rename' => [],
+    ];
+    $this->assertEquals($expected, $change_list);
+  }
+
 }

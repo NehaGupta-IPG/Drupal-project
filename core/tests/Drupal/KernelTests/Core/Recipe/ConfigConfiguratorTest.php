@@ -144,6 +144,17 @@ class ConfigConfiguratorTest extends KernelTestBase {
       $data['config']['strict'] = TRUE;
       return $data;
     });
+
+    if (\Drupal::database()->driver() === 'mongodb') {
+      // Alter config item for MongoDB.
+      $file = $clone_dir . '/config/core.base_field_override.node.page.promote.yml';
+      $this->assertFileExists($file);
+      $contents = file_get_contents($file);
+      $contents = Yaml::decode($contents);
+      $contents['dependencies']['module'] = ['mongodb'];
+      file_put_contents($file, Yaml::encode($contents));
+    }
+
     // If we try to instantiate this recipe, we should an exception.
     $this->expectException(RecipePreExistingConfigException::class);
     $this->expectExceptionMessage("The configuration 'node.type.page' exists already and does not match the recipe's configuration");

@@ -797,7 +797,19 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
     if (!empty($this->options['relationship']) && $this->options['relationship'] != 'none') {
       $relationship = $this->displayHandler->getOption('relationships')[$this->options['relationship']];
       $table_data = $this->getViewsData()->get($relationship['table']);
-      $views_data = $this->getViewsData()->get($table_data[$relationship['field']]['relationship']['base']);
+      if ($this->view->getDatabaseDriver() == 'mongodb') {
+        if (isset($table_data[$relationship['field']]['relationship']['base'])) {
+          $views_data = $this->getViewsData()->get($table_data[$relationship['field']]['relationship']['base']);
+        }
+        elseif (isset($relationship['relationship']) && ($relationship['relationship'] == 'none')) {
+          // Some relationships are removed, because in MongoDB's entity storage
+          // they live in the same document instead of in separate tables.
+          $views_data = $this->getViewsData()->get($this->view->storage->get('base_table'));
+        }
+      }
+      else {
+        $views_data = $this->getViewsData()->get($table_data[$relationship['field']]['relationship']['base']);
+      }
     }
     else {
       $views_data = $this->getViewsData()->get($this->view->storage->get('base_table'));

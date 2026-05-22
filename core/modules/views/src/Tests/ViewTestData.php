@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\views\Tests;
 
 use Drupal\Core\Config\FileStorage;
+use Drupal\Core\Database\Database;
 
 /**
  * Provides tests view data and the base test schema with sample data records.
@@ -117,6 +118,16 @@ class ViewTestData {
         'ages' => ['age'],
       ],
     ];
+
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $schema['views_test_data']['fields']['created']['type'] = 'date';
+      unset($schema['views_test_data']['fields']['created']['unsigned']);
+
+      $schema['views_test_data']['fields']['status']['type'] = 'bool';
+      $schema['views_test_data']['fields']['status']['default'] = FALSE;
+      unset($schema['views_test_data']['fields']['status']['unsigned']);
+    }
+
     return $schema;
   }
 

@@ -31,7 +31,12 @@ class TaxonomyTerm extends WizardPluginBase {
 
     /* Field: Taxonomy: Term */
     $display_options['fields']['name']['id'] = 'name';
-    $display_options['fields']['name']['table'] = 'taxonomy_term_field_data';
+    if ($this->connection->driver() == 'mongodb') {
+      $display_options['fields']['name']['table'] = 'taxonomy_term_data';
+    }
+    else {
+      $display_options['fields']['name']['table'] = 'taxonomy_term_field_data';
+    }
     $display_options['fields']['name']['field'] = 'name';
     $display_options['fields']['name']['entity_type'] = 'taxonomy_term';
     $display_options['fields']['name']['entity_field'] = 'name';

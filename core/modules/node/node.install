@@ -114,6 +114,28 @@ function node_schema(): array {
     ],
   ];
 
+  if (Database::getConnection()->driver() == 'mongodb') {
+    $schema['node_access']['fields']['fallback']['type'] = 'bool';
+    $schema['node_access']['fields']['fallback']['default'] = TRUE;
+    unset($schema['node_access']['fields']['fallback']['unsigned']);
+    unset($schema['node_access']['fields']['fallback']['size']);
+
+    $schema['node_access']['fields']['grant_view']['type'] = 'bool';
+    $schema['node_access']['fields']['grant_view']['default'] = FALSE;
+    unset($schema['node_access']['fields']['grant_view']['unsigned']);
+    unset($schema['node_access']['fields']['grant_view']['size']);
+
+    $schema['node_access']['fields']['grant_update']['type'] = 'bool';
+    $schema['node_access']['fields']['grant_update']['default'] = FALSE;
+    unset($schema['node_access']['fields']['grant_update']['unsigned']);
+    unset($schema['node_access']['fields']['grant_update']['size']);
+
+    $schema['node_access']['fields']['grant_delete']['type'] = 'bool';
+    $schema['node_access']['fields']['grant_delete']['default'] = FALSE;
+    unset($schema['node_access']['fields']['grant_delete']['unsigned']);
+    unset($schema['node_access']['fields']['grant_delete']['size']);
+  }
+
   return $schema;
 }
 

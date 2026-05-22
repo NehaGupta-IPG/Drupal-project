@@ -7,6 +7,8 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use MongoDB\BSON\Binary;
+use MongoDB\BSON\UTCDateTime;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
 
@@ -16,6 +18,15 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
 class SessionHandler extends AbstractProxy implements \SessionHandlerInterface {
 
   use DependencySerializationTrait;
+
+  /**
+   * Indicator for the existence of the database table.
+   *
+   * This variable is only used by the database driver for MongoDB.
+   *
+   * @var bool
+   */
+  protected $tableExists = FALSE;
 
   /**
    * Constructs a new SessionHandler instance.
@@ -47,14 +58,31 @@ class SessionHandler extends AbstractProxy implements \SessionHandlerInterface {
   public function read(#[\SensitiveParameter] string $sid): string|false {
     $data = '';
     if (!empty($sid)) {
-      try {
-        // Read the session data from the database.
-        $query = $this->connection
-          ->queryRange('SELECT [session] FROM {sessions} WHERE [sid] = :sid', 0, 1, [':sid' => Crypt::hashBase64($sid)]);
-        $data = (string) $query->fetchField();
+      // Read the session data from the database.
+      if ($this->connection->driver() == 'mongodb') {
+        $prefixed_table = $this->connection->getPrefix() . 'sessions';
+        $result = $this->connection->getConnection()->selectCollection($prefixed_table)->findOne(
+          ['sid' => ['$eq' => Crypt::hashBase64($sid)]],
+          [
+            'projection' => ['session' => 1, '_id' => 0],
+            'session' => $this->connection->getMongodbSession(),
+          ],
+        );
+
+        // Get the session data.
+        if (isset($result->session) && ($result->session instanceof Binary)) {
+          $data = $result->session->getData();
+        }
       }
-      // Swallow the error if the table hasn't been created yet.
-      catch (\Exception) {
+      else {
+        try {
+          $query = $this->connection
+            ->queryRange('SELECT [session] FROM {sessions} WHERE [sid] = :sid', 0, 1, [':sid' => Crypt::hashBase64($sid)]);
+          $data = (string) $query->fetchField();
+        }
+        // Swallow the error if the table hasn't been created yet.
+        catch (\Exception) {
+        }
       }
     }
     return $data;
@@ -64,6 +92,12 @@ class SessionHandler extends AbstractProxy implements \SessionHandlerInterface {
    * {@inheritdoc}
    */
   public function write(#[\SensitiveParameter] string $sid, string $value): bool {
+    if ($this->connection->driver() == 'mongodb' && !$this->tableExists) {
+      // For MongoDB the table need to exists. Otherwise MongoDB creates one
+      // without the correct validation.
+      $this->tableExists = $this->ensureTableExists();
+    }
+
     $try_again = FALSE;
     $request = $this->requestStack->getCurrentRequest();
     $fields = [
@@ -108,6 +142,12 @@ class SessionHandler extends AbstractProxy implements \SessionHandlerInterface {
    */
   public function destroy(#[\SensitiveParameter] string $sid): bool {
     try {
+      if ($this->connection->driver() == 'mongodb' && !$this->tableExists) {
+        // For MongoDB the table need to exists. Otherwise MongoDB creates one
+        // without the correct validation.
+        $this->tableExists = $this->ensureTableExists();
+      }
+
       // Delete session data.
       $this->connection->delete('sessions')
         ->condition('sid', Crypt::hashBase64($sid))
@@ -129,9 +169,19 @@ class SessionHandler extends AbstractProxy implements \SessionHandlerInterface {
     // for three weeks before deleting them, you need to set gc_maxlifetime
     // to '1814400'. At that value, only after a user doesn't log in after
     // three weeks (1814400 seconds) will their session be removed.
+    $timestamp = $this->time->getRequestTime() - $lifetime;
+    if ($this->connection->driver() == 'mongodb') {
+      $timestamp = new UTCDateTime($timestamp * 1000);
+
+      if (!$this->tableExists) {
+        // For MongoDB the table need to exists. Otherwise MongoDB creates one
+        // without the correct validation.
+        $this->tableExists = $this->ensureTableExists();
+      }
+    }
     try {
       return $this->connection->delete('sessions')
-        ->condition('timestamp', $this->time->getRequestTime() - $lifetime, '<')
+        ->condition('timestamp', $timestamp, '<')
         ->execute();
     }
     // Swallow the error if the table hasn't been created yet.
@@ -196,6 +246,10 @@ class SessionHandler extends AbstractProxy implements \SessionHandlerInterface {
         ],
       ],
     ];
+
+    if ($this->connection->driver() == 'mongodb') {
+      $schema['fields']['timestamp']['type'] = 'date';
+    }
 
     return $schema;
   }

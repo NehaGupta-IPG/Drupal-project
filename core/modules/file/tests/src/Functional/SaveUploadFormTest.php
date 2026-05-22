@@ -76,10 +76,16 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->phpFile = current($this->drupalGetTestFiles('php'));
     $this->assertFileExists($this->phpFile->uri);
 
-    $this->maxFidBefore = (int) \Drupal::entityQueryAggregate('file')
+    $result = \Drupal::entityQueryAggregate('file')
       ->accessCheck(FALSE)
       ->aggregate('fid', 'max')
-      ->execute()[0]['fid_max'];
+      ->execute();
+    if (isset($result[0]['fid_max'])) {
+      $this->maxFidBefore = (int) $result[0]['fid_max'];
+    }
+    else {
+      $this->maxFidBefore = 0;
+    }
 
     /** @var \Drupal\Core\File\FileSystemInterface $file_system */
     $file_system = \Drupal::service('file_system');
@@ -103,10 +109,17 @@ class SaveUploadFormTest extends FileManagedTestBase {
    * Tests the _file_save_upload_from_form() function.
    */
   public function testNormal(): void {
-    $max_fid_after = (int) \Drupal::entityQueryAggregate('file')
+    $result = \Drupal::entityQueryAggregate('file')
       ->accessCheck(FALSE)
       ->aggregate('fid', 'max')
-      ->execute()[0]['fid_max'];
+      ->execute();
+    if (isset($result[0]['fid_max'])) {
+      $max_fid_after = (int) $result[0]['fid_max'];
+    }
+    else {
+      $max_fid_after = 0;
+    }
+
     // Verify that a new file was created.
     $this->assertGreaterThan($this->maxFidBefore, $max_fid_after);
     $file1 = File::load($max_fid_after);
@@ -126,10 +139,16 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->submitForm($edit, 'Submit');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains("You WIN!");
-    $max_fid_after = (int) \Drupal::entityQueryAggregate('file')
+    $result = \Drupal::entityQueryAggregate('file')
       ->accessCheck(FALSE)
       ->aggregate('fid', 'max')
-      ->execute()[0]['fid_max'];
+      ->execute();
+    if (isset($result[0]['fid_max'])) {
+      $max_fid_after = (int) $result[0]['fid_max'];
+    }
+    else {
+      $max_fid_after = 0;
+    }
 
     // Check that the correct hooks were called.
     $this->assertFileHooksCalled(['validate', 'insert']);

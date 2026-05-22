@@ -109,7 +109,12 @@ class EntityRow extends RowPluginBase {
 
     $this->entityTypeId = $this->definition['entity_type'];
     $this->entityType = $this->entityTypeManager->getDefinition($this->entityTypeId);
-    $this->base_table = $this->entityType->getDataTable() ?: $this->entityType->getBaseTable();
+    if (($view->getDatabaseDriver() != 'mongodb') && $this->entityType->getDataTable()) {
+      $this->base_table = $this->entityType->getDataTable();
+    }
+    else {
+      $this->base_table = $this->entityType->getBaseTable();
+    }
     $this->base_field = $this->entityType->getKey('id');
   }
 

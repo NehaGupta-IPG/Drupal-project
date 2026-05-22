@@ -172,7 +172,7 @@ class TaxonomyHooks {
   public function taxonomyTermDelete(Term $term) {
     if (\Drupal::config('taxonomy.settings')->get('maintain_index_table')) {
       // Clean up the {taxonomy_index} table when terms are deleted.
-      \Drupal::database()->delete('taxonomy_index')->condition('tid', $term->id())->execute();
+      \Drupal::database()->delete('taxonomy_index')->condition('tid', (int) $term->id())->execute();
     }
   }
 

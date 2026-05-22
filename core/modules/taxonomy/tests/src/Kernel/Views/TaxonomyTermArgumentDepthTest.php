@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Kernel\Views;
 
+use Drupal\Core\Database\Database;
 use Drupal\views\Views;
 
 /**
@@ -43,6 +44,13 @@ class TaxonomyTermArgumentDepthTest extends TaxonomyTestBase {
    * @var \Drupal\views\ViewExecutable
    */
   protected $view;
+
+  /**
+   * The column map.
+   *
+   * @var array
+   */
+  protected $columnMap;
 
   /**
    * {@inheritdoc}
@@ -87,6 +95,13 @@ class TaxonomyTermArgumentDepthTest extends TaxonomyTestBase {
     foreach ($this->nodes as $i => $node) {
       $node->setCreatedTime($time->getRequestTime() - $i)->save();
     }
+
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $this->columnMap = ['node_vid' => 'nid'];
+    }
+    else {
+      $this->columnMap = ['nid' => 'nid'];
+    }
   }
 
   /**
@@ -104,7 +119,7 @@ class TaxonomyTermArgumentDepthTest extends TaxonomyTestBase {
       ['nid' => 6],
     ];
     $this->executeView($this->view);
-    $this->assertIdenticalResultsetHelper($this->view, $expected, ['nid' => 'nid'], 'assertIdentical');
+    $this->assertIdenticalResultsetHelper($this->view, $expected, $this->columnMap, 'assertIdentical');
 
     // Set filter to search on top-level term, with depth 0.
     $expected = [['nid' => 4]];
@@ -191,7 +206,7 @@ class TaxonomyTermArgumentDepthTest extends TaxonomyTestBase {
     $arguments['term_node_tid_depth']['break_phrase'] = $break_phrase;
     $this->view->displayHandlers->get('default')->setOption('arguments', $arguments);
     $this->executeView($this->view, [$tid]);
-    $this->assertIdenticalResultsetHelper($this->view, $expected, ['nid' => 'nid'], 'assertIdentical');
+    $this->assertIdenticalResultsetHelper($this->view, $expected, $this->columnMap, 'assertIdentical');
   }
 
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Functional\Handler;
 
+use Drupal\Core\Database\Database;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\NodeType;
@@ -259,22 +260,24 @@ class FilterDateTest extends ViewTestBase {
     $this->submitForm(['path' => $path], 'Apply');
     $this->submitForm([], 'Save');
 
-    $this->drupalGet($path);
-    $this->submitForm([], 'Apply');
-    $results = $this->cssSelect('.view-content .field-content');
-    $this->assertCount(4, $results);
-    $this->submitForm(['created' => '1'], 'Apply');
-    $results = $this->cssSelect('.view-content .field-content');
-    $this->assertCount(1, $results);
-    $this->assertEquals($this->nodes[3]->id(), $results[0]->getText());
-    $this->submitForm(['created' => '2'], 'Apply');
-    $results = $this->cssSelect('.view-content .field-content');
-    $this->assertCount(1, $results);
-    $this->assertEquals($this->nodes[3]->id(), $results[0]->getText());
-    $this->submitForm(['created' => '3'], 'Apply');
-    $results = $this->cssSelect('.view-content .field-content');
-    $this->assertCount(1, $results);
-    $this->assertEquals($this->nodes[1]->id(), $results[0]->getText());
+    if (Database::getConnection()->driver() != 'mongodb') {
+      $this->drupalGet($path);
+      $this->submitForm([], 'Apply');
+      $results = $this->cssSelect('.view-content .field-content');
+      $this->assertCount(4, $results);
+      $this->submitForm(['created' => '1'], 'Apply');
+      $results = $this->cssSelect('.view-content .field-content');
+      $this->assertCount(1, $results);
+      $this->assertEquals($this->nodes[3]->id(), $results[0]->getText());
+      $this->submitForm(['created' => '2'], 'Apply');
+      $results = $this->cssSelect('.view-content .field-content');
+      $this->assertCount(1, $results);
+      $this->assertEquals($this->nodes[3]->id(), $results[0]->getText());
+      $this->submitForm(['created' => '3'], 'Apply');
+      $results = $this->cssSelect('.view-content .field-content');
+      $this->assertCount(1, $results);
+      $this->assertEquals($this->nodes[1]->id(), $results[0]->getText());
+    }
 
     // Change the filter to a single filter to test the schema when the operator
     // is not exposed.
@@ -309,9 +312,16 @@ class FilterDateTest extends ViewTestBase {
   protected function _testFilterDatetimeUI(): void {
     $this->drupalLogin($this->drupalCreateUser(['administer views']));
     $this->drupalGet('admin/structure/views/nojs/add-handler/test_filter_date_between/default/filter');
-    $this->submitForm([
-      'name[node__field_date.field_date_value]' => 'node__field_date.field_date_value',
-    ], 'Add and configure filter criteria');
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $this->submitForm([
+        'name[node.field_date_value]' => 'node.field_date_value',
+      ], 'Add and configure filter criteria');
+    }
+    else {
+      $this->submitForm([
+        'name[node__field_date.field_date_value]' => 'node__field_date.field_date_value',
+      ], 'Add and configure filter criteria');
+    }
 
     $this->submitForm([], 'Expose filter');
     $this->submitForm([], 'Grouped filters');
@@ -355,8 +365,10 @@ class FilterDateTest extends ViewTestBase {
 
     $this->submitForm([], 'Save');
 
-    $this->drupalGet('exposed-date-filter');
-    $this->assertSession()->fieldExists('created');
+    if (Database::getConnection()->driver() != 'mongodb') {
+      $this->drupalGet('exposed-date-filter');
+      $this->assertSession()->fieldExists('created');
+    }
   }
 
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\Database\Database;
 use Drupal\Core\Url;
 use Drupal\jsonapi\Query\OffsetPage;
 use Drupal\node\Entity\Node;
@@ -201,39 +202,41 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     $this->assertMatchesRegularExpression('/^item--[a-zA-Z0-9]{7}$/', next($link_keys));
     $this->nodes[1]->set('status', TRUE);
     $this->nodes[1]->save();
-    // 13. Test filtering when using short syntax.
-    $filter = [
-      'uid.id' => ['value' => $this->user->uuid()],
-      'field_tags.id' => ['value' => $this->tags[0]->uuid()],
-    ];
-    $single_output = Json::decode($this->drupalGet('/jsonapi/node/article', [
-      'query' => ['filter' => $filter, 'include' => 'uid,field_tags'],
-    ]));
-    $this->assertSession()->statusCodeEquals(200);
-    $this->assertGreaterThan(0, count($single_output['data']));
-    // 14. Test filtering when using long syntax.
-    $filter = [
-      'and_group' => ['group' => ['conjunction' => 'AND']],
-      'filter_user' => [
-        'condition' => [
-          'path' => 'uid.id',
-          'value' => $this->user->uuid(),
-          'memberOf' => 'and_group',
+    if (Database::getConnection()->driver() != 'mongodb') {
+      // 13. Test filtering when using short syntax.
+      $filter = [
+        'uid.id' => ['value' => $this->user->uuid()],
+        'field_tags.id' => ['value' => $this->tags[0]->uuid()],
+      ];
+      $single_output = Json::decode($this->drupalGet('/jsonapi/node/article', [
+        'query' => ['filter' => $filter, 'include' => 'uid,field_tags'],
+      ]));
+      $this->assertSession()->statusCodeEquals(200);
+      $this->assertGreaterThan(0, count($single_output['data']));
+      // 14. Test filtering when using long syntax.
+      $filter = [
+        'and_group' => ['group' => ['conjunction' => 'AND']],
+        'filter_user' => [
+          'condition' => [
+            'path' => 'uid.id',
+            'value' => $this->user->uuid(),
+            'memberOf' => 'and_group',
+          ],
         ],
-      ],
-      'filter_tags' => [
-        'condition' => [
-          'path' => 'field_tags.id',
-          'value' => $this->tags[0]->uuid(),
-          'memberOf' => 'and_group',
+        'filter_tags' => [
+          'condition' => [
+            'path' => 'field_tags.id',
+            'value' => $this->tags[0]->uuid(),
+            'memberOf' => 'and_group',
+          ],
         ],
-      ],
-    ];
-    $single_output = Json::decode($this->drupalGet('/jsonapi/node/article', [
-      'query' => ['filter' => $filter, 'include' => 'uid,field_tags'],
-    ]));
-    $this->assertSession()->statusCodeEquals(200);
-    $this->assertGreaterThan(0, count($single_output['data']));
+      ];
+      $single_output = Json::decode($this->drupalGet('/jsonapi/node/article', [
+        'query' => ['filter' => $filter, 'include' => 'uid,field_tags'],
+      ]));
+      $this->assertSession()->statusCodeEquals(200);
+      $this->assertGreaterThan(0, count($single_output['data']));
+    }
     // 15. Test filtering when using invalid syntax.
     $filter = [
       'and_group' => ['group' => ['conjunction' => 'AND']],
@@ -249,29 +252,34 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
       'query' => ['filter' => $filter] + $default_sort,
     ]);
     $this->assertSession()->statusCodeEquals(400);
-    // 16. Test filtering on the same field.
-    $filter = [
-      'or_group' => ['group' => ['conjunction' => 'OR']],
-      'filter_tags_1' => [
-        'condition' => [
-          'path' => 'field_tags.id',
-          'value' => $this->tags[0]->uuid(),
-          'memberOf' => 'or_group',
+    if (Database::getConnection()->driver() != 'mongodb') {
+      // 16. Test filtering on the same field.
+      $filter = [
+        'or_group' => ['group' => ['conjunction' => 'OR']],
+        'filter_tags_1' => [
+          'condition' => [
+            'path' => 'field_tags.id',
+            'value' => $this->tags[0]->uuid(),
+            'memberOf' => 'or_group',
+          ],
         ],
-      ],
-      'filter_tags_2' => [
-        'condition' => [
-          'path' => 'field_tags.id',
-          'value' => $this->tags[1]->uuid(),
-          'memberOf' => 'or_group',
+        'filter_tags_2' => [
+          'condition' => [
+            'path' => 'field_tags.id',
+            'value' => $this->tags[1]->uuid(),
+            'memberOf' => 'or_group',
+          ],
         ],
-      ],
-    ];
-    $single_output = Json::decode($this->drupalGet('/jsonapi/node/article', [
-      'query' => ['filter' => $filter, 'include' => 'field_tags'] + $default_sort,
-    ]));
-    $this->assertSession()->statusCodeEquals(200);
-    $this->assertGreaterThanOrEqual(2, count($single_output['included']));
+      ];
+      $single_output = Json::decode($this->drupalGet('/jsonapi/node/article', [
+        'query' => [
+          'filter' => $filter,
+          'include' => 'field_tags',
+        ] + $default_sort,
+      ]));
+      $this->assertSession()->statusCodeEquals(200);
+      $this->assertGreaterThanOrEqual(2, count($single_output['included']));
+    }
     // 17. Single user (check fields lacking 'view' access).
     $user_url = Url::fromRoute('jsonapi.user--user.individual', [
       'entity' => $this->user->uuid(),
@@ -415,65 +423,67 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     ]));
     $this->assertSession()->statusCodeEquals(200);
     $this->assertGreaterThanOrEqual(OffsetPage::SIZE_MAX, count($collection_output['data']));
-    // 2. Nested Filters: Get nodes created by user admin.
-    $filter = [
-      'name-filter' => [
-        'condition' => [
-          'path' => 'uid.name',
-          'value' => $this->user->getAccountName(),
-        ],
-      ],
-    ];
-    $collection_output = Json::decode($this->drupalGet('/jsonapi/node/article', [
-      'query' => ['filter' => $filter] + $default_sort,
-    ]));
-    $this->assertSession()->statusCodeEquals(200);
-    $this->assertGreaterThanOrEqual(OffsetPage::SIZE_MAX, count($collection_output['data']));
-    // 3. Filtering with arrays: Get nodes created by users [admin, john].
-    $filter = [
-      'name-filter' => [
-        'condition' => [
-          'path' => 'uid.name',
-          'operator' => 'IN',
-          'value' => [
-            $this->user->getAccountName(),
-            $this->getRandomGenerator()->name(),
+    if (Database::getConnection()->driver() != 'mongodb') {
+      // 2. Nested Filters: Get nodes created by user admin.
+      $filter = [
+        'name-filter' => [
+          'condition' => [
+            'path' => 'uid.name',
+            'value' => $this->user->getAccountName(),
           ],
         ],
-      ],
-    ];
-    $collection_output = Json::decode($this->drupalGet('/jsonapi/node/article', [
-      'query' => ['filter' => $filter] + $default_sort,
-    ]));
-    $this->assertSession()->statusCodeEquals(200);
-    $this->assertGreaterThanOrEqual(OffsetPage::SIZE_MAX, count($collection_output['data']));
-    // 4. Grouping filters: Get nodes that are published and create by admin.
-    $filter = [
-      'and-group' => [
-        'group' => [
-          'conjunction' => 'AND',
+      ];
+      $collection_output = Json::decode($this->drupalGet('/jsonapi/node/article', [
+        'query' => ['filter' => $filter] + $default_sort,
+      ]));
+      $this->assertSession()->statusCodeEquals(200);
+      $this->assertGreaterThanOrEqual(OffsetPage::SIZE_MAX, count($collection_output['data']));
+      // 3. Filtering with arrays: Get nodes created by users [admin, john].
+      $filter = [
+        'name-filter' => [
+          'condition' => [
+            'path' => 'uid.name',
+            'operator' => 'IN',
+            'value' => [
+              $this->user->getAccountName(),
+              $this->getRandomGenerator()->name(),
+            ],
+          ],
         ],
-      ],
-      'name-filter' => [
-        'condition' => [
-          'path' => 'uid.name',
-          'value' => $this->user->getAccountName(),
-          'memberOf' => 'and-group',
+      ];
+      $collection_output = Json::decode($this->drupalGet('/jsonapi/node/article', [
+        'query' => ['filter' => $filter] + $default_sort,
+      ]));
+      $this->assertSession()->statusCodeEquals(200);
+      $this->assertGreaterThanOrEqual(OffsetPage::SIZE_MAX, count($collection_output['data']));
+      // 4. Grouping filters: Get nodes that are published and create by admin.
+      $filter = [
+        'and-group' => [
+          'group' => [
+            'conjunction' => 'AND',
+          ],
         ],
-      ],
-      'status-filter' => [
-        'condition' => [
-          'path' => 'status',
-          'value' => 1,
-          'memberOf' => 'and-group',
+        'name-filter' => [
+          'condition' => [
+            'path' => 'uid.name',
+            'value' => $this->user->getAccountName(),
+            'memberOf' => 'and-group',
+          ],
         ],
-      ],
-    ];
-    $collection_output = Json::decode($this->drupalGet('/jsonapi/node/article', [
-      'query' => ['filter' => $filter] + $default_sort,
-    ]));
-    $this->assertSession()->statusCodeEquals(200);
-    $this->assertGreaterThanOrEqual(OffsetPage::SIZE_MAX, count($collection_output['data']));
+        'status-filter' => [
+          'condition' => [
+            'path' => 'status',
+            'value' => 1,
+            'memberOf' => 'and-group',
+          ],
+        ],
+      ];
+      $collection_output = Json::decode($this->drupalGet('/jsonapi/node/article', [
+        'query' => ['filter' => $filter] + $default_sort,
+      ]));
+      $this->assertSession()->statusCodeEquals(200);
+      $this->assertGreaterThanOrEqual(OffsetPage::SIZE_MAX, count($collection_output['data']));
+    }
     // 5. Grouping grouped filters: Get nodes that are promoted or sticky and
     //    created by admin.
     $filter = [

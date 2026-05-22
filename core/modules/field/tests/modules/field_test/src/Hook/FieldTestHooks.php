@@ -74,7 +74,7 @@ class FieldTestHooks {
   public function queryEfqTablePrefixingTestAlter(&$query): void {
     // Add an additional join onto the entity base table. This will cause an
     // exception if the EFQ does not properly prefix the base table.
-    $query->join('entity_test', 'et2', '[%alias].[id] = [entity_test].[id]');
+    $query->join('entity_test', 'et2', $query->joinCondition()->compare('%alias.id', 'entity_test.id'));
   }
 
   /**

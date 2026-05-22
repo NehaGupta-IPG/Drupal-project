@@ -205,7 +205,7 @@ class CommentStatistics implements CommentStatisticsInterface {
     }
 
     $query = $this->database->select('comment_field_data', 'c');
-    $query->addExpression('COUNT([cid])');
+    $query->addExpressionCount('cid');
     $count = $query->condition('c.entity_id', $comment->getCommentedEntityId())
       ->condition('c.entity_type', $comment->getCommentedEntityTypeId())
       ->condition('c.field_name', $comment->getFieldName())

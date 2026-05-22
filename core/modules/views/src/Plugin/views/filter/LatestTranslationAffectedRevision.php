@@ -94,7 +94,7 @@ class LatestTranslationAffectedRevision extends FilterPluginBase implements Cont
     $keys = $entity_type->getKeys();
 
     $subquery = $query->getConnection()->select($query_base_table, 'base_table');
-    $subquery->addExpression("MAX(base_table.{$keys['revision']})", $keys['revision']);
+    $subquery->addExpressionMax("base_table.{$keys['revision']}", $keys['revision']);
     $subquery->fields('base_table', [$keys['id'], 'langcode']);
     $subquery->groupBy("base_table.{$keys['id']}");
     $subquery->groupBy('base_table.langcode');

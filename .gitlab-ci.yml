@@ -28,7 +28,7 @@
 
 workflow:
   rules:
-  # These 3 rules from https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Workflows/MergeRequest-Pipelines.gitlab-ci.yml
+    # These 3 rules from https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Workflows/MergeRequest-Pipelines.gitlab-ci.yml
     # Run on merge requests
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
     # Run when called from an upstream pipeline https://docs.gitlab.com/ee/ci/pipelines/downstream_pipelines.html?tab=Multi-project+pipeline#use-rules-to-control-downstream-pipeline-jobs
@@ -41,7 +41,7 @@ workflow:
     - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_ROOT_NAMESPACE == "project"
     # Run if triggered from Web using 'Run Pipelines'
     - if: $CI_PIPELINE_SOURCE == "web"
-     # Run if triggered from WebIDE
+    # Run if triggered from WebIDE
     - if: $CI_PIPELINE_SOURCE == "webide"
 
 ################
@@ -89,7 +89,7 @@ default:
       - runner_system_failure
       - scheduler_failure
   image:
-    name: $_CONFIG_DOCKERHUB_ROOT/php-$_TARGET_PHP-apache:production
+    name: $_CONFIG_DOCKERHUB_ROOT/php-$_TARGET_PHP-apache:dev
 
 #############
 # Templates #
@@ -181,7 +181,7 @@ default:
   <<: *default-stage
   variables:
     _TARGET_PHP: "8.3-ubuntu"
-    _TARGET_DB: "mysql-8"
+    _TARGET_DB: "mongodb-8"
     PERFORMANCE_TEST: $PERFORMANCE_TEST
     OTEL_COLLECTOR: $OTEL_COLLECTOR
   # Run on MR, schedule, push, parent pipeline and performance test.
@@ -216,7 +216,7 @@ default:
   allow_failure: true
   variables:
     _TARGET_PHP: "8.3-ubuntu"
-    _TARGET_DB: "mysql-8"
+    _TARGET_DB: "mongodb-8"
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   trigger:
@@ -350,11 +350,12 @@ default:
   script:
     - *prepare-lint-directory
     - *phpstan-cache
+    - docker-php-ext-enable mongodb
     - composer validate
     - composer install --optimize-autoloader
     - if [ -n "$COMPOSER_UPDATE" ]; then
-        composer update --optimize-autoloader;
-        composer outdated;
+      composer update --optimize-autoloader;
+      composer outdated;
       fi
     - vendor/bin/phpstan --version
     # Rely on PHPStan caching to execute analysis multiple times without performance drawback.
@@ -386,11 +387,12 @@ default:
   variables:
     KUBERNETES_CPU_REQUEST: "16"
   script:
+    - docker-php-ext-enable mongodb
     - composer validate
     - composer install --optimize-autoloader
     - if [ -n "$COMPOSER_UPDATE" ]; then
-        composer update --optimize-autoloader;
-        composer outdated;
+      composer update --optimize-autoloader;
+      composer outdated;
       fi
     - vendor/bin/phpcs --version
     - composer phpcs -- -s --report-full --report-summary --report-\\Micheh\\PhpCodeSniffer\\Report\\Gitlab=phpcs-quality-report.json

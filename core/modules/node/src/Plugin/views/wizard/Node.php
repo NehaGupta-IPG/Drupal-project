@@ -2,6 +2,7 @@
 
 namespace Drupal\node\Plugin\views\wizard;
 
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
@@ -65,12 +66,19 @@ class Node extends WizardPluginBase {
    *   The entity field manager.
    * @param \Drupal\Core\Menu\MenuParentFormSelectorInterface $parent_form_selector
    *   The parent form selector service.
+   * @param \Drupal\Core\Database\Connection $connection
+   *   The database connection.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeBundleInfoInterface $bundle_info_service, EntityDisplayRepositoryInterface $entity_display_repository, EntityFieldManagerInterface $entity_field_manager, MenuParentFormSelectorInterface $parent_form_selector) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $bundle_info_service, $parent_form_selector);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeBundleInfoInterface $bundle_info_service, EntityDisplayRepositoryInterface $entity_display_repository, EntityFieldManagerInterface $entity_field_manager, MenuParentFormSelectorInterface $parent_form_selector, Connection $connection) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $bundle_info_service, $parent_form_selector, $connection);
 
     $this->entityDisplayRepository = $entity_display_repository;
     $this->entityFieldManager = $entity_field_manager;
+
+    if ($connection->driver() == 'mongodb') {
+      $this->base_table = 'node';
+      $this->createdColumn = 'node-created';
+    }
   }
 
   /**
@@ -84,7 +92,8 @@ class Node extends WizardPluginBase {
       $container->get('entity_type.bundle.info'),
       $container->get('entity_display.repository'),
       $container->get('entity_field.manager'),
-      $container->get('menu.parent_form_selector')
+      $container->get('menu.parent_form_selector'),
+      $container->get('database')
     );
   }
 
@@ -97,9 +106,16 @@ class Node extends WizardPluginBase {
    */
   public function getAvailableSorts() {
     // You can't execute functions in properties, so override the method
-    return [
-      'node_field_data-title:ASC' => $this->t('Title'),
-    ];
+    if ($this->connection->driver() == 'mongodb') {
+      return [
+        'node-title:ASC' => $this->t('Title'),
+      ];
+    }
+    else {
+      return [
+        'node_field_data-title:ASC' => $this->t('Title'),
+      ];
+    }
   }
 
   /**
@@ -132,7 +148,12 @@ class Node extends WizardPluginBase {
     // to a row style that uses fields.
     /* Field: Content: Title */
     $display_options['fields']['title']['id'] = 'title';
-    $display_options['fields']['title']['table'] = 'node_field_data';
+    if ($this->connection->driver() == 'mongodb') {
+      $display_options['fields']['title']['table'] = 'node';
+    }
+    else {
+      $display_options['fields']['title']['table'] = 'node_field_data';
+    }
     $display_options['fields']['title']['field'] = 'title';
     $display_options['fields']['title']['entity_type'] = 'node';
     $display_options['fields']['title']['entity_field'] = 'title';
@@ -229,7 +250,12 @@ class Node extends WizardPluginBase {
       case 'titles':
         $display_options['row']['type'] = 'fields';
         $display_options['fields']['title']['id'] = 'title';
-        $display_options['fields']['title']['table'] = 'node_field_data';
+        if ($this->connection->driver() == 'mongodb') {
+          $display_options['fields']['title']['table'] = 'node';
+        }
+        else {
+          $display_options['fields']['title']['table'] = 'node_field_data';
+        }
         $display_options['fields']['title']['field'] = 'title';
         $display_options['fields']['title']['settings']['link_to_entity'] = $row_plugin === 'titles_linked';
         $display_options['fields']['title']['plugin_id'] = 'field';

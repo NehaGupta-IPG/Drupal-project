@@ -2,9 +2,13 @@
 
 namespace Drupal\media\Plugin\views\wizard;
 
+use Drupal\Core\Database\Connection;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Drupal\Core\Menu\MenuParentFormSelectorInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsWizard;
 use Drupal\views\Plugin\views\wizard\WizardPluginBase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides Views creation wizard for Media revisions.
@@ -26,6 +30,32 @@ class MediaRevision extends WizardPluginBase {
   /**
    * {@inheritdoc}
    */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('entity_type.bundle.info'),
+      $container->get('menu.parent_form_selector'),
+      $container->get('database')
+    );
+  }
+
+  /**
+   * Constructs a WizardPluginBase object.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeBundleInfoInterface $bundle_info_service, MenuParentFormSelectorInterface $parent_form_selector, Connection $connection) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $bundle_info_service, $parent_form_selector, $connection);
+
+    if ($connection->driver() == 'mongodb') {
+      $this->base_table = 'media';
+      $this->createdColumn = 'media-created';
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function defaultDisplayOptions() {
     $display_options = parent::defaultDisplayOptions();
 
@@ -38,7 +68,12 @@ class MediaRevision extends WizardPluginBase {
 
     // Add the changed field.
     $display_options['fields']['changed']['id'] = 'changed';
-    $display_options['fields']['changed']['table'] = 'media_field_revision';
+    if ($this->connection->driver() == 'mongodb') {
+      $display_options['fields']['changed']['table'] = 'media';
+    }
+    else {
+      $display_options['fields']['changed']['table'] = 'media_field_revision';
+    }
     $display_options['fields']['changed']['field'] = 'changed';
     $display_options['fields']['changed']['entity_type'] = 'media';
     $display_options['fields']['changed']['entity_field'] = 'changed';
@@ -60,7 +95,12 @@ class MediaRevision extends WizardPluginBase {
 
     // Add the name field.
     $display_options['fields']['name']['id'] = 'name';
-    $display_options['fields']['name']['table'] = 'media_field_revision';
+    if ($this->connection->driver() == 'mongodb') {
+      $display_options['fields']['name']['table'] = 'media';
+    }
+    else {
+      $display_options['fields']['name']['table'] = 'media_field_revision';
+    }
     $display_options['fields']['name']['field'] = 'name';
     $display_options['fields']['name']['entity_type'] = 'media';
     $display_options['fields']['name']['entity_field'] = 'name';

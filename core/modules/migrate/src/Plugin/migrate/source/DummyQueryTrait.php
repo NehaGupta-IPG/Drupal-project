@@ -20,7 +20,7 @@ trait DummyQueryTrait {
     // anyway.
     $query = $this->select(uniqid(), 's')
       ->range(0, 1);
-    $query->addExpression('1');
+    $query->addExpressionConstant('1');
     return $query;
   }
 

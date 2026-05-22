@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Functional\Wizard;
 
+use Drupal\Core\Database\Database;
+
 /**
  * Tests the ability of the views wizard to create views with sorts.
  *
@@ -41,7 +43,12 @@ class SortingTest extends WizardTestBase {
     $view1['label'] = $this->randomMachineName(16);
     $view1['id'] = $this->randomMachineName(16);
     $view1['description'] = $this->randomMachineName(16);
-    $view1['show[sort]'] = 'node_field_data-created:ASC';
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $view1['show[sort]'] = 'node-created:ASC';
+    }
+    else {
+      $view1['show[sort]'] = 'node_field_data-created:ASC';
+    }
     $view1['page[create]'] = 1;
     $view1['page[title]'] = $this->randomMachineName(16);
     $view1['page[path]'] = $this->randomMachineName(16);
@@ -68,7 +75,12 @@ class SortingTest extends WizardTestBase {
     $view2['label'] = $this->randomMachineName(16);
     $view2['id'] = $this->randomMachineName(16);
     $view2['description'] = $this->randomMachineName(16);
-    $view2['show[sort]'] = 'node_field_data-created:DESC';
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $view2['show[sort]'] = 'node-created:DESC';
+    }
+    else {
+      $view2['show[sort]'] = 'node_field_data-created:DESC';
+    }
     $view2['page[create]'] = 1;
     $view2['page[title]'] = $this->randomMachineName(16);
     $view2['page[path]'] = $this->randomMachineName(16);

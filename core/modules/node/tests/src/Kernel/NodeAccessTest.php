@@ -129,6 +129,10 @@ class NodeAccessTest extends NodeAccessTestBase {
    * Tests node grants for queries with node access checks and base table join.
    */
   public function testQueryWithBaseTableJoin(): void {
+    if (\Drupal::database()->driver() == 'mongodb') {
+      $this->markTestSkipped('The MongoDB database driver does not support self joins on data tables.');
+    }
+
     $this->enableModules(['node_access_test_empty']);
     $this->drupalCreateNode(['type' => 'page']);
     $this->drupalCreateNode(['type' => 'page']);

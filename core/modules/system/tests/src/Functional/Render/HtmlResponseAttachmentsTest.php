@@ -108,6 +108,7 @@ class HtmlResponseAttachmentsTest extends BrowserTestBase {
     $this->assertSession()->responseHeaderEquals('X-Test-Teapot', 'Teapot Mode Active');
     $this->assertSession()->responseHeaderEquals('X-Test-Teapot-Replace', 'Teapot replaced');
     $this->assertSession()->responseHeaderEquals('X-Test-Teapot-No-Replace', 'This value is not replaced');
+    // $this->assertSession()->responseHeaderEquals('X-Test-Teapot-No-Replace', 'This value is not replaced, This one is added');
   }
 
   /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field\Kernel\Views;
 
+use Drupal\Core\Database\Database;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -64,9 +65,11 @@ class HandlerFieldFieldTest extends KernelTestBase {
   protected $nodes = [];
 
   /**
-   * Tests fields rendering in views.
+   * {@inheritdoc}
    */
-  public function testFieldRender(): void {
+  protected function setUp($import_test_views = TRUE): void {
+    parent::setUp();
+
     $this->installConfig(['filter']);
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
@@ -74,11 +77,19 @@ class HandlerFieldFieldTest extends KernelTestBase {
       'type' => 'page',
       'name' => 'Page',
     ])->save();
-    ViewTestData::createTestViews(static::class, ['field_test_views']);
 
     // Setup basic fields.
     $this->createFields();
 
+    // For MongoDB to update the views correctly the views must be loaded after
+    // the creation of the fields.
+    ViewTestData::createTestViews(static::class, ['field_test_views']);
+  }
+
+  /**
+   * Tests fields rendering in views.
+   */
+  public function testFieldRender(): void {
     // Create some nodes.
     $this->nodes = [];
     for ($i = 0; $i < 3; $i++) {
@@ -316,10 +327,17 @@ class HandlerFieldFieldTest extends KernelTestBase {
   protected function prepareView(ViewExecutable $view): void {
     $view->storage->invalidateCaches();
     $view->initDisplay();
+    $connection = Database::getConnection();
     foreach ($this->fieldStorages as $field_storage) {
       $field_name = $field_storage->getName();
       $view->display_handler->options['fields'][$field_name]['id'] = $field_name;
-      $view->display_handler->options['fields'][$field_name]['table'] = 'node__' . $field_name;
+      if ($connection->driver() == 'mongodb') {
+        $table = 'node';
+      }
+      else {
+        $table = 'node__' . $field_name;
+      }
+      $view->display_handler->options['fields'][$field_name]['table'] = $table;
       $view->display_handler->options['fields'][$field_name]['field'] = $field_name;
     }
   }

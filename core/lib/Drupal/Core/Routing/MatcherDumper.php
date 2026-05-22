@@ -91,7 +91,17 @@ class MatcherDumper implements MatcherDumperInterface {
     // stale data. The transaction makes it atomic to avoid unstable router
     // states due to random failures.
     try {
-      $transaction = $this->connection->startTransaction();
+      if ($this->connection->driver() == 'mongodb') {
+        $session = $this->connection->getMongodbSession();
+        $session_started = FALSE;
+        if (!$session->isInTransaction()) {
+          $session->startTransaction();
+          $session_started = TRUE;
+        }
+      }
+      else {
+        $transaction = $this->connection->startTransaction();
+      }
       // We don't use truncate, because it is not guaranteed to be transaction
       // safe.
       try {
@@ -142,10 +152,16 @@ class MatcherDumper implements MatcherDumperInterface {
         $insert->execute();
       }
 
+      if (isset($session) && $session->isInTransaction() && $session_started) {
+        $session->commitTransaction();
+      }
     }
     catch (\Exception $e) {
       if (isset($transaction)) {
         $transaction->rollBack();
+      }
+      if (isset($session) && $session->isInTransaction() && $session_started) {
+        $session->abortTransaction();
       }
       Error::logException($this->logger, $e);
       throw $e;

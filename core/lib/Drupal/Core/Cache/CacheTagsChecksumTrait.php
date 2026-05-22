@@ -33,6 +33,15 @@ trait CacheTagsChecksumTrait {
   protected $tagCache = [];
 
   /**
+   * Indicator for the existence of the database table.
+   *
+   * This variable is only used by the database driver for MongoDB.
+   *
+   * @var bool
+   */
+  protected $tableExists = FALSE;
+
+  /**
    * Callback to be invoked just after a database transaction gets committed.
    *
    * Executes all delayed tag invalidations.
@@ -51,6 +60,13 @@ trait CacheTagsChecksumTrait {
    * Implements \Drupal\Core\Cache\CacheTagsInvalidatorInterface::invalidateTags()
    */
   public function invalidateTags(array $tags) {
+    if (isset($this->connection) && ($this->connection->driver() == 'mongodb') && !$this->tableExists) {
+      // For MongoDB the table needs to exist. Otherwise MongoDB creates one
+      // without the correct validation.
+      $this->tableExists = $this->ensureTableExists();
+    }
+
+    // Only invalidate tags once per request unless they are written again.
     foreach ($tags as $key => $tag) {
       if (isset($this->invalidatedTags[$tag])) {
         unset($tags[$key]);
@@ -80,6 +96,12 @@ trait CacheTagsChecksumTrait {
    * Implements \Drupal\Core\Cache\CacheTagsChecksumInterface::getCurrentChecksum()
    */
   public function getCurrentChecksum(array $tags) {
+    if (isset($this->connection) && ($this->connection->driver() == 'mongodb') && !$this->tableExists) {
+      // For MongoDB the table needs to exist. Otherwise MongoDB creates one
+      // without the correct validation.
+      $this->tableExists = $this->ensureTableExists();
+    }
+
     // Any cache writes in this request containing cache tags whose invalidation
     // has been delayed due to an in-progress transaction must not be read by
     // any other request, so use a nonsensical checksum which will cause any

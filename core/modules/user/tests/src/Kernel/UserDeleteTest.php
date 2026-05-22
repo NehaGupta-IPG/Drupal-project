@@ -42,14 +42,36 @@ class UserDeleteTest extends KernelTestBase {
 
     // These users should have a role
     $connection = Database::getConnection();
-    $query = $connection->select('user__roles', 'r');
-    $roles_created = $query
-      ->fields('r', ['entity_id'])
-      ->condition('entity_id', $uids, 'IN')
-      ->countQuery()
-      ->execute()
-      ->fetchField();
+    if ($connection->driver() == 'mongodb') {
+      $query = $connection->select('users', 'u');
+      $result = $query
+        ->fields('u', ['user_translations'])
+        ->execute()
+        ->fetchCol();
 
+      $roles = [];
+      foreach ($result as $user_translations) {
+        foreach ($user_translations as $user_translation) {
+          if (isset($user_translation['user_translations__roles']) && is_array($user_translation['user_translations__roles'])) {
+            foreach ($user_translation['user_translations__roles'] as $user_translations__role) {
+              if (in_array($user_translations__role['entity_id'], $uids, TRUE)) {
+                $roles[] = $user_translations__role['entity_id'];
+              }
+            }
+          }
+        }
+      }
+      $roles_created = count($roles);
+    }
+    else {
+      $query = $connection->select('user__roles', 'r');
+      $roles_created = $query
+        ->fields('r', ['entity_id'])
+        ->condition('entity_id', $uids, 'IN')
+        ->countQuery()
+        ->execute()
+        ->fetchField();
+    }
     $this->assertGreaterThan(0, $roles_created);
     // We should be able to load one of the users.
     $this->assertNotNull(User::load($user_a->id()));
@@ -58,13 +80,36 @@ class UserDeleteTest extends KernelTestBase {
     $users = $storage->loadMultiple($uids);
     $storage->delete($users);
     // Test if the roles assignments are deleted.
-    $query = $connection->select('user__roles', 'r');
-    $roles_after_deletion = $query
-      ->fields('r', ['entity_id'])
-      ->condition('entity_id', $uids, 'IN')
-      ->countQuery()
-      ->execute()
-      ->fetchField();
+    if ($connection->driver() == 'mongodb') {
+      $query = $connection->select('users', 'u');
+      $result = $query
+        ->fields('u', ['user_translations'])
+        ->execute()
+        ->fetchCol();
+
+      $roles = [];
+      foreach ($result as $user_translations) {
+        foreach ($user_translations as $user_translation) {
+          if (isset($user_translation['user_translations__roles']) && is_array($user_translation['user_translations__roles'])) {
+            foreach ($user_translation['user_translations__roles'] as $user_translations__role) {
+              if (in_array($user_translations__role['entity_id'], $uids, TRUE)) {
+                $roles[] = $user_translations__role['entity_id'];
+              }
+            }
+          }
+        }
+      }
+      $roles_after_deletion = count($roles);
+    }
+    else {
+      $query = $connection->select('user__roles', 'r');
+      $roles_after_deletion = $query
+        ->fields('r', ['entity_id'])
+        ->condition('entity_id', $uids, 'IN')
+        ->countQuery()
+        ->execute()
+        ->fetchField();
+    }
     $this->assertEquals(0, $roles_after_deletion);
     // Test if the users are deleted, User::load() will return NULL.
     $this->assertNull(User::load($user_a->id()));

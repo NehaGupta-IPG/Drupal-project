@@ -90,6 +90,10 @@ function dblog_schema(): array {
     ],
   ];
 
+  if (\Drupal::database()->driver() == 'mongodb') {
+    $schema['watchdog']['fields']['timestamp']['type'] = 'date';
+  }
+
   return $schema;
 }
 

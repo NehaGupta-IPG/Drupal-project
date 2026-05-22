@@ -52,7 +52,7 @@ function history_read_multiple($nids) {
     }
     else {
       // Initialize value if current user has not viewed the node.
-      $nodes_to_read[$nid] = 0;
+      $nodes_to_read[(int) $nid] = 0;
     }
   }
 
@@ -62,7 +62,7 @@ function history_read_multiple($nids) {
 
   $result = \Drupal::database()->select('history', 'h')
     ->fields('h', ['nid', 'timestamp'])
-    ->condition('uid', \Drupal::currentUser()->id())
+    ->condition('uid', (int) \Drupal::currentUser()->id())
     ->condition('nid', array_keys($nodes_to_read), 'IN')
     ->execute();
   foreach ($result as $row) {
@@ -92,8 +92,8 @@ function history_write($nid, $account = NULL) {
     $request_time = \Drupal::time()->getRequestTime();
     \Drupal::database()->merge('history')
       ->keys([
-        'uid' => $account->id(),
-        'nid' => $nid,
+        'uid' => (int) $account->id(),
+        'nid' => (int) $nid,
       ])
       ->fields(['timestamp' => $request_time])
       ->execute();

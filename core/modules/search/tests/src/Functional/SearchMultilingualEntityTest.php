@@ -243,7 +243,7 @@ class SearchMultilingualEntityTest extends BrowserTestBase {
     $result = $connection->select('search_dataset', 'd')
       ->fields('d', ['reindex'])
       ->condition('type', 'node_search')
-      ->condition('sid', $this->searchableNodes[1]->id())
+      ->condition('sid', (int) $this->searchableNodes[1]->id())
       ->execute()
       ->fetchField();
     $this->assertEquals($old, $result, 'Reindex time was not updated if node was already marked');

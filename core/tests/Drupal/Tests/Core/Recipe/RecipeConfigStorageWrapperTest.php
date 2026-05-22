@@ -280,7 +280,7 @@ class RecipeConfigStorageWrapperTest extends UnitTestCase {
   public function testGetCollection(): void {
     $a = $this->createMock(StorageInterface::class);
     $b = $this->createMock(StorageInterface::class);
-    $storage = new RecipeConfigStorageWrapper($a, $b, 'collection');
+    $storage = new RecipeConfigStorageWrapper($a, $b, NULL, NULL, 'collection');
     $this->assertEquals('collection', $storage->getCollectionName());
   }
 

@@ -218,6 +218,7 @@ class ViewsViewsHooks {
    */
   #[Hook('field_views_data')]
   public function fieldViewsData(FieldStorageConfigInterface $field_storage): array {
+    $driver = \Drupal::database()->driver();
     $data = views_field_default_views_data($field_storage);
     // The code below only deals with the Entity reference field type.
     if ($field_storage->getType() != 'entity_reference') {
@@ -233,8 +234,19 @@ class ViewsViewsHooks {
       $target_entity_type = $entity_type_manager->getDefinition($target_entity_type_id);
       $entity_type_id = $field_storage->getTargetEntityTypeId();
       $entity_type = $entity_type_manager->getDefinition($entity_type_id);
-      $target_base_table = $target_entity_type->getDataTable() ?: $target_entity_type->getBaseTable();
+      if ($driver === 'mongodb') {
+        $target_base_table = $target_entity_type->getBaseTable();
+      }
+      else {
+        $target_base_table = $target_entity_type->getDataTable() ?: $target_entity_type->getBaseTable();
+      }
       $field_name = $field_storage->getName();
+
+      $relationship_field = $field_name . '_target_id';
+      if (($driver === 'mongodb') && isset($table_data[$field_name]['field']['real field'])) {
+        $relationship_field = $table_data[$field_name]['field']['real field'];
+      }
+
       if ($target_entity_type instanceof ContentEntityTypeInterface) {
         // Provide a relationship for the entity type with the entity reference
         // field.
@@ -250,35 +262,38 @@ class ViewsViewsHooks {
           'base' => $target_base_table,
           'entity type' => $target_entity_type_id,
           'base field' => $target_entity_type->getKey('id'),
-          'relationship field' => $field_name . '_target_id',
+          'relationship field' => $relationship_field,
         ];
-        // Provide a reverse relationship for the entity type that is referenced by
-        // the field.
-        $args['@entity'] = $entity_type->getLabel();
-        $args['@label'] = $target_entity_type->getSingularLabel();
-        $pseudo_field_name = 'reverse__' . $entity_type_id . '__' . $field_name;
-        $data[$target_base_table][$pseudo_field_name]['relationship'] = [
-          'title' => t('@entity using @field_name', $args),
-          'label' => t('@field_name', [
-            '@field_name' => $field_name,
-          ]),
-          'group' => $target_entity_type->getLabel(),
-          'help' => t('Relate each @entity with a @field_name set to the @label.', $args),
-          'id' => 'entity_reverse',
-          'base' => $entity_type->getDataTable() ?: $entity_type->getBaseTable(),
-          'entity_type' => $entity_type_id,
-          'base field' => $entity_type->getKey('id'),
-          'field_name' => $field_name,
-          'field table' => $table_mapping->getDedicatedDataTableName($field_storage),
-          'field field' => $field_name . '_target_id',
-          'join_extra' => [
-                  [
-                    'field' => 'deleted',
-                    'value' => 0,
-                    'numeric' => TRUE,
-                  ],
-          ],
-        ];
+        // MongoDB does not need reverse relationships.
+        if ($driver != 'mongodb') {
+          // Provide a reverse relationship for the entity type that is referenced by
+          // the field.
+          $args['@entity'] = $entity_type->getLabel();
+          $args['@label'] = $target_entity_type->getSingularLabel();
+          $pseudo_field_name = 'reverse__' . $entity_type_id . '__' . $field_name;
+          $data[$target_base_table][$pseudo_field_name]['relationship'] = [
+            'title' => t('@entity using @field_name', $args),
+            'label' => t('@field_name', [
+              '@field_name' => $field_name,
+            ]),
+            'group' => $target_entity_type->getLabel(),
+            'help' => t('Relate each @entity with a @field_name set to the @label.', $args),
+            'id' => 'entity_reverse',
+            'base' => $entity_type->getDataTable() ?: $entity_type->getBaseTable(),
+            'entity_type' => $entity_type_id,
+            'base field' => $entity_type->getKey('id'),
+            'field_name' => $field_name,
+            'field table' => $table_mapping->getDedicatedDataTableName($field_storage),
+            'field field' => $field_name . '_target_id',
+            'join_extra' => [
+              [
+                'field' => 'deleted',
+                'value' => 0,
+                'numeric' => TRUE,
+              ],
+            ],
+          ];
+        }
       }
       // Provide an argument plugin that has a meaningful titleQuery()
       // implementation getting the entity label.

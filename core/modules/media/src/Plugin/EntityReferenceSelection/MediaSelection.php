@@ -27,7 +27,7 @@ class MediaSelection extends DefaultSelection {
     // Ensure that users with insufficient permission cannot see unpublished
     // entities.
     if (!$this->currentUser->hasPermission('administer media')) {
-      $query->condition('status', 1);
+      $query->condition('status', TRUE);
     }
     return $query;
   }

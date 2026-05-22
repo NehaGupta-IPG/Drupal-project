@@ -228,7 +228,7 @@ class FieldStorageConfigEditForm extends EntityForm {
       // need to be incremented.
       $entities_with_higher_delta = \Drupal::entityQuery($this->entity->getTargetEntityTypeId())
         ->accessCheck(FALSE)
-        ->condition($this->entity->getName() . '.%delta', $cardinality_number)
+        ->condition($this->entity->getName() . '.%delta', (int) $cardinality_number)
         ->count()
         ->execute();
       if ($entities_with_higher_delta) {

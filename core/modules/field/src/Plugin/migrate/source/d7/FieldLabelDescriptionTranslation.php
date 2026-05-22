@@ -50,9 +50,13 @@ class FieldLabelDescriptionTranslation extends DrupalSqlBase {
       ->condition('textgroup', 'field')
       ->condition('objectid', '#allowed_values', '!=');
     $query->condition($condition);
-    $query->innerJoin('locales_target', 'lt', '[lt].[lid] = [i18n].[lid]');
+    $query->innerJoin('locales_target', 'lt', $query->joinCondition()->compare('lt.lid', 'i18n.lid'));
 
-    $query->leftJoin('field_config_instance', 'fci', '[fci].[bundle] = [i18n].[objectid] AND [fci].[field_name] = [i18n].[type]');
+    $query->leftJoin('field_config_instance', 'fci',
+      $query->joinCondition()
+        ->compare('fci.bundle', 'i18n.objectid')
+        ->compare('fci.field_name', 'i18n.type')
+    );
     return $query;
   }
 

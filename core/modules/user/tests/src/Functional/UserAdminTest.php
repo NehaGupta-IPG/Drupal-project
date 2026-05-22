@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Functional;
 
+use Drupal\Core\Database\Database;
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\RoleInterface;
@@ -123,7 +124,13 @@ class UserAdminTest extends BrowserTestBase {
     $this->assertTrue($account->isActive(), 'User C not blocked');
     $edit = [];
     $edit['action'] = 'user_block_user_action';
-    $edit['user_bulk_form[4]'] = TRUE;
+    if (Database::getConnection()->driver() == 'mongodb') {
+      // Sorting in MongoDB is by default case-sensitive.
+      $edit['user_bulk_form[3]'] = TRUE;
+    }
+    else {
+      $edit['user_bulk_form[4]'] = TRUE;
+    }
     $config
       ->set('notify.status_blocked', TRUE)
       ->save();
@@ -148,7 +155,13 @@ class UserAdminTest extends BrowserTestBase {
     // Test unblocking of a user from /admin/people page and sending of activation mail
     $edit_unblock = [];
     $edit_unblock['action'] = 'user_unblock_user_action';
-    $edit_unblock['user_bulk_form[4]'] = TRUE;
+    if (Database::getConnection()->driver() == 'mongodb') {
+      // Sorting in MongoDB is by default case-sensitive.
+      $edit_unblock['user_bulk_form[3]'] = TRUE;
+    }
+    else {
+      $edit_unblock['user_bulk_form[4]'] = TRUE;
+    }
     $this->drupalGet('admin/people', [
       // Sort the table by username so that we know reliably which user will be
       // targeted with the blocking action.

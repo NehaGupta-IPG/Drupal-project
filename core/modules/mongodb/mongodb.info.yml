@@ -1,0 +1,6 @@
+name: 'MongoDB'
+type: module
+description: 'Provides the database driver for MongoDB.'
+package: Core
+core_version_requirement: "~11.1"
+version: VERSION

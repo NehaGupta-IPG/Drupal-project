@@ -143,7 +143,12 @@ class SettingsTest extends UITestBase {
     $this->assertSession()->elementTextNotContains('xpath', '//div[@class="views-query-info"]//pre', 'db_condition_placeholder');
     // Verify that the placeholders in the views sql are replaced by the actual
     // values.
-    $this->assertSession()->elementTextContains('xpath', '//div[@class="views-query-info"]//pre', Database::getConnection()->escapeField("node_field_data.status") . " = '1'");
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $this->assertSession()->elementTextContains('xpath', '//div[@class="views-query-info"]//pre', '{s:6:"$match";a:1:{s:28:"node_current_revision.status";a:1:{s:3:"$eq";b:1;}}}');
+    }
+    else {
+      $this->assertSession()->elementTextContains('xpath', '//div[@class="views-query-info"]//pre', Database::getConnection()->escapeField("node_field_data.status") . " = '1'");
+    }
 
     // Test the advanced settings form.
 

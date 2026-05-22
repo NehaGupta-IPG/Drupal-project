@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Kernel\Views;
 
+use Drupal\Core\Database\Database;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
@@ -55,7 +56,9 @@ class ArgumentNodeRevisionIdTest extends ViewsKernelTestBase {
     $view_nid = Views::getView('test_node_revision_id_argument');
     $this->executeView($view_nid, [$second_revision_id]);
     $this->assertIdenticalResultset($view_nid, [['title' => 'test2']]);
-    $this->assertSame('test2', $view_nid->getTitle());
+    if (Database::getConnection()->driver() != 'mongodb') {
+      $this->assertSame('test2', $view_nid->getTitle());
+    }
   }
 
 }

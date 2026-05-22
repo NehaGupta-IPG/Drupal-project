@@ -43,7 +43,7 @@ class DistributionProfileTest extends InstallerTestBase {
     $path = $this->siteDirectory . '/profiles/my_distribution';
     mkdir($path, 0777, TRUE);
     file_put_contents("$path/my_distribution.info.yml", Yaml::encode($this->info));
-    file_put_contents("$path/my_distribution.install", "<?php function my_distribution_install() {\Drupal::entityTypeManager()->getStorage('path_alias')->create(['path' => '/user/1', 'alias' => '/root-user'])->save();}");
+    file_put_contents("$path/my_distribution.install", "<?php function my_distribution_install() {\Drupal::service('module_installer')->install(['path_alias']); \Drupal::entityTypeManager()->getStorage('path_alias')->create(['path' => '/user/1', 'alias' => '/root-user'])->save();}");
   }
 
   /**

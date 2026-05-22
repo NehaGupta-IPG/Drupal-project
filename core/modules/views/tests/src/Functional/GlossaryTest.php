@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Functional;
 
+use Drupal\Core\Database\Database;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
@@ -72,6 +73,54 @@ class GlossaryTest extends ViewTestBase {
     $this->container->get('router.builder')->rebuildIfNeeded();
     $url = Url::fromRoute('view.glossary.page_1');
 
+    $expected_tags = [
+      'config:views.view.glossary',
+      // Listed for letter 'a'
+      'node:' . $nodes_by_char['a'][0]->id(), 'node:' . $nodes_by_char['a'][1]->id(), 'node:' . $nodes_by_char['a'][2]->id(),
+      // Link for letter 'd'.
+      'node:1',
+      // Link for letter 'p'.
+      'node:16',
+      // Link for letter 'r'.
+      'node:2',
+      // Link for letter 'l'.
+      'node:21',
+      // Link for letter 'u'.
+      'node:6',
+      'node_list',
+      'user:0',
+      'user_list',
+      'http_response',
+      'rendered',
+      // FinishResponseSubscriber adds this cache tag to responses that have
+      // the 'user.permissions' cache context for anonymous users.
+      'config:user.role.anonymous',
+    ];
+
+    // Extra tags for MongoDB.
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $expected_tags = array_merge($expected_tags, [
+        'node:10',
+        'node:11',
+        'node:12',
+        'node:13',
+        'node:14',
+        'node:15',
+        'node:17',
+        'node:22',
+        'node:23',
+        'node:24',
+        'node:25',
+        'node:26',
+        'node:3',
+        'node:4',
+        'node:5',
+        'node:7',
+        'node:8',
+        'node:9',
+      ]);
+    }
+
     // Verify cache tags.
     $this->assertPageCacheContextsAndTags(
       $url,
@@ -84,29 +133,7 @@ class GlossaryTest extends ViewTestBase {
         'user.node_grants:view',
         'user.permissions',
       ],
-      [
-        'config:views.view.glossary',
-        // Listed for letter 'a'
-        'node:' . $nodes_by_char['a'][0]->id(), 'node:' . $nodes_by_char['a'][1]->id(), 'node:' . $nodes_by_char['a'][2]->id(),
-        // Link for letter 'd'.
-        'node:1',
-        // Link for letter 'p'.
-        'node:16',
-        // Link for letter 'r'.
-        'node:2',
-        // Link for letter 'l'.
-        'node:21',
-        // Link for letter 'u'.
-        'node:6',
-        'node_list',
-        'user:0',
-        'user_list',
-        'http_response',
-        'rendered',
-        // FinishResponseSubscriber adds this cache tag to responses that have
-        // the 'user.permissions' cache context for anonymous users.
-        'config:user.role.anonymous',
-      ]
+      $expected_tags,
     );
 
     // Check the actual page response.

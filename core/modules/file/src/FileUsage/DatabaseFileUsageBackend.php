@@ -48,7 +48,7 @@ class DatabaseFileUsageBackend extends FileUsageBase {
   public function add(FileInterface $file, $module, $type, $id, $count = 1) {
     $this->connection->merge($this->tableName)
       ->keys([
-        'fid' => $file->id(),
+        'fid' => (int) $file->id(),
         'module' => $module,
         'type' => $type,
         'id' => $id,
@@ -67,7 +67,7 @@ class DatabaseFileUsageBackend extends FileUsageBase {
     // Delete rows that have an exact or less value to prevent empty rows.
     $query = $this->connection->delete($this->tableName)
       ->condition('module', $module)
-      ->condition('fid', $file->id());
+      ->condition('fid', (int) $file->id());
     if ($type && $id) {
       $query
         ->condition('type', $type)
@@ -101,7 +101,7 @@ class DatabaseFileUsageBackend extends FileUsageBase {
   public function listUsage(FileInterface $file) {
     $result = $this->connection->select($this->tableName, 'f')
       ->fields('f', ['module', 'type', 'id', 'count'])
-      ->condition('fid', $file->id())
+      ->condition('fid', (int) $file->id())
       ->condition('count', 0, '>')
       ->execute();
     $references = [];

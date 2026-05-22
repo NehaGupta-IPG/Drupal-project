@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\image\Kernel\Views;
 
+use Drupal\Core\Database\Database;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
@@ -56,7 +57,12 @@ class ImageViewsDataTest extends ViewsKernelTestBase {
       'bundle' => 'entity_test',
     ])->save();
     // Check the generated views data.
-    $views_data = Views::viewsData()->get('entity_test__field_base_image');
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $views_data = Views::viewsData()->get('entity_test');
+    }
+    else {
+      $views_data = Views::viewsData()->get('entity_test__field_base_image');
+    }
     $relationship = $views_data['field_base_image_target_id']['relationship'];
     $this->assertEquals('standard', $relationship['id']);
     $this->assertEquals('file_managed', $relationship['base']);
@@ -86,7 +92,12 @@ class ImageViewsDataTest extends ViewsKernelTestBase {
       'bundle' => 'entity_test_mul',
     ])->save();
     // Check the generated views data.
-    $views_data = Views::viewsData()->get('entity_test_mul__field_data_image');
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $views_data = Views::viewsData()->get('entity_test_mul');
+    }
+    else {
+      $views_data = Views::viewsData()->get('entity_test_mul__field_data_image');
+    }
     $relationship = $views_data['field_data_image_target_id']['relationship'];
     $this->assertEquals('standard', $relationship['id']);
     $this->assertEquals('file_managed', $relationship['base']);

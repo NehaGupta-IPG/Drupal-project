@@ -2,11 +2,13 @@
 
 namespace Drupal\Core\KeyValueStore;
 
+use Drupal\Component\Assertion\Inspector;
 use Drupal\Component\Serialization\SerializationInterface;
 use Drupal\Core\Database\Query\Merge;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Drupal\mongodb\Driver\Database\mongodb\Statement;
 
 /**
  * Defines a default key/value store implementation.
@@ -40,6 +42,15 @@ class DatabaseStorage extends StorageBase {
   protected $table;
 
   /**
+   * Indicator for the existence of the database table.
+   *
+   *  This variable is only used by the database driver for MongoDB.
+   *
+   * @var bool
+   */
+  protected $tableExists = FALSE;
+
+  /**
    * Overrides Drupal\Core\KeyValueStore\StorageBase::__construct().
    *
    * @param string $collection
@@ -62,15 +73,32 @@ class DatabaseStorage extends StorageBase {
    * {@inheritdoc}
    */
   public function has($key) {
-    try {
-      return (bool) $this->connection->query('SELECT 1 FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :key', [
-        ':collection' => $this->collection,
-        ':key' => $key,
-      ])->fetchField();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
+    if ($this->connection->driver() == 'mongodb') {
+      $prefixed_table = $this->connection->getPrefix() . $this->table;
+      $cursor = $this->connection->getConnection()->selectCollection($prefixed_table)->find(
+        ['collection' => ['$eq' => (string) $this->collection], 'name' => ['$eq' => (string) $key]],
+        [
+          'projection' => ['_id' => 1],
+          'session' => $this->connection->getMongodbSession(),
+        ]
+      );
+
+      if ($cursor && !empty($cursor->toArray())) {
+        return TRUE;
+      }
       return FALSE;
+    }
+    else {
+      try {
+        return (bool) $this->connection->query('SELECT 1 FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :key', [
+          ':collection' => $this->collection,
+          ':key' => $key,
+        ])->fetchField();
+      }
+      catch (\Exception $e) {
+        $this->catchException($e);
+        return FALSE;
+      }
     }
   }
 
@@ -80,7 +108,33 @@ class DatabaseStorage extends StorageBase {
   public function getMultiple(array $keys) {
     $values = [];
     try {
-      $result = $this->connection->query('SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [name] IN ( :keys[] ) AND [collection] = :collection', [':keys[]' => $keys, ':collection' => $this->collection])->fetchAllAssoc('name');
+      if ($this->connection->driver() == 'mongodb') {
+        if (empty($keys)) {
+          return [];
+        }
+
+        // Check that key values are string values.
+        assert(Inspector::assertAllStrings($keys), 'All keys must be strings.');
+
+        $prefixed_table = $this->connection->getPrefix() . $this->table;
+        $cursor = $this->connection->getConnection()->selectCollection($prefixed_table)->find(
+          [
+            'collection' => ['$eq' => (string) $this->collection],
+            'name' => ['$in' => $keys],
+          ],
+          [
+            'projection' => ['name' => 1, 'value' => 1, '_id' => 0],
+            'session' => $this->connection->getMongodbSession(),
+          ],
+        );
+
+        $statement = new Statement($this->connection, $cursor, ['name', 'value']);
+        $result = $statement->execute()->fetchAllAssoc('name');
+
+      }
+      else {
+        $result = $this->connection->query('SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [name] IN ( :keys[] ) AND [collection] = :collection', [':keys[]' => $keys, ':collection' => $this->collection])->fetchAllAssoc('name');
+      }
       foreach ($keys as $key) {
         if (isset($result[$key])) {
           $values[$key] = $this->serializer->decode($result[$key]->value);
@@ -100,7 +154,22 @@ class DatabaseStorage extends StorageBase {
    */
   public function getAll() {
     try {
-      $result = $this->connection->query('SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection', [':collection' => $this->collection]);
+      if ($this->connection->driver() == 'mongodb') {
+        $prefixed_table = $this->connection->getPrefix() . $this->table;
+        $cursor = $this->connection->getConnection()->selectCollection($prefixed_table)->find(
+          ['collection' => ['$eq' => (string) $this->collection]],
+          [
+            'projection' => ['name' => 1, 'value' => 1, '_id' => 0],
+            'session' => $this->connection->getMongodbSession(),
+          ]
+        );
+
+        $statement = new Statement($this->connection, $cursor, ['name', 'value']);
+        $result = $statement->execute();
+      }
+      else {
+        $result = $this->connection->query('SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection', [':collection' => $this->collection]);
+      }
     }
     catch (\Exception $e) {
       $this->catchException($e);
@@ -140,6 +209,10 @@ class DatabaseStorage extends StorageBase {
    * {@inheritdoc}
    */
   public function set($key, $value) {
+    if (($this->connection->driver() == 'mongodb') && !$this->tableExists) {
+      $this->tableExists = $this->ensureTableExists();
+    }
+
     try {
       $this->doSet($key, $value);
     }
@@ -168,6 +241,10 @@ class DatabaseStorage extends StorageBase {
    *   TRUE if the data was set, FALSE if it already existed.
    */
   public function doSetIfNotExists($key, $value) {
+    if (($this->connection->driver() == 'mongodb') && !$this->tableExists) {
+      $this->tableExists = $this->ensureTableExists();
+    }
+
     $result = $this->connection->merge($this->table)
       ->insertFields([
         'collection' => $this->collection,
@@ -175,7 +252,7 @@ class DatabaseStorage extends StorageBase {
         'value' => $this->serializer->encode($value),
       ])
       ->condition('collection', $this->collection)
-      ->condition('name', $key)
+      ->condition('name', (string) $key)
       ->execute();
     return $result == Merge::STATUS_INSERT;
   }
@@ -202,11 +279,15 @@ class DatabaseStorage extends StorageBase {
    * {@inheritdoc}
    */
   public function rename($key, $new_key) {
+    if (($this->connection->driver() == 'mongodb') && !$this->tableExists) {
+      $this->tableExists = $this->ensureTableExists();
+    }
+
     try {
       $this->connection->update($this->table)
         ->fields(['name' => $new_key])
         ->condition('collection', $this->collection)
-        ->condition('name', $key)
+        ->condition('name', (string) $key)
         ->execute();
     }
     catch (\Exception $e) {
@@ -218,6 +299,14 @@ class DatabaseStorage extends StorageBase {
    * {@inheritdoc}
    */
   public function deleteMultiple(array $keys) {
+    if (($this->connection->driver() == 'mongodb') && !$this->tableExists) {
+      $this->tableExists = $this->ensureTableExists();
+
+      foreach ($keys as &$key) {
+        $key = (string) $key;
+      }
+    }
+
     // Delete in chunks when a large array is passed.
     while ($keys) {
       try {
@@ -236,6 +325,10 @@ class DatabaseStorage extends StorageBase {
    * {@inheritdoc}
    */
   public function deleteAll() {
+    if (($this->connection->driver() == 'mongodb') && !$this->tableExists) {
+      $this->tableExists = $this->ensureTableExists();
+    }
+
     try {
       $this->connection->delete($this->table)
         ->condition('collection', $this->collection)
@@ -290,8 +383,8 @@ class DatabaseStorage extends StorageBase {
   /**
    * Defines the schema for the key_value table.
    */
-  public static function schemaDefinition() {
-    return [
+  public function schemaDefinition() {
+    $schema = [
       'description' => 'Generic key-value storage table. See the state system for an example.',
       'fields' => [
         'collection' => [
@@ -317,6 +410,12 @@ class DatabaseStorage extends StorageBase {
       ],
       'primary key' => ['collection', 'name'],
     ];
+
+    if ($this->connection->driver() == 'mongodb') {
+      $schema['fields']['expire']['type'] = 'date';
+    }
+
+    return $schema;
   }
 
 }

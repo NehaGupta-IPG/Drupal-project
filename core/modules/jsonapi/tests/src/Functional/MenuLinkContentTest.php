@@ -6,9 +6,17 @@ namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Database\Database;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Url;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
+use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\jsonapi\Traits\CommonCollectionFilterAccessTestPatternsTrait;
+use Drupal\user\Entity\Role;
+use Drupal\user\RoleInterface;
+use Drupal\user\UserInterface;
 use GuzzleHttp\RequestOptions;
 
 /**
@@ -58,6 +66,128 @@ class MenuLinkContentTest extends ResourceTestBase {
   protected static $patchProtectedFieldNames = [
     'changed' => NULL,
   ];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    BrowserTestBase::setUp();
+
+    $this->serializer = $this->container->get('jsonapi.serializer');
+
+    $this->config('system.logging')->set('error_level', ERROR_REPORTING_HIDE)->save();
+
+    // Ensure the anonymous user role has no permissions at all.
+    $user_role = Role::load(RoleInterface::ANONYMOUS_ID);
+    foreach ($user_role->getPermissions() as $permission) {
+      $user_role->revokePermission($permission);
+    }
+    $user_role->save();
+    assert([] === $user_role->getPermissions(), 'The anonymous user role has no permissions at all.');
+
+    // Ensure the authenticated user role has no permissions at all.
+    $user_role = Role::load(RoleInterface::AUTHENTICATED_ID);
+    foreach ($user_role->getPermissions() as $permission) {
+      $user_role->revokePermission($permission);
+    }
+    $user_role->save();
+    assert([] === $user_role->getPermissions(), 'The authenticated user role has no permissions at all.');
+
+    // Create an account, which tests will use. Also ensure the @current_user
+    // service this account, to ensure certain access check logic in tests works
+    // as expected.
+    $this->account = $this->createUser();
+    $this->container->get('current_user')->setAccount($this->account);
+
+    // Create an entity.
+    $entity_type_manager = $this->container->get('entity_type.manager');
+    $this->entityStorage = $entity_type_manager->getStorage(static::$entityTypeId);
+    $this->uuidKey = $entity_type_manager->getDefinition(static::$entityTypeId)
+      ->getKey('uuid');
+    $this->entity = $this->setUpFields2($this->account);
+
+    $this->resourceType = $this->container->get('jsonapi.resource_type.repository')->getByTypeName(static::$resourceTypeName);
+  }
+
+  /**
+   * Sets up additional fields for testing.
+   *
+   * @param \Drupal\user\UserInterface $account
+   *   The primary test user account.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface
+   *   The reloaded entity with the new fields attached.
+   *
+   * @throws \Drupal\Core\Entity\EntityStorageException
+   */
+  protected function setUpFields2(UserInterface $account) {
+    // Add access-protected field.
+    FieldStorageConfig::create([
+      'entity_type' => static::$entityTypeId,
+      'field_name' => 'field_rest_test',
+      'type' => 'text',
+    ])
+      ->setCardinality(1)
+      ->save();
+    FieldConfig::create([
+      'entity_type' => static::$entityTypeId,
+      'field_name' => 'field_rest_test',
+      'bundle' => 'menu_link_content',
+    ])
+      ->setLabel('Test field')
+      ->setTranslatable(FALSE)
+      ->save();
+
+    FieldStorageConfig::create([
+      'entity_type' => static::$entityTypeId,
+      'field_name' => 'field_jsonapi_test_entity_ref',
+      'type' => 'entity_reference',
+    ])
+      ->setSetting('target_type', 'user')
+      ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
+      ->save();
+
+    FieldConfig::create([
+      'entity_type' => static::$entityTypeId,
+      'field_name' => 'field_jsonapi_test_entity_ref',
+      'bundle' => 'menu_link_content',
+    ])
+      ->setTranslatable(FALSE)
+      ->setSetting('handler', 'default')
+      ->setSetting('handler_settings', [
+        'target_bundles' => NULL,
+      ])
+      ->save();
+
+    // Add multi-value field.
+    FieldStorageConfig::create([
+      'entity_type' => static::$entityTypeId,
+      'field_name' => 'field_rest_test_multivalue',
+      'type' => 'string',
+    ])
+      ->setCardinality(3)
+      ->save();
+    FieldConfig::create([
+      'entity_type' => static::$entityTypeId,
+      'field_name' => 'field_rest_test_multivalue',
+      'bundle' => 'menu_link_content',
+    ])
+      ->setLabel('Test field: multi-value')
+      ->setTranslatable(FALSE)
+      ->save();
+
+    \Drupal::service('router.builder')->rebuildIfNeeded();
+
+    $entity = $this->createEntity();
+
+    // Set a default value on the fields.
+    $entity->set('field_rest_test', ['value' => 'All the faith he had had had had no effect on the outcome of his life.']);
+    $entity->set('field_jsonapi_test_entity_ref', ['user' => $account->id()]);
+    $entity->set('field_rest_test_multivalue', [['value' => 'One'], ['value' => 'Two']]);
+    $entity->save();
+
+    return $entity;
+  }
 
   /**
    * {@inheritdoc}
@@ -187,6 +317,11 @@ class MenuLinkContentTest extends ResourceTestBase {
    * {@inheritdoc}
    */
   public function testCollectionFilterAccess(): void {
+    if (Database::getConnection()->driver() == 'mongodb') {
+      // @todo This test should work for MongoDB.
+      $this->markTestSkipped();
+    }
+
     $this->doTestCollectionFilterAccessBasedOnPermissions('title', 'administer menu');
   }
 

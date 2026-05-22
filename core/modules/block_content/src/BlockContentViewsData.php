@@ -16,14 +16,23 @@ class BlockContentViewsData extends EntityViewsData {
 
     $data = parent::getViewsData();
 
-    $data['block_content_field_data']['id']['field']['id'] = 'field';
+    if ($this->connection->driver() == 'mongodb') {
+      $data_table = 'block_content';
+      $revision_table = 'block_content';
+    }
+    else {
+      $data_table = 'block_content_field_data';
+      $revision_table = 'block_content_field_revision';
+    }
 
-    $data['block_content_field_data']['info']['field']['id'] = 'field';
-    $data['block_content_field_data']['info']['field']['link_to_entity default'] = TRUE;
+    $data[$data_table]['id']['field']['id'] = 'field';
 
-    $data['block_content_field_data']['type']['field']['id'] = 'field';
+    $data[$data_table]['info']['field']['id'] = 'field';
+    $data[$data_table]['info']['field']['link_to_entity default'] = TRUE;
 
-    $data['block_content_field_data']['table']['wizard_id'] = 'block_content';
+    $data[$data_table]['type']['field']['id'] = 'field';
+
+    $data[$data_table]['table']['wizard_id'] = 'block_content';
 
     $data['block_content']['block_content_listing_empty'] = [
       'title' => $this->t('Empty block library behavior'),
@@ -33,8 +42,8 @@ class BlockContentViewsData extends EntityViewsData {
       ],
     ];
     // Advertise this table as a possible base table.
-    $data['block_content_field_revision']['table']['base']['help'] = $this->t('Block Content revision is a history of changes to block content.');
-    $data['block_content_field_revision']['table']['base']['defaults']['title'] = 'info';
+    $data[$revision_table]['table']['base']['help'] = $this->t('Block Content revision is a history of changes to block content.');
+    $data[$revision_table]['table']['base']['defaults']['title'] = 'info';
 
     return $data;
   }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\workspaces\Functional;
 
+use Drupal\Core\Database\Database;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\workspaces\Entity\Workspace;
 
@@ -31,6 +32,11 @@ class WorkspaceEntityDeleteTest extends BrowserTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+
+    if (Database::getConnection()->driver() == 'mongodb') {
+      // @todo Fix these tests for MongoDB.
+      $this->markTestSkipped();
+    }
 
     $this->createContentType(['type' => 'article', 'label' => 'Article']);
     $this->setupWorkspaceSwitcherBlock();

@@ -91,7 +91,7 @@ final class Recipe {
 
     $recipes = new RecipeConfigurator(is_array($recipe_data['recipes']) ? $recipe_data['recipes'] : [], dirname($path));
     $install = new InstallConfigurator($recipe_data['install'], \Drupal::service('extension.list.module'), \Drupal::service('extension.list.theme'));
-    $config = new ConfigConfigurator($recipe_data['config'], $path, \Drupal::service('config.storage'));
+    $config = new ConfigConfigurator($recipe_data['config'], $path, \Drupal::service('config.storage'), \Drupal::database());
     $input = new InputConfigurator($recipe_data['input'] ?? [], $recipes, basename($path), \Drupal::typedDataManager());
     $content = new Finder($path . '/content');
     return new static($recipe_data['name'], $recipe_data['description'], $recipe_data['type'], $recipes, $install, $config, $input, $content, $path, $recipe_data['extra'] ?? []);

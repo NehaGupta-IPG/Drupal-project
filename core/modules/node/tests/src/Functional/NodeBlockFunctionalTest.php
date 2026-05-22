@@ -10,6 +10,7 @@ use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Url;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\user\RoleInterface;
+use MongoDB\BSON\UTCDateTime;
 
 /**
  * Tests node block functionality.
@@ -96,18 +97,48 @@ class NodeBlockFunctionalTest extends NodeTestBase {
 
     $connection = Database::getConnection();
     // Change the changed time for node so that we can test ordering.
-    $connection->update('node_field_data')
-      ->fields([
-        'changed' => $node1->getChangedTime() + 100,
-      ])
-      ->condition('nid', $node2->id())
-      ->execute();
-    $connection->update('node_field_data')
-      ->fields([
-        'changed' => $node1->getChangedTime() + 200,
-      ])
-      ->condition('nid', $node3->id())
-      ->execute();
+    if ($connection->driver() == 'mongodb') {
+      $prefixed_table = $connection->getPrefix() . 'node';
+      $connection->getConnection()->selectCollection($prefixed_table)->updateMany(
+        [],
+        [
+          '$set' =>
+            ["node_current_revision.$[revision].changed" => new UTCDateTime(($node1->getChangedTime() + 100) * 1000)],
+        ],
+        [
+          'arrayFilters' => [
+            ["revision.nid" => (int) $node2->id()],
+          ],
+        ]
+      );
+      $connection->getConnection()->selectCollection($prefixed_table)->updateMany(
+        [],
+        [
+          '$set' =>
+            ["node_current_revision.$[revision].changed" => new UTCDateTime(($node1->getChangedTime() + 200) * 1000)],
+        ],
+        [
+          'arrayFilters' =>
+            [
+              ["revision.nid" => (int) $node3->id()],
+            ],
+        ],
+      );
+    }
+    else {
+      $connection->update('node_field_data')
+        ->fields([
+          'changed' => $node1->getChangedTime() + 100,
+        ])
+        ->condition('nid', $node2->id())
+        ->execute();
+      $connection->update('node_field_data')
+        ->fields([
+          'changed' => $node1->getChangedTime() + 200,
+        ])
+        ->condition('nid', $node3->id())
+        ->execute();
+    }
 
     // Test that a user without the 'access content' permission cannot
     // see the block.

@@ -20,6 +20,10 @@ final class RecipeConfigStorageWrapper implements StorageInterface {
    *   First config storage to wrap.
    * @param \Drupal\Core\Config\StorageInterface $storageB
    *   Second config storage to wrap.
+   * @param \Drupal\Core\Config\StorageInterface $storageDatabaseOverrideA
+   *   First database override config storage to wrap.
+   * @param \Drupal\Core\Config\StorageInterface $storageDatabaseOverrideB
+   *   Second database override config storage to wrap.
    * @param string $collection
    *   (optional) The collection to store configuration in. Defaults to the
    *   default collection.
@@ -27,6 +31,8 @@ final class RecipeConfigStorageWrapper implements StorageInterface {
   public function __construct(
     protected readonly StorageInterface $storageA,
     protected readonly StorageInterface $storageB,
+    protected readonly ?StorageInterface $storageDatabaseOverrideA = NULL,
+    protected readonly ?StorageInterface $storageDatabaseOverrideB = NULL,
     protected readonly string $collection = StorageInterface::DEFAULT_COLLECTION,
   ) {
   }
@@ -66,6 +72,10 @@ final class RecipeConfigStorageWrapper implements StorageInterface {
    * {@inheritdoc}
    */
   public function exists($name): bool {
+    if ($this->storageDatabaseOverrideA && $this->storageDatabaseOverrideB) {
+      return $this->storageA->exists($name) || $this->storageB->exists($name) || $this->storageDatabaseOverrideA->exists($name) || $this->storageDatabaseOverrideB->exists($name);
+    }
+
     return $this->storageA->exists($name) || $this->storageB->exists($name);
   }
 
@@ -73,7 +83,17 @@ final class RecipeConfigStorageWrapper implements StorageInterface {
    * {@inheritdoc}
    */
   public function read($name): array|bool {
-    return $this->storageA->read($name) ?: $this->storageB->read($name);
+    if ($this->storageDatabaseOverrideA && ($data = $this->storageDatabaseOverrideA->read($name))) {
+      return $data;
+    }
+    if ($data = $this->storageA->read($name)) {
+      return $data;
+    }
+    if ($this->storageDatabaseOverrideB && ($data = $this->storageDatabaseOverrideB->read($name))) {
+      return $data;
+    }
+
+    return $this->storageB->read($name);
   }
 
   /**
@@ -82,6 +102,10 @@ final class RecipeConfigStorageWrapper implements StorageInterface {
   public function readMultiple(array $names): array {
     // If both storageA and storageB contain the same configuration, the value
     // for storageA takes precedence.
+    if ($this->storageDatabaseOverrideA && $this->storageDatabaseOverrideB) {
+      return array_merge($this->storageB->readMultiple($names), $this->storageDatabaseOverrideB->readMultiple($names), $this->storageA->readMultiple($names), $this->storageDatabaseOverrideA->readMultiple($names));
+    }
+
     return array_merge($this->storageB->readMultiple($names), $this->storageA->readMultiple($names));
   }
 
@@ -124,6 +148,10 @@ final class RecipeConfigStorageWrapper implements StorageInterface {
    * {@inheritdoc}
    */
   public function listAll($prefix = ''): array {
+    if ($this->storageDatabaseOverrideA && $this->storageDatabaseOverrideB) {
+      return array_unique(array_merge($this->storageA->listAll($prefix), $this->storageB->listAll($prefix), $this->storageDatabaseOverrideA->listAll($prefix), $this->storageDatabaseOverrideB->listAll($prefix)));
+    }
+
     return array_unique(array_merge($this->storageA->listAll($prefix), $this->storageB->listAll($prefix)));
   }
 
@@ -138,9 +166,21 @@ final class RecipeConfigStorageWrapper implements StorageInterface {
    * {@inheritdoc}
    */
   public function createCollection($collection): static {
+    if ($this->storageDatabaseOverrideA && $this->storageDatabaseOverrideB) {
+      return new static(
+        $this->storageA->createCollection($collection),
+        $this->storageB->createCollection($collection),
+        $this->storageDatabaseOverrideA->createCollection($collection),
+        $this->storageDatabaseOverrideB->createCollection($collection),
+        $collection
+      );
+    }
+
     return new static(
       $this->storageA->createCollection($collection),
       $this->storageB->createCollection($collection),
+      NULL,
+      NULL,
       $collection
     );
   }
@@ -149,6 +189,10 @@ final class RecipeConfigStorageWrapper implements StorageInterface {
    * {@inheritdoc}
    */
   public function getAllCollectionNames(): array {
+    if ($this->storageDatabaseOverrideA && $this->storageDatabaseOverrideB) {
+      return array_unique(array_merge($this->storageA->getAllCollectionNames(), $this->storageB->getAllCollectionNames(), $this->storageDatabaseOverrideA->getAllCollectionNames(), $this->storageDatabaseOverrideB->getAllCollectionNames()));
+    }
+
     return array_unique(array_merge($this->storageA->getAllCollectionNames(), $this->storageB->getAllCollectionNames()));
   }
 

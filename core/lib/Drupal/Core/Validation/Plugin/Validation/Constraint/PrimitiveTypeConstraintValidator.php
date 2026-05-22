@@ -37,7 +37,9 @@ class PrimitiveTypeConstraintValidator extends ConstraintValidator {
     if ($typed_data instanceof BinaryInterface && !is_resource($value)) {
       $valid = FALSE;
     }
-    if ($typed_data instanceof BooleanInterface && !(is_bool($value) || $value === 0 || $value === '0' || $value === 1 || $value == '1')) {
+    // With MongoDB a boolean with the value FALSE is stored as an empty
+    // string.
+    if ($typed_data instanceof BooleanInterface && !(is_bool($value) || $value === 0 || $value === '0' || $value === 1 || $value == '1' || $value == '')) {
       $valid = FALSE;
     }
     if ($typed_data instanceof FloatInterface && filter_var($value, FILTER_VALIDATE_FLOAT) === FALSE) {

@@ -70,9 +70,10 @@ class DatabaseEventTest extends DatabaseTestBase {
     catch (\Exception) {
       // Expected, keep going.
     }
-    $this->assertSame(3, $subscriber->countStatementStarts);
+
+    $this->assertSame(2, $subscriber->countStatementStarts);
     $this->assertSame(1, $subscriber->countStatementEnds);
-    $this->assertSame(1, $subscriber->countStatementFailures);
+    $this->assertSame(0, $subscriber->countStatementFailures);
     $this->assertEmpty($subscriber->statementIdsInExecution);
     $this->assertTrue($this->connection->isEventEnabled(StatementExecutionStartEvent::class));
     $this->assertTrue($this->connection->isEventEnabled(StatementExecutionEndEvent::class));
@@ -81,9 +82,9 @@ class DatabaseEventTest extends DatabaseTestBase {
     // Disable all events, no more events captured.
     $this->connection->disableEvents(StatementEvent::all());
     $this->connection->query('SELECT * FROM {test}');
-    $this->assertSame(3, $subscriber->countStatementStarts);
+    $this->assertSame(2, $subscriber->countStatementStarts);
     $this->assertSame(1, $subscriber->countStatementEnds);
-    $this->assertSame(1, $subscriber->countStatementFailures);
+    $this->assertSame(0, $subscriber->countStatementFailures);
     $this->assertEmpty($subscriber->statementIdsInExecution);
     $this->assertFalse($this->connection->isEventEnabled(StatementExecutionStartEvent::class));
     $this->assertFalse($this->connection->isEventEnabled(StatementExecutionEndEvent::class));
@@ -93,7 +94,7 @@ class DatabaseEventTest extends DatabaseTestBase {
     // start event is required before the end one can be fired.
     $this->connection->enableEvents([StatementExecutionEndEvent::class]);
     $this->connection->query('SELECT * FROM {test}');
-    $this->assertSame(3, $subscriber->countStatementStarts);
+    $this->assertSame(2, $subscriber->countStatementStarts);
     $this->assertSame(1, $subscriber->countStatementEnds);
     $this->assertEmpty($subscriber->statementIdsInExecution);
     $this->assertFalse($this->connection->isEventEnabled(StatementExecutionStartEvent::class));

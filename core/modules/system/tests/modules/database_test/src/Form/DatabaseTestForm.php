@@ -39,7 +39,7 @@ class DatabaseTestForm extends FormBase {
     $query->condition('u.default_langcode', 1);
 
     $count_query = clone $query;
-    $count_query->addExpression('COUNT([u].[uid])');
+    $count_query->addExpressionCount('u.uid');
 
     $query = $query
       ->extend(PagerSelectExtender::class)

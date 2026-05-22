@@ -50,6 +50,10 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $this->markTestSkipped();
+    }
+
     $this->createMigrationConnection();
     $this->sourceDatabase = Database::getConnection('default', 'migrate_drupal_ui');
 

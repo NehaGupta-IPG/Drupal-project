@@ -155,6 +155,10 @@ class InsertTest extends DatabaseTestBase {
    * Tests that the INSERT INTO ... SELECT (fields) ... syntax works.
    */
   public function testInsertSelectFields(): void {
+    if ($this->connection->driver() == 'mongodb') {
+      $this->markTestSkipped('The MongoDB database driver does not support insert queries from select.');
+    }
+
     $query = $this->connection->select('test_people', 'tp');
     // The query builder will always append expressions after fields.
     // Add the expression first to test that the insert fields are correctly

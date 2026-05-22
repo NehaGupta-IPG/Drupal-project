@@ -6,6 +6,7 @@ namespace Drupal\Tests\block_content\Kernel\Views;
 
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
+use Drupal\Core\Database\Database;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
@@ -60,14 +61,26 @@ class FieldTypeTest extends ViewsKernelTestBase {
     ]);
     $block_content->save();
 
-    $expected_result[] = [
-      'id' => $block_content->id(),
-      'type' => $block_content->bundle(),
-    ];
-    $column_map = [
-      'id' => 'id',
-      'type:target_id' => 'type',
-    ];
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $expected_result[] = [
+        'revision_id' => $block_content->id(),
+        'type' => $block_content->bundle(),
+      ];
+      $column_map = [
+        'revision_id' => 'revision_id',
+        'type:target_id' => 'type',
+      ];
+    }
+    else {
+      $expected_result[] = [
+        'id' => $block_content->id(),
+        'type' => $block_content->bundle(),
+      ];
+      $column_map = [
+        'id' => 'id',
+        'type:target_id' => 'type',
+      ];
+    }
 
     $view = Views::getView('test_field_type');
     $this->executeView($view);

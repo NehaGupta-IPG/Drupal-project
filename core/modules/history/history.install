@@ -5,6 +5,8 @@
  * Installation functions for History module.
  */
 
+use Drupal\Core\Database\Database;
+
 /**
  * Implements hook_schema().
  */
@@ -38,6 +40,10 @@ function history_schema(): array {
       'nid' => ['nid'],
     ],
   ];
+
+  if (Database::getConnection()->driver() == 'mongodb') {
+    $schema['history']['fields']['timestamp']['type'] = 'date';
+  }
 
   return $schema;
 }

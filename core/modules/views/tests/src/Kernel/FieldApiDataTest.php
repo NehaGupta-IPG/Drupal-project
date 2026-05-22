@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel;
 
+use Drupal\Core\Database\Database;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -112,46 +113,60 @@ class FieldApiDataTest extends ViewsKernelTestBase {
       ->getStorage('node')
       ->getTableMapping();
 
-    $current_table = $table_mapping->getDedicatedDataTableName($field_storage_string);
-    $revision_table = $table_mapping->getDedicatedRevisionTableName($field_storage_string);
     $data = $this->getViewsData();
 
-    $this->assertArrayHasKey($current_table, $data);
-    $this->assertArrayHasKey($revision_table, $data);
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $current_table = 'node';
+    }
+    else {
+      $current_table = $table_mapping->getDedicatedDataTableName($field_storage_string);
+      $revision_table = $table_mapping->getDedicatedRevisionTableName($field_storage_string);
 
-    // The node field should join against node_field_data.
-    $this->assertArrayHasKey('node_field_data', $data[$current_table]['table']['join']);
-    $this->assertArrayHasKey('node_field_revision', $data[$revision_table]['table']['join']);
+      $this->assertArrayHasKey($current_table, $data);
+      $this->assertArrayHasKey($revision_table, $data);
 
-    $expected_join = [
-      'table' => $current_table,
-      'left_field' => 'nid',
-      'field' => 'entity_id',
-      'extra' => [
-        ['field' => 'deleted', 'value' => 0, 'numeric' => TRUE],
-        ['left_field' => 'langcode', 'field' => 'langcode'],
-      ],
-    ];
-    $this->assertSame($expected_join, $data[$current_table]['table']['join']['node_field_data']);
-    $expected_join = [
-      'table' => $revision_table,
-      'left_field' => 'vid',
-      'field' => 'revision_id',
-      'extra' => [
-        ['field' => 'deleted', 'value' => 0, 'numeric' => TRUE],
-        ['left_field' => 'langcode', 'field' => 'langcode'],
-      ],
-    ];
-    $this->assertSame($expected_join, $data[$revision_table]['table']['join']['node_field_revision']);
+      // The node field should join against node_field_data.
+      $this->assertArrayHasKey('node_field_data', $data[$current_table]['table']['join']);
+      $this->assertArrayHasKey('node_field_revision', $data[$revision_table]['table']['join']);
+
+      $expected_join = [
+        'table' => $current_table,
+        'left_field' => 'nid',
+        'field' => 'entity_id',
+        'extra' => [
+          ['field' => 'deleted', 'value' => 0, 'numeric' => TRUE],
+          ['left_field' => 'langcode', 'field' => 'langcode'],
+        ],
+      ];
+      $this->assertSame($expected_join, $data[$current_table]['table']['join']['node_field_data']);
+      $expected_join = [
+        'table' => $revision_table,
+        'left_field' => 'vid',
+        'field' => 'revision_id',
+        'extra' => [
+          ['field' => 'deleted', 'value' => 0, 'numeric' => TRUE],
+          ['left_field' => 'langcode', 'field' => 'langcode'],
+        ],
+      ];
+      $this->assertSame($expected_join, $data[$revision_table]['table']['join']['node_field_revision']);
+    }
 
     // Test click sortable for string field.
     $this->assertTrue($data[$current_table][$field_storage_string->getName()]['field']['click sortable']);
-    // Click sort should only be on the primary field.
-    $this->assertArrayNotHasKey($field_storage_string->getName(), $data[$revision_table]);
+    if (Database::getConnection()->driver() != 'mongodb') {
+      // Click sort should only be on the primary field.
+      $this->assertArrayNotHasKey($field_storage_string->getName(), $data[$revision_table]);
+    }
     // Test click sortable for long text field.
     $data_long = $this->getViewsData('field_string_long');
-    $current_table_long = $table_mapping->getDedicatedDataTableName($field_storage_string_long);
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $current_table_long = 'node';
+    }
+    else {
+      $current_table_long = $table_mapping->getDedicatedDataTableName($field_storage_string_long);
+    }
     $this->assertTrue($data_long[$current_table_long][$field_storage_string_long->getName()]['field']['click sortable']);
+    $this->assertTrue($data_long['node'][$field_storage_string_long->getName()]['field']['click sortable']);
 
     $this->assertInstanceOf(MarkupInterface::class, $data[$current_table][$field_storage_string->getName()]['help']);
     $this->assertEquals('Appears in: page, article. Also known as: Content: GiraffeB&quot; label', $data[$current_table][$field_storage_string->getName()]['help']);
@@ -195,17 +210,23 @@ class FieldApiDataTest extends ViewsKernelTestBase {
    */
   protected function getViewsData($field_storage_key = 'field_string'): array {
     $views_data = $this->container->get('views.views_data');
-    $data = [];
 
-    // Check the table and the joins of the first field. Attached to node only.
-    /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
-    $table_mapping = $this->container->get('entity_type.manager')->getStorage('node')->getTableMapping();
-    $field_storage = FieldStorageConfig::loadByName('node', $field_storage_key);
-    $current_table = $table_mapping->getDedicatedDataTableName($field_storage);
-    $revision_table = $table_mapping->getDedicatedRevisionTableName($field_storage);
-    $data[$current_table] = $views_data->get($current_table);
-    $data[$revision_table] = $views_data->get($revision_table);
-    return $data;
+    if (Database::getConnection()->driver() == 'mongodb') {
+      return ['node' => $views_data->get('node')];
+    }
+    else {
+      $data = [];
+
+      // Check the table and the joins of the first field. Attached to node only.
+      /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
+      $table_mapping = $this->container->get('entity_type.manager')->getStorage('node')->getTableMapping();
+      $field_storage = FieldStorageConfig::loadByName('node', $field_storage_key);
+      $current_table = $table_mapping->getDedicatedDataTableName($field_storage);
+      $revision_table = $table_mapping->getDedicatedRevisionTableName($field_storage);
+      $data[$current_table] = $views_data->get($current_table);
+      $data[$revision_table] = $views_data->get($revision_table);
+      return $data;
+    }
   }
 
   /**

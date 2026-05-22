@@ -19,7 +19,7 @@ class GenericTestExistsTest extends UnitTestCase {
   /**
    * Lists module that do not require a Generic test.
    */
-  protected $modulesNoTest = ['help_topics', 'sdc'];
+  protected $modulesNoTest = ['help_topics', 'sdc', 'mongodb'];
 
   /**
    * Tests that the Generic module test exists for all modules.

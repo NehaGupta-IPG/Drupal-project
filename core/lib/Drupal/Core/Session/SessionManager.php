@@ -202,7 +202,7 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
     // The sessions table may not have been created yet.
     try {
       $this->connection->delete('sessions')
-        ->condition('uid', $uid)
+        ->condition('uid', (int) $uid)
         ->execute();
     }
     catch (\Exception) {

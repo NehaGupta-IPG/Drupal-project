@@ -37,10 +37,17 @@ class ContentTranslationSettingsApiTest extends KernelTestBase {
    */
   public function testSettingsApi(): void {
     $this->container->get('content_translation.manager')->setEnabled('entity_test_mul', 'entity_test_mul', TRUE);
-    $schema = Database::getConnection()->schema();
-    $result =
-      $schema->fieldExists('entity_test_mul_property_data', 'content_translation_source') &&
-      $schema->fieldExists('entity_test_mul_property_data', 'content_translation_outdated');
+    $connection = Database::getConnection();
+    if ($connection->driver() == 'mongodb') {
+      $result =
+        $connection->tableInformation()->getTableField('entity_test_mul_translations', 'content_translation_source') &&
+        $connection->tableInformation()->getTableField('entity_test_mul_translations', 'content_translation_outdated');
+    }
+    else {
+      $result =
+        $connection->schema()->fieldExists('entity_test_mul_property_data', 'content_translation_source') &&
+        $connection->schema()->fieldExists('entity_test_mul_property_data', 'content_translation_outdated');
+    }
     $this->assertTrue($result, 'Schema updates correctly performed.');
   }
 

@@ -4,6 +4,7 @@ namespace Drupal\Core\Cache;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
+use Drupal\mongodb\Driver\Database\mongodb\Statement;
 
 /**
  * Cache tags invalidations checksum implementation that uses the database.
@@ -35,11 +36,24 @@ class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTags
   protected function doInvalidateTags(array $tags) {
     try {
       foreach ($tags as $tag) {
-        $this->connection->merge('cachetags')
-          ->insertFields(['invalidations' => 1])
-          ->expression('invalidations', '[invalidations] + 1')
-          ->key('tag', $tag)
-          ->execute();
+        if ($this->connection->driver() == 'mongodb') {
+          $prefixed_table = $this->connection->getPrefix() . 'cachetags';
+          $this->connection->getConnection()->selectCollection($prefixed_table)->updateOne(
+            ['tag' => $tag],
+            ['$inc' => ['invalidations' => 1]],
+            [
+              'upsert' => TRUE,
+              'session' => $this->connection->getMongodbSession(),
+            ],
+          );
+        }
+        else {
+          $this->connection->merge('cachetags')
+            ->insertFields(['invalidations' => 1])
+            ->expression('invalidations', '[invalidations] + 1')
+            ->key('tag', $tag)
+            ->execute();
+        }
       }
     }
     catch (\Exception $e) {
@@ -57,8 +71,22 @@ class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTags
    */
   protected function getTagInvalidationCounts(array $tags) {
     try {
-      return $this->connection->query('SELECT [tag], [invalidations] FROM {cachetags} WHERE [tag] IN ( :tags[] )', [':tags[]' => $tags])
-        ->fetchAllKeyed();
+      if ($this->connection->driver() == 'mongodb') {
+        $prefixed_table = $this->connection->getPrefix() . 'cachetags';
+        $cursor = $this->connection->getConnection()->selectCollection($prefixed_table)->find(
+          ['tag' => ['$in' => array_values($tags)]],
+          [
+            'projection' => ['tag' => 1, 'invalidations' => 1, '_id' => 0],
+            'session' => $this->connection->getMongodbSession(),
+          ],
+        );
+        $statement = new Statement($this->connection, $cursor, ['tag', 'invalidations']);
+        return $statement->execute()->fetchAllKeyed();
+      }
+      else {
+        return $this->connection->query('SELECT [tag], [invalidations] FROM {cachetags} WHERE [tag] IN ( :tags[] )', [':tags[]' => $tags])
+          ->fetchAllKeyed();
+      }
     }
     catch (\Exception $e) {
       // If the table does not exist yet, create.

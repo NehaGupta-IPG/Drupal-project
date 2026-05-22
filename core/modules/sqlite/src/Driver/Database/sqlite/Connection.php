@@ -424,8 +424,8 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public static function createConnectionOptionsFromUrl($url, $root) {
-    $database = parent::createConnectionOptionsFromUrl($url, $root);
+  public static function createConnectionOptionsFromUrl($url, $root, $hosts = '') {
+    $database = parent::createConnectionOptionsFromUrl($url, $root, $hosts);
 
     // A SQLite database path with two leading slashes indicates a system path.
     // Otherwise the path is relative to the Drupal root.

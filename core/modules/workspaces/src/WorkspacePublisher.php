@@ -45,7 +45,20 @@ class WorkspacePublisher implements WorkspacePublisherInterface {
     }
 
     try {
-      $transaction = $this->database->startTransaction();
+      if ($this->database->driver() == 'mongodb') {
+        $session = $this->database->getMongodbSession();
+        $session_started = FALSE;
+        if (!$session->isInTransaction()) {
+          $session->startTransaction();
+          $session_started = TRUE;
+        }
+      }
+      else {
+        $transaction = $this->database->startTransaction();
+      }
+
+      // @todo Handle the publishing of a workspace with a batch operation in
+      //   https://www.drupal.org/node/2958752.
       $this->workspaceManager->executeOutsideWorkspace(function () use ($tracked_entities) {
         $max_execution_time = ini_get('max_execution_time');
         $step_size = Settings::get('entity_update_batch_size', 50);
@@ -82,10 +95,17 @@ class WorkspacePublisher implements WorkspacePublisherInterface {
           }
         }
       });
+
+      if (isset($session) && $session->isInTransaction() && $session_started) {
+        $session->commitTransaction();
+      }
     }
     catch (\Exception $e) {
       if (isset($transaction)) {
         $transaction->rollBack();
+      }
+      if (isset($session) && $session->isInTransaction() && $session_started) {
+        $session->abortTransaction();
       }
       Error::logException($this->logger, $e);
       throw $e;

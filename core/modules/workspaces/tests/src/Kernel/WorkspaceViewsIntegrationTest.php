@@ -104,6 +104,10 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
    * @covers \Drupal\workspaces\ViewsQueryAlter::getRevisionTableJoin
    */
   public function testViewsQueryAlter(): void {
+    if (\Drupal::database()->driver() == 'mongodb') {
+      $this->markTestSkipped('The MongoDB database driver does not support the workspace views query alter functionality.');
+    }
+
     // Create a test entity and two nodes.
     $test_entity = \Drupal::entityTypeManager()
       ->getStorage('entity_test_mulrevpub')

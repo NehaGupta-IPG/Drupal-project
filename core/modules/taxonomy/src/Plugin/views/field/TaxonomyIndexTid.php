@@ -62,10 +62,22 @@ class TaxonomyIndexTid extends PrerenderList {
 
     // @todo Wouldn't it be possible to use $this->base_table and no if here?
     if ($view->storage->get('base_table') == 'node_field_revision') {
-      $this->additional_fields['nid'] = ['table' => 'node_field_revision', 'field' => 'nid'];
+      if ($this->view->getDatabaseDriver() == 'mongodb') {
+        $table = 'node';
+      }
+      else {
+        $table = 'node_field_revision';
+      }
+      $this->additional_fields['nid'] = ['table' => $table, 'field' => 'nid'];
     }
     else {
-      $this->additional_fields['nid'] = ['table' => 'node_field_data', 'field' => 'nid'];
+      if ($this->view->getDatabaseDriver() == 'mongodb') {
+        $table = 'node';
+      }
+      else {
+        $table = 'node_field_data';
+      }
+      $this->additional_fields['nid'] = ['table' => $table, 'field' => 'nid'];
     }
   }
 

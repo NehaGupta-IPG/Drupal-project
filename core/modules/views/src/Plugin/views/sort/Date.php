@@ -74,7 +74,20 @@ class Date extends SortPluginBase {
     }
 
     // Add the field.
-    $this->query->addOrderBy(NULL, $formula, $this->options['order'], $this->tableAlias . '_' . $this->field . '_' . $this->options['granularity']);
+    if ($this->view->getDatabaseDriver() == 'mongodb') {
+      $placeholder = $this->placeholder();
+      if ($this->getPluginId() == 'datetime') {
+        $this->query->addDateStringFormattedField($placeholder, $this->realField, $formula);
+      }
+      else {
+        $this->query->addDateDateFormattedField($placeholder, $this->realField, $formula);
+      }
+      $this->query->addOrderBy($this->tableAlias, $placeholder, $this->options['order']);
+    }
+    else {
+      // Add the field.
+      $this->query->addOrderBy(NULL, $formula, $this->options['order'], $this->tableAlias . '_' . $this->field . '_' . $this->options['granularity']);
+    }
   }
 
 }

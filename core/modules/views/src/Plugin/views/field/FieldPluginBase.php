@@ -232,7 +232,24 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
           $this->aliases[$identifier] = $this->query->addField($table_alias, $info['field'], NULL, $params);
         }
         else {
-          $this->aliases[$info] = $this->query->addField($this->tableAlias, $info, NULL, $group_params);
+          if ($this->view->getDatabaseDriver() == 'mongodb') {
+            $real_field_last_part = '';
+            if (!empty($this->realField)) {
+              $real_field_parts = explode('.', $this->realField);
+              $real_field_last_part = end($real_field_parts);
+            }
+
+            if (!empty($real_field_last_part) && ($real_field_last_part == $info)) {
+              $alias = $this->tableAlias . '_' . str_replace('.', '_', $info);
+              $this->aliases[$info] = $this->query->addField($this->tableAlias, $this->realField, $alias, $group_params);
+            }
+            else {
+              $this->aliases[$info] = $this->query->addField($this->tableAlias, $info, NULL, $group_params);
+            }
+          }
+          else {
+            $this->aliases[$info] = $this->query->addField($this->tableAlias, $info, NULL, $group_params);
+          }
         }
       }
     }

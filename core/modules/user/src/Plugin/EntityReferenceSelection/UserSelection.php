@@ -2,6 +2,7 @@
 
 namespace Drupal\user\Plugin\EntityReferenceSelection;
 
+use Daffie\SqlLikeToRegularExpression;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\Attribute\EntityReferenceSelection;
@@ -178,7 +179,7 @@ class UserSelection extends DefaultSelection {
     // Adding the permission check is sadly insufficient for users: core
     // requires us to also know about the concept of 'blocked' and 'active'.
     if (!$this->currentUser->hasPermission('administer users')) {
-      $query->condition('status', 1);
+      $query->condition('status', TRUE);
     }
     return $query;
   }
@@ -236,7 +237,7 @@ class UserSelection extends DefaultSelection {
       // database.
       $conditions = &$query->conditions();
       foreach ($conditions as $key => $condition) {
-        if ($key !== '#conjunction' && is_string($condition['field']) && $condition['field'] === 'users_field_data.name') {
+        if ($key !== '#conjunction' && is_string($condition['field']) && (($condition['field'] === 'users_field_data.name') || ($condition['field'] === 'user_translations.name'))) {
           // Remove the condition.
           unset($conditions[$key]);
 
@@ -245,18 +246,31 @@ class UserSelection extends DefaultSelection {
           // WHERE (name LIKE :name) OR (:anonymous_name LIKE :name AND uid = 0)
           $or = $this->connection->condition('OR');
           $or->condition($condition['field'], $condition['value'], $condition['operator']);
-          // Sadly, the Database layer doesn't allow us to build a condition
-          // in the form ':placeholder = :placeholder2', because the 'field'
-          // part of a condition is always escaped.
-          // As a (cheap) workaround, we separately build a condition with no
-          // field, and concatenate the field and the condition separately.
-          $value_part = $this->connection->condition('AND');
-          $value_part->condition('anonymous_name', $condition['value'], $condition['operator']);
-          $value_part->compile($this->connection, $query);
-          $or->condition(($this->connection->condition('AND'))
-            ->where(str_replace($query->escapeField('anonymous_name'), ':anonymous_name', (string) $value_part), $value_part->arguments() + [':anonymous_name' => \Drupal::config('user.settings')->get('anonymous')])
-            ->condition('base_table.uid', 0)
-          );
+
+          if ($condition['field'] === 'user_translations.name') {
+            $pattern = SqlLikeToRegularExpression::convert($condition['value']);
+            preg_match('/' . $pattern . '/i', \Drupal::config('user.settings')->get('anonymous'), $matches);
+            if ($matches) {
+              $or->condition('uid', 0);
+            }
+          }
+          else {
+            // Sadly, the Database layer doesn't allow us to build a condition
+            // in the form ':placeholder = :placeholder2', because the 'field'
+            // part of a condition is always escaped.
+            // As a (cheap) workaround, we separately build a condition with no
+            // field, and concatenate the field and the condition separately.
+            $value_part = $this->connection->condition('AND');
+            $value_part->condition('anonymous_name', $condition['value'], $condition['operator']);
+            $value_part->compile($this->connection, $query);
+            $or->condition(($this->connection->condition('AND'))
+              ->where(str_replace($query->escapeField('anonymous_name'), ':anonymous_name', (string) $value_part), $value_part->arguments() + [
+                ':anonymous_name' => \Drupal::config('user.settings')->get('anonymous'),
+              ])
+              ->condition('base_table.uid', 0)
+            );
+          }
+
           $query->condition($or);
         }
       }

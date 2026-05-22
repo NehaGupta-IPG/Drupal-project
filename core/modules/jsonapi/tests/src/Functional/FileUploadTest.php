@@ -8,6 +8,7 @@ use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Database\Database;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTest;
@@ -239,7 +240,7 @@ class FileUploadTest extends ResourceTestBase {
     $this->assertSame([
       [
         'target_id' => '1',
-        'display' => NULL,
+        'display' => (Database::getConnection()->driver() == 'mongodb' ? 1 : NULL),
         'description' => "The most fascinating file ever!",
       ],
     ], EntityTest::load(2)->get('field_rest_file_test')->getValue());

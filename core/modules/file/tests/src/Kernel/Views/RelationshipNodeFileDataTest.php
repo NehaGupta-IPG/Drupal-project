@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\Kernel\Views;
 
+use Drupal\Core\Database\Database;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\file\Entity\File;
 use Drupal\file\FileInterface;
@@ -178,13 +179,24 @@ class RelationshipNodeFileDataTest extends ViewsKernelTestBase {
     // We should only see a single file, the one on the user account. The other
     // account's UUID, nor the other unlinked file, should appear in the
     // results.
-    $expected_result = [
-      [
-        'fid' => $file2->id(),
-        'nid' => $node2->id(),
-      ],
-    ];
-    $column_map = ['fid' => 'fid', 'nid' => 'nid'];
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $expected_result = [
+        [
+          'file_managed_file_usage_fid' => $file2->id(),
+          'vid' => $node2->id(),
+        ],
+      ];
+      $column_map = ['file_managed_file_usage_fid' => 'file_managed_file_usage_fid', 'vid' => 'vid'];
+    }
+    else {
+      $expected_result = [
+        [
+          'fid' => $file2->id(),
+          'nid' => $node2->id(),
+        ],
+      ];
+      $column_map = ['fid' => 'fid', 'nid' => 'nid'];
+    }
     $this->assertIdenticalResultset($view, $expected_result, $column_map);
   }
 

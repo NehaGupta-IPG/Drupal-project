@@ -5,6 +5,7 @@ namespace Drupal\Core\Config;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Drupal\mongodb\Driver\Database\mongodb\Statement;
 
 /**
  * Defines the Database storage.
@@ -41,6 +42,15 @@ class DatabaseStorage implements StorageInterface {
   protected $collection = StorageInterface::DEFAULT_COLLECTION;
 
   /**
+   * Indicator for the existence of the database table.
+   *
+   *  This variable is only used by the database driver for MongoDB.
+   *
+   * @var bool
+   */
+  protected $tableExists = FALSE;
+
+  /**
    * Constructs a new DatabaseStorage.
    *
    * @param \Drupal\Core\Database\Connection $connection
@@ -64,19 +74,40 @@ class DatabaseStorage implements StorageInterface {
    * {@inheritdoc}
    */
   public function exists($name) {
-    try {
-      return (bool) $this->connection->queryRange('SELECT 1 FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :name', 0, 1, [
-        ':collection' => $this->collection,
-        ':name' => $name,
-      ], $this->options)->fetchField();
-    }
-    catch (\Exception $e) {
-      if ($this->connection->schema()->tableExists($this->table)) {
-        throw $e;
+    if ($this->connection->driver() == 'mongodb') {
+      $prefixed_table = $this->connection->getPrefix() . $this->table;
+      $cursor = $this->connection->getConnection()->selectCollection($prefixed_table)->find(
+        [
+          'collection' => ['$eq' => $this->collection],
+          'name' => ['$eq' => $name],
+        ],
+        [
+          'projection' => ['_id' => 1],
+          'session' => $this->connection->getMongodbSession(),
+        ]
+      );
+
+      if ($cursor && !empty($cursor->toArray())) {
+        return TRUE;
       }
-      // If we attempt a read without actually having the table available,
-      // return false so the caller can handle it.
+
       return FALSE;
+    }
+    else {
+      try {
+        return (bool) $this->connection->queryRange('SELECT 1 FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :name', 0, 1, [
+          ':collection' => $this->collection,
+          ':name' => $name,
+        ], $this->options)->fetchField();
+      }
+      catch (\Exception $e) {
+        if ($this->connection->schema()->tableExists($this->table)) {
+          throw $e;
+        }
+        // If we attempt a read without actually having the table available,
+        // return false so the caller can handle it.
+        return FALSE;
+      }
     }
   }
 
@@ -86,7 +117,22 @@ class DatabaseStorage implements StorageInterface {
   public function read($name) {
     $data = FALSE;
     try {
-      $raw = $this->connection->query('SELECT [data] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :name', [':collection' => $this->collection, ':name' => $name], $this->options)->fetchField();
+      if ($this->connection->driver() == 'mongodb') {
+        $prefixed_table = $this->connection->getPrefix() . $this->table;
+        $cursor = $this->connection->getConnection()->selectCollection($prefixed_table)->find(
+          ['collection' => ['$eq' => $this->collection], 'name' => ['$eq' => $name]],
+          ['projection' => ['data' => 1, '_id' => 0]]
+        );
+
+        $statement = new Statement($this->connection, $cursor, ['data']);
+        $raw = $statement->execute()->fetchField();
+      }
+      else {
+        $raw = $this->connection->query('SELECT [data] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :name', [
+          ':collection' => $this->collection,
+          ':name' => $name,
+        ], $this->options)->fetchField();
+      }
       if ($raw !== FALSE) {
         $data = $this->decode($raw);
       }
@@ -111,7 +157,22 @@ class DatabaseStorage implements StorageInterface {
 
     $list = [];
     try {
-      $list = $this->connection->query('SELECT [name], [data] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] IN ( :names[] )', [':collection' => $this->collection, ':names[]' => $names], $this->options)->fetchAllKeyed();
+      if ($this->connection->driver() == 'mongodb') {
+        $prefixed_table = $this->connection->getPrefix() . $this->table;
+        $cursor = $this->connection->getConnection()->selectCollection($prefixed_table)->find(
+          ['collection' => ['$eq' => $this->collection], 'name' => ['$in' => $names]],
+          [
+            'projection' => ['name' => 1, 'data' => 1, '_id' => 0],
+            'session' => $this->connection->getMongodbSession(),
+          ]
+        );
+
+        $statement = new Statement($this->connection, $cursor, ['name', 'data']);
+        $list = $statement->execute()->fetchAllKeyed();
+      }
+      else {
+        $list = $this->connection->query('SELECT [name], [data] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] IN ( :names[] )', [':collection' => $this->collection, ':names[]' => $names], $this->options)->fetchAllKeyed();
+      }
       foreach ($list as &$data) {
         $data = $this->decode($data);
       }
@@ -131,16 +192,27 @@ class DatabaseStorage implements StorageInterface {
    */
   public function write($name, array $data) {
     $data = $this->encode($data);
-    try {
+    if ($this->connection->driver() == 'mongodb') {
+      // For MongoDB the table needs to exist. Otherwise MongoDB creates one
+      // without the correct validation.
+      if (!$this->tableExists) {
+        $this->tableExists = $this->ensureTableExists();
+      }
+
       return $this->doWrite($name, $data);
     }
-    catch (\Exception $e) {
-      // If there was an exception, try to create the table.
-      if ($this->ensureTableExists()) {
+    else {
+      try {
         return $this->doWrite($name, $data);
       }
-      // Some other failure that we can not recover from.
-      throw new StorageException($e->getMessage(), 0, $e);
+      catch (\Exception $e) {
+        // If there was an exception, try to create the table.
+        if ($this->ensureTableExists()) {
+          return $this->doWrite($name, $data);
+        }
+        // Some other failure that we can not recover from.
+        throw new StorageException($e->getMessage(), 0, $e);
+      }
     }
   }
 
@@ -277,7 +349,12 @@ class DatabaseStorage implements StorageInterface {
       $query->condition('collection', $this->collection, '=');
       $query->condition('name', $prefix . '%', 'LIKE');
       $query->orderBy('collection')->orderBy('name');
-      return $query->execute()->fetchCol();
+      $list = $query->execute()->fetchCol();
+      if ($this->connection->driver() == 'mongodb') {
+        // MongoDB does not remove duplicate values from the list.
+        return array_unique($list);
+      }
+      return $list;
     }
     catch (\Exception $e) {
       if ($this->connection->schema()->tableExists($this->table)) {
@@ -333,9 +410,24 @@ class DatabaseStorage implements StorageInterface {
    */
   public function getAllCollectionNames() {
     try {
-      return $this->connection->query('SELECT DISTINCT [collection] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] <> :collection ORDER by [collection]', [
-        ':collection' => StorageInterface::DEFAULT_COLLECTION,
-      ])->fetchCol();
+      if ($this->connection->driver() == 'mongodb') {
+        $prefixed_table = $this->connection->getPrefix() . $this->table;
+        $collections = $this->connection->getConnection()->selectCollection($prefixed_table)->distinct(
+          'collection',
+          ['collection' => ['$ne' => StorageInterface::DEFAULT_COLLECTION]],
+          ['session' => $this->connection->getMongodbSession()]
+        );
+
+        // The distinct query does not allow sorting.
+        sort($collections);
+
+        return $collections;
+      }
+      else {
+        return $this->connection->query('SELECT DISTINCT [collection] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] <> :collection ORDER by [collection]', [
+          ':collection' => StorageInterface::DEFAULT_COLLECTION,
+        ])->fetchCol();
+      }
     }
     catch (\Exception $e) {
       if ($this->connection->schema()->tableExists($this->table)) {

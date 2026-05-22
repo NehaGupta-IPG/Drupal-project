@@ -58,7 +58,7 @@ class AlterTest extends DatabaseTestBase {
     $tid_field = $query->addField('test_task', 'tid');
     $pid_field = $query->addField('test_task', 'pid');
     $task_field = $query->addField('test_task', 'task');
-    $people_alias = $query->join('test', 'people', "[test_task].[pid] = [people].[id]");
+    $people_alias = $query->join('test', 'people', $query->joinCondition()->compare('test_task.pid', 'people.id'));
     $name_field = $query->addField($people_alias, 'name', 'name');
     $query->condition('test_task.tid', '1');
     $query->orderBy($tid_field);
@@ -94,6 +94,13 @@ class AlterTest extends DatabaseTestBase {
    * Tests that we can alter expressions in the query.
    */
   public function testAlterExpression(): void {
+    if ($this->connection->driver() == 'mongodb') {
+      // The MongoDB database driver does not throw this exception by default.
+      // Adding this functionality will require to do a table exists on every
+      // select query. The performance will be greatly reduced.
+      $this->markTestSkipped('The MongoDB database driver does not support string expressions.');
+    }
+
     $query = $this->connection->select('test');
     $name_field = $query->addField('test', 'name');
     $age_field = $query->addExpression("[age]*2", 'double_age');
@@ -129,6 +136,10 @@ class AlterTest extends DatabaseTestBase {
    * Tests that we can do basic alters on subqueries.
    */
   public function testSimpleAlterSubquery(): void {
+    if ($this->connection->driver() == 'mongodb') {
+      $this->markTestSkipped('The MongoDB database driver does not support subqueries.');
+    }
+
     // Create a sub-query with an alter tag.
     $subquery = $this->connection->select('test', 'p');
     $subquery->addField('p', 'name');
@@ -141,7 +152,7 @@ class AlterTest extends DatabaseTestBase {
 
     // Create a main query and join to sub-query.
     $query = $this->connection->select('test_task', 'tt');
-    $query->join($subquery, 'pq', '[pq].[id] = [tt].[pid]');
+    $query->join($subquery, 'pq', $query->joinCondition()->compare('pq.id', 'tt.pid'));
     $age_field = $query->addField('pq', 'double_age');
     $name_field = $query->addField('pq', 'name');
 

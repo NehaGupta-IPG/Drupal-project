@@ -1,0 +1,42 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the mongodb module.
+ */
+
+use Drupal\Core\Database\Database;
+
+/**
+ * Implements hook_requirements().
+ */
+function mongodb_requirements($phase) {
+  $requirements = [];
+  // Test with MongoDB databases for the being used as a replica set.
+  if (Database::isActiveConnection()) {
+    $connection = Database::getConnection();
+
+    // Set the requirement just for MongoDB.
+    if ($connection->driver() == 'mongodb') {
+      // If the MongoDB database is not set up as a replica set.
+      if ($set = $connection->getReplicaSetName()) {
+        $requirements['mongodb_replica_set'] = [
+          'severity' => REQUIREMENT_OK,
+          'title' => t('MongoDB replica set'),
+          'value' => $set,
+          'description' => 'The MongoDB database is set up with a replica set.',
+        ];
+      }
+      else {
+        $requirements['mongodb_replica_set']['severity'] = REQUIREMENT_ERROR;
+        $requirements['mongodb_replica_set']['value'] = t('Not available');
+        $requirements['mongodb_replica_set']['description'] = t('The MongoDB is not set up with a <a href=":replication">replica set</a>. Replica sets offer support for multi document <a href=":transactions">transactions</a>, which is needed by Drupal.', [
+          ':replication' => 'https://www.mongodb.com/docs/manual/replication/',
+          ':transactions' => 'https://www.mongodb.com/docs/manual/core/transactions/',
+        ]);
+      }
+    }
+  }
+
+  return $requirements;
+}

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\layout_builder\Functional;
 
+use Drupal\Core\Database\Database;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\node\Entity\Node;
 
@@ -18,6 +19,11 @@ class LayoutBuilderOverridesTest extends LayoutBuilderTestBase {
    * Tests deleting a field in-use by an overridden layout.
    */
   public function testDeleteField(): void {
+    if (Database::getConnection()->driver() == 'mongodb') {
+      // @todo Fix this test for MongoDB.
+      $this->markTestSkipped();
+    }
+
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 

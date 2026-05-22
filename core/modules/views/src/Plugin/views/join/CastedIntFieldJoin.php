@@ -49,7 +49,7 @@ class CastedIntFieldJoin extends JoinPluginBase {
       $right_field = \Drupal::service('views.cast_sql')->getFieldAsInt($right_field);
     }
 
-    $condition = "$left_field {$this->configuration['operator']} $right_field";
+    $condition = $select_query->joinCondition()->where("$left_field {$this->configuration['operator']} $right_field");
     $arguments = [];
 
     // Tack on the extra.

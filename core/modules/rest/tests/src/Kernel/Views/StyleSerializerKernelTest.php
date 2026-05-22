@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\rest\Kernel\Views;
 
+use Drupal\Core\Database\Database;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Entity\View;
 use Drupal\views\Tests\ViewTestData;
@@ -22,7 +23,7 @@ class StyleSerializerKernelTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['rest_test_views', 'serialization', 'rest'];
+  protected static $modules = ['rest_test_views', 'serialization', 'rest', 'entity_test'];
 
   /**
    * {@inheritdoc}
@@ -47,7 +48,13 @@ class StyleSerializerKernelTest extends ViewsKernelTestBase {
     $view->save();
 
     $view->calculateDependencies();
-    $this->assertEquals(['module' => ['rest', 'serialization', 'user']], $view->getDependencies());
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $modules = ['entity_test', 'mongodb', 'rest', 'serialization', 'user'];
+    }
+    else {
+      $modules = ['rest', 'serialization', 'user'];
+    }
+    $this->assertEquals(['module' => $modules], $view->getDependencies());
   }
 
 }

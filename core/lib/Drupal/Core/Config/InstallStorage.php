@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Config;
 
+use Drupal\Core\Database\Database;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Extension\Extension;
 
@@ -34,6 +35,11 @@ class InstallStorage extends FileStorage {
   const CONFIG_SCHEMA_DIRECTORY = 'config/schema';
 
   /**
+   * Extension sub-directory containing configuration database driver overrides.
+   */
+  const CONFIG_OVERRIDES_DIRECTORY = 'config/overrides';
+
+  /**
    * Folder map indexed by configuration name.
    *
    * @var array
@@ -48,6 +54,13 @@ class InstallStorage extends FileStorage {
   protected $directory;
 
   /**
+   * The database override directory.
+   *
+   * @var string
+   */
+  protected $databaseDriverOverrideDirectory;
+
+  /**
    * Constructs an InstallStorage object.
    *
    * @param string $directory
@@ -59,6 +72,10 @@ class InstallStorage extends FileStorage {
    */
   public function __construct($directory = self::CONFIG_INSTALL_DIRECTORY, $collection = StorageInterface::DEFAULT_COLLECTION) {
     parent::__construct($directory, $collection);
+
+    // Init the base database driver override directory. We do this here to do
+    // it only once.
+    $this->initBaseDatabaseDriverOverrideDirectory();
   }
 
   /**
@@ -206,9 +223,82 @@ class InstallStorage extends FileStorage {
             $folders[basename($file, $extension)] = $directory;
           }
         }
+
+        // Let a config item be overridden by a database driver one.
+        if ($this->hasBaseDatabaseDriverOverrideDirectory()) {
+          $database_driver_override_directory = $this->getDatabaseDriverOverrideDirectory($directory, $extension_object);
+          if (is_dir($database_driver_override_directory)) {
+            $database_driver_override_files = scandir($database_driver_override_directory);
+            foreach ($database_driver_override_files as $database_driver_override_file) {
+              if ($database_driver_override_file[0] !== '.' && preg_match($pattern, $database_driver_override_file)) {
+                $folders[basename($database_driver_override_file, $extension)] = $database_driver_override_directory;
+              }
+            }
+          }
+        }
       }
     }
     return $folders;
+  }
+
+  /**
+   * Initiate the base database driver override directory.
+   */
+  protected function initBaseDatabaseDriverOverrideDirectory(): void {
+    if (Database::isActiveConnection()) {
+      $connection = Database::getConnection();
+      // Get the module root directory from the autoload directory setting from
+      // the database connection.
+      $database_driver_autoload_directory = $connection->getConnectionOptions()['autoload'] ?? '';
+      $pos = strpos($database_driver_autoload_directory, 'src/Driver/Database/');
+      if ($pos !== FALSE) {
+        $database_driver_override_directory = substr($database_driver_autoload_directory, 0, $pos) . self::CONFIG_OVERRIDES_DIRECTORY;
+        if (is_dir($database_driver_override_directory)) {
+          // Only set the base database driver when the module providing the
+          // database driver has one.
+          $this->databaseDriverOverrideDirectory = $database_driver_override_directory;
+        }
+      }
+    }
+  }
+
+  /**
+   * Check whether the database driver has a config override directory.
+   *
+   * @return bool
+   *   Return TRUE when the database driver has the config override directory.
+   */
+  protected function hasBaseDatabaseDriverOverrideDirectory(): bool {
+    return (bool) $this->databaseDriverOverrideDirectory;
+  }
+
+  /**
+   * Get the database driver directory for overridden config items.
+   *
+   * @param string $directory
+   *   The directory in which to search for config items.
+   * @param \Drupal\Core\Extension\Extension $extension
+   *   The extension item from which the config belongs to.
+   *
+   * @return string
+   *   The directory to search for by the database driver overridden config
+   *   items.
+   */
+  protected function getDatabaseDriverOverrideDirectory(string $directory, Extension $extension): string {
+    // The overridden config items are in  the database drivers override directory
+    $dir = $this->databaseDriverOverrideDirectory . '/' . $extension->getName();
+
+    if (str_ends_with($directory, self::CONFIG_INSTALL_DIRECTORY)) {
+      $dir .= '/install';
+    }
+    elseif (str_ends_with($directory, self::CONFIG_OPTIONAL_DIRECTORY)) {
+      $dir .= '/optional';
+    }
+    elseif (str_ends_with($directory, self::CONFIG_SCHEMA_DIRECTORY)) {
+      $dir .= '/schema';
+    }
+
+    return $dir;
   }
 
   /**

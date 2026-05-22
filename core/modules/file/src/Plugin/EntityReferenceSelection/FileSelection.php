@@ -30,8 +30,8 @@ class FileSelection extends DefaultSelection {
     //   become "permanent" after the containing entity gets validated and
     //   saved.)
     $query->condition($query->orConditionGroup()
-      ->condition('status', FileInterface::STATUS_PERMANENT)
-      ->condition('uid', $this->currentUser->id()));
+      ->condition('status', (bool) FileInterface::STATUS_PERMANENT)
+      ->condition('uid', (int) $this->currentUser->id()));
     return $query;
   }
 

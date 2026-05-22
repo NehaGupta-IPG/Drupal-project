@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\content_moderation\Kernel;
 
+use Drupal\Core\Database\Database;
 use Drupal\entity_test\Entity\EntityTestNoBundle;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
@@ -195,13 +196,24 @@ class ViewsModerationStateFilterTest extends ViewsKernelTestBase {
       'moderation_state' => 'editorial-draft',
     ]);
     $view->execute();
-    $this->assertIdenticalResultset($view, [['id' => $test_entity->id()]], ['id' => 'id']);
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $map = ['revision_id' => 'id'];
+    }
+    else {
+      $map = ['id' => 'id'];
+    }
+    $this->assertIdenticalResultset($view, [['id' => $test_entity->id()]], $map);
   }
 
   /**
    * Tests the moderation state filter on an entity added via a relationship.
    */
   public function testModerationStateFilterOnJoinedEntity(): void {
+    if (Database::getConnection()->driver() == 'mongodb') {
+      // @todo Fix this test for Mongodb.
+      $this->markTestSkipped();
+    }
+
     $workflow = Workflow::load('editorial');
     $workflow->getTypePlugin()->addEntityTypeAndBundle('node', 'example');
     $workflow->save();
@@ -389,16 +401,30 @@ class ViewsModerationStateFilterTest extends ViewsKernelTestBase {
     $query = $view->getQuery();
     $join = $query->getTableInfo('content_moderation_state')['join'];
     $configuration = $join->configuration;
-    $this->assertEquals('content_moderation_state_field_revision', $configuration['table']);
-    $this->assertEquals('content_entity_revision_id', $configuration['field']);
-    $this->assertEquals('vid', $configuration['left_field']);
-    $this->assertEquals('content_entity_type_id', $configuration['extra'][0]['field']);
-    $this->assertEquals('node', $configuration['extra'][0]['value']);
+    if (Database::getConnection()->databaseType() == 'mongodb') {
+      $this->assertEquals('content_moderation_state', $configuration['table']);
+      $this->assertMatchesRegularExpression('/content_moderation_state_(.*)\.content_entity_revision_id/', $configuration['field']);
+      $this->assertEquals('vid', $configuration['left_field']);
+      $this->assertMatchesRegularExpression('/content_moderation_state_(.*)\.content_entity_type_id/', $configuration['extra'][0]['field']);
+      $this->assertEquals('node', $configuration['extra'][0]['value']);
 
-    $this->assertEquals('content_entity_id', $configuration['extra'][1]['field']);
-    $this->assertEquals('nid', $configuration['extra'][1]['left_field']);
-    $this->assertEquals('langcode', $configuration['extra'][2]['field']);
-    $this->assertEquals('langcode', $configuration['extra'][2]['left_field']);
+      $this->assertMatchesRegularExpression('/content_moderation_state_(.*)\.content_entity_id/', $configuration['extra'][1]['field']);
+      $this->assertEquals('nid', $configuration['extra'][1]['left_field']);
+      $this->assertMatchesRegularExpression('/content_moderation_state_(.*)\.langcode/', $configuration['extra'][2]['field']);
+      $this->assertMatchesRegularExpression('/node_(.*)\.langcode/', $configuration['extra'][2]['left_field']);
+    }
+    else {
+      $this->assertEquals('content_moderation_state_field_revision', $configuration['table']);
+      $this->assertEquals('content_entity_revision_id', $configuration['field']);
+      $this->assertEquals('vid', $configuration['left_field']);
+      $this->assertEquals('content_entity_type_id', $configuration['extra'][0]['field']);
+      $this->assertEquals('node', $configuration['extra'][0]['value']);
+
+      $this->assertEquals('content_entity_id', $configuration['extra'][1]['field']);
+      $this->assertEquals('nid', $configuration['extra'][1]['left_field']);
+      $this->assertEquals('langcode', $configuration['extra'][2]['field']);
+      $this->assertEquals('langcode', $configuration['extra'][2]['left_field']);
+    }
 
     $expected_result = [];
     foreach ($nodes as $node) {

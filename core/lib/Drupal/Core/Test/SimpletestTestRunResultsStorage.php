@@ -6,6 +6,8 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\ConnectionNotDefinedException;
 
+// cspell:ignore sttid
+
 /**
  * Implements a test run results storage compatible with legacy Simpletest.
  *
@@ -68,7 +70,7 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
   public function setDatabasePrefix(TestRun $test_run, string $database_prefix): void {
     $affected_rows = $this->connection->update('simpletest_test_id')
       ->fields(['last_prefix' => $database_prefix])
-      ->condition('test_id', $test_run->id())
+      ->condition('test_id', (int) $test_run->id())
       ->execute();
     if (!$affected_rows) {
       throw new \RuntimeException('Failed to set up database prefix.');
@@ -97,10 +99,10 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
   public function removeResults(TestRun $test_run): int {
     $this->connection->startTransaction('delete_test_run');
     $this->connection->delete('simpletest')
-      ->condition('test_id', $test_run->id())
+      ->condition('test_id', (int) $test_run->id())
       ->execute();
     $count = $this->connection->delete('simpletest_test_id')
-      ->condition('test_id', $test_run->id())
+      ->condition('test_id', (int) $test_run->id())
       ->execute();
     return $count;
   }
@@ -111,7 +113,7 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
   public function getLogEntriesByTestClass(TestRun $test_run): array {
     return $this->connection->select('simpletest')
       ->fields('simpletest')
-      ->condition('test_id', $test_run->id())
+      ->condition('test_id', (int) $test_run->id())
       ->orderBy('test_class')
       ->orderBy('message_id')
       ->execute()
@@ -122,22 +124,47 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
    * {@inheritdoc}
    */
   public function getCurrentTestRunState(TestRun $test_run): array {
-    // Define a subquery to identify the latest 'message_id' given the
-    // $test_id.
-    $max_message_id_subquery = $this->connection
-      ->select('simpletest', 'sub')
-      ->condition('test_id', $test_run->id());
-    $max_message_id_subquery->addExpression('MAX([message_id])', 'max_message_id');
+    if ($this->connection->driver() == 'mongodb') {
+      $max_message_id_query = $this->connection->select('simpletest', 'sub')
+        ->condition('test_id', (int) $test_run->id());
+      $max_message_id_query->addExpressionMax('message_id', 'max_message_id');
+      $max_message_id = $max_message_id_query->execute()->fetchField();
 
-    // Run a select query to return 'last_prefix' from {simpletest_test_id} and
-    // 'test_class' from {simpletest}.
-    $select = $this->connection->select($max_message_id_subquery, 'st_sub');
-    $select->join('simpletest', 'st', '[st].[message_id] = [st_sub].[max_message_id]');
-    $select->join('simpletest_test_id', 'st_tid', '[st].[test_id] = [st_tid].[test_id]');
-    $select->addField('st_tid', 'last_prefix', 'db_prefix');
-    $select->addField('st', 'test_class');
+      $db_prefix = $this->connection->select('simpletest_test_id', 'sttid')
+        ->fields('sttid', ['last_prefix'])
+        ->condition('test_id', (int) $max_message_id)
+        ->execute()
+        ->fetchField();
 
-    return $select->execute()->fetchAssoc();
+      $test_class = $this->connection->select('simpletest', 'st')
+        ->fields('st', ['test_class'])
+        ->condition('test_id', (int) $max_message_id)
+        ->execute()
+        ->fetchField();
+
+      return [
+        'db_prefix' => $db_prefix,
+        'test_class' => $test_class,
+      ];
+    }
+    else {
+      // Define a subquery to identify the latest 'message_id' given the
+      // $test_id.
+      $max_message_id_subquery = $this->connection
+        ->select('simpletest', 'sub')
+        ->condition('test_id', (int) $test_run->id());
+      $max_message_id_subquery->addExpressionMax('message_id', 'max_message_id');
+
+      // Run a select query to return 'last_prefix' from {simpletest_test_id} and
+      // 'test_class' from {simpletest}.
+      $select = $this->connection->select($max_message_id_subquery, 'st_sub');
+      $select->join('simpletest', 'st', $select->joinCondition()->compare('st.message_id', 'st_sub.max_message_id'));
+      $select->join('simpletest_test_id', 'sttid', $select->joinCondition()->compare('st.test_id', 'sttid.test_id'));
+      $select->addField('sttid', 'last_prefix', 'db_prefix');
+      $select->addField('st', 'test_class');
+
+      return $select->execute()->fetchAssoc();
+    }
   }
 
   /**

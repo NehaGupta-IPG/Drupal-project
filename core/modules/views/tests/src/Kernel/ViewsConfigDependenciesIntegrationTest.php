@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel;
 
+use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -70,12 +71,19 @@ class ViewsConfigDependenciesIntegrationTest extends ViewsKernelTestBase {
     $view = View::load('entity_test_fields');
     $display =& $view->getDisplay('default');
 
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $table = 'entity_test';
+    }
+    else {
+      $table = 'entity_test__bar';
+    }
+
     // Add the 'bar' image field to 'entity_test_fields' view.
     $display['display_options']['fields']['bar'] = [
       'id' => 'bar',
       'field' => 'bar',
       'plugin_id' => 'field',
-      'table' => 'entity_test__bar',
+      'table' => $table,
       'entity_type' => 'entity_test',
       'entity_field' => 'bar',
       'type' => 'image',

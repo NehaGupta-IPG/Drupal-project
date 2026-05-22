@@ -16,6 +16,7 @@ use Drupal\node\Entity\NodeType;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use MongoDB\BSON\UTCDateTime;
 
 /**
  * Hook implementations for node.
@@ -231,6 +232,17 @@ class NodeHooks1 {
     // Add relevance based on updated date, but only if it the scale values have
     // been calculated in node_cron().
     if ($node_min_max = \Drupal::state()->get('node.min_max_update_time')) {
+      if (isset($node_min_max['min_created']) && ($node_min_max['min_created'] instanceof UTCDateTime)) {
+        $node_min_max['min_created'] = (int) $node_min_max['min_created']->__toString();
+        $node_min_max['min_created'] = $node_min_max['min_created'] / 1000;
+        $node_min_max['min_created'] = (string) $node_min_max['min_created'];
+      }
+      if (isset($node_min_max['max_created']) && ($node_min_max['max_created'] instanceof UTCDateTime)) {
+        $node_min_max['max_created'] = (int) $node_min_max['max_created']->__toString();
+        $node_min_max['max_created'] = $node_min_max['max_created'] / 1000;
+        $node_min_max['max_created'] = (string) $node_min_max['max_created'];
+      }
+
       $ranking['recent'] = [
         'title' => t('Recently created'),
             // Exponential decay with half life of 14% of the age range of nodes.
@@ -251,7 +263,7 @@ class NodeHooks1 {
   public function userPredelete($account) {
     // Delete nodes (current revisions).
     // @todo Introduce node_mass_delete() or make node_mass_update() more flexible.
-    $nids = \Drupal::entityQuery('node')->condition('uid', $account->id())->accessCheck(FALSE)->execute();
+    $nids = \Drupal::entityQuery('node')->condition('uid', (int) $account->id())->accessCheck(FALSE)->execute();
     // Delete old revisions.
     $storage_controller = \Drupal::entityTypeManager()->getStorage('node');
     $nodes = $storage_controller->loadMultiple($nids);

@@ -204,8 +204,8 @@ class SearchIndex implements SearchIndexInterface {
         $query_index->condition('type', $type);
         $query_dataset->condition('type', $type);
         if ($sid) {
-          $query_index->condition('sid', $sid);
-          $query_dataset->condition('sid', $sid);
+          $query_index->condition('sid', (int) $sid);
+          $query_dataset->condition('sid', (int) $sid);
           if ($langcode) {
             $query_index->condition('langcode', $langcode);
             $query_dataset->condition('langcode', $langcode);
@@ -242,7 +242,7 @@ class SearchIndex implements SearchIndexInterface {
       if ($type) {
         $query->condition('type', $type);
         if ($sid) {
-          $query->condition('sid', $sid);
+          $query->condition('sid', (int) $sid);
           if ($langcode) {
             $query->condition('langcode', $langcode);
           }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Plugin;
 
+use Drupal\Core\Database\Database;
 use Drupal\Core\Url;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Session\AnonymousUserSession;
@@ -136,13 +137,20 @@ class DisplayPageTest extends ViewsKernelTestBase {
    * Tests the calculated dependencies for various views using Page displays.
    */
   public function testDependencies(): void {
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $modules = ['mongodb', 'views_test_data'];
+    }
+    else {
+      $modules = ['views_test_data'];
+    }
+
     $view = Views::getView('test_page_display');
-    $this->assertSame(['module' => ['views_test_data']], $view->getDependencies());
+    $this->assertSame(['module' => $modules], $view->getDependencies());
 
     $view = Views::getView('test_page_display_route');
     $expected = [
       'content' => ['StaticTest'],
-      'module' => ['views_test_data'],
+      'module' => $modules,
     ];
     $this->assertSame($expected, $view->getDependencies());
 
@@ -152,9 +160,7 @@ class DisplayPageTest extends ViewsKernelTestBase {
         'system.menu.admin',
         'system.menu.tools',
       ],
-      'module' => [
-        'views_test_data',
-      ],
+      'module' => $modules,
     ];
     $this->assertSame($expected, $view->getDependencies());
   }

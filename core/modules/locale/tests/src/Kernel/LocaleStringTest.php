@@ -113,7 +113,7 @@ class LocaleStringTest extends KernelTestBase {
 
     $rows = $this->container->get('database')->select('locales_location')
       ->fields('locales_location')
-      ->condition('sid', $source_string->lid)
+      ->condition('sid', (int) $source_string->lid)
       ->execute()
       ->fetchAllAssoc('type');
     $this->assertCount(4, $rows);

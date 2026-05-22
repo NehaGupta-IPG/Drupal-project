@@ -70,10 +70,10 @@ class TestSelection extends DefaultSelection {
           break;
       }
       if ($this->isReusable) {
-        $add_condition->condition('reusable', 1);
+        $add_condition->condition('reusable', TRUE);
       }
       else {
-        $add_condition->condition('reusable', 0);
+        $add_condition->condition('reusable', FALSE);
       }
     }
     return $query;

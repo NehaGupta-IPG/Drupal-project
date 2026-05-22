@@ -5,6 +5,7 @@
  */
 
 use Drupal\Core\Database\Query\AlterableInterface;
+use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Entity\View;
@@ -339,13 +340,16 @@ function _views_query_tag_alter_condition(AlterableInterface $query, &$condition
       if (is_string($condition['field'])) {
         $condition['field'] = str_replace(array_keys($substitutions), array_values($substitutions), $condition['field']);
       }
-      elseif (is_object($condition['field'])) {
+      elseif (is_object($condition['field']) && ($condition['value'] instanceof SelectInterface)) {
         $sub_conditions = &$condition['field']->conditions();
         _views_query_tag_alter_condition($query, $sub_conditions, $substitutions);
       }
+      if (isset($condition['field2']) && is_string($condition['field2'])) {
+        $condition['field2'] = str_replace(array_keys($substitutions), array_values($substitutions), $condition['field2']);
+      }
       // $condition['value'] is a subquery so alter the subquery recursive.
       // Therefore make sure to get the metadata of the main query.
-      if (is_object($condition['value'])) {
+      if (isset($condition['value']) && is_object($condition['value']) && ($condition['value'] instanceof SelectInterface)) {
         $subquery = $condition['value'];
         $subquery->addMetaData('views_substitutions', $query->getMetaData('views_substitutions'));
         \Drupal::moduleHandler()->invoke('views', 'query_views_alter', [$condition['value']]);

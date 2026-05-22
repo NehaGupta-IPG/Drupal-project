@@ -41,7 +41,7 @@ function workspaces_install(): void {
     $query = \Drupal::entityTypeManager()->getStorage('user')->getQuery()
       ->accessCheck(FALSE)
       ->condition('roles', $admin_roles, 'IN')
-      ->condition('status', 1)
+      ->condition('status', TRUE)
       ->sort('uid', 'ASC')
       ->range(0, 1);
     $result = $query->execute();

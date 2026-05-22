@@ -31,7 +31,7 @@ class CommentSelection extends DefaultSelection {
     // core requires us to also know about the concept of 'published' and
     // 'unpublished'.
     if (!$this->currentUser->hasPermission('administer comments')) {
-      $query->condition('status', CommentInterface::PUBLISHED);
+      $query->condition('status', (bool) CommentInterface::PUBLISHED);
     }
     return $query;
   }
@@ -75,7 +75,7 @@ class CommentSelection extends DefaultSelection {
       $query = $this->buildEntityQuery();
       // Mirror the conditions checked in buildEntityQuery().
       if (!$this->currentUser->hasPermission('administer comments')) {
-        $query->condition('status', 1);
+        $query->condition('status', TRUE);
       }
       $result = $query
         ->condition($entity_type->getKey('id'), $ids, 'IN')
@@ -90,13 +90,20 @@ class CommentSelection extends DefaultSelection {
    */
   public function entityQueryAlter(SelectInterface $query) {
     parent::entityQueryAlter($query);
+    $driver = \Drupal::database()->driver();
 
-    $tables = $query->getTables();
-    $data_table = 'comment_field_data';
-    if (!isset($tables['comment_field_data']['alias'])) {
-      // If no conditions join against the comment data table, it should be
-      // joined manually to allow node access processing.
-      $query->innerJoin($data_table, NULL, "[base_table].[cid] = [$data_table].[cid] AND [$data_table].[default_langcode] = 1");
+    if ($driver != 'mongodb') {
+      $tables = $query->getTables();
+      $data_table = 'comment_field_data';
+      if (!isset($tables['comment_field_data']['alias'])) {
+        // If no conditions join against the comment data table, it should be
+        // joined manually to allow node access processing.
+        $query->innerJoin($data_table, NULL,
+          $query->joinCondition()
+            ->compare('base_table.cid', "$data_table.cid")
+            ->condition("$data_table.default_langcode", TRUE)
+        );
+      }
     }
 
     // Historically, comments were always linked to 'node' entities, but that is
@@ -121,7 +128,21 @@ class CommentSelection extends DefaultSelection {
 
         // The Comment module doesn't implement per-comment access, so it
         // checks instead that the user has access to the host entity.
-        $entity_alias = $query->innerJoin($host_entity_field_data_table, 'n', "[%alias].[$id_key] = [$data_table].[entity_id] AND [$data_table].[entity_type] = '$host_entity_type_id'");
+        if ($driver == 'mongodb') {
+          $entity_alias = $query->innerJoin($host_entity_type->getBaseTable(), 'n',
+            $query->joinCondition()
+              ->compare("%alias.$id_key", 'comment_translations.entity_id')
+              ->condition("%alias.comment_translations.entity_type", $host_entity_type_id)
+          );
+        }
+        else {
+          $entity_alias = $query->innerJoin($host_entity_field_data_table, 'n',
+            $query->joinCondition()
+              ->compare("%alias.$id_key", "$data_table.entity_id")
+              ->condition("$data_table.entity_type", $host_entity_type_id)
+          );
+        }
+
         // Pass the query to the entity access control.
         $this->reAlterQuery($query, $host_entity_type_id . '_access', $entity_alias);
 
@@ -131,7 +152,13 @@ class CommentSelection extends DefaultSelection {
           // insufficient for nodes.
           // @see \Drupal\node\Plugin\EntityReferenceSelection\NodeSelection::buildEntityQuery()
           if (!$this->currentUser->hasPermission('bypass node access') && !$this->moduleHandler->hasImplementations('node_grants')) {
-            $query->condition($entity_alias . '.status', 1);
+            if ($driver == 'mongodb') {
+              $query->addFilterUnwindPath($entity_alias . '.node_current_revision');
+              $query->condition($entity_alias . '.node_current_revision.status', TRUE);
+            }
+            else {
+              $query->condition($entity_alias . '.status', 1);
+            }
           }
         }
       }

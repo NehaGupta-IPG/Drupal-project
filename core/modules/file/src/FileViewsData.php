@@ -15,6 +15,19 @@ class FileViewsData extends EntityViewsData {
   public function getViewsData() {
     $data = parent::getViewsData();
 
+    if ($this->connection->driver() == 'mongodb') {
+      $node_table = 'node';
+      $users_table = 'users';
+      $term_table = 'taxonomy_term_data';
+      $comment_table = 'comment';
+    }
+    else {
+      $node_table = 'node_field_data';
+      $users_table = 'users_field_data';
+      $term_table = 'taxonomy_term_field_data';
+      $comment_table = 'comment_field_data';
+    }
+
     // @todo There is no corresponding information in entity metadata.
     $data['file_managed']['table']['base']['help'] = $this->t('Files maintained by Drupal and various modules.');
     $data['file_managed']['table']['base']['defaults']['field'] = 'filename';
@@ -78,7 +91,7 @@ class FileViewsData extends EntityViewsData {
       ],
       // Link ourselves to the {node_field_data} table
       // so we can provide node->file relationships.
-      'node_field_data' => [
+      $node_table => [
         'join_id' => 'casted_int_field_join',
         'cast' => 'right',
         'field' => 'id',
@@ -87,7 +100,7 @@ class FileViewsData extends EntityViewsData {
       ],
       // Link ourselves to the {users_field_data} table
       // so we can provide user->file relationships.
-      'users_field_data' => [
+      $users_table => [
         'join_id' => 'casted_int_field_join',
         'cast' => 'right',
         'field' => 'id',
@@ -126,7 +139,7 @@ class FileViewsData extends EntityViewsData {
       'help' => $this->t('Content that is associated with this file, usually because this file is in a field on the content.'),
       // Only provide this field/relationship/etc.,
       // when the 'file_managed' base table is present.
-      'skip base' => ['node_field_data', 'node_field_revision', 'users_field_data', 'comment_field_data', 'taxonomy_term_field_data'],
+      'skip base' => [$node_table, 'node_field_revision', $users_table, $comment_table, $term_table],
       'real field' => 'id',
       'relationship' => [
         'id' => 'standard',
@@ -134,7 +147,7 @@ class FileViewsData extends EntityViewsData {
         'cast' => 'left',
         'title' => $this->t('Content'),
         'label' => $this->t('Content'),
-        'base' => 'node_field_data',
+        'base' => $node_table,
         'base field' => 'nid',
         'relationship field' => 'id',
         'extra' => [['table' => 'file_usage', 'field' => 'type', 'operator' => '=', 'value' => 'node']],
@@ -145,7 +158,7 @@ class FileViewsData extends EntityViewsData {
       'help' => $this->t('A file that is associated with this node, usually because it is in a field on the node.'),
       // Only provide this field/relationship/etc.,
       // when the 'node' base table is present.
-      'skip base' => ['file_managed', 'users_field_data', 'comment_field_data', 'taxonomy_term_field_data'],
+      'skip base' => ['file_managed', $users_table, $comment_table, $term_table],
       'real field' => 'fid',
       'relationship' => [
         'id' => 'standard',
@@ -163,7 +176,7 @@ class FileViewsData extends EntityViewsData {
       'help' => $this->t('A user that is associated with this file, usually because this file is in a field on the user.'),
       // Only provide this field/relationship/etc.,
       // when the 'file_managed' base table is present.
-      'skip base' => ['node_field_data', 'node_field_revision', 'users_field_data', 'comment_field_data', 'taxonomy_term_field_data'],
+      'skip base' => [$node_table, 'node_field_revision', $users_table, $comment_table, $term_table],
       'real field' => 'id',
       'relationship' => [
         'id' => 'standard',
@@ -182,7 +195,7 @@ class FileViewsData extends EntityViewsData {
       'help' => $this->t('A file that is associated with this user, usually because it is in a field on the user.'),
       // Only provide this field/relationship/etc.,
       // when the 'users' base table is present.
-      'skip base' => ['file_managed', 'node_field_data', 'node_field_revision', 'comment_field_data', 'taxonomy_term_field_data'],
+      'skip base' => ['file_managed', $node_table, 'node_field_revision', $comment_table, $term_table],
       'real field' => 'fid',
       'relationship' => [
         'id' => 'standard',
@@ -202,7 +215,7 @@ class FileViewsData extends EntityViewsData {
       'help' => $this->t('A comment that is associated with this file, usually because this file is in a field on the comment.'),
       // Only provide this field/relationship/etc.,
       // when the 'file_managed' base table is present.
-      'skip base' => ['node_field_data', 'node_field_revision', 'users_field_data', 'comment_field_data', 'taxonomy_term_field_data'],
+      'skip base' => [$node_table, 'node_field_revision', $users_table, $comment_table, $term_table],
       'real field' => 'id',
       'relationship' => [
         'id' => 'standard',
@@ -210,7 +223,7 @@ class FileViewsData extends EntityViewsData {
         'cast' => 'left',
         'title' => $this->t('Comment'),
         'label' => $this->t('Comment'),
-        'base' => 'comment_field_data',
+        'base' => $comment_table,
         'base field' => 'cid',
         'relationship field' => 'id',
         'extra' => [['table' => 'file_usage', 'field' => 'type', 'operator' => '=', 'value' => 'comment']],
@@ -221,7 +234,7 @@ class FileViewsData extends EntityViewsData {
       'help' => $this->t('A file that is associated with this comment, usually because it is in a field on the comment.'),
       // Only provide this field/relationship/etc.,
       // when the 'comment' base table is present.
-      'skip base' => ['file_managed', 'node_field_data', 'node_field_revision', 'users_field_data', 'taxonomy_term_field_data'],
+      'skip base' => ['file_managed', $node_table, 'node_field_revision', $users_table, $term_table],
       'real field' => 'fid',
       'relationship' => [
         'id' => 'standard',
@@ -239,7 +252,7 @@ class FileViewsData extends EntityViewsData {
       'help' => $this->t('A taxonomy term that is associated with this file, usually because this file is in a field on the taxonomy term.'),
       // Only provide this field/relationship/etc.,
       // when the 'file_managed' base table is present.
-      'skip base' => ['node_field_data', 'node_field_revision', 'users_field_data', 'comment_field_data', 'taxonomy_term_field_data'],
+      'skip base' => [$node_table, 'node_field_revision', $users_table, $comment_table, $term_table],
       'real field' => 'id',
       'relationship' => [
         'id' => 'standard',
@@ -258,7 +271,7 @@ class FileViewsData extends EntityViewsData {
       'help' => $this->t('A file that is associated with this taxonomy term, usually because it is in a field on the taxonomy term.'),
       // Only provide this field/relationship/etc.,
       // when the 'taxonomy_term_data' base table is present.
-      'skip base' => ['file_managed', 'node_field_data', 'node_field_revision', 'users_field_data', 'comment_field_data'],
+      'skip base' => ['file_managed', $node_table, 'node_field_revision', $users_table, $comment_table],
       'real field' => 'fid',
       'relationship' => [
         'id' => 'standard',

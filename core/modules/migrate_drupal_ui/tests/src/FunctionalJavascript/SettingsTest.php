@@ -35,6 +35,10 @@ class SettingsTest extends WebDriverTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    if (\Drupal::database()->driver() === 'mongodb') {
+      $this->markTestSkipped('MongoDB does not support migrations.');
+    }
+
     // Log in as user 1. Migrations in the UI can only be performed as user 1.
     $this->drupalLogin($this->rootUser);
   }

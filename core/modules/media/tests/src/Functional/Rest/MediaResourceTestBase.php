@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\media\Functional\Rest;
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Database\Database;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 use Drupal\media\Entity\Media;
@@ -273,7 +274,7 @@ abstract class MediaResourceTestBase extends EntityResourceTestBase {
       'field_media_file' => [
         [
           'description' => NULL,
-          'display' => NULL,
+          'display' => (Database::getConnection()->driver() == 'mongodb' ? TRUE : NULL),
           'target_id' => 3,
         ],
       ],

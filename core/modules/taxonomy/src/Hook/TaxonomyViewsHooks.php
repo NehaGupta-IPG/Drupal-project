@@ -15,13 +15,22 @@ class TaxonomyViewsHooks {
    */
   #[Hook('views_data_alter')]
   public function viewsDataAlter(&$data): void {
-    $data['node_field_data']['term_node_tid'] = [
+    if (\Drupal::database()->driver() == 'mongodb') {
+      $node_table = 'node';
+      $taxonomy_term_table = 'taxonomy_term_data';
+    }
+    else {
+      $node_table = 'node_field_data';
+      $taxonomy_term_table = 'taxonomy_term_field_data';
+    }
+
+    $data[$node_table]['term_node_tid'] = [
       'title' => t('Taxonomy terms on node'),
       'help' => t('Relate nodes to taxonomy terms, specifying which vocabulary or vocabularies to use. This relationship will cause duplicated records if there are multiple terms.'),
       'relationship' => [
         'id' => 'node_term_data',
         'label' => t('term'),
-        'base' => 'taxonomy_term_field_data',
+        'base' => $taxonomy_term_table,
       ],
       'field' => [
         'title' => t('All taxonomy terms'),
@@ -31,7 +40,7 @@ class TaxonomyViewsHooks {
         'click sortable' => FALSE,
       ],
     ];
-    $data['node_field_data']['term_node_tid_depth'] = [
+    $data[$node_table]['term_node_tid_depth'] = [
       'help' => t('Display content if it has the selected taxonomy terms, or children of the selected terms. Due to additional complexity, this has fewer options than the versions without depth.'),
       'real field' => 'nid',
       'argument' => [
@@ -44,7 +53,7 @@ class TaxonomyViewsHooks {
         'id' => 'taxonomy_index_tid_depth',
       ],
     ];
-    $data['node_field_data']['term_node_tid_depth_modifier'] = [
+    $data[$node_table]['term_node_tid_depth_modifier'] = [
       'title' => t('Has taxonomy term ID depth modifier'),
       'help' => t('Allows the "depth" for Taxonomy: Term ID (with depth) to be modified via an additional contextual filter value.'),
       'argument' => [

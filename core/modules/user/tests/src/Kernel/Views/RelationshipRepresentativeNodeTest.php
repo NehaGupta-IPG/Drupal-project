@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Kernel\Views;
 
+use Drupal\Core\Database\Database;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
@@ -45,6 +46,10 @@ class RelationshipRepresentativeNodeTest extends KernelTestBase {
    * Tests the relationship.
    */
   public function testRelationship(): void {
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $this->markTestSkipped('The MongoDB database driver does not support views with groupwise max.');
+    }
+
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
     $this->installConfig(['filter']);

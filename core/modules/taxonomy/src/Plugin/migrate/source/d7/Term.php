@@ -55,7 +55,7 @@ class Term extends FieldableEntity {
       ->fields('td')
       ->distinct()
       ->orderBy('tid');
-    $query->leftJoin('taxonomy_vocabulary', 'tv', '[td].[vid] = [tv].[vid]');
+    $query->leftJoin('taxonomy_vocabulary', 'tv', $query->joinCondition()->compare('td.vid', 'tv.vid'));
     $query->addField('tv', 'machine_name');
 
     if ($this->getDatabase()

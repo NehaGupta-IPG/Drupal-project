@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel;
 
+use Drupal\Core\Database\Database;
 use Drupal\entity_test\Entity\EntityTestMul;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -94,7 +95,7 @@ class QueryGroupByTest extends ViewsKernelTestBase {
     $view = Views::getView('test_aggregate_count_function');
     $this->executeView($view);
 
-    $this->assertEquals(7, $view->result[0]->id);
+    $this->assertEquals(7, $view->result[0]->entity_test_id);
     $this->assertCount(1, $view->result, 'Make sure the count of rows is one.');
   }
 
@@ -128,7 +129,12 @@ class QueryGroupByTest extends ViewsKernelTestBase {
     // Group by name to identify the right count.
     $results = [];
     foreach ($view->result as $item) {
-      $results[$item->entity_test_name] = $item->id;
+      if (isset($item->entity_test_id)) {
+        $results[$item->entity_test_name] = $item->entity_test_id;
+      }
+      else {
+        $results[$item->entity_test_name] = $item->id;
+      }
     }
     $aggregation_function ??= 'NULL';
     $this->assertEquals($values[0], $results['name1'], "Aggregation with $aggregation_function and groupby name: name1 returned the expected amount of results");
@@ -213,8 +219,19 @@ class QueryGroupByTest extends ViewsKernelTestBase {
     $view = Views::getView('test_group_by_in_filters');
     $this->executeView($view);
 
-    $this->assertStringContainsString('GROUP BY', (string) $view->build_info['query'], 'Make sure that GROUP BY is in the query');
-    $this->assertStringContainsString('HAVING', (string) $view->build_info['query'], 'Make sure that HAVING is in the query');
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $query_as_string = $view->build_info['query']->__toString();
+
+      $this->assertStringStartsWith('SELECT WITH AGGREGATE PIPELINE: ', $query_as_string);
+      $query_as_array = unserialize(substr($query_as_string, 32));
+
+      $this->assertSame('$match', key($query_as_array[0]));
+      $this->assertSame('$group', key($query_as_array[1]));
+    }
+    else {
+      $this->assertStringContainsString('GROUP BY', (string) $view->build_info['query'], 'Make sure that GROUP BY is in the query');
+      $this->assertStringContainsString('HAVING', (string) $view->build_info['query'], 'Make sure that HAVING is in the query');
+    }
   }
 
   /**
@@ -230,7 +247,14 @@ class QueryGroupByTest extends ViewsKernelTestBase {
     $view->displayHandlers->get('default')->options['fields']['name']['group_type'] = 'min';
     unset($view->displayHandlers->get('default')->options['fields']['id']['group_type']);
     $this->executeView($view);
-    $this->assertMatchesRegularExpression('/GROUP BY .*[^\w\s]entity_test[^\w\s]\.[^\w\s]id[^\w\s]/', (string) $view->build_info['query'], 'GROUP BY field includes the base table name when grouping on the base field.');
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $query_as_string = $view->build_info['query']->__toString();
+      $query_as_array = unserialize(substr($query_as_string, 32));
+      $this->assertSame('$group', key($query_as_array[0]));
+    }
+    else {
+      $this->assertMatchesRegularExpression('/GROUP BY .*[^\w\s]entity_test[^\w\s]\.[^\w\s]id[^\w\s]/', (string) $view->build_info['query'], 'GROUP BY field includes the base table name when grouping on the base field.');
+    }
   }
 
   /**

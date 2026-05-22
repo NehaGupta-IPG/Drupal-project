@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Entity\Query\Sql;
 
+use Drupal\Core\Database\Query\ConditionInterface;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\EntityType;
 use Drupal\Core\Entity\Query\QueryException;
@@ -365,7 +366,7 @@ class Tables implements TablesInterface {
         // gets a unique alias.
         $key = $index_prefix . ($base_table === 'base_table' ? $table : $base_table);
         if (!isset($this->entityTables[$key])) {
-          $this->entityTables[$key] = $this->addJoin($type, $table, "[%alias].[$id_field] = [$base_table].[$id_field]", $langcode);
+          $this->entityTables[$key] = $this->addJoin($type, $table, $this->sqlQuery->joinCondition()->compare("%alias.$id_field", "$base_table.$id_field"), $langcode);
         }
         return $this->entityTables[$key];
       }
@@ -411,7 +412,7 @@ class Tables implements TablesInterface {
       if ($field->getCardinality() != 1) {
         $this->sqlQuery->addMetaData('simple_query', FALSE);
       }
-      $this->fieldTables[$index_prefix . $field_name] = $this->addJoin($type, $table, "[%alias].[$field_id_field] = [$base_table].[$entity_id_field]", $langcode, $delta);
+      $this->fieldTables[$index_prefix . $field_name] = $this->addJoin($type, $table, $this->sqlQuery->joinCondition()->compare("%alias.$field_id_field", "$base_table.$entity_id_field"), $langcode, $delta);
     }
     return $this->fieldTables[$index_prefix . $field_name];
   }
@@ -423,7 +424,7 @@ class Tables implements TablesInterface {
    *   The join type.
    * @param string $table
    *   The table to join to.
-   * @param string $join_condition
+   * @param \Drupal\Core\Database\Query\ConditionInterface|string $join_condition
    *   The condition on which to join to.
    * @param string $langcode
    *   The langcode used on the join.
@@ -441,14 +442,24 @@ class Tables implements TablesInterface {
       // For a data table, get the entity language key from the entity type.
       // A dedicated field table has a hard-coded 'langcode' column.
       $langcode_key = $entity_type->getDataTable() == $table ? $entity_type->getKey('langcode') : 'langcode';
-      $placeholder = ':langcode' . $this->sqlQuery->nextPlaceholder();
-      $join_condition .= ' AND [%alias].[' . $langcode_key . '] = ' . $placeholder;
-      $arguments[$placeholder] = $langcode;
+      if ($join_condition instanceof ConditionInterface) {
+        $join_condition->condition('%alias.' . $langcode_key, $langcode);
+      }
+      else {
+        $placeholder = ':langcode' . $this->sqlQuery->nextPlaceholder();
+        $join_condition .= ' AND [%alias].[' . $langcode_key . '] = ' . $placeholder;
+        $arguments[$placeholder] = $langcode;
+      }
     }
     if (isset($delta)) {
-      $placeholder = ':delta' . $this->sqlQuery->nextPlaceholder();
-      $join_condition .= ' AND [%alias].[delta] = ' . $placeholder;
-      $arguments[$placeholder] = $delta;
+      if ($join_condition instanceof ConditionInterface) {
+        $join_condition->condition('%alias.delta', $delta);
+      }
+      else {
+        $placeholder = ':delta' . $this->sqlQuery->nextPlaceholder();
+        $join_condition .= ' AND [%alias].[delta] = ' . $placeholder;
+        $arguments[$placeholder] = $delta;
+      }
     }
     return $this->sqlQuery->addJoin($type, $table, NULL, $join_condition, $arguments);
   }
@@ -499,7 +510,7 @@ class Tables implements TablesInterface {
    *   The alias of the next entity table joined in.
    */
   protected function addNextBaseTable(EntityType $entity_type, $table, $sql_column, FieldStorageDefinitionInterface $field_storage) {
-    $join_condition = '[%alias].[' . $entity_type->getKey('id') . "] = [$table].[$sql_column]";
+    $join_condition = $this->sqlQuery->joinCondition()->compare('%alias.' . $entity_type->getKey('id'), "$table.$sql_column");
     return $this->sqlQuery->leftJoin($entity_type->getBaseTable(), NULL, $join_condition);
   }
 

@@ -139,10 +139,12 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
         ->accessCheck(FALSE)
         ->aggregate('id', $aggregation_function);
       $this->queryResult = $query->execute();
-      // We need to check that a character exists before and after the table,
-      // column and alias identifiers. These would be the quote characters
-      // specific for each database system.
-      $this->assertMatchesRegularExpression('/' . $aggregation_function . '\(.*entity_test.\..id.\).* AS .id_' . $aggregation_function . './', (string) $query, 'The argument to the aggregation function should be a quoted field.');
+      if (\Drupal::database()->driver() != 'mongodb') {
+        // We need to check that a character exists before and after the table,
+        // column and alias identifiers. These would be the quote characters
+        // specific for each database system.
+        $this->assertMatchesRegularExpression('/' . $aggregation_function . '\(.*entity_test.\..id.\).* AS .id_' . $aggregation_function . './', (string) $query, 'The argument to the aggregation function should be a quoted field.');
+      }
       $this->assertEquals($expected, $this->queryResult);
     }
 

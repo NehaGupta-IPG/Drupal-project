@@ -134,7 +134,11 @@ class Query extends QueryBase implements QueryInterface {
     // Add a self-join to the base revision table if we're querying only the
     // latest revisions.
     if ($this->latestRevision && $revision_field) {
-      $this->sqlQuery->leftJoin($base_table, 'base_table_2', "[base_table].[$id_field] = [base_table_2].[$id_field] AND [base_table].[$revision_field] < [base_table_2].[$revision_field]");
+      $this->sqlQuery->leftJoin($base_table, 'base_table_2',
+        $this->sqlQuery->joinCondition()
+          ->compare("base_table.$id_field", "base_table_2.$id_field")
+          ->compare("base_table.$revision_field", "base_table_2.$revision_field", '<')
+      );
       $this->sqlQuery->isNull("base_table_2.$id_field");
     }
 
@@ -227,9 +231,12 @@ class Query extends QueryBase implements QueryInterface {
         // Order based on the smallest element of each group if the
         // direction is ascending, or on the largest element of each group
         // if the direction is descending.
-        $function = $direction == 'ASC' ? 'min' : 'max';
-        $expression = "$function($sql_alias)";
-        $expression_alias = $this->sqlQuery->addExpression($expression);
+        if ($direction == 'ASC') {
+          $expression_alias = $this->sqlQuery->addExpressionMin($sql_alias);
+        }
+        else {
+          $expression_alias = $this->sqlQuery->addExpressionMax($sql_alias);
+        }
         $this->sqlQuery->orderBy($expression_alias, $direction);
       }
     }

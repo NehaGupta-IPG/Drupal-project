@@ -7,6 +7,7 @@ namespace Drupal\Tests\comment\Functional\Views;
 use Drupal\comment\CommentInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Tests\CommentTestTrait;
+use Drupal\Core\Database\Database;
 use Drupal\views\Views;
 use Drupal\Tests\views\Functional\ViewTestBase;
 
@@ -127,8 +128,14 @@ class DefaultViewRecentCommentsTest extends ViewTestBase {
     $map = [
       'subject' => 'subject',
       'cid' => 'cid',
-      'comment_field_data_created' => 'created',
     ];
+    if (Database::getConnection()->databaseType() == 'mongodb') {
+      $map['comment_comment_translations_created'] = 'created';
+    }
+    else {
+      $map['comment_field_data_created'] = 'created';
+    }
+
     $expected_result = [];
     foreach (array_values($this->commentsCreated) as $key => $comment) {
       $expected_result[$key]['subject'] = $comment->getSubject();

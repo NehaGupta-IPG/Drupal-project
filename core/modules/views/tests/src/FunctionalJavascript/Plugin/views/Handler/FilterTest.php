@@ -81,8 +81,15 @@ class FilterTest extends WebDriverTestBase {
     $filtering_done = $this->waitForVisibleElementCount(1, 'tr.filterable-option');
     $this->assertTrue($filtering_done);
 
+    if (\Drupal::database()->driver() == 'mongodb') {
+      $field = 'name[node.body_value]';
+    }
+    else {
+      $field = 'name[node__body.body_value]';
+    }
+
     // Select the body field and apply the choice.
-    $page->checkField('name[node__body.body_value]');
+    $page->checkField($field);
     $page->find('css', '.ui-dialog .ui-dialog-buttonpane')->pressButton('Add and configure filter criteria');
     $web_assert->waitForField('options[expose_button][checkbox][checkbox]');
 

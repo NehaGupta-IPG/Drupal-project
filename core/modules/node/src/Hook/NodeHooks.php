@@ -47,7 +47,7 @@ class NodeHooks {
     if ($method === 'user_cancel_block_unpublish') {
       $nids = $this->nodeStorage->getQuery()
         ->accessCheck(FALSE)
-        ->condition('uid', $account->id())
+        ->condition('uid', (int) $account->id())
         ->execute();
       $this->moduleHandler->invoke('node', 'mass_update', [$nids, ['status' => 0], NULL, TRUE]);
     }

@@ -38,7 +38,7 @@ class ProfileFieldValues extends DrupalSqlBase {
     // Find profile values for this row.
     $query = $this->select('profile_values', 'pv')
       ->fields('pv', ['fid', 'value']);
-    $query->leftJoin('profile_fields', 'pf', '[pf].[fid] = [pv].[fid]');
+    $query->leftJoin('profile_fields', 'pf', $query->joinCondition()->compare('pf.fid', 'pv.fid'));
     $query->fields('pf', ['name', 'type']);
     $query->condition('uid', $row->getSourceProperty('uid'));
     $results = $query->execute();
@@ -74,7 +74,7 @@ class ProfileFieldValues extends DrupalSqlBase {
 
     $query = $this->select('profile_values', 'pv')
       ->fields('pv', ['fid', 'value']);
-    $query->leftJoin('profile_fields', 'pf', '[pf].[fid] = [pv].[fid]');
+    $query->leftJoin('profile_fields', 'pf', $query->joinCondition()->compare('pf.fid', 'pv.fid'));
     $query->fields('pf', ['name', 'title']);
     $results = $query->execute();
     foreach ($results as $profile) {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Plugin;
 
+use Drupal\Core\Database\Database;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
@@ -67,20 +68,41 @@ class SqlEntityLoadingTest extends ViewsKernelTestBase {
     $view = Views::getView('base_and_revision');
     $view->execute();
 
-    $expected = [
-      [
-        'nid' => $node->id(),
-        // The default revision ID.
-        'vid_1' => $revision->getRevisionId(),
-        // The latest revision ID.
-        'vid' => $revision2->getRevisionId(),
-      ],
-    ];
-    $this->assertIdenticalResultset($view, $expected, [
-      'node_field_data_node_field_revision_nid' => 'nid',
-      'vid_1' => 'vid_1',
-      'vid' => 'vid',
-    ]);
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $expected = [
+        [
+          'nid' => $node->id(),
+          // In MongoDB the data in the tables node_field_revision and
+          // node_field_data is stored in the "node" table as embedded data.
+          // Therefor it cannot be independently queried/joined from the
+          // database.
+          'vid_1' => $revision2->getRevisionId(),
+          // The latest revision ID.
+          'vid' => $revision2->getRevisionId(),
+        ],
+      ];
+      $this->assertIdenticalResultset($view, $expected, [
+        'nid' => 'nid',
+        'node_node_all_revisions_vid' => 'vid_1',
+        'vid' => 'vid',
+      ]);
+    }
+    else {
+      $expected = [
+        [
+          'nid' => $node->id(),
+          // The default revision ID.
+          'vid_1' => $revision->getRevisionId(),
+          // The latest revision ID.
+          'vid' => $revision2->getRevisionId(),
+        ],
+      ];
+      $this->assertIdenticalResultset($view, $expected, [
+        'node_field_data_node_field_revision_nid' => 'nid',
+        'vid_1' => 'vid_1',
+        'vid' => 'vid',
+      ]);
+    }
   }
 
 }

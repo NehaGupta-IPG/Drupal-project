@@ -73,6 +73,28 @@ interface ConditionInterface {
   public function condition($field, $value = NULL, $operator = '=');
 
   /**
+   * Compare two database fields with each other.
+   *
+   * This method is used in joins to compare 2 fields from different tables to
+   * each other.
+   *
+   * @param string $field
+   *   The name of the field to compare.
+   * @param string $field2
+   *   The name of the other field to compare.
+   * @param string|null $operator
+   *   (optional) The operator to use. The supported operators are: =, <>, <,
+   *   <=, >, >=, <>.
+   *
+   * @return $this
+   *   The called object.
+   *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If passed invalid arguments, such as an empty array as $value.
+   */
+  public function compare(string $field, string $field2, ?string $operator = '=');
+
+  /**
    * Adds an arbitrary WHERE clause to the query.
    *
    * @param string $snippet

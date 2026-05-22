@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Handler;
 
+use Drupal\Core\Database\Database;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
 
@@ -85,7 +86,12 @@ class HandlerAliasTest extends ViewsKernelTestBase {
     $this->assertSame('uid', $filter->definition['real field']);
 
     $this->assertSame('uid_raw', $filter->field);
-    $this->assertSame('users_field_data', $filter->table);
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $this->assertSame('users', $filter->table);
+    }
+    else {
+      $this->assertSame('users_field_data', $filter->table);
+    }
     $this->assertSame('uid', $filter->realField);
   }
 

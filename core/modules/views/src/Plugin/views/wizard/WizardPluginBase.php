@@ -3,6 +3,7 @@
 namespace Drupal\views\Plugin\views\wizard;
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -128,6 +129,13 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
   protected $parentFormSelector;
 
   /**
+   * The database connection.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $connection;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -136,18 +144,20 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
       $plugin_id,
       $plugin_definition,
       $container->get('entity_type.bundle.info'),
-      $container->get('menu.parent_form_selector')
+      $container->get('menu.parent_form_selector'),
+      $container->get('database')
     );
   }
 
   /**
    * Constructs a WizardPluginBase object.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeBundleInfoInterface $bundle_info_service, MenuParentFormSelectorInterface $parent_form_selector) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeBundleInfoInterface $bundle_info_service, MenuParentFormSelectorInterface $parent_form_selector, Connection $connection) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->bundleInfoService = $bundle_info_service;
     $this->base_table = $this->definition['base_table'];
+    $this->connection = $connection;
 
     $this->parentFormSelector = $parent_form_selector;
 
@@ -156,6 +166,9 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
       if (in_array($this->base_table, [$entity_type->getBaseTable(), $entity_type->getDataTable(), $entity_type->getRevisionTable(), $entity_type->getRevisionDataTable()], TRUE)) {
         $this->entityType = $entity_type;
         $this->entityTypeId = $entity_type_id;
+        if ($this->connection->driver() == 'mongodb') {
+          $this->base_table = $entity_type->getBaseTable();
+        }
       }
     }
   }

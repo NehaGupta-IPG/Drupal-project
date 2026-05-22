@@ -323,7 +323,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    * {@inheritdoc}
    */
   public function getLoadedRevisionId() {
-    return $this->loadedRevisionId;
+    return !is_null($this->loadedRevisionId) ? (int) $this->loadedRevisionId : NULL;
   }
 
   /**

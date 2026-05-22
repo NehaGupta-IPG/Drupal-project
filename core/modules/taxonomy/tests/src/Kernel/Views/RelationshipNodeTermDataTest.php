@@ -31,6 +31,7 @@ class RelationshipNodeTermDataTest extends TaxonomyTestBase {
     $expected = [
       'config' => ['core.entity_view_mode.node.teaser'],
       'module' => [
+        'mongodb',
         'node',
         'taxonomy',
         'user',

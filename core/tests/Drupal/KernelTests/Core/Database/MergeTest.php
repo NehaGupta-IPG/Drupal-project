@@ -118,6 +118,11 @@ class MergeTest extends DatabaseTestBase {
    * Confirms that we can merge-update a record successfully, with expressions.
    */
   public function testMergeUpdateExpression(): void {
+    if ($this->connection->driver() == 'mongodb') {
+      // Mongodb Does not support expressions in Merge queries.
+      $this->markTestSkipped();
+    }
+
     $num_records_before = $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();
 
     $age_before = $this->connection->query('SELECT [age] FROM {test_people} WHERE [job] = :job', [':job' => 'Speaker'])->fetchField();

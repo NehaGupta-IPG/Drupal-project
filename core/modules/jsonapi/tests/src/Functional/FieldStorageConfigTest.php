@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
+use Drupal\Core\Database\Database;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldStorageConfig;
 
@@ -66,7 +67,7 @@ class FieldStorageConfigTest extends ConfigEntityResourceTestBase {
    */
   protected function getExpectedDocument(): array {
     $self_url = Url::fromUri('base:/jsonapi/field_storage_config/field_storage_config/' . $this->entity->uuid())->setAbsolute()->toString(TRUE)->getGeneratedUrl();
-    return [
+    $return = [
       'jsonapi' => [
         'meta' => [
           'links' => [
@@ -107,6 +108,13 @@ class FieldStorageConfigTest extends ConfigEntityResourceTestBase {
         ],
       ],
     ];
+
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $return['data']['attributes']['dependencies']['module'] = ['mongodb', 'node'];
+      $return['data']['attributes']['module'] = 'mongodb';
+    }
+
+    return $return;
   }
 
   /**

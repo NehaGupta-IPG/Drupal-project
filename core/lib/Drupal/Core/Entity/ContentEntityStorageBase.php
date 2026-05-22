@@ -333,8 +333,8 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     }
 
     $query = $this->getQuery()
-      ->condition($this->entityType->getKey('id'), $entity->id())
-      ->condition($this->entityType->getKey('default_langcode'), 0)
+      ->condition($this->entityType->getKey('id'), (int) $entity->id())
+      ->condition($this->entityType->getKey('default_langcode'), FALSE)
       ->accessCheck(FALSE)
       ->range(0, 1);
 
@@ -483,7 +483,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     if (!isset($this->latestRevisionIds[$entity_id][LanguageInterface::LANGCODE_DEFAULT])) {
       $result = $this->getQuery()
         ->latestRevision()
-        ->condition($this->entityType->getKey('id'), $entity_id)
+        ->condition($this->entityType->getKey('id'), (int) $entity_id)
         ->accessCheck(FALSE)
         ->execute();
 
@@ -508,8 +508,8 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     if (!isset($this->latestRevisionIds[$entity_id][$langcode])) {
       $result = $this->getQuery()
         ->allRevisions()
-        ->condition($this->entityType->getKey('id'), $entity_id)
-        ->condition($this->entityType->getKey('revision_translation_affected'), 1, '=', $langcode)
+        ->condition($this->entityType->getKey('id'), (int) $entity_id)
+        ->condition($this->entityType->getKey('revision_translation_affected'), TRUE, '=', $langcode)
         ->range(0, 1)
         ->sort($this->entityType->getKey('revision'), 'DESC')
         ->accessCheck(FALSE)
@@ -616,9 +616,14 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       // If we had to load all the entities ($ids was set to NULL), get an array
       // of IDs that still need to be loaded.
       else {
+        // For MongoDB all integer values need to be real integer values.
+        $entity_ids = [];
+        foreach (array_keys($entities) as $entity_id) {
+          $entity_ids[] = (int) $entity_id;
+        }
         $result = $this->getQuery()
           ->accessCheck(FALSE)
-          ->condition($this->entityType->getKey('id'), array_keys($entities), 'NOT IN')
+          ->condition($this->entityType->getKey('id'), $entity_ids, 'NOT IN')
           ->execute();
         $ids = array_values($result);
       }

@@ -17,7 +17,7 @@ class UserViewsExecutionHooks {
    */
   #[Hook('views_query_substitutions')]
   public function viewsQuerySubstitutions(ViewExecutable $view) {
-    return ['***CURRENT_USER***' => \Drupal::currentUser()->id()];
+    return ['***CURRENT_USER***' => (int) \Drupal::currentUser()->id()];
   }
 
 }

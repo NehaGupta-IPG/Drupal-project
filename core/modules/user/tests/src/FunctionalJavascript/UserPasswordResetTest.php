@@ -64,7 +64,7 @@ class UserPasswordResetTest extends WebDriverTestBase {
     $account->login = \Drupal::time()->getRequestTime() - mt_rand(10, 100000);
     Database::getConnection()->update('users_field_data')
       ->fields(['login' => $account->getLastLoginTime()])
-      ->condition('uid', $account->id())
+      ->condition('uid', (int) $account->id())
       ->execute();
   }
 

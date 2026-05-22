@@ -67,7 +67,14 @@ class ContextualFilterTest extends WebDriverTestBase {
 
     $page->clickLink('views-add-argument');
 
-    $field = $web_assert->waitForField('name[node_field_data.nid]');
+    if (\Drupal::database()->driver() == 'mongodb') {
+      $field = 'name[node.nid]';
+    }
+    else {
+      $field = 'name[node_field_data.nid]';
+    }
+
+    $field = $web_assert->waitForField($field);
     $this->assertNotEmpty($field);
     $field->check();
 

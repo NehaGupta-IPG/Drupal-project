@@ -23,7 +23,7 @@ class UpdateLobTest extends DatabaseTestBase {
 
     $data .= $data;
     $this->connection->update('test_one_blob')
-      ->condition('id', $id)
+      ->condition('id', (int) $id)
       ->fields(['blob1' => $data])
       ->execute();
 
@@ -43,7 +43,7 @@ class UpdateLobTest extends DatabaseTestBase {
 
     $this->connection->update('test_one_blob')
       ->fields(['blob1' => NULL])
-      ->condition('id', $id)
+      ->condition('id', (int) $id)
       ->execute();
     $r = $this->connection->query('SELECT * FROM {test_one_blob} WHERE [id] = :id', [':id' => $id])->fetchAssoc();
     $this->assertNull($r['blob1']);
@@ -61,7 +61,7 @@ class UpdateLobTest extends DatabaseTestBase {
       ->execute();
 
     $this->connection->update('test_two_blobs')
-      ->condition('id', $id)
+      ->condition('id', (int) $id)
       ->fields(['blob1' => 'and so', 'blob2' => 'is this'])
       ->execute();
 

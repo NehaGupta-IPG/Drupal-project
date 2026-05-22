@@ -126,6 +126,14 @@ class SelectExtender implements SelectInterface {
   /**
    * {@inheritdoc}
    */
+  public function compare(string $field, string $field2, ?string $operator = '=') {
+    $this->query->compare($field, $field2, $operator);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function where($snippet, $args = []) {
     $this->query->where($snippet, $args);
     return $this;
@@ -362,6 +370,69 @@ class SelectExtender implements SelectInterface {
   /**
    * {@inheritdoc}
    */
+  public function addExpressionConstant($constant, $alias = NULL) {
+    return $this->query->addExpressionConstant($constant, $alias);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addExpressionField($field, $alias = NULL) {
+    return $this->query->addExpressionField($field, $alias);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addExpressionMax($field, $alias = NULL) {
+    return $this->query->addExpressionMax($field, $alias);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addExpressionMin($field, $alias = NULL) {
+    return $this->query->addExpressionMin($field, $alias);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addExpressionSum($field, $alias = NULL) {
+    return $this->query->addExpressionSum($field, $alias);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addExpressionCount($field, $alias = NULL) {
+    return $this->query->addExpressionCount($field, $alias);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addExpressionCountAll($alias = NULL) {
+    return $this->query->addExpressionCountAll($alias);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addExpressionCountDistinct($field, $alias = NULL) {
+    return $this->query->addExpressionCountDistinct($field, $alias);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addExpressionCoalesce($fields, $alias = NULL) {
+    return $this->query->addExpressionCoalesce($fields, $alias);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function join($table, $alias = NULL, $condition = NULL, $arguments = []) {
     return $this->query->join($table, $alias, $condition, $arguments);
   }
@@ -385,6 +456,13 @@ class SelectExtender implements SelectInterface {
    */
   public function addJoin($type, $table, $alias = NULL, $condition = NULL, $arguments = []) {
     return $this->query->addJoin($type, $table, $alias, $condition, $arguments);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function joinCondition(string $conjunction = 'AND') {
+    return $this->query->joinCondition($conjunction);
   }
 
   /**

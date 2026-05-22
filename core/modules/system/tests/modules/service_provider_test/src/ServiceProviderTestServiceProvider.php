@@ -14,7 +14,13 @@ class ServiceProviderTestServiceProvider implements ServiceModifierInterface {
    * {@inheritdoc}
    */
   public function alter(ContainerBuilder $container) {
-    if ($container->has('file.usage')) {
+    // The mongodb module overrides the service file.usage.
+    if ($container->has('mongodb.file.usage')) {
+      // Override the class used for the mongodb.file.usage service.
+      $definition = $container->getDefinition('mongodb.file.usage');
+      $definition->setClass('Drupal\service_provider_test\TestFileUsage');
+    }
+    elseif ($container->has('file.usage')) {
       // Override the class used for the file.usage service.
       $definition = $container->getDefinition('file.usage');
       $definition->setClass('Drupal\service_provider_test\TestFileUsage');

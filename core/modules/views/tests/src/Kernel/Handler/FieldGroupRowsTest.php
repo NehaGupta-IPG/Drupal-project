@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Handler;
 
+use Drupal\Core\Database\Database;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\field\Entity\FieldConfig;
@@ -87,21 +88,26 @@ class FieldGroupRowsTest extends ViewsKernelTestBase {
     $this->executeView($view);
     $view->render();
 
-    $view->row_index = 0;
-    $output = $renderer->executeInRenderContext(new RenderContext(), function () use ($view) {
-      return $view->field['field_group_rows']->advancedRender($view->result[0]);
-    });
-    $this->assertEquals('a', $output);
-    $view->row_index = 1;
-    $output = $renderer->executeInRenderContext(new RenderContext(), function () use ($view) {
-      return $view->field['field_group_rows']->advancedRender($view->result[1]);
-    });
-    $this->assertEquals('b', $output);
-    $view->row_index = 2;
-    $output = $renderer->executeInRenderContext(new RenderContext(), function () use ($view) {
-      return $view->field['field_group_rows']->advancedRender($view->result[2]);
-    });
-    $this->assertEquals('c', $output);
+    // For MongoDB all entity data is stored in a single document and not as
+    // separate rows in multiple tables. As a result the following part is not
+    // supported by MongoDB.
+    if (Database::getConnection()->driver() != 'mongodb') {
+      $view->row_index = 0;
+      $output = $renderer->executeInRenderContext(new RenderContext(), function () use ($view) {
+        return $view->field['field_group_rows']->advancedRender($view->result[0]);
+      });
+      $this->assertEquals('a', $output);
+      $view->row_index = 1;
+      $output = $renderer->executeInRenderContext(new RenderContext(), function () use ($view) {
+        return $view->field['field_group_rows']->advancedRender($view->result[1]);
+      });
+      $this->assertEquals('b', $output);
+      $view->row_index = 2;
+      $output = $renderer->executeInRenderContext(new RenderContext(), function () use ($view) {
+        return $view->field['field_group_rows']->advancedRender($view->result[2]);
+      });
+      $this->assertEquals('c', $output);
+    }
   }
 
 }

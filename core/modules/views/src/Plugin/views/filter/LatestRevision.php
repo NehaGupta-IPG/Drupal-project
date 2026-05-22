@@ -94,7 +94,7 @@ class LatestRevision extends FilterPluginBase implements ContainerFactoryPluginI
     $keys = $entity_type->getKeys();
 
     $subquery = $query->getConnection()->select($query_base_table, 'base_table');
-    $subquery->addExpression("MAX(base_table.{$keys['revision']})", $keys['revision']);
+    $subquery->addExpressionMax("base_table.{$keys['revision']}", $keys['revision']);
     $subquery->groupBy("base_table.{$keys['id']}");
     $query->addWhere($this->options['group'], "$query_base_table.{$keys['revision']}", $subquery, 'IN');
   }

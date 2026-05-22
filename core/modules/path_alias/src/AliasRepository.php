@@ -99,7 +99,7 @@ class AliasRepository implements AliasRepositoryInterface {
    */
   public function pathHasMatchingAlias($initial_substring) {
     $query = $this->getBaseQuery();
-    $query->addExpression(1);
+    $query->addExpressionConstant(1);
 
     return (bool) $query
       ->condition('base_table.path', $this->connection->escapeLike($initial_substring) . '%', 'LIKE')
@@ -116,7 +116,7 @@ class AliasRepository implements AliasRepositoryInterface {
    */
   protected function getBaseQuery() {
     $query = $this->connection->select('path_alias', 'base_table');
-    $query->condition('base_table.status', 1);
+    $query->condition('base_table.status', TRUE);
 
     return $query;
   }

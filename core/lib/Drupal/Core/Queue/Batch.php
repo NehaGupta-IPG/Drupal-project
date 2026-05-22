@@ -26,7 +26,14 @@ class Batch extends DatabaseQueue {
    */
   public function claimItem($lease_time = 0) {
     try {
-      $item = $this->connection->queryRange('SELECT [data], [item_id] FROM {queue} q WHERE [name] = :name ORDER BY [item_id] ASC', 0, 1, [':name' => $this->name])->fetchObject();
+      $item = $this->connection->select('queue', 'q')
+        ->fields('q', ['data', 'item_id'])
+        ->condition('name', $this->name)
+        ->orderBy('item_id', 'ASC')
+        ->range(0, 1)
+        ->execute()
+        ->fetchObject();
+
       if ($item) {
         $item->data = unserialize($item->data);
         return $item;

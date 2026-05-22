@@ -77,10 +77,10 @@ class ModerationStateFieldItemList extends FieldItemList {
     $revisions = $content_moderation_storage->getQuery()
       ->accessCheck(FALSE)
       ->condition('content_entity_type_id', $entity->getEntityTypeId())
-      ->condition('content_entity_id', $entity->id())
+      ->condition('content_entity_id', (int) $entity->id())
       // Ensure the correct revision is loaded in scenarios where a revision is
       // being reverted.
-      ->condition('content_entity_revision_id', $entity->isNewRevision() ? $entity->getLoadedRevisionId() : $entity->getRevisionId())
+      ->condition('content_entity_revision_id', $entity->isNewRevision() ? (int) $entity->getLoadedRevisionId() : (int) $entity->getRevisionId())
       ->condition('workflow', $moderation_info->getWorkflowForEntity($entity)->id())
       ->condition('langcode', $entity->language()->getId())
       ->allRevisions()

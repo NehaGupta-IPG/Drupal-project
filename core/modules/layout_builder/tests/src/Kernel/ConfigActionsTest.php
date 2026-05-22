@@ -28,6 +28,7 @@ class ConfigActionsTest extends KernelTestBase {
    * Tests config actions exposed by Layout Builder.
    */
   public function testLayoutBuilderActions(): void {
+    $this->installEntitySchema('entity_test_with_bundle');
     /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */
     $manager = $this->container->get('plugin.manager.config_action');
 

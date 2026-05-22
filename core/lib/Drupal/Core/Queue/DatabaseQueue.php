@@ -35,6 +35,15 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
   protected $connection;
 
   /**
+   * Indicator for the existence of the database table.
+   *
+   *  This variable is only used by the database driver for MongoDB.
+   *
+   * @var bool
+   */
+  protected $tableExists = FALSE;
+
+  /**
    * Constructs a \Drupal\Core\Queue\DatabaseQueue object.
    *
    * @param string $name
@@ -51,23 +60,34 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
    * {@inheritdoc}
    */
   public function createItem($data) {
-    $try_again = FALSE;
-    try {
-      $id = $this->doCreateItem($data);
-    }
-    catch (\Exception $e) {
-      // If there was an exception, try to create the table.
-      if (!$try_again = $this->ensureTableExists()) {
-        // If the exception happened for other reason than the missing table,
-        // propagate the exception.
-        throw $e;
+    if ($this->connection->driver() == 'mongodb') {
+      // For MongoDB the table needs to exist. Otherwise MongoDB creates one
+      // without the correct validation.
+      if (!$this->tableExists) {
+        $this->tableExists = $this->ensureTableExists();
       }
+
+      return $this->doCreateItem($data);
     }
-    // Now that the table has been created, try again if necessary.
-    if ($try_again) {
-      $id = $this->doCreateItem($data);
+    else {
+      $try_again = FALSE;
+      try {
+        $id = $this->doCreateItem($data);
+      }
+      catch (\Exception $e) {
+        // If there was an exception, try to create the table.
+        if (!$try_again = $this->ensureTableExists()) {
+          // If the exception happened for other reason than the missing table,
+          // propagate the exception.
+          throw $e;
+        }
+      }
+      // Now that the table has been created, try again if necessary.
+      if ($try_again) {
+        $id = $this->doCreateItem($data);
+      }
+      return $id;
     }
-    return $id;
   }
 
   /**
@@ -101,8 +121,17 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
    */
   public function numberOfItems() {
     try {
-      return (int) $this->connection->query('SELECT COUNT([item_id]) FROM {' . static::TABLE_NAME . '} WHERE [name] = :name', [':name' => $this->name])
-        ->fetchField();
+      if ($this->connection->driver() == 'mongodb') {
+        $prefixed_table = $this->connection->getPrefix() . static::TABLE_NAME;
+        return $this->connection->getConnection()->selectCollection($prefixed_table)->count(
+          ['name' => ['$eq' => $this->name]],
+          ['session' => $this->connection->getMongodbSession()]
+        );
+      }
+      else {
+        return (int) $this->connection->query('SELECT COUNT([item_id]) FROM {' . static::TABLE_NAME . '} WHERE [name] = :name', [':name' => $this->name])
+          ->fetchField();
+      }
     }
     catch (\Exception $e) {
       $this->catchException($e);
@@ -121,7 +150,20 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
     // are no unclaimed items left.
     while (TRUE) {
       try {
-        $item = $this->connection->queryRange('SELECT [data], [created], [item_id] FROM {' . static::TABLE_NAME . '} q WHERE [expire] = 0 AND [name] = :name ORDER BY [created], [item_id] ASC', 0, 1, [':name' => $this->name])->fetchObject();
+        if ($this->connection->driver() == 'mongodb') {
+          $item = $this->connection->select(static::TABLE_NAME, 'b')
+            ->fields('b', ['data', 'created', 'item_id'])
+            ->condition('expire', 0)
+            ->condition('name', $this->name)
+            ->orderBy('created')
+            ->orderBy('item_id')
+            ->range(0, 1)
+            ->execute()
+            ->fetchObject();
+        }
+        else {
+          $item = $this->connection->queryRange('SELECT [data], [created], [item_id] FROM {' . static::TABLE_NAME . '} q WHERE [expire] = 0 AND [name] = :name ORDER BY [created], [item_id] ASC', 0, 1, [':name' => $this->name])->fetchObject();
+        }
       }
       catch (\Exception $e) {
         $this->catchException($e);
@@ -143,7 +185,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
         ->fields([
           'expire' => \Drupal::time()->getCurrentTime() + $lease_time,
         ])
-        ->condition('item_id', $item->item_id)
+        ->condition('item_id', (int) $item->item_id)
         ->condition('expire', 0);
       // If there are affected rows, this update succeeded.
       if ($update->execute()) {
@@ -162,7 +204,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
         ->fields([
           'expire' => 0,
         ])
-        ->condition('item_id', $item->item_id);
+        ->condition('item_id', (int) $item->item_id);
       return (bool) $update->execute();
     }
     catch (\Exception $e) {
@@ -189,7 +231,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
         ->fields([
           'expire' => $expire,
         ])
-        ->condition('item_id', $item->item_id);
+        ->condition('item_id', (int) $item->item_id);
       return (bool) $update->execute();
     }
     catch (\Exception $e) {
@@ -205,7 +247,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
   public function deleteItem($item) {
     try {
       $this->connection->delete(static::TABLE_NAME)
-        ->condition('item_id', $item->item_id)
+        ->condition('item_id', (int) $item->item_id)
         ->execute();
     }
     catch (\Exception $e) {

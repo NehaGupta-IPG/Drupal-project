@@ -57,7 +57,7 @@ abstract class DateTimeHandlerTestBase extends ViewsKernelTestBase {
    * {@inheritdoc}
    */
   protected function setUp($import_test_views = TRUE): void {
-    parent::setUp($import_test_views);
+    parent::setUp(FALSE);
 
     $this->installSchema('node', 'node_access');
     $this->installEntitySchema('node');

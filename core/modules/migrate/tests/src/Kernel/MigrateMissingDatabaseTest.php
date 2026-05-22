@@ -49,8 +49,8 @@ class MigrateMissingDatabaseTest extends KernelTestBase {
    * - The checkRequirements() method throws a RequirementsException.
    */
   public function testMissingDatabase(): void {
-    if (Database::getConnection()->driver() === 'sqlite') {
-      $this->markTestSkipped('Not compatible with sqlite');
+    if (in_array(Database::getConnection()->driver(), ['sqlite', 'mongodb'])) {
+      $this->markTestSkipped('Not compatible with SQLite or MongoDB');
     }
 
     $migration = $this->migrationPluginManager->createInstance('missing_database');

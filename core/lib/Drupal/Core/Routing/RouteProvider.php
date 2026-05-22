@@ -10,6 +10,7 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\PathProcessor\InboundPathProcessorInterface;
 use Drupal\Core\State\StateInterface;
+use Drupal\mongodb\Driver\Database\mongodb\Statement;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -231,8 +232,23 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
       }
       else {
         try {
-          $result = $this->connection->query('SELECT [name], [route] FROM {' . $this->connection->escapeTable($this->tableName) . '} WHERE [name] IN ( :names[] )', [':names[]' => $routes_to_load]);
-          $routes = $result->fetchAllKeyed();
+          if ($this->connection->driver() == 'mongodb') {
+            $prefixed_table = $this->connection->getPrefix() . $this->tableName;
+            $cursor = $this->connection->getConnection()->selectCollection($prefixed_table)->find(
+              ['name' => ['$in' => $routes_to_load]],
+              [
+                'projection' => ['name' => 1, 'route' => 1, '_id' => 0],
+                'session' => $this->connection->getMongodbSession(),
+              ]
+            );
+
+            $statement = new Statement($this->connection, $cursor, ['name', 'route']);
+            $routes = $statement->execute()->fetchAllKeyed();
+          }
+          else {
+            $result = $this->connection->query('SELECT [name], [route] FROM {' . $this->connection->escapeTable($this->tableName) . '} WHERE [name] IN ( :names[] )', [':names[]' => $routes_to_load]);
+            $routes = $result->fetchAllKeyed();
+          }
 
           $this->cache->set($cid, $routes, Cache::PERMANENT, ['routes']);
         }
@@ -367,11 +383,26 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
     // trailing wildcard parts as long as the pattern matches, since we
     // dump the route pattern without those optional parts.
     try {
-      $routes = $this->connection->query("SELECT [name], [route], [fit] FROM {" . $this->connection->escapeTable($this->tableName) . "} WHERE [pattern_outline] IN ( :patterns[] ) AND [number_parts] >= :count_parts", [
-        ':patterns[]' => $ancestors,
-        ':count_parts' => count($parts),
-      ])
-        ->fetchAll(\PDO::FETCH_ASSOC);
+      if ($this->connection->driver() == 'mongodb') {
+        $prefixed_table = $this->connection->getPrefix() . $this->tableName;
+        $cursor = $this->connection->getConnection()->selectCollection($prefixed_table)->find(
+          ['pattern_outline' => ['$in' => $ancestors], 'number_parts' => ['$gte' => count($parts)]],
+          [
+            'projection' => ['name' => 1, 'route' => 1, 'fit' => 1, '_id' => 0],
+            'session' => $this->connection->getMongodbSession(),
+          ]
+        );
+
+        $statement = new Statement($this->connection, $cursor, ['name', 'route', 'fit']);
+        $routes = $statement->execute()->fetchAll(\PDO::FETCH_ASSOC);
+      }
+      else {
+        $routes = $this->connection->query("SELECT [name], [route], [fit] FROM {" . $this->connection->escapeTable($this->tableName) . "} WHERE [pattern_outline] IN ( :patterns[] ) AND [number_parts] >= :count_parts", [
+          ':patterns[]' => $ancestors,
+          ':count_parts' => count($parts),
+        ])
+          ->fetchAll(\PDO::FETCH_ASSOC);
+      }
     }
     catch (\Exception) {
       $routes = [];

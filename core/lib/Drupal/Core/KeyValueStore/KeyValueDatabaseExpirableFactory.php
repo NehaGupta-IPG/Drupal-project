@@ -5,6 +5,7 @@ namespace Drupal\Core\KeyValueStore;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Serialization\SerializationInterface;
 use Drupal\Core\Database\Connection;
+use MongoDB\BSON\UTCDateTime;
 
 /**
  * Defines the key/value store factory for the database backend.
@@ -50,8 +51,12 @@ class KeyValueDatabaseExpirableFactory implements KeyValueExpirableFactoryInterf
    */
   public function garbageCollection() {
     try {
+      $now = $this->time->getRequestTime();
+      if ($this->connection->driver() == 'mongodb') {
+        $now = new UTCDateTime($now * 1000);
+      }
       $this->connection->delete('key_value_expire')
-        ->condition('expire', $this->time->getRequestTime(), '<')
+        ->condition('expire', $now, '<')
         ->execute();
     }
     catch (\Exception $e) {

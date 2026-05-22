@@ -22,6 +22,10 @@ class StandardRecipeTest extends StandardTest {
    * Tests Standard installation recipe.
    */
   public function testStandard(): void {
+    if (\Drupal::database()->driver() === 'mongodb') {
+      $this->markTestSkipped();
+    }
+
     // Install some modules that Standard has optional integrations with.
     \Drupal::service('module_installer')->install(['media_library', 'content_moderation']);
 

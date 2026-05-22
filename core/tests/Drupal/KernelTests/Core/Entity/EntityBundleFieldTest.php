@@ -81,11 +81,24 @@ class EntityBundleFieldTest extends EntityKernelTestBase {
     $entity->delete();
     /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
     $table_mapping = $storage->getTableMapping();
-    $table = $table_mapping->getDedicatedDataTableName($entity->getFieldDefinition('custom_bundle_field')->getFieldStorageDefinition());
-    $result = $this->database->select($table, 'f')
-      ->fields('f')
-      ->condition('f.entity_id', $entity->id())
-      ->execute();
+    if ($this->database->driver() == 'mongodb') {
+      $table = $table_mapping->getJsonStorageDedicatedTableName(
+        $entity->getFieldDefinition('custom_bundle_field')->getFieldStorageDefinition(),
+        $storage->getBaseTable(),
+      );
+      $result = $this->database->select($storage->getBaseTable(), 'b')
+        ->fields('f')
+        ->condition("$table.entity_id", $entity->id())
+        ->execute();
+    }
+    else {
+      $table = $table_mapping->getDedicatedDataTableName($entity->getFieldDefinition('custom_bundle_field')
+        ->getFieldStorageDefinition());
+      $result = $this->database->select($table, 'f')
+        ->fields('f')
+        ->condition('f.entity_id', $entity->id())
+        ->execute();
+    }
     $this->assertFalse($result->fetchAssoc(), 'Field data has been deleted');
 
     // Create another entity to test that values are marked as deleted when a
@@ -94,12 +107,29 @@ class EntityBundleFieldTest extends EntityKernelTestBase {
     $entity->save();
     entity_test_delete_bundle('custom', 'entity_test_update');
 
-    $table = $table_mapping->getDedicatedDataTableName($entity->getFieldDefinition('custom_bundle_field')->getFieldStorageDefinition(), TRUE);
-    $result = $this->database->select($table, 'f')
-      ->condition('f.entity_id', $entity->id())
-      ->condition('deleted', 1)
-      ->countQuery()
-      ->execute();
+    if ($this->database->driver() == 'mongodb') {
+      $table = $table_mapping->getJsonStorageDedicatedTableName(
+        $entity->getFieldDefinition('custom_bundle_field')->getFieldStorageDefinition(),
+        $storage->getBaseTable(),
+        TRUE,
+      );
+      $result = $this->database->select($storage->getBaseTable(), 'b')
+        ->condition($table . '.entity_id', (int) $entity->id())
+        ->condition($table . '.deleted', TRUE)
+        ->countQuery()
+        ->execute();
+    }
+    else {
+      $table = $table_mapping->getDedicatedDataTableName(
+        $entity->getFieldDefinition('custom_bundle_field')->getFieldStorageDefinition(),
+        TRUE,
+      );
+      $result = $this->database->select($table, 'f')
+        ->condition('f.entity_id', $entity->id())
+        ->condition('deleted', 1)
+        ->countQuery()
+        ->execute();
+    }
     $this->assertEquals(1, $result->fetchField(), 'Field data has been deleted');
 
     // Ensure that the field no longer exists in the field map.

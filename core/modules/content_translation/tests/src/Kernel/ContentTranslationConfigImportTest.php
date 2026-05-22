@@ -105,9 +105,16 @@ class ContentTranslationConfigImportTest extends KernelTestBase {
 
     // Verify that updates were performed.
     $entity_type = $this->container->get('entity_type.manager')->getDefinition($entity_type_id);
-    $table = $entity_type->getDataTable();
-    $db_schema = $this->container->get('database')->schema();
-    $result = $db_schema->fieldExists($table, 'content_translation_source') && $db_schema->fieldExists($table, 'content_translation_outdated');
+    $connection = $this->container->get('database');
+    if ($connection->driver() == 'mongodb') {
+      $result =
+        $connection->tableInformation()->getTableField('entity_test_mul_translations', 'content_translation_source') &&
+        $connection->tableInformation()->getTableField('entity_test_mul_translations', 'content_translation_source');
+    }
+    else {
+      $table = $entity_type->getDataTable();
+      $result = $connection->schema()->fieldExists($table, 'content_translation_source') && $connection->schema()->fieldExists($table, 'content_translation_outdated');
+    }
     $this->assertTrue($result, 'Content translation updates were successfully performed during config import.');
   }
 

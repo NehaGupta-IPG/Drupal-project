@@ -82,12 +82,12 @@ class MessageForm extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $filters['message'] = [
       'title' => $this->t('message'),
-      'where' => 'msg.message LIKE ?',
+      'where' => 'msg.message',
       'type' => 'string',
     ];
     $filters['severity'] = [
       'title' => $this->t('Severity'),
-      'where' => 'msg.level = ?',
+      'where' => 'msg.level',
       'type' => 'array',
     ];
     $session_filters = $this->getRequest()->getSession()->get('migration_messages_overview_filter', []);

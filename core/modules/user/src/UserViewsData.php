@@ -15,31 +15,40 @@ class UserViewsData extends EntityViewsData {
   public function getViewsData() {
     $data = parent::getViewsData();
 
-    $data['users_field_data']['table']['base']['help'] = $this->t('Users who have created accounts on your site.');
-    $data['users_field_data']['table']['base']['access query tag'] = 'user_access';
+    if ($this->connection->driver() == 'mongodb') {
+      $data_table = 'users';
+      $roles_table = 'users';
+    }
+    else {
+      $data_table = 'users_field_data';
+      $roles_table = 'user__roles';
+    }
 
-    $data['users_field_data']['table']['wizard_id'] = 'user';
+    $data[$data_table]['table']['base']['help'] = $this->t('Users who have created accounts on your site.');
+    $data[$data_table]['table']['base']['access query tag'] = 'user_access';
 
-    $data['users_field_data']['uid']['argument']['id'] = 'user_uid';
-    $data['users_field_data']['uid']['argument'] += [
-      'name table' => 'users_field_data',
+    $data[$data_table]['table']['wizard_id'] = 'user';
+
+    $data[$data_table]['uid']['argument']['id'] = 'user_uid';
+    $data[$data_table]['uid']['argument'] += [
+      'name table' => $data_table,
       'name field' => 'name',
       'empty field name' => \Drupal::config('user.settings')->get('anonymous'),
     ];
-    $data['users_field_data']['uid']['filter']['id'] = 'user_name';
-    $data['users_field_data']['uid']['filter']['title'] = $this->t('Name (autocomplete)');
-    $data['users_field_data']['uid']['filter']['help'] = $this->t('The user or author name. Uses an autocomplete widget to find a user name, the actual filter uses the resulting user ID.');
-    $data['users_field_data']['uid']['relationship'] = [
+    $data[$data_table]['uid']['filter']['id'] = 'user_name';
+    $data[$data_table]['uid']['filter']['title'] = $this->t('Name (autocomplete)');
+    $data[$data_table]['uid']['filter']['help'] = $this->t('The user or author name. Uses an autocomplete widget to find a user name, the actual filter uses the resulting user ID.');
+    $data[$data_table]['uid']['relationship'] = [
       'title' => $this->t('Content authored'),
       'help' => $this->t('Relate content to the user who created it. This relationship will create one record for each content item created by the user.'),
       'id' => 'standard',
-      'base' => 'node_field_data',
+      'base' => ($this->connection->driver() == 'mongodb' ? 'node' : 'node_field_data'),
       'base field' => 'uid',
       'field' => 'uid',
       'label' => $this->t('nodes'),
     ];
 
-    $data['users_field_data']['uid_raw'] = [
+    $data[$data_table]['uid_raw'] = [
       'help' => $this->t('The raw numeric user ID.'),
       'real field' => 'uid',
       'filter' => [
@@ -48,19 +57,19 @@ class UserViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['users_field_data']['uid_representative'] = [
+    $data[$data_table]['uid_representative'] = [
       'relationship' => [
         'title' => $this->t('Representative node'),
         'label'  => $this->t('Representative node'),
         'help' => $this->t('Obtains a single representative node for each user, according to a chosen sort criterion.'),
         'id' => 'groupwise_max',
         'relationship field' => 'uid',
-        'outer field' => 'users_field_data.uid',
-        'argument table' => 'users_field_data',
+        'outer field' => "$data_table.uid",
+        'argument table' => $data_table,
         'argument field' => 'uid',
-        'base' => 'node_field_data',
+        'base' => ($this->connection->driver() == 'mongodb' ? 'node' : 'node_field_data'),
         'field' => 'nid',
-        'relationship' => 'node_field_data:uid',
+        'relationship' => ($this->connection->driver() == 'mongodb' ? 'node:uid' : 'node_field_data:uid'),
       ],
     ];
 
@@ -74,22 +83,22 @@ class UserViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['users_field_data']['name']['help'] = $this->t('The user or author name.');
-    $data['users_field_data']['name']['field']['default_formatter'] = 'user_name';
-    $data['users_field_data']['name']['filter']['title'] = $this->t('Name (raw)');
-    $data['users_field_data']['name']['filter']['help'] = $this->t('The user or author name. This filter does not check if the user exists and allows partial matching. Does not use autocomplete.');
+    $data[$data_table]['name']['help'] = $this->t('The user or author name.');
+    $data[$data_table]['name']['field']['default_formatter'] = 'user_name';
+    $data[$data_table]['name']['filter']['title'] = $this->t('Name (raw)');
+    $data[$data_table]['name']['filter']['help'] = $this->t('The user or author name. This filter does not check if the user exists and allows partial matching. Does not use autocomplete.');
 
     // Note that this field implements field level access control.
-    $data['users_field_data']['mail']['help'] = $this->t('Email address for a given user. This field is normally not shown to users, so be cautious when using it.');
+    $data[$data_table]['mail']['help'] = $this->t('Email address for a given user. This field is normally not shown to users, so be cautious when using it.');
 
-    $data['users_field_data']['langcode']['help'] = $this->t('Language of the translation of user information');
+    $data[$data_table]['langcode']['help'] = $this->t('Language of the translation of user information');
 
-    $data['users_field_data']['preferred_langcode']['title'] = $this->t('Preferred language');
-    $data['users_field_data']['preferred_langcode']['help'] = $this->t('Preferred language of the user');
-    $data['users_field_data']['preferred_admin_langcode']['title'] = $this->t('Preferred admin language');
-    $data['users_field_data']['preferred_admin_langcode']['help'] = $this->t('Preferred administrative language of the user');
+    $data[$data_table]['preferred_langcode']['title'] = $this->t('Preferred language');
+    $data[$data_table]['preferred_langcode']['help'] = $this->t('Preferred language of the user');
+    $data[$data_table]['preferred_admin_langcode']['title'] = $this->t('Preferred admin language');
+    $data[$data_table]['preferred_admin_langcode']['help'] = $this->t('Preferred administrative language of the user');
 
-    $data['users_field_data']['created_fulldate'] = [
+    $data[$data_table]['created_fulldate'] = [
       'title' => $this->t('Created date'),
       'help' => $this->t('Date in the form of CCYYMMDD.'),
       'argument' => [
@@ -98,7 +107,7 @@ class UserViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['users_field_data']['created_year_month'] = [
+    $data[$data_table]['created_year_month'] = [
       'title' => $this->t('Created year + month'),
       'help' => $this->t('Date in the form of YYYYMM.'),
       'argument' => [
@@ -107,7 +116,7 @@ class UserViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['users_field_data']['created_year'] = [
+    $data[$data_table]['created_year'] = [
       'title' => $this->t('Created year'),
       'help' => $this->t('Date in the form of YYYY.'),
       'argument' => [
@@ -116,7 +125,7 @@ class UserViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['users_field_data']['created_month'] = [
+    $data[$data_table]['created_month'] = [
       'title' => $this->t('Created month'),
       'help' => $this->t('Date in the form of MM (01 - 12).'),
       'argument' => [
@@ -125,7 +134,7 @@ class UserViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['users_field_data']['created_day'] = [
+    $data[$data_table]['created_day'] = [
       'title' => $this->t('Created day'),
       'help' => $this->t('Date in the form of DD (01 - 31).'),
       'argument' => [
@@ -134,7 +143,7 @@ class UserViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['users_field_data']['created_week'] = [
+    $data[$data_table]['created_week'] = [
       'title' => $this->t('Created week'),
       'help' => $this->t('Date in the form of WW (01 - 53).'),
       'argument' => [
@@ -143,12 +152,12 @@ class UserViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['users_field_data']['status']['filter']['label'] = $this->t('Active');
-    $data['users_field_data']['status']['filter']['type'] = 'yes-no';
+    $data[$data_table]['status']['filter']['label'] = $this->t('Active');
+    $data[$data_table]['status']['filter']['type'] = 'yes-no';
 
-    $data['users_field_data']['changed']['title'] = $this->t('Updated date');
+    $data[$data_table]['changed']['title'] = $this->t('Updated date');
 
-    $data['users_field_data']['changed_fulldate'] = [
+    $data[$data_table]['changed_fulldate'] = [
       'title' => $this->t('Updated date'),
       'help' => $this->t('Date in the form of CCYYMMDD.'),
       'argument' => [
@@ -157,7 +166,7 @@ class UserViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['users_field_data']['changed_year_month'] = [
+    $data[$data_table]['changed_year_month'] = [
       'title' => $this->t('Updated year + month'),
       'help' => $this->t('Date in the form of YYYYMM.'),
       'argument' => [
@@ -166,7 +175,7 @@ class UserViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['users_field_data']['changed_year'] = [
+    $data[$data_table]['changed_year'] = [
       'title' => $this->t('Updated year'),
       'help' => $this->t('Date in the form of YYYY.'),
       'argument' => [
@@ -175,7 +184,7 @@ class UserViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['users_field_data']['changed_month'] = [
+    $data[$data_table]['changed_month'] = [
       'title' => $this->t('Updated month'),
       'help' => $this->t('Date in the form of MM (01 - 12).'),
       'argument' => [
@@ -184,7 +193,7 @@ class UserViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['users_field_data']['changed_day'] = [
+    $data[$data_table]['changed_day'] = [
       'title' => $this->t('Updated day'),
       'help' => $this->t('Date in the form of DD (01 - 31).'),
       'argument' => [
@@ -193,7 +202,7 @@ class UserViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['users_field_data']['changed_week'] = [
+    $data[$data_table]['changed_week'] = [
       'title' => $this->t('Updated week'),
       'help' => $this->t('Date in the form of WW (01 - 53).'),
       'argument' => [
@@ -219,14 +228,20 @@ class UserViewsData extends EntityViewsData {
       ],
     ];
 
+    // Not sure if this is needed anymore.
+    if ($this->connection->driver() == 'mongodb') {
+      $data[$roles_table]['roles_target_id']['title'] = $this->t('Roles');
+      $data[$roles_table]['roles_target_id']['help'] = $this->t('Roles that a user belongs to.');
+    }
+
     // Alter the user roles target_id column.
-    $data['user__roles']['roles_target_id']['field']['id'] = 'user_roles';
-    $data['user__roles']['roles_target_id']['field']['no group by'] = TRUE;
+    $data[$roles_table]['roles_target_id']['field']['id'] = 'user_roles';
+    $data[$roles_table]['roles_target_id']['field']['no group by'] = TRUE;
 
-    $data['user__roles']['roles_target_id']['filter']['id'] = 'user_roles';
-    $data['user__roles']['roles_target_id']['filter']['allow empty'] = TRUE;
+    $data[$roles_table]['roles_target_id']['filter']['id'] = 'user_roles';
+    $data[$roles_table]['roles_target_id']['filter']['allow empty'] = TRUE;
 
-    $data['user__roles']['roles_target_id']['argument'] = [
+    $data[$roles_table]['roles_target_id']['argument'] = [
       'id' => 'user__roles_rid',
       'name table' => 'role',
       'name field' => 'name',
@@ -235,7 +250,7 @@ class UserViewsData extends EntityViewsData {
       'numeric' => FALSE,
     ];
 
-    $data['user__roles']['permission'] = [
+    $data[$roles_table]['permission'] = [
       'title' => $this->t('Permission'),
       'help' => $this->t('The user permissions.'),
       'field' => [
@@ -250,7 +265,7 @@ class UserViewsData extends EntityViewsData {
 
     // Unset the "pass" field because the access control handler for the user
     // entity type allows editing the password, but not viewing it.
-    unset($data['users_field_data']['pass']);
+    unset($data[$data_table]['pass']);
 
     return $data;
   }

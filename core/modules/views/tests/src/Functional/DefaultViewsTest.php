@@ -6,6 +6,7 @@ namespace Drupal\Tests\views\Functional;
 
 use Drupal\comment\CommentInterface;
 use Drupal\comment\Tests\CommentTestTrait;
+use Drupal\Core\Database\Database;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Link;
@@ -208,6 +209,10 @@ class DefaultViewsTest extends ViewTestBase {
     $this->executeView($view);
     $columns = ['nid', 'created_year_month', 'num_records'];
     $column_map = array_combine($columns, $columns);
+    if (Database::getConnection()->driver() == 'mongodb') {
+      unset($column_map['nid']);
+      $column_map['vid'] = 'nid';
+    }
     // Create time of additional nodes created in the setup method.
     $created_year_month = date('Ym', \Drupal::time()->getRequestTime() - 3600);
     $expected_result = [

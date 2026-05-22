@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Kernel\Views;
 
+use Drupal\Core\Database\Database;
 use Drupal\views\Views;
 
 /**
@@ -24,6 +25,10 @@ class RelationshipRepresentativeNodeTest extends TaxonomyTestBase {
    * Tests the relationship.
    */
   public function testRelationship(): void {
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $this->markTestSkipped('The MongoDB database driver does not support groupwise max relationships.');
+    }
+
     $view = Views::getView('test_groupwise_term');
     $this->executeView($view);
     $map = ['node_field_data_taxonomy_term_field_data_nid' => 'nid', 'tid' => 'tid'];

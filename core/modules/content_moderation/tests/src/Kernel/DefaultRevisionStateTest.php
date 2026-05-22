@@ -129,7 +129,7 @@ class DefaultRevisionStateTest extends KernelTestBase {
    *
    * @internal
    */
-  protected function assertModerationState(string $revision_id, string $langcode, string $expected_state, string $expected_workflow = 'editorial'): void {
+  protected function assertModerationState(string|int $revision_id, string $langcode, string $expected_state, string $expected_workflow = 'editorial'): void {
     $moderation_state_storage = $this->entityTypeManager->getStorage('content_moderation_state');
 
     $query = $moderation_state_storage->getQuery()->accessCheck(FALSE);

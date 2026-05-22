@@ -5,6 +5,7 @@
  */
 
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
+use MongoDB\BSON\UTCDateTime;
 
 /**
  * Comparison result of source files timestamps.
@@ -332,11 +333,14 @@ function locale_cron_fill_queue() {
   // Determine which project+language should be updated.
   $request_time = \Drupal::time()->getRequestTime();
   $last = $request_time - $config->get('translation.update_interval_days') * 3600 * 24;
+  $connection = \Drupal::database();
+  if ($connection->driver() == 'mongodb') {
+    $last = new UTCDateTime($last * 1000);
+  }
   $projects = \Drupal::service('locale.project')->getAll();
   $projects = array_filter($projects, function ($project) {
     return $project['status'] == 1;
   });
-  $connection = \Drupal::database();
   $files = $connection->select('locale_file', 'f')
     ->condition('f.project', array_keys($projects), 'IN')
     ->condition('f.last_checked', $last, '<')

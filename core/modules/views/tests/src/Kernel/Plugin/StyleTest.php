@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Plugin;
 
+use Drupal\Core\Database\Database;
 use Drupal\Component\Utility\Html;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
@@ -144,6 +145,12 @@ class StyleTest extends ViewsKernelTestBase {
     $expected['Job: Singer']['rows']['Age: 25']['rows'][0]->views_test_data_job = 'Singer';
     $expected['Job: Singer']['rows']['Age: 25']['rows'][0]->views_test_data_age = '25';
     $expected['Job: Singer']['rows']['Age: 25']['rows'][0]->views_test_data_id = '1';
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $expected['Job: Singer']['rows']['Age: 25']['rows'][0]->name = 'John';
+      $expected['Job: Singer']['rows']['Age: 25']['rows'][0]->job = 'Singer';
+      $expected['Job: Singer']['rows']['Age: 25']['rows'][0]->age = '25';
+      $expected['Job: Singer']['rows']['Age: 25']['rows'][0]->id = '1';
+    }
     $expected['Job: Singer']['rows']['Age: 27'] = [];
     $expected['Job: Singer']['rows']['Age: 27']['group'] = 'Age: 27';
     $expected['Job: Singer']['rows']['Age: 27']['level'] = 1;
@@ -152,6 +159,12 @@ class StyleTest extends ViewsKernelTestBase {
     $expected['Job: Singer']['rows']['Age: 27']['rows'][1]->views_test_data_job = 'Singer';
     $expected['Job: Singer']['rows']['Age: 27']['rows'][1]->views_test_data_age = '27';
     $expected['Job: Singer']['rows']['Age: 27']['rows'][1]->views_test_data_id = '2';
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $expected['Job: Singer']['rows']['Age: 27']['rows'][1]->name = 'George';
+      $expected['Job: Singer']['rows']['Age: 27']['rows'][1]->job = 'Singer';
+      $expected['Job: Singer']['rows']['Age: 27']['rows'][1]->age = '27';
+      $expected['Job: Singer']['rows']['Age: 27']['rows'][1]->id = '2';
+    }
     $expected['Job: Drummer'] = [];
     $expected['Job: Drummer']['group'] = 'Job: Drummer';
     $expected['Job: Drummer']['level'] = 0;
@@ -163,6 +176,12 @@ class StyleTest extends ViewsKernelTestBase {
     $expected['Job: Drummer']['rows']['Age: 28']['rows'][2]->views_test_data_job = 'Drummer';
     $expected['Job: Drummer']['rows']['Age: 28']['rows'][2]->views_test_data_age = '28';
     $expected['Job: Drummer']['rows']['Age: 28']['rows'][2]->views_test_data_id = '3';
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $expected['Job: Drummer']['rows']['Age: 28']['rows'][2]->name = 'Ringo';
+      $expected['Job: Drummer']['rows']['Age: 28']['rows'][2]->job = 'Drummer';
+      $expected['Job: Drummer']['rows']['Age: 28']['rows'][2]->age = '28';
+      $expected['Job: Drummer']['rows']['Age: 28']['rows'][2]->id = '3';
+    }
 
     // Alter the results to support the stripped case.
     if ($stripped) {

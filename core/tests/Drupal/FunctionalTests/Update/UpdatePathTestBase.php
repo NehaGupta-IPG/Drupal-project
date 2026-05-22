@@ -106,6 +106,13 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
     $this->doInstall();
     $this->initSettings();
 
+    if (Database::getConnection()->driver() == 'mongodb') {
+      // The used database dump files are made for a relational database
+      // storage. This is not supported by the database driver for MongoDB. Also
+      // there are no Drupal sites on MongoDB that use the tested upgrades.
+      $this->markTestSkipped();
+    }
+
     $request = Request::createFromGlobals();
     $container = $this->initKernel($request);
     $this->initConfig($container);

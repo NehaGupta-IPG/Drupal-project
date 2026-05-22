@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\comment\Functional\Views;
 
 use Drupal\comment\Tests\CommentTestTrait;
+use Drupal\Core\Database\Database;
 use Drupal\views\Views;
 use Drupal\Tests\views\Functional\Wizard\WizardTestBase;
 
@@ -87,16 +88,32 @@ class WizardTest extends WizardTestBase {
     $row = $view->display_handler->getOption('row');
     $this->assertEquals('entity:comment', $row['type']);
 
+    $connection = Database::getConnection();
     // Check for the default filters.
-    $this->assertEquals('comment_field_data', $view->filter['status']->table);
+    if ($connection->driver() == 'mongodb') {
+      $this->assertEquals('comment', $view->filter['status']->table);
+    }
+    else {
+      $this->assertEquals('comment_field_data', $view->filter['status']->table);
+    }
     $this->assertEquals('status', $view->filter['status']->field);
     $this->assertEquals('1', $view->filter['status']->value);
-    $this->assertEquals('node_field_data', $view->filter['status_node']->table);
+    if ($connection->driver() == 'mongodb') {
+      $this->assertEquals('node', $view->filter['status_node']->table);
+    }
+    else {
+      $this->assertEquals('node_field_data', $view->filter['status_node']->table);
+    }
     $this->assertEquals('status', $view->filter['status_node']->field);
     $this->assertEquals('1', $view->filter['status_node']->value);
 
     // Check for the default fields.
-    $this->assertEquals('comment_field_data', $view->field['subject']->table);
+    if ($connection->driver() == 'mongodb') {
+      $this->assertEquals('comment', $view->field['subject']->table);
+    }
+    else {
+      $this->assertEquals('comment_field_data', $view->field['subject']->table);
+    }
     $this->assertEquals('subject', $view->field['subject']->field);
   }
 

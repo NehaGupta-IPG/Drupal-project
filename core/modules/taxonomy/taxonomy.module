@@ -131,7 +131,7 @@ function taxonomy_build_node_index($node) {
       $connection = \Drupal::database();
       foreach ($tid_all as $tid) {
         $connection->merge('taxonomy_index')
-          ->keys(['nid' => $node->id(), 'tid' => $tid, 'status' => $node->isPublished()])
+          ->keys(['nid' => (int) $node->id(), 'tid' => (int) $tid, 'status' => (bool) $node->isPublished()])
           ->fields(['sticky' => $sticky, 'created' => $node->getCreatedTime()])
           ->execute();
       }
@@ -147,7 +147,7 @@ function taxonomy_build_node_index($node) {
  */
 function taxonomy_delete_node_index(EntityInterface $node) {
   if (\Drupal::config('taxonomy.settings')->get('maintain_index_table')) {
-    \Drupal::database()->delete('taxonomy_index')->condition('nid', $node->id())->execute();
+    \Drupal::database()->delete('taxonomy_index')->condition('nid', (int) $node->id())->execute();
   }
 }
 

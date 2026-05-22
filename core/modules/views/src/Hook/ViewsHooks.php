@@ -6,6 +6,7 @@ use Drupal\views\ViewsConfigUpdater;
 use Drupal\views\ViewEntityInterface;
 use Drupal\views\Plugin\Derivative\ViewsLocalTask;
 use Drupal\Core\Database\Query\AlterableInterface;
+use Drupal\Core\Database\Query\ConditionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\views\ViewExecutable;
@@ -349,6 +350,10 @@ class ViewsHooks {
             }
           }
         }
+      }
+      if (isset($table_metadata['condition']) && ($table_metadata['condition'] instanceof ConditionInterface)) {
+        $table_conditions = &$tables[$table_name]['condition']->conditions();
+        _views_query_tag_alter_condition($query, $table_conditions, $substitutions);
       }
     }
     // Replaces substitutions in filter criteria.

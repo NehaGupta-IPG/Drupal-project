@@ -361,7 +361,7 @@ class Merge extends Query implements ConditionInterface {
 
     $select = $this->connection->select($this->conditionTable)
       ->condition($this->condition);
-    $select->addExpression('1');
+    $select->addExpressionConstant('1');
 
     if (!$select->execute()->fetchField()) {
       try {

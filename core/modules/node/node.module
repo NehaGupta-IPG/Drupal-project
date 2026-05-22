@@ -609,7 +609,7 @@ function _node_access_rebuild_batch_operation(&$context) {
   // Process the next 20 nodes.
   $limit = 20;
   $nids = \Drupal::entityQuery('node')
-    ->condition('nid', $context['sandbox']['current_node'], '>')
+    ->condition('nid', (int) $context['sandbox']['current_node'], '>')
     ->sort('nid', 'ASC')
     // Disable access checking since all nodes must be processed even if the
     // user does not have access. And unless the current user has the bypass

@@ -3,6 +3,7 @@
 namespace Drupal\file\Hook;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Database\Database;
 use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\Core\Render\BubbleableMetadata;
@@ -12,6 +13,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use MongoDB\BSON\UTCDateTime;
 
 /**
  * Hook implementations for file.
@@ -171,7 +173,12 @@ class FileHooks {
     // Only delete temporary files if older than $age. Note that automatic cleanup
     // is disabled if $age set to 0.
     if ($age) {
-      $fids = \Drupal::entityQuery('file')->accessCheck(FALSE)->condition('status', FileInterface::STATUS_PERMANENT, '<>')->condition('changed', \Drupal::time()->getRequestTime() - $age, '<')->range(0, 100)->execute();
+      $timestamp = \Drupal::time()->getRequestTime() - $age;
+      if (Database::getConnection()->driver() == 'mongodb') {
+        $timestamp = new UTCDateTime($timestamp * 1000);
+      }
+
+      $fids = \Drupal::entityQuery('file')->accessCheck(FALSE)->condition('status', FileInterface::STATUS_PERMANENT, '<>')->condition('changed', $timestamp, '<')->range(0, 100)->execute();
       $files = $file_storage->loadMultiple($fids);
       foreach ($files as $file) {
         $references = \Drupal::service('file.usage')->listUsage($file);

@@ -67,7 +67,7 @@ class UsageTest extends FileManagedUnitTestBase {
 
     $usage = Database::getConnection()->select('file_usage', 'f')
       ->fields('f')
-      ->condition('f.fid', $file->id())
+      ->condition('f.fid', (int) $file->id())
       ->execute()
       ->fetchAllAssoc('id');
     $this->assertCount(2, $usage, 'Created two records');
@@ -123,7 +123,7 @@ class UsageTest extends FileManagedUnitTestBase {
     $file_usage->delete($file, 'testing', 'bar', 2);
     $count = $connection->select('file_usage', 'f')
       ->fields('f', ['count'])
-      ->condition('f.fid', $file->id())
+      ->condition('f.fid', (int) $file->id())
       ->execute()
       ->fetchField();
     $this->assertEquals(2, $count, 'The count was decremented correctly.');
@@ -132,7 +132,7 @@ class UsageTest extends FileManagedUnitTestBase {
     $file_usage->delete($file, 'testing', 'bar', 2, 2);
     $count = $connection->select('file_usage', 'f')
       ->fields('f', ['count'])
-      ->condition('f.fid', $file->id())
+      ->condition('f.fid', (int) $file->id())
       ->execute()
       ->fetchField();
     $this->assertFalse($count, 'The count was removed entirely when empty.');
@@ -141,7 +141,7 @@ class UsageTest extends FileManagedUnitTestBase {
     $file_usage->delete($file, 'testing', 'bar', 2);
     $count = $connection->select('file_usage', 'f')
       ->fields('f', ['count'])
-      ->condition('f.fid', $file->id())
+      ->condition('f.fid', (int) $file->id())
       ->execute()
       ->fetchField();
     $this->assertFalse($count, 'Decrementing non-exist record complete.');
@@ -167,7 +167,7 @@ class UsageTest extends FileManagedUnitTestBase {
         'status' => 0,
         'changed' => \Drupal::time()->getRequestTime() - $this->config('system.file')->get('temporary_maximum_age') - 1,
       ])
-      ->condition('fid', $temp_old->id())
+      ->condition('fid', (int) $temp_old->id())
       ->execute();
     $this->assertFileExists($temp_old->getFileUri());
 
@@ -175,7 +175,7 @@ class UsageTest extends FileManagedUnitTestBase {
     $temp_new = $fileRepository->writeData('', $destination);
     $connection->update('file_managed')
       ->fields(['status' => 0])
-      ->condition('fid', $temp_new->id())
+      ->condition('fid', (int) $temp_new->id())
       ->execute();
     $this->assertFileExists($temp_new->getFileUri());
 
@@ -183,7 +183,7 @@ class UsageTest extends FileManagedUnitTestBase {
     $perm_old = $fileRepository->writeData('', $destination);
     $connection->update('file_managed')
       ->fields(['changed' => \Drupal::time()->getRequestTime() - $this->config('system.file')->get('temporary_maximum_age') - 1])
-      ->condition('fid', $temp_old->id())
+      ->condition('fid', (int) $temp_old->id())
       ->execute();
     $this->assertFileExists($perm_old->getFileUri());
 

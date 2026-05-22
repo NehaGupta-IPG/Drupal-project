@@ -104,14 +104,47 @@ class NumericArgument extends ArgumentPluginBase {
     $placeholder = $this->placeholder();
     $null_check = empty($this->options['not']) ? '' : " OR $this->tableAlias.$this->realField IS NULL";
 
-    if (count($this->value) > 1) {
-      $operator = empty($this->options['not']) ? 'IN' : 'NOT IN';
-      $placeholder .= '[]';
-      $this->query->addWhereExpression(0, "$this->tableAlias.$this->realField $operator($placeholder)" . $null_check, [$placeholder => $this->value]);
+    if (($this->view->getDatabaseDriver() == 'mongodb') && ($this->table == $this->view->storage->get('base_table'))) {
+      $field = $this->realField;
     }
     else {
-      $operator = empty($this->options['not']) ? '=' : '!=';
-      $this->query->addWhereExpression(0, "$this->tableAlias.$this->realField $operator $placeholder" . $null_check, [$placeholder => $this->argument]);
+      $field = "$this->tableAlias.$this->realField";
+    }
+
+    if (count($this->value) > 1) {
+      if ($this->view->getDatabaseDriver() == 'mongodb') {
+        if (empty($this->options['not'])) {
+          $this->query->addCondition(0, $field, $this->value, 'IN');
+        }
+        else {
+          $or_condition = $this->view->getDatabaseCondition('OR');
+          $or_condition->condition($field, $this->value, 'NOT IN');
+          $or_condition->isNull($field);
+          $this->query->addCondition(0, $or_condition);
+        }
+      }
+      else {
+        $operator = empty($this->options['not']) ? 'IN' : 'NOT IN';
+        $placeholder .= '[]';
+        $this->query->addWhereExpression(0, "$this->tableAlias.$this->realField $operator($placeholder)" . $null_check, [$placeholder => $this->value]);
+      }
+    }
+    else {
+      if ($this->view->getDatabaseDriver() == 'mongodb') {
+        if (empty($this->options['not'])) {
+          $this->query->addCondition(0, $field, $this->argument, '=');
+        }
+        else {
+          $or_condition = $this->view->getDatabaseCondition('OR');
+          $or_condition->condition($field, $this->argument, '!=');
+          $or_condition->isNull($field);
+          $this->query->addCondition(0, $or_condition);
+        }
+      }
+      else {
+        $operator = empty($this->options['not']) ? '=' : '!=';
+        $this->query->addWhereExpression(0, "$this->tableAlias.$this->realField $operator $placeholder" . $null_check, [$placeholder => $this->argument]);
+      }
     }
   }
 

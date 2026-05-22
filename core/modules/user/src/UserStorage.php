@@ -58,7 +58,7 @@ class UserStorage extends SqlContentEntityStorage implements UserStorageInterfac
       ->fields([
         'access' => $timestamp,
       ])
-      ->condition('uid', $account->id())
+      ->condition('uid', (int) $account->id())
       ->execute();
     // Ensure that the entity cache is cleared.
     $this->resetCache([$account->id()]);

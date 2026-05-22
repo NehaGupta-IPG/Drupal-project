@@ -2,9 +2,13 @@
 
 namespace Drupal\user\Plugin\views\wizard;
 
+use Drupal\Core\Database\Connection;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Drupal\Core\Menu\MenuParentFormSelectorInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsWizard;
 use Drupal\views\Plugin\views\wizard\WizardPluginBase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @todo Replace numbers with constants.
@@ -46,6 +50,32 @@ class Users extends WizardPluginBase {
   /**
    * {@inheritdoc}
    */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('entity_type.bundle.info'),
+      $container->get('menu.parent_form_selector'),
+      $container->get('database')
+    );
+  }
+
+  /**
+   * Constructs a WizardPluginBase object.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeBundleInfoInterface $bundle_info_service, MenuParentFormSelectorInterface $parent_form_selector, Connection $connection) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $bundle_info_service, $parent_form_selector, $connection);
+
+    if ($connection->driver() == 'mongodb') {
+      $this->base_table = 'users';
+      $this->filters['status']['table'] = 'users';
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function defaultDisplayOptions() {
     $display_options = parent::defaultDisplayOptions();
 
@@ -58,7 +88,12 @@ class Users extends WizardPluginBase {
 
     /* Field: User: Name */
     $display_options['fields']['name']['id'] = 'name';
-    $display_options['fields']['name']['table'] = 'users_field_data';
+    if ($this->connection->driver() == 'mongodb') {
+      $display_options['fields']['name']['table'] = 'users';
+    }
+    else {
+      $display_options['fields']['name']['table'] = 'users_field_data';
+    }
     $display_options['fields']['name']['field'] = 'name';
     $display_options['fields']['name']['entity_type'] = 'user';
     $display_options['fields']['name']['entity_field'] = 'name';

@@ -11,6 +11,7 @@
         "ext-hash": "*",
         "ext-json": "*",
         "ext-pcre": "*",
+        "ext-mongodb": "*",
         "ext-PDO": "*",
         "ext-session": "*",
         "ext-SimpleXML": "*",

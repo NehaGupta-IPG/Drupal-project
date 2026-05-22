@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\System;
 
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Database\Database;
 use Drupal\Tests\BrowserTestBase;
 
 /**
@@ -128,17 +129,19 @@ class ErrorHandlerTest extends BrowserTestBase {
       '%file' => $this->getModulePath('error_test') . '/error_test.module',
     ];
     $select = \Drupal::database()->select('bananas_are_awesome', 'b')->fields('b');
-    $message = \Drupal::database()->prepareStatement((string) $select, [])->getQueryString();
-    $message = str_replace(["\r", "\n"], ' ', $message);
-    $error_pdo_exception = [
-      '%type' => 'DatabaseExceptionWrapper',
-      '@message' => PHP_VERSION_ID >= 80400 ?
-      $message :
-      'SELECT "b".* FROM {bananas_are_awesome} "b"',
-      '%function' => 'Drupal\error_test\Controller\ErrorTestController->triggerPDOException()',
-      '%line' => 64,
-      '%file' => $this->getModulePath('error_test') . '/error_test.module',
-    ];
+    if (Database::getConnection()->driver() != 'mongodb') {
+      $message = \Drupal::database()->prepareStatement((string) $select, [])->getQueryString();
+      $message = str_replace(["\r", "\n"], ' ', $message);
+      $error_pdo_exception = [
+        '%type' => 'DatabaseExceptionWrapper',
+        '@message' => PHP_VERSION_ID >= 80400 ?
+        $message :
+        'SELECT "b".* FROM {bananas_are_awesome} "b"',
+        '%function' => 'Drupal\error_test\Controller\ErrorTestController->triggerPDOException()',
+        '%line' => 64,
+        '%file' => $this->getModulePath('error_test') . '/error_test.module',
+      ];
+    }
     $error_renderer_exception = [
       '%type' => 'Exception',
       '@message' => 'This is an exception that occurs during rendering',
@@ -153,16 +156,18 @@ class ErrorHandlerTest extends BrowserTestBase {
     $this->assertSession()->statusCodeEquals(500);
     $this->assertErrorMessage($error_exception);
 
-    $this->drupalGet('error-test/trigger-pdo-exception');
-    $this->assertSession()->statusCodeEquals(500);
-    // We cannot use assertErrorMessage() since the exact error reported
-    // varies from database to database. Check that the SQL string is displayed.
-    $this->assertSession()->pageTextContains($error_pdo_exception['%type']);
-    // Assert statement improved since static queries adds table alias in the
-    // error message.
-    $this->assertSession()->pageTextContains($error_pdo_exception['@message']);
-    $error_details = new FormattableMarkup('in %function (line ', $error_pdo_exception);
-    $this->assertSession()->responseContains($error_details);
+    if (Database::getConnection()->driver() != 'mongodb') {
+      $this->drupalGet('error-test/trigger-pdo-exception');
+      $this->assertSession()->statusCodeEquals(500);
+      // We cannot use assertErrorMessage() since the exact error reported
+      // varies from database to database. Check that the SQL string is displayed.
+      $this->assertSession()->pageTextContains($error_pdo_exception['%type']);
+      // Assert statement improved since static queries adds table alias in the
+      // error message.
+      $this->assertSession()->pageTextContains($error_pdo_exception['@message']);
+      $error_details = new FormattableMarkup('in %function (line ', $error_pdo_exception);
+      $this->assertSession()->responseContains($error_details);
+    }
     $this->drupalGet('error-test/trigger-renderer-exception');
     $this->assertSession()->statusCodeEquals(500);
     $this->assertErrorMessage($error_renderer_exception);

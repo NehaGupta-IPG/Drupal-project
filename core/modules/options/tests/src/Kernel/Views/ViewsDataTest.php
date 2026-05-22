@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\options\Kernel\Views;
 
+use Drupal\Core\Database\Database;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\views\Tests\ViewTestData;
 
 /**
  * Test to ensure views data is properly created for the Options module.
@@ -40,7 +42,7 @@ class ViewsDataTest extends OptionsTestBase {
    * {@inheritdoc}
    */
   protected function setUp($import_test_views = TRUE): void {
-    parent::setUp();
+    parent::setUp(FALSE);
 
     $this->installEntitySchema('entity_test');
     $field_name = 'test_options';
@@ -61,13 +63,22 @@ class ViewsDataTest extends OptionsTestBase {
       'bundle' => 'entity_test',
       'required' => TRUE,
     ])->save();
+
+    // For MongoDB to update the views correctly the views must be loaded after
+    // the creation of the fields.
+    ViewTestData::createTestViews(get_class($this), ['options_test_views']);
   }
 
   /**
    * Tests the option module's implementation of hook_field_views_data().
    */
   public function testOptionsFieldViewsData(): void {
-    $field_data = \Drupal::service('views.views_data')->get('entity_test__test_options');
+    if (Database::getConnection()->driver() == 'mongodb') {
+      $field_data = \Drupal::service('views.views_data')->get('entity_test');
+    }
+    else {
+      $field_data = \Drupal::service('views.views_data')->get('entity_test__test_options');
+    }
 
     // Check that the options module has properly overridden default views data.
     $test_options_field = $field_data['test_options_value'];

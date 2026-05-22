@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Functional\Views;
 
+use Drupal\Core\Database\Database;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
@@ -147,8 +148,15 @@ class TaxonomyTermViewTest extends TaxonomyTestBase {
     $query = $view->build_info['query'];
     $tables = $query->getTables();
 
-    // Ensure that the join to node_field_data is not added by default.
-    $this->assertEquals(['node_field_data', 'taxonomy_index'], array_keys($tables));
+    if (Database::getConnection()->databaseType() == 'mongodb') {
+      // Ensure that the join to node is not added by default.
+      $this->assertEquals(['node', 'taxonomy_index'], array_keys($tables));
+    }
+    else {
+      // Ensure that the join to node_field_data is not added by default.
+      $this->assertEquals(['node_field_data', 'taxonomy_index'], array_keys($tables));
+    }
+
     // Ensure that the filter to the language column is not there by default.
     $condition = $query->conditions();
     // We only want to check the no. of conditions in the query.

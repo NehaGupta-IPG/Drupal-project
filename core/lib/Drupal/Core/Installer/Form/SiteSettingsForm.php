@@ -161,6 +161,34 @@ class SiteSettingsForm extends FormBase {
     $database['driver'] = $driver;
     $database = array_merge($database, $this->databaseDriverList->get($driver)->getAutoloadInfo());
 
+    // For MongoDB there are always multiple hosts. They are in the
+    // settings.php file stored in the hosts array. Change the FORM API values
+    // to the hosts array for the settings.php file.
+    if ($driver == 'Drupal\mongodb\Driver\Database\mongodb') {
+      $hosts = [];
+      foreach ([1, 2, 3] as $i) {
+        if (!empty($database['host' . $i]['host'])) {
+          // Add the port setting when it is given and it is not the default
+          // port.
+          if (isset($database['host' . $i]['port']) && ($database['host' . $i]['port'] != 27017)) {
+            $hosts[] = [
+              'host' => $database['host' . $i]['host'],
+              'port' => $database['host' . $i]['port'],
+            ];
+          }
+          else {
+            $hosts[] = [
+              'host' => $database['host' . $i]['host'],
+            ];
+          }
+        }
+        unset($database['host' . $i]);
+      }
+      if (!empty($hosts)) {
+        $database['hosts'] = $hosts;
+      }
+    }
+
     $form_state->set('database', $database);
 
     foreach ($this->getDatabaseErrors($database, $form_state->getValue('settings_file')) as $name => $message) {

@@ -34,7 +34,7 @@ class UserData implements UserDataInterface {
       ->fields('ud')
       ->condition('module', $module);
     if (isset($uid)) {
-      $query->condition('uid', $uid);
+      $query->condition('uid', (int) $uid);
     }
     if (isset($name)) {
       $query->condition('name', $name);

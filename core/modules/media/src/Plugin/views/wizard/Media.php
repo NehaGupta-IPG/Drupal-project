@@ -2,9 +2,13 @@
 
 namespace Drupal\media\Plugin\views\wizard;
 
+use Drupal\Core\Database\Connection;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Drupal\Core\Menu\MenuParentFormSelectorInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsWizard;
 use Drupal\views\Plugin\views\wizard\WizardPluginBase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides Views creation wizard for Media.
@@ -22,6 +26,32 @@ class Media extends WizardPluginBase {
    * @var string
    */
   protected $createdColumn = 'media_field_data-created';
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('entity_type.bundle.info'),
+      $container->get('menu.parent_form_selector'),
+      $container->get('database')
+    );
+  }
+
+  /**
+   * Constructs a WizardPluginBase object.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeBundleInfoInterface $bundle_info_service, MenuParentFormSelectorInterface $parent_form_selector, Connection $connection) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $bundle_info_service, $parent_form_selector, $connection);
+
+    if ($connection->driver() == 'mongodb') {
+      $this->base_table = 'media';
+      $this->createdColumn = 'media-created';
+    }
+  }
 
   /**
    * {@inheritdoc}
@@ -48,7 +78,12 @@ class Media extends WizardPluginBase {
     // Add the name field, so that the display has content if the user switches
     // to a row style that uses fields.
     $display_options['fields']['name']['id'] = 'name';
-    $display_options['fields']['name']['table'] = 'media_field_data';
+    if ($this->connection->driver() == 'mongodb') {
+      $display_options['fields']['name']['table'] = 'media';
+    }
+    else {
+      $display_options['fields']['name']['table'] = 'media_field_data';
+    }
     $display_options['fields']['name']['field'] = 'name';
     $display_options['fields']['name']['entity_type'] = 'media';
     $display_options['fields']['name']['entity_field'] = 'media';

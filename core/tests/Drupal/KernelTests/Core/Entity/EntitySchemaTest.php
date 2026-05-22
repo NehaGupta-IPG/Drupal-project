@@ -101,13 +101,25 @@ class EntitySchemaTest extends EntityKernelTestBase {
    * Tests that entity schema responds to changes in the entity type definition.
    */
   public function testEntitySchemaUpdate(): void {
+    if ($this->database->driver() == 'mongodb') {
+      // @todo Fix this test for MongoDB.
+      $this->markTestSkipped('The MongoDB database driver does not support this functionality.');
+    }
+
     $this->installModule('entity_schema_test');
     $storage_definitions = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions('entity_test_update');
     \Drupal::service('field_storage_definition.listener')->onFieldStorageDefinitionCreate($storage_definitions['custom_base_field']);
     \Drupal::service('field_storage_definition.listener')->onFieldStorageDefinitionCreate($storage_definitions['custom_bundle_field']);
     $schema_handler = $this->database->schema();
-    $tables = ['entity_test_update', 'entity_test_update_revision', 'entity_test_update_data', 'entity_test_update_revision_data'];
-    $dedicated_tables = ['entity_test_update__custom_bundle_field', 'entity_test_update_revision__custom_bundle_field'];
+
+    if ($this->database->driver() == 'mongodb') {
+      $tables = ['entity_test_update'];
+      $dedicated_tables = ['entity_test_update__custom_bundle_field'];
+    }
+    else {
+      $tables = ['entity_test_update', 'entity_test_update_revision', 'entity_test_update_data', 'entity_test_update_revision_data'];
+      $dedicated_tables = ['entity_test_update__custom_bundle_field', 'entity_test_update_revision__custom_bundle_field'];
+    }
 
     // Initially only the base table and the dedicated field data table should
     // exist.
@@ -185,14 +197,35 @@ class EntitySchemaTest extends EntityKernelTestBase {
 
     $expected = [];
     $expected[$entity_type->getBaseTable()] = [$id_key];
-    if ($entity_type->isRevisionable()) {
-      $expected[$entity_type->getRevisionTable()] = [$revision_key];
+    if ($this->database->driver() == 'mongodb') {
+      $storage = \Drupal::entityTypeManager()->getStorage($entity_type->id());
+      if ($entity_type->isRevisionable()) {
+        $all_revisions_table = $storage->getJsonStorageAllRevisionsTable();
+        $current_revision_table = $storage->getJsonStorageCurrentRevisionTable();
+        if ($entity_type->isTranslatable()) {
+          $expected[$all_revisions_table] = [$revision_key, $langcode_key];
+          $expected[$current_revision_table] = [$revision_key, $langcode_key];
+        }
+        else {
+          $expected[$all_revisions_table] = [$revision_key];
+          $expected[$current_revision_table] = [$revision_key];
+        }
+      }
+      elseif ($entity_type->isTranslatable()) {
+        $translations_table = $storage->getJsonStorageTranslationsTable();
+        $expected[$translations_table] = [$id_key, $langcode_key];
+      }
     }
-    if ($entity_type->isTranslatable()) {
-      $expected[$entity_type->getDataTable()] = [$id_key, $langcode_key];
-    }
-    if ($entity_type->isRevisionable() && $entity_type->isTranslatable()) {
-      $expected[$entity_type->getRevisionDataTable()] = [$revision_key, $langcode_key];
+    else {
+      if ($entity_type->isRevisionable()) {
+        $expected[$entity_type->getRevisionTable()] = [$revision_key];
+      }
+      if ($entity_type->isTranslatable()) {
+        $expected[$entity_type->getDataTable()] = [$id_key, $langcode_key];
+      }
+      if ($entity_type->isRevisionable() && $entity_type->isTranslatable()) {
+        $expected[$entity_type->getRevisionDataTable()] = [$revision_key, $langcode_key];
+      }
     }
 
     // First, test explicitly deleting and re-installing a field. Make sure that
@@ -251,14 +284,30 @@ class EntitySchemaTest extends EntityKernelTestBase {
     // primary key, we skip the assertion for that table as this represents an
     // intermediate and invalid state of the entity schema.
     $primary_keys[$base_table] = $find_primary_key_columns->invoke($schema, $base_table);
-    if ($entity_type->isRevisionable()) {
-      $primary_keys[$revision_table] = $find_primary_key_columns->invoke($schema, $revision_table);
+    if ($this->database->driver() == 'mongodb') {
+      $storage = \Drupal::entityTypeManager()->getStorage($entity_type->id());
+      if ($entity_type->isRevisionable()) {
+        $all_revisions_table = $storage->getJsonStorageAllRevisionsTable();
+        $primary_keys[$all_revisions_table] = $find_primary_key_columns->invoke($schema, $all_revisions_table);
+
+        $current_revision_table = $storage->getJsonStorageCurrentRevisionTable();
+        $primary_keys[$current_revision_table] = $find_primary_key_columns->invoke($schema, $current_revision_table);
+      }
+      elseif ($entity_type->isTranslatable()) {
+        $translations_table = $storage->getJsonStorageTranslationsTable();
+        $primary_keys[$translations_table] = $find_primary_key_columns->invoke($schema, $translations_table);
+      }
     }
-    if ($entity_type->isTranslatable()) {
-      $primary_keys[$data_table] = $find_primary_key_columns->invoke($schema, $data_table);
-    }
-    if ($entity_type->isRevisionable() && $entity_type->isTranslatable()) {
-      $primary_keys[$revision_data_table] = $find_primary_key_columns->invoke($schema, $revision_data_table);
+    else {
+      if ($entity_type->isRevisionable()) {
+        $primary_keys[$revision_table] = $find_primary_key_columns->invoke($schema, $revision_table);
+      }
+      if ($entity_type->isTranslatable()) {
+        $primary_keys[$data_table] = $find_primary_key_columns->invoke($schema, $data_table);
+      }
+      if ($entity_type->isRevisionable() && $entity_type->isTranslatable()) {
+        $primary_keys[$revision_data_table] = $find_primary_key_columns->invoke($schema, $revision_data_table);
+      }
     }
 
     return $primary_keys;
@@ -381,52 +430,144 @@ class EntitySchemaTest extends EntityKernelTestBase {
     $id_schema = $key_value_store->get('entity_test_rev.field_schema_data.id', []);
     $revision_id_schema = $key_value_store->get('entity_test_rev.field_schema_data.revision_id', []);
 
-    $expected_id_schema = [
-      'entity_test_rev' => [
-        'fields' => [
-          'id' => [
-            'type' => 'serial',
-            'unsigned' => TRUE,
-            'size' => 'normal',
-            'not null' => TRUE,
+    if ($this->database->driver() == 'mongodb') {
+      $expected_id_schema = [
+        'entity_test_rev' => [
+          'fields' => [
+            'id' => [
+              'type' => 'serial',
+              'unsigned' => TRUE,
+              'size' => 'normal',
+              'not null' => TRUE,
+            ],
           ],
         ],
-      ],
-      'entity_test_rev_revision' => [
-        'fields' => [
-          'id' => [
-            'type' => 'int',
-            'unsigned' => TRUE,
-            'size' => 'normal',
-            'not null' => TRUE,
+        'entity_test_rev_all_revisions' => [
+          'fields' => [
+            'id' => [
+              'type' => 'int',
+              'unsigned' => TRUE,
+              'size' => 'normal',
+              'not null' => TRUE,
+            ],
           ],
         ],
-      ],
-    ];
+        'entity_test_rev_current_revision' => [
+          'fields' => [
+            'id' => [
+              'type' => 'int',
+              'unsigned' => TRUE,
+              'size' => 'normal',
+              'not null' => TRUE,
+            ],
+          ],
+        ],
+        'entity_test_rev_latest_revision' => [
+          'fields' => [
+            'id' => [
+              'type' => 'int',
+              'unsigned' => TRUE,
+              'size' => 'normal',
+              'not null' => TRUE,
+            ],
+          ],
+        ],
+      ];
+    }
+    else {
+      $expected_id_schema = [
+        'entity_test_rev' => [
+          'fields' => [
+            'id' => [
+              'type' => 'serial',
+              'unsigned' => TRUE,
+              'size' => 'normal',
+              'not null' => TRUE,
+            ],
+          ],
+        ],
+        'entity_test_rev_revision' => [
+          'fields' => [
+            'id' => [
+              'type' => 'int',
+              'unsigned' => TRUE,
+              'size' => 'normal',
+              'not null' => TRUE,
+            ],
+          ],
+        ],
+      ];
+    }
     $this->assertEquals($expected_id_schema, $id_schema);
 
-    $expected_revision_id_schema = [
-      'entity_test_rev' => [
-        'fields' => [
-          'revision_id' => [
-            'type' => 'int',
-            'unsigned' => TRUE,
-            'size' => 'normal',
-            'not null' => FALSE,
+    if ($this->database->driver() == 'mongodb') {
+      $expected_revision_id_schema = [
+        'entity_test_rev' => [
+          'fields' => [
+            'revision_id' => [
+              'type' => 'int',
+              'unsigned' => TRUE,
+              'size' => 'normal',
+              'not null' => FALSE,
+            ],
           ],
         ],
-      ],
-      'entity_test_rev_revision' => [
-        'fields' => [
-          'revision_id' => [
-            'type' => 'serial',
-            'unsigned' => TRUE,
-            'size' => 'normal',
-            'not null' => TRUE,
+        'entity_test_rev_all_revisions' => [
+          'fields' => [
+            'revision_id' => [
+              'type' => 'int',
+              'unsigned' => TRUE,
+              'size' => 'normal',
+              'not null' => TRUE,
+            ],
           ],
         ],
-      ],
-    ];
+        'entity_test_rev_current_revision' => [
+          'fields' => [
+            'revision_id' => [
+              'type' => 'int',
+              'unsigned' => TRUE,
+              'size' => 'normal',
+              'not null' => TRUE,
+            ],
+          ],
+        ],
+        'entity_test_rev_latest_revision' => [
+          'fields' => [
+            'revision_id' => [
+              'type' => 'int',
+              'unsigned' => TRUE,
+              'size' => 'normal',
+              'not null' => TRUE,
+            ],
+          ],
+        ],
+      ];
+    }
+    else {
+      $expected_revision_id_schema = [
+        'entity_test_rev' => [
+          'fields' => [
+            'revision_id' => [
+              'type' => 'int',
+              'unsigned' => TRUE,
+              'size' => 'normal',
+              'not null' => FALSE,
+            ],
+          ],
+        ],
+        'entity_test_rev_revision' => [
+          'fields' => [
+            'revision_id' => [
+              'type' => 'serial',
+              'unsigned' => TRUE,
+              'size' => 'normal',
+              'not null' => TRUE,
+            ],
+          ],
+        ],
+      ];
+    }
     $this->assertEquals($expected_revision_id_schema, $revision_id_schema);
   }
 

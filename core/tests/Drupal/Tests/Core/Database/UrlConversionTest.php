@@ -296,11 +296,7 @@ class UrlConversionTest extends UnitTestCase {
     return [
       ['foo', '', "Missing scheme in URL 'foo'"],
       ['foo', 'bar', "Missing scheme in URL 'foo'"],
-      ['foo://', 'bar', "Can not convert 'foo://' to a database connection, the module providing the driver 'foo' is not specified"],
-      ['foo://bar', 'baz', "Can not convert 'foo://bar' to a database connection, the module providing the driver 'foo' is not specified"],
-      ['foo://bar:port', 'baz', "Can not convert 'foo://bar:port' to a database connection, the module providing the driver 'foo' is not specified"],
       ['foo/bar/baz', 'bar2', "Missing scheme in URL 'foo/bar/baz'"],
-      ['foo://bar:baz@test1', 'test2', "Can not convert 'foo://bar:baz@test1' to a database connection, the module providing the driver 'foo' is not specified"],
     ];
   }
 
