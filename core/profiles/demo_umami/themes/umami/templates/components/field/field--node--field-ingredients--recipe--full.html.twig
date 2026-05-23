@@ -58,6 +58,6 @@
     <div{{ title_attributes.addClass(title_classes) }}>{{ label }}</div>
   {% endif %}
   {% include "umami:list" with {
-    items,
+    items: items|map(item => item.content),
   } only %}
 </div>

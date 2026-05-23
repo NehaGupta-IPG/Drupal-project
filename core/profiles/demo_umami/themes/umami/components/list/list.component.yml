@@ -9,14 +9,9 @@ status: experimental
 # Schema for the props. We support www.json-schema.org. Learn more about the
 # syntax there.
 props:
-  # Props are always an object with keys. Each key is a variable in your
-  # component template.
   type: object
 
   properties:
-    items:
-      type: array
-      title: List items
     html_tag:
       type: string
       title: HTML tag for list
@@ -30,3 +25,7 @@ props:
       x-translation-context: Umami list HTML tag options
       # Provide a default value
       default: ul
+
+slots:
+  items:
+    title: Item

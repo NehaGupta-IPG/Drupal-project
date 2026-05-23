@@ -1,8 +1,9 @@
 <div {{ attributes.addClass('umami-list') }}>
   <{{ html_tag|default('ul') }}>
+    {% set items = items and items is not sequence ? [items] : items %}
     {% for item in items %}
-      <li{{ item.attributes.addClass('umami-list__item') }}>
-        {{ item.content }}
+      <li class="umami-list__item">
+        {{ item }}
       </li>
     {% endfor %}
   </{{ html_tag|default('ul') }}>
