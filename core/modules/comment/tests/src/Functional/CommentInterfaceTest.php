@@ -13,6 +13,7 @@ use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\filter\Entity\FilterFormat;
+use Drupal\TestTools\IntegerLikeAssert;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -121,7 +122,7 @@ class CommentInterfaceTest extends CommentTestBase {
     $this->drupalGet('comment/' . $comment->id() . '/edit');
     $comment = $this->postComment(NULL, $comment->comment_body->value, $comment->getSubject(), ['uid' => $this->webUser->getAccountName() . ' (' . $this->webUser->id() . ')']);
     $this->assertSame($this->webUser->getAccountName(), $comment->getAuthorName());
-    $this->assertSame($this->webUser->id(), $comment->getOwnerId());
+    IntegerLikeAssert::same($this->webUser->id(), $comment->getOwnerId());
 
     $this->drupalLogout();
 
