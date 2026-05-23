@@ -63,6 +63,105 @@ module.exports = {
   after(browser) {
     browser.drupalUninstall();
   },
+  'Test drupalViewportOffsetChange native event carries correct offsets': (
+    browser,
+  ) => {
+    browser
+      .drupalRelativeURL('/')
+      .waitForElementVisible('body')
+      .execute(
+        // eslint-disable-next-line func-names, prefer-arrow-callback, no-shadow
+        function (testValues, testElements) {
+          const testElementsContainer = document.createElement('div');
+          testElementsContainer.innerHTML = testElements;
+          document.body.append(testElementsContainer);
+
+          let receivedOffsets = null;
+          document.addEventListener(
+            'drupalViewportOffsetChange',
+            (e) => {
+              receivedOffsets = e.offsets;
+            },
+            { once: true },
+          );
+
+          Drupal.displace();
+
+          return (
+            receivedOffsets !== null &&
+            receivedOffsets.top === testValues.top &&
+            receivedOffsets.right === testValues.right &&
+            receivedOffsets.bottom === testValues.bottom &&
+            receivedOffsets.left === testValues.left
+          );
+        },
+        [testValues, testElements],
+        (result) => {
+          browser.assert.ok(
+            result.value,
+            'drupalViewportOffsetChange native event carries correct offsets.',
+          );
+        },
+      );
+  },
+
+  'Test jQuery drupalViewportOffsetChange listener triggers deprecation warning':
+    (browser) => {
+      browser
+        .drupalRelativeURL('/')
+        .waitForElementVisible('body')
+        .execute(
+          // eslint-disable-next-line func-names, prefer-arrow-callback
+          function () {
+            $(document).on('drupalViewportOffsetChange', () => {});
+            Drupal.displace();
+          },
+          [],
+          () => {},
+        )
+        .assert.deprecationErrorExists(
+          'jQuery event drupalViewportOffsetChange is deprecated in 11.4.0 and is removed from Drupal:12.0.0. See https://www.drupal.org/node/3449016',
+        );
+    },
+
+  'Test jQuery drupalViewportOffsetChange listener receives correct offsets': (
+    browser,
+  ) => {
+    browser
+      .drupalRelativeURL('/')
+      .waitForElementVisible('body')
+      .execute(
+        // eslint-disable-next-line func-names, prefer-arrow-callback, no-shadow
+        function (testValues, testElements) {
+          const testElementsContainer = document.createElement('div');
+          testElementsContainer.innerHTML = testElements;
+          document.body.append(testElementsContainer);
+
+          let receivedOffsets = null;
+          $(document).on('drupalViewportOffsetChange', (event, offsets) => {
+            receivedOffsets = offsets;
+          });
+
+          Drupal.displace();
+
+          return (
+            receivedOffsets !== null &&
+            receivedOffsets.top === testValues.top &&
+            receivedOffsets.right === testValues.right &&
+            receivedOffsets.bottom === testValues.bottom &&
+            receivedOffsets.left === testValues.left
+          );
+        },
+        [testValues, testElements],
+        (result) => {
+          browser.assert.ok(
+            result.value,
+            'jQuery drupalViewportOffsetChange listener receives correct offsets for backward compatibility.',
+          );
+        },
+      );
+  },
+
   'Test Drupal.displace() JavaScript API': (browser) => {
     browser
       .drupalRelativeURL('/')
