@@ -2,6 +2,7 @@
 
 namespace Drupal\user;
 
+use Drupal\Component\Utility\IntegerLike;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Exception\UnsupportedEntityTypeDefinitionException;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -46,7 +47,8 @@ trait EntityOwnerTrait {
    * {@inheritdoc}
    */
   public function getOwnerId() {
-    return $this->getEntityKey('owner');
+    $id = $this->getEntityKey('owner');
+    return IntegerLike::randomize($id);
   }
 
   /**

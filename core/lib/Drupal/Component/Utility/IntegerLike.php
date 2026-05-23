@@ -10,6 +10,31 @@ namespace Drupal\Component\Utility;
 class IntegerLike {
 
   /**
+   * Randomly swaps int and int-like string representation of a value.
+   *
+   * This can be used to trip up tests.
+   *
+   * @param mixed $value
+   *   The original value.
+   *
+   * @return mixed
+   *   The randomly swapped value.
+   */
+  public static function randomize(mixed $value): mixed {
+    if (is_int($value)) {
+      if (rand(0, 1)) {
+        $value = (string) $value;
+      }
+    }
+    elseif (is_string($value) && (string) (int) $value === $value) {
+      if (rand(0, 1)) {
+        $value = (int) $value;
+      }
+    }
+    return $value;
+  }
+
+  /**
    * Compares two values that may be integer-like.
    *
    * @param mixed $a
