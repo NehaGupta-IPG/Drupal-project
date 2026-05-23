@@ -94,6 +94,27 @@ class IntegerLike {
   }
 
   /**
+   * Casts a value to string, if it is an integer.
+   *
+   * This can be used instead of a regular cast, if values like NULL or FALSE
+   * should be preserved.
+   *
+   * @param mixed $value
+   *   A value which may be coming from the database or user input.
+   *
+   * @return mixed
+   *   The string value, or the original value if it was not an integer.
+   *
+   * @phpstan-return !int
+   */
+  public static function toStringIfInteger(mixed $value): mixed {
+    return match (TRUE) {
+      is_int($value) => (string) $value,
+      default => $value,
+    };
+  }
+
+  /**
    * Validates and casts a value as integer or NULL.
    *
    * @param mixed $value
