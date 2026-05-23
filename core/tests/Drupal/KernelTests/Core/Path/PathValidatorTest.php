@@ -79,7 +79,7 @@ class PathValidatorTest extends KernelTestBase {
       $url = $pathValidator->getUrlIfValidWithoutAccessCheck($entity->toUrl()->toString(TRUE)->getGeneratedUrl());
       $this->assertEquals($method, $requestContext->getMethod());
       $this->assertInstanceOf(Url::class, $url);
-      $this->assertSame(['entity_test' => $entity->id()], $url->getRouteParameters());
+      $this->assertSame(['entity_test' => (string) $entity->id()], $url->getRouteParameters());
 
       if ($method === FALSE) {
         // Restore main request.

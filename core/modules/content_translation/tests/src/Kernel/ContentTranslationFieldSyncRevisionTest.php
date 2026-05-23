@@ -556,7 +556,7 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
   /**
    * Asserts that the latest revision has the expected field values.
    *
-   * @param string $entity_id
+   * @param string|int $entity_id
    *   The entity ID.
    * @param array $expected_values
    *   An array of expected values in the following order:
@@ -568,7 +568,7 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
    *
    * @internal
    */
-  protected function assertLatestRevisionFieldValues(string $entity_id, array $expected_values): void {
+  protected function assertLatestRevisionFieldValues(string|int $entity_id, array $expected_values): void {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $this->storage->loadRevision($this->storage->getLatestRevisionId($entity_id));
     @[$revision_id, $target_id_en, $target_id_it, $alt_en, $alt_it] = $expected_values;

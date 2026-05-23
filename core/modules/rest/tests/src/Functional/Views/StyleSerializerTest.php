@@ -255,15 +255,15 @@ class StyleSerializerTest extends ViewTestBase {
 
     $expected = [
       0 => [
-        'nid' => $node0->id(),
+        'nid' => (string) $node0->id(),
         'body' => (string) $node0->body->processed,
       ],
       1 => [
-        'nid' => $node1->id(),
+        'nid' => (string) $node1->id(),
         'body' => (string) $node1->body->processed,
       ],
       2 => [
-        'nid' => $node2->id(),
+        'nid' => (string) $node2->id(),
         'body' => (string) $node2->body->processed,
       ],
     ];
@@ -282,11 +282,11 @@ class StyleSerializerTest extends ViewTestBase {
 
     $expected = [
       0 => [
-        'nid' => $node1->id(),
+        'nid' => (string) $node1->id(),
         'body' => (string) $node1->body->processed,
       ],
       1 => [
-        'nid' => $node2->id(),
+        'nid' => (string) $node2->id(),
         'body' => (string) $node2->body->processed,
       ],
     ];
