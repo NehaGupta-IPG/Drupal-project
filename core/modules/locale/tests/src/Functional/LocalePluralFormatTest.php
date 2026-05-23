@@ -75,9 +75,6 @@ class LocalePluralFormatTest extends BrowserTestBase {
       'overwrite_options[not_customized]' => TRUE,
     ]);
 
-    // Reset static caches to ensure we get fresh data.
-    \Drupal::service(PluralIndexInterface::class)->reset();
-
     // Expected plural translation strings for each plural index.
     $plural_strings = [
       // English is not imported in this case, so we assume built-in text
