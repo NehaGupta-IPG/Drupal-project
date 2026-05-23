@@ -205,7 +205,7 @@ class NavigationTopBarTest extends PageCacheTagsTestBase {
   public function testTabsRendering(): void {
     $this->drupalGet($this->node->toUrl());
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->elementExists('xpath', '//a[@href="/custom/path"]');
+    $this->assertSession()->linkByHrefExists('/custom/path');
   }
 
 }

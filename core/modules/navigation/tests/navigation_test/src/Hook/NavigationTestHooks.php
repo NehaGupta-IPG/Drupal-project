@@ -126,7 +126,7 @@ class NavigationTestHooks {
   * Implements hook_menu_local_tasks_alter().
   */
   #[Hook('menu_local_tasks_alter')]
-  public function menuLocalTasksAlter(&$data, $route_name): void {
+  public function menuLocalTasksAlter(&$data, $route_name, &$cacheability): void {
     if (in_array($route_name, ['entity.node.canonical'])) {
       $data['tabs'][0]['foo'] = [
         '#theme' => 'menu_local_task',
@@ -135,6 +135,8 @@ class NavigationTestHooks {
           'url' => Url::fromUserInput('/custom/path'),
         ],
         '#weight' => 100,
+        '#active' => FALSE,
+        '#access' => TRUE,
       ];
     }
   }
