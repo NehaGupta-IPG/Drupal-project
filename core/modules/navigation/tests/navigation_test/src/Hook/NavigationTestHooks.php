@@ -7,6 +7,7 @@ namespace Drupal\navigation_test\Hook;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\State\StateInterface;
+use Drupal\Core\Url;
 
 /**
  * Hooks implementations for navigation_test module.
@@ -117,6 +118,23 @@ class NavigationTestHooks {
       $links['navigation_test.navigation__default_item']['options']['icon'] = [
         'icon_id' => 'foo',
         'pack_id' => 'bar',
+      ];
+    }
+  }
+
+  /**
+  * Implements hook_menu_local_tasks_alter().
+  */
+  #[Hook('menu_local_tasks_alter')]
+  public function menuLocalTasksAlter(&$data, $route_name): void {
+    if (in_array($route_name, ['entity.node.canonical'])) {
+      $data['tabs'][0]['foo'] = [
+        '#theme' => 'menu_local_task',
+        '#link' => [
+          'title' => 'Custom Local Task',
+          'url' => Url::fromUserInput('/custom/path'),
+        ],
+        '#weight' => 100,
       ];
     }
   }
