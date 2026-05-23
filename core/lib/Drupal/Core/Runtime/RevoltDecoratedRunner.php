@@ -10,7 +10,7 @@ use Symfony\Component\Runtime\RunnerInterface;
  *
  * Applications should only have a single invocation of `EventLoop::run()`.
  * This Runner class will decorate any other Runner (inner) and ensure that all
- * work done by the inner runner is executed as a single suspendible task on
+ * work done by the inner runner is executed as a single suspendable task on
  * the event loop.
  *
  * Once that task is scheduled, this runner will execute the event loop and run
