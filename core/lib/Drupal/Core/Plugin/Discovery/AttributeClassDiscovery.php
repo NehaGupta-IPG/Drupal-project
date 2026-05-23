@@ -78,6 +78,7 @@ class AttributeClassDiscovery extends FileParsingCacheCollectorBase implements D
    */
   public function getDefinitions() {
     $definitions = [];
+    $this->lazyLoadCache();
 
     // Search for classes within all PSR-4 namespace locations.
     foreach ($this->getPluginNamespaces() as $namespace => $dirs) {
@@ -123,6 +124,7 @@ class AttributeClassDiscovery extends FileParsingCacheCollectorBase implements D
                   continue;
                 }
               }
+              $this->persist($path);
               $this->storage[$path] = [
                 'mtime' => filemtime($path),
                 'parsed' => NULL,
@@ -132,6 +134,7 @@ class AttributeClassDiscovery extends FileParsingCacheCollectorBase implements D
         }
       }
     }
+    $this->destruct();
 
     return $definitions;
   }
