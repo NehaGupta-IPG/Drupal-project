@@ -83,6 +83,7 @@ class Url extends FormElementBase {
    *   The $element with prepared variables ready for input.html.twig.
    */
   public static function preRenderUrl($element) {
+    $element = static::processToggletip($element);
     $element['#attributes']['type'] = 'url';
     Element::setAttributes($element, ['id', 'name', 'value', 'size', 'maxlength', 'placeholder']);
     static::setAttributes($element, ['form-url']);

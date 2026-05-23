@@ -63,6 +63,7 @@ class Tel extends FormElementBase {
    *   The $element with prepared variables ready for input.html.twig.
    */
   public static function preRenderTel($element) {
+    $element = static::processToggletip($element);
     $element['#attributes']['type'] = 'tel';
     Element::setAttributes($element, ['id', 'name', 'value', 'size', 'maxlength', 'placeholder']);
     static::setAttributes($element, ['form-tel']);

@@ -96,6 +96,7 @@ class Container extends RenderElementBase {
    *   The modified element.
    */
   public static function preRenderContainer($element) {
+    $element = static::processToggletip($element);
     // Do not render optional container elements if there are no children.
     if (empty($element['#printed']) && !empty($element['#optional']) && !Element::getVisibleChildren($element)) {
       $element['#printed'] = TRUE;

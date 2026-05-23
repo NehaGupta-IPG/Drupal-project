@@ -36,11 +36,20 @@ class Fieldset extends RenderElementBase {
         [static::class, 'processAjaxForm'],
       ],
       '#pre_render' => [
+        [static::class, 'preRenderFieldset'],
         [static::class, 'preRenderGroup'],
       ],
       '#value' => NULL,
       '#theme_wrappers' => ['fieldset'],
     ];
+  }
+
+  /**
+   * Adds toggletip support to fieldset.
+   */
+  public static function preRenderFieldset(array $element): array {
+    $element = static::processToggletip($element);
+    return $element;
   }
 
 }

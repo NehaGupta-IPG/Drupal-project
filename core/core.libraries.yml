@@ -792,6 +792,29 @@ drupal.dialog.off_canvas:
     - core/drupal.dialog.ajax
     - core/drupal.touchevents-test
 
+drupal.toggletip:
+  version: VERSION
+  css:
+    component:
+      misc/toggletip.css: {}
+  dependencies:
+    - core/once
+    - core/drupal
+    - core/drupal.tip
+
+drupal.tip:
+  version: VERSION
+  js:
+    misc/tip.js: {}
+  css:
+    component:
+      misc/tip.css: {}
+  dependencies:
+    - core/once
+    - core/drupal
+    - core/drupal.displace
+    - core/internal.floating-ui
+
 drupal.fieldListKeyboardNavigation:
   version: VERSION
   js:

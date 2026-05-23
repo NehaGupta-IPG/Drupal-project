@@ -69,6 +69,7 @@ class Details extends RenderElementBase {
    *   The modified element.
    */
   public static function preRenderDetails($element) {
+    $element = static::processToggletip($element);
     Element::setAttributes($element, ['id']);
 
     // The .js-form-wrapper class is required for #states to treat details like

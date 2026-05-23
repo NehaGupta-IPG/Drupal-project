@@ -1,0 +1,6 @@
+tooltips:
+  path: '/toggletip-test/toggletips'
+  defaults:
+    _form: '\Drupal\toggletip_test\Form\ToggletipForm'
+  requirements:
+    _access: 'TRUE'

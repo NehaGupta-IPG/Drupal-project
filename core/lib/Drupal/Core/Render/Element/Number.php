@@ -111,6 +111,7 @@ class Number extends FormElementBase {
    *   The $element with prepared variables ready for input.html.twig.
    */
   public static function preRenderNumber($element) {
+    $element = static::processToggletip($element);
     $element['#attributes']['type'] = 'number';
     Element::setAttributes($element, ['id', 'name', 'value', 'step', 'min', 'max', 'placeholder', 'size']);
     static::setAttributes($element, ['form-number']);

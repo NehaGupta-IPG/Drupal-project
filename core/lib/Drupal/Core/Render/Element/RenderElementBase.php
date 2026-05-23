@@ -129,6 +129,8 @@ use Drupal\Core\Url;
  */
 abstract class RenderElementBase extends PluginBase implements ElementInterface {
 
+  use ToggletipTrait;
+
   /**
    * {@inheritdoc}
    */

@@ -1,0 +1,55 @@
+/**
+ * @file
+ * Toggletips
+ */
+
+.toggletip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.toggletip:hover {
+  cursor: pointer;
+}
+
+/* Elements containing positioned toggletip buttons become anchors */
+:has(> .toggletip[data-drupal-toggletip-positioned]) {
+  anchor-name: --toggletip;
+  anchor-scope: --toggletip;
+}
+
+/* Button placements using CSS Anchor Positioning */
+.toggletip[data-drupal-toggletip-positioned] {
+  position: absolute;
+  position-anchor: --toggletip;
+}
+
+.toggletip[data-drupal-toggletip-positioned="left"] {
+  position-area: left;
+}
+
+.toggletip[data-drupal-toggletip-positioned="right"] {
+  position-area: right;
+}
+
+.toggletip[data-drupal-toggletip-positioned="top"] {
+  position-area: top;
+}
+
+.toggletip[data-drupal-toggletip-positioned="bottom"] {
+  position-area: bottom;
+}
+
+.toggletip[data-drupal-toggletip-positioned="start"] {
+  position-area: inline-start;
+}
+
+.toggletip[data-drupal-toggletip-positioned="end"] {
+  position-area: inline-end;
+}
+
+.toggletip[data-drupal-toggletip-positioned="center"] {
+  position-area: center;
+}

@@ -276,6 +276,9 @@ class ThemeCommonElements {
           'requirements' => NULL,
         ],
       ],
+      'toggletip' => [
+        'render element' => 'element',
+      ],
     ];
   }
 

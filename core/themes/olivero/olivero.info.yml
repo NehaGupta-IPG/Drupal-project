@@ -84,3 +84,7 @@ libraries-extend:
     - olivero/drupal.node.preview
   content_moderation/content_moderation:
     - olivero/content_moderation
+  core/drupal.toggletip:
+    - olivero/toggletip
+  core/drupal.tip:
+    - olivero/tip

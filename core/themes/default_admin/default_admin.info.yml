@@ -157,6 +157,10 @@ libraries-extend:
     - default_admin/tableselect
   core/drupal.tablesort:
     - default_admin/drupal.tablesort
+  core/drupal.tip:
+    - default_admin/tip
+  core/drupal.toggletip:
+    - default_admin/toggletip
   core/drupal.vertical-tabs:
     - default_admin/vertical-tabs
   file/drupal.file:

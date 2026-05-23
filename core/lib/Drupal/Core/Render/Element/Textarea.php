@@ -55,6 +55,7 @@ class Textarea extends FormElementBase {
    * Adds the textarea resize library.
    */
   public static function preRenderAttachments($element): array {
+    $element = static::processToggletip($element);
     $element['#attached']['library'][] = 'core/drupal.textarea-resize';
     return $element;
   }
