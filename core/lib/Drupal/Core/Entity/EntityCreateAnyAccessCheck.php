@@ -93,7 +93,7 @@ class EntityCreateAnyAccessCheck implements AccessInterface {
 
     // Check whether an entity of any bundle may be created.
     foreach ($bundles as $bundle) {
-      $bundle_access = $access_control_handler->createAccess($bundle, $account, [], TRUE);
+      $bundle_access = $access_control_handler->createAccess((string) $bundle, $account, [], TRUE);
       $access->inheritCacheability($bundle_access);
       if ($bundle_access instanceof AccessResultReasonInterface && $bundle_access->getReason() !== "" && $access->getReason() === "") {
         $access->setReason($bundle_access->getReason());
