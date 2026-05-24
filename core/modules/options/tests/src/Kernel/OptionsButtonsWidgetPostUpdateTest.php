@@ -24,7 +24,7 @@ class OptionsButtonsWidgetPostUpdateTest extends OptionsFieldUnitTestBase {
     $config = \Drupal::configFactory()->getEditable($config_name);
     $content = $config->get('content');
     unset($content[$this->fieldName]['settings']['check_all_enabled']);
-    $config->set('content', $content)->save(TRUE);
+    $config->set('content', $content)->save();
 
     // Confirm the setting is absent.
     $component = \Drupal::service('entity_display.repository')

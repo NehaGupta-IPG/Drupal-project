@@ -60,8 +60,8 @@ class OptionsWidgetsJsTest extends WebDriverTestBase {
       'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
       'settings' => [
         'allowed_values' => [
-          ['value' => 'a', 'label' => 'Option A'],
-          ['value' => 'b', 'label' => 'Option B'],
+          'a' => 'Option A',
+          'b' => 'Option B',
         ],
       ],
     ])->save();
