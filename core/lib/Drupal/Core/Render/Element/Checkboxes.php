@@ -110,7 +110,7 @@ class Checkboxes extends FormElementBase {
     }
 
     if (!empty($element['#check_all'])) {
-      $check_all_id = $element['#id'] . '--check-all';
+      $check_all_id = ($element['#id'] ?? '') . '--check-all';
       $element['all_wrapper'] = [
         '#type' => 'container',
         '#attributes' => ['class' => ['check-all']],
