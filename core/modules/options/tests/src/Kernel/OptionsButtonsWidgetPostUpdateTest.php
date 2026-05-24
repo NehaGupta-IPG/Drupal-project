@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Drupal\Tests\options\Kernel;
 
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests options_post_update_options_buttons_check_all_setting().
  */
 #[Group('options')]
+#[RunTestsInSeparateProcesses]
 class OptionsButtonsWidgetPostUpdateTest extends OptionsFieldUnitTestBase {
 
   /**
