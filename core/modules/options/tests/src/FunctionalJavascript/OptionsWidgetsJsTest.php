@@ -56,8 +56,14 @@ class OptionsWidgetsJsTest extends WebDriverTestBase {
     FieldStorageConfig::create([
       'field_name' => 'field_fences_test',
       'entity_type' => 'node',
-      'type' => 'text',
+      'type' => 'list_string',
       'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
+      'settings' => [
+        'allowed_values' => [
+          ['value' => 'a', 'label' => 'Option A'],
+          ['value' => 'b', 'label' => 'Option B'],
+        ],
+      ],
     ])->save();
     // Create field instance.
     FieldConfig::create([
@@ -72,7 +78,7 @@ class OptionsWidgetsJsTest extends WebDriverTestBase {
     // Enable form display and set check_all_enabled to TRUE.
     $display_repository->getFormDisplay('node', 'article')
       ->setComponent('field_fences_test', [
-        'type' => 'text_textfield',
+        'type' => 'options_buttons',
         'settings' => [
           'check_all_enabled' => TRUE,
         ],
@@ -80,11 +86,11 @@ class OptionsWidgetsJsTest extends WebDriverTestBase {
       ->save();
     // Go to the Create Article page and check that the button is there.
     $this->drupalGet('node/add/article');
-    $this->getSession()->getPage()->hasButton('Check all / none');
+    $this->assertTrue($this->getSession()->getPage()->hasButton('Check all / none'));
     // Change the setting to FALSE.
     $display_repository->getFormDisplay('node', 'article')
       ->setComponent('field_fences_test', [
-        'type' => 'text_textfield',
+        'type' => 'options_buttons',
         'settings' => [
           'check_all_enabled' => FALSE,
         ],
