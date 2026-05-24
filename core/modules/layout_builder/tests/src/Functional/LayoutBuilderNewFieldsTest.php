@@ -7,11 +7,13 @@ namespace Drupal\Tests\layout_builder\Functional;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\Tests\layout_builder\Traits\EnableLayoutBuilderTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test adding new fields to layout builder enabled bundles.
  */
 #[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class LayoutBuilderNewFieldsTest extends LayoutBuilderTestBase {
 
   use EnableLayoutBuilderTrait;
