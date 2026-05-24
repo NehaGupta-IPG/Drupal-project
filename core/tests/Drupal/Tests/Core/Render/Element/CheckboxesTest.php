@@ -68,7 +68,7 @@ class CheckboxesTest extends UnitTestCase {
 
     $form_state->setCompleteForm($complete_form);
     $element = Checkboxes::processCheckboxes($element, $form_state, $complete_form);
-    // Check that the checkboxes and checkAll button have been created.
+    // Check that the checkboxes and the select-all checkbox have been created.
     $this->assertArrayHasKey('test1', $element);
     $this->assertArrayHasKey('test2', $element);
     $this->assertArrayHasKey('test3', $element);
@@ -79,7 +79,7 @@ class CheckboxesTest extends UnitTestCase {
     $this->assertEquals($element['test3']['#type'], 'checkbox');
     $this->assertEquals($element['test3']['#title'], 'Test3');
     $this->assertArrayHasKey('all_wrapper', $element);
-    // Remove check_all (set it to FALSE) and see that there is no 'check all' button.
+    // Remove check_all (set it to FALSE) and see that there is no select-all checkbox.
     $element = [
       '#type' => 'checkboxes',
       '#options' => [
