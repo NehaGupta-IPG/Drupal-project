@@ -84,8 +84,9 @@ class OptionsButtonsWidget extends OptionsWidgetBase {
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $element['check_all_enabled'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Show "Check all / none" button'),
+      '#title' => $this->t('Show "Select all" checkbox'),
       '#default_value' => $this->getSetting('check_all_enabled'),
+      '#access' => $this->fieldDefinition->getFieldStorageDefinition()->isMultiple(),
     ];
 
     return $element;
@@ -97,7 +98,9 @@ class OptionsButtonsWidget extends OptionsWidgetBase {
   public function settingsSummary() {
     $summary = [];
 
-    $summary[] = $this->t('"Check all / none" button enabled: @check_all_enabled', ['@check_all_enabled' => $this->getSetting('check_all_enabled') ? $this->t('Yes') : $this->t('No')]);
+    if ($this->getSetting('check_all_enabled')) {
+      $summary[] = $this->t('"Select all" checkbox enabled');
+    }
 
     return $summary;
   }

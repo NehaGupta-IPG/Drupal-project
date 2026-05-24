@@ -10,24 +10,27 @@
    */
   Drupal.behaviors.checkAll = {
     attach(context) {
-      once('button--check-all', '.form-checkboxes', context).forEach(
-        (container) => {
-          container.addEventListener('click', function (e) {
-            const clickedBtn = e.target.closest('.button--check-all');
+      once('check-all', '.form-checkboxes', context).forEach((container) => {
+        const selectAll = container.querySelector('input.check-all');
+        if (!selectAll) return;
 
-            if (!clickedBtn) return;
+        const getCheckboxes = () => [
+          ...container.querySelectorAll('input[type="checkbox"]:not(.check-all)'),
+        ];
 
-            const checkboxes = [
-              ...container.querySelectorAll('input[type="checkbox"]'),
-            ];
-            // If not all are checked, check all; otherwise uncheck all.
-            const checkAll = checkboxes.some((cb) => !cb.checked);
-            checkboxes.forEach((cb) => {
-              cb.checked = checkAll;
-            });
+        selectAll.addEventListener('change', () => {
+          getCheckboxes().forEach((cb) => {
+            cb.checked = selectAll.checked;
           });
-        },
-      );
+        });
+
+        // Keep the select-all state in sync when individual checkboxes change.
+        container.addEventListener('change', (e) => {
+          if (e.target === selectAll || !e.target.matches('input[type="checkbox"]')) return;
+          const checkboxes = getCheckboxes();
+          selectAll.checked = checkboxes.every((cb) => cb.checked);
+        });
+      });
     },
   };
 })(Drupal, once);

@@ -4,6 +4,7 @@ namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Provides a form element for a set of checkboxes.
@@ -58,7 +59,7 @@ class Checkboxes extends FormElementBase {
    * Processes a checkboxes form element.
    */
   public static function processCheckboxes(&$element, FormStateInterface $form_state, &$complete_form) {
-    $value = is_array($element['#value']) ? $element['#value'] : [];
+    $value = is_array($element['#value'] ?? NULL) ? $element['#value'] : [];
     $element['#tree'] = TRUE;
     if (count($element['#options']) > 0) {
       if (!isset($element['#default_value']) || $element['#default_value'] == 0) {
@@ -108,25 +109,27 @@ class Checkboxes extends FormElementBase {
       }
     }
 
-    if (!empty($element['#check_all']) && $element['#check_all']) {
+    if (!empty($element['#check_all'])) {
+      $check_all_id = $element['#id'] . '--check-all';
       $element['all_wrapper'] = [
         '#type' => 'container',
         '#attributes' => ['class' => ['check-all']],
         '#weight' => 0,
       ];
-      $element['all_wrapper']['check_all'] = [
+      $element['all_wrapper']['check_all_input'] = [
         '#type' => 'html_tag',
-        '#tag' => 'button',
-        '#value' => t('Check all / none'),
-        '#default_value' => FALSE,
+        '#tag' => 'input',
         '#attributes' => [
-          'class' => [
-            'button',
-            'button--small',
-            'button--check-all',
-          ],
-          'type' => 'button',
+          'type' => 'checkbox',
+          'class' => ['check-all'],
+          'id' => $check_all_id,
         ],
+      ];
+      $element['all_wrapper']['check_all_label'] = [
+        '#type' => 'html_tag',
+        '#tag' => 'label',
+        '#value' => new TranslatableMarkup('Select all'),
+        '#attributes' => ['for' => $check_all_id],
       ];
       $element['#attached']['library'][] = 'core/drupal.checkboxes-check-all';
     }

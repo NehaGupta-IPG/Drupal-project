@@ -84,9 +84,9 @@ class OptionsWidgetsJsTest extends WebDriverTestBase {
         ],
       ])
       ->save();
-    // Go to the Create Article page and check that the button is there.
+    // Go to the Create Article page and check that the checkbox is there.
     $this->drupalGet('node/add/article');
-    $this->assertTrue($this->getSession()->getPage()->hasButton('Check all / none'));
+    $this->assertSession()->elementExists('css', 'input.check-all');
     // Change the setting to FALSE.
     $display_repository->getFormDisplay('node', 'article')
       ->setComponent('field_fences_test', [
@@ -96,9 +96,9 @@ class OptionsWidgetsJsTest extends WebDriverTestBase {
         ],
       ])
       ->save();
-    // Reload the create Article page and confirm there is no 'check all' button.
+    // Reload the create Article page and confirm there is no 'select all' checkbox.
     $this->drupalGet('node/add/article');
-    $this->assertFalse($this->getSession()->getPage()->hasButton('Check all / none'));
+    $this->assertSession()->elementNotExists('css', 'input.check-all');
   }
 
 }
