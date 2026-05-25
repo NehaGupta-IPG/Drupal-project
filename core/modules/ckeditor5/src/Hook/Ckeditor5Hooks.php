@@ -500,8 +500,7 @@ class Ckeditor5Hooks {
     }
 
     // Check if this format uses CKEditor 5.
-    $instance = \Drupal::service('ckeditor5.hooks');
-    if (!$instance->usesCKEditor5($format_id)) {
+    if (!static::usesCKEditor5($format_id)) {
       return $element;
     }
 
