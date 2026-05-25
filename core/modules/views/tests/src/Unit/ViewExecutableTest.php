@@ -565,6 +565,10 @@ class ViewExecutableTest extends UnitTestCase {
   /**
    * Setups a view executable and default display.
    *
+   * @param int $getPluginCallCount
+   *   (optional) The number of expected calls to the ::getPlugin method.
+   *   Defaults to 0.
+   *
    * @return array
    *   Returns the view executable and default display.
    */

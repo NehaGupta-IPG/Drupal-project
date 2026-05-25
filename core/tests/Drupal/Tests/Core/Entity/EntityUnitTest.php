@@ -97,6 +97,19 @@ class EntityUnitTest extends UnitTestCase {
     $this->entityTypeId = $this->randomMachineName();
   }
 
+  /**
+   * Sets up the entity under test.
+   *
+   * @param int $getBundleListCacheTagsCallsCount
+   *   The number of expected calls to the
+   *   EntityTypeInterface::getBundleListCacheTags() method.
+   * @param int $getDefinitionCallsCount
+   *   The number of expected calls to the
+   *   EntityTypeManagerInterface::getDefinition() method.
+   * @param int $getLanguageCallsCount
+   *   The number of expected calls to the
+   *   LanguageManagerInterface::getLanguage() method.
+   */
   protected function setUpEntity(int $getBundleListCacheTagsCallsCount, int $getDefinitionCallsCount, int $getLanguageCallsCount): void {
     $this->entityType = $this->createMock(EntityTypeInterface::class);
     $this->entityType
