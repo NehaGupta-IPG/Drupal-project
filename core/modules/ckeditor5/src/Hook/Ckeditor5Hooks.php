@@ -514,7 +514,7 @@ class Ckeditor5Hooks {
     }
 
     // Apply other single-line enhancements (library, config, validation).
-    $instance->applySingleLineEnhancements($element, $format_id);
+    static::applySingleLineEnhancements($element, $format_id);
     return $element;
   }
 
@@ -528,7 +528,7 @@ class Ckeditor5Hooks {
    *
    * @internal
    */
-  protected function applySingleLineEnhancements(array &$element, ?string $format_id = NULL): void {
+  protected static function applySingleLineEnhancements(array &$element, ?string $format_id = NULL): void {
     // After TextFormat::processFormat(), the structure has 'value' as a child.
     // Apply enhancements to the 'value' element where CKEditor 5 will attach.
     $value_element = &$element['value'];
@@ -556,7 +556,7 @@ class Ckeditor5Hooks {
    *
    * @internal
    */
-  protected function usesCKEditor5(string $format_id): bool {
+  protected static function usesCKEditor5(string $format_id): bool {
     $format = FilterFormat::load($format_id);
     if (!$format) {
       return FALSE;

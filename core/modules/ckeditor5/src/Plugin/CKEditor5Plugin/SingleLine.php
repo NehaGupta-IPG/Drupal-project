@@ -6,8 +6,8 @@ namespace Drupal\ckeditor5\Plugin\CKEditor5Plugin;
 
 use Drupal\ckeditor5\Plugin\CKEditor5PluginDefault;
 use Drupal\ckeditor5\Plugin\CKEditor5PluginManagerInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\editor\EditorInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * CKEditor 5 Single line helper plugin.
@@ -17,37 +17,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @internal
  *   Plugin classes are internal.
  */
-class SingleLine extends CKEditor5PluginDefault {
+class SingleLine extends CKEditor5PluginDefault implements ContainerFactoryPluginInterface {
 
-  /**
-   * The CKEditor 5 plugin manager.
-   *
-   * @var \Drupal\ckeditor5\Plugin\CKEditor5PluginManagerInterface|null
-   */
-  protected ?CKEditor5PluginManagerInterface $pluginManager = NULL;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
-    /** @var static $plugin */
-    $plugin = parent::create($container, $configuration, $plugin_id, $plugin_definition);
-    $plugin->pluginManager = $container->get('plugin.manager.ckeditor5.plugin');
-    assert($plugin->pluginManager instanceof CKEditor5PluginManagerInterface);
-    return $plugin;
-  }
-
-  /**
-   * Gets the plugin manager, initializing it if necessary.
-   *
-   * @return \Drupal\ckeditor5\Plugin\CKEditor5PluginManagerInterface
-   *   The plugin manager.
-   */
-  protected function getPluginManager(): CKEditor5PluginManagerInterface {
-    if ($this->pluginManager === NULL) {
-      $this->pluginManager = \Drupal::service('plugin.manager.ckeditor5.plugin');
-    }
-    return $this->pluginManager;
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected CKEditor5PluginManagerInterface $pluginManager,
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 
   /**
@@ -98,7 +76,7 @@ class SingleLine extends CKEditor5PluginDefault {
    * {@inheritdoc}
    */
   public function getDynamicPluginConfig(array $static_plugin_config, EditorInterface $editor): array {
-    $config = self::computeConfig($editor, $this->getPluginManager());
+    $config = self::computeConfig($editor, $this->pluginManager);
 
     // Expose configuration for filtering plugins and toolbar items.
     // @see core/modules/ckeditor5/js/ckeditor5.js
