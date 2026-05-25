@@ -85,6 +85,13 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
   protected $negotiatedMethods;
 
   /**
+   * The language config IDs.
+   *
+   * @var array|null
+   */
+  protected $languageConfigIds;
+
+  /**
    * Whether or not the language manager has been initialized.
    *
    * @var bool
@@ -253,6 +260,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
       $this->languageTypes = NULL;
       $this->languageTypesInfo = NULL;
       $this->languages = [];
+      $this->languageConfigIds = NULL;
       $this->cacheBackend->delete('language_config_ids');
       if ($this->negotiator) {
         $this->negotiator->reset();
@@ -315,15 +323,17 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
       // always present.
       // To avoid running the query on every request, cache it in the fast
       // chained bootstrap cache bin.
-      $cid = 'language_config_ids';
-      if ($cache = $this->cacheBackend->get($cid)) {
-        $config_ids = $cache->data;
+      if (!isset($this->languageConfigIds)) {
+        $cid = 'language_config_ids';
+        if ($cache = $this->cacheBackend->get($cid)) {
+          $this->languageConfigIds = $cache->data;
+        }
+        else {
+          $this->languageConfigIds = $this->configFactory->listAll('language.entity.');
+          $this->cacheBackend->set($cid, $this->languageConfigIds);
+        }
       }
-      else {
-        $config_ids = $this->configFactory->listAll('language.entity.');
-        $this->cacheBackend->set($cid, $config_ids);
-      }
-      foreach ($this->configFactory->loadMultiple($config_ids) as $config) {
+      foreach ($this->configFactory->loadMultiple($this->languageConfigIds) as $config) {
         $data = $config->get();
         $data['name'] = $data['label'];
         $languages[$data['id']] = new Language($data);
