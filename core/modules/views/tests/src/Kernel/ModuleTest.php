@@ -35,15 +35,6 @@ class ModuleTest extends ViewsKernelTestBase {
   protected static $modules = ['field', 'user', 'block'];
 
   /**
-   * Stores the last triggered error.
-   *
-   * @var string
-   *
-   * @see \Drupal\views\Tests\ModuleTest::errorHandler()
-   */
-  protected $lastErrorMessage;
-
-  /**
    * Tests the  ViewsHandlerManager::getHandler() method.
    *
    * @see \Drupal\views\Plugin\ViewsHandlerManager::getHandler()
@@ -135,7 +126,7 @@ class ModuleTest extends ViewsKernelTestBase {
     $this->assertEquals(array_keys($expected_enabled), array_keys(Views::getEnabledViews()), 'Expected enabled views returned.');
 
     // Test Views::getDisabledViews().
-    $expected_disabled = array_filter($all_views, function ($view) {
+    $expected_disabled = array_filter($all_views, function ($view): bool {
       return !$view->status();
     });
     $this->assertEquals(array_keys($expected_disabled), array_keys(Views::getDisabledViews()), 'Expected disabled views returned.');

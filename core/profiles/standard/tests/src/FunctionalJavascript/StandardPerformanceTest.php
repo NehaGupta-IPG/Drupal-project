@@ -45,9 +45,11 @@ class StandardPerformanceTest extends PerformanceTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    // Standard does not include any content types, create a test content type.
+    $this->drupalCreateContentType(['type' => 'test_content', 'name' => 'Test Content']);
     // Create a node to be shown on the front page.
     $this->drupalCreateNode([
-      'type' => 'article',
+      'type' => 'test_content',
       'promote' => NodeInterface::PROMOTED,
     ]);
     // Grant the anonymous user the permission to look at user profiles.
@@ -98,21 +100,16 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'SELECT COUNT(*) AS "expression" FROM (SELECT 1 AS "expression" FROM "node_field_data" "node_field_data" WHERE ("node_field_data"."promote" = 1) AND ("node_field_data"."status" = 1)) "subquery"',
       'SELECT "node_field_data"."sticky" AS "node_field_data_sticky", "node_field_data"."created" AS "node_field_data_created", "node_field_data"."nid" AS "nid" FROM "node_field_data" "node_field_data" WHERE ("node_field_data"."promote" = 1) AND ("node_field_data"."status" = 1) ORDER BY "node_field_data_sticky" DESC, "node_field_data_created" DESC LIMIT 10 OFFSET 0',
       'SELECT "revision"."vid" AS "vid", "revision"."langcode" AS "langcode", "revision"."revision_uid" AS "revision_uid", "revision"."revision_timestamp" AS "revision_timestamp", "revision"."revision_log" AS "revision_log", "revision"."revision_default" AS "revision_default", "base"."nid" AS "nid", "base"."type" AS "type", "base"."uuid" AS "uuid", CASE "base"."vid" WHEN "revision"."vid" THEN 1 ELSE 0 END AS "isDefaultRevision" FROM "node" "base" INNER JOIN "node_revision" "revision" ON "revision"."vid" = "base"."vid" WHERE "base"."nid" IN (1)',
-      'SELECT "revision".* FROM "node_field_revision" "revision" WHERE ("revision"."nid" IN (1)) AND ("revision"."vid" IN ("1")) ORDER BY "revision"."nid" ASC',
-      'SELECT "node_field_data"."nid" AS "nid", "node_field_data"."langcode" AS "langcode", "node__body"."body_value" AS "body_value", "node__body"."body_format" AS "body_format", "node__comment"."comment_status" AS "comment_status", "node__field_image"."field_image_target_id" AS "field_image_target_id", "node__field_image"."field_image_alt" AS "field_image_alt", "node__field_image"."field_image_title" AS "field_image_title", "node__field_image"."field_image_width" AS "field_image_width", "node__field_image"."field_image_height" AS "field_image_height" FROM "node_field_data" "node_field_data" LEFT OUTER JOIN "node__body" "node__body" ON "node__body"."entity_id" = "node_field_data"."nid" AND "node__body"."langcode" = "node_field_data"."langcode" AND "node__body"."deleted" = 0 LEFT OUTER JOIN "node__comment" "node__comment" ON "node__comment"."entity_id" = "node_field_data"."nid" AND "node__comment"."langcode" = "node_field_data"."langcode" AND "node__comment"."deleted" = 0 LEFT OUTER JOIN "node__field_image" "node__field_image" ON "node__field_image"."entity_id" = "node_field_data"."nid" AND "node__field_image"."langcode" = "node_field_data"."langcode" AND "node__field_image"."deleted" = 0 WHERE ("node_field_data"."nid" IN (1)) AND ("node_field_data"."langcode" IN ("en", "und", "zxx"))',
-      'SELECT "node_field_data"."nid" AS "nid", "node_field_data"."langcode" AS "langcode", "node__field_tags"."field_tags_target_id" AS "field_tags_target_id", "node__field_tags"."delta" AS "field_tags_delta" FROM "node_field_data" "node_field_data" LEFT OUTER JOIN "node__field_tags" "node__field_tags" ON "node__field_tags"."entity_id" = "node_field_data"."nid" AND "node__field_tags"."langcode" = "node_field_data"."langcode" AND "node__field_tags"."deleted" = 0 WHERE ("node_field_data"."nid" IN (1)) AND ("node_field_data"."langcode" IN ("en", "und", "zxx"))',
-      'SELECT "ces".* FROM "comment_entity_statistics" "ces" WHERE ("ces"."entity_id" IN (1)) AND ("ces"."entity_type" = "node")',
+      'SELECT "node_field_data".*, "node_field_data"."langcode" AS "node_field_data__langcode", "node__body"."body_value" AS "body_value", "node__body"."body_format" AS "body_format" FROM "node_field_data" "node_field_data" LEFT OUTER JOIN "node__body" "node__body" ON "node__body"."entity_id" = "node_field_data"."nid" AND "node__body"."langcode" = "node_field_data"."langcode" AND "node__body"."deleted" = 0 WHERE "node_field_data"."nid" IN (1)',
       'SELECT "config"."name" AS "name" FROM "config" "config" WHERE ("collection" = "") AND ("name" LIKE "comment.type.%" ESCAPE ' . "'\\\\'" . ') ORDER BY "collection" ASC, "name" ASC',
       'SELECT "config"."name" AS "name" FROM "config" "config" WHERE ("collection" = "") AND ("name" LIKE "node.type.%" ESCAPE ' . "'\\\\'" . ') ORDER BY "collection" ASC, "name" ASC',
       'SELECT "base"."uid" AS "uid", "base"."uuid" AS "uuid", "base"."langcode" AS "langcode" FROM "users" "base" WHERE "base"."uid" IN (0)',
-      'SELECT "data".* FROM "users_field_data" "data" WHERE "data"."uid" IN (0) ORDER BY "data"."uid" ASC',
-      'SELECT "users_field_data"."uid" AS "uid", "users_field_data"."langcode" AS "langcode", "user__user_picture"."user_picture_target_id" AS "user_picture_target_id", "user__user_picture"."user_picture_alt" AS "user_picture_alt", "user__user_picture"."user_picture_title" AS "user_picture_title", "user__user_picture"."user_picture_width" AS "user_picture_width", "user__user_picture"."user_picture_height" AS "user_picture_height" FROM "users_field_data" "users_field_data" LEFT OUTER JOIN "user__user_picture" "user__user_picture" ON "user__user_picture"."entity_id" = "users_field_data"."uid" AND "user__user_picture"."langcode" = "users_field_data"."langcode" AND "user__user_picture"."deleted" = 0 WHERE ("users_field_data"."uid" IN (0)) AND ("users_field_data"."langcode" IN ("en", "und", "zxx"))',
-      'SELECT "users_field_data"."uid" AS "uid", "users_field_data"."langcode" AS "langcode", "user__roles"."roles_target_id" AS "roles_target_id", "user__roles"."delta" AS "roles_delta" FROM "users_field_data" "users_field_data" LEFT OUTER JOIN "user__roles" "user__roles" ON "user__roles"."entity_id" = "users_field_data"."uid" AND "user__roles"."langcode" = "users_field_data"."langcode" AND "user__roles"."deleted" = 0 WHERE ("users_field_data"."uid" IN (0)) AND ("users_field_data"."langcode" IN ("en", "und", "zxx"))',
+      'SELECT "users_field_data".*, "users_field_data"."langcode" AS "users_field_data__langcode", "user__user_picture"."user_picture_target_id" AS "user_picture_target_id", "user__user_picture"."user_picture_alt" AS "user_picture_alt", "user__user_picture"."user_picture_title" AS "user_picture_title", "user__user_picture"."user_picture_width" AS "user_picture_width", "user__user_picture"."user_picture_height" AS "user_picture_height" FROM "users_field_data" "users_field_data" LEFT OUTER JOIN "user__user_picture" "user__user_picture" ON "user__user_picture"."entity_id" = "users_field_data"."uid" AND "user__user_picture"."langcode" = "users_field_data"."langcode" AND "user__user_picture"."deleted" = 0 WHERE "users_field_data"."uid" IN (0)',
+      'SELECT "users_field_data".*, "users_field_data"."langcode" AS "users_field_data__langcode", "user__roles"."roles_target_id" AS "roles_target_id", "user__roles"."delta" AS "roles_delta" FROM "users_field_data" "users_field_data" LEFT OUTER JOIN "user__roles" "user__roles" ON "user__roles"."entity_id" = "users_field_data"."uid" AND "user__roles"."langcode" = "users_field_data"."langcode" AND "user__roles"."deleted" = 0 WHERE "users_field_data"."uid" IN (0)',
       'SELECT "name", "data" FROM "config" WHERE "collection" = "" AND "name" IN ( "core.date_format.medium" )',
       'SELECT "name", "data" FROM "config" WHERE "collection" = "" AND "name" IN ( "core.date_format.long" )',
       'SELECT 1 AS "expression" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."path" LIKE "/node%" ESCAPE ' . "'\\\\'" . ') LIMIT 1 OFFSET 0',
       'SELECT "name", "data" FROM "config" WHERE "collection" = "" AND "name" IN ( "filter.format.restricted_html" )',
-      'SELECT "name", "data" FROM "config" WHERE "collection" = "" AND "name" IN ( "user.role.authenticated" )',
       'SELECT "name", "value" FROM "key_value" WHERE "name" IN ( "theme:stark" ) AND "collection" = "config.entity.key_store.block"',
       'SELECT "menu_tree"."menu_name" AS "menu_name", "menu_tree"."route_name" AS "route_name", "menu_tree"."route_parameters" AS "route_parameters", "menu_tree"."url" AS "url", "menu_tree"."title" AS "title", "menu_tree"."description" AS "description", "menu_tree"."parent" AS "parent", "menu_tree"."weight" AS "weight", "menu_tree"."options" AS "options", "menu_tree"."expanded" AS "expanded", "menu_tree"."enabled" AS "enabled", "menu_tree"."provider" AS "provider", "menu_tree"."metadata" AS "metadata", "menu_tree"."class" AS "class", "menu_tree"."form_class" AS "form_class", "menu_tree"."id" AS "id" FROM "menu_tree" "menu_tree" WHERE ("route_name" = "view.frontpage.page_1") AND ("route_param_key" = "view_id=frontpage&display_id=page_1") AND ("menu_name" = "main") ORDER BY "depth" ASC, "weight" ASC, "id" ASC',
       'SELECT "menu_tree"."menu_name" AS "menu_name", "menu_tree"."route_name" AS "route_name", "menu_tree"."route_parameters" AS "route_parameters", "menu_tree"."url" AS "url", "menu_tree"."title" AS "title", "menu_tree"."description" AS "description", "menu_tree"."parent" AS "parent", "menu_tree"."weight" AS "weight", "menu_tree"."options" AS "options", "menu_tree"."expanded" AS "expanded", "menu_tree"."enabled" AS "enabled", "menu_tree"."provider" AS "provider", "menu_tree"."metadata" AS "metadata", "menu_tree"."class" AS "class", "menu_tree"."form_class" AS "form_class", "menu_tree"."id" AS "id" FROM "menu_tree" "menu_tree" WHERE ("route_name" = "<front>") AND ("route_param_key" = "") AND ("menu_name" = "main") ORDER BY "depth" ASC, "weight" ASC, "id" ASC',
@@ -121,36 +118,34 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'SELECT "menu_tree"."menu_name" AS "menu_name", "menu_tree"."route_name" AS "route_name", "menu_tree"."route_parameters" AS "route_parameters", "menu_tree"."url" AS "url", "menu_tree"."title" AS "title", "menu_tree"."description" AS "description", "menu_tree"."parent" AS "parent", "menu_tree"."weight" AS "weight", "menu_tree"."options" AS "options", "menu_tree"."expanded" AS "expanded", "menu_tree"."enabled" AS "enabled", "menu_tree"."provider" AS "provider", "menu_tree"."metadata" AS "metadata", "menu_tree"."class" AS "class", "menu_tree"."form_class" AS "form_class", "menu_tree"."id" AS "id" FROM "menu_tree" "menu_tree" WHERE ("route_name" = "view.frontpage.page_1") AND ("route_param_key" = "view_id=frontpage&display_id=page_1") AND ("menu_name" = "account") ORDER BY "depth" ASC, "weight" ASC, "id" ASC',
       'SELECT "menu_tree"."menu_name" AS "menu_name", "menu_tree"."route_name" AS "route_name", "menu_tree"."route_parameters" AS "route_parameters", "menu_tree"."url" AS "url", "menu_tree"."title" AS "title", "menu_tree"."description" AS "description", "menu_tree"."parent" AS "parent", "menu_tree"."weight" AS "weight", "menu_tree"."options" AS "options", "menu_tree"."expanded" AS "expanded", "menu_tree"."enabled" AS "enabled", "menu_tree"."provider" AS "provider", "menu_tree"."metadata" AS "metadata", "menu_tree"."class" AS "class", "menu_tree"."form_class" AS "form_class", "menu_tree"."id" AS "id" FROM "menu_tree" "menu_tree" WHERE ("route_name" = "<front>") AND ("route_param_key" = "") AND ("menu_name" = "account") ORDER BY "depth" ASC, "weight" ASC, "id" ASC',
       'SELECT "menu_tree".* FROM "menu_tree" "menu_tree" WHERE ("menu_name" = "main") AND ("depth" <= 2) ORDER BY "p1" ASC, "p2" ASC, "p3" ASC, "p4" ASC, "p5" ASC, "p6" ASC, "p7" ASC, "p8" ASC, "p9" ASC',
-      'INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("theme_registry:runtime:stark:Drupal\Core\Utility\ThemeRegistry", "LOCK_ID", "EXPIRE")',
-      'DELETE FROM "semaphore"  WHERE ("name" = "theme_registry:runtime:stark:Drupal\Core\Utility\ThemeRegistry") AND ("value" = "LOCK_ID")',
+      'INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("theme_registry:runtime:stark:Drupal\Core\Cache\CacheCollector", "LOCK_ID", "EXPIRE")',
+      'DELETE FROM "semaphore"  WHERE ("name" = "theme_registry:runtime:stark:Drupal\Core\Cache\CacheCollector") AND ("value" = "LOCK_ID")',
       'INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("library_info:stark:Drupal\Core\Cache\CacheCollector", "LOCK_ID", "EXPIRE")',
       'DELETE FROM "semaphore"  WHERE ("name" = "library_info:stark:Drupal\Core\Cache\CacheCollector") AND ("value" = "LOCK_ID")',
       'INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("path_alias_prefix_list:Drupal\Core\Cache\CacheCollector", "LOCK_ID", "EXPIRE")',
       'DELETE FROM "semaphore"  WHERE ("name" = "path_alias_prefix_list:Drupal\Core\Cache\CacheCollector") AND ("value" = "LOCK_ID")',
-      'INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("active-trail:route:view.frontpage.page_1:route_parameters:a:2:{s:10:"display_id";s:6:"page_1";s:7:"view_id";s:9:"frontpage";}:Drupal\Core\Cache\CacheCollector", "LOCK_ID", "EXPIRE")',
-      'DELETE FROM "semaphore"  WHERE ("name" = "active-trail:route:view.frontpage.page_1:route_parameters:a:2:{s:10:"display_id";s:6:"page_1";s:7:"view_id";s:9:"frontpage";}:Drupal\Core\Cache\CacheCollector") AND ("value" = "LOCK_ID")',
     ];
     $recorded_queries = $performance_data->getQueries();
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
-      'QueryCount' => 37,
-      'CacheGetCount' => 96,
+      'QueryCount' => 30,
+      'CacheGetCount' => 91,
       'CacheGetCountByBin' => [
         'page' => 1,
-        'config' => 20,
+        'config' => 19,
         'data' => 4,
-        'discovery' => 39,
+        'discovery' => 38,
         'bootstrap' => 10,
         'dynamic_page_cache' => 1,
-        'render' => 11,
+        'render' => 8,
         'default' => 5,
         'entity' => 2,
         'menu' => 3,
       ],
-      'CacheSetCount' => 43,
+      'CacheSetCount' => 42,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 9,
+      'CacheTagLookupQueryCount' => 10,
       'CacheTagGroupedLookups' => [
         [
           'route_match',
@@ -168,10 +163,8 @@ class StandardPerformanceTest extends PerformanceTestBase {
         ['config:views.view.frontpage', 'node:1', 'node_list'],
         ['rendered', 'user:0', 'user_view'],
         ['config:filter.format.restricted_html', 'node_view'],
-        [
-          'config:block_list',
-          'config:system.site',
-        ],
+        ['config:block_list'],
+        ['config:system.site'],
         ['config:system.menu.account'],
         ['config:system.menu.main'],
         ['config:user.role.anonymous'],
@@ -198,22 +191,18 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $expected_queries = [
       'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."alias" LIKE "/node/1" ESCAPE ' . "'\\\\'" . ') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
       'SELECT "name", "route", "fit" FROM "router" WHERE "pattern_outline" IN ( "/node/1", "/node/%", "/node" ) AND "number_parts" >= 2',
-      'SELECT "name", "data" FROM "config" WHERE "collection" = "" AND "name" IN ( "core.entity_view_display.node.article.full" )',
+      'SELECT "name", "data" FROM "config" WHERE "collection" = "" AND "name" IN ( "core.entity_view_display.node.test_content.full" )',
       'SELECT "name", "value" FROM "key_value" WHERE "name" IN ( "theme:stark" ) AND "collection" = "config.entity.key_store.block"',
       'SELECT "menu_tree"."menu_name" AS "menu_name", "menu_tree"."route_name" AS "route_name", "menu_tree"."route_parameters" AS "route_parameters", "menu_tree"."url" AS "url", "menu_tree"."title" AS "title", "menu_tree"."description" AS "description", "menu_tree"."parent" AS "parent", "menu_tree"."weight" AS "weight", "menu_tree"."options" AS "options", "menu_tree"."expanded" AS "expanded", "menu_tree"."enabled" AS "enabled", "menu_tree"."provider" AS "provider", "menu_tree"."metadata" AS "metadata", "menu_tree"."class" AS "class", "menu_tree"."form_class" AS "form_class", "menu_tree"."id" AS "id" FROM "menu_tree" "menu_tree" WHERE ("route_name" = "entity.node.canonical") AND ("route_param_key" = "node=1") AND ("menu_name" = "main") ORDER BY "depth" ASC, "weight" ASC, "id" ASC',
       'SELECT "menu_tree"."menu_name" AS "menu_name", "menu_tree"."route_name" AS "route_name", "menu_tree"."route_parameters" AS "route_parameters", "menu_tree"."url" AS "url", "menu_tree"."title" AS "title", "menu_tree"."description" AS "description", "menu_tree"."parent" AS "parent", "menu_tree"."weight" AS "weight", "menu_tree"."options" AS "options", "menu_tree"."expanded" AS "expanded", "menu_tree"."enabled" AS "enabled", "menu_tree"."provider" AS "provider", "menu_tree"."metadata" AS "metadata", "menu_tree"."class" AS "class", "menu_tree"."form_class" AS "form_class", "menu_tree"."id" AS "id" FROM "menu_tree" "menu_tree" WHERE ("route_name" = "entity.node.canonical") AND ("route_param_key" = "node=1") AND ("menu_name" = "account") ORDER BY "depth" ASC, "weight" ASC, "id" ASC',
       'SELECT "base_table"."vid" AS "vid", "base_table"."nid" AS "nid" FROM "node_revision" "base_table" INNER JOIN (SELECT "subquery_base_table"."nid" AS "nid", MAX(subquery_base_table.vid) AS "maximum_revision_id" FROM "node_revision" "subquery_base_table" WHERE "nid" = "1" GROUP BY "subquery_base_table"."nid") "sq_base_table" ON base_table.nid = sq_base_table.nid AND base_table.vid = sq_base_table.maximum_revision_id INNER JOIN "node_field_data" "node_field_data" ON "node_field_data"."nid" = "base_table"."nid" WHERE "node_field_data"."nid" = "1"',
-      'INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("theme_registry:runtime:stark:Drupal\Core\Utility\ThemeRegistry", "LOCK_ID", "EXPIRE")',
-      'DELETE FROM "semaphore"  WHERE ("name" = "theme_registry:runtime:stark:Drupal\Core\Utility\ThemeRegistry") AND ("value" = "LOCK_ID")',
-      'INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("active-trail:route:entity.node.canonical:route_parameters:a:1:{s:4:"node";s:1:"1";}:Drupal\Core\Cache\CacheCollector", "LOCK_ID", "EXPIRE")',
-      'DELETE FROM "semaphore"  WHERE ("name" = "active-trail:route:entity.node.canonical:route_parameters:a:1:{s:4:"node";s:1:"1";}:Drupal\Core\Cache\CacheCollector") AND ("value" = "LOCK_ID")',
     ];
     $recorded_queries = $performance_data->getQueries();
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
-      'QueryCount' => 11,
-      'CacheGetCount' => 75,
-      'CacheSetCount' => 18,
+      'QueryCount' => 7,
+      'CacheGetCount' => 65,
+      'CacheSetCount' => 16,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 7,
@@ -232,16 +221,16 @@ class StandardPerformanceTest extends PerformanceTestBase {
         ],
         ['rendered', 'user:0', 'user_view'],
         ['config:filter.format.restricted_html', 'node:1', 'node_view'],
+        ['config:block_list'],
         [
-          'config:block_list',
+          'config:system.menu.main',
           'config:system.site',
         ],
-        ['config:system.menu.main'],
         ['config:system.menu.account'],
         ['config:user.role.anonymous'],
       ],
       'StylesheetCount' => 1,
-      'StylesheetBytes' => 1500,
+      'StylesheetBytes' => 1000,
     ];
     $this->assertMetrics($expected, $performance_data);
 
@@ -256,20 +245,17 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."alias" LIKE "/user/2" ESCAPE ' . "'\\\\'" . ') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
       'SELECT "name", "route", "fit" FROM "router" WHERE "pattern_outline" IN ( "/user/2", "/user/%", "/user" ) AND "number_parts" >= 2',
       'SELECT "base"."uid" AS "uid", "base"."uuid" AS "uuid", "base"."langcode" AS "langcode" FROM "users" "base" WHERE "base"."uid" IN (2)',
-      'SELECT "data".* FROM "users_field_data" "data" WHERE "data"."uid" IN (2) ORDER BY "data"."uid" ASC',
-      'SELECT "users_field_data"."uid" AS "uid", "users_field_data"."langcode" AS "langcode", "user__user_picture"."user_picture_target_id" AS "user_picture_target_id", "user__user_picture"."user_picture_alt" AS "user_picture_alt", "user__user_picture"."user_picture_title" AS "user_picture_title", "user__user_picture"."user_picture_width" AS "user_picture_width", "user__user_picture"."user_picture_height" AS "user_picture_height" FROM "users_field_data" "users_field_data" LEFT OUTER JOIN "user__user_picture" "user__user_picture" ON "user__user_picture"."entity_id" = "users_field_data"."uid" AND "user__user_picture"."langcode" = "users_field_data"."langcode" AND "user__user_picture"."deleted" = 0 WHERE ("users_field_data"."uid" IN (2)) AND ("users_field_data"."langcode" IN ("en", "und", "zxx"))',
-      'SELECT "users_field_data"."uid" AS "uid", "users_field_data"."langcode" AS "langcode", "user__roles"."roles_target_id" AS "roles_target_id", "user__roles"."delta" AS "roles_delta" FROM "users_field_data" "users_field_data" LEFT OUTER JOIN "user__roles" "user__roles" ON "user__roles"."entity_id" = "users_field_data"."uid" AND "user__roles"."langcode" = "users_field_data"."langcode" AND "user__roles"."deleted" = 0 WHERE ("users_field_data"."uid" IN (2)) AND ("users_field_data"."langcode" IN ("en", "und", "zxx"))',
+      'SELECT "users_field_data".*, "users_field_data"."langcode" AS "users_field_data__langcode", "user__user_picture"."user_picture_target_id" AS "user_picture_target_id", "user__user_picture"."user_picture_alt" AS "user_picture_alt", "user__user_picture"."user_picture_title" AS "user_picture_title", "user__user_picture"."user_picture_width" AS "user_picture_width", "user__user_picture"."user_picture_height" AS "user_picture_height" FROM "users_field_data" "users_field_data" LEFT OUTER JOIN "user__user_picture" "user__user_picture" ON "user__user_picture"."entity_id" = "users_field_data"."uid" AND "user__user_picture"."langcode" = "users_field_data"."langcode" AND "user__user_picture"."deleted" = 0 WHERE "users_field_data"."uid" IN (2)',
+      'SELECT "users_field_data".*, "users_field_data"."langcode" AS "users_field_data__langcode", "user__roles"."roles_target_id" AS "roles_target_id", "user__roles"."delta" AS "roles_delta" FROM "users_field_data" "users_field_data" LEFT OUTER JOIN "user__roles" "user__roles" ON "user__roles"."entity_id" = "users_field_data"."uid" AND "user__roles"."langcode" = "users_field_data"."langcode" AND "user__roles"."deleted" = 0 WHERE "users_field_data"."uid" IN (2)',
       'SELECT "name", "value" FROM "key_value" WHERE "name" IN ( "theme:stark" ) AND "collection" = "config.entity.key_store.block"',
       'SELECT "menu_tree"."menu_name" AS "menu_name", "menu_tree"."route_name" AS "route_name", "menu_tree"."route_parameters" AS "route_parameters", "menu_tree"."url" AS "url", "menu_tree"."title" AS "title", "menu_tree"."description" AS "description", "menu_tree"."parent" AS "parent", "menu_tree"."weight" AS "weight", "menu_tree"."options" AS "options", "menu_tree"."expanded" AS "expanded", "menu_tree"."enabled" AS "enabled", "menu_tree"."provider" AS "provider", "menu_tree"."metadata" AS "metadata", "menu_tree"."class" AS "class", "menu_tree"."form_class" AS "form_class", "menu_tree"."id" AS "id" FROM "menu_tree" "menu_tree" WHERE ("route_name" = "entity.user.canonical") AND ("route_param_key" = "user=2") AND ("menu_name" = "main") ORDER BY "depth" ASC, "weight" ASC, "id" ASC',
       'SELECT "menu_tree"."menu_name" AS "menu_name", "menu_tree"."route_name" AS "route_name", "menu_tree"."route_parameters" AS "route_parameters", "menu_tree"."url" AS "url", "menu_tree"."title" AS "title", "menu_tree"."description" AS "description", "menu_tree"."parent" AS "parent", "menu_tree"."weight" AS "weight", "menu_tree"."options" AS "options", "menu_tree"."expanded" AS "expanded", "menu_tree"."enabled" AS "enabled", "menu_tree"."provider" AS "provider", "menu_tree"."metadata" AS "metadata", "menu_tree"."class" AS "class", "menu_tree"."form_class" AS "form_class", "menu_tree"."id" AS "id" FROM "menu_tree" "menu_tree" WHERE ("route_name" = "entity.user.canonical") AND ("route_param_key" = "user=2") AND ("menu_name" = "account") ORDER BY "depth" ASC, "weight" ASC, "id" ASC',
-      'INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("active-trail:route:entity.user.canonical:route_parameters:a:1:{s:4:"user";s:1:"2";}:Drupal\Core\Cache\CacheCollector", "LOCK_ID", "EXPIRE")',
-      'DELETE FROM "semaphore"  WHERE ("name" = "active-trail:route:entity.user.canonical:route_parameters:a:1:{s:4:"user";s:1:"2";}:Drupal\Core\Cache\CacheCollector") AND ("value" = "LOCK_ID")',
     ];
     $recorded_queries = $performance_data->getQueries();
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
-      'QueryCount' => 11,
-      'CacheGetCount' => 61,
+      'QueryCount' => 8,
+      'CacheGetCount' => 55,
       'CacheSetCount' => 15,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
@@ -290,7 +276,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     // invalidate that again. Repeat this twice as some routing caches are not
     // yet properly populated due to directly emptying the caches before.
     \Drupal::service('cache_tags.invalidator.checksum')->reset();
-    $this->drupalCreateNode(['type' => 'page', 'title' => 'new page']);
+    $this->drupalCreateNode(['type' => 'test_content', 'title' => 'new page']);
 
     $this->drupalGet('');
     // Ensure everything finishes before we collect performance data.
@@ -298,7 +284,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     sleep(2);
 
     \Drupal::service('cache_tags.invalidator.checksum')->reset();
-    $this->drupalCreateNode(['type' => 'page', 'title' => 'new page']);
+    $this->drupalCreateNode(['type' => 'test_content', 'title' => 'new page']);
 
     // Visit the frontpage again.
     $performance_data = $this->collectPerformanceData(function () {
@@ -314,7 +300,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 3,
-      'CacheGetCount' => 64,
+      'CacheGetCount' => 61,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 11,
@@ -322,7 +308,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
         'discovery' => 21,
         'bootstrap' => 8,
         'dynamic_page_cache' => 2,
-        'render' => 12,
+        'render' => 9,
         'default' => 3,
         'entity' => 1,
         'menu' => 1,
@@ -414,9 +400,8 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = "2" AND "u"."default_langcode" = 1',
       'SELECT "roles_target_id" FROM "user__roles" WHERE "entity_id" = "2"',
       'SELECT "base"."uid" AS "uid", "base"."uuid" AS "uuid", "base"."langcode" AS "langcode" FROM "users" "base" WHERE "base"."uid" IN (2)',
-      'SELECT "data".* FROM "users_field_data" "data" WHERE "data"."uid" IN (2) ORDER BY "data"."uid" ASC',
-      'SELECT "users_field_data"."uid" AS "uid", "users_field_data"."langcode" AS "langcode", "user__user_picture"."user_picture_target_id" AS "user_picture_target_id", "user__user_picture"."user_picture_alt" AS "user_picture_alt", "user__user_picture"."user_picture_title" AS "user_picture_title", "user__user_picture"."user_picture_width" AS "user_picture_width", "user__user_picture"."user_picture_height" AS "user_picture_height" FROM "users_field_data" "users_field_data" LEFT OUTER JOIN "user__user_picture" "user__user_picture" ON "user__user_picture"."entity_id" = "users_field_data"."uid" AND "user__user_picture"."langcode" = "users_field_data"."langcode" AND "user__user_picture"."deleted" = 0 WHERE ("users_field_data"."uid" IN (2)) AND ("users_field_data"."langcode" IN ("en", "und", "zxx"))',
-      'SELECT "users_field_data"."uid" AS "uid", "users_field_data"."langcode" AS "langcode", "user__roles"."roles_target_id" AS "roles_target_id", "user__roles"."delta" AS "roles_delta" FROM "users_field_data" "users_field_data" LEFT OUTER JOIN "user__roles" "user__roles" ON "user__roles"."entity_id" = "users_field_data"."uid" AND "user__roles"."langcode" = "users_field_data"."langcode" AND "user__roles"."deleted" = 0 WHERE ("users_field_data"."uid" IN (2)) AND ("users_field_data"."langcode" IN ("en", "und", "zxx"))',
+      'SELECT "users_field_data".*, "users_field_data"."langcode" AS "users_field_data__langcode", "user__user_picture"."user_picture_target_id" AS "user_picture_target_id", "user__user_picture"."user_picture_alt" AS "user_picture_alt", "user__user_picture"."user_picture_title" AS "user_picture_title", "user__user_picture"."user_picture_width" AS "user_picture_width", "user__user_picture"."user_picture_height" AS "user_picture_height" FROM "users_field_data" "users_field_data" LEFT OUTER JOIN "user__user_picture" "user__user_picture" ON "user__user_picture"."entity_id" = "users_field_data"."uid" AND "user__user_picture"."langcode" = "users_field_data"."langcode" AND "user__user_picture"."deleted" = 0 WHERE "users_field_data"."uid" IN (2)',
+      'SELECT "users_field_data".*, "users_field_data"."langcode" AS "users_field_data__langcode", "user__roles"."roles_target_id" AS "roles_target_id", "user__roles"."delta" AS "roles_delta" FROM "users_field_data" "users_field_data" LEFT OUTER JOIN "user__roles" "user__roles" ON "user__roles"."entity_id" = "users_field_data"."uid" AND "user__roles"."langcode" = "users_field_data"."langcode" AND "user__roles"."deleted" = 0 WHERE "users_field_data"."uid" IN (2)',
       'SELECT "name", "value" FROM "key_value" WHERE "name" IN ( "theme:stark" ) AND "collection" = "config.entity.key_store.block"',
     ];
     $recorded_queries = $performance_data->getQueries();
@@ -426,12 +411,12 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'ScriptCount' => 1,
       'StylesheetBytes' => 1429,
       'StylesheetCount' => 1,
-      'QueryCount' => 17,
-      'CacheGetCount' => 77,
+      'QueryCount' => 16,
+      'CacheGetCount' => 69,
       'CacheSetCount' => 1,
       'CacheDeleteCount' => 1,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 6,
+      'CacheTagLookupQueryCount' => 7,
       'CacheTagGroupedLookups' => [
         // Form submission and login.
         [
@@ -461,13 +446,12 @@ class StandardPerformanceTest extends PerformanceTestBase {
         ],
         ['rendered', 'user:2', 'user_view'],
         [
-          'config:block_list',
-          'config:system.site',
+          'config:system.menu.account',
+          'config:system.menu.main',
         ],
-        ['config:system.menu.account', 'config:system.menu.main'],
-        [
-          'config:user.role.authenticated',
-        ],
+        ['config:block_list'],
+        ['config:system.site'],
+        ['config:user.role.authenticated'],
       ],
     ];
     $this->assertMetrics($expected, $performance_data);
@@ -502,9 +486,8 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'SELECT COUNT(*) AS "expression" FROM (SELECT 1 AS "expression" FROM "flood" "f" WHERE ("event" = "user.failed_login_ip") AND ("identifier" = "CLIENT_IP") AND ("timestamp" > "TIMESTAMP")) "subquery"',
       'SELECT "base_table"."uid" AS "uid", "base_table"."uid" AS "base_table_uid" FROM "users" "base_table" INNER JOIN "users_field_data" "users_field_data" ON "users_field_data"."uid" = "base_table"."uid" WHERE ("users_field_data"."name" IN ("ACCOUNT_NAME")) AND ("users_field_data"."default_langcode" IN (1))',
       'SELECT "base"."uid" AS "uid", "base"."uuid" AS "uuid", "base"."langcode" AS "langcode" FROM "users" "base" WHERE "base"."uid" IN (2)',
-      'SELECT "data".* FROM "users_field_data" "data" WHERE "data"."uid" IN (2) ORDER BY "data"."uid" ASC',
-      'SELECT "users_field_data"."uid" AS "uid", "users_field_data"."langcode" AS "langcode", "user__user_picture"."user_picture_target_id" AS "user_picture_target_id", "user__user_picture"."user_picture_alt" AS "user_picture_alt", "user__user_picture"."user_picture_title" AS "user_picture_title", "user__user_picture"."user_picture_width" AS "user_picture_width", "user__user_picture"."user_picture_height" AS "user_picture_height" FROM "users_field_data" "users_field_data" LEFT OUTER JOIN "user__user_picture" "user__user_picture" ON "user__user_picture"."entity_id" = "users_field_data"."uid" AND "user__user_picture"."langcode" = "users_field_data"."langcode" AND "user__user_picture"."deleted" = 0 WHERE ("users_field_data"."uid" IN (2)) AND ("users_field_data"."langcode" IN ("en", "und", "zxx"))',
-      'SELECT "users_field_data"."uid" AS "uid", "users_field_data"."langcode" AS "langcode", "user__roles"."roles_target_id" AS "roles_target_id", "user__roles"."delta" AS "roles_delta" FROM "users_field_data" "users_field_data" LEFT OUTER JOIN "user__roles" "user__roles" ON "user__roles"."entity_id" = "users_field_data"."uid" AND "user__roles"."langcode" = "users_field_data"."langcode" AND "user__roles"."deleted" = 0 WHERE ("users_field_data"."uid" IN (2)) AND ("users_field_data"."langcode" IN ("en", "und", "zxx"))',
+      'SELECT "users_field_data".*, "users_field_data"."langcode" AS "users_field_data__langcode", "user__user_picture"."user_picture_target_id" AS "user_picture_target_id", "user__user_picture"."user_picture_alt" AS "user_picture_alt", "user__user_picture"."user_picture_title" AS "user_picture_title", "user__user_picture"."user_picture_width" AS "user_picture_width", "user__user_picture"."user_picture_height" AS "user_picture_height" FROM "users_field_data" "users_field_data" LEFT OUTER JOIN "user__user_picture" "user__user_picture" ON "user__user_picture"."entity_id" = "users_field_data"."uid" AND "user__user_picture"."langcode" = "users_field_data"."langcode" AND "user__user_picture"."deleted" = 0 WHERE "users_field_data"."uid" IN (2)',
+      'SELECT "users_field_data".*, "users_field_data"."langcode" AS "users_field_data__langcode", "user__roles"."roles_target_id" AS "roles_target_id", "user__roles"."delta" AS "roles_delta" FROM "users_field_data" "users_field_data" LEFT OUTER JOIN "user__roles" "user__roles" ON "user__roles"."entity_id" = "users_field_data"."uid" AND "user__roles"."langcode" = "users_field_data"."langcode" AND "user__roles"."deleted" = 0 WHERE "users_field_data"."uid" IN (2)',
       'SELECT COUNT(*) AS "expression" FROM (SELECT 1 AS "expression" FROM "flood" "f" WHERE ("event" = "user.failed_login_user") AND ("identifier" = "CLIENT_IP") AND ("timestamp" > "TIMESTAMP")) "subquery"',
       'INSERT INTO "watchdog" ("uid", "type", "message", "variables", "severity", "link", "location", "referer", "hostname", "timestamp") VALUES ("2", "user", "Session opened for %name.", "WATCHDOG_DATA", 6, "", "LOCATION", "REFERER", "CLIENT_IP", "TIMESTAMP")',
       'UPDATE "users_field_data" SET "login"="TIMESTAMP" WHERE "uid" = "2"',
@@ -518,12 +501,12 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $recorded_queries = $performance_data->getQueries();
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
-      'QueryCount' => 17,
-      'CacheGetCount' => 101,
+      'QueryCount' => 16,
+      'CacheGetCount' => 99,
       'CacheSetCount' => 1,
       'CacheDeleteCount' => 1,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 10,
+      'CacheTagLookupQueryCount' => 11,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
@@ -568,14 +551,14 @@ class StandardPerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 4,
-      'CacheGetCount' => 43,
+      'CacheGetCount' => 41,
       'CacheGetCountByBin' => [
         'config' => 10,
-        'data' => 4,
+        'data' => 5,
         'discovery' => 9,
         'bootstrap' => 8,
         'dynamic_page_cache' => 1,
-        'render' => 10,
+        'render' => 7,
         'menu' => 1,
       ],
       'CacheSetCount' => 2,

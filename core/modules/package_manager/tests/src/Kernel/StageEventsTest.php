@@ -30,6 +30,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * @internal
  */
 #[Group('package_manager')]
+#[Group('#slow')]
 #[CoversClass(SandboxEvent::class)]
 #[RunTestsInSeparateProcesses]
 class StageEventsTest extends PackageManagerKernelTestBase implements EventSubscriberInterface {
@@ -41,14 +42,14 @@ class StageEventsTest extends PackageManagerKernelTestBase implements EventSubsc
    *
    * @var string[]
    */
-  private $events = [];
+  private array $events = [];
 
   /**
    * The stage under test.
    *
    * @var \Drupal\package_manager\SandboxManagerBase
    */
-  private $stage;
+  private TestSandboxManager $stage;
 
   /**
    * {@inheritdoc}

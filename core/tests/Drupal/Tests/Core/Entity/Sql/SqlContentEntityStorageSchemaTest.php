@@ -22,6 +22,8 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Tests Drupal\Core\Entity\Sql\SqlContentEntityStorageSchema.
@@ -32,10 +34,8 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
 
   /**
    * The mocked DB schema handler.
-   *
-   * @var \Drupal\Core\Database\Schema|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $dbSchemaHandler;
+  protected Schema&MockObject $dbSchemaHandler;
 
   /**
    * The mocked entity type manager used in this test.
@@ -52,11 +52,9 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
   protected $entityFieldManager;
 
   /**
-   * The mocked entity last installed schema repository used in this test.
-   *
-   * @var \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface|\PHPUnit\Framework\MockObject\Stub
+   * The entity last installed schema repository used in this test.
    */
-  protected $entityLastInstalledSchemaRepository;
+  protected EntityLastInstalledSchemaRepositoryInterface&Stub $entityLastInstalledSchemaRepository;
 
   /**
    * The mocked entity type used in this test.
@@ -66,11 +64,9 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
   protected $entityType;
 
   /**
-   * The mocked SQL storage used in this test.
-   *
-   * @var \Drupal\Core\Entity\Sql\SqlContentEntityStorage
+   * The SQL storage used in this test.
    */
-  protected $storage;
+  protected SqlContentEntityStorage&Stub $storage;
 
   /**
    * The mocked field definitions used in this test.
@@ -81,10 +77,8 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
 
   /**
    * The storage schema handler used in this test.
-   *
-   * @var \Drupal\Core\Entity\Sql\SqlContentEntityStorageSchema|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $storageSchema;
+  protected SqlContentEntityStorageSchema&MockObject $storageSchema;
 
   /**
    * {@inheritdoc}
@@ -403,7 +397,7 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
       ],
     ];
 
-    $this->setUpStorageSchema($expected);
+    $this->setUpStorageSchema($expected, 1);
 
     $table_mapping = new TestSqlContentDefaultTableMapping($this->entityType, $this->storageDefinitions);
     $table_mapping->setFieldNames('entity_test', array_keys($this->storageDefinitions));
@@ -503,7 +497,7 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
       ],
     ];
 
-    $this->setUpStorageSchema($expected);
+    $this->setUpStorageSchema($expected, 2);
 
     $table_mapping = new TestSqlContentDefaultTableMapping($this->entityType, $this->storageDefinitions);
     $table_mapping->setFieldNames('entity_test', array_keys($this->storageDefinitions));
@@ -614,7 +608,7 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
       ],
     ];
 
-    $this->setUpStorageSchema($expected);
+    $this->setUpStorageSchema($expected, 2);
 
     $table_mapping = new TestSqlContentDefaultTableMapping($this->entityType, $this->storageDefinitions);
     $non_data_fields = array_keys($this->storageDefinitions);
@@ -832,7 +826,7 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
       ],
     ];
 
-    $this->setUpStorageSchema($expected);
+    $this->setUpStorageSchema($expected, 4);
 
     $table_mapping = new TestSqlContentDefaultTableMapping($this->entityType, $this->storageDefinitions);
     $non_data_fields = array_keys($this->storageDefinitions);
@@ -1007,7 +1001,7 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
       ],
     ];
 
-    $this->setUpStorageSchema($expected);
+    $this->setUpStorageSchema($expected, 1);
 
     $table_mapping = new TestSqlContentDefaultTableMapping($this->entityType, $this->storageDefinitions);
     $table_mapping->setFieldNames($entity_type_id, array_keys($this->storageDefinitions));
@@ -1148,7 +1142,7 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
       ],
     ];
 
-    $this->setUpStorageSchema($expected);
+    $this->setUpStorageSchema($expected, 1);
 
     $table_mapping = new TestSqlContentDefaultTableMapping($this->entityType, $this->storageDefinitions);
     $table_mapping->setFieldNames($entity_type_id, array_keys($this->storageDefinitions));
@@ -1165,35 +1159,35 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
 
   public static function providerTestRequiresEntityDataMigration(): \Generator {
     // Case 1: same storage class, ::hasData() === TRUE.
-    yield [SqlContentEntityStorageSchema::class, TRUE, TRUE, TRUE];
+    yield [SqlContentEntityStorageSchema::class, TRUE, TRUE, TRUE, 1];
 
     // Case 2: same storage class, ::hasData() === FALSE.
-    yield [SqlContentEntityStorageSchema::class, FALSE, TRUE, FALSE];
+    yield [SqlContentEntityStorageSchema::class, FALSE, TRUE, FALSE, 1];
 
     // Case 3: different storage class, original storage class does not exist.
-    yield ['bar', NULL, TRUE, TRUE];
+    yield ['bar', NULL, TRUE, TRUE, 0];
 
     // Case 4: different storage class, original storage class exists,
     // ::hasData() === TRUE.
-    yield [SqlContentEntityStorageSchemaTest::class, TRUE, TRUE, TRUE];
+    yield [SqlContentEntityStorageSchemaTest::class, TRUE, TRUE, TRUE, 1];
 
     // Case 5: different storage class, original storage class exists,
     // ::hasData() === FALSE.
-    yield [SqlContentEntityStorageSchemaTest::class, FALSE, TRUE, FALSE];
+    yield [SqlContentEntityStorageSchemaTest::class, FALSE, TRUE, FALSE, 1];
 
     // Case 6: same storage class, ::hasData() === TRUE, no structure changes.
-    yield [SqlContentEntityStorageSchema::class, TRUE, FALSE, FALSE];
+    yield [SqlContentEntityStorageSchema::class, TRUE, FALSE, FALSE, 1];
 
     // Case 7: different storage class, original storage class exists,
     // ::hasData() === TRUE, no structure changes.
-    yield [SqlContentEntityStorageSchemaTest::class, TRUE, FALSE, FALSE];
+    yield [SqlContentEntityStorageSchemaTest::class, TRUE, FALSE, FALSE, 1];
   }
 
   /**
    * Tests requires entity data migration.
    */
   #[DataProvider('providerTestRequiresEntityDataMigration')]
-  public function testRequiresEntityDataMigration(string $storage_class, bool|null $original_storage_has_data, bool $shared_table_structure_changed, bool $migration_required): void {
+  public function testRequiresEntityDataMigration(string $storage_class, bool|null $original_storage_has_data, bool $shared_table_structure_changed, bool $migration_required, int $hasSharedTableStructureChangeCallCount): void {
     $this->setUpMockContentEntityStorage();
 
     $this->entityType = new ContentEntityType([
@@ -1235,7 +1229,7 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
       ->method('getStorageClass')
       ->willReturn($storage_class);
 
-    $this->storageSchema
+    $this->storageSchema->expects($this->exactly($hasSharedTableStructureChangeCallCount))
       ->method('hasSharedTableStructureChange')
       ->with($updated_entity_type_definition, $original_entity_type_definition)
       ->willReturn($shared_table_structure_changed);
@@ -1351,8 +1345,11 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
    * @param array $expected
    *   (optional) An associative array describing the expected entity schema to
    *   be created. Defaults to expecting nothing.
+   * @param int $createTableCallCount
+   *   (optional) The number of expected calls to the ::createTable method.
+   *   Defaults to 0.
    */
-  protected function setUpStorageSchema(array $expected = []): void {
+  protected function setUpStorageSchema(array $expected = [], int $createTableCallCount = 0): void {
     $this->entityTypeManager
       ->getDefinition($this->entityType->id())
       ->willReturn($this->entityType);
@@ -1375,7 +1372,7 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
       $expected_table_schemas = array_values($expected);
 
       $this->dbSchemaHandler = $this->createMock(Schema::class);
-      $this->dbSchemaHandler
+      $this->dbSchemaHandler->expects($this->exactly($createTableCallCount))
         ->method('createTable')
         ->with(
           $this->callback(function ($table_name) use (&$invocation_count, $expected_table_names): bool {
@@ -1393,7 +1390,7 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
     $connection = $this->createStub(Connection::class);
     $connection
       ->method('schema')
-      ->willReturn($this->dbSchemaHandler);
+      ->willReturn($this->dbSchemaHandler ?? NULL);
 
     $this->entityLastInstalledSchemaRepository
       ->method('getLastInstalledDefinition')

@@ -6,12 +6,14 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\PreExistingConfigException;
 use Drupal\Core\Config\UnmetDependenciesException;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Extension\MissingDependencyException;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Extension\ThemeInstallerInterface;
 use Drupal\system\Form\ThemeExperimentalConfirmForm;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Controller for theme handling.
@@ -59,39 +61,6 @@ class ThemeController extends ControllerBase {
   }
 
   /**
-   * Uninstalls a theme.
-   *
-   * @param string $theme
-   *   The theme name.
-   *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse
-   *   Redirects back to the appearance admin page.
-   */
-  public function uninstall(#[MapQueryParameter] string $theme) {
-    $config = $this->config('system.theme');
-
-    // Get current list of themes.
-    $themes = $this->themeHandler->listInfo();
-
-    // Check if the specified theme is one recognized by the system.
-    if (!empty($themes[$theme])) {
-      // Do not uninstall the default or admin theme.
-      if ($theme === $config->get('default') || $theme === $config->get('admin')) {
-        $this->messenger()->addError($this->t('%theme is the default theme and cannot be uninstalled.', ['%theme' => $themes[$theme]->info['name']]));
-      }
-      else {
-        $this->themeInstaller->uninstall([$theme]);
-        $this->messenger()->addStatus($this->t('The %theme theme has been uninstalled.', ['%theme' => $themes[$theme]->info['name']]));
-      }
-    }
-    else {
-      $this->messenger()->addError($this->t('The %theme theme was not found.', ['%theme' => $theme]));
-    }
-
-    return $this->redirect('system.themes_page');
-  }
-
-  /**
    * Installs a theme.
    *
    * @param string $theme
@@ -101,6 +70,14 @@ class ThemeController extends ControllerBase {
    *   Redirects back to the appearance admin page or the confirmation form
    *   if an experimental theme will be installed.
    */
+  #[Route(
+    path: '/admin/appearance/install',
+    name: 'system.theme_install',
+    requirements: [
+      '_permission' => 'administer themes',
+      '_csrf_token' => 'TRUE',
+    ],
+  )]
   public function install(#[MapQueryParameter] string $theme) {
     // Display confirmation form in case of experimental theme.
     if ($this->willInstallExperimentalTheme($theme)) {
@@ -175,6 +152,17 @@ class ThemeController extends ControllerBase {
    *   Redirects back to the appearance admin page or the confirmation form
    *   if an experimental theme will be installed.
    */
+  #[Route(
+    path: '/admin/appearance/default',
+    name: 'system.theme_set_default',
+    requirements: [
+      '_permission' => 'administer themes',
+      '_csrf_token' => 'TRUE',
+    ],
+    defaults: [
+      '_title' => new TranslatableMarkup('Set as default theme'),
+    ],
+  )]
   public function setDefaultTheme(#[MapQueryParameter] string $theme) {
     $config = $this->configFactory->getEditable('system.theme');
 

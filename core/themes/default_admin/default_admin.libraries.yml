@@ -1,21 +1,29 @@
 global-styling:
   version: VERSION
+  fonts:
+    font/inter.woff2:
+      preload: true
   css:
     base:
+      css/base/font.css: {}
       css/base/accents.css: {}
       css/base/variables.css: {}
+      css/base/icons.css: {}
       css/base/elements.css: {}
       css/base/typography.css: {}
       css/base/print.css: {}
     component:
       css/components/accordion.css: {}
       css/components/action-link.css: {}
+      css/components/batch.css: {}
+      css/components/blocks.css: {}
       css/components/content-header.css: {}
       css/components/ckeditor5.css: {}
       css/components/container-inline.css: {}
       css/components/container-inline.module.css: {}
       css/components/breadcrumb.css: {}
       css/components/button.css: {}
+      css/components/dropbutton.css: {}
       css/components/details.css: {}
       css/components/divider.css: {}
       css/components/messages.css: {}
@@ -23,29 +31,33 @@ global-styling:
       css/components/fieldset.css: {}
       css/components/form.css: {}
       css/components/form--checkbox-radio.css: {}
+      css/components/form--checkbox-toggle.css: {}
       css/components/form--field-multiple.css: {}
       css/components/form--managed-file.css: {}
       css/components/form--text.css: {}
       css/components/form--select.css: {}
+      css/components/form-inline.css: {}
       css/components/help.css: {}
       css/components/image-preview.css: {}
+      css/components/layers.css: {}
+      css/components/local-actions.css: {}
       css/components/menus-and-lists.css: {}
       css/components/modules-page.css: {}
       css/components/node.css: {}
       css/components/page-title.css: {}
       css/components/pager.css: {}
+      css/components/performance.css: {}
       css/components/skip-link.css: {}
       css/components/tables.css: {}
       css/components/table--file-multiple-widget.css: {}
       css/components/search-admin-settings.css: {}
+      css/components/system-themes.css: {}
       css/components/tableselect.css: {}
       css/components/tabs.css: {}
     theme:
       css/theme/colors.css: {}
-      migration/css/base/gin.css: { minified: false }
     layout:
       css/layout/breadcrumb.css: {}
-      css/layout/local-actions.css: {}
       css/layout/layout.css: {}
   dependencies:
     - system/admin
@@ -60,7 +72,9 @@ global-styling:
     # rendering links, it is hard to recognize when this detection should be
     # attached, therefore it is always attached.
     - core/drupal.touchevents-test
-    - default_admin/base
+    - default_admin/tabs
+    - default_admin/admin_dialog
+    - default_admin/status
 
 form-two-columns:
   version: VERSION
@@ -115,8 +129,24 @@ admin.drupal.dialog:
 
 admin.tabledrag:
   version: VERSION
+  css:
+    component:
+      css/components/tabledrag.css: {}
   js:
+    migration/js/tabledrag.js: {}
     js/tabledrag.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings
+    - core/once
+    - core/drupal.touchevents-test
+
+drupal.dblog:
+  version: VERSION
+  css:
+    theme:
+      css/components/dblog.css: {}
 
 drupal.node.preview:
   version: VERSION
@@ -129,6 +159,18 @@ drupal.tablesort:
   css:
     component:
       css/components/tablesort-indicator.css: {}
+
+drupal.update.admin:
+  version: VERSION
+  css:
+    component:
+      css/components/update.css: {}
+
+drupal.user.admin:
+  version: VERSION
+  css:
+    component:
+      css/components/user.admin.css: {}
 
 media-form:
   version: VERSION
@@ -318,18 +360,6 @@ tableselect:
     - core/tabbable
     - core/once
 
-# Base
-
-base:
-  css:
-    component:
-      migration/css/theme/font.css: { minified: false }
-      migration/css/theme/variables.css: { minified: false }
-  dependencies:
-    - default_admin/tabs
-    - default_admin/admin_dialog
-    - default_admin/status
-
 # Init
 
 init:
@@ -385,7 +415,7 @@ toolbar:
 accent:
   css:
     theme:
-      migration/css/theme/accent.css: { minified: false }
+      css/theme/accent.css: {}
   js:
     migration/js/accent.js: { minified: false }
   dependencies:
