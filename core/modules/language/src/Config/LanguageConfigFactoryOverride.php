@@ -153,6 +153,13 @@ class LanguageConfigFactoryOverride extends ConfigFactoryOverrideBase implements
    */
   public function onConfigSave(ConfigCrudEvent $event) {
     $config = $event->getConfig();
+    // Only validate configuration if in the default collection. Other
+    // collections may have incomplete configuration (for example language
+    // overrides only). These are not valid in themselves.
+    if ($config->getStorage()->getCollectionName() != StorageInterface::DEFAULT_COLLECTION) {
+      return;
+    }
+
     $name = $config->getName();
     foreach (\Drupal::languageManager()->getLanguages() as $language) {
       $config_translation = $this->getOverride($language->getId(), $name);
