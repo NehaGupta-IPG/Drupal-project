@@ -67,9 +67,8 @@ interface ConfigurableLanguageManagerInterface extends LanguageManagerInterface 
    *   The language configuration object name.
    *
    * @return \Drupal\language\Config\LanguageConfigOverride
-   *   The language config override object is always instantiated for the
-   *   requested $langcode. If no configuration data exists, the object will be
-   *   empty.
+   *   The language config override object for the requested $langcode.
+   *   If no configuration data exists, the object will be empty.
    */
   public function getLanguageConfigOverride($langcode, $name);
 
