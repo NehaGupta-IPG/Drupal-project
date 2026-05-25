@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Routing;
 
+use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Controller\ControllerResolverInterface;
-use Drupal\Core\Discovery\YamlDiscovery;
+use Drupal\Core\Discovery\YamlCacheCollectorDiscovery;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Lock\LockBackendInterface;
+use Drupal\Core\Utility\YamlCacheCollector;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -17,7 +21,22 @@ class YamlRouteDiscovery extends StaticRouteDiscoveryBase {
   public function __construct(
     protected readonly ModuleHandlerInterface $moduleHandler,
     protected readonly ControllerResolverInterface $controllerResolver,
+    protected ?CacheBackendInterface $cache,
+    protected ?LockBackendInterface $lock,
+    protected ?TimeInterface $time,
   ) {
+    if (!isset($cache)) {
+      $this->cache = \Drupal::service('cache.file_parsing');
+      @trigger_error('Calling ' . __METHOD__ . '() without the $cache argument is deprecated in drupal:11.4.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3486503', E_USER_DEPRECATED);
+    }
+    if (!isset($lock)) {
+      $this->lock = \Drupal::service('lock');
+      @trigger_error('Calling ' . __METHOD__ . '() without the $lock argument is deprecated in drupal:11.4.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3486503', E_USER_DEPRECATED);
+    }
+    if (!isset($time)) {
+      $this->time = \Drupal::service('time');
+      @trigger_error('Calling ' . __METHOD__ . '() without the $time argument is deprecated in drupal:11.4.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3486503', E_USER_DEPRECATED);
+    }
   }
 
   /**
@@ -90,7 +109,8 @@ class YamlRouteDiscovery extends StaticRouteDiscoveryBase {
   protected function getRouteDefinitions() {
     // Always instantiate a new YamlDiscovery object so that we always search on
     // the up-to-date list of modules.
-    $discovery = new YamlDiscovery('routing', $this->moduleHandler->getModuleDirectories());
+    $cache_collector = new YamlCacheCollector('route_discovery', $this->cache, $this->lock, $this->time);
+    $discovery = new YamlCacheCollectorDiscovery('routing', $this->moduleHandler->getModuleDirectories(), $cache_collector);
     return $discovery->findAll();
   }
 

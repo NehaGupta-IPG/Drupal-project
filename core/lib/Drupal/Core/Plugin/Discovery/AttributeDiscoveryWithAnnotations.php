@@ -7,6 +7,9 @@ use Drupal\Component\Annotation\Doctrine\AnnotationRegistry;
 use Drupal\Component\Annotation\Doctrine\SimpleAnnotationReader;
 use Drupal\Component\Annotation\Doctrine\StaticReflectionParser;
 use Drupal\Component\Annotation\Reflection\MockFileFinder;
+use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Component\Utility\Crypt;
 
 /**
@@ -43,11 +46,15 @@ class AttributeDiscoveryWithAnnotations extends AttributeClassDiscovery {
   public function __construct(
     string $subdir,
     \Traversable $rootNamespaces,
+    CacheBackendInterface $cache,
+    LockBackendInterface $lock,
+    protected TimeInterface $time,
     string $pluginDefinitionAttributeName = 'Drupal\Component\Plugin\Attribute\Plugin',
     protected readonly string $pluginDefinitionAnnotationName = 'Drupal\Component\Annotation\Plugin',
     protected readonly array $additionalNamespaces = [],
+
   ) {
-    parent::__construct($subdir, $rootNamespaces, $pluginDefinitionAttributeName);
+    parent::__construct($subdir, $rootNamespaces, $cache, $lock, $time, $pluginDefinitionAttributeName);
   }
 
   /**
