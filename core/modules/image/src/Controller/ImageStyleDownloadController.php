@@ -111,7 +111,11 @@ class ImageStyleDownloadController extends FileDownloadController {
     if ($this->streamWrapperManager->isValidScheme($scheme)) {
       $normalized_target = $this->streamWrapperManager->getTarget($image_uri);
       if ($normalized_target !== FALSE) {
-        if (!in_array($scheme, Settings::get('file_sa_core_2023_005_schemes', []))) {
+        $file_sa_core_2023_005_schemes = Settings::get('file_sa_core_2023_005_schemes', []);
+        if ($file_sa_core_2023_005_schemes) {
+          @trigger_error('The \'file_sa_core_2023_005_schemes\' setting is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3591511', E_USER_DEPRECATED);
+        }
+        if (!in_array($scheme, $file_sa_core_2023_005_schemes)) {
           $parts = explode('/', $normalized_target);
           if (array_intersect($parts, ['.', '..'])) {
             throw new NotFoundHttpException();
