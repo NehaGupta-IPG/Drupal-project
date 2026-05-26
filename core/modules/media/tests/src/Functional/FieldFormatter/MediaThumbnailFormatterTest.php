@@ -99,6 +99,7 @@ class MediaThumbnailFormatterTest extends MediaFunctionalTestBase {
 
     // Validate the image being loaded with the media reference.
     $this->assertSession()->responseContains('<a href="' . $mediaImage->toUrl('edit-form')->toString());
+    $this->assertSession()->responseNotContains('loading="eager"');
     // Check preload head link tag.
     $this->assertPageHead('link', [
       'rel' => 'preload',

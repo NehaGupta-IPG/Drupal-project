@@ -572,6 +572,14 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $this->drupalGet('node/' . $nid);
     // Regardless of preload, the image must be on the page.
     $this->assertSession()->responseContains($default_output);
+    // When preload is enabled the loading attribute must be absent; when
+    // disabled the loading attribute must be present on the image.
+    if ($preload) {
+      $this->assertSession()->responseNotContains('loading="lazy"');
+    }
+    else {
+      $this->assertSession()->responseContains('loading="lazy"');
+    }
     // Check preload head link tag.
     $this->assertPageHead('link', [
       'rel' => 'preload',
@@ -602,6 +610,14 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $this->drupalGet('node/' . $nid);
     // Regardless of preload, the image must be on the page.
     $this->assertSession()->responseContains($default_output);
+    // When preload is enabled the loading attribute must be absent; when
+    // disabled the loading attribute must be present on the image.
+    if ($preload) {
+      $this->assertSession()->responseNotContains('loading="lazy"');
+    }
+    else {
+      $this->assertSession()->responseContains('loading="lazy"');
+    }
     // Prepare expected image URL.
     // @see template_preprocess_image()
     /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
