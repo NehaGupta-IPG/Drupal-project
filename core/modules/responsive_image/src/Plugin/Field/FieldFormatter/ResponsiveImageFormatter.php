@@ -135,7 +135,7 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
       '#type' => 'checkbox',
       '#title' => $this->t('Preload'),
       '#default_value' => $image_loading['preload'] ?? FALSE,
-      '#description' => $this->t('Preload to optimize the loading of late-discovered resources. Normally large or hero images below the fold. <a href=":link_preload">Learn more about preload</a> and see <a href=":link_examples">examples for images</a>. When using a responsive image style, each breakpoint must be bounded by both <code>min-width</code> and <code>max-width</code> to ensure breakpoints are mutually exclusive. Breakpoints using only <code>min-width</code>, only <code>max-width</code>, or no width constraint at all can match simultaneously at some viewport sizes, causing multiple image variants to download at once.', [
+      '#description' => $this->t('Preload to optimize the loading of late-discovered resources. Normally large or hero images below the fold. <a href=":link_preload">Learn more about preload</a> and see <a href=":link_examples">examples for images</a>. When using a responsive image style, breakpoints must be mutually exclusive: at most one <code>min-width</code>-only query (the outermost top breakpoint) and at most one <code>max-width</code>-only query (the outermost bottom breakpoint) are permitted; all other breakpoints must be bounded by both <code>min-width</code> and <code>max-width</code>, and no breakpoint may omit a width constraint entirely. Otherwise multiple image variants may download simultaneously at some viewport sizes.', [
         ':link_preload' => 'https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/rel/preload',
         ':link_examples' => 'https://html.spec.whatwg.org/multipage/semantics.html#attr-link-imagesrcset',
       ]),
@@ -182,7 +182,7 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
           ],
         ],
         'message' => [
-          '#markup' => $this->t('The selected responsive image style contains breakpoints that are not mutually exclusive: one or more media queries use only <code>min-width</code>, only <code>max-width</code>, or no width constraint. With preload enabled, multiple image variants may download simultaneously at certain viewport sizes. Each breakpoint must be bounded by both <code>min-width</code> and <code>max-width</code> for correct preload behavior.'),
+          '#markup' => $this->t('The selected responsive image style contains breakpoints that are not mutually exclusive: multiple <code>min-width</code>-only or <code>max-width</code>-only queries, or a query with no width constraint. With preload enabled, multiple image variants may download simultaneously at certain viewport sizes. Allow at most one <code>min-width</code>-only and one <code>max-width</code>-only query (the outermost top and bottom breakpoints); every other breakpoint must be bounded by both <code>min-width</code> and <code>max-width</code>.'),
         ],
       ];
     }
@@ -370,23 +370,24 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
    * Checks whether a set of media queries is non-exclusive (cumulative).
    *
    * For preload to work correctly, at most one breakpoint may match any given
-   * viewport width. A breakpoint is non-exclusive when its media query is not
-   * bounded on both sides with min-width and max-width. Three problematic
-   * patterns exist:
+   * viewport width. A set of media queries is non-exclusive when one of the
+   * following patterns is present:
    *
-   * - min-width only: cumulative on wider viewports — every screen wider than
-   *   the lower bound matches, so multiple breakpoints fire simultaneously on
-   *   larger screens.
-   * - max-width only: cumulative on smaller viewports — every screen narrower
-   *   than the upper bound matches, so multiple breakpoints fire simultaneously
-   *   on smaller screens.
-   * - neither min-width nor max-width: not bounded by width at all (e.g.
-   *   orientation or color queries) — can overlap with any width-based
-   *   breakpoint.
+   * - Two or more min-width-only queries: cumulative on wider viewports — every
+   *   screen wider than the lower bound matches each query, so multiple
+   *   breakpoints fire simultaneously on larger screens.
+   * - Two or more max-width-only queries: cumulative on smaller viewports —
+   *   every screen narrower than the upper bound matches each query, so
+   *   multiple breakpoints fire simultaneously on smaller screens.
+   * - Any query without min-width and without max-width: not bounded by width
+   *   at all (e.g. orientation or color queries) — can overlap with any
+   *   width-based breakpoint.
    *
-   * When a set has two or more non-empty media queries and any one of them
-   * falls into one of the patterns above, concurrent preload downloads become
-   * likely, so the set is considered non-exclusive.
+   * A single min-width-only query is allowed when at least one other query in
+   * the set carries a max-width: it represents an open-ended outermost top
+   * breakpoint (anything wider than X) paired with bounded siblings covering
+   * lower viewports. A single max-width-only query is allowed symmetrically
+   * for the outermost bottom breakpoint.
    *
    * @param string[] $media_queries
    *   Media query strings from the responsive image style's breakpoints.
@@ -399,14 +400,26 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
     if (count($non_empty) <= 1) {
       return FALSE;
     }
+    $min_only_count = 0;
+    $max_only_count = 0;
     foreach ($non_empty as $query) {
       $has_min = str_contains($query, 'min-width');
       $has_max = str_contains($query, 'max-width');
-      if (!$has_min || !$has_max) {
+      // Queries without any width constraint can overlap with any width-based
+      // breakpoint.
+      if (!$has_min && !$has_max) {
         return TRUE;
       }
+      if ($has_min && !$has_max) {
+        $min_only_count++;
+      }
+      elseif (!$has_min && $has_max) {
+        $max_only_count++;
+      }
     }
-    return FALSE;
+    // At most one open-ended top and one open-ended bottom; everything else
+    // must be bounded on both sides.
+    return $min_only_count > 1 || $max_only_count > 1;
   }
 
   /**

@@ -87,10 +87,44 @@ class ResponsiveImageFormatterTest extends UnitTestCase {
         TRUE,
       ],
 
-      // ── Mixed: one unbounded query invalidates an otherwise safe set ──────
-      'one unbounded query in otherwise safe set' => [
+      // ── Allowed: a single open-ended outermost breakpoint ─────────────────
+      // Exactly one min-only query, paired with at least one bounded sibling,
+      // represents an open-ended top breakpoint (anything wider than X).
+      'single min-only at top with bounded sibling' => [
         ['(min-width: 0px) and (max-width: 559px)', '(min-width: 560px)'],
+        FALSE,
+      ],
+      // Symmetric: exactly one max-only query represents an open-ended bottom.
+      'single max-only at bottom with bounded sibling' => [
+        ['(max-width: 559px)', '(min-width: 560px) and (max-width: 1200px)'],
+        FALSE,
+      ],
+      // One min-only and one max-only with a gap between them — still
+      // mutually exclusive (no viewport matches both).
+      'one min-only and one max-only with a gap' => [
+        ['(max-width: 559px)', '(min-width: 1000px)'],
+        FALSE,
+      ],
+      // Two min-only queries are still cumulative, even with a bounded sibling.
+      'two min-only with bounded sibling' => [
+        [
+          '(min-width: 0px) and (max-width: 559px)',
+          '(min-width: 560px)',
+          '(min-width: 800px)',
+        ],
         TRUE,
+      ],
+      // The umami hero responsive image style: two bounded queries flanked by
+      // a single open-ended bottom (max-only) and a single open-ended top
+      // (min-only) — exclusive under the refined rule.
+      'umami hero set with open-ended top and bottom breakpoints' => [
+        [
+          'all and (max-width: 499px)',
+          'all and (min-width: 500px) and (max-width: 800px)',
+          'all and (min-width: 800px) and (max-width: 1400px)',
+          'all and (min-width: 1400px)',
+        ],
+        FALSE,
       ],
     ];
   }
