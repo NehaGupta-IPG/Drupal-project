@@ -474,6 +474,10 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
     $values = NestedArray::getValue($form_state->getValues(), $path, $key_exists);
 
     if ($key_exists) {
+      if (!is_array($values)) {
+        $values = [];
+      }
+
       // Account for drag-and-drop reordering if needed.
       if (!$this->handlesMultipleValues()) {
         // Remove the 'value' of the 'add more' button.
