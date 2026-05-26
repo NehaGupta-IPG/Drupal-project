@@ -15,6 +15,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\datetime\Functional\DateTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -975,6 +976,7 @@ class DateRangeFieldTest extends DateTestBase {
    * @param string $type
    *   The datetime type - 'date' or 'datetime'.
    */
+  #[DataProvider('defaultValueProvider')]
   public function testDefaultValue(string $type): void {
     $storage_format = match ($type) {
       DateTimeItem::DATETIME_TYPE_DATE => DateTimeItemInterface::DATE_STORAGE_FORMAT,

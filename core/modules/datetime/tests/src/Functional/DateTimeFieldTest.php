@@ -13,6 +13,7 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -687,6 +688,7 @@ class DateTimeFieldTest extends DateTestBase {
    * @param string $relative_value
    *   The relative date value to use as the default relative value.
    */
+  #[DataProvider('defaultValueProvider')]
   public function testDefaultValue(string $type, string $relative_value): void {
     $storage_format = match ($type) {
       DateTimeItem::DATETIME_TYPE_DATE => DateTimeItemInterface::DATE_STORAGE_FORMAT,
