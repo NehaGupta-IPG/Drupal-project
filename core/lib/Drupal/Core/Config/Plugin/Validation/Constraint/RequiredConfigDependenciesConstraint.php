@@ -18,34 +18,26 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 class RequiredConfigDependenciesConstraint extends SymfonyConstraint {
 
   /**
-   * The error message.
+   * Constructs a RequiredConfigDependenciesConstraint object.
    *
-   * @var string
+   * @param array $entityTypes
+   *   The IDs of entity types that need to exist in config dependencies. For
+   *   example, if an entity requires a filter format in its config
+   *   dependencies, this should contain `filter_format`.
+   * @param string $message
+   *   The error message.
+   * @param array|null $groups
+   *   The groups that the constraint belongs to.
+   * @param mixed|null $payload
+   *   Domain-specific data attached to a constraint.
    */
-  public string $message = 'This @entity_type requires a @dependency_type.';
-
-  /**
-   * The IDs of entity types that need to exist in config dependencies.
-   *
-   * For example, if an entity requires a filter format in its config
-   * dependencies, this should contain `filter_format`.
-   *
-   * @var string[]
-   */
-  public array $entityTypes = [];
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getRequiredOptions(): array {
-    return ['entityTypes'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getDefaultOption(): ?string {
-    return 'entityTypes';
+  public function __construct(
+    public array $entityTypes = [],
+    public string $message = 'This @entity_type requires a @dependency_type.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct(groups: $groups, payload: $payload);
   }
 
 }
