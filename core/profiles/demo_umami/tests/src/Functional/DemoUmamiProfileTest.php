@@ -11,6 +11,8 @@ use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\editor\Entity\Editor;
 use Drupal\KernelTests\AssertConfigTrait;
+use Drupal\responsive_image\Entity\ResponsiveImageStyle;
+use Drupal\responsive_image\Plugin\Field\FieldFormatter\ResponsiveImageFormatter;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\SchemaCheckTestTrait;
 use PHPUnit\Framework\Attributes\Group;
@@ -54,6 +56,95 @@ class DemoUmamiProfileTest extends BrowserTestBase {
     $this->testDemonstrationWarningMessage();
     $this->testConfig();
     $this->testEditNodesByAdmin();
+    $this->testHeroBreakpointsAreExclusive();
+    $this->testHeroImagePreloads();
+    $this->testRecipeDetailImagePreload();
+  }
+
+  /**
+   * Tests that the umami hero breakpoints are mutually exclusive.
+   *
+   * The hero responsive image style is preloaded on the front page, and the
+   * formatter's preload warning fires whenever the selected style's
+   * breakpoints overlap. This guards against future edits to
+   * umami.breakpoints.yml or responsive_image.styles.hero.yml that would
+   * reintroduce concurrent preload downloads at some viewport widths.
+   */
+  protected function testHeroBreakpointsAreExclusive(): void {
+    $style = ResponsiveImageStyle::load('hero');
+    $this->assertNotNull($style, 'The umami hero responsive image style exists.');
+    $breakpoints = \Drupal::service('breakpoint.manager')
+      ->getBreakpointsByGroup($style->getBreakpointGroup());
+    $used_breakpoint_ids = array_keys($style->getKeyedImageStyleMappings());
+    $media_queries = array_map(
+      fn($bp) => $bp->getMediaQuery(),
+      array_intersect_key($breakpoints, array_flip($used_breakpoint_ids)),
+    );
+    $this->assertNotEmpty($media_queries, 'Hero style has at least one breakpoint media query.');
+    $this->assertFalse(
+      ResponsiveImageFormatter::hasNonExclusiveBreakpoints($media_queries),
+      'Umami hero breakpoints are mutually exclusive for preload purposes.',
+    );
+  }
+
+  /**
+   * Tests that the front page emits preload links for the hero image.
+   *
+   * The umami front page renders the hero media in the scale_crop_7_3_large
+   * view mode, which has preload enabled on its responsive image formatter.
+   * The hero responsive image style maps four breakpoints, so the page head
+   * should carry one preload link per source.
+   */
+  protected function testHeroImagePreloads(): void {
+    if ($this->loggedInUser) {
+      $this->drupalLogout();
+    }
+    $this->drupalGet('<front>');
+    $this->assertSession()->statusCodeEquals(200);
+    $hero_preloads = $this->getSession()->getPage()->findAll(
+      'xpath',
+      '//head/link[@rel="preload" and @as="image" and contains(@imagesrcset, "scale_crop_7_3_")]',
+    );
+    // The hero responsive image style maps four breakpoints, so the head
+    // should carry one preload link per source.
+    $this->assertCount(
+      4,
+      $hero_preloads,
+      'Front page contains a preload link for each hero breakpoint source.',
+    );
+  }
+
+  /**
+   * Tests that a recipe detail page preloads its 3:2 hero image.
+   *
+   * The responsive_3x2 media view mode used on recipe pages has preload
+   * disabled by default (it is reused below the fold in recipe cards), so a
+   * preprocess hook on field--node--field-media-image--recipe--full flips
+   * preload on. The 3_2_image responsive style declares a single sizes-based
+   * mapping, so exactly one preload link should be emitted for the recipe
+   * hero on the full view.
+   */
+  protected function testRecipeDetailImagePreload(): void {
+    if ($this->loggedInUser) {
+      $this->drupalLogout();
+    }
+    $nodes = $this->container->get('entity_type.manager')
+      ->getStorage('node')
+      ->loadByProperties(['title' => 'Deep mediterranean quiche']);
+    /** @var \Drupal\node\NodeInterface $recipe */
+    $recipe = reset($nodes);
+    $this->assertNotEmpty($recipe, 'The "Deep mediterranean quiche" recipe is available.');
+    $this->drupalGet($recipe->toUrl());
+    $this->assertSession()->statusCodeEquals(200);
+    $preloads = $this->getSession()->getPage()->findAll(
+      'xpath',
+      '//head/link[@rel="preload" and @as="image"]',
+    );
+    $this->assertCount(
+      1,
+      $preloads,
+      'Recipe detail page has exactly one preload link for the 3:2 hero image.',
+    );
   }
 
   /**
