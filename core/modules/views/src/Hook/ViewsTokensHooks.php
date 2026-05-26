@@ -71,16 +71,16 @@ class ViewsTokensHooks {
       'description' => $this->t('The total page count.'),
     ];
     $info['tokens']['view']['start'] = [
-      'name' => t('Start'),
-      'description' => t('The initial record number in the set.'),
+      'name' => $this->t('Start'),
+      'description' => $this->t('The initial record number in the set.'),
     ];
     $info['tokens']['view']['end'] = [
-      'name' => t('End'),
-      'description' => t('The last record number in the set.'),
+      'name' => $this->t('End'),
+      'description' => $this->t('The last record number in the set.'),
     ];
     $info['tokens']['view']['current_record_count'] = [
-      'name' => t('Current record count'),
-      'description' => t('The current page record count.'),
+      'name' => $this->t('Current record count'),
+      'description' => $this->t('The current page record count.'),
     ];
     return $info;
   }
