@@ -44,18 +44,13 @@ class EntityConverterTest extends UnitTestCase {
 
   /**
    * The tested entity converter.
-   *
-   * @var \Drupal\Core\ParamConverter\EntityConverter
    */
-  protected $entityConverter;
+  protected EntityConverter $entityConverter;
 
   /**
    * Sets up mock services and class instances.
-   *
-   * @param object[] $service_map
-   *   An associative array of service instances keyed by service name.
    */
-  protected function setUpMocks($service_map = []): void {
+  protected function setUpMocks(int $getDefinitionCallsCount = 0): void {
     $entity = $this->createStub(ContentEntityInterface::class);
     $entity
       ->method('getEntityTypeId')
@@ -78,17 +73,16 @@ class EntityConverterTest extends UnitTestCase {
       ->method('getLatestRevisionId')
       ->willReturn('revision_id');
 
-    $this->entityTypeManager
+    $this->entityTypeManager->expects($this->never())
       ->method('getStorage')
-      ->with('entity_test')
-      ->willReturn($storage);
+      ->with('entity_test');
 
     $entity_type = $this->createStub(ContentEntityTypeInterface::class);
     $entity_type
       ->method('isRevisionable')
       ->willReturn(TRUE);
 
-    $this->entityTypeManager
+    $this->entityTypeManager->expects($this->exactly($getDefinitionCallsCount))
       ->method('getDefinition')
       ->with('entity_test')
       ->willReturn($entity_type);
@@ -111,7 +105,7 @@ class EntityConverterTest extends UnitTestCase {
       ->method('createDataDefinition')
       ->willReturn($context_definition);
 
-    $service_map += [
+    $service_map = [
       'typed_data_manager' => $typed_data_manager,
     ];
 
@@ -194,11 +188,17 @@ class EntityConverterTest extends UnitTestCase {
    * Tests the convert() method.
    */
   #[DataProvider('providerTestConvert')]
-  public function testConvert($value, array $definition, array $defaults, $expected_result): void {
+  public function testConvert(
+    string $value,
+    array $definition,
+    array $defaults,
+    ?object $expected_result,
+    int $getDefinitionCallsCount,
+  ): void {
     $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
     $this->entityRepository = $this->createStub(EntityRepositoryInterface::class);
     $this->entityConverter = new EntityConverter($this->entityTypeManager, $this->entityRepository);
-    $this->setUpMocks();
+    $this->setUpMocks($getDefinitionCallsCount);
 
     $this->entityRepository
       ->method('getCanonical')
@@ -220,6 +220,7 @@ class EntityConverterTest extends UnitTestCase {
       ['type' => 'entity:entity_test'],
       ['foo' => 'valid_id'],
       (object) ['id' => 'valid_id'],
+      0,
     ];
     // Invalid ID.
     $data[] = [
@@ -227,6 +228,7 @@ class EntityConverterTest extends UnitTestCase {
       ['type' => 'entity:entity_test'],
       ['foo' => 'invalid_id'],
       NULL,
+      0,
     ];
     // Entity type placeholder.
     $data[] = [
@@ -234,6 +236,7 @@ class EntityConverterTest extends UnitTestCase {
       ['type' => 'entity:{entity_type}'],
       ['foo' => 'valid_id', 'entity_type' => 'entity_test'],
       (object) ['id' => 'valid_id'],
+      1,
     ];
 
     return $data;
