@@ -67,9 +67,7 @@ class SingleLinePluginTest extends UnitTestCase {
 
     $editor = $this->createStub(EditorInterface::class);
 
-    $plugin = new SingleLine([], 'ckeditor5_singleLine', $definition_block);
-    // Inject mocked plugin manager.
-    $this->setProtectedProperty($plugin, 'pluginManager', $plugin_manager);
+    $plugin = new SingleLine([], 'ckeditor5_singleLine', $definition_block, $plugin_manager);
 
     $dynamic_config = $plugin->getDynamicPluginConfig([], $editor);
 
@@ -82,15 +80,6 @@ class SingleLinePluginTest extends UnitTestCase {
       ['list.List', 'list.ListUI'],
       $dynamic_config['drupalSingleLine']['blockCKEditor5Plugins']
     );
-  }
-
-  /**
-   * Helper to set a protected property for testing.
-   */
-  protected function setProtectedProperty(object $object, string $property, mixed $value): void {
-    $ref = new \ReflectionObject($object);
-    $prop = $ref->getProperty($property);
-    $prop->setValue($object, $value);
   }
 
 }
