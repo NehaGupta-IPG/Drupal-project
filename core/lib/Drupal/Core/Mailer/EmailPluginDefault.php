@@ -12,7 +12,7 @@ use Symfony\Component\Mime\Email;
 /**
  * Default class used for emails plugins.
  */
-class EmailPluginBase extends PluginBase implements EmailPluginInterface {
+class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
 
   /**
    * A list of template parameters.

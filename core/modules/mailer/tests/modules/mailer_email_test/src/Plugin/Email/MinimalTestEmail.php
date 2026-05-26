@@ -6,7 +6,7 @@ namespace Drupal\mailer_email_test\Plugin\Email;
 
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Mailer\Attribute\Email;
-use Drupal\Core\Mailer\EmailPluginBase;
+use Drupal\Core\Mailer\EmailPluginDefault;
 use Drupal\Core\Render\RenderableInterface;
 
 /**
@@ -15,7 +15,7 @@ use Drupal\Core\Render\RenderableInterface;
 #[Email(
   id: 'mailer_email_test.minimal',
 )]
-class MinimalTestEmail extends EmailPluginBase {
+class MinimalTestEmail extends EmailPluginDefault {
 
   /**
    * {@inheritdoc}

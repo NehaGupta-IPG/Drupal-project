@@ -3,7 +3,7 @@
 namespace Drupal\Core\Mailer\Attribute;
 
 use Drupal\Component\Plugin\Attribute\Plugin;
-use Drupal\Core\Mailer\EmailPluginBase;
+use Drupal\Core\Mailer\EmailPluginDefault;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
@@ -51,7 +51,7 @@ class Email extends Plugin {
     public readonly ?TranslatableMarkup $description = NULL,
     public readonly ?string $module = '',
     public readonly ?string $key = '',
-    protected string $class = EmailPluginBase::class,
+    protected string $class = EmailPluginDefault::class,
     public readonly ?string $html_body_template = NULL,
     public readonly ?string $text_body_template = NULL,
     public readonly ?string $default_subject = NULL,

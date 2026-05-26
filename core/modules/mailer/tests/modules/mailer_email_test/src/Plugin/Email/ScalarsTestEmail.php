@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\mailer_email_test\Plugin\Email;
 
 use Drupal\Core\Mailer\Attribute\Email;
-use Drupal\Core\Mailer\EmailPluginBase;
+use Drupal\Core\Mailer\EmailPluginDefault;
 use Drupal\Core\Render\RenderableInterface;
 
 /**
@@ -15,7 +15,7 @@ use Drupal\Core\Render\RenderableInterface;
   id: 'mailer_email_test.scalars',
   default_subject: 'Scalar Params Test Email',
 )]
-class ScalarsTestEmail extends EmailPluginBase {
+class ScalarsTestEmail extends EmailPluginDefault {
 
   /**
    * {@inheritdoc}
