@@ -260,6 +260,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
       $this->languageTypes = NULL;
       $this->languageTypesInfo = NULL;
       $this->languages = [];
+      $this->languageConfigIds = NULL;
       $this->cacheBackend->delete('language_config_ids');
       if ($this->negotiator) {
         $this->negotiator->reset();
