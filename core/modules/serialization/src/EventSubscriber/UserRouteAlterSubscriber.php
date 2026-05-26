@@ -44,10 +44,6 @@ class UserRouteAlterSubscriber implements EventSubscriberInterface {
    */
   public function onRoutingAlterAddFormats(RouteBuildEvent $event) {
     $route_names = [
-      'user.login_status.http',
-      'user.login.http',
-      'user.logout.http',
-      'user.pass.http',
       'rest.login_status',
       'rest.login',
       'rest.logout',
