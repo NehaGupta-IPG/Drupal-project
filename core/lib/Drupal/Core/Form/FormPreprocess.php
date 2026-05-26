@@ -132,7 +132,7 @@ class FormPreprocess {
 
     $variables['description'] = NULL;
     if (!empty($element['#description'])) {
-      $variables['description_display'] = $element['#description_display'];
+      $variables['description_display'] = $element['#description_display'] ?? 'after';
       $description_attributes = [];
       if (!empty($element['#id'])) {
         $description_attributes['id'] = $element['#id'] . '--description';
@@ -319,8 +319,8 @@ class FormPreprocess {
     if (!empty($element['#description'])) {
       $description_id = $element['#attributes']['id'] . '--description';
       $description_attributes['id'] = $description_id;
-      $variables['description_display'] = $element['#description_display'];
-      if ($element['#description_display'] === 'invisible') {
+      $variables['description_display'] = $element['#description_display'] ?? 'after';
+      if (($element['#description_display'] ?? 'after') === 'invisible') {
         $description_attributes['class'][] = 'visually-hidden';
       }
       $description_attributes['data-drupal-field-elements'] = 'description';
