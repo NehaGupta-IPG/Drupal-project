@@ -335,7 +335,7 @@ class MenuActiveTrailTest extends UnitTestCase {
     $request->attributes->get('_raw_variables')->add(['b' => 1, 'a' => 0]);
     $this->requestStack->push($request);
 
-    $this->menuLinkManager
+    $this->menuLinkManager->expects($this->once())
       ->method('loadLinksByRoute')
       ->with('baby_llama')
       ->willReturn($data[1]);
