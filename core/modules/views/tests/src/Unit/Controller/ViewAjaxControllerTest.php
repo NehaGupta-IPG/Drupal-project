@@ -93,11 +93,13 @@ class ViewAjaxControllerTest extends UnitTestCase {
   protected $pathValidator;
 
   /**
-   * {@inheritdoc}
+   * Sets up the controller under test.
+   *
+   * @param int $getInfoCallsCount
+   *   The number of expected calls to the
+   *   ElementInfoManagerInterface::getInfo() method.
    */
-  protected function setUp(): void {
-    parent::setUp();
-
+  protected function commonSetUp(int $getInfoCallsCount): void {
     $this->viewStorage = $this->createStub(EntityStorageInterface::class);
     $this->executableFactory = $this->createStub(ViewExecutableFactory::class);
     $this->renderer = $this->createStub(RendererInterface::class);
@@ -138,7 +140,7 @@ class ViewAjaxControllerTest extends UnitTestCase {
     $this->viewAjaxController = new ViewAjaxController($this->viewStorage, $this->executableFactory, $this->renderer, $this->currentPath, $this->redirectDestination, $this->pathValidator);
 
     $element_info_manager = $this->createMock(ElementInfoManagerInterface::class);
-    $element_info_manager
+    $element_info_manager->expects($this->exactly($getInfoCallsCount))
       ->method('getInfo')
       ->with('status_messages')
       ->willReturn([]);
@@ -207,6 +209,7 @@ class ViewAjaxControllerTest extends UnitTestCase {
    * Tests missing view_name and view_display_id.
    */
   public function testMissingViewName(): void {
+    $this->commonSetUp(0);
     $request = new Request();
     $this->expectException(NotFoundHttpException::class);
     $this->viewAjaxController->ajaxView($request);
@@ -216,6 +219,7 @@ class ViewAjaxControllerTest extends UnitTestCase {
    * Tests non-existent view with view_name and view_display_id.
    */
   public function testMissingView(): void {
+    $this->commonSetUp(0);
     $this->setUpMockViewStorage();
 
     $request = new Request();
@@ -235,6 +239,7 @@ class ViewAjaxControllerTest extends UnitTestCase {
    * Tests a view without having access to it.
    */
   public function testAccessDeniedView(): void {
+    $this->commonSetUp(0);
     $this->setUpMockViewExecutableFactory();
     $this->setUpMockViewStorage();
 
@@ -269,6 +274,7 @@ class ViewAjaxControllerTest extends UnitTestCase {
    * Tests a valid view without arguments pagers etc.
    */
   public function testAjaxView(): void {
+    $this->commonSetUp(1);
     $this->setUpMockCurrentPath();
     $this->setUpMockRedirectDestination();
 
@@ -309,6 +315,7 @@ class ViewAjaxControllerTest extends UnitTestCase {
    * Tests a valid view without arguments pagers etc.
    */
   public function testInvalidPath(): void {
+    $this->commonSetUp(1);
     $this->setUpMockCurrentPath();
     $this->setUpMockRedirectDestination();
 
@@ -349,6 +356,7 @@ class ViewAjaxControllerTest extends UnitTestCase {
    * Tests a valid view with a view_path with no slash.
    */
   public function testAjaxViewViewPathNoSlash(): void {
+    $this->commonSetUp(1);
     $this->setUpMockCurrentPath();
     $this->setUpMockRedirectDestination();
 
@@ -381,6 +389,7 @@ class ViewAjaxControllerTest extends UnitTestCase {
    * Tests a valid view without ajax enabled.
    */
   public function testAjaxViewWithoutAjax(): void {
+    $this->commonSetUp(0);
     $request = new Request();
     $request->request->set('view_name', 'test_view');
     $request->request->set('view_display_id', 'page_1');
@@ -399,6 +408,7 @@ class ViewAjaxControllerTest extends UnitTestCase {
    * Tests a valid view with arguments.
    */
   public function testAjaxViewWithArguments(): void {
+    $this->commonSetUp(1);
     $request = new Request();
     $request->request->set('view_name', 'test_view');
     $request->request->set('view_display_id', 'page_1');
@@ -419,6 +429,7 @@ class ViewAjaxControllerTest extends UnitTestCase {
    * Tests a valid view with arguments.
    */
   public function testAjaxViewWithEmptyArguments(): void {
+    $this->commonSetUp(1);
     $request = new Request();
     $request->request->set('view_name', 'test_view');
     $request->request->set('view_display_id', 'page_1');
@@ -440,6 +451,7 @@ class ViewAjaxControllerTest extends UnitTestCase {
    * Tests a valid view with arguments.
    */
   public function testAjaxViewWithHtmlEntityArguments(): void {
+    $this->commonSetUp(1);
     $request = new Request();
     $request->request->set('view_name', 'test_view');
     $request->request->set('view_display_id', 'page_1');
@@ -460,6 +472,7 @@ class ViewAjaxControllerTest extends UnitTestCase {
    * Tests a valid view with a pager.
    */
   public function testAjaxViewWithPager(): void {
+    $this->commonSetUp(1);
     $request = new Request();
     $request->request->set('view_name', 'test_view');
     $request->request->set('view_display_id', 'page_1');
