@@ -280,12 +280,7 @@ class ImageItem extends FileItem {
       '#weight' => 4.3,
       '#open' => TRUE,
       '#tree' => TRUE,
-      '#process' => [
-        [
-          '\Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem',
-          'formProcessMergeParent',
-        ],
-      ],
+      '#process' => [[static::class, 'formProcessMergeParent']],
       '#states' => [
         'visible' => $resize_visibility,
       ],
