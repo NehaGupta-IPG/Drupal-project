@@ -2,8 +2,6 @@
 
 namespace Drupal\system\Form;
 
-use Drupal\Core\Config\PreExistingConfigException;
-use Drupal\Core\Config\UnmetDependenciesException;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Extension\ThemeInstallerInterface;
 use Drupal\Core\Form\ConfirmFormBase;

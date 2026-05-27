@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Entity;
 
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Entity\EntityBase;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityTypeRepository;
-use Drupal\Core\Entity\Exception\AmbiguousEntityClassException;
-use Drupal\Core\Entity\Exception\NoCorrespondingEntityClassException;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;

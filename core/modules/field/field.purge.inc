@@ -5,7 +5,6 @@
  */
 
 use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\Core\Field\FieldException;
 use Drupal\Core\Field\FieldPurger;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 

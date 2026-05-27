@@ -10,7 +10,6 @@ use Drupal\ckeditor5\Annotation\DrupalAspectsOfCKEditor5Plugin;
 use Drupal\ckeditor5\HTMLRestrictions;
 use Drupal\ckeditor5\Plugin\CKEditor5Plugin\Heading;
 use Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition;
-use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;

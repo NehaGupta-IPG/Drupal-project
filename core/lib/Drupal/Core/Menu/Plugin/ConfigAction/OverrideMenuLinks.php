@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Menu\Plugin\ConfigAction;
 
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Config\Action\Attribute\ConfigAction;
-use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Config\Action\ConfigActionPluginInterface;
 use Drupal\Core\DependencyInjection\AutowiredInstanceTrait;
 use Drupal\Core\Menu\MenuLinkManagerInterface;

@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\migrate\Unit\process;
 
 use Drupal\Component\Utility\Variable;
-use Drupal\migrate\MigrateException;
-use Drupal\migrate\MigrateSkipRowException;
 use Drupal\migrate\Plugin\migrate\process\StaticMap;
 use PHPUnit\Framework\Attributes\Group;
 

@@ -6,7 +6,6 @@ namespace Drupal\Tests\package_manager\Kernel;
 
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\package_manager\Event\CollectPathsToExcludeEvent;
-use Drupal\package_manager\Exception\FailureMarkerExistsException;
 use Drupal\package_manager\FailureMarker;
 use Drupal\package_manager\PathLocator;
 use PhpTuf\ComposerStager\API\Path\Factory\PathFactoryInterface;

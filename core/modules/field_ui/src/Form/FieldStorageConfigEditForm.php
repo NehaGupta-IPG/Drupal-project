@@ -12,7 +12,6 @@ use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\FieldConfigInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Provides a form for the "field storage" edit page.

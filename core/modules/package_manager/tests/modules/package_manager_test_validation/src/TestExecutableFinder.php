@@ -6,7 +6,6 @@ namespace Drupal\package_manager_test_validation;
 
 use Drupal\Core\State\StateInterface;
 use Drupal\package_manager\TranslatableStringAdapter;
-use PhpTuf\ComposerStager\API\Exception\LogicException;
 use PhpTuf\ComposerStager\API\Finder\Service\ExecutableFinderInterface;
 
 /**

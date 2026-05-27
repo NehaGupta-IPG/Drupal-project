@@ -7,7 +7,6 @@ namespace Drupal\Tests\Core\Security;
 use Drupal\Core\Security\Attribute\TrustedCallback;
 use Drupal\Core\Security\DoTrustedCallbackTrait;
 use Drupal\Core\Security\TrustedCallbackInterface;
-use Drupal\Core\Security\UntrustedCallbackException;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

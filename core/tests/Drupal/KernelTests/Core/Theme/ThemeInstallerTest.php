@@ -6,13 +6,8 @@ namespace Drupal\KernelTests\Core\Theme;
 
 use Drupal\Core\Config\Config;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Core\Extension\Exception\UnknownExtensionException;
-use Drupal\Core\Extension\ExtensionNameLengthException;
-use Drupal\Core\Extension\ExtensionNameReservedException;
-use Drupal\Core\Extension\MissingDependencyException;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ModuleInstallerInterface;
-use Drupal\Core\Extension\ModuleUninstallValidatorException;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Extension\ThemeInstallerInterface;

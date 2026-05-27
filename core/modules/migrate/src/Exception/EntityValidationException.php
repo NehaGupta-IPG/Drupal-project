@@ -4,7 +4,6 @@ namespace Drupal\migrate\Exception;
 
 use Drupal\Core\Entity\EntityConstraintViolationListInterface;
 use Drupal\Core\Entity\RevisionableInterface;
-use Drupal\migrate\MigrateException;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**

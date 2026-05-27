@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Recipe;
 
 use Drupal\block\Entity\Block;
-use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Config\Action\ConfigActionManager;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;

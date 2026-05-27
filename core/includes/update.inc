@@ -9,7 +9,6 @@
  */
 
 use Drupal\Component\Graph\Graph;
-use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Utility\Error;
 use Drupal\Core\Update\EquivalentUpdate;

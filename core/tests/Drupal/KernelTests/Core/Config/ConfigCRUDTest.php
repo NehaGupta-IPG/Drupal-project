@@ -6,10 +6,7 @@ namespace Drupal\KernelTests\Core\Config;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Config\Config;
-use Drupal\Core\Config\ConfigNameException;
-use Drupal\Core\Config\ConfigValueException;
 use Drupal\Core\Config\DatabaseStorage;
-use Drupal\Core\Config\UnsupportedDataTypeConfigException;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;

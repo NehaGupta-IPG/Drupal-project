@@ -10,7 +10,6 @@ use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\language\ConfigurableLanguageManager;
 use Drupal\language\ConfigurableLanguageManagerInterface;
-use Drupal\language\Exception\DeleteDefaultLanguageException;
 use Drupal\language\ConfigurableLanguageInterface;
 use Drupal\language\Form\LanguageAddForm;
 use Drupal\language\Form\LanguageDeleteForm;

@@ -10,7 +10,6 @@ use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Cache\VariationCacheInterface;
 use Drupal\Core\Session\AccessPolicyBase;
 use Drupal\Core\Session\AccessPolicyProcessor;
-use Drupal\Core\Session\AccessPolicyScopeException;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Session\AccountSwitcherInterface;

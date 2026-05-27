@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field\Kernel;
 
-use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Field\FieldConfigBase;
-use Drupal\Core\Field\FieldException;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;

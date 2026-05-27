@@ -4,7 +4,6 @@ namespace Drupal\Core\Http\Exception;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableDependencyTrait;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * A cacheable HttpException.

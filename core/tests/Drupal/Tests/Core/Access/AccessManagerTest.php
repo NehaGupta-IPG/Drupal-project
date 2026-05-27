@@ -7,7 +7,6 @@ namespace Drupal\Tests\Core\Access;
 use Drupal\Component\Utility\ArgumentsResolverInterface;
 use Drupal\Core\Access\AccessArgumentsResolverFactoryInterface;
 use Drupal\Core\Access\AccessCheckInterface;
-use Drupal\Core\Access\AccessException;
 use Drupal\Core\Access\AccessManager;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\CheckProvider;
@@ -28,7 +27,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\InvocationOrder;
 use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 

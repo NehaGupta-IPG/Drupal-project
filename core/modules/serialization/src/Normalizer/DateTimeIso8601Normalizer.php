@@ -6,7 +6,6 @@ use Drupal\Core\Serialization\Attribute\JsonSchema;
 use Drupal\Core\TypedData\Plugin\DataType\DateTimeIso8601;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItem;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**
  * Converts values for the DateTimeIso8601 data type to RFC3339.

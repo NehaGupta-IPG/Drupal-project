@@ -2,8 +2,6 @@
 
 namespace Drupal\locale\File;
 
-use Drupal\Core\File\Exception\FileException;
-use Drupal\Core\File\Exception\InvalidStreamWrapperException;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Http\ClientFactory;
@@ -16,8 +14,6 @@ use Drupal\locale\LocaleProjectRepository;
 use Drupal\locale\LocaleSource;
 use Drupal\locale\StreamWrapper\TranslationsStream;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Exception\RequestException;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;

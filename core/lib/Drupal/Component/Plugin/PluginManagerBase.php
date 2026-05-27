@@ -3,7 +3,6 @@
 namespace Drupal\Component\Plugin;
 
 use Drupal\Component\Plugin\Discovery\DiscoveryTrait;
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 
 /**
  * Base class for plugin managers.

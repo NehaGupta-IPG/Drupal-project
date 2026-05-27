@@ -7,7 +7,6 @@ namespace Drupal\Tests\Core\Theme\Component;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Plugin\Component;
-use Drupal\Core\Render\Component\Exception\InvalidComponentException;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Theme\Component\ComponentValidator;
 use Drupal\Tests\UnitTestCase;

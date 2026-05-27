@@ -2,8 +2,6 @@
 
 namespace Drupal\Core\Menu;
 
-use Drupal\Component\Plugin\Exception\PluginException;
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;

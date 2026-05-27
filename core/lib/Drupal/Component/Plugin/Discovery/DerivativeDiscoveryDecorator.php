@@ -3,7 +3,6 @@
 namespace Drupal\Component\Plugin\Discovery;
 
 use Drupal\Component\Plugin\Definition\DerivablePluginDefinitionInterface;
-use Drupal\Component\Plugin\Exception\InvalidDeriverException;
 
 /**
  * Base class providing the tools for a plugin discovery to be derivative aware.

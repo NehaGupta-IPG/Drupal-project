@@ -7,8 +7,6 @@ namespace Drupal\Tests\block\Kernel;
 use Drupal\block\Entity\Block;
 use Drupal\block\Plugin\ConfigAction\PlaceBlock;
 use Drupal\block\Plugin\ConfigAction\PlaceBlockDeriver;
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
-use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Config\Action\ConfigActionManager;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ThemeInstallerInterface;

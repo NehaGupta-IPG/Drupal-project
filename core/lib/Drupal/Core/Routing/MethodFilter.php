@@ -3,7 +3,6 @@
 namespace Drupal\Core\Routing;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\RouteCollection;
 
 /**

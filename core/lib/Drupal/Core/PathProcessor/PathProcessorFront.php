@@ -4,7 +4,6 @@ namespace Drupal\Core\PathProcessor;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Processes the inbound path by resolving it to the front page if empty.

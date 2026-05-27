@@ -8,7 +8,6 @@ use Drupal\content_moderation\Entity\ContentModerationState;
 use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
-use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\entity_test\EntityTestHelper;

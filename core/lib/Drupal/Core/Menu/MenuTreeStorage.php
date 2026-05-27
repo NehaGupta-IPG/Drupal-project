@@ -2,13 +2,11 @@
 
 namespace Drupal\Core\Menu;
 
-use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Database\Statement\FetchAs;
 

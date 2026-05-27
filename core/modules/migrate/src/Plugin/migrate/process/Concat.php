@@ -3,7 +3,6 @@
 namespace Drupal\migrate\Plugin\migrate\process;
 
 use Drupal\migrate\Attribute\MigrateProcess;
-use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;

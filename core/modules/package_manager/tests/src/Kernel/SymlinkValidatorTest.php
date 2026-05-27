@@ -6,7 +6,6 @@ namespace Drupal\Tests\package_manager\Kernel;
 
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\package_manager\Event\PreCreateEvent;
-use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\PathLocator;
 use Drupal\package_manager\ValidationResult;
 use Drupal\package_manager\Validator\SymlinkValidator;

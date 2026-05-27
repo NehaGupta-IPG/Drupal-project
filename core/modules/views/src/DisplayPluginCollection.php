@@ -2,7 +2,6 @@
 
 namespace Drupal\views;
 
-use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Plugin\DefaultLazyPluginCollection;
 use Drupal\Core\StringTranslation\StringTranslationTrait;

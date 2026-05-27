@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\migrate\Unit;
 
 use Drupal\Component\Utility\Html;
-use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\MigrateMessageInterface;
 use Drupal\migrate\Plugin\MigrateDestinationInterface;

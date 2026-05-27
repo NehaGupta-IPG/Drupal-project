@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\content_moderation\Kernel;
 
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\rest\Entity\RestResourceConfig;
 use Drupal\rest\RestResourceConfigInterface;

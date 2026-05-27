@@ -2,7 +2,6 @@
 
 namespace Drupal\layout_builder\SectionStorage;
 
-use Drupal\Component\Plugin\Exception\ContextException;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;

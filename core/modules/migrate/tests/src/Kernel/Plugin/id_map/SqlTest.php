@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\migrate\Kernel\Plugin\id_map;
 
 use Drupal\Core\Database\Database;
-use Drupal\Core\Database\Exception\SchemaTableColumnSizeTooLargeException;
-use Drupal\migrate\MigrateException;
 use Drupal\Tests\migrate\Kernel\MigrateTestBase;
 use Drupal\Tests\migrate\Unit\TestSqlIdMap;
 use PHPUnit\Framework\Attributes\DataProvider;

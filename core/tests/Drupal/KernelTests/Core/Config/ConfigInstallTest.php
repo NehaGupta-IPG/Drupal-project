@@ -6,8 +6,6 @@ namespace Drupal\KernelTests\Core\Config;
 
 use Drupal\Core\Config\ConfigCollectionEvents;
 use Drupal\Core\Config\InstallStorage;
-use Drupal\Core\Config\PreExistingConfigException;
-use Drupal\Core\Config\UnmetDependenciesException;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;

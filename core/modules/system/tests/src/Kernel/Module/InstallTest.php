@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Kernel\Module;
 
-use Drupal\Core\Extension\ExtensionNameLengthException;
-use Drupal\Core\Extension\ExtensionNameReservedException;
 use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;

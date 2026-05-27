@@ -8,7 +8,6 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\ParamConverter\EntityConverter;
 use Drupal\jsonapi\Routing\Routes;
 use Drupal\Core\Routing\RouteObjectInterface;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Route;
 
 /**

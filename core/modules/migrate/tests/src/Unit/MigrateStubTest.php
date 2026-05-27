@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Unit;
 
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\migrate\MigrateStub;
 use Drupal\migrate\Plugin\MigrateDestinationInterface;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;

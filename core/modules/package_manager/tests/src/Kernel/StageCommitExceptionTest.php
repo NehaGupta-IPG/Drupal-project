@@ -5,15 +5,11 @@ declare(strict_types=1);
 namespace Drupal\Tests\package_manager\Kernel;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\package_manager\Exception\ApplyFailedException;
-use Drupal\package_manager\Exception\SandboxException;
 use Drupal\package_manager\FailureMarker;
 use Drupal\package_manager\PackageManagerUninstallValidator;
 use Drupal\package_manager\SandboxManagerBase;
 use Drupal\package_manager_bypass\LoggingCommitter;
 use PhpTuf\ComposerStager\API\Exception\ExceptionInterface;
-use PhpTuf\ComposerStager\API\Exception\InvalidArgumentException;
-use PhpTuf\ComposerStager\API\Exception\PreconditionException;
 use PhpTuf\ComposerStager\API\Precondition\Service\PreconditionInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

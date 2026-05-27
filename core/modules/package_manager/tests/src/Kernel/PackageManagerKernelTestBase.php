@@ -15,7 +15,6 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\package_manager\Attribute\AllowDirectWrite;
 use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\Event\SandboxValidationEvent;
-use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\FailureMarker;
 use Drupal\package_manager\PathLocator;
 use Drupal\package_manager\SandboxManagerBase;

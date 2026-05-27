@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests;
 
 use Behat\Mink\Element\TraversableElement;
-use Behat\Mink\Exception\ElementNotFoundException;
-use Behat\Mink\Exception\ExpectationException;
-use Behat\Mink\Exception\ResponseTextException;
 use Behat\Mink\Session;
 use Behat\Mink\WebAssert as MinkWebAssert;
 use Drupal\Component\Utility\Html;

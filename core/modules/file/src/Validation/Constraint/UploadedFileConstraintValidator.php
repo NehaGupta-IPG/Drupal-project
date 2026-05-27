@@ -9,7 +9,6 @@ use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Constraint validator for uploaded files.

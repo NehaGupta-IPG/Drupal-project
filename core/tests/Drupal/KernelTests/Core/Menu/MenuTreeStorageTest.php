@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Menu;
 
-use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Menu\MenuTreeStorage;

@@ -3,7 +3,6 @@
 namespace Drupal\Core\Template\Loader;
 
 use Drupal\Component\Discovery\YamlDirectoryDiscovery;
-use Drupal\Core\Render\Component\Exception\ComponentNotFoundException;
 use Drupal\Core\Theme\ComponentPluginManager;
 use Twig\Error\LoaderError;
 use Twig\Loader\LoaderInterface;

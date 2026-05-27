@@ -4,7 +4,6 @@ namespace Drupal\jsonapi\Normalizer;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\jsonapi\ResourceType\ResourceType;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 /**
  * Converts a JSON:API array structure into a Drupal entity object.

@@ -3,7 +3,6 @@
 namespace Drupal\Core\Entity\Plugin\DataType;
 
 use Drupal\Core\Config\TypedConfigManagerInterface;
-use Drupal\Core\TypedData\Exception\MissingDataException;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 
 /**

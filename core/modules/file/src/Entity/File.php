@@ -12,7 +12,6 @@ use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\File\Exception\FileException;
 use Drupal\file\FileAccessControlHandler;
 use Drupal\file\FileInterface;
 use Drupal\file\FileStorage;

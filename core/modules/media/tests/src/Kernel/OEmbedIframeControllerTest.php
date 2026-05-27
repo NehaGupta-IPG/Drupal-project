@@ -8,7 +8,6 @@ use Drupal\Core\Render\HtmlResponse;
 use Drupal\media\Controller\OEmbedIframeController;
 use Drupal\media\OEmbed\Provider;
 use Drupal\media\OEmbed\Resource;
-use Drupal\media\OEmbed\ResourceException;
 use Drupal\media\OEmbed\ResourceFetcherInterface;
 use Drupal\media\OEmbed\UrlResolverInterface;
 use Drupal\TestTools\Random;

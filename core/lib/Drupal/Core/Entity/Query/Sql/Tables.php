@@ -4,7 +4,6 @@ namespace Drupal\Core\Entity\Query\Sql;
 
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\EntityType;
-use Drupal\Core\Entity\Query\QueryException;
 use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
 use Drupal\Core\Entity\Sql\TableMappingInterface;
 use Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface;

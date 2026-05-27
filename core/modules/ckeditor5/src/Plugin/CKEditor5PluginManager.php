@@ -8,7 +8,6 @@ use Drupal\ckeditor5\Attribute\CKEditor5Plugin;
 use Drupal\ckeditor5\HTMLRestrictions;
 use Drupal\Component\Assertion\Inspector;
 use Drupal\Component\Plugin\Discovery\AttributeBridgeDecorator;
-use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;

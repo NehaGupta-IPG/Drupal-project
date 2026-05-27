@@ -6,7 +6,6 @@ namespace Drupal\Tests\layout_builder\Unit;
 
 use Drupal\Component\Plugin\Context\ContextInterface;
 use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
-use Drupal\Component\Plugin\Exception\ContextException;
 use Drupal\Component\Plugin\Factory\FactoryInterface;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;

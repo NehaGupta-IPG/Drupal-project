@@ -4,8 +4,6 @@ namespace Drupal\Component\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
  * Provides a container optimized for Drupal's needs.

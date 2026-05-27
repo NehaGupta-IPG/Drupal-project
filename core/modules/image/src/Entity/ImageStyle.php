@@ -9,7 +9,6 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
-use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Routing\RequestHelper;
 use Drupal\Core\Site\Settings;
@@ -28,7 +27,6 @@ use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\image\ImageStyleListBuilder;
 use Drupal\image\ImageStyleStorage;
-use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 
 /**

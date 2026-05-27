@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Kernel\Scripts;
 
 use Drupal\Core\Command\DbCommandBase;
-use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Database\Database;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;

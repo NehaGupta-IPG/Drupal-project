@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Plugin;
 
 use Drupal\Component\Plugin\Definition\PluginDefinition;
-use Drupal\Component\Plugin\Exception\PluginException;
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;

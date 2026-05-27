@@ -14,7 +14,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Tests Entity Bundle Exists Constraint Validator.

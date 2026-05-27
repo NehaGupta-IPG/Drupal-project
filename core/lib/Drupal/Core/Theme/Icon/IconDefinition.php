@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Core\Theme\Icon;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\Theme\Icon\Exception\IconDefinitionInvalidDataException;
 use function Symfony\Component\String\u;
 
 /**

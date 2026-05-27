@@ -3,12 +3,8 @@
 namespace Drupal\link\Plugin\Validation\Constraint;
 
 use Drupal\link\LinkItemInterface;
-use Symfony\Component\Routing\Exception\InvalidParameterException;
-use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
  * Validates the LinkNotExistingInternal constraint.

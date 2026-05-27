@@ -3,8 +3,6 @@
 namespace Drupal\Core\Plugin\Context;
 
 use Drupal\Component\Plugin\Definition\ContextAwarePluginDefinitionInterface;
-use Drupal\Component\Plugin\Exception\ContextException;
-use Drupal\Component\Plugin\Exception\MissingValueContextException;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Plugin\ContextAwarePluginInterface;
 

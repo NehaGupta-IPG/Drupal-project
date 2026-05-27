@@ -3,7 +3,6 @@
 namespace Drupal\Core\Extension;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Extension\Exception\UnknownExtensionException;
 
 /**
  * Default theme handler using the config system to store installation statuses.

@@ -2,12 +2,10 @@
 
 namespace Drupal\mysql\Driver\Database\mysql\Install;
 
-use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Install\Tasks as InstallTasks;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\mysql\Driver\Database\mysql\Connection;
-use Drupal\Core\Database\DatabaseNotFoundException;
 
 /**
  * Specifies installation tasks for MySQL and equivalent databases.

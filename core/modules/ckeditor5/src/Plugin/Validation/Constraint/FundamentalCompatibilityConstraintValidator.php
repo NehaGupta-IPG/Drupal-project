@@ -15,7 +15,6 @@ use Drupal\filter\Plugin\Filter\FilterUrl;
 use Drupal\filter\Plugin\FilterInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Validates fundamental compatibility of CKEditor 5 with the given text format.

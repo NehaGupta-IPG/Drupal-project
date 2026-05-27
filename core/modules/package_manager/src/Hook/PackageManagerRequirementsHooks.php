@@ -8,7 +8,6 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Site\Settings;
 use Drupal\package_manager\ComposerInspector;
-use Drupal\package_manager\Exception\FailureMarkerExistsException;
 use Drupal\package_manager\FailureMarker;
 use PhpTuf\ComposerStager\API\Exception\ExceptionInterface;
 use PhpTuf\ComposerStager\API\Finder\Service\ExecutableFinderInterface;

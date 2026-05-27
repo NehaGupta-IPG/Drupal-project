@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\mailer_transport_factory_kernel_test\Transport;
 
-use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\AbstractTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;

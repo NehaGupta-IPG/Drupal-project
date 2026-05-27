@@ -7,7 +7,6 @@ namespace Drupal\Core\Recipe;
 use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Command\BootableCommandTrait;
 use Drupal\Core\Config\Checkpoint\Checkpoint;
-use Drupal\Core\Config\ConfigImporterException;
 use Drupal\Core\Config\ConfigImporterFactory;
 use Drupal\Core\Config\StorageComparer;
 use Drupal\Core\StringTranslation\StringTranslationTrait;

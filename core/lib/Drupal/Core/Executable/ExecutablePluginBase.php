@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Executable;
 
-use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Drupal\Core\Plugin\ContextAwarePluginTrait;

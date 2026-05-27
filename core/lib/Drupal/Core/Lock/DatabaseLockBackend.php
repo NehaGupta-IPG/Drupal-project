@@ -4,8 +4,6 @@ namespace Drupal\Core\Lock;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\DatabaseException;
-use Drupal\Core\Database\IntegrityConstraintViolationException;
 
 /**
  * Defines the database lock backend. This is the default backend in Drupal.

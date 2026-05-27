@@ -17,8 +17,6 @@ use Drupal\Tests\image\Kernel\ImageFieldCreationTrait;
 use Drupal\Tests\jsonapi\Traits\GetDocumentFromResponseTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\ServerException;
 use Psr\Http\Message\ResponseInterface;
 
 /**

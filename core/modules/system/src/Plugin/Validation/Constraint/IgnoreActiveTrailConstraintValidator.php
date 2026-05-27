@@ -6,7 +6,6 @@ namespace Drupal\system\Plugin\Validation\Constraint;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Validator for the IgnoreActiveTrail constraint.

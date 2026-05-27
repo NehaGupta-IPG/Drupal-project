@@ -14,7 +14,6 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Routing\Alias;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
  * Functional class for the full integrated routing system.

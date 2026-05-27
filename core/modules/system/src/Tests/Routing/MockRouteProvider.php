@@ -6,7 +6,6 @@ namespace Drupal\system\Tests\Routing;
 
 use Drupal\Core\Routing\RouteProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\RouteCollection;
 
 /**

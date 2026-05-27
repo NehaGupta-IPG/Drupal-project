@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Config\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityType;
-use Drupal\Core\Config\Entity\Exception\ConfigEntityStorageClassException;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\UnitTestCase;

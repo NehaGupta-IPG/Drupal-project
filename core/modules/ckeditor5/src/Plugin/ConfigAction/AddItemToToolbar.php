@@ -4,7 +4,6 @@ namespace Drupal\ckeditor5\Plugin\ConfigAction;
 
 use Drupal\ckeditor5\Plugin\CKEditor5PluginManagerInterface;
 use Drupal\Core\Config\Action\Attribute\ConfigAction;
-use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Config\Action\ConfigActionPluginInterface;
 use Drupal\Core\Config\ConfigManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;

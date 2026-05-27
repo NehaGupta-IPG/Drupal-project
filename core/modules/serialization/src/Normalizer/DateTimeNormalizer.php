@@ -5,7 +5,6 @@ namespace Drupal\serialization\Normalizer;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Serialization\Attribute\JsonSchema;
 use Drupal\Core\TypedData\Type\DateTimeInterface;
-use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**

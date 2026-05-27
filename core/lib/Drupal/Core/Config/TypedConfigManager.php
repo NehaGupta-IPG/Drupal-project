@@ -4,7 +4,6 @@ namespace Drupal\Core\Config;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Config\Schema\ConfigSchemaAlterException;
 use Drupal\Core\Config\Schema\ConfigSchemaDiscovery;
 use Drupal\Core\Config\Schema\TypeResolver;
 use Drupal\Core\Config\Schema\SequenceDataDefinition;

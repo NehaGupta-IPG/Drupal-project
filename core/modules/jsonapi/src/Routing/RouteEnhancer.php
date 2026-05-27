@@ -4,7 +4,6 @@ namespace Drupal\jsonapi\Routing;
 
 use Drupal\Core\Routing\EnhancerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Ensures the loaded entity matches the requested resource type.

@@ -3,7 +3,6 @@
 namespace Drupal\Core\Entity\KeyValueStore\Query;
 
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Entity\Query\QueryException;
 use Drupal\Core\Entity\Query\QueryFactoryInterface;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 

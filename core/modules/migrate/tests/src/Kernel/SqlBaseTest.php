@@ -9,7 +9,6 @@ use Drupal\Core\Database\Query\ConditionInterface;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\StatementInterface;
-use Drupal\migrate\Exception\RequirementsException;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\Plugin\migrate\source\SqlBase;

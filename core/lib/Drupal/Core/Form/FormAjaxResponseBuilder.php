@@ -8,7 +8,6 @@ use Drupal\Core\Render\MainContent\MainContentRendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Builds an AJAX form response.

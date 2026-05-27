@@ -9,7 +9,6 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\TypedData\DataReferenceDefinitionInterface;
 use Drupal\jsonapi\Access\EntityAccessChecker;
 use Drupal\jsonapi\Context\FieldResolver;
-use Drupal\jsonapi\Exception\EntityAccessDeniedHttpException;
 use Drupal\jsonapi\JsonApiResource\Data;
 use Drupal\jsonapi\JsonApiResource\IncludedData;
 use Drupal\jsonapi\JsonApiResource\LabelOnlyResourceObject;

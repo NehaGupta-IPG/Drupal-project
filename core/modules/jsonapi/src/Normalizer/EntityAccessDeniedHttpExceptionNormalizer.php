@@ -3,8 +3,6 @@
 namespace Drupal\jsonapi\Normalizer;
 
 use Drupal\Core\Url;
-use Drupal\jsonapi\Exception\EntityAccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Normalizes an EntityAccessDeniedException.

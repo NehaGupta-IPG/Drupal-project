@@ -7,7 +7,6 @@ use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\TypedData\Validation\TypedDataAwareValidatorTrait;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Validates complex data.

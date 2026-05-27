@@ -10,7 +10,6 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Theme\Icon\Plugin\IconPackManager;
 use Drupal\Core\Theme\Icon\IconCollector;
-use Drupal\Core\Theme\Icon\Exception\IconPackConfigErrorException;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

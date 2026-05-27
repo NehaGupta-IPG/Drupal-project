@@ -12,7 +12,6 @@ use Drupal\package_manager\Event\PostRequireEvent;
 use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\Event\PreCreateEvent;
 use Drupal\package_manager\Event\PreRequireEvent;
-use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\PackageManagerUninstallValidator;
 use Drupal\package_manager\SandboxManagerBase;
 use Drupal\package_manager_test_validation\EventSubscriber\TestSubscriber;

@@ -2,8 +2,6 @@
 
 namespace Drupal\pgsql\Driver\Database\pgsql;
 
-use Drupal\Core\Database\SchemaObjectExistsException;
-use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\Schema as DatabaseSchema;
 
 // cSpell:ignore adbin adnum adrelid adsrc attisdropped attname attnum attrdef

@@ -2,7 +2,6 @@
 
 namespace Drupal\Component\Plugin\Context;
 
-use Drupal\Component\Plugin\Exception\ContextException;
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Validation;
 

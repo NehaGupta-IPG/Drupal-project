@@ -23,7 +23,6 @@ use Drupal\Core\Utility\CallableResolver;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Renders the batch processing page based on the current state of the batch.

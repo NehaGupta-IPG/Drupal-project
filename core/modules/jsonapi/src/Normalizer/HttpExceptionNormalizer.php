@@ -7,7 +7,6 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\jsonapi\Normalizer\Value\HttpExceptionNormalizerValue;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Normalizes an HttpException in compliance with the JSON:API specification.

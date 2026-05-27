@@ -3,7 +3,6 @@
 namespace Drupal\Component\Discovery;
 
 use Drupal\Component\FileCache\FileCacheFactory;
-use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Component\Serialization\Yaml;
 
 /**

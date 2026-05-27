@@ -6,7 +6,6 @@ namespace Drupal\Core\Routing;
 
 use Symfony\Component\Routing\Attribute\DeprecatedAlias;
 use Symfony\Component\Routing\Attribute\Route as RouteAttribute;
-use Symfony\Component\Routing\Exception\InvalidArgumentException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 

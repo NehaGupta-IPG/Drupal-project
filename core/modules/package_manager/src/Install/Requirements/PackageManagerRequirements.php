@@ -7,7 +7,6 @@ namespace Drupal\package_manager\Install\Requirements;
 use Drupal\Core\Extension\InstallRequirementsInterface;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Site\Settings;
-use Drupal\package_manager\Exception\FailureMarkerExistsException;
 use Drupal\package_manager\FailureMarker;
 
 /**

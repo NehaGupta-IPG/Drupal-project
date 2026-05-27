@@ -7,7 +7,6 @@ use Drupal\Core\Access\AccessResultReasonInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Http\Exception\CacheableAccessDeniedHttpException;
 use Drupal\jsonapi\JsonApiResource\ResourceIdentifier;
 use Drupal\jsonapi\JsonApiResource\ResourceIdentifierInterface;
 use Drupal\jsonapi\JsonApiResource\ResourceIdentifierTrait;

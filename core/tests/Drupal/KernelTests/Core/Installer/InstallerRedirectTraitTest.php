@@ -6,7 +6,6 @@ namespace Drupal\KernelTests\Core\Installer;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
-use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Installer\InstallerRedirectTrait;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\Core\Database\Stub\StubConnection;
@@ -15,7 +14,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Tests Drupal\Core\Installer\InstallerRedirectTrait.

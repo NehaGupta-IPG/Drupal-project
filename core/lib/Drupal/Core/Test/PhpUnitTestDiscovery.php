@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Test;
 
-use Drupal\Core\Test\Exception\MissingGroupException;
-use PHPUnit\Event\EventFacadeIsSealedException;
 use PHPUnit\Event\Facade as EventFacade;
 use PHPUnit\Framework\DataProviderTestSuite;
 use PHPUnit\Framework\Test;

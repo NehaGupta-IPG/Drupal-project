@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field_ui\Functional;
 
-use Behat\Mink\Exception\ElementNotFoundException;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;

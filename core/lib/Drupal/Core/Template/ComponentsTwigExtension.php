@@ -3,8 +3,6 @@
 namespace Drupal\Core\Template;
 
 use Drupal\Core\Plugin\Component;
-use Drupal\Core\Render\Component\Exception\ComponentNotFoundException;
-use Drupal\Core\Render\Component\Exception\InvalidComponentException;
 use Drupal\Core\Theme\Component\ComponentValidator;
 use Drupal\Core\Theme\ComponentPluginManager;
 use Twig\Extension\AbstractExtension;

@@ -7,7 +7,6 @@ namespace Drupal\test_page_test\Controller;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Defines a test controller for page titles.

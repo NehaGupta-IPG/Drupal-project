@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Config\Action;
 
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\Action\Attribute\ConfigAction;
@@ -15,7 +14,6 @@ use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
-use Drupal\Core\Recipe\InvalidConfigException;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\FullyValidatableConstraint;
 
 /**

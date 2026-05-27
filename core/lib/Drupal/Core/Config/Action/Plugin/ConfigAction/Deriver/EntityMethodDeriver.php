@@ -8,7 +8,6 @@ namespace Drupal\Core\Config\Action\Plugin\ConfigAction\Deriver;
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Config\Action\Attribute\ActionMethod;
-use Drupal\Core\Config\Action\EntityMethodException;
 use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;

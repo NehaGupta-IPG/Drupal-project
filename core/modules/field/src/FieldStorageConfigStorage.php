@@ -2,7 +2,6 @@
 
 namespace Drupal\field;
 
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Config\Entity\ConfigEntityStorage;

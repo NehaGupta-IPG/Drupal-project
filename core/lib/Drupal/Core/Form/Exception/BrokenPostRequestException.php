@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Form\Exception;
 
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-
 /**
  * Defines an exception used, when the POST HTTP body is broken.
  */

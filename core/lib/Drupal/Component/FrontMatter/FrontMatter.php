@@ -2,8 +2,6 @@
 
 namespace Drupal\Component\FrontMatter;
 
-use Drupal\Component\FrontMatter\Exception\FrontMatterParseException;
-use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Component\Serialization\SerializationInterface;
 
 /**

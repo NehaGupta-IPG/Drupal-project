@@ -6,7 +6,6 @@ namespace Drupal\file\Plugin\Validation\Constraint;
 
 use Drupal\file\FileInterface;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Provides a base class for file constraint validators.

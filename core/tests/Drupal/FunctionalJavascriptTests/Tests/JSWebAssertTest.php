@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\FunctionalJavascriptTests\Tests;
 
 use Behat\Mink\Element\NodeElement;
-use Behat\Mink\Exception\ElementHtmlException;
 use Drupal\Component\Utility\Timer;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use PHPUnit\Framework\Attributes\Group;

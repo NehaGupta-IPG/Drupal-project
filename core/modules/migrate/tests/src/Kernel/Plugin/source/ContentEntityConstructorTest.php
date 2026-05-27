@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Kernel\Plugin\source;
 
-use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\migrate\Plugin\migrate\source\ContentEntity;
 use Drupal\migrate\Plugin\MigrationInterface;

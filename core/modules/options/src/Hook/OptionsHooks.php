@@ -2,7 +2,6 @@
 
 namespace Drupal\options\Hook;
 
-use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\Core\Url;

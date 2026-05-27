@@ -5,7 +5,6 @@ namespace Drupal\Core\Plugin;
 use Drupal\Component\Plugin\ConfigurableInterface;
 use Drupal\Component\Plugin\Context\ContextInterface as ComponentContextInterface;
 use Drupal\Component\Plugin\Definition\ContextAwarePluginDefinitionInterface;
-use Drupal\Component\Plugin\Exception\ContextException;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Plugin\Context\Context;

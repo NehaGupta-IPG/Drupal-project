@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Field\Plugin\Field\FieldType;
 
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\ContentEntityStorageInterface;
@@ -13,7 +12,6 @@ use Drupal\Core\Entity\TypedData\EntityDataDefinition;
 use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\EntityReferenceFieldItemList;
 use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\Core\Field\FieldException;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\PreconfiguredFieldUiOptionsInterface;
 use Drupal\Core\Form\FormStateInterface;

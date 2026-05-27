@@ -7,7 +7,6 @@ namespace Drupal\Tests\serialization\Kernel;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * Functional tests for serialization system.

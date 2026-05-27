@@ -3,7 +3,6 @@
 namespace Drupal\Core\Plugin;
 
 use Drupal\Core\Theme\Component\ComponentMetadata;
-use Drupal\Core\Render\Component\Exception\InvalidComponentException;
 
 /**
  * Simple value object that contains information about the component.

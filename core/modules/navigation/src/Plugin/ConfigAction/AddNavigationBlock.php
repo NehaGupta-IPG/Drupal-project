@@ -6,7 +6,6 @@ namespace Drupal\navigation\Plugin\ConfigAction;
 
 use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Config\Action\Attribute\ConfigAction;
-use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Config\Action\ConfigActionPluginInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\Context\Context;

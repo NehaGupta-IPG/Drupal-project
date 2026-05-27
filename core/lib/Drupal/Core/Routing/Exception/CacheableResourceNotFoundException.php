@@ -4,7 +4,6 @@ namespace Drupal\Core\Routing\Exception;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableDependencyTrait;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 /**
  * A cacheable ResourceNotFoundException.

@@ -11,7 +11,6 @@ use Drupal\Core\TypedData\Validation\TypedDataAwareValidatorTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\ChoiceValidator;
-use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
  * Validates the AllowedValues constraint.

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\package_manager\Kernel;
 
-use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\PathLocator;
 use Drupal\package_manager\ValidationResult;
 use Drupal\package_manager\Validator\DuplicateInfoFileValidator;

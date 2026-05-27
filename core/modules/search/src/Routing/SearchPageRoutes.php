@@ -2,7 +2,6 @@
 
 namespace Drupal\search\Routing;
 
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\search\SearchPageRepositoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;

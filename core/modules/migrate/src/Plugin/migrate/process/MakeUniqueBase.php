@@ -5,7 +5,6 @@ namespace Drupal\migrate\Plugin\migrate\process;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\Row;
-use Drupal\migrate\MigrateException;
 
 /**
  * This plugin ensures the source value is unique.

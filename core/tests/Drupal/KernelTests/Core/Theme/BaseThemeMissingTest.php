@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Theme;
 
-use Drupal\Core\Extension\InfoParserException;
 use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;

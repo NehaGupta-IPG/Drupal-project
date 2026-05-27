@@ -9,7 +9,6 @@ use Drupal\Core\Database\Event\StatementExecutionEndEvent;
 use Drupal\Core\Database\Event\StatementExecutionFailureEvent;
 use Drupal\Core\Database\Event\StatementExecutionStartEvent;
 use Drupal\Core\Database\FetchModeTrait;
-use Drupal\Core\Database\RowCountException;
 use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\StatementIteratorTrait;
 

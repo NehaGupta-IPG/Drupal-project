@@ -3,9 +3,7 @@
 namespace Drupal\migrate\Plugin\migrate\id_map;
 
 use Drupal\Component\Plugin\Attribute\PluginID;
-use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
-use Drupal\Core\Database\Exception\SchemaTableKeyTooLargeException;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -14,7 +12,6 @@ use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\Audit\HighestIdInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Event\MigrateIdMapMessageEvent;
-use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateMessageInterface;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrationPluginManagerInterface;

@@ -7,7 +7,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\language\ContentLanguageSettingsException;
 use Drupal\language\ContentLanguageSettingsInterface;
 
 /**

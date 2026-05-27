@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\migrate\Kernel\process;
 
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\Plugin\migrate\process\LinkUri;
 use Drupal\migrate\Row;

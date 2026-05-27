@@ -6,7 +6,6 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\TypedData\FieldItemDataDefinitionInterface;
-use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * A trait for providing fieldable entity normalization/denormalization methods.

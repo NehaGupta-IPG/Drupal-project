@@ -3,7 +3,6 @@
 namespace Drupal\jsonapi\JsonApiResource;
 
 use Drupal\Component\Assertion\Inspector;
-use Drupal\jsonapi\Exception\EntityAccessDeniedHttpException;
 
 /**
  * Represents the included member of a JSON:API document.

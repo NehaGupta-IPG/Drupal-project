@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Recipe;
 
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\config_test\Entity\ConfigTest;
 use Drupal\Core\Recipe\Recipe;
-use Drupal\Core\Recipe\RecipePreExistingConfigException;
 use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;
 use Drupal\KernelTests\KernelTestBase;

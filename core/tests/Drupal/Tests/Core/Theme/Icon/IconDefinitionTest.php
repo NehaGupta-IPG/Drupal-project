@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Theme\Icon;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\Theme\Icon\Exception\IconDefinitionInvalidDataException;
 use Drupal\Core\Theme\Icon\IconDefinition;
 use Drupal\Tests\UnitTestCase;
 // cspell:ignore corge grault quux

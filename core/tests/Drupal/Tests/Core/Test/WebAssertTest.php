@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Test;
 
 use Behat\Mink\Driver\BrowserKitDriver;
-use Behat\Mink\Exception\ExpectationException;
-use Behat\Mink\Exception\ResponseTextException;
 use Behat\Mink\Session;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Url;

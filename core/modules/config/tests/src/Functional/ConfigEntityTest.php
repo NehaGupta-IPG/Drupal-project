@@ -6,9 +6,6 @@ namespace Drupal\Tests\config\Functional;
 
 use Drupal\Component\Uuid\Uuid;
 use Drupal\Core\Config\Entity\ConfigEntityStorage;
-use Drupal\Core\Config\Entity\Exception\ConfigEntityIdLengthException;
-use Drupal\Core\Entity\EntityMalformedException;
-use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;

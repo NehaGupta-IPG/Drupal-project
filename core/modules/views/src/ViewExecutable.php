@@ -12,7 +12,6 @@ use Drupal\views\Plugin\views\query\QueryPluginBase;
 use Drupal\views\Plugin\ViewsPluginManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
  * Represents a view as a whole.

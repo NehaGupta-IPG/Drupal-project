@@ -11,7 +11,6 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Routing\AccessAwareRouterInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -24,9 +23,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\rest\ModifiedResourceResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Represents entities as resources.

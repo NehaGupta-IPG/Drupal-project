@@ -6,7 +6,6 @@ namespace Drupal\ckeditor5\Plugin\Validation\Constraint;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Uniquely labeled list item constraint validator.

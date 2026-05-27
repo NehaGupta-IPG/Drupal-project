@@ -6,7 +6,6 @@ namespace Drupal\Core\Config\Action\Plugin\ConfigAction;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Config\Action\Attribute\ConfigAction;
-use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Config\Action\ConfigActionPluginInterface;
 use Drupal\Core\Config\ConfigManagerInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;

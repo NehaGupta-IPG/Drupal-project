@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Extension;
 
 use Drupal\Core\Cache\NullBackend;
-use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ModuleHandler;
 use Drupal\Core\Hook\ImplementationList;

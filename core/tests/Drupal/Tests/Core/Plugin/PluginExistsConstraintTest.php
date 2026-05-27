@@ -10,7 +10,6 @@ use Drupal\Core\Plugin\Plugin\Validation\Constraint\PluginExistsConstraint;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
  * Tests Drupal\Core\Plugin\Plugin\Validation\Constraint\PluginExistsConstraint.

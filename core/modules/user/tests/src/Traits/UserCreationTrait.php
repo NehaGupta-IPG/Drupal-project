@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\user\Traits;
 
 use Drupal\Core\Database\DatabaseExceptionWrapper;
-use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\Role;

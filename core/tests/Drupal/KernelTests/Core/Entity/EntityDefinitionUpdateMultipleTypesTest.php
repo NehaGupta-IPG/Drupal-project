@@ -4,16 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Entity\ContentEntityType;
 use Drupal\Core\Entity\EntityDefinitionUpdateManager;
-use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityTypeEvents;
-use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Field\FieldException;
 use Drupal\Core\Field\FieldPurger;
 use Drupal\Core\Field\FieldStorageDefinitionEvents;
 use Drupal\Core\Language\LanguageInterface;

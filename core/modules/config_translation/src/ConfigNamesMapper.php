@@ -4,7 +4,6 @@ namespace Drupal\config_translation;
 
 use Drupal\config_translation\Event\ConfigMapperPopulateEvent;
 use Drupal\config_translation\Event\ConfigTranslationEvents;
-use Drupal\config_translation\Exception\ConfigMapperLanguageException;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Language\LanguageInterface;

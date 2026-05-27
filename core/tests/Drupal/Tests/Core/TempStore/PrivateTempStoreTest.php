@@ -9,7 +9,6 @@ use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\TempStore\Lock;
 use Drupal\Core\TempStore\PrivateTempStore;
-use Drupal\Core\TempStore\TempStoreException;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;

@@ -8,7 +8,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\fixture_manipulator\ActiveFixtureManipulator;
 use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\Event\PreCreateEvent;
-use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\ValidationResult;
 use Drupal\package_manager\Validator\ComposerPluginsValidator;
 use PHPUnit\Framework\Attributes\CoversClass;

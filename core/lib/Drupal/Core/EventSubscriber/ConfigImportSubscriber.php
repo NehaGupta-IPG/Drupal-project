@@ -6,7 +6,6 @@ use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\ConfigImporterEvent;
 use Drupal\Core\Config\ConfigImportValidateEventSubscriberBase;
-use Drupal\Core\Config\ConfigNameException;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ConfigImportModuleUninstallValidatorInterface;
 use Drupal\Core\Extension\ModuleExtensionList;

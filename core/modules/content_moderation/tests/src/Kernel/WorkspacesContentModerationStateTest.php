@@ -13,7 +13,6 @@ use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\Tests\workspaces\Kernel\WorkspaceTestTrait;
 use Drupal\workflows\Entity\Workflow;
 use Drupal\workflows\WorkflowInterface;
-use Drupal\workspaces\WorkspacePublishException;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 

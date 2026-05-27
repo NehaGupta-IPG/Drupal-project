@@ -12,7 +12,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Tests Drupal\jsonapi\Query\OffsetPage.

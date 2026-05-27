@@ -5,7 +5,6 @@ namespace Drupal\rest\Plugin\rest\resource;
 use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 /**
  * @internal

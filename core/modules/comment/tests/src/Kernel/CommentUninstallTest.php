@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\comment\Kernel;
 
 use Drupal\comment\Tests\CommentTestTrait;
-use Drupal\Core\Extension\ModuleUninstallValidatorException;
 use Drupal\Core\Field\FieldPurger;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;

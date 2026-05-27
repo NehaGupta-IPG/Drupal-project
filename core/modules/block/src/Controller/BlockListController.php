@@ -5,7 +5,6 @@ namespace Drupal\block\Controller;
 use Drupal\Core\Entity\Controller\EntityListController;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Defines a controller to list blocks.

@@ -16,7 +16,6 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * Unit test coverage for @DataTypes implementing DateTimeInterface.

@@ -2,7 +2,6 @@
 
 namespace Drupal\block;
 
-use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
 

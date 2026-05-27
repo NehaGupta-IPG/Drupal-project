@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\config\Functional;
 
 use Drupal\config_test\Entity\ConfigTest;
-use Drupal\Core\Config\PreExistingConfigException;
 use Drupal\Core\Config\StorageInterface;
-use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\Site\Settings;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;

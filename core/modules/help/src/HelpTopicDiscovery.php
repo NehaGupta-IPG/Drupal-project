@@ -2,13 +2,11 @@
 
 namespace Drupal\help;
 
-use Drupal\Component\Discovery\DiscoveryException;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\FileSystem\RegexDirectoryIterator;
 use Drupal\Component\FrontMatter\FrontMatter;
 use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
 use Drupal\Component\Plugin\Discovery\DiscoveryTrait;
-use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 

@@ -10,7 +10,6 @@ use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\Session\AccountSwitcherInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\migrate\Attribute\MigrateDestination;
-use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\Derivative\MigrateEntityRevision;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;

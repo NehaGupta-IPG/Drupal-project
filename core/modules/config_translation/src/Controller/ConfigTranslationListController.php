@@ -4,7 +4,6 @@ namespace Drupal\config_translation\Controller;
 
 use Drupal\config_translation\ConfigMapperManagerInterface;
 use Drupal\Core\Controller\ControllerBase;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Defines the configuration translation list controller.

@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\package_manager\Kernel;
 
 use Drupal\package_manager\Event\PreCreateEvent;
-use Drupal\package_manager\Exception\SandboxException;
-use Drupal\package_manager\Exception\SandboxOwnershipException;
 use Drupal\package_manager_test_validation\EventSubscriber\TestSubscriber;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\Group;

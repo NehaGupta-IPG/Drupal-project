@@ -5,8 +5,6 @@ namespace Drupal\serialization\Normalizer;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\file\FileInterface;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
-use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * Adds the file URI to embedded file entities.

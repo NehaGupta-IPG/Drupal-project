@@ -15,7 +15,6 @@ use Drupal\package_manager\Event\PreRequireEvent;
 use Drupal\package_manager\Event\SandboxEvent;
 use Drupal\package_manager\Event\SandboxValidationEvent;
 use Drupal\package_manager\Event\StatusCheckEvent;
-use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\ValidationResult;
 use PhpTuf\ComposerStager\API\Path\Value\PathListInterface;
 use PHPUnit\Framework\Attributes\CoversClass;

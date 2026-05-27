@@ -3,8 +3,6 @@
 namespace Drupal\Core\Asset;
 
 use Drupal\Component\Utility\NestedArray;
-use Drupal\Core\Asset\Exception\InvalidLibrariesExtendSpecificationException;
-use Drupal\Core\Asset\Exception\InvalidLibrariesOverrideSpecificationException;
 use Drupal\Core\Cache\CacheCollector;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Lock\LockBackendInterface;

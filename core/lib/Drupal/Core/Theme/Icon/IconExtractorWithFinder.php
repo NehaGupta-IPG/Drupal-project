@@ -7,7 +7,6 @@ namespace Drupal\Core\Theme\Icon;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginWithFormsInterface;
 use Drupal\Core\Plugin\PluginWithFormsTrait;
-use Drupal\Core\Theme\Icon\Exception\IconPackConfigErrorException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

@@ -3,14 +3,12 @@
 namespace Drupal\Core\Routing\Enhancer;
 
 use Drupal\Core\ParamConverter\ParamConverterManagerInterface;
-use Drupal\Core\ParamConverter\ParamNotConvertedException;
 use Drupal\Core\Routing\EnhancerInterface;
 use Drupal\Core\Routing\RouteObjectInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**

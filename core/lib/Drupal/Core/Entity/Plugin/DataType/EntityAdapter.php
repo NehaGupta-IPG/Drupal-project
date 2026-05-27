@@ -9,7 +9,6 @@ use Drupal\Core\Entity\TypedData\EntityDataDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\Attribute\DataType;
 use Drupal\Core\TypedData\ComplexDataInterface;
-use Drupal\Core\TypedData\Exception\MissingDataException;
 use Drupal\Core\TypedData\TypedData;
 
 /**

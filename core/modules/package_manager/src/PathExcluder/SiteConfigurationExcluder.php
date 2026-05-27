@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\package_manager\PathExcluder;
 
-use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\package_manager\Event\CollectPathsToExcludeEvent;
 use Drupal\package_manager\Event\PostCreateEvent;

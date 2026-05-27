@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\layout_builder\Kernel\Plugin\ConfigAction;
 
-use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Config\Action\ConfigActionManager;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\EntityTypeManagerInterface;

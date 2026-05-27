@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\search\Functional;
 
-use Behat\Mink\Exception\ResponseTextException;
 use Drupal\comment\CommentingStatus;
 use Drupal\comment\CommentPreviewMode;
 use Drupal\comment\Tests\CommentTestTrait;

@@ -6,7 +6,6 @@ namespace Drupal\KernelTests\Core\Recipe;
 
 use Drupal\Core\Recipe\Recipe;
 use Drupal\Core\Recipe\RecipeConfigurator;
-use Drupal\Core\Recipe\UnknownRecipeException;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;

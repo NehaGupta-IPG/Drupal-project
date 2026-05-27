@@ -8,7 +8,6 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Config\ConfigCollectionEvents;
 use Drupal\Core\Config\ConfigEvents;
 use Drupal\Core\Config\ConfigImporter;
-use Drupal\Core\Config\ConfigImporterException;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;

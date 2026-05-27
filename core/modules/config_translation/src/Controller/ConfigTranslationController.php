@@ -4,7 +4,6 @@ namespace Drupal\config_translation\Controller;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\config_translation\ConfigMapperManagerInterface;
-use Drupal\config_translation\Exception\ConfigMapperLanguageException;
 use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;

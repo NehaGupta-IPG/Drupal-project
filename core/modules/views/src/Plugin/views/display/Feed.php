@@ -12,7 +12,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsDisplay;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * The plugin that handles a feed, such as RSS or atom.

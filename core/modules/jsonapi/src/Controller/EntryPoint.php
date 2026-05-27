@@ -14,7 +14,6 @@ use Drupal\jsonapi\JsonApiResource\Link;
 use Drupal\jsonapi\JsonApiResource\ResourceObjectData;
 use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
  * Controller for the API entry point.

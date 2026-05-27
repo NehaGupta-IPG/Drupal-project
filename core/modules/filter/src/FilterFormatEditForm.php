@@ -3,7 +3,6 @@
 namespace Drupal\filter;
 
 use Drupal\Core\Form\FormStateInterface;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Provides a form for adding a filter format.

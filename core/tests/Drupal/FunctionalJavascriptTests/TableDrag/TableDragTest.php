@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\FunctionalJavascriptTests\TableDrag;
 
 use Behat\Mink\Element\NodeElement;
-use Behat\Mink\Exception\ExpectationException;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;

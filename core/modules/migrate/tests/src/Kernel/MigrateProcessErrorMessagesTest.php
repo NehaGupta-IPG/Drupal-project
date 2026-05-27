@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Kernel;
 
-use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\Plugin\migrate\process\Get;
 use Drupal\migrate\Plugin\migrate\process\SubProcess;

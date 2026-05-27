@@ -2,14 +2,10 @@
 
 namespace Drupal\migrate\Plugin\migrate\source;
 
-use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\State\StateInterface;
-use Drupal\migrate\Exception\RequirementsException;
-use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\migrate\id_map\Sql;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;

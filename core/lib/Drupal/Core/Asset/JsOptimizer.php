@@ -7,7 +7,6 @@ use Drupal\Core\Utility\Error;
 use Peast\Formatter\Compact as CompactFormatter;
 use Peast\Peast;
 use Peast\Renderer;
-use Peast\Syntax\Exception as PeastSyntaxException;
 use Psr\Log\LoggerInterface;
 
 /**

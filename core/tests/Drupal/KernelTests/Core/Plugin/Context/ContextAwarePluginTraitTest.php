@@ -8,7 +8,6 @@ use Drupal\Component\Plugin\Context\ContextInterface as ComponentContextInterfac
 use Drupal\Component\Plugin\Definition\ContextAwarePluginDefinitionInterface;
 use Drupal\Component\Plugin\Definition\ContextAwarePluginDefinitionTrait;
 use Drupal\Component\Plugin\Definition\PluginDefinition;
-use Drupal\Component\Plugin\Exception\ContextException;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Plugin\ContextAwarePluginInterface;

@@ -11,7 +11,6 @@ use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Entity\Exception\UnsupportedEntityTypeDefinitionException;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\Plugin\Derivative\DefaultSelectionDeriver;
 use Drupal\Core\Extension\ModuleHandlerInterface;

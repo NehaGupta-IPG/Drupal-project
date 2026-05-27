@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Command;
 
-use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Site\Settings;

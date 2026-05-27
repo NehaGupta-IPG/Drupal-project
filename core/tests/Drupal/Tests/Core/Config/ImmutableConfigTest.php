@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Config;
 
 use Drupal\Core\Config\ImmutableConfig;
-use Drupal\Core\Config\ImmutableConfigException;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Tests\UnitTestCase;

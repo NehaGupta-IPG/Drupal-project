@@ -14,7 +14,6 @@ use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\Event\PreRequireEvent;
 use Drupal\package_manager\Event\SandboxEvent;
 use Drupal\package_manager\EventSubscriber\DirectWriteSubscriber;
-use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\PathLocator;
 use Drupal\package_manager\SandboxManagerBase;
 use Drupal\package_manager\StatusCheckTrait;

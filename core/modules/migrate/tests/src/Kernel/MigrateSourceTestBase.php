@@ -6,7 +6,6 @@ namespace Drupal\Tests\migrate\Kernel;
 
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\migrate\MigrateSkipRowException;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\MigrateSourceInterface;

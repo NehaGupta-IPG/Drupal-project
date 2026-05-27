@@ -5,7 +5,6 @@ namespace Drupal\views\Element;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\views\ContextualLinksHelper;
-use Drupal\views\Exception\ViewRenderElementException;
 use Drupal\views\Views;
 
 /**

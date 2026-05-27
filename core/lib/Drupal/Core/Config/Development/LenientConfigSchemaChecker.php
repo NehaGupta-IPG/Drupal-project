@@ -3,7 +3,6 @@
 namespace Drupal\Core\Config\Development;
 
 use Drupal\Core\Config\ConfigCrudEvent;
-use Drupal\Core\Config\Schema\SchemaIncompleteException;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Psr\Log\LoggerInterface;

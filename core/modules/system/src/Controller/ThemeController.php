@@ -3,11 +3,8 @@
 namespace Drupal\system\Controller;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Config\PreExistingConfigException;
-use Drupal\Core\Config\UnmetDependenciesException;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\Extension\MissingDependencyException;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Extension\ThemeInstallerInterface;

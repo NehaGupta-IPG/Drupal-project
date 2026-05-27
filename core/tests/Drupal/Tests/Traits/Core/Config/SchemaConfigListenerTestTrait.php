@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Traits\Core\Config;
 
-use Drupal\Core\Config\Schema\SchemaIncompleteException;
-
 /**
  * Adds a test for the configuration schema checker use in tests.
  */

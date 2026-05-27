@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Unit\process;
 
-use Drupal\migrate\MigrateSkipRowException;
 use Drupal\migrate\Plugin\migrate\process\MigrationLookup;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrationInterface;

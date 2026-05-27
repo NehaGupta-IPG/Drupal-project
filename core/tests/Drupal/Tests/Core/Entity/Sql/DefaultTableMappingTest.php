@@ -6,7 +6,6 @@ namespace Drupal\Tests\Core\Entity\Sql;
 
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\Sql\DefaultTableMapping;
-use Drupal\Core\Entity\Sql\SqlContentEntityStorageException;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Tests\Core\Field\TestBaseFieldDefinitionInterface;
 use Drupal\Tests\UnitTestCase;

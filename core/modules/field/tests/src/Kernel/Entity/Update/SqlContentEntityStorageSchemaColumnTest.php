@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\field\Kernel\Entity\Update;
 
 use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
-use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
 use Drupal\Core\State\StateInterface;
 use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\field\Entity\FieldConfig;

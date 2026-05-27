@@ -17,9 +17,7 @@ use Drupal\Core\Url;
 use Drupal\views\Views;
 use Drupal\views\ViewsFormHelperTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Plugin;
 
-use Drupal\Component\Plugin\Exception\ContextException;
 use Drupal\Core\Plugin\Context\EntityContextDefinition;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;

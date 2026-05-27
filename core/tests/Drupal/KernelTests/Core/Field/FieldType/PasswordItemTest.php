@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Field\FieldType;
 
-use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Field\Plugin\Field\FieldType\PasswordItem;
 use Drupal\Core\Password\PasswordInterface;
 use Drupal\entity_test\Entity\EntityTest;

@@ -9,7 +9,6 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\Session\AccountSwitcherInterface;
-use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\migrate\destination\EntityRevision;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;

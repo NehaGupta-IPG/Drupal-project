@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Config\Action\Plugin\ConfigAction;
 
-use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Core\Config\Action\Attribute\ConfigAction;
 use Drupal\Core\Config\Action\ConfigActionManager;
 use Drupal\Core\Config\Action\ConfigActionPluginInterface;

@@ -2,7 +2,6 @@
 
 namespace Drupal\system\Form;
 
-use Drupal\Core\Config\PreExistingConfigException;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;

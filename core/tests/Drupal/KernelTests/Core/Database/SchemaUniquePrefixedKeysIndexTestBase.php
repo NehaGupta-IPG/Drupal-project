@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Database;
 
-use Drupal\Core\Database\DatabaseException;
-
 /**
  * Tests adding UNIQUE keys to tables.
  */

@@ -4,7 +4,6 @@ namespace Drupal\Core\File;
 
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\File\Exception\InvalidStreamWrapperException;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Drupal\Core\Url;

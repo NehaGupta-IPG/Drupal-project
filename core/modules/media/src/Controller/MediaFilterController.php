@@ -11,8 +11,6 @@ use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\filter\FilterFormatInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Controller which renders a preview of the provided text.

@@ -6,7 +6,6 @@ namespace Drupal\Tests\migrate\Kernel\process;
 
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\KernelTests\Core\File\FileTestBase;
-use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\Plugin\migrate\process\FileCopy;
 use Drupal\migrate\Plugin\MigrateProcessInterface;

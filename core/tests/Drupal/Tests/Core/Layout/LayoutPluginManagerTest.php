@@ -6,7 +6,6 @@ namespace Drupal\Tests\Core\Layout;
 
 use Composer\Autoload\ClassLoader;
 use Drupal\Component\Plugin\Derivative\DeriverBase;
-use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Extension\Extension;

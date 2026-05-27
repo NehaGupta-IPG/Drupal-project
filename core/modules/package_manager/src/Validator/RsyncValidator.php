@@ -10,7 +10,6 @@ use Drupal\Core\Url;
 use Drupal\package_manager\Event\PreCreateEvent;
 use Drupal\package_manager\Event\SandboxValidationEvent;
 use Drupal\package_manager\Event\StatusCheckEvent;
-use PhpTuf\ComposerStager\API\Exception\LogicException;
 use PhpTuf\ComposerStager\API\Finder\Service\ExecutableFinderInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 

@@ -9,8 +9,6 @@ use Drupal\Component\Plugin\Definition\ContextAwarePluginDefinitionInterface;
 use Drupal\Component\Plugin\Definition\ContextAwarePluginDefinitionTrait;
 use Drupal\Component\Plugin\Definition\PluginDefinition;
 use Drupal\Component\Plugin\DependentPluginInterface;
-use Drupal\Component\Plugin\Exception\ContextException;
-use Drupal\Component\Plugin\Exception\MissingValueContextException;
 use Drupal\Core\Cache\NullBackend;
 use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;

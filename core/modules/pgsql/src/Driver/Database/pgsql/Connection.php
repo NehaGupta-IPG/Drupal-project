@@ -4,8 +4,6 @@ namespace Drupal\pgsql\Driver\Database\pgsql;
 
 use Drupal\Core\Database\Connection as DatabaseConnection;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Database\DatabaseAccessDeniedException;
-use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\ExceptionHandler;
 use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\StatementWrapperIterator;

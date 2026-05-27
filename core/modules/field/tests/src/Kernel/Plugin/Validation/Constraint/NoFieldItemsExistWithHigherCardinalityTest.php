@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field\Kernel\Plugin\Validation\Constraint;
 
-use Drupal\Core\Config\Schema\SchemaIncompleteException;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;

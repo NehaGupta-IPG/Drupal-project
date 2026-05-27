@@ -7,7 +7,6 @@ namespace Drupal\Core\Config\Plugin\Validation\Constraint;
 use Drupal\Core\Config\Schema\Mapping;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\LogicException;
 
 /**
  * Validates the LangcodeRequiredIfTranslatableValues constraint.

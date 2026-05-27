@@ -6,7 +6,6 @@ use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\Row;
-use Drupal\migrate\MigrateException;
 
 // cspell:ignore skłodowska
 

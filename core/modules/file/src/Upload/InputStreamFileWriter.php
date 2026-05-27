@@ -3,9 +3,6 @@
 namespace Drupal\file\Upload;
 
 use Drupal\Core\File\FileSystemInterface;
-use Symfony\Component\HttpFoundation\File\Exception\CannotWriteFileException;
-use Symfony\Component\HttpFoundation\File\Exception\NoFileException;
-use Symfony\Component\HttpFoundation\File\Exception\UploadException;
 
 /**
  * Writes files from a input stream to a temporary file.

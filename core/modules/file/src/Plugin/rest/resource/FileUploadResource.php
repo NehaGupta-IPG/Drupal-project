@@ -6,11 +6,8 @@ use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\File\Exception\FileException;
-use Drupal\Core\File\Exception\FileExistsException;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
-use Drupal\Core\Lock\LockAcquiringException;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\file\Entity\File;
 use Drupal\file\Upload\ContentDispositionFilenameParser;
@@ -27,14 +24,7 @@ use Drupal\rest\Plugin\rest\resource\EntityResourceValidationTrait;
 use Drupal\rest\RequestHandler;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\File\Exception\CannotWriteFileException;
-use Symfony\Component\HttpFoundation\File\Exception\NoFileException;
-use Symfony\Component\HttpFoundation\File\Exception\UploadException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Route;
 
 /**

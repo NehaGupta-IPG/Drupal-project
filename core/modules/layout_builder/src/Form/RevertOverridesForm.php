@@ -2,7 +2,6 @@
 
 namespace Drupal\layout_builder\Form;
 
-use Drupal\Component\Plugin\Exception\ContextException;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceDynamicSafeFormInterface;

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\field_ui\Functional;
 
 use Behat\Mink\Element\NodeElement;
-use Behat\Mink\Exception\ExpectationException;
 use Drupal\Core\Entity\Entity\EntityFormMode;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\LanguageInterface;

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\language\Kernel;
 
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Logger\LoggerChannelFactory;
 use Drupal\KernelTests\KernelTestBase;

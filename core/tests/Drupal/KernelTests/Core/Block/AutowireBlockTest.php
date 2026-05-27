@@ -9,7 +9,6 @@ use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
 
 /**
  * Tests that blocks can be autowired.

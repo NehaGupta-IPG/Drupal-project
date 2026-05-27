@@ -2,8 +2,6 @@
 
 namespace Drupal\migrate;
 
-use Drupal\Component\Plugin\Exception\PluginException;
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\MigrationPluginManagerInterface;
 

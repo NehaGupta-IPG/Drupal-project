@@ -16,7 +16,6 @@ use Drupal\Core\Url;
 use Drupal\media\Entity\MediaType;
 use Drupal\media\IFrameUrlHelper;
 use Drupal\media\OEmbed\Resource;
-use Drupal\media\OEmbed\ResourceException;
 use Drupal\media\OEmbed\ResourceFetcherInterface;
 use Drupal\media\OEmbed\UrlResolverInterface;
 use Drupal\media\Plugin\media\Source\OEmbedInterface;

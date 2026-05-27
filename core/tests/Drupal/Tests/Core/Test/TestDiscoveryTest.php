@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Test;
 
-use Drupal\Core\Test\Exception\MissingGroupException;
 use Drupal\Core\Test\PhpUnitTestDiscovery;
 use Drupal\Core\Test\TestDiscovery;
 use Drupal\Tests\UnitTestCase;

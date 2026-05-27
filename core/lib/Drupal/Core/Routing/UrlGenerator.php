@@ -10,8 +10,6 @@ use Symfony\Component\Routing\Route as SymfonyRoute;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\PathProcessor\OutboundPathProcessorInterface;
 use Drupal\Core\RouteProcessor\OutboundRouteProcessorInterface;
-use Symfony\Component\Routing\Exception\InvalidParameterException;
-use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 
 /**
  * Generates URLs from route names and parameters.

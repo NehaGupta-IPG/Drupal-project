@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\package_manager\Kernel;
 
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\ValidationResult;
 use Drupal\package_manager\Validator\ComposerMinimumStabilityValidator;
 use PHPUnit\Framework\Attributes\CoversClass;

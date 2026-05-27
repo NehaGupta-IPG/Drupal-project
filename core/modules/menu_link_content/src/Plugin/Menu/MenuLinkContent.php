@@ -2,7 +2,6 @@
 
 namespace Drupal\menu_link_content\Plugin\Menu;
 
-use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;

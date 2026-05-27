@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\File;
 
-use Drupal\Core\File\Exception\FileExistsException;
-use Drupal\Core\File\Exception\FileNotExistsException;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystem;
 use Drupal\Core\Site\Settings;

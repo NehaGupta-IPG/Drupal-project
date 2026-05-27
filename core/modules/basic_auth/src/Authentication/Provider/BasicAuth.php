@@ -9,10 +9,8 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Flood\FloodInterface;
-use Drupal\Core\Http\Exception\CacheableUnauthorizedHttpException;
 use Drupal\user\UserAuthenticationInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 /**
  * HTTP Basic authentication provider.

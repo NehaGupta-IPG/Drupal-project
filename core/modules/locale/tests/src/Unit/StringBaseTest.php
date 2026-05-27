@@ -6,7 +6,6 @@ namespace Drupal\Tests\locale\Unit;
 
 use Drupal\locale\SourceString;
 use Drupal\locale\StringBase;
-use Drupal\locale\StringStorageException;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;

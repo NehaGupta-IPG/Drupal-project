@@ -6,7 +6,6 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\TypedData\FieldItemDataDefinition;
-use Drupal\Core\File\Exception\FileWriteException;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;

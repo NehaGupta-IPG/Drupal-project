@@ -5,7 +5,6 @@ namespace Drupal\Core\Condition;
 use Drupal\Component\Plugin\CategorizingPluginManagerInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Condition\Attribute\Condition;
-use Drupal\Core\Executable\ExecutableException;
 use Drupal\Core\Executable\ExecutableInterface;
 use Drupal\Core\Executable\ExecutableManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;

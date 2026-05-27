@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Bootstrap;
 
-use Drupal\Core\Extension\Exception\UnknownExtensionException;
-use Drupal\Core\Extension\Exception\UnknownExtensionTypeException;
 use Drupal\Core\Extension\ExtensionPathResolver;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ProfileExtensionList;

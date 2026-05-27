@@ -3,7 +3,6 @@
 namespace Drupal\jsonapi\Query;
 
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
 
 /**
  * Value object for containing the requested offset and page parameters.

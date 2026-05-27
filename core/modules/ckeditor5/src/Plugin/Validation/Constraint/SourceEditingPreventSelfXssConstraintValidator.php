@@ -7,7 +7,6 @@ namespace Drupal\ckeditor5\Plugin\Validation\Constraint;
 use Drupal\ckeditor5\HTMLRestrictions;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Ensures Source Editing cannot be configured to allow self-XSS.

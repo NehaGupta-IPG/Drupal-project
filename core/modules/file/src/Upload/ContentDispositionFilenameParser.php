@@ -3,7 +3,6 @@
 namespace Drupal\file\Upload;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Parses the content-disposition header to extract the client filename.

@@ -3,7 +3,6 @@
 namespace Drupal\Core\Queue;
 
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 
 /**

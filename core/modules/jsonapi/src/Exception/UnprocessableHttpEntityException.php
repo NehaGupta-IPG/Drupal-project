@@ -4,7 +4,6 @@ namespace Drupal\jsonapi\Exception;
 
 use Drupal\Core\Entity\EntityConstraintViolationListInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * A class to represent a 422 - Unprocessable Entity Exception.

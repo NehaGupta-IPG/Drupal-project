@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\serialization\Serializer;
 
 use Drupal\serialization\Normalizer\SchematicNormalizerFallbackTrait;
-use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 
 /**
  * Trait for normalizing the JSON schema.

@@ -6,9 +6,6 @@ namespace Drupal\package_manager;
 
 use Composer\Semver\Semver;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\package_manager\Exception\ComposerNotReadyException;
-use PhpTuf\ComposerStager\API\Exception\PreconditionException;
-use PhpTuf\ComposerStager\API\Exception\RuntimeException;
 use PhpTuf\ComposerStager\API\Path\Factory\PathFactoryInterface;
 use PhpTuf\ComposerStager\API\Precondition\Service\ComposerIsAvailableInterface;
 use PhpTuf\ComposerStager\API\Process\Service\ComposerProcessRunnerInterface;

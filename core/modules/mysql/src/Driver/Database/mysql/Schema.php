@@ -2,10 +2,6 @@
 
 namespace Drupal\mysql\Driver\Database\mysql;
 
-use Drupal\Core\Database\Exception\SchemaPrimaryKeyMustBeDroppedException;
-use Drupal\Core\Database\SchemaException;
-use Drupal\Core\Database\SchemaObjectExistsException;
-use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\Schema as DatabaseSchema;
 use Drupal\Component\Utility\Unicode;
 

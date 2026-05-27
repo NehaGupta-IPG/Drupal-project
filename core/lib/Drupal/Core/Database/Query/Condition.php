@@ -3,7 +3,6 @@
 namespace Drupal\Core\Database\Query;
 
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\InvalidQueryException;
 
 /**
  * Generic class for a series of conditions in a query.

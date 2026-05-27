@@ -6,7 +6,6 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Query\QueryBase;
-use Drupal\Core\Entity\Query\QueryException;
 use Drupal\Core\Entity\Query\QueryInterface;
 
 /**

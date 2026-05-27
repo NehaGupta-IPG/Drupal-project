@@ -4,13 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Config\Action;
 
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Uuid\Uuid;
 use Drupal\config_test\ConfigActionErrorEntity\DuplicatePluralizedMethodName;
 use Drupal\config_test\ConfigActionErrorEntity\DuplicatePluralizedOtherMethodName;
-use Drupal\Core\Config\Action\ConfigActionException;
-use Drupal\Core\Config\Action\DuplicateConfigActionIdException;
-use Drupal\Core\Config\Action\EntityMethodException;
 use Drupal\KernelTests\KernelTestBase;
 // cspell:ignore inflector
 use PHPUnit\Framework\Attributes\Group;

@@ -2,8 +2,6 @@
 
 namespace Drupal\migrate\Plugin\Exception;
 
-use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
-
 /**
  * Defines a class for bad plugin definition exceptions.
  */

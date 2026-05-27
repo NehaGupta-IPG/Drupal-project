@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Menu;
 
-use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\Core\Url;

@@ -2,12 +2,9 @@
 
 namespace Drupal\system\Form;
 
-use Drupal\Core\Config\PreExistingConfigException;
-use Drupal\Core\Config\UnmetDependenciesException;
 use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionLifecycle;
-use Drupal\Core\Extension\InfoParserException;
 use Drupal\Core\Extension\ModuleDependencyMessageTrait;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;

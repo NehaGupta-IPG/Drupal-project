@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\file\Plugin\Validation\Constraint;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Validates the file encoding constraint.

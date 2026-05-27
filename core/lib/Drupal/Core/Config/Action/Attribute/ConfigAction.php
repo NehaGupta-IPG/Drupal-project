@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Core\Config\Action\Attribute;
 
 use Drupal\Component\Plugin\Attribute\Plugin;
-use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**

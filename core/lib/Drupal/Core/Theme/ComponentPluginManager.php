@@ -5,7 +5,6 @@ namespace Drupal\Core\Theme;
 use Drupal\Component\Assertion\Inspector;
 use Drupal\Component\Discovery\YamlDirectoryDiscovery;
 use Drupal\Component\Plugin\CategorizingPluginManagerInterface;
-use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -18,7 +17,6 @@ use Drupal\Core\Plugin\Factory\ContainerFactory;
 use Drupal\Core\Theme\Component\ComponentValidator;
 use Drupal\Core\Theme\Component\SchemaCompatibilityChecker;
 use Drupal\Core\Plugin\Component;
-use Drupal\Core\Render\Component\Exception\ComponentNotFoundException;
 use Drupal\Core\Render\Component\Exception\IncompatibleComponentSchema;
 use Drupal\Core\Plugin\Discovery\DirectoryWithMetadataPluginDiscovery;
 

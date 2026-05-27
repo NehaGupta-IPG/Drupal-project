@@ -8,7 +8,6 @@ use Drupal\Component\Graph\Graph;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Serialization\Yaml;
 use Drupal\Component\Utility\SortArray;
-use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder as SymfonyFinder;
 
 /**

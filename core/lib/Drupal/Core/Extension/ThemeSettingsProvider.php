@@ -6,7 +6,6 @@ namespace Drupal\Core\Extension;
 
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Config\StorageException;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Theme\ThemeInitializationInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;

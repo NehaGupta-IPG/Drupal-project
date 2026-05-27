@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Entity;
 
-use Drupal\Core\Entity\Exception\UnsupportedEntityTypeDefinitionException;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\user\UserInterface;
 

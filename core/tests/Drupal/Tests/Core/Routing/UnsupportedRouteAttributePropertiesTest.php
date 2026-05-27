@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Routing;
 
 use Drupal\Core\Routing\AttributeRouteDiscovery;
-use Drupal\Core\Routing\UnsupportedRouteAttributePropertyException;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

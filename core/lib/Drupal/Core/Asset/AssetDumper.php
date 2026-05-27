@@ -3,7 +3,6 @@
 namespace Drupal\Core\Asset;
 
 use Drupal\Component\Utility\Crypt;
-use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 

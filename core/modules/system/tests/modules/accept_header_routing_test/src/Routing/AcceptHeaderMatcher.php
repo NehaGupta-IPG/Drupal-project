@@ -6,7 +6,6 @@ namespace Drupal\accept_header_routing_test\Routing;
 
 use Drupal\Core\Routing\FilterInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 use Symfony\Component\Routing\RouteCollection;
 
 /**

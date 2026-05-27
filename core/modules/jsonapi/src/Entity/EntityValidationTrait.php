@@ -4,7 +4,6 @@ namespace Drupal\jsonapi\Entity;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
-use Drupal\jsonapi\Exception\UnprocessableHttpEntityException;
 
 /**
  * Provides a method to validate an entity.

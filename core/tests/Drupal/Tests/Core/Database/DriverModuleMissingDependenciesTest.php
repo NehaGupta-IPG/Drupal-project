@@ -6,7 +6,6 @@ namespace Drupal\Tests\Core\Database;
 
 use Drupal\Core\Cache\NullBackend;
 use Drupal\Core\Extension\DatabaseDriverList;
-use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;

@@ -12,7 +12,6 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use PHPUnit\Framework\ExpectationFailedException;
 
 /**
  * Tests breadcrumbs functionality.

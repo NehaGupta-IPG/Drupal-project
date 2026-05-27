@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Config\Storage;
 
 use Drupal\Core\Config\FileStorage;
-use Drupal\Core\Config\UnsupportedDataTypeConfigException;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\StreamWrapper\PublicStream;
 use PHPUnit\Framework\Attributes\Group;

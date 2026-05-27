@@ -10,8 +10,6 @@ use Drupal\Core\Database\Transaction\ClientConnectionTransactionState;
 use Drupal\Core\Database\Transaction\StackItem;
 use Drupal\Core\Database\Transaction\StackItemType;
 use Drupal\Core\Database\Transaction\TransactionManagerBase;
-use Drupal\Core\Database\TransactionNameNonUniqueException;
-use Drupal\Core\Database\TransactionOutOfOrderException;
 
 /**
  * Tests the transaction abstraction system.

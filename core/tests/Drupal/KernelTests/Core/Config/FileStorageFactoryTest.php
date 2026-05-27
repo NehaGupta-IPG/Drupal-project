@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Config;
 
-use Drupal\Core\Config\ConfigDirectoryNotDefinedException;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\FileStorageFactory;
 use Drupal\Core\Site\Settings;

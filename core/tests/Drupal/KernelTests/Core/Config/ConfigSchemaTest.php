@@ -6,7 +6,6 @@ namespace Drupal\KernelTests\Core\Config;
 
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\InstallStorage;
-use Drupal\Core\Config\Schema\ConfigSchemaAlterException;
 use Drupal\Core\Config\Schema\Ignore;
 use Drupal\Core\Config\Schema\Mapping;
 use Drupal\Core\Config\Schema\Undefined;

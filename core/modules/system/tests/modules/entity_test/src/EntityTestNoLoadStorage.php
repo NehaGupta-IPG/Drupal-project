@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\entity_test;
 
-use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 
 /**

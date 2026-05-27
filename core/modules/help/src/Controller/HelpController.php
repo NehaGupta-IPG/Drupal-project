@@ -11,7 +11,6 @@ use Drupal\help\HelpSectionManager;
 use Drupal\system\ModuleAdminLinksHelper;
 use Drupal\user\ModulePermissionsLinkHelper;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Controller routines for help routes.

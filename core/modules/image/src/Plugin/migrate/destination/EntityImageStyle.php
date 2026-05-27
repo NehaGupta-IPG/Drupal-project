@@ -2,9 +2,7 @@
 
 namespace Drupal\image\Plugin\migrate\destination;
 
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\migrate\Attribute\MigrateDestination;
-use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\migrate\destination\EntityConfigBase;
 use Drupal\migrate\Row;
 

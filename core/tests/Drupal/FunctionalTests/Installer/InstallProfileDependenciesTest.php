@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Installer;
 
-use Drupal\Core\Extension\ModuleUninstallValidatorException;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;

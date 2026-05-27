@@ -6,7 +6,6 @@ namespace Drupal\Tests\Core\Entity\Query\Sql;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityType;
-use Drupal\Core\Entity\Query\QueryException;
 use Drupal\Core\Entity\Query\Sql\Query;
 use Drupal\Core\Extension\ModuleHandler;
 use Drupal\Tests\UnitTestCase;

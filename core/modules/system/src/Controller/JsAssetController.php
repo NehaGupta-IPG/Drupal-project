@@ -4,7 +4,6 @@ namespace Drupal\system\Controller;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Asset\AssetGroupSetHashTrait;
 

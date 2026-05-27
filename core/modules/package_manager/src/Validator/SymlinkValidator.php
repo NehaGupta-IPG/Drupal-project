@@ -7,7 +7,6 @@ namespace Drupal\package_manager\Validator;
 use Drupal\package_manager\Event\SandboxValidationEvent;
 use Drupal\package_manager\Event\PreRequireEvent;
 use Drupal\package_manager\PathLocator;
-use PhpTuf\ComposerStager\API\Exception\PreconditionException;
 use PhpTuf\ComposerStager\API\Path\Factory\PathFactoryInterface;
 use PhpTuf\ComposerStager\API\Path\Factory\PathListFactoryInterface;
 use PhpTuf\ComposerStager\API\Precondition\Service\NoUnsupportedLinksExistInterface;

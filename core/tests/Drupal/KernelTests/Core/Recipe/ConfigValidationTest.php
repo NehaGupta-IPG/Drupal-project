@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Recipe;
 
 use Drupal\Component\Serialization\Yaml;
-use Drupal\Core\Recipe\InvalidConfigException;
 use Drupal\Core\Recipe\Recipe;
 use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\KernelTests\KernelTestBase;

@@ -2,9 +2,7 @@
 
 namespace Drupal\Core\Config\Entity;
 
-use Drupal\Core\Config\Entity\Exception\ConfigEntityStorageClassException;
 use Drupal\Core\Entity\EntityType;
-use Drupal\Core\Config\ConfigPrefixLengthException;
 
 /**
  * Provides an implementation of a configuration entity type and its metadata.

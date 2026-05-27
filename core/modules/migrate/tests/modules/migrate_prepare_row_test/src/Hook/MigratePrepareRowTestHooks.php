@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\migrate_prepare_row_test\Hook;
 
-use Drupal\migrate\MigrateSkipRowException;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\MigrateSourceInterface;
 use Drupal\migrate\Row;

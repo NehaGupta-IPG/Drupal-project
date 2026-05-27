@@ -7,7 +7,6 @@ namespace Drupal\Core\Recipe;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
-use Symfony\Component\Validator\Exception\ValidationFailedException;
 
 /**
  * Collects and validates input values for a recipe.

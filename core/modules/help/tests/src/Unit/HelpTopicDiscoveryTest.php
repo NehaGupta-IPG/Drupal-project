@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\help\Unit;
 
-use Drupal\Component\Discovery\DiscoveryException;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\help\HelpTopicDiscovery;

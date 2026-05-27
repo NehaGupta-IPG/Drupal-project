@@ -10,7 +10,6 @@ use Drupal\Component\Serialization\Yaml;
 use Drupal\Core\DefaultContent\Existing;
 use Drupal\Core\DefaultContent\Finder;
 use Drupal\Core\DefaultContent\Importer;
-use Drupal\Core\DefaultContent\InvalidEntityException;
 use Drupal\Core\DefaultContent\PreImportEvent;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\File\FileExists;

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\router_test;
 
 use Drupal\Core\Cache\CacheableResponse;
-use Drupal\Core\ParamConverter\ParamNotConvertedException;
 use Drupal\user\UserInterface;
 use Drupal\Core\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;

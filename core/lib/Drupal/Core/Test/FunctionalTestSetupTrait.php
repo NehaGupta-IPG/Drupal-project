@@ -10,7 +10,6 @@ use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DrupalKernel;
-use Drupal\Core\Extension\MissingDependencyException;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\Session\UserSession;

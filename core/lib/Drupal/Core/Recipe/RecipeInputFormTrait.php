@@ -8,7 +8,6 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
-use Symfony\Component\Validator\Exception\ValidationFailedException;
 
 /**
  * Defines helper methods for forms which collect input on behalf of recipes.

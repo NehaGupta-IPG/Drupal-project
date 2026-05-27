@@ -8,7 +8,6 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Site\Settings;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * A value object for the media library state.

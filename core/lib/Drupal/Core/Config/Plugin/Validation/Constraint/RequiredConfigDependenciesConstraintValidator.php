@@ -11,8 +11,6 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\LogicException;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Validates the RequiredConfigDependencies constraint.

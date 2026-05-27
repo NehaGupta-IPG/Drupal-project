@@ -10,7 +10,6 @@ use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\RangeConstraintValidator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Exception\RuntimeException;
 
 /**
  * Validates the MenuLinkDepthConstraint constraint.

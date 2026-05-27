@@ -8,7 +8,6 @@ use Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Enabled configurable plugin settings validator.

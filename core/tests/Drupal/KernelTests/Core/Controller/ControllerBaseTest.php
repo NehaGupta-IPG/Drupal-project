@@ -13,7 +13,6 @@ use Drupal\system_test\Controller\SystemTestController;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
 
 /**
  * Tests \Drupal\Core\Controller\ControllerBase.

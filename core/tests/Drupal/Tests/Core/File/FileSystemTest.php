@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\File;
 
-use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileSystem;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;

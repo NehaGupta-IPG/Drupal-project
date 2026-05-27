@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\workspaces\Kernel;
 
-use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\entity_test\Entity\EntityTestMulRevPub;
@@ -20,7 +19,6 @@ use Drupal\views\Tests\ViewResultAssertionTrait;
 use Drupal\views\Views;
 use Drupal\workspaces\Entity\Workspace;
 use Drupal\workspaces\Event\WorkspaceSwitchEvent;
-use Drupal\workspaces\WorkspacePublishException;
 use PHPUnit\Framework\Attributes\DataProvider;
 // cspell:ignore differring
 use PHPUnit\Framework\Attributes\Group;

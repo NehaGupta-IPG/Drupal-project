@@ -6,10 +6,8 @@ namespace Drupal\package_manager;
 
 use Drupal\package_manager\Event\CollectPathsToExcludeEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\package_manager\Exception\FailureMarkerExistsException;
 
 /**
  * Handles failure marker file operation.

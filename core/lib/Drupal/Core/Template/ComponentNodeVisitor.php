@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Core\Template;
 
 use Drupal\Core\Plugin\Component;
-use Drupal\Core\Render\Component\Exception\ComponentNotFoundException;
-use Drupal\Core\Render\Component\Exception\InvalidComponentException;
 use Drupal\Core\Theme\ComponentPluginManager;
 use Twig\Environment;
 use Twig\Node\Expression\Variable\ContextVariable;

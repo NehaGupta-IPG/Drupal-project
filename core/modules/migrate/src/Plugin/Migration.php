@@ -2,12 +2,8 @@
 
 namespace Drupal\migrate\Plugin;
 
-use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
-use Drupal\migrate\Exception\RequirementsException;
-use Drupal\migrate\MigrateException;
-use Drupal\migrate\MigrateSkipRowException;
 use Drupal\Component\Utility\NestedArray;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\jsonapi\Kernel\Query;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
 use Drupal\jsonapi\Context\FieldResolver;
 use Drupal\jsonapi\Query\Filter;
 use Drupal\jsonapi\ResourceType\ResourceType;

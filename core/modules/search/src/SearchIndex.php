@@ -6,7 +6,6 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
-use Drupal\search\Exception\SearchIndexException;
 
 /**
  * Provides search index management functions.

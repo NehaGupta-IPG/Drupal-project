@@ -4,7 +4,6 @@ namespace Drupal\Core\Extension;
 
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
-use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\State\StateInterface;
 
 /**

@@ -6,7 +6,6 @@ namespace Drupal\cron_queue_test\Plugin\QueueWorker;
 
 use Drupal\Core\Queue\Attribute\QueueWorker;
 use Drupal\Core\Queue\QueueWorkerBase;
-use Drupal\Core\Queue\SuspendQueueException;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**

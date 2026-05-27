@@ -7,7 +7,6 @@ use Drupal\Component\Assertion\Inspector;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\DatabaseException;
 
 /**
  * Defines a default cache implementation.

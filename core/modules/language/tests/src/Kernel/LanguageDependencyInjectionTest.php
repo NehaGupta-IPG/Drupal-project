@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\language\Kernel;
 
 use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\language\Exception\DeleteDefaultLanguageException;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 

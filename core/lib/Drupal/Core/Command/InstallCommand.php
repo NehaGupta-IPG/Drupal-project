@@ -3,7 +3,6 @@
 namespace Drupal\Core\Command;
 
 use Drupal\Component\Utility\Crypt;
-use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Extension\ExtensionDiscovery;

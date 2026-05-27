@@ -14,7 +14,6 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\Core\Plugin\Discovery\YamlDiscovery;
 use Drupal\Core\Plugin\Factory\ContainerFactory;
-use Drupal\Core\Theme\Icon\Exception\IconPackConfigErrorException;
 use Drupal\Core\Theme\Icon\IconCollector;
 use Drupal\Core\Theme\Icon\IconDefinitionInterface;
 use Drupal\Core\Theme\Icon\IconExtractorPluginManager;

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Component\Serialization;
 
-use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Component\Serialization\Yaml;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

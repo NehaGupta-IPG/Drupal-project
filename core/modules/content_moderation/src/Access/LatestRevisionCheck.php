@@ -2,7 +2,6 @@
 
 namespace Drupal\content_moderation\Access;
 
-use Drupal\Core\Access\AccessException;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Routing\Access\AccessInterface;

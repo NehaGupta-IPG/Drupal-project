@@ -5,7 +5,6 @@ namespace Drupal\Core\Security;
 use Drupal\Component\Utility\UrlHelper;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Sanitizes user input.

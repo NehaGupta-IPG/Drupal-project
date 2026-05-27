@@ -10,7 +10,6 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Validates that a bundle exists on a certain content entity type.

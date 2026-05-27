@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\Plugin;
 
 use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
-use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Drupal\Tests\Component\Plugin\Fixtures\vegetable\Broccoli;
 use Drupal\Tests\Component\Plugin\Fixtures\vegetable\Corn;

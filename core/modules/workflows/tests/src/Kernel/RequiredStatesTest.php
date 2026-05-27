@@ -6,7 +6,6 @@ namespace Drupal\Tests\workflows\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\workflows\Entity\Workflow;
-use Drupal\workflows\Exception\RequiredStateMissingException;
 use Drupal\workflows\Plugin\WorkflowTypeBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;

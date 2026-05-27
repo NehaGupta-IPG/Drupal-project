@@ -6,7 +6,6 @@ use Drupal\Component\Utility\UrlHelper;
 use Drupal\link\LinkItemInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
  * Validates the LinkExternalProtocols constraint.

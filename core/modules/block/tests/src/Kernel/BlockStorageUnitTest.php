@@ -6,7 +6,6 @@ namespace Drupal\Tests\block\Kernel;
 
 use Drupal\block\Entity\Block;
 use Drupal\block_test\Plugin\Block\TestHtmlBlock;
-use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Config\Entity\ConfigEntityStorage;
 use Drupal\KernelTests\KernelTestBase;

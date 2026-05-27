@@ -3,7 +3,6 @@
 namespace Drupal\user;
 
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Entity\Exception\UnsupportedEntityTypeDefinitionException;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 

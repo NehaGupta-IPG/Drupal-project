@@ -6,14 +6,10 @@ namespace Drupal\FunctionalJavascriptTests;
 
 use Behat\Mink\Element\Element;
 use Behat\Mink\Element\NodeElement;
-use Behat\Mink\Exception\ElementHtmlException;
-use Behat\Mink\Exception\ElementNotFoundException;
-use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Drupal\Tests\WebAssert;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Constraint\IsNull;
 use PHPUnit\Framework\Constraint\LogicalNot;
-use WebDriver\Exception;
 
 // cspell:ignore interactable xmlhttprequest
 

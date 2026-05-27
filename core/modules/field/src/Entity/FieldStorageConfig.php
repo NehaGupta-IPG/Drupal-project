@@ -10,7 +10,6 @@ use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\FieldableEntityStorageInterface;
 use Drupal\Core\Entity\Plugin\DataType\EntityAdapter;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Field\FieldException;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\TypedData\OptionsProviderInterface;
 use Drupal\field\FieldStorageConfigAccessControlHandler;

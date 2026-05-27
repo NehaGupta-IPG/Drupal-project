@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\layout_builder\Unit;
 
-use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Block\BlockPluginInterface;

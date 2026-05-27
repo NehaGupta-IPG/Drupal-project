@@ -5,7 +5,6 @@ namespace Drupal\workflows\Form;
 use Drupal\workflows\WorkflowInterface;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Builds the form to delete transitions from Workflow entities.

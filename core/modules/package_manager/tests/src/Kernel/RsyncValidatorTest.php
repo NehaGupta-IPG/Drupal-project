@@ -9,7 +9,6 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\package_manager\Event\PreCreateEvent;
 use Drupal\package_manager\ValidationResult;
 use Drupal\package_manager\Validator\RsyncValidator;
-use PhpTuf\ComposerStager\API\Exception\LogicException;
 use PhpTuf\ComposerStager\API\Finder\Service\ExecutableFinderInterface;
 use PhpTuf\ComposerStager\API\Translation\Factory\TranslatableFactoryInterface;
 use PHPUnit\Framework\Attributes\CoversClass;

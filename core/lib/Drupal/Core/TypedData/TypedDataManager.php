@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\TypedData;
 
-use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;

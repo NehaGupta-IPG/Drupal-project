@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Mailer;
 
-use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 

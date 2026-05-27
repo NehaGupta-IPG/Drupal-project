@@ -4,7 +4,6 @@ namespace Drupal\migrate\Plugin\migrate\destination;
 
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\Plugin\MigrationInterface;
-use Drupal\migrate\Exception\RequirementsException;
 use Drupal\migrate\Plugin\MigrateDestinationInterface;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\RequirementsInterface;

@@ -3,7 +3,6 @@
 namespace Drupal\rest\Plugin\rest\resource;
 
 use Drupal\Core\Entity\EntityInterface;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * @internal

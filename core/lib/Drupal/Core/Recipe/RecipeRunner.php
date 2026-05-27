@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Recipe;
 
-use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Config\ConfigManagerInterface;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\InstallStorage;

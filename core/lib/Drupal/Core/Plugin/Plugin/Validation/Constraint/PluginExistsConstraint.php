@@ -10,7 +10,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Validation\Attribute\Constraint;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint as SymfonyConstraint;
-use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
  * Checks if a plugin exists and optionally implements a particular interface.

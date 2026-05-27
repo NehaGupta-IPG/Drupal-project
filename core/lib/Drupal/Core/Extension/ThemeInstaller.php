@@ -8,7 +8,6 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\ConfigInstallerInterface;
 use Drupal\Core\Config\ConfigManagerInterface;
 use Drupal\Core\DrupalKernelInterface;
-use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Routing\RouteBuilderInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;

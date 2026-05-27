@@ -4,7 +4,6 @@ namespace Drupal\Core\Theme\Component;
 
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\Render\Component\Exception\InvalidComponentException;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**

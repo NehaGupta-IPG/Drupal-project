@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Recipe;
 
 use Drupal\Component\Uuid\UuidInterface;
-use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Recipe\ConsoleInputCollector;
 use Drupal\Core\Recipe\InputCollectorInterface;
 use Drupal\Core\Recipe\InputConfigurator;
@@ -24,7 +23,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\StyleInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Validator\Exception\ValidationFailedException;
 
 /**
  * Tests Input.

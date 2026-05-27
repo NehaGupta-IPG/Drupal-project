@@ -2,8 +2,6 @@
 
 namespace Drupal\Component\FrontMatter\Exception;
 
-use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
-
 /**
  * Defines a class for front matter parsing exceptions.
  */

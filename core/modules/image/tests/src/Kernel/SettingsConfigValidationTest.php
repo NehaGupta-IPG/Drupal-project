@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\image\Kernel;
 
-use Drupal\Core\Config\Schema\SchemaIncompleteException;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Database;
 
-use Drupal\Core\Database\Query\InvalidMergeQueryException;
 use Drupal\Core\Database\Query\Merge;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;

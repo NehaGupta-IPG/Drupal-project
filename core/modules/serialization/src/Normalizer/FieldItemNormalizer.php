@@ -3,7 +3,6 @@
 namespace Drupal\serialization\Normalizer;
 
 use Drupal\Core\Field\FieldItemInterface;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**

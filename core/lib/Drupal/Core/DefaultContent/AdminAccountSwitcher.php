@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Core\DefaultContent;
 
-use Drupal\Core\Access\AccessException;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AccountSwitcherInterface;

@@ -6,9 +6,6 @@ namespace Drupal\Core\Database\Transaction;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Transaction;
-use Drupal\Core\Database\TransactionCommitFailedException;
-use Drupal\Core\Database\TransactionNameNonUniqueException;
-use Drupal\Core\Database\TransactionOutOfOrderException;
 
 /**
  * The database transaction manager base class.

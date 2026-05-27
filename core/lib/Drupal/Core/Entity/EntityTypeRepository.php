@@ -2,9 +2,6 @@
 
 namespace Drupal\Core\Entity;
 
-use Drupal\Core\Entity\Exception\AmbiguousBundleClassException;
-use Drupal\Core\Entity\Exception\AmbiguousEntityClassException;
-use Drupal\Core\Entity\Exception\NoCorrespondingEntityClassException;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**

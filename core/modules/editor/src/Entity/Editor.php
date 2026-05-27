@@ -4,7 +4,6 @@ namespace Drupal\editor\Entity;
 
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\editor\EditorAccessControlHandler;

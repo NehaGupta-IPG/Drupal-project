@@ -2,10 +2,8 @@
 
 namespace Drupal\config\Form;
 
-use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\config\StorageReplaceDataWrapper;
 use Drupal\Core\Batch\BatchBuilder;
-use Drupal\Core\Config\ConfigImporterException;
 use Drupal\Core\Config\ConfigImporterFactory;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Config\Importer\ConfigImporterBatch;

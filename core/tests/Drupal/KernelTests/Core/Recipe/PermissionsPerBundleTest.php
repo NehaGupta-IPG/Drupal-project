@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Recipe;
 
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Serialization\Json;
-use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Config\Action\Plugin\ConfigAction\Deriver\PermissionsPerBundleDeriver;
 use Drupal\Core\Config\Action\Plugin\ConfigAction\PermissionsPerBundle;
 use Drupal\Core\Recipe\RecipeRunner;

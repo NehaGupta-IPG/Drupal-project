@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\navigation\Kernel\ConfigAction;
 
-use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Plugin\Context\Context;
 use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;

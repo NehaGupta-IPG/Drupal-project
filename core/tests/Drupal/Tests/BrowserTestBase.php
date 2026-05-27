@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests;
 
 use Behat\Mink\Driver\BrowserKitDriver;
-use Behat\Mink\Exception\Exception as MinkException;
 use Behat\Mink\Mink;
 use Behat\Mink\Selector\SelectorsHandler;
 use Behat\Mink\Session;

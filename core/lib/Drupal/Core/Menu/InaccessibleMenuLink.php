@@ -2,8 +2,6 @@
 
 namespace Drupal\Core\Menu;
 
-use Drupal\Component\Plugin\Exception\PluginException;
-
 /**
  * A menu link plugin for wrapping another menu link, in sensitive situations.
  *

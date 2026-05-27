@@ -2,8 +2,6 @@
 
 namespace Drupal\Component\Serialization;
 
-use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
-
 /**
  * Provides default serialization for YAML using the PECL extension.
  */

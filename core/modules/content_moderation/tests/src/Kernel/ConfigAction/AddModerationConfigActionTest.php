@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\content_moderation\Kernel\ConfigAction;
 
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\content_moderation\Plugin\ConfigAction\AddModeration;
 use Drupal\content_moderation\Plugin\ConfigAction\AddModerationDeriver;
-use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Recipe\Recipe;
 use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;

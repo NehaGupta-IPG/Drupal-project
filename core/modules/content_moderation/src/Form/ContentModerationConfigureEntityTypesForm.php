@@ -2,7 +2,6 @@
 
 namespace Drupal\content_moderation\Form;
 
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\CloseDialogCommand;
@@ -15,7 +14,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\workflows\WorkflowInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * The form for editing entity types associated with a workflow.

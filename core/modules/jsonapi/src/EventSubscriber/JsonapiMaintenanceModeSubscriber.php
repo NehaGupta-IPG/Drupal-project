@@ -12,7 +12,6 @@ use Drupal\jsonapi\JsonApiResource\NullIncludedData;
 use Drupal\jsonapi\ResourceResponse;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Maintenance mode subscriber for JSON:API requests.

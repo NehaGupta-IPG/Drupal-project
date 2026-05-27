@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Database;
 
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\InvalidQueryException;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\Query\PlaceholderInterface;
 use Drupal\Tests\Core\Database\Stub\StubCondition;

@@ -15,7 +15,6 @@ use Drupal\Tests\Core\Entity\ContentEntityBaseMockableClass;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * Tests Drupal\serialization\Normalizer\EntityNormalizer.

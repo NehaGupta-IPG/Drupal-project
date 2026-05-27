@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Theme\Component;
 
-use Drupal\Core\Render\Component\Exception\InvalidComponentException;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Plugin\Component;
 use JsonSchema\Constraints\Constraint;

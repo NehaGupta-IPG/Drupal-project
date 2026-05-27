@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests;
 
-use Behat\Mink\Exception\ElementNotFoundException;
-use Behat\Mink\Exception\ExpectationException;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
@@ -15,7 +13,6 @@ use Drupal\TestTools\Extension\Dump\DebugDump;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use PHPUnit\Framework\ExpectationFailedException;
 
 // cspell:ignore htkey
 

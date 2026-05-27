@@ -7,7 +7,6 @@ namespace Drupal\field_ui\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\TempStore\PrivateTempStore;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Controller for building the field instance form.

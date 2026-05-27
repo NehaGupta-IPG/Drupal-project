@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\comment\Entity\CommentType;
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Entity\Plugin\DataType\Deriver\EntityDeriver;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\KernelTests\KernelTestBase;

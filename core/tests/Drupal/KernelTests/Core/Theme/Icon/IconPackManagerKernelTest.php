@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Theme\Icon;
 
 use Drupal\Core\Form\FormState;
-use Drupal\Core\Theme\Icon\Exception\IconPackConfigErrorException;
 use Drupal\Core\Theme\Icon\IconDefinitionInterface;
 use Drupal\Core\Theme\Icon\Plugin\IconPackManager;
 use Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface;

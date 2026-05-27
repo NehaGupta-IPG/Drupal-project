@@ -8,7 +8,6 @@ use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Url;
-use Drupal\workspaces\WorkspaceAccessException;
 use Drupal\workspaces\WorkspaceInterface;
 use Drupal\workspaces\WorkspaceOperationFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;

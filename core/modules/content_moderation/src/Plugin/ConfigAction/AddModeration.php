@@ -4,7 +4,6 @@ namespace Drupal\content_moderation\Plugin\ConfigAction;
 
 use Drupal\content_moderation\Plugin\WorkflowType\ContentModerationInterface;
 use Drupal\Core\Config\Action\Attribute\ConfigAction;
-use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Config\Action\ConfigActionPluginInterface;
 use Drupal\Core\Config\ConfigManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;

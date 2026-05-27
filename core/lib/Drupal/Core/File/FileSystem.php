@@ -4,13 +4,6 @@ namespace Drupal\Core\File;
 
 use Drupal\Component\FileSystem\FileSystem as FileSystemComponent;
 use Drupal\Component\Utility\Unicode;
-use Drupal\Core\File\Exception\DirectoryNotReadyException;
-use Drupal\Core\File\Exception\FileException;
-use Drupal\Core\File\Exception\FileExistsException;
-use Drupal\Core\File\Exception\FileNotExistsException;
-use Drupal\Core\File\Exception\FileWriteException;
-use Drupal\Core\File\Exception\NotRegularDirectoryException;
-use Drupal\Core\File\Exception\NotRegularFileException;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;

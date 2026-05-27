@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Entity\Sql;
 
-use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Site\Settings;
 

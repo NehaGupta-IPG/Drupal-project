@@ -11,7 +11,6 @@ use Drupal\jsonapi\ResourceResponse;
 use Drupal\jsonapi\Routing\Routes;
 use Drupal\serialization\EventSubscriber\DefaultExceptionSubscriber as SerializationDefaultExceptionSubscriber;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Serializes exceptions in compliance with the  JSON:API specification.

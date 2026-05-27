@@ -6,7 +6,6 @@ namespace Drupal\Tests\Core\Config;
 
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Config\Config;
-use Drupal\Core\Config\ConfigValueException;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;

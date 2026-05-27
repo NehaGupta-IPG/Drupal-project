@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Routing;
 
-use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\Utility\Error;
 use Psr\Log\LoggerInterface;

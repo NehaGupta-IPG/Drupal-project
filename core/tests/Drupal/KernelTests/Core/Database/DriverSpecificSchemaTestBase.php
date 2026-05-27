@@ -6,9 +6,7 @@ namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Database\Schema;
-use Drupal\Core\Database\SchemaException;
 use Drupal\Tests\Core\Database\SchemaIntrospectionTestTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 

@@ -10,7 +10,6 @@ use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
  * Tests Drupal\Core\DependencyInjection\Compiler\ProxyServicesPass.

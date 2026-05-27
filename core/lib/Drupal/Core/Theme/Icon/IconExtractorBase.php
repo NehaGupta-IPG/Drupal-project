@@ -8,7 +8,6 @@ use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginWithFormsInterface;
 use Drupal\Core\Plugin\PluginWithFormsTrait;
-use Drupal\Core\Theme\Icon\Exception\IconPackConfigErrorException;
 
 /**
  * Base class for icon extractor plugins.

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\StreamWrapper;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\StreamWrapper\ExtensionStreamBase;
 use Drupal\Core\StreamWrapper\ModuleStream;
 use Drupal\Core\StreamWrapper\ThemeStream;

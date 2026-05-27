@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Drupal\FunctionalJavascriptTests;
 
 use Behat\Mink\Driver\Selenium2Driver;
-use Behat\Mink\Exception\DriverException;
 use WebDriver\Element;
-use WebDriver\Exception;
 use WebDriver\Exception\UnknownError;
 
 /**

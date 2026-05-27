@@ -9,7 +9,6 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
-use Drupal\workflows\Exception\RequiredStateMissingException;
 use Drupal\workflows\Form\WorkflowAddForm;
 use Drupal\workflows\Form\WorkflowDeleteForm;
 use Drupal\workflows\Form\WorkflowEditForm;

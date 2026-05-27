@@ -5,7 +5,6 @@ namespace Drupal\link\Plugin\Validation\Constraint;
 use Drupal\link\LinkItemInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
  * Constraint validator for links receiving data allowed by its settings.

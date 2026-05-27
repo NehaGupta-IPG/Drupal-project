@@ -11,7 +11,6 @@ use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\system\Controller\SystemController;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
  * Provides a menu link tree manipulator for the navigation menu block.

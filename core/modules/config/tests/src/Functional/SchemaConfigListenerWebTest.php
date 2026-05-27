@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\config\Functional;
 
-use Drupal\Core\Config\Schema\SchemaIncompleteException;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;

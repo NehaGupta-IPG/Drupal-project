@@ -6,7 +6,6 @@ namespace Drupal\Tests\Core\Extension;
 
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\Extension\InfoParser;
-use Drupal\Core\Extension\InfoParserException;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
 // cspell:ignore skynet

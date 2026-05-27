@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Kernel\Revisions;
 
-use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
-use Drupal\Core\Http\Exception\CacheableNotFoundHttpException;
 use Drupal\jsonapi\Revisions\VersionById;
 use Drupal\jsonapi\Revisions\VersionByRel;
 use Drupal\jsonapi\Revisions\VersionNegotiator;

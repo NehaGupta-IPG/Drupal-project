@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Routing;
 
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 

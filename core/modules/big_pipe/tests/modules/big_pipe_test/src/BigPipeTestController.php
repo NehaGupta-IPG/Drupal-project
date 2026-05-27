@@ -6,7 +6,6 @@ namespace Drupal\big_pipe_test;
 
 use Drupal\big_pipe\Render\BigPipeMarkup;
 use Drupal\big_pipe_test\EventSubscriber\BigPipeTestSubscriber;
-use Drupal\Core\Form\EnforcedResponseException;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 

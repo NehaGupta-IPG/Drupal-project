@@ -6,7 +6,6 @@ namespace Drupal\Tests\Core\Theme\Icon\Plugin;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\SubformStateInterface;
-use Drupal\Core\Theme\Icon\Exception\IconPackConfigErrorException;
 use Drupal\Core\Theme\Icon\IconDefinition;
 use Drupal\Core\Theme\Icon\IconDefinitionInterface;
 use Drupal\Core\Theme\Icon\IconFinder;

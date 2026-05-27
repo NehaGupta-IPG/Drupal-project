@@ -32,7 +32,6 @@ use Drupal\jsonapi\Context\FieldResolver;
 use Drupal\jsonapi\Entity\EntityValidationTrait;
 use Drupal\jsonapi\Access\TemporaryQueryGuard;
 use Drupal\jsonapi\Events\CollectRelationshipMetaEvent;
-use Drupal\jsonapi\Exception\EntityAccessDeniedHttpException;
 use Drupal\jsonapi\IncludeResolver;
 use Drupal\jsonapi\JsonApiResource\IncludedData;
 use Drupal\jsonapi\JsonApiResource\LinkCollection;
@@ -56,12 +55,6 @@ use Drupal\jsonapi\Revisions\ResourceVersionRouteEnhancer;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
-use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**

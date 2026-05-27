@@ -2,8 +2,6 @@
 
 namespace Drupal\Component\Plugin\Discovery;
 
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
-
 /**
  * @see Drupal\Component\Plugin\Discovery\DiscoveryInterface
  */

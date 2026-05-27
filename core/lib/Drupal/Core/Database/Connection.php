@@ -4,7 +4,6 @@ namespace Drupal\Core\Database;
 
 use Drupal\Component\Assertion\Inspector;
 use Drupal\Core\Database\Event\DatabaseEvent;
-use Drupal\Core\Database\Exception\EventException;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\Query\Delete;
 use Drupal\Core\Database\Query\Insert;

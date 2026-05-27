@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\ImageToolkit;
 
-use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Psr\Log\LoggerInterface;

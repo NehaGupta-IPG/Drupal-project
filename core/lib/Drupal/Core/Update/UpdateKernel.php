@@ -10,7 +10,6 @@ use Drupal\Core\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * Defines a kernel which is used primarily to run the update of Drupal.

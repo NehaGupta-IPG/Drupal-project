@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Menu;
 
 use ColinODell\PsrTestLogger\TestLogger;
-use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Menu\MenuLinkManagerInterface;

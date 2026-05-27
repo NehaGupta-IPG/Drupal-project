@@ -3,7 +3,6 @@
 namespace Drupal\help;
 
 use Drupal\Component\FrontMatter\FrontMatter;
-use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Serialization\Yaml;

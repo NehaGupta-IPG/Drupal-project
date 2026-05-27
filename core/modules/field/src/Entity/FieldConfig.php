@@ -7,7 +7,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\FieldableEntityStorageInterface;
 use Drupal\Core\Field\FieldConfigBase;
-use Drupal\Core\Field\FieldException;
 use Drupal\field\FieldConfigAccessControlHandler;
 use Drupal\field\FieldConfigStorage;
 use Drupal\field\FieldStorageConfigInterface;

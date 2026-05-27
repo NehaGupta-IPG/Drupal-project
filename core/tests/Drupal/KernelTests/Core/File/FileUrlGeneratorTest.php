@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\File;
 
-use Drupal\Core\File\Exception\InvalidStreamWrapperException;
 use Drupal\Core\File\FileUrlGenerator;
 use Drupal\file_test\FileTestCdn;
 use PHPUnit\Framework\Attributes\CoversClass;

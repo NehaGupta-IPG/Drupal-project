@@ -6,7 +6,6 @@ namespace Drupal\binary_file_response_test\Controller;
 
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Controller routines for binary file response tests.

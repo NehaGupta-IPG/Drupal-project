@@ -6,8 +6,6 @@ namespace Drupal\KernelTests\Core\Extension;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Core\Extension\Exception\ObsoleteExtensionException;
-use Drupal\Core\Extension\MissingDependencyException;
 use Drupal\Core\Extension\ModuleInstaller;
 use Drupal\Core\Logger\RfcLoggerTrait;
 use Drupal\Core\Logger\RfcLogLevel;
@@ -18,7 +16,6 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
  * Tests the ModuleInstaller class.

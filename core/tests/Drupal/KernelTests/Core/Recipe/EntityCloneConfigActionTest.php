@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Recipe;
 
-use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Config\Action\Plugin\ConfigAction\EntityClone;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Extension\ModuleInstallerInterface;

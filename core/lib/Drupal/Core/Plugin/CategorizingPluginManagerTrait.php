@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Plugin;
 
-use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 

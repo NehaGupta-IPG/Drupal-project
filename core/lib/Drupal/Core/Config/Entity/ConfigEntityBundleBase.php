@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Config\Entity;
 
-use Drupal\Core\Config\ConfigNameException;
 use Drupal\Core\Entity\EntityStorageInterface;
 
 /**

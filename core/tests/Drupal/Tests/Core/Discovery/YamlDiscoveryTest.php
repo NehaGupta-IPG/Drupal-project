@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Discovery;
 
 use Drupal\Component\FileCache\FileCacheFactory;
-use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Core\Discovery\YamlDiscovery;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;

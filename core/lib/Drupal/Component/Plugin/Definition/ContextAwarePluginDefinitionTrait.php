@@ -3,7 +3,6 @@
 namespace Drupal\Component\Plugin\Definition;
 
 use Drupal\Component\Plugin\Context\ContextDefinitionInterface;
-use Drupal\Component\Plugin\Exception\ContextException;
 
 /**
  * Provides a trait for context-aware object-based plugin definitions.

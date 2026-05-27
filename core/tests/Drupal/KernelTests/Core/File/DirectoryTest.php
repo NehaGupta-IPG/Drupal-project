@@ -7,7 +7,6 @@ namespace Drupal\KernelTests\Core\File;
 use Drupal\Component\FileSecurity\FileSecurity;
 use Drupal\Component\FileSystem\FileSystem;
 use Drupal\Core\Database\Database;
-use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\system\Hook\SystemHooks;

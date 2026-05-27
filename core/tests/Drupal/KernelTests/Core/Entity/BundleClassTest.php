@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
-use Drupal\Core\Entity\Exception\AmbiguousBundleClassException;
-use Drupal\Core\Entity\Exception\BundleClassInheritanceException;
-use Drupal\Core\Entity\Exception\MissingBundleClassException;
 use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\entity_test\Entity\EntityTest;

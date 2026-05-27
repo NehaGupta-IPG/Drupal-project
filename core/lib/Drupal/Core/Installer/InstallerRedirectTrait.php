@@ -3,11 +3,7 @@
 namespace Drupal\Core\Installer;
 
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Database\DatabaseException;
-use Drupal\Core\Database\DatabaseNotFoundException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Provides methods for checking if Drupal is already installed.

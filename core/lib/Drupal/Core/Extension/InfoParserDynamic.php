@@ -3,7 +3,6 @@
 namespace Drupal\Core\Extension;
 
 use Composer\Semver\Semver;
-use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Core\Serialization\Yaml;
 
 /**

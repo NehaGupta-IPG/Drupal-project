@@ -3,7 +3,6 @@
 namespace Drupal\field_ui\Form;
 
 use Drupal\Core\Form\FormStateInterface;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Provides the add form for entity display modes.

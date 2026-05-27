@@ -5,22 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Http;
 
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\Http\Exception\CacheableAccessDeniedHttpException;
-use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
-use Drupal\Core\Http\Exception\CacheableConflictHttpException;
-use Drupal\Core\Http\Exception\CacheableGoneHttpException;
-use Drupal\Core\Http\Exception\CacheableHttpException;
-use Drupal\Core\Http\Exception\CacheableLengthRequiredHttpException;
-use Drupal\Core\Http\Exception\CacheableMethodNotAllowedHttpException;
-use Drupal\Core\Http\Exception\CacheableNotAcceptableHttpException;
-use Drupal\Core\Http\Exception\CacheableNotFoundHttpException;
-use Drupal\Core\Http\Exception\CacheablePreconditionFailedHttpException;
-use Drupal\Core\Http\Exception\CacheablePreconditionRequiredHttpException;
-use Drupal\Core\Http\Exception\CacheableServiceUnavailableHttpException;
-use Drupal\Core\Http\Exception\CacheableTooManyRequestsHttpException;
-use Drupal\Core\Http\Exception\CacheableUnauthorizedHttpException;
-use Drupal\Core\Http\Exception\CacheableUnprocessableEntityHttpException;
-use Drupal\Core\Http\Exception\CacheableUnsupportedMediaTypeHttpException;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -70,10 +54,18 @@ class CacheableExceptionTest extends UnitTestCase {
   public static function providerTestExceptions(): array {
     return [
       [400, \Drupal\Core\Http\Exception\CacheableBadRequestHttpException::class],
-      [401, \Drupal\Core\Http\Exception\CacheableUnauthorizedHttpException::class, 'test challenge', ['WWW-Authenticate' => 'test challenge']],
+      [401, \Drupal\Core\Http\Exception\CacheableUnauthorizedHttpException::class, 'test challenge',
+        [
+          'WWW-Authenticate' => 'test challenge',
+        ],
+      ],
       [403, \Drupal\Core\Http\Exception\CacheableAccessDeniedHttpException::class],
       [404, \Drupal\Core\Http\Exception\CacheableNotFoundHttpException::class],
-      [405, \Drupal\Core\Http\Exception\CacheableMethodNotAllowedHttpException::class, ['POST', 'PUT'], ['Allow' => 'POST, PUT']],
+      [405, \Drupal\Core\Http\Exception\CacheableMethodNotAllowedHttpException::class, ['POST', 'PUT'],
+        [
+          'Allow' => 'POST, PUT',
+        ],
+      ],
       [406, \Drupal\Core\Http\Exception\CacheableNotAcceptableHttpException::class],
       [409, \Drupal\Core\Http\Exception\CacheableConflictHttpException::class],
       [410, \Drupal\Core\Http\Exception\CacheableGoneHttpException::class],

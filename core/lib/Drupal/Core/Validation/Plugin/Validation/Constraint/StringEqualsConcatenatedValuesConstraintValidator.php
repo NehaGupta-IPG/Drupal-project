@@ -8,7 +8,6 @@ use Drupal\Core\Config\Schema\TypeResolver;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Validates the StringEqualsConcatenatedValues constraint.

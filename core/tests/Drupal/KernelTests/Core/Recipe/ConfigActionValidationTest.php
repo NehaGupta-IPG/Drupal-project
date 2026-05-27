@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Recipe;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Recipe\InvalidConfigException;
 use Drupal\Core\Recipe\Recipe;
-use Drupal\Core\Recipe\RecipeFileException;
 use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;
 use Drupal\KernelTests\KernelTestBase;

@@ -7,8 +7,6 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Routing\LocalRedirectResponse;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Returns responses for BigPipe module routes.

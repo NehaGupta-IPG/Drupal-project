@@ -2,8 +2,6 @@
 
 namespace Drupal\Core\Database\Query;
 
-use Drupal\Core\Database\DatabaseException;
-
 /**
  * Exception thrown for merge queries that do not make semantic sense.
  *

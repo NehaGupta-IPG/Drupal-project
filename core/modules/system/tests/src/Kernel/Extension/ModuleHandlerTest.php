@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Kernel\Extension;
 
 use Drupal\Core\Entity\ContentEntityTypeInterface;
-use Drupal\Core\Extension\MissingDependencyException;
-use Drupal\Core\Extension\ModuleUninstallValidatorException;
 use Drupal\Core\Extension\ProfileExtensionList;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;

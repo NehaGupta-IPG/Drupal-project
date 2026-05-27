@@ -4,10 +4,8 @@ namespace Drupal\Core\Entity\KeyValueStore;
 
 use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
-use Drupal\Core\Config\Entity\Exception\ConfigEntityIdLengthException;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\KeyValueStore\KeyValueStoreInterface;

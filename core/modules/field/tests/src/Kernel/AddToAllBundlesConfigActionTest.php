@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field\Kernel;
 
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
-use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Recipe\RecipeRunner;

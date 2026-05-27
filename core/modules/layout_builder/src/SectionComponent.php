@@ -2,7 +2,6 @@
 
 namespace Drupal\layout_builder;
 
-use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Drupal\layout_builder\Event\SectionComponentBuildRenderArrayEvent;
 

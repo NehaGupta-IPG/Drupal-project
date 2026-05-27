@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\migrate\Kernel\Plugin;
 
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\migrate\MigrateException;
-use Drupal\migrate\MigrateSkipRowException;
 use Drupal\migrate\Plugin\Migration;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

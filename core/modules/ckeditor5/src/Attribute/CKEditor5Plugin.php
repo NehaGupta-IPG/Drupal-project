@@ -6,7 +6,6 @@ namespace Drupal\ckeditor5\Attribute;
 
 use Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition;
 use Drupal\Component\Plugin\Attribute\Plugin;
-use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**

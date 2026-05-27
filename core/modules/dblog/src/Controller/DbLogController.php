@@ -20,7 +20,6 @@ use Drupal\user\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\Link;
 use Drupal\dblog\DbLogFilters;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Returns responses for dblog routes.

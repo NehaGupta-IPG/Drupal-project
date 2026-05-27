@@ -13,7 +13,6 @@ use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\DependencyInjection\Definition;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;

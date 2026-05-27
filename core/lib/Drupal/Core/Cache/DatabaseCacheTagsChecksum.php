@@ -3,7 +3,6 @@
 namespace Drupal\Core\Cache;
 
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\DatabaseException;
 
 /**
  * Cache tags invalidations checksum implementation that uses the database.

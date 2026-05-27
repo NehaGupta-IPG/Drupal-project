@@ -5,7 +5,6 @@ namespace Drupal\Core\Batch;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\DatabaseException;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**

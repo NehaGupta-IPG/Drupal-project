@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Asset;
 
 use Drupal\Component\FileCache\FileCacheFactory;
-use Drupal\Core\Asset\Exception\IncompleteLibraryDefinitionException;
-use Drupal\Core\Asset\Exception\InvalidLibraryFileException;
-use Drupal\Core\Asset\Exception\LibraryDefinitionMissingLicenseException;
 use Drupal\Core\Asset\LibrariesDirectoryFileFinder;
 use Drupal\Core\Asset\LibraryDiscoveryParser;
 use Drupal\Core\Extension\ExtensionPathResolver;

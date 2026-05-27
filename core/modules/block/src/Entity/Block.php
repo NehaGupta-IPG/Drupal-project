@@ -16,7 +16,6 @@ use Drupal\block\BlockInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;

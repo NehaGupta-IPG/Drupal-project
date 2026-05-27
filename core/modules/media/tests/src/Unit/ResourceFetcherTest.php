@@ -7,7 +7,6 @@ namespace Drupal\Tests\media\Unit;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Cache\NullBackend;
 use Drupal\media\OEmbed\ProviderRepositoryInterface;
-use Drupal\media\OEmbed\ResourceException;
 use Drupal\media\OEmbed\ResourceFetcher;
 use Drupal\Tests\UnitTestCase;
 use GuzzleHttp\Client;

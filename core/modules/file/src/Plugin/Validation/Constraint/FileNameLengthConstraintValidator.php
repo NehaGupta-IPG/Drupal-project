@@ -3,7 +3,6 @@
 namespace Drupal\file\Plugin\Validation\Constraint;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Validates the file name length constraint.

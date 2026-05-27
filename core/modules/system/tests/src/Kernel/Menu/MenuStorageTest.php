@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Kernel\Menu;
 
-use Drupal\Core\Config\Entity\Exception\ConfigEntityIdLengthException;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\Entity\Menu;
 use Drupal\system\MenuStorage;

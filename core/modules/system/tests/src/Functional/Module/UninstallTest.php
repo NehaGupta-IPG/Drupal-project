@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Module;
 
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\BrowserTestBase;

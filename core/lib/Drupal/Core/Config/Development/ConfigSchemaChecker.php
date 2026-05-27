@@ -7,7 +7,6 @@ use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Config\ConfigCrudEvent;
 use Drupal\Core\Config\ConfigEvents;
 use Drupal\Core\Config\Schema\SchemaCheckTrait;
-use Drupal\Core\Config\Schema\SchemaIncompleteException;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

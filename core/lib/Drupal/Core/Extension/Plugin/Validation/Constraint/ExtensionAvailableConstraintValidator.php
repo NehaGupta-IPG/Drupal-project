@@ -7,7 +7,6 @@ namespace Drupal\Core\Extension\Plugin\Validation\Constraint;
 use Drupal\Component\FileSystem\FileSystem as DrupalFilesystem;
 use Drupal\Core\Config\Schema\TypeResolver;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Extension\ExtensionList;
 use Drupal\Core\Extension\ModuleExtensionList;

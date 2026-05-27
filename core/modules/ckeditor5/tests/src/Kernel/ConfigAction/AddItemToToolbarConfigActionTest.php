@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\ckeditor5\Kernel\ConfigAction;
 
 use Drupal\ckeditor5\Plugin\ConfigAction\AddItemToToolbar;
-use Drupal\Core\Config\Action\ConfigActionException;
-use Drupal\Core\Recipe\InvalidConfigException;
 use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\editor\Entity\Editor;
 use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;

@@ -6,7 +6,6 @@ namespace Drupal\ckeditor5\Plugin\Validation\Constraint;
 
 use Drupal\ckeditor5\HTMLRestrictions;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * CKEditor 5 element validator.

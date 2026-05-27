@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Component\Plugin;
 
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Plugin\Mapper\MapperInterface;
 use Drupal\Component\Plugin\PluginManagerBase;
 use PHPUnit\Framework\Attributes\CoversClass;

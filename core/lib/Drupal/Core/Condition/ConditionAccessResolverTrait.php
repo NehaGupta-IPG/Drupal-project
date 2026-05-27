@@ -2,8 +2,6 @@
 
 namespace Drupal\Core\Condition;
 
-use Drupal\Component\Plugin\Exception\ContextException;
-
 /**
  * Resolves a set of conditions.
  */

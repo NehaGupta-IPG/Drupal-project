@@ -4,9 +4,6 @@ namespace Drupal\mysql\Driver\Database\mysql;
 
 use Drupal\Core\Database\Connection as DatabaseConnection;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Database\DatabaseAccessDeniedException;
-use Drupal\Core\Database\DatabaseConnectionRefusedException;
-use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\StatementWrapperIterator;
 use Drupal\Core\Database\SupportsTemporaryTablesInterface;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;

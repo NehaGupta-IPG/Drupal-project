@@ -4,7 +4,6 @@ namespace Drupal\Component\Plugin\Factory;
 
 use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
 use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
-use Drupal\Component\Plugin\Exception\PluginException;
 
 /**
  * Default plugin factory.

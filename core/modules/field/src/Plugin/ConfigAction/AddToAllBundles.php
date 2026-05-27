@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\field\Plugin\ConfigAction;
 
 use Drupal\Core\Config\Action\Attribute\ConfigAction;
-use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Config\Action\ConfigActionPluginInterface;
 use Drupal\Core\Config\ConfigManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;

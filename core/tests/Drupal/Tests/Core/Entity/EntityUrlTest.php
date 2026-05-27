@@ -6,10 +6,8 @@ namespace Drupal\Tests\Core\Entity;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityBase;
-use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Entity\Exception\UndefinedLinkTemplateException;
 use Drupal\Core\GeneratedUrl;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Url;
@@ -18,7 +16,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 
 /**
  * Tests URL handling of the \Drupal\Core\Entity\EntityBase class.

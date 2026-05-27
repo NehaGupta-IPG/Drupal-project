@@ -10,7 +10,6 @@ use Drupal\fixture_manipulator\FixtureManipulator;
 use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\Event\PreCreateEvent;
 use Drupal\package_manager\Event\PreRequireEvent;
-use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\ValidationResult;
 use Drupal\package_manager\Validator\LockFileValidator;
 use Drupal\package_manager\Validator\PhpTufValidator;

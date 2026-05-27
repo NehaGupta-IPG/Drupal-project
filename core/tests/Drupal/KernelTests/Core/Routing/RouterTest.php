@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Routing;
 
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Routing\Exception\CacheableResourceNotFoundException;
 use Drupal\Core\Routing\Router;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;

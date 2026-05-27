@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field_ui\Traits;
 
-use Behat\Mink\Exception\ElementNotFoundException;
-
 /**
  * Provides common functionality for the Field UI test classes.
  */

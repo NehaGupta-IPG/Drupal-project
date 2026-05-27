@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Template;
 
-use Drupal\Component\FrontMatter\Exception\FrontMatterParseException;
 use Drupal\Component\FrontMatter\FrontMatter;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\PhpStorage\PhpStorageFactory;

@@ -10,7 +10,6 @@ use Drupal\Core\Config\ConfigManagerInterface;
 use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Query\QueryBase;
-use Drupal\Core\Entity\Query\QueryException;
 use Drupal\Core\Entity\Query\QueryFactoryInterface;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

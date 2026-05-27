@@ -7,7 +7,6 @@ namespace Drupal\Tests\media\Unit;
 use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
 use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
-use Drupal\media\OEmbed\ProviderException;
 use Drupal\media\OEmbed\ProviderRepository;
 use Drupal\Tests\UnitTestCase;
 use GuzzleHttp\Client;

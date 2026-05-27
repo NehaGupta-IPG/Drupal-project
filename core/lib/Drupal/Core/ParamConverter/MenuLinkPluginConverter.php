@@ -3,7 +3,6 @@
 namespace Drupal\Core\ParamConverter;
 
 use Drupal\Core\Menu\MenuLinkManagerInterface;
-use Drupal\Component\Plugin\Exception\PluginException;
 use Symfony\Component\Routing\Route;
 
 /**

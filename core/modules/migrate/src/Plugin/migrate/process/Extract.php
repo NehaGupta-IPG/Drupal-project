@@ -6,7 +6,6 @@ use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Variable;
 use Drupal\migrate\ProcessPluginBase;
-use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\Row;
 

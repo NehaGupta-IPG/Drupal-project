@@ -3,7 +3,6 @@
 namespace Drupal\config\Form;
 
 use Drupal\Core\Batch\BatchBuilder;
-use Drupal\Core\Config\ConfigImporterException;
 use Drupal\Core\Config\ConfigImporterFactory;
 use Drupal\Core\Config\Importer\ConfigImporterBatch;
 use Drupal\Core\Config\ImportStorageTransformer;

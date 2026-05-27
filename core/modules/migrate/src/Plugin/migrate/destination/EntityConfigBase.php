@@ -9,7 +9,6 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\language\ConfigurableLanguageManager;
 use Drupal\migrate\Plugin\MigrationInterface;
-use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\DefaultContent;
 
-use Drupal\Core\Access\AccessException;
 use Drupal\Core\DefaultContent\AdminAccountSwitcher;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityTypeManagerInterface;

@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\Kernel;
 
-use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityTypeManager;
-use Drupal\Core\File\Exception\FileExistsException;
-use Drupal\Core\File\Exception\InvalidStreamWrapperException;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Drupal\file\Entity\File;

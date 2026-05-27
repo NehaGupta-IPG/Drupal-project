@@ -2,9 +2,6 @@
 
 namespace Drupal\Core\Extension;
 
-use Drupal\Core\Extension\Exception\UnknownExtensionException;
-use Drupal\Core\Extension\Exception\UnknownExtensionTypeException;
-
 /**
  * Factory for getting extension lists by type.
  */

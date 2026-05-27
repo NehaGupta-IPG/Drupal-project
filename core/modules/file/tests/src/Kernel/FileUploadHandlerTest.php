@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\Kernel;
 
-use Drupal\Core\Lock\LockAcquiringException;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\file\Upload\FileUploadHandler;
 use Drupal\file\Upload\UploadedFileInterface;

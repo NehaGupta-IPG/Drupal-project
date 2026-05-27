@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Recipe;
 
 use Drupal\Core\Recipe\Recipe;
-use Drupal\Core\Recipe\RecipeFileException;
 use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;

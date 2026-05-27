@@ -4,8 +4,6 @@ namespace Drupal\jsonapi\Revisions;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
-use Drupal\Core\Http\Exception\CacheableNotFoundHttpException;
 
 /**
  * Provides a version negotiator manager.

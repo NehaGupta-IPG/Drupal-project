@@ -4,7 +4,6 @@ namespace Drupal\language\Plugin\migrate\destination;
 
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\migrate\Attribute\MigrateDestination;
-use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\migrate\destination\Config;
 use Drupal\migrate\Row;
 

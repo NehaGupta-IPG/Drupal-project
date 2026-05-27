@@ -2,11 +2,9 @@
 
 namespace Drupal\media\Plugin\Validation\Constraint;
 
-use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\media\MediaTypeInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Validates media mappings.

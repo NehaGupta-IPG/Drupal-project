@@ -16,7 +16,6 @@ use Drupal\serialization\Normalizer\JsonSchemaReflectionTrait;
 use Drupal\serialization\Normalizer\SchematicNormalizerTrait;
 use Drupal\serialization\Normalizer\SerializedColumnNormalizerTrait;
 use Drupal\serialization\Serializer\JsonSchemaProviderSerializerInterface;
-use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**

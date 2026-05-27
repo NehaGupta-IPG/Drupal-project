@@ -19,7 +19,6 @@ use Drupal\Core\Logger\LoggerChannelTrait;
 use Drupal\Core\TypedData\DataReferenceTargetDefinition;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
 
 /**
  * Provides a repository of all JSON:API resource types.

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media\Kernel;
 
-use Drupal\media\OEmbed\ProviderException;
 use Drupal\media\OEmbed\ProviderRepository;
 use GuzzleHttp\Psr7\Utils;
 use PHPUnit\Framework\Attributes\CoversClass;

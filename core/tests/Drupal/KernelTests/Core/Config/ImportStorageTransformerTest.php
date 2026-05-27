@@ -7,7 +7,6 @@ namespace Drupal\KernelTests\Core\Config;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\ImportStorageTransformer;
 use Drupal\Core\Config\MemoryStorage;
-use Drupal\Core\Config\StorageTransformerException;
 use Drupal\Core\Lock\NullLockBackend;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;

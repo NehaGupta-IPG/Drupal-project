@@ -11,7 +11,6 @@ use Drupal\Core\Site\Settings;
 use Drupal\package_manager\ExecutableFinder;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
-use PhpTuf\ComposerStager\API\Exception\LogicException;
 use PhpTuf\ComposerStager\API\Finder\Service\ExecutableFinderInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;

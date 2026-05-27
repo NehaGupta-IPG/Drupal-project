@@ -6,7 +6,6 @@ namespace Drupal\Core\Config\Action\Plugin\ConfigAction;
 
 use Drupal\Core\Config\Action\Attribute\ConfigAction;
 use Drupal\Core\Config\Action\ConfigActionPluginInterface;
-use Drupal\Core\Config\Action\EntityMethodException;
 use Drupal\Core\Config\Action\Exists;
 use Drupal\Core\Config\Action\Plugin\ConfigAction\Deriver\EntityMethodDeriver;
 use Drupal\Core\Config\ConfigManagerInterface;

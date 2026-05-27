@@ -6,7 +6,6 @@ namespace Drupal\default_admin\Hook;
 
 use Drupal\default_admin\Helper;
 use Drupal\default_admin\Settings;
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Block\BlockManagerInterface;
