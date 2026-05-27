@@ -1389,6 +1389,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     if (!NestedArray::keyExists($form_state->getValues(), $element['#parents'])) {
       $form_state->setValueForElement($element, $element['#value']);
     }
+
+    $element['#pre_render'][] = '\Drupal\Core\Render\Element\FormElementBase::preRenderRequiredElementTitle';
   }
 
   /**

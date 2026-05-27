@@ -4,6 +4,7 @@ namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 
 /**
@@ -219,6 +220,33 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
       $metadata
         ->merge(BubbleableMetadata::createFromObject($access))
         ->applyTo($element);
+    }
+
+    return $element;
+  }
+
+  /**
+   * Render API callback: Appends "(required)" to element '#title'.
+   *
+   * This function is assigned as a #pre_render callback to all input elements
+   * in \Drupal\Core\Form\FormBuilder::handleInputElement() and in other
+   * render elements' ::getInfo() as needed.
+   *
+   * @param array $element
+   *   An associative array containing the properties and children of the
+   *   element.
+   *
+   * @return array
+   *   The modified element with all group members.
+   */
+  public static function preRenderRequiredElementTitle($element): array {
+    // Add "(required)" to '#title' of required elements.
+    // Drupal currently allows empty '#title' values to hide labels.
+    // We don't want to blindly add text to these.
+    // We also don't want to add "(required)" with HTML to 'title' attributes.
+    // @todo Adjust condition after https://www.drupal.org/i/933004.
+    if (!empty($element['#required']) && !empty($element['#title']) && $element['#title_display'] !== 'attribute') {
+      $element['#title'] = new TranslatableMarkup('@title <span aria-hidden="true" class="hidden"> (required)</span>', ['@title' => $element['#title']]);
     }
 
     return $element;

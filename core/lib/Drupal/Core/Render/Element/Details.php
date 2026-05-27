@@ -91,6 +91,9 @@ class Details extends RenderElementBase {
       }
     }
 
+    // Add required indicator for details elements within forms.
+    $element = FormElementBase::preRenderRequiredElementTitle($element);
+
     return $element;
   }
 
