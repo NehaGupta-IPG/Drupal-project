@@ -3,6 +3,7 @@
 namespace Drupal\views\Hook;
 
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Component\Render\Markup;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -402,9 +403,17 @@ class ViewsThemeHooks {
    *     views_view_grouping render array (for non-leaf levels) or the style's
    *     own render array (for the leaf level). Always an indexed array so that
    *     templates can iterate over it consistently.
-   *   - title: The group heading.
+   *   - title: The group heading. Converted to a Markup object by this
+   *     function so that Twig does not double-escape the already-HTML-escaped
+   *     rendered field value.
    */
   public function preprocessViewsViewGrouping(array &$variables): void {
+    // The group title is built by concatenating a plain-text label with an
+    // already-HTML-escaped rendered field value, so the result is a plain PHP
+    // string that contains HTML entities. Mark it as safe to prevent Twig from
+    // double-escaping it.
+    $variables['title'] = Markup::create((string) $variables['title']);
+
     $rows = $variables['rows'];
     $first = reset($rows);
     if (!empty($rows) && is_array($first) && isset($first['group'])) {
