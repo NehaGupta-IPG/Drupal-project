@@ -11,8 +11,8 @@ use Drupal\language\ConfigurableLanguageInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\locale\LocaleDefaultOptions;
-use Drupal\locale\LocaleFetch;
+use Drupal\locale\StreamWrapper\TranslationsStream;
+use Drupal\locale\File\LocaleFileManager;
 
 /**
  * Hook implementations for locale.
@@ -127,7 +127,7 @@ class LocaleHooks {
     \Drupal::service('locale.storage')->deleteTranslations(['language' => $language->id()]);
     // Remove interface translation files.
     \Drupal::moduleHandler()->loadInclude('locale', 'inc', 'locale.bulk');
-    locale_translate_delete_translation_files([], [$language->id()]);
+    \Drupal::service(LocaleFileManager::class)->deleteTranslationFiles([], [$language->id()]);
     // Remove translated configuration objects.
     \Drupal::service('locale.config_manager')->deleteLanguageTranslations($language->id());
     // Changing the language settings impacts the interface:
@@ -172,62 +172,6 @@ class LocaleHooks {
   public function themesUninstalled($themes): void {
     $components['theme'] = $themes;
     locale_system_remove($components);
-  }
-
-  /**
-   * Implements hook_cron().
-   *
-   * @see \Drupal\locale\Plugin\QueueWorker\LocaleTranslation
-   */
-  #[Hook('cron')]
-  public function cron(): void {
-    // Update translations only when an update frequency was set by the admin
-    // and a translatable language was set.
-    // Update tasks are added to the queue here but processed by Drupal's cron.
-    if (\Drupal::config('locale.settings')->get('translation.update_interval_days') && locale_translatable_language_list()) {
-      $updates = [];
-      $config = \Drupal::config('locale.settings');
-
-      // Determine which project+language should be updated.
-      $request_time = \Drupal::time()->getRequestTime();
-      $last = $request_time - $config->get('translation.update_interval_days') * 3600 * 24;
-      $projects = \Drupal::service('locale.project')->getAll();
-      $projects = array_filter($projects, function ($project) {
-        return $project['status'] == 1;
-      });
-      $connection = \Drupal::database();
-      $files = $connection->select('locale_file', 'f')
-        ->condition('f.project', array_keys($projects), 'IN')
-        ->condition('f.last_checked', $last, '<')
-        ->fields('f', ['project', 'langcode'])
-        ->execute()->fetchAll();
-      foreach ($files as $file) {
-        $updates[$file->project][] = $file->langcode;
-
-        // Update the last_checked timestamp of the project+language that will
-        // be checked for updates.
-        $connection->update('locale_file')
-          ->fields(['last_checked' => $request_time])
-          ->condition('project', $file->project)
-          ->condition('langcode', $file->langcode)
-          ->execute();
-      }
-
-      // For each project+language combination a number of tasks are added to
-      // the queue.
-      if ($updates) {
-        \Drupal::moduleHandler()->loadInclude('locale', 'inc', 'locale.fetch');
-        $options = LocaleDefaultOptions::updateOptions();
-        $queue = \Drupal::queue('locale_translation', TRUE);
-
-        foreach ($updates as $project => $languages) {
-          $batch = \Drupal::service(LocaleFetch::class)->batchUpdateBuild([$project], $languages, $options);
-          foreach ($batch['operations'] as $item) {
-            $queue->createItem($item);
-          }
-        }
-      }
-    }
   }
 
   /**
@@ -361,21 +305,14 @@ class LocaleHooks {
   #[Hook('form_system_file_system_settings_alter')]
   public function formSystemFileSystemSettingsAlter(&$form, FormStateInterface $form_state) : void {
     $form['translation_path'] = [
-      '#type' => 'textfield',
+      '#type' => 'item',
       '#title' => $this->t('Interface translations directory'),
-      '#default_value' => \Drupal::configFactory()->getEditable('locale.settings')->get('translation.path'),
-      '#maxlength' => 255,
-      '#description' => $this->t('A local file system path where interface translation files will be stored.'),
-      '#required' => TRUE,
-      '#after_build' => [
-        'system_check_directory',
-      ],
-      '#weight' => 10,
+      '#markup' => TranslationsStream::basePath(),
+      '#description' => $this->t('A local file system path where interface translation files will be stored. This must be changed in settings.php file as the "locale_translation_path" setting.'),
     ];
     if ($form['file_default_scheme']) {
       $form['file_default_scheme']['#weight'] = 20;
     }
-    $form['#submit'][] = 'locale_system_file_system_settings_submit';
   }
 
 }

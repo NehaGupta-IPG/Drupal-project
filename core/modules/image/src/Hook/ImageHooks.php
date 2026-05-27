@@ -13,6 +13,8 @@ use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\image\ImageDerivativeUtilities;
+use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 use Drupal\image\ImageConfigUpdater;
 
 /**
@@ -23,6 +25,8 @@ class ImageHooks {
   use StringTranslationTrait;
 
   public function __construct(
+    #[AutowireServiceClosure(ImageDerivativeUtilities::class)]
+    protected readonly \Closure $imageDerivativeUtilitiesClosure,
     private readonly ImageConfigUpdater $imageConfigUpdater,
   ) {}
 
@@ -144,8 +148,9 @@ class ImageHooks {
    */
   #[Hook('file_move')]
   public function fileMove(FileInterface $file, FileInterface $source): void {
+    $imageDerivativeUtilities = ($this->imageDerivativeUtilitiesClosure)();
     // Delete any image derivatives at the original image path.
-    image_path_flush($source->getFileUri());
+    $imageDerivativeUtilities->pathFlush($source->getFileUri());
   }
 
   /**
@@ -153,8 +158,9 @@ class ImageHooks {
    */
   #[Hook('file_predelete')]
   public function filePredelete(FileInterface $file): void {
+    $imageDerivativeUtilities = ($this->imageDerivativeUtilitiesClosure)();
     // Delete any image derivatives of this image.
-    image_path_flush($file->getFileUri());
+    $imageDerivativeUtilities->pathFlush($file->getFileUri());
   }
 
   /**
