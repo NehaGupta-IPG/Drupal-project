@@ -54,7 +54,7 @@ class ElementsDetailsTest extends KernelTestBase implements FormInterface {
   public function validateForm(array &$form, FormStateInterface $form_state): void {}
 
   /**
-   * Tests markup for required details elements.
+   * Tests markup for required details elements in forms.
    */
   public function testDetailsRequired(): void {
     $form = \Drupal::formBuilder()->getForm($this);

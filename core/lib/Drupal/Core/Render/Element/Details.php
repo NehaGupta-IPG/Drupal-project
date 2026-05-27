@@ -53,6 +53,8 @@ class Details extends RenderElementBase {
       '#pre_render' => [
         [static::class, 'preRenderDetails'],
         [static::class, 'preRenderGroup'],
+        // Add required indicator for details elements within forms.
+        [FormElementBase::class, 'preRenderRequiredElementTitle'],
       ],
       '#theme_wrappers' => ['details'],
     ];
@@ -90,9 +92,6 @@ class Details extends RenderElementBase {
         $element['#printed'] = TRUE;
       }
     }
-
-    // Add required indicator for details elements within forms.
-    $element = FormElementBase::preRenderRequiredElementTitle($element);
 
     return $element;
   }
