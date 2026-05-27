@@ -184,8 +184,8 @@ class TextTrimmedFormatter extends FormatterBase implements TrustedCallbackInter
    *    - #text_summary_wordsafe: If TRUE, attempt to truncate on a word
    *      boundary.
    *      (used by \Drupal\text\TextSummary::generate())
-   *    - #text_summary_breakpoints: If TRUE, attempt to truncate on a breakpoints
-   *      as end of paragraph, line break or end of a sentence.
+   *    - #text_summary_breakpoints: If TRUE, attempt to truncate on a
+   *      breakpoints as end of paragraph, line break or end of a sentence.
    *      (used by \Drupal\text\TextSummary::generate())
    *    - #text_summary_add_ellipsis: If TRUE, add '...' to the end of the
    *      truncated string.

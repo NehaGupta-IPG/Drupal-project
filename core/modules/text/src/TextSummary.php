@@ -103,17 +103,17 @@ class TextSummary {
     // @todo split settings to "by breakpoint end of" : paragraph, line, sentence.
     if ($breakpoints) {
 
-      // Store the actual length of the UTF8 string -- which might not be the same
-      // as $size.
+      // Store the actual length of the UTF8 string -- which might not be the
+      // same as $size.
       $max_right_pos = strlen($summary);
 
-      // How much to cut off the end of the summary so that it doesn't end in the
-      // middle of a paragraph, sentence, or word.
+      // How much to cut off the end of the summary so that it doesn't end in
+      // the middle of a paragraph, sentence, or word.
       // Initialize it to maximum in order to find the minimum.
       $min_right_pos = $max_right_pos;
 
-      // Store the reverse of the summary. We use strpos on the reversed needle and
-      // haystack for speed and convenience.
+      // Store the reverse of the summary. We use strpos on the reversed needle
+      // and haystack for speed and convenience.
       $reversed = strrev($summary);
 
       // Build an array of arrays of break points grouped by preference.
@@ -134,8 +134,8 @@ class TextSummary {
       // If the first paragraph is too long, split at the end of a sentence.
       $break_points[] = ['. ' => 1, '! ' => 1, '? ' => 1, 'ã€‚' => 0, 'ØŸ ' => 1];
 
-      // If trim on breakpoints is used then track if ellipsis have been added and
-      // remove it so that to be added after the breakpoints trim.
+      // If trim on breakpoints is used then track if ellipsis have been added
+      // and remove it so that to be added after the breakpoints trim.
       if (($pos_ellipsis = strrpos($summary, 'Ã¢â‚¬Â¦')) !== FALSE) {
         $summary = substr($summary, 0, $pos_ellipsis);
       }
