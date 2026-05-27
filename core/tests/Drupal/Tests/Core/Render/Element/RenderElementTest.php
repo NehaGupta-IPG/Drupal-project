@@ -130,45 +130,6 @@ class RenderElementTest extends UnitTestCase {
   }
 
   /**
-   * Tests pre render ajax form with suppress_required_fields_validation.
-   */
-  public function testPreRenderAjaxFormWithSuppressRequiredFieldsValidation(): void {
-    $request = Request::create('/test');
-    $request->query->set('foo', 'bar');
-    $this->requestStack->push($request);
-
-    $prophecy = $this->prophesize('Drupal\Core\Routing\UrlGeneratorInterface');
-    $url = '/test?foo=bar&ajax_form=1&ajax_skip_required_validation=1';
-    $prophecy->generateFromRoute('<current>', [], [
-      'query' => [
-        'foo' => 'bar',
-        FormBuilderInterface::AJAX_FORM_REQUEST => TRUE,
-        FormBuilderInterface::AJAX_SKIP_REQUIRED_VALIDATION => TRUE,
-      ],
-    ], TRUE)
-      ->willReturn((new GeneratedUrl())->setCacheContexts(['route'])
-        ->setGeneratedUrl($url));
-
-    $url_generator = $prophecy->reveal();
-    $this->container->set('url_generator', $url_generator);
-
-    $element = [
-      '#type' => 'select',
-      '#id' => 'test',
-      '#ajax' => [
-        'wrapper' => 'foo',
-        'callback' => 'test-callback',
-        'suppress_required_fields_validation' => TRUE,
-      ],
-    ];
-
-    $element = RenderElementBase::preRenderAjaxForm($element);
-
-    $this->assertTrue($element['#ajax_processed']);
-    $this->assertEquals($url, $element['#attached']['drupalSettings']['ajax']['test']['url']);
-  }
-
-  /**
    * Tests set attributes.
    */
   #[DataProvider('providerTestSetAttributes')]

@@ -404,13 +404,13 @@ class FormValidatorTest extends UnitTestCase {
   }
 
   /**
-   * Tests that required error is suppressed during AJAX with suppression flag.
+   * Tests required error is suppressed when the triggering element opts in.
    *
    * @legacy-covers ::doValidateForm
    */
   public function testRequiredErrorMessageSuppressedForAjax(): void {
     $request_stack = new RequestStack();
-    $request = Request::create('/test?' . FormBuilderInterface::AJAX_FORM_REQUEST . '=1&' . FormBuilderInterface::AJAX_SKIP_REQUIRED_VALIDATION . '=1');
+    $request = Request::create('/test?' . FormBuilderInterface::AJAX_FORM_REQUEST . '=1');
     $request_stack->push($request);
 
     $form_validator = $this->getMockBuilder('Drupal\Core\Form\FormValidator')
@@ -439,13 +439,25 @@ class FormValidatorTest extends UnitTestCase {
     $form_state = $this->getMockBuilder('Drupal\Core\Form\FormState')
       ->onlyMethods(['setError'])
       ->getMock();
+    // The triggering element opts in to required-field suppression in its
+    // server-side #ajax definition. #limit_validation_errors is set to FALSE
+    // (the button default) so the generic limit-validation suppression does not
+    // interfere, isolating the behavior under test.
+    $form_state->setTriggeringElement([
+      '#limit_validation_errors' => FALSE,
+      '#ajax' => ['suppress_required_fields_validation' => TRUE],
+    ]);
     $form_state->expects($this->never())
       ->method('setError');
     $form_validator->validateForm('test_form_id', $form, $form_state);
   }
 
   /**
-   * Tests that required error is still set for AJAX without suppression flag.
+   * Tests that an AJAX request alone cannot suppress required validation.
+   *
+   * The suppression is gated on the server-side #ajax opt-in of the triggering
+   * element, so a crafted AJAX request whose triggering element did not opt in
+   * must still raise the required error.
    *
    * @legacy-covers ::doValidateForm
    */
@@ -480,6 +492,11 @@ class FormValidatorTest extends UnitTestCase {
     $form_state = $this->getMockBuilder('Drupal\Core\Form\FormState')
       ->onlyMethods(['setError'])
       ->getMock();
+    // The triggering element did not opt in to suppression, so the required
+    // error must still be set even though this is an AJAX request.
+    $form_state->setTriggeringElement([
+      '#limit_validation_errors' => FALSE,
+    ]);
     $form_state->expects($this->once())
       ->method('setError')
       ->with($this->isArray(), 'Test field is required.');

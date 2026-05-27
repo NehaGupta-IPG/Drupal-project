@@ -375,11 +375,6 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
         // to hide the password field dynamically.
         $settings['options']['query'] += \Drupal::request()->query->all();
         $settings['options']['query'][FormBuilderInterface::AJAX_FORM_REQUEST] = TRUE;
-        // Set query option to enforce validation suppression of required
-        // fields.
-        if (isset($settings['suppress_required_fields_validation']) && $settings['suppress_required_fields_validation'] === TRUE) {
-          $settings['options']['query'][FormBuilderInterface::AJAX_SKIP_REQUIRED_VALIDATION] = TRUE;
-        }
       }
 
       // Convert \Drupal\Core\Url object to string.

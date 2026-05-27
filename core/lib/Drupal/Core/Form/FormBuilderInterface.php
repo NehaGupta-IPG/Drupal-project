@@ -28,11 +28,6 @@ interface FormBuilderInterface {
   const HTMX_REQUEST = 'HX-Request';
 
   /**
-   * Request key for AJAX forms to suppress validation of required fields.
-   */
-  const AJAX_SKIP_REQUIRED_VALIDATION = 'ajax_skip_required_validation';
-
-  /**
    * Determines the ID of a form.
    *
    * @param \Drupal\Core\Form\FormInterface|string $form_arg
