@@ -227,6 +227,7 @@ trait PerformanceTestTrait {
     }
     elseif (str_starts_with($query, 'SELECT "session" FROM "sessions"')) {
       $args[':sid'] = 'SESSION_ID';
+      $args[':timestamp'] = 'TIMESTAMP';
     }
     elseif (str_starts_with($query, 'SELECT 1 AS "expression" FROM "sessions"')) {
       $args[':db_condition_placeholder_0'] = 'SESSION_ID';
