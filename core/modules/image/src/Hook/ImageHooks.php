@@ -16,7 +16,6 @@ use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\image\ImageDerivativeUtilities;
 use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 use Drupal\image\ImageConfigUpdater;
-use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 
 /**
  * Hook implementations for image.
