@@ -31,7 +31,7 @@ class ResizePolicySettingUpdateTest extends UpdatePathTestBase {
   /**
    * Tests image_post_update_add_resize_policy().
    */
-  public function testSystemPostUpdateLinksetSettings(): void {
+  public function testImagePostUpdateAddResizePolicy(): void {
     $storage = \Drupal::entityTypeManager()->getStorage('field_config');
     $imageFields = $storage->loadMultiple();
     $imagesProcessed = FALSE;
