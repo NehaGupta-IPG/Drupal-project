@@ -64,7 +64,7 @@ class ResponseStatusTest extends KernelTestBase {
     }
     else {
       $request = new Request();
-      $request->attributes->set('exception', new HttpException($response_code));
+      $request->attributes->set('exception', new \Symfony\Component\HttpKernel\Exception\HttpException($response_code));
     }
     $request->setSession(new Session(new MockArraySessionStorage()));
     $this->requestStack->push($request);

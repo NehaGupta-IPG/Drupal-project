@@ -94,7 +94,7 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
     $class = $data_definition->getClass();
 
     if (!isset($class)) {
-      throw new PluginException(sprintf('The plugin (%s) did not specify an instance class.', $data_type));
+      throw new \Drupal\Component\Plugin\Exception\PluginException(sprintf('The plugin (%s) did not specify an instance class.', $data_type));
     }
     $typed_data = $class::createInstance($data_definition, $configuration['name'], $configuration['parent']);
     $typed_data->setTypedDataManager($this);

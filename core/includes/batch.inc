@@ -45,7 +45,7 @@ function _batch_page(Request $request) {
     $batch = \Drupal::service('batch.storage')->load($request_id);
     if (!$batch) {
       \Drupal::messenger()->addError(t('No batch with ID @batch exists.', ['@batch' => $request_id]));
-      throw new NotFoundHttpException(sprintf('No batch with ID %s exists.', $request_id));
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException(sprintf('No batch with ID %s exists.', $request_id));
     }
   }
 

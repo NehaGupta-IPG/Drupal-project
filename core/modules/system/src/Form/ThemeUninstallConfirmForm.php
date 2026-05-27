@@ -83,7 +83,7 @@ class ThemeUninstallConfirmForm extends ConfirmFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state, #[MapQueryParameter] string $theme = ''): RedirectResponse|array {
     if (empty($theme)) {
-      throw new AccessDeniedHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
     }
 
     // Get current list of themes.

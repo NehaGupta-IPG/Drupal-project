@@ -59,7 +59,7 @@ trait ContextAwarePluginTrait {
   public function setContext($name, ComponentContextInterface $context) {
     // Check that the context passed is an instance of our extended interface.
     if (!$context instanceof ContextInterface) {
-      throw new ContextException("Passed $name context must be an instance of \\Drupal\\Core\\Plugin\\Context\\ContextInterface");
+      throw new \Drupal\Component\Plugin\Exception\ContextException("Passed $name context must be an instance of \\Drupal\\Core\\Plugin\\Context\\ContextInterface");
     }
     $this->context[$name] = $context;
   }
@@ -149,7 +149,7 @@ trait ContextAwarePluginTrait {
     elseif (!empty($definition['context_definitions'][$name])) {
       return $definition['context_definitions'][$name];
     }
-    throw new ContextException(sprintf("The %s context is not a valid context.", $name));
+    throw new \Drupal\Component\Plugin\Exception\ContextException(sprintf("The %s context is not a valid context.", $name));
   }
 
   /**

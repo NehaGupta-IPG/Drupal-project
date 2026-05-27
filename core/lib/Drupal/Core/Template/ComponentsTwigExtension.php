@@ -126,8 +126,8 @@ final class ComponentsTwigExtension extends AbstractExtension {
         $this->pluginManager->find($component_id)
       );
     }
-    catch (ComponentNotFoundException $e) {
-      throw new InvalidComponentException($e->getMessage(), $e->getCode(), $e);
+    catch (\Drupal\Core\Render\Component\Exception\ComponentNotFoundException $e) {
+      throw new \Drupal\Core\Render\Component\Exception\InvalidComponentException($e->getMessage(), $e->getCode(), $e);
     }
   }
 

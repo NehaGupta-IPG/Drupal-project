@@ -88,7 +88,7 @@ class ConfigActionsTest extends KernelTestBase {
   #[TestWith(["placeBlockInDefaultTheme"])]
   #[TestWith(["placeBlockInAdminTheme"])]
   public function testPlaceBlockActionOnlyWorksOnBlocks(string $action): void {
-    $this->expectException(PluginNotFoundException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\PluginNotFoundException::class);
     $this->expectExceptionMessage("The \"user_role\" entity does not support the \"$action\" config action.");
     $this->configActionManager->applyAction($action, 'user.role.anonymous', []);
   }
@@ -131,7 +131,7 @@ class ConfigActionsTest extends KernelTestBase {
     $this->assertSame($expected_theme, $block->getTheme());
     $this->assertSame($expected_region, $block->getRegion());
 
-    $this->expectException(ConfigActionException::class);
+    $this->expectException(\Drupal\Core\Config\Action\ConfigActionException::class);
     $this->expectExceptionMessage('Cannot determine which region to place this block into, because no default region was provided.');
     $this->configActionManager->applyAction($action, 'block.block.no_region', [
       'plugin' => 'system_powered_by_block',

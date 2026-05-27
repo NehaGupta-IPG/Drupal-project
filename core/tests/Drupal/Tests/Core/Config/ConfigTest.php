@@ -274,7 +274,7 @@ class ConfigTest extends UnitTestCase {
    * Tests set validation.
    */
   public function testSetValidation(): void {
-    $this->expectException(ConfigValueException::class);
+    $this->expectException(\Drupal\Core\Config\ConfigValueException::class);
     $this->config->set('testData', ['dot.key' => 1]);
   }
 

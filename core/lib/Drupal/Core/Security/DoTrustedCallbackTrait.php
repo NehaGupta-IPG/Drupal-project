@@ -99,7 +99,7 @@ trait DoTrustedCallbackTrait {
         @trigger_error($message, E_USER_DEPRECATED);
       }
       else {
-        throw new UntrustedCallbackException($message);
+        throw new \Drupal\Core\Security\UntrustedCallbackException($message);
       }
     }
 

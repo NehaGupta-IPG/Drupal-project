@@ -516,7 +516,7 @@ trait FunctionalTestSetupTrait {
         $success = $container->get('module_installer')->install($modules, TRUE);
         $this->assertTrue($success, 'Enabled modules: ' . implode(', ', $modules));
       }
-      catch (MissingDependencyException $e) {
+      catch (\Drupal\Core\Extension\MissingDependencyException $e) {
         // The exception message has all the details.
         $this->fail($e->getMessage());
       }

@@ -134,7 +134,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
       $this->schema->addIndex('test_table_index_length', 'test_separate', [['test_field_text', 200]], $missing_field_spec);
       $this->fail('SchemaException not thrown when adding index with missing information.');
     }
-    catch (SchemaException $e) {
+    catch (\Drupal\Core\Database\SchemaException $e) {
       $this->assertEquals($expected_exception_message, $e->getMessage());
     }
 
@@ -148,7 +148,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
       $this->schema->addIndex('test_table_index_length', 'test_separate', [['test_field_text', 200]], $table_specification);
       $this->fail('\Drupal\Core\Database\SchemaObjectExistsException exception missed.');
     }
-    catch (SchemaObjectExistsException) {
+    catch (\Drupal\Core\Database\SchemaObjectExistsException) {
       // Expected exception; just continue testing.
     }
 
@@ -156,7 +156,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
       $this->schema->addIndex('test_table_non_existing', 'test_separate', [['test_field_text', 200]], $table_specification);
       $this->fail('\Drupal\Core\Database\SchemaObjectDoesNotExistException exception missed.');
     }
-    catch (SchemaObjectDoesNotExistException) {
+    catch (\Drupal\Core\Database\SchemaObjectDoesNotExistException) {
       // Expected exception; just continue testing.
     }
 
@@ -260,7 +260,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
    * Tests SchemaTableKeyTooLargeException.
    */
   public function testSchemaTableKeyTooLargeException(): void {
-    $this->expectException(SchemaTableKeyTooLargeException::class);
+    $this->expectException(\Drupal\Core\Database\Exception\SchemaTableKeyTooLargeException::class);
     $this->schema->createTable('test_schema', [
       'description' => 'Tests SchemaTableKeyTooLargeException.',
       'fields' => [
@@ -306,7 +306,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
    * Tests SchemaTableColumnSizeTooLargeException.
    */
   public function testSchemaTableColumnSizeTooLargeException(): void {
-    $this->expectException(SchemaTableColumnSizeTooLargeException::class);
+    $this->expectException(\Drupal\Core\Database\Exception\SchemaTableColumnSizeTooLargeException::class);
     $this->expectExceptionMessage("Column length too big for column 'too_large' (max = 16383); use BLOB or TEXT instead");
     $this->schema->createTable('test_schema', [
       'description' => 'Tests SchemaTableColumnSizeTooLargeException.',

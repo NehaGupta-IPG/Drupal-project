@@ -172,7 +172,7 @@ class DerivativeDiscoveryDecoratorTest extends UnitTestCase {
 
     $discovery = new DerivativeDiscoveryDecorator($this->discoveryMain);
 
-    $this->expectException(InvalidDeriverException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\InvalidDeriverException::class);
     $this->expectExceptionMessage('Plugin (non_existent_discovery) deriver "\Drupal\system\Tests\Plugin\NonExistentDeriver" does not exist.');
     $discovery->getDefinitions();
   }
@@ -194,7 +194,7 @@ class DerivativeDiscoveryDecoratorTest extends UnitTestCase {
       ->willReturn($definitions);
 
     $discovery = new DerivativeDiscoveryDecorator($this->discoveryMain);
-    $this->expectException(InvalidDeriverException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\InvalidDeriverException::class);
     $this->expectExceptionMessage('Plugin (non_existent_discovery) deriver "\Drupal\system\Tests\Plugin\NonExistentDeriver" does not exist.');
     $discovery->getDefinitions();
   }
@@ -216,7 +216,7 @@ class DerivativeDiscoveryDecoratorTest extends UnitTestCase {
       ->willReturn($definitions);
 
     $discovery = new DerivativeDiscoveryDecorator($this->discoveryMain);
-    $this->expectException(InvalidDeriverException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\InvalidDeriverException::class);
     $this->expectExceptionMessage('Plugin (invalid_discovery) deriver "\Drupal\KernelTests\Core\Plugin\DerivativeTest" must implement \Drupal\Component\Plugin\Derivative\DeriverInterface.');
     $discovery->getDefinitions();
   }

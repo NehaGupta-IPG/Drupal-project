@@ -26,7 +26,7 @@ class ToolbarItemConstraintValidator extends ConstraintValidator implements Cont
    */
   public function validate($toolbar_item, Constraint $constraint): void {
     if (!$constraint instanceof ToolbarItemConstraint) {
-      throw new UnexpectedTypeException($constraint, __NAMESPACE__ . '\ToolbarItem');
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($constraint, __NAMESPACE__ . '\ToolbarItem');
     }
 
     if ($toolbar_item === NULL) {

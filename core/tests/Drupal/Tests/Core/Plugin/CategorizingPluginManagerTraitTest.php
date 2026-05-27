@@ -47,7 +47,7 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
         if ($argument == 'node') {
           return 'Node';
         }
-        throw new UnknownExtensionException();
+        throw new \Drupal\Core\Extension\Exception\UnknownExtensionException();
       });
     $this->pluginManager = new CategorizingPluginManager($module_handler, $module_extension_list);
     $this->pluginManager->setStringTranslation($this->getStringTranslationStub());

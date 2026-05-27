@@ -113,10 +113,10 @@ class CheckProvider implements CheckProviderInterface {
       $check = $this->container->get($service_id);
 
       if (!($check instanceof AccessInterface)) {
-        throw new AccessException('All access checks must implement AccessInterface.');
+        throw new \Drupal\Core\Access\AccessException('All access checks must implement AccessInterface.');
       }
       if (!is_callable([$check, $this->checkMethods[$service_id]])) {
-        throw new AccessException(sprintf('Access check method %s in service %s must be callable.', $this->checkMethods[$service_id], $service_id));
+        throw new \Drupal\Core\Access\AccessException(sprintf('Access check method %s in service %s must be callable.', $this->checkMethods[$service_id], $service_id));
       }
 
       $this->checks[$service_id] = $check;

@@ -76,29 +76,29 @@ class DefaultFactory implements FactoryInterface {
     $missing_class_message = sprintf('The plugin (%s) did not specify an instance class.', $plugin_id);
     if (is_array($plugin_definition)) {
       if (empty($plugin_definition['class'])) {
-        throw new PluginException($missing_class_message);
+        throw new \Drupal\Component\Plugin\Exception\PluginException($missing_class_message);
       }
 
       $class = $plugin_definition['class'];
     }
     elseif ($plugin_definition instanceof PluginDefinitionInterface) {
       if (!$plugin_definition->getClass()) {
-        throw new PluginException($missing_class_message);
+        throw new \Drupal\Component\Plugin\Exception\PluginException($missing_class_message);
       }
 
       $class = $plugin_definition->getClass();
     }
     else {
       $plugin_definition_type = is_object($plugin_definition) ? get_class($plugin_definition) : gettype($plugin_definition);
-      throw new PluginException(sprintf('%s can only handle plugin definitions that are arrays or that implement %s, but %s given.', __CLASS__, PluginDefinitionInterface::class, $plugin_definition_type));
+      throw new \Drupal\Component\Plugin\Exception\PluginException(sprintf('%s can only handle plugin definitions that are arrays or that implement %s, but %s given.', __CLASS__, PluginDefinitionInterface::class, $plugin_definition_type));
     }
 
     if (!class_exists($class)) {
-      throw new PluginException(sprintf('Plugin (%s) instance class "%s" does not exist.', $plugin_id, $class));
+      throw new \Drupal\Component\Plugin\Exception\PluginException(sprintf('Plugin (%s) instance class "%s" does not exist.', $plugin_id, $class));
     }
 
     if ($required_interface && !is_subclass_of($class, $required_interface)) {
-      throw new PluginException(sprintf('Plugin "%s" (%s) must implement interface %s.', $plugin_id, $class, $required_interface));
+      throw new \Drupal\Component\Plugin\Exception\PluginException(sprintf('Plugin "%s" (%s) must implement interface %s.', $plugin_id, $class, $required_interface));
     }
 
     return $class;

@@ -84,11 +84,11 @@ final class CKEditor5PluginDefinition extends PluginDefinition implements Plugin
    */
   public static function validateCKEditor5Aspects(string $id, array $definition): void {
     if (!isset($definition['ckeditor5'])) {
-      throw new InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition must contain a "ckeditor5" key.', $id));
+      throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition must contain a "ckeditor5" key.', $id));
     }
 
     if (!isset($definition['ckeditor5']['plugins'])) {
-      throw new InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition must contain a "ckeditor5.plugins" key.', $id));
+      throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition must contain a "ckeditor5.plugins" key.', $id));
     }
 
     // Automatic link decorators make sense in CKEditor 5, where the generated
@@ -100,7 +100,7 @@ final class CKEditor5PluginDefinition extends PluginDefinition implements Plugin
       if (isset($definition['ckeditor5']['config']['link']['decorators']) && is_array($definition['ckeditor5']['config']['link']['decorators'])) {
         foreach ($definition['ckeditor5']['config']['link']['decorators'] as $decorator) {
           if ($decorator['mode'] === 'automatic') {
-            throw new InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition specifies an automatic decorator, this is not supported. Use the Drupal filter system instead.', $id));
+            throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition specifies an automatic decorator, this is not supported. Use the Drupal filter system instead.', $id));
           }
         }
       }
@@ -108,7 +108,7 @@ final class CKEditor5PluginDefinition extends PluginDefinition implements Plugin
       // special config flag.
       // @see https://ckeditor.com/docs/ckeditor5/latest/api/module_link_link-LinkConfig.html#member-addTargetToExternalLinks
       if (isset($definition['ckeditor5']['config']['link']['addTargetToExternalLinks']) && $definition['ckeditor5']['config']['link']['addTargetToExternalLinks']) {
-        throw new InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition specifies an automatic decorator, this is not supported. Use the Drupal filter system instead.', $id));
+        throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition specifies an automatic decorator, this is not supported. Use the Drupal filter system instead.', $id));
       }
     }
   }
@@ -128,23 +128,23 @@ final class CKEditor5PluginDefinition extends PluginDefinition implements Plugin
    */
   public function validateDrupalAspects(string $id, array $definition): void {
     if (!isset($definition['drupal'])) {
-      throw new InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition must contain a "drupal" key.', $id));
+      throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition must contain a "drupal" key.', $id));
     }
 
     // Without a label, the CKEditor 5 UI, validation constraints et cetera
     // cannot be as informative in guiding the end user.
     if (!isset($definition['drupal']['label'])) {
-      throw new InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition must contain a "drupal.label" key.', $id));
+      throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition must contain a "drupal.label" key.', $id));
     }
     elseif (!is_string($definition['drupal']['label']) && !$definition['drupal']['label'] instanceof TranslatableMarkup) {
-      throw new InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition has a "drupal.label" value that is not a string nor a TranslatableMarkup instance.', $id));
+      throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition has a "drupal.label" value that is not a string nor a TranslatableMarkup instance.', $id));
     }
 
     // Without accurate and complete metadata about what HTML elements a
     // CKEditor 5 plugin supports, Drupal cannot ensure a complete and accurate
     // upgrade path.
     if (!isset($definition['drupal']['elements'])) {
-      throw new InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition must contain a "drupal.elements" key.', $id));
+      throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition must contain a "drupal.elements" key.', $id));
     }
     // ckeditor5_sourceEditing is the edge case here: it is the only plugin that
     // is allowed to return a superset. It's a special case because it is
@@ -157,25 +157,25 @@ final class CKEditor5PluginDefinition extends PluginDefinition implements Plugin
       assert($definition['drupal']['elements'] === []);
     }
     elseif ($definition['drupal']['elements'] !== FALSE && !(is_array($definition['drupal']['elements']) && !empty($definition['drupal']['elements']) && Inspector::assertAllStrings($definition['drupal']['elements']))) {
-      throw new InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition has a "drupal.elements" value that is neither a list of HTML tags/attributes nor false.', $id));
+      throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition has a "drupal.elements" value that is neither a list of HTML tags/attributes nor false.', $id));
     }
     elseif (is_array($definition['drupal']['elements'])) {
       foreach ($definition['drupal']['elements'] as $index => $element) {
         $parsed = HTMLRestrictions::fromString($element);
         if ($parsed->allowsNothing()) {
-          throw new InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition has a value at "drupal.elements.%d" that is not an HTML tag with optional attributes: "%s". Expected structure: "<tag allowedAttribute="allowedValue1 allowedValue2">".', $id, $index, $element));
+          throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition has a value at "drupal.elements.%d" that is not an HTML tag with optional attributes: "%s". Expected structure: "<tag allowedAttribute="allowedValue1 allowedValue2">".', $id, $index, $element));
         }
         if (count($parsed->getAllowedElements()) > 1) {
-          throw new InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition has a value at "drupal.elements.%d": multiple tags listed, should be one: "%s".', $id, $index, $element));
+          throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition has a value at "drupal.elements.%d": multiple tags listed, should be one: "%s".', $id, $index, $element));
         }
       }
     }
 
     if (isset($definition['drupal']['class']) && !class_exists($definition['drupal']['class'])) {
-      throw new InvalidPluginDefinitionException($id, sprintf('The CKEditor 5 "%s" provides a plugin class: "%s", but it does not exist.', $id, $definition['drupal']['class']));
+      throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($id, sprintf('The CKEditor 5 "%s" provides a plugin class: "%s", but it does not exist.', $id, $definition['drupal']['class']));
     }
     elseif (isset($definition['drupal']['class']) && !in_array(CKEditor5PluginInterface::class, class_implements($definition['drupal']['class']))) {
-      throw new InvalidPluginDefinitionException($id, sprintf('CKEditor 5 plugins must implement \Drupal\ckeditor5\Plugin\CKEditor5PluginInterface. "%s" does not.', $id));
+      throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($id, sprintf('CKEditor 5 plugins must implement \Drupal\ckeditor5\Plugin\CKEditor5PluginInterface. "%s" does not.', $id));
     }
     elseif (in_array(CKEditor5PluginConfigurableInterface::class, class_implements($definition['drupal']['class'], TRUE))) {
       $default_configuration = (new \ReflectionClass($definition['drupal']['class']))
@@ -184,11 +184,11 @@ final class CKEditor5PluginDefinition extends PluginDefinition implements Plugin
       if (!empty($default_configuration)) {
         $configuration_name = sprintf("ckeditor5.plugin.%s", $definition['id']);
         if (!$this->getTypedConfig()->hasConfigSchema($configuration_name)) {
-          throw new InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition is configurable, has non-empty default configuration but has no config schema. Config schema is required for validation.', $id));
+          throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition is configurable, has non-empty default configuration but has no config schema. Config schema is required for validation.', $id));
         }
         $error_message = $this->validateConfiguration($default_configuration);
         if ($error_message) {
-          throw new InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition is configurable, but its default configuration does not match its config schema. %s', $id, $error_message));
+          throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition is configurable, but its default configuration does not match its config schema. %s', $id, $error_message));
         }
       }
     }
@@ -222,12 +222,12 @@ final class CKEditor5PluginDefinition extends PluginDefinition implements Plugin
       ];
       $unsupported_condition_types = array_keys(array_diff_key($definition['drupal']['conditions'], $supported_condition_types));
       if (!empty($unsupported_condition_types)) {
-        throw new InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition has a "drupal.conditions" value that contains some unsupported condition types: "%s". Only the following conditions types are supported: "%s".', $id, implode(', ', $unsupported_condition_types), implode('", "', array_keys($supported_condition_types))));
+        throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition has a "drupal.conditions" value that contains some unsupported condition types: "%s". Only the following conditions types are supported: "%s".', $id, implode(', ', $unsupported_condition_types), implode('", "', array_keys($supported_condition_types))));
       }
       foreach ($definition['drupal']['conditions'] as $condition_type => $value) {
         $assessment = $supported_condition_types[$condition_type]($value, $definition);
         if (is_string($assessment)) {
-          throw new InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition has an invalid "drupal.conditions" item. "%s" is set to an invalid value. %s', $id, $condition_type, $assessment));
+          throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition has an invalid "drupal.conditions" item. "%s" is set to an invalid value. %s', $id, $condition_type, $assessment));
         }
       }
     }
@@ -235,7 +235,7 @@ final class CKEditor5PluginDefinition extends PluginDefinition implements Plugin
     if ($definition['drupal']['admin_library'] !== FALSE) {
       [$extension, $library] = explode('/', $definition['drupal']['admin_library'], 2);
       if (\Drupal::service('library.discovery')->getLibraryByName($extension, $library) === FALSE) {
-        throw new InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition has a "drupal.admin_library" key whose asset library "%s" does not exist.', $id, $definition['drupal']['admin_library']));
+        throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition has a "drupal.admin_library" key whose asset library "%s" does not exist.', $id, $definition['drupal']['admin_library']));
       }
     }
   }

@@ -83,7 +83,7 @@ YAML;
       RecipeRunner::processRecipe($recipe);
       $this->fail('An exception should have been thrown.');
     }
-    catch (InvalidConfigException $e) {
+    catch (\Drupal\Core\Recipe\InvalidConfigException $e) {
       $this->assertCount(1, $e->violations);
       $violation = $e->violations->get(0);
       $this->assertSame($label_key, $violation->getPropertyPath());
@@ -123,7 +123,7 @@ YAML;
       $this->createRecipe($recipe_data);
       $this->fail('An exception should have been thrown.');
     }
-    catch (RecipeFileException $e) {
+    catch (\Drupal\Core\Recipe\RecipeFileException $e) {
       $this->assertIsObject($e->violations);
       $this->assertCount(1, $e->violations);
       $this->assertSame('[config][actions][random.config]', $e->violations[0]->getPropertyPath());

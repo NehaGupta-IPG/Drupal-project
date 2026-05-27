@@ -8,5 +8,5 @@ namespace Drupal\Core\File\Exception;
  * A directory can be considered not ready when it either does not exist, or
  * is not writable.
  */
-class DirectoryNotReadyException extends FileException {
+class DirectoryNotReadyException extends \Drupal\Core\File\Exception\FileException {
 }

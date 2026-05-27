@@ -209,15 +209,15 @@ function file_save_upload($form_field_name, $validators = [], $destination = FAL
       }
       $files[$i] = $file;
     }
-    catch (FileExistsException) {
+    catch (\Drupal\Core\File\Exception\FileExistsException) {
       \Drupal::messenger()->addError(t('Destination file "%file" exists', ['%file' => $destination . $uploaded_file->getFilename()]));
       $files[$i] = FALSE;
     }
-    catch (InvalidStreamWrapperException) {
+    catch (\Drupal\Core\File\Exception\InvalidStreamWrapperException) {
       \Drupal::messenger()->addError(t('The file could not be uploaded because the destination "%destination" is invalid.', ['%destination' => $destination]));
       $files[$i] = FALSE;
     }
-    catch (FileWriteException) {
+    catch (\Drupal\Core\File\Exception\FileWriteException) {
       \Drupal::messenger()->addError(t('File upload error. Could not move uploaded file.'));
       \Drupal::logger('file')
         ->notice('Upload error. Could not move uploaded file %file to destination %destination.', [
@@ -226,11 +226,11 @@ function file_save_upload($form_field_name, $validators = [], $destination = FAL
         ]);
       $files[$i] = FALSE;
     }
-    catch (FileException) {
+    catch (\Drupal\Core\File\Exception\FileException) {
       \Drupal::messenger()->addError(t('The file %filename could not be uploaded because the name is invalid.', ['%filename' => $uploaded_file->getClientOriginalName()]));
       $files[$i] = FALSE;
     }
-    catch (LockAcquiringException) {
+    catch (\Drupal\Core\Lock\LockAcquiringException) {
       \Drupal::messenger()->addError(t('File already locked for writing.'));
       $files[$i] = FALSE;
     }

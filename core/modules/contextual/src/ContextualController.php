@@ -45,19 +45,19 @@ class ContextualController implements ContainerInjectionInterface {
    */
   public function render(Request $request) {
     if (!$request->request->has('ids')) {
-      throw new BadRequestHttpException('No contextual ids specified.');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('No contextual ids specified.');
     }
     $ids = $request->request->all('ids');
 
     if (!$request->request->has('tokens')) {
-      throw new BadRequestHttpException('No contextual ID tokens specified.');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('No contextual ID tokens specified.');
     }
     $tokens = $request->request->all('tokens');
 
     $rendered = [];
     foreach ($ids as $key => $id) {
       if (!isset($tokens[$key]) || !hash_equals($tokens[$key], Crypt::hmacBase64($id, Settings::getHashSalt() . \Drupal::service('private_key')->get()))) {
-        throw new BadRequestHttpException('Invalid contextual ID specified.');
+        throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Invalid contextual ID specified.');
       }
       $element = [
         '#type' => 'contextual_links',

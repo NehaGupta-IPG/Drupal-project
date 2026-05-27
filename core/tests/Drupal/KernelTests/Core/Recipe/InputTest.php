@@ -101,7 +101,7 @@ class InputTest extends KernelTestBase {
       $this->recipe->input->collectAll($collector);
       $this->fail('Expected an exception due to validation failure, but none was thrown.');
     }
-    catch (ValidationFailedException $e) {
+    catch (\Symfony\Component\Validator\Exception\ValidationFailedException $e) {
       $value = $e->getValue();
       $this->assertInstanceOf(TypedDataInterface::class, $value);
       $this->assertSame('hack', $value->getValue());
@@ -321,7 +321,7 @@ YAML
       ],
     ]);
     $recipe->input->collectAll($collector);
-    $this->expectException(ConfigActionException::class);
+    $this->expectException(\Drupal\Core\Config\Action\ConfigActionException::class);
     $this->expectExceptionMessage("The entity type for the config name 'node.\${anything}.test' could not be identified.");
     RecipeRunner::processRecipe($recipe);
   }

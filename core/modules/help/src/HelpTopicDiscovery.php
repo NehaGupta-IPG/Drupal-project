@@ -112,21 +112,21 @@ class HelpTopicDiscovery implements DiscoveryInterface {
         try {
           $front_matter = FrontMatter::create(file_get_contents($file), Yaml::class)->getData();
         }
-        catch (InvalidDataTypeException $e) {
-          throw new DiscoveryException(sprintf('Malformed YAML in help topic "%s": %s.', $file, $e->getMessage()));
+        catch (\Drupal\Component\Serialization\Exception\InvalidDataTypeException $e) {
+          throw new \Drupal\Component\Discovery\DiscoveryException(sprintf('Malformed YAML in help topic "%s": %s.', $file, $e->getMessage()));
         }
         foreach ($front_matter as $key => $value) {
           switch ($key) {
             case 'related':
               if (!is_array($value)) {
-                throw new DiscoveryException("$file contains invalid value for 'related' key, the value must be an array of strings");
+                throw new \Drupal\Component\Discovery\DiscoveryException("$file contains invalid value for 'related' key, the value must be an array of strings");
               }
               $data[$key] = $value;
               break;
 
             case 'top_level':
               if (!is_bool($value)) {
-                throw new DiscoveryException("$file contains invalid value for 'top_level' key, the value must be a Boolean");
+                throw new \Drupal\Component\Discovery\DiscoveryException("$file contains invalid value for 'top_level' key, the value must be a Boolean");
               }
               $data[$key] = $value;
               break;
@@ -137,11 +137,11 @@ class HelpTopicDiscovery implements DiscoveryInterface {
               break;
 
             default:
-              throw new DiscoveryException("$file contains invalid key='$key'");
+              throw new \Drupal\Component\Discovery\DiscoveryException("$file contains invalid key='$key'");
           }
         }
         if (!isset($data['label'])) {
-          throw new DiscoveryException("$file does not contain the required key with name='label'");
+          throw new \Drupal\Component\Discovery\DiscoveryException("$file does not contain the required key with name='label'");
         }
 
         $all[$provider][$data['id']] = $data;

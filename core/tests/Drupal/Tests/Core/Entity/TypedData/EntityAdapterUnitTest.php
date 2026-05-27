@@ -318,7 +318,7 @@ class EntityAdapterUnitTest extends UnitTestCase {
    */
   public function testGetWithoutData(): void {
     $this->entityAdapter->setValue(NULL);
-    $this->expectException(MissingDataException::class);
+    $this->expectException(\Drupal\Core\TypedData\Exception\MissingDataException::class);
     $this->entityAdapter->get('id');
   }
 
@@ -342,7 +342,7 @@ class EntityAdapterUnitTest extends UnitTestCase {
   public function testSetWithoutData(): void {
     $this->entityAdapter->setValue(NULL);
     $id_items = [['value' => $this->id + 1]];
-    $this->expectException(MissingDataException::class);
+    $this->expectException(\Drupal\Core\TypedData\Exception\MissingDataException::class);
     $this->entityAdapter->set('id', $id_items);
   }
 
@@ -371,7 +371,7 @@ class EntityAdapterUnitTest extends UnitTestCase {
    */
   public function testToArrayWithoutData(): void {
     $this->entityAdapter->setValue(NULL);
-    $this->expectException(MissingDataException::class);
+    $this->expectException(\Drupal\Core\TypedData\Exception\MissingDataException::class);
     $this->entityAdapter->toArray();
   }
 

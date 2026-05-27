@@ -98,10 +98,10 @@ class EntityLabel extends FieldPluginBase {
         $this->options['alter']['url'] = $entity->toUrl();
         $this->options['alter']['make_link'] = TRUE;
       }
-      catch (UndefinedLinkTemplateException) {
+      catch (\Drupal\Core\Entity\Exception\UndefinedLinkTemplateException) {
         $this->options['alter']['make_link'] = FALSE;
       }
-      catch (EntityMalformedException) {
+      catch (\Drupal\Core\Entity\EntityMalformedException) {
         $this->options['alter']['make_link'] = FALSE;
       }
     }

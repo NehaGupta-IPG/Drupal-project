@@ -93,7 +93,7 @@ class ComposerPluginsValidatorInsecureTest extends PackageManagerKernelTestBase 
       // so we expect the operation to fail on PreApplyEvent.
       $stage->apply();
     }
-    catch (SandboxEventException $e) {
+    catch (\Drupal\package_manager\Exception\SandboxEventException $e) {
       // Processing is required because the error message we get from Composer
       // contains multiple white spaces at the start or end of line.
       $this->assertStringContainsString($expected_message, preg_replace('/\s\s+/', '', $e->getMessage()));

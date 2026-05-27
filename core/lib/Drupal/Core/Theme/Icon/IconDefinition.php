@@ -66,7 +66,7 @@ class IconDefinition implements IconDefinitionInterface {
     }
 
     if (count($errors)) {
-      throw new IconDefinitionInvalidDataException(implode(' ', $errors));
+      throw new \Drupal\Core\Theme\Icon\Exception\IconDefinitionInvalidDataException(implode(' ', $errors));
     }
 
     // Cleanup of data that do not need to be passed.

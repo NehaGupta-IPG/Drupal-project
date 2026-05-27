@@ -69,7 +69,7 @@ class CKEditor5MediaAndFilterSettingsInSyncConstraintValidator extends Constrain
    */
   public function validate($toolbar_item, Constraint $constraint): void {
     if (!$constraint instanceof CKEditor5MediaAndFilterSettingsInSyncConstraint) {
-      throw new UnexpectedTypeException($constraint, __NAMESPACE__ . '\CKEditor5MediaAndFilterSettingsInSync');
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($constraint, __NAMESPACE__ . '\CKEditor5MediaAndFilterSettingsInSync');
     }
     $text_editor = $this->createTextEditorObjectFromContext();
 

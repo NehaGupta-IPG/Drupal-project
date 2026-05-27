@@ -26,7 +26,7 @@ class ToolbarItemDependencyConstraintValidator extends ConstraintValidator imple
    */
   public function validate($toolbar_item, Constraint $constraint): void {
     if (!$constraint instanceof ToolbarItemDependencyConstraint) {
-      throw new UnexpectedTypeException($constraint, __NAMESPACE__ . '\ToolbarItemDependency');
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($constraint, __NAMESPACE__ . '\ToolbarItemDependency');
     }
 
     $toolbar_items = $this->context->getRoot()->get('settings.toolbar.items')->toArray();

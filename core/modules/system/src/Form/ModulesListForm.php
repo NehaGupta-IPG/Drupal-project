@@ -179,7 +179,7 @@ class ModulesListForm extends FormBase {
       });
       uasort($modules, [ModuleExtensionList::class, 'sortByName']);
     }
-    catch (InfoParserException $e) {
+    catch (\Drupal\Core\Extension\InfoParserException $e) {
       $this->messenger()->addError($this->t('Modules could not be listed due to an error: %error', ['%error' => $e->getMessage()]));
       $modules = [];
     }
@@ -504,11 +504,11 @@ class ModulesListForm extends FormBase {
         $this->messenger()
           ->addStatus($this->modulesEnabledConfirmationMessage($modules['install']));
       }
-      catch (PreExistingConfigException $e) {
+      catch (\Drupal\Core\Config\PreExistingConfigException $e) {
         $this->messenger()->addError($this->modulesFailToEnableMessage($modules, $e));
         return;
       }
-      catch (UnmetDependenciesException $e) {
+      catch (\Drupal\Core\Config\UnmetDependenciesException $e) {
         $this->messenger()->addError(
           $e->getTranslatedMessage($this->getStringTranslation(), $modules['install'][$e->getExtension()])
         );

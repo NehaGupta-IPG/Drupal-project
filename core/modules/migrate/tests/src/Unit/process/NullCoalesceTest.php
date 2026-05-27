@@ -23,7 +23,7 @@ class NullCoalesceTest extends MigrateProcessTestCase {
    * @legacy-covers ::transform
    */
   public function testExceptionOnInvalidValue(): void {
-    $this->expectException(MigrateException::class);
+    $this->expectException(\Drupal\migrate\MigrateException::class);
     (new NullCoalesce([], 'null_coalesce', []))->transform('invalid', $this->migrateExecutable, $this->row, 'destination_property');
   }
 

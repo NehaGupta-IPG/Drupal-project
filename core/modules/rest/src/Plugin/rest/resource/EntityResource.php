@@ -161,23 +161,23 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
    */
   public function post(?EntityInterface $entity = NULL) {
     if ($entity == NULL) {
-      throw new BadRequestHttpException('No entity content received.');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('No entity content received.');
     }
 
     $entity_access = $entity->access('create', NULL, TRUE);
     if (!$entity_access->isAllowed()) {
-      throw new AccessDeniedHttpException($entity_access->getReason() ?: $this->generateFallbackAccessDeniedMessage($entity, 'create'));
+      throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException($entity_access->getReason() ?: $this->generateFallbackAccessDeniedMessage($entity, 'create'));
     }
     $definition = $this->getPluginDefinition();
     // Verify that the deserialized entity is of the type that we expect to
     // prevent security issues.
     if ($entity->getEntityTypeId() != $definition['entity_type']) {
-      throw new BadRequestHttpException('Invalid entity type');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Invalid entity type');
     }
     // POSTed entities must not have an ID set, because we always want to create
     // new entities here.
     if (!$entity->isNew()) {
-      throw new BadRequestHttpException('Only new entities can be created');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Only new entities can be created');
     }
 
     $this->checkEditFieldAccess($entity);
@@ -201,8 +201,8 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
       }
       return new ModifiedResourceResponse($entity, 201, $headers);
     }
-    catch (EntityStorageException $e) {
-      throw new HttpException(500, 'Internal Server Error', $e);
+    catch (\Drupal\Core\Entity\EntityStorageException $e) {
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(500, 'Internal Server Error', $e);
     }
   }
 
@@ -221,11 +221,11 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
    */
   public function patch(EntityInterface $original_entity, ?EntityInterface $entity = NULL) {
     if ($entity == NULL) {
-      throw new BadRequestHttpException('No entity content received.');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('No entity content received.');
     }
     $definition = $this->getPluginDefinition();
     if ($entity->getEntityTypeId() != $definition['entity_type']) {
-      throw new BadRequestHttpException('Invalid entity type');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Invalid entity type');
     }
 
     // Overwrite the received fields.
@@ -262,8 +262,8 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
       // Return the updated entity in the response body.
       return new ModifiedResourceResponse($original_entity, 200);
     }
-    catch (EntityStorageException $e) {
-      throw new HttpException(500, 'Internal Server Error', $e);
+    catch (\Drupal\Core\Entity\EntityStorageException $e) {
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(500, 'Internal Server Error', $e);
     }
   }
 
@@ -315,7 +315,7 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
         $error_message .= ' ' . $reason;
       }
     }
-    throw new AccessDeniedHttpException($error_message);
+    throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException($error_message);
   }
 
   /**
@@ -340,8 +340,8 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
       // DELETE responses have an empty body.
       return new ModifiedResourceResponse(NULL, 204);
     }
-    catch (EntityStorageException $e) {
-      throw new HttpException(500, 'Internal Server Error', $e);
+    catch (\Drupal\Core\Entity\EntityStorageException $e) {
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(500, 'Internal Server Error', $e);
     }
   }
 

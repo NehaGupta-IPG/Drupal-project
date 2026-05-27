@@ -46,7 +46,7 @@ class Provider {
     $this->name = $name;
 
     if (!UrlHelper::isValid($url, TRUE) || !UrlHelper::isExternal($url)) {
-      throw new ProviderException('Provider @name does not define a valid external URL.', $this);
+      throw new \Drupal\media\OEmbed\ProviderException('Provider @name does not define a valid external URL.', $this);
     }
     $this->url = $url;
 
@@ -63,7 +63,7 @@ class Provider {
     }
 
     if (empty($this->endpoints)) {
-      throw new ProviderException('Provider @name does not define any valid endpoints.', $this);
+      throw new \Drupal\media\OEmbed\ProviderException('Provider @name does not define any valid endpoints.', $this);
     }
   }
 

@@ -47,7 +47,7 @@ class FileDeleteTest extends FileTestBase {
       \Drupal::service('file_system')->delete($directory);
       $this->fail('Expected NotRegularFileException');
     }
-    catch (NotRegularFileException) {
+    catch (\Drupal\Core\File\Exception\NotRegularFileException) {
       // Ignore.
     }
     $this->assertDirectoryExists($directory);
@@ -82,7 +82,7 @@ class FileDeleteTest extends FileTestBase {
     $this->assertDirectoryExists($link);
 
     $this->expectExceptionMessage("Cannot delete '$link' because it is a directory. Use deleteRecursive() instead.");
-    $this->expectException(NotRegularFileException::class);
+    $this->expectException(\Drupal\Core\File\Exception\NotRegularFileException::class);
     \Drupal::service('file_system')->delete($link);
   }
 

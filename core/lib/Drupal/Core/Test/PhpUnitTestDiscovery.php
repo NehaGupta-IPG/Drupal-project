@@ -51,7 +51,7 @@ class PhpUnitTestDiscovery {
       EventFacade::instance()->registerTracer(new PhpUnitTestDiscoveryTracer($this));
       EventFacade::instance()->seal();
     }
-    catch (EventFacadeIsSealedException) {
+    catch (\PHPUnit\Event\EventFacadeIsSealedException) {
       // Just continue.
     }
   }
@@ -318,14 +318,14 @@ class PhpUnitTestDiscovery {
       if ($test instanceof DataProviderTestSuite) {
         foreach ($test as $testWithData) {
           if ($testWithData->valueObjectForEvents()->metadata()->isGroup()->isEmpty()) {
-            throw new MissingGroupException(sprintf('Missing group metadata in test %s', $testWithData->valueObjectForEvents()->id()));
+            throw new \Drupal\Core\Test\Exception\MissingGroupException(sprintf('Missing group metadata in test %s', $testWithData->valueObjectForEvents()->id()));
           }
           $tmp = array_merge($tmp, $testWithData->groups());
         }
       }
       else {
         if ($test->valueObjectForEvents()->metadata()->isGroup()->isEmpty()) {
-          throw new MissingGroupException(sprintf('Missing group metadata in test %s', $test->valueObjectForEvents()->id()));
+          throw new \Drupal\Core\Test\Exception\MissingGroupException(sprintf('Missing group metadata in test %s', $test->valueObjectForEvents()->id()));
         }
         $tmp = array_merge($tmp, $test->groups());
       }

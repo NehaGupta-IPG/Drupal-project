@@ -87,7 +87,7 @@ abstract class ConfigEntityBundleBase extends ConfigEntityBase {
       $bundle_type = $this->getEntityType();
       $bundle_of = $bundle_type->getBundleOf();
       if (!empty($bundle_of)) {
-        throw new ConfigNameException("The machine name of the '{$bundle_type->getLabel()}' bundle cannot be changed.");
+        throw new \Drupal\Core\Config\ConfigNameException("The machine name of the '{$bundle_type->getLabel()}' bundle cannot be changed.");
       }
     }
   }

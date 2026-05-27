@@ -65,7 +65,7 @@ final class ConsoleInputCollector implements InputCollectorInterface {
         $options[$key] = $value;
       }
     }
-    catch (InvalidArgumentException) {
+    catch (\Symfony\Component\Console\Exception\InvalidArgumentException) {
       // The option is undefined; there's nothing we need to do.
     }
     return $options;

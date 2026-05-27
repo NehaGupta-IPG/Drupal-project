@@ -100,8 +100,8 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
     try {
       $request = Request::create($pathinfo);
     }
-    catch (BadRequestException $e) {
-      throw new ResourceNotFoundException($e->getMessage(), $e->getCode(), $e);
+    catch (\Symfony\Component\HttpFoundation\Exception\BadRequestException $e) {
+      throw new \Symfony\Component\Routing\Exception\ResourceNotFoundException($e->getMessage(), $e->getCode(), $e);
     }
 
     return $this->matchRequest($request);
@@ -119,7 +119,7 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
       // 1. This is outside the scope of Dynamic Page Cache since we have not
       //    actually resolved a route
       // 2. Page Cache does not use cache contexts (and caches per URL anyway)
-      throw new CacheableResourceNotFoundException(
+      throw new \Drupal\Core\Routing\Exception\CacheableResourceNotFoundException(
         new CacheableMetadata(),
         sprintf('No routes found for "%s".', $this->currentPath->getPath()),
       );
@@ -143,8 +143,8 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
     }
     if ($match === NULL) {
       throw 0 < count($this->allow)
-        ? new MethodNotAllowedException(array_unique($this->allow))
-        : new ResourceNotFoundException(sprintf('No routes found for "%s".', $this->currentPath->getPath()));
+        ? new \Symfony\Component\Routing\Exception\MethodNotAllowedException(array_unique($this->allow))
+        : new \Symfony\Component\Routing\Exception\ResourceNotFoundException(sprintf('No routes found for "%s".', $this->currentPath->getPath()));
     }
     return $match;
   }

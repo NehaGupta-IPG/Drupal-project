@@ -66,7 +66,7 @@ class ShortcutSetController extends ControllerBase {
       return $this->redirect('<front>');
     }
 
-    throw new AccessDeniedHttpException();
+    throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
   }
 
 }

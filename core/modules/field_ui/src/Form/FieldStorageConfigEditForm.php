@@ -54,7 +54,7 @@ class FieldStorageConfigEditForm extends EntityForm {
     // but we are actually editing a field_storage_config entity.
     $field_config = FieldConfig::load($route_match->getRawParameter('field_config'));
     if (!$field_config) {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
 
     return $field_config->getFieldStorageDefinition();

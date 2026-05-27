@@ -188,7 +188,7 @@ function update_do_one($module, $number, $dependency_map, &$context): void {
     // exception types, but for now we'll just log the exception and
     // return the message for printing.
     // @see https://www.drupal.org/node/2564311
-    catch (Exception $e) {
+    catch (\Exception $e) {
       $variables = Error::decodeException($e);
       \Drupal::logger('update')->error(Error::DEFAULT_ERROR_MESSAGE, $variables);
 
@@ -258,7 +258,7 @@ function update_invoke_post_update($function, &$context): void {
     // types, but for now we'll just log the exception and return the message
     // for printing.
     // @see https://www.drupal.org/node/2564311
-    catch (Exception $e) {
+    catch (\Exception $e) {
       $variables = Error::decodeException($e);
       \Drupal::logger('update')->error(Error::DEFAULT_ERROR_MESSAGE, $variables);
       unset($variables['backtrace'], $variables['exception'], $variables['severity_level']);
@@ -325,7 +325,7 @@ function update_get_update_list(): array {
     }
     // It is possible that the system schema has orphaned entries, so the
     // incompatibility checking might throw an exception.
-    catch (UnknownExtensionException) {
+    catch (\Drupal\Core\Extension\Exception\UnknownExtensionException) {
       $args = [
         '%name' => $module,
         ':url' => 'https://www.drupal.org/node/3137656',

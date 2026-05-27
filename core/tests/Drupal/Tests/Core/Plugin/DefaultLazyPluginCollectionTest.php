@@ -57,7 +57,7 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
    */
   public function testGetNotExistingPlugin(): void {
     $this->setupPluginCollection();
-    $this->expectException(PluginNotFoundException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\PluginNotFoundException::class);
     $this->expectExceptionMessage("Plugin ID 'pear' was not found.");
     $this->defaultPluginCollection->get('pear');
   }
@@ -103,7 +103,7 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
    */
   public function testSortHelperException(): void {
     $this->setupPluginCollection($this->never());
-    $this->expectException(PluginNotFoundException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\PluginNotFoundException::class);
     $this->expectExceptionMessage("Plugin ID 'pear' was not found.");
     $this->defaultPluginCollection->sortHelper("apple", "pear");
   }

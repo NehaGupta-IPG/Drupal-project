@@ -126,7 +126,7 @@ class EntityConfigBase extends Entity {
    */
   public function import(Row $row, array $old_destination_id_values = []) {
     if ($row->isStub()) {
-      throw new MigrateException('Config entities can not be stubbed.');
+      throw new \Drupal\migrate\MigrateException('Config entities can not be stubbed.');
     }
     $this->rollbackAction = MigrateIdMapInterface::ROLLBACK_DELETE;
     $ids = $this->getIds();

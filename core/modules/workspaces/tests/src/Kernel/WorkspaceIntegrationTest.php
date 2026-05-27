@@ -571,7 +571,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     $this->assertWorkspaceAssociation($expected_workspace_association, 'node');
 
     // Check that a workspace that is not at the top level can not be published.
-    $this->expectException(WorkspacePublishException::class);
+    $this->expectException(\Drupal\workspaces\WorkspacePublishException::class);
     $this->expectExceptionMessage('Only top-level workspaces can be published.');
     $this->workspaces['dev']->publish();
   }
@@ -727,7 +727,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     }
 
     if (!$allowed) {
-      $this->expectException(EntityStorageException::class);
+      $this->expectException(\Drupal\Core\Entity\EntityStorageException::class);
       $this->expectExceptionMessage("The \"$entity_type_id\" entity type can only be saved in the default workspace.");
     }
     $entity->save();
@@ -757,7 +757,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     $entity->created->value = 1;
 
     if (!$allowed) {
-      $this->expectException(EntityStorageException::class);
+      $this->expectException(\Drupal\Core\Entity\EntityStorageException::class);
       $this->expectExceptionMessage("The \"$entity_type_id\" entity type can only be saved in the default workspace.");
     }
     $entity->save();
@@ -785,7 +785,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     $this->switchToWorkspace('stage');
 
     if (!$allowed) {
-      $this->expectException(EntityStorageException::class);
+      $this->expectException(\Drupal\Core\Entity\EntityStorageException::class);
       $this->expectExceptionMessage("This {$entity->getEntityType()->getSingularLabel()} can only be deleted in the Live workspace.");
     }
     $entity->delete();

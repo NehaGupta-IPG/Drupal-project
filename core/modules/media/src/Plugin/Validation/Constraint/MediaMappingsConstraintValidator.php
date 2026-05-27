@@ -18,10 +18,10 @@ class MediaMappingsConstraintValidator extends ConstraintValidator {
    */
   public function validate($value, Constraint $constraint): void {
     if (!$constraint instanceof MediaMappingsConstraint) {
-      throw new UnexpectedTypeException($constraint, __NAMESPACE__ . '\MediaMappingsConstraint');
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($constraint, __NAMESPACE__ . '\MediaMappingsConstraint');
     }
     if (!$value instanceof MediaTypeInterface) {
-      throw new UnexpectedTypeException($value, MediaTypeInterface::class);
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($value, MediaTypeInterface::class);
     }
     // The source field cannot be the target of a field mapping because that
     // would cause it to be overwritten, possibly with invalid data. This is
@@ -38,7 +38,7 @@ class MediaMappingsConstraintValidator extends ConstraintValidator {
           ]);
         }
       }
-      catch (PluginException) {
+      catch (\Drupal\Component\Plugin\Exception\PluginException) {
         // The source references an invalid plugin.
       }
     }

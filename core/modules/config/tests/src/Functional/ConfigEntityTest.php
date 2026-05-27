@@ -69,7 +69,7 @@ class ConfigEntityTest extends BrowserTestBase {
       $empty->toUrl();
       $this->fail('EntityMalformedException was thrown.');
     }
-    catch (EntityMalformedException $e) {
+    catch (\Drupal\Core\Entity\EntityMalformedException $e) {
       // Expected exception; just continue testing.
     }
 
@@ -78,7 +78,7 @@ class ConfigEntityTest extends BrowserTestBase {
       $empty->save();
       $this->fail('EntityMalformedException was thrown.');
     }
-    catch (EntityMalformedException $e) {
+    catch (\Drupal\Core\Entity\EntityMalformedException $e) {
       // Expected exception; just continue testing.
     }
 
@@ -91,7 +91,7 @@ class ConfigEntityTest extends BrowserTestBase {
       $empty_id->save();
       $this->fail('EntityMalformedException was thrown.');
     }
-    catch (EntityMalformedException $e) {
+    catch (\Drupal\Core\Entity\EntityMalformedException $e) {
       // Expected exception; just continue testing.
     }
 
@@ -118,7 +118,7 @@ class ConfigEntityTest extends BrowserTestBase {
     try {
       $status = $config_test->save();
     }
-    catch (EntityMalformedException $e) {
+    catch (\Drupal\Core\Entity\EntityMalformedException $e) {
       $this->fail('EntityMalformedException was not thrown.');
     }
 
@@ -152,7 +152,7 @@ class ConfigEntityTest extends BrowserTestBase {
     try {
       $id_length_config_test->save();
     }
-    catch (ConfigEntityIdLengthException $e) {
+    catch (\Drupal\Core\Config\Entity\Exception\ConfigEntityIdLengthException $e) {
       $this->fail($e->getMessage());
     }
 
@@ -163,7 +163,7 @@ class ConfigEntityTest extends BrowserTestBase {
     try {
       $id_length_config_test->save();
     }
-    catch (ConfigEntityIdLengthException $e) {
+    catch (\Drupal\Core\Config\Entity\Exception\ConfigEntityIdLengthException $e) {
       $this->fail($e->getMessage());
     }
 
@@ -177,7 +177,7 @@ class ConfigEntityTest extends BrowserTestBase {
       $max = static::MAX_ID_LENGTH;
       $this->fail("config_test entity with ID length $length exceeding the maximum allowed length of $max saved successfully");
     }
-    catch (ConfigEntityIdLengthException) {
+    catch (\Drupal\Core\Config\Entity\Exception\ConfigEntityIdLengthException) {
       // Expected exception; just continue testing.
     }
 
@@ -191,7 +191,7 @@ class ConfigEntityTest extends BrowserTestBase {
       $same_id->save();
       $this->fail('Not possible to overwrite an entity.');
     }
-    catch (EntityStorageException) {
+    catch (\Drupal\Core\Entity\EntityStorageException) {
       // Expected exception; just continue testing.
     }
 

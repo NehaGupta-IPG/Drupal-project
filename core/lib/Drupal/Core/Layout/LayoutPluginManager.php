@@ -78,11 +78,11 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
     parent::processDefinition($definition, $plugin_id);
 
     if (!$definition instanceof LayoutDefinition) {
-      throw new InvalidPluginDefinitionException($plugin_id, sprintf('The "%s" layout definition must extend %s', $plugin_id, LayoutDefinition::class));
+      throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($plugin_id, sprintf('The "%s" layout definition must extend %s', $plugin_id, LayoutDefinition::class));
     }
 
     if (empty($definition->getLabel())) {
-      throw new InvalidPluginDefinitionException($plugin_id, sprintf('The "%s" layout definition must have a label.', $plugin_id));
+      throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($plugin_id, sprintf('The "%s" layout definition must have a label.', $plugin_id));
     }
 
     // Ensure that every plugin has a category.

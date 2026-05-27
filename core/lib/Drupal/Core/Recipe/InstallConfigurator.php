@@ -108,7 +108,7 @@ final class InstallConfigurator {
     }
 
     if (!empty($missing_extensions)) {
-      throw new RecipeMissingExtensionsException(array_values($missing_extensions));
+      throw new \Drupal\Core\Recipe\RecipeMissingExtensionsException(array_values($missing_extensions));
     }
 
     arsort($modules);

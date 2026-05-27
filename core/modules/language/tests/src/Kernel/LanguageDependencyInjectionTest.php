@@ -49,7 +49,7 @@ class LanguageDependencyInjectionTest extends LanguageTestBase {
       $fr->delete();
       $this->fail('Expected DeleteDefaultLanguageException thrown.');
     }
-    catch (DeleteDefaultLanguageException) {
+    catch (\Drupal\language\Exception\DeleteDefaultLanguageException) {
       // Expected exception; just continue testing.
     }
 

@@ -25,10 +25,10 @@ class UploadedFileConstraintValidator extends ConstraintValidator {
    */
   public function validate(mixed $value, Constraint $constraint): void {
     if (!$constraint instanceof UploadedFileConstraint) {
-      throw new UnexpectedTypeException($constraint, UploadedFileConstraint::class);
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($constraint, UploadedFileConstraint::class);
     }
     if (!$value instanceof UploadedFile) {
-      throw new UnexpectedTypeException($value, UploadedFile::class);
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($value, UploadedFile::class);
     }
     if ($value->isValid()) {
       return;

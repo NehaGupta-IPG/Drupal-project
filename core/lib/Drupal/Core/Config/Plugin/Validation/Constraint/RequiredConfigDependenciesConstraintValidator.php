@@ -53,7 +53,7 @@ class RequiredConfigDependenciesConstraintValidator extends ConstraintValidator 
 
     // Only config entities can have config dependencies.
     if (!$entity instanceof ConfigEntityInterface) {
-      throw new UnexpectedTypeException($entity, ConfigEntityInterface::class);
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($entity, ConfigEntityInterface::class);
     }
 
     $config_dependencies = $entity->getDependencies()['config'] ?? [];
@@ -62,7 +62,7 @@ class RequiredConfigDependenciesConstraintValidator extends ConstraintValidator 
       $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
 
       if (!$entity_type instanceof ConfigEntityTypeInterface) {
-        throw new LogicException("'$entity_type_id' is not a config entity type.");
+        throw new \Symfony\Component\Validator\Exception\LogicException("'$entity_type_id' is not a config entity type.");
       }
 
       // Ensure the current entity type's config prefix is found in the config

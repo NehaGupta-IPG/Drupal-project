@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
 /**
  * A cacheable PreconditionFailedHttpException.
  */
-class CacheablePreconditionFailedHttpException extends PreconditionFailedHttpException implements CacheableDependencyInterface {
+class CacheablePreconditionFailedHttpException extends \Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException implements CacheableDependencyInterface {
 
   use CacheableDependencyTrait;
 

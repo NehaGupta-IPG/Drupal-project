@@ -147,7 +147,7 @@ class ComponentElement extends RenderElementBase implements FormElementInterface
           $id,
           $slot_name
         );
-        throw new InvalidComponentDataException($message);
+        throw new \Drupal\Core\Render\Component\Exception\InvalidComponentDataException($message);
       }
       $context[$slot_name] = array_reduce(
         $slots_alter_callbacks,

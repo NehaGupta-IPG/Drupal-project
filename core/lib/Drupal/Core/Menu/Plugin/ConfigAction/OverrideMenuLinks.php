@@ -59,7 +59,7 @@ final readonly class OverrideMenuLinks implements ConfigActionPluginInterface, C
    */
   public function apply(string $configName, mixed $value): void {
     if ($configName !== 'core.menu.static_menu_link_overrides') {
-      throw new ConfigActionException('This config action can only be used on the core.menu.static_menu_link_overrides config object.');
+      throw new \Drupal\Core\Config\Action\ConfigActionException('This config action can only be used on the core.menu.static_menu_link_overrides config object.');
     }
     // We want to be sure we have the latest menu link data.
     $this->menuLinkManager->rebuild();
@@ -74,7 +74,7 @@ final readonly class OverrideMenuLinks implements ConfigActionPluginInterface, C
       try {
         $this->linkOverrides->saveOverride($link_id, $definition + $this->menuLinkManager->getDefinition($link_id));
       }
-      catch (PluginNotFoundException) {
+      catch (\Drupal\Component\Plugin\Exception\PluginNotFoundException) {
         $this->logger->warning('The @link_id menu link was not overridden because it does not exist.', [
           '@link_id' => $link_id,
         ]);

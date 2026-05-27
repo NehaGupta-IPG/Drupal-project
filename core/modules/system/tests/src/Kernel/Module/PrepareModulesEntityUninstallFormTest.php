@@ -44,7 +44,7 @@ class PrepareModulesEntityUninstallFormTest extends KernelTestBase {
     $request = Request::create('/admin/modules/uninstall/entity/' . $not_an_entity_type);
     // Simulate matching.
     $request->attributes->set('entity_type_id', $not_an_entity_type);
-    $this->expectException(PluginNotFoundException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\PluginNotFoundException::class);
     (string) $title_resolver->getTitle($request, $route);
   }
 

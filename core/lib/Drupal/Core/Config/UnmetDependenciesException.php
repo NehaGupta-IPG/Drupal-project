@@ -8,7 +8,7 @@ use Drupal\Core\StringTranslation\TranslationInterface;
 /**
  * An exception thrown if configuration has unmet dependencies.
  */
-class UnmetDependenciesException extends ConfigException {
+class UnmetDependenciesException extends \Drupal\Core\Config\ConfigException {
 
   /**
    * A list of configuration objects that have unmet dependencies.

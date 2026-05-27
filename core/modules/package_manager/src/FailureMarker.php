@@ -87,8 +87,8 @@ final class FailureMarker implements EventSubscriberInterface {
         return Yaml::parse($data);
 
       }
-      catch (ParseException $exception) {
-        throw new FailureMarkerExistsException('Failure marker file exists but cannot be decoded.', $exception->getCode(), $exception);
+      catch (\Symfony\Component\Yaml\Exception\ParseException $exception) {
+        throw new \Drupal\package_manager\Exception\FailureMarkerExistsException('Failure marker file exists but cannot be decoded.', $exception->getCode(), $exception);
       }
     }
     return NULL;
@@ -135,7 +135,7 @@ final class FailureMarker implements EventSubscriberInterface {
    */
   public function assertNotExists(): void {
     if ($message = $this->getMessage()) {
-      throw new FailureMarkerExistsException($message);
+      throw new \Drupal\package_manager\Exception\FailureMarkerExistsException($message);
     }
   }
 

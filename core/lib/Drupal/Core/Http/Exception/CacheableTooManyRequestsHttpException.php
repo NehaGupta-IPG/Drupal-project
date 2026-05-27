@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 /**
  * A cacheable TooManyRequestsHttpException.
  */
-class CacheableTooManyRequestsHttpException extends TooManyRequestsHttpException implements CacheableDependencyInterface {
+class CacheableTooManyRequestsHttpException extends \Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException implements CacheableDependencyInterface {
 
   use CacheableDependencyTrait;
 

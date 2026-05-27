@@ -76,7 +76,7 @@ class DefaultLazyPluginCollection extends LazyPluginCollection {
   protected function initializePlugin($instance_id) {
     $configuration = $this->configurations[$instance_id] ?? [];
     if (!isset($configuration[$this->pluginKey])) {
-      throw new PluginNotFoundException($instance_id);
+      throw new \Drupal\Component\Plugin\Exception\PluginNotFoundException($instance_id);
     }
     $this->set($instance_id, $this->manager->createInstance($configuration[$this->pluginKey], $configuration));
   }
@@ -114,7 +114,7 @@ class DefaultLazyPluginCollection extends LazyPluginCollection {
     if (isset($this->pluginInstances[$instance_id])) {
       return $this->pluginInstances[$instance_id]->getPluginId();
     }
-    return $this->configurations[$instance_id][$this->pluginKey] ?? throw new PluginNotFoundException($instance_id);
+    return $this->configurations[$instance_id][$this->pluginKey] ?? throw new \Drupal\Component\Plugin\Exception\PluginNotFoundException($instance_id);
   }
 
   /**

@@ -5,4 +5,4 @@ namespace Drupal\Core\Config;
 /**
  * Exception thrown when config object values are invalid.
  */
-class ConfigValueException extends ConfigException {}
+class ConfigValueException extends \Drupal\Core\Config\ConfigException {}

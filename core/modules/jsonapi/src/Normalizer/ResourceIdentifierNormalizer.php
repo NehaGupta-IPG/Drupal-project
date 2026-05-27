@@ -79,7 +79,7 @@ class ResourceIdentifierNormalizer extends NormalizerBase implements Denormalize
       $resource_type->getBundle()
     );
     if (empty($context['related']) || empty($field_definitions[$context['related']])) {
-      throw new BadRequestHttpException('Invalid or missing related field.');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Invalid or missing related field.');
     }
     /** @var \Drupal\field\Entity\FieldConfig $field_definition */
     $field_definition = $field_definitions[$context['related']];
@@ -94,7 +94,7 @@ class ResourceIdentifierNormalizer extends NormalizerBase implements Denormalize
       // Make sure that the provided type is compatible with the targeted
       // resource.
       if (!in_array($value['type'], $target_resource_type_names)) {
-        throw new BadRequestHttpException(sprintf(
+        throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException(sprintf(
           'The provided type (%s) does not match the destination resource types (%s).',
           $value['type'],
           implode(', ', $target_resource_type_names)
@@ -103,7 +103,7 @@ class ResourceIdentifierNormalizer extends NormalizerBase implements Denormalize
       return new ResourceIdentifier($value['type'], $value['id'], $value['meta'] ?? []);
     }, $data['data']);
     if (!ResourceIdentifier::areResourceIdentifiersUnique($resource_identifiers)) {
-      throw new BadRequestHttpException('Duplicate relationships are not permitted. Use `meta.arity` to distinguish resource identifiers with matching `type` and `id` values.');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Duplicate relationships are not permitted. Use `meta.arity` to distinguish resource identifiers with matching `type` and `id` values.');
     }
     return $resource_identifiers;
   }
@@ -122,14 +122,14 @@ class ResourceIdentifierNormalizer extends NormalizerBase implements Denormalize
   protected function massageRelationshipInput(array $data, $is_multiple) {
     if ($is_multiple) {
       if (!is_array($data['data'])) {
-        throw new BadRequestHttpException('Invalid body payload for the relationship.');
+        throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Invalid body payload for the relationship.');
       }
       // Leave the invalid elements.
       $invalid_elements = array_filter($data['data'], function ($element) {
         return empty($element['type']) || empty($element['id']);
       });
       if ($invalid_elements) {
-        throw new BadRequestHttpException('Invalid body payload for the relationship.');
+        throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Invalid body payload for the relationship.');
       }
     }
     else {
@@ -138,7 +138,7 @@ class ResourceIdentifierNormalizer extends NormalizerBase implements Denormalize
         return ['data' => []];
       }
       if (empty($data['data']['type']) || empty($data['data']['id'])) {
-        throw new BadRequestHttpException('Invalid body payload for the relationship.');
+        throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Invalid body payload for the relationship.');
       }
       $data['data'] = [$data['data']];
     }

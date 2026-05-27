@@ -103,7 +103,7 @@ class LocaleFileManager {
         try {
           $this->fileSystem->delete($file->uri);
         }
-        catch (FileException) {
+        catch (\Drupal\Core\File\Exception\FileException) {
           $fail = TRUE;
         }
       }
@@ -142,7 +142,7 @@ class LocaleFileManager {
       $remoteFileInfo->status = RemoteFileStatus::Success;
       return $remoteFileInfo;
     }
-    catch (RequestException $e) {
+    catch (\GuzzleHttp\Exception\RequestException $e) {
       // Handle 4xx and 5xx http responses.
       $response = $e->getResponse();
       if ($response) {
@@ -167,7 +167,7 @@ class LocaleFileManager {
     }
     // We need to handle ConnectException separately because in Guzzle 7 it
     // doesn't have a getResponse() method, so the above will fatal.
-    catch (ConnectException $e) {
+    catch (\GuzzleHttp\Exception\ConnectException $e) {
       $logger->notice('HTTP request to @url failed with error: @error.', ['@url' => $uri, '@error' => $e->getMessage()]);
     }
 
@@ -210,7 +210,7 @@ class LocaleFileManager {
     catch (ClientExceptionInterface $exception) {
       $this->messenger->addError($this->t('Failed to fetch file due to error "%error"', ['%error' => $exception->getMessage()]));
     }
-    catch (FileException | InvalidStreamWrapperException $e) {
+    catch (\Drupal\Core\File\Exception\FileException | \Drupal\Core\File\Exception\InvalidStreamWrapperException $e) {
       $this->messenger->addError($this->t('Failed to save file due to error "%error"', ['%error' => $e->getMessage()]));
     }
     $this->loggerFactory->get('locale')->error('Unable to download translation file @uri.', ['@uri' => $source_file->uri]);

@@ -56,7 +56,7 @@ class FileCopyTest extends FileTestBase {
     // Copy non-existent file.
     $desired_filepath = $this->randomMachineName();
     $this->assertFileDoesNotExist($desired_filepath);
-    $this->expectException(FileNotExistsException::class);
+    $this->expectException(\Drupal\Core\File\Exception\FileNotExistsException::class);
     $new_filepath = \Drupal::service('file_system')->copy($desired_filepath, $this->randomMachineName());
     $this->assertFalse($new_filepath, 'Copying a missing file fails.');
   }
@@ -79,7 +79,7 @@ class FileCopyTest extends FileTestBase {
     $this->assertFilePermissions($new_filepath, Settings::get('file_chmod_file', FileSystem::CHMOD_FILE));
 
     // Copy the file onto itself without renaming fails.
-    $this->expectException(FileExistsException::class);
+    $this->expectException(\Drupal\Core\File\Exception\FileExistsException::class);
     $new_filepath = $file_system->copy($uri, $uri, FileExists::Error);
     $this->assertFalse($new_filepath, 'Copying onto itself without renaming fails.');
     $this->assertFileExists($uri);

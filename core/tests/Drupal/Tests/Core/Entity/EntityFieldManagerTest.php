@@ -207,7 +207,7 @@ class EntityFieldManagerTest extends UnitTestCase {
         if (isset($definitions[$args[0]])) {
           return $definitions[$args[0]];
         }
-        throw new PluginNotFoundException($args[0]);
+        throw new \Drupal\Component\Plugin\Exception\PluginNotFoundException($args[0]);
       });
     $this->entityTypeManager->getDefinition(Argument::type('string'), FALSE)
       ->will(function ($args) use ($definitions) {

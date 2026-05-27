@@ -416,7 +416,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       else {
         $message = "Invoking hook_config_schema_info_alter() has removed ($removed_keys) schema definitions";
       }
-      throw new ConfigSchemaAlterException($message);
+      throw new \Drupal\Core\Config\Schema\ConfigSchemaAlterException($message);
     }
   }
 

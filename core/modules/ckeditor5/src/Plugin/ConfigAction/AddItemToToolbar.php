@@ -50,7 +50,7 @@ final class AddItemToToolbar implements ConfigActionPluginInterface, ContainerFa
     assert($editor instanceof EditorInterface);
 
     if ($editor->getEditor() !== 'ckeditor5') {
-      throw new ConfigActionException(sprintf('The %s config action only works with editors that use CKEditor 5.', $this->pluginId));
+      throw new \Drupal\Core\Config\Action\ConfigActionException(sprintf('The %s config action only works with editors that use CKEditor 5.', $this->pluginId));
     }
 
     if (is_string($value)) {

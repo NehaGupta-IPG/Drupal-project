@@ -64,7 +64,7 @@ class RouterTest extends UnitTestCase {
 
     $this->assertEquals('user_login', $result['_route']);
 
-    $this->expectException(ResourceNotFoundException::class);
+    $this->expectException(\Symfony\Component\Routing\Exception\ResourceNotFoundException::class);
     $router->match('/user/login ');
   }
 

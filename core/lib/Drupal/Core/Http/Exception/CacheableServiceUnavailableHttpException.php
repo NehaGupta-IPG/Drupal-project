@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 /**
  * A cacheable ServiceUnavailableHttpException.
  */
-class CacheableServiceUnavailableHttpException extends ServiceUnavailableHttpException implements CacheableDependencyInterface {
+class CacheableServiceUnavailableHttpException extends \Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException implements CacheableDependencyInterface {
 
   use CacheableDependencyTrait;
 

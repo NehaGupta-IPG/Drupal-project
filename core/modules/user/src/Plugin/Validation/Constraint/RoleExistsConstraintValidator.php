@@ -40,7 +40,7 @@ class RoleExistsConstraintValidator extends ConstraintValidator implements Conta
     assert($constraint instanceof RoleExistsConstraint);
 
     if (!is_string($value)) {
-      throw new UnexpectedTypeException($value, 'string');
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($value, 'string');
     }
 
     $roleStorage = $this->entity_type_manager->getStorage('user_role');

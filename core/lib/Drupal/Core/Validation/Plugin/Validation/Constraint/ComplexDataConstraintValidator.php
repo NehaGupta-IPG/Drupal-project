@@ -26,7 +26,7 @@ class ComplexDataConstraintValidator extends ConstraintValidator {
       $data = $this->getTypedData();
     }
     if (!$data instanceof ComplexDataInterface) {
-      throw new UnexpectedTypeException($data, 'ComplexData');
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($data, 'ComplexData');
     }
 
     foreach ($constraint->properties as $name => $constraints) {

@@ -553,14 +553,14 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
       $id_map->lookupDestinationIds([1, 2, 3]);
       $this->fail('Too many source IDs should throw');
     }
-    catch (MigrateException $e) {
+    catch (\Drupal\migrate\MigrateException $e) {
       $this->assertEquals("Extra unknown items for map migrate_map_sql_idmap_test in source IDs: array (\n  0 => 3,\n)", $e->getMessage());
     }
     try {
       $id_map->lookupDestinationIds(['nid' => 1, 'aaa' => '2']);
       $this->fail('Unknown source ID key should throw');
     }
-    catch (MigrateException $e) {
+    catch (\Drupal\migrate\MigrateException $e) {
       $this->assertEquals("Extra unknown items for map migrate_map_sql_idmap_test in source IDs: array (\n  'aaa' => '2',\n)", $e->getMessage());
     }
 
@@ -939,7 +939,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
       $id_map->setUpdate([]);
       $this->assertFalse(FALSE, 'MigrateException not thrown, when source identifiers were provided to update.');
     }
-    catch (MigrateException) {
+    catch (\Drupal\migrate\MigrateException) {
       $this->assertTrue(TRUE, "MigrateException thrown, when source identifiers were not provided to update.");
     }
   }

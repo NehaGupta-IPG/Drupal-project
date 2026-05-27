@@ -83,8 +83,8 @@ class YamlDiscovery implements DiscoverableInterface {
     try {
       return Yaml::decode(file_get_contents($file)) ?: [];
     }
-    catch (InvalidDataTypeException $e) {
-      throw new InvalidDataTypeException($file . ': ' . $e->getMessage(), $e->getCode(), $e);
+    catch (\Drupal\Component\Serialization\Exception\InvalidDataTypeException $e) {
+      throw new \Drupal\Component\Serialization\Exception\InvalidDataTypeException($file . ': ' . $e->getMessage(), $e->getCode(), $e);
     }
   }
 

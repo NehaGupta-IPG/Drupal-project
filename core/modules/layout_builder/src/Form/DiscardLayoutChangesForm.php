@@ -89,7 +89,7 @@ class DiscardLayoutChangesForm extends ConfirmFormBase implements WorkspaceDynam
         '%label' => $entity->label(),
       ]);
     }
-    catch (ContextException) {
+    catch (\Drupal\Component\Plugin\Exception\ContextException) {
       // If the entity is not available, just return a generic message.
       return $this->t('Any unsaved changes to the layout will be discarded. This action cannot be undone.');
     }

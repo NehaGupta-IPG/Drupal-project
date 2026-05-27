@@ -178,7 +178,7 @@ class ModuleHandler implements ModuleHandlerInterface {
     if (isset($this->moduleList[$name])) {
       return $this->moduleList[$name];
     }
-    throw new UnknownExtensionException(sprintf('The module %s does not exist.', $name));
+    throw new \Drupal\Core\Extension\Exception\UnknownExtensionException(sprintf('The module %s does not exist.', $name));
   }
 
   /**

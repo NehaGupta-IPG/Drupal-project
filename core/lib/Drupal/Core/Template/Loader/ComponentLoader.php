@@ -35,7 +35,7 @@ class ComponentLoader implements LoaderInterface {
       $this->pluginManager->find($name);
       return TRUE;
     }
-    catch (ComponentNotFoundException) {
+    catch (\Drupal\Core\Render\Component\Exception\ComponentNotFoundException) {
       return FALSE;
     }
   }
@@ -48,7 +48,7 @@ class ComponentLoader implements LoaderInterface {
       $component = $this->pluginManager->find($name);
       $path = $component->getTemplatePath();
     }
-    catch (ComponentNotFoundException) {
+    catch (\Drupal\Core\Render\Component\Exception\ComponentNotFoundException) {
       return new Source('', $name, '');
     }
     $original_code = file_get_contents($path);
@@ -62,7 +62,7 @@ class ComponentLoader implements LoaderInterface {
     try {
       $component = $this->pluginManager->find($name);
     }
-    catch (ComponentNotFoundException) {
+    catch (\Drupal\Core\Render\Component\Exception\ComponentNotFoundException) {
       throw new LoaderError('Unable to find component');
     }
     return implode('--', array_filter([
@@ -80,7 +80,7 @@ class ComponentLoader implements LoaderInterface {
     try {
       $component = $this->pluginManager->find($name);
     }
-    catch (ComponentNotFoundException) {
+    catch (\Drupal\Core\Render\Component\Exception\ComponentNotFoundException) {
       throw new LoaderError('Unable to find component');
     }
     $metadata_path = $component->getPluginDefinition()[YamlDirectoryDiscovery::FILE_KEY];

@@ -189,14 +189,14 @@ class EntityRevision extends EntityContentBase {
 
     $revision_key = $this->getKey('revision');
     if (!$revision_key) {
-      throw new MigrateException(sprintf('The "%s" entity type does not support revisions.', $this->storage->getEntityTypeId()));
+      throw new \Drupal\migrate\MigrateException(sprintf('The "%s" entity type does not support revisions.', $this->storage->getEntityTypeId()));
     }
     $ids[$revision_key] = $this->getDefinitionFromEntity($revision_key);
 
     if ($this->isTranslationDestination()) {
       $langcode_key = $this->getKey('langcode');
       if (!$langcode_key) {
-        throw new MigrateException(sprintf('The "%s" entity type does not support translations.', $this->storage->getEntityTypeId()));
+        throw new \Drupal\migrate\MigrateException(sprintf('The "%s" entity type does not support translations.', $this->storage->getEntityTypeId()));
       }
       $ids[$langcode_key] = $this->getDefinitionFromEntity($langcode_key);
     }

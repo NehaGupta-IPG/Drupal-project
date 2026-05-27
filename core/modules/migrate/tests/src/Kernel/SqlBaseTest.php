@@ -126,7 +126,7 @@ class SqlBaseTest extends MigrateTestBase {
     \Drupal::state()->delete('migrate.fallback_state_key');
     $sql_base->setConfiguration([]);
     Database::renameConnection('migrate', 'fallback_connection');
-    $this->expectException(RequirementsException::class);
+    $this->expectException(\Drupal\migrate\Exception\RequirementsException::class);
     $this->expectExceptionMessage('No database connection configured for source plugin');
     $sql_base->getDatabase();
   }
@@ -151,7 +151,7 @@ class SqlBaseTest extends MigrateTestBase {
 
     // Call checkRequirements(): it will call getDatabase() and convert the
     // exception to a RequirementsException.
-    $this->expectException(RequirementsException::class);
+    $this->expectException(\Drupal\migrate\Exception\RequirementsException::class);
     $this->expectExceptionMessage('No database connection available for source plugin sql_base');
     $sql_base->checkRequirements();
   }

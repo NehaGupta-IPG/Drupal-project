@@ -163,7 +163,7 @@ class WorkspacesContentModerationStateTest extends ContentModerationStateTest {
       $this->workspaces['stage']->publish();
       $this->fail('The expected exception was not thrown.');
     }
-    catch (WorkspacePublishException $e) {
+    catch (\Drupal\workspaces\WorkspacePublishException $e) {
       $this->assertEquals('The Stage workspace can not be published because it contains 3 items in an unpublished moderation state.', $e->getMessage());
     }
 
@@ -175,7 +175,7 @@ class WorkspacesContentModerationStateTest extends ContentModerationStateTest {
       $this->workspaces['stage']->publish();
       $this->fail('The expected exception was not thrown.');
     }
-    catch (WorkspacePublishException $e) {
+    catch (\Drupal\workspaces\WorkspacePublishException $e) {
       $this->assertEquals('The Stage workspace can not be published because it contains 2 items in an unpublished moderation state.', $e->getMessage());
     }
 
@@ -187,7 +187,7 @@ class WorkspacesContentModerationStateTest extends ContentModerationStateTest {
       $this->workspaces['stage']->publish();
       $this->fail('The expected exception was not thrown.');
     }
-    catch (WorkspacePublishException $e) {
+    catch (\Drupal\workspaces\WorkspacePublishException $e) {
       $this->assertEquals('The Stage workspace can not be published because it contains 1 item in an unpublished moderation state.', $e->getMessage());
     }
 

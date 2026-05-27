@@ -24,11 +24,11 @@ class MigratePrepareRowTestHooks {
     $data = $row->getSourceProperty('data');
     if ($data == 'skip_and_record') {
       // Record mapping but don't record a message.
-      throw new MigrateSkipRowException('', TRUE);
+      throw new \Drupal\migrate\MigrateSkipRowException('', TRUE);
     }
     elseif ($data == 'skip_and_do_not_record') {
       // Don't record mapping but record a message.
-      throw new MigrateSkipRowException('skip_and_do_not_record message', FALSE);
+      throw new \Drupal\migrate\MigrateSkipRowException('skip_and_do_not_record message', FALSE);
     }
   }
 

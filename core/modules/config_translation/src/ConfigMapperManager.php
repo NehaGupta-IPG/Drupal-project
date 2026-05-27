@@ -106,7 +106,7 @@ class ConfigMapperManager extends DefaultPluginManager implements ConfigMapperMa
     parent::processDefinition($definition, $plugin_id);
 
     if (!isset($definition['base_route_name'])) {
-      throw new InvalidPluginDefinitionException($plugin_id, "The plugin definition of the mapper '$plugin_id' does not contain a base_route_name.");
+      throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($plugin_id, "The plugin definition of the mapper '$plugin_id' does not contain a base_route_name.");
     }
   }
 

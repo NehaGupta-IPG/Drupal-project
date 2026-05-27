@@ -43,12 +43,12 @@ class ExtensionPathResolver {
       return 'core/core.info.yml';
     }
     if (!isset($this->extensionLists[$type])) {
-      throw new UnknownExtensionTypeException(sprintf('Extension type %s is unknown.', $type));
+      throw new \Drupal\Core\Extension\Exception\UnknownExtensionTypeException(sprintf('Extension type %s is unknown.', $type));
     }
     try {
       return $this->extensionLists[$type]->getPathname($name);
     }
-    catch (UnknownExtensionException) {
+    catch (\Drupal\Core\Extension\Exception\UnknownExtensionException) {
       // Catch the exception. This will result in triggering an error.
       // If the filename is still unknown, create a user-level error message.
       trigger_error(sprintf('The following %s is missing from the file system: %s', $type, $name), E_USER_WARNING);

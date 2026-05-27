@@ -265,7 +265,7 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
       $typed_config->create(clone $definition, 2501)->validate();
       $this->fail('Expected an exception but none was raised.');
     }
-    catch (UnexpectedTypeException $e) {
+    catch (\Symfony\Component\Validator\Exception\UnexpectedTypeException $e) {
       $this->assertSame('Expected argument of type "array", "int" given', $e->getMessage());
     }
 

@@ -64,7 +64,7 @@ class ConfigImporterTest extends KernelTestBase {
    * Tests that trying to import from empty sync configuration directory fails.
    */
   public function testEmptyImportFails(): void {
-    $this->expectException(ConfigImporterException::class);
+    $this->expectException(\Drupal\Core\Config\ConfigImporterException::class);
     $this->container->get('config.storage.sync')->deleteAll();
     $this->configImporter()->import();
   }
@@ -84,7 +84,7 @@ class ConfigImporterTest extends KernelTestBase {
       $config_importer->import();
       $this->fail('ConfigImporterException not thrown, invalid import was not stopped due to mis-matching site UUID.');
     }
-    catch (ConfigImporterException $e) {
+    catch (\Drupal\Core\Config\ConfigImporterException $e) {
       $actual_message = $e->getMessage();
 
       $actual_error_log = $config_importer->getErrors();
@@ -578,7 +578,7 @@ class ConfigImporterTest extends KernelTestBase {
       $config_importer->import();
       $this->fail('ConfigImporterException not thrown; an invalid import was not stopped due to missing dependencies.');
     }
-    catch (ConfigImporterException $e) {
+    catch (\Drupal\Core\Config\ConfigImporterException $e) {
       $expected = [
         static::FAIL_MESSAGE,
         'Unable to install the <em class="placeholder">unknown_module</em> module since it does not exist.',
@@ -621,7 +621,7 @@ class ConfigImporterTest extends KernelTestBase {
       $this->configImporter->import();
       $this->fail('ConfigImporterException not thrown, invalid import was not stopped due to missing dependencies.');
     }
-    catch (ConfigImporterException $e) {
+    catch (\Drupal\Core\Config\ConfigImporterException $e) {
       $expected = [
         static::FAIL_MESSAGE,
         'Unable to install the <em class="placeholder">unknown_module</em> module since it does not exist.',
@@ -660,7 +660,7 @@ class ConfigImporterTest extends KernelTestBase {
       $config_importer->import();
       $this->fail('ConfigImporterException not thrown, invalid import was not stopped due to missing dependencies.');
     }
-    catch (ConfigImporterException $e) {
+    catch (\Drupal\Core\Config\ConfigImporterException $e) {
       $expected = static::FAIL_MESSAGE . PHP_EOL . 'The core.extension configuration does not exist.';
       $this->assertEquals($expected, $e->getMessage());
       $error_log = $config_importer->getErrors();
@@ -685,7 +685,7 @@ class ConfigImporterTest extends KernelTestBase {
       $config_importer->import();
       $this->fail('ConfigImporterException not thrown, invalid import was not stopped due to missing dependencies.');
     }
-    catch (ConfigImporterException $e) {
+    catch (\Drupal\Core\Config\ConfigImporterException $e) {
       $this->assertStringContainsString('There were errors validating the config synchronization.', $e->getMessage());
       $error_log = $config_importer->getErrors();
       $this->assertEquals('Unable to uninstall the System module because: The System module is required.', $error_log[0]);
@@ -741,7 +741,7 @@ class ConfigImporterTest extends KernelTestBase {
       $config_importer->import();
       $this->fail('ConfigImporterException not thrown; an invalid import was not stopped due to missing dependencies.');
     }
-    catch (ConfigImporterException $e) {
+    catch (\Drupal\Core\Config\ConfigImporterException $e) {
       $expected = static::FAIL_MESSAGE . PHP_EOL . 'Unable to install the <em class="placeholder">standard</em> module since it does not exist.';
       $this->assertEquals($expected, $e->getMessage(), 'There were errors validating the config synchronization.');
       $error_log = $config_importer->getErrors();
@@ -772,7 +772,7 @@ class ConfigImporterTest extends KernelTestBase {
       $config_importer->import();
       $this->fail('ConfigImporterException not thrown; an invalid import was not stopped due to missing dependencies.');
     }
-    catch (ConfigImporterException $e) {
+    catch (\Drupal\Core\Config\ConfigImporterException $e) {
       $expected = static::FAIL_MESSAGE . PHP_EOL . 'Cannot change the install profile from <em class="placeholder">minimal</em> to <em class="placeholder">this_will_not_work</em> once Drupal is installed.';
       $this->assertEquals($expected, $e->getMessage(), 'There were errors validating the config synchronization.');
       $error_log = $config_importer->getErrors();

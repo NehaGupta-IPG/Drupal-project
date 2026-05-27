@@ -65,11 +65,11 @@ class EntityUuidConverter extends EntityConverter {
         if (in_array($method, ['PATCH', 'DELETE'], TRUE)) {
           $current_content_language = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
           if ($method === 'DELETE' && (!$entity->isDefaultTranslation() || $entity->language()->getId() !== $current_content_language)) {
-            throw new MethodNotAllowedHttpException(['GET'], 'Deleting a resource object translation is not yet supported. See https://www.drupal.org/docs/8/modules/jsonapi/translations.');
+            throw new \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException(['GET'], 'Deleting a resource object translation is not yet supported. See https://www.drupal.org/docs/8/modules/jsonapi/translations.');
           }
           if ($method === 'PATCH' && $entity->language()->getId() !== $current_content_language) {
             $available_translations = implode(', ', array_keys($entity->getTranslationLanguages()));
-            throw new MethodNotAllowedHttpException(['GET'], sprintf('The requested translation of the resource object does not exist, instead modify one of the translations that do exist: %s.', $available_translations));
+            throw new \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException(['GET'], sprintf('The requested translation of the resource object does not exist, instead modify one of the translations that do exist: %s.', $available_translations));
           }
         }
       }

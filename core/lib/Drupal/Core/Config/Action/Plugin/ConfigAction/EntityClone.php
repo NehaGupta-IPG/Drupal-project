@@ -54,7 +54,7 @@ final class EntityClone implements ConfigActionPluginInterface, ContainerFactory
     // If the original doesn't exist, there's nothing to clone.
     $original = $this->configManager->loadConfigEntityByName($configName);
     if (empty($original)) {
-      throw new ConfigActionException("Cannot clone '$configName' because it does not exist.");
+      throw new \Drupal\Core\Config\Action\ConfigActionException("Cannot clone '$configName' because it does not exist.");
     }
 
     // Treat the original ID like a period-separated array of strings, and

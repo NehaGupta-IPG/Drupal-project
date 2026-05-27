@@ -88,14 +88,14 @@ class ConfigSchemaChecker implements EventSubscriberInterface {
       $this->checked[$name . ':' . $checksum] = TRUE;
       $errors = $this->checkConfigSchema($this->typedManager, $name, $data, $this->validateConstraints);
       if ($errors === FALSE) {
-        throw new SchemaIncompleteException("No schema for $name");
+        throw new \Drupal\Core\Config\Schema\SchemaIncompleteException("No schema for $name");
       }
       elseif (is_array($errors)) {
         $text_errors = [];
         foreach ($errors as $key => $error) {
           $text_errors[] = new FormattableMarkup('@key @error', ['@key' => $key, '@error' => $error]);
         }
-        throw new SchemaIncompleteException("Schema errors for $name with the following errors: " . implode(', ', $text_errors));
+        throw new \Drupal\Core\Config\Schema\SchemaIncompleteException("Schema errors for $name with the following errors: " . implode(', ', $text_errors));
       }
     }
   }

@@ -324,7 +324,7 @@ abstract class BrowserTestBase extends TestCase {
 
     // Setup Mink. Register Mink exceptions to cause test failures instead of
     // errors.
-    $this->registerFailureType(MinkException::class);
+    $this->registerFailureType(\Behat\Mink\Exception\Exception::class);
     $this->initMink();
 
     // Set up the browser test output file.

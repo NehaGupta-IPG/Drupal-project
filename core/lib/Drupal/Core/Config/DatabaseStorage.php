@@ -148,7 +148,7 @@ class DatabaseStorage implements StorageInterface {
         return $this->doWrite($name, $data);
       }
       // Some other failure that we can not recover from.
-      throw new StorageException($e->getMessage(), 0, $e);
+      throw new \Drupal\Core\Config\StorageException($e->getMessage(), 0, $e);
     }
   }
 
@@ -186,7 +186,7 @@ class DatabaseStorage implements StorageInterface {
     // If another process has already created the config table, attempting to
     // recreate it will throw an exception. In this case just catch the
     // exception and do nothing.
-    catch (DatabaseException) {
+    catch (\Drupal\Core\Database\DatabaseException) {
       return TRUE;
     }
     catch (\Exception) {

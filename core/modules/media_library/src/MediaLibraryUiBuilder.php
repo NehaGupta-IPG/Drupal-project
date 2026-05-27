@@ -181,7 +181,7 @@ class MediaLibraryUiBuilder {
       try {
         $state = MediaLibraryState::fromRequest($this->request);
       }
-      catch (BadRequestHttpException $e) {
+      catch (\Symfony\Component\HttpKernel\Exception\BadRequestHttpException $e) {
         return AccessResult::forbidden($e->getMessage());
       }
       catch (\InvalidArgumentException $e) {

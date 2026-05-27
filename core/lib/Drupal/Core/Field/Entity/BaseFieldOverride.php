@@ -107,13 +107,13 @@ class BaseFieldOverride extends FieldConfigBase {
    */
   public function __construct(array $values, $entity_type = 'base_field_override') {
     if (empty($values['field_name'])) {
-      throw new FieldException('Attempt to create a base field bundle override of a field without a field_name');
+      throw new \Drupal\Core\Field\FieldException('Attempt to create a base field bundle override of a field without a field_name');
     }
     if (empty($values['entity_type'])) {
-      throw new FieldException("Attempt to create a base field bundle override of field {$values['field_name']} without an entity_type");
+      throw new \Drupal\Core\Field\FieldException("Attempt to create a base field bundle override of field {$values['field_name']} without an entity_type");
     }
     if (empty($values['bundle'])) {
-      throw new FieldException("Attempt to create a base field bundle override of field {$values['field_name']} without a bundle");
+      throw new \Drupal\Core\Field\FieldException("Attempt to create a base field bundle override of field {$values['field_name']} without a bundle");
     }
 
     parent::__construct($values, $entity_type);
@@ -216,10 +216,10 @@ class BaseFieldOverride extends FieldConfigBase {
     else {
       // Some updates are always disallowed.
       if ($this->entity_type != $this->getOriginal()->entity_type) {
-        throw new FieldException("Cannot change the entity_type of an existing base field bundle override (entity type:{$this->entity_type}, bundle:{$this->getOriginal()->bundle}, field name: {$this->field_name})");
+        throw new \Drupal\Core\Field\FieldException("Cannot change the entity_type of an existing base field bundle override (entity type:{$this->entity_type}, bundle:{$this->getOriginal()->bundle}, field name: {$this->field_name})");
       }
       if ($this->bundle != $this->getOriginal()->bundle) {
-        throw new FieldException("Cannot change the bundle of an existing base field bundle override (entity type:{$this->entity_type}, bundle:{$this->getOriginal()->bundle}, field name: {$this->field_name})");
+        throw new \Drupal\Core\Field\FieldException("Cannot change the bundle of an existing base field bundle override (entity type:{$this->entity_type}, bundle:{$this->getOriginal()->bundle}, field name: {$this->field_name})");
       }
       $previous_definition = $this->getOriginal();
     }

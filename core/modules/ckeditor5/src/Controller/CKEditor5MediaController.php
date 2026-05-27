@@ -83,12 +83,12 @@ class CKEditor5MediaController extends ControllerBase {
   public function mediaEntityMetadata(Request $request) {
     $uuid = $request->query->get('uuid');
     if (!$uuid || !Uuid::isValid($uuid)) {
-      throw new BadRequestHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException();
     }
     // Access is enforced on route level.
     // @see \Drupal\ckeditor5\Controller\CKEditor5MediaController::access().
     if (!$media = $this->entityRepository->loadEntityByUuid('media', $uuid)) {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
     $image_field = $this->getMediaImageSourceFieldName($media);
     $response = [];
@@ -147,11 +147,11 @@ class CKEditor5MediaController extends ControllerBase {
     $request = $this->requestStack->getCurrentRequest();
     $uuid = $request->query->get('uuid');
     if (!$uuid || !Uuid::isValid($uuid)) {
-      throw new BadRequestHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException();
     }
     $media = $this->entityRepository->loadEntityByUuid('media', $uuid);
     if (!$media) {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
     $filters = $editor->getFilterFormat()->filters();
 

@@ -267,16 +267,16 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
   public function __construct(array $values, $entity_type = 'field_storage_config') {
     // Check required properties.
     if (empty($values['field_name'])) {
-      throw new FieldException('Attempt to create a field storage without a field name.');
+      throw new \Drupal\Core\Field\FieldException('Attempt to create a field storage without a field name.');
     }
     if (!preg_match('/^[_a-z]+[_a-z0-9]*$/', $values['field_name'])) {
-      throw new FieldException("Attempt to create a field storage {$values['field_name']} with invalid characters. Only lowercase alphanumeric characters and underscores are allowed, and only lowercase letters and underscore are allowed as the first character");
+      throw new \Drupal\Core\Field\FieldException("Attempt to create a field storage {$values['field_name']} with invalid characters. Only lowercase alphanumeric characters and underscores are allowed, and only lowercase letters and underscore are allowed as the first character");
     }
     if (empty($values['type'])) {
-      throw new FieldException("Attempt to create a field storage {$values['field_name']} with no type.");
+      throw new \Drupal\Core\Field\FieldException("Attempt to create a field storage {$values['field_name']} with no type.");
     }
     if (empty($values['entity_type'])) {
-      throw new FieldException("Attempt to create a field storage {$values['field_name']} with no entity_type.");
+      throw new \Drupal\Core\Field\FieldException("Attempt to create a field storage {$values['field_name']} with no entity_type.");
     }
 
     parent::__construct($values, $entity_type);
@@ -298,7 +298,7 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
     // Check that the field type is known.
     $field_type = \Drupal::service('plugin.manager.field.field_type')->getDefinition($this->type, FALSE);
     if (!$field_type) {
-      throw new FieldException("Attempt to create a field storage of unknown type {$this->type}.");
+      throw new \Drupal\Core\Field\FieldException("Attempt to create a field storage of unknown type {$this->type}.");
     }
     $this->module = $field_type['provider'];
 
@@ -359,13 +359,13 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
     // characters. We use mb_strlen() because the DB layer assumes that column
     // widths are given in characters rather than bytes.
     if (mb_strlen($this->getName()) > static::NAME_MAX_LENGTH) {
-      throw new FieldException('Attempt to create a field storage with an name longer than ' . static::NAME_MAX_LENGTH . ' characters: ' . $this->getName());
+      throw new \Drupal\Core\Field\FieldException('Attempt to create a field storage with an name longer than ' . static::NAME_MAX_LENGTH . ' characters: ' . $this->getName());
     }
 
     // Disallow reserved field names.
     $disallowed_field_names = array_keys($entity_field_manager->getBaseFieldDefinitions($this->getTargetEntityTypeId()));
     if (in_array($this->getName(), $disallowed_field_names)) {
-      throw new FieldException("Attempt to create field storage {$this->getName()} which is reserved by entity type {$this->getTargetEntityTypeId()}.");
+      throw new \Drupal\Core\Field\FieldException("Attempt to create field storage {$this->getName()} which is reserved by entity type {$this->getTargetEntityTypeId()}.");
     }
 
     // Notify the field storage definition listener.
@@ -401,10 +401,10 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
 
     // Some updates are always disallowed.
     if ($this->getType() != $this->getOriginal()->getType()) {
-      throw new FieldException(sprintf('Cannot change the field type for an existing field storage. The field storage %s has the type %s.', $this->id(), $this->getOriginal()->getType()));
+      throw new \Drupal\Core\Field\FieldException(sprintf('Cannot change the field type for an existing field storage. The field storage %s has the type %s.', $this->id(), $this->getOriginal()->getType()));
     }
     if ($this->getTargetEntityTypeId() != $this->getOriginal()->getTargetEntityTypeId()) {
-      throw new FieldException(sprintf('Cannot change the entity type for an existing field storage. The field storage %s has the type %s.', $this->id(), $this->getOriginal()->getTargetEntityTypeId()));
+      throw new \Drupal\Core\Field\FieldException(sprintf('Cannot change the entity type for an existing field storage. The field storage %s has the type %s.', $this->id(), $this->getOriginal()->getTargetEntityTypeId()));
     }
 
     // See if any module forbids the update by throwing an exception. This
@@ -668,7 +668,7 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
 
     // Enforced cardinality is a positive integer or -1.
     if ($enforced_cardinality !== NULL && $enforced_cardinality < 1 && $enforced_cardinality !== FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED) {
-      throw new FieldException("Invalid enforced cardinality '{$definition['cardinality']}'. Allowed values: a positive integer or -1.");
+      throw new \Drupal\Core\Field\FieldException("Invalid enforced cardinality '{$definition['cardinality']}'. Allowed values: a positive integer or -1.");
     }
 
     return $enforced_cardinality ?: $this->cardinality;

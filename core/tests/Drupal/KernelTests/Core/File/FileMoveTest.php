@@ -57,7 +57,7 @@ class FileMoveTest extends FileTestBase {
    */
   public function testMissing(): void {
     // Move non-existent file.
-    $this->expectException(FileNotExistsException::class);
+    $this->expectException(\Drupal\Core\File\Exception\FileNotExistsException::class);
     \Drupal::service('file_system')->move($this->randomMachineName(), $this->randomMachineName());
   }
 
@@ -71,7 +71,7 @@ class FileMoveTest extends FileTestBase {
     // Move the file onto itself without renaming shouldn't make changes.
     /** @var \Drupal\Core\File\FileSystemInterface $file_system */
     $file_system = \Drupal::service('file_system');
-    $this->expectException(FileException::class);
+    $this->expectException(\Drupal\Core\File\Exception\FileException::class);
     $new_filepath = $file_system->move($uri, $uri, FileExists::Replace);
     $this->assertFalse($new_filepath, 'Moving onto itself without renaming fails.');
     $this->assertFileExists($uri);

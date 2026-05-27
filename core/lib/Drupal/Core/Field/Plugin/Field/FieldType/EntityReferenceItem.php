@@ -74,7 +74,7 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
     // If the target entity type doesn't have an ID key, we cannot determine
     // the target_id data type.
     if (!$target_type_info->hasKey('id')) {
-      throw new FieldException('Entity type "' . $target_type_info->id() . '" has no ID key and cannot be targeted by entity reference field "' . $field_definition->getName() . '"');
+      throw new \Drupal\Core\Field\FieldException('Entity type "' . $target_type_info->id() . '" has no ID key and cannot be targeted by entity reference field "' . $field_definition->getName() . '"');
     }
 
     $target_id_data_type = $target_type_info->hasIntegerId() ? 'integer' : 'string';
@@ -163,8 +163,8 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
     try {
       $target_type_info = \Drupal::entityTypeManager()->getDefinition($target_type);
     }
-    catch (PluginNotFoundException) {
-      throw new FieldException(sprintf("Field '%s' on entity type '%s' references a target entity type '%s' which does not exist.",
+    catch (\Drupal\Component\Plugin\Exception\PluginNotFoundException) {
+      throw new \Drupal\Core\Field\FieldException(sprintf("Field '%s' on entity type '%s' references a target entity type '%s' which does not exist.",
         $field_definition->getName(),
         $field_definition->getTargetEntityTypeId(),
         $target_type

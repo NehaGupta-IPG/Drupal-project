@@ -127,26 +127,26 @@ abstract class AssetControllerBase extends FileDownloadController {
     // aggregate. The theme must be passed as a query parameter, since assets
     // always depend on the current theme.
     if (!$request->query->has('theme')) {
-      throw new BadRequestHttpException('The theme must be passed as a query argument');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('The theme must be passed as a query argument');
     }
     if (!$request->query->has('delta') || !is_numeric($request->query->get('delta'))) {
-      throw new BadRequestHttpException('The numeric delta must be passed as a query argument');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('The numeric delta must be passed as a query argument');
     }
     if (!$request->query->has('language')) {
-      throw new BadRequestHttpException('The language must be passed as a query argument');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('The language must be passed as a query argument');
     }
     if (!$request->query->has('include')) {
-      throw new BadRequestHttpException('The libraries to include must be passed as a query argument');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('The libraries to include must be passed as a query argument');
     }
     $file_parts = explode('_', basename($file_name, '.' . $this->fileExtension), 2);
     // Ensure the filename is correctly prefixed.
     if ($file_parts[0] !== $this->fileExtension) {
-      throw new BadRequestHttpException('The filename prefix must match the file extension');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('The filename prefix must match the file extension');
     }
 
     // The hash is the second segment of the filename.
     if (!isset($file_parts[1])) {
-      throw new BadRequestHttpException('Invalid filename');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Invalid filename');
     }
     $received_hash = $file_parts[1];
 
@@ -164,7 +164,7 @@ abstract class AssetControllerBase extends FileDownloadController {
     $validate = function ($libraries_to_check) {
       foreach ($libraries_to_check as $library) {
         if (substr_count($library, '/') === 0) {
-          throw new BadRequestHttpException(sprintf('The "%s" library name must include at least one slash.', $library));
+          throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException(sprintf('The "%s" library name must include at least one slash.', $library));
         }
       }
     };
@@ -232,7 +232,7 @@ abstract class AssetControllerBase extends FileDownloadController {
     if (isset($groups[$group_delta])) {
       return $groups[$group_delta];
     }
-    throw new BadRequestHttpException('Invalid filename.');
+    throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Invalid filename.');
   }
 
   /**

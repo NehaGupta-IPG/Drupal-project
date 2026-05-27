@@ -176,7 +176,7 @@ class BatchStorage implements BatchStorageInterface {
     // If another process has already created the batch table, attempting to
     // recreate it will throw an exception. In this case just catch the
     // exception and do nothing.
-    catch (DatabaseException) {
+    catch (\Drupal\Core\Database\DatabaseException) {
     }
     catch (\Exception) {
       return FALSE;

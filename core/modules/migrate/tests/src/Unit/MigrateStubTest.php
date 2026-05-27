@@ -71,7 +71,7 @@ class MigrateStubTest extends UnitTestCase {
    */
   public function testExceptionOnPluginNotFound(): void {
     $this->migrationPluginManager->createInstances(['test_migration'])->willReturn([]);
-    $this->expectException(PluginNotFoundException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\PluginNotFoundException::class);
     $this->expectExceptionMessage("Plugin ID 'test_migration' was not found.");
     $stub = new MigrateStub($this->migrationPluginManager->reveal());
     $stub->createStub('test_migration', [1]);

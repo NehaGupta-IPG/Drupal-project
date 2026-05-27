@@ -61,7 +61,7 @@ class YamlTest extends YamlTestBase {
    * @legacy-covers ::decode
    */
   public function testError(): void {
-    $this->expectException(InvalidDataTypeException::class);
+    $this->expectException(\Drupal\Component\Serialization\Exception\InvalidDataTypeException::class);
     Yaml::decode('foo: [ads');
   }
 
@@ -69,7 +69,7 @@ class YamlTest extends YamlTestBase {
    * Ensures that php object support is disabled.
    */
   public function testEncodeObjectSupportDisabled(): void {
-    $this->expectException(InvalidDataTypeException::class);
+    $this->expectException(\Drupal\Component\Serialization\Exception\InvalidDataTypeException::class);
     $this->expectExceptionMessage('Object support when dumping a YAML file has been disabled.');
     $object = new \stdClass();
     $object->foo = 'bar';
@@ -80,7 +80,7 @@ class YamlTest extends YamlTestBase {
    * Ensures that decoding PHP objects does not work in Symfony.
    */
   public function testDecodeObjectSupportDisabled(): void {
-    $this->expectException(InvalidDataTypeException::class);
+    $this->expectException(\Drupal\Component\Serialization\Exception\InvalidDataTypeException::class);
     $this->expectExceptionMessageMatches('/^Object support when parsing a YAML file has been disabled/');
     $yaml = <<<YAML
     obj: !php/object "O:8:\"stdClass\":1:{s:3:\"foo\";s:3:\"bar\";}"

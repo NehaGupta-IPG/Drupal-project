@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 /**
  * A cacheable NotFoundHttpException.
  */
-class CacheableNotFoundHttpException extends NotFoundHttpException implements CacheableDependencyInterface {
+class CacheableNotFoundHttpException extends \Symfony\Component\HttpKernel\Exception\NotFoundHttpException implements CacheableDependencyInterface {
 
   use CacheableDependencyTrait;
 

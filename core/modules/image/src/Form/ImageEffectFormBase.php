@@ -58,13 +58,13 @@ abstract class ImageEffectFormBase extends FormBase {
     try {
       $this->imageEffect = $this->prepareImageEffect($image_effect);
     }
-    catch (PluginNotFoundException) {
-      throw new NotFoundHttpException("Invalid effect id: '$image_effect'.");
+    catch (\Drupal\Component\Plugin\Exception\PluginNotFoundException) {
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException("Invalid effect id: '$image_effect'.");
     }
     $request = $this->getRequest();
 
     if (!($this->imageEffect instanceof ConfigurableImageEffectInterface)) {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
 
     $form['#attached']['library'][] = 'image/admin';

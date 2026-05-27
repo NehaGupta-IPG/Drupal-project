@@ -107,7 +107,7 @@ class EntryPoint extends ControllerBase {
         // itself and the currently authenticated user.
         $cacheability = $cacheability->merge($me_url);
       }
-      catch (RouteNotFoundException) {
+      catch (\Symfony\Component\Routing\Exception\RouteNotFoundException) {
         // Do not add the link if the route is disabled or marked as internal.
       }
     }

@@ -243,7 +243,7 @@ abstract class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseT
     $savepoint = $this->createFirstSavepointTransaction();
 
     // Try to rollback root. Since a savepoint is active, this should fail.
-    $this->expectException(TransactionOutOfOrderException::class);
+    $this->expectException(\Drupal\Core\Database\TransactionOutOfOrderException::class);
     $this->expectExceptionMessageMatches("/^Error attempting rollback of .*\\\\drupal_transaction\\. Active stack: .*\\\\drupal_transaction > .*\\\\savepoint_1/");
     $transaction->rollBack();
   }
@@ -300,7 +300,7 @@ abstract class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseT
       $this->fail('Expected TransactionOutOfOrderException was not thrown');
     }
     catch (\Exception $e) {
-      $this->assertInstanceOf(TransactionOutOfOrderException::class, $e);
+      $this->assertInstanceOf(\Drupal\Core\Database\TransactionOutOfOrderException::class, $e);
       $this->assertMatchesRegularExpression("/^Error attempting rollback of .*\\\\savepoint_1\\. Active stack: .*\\\\drupal_transaction/", $e->getMessage());
     }
     $this->assertRowPresent('David');
@@ -332,7 +332,7 @@ abstract class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseT
     $this->assertRowPresent('Syd');
 
     // Try to rollback to savepoint 1. Out of order.
-    $this->expectException(TransactionOutOfOrderException::class);
+    $this->expectException(\Drupal\Core\Database\TransactionOutOfOrderException::class);
     $this->expectExceptionMessageMatches("/^Error attempting rollback of .*\\\\savepoint_1\\. Active stack: .*\\\\drupal_transaction > .*\\\\savepoint_1 > .*\\\\savepoint_2/");
     $savepoint1->rollBack();
   }
@@ -776,7 +776,7 @@ abstract class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseT
     $savepoint1 = $this->createFirstSavepointTransaction('', FALSE);
     $this->assertSame('savepoint_1', $savepoint1->name());
 
-    $this->expectException(TransactionNameNonUniqueException::class);
+    $this->expectException(\Drupal\Core\Database\TransactionNameNonUniqueException::class);
     $this->expectExceptionMessage("savepoint_1 is already in use.");
     $this->connection->startTransaction('savepoint_1');
   }

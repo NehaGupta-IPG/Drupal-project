@@ -50,7 +50,7 @@ final class FieldConfigAddController extends ControllerBase {
     // @see \Drupal\field_ui\Form\FieldStorageAddForm::submitForm
     $temp_storage = $this->tempStore->get($entity_type . ':' . $field_name);
     if (!$temp_storage) {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
 
     /** @var \Drupal\Core\Field\FieldConfigInterface $entity */

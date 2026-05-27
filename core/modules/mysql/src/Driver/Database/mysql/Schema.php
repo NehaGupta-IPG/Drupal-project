@@ -329,7 +329,7 @@ class Schema extends DatabaseSchema {
           }
         }
         else {
-          throw new SchemaException("MySQL needs the '$field_name' field specification in order to normalize the '$index_name' index");
+          throw new \Drupal\Core\Database\SchemaException("MySQL needs the '$field_name' field specification in order to normalize the '$index_name' index");
         }
       }
     }
@@ -379,10 +379,10 @@ class Schema extends DatabaseSchema {
    */
   public function renameTable($table, $new_name) {
     if (!$this->tableExists($table)) {
-      throw new SchemaObjectDoesNotExistException("Cannot rename '$table' to '$new_name': table '$table' doesn't exist.");
+      throw new \Drupal\Core\Database\SchemaObjectDoesNotExistException("Cannot rename '$table' to '$new_name': table '$table' doesn't exist.");
     }
     if ($this->tableExists($new_name)) {
-      throw new SchemaObjectExistsException("Cannot rename '$table' to '$new_name': table '$new_name' already exists.");
+      throw new \Drupal\Core\Database\SchemaObjectExistsException("Cannot rename '$table' to '$new_name': table '$new_name' already exists.");
     }
 
     $info = $this->getPrefixInfo($new_name);
@@ -406,10 +406,10 @@ class Schema extends DatabaseSchema {
    */
   public function addField($table, $field, $spec, $keys_new = []) {
     if (!$this->tableExists($table)) {
-      throw new SchemaObjectDoesNotExistException("Cannot add field '$table.$field': table doesn't exist.");
+      throw new \Drupal\Core\Database\SchemaObjectDoesNotExistException("Cannot add field '$table.$field': table doesn't exist.");
     }
     if ($this->fieldExists($table, $field)) {
-      throw new SchemaObjectExistsException("Cannot add field '$table.$field': field already exists.");
+      throw new \Drupal\Core\Database\SchemaObjectExistsException("Cannot add field '$table.$field': field already exists.");
     }
 
     // Fields that are part of a PRIMARY KEY must be added as NOT NULL.
@@ -438,7 +438,7 @@ class Schema extends DatabaseSchema {
     try {
       $this->executeDdlStatement($query);
     }
-    catch (SchemaPrimaryKeyMustBeDroppedException $e) {
+    catch (\Drupal\Core\Database\Exception\SchemaPrimaryKeyMustBeDroppedException $e) {
       // MySQL error number 4111 (ER_DROP_PK_COLUMN_TO_DROP_GIPK) indicates that
       // when dropping and adding a primary key, the generated invisible primary
       // key (GIPK) column must also be dropped.
@@ -513,10 +513,10 @@ class Schema extends DatabaseSchema {
    */
   public function addPrimaryKey($table, $fields) {
     if (!$this->tableExists($table)) {
-      throw new SchemaObjectDoesNotExistException("Cannot add primary key to table '$table': table doesn't exist.");
+      throw new \Drupal\Core\Database\SchemaObjectDoesNotExistException("Cannot add primary key to table '$table': table doesn't exist.");
     }
     if ($this->indexExists($table, 'PRIMARY')) {
-      throw new SchemaObjectExistsException("Cannot add primary key to table '$table': primary key already exists.");
+      throw new \Drupal\Core\Database\SchemaObjectExistsException("Cannot add primary key to table '$table': primary key already exists.");
     }
 
     $this->executeDdlStatement('ALTER TABLE {' . $table . '} ADD PRIMARY KEY (' . $this->createKeySql($fields) . ')');
@@ -550,10 +550,10 @@ class Schema extends DatabaseSchema {
    */
   public function addUniqueKey($table, $name, $fields) {
     if (!$this->tableExists($table)) {
-      throw new SchemaObjectDoesNotExistException("Cannot add unique key '$name' to table '$table': table doesn't exist.");
+      throw new \Drupal\Core\Database\SchemaObjectDoesNotExistException("Cannot add unique key '$name' to table '$table': table doesn't exist.");
     }
     if ($this->indexExists($table, $name)) {
-      throw new SchemaObjectExistsException("Cannot add unique key '$name' to table '$table': unique key already exists.");
+      throw new \Drupal\Core\Database\SchemaObjectExistsException("Cannot add unique key '$name' to table '$table': unique key already exists.");
     }
 
     $this->executeDdlStatement('ALTER TABLE {' . $table . '} ADD UNIQUE KEY [' . $name . '] (' . $this->createKeySql($fields) . ')');
@@ -576,10 +576,10 @@ class Schema extends DatabaseSchema {
    */
   public function addIndex($table, $name, $fields, array $spec) {
     if (!$this->tableExists($table)) {
-      throw new SchemaObjectDoesNotExistException("Cannot add index '$name' to table '$table': table doesn't exist.");
+      throw new \Drupal\Core\Database\SchemaObjectDoesNotExistException("Cannot add index '$name' to table '$table': table doesn't exist.");
     }
     if ($this->indexExists($table, $name)) {
-      throw new SchemaObjectExistsException("Cannot add index '$name' to table '$table': index already exists.");
+      throw new \Drupal\Core\Database\SchemaObjectExistsException("Cannot add index '$name' to table '$table': index already exists.");
     }
 
     $spec['indexes'][$name] = $fields;
@@ -605,7 +605,7 @@ class Schema extends DatabaseSchema {
    */
   protected function introspectIndexSchema($table) {
     if (!$this->tableExists($table)) {
-      throw new SchemaObjectDoesNotExistException("The table $table doesn't exist.");
+      throw new \Drupal\Core\Database\SchemaObjectDoesNotExistException("The table $table doesn't exist.");
     }
 
     $index_schema = [
@@ -635,10 +635,10 @@ class Schema extends DatabaseSchema {
    */
   public function changeField($table, $field, $field_new, $spec, $keys_new = []) {
     if (!$this->fieldExists($table, $field)) {
-      throw new SchemaObjectDoesNotExistException("Cannot change the definition of field '$table.$field': field doesn't exist.");
+      throw new \Drupal\Core\Database\SchemaObjectDoesNotExistException("Cannot change the definition of field '$table.$field': field doesn't exist.");
     }
     if (($field != $field_new) && $this->fieldExists($table, $field_new)) {
-      throw new SchemaObjectExistsException("Cannot rename field '$table.$field' to '$field_new': target field already exists.");
+      throw new \Drupal\Core\Database\SchemaObjectExistsException("Cannot rename field '$table.$field' to '$field_new': target field already exists.");
     }
     if (isset($keys_new['primary key']) && in_array($field_new, $keys_new['primary key'], TRUE)) {
       $this->ensureNotNullPrimaryKey($keys_new['primary key'], [$field_new => $spec]);

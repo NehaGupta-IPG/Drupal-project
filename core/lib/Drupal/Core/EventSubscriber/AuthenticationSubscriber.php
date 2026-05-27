@@ -93,7 +93,7 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
     if (isset($this->filter) && $event->isMainRequest()) {
       $request = $event->getRequest();
       if ($this->authenticationProvider->applies($request) && !$this->filter->appliesToRoutedRequest($request, TRUE)) {
-        throw new AccessDeniedHttpException('The used authentication method is not allowed on this route.');
+        throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException('The used authentication method is not allowed on this route.');
       }
     }
   }
@@ -112,7 +112,7 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
     if (isset($this->challengeProvider) && $event->isMainRequest()) {
       $request = $event->getRequest();
       $exception = $event->getThrowable();
-      if ($exception instanceof AccessDeniedHttpException && !$this->authenticationProvider->applies($request) && (!isset($this->filter) || $this->filter->appliesToRoutedRequest($request, FALSE))) {
+      if ($exception instanceof \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException && !$this->authenticationProvider->applies($request) && (!isset($this->filter) || $this->filter->appliesToRoutedRequest($request, FALSE))) {
         $challenge_exception = $this->challengeProvider->challengeException($request, $exception);
         if ($challenge_exception) {
           $event->setThrowable($challenge_exception);
@@ -131,8 +131,8 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
     if (isset($this->filter) && $event->isMainRequest()) {
       $request = $event->getRequest();
       $exception = $event->getThrowable();
-      if ($exception instanceof AccessDeniedHttpException && $this->authenticationProvider->applies($request) && !$this->filter->appliesToRoutedRequest($request, TRUE)) {
-        $event->setThrowable(new AccessDeniedHttpException('The used authentication method is not allowed on this route.', $exception));
+      if ($exception instanceof \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException && $this->authenticationProvider->applies($request) && !$this->filter->appliesToRoutedRequest($request, TRUE)) {
+        $event->setThrowable(new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException('The used authentication method is not allowed on this route.', $exception));
       }
     }
   }

@@ -189,7 +189,7 @@ class ConfigSingleImportForm extends ConfirmFormBase {
       // Decode the submitted import.
       $data = Yaml::decode($form_state->getValue('import'));
     }
-    catch (InvalidDataTypeException $e) {
+    catch (\Drupal\Component\Serialization\Exception\InvalidDataTypeException $e) {
       $form_state->setErrorByName('import', $this->t('The import failed with the following message: %message', ['%message' => $e->getMessage()]));
     }
 
@@ -255,7 +255,7 @@ class ConfigSingleImportForm extends ConfirmFormBase {
           $config_importer->validate();
           $form_state->set('config_importer', $config_importer);
         }
-        catch (ConfigImporterException) {
+        catch (\Drupal\Core\Config\ConfigImporterException) {
           // There are validation errors.
           $item_list = [
             '#theme' => 'item_list',
@@ -301,7 +301,7 @@ class ConfigSingleImportForm extends ConfirmFormBase {
         }
         batch_set($batch_builder->toArray());
       }
-      catch (ConfigImporterException) {
+      catch (\Drupal\Core\Config\ConfigImporterException) {
         // There are validation errors.
         $this->messenger()->addError($this->t('The configuration import failed for the following reasons:'));
         foreach ($config_importer->getErrors() as $message) {

@@ -37,7 +37,7 @@ class PathProcessorFront implements InboundPathProcessorInterface {
       if (empty($path)) {
         // We have to return a valid path but / does not have a route and config
         // might be broken so stop execution.
-        throw new NotFoundHttpException();
+        throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
       }
       $components = parse_url($path);
       // Remove query string and fragment.

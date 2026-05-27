@@ -64,7 +64,7 @@ class OffsetPageTest extends UnitTestCase {
    * Tests create from query parameter fail.
    */
   public function testCreateFromQueryParameterFail(): void {
-    $this->expectException(BadRequestHttpException::class);
+    $this->expectException(\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class);
     OffsetPage::createFromQueryParameter('lorem');
   }
 

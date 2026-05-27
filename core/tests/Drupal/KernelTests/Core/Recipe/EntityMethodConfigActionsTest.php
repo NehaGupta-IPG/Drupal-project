@@ -236,7 +236,7 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
 
     // We should get an exception if we try to set a nested value on a property
     // that isn't an array.
-    $this->expectException(ConfigActionException::class);
+    $this->expectException(\Drupal\Core\Config\Action\ConfigActionException::class);
     $this->expectExceptionMessage('The setProperties config action can only set nested values on arrays.');
     $this->configActionManager->applyAction(
       'setProperties',
@@ -258,7 +258,7 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
     $property_name = $view_display->getEntityType()->getKey($key);
     $this->assertNotEmpty($property_name);
 
-    $this->expectException(ConfigActionException::class);
+    $this->expectException(\Drupal\Core\Config\Action\ConfigActionException::class);
     $this->expectExceptionMessage("Entity key '$property_name' cannot be changed by the setProperties config action.");
     $this->configActionManager->applyAction(
       'setProperties',
@@ -275,7 +275,7 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
       ->getViewDisplay('entity_test_with_bundle', 'test');
     $view_display->save();
 
-    $this->expectException(ConfigActionException::class);
+    $this->expectException(\Drupal\Core\Config\Action\ConfigActionException::class);
     $this->expectExceptionMessage('Using the simpleConfigUpdate config action on config entities is not supported. Use the setProperties action instead. See https://www.drupal.org/node/3515543');
     $this->configActionManager->applyAction(
       'simpleConfigUpdate',

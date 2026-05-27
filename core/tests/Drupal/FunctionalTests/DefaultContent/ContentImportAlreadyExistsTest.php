@@ -98,7 +98,7 @@ class ContentImportAlreadyExistsTest extends BrowserTestBase {
     $this->drupalCreateUser(values: ['uuid' => '94503467-be7f-406c-9795-fc25baa22203']);
 
     if ($existing === Existing::Error) {
-      $this->expectException(ImportException::class);
+      $this->expectException(\Drupal\Core\DefaultContent\ImportException::class);
       $this->expectExceptionMessage('user 94503467-be7f-406c-9795-fc25baa22203 already exists.');
     }
 

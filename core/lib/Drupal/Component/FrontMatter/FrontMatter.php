@@ -136,9 +136,9 @@ class FrontMatter {
           try {
             $data = (array) $this->serializer::decode($raw);
           }
-          catch (InvalidDataTypeException $exception) {
+          catch (\Drupal\Component\Serialization\Exception\InvalidDataTypeException $exception) {
             // Rethrow a specific front matter parse exception.
-            throw new FrontMatterParseException($exception);
+            throw new \Drupal\Component\FrontMatter\Exception\FrontMatterParseException($exception);
           }
         }
 

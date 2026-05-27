@@ -57,7 +57,7 @@ final class ExecutableFinder implements ExecutableFinderInterface, LoggerAwareIn
       try {
         return Settings::get('package_manager_rsync_path', $this->decorated->find($name));
       }
-      catch (LogicException $e) {
+      catch (\PhpTuf\ComposerStager\API\Exception\LogicException $e) {
         if (isset($legacy_executables[$name])) {
           @trigger_error("Storing the path to rsync in configuration is deprecated in drupal:11.2.4 and not supported in drupal:12.0.0. Move it to the <code>package_manager_rsync_path</code> setting instead. See https://www.drupal.org/node/3540264", E_USER_DEPRECATED);
           return $legacy_executables[$name];
@@ -79,7 +79,7 @@ final class ExecutableFinder implements ExecutableFinderInterface, LoggerAwareIn
       try {
         return Settings::get('package_manager_composer_path', $this->decorated->find($name));
       }
-      catch (LogicException $e) {
+      catch (\PhpTuf\ComposerStager\API\Exception\LogicException $e) {
         if (isset($legacy_executables[$name])) {
           @trigger_error("Storing the path to Composer in configuration is deprecated in drupal:11.2.4 and not supported in drupal:12.0.0. Add composer/composer directly to your project's dependencies instead. See https://www.drupal.org/node/3540264", E_USER_DEPRECATED);
           return $legacy_executables[$name];

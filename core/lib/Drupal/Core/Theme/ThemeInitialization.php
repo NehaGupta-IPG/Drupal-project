@@ -126,7 +126,7 @@ class ThemeInitialization implements ThemeInitializationInterface {
     while ($ancestor && isset($themes[$ancestor]->base_theme)) {
       $ancestor = $themes[$ancestor]->base_theme;
       if (!$this->themeHandler->themeExists($ancestor)) {
-        throw new MissingThemeDependencyException(sprintf('Base theme %s has not been installed.', $ancestor), $ancestor);
+        throw new \Drupal\Core\Theme\MissingThemeDependencyException(sprintf('Base theme %s has not been installed.', $ancestor), $ancestor);
       }
       $base_themes[] = $themes[$ancestor];
     }

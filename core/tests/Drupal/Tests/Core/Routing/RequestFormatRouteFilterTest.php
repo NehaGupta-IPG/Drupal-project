@@ -99,7 +99,7 @@ class RequestFormatRouteFilterTest extends UnitTestCase {
     $request = Request::create('test?_format=xml', 'GET');
     $request->setRequestFormat('xml');
     $route_filter = new RequestFormatRouteFilter();
-    $this->expectException(NotAcceptableHttpException::class);
+    $this->expectException(\Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException::class);
     $this->expectExceptionMessage('No route found for the specified format.');
     $route_filter->filter($collection, $request);
   }
@@ -110,7 +110,7 @@ class RequestFormatRouteFilterTest extends UnitTestCase {
    * @legacy-covers ::filter
    */
   public function testNoRouteFoundWhenNoRequestFormatAndSingleRouteWithMultipleFormats(): void {
-    $this->expectException(NotAcceptableHttpException::class);
+    $this->expectException(\Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException::class);
     $this->expectExceptionMessage('No route found for the specified format.');
 
     $url = $this->prophesize(GeneratedUrl::class);

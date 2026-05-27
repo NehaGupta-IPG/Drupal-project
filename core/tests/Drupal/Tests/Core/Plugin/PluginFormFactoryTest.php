@@ -130,7 +130,7 @@ class PluginFormFactoryTest extends UnitTestCase {
    * Tests create instance definition exception.
    */
   public function testCreateInstanceDefinitionException(): void {
-    $this->expectException(InvalidPluginDefinitionException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class);
     $this->expectExceptionMessage('The "the_plugin_id" plugin did not specify a "anything" form class');
 
     $plugin = $this->prophesize(PluginWithFormsInterface::class);
@@ -145,7 +145,7 @@ class PluginFormFactoryTest extends UnitTestCase {
    * Tests create instance invalid exception.
    */
   public function testCreateInstanceInvalidException(): void {
-    $this->expectException(InvalidPluginDefinitionException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class);
     $this->expectExceptionMessage('The "the_plugin_id" plugin did not specify a valid "invalid" form class, must implement \Drupal\Core\Plugin\PluginFormInterface');
 
     $expected = new \stdClass();

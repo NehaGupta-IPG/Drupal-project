@@ -10,7 +10,7 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 /**
  * To throw when an entity generated during the import is not valid.
  */
-class EntityValidationException extends MigrateException {
+class EntityValidationException extends \Drupal\migrate\MigrateException {
 
   /**
    * The separator for combining multiple messages into a single string.

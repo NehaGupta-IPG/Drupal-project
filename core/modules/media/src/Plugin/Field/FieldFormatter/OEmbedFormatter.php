@@ -154,7 +154,7 @@ class OEmbedFormatter extends FormatterBase {
         $resource_url = $this->urlResolver->getResourceUrl($value, $max_width, $max_height);
         $resource = $this->resourceFetcher->fetchResource($resource_url);
       }
-      catch (ResourceException $exception) {
+      catch (\Drupal\media\OEmbed\ResourceException $exception) {
         $this->logger->error("Could not retrieve the remote URL (@url): %error", [
           '@url' => $value,
           '%error' => $exception->getPrevious() ? $exception->getPrevious()->getMessage() : $exception->getMessage(),

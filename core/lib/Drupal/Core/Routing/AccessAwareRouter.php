@@ -111,10 +111,10 @@ class AccessAwareRouter implements AccessAwareRouterInterface {
     }
     if (!$access_result->isAllowed()) {
       if ($access_result instanceof CacheableDependencyInterface && $request->isMethodCacheable()) {
-        throw new CacheableAccessDeniedHttpException($access_result, $access_result instanceof AccessResultReasonInterface ? $access_result->getReason() : '');
+        throw new \Drupal\Core\Http\Exception\CacheableAccessDeniedHttpException($access_result, $access_result instanceof AccessResultReasonInterface ? $access_result->getReason() : '');
       }
       else {
-        throw new AccessDeniedHttpException($access_result instanceof AccessResultReasonInterface ? $access_result->getReason() : '');
+        throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException($access_result instanceof AccessResultReasonInterface ? $access_result->getReason() : '');
       }
     }
   }
@@ -143,8 +143,8 @@ class AccessAwareRouter implements AccessAwareRouterInterface {
     try {
       $request = Request::create($pathinfo);
     }
-    catch (BadRequestException $e) {
-      throw new ResourceNotFoundException($e->getMessage(), $e->getCode(), $e);
+    catch (\Symfony\Component\HttpFoundation\Exception\BadRequestException $e) {
+      throw new \Symfony\Component\Routing\Exception\ResourceNotFoundException($e->getMessage(), $e->getCode(), $e);
     }
     return $this->matchRequest($request);
   }

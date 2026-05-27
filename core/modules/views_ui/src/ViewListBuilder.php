@@ -270,7 +270,7 @@ class ViewListBuilder extends ConfigEntityListBuilder {
               //   https://www.drupal.org/node/2423913
               $rendered_path = Link::fromTextAndUrl('/' . $path, Url::fromUserInput('/' . $path))->toString();
             }
-            catch (BadRequestException | NotAcceptableHttpException) {
+            catch (\Symfony\Component\HttpFoundation\Exception\BadRequestException | \Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException) {
               $rendered_path = '/' . $path;
             }
           }

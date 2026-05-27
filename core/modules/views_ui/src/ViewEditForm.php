@@ -492,7 +492,7 @@ class ViewEditForm extends ViewFormBase {
                 $url = Url::fromUri("base:$path");
               }
             }
-            catch (BadRequestException | NotAcceptableHttpException) {
+            catch (\Symfony\Component\HttpFoundation\Exception\BadRequestException | \Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException) {
               $url = '/' . $path;
             }
 

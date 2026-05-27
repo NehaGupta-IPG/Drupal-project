@@ -166,7 +166,7 @@ class MenuLinkManager implements MenuLinkManagerInterface {
   public function getDefinition($plugin_id, $exception_on_invalid = TRUE) {
     $definition = $this->treeStorage->load($plugin_id);
     if (empty($definition) && $exception_on_invalid) {
-      throw new PluginNotFoundException($plugin_id);
+      throw new \Drupal\Component\Plugin\Exception\PluginNotFoundException($plugin_id);
     }
     return $definition;
   }
@@ -240,7 +240,7 @@ class MenuLinkManager implements MenuLinkManagerInterface {
       }
     }
     else {
-      throw new PluginException("Menu link plugin with ID '$id' does not support deletion");
+      throw new \Drupal\Component\Plugin\Exception\PluginException("Menu link plugin with ID '$id' does not support deletion");
     }
     $this->treeStorage->delete($id);
   }
@@ -308,10 +308,10 @@ class MenuLinkManager implements MenuLinkManagerInterface {
    */
   public function addDefinition($id, array $definition) {
     if ($this->treeStorage->load($id)) {
-      throw new PluginException("The menu link ID $id already exists as a plugin definition");
+      throw new \Drupal\Component\Plugin\Exception\PluginException("The menu link ID $id already exists as a plugin definition");
     }
     elseif ($id === '') {
-      throw new PluginException("The menu link ID cannot be empty");
+      throw new \Drupal\Component\Plugin\Exception\PluginException("The menu link ID cannot be empty");
     }
     // Add defaults, so there is no requirement to specify everything.
     $this->processDefinition($definition, $id);
@@ -358,7 +358,7 @@ class MenuLinkManager implements MenuLinkManagerInterface {
     $id = $instance->getPluginId();
 
     if (!$instance->isResettable()) {
-      throw new PluginException("Menu link $id is not resettable");
+      throw new \Drupal\Component\Plugin\Exception\PluginException("Menu link $id is not resettable");
     }
     // Get the original data from disk, reset the override and re-save the menu
     // tree for this link.

@@ -81,7 +81,7 @@ class SiteConfigurationExcluder implements EventSubscriberInterface {
       return;
     }
     if (!$this->fileSystem->chmod($dir, 0700)) {
-      throw new FileException("Could not change permissions on '$dir'.");
+      throw new \Drupal\Core\File\Exception\FileException("Could not change permissions on '$dir'.");
     }
   }
 
@@ -105,11 +105,11 @@ class SiteConfigurationExcluder implements EventSubscriberInterface {
 
     $permissions = fileperms($live_dir);
     if ($permissions === FALSE) {
-      throw new FileException("Could not determine permissions for '$live_dir'.");
+      throw new \Drupal\Core\File\Exception\FileException("Could not determine permissions for '$live_dir'.");
     }
 
     if (!$this->fileSystem->chmod($staged_dir, $permissions)) {
-      throw new FileException("Could not change permissions on '$staged_dir'.");
+      throw new \Drupal\Core\File\Exception\FileException("Could not change permissions on '$staged_dir'.");
     }
   }
 

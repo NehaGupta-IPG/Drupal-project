@@ -32,7 +32,7 @@ class FileRepository implements FileRepositoryInterface {
    */
   public function writeData(string $data, string $destination, FileExists $fileExists = FileExists::Rename): FileInterface {
     if (!$this->streamWrapperManager->isValidUri($destination)) {
-      throw new InvalidStreamWrapperException("Invalid stream wrapper: {$destination}");
+      throw new \Drupal\Core\File\Exception\InvalidStreamWrapperException("Invalid stream wrapper: {$destination}");
     }
     $uri = $this->fileSystem->saveData($data, $destination, $fileExists);
     return $this->createOrUpdate($uri, $destination, $fileExists === FileExists::Rename);
@@ -76,7 +76,7 @@ class FileRepository implements FileRepositoryInterface {
    */
   public function copy(FileInterface $source, string $destination, FileExists $fileExists = FileExists::Rename): FileInterface {
     if (!$this->streamWrapperManager->isValidUri($destination)) {
-      throw new InvalidStreamWrapperException("Invalid stream wrapper: {$destination}");
+      throw new \Drupal\Core\File\Exception\InvalidStreamWrapperException("Invalid stream wrapper: {$destination}");
     }
     $uri = $this->fileSystem->copy($source->getFileUri(), $destination, $fileExists);
 
@@ -110,7 +110,7 @@ class FileRepository implements FileRepositoryInterface {
    */
   public function move(FileInterface $source, string $destination, FileExists $fileExists = FileExists::Rename): FileInterface {
     if (!$this->streamWrapperManager->isValidUri($destination)) {
-      throw new InvalidStreamWrapperException("Invalid stream wrapper: {$destination}");
+      throw new \Drupal\Core\File\Exception\InvalidStreamWrapperException("Invalid stream wrapper: {$destination}");
     }
     $uri = $this->fileSystem->move($source->getFileUri(), $destination, $fileExists);
     $delete_source = FALSE;

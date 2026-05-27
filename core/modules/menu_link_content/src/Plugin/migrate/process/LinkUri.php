@@ -112,7 +112,7 @@ class LinkUri extends ProcessPluginBase implements ContainerFactoryPluginInterfa
           return $url->getUri();
         }
         else {
-          throw new MigrateException(sprintf('The path "%s" failed validation.', $path));
+          throw new \Drupal\migrate\MigrateException(sprintf('The path "%s" failed validation.', $path));
         }
       }
     }

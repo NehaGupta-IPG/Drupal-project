@@ -107,7 +107,7 @@ class InstallTest extends KernelTestBase {
    */
   public function testModuleNameLength(): void {
     $module_name = 'invalid_module_name_over_the_maximum_allowed_character_length';
-    $this->expectException(ExtensionNameLengthException::class);
+    $this->expectException(\Drupal\Core\Extension\ExtensionNameLengthException::class);
     $this->expectExceptionMessage("Module name 'invalid_module_name_over_the_maximum_allowed_character_length' is over the maximum allowed length of 50 characters");
     $this->moduleInstaller->install([$module_name]);
   }
@@ -119,7 +119,7 @@ class InstallTest extends KernelTestBase {
    */
   public function testModuleNameLengthWithoutDependencyCheck(): void {
     $module_name = 'invalid_module_name_over_the_maximum_allowed_character_length';
-    $this->expectException(ExtensionNameLengthException::class);
+    $this->expectException(\Drupal\Core\Extension\ExtensionNameLengthException::class);
     $this->expectExceptionMessage("Module name 'invalid_module_name_over_the_maximum_allowed_character_length' is over the maximum allowed length of 50 characters");
     $this->moduleInstaller->install([$module_name], FALSE);
   }
@@ -137,7 +137,7 @@ class InstallTest extends KernelTestBase {
     // Install the theme, then the module.
     $this->container->get('theme_installer')->install([$name]);
     $message = "Module name {$name} is already in use by an installed theme.";
-    $this->expectException(ExtensionNameReservedException::class);
+    $this->expectException(\Drupal\Core\Extension\ExtensionNameReservedException::class);
     $this->expectExceptionMessage($message);
     $this->moduleInstaller->install([$name]);
   }

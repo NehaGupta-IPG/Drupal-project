@@ -23,10 +23,10 @@ class TestSkipRowProcess extends ProcessPluginBase {
     // Test both options for save_to_map.
     $data = $row->getSourceProperty('data');
     if ($data == 'skip_and_record (use plugin)') {
-      throw new MigrateSkipRowException('', TRUE);
+      throw new \Drupal\migrate\MigrateSkipRowException('', TRUE);
     }
     elseif ($data == 'skip_and_do_not_record (use plugin)') {
-      throw new MigrateSkipRowException('', FALSE);
+      throw new \Drupal\migrate\MigrateSkipRowException('', FALSE);
     }
     return $value;
   }

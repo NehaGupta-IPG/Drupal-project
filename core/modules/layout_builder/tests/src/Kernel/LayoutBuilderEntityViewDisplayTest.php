@@ -46,7 +46,7 @@ class LayoutBuilderEntityViewDisplayTest extends SectionListTestBase {
    * Tests that configuration schema enforces valid values.
    */
   public function testInvalidConfiguration(): void {
-    $this->expectException(SchemaIncompleteException::class);
+    $this->expectException(\Drupal\Core\Config\Schema\SchemaIncompleteException::class);
     $this->sectionList->getSection(0)
       ->getComponent('10000000-0000-1000-a000-000000000000')
       ->setConfiguration(['id' => 'foo', 'bar' => 'baz']);

@@ -27,10 +27,10 @@ trait EntityOwnerTrait {
    */
   public static function ownerBaseFieldDefinitions(EntityTypeInterface $entity_type) {
     if (!is_subclass_of($entity_type->getClass(), EntityOwnerInterface::class)) {
-      throw new UnsupportedEntityTypeDefinitionException('The entity type ' . $entity_type->id() . ' does not implement \Drupal\user\EntityOwnerInterface.');
+      throw new \Drupal\Core\Entity\Exception\UnsupportedEntityTypeDefinitionException('The entity type ' . $entity_type->id() . ' does not implement \Drupal\user\EntityOwnerInterface.');
     }
     if (!$entity_type->hasKey('owner')) {
-      throw new UnsupportedEntityTypeDefinitionException('The entity type ' . $entity_type->id() . ' does not have an "owner" entity key.');
+      throw new \Drupal\Core\Entity\Exception\UnsupportedEntityTypeDefinitionException('The entity type ' . $entity_type->id() . ' does not have an "owner" entity key.');
     }
 
     return [

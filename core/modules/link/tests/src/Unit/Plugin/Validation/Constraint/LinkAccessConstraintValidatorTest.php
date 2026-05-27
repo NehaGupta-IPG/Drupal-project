@@ -98,7 +98,7 @@ class LinkAccessConstraintValidatorTest extends UnitTestCase {
    * Tests validating a value that isn't a LinkItemInterface.
    */
   public function testUnexpectedValue(): void {
-    $this->expectException(UnexpectedValueException::class);
+    $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedValueException::class);
     $user = $this->createStub(AccountProxyInterface::class);
     $validator = new LinkAccessConstraintValidator($user);
     $context = $this->createStub(ExecutionContextInterface::class);

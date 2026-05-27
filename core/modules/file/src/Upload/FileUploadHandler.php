@@ -68,7 +68,7 @@ class FileUploadHandler implements FileUploadHandlerInterface {
     // Assert that the destination contains a valid stream.
     $destinationScheme = $this->streamWrapperManager::getScheme($destination);
     if (!$this->streamWrapperManager->isValidScheme($destinationScheme)) {
-      throw new InvalidStreamWrapperException(sprintf('The file could not be uploaded because the destination "%s" is invalid.', $destination));
+      throw new \Drupal\Core\File\Exception\InvalidStreamWrapperException(sprintf('The file could not be uploaded because the destination "%s" is invalid.', $destination));
     }
 
     // A file URI may already have a trailing slash or look like "public://".
@@ -85,7 +85,7 @@ class FileUploadHandler implements FileUploadHandlerInterface {
     $mimeType = $this->mimeTypeGuesser->guessMimeType($filename);
     $destinationFilename = $this->fileSystem->getDestinationFilename($destination . $filename, $fileExists);
     if ($destinationFilename === FALSE) {
-      throw new FileExistsException(sprintf('Destination file "%s" exists', $destinationFilename));
+      throw new \Drupal\Core\File\Exception\FileExistsException(sprintf('Destination file "%s" exists', $destinationFilename));
     }
 
     // Lock based on the prepared file URI.
@@ -93,7 +93,7 @@ class FileUploadHandler implements FileUploadHandlerInterface {
 
     try {
       if (!$this->lock->acquire($lock_id)) {
-        throw new LockAcquiringException(
+        throw new \Drupal\Core\Lock\LockAcquiringException(
           sprintf(
             'File "%s" is already locked for writing.',
             $destinationFilename
@@ -126,7 +126,7 @@ class FileUploadHandler implements FileUploadHandlerInterface {
       $file->setFileUri($destinationFilename);
 
       if (!$this->moveUploadedFile($uploadedFile, $file->getFileUri())) {
-        throw new FileWriteException(
+        throw new \Drupal\Core\File\Exception\FileWriteException(
           'File upload error. Could not move uploaded file.'
         );
       }

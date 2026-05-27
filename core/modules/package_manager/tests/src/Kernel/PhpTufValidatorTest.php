@@ -142,7 +142,7 @@ class PhpTufValidatorTest extends PackageManagerKernelTestBase {
       $stage->apply();
       $this->fail('Expected an exception but none was thrown.');
     }
-    catch (SandboxEventException $e) {
+    catch (\Drupal\package_manager\Exception\SandboxEventException $e) {
       $this->assertInstanceOf(PreApplyEvent::class, $e->event);
       $this->assertValidationResultsEqual([$result], $e->event->getResults());
     }

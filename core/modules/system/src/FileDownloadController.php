@@ -68,7 +68,7 @@ class FileDownloadController extends ControllerBase {
 
       foreach ($headers as $result) {
         if ($result == -1) {
-          throw new AccessDeniedHttpException();
+          throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
         }
       }
 
@@ -95,10 +95,10 @@ class FileDownloadController extends ControllerBase {
           : $response->setPrivate();
       }
 
-      throw new AccessDeniedHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
     }
 
-    throw new NotFoundHttpException();
+    throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
   }
 
 }

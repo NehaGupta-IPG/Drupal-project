@@ -62,15 +62,15 @@ abstract class ViewFormBase extends EntityForm {
       // If a display is specified, but we don't have access to it, return
       // an access denied page.
       if ($this->displayID && !isset($tabs[$this->displayID])) {
-        throw new NotFoundHttpException();
+        throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
       }
       elseif ($this->displayID && (isset($tabs[$this->displayID]['#access']) && !$tabs[$this->displayID]['#access'])) {
-        throw new AccessDeniedHttpException();
+        throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
       }
 
     }
     elseif ($this->displayID) {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
   }
 

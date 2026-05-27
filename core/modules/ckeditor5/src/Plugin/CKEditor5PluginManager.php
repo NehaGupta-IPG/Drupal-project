@@ -81,7 +81,7 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
    */
   public function processDefinition(&$definition, $plugin_id) {
     if (!$definition instanceof CKEditor5PluginDefinition) {
-      throw new InvalidPluginDefinitionException($plugin_id, sprintf('The "%s" CKEditor 5 plugin definition must extend %s', $plugin_id, CKEditor5PluginDefinition::class));
+      throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($plugin_id, sprintf('The "%s" CKEditor 5 plugin definition must extend %s', $plugin_id, CKEditor5PluginDefinition::class));
     }
 
     // A derived plugin will still have the ID of the derivative, rather than
@@ -97,20 +97,20 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
     $expected_prefix = sprintf("%s_", $definition->getProvider());
     $id = $definition->id();
     if (!str_starts_with($id, $expected_prefix)) {
-      throw new InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition must have a plugin ID that starts with "%s".', $id, $expected_prefix));
+      throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition must have a plugin ID that starts with "%s".', $id, $expected_prefix));
     }
 
     try {
       $definition->validateCKEditor5Aspects($id, $definition->toArray());
       $definition->validateDrupalAspects($id, $definition->toArray());
     }
-    catch (InvalidPluginDefinitionException $e) {
+    catch (\Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException $e) {
       // If this exception is thrown for a derived CKEditor 5 plugin definition,
       // it means the deriver did not generate a valid plugin definition.
       // Re-throw the exception, but tweak the language for DX: clarify it is
       // for a derived plugin definition.
       if ($is_derived) {
-        throw new InvalidPluginDefinitionException($e->getPluginId(), str_replace('plugin definition', 'derived plugin definition', $e->getMessage()));
+        throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($e->getPluginId(), str_replace('plugin definition', 'derived plugin definition', $e->getMessage()));
       }
       // Otherwise, the exception was appropriate: re-throw it.
       throw $e;

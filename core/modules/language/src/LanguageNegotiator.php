@@ -90,7 +90,7 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
           try {
             $this->negotiatedLanguages[$method_id] = $this->negotiateLanguage($type, $method_id);
           }
-          catch (PluginNotFoundException $e) {
+          catch (\Drupal\Component\Plugin\Exception\PluginNotFoundException $e) {
             // If a plugin is not found, log the error so user can handle it.
             $this->getLogger('language')->error($e->getMessage());
           }

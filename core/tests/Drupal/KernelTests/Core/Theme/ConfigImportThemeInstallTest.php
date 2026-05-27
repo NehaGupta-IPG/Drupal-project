@@ -50,7 +50,7 @@ class ConfigImportThemeInstallTest extends KernelTestBase {
       $this->configImporter()->validate();
       $this->fail('ConfigImporterException not thrown; an invalid import was not stopped due to missing dependencies.');
     }
-    catch (ConfigImporterException $e) {
+    catch (\Drupal\Core\Config\ConfigImporterException $e) {
       $error_message = 'Unable to uninstall the <em class="placeholder">Test Module Required by Theme</em> module because: Required by the theme: Test Theme Depending on Modules.';
       $this->assertStringContainsString($error_message, $e->getMessage(), 'There were errors validating the config synchronization.');
       $error_log = $this->configImporter->getErrors();
@@ -73,7 +73,7 @@ class ConfigImportThemeInstallTest extends KernelTestBase {
       $this->configImporter()->validate();
       $this->fail('ConfigImporterException not thrown; an invalid import was not stopped due to missing dependencies.');
     }
-    catch (ConfigImporterException $e) {
+    catch (\Drupal\Core\Config\ConfigImporterException $e) {
       $error_message = 'Unable to install the <em class="placeholder">Test Theme Depending on Modules</em> theme since it requires the <em class="placeholder">Test Module Required by Theme</em> module.';
       $this->assertStringContainsString($error_message, $e->getMessage(), 'There were errors validating the config synchronization.');
       $error_log = $this->configImporter->getErrors();

@@ -222,7 +222,7 @@ class DuplicateInfoFileValidatorTest extends PackageManagerKernelTestBase {
       $stage->apply();
       $this->assertEmpty($expected_results);
     }
-    catch (SandboxEventException $e) {
+    catch (\Drupal\package_manager\Exception\SandboxEventException $e) {
       $this->assertNotEmpty($expected_results);
       $this->assertValidationResultsEqual($expected_results, $e->event->getResults());
     }

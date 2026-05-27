@@ -28,12 +28,12 @@ class IdAuditor implements AuditorInterface {
 
     $destination = $migration->getDestinationPlugin();
     if (!$destination instanceof HighestIdInterface) {
-      throw new AuditException($migration, "Destination does not implement $interface");
+      throw new \Drupal\migrate\Audit\AuditException($migration, "Destination does not implement $interface");
     }
 
     $id_map = $migration->getIdMap();
     if (!$id_map instanceof HighestIdInterface) {
-      throw new AuditException($migration, "ID map does not implement $interface");
+      throw new \Drupal\migrate\Audit\AuditException($migration, "ID map does not implement $interface");
     }
 
     if ($destination->getHighestId() > $id_map->getHighestId() || ($destination instanceof EntityContentComplete && !$this->auditEntityComplete($migration))) {

@@ -35,7 +35,7 @@ final class TestExecutableFinder implements ExecutableFinderInterface {
   public function find(string $name): string {
     if ($this->state->get("throw for $name")) {
       $message = new TranslatableStringAdapter("$name is not a thing");
-      throw new LogicException($message);
+      throw new \PhpTuf\ComposerStager\API\Exception\LogicException($message);
     }
     return $this->decorated->find($name);
   }

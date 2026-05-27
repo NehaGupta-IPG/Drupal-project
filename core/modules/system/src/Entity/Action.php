@@ -98,7 +98,7 @@ class Action extends ConfigEntityBase implements ActionConfigEntityInterface, En
         assert(array_key_exists('label', $action_plugin_definition));
         $values['label'] = $action_plugin_definition['label'];
       }
-      catch (PluginNotFoundException) {
+      catch (\Drupal\Component\Plugin\Exception\PluginNotFoundException) {
       }
     }
     return parent::create($values);

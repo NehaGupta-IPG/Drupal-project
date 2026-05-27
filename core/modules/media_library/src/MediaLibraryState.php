@@ -111,7 +111,7 @@ class MediaLibraryState extends ParameterBag implements CacheableDependencyInter
     // malicious user modifying the query string to attempt to access
     // inaccessible information.
     if (!$state->isValidHash($query->get('hash'))) {
-      throw new BadRequestHttpException("Invalid media library parameters specified.");
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException("Invalid media library parameters specified.");
     }
 
     // @todo Review parameters passed and remove irrelevant ones in

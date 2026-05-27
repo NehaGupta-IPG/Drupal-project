@@ -139,8 +139,8 @@ class CronTest extends UnitTestCase {
     $queue_worker_plugin->getPluginDefinition()->willReturn($queue_worker_definition);
     $queue_worker_plugin->processItem('Complete')->willReturn();
     $queue_worker_plugin->processItem('Exception')->willThrow(\Exception::class);
-    $queue_worker_plugin->processItem('DelayedRequeueException')->willThrow(DelayedRequeueException::class);
-    $queue_worker_plugin->processItem('SuspendQueueException')->willThrow(SuspendQueueException::class);
+    $queue_worker_plugin->processItem('DelayedRequeueException')->willThrow(\Drupal\Core\Queue\DelayedRequeueException::class);
+    $queue_worker_plugin->processItem('SuspendQueueException')->willThrow(\Drupal\Core\Queue\SuspendQueueException::class);
     // 'RequeueException' would normally result in an infinite loop.
     //
     // This is avoided by throwing RequeueException for the first few calls to
@@ -154,7 +154,7 @@ class CronTest extends UnitTestCase {
       // Throw the expected exception on the first few calls.
       if ($method_calls < self::REQUEUE_COUNT) {
         \Drupal::state()->set('cron_test.requeue_count', $method_calls + 1);
-        throw new RequeueException();
+        throw new \Drupal\Core\Queue\RequeueException();
       }
     });
 

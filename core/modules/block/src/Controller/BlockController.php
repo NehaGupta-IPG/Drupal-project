@@ -49,7 +49,7 @@ class BlockController extends ControllerBase {
    */
   public function demo($theme) {
     if (!$this->themeHandler->hasUi($theme)) {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
 
     $page = [

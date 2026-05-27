@@ -28,11 +28,11 @@ trait RevisionLogEntityTrait {
   public static function revisionLogBaseFieldDefinitions(EntityTypeInterface $entity_type) {
 
     if (!($entity_type instanceof ContentEntityTypeInterface)) {
-      throw new UnsupportedEntityTypeDefinitionException('The entity type ' . $entity_type->id() . ' is not a content entity type.');
+      throw new \Drupal\Core\Entity\Exception\UnsupportedEntityTypeDefinitionException('The entity type ' . $entity_type->id() . ' is not a content entity type.');
     }
     foreach (['revision_created', 'revision_user', 'revision_log_message'] as $revision_metadata_key) {
       if (!$entity_type->hasRevisionMetadataKey($revision_metadata_key)) {
-        throw new UnsupportedEntityTypeDefinitionException('The entity type ' . $entity_type->id() . ' does not have an "' . $revision_metadata_key . '" entity revision metadata key.');
+        throw new \Drupal\Core\Entity\Exception\UnsupportedEntityTypeDefinitionException('The entity type ' . $entity_type->id() . ' does not have an "' . $revision_metadata_key . '" entity revision metadata key.');
       }
     }
 

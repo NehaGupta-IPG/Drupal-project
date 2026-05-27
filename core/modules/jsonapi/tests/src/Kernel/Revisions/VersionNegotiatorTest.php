@@ -141,7 +141,7 @@ class VersionNegotiatorTest extends JsonapiKernelTestBase {
    * @legacy-covers \Drupal\jsonapi\Revisions\VersionById::getRevision
    */
   public function testInvalidRevisionId(): void {
-    $this->expectException(CacheableNotFoundHttpException::class);
+    $this->expectException(\Drupal\Core\Http\Exception\CacheableNotFoundHttpException::class);
     $this->expectExceptionMessage(sprintf('The requested version, identified by `id:%s`, could not be found.', $this->node2->getRevisionId()));
     $this->versionNegotiator->getRevision($this->node, 'id:' . $this->node2->getRevisionId());
   }
@@ -175,7 +175,7 @@ class VersionNegotiatorTest extends JsonapiKernelTestBase {
    * @legacy-covers \Drupal\jsonapi\Revisions\VersionByRel::getRevision
    */
   public function testInvalidRevisionRel(): void {
-    $this->expectException(CacheableBadRequestHttpException::class);
+    $this->expectException(\Drupal\Core\Http\Exception\CacheableBadRequestHttpException::class);
     $this->expectExceptionMessage('An invalid resource version identifier, `rel:erroneous-revision-name`, was provided.');
     $this->versionNegotiator->getRevision($this->node, 'rel:erroneous-revision-name');
   }

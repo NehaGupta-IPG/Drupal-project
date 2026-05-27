@@ -47,7 +47,7 @@ class InstallProfileDependenciesTest extends BrowserTestBase {
       $this->container->get('module_installer')->uninstall(['dblog']);
       $this->fail('Uninstalled dblog module.');
     }
-    catch (ModuleUninstallValidatorException $e) {
+    catch (\Drupal\Core\Extension\ModuleUninstallValidatorException $e) {
       $this->assertStringContainsString("The 'Testing install profile dependencies' install profile requires 'Database Logging'", $e->getMessage());
     }
   }

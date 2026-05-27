@@ -54,7 +54,7 @@ class FundamentalCompatibilityConstraintValidator extends ConstraintValidator im
    */
   public function validate($toolbar_item, Constraint $constraint): void {
     if (!$constraint instanceof FundamentalCompatibilityConstraint) {
-      throw new UnexpectedTypeException($constraint, __NAMESPACE__ . '\FundamentalCompatibility');
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($constraint, __NAMESPACE__ . '\FundamentalCompatibility');
     }
 
     $text_editor = $this->createTextEditorObjectFromContext();

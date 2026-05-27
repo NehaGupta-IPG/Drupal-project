@@ -167,10 +167,10 @@ class RequestHandler implements ContainerInjectionInterface {
       try {
         $unserialized = $this->serializer->decode($received, $format, ['request_method' => $method]);
       }
-      catch (UnexpectedValueException $e) {
+      catch (\Symfony\Component\Serializer\Exception\UnexpectedValueException $e) {
         // If an exception was thrown at this stage, there was a problem
         // decoding the data. Throw a 400 http exception.
-        throw new BadRequestHttpException($e->getMessage());
+        throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException($e->getMessage());
       }
 
       // Then attempt to denormalize if there is a serialization class.
@@ -180,11 +180,11 @@ class RequestHandler implements ContainerInjectionInterface {
         }
         // These two serialization exception types mean there was a problem
         // with the structure of the decoded data and it's not valid.
-        catch (UnexpectedValueException $e) {
-          throw new UnprocessableEntityHttpException($e->getMessage());
+        catch (\Symfony\Component\Serializer\Exception\UnexpectedValueException $e) {
+          throw new \Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException($e->getMessage());
         }
-        catch (InvalidArgumentException $e) {
-          throw new UnprocessableEntityHttpException($e->getMessage());
+        catch (\Symfony\Component\Serializer\Exception\InvalidArgumentException $e) {
+          throw new \Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException($e->getMessage());
         }
       }
     }

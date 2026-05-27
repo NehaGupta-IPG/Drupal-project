@@ -489,7 +489,7 @@ class AccessManagerTest extends UnitTestCase {
   public function testCheckNamedRouteWithNonExistingRoute(): void {
     $this->routeProvider
       ->method('getRouteByName')
-      ->will($this->throwException(new RouteNotFoundException()));
+      ->will($this->throwException(new \Symfony\Component\Routing\Exception\RouteNotFoundException()));
     $accessManager = new AccessManager(
       $this->routeProvider,
       $this->createStub(ParamConverterManagerInterface::class),
@@ -552,7 +552,7 @@ class AccessManagerTest extends UnitTestCase {
       $this->checkProvider,
     );
 
-    $this->expectException(AccessException::class);
+    $this->expectException(\Drupal\Core\Access\AccessException::class);
     $access_manager->checkNamedRoute('test_incorrect_value', [], $this->account);
   }
 

@@ -168,7 +168,7 @@ class ModuleHandlerTest extends UnitTestCase {
    * Tests get module with non existing module.
    */
   public function testGetModuleWithNonExistingModule(): void {
-    $this->expectException(UnknownExtensionException::class);
+    $this->expectException(\Drupal\Core\Extension\Exception\UnknownExtensionException::class);
     $this->getModuleHandler()->getModule('claire_alice_watch_my_little_pony_module_that_does_not_exist');
   }
 

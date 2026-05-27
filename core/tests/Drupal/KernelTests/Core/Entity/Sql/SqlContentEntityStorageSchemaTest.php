@@ -86,7 +86,7 @@ class SqlContentEntityStorageSchemaTest extends EntityKernelTestBase {
     // This should throw an exception because the field has existing data.
     $field_storage_definition->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
 
-    $this->expectException(FieldStorageDefinitionUpdateForbiddenException::class);
+    $this->expectException(\Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException::class);
     $this->entityDefinitionUpdateManager->updateFieldStorageDefinition($field_storage_definition);
   }
 

@@ -52,7 +52,7 @@ class Flatten extends ProcessPluginBase {
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
     if (!is_array($value) && !is_object($value)) {
       $type = gettype($value);
-      throw new MigrateException(sprintf("Input should be an array or an object, instead it was of type '%s'", $type));
+      throw new \Drupal\migrate\MigrateException(sprintf("Input should be an array or an object, instead it was of type '%s'", $type));
     }
     return iterator_to_array(new \RecursiveIteratorIterator(new \RecursiveArrayIterator((array) $value)), FALSE);
   }

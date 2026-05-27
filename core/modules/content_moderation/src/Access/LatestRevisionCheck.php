@@ -99,7 +99,7 @@ class LatestRevisionCheck implements AccessInterface {
         return $entity;
       }
     }
-    throw new AccessException(sprintf('%s is not a valid entity route. The LatestRevisionCheck access checker may only be used with a route that has a single entity parameter.', $route_match->getRouteName()));
+    throw new \Drupal\Core\Access\AccessException(sprintf('%s is not a valid entity route. The LatestRevisionCheck access checker may only be used with a route that has a single entity parameter.', $route_match->getRouteName()));
   }
 
 }

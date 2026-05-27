@@ -143,7 +143,7 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
 
         $policy_permissions = $access_policy->calculatePermissions($account, $scope);
         if (!$this->validateScope($scope, $policy_permissions)) {
-          throw new AccessPolicyScopeException(sprintf('The access policy "%s" returned permissions for scopes other than "%s".', get_class($access_policy), $scope));
+          throw new \Drupal\Core\Session\AccessPolicyScopeException(sprintf('The access policy "%s" returned permissions for scopes other than "%s".', get_class($access_policy), $scope));
         }
 
         $calculated_permissions = $calculated_permissions->merge($policy_permissions);
@@ -157,7 +157,7 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
 
         $access_policy->alterPermissions($account, $scope, $calculated_permissions);
         if (!$this->validateScope($scope, $calculated_permissions)) {
-          throw new AccessPolicyScopeException(sprintf('The access policy "%s" altered permissions in a scope other than "%s".', get_class($access_policy), $scope));
+          throw new \Drupal\Core\Session\AccessPolicyScopeException(sprintf('The access policy "%s" altered permissions in a scope other than "%s".', get_class($access_policy), $scope));
         }
       }
 

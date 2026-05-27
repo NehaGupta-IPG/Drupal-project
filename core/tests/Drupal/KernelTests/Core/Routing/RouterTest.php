@@ -64,7 +64,7 @@ class RouterTest extends KernelTestBase {
         Router::class,
       ));
     }
-    catch (CacheableResourceNotFoundException $exception) {
+    catch (\Drupal\Core\Routing\Exception\CacheableResourceNotFoundException $exception) {
       $this->assertEquals([], $exception->getCacheContexts());
       $this->assertEquals([], $exception->getCacheTags());
       $this->assertEquals(Cache::PERMANENT, $exception->getCacheMaxAge());
@@ -73,7 +73,7 @@ class RouterTest extends KernelTestBase {
       $this->fail(sprintf(
         '%s::match() should throw %s, %s thrown instead.',
         Router::class,
-        CacheableResourceNotFoundException::class,
+        \Drupal\Core\Routing\Exception\CacheableResourceNotFoundException::class,
         get_class($exception),
       ));
     }

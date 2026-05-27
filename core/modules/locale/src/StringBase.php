@@ -185,7 +185,7 @@ abstract class StringBase implements StringInterface {
       $storage->save($this);
     }
     else {
-      throw new StringStorageException('The string cannot be saved because its not bound to a storage: ' . $this->getString());
+      throw new \Drupal\locale\StringStorageException('The string cannot be saved because its not bound to a storage: ' . $this->getString());
     }
     return $this;
   }
@@ -199,7 +199,7 @@ abstract class StringBase implements StringInterface {
         $storage->delete($this);
       }
       else {
-        throw new StringStorageException('The string cannot be deleted because its not bound to a storage: ' . $this->getString());
+        throw new \Drupal\locale\StringStorageException('The string cannot be deleted because its not bound to a storage: ' . $this->getString());
       }
     }
     return $this;

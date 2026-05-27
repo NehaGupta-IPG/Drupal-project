@@ -242,7 +242,7 @@ final class SettingsForm extends ConfigFormBase {
 
       }
     }
-    catch (FileException) {
+    catch (\Drupal\Core\File\Exception\FileException) {
       $this->messenger()->addError($this->t('The file %file could not be copied to the permanent destination. Contact the site administrator if the problem persists.', ['%file' => $values['logo_upload']->getFilename()]));
       return;
     }

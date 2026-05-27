@@ -114,7 +114,7 @@ abstract class ViewTestBase extends BrowserTestBase {
     $field = $this->getSession()->getPage()->find('xpath', $xpath);
 
     if (empty($field)) {
-      throw new ElementNotFoundException($this->getSession()->getDriver(), 'form field', 'id', $field);
+      throw new \Behat\Mink\Exception\ElementNotFoundException($this->getSession()->getDriver(), 'form field', 'id', $field);
     }
 
     $this->assertEquals($expected_label, $field->getValue());

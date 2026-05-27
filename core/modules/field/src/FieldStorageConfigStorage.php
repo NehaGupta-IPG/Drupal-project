@@ -162,9 +162,9 @@ class FieldStorageConfigStorage extends ConfigEntityStorage {
       try {
         $class = $this->fieldTypeManager->getPluginClass($record['type']);
       }
-      catch (PluginNotFoundException $e) {
+      catch (\Drupal\Component\Plugin\Exception\PluginNotFoundException $e) {
         $config_id = $this->getPrefix() . $id;
-        throw new PluginNotFoundException($record['type'], "Unable to determine class for field type '{$record['type']}' found in the '$config_id' configuration", $e->getCode(), $e);
+        throw new \Drupal\Component\Plugin\Exception\PluginNotFoundException($record['type'], "Unable to determine class for field type '{$record['type']}' found in the '$config_id' configuration", $e->getCode(), $e);
       }
       $record['settings'] = $class::storageSettingsFromConfigData($record['settings']);
     }

@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 /**
  * Defines an exception used, when the POST HTTP body is broken.
  */
-class BrokenPostRequestException extends BadRequestHttpException {
+class BrokenPostRequestException extends \Symfony\Component\HttpKernel\Exception\BadRequestHttpException {
 
   /**
    * The maximum upload size.

@@ -133,38 +133,38 @@ class UserRegistrationResource extends ResourceBase {
    */
   protected function ensureAccountCanRegister(?UserInterface $account = NULL) {
     if ($account === NULL) {
-      throw new BadRequestHttpException('No user account data for registration received.');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('No user account data for registration received.');
     }
 
     // POSTed user accounts must not have an ID set, because we always want to
     // create new entities here.
     if (!$account->isNew()) {
-      throw new BadRequestHttpException('An ID has been set and only new user accounts can be registered.');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('An ID has been set and only new user accounts can be registered.');
     }
 
     // Only allow anonymous users to register, authenticated users with the
     // necessary permissions can POST a new user to the "user" REST resource.
     // @see \Drupal\rest\Plugin\rest\resource\EntityResource
     if (!$this->currentUser->isAnonymous()) {
-      throw new AccessDeniedHttpException('Only anonymous users can register a user.');
+      throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException('Only anonymous users can register a user.');
     }
 
     // Verify that the current user can register a user account.
     if ($this->userSettings->get('register') == UserInterface::REGISTER_ADMINISTRATORS_ONLY) {
-      throw new AccessDeniedHttpException('You cannot register a new user account.');
+      throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException('You cannot register a new user account.');
     }
 
     if (!$this->userSettings->get('verify_mail')) {
       if (empty($account->getPassword())) {
         // If no email verification then the user must provide a password.
-        throw new UnprocessableEntityHttpException('No password provided.');
+        throw new \Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException('No password provided.');
       }
     }
     else {
       if (!empty($account->getPassword())) {
         // If email verification required then a password cannot provided.
         // The password will be set when the user logs in.
-        throw new UnprocessableEntityHttpException('A Password cannot be specified. It will be generated on login.');
+        throw new \Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException('A Password cannot be specified. It will be generated on login.');
       }
     }
   }

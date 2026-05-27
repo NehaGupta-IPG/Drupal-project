@@ -70,7 +70,7 @@ class FormAjaxResponseBuilderTest extends UnitTestCase {
     $form_state = new FormState();
     $commands = [];
 
-    $this->expectException(HttpException::class);
+    $this->expectException(\Symfony\Component\HttpKernel\Exception\HttpException::class);
     $this->formAjaxResponseBuilder->buildResponse($request, $form, $form_state, $commands);
   }
 
@@ -90,7 +90,7 @@ class FormAjaxResponseBuilderTest extends UnitTestCase {
 
     $this->callableResolver->method('getCallableFromDefinition')->willThrowException(new \InvalidArgumentException());
 
-    $this->expectException(HttpException::class);
+    $this->expectException(\Symfony\Component\HttpKernel\Exception\HttpException::class);
     $this->formAjaxResponseBuilder->buildResponse($request, $form, $form_state, $commands);
   }
 

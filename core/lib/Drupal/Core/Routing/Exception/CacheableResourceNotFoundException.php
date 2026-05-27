@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 /**
  * A cacheable ResourceNotFoundException.
  */
-class CacheableResourceNotFoundException extends ResourceNotFoundException implements CacheableDependencyInterface {
+class CacheableResourceNotFoundException extends \Symfony\Component\Routing\Exception\ResourceNotFoundException implements CacheableDependencyInterface {
 
   use CacheableDependencyTrait;
 

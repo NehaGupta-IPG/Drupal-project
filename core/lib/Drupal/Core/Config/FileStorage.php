@@ -83,7 +83,7 @@ class FileStorage implements StorageInterface {
       $success = $success && FileSecurity::writeHtaccess($this->directory);
     }
     if (!$success) {
-      throw new StorageException('Failed to create config directory ' . $dir);
+      throw new \Drupal\Core\Config\StorageException('Failed to create config directory ' . $dir);
     }
     return $this;
   }
@@ -114,8 +114,8 @@ class FileStorage implements StorageInterface {
     try {
       $data = $this->decode($data);
     }
-    catch (InvalidDataTypeException $e) {
-      throw new UnsupportedDataTypeConfigException('Invalid data type in config ' . $name . ', found in file ' . $filepath . ': ' . $e->getMessage());
+    catch (\Drupal\Component\Serialization\Exception\InvalidDataTypeException $e) {
+      throw new \Drupal\Core\Config\UnsupportedDataTypeConfigException('Invalid data type in config ' . $name . ', found in file ' . $filepath . ': ' . $e->getMessage());
     }
     $this->fileCache->set($filepath, $data);
 
@@ -142,8 +142,8 @@ class FileStorage implements StorageInterface {
     try {
       $encoded_data = $this->encode($data);
     }
-    catch (InvalidDataTypeException $e) {
-      throw new StorageException("Invalid data type in config $name: {$e->getMessage()}");
+    catch (\Drupal\Component\Serialization\Exception\InvalidDataTypeException $e) {
+      throw new \Drupal\Core\Config\StorageException("Invalid data type in config $name: {$e->getMessage()}");
     }
 
     $target = $this->getFilePath($name);
@@ -154,7 +154,7 @@ class FileStorage implements StorageInterface {
       $status = @file_put_contents($target, $encoded_data);
     }
     if ($status === FALSE) {
-      throw new StorageException('Failed to write configuration file: ' . $target);
+      throw new \Drupal\Core\Config\StorageException('Failed to write configuration file: ' . $target);
     }
 
     $this->fileCache->set($target, $data);

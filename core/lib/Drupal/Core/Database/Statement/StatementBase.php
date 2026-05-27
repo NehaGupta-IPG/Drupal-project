@@ -345,7 +345,7 @@ abstract class StatementBase implements \Iterator, StatementInterface {
       return $this->result->rowCount();
     }
     else {
-      throw new RowCountException();
+      throw new \Drupal\Core\Database\RowCountException();
     }
   }
 

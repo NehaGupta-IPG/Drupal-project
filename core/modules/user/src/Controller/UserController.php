@@ -202,7 +202,7 @@ class UserController extends ControllerBase {
     $session->remove('pass_reset_timeout');
     $session->remove('pass_reset_hash');
     if (!$hash || !$timestamp) {
-      throw new AccessDeniedHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
     }
 
     /** @var \Drupal\user\UserInterface $user */
@@ -210,7 +210,7 @@ class UserController extends ControllerBase {
     if ($user === NULL || !$user->isActive()) {
       // Blocked or invalid user ID, so deny access. The parameters will be in
       // the watchdog's URL for the administrator to check.
-      throw new AccessDeniedHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
     }
 
     // Time out, in seconds, until login URL expires.
@@ -308,7 +308,7 @@ class UserController extends ControllerBase {
     if ($user === NULL || !$user->isActive()) {
       // Blocked or invalid user ID, so deny access. The parameters will be in
       // the watchdog's URL for the administrator to check.
-      throw new AccessDeniedHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
     }
 
     // Time out, in seconds, until login URL expires.
@@ -439,7 +439,7 @@ class UserController extends ControllerBase {
         return $this->redirect('entity.user.cancel_form', ['user' => $user->id()], ['absolute' => TRUE]);
       }
     }
-    throw new AccessDeniedHttpException();
+    throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
   }
 
 }

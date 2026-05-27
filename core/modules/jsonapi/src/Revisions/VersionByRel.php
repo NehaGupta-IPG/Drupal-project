@@ -59,7 +59,7 @@ class VersionByRel extends NegotiatorBase {
 
       default:
         $message = sprintf('The version specifier must be either `%s` or `%s`, `%s` given.', static::LATEST_VERSION, static::WORKING_COPY, $version_argument);
-        throw new InvalidVersionIdentifierException($message);
+        throw new \Drupal\jsonapi\Revisions\InvalidVersionIdentifierException($message);
     }
   }
 

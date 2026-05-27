@@ -24,7 +24,7 @@ class ActionMethodAttributeTest extends UnitTestCase {
    */
   public function testInvalidFunctionName(): void {
     $name = "hello Goodbye";
-    $this->expectException(InvalidPluginDefinitionException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class);
     $this->expectExceptionMessage("'$name' is not a valid PHP function name.");
     new ActionMethod(name: $name);
   }

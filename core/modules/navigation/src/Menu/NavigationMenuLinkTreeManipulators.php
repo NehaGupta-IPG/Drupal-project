@@ -108,7 +108,7 @@ class NavigationMenuLinkTreeManipulators {
       $controller = ltrim($this->routeProvider->getRouteByName($route_name)->getDefault('_controller') ?? '', "\\");
       return $controller !== SystemController::class . '::systemAdminMenuBlockPage';
     }
-    catch (RouteNotFoundException) {
+    catch (\Symfony\Component\Routing\Exception\RouteNotFoundException) {
       return TRUE;
     }
   }

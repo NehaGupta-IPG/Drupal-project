@@ -64,7 +64,7 @@ class LazyRouteCollection extends RouteCollection {
     try {
       return $this->provider->getRouteByName($name);
     }
-    catch (RouteNotFoundException) {
+    catch (\Symfony\Component\Routing\Exception\RouteNotFoundException) {
       return NULL;
     }
   }

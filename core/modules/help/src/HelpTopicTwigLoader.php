@@ -86,7 +86,7 @@ class HelpTopicTwigLoader extends FilesystemLoader {
         $contents = "{% line $line %}" . $front_matter->getContent();
       }
     }
-    catch (InvalidDataTypeException $e) {
+    catch (\Drupal\Component\Serialization\Exception\InvalidDataTypeException $e) {
       throw new LoaderError(sprintf('Malformed YAML in help topic "%s": %s.', $path, $e->getMessage()));
     }
 

@@ -215,10 +215,10 @@ class DerivativeDiscoveryDecorator implements CachedDiscoveryInterface {
     }
     if ($class) {
       if (!class_exists($class)) {
-        throw new InvalidDeriverException(sprintf('Plugin (%s) deriver "%s" does not exist.', $id, $class));
+        throw new \Drupal\Component\Plugin\Exception\InvalidDeriverException(sprintf('Plugin (%s) deriver "%s" does not exist.', $id, $class));
       }
       if (!is_subclass_of($class, '\Drupal\Component\Plugin\Derivative\DeriverInterface')) {
-        throw new InvalidDeriverException(sprintf('Plugin (%s) deriver "%s" must implement \Drupal\Component\Plugin\Derivative\DeriverInterface.', $id, $class));
+        throw new \Drupal\Component\Plugin\Exception\InvalidDeriverException(sprintf('Plugin (%s) deriver "%s" must implement \Drupal\Component\Plugin\Derivative\DeriverInterface.', $id, $class));
       }
     }
     return $class;

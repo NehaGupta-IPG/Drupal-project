@@ -92,7 +92,7 @@ final class CheckpointStorage implements CheckpointStorageInterface, EventSubscr
    */
   public function exists($name) {
     if (count($this->checkpoints) === 0) {
-      throw new NoCheckpointsException();
+      throw new \Drupal\Core\Config\Checkpoint\NoCheckpointsException();
     }
 
     foreach ($this->getCheckpointsToReadFrom() as $checkpoint) {
@@ -118,7 +118,7 @@ final class CheckpointStorage implements CheckpointStorageInterface, EventSubscr
    */
   public function readMultiple(array $names) {
     if (count($this->checkpoints) === 0) {
-      throw new NoCheckpointsException();
+      throw new \Drupal\Core\Config\Checkpoint\NoCheckpointsException();
     }
     $return = [];
 
@@ -170,7 +170,7 @@ final class CheckpointStorage implements CheckpointStorageInterface, EventSubscr
    */
   public function listAll($prefix = '') {
     if (count($this->checkpoints) === 0) {
-      throw new NoCheckpointsException();
+      throw new \Drupal\Core\Config\Checkpoint\NoCheckpointsException();
     }
 
     $names = $new_configuration = [];

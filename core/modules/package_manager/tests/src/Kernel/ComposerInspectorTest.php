@@ -70,7 +70,7 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
       $inspector->getConfig('non-existent-config', $dir);
       $this->fail('Expected an exception when trying to get a non-existent config key, but none was thrown.');
     }
-    catch (RuntimeException) {
+    catch (\PhpTuf\ComposerStager\API\Exception\RuntimeException) {
       // We don't need to do anything here.
     }
 
@@ -174,7 +174,7 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
 
     $message = $this->createComposeStagerMessage("Well, that didn't work.");
     $precondition->assertIsFulfilled(Argument::cetera())
-      ->willThrow(new PreconditionException($mocked_precondition, $message))
+      ->willThrow(new \PhpTuf\ComposerStager\API\Exception\PreconditionException($mocked_precondition, $message))
       // The result of the precondition is statically cached, so it should only
       // be called once even though we call validate() twice.
       ->shouldBeCalledOnce();
@@ -186,13 +186,13 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
       $inspector->validate($project_root);
       $this->fail('Expected an exception to be thrown, but it was not.');
     }
-    catch (ComposerNotReadyException $e) {
+    catch (\Drupal\package_manager\Exception\ComposerNotReadyException $e) {
       $this->assertNull($e->workingDir);
       $this->assertSame("Well, that didn't work.", $e->getMessage());
     }
 
     // Call validate() again to ensure the precondition is called once.
-    $this->expectException(ComposerNotReadyException::class);
+    $this->expectException(\Drupal\package_manager\Exception\ComposerNotReadyException::class);
     $this->expectExceptionMessage("Well, that didn't work.");
     $inspector->validate($project_root);
   }
@@ -220,7 +220,7 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
     try {
       $inspector->validate($project_root);
     }
-    catch (ComposerNotReadyException $e) {
+    catch (\Drupal\package_manager\Exception\ComposerNotReadyException $e) {
       $this->assertSame($project_root, $e->workingDir);
       $this->assertStringContainsString("$filename not found", $e->getMessage());
     }
@@ -293,13 +293,13 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
       // an exception message.
       $this->assertNull($expected_message, 'Expected an exception, but none was thrown.');
     }
-    catch (ComposerNotReadyException $e) {
+    catch (\Drupal\package_manager\Exception\ComposerNotReadyException $e) {
       $this->assertNull($e->workingDir);
       $this->assertSame($expected_message, $e->getMessage());
     }
 
     if (isset($expected_message)) {
-      $this->expectException(ComposerNotReadyException::class);
+      $this->expectException(\Drupal\package_manager\Exception\ComposerNotReadyException::class);
       $this->expectExceptionMessage($expected_message);
     }
     $inspector->validate($project_root);
@@ -342,7 +342,7 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
         ->validate($project_root);
       $this->fail('Expected an exception to be thrown, but it was not.');
     }
-    catch (ComposerNotReadyException $e) {
+    catch (\Drupal\package_manager\Exception\ComposerNotReadyException $e) {
       $this->assertSame($project_root, $e->workingDir);
       // The exception message is translated by Composer Stager and HTML-escaped
       // by Drupal's markup system, which is why there's a &quot; in the

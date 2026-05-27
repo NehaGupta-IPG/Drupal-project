@@ -114,7 +114,7 @@ class ImageStyleDownloadController extends FileDownloadController {
         if (!in_array($scheme, Settings::get('file_sa_core_2023_005_schemes', []))) {
           $parts = explode('/', $normalized_target);
           if (array_intersect($parts, ['.', '..'])) {
-            throw new NotFoundHttpException();
+            throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
           }
         }
       }
@@ -145,14 +145,14 @@ class ImageStyleDownloadController extends FileDownloadController {
       // image token is for DDoS protection rather than access checking. 404s
       // are more likely to be cached (e.g. at a proxy) which enhances
       // protection from DDoS.
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
 
     $derivative_uri = $image_style->buildUri($image_uri);
     $derivative_scheme = $this->streamWrapperManager->getScheme($derivative_uri);
 
     if ($required_derivative_scheme !== $derivative_scheme) {
-      throw new AccessDeniedHttpException("The scheme for this image doesn't match the scheme for the original image");
+      throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException("The scheme for this image doesn't match the scheme for the original image");
     }
 
     if ($token_is_valid) {
@@ -193,7 +193,7 @@ class ImageStyleDownloadController extends FileDownloadController {
     if (!$is_public) {
       $headers = $this->moduleHandler()->invokeAll('file_download', [$image_uri]);
       if (in_array(-1, $headers) || empty($headers)) {
-        throw new AccessDeniedHttpException();
+        throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
       }
     }
 
@@ -212,7 +212,7 @@ class ImageStyleDownloadController extends FileDownloadController {
       if (!$lock_acquired) {
         // Tell client to retry again in 3 seconds. Currently no browsers are
         // known to support Retry-After.
-        throw new ServiceUnavailableHttpException(3, 'Image generation in progress. Try again shortly.');
+        throw new \Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException(3, 'Image generation in progress. Try again shortly.');
       }
     }
 

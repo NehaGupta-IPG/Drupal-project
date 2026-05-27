@@ -93,7 +93,7 @@ class ThemeController extends ControllerBase {
         $this->messenger()->addError($this->t('The %theme theme was not found.', ['%theme' => $theme]));
       }
     }
-    catch (PreExistingConfigException $e) {
+    catch (\Drupal\Core\Config\PreExistingConfigException $e) {
       $config_objects = $e->flattenConfigObjects($e->getConfigObjects());
       $this->messenger()->addError(
         $this->formatPlural(
@@ -106,10 +106,10 @@ class ThemeController extends ControllerBase {
           ])
       );
     }
-    catch (UnmetDependenciesException $e) {
+    catch (\Drupal\Core\Config\UnmetDependenciesException $e) {
       $this->messenger()->addError($e->getTranslatedMessage($this->getStringTranslation(), $theme));
     }
-    catch (MissingDependencyException) {
+    catch (\Drupal\Core\Extension\MissingDependencyException) {
       $this->messenger()->addError($this->t('Unable to install @theme due to missing module dependencies.', ['@theme' => $theme]));
     }
 

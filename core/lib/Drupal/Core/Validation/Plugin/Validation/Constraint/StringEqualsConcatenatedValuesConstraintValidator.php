@@ -20,10 +20,10 @@ class StringEqualsConcatenatedValuesConstraintValidator extends ConstraintValida
    */
   public function validate(mixed $value, Constraint $constraint): void {
     if (!is_string($value)) {
-      throw new UnexpectedTypeException($value, 'string');
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($value, 'string');
     }
     if (!$constraint instanceof StringEqualsConcatenatedValuesConstraint) {
-      throw new UnexpectedTypeException($constraint, StringEqualsConcatenatedValuesConstraint::class);
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($constraint, StringEqualsConcatenatedValuesConstraint::class);
     }
 
     assert($this->context->getObject() instanceof TypedDataInterface);

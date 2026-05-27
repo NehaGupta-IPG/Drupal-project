@@ -30,7 +30,7 @@ class ConfigEntityAdapter extends EntityAdapter {
    */
   public function get($property_name) {
     if (!isset($this->entity)) {
-      throw new MissingDataException("Unable to get property $property_name as no entity has been provided.");
+      throw new \Drupal\Core\TypedData\Exception\MissingDataException("Unable to get property $property_name as no entity has been provided.");
     }
     return $this->getConfigTypedData()->get($property_name);
   }
@@ -40,7 +40,7 @@ class ConfigEntityAdapter extends EntityAdapter {
    */
   public function set($property_name, $value, $notify = TRUE) {
     if (!isset($this->entity)) {
-      throw new MissingDataException("Unable to set property $property_name as no entity has been provided.");
+      throw new \Drupal\Core\TypedData\Exception\MissingDataException("Unable to set property $property_name as no entity has been provided.");
     }
     $this->entity->set($property_name, $value, $notify);
     return $this;
@@ -51,7 +51,7 @@ class ConfigEntityAdapter extends EntityAdapter {
    */
   public function getProperties($include_computed = FALSE) {
     if (!isset($this->entity)) {
-      throw new MissingDataException('Unable to get properties as no entity has been provided.');
+      throw new \Drupal\Core\TypedData\Exception\MissingDataException('Unable to get properties as no entity has been provided.');
     }
     return $this->getConfigTypedData()->getProperties($include_computed);
   }

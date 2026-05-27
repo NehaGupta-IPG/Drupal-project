@@ -27,7 +27,7 @@ class ContentModerationStateResourceTest extends KernelTestBase {
    * @see \Drupal\content_moderation\Entity\ContentModerationState
    */
   public function testCreateContentModerationStateResource(): void {
-    $this->expectException(PluginNotFoundException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\PluginNotFoundException::class);
     $this->expectExceptionMessage('The "entity:content_moderation_state" plugin does not exist.');
     RestResourceConfig::create([
       'id' => 'entity.content_moderation_state',

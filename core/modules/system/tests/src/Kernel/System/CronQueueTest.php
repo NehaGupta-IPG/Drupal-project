@@ -129,9 +129,9 @@ class CronQueueTest extends KernelTestBase {
     // allows us to assume that (if updated) the new expiry time will be greater
     // than the initial expiry time. We can then also assume that the new expiry
     // time offset will be identical to the delay interval.
-    $this->assertGreaterThan($database_lease_time, CronQueueTestDatabaseDelayException::DELAY_INTERVAL);
+    $this->assertGreaterThan($database_lease_time, \Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestDatabaseDelayException::DELAY_INTERVAL);
     $this->assertGreaterThan($this->currentTime + $database_lease_time, $expire);
-    $this->assertEquals(CronQueueTestDatabaseDelayException::DELAY_INTERVAL, $expire - $this->currentTime);
+    $this->assertEquals(\Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestDatabaseDelayException::DELAY_INTERVAL, $expire - $this->currentTime);
 
     // Ensure that the memory queue expiry time is unchanged after the
     // DelayedRequeueException has been thrown.
@@ -192,7 +192,7 @@ class CronQueueTest extends KernelTestBase {
     )->shouldBeCalled();
 
     // Get the queue to test the normal Exception.
-    $queue = $this->container->get('queue')->get(CronQueueTestException::PLUGIN_ID);
+    $queue = $this->container->get('queue')->get(\Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestException::PLUGIN_ID);
 
     // Enqueue an item for processing.
     $queue->createItem([$this->randomMachineName() => $this->randomMachineName()]);
@@ -272,7 +272,7 @@ class CronQueueTest extends KernelTestBase {
    */
   public function testRequeueException(): void {
     // Test the requeueing functionality.
-    $queue = $this->container->get('queue')->get(CronQueueTestRequeueException::PLUGIN_ID);
+    $queue = $this->container->get('queue')->get(\Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestRequeueException::PLUGIN_ID);
     $queue->createItem([]);
     $this->cron->run();
 

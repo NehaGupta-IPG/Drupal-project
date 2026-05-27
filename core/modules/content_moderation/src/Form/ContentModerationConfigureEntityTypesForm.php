@@ -103,8 +103,8 @@ class ContentModerationConfigureEntityTypesForm extends FormBase {
     try {
       $this->entityType = $this->entityTypeManager->getDefinition($entity_type_id);
     }
-    catch (PluginNotFoundException) {
-      throw new NotFoundHttpException();
+    catch (\Drupal\Component\Plugin\Exception\PluginNotFoundException) {
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
 
     $options = $defaults = [];

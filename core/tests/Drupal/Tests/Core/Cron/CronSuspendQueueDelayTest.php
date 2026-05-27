@@ -188,8 +188,8 @@ final class CronSuspendQueueDelayTest extends UnitTestCase {
       ->method('processItem')
       ->with($this->anything())
       ->willReturnOnConsecutiveCalls(
-        $this->throwException(new SuspendQueueException('', 0, NULL, 2.0)),
-        $this->throwException(new SuspendQueueException('', 0, NULL, 3.0))
+        $this->throwException(new \Drupal\Core\Queue\SuspendQueueException('', 0, NULL, 2.0)),
+        $this->throwException(new \Drupal\Core\Queue\SuspendQueueException('', 0, NULL, 3.0))
       );
     $workerB->expects($this->once())
       ->method('processItem')
@@ -268,7 +268,7 @@ final class CronSuspendQueueDelayTest extends UnitTestCase {
       ->method('processItem')
       ->with($this->anything())
       ->willReturnOnConsecutiveCalls(
-        $this->throwException(new SuspendQueueException('', 0, NULL, $suspendQueueDelay)),
+        $this->throwException(new \Drupal\Core\Queue\SuspendQueueException('', 0, NULL, $suspendQueueDelay)),
       );
 
     $cron->run();
@@ -409,8 +409,8 @@ final class CronSuspendQueueDelayTest extends UnitTestCase {
       }))
       ->willReturnOnConsecutiveCalls(
         NULL,
-        $this->throwException(new SuspendQueueException('', 0, NULL, 16.0)),
-        $this->throwException(new SuspendQueueException('', 0, NULL, 8.0)),
+        $this->throwException(new \Drupal\Core\Queue\SuspendQueueException('', 0, NULL, 16.0)),
+        $this->throwException(new \Drupal\Core\Queue\SuspendQueueException('', 0, NULL, 8.0)),
         NULL,
         NULL,
         NULL,

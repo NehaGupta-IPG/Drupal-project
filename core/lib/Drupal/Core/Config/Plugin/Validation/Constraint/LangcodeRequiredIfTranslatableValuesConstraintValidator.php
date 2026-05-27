@@ -24,7 +24,7 @@ final class LangcodeRequiredIfTranslatableValuesConstraintValidator extends Cons
     assert($mapping instanceof Mapping);
     $root = $this->context->getRoot();
     if ($mapping !== $root) {
-      throw new LogicException(sprintf(
+      throw new \Symfony\Component\Validator\Exception\LogicException(sprintf(
         'The LangcodeRequiredIfTranslatableValues constraint is applied to \'%s\'. This constraint can only operate on the root object being validated.',
         $root->getName() . '::' . $mapping->getName()
       ));

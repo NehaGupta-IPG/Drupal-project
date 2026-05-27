@@ -122,7 +122,7 @@ class ImageToolkitOperationManager extends DefaultPluginManager implements Image
         '@toolkit' => $toolkit_id,
         '@operation' => $operation,
       ]);
-      throw new PluginNotFoundException($toolkit_id . '.' . $operation, $message);
+      throw new \Drupal\Component\Plugin\Exception\PluginNotFoundException($toolkit_id . '.' . $operation, $message);
     }
     else {
       // Pickup the first plugin found.

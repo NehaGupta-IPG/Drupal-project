@@ -81,7 +81,7 @@ class EntityConditionTest extends UnitTestCase {
    * @legacy-covers ::validate
    */
   #[DataProvider('validationProvider')]
-  public function testValidation(array $input, ?BadRequestHttpException $exception): void {
+  public function testValidation(array $input, ?\Symfony\Component\HttpKernel\Exception\BadRequestHttpException $exception): void {
     if ($exception) {
       $this->expectException(get_class($exception));
       $this->expectExceptionMessage($exception->getMessage());
@@ -104,7 +104,7 @@ class EntityConditionTest extends UnitTestCase {
       [['path' => 'some_field', 'operator' => 'IS NOT NULL'], NULL],
       [
         ['path' => 'some_field', 'operator' => 'IS', 'value' => 'some_value'],
-        new BadRequestHttpException("The 'IS' operator is not allowed in a filter parameter."),
+        new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException("The 'IS' operator is not allowed in a filter parameter."),
       ],
       [
         [
@@ -112,7 +112,7 @@ class EntityConditionTest extends UnitTestCase {
           'operator' => 'NOT_ALLOWED',
           'value' => 'some_value',
         ],
-        new BadRequestHttpException("The 'NOT_ALLOWED' operator is not allowed in a filter parameter."),
+        new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException("The 'NOT_ALLOWED' operator is not allowed in a filter parameter."),
       ],
       [
         [
@@ -120,7 +120,7 @@ class EntityConditionTest extends UnitTestCase {
           'operator' => 'IS NULL',
           'value' => 'should_not_be_here',
         ],
-        new BadRequestHttpException("Filters using the 'IS NULL' operator should not provide a value."),
+        new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException("Filters using the 'IS NULL' operator should not provide a value."),
       ],
       [
         [
@@ -128,15 +128,15 @@ class EntityConditionTest extends UnitTestCase {
           'operator' => 'IS NOT NULL',
           'value' => 'should_not_be_here',
         ],
-        new BadRequestHttpException("Filters using the 'IS NOT NULL' operator should not provide a value."),
+        new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException("Filters using the 'IS NOT NULL' operator should not provide a value."),
       ],
       [
         ['path' => 'path_only'],
-        new BadRequestHttpException("Filter parameter is missing a '" . EntityCondition::VALUE_KEY . "' key."),
+        new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException("Filter parameter is missing a '" . EntityCondition::VALUE_KEY . "' key."),
       ],
       [
         ['value' => 'value_only'],
-        new BadRequestHttpException("Filter parameter is missing a '" . EntityCondition::PATH_KEY . "' key."),
+        new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException("Filter parameter is missing a '" . EntityCondition::PATH_KEY . "' key."),
       ],
     ];
   }

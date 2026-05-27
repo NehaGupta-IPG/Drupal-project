@@ -83,7 +83,7 @@ class Tasks extends InstallTasks {
     }
     catch (\Exception $e) {
       // Attempt to create the database if it is not found.
-      if ($e instanceof DatabaseNotFoundException) {
+      if ($e instanceof \Drupal\Core\Database\DatabaseNotFoundException) {
         // Remove the database string from connection info.
         $connection_info = Database::getConnectionInfo();
         $database = $connection_info['default']['database'];
@@ -109,7 +109,7 @@ class Tasks extends InstallTasks {
           Database::getConnection();
           $this->pass('Drupal can CONNECT to the database ok.');
         }
-        catch (DatabaseNotFoundException $e) {
+        catch (\Drupal\Core\Database\DatabaseNotFoundException $e) {
           // Still no dice; probably a permission issue. Raise the error to the
           // installer.
           $this->fail($this->t('Database %database not found. The server reports the following message when attempting to create the database: %error.', [

@@ -1297,7 +1297,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
   public function createView(array $form, FormStateInterface $form_state) {
     $view = $this->retrieveValidatedView($form, $form_state);
     if (empty($view)) {
-      throw new WizardException('Attempted to create a view with values that have not been validated.');
+      throw new \Drupal\views\Plugin\views\wizard\WizardException('Attempted to create a view with values that have not been validated.');
     }
     return $view;
   }

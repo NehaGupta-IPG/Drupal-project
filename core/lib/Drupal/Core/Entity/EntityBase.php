@@ -174,7 +174,7 @@ abstract class EntityBase implements EntityInterface {
    */
   public function toUrl($rel = NULL, array $options = []) {
     if ($this->id() === NULL) {
-      throw new EntityMalformedException(sprintf('The "%s" entity cannot have a URI as it does not have an ID', $this->getEntityTypeId()));
+      throw new \Drupal\Core\Entity\EntityMalformedException(sprintf('The "%s" entity cannot have a URI as it does not have an ID', $this->getEntityTypeId()));
     }
 
     // The links array might contain URI templates set in annotations.
@@ -225,7 +225,7 @@ abstract class EntityBase implements EntityInterface {
         $uri = call_user_func($uri_callback, $this);
       }
       else {
-        throw new UndefinedLinkTemplateException($exception_message);
+        throw new \Drupal\Core\Entity\Exception\UndefinedLinkTemplateException($exception_message);
       }
     }
 
@@ -322,10 +322,10 @@ abstract class EntityBase implements EntityInterface {
       try {
         $this->toUrl($link_relation_type)->toString(TRUE)->getGeneratedUrl();
       }
-      catch (RouteNotFoundException) {
+      catch (\Symfony\Component\Routing\Exception\RouteNotFoundException) {
         return FALSE;
       }
-      catch (MissingMandatoryParametersException) {
+      catch (\Symfony\Component\Routing\Exception\MissingMandatoryParametersException) {
         return FALSE;
       }
       return TRUE;
@@ -418,7 +418,7 @@ abstract class EntityBase implements EntityInterface {
     if ($this->getEntityType()->getBundleOf()) {
       // Throw an exception if the bundle ID is longer than 32 characters.
       if (mb_strlen($this->id()) > EntityTypeInterface::BUNDLE_MAX_LENGTH) {
-        throw new ConfigEntityIdLengthException("Attempt to create a bundle with an ID longer than " . EntityTypeInterface::BUNDLE_MAX_LENGTH . " characters: " . $this->id() . ".");
+        throw new \Drupal\Core\Config\Entity\Exception\ConfigEntityIdLengthException("Attempt to create a bundle with an ID longer than " . EntityTypeInterface::BUNDLE_MAX_LENGTH . " characters: " . $this->id() . ".");
       }
     }
   }

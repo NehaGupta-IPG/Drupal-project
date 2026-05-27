@@ -444,7 +444,7 @@ class ManageDisplayTest extends BrowserTestBase {
     if ($scope_selector) {
       $scope_element = $page->find('css', $scope_selector);
       if (!$scope_element) {
-        throw new ExpectationException("Cannot find scope element '$scope_selector'", $session->getDriver());
+        throw new \Behat\Mink\Exception\ExpectationException("Cannot find scope element '$scope_selector'", $session->getDriver());
       }
       $text = $scope_element->getHtml();
     }
@@ -455,7 +455,7 @@ class ManageDisplayTest extends BrowserTestBase {
     $strings = [];
     foreach ($items as $item) {
       if (($pos = strpos($text, $item)) === FALSE) {
-        throw new ExpectationException("Cannot find '$item' in the page", $session->getDriver());
+        throw new \Behat\Mink\Exception\ExpectationException("Cannot find '$item' in the page", $session->getDriver());
       }
       $strings[$pos] = $item;
     }

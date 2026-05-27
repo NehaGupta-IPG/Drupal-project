@@ -172,8 +172,8 @@ class BasicAuth implements AuthenticationProviderInterface, AuthenticationProvid
       ->addCacheTags(['config:user.role.anonymous'])
       ->addCacheContexts(['user.roles:anonymous']);
     return $request->isMethodCacheable()
-      ? new CacheableUnauthorizedHttpException($cacheability, (string) $challenge, 'No authentication credentials provided.', $previous)
-      : new UnauthorizedHttpException((string) $challenge, 'No authentication credentials provided.', $previous);
+      ? new \Drupal\Core\Http\Exception\CacheableUnauthorizedHttpException($cacheability, (string) $challenge, 'No authentication credentials provided.', $previous)
+      : new \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException((string) $challenge, 'No authentication credentials provided.', $previous);
   }
 
 }

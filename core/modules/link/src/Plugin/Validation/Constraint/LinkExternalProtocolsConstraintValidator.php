@@ -18,7 +18,7 @@ class LinkExternalProtocolsConstraintValidator extends ConstraintValidator {
    */
   public function validate($value, Constraint $constraint): void {
     if (!$value instanceof LinkItemInterface) {
-      throw new UnexpectedValueException($value, LinkItemInterface::class);
+      throw new \Symfony\Component\Validator\Exception\UnexpectedValueException($value, LinkItemInterface::class);
     }
     if ($value->isEmpty()) {
       return;

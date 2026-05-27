@@ -15,7 +15,7 @@ use Drupal\package_manager\Event\SandboxEvent;
  *
  * Should not be thrown by external code.
  */
-class SandboxEventException extends SandboxException {
+class SandboxEventException extends \Drupal\package_manager\Exception\SandboxException {
 
   /**
    * Constructs a StageEventException object.

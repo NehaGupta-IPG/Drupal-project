@@ -34,7 +34,7 @@ class SettingsConfigValidationTest extends KernelTestBase {
     $file = sys_get_temp_dir() . '/fake_image.png.txt';
     file_put_contents($file, 'Not an image!');
 
-    $this->expectException(SchemaIncompleteException::class);
+    $this->expectException(\Drupal\Core\Config\Schema\SchemaIncompleteException::class);
     $this->expectExceptionMessage('[preview_image] This file is not a valid image.');
     $this->config('image.settings')
       ->set('preview_image', $file)

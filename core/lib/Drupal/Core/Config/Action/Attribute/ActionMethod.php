@@ -47,7 +47,7 @@ final class ActionMethod {
     public readonly ?string $name = NULL,
   ) {
     if ($name && !preg_match(ExtensionDiscovery::PHP_FUNCTION_PATTERN, $name)) {
-      throw new InvalidPluginDefinitionException('entity_method', sprintf("'%s' is not a valid PHP function name.", $name));
+      throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException('entity_method', sprintf("'%s' is not a valid PHP function name.", $name));
     }
   }
 

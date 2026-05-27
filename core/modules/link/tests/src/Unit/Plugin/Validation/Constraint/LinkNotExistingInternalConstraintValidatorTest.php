@@ -77,7 +77,7 @@ class LinkNotExistingInternalConstraintValidatorTest extends UnitTestCase {
     $urlGenerator->expects($this->once())
       ->method('generateFromRoute')
       ->with('example.not_existing_route', [], [])
-      ->willThrowException(new RouteNotFoundException());
+      ->willThrowException(new \Symfony\Component\Routing\Exception\RouteNotFoundException());
     $url->setUrlGenerator($urlGenerator);
 
     $link = $this->createStub(LinkItemInterface::class);
@@ -127,7 +127,7 @@ class LinkNotExistingInternalConstraintValidatorTest extends UnitTestCase {
    * Tests validating a value that isn't a LinkItemInterface.
    */
   public function testUnexpectedValue(): void {
-    $this->expectException(UnexpectedValueException::class);
+    $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedValueException::class);
     $validator = new LinkNotExistingInternalConstraintValidator();
     $context = $this->createStub(ExecutionContextInterface::class);
     $validator->initialize($context);

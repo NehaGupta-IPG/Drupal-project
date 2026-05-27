@@ -43,10 +43,10 @@ class ContentTypeHeaderMatcher implements FilterInterface {
     // \Symfony\Component\Routing\Exception\ResourceNotFoundException here
     // because we don't want to return a 404 status code, but rather a 415.
     if (!$request->headers->get('Content-Type', FALSE)) {
-      throw new UnsupportedMediaTypeHttpException('No "Content-Type" request header specified');
+      throw new \Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException('No "Content-Type" request header specified');
     }
     else {
-      throw new UnsupportedMediaTypeHttpException('No route found that matches "Content-Type: ' . $request->headers->get('Content-Type') . '"');
+      throw new \Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException('No route found that matches "Content-Type: ' . $request->headers->get('Content-Type') . '"');
     }
   }
 

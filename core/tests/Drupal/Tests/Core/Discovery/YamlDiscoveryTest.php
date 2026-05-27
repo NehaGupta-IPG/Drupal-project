@@ -39,7 +39,7 @@ class YamlDiscoveryTest extends TestCase {
     mkdir($url . '/test_broken');
     file_put_contents($url . '/test_broken/test_broken.test.yml', "broken:\n:");
 
-    $this->expectException(InvalidDataTypeException::class);
+    $this->expectException(\Drupal\Component\Serialization\Exception\InvalidDataTypeException::class);
     $this->expectExceptionMessage('vfs://modules/test_broken/test_broken.test.yml');
 
     $directories = ['test_broken' => $url . '/test_broken'];

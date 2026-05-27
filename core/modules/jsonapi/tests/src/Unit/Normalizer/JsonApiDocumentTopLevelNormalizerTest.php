@@ -227,7 +227,7 @@ class JsonApiDocumentTopLevelNormalizerTest extends UnitTestCase {
       ['type' => 'node--article'];
 
     if ($expect_exception) {
-      $this->expectException(UnprocessableEntityHttpException::class);
+      $this->expectException(\Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException::class);
       $this->expectExceptionMessage('IDs should be properly generated and formatted UUIDs as described in RFC 4122.');
     }
 

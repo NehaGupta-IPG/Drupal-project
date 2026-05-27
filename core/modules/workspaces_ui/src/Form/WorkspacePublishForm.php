@@ -149,7 +149,7 @@ class WorkspacePublishForm extends ConfirmFormBase implements ContainerInjection
       $workspace->publish();
       $this->messenger()->addMessage($this->t('Successful publication.'));
     }
-    catch (WorkspaceAccessException $e) {
+    catch (\Drupal\workspaces\WorkspaceAccessException $e) {
       $this->messenger()->addMessage($e->getMessage(), 'error');
     }
     catch (\Exception $e) {

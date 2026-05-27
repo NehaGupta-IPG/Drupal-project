@@ -71,7 +71,7 @@ trait ModulesEnabledTrait {
    *   that the current user can manage, then include a link to the permissions
    *   page for those modules.
    */
-  protected function modulesFailToEnableMessage(array $modules, PreExistingConfigException $exception): PluralTranslatableMarkup {
+  protected function modulesFailToEnableMessage(array $modules, \Drupal\Core\Config\PreExistingConfigException $exception): PluralTranslatableMarkup {
     $config_objects = $exception->flattenConfigObjects($exception->getConfigObjects());
     return $this->formatPlural(
       count($config_objects),

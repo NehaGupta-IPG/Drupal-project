@@ -57,7 +57,7 @@ class AcceptHeaderMatcher implements FilterInterface {
     // We do not throw a
     // \Symfony\Component\Routing\Exception\ResourceNotFoundException here
     // because we don't want to return a 404 status code, but rather a 406.
-    throw new NotAcceptableHttpException('No route found for the specified formats ' . implode(' ', $acceptable_mime_types));
+    throw new \Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException('No route found for the specified formats ' . implode(' ', $acceptable_mime_types));
   }
 
 }

@@ -71,10 +71,10 @@ class VersionNegotiator {
       }
       return $this->negotiators[$version_negotiator_name]->getRevision($entity, $version_argument);
     }
-    catch (VersionNotFoundException) {
+    catch (\Drupal\jsonapi\Revisions\VersionNotFoundException) {
       static::throwNotFoundHttpException($entity, $resource_version_identifier);
     }
-    catch (InvalidVersionIdentifierException) {
+    catch (\Drupal\jsonapi\Revisions\InvalidVersionIdentifierException) {
       static::throwBadRequestHttpException($resource_version_identifier);
     }
   }
@@ -96,7 +96,7 @@ class VersionNegotiator {
         'url.query_args:' . ResourceVersionRouteEnhancer::RESOURCE_VERSION_QUERY_PARAMETER,
       ]);
     $reason = sprintf('The requested version, identified by `%s`, could not be found.', $resource_version_identifier);
-    throw new CacheableNotFoundHttpException($cacheability, $reason);
+    throw new \Drupal\Core\Http\Exception\CacheableNotFoundHttpException($cacheability, $reason);
   }
 
   /**
@@ -110,7 +110,7 @@ class VersionNegotiator {
   protected static function throwBadRequestHttpException($resource_version_identifier) {
     $cacheability = (new CacheableMetadata())->addCacheContexts(['url.query_args:' . ResourceVersionRouteEnhancer::RESOURCE_VERSION_QUERY_PARAMETER]);
     $message = sprintf('An invalid resource version identifier, `%s`, was provided.', $resource_version_identifier);
-    throw new CacheableBadRequestHttpException($cacheability, $message);
+    throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cacheability, $message);
   }
 
 }

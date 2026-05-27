@@ -225,7 +225,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
     // Configuration entity IDs are strings, and '0' is a valid ID.
     $id = $entity->id();
     if ($id === NULL || $id === '') {
-      throw new EntityMalformedException('The entity does not have an ID.');
+      throw new \Drupal\Core\Entity\EntityMalformedException('The entity does not have an ID.');
     }
 
     // Check the configuration entity ID length.
@@ -233,7 +233,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
     // @todo Consider moving this to a protected method on the parent class, and
     //   abstracting it for all entity types.
     if (strlen($id) > static::MAX_ID_LENGTH) {
-      throw new ConfigEntityIdLengthException("Configuration entity ID {$id} exceeds maximum allowed length of " . static::MAX_ID_LENGTH . " characters.");
+      throw new \Drupal\Core\Config\Entity\Exception\ConfigEntityIdLengthException("Configuration entity ID {$id} exceeds maximum allowed length of " . static::MAX_ID_LENGTH . " characters.");
     }
 
     return parent::save($entity);
@@ -367,7 +367,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
     $id = static::getIDFromConfigName($name, $this->entityType->getConfigPrefix());
     $entity = $this->load($id);
     if (!$entity) {
-      throw new ConfigImporterException("Attempt to update non-existing entity '$id'.");
+      throw new \Drupal\Core\Config\ConfigImporterException("Attempt to update non-existing entity '$id'.");
     }
     $entity->setSyncing(TRUE);
     $entity = $this->updateFromStorageRecord($entity, $new_config->get());

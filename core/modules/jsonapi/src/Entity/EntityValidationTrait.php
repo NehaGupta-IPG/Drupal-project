@@ -56,7 +56,7 @@ trait EntityValidationTrait {
       // distinguish between general syntax errors in bad serializations (code
       // 400) and semantic errors in well-formed requests (code 422).
       // @see \Drupal\jsonapi\Normalizer\UnprocessableHttpEntityExceptionNormalizer
-      $exception = new UnprocessableHttpEntityException();
+      $exception = new \Drupal\jsonapi\Exception\UnprocessableHttpEntityException();
       $exception->setViolations($violations);
       throw $exception;
     }

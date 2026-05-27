@@ -158,7 +158,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
             // Show message for socket connection via 'unix_socket' option.
             $message = 'Drupal is configured to connect to the database server via a socket, but the socket file could not be found.';
             $message .= ' This message normally means that there is no MySQL server running on the system or that you are using an incorrect Unix socket file name when trying to connect to the server.';
-            throw new DatabaseConnectionRefusedException($e->getMessage() . ' [Tip: ' . $message . '] ', $e->getCode(), $e);
+            throw new \Drupal\Core\Database\DatabaseConnectionRefusedException($e->getMessage() . ' [Tip: ' . $message . '] ', $e->getCode(), $e);
           }
           if (isset($connection_options['host']) && in_array(strtolower($connection_options['host']), ['', 'localhost'], TRUE)) {
             // Show message for socket connection via 'host' option.
@@ -166,18 +166,18 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
             $message .= ' A Unix socket file is used if you do not specify a host name or if you specify the special host name localhost.';
             $message .= ' To connect via TCP/IP use an IP address (127.0.0.1 for IPv4) instead of "localhost".';
             $message .= ' This message normally means that there is no MySQL server running on the system or that you are using an incorrect Unix socket file name when trying to connect to the server.';
-            throw new DatabaseConnectionRefusedException($e->getMessage() . ' [Tip: ' . $message . '] ', $e->getCode(), $e);
+            throw new \Drupal\Core\Database\DatabaseConnectionRefusedException($e->getMessage() . ' [Tip: ' . $message . '] ', $e->getCode(), $e);
           }
           // Show message for TCP/IP connection.
           $message = 'This message normally means that there is no MySQL server running on the system or that you are using an incorrect host name or port number when trying to connect to the server.';
           $message .= ' You should also check that the TCP/IP port you are using has not been blocked by a firewall or port blocking service.';
-          throw new DatabaseConnectionRefusedException($e->getMessage() . ' [Tip: ' . $message . '] ', $e->getCode(), $e);
+          throw new \Drupal\Core\Database\DatabaseConnectionRefusedException($e->getMessage() . ' [Tip: ' . $message . '] ', $e->getCode(), $e);
 
         case static::DATABASE_NOT_FOUND:
-          throw new DatabaseNotFoundException($e->getMessage(), $e->getCode(), $e);
+          throw new \Drupal\Core\Database\DatabaseNotFoundException($e->getMessage(), $e->getCode(), $e);
 
         case static::ACCESS_DENIED:
-          throw new DatabaseAccessDeniedException($e->getMessage(), $e->getCode(), $e);
+          throw new \Drupal\Core\Database\DatabaseAccessDeniedException($e->getMessage(), $e->getCode(), $e);
 
         default:
           throw $e;
@@ -322,7 +322,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
       $this->connection->exec("USE $database");
     }
     catch (\Exception $e) {
-      throw new DatabaseNotFoundException($e->getMessage());
+      throw new \Drupal\Core\Database\DatabaseNotFoundException($e->getMessage());
     }
   }
 

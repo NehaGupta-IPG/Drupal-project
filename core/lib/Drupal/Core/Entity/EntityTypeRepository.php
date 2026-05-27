@@ -80,7 +80,7 @@ class EntityTypeRepository implements EntityTypeRepositoryInterface {
       if (in_array($class_name, $entity_type->getDecoratedClasses(), TRUE) || $entity_type->getClass() == $class_name) {
         $entity_type_id = $entity_type->id();
         if ($same_class++) {
-          throw new AmbiguousEntityClassException($class_name);
+          throw new \Drupal\Core\Entity\Exception\AmbiguousEntityClassException($class_name);
         }
       }
     }
@@ -95,7 +95,7 @@ class EntityTypeRepository implements EntityTypeRepositoryInterface {
           if (isset($info['class']) && $info['class'] === $class_name) {
             $entity_type_id = $info_entity_type_id;
             if ($same_class++) {
-              throw new AmbiguousBundleClassException($class_name);
+              throw new \Drupal\Core\Entity\Exception\AmbiguousBundleClassException($class_name);
             }
           }
         }
@@ -108,7 +108,7 @@ class EntityTypeRepository implements EntityTypeRepositoryInterface {
       return $entity_type_id;
     }
 
-    throw new NoCorrespondingEntityClassException($class_name);
+    throw new \Drupal\Core\Entity\Exception\NoCorrespondingEntityClassException($class_name);
   }
 
 }

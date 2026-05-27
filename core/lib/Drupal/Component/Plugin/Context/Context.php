@@ -49,7 +49,7 @@ class Context implements ContextInterface {
 
       if (!isset($default_value) && $definition->isRequired()) {
         $type = $definition->getDataType();
-        throw new ContextException(sprintf("The %s context is required and not present.", $type));
+        throw new \Drupal\Component\Plugin\Exception\ContextException(sprintf("The %s context is required and not present.", $type));
       }
       // Keep the default value here so that subsequent calls don't have to look
       // it up again.
@@ -77,7 +77,7 @@ class Context implements ContextInterface {
    */
   public function getConstraints() {
     if (empty($this->contextDefinition['class'])) {
-      throw new ContextException("An error was encountered while trying to validate the context.");
+      throw new \Drupal\Component\Plugin\Exception\ContextException("An error was encountered while trying to validate the context.");
     }
     return [new Type($this->contextDefinition['class'])];
   }

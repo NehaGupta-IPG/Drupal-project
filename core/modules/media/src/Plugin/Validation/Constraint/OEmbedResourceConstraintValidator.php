@@ -93,11 +93,11 @@ class OEmbedResourceConstraintValidator extends ConstraintValidator implements C
     try {
       $provider = $this->urlResolver->getProviderByUrl($url);
     }
-    catch (ResourceException $e) {
+    catch (\Drupal\media\OEmbed\ResourceException $e) {
       $this->handleException($e, $constraint->unknownProviderMessage);
       return;
     }
-    catch (ProviderException $e) {
+    catch (\Drupal\media\OEmbed\ProviderException $e) {
       $this->handleException($e, $constraint->providerErrorMessage);
       return;
     }
@@ -116,7 +116,7 @@ class OEmbedResourceConstraintValidator extends ConstraintValidator implements C
       $resource_url = $this->urlResolver->getResourceUrl($url);
       $this->resourceFetcher->fetchResource($resource_url);
     }
-    catch (ResourceException $e) {
+    catch (\Drupal\media\OEmbed\ResourceException $e) {
       $this->handleException($e, $constraint->invalidResourceMessage);
     }
   }

@@ -23,7 +23,7 @@ class ConfigActionAttributeTest extends UnitTestCase {
    * @legacy-covers ::__construct
    */
   public function testNoLabelNoDeriver(): void {
-    $this->expectException(InvalidPluginDefinitionException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class);
     $this->expectExceptionMessage("The 'test' config action plugin must have either an admin label or a deriver");
     new ConfigAction('test');
   }

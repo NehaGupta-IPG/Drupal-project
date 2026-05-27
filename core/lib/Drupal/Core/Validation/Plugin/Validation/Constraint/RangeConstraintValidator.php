@@ -17,7 +17,7 @@ class RangeConstraintValidator extends ConstraintValidator {
    */
   public function validate($value, Constraint $constraint): void {
     if (!$constraint instanceof Range) {
-      throw new UnexpectedTypeException($constraint, __NAMESPACE__ . '\Range');
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($constraint, __NAMESPACE__ . '\Range');
     }
 
     if (NULL === $value) {

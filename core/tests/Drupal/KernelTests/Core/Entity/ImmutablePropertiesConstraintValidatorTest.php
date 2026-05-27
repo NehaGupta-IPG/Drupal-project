@@ -40,7 +40,7 @@ class ImmutablePropertiesConstraintValidatorTest extends KernelTestBase {
       ->addConstraint('ImmutableProperties', ['properties' => ['read_only']]);
     $data = $this->container->get(TypedDataManagerInterface::class)
       ->create($definition, 39);
-    $this->expectException(UnexpectedValueException::class);
+    $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedValueException::class);
     $this->expectExceptionMessage('Expected argument of type "' . ConfigEntityInterface::class . '", "int" given');
     $data->validate();
   }
@@ -60,7 +60,7 @@ class ImmutablePropertiesConstraintValidatorTest extends KernelTestBase {
     $definition = DataDefinition::createFromDataType('entity:block_content_type')
       ->addConstraint('ImmutableProperties', ['properties' => ['non_existent']]);
 
-    $this->expectException(LogicException::class);
+    $this->expectException(\Symfony\Component\Validator\Exception\LogicException::class);
     $this->expectExceptionMessage("The entity does not have a 'non_existent' property.");
     $this->container->get(TypedDataManagerInterface::class)
       ->create($definition, $entity)
@@ -80,7 +80,7 @@ class ImmutablePropertiesConstraintValidatorTest extends KernelTestBase {
       ->addConstraint('ImmutableProperties', ['properties' => ['read_only']]);
     $data = $this->container->get(TypedDataManagerInterface::class)
       ->create($definition, $entity->reveal());
-    $this->expectException(LogicException::class);
+    $this->expectException(\Symfony\Component\Validator\Exception\LogicException::class);
     $this->expectExceptionMessage('The entity does not have an ID.');
     $data->validate();
   }

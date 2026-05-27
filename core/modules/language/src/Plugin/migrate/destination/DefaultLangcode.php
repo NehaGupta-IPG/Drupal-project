@@ -23,7 +23,7 @@ class DefaultLangcode extends Config {
 
     // Check if the language exists.
     if (ConfigurableLanguage::load($langcode) === NULL) {
-      throw new MigrateException("The language '$langcode' does not exist on this site.");
+      throw new \Drupal\migrate\MigrateException("The language '$langcode' does not exist on this site.");
     }
 
     $this->config->set('default_langcode', $destination['default_langcode']);

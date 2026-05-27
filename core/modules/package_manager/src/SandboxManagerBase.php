@@ -312,7 +312,7 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
     $this->failureMarker->assertNotExists();
 
     if (!$this->isAvailable()) {
-      throw new SandboxException($this, 'Cannot create a new stage because one already exists.');
+      throw new \Drupal\package_manager\Exception\SandboxException($this, 'Cannot create a new stage because one already exists.');
     }
     // Mark the stage as unavailable as early as possible, before dispatching
     // the pre-create event. The idea is to prevent a race condition if the
@@ -376,7 +376,7 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
    *   The throwable to wrap.
    */
   private function rethrowAsStageException(\Throwable $e): never {
-    throw new SandboxException($this, $e->getMessage(), $e->getCode(), $e);
+    throw new \Drupal\package_manager\Exception\SandboxException($this, $e->getMessage(), $e->getCode(), $e);
   }
 
   /**
@@ -419,7 +419,7 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
         // PreconditionException, a Composer operation was actually attempted,
         // and failed. The stage should therefore be destroyed, because it's in
         // an indeterminate and possibly unrecoverable state.
-        if (!$e instanceof InvalidArgumentException && !$e instanceof PreconditionException) {
+        if (!$e instanceof \PhpTuf\ComposerStager\API\Exception\InvalidArgumentException && !$e instanceof \PhpTuf\ComposerStager\API\Exception\PreconditionException) {
           $this->destroy();
         }
         $this->rethrowAsStageException($e);
@@ -505,7 +505,7 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
     try {
       $this->committer->commit($stage_dir, $active_dir, $excluded_paths, NULL, $timeout);
     }
-    catch (InvalidArgumentException | PreconditionException $e) {
+    catch (\PhpTuf\ComposerStager\API\Exception\InvalidArgumentException | \PhpTuf\ComposerStager\API\Exception\PreconditionException $e) {
       // The commit operation has not started yet, so we can clear the failure
       // marker and release the flag that says we're applying.
       $this->setNotApplying();
@@ -520,7 +520,7 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
       $this->setNotApplying();
       // Update the marker file with the information from the throwable.
       $this->failureMarker->write($this, $this->getFailureMarkerMessage(), $throwable);
-      throw new ApplyFailedException($this, $this->failureMarker->getMessage(), $throwable->getCode(), $throwable);
+      throw new \Drupal\package_manager\Exception\ApplyFailedException($this, $this->failureMarker->getMessage(), $throwable->getCode(), $throwable);
     }
     $this->failureMarker->clear();
     $this->setMetadata(self::TEMPSTORE_CHANGES_APPLIED, TRUE);
@@ -578,7 +578,7 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
       $this->checkOwnership();
     }
     if ($this->isApplying()) {
-      throw new SandboxException($this, 'Cannot destroy the stage directory while it is being applied to the active directory.');
+      throw new \Drupal\package_manager\Exception\SandboxException($this, 'Cannot destroy the stage directory while it is being applied to the active directory.');
     }
 
     // If the stage directory exists, queue it to be automatically cleaned up
@@ -621,12 +621,12 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
 
       if ($event instanceof SandboxValidationEvent) {
         if ($event->getResults()) {
-          $error = new SandboxEventException($event);
+          $error = new \Drupal\package_manager\Exception\SandboxEventException($event);
         }
       }
     }
     catch (\Throwable $error) {
-      $error = new SandboxEventException($event, $error->getMessage(), $error->getCode(), $error);
+      $error = new \Drupal\package_manager\Exception\SandboxEventException($event, $error->getMessage(), $error->getCode(), $error);
     }
 
     if (isset($error)) {
@@ -673,7 +673,7 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
     if ($this->isAvailable()) {
       // phpcs:disable DrupalPractice.General.ExceptionT.ExceptionT
       // @see https://www.drupal.org/project/automatic_updates/issues/3338651
-      throw new SandboxException($this, $this->computeDestroyMessage(
+      throw new \Drupal\package_manager\Exception\SandboxException($this, $this->computeDestroyMessage(
         $unique_id,
         $this->t('Cannot claim the stage because no stage has been created.')
       )->render());
@@ -681,7 +681,7 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
 
     $stored_lock = $this->tempStore->getIfOwner(static::TEMPSTORE_LOCK_KEY);
     if (!$stored_lock) {
-      throw new SandboxOwnershipException($this, $this->computeDestroyMessage(
+      throw new \Drupal\package_manager\Exception\SandboxOwnershipException($this, $this->computeDestroyMessage(
         $unique_id,
         $this->t('Cannot claim the stage because it is not owned by the current user or session.')
       )->render());
@@ -698,7 +698,7 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
       return $this;
     }
 
-    throw new SandboxOwnershipException($this, $this->computeDestroyMessage(
+    throw new \Drupal\package_manager\Exception\SandboxOwnershipException($this, $this->computeDestroyMessage(
       $unique_id,
       $this->t('Cannot claim the stage because the current lock does not match the stored lock.')
     )->render());
@@ -743,7 +743,7 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
 
     $stored_lock = $this->tempStore->getIfOwner(static::TEMPSTORE_LOCK_KEY);
     if ($stored_lock !== $this->lock) {
-      throw new SandboxOwnershipException($this, 'Stage is not owned by the current user or session.');
+      throw new \Drupal\package_manager\Exception\SandboxOwnershipException($this, 'Stage is not owned by the current user or session.');
     }
   }
 

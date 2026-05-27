@@ -30,7 +30,7 @@ class PhpArrayContainer extends Container {
    */
   public function __construct(array $container_definition = []) {
     if (isset($container_definition['machine_format']) && $container_definition['machine_format'] === TRUE) {
-      throw new InvalidArgumentException('The machine-optimized format is not supported by this class. Use a human-readable format instead, e.g. as produced by \Drupal\Component\DependencyInjection\Dumper\PhpArrayDumper.');
+      throw new \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException('The machine-optimized format is not supported by this class. Use a human-readable format instead, e.g. as produced by \Drupal\Component\DependencyInjection\Dumper\PhpArrayDumper.');
     }
 
     // Do not call the parent's constructor as it would bail on the
@@ -52,7 +52,7 @@ class PhpArrayContainer extends Container {
     //   parent class to avoid resolving services and parameters when it is
     //   known from dumping that there is nothing to resolve.
     if (isset($definition['synthetic']) && $definition['synthetic'] === TRUE) {
-      throw new RuntimeException(sprintf('You have requested a synthetic service ("%s"). The service container does not know how to construct this service. The service will need to be set before it is first used.', $id));
+      throw new \Symfony\Component\DependencyInjection\Exception\RuntimeException(sprintf('You have requested a synthetic service ("%s"). The service container does not know how to construct this service. The service will need to be set before it is first used.', $id));
     }
 
     $arguments = [];
@@ -71,7 +71,7 @@ class PhpArrayContainer extends Container {
         $factory = $this->resolveServicesAndParameters([$factory[0], $factory[1]]);
       }
       elseif (!is_string($factory)) {
-        throw new RuntimeException(sprintf('Cannot create service "%s" because of invalid factory', $id));
+        throw new \Symfony\Component\DependencyInjection\Exception\RuntimeException(sprintf('Cannot create service "%s" because of invalid factory', $id));
       }
 
       $service = call_user_func_array($factory, $arguments);
@@ -111,7 +111,7 @@ class PhpArrayContainer extends Container {
       }
 
       if (!is_callable($callable)) {
-        throw new InvalidArgumentException(sprintf('The configurator for class "%s" is not a callable.', get_class($service)));
+        throw new \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException(sprintf('The configurator for class "%s" is not a callable.', get_class($service)));
       }
 
       call_user_func($callable, $service);
@@ -186,7 +186,7 @@ class PhpArrayContainer extends Container {
         }
 
         if ($type !== NULL) {
-          throw new InvalidArgumentException("Undefined type '$type' while resolving parameters and services.");
+          throw new \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException("Undefined type '$type' while resolving parameters and services.");
         }
       }
 

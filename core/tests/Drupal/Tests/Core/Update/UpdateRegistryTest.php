@@ -432,7 +432,7 @@ EOS;
         ],
     ], $key_value, $theme_handler, 'post_update');
 
-    $this->expectException(RemovedPostUpdateNameException::class);
+    $this->expectException(\Drupal\Core\Update\RemovedPostUpdateNameException::class);
     $update_registry->getPendingUpdateInformation();
   }
 

@@ -110,7 +110,7 @@ class OffsetPage {
   public static function createFromQueryParameter($parameter) {
     if (!is_array($parameter)) {
       $cacheability = (new CacheableMetadata())->addCacheContexts(['url.query_args:page']);
-      throw new CacheableBadRequestHttpException($cacheability, 'The page parameter needs to be an array.');
+      throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cacheability, 'The page parameter needs to be an array.');
     }
 
     $expanded = $parameter + [

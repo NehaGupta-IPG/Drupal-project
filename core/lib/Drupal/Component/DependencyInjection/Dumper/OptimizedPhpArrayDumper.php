@@ -250,7 +250,7 @@ class OptimizedPhpArrayDumper extends Dumper {
     }
 
     if ($definition->getDecoratedService() !== NULL) {
-      throw new InvalidArgumentException("The 'decorated' definition is not supported by the Drupal run-time container. The Container Builder should have resolved that during the DecoratorServicePass compiler pass.");
+      throw new \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException("The 'decorated' definition is not supported by the Drupal run-time container. The Container Builder should have resolved that during the DecoratorServicePass compiler pass.");
     }
 
     if ($callable = $definition->getFactory()) {
@@ -426,7 +426,7 @@ class OptimizedPhpArrayDumper extends Dumper {
       }
     }
     elseif ($value instanceof Expression) {
-      throw new RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
+      throw new \Symfony\Component\DependencyInjection\Exception\RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
     }
     elseif ($value instanceof ServiceClosureArgument) {
       $reference = $value->getValues();
@@ -439,10 +439,10 @@ class OptimizedPhpArrayDumper extends Dumper {
       return $this->getIterator($value);
     }
     elseif (is_object($value)) {
-      throw new RuntimeException('Unable to dump a service container if a parameter is an object.');
+      throw new \Symfony\Component\DependencyInjection\Exception\RuntimeException('Unable to dump a service container if a parameter is an object.');
     }
     elseif (is_resource($value)) {
-      throw new RuntimeException('Unable to dump a service container if a parameter is a resource.');
+      throw new \Symfony\Component\DependencyInjection\Exception\RuntimeException('Unable to dump a service container if a parameter is a resource.');
     }
 
     return $value;

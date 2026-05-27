@@ -139,7 +139,7 @@ class LanguageNegotiationUserAdmin extends LanguageNegotiationMethodBase impleme
           $path = $this->pathProcessorManager->processInbound(urldecode(rtrim($cloned_request->getPathInfo(), '/')), $cloned_request);
           $attributes = $this->router->match($path);
         }
-        catch (ExceptionInterface | HttpException) {
+        catch (ExceptionInterface | \Symfony\Component\HttpKernel\Exception\HttpException) {
           return FALSE;
         }
         $route_object = $attributes[RouteObjectInterface::ROUTE_OBJECT];

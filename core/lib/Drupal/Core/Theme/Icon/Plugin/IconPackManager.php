@@ -207,7 +207,7 @@ class IconPackManager extends DefaultPluginManager implements IconPackManagerInt
    */
   public function processDefinition(&$definition, $plugin_id): void {
     if (preg_match('@[^a-z0-9_]@', $plugin_id)) {
-      throw new IconPackConfigErrorException(sprintf('Invalid icon pack id in: %s, name: %s must contain only lowercase letters, numbers, and underscores.', $definition['provider'], $plugin_id));
+      throw new \Drupal\Core\Theme\Icon\Exception\IconPackConfigErrorException(sprintf('Invalid icon pack id in: %s, name: %s must contain only lowercase letters, numbers, and underscores.', $definition['provider'], $plugin_id));
     }
 
     $this->validateDefinition($definition);
@@ -427,7 +427,7 @@ class IconPackManager extends DefaultPluginManager implements IconPackManagerInt
     );
     $message = implode(", ", $message_parts);
 
-    throw new IconPackConfigErrorException(
+    throw new \Drupal\Core\Theme\Icon\Exception\IconPackConfigErrorException(
       sprintf(
         '%s:%s Error in definition `%s`:%s',
         $definition['provider'],

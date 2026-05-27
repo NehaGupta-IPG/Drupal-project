@@ -66,7 +66,7 @@ final class ConfigConfigurator {
         SortArray::sortByKeyRecursive($active_data);
         SortArray::sortByKeyRecursive($recipe_data);
         if ($active_data !== $recipe_data) {
-          throw new RecipePreExistingConfigException($config_name, sprintf("The configuration '%s' exists already and does not match the recipe's configuration", $config_name));
+          throw new \Drupal\Core\Recipe\RecipePreExistingConfigException($config_name, sprintf("The configuration '%s' exists already and does not match the recipe's configuration", $config_name));
         }
       }
     }

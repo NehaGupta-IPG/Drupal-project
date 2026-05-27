@@ -7,5 +7,5 @@ use Drupal\Core\Entity\EntityStorageException;
 /**
  * Exception thrown when a SQL storage operation fails.
  */
-class SqlContentEntityStorageException extends EntityStorageException {
+class SqlContentEntityStorageException extends \Drupal\Core\Entity\EntityStorageException {
 }

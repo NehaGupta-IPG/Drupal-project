@@ -264,7 +264,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
     $id_key = $entity_type->getKey('id');
     $property_names = $entity_type->getPropertiesToExport($this->id());
     if (empty($property_names)) {
-      throw new SchemaIncompleteException(sprintf("Entity type '%s' is missing 'config_export' definition in its annotation", $entity_type->getClass()));
+      throw new \Drupal\Core\Config\Schema\SchemaIncompleteException(sprintf("Entity type '%s' is missing 'config_export' definition in its annotation", $entity_type->getClass()));
     }
     foreach ($property_names as $property_name => $export_name) {
       // Special handling for IDs so that computed compound IDs work.
@@ -318,7 +318,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
       ->execute();
     $matched_entity = reset($matching_entities);
     if (!empty($matched_entity) && ($matched_entity != $this->id()) && $matched_entity != $this->getOriginalId()) {
-      throw new ConfigDuplicateUUIDException("Attempt to save a configuration entity '{$this->id()}' with UUID '{$this->uuid()}' when this UUID is already used for '$matched_entity'");
+      throw new \Drupal\Core\Config\ConfigDuplicateUUIDException("Attempt to save a configuration entity '{$this->id()}' with UUID '{$this->uuid()}' when this UUID is already used for '$matched_entity'");
     }
 
     // If this entity is not new, load the original entity for comparison.
@@ -326,7 +326,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
       $original = $storage->loadUnchanged($this->getOriginalId());
       // Ensure that the UUID cannot be changed for an existing entity.
       if ($original && ($original->uuid() != $this->uuid())) {
-        throw new ConfigDuplicateUUIDException("Attempt to save a configuration entity '{$this->id()}' with UUID '{$this->uuid()}' when this entity already exists with UUID '{$original->uuid()}'");
+        throw new \Drupal\Core\Config\ConfigDuplicateUUIDException("Attempt to save a configuration entity '{$this->id()}' with UUID '{$this->uuid()}' when this entity already exists with UUID '{$original->uuid()}'");
       }
     }
     if (!$this->isSyncing()) {

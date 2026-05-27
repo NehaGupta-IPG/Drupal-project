@@ -13,7 +13,7 @@ use Drupal\Core\Utility\UpdateException;
  * This update will fail.
  */
 function update_test_failing_update_8001(): void {
-  throw new UpdateException('This update hook is failing.');
+  throw new \Drupal\Core\Utility\UpdateException('This update hook is failing.');
 }
 
 /**

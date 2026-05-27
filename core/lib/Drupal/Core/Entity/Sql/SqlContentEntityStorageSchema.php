@@ -365,7 +365,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
 
     // If shared table schema changes are needed, we can't proceed.
     if (!class_exists($original->getStorageClass()) || $this->hasSharedTableStructureChange($entity_type, $original)) {
-      throw new EntityStorageException('It is not possible to change the entity type schema outside of a batch context. Use EntityDefinitionUpdateManagerInterface::updateFieldableEntityType() instead.');
+      throw new \Drupal\Core\Entity\EntityStorageException('It is not possible to change the entity type schema outside of a batch context. Use EntityDefinitionUpdateManagerInterface::updateFieldableEntityType() instead.');
     }
 
     // Drop original indexes and unique keys.
@@ -760,7 +760,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
           $this->database->schema()->createTable($dedicated_table_name_mapping[$name], $table);
         }
         else {
-          throw new EntityStorageException('The field ' . $storage_definition->getName() . ' has already been deleted and it is in the process of being purged.');
+          throw new \Drupal\Core\Entity\EntityStorageException('The field ' . $storage_definition->getName() . ' has already been deleted and it is in the process of being purged.');
         }
       }
 
@@ -920,7 +920,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    */
   protected function checkEntityType(EntityTypeInterface $entity_type) {
     if ($entity_type->id() != $this->entityType->id()) {
-      throw new EntityStorageException("Unsupported entity type {$entity_type->id()}");
+      throw new \Drupal\Core\Entity\EntityStorageException("Unsupported entity type {$entity_type->id()}");
     }
     return TRUE;
   }
@@ -974,7 +974,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
         }
         foreach ($table_mapping->getFieldNames($table_name) as $field_name) {
           if (!isset($this->fieldStorageDefinitions[$field_name])) {
-            throw new FieldException("Field storage definition for '$field_name' could not be found.");
+            throw new \Drupal\Core\Field\FieldException("Field storage definition for '$field_name' could not be found.");
           }
           // Add the schema for base field definitions.
           elseif ($table_mapping->allowsSharedTableStorage($this->fieldStorageDefinitions[$field_name])) {
@@ -1766,7 +1766,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
     }
     else {
       if (empty($storage_definition->getSetting('column_changes_handled')) && $this->hasColumnChanges($storage_definition, $original)) {
-        throw new FieldStorageDefinitionUpdateForbiddenException('The SQL storage cannot change the schema for an existing field (' . $storage_definition->getName() . ' in ' . $storage_definition->getTargetEntityTypeId() . ' entity) with data.');
+        throw new \Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException('The SQL storage cannot change the schema for an existing field (' . $storage_definition->getName() . ' in ' . $storage_definition->getTargetEntityTypeId() . ' entity) with data.');
       }
       // There is data, so there are no column changes. Drop all the prior
       // indexes and create all the new ones, except for all the priors that
@@ -1864,7 +1864,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
     }
     else {
       if (empty($storage_definition->getSetting('column_changes_handled')) && $this->hasColumnChanges($storage_definition, $original)) {
-        throw new FieldStorageDefinitionUpdateForbiddenException('The SQL storage cannot change the schema for an existing field (' . $storage_definition->getName() . ' in ' . $storage_definition->getTargetEntityTypeId() . ' entity) with data.');
+        throw new \Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException('The SQL storage cannot change the schema for an existing field (' . $storage_definition->getName() . ' in ' . $storage_definition->getTargetEntityTypeId() . ' entity) with data.');
       }
 
       $updated_field_name = $storage_definition->getName();
@@ -1887,7 +1887,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
               $original_not_null = !empty($original_schema[$table_name]['fields'][$column_name]['not null']);
               if ($not_null !== $original_not_null) {
                 if ($not_null && $this->hasNullFieldPropertyData($table_name, $column_name)) {
-                  throw new EntityStorageException("The $column_name column cannot have NOT NULL constraints as it holds NULL values.");
+                  throw new \Drupal\Core\Entity\EntityStorageException("The $column_name column cannot have NOT NULL constraints as it holds NULL values.");
                 }
                 $column_schema = $original_schema[$table_name]['fields'][$column_name];
                 $column_schema['not null'] = $not_null;
@@ -2079,7 +2079,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
 
     // Check that the schema does not include forbidden column names.
     if (array_intersect(array_keys($field_schema['columns']), $table_mapping->getReservedColumns())) {
-      throw new FieldException("Reserved field column names on {$storage_definition->getName()}");
+      throw new \Drupal\Core\Field\FieldException("Reserved field column names on {$storage_definition->getName()}");
     }
 
     $field_name = $storage_definition->getName();
@@ -2101,15 +2101,15 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       if ($initial_value_field_name = $storage_definition->getInitialValueFromField()) {
         // Check that the field used for populating initial values is valid.
         if (!isset($this->fieldStorageDefinitions[$initial_value_field_name])) {
-          throw new FieldException("Invalid initial value definition on {$storage_definition->getName()}: The field $initial_value_field_name does not exist.");
+          throw new \Drupal\Core\Field\FieldException("Invalid initial value definition on {$storage_definition->getName()}: The field $initial_value_field_name does not exist.");
         }
 
         if ($storage_definition->getType() !== $this->fieldStorageDefinitions[$initial_value_field_name]->getType()) {
-          throw new FieldException("Invalid initial value definition on {$storage_definition->getName()}: The field types do not match.");
+          throw new \Drupal\Core\Field\FieldException("Invalid initial value definition on {$storage_definition->getName()}: The field types do not match.");
         }
 
         if (!$table_mapping->allowsSharedTableStorage($this->fieldStorageDefinitions[$initial_value_field_name])) {
-          throw new FieldException("Invalid initial value definition on {$storage_definition->getName()}: Both fields have to be stored in the shared entity tables.");
+          throw new \Drupal\Core\Field\FieldException("Invalid initial value definition on {$storage_definition->getName()}: Both fields have to be stored in the shared entity tables.");
         }
 
         $initial_value_from_field = $table_mapping->getColumnNames($initial_value_field_name);
@@ -2346,7 +2346,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
     $properties = $storage_definition->getPropertyDefinitions();
     $table_mapping = $this->getTableMapping($entity_type, [$storage_definition]);
     if (array_intersect(array_keys($schema['columns']), $table_mapping->getReservedColumns())) {
-      throw new FieldException("Reserved field column names on {$storage_definition->getName()}");
+      throw new \Drupal\Core\Field\FieldException("Reserved field column names on {$storage_definition->getName()}");
     }
 
     // Add field columns.

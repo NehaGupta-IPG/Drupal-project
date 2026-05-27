@@ -157,7 +157,7 @@ class FieldItemNormalizer extends NormalizerBase implements DenormalizerInterfac
           $format = count($invalid_property_names) === 1
             ? "The property '%s' does not exist on the '%s' field of type '%s'. Did you mean '%s'?"
             : "The properties '%s' do not exist on the '%s' field of type '%s'. Did you mean '%s'?";
-          throw new UnexpectedValueException(sprintf(
+          throw new \Symfony\Component\Serializer\Exception\UnexpectedValueException(sprintf(
             $format,
             implode("', '", array_keys($invalid_property_names)),
             $item_definition->getFieldDefinition()->getName(),
@@ -169,7 +169,7 @@ class FieldItemNormalizer extends NormalizerBase implements DenormalizerInterfac
           $format = count($invalid_property_names) === 1
             ? "The property '%s' does not exist on the '%s' field of type '%s'. Writable properties are: '%s'."
             : "The properties '%s' do not exist on the '%s' field of type '%s'. Writable properties are: '%s'.";
-          throw new UnexpectedValueException(sprintf(
+          throw new \Symfony\Component\Serializer\Exception\UnexpectedValueException(sprintf(
             $format,
             implode("', '", array_keys($invalid_property_names)),
             $item_definition->getFieldDefinition()->getName(),

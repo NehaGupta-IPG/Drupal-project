@@ -20,7 +20,7 @@ class LinkNotExistingInternalConstraintValidator extends ConstraintValidator {
    */
   public function validate($value, Constraint $constraint): void {
     if (!$value instanceof LinkItemInterface) {
-      throw new UnexpectedValueException($value, LinkItemInterface::class);
+      throw new \Symfony\Component\Validator\Exception\UnexpectedValueException($value, LinkItemInterface::class);
     }
     if ($value->isEmpty()) {
       return;
@@ -42,13 +42,13 @@ class LinkNotExistingInternalConstraintValidator extends ConstraintValidator {
       }
       // The following exceptions are all possible during URL generation, and
       // should be considered as disallowed URLs.
-      catch (RouteNotFoundException) {
+      catch (\Symfony\Component\Routing\Exception\RouteNotFoundException) {
         $allowed = FALSE;
       }
-      catch (InvalidParameterException) {
+      catch (\Symfony\Component\Routing\Exception\InvalidParameterException) {
         $allowed = FALSE;
       }
-      catch (MissingMandatoryParametersException) {
+      catch (\Symfony\Component\Routing\Exception\MissingMandatoryParametersException) {
         $allowed = FALSE;
       }
       if (!$allowed) {

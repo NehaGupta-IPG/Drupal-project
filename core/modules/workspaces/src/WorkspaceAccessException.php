@@ -7,6 +7,6 @@ use Drupal\Core\Access\AccessException;
 /**
  * Exception thrown when trying to switch to an inaccessible workspace.
  */
-class WorkspaceAccessException extends AccessException {
+class WorkspaceAccessException extends \Drupal\Core\Access\AccessException {
 
 }

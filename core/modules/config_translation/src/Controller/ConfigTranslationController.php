@@ -144,7 +144,7 @@ class ConfigTranslationController extends ControllerBase {
       $original_langcode = $mapper->getLangcode();
       $operations_access = TRUE;
     }
-    catch (ConfigMapperLanguageException) {
+    catch (\Drupal\config_translation\Exception\ConfigMapperLanguageException) {
       $items = [];
       foreach ($mapper->getConfigNames() as $config_name) {
         $langcode = $mapper->getLangcodeFromConfig($config_name);

@@ -1267,7 +1267,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
     try {
       $style = $this->entityTypeManager->getStorage('image_style')->load('thumbnail');
     }
-    catch (PluginNotFoundException) {
+    catch (\Drupal\Component\Plugin\Exception\PluginNotFoundException) {
       // The image style plugin does not exists. $style stays NULL and no user
       // picture will be added.
     }

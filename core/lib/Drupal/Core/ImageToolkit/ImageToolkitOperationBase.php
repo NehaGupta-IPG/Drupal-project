@@ -137,7 +137,7 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
         if (!array_key_exists('default', $argument)) {
           // The plugin did not define a default, so throw a plugin exception,
           // not an invalid argument exception.
-          throw new InvalidPluginDefinitionException("Default for argument '$id' expected by plugin '{$this->getPluginId()}' but not defined");
+          throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException("Default for argument '$id' expected by plugin '{$this->getPluginId()}' but not defined");
         }
 
         // Use the default value if the argument is not passed in.

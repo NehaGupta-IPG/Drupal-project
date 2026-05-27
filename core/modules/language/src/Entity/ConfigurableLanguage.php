@@ -181,7 +181,7 @@ class ConfigurableLanguage extends ConfigEntityBase implements ConfigurableLangu
     $default_langcode = static::getDefaultLangcode();
     foreach ($entities as $entity) {
       if ($entity->id() == $default_langcode && !$entity->isUninstalling()) {
-        throw new DeleteDefaultLanguageException('Can not delete the default language');
+        throw new \Drupal\language\Exception\DeleteDefaultLanguageException('Can not delete the default language');
       }
     }
   }

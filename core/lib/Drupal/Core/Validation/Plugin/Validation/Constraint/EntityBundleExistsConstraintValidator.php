@@ -41,7 +41,7 @@ class EntityBundleExistsConstraintValidator extends ConstraintValidator implemen
     assert($constraint instanceof EntityBundleExistsConstraint);
 
     if (!is_string($value)) {
-      throw new UnexpectedTypeException($value, 'string');
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($value, 'string');
     }
     // Resolve any dynamic tokens, like %parent, in the entity type ID.
     $entity_type_id = TypeResolver::resolveDynamicTypeName("[$constraint->entityTypeId]", $this->context->getObject());

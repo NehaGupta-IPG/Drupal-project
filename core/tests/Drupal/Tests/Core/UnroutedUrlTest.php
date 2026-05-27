@@ -148,9 +148,9 @@ class UnroutedUrlTest extends UnitTestCase {
     $this->router->expects($this->once())
       ->method('matchRequest')
       ->with($request)
-      ->will($this->throwException(new ResourceNotFoundException()));
+      ->will($this->throwException(new \Symfony\Component\Routing\Exception\ResourceNotFoundException()));
 
-    $this->expectException(ResourceNotFoundException::class);
+    $this->expectException(\Symfony\Component\Routing\Exception\ResourceNotFoundException::class);
     Url::createFromRequest($request);
   }
 

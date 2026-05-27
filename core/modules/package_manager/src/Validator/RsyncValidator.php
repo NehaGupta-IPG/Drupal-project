@@ -48,7 +48,7 @@ final class RsyncValidator implements EventSubscriberInterface {
       $this->executableFinder->find('rsync');
       $rsync_found = TRUE;
     }
-    catch (LogicException) {
+    catch (\PhpTuf\ComposerStager\API\Exception\LogicException) {
       $rsync_found = FALSE;
     }
 

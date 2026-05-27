@@ -582,7 +582,7 @@ EOF;
         // Handle enforced redirect responses.
         // A typical use case where this might happen are forms using GET as
         // #method that are build inside a lazy builder.
-        catch (EnforcedResponseException $e) {
+        catch (\Drupal\Core\Form\EnforcedResponseException $e) {
           $response = $e->getResponse();
           if (!$response instanceof RedirectResponse) {
             throw $e;

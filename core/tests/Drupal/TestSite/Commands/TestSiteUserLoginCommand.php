@@ -61,7 +61,7 @@ class TestSiteUserLoginCommand extends Command {
     $container = $kernel->getContainer();
     $uid = $input->getArgument('uid');
     if (!is_numeric($uid)) {
-      throw new InvalidArgumentException(sprintf('The "uid" argument needs to be an integer, but it is "%s".', $uid));
+      throw new \Symfony\Component\Console\Exception\InvalidArgumentException(sprintf('The "uid" argument needs to be an integer, but it is "%s".', $uid));
     }
     $userEntity = $container->get('entity_type.manager')
       ->getStorage('user')

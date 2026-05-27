@@ -209,7 +209,7 @@ class Condition extends ConditionBase {
           return str_ends_with($value, $condition['value']);
 
         default:
-          throw new QueryException('Invalid condition operator.');
+          throw new \Drupal\Core\Entity\Query\QueryException('Invalid condition operator.');
       }
     }
     return FALSE;

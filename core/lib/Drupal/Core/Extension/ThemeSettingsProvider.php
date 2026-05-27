@@ -92,7 +92,7 @@ class ThemeSettingsProvider {
           $themeSettings->merge($themeConfigSettings);
         }
       }
-      catch (StorageException) {
+      catch (\Drupal\Core\Config\StorageException) {
       }
 
       // If the theme does not support a particular feature, override the

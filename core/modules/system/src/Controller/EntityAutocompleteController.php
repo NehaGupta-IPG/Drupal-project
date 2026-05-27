@@ -94,13 +94,13 @@ class EntityAutocompleteController extends ControllerBase {
         if (!hash_equals($selection_settings_hash, $selection_settings_key)) {
           // Disallow access when the selection settings hash does not match the
           // passed-in key.
-          throw new AccessDeniedHttpException('Invalid selection settings key.');
+          throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException('Invalid selection settings key.');
         }
       }
       else {
         // Disallow access when the selection settings key is not found in the
         // key/value store.
-        throw new AccessDeniedHttpException();
+        throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
       }
 
       $entity_type_id = $request->query->get('entity_type');

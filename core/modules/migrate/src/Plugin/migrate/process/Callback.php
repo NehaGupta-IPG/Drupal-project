@@ -96,7 +96,7 @@ class Callback extends ProcessPluginBase {
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
     if (!empty($this->configuration['unpack_source'])) {
       if (!is_array($value)) {
-        throw new MigrateException(sprintf("When 'unpack_source' is set, the source must be an array. Instead it was of type '%s'", gettype($value)));
+        throw new \Drupal\migrate\MigrateException(sprintf("When 'unpack_source' is set, the source must be an array. Instead it was of type '%s'", gettype($value)));
       }
       return call_user_func($this->configuration['callable'], ...$value);
     }

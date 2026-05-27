@@ -132,7 +132,7 @@ final class RecipeCommand extends Command {
       try {
         $this->rollBackToCheckpoint($backup_checkpoint);
       }
-      catch (ConfigImporterException $importer_exception) {
+      catch (\Drupal\Core\Config\ConfigImporterException $importer_exception) {
         $io->error($importer_exception->getMessage());
       }
       throw $e;

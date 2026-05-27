@@ -66,7 +66,7 @@ class FrontMatterTest extends TestCase {
    * @legacy-covers \Drupal\Component\FrontMatter\Exception\FrontMatterParseException
    */
   public function testFrontMatterBroken(): void {
-    $this->expectException(FrontMatterParseException::class);
+    $this->expectException(\Drupal\Component\FrontMatter\Exception\FrontMatterParseException::class);
     $this->expectExceptionMessage('An error occurred when attempting to parse front matter data on line 4');
     $source = "---\ncollection:\n-  key: foo\n  foo: bar\n---\n";
     FrontMatter::create($source)->getData();

@@ -301,7 +301,7 @@ class Tables implements TablesInterface {
             $entity_type_id = $target_definition->getEntityTypeId();
           }
           if (!$entity_type_id) {
-            throw new QueryException(sprintf("Cannot determine entity type for relationship '%s' for field '%s'", $relationship_specifier ?? '', $field));
+            throw new \Drupal\Core\Entity\Query\QueryException(sprintf("Cannot determine entity type for relationship '%s' for field '%s'", $relationship_specifier ?? '', $field));
           }
           $entity_type = $this->entityTypeManager->getActiveDefinition($entity_type_id);
           $field_storage_definitions = $this->entityFieldManager->getActiveFieldStorageDefinitions($entity_type_id);
@@ -312,7 +312,7 @@ class Tables implements TablesInterface {
           $index_prefix .= "$next_index_prefix.";
         }
         else {
-          throw new QueryException("Invalid specifier '$relationship_specifier'");
+          throw new \Drupal\Core\Entity\Query\QueryException("Invalid specifier '$relationship_specifier'");
         }
       }
     }
@@ -373,7 +373,7 @@ class Tables implements TablesInterface {
         return $this->entityTables[$key];
       }
     }
-    throw new QueryException("'$property' not found");
+    throw new \Drupal\Core\Entity\Query\QueryException("'$property' not found");
   }
 
   /**

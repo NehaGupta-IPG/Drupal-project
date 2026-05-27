@@ -30,7 +30,7 @@ class SchemaListenerController extends ControllerBase {
     try {
       $this->configFactory->getEditable('config_schema_test.schemaless')->set('foo', 'bar')->save();
     }
-    catch (SchemaIncompleteException $e) {
+    catch (\Drupal\Core\Config\Schema\SchemaIncompleteException $e) {
       return [
         '#markup' => $e->getMessage(),
       ];

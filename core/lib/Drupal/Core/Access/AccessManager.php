@@ -92,12 +92,12 @@ class AccessManager implements AccessManagerInterface {
       $route_match = new RouteMatch($route_name, $route, $upcasted_parameters, $parameters);
       return $this->check($route_match, $account, NULL, $return_as_object);
     }
-    catch (RouteNotFoundException) {
+    catch (\Symfony\Component\Routing\Exception\RouteNotFoundException) {
       // Cacheable until extensions change.
       $result = AccessResult::forbidden()->addCacheTags(['config:core.extension']);
       return $return_as_object ? $result : $result->isAllowed();
     }
-    catch (ParamNotConvertedException) {
+    catch (\Drupal\Core\ParamConverter\ParamNotConvertedException) {
       // Uncacheable because conversion of the parameter may not have been
       // possible due to dynamic circumstances.
       $result = AccessResult::forbidden()->setCacheMaxAge(0);
@@ -160,7 +160,7 @@ class AccessManager implements AccessManagerInterface {
     $service_access = call_user_func_array($callable, $arguments);
 
     if (!$service_access instanceof AccessResultInterface) {
-      throw new AccessException("Access error in $service_id. Access services must return an object that implements AccessResultInterface.");
+      throw new \Drupal\Core\Access\AccessException("Access error in $service_id. Access services must return an object that implements AccessResultInterface.");
     }
 
     return $service_access;

@@ -67,7 +67,7 @@ final class RecipeConfigInstaller extends ConfigInstaller {
           /** @var \Symfony\Component\Validator\ConstraintViolationList $violations */
           $violations = $typed_config->validate();
           if (count($violations) > 0) {
-            throw new InvalidConfigException($violations, $typed_config);
+            throw new \Drupal\Core\Recipe\InvalidConfigException($violations, $typed_config);
           }
           break;
         }

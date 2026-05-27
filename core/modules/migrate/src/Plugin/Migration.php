@@ -326,7 +326,7 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
 
     $this->migration_dependencies = ($this->migration_dependencies ?: []) + ['required' => [], 'optional' => []];
     if (count($this->migration_dependencies) !== 2 || !is_array($this->migration_dependencies['required']) || !is_array($this->migration_dependencies['optional'])) {
-      throw new InvalidPluginDefinitionException($this->id(), "Invalid migration dependencies configuration for migration {$this->id()}");
+      throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($this->id(), "Invalid migration dependencies configuration for migration {$this->id()}");
     }
   }
 
@@ -400,7 +400,7 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
             $this->processPlugins[$index][$property][] = $this->processPluginManager->createInstance($configuration['plugin'], $configuration, $this);
           }
           if (!$this->processPlugins[$index][$property]) {
-            throw new MigrateException("Invalid process configuration for $property");
+            throw new \Drupal\migrate\MigrateException("Invalid process configuration for $property");
           }
         }
       }
@@ -431,7 +431,7 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
       }
       if (!is_array($configuration)) {
         $migration_id = $this->getPluginId();
-        throw new MigrateException("Invalid process for destination '$destination' in migration '$migration_id'");
+        throw new \Drupal\migrate\MigrateException("Invalid process for destination '$destination' in migration '$migration_id'");
       }
       $normalized_configurations[$destination] = $configuration;
     }
@@ -443,7 +443,7 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
    */
   public function getDestinationPlugin($stub_being_requested = FALSE) {
     if ($stub_being_requested && !empty($this->destination['no_stub'])) {
-      throw new MigrateSkipRowException('Stub requested but not made because no_stub configuration is set.');
+      throw new \Drupal\migrate\MigrateSkipRowException('Stub requested but not made because no_stub configuration is set.');
     }
     if (!isset($this->destinationPlugin)) {
       $this->destinationPlugin = $this->destinationPluginManager->createInstance($this->destination['plugin'], $this->destination, $this);
@@ -498,7 +498,7 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
       }
     }
     if ($missing_migrations) {
-      throw new RequirementsException('Missing migrations ' . implode(', ', $missing_migrations) . '.', ['requirements' => $missing_migrations]);
+      throw new \Drupal\migrate\Exception\RequirementsException('Missing migrations ' . implode(', ', $missing_migrations) . '.', ['requirements' => $missing_migrations]);
     }
   }
 
@@ -677,7 +677,7 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
   public function getMigrationDependencies() {
     $this->migration_dependencies = ($this->migration_dependencies ?: []) + ['required' => [], 'optional' => []];
     if (count($this->migration_dependencies) !== 2 || !is_array($this->migration_dependencies['required']) || !is_array($this->migration_dependencies['optional'])) {
-      throw new InvalidPluginDefinitionException($this->id(), "Invalid migration dependencies configuration for migration {$this->id()}");
+      throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($this->id(), "Invalid migration dependencies configuration for migration {$this->id()}");
     }
     $this->migration_dependencies['optional'] = array_unique(array_merge($this->migration_dependencies['optional'], $this->findMigrationDependencies($this->process)));
 

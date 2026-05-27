@@ -117,7 +117,7 @@ class SearchPageRoutes implements ContainerInjectionInterface {
       try {
         $uses_admin_theme = $entity->getPlugin()->usesAdminTheme();
       }
-      catch (PluginNotFoundException) {
+      catch (\Drupal\Component\Plugin\Exception\PluginNotFoundException) {
         $uses_admin_theme = FALSE;
       }
       if ($uses_admin_theme) {

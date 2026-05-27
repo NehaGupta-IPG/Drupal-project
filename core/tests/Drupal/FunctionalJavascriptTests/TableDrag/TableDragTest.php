@@ -338,7 +338,7 @@ class TableDragTest extends WebDriverTestBase {
     $strings = [];
     foreach ($items as $item) {
       if (($pos = strpos($text, $item)) === FALSE) {
-        throw new ExpectationException("Cannot find '$item' in the page", $session->getDriver());
+        throw new \Behat\Mink\Exception\ExpectationException("Cannot find '$item' in the page", $session->getDriver());
       }
       $strings[$pos] = $item;
     }

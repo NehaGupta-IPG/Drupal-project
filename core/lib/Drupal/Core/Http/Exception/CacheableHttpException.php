@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 /**
  * A cacheable HttpException.
  */
-class CacheableHttpException extends HttpException implements CacheableDependencyInterface {
+class CacheableHttpException extends \Symfony\Component\HttpKernel\Exception\HttpException implements CacheableDependencyInterface {
 
   use CacheableDependencyTrait;
 

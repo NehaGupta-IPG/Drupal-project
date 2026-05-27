@@ -53,7 +53,7 @@ trait InstallerRedirectTrait {
     // If the database wasn't found, assume the user hasn't entered it properly
     // and redirect to the installer. This check needs to come first because a
     // DatabaseNotFoundException is also an instance of DatabaseException.
-    if ($exception instanceof DatabaseNotFoundException || $exception instanceof ConnectionNotDefinedException) {
+    if ($exception instanceof \Drupal\Core\Database\DatabaseNotFoundException || $exception instanceof \Drupal\Core\Database\ConnectionNotDefinedException) {
       return TRUE;
     }
 
@@ -61,7 +61,7 @@ trait InstallerRedirectTrait {
     // expected to occur when Drupal has not yet been installed. This includes
     // NotFoundHttpException because an uninstalled site won't have route
     // information available yet and therefore can return 404 errors.
-    if (!($exception instanceof \PDOException || $exception instanceof DatabaseException || $exception instanceof NotFoundHttpException)) {
+    if (!($exception instanceof \PDOException || $exception instanceof \Drupal\Core\Database\DatabaseException || $exception instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException)) {
       return FALSE;
     }
 

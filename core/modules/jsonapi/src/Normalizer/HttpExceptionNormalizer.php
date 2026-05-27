@@ -84,7 +84,7 @@ class HttpExceptionNormalizer extends NormalizerBase {
    * @return array
    *   The error objects to include in the response.
    */
-  protected function buildErrorObjects(HttpException $exception) {
+  protected function buildErrorObjects(\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
     $error = [];
     $status_code = $exception->getStatusCode();
     if (!empty(Response::$statusTexts[$status_code])) {
@@ -193,7 +193,7 @@ class HttpExceptionNormalizer extends NormalizerBase {
    */
   public function getSupportedTypes(?string $format): array {
     return [
-      HttpException::class => TRUE,
+      \Symfony\Component\HttpKernel\Exception\HttpException::class => TRUE,
     ];
   }
 

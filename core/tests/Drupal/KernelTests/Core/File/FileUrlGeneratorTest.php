@@ -47,7 +47,7 @@ class FileUrlGeneratorTest extends FileTestBase {
    * Tests missing stream handler.
    */
   public function testGenerateMissingStreamWrapper(): void {
-    $this->expectException(InvalidStreamWrapperException::class);
+    $this->expectException(\Drupal\Core\File\Exception\InvalidStreamWrapperException::class);
     $this->fileUrlGenerator->generate("foo://bar");
   }
 
@@ -55,7 +55,7 @@ class FileUrlGeneratorTest extends FileTestBase {
    * Tests missing stream handler.
    */
   public function testGenerateStringMissingStreamWrapper(): void {
-    $this->expectException(InvalidStreamWrapperException::class);
+    $this->expectException(\Drupal\Core\File\Exception\InvalidStreamWrapperException::class);
     $this->fileUrlGenerator->generateString("foo://bar");
   }
 
@@ -63,7 +63,7 @@ class FileUrlGeneratorTest extends FileTestBase {
    * Tests missing stream handler.
    */
   public function testGenerateAbsoluteStringMissingStreamWrapper(): void {
-    $this->expectException(InvalidStreamWrapperException::class);
+    $this->expectException(\Drupal\Core\File\Exception\InvalidStreamWrapperException::class);
     $this->fileUrlGenerator->generateAbsoluteString("foo://bar");
   }
 

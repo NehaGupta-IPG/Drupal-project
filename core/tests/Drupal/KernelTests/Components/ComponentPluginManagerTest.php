@@ -47,7 +47,7 @@ class ComponentPluginManagerTest extends ComponentKernelTestBase {
    * And not from the enclosing directory.
    */
   public function testMismatchingFolderName(): void {
-    $this->expectException(ComponentNotFoundException::class);
+    $this->expectException(\Drupal\Core\Render\Component\Exception\ComponentNotFoundException::class);
     $this->manager->find('sdc_theme_test:mismatching-folder-name');
   }
 

@@ -546,7 +546,7 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
     // @todo Implement initial value support for multi-value fields in
     //   https://www.drupal.org/node/2883851.
     if ($this->isMultiple()) {
-      throw new FieldException('Multi-value fields can not have an initial value.');
+      throw new \Drupal\Core\Field\FieldException('Multi-value fields can not have an initial value.');
     }
 
     $this->definition['initial_value'] = $this->normalizeValue($value, $this->getMainPropertyName());

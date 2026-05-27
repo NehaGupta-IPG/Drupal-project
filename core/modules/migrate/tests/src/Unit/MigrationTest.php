@@ -46,7 +46,7 @@ class MigrationTest extends UnitTestCase {
     $destination_plugin_manager = $this->createStub(MigrateDestinationPluginManager::class);
     $id_map_plugin_manager = $this->createStub(MigratePluginManagerInterface::class);
 
-    $this->expectException(InvalidPluginDefinitionException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class);
     $this->expectExceptionMessage("Invalid migration dependencies configuration for migration test_migration");
     new Migration($configuration, $plugin_id, [], $migration_plugin_manager, $source_plugin_manager, $process_plugin_manager, $destination_plugin_manager, $id_map_plugin_manager);
   }
@@ -62,13 +62,13 @@ class MigrationTest extends UnitTestCase {
     $source_plugin = $this->createMock('Drupal\Tests\migrate\Unit\RequirementsAwareSourceInterface');
     $source_plugin->expects($this->once())
       ->method('checkRequirements')
-      ->willThrowException(new RequirementsException('Missing source requirement', ['key' => 'value']));
+      ->willThrowException(new \Drupal\migrate\Exception\RequirementsException('Missing source requirement', ['key' => 'value']));
     $destination_plugin = $this->createStub(RequirementsAwareDestinationInterface::class);
 
     $migration->setSourcePlugin($source_plugin);
     $migration->setDestinationPlugin($destination_plugin);
 
-    $this->expectException(RequirementsException::class);
+    $this->expectException(\Drupal\migrate\Exception\RequirementsException::class);
     $this->expectExceptionMessage('Missing source requirement');
     $migration->checkRequirements();
   }
@@ -85,12 +85,12 @@ class MigrationTest extends UnitTestCase {
     $destination_plugin = $this->createMock('Drupal\Tests\migrate\Unit\RequirementsAwareDestinationInterface');
     $destination_plugin->expects($this->once())
       ->method('checkRequirements')
-      ->willThrowException(new RequirementsException('Missing destination requirement', ['key' => 'value']));
+      ->willThrowException(new \Drupal\migrate\Exception\RequirementsException('Missing destination requirement', ['key' => 'value']));
 
     $migration->setSourcePlugin($source_plugin);
     $migration->setDestinationPlugin($destination_plugin);
 
-    $this->expectException(RequirementsException::class);
+    $this->expectException(\Drupal\migrate\Exception\RequirementsException::class);
     $this->expectExceptionMessage('Missing destination requirement');
     $migration->checkRequirements();
   }
@@ -135,7 +135,7 @@ class MigrationTest extends UnitTestCase {
       ->with(['test_a', 'test_b', 'test_c', 'test_d'])
       ->willReturn(['test_b' => $migration_b, 'test_c' => $migration_c, 'test_d' => $migration_d]);
 
-    $this->expectException(RequirementsException::class);
+    $this->expectException(\Drupal\migrate\Exception\RequirementsException::class);
     $this->expectExceptionMessage('Missing migrations test_a, test_c');
     $migration->checkRequirements();
   }
@@ -201,7 +201,7 @@ class MigrationTest extends UnitTestCase {
     // Migration dependencies expects ['optional' => []] or ['required' => []]].
     $migration->set('migration_dependencies', $dependencies);
 
-    $this->expectException(InvalidPluginDefinitionException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class);
     $this->expectExceptionMessage("Invalid migration dependencies configuration for migration {$plugin_id}");
     $migration->getMigrationDependencies();
   }

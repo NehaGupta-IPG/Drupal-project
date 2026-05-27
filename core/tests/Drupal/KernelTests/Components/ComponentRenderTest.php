@@ -496,7 +496,7 @@ class ComponentRenderTest extends ComponentKernelTestBase {
         'banner_body' => new \stdClass(),
       ],
     ];
-    $this->expectException(InvalidComponentDataException::class);
+    $this->expectException(\Drupal\Core\Render\Component\Exception\InvalidComponentDataException::class);
     $this->expectExceptionMessage('Unable to render component "sdc_test:my-banner". A render array or a scalar is expected for the slot "banner_body" when using the render element with the "#slots" property');
     $this->renderComponentRenderArray($build);
   }

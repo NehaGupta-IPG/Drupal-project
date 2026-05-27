@@ -121,7 +121,7 @@ class CommentController extends ControllerBase {
     if ($entity = $comment->getCommentedEntity()) {
       // Check access permissions for the entity.
       if (!$entity->access('view')) {
-        throw new AccessDeniedHttpException();
+        throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
       }
       $field_definition = $this->entityFieldManager->getFieldDefinitions($entity->getEntityTypeId(), $entity->bundle())[$comment->getFieldName()];
 
@@ -144,7 +144,7 @@ class CommentController extends ControllerBase {
       }
       return $response;
     }
-    throw new NotFoundHttpException();
+    throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
   }
 
   /**
@@ -182,7 +182,7 @@ class CommentController extends ControllerBase {
         'field_name' => $field_name,
       ]);
     }
-    throw new NotFoundHttpException();
+    throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
   }
 
   /**
@@ -286,7 +286,7 @@ class CommentController extends ControllerBase {
     // Check if entity and field exists.
     $fields = $this->commentManager->getFields($entity->getEntityTypeId());
     if (empty($fields[$field_name])) {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
 
     $account = $this->currentUser();

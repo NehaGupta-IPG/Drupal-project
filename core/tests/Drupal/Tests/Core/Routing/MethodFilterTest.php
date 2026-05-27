@@ -67,7 +67,7 @@ class MethodFilterTest extends UnitTestCase {
     $collection = new RouteCollection();
     $collection->add('test_route.get', new Route('/test', [], [], [], '', [], ['GET']));
 
-    $this->expectException(MethodNotAllowedException::class);
+    $this->expectException(\Symfony\Component\Routing\Exception\MethodNotAllowedException::class);
 
     $method_filter = new MethodFilter();
     $method_filter->filter($collection, $request);
@@ -85,7 +85,7 @@ class MethodFilterTest extends UnitTestCase {
     $collection->add('test_route2.get', new Route('/test', [], [], [], '', [], ['GET']));
     $collection->add('test_route3.get', new Route('/test', [], [], [], '', [], ['GET']));
 
-    $this->expectException(MethodNotAllowedException::class);
+    $this->expectException(\Symfony\Component\Routing\Exception\MethodNotAllowedException::class);
 
     $method_filter = new MethodFilter();
     $method_filter->filter($collection, $request);

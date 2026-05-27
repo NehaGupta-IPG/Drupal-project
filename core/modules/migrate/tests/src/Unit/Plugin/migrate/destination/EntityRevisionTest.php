@@ -62,7 +62,7 @@ class EntityRevisionTest extends EntityTestBase {
       $this->prophesize(AccountSwitcherInterface::class)->reveal(),
       $this->prophesize(EntityTypeBundleInfoInterface::class)->reveal(),
     );
-    $this->expectException(MigrateException::class);
+    $this->expectException(\Drupal\migrate\MigrateException::class);
     $this->expectExceptionMessage('The "foo" entity type does not support revisions.');
     $destination->getIds();
   }
@@ -92,7 +92,7 @@ class EntityRevisionTest extends EntityTestBase {
       $this->prophesize(AccountSwitcherInterface::class)->reveal(),
       $this->prophesize(EntityTypeBundleInfoInterface::class)->reveal(),
     );
-    $this->expectException(MigrateException::class);
+    $this->expectException(\Drupal\migrate\MigrateException::class);
     $this->expectExceptionMessage('The "foo" entity type does not support translations.');
     $destination->getIds();
   }

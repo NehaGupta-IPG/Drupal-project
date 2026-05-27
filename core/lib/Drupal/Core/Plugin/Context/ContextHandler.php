@@ -118,7 +118,7 @@ class ContextHandler implements ContextHandlerInterface {
       try {
         $context = $plugin->getContext($context_id);
       }
-      catch (ContextException) {
+      catch (\Drupal\Component\Plugin\Exception\ContextException) {
         $context = NULL;
       }
 
@@ -142,12 +142,12 @@ class ContextHandler implements ContextHandlerInterface {
     // This is a more severe problem than missing values, so check and throw
     // this first.
     if (!empty($mappings)) {
-      throw new ContextException('Assigned contexts were not satisfied: ' . implode(',', array_keys($mappings)));
+      throw new \Drupal\Component\Plugin\Exception\ContextException('Assigned contexts were not satisfied: ' . implode(',', array_keys($mappings)));
     }
 
     // If there are any required contexts without a value, throw an exception.
     if ($missing_value) {
-      throw new MissingValueContextException($missing_value);
+      throw new \Drupal\Component\Plugin\Exception\MissingValueContextException($missing_value);
     }
   }
 

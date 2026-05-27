@@ -37,7 +37,7 @@ class RendererCallbackTest extends RendererTestBase {
    */
   #[DataProvider('providerTestCallback')]
   public function testCallback(array $render_array, string $expected_deprecation): void {
-    $this->expectException(UntrustedCallbackException::class);
+    $this->expectException(\Drupal\Core\Security\UntrustedCallbackException::class);
     $this->expectExceptionMessage($expected_deprecation);
     $this->renderer->renderRoot($render_array);
   }

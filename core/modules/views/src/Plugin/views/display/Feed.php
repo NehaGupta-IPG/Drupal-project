@@ -95,7 +95,7 @@ class Feed extends PathPluginBase implements ResponseDisplayPluginInterface {
     $output = (string) $renderer->renderRoot($build);
 
     if (empty($output)) {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
 
     $response->setContent($output);

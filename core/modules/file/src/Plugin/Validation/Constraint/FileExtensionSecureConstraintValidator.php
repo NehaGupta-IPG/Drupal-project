@@ -39,7 +39,7 @@ class FileExtensionSecureConstraintValidator extends BaseFileConstraintValidator
   public function validate(mixed $value, Constraint $constraint): void {
     $file = $this->assertValueIsFile($value);
     if (!$constraint instanceof FileExtensionSecureConstraint) {
-      throw new UnexpectedTypeException($constraint, FileExtensionSecureConstraint::class);
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($constraint, FileExtensionSecureConstraint::class);
     }
 
     $allowInsecureUploads = $this->configFactory->get('system.file')->get('allow_insecure_uploads');

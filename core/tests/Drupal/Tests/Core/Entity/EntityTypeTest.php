@@ -308,11 +308,11 @@ class EntityTypeTest extends UnitTestCase {
       $entity_type = NULL;
     }
     if ($invalid_bundle) {
-      $this->assertInstanceOf(EntityTypeIdLengthException::class, $t);
+      $this->assertInstanceOf(\Drupal\Core\Entity\Exception\EntityTypeIdLengthException::class, $t);
       $this->assertSame('Attempt to create an entity type bundle class with an ID longer than ' . EntityTypeInterface::ID_MAX_LENGTH . " characters: $bundle.", $t->getMessage());
     }
     elseif ($invalid_entity_type) {
-      $this->assertInstanceOf(EntityTypeIdLengthException::class, $t);
+      $this->assertInstanceOf(\Drupal\Core\Entity\Exception\EntityTypeIdLengthException::class, $t);
       $this->assertSame('Attempt to create an entity type with an ID longer than ' . EntityTypeInterface::ID_MAX_LENGTH . " characters: $entity_type_id.", $t->getMessage());
     }
     else {

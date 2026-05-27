@@ -38,7 +38,7 @@ class ComposerMinimumStabilityValidatorTest extends PackageManagerKernelTestBase
       $stage->require(['drupal/core:9.8.1-beta1']);
       $this->fail('Able to require a package even though it did not meet minimum stability.');
     }
-    catch (SandboxEventException $exception) {
+    catch (\Drupal\package_manager\Exception\SandboxEventException $exception) {
       $this->assertValidationResultsEqual([$result], $exception->event->getResults());
     }
     $stage->destroy();
@@ -57,7 +57,7 @@ class ComposerMinimumStabilityValidatorTest extends PackageManagerKernelTestBase
       $stage->require([], ['drupal/core-dev:9.8.x-dev']);
       $this->fail('Able to require a package even though it did not meet minimum stability.');
     }
-    catch (SandboxEventException $exception) {
+    catch (\Drupal\package_manager\Exception\SandboxEventException $exception) {
       $this->assertValidationResultsEqual([$result], $exception->event->getResults());
     }
   }

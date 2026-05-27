@@ -52,7 +52,7 @@ trait EntityResourceValidationTrait {
         // message on REST responses.
         $message .= $violation->getPropertyPath() . ': ' . PlainTextOutput::renderFromHtml($violation->getMessage()) . "\n";
       }
-      throw new UnprocessableEntityHttpException($message);
+      throw new \Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException($message);
     }
   }
 

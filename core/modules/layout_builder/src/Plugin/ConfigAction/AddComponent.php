@@ -98,7 +98,7 @@ final class AddComponent implements ConfigActionPluginInterface, ContainerFactor
 
     $entity = $this->configManager->loadConfigEntityByName($configName);
     if (!$entity instanceof SectionListInterface) {
-      throw new ConfigActionException("No entity found for applying the addComponentToLayout action.");
+      throw new \Drupal\Core\Config\Action\ConfigActionException("No entity found for applying the addComponentToLayout action.");
     }
     foreach ($values as $value) {
       $this->applySingle($entity, $value);
@@ -133,13 +133,13 @@ final class AddComponent implements ConfigActionPluginInterface, ContainerFactor
       // exception.
       $region = $component['region'][$section->getLayoutId()] ??
         $component['default_region'] ??
-        throw new ConfigActionException("Cannot determine which region of the section to place this component into, because no default region was provided.");
+        throw new \Drupal\Core\Config\Action\ConfigActionException("Cannot determine which region of the section to place this component into, because no default region was provided.");
     }
     if ($region === NULL) {
-      throw new ConfigActionException("Cannot determine which region of the section to place this component into, because no region was provided.");
+      throw new \Drupal\Core\Config\Action\ConfigActionException("Cannot determine which region of the section to place this component into, because no region was provided.");
     }
     if (!isset($value['component']['configuration']) || !isset($value['component']['configuration']['id'])) {
-      throw new ConfigActionException("Cannot determine the component configuration, or misses a plugin ID.");
+      throw new \Drupal\Core\Config\Action\ConfigActionException("Cannot determine the component configuration, or misses a plugin ID.");
     }
     // If no weight were set, there would be a warning. So we set a
     // default, which will be overridden in insertComponent anyway.

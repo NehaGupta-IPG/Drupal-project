@@ -87,7 +87,7 @@ class IconPackManagerTest extends UnitTestCase {
     catch (\Exception $e) {
       if (!$is_valid) {
         $this->assertSame('icon_test:foo Error in definition `foo`:[library] Does not match the regex pattern ^\w+/[A-Za-z]+[\w\.-]*$', $e->getMessage());
-        $this->assertInstanceOf(IconPackConfigErrorException::class, $e);
+        $this->assertInstanceOf(\Drupal\Core\Theme\Icon\Exception\IconPackConfigErrorException::class, $e);
       }
     }
 

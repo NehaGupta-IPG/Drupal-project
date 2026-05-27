@@ -88,7 +88,7 @@ foo:
    * @legacy-covers ::errorHandler
    */
   public function testError(): void {
-    $this->expectException(InvalidDataTypeException::class);
+    $this->expectException(\Drupal\Component\Serialization\Exception\InvalidDataTypeException::class);
     YamlPecl::decode('foo: [ads');
   }
 

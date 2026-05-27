@@ -553,7 +553,7 @@ abstract class Schema implements PlaceholderInterface {
    */
   protected function introspectIndexSchema($table) {
     if (!$this->tableExists($table)) {
-      throw new SchemaObjectDoesNotExistException("The table $table doesn't exist.");
+      throw new \Drupal\Core\Database\SchemaObjectDoesNotExistException("The table $table doesn't exist.");
     }
     throw new \RuntimeException("The '{$this->connection->driver()}' database driver does not implement " . __METHOD__);
   }
@@ -642,7 +642,7 @@ abstract class Schema implements PlaceholderInterface {
    */
   public function createTable($name, $table) {
     if ($this->tableExists($name)) {
-      throw new SchemaObjectExistsException("Table '$name' already exists.");
+      throw new \Drupal\Core\Database\SchemaObjectExistsException("Table '$name' already exists.");
     }
     $statements = $this->createTableSql($name, $table);
     foreach ($statements as $statement) {
@@ -751,7 +751,7 @@ abstract class Schema implements PlaceholderInterface {
   protected function ensureNotNullPrimaryKey(array $primary_key, array $fields) {
     foreach (array_intersect($primary_key, array_keys($fields)) as $field_name) {
       if (!isset($fields[$field_name]['not null']) || $fields[$field_name]['not null'] !== TRUE) {
-        throw new SchemaException("The '$field_name' field specification does not define 'not null' as TRUE.");
+        throw new \Drupal\Core\Database\SchemaException("The '$field_name' field specification does not define 'not null' as TRUE.");
       }
     }
   }

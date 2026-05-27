@@ -90,7 +90,7 @@ class RevertOverridesForm extends ConfirmFormBase implements WorkspaceDynamicSaf
         '%label' => $entity->label(),
       ]);
     }
-    catch (ContextException) {
+    catch (\Drupal\Component\Plugin\Exception\ContextException) {
       // If the entity is not available, just return a generic message.
       return $this->t('The layout will be reverted to its default state. All layout modifications and inline blocks will be reset.');
     }

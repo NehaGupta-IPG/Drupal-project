@@ -91,7 +91,7 @@ class AddToAllBundlesConfigActionTest extends KernelTestBase {
 
     // Expect an error when the 'addToAllBundles' action is invoked on anything
     // other than a field storage config entity.
-    $this->expectException(PluginNotFoundException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\PluginNotFoundException::class);
     $this->expectExceptionMessage('The "user_role" entity does not support the "addToAllBundles" config action.');
     $this->applyAction('user.role.anonymous');
   }
@@ -112,7 +112,7 @@ class AddToAllBundlesConfigActionTest extends KernelTestBase {
     ]);
     $field->save();
 
-    $this->expectException(ConfigActionException::class);
+    $this->expectException(\Drupal\Core\Config\Action\ConfigActionException::class);
     $this->expectExceptionMessage('Field entity_test.one.body already exists.');
     $this->applyAction('field.storage.entity_test.body', TRUE);
   }
@@ -166,7 +166,7 @@ config:
 YAML;
     $recipe = $this->createRecipe($contents);
 
-    $this->expectException(ConfigActionException::class);
+    $this->expectException(\Drupal\Core\Config\Action\ConfigActionException::class);
     $this->expectExceptionMessage('The `label` property must be set for entity_test.entity_test.body.');
     RecipeRunner::processRecipe($recipe);
   }

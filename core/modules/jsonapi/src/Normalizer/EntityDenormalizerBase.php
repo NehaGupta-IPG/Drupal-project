@@ -94,7 +94,7 @@ abstract class EntityDenormalizerBase extends NormalizerBase implements Denormal
    */
   public function denormalize($data, $class, $format = NULL, array $context = []): mixed {
     if (empty($context['resource_type']) || !$context['resource_type'] instanceof ResourceType) {
-      throw new PreconditionFailedHttpException('Missing context during denormalization.');
+      throw new \Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException('Missing context during denormalization.');
     }
     /** @var \Drupal\jsonapi\ResourceType\ResourceType $resource_type */
     $resource_type = $context['resource_type'];

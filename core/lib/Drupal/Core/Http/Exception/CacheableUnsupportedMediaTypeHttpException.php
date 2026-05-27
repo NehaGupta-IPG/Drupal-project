@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 /**
  * A cacheable UnsupportedMediaTypeHttpException.
  */
-class CacheableUnsupportedMediaTypeHttpException extends UnsupportedMediaTypeHttpException implements CacheableDependencyInterface {
+class CacheableUnsupportedMediaTypeHttpException extends \Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException implements CacheableDependencyInterface {
 
   use CacheableDependencyTrait;
 

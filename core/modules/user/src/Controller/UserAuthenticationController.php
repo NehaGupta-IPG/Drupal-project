@@ -171,14 +171,14 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
     $content = $request->getContent();
     $credentials = $this->serializer->decode($content, $format);
     if (!isset($credentials['name']) && !isset($credentials['pass'])) {
-      throw new BadRequestHttpException('Missing credentials.');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Missing credentials.');
     }
 
     if (!isset($credentials['name'])) {
-      throw new BadRequestHttpException('Missing credentials.name.');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Missing credentials.name.');
     }
     if (!isset($credentials['pass'])) {
-      throw new BadRequestHttpException('Missing credentials.pass.');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Missing credentials.pass.');
     }
 
     $this->floodControl($request, $credentials['name']);
@@ -186,7 +186,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
     $account = $this->userAuth->lookupAccount($credentials['name']);
     if ($account) {
       if ($account->isBlocked()) {
-        throw new BadRequestHttpException('The user has not been activated or is blocked.');
+        throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('The user has not been activated or is blocked.');
       }
       $authenticated = $this->userAuth->authenticateAccount($account, $credentials['pass']) && $account->id();
       if ($authenticated) {
@@ -222,7 +222,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
     }
     // Always register an IP-based failed login event.
     $this->userFloodControl->register('user.failed_login_ip', $flood_config->get('ip_window'));
-    throw new BadRequestHttpException('Unrecognized username or password.');
+    throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Unrecognized username or password.');
   }
 
   /**
@@ -242,7 +242,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
 
     // Check if a name or mail is provided.
     if (!isset($credentials['name']) && !isset($credentials['mail'])) {
-      throw new BadRequestHttpException('Missing credentials.name or credentials.mail');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Missing credentials.name or credentials.mail');
     }
 
     // Load by name if provided.
@@ -269,7 +269,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
       // Send the password reset email.
       $mail = _user_mail_notify('password_reset', $account);
       if (empty($mail)) {
-        throw new BadRequestHttpException('Unable to send email. Contact the site administrator if the problem persists.');
+        throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Unable to send email. Contact the site administrator if the problem persists.');
       }
       else {
         $this->logger->info('Password reset instructions mailed to %name at %email.', [
@@ -344,7 +344,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
   protected function getRequestFormat(Request $request) {
     $format = $request->getRequestFormat();
     if (!in_array($format, $this->serializerFormats)) {
-      throw new BadRequestHttpException("Unrecognized format.");
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException("Unrecognized format.");
     }
     return $format;
   }
@@ -360,7 +360,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
   protected function floodControl(Request $request, $username) {
     $flood_config = $this->config('user.flood');
     if (!$this->userFloodControl->isAllowed('user.failed_login_ip', $flood_config->get('ip_limit'), $flood_config->get('ip_window'))) {
-      throw new AccessDeniedHttpException('Access is blocked because of IP based flood prevention.', NULL, Response::HTTP_TOO_MANY_REQUESTS);
+      throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException('Access is blocked because of IP based flood prevention.', NULL, Response::HTTP_TOO_MANY_REQUESTS);
     }
 
     if ($identifier = $this->getLoginFloodIdentifier($request, $username)) {
@@ -373,7 +373,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
         else {
           $error_message = 'Too many failed login attempts from your IP address. This IP address is temporarily blocked.';
         }
-        throw new AccessDeniedHttpException($error_message, NULL, Response::HTTP_TOO_MANY_REQUESTS);
+        throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException($error_message, NULL, Response::HTTP_TOO_MANY_REQUESTS);
       }
     }
   }

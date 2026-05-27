@@ -157,7 +157,7 @@ class MoveTest extends FileManagedUnitTestBase {
       $this->fileRepository->move(clone $source, $source->getFileUri(), FileExists::Error);
       $this->fail('expected FileExistsException');
     }
-    catch (FileExistsException $e) {
+    catch (\Drupal\Core\File\Exception\FileExistsException $e) {
       $this->assertStringContainsString("could not be copied because a file by that name already exists in the destination directory", $e->getMessage());
     }
     $this->assertEquals($contents, file_get_contents($source->getFileUri()), 'Contents of file were not altered.');
@@ -188,7 +188,7 @@ class MoveTest extends FileManagedUnitTestBase {
       $this->fail('expected FileExistsException');
     }
     // FileExistsException is a subclass of FileException.
-    catch (FileExistsException $e) {
+    catch (\Drupal\Core\File\Exception\FileExistsException $e) {
       $this->assertStringContainsString("could not be copied because a file by that name already exists in the destination directory", $e->getMessage());
     }
     // Check the return status and that the contents did not change.
@@ -210,7 +210,7 @@ class MoveTest extends FileManagedUnitTestBase {
    * @legacy-covers ::move
    */
   public function testInvalidStreamWrapper(): void {
-    $this->expectException(InvalidStreamWrapperException::class);
+    $this->expectException(\Drupal\Core\File\Exception\InvalidStreamWrapperException::class);
     $this->expectExceptionMessage('Invalid stream wrapper: foo://');
     $source = $this->createFile();
     $this->fileRepository->move($source, 'foo://');
@@ -225,7 +225,7 @@ class MoveTest extends FileManagedUnitTestBase {
     /** @var \Drupal\Core\Entity\EntityTypeManager $entityTypeManager */
     $entityTypeManager = $this->prophesize(EntityTypeManager::class);
     $entityTypeManager->getStorage('file')
-      ->willThrow(EntityStorageException::class);
+      ->willThrow(\Drupal\Core\Entity\EntityStorageException::class);
 
     $fileRepository = new FileRepository(
       $this->container->get('file_system'),
@@ -236,7 +236,7 @@ class MoveTest extends FileManagedUnitTestBase {
       $this->container->get('current_user')
     );
 
-    $this->expectException(EntityStorageException::class);
+    $this->expectException(\Drupal\Core\Entity\EntityStorageException::class);
     $source = $this->createFile();
     $target = $this->createFile();
     $fileRepository->move($source, $target->getFileUri(), FileExists::Replace);

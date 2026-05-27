@@ -225,7 +225,7 @@ class DbLogController extends ControllerBase {
     $dblog = $query->execute()->fetchObject();
 
     if (empty($dblog)) {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
 
     $build = [];

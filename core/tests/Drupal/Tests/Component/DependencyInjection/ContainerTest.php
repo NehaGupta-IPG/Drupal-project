@@ -74,7 +74,7 @@ class ContainerTest extends TestCase {
   public function testConstruct(): void {
     $container_definition = $this->getMockContainerDefinition();
     $container_definition['machine_format'] = !$this->machineFormat;
-    $this->expectException(InvalidArgumentException::class);
+    $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
     new $this->containerClass($container_definition);
   }
 
@@ -94,7 +94,7 @@ class ContainerTest extends TestCase {
    * @legacy-covers ::getAlternatives
    */
   public function testGetParameterIfNotFound(): void {
-    $this->expectException(ParameterNotFoundException::class);
+    $this->expectException(\Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException::class);
     $this->container->getParameter('parameter_that_does_not_exist');
   }
 
@@ -122,7 +122,7 @@ class ContainerTest extends TestCase {
    */
   public function testSetParameterWithFrozenContainer(): void {
     $this->container = new $this->containerClass($this->containerDefinition);
-    $this->expectException(LogicException::class);
+    $this->expectException(\Symfony\Component\DependencyInjection\Exception\LogicException::class);
     $this->container->setParameter('some_config', 'new_value');
   }
 
@@ -222,7 +222,7 @@ class ContainerTest extends TestCase {
    * @legacy-covers ::createService
    */
   public function testGetForCircularServices(): void {
-    $this->expectException(ServiceCircularReferenceException::class);
+    $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException::class);
     $this->container->get('circular_dependency');
   }
 
@@ -235,7 +235,7 @@ class ContainerTest extends TestCase {
    * @legacy-covers ::getServiceAlternatives
    */
   public function testGetForNonExistentService(): void {
-    $this->expectException(ServiceNotFoundException::class);
+    $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
     $this->container->get('service_not_exists');
   }
 
@@ -284,7 +284,7 @@ class ContainerTest extends TestCase {
 
     // Reset the service.
     $this->container->set('service_parameter_not_exists', NULL);
-    $this->expectException(InvalidArgumentException::class);
+    $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
     $this->container->get('service_parameter_not_exists');
   }
 
@@ -296,7 +296,7 @@ class ContainerTest extends TestCase {
    * @legacy-covers ::resolveServicesAndParameters
    */
   public function testGetForNonExistentParameterDependencyWithException(): void {
-    $this->expectException(InvalidArgumentException::class);
+    $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
     $this->container->get('service_parameter_not_exists');
   }
 
@@ -321,7 +321,7 @@ class ContainerTest extends TestCase {
    * @legacy-covers ::getAlternatives
    */
   public function testGetForNonExistentServiceDependencyWithException(): void {
-    $this->expectException(ServiceNotFoundException::class);
+    $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
     $this->container->get('service_dependency_not_exists');
   }
 
@@ -357,7 +357,7 @@ class ContainerTest extends TestCase {
    */
   public function testGetForNonExistentServiceWithExceptionOnSecondCall(): void {
     $this->assertNull($this->container->get('service_not_exists', ContainerInterface::NULL_ON_INVALID_REFERENCE), 'Not found service does nto throw exception.');
-    $this->expectException(ServiceNotFoundException::class);
+    $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
     $this->container->get('service_not_exists');
   }
 
@@ -393,7 +393,7 @@ class ContainerTest extends TestCase {
    * @legacy-covers ::createService
    */
   public function testGetForSyntheticServiceWithException(): void {
-    $this->expectException(RuntimeException::class);
+    $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
     $this->container->get('synthetic');
   }
 
@@ -432,7 +432,7 @@ class ContainerTest extends TestCase {
    * @legacy-covers ::createService
    */
   public function testGetForWrongFactory(): void {
-    $this->expectException(RuntimeException::class);
+    $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
     $this->container->get('wrong_factory');
   }
 
@@ -470,7 +470,7 @@ class ContainerTest extends TestCase {
    * @legacy-covers ::createService
    */
   public function testGetForConfiguratorWithException(): void {
-    $this->expectException(InvalidArgumentException::class);
+    $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
     $this->container->get('configurable_service_exception');
   }
 
@@ -583,7 +583,7 @@ class ContainerTest extends TestCase {
    * @legacy-covers ::resolveServicesAndParameters
    */
   public function testResolveServicesAndParametersForInvalidArgument(): void {
-    $this->expectException(InvalidArgumentException::class);
+    $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
     $this->container->get('invalid_argument_service');
   }
 
@@ -597,9 +597,9 @@ class ContainerTest extends TestCase {
   public function testResolveServicesAndParametersForInvalidArguments(): void {
     // In case the machine-optimized format is not used, we need to simulate the
     // test failure.
-    $this->expectException(InvalidArgumentException::class);
+    $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
     if (!$this->machineFormat) {
-      throw new InvalidArgumentException('Simulating the test failure.');
+      throw new \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException('Simulating the test failure.');
     }
     $this->container->get('invalid_arguments_service');
   }

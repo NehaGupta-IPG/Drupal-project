@@ -276,7 +276,7 @@ class AddComponentTest extends KernelTestBase {
       1,
       // No default_region, no matching region, so we error.
       [
-        ConfigActionException::class,
+        \Drupal\Core\Config\Action\ConfigActionException::class,
         'Cannot determine which region of the section to place this component into, because no default region was provided.',
       ],
     ];
@@ -295,7 +295,7 @@ class AddComponentTest extends KernelTestBase {
       1,
       // No default_region, no matching region, so we error.
       [
-        ConfigActionException::class,
+        \Drupal\Core\Config\Action\ConfigActionException::class,
         'Cannot determine which region of the section to place this component into, because no region was provided.',
       ],
     ];
@@ -315,7 +315,7 @@ class AddComponentTest extends KernelTestBase {
       1,
       // No component configuration.
       [
-        ConfigActionException::class,
+        \Drupal\Core\Config\Action\ConfigActionException::class,
         'Cannot determine the component configuration, or misses a plugin ID.',
       ],
     ];
@@ -338,7 +338,7 @@ class AddComponentTest extends KernelTestBase {
       1,
       // No component configuration id.
       [
-        ConfigActionException::class,
+        \Drupal\Core\Config\Action\ConfigActionException::class,
         'Cannot determine the component configuration, or misses a plugin ID.',
       ],
     ];
@@ -386,7 +386,7 @@ class AddComponentTest extends KernelTestBase {
    * Tests that applying the config action to a missing entity fails.
    */
   public function testActionFailsIfEntityNotFound(): void {
-    $this->expectException(ConfigActionException::class);
+    $this->expectException(\Drupal\Core\Config\Action\ConfigActionException::class);
     $this->expectExceptionMessage('No entity found for applying the addComponentToLayout action.');
     $this->configActionManager->applyAction(
       'addComponentToLayout',

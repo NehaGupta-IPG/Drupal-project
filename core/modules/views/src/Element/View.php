@@ -43,7 +43,7 @@ class View extends RenderElementBase {
     if (!isset($element['#view'])) {
       $view = Views::getView($element['#name']);
       if (!$view) {
-        throw new ViewRenderElementException("Invalid View name ({$element['#name']}) given.");
+        throw new \Drupal\views\Exception\ViewRenderElementException("Invalid View name ({$element['#name']}) given.");
       }
     }
     else {

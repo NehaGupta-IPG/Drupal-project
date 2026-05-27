@@ -86,7 +86,7 @@ class WorkflowTransitionDeleteForm extends ConfirmFormBase {
       $this->transition = $workflow->getTypePlugin()->getTransition($workflow_transition);
     }
     catch (\InvalidArgumentException) {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
     $this->workflow = $workflow;
     return parent::buildForm($form, $form_state);

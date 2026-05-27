@@ -291,7 +291,7 @@ class FileSystem implements FileSystemInterface {
       $real_source = $this->realpath($source) ?: $source;
       $real_destination = $this->realpath($destination) ?: $destination;
       if ($real_source === FALSE || $real_destination === FALSE || !@copy($real_source, $real_destination)) {
-        throw new FileWriteException("The specified file '$source' could not be copied to '$destination'.");
+        throw new \Drupal\Core\File\Exception\FileWriteException("The specified file '$source' could not be copied to '$destination'.");
       }
     }
 
@@ -308,19 +308,19 @@ class FileSystem implements FileSystemInterface {
     if (is_link($path)) {
       // See https://bugs.php.net/52176.
       if (!($this->unlink($path) || '\\' !== \DIRECTORY_SEPARATOR || $this->rmdir($path)) && file_exists($path)) {
-        throw new FileException("Failed to unlink symlink '$path'.");
+        throw new \Drupal\Core\File\Exception\FileException("Failed to unlink symlink '$path'.");
       }
       return TRUE;
     }
     if (is_file($path)) {
       if (!$this->unlink($path)) {
-        throw new FileException("Failed to unlink file '$path'.");
+        throw new \Drupal\Core\File\Exception\FileException("Failed to unlink file '$path'.");
       }
       return TRUE;
     }
 
     if (is_dir($path)) {
-      throw new NotRegularFileException("Cannot delete '$path' because it is a directory. Use deleteRecursive() instead.");
+      throw new \Drupal\Core\File\Exception\NotRegularFileException("Cannot delete '$path' because it is a directory. Use deleteRecursive() instead.");
     }
 
     // Return TRUE for non-existent file as the current state is the intended
@@ -331,7 +331,7 @@ class FileSystem implements FileSystemInterface {
 
     // We cannot handle anything other than files and directories.
     // Throw an exception for everything else (sockets, symbolic links, etc).
-    throw new NotRegularFileException("The file '$path' is not of a recognized type so it was not deleted.");
+    throw new \Drupal\Core\File\Exception\NotRegularFileException("The file '$path' is not of a recognized type so it was not deleted.");
   }
 
   /**
@@ -399,10 +399,10 @@ class FileSystem implements FileSystemInterface {
       // been implemented. It's not necessary to use FileSystem::unlink() as the
       // Windows issue has already been resolved above.
       if (!@copy($real_source, $real_destination)) {
-        throw new FileWriteException("The specified file '$source' could not be moved to '$destination'.");
+        throw new \Drupal\Core\File\Exception\FileWriteException("The specified file '$source' could not be moved to '$destination'.");
       }
       if (!@unlink($real_source)) {
-        throw new FileException("The source file '$source' could not be unlinked after copying to '$destination'.");
+        throw new \Drupal\Core\File\Exception\FileException("The source file '$source' could not be unlinked after copying to '$destination'.");
       }
     }
 
@@ -438,10 +438,10 @@ class FileSystem implements FileSystemInterface {
 
     if (!file_exists($source)) {
       if (($realpath = $this->realpath($original_source)) !== FALSE) {
-        throw new FileNotExistsException("File '$original_source' ('$realpath') could not be copied because it does not exist.");
+        throw new \Drupal\Core\File\Exception\FileNotExistsException("File '$original_source' ('$realpath') could not be copied because it does not exist.");
       }
       else {
-        throw new FileNotExistsException("File '$original_source' could not be copied because it does not exist.");
+        throw new \Drupal\Core\File\Exception\FileNotExistsException("File '$original_source' could not be copied because it does not exist.");
       }
     }
 
@@ -454,21 +454,21 @@ class FileSystem implements FileSystemInterface {
       // Perhaps $destination is a dir/file?
       $dirname = $this->dirname($destination);
       if (!$this->prepareDirectory($dirname)) {
-        throw new DirectoryNotReadyException("The specified file '$original_source' could not be copied because the destination directory '$dirname' is not properly configured. This may be caused by a problem with file or directory permissions.");
+        throw new \Drupal\Core\File\Exception\DirectoryNotReadyException("The specified file '$original_source' could not be copied because the destination directory '$dirname' is not properly configured. This may be caused by a problem with file or directory permissions.");
       }
     }
 
     // Determine whether we can perform this operation based on overwrite rules.
     $destination = $this->getDestinationFilename($destination, $fileExists);
     if ($destination === FALSE) {
-      throw new FileExistsException("File '$original_source' could not be copied because a file by that name already exists in the destination directory ('$destination').");
+      throw new \Drupal\Core\File\Exception\FileExistsException("File '$original_source' could not be copied because a file by that name already exists in the destination directory ('$destination').");
     }
 
     // Assert that the source and destination filenames are not the same.
     $real_source = $this->realpath($source);
     $real_destination = $this->realpath($destination);
     if ($source == $destination || ($real_source !== FALSE) && ($real_source == $real_destination)) {
-      throw new FileException("File '$source' could not be copied because it would overwrite itself.");
+      throw new \Drupal\Core\File\Exception\FileException("File '$source' could not be copied because it would overwrite itself.");
     }
   }
 
@@ -479,7 +479,7 @@ class FileSystem implements FileSystemInterface {
     // Write the data to a temporary file.
     $temp_name = $this->tempnam('temporary://', 'file');
     if (file_put_contents($temp_name, $data) === FALSE) {
-      throw new FileWriteException("Temporary file '$temp_name' could not be created.");
+      throw new \Drupal\Core\File\Exception\FileWriteException("Temporary file '$temp_name' could not be created.");
     }
 
     // Move the file to its final destination.
@@ -528,7 +528,7 @@ class FileSystem implements FileSystemInterface {
   public function getDestinationFilename($destination, FileExists $fileExists) {
     $basename = basename($destination);
     if (!Unicode::validateUtf8($basename)) {
-      throw new FileException(sprintf("Invalid filename '%s'", $basename));
+      throw new \Drupal\Core\File\Exception\FileException(sprintf("Invalid filename '%s'", $basename));
     }
     if (file_exists($destination)) {
       switch ($fileExists) {
@@ -558,7 +558,7 @@ class FileSystem implements FileSystemInterface {
     // some filesystems, not many applications handle them well.
     $basename = preg_replace('/[\x00-\x1F]/u', '_', $basename);
     if (preg_last_error() !== PREG_NO_ERROR) {
-      throw new FileException(sprintf("Invalid filename '%s'", $original));
+      throw new \Drupal\Core\File\Exception\FileException(sprintf("Invalid filename '%s'", $original));
     }
     if (str_starts_with(PHP_OS, 'WIN')) {
       // These characters are not allowed in Windows filenames.
@@ -635,7 +635,7 @@ class FileSystem implements FileSystemInterface {
     ];
     $dir = $this->streamWrapperManager->normalizeUri($dir);
     if (!is_dir($dir)) {
-      throw new NotRegularDirectoryException("$dir is not a directory.");
+      throw new \Drupal\Core\File\Exception\NotRegularDirectoryException("$dir is not a directory.");
     }
     // Allow directories specified in settings.php to be ignored. You can use
     // this to not check for files in common special-purpose directories. For

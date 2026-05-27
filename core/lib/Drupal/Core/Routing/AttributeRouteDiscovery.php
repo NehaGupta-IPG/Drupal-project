@@ -86,7 +86,7 @@ class AttributeRouteDiscovery extends StaticRouteDiscoveryBase {
     if (!$class->hasMethod('__invoke')) {
       foreach ($this->getAttributes($class) as $attribute) {
         if ($attribute->aliases) {
-          throw new InvalidArgumentException(\sprintf('Route aliases cannot be used on non-invokable class "%s".', $class->getName()));
+          throw new \Symfony\Component\Routing\Exception\InvalidArgumentException(\sprintf('Route aliases cannot be used on non-invokable class "%s".', $class->getName()));
         }
       }
     }
@@ -156,7 +156,7 @@ class AttributeRouteDiscovery extends StaticRouteDiscoveryBase {
       if ($attribute->path !== NULL) {
         $globals['path'] = $attribute->path;
         if (is_array($attribute->path)) {
-          throw new UnsupportedRouteAttributePropertyException(sprintf('The "%s" route attribute does not support arrays in class "%s"', "path", $class->getName()));
+          throw new \Drupal\Core\Routing\UnsupportedRouteAttributePropertyException(sprintf('The "%s" route attribute does not support arrays in class "%s"', "path", $class->getName()));
         }
       }
 
@@ -171,7 +171,7 @@ class AttributeRouteDiscovery extends StaticRouteDiscoveryBase {
       if ($attribute->defaults !== NULL) {
         $globals['defaults'] = $attribute->defaults;
         if (!empty($attribute->defaults['_locale'])) {
-          throw new UnsupportedRouteAttributePropertyException(sprintf('The "%s" route attribute is not supported in class "%s""', "locale", $class->getName()));
+          throw new \Drupal\Core\Routing\UnsupportedRouteAttributePropertyException(sprintf('The "%s" route attribute is not supported in class "%s""', "locale", $class->getName()));
         }
       }
 
@@ -188,7 +188,7 @@ class AttributeRouteDiscovery extends StaticRouteDiscoveryBase {
       }
 
       if ($attribute->condition !== NULL) {
-        throw new UnsupportedRouteAttributePropertyException(sprintf('The "%s" route attribute is not supported in class "%s"', "condition", $class->getName()));
+        throw new \Drupal\Core\Routing\UnsupportedRouteAttributePropertyException(sprintf('The "%s" route attribute is not supported in class "%s"', "condition", $class->getName()));
       }
 
       $globals['priority'] = $attribute->priority ?? 0;
@@ -219,18 +219,18 @@ class AttributeRouteDiscovery extends StaticRouteDiscoveryBase {
    */
   private function addRoute(RouteCollection $collection, RouteAttribute $attribute, array $globals, \ReflectionClass $class, \ReflectionMethod $method): void {
     if ($attribute->name === NULL) {
-      throw new UnsupportedRouteAttributePropertyException(sprintf('The Route attribute on "%s::%s()" is missing a required "name" property.', $class->getName(), $method->getName()));
+      throw new \Drupal\Core\Routing\UnsupportedRouteAttributePropertyException(sprintf('The Route attribute on "%s::%s()" is missing a required "name" property.', $class->getName(), $method->getName()));
     }
     $name = $globals['name'] . $attribute->name;
 
     if (is_array($attribute->path)) {
-      throw new UnsupportedRouteAttributePropertyException(sprintf('The "%s" route attribute does not support arrays on route "%s" in "%s::%s()"', "path", $name, $class->getName(), $method->getName()));
+      throw new \Drupal\Core\Routing\UnsupportedRouteAttributePropertyException(sprintf('The "%s" route attribute does not support arrays on route "%s" in "%s::%s()"', "path", $name, $class->getName(), $method->getName()));
     }
     if (!empty($attribute->defaults['_locale'])) {
-      throw new UnsupportedRouteAttributePropertyException(sprintf('The "%s" route attribute is not supported on route "%s" in "%s::%s()"', "locale", $name, $class->getName(), $method->getName()));
+      throw new \Drupal\Core\Routing\UnsupportedRouteAttributePropertyException(sprintf('The "%s" route attribute is not supported on route "%s" in "%s::%s()"', "locale", $name, $class->getName(), $method->getName()));
     }
     if ($attribute->condition !== NULL) {
-      throw new UnsupportedRouteAttributePropertyException(sprintf('The "%s" route attribute is not supported on route "%s" in "%s::%s()"', "condition", $name, $class->getName(), $method->getName()));
+      throw new \Drupal\Core\Routing\UnsupportedRouteAttributePropertyException(sprintf('The "%s" route attribute is not supported on route "%s" in "%s::%s()"', "condition", $name, $class->getName(), $method->getName()));
     }
 
     $requirements = $attribute->requirements;

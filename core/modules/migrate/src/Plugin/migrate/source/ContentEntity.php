@@ -101,11 +101,11 @@ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginIn
     protected EntityTypeBundleInfoInterface $entityTypeBundleInfo,
   ) {
     if (empty($plugin_definition['entity_type'])) {
-      throw new InvalidPluginDefinitionException($plugin_id, 'Missing required "entity_type" definition.');
+      throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($plugin_id, 'Missing required "entity_type" definition.');
     }
     $this->entityType = $this->entityTypeManager->getDefinition($plugin_definition['entity_type']);
     if (!$this->entityType instanceof ContentEntityTypeInterface) {
-      throw new InvalidPluginDefinitionException($plugin_id, sprintf('The entity type (%s) is not supported. The "content_entity" source plugin only supports content entities.', $plugin_definition['entity_type']));
+      throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($plugin_id, sprintf('The entity type (%s) is not supported. The "content_entity" source plugin only supports content entities.', $plugin_definition['entity_type']));
     }
     if (!empty($configuration['bundle'])) {
       if (!$this->entityType->hasKey('bundle')) {

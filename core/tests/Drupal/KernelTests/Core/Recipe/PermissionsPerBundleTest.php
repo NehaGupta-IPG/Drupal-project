@@ -134,7 +134,7 @@ config:
         - edit own %bundle content
 YAML;
 
-    $this->expectException(PluginNotFoundException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\PluginNotFoundException::class);
     $this->expectExceptionMessage('The "field_storage_config" entity does not support the "grantPermissionsForEachNodeType" config action.');
     $this->applyRecipeFromString($recipe_data);
   }
@@ -222,7 +222,7 @@ config:
     user.role.super_editor:
       grantPermissionsForEachMediaType: $value
 YAML;
-    $this->expectException(ConfigActionException::class);
+    $this->expectException(\Drupal\Core\Config\Action\ConfigActionException::class);
     $this->expectExceptionMessage(" must be an array of strings that contain '%bundle'.");
     $this->applyRecipeFromString($recipe_data);
   }

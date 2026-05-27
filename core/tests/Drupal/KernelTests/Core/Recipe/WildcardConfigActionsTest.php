@@ -144,7 +144,7 @@ config:
 YAML;
     $recipe = $this->createRecipe($contents);
 
-    $this->expectException(ConfigActionException::class);
+    $this->expectException(\Drupal\Core\Config\Action\ConfigActionException::class);
     $this->expectExceptionMessage($expected_exception_message);
     RecipeRunner::processRecipe($recipe);
   }
@@ -188,7 +188,7 @@ YAML;
         ]);
       $this->fail('Expected an exception to be thrown but it was not.');
     }
-    catch (InvalidConfigException $e) {
+    catch (\Drupal\Core\Recipe\InvalidConfigException $e) {
       $this->assertSame('image.style.node__one', $e->data->getName());
       $this->assertCount(1, $e->violations);
       $this->assertSame('label', $e->violations[0]->getPropertyPath());
@@ -252,7 +252,7 @@ YAML;
       'target_bundle' => 'one',
     ])->save();
 
-    $this->expectExceptionMessage(ConfigActionException::class);
+    $this->expectExceptionMessage(\Drupal\Core\Config\Action\ConfigActionException::class);
     $this->expectExceptionMessage('Entity language.content_settings.node.one exists');
     $this->container->get('plugin.manager.config_action')
       ->applyAction('createForEach', 'node.type.*', [
@@ -271,7 +271,7 @@ YAML;
 
     // We should not be able to use this action on entities that aren't
     // themselves bundles of another entity type.
-    $this->expectException(PluginNotFoundException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\PluginNotFoundException::class);
     $this->expectExceptionMessage('The "language_content_settings" entity does not support the "createForEach" config action.');
     $this->container->get('plugin.manager.config_action')
       ->applyAction('createForEach', 'language.content_settings.node.*', []);
@@ -285,7 +285,7 @@ YAML;
 
     $manager = $this->container->get('plugin.manager.config_action');
     $manager->clearCachedDefinitions();
-    $this->expectException(InvalidPluginDefinitionException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class);
     $this->expectExceptionMessage('The create_for_each_bundle:createForEach config action must be restricted to entity types that are bundles of another entity type.');
     $manager->applyAction('create_for_each_bundle:createForEach', 'node.type.*', []);
   }

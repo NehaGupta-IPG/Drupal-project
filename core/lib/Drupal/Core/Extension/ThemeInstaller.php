@@ -59,7 +59,7 @@ class ThemeInstaller implements ThemeInstallerInterface {
 
       if ($missing = array_diff_key($theme_list, $theme_data)) {
         // One or more of the given themes doesn't exist.
-        throw new UnknownExtensionException('Unknown themes: ' . implode(', ', $missing) . '.');
+        throw new \Drupal\Core\Extension\Exception\UnknownExtensionException('Unknown themes: ' . implode(', ', $missing) . '.');
       }
 
       // Only process themes that are not installed currently.
@@ -90,13 +90,13 @@ class ThemeInstaller implements ThemeInstallerInterface {
         // Prevent themes with unmet module dependencies from being installed.
         if (!empty($unmet_module_dependencies)) {
           $unmet_module_dependencies_list = implode(', ', array_keys($unmet_module_dependencies));
-          throw new MissingDependencyException("Unable to install theme: '$theme' due to unmet module dependencies: '$unmet_module_dependencies_list'.");
+          throw new \Drupal\Core\Extension\MissingDependencyException("Unable to install theme: '$theme' due to unmet module dependencies: '$unmet_module_dependencies_list'.");
         }
 
         foreach ($module_dependencies as $dependency => $dependency_object) {
           if ($incompatible = $this->checkDependencyMessage($module_list, $dependency, $dependency_object)) {
             $sanitized_message = Html::decodeEntities(strip_tags($incompatible));
-            throw new MissingDependencyException("Unable to install theme: $sanitized_message");
+            throw new \Drupal\Core\Extension\MissingDependencyException("Unable to install theme: $sanitized_message");
           }
         }
 
@@ -135,13 +135,13 @@ class ThemeInstaller implements ThemeInstallerInterface {
 
       // Throw an exception if the theme name is too long.
       if (strlen($key) > DRUPAL_EXTENSION_NAME_MAX_LENGTH) {
-        throw new ExtensionNameLengthException("Theme name $key is over the maximum allowed length of " . DRUPAL_EXTENSION_NAME_MAX_LENGTH . ' characters.');
+        throw new \Drupal\Core\Extension\ExtensionNameLengthException("Theme name $key is over the maximum allowed length of " . DRUPAL_EXTENSION_NAME_MAX_LENGTH . ' characters.');
       }
 
       // Throw an exception if a module with the same name is enabled.
       $installed_modules = $extension_config->get('module') ?: [];
       if (isset($installed_modules[$key])) {
-        throw new ExtensionNameReservedException("Theme name $key is already in use by an installed module.");
+        throw new \Drupal\Core\Extension\ExtensionNameReservedException("Theme name $key is already in use by an installed module.");
       }
 
       // Validate default configuration of the theme. If there is existing
@@ -191,7 +191,7 @@ class ThemeInstaller implements ThemeInstallerInterface {
     $theme_data = $this->themeExtensionList->reset()->getList();
     foreach ($theme_list as $key) {
       if ($extension_config->get("theme.$key") === NULL) {
-        throw new UnknownExtensionException("Unknown theme: $key.");
+        throw new \Drupal\Core\Extension\Exception\UnknownExtensionException("Unknown theme: $key.");
       }
       if ($key === $theme_config->get('default')) {
         throw new \InvalidArgumentException("The current default theme $key cannot be uninstalled.");

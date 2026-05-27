@@ -140,7 +140,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
     try {
       $this->migration->checkRequirements();
     }
-    catch (RequirementsException $e) {
+    catch (\Drupal\migrate\Exception\RequirementsException $e) {
       $this->message->display(
         $this->t(
           'Migration @id did not meet the requirements. @message',
@@ -178,7 +178,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
       try {
         $pipeline = $this->migration->getProcessPlugins();
       }
-      catch (MigrateException $e) {
+      catch (\Drupal\migrate\MigrateException $e) {
         $row = $source->current();
         $this->sourceIdValues = $row->getSourceIdValues();
         $this->getIdMap()->saveIdMapping($row, [], $e->getStatus());
@@ -200,13 +200,13 @@ class MigrateExecutable implements MigrateExecutableInterface {
           }
           $save = TRUE;
         }
-        catch (MigrateException $e) {
+        catch (\Drupal\migrate\MigrateException $e) {
           $this->getIdMap()->saveIdMapping($row, [], $e->getStatus());
           $msg = sprintf("%s:%s:%s", $this->migration->getPluginId(), $destination_property_name, $e->getMessage());
           $this->saveMessage($msg, $e->getLevel());
           $save = FALSE;
         }
-        catch (MigrateSkipRowException $e) {
+        catch (\Drupal\migrate\MigrateSkipRowException $e) {
           if ($e->getSaveToMap()) {
             $id_map->saveIdMapping($row, [], MigrateIdMapInterface::STATUS_IGNORED);
           }
@@ -241,7 +241,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
               }
             }
           }
-          catch (MigrateException $e) {
+          catch (\Drupal\migrate\MigrateException $e) {
             $this->getIdMap()->saveIdMapping($row, [], $e->getStatus());
             $this->saveMessage($e->getMessage(), $e->getLevel());
           }
@@ -393,7 +393,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
       if ($multiple && !$definition['handle_multiples']) {
         $new_value = [];
         if (!is_array($value)) {
-          throw new MigrateException(sprintf('Pipeline failed at %s plugin for destination %s: %s received instead of an array,', $plugin->getPluginId(), $destination, $value));
+          throw new \Drupal\migrate\MigrateException(sprintf('Pipeline failed at %s plugin for destination %s: %s received instead of an array,', $plugin->getPluginId(), $destination, $value));
         }
         $break = FALSE;
         foreach ($value as $scalar_value) {
@@ -401,10 +401,10 @@ class MigrateExecutable implements MigrateExecutableInterface {
           try {
             $new_value[] = $plugin->transform($scalar_value, $this, $row, $destination);
           }
-          catch (MigrateException $e) {
+          catch (\Drupal\migrate\MigrateException $e) {
             // Prepend the process plugin id to the message.
             $message = sprintf("%s: %s", $plugin->getPluginId(), $e->getMessage());
-            throw new MigrateException($message);
+            throw new \Drupal\migrate\MigrateException($message);
           }
           if ($plugin->isPipelineStopped()) {
             $break = TRUE;
@@ -420,10 +420,10 @@ class MigrateExecutable implements MigrateExecutableInterface {
         try {
           $value = $plugin->transform($value, $this, $row, $destination);
         }
-        catch (MigrateException $e) {
+        catch (\Drupal\migrate\MigrateException $e) {
           // Prepend the process plugin id to the message.
           $message = sprintf("%s: %s", $plugin->getPluginId(), $e->getMessage());
-          throw new MigrateException($message);
+          throw new \Drupal\migrate\MigrateException($message);
         }
         if ($plugin->isPipelineStopped()) {
           break;

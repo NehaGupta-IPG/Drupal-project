@@ -289,7 +289,7 @@ class WorkspaceCRUDTest extends KernelTestBase {
       $stage->delete();
       $this->fail('The Stage workspace has children and should not be deletable.');
     }
-    catch (EntityStorageException $e) {
+    catch (\Drupal\Core\Entity\EntityStorageException $e) {
       $this->assertEquals('The Stage workspace can not be deleted because it has child workspaces.', $e->getMessage());
       $this->assertNotNull(Workspace::load('stage'));
     }

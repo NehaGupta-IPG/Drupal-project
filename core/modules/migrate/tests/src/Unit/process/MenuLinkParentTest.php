@@ -143,7 +143,7 @@ class MenuLinkParentTest extends MigrateProcessTestCase {
     [$parent_id, $menu_name] = $source_value;
     $this->migrateLookup->lookup(NULL, [1])->willReturn([]);
     $plugin = new MenuLinkParent([], 'map', [], $this->migrateLookup->reveal(), $this->menuLinkManager->reveal(), $this->menuLinkStorage->reveal(), $this->migration->reveal());
-    $this->expectException(MigrateSkipRowException::class);
+    $this->expectException(\Drupal\migrate\MigrateSkipRowException::class);
     $this->expectExceptionMessage("No parent link found for plid '$parent_id' in menu '$menu_name'.");
     $plugin->transform($source_value, $this->migrateExecutable, $this->row, 'destination');
   }

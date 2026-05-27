@@ -347,7 +347,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // protection against that and at the same time have a nice error message.
     $request_form_id = $request->query->get('form_id', $request->request->get('form_id'));
     if ($ajax_form_request && !$request_form_id) {
-      throw new BrokenPostRequestException($this->getFileUploadMaxSize());
+      throw new \Drupal\Core\Form\Exception\BrokenPostRequestException($this->getFileUploadMaxSize());
     }
 
     // After processing the form, if this is an AJAX form request, interrupt
@@ -360,7 +360,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // Only do this when the form ID matches, since there is no guarantee from
     // $ajax_form_request that it's an AJAX request for this particular form.
     if ($ajax_form_request && $form_state->isProcessingInput() && $request_form_id == $form_id) {
-      throw new FormAjaxException($form, $form_state);
+      throw new \Drupal\Core\Form\FormAjaxException($form, $form_state);
     }
 
     // If the form returns a response, skip subsequent page construction by
@@ -372,7 +372,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     //   submission from rendering.
     //   @see https://www.drupal.org/node/2367555
     if ($response instanceof Response) {
-      throw new EnforcedResponseException($response);
+      throw new \Drupal\Core\Form\EnforcedResponseException($response);
     }
 
     // If this was a successful submission of a single-step form or the last
@@ -566,7 +566,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     //   response.
     //   @see https://www.drupal.org/node/2363189
     if ($form instanceof Response) {
-      throw new EnforcedResponseException($form);
+      throw new \Drupal\Core\Form\EnforcedResponseException($form);
     }
     $form['#form_id'] = $form_id;
 

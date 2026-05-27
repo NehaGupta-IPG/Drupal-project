@@ -578,7 +578,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
         $missing_dependencies,
       ] = $this->findDefaultConfigWithUnmetDependencies($storage, $enabled_extensions, $profile_storages, $previous_config_names);
       if (!empty($invalid_default_config)) {
-        throw UnmetDependenciesException::create($name, array_unique($missing_dependencies, SORT_REGULAR));
+        throw \Drupal\Core\Config\UnmetDependenciesException::create($name, array_unique($missing_dependencies, SORT_REGULAR));
       }
 
       // Install profiles can not have config clashes. Configuration that
@@ -590,7 +590,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
         // module being installed.
         $existing_configuration = $this->findPreExistingConfiguration($storage, $previous_config_names);
         if (!empty($existing_configuration)) {
-          throw PreExistingConfigException::create($name, $existing_configuration);
+          throw \Drupal\Core\Config\PreExistingConfigException::create($name, $existing_configuration);
         }
       }
 

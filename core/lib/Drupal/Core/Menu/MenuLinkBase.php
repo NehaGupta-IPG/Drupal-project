@@ -206,7 +206,7 @@ abstract class MenuLinkBase extends PluginBase implements MenuLinkInterface {
    * {@inheritdoc}
    */
   public function deleteLink() {
-    throw new PluginException("Menu link plugin with ID '{$this->getPluginId()}' does not support deletion");
+    throw new \Drupal\Component\Plugin\Exception\PluginException("Menu link plugin with ID '{$this->getPluginId()}' does not support deletion");
   }
 
   /**

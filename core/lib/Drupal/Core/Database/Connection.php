@@ -756,7 +756,7 @@ abstract class Connection {
       'Truncate',
       'Schema',
       'Condition',
-      'Transaction' => throw new InvalidQueryException('Calling ' . __METHOD__ . '() for \'' . $class . '\' is not supported. Use standard autoloading in the methods that return database operations. See https://www.drupal.org/node/3217534'),
+      'Transaction' => throw new \Drupal\Core\Database\InvalidQueryException('Calling ' . __METHOD__ . '() for \'' . $class . '\' is not supported. Use standard autoloading in the methods that return database operations. See https://www.drupal.org/node/3217534'),
       default => NULL,
     };
     if (empty($this->driverClasses[$class])) {
@@ -1531,7 +1531,7 @@ abstract class Connection {
     if (\Drupal::hasService('event_dispatcher')) {
       return \Drupal::service('event_dispatcher')->dispatch($event, $eventName);
     }
-    throw new EventException('The event dispatcher service is not available. Database API events can only be fired if the container is initialized');
+    throw new \Drupal\Core\Database\Exception\EventException('The event dispatcher service is not available. Database API events can only be fired if the container is initialized');
   }
 
   /**

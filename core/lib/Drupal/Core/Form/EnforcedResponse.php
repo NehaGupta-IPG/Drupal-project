@@ -43,7 +43,7 @@ class EnforcedResponse extends Response {
    */
   public static function createFromException(\Throwable $e) {
     while ($e) {
-      if ($e instanceof EnforcedResponseException) {
+      if ($e instanceof \Drupal\Core\Form\EnforcedResponseException) {
         return new static($e->getResponse());
       }
 

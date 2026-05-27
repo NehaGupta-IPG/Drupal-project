@@ -86,7 +86,7 @@ class FormAjaxSubscriber implements EventSubscriberInterface {
 
     // Render a nice error message in case we have a file upload which exceeds
     // the configured upload limit.
-    if ($exception instanceof BrokenPostRequestException && $request->query->has(FormBuilderInterface::AJAX_FORM_REQUEST)) {
+    if ($exception instanceof \Drupal\Core\Form\Exception\BrokenPostRequestException && $request->query->has(FormBuilderInterface::AJAX_FORM_REQUEST)) {
       $this->messenger->addError($this->t('An unrecoverable error occurred. The uploaded file likely exceeded the maximum file size (@size) that this server supports.', [
         '@size' => ByteSizeMarkup::create((int) $exception->getSize()),
       ]));
@@ -136,7 +136,7 @@ class FormAjaxSubscriber implements EventSubscriberInterface {
   protected function getFormAjaxException(\Throwable $e) {
     $exception = NULL;
     while ($e) {
-      if ($e instanceof FormAjaxException) {
+      if ($e instanceof \Drupal\Core\Form\FormAjaxException) {
         $exception = $e;
         break;
       }

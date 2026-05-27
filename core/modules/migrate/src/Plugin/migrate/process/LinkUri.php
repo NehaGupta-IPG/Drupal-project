@@ -90,7 +90,7 @@ class LinkUri extends ProcessPluginBase implements ContainerFactoryPluginInterfa
         // other processing. If this is the case, the "validate_route"
         // configuration option can be set to FALSE to return the URI.
         if ($this->configuration['validate_route']) {
-          throw new MigrateException(sprintf('The path "%s" failed validation.', $path));
+          throw new \Drupal\migrate\MigrateException(sprintf('The path "%s" failed validation.', $path));
         }
         return $url->getUri();
       }

@@ -20,7 +20,7 @@ class InvalidDataTest extends DatabaseTestBase {
    */
   public function testInsertDuplicateData(): void {
     // Try to insert multiple records where at least one has bad data.
-    $this->expectException(IntegrityConstraintViolationException::class);
+    $this->expectException(\Drupal\Core\Database\IntegrityConstraintViolationException::class);
     try {
       $this->connection->insert('test')
         ->fields(['name', 'age', 'job'])
@@ -43,7 +43,7 @@ class InvalidDataTest extends DatabaseTestBase {
         ->execute();
       $this->fail('Insert succeeded when it should not have.');
     }
-    catch (IntegrityConstraintViolationException $e) {
+    catch (\Drupal\Core\Database\IntegrityConstraintViolationException $e) {
       // Ensure the whole transaction is rolled back when a duplicate key
       // insert occurs.
       $this->assertFalse($this->connection->select('test')
@@ -95,14 +95,14 @@ class InvalidDataTest extends DatabaseTestBase {
       ->orderBy('name');
 
     // Try inserting from the subselect.
-    $this->expectException(IntegrityConstraintViolationException::class);
+    $this->expectException(\Drupal\Core\Database\IntegrityConstraintViolationException::class);
     try {
       $this->connection->insert('test')
         ->from($query)
         ->execute();
       $this->fail('Insert succeeded when it should not have.');
     }
-    catch (IntegrityConstraintViolationException $e) {
+    catch (\Drupal\Core\Database\IntegrityConstraintViolationException $e) {
       // Ensure the whole transaction is rolled back when a duplicate key
       // insert occurs.
       $this->assertFalse($this->connection->select('test')

@@ -244,7 +244,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
         return $query->execute();
       }
       // Some other failure that we can not recover from.
-      throw new PluginException($e->getMessage(), 0, $e);
+      throw new \Drupal\Component\Plugin\Exception\PluginException($e->getMessage(), 0, $e);
     }
   }
 
@@ -511,7 +511,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
         $limit = $this->maxDepth() - 1;
       }
       if ($parent['depth'] > $limit) {
-        throw new PluginException("The link with ID {$fields['id']} or its children exceeded the maximum depth of {$this->maxDepth()}");
+        throw new \Drupal\Component\Plugin\Exception\PluginException("The link with ID {$fields['id']} or its children exceeded the maximum depth of {$this->maxDepth()}");
       }
       $fields['depth'] = $parent['depth'] + 1;
       $i = 1;
@@ -1193,7 +1193,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
     try {
       $this->connection->schema()->createTable($this->table, static::schemaDefinition());
     }
-    catch (DatabaseException) {
+    catch (\Drupal\Core\Database\DatabaseException) {
       // If another process has already created the config table, attempting to
       // recreate it will throw an exception. In this case just catch the
       // exception and do nothing.

@@ -30,7 +30,7 @@ class ValidSequenceKeysConstraintValidator extends ConstraintValidator implement
     assert($constraint instanceof ValidSequenceKeysConstraint);
 
     if (!is_array($value)) {
-      throw new UnexpectedTypeException($value, 'array');
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($value, 'array');
     }
 
     if (empty($value)) {

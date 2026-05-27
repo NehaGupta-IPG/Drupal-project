@@ -129,7 +129,7 @@ class PrepareModulesEntityUninstallForm extends ConfirmFormBase {
   public function buildForm(array $form, FormStateInterface $form_state, $entity_type_id = NULL) {
     $this->entityTypeId = $entity_type_id;
     if (!$this->entityTypeManager->hasDefinition($this->entityTypeId)) {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
     $form = parent::buildForm($form, $form_state);
 

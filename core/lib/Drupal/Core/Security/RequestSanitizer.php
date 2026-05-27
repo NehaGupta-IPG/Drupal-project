@@ -42,7 +42,7 @@ class RequestSanitizer {
    */
   public static function sanitize(Request $request, array $safe_keys, $log_sanitized_keys = FALSE) {
     if ($request->getMethod() !== $request->getRealMethod() && $request->isMethodSafe()) {
-      throw new BadRequestHttpException("Changing a request's method to a safe method is not supported.");
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException("Changing a request's method to a safe method is not supported.");
     }
     if (!$request->attributes->get(self::SANITIZED, FALSE)) {
       $update_globals = FALSE;

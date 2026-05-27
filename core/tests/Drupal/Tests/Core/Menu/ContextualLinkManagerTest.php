@@ -198,7 +198,7 @@ class ContextualLinkManagerTest extends UnitTestCase {
       'group' => 'example',
       'id' => 'test_plugin',
     ];
-    $this->expectException(PluginException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\PluginException::class);
     $this->contextualLinkManager->processDefinition($definition, 'test_plugin');
   }
 
@@ -213,7 +213,7 @@ class ContextualLinkManagerTest extends UnitTestCase {
       'route_name' => 'example',
       'id' => 'test_plugin',
     ];
-    $this->expectException(PluginException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\PluginException::class);
     $this->contextualLinkManager->processDefinition($definition, 'test_plugin');
   }
 

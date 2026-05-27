@@ -147,7 +147,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
     $processor = $this->setUpAccessPolicyProcessor();
     $processor->addAccessPolicy(new AlwaysAddsAccessPolicy());
 
-    $this->expectException(AccessPolicyScopeException::class);
+    $this->expectException(\Drupal\Core\Session\AccessPolicyScopeException::class);
     $this->expectExceptionMessage(sprintf('The access policy "%s" returned permissions for scopes other than "%s".', AlwaysAddsAccessPolicy::class, 'bar'));
     $processor->processAccessPolicies($this->prophesize(AccountInterface::class)->reveal(), 'bar');
   }
@@ -160,7 +160,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
     $processor->addAccessPolicy(new FooAccessPolicy());
     $processor->addAccessPolicy(new AlwaysAddsAccessPolicy());
 
-    $this->expectException(AccessPolicyScopeException::class);
+    $this->expectException(\Drupal\Core\Session\AccessPolicyScopeException::class);
     $this->expectExceptionMessage(sprintf('The access policy "%s" returned permissions for scopes other than "%s".', AlwaysAddsAccessPolicy::class, 'foo'));
     $processor->processAccessPolicies($this->prophesize(AccountInterface::class)->reveal(), 'foo');
   }
@@ -173,7 +173,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
     $processor->addAccessPolicy(new FooAccessPolicy());
     $processor->addAccessPolicy(new AlwaysAltersAccessPolicy());
 
-    $this->expectException(AccessPolicyScopeException::class);
+    $this->expectException(\Drupal\Core\Session\AccessPolicyScopeException::class);
     $this->expectExceptionMessage(sprintf('The access policy "%s" altered permissions in a scope other than "%s".', AlwaysAltersAccessPolicy::class, 'foo'));
     $processor->processAccessPolicies($this->prophesize(AccountInterface::class)->reveal(), 'foo');
   }

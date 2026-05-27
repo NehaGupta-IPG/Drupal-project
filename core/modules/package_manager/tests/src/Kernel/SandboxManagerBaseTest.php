@@ -197,7 +197,7 @@ class SandboxManagerBaseTest extends PackageManagerKernelTestBase {
       $stage->apply();
       $this->fail('Expected an exception.');
     }
-    catch (ApplyFailedException $e) {
+    catch (\Drupal\package_manager\Exception\ApplyFailedException $e) {
       $this->assertStringContainsString($thrown_message, $e->getMessage());
       $this->assertFalse($stage->isApplying());
     }
@@ -210,7 +210,7 @@ class SandboxManagerBaseTest extends PackageManagerKernelTestBase {
       $stage->create();
       $this->fail('Expected an exception.');
     }
-    catch (FailureMarkerExistsException $e) {
+    catch (\Drupal\package_manager\Exception\FailureMarkerExistsException $e) {
       $this->assertMatchesRegularExpression('/^Staged changes failed to apply, and the site is in an indeterminate state. It is strongly recommended to restore the code and database from a backup. Caused by Exception, with this message: ' . $thrown_message . "\nBacktrace:\n#0 .*/", $e->getMessage());
       $this->assertFalse($stage->isApplying());
     }
@@ -313,7 +313,7 @@ class SandboxManagerBaseTest extends PackageManagerKernelTestBase {
 
     // Claiming the first stage always fails in this test because it was
     // destroyed, but the exception message depends on why it was destroyed.
-    $this->expectException(SandboxException::class);
+    $this->expectException(\Drupal\package_manager\Exception\SandboxException::class);
     $this->expectExceptionMessage($expected_exception_message);
     $stage->claim($stage_id);
   }
@@ -335,7 +335,7 @@ class SandboxManagerBaseTest extends PackageManagerKernelTestBase {
     // Claiming the stage will fail, but we won't get the message we set in
     // \Drupal\package_manager\Stage::storeDestroyInfo() as we are deleting it
     // above.
-    $this->expectException(SandboxException::class);
+    $this->expectException(\Drupal\package_manager\Exception\SandboxException::class);
     $this->expectExceptionMessage('Cannot claim the stage because no stage has been created.');
     $stage->claim($stage_id);
   }
@@ -382,7 +382,7 @@ class SandboxManagerBaseTest extends PackageManagerKernelTestBase {
       $stage->apply();
       $this->fail('Expected an exception to be thrown, but it was not.');
     }
-    catch (SandboxException $e) {
+    catch (\Drupal\package_manager\Exception\SandboxException $e) {
       $this->assertMatchesRegularExpression($expected_message, $e->getMessage());
       $this->assertSame(1024, $e->getCode());
       $this->assertInstanceOf(\Exception::class, $e->getPrevious());
@@ -435,7 +435,7 @@ class SandboxManagerBaseTest extends PackageManagerKernelTestBase {
   public function testFailureCollectPathsToExclude(): void {
     $project_root = $this->container->get(PathLocator::class)->getProjectRoot();
     unlink($project_root . '/composer.json');
-    $this->expectException(SandboxException::class);
+    $this->expectException(\Drupal\package_manager\Exception\SandboxException::class);
     $this->expectExceptionMessage("composer.json not found.");
     $this->createStage()->create();
   }
@@ -447,7 +447,7 @@ class SandboxManagerBaseTest extends PackageManagerKernelTestBase {
     $stage = $this->createStage();
     $stage->create();
     $stage->require(['drupal/random']);
-    $this->expectException(SandboxException::class);
+    $this->expectException(\Drupal\package_manager\Exception\SandboxException::class);
     $this->expectExceptionMessage("composer.json not found.");
     unlink($stage->getSandboxDirectory() . '/composer.json');
     $stage->apply();

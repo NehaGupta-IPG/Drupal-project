@@ -129,10 +129,10 @@ class ModuleInstaller implements ModuleInstallerInterface {
     $module_data = \Drupal::service('extension.list.module')->reset()->getList();
     foreach ($module_list as $module) {
       if (!empty($module_data[$module]->info['core_incompatible'])) {
-        throw new MissingDependencyException("Unable to install modules: module '$module' is incompatible with this version of Drupal core.");
+        throw new \Drupal\Core\Extension\MissingDependencyException("Unable to install modules: module '$module' is incompatible with this version of Drupal core.");
       }
       if ($module_data[$module]->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::OBSOLETE) {
-        throw new ObsoleteExtensionException("Unable to install modules: module '$module' is obsolete.");
+        throw new \Drupal\Core\Extension\Exception\ObsoleteExtensionException("Unable to install modules: module '$module' is obsolete.");
       }
       if ($module_data[$module]->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED) {
         // phpcs:ignore Drupal.Semantics.FunctionTriggerError
@@ -143,7 +143,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       $module_list = array_combine($module_list, $module_list);
       if ($missing_modules = array_diff_key($module_list, $module_data)) {
         // One or more of the given modules doesn't exist.
-        throw new MissingDependencyException(sprintf('Unable to install modules %s due to missing modules %s.', implode(', ', $module_list), implode(', ', $missing_modules)));
+        throw new \Drupal\Core\Extension\MissingDependencyException(sprintf('Unable to install modules %s due to missing modules %s.', implode(', ', $module_list), implode(', ', $missing_modules)));
       }
 
       // Add dependencies to the list. The new modules will be processed as
@@ -152,13 +152,13 @@ class ModuleInstaller implements ModuleInstallerInterface {
         foreach (array_keys($module_data[$module]->requires) as $dependency) {
           if (!isset($module_data[$dependency])) {
             // The dependency does not exist.
-            throw new MissingDependencyException("Unable to install modules: module '$module' is missing its dependency module $dependency.");
+            throw new \Drupal\Core\Extension\MissingDependencyException("Unable to install modules: module '$module' is missing its dependency module $dependency.");
           }
 
           // Skip already installed modules.
           if (!isset($module_list[$dependency]) && !isset($installed_modules[$dependency])) {
             if ($module_data[$dependency]->info['core_incompatible']) {
-              throw new MissingDependencyException("Unable to install modules: module '$module'. Its dependency module '$dependency' is incompatible with this version of Drupal core.");
+              throw new \Drupal\Core\Extension\MissingDependencyException("Unable to install modules: module '$module'. Its dependency module '$dependency' is incompatible with this version of Drupal core.");
             }
             $module_list[$dependency] = $dependency;
           }
@@ -184,13 +184,13 @@ class ModuleInstaller implements ModuleInstallerInterface {
     foreach ($module_list as $module) {
       // Throw an exception if the module name is too long.
       if (strlen($module) > DRUPAL_EXTENSION_NAME_MAX_LENGTH) {
-        throw new ExtensionNameLengthException("Module name '$module' is over the maximum allowed length of " . DRUPAL_EXTENSION_NAME_MAX_LENGTH . ' characters');
+        throw new \Drupal\Core\Extension\ExtensionNameLengthException("Module name '$module' is over the maximum allowed length of " . DRUPAL_EXTENSION_NAME_MAX_LENGTH . ' characters');
       }
 
       // Throw an exception if a theme with the same name is enabled.
       $installed_themes = $extension_config->get('theme') ?: [];
       if (isset($installed_themes[$module])) {
-        throw new ExtensionNameReservedException("Module name $module is already in use by an installed theme.");
+        throw new \Drupal\Core\Extension\ExtensionNameReservedException("Module name $module is already in use by an installed theme.");
       }
     }
 
@@ -380,7 +380,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
               try {
                 $update_manager->installFieldStorageDefinition($storage_definition->getName(), $entity_type->id(), $module, $storage_definition);
               }
-              catch (EntityStorageException $e) {
+              catch (\Drupal\Core\Entity\EntityStorageException $e) {
                 Error::logException($this->logger, $e, 'An error occurred while notifying the creation of the @name field storage definition: "@message" in %function (line %line of %file).', ['@name' => $storage_definition->getName()]);
               }
             }
@@ -524,7 +524,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       foreach ($reasons as $reason) {
         $reason_message[] = implode(', ', $reason);
       }
-      throw new ModuleUninstallValidatorException('The following reasons prevent the modules from being uninstalled: ' . implode('; ', $reason_message));
+      throw new \Drupal\Core\Extension\ModuleUninstallValidatorException('The following reasons prevent the modules from being uninstalled: ' . implode('; ', $reason_message));
     }
     // Set the actual module weights.
     $module_list = array_map(function ($module) use ($module_data) {

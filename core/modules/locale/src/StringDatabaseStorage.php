@@ -195,7 +195,7 @@ class StringDatabaseStorage implements StringStorageInterface {
       }
     }
     else {
-      throw new StringStorageException('The string cannot be deleted because it lacks some key fields: ' . $string->getString());
+      throw new \Drupal\locale\StringStorageException('The string cannot be deleted because it lacks some key fields: ' . $string->getString());
     }
     return $this;
   }
@@ -478,7 +478,7 @@ class StringDatabaseStorage implements StringStorageInterface {
         ->execute();
     }
     else {
-      throw new StringStorageException('The string cannot be saved: ' . $string->getString());
+      throw new \Drupal\locale\StringStorageException('The string cannot be saved: ' . $string->getString());
     }
   }
 
@@ -509,7 +509,7 @@ class StringDatabaseStorage implements StringStorageInterface {
         ->execute();
     }
     else {
-      throw new StringStorageException('The string cannot be updated: ' . $string->getString());
+      throw new \Drupal\locale\StringStorageException('The string cannot be updated: ' . $string->getString());
     }
   }
 

@@ -73,7 +73,7 @@ YAML;
     // If we create a config object which IS fully validatable, and has invalid
     // data, we should get a validation error.
     $recipe = $this->createRecipeWithInvalidDataInFile('config_test.types.fully_validatable.yml');
-    $this->expectException(InvalidConfigException::class);
+    $this->expectException(\Drupal\Core\Recipe\InvalidConfigException::class);
     $this->expectExceptionMessage('There were validation errors in config_test.types.fully_validatable');
     RecipeRunner::processRecipe($recipe);
   }

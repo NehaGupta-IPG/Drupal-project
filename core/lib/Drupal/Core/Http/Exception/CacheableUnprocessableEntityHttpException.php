@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 /**
  * A cacheable UnprocessableEntityHttpException.
  */
-class CacheableUnprocessableEntityHttpException extends UnprocessableEntityHttpException implements CacheableDependencyInterface {
+class CacheableUnprocessableEntityHttpException extends \Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException implements CacheableDependencyInterface {
 
   use CacheableDependencyTrait;
 

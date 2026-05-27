@@ -64,7 +64,7 @@ class ComponentValidatorTest extends UnitTestCase {
    */
   #[DataProvider('dataProviderValidateDefinitionInvalid')]
   public function testValidateDefinitionInvalid(array $definition): void {
-    $this->expectException(InvalidComponentException::class);
+    $this->expectException(\Drupal\Core\Render\Component\Exception\InvalidComponentException::class);
     $component_validator = new ComponentValidator();
     $component_validator->setValidator();
     $component_validator->validateDefinition($definition, TRUE);
@@ -286,7 +286,7 @@ class ComponentValidatorTest extends UnitTestCase {
       'sdc_test:' . $component_id,
       $definition
     );
-    $this->expectException(InvalidComponentException::class);
+    $this->expectException(\Drupal\Core\Render\Component\Exception\InvalidComponentException::class);
     $this->expectExceptionMessage($expected_exception_message);
     $component_validator = new ComponentValidator();
     $component_validator->setValidator();

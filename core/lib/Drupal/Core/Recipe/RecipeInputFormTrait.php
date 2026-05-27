@@ -108,7 +108,7 @@ trait RecipeInputFormTrait {
     try {
       $this->setRecipeInput($recipe, $form_state);
     }
-    catch (ValidationFailedException $e) {
+    catch (\Symfony\Component\Validator\Exception\ValidationFailedException $e) {
       $data = $e->getValue();
 
       if ($data instanceof TypedDataInterface) {

@@ -37,7 +37,7 @@ class SchemaConfigListenerWebTest extends BrowserTestBase {
       $this->config('config_schema_test.schemaless')->set('foo', 'bar')->save();
       $this->fail('Expected SchemaIncompleteException thrown');
     }
-    catch (SchemaIncompleteException $e) {
+    catch (\Drupal\Core\Config\Schema\SchemaIncompleteException $e) {
       $this->assertEquals('No schema for config_schema_test.schemaless', $e->getMessage());
     }
 
@@ -46,7 +46,7 @@ class SchemaConfigListenerWebTest extends BrowserTestBase {
     try {
       $config->save();
     }
-    catch (SchemaIncompleteException $e) {
+    catch (\Drupal\Core\Config\Schema\SchemaIncompleteException $e) {
       $this->fail('Unexpected SchemaIncompleteException thrown');
     }
 
@@ -58,7 +58,7 @@ class SchemaConfigListenerWebTest extends BrowserTestBase {
       $config->save();
       $this->fail('Expected SchemaIncompleteException thrown');
     }
-    catch (SchemaIncompleteException $e) {
+    catch (\Drupal\Core\Config\Schema\SchemaIncompleteException $e) {
       $this->assertEquals("Schema errors for config_test.types with the following errors: config_test.types:array variable type is integer but applied schema class is Drupal\Core\Config\Schema\Sequence, config_test.types:foo missing schema, 0 [foo] &#039;foo&#039; is not a supported key.", $e->getMessage());
     }
 

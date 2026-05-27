@@ -279,7 +279,7 @@ function update_calculate_project_update_status(&$project_data, $available): voi
   try {
     $existing_major = ExtensionVersion::createFromVersionString($project_data['existing_version'])->getMajorVersion();
   }
-  catch (UnexpectedValueException $exception) {
+  catch (\UnexpectedValueException $exception) {
     // If the version has an unexpected value we can't determine updates.
     $project_data['status'] = UpdateFetcherInterface::UNKNOWN;
     $project_data['reason'] = t('Invalid version: @existing_version', ['@existing_version' => $project_data['existing_version']]);
@@ -312,7 +312,7 @@ function update_calculate_project_update_status(&$project_data, $available): voi
         $target_major = ExtensionVersion::createFromSupportBranch($supported_branch)->getMajorVersion();
         break;
       }
-      catch (UnexpectedValueException $exception) {
+      catch (\UnexpectedValueException $exception) {
         continue;
       }
     }
@@ -361,7 +361,7 @@ function update_calculate_project_update_status(&$project_data, $available): voi
     try {
       $release = ProjectRelease::createFromArray($release_info);
     }
-    catch (UnexpectedValueException $exception) {
+    catch (\UnexpectedValueException $exception) {
       // Ignore releases that are in an invalid format. Although this is highly
       // unlikely we should still process releases in the correct format.
       Error::logException(\Drupal::logger('update'), $exception, 'Invalid project format: @release', ['@release' => print_r($release_info, TRUE)]);
@@ -371,7 +371,7 @@ function update_calculate_project_update_status(&$project_data, $available): voi
     try {
       $release_module_version = ExtensionVersion::createFromVersionString($release->getVersion());
     }
-    catch (UnexpectedValueException) {
+    catch (\UnexpectedValueException) {
       continue;
     }
     // This release is supported only if it is in a supported branch and is

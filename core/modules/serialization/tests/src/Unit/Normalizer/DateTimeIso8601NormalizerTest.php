@@ -222,7 +222,7 @@ class DateTimeIso8601NormalizerTest extends UnitTestCase {
    * Tests the denormalize function with bad data for the date-only case.
    */
   public function testDenormalizeDateOnlyException(): void {
-    $this->expectException(UnexpectedValueException::class);
+    $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
     $this->expectExceptionMessage('The specified date "2016/11/06" is not in an accepted format: "Y-m-d" (date-only).');
 
     $normalized = '2016/11/06';
@@ -236,7 +236,7 @@ class DateTimeIso8601NormalizerTest extends UnitTestCase {
    * Tests the denormalize function with bad data for the date+time case.
    */
   public function testDenormalizeDateAndTimeException(): void {
-    $this->expectException(UnexpectedValueException::class);
+    $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
     $this->expectExceptionMessage('The specified date "on a rainy day" is not in an accepted format: "Y-m-d\TH:i:sP" (RFC 3339), "Y-m-d\TH:i:sO" (ISO 8601).');
 
     $normalized = 'on a rainy day';
@@ -250,7 +250,7 @@ class DateTimeIso8601NormalizerTest extends UnitTestCase {
    * Tests the denormalize function with incomplete serialization context.
    */
   public function testDenormalizeNoTargetInstanceOrFieldDefinitionException(): void {
-    $this->expectException(InvalidArgumentException::class);
+    $this->expectException(\Symfony\Component\Serializer\Exception\InvalidArgumentException::class);
     $this->expectExceptionMessage('$context[\'target_instance\'] or $context[\'field_definition\'] must be set to denormalize with the DateTimeIso8601Normalizer');
     $this->normalizer->denormalize('', DateTimeIso8601::class, NULL, []);
   }

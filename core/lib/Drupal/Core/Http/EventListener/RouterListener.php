@@ -56,7 +56,7 @@ class RouterListener implements EventSubscriberInterface {
         $this->context->fromRequest($request);
       }
       catch (\UnexpectedValueException $e) {
-        throw new BadRequestHttpException($e->getMessage(), $e, $e->getCode());
+        throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException($e->getMessage(), $e, $e->getCode());
       }
     }
   }
@@ -130,7 +130,7 @@ class RouterListener implements EventSubscriberInterface {
       unset($parameters['_route'], $parameters['_controller']);
       $request->attributes->set('_route_params', $parameters);
     }
-    catch (CacheableResourceNotFoundException $exception) {
+    catch (\Drupal\Core\Routing\Exception\CacheableResourceNotFoundException $exception) {
       $message = sprintf('No route found for "%s %s"', $request->getMethod(), $request->getUriForPath($request->getPathInfo()));
 
       $referer = $request->headers->get('referer');
@@ -138,9 +138,9 @@ class RouterListener implements EventSubscriberInterface {
         $message .= sprintf(' (from "%s")', $referer);
       }
 
-      throw new CacheableNotFoundHttpException($exception, $message, $exception);
+      throw new \Drupal\Core\Http\Exception\CacheableNotFoundHttpException($exception, $message, $exception);
     }
-    catch (ResourceNotFoundException $exception) {
+    catch (\Symfony\Component\Routing\Exception\ResourceNotFoundException $exception) {
       $message = sprintf('No route found for "%s %s"', $request->getMethod(), $request->getUriForPath($request->getPathInfo()));
 
       $referer = $request->headers->get('referer');
@@ -148,12 +148,12 @@ class RouterListener implements EventSubscriberInterface {
         $message .= sprintf(' (from "%s")', $referer);
       }
 
-      throw new NotFoundHttpException($message, $exception);
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException($message, $exception);
     }
-    catch (MethodNotAllowedException $exception) {
+    catch (\Symfony\Component\Routing\Exception\MethodNotAllowedException $exception) {
       $message = sprintf('No route found for "%s %s": Method Not Allowed (Allow: %s)', $request->getMethod(), $request->getUriForPath($request->getPathInfo()), implode(', ', $exception->getAllowedMethods()));
 
-      throw new MethodNotAllowedHttpException($exception->getAllowedMethods(), $message, $exception);
+      throw new \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException($exception->getAllowedMethods(), $message, $exception);
     }
   }
 

@@ -283,7 +283,7 @@ class MediaLibraryStateTest extends KernelTestBase {
     $query = MediaLibraryState::create('test', ['file', 'image'], 'image', 2)->all();
     $query = array_merge($query, $query_overrides);
     if ($exception_expected) {
-      $this->expectException(BadRequestHttpException::class);
+      $this->expectException(\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class);
       $this->expectExceptionMessage("Invalid media library parameters specified.");
     }
 

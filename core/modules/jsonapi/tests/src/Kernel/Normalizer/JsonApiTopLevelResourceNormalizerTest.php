@@ -458,7 +458,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
       ->container
       ->get('jsonapi.serializer')
       ->normalize(
-        new JsonApiDocumentTopLevel(new ErrorCollection([new BadRequestHttpException('Lorem')]), new NullIncludedData(), new LinkCollection([])),
+        new JsonApiDocumentTopLevel(new ErrorCollection([new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Lorem')]), new NullIncludedData(), new LinkCollection([])),
         'api_json',
         []
       )->getNormalization();
@@ -648,7 +648,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
             'resource_type' => $resource_type,
           ]);
       }
-      catch (NotFoundHttpException $e) {
+      catch (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e) {
         $non_existing_resource_identifier = $configuration[2];
         $this->assertEquals("The resource identified by `$non_existing_resource_identifier` (given as a relationship item) could not be found.", $e->getMessage());
         continue;
@@ -719,7 +719,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
 
       $this->fail('No assertion thrown for invalid type');
     }
-    catch (BadRequestHttpException $e) {
+    catch (\Symfony\Component\HttpKernel\Exception\BadRequestHttpException $e) {
       $this->assertEquals("Invalid type specified for related resource: 'foobar'", $e->getMessage());
     }
 
@@ -736,7 +736,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
 
       $this->fail('No assertion thrown for missing type');
     }
-    catch (BadRequestHttpException $e) {
+    catch (\Symfony\Component\HttpKernel\Exception\BadRequestHttpException $e) {
       $this->assertEquals("No type specified for related resource", $e->getMessage());
     }
   }

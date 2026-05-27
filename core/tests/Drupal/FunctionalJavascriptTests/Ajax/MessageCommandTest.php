@@ -135,7 +135,7 @@ class MessageCommandTest extends WebDriverTestBase {
     try {
       $this->assertSession()->statusMessageContainsAfterWait('Not a real message', NULL, 1000);
     }
-    catch (ExpectationFailedException) {
+    catch (\PHPUnit\Framework\ExpectationFailedException) {
       $expected_failure_occurred = TRUE;
     }
     $this->assertTrue($expected_failure_occurred, 'JsWebAssert::statusMessageContainsAfterWait() did not fail when it should have failed.');
@@ -144,7 +144,7 @@ class MessageCommandTest extends WebDriverTestBase {
     try {
       $this->assertSession()->statusMessageNotContainsAfterWait('I am a warning', NULL, 1000);
     }
-    catch (ExpectationFailedException) {
+    catch (\PHPUnit\Framework\ExpectationFailedException) {
       $expected_failure_occurred = TRUE;
     }
     $this->assertTrue($expected_failure_occurred, 'JsWebAssert::statusMessageNotContainsAfterWait() did not fail when it should have failed.');
@@ -153,7 +153,7 @@ class MessageCommandTest extends WebDriverTestBase {
     try {
       $this->assertSession()->statusMessageExistsAfterWait('error', 1000);
     }
-    catch (ExpectationFailedException) {
+    catch (\PHPUnit\Framework\ExpectationFailedException) {
       $expected_failure_occurred = TRUE;
     }
     $this->assertTrue($expected_failure_occurred, 'JsWebAssert::statusMessageExistsAfterWait() did not fail when it should have failed.');
@@ -162,7 +162,7 @@ class MessageCommandTest extends WebDriverTestBase {
     try {
       $this->assertSession()->statusMessageNotExistsAfterWait('warning', 1000);
     }
-    catch (ExpectationFailedException) {
+    catch (\PHPUnit\Framework\ExpectationFailedException) {
       $expected_failure_occurred = TRUE;
     }
     $this->assertTrue($expected_failure_occurred, 'JsWebAssert::statusMessageNotExistsAfterWait() did not fail when it should have failed.');

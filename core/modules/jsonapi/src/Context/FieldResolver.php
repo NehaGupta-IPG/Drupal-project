@@ -182,7 +182,7 @@ class FieldResolver {
   public static function resolveInternalIncludePath(ResourceType $resource_type, array $path_parts, $depth = 0) {
     $cacheability = (new CacheableMetadata())->addCacheContexts(['url.query_args:include']);
     if (empty($path_parts[0])) {
-      throw new CacheableBadRequestHttpException($cacheability, 'Empty include path.');
+      throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cacheability, 'Empty include path.');
     }
     $public_field_name = $path_parts[0];
     $internal_field_name = $resource_type->getInternalName($public_field_name);
@@ -192,7 +192,7 @@ class FieldResolver {
       if (!empty(($possible = implode(', ', array_keys($resource_type->getRelatableResourceTypes()))))) {
         $message .= " Possible values: $possible.";
       }
-      throw new CacheableBadRequestHttpException($cacheability, $message);
+      throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cacheability, $message);
     }
     $remaining_parts = array_slice($path_parts, 1);
     if (empty($remaining_parts)) {
@@ -206,17 +206,17 @@ class FieldResolver {
         // multiple possible resolutions.
         $resolved = array_merge($resolved, static::resolveInternalIncludePath($relatable_resource_type, $remaining_parts, $depth + 1));
       }
-      catch (CacheableBadRequestHttpException $e) {
+      catch (\Drupal\Core\Http\Exception\CacheableBadRequestHttpException $e) {
         $exceptions[] = $e;
       }
     }
     if (!empty($exceptions) && count($exceptions) === count($relatable_resource_types)) {
-      $previous_messages = implode(' ', array_unique(array_map(function (CacheableBadRequestHttpException $e) {
+      $previous_messages = implode(' ', array_unique(array_map(function (\Drupal\Core\Http\Exception\CacheableBadRequestHttpException $e) {
         return $e->getMessage();
       }, $exceptions)));
       // Only add the full include path on the first level of recursion so that
       // the invalid path phrase isn't repeated at every level.
-      throw new CacheableBadRequestHttpException($cacheability, $depth === 0
+      throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cacheability, $depth === 0
         ? sprintf("`%s` is not a valid include path. $previous_messages", implode('.', $path_parts))
         : $previous_messages
       );
@@ -274,7 +274,7 @@ class FieldResolver {
   public function resolveInternalEntityQueryPath(ResourceType $resource_type, $external_field_name, $operator = NULL) {
     $cacheability = (new CacheableMetadata())->addCacheContexts(['url.query_args:filter', 'url.query_args:sort']);
     if (empty($external_field_name)) {
-      throw new CacheableBadRequestHttpException($cacheability, 'No field name was provided for the filter.');
+      throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cacheability, 'No field name was provided for the filter.');
     }
 
     // Turns 'uid.categories.name' into
@@ -289,7 +289,7 @@ class FieldResolver {
     // otherwise be evaluated as FALSE.
     while (!is_null(($part = array_shift($parts)))) {
       if (!$this->isMemberFilterable($part, $resource_types)) {
-        throw new CacheableBadRequestHttpException($cacheability, sprintf(
+        throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cacheability, sprintf(
           'Invalid nested filtering. The field `%s`, given in the path `%s`, does not exist.',
           $part,
           $external_field_name
@@ -328,7 +328,7 @@ class FieldResolver {
           if ($field_access instanceof AccessResultReasonInterface && ($reason = $field_access->getReason()) && !empty($reason)) {
             $message .= ' ' . $reason;
           }
-          throw new CacheableAccessDeniedHttpException($cacheability, $message);
+          throw new \Drupal\Core\Http\Exception\CacheableAccessDeniedHttpException($cacheability, $message);
         }
       }
 
@@ -372,7 +372,7 @@ class FieldResolver {
           $possible_specifiers = array_map(function ($specifier) use ($at_least_one_entity_reference_field) {
             return $at_least_one_entity_reference_field && $specifier !== 'id' ? "meta.$specifier" : $specifier;
           }, $candidate_property_names);
-          throw new CacheableBadRequestHttpException($cacheability, sprintf('Invalid nested filtering. The field `%s`, given in the path `%s` is incomplete, it must end with one of the following specifiers: `%s`.', $part, $external_field_name, implode('`, `', $possible_specifiers)));
+          throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cacheability, sprintf('Invalid nested filtering. The field `%s`, given in the path `%s` is incomplete, it must end with one of the following specifiers: `%s`.', $part, $external_field_name, implode('`, `', $possible_specifiers)));
         }
         return $this->constructInternalPath($reference_breadcrumbs);
       }
@@ -401,7 +401,7 @@ class FieldResolver {
           array_shift($parts);
         }
         elseif (in_array($parts[0], $candidate_property_names) && !static::isCandidateDefinitionReferenceProperty($parts[0], $candidate_definitions)) {
-          throw new CacheableBadRequestHttpException($cacheability, sprintf('Invalid nested filtering. The property `%s`, given in the path `%s` belongs to the meta object of a relationship and must be preceded by `meta`.', $parts[0], $external_field_name));
+          throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cacheability, sprintf('Invalid nested filtering. The property `%s`, given in the path `%s` belongs to the meta object of a relationship and must be preceded by `meta`.', $parts[0], $external_field_name));
         }
       }
 
@@ -424,10 +424,10 @@ class FieldResolver {
           // exist. This is because JSON:API elides single-value properties;
           // respecting it would leak this Drupalism out.
           if (count($candidate_property_names) === 1) {
-            throw new CacheableBadRequestHttpException($cacheability, sprintf('Invalid nested filtering. The property `%s`, given in the path `%s`, does not exist. Filter by `%s`, not `%s` (the JSON:API module elides property names from single-property fields).', $parts[0], $external_field_name, substr($external_field_name, 0, strlen($external_field_name) - strlen($parts[0]) - 1), $external_field_name));
+            throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cacheability, sprintf('Invalid nested filtering. The property `%s`, given in the path `%s`, does not exist. Filter by `%s`, not `%s` (the JSON:API module elides property names from single-property fields).', $parts[0], $external_field_name, substr($external_field_name, 0, strlen($external_field_name) - strlen($parts[0]) - 1), $external_field_name));
           }
           elseif (!in_array($parts[0], $candidate_property_names, TRUE)) {
-            throw new CacheableBadRequestHttpException($cacheability, sprintf('Invalid nested filtering. The property `%s`, given in the path `%s`, does not exist. Must be one of the following property names: `%s`.', $parts[0], $external_field_name, implode('`, `', $candidate_property_names)));
+            throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cacheability, sprintf('Invalid nested filtering. The property `%s`, given in the path `%s`, does not exist. Must be one of the following property names: `%s`.', $parts[0], $external_field_name, implode('`, `', $candidate_property_names)));
           }
           return $this->constructInternalPath($reference_breadcrumbs, $parts);
         }
@@ -646,7 +646,7 @@ class FieldResolver {
       // @todo Add test coverage for this in https://www.drupal.org/project/drupal/issues/2971281
       $message = sprintf('Ambiguous path. Try one of the following: %s, in place of the given path: %s', implode(', ', $choices), implode('.', $unresolved_path_parts));
       $cacheability = (new CacheableMetadata())->addCacheContexts(['url.query_args:filter', 'url.query_args:sort']);
-      throw new CacheableBadRequestHttpException($cacheability, $message);
+      throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cacheability, $message);
     }
     return $unique_reference_names[0];
   }

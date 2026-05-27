@@ -69,7 +69,7 @@ class YamlPecl implements SerializationInterface {
    */
   public static function errorHandler($severity, $message) {
     restore_error_handler();
-    throw new InvalidDataTypeException($message, $severity);
+    throw new \Drupal\Component\Serialization\Exception\InvalidDataTypeException($message, $severity);
   }
 
   /**

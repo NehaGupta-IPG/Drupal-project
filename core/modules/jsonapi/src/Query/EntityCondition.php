@@ -156,28 +156,28 @@ class EntityCondition {
       // Try to provide a more specific exception is a key is missing.
       if (!$has_operator_key) {
         if (!$has_path_key) {
-          throw new CacheableBadRequestHttpException($cacheability, "Filter parameter is missing a '" . static::PATH_KEY . "' key.");
+          throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cacheability, "Filter parameter is missing a '" . static::PATH_KEY . "' key.");
         }
         if (!$has_value_key) {
-          throw new CacheableBadRequestHttpException($cacheability, "Filter parameter is missing a '" . static::VALUE_KEY . "' key.");
+          throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cacheability, "Filter parameter is missing a '" . static::VALUE_KEY . "' key.");
         }
       }
 
       // Catchall exception.
       $reason = "You must provide a valid filter condition. Check that you have set the required keys for your filter.";
-      throw new CacheableBadRequestHttpException($cacheability, $reason);
+      throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cacheability, $reason);
     }
 
     if ($has_operator_key) {
       $operator = $parameter[static::OPERATOR_KEY];
       if (!in_array($operator, static::$allowedOperators)) {
         $reason = "The '" . $operator . "' operator is not allowed in a filter parameter.";
-        throw new CacheableBadRequestHttpException($cacheability, $reason);
+        throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cacheability, $reason);
       }
 
       if (in_array($operator, ['IS NULL', 'IS NOT NULL']) && $has_value_key) {
         $reason = "Filters using the '" . $operator . "' operator should not provide a value.";
-        throw new CacheableBadRequestHttpException($cacheability, $reason);
+        throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cacheability, $reason);
       }
     }
   }

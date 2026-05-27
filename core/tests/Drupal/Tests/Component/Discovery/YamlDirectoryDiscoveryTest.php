@@ -177,7 +177,7 @@ class YamlDirectoryDiscoveryTest extends TestCase {
    * @legacy-covers ::getIdentifier
    */
   public function testDiscoveryNoIdException(): void {
-    $this->expectException(DiscoveryException::class);
+    $this->expectException(\Drupal\Component\Discovery\DiscoveryException::class);
     $this->expectExceptionMessage('The vfs://modules/test_1' . DIRECTORY_SEPARATOR . 'item_1.test.yml contains no data in the identifier key \'id\'');
     vfsStream::setup('modules', NULL, [
       'test_1' => [
@@ -198,7 +198,7 @@ class YamlDirectoryDiscoveryTest extends TestCase {
    * @legacy-covers ::findAll
    */
   public function testDiscoveryInvalidYamlException(): void {
-    $this->expectException(DiscoveryException::class);
+    $this->expectException(\Drupal\Component\Discovery\DiscoveryException::class);
     $this->expectExceptionMessage('The vfs://modules/test_1' . DIRECTORY_SEPARATOR . 'item_1.test.yml contains invalid YAML');
     vfsStream::setup('modules', NULL, [
       'test_1' => [

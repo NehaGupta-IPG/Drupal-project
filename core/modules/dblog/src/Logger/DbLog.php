@@ -91,7 +91,7 @@ class DbLog implements LoggerInterface {
       // connection and write again.
       if (
         // Only handle database related exceptions.
-        ($e instanceof DatabaseException || $e instanceof \PDOException) &&
+        ($e instanceof \Drupal\Core\Database\DatabaseException || $e instanceof \PDOException) &&
         // Avoid an endless loop of re-write attempts.
         $this->connection->getTarget() != self::DEDICATED_DBLOG_CONNECTION_TARGET
       ) {

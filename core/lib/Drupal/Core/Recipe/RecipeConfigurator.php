@@ -70,7 +70,7 @@ final class RecipeConfigurator {
       return static::$cache[$path] = Recipe::createFromDirectory(dirname($path));
     }
     $search_path = dirname($path, 2);
-    throw new UnknownRecipeException($name, $search_path, sprintf("Can not find the %s recipe, search path: %s", $name, $search_path));
+    throw new \Drupal\Core\Recipe\UnknownRecipeException($name, $search_path, sprintf("Can not find the %s recipe, search path: %s", $name, $search_path));
   }
 
   /**

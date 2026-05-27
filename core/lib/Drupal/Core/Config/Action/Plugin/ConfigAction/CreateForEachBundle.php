@@ -70,7 +70,7 @@ final class CreateForEachBundle implements ConfigActionPluginInterface, Containe
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     // If there are no bundle entity types, this plugin should not be usable.
     if (empty($plugin_definition['entity_types'])) {
-      throw new InvalidPluginDefinitionException($plugin_id, "The $plugin_id config action must be restricted to entity types that are bundles of another entity type.");
+      throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($plugin_id, "The $plugin_id config action must be restricted to entity types that are bundles of another entity type.");
     }
 
     return new static(

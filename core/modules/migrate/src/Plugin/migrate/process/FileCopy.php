@@ -132,7 +132,7 @@ class FileCopy extends FileProcessBase implements ContainerFactoryPluginInterfac
 
     // Ensure the source file exists, if it's a local URI or path.
     if (!file_exists($source)) {
-      throw new MigrateException("File '$source' does not exist");
+      throw new \Drupal\migrate\MigrateException("File '$source' does not exist");
     }
 
     // If the start and end file is exactly the same, there is nothing to do.
@@ -147,7 +147,7 @@ class FileCopy extends FileProcessBase implements ContainerFactoryPluginInterfac
     // the file to destination.
     if (!is_dir($dir) || !is_writable($dir)) {
       if (!$this->fileSystem->prepareDirectory($dir, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS)) {
-        throw new MigrateException("Could not create or write to directory '$dir'");
+        throw new \Drupal\migrate\MigrateException("Could not create or write to directory '$dir'");
       }
     }
 
@@ -155,7 +155,7 @@ class FileCopy extends FileProcessBase implements ContainerFactoryPluginInterfac
     if ($final_destination) {
       return $final_destination;
     }
-    throw new MigrateException("File $source could not be copied to $destination");
+    throw new \Drupal\migrate\MigrateException("File $source could not be copied to $destination");
   }
 
   /**
@@ -187,7 +187,7 @@ class FileCopy extends FileProcessBase implements ContainerFactoryPluginInterfac
         return $this->fileSystem->copy($source, $destination, $fileExists);
       }
     }
-    catch (FileException) {
+    catch (\Drupal\Core\File\Exception\FileException) {
       return FALSE;
     }
   }

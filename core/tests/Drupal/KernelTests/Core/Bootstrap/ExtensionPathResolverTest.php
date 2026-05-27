@@ -60,7 +60,7 @@ class ExtensionPathResolverTest extends KernelTestBase {
    * @legacy-covers ::getPathname
    */
   public function testExtensionPathResolvingWithNonExistingModule(): void {
-    $this->expectException(UnknownExtensionException::class);
+    $this->expectException(\Drupal\Core\Extension\Exception\UnknownExtensionException::class);
     $this->expectExceptionMessage('The module there_is_a_module_for_that does not exist.');
     $this->assertNull(\Drupal::service('extension.list.module')
       ->getPathname('there_is_a_module_for_that'), 'Searching for an item that does not exist returns NULL.');
@@ -72,7 +72,7 @@ class ExtensionPathResolverTest extends KernelTestBase {
    * @legacy-covers ::getPathname
    */
   public function testExtensionPathResolvingWithNonExistingTheme(): void {
-    $this->expectException(UnknownExtensionException::class);
+    $this->expectException(\Drupal\Core\Extension\Exception\UnknownExtensionException::class);
     $this->expectExceptionMessage('The theme there_is_a_theme_for_you does not exist.');
     $this->assertNull(\Drupal::service('extension.list.theme')
       ->getPathname('there_is_a_theme_for_you'), 'Searching for an item that does not exist returns NULL.');
@@ -84,7 +84,7 @@ class ExtensionPathResolverTest extends KernelTestBase {
    * @legacy-covers ::getPathname
    */
   public function testExtensionPathResolvingWithNonExistingProfile(): void {
-    $this->expectException(UnknownExtensionException::class);
+    $this->expectException(\Drupal\Core\Extension\Exception\UnknownExtensionException::class);
     $this->expectExceptionMessage('The profile there_is_an_install_profile_for_you does not exist.');
     $this->assertNull(\Drupal::service('extension.list.profile')
       ->getPathname('there_is_an_install_profile_for_you'), 'Searching for an item that does not exist returns NULL.');
@@ -103,7 +103,7 @@ class ExtensionPathResolverTest extends KernelTestBase {
       $theme_extension_list->reveal(),
     );
 
-    $this->expectException(UnknownExtensionTypeException::class);
+    $this->expectException(\Drupal\Core\Extension\Exception\UnknownExtensionTypeException::class);
     $this->expectExceptionMessage('Extension type foo is unknown.');
     $resolver->getPath('foo', 'bar');
   }

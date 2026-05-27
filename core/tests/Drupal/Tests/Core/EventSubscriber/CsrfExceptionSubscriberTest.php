@@ -28,7 +28,7 @@ class CsrfExceptionSubscriberTest extends UnitTestCase {
 
     $request = new Request();
     $kernel = $this->createStub(HttpKernelInterface::class);
-    $exception = new AccessDeniedHttpException();
+    $exception = new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
 
     $event = new ExceptionEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $exception);
 

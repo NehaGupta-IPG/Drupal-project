@@ -153,7 +153,7 @@ class MigrateProcessErrorMessagesTest extends MigrateTestBase {
     $error_plugin_prophecy->getPluginDefinition()->willReturn(['plugin_id' => 'test_error']);
     $error_plugin_prophecy->getPluginId()->willReturn('test_error');
     $error_plugin_prophecy->reset()->shouldBeCalled();
-    $error_plugin_prophecy->transform(Argument::cetera())->willThrow(new MigrateException('Process exception.'));
+    $error_plugin_prophecy->transform(Argument::cetera())->willThrow(new \Drupal\migrate\MigrateException('Process exception.'));
 
     $this->processPluginManager->createInstance('get', Argument::cetera())
       ->will(fn($x): Get => new Get($x[1], 'get', ['handle_multiples' => TRUE]));

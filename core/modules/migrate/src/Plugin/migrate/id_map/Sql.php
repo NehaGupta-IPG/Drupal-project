@@ -421,7 +421,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
             ->createTable($this->mapTableName, $schema);
           break;
         }
-        catch (SchemaTableKeyTooLargeException $e) {
+        catch (\Drupal\Core\Database\Exception\SchemaTableKeyTooLargeException $e) {
           $chunk_size--;
           // Rethrow the exception if the source IDs can not be in smaller
           // groups.
@@ -640,7 +640,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
 
     if (!empty($source_id_values)) {
       $var_dump = var_export($source_id_values, TRUE);
-      throw new MigrateException(sprintf("Extra unknown items for map %s in source IDs: %s", $this->mapTableName(), $var_dump));
+      throw new \Drupal\migrate\MigrateException(sprintf("Extra unknown items for map %s in source IDs: %s", $this->mapTableName(), $var_dump));
     }
 
     $query = $this->getDatabase()->select($this->mapTableName(), 'map')
@@ -825,7 +825,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
     try {
       $count = (int) $query->countQuery()->execute()->fetchField();
     }
-    catch (DatabaseException) {
+    catch (\Drupal\Core\Database\DatabaseException) {
       // The table does not exist, therefore there are no records.
       $count = 0;
     }
@@ -837,7 +837,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
    */
   public function delete(array $source_id_values, $messages_only = FALSE) {
     if (empty($source_id_values)) {
-      throw new MigrateException('Without source identifier values it is impossible to find the row to delete.');
+      throw new \Drupal\migrate\MigrateException('Without source identifier values it is impossible to find the row to delete.');
     }
 
     if (!$messages_only) {
@@ -877,7 +877,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
    */
   public function setUpdate(array $source_id_values) {
     if (empty($source_id_values)) {
-      throw new MigrateException('No source identifiers provided to update.');
+      throw new \Drupal\migrate\MigrateException('No source identifiers provided to update.');
     }
     $query = $this->getDatabase()
       ->update($this->mapTableName())

@@ -110,7 +110,7 @@ class ProviderRepository implements ProviderRepositoryInterface {
         return $stored['data'];
       }
       // We have no previous data and the request failed.
-      throw new ProviderException("Could not retrieve the oEmbed provider database from $this->providersUrl", NULL, $e);
+      throw new \Drupal\media\OEmbed\ProviderException("Could not retrieve the oEmbed provider database from $this->providersUrl", NULL, $e);
     }
 
     $providers = Json::decode((string) $response->getBody());
@@ -123,7 +123,7 @@ class ProviderRepository implements ProviderRepositoryInterface {
         return $stored['data'];
       }
       // We have no previous data and the current data is corrupt.
-      throw new ProviderException('Remote oEmbed providers database returned invalid or empty list.');
+      throw new \Drupal\media\OEmbed\ProviderException('Remote oEmbed providers database returned invalid or empty list.');
     }
 
     $keyed_providers = [];
@@ -132,7 +132,7 @@ class ProviderRepository implements ProviderRepositoryInterface {
         $name = (string) $provider['provider_name'];
         $keyed_providers[$name] = new Provider($provider['provider_name'], $provider['provider_url'], $provider['endpoints']);
       }
-      catch (ProviderException $e) {
+      catch (\Drupal\media\OEmbed\ProviderException $e) {
         // Skip invalid providers, but log the exception message to help with
         // debugging.
         $this->logger->warning($e->getMessage());

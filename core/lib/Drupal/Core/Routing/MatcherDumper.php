@@ -200,7 +200,7 @@ class MatcherDumper implements MatcherDumperInterface {
     try {
       $this->connection->schema()->createTable($this->tableName, $this->schemaDefinition());
     }
-    catch (DatabaseException) {
+    catch (\Drupal\Core\Database\DatabaseException) {
       // If another process has already created the config table, attempting to
       // recreate it will throw an exception. In this case just catch the
       // exception and do nothing.

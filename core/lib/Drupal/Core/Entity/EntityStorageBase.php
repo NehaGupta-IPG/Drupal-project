@@ -468,7 +468,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
       $entity = new $entity_class($record, $this->entityTypeId);
       $entity_id = $entity->id();
       if ($entity_id === NULL) {
-        throw new EntityMalformedException('The entity does not have an ID.');
+        throw new \Drupal\Core\Entity\EntityMalformedException('The entity does not have an ID.');
       }
       $entities[$entity_id] = $entity;
     }
@@ -570,7 +570,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
 
     // A new entity should not already exist.
     if ($id_exists && $entity->isNew()) {
-      throw new EntityStorageException("'{$this->entityTypeId}' entity with ID '$id' already exists.");
+      throw new \Drupal\Core\Entity\EntityStorageException("'{$this->entityTypeId}' entity with ID '$id' already exists.");
     }
 
     // Load the original entity, if any.

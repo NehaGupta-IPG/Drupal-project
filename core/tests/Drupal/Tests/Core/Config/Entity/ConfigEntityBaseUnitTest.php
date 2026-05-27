@@ -847,7 +847,7 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
     $this->entityType
       ->method('getClass')
       ->willReturn("FooConfigEntity");
-    $this->expectException(SchemaIncompleteException::class);
+    $this->expectException(\Drupal\Core\Config\Schema\SchemaIncompleteException::class);
     $this->expectExceptionMessage("Entity type 'FooConfigEntity' is missing 'config_export' definition in its annotation");
     $this->entity->toArray();
   }

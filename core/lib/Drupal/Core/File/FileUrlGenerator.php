@@ -103,7 +103,7 @@ class FileUrlGenerator implements FileUrlGeneratorInterface {
       $externalUrl = $wrapper->getExternalUrl();
       return $relative ? $this->transformRelative($externalUrl) : $externalUrl;
     }
-    throw new InvalidStreamWrapperException();
+    throw new \Drupal\Core\File\Exception\InvalidStreamWrapperException();
   }
 
   /**
@@ -199,7 +199,7 @@ class FileUrlGenerator implements FileUrlGeneratorInterface {
         return Url::fromUri(urldecode($options['path']), $options);
       }
     }
-    throw new InvalidStreamWrapperException();
+    throw new \Drupal\Core\File\Exception\InvalidStreamWrapperException();
   }
 
   /**

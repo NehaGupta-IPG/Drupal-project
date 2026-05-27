@@ -68,7 +68,7 @@ class RsyncValidatorTest extends PackageManagerKernelTestBase {
     /** @var \PhpTuf\ComposerStager\API\Translation\Factory\TranslatableFactoryInterface $translatable_factory */
     $translatable_factory = $this->container->get(TranslatableFactoryInterface::class);
     $message = $translatable_factory->createTranslatableMessage('Nope!');
-    $this->executableFinder->find('rsync')->willThrow(new LogicException($message));
+    $this->executableFinder->find('rsync')->willThrow(new \PhpTuf\ComposerStager\API\Exception\LogicException($message));
 
     $result = ValidationResult::createError([
       $this->t('<code>rsync</code> is not available.'),

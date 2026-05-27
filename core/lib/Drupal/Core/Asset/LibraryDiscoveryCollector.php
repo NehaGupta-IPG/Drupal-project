@@ -102,7 +102,7 @@ class LibraryDiscoveryCollector extends CacheCollector implements LibraryDiscove
             $libraries[$name] = $replacement_definition[$replacement_name];
           }
           else {
-            throw new InvalidLibrariesOverrideSpecificationException(sprintf('The specified library %s does not exist.', $definition['override']));
+            throw new \Drupal\Core\Asset\Exception\InvalidLibrariesOverrideSpecificationException(sprintf('The specified library %s does not exist.', $definition['override']));
           }
         }
       }
@@ -145,7 +145,7 @@ class LibraryDiscoveryCollector extends CacheCollector implements LibraryDiscove
         }
         if (!is_string($library_extend_name)) {
           // Only string library names are allowed.
-          throw new InvalidLibrariesExtendSpecificationException('The libraries-extend specification for each library must be a list of strings.');
+          throw new \Drupal\Core\Asset\Exception\InvalidLibrariesExtendSpecificationException('The libraries-extend specification for each library must be a list of strings.');
         }
         [$new_extension, $new_library_name] = explode('/', $library_extend_name, 2);
         $new_libraries = $this->get($new_extension);
@@ -153,7 +153,7 @@ class LibraryDiscoveryCollector extends CacheCollector implements LibraryDiscove
           $library_definition = NestedArray::mergeDeep($library_definition, $new_libraries[$new_library_name]);
         }
         else {
-          throw new InvalidLibrariesExtendSpecificationException(sprintf('The specified library "%s" does not exist.', $library_extend_name));
+          throw new \Drupal\Core\Asset\Exception\InvalidLibrariesExtendSpecificationException(sprintf('The specified library "%s" does not exist.', $library_extend_name));
         }
       }
     }

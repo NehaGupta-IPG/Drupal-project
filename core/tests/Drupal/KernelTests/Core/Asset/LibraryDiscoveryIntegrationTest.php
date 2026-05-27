@@ -109,7 +109,7 @@ class LibraryDiscoveryIntegrationTest extends KernelTestBase {
       $this->libraryDiscovery->getLibraryByName('core', 'drupal.ajax');
       $this->fail('Throw Exception when trying to override drupalSettings');
     }
-    catch (InvalidLibrariesOverrideSpecificationException $e) {
+    catch (\Drupal\Core\Asset\Exception\InvalidLibrariesOverrideSpecificationException $e) {
       $expected_message = 'drupalSettings may not be overridden in libraries-override. Trying to override core/drupal.ajax/drupalSettings. Use hook_library_info_alter() instead.';
       $this->assertEquals($expected_message, $e->getMessage(), 'Throw Exception when trying to override drupalSettings');
     }
@@ -128,7 +128,7 @@ class LibraryDiscoveryIntegrationTest extends KernelTestBase {
       $this->libraryDiscovery->getLibraryByName('core', 'drupal.dialog');
       $this->fail('Throw Exception when specifying invalid override');
     }
-    catch (InvalidLibrariesOverrideSpecificationException $e) {
+    catch (\Drupal\Core\Asset\Exception\InvalidLibrariesOverrideSpecificationException $e) {
       $expected_message = 'Library asset core/drupal.dialog/css is not correctly specified. It should be in the form "extension/library_name/sub_key/path/to/asset.js".';
       $this->assertEquals($expected_message, $e->getMessage(), 'Throw Exception when specifying invalid override');
     }
@@ -237,7 +237,7 @@ class LibraryDiscoveryIntegrationTest extends KernelTestBase {
       $this->libraryDiscovery->getLibraryByName('core', 'drupal.dialog');
       $this->fail('Throw Exception when specifying non-existent libraries-extend.');
     }
-    catch (InvalidLibrariesExtendSpecificationException $e) {
+    catch (\Drupal\Core\Asset\Exception\InvalidLibrariesExtendSpecificationException $e) {
       $expected_message = 'The specified library "test_theme_libraries_extend/non_existent_library" does not exist.';
       $this->assertEquals($expected_message, $e->getMessage(), 'Throw Exception when specifying non-existent libraries-extend.');
     }
@@ -248,7 +248,7 @@ class LibraryDiscoveryIntegrationTest extends KernelTestBase {
       $this->libraryDiscovery->getLibraryByName('test_theme', 'collapse');
       $this->fail('Throw Exception when specifying non-string libraries-extend.');
     }
-    catch (InvalidLibrariesExtendSpecificationException $e) {
+    catch (\Drupal\Core\Asset\Exception\InvalidLibrariesExtendSpecificationException $e) {
       $expected_message = 'The libraries-extend specification for each library must be a list of strings.';
       $this->assertEquals($expected_message, $e->getMessage(), 'Throw Exception when specifying non-string libraries-extend.');
     }

@@ -21,7 +21,7 @@ use Drupal\jsonapi\JsonApiResource\ResourceIdentifierTrait;
  * @see https://www.drupal.org/project/drupal/issues/3032787
  * @see jsonapi.api.php
  */
-class EntityAccessDeniedHttpException extends CacheableAccessDeniedHttpException implements ResourceIdentifierInterface {
+class EntityAccessDeniedHttpException extends \Drupal\Core\Http\Exception\CacheableAccessDeniedHttpException implements ResourceIdentifierInterface {
 
   use DependencySerializationTrait;
   use ResourceIdentifierTrait;

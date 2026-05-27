@@ -182,7 +182,7 @@ class SearchIndex implements SearchIndexInterface {
       }
     }
     catch (\Exception $e) {
-      throw new SearchIndexException("Failed to insert dataset in index for type '$type', sid '$sid' and langcode '$langcode'", 0, $e);
+      throw new \Drupal\search\Exception\SearchIndexException("Failed to insert dataset in index for type '$type', sid '$sid' and langcode '$langcode'", 0, $e);
     }
     finally {
       if ($update_weights) {
@@ -216,7 +216,7 @@ class SearchIndex implements SearchIndexInterface {
       $query_dataset->execute();
     }
     catch (\Exception $e) {
-      throw new SearchIndexException("Failed to clear index for type '$type', sid '$sid' and langcode '$langcode'", 0, $e);
+      throw new \Drupal\search\Exception\SearchIndexException("Failed to clear index for type '$type', sid '$sid' and langcode '$langcode'", 0, $e);
     }
     if ($type) {
       // Invalidate all render cache items that contain data from this index.
@@ -251,7 +251,7 @@ class SearchIndex implements SearchIndexInterface {
       $query->execute();
     }
     catch (\Exception $e) {
-      throw new SearchIndexException("Failed to mark index for re-indexing for type '$type', sid '$sid' and langcode '$langcode'", 0, $e);
+      throw new \Drupal\search\Exception\SearchIndexException("Failed to mark index for re-indexing for type '$type', sid '$sid' and langcode '$langcode'", 0, $e);
     }
   }
 
@@ -289,7 +289,7 @@ class SearchIndex implements SearchIndexInterface {
       }
     }
     catch (\Exception $e) {
-      throw new SearchIndexException("Failed to update totals for index words.", 0, $e);
+      throw new \Drupal\search\Exception\SearchIndexException("Failed to update totals for index words.", 0, $e);
     }
   }
 

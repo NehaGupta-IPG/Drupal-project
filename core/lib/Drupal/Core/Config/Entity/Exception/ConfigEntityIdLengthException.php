@@ -7,4 +7,4 @@ use Drupal\Core\Config\ConfigException;
 /**
  * Defines an exception thrown when a configuration entity ID is too long.
  */
-class ConfigEntityIdLengthException extends ConfigException {}
+class ConfigEntityIdLengthException extends \Drupal\Core\Config\ConfigException {}

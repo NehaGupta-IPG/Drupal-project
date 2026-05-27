@@ -95,7 +95,7 @@ class HelpTwigExtension extends AbstractExtension {
         $build = ['#markup' => $text];
       }
     }
-    catch (RouteNotFoundException | MissingMandatoryParametersException | InvalidParameterException) {
+    catch (\Symfony\Component\Routing\Exception\RouteNotFoundException | \Symfony\Component\Routing\Exception\MissingMandatoryParametersException | \Symfony\Component\Routing\Exception\InvalidParameterException) {
       // If the route had one of these exceptions, return the link text.
       $build = ['#markup' => $text];
     }
@@ -125,7 +125,7 @@ class HelpTwigExtension extends AbstractExtension {
     try {
       $plugin = $this->pluginManager->createInstance($topic_id);
     }
-    catch (PluginNotFoundException) {
+    catch (\Drupal\Component\Plugin\Exception\PluginNotFoundException) {
       // Not a topic.
       $plugin = FALSE;
     }

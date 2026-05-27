@@ -116,7 +116,7 @@ class ComposerInspector implements LoggerAwareInterface {
           "--working-dir=$working_dir",
         ]);
       }
-      catch (RuntimeException $e) {
+      catch (\PhpTuf\ComposerStager\API\Exception\RuntimeException $e) {
         $messages[] = $e->getMessage();
         $previous_exception = $e;
       }
@@ -131,7 +131,7 @@ class ComposerInspector implements LoggerAwareInterface {
     }
 
     if ($messages) {
-      throw new ComposerNotReadyException($working_dir, $messages, 0, $previous_exception);
+      throw new \Drupal\package_manager\Exception\ComposerNotReadyException($working_dir, $messages, 0, $previous_exception);
     }
   }
 
@@ -163,7 +163,7 @@ class ComposerInspector implements LoggerAwareInterface {
         $this->composerIsAvailable->assertIsFulfilled($active_dir, $stage_dir);
         $unavailable_message = FALSE;
       }
-      catch (PreconditionException $e) {
+      catch (\PhpTuf\ComposerStager\API\Exception\PreconditionException $e) {
         $unavailable_message = $e->getMessage();
       }
     }
@@ -201,7 +201,7 @@ class ComposerInspector implements LoggerAwareInterface {
     }
 
     if ($messages) {
-      throw new ComposerNotReadyException(NULL, $messages);
+      throw new \Drupal\package_manager\Exception\ComposerNotReadyException(NULL, $messages);
     }
   }
 
@@ -240,7 +240,7 @@ class ComposerInspector implements LoggerAwareInterface {
     try {
       $this->runner->run($command, callback: $this->processCallback->reset());
     }
-    catch (RuntimeException $e) {
+    catch (\PhpTuf\ComposerStager\API\Exception\RuntimeException $e) {
       // Assume any error from `composer config` is about an undefined key-value
       // pair which may have a known default value.
       return match ($key) {

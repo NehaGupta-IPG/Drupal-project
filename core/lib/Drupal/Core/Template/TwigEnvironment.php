@@ -122,7 +122,7 @@ class TwigEnvironment extends Environment {
         $source = new Source($content, $source->getName(), $source->getPath());
       }
     }
-    catch (FrontMatterParseException $exception) {
+    catch (\Drupal\Component\FrontMatter\Exception\FrontMatterParseException $exception) {
       // Convert parse exception into a syntax exception for Twig and append
       // the path/name of the source to help further identify where it occurred.
       $message = sprintf($exception->getMessage() . ' in %s', $source->getPath() ?: $source->getName());
@@ -176,7 +176,7 @@ class TwigEnvironment extends Environment {
     try {
       return FrontMatter::create($source->getCode(), Yaml::class)->getData();
     }
-    catch (FrontMatterParseException $exception) {
+    catch (\Drupal\Component\FrontMatter\Exception\FrontMatterParseException $exception) {
       // Convert parse exception into a syntax exception for Twig and append
       // the path/name of the source to help further identify where it occurred.
       $message = sprintf($exception->getMessage() . ' in %s', $source->getPath() ?: $source->getName());

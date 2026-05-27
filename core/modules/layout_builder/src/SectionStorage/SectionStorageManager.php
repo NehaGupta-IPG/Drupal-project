@@ -76,7 +76,7 @@ class SectionStorageManager extends DefaultPluginManager implements SupportAware
     try {
       $this->contextHandler->applyContextMapping($plugin, $contexts);
     }
-    catch (ContextException) {
+    catch (\Drupal\Component\Plugin\Exception\ContextException) {
       return NULL;
     }
     return $plugin;

@@ -35,7 +35,7 @@ final class ContentDispositionFilenameParser {
   public static function parseFilename(Request $request): string {
     // Firstly, check the header exists.
     if (!$request->headers->has('content-disposition')) {
-      throw new BadRequestHttpException('"Content-Disposition" header is required. A file name in the format "filename=FILENAME" must be provided.');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('"Content-Disposition" header is required. A file name in the format "filename=FILENAME" must be provided.');
     }
 
     $content_disposition = $request->headers->get('content-disposition');
@@ -44,12 +44,12 @@ final class ContentDispositionFilenameParser {
     // i.e. 'filename=""'. This also matches on a word boundary so other keys
     // like 'not_a_filename' don't work.
     if (!preg_match(static::REQUEST_HEADER_FILENAME_REGEX, $content_disposition, $matches)) {
-      throw new BadRequestHttpException('No filename found in "Content-Disposition" header. A file name in the format "filename=FILENAME" must be provided.');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('No filename found in "Content-Disposition" header. A file name in the format "filename=FILENAME" must be provided.');
     }
 
     // Check for the "filename*" format. This is currently unsupported.
     if (!empty($matches['star'])) {
-      throw new BadRequestHttpException('The extended "filename*" format is currently not supported in the "Content-Disposition" header.');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('The extended "filename*" format is currently not supported in the "Content-Disposition" header.');
     }
 
     // Don't validate the actual filename here, that will be done by the upload

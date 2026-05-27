@@ -109,7 +109,7 @@ final class ImportStorageTransformer {
     if (!$this->requestLock->acquire(self::LOCK_NAME)) {
       $this->requestLock->wait(self::LOCK_NAME);
       if (!$this->requestLock->acquire(self::LOCK_NAME)) {
-        throw new StorageTransformerException("Cannot acquire config import transformer lock.");
+        throw new \Drupal\Core\Config\StorageTransformerException("Cannot acquire config import transformer lock.");
       }
     }
 

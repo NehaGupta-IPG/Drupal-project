@@ -338,7 +338,7 @@ class SearchCommentTest extends BrowserTestBase {
         $this->assertSession()->pageTextContains('Your search yielded no results.');
       }
     }
-    catch (ResponseTextException) {
+    catch (\Behat\Mink\Exception\ResponseTextException) {
       $this->fail($message);
     }
   }

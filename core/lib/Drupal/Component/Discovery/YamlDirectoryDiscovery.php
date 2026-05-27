@@ -86,8 +86,8 @@ class YamlDirectoryDiscovery implements DiscoverableInterface {
         try {
           $data = Yaml::decode(file_get_contents($file)) ?: [];
         }
-        catch (InvalidDataTypeException $e) {
-          throw new DiscoveryException("The $file contains invalid YAML", 0, $e);
+        catch (\Drupal\Component\Serialization\Exception\InvalidDataTypeException $e) {
+          throw new \Drupal\Component\Discovery\DiscoveryException("The $file contains invalid YAML", 0, $e);
         }
         $data[static::FILE_KEY] = $file;
         $all[$provider][$this->getIdentifier($file, $data)] = $data;
@@ -111,7 +111,7 @@ class YamlDirectoryDiscovery implements DiscoverableInterface {
    */
   protected function getIdentifier($file, array $data) {
     if (!isset($data[$this->idKey])) {
-      throw new DiscoveryException("The $file contains no data in the identifier key '{$this->idKey}'");
+      throw new \Drupal\Component\Discovery\DiscoveryException("The $file contains no data in the identifier key '{$this->idKey}'");
     }
     return $data[$this->idKey];
   }

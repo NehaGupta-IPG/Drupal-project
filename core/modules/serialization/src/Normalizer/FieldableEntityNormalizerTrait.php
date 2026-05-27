@@ -72,7 +72,7 @@ trait FieldableEntityNormalizerTrait {
 
     // Don't try to create an entity without an entity type id.
     if (!$entity_type_definition) {
-      throw new UnexpectedValueException(sprintf('The specified entity type "%s" does not exist. A valid entity type is required for denormalization', $entity_type_id));
+      throw new \Symfony\Component\Serializer\Exception\UnexpectedValueException(sprintf('The specified entity type "%s" does not exist. A valid entity type is required for denormalization', $entity_type_id));
     }
 
     return $entity_type_definition;
@@ -112,12 +112,12 @@ trait FieldableEntityNormalizerTrait {
 
     // Make sure a bundle has been provided.
     if (!is_string($bundle_value)) {
-      throw new UnexpectedValueException(sprintf('Could not determine entity type bundle: "%s" field is missing.', $bundle_key));
+      throw new \Symfony\Component\Serializer\Exception\UnexpectedValueException(sprintf('Could not determine entity type bundle: "%s" field is missing.', $bundle_key));
     }
 
     // Make sure the submitted bundle is a valid bundle for the entity type.
     if ($bundle_types && !in_array($bundle_value, $bundle_types)) {
-      throw new UnexpectedValueException(sprintf('"%s" is not a valid bundle type for denormalization.', $bundle_value));
+      throw new \Symfony\Component\Serializer\Exception\UnexpectedValueException(sprintf('"%s" is not a valid bundle type for denormalization.', $bundle_value));
     }
 
     return [$bundle_key => $bundle_value];

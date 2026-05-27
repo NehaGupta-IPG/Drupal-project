@@ -33,7 +33,7 @@ class ClassResolverConstraintValidator extends ConstraintValidator implements Co
   public function validate(mixed $value, Constraint $constraint): void {
 
     if (!$constraint instanceof ClassResolverConstraint) {
-      throw new UnexpectedTypeException($constraint, ClassResolverConstraint::class);
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($constraint, ClassResolverConstraint::class);
     }
     $service = $this->classResolver->getInstanceFromDefinition($constraint->classOrService);
 

@@ -268,7 +268,7 @@ class HelpTopicsSyntaxTest extends KernelTestBase implements NodeVisitorInterfac
     try {
       $this->verifyTopic($id, $definitions);
     }
-    catch (ExpectationFailedException | AssertionFailedError $e) {
+    catch (\PHPUnit\Framework\ExpectationFailedException | AssertionFailedError $e) {
       $found_error = TRUE;
       $message = $e->getMessage();
       switch ($bad_topic_type) {

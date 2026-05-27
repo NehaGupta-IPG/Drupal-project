@@ -220,7 +220,7 @@ class MenuLinkParent extends ProcessPluginBase implements ContainerFactoryPlugin
     }
 
     // Parent could not be determined.
-    throw new MigrateSkipRowException(sprintf("No parent link found for plid '%d' in menu '%s'.", $parent_id, $value[0]));
+    throw new \Drupal\migrate\MigrateSkipRowException(sprintf("No parent link found for plid '%d' in menu '%s'.", $parent_id, $value[0]));
   }
 
 }

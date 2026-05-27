@@ -92,7 +92,7 @@ class AddNavigationBlockConfigActionTest extends KernelTestBase {
    * Checks invalid config exception.
    */
   public function testActionOnlySupportsNavigationConfig(): void {
-    $this->expectException(ConfigActionException::class);
+    $this->expectException(\Drupal\Core\Config\Action\ConfigActionException::class);
     $this->expectExceptionMessage('addNavigationBlock can only be executed for the navigation.block_layout config.');
     // Try to apply the Config Action against an unexpected config entity.
     /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */

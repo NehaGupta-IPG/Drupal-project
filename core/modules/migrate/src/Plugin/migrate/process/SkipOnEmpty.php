@@ -101,7 +101,7 @@ class SkipOnEmpty extends ProcessPluginBase {
   public function row($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
     if (!$value) {
       $message = !empty($this->configuration['message']) ? $this->configuration['message'] : '';
-      throw new MigrateSkipRowException($message);
+      throw new \Drupal\migrate\MigrateSkipRowException($message);
     }
     return $value;
   }

@@ -383,7 +383,7 @@ class FetchTest extends DatabaseTestBase {
       $result->rowCount();
       $exception = FALSE;
     }
-    catch (RowCountException) {
+    catch (\Drupal\Core\Database\RowCountException) {
       $exception = TRUE;
     }
     $this->assertTrue($exception, 'Exception was thrown');

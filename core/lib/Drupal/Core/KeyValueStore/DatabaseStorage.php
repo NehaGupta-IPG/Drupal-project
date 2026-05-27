@@ -296,7 +296,7 @@ class DatabaseStorage extends StorageBase {
     }
     // If the table already exists, then attempting to recreate it will throw an
     // exception. In this case just catch the exception and do nothing.
-    catch (DatabaseException) {
+    catch (\Drupal\Core\Database\DatabaseException) {
     }
     catch (\Exception) {
       return FALSE;
@@ -319,7 +319,7 @@ class DatabaseStorage extends StorageBase {
    * @throws \Exception
    */
   protected function catchException(\Exception $e) {
-    if (!($e instanceof DatabaseException) && $this->connection->schema()->tableExists($this->table)) {
+    if (!($e instanceof \Drupal\Core\Database\DatabaseException) && $this->connection->schema()->tableExists($this->table)) {
       throw $e;
     }
   }

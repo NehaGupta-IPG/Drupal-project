@@ -54,7 +54,7 @@ final class AddModeration implements ConfigActionPluginInterface, ContainerFacto
 
     $plugin = $workflow->getTypePlugin();
     if (!$plugin instanceof ContentModerationInterface) {
-      throw new ConfigActionException("The $this->pluginId config action only works with Content Moderation workflows.");
+      throw new \Drupal\Core\Config\Action\ConfigActionException("The $this->pluginId config action only works with Content Moderation workflows.");
     }
 
     assert($value === '*' || is_array($value));

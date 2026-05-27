@@ -7,7 +7,7 @@ use Drupal\Core\StringTranslation\TranslationInterface;
 /**
  * Exception thrown if Drupal is installed already.
  */
-class AlreadyInstalledException extends InstallerException {
+class AlreadyInstalledException extends \Drupal\Core\Installer\Exception\InstallerException {
 
   /**
    * Constructs a new "already installed" exception.

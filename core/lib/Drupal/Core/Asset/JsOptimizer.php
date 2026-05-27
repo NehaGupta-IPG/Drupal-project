@@ -54,7 +54,7 @@ class JsOptimizer implements AssetOptimizerInterface {
       return $renderer->render($ast);
     }
     catch (\Exception $exception) {
-      if ($exception instanceof PeastSyntaxException) {
+      if ($exception instanceof \Peast\Syntax\Exception) {
         $position = $exception->getPosition();
         Error::logException($this->logger, $exception, 'Syntax error:  @message, File: @asset_file, Line: @asset_line, Column: @asset_column, Index: @asset_index', [
           '@asset_file' => $js_asset['data'],

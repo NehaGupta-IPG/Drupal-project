@@ -27,7 +27,7 @@ function image_uninstall(): void {
   try {
     $file_system->deleteRecursive(\Drupal::config('system.file')->get('default_scheme') . '://styles');
   }
-  catch (FileException) {
+  catch (\Drupal\Core\File\Exception\FileException) {
     // Ignore failed deletes.
   }
 }

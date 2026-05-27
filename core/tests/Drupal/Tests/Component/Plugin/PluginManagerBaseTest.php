@@ -30,7 +30,7 @@ class PluginManagerBaseTest extends TestCase {
     $plugin_id = $args[0];
     $configuration = $args[1];
     if ('invalid' == $plugin_id) {
-      throw new PluginNotFoundException($plugin_id);
+      throw new \Drupal\Component\Plugin\Exception\PluginNotFoundException($plugin_id);
     }
     return [
       'plugin_id' => $plugin_id,

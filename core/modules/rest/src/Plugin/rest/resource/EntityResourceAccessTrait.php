@@ -27,7 +27,7 @@ trait EntityResourceAccessTrait {
     // so the 'edit' operation is used here.
     foreach ($entity->_restSubmittedFields as $field_name) {
       if (!$entity->get($field_name)->access('edit')) {
-        throw new AccessDeniedHttpException("Access denied on creating field '$field_name'.");
+        throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException("Access denied on creating field '$field_name'.");
       }
     }
   }

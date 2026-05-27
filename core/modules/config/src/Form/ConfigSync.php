@@ -243,7 +243,7 @@ class ConfigSync extends FormBase {
 
         batch_set($batch_builder->toArray());
       }
-      catch (ConfigImporterException) {
+      catch (\Drupal\Core\Config\ConfigImporterException) {
         // There are validation errors.
         $this->messenger()->addError($this->t('The configuration cannot be imported because it failed validation for the following reasons:'));
         foreach ($config_importer->getErrors() as $message) {

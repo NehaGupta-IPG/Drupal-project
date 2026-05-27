@@ -90,7 +90,7 @@ class SortTest extends UnitTestCase {
    */
   #[DataProvider('badParameterProvider')]
   public function testCreateFromQueryParameterFail(string|array $input): void {
-    $this->expectException(BadRequestHttpException::class);
+    $this->expectException(\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class);
     Sort::createFromQueryParameter($input);
   }
 

@@ -36,14 +36,14 @@ class ConditionAccessResolverTraitTest extends UnitTestCase {
     $mocks['exception'] = $this->createStub(ConditionInterface::class);
     $mocks['exception']
       ->method('execute')
-      ->will($this->throwException(new ContextException()));
+      ->will($this->throwException(new \Drupal\Component\Plugin\Exception\ContextException()));
     $mocks['exception']
       ->method('isNegated')
       ->willReturn(FALSE);
     $mocks['negated'] = $this->createStub(ConditionInterface::class);
     $mocks['negated']
       ->method('execute')
-      ->will($this->throwException(new ContextException()));
+      ->will($this->throwException(new \Drupal\Component\Plugin\Exception\ContextException()));
     $mocks['negated']
       ->method('isNegated')
       ->willReturn(TRUE);

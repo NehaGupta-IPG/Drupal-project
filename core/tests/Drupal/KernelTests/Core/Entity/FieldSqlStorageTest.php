@@ -358,7 +358,7 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
 
     // Attempt to update the field in a way that would work without data.
     $field_storage->setSetting('scale', 3);
-    $this->expectException(FieldStorageDefinitionUpdateForbiddenException::class);
+    $this->expectException(\Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException::class);
     $field_storage->save();
   }
 

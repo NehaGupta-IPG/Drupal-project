@@ -5,7 +5,7 @@ namespace Drupal\Component\Plugin\Exception;
 /**
  * An exception class thrown when contexts exist but are missing a value.
  */
-class MissingValueContextException extends ContextException {
+class MissingValueContextException extends \Drupal\Component\Plugin\Exception\ContextException {
 
   /**
    * MissingValueContextException constructor.

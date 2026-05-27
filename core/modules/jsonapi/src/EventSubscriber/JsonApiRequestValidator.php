@@ -93,13 +93,13 @@ class JsonApiRequestValidator implements EventSubscriberInterface {
     // direction. (This is special cased because using it is pretty common.)
     if (in_array('_format', $invalid_query_params, TRUE)) {
       $uri_without_query_string = $request->getSchemeAndHttpHost() . $request->getBaseUrl() . $request->getPathInfo();
-      $exception = new CacheableBadRequestHttpException((new CacheableMetadata())->addCacheContexts(['url.query_args']), 'JSON:API does not need that ugly \'_format\' query string! 🤘 Use the URL provided in \'links\' 🙏');
+      $exception = new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException((new CacheableMetadata())->addCacheContexts(['url.query_args']), 'JSON:API does not need that ugly \'_format\' query string! 🤘 Use the URL provided in \'links\' 🙏');
       $exception->setHeaders(['Link' => $uri_without_query_string]);
       throw $exception;
     }
 
     $message = sprintf('The following query parameters violate the JSON:API spec: \'%s\'.', implode("', '", $invalid_query_params));
-    $exception = new CacheableBadRequestHttpException((new CacheableMetadata())->addCacheContexts(['url.query_args']), $message);
+    $exception = new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException((new CacheableMetadata())->addCacheContexts(['url.query_args']), $message);
     $exception->setHeaders(['Link' => 'https://jsonapi.org/format/#query-parameters']);
     throw $exception;
   }

@@ -118,7 +118,7 @@ class SectionStorageManagerTest extends UnitTestCase {
       'the_context' => $this->prophesize(ContextInterface::class)->reveal(),
     ];
 
-    $this->contextHandler->applyContextMapping($this->plugin, $contexts)->willThrow(new ContextException());
+    $this->contextHandler->applyContextMapping($this->plugin, $contexts)->willThrow(new \Drupal\Component\Plugin\Exception\ContextException());
 
     $result = $this->manager->load('the_plugin_id', $contexts);
     $this->assertNull($result);
@@ -176,7 +176,7 @@ class SectionStorageManagerTest extends UnitTestCase {
     $this->contextHandler->filterPluginDefinitionsByContexts($contexts, $definitions)->willReturnArgument(1);
     $this->contextHandler->applyContextMapping($no_access, $contexts)->shouldBeCalled();
     $this->contextHandler->applyContextMapping($provider_access, $contexts)->shouldBeCalled();
-    $this->contextHandler->applyContextMapping($missing_contexts, $contexts)->willThrow(new ContextException());
+    $this->contextHandler->applyContextMapping($missing_contexts, $contexts)->willThrow(new \Drupal\Component\Plugin\Exception\ContextException());
 
     $this->factory->createInstance('no_access', [])->willReturn($no_access->reveal());
     $this->factory->createInstance('missing_contexts', [])->willReturn($missing_contexts->reveal());

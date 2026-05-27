@@ -165,7 +165,7 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
       }
     }
     // @todo Remove in https://www.drupal.org/project/drupal/issues/2367555.
-    catch (EnforcedResponseException $e) {
+    catch (\Drupal\Core\Form\EnforcedResponseException $e) {
       throw $e;
     }
     catch (\Exception $e) {

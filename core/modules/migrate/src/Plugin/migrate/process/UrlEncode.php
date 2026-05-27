@@ -39,7 +39,7 @@ class UrlEncode extends ProcessPluginBase {
       $parsed_url = parse_url($value);
       // Fail on seriously malformed URLs.
       if ($parsed_url === FALSE) {
-        throw new MigrateException("Value '$value' is not a valid URL");
+        throw new \Drupal\migrate\MigrateException("Value '$value' is not a valid URL");
       }
       // Iterate over specific pieces of the URL raw URL encoding each one.
       $url_parts_to_encode = ['path', 'query', 'fragment'];

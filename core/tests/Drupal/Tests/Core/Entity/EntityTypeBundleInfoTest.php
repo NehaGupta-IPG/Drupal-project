@@ -137,7 +137,7 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
           return NULL;
         }
         else {
-          throw new PluginNotFoundException($entity_type_id);
+          throw new \Drupal\Component\Plugin\Exception\PluginNotFoundException($entity_type_id);
         }
       });
     $this->entityTypeManager->getDefinitions()->willReturn($definitions);

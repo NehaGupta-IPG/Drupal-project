@@ -27,7 +27,7 @@ class CanaryTransportFactory extends AbstractTransportFactory implements Transpo
       return new CanaryTransport($this->dispatcher, $this->logger);
     }
 
-    throw new UnsupportedSchemeException($dsn, 'test_canary', $this->getSupportedSchemes());
+    throw new \Symfony\Component\Mailer\Exception\UnsupportedSchemeException($dsn, 'test_canary', $this->getSupportedSchemes());
   }
 
 }

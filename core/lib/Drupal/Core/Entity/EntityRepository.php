@@ -57,7 +57,7 @@ class EntityRepository implements EntityRepositoryInterface {
     $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
 
     if (!$uuid_key = $entity_type->getKey('uuid')) {
-      throw new EntityStorageException("Entity type $entity_type_id does not support UUIDs.");
+      throw new \Drupal\Core\Entity\EntityStorageException("Entity type $entity_type_id does not support UUIDs.");
     }
 
     $entities = $this->entityTypeManager->getStorage($entity_type_id)->loadByProperties([$uuid_key => $uuid]);

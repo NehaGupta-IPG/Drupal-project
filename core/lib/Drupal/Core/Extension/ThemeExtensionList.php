@@ -222,7 +222,7 @@ class ThemeExtensionList extends ExtensionList {
     $info = parent::createExtensionInfo($extension);
 
     if (!isset($info['base theme'])) {
-      throw new InfoParserException(sprintf('Missing required key ("base theme") in %s, see https://www.drupal.org/node/3066038', $extension->getPathname()));
+      throw new \Drupal\Core\Extension\InfoParserException(sprintf('Missing required key ("base theme") in %s, see https://www.drupal.org/node/3066038', $extension->getPathname()));
     }
 
     // Remove the base theme when 'base theme: false' is set in a theme

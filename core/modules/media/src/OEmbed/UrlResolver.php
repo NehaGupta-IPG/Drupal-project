@@ -100,7 +100,7 @@ class UrlResolver implements UrlResolverInterface {
       return $this->resourceFetcher->fetchResource($resource_url)->getProvider();
     }
 
-    throw new ResourceException("No matching oEmbed provider found for resource: \"{$url}\"", $url);
+    throw new \Drupal\media\OEmbed\ResourceException("No matching oEmbed provider found for resource: \"{$url}\"", $url);
   }
 
   /**

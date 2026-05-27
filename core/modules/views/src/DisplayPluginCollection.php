@@ -85,7 +85,7 @@ class DisplayPluginCollection extends DefaultLazyPluginCollection {
     }
     // Catch any plugin exceptions that are thrown. So we can fail nicely if a
     // display plugin isn't found.
-    catch (PluginException $e) {
+    catch (\Drupal\Component\Plugin\Exception\PluginException $e) {
       $message = $e->getMessage();
       \Drupal::messenger()->addWarning($this->t('@message', ['@message' => $message]));
     }

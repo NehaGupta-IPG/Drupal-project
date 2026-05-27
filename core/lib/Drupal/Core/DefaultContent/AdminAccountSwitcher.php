@@ -61,7 +61,7 @@ final class AdminAccountSwitcher implements AccountSwitcherInterface {
       $this->switchTo($account);
       return $account;
     }
-    throw new AccessException("There are no user accounts with administrative roles.");
+    throw new \Drupal\Core\Access\AccessException("There are no user accounts with administrative roles.");
   }
 
   /**

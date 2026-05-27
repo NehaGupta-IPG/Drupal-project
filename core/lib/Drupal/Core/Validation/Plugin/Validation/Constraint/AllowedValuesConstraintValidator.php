@@ -89,7 +89,7 @@ class AllowedValuesConstraintValidator extends ChoiceValidator implements Contai
         && !\is_callable($choices = [$this->context->getClassName(), $constraint->callback])
         && !\is_callable($choices = $constraint->callback)
       ) {
-        throw new ConstraintDefinitionException('The AllowedValuesConstraint constraint expects a valid callback');
+        throw new \Symfony\Component\Validator\Exception\ConstraintDefinitionException('The AllowedValuesConstraint constraint expects a valid callback');
       }
       $allowed_values = \call_user_func($choices);
       $constraint->choices = $allowed_values;

@@ -90,7 +90,7 @@ class ConfigEntityType extends EntityType implements ConfigEntityTypeInterface {
     }
 
     if (strlen($config_prefix) > static::PREFIX_LENGTH) {
-      throw new ConfigPrefixLengthException("The configuration file name prefix $config_prefix exceeds the maximum character limit of " . static::PREFIX_LENGTH);
+      throw new \Drupal\Core\Config\ConfigPrefixLengthException("The configuration file name prefix $config_prefix exceeds the maximum character limit of " . static::PREFIX_LENGTH);
     }
     return $config_prefix;
   }
@@ -141,7 +141,7 @@ class ConfigEntityType extends EntityType implements ConfigEntityTypeInterface {
    */
   protected function checkStorageClass($class) {
     if (!is_a($class, 'Drupal\Core\Config\Entity\ConfigEntityStorage', TRUE)) {
-      throw new ConfigEntityStorageClassException("$class is not \\Drupal\\Core\\Config\\Entity\\ConfigEntityStorage or it does not extend it");
+      throw new \Drupal\Core\Config\Entity\Exception\ConfigEntityStorageClassException("$class is not \\Drupal\\Core\\Config\\Entity\\ConfigEntityStorage or it does not extend it");
     }
   }
 

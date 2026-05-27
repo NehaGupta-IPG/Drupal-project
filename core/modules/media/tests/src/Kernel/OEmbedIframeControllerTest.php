@@ -173,7 +173,7 @@ class OEmbedIframeControllerTest extends MediaKernelTestBase {
     $url_resolver = $this->prophesize(UrlResolverInterface::class);
     $resource_fetcher = $this->prophesize(ResourceFetcherInterface::class);
 
-    $resource_fetcher->fetchResource(Argument::cetera())->willThrow(new ResourceException(
+    $resource_fetcher->fetchResource(Argument::cetera())->willThrow(new \Drupal\media\OEmbed\ResourceException(
       'Error while fetching resource.',
       'https://youtube.com/foo',
     ));

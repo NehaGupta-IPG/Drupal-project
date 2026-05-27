@@ -123,7 +123,7 @@ class EntityNormalizerTest extends UnitTestCase {
     $this->entityTypeManager->expects($this->never())
       ->method('getStorage');
 
-    $this->expectException(UnexpectedValueException::class);
+    $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
     $this->entityNormalizer->denormalize([], ContentEntityBaseMockableClass::class);
   }
 
@@ -318,7 +318,7 @@ class EntityNormalizerTest extends UnitTestCase {
       ->with('test_bundle')
       ->willReturn($entity_type_storage);
 
-    $this->expectException(UnexpectedValueException::class);
+    $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
     $this->entityNormalizer->denormalize($test_data, ContentEntityBaseMockableClass::class, NULL, ['entity_type' => 'test']);
   }
 

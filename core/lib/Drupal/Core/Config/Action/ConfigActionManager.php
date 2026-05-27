@@ -124,7 +124,7 @@ class ConfigActionManager extends DefaultPluginManager {
   public function applyAction(string $action_id, string $configName, mixed $data): void {
     if (str_starts_with($configName, '?')) {
       if (str_contains($configName, '*')) {
-        throw new ConfigActionException("The '$configName' configuration name is optional because it starts with a question mark, and therefore cannot contain wildcards.");
+        throw new \Drupal\Core\Config\Action\ConfigActionException("The '$configName' configuration name is optional because it starts with a question mark, and therefore cannot contain wildcards.");
       }
       $configName = trim($configName, '?');
       if (!$this->configStorage->exists($configName)) {
@@ -145,12 +145,12 @@ class ConfigActionManager extends DefaultPluginManager {
       /** @var \Drupal\Core\Config\Action\ConfigActionPluginInterface $action */
       $action = $this->createInstance($action_id);
     }
-    catch (PluginNotFoundException $e) {
+    catch (\Drupal\Component\Plugin\Exception\PluginNotFoundException $e) {
       $entity_type = $this->configManager->getEntityTypeIdByName($configName);
       if ($entity_type) {
         $action_ids = $this->getShorthandActionIdsForEntityType($entity_type);
         $valid_ids = implode(', ', array_keys($action_ids));
-        throw new PluginNotFoundException($action_id, sprintf('The "%s" entity does not support the "%s" config action. Valid config actions for %s are: %s', $entity_type, $action_id, $entity_type, $valid_ids));
+        throw new \Drupal\Component\Plugin\Exception\PluginNotFoundException($action_id, sprintf('The "%s" entity does not support the "%s" config action. Valid config actions for %s are: %s', $entity_type, $action_id, $entity_type, $valid_ids));
       }
       throw $e;
     }
@@ -167,7 +167,7 @@ class ConfigActionManager extends DefaultPluginManager {
           /** @var \Symfony\Component\Validator\ConstraintViolationList $violations */
           $violations = $typed_config->validate();
           if (count($violations) > 0) {
-            throw new InvalidConfigException($violations, $typed_config);
+            throw new \Drupal\Core\Recipe\InvalidConfigException($violations, $typed_config);
           }
           break;
         }
@@ -207,7 +207,7 @@ class ConfigActionManager extends DefaultPluginManager {
 
     $entity_type = $this->configManager->getEntityTypeIdByName($expression);
     if (empty($entity_type)) {
-      throw new ConfigActionException("No installed config entity type uses the prefix in the expression '$expression'. Either there is a typo in the expression or this recipe should install an additional module or depend on another recipe.");
+      throw new \Drupal\Core\Config\Action\ConfigActionException("No installed config entity type uses the prefix in the expression '$expression'. Either there is a typo in the expression or this recipe should install an additional module or depend on another recipe.");
     }
     /** @var \Drupal\Core\Config\Entity\ConfigEntityTypeInterface $entity_type */
     $entity_type = $this->configManager->getEntityTypeManager()
@@ -220,7 +220,7 @@ class ConfigActionManager extends DefaultPluginManager {
     $expression = str_replace('\\*', '[^.:?*<>"\'\/\\\\]+', preg_quote($expression));
     $matches = @preg_grep("/^$expression$/", $this->configStorage->listAll("$prefix."));
     if ($matches === FALSE) {
-      throw new ConfigActionException("The expression '$expression' could not be parsed.");
+      throw new \Drupal\Core\Config\Action\ConfigActionException("The expression '$expression' could not be parsed.");
     }
     return $matches;
   }
@@ -242,7 +242,7 @@ class ConfigActionManager extends DefaultPluginManager {
         $regex = '/' . PluginBase::DERIVATIVE_SEPARATOR . '([^' . PluginBase::DERIVATIVE_SEPARATOR . ']*)$/';
         $action_id = preg_match($regex, $plugin_id, $matches) ? $matches[1] : $plugin_id;
         if (isset($map[$action_id])) {
-          throw new DuplicateConfigActionIdException(sprintf('The plugins \'%s\' and \'%s\' both resolve to the same shorthand action ID for the \'%s\' entity type', $plugin_id, $map[$action_id], $entityType));
+          throw new \Drupal\Core\Config\Action\DuplicateConfigActionIdException(sprintf('The plugins \'%s\' and \'%s\' both resolve to the same shorthand action ID for the \'%s\' entity type', $plugin_id, $map[$action_id], $entityType));
         }
         $map[$action_id] = $plugin_id;
       }

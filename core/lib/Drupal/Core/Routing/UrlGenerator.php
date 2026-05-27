@@ -186,7 +186,7 @@ class UrlGenerator implements UrlGeneratorInterface {
 
     // All params must be given.
     if ($diff = array_diff_key($variables, $mergedParams)) {
-      throw new MissingMandatoryParametersException($name, array_keys($diff));
+      throw new \Symfony\Component\Routing\Exception\MissingMandatoryParametersException($name, array_keys($diff));
     }
 
     $url = '';
@@ -211,7 +211,7 @@ class UrlGenerator implements UrlGeneratorInterface {
           // Check requirement.
           if (!preg_match('#^' . $token[2] . '$#', $mergedParams[$token[3]])) {
             $message = sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given) to generate a corresponding URL.', $token[3], $name, $token[2], $mergedParams[$token[3]]);
-            throw new InvalidParameterException($message);
+            throw new \Symfony\Component\Routing\Exception\InvalidParameterException($message);
           }
 
           $url = $token[1] . $mergedParams[$token[3]] . $url;

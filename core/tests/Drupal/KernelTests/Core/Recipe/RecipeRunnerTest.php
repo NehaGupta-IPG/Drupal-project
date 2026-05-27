@@ -121,7 +121,7 @@ class RecipeRunnerTest extends KernelTestBase {
     $type->setNewRevision(FALSE);
     $type->save();
 
-    $this->expectException(RecipePreExistingConfigException::class);
+    $this->expectException(\Drupal\Core\Recipe\RecipePreExistingConfigException::class);
     $this->expectExceptionMessage("The configuration 'node.type.test' exists already and does not match the recipe's configuration");
     Recipe::createFromDirectory('core/tests/fixtures/recipes/install_node_with_config');
   }
@@ -253,7 +253,7 @@ config:
 YAML;
 
     $recipe = $this->createRecipe($recipe_data);
-    $this->expectException(PluginNotFoundException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\PluginNotFoundException::class);
     $this->expectExceptionMessage('The "setFoo" plugin does not exist.');
     RecipeRunner::processRecipe($recipe);
   }
@@ -275,7 +275,7 @@ config:
 YAML;
 
     $recipe = $this->createRecipe($recipe_data);
-    $this->expectException(PluginNotFoundException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\PluginNotFoundException::class);
     $this->expectExceptionMessage('The "config_test" entity does not support the "setBody" config action.');
     RecipeRunner::processRecipe($recipe);
   }

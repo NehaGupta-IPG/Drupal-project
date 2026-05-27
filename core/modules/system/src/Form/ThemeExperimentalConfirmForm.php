@@ -181,7 +181,7 @@ class ThemeExperimentalConfirmForm extends ConfirmFormBase {
         $this->messenger()->addError($this->t('The %theme theme was not found.', ['%theme' => $theme]));
       }
     }
-    catch (PreExistingConfigException $e) {
+    catch (\Drupal\Core\Config\PreExistingConfigException $e) {
       $config_objects = $e->flattenConfigObjects($e->getConfigObjects());
       $this->messenger()->addError(
         $this->formatPlural(
@@ -194,7 +194,7 @@ class ThemeExperimentalConfirmForm extends ConfirmFormBase {
           ])
       );
     }
-    catch (UnmetDependenciesException $e) {
+    catch (\Drupal\Core\Config\UnmetDependenciesException $e) {
       $this->messenger()->addError($e->getTranslatedMessage($this->getStringTranslation(), $theme));
     }
     $form_state->setRedirectUrl($this->getCancelUrl());

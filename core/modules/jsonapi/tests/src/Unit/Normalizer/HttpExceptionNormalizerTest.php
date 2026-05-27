@@ -47,7 +47,7 @@ class HttpExceptionNormalizerTest extends UnitTestCase {
     $container->get('cache_contexts_manager')->willReturn($cache_contexts_manager->reveal());
     \Drupal::setContainer($container->reveal());
     $cacheability = new TestCacheableDependency([], [], Cache::PERMANENT);
-    $exception = new CacheableAccessDeniedHttpException($cacheability, 'lorem', NULL, 13);
+    $exception = new \Drupal\Core\Http\Exception\CacheableAccessDeniedHttpException($cacheability, 'lorem', NULL, 13);
     $current_user = $this->prophesize(AccountInterface::class);
     $current_user->hasPermission('access site reports')->willReturn(TRUE);
     $normalizer = new HttpExceptionNormalizer($current_user->reveal());

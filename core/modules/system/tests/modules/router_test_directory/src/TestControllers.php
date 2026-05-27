@@ -63,7 +63,7 @@ class TestControllers {
         $text = sprintf('User route "%s" was matched.', $match[RouteObjectInterface::ROUTE_NAME]);
       }
     }
-    catch (ParamNotConvertedException) {
+    catch (\Drupal\Core\ParamConverter\ParamNotConvertedException) {
     }
     return new Response($text);
   }

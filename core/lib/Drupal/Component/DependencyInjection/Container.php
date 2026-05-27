@@ -112,7 +112,7 @@ class Container implements ContainerInterface, ResetInterface {
    */
   public function __construct(array $container_definition = []) {
     if (!empty($container_definition) && (!isset($container_definition['machine_format']) || $container_definition['machine_format'] !== TRUE)) {
-      throw new InvalidArgumentException('The non-optimized format is not supported by this class. Use an optimized machine-readable format instead, e.g. as produced by \Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper.');
+      throw new \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException('The non-optimized format is not supported by this class. Use an optimized machine-readable format instead, e.g. as produced by \Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper.');
     }
 
     $this->aliases = $container_definition['aliases'] ?? [];
@@ -140,17 +140,17 @@ class Container implements ContainerInterface, ResetInterface {
     }
 
     if (isset($this->loading[$id])) {
-      throw new ServiceCircularReferenceException($id, array_keys($this->loading));
+      throw new \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException($id, array_keys($this->loading));
     }
 
     $definition = $this->serviceDefinitions[$id] ?? NULL;
 
     if (!$definition && $invalid_behavior === ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
       if (!$id) {
-        throw new ServiceNotFoundException('');
+        throw new \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException('');
       }
 
-      throw new ServiceNotFoundException($id, NULL, NULL, $this->getServiceAlternatives($id));
+      throw new \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException($id, NULL, NULL, $this->getServiceAlternatives($id));
     }
 
     // In case something else than ContainerInterface::NULL_ON_INVALID_REFERENCE
@@ -229,7 +229,7 @@ class Container implements ContainerInterface, ResetInterface {
    */
   protected function createService(array $definition, $id) {
     if (isset($definition['synthetic']) && $definition['synthetic'] === TRUE) {
-      throw new RuntimeException(sprintf('You have requested a synthetic service ("%s"). The service container does not know how to construct this service. The service will need to be set before it is first used.', $id));
+      throw new \Symfony\Component\DependencyInjection\Exception\RuntimeException(sprintf('You have requested a synthetic service ("%s"). The service container does not know how to construct this service. The service will need to be set before it is first used.', $id));
     }
 
     $arguments = [];
@@ -252,7 +252,7 @@ class Container implements ContainerInterface, ResetInterface {
         $factory = $this->resolveServicesAndParameters([$factory[0], $factory[1]]);
       }
       elseif (!is_string($factory)) {
-        throw new RuntimeException(sprintf('Cannot create service "%s" because of invalid factory', $id));
+        throw new \Symfony\Component\DependencyInjection\Exception\RuntimeException(sprintf('Cannot create service "%s" because of invalid factory', $id));
       }
 
       $service = call_user_func_array($factory, $arguments);
@@ -296,7 +296,7 @@ class Container implements ContainerInterface, ResetInterface {
       }
 
       if (!is_callable($callable)) {
-        throw new InvalidArgumentException(sprintf('The configurator for class "%s" is not a callable.', get_class($service)));
+        throw new \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException(sprintf('The configurator for class "%s" is not a callable.', get_class($service)));
       }
 
       call_user_func($callable, $service);
@@ -324,7 +324,7 @@ class Container implements ContainerInterface, ResetInterface {
    */
   public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null {
     if (!\array_key_exists($name, $this->parameters)) {
-      throw new ParameterNotFoundException($name, NULL, NULL, NULL, $this->getParameterAlternatives($name));
+      throw new \Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException($name, NULL, NULL, NULL, $this->getParameterAlternatives($name));
     }
 
     return $this->parameters[$name];
@@ -342,7 +342,7 @@ class Container implements ContainerInterface, ResetInterface {
    */
   public function setParameter(string $name, array|bool|string|int|float|\UnitEnum|null $value): void {
     if ($this->frozen) {
-      throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
+      throw new \Symfony\Component\DependencyInjection\Exception\LogicException('Impossible to call set() on a frozen ParameterBag.');
     }
 
     $this->parameters[$name] = $value;
@@ -377,7 +377,7 @@ class Container implements ContainerInterface, ResetInterface {
     // Check if this collection needs to be resolved.
     if ($arguments instanceof \stdClass) {
       if ($arguments->type !== 'collection') {
-        throw new InvalidArgumentException(sprintf('Undefined type "%s" while resolving parameters and services.', $arguments->type));
+        throw new \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException(sprintf('Undefined type "%s" while resolving parameters and services.', $arguments->type));
       }
       $arguments = $arguments->value;
     }
@@ -478,7 +478,7 @@ class Container implements ContainerInterface, ResetInterface {
         }
 
         if ($type !== NULL) {
-          throw new InvalidArgumentException(sprintf('Undefined type "%s" while resolving parameters and services.', $type));
+          throw new \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException(sprintf('Undefined type "%s" while resolving parameters and services.', $type));
         }
       }
     }

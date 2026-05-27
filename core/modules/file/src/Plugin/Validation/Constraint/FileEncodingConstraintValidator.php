@@ -20,7 +20,7 @@ class FileEncodingConstraintValidator extends BaseFileConstraintValidator {
     /** @var \Drupal\file\Entity\FileInterface $file */
     $file = $this->assertValueIsFile($value);
     if (!$constraint instanceof FileEncodingConstraint) {
-      throw new UnexpectedTypeException($constraint, FileEncodingConstraint::class);
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($constraint, FileEncodingConstraint::class);
     }
 
     $encodings = $constraint->encodings;

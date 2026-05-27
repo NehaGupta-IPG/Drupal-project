@@ -112,11 +112,11 @@ final class Recipe {
    */
   private static function parse(string $file): array {
     if (!file_exists($file)) {
-      throw new RecipeFileException($file, "There is no $file file");
+      throw new \Drupal\Core\Recipe\RecipeFileException($file, "There is no $file file");
     }
     $recipe_contents = file_get_contents($file);
     if (!$recipe_contents) {
-      throw new RecipeFileException($file, "$file does not exist or could not be read.");
+      throw new \Drupal\Core\Recipe\RecipeFileException($file, "$file does not exist or could not be read.");
     }
     // Certain parts of our validation need to be able to scan for other
     // recipes.
@@ -319,7 +319,7 @@ final class Recipe {
     /** @var \Symfony\Component\Validator\ConstraintViolationList $violations */
     $violations = Validation::createValidator()->validate($recipe_data, $constraints);
     if (count($violations) > 0) {
-      throw RecipeFileException::fromViolationList($file, $violations);
+      throw \Drupal\Core\Recipe\RecipeFileException::fromViolationList($file, $violations);
     }
     $recipe_data += [
       'description' => '',
@@ -387,7 +387,7 @@ final class Recipe {
     try {
       RecipeConfigurator::getIncludedRecipe($include_path, $name);
     }
-    catch (UnknownRecipeException) {
+    catch (\Drupal\Core\Recipe\UnknownRecipeException) {
       $context->addViolation('The %name recipe does not exist.', ['%name' => $name]);
     }
   }

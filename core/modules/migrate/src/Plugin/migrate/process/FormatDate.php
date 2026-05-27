@@ -100,10 +100,10 @@ class FormatDate extends ProcessPluginBase {
 
     // Validate the configuration.
     if (empty($this->configuration['from_format'])) {
-      throw new MigrateException('Format date plugin is missing from_format configuration.');
+      throw new \Drupal\migrate\MigrateException('Format date plugin is missing from_format configuration.');
     }
     if (empty($this->configuration['to_format'])) {
-      throw new MigrateException('Format date plugin is missing to_format configuration.');
+      throw new \Drupal\migrate\MigrateException('Format date plugin is missing to_format configuration.');
     }
 
     $fromFormat = $this->configuration['from_format'];
@@ -128,10 +128,10 @@ class FormatDate extends ProcessPluginBase {
       $transformed = DateTimePlus::createFromFormat($fromFormat, $value, $from_timezone, $settings)->format($toFormat, ['timezone' => $to_timezone]);
     }
     catch (\InvalidArgumentException $e) {
-      throw new MigrateException(sprintf("Format date plugin could not transform '%s' using the format '%s'. Error: %s", $value, $fromFormat, $e->getMessage()), $e->getCode(), $e);
+      throw new \Drupal\migrate\MigrateException(sprintf("Format date plugin could not transform '%s' using the format '%s'. Error: %s", $value, $fromFormat, $e->getMessage()), $e->getCode(), $e);
     }
     catch (\UnexpectedValueException $e) {
-      throw new MigrateException(sprintf("Format date plugin could not transform '%s' using the format '%s'. Error: %s", $value, $fromFormat, $e->getMessage()), $e->getCode(), $e);
+      throw new \Drupal\migrate\MigrateException(sprintf("Format date plugin could not transform '%s' using the format '%s'. Error: %s", $value, $fromFormat, $e->getMessage()), $e->getCode(), $e);
     }
 
     return $transformed;

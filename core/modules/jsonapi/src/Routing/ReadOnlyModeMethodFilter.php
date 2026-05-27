@@ -73,7 +73,7 @@ class ReadOnlyModeMethodFilter implements FilterInterface {
     if (count($collection)) {
       return $collection;
     }
-    throw new MethodNotAllowedHttpException(array_intersect($all_supported_methods, $read_only_methods), sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromRoute('jsonapi.settings')->setAbsolute()->toString(TRUE)->getGeneratedUrl()));
+    throw new \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException(array_intersect($all_supported_methods, $read_only_methods), sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromRoute('jsonapi.settings')->setAbsolute()->toString(TRUE)->getGeneratedUrl()));
   }
 
 }

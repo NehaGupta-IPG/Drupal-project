@@ -32,7 +32,7 @@ class FinalExceptionSubscriberTest extends UnitTestCase {
     // \Drupal\Core\StackMiddleware\NegotiationMiddleware normally takes care
     // of this so we'll hard code it here.
     $request->setRequestFormat('bananas');
-    $e = new MethodNotAllowedHttpException(['POST', 'PUT'], 'test message');
+    $e = new \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException(['POST', 'PUT'], 'test message');
     $event = new ExceptionEvent($kernel->reveal(), $request, HttpKernelInterface::MAIN_REQUEST, $e);
     $subscriber = new TestDefaultExceptionSubscriber($config_factory);
     $subscriber->setStringTranslation($this->getStringTranslationStub());

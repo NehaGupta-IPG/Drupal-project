@@ -43,7 +43,7 @@ class MethodFilter implements FilterInterface {
     if (count($collection)) {
       return $collection;
     }
-    throw new MethodNotAllowedException(array_unique(array_merge(...$all_supported_methods)));
+    throw new \Symfony\Component\Routing\Exception\MethodNotAllowedException(array_unique(array_merge(...$all_supported_methods)));
   }
 
 }

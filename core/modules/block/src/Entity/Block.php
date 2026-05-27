@@ -356,7 +356,7 @@ class Block extends ConfigEntityBase implements BlockInterface, EntityWithPlugin
       $regions = $theme_extension->listAllRegions();
       $default_region = $theme_extension->getDefaultRegion();
     }
-    catch (UnknownExtensionException) {
+    catch (\Drupal\Core\Extension\Exception\UnknownExtensionException) {
       $regions = [];
       $default_region = '';
     }
@@ -382,7 +382,7 @@ class Block extends ConfigEntityBase implements BlockInterface, EntityWithPlugin
       try {
         $theme_extension = \Drupal::service(ThemeHandlerInterface::class)->getTheme($theme);
       }
-      catch (UnknownExtensionException) {
+      catch (\Drupal\Core\Extension\Exception\UnknownExtensionException) {
       }
       if (!$theme_extension || !array_key_exists($region, $theme_extension->listAllRegions())) {
         $context->addViolation('This is not a valid region of the %theme theme.', ['%theme' => $theme]);

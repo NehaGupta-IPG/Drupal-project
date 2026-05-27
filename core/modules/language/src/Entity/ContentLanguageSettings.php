@@ -105,10 +105,10 @@ class ContentLanguageSettings extends ConfigEntityBase implements ContentLanguag
    */
   public function __construct(array $values, $entity_type = 'language_content_settings') {
     if (empty($values['target_entity_type_id'])) {
-      throw new ContentLanguageSettingsException('Attempt to create content language settings without a target_entity_type_id.');
+      throw new \Drupal\language\ContentLanguageSettingsException('Attempt to create content language settings without a target_entity_type_id.');
     }
     if (empty($values['target_bundle'])) {
-      throw new ContentLanguageSettingsException('Attempt to create content language settings without a target_bundle.');
+      throw new \Drupal\language\ContentLanguageSettingsException('Attempt to create content language settings without a target_bundle.');
     }
     parent::__construct($values, $entity_type);
   }

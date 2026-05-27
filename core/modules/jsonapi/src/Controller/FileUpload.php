@@ -183,29 +183,29 @@ class FileUpload {
 
     // Check the destination file path is writable.
     if (!$this->fileSystem->prepareDirectory($destination, FileSystemInterface::CREATE_DIRECTORY)) {
-      throw new HttpException(500, 'Destination file path is not writable');
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(500, 'Destination file path is not writable');
     }
 
     try {
       $result = $this->fileUploadHandler->handleFileUpload($uploadedFile, $validators, $destination, FileExists::Rename, FALSE);
     }
-    catch (LockAcquiringException $e) {
-      throw new HttpException(503, $e->getMessage(), NULL, ['Retry-After' => 1]);
+    catch (\Drupal\Core\Lock\LockAcquiringException $e) {
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(503, $e->getMessage(), NULL, ['Retry-After' => 1]);
     }
-    catch (UploadException $e) {
-      throw new HttpException(500, 'Input file data could not be read', $e);
+    catch (\Symfony\Component\HttpFoundation\File\Exception\UploadException $e) {
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(500, 'Input file data could not be read', $e);
     }
-    catch (CannotWriteFileException $e) {
-      throw new HttpException(500, 'Temporary file data could not be written', $e);
+    catch (\Symfony\Component\HttpFoundation\File\Exception\CannotWriteFileException $e) {
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(500, 'Temporary file data could not be written', $e);
     }
-    catch (NoFileException $e) {
-      throw new HttpException(500, 'Temporary file could not be opened', $e);
+    catch (\Symfony\Component\HttpFoundation\File\Exception\NoFileException $e) {
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(500, 'Temporary file could not be opened', $e);
     }
-    catch (FileExistsException $e) {
-      throw new HttpException(500, $e->getMessage(), $e);
+    catch (\Drupal\Core\File\Exception\FileExistsException $e) {
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(500, $e->getMessage(), $e);
     }
-    catch (FileException) {
-      throw new HttpException(500, 'Temporary file could not be moved to file location');
+    catch (\Drupal\Core\File\Exception\FileException) {
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(500, 'Temporary file could not be moved to file location');
     }
 
     if ($result->hasViolations()) {
@@ -213,7 +213,7 @@ class FileUpload {
       $message .= implode("\n", array_map(function (ConstraintViolationInterface $violation) {
         return PlainTextOutput::renderFromHtml($violation->getMessage());
       }, (array) $result->getViolations()->getIterator()));
-      throw new UnprocessableEntityHttpException($message);
+      throw new \Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException($message);
     }
 
     return $result;
@@ -269,7 +269,7 @@ class FileUpload {
       if ($access_result instanceof AccessResultReasonInterface) {
         $reason .= ' ' . $access_result->getReason();
       }
-      throw new AccessDeniedHttpException($reason);
+      throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException($reason);
     }
   }
 
@@ -295,13 +295,13 @@ class FileUpload {
   protected function validateAndLoadFieldDefinition($entity_type_id, $bundle, $field_name) {
     $field_definitions = $this->fieldManager->getFieldDefinitions($entity_type_id, $bundle);
     if (!isset($field_definitions[$field_name])) {
-      throw new NotFoundHttpException(sprintf('Field "%s" does not exist.', $field_name));
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException(sprintf('Field "%s" does not exist.', $field_name));
     }
 
     /** @var \Drupal\Core\Field\FieldDefinitionInterface $field_definition */
     $field_definition = $field_definitions[$field_name];
     if ($field_definition->getSetting('target_type') !== 'file') {
-      throw new AccessDeniedException(sprintf('"%s" is not a file field', $field_name));
+      throw new \Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException(sprintf('"%s" is not a file field', $field_name));
     }
 
     return $field_definition;

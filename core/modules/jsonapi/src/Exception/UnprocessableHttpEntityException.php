@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  * @see https://www.drupal.org/project/drupal/issues/3032787
  * @see jsonapi.api.php
  */
-class UnprocessableHttpEntityException extends HttpException {
+class UnprocessableHttpEntityException extends \Symfony\Component\HttpKernel\Exception\HttpException {
 
   use DependencySerializationTrait;
 

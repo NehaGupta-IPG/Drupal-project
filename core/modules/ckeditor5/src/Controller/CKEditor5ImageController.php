@@ -74,7 +74,7 @@ class CKEditor5ImageController extends ControllerBase {
     /** @var \Symfony\Component\HttpFoundation\File\UploadedFile|null $upload */
     $upload = $request->files->get('upload');
     if ($upload === NULL || !$upload->isValid()) {
-      throw new HttpException(500, $upload?->getErrorMessage() ?: 'Invalid file upload');
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(500, $upload?->getErrorMessage() ?: 'Invalid file upload');
     }
     $filename = $upload->getClientOriginalName();
 
@@ -85,7 +85,7 @@ class CKEditor5ImageController extends ControllerBase {
 
     // Check the destination file path is writable.
     if (!$this->fileSystem->prepareDirectory($destination, FileSystemInterface::CREATE_DIRECTORY)) {
-      throw new HttpException(500, 'Destination file path is not writable');
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(500, 'Destination file path is not writable');
     }
 
     $validators = $this->getImageUploadValidators($settings);
@@ -97,21 +97,21 @@ class CKEditor5ImageController extends ControllerBase {
     $lock_id = $this->generateLockIdFromFileUri($file_uri);
 
     if (!$this->lock->acquire($lock_id)) {
-      throw new HttpException(503, sprintf('File "%s" is already locked for writing.', $file_uri), NULL, ['Retry-After' => 1]);
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(503, sprintf('File "%s" is already locked for writing.', $file_uri), NULL, ['Retry-After' => 1]);
     }
 
     try {
       $uploadedFile = new FormUploadedFile($upload);
       $uploadResult = $this->fileUploadHandler->handleFileUpload($uploadedFile, $validators, $destination, FileExists::Rename);
       if ($uploadResult->hasViolations()) {
-        throw new UnprocessableEntityHttpException((string) $uploadResult->getViolations());
+        throw new \Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException((string) $uploadResult->getViolations());
       }
     }
-    catch (FileException) {
-      throw new HttpException(500, 'File could not be saved');
+    catch (\Drupal\Core\File\Exception\FileException) {
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(500, 'File could not be saved');
     }
-    catch (LockAcquiringException) {
-      throw new HttpException(503, sprintf('File "%s" is already locked for writing.', $upload->getClientOriginalName()), NULL, ['Retry-After' => 1]);
+    catch (\Symfony\Component\Lock\Exception\LockAcquiringException) {
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(503, sprintf('File "%s" is already locked for writing.', $upload->getClientOriginalName()), NULL, ['Retry-After' => 1]);
     }
 
     $this->lock->release($lock_id);

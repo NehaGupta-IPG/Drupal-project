@@ -88,7 +88,7 @@ abstract class ExecutablePluginBase extends PluginBase implements ExecutableInte
       $typed_data = \Drupal::typedDataManager()->create($definition, $value);
 
       if ($typed_data->validate()->count() > 0) {
-        throw new PluginException("The provided configuration value does not pass validation.");
+        throw new \Drupal\Component\Plugin\Exception\PluginException("The provided configuration value does not pass validation.");
       }
     }
     $this->configuration[$key] = $value;

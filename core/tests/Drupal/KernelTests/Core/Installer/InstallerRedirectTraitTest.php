@@ -37,11 +37,11 @@ class InstallerRedirectTraitTest extends KernelTestBase {
    */
   public static function providerShouldRedirectToInstaller(): array {
     return [
-      [TRUE, DatabaseNotFoundException::class, FALSE, FALSE],
-      [TRUE, DatabaseNotFoundException::class, TRUE, FALSE],
-      [TRUE, DatabaseNotFoundException::class, FALSE, TRUE],
-      [TRUE, DatabaseNotFoundException::class, TRUE, TRUE],
-      [TRUE, DatabaseNotFoundException::class, TRUE, TRUE, FALSE],
+      [TRUE, \Drupal\Core\Database\DatabaseNotFoundException::class, FALSE, FALSE],
+      [TRUE, \Drupal\Core\Database\DatabaseNotFoundException::class, TRUE, FALSE],
+      [TRUE, \Drupal\Core\Database\DatabaseNotFoundException::class, FALSE, TRUE],
+      [TRUE, \Drupal\Core\Database\DatabaseNotFoundException::class, TRUE, TRUE],
+      [TRUE, \Drupal\Core\Database\DatabaseNotFoundException::class, TRUE, TRUE, FALSE],
 
       [TRUE, \PDOException::class, FALSE, FALSE],
       [TRUE, \PDOException::class, TRUE, FALSE],
@@ -55,11 +55,11 @@ class InstallerRedirectTraitTest extends KernelTestBase {
       [FALSE, DatabaseExceptionWrapper::class, TRUE, TRUE],
       [TRUE, DatabaseExceptionWrapper::class, TRUE, TRUE, FALSE],
 
-      [TRUE, NotFoundHttpException::class, FALSE, FALSE],
-      [TRUE, NotFoundHttpException::class, TRUE, FALSE],
-      [FALSE, NotFoundHttpException::class, FALSE, TRUE],
-      [FALSE, NotFoundHttpException::class, TRUE, TRUE],
-      [TRUE, NotFoundHttpException::class, TRUE, TRUE, FALSE],
+      [TRUE, \Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class, FALSE, FALSE],
+      [TRUE, \Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class, TRUE, FALSE],
+      [FALSE, \Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class, FALSE, TRUE],
+      [FALSE, \Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class, TRUE, TRUE],
+      [TRUE, \Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class, TRUE, TRUE, FALSE],
 
       [FALSE, \Exception::class, FALSE, FALSE],
       [FALSE, \Exception::class, TRUE, FALSE],

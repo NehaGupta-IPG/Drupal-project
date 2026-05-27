@@ -80,7 +80,7 @@ class PathProcessorFrontTest extends UnitTestCase {
     $config->get('page.front')
       ->willReturn('');
     $processor = new PathProcessorFront($config_factory->reveal());
-    $this->expectException(NotFoundHttpException::class);
+    $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
     $processor->processInbound('/', new Request());
   }
 

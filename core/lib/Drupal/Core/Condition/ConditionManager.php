@@ -76,7 +76,7 @@ class ConditionManager extends DefaultPluginManager implements ExecutableManager
       $result = $condition->evaluate();
       return $condition->isNegated() ? !$result : $result;
     }
-    throw new ExecutableException("This manager object can only execute condition plugins");
+    throw new \Drupal\Core\Executable\ExecutableException("This manager object can only execute condition plugins");
   }
 
 }

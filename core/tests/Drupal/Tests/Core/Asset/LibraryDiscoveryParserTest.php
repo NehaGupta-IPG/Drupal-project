@@ -229,7 +229,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
       ->with('module', 'invalid_file')
       ->willReturn($path);
 
-    $this->expectException(InvalidLibraryFileException::class);
+    $this->expectException(\Drupal\Core\Asset\Exception\InvalidLibraryFileException::class);
     $this->libraryDiscoveryParser->buildByExtension('invalid_file');
   }
 
@@ -269,7 +269,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
       ->with('module', 'example_module_missing_information')
       ->willReturn($path);
 
-    $this->expectException(IncompleteLibraryDefinitionException::class);
+    $this->expectException(\Drupal\Core\Asset\Exception\IncompleteLibraryDefinitionException::class);
     $this->expectExceptionMessage("Incomplete library definition for definition 'example' in extension 'example_module_missing_information'");
     $this->libraryDiscoveryParser->buildByExtension('example_module_missing_information');
   }
@@ -539,7 +539,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
       ->with('module', 'licenses_missing_information')
       ->willReturn($path);
 
-    $this->expectException(LibraryDefinitionMissingLicenseException::class);
+    $this->expectException(\Drupal\Core\Asset\Exception\LibraryDefinitionMissingLicenseException::class);
     $this->expectExceptionMessage("Missing license information in library definition for definition 'no-license-info-but-remote' extension 'licenses_missing_information': it has a remote, but no license.");
     $this->libraryDiscoveryParser->buildByExtension('licenses_missing_information');
   }

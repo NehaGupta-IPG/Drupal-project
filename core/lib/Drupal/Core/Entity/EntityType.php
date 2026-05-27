@@ -344,14 +344,14 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
     if (str_contains($definition['id'], PluginBase::DERIVATIVE_SEPARATOR)) {
       [$entity_type_id, $bundle] = explode(PluginBase::DERIVATIVE_SEPARATOR, $definition['id']);
       if (mb_strlen($bundle) > static::BUNDLE_MAX_LENGTH) {
-        throw new EntityTypeIdLengthException('Attempt to create an entity type bundle class with an ID longer than ' . static::BUNDLE_MAX_LENGTH . " characters: $bundle.");
+        throw new \Drupal\Core\Entity\Exception\EntityTypeIdLengthException('Attempt to create an entity type bundle class with an ID longer than ' . static::BUNDLE_MAX_LENGTH . " characters: $bundle.");
       }
     }
     else {
       $entity_type_id = $definition['id'];
     }
     if (mb_strlen($entity_type_id) > static::ID_MAX_LENGTH) {
-      throw new EntityTypeIdLengthException('Attempt to create an entity type with an ID longer than ' . static::ID_MAX_LENGTH . " characters: $entity_type_id.");
+      throw new \Drupal\Core\Entity\Exception\EntityTypeIdLengthException('Attempt to create an entity type with an ID longer than ' . static::ID_MAX_LENGTH . " characters: $entity_type_id.");
     }
 
     foreach ($definition as $property => $value) {

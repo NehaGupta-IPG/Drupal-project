@@ -70,7 +70,7 @@ class EntityResourceValidationTraitTest extends UnitTestCase {
 
     $method = new \ReflectionMethod($trait, 'validate');
 
-    $this->expectException(UnprocessableEntityHttpException::class);
+    $this->expectException(\Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException::class);
 
     $method->invoke($trait, $entity->reveal());
   }

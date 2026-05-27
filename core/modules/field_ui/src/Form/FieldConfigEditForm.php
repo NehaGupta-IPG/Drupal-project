@@ -508,7 +508,7 @@ class FieldConfigEditForm extends EntityForm {
     try {
       $field_storage_form->save($form['field_storage']['subform'], $subform_state);
     }
-    catch (EntityStorageException $exception) {
+    catch (\Drupal\Core\Entity\EntityStorageException $exception) {
       $this->handleEntityStorageException($form_state, $exception);
       return;
     }
@@ -531,7 +531,7 @@ class FieldConfigEditForm extends EntityForm {
       try {
         $this->entity->save();
       }
-      catch (EntityStorageException $exception) {
+      catch (\Drupal\Core\Entity\EntityStorageException $exception) {
         $this->handleEntityStorageException($form_state, $exception);
         return;
       }
@@ -665,7 +665,7 @@ class FieldConfigEditForm extends EntityForm {
    * @param \Drupal\Core\Entity\EntityStorageException $exception
    *   The exception.
    */
-  protected function handleEntityStorageException(FormStateInterface $form_state, EntityStorageException $exception): void {
+  protected function handleEntityStorageException(FormStateInterface $form_state, \Drupal\Core\Entity\EntityStorageException $exception): void {
     $this->tempStore->delete($this->entity->getTargetEntityTypeId() . ':' . $this->entity->getName());
     $form_state->setRedirectUrl(FieldUI::getOverviewRouteInfo($this->entity->getTargetEntityTypeId(),
       $this->entity->getTargetBundle()));

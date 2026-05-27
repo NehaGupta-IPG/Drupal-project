@@ -26,7 +26,7 @@ class PluginExistsConstraintTest extends UnitTestCase {
    * @legacy-covers ::create
    */
   public function testMissingOption(): void {
-    $this->expectException(MissingOptionsException::class);
+    $this->expectException(\Symfony\Component\Validator\Exception\MissingOptionsException::class);
     $this->expectExceptionMessage('The option "manager" must be set for constraint "Drupal\Core\Plugin\Plugin\Validation\Constraint\PluginExistsConstraint".');
     $container = $this->createStub(ContainerInterface::class);
     PluginExistsConstraint::create($container, [], 'test_plugin_id', []);

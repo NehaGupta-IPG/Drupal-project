@@ -411,11 +411,11 @@ abstract class Database {
     // If the requested database does not exist then it is an unrecoverable
     // error.
     if (!isset(self::$databaseInfo[$key])) {
-      throw new ConnectionNotDefinedException('The specified database connection is not defined: ' . $key);
+      throw new \Drupal\Core\Database\ConnectionNotDefinedException('The specified database connection is not defined: ' . $key);
     }
 
     if (!self::$databaseInfo[$key][$target]['driver']) {
-      throw new DriverNotSpecifiedException('Driver not specified for this database connection: ' . $key);
+      throw new \Drupal\Core\Database\DriverNotSpecifiedException('Driver not specified for this database connection: ' . $key);
     }
 
     $driver_class = self::$databaseInfo[$key][$target]['namespace'] . '\\Connection';

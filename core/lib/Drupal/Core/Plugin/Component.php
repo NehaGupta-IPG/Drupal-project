@@ -47,7 +47,7 @@ class Component extends PluginBase {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     if (str_contains($plugin_id, '/')) {
       $message = sprintf('Component ID cannot contain slashes: %s', $plugin_id);
-      throw new InvalidComponentException($message);
+      throw new \Drupal\Core\Render\Component\Exception\InvalidComponentException($message);
     }
     $template = $plugin_definition['template'] ?? NULL;
     if (!$template) {
@@ -55,7 +55,7 @@ class Component extends PluginBase {
         'Unable to find the Twig template for the component "%s".',
         $plugin_id
       );
-      throw new InvalidComponentException($message);
+      throw new \Drupal\Core\Render\Component\Exception\InvalidComponentException($message);
     }
     $this->template = $template;
     $this->machineName = $plugin_definition['machineName'];

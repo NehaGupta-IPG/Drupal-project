@@ -76,18 +76,18 @@ class Connection extends BaseMySqlConnection {
         $connection_options['unix_socket'] ?? ''
       );
       if (!$mysqli->set_charset('utf8mb4')) {
-        throw new InvalidCharsetException('Invalid charset utf8mb4');
+        throw new \Drupal\mysqli\Driver\Database\mysqli\InvalidCharsetException('Invalid charset utf8mb4');
       }
     }
     catch (\mysqli_sql_exception $e) {
       if ($e->getCode() === static::DATABASE_NOT_FOUND) {
-        throw new DatabaseNotFoundException($e->getMessage(), $e->getCode(), $e);
+        throw new \Drupal\Core\Database\DatabaseNotFoundException($e->getMessage(), $e->getCode(), $e);
       }
       elseif ($e->getCode() === static::ACCESS_DENIED) {
-        throw new DatabaseAccessDeniedException($e->getMessage(), $e->getCode(), $e);
+        throw new \Drupal\Core\Database\DatabaseAccessDeniedException($e->getMessage(), $e->getCode(), $e);
       }
 
-      throw new ConnectionNotDefinedException('Invalid database connection: ' . $e->getMessage(), $e->getCode(), $e);
+      throw new \Drupal\Core\Database\ConnectionNotDefinedException('Invalid database connection: ' . $e->getMessage(), $e->getCode(), $e);
     }
 
     // Force MySQL to use the UTF-8 character set. Also set the collation, if a
@@ -156,7 +156,7 @@ class Connection extends BaseMySqlConnection {
       $this->connection->query("USE $database");
     }
     catch (\Exception $e) {
-      throw new DatabaseNotFoundException($e->getMessage());
+      throw new \Drupal\Core\Database\DatabaseNotFoundException($e->getMessage());
     }
   }
 

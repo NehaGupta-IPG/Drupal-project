@@ -159,7 +159,7 @@ class ThemeHandler implements ThemeHandlerInterface {
     if (isset($themes[$name])) {
       return $themes[$name];
     }
-    throw new UnknownExtensionException(sprintf('The theme %s does not exist.', $name));
+    throw new \Drupal\Core\Extension\Exception\UnknownExtensionException(sprintf('The theme %s does not exist.', $name));
   }
 
   /**

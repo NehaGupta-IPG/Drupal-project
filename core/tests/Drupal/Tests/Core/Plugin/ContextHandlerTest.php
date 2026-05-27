@@ -369,9 +369,9 @@ class ContextHandlerTest extends UnitTestCase {
     // No context, so no cacheability metadata can be passed along.
     $plugin
       ->method('getContext')
-      ->willThrowException(new ContextException());
+      ->willThrowException(new \Drupal\Component\Plugin\Exception\ContextException());
 
-    $this->expectException(MissingValueContextException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\MissingValueContextException::class);
     $this->expectExceptionMessage('Required contexts without a value: hit');
     $this->contextHandler->applyContextMapping($plugin, $contexts);
   }
@@ -406,7 +406,7 @@ class ContextHandlerTest extends UnitTestCase {
     // No context, so no cacheability metadata can be passed along.
     $plugin
       ->method('getContext')
-      ->willThrowException(new ContextException());
+      ->willThrowException(new \Drupal\Component\Plugin\Exception\ContextException());
 
     $this->contextHandler->applyContextMapping($plugin, $contexts);
   }
@@ -441,7 +441,7 @@ class ContextHandlerTest extends UnitTestCase {
     $plugin->expects($this->never())
       ->method('setContext');
 
-    $this->expectException(MissingValueContextException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\MissingValueContextException::class);
     $this->expectExceptionMessage('Required contexts without a value: hit');
     $this->contextHandler->applyContextMapping($plugin, $contexts);
   }
@@ -538,7 +538,7 @@ class ContextHandlerTest extends UnitTestCase {
     $plugin->expects($this->never())
       ->method('setContext');
 
-    $this->expectException(ContextException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\ContextException::class);
     $this->expectExceptionMessage('Assigned contexts were not satisfied: miss');
     $this->contextHandler->applyContextMapping($plugin, $contexts, ['miss' => 'name']);
   }

@@ -37,14 +37,14 @@ class InputStreamFileWriter implements InputStreamFileWriterInterface {
           // Close the file streams.
           fclose($tempFile);
           fclose($fileData);
-          throw new UploadException('Input file data could not be read');
+          throw new \Symfony\Component\HttpFoundation\File\Exception\UploadException('Input file data could not be read');
         }
 
         if (fwrite($tempFile, $read) === FALSE) {
           // Close the file streams.
           fclose($tempFile);
           fclose($fileData);
-          throw new CannotWriteFileException(sprintf('Temporary file data for "%s" could not be written', $tempFilePath));
+          throw new \Symfony\Component\HttpFoundation\File\Exception\CannotWriteFileException(sprintf('Temporary file data for "%s" could not be written', $tempFilePath));
         }
       }
 
@@ -55,7 +55,7 @@ class InputStreamFileWriter implements InputStreamFileWriterInterface {
       // Close the input file stream since we can't proceed with the upload.
       // Don't try to close $tempFile since it's FALSE at this point.
       fclose($fileData);
-      throw new NoFileException(sprintf('Temporary file "%s" could not be opened for file upload', $tempFilePath));
+      throw new \Symfony\Component\HttpFoundation\File\Exception\NoFileException(sprintf('Temporary file "%s" could not be opened for file upload', $tempFilePath));
     }
 
     // Close the input stream.

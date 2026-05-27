@@ -654,7 +654,7 @@ class ConfigSchemaTest extends KernelTestBase {
       $typed_config->getDefinitions();
       $this->fail('Expected ConfigSchemaAlterException thrown.');
     }
-    catch (ConfigSchemaAlterException $e) {
+    catch (\Drupal\Core\Config\Schema\ConfigSchemaAlterException $e) {
       $this->assertEquals('Invoking hook_config_schema_info_alter() has removed (config_schema_test.hook) schema definitions', $e->getMessage());
     }
 
@@ -663,7 +663,7 @@ class ConfigSchemaTest extends KernelTestBase {
       $typed_config->getDefinitions();
       $this->fail('Expected ConfigSchemaAlterException thrown.');
     }
-    catch (ConfigSchemaAlterException $e) {
+    catch (\Drupal\Core\Config\Schema\ConfigSchemaAlterException $e) {
       $this->assertEquals('Invoking hook_config_schema_info_alter() has added (config_schema_test.hook_added_definition) and removed (config_schema_test.hook) schema definitions', $e->getMessage());
     }
 
@@ -672,7 +672,7 @@ class ConfigSchemaTest extends KernelTestBase {
       $typed_config->getDefinitions();
       $this->fail('Expected ConfigSchemaAlterException thrown.');
     }
-    catch (ConfigSchemaAlterException $e) {
+    catch (\Drupal\Core\Config\Schema\ConfigSchemaAlterException $e) {
       $this->assertEquals('Invoking hook_config_schema_info_alter() has added (config_schema_test.hook_added_definition) schema definitions', $e->getMessage());
     }
 

@@ -65,7 +65,7 @@ trait FieldUiTestTrait {
       }
     }
     // If the element could not be found then it is probably in a group.
-    catch (ElementNotFoundException) {
+    catch (\Behat\Mink\Exception\ElementNotFoundException) {
       // Call the helper function to confirm it is in a group.
       $field_group = $this->getFieldFromGroup($field_type);
       // Pass in the group name as the new storage type.

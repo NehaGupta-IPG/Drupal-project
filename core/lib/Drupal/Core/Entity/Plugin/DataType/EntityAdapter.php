@@ -79,7 +79,7 @@ class EntityAdapter extends TypedData implements \IteratorAggregate, ComplexData
    */
   public function get($property_name) {
     if (!isset($this->entity)) {
-      throw new MissingDataException("Unable to get property $property_name as no entity has been provided.");
+      throw new \Drupal\Core\TypedData\Exception\MissingDataException("Unable to get property $property_name as no entity has been provided.");
     }
     if (!$this->entity instanceof FieldableEntityInterface) {
       throw new \InvalidArgumentException("Unable to get unknown property $property_name.");
@@ -93,7 +93,7 @@ class EntityAdapter extends TypedData implements \IteratorAggregate, ComplexData
    */
   public function set($property_name, $value, $notify = TRUE) {
     if (!isset($this->entity)) {
-      throw new MissingDataException("Unable to set property $property_name as no entity has been provided.");
+      throw new \Drupal\Core\TypedData\Exception\MissingDataException("Unable to set property $property_name as no entity has been provided.");
     }
     if (!$this->entity instanceof FieldableEntityInterface) {
       throw new \InvalidArgumentException("Unable to set unknown property $property_name.");
@@ -108,7 +108,7 @@ class EntityAdapter extends TypedData implements \IteratorAggregate, ComplexData
    */
   public function getProperties($include_computed = FALSE) {
     if (!isset($this->entity)) {
-      throw new MissingDataException('Unable to get properties as no entity has been provided.');
+      throw new \Drupal\Core\TypedData\Exception\MissingDataException('Unable to get properties as no entity has been provided.');
     }
     if (!$this->entity instanceof FieldableEntityInterface) {
       return [];
@@ -121,7 +121,7 @@ class EntityAdapter extends TypedData implements \IteratorAggregate, ComplexData
    */
   public function toArray() {
     if (!isset($this->entity)) {
-      throw new MissingDataException('Unable to get property values as no entity has been provided.');
+      throw new \Drupal\Core\TypedData\Exception\MissingDataException('Unable to get property values as no entity has been provided.');
     }
     return $this->entity->toArray();
   }

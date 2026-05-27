@@ -190,11 +190,11 @@ abstract class SqlBase extends SourcePluginBase implements ContainerFactoryPlugi
     try {
       $connection = Database::getConnection($target, $key);
     }
-    catch (ConnectionNotDefinedException $e) {
+    catch (\Drupal\Core\Database\ConnectionNotDefinedException $e) {
       // If we fell back to the magic 'migrate' connection and it doesn't exist,
       // treat the lack of the connection as a RequirementsException.
       if ($key == 'migrate') {
-        throw new RequirementsException("No database connection configured for source plugin " . $this->pluginId, [], 0, $e);
+        throw new \Drupal\migrate\Exception\RequirementsException("No database connection configured for source plugin " . $this->pluginId, [], 0, $e);
       }
       else {
         throw $e;
@@ -211,8 +211,8 @@ abstract class SqlBase extends SourcePluginBase implements ContainerFactoryPlugi
       try {
         $this->getDatabase();
       }
-      catch (\PDOException | DatabaseException $e) {
-        throw new RequirementsException("No database connection available for source plugin " . $this->pluginId, [], 0, $e);
+      catch (\PDOException | \Drupal\Core\Database\DatabaseException $e) {
+        throw new \Drupal\migrate\Exception\RequirementsException("No database connection available for source plugin " . $this->pluginId, [], 0, $e);
       }
     }
   }
@@ -251,7 +251,7 @@ abstract class SqlBase extends SourcePluginBase implements ContainerFactoryPlugi
         $this->batchSize = $this->configuration['batch_size'];
       }
       else {
-        throw new MigrateException("batch_size must be greater than or equal to zero");
+        throw new \Drupal\migrate\MigrateException("batch_size must be greater than or equal to zero");
       }
     }
 

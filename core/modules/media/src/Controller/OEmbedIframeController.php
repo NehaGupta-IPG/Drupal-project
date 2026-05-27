@@ -134,7 +134,7 @@ class OEmbedIframeController implements ContainerInjectionInterface {
       $allowed_host = parse_url($allowed_domain, PHP_URL_HOST);
       $host = parse_url($request->getSchemeAndHttpHost(), PHP_URL_HOST);
       if ($allowed_host !== $host) {
-        throw new CacheableBadRequestHttpException($cache, 'This resource is not available');
+        throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cache, 'This resource is not available');
       }
     }
 
@@ -150,7 +150,7 @@ class OEmbedIframeController implements ContainerInjectionInterface {
     // parameter passed in the query string.
     $hash = $this->iFrameUrlHelper->getHash($url, $max_width, $max_height);
     if (!hash_equals($hash, $request->query->get('hash', ''))) {
-      throw new CacheableBadRequestHttpException($cache, 'This resource is not available');
+      throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cache, 'This resource is not available');
     }
 
     // Return a response instead of a render array so that the frame content
@@ -213,7 +213,7 @@ class OEmbedIframeController implements ContainerInjectionInterface {
         $response->addAttachments($bubbleable_metadata->getAttachments());
       }
     }
-    catch (ResourceException $e) {
+    catch (\Drupal\media\OEmbed\ResourceException $e) {
       // Prevent the response from being cached.
       $response->getCacheableMetadata()->setCacheMaxAge(0);
 

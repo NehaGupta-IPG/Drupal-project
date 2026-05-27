@@ -28,7 +28,7 @@ class EntityFile extends EntityContentBase {
     // we're loading the matching URI.
     $destination = $row->getDestinationProperty('uri');
     if (empty($destination)) {
-      throw new MigrateException('Destination property uri not provided');
+      throw new \Drupal\migrate\MigrateException('Destination property uri not provided');
     }
     $entity = $this->storage->loadByProperties(['uri' => $destination]);
     if ($entity) {
@@ -50,7 +50,7 @@ class EntityFile extends EntityContentBase {
           $this->getKey('bundle'));
       $value = UriItem::generateSampleValue($field_definitions['uri']);
       if (empty($value)) {
-        throw new MigrateException('Stubbing failed, unable to generate value for field uri');
+        throw new \Drupal\migrate\MigrateException('Stubbing failed, unable to generate value for field uri');
       }
       // generateSampleValue() wraps the value in an array.
       $value = reset($value);

@@ -259,7 +259,7 @@ class BigPipeTestController implements TrustedCallbackInterface {
    */
   public static function redirectTrusted(): void {
     $response = new RedirectResponse('/big_pipe_test');
-    throw new EnforcedResponseException($response);
+    throw new \Drupal\Core\Form\EnforcedResponseException($response);
   }
 
   /**
@@ -285,7 +285,7 @@ class BigPipeTestController implements TrustedCallbackInterface {
    */
   public static function redirectUntrusted(): void {
     $response = new RedirectResponse('https://example.com');
-    throw new EnforcedResponseException($response);
+    throw new \Drupal\Core\Form\EnforcedResponseException($response);
   }
 
   /**

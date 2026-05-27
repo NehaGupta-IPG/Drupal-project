@@ -5,7 +5,7 @@ namespace Drupal\Core\Database;
 /**
  * Exception thrown if a SELECT query trying to execute rowCount() on result.
  */
-class RowCountException extends \RuntimeException implements DatabaseException {
+class RowCountException extends \RuntimeException implements \Drupal\Core\Database\DatabaseException {
 
   public function __construct($message = '', $code = 0, ?\Throwable $previous = NULL) {
     if (empty($message)) {

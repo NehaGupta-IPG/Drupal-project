@@ -27,5 +27,5 @@ function _system_test_second_shutdown_function($arg1, $arg2): void {
   // function, it will not bubble up to the default exception handler but will
   // be caught in _drupal_shutdown_function() and be displayed through
   // \Drupal\Core\Utility\Error::renderExceptionSafe() if possible.
-  throw new Exception('Drupal is <blink>awesome</blink>.');
+  throw new \Exception('Drupal is <blink>awesome</blink>.');
 }

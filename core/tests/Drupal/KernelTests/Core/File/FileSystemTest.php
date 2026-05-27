@@ -46,7 +46,7 @@ class FileSystemTest extends KernelTestBase {
   public function testEnsureFileExistsBeforeCopy(): void {
     // We need to compute the exception message here because it will include
     // the 'real' path to the file, which varies with $this->siteDirectory.
-    $this->expectException(FileNotExistsException::class);
+    $this->expectException(\Drupal\Core\File\Exception\FileNotExistsException::class);
     $this->expectExceptionMessage("File 'public://test.txt' ('{$this->siteDirectory}/files/test.txt') could not be copied because it does not exist");
 
     $this->fileSystem->copy('public://test.txt', 'public://test-copy.txt');
@@ -58,7 +58,7 @@ class FileSystemTest extends KernelTestBase {
    * @legacy-covers ::copy
    */
   public function testDestinationDirectoryFailureOnCopy(): void {
-    $this->expectException(DirectoryNotReadyException::class);
+    $this->expectException(\Drupal\Core\File\Exception\DirectoryNotReadyException::class);
     $this->expectExceptionMessage("The specified file 'public://test.txt' could not be copied because the destination directory 'public://subdirectory' is not properly configured. This may be caused by a problem with file or directory permissions.");
     touch('public://test.txt');
     // public://subdirectory has not been created, so
@@ -71,7 +71,7 @@ class FileSystemTest extends KernelTestBase {
    * Tests copy failure if file already exists.
    */
   public function testCopyFailureIfFileAlreadyExists(): void {
-    $this->expectException(FileExistsException::class);
+    $this->expectException(\Drupal\Core\File\Exception\FileExistsException::class);
     $this->expectExceptionMessage("File 'public://test.txt' could not be copied because a file by that name already exists in the destination directory ('')");
     $uri = 'public://test.txt';
     touch($uri);
@@ -82,7 +82,7 @@ class FileSystemTest extends KernelTestBase {
    * Tests copy failure if self overwrite.
    */
   public function testCopyFailureIfSelfOverwrite(): void {
-    $this->expectException(FileException::class);
+    $this->expectException(\Drupal\Core\File\Exception\FileException::class);
     $this->expectExceptionMessage("'public://test.txt' could not be copied because it would overwrite itself");
     $uri = 'public://test.txt';
     touch($uri);

@@ -96,18 +96,18 @@ class Explode extends ProcessPluginBase {
    */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
     if (empty($this->configuration['delimiter'])) {
-      throw new MigrateException('delimiter is empty');
+      throw new \Drupal\migrate\MigrateException('delimiter is empty');
     }
 
     $strict = array_key_exists('strict', $this->configuration) ? $this->configuration['strict'] : TRUE;
     if ($strict && !is_string($value)) {
-      throw new MigrateException(sprintf('%s is not a string', var_export($value, TRUE)));
+      throw new \Drupal\migrate\MigrateException(sprintf('%s is not a string', var_export($value, TRUE)));
     }
     elseif (!$strict) {
       // Check if the incoming value can cast to a string.
       $original = $value;
       if (!is_string($original) && ($original != ($value = @strval($value)))) {
-        throw new MigrateException(sprintf('%s cannot be casted to a string', var_export($original, TRUE)));
+        throw new \Drupal\migrate\MigrateException(sprintf('%s cannot be casted to a string', var_export($original, TRUE)));
       }
       // Empty strings should be exploded to empty arrays.
       if ($value === '') {

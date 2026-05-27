@@ -167,7 +167,7 @@ class UpdateTest extends DatabaseTestBase {
    * Updating a serial field throws a IntegrityConstraintViolationException.
    */
   public function testUpdateValueInSerial(): void {
-    $this->expectException(IntegrityConstraintViolationException::class);
+    $this->expectException(\Drupal\Core\Database\IntegrityConstraintViolationException::class);
     $this->connection->update('test')
       ->fields(['id' => 2])
       ->condition('id', 1)

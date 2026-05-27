@@ -113,7 +113,7 @@ class ConfigInstallWebTest extends BrowserTestBase {
       \Drupal::service('module_installer')->install(['config_integration_test']);
       $this->fail('Expected PreExistingConfigException not thrown.');
     }
-    catch (PreExistingConfigException $e) {
+    catch (\Drupal\Core\Config\PreExistingConfigException $e) {
       $this->assertEquals('config_integration_test', $e->getExtension());
       $this->assertEquals([StorageInterface::DEFAULT_COLLECTION => ['config_test.dynamic.config_integration_test']], $e->getConfigObjects());
       $this->assertEquals('Configuration objects (config_test.dynamic.config_integration_test) provided by config_integration_test already exist in active configuration', $e->getMessage());
@@ -204,7 +204,7 @@ class ConfigInstallWebTest extends BrowserTestBase {
       \Drupal::service('theme_installer')->install(['config_clash_test_theme']);
       $this->fail('Expected PreExistingConfigException not thrown.');
     }
-    catch (PreExistingConfigException $e) {
+    catch (\Drupal\Core\Config\PreExistingConfigException $e) {
       $this->assertEquals('config_clash_test_theme', $e->getExtension());
       $this->assertEquals([
         StorageInterface::DEFAULT_COLLECTION => ['config_test.dynamic.dotted.default'],
@@ -253,7 +253,7 @@ class ConfigInstallWebTest extends BrowserTestBase {
     try {
       \Drupal::service('file_system')->deleteRecursive($directory);
     }
-    catch (FileException) {
+    catch (\Drupal\Core\File\Exception\FileException) {
       // Ignore failed deletes.
     }
     $this->drupalGet('/admin/reports/status');

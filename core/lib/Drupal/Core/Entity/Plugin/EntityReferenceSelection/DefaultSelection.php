@@ -469,7 +469,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
           "Trying to use non-empty 'target_bundle' configuration on entity type '%s' without bundle support.",
           $entity_type->id(),
         );
-        throw new UnsupportedEntityTypeDefinitionException($message);
+        throw new \Drupal\Core\Entity\Exception\UnsupportedEntityTypeDefinitionException($message);
       }
     }
 

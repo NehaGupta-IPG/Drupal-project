@@ -57,7 +57,7 @@ class AssetDumper implements AssetDumperUriInterface {
         return FALSE;
       }
     }
-    catch (FileException) {
+    catch (\Drupal\Core\File\Exception\FileException) {
       return FALSE;
     }
     // If CSS/JS gzip compression is enabled then create a gzipped version of
@@ -74,7 +74,7 @@ class AssetDumper implements AssetDumperUriInterface {
           return FALSE;
         }
       }
-      catch (FileException) {
+      catch (\Drupal\Core\File\Exception\FileException) {
         return FALSE;
       }
       if (extension_loaded('brotli')) {
@@ -83,7 +83,7 @@ class AssetDumper implements AssetDumperUriInterface {
             return FALSE;
           }
         }
-        catch (FileException) {
+        catch (\Drupal\Core\File\Exception\FileException) {
           return FALSE;
         }
       }

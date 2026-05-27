@@ -97,7 +97,7 @@ class ExecutableFinderTest extends UnitTestCase {
    */
   #[IgnoreDeprecations]
   public function testLegacyExecutablePaths(): void {
-    $exception = $this->prophesize(LogicException::class);
+    $exception = $this->prophesize(\PhpTuf\ComposerStager\API\Exception\LogicException::class);
 
     $decorated = $this->prophesize(ExecutableFinderInterface::class);
     $decorated->find('composer')->willThrow($exception->reveal());

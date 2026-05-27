@@ -23,11 +23,11 @@ class FieldNormalizer extends ListNormalizer implements DenormalizerInterface {
    */
   public function denormalize($data, $class, $format = NULL, array $context = []): mixed {
     if (!isset($context['target_instance'])) {
-      throw new InvalidArgumentException('$context[\'target_instance\'] must be set to denormalize with the FieldNormalizer');
+      throw new \Symfony\Component\Serializer\Exception\InvalidArgumentException('$context[\'target_instance\'] must be set to denormalize with the FieldNormalizer');
     }
 
     if ($context['target_instance']->getParent() == NULL) {
-      throw new InvalidArgumentException('The field passed in via $context[\'target_instance\'] must have a parent set.');
+      throw new \Symfony\Component\Serializer\Exception\InvalidArgumentException('The field passed in via $context[\'target_instance\'] must have a parent set.');
     }
 
     /** @var \Drupal\Core\Field\FieldItemListInterface $items */
@@ -35,7 +35,7 @@ class FieldNormalizer extends ListNormalizer implements DenormalizerInterface {
     $item_class = $items->getItemDefinition()->getClass();
 
     if (!is_array($data)) {
-      throw new UnexpectedValueException(sprintf('Field values for "%s" must use an array structure', $items->getName()));
+      throw new \Symfony\Component\Serializer\Exception\UnexpectedValueException(sprintf('Field values for "%s" must use an array structure', $items->getName()));
     }
 
     foreach ($data as $item_data) {

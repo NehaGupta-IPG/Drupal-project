@@ -31,7 +31,7 @@ class DefaultExceptionSubscriberTest extends UnitTestCase {
     $request = Request::create('/test');
     $request->setRequestFormat('json');
 
-    $e = new MethodNotAllowedHttpException(['POST', 'PUT'], 'test message');
+    $e = new \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException(['POST', 'PUT'], 'test message');
     $event = new ExceptionEvent($kernel->reveal(), $request, HttpKernelInterface::MAIN_REQUEST, $e);
     $subscriber = new DefaultExceptionSubscriber(new Serializer([], [new JsonEncoder()]), []);
     $subscriber->on4xx($event);

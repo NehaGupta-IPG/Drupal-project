@@ -61,7 +61,7 @@ final class ExportStorageManager implements StorageManagerInterface {
     if (!$this->lock->acquire(self::LOCK_NAME)) {
       $this->lock->wait(self::LOCK_NAME);
       if (!$this->lock->acquire(self::LOCK_NAME)) {
-        throw new StorageTransformerException("Cannot acquire config export transformer lock.");
+        throw new \Drupal\Core\Config\StorageTransformerException("Cannot acquire config export transformer lock.");
       }
     }
 

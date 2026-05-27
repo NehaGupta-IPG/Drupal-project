@@ -83,7 +83,7 @@ class ServicesDefaultsTest extends KernelTestBase {
    */
   public function testPrivateServices(): void {
     // Ensure default and overridden public flag works.
-    $this->expectException(ServiceNotFoundException::class);
+    $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
     $this->container->getDefinition('Drupal\services_defaults_test\TestPrivateService');
   }
 

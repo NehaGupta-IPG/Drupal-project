@@ -123,7 +123,7 @@ class ConfigTranslationDeleteForm extends ConfirmFormBase {
 
     $language = $this->languageManager->getLanguage($langcode);
     if (!$language) {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
 
     $this->mapper = $mapper;

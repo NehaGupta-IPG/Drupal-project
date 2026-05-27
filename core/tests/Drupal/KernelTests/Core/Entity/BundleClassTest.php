@@ -245,7 +245,7 @@ class BundleClassTest extends EntityKernelTestBase {
 
     // Since we now have two bundles trying to reuse the same class, we expect
     // this to throw an exception.
-    $this->expectException(AmbiguousBundleClassException::class);
+    $this->expectException(\Drupal\Core\Entity\Exception\AmbiguousBundleClassException::class);
     EntityTestBundleClass::create();
   }
 
@@ -260,7 +260,7 @@ class BundleClassTest extends EntityKernelTestBase {
     EntityTestHelper::createBundle('entity_test_no_label', NULL, 'entity_test_no_label');
     // Now that we have an entity bundle class that's shared by two entirely
     // different entity types, we expect an exception to be thrown.
-    $this->expectException(AmbiguousBundleClassException::class);
+    $this->expectException(\Drupal\Core\Entity\Exception\AmbiguousBundleClassException::class);
     $this->container->get('entity_type.repository')->getEntityTypeFromClass(EntityTestAmbiguousBundleClass::class);
   }
 
@@ -282,7 +282,7 @@ class BundleClassTest extends EntityKernelTestBase {
   public function testBundleClassShouldExtendEntityClass(): void {
     $this->container->get('state')->set('entity_test_bundle_class_non_inheriting', TRUE);
     $this->entityTypeManager->clearCachedDefinitions();
-    $this->expectException(BundleClassInheritanceException::class);
+    $this->expectException(\Drupal\Core\Entity\Exception\BundleClassInheritanceException::class);
     EntityTestHelper::createBundle('bundle_class');
     $this->storage->create(['type' => 'bundle_class']);
   }
@@ -293,7 +293,7 @@ class BundleClassTest extends EntityKernelTestBase {
   public function testBundleClassShouldExist(): void {
     $this->container->get('state')->set('entity_test_bundle_class_does_not_exist', TRUE);
     $this->entityTypeManager->clearCachedDefinitions();
-    $this->expectException(MissingBundleClassException::class);
+    $this->expectException(\Drupal\Core\Entity\Exception\MissingBundleClassException::class);
     EntityTestHelper::createBundle('bundle_class');
     $this->storage->create(['type' => 'bundle_class']);
   }

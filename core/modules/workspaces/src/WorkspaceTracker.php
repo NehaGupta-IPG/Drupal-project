@@ -474,7 +474,7 @@ class WorkspaceTracker implements WorkspaceTrackerInterface, EventSubscriberInte
         try {
           $query->condition(static::getIdField($entity_type_id), $entity_ids, 'IN');
         }
-        catch (PluginNotFoundException) {
+        catch (\Drupal\Component\Plugin\Exception\PluginNotFoundException) {
           // When an entity type is being deleted, we no longer have the ability
           // to retrieve its identifier field type, so we try both.
           $query->condition(

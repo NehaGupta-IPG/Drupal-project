@@ -381,11 +381,11 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
     $this->view->build();
 
     if (!empty($this->view->build_info['fail'])) {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
 
     if (!empty($this->view->build_info['denied'])) {
-      throw new AccessDeniedHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
     }
   }
 

@@ -185,11 +185,11 @@ class ModulesListConfirmForm extends ConfirmFormBase {
         // Install the given modules.
         $this->moduleInstaller->install(array_keys($this->modules['install']));
       }
-      catch (PreExistingConfigException $e) {
+      catch (\Drupal\Core\Config\PreExistingConfigException $e) {
         $this->messenger()->addError($this->modulesFailToEnableMessage($this->modules, $e));
         return;
       }
-      catch (UnmetDependenciesException $e) {
+      catch (\Drupal\Core\Config\UnmetDependenciesException $e) {
         $this->messenger()->addError(
           $e->getTranslatedMessage($this->getStringTranslation(), $this->modules['install'][$e->getExtension()])
         );

@@ -32,7 +32,7 @@ class JSInteractionTest extends WebDriverTestBase {
    * Assert an exception is thrown when the blocker element is never removed.
    */
   public function testNotClickable(): void {
-    $this->expectException(Exception::class);
+    $this->expectException(\WebDriver\Exception::class);
     $this->drupalGet('/js_interaction_test');
     $this->assertSession()->elementExists('named', ['link', 'Target link'])->click();
   }
@@ -41,7 +41,7 @@ class JSInteractionTest extends WebDriverTestBase {
    * Assert an exception is thrown when the field is never enabled.
    */
   public function testFieldValueNotSettable(): void {
-    $this->expectException(Exception::class);
+    $this->expectException(\WebDriver\Exception::class);
     $this->drupalGet('/js_interaction_test');
     $this->assertSession()->fieldExists('target_field')->setValue('Test');
   }

@@ -157,7 +157,7 @@ final class InputConfigurator {
 
       $violations = $data->validate();
       if (count($violations) > 0) {
-        throw new ValidationFailedException($data, $violations);
+        throw new \Symfony\Component\Validator\Exception\ValidationFailedException($data, $violations);
       }
       $this->values[$key] = $data->getValue();
     }

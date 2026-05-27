@@ -109,7 +109,7 @@ class EntityResource {
    */
   public function getIndividual(EntityInterface $entity, Request $request) {
     $resource_object = $this->entityAccessChecker->getAccessCheckedResourceObject($entity);
-    if ($resource_object instanceof EntityAccessDeniedHttpException) {
+    if ($resource_object instanceof \Drupal\jsonapi\Exception\EntityAccessDeniedHttpException) {
       throw $resource_object;
     }
     $primary_data = new ResourceObjectData([$resource_object], 1);
@@ -157,7 +157,7 @@ class EntityResource {
             $field_access = $parsed_entity->get($internal_field_name)->access('edit', NULL, TRUE);
             if (!$field_access->isAllowed()) {
               $public_field_name = $field_mapping[$internal_field_name];
-              throw new EntityAccessDeniedHttpException(NULL, $field_access, "/data/$data_member_name/$public_field_name", sprintf('The current user is not allowed to POST the selected field (%s).', $public_field_name));
+              throw new \Drupal\jsonapi\Exception\EntityAccessDeniedHttpException(NULL, $field_access, "/data/$data_member_name/$public_field_name", sprintf('The current user is not allowed to POST the selected field (%s).', $public_field_name));
             }
           }
         }
@@ -169,7 +169,7 @@ class EntityResource {
     // Return a 409 Conflict response in accordance with the JSON:API spec. See
     // https://jsonapi.org/format/#crud-creating-responses-409.
     if ($this->entityExists($parsed_entity)) {
-      throw new ConflictHttpException('Conflict: Entity already exists.');
+      throw new \Symfony\Component\HttpKernel\Exception\ConflictHttpException('Conflict: Entity already exists.');
     }
 
     $parsed_entity->save();
@@ -210,7 +210,7 @@ class EntityResource {
    */
   public function patchIndividual(ResourceType $resource_type, EntityInterface $entity, Request $request) {
     if ($entity instanceof RevisionableInterface && !($entity->isLatestRevision() && $entity->isDefaultRevision())) {
-      throw new BadRequestHttpException('Updating a resource object that has a working copy is not yet supported. See https://www.drupal.org/project/drupal/issues/2795279.');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Updating a resource object that has a working copy is not yet supported. See https://www.drupal.org/project/drupal/issues/2795279.');
     }
 
     $parsed_entity = $this->deserialize($resource_type, $request, JsonApiDocumentTopLevel::class);
@@ -218,7 +218,7 @@ class EntityResource {
     $body = Json::decode($request->getContent());
     $data = $body['data'];
     if (!isset($data['id']) || $data['id'] != $entity->uuid()) {
-      throw new BadRequestHttpException(sprintf(
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException(sprintf(
         'The selected entity (%s) does not match the ID in the payload (%s).',
         $entity->uuid(),
         $data['id'] ?? '',
@@ -335,7 +335,7 @@ class EntityResource {
         preg_match('/entity type (.*)\./', $e->getMessage(), $matches);
         $config_entity_type_id = $matches[1];
         $cacheability = (new CacheableMetadata())->addCacheContexts(['url.path', 'url.query_args:filter']);
-        throw new CacheableBadRequestHttpException($cacheability, sprintf("Filtering on config entities is not supported by Drupal's entity API. You tried to filter on a %s config entity.", $config_entity_type_id));
+        throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cacheability, sprintf("Filtering on config entities is not supported by Drupal's entity API. You tried to filter on a %s config entity.", $config_entity_type_id));
       }
       else {
         throw $e;
@@ -541,7 +541,7 @@ class EntityResource {
     $field_definition = $field_list->getFieldDefinition();
     $is_multiple = $field_definition->getFieldStorageDefinition()->isMultiple();
     if (!$is_multiple) {
-      throw new ConflictHttpException(sprintf('You can only POST to to-many relationships. %s is a to-one relationship.', $related));
+      throw new \Symfony\Component\HttpKernel\Exception\ConflictHttpException(sprintf('You can only POST to to-many relationships. %s is a to-one relationship.', $related));
     }
 
     $original_resource_identifiers = ResourceIdentifier::toResourceIdentifiersWithArityRequired($field_list);
@@ -630,7 +630,7 @@ class EntityResource {
    */
   protected function doPatchIndividualRelationship(EntityInterface $entity, array $resource_identifiers, FieldDefinitionInterface $field_definition) {
     if (count($resource_identifiers) > 1) {
-      throw new BadRequestHttpException(sprintf('Provide a single relationship so to-one relationship fields (%s).', $field_definition->getName()));
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException(sprintf('Provide a single relationship so to-one relationship fields (%s).', $field_definition->getName()));
     }
     $this->doPatchMultipleRelationship($entity, $resource_identifiers, $field_definition);
   }
@@ -690,7 +690,7 @@ class EntityResource {
       ->getFieldStorageDefinition()
       ->isMultiple();
     if (!$is_multiple) {
-      throw new ConflictHttpException(sprintf('You can only DELETE from to-many relationships. %s is a to-one relationship.', $related));
+      throw new \Symfony\Component\HttpKernel\Exception\ConflictHttpException(sprintf('You can only DELETE from to-many relationships. %s is a to-one relationship.', $related));
     }
 
     // Compute the list of current values and remove the ones in the payload.
@@ -752,10 +752,10 @@ class EntityResource {
     if (!$received) {
       assert($request->isMethod('POST') || $request->isMethod('PATCH') || $request->isMethod('DELETE'));
       if ($request->isMethod('DELETE') && $relationship_field_name) {
-        throw new BadRequestHttpException(sprintf('You need to provide a body for DELETE operations on a relationship (%s).', $relationship_field_name));
+        throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException(sprintf('You need to provide a body for DELETE operations on a relationship (%s).', $relationship_field_name));
       }
       else {
-        throw new BadRequestHttpException('Empty request body.');
+        throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Empty request body.');
       }
     }
     // First decode the request data. We can then determine if the serialized
@@ -763,10 +763,10 @@ class EntityResource {
     try {
       $decoded = $this->serializer->decode($received, 'api_json');
     }
-    catch (UnexpectedValueException $e) {
+    catch (\Symfony\Component\Serializer\Exception\UnexpectedValueException $e) {
       // If an exception was thrown at this stage, there was a problem decoding
       // the data. Throw a 400 HTTP exception.
-      throw new BadRequestHttpException($e->getMessage());
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException($e->getMessage());
     }
 
     try {
@@ -778,11 +778,11 @@ class EntityResource {
     }
     // These two serialization exception types mean there was a problem with
     // the structure of the decoded data and it's not valid.
-    catch (UnexpectedValueException $e) {
-      throw new UnprocessableEntityHttpException($e->getMessage());
+    catch (\Symfony\Component\Serializer\Exception\UnexpectedValueException $e) {
+      throw new \Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException($e->getMessage());
     }
-    catch (InvalidArgumentException $e) {
-      throw new UnprocessableEntityHttpException($e->getMessage());
+    catch (\Symfony\Component\Serializer\Exception\InvalidArgumentException $e) {
+      throw new \Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException($e->getMessage());
     }
   }
 
@@ -882,11 +882,11 @@ class EntityResource {
   protected function getEntityFromResourceIdentifier(ResourceIdentifier $resource_identifier) {
     $resource_type_name = $resource_identifier->getTypeName();
     if (!($target_resource_type = $this->resourceTypeRepository->getByTypeName($resource_type_name))) {
-      throw new BadRequestHttpException("The resource type `{$resource_type_name}` does not exist.");
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException("The resource type `{$resource_type_name}` does not exist.");
     }
     $id = $resource_identifier->getId();
     if (!($targeted_resource = $this->entityRepository->loadEntityByUuid($target_resource_type->getEntityTypeId(), $id))) {
-      throw new BadRequestHttpException("The targeted `{$resource_type_name}` resource with ID `{$id}` does not exist.");
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException("The targeted `{$resource_type_name}` resource with ID `{$id}` does not exist.");
     }
     return $targeted_resource;
   }
@@ -1028,7 +1028,7 @@ class EntityResource {
       $destination->set($field_name, $origin->get($field_name));
     }
     else {
-      throw new BadRequestHttpException('The serialized entity and the destination entity are of different types.');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('The serialized entity and the destination entity are of different types.');
     }
   }
 
@@ -1097,7 +1097,7 @@ class EntityResource {
     // It's helpful and safe to let the user know when they are not allowed to
     // update a field.
     $field_name = $received_field->getName();
-    throw new EntityAccessDeniedHttpException($original_field->getEntity(), $field_edit_access, '/data/attributes/' . $field_name, sprintf('The current user is not allowed to PATCH the selected field (%s).', $field_name));
+    throw new \Drupal\jsonapi\Exception\EntityAccessDeniedHttpException($original_field->getEntity(), $field_edit_access, '/data/attributes/' . $field_name, sprintf('The current user is not allowed to PATCH the selected field (%s).', $field_name));
   }
 
   /**
@@ -1222,7 +1222,7 @@ class EntityResource {
     $size = $page_param->getSize();
     if ($size <= 0) {
       $cacheability = (new CacheableMetadata())->addCacheContexts(['url.query_args:page']);
-      throw new CacheableBadRequestHttpException($cacheability, sprintf('The page size needs to be a positive integer.'));
+      throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cacheability, sprintf('The page size needs to be a positive integer.'));
     }
     $query = (array) $request->query->getIterator();
     // Check if this is not the last page.

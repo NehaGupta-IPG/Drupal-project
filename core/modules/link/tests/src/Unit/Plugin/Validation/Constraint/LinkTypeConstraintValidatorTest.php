@@ -172,7 +172,7 @@ class LinkTypeConstraintValidatorTest extends UnitTestCase {
    * Tests validating a value that isn't a LinkItemInterface.
    */
   public function testUnexpectedValue(): void {
-    $this->expectException(UnexpectedValueException::class);
+    $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedValueException::class);
     $context = $this->createStub(ExecutionContextInterface::class);
     $this->doValidate('bad value', $context);
   }

@@ -82,7 +82,7 @@ class ProxyServicesPassTest extends UnitTestCase {
     $container->register('path.current', CurrentPathStack::class)
       ->setLazy(TRUE);
 
-    $this->expectException(InvalidArgumentException::class);
+    $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
     $this->proxyServicesPass->process($container);
   }
 

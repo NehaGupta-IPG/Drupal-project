@@ -80,17 +80,17 @@ class ExceptionHandler extends BaseExceptionHandler {
     // in case of attempted INSERT of a record with an undefined column and no
     // default value indicated in schema, MySql returns a 1364 error code.
     if (substr($sqlState, -6, -3) == '23' || $errorCode === 1364) {
-      throw new IntegrityConstraintViolationException($message, $code, $exception);
+      throw new \Drupal\Core\Database\IntegrityConstraintViolationException($message, $code, $exception);
     }
 
     match ($sqlState) {
       'HY000' =>  match ($errorCode) {
-        4111 => throw new SchemaPrimaryKeyMustBeDroppedException($message, 0, $exception),
+        4111 => throw new \Drupal\Core\Database\Exception\SchemaPrimaryKeyMustBeDroppedException($message, 0, $exception),
         default => throw new DatabaseExceptionWrapper($message, 0, $exception),
       },
       '42000' =>  match ($errorCode) {
-        1071 => throw new SchemaTableKeyTooLargeException($message, $code, $exception),
-        1074 => throw new SchemaTableColumnSizeTooLargeException($message, $code, $exception),
+        1071 => throw new \Drupal\Core\Database\Exception\SchemaTableKeyTooLargeException($message, $code, $exception),
+        1074 => throw new \Drupal\Core\Database\Exception\SchemaTableColumnSizeTooLargeException($message, $code, $exception),
         default => throw new DatabaseExceptionWrapper($message, 0, $exception),
       },
       default => throw new DatabaseExceptionWrapper($message, 0, $exception),

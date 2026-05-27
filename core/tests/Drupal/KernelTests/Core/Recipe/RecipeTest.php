@@ -50,7 +50,7 @@ class RecipeTest extends KernelTestBase {
     $dir = uniqid('public://');
     mkdir($dir);
 
-    $this->expectException(RecipeFileException::class);
+    $this->expectException(\Drupal\Core\Recipe\RecipeFileException::class);
     $this->expectExceptionMessage('There is no ' . $dir . '/recipe.yml file');
     Recipe::createFromDirectory($dir);
   }
@@ -69,7 +69,7 @@ class RecipeTest extends KernelTestBase {
       Recipe::createFromDirectory('core/tests/fixtures/recipes/install_node_with_config');
       $this->fail('Expected exception not thrown');
     }
-    catch (RecipePreExistingConfigException $e) {
+    catch (\Drupal\Core\Recipe\RecipePreExistingConfigException $e) {
       $this->assertSame("The configuration 'node.settings' exists already and does not match the recipe's configuration", $e->getMessage());
       $this->assertSame('node.settings', $e->configName);
     }

@@ -143,7 +143,7 @@ class StageConflictTest extends PackageManagerKernelTestBase {
       // testing purposes.
       $event->sandboxManager->destroy($force);
       LoggingCommitter::setException(
-        PreconditionException::class,
+        \PhpTuf\ComposerStager\API\Exception\PreconditionException::class,
         $this->createStub(PreconditionInterface::class),
         $this->createComposeStagerMessage('Stage directory does not exist'),
       );
@@ -154,7 +154,7 @@ class StageConflictTest extends PackageManagerKernelTestBase {
     $stage->create();
     $stage->require(['ext-json:*']);
     if ($expected_exception_message) {
-      $this->expectException(SandboxException::class);
+      $this->expectException(\Drupal\package_manager\Exception\SandboxException::class);
       $this->expectExceptionMessage($expected_exception_message);
     }
     $stage->apply();
@@ -213,7 +213,7 @@ class StageConflictTest extends PackageManagerKernelTestBase {
           ->uninstall(['package_manager_bypass']);
         $this->fail('Expected an exception to be thrown while uninstalling a module.');
       }
-      catch (ModuleUninstallValidatorException $e) {
+      catch (\Drupal\Core\Extension\ModuleUninstallValidatorException $e) {
         $this->assertStringContainsString('Modules cannot be uninstalled while Package Manager is applying staged changes to the active code base.', $e->getMessage());
       }
     };

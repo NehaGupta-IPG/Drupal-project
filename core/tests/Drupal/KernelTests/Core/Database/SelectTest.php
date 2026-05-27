@@ -578,7 +578,7 @@ class SelectTest extends DatabaseTestBase {
 
       $this->fail('Expected exception not thrown');
     }
-    catch (InvalidQueryException $e) {
+    catch (\Drupal\Core\Database\InvalidQueryException $e) {
       $this->assertEquals("Query condition 'age IN ()' cannot be empty.", $e->getMessage());
     }
 
@@ -590,7 +590,7 @@ class SelectTest extends DatabaseTestBase {
 
       $this->fail('Expected exception not thrown');
     }
-    catch (InvalidQueryException $e) {
+    catch (\Drupal\Core\Database\InvalidQueryException $e) {
       $this->assertEquals("Query condition 'age NOT IN ()' cannot be empty.", $e->getMessage());
     }
   }
@@ -621,7 +621,7 @@ class SelectTest extends DatabaseTestBase {
    */
   #[DataProvider('providerNonArrayOperatorWithArrayValueCondition')]
   public function testNonArrayOperatorWithArrayValueCondition(?string $operator, string $operator_in_exception_message): void {
-    $this->expectException(InvalidQueryException::class);
+    $this->expectException(\Drupal\Core\Database\InvalidQueryException::class);
     $this->expectExceptionMessage("Query condition 'age " . $operator_in_exception_message . " 26, 27' must have an array compatible operator.");
 
     $this->connection->select('test', 't')

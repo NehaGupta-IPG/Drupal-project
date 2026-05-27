@@ -80,7 +80,7 @@ trait UserCreationTrait {
       }
       $user = $this->createUser($permissions, NULL, $admin, $values);
     }
-    catch (EntityStorageException $e) {
+    catch (\Drupal\Core\Entity\EntityStorageException $e) {
       if ($this instanceof KernelTestBase) {
         $this->installEntitySchema('user');
         $user = $this->createUser($permissions, NULL, $admin, $values);

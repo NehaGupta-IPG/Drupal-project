@@ -92,7 +92,7 @@ final class ContentExportCommand extends Command {
     // If we're going to export multiple entities, or a single entity with its
     // dependencies, require the `--dir` option.
     if (empty($dir) && (empty($entity_id) || $with_dependencies)) {
-      throw new RuntimeException('The --dir option is required to export multiple entities, or a single entity with its dependencies.');
+      throw new \Symfony\Component\Console\Exception\RuntimeException('The --dir option is required to export multiple entities, or a single entity with its dependencies.');
     }
 
     $count = 0;

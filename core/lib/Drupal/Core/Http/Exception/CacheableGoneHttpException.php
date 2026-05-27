@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Exception\GoneHttpException;
 /**
  * A cacheable GoneHttpException.
  */
-class CacheableGoneHttpException extends GoneHttpException implements CacheableDependencyInterface {
+class CacheableGoneHttpException extends \Symfony\Component\HttpKernel\Exception\GoneHttpException implements CacheableDependencyInterface {
 
   use CacheableDependencyTrait;
 

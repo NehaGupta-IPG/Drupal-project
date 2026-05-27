@@ -86,7 +86,7 @@ class FormAjaxSubscriberTest extends UnitTestCase {
       '#build_id_old' => 'the_build_id',
     ];
     $form_state = new FormState();
-    $exception = new FormAjaxException($form, $form_state);
+    $exception = new \Drupal\Core\Form\FormAjaxException($form, $form_state);
 
     $request = new Request([], ['form_build_id' => 'the_build_id']);
     $commands = [];
@@ -111,7 +111,7 @@ class FormAjaxSubscriberTest extends UnitTestCase {
       '#build_id_old' => 'a_new_build_id',
     ];
     $form_state = new FormState();
-    $exception = new FormAjaxException($form, $form_state);
+    $exception = new \Drupal\Core\Form\FormAjaxException($form, $form_state);
 
     $request = new Request([], ['form_build_id' => 'a_new_build_id']);
     $commands = [];
@@ -149,11 +149,11 @@ class FormAjaxSubscriberTest extends UnitTestCase {
       '#build_id_old' => 'the_build_id',
     ];
     $form_state = new FormState();
-    $exception = new FormAjaxException($form, $form_state);
+    $exception = new \Drupal\Core\Form\FormAjaxException($form, $form_state);
     $request = new Request([], ['form_build_id' => 'the_build_id']);
     $commands = [];
 
-    $expected_exception = new HttpException(500, 'The specified #ajax callback is empty or not callable.');
+    $expected_exception = new \Symfony\Component\HttpKernel\Exception\HttpException(500, 'The specified #ajax callback is empty or not callable.');
     $this->formAjaxResponseBuilder->expects($this->once())
       ->method('buildResponse')
       ->with($request, $expected_form, $form_state, $commands)
@@ -191,7 +191,7 @@ class FormAjaxSubscriberTest extends UnitTestCase {
     $container->set('renderer', $renderer);
     \Drupal::setContainer($container);
 
-    $exception = new BrokenPostRequestException((int) (32 * 1e6));
+    $exception = new \Drupal\Core\Form\Exception\BrokenPostRequestException((int) (32 * 1e6));
     $request = new Request([FormBuilderInterface::AJAX_FORM_REQUEST => TRUE]);
 
     $event = new ExceptionEvent($this->httpKernel, $request, HttpKernelInterface::MAIN_REQUEST, $exception);
@@ -222,7 +222,7 @@ class FormAjaxSubscriberTest extends UnitTestCase {
       '#build_id_old' => 'the_build_id',
     ];
     $form_state = new FormState();
-    $form_exception = new FormAjaxException($form, $form_state);
+    $form_exception = new \Drupal\Core\Form\FormAjaxException($form, $form_state);
     $exception = new \Exception('', 0, $form_exception);
 
     $request = new Request([], ['form_build_id' => 'the_build_id']);

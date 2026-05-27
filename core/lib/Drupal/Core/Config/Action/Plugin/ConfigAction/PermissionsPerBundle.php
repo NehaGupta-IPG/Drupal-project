@@ -52,14 +52,14 @@ final class PermissionsPerBundle implements ConfigActionPluginInterface, Contain
   public function apply(string $configName, mixed $value): void {
     $role = $this->configManager->loadConfigEntityByName($configName);
     if (!($role instanceof RoleInterface)) {
-      throw new ConfigActionException(sprintf("Cannot determine role from %s", $configName));
+      throw new \Drupal\Core\Config\Action\ConfigActionException(sprintf("Cannot determine role from %s", $configName));
     }
 
     assert(is_string($value) || is_array($value));
     [$permissions, $except_bundles] = self::parseValue($value);
 
     if (empty($permissions) || !Inspector::assertAllMatch('%bundle', $permissions, TRUE)) {
-      throw new ConfigActionException(sprintf("The permissions provided %s must be an array of strings that contain '%%bundle'.", var_export($value, TRUE)));
+      throw new \Drupal\Core\Config\Action\ConfigActionException(sprintf("The permissions provided %s must be an array of strings that contain '%%bundle'.", var_export($value, TRUE)));
     }
 
     $bundles = $this->entityTypeBundleInfo->getBundleInfo($this->targetEntityType);

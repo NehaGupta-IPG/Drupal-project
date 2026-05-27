@@ -50,7 +50,7 @@ final class EntityCreate implements ConfigActionPluginInterface, ContainerFactor
    */
   public function apply(string $configName, mixed $value): void {
     if (!is_array($value)) {
-      throw new ConfigActionException(sprintf("The value provided to create %s must be an array", $configName));
+      throw new \Drupal\Core\Config\Action\ConfigActionException(sprintf("The value provided to create %s must be an array", $configName));
     }
 
     /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface|null $entity */
@@ -62,7 +62,7 @@ final class EntityCreate implements ConfigActionPluginInterface, ContainerFactor
     $entity_type_manager = $this->configManager->getEntityTypeManager();
     $entity_type_id = $this->configManager->getEntityTypeIdByName($configName);
     if ($entity_type_id === NULL) {
-      throw new ConfigActionException(sprintf("Cannot determine a config entity type from %s", $configName));
+      throw new \Drupal\Core\Config\Action\ConfigActionException(sprintf("Cannot determine a config entity type from %s", $configName));
     }
     /** @var \Drupal\Core\Config\Entity\ConfigEntityTypeInterface $entity_type */
     $entity_type = $entity_type_manager->getDefinition($entity_type_id);

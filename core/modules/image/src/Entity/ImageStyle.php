@@ -245,7 +245,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
         $request = \Drupal::request();
         $clean_urls = RequestHelper::isCleanUrl($request);
       }
-      catch (ServiceNotFoundException) {
+      catch (\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException) {
       }
     }
 
@@ -286,7 +286,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
         try {
           $file_system->delete($derivative_uri);
         }
-        catch (FileException) {
+        catch (\Drupal\Core\File\Exception\FileException) {
           // Ignore failed deletes.
         }
       }
@@ -299,7 +299,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
           try {
             $file_system->deleteRecursive($directory);
           }
-          catch (FileException) {
+          catch (\Drupal\Core\File\Exception\FileException) {
             // Ignore failed deletes.
           }
         }

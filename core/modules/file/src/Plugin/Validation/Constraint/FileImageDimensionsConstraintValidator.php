@@ -48,7 +48,7 @@ class FileImageDimensionsConstraintValidator extends BaseFileConstraintValidator
   public function validate(mixed $value, Constraint $constraint): void {
     $file = $this->assertValueIsFile($value);
     if (!$constraint instanceof FileImageDimensionsConstraint) {
-      throw new UnexpectedTypeException($constraint, FileImageDimensionsConstraint::class);
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($constraint, FileImageDimensionsConstraint::class);
     }
 
     $image = $this->imageFactory->get($file->getFileUri());

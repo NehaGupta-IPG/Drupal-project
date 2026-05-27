@@ -217,7 +217,7 @@ class EntityQueryRelationshipTest extends EntityKernelTestBase {
    * Tests the invalid specifier in the query relationship.
    */
   public function testInvalidSpecifier(): void {
-    $this->expectException(QueryException::class);
+    $this->expectException(\Drupal\Core\Entity\Query\QueryException::class);
     $this->expectExceptionMessage("Cannot determine entity type for relationship 'language' for field 'langcode.language.foo'");
     $this->container
       ->get('entity_type.manager')
@@ -233,7 +233,7 @@ class EntityQueryRelationshipTest extends EntityKernelTestBase {
    */
   #[DataProvider('providerTestInvalidFieldName')]
   public function testInvalidFieldName(string $field_name): void {
-    $this->expectException(QueryException::class);
+    $this->expectException(\Drupal\Core\Entity\Query\QueryException::class);
     $this->expectExceptionMessage("'non_existent_field_name' not found");
 
     // Check that non-existent field names in a complex relationship query

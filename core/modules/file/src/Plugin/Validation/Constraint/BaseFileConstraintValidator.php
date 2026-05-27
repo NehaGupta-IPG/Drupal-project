@@ -27,7 +27,7 @@ abstract class BaseFileConstraintValidator extends ConstraintValidator {
    */
   protected function assertValueIsFile(mixed $value): FileInterface {
     if (!$value instanceof FileInterface) {
-      throw new UnexpectedTypeException($value, FileInterface::class);
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($value, FileInterface::class);
     }
     return $value;
   }

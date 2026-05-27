@@ -359,7 +359,7 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
    * Tests denormalize with uuid with incorrect type.
    */
   public function testDenormalizeWithUuidWithIncorrectType(): void {
-    $this->expectException(UnexpectedValueException::class);
+    $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
     $this->expectExceptionMessage('The field "field_reference" property "target_type" must be set to "test_type" or omitted.');
 
     $data = [
@@ -380,7 +380,7 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
    * Tests denormalize with type with incorrect uuid.
    */
   public function testDenormalizeWithTypeWithIncorrectUuid(): void {
-    $this->expectException(InvalidArgumentException::class);
+    $this->expectException(\Symfony\Component\Serializer\Exception\InvalidArgumentException::class);
     $this->expectExceptionMessage('No "test_type" entity found with UUID "unique-but-none-non-existent" for field "field_reference"');
 
     $data = [
@@ -404,7 +404,7 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
    * Tests denormalize with empty uuid.
    */
   public function testDenormalizeWithEmptyUuid(): void {
-    $this->expectException(InvalidArgumentException::class);
+    $this->expectException(\Symfony\Component\Serializer\Exception\InvalidArgumentException::class);
     $this->expectExceptionMessage('If provided "target_uuid" cannot be empty for field "field_reference".');
 
     $data = [

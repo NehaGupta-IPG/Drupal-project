@@ -70,7 +70,7 @@ class Context extends ComponentContext implements ContextInterface {
       }
       elseif ($definition->isRequired()) {
         $type = $definition->getDataType();
-        throw new ContextException("The '$type' context is required and not present.");
+        throw new \Drupal\Component\Plugin\Exception\ContextException("The '$type' context is required and not present.");
       }
       return $default_value;
     }

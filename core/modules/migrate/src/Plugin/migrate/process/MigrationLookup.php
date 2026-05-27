@@ -213,14 +213,14 @@ class MigrationLookup extends ProcessPluginBase implements ContainerFactoryPlugi
       try {
         $destination_id_array = $this->migrateLookup->lookup($lookup_migration_id, $lookup_value);
       }
-      catch (PluginNotFoundException $e) {
+      catch (\Drupal\Component\Plugin\Exception\PluginNotFoundException $e) {
         $destination_id_array = [];
       }
-      catch (MigrateException $e) {
+      catch (\Drupal\migrate\MigrateException $e) {
         throw $e;
       }
       catch (\Exception $e) {
-        throw new MigrateException(sprintf('A %s was thrown while processing this migration lookup', gettype($e)), $e->getCode(), $e);
+        throw new \Drupal\migrate\MigrateException(sprintf('A %s was thrown while processing this migration lookup', gettype($e)), $e->getCode(), $e);
       }
 
       if ($destination_id_array) {
@@ -253,14 +253,14 @@ class MigrationLookup extends ProcessPluginBase implements ContainerFactoryPlugi
       catch (\LogicException) {
         // For BC reasons, we must allow attempting to stub a derived migration.
       }
-      catch (PluginNotFoundException) {
+      catch (\Drupal\Component\Plugin\Exception\PluginNotFoundException) {
         // For BC reasons, we must allow attempting to stub a non-existent
         // migration.
       }
-      catch (MigrateException $e) {
+      catch (\Drupal\migrate\MigrateException $e) {
         throw $e;
       }
-      catch (MigrateSkipRowException $e) {
+      catch (\Drupal\migrate\MigrateSkipRowException $e) {
         // Build a new message.
         $skip_row_exception_message = $e->getMessage();
         if (empty($skip_row_exception_message)) {
@@ -278,10 +278,10 @@ class MigrationLookup extends ProcessPluginBase implements ContainerFactoryPlugi
             $skip_row_exception_message,
           );
         }
-        throw new MigrateSkipRowException($new_message, 0);
+        throw new \Drupal\migrate\MigrateSkipRowException($new_message, 0);
       }
       catch (\Exception $e) {
-        throw new MigrateException(sprintf('%s was thrown while attempting to stub: %s', get_class($e), $e->getMessage()), $e->getCode(), $e);
+        throw new \Drupal\migrate\MigrateException(sprintf('%s was thrown while attempting to stub: %s', get_class($e), $e->getMessage()), $e->getCode(), $e);
       }
     }
     if ($destination_ids) {

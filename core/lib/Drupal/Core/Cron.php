@@ -172,7 +172,7 @@ class Cron implements CronInterface {
       try {
         $this->processQueue($queue, $worker);
       }
-      catch (SuspendQueueException $e) {
+      catch (\Drupal\Core\Queue\SuspendQueueException $e) {
         // Return to this queue after processing other queues if the delay is
         // within the threshold.
         if ($e->isDelayable() && ($e->getDelay() < $max_wait)) {
@@ -208,7 +208,7 @@ class Cron implements CronInterface {
         $worker->processItem($item->data);
         $queue->deleteItem($item);
       }
-      catch (DelayedRequeueException $e) {
+      catch (\Drupal\Core\Queue\DelayedRequeueException $e) {
         // The worker requested the task not be immediately re-queued.
         // - If the queue doesn't support ::delayItem(), we should leave the
         // item's current expiry time alone.
@@ -220,11 +220,11 @@ class Cron implements CronInterface {
           $queue->delayItem($item, $e->getDelay());
         }
       }
-      catch (RequeueException) {
+      catch (\Drupal\Core\Queue\RequeueException) {
         // The worker requested the task be immediately requeued.
         $queue->releaseItem($item);
       }
-      catch (SuspendQueueException $e) {
+      catch (\Drupal\Core\Queue\SuspendQueueException $e) {
         // If the worker indicates the whole queue should be skipped, release
         // the item and go to the next queue.
         $queue->releaseItem($item);

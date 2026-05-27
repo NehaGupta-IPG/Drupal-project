@@ -39,7 +39,7 @@ class NullGenerator extends UrlGenerator {
     elseif ($name === '<none>') {
       return new Route('');
     }
-    throw new RouteNotFoundException();
+    throw new \Symfony\Component\Routing\Exception\RouteNotFoundException();
   }
 
   /**

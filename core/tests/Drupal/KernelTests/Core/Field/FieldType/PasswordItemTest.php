@@ -173,7 +173,7 @@ class PasswordItemTest extends FieldKernelTestBase {
   public function testPreSaveExceptionNew(): void {
     $entity = EntityTest::create();
     $entity->test_field = str_repeat('a', PasswordInterface::PASSWORD_MAX_LENGTH + 1);
-    $this->expectException(EntityStorageException::class);
+    $this->expectException(\Drupal\Core\Entity\EntityStorageException::class);
     $this->expectExceptionMessage('Failed to hash the Test entity password.');
     $entity->save();
   }
@@ -188,7 +188,7 @@ class PasswordItemTest extends FieldKernelTestBase {
 
     $this->assertNotEquals('will_be_hashed', $entity->test_field->value);
 
-    $this->expectException(EntityStorageException::class);
+    $this->expectException(\Drupal\Core\Entity\EntityStorageException::class);
     $this->expectExceptionMessage('Failed to hash the Test entity password.');
     $entity->test_field = str_repeat('a', PasswordInterface::PASSWORD_MAX_LENGTH + 1);
     $entity->save();

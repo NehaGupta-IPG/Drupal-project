@@ -193,7 +193,7 @@ class ManageFieldsFunctionalTest extends ManageFieldsFunctionalTestBase {
         try {
           $this->assertSession()->elementExists('xpath', "//a//span[text()='$label']");
         }
-        catch (ElementNotFoundException) {
+        catch (\Behat\Mink\Exception\ElementNotFoundException) {
           if ($group = $this->getFieldFromGroup($field_type)) {
             if ($group !== 'General') {
               $link = $this->assertSession()->elementExists('xpath', "//a[.//span[text()='$group']]");

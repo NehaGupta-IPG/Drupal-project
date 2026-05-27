@@ -7,7 +7,7 @@ use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 /**
  * Defines a class for front matter parsing exceptions.
  */
-class FrontMatterParseException extends InvalidDataTypeException {
+class FrontMatterParseException extends \Drupal\Component\Serialization\Exception\InvalidDataTypeException {
 
   /**
    * The line number of where the parse error occurred.
@@ -27,7 +27,7 @@ class FrontMatterParseException extends InvalidDataTypeException {
    * @param \Drupal\Component\Serialization\Exception\InvalidDataTypeException $exception
    *   The exception thrown when attempting to parse front matter data.
    */
-  public function __construct(InvalidDataTypeException $exception) {
+  public function __construct(\Drupal\Component\Serialization\Exception\InvalidDataTypeException $exception) {
     $this->sourceLine = 1;
 
     // Attempt to extract the line number from the serializer error. This isn't

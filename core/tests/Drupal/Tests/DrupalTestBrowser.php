@@ -141,7 +141,7 @@ class DrupalTestBrowser extends AbstractBrowser {
     // Catch RequestException rather than ClientExceptionInterface because we
     // want to re-throw the exception whenever the response is NULL, and
     // ConnectException always has a NULL response.
-    catch (RequestException $e) {
+    catch (\GuzzleHttp\Exception\RequestException $e) {
       if (!$e->hasResponse()) {
         throw $e;
       }

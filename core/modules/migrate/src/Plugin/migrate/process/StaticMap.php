@@ -150,13 +150,13 @@ class StaticMap extends ProcessPluginBase {
       if (!empty($this->configuration['bypass'])) {
         return NULL;
       }
-      throw new MigrateSkipRowException(sprintf("No static mapping possible for NULL and no default value provided for destination '%s'.", $destination_property));
+      throw new \Drupal\migrate\MigrateSkipRowException(sprintf("No static mapping possible for NULL and no default value provided for destination '%s'.", $destination_property));
     }
 
     $new_value = $value;
     if (is_array($value)) {
       if (!$value) {
-        throw new MigrateException('Can not lookup without a value.');
+        throw new \Drupal\migrate\MigrateException('Can not lookup without a value.');
       }
     }
     else {
@@ -166,12 +166,12 @@ class StaticMap extends ProcessPluginBase {
     if (!$key_exists) {
       if (array_key_exists('default_value', $this->configuration)) {
         if (!empty($this->configuration['bypass'])) {
-          throw new MigrateException('Setting both default_value and bypass is invalid.');
+          throw new \Drupal\migrate\MigrateException('Setting both default_value and bypass is invalid.');
         }
         return $this->configuration['default_value'];
       }
       if (empty($this->configuration['bypass'])) {
-        throw new MigrateSkipRowException(sprintf("No static mapping found for '%s' and no default value provided for destination '%s'.", Variable::export($value), $destination_property));
+        throw new \Drupal\migrate\MigrateSkipRowException(sprintf("No static mapping found for '%s' and no default value provided for destination '%s'.", Variable::export($value), $destination_property));
       }
       else {
         return $value;

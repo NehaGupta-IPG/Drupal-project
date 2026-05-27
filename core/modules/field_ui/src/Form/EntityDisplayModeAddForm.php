@@ -43,7 +43,7 @@ class EntityDisplayModeAddForm extends EntityDisplayModeFormBase {
   protected function prepareEntity() {
     $definition = $this->entityTypeManager->getDefinition($this->targetEntityTypeId);
     if (!$definition->get('field_ui_base_route') || !$definition->hasViewBuilderClass()) {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
 
     $this->entity->setTargetType($this->targetEntityTypeId);

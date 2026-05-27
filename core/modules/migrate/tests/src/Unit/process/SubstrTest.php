@@ -56,7 +56,7 @@ class SubstrTest extends MigrateProcessTestCase {
   public function testSubstrFail(): void {
     $configuration = [];
     $this->plugin = new Substr($configuration, 'map', []);
-    $this->expectException(MigrateException::class);
+    $this->expectException(\Drupal\migrate\MigrateException::class);
     $this->expectExceptionMessage('The input value must be a string.');
     $this->plugin->transform(['Captain Janeway'], $this->migrateExecutable, $this->row, 'destination_property');
   }
@@ -67,7 +67,7 @@ class SubstrTest extends MigrateProcessTestCase {
   public function testStartIsString(): void {
     $configuration['start'] = '2';
     $this->plugin = new Substr($configuration, 'map', []);
-    $this->expectException(MigrateException::class);
+    $this->expectException(\Drupal\migrate\MigrateException::class);
     $this->expectExceptionMessage('The start position configuration value should be an integer. Omit this key to capture from the beginning of the string.');
     $this->plugin->transform(['foo'], $this->migrateExecutable, $this->row, 'destination_property');
   }
@@ -78,7 +78,7 @@ class SubstrTest extends MigrateProcessTestCase {
   public function testLengthIsString(): void {
     $configuration['length'] = '1';
     $this->plugin = new Substr($configuration, 'map', []);
-    $this->expectException(MigrateException::class);
+    $this->expectException(\Drupal\migrate\MigrateException::class);
     $this->expectExceptionMessage('The character length configuration value should be an integer. Omit this key to capture from the start position to the end of the string.');
     $this->plugin->transform(['foo'], $this->migrateExecutable, $this->row, 'destination_property');
   }

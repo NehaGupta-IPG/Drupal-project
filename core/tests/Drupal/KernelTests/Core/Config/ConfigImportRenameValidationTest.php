@@ -91,7 +91,7 @@ class ConfigImportRenameValidationTest extends KernelTestBase {
       $this->configImporter->import();
       $this->fail('Expected ConfigImporterException thrown when a renamed configuration entity does not match the existing entity type.');
     }
-    catch (ConfigImporterException) {
+    catch (\Drupal\Core\Config\ConfigImporterException) {
       $expected = [
         "Entity type mismatch on rename. node_type not equal to config_test for existing configuration node.type.{$content_type->id()} and staged configuration config_test.dynamic.$test_entity_id.",
       ];
@@ -133,7 +133,7 @@ class ConfigImportRenameValidationTest extends KernelTestBase {
       $this->configImporter->import();
       $this->fail('Expected ConfigImporterException thrown when simple configuration is renamed.');
     }
-    catch (ConfigImporterException) {
+    catch (\Drupal\Core\Config\ConfigImporterException) {
       $expected = [
         'Rename operation for simple configuration. Existing configuration config_test.old and staged configuration config_test.new.',
       ];

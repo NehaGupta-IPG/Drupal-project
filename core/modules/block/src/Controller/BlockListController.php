@@ -44,7 +44,7 @@ class BlockListController extends EntityListController {
   public function listing($theme = NULL, ?Request $request = NULL) {
     $theme = $theme ?: $this->config('system.theme')->get('default');
     if (!$this->themeHandler->hasUi($theme)) {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
 
     return $this->entityTypeManager()->getListBuilder('block')->render($theme, $request);

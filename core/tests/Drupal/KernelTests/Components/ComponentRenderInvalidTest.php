@@ -32,7 +32,7 @@ class ComponentRenderInvalidTest extends ComponentKernelTestBase {
    * component does not have schema definitions.
    */
   public function testInvalidDefinitionModule(): void {
-    $this->expectException(InvalidComponentException::class);
+    $this->expectException(\Drupal\Core\Render\Component\Exception\InvalidComponentException::class);
     $this->expectExceptionMessage('The component "sdc_test_invalid:my-card-no-schema" does not provide schema information. Schema definitions are mandatory for components declared in modules. For components declared in themes, schema definitions are only mandatory if the "enforce_prop_schemas" key is set to "true" in the theme info file.');
     $this->manager->getDefinitions();
   }
@@ -47,7 +47,7 @@ class ComponentRenderInvalidTest extends ComponentKernelTestBase {
     \Drupal::service('theme_installer')->install(['sdc_theme_test_enforce_schema_invalid']);
     $active_theme = \Drupal::service('theme.initialization')->initTheme('sdc_theme_test_enforce_schema_invalid');
     \Drupal::service('theme.manager')->setActiveTheme($active_theme);
-    $this->expectException(InvalidComponentException::class);
+    $this->expectException(\Drupal\Core\Render\Component\Exception\InvalidComponentException::class);
     $this->manager->getDefinitions();
   }
 

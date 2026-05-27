@@ -19,7 +19,7 @@ class IgnoreActiveTrailConstraintValidator extends ConstraintValidator {
   public function validate(mixed $value, Constraint $constraint): void {
     assert($constraint instanceof IgnoreActiveTrailConstraint);
     if (!is_array($value)) {
-      throw new UnexpectedTypeException($value, 'array');
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($value, 'array');
     }
     if (!empty($value['ignore_active_trail'])
       && ((isset($value['level']) && $value['level'] > 1) || (empty($value['expand_all_items']) && $value['depth'] != 1))) {

@@ -94,7 +94,7 @@ class FileStorageTest extends ConfigStorageTestBase {
   public function testUnsupportedDataTypeConfigException(): void {
     $name = 'core.extension';
     $path = $this->storage->getFilePath($name);
-    $this->expectException(UnsupportedDataTypeConfigException::class);
+    $this->expectException(\Drupal\Core\Config\UnsupportedDataTypeConfigException::class);
     $this->expectExceptionMessageMatches("@Invalid data type in config $name, found in file $path: @");
     file_put_contents($path, PHP_EOL . 'foo : @bar', FILE_APPEND);
     $this->storage->read($name);

@@ -99,12 +99,12 @@ class ResourceFetcherTest extends UnitTestCase {
       $fetcher->fetchResource('invalid');
       $this->fail('Expected a ResourceException to be thrown for invalid JSON.');
     }
-    catch (ResourceException $e) {
+    catch (\Drupal\media\OEmbed\ResourceException $e) {
       $this->assertStringStartsWith('Error decoding oEmbed resource: Syntax error', $e->getMessage());
     }
 
     // Valid JSON that does not produce an array should also throw an exception.
-    $this->expectException(ResourceException::class);
+    $this->expectException(\Drupal\media\OEmbed\ResourceException::class);
     $this->expectExceptionMessage('The oEmbed resource could not be decoded.');
     $fetcher->fetchResource('non_array');
   }

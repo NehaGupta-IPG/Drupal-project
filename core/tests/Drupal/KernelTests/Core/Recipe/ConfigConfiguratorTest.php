@@ -119,7 +119,7 @@ class ConfigConfiguratorTest extends KernelTestBase {
       Recipe::createFromDirectory($clone_dir);
       $this->fail('Expected an exception but none was thrown.');
     }
-    catch (RecipePreExistingConfigException $e) {
+    catch (\Drupal\Core\Recipe\RecipePreExistingConfigException $e) {
       $this->assertSame("The configuration 'block_content.type.basic' exists already and does not match the recipe's configuration", $e->getMessage());
     }
 
@@ -162,7 +162,7 @@ class ConfigConfiguratorTest extends KernelTestBase {
       return $data;
     });
     // If we try to instantiate this recipe, we should an exception.
-    $this->expectException(RecipePreExistingConfigException::class);
+    $this->expectException(\Drupal\Core\Recipe\RecipePreExistingConfigException::class);
     $this->expectExceptionMessage("The configuration 'block_content.type.basic' exists already and does not match the recipe's configuration");
     Recipe::createFromDirectory($clone_dir);
   }

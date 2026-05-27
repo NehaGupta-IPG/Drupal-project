@@ -154,7 +154,7 @@ class MigrateSourceTest extends MigrateTestCase {
    */
   public function testHighwaterTrackChangesIncompatible(): void {
     $source_config = ['track_changes' => TRUE, 'high_water_property' => ['name' => 'something']];
-    $this->expectException(MigrateException::class);
+    $this->expectException(\Drupal\migrate\MigrateException::class);
     $this->getSource($source_config);
   }
 
@@ -384,7 +384,7 @@ class MigrateSourceTest extends MigrateTestCase {
       ->willReturn([TRUE, TRUE])
       ->shouldBeCalled();
     $module_handler->invokeAll('migrate_' . $migration->id() . '_prepare_row', [$row, $source, $migration])
-      ->willThrow(new MigrateSkipRowException())
+      ->willThrow(new \Drupal\migrate\MigrateSkipRowException())
       ->shouldBeCalled();
     $source->setModuleHandler($module_handler->reveal());
 
@@ -396,7 +396,7 @@ class MigrateSourceTest extends MigrateTestCase {
     $this->assertFalse($source->prepareRow($row));
 
     // Throw an exception the second time that avoids mapping.
-    $e = new MigrateSkipRowException('', FALSE);
+    $e = new \Drupal\migrate\MigrateSkipRowException('', FALSE);
     $module_handler->invokeAll('migrate_' . $migration->id() . '_prepare_row', [$row, $source, $migration])
       ->willThrow($e)
       ->shouldBeCalled();

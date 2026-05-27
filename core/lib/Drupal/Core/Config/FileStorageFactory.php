@@ -22,7 +22,7 @@ class FileStorageFactory {
   public static function getSync() {
     $directory = Settings::get('config_sync_directory', FALSE);
     if ($directory === FALSE) {
-      throw new ConfigDirectoryNotDefinedException('The config sync directory is not defined in $settings["config_sync_directory"]');
+      throw new \Drupal\Core\Config\ConfigDirectoryNotDefinedException('The config sync directory is not defined in $settings["config_sync_directory"]');
     }
     return new FileStorage($directory);
   }

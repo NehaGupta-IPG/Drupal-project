@@ -120,7 +120,7 @@ class MigrateMessageController extends ControllerBase {
     $migration = $this->migrationPluginManager->createInstance($migration_id);
 
     if (!$migration) {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
 
     // Get the map and message table names.
@@ -129,7 +129,7 @@ class MigrateMessageController extends ControllerBase {
 
     // If the map table does not exist then do not continue.
     if (!$this->database->schema()->tableExists($map_table)) {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
 
     // If there is a map table but no message table display an error.
@@ -147,7 +147,7 @@ class MigrateMessageController extends ControllerBase {
     try {
       $fields = $source_plugin->fields();
     }
-    catch (DatabaseConnectionRefusedException | DatabaseNotFoundException | RequirementsException | \PDOException) {
+    catch (\Drupal\Core\Database\DatabaseConnectionRefusedException | \Drupal\Core\Database\DatabaseNotFoundException | \Drupal\migrate\Exception\RequirementsException | \PDOException) {
     }
 
     $source_id_field_names = array_keys($source_plugin->getIds());

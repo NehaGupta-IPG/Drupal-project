@@ -209,7 +209,7 @@ class FormBuilderTest extends FormTestBase {
       $this->simulateFormSubmission($form_id, $form_arg, $form_state, FALSE);
       $this->fail('EnforcedResponseException was not thrown.');
     }
-    catch (EnforcedResponseException $e) {
+    catch (\Drupal\Core\Form\EnforcedResponseException $e) {
       $this->assertSame($response, $e->getResponse());
     }
     $this->assertSame($response, $form_state->getResponse());
@@ -257,7 +257,7 @@ class FormBuilderTest extends FormTestBase {
       $this->simulateFormSubmission($form_id, $form_arg, $form_state, FALSE);
       $this->fail('EnforcedResponseException was not thrown.');
     }
-    catch (EnforcedResponseException $e) {
+    catch (\Drupal\Core\Form\EnforcedResponseException $e) {
       $this->assertSame($response, $e->getResponse());
     }
     $this->assertSame($response, $form_state->getResponse());
@@ -651,7 +651,7 @@ class FormBuilderTest extends FormTestBase {
     $form_arg = $this->getMockForm('test_form_id');
     $form_state = new FormState();
 
-    $this->expectException(BrokenPostRequestException::class);
+    $this->expectException(\Drupal\Core\Form\Exception\BrokenPostRequestException::class);
     $this->formBuilder->buildForm($form_arg, $form_state);
   }
 

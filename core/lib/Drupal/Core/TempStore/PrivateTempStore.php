@@ -131,7 +131,7 @@ class PrivateTempStore {
     if (!$this->lockBackend->acquire($key)) {
       $this->lockBackend->wait($key);
       if (!$this->lockBackend->acquire($key)) {
-        throw new TempStoreException("Couldn't acquire lock to update item '$key' in '{$this->storage->getCollectionName()}' temporary storage.");
+        throw new \Drupal\Core\TempStore\TempStoreException("Couldn't acquire lock to update item '$key' in '{$this->storage->getCollectionName()}' temporary storage.");
       }
     }
 
@@ -189,7 +189,7 @@ class PrivateTempStore {
     if (!$this->lockBackend->acquire($key)) {
       $this->lockBackend->wait($key);
       if (!$this->lockBackend->acquire($key)) {
-        throw new TempStoreException("Couldn't acquire lock to delete item '$key' from '{$this->storage->getCollectionName()}' temporary storage.");
+        throw new \Drupal\Core\TempStore\TempStoreException("Couldn't acquire lock to delete item '$key' from '{$this->storage->getCollectionName()}' temporary storage.");
       }
     }
     $this->storage->delete($key);

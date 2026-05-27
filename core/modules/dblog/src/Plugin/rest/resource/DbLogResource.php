@@ -49,10 +49,10 @@ class DbLogResource extends ResourceBase {
         return new ResourceResponse($record);
       }
 
-      throw new NotFoundHttpException("Log entry with ID '$id' was not found");
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException("Log entry with ID '$id' was not found");
     }
 
-    throw new BadRequestHttpException('No log entry ID was provided');
+    throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('No log entry ID was provided');
   }
 
 }

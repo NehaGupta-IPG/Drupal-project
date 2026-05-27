@@ -97,7 +97,7 @@ class EntityUrlTest extends UnitTestCase {
   public function testToUrlNoId(): void {
     $entity = new StubEntityBase([], static::ENTITY_TYPE_ID);
 
-    $this->expectException(EntityMalformedException::class);
+    $this->expectException(\Drupal\Core\Entity\EntityMalformedException::class);
     $this->expectExceptionMessage('The "' . static::ENTITY_TYPE_ID . '" entity cannot have a URI as it does not have an ID');
     $entity->toUrl();
   }
@@ -114,7 +114,7 @@ class EntityUrlTest extends UnitTestCase {
     // @phpstan-ignore method.deprecated
     $this->entityType->getUriCallback()->willReturn(NULL);
 
-    $this->expectException(UndefinedLinkTemplateException::class);
+    $this->expectException(\Drupal\Core\Entity\Exception\UndefinedLinkTemplateException::class);
     $this->expectExceptionMessage("Cannot generate default URL because no link template 'canonical' or 'edit-form' was found for the '" . static::ENTITY_TYPE_ID . "' entity type");
     $entity->toUrl();
   }
@@ -369,7 +369,7 @@ class EntityUrlTest extends UnitTestCase {
     $this->entityType->getUriCallback()->willReturn($uri_callback);
 
     $link_template = 'canonical';
-    $this->expectException(UndefinedLinkTemplateException::class);
+    $this->expectException(\Drupal\Core\Entity\Exception\UndefinedLinkTemplateException::class);
     $this->expectExceptionMessage("No link template '$link_template' found for the '" . static::ENTITY_TYPE_ID . "' entity type");
     $entity->toUrl($link_template);
   }
@@ -461,7 +461,7 @@ class EntityUrlTest extends UnitTestCase {
     $url_generator
       ->method('generateFromRoute')
       ->with($route_name_1)
-      ->willThrowException(new MissingMandatoryParametersException($route_name_1, ['missing_parameter']));
+      ->willThrowException(new \Symfony\Component\Routing\Exception\MissingMandatoryParametersException($route_name_1, ['missing_parameter']));
     $this->assertEquals([], $entity->uriRelationships());
   }
 

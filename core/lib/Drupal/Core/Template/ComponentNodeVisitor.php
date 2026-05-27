@@ -123,7 +123,7 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
     try {
       return $this->pluginManager->find($component_id);
     }
-    catch (ComponentNotFoundException) {
+    catch (\Drupal\Core\Render\Component\Exception\ComponentNotFoundException) {
       return NULL;
     }
   }
@@ -181,7 +181,7 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
     }
     if (!empty($error_messages)) {
       $message = implode("\n", $error_messages);
-      throw new InvalidComponentException($message);
+      throw new \Drupal\Core\Render\Component\Exception\InvalidComponentException($message);
     }
   }
 

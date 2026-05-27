@@ -32,7 +32,7 @@ class CheckRequirementsTest extends UnitTestCase {
       $this->prophesize(LanguageManagerInterface::class)->reveal(),
       $this->prophesize(TypedConfigManagerInterface::class)->reveal(),
     );
-    $this->expectException(RequirementsException::class);
+    $this->expectException(\Drupal\migrate\Exception\RequirementsException::class);
     $this->expectExceptionMessage("Destination plugin 'test' did not meet the requirements");
     $destination->checkRequirements();
   }

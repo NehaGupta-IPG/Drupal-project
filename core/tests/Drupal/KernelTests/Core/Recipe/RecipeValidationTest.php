@@ -844,7 +844,7 @@ YAML,
       // If there was no error, we'd better not have been expecting any.
       $this->assertNull($expected_violations, 'Validation errors were expected, but there were none.');
     }
-    catch (RecipeFileException $e) {
+    catch (\Drupal\Core\Recipe\RecipeFileException $e) {
       $this->assertIsArray($expected_violations, 'There were validation errors, but none were expected.');
       $this->assertIsObject($e->violations);
 

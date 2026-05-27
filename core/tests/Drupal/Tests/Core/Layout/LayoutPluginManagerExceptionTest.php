@@ -29,7 +29,7 @@ class LayoutPluginManagerExceptionTest extends UnitTestCase {
    * @legacy-covers ::processDefinition
    */
   public function testProcessDefinitionWithMissingLayoutLabel(): void {
-    $this->expectException(InvalidPluginDefinitionException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class);
     $this->expectExceptionMessage('The "test_layout" layout definition must have a label.');
     $definition = new LayoutDefinition([
       'id' => 'a_label_less_layout',

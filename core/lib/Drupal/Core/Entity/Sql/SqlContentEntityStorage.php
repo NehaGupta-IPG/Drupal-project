@@ -289,7 +289,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       $this->initTableLayout();
     }
     else {
-      throw new EntityStorageException("Unsupported entity type {$entity_type->id()}");
+      throw new \Drupal\Core\Entity\EntityStorageException("Unsupported entity type {$entity_type->id()}");
     }
   }
 
@@ -304,7 +304,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   public function setFieldStorageDefinitions(array $field_storage_definitions) {
     foreach ($field_storage_definitions as $field_storage_definition) {
       if ($field_storage_definition->getTargetEntityTypeId() !== $this->entityType->id()) {
-        throw new EntityStorageException("Unsupported entity type {$field_storage_definition->getTargetEntityTypeId()}");
+        throw new \Drupal\Core\Entity\EntityStorageException("Unsupported entity type {$field_storage_definition->getTargetEntityTypeId()}");
       }
     }
 
@@ -779,12 +779,12 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         try {
           $transaction->rollBack();
         }
-        catch (TransactionOutOfOrderException $rollbackException) {
+        catch (\Drupal\Core\Database\TransactionOutOfOrderException $rollbackException) {
           Error::logException(\Drupal::logger($this->entityTypeId), $rollbackException);
         }
       }
       Error::logException(\Drupal::logger($this->entityTypeId), $e);
-      throw new EntityStorageException($e->getMessage(), $e->getCode(), $e);
+      throw new \Drupal\Core\Entity\EntityStorageException($e->getMessage(), $e->getCode(), $e);
     }
   }
 
@@ -837,12 +837,12 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         try {
           $transaction->rollBack();
         }
-        catch (TransactionOutOfOrderException $rollbackException) {
+        catch (\Drupal\Core\Database\TransactionOutOfOrderException $rollbackException) {
           Error::logException(\Drupal::logger($this->entityTypeId), $rollbackException);
         }
       }
       Error::logException(\Drupal::logger($this->entityTypeId), $e);
-      throw new EntityStorageException($e->getMessage(), $e->getCode(), $e);
+      throw new \Drupal\Core\Entity\EntityStorageException($e->getMessage(), $e->getCode(), $e);
     }
   }
 
@@ -893,12 +893,12 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         try {
           $transaction->rollBack();
         }
-        catch (TransactionOutOfOrderException $rollbackException) {
+        catch (\Drupal\Core\Database\TransactionOutOfOrderException $rollbackException) {
           Error::logException(\Drupal::logger($this->entityTypeId), $rollbackException);
         }
       }
       Error::logException(\Drupal::logger($this->entityTypeId), $e);
-      throw new EntityStorageException($e->getMessage(), $e->getCode(), $e);
+      throw new \Drupal\Core\Entity\EntityStorageException($e->getMessage(), $e->getCode(), $e);
     }
   }
 
@@ -1077,7 +1077,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     foreach ($table_mapping->getFieldNames($table_name) as $field_name) {
 
       if (empty($this->fieldStorageDefinitions[$field_name])) {
-        throw new EntityStorageException("Table mapping contains invalid field $field_name.");
+        throw new \Drupal\Core\Entity\EntityStorageException("Table mapping contains invalid field $field_name.");
       }
       $definition = $this->fieldStorageDefinitions[$field_name];
       $columns = $table_mapping->getColumnNames($field_name);
@@ -1824,13 +1824,13 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     try {
       $callback();
     }
-    catch (SchemaException $e) {
+    catch (\Drupal\Core\Database\SchemaException $e) {
       $message .= ' ' . $e->getMessage();
-      throw new EntityStorageException($message, 0, $e);
+      throw new \Drupal\Core\Entity\EntityStorageException($message, 0, $e);
     }
     catch (DatabaseExceptionWrapper $e) {
       $message .= ' ' . $e->getMessage();
-      throw new EntityStorageException($message, 0, $e);
+      throw new \Drupal\Core\Entity\EntityStorageException($message, 0, $e);
     }
   }
 

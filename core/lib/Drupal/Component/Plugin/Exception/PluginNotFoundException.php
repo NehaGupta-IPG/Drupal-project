@@ -5,7 +5,7 @@ namespace Drupal\Component\Plugin\Exception;
 /**
  * Plugin exception class to be thrown when a plugin ID could not be found.
  */
-class PluginNotFoundException extends PluginException {
+class PluginNotFoundException extends \Drupal\Component\Plugin\Exception\PluginException {
 
   /**
    * Construct a PluginNotFoundException exception.

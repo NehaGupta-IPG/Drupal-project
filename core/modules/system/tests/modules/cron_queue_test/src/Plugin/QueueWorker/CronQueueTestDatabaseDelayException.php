@@ -25,7 +25,7 @@ class CronQueueTestDatabaseDelayException extends QueueWorkerBase {
    * {@inheritdoc}
    */
   public function processItem($data) {
-    throw new DelayedRequeueException(self::DELAY_INTERVAL);
+    throw new \Drupal\Core\Queue\DelayedRequeueException(self::DELAY_INTERVAL);
   }
 
 }

@@ -155,14 +155,14 @@ class KeyValueEntityStorage extends EntityStorageBase {
   public function save(EntityInterface $entity) {
     $id = $entity->id();
     if ($id === NULL || $id === '') {
-      throw new EntityMalformedException('The entity does not have an ID.');
+      throw new \Drupal\Core\Entity\EntityMalformedException('The entity does not have an ID.');
     }
 
     // Check the entity ID length.
     // @todo This is not config-specific, but serial IDs will likely never hit
     //   this limit. Consider renaming the exception class.
     if (strlen($entity->id()) > static::MAX_ID_LENGTH) {
-      throw new ConfigEntityIdLengthException("Entity ID {$entity->id()} exceeds maximum allowed length of " . static::MAX_ID_LENGTH . ' characters.');
+      throw new \Drupal\Core\Config\Entity\Exception\ConfigEntityIdLengthException("Entity ID {$entity->id()} exceeds maximum allowed length of " . static::MAX_ID_LENGTH . ' characters.');
     }
     return parent::save($entity);
   }

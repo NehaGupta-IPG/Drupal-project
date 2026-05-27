@@ -93,7 +93,7 @@ class Sort {
   public static function createFromQueryParameter($parameter) {
     if (empty($parameter)) {
       $cacheability = (new CacheableMetadata())->addCacheContexts(['url.query_args:sort']);
-      throw new CacheableBadRequestHttpException($cacheability, 'You need to provide a value for the sort parameter.');
+      throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cacheability, 'You need to provide a value for the sort parameter.');
     }
 
     // Expand a JSON:API compliant sort into a more expressive sort parameter.
@@ -153,7 +153,7 @@ class Sort {
     ];
 
     if (!isset($sort_item[static::PATH_KEY])) {
-      throw new CacheableBadRequestHttpException($cacheability, 'You need to provide a field name for the sort parameter.');
+      throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cacheability, 'You need to provide a field name for the sort parameter.');
     }
 
     $expected_keys = [
@@ -166,7 +166,7 @@ class Sort {
 
     // Verify correct sort keys.
     if (count(array_diff($expected_keys, array_keys($expanded))) > 0) {
-      throw new CacheableBadRequestHttpException($cacheability, 'You have provided an invalid set of sort keys.');
+      throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cacheability, 'You have provided an invalid set of sort keys.');
     }
 
     return $expanded;

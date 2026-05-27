@@ -101,7 +101,7 @@ class ExtensionAvailableConstraintValidator extends ConstraintValidator implemen
       try {
         $extension_discovery = $this->getExtensionDiscovery($validation_profile);
       }
-      catch (UnknownExtensionException) {
+      catch (\Drupal\Core\Extension\Exception\UnknownExtensionException) {
         // The new profile passed is not available. If we are validating a
         // profile, show the profile missing message.
         if ($constraint->type === 'profile') {

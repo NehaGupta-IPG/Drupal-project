@@ -78,7 +78,7 @@ class WorkflowStateDeleteForm extends ConfirmFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state, ?WorkflowInterface $workflow = NULL, $workflow_state = NULL) {
     if (!$workflow->getTypePlugin()->hasState($workflow_state)) {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
     $this->workflow = $workflow;
     $this->stateId = $workflow_state;

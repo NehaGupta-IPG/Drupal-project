@@ -136,7 +136,7 @@ class InstallCommand extends Command {
       Settings::initialize($kernel->getAppRoot(), $kernel->getSitePath(), $this->classLoader);
       $kernel->boot();
     }
-    catch (ConnectionNotDefinedException) {
+    catch (\Drupal\Core\Database\ConnectionNotDefinedException) {
       return FALSE;
     }
     return !empty(Database::getConnectionInfo());

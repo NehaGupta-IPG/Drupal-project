@@ -84,7 +84,7 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
       $this->fail('Cannot create two fields with the same name.');
     }
     catch (\Exception $e) {
-      $this->assertInstanceOf(EntityStorageException::class, $e);
+      $this->assertInstanceOf(\Drupal\Core\Entity\EntityStorageException::class, $e);
     }
 
     // Check that field type is required.
@@ -97,7 +97,7 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
       $this->fail('Cannot create a field with no type.');
     }
     catch (\Exception $e) {
-      $this->assertInstanceOf(FieldException::class, $e);
+      $this->assertInstanceOf(\Drupal\Core\Field\FieldException::class, $e);
     }
 
     // Check that field name is required.
@@ -110,7 +110,7 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
       $this->fail('Cannot create an unnamed field.');
     }
     catch (\Exception $e) {
-      $this->assertInstanceOf(FieldException::class, $e);
+      $this->assertInstanceOf(\Drupal\Core\Field\FieldException::class, $e);
     }
     // Check that entity type is required.
     try {
@@ -122,7 +122,7 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
       $this->fail('Cannot create a field without an entity type.');
     }
     catch (\Exception $e) {
-      $this->assertInstanceOf(FieldException::class, $e);
+      $this->assertInstanceOf(\Drupal\Core\Field\FieldException::class, $e);
     }
 
     // Check that field name must start with a letter or _.
@@ -136,7 +136,7 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
       $this->fail('Cannot create a field with a name starting with a digit.');
     }
     catch (\Exception $e) {
-      $this->assertInstanceOf(FieldException::class, $e);
+      $this->assertInstanceOf(\Drupal\Core\Field\FieldException::class, $e);
     }
 
     // Check that field name must only contain lowercase alphanumeric or _.
@@ -150,7 +150,7 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
       $this->fail('Cannot create a field with a name containing an invalid character.');
     }
     catch (\Exception $e) {
-      $this->assertInstanceOf(FieldException::class, $e);
+      $this->assertInstanceOf(\Drupal\Core\Field\FieldException::class, $e);
     }
 
     // Check that field name cannot be longer than 32 characters long.
@@ -164,7 +164,7 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
       $this->fail('Cannot create a field with a name longer than 32 characters.');
     }
     catch (\Exception $e) {
-      $this->assertInstanceOf(FieldException::class, $e);
+      $this->assertInstanceOf(\Drupal\Core\Field\FieldException::class, $e);
     }
 
     // Check that field name can not be an entity key.
@@ -179,7 +179,7 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
       $this->fail('Cannot create a field bearing the name of an entity key.');
     }
     catch (\Exception $e) {
-      $this->assertInstanceOf(FieldException::class, $e);
+      $this->assertInstanceOf(\Drupal\Core\Field\FieldException::class, $e);
     }
   }
 
@@ -407,7 +407,7 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
       $this->fail('Cannot update a field to a different type.');
     }
     catch (\Exception $e) {
-      $this->assertInstanceOf(FieldException::class, $e);
+      $this->assertInstanceOf(\Drupal\Core\Field\FieldException::class, $e);
     }
   }
 
@@ -422,7 +422,7 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
     ]);
     $field_storage->save();
 
-    $this->expectException(FieldException::class);
+    $this->expectException(\Drupal\Core\Field\FieldException::class);
     $this->expectExceptionMessage('Cannot change the field type for an existing field storage. The field storage entity_test.field_type has the type decimal.');
 
     $field_storage->set('type', 'foobar');
@@ -440,7 +440,7 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
     ]);
     $field_storage->save();
 
-    $this->expectException(FieldException::class);
+    $this->expectException(\Drupal\Core\Field\FieldException::class);
     $this->expectExceptionMessage('Cannot change the entity type for an existing field storage. The field storage foobar.field_type has the type entity_test.');
 
     $field_storage->set('entity_type', 'foobar');
@@ -507,7 +507,7 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
     try {
       $field_storage->save();
     }
-    catch (FieldStorageDefinitionUpdateForbiddenException $e) {
+    catch (\Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException $e) {
       $this->fail('An unchangeable setting cannot be updated.');
     }
     $field_storage->setSetting('unchangeable', $field_storage->getSetting('unchangeable') + 1);
@@ -516,7 +516,7 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
       $this->fail('An unchangeable setting can be updated.');
     }
     catch (\Exception $e) {
-      $this->assertInstanceOf(FieldStorageDefinitionUpdateForbiddenException::class, $e);
+      $this->assertInstanceOf(\Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException::class, $e);
     }
   }
 

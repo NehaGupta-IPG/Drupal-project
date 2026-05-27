@@ -129,7 +129,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
   protected function doCreate(array $values) {
     $bundle = $this->getBundleFromValues($values);
     if ($this->bundleKey && !$bundle) {
-      throw new EntityStorageException('Missing bundle for entity type ' . $this->entityTypeId);
+      throw new \Drupal\Core\Entity\EntityStorageException('Missing bundle for entity type ' . $this->entityTypeId);
     }
     $entity_class = $this->getEntityClass($bundle);
     $entity = new $entity_class([], $this->entityTypeId, $bundle);
@@ -146,7 +146,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     foreach ($this->entityTypeBundleInfo->getBundleInfo($this->entityTypeId) as $bundle => $bundle_info) {
       if (!empty($bundle_info['class']) && $bundle_info['class'] === $class_name) {
         if ($bundle_for_class) {
-          throw new AmbiguousBundleClassException($class_name);
+          throw new \Drupal\Core\Entity\Exception\AmbiguousBundleClassException($class_name);
         }
         else {
           $bundle_for_class = $bundle;
@@ -210,10 +210,10 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     // Bundle classes should exist and extend the main entity class.
     if ($bundle_class) {
       if (!class_exists($bundle_class)) {
-        throw new MissingBundleClassException($bundle_class);
+        throw new \Drupal\Core\Entity\Exception\MissingBundleClassException($bundle_class);
       }
       elseif (!is_subclass_of($bundle_class, $entity_class)) {
-        throw new BundleClassInheritanceException($bundle_class, $entity_class);
+        throw new \Drupal\Core\Entity\Exception\BundleClassInheritanceException($bundle_class, $entity_class);
       }
       return $bundle_class;
     }
@@ -234,10 +234,10 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     }
     if ($bundle_key = $this->entityType->getKey('bundle')) {
       if (!$bundle) {
-        throw new EntityStorageException("No entity bundle was specified");
+        throw new \Drupal\Core\Entity\EntityStorageException("No entity bundle was specified");
       }
       if (!array_key_exists($bundle, $this->entityTypeBundleInfo->getBundleInfo($this->entityTypeId))) {
-        throw new EntityStorageException(sprintf("Missing entity bundle. The \"%s\" bundle does not exist", $bundle));
+        throw new \Drupal\Core\Entity\EntityStorageException(sprintf("Missing entity bundle. The \"%s\" bundle does not exist", $bundle));
       }
       $values[$bundle_key] = $bundle;
       // Bundle is already set.
@@ -886,19 +886,19 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     $original_same_as_current = $entity->getOriginal()?->getRevisionId() == $entity->getLoadedRevisionId();
     $not_new_revision = !$entity->isNewRevision();
     if ($previously_default_revision && $no_longer_default && $original_same_as_current && $not_new_revision) {
-      throw new EntityStorageException("An existing default revision of the '{$this->entityTypeId}' entity type can not be changed to a non-default revision.");
+      throw new \Drupal\Core\Entity\EntityStorageException("An existing default revision of the '{$this->entityTypeId}' entity type can not be changed to a non-default revision.");
     }
 
     if (!$entity->isNew()) {
       // If the ID changed then original can't be loaded, throw an exception
       // in that case.
       if (!$entity->getOriginal() || $entity->id() != $entity->getOriginal()->id()) {
-        throw new EntityStorageException("Update existing '{$this->entityTypeId}' entity while changing the ID is not supported.");
+        throw new \Drupal\Core\Entity\EntityStorageException("Update existing '{$this->entityTypeId}' entity while changing the ID is not supported.");
       }
       // Do not allow changing the revision ID when resaving the current
       // revision.
       if (!$entity->isNewRevision() && $entity->getRevisionId() != $entity->getLoadedRevisionId()) {
-        throw new EntityStorageException("Update existing '{$this->entityTypeId}' entity revision while changing the revision ID is not supported.");
+        throw new \Drupal\Core\Entity\EntityStorageException("Update existing '{$this->entityTypeId}' entity revision while changing the revision ID is not supported.");
       }
     }
 
@@ -951,7 +951,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     if ($revision = $this->loadRevision($revision_id)) {
       // Prevent deletion if this is the default revision.
       if ($revision->isDefaultRevision()) {
-        throw new EntityStorageException('Default revision can not be deleted');
+        throw new \Drupal\Core\Entity\EntityStorageException('Default revision can not be deleted');
       }
       $this->invokeFieldMethod('deleteRevision', $revision);
       $this->doDeleteRevisionFieldItems($revision);

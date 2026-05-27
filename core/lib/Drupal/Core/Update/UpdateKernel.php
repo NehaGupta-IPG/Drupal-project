@@ -185,7 +185,7 @@ class UpdateKernel extends DrupalKernel {
     $db_update_access = $this->getContainer()->get('access_check.db_update');
 
     if (!$db_update_access->access($account)->isAllowed()) {
-      throw new AccessDeniedHttpException('In order to run update.php you need to either have "Administer software updates" permission or have set $settings[\'update_free_access\'] in your settings.php.');
+      throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException('In order to run update.php you need to either have "Administer software updates" permission or have set $settings[\'update_free_access\'] in your settings.php.');
     }
   }
 

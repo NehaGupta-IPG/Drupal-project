@@ -71,7 +71,7 @@ class EntityContentBaseTest extends EntityTestBase {
       $this->prophesize(EntityTypeBundleInfoInterface::class)->reveal(),
     );
     $destination->setEntity(FALSE);
-    $this->expectException(MigrateException::class);
+    $this->expectException(\Drupal\migrate\MigrateException::class);
     $this->expectExceptionMessage('Unable to get entity');
     $destination->import(new Row());
   }
@@ -98,7 +98,7 @@ class EntityContentBaseTest extends EntityTestBase {
       $this->prophesize(AccountSwitcherInterface::class)->reveal(),
       $this->prophesize(EntityTypeBundleInfoInterface::class)->reveal(),
     );
-    $this->expectException(MigrateException::class);
+    $this->expectException(\Drupal\migrate\MigrateException::class);
     $this->expectExceptionMessage('The "foo" entity type does not support translations.');
     $destination->getIds();
   }

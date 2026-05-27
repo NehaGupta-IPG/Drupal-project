@@ -110,7 +110,7 @@ final class EntityMethod implements ConfigActionPluginInterface, ContainerFactor
    */
   private function applyPluralized(ConfigEntityInterface $entity, mixed $values): ConfigEntityInterface {
     if (!is_array($values)) {
-      throw new EntityMethodException(sprintf('The pluralized entity method config action \'%s\' requires an array value in order to call %s::%s() multiple times', $this->pluginId, $entity->getEntityType()->getClass(), $this->method));
+      throw new \Drupal\Core\Config\Action\EntityMethodException(sprintf('The pluralized entity method config action \'%s\' requires an array value in order to call %s::%s() multiple times', $this->pluginId, $entity->getEntityType()->getClass(), $this->method));
     }
     foreach ($values as $value) {
       $entity = $this->applySingle($entity, $value);
@@ -136,7 +136,7 @@ final class EntityMethod implements ConfigActionPluginInterface, ContainerFactor
     // an array.
     if (!is_array($value) || $this->numberOfParams === 1) {
       if ($this->numberOfRequiredParams !== 1 && $this->numberOfParams !== 1) {
-        throw new EntityMethodException(sprintf('Entity method config action \'%s\' requires an array value. The number of parameters or required parameters for %s::%s() is not 1', $this->pluginId, $entity->getEntityType()->getClass(), $this->method));
+        throw new \Drupal\Core\Config\Action\EntityMethodException(sprintf('Entity method config action \'%s\' requires an array value. The number of parameters or required parameters for %s::%s() is not 1', $this->pluginId, $entity->getEntityType()->getClass(), $this->method));
       }
       $result = $entity->{$this->method}($value);
     }

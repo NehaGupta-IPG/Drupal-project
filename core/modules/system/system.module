@@ -144,7 +144,7 @@ function system_region_list($theme, $show = REGIONS_ALL): array {
       /** @var \Drupal\core\Extension\Theme $theme */
       $theme = \Drupal::service('theme_handler')->getTheme($theme);
     }
-    catch (UnknownExtensionException) {
+    catch (\Drupal\Core\Extension\Exception\UnknownExtensionException) {
       return [];
     }
   }
@@ -199,7 +199,7 @@ function system_default_region($theme) {
     /** @var \Drupal\core\Extension\Theme $theme */
     $theme = \Drupal::service('theme_handler')->getTheme($theme);
   }
-  catch (UnknownExtensionException) {
+  catch (\Drupal\Core\Extension\Exception\UnknownExtensionException) {
     return '';
   }
   return $theme->getDefaultRegion();

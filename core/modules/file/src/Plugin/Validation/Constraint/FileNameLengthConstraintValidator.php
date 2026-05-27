@@ -16,7 +16,7 @@ class FileNameLengthConstraintValidator extends BaseFileConstraintValidator {
   public function validate(mixed $value, Constraint $constraint): void {
     $file = $this->assertValueIsFile($value);
     if (!$constraint instanceof FileNameLengthConstraint) {
-      throw new UnexpectedTypeException($constraint, FileNameLengthConstraint::class);
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($constraint, FileNameLengthConstraint::class);
     }
 
     if (!$file->getFilename()) {

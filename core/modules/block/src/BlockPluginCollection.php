@@ -54,7 +54,7 @@ class BlockPluginCollection extends DefaultSingleLazyPluginCollection {
    */
   public function addInstanceId($id, $configuration = NULL) {
     if (!$id) {
-      throw new PluginException("The block '{$this->blockId}' did not specify a plugin.");
+      throw new \Drupal\Component\Plugin\Exception\PluginException("The block '{$this->blockId}' did not specify a plugin.");
     }
     parent::addInstanceId($id, $configuration);
   }
@@ -64,13 +64,13 @@ class BlockPluginCollection extends DefaultSingleLazyPluginCollection {
    */
   protected function initializePlugin($instance_id) {
     if (!$instance_id) {
-      throw new PluginException("The block '{$this->blockId}' did not specify a plugin.");
+      throw new \Drupal\Component\Plugin\Exception\PluginException("The block '{$this->blockId}' did not specify a plugin.");
     }
 
     try {
       parent::initializePlugin($instance_id);
     }
-    catch (PluginException $e) {
+    catch (\Drupal\Component\Plugin\Exception\PluginException $e) {
       $module = $this->configuration['provider'];
       // Ignore blocks belonging to uninstalled modules, but re-throw valid
       // exceptions when the module is installed and the plugin is

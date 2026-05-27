@@ -87,7 +87,7 @@ class ImportStorageTransformerTest extends KernelTestBase {
       new NullLockBackend()
     );
 
-    $this->expectException(StorageTransformerException::class);
+    $this->expectException(\Drupal\Core\Config\StorageTransformerException::class);
     $this->expectExceptionMessage("Cannot acquire config import transformer lock.");
     $transformer->transform(new MemoryStorage());
   }

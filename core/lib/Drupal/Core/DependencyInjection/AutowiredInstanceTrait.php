@@ -87,7 +87,7 @@ trait AutowiredInstanceTrait {
         continue;
       }
 
-      throw new AutowiringFailedException($argument, sprintf('Cannot autowire %s "%s": argument "$%s" of method "%s::%s()". Check that either the argument type is correct or the Autowire attribute is passed a valid identifier. Otherwise configure its value explicitly if possible.', $type, $argument, $parameter->getName(), static::class, $method_name));
+      throw new \Symfony\Component\DependencyInjection\Exception\AutowiringFailedException($argument, sprintf('Cannot autowire %s "%s": argument "$%s" of method "%s::%s()". Check that either the argument type is correct or the Autowire attribute is passed a valid identifier. Otherwise configure its value explicitly if possible.', $type, $argument, $parameter->getName(), static::class, $method_name));
     }
     return $args;
   }

@@ -120,7 +120,7 @@ class Workflow extends ConfigEntityBase implements WorkflowInterface, EntityWith
     $workflow_type = $this->getTypePlugin();
     $missing_states = array_diff($workflow_type->getRequiredStates(), array_keys($this->getTypePlugin()->getStates()));
     if (!empty($missing_states)) {
-      throw new RequiredStateMissingException(sprintf("Workflow type '{$workflow_type->label()}' requires states with the ID '%s' in workflow '{$this->id()}'", implode("', '", $missing_states)));
+      throw new \Drupal\workflows\Exception\RequiredStateMissingException(sprintf("Workflow type '{$workflow_type->label()}' requires states with the ID '%s' in workflow '{$this->id()}'", implode("', '", $missing_states)));
     }
     parent::preSave($storage);
   }

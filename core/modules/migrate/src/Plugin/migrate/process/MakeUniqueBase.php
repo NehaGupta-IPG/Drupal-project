@@ -48,11 +48,11 @@ abstract class MakeUniqueBase extends ProcessPluginBase {
     $postfix = $this->configuration['postfix'] ?? '';
     $start = $this->configuration['start'] ?? 0;
     if (!is_int($start)) {
-      throw new MigrateException('The start position configuration key should be an integer. Omit this key to capture from the beginning of the string.');
+      throw new \Drupal\migrate\MigrateException('The start position configuration key should be an integer. Omit this key to capture from the beginning of the string.');
     }
     $length = $this->configuration['length'] ?? NULL;
     if (!is_null($length) && !is_int($length)) {
-      throw new MigrateException('The character length configuration key should be an integer. Omit this key to capture the entire string.');
+      throw new \Drupal\migrate\MigrateException('The character length configuration key should be an integer. Omit this key to capture the entire string.');
     }
     // Use optional start or length to return a portion of the unique value.
     $value = mb_substr($value, $start, $length);

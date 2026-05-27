@@ -37,7 +37,7 @@ class CacheableExceptionTest extends UnitTestCase {
    * @legacy-covers \Drupal\Core\Http\Exception\CacheableHttpException
    */
   public function testCacheableHttpException(): void {
-    $exception = new CacheableHttpException((new CacheableMetadata())->setCacheContexts(['route']), 500, 'test message', NULL, ['X-Drupal-Exception' => 'Test'], 123);
+    $exception = new \Drupal\Core\Http\Exception\CacheableHttpException((new CacheableMetadata())->setCacheContexts(['route']), 500, 'test message', NULL, ['X-Drupal-Exception' => 'Test'], 123);
     $this->assertSame(['route'], $exception->getCacheContexts());
     $this->assertSame(500, $exception->getStatusCode());
     $this->assertSame('test message', $exception->getMessage());
@@ -69,21 +69,21 @@ class CacheableExceptionTest extends UnitTestCase {
 
   public static function providerTestExceptions(): array {
     return [
-      [400, CacheableBadRequestHttpException::class],
-      [401, CacheableUnauthorizedHttpException::class, 'test challenge', ['WWW-Authenticate' => 'test challenge']],
-      [403, CacheableAccessDeniedHttpException::class],
-      [404, CacheableNotFoundHttpException::class],
-      [405, CacheableMethodNotAllowedHttpException::class, ['POST', 'PUT'], ['Allow' => 'POST, PUT']],
-      [406, CacheableNotAcceptableHttpException::class],
-      [409, CacheableConflictHttpException::class],
-      [410, CacheableGoneHttpException::class],
-      [411, CacheableLengthRequiredHttpException::class],
-      [412, CacheablePreconditionFailedHttpException::class],
-      [415, CacheableUnsupportedMediaTypeHttpException::class],
-      [422, CacheableUnprocessableEntityHttpException::class],
-      [428, CacheablePreconditionRequiredHttpException::class],
-      [429, CacheableTooManyRequestsHttpException::class, 60, ['Retry-After' => 60]],
-      [503, CacheableServiceUnavailableHttpException::class, 60, ['Retry-After' => 60]],
+      [400, \Drupal\Core\Http\Exception\CacheableBadRequestHttpException::class],
+      [401, \Drupal\Core\Http\Exception\CacheableUnauthorizedHttpException::class, 'test challenge', ['WWW-Authenticate' => 'test challenge']],
+      [403, \Drupal\Core\Http\Exception\CacheableAccessDeniedHttpException::class],
+      [404, \Drupal\Core\Http\Exception\CacheableNotFoundHttpException::class],
+      [405, \Drupal\Core\Http\Exception\CacheableMethodNotAllowedHttpException::class, ['POST', 'PUT'], ['Allow' => 'POST, PUT']],
+      [406, \Drupal\Core\Http\Exception\CacheableNotAcceptableHttpException::class],
+      [409, \Drupal\Core\Http\Exception\CacheableConflictHttpException::class],
+      [410, \Drupal\Core\Http\Exception\CacheableGoneHttpException::class],
+      [411, \Drupal\Core\Http\Exception\CacheableLengthRequiredHttpException::class],
+      [412, \Drupal\Core\Http\Exception\CacheablePreconditionFailedHttpException::class],
+      [415, \Drupal\Core\Http\Exception\CacheableUnsupportedMediaTypeHttpException::class],
+      [422, \Drupal\Core\Http\Exception\CacheableUnprocessableEntityHttpException::class],
+      [428, \Drupal\Core\Http\Exception\CacheablePreconditionRequiredHttpException::class],
+      [429, \Drupal\Core\Http\Exception\CacheableTooManyRequestsHttpException::class, 60, ['Retry-After' => 60]],
+      [503, \Drupal\Core\Http\Exception\CacheableServiceUnavailableHttpException::class, 60, ['Retry-After' => 60]],
     ];
   }
 

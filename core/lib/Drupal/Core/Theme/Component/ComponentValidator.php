@@ -63,7 +63,7 @@ class ComponentValidator {
         $definition['id'],
         implode(', ', $collisions)
       );
-      throw new InvalidComponentException($message);
+      throw new \Drupal\Core\Render\Component\Exception\InvalidComponentException($message);
     }
     // If the validator isn't set, then the validation library is not installed.
     if (!$this->validator) {
@@ -73,7 +73,7 @@ class ComponentValidator {
     $schema = $definition['props'] ?? NULL;
     if (!$schema) {
       if ($enforce_schemas) {
-        throw new InvalidComponentException(sprintf('The component "%s" does not provide schema information. Schema definitions are mandatory for components declared in modules. For components declared in themes, schema definitions are only mandatory if the "enforce_prop_schemas" key is set to "true" in the theme info file.', $definition['id']));
+        throw new \Drupal\Core\Render\Component\Exception\InvalidComponentException(sprintf('The component "%s" does not provide schema information. Schema definitions are mandatory for components declared in modules. For components declared in themes, schema definitions are only mandatory if the "enforce_prop_schemas" key is set to "true" in the theme info file.', $definition['id']));
       }
       return TRUE;
     }
@@ -104,7 +104,7 @@ class ComponentValidator {
     });
 
     if ($non_string_props) {
-      throw new InvalidComponentException(\sprintf(
+      throw new \Drupal\Core\Render\Component\Exception\InvalidComponentException(\sprintf(
         'The component "%s" uses non-string types for properties: %s.',
         $definition['id'],
         \implode(', ', $non_string_props),
@@ -150,7 +150,7 @@ class ComponentValidator {
     ];
     $message = implode("\n", $message_parts);
     // Throw the exception with the error message.
-    throw new InvalidComponentException($message);
+    throw new \Drupal\Core\Render\Component\Exception\InvalidComponentException($message);
   }
 
   /**
@@ -178,7 +178,7 @@ class ComponentValidator {
     $schema = $component->metadata->schema;
     if (!$schema) {
       if ($component->metadata->mandatorySchemas) {
-        throw new InvalidComponentException(sprintf('The component "%s" does not provide schema information. Schema definitions are mandatory for components declared in modules. For components declared in themes, schema definitions are only mandatory if the "enforce_prop_schemas" key is set to "true" in the theme info file.', $component_id));
+        throw new \Drupal\Core\Render\Component\Exception\InvalidComponentException(sprintf('The component "%s" does not provide schema information. Schema definitions are mandatory for components declared in modules. For components declared in themes, schema definitions are only mandatory if the "enforce_prop_schemas" key is set to "true" in the theme info file.', $component_id));
       }
       return TRUE;
     }
@@ -240,7 +240,7 @@ class ComponentValidator {
       $errors
     );
     $message = implode("\n", $message_parts);
-    throw new InvalidComponentException($message);
+    throw new \Drupal\Core\Render\Component\Exception\InvalidComponentException($message);
   }
 
   /**
@@ -295,7 +295,7 @@ class ComponentValidator {
     $props_schema = $this->nullifyClassPropsSchema($props_schema, $classes_per_prop);
     if (!empty($error_messages)) {
       $message = implode("\n", $error_messages);
-      throw new InvalidComponentException($message);
+      throw new \Drupal\Core\Render\Component\Exception\InvalidComponentException($message);
     }
     return [$props_schema, $props_raw];
   }

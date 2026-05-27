@@ -238,10 +238,10 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
     try {
       $response = $this->httpClient->request($method, $url->toString(), $request_options);
     }
-    catch (ClientException $e) {
+    catch (\GuzzleHttp\Exception\ClientException $e) {
       $response = $e->getResponse();
     }
-    catch (ServerException $e) {
+    catch (\GuzzleHttp\Exception\ServerException $e) {
       $response = $e->getResponse();
     }
 

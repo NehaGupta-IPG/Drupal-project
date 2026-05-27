@@ -23,7 +23,7 @@ class CKEditor5ElementConstraintValidator extends ConstraintValidator {
    */
   public function validate($element, $constraint): void {
     if (!$constraint instanceof CKEditor5ElementConstraint) {
-      throw new UnexpectedTypeException($constraint, __NAMESPACE__ . '\CKEditor5Element');
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($constraint, __NAMESPACE__ . '\CKEditor5Element');
     }
 
     $parsed = HTMLRestrictions::fromString($element);

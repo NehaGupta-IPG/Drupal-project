@@ -106,21 +106,21 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
     try {
       $instance = parent::createInstance($plugin_id, $configuration);
       if (!$instance instanceof Component) {
-        throw new ComponentNotFoundException(sprintf(
+        throw new \Drupal\Core\Render\Component\Exception\ComponentNotFoundException(sprintf(
           'Unable to find component "%s" in the component repository.',
           $plugin_id,
         ));
       }
       return $instance;
     }
-    catch (PluginException $e) {
+    catch (\Drupal\Component\Plugin\Exception\PluginException $e) {
       // Cast the PluginNotFound to a more specific exception.
       $message = sprintf(
         'Unable to find component "%s" in the component repository. [%s]',
         $plugin_id,
         $e->getMessage()
       );
-      throw new ComponentNotFoundException($message, $e->getCode(), $e);
+      throw new \Drupal\Core\Render\Component\Exception\ComponentNotFoundException($message, $e->getCode(), $e);
     }
   }
 
@@ -138,7 +138,7 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
   public function find(string $component_id): Component {
     $definitions = $this->getDefinitions();
     if (empty($definitions)) {
-      throw new ComponentNotFoundException('Unable to find any component definition.');
+      throw new \Drupal\Core\Render\Component\Exception\ComponentNotFoundException('Unable to find any component definition.');
     }
     $negotiated_plugin_id = $this->componentNegotiator->negotiate($component_id, $definitions);
     return $this->createInstance($negotiated_plugin_id ?? $component_id);

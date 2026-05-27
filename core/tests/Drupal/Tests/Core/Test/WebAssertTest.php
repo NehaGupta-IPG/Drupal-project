@@ -110,7 +110,7 @@ class WebAssertTest extends UnitTestCase {
     $this->visit('', 'Test page text. <a href="#">Foo</a>');
     $this->assertSession()->pageTextContainsOnce('Test page text.');
 
-    $this->expectException(ResponseTextException::class);
+    $this->expectException(\Behat\Mink\Exception\ResponseTextException::class);
     $this->expectExceptionMessage("Failed asserting that the page matches the pattern '/does\\-not\\-exist/ui' 1 time(s), 0 found.");
     $this->assertSession()->pageTextContainsOnce('does-not-exist');
   }
@@ -154,7 +154,7 @@ class WebAssertTest extends UnitTestCase {
     $this->assertSession()->addressNotEquals('other-page');
     $this->assertSession()->addressNotEquals('other-page?a=b&c=d');
 
-    $this->expectException(ExpectationException::class);
+    $this->expectException(\Behat\Mink\Exception\ExpectationException::class);
     $this->expectExceptionMessage('Current page is "/test-page?a=b&c=d", but "/test-page?a=b&c=e" expected.');
     $this->assertSession()->addressEquals('test-page?a=b&c=e');
   }
@@ -165,7 +165,7 @@ class WebAssertTest extends UnitTestCase {
   public function testAddressNotEqualsException(): void {
     $this->visit('http://localhost/test-page?a=b&c=d');
 
-    $this->expectException(ExpectationException::class);
+    $this->expectException(\Behat\Mink\Exception\ExpectationException::class);
     $this->expectExceptionMessage('Current page is "/test-page?a=b&c=d", but should not be.');
     $this->assertSession()->addressNotEquals('test-page?a=b&c=d');
   }
@@ -197,7 +197,7 @@ class WebAssertTest extends UnitTestCase {
    */
   public function testInvalidLinkExistsExact(): void {
     $this->visit('', '<a href="http://example.com">foo|bar|baz</a>');
-    $this->expectException(ExpectationException::class);
+    $this->expectException(\Behat\Mink\Exception\ExpectationException::class);
     $this->expectExceptionMessage('Link with label foo|bar not found');
     $this->assertSession()->linkExistsExact('foo|bar');
   }
@@ -218,7 +218,7 @@ class WebAssertTest extends UnitTestCase {
    */
   public function testInvalidLinkNotExistsExact(): void {
     $this->visit('', '<a href="http://example.com">foo|bar|baz</a>');
-    $this->expectException(ExpectationException::class);
+    $this->expectException(\Behat\Mink\Exception\ExpectationException::class);
     $this->expectExceptionMessage('Link with label foo|bar|baz found');
     $this->assertSession()->linkNotExistsExact('foo|bar|baz');
     $this->addToAssertionCount(1);
@@ -243,7 +243,7 @@ class WebAssertTest extends UnitTestCase {
    */
   public function testInvalidLinkByHrefExists(): void {
     $this->visit('', '<a href="/user/login">Log in</a><a href="/user/register">Register</a>');
-    $this->expectException(ExpectationException::class);
+    $this->expectException(\Behat\Mink\Exception\ExpectationException::class);
     $this->assertSession()->linkByHrefExists('/foo');
     $this->addToAssertionCount(1);
   }
@@ -264,7 +264,7 @@ class WebAssertTest extends UnitTestCase {
    */
   public function testInvalidLinkByHrefNotExistsPartial(): void {
     $this->visit('', '<a href="/user/login">Log in</a><a href="/user/register">Register</a>');
-    $this->expectException(ExpectationException::class);
+    $this->expectException(\Behat\Mink\Exception\ExpectationException::class);
     $this->assertSession()->linkByHrefNotExists('/user');
     $this->addToAssertionCount(1);
   }
@@ -276,7 +276,7 @@ class WebAssertTest extends UnitTestCase {
    */
   public function testInvalidLinkByHrefNotExistsFull(): void {
     $this->visit('', '<a href="/user/login">Log in</a><a href="/user/register">Register</a>');
-    $this->expectException(ExpectationException::class);
+    $this->expectException(\Behat\Mink\Exception\ExpectationException::class);
     $this->assertSession()->linkByHrefNotExists('/user/login');
   }
 
@@ -296,7 +296,7 @@ class WebAssertTest extends UnitTestCase {
    */
   public function testInvalidLinkByHrefExistsExact(): void {
     $this->visit('', '<a href="/user/login">Log in</a><a href="/user/register">Register</a>');
-    $this->expectException(ExpectationException::class);
+    $this->expectException(\Behat\Mink\Exception\ExpectationException::class);
     $this->assertSession()->linkByHrefExistsExact('/foo');
   }
 
@@ -316,7 +316,7 @@ class WebAssertTest extends UnitTestCase {
    */
   public function testInvalidLinkByHrefNotExistsExact(): void {
     $this->visit('', '<a href="/user/login">Log in</a><a href="/user/register">Register</a>');
-    $this->expectException(ExpectationException::class);
+    $this->expectException(\Behat\Mink\Exception\ExpectationException::class);
     $this->assertSession()->linkByHrefNotExistsExact('/user/login');
   }
 
@@ -372,7 +372,7 @@ HTML);
       $this->assertSession()->buttonNotExists('Duplicate button 2');
       $this->fail('The "duplicate_button" field with the value Duplicate button 2 was not found.');
     }
-    catch (ExpectationException) {
+    catch (\Behat\Mink\Exception\ExpectationException) {
       // Expected exception; just continue testing.
     }
     $this->addToAssertionCount(11);
@@ -393,7 +393,7 @@ HTML);
       <h1 id="page-element">Hello</h1>
       <h2 id="page-element">World</h2>
 HTML);
-    $this->expectException(ExpectationException::class);
+    $this->expectException(\Behat\Mink\Exception\ExpectationException::class);
     $this->expectExceptionMessage('The page contains a duplicate HTML ID "page-element".');
     $assert_session->pageContainsNoDuplicateId();
   }

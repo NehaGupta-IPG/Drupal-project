@@ -36,13 +36,13 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
     try {
       $connection = Database::getConnection('default', 'test-runner');
     }
-    catch (ConnectionNotDefinedException) {
+    catch (\Drupal\Core\Database\ConnectionNotDefinedException) {
       // Check whether there is a backup of the original default connection.
       // @see FunctionalTestSetupTrait::prepareEnvironment()
       try {
         $connection = Database::getConnection('default', 'simpletest_original_default');
       }
-      catch (ConnectionNotDefinedException) {
+      catch (\Drupal\Core\Database\ConnectionNotDefinedException) {
         // If FunctionalTestSetupTrait::prepareEnvironment() failed, the
         // test-specific database connection does not exist yet/anymore, so
         // fall back to the default of the (UI) test runner.

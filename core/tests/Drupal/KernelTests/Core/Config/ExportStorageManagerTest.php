@@ -100,7 +100,7 @@ class ExportStorageManagerTest extends KernelTestBase {
       $lock
     );
 
-    $this->expectException(StorageTransformerException::class);
+    $this->expectException(\Drupal\Core\Config\StorageTransformerException::class);
     $this->expectExceptionMessage("Cannot acquire config export transformer lock.");
     $manager->getStorage();
   }

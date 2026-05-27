@@ -175,7 +175,7 @@ class ContentModerationStateTest extends KernelTestBase {
     $this->assertDefaultRevision($entity, 6);
 
     // Set an invalid moderation state.
-    $this->expectException(EntityStorageException::class);
+    $this->expectException(\Drupal\Core\Entity\EntityStorageException::class);
     $entity->moderation_state->value = 'foobar';
     $entity->save();
   }

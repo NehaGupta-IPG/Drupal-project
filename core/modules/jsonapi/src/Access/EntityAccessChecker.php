@@ -99,7 +99,7 @@ class EntityAccessChecker {
         }
         $access = $access->orIf($label_access);
       }
-      return new EntityAccessDeniedHttpException($entity, $access, '/data', 'The current user is not allowed to GET the selected resource.');
+      return new \Drupal\jsonapi\Exception\EntityAccessDeniedHttpException($entity, $access, '/data', 'The current user is not allowed to GET the selected resource.');
     }
     return ResourceObject::createFromEntity($resource_type, $entity);
   }

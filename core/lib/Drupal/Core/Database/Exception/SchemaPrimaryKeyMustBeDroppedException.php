@@ -8,5 +8,5 @@ use Drupal\Core\Database\SchemaException;
 /**
  * Exception thrown if the Primary Key must be dropped before an operation.
  */
-class SchemaPrimaryKeyMustBeDroppedException extends SchemaException implements DatabaseException {
+class SchemaPrimaryKeyMustBeDroppedException extends \Drupal\Core\Database\SchemaException implements \Drupal\Core\Database\DatabaseException {
 }

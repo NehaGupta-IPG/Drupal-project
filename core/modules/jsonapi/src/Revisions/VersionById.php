@@ -20,7 +20,7 @@ class VersionById extends NegotiatorBase implements VersionNegotiatorInterface {
    */
   protected function getRevisionId(EntityInterface $entity, $version_argument) {
     if (!is_numeric($version_argument)) {
-      throw new InvalidVersionIdentifierException('The revision ID must be an integer.');
+      throw new \Drupal\jsonapi\Revisions\InvalidVersionIdentifierException('The revision ID must be an integer.');
     }
     return $version_argument;
   }

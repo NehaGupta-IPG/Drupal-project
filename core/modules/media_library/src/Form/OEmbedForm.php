@@ -157,7 +157,7 @@ class OEmbedForm extends AddFormBase {
         $resource_url = $this->urlResolver->getResourceUrl($url);
         $this->resourceFetcher->fetchResource($resource_url);
       }
-      catch (ResourceException $e) {
+      catch (\Drupal\media\OEmbed\ResourceException $e) {
         $form_state->setErrorByName('url', $e->getMessage());
       }
     }

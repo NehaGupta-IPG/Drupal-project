@@ -85,7 +85,7 @@ class InstallStorage extends FileStorage {
     }
     // If any code in the early installer requests a configuration object that
     // does not exist anywhere as default config, then that must be mistake.
-    throw new StorageException("Missing configuration file: $name");
+    throw new \Drupal\Core\Config\StorageException("Missing configuration file: $name");
   }
 
   /**
@@ -101,7 +101,7 @@ class InstallStorage extends FileStorage {
    * @throws \Drupal\Core\Config\StorageException
    */
   public function write($name, array $data) {
-    throw new StorageException('Write operation is not allowed.');
+    throw new \Drupal\Core\Config\StorageException('Write operation is not allowed.');
   }
 
   /**
@@ -110,7 +110,7 @@ class InstallStorage extends FileStorage {
    * @throws \Drupal\Core\Config\StorageException
    */
   public function delete($name) {
-    throw new StorageException('Delete operation is not allowed.');
+    throw new \Drupal\Core\Config\StorageException('Delete operation is not allowed.');
   }
 
   /**
@@ -119,7 +119,7 @@ class InstallStorage extends FileStorage {
    * @throws \Drupal\Core\Config\StorageException
    */
   public function rename($name, $new_name) {
-    throw new StorageException('Rename operation is not allowed.');
+    throw new \Drupal\Core\Config\StorageException('Rename operation is not allowed.');
   }
 
   /**
@@ -267,7 +267,7 @@ class InstallStorage extends FileStorage {
    * @throws \Drupal\Core\Config\StorageException
    */
   public function deleteAll($prefix = '') {
-    throw new StorageException('Delete operation is not allowed.');
+    throw new \Drupal\Core\Config\StorageException('Delete operation is not allowed.');
   }
 
   /**

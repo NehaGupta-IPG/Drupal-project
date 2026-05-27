@@ -217,7 +217,7 @@ class DirectWriteTest extends PackageManagerKernelTestBase implements EventSubsc
       $sandbox_manager->require(['ext-json:*']);
       $this->fail('Expected an exception to be thrown on pre-require.');
     }
-    catch (SandboxEventException $e) {
+    catch (\Drupal\package_manager\Exception\SandboxEventException $e) {
       $this->assertSame("Maintenance mode should not happen.\n", $e->getMessage());
       // We should never have entered maintenance mode.
       $this->assertFalse($this->preRequireMaintenanceMode);

@@ -382,7 +382,7 @@ class EntityApiTest extends EntityKernelTestBase {
       $entity->save();
       $this->fail('Entity presave EntityStorageException thrown but not caught.');
     }
-    catch (EntityStorageException $e) {
+    catch (\Drupal\Core\Entity\EntityStorageException $e) {
       $this->assertEquals(1, $e->getCode(), 'Entity presave EntityStorageException caught.');
     }
 
@@ -391,7 +391,7 @@ class EntityApiTest extends EntityKernelTestBase {
       unset($GLOBALS['entity_test_throw_exception']);
       $entity->save();
     }
-    catch (EntityStorageException $e) {
+    catch (\Drupal\Core\Entity\EntityStorageException $e) {
       $this->assertNotEquals(1, $e->getCode(), 'Entity presave EntityStorageException caught.');
     }
 
@@ -402,7 +402,7 @@ class EntityApiTest extends EntityKernelTestBase {
       $entity->delete();
       $this->fail('Entity predelete EntityStorageException not thrown.');
     }
-    catch (EntityStorageException $e) {
+    catch (\Drupal\Core\Entity\EntityStorageException $e) {
       $this->assertEquals(2, $e->getCode(), 'Entity predelete EntityStorageException caught.');
     }
 
@@ -412,7 +412,7 @@ class EntityApiTest extends EntityKernelTestBase {
     try {
       $entity->delete();
     }
-    catch (EntityStorageException $e) {
+    catch (\Drupal\Core\Entity\EntityStorageException $e) {
       $this->assertNotEquals(2, $e->getCode(), 'Entity predelete EntityStorageException thrown.');
     }
   }
@@ -428,7 +428,7 @@ class EntityApiTest extends EntityKernelTestBase {
     $entity = $storage->create(['name' => 'revision_test']);
     $entity->save();
 
-    $this->expectException(EntityStorageException::class);
+    $this->expectException(\Drupal\Core\Entity\EntityStorageException::class);
     $this->expectExceptionMessage("Update existing 'entity_test_mulrev' entity revision while changing the revision ID is not supported.");
 
     $entity->revision_id = 60;
@@ -446,7 +446,7 @@ class EntityApiTest extends EntityKernelTestBase {
     $entity = $storage->create(['name' => 'revision_test']);
     $entity->save();
 
-    $this->expectException(EntityStorageException::class);
+    $this->expectException(\Drupal\Core\Entity\EntityStorageException::class);
     $this->expectExceptionMessage("Update existing 'entity_test_mulrev' entity while changing the ID is not supported.");
 
     $entity->id = 60;

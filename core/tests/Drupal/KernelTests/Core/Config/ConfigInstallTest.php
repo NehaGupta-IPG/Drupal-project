@@ -128,7 +128,7 @@ class ConfigInstallTest extends KernelTestBase {
       \Drupal::service('module_installer')->install(['config_collection_clash_install_test']);
       $this->fail('Expected PreExistingConfigException not thrown.');
     }
-    catch (PreExistingConfigException $e) {
+    catch (\Drupal\Core\Config\PreExistingConfigException $e) {
       $this->assertEquals('config_collection_clash_install_test', $e->getExtension());
       $this->assertEquals(
         [
@@ -221,7 +221,7 @@ class ConfigInstallTest extends KernelTestBase {
       $this->installModules(['config_install_dependency_test']);
       $this->fail('Expected UnmetDependenciesException not thrown.');
     }
-    catch (UnmetDependenciesException $e) {
+    catch (\Drupal\Core\Config\UnmetDependenciesException $e) {
       $this->assertEquals('config_install_dependency_test', $e->getExtension());
       $this->assertEquals(
         [
@@ -238,7 +238,7 @@ class ConfigInstallTest extends KernelTestBase {
       $this->installModules(['config_install_double_dependency_test']);
       $this->fail('Expected UnmetDependenciesException not thrown.');
     }
-    catch (UnmetDependenciesException $e) {
+    catch (\Drupal\Core\Config\UnmetDependenciesException $e) {
       $this->assertEquals('config_install_double_dependency_test', $e->getExtension());
       $this->assertEquals(
         [
@@ -256,7 +256,7 @@ class ConfigInstallTest extends KernelTestBase {
       $this->installModules(['config_install_dependency_test']);
       $this->fail('Expected UnmetDependenciesException not thrown.');
     }
-    catch (UnmetDependenciesException $e) {
+    catch (\Drupal\Core\Config\UnmetDependenciesException $e) {
       $this->assertEquals('config_install_dependency_test', $e->getExtension());
       $this->assertEquals(['config_test.dynamic.other_module_test_with_dependency' => ['config_other_module_config_test']], $e->getConfigObjects());
       $this->assertEquals('Configuration objects provided by <em class="placeholder">config_install_dependency_test</em> have unmet dependencies: <em class="placeholder">config_test.dynamic.other_module_test_with_dependency (config_other_module_config_test)</em>', $e->getMessage());

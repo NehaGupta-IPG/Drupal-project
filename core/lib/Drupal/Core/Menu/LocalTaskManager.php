@@ -166,7 +166,7 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
     parent::processDefinition($definition, $plugin_id);
     // If there is no route name, this is a broken definition.
     if (empty($definition['route_name'])) {
-      throw new PluginException(sprintf('Plugin (%s) definition must include "route_name"', $plugin_id));
+      throw new \Drupal\Component\Plugin\Exception\PluginException(sprintf('Plugin (%s) definition must include "route_name"', $plugin_id));
     }
   }
 

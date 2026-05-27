@@ -84,7 +84,7 @@ class RecipeConfiguratorTest extends KernelTestBase {
       RecipeConfigurator::getIncludedRecipe('core/tests/fixtures/recipes', $recipe);
       $this->fail('Expected exception not thrown');
     }
-    catch (UnknownRecipeException $e) {
+    catch (\Drupal\Core\Recipe\UnknownRecipeException $e) {
       $this->assertSame($recipe, $e->recipe);
       $this->assertSame('core/tests/fixtures/recipes', $e->searchPath);
       $this->assertSame('Can not find the ' . $recipe . ' recipe, search path: ' . $e->searchPath, $e->getMessage());

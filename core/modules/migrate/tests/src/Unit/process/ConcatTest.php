@@ -34,7 +34,7 @@ class ConcatTest extends MigrateProcessTestCase {
    * Tests concat fails properly on non-arrays.
    */
   public function testConcatWithNonArray(): void {
-    $this->expectException(MigrateException::class);
+    $this->expectException(\Drupal\migrate\MigrateException::class);
     $this->plugin->transform('foo', $this->migrateExecutable, $this->row, 'destination_property');
   }
 

@@ -39,7 +39,7 @@ class ExtractTest extends MigrateProcessTestCase {
    */
   #[DataProvider('providerTestExtractInvalid')]
   public function testExtractInvalid($value): void {
-    $this->expectException(MigrateException::class);
+    $this->expectException(\Drupal\migrate\MigrateException::class);
     $type = gettype($value);
     $this->expectExceptionMessage(sprintf("Input should be an array, instead it was of type '%s'", $type));
     $this->plugin->transform($value, $this->migrateExecutable, $this->row, 'destination_property');
@@ -49,7 +49,7 @@ class ExtractTest extends MigrateProcessTestCase {
    * Tests unsuccessful extraction.
    */
   public function testExtractFail(): void {
-    $this->expectException(MigrateException::class);
+    $this->expectException(\Drupal\migrate\MigrateException::class);
     $this->expectExceptionMessage("Array index missing, extraction failed for '[\n  'bar' => 'foo',\n]'. Consider adding a `default` key to the configuration.");
     $this->plugin->transform(['bar' => 'foo'], $this->migrateExecutable, $this->row, 'destination_property');
   }

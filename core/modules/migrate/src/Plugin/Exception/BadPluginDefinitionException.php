@@ -7,7 +7,7 @@ use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 /**
  * Defines a class for bad plugin definition exceptions.
  */
-class BadPluginDefinitionException extends InvalidPluginDefinitionException {
+class BadPluginDefinitionException extends \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException {
 
   /**
    * Constructs a BadPluginDefinitionException.

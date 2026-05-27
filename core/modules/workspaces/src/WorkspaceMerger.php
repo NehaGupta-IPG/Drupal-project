@@ -29,7 +29,7 @@ class WorkspaceMerger implements WorkspaceMergerInterface {
     }
 
     if ($this->checkConflictsOnTarget()) {
-      throw new WorkspaceConflictException();
+      throw new \Drupal\workspaces\WorkspaceConflictException();
     }
 
     try {

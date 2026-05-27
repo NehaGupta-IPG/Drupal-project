@@ -392,7 +392,7 @@ class DefaultTableMapping implements TableMappingInterface {
     }
 
     if (!isset($result)) {
-      throw new SqlContentEntityStorageException("Table information not available for the '$field_name' field.");
+      throw new \Drupal\Core\Entity\Sql\SqlContentEntityStorageException("Table information not available for the '$field_name' field.");
     }
 
     return $result;
@@ -440,7 +440,7 @@ class DefaultTableMapping implements TableMappingInterface {
       }
     }
     else {
-      throw new SqlContentEntityStorageException("Column information not available for the '$field_name' field.");
+      throw new \Drupal\Core\Entity\Sql\SqlContentEntityStorageException("Column information not available for the '$field_name' field.");
     }
 
     return $column_name;

@@ -182,7 +182,7 @@ class DateTimeNormalizerTest extends UnitTestCase {
    * Tests the denormalize function with bad data.
    */
   public function testDenormalizeException(): void {
-    $this->expectException(UnexpectedValueException::class);
+    $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
     $this->expectExceptionMessage('The specified date "2016/11/06 09:02am GMT" is not in an accepted format: "Y-m-d\TH:i:sP" (RFC 3339), "Y-m-d\TH:i:sO" (ISO 8601).');
 
     $normalized = '2016/11/06 09:02am GMT';

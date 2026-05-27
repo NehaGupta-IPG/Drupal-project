@@ -25,7 +25,7 @@ class CronQueueTestMemoryDelayException extends QueueWorkerBase {
   public function processItem($data): void {
     // Set the delay to something larger than the original lease.
     $cron_time = $this->pluginDefinition['cron']['time'];
-    throw new DelayedRequeueException($cron_time + 100);
+    throw new \Drupal\Core\Queue\DelayedRequeueException($cron_time + 100);
   }
 
 }

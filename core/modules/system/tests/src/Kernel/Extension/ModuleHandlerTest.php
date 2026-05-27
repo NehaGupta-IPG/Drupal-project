@@ -107,7 +107,7 @@ class ModuleHandlerTest extends KernelTestBase {
       $result = $this->moduleInstaller()->install(['dblog']);
       $this->fail('ModuleInstaller::install() throws an exception if dependencies are missing.');
     }
-    catch (MissingDependencyException) {
+    catch (\Drupal\Core\Extension\MissingDependencyException) {
       // Expected exception; just continue testing.
     }
 
@@ -209,7 +209,7 @@ class ModuleHandlerTest extends KernelTestBase {
       $this->moduleInstaller()->uninstall([$dependency]);
       $this->fail('Expected ModuleUninstallValidatorException not thrown');
     }
-    catch (ModuleUninstallValidatorException $e) {
+    catch (\Drupal\Core\Extension\ModuleUninstallValidatorException $e) {
       $this->assertEquals("The following reasons prevent the modules from being uninstalled: The 'Testing install profile dependencies' install profile requires 'Database Logging'", $e->getMessage());
     }
 
@@ -254,7 +254,7 @@ class ModuleHandlerTest extends KernelTestBase {
     }
 
     // Try uninstalling the dependencies.
-    $this->expectException(ModuleUninstallValidatorException::class);
+    $this->expectException(\Drupal\Core\Extension\ModuleUninstallValidatorException::class);
     $this->expectExceptionMessage("The following reasons prevent the modules from being uninstalled: The 'Testing install profile all dependencies' install profile requires 'Database Logging'; The 'Testing install profile all dependencies' install profile requires 'Dependency foo test module'");
     $this->moduleInstaller()->uninstall($dependencies);
   }
@@ -290,7 +290,7 @@ class ModuleHandlerTest extends KernelTestBase {
       $this->moduleInstaller()->uninstall(['entity_test']);
       $this->fail($message);
     }
-    catch (ModuleUninstallValidatorException) {
+    catch (\Drupal\Core\Extension\ModuleUninstallValidatorException) {
       // Expected exception; just continue testing.
     }
 
@@ -300,7 +300,7 @@ class ModuleHandlerTest extends KernelTestBase {
       $this->moduleInstaller()->uninstall(['help']);
       $this->fail($message);
     }
-    catch (ModuleUninstallValidatorException) {
+    catch (\Drupal\Core\Extension\ModuleUninstallValidatorException) {
       // Expected exception; just continue testing.
     }
 

@@ -16,7 +16,7 @@ class EntityTestNoLoadStorage extends SqlContentEntityStorage {
    * {@inheritdoc}
    */
   public function load($id) {
-    throw new EntityStorageException('No load operation is supposed to happen.');
+    throw new \Drupal\Core\Entity\EntityStorageException('No load operation is supposed to happen.');
   }
 
 }

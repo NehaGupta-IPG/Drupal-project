@@ -96,7 +96,7 @@ final class ResourceVersionRouteEnhancer implements EnhancerInterface {
       // versionable, provide a helpful error.
       if ($has_version_param) {
         $cacheability = (new CacheableMetadata())->addCacheContexts(['url.path', static::CACHE_CONTEXT]);
-        throw new CacheableHttpException($cacheability, 501, 'Resource versioning is not yet supported for this resource type.');
+        throw new \Drupal\Core\Http\Exception\CacheableHttpException($cacheability, 501, 'Resource versioning is not yet supported for this resource type.');
       }
       return $defaults;
     }
@@ -117,7 +117,7 @@ final class ResourceVersionRouteEnhancer implements EnhancerInterface {
     // Provide a helpful error when a version is specified with an unsafe
     // method.
     if (!$request->isMethodCacheable()) {
-      throw new BadRequestHttpException(sprintf('%s requests with a `%s` query parameter are not supported.', $request->getMethod(), static::RESOURCE_VERSION_QUERY_PARAMETER));
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException(sprintf('%s requests with a `%s` query parameter are not supported.', $request->getMethod(), static::RESOURCE_VERSION_QUERY_PARAMETER));
     }
 
     $resource_version_identifier = $request->query->get(static::RESOURCE_VERSION_QUERY_PARAMETER);
@@ -125,7 +125,7 @@ final class ResourceVersionRouteEnhancer implements EnhancerInterface {
     if (!static::isValidVersionIdentifier($resource_version_identifier)) {
       $cacheability = (new CacheableMetadata())->addCacheContexts([static::CACHE_CONTEXT]);
       $message = sprintf('A resource version identifier was provided in an invalid format: `%s`', $resource_version_identifier);
-      throw new CacheableBadRequestHttpException($cacheability, $message);
+      throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cacheability, $message);
     }
 
     // Determine if the request is for a collection resource.
@@ -142,7 +142,7 @@ final class ResourceVersionRouteEnhancer implements EnhancerInterface {
         ];
         $cacheability = (new CacheableMetadata())->addCacheContexts($cache_contexts);
         $message = 'JSON:API does not support filtering on revisions other than the latest version because a secure Drupal core API does not yet exist to do so.';
-        throw new CacheableHttpException($cacheability, 501, $message);
+        throw new \Drupal\Core\Http\Exception\CacheableHttpException($cacheability, 501, $message);
       }
       // 'latest-version' and 'working-copy' are the only acceptable version
       // identifiers for a collection resource.
@@ -152,7 +152,7 @@ final class ResourceVersionRouteEnhancer implements EnhancerInterface {
           $latest_version_identifier,
           $working_copy_identifier,
         ]));
-        throw new CacheableBadRequestHttpException($cacheability, $message);
+        throw new \Drupal\Core\Http\Exception\CacheableBadRequestHttpException($cacheability, $message);
       }
       // Whether the collection to be loaded should include only working copies.
       $defaults[static::WORKING_COPIES_REQUESTED] = $resource_version_identifier === $working_copy_identifier;

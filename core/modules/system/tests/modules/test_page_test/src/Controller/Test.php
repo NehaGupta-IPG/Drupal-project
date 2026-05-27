@@ -87,7 +87,7 @@ class Test {
    *   The status code.
    */
   public function httpResponseException(int $code) {
-    throw new HttpException($code);
+    throw new \Symfony\Component\HttpKernel\Exception\HttpException($code);
   }
 
   public function error() {

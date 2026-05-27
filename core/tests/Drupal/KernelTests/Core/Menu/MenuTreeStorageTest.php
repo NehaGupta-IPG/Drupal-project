@@ -244,7 +244,7 @@ class MenuTreeStorageTest extends KernelTestBase {
       $this->moveMenuLink('test1', 'footerA');
       $this->fail('Exception was not thrown');
     }
-    catch (PluginException) {
+    catch (\Drupal\Component\Plugin\Exception\PluginException) {
       // Expected exception; just continue testing.
     }
     // The opposite move should work, and change the has_children flag.

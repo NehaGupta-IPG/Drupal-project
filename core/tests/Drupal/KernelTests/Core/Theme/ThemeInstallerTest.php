@@ -138,7 +138,7 @@ class ThemeInstallerTest extends KernelTestBase {
       $this->fail($message);
     }
     catch (\Exception $e) {
-      $this->assertInstanceOf(UnknownExtensionException::class, $e);
+      $this->assertInstanceOf(\Drupal\Core\Extension\Exception\UnknownExtensionException::class, $e);
     }
 
     $themes = $this->themeHandler()->listInfo();
@@ -157,7 +157,7 @@ class ThemeInstallerTest extends KernelTestBase {
       $this->fail($message);
     }
     catch (\Exception $e) {
-      $this->assertInstanceOf(ExtensionNameLengthException::class, $e);
+      $this->assertInstanceOf(\Drupal\Core\Extension\ExtensionNameLengthException::class, $e);
     }
   }
 
@@ -174,7 +174,7 @@ class ThemeInstallerTest extends KernelTestBase {
     // Install the module, then the theme.
     $this->moduleInstaller()->install([$name]);
     $message = "Theme name {$name} is already in use by an installed module.";
-    $this->expectException(ExtensionNameReservedException::class);
+    $this->expectException(\Drupal\Core\Extension\ExtensionNameReservedException::class);
     $this->expectExceptionMessage($message);
     $this->themeInstaller()->install([$name]);
   }
@@ -187,7 +187,7 @@ class ThemeInstallerTest extends KernelTestBase {
     $this->moduleInstaller()->install($installed_modules);
     $themes = $this->themeHandler()->listInfo();
     $this->assertEmpty($themes);
-    $this->expectException(MissingDependencyException::class);
+    $this->expectException(\Drupal\Core\Extension\MissingDependencyException::class);
     $this->expectExceptionMessage($message);
     $this->themeInstaller()->install([$theme_name]);
   }
@@ -258,7 +258,7 @@ class ThemeInstallerTest extends KernelTestBase {
     $this->themeInstaller()->install([$name]);
     $themes = $this->themeHandler()->listInfo();
     $this->assertArrayHasKey($name, $themes);
-    $this->expectException(ModuleUninstallValidatorException::class);
+    $this->expectException(\Drupal\Core\Extension\ModuleUninstallValidatorException::class);
     $this->expectExceptionMessage('The following reasons prevent the modules from being uninstalled: Required by the theme: Test Theme Depending on Modules');
     $this->moduleInstaller()->uninstall(['test_module_required_by_theme']);
   }
@@ -371,7 +371,7 @@ class ThemeInstallerTest extends KernelTestBase {
     $themes = $this->themeHandler()->listInfo();
     $this->assertEmpty(array_keys($themes));
 
-    $this->expectException(UnknownExtensionException::class);
+    $this->expectException(\Drupal\Core\Extension\Exception\UnknownExtensionException::class);
     $this->themeInstaller()->uninstall([$name]);
   }
 
@@ -406,7 +406,7 @@ class ThemeInstallerTest extends KernelTestBase {
 
     $themes = $this->themeHandler()->listInfo();
     $this->assertEmpty(array_keys($themes));
-    $this->expectException(UnknownExtensionException::class);
+    $this->expectException(\Drupal\Core\Extension\Exception\UnknownExtensionException::class);
     $this->themeInstaller()->uninstall([$name]);
   }
 

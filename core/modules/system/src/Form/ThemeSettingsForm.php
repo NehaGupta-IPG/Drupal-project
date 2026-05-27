@@ -157,7 +157,7 @@ class ThemeSettingsForm extends ConfigFormBase {
     // @see \Drupal\Core\Extension\ThemeSettingsProvider::getSetting()
     if ($theme) {
       if (!$this->themeHandler->hasUi($theme)) {
-        throw new NotFoundHttpException();
+        throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
       }
       $var = 'theme_' . $theme . '_settings';
       $config_key = $theme . '.settings';
@@ -487,7 +487,7 @@ class ThemeSettingsForm extends ConfigFormBase {
         $values['logo_path'] = $filename;
       }
     }
-    catch (FileException) {
+    catch (\Drupal\Core\File\Exception\FileException) {
       // Ignore.
     }
     try {
@@ -498,7 +498,7 @@ class ThemeSettingsForm extends ConfigFormBase {
         $values['toggle_favicon'] = 1;
       }
     }
-    catch (FileException) {
+    catch (\Drupal\Core\File\Exception\FileException) {
       // Ignore.
     }
     unset($values['logo_upload']);

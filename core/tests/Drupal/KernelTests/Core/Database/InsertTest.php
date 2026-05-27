@@ -229,7 +229,7 @@ class InsertTest extends DatabaseTestBase {
 
     // Try inserting a record that misses the value for the 'age' column,
     // should raise an IntegrityConstraintViolationException.
-    $this->expectException(IntegrityConstraintViolationException::class);
+    $this->expectException(\Drupal\Core\Database\IntegrityConstraintViolationException::class);
     $this->connection->insert('test')
       ->fields(['name'])
       ->values(['name' => 'Elvis'])

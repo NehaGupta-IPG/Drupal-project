@@ -45,13 +45,13 @@ class FormAjaxResponseBuilder implements FormAjaxResponseBuilderInterface {
     }
     $callback = $form_state->prepareCallback($callback);
     if (empty($callback)) {
-      throw new HttpException(500, 'The specified #ajax callback is empty or not callable.');
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(500, 'The specified #ajax callback is empty or not callable.');
     }
     try {
       $callback = $this->callableResolver->getCallableFromDefinition($callback);
     }
     catch (\InvalidArgumentException $e) {
-      throw new HttpException(500, 'The specified #ajax callback is empty or not callable.', $e);
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(500, 'The specified #ajax callback is empty or not callable.', $e);
     }
     $result = call_user_func_array($callback, [&$form, &$form_state, $request]);
 

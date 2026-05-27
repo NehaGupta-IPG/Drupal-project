@@ -270,7 +270,7 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
       // If we didn't get an exception, ensure we didn't expect any errors.
       $this->assertSame([], $expected_results);
     }
-    catch (SandboxEventException $e) {
+    catch (\Drupal\package_manager\Exception\SandboxEventException $e) {
       $this->assertNotEmpty($expected_results);
       $this->assertValidationResultsEqual($expected_results, $e->event->getResults(), NULL, $stage_dir);
     }

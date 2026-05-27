@@ -60,7 +60,7 @@ trait DependencySerializationTrait {
         }
       }
     }
-    catch (ContainerNotInitializedException) {
+    catch (\Drupal\Core\DependencyInjection\ContainerNotInitializedException) {
       // No container, no problem.
     }
 

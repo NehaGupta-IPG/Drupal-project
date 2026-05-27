@@ -253,9 +253,9 @@ class EntityConverterTest extends UnitTestCase {
     $this->entityRepository->expects($this->once())
       ->method('getCanonical')
       ->with($plugin_id, 'id', $contexts)
-      ->willThrowException(new PluginNotFoundException($plugin_id));
+      ->willThrowException(new \Drupal\Component\Plugin\Exception\PluginNotFoundException($plugin_id));
 
-    $this->expectException(PluginNotFoundException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\PluginNotFoundException::class);
 
     $this->entityConverter->convert('id', ['type' => 'entity:' . $plugin_id], 'foo', ['foo' => 'id']);
   }
@@ -268,7 +268,7 @@ class EntityConverterTest extends UnitTestCase {
     $this->entityRepository = $this->createStub(EntityRepositoryInterface::class);
     $this->entityConverter = new EntityConverter($this->entityTypeManager, $this->entityRepository);
 
-    $this->expectException(ParamNotConvertedException::class);
+    $this->expectException(\Drupal\Core\ParamConverter\ParamNotConvertedException::class);
     $this->expectExceptionMessage('The "foo" parameter was not converted because the "invalid_id" parameter is missing.');
     $this->entityConverter->convert('id', ['type' => 'entity:{invalid_id}'], 'foo', ['foo' => 'id']);
   }

@@ -46,13 +46,13 @@ class ContentEntityConstructorTest extends KernelTestBase {
       'entity type missing' => [
         [],
         ['entity_type' => ''],
-        InvalidPluginDefinitionException::class,
+        \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
         'Missing required "entity_type" definition.',
       ],
       'non content entity' => [
         [],
         ['entity_type' => 'node_type'],
-        InvalidPluginDefinitionException::class,
+        \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
         'The entity type (node_type) is not supported. The "content_entity" source plugin only supports content entities.',
       ],
       'not bundleable' => [

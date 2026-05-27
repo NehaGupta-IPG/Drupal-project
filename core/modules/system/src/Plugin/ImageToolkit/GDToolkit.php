@@ -280,7 +280,7 @@ class GDToolkit extends ImageToolkitBase {
         $this->fileSystem->move($destination, $permanent_destination, FileExists::Replace);
         return TRUE;
       }
-      catch (FileException) {
+      catch (\Drupal\Core\File\Exception\FileException) {
         return FALSE;
       }
     }

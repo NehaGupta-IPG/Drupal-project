@@ -156,7 +156,7 @@ class WebAssert extends MinkWebAssert {
     $node = $container->findButton($button);
 
     if ($node === NULL) {
-      throw new ElementNotFoundException($this->session->getDriver(), 'button', 'id|name|label|value', $button);
+      throw new \Behat\Mink\Exception\ElementNotFoundException($this->session->getDriver(), 'button', 'id|name|label|value', $button);
     }
 
     return $node;
@@ -202,7 +202,7 @@ class WebAssert extends MinkWebAssert {
     ]);
 
     if ($node === NULL) {
-      throw new ElementNotFoundException($this->session->getDriver(), 'select', 'id|name|label|value', $select);
+      throw new \Behat\Mink\Exception\ElementNotFoundException($this->session->getDriver(), 'select', 'id|name|label|value', $select);
     }
 
     return $node;
@@ -237,13 +237,13 @@ class WebAssert extends MinkWebAssert {
     ]);
 
     if ($select_field === NULL) {
-      throw new ElementNotFoundException($this->session->getDriver(), 'select', 'id|name|label|value', $select);
+      throw new \Behat\Mink\Exception\ElementNotFoundException($this->session->getDriver(), 'select', 'id|name|label|value', $select);
     }
 
     $option_field = $select_field->find('named_exact', ['option', $option]);
 
     if ($option_field === NULL) {
-      throw new ElementNotFoundException($this->session->getDriver(), 'option', 'id|name|label|value', $option);
+      throw new \Behat\Mink\Exception\ElementNotFoundException($this->session->getDriver(), 'option', 'id|name|label|value', $option);
     }
 
     return $option_field;
@@ -275,7 +275,7 @@ class WebAssert extends MinkWebAssert {
     ]);
 
     if ($select_field === NULL) {
-      throw new ElementNotFoundException($this->session->getDriver(), 'select', 'id|name|label|value', $select);
+      throw new \Behat\Mink\Exception\ElementNotFoundException($this->session->getDriver(), 'select', 'id|name|label|value', $select);
     }
 
     $option_field = $select_field->find('named_exact', ['option', $option]);
@@ -295,7 +295,7 @@ class WebAssert extends MinkWebAssert {
   public function titleEquals($expected_title): void {
     $title_element = $this->session->getPage()->find('css', 'title');
     if (!$title_element) {
-      throw new ExpectationException('No title element found on the page', $this->session->getDriver());
+      throw new \Behat\Mink\Exception\ExpectationException('No title element found on the page', $this->session->getDriver());
     }
     $actual_title = $title_element->getText();
     $this->assert($expected_title === $actual_title, 'Title found');
@@ -599,7 +599,7 @@ class WebAssert extends MinkWebAssert {
       return;
     }
 
-    throw new ExpectationException($message, $this->session->getDriver());
+    throw new \Behat\Mink\Exception\ExpectationException($message, $this->session->getDriver());
   }
 
   /**
@@ -621,11 +621,11 @@ class WebAssert extends MinkWebAssert {
     $node = $container->findField($field);
 
     if ($node === NULL) {
-      throw new ElementNotFoundException($this->session->getDriver(), 'field', 'id|name|label|value', $field);
+      throw new \Behat\Mink\Exception\ElementNotFoundException($this->session->getDriver(), 'field', 'id|name|label|value', $field);
     }
 
     if (!$node->hasAttribute('disabled')) {
-      throw new ExpectationException("Field $field is disabled", $this->session->getDriver());
+      throw new \Behat\Mink\Exception\ExpectationException("Field $field is disabled", $this->session->getDriver());
     }
 
     return $node;
@@ -650,11 +650,11 @@ class WebAssert extends MinkWebAssert {
     $node = $container->findField($field);
 
     if ($node === NULL) {
-      throw new ElementNotFoundException($this->session->getDriver(), 'field', 'id|name|label|value', $field);
+      throw new \Behat\Mink\Exception\ElementNotFoundException($this->session->getDriver(), 'field', 'id|name|label|value', $field);
     }
 
     if ($node->hasAttribute('disabled')) {
-      throw new ExpectationException("Field $field is not enabled", $this->session->getDriver());
+      throw new \Behat\Mink\Exception\ExpectationException("Field $field is not enabled", $this->session->getDriver());
     }
 
     return $node;
@@ -678,7 +678,7 @@ class WebAssert extends MinkWebAssert {
     if ($node = $container->find('hidden_field_selector', ['hidden_field', $field])) {
       return $node;
     }
-    throw new ElementNotFoundException($this->session->getDriver(), 'form hidden field', 'id|name|value', $field);
+    throw new \Behat\Mink\Exception\ElementNotFoundException($this->session->getDriver(), 'form hidden field', 'id|name|value', $field);
   }
 
   /**
@@ -753,7 +753,7 @@ class WebAssert extends MinkWebAssert {
       $this->pageTextMatchesCount(1, $regex);
     }
     catch (AssertionFailedError $e) {
-      throw new ResponseTextException($e->getMessage(), $this->session->getDriver());
+      throw new \Behat\Mink\Exception\ResponseTextException($e->getMessage(), $this->session->getDriver());
     }
   }
 
@@ -767,7 +767,7 @@ class WebAssert extends MinkWebAssert {
     foreach ($this->session->getPage()->findAll('xpath', '//*[@id]') as $element) {
       $id = $element->getAttribute('id');
       if (isset($seen_ids[$id])) {
-        throw new ExpectationException(sprintf('The page contains a duplicate HTML ID "%s".', $id), $this->session->getDriver());
+        throw new \Behat\Mink\Exception\ExpectationException(sprintf('The page contains a duplicate HTML ID "%s".', $id), $this->session->getDriver());
       }
       $seen_ids[$id] = TRUE;
     }
@@ -834,7 +834,7 @@ class WebAssert extends MinkWebAssert {
     try {
       $this->elementExists('xpath', $selector);
     }
-    catch (ExpectationException $e) {
+    catch (\Behat\Mink\Exception\ExpectationException $e) {
       Assert::fail($e->getMessage());
     }
   }
@@ -850,7 +850,7 @@ class WebAssert extends MinkWebAssert {
     try {
       $this->elementNotExists('xpath', $selector);
     }
-    catch (ExpectationException $e) {
+    catch (\Behat\Mink\Exception\ExpectationException $e) {
       Assert::fail($e->getMessage());
     }
   }
@@ -868,7 +868,7 @@ class WebAssert extends MinkWebAssert {
     try {
       $this->elementExists('xpath', $selector);
     }
-    catch (ExpectationException $e) {
+    catch (\Behat\Mink\Exception\ExpectationException $e) {
       Assert::fail($e->getMessage());
     }
   }
@@ -886,7 +886,7 @@ class WebAssert extends MinkWebAssert {
     try {
       $this->elementNotExists('xpath', $selector);
     }
-    catch (ExpectationException $e) {
+    catch (\Behat\Mink\Exception\ExpectationException $e) {
       Assert::fail($e->getMessage());
     }
   }

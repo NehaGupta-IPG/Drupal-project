@@ -64,18 +64,18 @@ abstract class Upsert extends Query implements \Countable {
   protected function preExecute() {
     // Confirm that the user set the unique/primary key of the table.
     if (!$this->key) {
-      throw new NoUniqueFieldException('There is no unique field specified.');
+      throw new \Drupal\Core\Database\Query\NoUniqueFieldException('There is no unique field specified.');
     }
 
     // Confirm that the user did not try to specify an identical
     // field and default field.
     if (array_intersect($this->insertFields, $this->defaultFields)) {
-      throw new FieldsOverlapException('You may not specify the same field to have a value and a schema-default value.');
+      throw new \Drupal\Core\Database\Query\FieldsOverlapException('You may not specify the same field to have a value and a schema-default value.');
     }
 
     // Don't execute query without fields.
     if (count($this->insertFields) + count($this->defaultFields) == 0) {
-      throw new NoFieldsException('There are no fields available to insert with.');
+      throw new \Drupal\Core\Database\Query\NoFieldsException('There are no fields available to insert with.');
     }
 
     // If no values have been added, silently ignore this query. This can happen

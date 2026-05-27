@@ -71,7 +71,7 @@ final class SymlinkValidator implements EventSubscriberInterface {
     try {
       $this->precondition->assertIsFulfilled($active_dir, $stage_dir, $exclusions);
     }
-    catch (PreconditionException $e) {
+    catch (\PhpTuf\ComposerStager\API\Exception\PreconditionException $e) {
       $event->addErrorFromThrowable($e);
     }
   }

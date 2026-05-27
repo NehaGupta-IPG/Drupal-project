@@ -143,7 +143,7 @@ class Insert extends Query implements \Countable {
     // Confirm that the user did not try to specify an identical
     // field and default field.
     if (array_intersect($this->insertFields, $this->defaultFields)) {
-      throw new FieldsOverlapException('You may not specify the same field to have a value and a schema-default value.');
+      throw new \Drupal\Core\Database\Query\FieldsOverlapException('You may not specify the same field to have a value and a schema-default value.');
     }
 
     if (!empty($this->fromQuery)) {
@@ -157,7 +157,7 @@ class Insert extends Query implements \Countable {
     else {
       // Don't execute query without fields.
       if (count($this->insertFields) + count($this->defaultFields) == 0) {
-        throw new NoFieldsException('There are no fields available to insert with.');
+        throw new \Drupal\Core\Database\Query\NoFieldsException('There are no fields available to insert with.');
       }
     }
 

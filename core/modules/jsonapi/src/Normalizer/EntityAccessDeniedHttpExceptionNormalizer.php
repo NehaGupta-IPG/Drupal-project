@@ -26,10 +26,10 @@ class EntityAccessDeniedHttpExceptionNormalizer extends HttpExceptionNormalizer 
   /**
    * {@inheritdoc}
    */
-  protected function buildErrorObjects(HttpException $exception) {
+  protected function buildErrorObjects(\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
     $errors = parent::buildErrorObjects($exception);
 
-    if ($exception instanceof EntityAccessDeniedHttpException) {
+    if ($exception instanceof \Drupal\jsonapi\Exception\EntityAccessDeniedHttpException) {
       $error = $exception->getError();
       /** @var \Drupal\Core\Entity\EntityInterface $entity */
       $entity = $error['entity'];
@@ -65,7 +65,7 @@ class EntityAccessDeniedHttpExceptionNormalizer extends HttpExceptionNormalizer 
    */
   public function getSupportedTypes(?string $format): array {
     return [
-      EntityAccessDeniedHttpException::class => TRUE,
+      \Drupal\jsonapi\Exception\EntityAccessDeniedHttpException::class => TRUE,
     ];
   }
 

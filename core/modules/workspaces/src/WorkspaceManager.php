@@ -124,7 +124,7 @@ class WorkspaceManager implements WorkspaceManagerInterface {
     // If the current user doesn't have access to view the workspace, they
     // shouldn't be allowed to switch to it, except in CLI processes.
     if ($workspace && PHP_SAPI !== 'cli' && !$workspace->access('view')) {
-      throw new WorkspaceAccessException('The user does not have permission to view that workspace.');
+      throw new \Drupal\workspaces\WorkspaceAccessException('The user does not have permission to view that workspace.');
     }
 
     $previous_workspace = $this->activeWorkspace ?: NULL;

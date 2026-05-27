@@ -244,7 +244,7 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
       $resource_url = $this->urlResolver->getResourceUrl($media_url);
       $resource = $this->resourceFetcher->fetchResource($resource_url);
     }
-    catch (ResourceException $e) {
+    catch (\Drupal\media\OEmbed\ResourceException $e) {
       $this->messenger->addError($e->getMessage());
       return NULL;
     }
@@ -465,7 +465,7 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
         '%error' => $e->getMessage(),
       ]);
     }
-    catch (FileException) {
+    catch (\Drupal\Core\File\Exception\FileException) {
       $this->logger->warning('Could not download remote thumbnail from {url}.', [
         'url' => $remote_thumbnail_url,
       ]);

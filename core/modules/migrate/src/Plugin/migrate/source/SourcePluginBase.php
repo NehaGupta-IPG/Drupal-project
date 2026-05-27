@@ -261,7 +261,7 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
 
     // Don't allow the use of both high water and track changes together.
     if ($this->highWaterProperty && $this->trackChanges) {
-      throw new MigrateException('You should either use a high-water mark or track changes not both. They are both designed to solve the same problem');
+      throw new \Drupal\migrate\MigrateException('You should either use a high-water mark or track changes not both. They are both designed to solve the same problem');
     }
   }
 
@@ -303,7 +303,7 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
       $skip = ($result_hook && in_array(FALSE, $result_hook)) || ($result_named_hook && in_array(FALSE, $result_named_hook));
       $save_to_map = TRUE;
     }
-    catch (MigrateSkipRowException $e) {
+    catch (\Drupal\migrate\MigrateSkipRowException $e) {
       $skip = TRUE;
       $save_to_map = $e->getSaveToMap();
       if ($message = trim($e->getMessage())) {

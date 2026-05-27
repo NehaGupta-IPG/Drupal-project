@@ -42,7 +42,7 @@ class RowCountExceptionTest extends UnitTestCase {
    */
   #[DataProvider('providerTestExceptionMessage')]
   public function testExceptionMessage(string $expected, string $message): void {
-    $e = new RowCountException($message);
+    $e = new \Drupal\Core\Database\RowCountException($message);
     $this->assertSame($expected, $e->getMessage());
   }
 
@@ -50,7 +50,7 @@ class RowCountExceptionTest extends UnitTestCase {
    * Tests exception message null.
    */
   public function testExceptionMessageNull(): void {
-    $e = new RowCountException(NULL);
+    $e = new \Drupal\Core\Database\RowCountException(NULL);
     $this->assertSame(self::DEFAULT_EXCEPTION_MESSAGE, $e->getMessage());
   }
 

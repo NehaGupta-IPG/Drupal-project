@@ -77,7 +77,7 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
         try {
           Config::validateName($name);
         }
-        catch (ConfigNameException) {
+        catch (\Drupal\Core\Config\ConfigNameException) {
           $message = $this->t('The config name @config_name is invalid.', ['@config_name' => $name]);
           $event->getConfigImporter()->logError($message);
         }

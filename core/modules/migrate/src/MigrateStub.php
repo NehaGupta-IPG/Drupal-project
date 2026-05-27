@@ -64,7 +64,7 @@ class MigrateStub implements MigrateStubInterface {
   public function createStub($migration_id, array $source_ids, array $default_values = [], $key_by_destination_ids = NULL) {
     $migrations = $this->migrationPluginManager->createInstances([$migration_id]);
     if (!$migrations) {
-      throw new PluginNotFoundException($migration_id);
+      throw new \Drupal\Component\Plugin\Exception\PluginNotFoundException($migration_id);
     }
     if (count($migrations) !== 1) {
       throw new \LogicException(sprintf('Cannot stub derivable migration "%s".  You must specify the id of a specific derivative to stub.', $migration_id));

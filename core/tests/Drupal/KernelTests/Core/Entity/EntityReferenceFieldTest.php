@@ -438,7 +438,7 @@ class EntityReferenceFieldTest extends EntityKernelTestBase {
     $this->state->set('entity_test.additional_base_field_definitions', $definitions);
     $this->entityTypeManager->clearCachedDefinitions();
 
-    $this->expectException(FieldException::class);
+    $this->expectException(\Drupal\Core\Field\FieldException::class);
     $this->expectExceptionMessage("Field 'bad_reference' on entity type 'entity_test' references a target entity type 'made_up_entity_type' which does not exist.");
 
     $this->installEntitySchema('entity_test');
@@ -479,7 +479,7 @@ class EntityReferenceFieldTest extends EntityKernelTestBase {
         ->create(['name' => $this->randomString()]);
       $entity->target_reference = $target_id;
     }
-    catch (EntityStorageException) {
+    catch (\Drupal\Core\Entity\EntityStorageException) {
       $this->fail($message);
     }
 
@@ -490,7 +490,7 @@ class EntityReferenceFieldTest extends EntityKernelTestBase {
       $storage->load($target_id);
       $this->fail($message);
     }
-    catch (EntityStorageException) {
+    catch (\Drupal\Core\Entity\EntityStorageException) {
       // Expected exception; just continue testing.
     }
   }

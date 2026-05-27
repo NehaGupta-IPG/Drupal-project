@@ -432,7 +432,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
       ->shouldNotBeCalled();
 
     $entity = new StubConfigEntity([], 'test_entity_type');
-    $this->expectException(EntityMalformedException::class);
+    $this->expectException(\Drupal\Core\Entity\EntityMalformedException::class);
     $this->expectExceptionMessage('The entity does not have an ID.');
     $this->entityStorage->save($entity);
   }
@@ -456,7 +456,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
     $entity = new StubConfigEntity(['id' => 'foo'], 'test_entity_type');
     $entity->enforceIsNew();
 
-    $this->expectException(EntityStorageException::class);
+    $this->expectException(\Drupal\Core\Entity\EntityStorageException::class);
     $this->entityStorage->save($entity);
   }
 
@@ -480,7 +480,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
     $this->entityQuery->execute()->willReturn(['baz']);
 
     $entity = new StubConfigEntity(['id' => 'foo'], 'test_entity_type');
-    $this->expectException(ConfigDuplicateUUIDException::class);
+    $this->expectException(\Drupal\Core\Config\ConfigDuplicateUUIDException::class);
     $this->expectExceptionMessage('when this UUID is already used for');
     $this->entityStorage->save($entity);
   }
@@ -566,7 +566,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
     $entity = new StubConfigEntity(['id' => 'foo'], 'test_entity_type');
 
     $entity->set('uuid', 'baz');
-    $this->expectException(ConfigDuplicateUUIDException::class);
+    $this->expectException(\Drupal\Core\Config\ConfigDuplicateUUIDException::class);
     $this->expectExceptionMessage('when this entity already exists with UUID');
     $this->entityStorage->save($entity);
   }

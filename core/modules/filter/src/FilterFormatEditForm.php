@@ -17,7 +17,7 @@ class FilterFormatEditForm extends FilterFormatFormBase {
    */
   public function form(array $form, FormStateInterface $form_state) {
     if (!$this->entity->status()) {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
 
     $form['#title'] = $this->entity->label();

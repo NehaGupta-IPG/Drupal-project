@@ -206,7 +206,7 @@ class ViewAddForm extends ViewFormBase {
       $this->entity = $wizard->createView($form, $form_state);
     }
     // @todo Figure out whether it really makes sense to throw and catch exceptions on the wizard.
-    catch (WizardException $e) {
+    catch (\Drupal\views\Plugin\views\wizard\WizardException $e) {
       $this->messenger()->addError($e->getMessage());
       $form_state->setRedirect('entity.view.collection');
       return;

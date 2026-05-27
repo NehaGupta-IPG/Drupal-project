@@ -46,7 +46,7 @@ class ConfigTranslationListController extends ControllerBase {
     $mapper_definition = $this->mapperManager->getDefinition($mapper_id);
     $mapper = $this->mapperManager->createInstance($mapper_id, $mapper_definition);
     if (!$mapper) {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
     $entity_type = $mapper->getType();
     // If the mapper, for example the mapper for fields, has a custom list

@@ -170,7 +170,7 @@ abstract class Data implements \IteratorAggregate, \Countable {
     $deduplicated = [];
     foreach ($collection as $resource) {
       $dedupe_key = $resource->getTypeName() . ':' . $resource->getId();
-      if ($resource instanceof EntityAccessDeniedHttpException && ($error = $resource->getError()) && !is_null($error['relationship_field'])) {
+      if ($resource instanceof \Drupal\jsonapi\Exception\EntityAccessDeniedHttpException && ($error = $resource->getError()) && !is_null($error['relationship_field'])) {
         $dedupe_key .= ':' . $error['relationship_field'];
       }
       $deduplicated[$dedupe_key] = $resource;

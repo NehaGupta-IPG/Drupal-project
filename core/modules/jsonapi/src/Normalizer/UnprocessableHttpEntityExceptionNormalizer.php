@@ -26,7 +26,7 @@ class UnprocessableHttpEntityExceptionNormalizer extends HttpExceptionNormalizer
   /**
    * {@inheritdoc}
    */
-  protected function buildErrorObjects(HttpException $exception) {
+  protected function buildErrorObjects(\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
     /** @var \Drupal\jsonapi\Exception\UnprocessableHttpEntityException $exception */
     $errors = parent::buildErrorObjects($exception);
     $error = $errors[0];
@@ -76,7 +76,7 @@ class UnprocessableHttpEntityExceptionNormalizer extends HttpExceptionNormalizer
    */
   public function getSupportedTypes(?string $format): array {
     return [
-      UnprocessableHttpEntityException::class => TRUE,
+      \Drupal\jsonapi\Exception\UnprocessableHttpEntityException::class => TRUE,
     ];
   }
 

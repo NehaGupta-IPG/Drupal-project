@@ -42,7 +42,7 @@ class ResourceFetcher implements ResourceFetcherInterface {
       ]);
     }
     catch (ClientExceptionInterface $e) {
-      throw new ResourceException('Could not retrieve the oEmbed resource.', $url, [], $e);
+      throw new \Drupal\media\OEmbed\ResourceException('Could not retrieve the oEmbed resource.', $url, [], $e);
     }
 
     [$format] = $response->getHeader('Content-Type');
@@ -56,11 +56,11 @@ class ResourceFetcher implements ResourceFetcherInterface {
       $data = Json::decode($content);
 
       if (json_last_error() !== JSON_ERROR_NONE) {
-        throw new ResourceException('Error decoding oEmbed resource: ' . json_last_error_msg(), $url);
+        throw new \Drupal\media\OEmbed\ResourceException('Error decoding oEmbed resource: ' . json_last_error_msg(), $url);
       }
     }
     if (empty($data) || !is_array($data)) {
-      throw new ResourceException('The oEmbed resource could not be decoded.', $url);
+      throw new \Drupal\media\OEmbed\ResourceException('The oEmbed resource could not be decoded.', $url);
     }
 
     $this->cacheBackend->set($cache_id, $data);
@@ -100,7 +100,7 @@ class ResourceFetcher implements ResourceFetcherInterface {
     ];
 
     if ($data['version'] !== '1.0') {
-      throw new ResourceException("Resource version must be '1.0'", $url, $data);
+      throw new \Drupal\media\OEmbed\ResourceException("Resource version must be '1.0'", $url, $data);
     }
 
     // Prepare the arguments to pass to the factory method.
@@ -170,11 +170,11 @@ class ResourceFetcher implements ResourceFetcherInterface {
           );
 
         default:
-          throw new ResourceException('Unknown resource type: ' . $data['type'], $url, $data);
+          throw new \Drupal\media\OEmbed\ResourceException('Unknown resource type: ' . $data['type'], $url, $data);
       }
     }
     catch (\InvalidArgumentException $e) {
-      throw new ResourceException($e->getMessage(), $url, $data, $e);
+      throw new \Drupal\media\OEmbed\ResourceException($e->getMessage(), $url, $data, $e);
     }
   }
 
@@ -204,10 +204,10 @@ class ResourceFetcher implements ResourceFetcherInterface {
     $error = libxml_get_last_error();
     if ($error) {
       libxml_clear_errors();
-      throw new ResourceException($error->message, $url);
+      throw new \Drupal\media\OEmbed\ResourceException($error->message, $url);
     }
     elseif ($content === FALSE) {
-      throw new ResourceException('The fetched resource could not be parsed.', $url);
+      throw new \Drupal\media\OEmbed\ResourceException('The fetched resource could not be parsed.', $url);
     }
 
     // Convert XML to JSON so that the parsed resource has a consistent array

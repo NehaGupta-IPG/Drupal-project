@@ -43,11 +43,11 @@ class BigPipeController {
     // - there is no session, in which case BigPipe is not enabled anyway, so it
     //   is pointless to set this cookie.
     if ($request->cookies->has(BigPipeStrategy::NOJS_COOKIE)) {
-      throw new AccessDeniedHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
     }
 
     if (!$request->query->has('destination')) {
-      throw new HttpException(400, 'The original location is missing.');
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(400, 'The original location is missing.');
     }
 
     $response = new LocalRedirectResponse($request->query->get('destination'));

@@ -77,7 +77,7 @@ class FinderTest extends UnitTestCase {
    * Tests that files without UUIDs will raise an exception.
    */
   public function testExceptionIfNoUuid(): void {
-    $this->expectException(ImportException::class);
+    $this->expectException(\Drupal\Core\DefaultContent\ImportException::class);
     $this->expectExceptionMessageMatches("#/no-uuid\.yml does not have a UUID\.$#");
     new Finder(__DIR__ . '/../../../../fixtures/default_content_broken');
   }

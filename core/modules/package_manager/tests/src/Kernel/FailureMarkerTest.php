@@ -74,7 +74,7 @@ REGEXP
     // Write the failure marker with invalid YAML.
     file_put_contents($failure_marker->getPath(), 'message : something message : something1');
 
-    $this->expectException(FailureMarkerExistsException::class);
+    $this->expectException(\Drupal\package_manager\Exception\FailureMarkerExistsException::class);
     $this->expectExceptionMessage('Failure marker file exists but cannot be decoded.');
     $failure_marker->assertNotExists();
   }
@@ -86,7 +86,7 @@ REGEXP
     $failure_marker = $this->container->get(FailureMarker::class);
     $failure_marker->write($this->createStage(), $this->t('Something wicked occurred here.'), new \Exception('Witchcraft!'));
 
-    $this->expectException(FailureMarkerExistsException::class);
+    $this->expectException(\Drupal\package_manager\Exception\FailureMarkerExistsException::class);
     $this->expectExceptionMessageMatches('/^Something wicked occurred here. Caused by Exception, with this message: Witchcraft!\nBacktrace:\n#0 .*/');
     $failure_marker->assertNotExists();
   }

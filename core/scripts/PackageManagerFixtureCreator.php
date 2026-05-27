@@ -83,7 +83,7 @@ final class PackageManagerFixtureCreator {
     ]);
     $process->run();
     if (!$process->isSuccessful()) {
-      throw new ProcessFailedException($process);
+      throw new \Symfony\Component\Process\Exception\ProcessFailedException($process);
     }
     return $process->getOutput();
   }

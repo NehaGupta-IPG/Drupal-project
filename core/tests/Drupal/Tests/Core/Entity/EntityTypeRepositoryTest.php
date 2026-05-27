@@ -88,7 +88,7 @@ class EntityTypeRepositoryTest extends UnitTestCase {
           return NULL;
         }
         else {
-          throw new PluginNotFoundException($entity_type_id);
+          throw new \Drupal\Component\Plugin\Exception\PluginNotFoundException($entity_type_id);
         }
       });
     $this->entityTypeManager->getDefinitions()->willReturn($definitions);
@@ -160,7 +160,7 @@ class EntityTypeRepositoryTest extends UnitTestCase {
     $apple->getDecoratedClasses()->willReturn(['\Drupal\apple\Entity\Apple']);
     $banana->getDecoratedClasses()->willReturn(['\Drupal\banana\Entity\Banana']);
 
-    $this->expectException(NoCorrespondingEntityClassException::class);
+    $this->expectException(\Drupal\Core\Entity\Exception\NoCorrespondingEntityClassException::class);
     $this->expectExceptionMessage('The \Drupal\pear\Entity\Pear class does not correspond to an entity type.');
     $this->entityTypeRepository->getEntityTypeFromClass('\Drupal\pear\Entity\Pear');
   }
@@ -182,7 +182,7 @@ class EntityTypeRepositoryTest extends UnitTestCase {
       'gala' => $gala,
     ]);
 
-    $this->expectException(AmbiguousEntityClassException::class);
+    $this->expectException(\Drupal\Core\Entity\Exception\AmbiguousEntityClassException::class);
     $this->expectExceptionMessage('Multiple entity types found for \Drupal\apple\Entity\Apple.');
     $this->entityTypeRepository->getEntityTypeFromClass('\Drupal\apple\Entity\Apple');
   }

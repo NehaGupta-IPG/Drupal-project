@@ -173,7 +173,7 @@ class Drupal {
    */
   public static function getContainer() {
     if (static::$container === NULL) {
-      throw new ContainerNotInitializedException('\Drupal::$container is not initialized yet. \Drupal::setContainer() must be called with a real container.');
+      throw new \Drupal\Core\DependencyInjection\ContainerNotInitializedException('\Drupal::$container is not initialized yet. \Drupal::setContainer() must be called with a real container.');
     }
     return static::$container;
   }

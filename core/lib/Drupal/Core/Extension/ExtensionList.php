@@ -261,7 +261,7 @@ abstract class ExtensionList {
       return $extensions[$extension_name];
     }
 
-    throw new UnknownExtensionException("The {$this->type} $extension_name does not exist.");
+    throw new \Drupal\Core\Extension\Exception\UnknownExtensionException("The {$this->type} $extension_name does not exist.");
   }
 
   /**
@@ -356,7 +356,7 @@ abstract class ExtensionList {
     if (isset($all_info[$extension_name])) {
       return $all_info[$extension_name];
     }
-    throw new UnknownExtensionException("The {$this->type} $extension_name does not exist or is not installed.");
+    throw new \Drupal\Core\Extension\Exception\UnknownExtensionException("The {$this->type} $extension_name does not exist or is not installed.");
   }
 
   /**
@@ -530,7 +530,7 @@ abstract class ExtensionList {
     elseif (($path_names = $this->getPathNames()) && isset($path_names[$extension_name])) {
       return $path_names[$extension_name];
     }
-    throw new UnknownExtensionException("The {$this->type} $extension_name does not exist.");
+    throw new \Drupal\Core\Extension\Exception\UnknownExtensionException("The {$this->type} $extension_name does not exist.");
   }
 
   /**

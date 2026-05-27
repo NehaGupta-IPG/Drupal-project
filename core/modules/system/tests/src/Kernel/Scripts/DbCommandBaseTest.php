@@ -49,7 +49,7 @@ class DbCommandBaseTest extends KernelTestBase {
     $command_tester->execute([
       '--database' => 'dne',
     ]);
-    $this->expectException(ConnectionNotDefinedException::class);
+    $this->expectException(\Drupal\Core\Database\ConnectionNotDefinedException::class);
     $command->getDatabaseConnection($command_tester->getInput());
   }
 

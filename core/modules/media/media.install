@@ -32,7 +32,7 @@ function media_install(): void {
       try {
         $file_system->copy($file->uri, $destination, FileExists::Error);
       }
-      catch (FileException) {
+      catch (\Drupal\Core\File\Exception\FileException) {
         // Ignore and continue.
       }
 

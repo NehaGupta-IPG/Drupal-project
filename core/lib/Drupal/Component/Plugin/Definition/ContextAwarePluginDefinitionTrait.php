@@ -38,7 +38,7 @@ trait ContextAwarePluginDefinitionTrait {
     if ($this->hasContextDefinition($name)) {
       return $this->contextDefinitions[$name];
     }
-    throw new ContextException($this->id() . " does not define a '$name' context");
+    throw new \Drupal\Component\Plugin\Exception\ContextException($this->id() . " does not define a '$name' context");
   }
 
   /**

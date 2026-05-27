@@ -39,7 +39,7 @@ final class Finder {
           '*.' . Json::getFileExtension(),
         ]);
     }
-    catch (DirectoryNotFoundException) {
+    catch (\Symfony\Component\Finder\Exception\DirectoryNotFoundException) {
       $this->data = [];
       return;
     }
@@ -54,7 +54,7 @@ final class Finder {
       })($file->getContents());
 
       $decoded['_meta']['path'] = $file->getPathname();
-      $uuid = $decoded['_meta']['uuid'] ?? throw new ImportException($decoded['_meta']['path'] . ' does not have a UUID.');
+      $uuid = $decoded['_meta']['uuid'] ?? throw new \Drupal\Core\DefaultContent\ImportException($decoded['_meta']['path'] . ' does not have a UUID.');
       $files[$uuid] = $decoded;
 
       // For the graph to work correctly, every entity must be mentioned in it.

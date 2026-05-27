@@ -22,7 +22,7 @@ class Yaml implements SerializationInterface {
       return $yaml->dump($data, PHP_INT_MAX, 0, SymfonyYaml::DUMP_EXCEPTION_ON_INVALID_TYPE | SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
     }
     catch (\Exception $e) {
-      throw new InvalidDataTypeException($e->getMessage(), $e->getCode(), $e);
+      throw new \Drupal\Component\Serialization\Exception\InvalidDataTypeException($e->getMessage(), $e->getCode(), $e);
     }
   }
 
@@ -40,7 +40,7 @@ class Yaml implements SerializationInterface {
       );
     }
     catch (\Exception $e) {
-      throw new InvalidDataTypeException($e->getMessage(), $e->getCode(), $e);
+      throw new \Drupal\Component\Serialization\Exception\InvalidDataTypeException($e->getMessage(), $e->getCode(), $e);
     }
   }
 

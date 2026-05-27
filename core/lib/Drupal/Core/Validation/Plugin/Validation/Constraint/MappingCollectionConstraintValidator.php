@@ -20,7 +20,7 @@ class MappingCollectionConstraintValidator extends CollectionValidator {
    */
   public function validate(mixed $value, Constraint $constraint): void {
     if (!$constraint instanceof MappingCollectionConstraint) {
-      throw new UnexpectedTypeException($constraint, Collection::class);
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($constraint, Collection::class);
     }
 
     if (NULL === $value) {
@@ -28,7 +28,7 @@ class MappingCollectionConstraintValidator extends CollectionValidator {
     }
 
     if (!$this->context->getObject() instanceof Mapping) {
-      throw new UnexpectedTypeException($this->context->getObject(), Mapping::class);
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($this->context->getObject(), Mapping::class);
     }
 
     $value = $this->context->getObject()->getIterator();

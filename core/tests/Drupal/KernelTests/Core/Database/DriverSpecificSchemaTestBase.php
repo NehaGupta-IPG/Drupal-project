@@ -114,7 +114,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
         ->execute();
       $this->fail('Expected IntegrityConstraintViolationException not thrown');
     }
-    catch (IntegrityConstraintViolationException) {
+    catch (\Drupal\Core\Database\IntegrityConstraintViolationException) {
       // Do nothing, it's the expected behavior.
     }
   }
@@ -731,7 +731,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
       ],
       'primary key' => ['test_field'],
     ];
-    $this->expectException(SchemaException::class);
+    $this->expectException(\Drupal\Core\Database\SchemaException::class);
     $this->expectExceptionMessage("The 'test_field' field specification does not define 'not null' as TRUE.");
     $this->schema->createTable($table_name, $table_spec);
   }
@@ -779,7 +779,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
         ->execute();
       $this->fail('Expected IntegrityConstraintViolationException not thrown');
     }
-    catch (IntegrityConstraintViolationException) {
+    catch (\Drupal\Core\Database\IntegrityConstraintViolationException) {
     }
 
     // Ensure auto numbering now works.
@@ -809,7 +809,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     ];
     $this->schema->createTable($table_name, $table_spec);
 
-    $this->expectException(SchemaException::class);
+    $this->expectException(\Drupal\Core\Database\SchemaException::class);
     $this->expectExceptionMessage("The 'new_test_field' field specification does not define 'not null' as TRUE.");
     $this->schema->addField(
       $table_name,
@@ -833,7 +833,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     ];
     $this->schema->createTable($table_name, $table_spec);
 
-    $this->expectException(SchemaException::class);
+    $this->expectException(\Drupal\Core\Database\SchemaException::class);
     $this->expectExceptionMessage("The 'changed_test_field' field specification does not define 'not null' as TRUE.");
     $this->schema->dropPrimaryKey($table_name);
     $this->schema->changeField($table_name, 'test_field', 'changed_test_field', ['type' => 'int'], ['primary key' => ['changed_test_field']]);

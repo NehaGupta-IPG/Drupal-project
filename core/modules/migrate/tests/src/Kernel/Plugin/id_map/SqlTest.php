@@ -152,7 +152,7 @@ class SqlTest extends MigrateTestBase {
     // Use local id map plugin to force an error.
     $map = new SqlIdMapTest($this->database, [], 'test', [], $migration, $this->eventDispatcher, $this->migrationPluginManager);
 
-    $this->expectException(SchemaTableColumnSizeTooLargeException::class);
+    $this->expectException(\Drupal\Core\Database\Exception\SchemaTableColumnSizeTooLargeException::class);
     $map->ensureTables();
   }
 
@@ -200,7 +200,7 @@ class SqlIdMapTest extends TestSqlIdMap implements \Iterator {
         ];
 
       default:
-        throw new MigrateException($id_definition['type'] . ' not supported');
+        throw new \Drupal\migrate\MigrateException($id_definition['type'] . ' not supported');
     }
   }
 

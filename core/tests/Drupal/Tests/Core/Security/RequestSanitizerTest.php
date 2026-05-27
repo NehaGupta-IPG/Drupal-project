@@ -325,7 +325,7 @@ class RequestSanitizerTest extends UnitTestCase {
     $request->server->set('REQUEST_METHOD', 'POST');
     $request->headers->set('X-HTTP-Method-Override', $override);
     if (!$expected) {
-      $this->expectException(BadRequestHttpException::class);
+      $this->expectException(\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class);
     }
     $request = RequestSanitizer::sanitize($request, []);
     $this->assertSame($expected, $request->getMethod());

@@ -138,7 +138,7 @@ class FileUploadResource extends ResourceBase {
 
     // Check the destination file path is writable.
     if (!$this->fileSystem->prepareDirectory($destination, FileSystemInterface::CREATE_DIRECTORY)) {
-      throw new HttpException(500, 'Destination file path is not writable');
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(500, 'Destination file path is not writable');
     }
 
     $settings = $field_definition->getSettings();
@@ -158,26 +158,26 @@ class FileUploadResource extends ResourceBase {
 
       $result = $this->fileUploadHandler->handleFileUpload($uploadedFile, $validators, $destination, FileExists::Rename, FALSE);
     }
-    catch (LockAcquiringException $e) {
-      throw new HttpException(503, $e->getMessage(), NULL, ['Retry-After' => 1]);
+    catch (\Drupal\Core\Lock\LockAcquiringException $e) {
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(503, $e->getMessage(), NULL, ['Retry-After' => 1]);
     }
-    catch (UploadException $e) {
+    catch (\Symfony\Component\HttpFoundation\File\Exception\UploadException $e) {
       $this->logger->error('Input data could not be read');
-      throw new HttpException(500, 'Input file data could not be read', $e);
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(500, 'Input file data could not be read', $e);
     }
-    catch (CannotWriteFileException $e) {
+    catch (\Symfony\Component\HttpFoundation\File\Exception\CannotWriteFileException $e) {
       $this->logger->error('Temporary file data for could not be written');
-      throw new HttpException(500, 'Temporary file data could not be written', $e);
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(500, 'Temporary file data could not be written', $e);
     }
-    catch (NoFileException $e) {
+    catch (\Symfony\Component\HttpFoundation\File\Exception\NoFileException $e) {
       $this->logger->error('Temporary file could not be opened for file upload');
-      throw new HttpException(500, 'Temporary file could not be opened', $e);
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(500, 'Temporary file could not be opened', $e);
     }
-    catch (FileExistsException $e) {
-      throw new HttpException(statusCode: 500, message: $e->getMessage(), previous: $e);
+    catch (\Drupal\Core\File\Exception\FileExistsException $e) {
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(statusCode: 500, message: $e->getMessage(), previous: $e);
     }
-    catch (FileException) {
-      throw new HttpException(500, 'Temporary file could not be moved to file location');
+    catch (\Drupal\Core\File\Exception\FileException) {
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(500, 'Temporary file could not be moved to file location');
     }
 
     if ($result->hasViolations()) {
@@ -188,7 +188,7 @@ class FileUploadResource extends ResourceBase {
       }
       $message .= implode("\n", $errors);
 
-      throw new UnprocessableEntityHttpException($message);
+      throw new \Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException($message);
     }
     // 201 Created responses return the newly created entity in the response
     // body. These responses are not cacheable, so we add no cacheability
@@ -218,13 +218,13 @@ class FileUploadResource extends ResourceBase {
   protected function validateAndLoadFieldDefinition($entity_type_id, $bundle, $field_name) {
     $field_definitions = $this->entityFieldManager->getFieldDefinitions($entity_type_id, $bundle);
     if (!isset($field_definitions[$field_name])) {
-      throw new NotFoundHttpException(sprintf('Field "%s" does not exist', $field_name));
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException(sprintf('Field "%s" does not exist', $field_name));
     }
 
     /** @var \Drupal\Core\Field\FieldDefinitionInterface $field_definition */
     $field_definition = $field_definitions[$field_name];
     if ($field_definition->getSetting('target_type') !== 'file') {
-      throw new AccessDeniedHttpException(sprintf('"%s" is not a file field', $field_name));
+      throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException(sprintf('"%s" is not a file field', $field_name));
     }
 
     $entity_access_control_handler = $this->entityTypeManager->getAccessControlHandler($entity_type_id);
@@ -232,7 +232,7 @@ class FileUploadResource extends ResourceBase {
     $access_result = $entity_access_control_handler->createAccess($bundle, NULL, [], TRUE)
       ->andIf($entity_access_control_handler->fieldAccess('edit', $field_definition, NULL, NULL, TRUE));
     if (!$access_result->isAllowed()) {
-      throw new AccessDeniedHttpException($access_result->getReason());
+      throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException($access_result->getReason());
     }
 
     return $field_definition;

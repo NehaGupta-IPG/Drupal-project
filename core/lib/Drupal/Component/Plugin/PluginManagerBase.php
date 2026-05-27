@@ -77,7 +77,7 @@ abstract class PluginManagerBase implements PluginManagerInterface {
       try {
         return $this->getFactory()->createInstance($plugin_id, $configuration);
       }
-      catch (PluginNotFoundException) {
+      catch (\Drupal\Component\Plugin\Exception\PluginNotFoundException) {
         return $this->handlePluginNotFound($plugin_id, $configuration);
       }
     }

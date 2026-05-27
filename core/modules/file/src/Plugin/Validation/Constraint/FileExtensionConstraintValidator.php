@@ -18,7 +18,7 @@ class FileExtensionConstraintValidator extends BaseFileConstraintValidator {
   public function validate(mixed $value, Constraint $constraint): void {
     $file = $this->assertValueIsFile($value);
     if (!$constraint instanceof FileExtensionConstraint) {
-      throw new UnexpectedTypeException($constraint, FileExtensionConstraint::class);
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($constraint, FileExtensionConstraint::class);
     }
 
     $extensions = $constraint->extensions;

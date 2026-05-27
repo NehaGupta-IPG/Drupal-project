@@ -106,7 +106,7 @@ class ParamConverterManager implements ParamConverterManagerInterface {
       if (!isset($defaults[$name])) {
         $message = 'The "%s" parameter was not converted for the path "%s" (route name: "%s")';
         $route_name = $defaults[RouteObjectInterface::ROUTE_NAME];
-        throw new ParamNotConvertedException(sprintf($message, $name, $route->getPath(), $route_name), 0, NULL, $route_name, [$name => $value]);
+        throw new \Drupal\Core\ParamConverter\ParamNotConvertedException(sprintf($message, $name, $route->getPath(), $route_name), 0, NULL, $route_name, [$name => $value]);
       }
     }
 

@@ -28,7 +28,7 @@ class EnabledConfigurablePluginsConstraintValidator extends ConstraintValidator 
    */
   public function validate($settings, Constraint $constraint): void {
     if (!$constraint instanceof EnabledConfigurablePluginsConstraint) {
-      throw new UnexpectedTypeException($constraint, __NAMESPACE__ . '\EnabledConfigurablePluginsConstraint');
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($constraint, __NAMESPACE__ . '\EnabledConfigurablePluginsConstraint');
     }
 
     $configurable_enabled_definitions = $this->getConfigurableEnabledDefinitions();

@@ -85,8 +85,8 @@ class ParamConversionEnhancer implements EnhancerInterface, EventSubscriberInter
    */
   public function onException(ExceptionEvent $event) {
     $exception = $event->getThrowable();
-    if ($exception instanceof ParamNotConvertedException) {
-      $event->setThrowable(new NotFoundHttpException($exception->getMessage(), $exception));
+    if ($exception instanceof \Drupal\Core\ParamConverter\ParamNotConvertedException) {
+      $event->setThrowable(new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException($exception->getMessage(), $exception));
     }
   }
 

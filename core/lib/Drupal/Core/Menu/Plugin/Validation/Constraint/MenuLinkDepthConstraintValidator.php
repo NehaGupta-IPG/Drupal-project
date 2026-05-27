@@ -36,7 +36,7 @@ class MenuLinkDepthConstraintValidator extends RangeConstraintValidator implemen
       $base_level = TypeResolver::resolveDynamicTypeName($base_level, $this->context->getObject());
     }
     if (!is_numeric($base_level)) {
-      throw new RuntimeException('The `base` option must be a number, or an expression that resolves to one.');
+      throw new \Symfony\Component\Validator\Exception\RuntimeException('The `base` option must be a number, or an expression that resolves to one.');
     }
     // Clamp $base_level (which is zero-based) to at least 0 and no more than
     // the maximum depth of a menu tree.

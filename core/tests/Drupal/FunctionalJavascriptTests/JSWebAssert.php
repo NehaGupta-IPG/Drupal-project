@@ -329,19 +329,19 @@ JS);
       if (is_array($selector)) {
         $selector = implode(' ', $selector);
       }
-      throw new ElementNotFoundException($this->session->getDriver(), 'element', $selector_type, $selector);
+      throw new \Behat\Mink\Exception\ElementNotFoundException($this->session->getDriver(), 'element', $selector_type, $selector);
     }
 
     // Check if the node is visible on the page, which is a prerequisite of
     // being visible in the viewport.
     if (!$node->isVisible()) {
-      throw new ElementHtmlException($message, $this->session->getDriver(), $node);
+      throw new \Behat\Mink\Exception\ElementHtmlException($message, $this->session->getDriver(), $node);
     }
 
     $result = $this->checkNodeVisibilityInViewport($node, $corner);
 
     if (!$result) {
-      throw new ElementHtmlException($message, $this->session->getDriver(), $node);
+      throw new \Behat\Mink\Exception\ElementHtmlException($message, $this->session->getDriver(), $node);
     }
   }
 
@@ -373,13 +373,13 @@ JS);
       if (is_array($selector)) {
         $selector = implode(' ', $selector);
       }
-      throw new ElementNotFoundException($this->session->getDriver(), 'element', $selector_type, $selector);
+      throw new \Behat\Mink\Exception\ElementNotFoundException($this->session->getDriver(), 'element', $selector_type, $selector);
     }
 
     $result = $this->checkNodeVisibilityInViewport($node, $corner);
 
     if ($result) {
-      throw new ElementHtmlException($message, $this->session->getDriver(), $node);
+      throw new \Behat\Mink\Exception\ElementHtmlException($message, $this->session->getDriver(), $node);
     }
   }
 
@@ -471,7 +471,7 @@ JS;
 
       // Throw an exception if an invalid corner parameter is given.
       default:
-        throw new UnsupportedDriverActionException($corner, $this->session->getDriver());
+        throw new \Behat\Mink\Exception\UnsupportedDriverActionException($corner, $this->session->getDriver());
     }
 
     // Build the full JavaScript test. The shared logic gets the corner
@@ -568,7 +568,7 @@ JS;
       usleep(100000);
     } while (microtime(TRUE) < $end);
 
-    throw new ElementHtmlException($message, $this->session->getDriver(), $node);
+    throw new \Behat\Mink\Exception\ElementHtmlException($message, $this->session->getDriver(), $node);
   }
 
   /**
@@ -581,7 +581,7 @@ JS;
    *   TRUE if the exception is due to an element not being clickable,
    *   interactable or visible.
    */
-  public static function isExceptionNotClickable(Exception $exception): bool {
+  public static function isExceptionNotClickable(\WebDriver\Exception $exception): bool {
     return (bool) preg_match('/not (clickable|interactable|visible)/', $exception->getMessage());
   }
 

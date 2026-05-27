@@ -128,7 +128,7 @@ final class UnknownPathExcluder implements EventSubscriberInterface, LoggerAware
         // include `custom`.
         $always_include[] = dirname($path, substr_count($path, '/') ?: 1);
       }
-      catch (InvalidArgumentException) {
+      catch (\Symfony\Component\Filesystem\Exception\InvalidArgumentException) {
         // The repository path is not relative to the project root, so we don't
         // need to worry about it.
       }

@@ -59,19 +59,19 @@ class StageCommitExceptionTest extends PackageManagerKernelTestBase {
     return [
       'RuntimeException to ApplyFailedException' => [
         'RuntimeException',
-        ApplyFailedException::class,
+        \Drupal\package_manager\Exception\ApplyFailedException::class,
       ],
       'InvalidArgumentException' => [
-        InvalidArgumentException::class,
-        SandboxException::class,
+        \PhpTuf\ComposerStager\API\Exception\InvalidArgumentException::class,
+        \Drupal\package_manager\Exception\SandboxException::class,
       ],
       'PreconditionException' => [
-        PreconditionException::class,
-        SandboxException::class,
+        \PhpTuf\ComposerStager\API\Exception\PreconditionException::class,
+        \Drupal\package_manager\Exception\SandboxException::class,
       ],
       'Exception' => [
         'Exception',
-        ApplyFailedException::class,
+        \Drupal\package_manager\Exception\ApplyFailedException::class,
       ],
     ];
   }
@@ -100,7 +100,7 @@ class StageCommitExceptionTest extends PackageManagerKernelTestBase {
       $throwable_arguments[0] = $this->createComposeStagerMessage($throwable_arguments[0]);
     }
     // PreconditionException requires a preconditions object.
-    if ($thrown_class === PreconditionException::class) {
+    if ($thrown_class === \PhpTuf\ComposerStager\API\Exception\PreconditionException::class) {
       array_unshift($throwable_arguments, $this->createStub(PreconditionInterface::class));
     }
     LoggingCommitter::setException($thrown_class, ...$throwable_arguments);
@@ -116,7 +116,7 @@ class StageCommitExceptionTest extends PackageManagerKernelTestBase {
       // This needs to be done because we always use the message from
       // \Drupal\package_manager\Stage::getFailureMarkerMessage() when throwing
       // ApplyFailedException.
-      if ($expected_class == ApplyFailedException::class) {
+      if ($expected_class == \Drupal\package_manager\Exception\ApplyFailedException::class) {
         $this->assertMatchesRegularExpression("/^Staged changes failed to apply, and the site is in an indeterminate state. It is strongly recommended to restore the code and database from a backup. Caused by $thrown_class, with this message: A very bad thing happened\nBacktrace:\n#0 .*/", $exception->getMessage());
       }
       else {
@@ -124,7 +124,7 @@ class StageCommitExceptionTest extends PackageManagerKernelTestBase {
       }
 
       $failure_marker = $this->container->get(FailureMarker::class);
-      if ($exception instanceof ApplyFailedException) {
+      if ($exception instanceof \Drupal\package_manager\Exception\ApplyFailedException) {
         $this->assertFileExists($failure_marker->getPath());
         $this->assertFalse($stage->isApplying());
       }

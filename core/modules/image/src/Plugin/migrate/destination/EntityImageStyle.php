@@ -39,8 +39,8 @@ class EntityImageStyle extends EntityConfigBase {
       try {
         $style->addImageEffect($effect);
       }
-      catch (PluginNotFoundException $e) {
-        throw new MigrateException($e->getMessage(), 0, $e);
+      catch (\Drupal\Component\Plugin\Exception\PluginNotFoundException $e) {
+        throw new \Drupal\migrate\MigrateException($e->getMessage(), 0, $e);
       }
     }
 

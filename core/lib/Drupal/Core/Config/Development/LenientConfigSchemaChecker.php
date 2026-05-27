@@ -39,7 +39,7 @@ class LenientConfigSchemaChecker extends ConfigSchemaChecker {
     try {
       parent::onConfigSave($event);
     }
-    catch (SchemaIncompleteException $exception) {
+    catch (\Drupal\Core\Config\Schema\SchemaIncompleteException $exception) {
       $message = sprintf('%s. These errors mean there is configuration that does not comply with its schema. This is not a fatal error, but it is recommended to fix these issues. For more information on configuration schemas, check out <a href="%s">the documentation</a>.', $exception->getMessage(), 'https://www.drupal.org/docs/drupal-apis/configuration-api/configuration-schemametadata');
 
       $this->messenger->addWarning($message);

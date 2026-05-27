@@ -563,7 +563,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
     $services['bar'] = $bar_definition;
 
     $this->containerBuilder->getDefinitions()->willReturn($services);
-    $this->expectException(InvalidArgumentException::class);
+    $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
     $this->dumper->getArray();
   }
 
@@ -581,7 +581,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
     $services['bar'] = $bar_definition;
 
     $this->containerBuilder->getDefinitions()->willReturn($services);
-    $this->expectException(RuntimeException::class);
+    $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
     $this->dumper->getArray();
   }
 
@@ -599,7 +599,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
     $services['bar'] = $bar_definition;
 
     $this->containerBuilder->getDefinitions()->willReturn($services);
-    $this->expectException(RuntimeException::class);
+    $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
     $this->dumper->getArray();
   }
 
@@ -617,7 +617,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
     $services['bar'] = $bar_definition;
 
     $this->containerBuilder->getDefinitions()->willReturn($services);
-    $this->expectException(RuntimeException::class);
+    $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
     $this->dumper->getArray();
   }
 

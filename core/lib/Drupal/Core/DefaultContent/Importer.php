@@ -110,7 +110,7 @@ final class Importer implements LoggerAwareInterface {
         $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
         /** @var \Drupal\Core\Entity\EntityTypeInterface $entity_type */
         if (!$entity_type->entityClassImplements(ContentEntityInterface::class)) {
-          throw new ImportException("Content entity $uuid is a '$entity_type_id', which is not a content entity type.");
+          throw new \Drupal\Core\DefaultContent\ImportException("Content entity $uuid is a '$entity_type_id', which is not a content entity type.");
         }
 
         $entity = $this->entityRepository->loadEntityByUuid($entity_type_id, $uuid);
@@ -119,7 +119,7 @@ final class Importer implements LoggerAwareInterface {
             continue;
           }
           else {
-            throw new ImportException("$entity_type_id $uuid already exists.");
+            throw new \Drupal\Core\DefaultContent\ImportException("$entity_type_id $uuid already exists.");
           }
         }
 
@@ -137,7 +137,7 @@ final class Importer implements LoggerAwareInterface {
         }
         $violations = $entity->validate();
         if (count($violations) > 0) {
-          throw new InvalidEntityException($violations, $path);
+          throw new \Drupal\Core\DefaultContent\InvalidEntityException($violations, $path);
         }
         $entity->save();
       }
@@ -209,10 +209,10 @@ final class Importer implements LoggerAwareInterface {
    */
   private function toEntity(array $data): ContentEntityInterface {
     if (empty($data['_meta']['entity_type'])) {
-      throw new ImportException('The entity type metadata must be specified.');
+      throw new \Drupal\Core\DefaultContent\ImportException('The entity type metadata must be specified.');
     }
     if (empty($data['_meta']['uuid'])) {
-      throw new ImportException('The uuid metadata must be specified.');
+      throw new \Drupal\Core\DefaultContent\ImportException('The uuid metadata must be specified.');
     }
 
     // Allow third-party code to modify the entity data before the entity is
@@ -300,7 +300,7 @@ final class Importer implements LoggerAwareInterface {
       foreach ($item_value as $property_name => $value) {
         if (\in_array($property_name, $serialized_property_names)) {
           if (\is_string($value)) {
-            throw new ImportException("Received string for serialized property $field_name.$delta.$property_name");
+            throw new \Drupal\Core\DefaultContent\ImportException("Received string for serialized property $field_name.$delta.$property_name");
           }
           $value = serialize($value);
         }

@@ -165,7 +165,7 @@ class ContentImportTest extends BrowserTestBase {
     $data['default']['sticky'][0]['value'] = 'not a boolean!';
     file_put_contents($dir . '/invalid.yml', Yaml::encode($data));
 
-    $this->expectException(InvalidEntityException::class);
+    $this->expectException(\Drupal\Core\DefaultContent\InvalidEntityException::class);
     $this->expectExceptionMessage("$dir/invalid.yml: sticky.0.value=This value should be of the correct primitive type.");
     $this->container->get(Importer::class)->importContent(new Finder($dir));
   }

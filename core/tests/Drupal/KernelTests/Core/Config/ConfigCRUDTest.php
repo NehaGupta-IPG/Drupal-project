@@ -192,7 +192,7 @@ class ConfigCRUDTest extends KernelTestBase {
       $this->fail('Expected ConfigNameException was thrown for a name without a namespace.');
     }
     catch (\Exception $e) {
-      $this->assertInstanceOf(ConfigNameException::class, $e);
+      $this->assertInstanceOf(\Drupal\Core\Config\ConfigNameException::class, $e);
     }
 
     // Verify that a name longer than the maximum length causes an exception.
@@ -202,7 +202,7 @@ class ConfigCRUDTest extends KernelTestBase {
       $this->fail('Expected ConfigNameException was thrown for a name longer than Config::MAX_NAME_LENGTH.');
     }
     catch (\Exception $e) {
-      $this->assertInstanceOf(ConfigNameException::class, $e);
+      $this->assertInstanceOf(\Drupal\Core\Config\ConfigNameException::class, $e);
     }
 
     // Verify that disallowed characters in the name cause an exception.
@@ -213,7 +213,7 @@ class ConfigCRUDTest extends KernelTestBase {
         $config = $this->config($name);
         $config->save();
       }
-      catch (ConfigNameException) {
+      catch (\Drupal\Core\Config\ConfigNameException) {
         unset($test_characters[$i]);
       }
     }
@@ -225,7 +225,7 @@ class ConfigCRUDTest extends KernelTestBase {
       $config = $this->config($name);
       $config->save();
     }
-    catch (ConfigNameException) {
+    catch (\Drupal\Core\Config\ConfigNameException) {
       $this->fail('ConfigNameException was not thrown for a valid object name.');
     }
 
@@ -241,7 +241,7 @@ class ConfigCRUDTest extends KernelTestBase {
       $this->fail('Expected ConfigValueException was thrown from setData() for value with dotted keys.');
     }
     catch (\Exception $e) {
-      $this->assertInstanceOf(ConfigValueException::class, $e);
+      $this->assertInstanceOf(\Drupal\Core\Config\ConfigValueException::class, $e);
     }
 
     // Verify that set() will catch dotted keys.
@@ -250,7 +250,7 @@ class ConfigCRUDTest extends KernelTestBase {
       $this->fail('Expected ConfigValueException was thrown from set() for value with dotted keys.');
     }
     catch (\Exception $e) {
-      $this->assertInstanceOf(ConfigValueException::class, $e);
+      $this->assertInstanceOf(\Drupal\Core\Config\ConfigValueException::class, $e);
     }
   }
 
@@ -317,7 +317,7 @@ class ConfigCRUDTest extends KernelTestBase {
       $config->set('stream', fopen(__FILE__, 'r'))->save();
       $this->fail('No Exception thrown upon saving invalid data type.');
     }
-    catch (UnsupportedDataTypeConfigException) {
+    catch (\Drupal\Core\Config\UnsupportedDataTypeConfigException) {
       // Expected exception; just continue testing.
     }
 
@@ -332,7 +332,7 @@ class ConfigCRUDTest extends KernelTestBase {
       $config->set('stream', fopen(__FILE__, 'r'))->save();
       $this->fail('No Exception thrown upon saving invalid data type.');
     }
-    catch (UnsupportedDataTypeConfigException) {
+    catch (\Drupal\Core\Config\UnsupportedDataTypeConfigException) {
       // Expected exception; just continue testing.
     }
   }

@@ -19,7 +19,7 @@ class TestMediaFilterController extends MediaFilterController {
    */
   public function preview(Request $request, FilterFormatInterface $filter_format) {
     if (\Drupal::state()->get('test_media_filter_controller_throw_error', FALSE)) {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
     return parent::preview($request, $filter_format);
   }

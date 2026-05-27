@@ -44,7 +44,7 @@ class FileSizeLimitConstraintValidator extends BaseFileConstraintValidator imple
   public function validate(mixed $value, Constraint $constraint): void {
     $file = $this->assertValueIsFile($value);
     if (!$constraint instanceof FileSizeLimitConstraint) {
-      throw new UnexpectedTypeException($constraint, FileSizeLimitConstraint::class);
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($constraint, FileSizeLimitConstraint::class);
     }
 
     $fileLimit = $constraint->fileLimit;

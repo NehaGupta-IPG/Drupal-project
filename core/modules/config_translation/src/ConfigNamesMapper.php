@@ -402,7 +402,7 @@ class ConfigNamesMapper extends PluginBase implements ConfigMapperInterface, Con
     $langcodes = array_map([$this, 'getLangcodeFromConfig'], $this->getConfigNames());
 
     if (count(array_unique($langcodes)) > 1) {
-      throw new ConfigMapperLanguageException('A config mapper can only contain configuration for a single language.');
+      throw new \Drupal\config_translation\Exception\ConfigMapperLanguageException('A config mapper can only contain configuration for a single language.');
     }
 
     return reset($langcodes);

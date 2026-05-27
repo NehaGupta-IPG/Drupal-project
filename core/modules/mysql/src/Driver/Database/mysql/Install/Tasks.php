@@ -49,14 +49,14 @@ class Tasks extends InstallTasks {
   public function name() {
     try {
       if (!$this->isConnectionActive() || !$this->getConnection() instanceof Connection) {
-        throw new ConnectionNotDefinedException('The database connection is not active or not a MySql connection');
+        throw new \Drupal\Core\Database\ConnectionNotDefinedException('The database connection is not active or not a MySql connection');
       }
       if ($this->getConnection()->isMariaDb()) {
         return $this->t('MariaDB');
       }
       return $this->t('MySQL or equivalent');
     }
-    catch (ConnectionNotDefinedException) {
+    catch (\Drupal\Core\Database\ConnectionNotDefinedException) {
       return $this->t('MySQL, MariaDB, or equivalent');
     }
   }
@@ -110,7 +110,7 @@ class Tasks extends InstallTasks {
           Database::getConnection();
           $this->pass('Drupal can CONNECT to the database ok.');
         }
-        catch (DatabaseNotFoundException $e) {
+        catch (\Drupal\Core\Database\DatabaseNotFoundException $e) {
           // Still no dice; probably a permission issue. Raise the error to the
           // installer.
           $this->fail($this->t('Database %database not found. The server reports the following message when attempting to create the database: %error.', [

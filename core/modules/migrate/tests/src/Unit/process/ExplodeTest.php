@@ -59,7 +59,7 @@ class ExplodeTest extends MigrateProcessTestCase {
    * Tests explode fails properly on non-strings.
    */
   public function testExplodeWithNonString(): void {
-    $this->expectException(MigrateException::class);
+    $this->expectException(\Drupal\migrate\MigrateException::class);
     $this->expectExceptionMessage('is not a string');
     $this->plugin->transform(['foo'], $this->migrateExecutable, $this->row, 'destination_property');
   }
@@ -95,7 +95,7 @@ class ExplodeTest extends MigrateProcessTestCase {
    */
   public function testExplodeWithNonStrictAndNonCastable(): void {
     $plugin = new Explode(['delimiter' => '|', 'strict' => FALSE], 'map', []);
-    $this->expectException(MigrateException::class);
+    $this->expectException(\Drupal\migrate\MigrateException::class);
     $this->expectExceptionMessage('cannot be casted to a string');
     $processed = $plugin->transform(['foo'], $this->migrateExecutable, $this->row, 'destination_property');
     $this->assertSame(['foo'], $processed);
@@ -114,7 +114,7 @@ class ExplodeTest extends MigrateProcessTestCase {
    * Tests explode fails with empty delimiter.
    */
   public function testExplodeWithEmptyDelimiter(): void {
-    $this->expectException(MigrateException::class);
+    $this->expectException(\Drupal\migrate\MigrateException::class);
     $this->expectExceptionMessage('delimiter is empty');
     $plugin = new Explode(['delimiter' => ''], 'map', []);
     $plugin->transform('foo,bar', $this->migrateExecutable, $this->row, 'destination_property');

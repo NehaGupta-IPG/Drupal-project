@@ -102,7 +102,7 @@ class DoTrustedCallbackTraitTest extends UnitTestCase {
    */
   #[DataProvider('providerTestUntrustedCallbacks')]
   public function testUntrustedCallbacks(callable $callback, $extra_trusted_interface = NULL): void {
-    $this->expectException(UntrustedCallbackException::class);
+    $this->expectException(\Drupal\Core\Security\UntrustedCallbackException::class);
     $this->doTrustedCallback($callback, [], '%s is not trusted', TrustedCallbackInterface::THROW_EXCEPTION, $extra_trusted_interface);
   }
 
@@ -155,7 +155,7 @@ class DoTrustedCallbackTraitTest extends UnitTestCase {
  */
   #[DataProvider('errorTypeProvider')]
   public function testException(callable $callback): void {
-    $this->expectException(UntrustedCallbackException::class);
+    $this->expectException(\Drupal\Core\Security\UntrustedCallbackException::class);
     $this->expectExceptionMessage('Drupal\Tests\Core\Security\UntrustedObject::callback is not trusted');
     $this->doTrustedCallback($callback, [], '%s is not trusted');
   }

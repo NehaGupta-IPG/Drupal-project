@@ -111,7 +111,7 @@ abstract class SchemaUniquePrefixedKeysIndexTestBase extends DriverSpecificDatab
       ])
       ->execute();
 
-    $this->expectException(DatabaseException::class);
+    $this->expectException(\Drupal\Core\Database\DatabaseException::class);
     $this->connection->insert($table)
       ->fields([
         $column => $this->columnValue,

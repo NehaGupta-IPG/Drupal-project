@@ -27,7 +27,7 @@ class UnsupportedRouteAttributePropertiesTest extends UnitTestCase {
     $discovery = new AttributeRouteDiscovery(new \ArrayIterator());
     $reflection = new \ReflectionClass($discovery);
     $method = $reflection->getMethod('createRouteCollection');
-    $this->expectException(UnsupportedRouteAttributePropertyException::class);
+    $this->expectException(\Drupal\Core\Routing\UnsupportedRouteAttributePropertyException::class);
     $this->expectExceptionMessage($message);
     $method->invoke($discovery, $class);
   }

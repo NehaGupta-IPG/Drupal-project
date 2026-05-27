@@ -29,7 +29,7 @@ class CronQueueTestSuspendQueue extends QueueWorkerBase {
    */
   public function processItem($data): void {
     if ($data === 'suspend') {
-      throw new SuspendQueueException('The queue is broken.');
+      throw new \Drupal\Core\Queue\SuspendQueueException('The queue is broken.');
     }
     // Do nothing otherwise.
   }

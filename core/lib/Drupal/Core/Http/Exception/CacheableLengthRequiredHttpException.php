@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Exception\LengthRequiredHttpException;
 /**
  * A cacheable LengthRequiredHttpException.
  */
-class CacheableLengthRequiredHttpException extends LengthRequiredHttpException implements CacheableDependencyInterface {
+class CacheableLengthRequiredHttpException extends \Symfony\Component\HttpKernel\Exception\LengthRequiredHttpException implements CacheableDependencyInterface {
 
   use CacheableDependencyTrait;
 

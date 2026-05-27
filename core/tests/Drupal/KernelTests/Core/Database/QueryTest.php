@@ -87,7 +87,7 @@ class QueryTest extends DatabaseTestBase {
         ->execute();
       $this->fail('Should not be able to attempt SQL injection via condition operator.');
     }
-    catch (InvalidQueryException $e) {
+    catch (\Drupal\Core\Database\InvalidQueryException $e) {
       $this->assertSame("Invalid characters in query operator: $injection", $e->getMessage());
       // Expected exception; just continue testing.
     }
@@ -116,7 +116,7 @@ class QueryTest extends DatabaseTestBase {
         ->execute();
       $this->fail('Should not be able to attempt SQL injection via operator.');
     }
-    catch (InvalidQueryException $e) {
+    catch (\Drupal\Core\Database\InvalidQueryException $e) {
       $this->assertSame("Invalid characters in query operator: $injection", $e->getMessage());
       // Expected exception; just continue testing.
     }
@@ -134,7 +134,7 @@ class QueryTest extends DatabaseTestBase {
         ->execute();
       $this->fail('Should not be able to attempt SQL injection via operator.');
     }
-    catch (InvalidQueryException $e) {
+    catch (\Drupal\Core\Database\InvalidQueryException $e) {
       $this->assertSame("Invalid characters in query operator: $injection", $e->getMessage());
       // Expected exception; just continue testing.
     }

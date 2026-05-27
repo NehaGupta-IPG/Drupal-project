@@ -90,7 +90,7 @@ class DatabaseEventsTest extends UnitTestCase {
    * @legacy-covers ::dispatchEvent
    */
   public function testEventDispatchingWhenNoContainerAvailable(): void {
-    $this->expectException(EventException::class);
+    $this->expectException(\Drupal\Core\Database\Exception\EventException::class);
     $this->expectExceptionMessage('The event dispatcher service is not available. Database API events can only be fired if the container is initialized');
     $this->connection->dispatchEvent($this->createStub(DatabaseEvent::class));
   }

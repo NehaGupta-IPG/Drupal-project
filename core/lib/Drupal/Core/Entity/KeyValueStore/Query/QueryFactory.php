@@ -45,7 +45,7 @@ class QueryFactory implements QueryFactoryInterface {
    * {@inheritdoc}
    */
   public function getAggregate(EntityTypeInterface $entity_type, $conjunction) {
-    throw new QueryException('Aggregation over key-value entity storage is not supported');
+    throw new \Drupal\Core\Entity\Query\QueryException('Aggregation over key-value entity storage is not supported');
   }
 
 }

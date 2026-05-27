@@ -36,7 +36,7 @@ class RoleExistsConstraintValidatorTest extends KernelTestBase {
     $definition = DataDefinition::create('any')
       ->addConstraint('RoleExists');
 
-    $this->expectException(UnexpectedTypeException::class);
+    $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
     $this->expectExceptionMessage('Expected argument of type "string", "int" given');
     $this->container->get('typed_data_manager')
       ->create($definition, 39)

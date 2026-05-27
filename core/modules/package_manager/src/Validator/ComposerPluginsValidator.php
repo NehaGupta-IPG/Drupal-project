@@ -142,7 +142,7 @@ final class ComposerPluginsValidator implements EventSubscriberInterface {
     try {
       $allowed_plugins = $this->inspector->getAllowPluginsConfig($dir);
     }
-    catch (RuntimeException $exception) {
+    catch (\PhpTuf\ComposerStager\API\Exception\RuntimeException $exception) {
       $event->addErrorFromThrowable($exception, $this->t('Unable to determine Composer <code>allow-plugins</code> setting.'));
       return;
     }

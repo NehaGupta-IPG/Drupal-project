@@ -169,7 +169,7 @@ class CopyTest extends FileManagedUnitTestBase {
       $this->fail('expected FileExistsException');
     }
     // FileExistsException is a subclass of FileException.
-    catch (FileExistsException $e) {
+    catch (\Drupal\Core\File\Exception\FileExistsException $e) {
       $this->assertStringContainsString("could not be copied because a file by that name already exists in the destination directory", $e->getMessage());
     }
     // Check the contents were not changed.
@@ -188,7 +188,7 @@ class CopyTest extends FileManagedUnitTestBase {
    * @legacy-covers ::copy
    */
   public function testInvalidStreamWrapper(): void {
-    $this->expectException(InvalidStreamWrapperException::class);
+    $this->expectException(\Drupal\Core\File\Exception\InvalidStreamWrapperException::class);
     $this->expectExceptionMessage('Invalid stream wrapper: foo://');
     $source = $this->createFile();
     $this->fileRepository->copy($source, 'foo://');
@@ -203,7 +203,7 @@ class CopyTest extends FileManagedUnitTestBase {
     /** @var \Drupal\Core\Entity\EntityTypeManager $entityTypeManager */
     $entityTypeManager = $this->prophesize(EntityTypeManager::class);
     $entityTypeManager->getStorage('file')
-      ->willThrow(EntityStorageException::class);
+      ->willThrow(\Drupal\Core\Entity\EntityStorageException::class);
 
     $fileRepository = new FileRepository(
       $this->container->get('file_system'),
@@ -214,7 +214,7 @@ class CopyTest extends FileManagedUnitTestBase {
       $this->container->get('current_user')
     );
 
-    $this->expectException(EntityStorageException::class);
+    $this->expectException(\Drupal\Core\Entity\EntityStorageException::class);
     $source = $this->createFile();
     $target = $this->createFile();
     $fileRepository->copy($source, $target->getFileUri(), FileExists::Replace);

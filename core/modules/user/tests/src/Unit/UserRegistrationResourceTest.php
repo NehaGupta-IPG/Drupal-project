@@ -80,7 +80,7 @@ class UserRegistrationResourceTest extends UnitTestCase {
    * Tests that an exception is thrown when no data provided for the account.
    */
   public function testEmptyPost(): void {
-    $this->expectException(BadRequestHttpException::class);
+    $this->expectException(\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class);
     $this->testClass->post(NULL);
   }
 
@@ -90,7 +90,7 @@ class UserRegistrationResourceTest extends UnitTestCase {
   public function testExistedEntityPost(): void {
     $entity = $this->prophesize(User::class);
     $entity->isNew()->willReturn(FALSE);
-    $this->expectException(BadRequestHttpException::class);
+    $this->expectException(\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class);
 
     $this->testClass->post($entity->reveal());
   }
@@ -109,7 +109,7 @@ class UserRegistrationResourceTest extends UnitTestCase {
     $entity = $this->prophesize(User::class);
     $entity->isNew()->willReturn(TRUE);
 
-    $this->expectException(AccessDeniedHttpException::class);
+    $this->expectException(\Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException::class);
 
     $this->testClass->post($entity->reveal());
   }
@@ -125,7 +125,7 @@ class UserRegistrationResourceTest extends UnitTestCase {
     $entity = $this->prophesize(User::class);
     $entity->isNew()->willReturn(TRUE);
 
-    $this->expectException(AccessDeniedHttpException::class);
+    $this->expectException(\Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException::class);
 
     $this->testClass->post($entity->reveal());
   }

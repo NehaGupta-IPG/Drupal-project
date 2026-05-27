@@ -152,7 +152,7 @@ class InstallerTest extends InstallerTestBase {
       $this->container->get('module_installer')->uninstall([$module]);
       $this->fail("Uninstalled $module module.");
     }
-    catch (ModuleUninstallValidatorException $e) {
+    catch (\Drupal\Core\Extension\ModuleUninstallValidatorException $e) {
       $module_name = $module_extension_list->getName($module);
       $driver = $database->driver();
       $this->assertStringContainsString("The module '$module_name' is providing the database driver '$driver'.", $e->getMessage());

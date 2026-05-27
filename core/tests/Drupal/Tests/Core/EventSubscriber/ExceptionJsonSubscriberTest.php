@@ -48,11 +48,11 @@ class ExceptionJsonSubscriberTest extends UnitTestCase {
   public static function providerTestOn4xx(): array {
     return [
       'uncacheable exception' => [
-        new MethodNotAllowedHttpException(['POST', 'PUT'], 'test message'),
+        new \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException(['POST', 'PUT'], 'test message'),
         JsonResponse::class,
       ],
       'cacheable exception' => [
-        new CacheableMethodNotAllowedHttpException((new CacheableMetadata())->setCacheContexts(['route']), [
+        new \Drupal\Core\Http\Exception\CacheableMethodNotAllowedHttpException((new CacheableMetadata())->setCacheContexts(['route']), [
           'POST',
           'PUT',
         ], 'test message'),

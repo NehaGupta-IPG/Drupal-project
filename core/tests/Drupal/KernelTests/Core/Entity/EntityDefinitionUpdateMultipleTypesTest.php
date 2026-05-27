@@ -129,7 +129,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
       $this->entityDefinitionUpdateManager->updateEntityType($entity_type);
       $this->fail('EntityStorageException thrown when trying to apply an update that requires shared table schema changes.');
     }
-    catch (EntityStorageException) {
+    catch (\Drupal\Core\Entity\EntityStorageException) {
       // Expected exception; just continue testing.
     }
   }
@@ -457,7 +457,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
         ->execute();
       $this->fail($message);
     }
-    catch (IntegrityConstraintViolationException) {
+    catch (\Drupal\Core\Database\IntegrityConstraintViolationException) {
       // Now provide a value for the 'not null' column. This is expected to
       // succeed.
       $values['new_bundle_field_shape'] = $this->randomString();
@@ -560,7 +560,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
       $this->applyEntityUpdates();
       $this->fail('FieldStorageDefinitionUpdateForbiddenException thrown when trying to update a field schema that has data.');
     }
-    catch (FieldStorageDefinitionUpdateForbiddenException) {
+    catch (\Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException) {
       // Expected exception; just continue testing.
     }
   }
@@ -587,7 +587,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
       $this->applyEntityUpdates();
       $this->fail('FieldStorageDefinitionUpdateForbiddenException thrown when trying to update a field schema that has data.');
     }
-    catch (FieldStorageDefinitionUpdateForbiddenException) {
+    catch (\Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException) {
       // Expected exception; just continue testing.
     }
   }
@@ -697,7 +697,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
       $this->entityDefinitionUpdateManager->installEntityType(new ContentEntityType(['id' => 'foo']));
       $this->fail($message);
     }
-    catch (PluginNotFoundException) {
+    catch (\Drupal\Component\Plugin\Exception\PluginNotFoundException) {
       // Expected exception; just continue testing.
     }
 
@@ -710,7 +710,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
       $this->entityDefinitionUpdateManager->installFieldStorageDefinition('bar', 'foo', 'entity_test', $storage_definition);
       $this->fail($message);
     }
-    catch (PluginNotFoundException) {
+    catch (\Drupal\Component\Plugin\Exception\PluginNotFoundException) {
       // Expected exception; just continue testing.
     }
 
@@ -839,7 +839,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
       $this->applyEntityUpdates();
       $this->fail($message);
     }
-    catch (EntityStorageException) {
+    catch (\Drupal\Core\Entity\EntityStorageException) {
       // Expected exception; just continue testing.
     }
 
@@ -855,7 +855,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
       $entity->save();
       $this->fail($message);
     }
-    catch (EntityStorageException) {
+    catch (\Drupal\Core\Entity\EntityStorageException) {
       // Expected exception; just continue testing.
     }
   }
@@ -992,7 +992,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
       $this->entityDefinitionUpdateManager->installFieldStorageDefinition('new_base_field', 'entity_test_update', 'entity_test', $storage_definition);
       $this->fail('Using a non-existent field as initial value does not work.');
     }
-    catch (FieldException $e) {
+    catch (\Drupal\Core\Field\FieldException $e) {
       $this->assertEquals('Invalid initial value definition on new_base_field: The field field_that_does_not_exist does not exist.', $e->getMessage());
     }
 
@@ -1004,7 +1004,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
       $this->entityDefinitionUpdateManager->installFieldStorageDefinition('new_base_field', 'entity_test_update', 'entity_test', $storage_definition);
       $this->fail('Using a field of a different type as initial value does not work.');
     }
-    catch (FieldException $e) {
+    catch (\Drupal\Core\Field\FieldException $e) {
       $this->assertEquals('Invalid initial value definition on new_base_field: The field types do not match.', $e->getMessage());
     }
 
@@ -1030,7 +1030,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
       $this->entityDefinitionUpdateManager->installFieldStorageDefinition('new_base_field', 'entity_test_update', 'entity_test', $new_base_field);
       $this->fail('Using a field that is not stored in the shared tables as initial value does not work.');
     }
-    catch (FieldException $e) {
+    catch (\Drupal\Core\Field\FieldException $e) {
       $this->assertEquals('Invalid initial value definition on new_base_field: Both fields have to be stored in the shared entity tables.', $e->getMessage());
     }
   }

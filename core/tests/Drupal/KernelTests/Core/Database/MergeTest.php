@@ -200,7 +200,7 @@ class MergeTest extends DatabaseTestBase {
    * Tests that an invalid merge query throws an exception.
    */
   public function testInvalidMerge(): void {
-    $this->expectException(InvalidMergeQueryException::class);
+    $this->expectException(\Drupal\Core\Database\Query\InvalidMergeQueryException::class);
     // This merge will fail because there is no key field specified.
     $this->connection
       ->merge('test_people')

@@ -77,7 +77,7 @@ class QueryFactory implements QueryFactoryInterface, EventSubscriberInterface {
    * {@inheritdoc}
    */
   public function getAggregate(EntityTypeInterface $entity_type, $conjunction) {
-    throw new QueryException('Aggregation over configuration entities is not supported');
+    throw new \Drupal\Core\Entity\Query\QueryException('Aggregation over configuration entities is not supported');
   }
 
   /**
@@ -163,7 +163,7 @@ class QueryFactory implements QueryFactoryInterface, EventSubscriberInterface {
    */
   protected function getKeys(Config $config, $key, $get_method, ConfigEntityTypeInterface $entity_type) {
     if (str_ends_with($key, '*')) {
-      throw new InvalidLookupKeyException(strtr('%entity_type lookup key %key ends with a wildcard this can not be used as a lookup', [
+      throw new \Drupal\Core\Config\Entity\Query\InvalidLookupKeyException(strtr('%entity_type lookup key %key ends with a wildcard this can not be used as a lookup', [
         '%entity_type' => $entity_type->id(),
         '%key' => $key,
       ]));

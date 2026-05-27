@@ -29,7 +29,7 @@ class ToolbarItemConditionsMetConstraintValidator extends ConstraintValidator im
    */
   public function validate($toolbar_item, Constraint $constraint): void {
     if (!$constraint instanceof ToolbarItemConditionsMetConstraint) {
-      throw new UnexpectedTypeException($constraint, __NAMESPACE__ . '\ToolbarItemConditionsMetConstraint');
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($constraint, __NAMESPACE__ . '\ToolbarItemConditionsMetConstraint');
     }
 
     try {

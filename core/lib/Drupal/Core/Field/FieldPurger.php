@@ -169,7 +169,7 @@ class FieldPurger {
   protected function purgeFieldStorageDefinition(FieldStorageDefinitionInterface $field_storage): void {
     $fields = $this->deletedFieldsRepository->getFieldDefinitions($field_storage->getUniqueStorageIdentifier());
     if (count($fields) > 0) {
-      throw new FieldException("Attempt to purge a field storage {$field_storage->getName()} that still has fields.");
+      throw new \Drupal\Core\Field\FieldException("Attempt to purge a field storage {$field_storage->getName()} that still has fields.");
     }
 
     $this->deletedFieldsRepository->removeFieldStorageDefinition($field_storage);

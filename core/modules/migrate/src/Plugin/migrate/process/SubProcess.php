@@ -206,13 +206,13 @@ class SubProcess extends ProcessPluginBase {
     if (is_iterable($value)) {
       foreach ($value as $key => $new_value) {
         if (!is_array($new_value)) {
-          throw new MigrateException(sprintf("Input array should hold elements of type array, instead element was of type '%s'", gettype($new_value)));
+          throw new \Drupal\migrate\MigrateException(sprintf("Input array should hold elements of type array, instead element was of type '%s'", gettype($new_value)));
         }
         $new_row = new Row($new_value + $source);
         try {
           $migrate_executable->processRow($new_row, $this->configuration['process']);
         }
-        catch (MigrateSkipRowException) {
+        catch (\Drupal\migrate\MigrateSkipRowException) {
           continue;
         }
         $destination = $new_row->getDestination();

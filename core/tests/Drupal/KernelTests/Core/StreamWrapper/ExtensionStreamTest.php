@@ -153,7 +153,7 @@ class ExtensionStreamTest extends KernelTestBase {
     [$scheme] = explode('://', $uri);
     $this->streamWrappers[$scheme]->setUri($uri);
 
-    $this->expectException(UnknownExtensionException::class);
+    $this->expectException(\Drupal\Core\Extension\Exception\UnknownExtensionException::class);
     $this->expectExceptionMessage($expected_message);
     $this->streamWrappers[$scheme]->dirname();
   }
@@ -171,7 +171,7 @@ class ExtensionStreamTest extends KernelTestBase {
     [$scheme] = explode('://', $uri);
     $this->streamWrappers[$scheme]->setUri($uri);
 
-    $this->expectException(UnknownExtensionException::class);
+    $this->expectException(\Drupal\Core\Extension\Exception\UnknownExtensionException::class);
     $this->expectExceptionMessage($expected_message);
     $this->streamWrappers[$scheme]->realpath();
   }
@@ -189,7 +189,7 @@ class ExtensionStreamTest extends KernelTestBase {
     [$scheme] = explode('://', $uri);
     $this->streamWrappers[$scheme]->setUri($uri);
 
-    $this->expectException(UnknownExtensionException::class);
+    $this->expectException(\Drupal\Core\Extension\Exception\UnknownExtensionException::class);
     $this->expectExceptionMessage($expected_message);
     $this->streamWrappers[$scheme]->getExternalUrl();
   }
@@ -238,7 +238,7 @@ class ExtensionStreamTest extends KernelTestBase {
   public function testWrappersAfterModuleUninstall(): void {
     $this->assertSame('module://file_module_test', $this->streamWrappers['module']->dirname('module://file_module_test/file_module_test.info.yml'));
     $this->container->get('module_installer')->uninstall(['file_module_test']);
-    $this->expectException(UnknownExtensionException::class);
+    $this->expectException(\Drupal\Core\Extension\Exception\UnknownExtensionException::class);
     $this->expectExceptionMessage('The module file_module_test does not exist.');
     $this->streamWrappers['module']->dirname('module://file_module_test/file_module_test.info.yml');
   }
@@ -249,7 +249,7 @@ class ExtensionStreamTest extends KernelTestBase {
   public function testWrappersAfterThemeUninstall(): void {
     $this->assertSame('theme://claro', $this->streamWrappers['theme']->dirname('theme://claro/claro.info.yml'));
     $this->container->get('theme_installer')->uninstall(['claro']);
-    $this->expectException(UnknownExtensionException::class);
+    $this->expectException(\Drupal\Core\Extension\Exception\UnknownExtensionException::class);
     $this->expectExceptionMessage('The theme claro does not exist.');
     $this->streamWrappers['theme']->dirname('theme://claro/claro.info.yml');
   }

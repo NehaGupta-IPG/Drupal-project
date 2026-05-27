@@ -516,7 +516,7 @@ class UrlConversionTest extends UnitTestCase {
    */
   public function testDriverModuleDoesNotExist(): void {
     $url = 'foo_bar_mysql://test_user:test_pass@test_host:3306/test_database?module=foo_bar';
-    $this->expectException(UnknownExtensionException::class);
+    $this->expectException(\Drupal\Core\Extension\Exception\UnknownExtensionException::class);
     $this->expectExceptionMessage("The database_driver Drupal\\foo_bar\\Driver\\Database\\foo_bar_mysql does not exist.");
     Database::convertDbUrlToConnectionInfo($url, TRUE);
   }
@@ -528,7 +528,7 @@ class UrlConversionTest extends UnitTestCase {
    */
   public function testModuleDriverDoesNotExist(): void {
     $url = 'driver_test_mysql://test_user:test_pass@test_host:3306/test_database?module=driver_test';
-    $this->expectException(UnknownExtensionException::class);
+    $this->expectException(\Drupal\Core\Extension\Exception\UnknownExtensionException::class);
     $this->expectExceptionMessage("The database_driver Drupal\\driver_test\\Driver\\Database\\driver_test_mysql does not exist.");
     Database::convertDbUrlToConnectionInfo($url, TRUE);
   }

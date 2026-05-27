@@ -317,13 +317,13 @@ class FieldBlockTest extends EntityKernelTestBase {
    */
   public function testBuildWithFormException(): void {
     $field = $this->prophesize(FieldItemListInterface::class);
-    $field->view(Argument::type('array'))->willThrow(new EnforcedResponseException(new Response()));
+    $field->view(Argument::type('array'))->willThrow(new \Drupal\Core\Form\EnforcedResponseException(new Response()));
 
     $entity = $this->prophesize(FieldableEntityInterface::class);
     $entity->get('the_field_name')->willReturn($field->reveal());
 
     $block = $this->getTestBlock($entity);
-    $this->expectException(EnforcedResponseException::class);
+    $this->expectException(\Drupal\Core\Form\EnforcedResponseException::class);
     $block->build();
   }
 

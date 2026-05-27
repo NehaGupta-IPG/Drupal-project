@@ -145,7 +145,7 @@ class PrivateTempStoreTest extends UnitTestCase {
     $this->keyValue->expects($this->once())
       ->method('getCollectionName');
 
-    $this->expectException(TempStoreException::class);
+    $this->expectException(\Drupal\Core\TempStore\TempStoreException::class);
     $this->tempStore->set('test', 'value');
   }
 
@@ -239,7 +239,7 @@ class PrivateTempStoreTest extends UnitTestCase {
     $this->keyValue->expects($this->once())
       ->method('getCollectionName');
 
-    $this->expectException(TempStoreException::class);
+    $this->expectException(\Drupal\Core\TempStore\TempStoreException::class);
     $this->tempStore->delete('test');
   }
 

@@ -143,7 +143,7 @@ class ViewElementTest extends ViewsKernelTestBase {
       '#name' => 'invalid_view_name',
       '#embed' => FALSE,
     ];
-    $this->expectException(ViewRenderElementException::class);
+    $this->expectException(\Drupal\views\Exception\ViewRenderElementException::class);
     $this->expectExceptionMessage("Invalid View name ({$render_element['#name']}) given.");
     $renderer->renderRoot($render_element);
   }

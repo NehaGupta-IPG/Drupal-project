@@ -53,7 +53,7 @@ class JSWebAssertTest extends WebDriverTestBase {
       $wait_time = Timer::read('js_test');
       $this->fail("Element not exists on page after too short wait. Press time: $press_time ms. Press + Wait time: $wait_time ms. Timestamp: " . microtime(TRUE));
     }
-    catch (ElementHtmlException $e) {
+    catch (\Behat\Mink\Exception\ElementHtmlException $e) {
       $this->assertSame('Element exists on page after too short wait.', $e->getMessage());
     }
 

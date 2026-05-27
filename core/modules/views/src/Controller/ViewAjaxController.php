@@ -116,7 +116,7 @@ class ViewAjaxController implements ContainerInjectionInterface {
 
       // Load the view.
       if (!$entity = $this->storage->load($name)) {
-        throw new NotFoundHttpException();
+        throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
       }
       $view = $this->executableFactory->get($entity);
       if ($view && $view->access($display_id) && $view->setDisplay($display_id) && $view->display_handler->ajaxEnabled()) {
@@ -169,11 +169,11 @@ class ViewAjaxController implements ContainerInjectionInterface {
         return $response;
       }
       else {
-        throw new AccessDeniedHttpException();
+        throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
       }
     }
     else {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
   }
 

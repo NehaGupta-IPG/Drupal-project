@@ -36,7 +36,7 @@ class LargeQueryTest extends DriverSpecificDatabaseTestBase {
       $this->connection->query('SELECT [name] FROM {test} WHERE [name] = :name', [':name' => $long_name]);
       $this->fail("An exception should be thrown for queries larger than 'max_allowed_packet'");
     }
-    catch (DatabaseException $e) {
+    catch (\Drupal\Core\Database\DatabaseException $e) {
       // Close and re-open the connection. Otherwise we will run into error
       // 2006 "MySQL server had gone away" afterwards.
       Database::closeConnection();

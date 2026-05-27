@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 /**
  * A cacheable ConflictHttpException.
  */
-class CacheableConflictHttpException extends ConflictHttpException implements CacheableDependencyInterface {
+class CacheableConflictHttpException extends \Symfony\Component\HttpKernel\Exception\ConflictHttpException implements CacheableDependencyInterface {
 
   use CacheableDependencyTrait;
 

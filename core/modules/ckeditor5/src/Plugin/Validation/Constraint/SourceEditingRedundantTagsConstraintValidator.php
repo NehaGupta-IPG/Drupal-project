@@ -32,7 +32,7 @@ class SourceEditingRedundantTagsConstraintValidator extends ConstraintValidator 
    */
   public function validate($value, Constraint $constraint): void {
     if (!$constraint instanceof SourceEditingRedundantTagsConstraint) {
-      throw new UnexpectedTypeException($constraint, __NAMESPACE__ . '\SourceEditingRedundantTagsConstraint');
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($constraint, __NAMESPACE__ . '\SourceEditingRedundantTagsConstraint');
     }
     if (empty($value)) {
       return;

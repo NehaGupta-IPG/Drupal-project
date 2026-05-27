@@ -38,11 +38,11 @@ class MigrateLookup implements MigrateLookupInterface {
     if (!$migrations) {
       if (is_array($migration_id)) {
         if (count($migration_id) != 1) {
-          throw new PluginException("Plugin IDs '" . implode("', '", $migration_id) . "' were not found.");
+          throw new \Drupal\Component\Plugin\Exception\PluginException("Plugin IDs '" . implode("', '", $migration_id) . "' were not found.");
         }
         $migration_id = reset($migration_id);
       }
-      throw new PluginNotFoundException($migration_id);
+      throw new \Drupal\Component\Plugin\Exception\PluginNotFoundException($migration_id);
     }
     foreach ($migrations as $migration) {
       if ($result = $this->doLookup($migration, $source_id_values)) {

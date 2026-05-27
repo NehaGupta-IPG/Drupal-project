@@ -79,7 +79,7 @@ abstract class NegotiatorBase implements VersionNegotiatorInterface {
     $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
     $revision = static::ensureVersionExists($storage->loadRevision($revision_id));
     if ($revision->id() !== $entity->id()) {
-      throw new VersionNotFoundException(sprintf('The requested resource does not have a version with ID %s.', $revision_id));
+      throw new \Drupal\jsonapi\Revisions\VersionNotFoundException(sprintf('The requested resource does not have a version with ID %s.', $revision_id));
     }
     return $revision;
   }
@@ -99,7 +99,7 @@ abstract class NegotiatorBase implements VersionNegotiatorInterface {
    */
   protected static function ensureVersionExists($revision) {
     if (is_null($revision)) {
-      throw new VersionNotFoundException();
+      throw new \Drupal\jsonapi\Revisions\VersionNotFoundException();
     }
     return $revision;
   }

@@ -190,10 +190,10 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     catch (\PDOException $e) {
       if (static::getSQLState($e) == static::CONNECTION_FAILURE) {
         if (str_contains($e->getMessage(), 'password authentication failed for user')) {
-          throw new DatabaseAccessDeniedException($e->getMessage(), $e->getCode(), $e);
+          throw new \Drupal\Core\Database\DatabaseAccessDeniedException($e->getMessage(), $e->getCode(), $e);
         }
         elseif (str_contains($e->getMessage(), 'database') && str_contains($e->getMessage(), 'does not exist')) {
-          throw new DatabaseNotFoundException($e->getMessage(), $e->getCode(), $e);
+          throw new \Drupal\Core\Database\DatabaseNotFoundException($e->getMessage(), $e->getCode(), $e);
         }
       }
       throw $e;
@@ -330,7 +330,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
       catch (\Exception $e) {
         // If the database can't be created with the 'en_US' locale either,
         // we're finally throwing an exception.
-        throw new DatabaseNotFoundException($e->getMessage());
+        throw new \Drupal\Core\Database\DatabaseNotFoundException($e->getMessage());
       }
     }
   }

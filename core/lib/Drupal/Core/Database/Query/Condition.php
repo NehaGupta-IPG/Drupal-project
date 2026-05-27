@@ -104,15 +104,15 @@ class Condition implements ConditionInterface, \Countable {
       $operator = '=';
     }
     if (empty($value) && is_array($value)) {
-      throw new InvalidQueryException(sprintf("Query condition '%s %s ()' cannot be empty.", $field, $operator));
+      throw new \Drupal\Core\Database\InvalidQueryException(sprintf("Query condition '%s %s ()' cannot be empty.", $field, $operator));
     }
     if (is_array($value) && in_array($operator, ['=', '<', '>', '<=', '>=', 'IS NULL', 'IS NOT NULL'], TRUE)) {
       if (count($value) > 1) {
         $value = implode(', ', $value);
-        throw new InvalidQueryException(sprintf("Query condition '%s %s %s' must have an array compatible operator.", $field, $operator, $value));
+        throw new \Drupal\Core\Database\InvalidQueryException(sprintf("Query condition '%s %s %s' must have an array compatible operator.", $field, $operator, $value));
       }
       else {
-        throw new InvalidQueryException('Calling ' . __METHOD__ . '() without an array compatible operator is not supported. See https://www.drupal.org/node/3350985');
+        throw new \Drupal\Core\Database\InvalidQueryException('Calling ' . __METHOD__ . '() without an array compatible operator is not supported. See https://www.drupal.org/node/3350985');
       }
     }
 
@@ -257,7 +257,7 @@ class Condition implements ConditionInterface, \Countable {
             // Provide a string which will result into an empty query result.
             $this->stringVersion = '( AND 1 = 0 )';
 
-            throw new InvalidQueryException('Invalid characters in query operator: ' . $condition['operator']);
+            throw new \Drupal\Core\Database\InvalidQueryException('Invalid characters in query operator: ' . $condition['operator']);
           }
 
           // For simplicity, we convert all operators to a data structure to

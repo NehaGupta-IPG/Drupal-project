@@ -49,7 +49,7 @@ class ContextPluginTest extends KernelTestBase {
       $plugin->getContextDefinition('not_exists');
       $this->fail('The user context should not yet be set.');
     }
-    catch (ContextException $e) {
+    catch (\Drupal\Component\Plugin\Exception\ContextException $e) {
       $this->assertEquals('The not_exists context is not a valid context.', $e->getMessage());
     }
 
@@ -67,7 +67,7 @@ class ContextPluginTest extends KernelTestBase {
     try {
       $plugin->getContextValue('user');
     }
-    catch (ContextException $e) {
+    catch (\Drupal\Component\Plugin\Exception\ContextException $e) {
       $this->assertSame("The 'entity:user' context is required and not present.", $e->getMessage(), 'Requesting a non-set value of a required context should throw a context exception.');
     }
 

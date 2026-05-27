@@ -97,12 +97,12 @@ class Query extends QueryBase implements QueryInterface {
   protected function prepare() {
     if ($this->allRevisions) {
       if (!$base_table = $this->entityType->getRevisionTable()) {
-        throw new QueryException("No revision table for " . $this->entityTypeId . ", invalid query.");
+        throw new \Drupal\Core\Entity\Query\QueryException("No revision table for " . $this->entityTypeId . ", invalid query.");
       }
     }
     else {
       if (!$base_table = $this->entityType->getBaseTable()) {
-        throw new QueryException("No base table for " . $this->entityTypeId . ", invalid query.");
+        throw new \Drupal\Core\Entity\Query\QueryException("No base table for " . $this->entityTypeId . ", invalid query.");
       }
     }
     $simple_query = TRUE;
@@ -155,7 +155,7 @@ class Query extends QueryBase implements QueryInterface {
     }
 
     if (is_null($this->accessCheck)) {
-      throw new QueryException('Entity queries must explicitly set whether the query should be access checked or not. See Drupal\Core\Entity\Query\QueryInterface::accessCheck().');
+      throw new \Drupal\Core\Entity\Query\QueryException('Entity queries must explicitly set whether the query should be access checked or not. See Drupal\Core\Entity\Query\QueryInterface::accessCheck().');
     }
     if ($this->accessCheck) {
       $this->sqlQuery->addTag($this->entityTypeId . '_access');

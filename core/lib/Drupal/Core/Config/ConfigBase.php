@@ -94,17 +94,17 @@ abstract class ConfigBase implements RefinableCacheableDependencyInterface {
   public static function validateName($name) {
     // The name must be namespaced by owner.
     if (!str_contains($name, '.')) {
-      throw new ConfigNameException("Missing namespace in Config object name $name.");
+      throw new \Drupal\Core\Config\ConfigNameException("Missing namespace in Config object name $name.");
     }
     // The name must be shorter than Config::MAX_NAME_LENGTH characters.
     if (strlen($name) > self::MAX_NAME_LENGTH) {
-      throw new ConfigNameException("Config object name $name exceeds maximum allowed length of " . static::MAX_NAME_LENGTH . " characters.");
+      throw new \Drupal\Core\Config\ConfigNameException("Config object name $name exceeds maximum allowed length of " . static::MAX_NAME_LENGTH . " characters.");
     }
 
     // The name must not contain any of the following characters:
     // : ? * < > ' " / \
     if (preg_match('/[:?*<>"\'\/\\\\]/', $name)) {
-      throw new ConfigNameException("Invalid character in Config object name $name.");
+      throw new \Drupal\Core\Config\ConfigNameException("Invalid character in Config object name $name.");
     }
   }
 
@@ -206,7 +206,7 @@ abstract class ConfigBase implements RefinableCacheableDependencyInterface {
   protected function validateKeys(array $data) {
     foreach ($data as $key => $value) {
       if (str_contains($key, '.')) {
-        throw new ConfigValueException("$key key contains a dot which is not supported.");
+        throw new \Drupal\Core\Config\ConfigValueException("$key key contains a dot which is not supported.");
       }
       if (is_array($value)) {
         $this->validateKeys($value);

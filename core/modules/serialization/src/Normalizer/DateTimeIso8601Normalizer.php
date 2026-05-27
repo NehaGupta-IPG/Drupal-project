@@ -76,7 +76,7 @@ class DateTimeIso8601Normalizer extends DateTimeNormalizer {
       $field_definition = $context['field_definition'];
     }
     else {
-      throw new InvalidArgumentException('$context[\'target_instance\'] or $context[\'field_definition\'] must be set to denormalize with the DateTimeIso8601Normalizer');
+      throw new \Symfony\Component\Serializer\Exception\InvalidArgumentException('$context[\'target_instance\'] or $context[\'field_definition\'] must be set to denormalize with the DateTimeIso8601Normalizer');
     }
 
     $datetime_type = $field_definition->getSetting('datetime_type');

@@ -234,7 +234,7 @@ foo_bar:
     label: TEST
     elements: false
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The "foo_bar" CKEditor 5 plugin definition must have a plugin ID that starts with "ckeditor5_invalid_plugin_".',
     ];
 
@@ -245,7 +245,7 @@ YAML,
       <<<YAML
 ckeditor5_invalid_plugin_foo_bar: {}
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The "ckeditor5_invalid_plugin_foo_bar" CKEditor 5 plugin definition must contain a "drupal" key.',
     ];
 
@@ -254,7 +254,7 @@ YAML,
 ckeditor5_invalid_plugin_foo_bar:
   drupal: {}
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The "ckeditor5_invalid_plugin_foo_bar" CKEditor 5 plugin definition must contain a "ckeditor5" key.',
     ];
 
@@ -264,7 +264,7 @@ ckeditor5_invalid_plugin_foo_bar:
   ckeditor5: {}
   drupal: {}
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The "ckeditor5_invalid_plugin_foo_bar" CKEditor 5 plugin definition must contain a "ckeditor5.plugins" key.',
     ];
 
@@ -275,7 +275,7 @@ ckeditor5_invalid_plugin_foo_bar:
     plugins: {}
   drupal: {}
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The "ckeditor5_invalid_plugin_foo_bar" CKEditor 5 plugin definition must contain a "drupal.label" key.',
     ];
 
@@ -287,7 +287,7 @@ ckeditor5_invalid_plugin_foo_bar:
   drupal:
     label: {}
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The "ckeditor5_invalid_plugin_foo_bar" CKEditor 5 plugin definition has a "drupal.label" value that is not a string nor a TranslatableMarkup instance.',
     ];
 
@@ -299,7 +299,7 @@ ckeditor5_invalid_plugin_foo_bar:
   drupal:
     label: "Foo bar"
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The "ckeditor5_invalid_plugin_foo_bar" CKEditor 5 plugin definition must contain a "drupal.elements" key.',
     ];
 
@@ -312,7 +312,7 @@ ckeditor5_invalid_plugin_foo_bar:
     label: "Foo bar"
     elements: {}
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The "ckeditor5_invalid_plugin_foo_bar" CKEditor 5 plugin definition has a "drupal.elements" value that is neither a list of HTML tags/attributes nor false.',
     ];
 
@@ -327,7 +327,7 @@ ckeditor5_invalid_plugin_foo_bar:
       - foo
       - bar
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The "ckeditor5_invalid_plugin_foo_bar" CKEditor 5 plugin definition has a value at "drupal.elements.0" that is not an HTML tag with optional attributes: "foo". Expected structure: "<tag allowedAttribute="allowedValue1 allowedValue2">".',
     ];
 
@@ -341,7 +341,7 @@ ckeditor5_invalid_plugin_foo_bar:
     elements:
       - <foo> <bar>
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The "ckeditor5_invalid_plugin_foo_bar" CKEditor 5 plugin definition has a value at "drupal.elements.0": multiple tags listed, should be one: "<foo> <bar>".',
     ];
 
@@ -369,7 +369,7 @@ foo_bar:
       - <foo>
       - <bar>
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The "foo_bar" CKEditor 5 plugin definition must have a plugin ID that starts with "ckeditor5_invalid_plugin_".',
     ];
 
@@ -396,7 +396,7 @@ ckeditor5_invalid_plugin_foo_bar:
       - <bar>
     admin_library: ckeditor5/foo_bar
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The "ckeditor5_invalid_plugin_foo_bar" CKEditor 5 plugin definition has a "drupal.admin_library" key whose asset library "ckeditor5/foo_bar" does not exist.',
     ];
 
@@ -429,7 +429,7 @@ ckeditor5_invalid_plugin_foo_bar:
     conditions:
       foo: bar
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The "ckeditor5_invalid_plugin_foo_bar" CKEditor 5 plugin definition has a "drupal.conditions" value that contains some unsupported condition types: "foo". Only the following conditions types are supported: "toolbarItem", "imageUploadStatus", "filter", "requiresConfiguration", "plugins".',
     ];
     yield 'invalid condition: toolbarItem' => [
@@ -446,7 +446,7 @@ ckeditor5_invalid_plugin_foo_bar:
     conditions:
       toolbarItem: [bold, italic]
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The "ckeditor5_invalid_plugin_foo_bar" CKEditor 5 plugin definition has an invalid "drupal.conditions" item. "toolbarItem" is set to an invalid value. A string corresponding to a CKEditor 5 toolbar item must be specified.',
     ];
     yield 'valid condition: toolbarItem' => [
@@ -479,7 +479,7 @@ ckeditor5_invalid_plugin_foo_bar:
       toolbarItem: bold
       filter: true
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The "ckeditor5_invalid_plugin_foo_bar" CKEditor 5 plugin definition has an invalid "drupal.conditions" item. "filter" is set to an invalid value. A string corresponding to a filter plugin ID must be specified.',
     ];
     yield 'valid condition: filter' => [
@@ -514,7 +514,7 @@ ckeditor5_invalid_plugin_foo_bar:
       filter: filter_caption
       imageUploadStatus: 'true'
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The "ckeditor5_invalid_plugin_foo_bar" CKEditor 5 plugin definition has an invalid "drupal.conditions" item. "imageUploadStatus" is set to an invalid value. A boolean indicating whether image uploads must be enabled (true) or not (false) must be specified.',
     ];
     yield 'valid condition: imageUploadStatus' => [
@@ -551,7 +551,7 @@ ckeditor5_invalid_plugin_foo_bar:
       imageUploadStatus: true
       plugins: ckeditor5_imageCaption
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The "ckeditor5_invalid_plugin_foo_bar" CKEditor 5 plugin definition has an invalid "drupal.conditions" item. "plugins" is set to an invalid value. A list of strings, each corresponding to a CKEditor 5 plugin ID must be specified.',
     ];
     yield 'valid condition: plugins' => [
@@ -615,7 +615,7 @@ ckeditor5_invalid_plugin_foo_bar:
       - <bar>
     admin_library: ckeditor5/internal.admin.basic
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The CKEditor 5 "ckeditor5_invalid_plugin_foo_bar" provides a plugin class: "Drupal\ckeditor5_invalid_plugin\Plugin\CKEditor5Plugin\FooBar", but it does not exist.',
     ];
 
@@ -632,7 +632,7 @@ ckeditor5_invalid_plugin_foo_bar:
       - <bar>
     admin_library: ckeditor5/internal.admin.basic
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'CKEditor 5 plugins must implement \Drupal\ckeditor5\Plugin\CKEditor5PluginInterface. "ckeditor5_invalid_plugin_foo_bar" does not.',
       [
         'src' => [
@@ -735,7 +735,7 @@ ckeditor5_invalid_plugin_foo_bar:
       - <bar>
     admin_library: ckeditor5/internal.admin.basic
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The "ckeditor5_invalid_plugin_foo_bar" CKEditor 5 plugin definition is configurable, has non-empty default configuration but has no config schema. Config schema is required for validation.',
       [
         'src' => [
@@ -828,7 +828,7 @@ ckeditor5_invalid_plugin_foo_bar:
       - <bar>
     admin_library: ckeditor5/internal.admin.basic
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The "ckeditor5_invalid_plugin_foo_bar" CKEditor 5 plugin definition is configurable, but its default configuration does not match its config schema. The following errors were found: [foo] The configuration property foo.bar doesn\'t exist, [baz] missing schema.',
       [
         'config' => [
@@ -935,7 +935,7 @@ ckeditor5_invalid_plugin_foo_bar:
     conditions:
       requiresConfiguration: true
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The "ckeditor5_invalid_plugin_foo_bar" CKEditor 5 plugin definition has an invalid "drupal.conditions" item. "requiresConfiguration" is set to an invalid value. An array structure matching the required configuration for this plugin must be specified.',
     ];
 
@@ -951,7 +951,7 @@ ckeditor5_invalid_plugin_foo_bar:
       requiresConfiguration:
         allow_resize: true
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The "ckeditor5_invalid_plugin_foo_bar" CKEditor 5 plugin definition has an invalid "drupal.conditions" item. "requiresConfiguration" is set to an invalid value. This condition type is only available for CKEditor 5 plugins implementing CKEditor5PluginConfigurableInterface.',
     ];
 
@@ -968,7 +968,7 @@ ckeditor5_invalid_plugin_foo_bar:
       requiresConfiguration:
         allow_resize: true
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The "ckeditor5_invalid_plugin_foo_bar" CKEditor 5 plugin definition has an invalid "drupal.conditions" item. "requiresConfiguration" is set to an invalid value. The required configuration does not match its config schema. The following errors were found: [allow_resize] The configuration property allow_resize doesn\'t exist.',
       [
         'config' => [
@@ -1594,7 +1594,7 @@ PHP,
    * @legacy-covers \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition::validateCKEditor5Aspects
    */
   public function testAutomaticLinkDecoratorsDisallowed(): void {
-    $this->expectException(InvalidPluginDefinitionException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class);
     $this->expectExceptionMessage('The "ckeditor5_automatic_link_decorator_test_llamaClass" CKEditor 5 plugin definition specifies an automatic decorator, this is not supported. Use the Drupal filter system instead.');
 
     $this->enableModules(['ckeditor5_automatic_link_decorator_test']);
@@ -1608,7 +1608,7 @@ PHP,
    * @legacy-covers \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition::validateCKEditor5Aspects
    */
   public function testExternalLinkAutomaticLinkDecoratorDisallowed(): void {
-    $this->expectException(InvalidPluginDefinitionException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class);
     $this->expectExceptionMessage('The "ckeditor5_automatic_link_decorator_test_2_addTargetToExternalLinks" CKEditor 5 plugin definition specifies an automatic decorator, this is not supported. Use the Drupal filter system instead.');
 
     $this->enableModules(['ckeditor5_automatic_link_decorator_test_2']);
@@ -1687,7 +1687,7 @@ ckeditor5_derived_plugin_foo:
   drupal:
     deriver: Drupal\ckeditor5_derived_plugin\Plugin\CKEditor5Plugin\SimpleDeriver
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The "ckeditor5_derived_plugin_foo:bar" CKEditor 5 derived plugin definition must contain a "drupal.elements" key.',
       $simple_deriver_additional_files,
     ];
@@ -1712,7 +1712,7 @@ ckeditor5_derived_plugin_foo:
     elements: false
     deriver: Drupal\ckeditor5_derived_plugin\Plugin\CKEditor5Plugin\SimpleDeriver
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The "ckeditor5_derived_plugin_foo:bar" CKEditor 5 derived plugin definition must contain a "ckeditor5" key.',
       $simple_deriver_additional_files,
     ];
@@ -1726,7 +1726,7 @@ ckeditor5_derived_plugin_foo:
     elements: false
     deriver: Drupal\ckeditor5_derived_plugin\Plugin\CKEditor5Plugin\SimpleDeriver
 YAML,
-      InvalidPluginDefinitionException::class,
+      \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException::class,
       'The "ckeditor5_derived_plugin_foo:bar" CKEditor 5 plugin definition must extend Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition',
       [
         'src' => [

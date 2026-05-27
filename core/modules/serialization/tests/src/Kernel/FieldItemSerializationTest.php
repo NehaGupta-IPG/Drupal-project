@@ -146,7 +146,7 @@ class FieldItemSerializationTest extends NormalizerTestBase {
    * Tests denormalizing using a scalar field value.
    */
   public function testFieldDenormalizeWithScalarValue(): void {
-    $this->expectException(UnexpectedValueException::class);
+    $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
     $this->expectExceptionMessage('Field values for "uuid" must use an array structure');
 
     $normalized = $this->serializer->normalize($this->entity, 'json');

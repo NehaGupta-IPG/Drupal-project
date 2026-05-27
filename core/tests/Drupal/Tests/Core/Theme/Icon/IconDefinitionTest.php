@@ -164,7 +164,7 @@ class IconDefinitionTest extends UnitTestCase {
    * Test the IconDefinition::create method with errors.
    */
   public function testCreateIconError(): void {
-    $this->expectException(IconDefinitionInvalidDataException::class);
+    $this->expectException(\Drupal\Core\Theme\Icon\Exception\IconDefinitionInvalidDataException::class);
     $this->expectExceptionMessage('Empty pack_id provided! Empty icon_id provided! Empty template provided!');
 
     IconDefinition::create('', '', '');

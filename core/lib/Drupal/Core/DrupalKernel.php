@@ -408,7 +408,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   public static function findSitePath(Request $request, $require_settings = TRUE, $app_root = NULL) {
     if (static::validateHostname($request) === FALSE) {
-      throw new BadRequestHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException();
     }
 
     if ($app_root === NULL) {
@@ -1214,7 +1214,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $host_patterns = Settings::get('trusted_host_patterns', []);
     if (PHP_SAPI !== 'cli' && !empty($host_patterns)) {
       if (static::setupTrustedHosts($request, $host_patterns) === FALSE) {
-        throw new BadRequestHttpException('The provided host name is not valid for this server.');
+        throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('The provided host name is not valid for this server.');
       }
     }
   }

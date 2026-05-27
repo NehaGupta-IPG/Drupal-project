@@ -30,7 +30,7 @@ class ValidKeysConstraintValidator extends ConstraintValidator {
       if ($value === NULL) {
         return;
       }
-      throw new UnexpectedTypeException($value, 'array');
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($value, 'array');
     }
 
     // Indexed arrays are invalid by definition. array_is_list() returns TRUE

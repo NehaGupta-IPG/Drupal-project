@@ -18,7 +18,7 @@ class FieldStorageIndexesConstraintValidator extends ConstraintValidator {
    */
   public function validate(mixed $value, Constraint $constraint): void {
     if (!$constraint instanceof FieldStorageIndexesConstraint) {
-      throw new UnexpectedTypeException($constraint, FieldStorageIndexesConstraint::class);
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($constraint, FieldStorageIndexesConstraint::class);
     }
 
     if ($value === NULL || $value === []) {

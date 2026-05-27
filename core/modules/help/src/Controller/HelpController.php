@@ -152,7 +152,7 @@ class HelpController extends ControllerBase {
       return $build;
     }
     else {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
   }
 

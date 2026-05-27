@@ -38,11 +38,11 @@ class DrupalSelenium2Driver extends Selenium2Driver {
    */
   public function uploadFileAndGetRemoteFilePath($path) {
     if (!is_file($path)) {
-      throw new DriverException('File does not exist locally and cannot be uploaded to the remote instance.');
+      throw new \Behat\Mink\Exception\DriverException('File does not exist locally and cannot be uploaded to the remote instance.');
     }
 
     if (!class_exists('ZipArchive')) {
-      throw new DriverException('Could not compress file, PHP is compiled without zip support.');
+      throw new \Behat\Mink\Exception\DriverException('Could not compress file, PHP is compiled without zip support.');
     }
 
     // Selenium only accepts uploads that are compressed as a Zip archive.
@@ -51,15 +51,15 @@ class DrupalSelenium2Driver extends Selenium2Driver {
     $archive = new \ZipArchive();
     $result = $archive->open($tempFilename, \ZipArchive::OVERWRITE);
     if (!$result) {
-      throw new DriverException('Zip archive could not be created. Error ' . $result);
+      throw new \Behat\Mink\Exception\DriverException('Zip archive could not be created. Error ' . $result);
     }
     $result = $archive->addFile($path, basename($path));
     if (!$result) {
-      throw new DriverException('File could not be added to zip archive.');
+      throw new \Behat\Mink\Exception\DriverException('File could not be added to zip archive.');
     }
     $result = $archive->close();
     if (!$result) {
-      throw new DriverException('Zip archive could not be closed.');
+      throw new \Behat\Mink\Exception\DriverException('Zip archive could not be closed.');
     }
 
     try {
@@ -91,7 +91,7 @@ class DrupalSelenium2Driver extends Selenium2Driver {
         parent::click($xpath);
         return TRUE;
       }
-      catch (Exception $exception) {
+      catch (\WebDriver\Exception $exception) {
         if (!JSWebAssert::isExceptionNotClickable($exception)) {
           // Rethrow any unexpected exceptions.
           throw $exception;
@@ -145,7 +145,7 @@ JS);
         parent::setValue($xpath, $value);
         return TRUE;
       }
-      catch (Exception $exception) {
+      catch (\WebDriver\Exception $exception) {
         if (!JSWebAssert::isExceptionNotClickable($exception) && !str_contains($exception->getMessage(), 'invalid element state')) {
           // Rethrow any unexpected exceptions.
           throw $exception;
@@ -199,7 +199,7 @@ JS);
     try {
       parent::dragTo($sourceXpath, $destinationXpath);
     }
-    catch (Exception) {
+    catch (\WebDriver\Exception) {
       // Do not care if this fails for any reason. It is a source of random
       // fails. The calling code should be doing assertions on the results of
       // dragging anyway. See upstream issues:

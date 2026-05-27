@@ -33,7 +33,7 @@ class ContentDispositionFilenameParserTest extends UnitTestCase {
    */
   #[DataProvider('invalidHeaderProvider')]
   public function testParseFilenameInvalid(string | bool $contentDisposition): void {
-    $this->expectException(BadRequestHttpException::class);
+    $this->expectException(\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class);
     $this->expectExceptionMessage('No filename found in "Content-Disposition" header. A file name in the format "filename=FILENAME" must be provided.');
     $request = $this->createRequest($contentDisposition);
     ContentDispositionFilenameParser::parseFilename($request);
@@ -43,7 +43,7 @@ class ContentDispositionFilenameParserTest extends UnitTestCase {
    * Tests parse filename missing.
    */
   public function testParseFilenameMissing(): void {
-    $this->expectException(BadRequestHttpException::class);
+    $this->expectException(\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class);
     $this->expectExceptionMessage('"Content-Disposition" header is required. A file name in the format "filename=FILENAME" must be provided.');
     $request = new Request();
     ContentDispositionFilenameParser::parseFilename($request);
@@ -53,7 +53,7 @@ class ContentDispositionFilenameParserTest extends UnitTestCase {
    * Tests parse filename extended.
    */
   public function testParseFilenameExtended(): void {
-    $this->expectException(BadRequestHttpException::class);
+    $this->expectException(\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class);
     $this->expectExceptionMessage('The extended "filename*" format is currently not supported in the "Content-Disposition" header.');
     $request = $this->createRequest('filename*="UTF-8 \' \' example.txt"');
     ContentDispositionFilenameParser::parseFilename($request);

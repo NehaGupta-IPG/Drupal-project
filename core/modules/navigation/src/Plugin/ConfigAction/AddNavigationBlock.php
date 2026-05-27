@@ -48,14 +48,14 @@ final class AddNavigationBlock implements ConfigActionPluginInterface, Container
    */
   public function apply(string $configName, mixed $value): void {
     if ($configName !== 'navigation.block_layout') {
-      throw new ConfigActionException('addNavigationBlock can only be executed for the navigation.block_layout config.');
+      throw new \Drupal\Core\Config\Action\ConfigActionException('addNavigationBlock can only be executed for the navigation.block_layout config.');
     }
     // Load the navigation section storage.
     $navigation_storage = $this->sectionStorageManager->load('navigation', [
       'navigation' => new Context(new ContextDefinition('string'), 'navigation'),
     ]);
     if (!$navigation_storage instanceof SectionStorageInterface) {
-      throw new ConfigActionException('Unable to load Navigation Layout storage.');
+      throw new \Drupal\Core\Config\Action\ConfigActionException('Unable to load Navigation Layout storage.');
     }
 
     $section = $navigation_storage->getSection(0);

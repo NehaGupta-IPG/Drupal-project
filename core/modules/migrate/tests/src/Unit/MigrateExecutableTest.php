@@ -231,7 +231,7 @@ class MigrateExecutableTest extends MigrateTestCase {
 
     $this->migration
       ->method('getProcessPlugins')
-      ->willThrowException(new MigrateException($exception_message));
+      ->willThrowException(new \Drupal\migrate\MigrateException($exception_message));
 
     $destination = $this->createMock('Drupal\migrate\Plugin\MigrateDestinationInterface');
     $destination->expects($this->never())
@@ -330,7 +330,7 @@ class MigrateExecutableTest extends MigrateTestCase {
     $plugins['destination_id'] = [$plugin, $plugin];
     $this->migration->method('getProcessPlugins')->willReturn($plugins);
 
-    $this->expectException(MigrateException::class);
+    $this->expectException(\Drupal\migrate\MigrateException::class);
     $this->expectExceptionMessage('Pipeline failed at plugin_id plugin for destination destination_id: transform_return_string received instead of an array,');
     $this->executable->processRow($row);
   }

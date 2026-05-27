@@ -36,29 +36,29 @@ trait SqlFieldableEntityTypeListenerTrait {
       $convert_rev_to_non_rev = $original->isRevisionable() && !$entity_type->isRevisionable();
       $convert_mul_to_non_mul = $original->isTranslatable() && !$entity_type->isTranslatable();
       if ($has_data && ($convert_rev_to_non_rev || $convert_mul_to_non_mul)) {
-        throw new EntityStorageException('Converting an entity type from revisionable to non-revisionable or from translatable to non-translatable is not supported.');
+        throw new \Drupal\Core\Entity\EntityStorageException('Converting an entity type from revisionable to non-revisionable or from translatable to non-translatable is not supported.');
       }
 
       // Check that the fields required by a revisionable entity type exist.
       if ($entity_type->isRevisionable() && !isset($field_storage_definitions[$entity_type->getKey('revision')])) {
-        throw new EntityStorageException('Missing revision field.');
+        throw new \Drupal\Core\Entity\EntityStorageException('Missing revision field.');
       }
       if ($entity_type->isRevisionable() && !isset($field_storage_definitions[$entity_type->getRevisionMetadataKey('revision_default')])) {
-        throw new EntityStorageException('Missing revision_default field.');
+        throw new \Drupal\Core\Entity\EntityStorageException('Missing revision_default field.');
       }
 
       // Check that the fields required by a translatable entity type exist.
       if ($entity_type->isTranslatable() && !isset($field_storage_definitions[$entity_type->getKey('langcode')])) {
-        throw new EntityStorageException('Missing langcode field.');
+        throw new \Drupal\Core\Entity\EntityStorageException('Missing langcode field.');
       }
       if ($entity_type->isTranslatable() && !isset($field_storage_definitions[$entity_type->getKey('default_langcode')])) {
-        throw new EntityStorageException('Missing default_langcode field.');
+        throw new \Drupal\Core\Entity\EntityStorageException('Missing default_langcode field.');
       }
 
       // Check that the fields required by a revisionable and translatable
       // entity type exist.
       if ($entity_type->isRevisionable() && $entity_type->isTranslatable() && !isset($field_storage_definitions[$entity_type->getKey('revision_translation_affected')])) {
-        throw new EntityStorageException('Missing revision_translation_affected field.');
+        throw new \Drupal\Core\Entity\EntityStorageException('Missing revision_translation_affected field.');
       }
 
       $this->preUpdateEntityTypeSchema($entity_type, $original, $field_storage_definitions, $original_field_storage_definitions, $sandbox);
@@ -217,7 +217,7 @@ trait SqlFieldableEntityTypeListenerTrait {
 
         // Re-throw the original exception with a helpful message.
         $error_revision_id = $load_revisions ? ", revision ID: {$entity->getLoadedRevisionId()}" : '';
-        throw new EntityStorageException("The entity update process failed while processing the entity type {$entity_type->id()}, ID: {$entity->id()}$error_revision_id.", $e->getCode(), $e);
+        throw new \Drupal\Core\Entity\EntityStorageException("The entity update process failed while processing the entity type {$entity_type->id()}, ID: {$entity->id()}$error_revision_id.", $e->getCode(), $e);
       }
 
       $sandbox['progress']++;

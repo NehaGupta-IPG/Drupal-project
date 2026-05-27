@@ -7,4 +7,4 @@ use Drupal\Core\Config\ConfigException;
 /**
  * Thrown when a storage class is not an instance of ConfigEntityStorage.
  */
-class ConfigEntityStorageClassException extends ConfigException {}
+class ConfigEntityStorageClassException extends \Drupal\Core\Config\ConfigException {}

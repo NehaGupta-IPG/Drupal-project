@@ -215,7 +215,7 @@ class SectionComponent {
    */
   public function getPluginId() {
     if (empty($this->configuration['id'])) {
-      throw new PluginException(sprintf('No plugin ID specified for component with "%s" UUID', $this->uuid));
+      throw new \Drupal\Component\Plugin\Exception\PluginException(sprintf('No plugin ID specified for component with "%s" UUID', $this->uuid));
     }
     return $this->configuration['id'];
   }

@@ -43,10 +43,10 @@ class ExceptionStatusCodeCacheContextTest extends UnitTestCase {
    */
   public static function providerTestGetContext(): array {
     return [
-      [new NotFoundHttpException(), '404'],
-      [new AccessDeniedHttpException(), '403'],
-      [new BadRequestHttpException(), '400'],
-      [new MethodNotAllowedHttpException(['POST']), '405'],
+      [new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException(), '404'],
+      [new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException(), '403'],
+      [new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException(), '400'],
+      [new \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException(['POST']), '405'],
       [NULL, '0'],
     ];
   }

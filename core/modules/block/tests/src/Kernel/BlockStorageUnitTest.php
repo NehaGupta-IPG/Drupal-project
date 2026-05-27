@@ -65,7 +65,7 @@ class BlockStorageUnitTest extends KernelTestBase {
       $entity->getPlugin();
       $this->fail('A block without a plugin was created with no exception thrown.');
     }
-    catch (PluginException $e) {
+    catch (\Drupal\Component\Plugin\Exception\PluginException $e) {
       $this->assertEquals('The block \'\' did not specify a plugin.', $e->getMessage(), 'An exception was thrown when a block was created without a plugin.');
     }
 

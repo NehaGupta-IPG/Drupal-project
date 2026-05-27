@@ -23,7 +23,7 @@ class RequirementsExceptionTest extends UnitTestCase {
    * Tests get requirements.
    */
   public function testGetRequirements(): void {
-    $exception = new RequirementsException('Missing requirements ', ['requirements' => static::MISSING_REQUIREMENTS]);
+    $exception = new \Drupal\migrate\Exception\RequirementsException('Missing requirements ', ['requirements' => static::MISSING_REQUIREMENTS]);
     $this->assertEquals(['requirements' => static::MISSING_REQUIREMENTS], $exception->getRequirements());
   }
 
@@ -34,7 +34,7 @@ class RequirementsExceptionTest extends UnitTestCase {
    */
   #[DataProvider('getRequirementsProvider')]
   public function testGetExceptionString(string $expected, string $message, array $requirements): void {
-    $exception = new RequirementsException($message, $requirements);
+    $exception = new \Drupal\migrate\Exception\RequirementsException($message, $requirements);
     $this->assertEquals($expected, $exception->getRequirementsString());
   }
 

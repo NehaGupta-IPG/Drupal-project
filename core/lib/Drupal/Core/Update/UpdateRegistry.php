@@ -107,7 +107,7 @@ class UpdateRegistry implements EventSubscriberInterface {
           if ($this->updateType === 'post_update') {
             $removed = array_keys($this->getRemovedPostUpdates($matches['extension']));
             if (array_search($function_name, $removed) !== FALSE) {
-              throw new RemovedPostUpdateNameException(sprintf('The following update is specified as removed in hook_removed_post_updates() but still exists in the code base: %s', $function_name));
+              throw new \Drupal\Core\Update\RemovedPostUpdateNameException(sprintf('The following update is specified as removed in hook_removed_post_updates() but still exists in the code base: %s', $function_name));
             }
           }
           $updates[] = $function_name;

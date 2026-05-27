@@ -87,12 +87,12 @@ class NodeTranslationExceptionSubscriber implements EventSubscriberInterface {
     $exception = $event->getThrowable();
 
     // If this is not a 404, we don't need to check for a redirection.
-    if (!($exception instanceof NotFoundHttpException)) {
+    if (!($exception instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException)) {
       return;
     }
 
     $previous_exception = $exception->getPrevious();
-    if ($previous_exception instanceof ParamNotConvertedException) {
+    if ($previous_exception instanceof \Drupal\Core\ParamConverter\ParamNotConvertedException) {
       $route_name = $previous_exception->getRouteName();
       $parameters = $previous_exception->getRawParameters();
       if ($route_name === 'entity.node.canonical' && isset($parameters['node'])) {

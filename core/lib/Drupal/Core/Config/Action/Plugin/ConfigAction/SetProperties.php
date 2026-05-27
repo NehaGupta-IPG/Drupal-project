@@ -57,14 +57,14 @@ final class SetProperties implements ConfigActionPluginInterface, ContainerFacto
 
     foreach ($values as $property_name => $value) {
       if (in_array($property_name, $forbidden_keys, TRUE)) {
-        throw new ConfigActionException("Entity key '$property_name' cannot be changed by the setProperties config action.");
+        throw new \Drupal\Core\Config\Action\ConfigActionException("Entity key '$property_name' cannot be changed by the setProperties config action.");
       }
       $parts = explode('.', $property_name);
 
       $property_value = $entity->get($parts[0]);
       if (count($parts) > 1) {
         if (isset($property_value) && !is_array($property_value)) {
-          throw new ConfigActionException('The setProperties config action can only set nested values on arrays.');
+          throw new \Drupal\Core\Config\Action\ConfigActionException('The setProperties config action can only set nested values on arrays.');
         }
         $property_value ??= [];
         NestedArray::setValue($property_value, array_slice($parts, 1), $value);

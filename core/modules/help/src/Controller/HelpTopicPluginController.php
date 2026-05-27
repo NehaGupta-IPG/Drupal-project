@@ -42,7 +42,7 @@ class HelpTopicPluginController extends ControllerBase {
     $build = [];
 
     if (!$this->helpTopicPluginManager->hasDefinition($id)) {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
     /** @var \Drupal\help\HelpTopicPluginInterface $help_topic */
     $help_topic = $this->helpTopicPluginManager->createInstance($id);

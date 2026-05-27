@@ -25,18 +25,18 @@ class InfoParserDynamic implements InfoParserInterface {
    */
   public function parse($filename) {
     if (!file_exists($filename)) {
-      throw new InfoParserException("Unable to parse $filename as it does not exist");
+      throw new \Drupal\Core\Extension\InfoParserException("Unable to parse $filename as it does not exist");
     }
 
     try {
       $parsed_info = Yaml::decode(file_get_contents($filename));
     }
-    catch (InvalidDataTypeException $e) {
-      throw new InfoParserException("Unable to parse $filename " . $e->getMessage());
+    catch (\Drupal\Component\Serialization\Exception\InvalidDataTypeException $e) {
+      throw new \Drupal\Core\Extension\InfoParserException("Unable to parse $filename " . $e->getMessage());
     }
     $missing_keys = array_diff($this->getRequiredKeys(), array_keys($parsed_info));
     if (!empty($missing_keys)) {
-      throw new InfoParserException('Missing required keys (' . implode(', ', $missing_keys) . ') in ' . $filename);
+      throw new \Drupal\Core\Extension\InfoParserException('Missing required keys (' . implode(', ', $missing_keys) . ') in ' . $filename);
     }
     if (!isset($parsed_info['core_version_requirement'])) {
       if (str_starts_with($filename, 'core/') || str_starts_with($filename, $this->root . '/core/')) {
@@ -52,7 +52,7 @@ class InfoParserDynamic implements InfoParserInterface {
       }
       else {
         // Non-core extensions must specify core compatibility.
-        throw new InfoParserException("The 'core_version_requirement' key must be present in " . $filename);
+        throw new \Drupal\Core\Extension\InfoParserException("The 'core_version_requirement' key must be present in " . $filename);
       }
     }
 
@@ -62,14 +62,14 @@ class InfoParserDynamic implements InfoParserInterface {
       $parsed_info['core_incompatible'] = !Semver::satisfies(\Drupal::VERSION, $parsed_info['core_version_requirement']);
     }
     catch (\UnexpectedValueException) {
-      throw new InfoParserException("The 'core_version_requirement' constraint ({$parsed_info['core_version_requirement']}) is not a valid value in $filename");
+      throw new \Drupal\Core\Extension\InfoParserException("The 'core_version_requirement' constraint ({$parsed_info['core_version_requirement']}) is not a valid value in $filename");
     }
     if (isset($parsed_info['version'])) {
       if ($parsed_info['version'] === 'VERSION') {
         $parsed_info['version'] = \Drupal::VERSION;
       }
       elseif (!is_scalar($parsed_info['version'])) {
-        throw new InfoParserException("The 'version' value must be a scalar in $filename");
+        throw new \Drupal\Core\Extension\InfoParserException("The 'version' value must be a scalar in $filename");
       }
       elseif (!is_string($parsed_info['version'])) {
         // @todo Replace this with an InfoParserException in Drupal 13.
@@ -87,14 +87,14 @@ class InfoParserDynamic implements InfoParserInterface {
         ExtensionLifecycle::DEPRECATED,
         ExtensionLifecycle::OBSOLETE,
       ];
-      throw new InfoParserException("'lifecycle: {$lifecycle}' is not valid in $filename. Valid values are: '" . implode("', '", $valid_values) . "'.");
+      throw new \Drupal\Core\Extension\InfoParserException("'lifecycle: {$lifecycle}' is not valid in $filename. Valid values are: '" . implode("', '", $valid_values) . "'.");
     }
     if (in_array($lifecycle, [ExtensionLifecycle::DEPRECATED, ExtensionLifecycle::OBSOLETE], TRUE)) {
       if (empty($parsed_info[ExtensionLifecycle::LIFECYCLE_LINK_IDENTIFIER])) {
-        throw new InfoParserException(sprintf("Extension %s (%s) has 'lifecycle: %s' but is missing a '%s' entry.", $parsed_info['name'], $filename, $lifecycle, ExtensionLifecycle::LIFECYCLE_LINK_IDENTIFIER));
+        throw new \Drupal\Core\Extension\InfoParserException(sprintf("Extension %s (%s) has 'lifecycle: %s' but is missing a '%s' entry.", $parsed_info['name'], $filename, $lifecycle, ExtensionLifecycle::LIFECYCLE_LINK_IDENTIFIER));
       }
       if (!filter_var($parsed_info[ExtensionLifecycle::LIFECYCLE_LINK_IDENTIFIER], FILTER_VALIDATE_URL)) {
-        throw new InfoParserException(sprintf("Extension %s (%s) has a '%s' entry that is not a valid URL.", $parsed_info['name'], $filename, ExtensionLifecycle::LIFECYCLE_LINK_IDENTIFIER));
+        throw new \Drupal\Core\Extension\InfoParserException(sprintf("Extension %s (%s) has a '%s' entry that is not a valid URL.", $parsed_info['name'], $filename, ExtensionLifecycle::LIFECYCLE_LINK_IDENTIFIER));
       }
     }
 

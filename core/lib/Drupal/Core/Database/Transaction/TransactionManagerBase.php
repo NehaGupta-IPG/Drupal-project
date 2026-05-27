@@ -264,7 +264,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     }
 
     if ($this->has($name)) {
-      throw new TransactionNameNonUniqueException("A transaction named {$name} is already in use. Active stack: " . $this->dumpStackItemsAsString());
+      throw new \Drupal\Core\Database\TransactionNameNonUniqueException("A transaction named {$name} is already in use. Active stack: " . $this->dumpStackItemsAsString());
     }
 
     // Define a unique ID for the transaction.
@@ -354,7 +354,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     // If there is no $id to commit, or if $id does not correspond to the one
     // in the stack for that $name, the commit is out of order.
     if (!isset($this->stack()[$id]) || $this->stack()[$id]->name !== $name) {
-      throw new TransactionOutOfOrderException("Error attempting commit of {$id}\\{$name}. Active stack: " . $this->dumpStackItemsAsString());
+      throw new \Drupal\Core\Database\TransactionOutOfOrderException("Error attempting commit of {$id}\\{$name}. Active stack: " . $this->dumpStackItemsAsString());
     }
 
     // Commit the transaction.
@@ -380,7 +380,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
   protected function commit(string $name, string $id): void {
     if ($this->getConnectionTransactionState() !== ClientConnectionTransactionState::Active) {
       // The stack got corrupted.
-      throw new TransactionOutOfOrderException("Transaction {$id}\\{$name} is out of order. Active stack: " . $this->dumpStackItemsAsString());
+      throw new \Drupal\Core\Database\TransactionOutOfOrderException("Transaction {$id}\\{$name} is out of order. Active stack: " . $this->dumpStackItemsAsString());
     }
 
     // If we are not releasing the last savepoint but an earlier one, or
@@ -403,7 +403,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     }
     else {
       // The stack got corrupted.
-      throw new TransactionOutOfOrderException("Transaction {$id}/{$name} is out of order. Active stack: " . $this->dumpStackItemsAsString());
+      throw new \Drupal\Core\Database\TransactionOutOfOrderException("Transaction {$id}/{$name} is out of order. Active stack: " . $this->dumpStackItemsAsString());
     }
   }
 
@@ -421,7 +421,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
 
     // Rolled back item should match the last one in stack.
     if ($id != array_key_last($this->stack()) || $name !== $this->stack()[$id]->name) {
-      throw new TransactionOutOfOrderException("Error attempting rollback of {$id}\\{$name}. Active stack: " . $this->dumpStackItemsAsString());
+      throw new \Drupal\Core\Database\TransactionOutOfOrderException("Error attempting rollback of {$id}\\{$name}. Active stack: " . $this->dumpStackItemsAsString());
     }
 
     if ($this->getConnectionTransactionState() === ClientConnectionTransactionState::Active) {
@@ -447,13 +447,13 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
       }
       else {
         // The stack got corrupted.
-        throw new TransactionOutOfOrderException("Error attempting rollback of {$id}\\{$name}. Active stack: " . $this->dumpStackItemsAsString());
+        throw new \Drupal\Core\Database\TransactionOutOfOrderException("Error attempting rollback of {$id}\\{$name}. Active stack: " . $this->dumpStackItemsAsString());
       }
       return;
     }
 
     // The stack got corrupted.
-    throw new TransactionOutOfOrderException("Error attempting rollback of {$id}\\{$name}. Active stack: " . $this->dumpStackItemsAsString());
+    throw new \Drupal\Core\Database\TransactionOutOfOrderException("Error attempting rollback of {$id}\\{$name}. Active stack: " . $this->dumpStackItemsAsString());
   }
 
   /**
@@ -528,7 +528,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
   protected function processRootCommit(): void {
     $clientCommit = $this->commitClientTransaction();
     if (!$clientCommit) {
-      throw new TransactionCommitFailedException();
+      throw new \Drupal\Core\Database\TransactionCommitFailedException();
     }
   }
 

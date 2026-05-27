@@ -50,7 +50,7 @@ class DrupalTest extends UnitTestCase {
    * Tests get container exception.
    */
   public function testGetContainerException(): void {
-    $this->expectException(ContainerNotInitializedException::class);
+    $this->expectException(\Drupal\Core\DependencyInjection\ContainerNotInitializedException::class);
     $this->expectExceptionMessage('\Drupal::$container is not initialized yet. \Drupal::setContainer() must be called with a real container.');
     \Drupal::getContainer();
   }

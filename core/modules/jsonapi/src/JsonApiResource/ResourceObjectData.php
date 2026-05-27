@@ -27,7 +27,7 @@ class ResourceObjectData extends Data implements TopLevelDataInterface {
    * @see \Drupal\jsonapi\JsonApiResource\Data::__construct
    */
   public function __construct($data, $cardinality = -1) {
-    assert(Inspector::assertAllObjects($data, ResourceObject::class, EntityAccessDeniedHttpException::class));
+    assert(Inspector::assertAllObjects($data, ResourceObject::class, \Drupal\jsonapi\Exception\EntityAccessDeniedHttpException::class));
     parent::__construct($data, $cardinality);
   }
 
@@ -46,7 +46,7 @@ class ResourceObjectData extends Data implements TopLevelDataInterface {
   public function getAccessible() {
     $accessible_data = [];
     foreach ($this->data as $resource_object) {
-      if (!$resource_object instanceof EntityAccessDeniedHttpException) {
+      if (!$resource_object instanceof \Drupal\jsonapi\Exception\EntityAccessDeniedHttpException) {
         $accessible_data[] = $resource_object;
       }
     }
@@ -61,7 +61,7 @@ class ResourceObjectData extends Data implements TopLevelDataInterface {
   public function getOmissions() {
     $omitted_data = [];
     foreach ($this->data as $resource_object) {
-      if ($resource_object instanceof EntityAccessDeniedHttpException) {
+      if ($resource_object instanceof \Drupal\jsonapi\Exception\EntityAccessDeniedHttpException) {
         $omitted_data[] = $resource_object;
       }
     }

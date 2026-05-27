@@ -21,7 +21,7 @@ class BinaryFileResponseTestController {
    */
   public function download(Request $request) {
     if (!$request->query->has('relative_file_url')) {
-      throw new BadRequestHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException();
     }
 
     $relative_file_url = $request->query->get('relative_file_url');

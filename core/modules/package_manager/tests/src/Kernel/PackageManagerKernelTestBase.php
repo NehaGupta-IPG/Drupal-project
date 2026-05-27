@@ -219,7 +219,7 @@ abstract class PackageManagerKernelTestBase extends KernelTestBase {
       // If we did not get an exception, ensure we didn't expect any results.
       $this->assertValidationResultsEqual([], $expected_results);
     }
-    catch (SandboxEventException $e) {
+    catch (\Drupal\package_manager\Exception\SandboxEventException $e) {
       $this->assertNotEmpty($expected_results);
       $this->assertInstanceOf($event_class, $e->event);
       $this->assertExpectedResultsFromException($expected_results, $e);
@@ -442,7 +442,7 @@ abstract class PackageManagerKernelTestBase extends KernelTestBase {
    * @param \Drupal\package_manager\Exception\SandboxEventException $exception
    *   The exception.
    */
-  protected function assertExpectedResultsFromException(array $expected_results, SandboxEventException $exception): void {
+  protected function assertExpectedResultsFromException(array $expected_results, \Drupal\package_manager\Exception\SandboxEventException $exception): void {
     $event = $exception->event;
     $this->assertInstanceOf(SandboxValidationEvent::class, $event);
 

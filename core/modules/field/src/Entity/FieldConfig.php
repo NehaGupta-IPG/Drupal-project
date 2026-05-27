@@ -114,7 +114,7 @@ class FieldConfig extends FieldConfigBase implements FieldConfigInterface {
     // entity_type.
     if (isset($values['field_storage'])) {
       if (!$values['field_storage'] instanceof FieldStorageConfigInterface) {
-        throw new FieldException('Attempt to create a configurable field for a non-configurable field storage.');
+        throw new \Drupal\Core\Field\FieldException('Attempt to create a configurable field for a non-configurable field storage.');
       }
       $field_storage = $values['field_storage'];
       $values['field_name'] = $field_storage->getName();
@@ -125,15 +125,15 @@ class FieldConfig extends FieldConfigBase implements FieldConfigInterface {
     }
     else {
       if (empty($values['field_name'])) {
-        throw new FieldException('Attempt to create a field without a field_name.');
+        throw new \Drupal\Core\Field\FieldException('Attempt to create a field without a field_name.');
       }
       if (empty($values['entity_type'])) {
-        throw new FieldException("Attempt to create a field '{$values['field_name']}' without an entity_type.");
+        throw new \Drupal\Core\Field\FieldException("Attempt to create a field '{$values['field_name']}' without an entity_type.");
       }
     }
     // 'bundle' is required in either case.
     if (empty($values['bundle'])) {
-      throw new FieldException("Attempt to create a field '{$values['field_name']}' without a bundle.");
+      throw new \Drupal\Core\Field\FieldException("Attempt to create a field '{$values['field_name']}' without a bundle.");
     }
 
     parent::__construct($values, $entity_type);
@@ -182,13 +182,13 @@ class FieldConfig extends FieldConfigBase implements FieldConfigInterface {
     else {
       // Some updates are always disallowed.
       if ($this->entity_type != $this->getOriginal()->entity_type) {
-        throw new FieldException("Cannot change an existing field's entity_type.");
+        throw new \Drupal\Core\Field\FieldException("Cannot change an existing field's entity_type.");
       }
       if ($this->bundle != $this->getOriginal()->bundle) {
-        throw new FieldException("Cannot change an existing field's bundle.");
+        throw new \Drupal\Core\Field\FieldException("Cannot change an existing field's bundle.");
       }
       if ($storage_definition->uuid() != $this->getOriginal()->getFieldStorageDefinition()->uuid()) {
-        throw new FieldException("Cannot change an existing field's storage.");
+        throw new \Drupal\Core\Field\FieldException("Cannot change an existing field's storage.");
       }
       // Notify the entity storage.
       \Drupal::service('field_definition.listener')->onFieldDefinitionUpdate($this, $this->getOriginal());
@@ -317,10 +317,10 @@ class FieldConfig extends FieldConfigBase implements FieldConfigInterface {
       }
 
       if (!$field_storage_definition) {
-        throw new FieldException("Attempted to create, modify or delete an instance of field with name {$this->field_name} on entity type {$this->entity_type} when the field storage does not exist.");
+        throw new \Drupal\Core\Field\FieldException("Attempted to create, modify or delete an instance of field with name {$this->field_name} on entity type {$this->entity_type} when the field storage does not exist.");
       }
       if (!$field_storage_definition instanceof FieldStorageConfigInterface) {
-        throw new FieldException("Attempted to create, modify or delete a configurable field of non-configurable field storage {$this->field_name}.");
+        throw new \Drupal\Core\Field\FieldException("Attempted to create, modify or delete a configurable field of non-configurable field storage {$this->field_name}.");
       }
       $this->fieldStorage = $field_storage_definition;
     }

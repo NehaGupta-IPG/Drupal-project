@@ -184,7 +184,7 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
     $this->rollbackAction = MigrateIdMapInterface::ROLLBACK_DELETE;
     $entity = $this->getEntity($row, $old_destination_id_values);
     if (!$entity) {
-      throw new MigrateException('Unable to get entity');
+      throw new \Drupal\migrate\MigrateException('Unable to get entity');
     }
     assert($entity instanceof ContentEntityInterface);
     if ($this->isEntityValidationRequired($entity)) {
@@ -235,7 +235,7 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
     }
 
     if (count($violations) > 0) {
-      throw new EntityValidationException($violations);
+      throw new \Drupal\migrate\Exception\EntityValidationException($violations);
     }
   }
 
@@ -275,7 +275,7 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
     if ($this->isTranslationDestination()) {
       $langcode_key = $this->getKey('langcode');
       if (!$langcode_key) {
-        throw new MigrateException(sprintf('The "%s" entity type does not support translations.', $this->storage->getEntityTypeId()));
+        throw new \Drupal\migrate\MigrateException(sprintf('The "%s" entity type does not support translations.', $this->storage->getEntityTypeId()));
       }
       $ids[$langcode_key] = $this->getDefinitionFromEntity($langcode_key);
     }
@@ -341,7 +341,7 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
     $bundle_key = $this->getKey('bundle');
     if ($bundle_key && empty($row->getDestinationProperty($bundle_key))) {
       if (empty($this->bundles)) {
-        throw new MigrateException('Stubbing failed, no bundles available for entity type: ' . $this->storage->getEntityTypeId());
+        throw new \Drupal\migrate\MigrateException('Stubbing failed, no bundles available for entity type: ' . $this->storage->getEntityTypeId());
       }
       $row->setDestinationProperty($bundle_key, reset($this->bundles));
     }
@@ -363,7 +363,7 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
           $values = $field_type_class::generateSampleValue($field_definition);
           if (is_null($values)) {
             // Handle failure to generate a sample value.
-            throw new MigrateException('Stubbing failed, unable to generate value for field ' . $field_name);
+            throw new \Drupal\migrate\MigrateException('Stubbing failed, unable to generate value for field ' . $field_name);
           }
         }
 
@@ -433,7 +433,7 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
       $bundle = $this->configuration['default_bundle'];
 
       if (!isset($bundle_info[$bundle])) {
-        throw new MigrateException(sprintf("The default_bundle value '%s' is not a valid bundle for the destination entity type '%s'.", $bundle, $entity_type->id()));
+        throw new \Drupal\migrate\MigrateException(sprintf("The default_bundle value '%s' is not a valid bundle for the destination entity type '%s'.", $bundle, $entity_type->id()));
       }
     }
     elseif (count($bundle_info) === 1) {

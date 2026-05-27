@@ -52,7 +52,7 @@ class JsAssetController extends AssetControllerBase {
     [$js_assets_header, $js_assets_footer] = $this->assetResolver->getJsAssets($attached_assets, FALSE, $language);
     $scope = $request->query->get('scope');
     if (!isset($scope)) {
-      throw new BadRequestHttpException('The URL must have a scope query argument.');
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('The URL must have a scope query argument.');
     }
     $assets = $scope === 'header' ? $js_assets_header : $js_assets_footer;
     // While the asset resolver will find settings, these are never aggregated,

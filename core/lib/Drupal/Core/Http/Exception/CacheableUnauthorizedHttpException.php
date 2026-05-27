@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 /**
  * A cacheable UnauthorizedHttpException.
  */
-class CacheableUnauthorizedHttpException extends UnauthorizedHttpException implements CacheableDependencyInterface {
+class CacheableUnauthorizedHttpException extends \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException implements CacheableDependencyInterface {
 
   use CacheableDependencyTrait;
 

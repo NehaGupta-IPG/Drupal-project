@@ -41,11 +41,11 @@ class WorkspacePublisher implements WorkspacePublisherInterface {
    */
   public function publish() {
     if ($this->sourceWorkspace->hasParent()) {
-      throw new WorkspacePublishException('Only top-level workspaces can be published.');
+      throw new \Drupal\workspaces\WorkspacePublishException('Only top-level workspaces can be published.');
     }
 
     if ($this->checkConflictsOnTarget()) {
-      throw new WorkspaceConflictException();
+      throw new \Drupal\workspaces\WorkspaceConflictException();
     }
 
     $tracked_entities = $this->workspaceTracker->getTrackedEntities($this->sourceWorkspace->id());
@@ -53,7 +53,7 @@ class WorkspacePublisher implements WorkspacePublisherInterface {
     $this->eventDispatcher->dispatch($event);
 
     if ($event->isPublishingStopped()) {
-      throw new WorkspacePublishException((string) $event->getPublishingStoppedReason());
+      throw new \Drupal\workspaces\WorkspacePublishException((string) $event->getPublishingStoppedReason());
     }
 
     try {

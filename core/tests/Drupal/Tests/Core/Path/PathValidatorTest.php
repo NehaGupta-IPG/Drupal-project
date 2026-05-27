@@ -263,7 +263,7 @@ class PathValidatorTest extends UnitTestCase {
     $this->accessAwareRouter->expects($this->once())
       ->method('match')
       ->with('/test-path')
-      ->willThrowException(new AccessDeniedHttpException());
+      ->willThrowException(new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException());
     $this->pathProcessor->expects($this->once())
       ->method('processInbound')
       ->willReturnArgument(0);
@@ -292,7 +292,7 @@ class PathValidatorTest extends UnitTestCase {
     $this->accessAwareRouter->expects($this->once())
       ->method('match')
       ->with('/test-path')
-      ->willThrowException(new ResourceNotFoundException());
+      ->willThrowException(new \Symfony\Component\Routing\Exception\ResourceNotFoundException());
     $this->pathProcessor->expects($this->once())
       ->method('processInbound')
       ->willReturnArgument(0);
@@ -321,7 +321,7 @@ class PathValidatorTest extends UnitTestCase {
     $this->accessAwareRouter->expects($this->once())
       ->method('match')
       ->with('/test-path')
-      ->willThrowException(new ParamNotConvertedException());
+      ->willThrowException(new \Drupal\Core\ParamConverter\ParamNotConvertedException());
     $this->pathProcessor->expects($this->once())
       ->method('processInbound')
       ->willReturnArgument(0);
@@ -350,7 +350,7 @@ class PathValidatorTest extends UnitTestCase {
     $this->accessAwareRouter->expects($this->once())
       ->method('match')
       ->with('/test-path')
-      ->willThrowException(new MethodNotAllowedException([]));
+      ->willThrowException(new \Symfony\Component\Routing\Exception\MethodNotAllowedException([]));
     $this->pathProcessor->expects($this->once())
       ->method('processInbound')
       ->willReturnArgument(0);
@@ -376,7 +376,7 @@ class PathValidatorTest extends UnitTestCase {
     $this->accessAwareRouter->expects($this->once())
       ->method('match')
       ->with('/entity-test/1')
-      ->willThrowException(new ParamNotConvertedException());
+      ->willThrowException(new \Drupal\Core\ParamConverter\ParamNotConvertedException());
     $this->pathProcessor->expects($this->once())
       ->method('processInbound')
       ->willReturnArgument(0);
@@ -402,7 +402,7 @@ class PathValidatorTest extends UnitTestCase {
     $this->accessAwareRouter->expects($this->once())
       ->method('match')
       ->with('/not-existing-path')
-      ->willThrowException(new ResourceNotFoundException());
+      ->willThrowException(new \Symfony\Component\Routing\Exception\ResourceNotFoundException());
     $this->pathProcessor->expects($this->once())
       ->method('processInbound')
       ->willReturnArgument(0);
@@ -495,7 +495,7 @@ class PathValidatorTest extends UnitTestCase {
     $this->accessAwareRouter->expects($this->once())
       ->method('match')
       ->with('/test-path')
-      ->willThrowException(new AccessDeniedHttpException());
+      ->willThrowException(new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException());
 
     $this->pathProcessor->expects($this->once())
       ->method('processInbound')

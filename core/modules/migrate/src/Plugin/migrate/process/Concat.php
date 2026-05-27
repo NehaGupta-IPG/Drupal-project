@@ -67,7 +67,7 @@ class Concat extends ProcessPluginBase {
       return implode($delimiter, $value);
     }
     else {
-      throw new MigrateException(sprintf('%s is not an array', var_export($value, TRUE)));
+      throw new \Drupal\migrate\MigrateException(sprintf('%s is not an array', var_export($value, TRUE)));
     }
   }
 

@@ -93,7 +93,7 @@ class StageOwnershipTest extends PackageManagerKernelTestBase {
         $stage->create();
         $this->fail("Able to create a stage that already exists.");
       }
-      catch (SandboxException $exception) {
+      catch (\Drupal\package_manager\Exception\SandboxException $exception) {
         $this->assertSame('Cannot create a new stage because one already exists.', $exception->getMessage());
       }
     }
@@ -101,7 +101,7 @@ class StageOwnershipTest extends PackageManagerKernelTestBase {
     try {
       $never_create->claim($stage_id);
     }
-    catch (SandboxOwnershipException $exception) {
+    catch (\Drupal\package_manager\Exception\SandboxOwnershipException $exception) {
       $this->assertSame('Cannot claim the stage because it is not owned by the current user or session.', $exception->getMessage());
     }
 
@@ -168,7 +168,7 @@ class StageOwnershipTest extends PackageManagerKernelTestBase {
       $creator_stage->claim('any-id-would-fail');
       $this->fail('Was able to claim a stage that has not been created.');
     }
-    catch (SandboxException $exception) {
+    catch (\Drupal\package_manager\Exception\SandboxException $exception) {
       $this->assertSame('Cannot claim the stage because no stage has been created.', $exception->getMessage());
     }
     TestSubscriber::setException(NULL, PreCreateEvent::class);
@@ -180,7 +180,7 @@ class StageOwnershipTest extends PackageManagerKernelTestBase {
       $this->createStage()->claim('not-correct-id');
       $this->fail('Was able to claim an owned stage with an incorrect ID.');
     }
-    catch (SandboxOwnershipException $exception) {
+    catch (\Drupal\package_manager\Exception\SandboxOwnershipException $exception) {
       $this->assertSame('Cannot claim the stage because the current lock does not match the stored lock.', $exception->getMessage());
     }
 
@@ -204,7 +204,7 @@ class StageOwnershipTest extends PackageManagerKernelTestBase {
       $this->createStage()->claim($stage_id);
       $this->fail('Was able to claim an owned stage after it was destroyed.');
     }
-    catch (SandboxException $exception) {
+    catch (\Drupal\package_manager\Exception\SandboxException $exception) {
       $this->assertSame('This operation was already canceled.', $exception->getMessage());
     }
 
@@ -218,7 +218,7 @@ class StageOwnershipTest extends PackageManagerKernelTestBase {
     try {
       $this->createStage()->claim($new_stage_id);
     }
-    catch (SandboxOwnershipException $exception) {
+    catch (\Drupal\package_manager\Exception\SandboxOwnershipException $exception) {
       $this->assertSame('Cannot claim the stage because it is not owned by the current user or session.', $exception->getMessage());
     }
   }

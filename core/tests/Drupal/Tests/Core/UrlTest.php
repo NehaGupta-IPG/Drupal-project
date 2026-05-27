@@ -330,9 +330,9 @@ class UrlTest extends UnitTestCase {
     $this->router->expects($this->once())
       ->method('matchRequest')
       ->with($request)
-      ->will($this->throwException(new ResourceNotFoundException()));
+      ->will($this->throwException(new \Symfony\Component\Routing\Exception\ResourceNotFoundException()));
 
-    $this->expectException(ResourceNotFoundException::class);
+    $this->expectException(\Symfony\Component\Routing\Exception\ResourceNotFoundException::class);
     Url::createFromRequest($request);
   }
 
@@ -654,9 +654,9 @@ class UrlTest extends UnitTestCase {
     $this->urlGenerator->expects($this->once())
       ->method('generateFromRoute')
       ->with('entity.test_entity.canonical', ['test_entity' => '1/blah'])
-      ->willThrowException(new InvalidParameterException('Parameter "test_entity" for route "/test_entity/{test_entity}" must match "[^/]++" ("1/blah" given) to generate a corresponding URL..'));
+      ->willThrowException(new \Symfony\Component\Routing\Exception\InvalidParameterException('Parameter "test_entity" for route "/test_entity/{test_entity}" must match "[^/]++" ("1/blah" given) to generate a corresponding URL..'));
 
-    $this->expectException(InvalidParameterException::class);
+    $this->expectException(\Symfony\Component\Routing\Exception\InvalidParameterException::class);
     Url::fromUri('entity:test_entity/1/blah')->toString();
   }
 

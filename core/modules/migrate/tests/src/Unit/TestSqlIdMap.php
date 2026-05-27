@@ -75,7 +75,7 @@ class TestSqlIdMap extends Sql implements \Iterator {
         ];
 
       default:
-        throw new MigrateException($id_definition['type'] . ' not supported');
+        throw new \Drupal\migrate\MigrateException($id_definition['type'] . ' not supported');
     }
   }
 

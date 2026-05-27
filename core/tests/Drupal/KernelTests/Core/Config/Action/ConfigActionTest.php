@@ -51,7 +51,7 @@ class ConfigActionTest extends KernelTestBase {
       $manager->applyAction('entity_create:create', 'config_test.dynamic.action_test', ['label' => 'Action test']);
       $this->fail('Expected exception not thrown');
     }
-    catch (ConfigActionException $e) {
+    catch (\Drupal\Core\Config\Action\ConfigActionException $e) {
       $this->assertSame('Entity config_test.dynamic.action_test exists', $e->getMessage());
     }
   }
@@ -167,7 +167,7 @@ class ConfigActionTest extends KernelTestBase {
       $manager->applyAction('entity_method:config_test.dynamic:setProtectedProperty', 'config_test.dynamic.dotted.default', 'Test value');
       $this->fail('Expected exception not thrown');
     }
-    catch (ConfigActionException $e) {
+    catch (\Drupal\Core\Config\Action\ConfigActionException $e) {
       $this->assertSame('Entity config_test.dynamic.dotted.default does not exist', $e->getMessage());
     }
 
@@ -181,7 +181,7 @@ class ConfigActionTest extends KernelTestBase {
       $manager->applyAction('entity_method:config_test.dynamic:setProtectedProperty', '?config_test.dynamic.*.default', 'Test value');
       $this->fail('Expected exception not thrown');
     }
-    catch (ConfigActionException $e) {
+    catch (\Drupal\Core\Config\Action\ConfigActionException $e) {
       $this->assertSame("The '?config_test.dynamic.*.default' configuration name is optional because it starts with a question mark, and therefore cannot contain wildcards.", $e->getMessage());
     }
 
@@ -258,7 +258,7 @@ class ConfigActionTest extends KernelTestBase {
     $this->installConfig('config_test');
     /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */
     $manager = $this->container->get('plugin.manager.config_action');
-    $this->expectException(EntityMethodException::class);
+    $this->expectException(\Drupal\Core\Config\Action\EntityMethodException::class);
     $this->expectExceptionMessage('The pluralized entity method config action \'entity_method:config_test.dynamic:addToArrayMultipleTimes\' requires an array value in order to call Drupal\config_test\Entity\ConfigTest::addToArray() multiple times');
     $manager->applyAction('entity_method:config_test.dynamic:addToArrayMultipleTimes', 'config_test.dynamic.dotted.default', 'Test value');
   }
@@ -274,7 +274,7 @@ class ConfigActionTest extends KernelTestBase {
     $this->installConfig('config_test');
     /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */
     $manager = $this->container->get('plugin.manager.config_action');
-    $this->expectException(EntityMethodException::class);
+    $this->expectException(\Drupal\Core\Config\Action\EntityMethodException::class);
     $this->expectExceptionMessage('Duplicate action can not be created for ID \'config_test.dynamic:testMethod\' for Drupal\config_test\ConfigActionErrorEntity\DuplicatePluralizedMethodName::testMethod(). The existing action is for the ::testMethod() method');
     $manager->getDefinitions();
   }
@@ -290,7 +290,7 @@ class ConfigActionTest extends KernelTestBase {
     $this->installConfig('config_test');
     /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */
     $manager = $this->container->get('plugin.manager.config_action');
-    $this->expectException(EntityMethodException::class);
+    $this->expectException(\Drupal\Core\Config\Action\EntityMethodException::class);
     $this->expectExceptionMessage('Duplicate action can not be created for ID \'config_test.dynamic:testMethod2\' for Drupal\config_test\ConfigActionErrorEntity\DuplicatePluralizedOtherMethodName::testMethod2(). The existing action is for the ::testMethod() method');
     $manager->getDefinitions();
   }
@@ -304,7 +304,7 @@ class ConfigActionTest extends KernelTestBase {
     $this->installConfig('config_test');
     /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */
     $manager = $this->container->get('plugin.manager.config_action');
-    $this->expectException(EntityMethodException::class);
+    $this->expectException(\Drupal\Core\Config\Action\EntityMethodException::class);
     $this->expectExceptionMessage('Entity method config action \'entity_method:config_test.dynamic:concatProtectedProperty\' requires an array value. The number of parameters or required parameters for Drupal\config_test\Entity\ConfigTest::concatProtectedProperty() is not 1');
     $manager->applyAction('entity_method:config_test.dynamic:concatProtectedProperty', 'config_test.dynamic.dotted.default', 'Test value');
   }
@@ -328,7 +328,7 @@ class ConfigActionTest extends KernelTestBase {
       $manager->applyAction('simpleConfigUpdate', 'config_test.system', 'Test');
       $this->fail('Expected exception not thrown');
     }
-    catch (ConfigActionException $e) {
+    catch (\Drupal\Core\Config\Action\ConfigActionException $e) {
       $this->assertSame('Config config_test.system can not be updated because $value is not an array', $e->getMessage());
     }
 
@@ -337,7 +337,7 @@ class ConfigActionTest extends KernelTestBase {
       $manager->applyAction('simpleConfigUpdate', 'config_test.system', ['foo' => 'Yay!']);
       $this->fail('Expected exception not thrown');
     }
-    catch (ConfigActionException $e) {
+    catch (\Drupal\Core\Config\Action\ConfigActionException $e) {
       $this->assertSame('Config config_test.system does not exist so can not be updated', $e->getMessage());
     }
   }
@@ -382,7 +382,7 @@ class ConfigActionTest extends KernelTestBase {
     $this->enableModules(['config_action_duplicate_test']);
     /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */
     $manager = $this->container->get('plugin.manager.config_action');
-    $this->expectException(DuplicateConfigActionIdException::class);
+    $this->expectException(\Drupal\Core\Config\Action\DuplicateConfigActionIdException::class);
     $this->expectExceptionMessage("The plugins 'entity_method:config_test.dynamic:setProtectedProperty' and 'config_action_duplicate_test:config_test.dynamic:setProtectedProperty' both resolve to the same shorthand action ID for the 'config_test' entity type");
     $manager->applyAction(
       'createIfNotExists',
@@ -409,7 +409,7 @@ class ConfigActionTest extends KernelTestBase {
    * @see \Drupal\Core\Config\Action\ConfigActionManager
    */
   public function testMissingAction(): void {
-    $this->expectException(PluginNotFoundException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\PluginNotFoundException::class);
     $this->expectExceptionMessageMatches('/^The "does_not_exist" plugin does not exist/');
     $this->container->get('plugin.manager.config_action')->applyAction('does_not_exist', 'config_test.system', ['foo' => 'Yay!']);
   }

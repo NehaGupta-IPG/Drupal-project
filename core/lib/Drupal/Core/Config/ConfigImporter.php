@@ -595,7 +595,7 @@ class ConfigImporter {
 
     if (!$this->lock->acquire(static::LOCK_NAME)) {
       // Another process is synchronizing configuration.
-      throw new ConfigImporterException(sprintf('%s is already importing', static::LOCK_NAME));
+      throw new \Drupal\Core\Config\ConfigImporterException(sprintf('%s is already importing', static::LOCK_NAME));
     }
 
     $sync_steps = [];
@@ -844,7 +844,7 @@ class ConfigImporter {
       $this->eventDispatcher->dispatch(new ConfigImporterEvent($this), ConfigEvents::IMPORT_VALIDATE);
       if (count($this->getErrors())) {
         $errors = array_merge(['There were errors validating the config synchronization.'], $this->getErrors());
-        throw new ConfigImporterException(implode(PHP_EOL, $errors));
+        throw new \Drupal\Core\Config\ConfigImporterException(implode(PHP_EOL, $errors));
       }
       else {
         $this->validated = TRUE;
@@ -1094,7 +1094,7 @@ class ConfigImporter {
       // Call to the configuration entity's storage to handle the configuration
       // change.
       if (!($entity_storage instanceof ImportableEntityStorageInterface)) {
-        throw new EntityStorageException(sprintf('The entity storage "%s" for the "%s" entity type does not support imports', get_class($entity_storage), $entity_type));
+        throw new \Drupal\Core\Entity\EntityStorageException(sprintf('The entity storage "%s" for the "%s" entity type does not support imports', get_class($entity_storage), $entity_type));
       }
       $entity_storage->$method($name, $new_config, $old_config);
       $this->setProcessedConfiguration($collection, $op, $name);
@@ -1140,7 +1140,7 @@ class ConfigImporter {
     // Call to the configuration entity's storage to handle the configuration
     // change.
     if (!($entity_storage instanceof ImportableEntityStorageInterface)) {
-      throw new EntityStorageException(sprintf("The entity storage '%s' for the '%s' entity type does not support imports", get_class($entity_storage), $entity_type_id));
+      throw new \Drupal\Core\Entity\EntityStorageException(sprintf("The entity storage '%s' for the '%s' entity type does not support imports", get_class($entity_storage), $entity_type_id));
     }
     $entity_storage->importRename($names['old_name'], $new_config, $old_config);
     $this->setProcessedConfiguration($collection, 'rename', $rename_name);

@@ -73,7 +73,7 @@ class InaccessibleMenuLink extends MenuLinkBase {
    * {@inheritdoc}
    */
   public function updateLink(array $new_definition_values, $persist) {
-    throw new PluginException('Inaccessible menu link plugins do not support updating');
+    throw new \Drupal\Component\Plugin\Exception\PluginException('Inaccessible menu link plugins do not support updating');
   }
 
 }

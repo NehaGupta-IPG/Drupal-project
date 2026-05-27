@@ -155,7 +155,7 @@ class LibraryDiscoveryParser {
 
     foreach ($libraries as $id => &$library) {
       if (!isset($library['js']) && !isset($library['css']) && !isset($library['drupalSettings']) && !isset($library['dependencies'])) {
-        throw new IncompleteLibraryDefinitionException(sprintf("Incomplete library definition for definition '%s' in extension '%s'", $id, $extension));
+        throw new \Drupal\Core\Asset\Exception\IncompleteLibraryDefinitionException(sprintf("Incomplete library definition for definition '%s' in extension '%s'", $id, $extension));
       }
       $library += ['dependencies' => [], 'js' => [], 'css' => [], 'fonts' => []];
 
@@ -176,7 +176,7 @@ class LibraryDiscoveryParser {
 
       // If this is a 3rd party library, the license info is required.
       if (isset($library['remote']) && !isset($library['license'])) {
-        throw new LibraryDefinitionMissingLicenseException(sprintf("Missing license information in library definition for definition '%s' extension '%s': it has a remote, but no license.", $id, $extension));
+        throw new \Drupal\Core\Asset\Exception\LibraryDefinitionMissingLicenseException(sprintf("Missing license information in library definition for definition '%s' extension '%s': it has a remote, but no license.", $id, $extension));
       }
 
       // Assign Drupal's license to libraries that don't have license info.
@@ -395,9 +395,9 @@ class LibraryDiscoveryParser {
           $libraries = Yaml::decode(file_get_contents($this->root . '/' . $library_file)) ?? [];
           $this->fileCache->set($library_path, $libraries);
         }
-        catch (InvalidDataTypeException $e) {
+        catch (\Drupal\Component\Serialization\Exception\InvalidDataTypeException $e) {
           // Rethrow a more helpful exception to provide context.
-          throw new InvalidLibraryFileException(sprintf('Invalid library definition in %s: %s', $library_file, $e->getMessage()), 0, $e);
+          throw new \Drupal\Core\Asset\Exception\InvalidLibraryFileException(sprintf('Invalid library definition in %s: %s', $library_file, $e->getMessage()), 0, $e);
         }
       }
     }
@@ -555,11 +555,11 @@ class LibraryDiscoveryParser {
             foreach ($override_definition as $sub_key => $value) {
               // Throw an exception if the asset is not properly specified.
               if (!is_array($value)) {
-                throw new InvalidLibrariesOverrideSpecificationException(sprintf('Library asset %s is not correctly specified. It should be in the form "extension/library_name/sub_key/path/to/asset.js".', "$extension/$library_name/$sub_key"));
+                throw new \Drupal\Core\Asset\Exception\InvalidLibrariesOverrideSpecificationException(sprintf('Library asset %s is not correctly specified. It should be in the form "extension/library_name/sub_key/path/to/asset.js".', "$extension/$library_name/$sub_key"));
               }
               if ($sub_key === 'drupalSettings') {
                 // drupalSettings may not be overridden.
-                throw new InvalidLibrariesOverrideSpecificationException(sprintf('drupalSettings may not be overridden in libraries-override. Trying to override %s. Use hook_library_info_alter() instead.', "$extension/$library_name/$sub_key"));
+                throw new \Drupal\Core\Asset\Exception\InvalidLibrariesOverrideSpecificationException(sprintf('drupalSettings may not be overridden in libraries-override. Trying to override %s. Use hook_library_info_alter() instead.', "$extension/$library_name/$sub_key"));
               }
               elseif ($sub_key === 'css') {
                 // SMACSS category should be incorporated into the asset name.

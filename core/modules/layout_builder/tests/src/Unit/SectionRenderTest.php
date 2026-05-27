@@ -300,7 +300,7 @@ class SectionRenderTest extends UnitTestCase {
    * Tests to render array missing plugin id.
    */
   public function testToRenderArrayMissingPluginId(): void {
-    $this->expectException(PluginException::class);
+    $this->expectException(\Drupal\Component\Plugin\Exception\PluginException::class);
     $this->expectExceptionMessage('No plugin ID specified for component with "some_uuid" UUID');
     (new Section('layout_onecol', [], [new SectionComponent('some_uuid', 'content')]))->toRenderArray();
   }

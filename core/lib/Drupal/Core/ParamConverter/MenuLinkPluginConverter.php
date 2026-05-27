@@ -36,7 +36,7 @@ class MenuLinkPluginConverter implements ParamConverterInterface {
       try {
         return $this->menuLinkManager->createInstance($value);
       }
-      catch (PluginException) {
+      catch (\Drupal\Component\Plugin\Exception\PluginException) {
         // Suppress the error.
       }
     }

@@ -105,7 +105,7 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
     // All link templates must have a leading slash.
     foreach ((array) $definition->getLinkTemplates() as $link_relation_name => $link_template) {
       if ($link_template[0] != '/') {
-        throw new InvalidLinkTemplateException("Link template '$link_relation_name' for entity type '$plugin_id' must start with a leading slash, the current link template is '$link_template'");
+        throw new \Drupal\Core\Entity\Exception\InvalidLinkTemplateException("Link template '$link_relation_name' for entity type '$plugin_id' must start with a leading slash, the current link template is '$link_template'");
       }
     }
   }
@@ -168,7 +168,7 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
       return NULL;
     }
 
-    throw new PluginNotFoundException($entity_type_id, sprintf('The "%s" entity type does not exist.', $entity_type_id));
+    throw new \Drupal\Component\Plugin\Exception\PluginNotFoundException($entity_type_id, sprintf('The "%s" entity type does not exist.', $entity_type_id));
   }
 
   /**
@@ -238,14 +238,14 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
     if (!$class = $this->getDefinition($entity_type_id, TRUE)->getFormClass($operation)) {
       $handlers = $this->getDefinition($entity_type_id, TRUE)->getHandlerClasses();
       if (!isset($handlers['form'][$operation])) {
-        throw new InvalidPluginDefinitionException($entity_type_id, sprintf('The "%s" entity type did not specify a "%s" form class.', $entity_type_id, $operation));
+        throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($entity_type_id, sprintf('The "%s" entity type did not specify a "%s" form class.', $entity_type_id, $operation));
       }
-      throw new InvalidPluginDefinitionException($entity_type_id, sprintf('The "%s" form handler of the "%s" entity type specifies a non-existent class "%s".', $operation, $entity_type_id, $handlers['form'][$operation]));
+      throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($entity_type_id, sprintf('The "%s" form handler of the "%s" entity type specifies a non-existent class "%s".', $operation, $entity_type_id, $handlers['form'][$operation]));
     }
 
     $form_object = $this->classResolver->getInstanceFromDefinition($class);
     if (!$form_object instanceof EntityFormInterface) {
-      throw new InvalidPluginDefinitionException($entity_type_id, sprintf('The "%s" form handler of the "%s" entity type specifies a class "%s" that does not extend "%s".', $operation, $entity_type_id, $class, EntityFormInterface::class));
+      throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($entity_type_id, sprintf('The "%s" form handler of the "%s" entity type specifies a class "%s" that does not extend "%s".', $operation, $entity_type_id, $class, EntityFormInterface::class));
     }
 
     return $form_object
@@ -294,9 +294,9 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
       if (!$class) {
         $handlers = $definition->getHandlerClasses();
         if (!isset($handlers[$handler_type])) {
-          throw new InvalidPluginDefinitionException($entity_type_id, sprintf('The "%s" entity type did not specify a %s handler.', $entity_type_id, $handler_type));
+          throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($entity_type_id, sprintf('The "%s" entity type did not specify a %s handler.', $entity_type_id, $handler_type));
         }
-        throw new InvalidPluginDefinitionException($entity_type_id, sprintf('The %s handler of the "%s" entity type specifies a non-existent class "%s".', $handler_type, $entity_type_id, $handlers[$handler_type]));
+        throw new \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException($entity_type_id, sprintf('The %s handler of the "%s" entity type specifies a non-existent class "%s".', $handler_type, $entity_type_id, $handlers[$handler_type]));
       }
       $this->handlers[$handler_type][$entity_type_id] = $this->createHandlerInstance($class, $definition);
     }

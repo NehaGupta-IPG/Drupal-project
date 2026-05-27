@@ -156,7 +156,7 @@ END;
 
     // When there is no stored data, we should get an exception.
     $this->keyValue->delete('oembed_providers');
-    $this->expectException(ProviderException::class);
+    $this->expectException(\Drupal\media\OEmbed\ProviderException::class);
     $this->repository->get('YouTube');
   }
 
@@ -198,7 +198,7 @@ END;
 
     // When there is no stored data, we should get an exception.
     $this->keyValue->delete('oembed_providers');
-    $this->expectException(ProviderException::class);
+    $this->expectException(\Drupal\media\OEmbed\ProviderException::class);
     $this->repository->get('YouTube');
   }
 

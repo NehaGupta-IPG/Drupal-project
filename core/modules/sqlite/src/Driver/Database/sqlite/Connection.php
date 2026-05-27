@@ -112,7 +112,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     }
     catch (\PDOException $e) {
       if ($e->getCode() == static::DATABASE_NOT_FOUND) {
-        throw new DatabaseNotFoundException($e->getMessage(), $e->getCode(), $e);
+        throw new \Drupal\Core\Database\DatabaseNotFoundException($e->getMessage(), $e->getCode(), $e);
       }
       // SQLite doesn't have a distinct error code for access denied, so don't
       // deal with that case.
@@ -406,7 +406,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // Verify the database is writable.
     $db_directory = new \SplFileInfo(dirname($database));
     if (!$db_directory->isDir() && !\Drupal::service('file_system')->mkdir($db_directory->getPathName(), 0755, TRUE)) {
-      throw new DatabaseNotFoundException('Unable to create database directory ' . $db_directory->getPathName());
+      throw new \Drupal\Core\Database\DatabaseNotFoundException('Unable to create database directory ' . $db_directory->getPathName());
     }
   }
 

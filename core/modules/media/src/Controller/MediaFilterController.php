@@ -57,7 +57,7 @@ class MediaFilterController extends ControllerBase {
     $text = $request->query->get('text');
     $uuid = $request->query->get('uuid');
     if ($text == '' || $uuid == '') {
-      throw new NotFoundHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
 
     $build = [
@@ -113,7 +113,7 @@ class MediaFilterController extends ControllerBase {
     $header = 'X-Drupal-MediaPreview-CSRF-Token';
 
     if (!$request->headers->has($header)) {
-      throw new AccessDeniedHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
     }
     if ($account->isAnonymous()) {
       // For anonymous users, just the presence of the custom header is
@@ -123,7 +123,7 @@ class MediaFilterController extends ControllerBase {
     // For authenticated users, validate the token value.
     $token = $request->headers->get($header);
     if (!$csrf_token->validate($token, $header)) {
-      throw new AccessDeniedHttpException();
+      throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
     }
   }
 

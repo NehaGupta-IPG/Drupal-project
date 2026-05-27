@@ -122,7 +122,7 @@ class DateTimeNormalizer extends NormalizerBase implements DenormalizerInterface
     }
 
     $formats = implode(', ', $format_strings);
-    throw new UnexpectedValueException(sprintf('The specified date "%s" is not in an accepted format: %s.', $data, $formats));
+    throw new \Symfony\Component\Serializer\Exception\UnexpectedValueException(sprintf('The specified date "%s" is not in an accepted format: %s.', $data, $formats));
   }
 
   /**

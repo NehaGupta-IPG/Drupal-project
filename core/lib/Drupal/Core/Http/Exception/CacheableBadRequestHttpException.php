@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 /**
  * A cacheable BadRequestHttpException.
  */
-class CacheableBadRequestHttpException extends BadRequestHttpException implements CacheableDependencyInterface {
+class CacheableBadRequestHttpException extends \Symfony\Component\HttpKernel\Exception\BadRequestHttpException implements CacheableDependencyInterface {
 
   use CacheableDependencyTrait;
 

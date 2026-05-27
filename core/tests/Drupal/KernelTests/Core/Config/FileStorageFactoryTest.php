@@ -42,7 +42,7 @@ class FileStorageFactoryTest extends KernelTestBase {
     new Settings($settings);
 
     // On an empty settings there is an exception thrown.
-    $this->expectException(ConfigDirectoryNotDefinedException::class);
+    $this->expectException(\Drupal\Core\Config\ConfigDirectoryNotDefinedException::class);
     $this->expectExceptionMessage('The config sync directory is not defined in $settings["config_sync_directory"]');
     FileStorageFactory::getSync();
   }

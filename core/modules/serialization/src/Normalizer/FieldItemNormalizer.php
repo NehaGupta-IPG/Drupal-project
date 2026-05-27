@@ -19,11 +19,11 @@ class FieldItemNormalizer extends ComplexDataNormalizer implements DenormalizerI
    */
   public function denormalize($data, $class, $format = NULL, array $context = []): mixed {
     if (!isset($context['target_instance'])) {
-      throw new InvalidArgumentException('$context[\'target_instance\'] must be set to denormalize with the FieldItemNormalizer');
+      throw new \Symfony\Component\Serializer\Exception\InvalidArgumentException('$context[\'target_instance\'] must be set to denormalize with the FieldItemNormalizer');
     }
 
     if ($context['target_instance']->getParent() == NULL) {
-      throw new InvalidArgumentException('The field item passed in via $context[\'target_instance\'] must have a parent set.');
+      throw new \Symfony\Component\Serializer\Exception\InvalidArgumentException('The field item passed in via $context[\'target_instance\'] must have a parent set.');
     }
 
     /** @var \Drupal\Core\Field\FieldItemInterface $field_item */

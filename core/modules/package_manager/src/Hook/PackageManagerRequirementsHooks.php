@@ -148,7 +148,7 @@ class PackageManagerRequirementsHooks {
       try {
         \Drupal::service($service_id)->assertNotExists(NULL);
       }
-      catch (FailureMarkerExistsException $exception) {
+      catch (\Drupal\package_manager\Exception\FailureMarkerExistsException $exception) {
         $requirements['package_manager_failure_marker'] = [
           'title' => $this->t('Failed Package Manager update detected'),
           'description' => $exception->getMessage(),

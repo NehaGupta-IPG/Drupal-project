@@ -122,7 +122,7 @@ class PathValidator implements PathValidatorInterface {
     try {
       $request = Request::create('/' . $path);
     }
-    catch (BadRequestException) {
+    catch (\Symfony\Component\HttpFoundation\Exception\BadRequestException) {
       return FALSE;
     }
     $attributes = $this->getPathAttributes($path, $request, $access_check);
@@ -166,19 +166,19 @@ class PathValidator implements PathValidatorInterface {
       $router->setContext((new RequestContext())->fromRequest($request));
       $result = $router->match($path);
     }
-    catch (ResourceNotFoundException) {
+    catch (\Symfony\Component\Routing\Exception\ResourceNotFoundException) {
       $result = FALSE;
     }
-    catch (ParamNotConvertedException) {
+    catch (\Drupal\Core\ParamConverter\ParamNotConvertedException) {
       $result = FALSE;
     }
-    catch (AccessDeniedHttpException) {
+    catch (\Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException) {
       $result = FALSE;
     }
-    catch (MethodNotAllowedException) {
+    catch (\Symfony\Component\Routing\Exception\MethodNotAllowedException) {
       $result = FALSE;
     }
-    catch (BadRequestException) {
+    catch (\Symfony\Component\HttpFoundation\Exception\BadRequestException) {
       $result = FALSE;
     }
 

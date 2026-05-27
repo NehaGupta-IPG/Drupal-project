@@ -76,11 +76,11 @@ class InfoParserUnitTest extends UnitTestCase {
     try {
       $this->infoParser->parse(vfsStream::url("modules/fixtures/broken.info.txt"));
     }
-    catch (InfoParserException $exception) {
+    catch (\Drupal\Core\Extension\InfoParserException $exception) {
       $this->assertSame("$expected_exception_message vfs://modules/fixtures/broken.info.txt", $exception->getMessage());
     }
 
-    $this->expectException(InfoParserException::class);
+    $this->expectException(\Drupal\Core\Extension\InfoParserException::class);
     $this->expectExceptionMessage("$expected_exception_message vfs://modules/fixtures/broken-duplicate.info.txt");
     $this->infoParser->parse(vfsStream::url("modules/fixtures/broken-duplicate.info.txt"));
   }
@@ -405,7 +405,7 @@ UNPARSABLE_CORE_VERSION_REQUIREMENT;
         'unparsable_core_version_requirement.info.txt' => $unparsable_core_version_requirement,
       ],
     ]);
-    $this->expectException(InfoParserException::class);
+    $this->expectException(\Drupal\Core\Extension\InfoParserException::class);
     $this->expectExceptionMessage("The 'core_version_requirement' constraint (not-this-version) is not a valid value in vfs://modules/fixtures/unparsable_core_version_requirement.info.txt");
     $this->infoParser->parse(vfsStream::url('modules/fixtures/unparsable_core_version_requirement.info.txt'));
   }
@@ -547,7 +547,7 @@ INFO;
     ]);
     $path = vfsStream::url("modules/fixtures/$filename");
     if ($exception_message) {
-      $this->expectException(InfoParserException::class);
+      $this->expectException(\Drupal\Core\Extension\InfoParserException::class);
       $this->expectExceptionMessage(sprintf($exception_message, $path));
     }
     $info_values = $this->infoParser->parse($path);

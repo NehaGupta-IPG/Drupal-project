@@ -91,7 +91,7 @@ class StageLoggedOnErrorTest extends PackageManagerKernelTestBase {
       $stage->postApply();
       $this->fail('Expected an exception to be thrown, but none was.');
     }
-    catch (SandboxEventException $e) {
+    catch (\Drupal\package_manager\Exception\SandboxEventException $e) {
       $this->assertInstanceOf($event_class, $e->event);
 
       $predicate = function (array $record) use ($e): bool {

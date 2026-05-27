@@ -39,7 +39,7 @@ class NullCoalesce extends ProcessPluginBase {
    */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
     if (!is_array($value)) {
-      throw new MigrateException("The input value should be an array.");
+      throw new \Drupal\migrate\MigrateException("The input value should be an array.");
     }
     foreach ($value as $val) {
       if (NULL !== $val) {

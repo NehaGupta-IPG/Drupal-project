@@ -125,12 +125,12 @@ class Download extends FileProcessBase implements ContainerFactoryPluginInterfac
       // If fopen didn't work, make sure there's a writable directory in place.
       $dir = $this->fileSystem->dirname($final_destination);
       if (!$this->fileSystem->prepareDirectory($dir, FileSystemInterface:: CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS)) {
-        throw new MigrateException("Could not create or write to directory '$dir'");
+        throw new \Drupal\migrate\MigrateException("Could not create or write to directory '$dir'");
       }
       // Let's try that fopen again.
       $destination_stream = @fopen($final_destination, 'w');
       if (!$destination_stream) {
-        throw new MigrateException("Could not write to file '$final_destination'");
+        throw new \Drupal\migrate\MigrateException("Could not write to file '$final_destination'");
       }
     }
 
@@ -148,7 +148,7 @@ class Download extends FileProcessBase implements ContainerFactoryPluginInterfac
       // failed.
       $this->fileSystem->delete($final_destination);
 
-      throw new MigrateException("{$e->getMessage()} ($source)");
+      throw new \Drupal\migrate\MigrateException("{$e->getMessage()} ($source)");
     }
 
     if (is_resource($destination_stream)) {

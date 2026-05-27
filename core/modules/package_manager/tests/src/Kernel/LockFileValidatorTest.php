@@ -172,7 +172,7 @@ class LockFileValidatorTest extends PackageManagerKernelTestBase {
       $stage->require(['drupal/core:9.8.1']);
       $stage->apply();
     }
-    catch (SandboxException $e) {
+    catch (\Drupal\package_manager\Exception\SandboxException $e) {
       $this->assertSame(\LogicException::class, $e->getPrevious()::class);
       $this->assertSame('Stored hash key deleted.', $e->getMessage());
     }

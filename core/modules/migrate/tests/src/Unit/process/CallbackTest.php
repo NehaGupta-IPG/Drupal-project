@@ -111,7 +111,7 @@ class CallbackTest extends MigrateProcessTestCase {
       'array required' => [
         'message' => "When 'unpack_source' is set, the source must be an array. Instead it was of type 'string'",
         'configuration' => ['callable' => 'count', 'unpack_source' => TRUE],
-        'class' => MigrateException::class,
+        'class' => \Drupal\migrate\MigrateException::class,
         'args' => 'This string is not an array.',
       ],
     ];

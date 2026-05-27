@@ -110,7 +110,7 @@ class IncludeResolver {
 
         if ($resource_object instanceof LabelOnlyResourceObject) {
           $message = "The current user is not allowed to view this relationship.";
-          $exception = new EntityAccessDeniedHttpException($resource_object->getEntity(), AccessResult::forbidden("The user only has authorization for the 'view label' operation."), '', $message, $public_field_name);
+          $exception = new \Drupal\jsonapi\Exception\EntityAccessDeniedHttpException($resource_object->getEntity(), AccessResult::forbidden("The user only has authorization for the 'view label' operation."), '', $message, $public_field_name);
           $includes = IncludedData::merge($includes, new IncludedData([$exception]));
           continue;
         }
@@ -133,7 +133,7 @@ class IncludeResolver {
         $field_access = $field_list->access('view', NULL, TRUE);
         if (!$field_access->isAllowed()) {
           $message = 'The current user is not allowed to view this relationship.';
-          $exception = new EntityAccessDeniedHttpException($field_list->getEntity(), $field_access, '', $message, $public_field_name);
+          $exception = new \Drupal\jsonapi\Exception\EntityAccessDeniedHttpException($field_list->getEntity(), $field_access, '', $message, $public_field_name);
           $includes = IncludedData::merge($includes, new IncludedData([$exception]));
           continue;
         }

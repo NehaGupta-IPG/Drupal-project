@@ -7,7 +7,7 @@ use Drupal\Core\StringTranslation\TranslationInterface;
 /**
  * Exception thrown if no installation profiles are available.
  */
-class NoProfilesException extends InstallerException {
+class NoProfilesException extends \Drupal\Core\Installer\Exception\InstallerException {
 
   /**
    * Constructs a new "no profiles available" exception.

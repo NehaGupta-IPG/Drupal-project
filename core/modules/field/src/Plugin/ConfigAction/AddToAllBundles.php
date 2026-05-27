@@ -73,10 +73,10 @@ final class AddToAllBundles implements ConfigActionPluginInterface, ContainerFac
         if (empty($value['fail_if_exists'])) {
           continue;
         }
-        throw new ConfigActionException(sprintf('Field %s already exists.', $id));
+        throw new \Drupal\Core\Config\Action\ConfigActionException(sprintf('Field %s already exists.', $id));
       }
       $storage->create([
-        'label' => $value['label'] ?? throw new ConfigActionException(sprintf('The `label` property must be set for %s.', $id)),
+        'label' => $value['label'] ?? throw new \Drupal\Core\Config\Action\ConfigActionException(sprintf('The `label` property must be set for %s.', $id)),
         'bundle' => $bundle,
         'description' => $value['description'] ?? '',
         'field_storage' => $field_storage,

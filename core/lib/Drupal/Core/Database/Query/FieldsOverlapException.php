@@ -10,4 +10,4 @@ use Drupal\Core\Database\DatabaseException;
  * It is not allowed to specify a field as default and insert field, this
  * exception is thrown if that is the case.
  */
-class FieldsOverlapException extends \InvalidArgumentException implements DatabaseException {}
+class FieldsOverlapException extends \InvalidArgumentException implements \Drupal\Core\Database\DatabaseException {}

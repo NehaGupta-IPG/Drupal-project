@@ -868,7 +868,7 @@ class InstallHelper implements ContainerInjectionInterface {
     try {
       $uri = $this->fileSystem->copy($path, 'public://' . $filename, FileExists::Replace);
     }
-    catch (FileException) {
+    catch (\Drupal\Core\File\Exception\FileException) {
       $uri = FALSE;
     }
     $file = $this->entityTypeManager->getStorage('file')->create([

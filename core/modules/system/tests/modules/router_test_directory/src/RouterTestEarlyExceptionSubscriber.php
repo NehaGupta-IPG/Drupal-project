@@ -22,7 +22,7 @@ class RouterTestEarlyExceptionSubscriber implements EventSubscriberInterface {
    */
   public function onKernelRequest(RequestEvent $event): void {
     if ($event->isMainRequest() && $event->getRequest()->headers->get('Authorization') === 'Bearer invalid') {
-      throw new HttpException(
+      throw new \Symfony\Component\HttpKernel\Exception\HttpException(
         Response::HTTP_UNAUTHORIZED,
         'This is a common exception during authentication.'
       );

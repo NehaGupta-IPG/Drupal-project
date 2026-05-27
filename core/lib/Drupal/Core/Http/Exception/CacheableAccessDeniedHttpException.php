@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 /**
  * A cacheable AccessDeniedHttpException.
  */
-class CacheableAccessDeniedHttpException extends AccessDeniedHttpException implements CacheableDependencyInterface {
+class CacheableAccessDeniedHttpException extends \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException implements CacheableDependencyInterface {
 
   use CacheableDependencyTrait;
 

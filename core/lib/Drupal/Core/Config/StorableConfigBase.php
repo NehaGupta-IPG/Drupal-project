@@ -200,7 +200,7 @@ abstract class StorableConfigBase extends ConfigBase {
       }
     }
     elseif ($value !== NULL && !is_scalar($value)) {
-      throw new UnsupportedDataTypeConfigException("Invalid data type for config element {$this->getName()}:$key");
+      throw new \Drupal\Core\Config\UnsupportedDataTypeConfigException("Invalid data type for config element {$this->getName()}:$key");
     }
   }
 
@@ -252,7 +252,7 @@ abstract class StorableConfigBase extends ConfigBase {
     else {
       // Throw exception on any non-scalar or non-array value.
       if (!is_array($value)) {
-        throw new UnsupportedDataTypeConfigException("Invalid data type for config element {$this->getName()}:$key");
+        throw new \Drupal\Core\Config\UnsupportedDataTypeConfigException("Invalid data type for config element {$this->getName()}:$key");
       }
       // Recurse into any nested keys.
       foreach ($value as $nested_value_key => $nested_value) {

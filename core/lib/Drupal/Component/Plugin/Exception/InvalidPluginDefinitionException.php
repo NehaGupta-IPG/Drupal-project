@@ -5,7 +5,7 @@ namespace Drupal\Component\Plugin\Exception;
 /**
  * Defines a class for invalid plugin definition exceptions.
  */
-class InvalidPluginDefinitionException extends PluginException {
+class InvalidPluginDefinitionException extends \Drupal\Component\Plugin\Exception\PluginException {
 
   /**
    * The plugin ID of the mapper.

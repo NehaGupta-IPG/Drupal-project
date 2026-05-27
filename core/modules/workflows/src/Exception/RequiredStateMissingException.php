@@ -7,5 +7,5 @@ use Drupal\Core\Config\ConfigException;
 /**
  * Indicates that a workflow does not contain a required state.
  */
-class RequiredStateMissingException extends ConfigException {
+class RequiredStateMissingException extends \Drupal\Core\Config\ConfigException {
 }

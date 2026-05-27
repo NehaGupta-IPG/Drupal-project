@@ -9,7 +9,6 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
-use Drupal\Core\Utility\UpdateException;
 
 /**
  * @defgroup update_api Update API
@@ -728,7 +727,7 @@ function hook_update_N(&$sandbox) {
 
   // Example of what to do if there is an error during your update.
   if ($some_error_condition_met) {
-    throw new UpdateException('Something went wrong; here is what you should do.');
+    throw new \Drupal\Core\Utility\UpdateException('Something went wrong; here is what you should do.');
   }
 
   // Example function body for a batch update. In this example, the values in

@@ -24,7 +24,7 @@ class UriHostConstraintValidator extends ConstraintValidator {
     }
 
     if (!is_string($value)) {
-      throw new UnexpectedTypeException($value, 'string');
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($value, 'string');
     }
 
     if (!$this->isValid($value)) {

@@ -162,7 +162,7 @@ class FileSystemTest extends UnitTestCase {
     vfsStream::setup('dir');
     // cspell:disable-next-line
     $filename = "a\xFFsdf\x80€" . '.txt';
-    $this->expectException(FileException::class);
+    $this->expectException(\Drupal\Core\File\Exception\FileException::class);
     $this->expectExceptionMessage("Invalid filename '$filename'");
     $this->fileSystem->createFilename($filename, 'vfs://dir');
   }

@@ -356,7 +356,7 @@ class Merge extends Query implements ConditionInterface {
    */
   public function execute() {
     if (!count($this->condition)) {
-      throw new InvalidMergeQueryException('Invalid merge query: no conditions');
+      throw new \Drupal\Core\Database\Query\InvalidMergeQueryException('Invalid merge query: no conditions');
     }
 
     $select = $this->connection->select($this->conditionTable)
@@ -372,7 +372,7 @@ class Merge extends Query implements ConditionInterface {
         $insert->execute();
         return self::STATUS_INSERT;
       }
-      catch (IntegrityConstraintViolationException $e) {
+      catch (\Drupal\Core\Database\IntegrityConstraintViolationException $e) {
         // The insert query failed, maybe it's because a racing insert query
         // beat us in inserting the same row. Retry the select query, if it
         // returns a row, ignore the error and continue with the update

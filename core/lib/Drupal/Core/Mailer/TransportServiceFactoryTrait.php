@@ -36,7 +36,7 @@ trait TransportServiceFactoryTrait {
       }
     }
 
-    throw new UnsupportedSchemeException($dsn);
+    throw new \Symfony\Component\Mailer\Exception\UnsupportedSchemeException($dsn);
   }
 
 }

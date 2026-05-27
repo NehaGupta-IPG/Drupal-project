@@ -65,7 +65,7 @@ final class BootstrapErrorHandler {
     try {
       call_user_func($this->phpUnitErrorHandler, $errorNumber, $errorString, $errorFile, $errorLine);
     }
-    catch (NoTestCaseObjectOnCallStackException) {
+    catch (\PHPUnit\Event\Code\NoTestCaseObjectOnCallStackException) {
       // If we end up here, it's likely because a test's processing has
       // finished already and we are processing an error that occurred while
       // dealing with STDOUT rewinding or truncating. Do nothing.

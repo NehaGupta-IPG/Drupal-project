@@ -63,7 +63,7 @@ class BigPipeResponseAttachmentsProcessor extends HtmlResponseAttachmentsProcess
     try {
       $response = $this->renderPlaceholders($response);
     }
-    catch (EnforcedResponseException $e) {
+    catch (\Drupal\Core\Form\EnforcedResponseException $e) {
       return $e->getResponse();
     }
 

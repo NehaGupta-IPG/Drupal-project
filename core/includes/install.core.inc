@@ -127,7 +127,7 @@ function install_drupal($class_loader, $settings = [], ?callable $callback = NUL
     // request, and collect any output.
     $output = install_run_tasks($install_state, $callback);
   }
-  catch (InstallerException $e) {
+  catch (\Drupal\Core\Installer\Exception\InstallerException $e) {
     // In the non-interactive installer, exceptions are always thrown directly.
     if (!$install_state['interactive']) {
       throw $e;
@@ -390,7 +390,7 @@ function install_begin_request($class_loader, &$install_state): void {
     $sync_directory = Settings::get('config_sync_directory', FALSE);
     $install_state['config_verified'] = file_exists($sync_directory);
   }
-  catch (Exception) {
+  catch (\Exception) {
     $install_state['config_verified'] = FALSE;
   }
   $install_state['database_verified'] = install_verify_database_settings($site_path);
@@ -531,7 +531,7 @@ function install_begin_request($class_loader, &$install_state): void {
     // already fully installed.
     $task = $install_state['completed_task'];
     if ($task === 'done') {
-      throw new AlreadyInstalledException($container->get('string_translation'));
+      throw new \Drupal\Core\Installer\Exception\AlreadyInstalledException($container->get('string_translation'));
     }
   }
   else {
@@ -542,7 +542,7 @@ function install_begin_request($class_loader, &$install_state): void {
   if ($install_state['config_verified'] && empty($task)) {
     if (count($kernel->getConfigStorage()->listAll())) {
       $task = NULL;
-      throw new AlreadyInstalledException($container->get('string_translation'));
+      throw new \Drupal\Core\Installer\Exception\AlreadyInstalledException($container->get('string_translation'));
     }
   }
 
@@ -997,7 +997,7 @@ function install_get_form($form_id, array &$install_state) {
 
     // Throw an exception in case of any form validation error.
     if ($errors = $form_state->getErrors()) {
-      throw new InstallerException(implode("\n", $errors));
+      throw new \Drupal\Core\Installer\Exception\InstallerException(implode("\n", $errors));
     }
   }
 }
@@ -1155,7 +1155,7 @@ function install_verify_completed_task() {
   }
   if (isset($task)) {
     if ($task == 'done') {
-      throw new AlreadyInstalledException(\Drupal::service('string_translation'));
+      throw new \Drupal\Core\Installer\Exception\AlreadyInstalledException(\Drupal::service('string_translation'));
     }
     return $task;
   }
@@ -1200,7 +1200,7 @@ function install_verify_database_ready(): void {
     }
   }
   if ($existing_install) {
-    throw new AlreadyInstalledException(\Drupal::service('string_translation'));
+    throw new \Drupal\Core\Installer\Exception\AlreadyInstalledException(\Drupal::service('string_translation'));
   }
 }
 
@@ -1223,7 +1223,7 @@ function install_database_errors($database, $settings_file) {
     Database::addConnectionInfo('default', 'default', $database);
     $errors = $driverExtension->getInstallTasks()->runTasks();
   }
-  catch (UnknownExtensionException) {
+  catch (\Drupal\Core\Extension\Exception\UnknownExtensionException) {
     $errors['driver'] = t("In your %settings_file file you have configured @drupal to use a %driver server, however your PHP installation currently does not support this database type.", [
       '%settings_file' => $settings_file,
       '@drupal' => drupal_install_profile_distribution_name(),
@@ -1250,7 +1250,7 @@ function install_select_profile(&$install_state) {
   if (!array_key_exists('profile', $install_state['parameters'])) {
     // If there are no profiles at all, installation cannot proceed.
     if (empty($install_state['profiles'])) {
-      throw new NoProfilesException(\Drupal::service('string_translation'));
+      throw new \Drupal\Core\Installer\Exception\NoProfilesException(\Drupal::service('string_translation'));
     }
     // Try to automatically select a profile.
     if ($profile = _install_select_profile($install_state)) {
@@ -1259,7 +1259,7 @@ function install_select_profile(&$install_state) {
     else {
       // The non-interactive installer requires a profile parameter.
       if (!$install_state['interactive']) {
-        throw new InstallerException('Missing profile parameter.');
+        throw new \Drupal\Core\Installer\Exception\InstallerException('Missing profile parameter.');
       }
       // Otherwise, display a form to select a profile.
       return install_get_form('Drupal\Core\Installer\Form\SelectProfileForm', $install_state);
@@ -1404,7 +1404,7 @@ function install_select_language(&$install_state) {
         return;
       }
       else {
-        throw new InstallerException('You must select a language to continue the installation.');
+        throw new \Drupal\Core\Installer\Exception\InstallerException('You must select a language to continue the installation.');
       }
     }
   }
@@ -2389,7 +2389,7 @@ function install_display_requirements($install_state, $requirements) {
         }
       }
       if (!empty($failures)) {
-        throw new InstallerException(implode("\n\n", $failures));
+        throw new \Drupal\Core\Installer\Exception\InstallerException(implode("\n\n", $failures));
       }
     }
   }
@@ -2440,7 +2440,7 @@ function install_config_import_batch() {
 
     return $batch_builder->toArray();
   }
-  catch (ConfigImporterException) {
+  catch (\Drupal\Core\Config\ConfigImporterException) {
     global $install_state;
     // There are validation errors.
     $messenger = \Drupal::messenger();
@@ -2488,7 +2488,7 @@ function install_config_revert_install_changes(): void {
     try {
       $config_importer->import();
     }
-    catch (ConfigImporterException) {
+    catch (\Drupal\Core\Config\ConfigImporterException) {
       $messenger = \Drupal::messenger();
       // There are validation errors.
       $messenger->addError(t('The configuration synchronization failed validation.'));

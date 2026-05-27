@@ -7,7 +7,7 @@ use Drupal\Component\Render\FormattableMarkup;
 /**
  * An exception thrown if configuration with the same name already exists.
  */
-class PreExistingConfigException extends ConfigException {
+class PreExistingConfigException extends \Drupal\Core\Config\ConfigException {
 
   /**
    * A list of configuration objects that already exist in active configuration.

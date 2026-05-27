@@ -128,16 +128,16 @@ final class Exporter implements LoggerAwareInterface {
     $this->fileSystem->prepareDirectory(
       $destination,
       FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS,
-    ) || throw new DirectoryNotReadyException("Could not create destination directory '$destination'");
+    ) || throw new \Drupal\Core\File\Exception\DirectoryNotReadyException("Could not create destination directory '$destination'");
 
     $destination = $this->fileSystem->realpath($destination);
     if (empty($destination)) {
-      throw new FileException("Could not resolve the destination directory '$destination'");
+      throw new \Drupal\Core\File\Exception\FileException("Could not resolve the destination directory '$destination'");
     }
 
     $path = $destination . '/' . $entity->uuid() . '.' . Yaml::getFileExtension();
     $result = $this->export($entity);
-    file_put_contents($path, (string) $result) || throw new FileWriteException("Could not write file '$path'");
+    file_put_contents($path, (string) $result) || throw new \Drupal\Core\File\Exception\FileWriteException("Could not write file '$path'");
 
     foreach ($result->metadata->getAttachments() as $from => $to) {
       $this->fileSystem->copy($from, $destination . '/' . $to, FileExists::Replace);

@@ -254,7 +254,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
       $this->assertSession()->fieldExists('nonexisting');
       $this->fail('The "nonexisting" field was found.');
     }
-    catch (ExpectationException) {
+    catch (\Behat\Mink\Exception\ExpectationException) {
       // Expected exception; just continue testing.
     }
 
@@ -262,7 +262,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
       $this->assertSession()->fieldNotExists('edit-name');
       $this->fail('The "edit-name" field was not found.');
     }
-    catch (ExpectationException) {
+    catch (\Behat\Mink\Exception\ExpectationException) {
       // Expected exception; just continue testing.
     }
   }
@@ -280,7 +280,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
       $this->assertSession()->fieldNotExists('name');
       $this->fail('The "name" field was not found based on name.');
     }
-    catch (ExpectationException) {
+    catch (\Behat\Mink\Exception\ExpectationException) {
       // Expected exception; just continue testing.
     }
     // Test that the assertion fails correctly when searching by id.
@@ -288,7 +288,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
       $this->assertSession()->fieldNotExists('edit-name');
       $this->fail('The "name" field was not found based on id.');
     }
-    catch (ExpectationException) {
+    catch (\Behat\Mink\Exception\ExpectationException) {
       // Expected exception; just continue testing.
     }
 
@@ -300,7 +300,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
       $this->assertSession()->fieldExists('invalid_name_and_id');
       $this->fail('The "invalid_name_and_id" field was found.');
     }
-    catch (ElementNotFoundException) {
+    catch (\Behat\Mink\Exception\ElementNotFoundException) {
       // Expected exception; just continue testing.
     }
 
@@ -312,7 +312,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
       $this->assertSession()->fieldNotExists('edit-description');
       $this->fail('The "description" field, with no value was not found.');
     }
-    catch (ExpectationException) {
+    catch (\Behat\Mink\Exception\ExpectationException) {
       // Expected exception; just continue testing.
     }
     // Test that the assertion fails correctly if a NULL value is passed in.
@@ -320,7 +320,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
       $this->assertSession()->fieldNotExists('name', NULL);
       $this->fail('The "name" field was not found.');
     }
-    catch (ExpectationException) {
+    catch (\Behat\Mink\Exception\ExpectationException) {
       // Expected exception; just continue testing.
     }
 
@@ -333,14 +333,14 @@ class BrowserTestBaseTest extends BrowserTestBase {
     try {
       $this->assertSession()->fieldValueNotEquals('edit-name', '');
     }
-    catch (ExpectationFailedException) {
+    catch (\PHPUnit\Framework\ExpectationFailedException) {
       // Expected exception; just continue testing.
     }
     // Test that the assertion fails correctly if the wrong value is passed in.
     try {
       $this->assertSession()->fieldValueNotEquals('edit-name', 'not the value');
     }
-    catch (ExpectationFailedException) {
+    catch (\PHPUnit\Framework\ExpectationFailedException) {
       // Expected exception; just continue testing.
     }
 
@@ -351,7 +351,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
       $this->assertSession()->fieldValueNotEquals('name', 'Test name');
       $this->fail('fieldValueNotEquals failed to throw an exception.');
     }
-    catch (ExpectationException) {
+    catch (\Behat\Mink\Exception\ExpectationException) {
       // Expected exception; just continue testing.
     }
 
@@ -363,7 +363,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
       $this->assertSession()->fieldValueEquals('name', 'not the value');
       $this->fail('fieldValueEquals failed to throw an exception.');
     }
-    catch (ExpectationException) {
+    catch (\Behat\Mink\Exception\ExpectationException) {
       // Expected exception; just continue testing.
     }
     // Test that text areas can contain new lines.
@@ -395,7 +395,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
       $this->assertSession()->fieldValueNotEquals('checkbox_enabled', '1');
       $this->fail('fieldValueNotEquals failed to throw an exception.');
     }
-    catch (ExpectationException) {
+    catch (\Behat\Mink\Exception\ExpectationException) {
       // Expected exception; just continue testing.
     }
 
@@ -425,7 +425,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
       $this->assertSession()->fieldNotExists('edit-checkbox-disabled', NULL);
       $this->fail('The "edit-checkbox-disabled" field was not found by ID, using NULL value.');
     }
-    catch (ExpectationException) {
+    catch (\Behat\Mink\Exception\ExpectationException) {
       // Expected exception; just continue testing.
     }
 
@@ -438,7 +438,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
       $this->assertSession()->checkboxNotChecked('incorrect_checkbox_id');
       $this->fail('The "incorrect_checkbox_id" field was found');
     }
-    catch (ExpectationException) {
+    catch (\Behat\Mink\Exception\ExpectationException) {
       // Expected exception; just continue testing.
     }
 
@@ -447,7 +447,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
       $this->assertSession()->checkboxNotChecked('edit-checkbox-enabled');
       $this->fail('The "edit-checkbox-enabled" field was not found in a checked state.');
     }
-    catch (ExpectationException) {
+    catch (\Behat\Mink\Exception\ExpectationException) {
       // Expected exception; just continue testing.
     }
 
@@ -457,7 +457,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
       $this->assertSession()->checkboxChecked('edit-checkbox-disabled');
       $this->fail('The "edit-checkbox-disabled" field was found and checked.');
     }
-    catch (ExpectationException) {
+    catch (\Behat\Mink\Exception\ExpectationException) {
       // Expected exception; just continue testing.
     }
   }

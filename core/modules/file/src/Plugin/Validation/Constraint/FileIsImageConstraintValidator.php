@@ -38,7 +38,7 @@ class FileIsImageConstraintValidator extends BaseFileConstraintValidator impleme
   public function validate(mixed $value, Constraint $constraint): void {
     $file = $this->assertValueIsFile($value);
     if (!$constraint instanceof FileIsImageConstraint) {
-      throw new UnexpectedTypeException($constraint, FileIsImageConstraint::class);
+      throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($constraint, FileIsImageConstraint::class);
     }
 
     $image = $this->imageFactory->get($file->getFileUri());

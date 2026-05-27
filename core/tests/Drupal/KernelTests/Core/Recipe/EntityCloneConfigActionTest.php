@@ -46,7 +46,7 @@ class EntityCloneConfigActionTest extends KernelTestBase {
    * Tests error if original entity does not exist.
    */
   public function testErrorIfOriginalDoesNotExist(): void {
-    $this->expectException(ConfigActionException::class);
+    $this->expectException(\Drupal\Core\Config\Action\ConfigActionException::class);
     $this->expectExceptionMessage("Cannot clone 'user.role.nope' because it does not exist.");
     $this->container->get('plugin.manager.config_action')
       ->applyAction('cloneAs', 'user.role.nope', 'user.role.yep');
@@ -89,7 +89,7 @@ class EntityCloneConfigActionTest extends KernelTestBase {
         'fail_if_exists' => TRUE,
       ]);
 
-    $this->expectException(ConfigActionException::class);
+    $this->expectException(\Drupal\Core\Config\Action\ConfigActionException::class);
     $this->expectExceptionMessage('Entity user.role.cloned exists');
     $this->container->get('plugin.manager.config_action')
       ->applyAction('cloneAs', 'user.role.test', [

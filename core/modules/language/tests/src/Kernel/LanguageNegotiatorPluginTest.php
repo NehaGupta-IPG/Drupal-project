@@ -49,7 +49,7 @@ class LanguageNegotiatorPluginTest extends KernelTestBase {
     try {
       $languageNegotiator->initializeType(LanguageInterface::TYPE_URL);
     }
-    catch (PluginNotFoundException) {
+    catch (\Drupal\Component\Plugin\Exception\PluginNotFoundException) {
       $this->fail('Plugin not found exception unhandled.');
     }
     $log_message = $logger->cleanLogs()[0];

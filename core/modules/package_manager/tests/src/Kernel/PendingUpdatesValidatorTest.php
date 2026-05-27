@@ -92,7 +92,7 @@ class PendingUpdatesValidatorTest extends PackageManagerKernelTestBase {
       $stage->apply();
       $this->fail('Able to apply update even though there is pending update.');
     }
-    catch (SandboxEventException $exception) {
+    catch (\Drupal\package_manager\Exception\SandboxEventException $exception) {
       $this->assertExpectedResultsFromException([$result], $exception);
     }
   }

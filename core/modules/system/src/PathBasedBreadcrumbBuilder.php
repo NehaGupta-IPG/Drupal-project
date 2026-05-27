@@ -145,7 +145,7 @@ class PathBasedBreadcrumbBuilder implements BreadcrumbBuilderInterface {
     try {
       $request = Request::create($path);
     }
-    catch (BadRequestException) {
+    catch (\Symfony\Component\HttpFoundation\Exception\BadRequestException) {
       return NULL;
     }
     // Performance optimization: set a short accept header to reduce overhead in
@@ -163,7 +163,7 @@ class PathBasedBreadcrumbBuilder implements BreadcrumbBuilderInterface {
       $request->attributes->add($this->router->matchRequest($request));
       return $request;
     }
-    catch (ParamNotConvertedException | ResourceNotFoundException | MethodNotAllowedException | AccessDeniedHttpException | NotFoundHttpException) {
+    catch (\Drupal\Core\ParamConverter\ParamNotConvertedException | \Symfony\Component\Routing\Exception\ResourceNotFoundException | \Symfony\Component\Routing\Exception\MethodNotAllowedException | \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException | \Symfony\Component\HttpKernel\Exception\NotFoundHttpException) {
       return NULL;
     }
   }

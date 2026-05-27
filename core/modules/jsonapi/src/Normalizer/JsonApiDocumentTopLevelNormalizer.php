@@ -111,22 +111,22 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
           return [];
         }
         if (empty($relationship['data'][0]['id'])) {
-          throw new BadRequestHttpException("No ID specified for related resource");
+          throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException("No ID specified for related resource");
         }
         $id_list = array_column($relationship['data'], 'id');
         if (empty($relationship['data'][0]['type'])) {
-          throw new BadRequestHttpException("No type specified for related resource");
+          throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException("No type specified for related resource");
         }
         if (!$resource_type = $this->resourceTypeRepository->getByTypeName($relationship['data'][0]['type'])) {
-          throw new BadRequestHttpException("Invalid type specified for related resource: '" . $relationship['data'][0]['type'] . "'");
+          throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException("Invalid type specified for related resource: '" . $relationship['data'][0]['type'] . "'");
         }
 
         $entity_type_id = $resource_type->getEntityTypeId();
         try {
           $entity_storage = $this->entityTypeManager->getStorage($entity_type_id);
         }
-        catch (PluginNotFoundException) {
-          throw new BadRequestHttpException("Invalid type specified for related resource: '" . $relationship['data'][0]['type'] . "'");
+        catch (\Drupal\Component\Plugin\Exception\PluginNotFoundException) {
+          throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException("Invalid type specified for related resource: '" . $relationship['data'][0]['type'] . "'");
         }
         // In order to maintain the order ($delta) of the relationships, we need
         // to load the entities and create a mapping between id and uuid.
@@ -148,7 +148,7 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
             if ($uuid === 'virtual') {
               continue;
             }
-            throw new NotFoundHttpException(sprintf('The resource identified by `%s:%s` (given as a relationship item) could not be found.', $relationship['data'][$delta]['type'], $uuid));
+            throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException(sprintf('The resource identified by `%s:%s` (given as a relationship item) could not be found.', $relationship['data'][$delta]['type'], $uuid));
           }
           $reference_item = [
             'target_id' => $map[$uuid],
@@ -313,15 +313,15 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
   protected static function validateRequestBody(array $document, ResourceType $resource_type) {
     // Ensure that the relationships key was not placed in the top level.
     if (isset($document['relationships']) && !empty($document['relationships'])) {
-      throw new BadRequestHttpException("Found \"relationships\" within the document's top level. The \"relationships\" key must be within resource object.");
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException("Found \"relationships\" within the document's top level. The \"relationships\" key must be within resource object.");
     }
     // Ensure that the resource object contains the "type" key.
     if (!isset($document['data']['type'])) {
-      throw new BadRequestHttpException("Resource object must include a \"type\".");
+      throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException("Resource object must include a \"type\".");
     }
     // Ensure that the client provided ID is a valid UUID.
     if (isset($document['data']['id']) && !Uuid::isValid($document['data']['id'])) {
-      throw new UnprocessableEntityHttpException('IDs should be properly generated and formatted UUIDs as described in RFC 4122.');
+      throw new \Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException('IDs should be properly generated and formatted UUIDs as described in RFC 4122.');
     }
     // Ensure that no relationship fields are being set via the attributes
     // resource object member.
@@ -329,7 +329,7 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
       $received_attribute_field_names = array_keys($document['data']['attributes']);
       $relationship_field_names = array_keys($resource_type->getRelatableResourceTypes());
       if ($relationship_fields_sent_as_attributes = array_intersect($received_attribute_field_names, $relationship_field_names)) {
-        throw new UnprocessableEntityHttpException(sprintf("The following relationship fields were provided as attributes: [ %s ]", implode(', ', $relationship_fields_sent_as_attributes)));
+        throw new \Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException(sprintf("The following relationship fields were provided as attributes: [ %s ]", implode(', ', $relationship_fields_sent_as_attributes)));
       }
     }
   }

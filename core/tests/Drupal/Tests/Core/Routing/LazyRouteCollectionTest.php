@@ -86,7 +86,7 @@ class LazyRouteCollectionTest extends UnitTestCase {
     $this->routeProvider
       ->method('getRouteByName')
       ->with('does_not_exist')
-      ->will($this->throwException(new RouteNotFoundException()));
+      ->will($this->throwException(new \Symfony\Component\Routing\Exception\RouteNotFoundException()));
 
     $lazyRouteCollectionFail = new LazyRouteCollection($this->routeProvider);
     $this->assertNull($lazyRouteCollectionFail->get('does_not_exist'));
