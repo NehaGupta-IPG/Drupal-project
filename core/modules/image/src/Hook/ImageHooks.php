@@ -294,8 +294,7 @@ class ImageHooks {
    */
   #[Hook('field_config_presave')]
   public function fieldConfigPresave(FieldConfigInterface $field): void {
-    $imageConfigUpdater = ($this->imageConfigUpdaterClosure)();
-    $imageConfigUpdater->updateField($field);
+    ($this->imageConfigUpdaterClosure)()->updateField($field);
   }
 
   /**
