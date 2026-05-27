@@ -45,16 +45,26 @@ class DefaultHtmlRouteProvider implements EntityRouteProviderInterface, EntityHa
   protected $entityFieldManager;
 
   /**
+   * The entity type definition.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeInterface|null
+   */
+  protected ?EntityTypeInterface $entityType = NULL;
+
+  /**
    * Constructs a new DefaultHtmlRouteProvider.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
+   * @param \Drupal\Core\Entity\EntityTypeInterface|null $entity_type
+   *   The entity type definition.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, ?EntityTypeInterface $entity_type = NULL) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityFieldManager = $entity_field_manager;
+    $this->entityType = $entity_type;
   }
 
   /**
@@ -63,14 +73,21 @@ class DefaultHtmlRouteProvider implements EntityRouteProviderInterface, EntityHa
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
     return new static(
       $container->get('entity_type.manager'),
-      $container->get('entity_field.manager')
+      $container->get('entity_field.manager'),
+      $entity_type
     );
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getRoutes(EntityTypeInterface $entity_type) {
+  public function getRoutes(?EntityTypeInterface $entity_type = NULL) {
+    if ($entity_type !== NULL) {
+      @trigger_error('Passing $entity_type to ' . __METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. The entity type is passed on construction. See https://www.drupal.org/node/2977140', E_USER_DEPRECATED);
+    }
+    else {
+      $entity_type = $this->entityType;
+    }
     $collection = new RouteCollection();
 
     $entity_type_id = $entity_type->id();

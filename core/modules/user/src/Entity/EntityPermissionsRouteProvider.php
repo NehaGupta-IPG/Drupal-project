@@ -26,13 +26,23 @@ class EntityPermissionsRouteProvider implements EntityRouteProviderInterface, En
   protected $entityTypeManager;
 
   /**
+   * The entity type definition.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeInterface|null
+   */
+  protected ?EntityTypeInterface $entityType = NULL;
+
+  /**
    * Constructs a new EntityPermissionsRouteProvider.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\Core\Entity\EntityTypeInterface|null $entity_type
+   *   The entity type definition.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, ?EntityTypeInterface $entity_type = NULL) {
     $this->entityTypeManager = $entity_type_manager;
+    $this->entityType = $entity_type;
   }
 
   /**
@@ -40,14 +50,21 @@ class EntityPermissionsRouteProvider implements EntityRouteProviderInterface, En
    */
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
     return new static(
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $entity_type
     );
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getRoutes(EntityTypeInterface $entity_type) {
+  public function getRoutes(?EntityTypeInterface $entity_type = NULL) {
+    if ($entity_type !== NULL) {
+      @trigger_error('Passing $entity_type to ' . __METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. The entity type is passed on construction. See https://www.drupal.org/node/2977140', E_USER_DEPRECATED);
+    }
+    else {
+      $entity_type = $this->entityType;
+    }
     $collection = new RouteCollection();
 
     $entity_type_id = $entity_type->id();

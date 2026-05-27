@@ -14,9 +14,32 @@ use Symfony\Component\Routing\RouteCollection;
 class RevisionHtmlRouteProvider implements EntityRouteProviderInterface {
 
   /**
+   * The entity type definition.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeInterface|null
+   */
+  protected ?EntityTypeInterface $entityType = NULL;
+
+  /**
+   * Constructs a new RevisionHtmlRouteProvider.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface|null $entity_type
+   *   The entity type definition.
+   */
+  public function __construct(?EntityTypeInterface $entity_type = NULL) {
+    $this->entityType = $entity_type;
+  }
+
+  /**
    * {@inheritdoc}
    */
-  public function getRoutes(EntityTypeInterface $entity_type) {
+  public function getRoutes(?EntityTypeInterface $entity_type = NULL) {
+    if ($entity_type !== NULL) {
+      @trigger_error('Passing $entity_type to ' . __METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. The entity type is passed on construction. See https://www.drupal.org/node/2977140', E_USER_DEPRECATED);
+    }
+    else {
+      $entity_type = $this->entityType;
+    }
     $collection = new RouteCollection();
     $entityTypeId = $entity_type->id();
 

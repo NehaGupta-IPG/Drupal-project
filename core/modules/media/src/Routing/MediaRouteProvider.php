@@ -24,8 +24,8 @@ class MediaRouteProvider extends AdminHtmlRouteProvider {
   /**
    * {@inheritdoc}
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, ConfigFactoryInterface $config_factory) {
-    parent::__construct($entity_type_manager, $entity_field_manager);
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, ConfigFactoryInterface $config_factory, ?EntityTypeInterface $entity_type = NULL) {
+    parent::__construct($entity_type_manager, $entity_field_manager, $entity_type);
     $this->config = $config_factory->get('media.settings');
   }
 
@@ -36,7 +36,8 @@ class MediaRouteProvider extends AdminHtmlRouteProvider {
     return new static(
       $container->get('entity_type.manager'),
       $container->get('entity_field.manager'),
-      $container->get('config.factory')
+      $container->get('config.factory'),
+      $entity_type
     );
   }
 

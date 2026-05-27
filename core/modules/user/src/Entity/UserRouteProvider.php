@@ -15,7 +15,10 @@ class UserRouteProvider implements EntityRouteProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRoutes(EntityTypeInterface $entity_type) {
+  public function getRoutes(?EntityTypeInterface $entity_type = NULL) {
+    if ($entity_type !== NULL) {
+      @trigger_error('Passing $entity_type to ' . __METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. The entity type is passed on construction. See https://www.drupal.org/node/2977140', E_USER_DEPRECATED);
+    }
     $route_collection = new RouteCollection();
     $route = (new Route('/user/{user}'))
       ->setDefaults([

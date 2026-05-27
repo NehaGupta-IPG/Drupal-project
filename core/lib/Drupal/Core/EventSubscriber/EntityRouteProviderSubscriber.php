@@ -44,7 +44,7 @@ class EntityRouteProviderSubscriber implements EventSubscriberInterface {
           // Allow to both return an array of routes or a route collection,
           // like route_callbacks in the routing.yml file.
 
-          $routes = $route_provider->getRoutes($entity_type);
+          $routes = $route_provider->getRoutes();
           if ($routes instanceof RouteCollection) {
             $routes = $routes->all();
           }
