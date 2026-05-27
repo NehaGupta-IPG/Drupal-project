@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\node_access_test\Hook;
 
+use Drupal\Component\Utility\IntegerLike;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -110,7 +111,7 @@ class NodeAccessTestHooks {
       return AccessResult::forbidden()->setCacheMaxAge(0);
     }
     // Grant access if a specific user is specified.
-    if (\Drupal::state()->get('node_access_test.allow_uid') === $account->id()) {
+    if (IntegerLike::same(\Drupal::state()->get('node_access_test.allow_uid'), $account->id())) {
       return AccessResult::allowed();
     }
     // No opinion.

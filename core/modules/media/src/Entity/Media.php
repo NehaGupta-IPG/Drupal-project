@@ -2,6 +2,7 @@
 
 namespace Drupal\media\Entity;
 
+use Drupal\Component\Utility\IntegerLike;
 use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\Entity\ContentEntityDeleteForm;
 use Drupal\Core\Entity\EntityViewBuilder;
@@ -348,7 +349,7 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
    */
   protected function hasSourceFieldChanged() {
     $source = $this->getSource();
-    return $this->getOriginal() && $source->getSourceFieldValue($this) !== $source->getSourceFieldValue($this->getOriginal());
+    return $this->getOriginal() && !IntegerLike::same($source->getSourceFieldValue($this), $source->getSourceFieldValue($this->getOriginal()));
   }
 
   /**

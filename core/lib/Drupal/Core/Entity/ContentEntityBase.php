@@ -3,6 +3,7 @@
 namespace Drupal\Core\Entity;
 
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Component\Utility\IntegerLike;
 use Drupal\Core\Entity\Plugin\DataType\EntityReference;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Language\Language;
@@ -222,15 +223,22 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
         if (is_array($this->values[$field_name])) {
           // We store untranslatable fields into an entity key without using a
           // langcode key.
-          if (!$this->getFieldDefinition($field_name)->isTranslatable()) {
+          $field_definition = $this->getFieldDefinition($field_name);
+          if (!$field_definition->isTranslatable()) {
             if (isset($this->values[$field_name][LanguageInterface::LANGCODE_DEFAULT])) {
               if (is_array($this->values[$field_name][LanguageInterface::LANGCODE_DEFAULT])) {
                 if (isset($this->values[$field_name][LanguageInterface::LANGCODE_DEFAULT][0]['value'])) {
                   $this->entityKeys[$key] = $this->values[$field_name][LanguageInterface::LANGCODE_DEFAULT][0]['value'];
+                  if ($field_definition->getType() === 'integer') {
+                    $this->entityKeys[$key] = IntegerLike::toInteger($this->entityKeys[$key], $field_name);
+                  }
                 }
               }
               else {
                 $this->entityKeys[$key] = $this->values[$field_name][LanguageInterface::LANGCODE_DEFAULT];
+                if ($field_definition->getType() === 'integer') {
+                  $this->entityKeys[$key] = IntegerLike::toInteger($this->entityKeys[$key], $field_name);
+                }
               }
             }
           }
@@ -243,10 +251,16 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
               if (is_array($this->values[$field_name][$langcode])) {
                 if (isset($this->values[$field_name][$langcode][0]['value'])) {
                   $this->translatableEntityKeys[$key][$langcode] = $this->values[$field_name][$langcode][0]['value'];
+                  if ($field_definition->getType() === 'integer') {
+                    $this->translatableEntityKeys[$key][$langcode] = IntegerLike::toInteger($this->translatableEntityKeys[$key][$langcode], $field_name);
+                  }
                 }
               }
               else {
                 $this->translatableEntityKeys[$key][$langcode] = $this->values[$field_name][$langcode];
+                if ($field_definition->getType() === 'integer') {
+                  $this->translatableEntityKeys[$key][$langcode] = IntegerLike::toIntegerOrNull($this->translatableEntityKeys[$key][$langcode], $field_name);
+                }
               }
             }
           }

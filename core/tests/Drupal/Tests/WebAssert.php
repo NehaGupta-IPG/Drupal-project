@@ -702,9 +702,10 @@ class WebAssert extends MinkWebAssert {
    *
    * @param string $field
    *   One of id|name|value for the hidden field.
-   * @param string $value
+   * @param string|int $value
    *   The hidden field value that needs to be checked.
-   * @param \Behat\Mink\Element\TraversableElement $container
+   *   Integer is allowed for convenience, and will be cast to string.
+   * @param \Behat\Mink\Element\TraversableElement|null $container
    *   (optional) The document to check against. Defaults to the current page.
    *
    * @throws \Behat\Mink\Exception\ElementNotFoundException
@@ -713,7 +714,7 @@ class WebAssert extends MinkWebAssert {
   public function hiddenFieldValueEquals($field, $value, ?TraversableElement $container = NULL): void {
     $node = $this->hiddenFieldExists($field, $container);
     $actual = $node->getValue();
-    $regex = '/^' . preg_quote($value, '/') . '$/ui';
+    $regex = '/^' . preg_quote((string) $value, '/') . '$/ui';
     $message = "The hidden field '$field' value is '$actual', but '$value' expected.";
     $this->assert((bool) preg_match($regex, $actual), $message);
   }
@@ -723,9 +724,10 @@ class WebAssert extends MinkWebAssert {
    *
    * @param string $field
    *   One of id|name|value for the hidden field.
-   * @param string $value
+   * @param string|int $value
    *   The hidden field value that needs to be checked.
-   * @param \Behat\Mink\Element\TraversableElement $container
+   *   Integer is allowed for convenience, and will be cast to string.
+   * @param \Behat\Mink\Element\TraversableElement|null $container
    *   (optional) The document to check against. Defaults to the current page.
    *
    * @throws \Behat\Mink\Exception\ElementNotFoundException
@@ -734,7 +736,7 @@ class WebAssert extends MinkWebAssert {
   public function hiddenFieldValueNotEquals($field, $value, ?TraversableElement $container = NULL): void {
     $node = $this->hiddenFieldExists($field, $container);
     $actual = $node->getValue();
-    $regex = '/^' . preg_quote($value, '/') . '$/ui';
+    $regex = '/^' . preg_quote((string) $value, '/') . '$/ui';
     $message = "The hidden field '$field' value is '$actual', but it should not be.";
     $this->assert(!preg_match($regex, $actual), $message);
   }

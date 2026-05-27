@@ -274,7 +274,7 @@ class EntityRepository implements EntityRepositoryInterface {
    *
    * @param \Drupal\Core\Entity\RevisionableInterface $entity
    *   The default revision of the entity being converted.
-   * @param string $revision_id
+   * @param int|string $revision_id
    *   The identifier of the revision to be loaded.
    *
    * @return \Drupal\Core\Entity\RevisionableInterface

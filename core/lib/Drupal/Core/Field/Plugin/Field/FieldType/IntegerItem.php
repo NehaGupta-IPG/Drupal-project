@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Field\Plugin\Field\FieldType;
 
+use Drupal\Component\Utility\IntegerLike;
 use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -37,6 +38,28 @@ class IntegerItem extends NumericItemBase {
       // and 'big'.
       'size' => 'normal',
     ] + parent::defaultStorageSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function writePropertyValue($property_name, $value) {
+    if ($property_name === 'value') {
+      $value = IntegerLike::toIntegerIfIntLikeString($value);
+    }
+    parent::writePropertyValue($property_name, $value);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setValue($values, $notify = TRUE) {
+    if ($values !== NULL) {
+      $value = is_array($values) ? $values['value'] ?? NULL : $values;
+      $value = IntegerLike::toIntegerOrNullIfPossible($value, $this->getPropertyPath(...));
+      $values = ['value' => $value];
+    }
+    parent::setValue($values, $notify);
   }
 
   /**

@@ -24,6 +24,7 @@ use Drupal\menu_link_content\MenuLinkContentInterface;
 use Drupal\node\NodeInterface;
 use Drupal\taxonomy\TermInterface;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\TestTools\IntegerLikeAssert;
 use Drupal\user\UserInterface;
 use Drupal\workspaces\Entity\Workspace;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -248,7 +249,7 @@ class ContentImportTest extends BrowserTestBase {
     // user or the user provided to the importer.
     $node = $entity_repository->loadEntityByUuid('node', '7f1dd75a-0be2-4d3b-be5d-9d1a868b9267');
     $this->assertInstanceOf(NodeInterface::class, $node);
-    $this->assertSame($account->id(), $node->getOwner()->id());
+    IntegerLikeAssert::same($account->id(), $node->getOwner()->id());
 
     // Ensure a node with a translation is imported properly.
     $node = $entity_repository->loadEntityByUuid('node', '2d3581c3-92c7-4600-8991-a0d4b3741198');

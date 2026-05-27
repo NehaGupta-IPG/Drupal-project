@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\entity_test;
 
+use Drupal\Component\Utility\IntegerLike;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityAccessControlHandler;
@@ -65,7 +66,7 @@ class EntityTestAccessControlHandler extends EntityAccessControlHandler {
     elseif (in_array($operation, ['update', 'delete'])) {
       $access = AccessResult::allowedIfHasPermission($account, 'administer entity_test content');
       if (!$access->isAllowed() && $operation === 'update' && $account->hasPermission('edit own entity_test content')) {
-        $access = $access->orIf(AccessResult::allowedIf($entity->getOwnerId() === $account->id()))->cachePerUser()->addCacheableDependency($entity);
+        $access = $access->orIf(AccessResult::allowedIf(IntegerLike::same($entity->getOwnerId(), $account->id())))->cachePerUser()->addCacheableDependency($entity);
       }
       return $access;
     }

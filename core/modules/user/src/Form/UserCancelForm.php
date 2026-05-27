@@ -2,6 +2,7 @@
 
 namespace Drupal\user\Form;
 
+use Drupal\Component\Utility\IntegerLike;
 use Drupal\Core\Entity\ContentEntityConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -156,7 +157,7 @@ class UserCancelForm extends ContentEntityConfirmFormBase {
         ]);
 
       $cancel_message = $this->t('A confirmation request to cancel your account has been sent to your email address.');
-      if ($this->entity->id() !== $this->currentUser()->id()) {
+      if (!IntegerLike::same($this->entity->id(), $this->currentUser()->id())) {
         $cancel_message = $this->t("A confirmation request to cancel the account %name has been sent to the user's email address.", ['%name' => $this->entity->label()]);
       }
       $this->messenger()->addStatus($cancel_message);

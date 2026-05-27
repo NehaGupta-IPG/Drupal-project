@@ -6,6 +6,7 @@ namespace Drupal\Tests\node\Functional;
 
 use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\node\NodeInterface;
+use Drupal\TestTools\IntegerLikeAssert;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -155,7 +156,7 @@ class NodeRevisionsAllTest extends NodeTestBase {
     $this->assertSame($nodes[1]->body->value, $reverted_node->body->value, 'Node reverted correctly.');
 
     // Confirm the revision author is the user performing the revert.
-    $this->assertSame($this->loggedInUser->id(), $reverted_node->getRevisionUserId(), 'Node revision author is user performing revert.');
+    IntegerLikeAssert::same($this->loggedInUser->id(), $reverted_node->getRevisionUserId(), 'Node revision author is user performing revert.');
     // And that its not the revision author.
     $this->assertNotSame($this->revisionUser->id(), $reverted_node->getRevisionUserId(), 'Node revision author is not original revision author.');
 
