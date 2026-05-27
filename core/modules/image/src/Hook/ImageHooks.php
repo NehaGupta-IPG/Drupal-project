@@ -27,7 +27,8 @@ class ImageHooks {
   public function __construct(
     #[AutowireServiceClosure(ImageDerivativeUtilities::class)]
     protected readonly \Closure $imageDerivativeUtilitiesClosure,
-    private readonly ImageConfigUpdater $imageConfigUpdater,
+    #[AutowireServiceClosure(ImageConfigUpdater::class)]
+    private readonly \Closure $imageConfigUpdaterClosure,
   ) {}
 
   /**
@@ -293,7 +294,8 @@ class ImageHooks {
    */
   #[Hook('field_config_presave')]
   public function fieldConfigPresave(FieldConfigInterface $field): void {
-    $this->imageConfigUpdater->updateField($field);
+    $imageConfigUpdater = ($this->imageConfigUpdaterClosure)();
+    $imageConfigUpdater->updateField($field);
   }
 
   /**
