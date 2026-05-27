@@ -283,7 +283,6 @@ class StyleTest extends ViewsKernelTestBase {
 
   /**
    * Tests that views_view_grouping is used for all grouping levels.
-   *
    */
   public function testGroupingPreprocessInvoked(): void {
     $view = Views::getView('test_view');
@@ -405,8 +404,8 @@ class StyleTest extends ViewsKernelTestBase {
     );
     $output = $view->style_plugin->renderGroupingSets($sets);
 
-    // Level 0 (outer): rows are nested sets, so views_view_grouping is used
-    // via the existing branch A — this was already correct.
+    // Level 0 (outer): rows are nested grouping sets, so views_view_grouping
+    // is used.
     foreach ($output as $outer_set) {
       $themes = (array) $outer_set['#theme'];
       $this->assertStringStartsWith(
@@ -422,7 +421,6 @@ class StyleTest extends ViewsKernelTestBase {
    *
    * When $this->options['grouping'] is empty, the else branch must still fall
    * back to renderRowGroup() (no regression).
-   *
    */
   public function testNoGroupingUsesRenderRowGroup(): void {
     $view = Views::getView('test_view');
@@ -454,7 +452,6 @@ class StyleTest extends ViewsKernelTestBase {
    *
    * Verifies both the nested-sets path (recursive renderGroupingSets call) and
    * the leaf-rows path (rows already rendered by the row plugin).
-   *
    */
   public function testGroupingPreprocessContentPopulated(): void {
     $renderer = $this->container->get('renderer');
