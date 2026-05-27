@@ -262,7 +262,7 @@ class DirectoryTest extends FileTestBase {
       elseif ($pid == 0) {
         // Sleep so that all the forks start preparing the directory at the same
         // time.
-        usleep((int) (($time_to_start - microtime(TRUE)) * 5000000));
+        usleep((int) (($time_to_start - microtime(TRUE)) * 1000000));
         $file_system->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY);
         exit();
       }
