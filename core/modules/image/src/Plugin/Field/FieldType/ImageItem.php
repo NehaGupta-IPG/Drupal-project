@@ -292,9 +292,6 @@ class ImageItem extends FileItem {
         ImageResizePolicy::ResizeLargerImages->value => $this->t('Resize proportionally'),
         ImageResizePolicy::RejectLargerImagesWithError->value => $this->t('Reject'),
       ],
-      '#states' => [
-        'visible' => $resize_visibility,
-      ],
     ];
 
     // Remove the description option.
