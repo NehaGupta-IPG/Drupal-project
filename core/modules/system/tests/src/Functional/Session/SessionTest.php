@@ -446,6 +446,50 @@ class SessionTest extends BrowserTestBase {
   }
 
   /**
+   * Tests that anonymous sessions are not used after their expiry.
+   */
+  public function testAnonymousSessionExpiration(): void {
+    $this->drupalGet('session-test/set/foo');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('The current value of the stored session variable has been set to foo');
+
+    $this->drupalGet('session-test/get');
+    $this->assertSession()->pageTextContains('The current value of the stored session variable is: foo');
+
+    // Expire the session.
+    $database = \Drupal::database();
+    $database->update('sessions')
+      ->fields(['timestamp' => 0])
+      ->execute();
+
+    // Expire the session.
+    $this->drupalGet('session-test/get');
+    $this->assertSession()->pageTextNotContains('The current value of the stored session variable is: foo');
+  }
+
+  /**
+   * Tests that authenticated sessions are not used after their expiry.
+   */
+  public function testAuthenticatedSessionExpiration(): void {
+    // Login to ensure a session exists.
+    $user = $this->drupalCreateUser([]);
+    $this->drupalLogin($user);
+
+    $this->drupalGet('user');
+    $this->assertSession()->pageTextContains($user->getAccountName());
+
+    // Expire the session.
+    $database = \Drupal::database();
+    $database->update('sessions')
+      ->fields(['timestamp' => 0])
+      ->execute();
+
+    // Should not be logged in with an expired session.
+    $this->drupalGet('user');
+    $this->assertSession()->pageTextNotContains($user->getAccountName());
+  }
+
+  /**
    * Reset the cookie file so that it refers to the specified user.
    */
   public function sessionReset(): void {
