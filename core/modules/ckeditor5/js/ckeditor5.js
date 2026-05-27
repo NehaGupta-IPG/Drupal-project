@@ -433,6 +433,17 @@
             editor.enableReadOnlyMode('ckeditor5_disabled');
           }
 
+          // If the textarea is set to autofocus, focus the editor and move it
+          // into the viewport.
+          if (element.hasAttribute('autofocus')) {
+            editor.editing.view.focus();
+            // Focusing the editor does not move the viewport to the editor,
+            // however, the [autofocus] attribute is usually scrolls to the
+            // element apart from focusing it. We need to scroll to the editor
+            // manually to maintain the expected behavior.
+            editor.editing.view.scrollToTheSelection();
+          }
+
           // Integrate CKEditor 5 viewport offset with Drupal displace.
           // @see \Drupal\Tests\ckeditor5\FunctionalJavascript\CKEditor5ToolbarTest
           // @see https://ckeditor.com/docs/ckeditor5/latest/api/module_core_editor_editorui-EditorUI.html#member-viewportOffset
