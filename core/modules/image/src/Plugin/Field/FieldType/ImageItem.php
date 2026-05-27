@@ -271,8 +271,8 @@ class ImageItem extends FileItem {
       '#suffix' => '</div>',
     ];
     $resize_visibility = [
-      ':input[name="settings[max_resolution][x]"]' => ['!value' => ''],
-      ':input[name="settings[max_resolution][y]"]' => ['!value' => ''],
+      [':input[name="settings[max_resolution][x]"]' => ['!value' => '']],
+      [':input[name="settings[max_resolution][y]"]' => ['!value' => '']],
     ];
     $element['resize'] = [
       '#type' => 'details',
