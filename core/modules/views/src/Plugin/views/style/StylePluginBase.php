@@ -501,7 +501,7 @@ abstract class StylePluginBase extends PluginBase {
         $single_output = [
           '#theme' => $theme_functions,
           '#view' => $this->view,
-          '#grouping' => $this->options['grouping'][$level],
+          '#grouping' => $this->options['grouping'][$level] ?? [],
           '#rows' => $set['rows'],
         ];
       }
@@ -514,7 +514,21 @@ abstract class StylePluginBase extends PluginBase {
           }
         }
 
-        $single_output = $this->renderRowGroup($set['rows']);
+        // When grouping is configured, always use the views_view_grouping
+        // theme so that hook_preprocess_views_view_grouping() is invoked for
+        // every grouping level, including the leaf level.
+        // @see https://www.drupal.org/project/drupal/issues/2950737
+        if (!empty($this->options['grouping'])) {
+          $single_output = [
+            '#theme' => $theme_functions,
+            '#view' => $this->view,
+            '#grouping' => $this->options['grouping'][$level] ?? [],
+            '#rows' => $set['rows'],
+          ];
+        }
+        else {
+          $single_output = $this->renderRowGroup($set['rows']);
+        }
       }
 
       $single_output['#grouping_level'] = $level;
