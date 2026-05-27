@@ -6,6 +6,7 @@ namespace Drupal\Tests\views\Kernel\Plugin;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
+use Drupal\views\Hook\ViewsThemeHooks;
 use Drupal\views\Plugin\views\row\Fields;
 use Drupal\views\ResultRow;
 use Drupal\views\Views;
@@ -283,7 +284,6 @@ class StyleTest extends ViewsKernelTestBase {
   /**
    * Tests that views_view_grouping is used for all grouping levels.
    *
-   * @see https://www.drupal.org/project/drupal/issues/2950737
    */
   public function testGroupingPreprocessInvoked(): void {
     $view = Views::getView('test_view');
@@ -351,7 +351,7 @@ class StyleTest extends ViewsKernelTestBase {
       'title' => $first_set['group'],
     ];
     // Manually trigger the initial preprocess.
-    (new \Drupal\views\Hook\ViewsThemeHooks(
+    (new ViewsThemeHooks(
       $this->container->get('module_handler'),
       $this->container->get('extension.list.module'),
       $this->container->get('path.current'),
@@ -423,7 +423,6 @@ class StyleTest extends ViewsKernelTestBase {
    * When $this->options['grouping'] is empty, the else branch must still fall
    * back to renderRowGroup() (no regression).
    *
-   * @see https://www.drupal.org/project/drupal/issues/2950737
    */
   public function testNoGroupingUsesRenderRowGroup(): void {
     $view = Views::getView('test_view');
@@ -456,7 +455,6 @@ class StyleTest extends ViewsKernelTestBase {
    * Verifies both the nested-sets path (recursive renderGroupingSets call) and
    * the leaf-rows path (rows already rendered by the row plugin).
    *
-   * @see https://www.drupal.org/project/drupal/issues/2950737
    */
   public function testGroupingPreprocessContentPopulated(): void {
     $renderer = $this->container->get('renderer');

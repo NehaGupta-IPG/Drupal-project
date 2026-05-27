@@ -408,15 +408,12 @@ class ViewsThemeHooks {
     $rows = $variables['rows'];
     $first = reset($rows);
     if (!empty($rows) && is_array($first) && isset($first['group'])) {
-      // Rows are nested grouping sets: recurse into renderGroupingSets().
+      // Nested grouping sets: recurse to render each inner group.
       $variables['content'] = $variables['view']->style_plugin->renderGroupingSets($rows);
     }
     else {
-      // Rows have already been rendered by the row plugin (leaf level).
-      // Wrap them with the style's own theme function. The result is placed
-      // in an indexed array to match the structure returned by
-      // renderGroupingSets() for nested levels, so that templates can iterate
-      // over $content consistently with {% for item in content %}.
+      // Leaf level: rows already rendered by the row plugin. Wrap in an
+      // indexed array to keep the same structure as the nested case.
       $variables['content'] = [
         [
           '#theme' => $variables['view']->style_plugin->themeFunctions(),

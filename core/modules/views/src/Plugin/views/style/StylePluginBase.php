@@ -514,10 +514,8 @@ abstract class StylePluginBase extends PluginBase {
           }
         }
 
-        // When grouping is configured, always use the views_view_grouping
-        // theme so that hook_preprocess_views_view_grouping() is invoked for
-        // every grouping level, including the leaf level.
-        // @see https://www.drupal.org/project/drupal/issues/2950737
+        // When grouping is configured, use views_view_grouping so that
+        // hook_preprocess_views_view_grouping() is invoked at every level.
         if (!empty($this->options['grouping'])) {
           $single_output = [
             '#theme' => $theme_functions,
