@@ -266,6 +266,7 @@
   <rule ref="SlevomatCodingStandard.ControlStructures.RequireNullCoalesceOperator"/>
   <rule ref="SlevomatCodingStandard.ControlStructures.RequireShortTernaryOperator"/>
   <rule ref="SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch" />
+  <rule ref="SlevomatCodingStandard.Namespaces.FullyQualifiedExceptions" />
   <rule ref="SlevomatCodingStandard.PHP.TypeCast" />
   <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
     <properties>
