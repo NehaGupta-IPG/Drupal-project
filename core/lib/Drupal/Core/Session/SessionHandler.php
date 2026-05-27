@@ -26,11 +26,14 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
    *   The database connection.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
+   * @param array $options
+   *   An associative array of session ini settings.
    */
   public function __construct(
     protected RequestStack $requestStack,
     protected Connection $connection,
     protected TimeInterface $time,
+    protected array $options,
   ) {
   }
 
@@ -50,7 +53,10 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
       try {
         // Read the session data from the database.
         $query = $this->connection
-          ->queryRange('SELECT [session] FROM {sessions} WHERE [sid] = :sid', 0, 1, [':sid' => Crypt::hashBase64($sessionId)]);
+          ->queryRange('SELECT [session] FROM {sessions} WHERE [sid] = :sid AND [timestamp] >= :timestamp', 0, 1, [
+            ':sid' => Crypt::hashBase64($sessionId),
+            ':timestamp' => $this->time->getRequestTime() - $this->options['gc_maxlifetime'],
+          ]);
         $data = (string) $query->fetchField();
       }
       // Swallow the error if the table hasn't been created yet.

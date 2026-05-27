@@ -1737,7 +1737,7 @@ services:
     alias: session_handler.storage
   session_handler.storage:
     class: Drupal\Core\Session\SessionHandler
-    arguments: ['@request_stack', '@database', '@datetime.time']
+    arguments: ['@request_stack', '@database', '@datetime.time', '%session.storage.options%']
     tags:
       - { name: backend_overridable }
   session_handler.write_safe:
