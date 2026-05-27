@@ -3,7 +3,7 @@
 namespace Drupal\views\Hook;
 
 use Drupal\Component\Datetime\TimeInterface;
-use Drupal\Component\Render\Markup;
+use Drupal\Core\Render\Markup;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Config\ConfigFactoryInterface;
