@@ -4,11 +4,18 @@ namespace Drupal\Tests\Core\Form;
 
 use Drupal\Core\Form\FormPreprocess;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
+ * Tests FormPreprocess #description_display default value handling.
+ *
  * @coversDefaultClass \Drupal\Core\Form\FormPreprocess
- * @group Form
+ * @group form
  */
+#[CoversClass(FormPreprocess::class)]
+#[Group('form')]
 class FormPreprocessDescriptionDisplayTest extends UnitTestCase {
 
   /**
@@ -30,7 +37,7 @@ class FormPreprocessDescriptionDisplayTest extends UnitTestCase {
    * Tests that #description_display defaults to 'after' when not set.
    *
    * This covers the case where a form element is added directly to a render
-   * array WITHOUT going through FormBuilder, meaning #description_display
+   * array without going through FormBuilder, meaning #description_display
    * is never explicitly set.
    *
    * @covers ::preprocessFormElement
@@ -43,9 +50,9 @@ class FormPreprocessDescriptionDisplayTest extends UnitTestCase {
         '#description' => 'Some description',
         '#id'          => 'edit-test',
         '#children'    => '',
-              // Intentionally NO #description_display set.
-              // This simulates adding an element directly to a render array,
-              // bypassing FormBuilder::doBuildForm().
+        // Intentionally NO #description_display set.
+        // This simulates adding an element directly to a render array,
+        // bypassing FormBuilder::doBuildForm().
       ],
     ];
 
@@ -54,31 +61,31 @@ class FormPreprocessDescriptionDisplayTest extends UnitTestCase {
 
     // Default must be 'after'.
     $this->assertSame(
-          'after',
-          $variables['description_display'],
-          '#description_display should default to "after" when not explicitly set.'
-      );
+      'after',
+      $variables['description_display'],
+      '#description_display should default to "after" when not explicitly set.'
+    );
 
     // Description content must still be populated.
     $this->assertNotNull(
-          $variables['description'],
-          'Description should not be NULL when #description is set.'
-      );
+      $variables['description'],
+      'Description should not be NULL when #description is set.'
+    );
     $this->assertSame(
-          'Some description',
-          $variables['description']['content'],
-          'Description content should match the #description value.'
-      );
+      'Some description',
+      $variables['description']['content'],
+      'Description content should match the #description value.'
+    );
   }
 
   /**
    * Tests that an explicit #description_display value is respected.
    *
-   * Ensures the fix does not override an intentionally set value.
+   * Ensures the fix does not accidentally override an intentionally set value.
    *
    * @covers ::preprocessFormElement
-   * @dataProvider descriptionDisplayValuesProvider
    */
+  #[DataProvider('descriptionDisplayValuesProvider')]
   public function testExplicitDescriptionDisplayIsRespected(string $display_value): void {
     $variables = [
       'element' => [
@@ -94,16 +101,16 @@ class FormPreprocessDescriptionDisplayTest extends UnitTestCase {
     $this->formPreprocess->preprocessFormElement($variables);
 
     $this->assertSame(
-          $display_value,
-          $variables['description_display'],
-          "Explicit #description_display value '$display_value' should be preserved."
-      );
+      $display_value,
+      $variables['description_display'],
+      "Explicit #description_display value '$display_value' should be preserved."
+    );
   }
 
   /**
    * Data provider for explicit #description_display values.
    *
-   * @return array
+   * @return array<string, array<string>>
    */
   public static function descriptionDisplayValuesProvider(): array {
     return [
@@ -125,21 +132,21 @@ class FormPreprocessDescriptionDisplayTest extends UnitTestCase {
         '#title'    => 'Test field',
         '#id'       => 'edit-test',
         '#children' => '',
-              // No #description at all.
+        // No #description at all.
       ],
     ];
 
     $this->formPreprocess->preprocessFormElement($variables);
 
     $this->assertNull(
-          $variables['description'],
-          'Description variable should be NULL when no #description is provided.'
-      );
+      $variables['description'],
+      'Description variable should be NULL when no #description is provided.'
+    );
     $this->assertArrayNotHasKey(
-          'description_display',
-          $variables,
-          'description_display should not be set when there is no #description.'
-      );
+      'description_display',
+      $variables,
+      'description_display should not be set when there is no #description.'
+    );
   }
 
   /**
@@ -155,17 +162,17 @@ class FormPreprocessDescriptionDisplayTest extends UnitTestCase {
         '#description' => 'Fieldset description',
         '#attributes'  => ['id' => 'edit-fieldset'],
         '#children'    => '',
-              // Intentionally NO #description_display set.
+        // Intentionally NO #description_display set.
       ],
     ];
 
     $this->formPreprocess->preprocessFieldset($variables);
 
     $this->assertSame(
-          'after',
-          $variables['description_display'],
-          'Fieldset #description_display should default to "after" when not set.'
-      );
+      'after',
+      $variables['description_display'],
+      'Fieldset #description_display should default to "after" when not set.'
+    );
   }
 
   /**
@@ -192,15 +199,13 @@ class FormPreprocessDescriptionDisplayTest extends UnitTestCase {
 
     $this->assertSame('invisible', $variables['description_display']);
 
-    // Drupal's Attribute object renders classes as a string like
-    // 'class="visually-hidden"'. Convert to string and check it contains
-    // the expected class.
+    // Cast Attribute object to string to check for the visually-hidden class.
     $attributes_string = (string) $variables['description']['attributes'];
     $this->assertStringContainsString(
-          'visually-hidden',
-          $attributes_string,
-          'visually-hidden class must be present when description_display is invisible.'
-      );
+      'visually-hidden',
+      $attributes_string,
+      'visually-hidden class must be present when description_display is invisible.'
+    );
   }
 
 }
