@@ -55,9 +55,9 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
     $this->assertSession()->pageTextContains('quiche');
 
     $expected = [
-      'QueryCount' => 199,
-      'CacheGetCount' => 223,
-      'CacheSetCount' => 222,
+      'QueryCount' => 195,
+      'CacheGetCount' => 215,
+      'CacheSetCount' => 219,
       'CacheDeleteCount' => 0,
       'CacheTagLookupQueryCount' => 23,
       'CacheTagInvalidationCount' => 0,
@@ -119,11 +119,11 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 70,
-      'CacheGetCount' => 167,
+      'CacheGetCount' => 162,
       'CacheSetCount' => 58,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 19,
+      'CacheTagLookupQueryCount' => 18,
       'ScriptCount' => 1,
       'ScriptBytes' => 12000,
       'StylesheetCount' => 2,
@@ -208,15 +208,15 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       'SELECT "base_table"."revision_id" AS "revision_id", "base_table"."id" AS "id" FROM "content_moderation_state_revision" "base_table" INNER JOIN "content_moderation_state_field_revision" "content_moderation_state_field_revision" ON "content_moderation_state_field_revision"."revision_id" = "base_table"."revision_id" WHERE ("content_moderation_state_field_revision"."content_entity_type_id" LIKE "node" ESCAPE \'\\\\\') AND ("content_moderation_state_field_revision"."content_entity_id" = "1") AND ("content_moderation_state_field_revision"."content_entity_revision_id" = "76") AND ("content_moderation_state_field_revision"."workflow" = "editorial") AND ("content_moderation_state_field_revision"."langcode" = "en") ORDER BY "base_table"."revision_id" DESC',
       'SELECT "revision"."revision_id" AS "revision_id", "revision"."langcode" AS "langcode", "revision"."revision_default" AS "revision_default", "base"."id" AS "id", "base"."uuid" AS "uuid", CASE "base"."revision_id" WHEN "revision"."revision_id" THEN 1 ELSE 0 END AS "isDefaultRevision" FROM "content_moderation_state" "base" INNER JOIN "content_moderation_state_revision" "revision" ON "revision"."id" = "base"."id" AND "revision"."revision_id" IN (76)',
       'SELECT "content_moderation_state_field_revision".*, "content_moderation_state_field_revision"."langcode" AS "content_moderation_state_field_revision__langcode" FROM "content_moderation_state_field_revision" "content_moderation_state_field_revision" WHERE "content_moderation_state_field_revision"."revision_id" IN ("76")',
-      'INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("theme_registry:runtime:umami:Drupal\Core\Utility\ThemeRegistry", "LOCK_ID", "EXPIRE")',
-      'DELETE FROM "semaphore"  WHERE ("name" = "theme_registry:runtime:umami:Drupal\Core\Utility\ThemeRegistry") AND ("value" = "LOCK_ID")',
+      'INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("theme_registry:runtime:umami:Drupal\Core\Cache\CacheCollector", "LOCK_ID", "EXPIRE")',
+      'DELETE FROM "semaphore"  WHERE ("name" = "theme_registry:runtime:umami:Drupal\Core\Cache\CacheCollector") AND ("value" = "LOCK_ID")',
     ];
     $recorded_queries = $performance_data->getQueries();
     $this->assertSame($expected_queries, $recorded_queries);
 
     $expected = [
       'QueryCount' => 56,
-      'CacheGetCount' => 163,
+      'CacheGetCount' => 158,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 34,
@@ -225,13 +225,13 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
         'data' => 7,
         'entity' => 21,
         'dynamic_page_cache' => 1,
-        'render' => 17,
+        'render' => 12,
         'default' => 3,
       ],
       'CacheSetCount' => 41,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 19,
+      'CacheTagLookupQueryCount' => 18,
       'CacheTagGroupedLookups' => [
         [
           'entity_types',
@@ -275,17 +275,15 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
           'taxonomy_term:31',
         ],
         [
-          'config:block_list',
-          'config:system.site',
-        ],
-        [
           'block_content:1',
           'block_content:2',
+          'config:block_list',
           'config:configurable_language_list',
         ],
         ['config:system.menu.footer'],
         [
           'config:system.menu.account',
+          'config:system.site',
           'block_content_view',
           'config:image.style.medium_8_7',
           'file:37',

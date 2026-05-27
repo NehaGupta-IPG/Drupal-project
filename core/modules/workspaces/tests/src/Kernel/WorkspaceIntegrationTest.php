@@ -11,6 +11,7 @@ use Drupal\entity_test\Entity\EntityTestMulRevPub;
 use Drupal\form_test\Form\FormTestAlterForm;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\node\NodeAccessRebuild;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
@@ -29,6 +30,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests a complete publishing scenario across different workspaces.
  */
 #[Group('workspaces')]
+#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class WorkspaceIntegrationTest extends KernelTestBase {
 
@@ -1186,7 +1188,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
   public function testNodeAccessDifferringRevisionIdsOnTarget(): void {
     $this->initializeWorkspacesModule();
     \Drupal::service('module_installer')->install(['node_access_test']);
-    node_access_rebuild();
+    \Drupal::service(NodeAccessRebuild::class)->rebuild();
 
     // Edit node 1 in 'stage'.
     $this->switchToWorkspace('stage');

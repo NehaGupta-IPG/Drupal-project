@@ -493,8 +493,8 @@ default:
   parallel: 8
   variables:
     TESTSUITE: functional
-    CONCURRENCY: "20"
-    KUBERNETES_CPU_REQUEST: "14"
+    CONCURRENCY: "24"
+    KUBERNETES_CPU_REQUEST: "16"
   services:
     - <<: *with-database
 
@@ -503,8 +503,8 @@ default:
   parallel: 4
   variables:
     TESTSUITE: kernel
-    KUBERNETES_CPU_REQUEST: "10"
-    CONCURRENCY: "20"
+    KUBERNETES_CPU_REQUEST: "12"
+    CONCURRENCY: "24"
   services:
     - <<: *with-database
 
