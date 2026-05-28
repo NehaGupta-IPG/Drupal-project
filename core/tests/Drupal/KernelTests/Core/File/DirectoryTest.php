@@ -205,6 +205,37 @@ class DirectoryTest extends FileTestBase {
   }
 
   /**
+   * Tests directory creation when open_basedir is set.
+   */
+  public function testOpenBaseDirDirectoryCreation(): void {
+    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
+    $file_system = $this->container->get('file_system');
+    $project_path = $file_system->realpath('..');
+
+    $include_path = ini_get('include_path');
+    $sys_temp_dir = sys_get_temp_dir();
+    ini_set('open_basedir', "{$sys_temp_dir}:{$include_path}:{$project_path}");
+
+    // Creating one immediate directory defined with stream wrapper
+    $files_dir_stream_wrapper = 'public://foo/';
+    $this->assertTrue($file_system->mkdir($files_dir_stream_wrapper, 0775, TRUE));
+
+    // Creating one immediate directory defined with absolute path
+    $files_dir_stream_wrapper = 'public://bar/';
+    $files_dir_realpath = $file_system->realpath($files_dir_stream_wrapper);
+    $this->assertTrue($file_system->mkdir($files_dir_realpath, 0775, TRUE));
+
+    // Creating two immediate directories defined with stream wrapper
+    $files_dir_stream_wrapper = 'public://foo_foo/bar/';
+    $this->assertTrue($file_system->mkdir($files_dir_stream_wrapper, 0775, TRUE));
+
+    // Creating two immediate directories defined with absolute path
+    $files_dir_realpath = $file_system->realpath('public://');
+    $files_dir_absolute = $files_dir_realpath . '/bar_bar/baz';
+    $this->assertTrue($file_system->mkdir($files_dir_absolute, 0775, TRUE));
+  }
+
+  /**
    * Tests asynchronous directory creation.
    *
    * Image style generation can result in many calls to create similar directory
