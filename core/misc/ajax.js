@@ -780,10 +780,10 @@
     // - Shift+click (open in new window)
     // - Middle mouse button (button === 1)
     if (
-        element.tagName === 'A' &&
-        (event.ctrlKey || event.metaKey || event.shiftKey || event.button === 1)
+      element.tagName === 'A' &&
+      (event.ctrlKey || event.metaKey || event.shiftKey || event.button === 1)
     ) {
-        return;
+      return;
     }
 
     event.preventDefault();
