@@ -90,7 +90,7 @@ class Gettext {
 
     // Add the seek position to the report. This is useful for the batch
     // operation.
-    $report['seek'] = $reader->getSeek();
+    $report['seek'] = $reader->getSeekLastItem();
     return $report;
   }
 
