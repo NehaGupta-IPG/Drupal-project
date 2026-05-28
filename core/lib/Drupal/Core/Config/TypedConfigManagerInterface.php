@@ -82,7 +82,7 @@ interface TypedConfigManagerInterface extends TypedDataManagerInterface {
    *   The data associated with the configuration. Note: This configuration
    *   doesn't yet have to be stored.
    *
-   * @return \Drupal\Core\TypedData\TraversableTypedDataInterface
+   * @return \Drupal\Core\TypedData\ComplexDataInterface
    *   The typed configuration element.
    */
   public function createFromNameAndData($config_name, array $config_data);
