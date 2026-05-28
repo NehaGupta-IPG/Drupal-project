@@ -40,6 +40,14 @@ class UpdateSemverCoreSecurityCoverageTest extends UpdateSemverCoreTestBase {
    */
   protected function doTestSecurityCoverageMessage($installed_version, $fixture, $requirements_section_heading, $message, $mock_date): void {
     \Drupal::state()->set('update_test.mock_date', $mock_date);
+    // Changing the mock date can result in the session timestamp being set to
+    // the mocked date. In later calls with a different mock date this can
+    // result in the session being considered expired. Update the timestamp if
+    // when alter the date to keep them in sync.
+    \Drupal::database()->update('sessions')
+      ->fields(['timestamp' => \Drupal::time()->getRequestTime()])
+      ->condition('uid', $this->loggedInUser->id())
+      ->execute();
     $this->setProjectInstalledVersion($installed_version);
     $this->refreshUpdateStatus(['drupal' => $fixture]);
     $this->drupalGet('admin/reports/status');
