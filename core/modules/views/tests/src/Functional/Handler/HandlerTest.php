@@ -397,4 +397,39 @@ class HandlerTest extends ViewTestBase {
     }
   }
 
+  /**
+   * Tests that trailing view arguments receive default values.
+   *
+   * This test ensures that when a view has multiple contextual arguments,
+   * an empty earlier argument does not prevent subsequent arguments from
+   * falling back to their default values.
+   */
+  public function testViewArgumentsDefaultValue(): void {
+    $view = Views::getView('test_view');
+    $this->assertNotNull($view, 'View test_argument was loaded.');
+
+    // Add first argument without default value.
+    $view->addHandler('default', 'argument', 'views_test_data', 'name', []);
+
+    // Add second argument with default value.
+    $options = [
+      'default_argument_type' => 'fixed',
+      'default_argument_options' => [
+        'argument' => 1,
+      ],
+      'default_action' => 'default',
+    ];
+    $arg_1 = $view->addHandler('default', 'argument', 'views_test_data', 'id', $options);
+    $view->initHandlers();
+
+    // Check that the value of the default argument is as expected.
+    $this->assertEquals(1, $view->argument[$arg_1]->getDefaultArgument(), 'The correct argument default value is returned.');
+    // Don't pass in a value for the default argument and make sure the query
+    // just returns 1 for id.
+    $this->executeView($view);
+
+    $this->assertEquals(1, $view->args[1], 'The correct argument value is used.');
+
+  }
+
 }
