@@ -361,7 +361,10 @@ class WorkspaceManager implements WorkspaceManagerInterface {
         // entity was created inside that workspace), we need to delete the
         // whole entity after all of its pending revisions are gone.
         if (isset($initial_revision_ids[$revision_id])) {
-          $associated_entity_storage->delete([$associated_entity_storage->load($initial_revision_ids[$revision_id])]);
+          $entity = $associated_entity_storage->load($initial_revision_ids[$revision_id]);
+          if ($entity) {
+            $associated_entity_storage->delete([$entity]);
+          }
         }
         else {
           // Delete the associated entity revision.

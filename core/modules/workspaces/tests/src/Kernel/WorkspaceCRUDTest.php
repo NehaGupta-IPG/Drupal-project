@@ -316,4 +316,34 @@ class WorkspaceCRUDTest extends KernelTestBase {
     $this->assertSame([], $tree);
   }
 
+  /**
+   * Tests that deleting a workspace with a deleted tracked entity does not fail.
+   */
+  public function testDeletingWorkspaceWithDeletedEntity(): void {
+    // Create a deleted workspace ID in the state.
+    $this->state->set('workspace.deleted', ['stage' => 'stage']);
+
+    $mock_workspace_association = $this->createMock(\Drupal\workspaces\WorkspaceAssociationInterface::class);
+    $mock_workspace_association->method('getAssociatedInitialRevisions')->willReturn([9999 => 9999]);
+
+    $call_count = 0;
+    $mock_workspace_association->method('getAssociatedRevisions')
+      ->willReturnCallback(function ($workspace_id, $entity_type_id) use (&$call_count) {
+        if ($entity_type_id === 'node') {
+          $call_count++;
+          return $call_count === 1 ? [9999 => 9999] : [];
+        }
+        return [];
+      });
+
+    $this->container->set('workspaces.association', $mock_workspace_association);
+
+    // Call the purge batch process, which should run without throwing any
+    // TypeError.
+    $this->workspaceManager->purgeDeletedWorkspacesBatch();
+
+    // Verify the workspace was deleted from state.
+    $this->assertEquals([], $this->state->get('workspace.deleted'));
+  }
+
 }
