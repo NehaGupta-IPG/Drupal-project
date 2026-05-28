@@ -10,7 +10,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\CssSelector\CssSelectorConverter;
 
 /**
- * Tests for form_element_label theme hook.
+ * Tests for Label render element and form_element_label theme hook.
  */
 #[Group('Form')]
 #[RunTestsInSeparateProcesses]
@@ -44,6 +44,21 @@ class FormElementLabelTest extends KernelTestBase {
     ];
     $this->render($render_array);
     $elements = $this->getSimpleXmlElementsByXpath($css_selector_converter->toXPath('label.meow'));
+    $this->assertCount(1, $elements);
+  }
+
+  /**
+   * Ensures that " (required)" is added to required Label element.
+   */
+  public function testRequiredFieldIndicator(): void {
+    $render_array = [
+      '#type' => 'label',
+      '#title' => 'Label for required',
+      '#required' => TRUE,
+      '#title_display' => 'above',
+    ];
+    $this->render($render_array);
+    $elements = $this->xpath('//label[@class="js-form-required form-required"]/span[@aria-hidden="true" and @class="hidden" and contains(text(), " (required)")]');
     $this->assertCount(1, $elements);
   }
 
