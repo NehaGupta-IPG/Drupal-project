@@ -18,6 +18,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Twig\Environment;
 use Twig\Extension\SandboxExtension;
 use Twig\Sandbox\SecurityError;
@@ -84,8 +85,8 @@ class TwigSandboxTest extends UnitTestCase {
    *
    * Currently "get", "has", and "is" are the only allowed prefixes.
    *
-   * @covers ::__construct
-   * @covers ::checkMethodAllowed
+   * @legacy-covers ::__construct
+   * @legacy-covers ::checkMethodAllowed
    */
   public function testEntitySafePrefixes(): void {
     $entity = $this->createMock('Drupal\Core\Entity\EntityInterface');
@@ -116,8 +117,8 @@ class TwigSandboxTest extends UnitTestCase {
    *
    * Currently, the following methods are allowed: id, label, bundle, get.
    *
-   * @covers ::__construct
-   * @covers ::checkMethodAllowed
+   * @legacy-covers ::__construct
+   * @legacy-covers ::checkMethodAllowed
    */
   public function testEntitySafeMethods(): void {
     $entity = $this->prophesize(EntityInterface::class);
@@ -149,12 +150,12 @@ class TwigSandboxTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::__construct
-   * @covers ::checkMethodAllowed
-   * @dataProvider provideAllowedEntityMethods
+   * @legacy-covers ::__construct
+   * @legacy-covers ::checkMethodAllowed
    */
-  public function testEntitySafeMethodsOnGenerics(): void {
-    $sot = new class () {
+  #[DataProvider('provideAllowedEntityMethods')]
+  public function testEntitySafeMethodsOnGenerics(string $method): void {
+    $sut = new class () {
 
       public function id(): string {
         return 'id';
@@ -170,14 +171,14 @@ class TwigSandboxTest extends UnitTestCase {
 
     };
     $this->expectException(SecurityError::class);
-    $this->twig->render('{{ sot.id }}', ['sot' => $sot]);
+    $this->twig->render('{{ sut.' . $method . ' }}', ['sut' => $sut]);
   }
 
   /**
    * Tests that safe methods can be called.
    *
-   * @covers ::__construct
-   * @covers ::checkMethodAllowed
+   * @legacy-covers ::__construct
+   * @legacy-covers ::checkMethodAllowed
    */
   public function testGloballySafeMethods(): void {
     // Calls to get method.
@@ -188,14 +189,14 @@ class TwigSandboxTest extends UnitTestCase {
     $result = $this->twig->render('{{ entity.get("title") }}', ['entity' => $entity->reveal()]);
     $this->assertEquals('test', $result, 'Sandbox policy allows get() to be called.');
 
-    $sot = new class () {
+    $sut = new class () {
 
       public function get(string $arg): string {
         return $arg;
       }
 
     };
-    $result = $this->twig->render('{{ sot.get("title") }}', ['sot' => $sot]);
+    $result = $this->twig->render('{{ sut.get("title") }}', ['sut' => $sut]);
     $this->assertEquals('title', $result, 'Sandbox policy allows get() to be called on generic class.');
 
     // toString methods
@@ -206,36 +207,36 @@ class TwigSandboxTest extends UnitTestCase {
     $result = $this->twig->render('{{ url.toString }}', ['url' => $url->reveal()]);
     $this->assertEquals('/are/cute', $result, 'Sandbox policy allows toString() to be called on URL.');
 
-    $sot = new class () {
+    $sut = new class () {
 
       public function toString(): string {
         return 'toString';
       }
 
     };
-    $result = $this->twig->render('{{ sot.toString }}', ['sot' => $sot]);
+    $result = $this->twig->render('{{ sut.toString }}', ['sut' => $sut]);
     $this->assertEquals('toString', $result, 'Sandbox policy allows toString() to be called on generic class.');
 
-    $sot = new class () {
+    $sut = new class () {
 
       public function __toString() {
         return '__toString';
       }
 
     };
-    $result = $this->twig->render('{{ sot.__toString }}', ['sot' => $sot]);
+    $result = $this->twig->render('{{ sut.__toString }}', ['sut' => $sut]);
     $this->assertEquals('__toString', $result, 'Sandbox policy allows __toString() to be called on generic class.');
-    $result = $this->twig->render('{{ sot }}', ['sot' => $sot]);
+    $result = $this->twig->render('{{ sut }}', ['sut' => $sut]);
     $this->assertEquals('__toString', $result, 'Sandbox policy allows string conversion on generic class.');
   }
 
   /**
    * Tests that shared method names across classes works.
    *
-   * @runInSeparateProcess
-   * @covers ::__construct
-   * @covers ::checkMethodAllowed
+   * @legacy-covers ::__construct
+   * @legacy-covers ::checkMethodAllowed
    */
+  #[RunInSeparateProcess]
   public function testOverrideCollision(): void {
     // Replace settings
     new Settings([
@@ -267,11 +268,10 @@ class TwigSandboxTest extends UnitTestCase {
   /**
    * Tests that unqualified twig_sandbox_allowed_methods methods trigger error.
    *
-   * @covers ::__construct
-   * @covers ::checkMethodAllowed
-   * @runInSeparateProcess
-   * @group legacy
+   * @legacy-covers ::__construct
+   * @legacy-covers ::checkMethodAllowed
    */
+  #[RunInSeparateProcess]
   public function testLegacyAllowedMethod(): void {
     // Replace settings
     new Settings([
@@ -279,7 +279,7 @@ class TwigSandboxTest extends UnitTestCase {
         'id',
       ],
     ]);
-    $this->expectDeprecation('Not specifying a fully-qualified method name to twig_sandbox_allowed_methods is deprecated in drupal:11.2.0 and will throw an error in drupal:12.0.0. See https://www.drupal.org/node/3263019');
+    $this->expectUserDeprecationMessage('Not specifying a fully-qualified method name to twig_sandbox_allowed_methods is deprecated in drupal:11.2.0 and will throw an error in drupal:12.0.0. See https://www.drupal.org/node/3263019');
     new TwigSandboxPolicy();
   }
 
