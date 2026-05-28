@@ -129,7 +129,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 30,
-      'CacheGetCount' => 94,
+      'CacheGetCount' => 91,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 19,
@@ -137,7 +137,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
         'discovery' => 38,
         'bootstrap' => 10,
         'dynamic_page_cache' => 1,
-        'render' => 11,
+        'render' => 8,
         'default' => 5,
         'entity' => 2,
         'menu' => 3,
@@ -145,7 +145,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'CacheSetCount' => 42,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 9,
+      'CacheTagLookupQueryCount' => 10,
       'CacheTagGroupedLookups' => [
         [
           'route_match',
@@ -163,10 +163,8 @@ class StandardPerformanceTest extends PerformanceTestBase {
         ['config:views.view.frontpage', 'node:1', 'node_list'],
         ['rendered', 'user:0', 'user_view'],
         ['config:filter.format.restricted_html', 'node_view'],
-        [
-          'config:block_list',
-          'config:system.site',
-        ],
+        ['config:block_list'],
+        ['config:system.site'],
         ['config:system.menu.account'],
         ['config:system.menu.main'],
         ['config:user.role.anonymous'],
@@ -203,7 +201,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 7,
-      'CacheGetCount' => 68,
+      'CacheGetCount' => 65,
       'CacheSetCount' => 16,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
@@ -223,11 +221,11 @@ class StandardPerformanceTest extends PerformanceTestBase {
         ],
         ['rendered', 'user:0', 'user_view'],
         ['config:filter.format.restricted_html', 'node:1', 'node_view'],
+        ['config:block_list'],
         [
-          'config:block_list',
+          'config:system.menu.main',
           'config:system.site',
         ],
-        ['config:system.menu.main'],
         ['config:system.menu.account'],
         ['config:user.role.anonymous'],
       ],
@@ -257,7 +255,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 8,
-      'CacheGetCount' => 58,
+      'CacheGetCount' => 55,
       'CacheSetCount' => 15,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
@@ -302,7 +300,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 3,
-      'CacheGetCount' => 64,
+      'CacheGetCount' => 61,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 11,
@@ -310,7 +308,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
         'discovery' => 21,
         'bootstrap' => 8,
         'dynamic_page_cache' => 2,
-        'render' => 12,
+        'render' => 9,
         'default' => 3,
         'entity' => 1,
         'menu' => 1,
@@ -414,11 +412,11 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'StylesheetBytes' => 1429,
       'StylesheetCount' => 1,
       'QueryCount' => 16,
-      'CacheGetCount' => 72,
+      'CacheGetCount' => 69,
       'CacheSetCount' => 1,
       'CacheDeleteCount' => 1,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 6,
+      'CacheTagLookupQueryCount' => 7,
       'CacheTagGroupedLookups' => [
         // Form submission and login.
         [
@@ -448,13 +446,12 @@ class StandardPerformanceTest extends PerformanceTestBase {
         ],
         ['rendered', 'user:2', 'user_view'],
         [
-          'config:block_list',
-          'config:system.site',
+          'config:system.menu.account',
+          'config:system.menu.main',
         ],
-        ['config:system.menu.account', 'config:system.menu.main'],
-        [
-          'config:user.role.authenticated',
-        ],
+        ['config:block_list'],
+        ['config:system.site'],
+        ['config:user.role.authenticated'],
       ],
     ];
     $this->assertMetrics($expected, $performance_data);
@@ -509,7 +506,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'CacheSetCount' => 1,
       'CacheDeleteCount' => 1,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 10,
+      'CacheTagLookupQueryCount' => 11,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
@@ -554,14 +551,14 @@ class StandardPerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 4,
-      'CacheGetCount' => 44,
+      'CacheGetCount' => 41,
       'CacheGetCountByBin' => [
         'config' => 10,
         'data' => 5,
         'discovery' => 9,
         'bootstrap' => 8,
         'dynamic_page_cache' => 1,
-        'render' => 10,
+        'render' => 7,
         'menu' => 1,
       ],
       'CacheSetCount' => 2,
