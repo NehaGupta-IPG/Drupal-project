@@ -146,9 +146,6 @@ class ModulesListForm extends FormBase {
     require_once DRUPAL_ROOT . '/core/includes/install.inc';
     $distribution = drupal_install_profile_distribution_name();
 
-    // Include system.admin.inc so we can use the sort callbacks.
-    $this->moduleHandler->loadInclude('system', 'inc', 'system.admin');
-
     $form['filters'] = [
       '#type' => 'container',
       '#attributes' => [
@@ -247,7 +244,7 @@ class ModulesListForm extends FormBase {
    *   The list existing modules.
    * @param \Drupal\Core\Extension\Extension $module
    *   The module for which to build the form row.
-   * @param $distribution
+   * @param string $distribution
    *   The distribution.
    *
    * @return array
@@ -328,7 +325,8 @@ class ModulesListForm extends FormBase {
 
     // Disable the checkbox for required modules.
     if (!empty($module->info['required'])) {
-      // Used when displaying modules that are required by the installation profile
+      // Used when displaying modules that are required by the installation
+      // profile.
       $row['enable']['#disabled'] = TRUE;
       $row['#required_by'][] = $distribution . (!empty($module->info['explanation']) ? ' (' . $module->info['explanation'] . ')' : '');
     }
@@ -352,7 +350,8 @@ class ModulesListForm extends FormBase {
       ]);
     }
 
-    // Ensure this module is compatible with the currently installed version of PHP.
+    // Ensure this module is compatible with the currently installed version of
+    // PHP.
     if (version_compare(phpversion(), $module->info['php']) < 0) {
       $compatible = FALSE;
       $required = $module->info['php'] . (substr_count($module->info['php'], '.') < 2 ? '.*' : '');
@@ -373,8 +372,6 @@ class ModulesListForm extends FormBase {
     // If this module requires other modules, add them to the array.
     /** @var \Drupal\Core\Extension\Dependency $dependency_object */
     foreach ($module->requires as $dependency => $dependency_object) {
-      // @todo Add logic for not displaying hidden modules in
-      //   https://drupal.org/node/3117829.
       if ($incompatible = $this->checkDependencyMessage($modules, $dependency, $dependency_object)) {
         $row['#requires'][$dependency] = $incompatible;
         $row['enable']['#disabled'] = TRUE;

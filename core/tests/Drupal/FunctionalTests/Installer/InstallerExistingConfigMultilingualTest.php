@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Core\Logger\RfcLogLevel;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Verifies that installing from existing configuration works.
- *
- * @group Installer
  */
+#[Group('Installer')]
+#[RunTestsInSeparateProcesses]
 class InstallerExistingConfigMultilingualTest extends InstallerConfigDirectoryTestBase {
 
   /**
@@ -36,7 +38,7 @@ class InstallerExistingConfigMultilingualTest extends InstallerConfigDirectoryTe
     $count = (int) \Drupal::database()->select('watchdog', 'w')->fields('w')->condition('severity', RfcLogLevel::WARNING, '<=')->countQuery()->execute()->fetchField();
     $this->assertSame(0, $count);
 
-    // Ensure the correct message is logged from locale_config_batch_finished().
+    // Ensure the correct message is logged from \Drupal\locale\LocaleConfigBatch::batchFinished().
     $count = (int) \Drupal::database()->select('watchdog', 'w')->fields('w')->condition('message', 'The configuration was successfully updated. %number configuration objects updated.')->countQuery()->execute()->fetchField();
     $this->assertSame(1, $count);
   }

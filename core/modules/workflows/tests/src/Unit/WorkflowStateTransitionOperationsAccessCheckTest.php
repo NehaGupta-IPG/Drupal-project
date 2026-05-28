@@ -8,24 +8,26 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Routing\RouteMatch;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\UnitTestCase;
-use Drupal\workflows\WorkflowStateTransitionOperationsAccessCheck;
 use Drupal\workflows\WorkflowInterface;
+use Drupal\workflows\WorkflowStateTransitionOperationsAccessCheck;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Symfony\Component\Routing\Route;
 
 /**
- * @coversDefaultClass \Drupal\workflows\WorkflowStateTransitionOperationsAccessCheck
- * @group workflows
+ * Tests Drupal\workflows\WorkflowStateTransitionOperationsAccessCheck.
  */
+#[CoversClass(WorkflowStateTransitionOperationsAccessCheck::class)]
+#[Group('workflows')]
 class WorkflowStateTransitionOperationsAccessCheckTest extends UnitTestCase {
 
   /**
    * Tests the access method correctly proxies to the entity access system.
-   *
-   * @covers ::access
-   * @dataProvider accessTestCases
    */
-  public function testAccess($route_requirement, $resulting_entity_access_check, $route_parameters = []): void {
+  #[DataProvider('accessTestCases')]
+  public function testAccess(string $route_requirement, string $resulting_entity_access_check, array $route_parameters = []): void {
     $workflow_entity_access_result = AccessResult::allowed();
     $workflow = $this->prophesize(WorkflowInterface::class);
     $workflow->access($resulting_entity_access_check, Argument::type(AccountInterface::class), TRUE)
@@ -50,7 +52,7 @@ class WorkflowStateTransitionOperationsAccessCheckTest extends UnitTestCase {
   /**
    * Test cases for ::testAccess.
    */
-  public static function accessTestCases() {
+  public static function accessTestCases(): array {
     return [
       'Transition add' => [
         'add-transition',
@@ -92,7 +94,9 @@ class WorkflowStateTransitionOperationsAccessCheckTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::access
+   * Tests missing route params.
+   *
+   * @legacy-covers ::access
    */
   public function testMissingRouteParams(): void {
     $workflow = $this->prophesize(WorkflowInterface::class);
@@ -123,10 +127,12 @@ class WorkflowStateTransitionOperationsAccessCheckTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::access
-   * @dataProvider invalidOperationNameTestCases
+   * Tests invalid operation name.
+   *
+   * @legacy-covers ::access
    */
-  public function testInvalidOperationName($operation_name): void {
+  #[DataProvider('invalidOperationNameTestCases')]
+  public function testInvalidOperationName(string $operation_name): void {
     $this->expectException(\Exception::class);
     $this->expectExceptionMessage("Invalid _workflow_access operation '$operation_name' specified for route 'Foo Route'.");
     $route = new Route('', [], [
@@ -140,7 +146,7 @@ class WorkflowStateTransitionOperationsAccessCheckTest extends UnitTestCase {
   /**
    * Test cases for ::testInvalidOperationName.
    */
-  public static function invalidOperationNameTestCases() {
+  public static function invalidOperationNameTestCases(): array {
     return [
       ['invalid-op'],
       ['foo-add-transition'],

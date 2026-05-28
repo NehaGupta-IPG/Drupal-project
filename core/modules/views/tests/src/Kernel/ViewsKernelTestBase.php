@@ -30,6 +30,7 @@ abstract class ViewsKernelTestBase extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
+    'filter',
     'system',
     'views',
     'views_test_config',
@@ -68,7 +69,8 @@ abstract class ViewsKernelTestBase extends KernelTestBase {
 
     /** @var \Drupal\Core\State\StateInterface $state */
     $state = $this->container->get('state');
-    // Define the schema and views data variable before enabling the test module.
+    // Define the schema and views data variable before enabling the test
+    // module.
     $state->set('views_test_data_schema', $this->schemaDefinition());
     $state->set('views_test_data_views_data', $this->viewsData());
     $this->container->get('views.views_data')->clear();
@@ -107,7 +109,7 @@ abstract class ViewsKernelTestBase extends KernelTestBase {
    */
   protected function orderResultSet($result_set, $column, $reverse = FALSE) {
     $order = $reverse ? -1 : 1;
-    usort($result_set, function ($a, $b) use ($column, $order) {
+    usort($result_set, function (array $a, array $b) use ($column, $order): int {
       return $order * ($a[$column] <=> $b[$column]);
     });
     return $result_set;

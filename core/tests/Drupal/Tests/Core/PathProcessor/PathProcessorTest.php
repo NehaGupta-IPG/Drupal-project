@@ -9,18 +9,23 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\PathProcessor\PathProcessorDecode;
 use Drupal\Core\PathProcessor\PathProcessorFront;
 use Drupal\Core\PathProcessor\PathProcessorManager;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\language\ConfigurableLanguageManagerInterface;
+use Drupal\language\EventSubscriber\ConfigSubscriber;
 use Drupal\language\HttpKernel\PathProcessorLanguage;
+use Drupal\language\LanguageNegotiatorInterface;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
 use Drupal\path_alias\AliasManager;
 use Drupal\path_alias\PathProcessor\AliasPathProcessor;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Tests processing of the inbound path.
- *
- * @group PathProcessor
  */
+#[Group('PathProcessor')]
 class PathProcessorTest extends UnitTestCase {
 
   /**
@@ -32,10 +37,8 @@ class PathProcessorTest extends UnitTestCase {
 
   /**
    * The language manager stub used to construct a PathProcessorLanguage object.
-   *
-   * @var \Drupal\language\ConfigurableLanguageManagerInterface|\PHPUnit\Framework\MockObject\MockBuilder
    */
-  protected $languageManager;
+  protected ConfigurableLanguageManagerInterface&Stub $languageManager;
 
   /**
    * {@inheritdoc}
@@ -52,15 +55,14 @@ class PathProcessorTest extends UnitTestCase {
     $this->languages = $languages;
 
     // Create a language manager stub.
-    $language_manager = $this->getMockBuilder('Drupal\language\ConfigurableLanguageManagerInterface')
-      ->getMock();
-    $language_manager->expects($this->any())
+    $language_manager = $this->createStub(ConfigurableLanguageManagerInterface::class);
+    $language_manager
       ->method('getCurrentLanguage')
       ->willReturn($languages['en']);
-    $language_manager->expects($this->any())
+    $language_manager
       ->method('getLanguages')
       ->willReturn($this->languages);
-    $language_manager->expects($this->any())
+    $language_manager
       ->method('getLanguageTypes')
       ->willReturn([LanguageInterface::TYPE_INTERFACE]);
 
@@ -73,9 +75,7 @@ class PathProcessorTest extends UnitTestCase {
   public function testProcessInbound(): void {
 
     // Create an alias manager stub.
-    $alias_manager = $this->getMockBuilder(AliasManager::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+    $alias_manager = $this->createStub(AliasManager::class);
 
     $system_path_map = [
       // Set up one proper alias that can be resolved to a system path.
@@ -86,12 +86,12 @@ class PathProcessorTest extends UnitTestCase {
       ['/user/login', NULL, '/user/login'],
     ];
 
-    $alias_manager->expects($this->any())
+    $alias_manager
       ->method('getPathByAlias')
       ->willReturnMap($system_path_map);
 
-    // Create a stub config factory with all config settings that will be checked
-    // during this test.
+    // Create a stub config factory with all config settings that will be
+    // checked during this test.
     $config_factory_stub = $this->getConfigFactoryStub(
       [
         'system.site' => [
@@ -107,9 +107,8 @@ class PathProcessorTest extends UnitTestCase {
     );
 
     // Create a language negotiator stub.
-    $negotiator = $this->getMockBuilder('Drupal\language\LanguageNegotiatorInterface')
-      ->getMock();
-    $negotiator->expects($this->any())
+    $negotiator = $this->createStub(LanguageNegotiatorInterface::class);
+    $negotiator
       ->method('getNegotiationMethods')
       ->willReturn([
         LanguageNegotiationUrl::METHOD_ID => [
@@ -120,18 +119,15 @@ class PathProcessorTest extends UnitTestCase {
     $method = new LanguageNegotiationUrl();
     $method->setConfig($config_factory_stub);
     $method->setLanguageManager($this->languageManager);
-    $negotiator->expects($this->any())
+    $negotiator
       ->method('getNegotiationMethodInstance')
       ->willReturn($method);
 
     // Create a user stub.
-    $current_user = $this->getMockBuilder('Drupal\Core\Session\AccountInterface')
-      ->getMock();
+    $current_user = $this->createStub(AccountInterface::class);
 
     // Create a config event subscriber stub.
-    $config_subscriber = $this->getMockBuilder('Drupal\language\EventSubscriber\ConfigSubscriber')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $config_subscriber = $this->createStub(ConfigSubscriber::class);
 
     // Create the processors.
     $alias_processor = new AliasPathProcessor($alias_manager);
@@ -140,20 +136,14 @@ class PathProcessorTest extends UnitTestCase {
     $language_processor = new PathProcessorLanguage($config_factory_stub, $this->languageManager, $negotiator, $current_user, $config_subscriber);
 
     // First, test the processor manager with the processors in the incorrect
-    // order. The alias processor will run before the language processor, meaning
-    // aliases will not be found.
-    $priorities = [
-      1000 => $alias_processor,
-      500 => $decode_processor,
-      300 => $front_processor,
-      200 => $language_processor,
-    ];
-
-    // Create the processor manager and add the processors.
-    $processor_manager = new PathProcessorManager();
-    foreach ($priorities as $priority => $processor) {
-      $processor_manager->addInbound($processor, $priority);
-    }
+    // order. The alias processor will run before the language processor,
+    // meaning aliases will not be found.
+    $processor_manager = new PathProcessorManager([
+      $alias_processor,
+      $decode_processor,
+      $front_processor,
+      $language_processor,
+    ]);
 
     // Test resolving the French homepage using the incorrect processor order.
     $test_path = '/fr';
@@ -167,18 +157,14 @@ class PathProcessorTest extends UnitTestCase {
     $processed = $processor_manager->processInbound($test_path, $request);
     $this->assertEquals('/foo', $processed, 'Processing in the incorrect order fails to resolve the system path from an alias');
 
-    // Now create a new processor manager and add the processors, this time in
-    // the correct order.
-    $processor_manager = new PathProcessorManager();
-    $priorities = [
-      1000 => $decode_processor,
-      500 => $language_processor,
-      300 => $front_processor,
-      200 => $alias_processor,
-    ];
-    foreach ($priorities as $priority => $processor) {
-      $processor_manager->addInbound($processor, $priority);
-    }
+    // Now create a new processor manager with the processors in the correct
+    // order.
+    $processor_manager = new PathProcessorManager([
+      $decode_processor,
+      $language_processor,
+      $front_processor,
+      $alias_processor,
+    ]);
 
     // Test resolving the French homepage using the correct processor order.
     $test_path = '/fr';

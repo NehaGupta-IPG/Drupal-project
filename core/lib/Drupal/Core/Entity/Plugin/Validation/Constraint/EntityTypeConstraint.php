@@ -16,32 +16,13 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class EntityTypeConstraint extends SymfonyConstraint {
 
-  /**
-   * The default violation message.
-   *
-   * @var string
-   */
-  public $message = 'The entity must be of type %type.';
-
-  /**
-   * The entity type option.
-   *
-   * @var string
-   */
-  public $type;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getDefaultOption(): ?string {
-    return 'type';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getRequiredOptions(): array {
-    return ['type'];
+  public function __construct(
+    public string $type,
+    public $message = 'The entity must be of type %type.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct(groups: $groups, payload: $payload);
   }
 
 }

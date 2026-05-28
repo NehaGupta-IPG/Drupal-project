@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\field_ui_test\Hook;
 
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Access\AccessResult;
@@ -19,7 +20,7 @@ class FieldUiTestHooks {
    * Implements hook_ENTITY_TYPE_access().
    */
   #[Hook('field_config_access')]
-  public function fieldConfigAccess(FieldConfigInterface $field) {
+  public function fieldConfigAccess(FieldConfigInterface $field): AccessResultInterface {
     return AccessResult::forbiddenIf($field->getName() == 'highlander');
   }
 
@@ -95,6 +96,22 @@ class FieldUiTestHooks {
 
   public function regionCallback($row): string {
     return 'content';
+  }
+
+  /**
+   * Implements hook_field_formatter_third_party_settings_form().
+   *
+   * We add an empty hook implementation to test it does not result in a fatal
+   * error in \Drupal\field_ui\Form\EntityViewDisplayEditForm::thirdPartySettingsForm.
+   *
+   * @see \Drupal\field_ui\Form\EntityViewDisplayEditForm::thirdPartySettingsForm
+   * @see \Drupal\Tests\field_ui\Functional\FieldUIIndentationTest::testIndentation
+   *
+   * @link https://www.drupal.org/project/drupal/issues/3552531
+   */
+  #[Hook('field_formatter_third_party_settings_form')]
+  public function fieldFormatterThirdPartySettingsForm(): void {
+    // Empty hook implementation.
   }
 
 }

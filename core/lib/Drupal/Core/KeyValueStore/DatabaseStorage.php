@@ -80,7 +80,12 @@ class DatabaseStorage extends StorageBase {
   public function getMultiple(array $keys) {
     $values = [];
     try {
-      $result = $this->connection->query('SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [name] IN ( :keys[] ) AND [collection] = :collection', [':keys[]' => $keys, ':collection' => $this->collection])->fetchAllAssoc('name');
+      $result = $this->connection
+        ->query('SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [name] IN ( :keys[] ) AND [collection] = :collection', [
+          ':keys[]' => $keys,
+          ':collection' => $this->collection,
+        ])
+        ->fetchAllAssoc('name');
       foreach ($keys as $key) {
         if (isset($result[$key])) {
           $values[$key] = $this->serializer->decode($result[$key]->value);
@@ -114,6 +119,24 @@ class DatabaseStorage extends StorageBase {
       }
     }
     return $values;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAllKeys(): iterable {
+    try {
+      $values = $this->connection->query(
+        'SELECT [name] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection',
+        [
+          ':collection' => $this->collection,
+        ])->fetchCol();
+      return $values;
+    }
+    catch (\Exception $e) {
+      $this->catchException($e);
+    }
+    return [];
   }
 
   /**
@@ -155,6 +178,20 @@ class DatabaseStorage extends StorageBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function setMultiple(array $data): void {
+    $transaction = $this->connection->startTransaction();
+    try {
+      parent::setMultiple($data);
+      $transaction->commitOrRelease();
+    }
+    catch (\Exception) {
+      $transaction->rollback();
+    }
+  }
+
+  /**
    * Saves a value for a given key if it does not exist yet.
    *
    * This will be called by setIfNotExists() within a try block.
@@ -167,7 +204,7 @@ class DatabaseStorage extends StorageBase {
    * @return bool
    *   TRUE if the data was set, FALSE if it already existed.
    */
-  public function doSetIfNotExists($key, $value) {
+  protected function doSetIfNotExists($key, $value) {
     $result = $this->connection->merge($this->table)
       ->insertFields([
         'collection' => $this->collection,

@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @ingroup testing
  */
-class PerformanceTestBase extends WebDriverTestBase {
+abstract class PerformanceTestBase extends WebDriverTestBase {
   use PerformanceTestTrait;
 
   /**
@@ -27,12 +27,13 @@ class PerformanceTestBase extends WebDriverTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->doSetUpTasks();
+    \Drupal::service('module_installer')->uninstall(['automated_cron']);
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function prepareEnvironment() {
+  protected function prepareEnvironment(): void {
     parent::prepareEnvironment();
     $db = Database::getConnection();
     $test_file_name = (new \ReflectionClass($this))->getFileName();
@@ -45,7 +46,7 @@ class PerformanceTestBase extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function installModulesFromClassProperty(ContainerInterface $container) {
+  protected function installModulesFromClassProperty(ContainerInterface $container): void {
     $this->doInstallModulesFromClassProperty($container);
   }
 

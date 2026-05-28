@@ -60,6 +60,13 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
   protected $user;
 
   /**
+   * Test admin user.
+   *
+   * @var \Drupal\user\Entity\User
+   */
+  protected $adminUser;
+
+  /**
    * Test user with access to view profiles.
    *
    * @var \Drupal\user\Entity\User
@@ -185,6 +192,14 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
       'edit any article content',
       'delete any article content',
     ]);
+    $this->adminUser = $this->drupalCreateUser([
+      'create article content',
+      'edit any article content',
+      'delete any article content',
+    ],
+      'jsonapi_admin_user',
+      TRUE,
+    );
 
     // Create a user that can.
     $this->userCanViewProfiles = $this->drupalCreateUser([
@@ -219,7 +234,7 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
    *
    * @see \GuzzleHttp\ClientInterface::request
    */
-  protected function request($method, Url $url, array $request_options): ResponseInterface {
+  protected function request(string $method, Url $url, array $request_options): ResponseInterface {
     try {
       $response = $this->httpClient->request($method, $url->toString(), $request_options);
     }
@@ -269,6 +284,7 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
       $values = [
         'uid' => ['target_id' => $this->user->id()],
         'type' => 'article',
+        'promote' => TRUE,
       ];
 
       if ($referencing_twice) {
@@ -285,7 +301,7 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
           $tags[] = mt_rand(1, $num_tags);
           $tags = array_unique($tags);
         }
-        $values['field_tags'] = array_map(function ($tag) {
+        $values['field_tags'] = array_map(function ($tag): array {
           return ['target_id' => $tag];
         }, $tags);
       }

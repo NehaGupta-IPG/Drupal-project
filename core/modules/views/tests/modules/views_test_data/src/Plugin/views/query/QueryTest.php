@@ -21,9 +21,33 @@ use Drupal\views\ViewExecutable;
   help: new TranslatableMarkup('Defines a query test plugin.')
 )]
 class QueryTest extends QueryPluginBase {
+
+  /**
+   * The conditions to apply to the query.
+   *
+   * @var array
+   */
   protected $conditions = [];
+
+  /**
+   * The list of fields.
+   *
+   * @var string[][]
+   */
   protected $fields = [];
+
+  /**
+   * An array of stdClasses.
+   *
+   * @var array<array<string, mixed>>
+   */
   protected $allItems = [];
+
+  /**
+   * The field to order and the direction.
+   *
+   * @var array
+   */
   protected $orderBy = [];
 
   /**
@@ -39,11 +63,11 @@ class QueryTest extends QueryPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
+  public function buildOptionsForm(&$form, FormStateInterface $form_state): void {
     parent::buildOptionsForm($form, $form_state);
 
     $form['test_setting'] = [
-      '#title' => $this->t('Test setting'),
+      '#title' => 'Test setting',
       '#type' => 'textfield',
       '#default_value' => $this->options['test_setting'],
     ];
@@ -55,14 +79,14 @@ class QueryTest extends QueryPluginBase {
    * @param array $allItems
    *   An array of stdClasses.
    */
-  public function setAllItems($allItems) {
+  public function setAllItems($allItems): void {
     $this->allItems = $allItems;
   }
 
   /**
    * Adds a simple WHERE clause to the query.
    */
-  public function addWhere($group, $field, $value = NULL, $operator = NULL) {
+  public function addWhere($group, $field, $value = NULL, $operator = NULL): void {
     $this->conditions[] = [
       'field' => $field,
       'value' => $value,
@@ -82,14 +106,14 @@ class QueryTest extends QueryPluginBase {
   /**
    * Adds an ORDER BY clause to the query.
    */
-  public function addOrderBy($table, $field = NULL, $order = 'ASC', $alias = '', $params = []) {
+  public function addOrderBy($table, $field = NULL, $order = 'ASC', $alias = '', $params = []): void {
     $this->orderBy = ['field' => $field, 'order' => $order];
   }
 
   /**
    * Ensures a table exists in the queue.
    */
-  public function ensureTable($table, $relationship = NULL, ?JoinPluginBase $join = NULL) {
+  public function ensureTable($table, $relationship = NULL, ?JoinPluginBase $join = NULL): void {
     // There is no concept of joins.
   }
 
@@ -99,7 +123,7 @@ class QueryTest extends QueryPluginBase {
    * @param \Drupal\views\ViewExecutable $view
    *   The view executable.
    */
-  public function build(ViewExecutable $view) {
+  public function build(ViewExecutable $view): void {
     $this->view = $view;
     // @todo Support pagers for know, a php based one would probably match.
     // @todo You could add a string representation of the query.
@@ -110,7 +134,7 @@ class QueryTest extends QueryPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function execute(ViewExecutable $view) {
+  public function execute(ViewExecutable $view): void {
     $result = [];
     foreach ($this->allItems as $element) {
       // Run all conditions on the element, and add it to the result if they
@@ -121,7 +145,7 @@ class QueryTest extends QueryPluginBase {
       }
       if ($match) {
         // If the query explicit defines fields to use, filter all others out.
-        // Filter out fields
+        // Filter out fields.
         if ($this->fields) {
           $element = array_intersect_key($element, $this->fields);
         }

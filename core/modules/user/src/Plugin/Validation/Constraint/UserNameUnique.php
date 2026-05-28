@@ -15,9 +15,13 @@ use Drupal\Core\Validation\Plugin\Validation\Constraint\UniqueFieldConstraint;
 )]
 class UserNameUnique extends UniqueFieldConstraint {
 
-  /**
-   * The default violation message.
-   */
-  public $message = 'The username %value is already taken.';
+  public function __construct(
+    bool $caseSensitive = FALSE,
+    $message = 'The username %value is already taken.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct($caseSensitive, $message, $groups, $payload);
+  }
 
 }

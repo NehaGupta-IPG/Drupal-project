@@ -57,16 +57,15 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
   public function set($property, $value);
 
   /**
-   * Gets the name of the original entity type class.
+   * Gets the list of all the classes for this entity type.
    *
    * In case the class name was changed with setClass(), this will return
-   * the initial value. Useful when trying to identify the entity type ID based
-   * on the class.
+   * the list of all the changes.
    *
-   * @return string
-   *   The name of the original entity type class.
+   * @return class-string[]
+   *   The list of classes.
    */
-  public function getOriginalClass();
+  public function getDecoratedClasses(): array;
 
   /**
    * Gets an array of entity keys.
@@ -195,10 +194,12 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    *     handler's constructor, so that one class can be used for multiple
    *     entity forms when the forms are similar. The classes must implement
    *     \Drupal\Core\Entity\EntityFormInterface.
-   *   - list_builder: The name of the class that provides listings of the entities. The
-   *     class must implement \Drupal\Core\Entity\EntityListBuilderInterface.
-   *   - view_builder: The name of the class that is used to render the entities. The
-   *     class must implement \Drupal\Core\Entity\EntityViewBuilderInterface.
+   *   - list_builder: The name of the class that provides listings of the
+   *     entities. The class must implement
+   *     \Drupal\Core\Entity\EntityListBuilderInterface.
+   *   - view_builder: The name of the class that is used to render the
+   *     entities. The class must implement
+   *     \Drupal\Core\Entity\EntityViewBuilderInterface.
    *   - access: The name of the class that is used for access checks. The class
    *     must implement \Drupal\Core\Entity\EntityAccessControlHandlerInterface.
    *     Defaults to \Drupal\Core\Entity\EntityAccessControlHandler.
@@ -378,12 +379,12 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
   /**
    * Gets the name of the default administrative permission.
    *
-   * The default \Drupal\Core\Entity\EntityAccessControlHandler class checks this
-   * permission for all operations in its checkAccess() method. Entities with
-   * more complex permissions can extend this class to do their own access
+   * The default \Drupal\Core\Entity\EntityAccessControlHandler class checks
+   * this permission for all operations in its checkAccess() method. Entities
+   * with more complex permissions can extend this class to do their own access
    * checks.
    *
-   * @return string|bool
+   * @return string|false
    *   The name of the administrative permission. Defaults to FALSE, if the
    *   permission does not exist.
    */
@@ -445,7 +446,7 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    * @param string $key
    *   The link type.
    *
-   * @return string|bool
+   * @return string|false
    *   The path for this link, or FALSE if it doesn't exist.
    */
   public function getLinkTemplate($key);
@@ -669,6 +670,11 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    *
    * @return callable|null
    *   A valid callback that is passed the entity or NULL if none is specified.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use link
+   *   templates or a route provider to specify entity URIs.
+   *
+   * @see https://www.drupal.org/node/3575062
    */
   public function getUriCallback();
 
@@ -679,6 +685,11 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    *   A callback to use to provide a URI for the entity.
    *
    * @return $this
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use link
+   *   templates or a route provider to specify entity URIs.
+   *
+   * @see https://www.drupal.org/node/3575062
    */
   public function setUriCallback($callback);
 
@@ -730,6 +741,17 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    *   An array of the cache tags for this entity type.
    */
   public function getListCacheTags();
+
+  /**
+   * The list cache tags associated with a specific bundle.
+   *
+   * Enables code listing entities of this type and bundle to ensure that newly
+   * created entities show up immediately.
+   *
+   * @return string[]
+   *   An array of the cache tags for this bundle.
+   */
+  public function getBundleListCacheTags(string $bundle): array;
 
   /**
    * Gets the key that is used to store configuration dependencies.
@@ -795,7 +817,7 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    *
    * @return $this
    */
-  public function addConstraint($constraint_name, $options = NULL);
+  public function addConstraint(string $constraint_name, ?array $options = NULL): static;
 
   /**
    * Gets the config dependency info for this entity, if any exists.
@@ -809,5 +831,16 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    *   - 'name': The name of the config dependency.
    */
   public function getBundleConfigDependency($bundle);
+
+  /**
+   * Checks if this entity type has an integer ID.
+   *
+   * @return bool|null
+   *   Returns:
+   *     - TRUE if the entity type ID is defined as integer;
+   *     - FALSE if the entity type ID is defined as string;
+   *     - NULL if the entity type lacks an ID key.
+   */
+  public function hasIntegerId(): ?bool;
 
 }

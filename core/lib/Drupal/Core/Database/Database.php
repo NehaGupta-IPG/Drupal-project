@@ -13,6 +13,8 @@ use Drupal\Core\Cache\NullBackend;
  * This class is un-extendable. It acts to encapsulate all control and
  * shepherding of database connections into a single location without the use of
  * globals.
+ *
+ * @final
  */
 abstract class Database {
 
@@ -47,14 +49,15 @@ abstract class Database {
   /**
    * An array of active query log objects.
    *
+   * @var array
    * Every connection has one and only one logger object for all targets and
    * logging keys.
    *
-   * array(
-   *   '$db_key' => DatabaseLog object.
-   * );
-   *
-   * @var array
+   * @code
+   *   [
+   *     '$db_key' => DatabaseLog object.
+   *   ]
+   * @endcode
    */
   protected static $logs = [];
 
@@ -475,9 +478,10 @@ abstract class Database {
   /**
    * Instructs the system to temporarily ignore a given key/target.
    *
-   * At times we need to temporarily disable replica queries. To do so, call this
-   * method with the database key and the target to disable. That database key
-   * will then always fall back to 'default' for that key, even if it's defined.
+   * At times we need to temporarily disable replica queries. To do so, call
+   * this method with the database key and the target to disable. That database
+   * key will then always fall back to 'default' for that key, even if it's
+   * defined.
    *
    * @param string $key
    *   The database connection key.
@@ -493,8 +497,6 @@ abstract class Database {
    *
    * @param string $url
    *   The URL.
-   * @param string $root
-   *   The root directory of the Drupal installation.
    * @param bool|null $include_test_drivers
    *   (optional) Whether to include test extensions. If FALSE, all 'tests'
    *   directories are excluded in the search. When NULL will be determined by
@@ -509,7 +511,7 @@ abstract class Database {
    * @throws \RuntimeException
    *   Exception thrown when a module provided database driver does not exist.
    */
-  public static function convertDbUrlToConnectionInfo($url, $root, ?bool $include_test_drivers = NULL) {
+  public static function convertDbUrlToConnectionInfo(string $url, ?bool $include_test_drivers = NULL): array {
     // Check that the URL is well formed, starting with 'scheme://', where
     // 'scheme' is a database driver name.
     if (preg_match('/^(.*):\/\//', $url, $matches) !== 1) {
@@ -557,7 +559,7 @@ abstract class Database {
 
     $additional_class_loader->register(TRUE);
 
-    $options = $connection_class::createConnectionOptionsFromUrl($url, $root);
+    $options = $connection_class::createConnectionOptionsFromUrl($url);
 
     // Add the necessary information to autoload code.
     // @see \Drupal\Core\Site\Settings::initialize()

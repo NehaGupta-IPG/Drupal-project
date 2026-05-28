@@ -97,23 +97,13 @@ class ModuleInstaller implements ModuleInstallerInterface {
     #[Autowire(service: 'logger.channel.default')]
     protected LoggerInterface $logger,
     #[AutowireIterator(tag: 'module_install.uninstall_validator')]
-    protected ?\Traversable $uninstallValidators = NULL,
+    protected \Traversable $uninstallValidators,
   ) {
     $this->root = $root;
     $this->moduleHandler = $module_handler;
     $this->kernel = $kernel;
     $this->connection = $connection;
     $this->updateRegistry = $update_registry;
-    if ($this->uninstallValidators === NULL) {
-      $this->uninstallValidators = \Drupal::service('module_installer.uninstall_validators');
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function addUninstallValidator(ModuleUninstallValidatorInterface $uninstall_validator) {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Inject the uninstall validators into the constructor instead. See https://www.drupal.org/node/3432595', E_USER_DEPRECATED);
   }
 
   /**
@@ -150,7 +140,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       }
     }
     if ($enable_dependencies) {
-      $module_list = $module_list ? array_combine($module_list, $module_list) : [];
+      $module_list = array_combine($module_list, $module_list);
       if ($missing_modules = array_diff_key($module_list, $module_data)) {
         // One or more of the given modules doesn't exist.
         throw new MissingDependencyException(sprintf('Unable to install modules %s due to missing modules %s.', implode(', ', $module_list), implode(', ', $missing_modules)));
@@ -278,7 +268,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
         array_fill_keys($module_list, 0),
         $installed_modules
       )))
-      ->save(TRUE);
+      ->save();
 
     // Prepare the new module list, sorted by weight, including filenames.
     // This list is used for both the ModuleHandler and DrupalKernel. It
@@ -352,14 +342,11 @@ class ModuleInstaller implements ModuleInstallerInterface {
     // @todo should this be in the loop?
     \Drupal::getContainer()->get('plugin.cache_clearer')->clearCachedDefinitions();
 
+    $entity_type_providers_to_install = $module_list;
     foreach ($module_list as $module) {
-      // Set the schema version to the number of the last update provided by
-      // the module, or the minimum core schema version.
-      $version = \Drupal::CORE_MINIMUM_SCHEMA_VERSION;
-      $versions = $this->updateRegistry->getAvailableUpdates($module);
-      if ($versions) {
-        $version = max(max($versions), $version);
-      }
+      // Remove the module from the list of possible entity type providers to
+      // install.
+      array_shift($entity_type_providers_to_install);
 
       // Notify interested components that this module's entity types and
       // field storage definitions are new. For example, a SQL-based storage
@@ -381,10 +368,10 @@ class ModuleInstaller implements ModuleInstallerInterface {
             $update_manager->installEntityType($entity_type);
           }
         }
-        elseif ($is_fieldable_entity_type) {
+        elseif ($is_fieldable_entity_type && !in_array($entity_type->getProvider(), $entity_type_providers_to_install, TRUE)) {
           // The module being installed may be adding new fields to existing
           // entity types. Field definitions for any entity type defined by
-          // the module are handled in the if branch.
+          // modules being installed are handled in the if branch.
           foreach ($entity_field_manager->getFieldStorageDefinitions($entity_type->id()) as $storage_definition) {
             if ($storage_definition->getProvider() == $module) {
               // If the module being installed is also defining a storage key
@@ -400,10 +387,20 @@ class ModuleInstaller implements ModuleInstallerInterface {
           }
         }
       }
+    }
 
+    foreach ($module_list as $module) {
       // Install default configuration of the module.
       $config_installer = \Drupal::service('config.installer');
       $config_installer->installDefaultConfig('module', $module, DefaultConfigMode::InstallSimple);
+
+      // Set the schema version to the number of the last update provided by
+      // the module, or the minimum core schema version.
+      $version = \Drupal::CORE_MINIMUM_SCHEMA_VERSION;
+      $versions = $this->updateRegistry->getAvailableUpdates($module);
+      if ($versions) {
+        $version = max(max($versions), $version);
+      }
 
       // If the module has no current updates, but has some that were
       // previously removed, set the version to the value of
@@ -558,7 +555,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       }
 
       // Allow modules to react prior to the uninstallation of a module.
-      $this->invokeAll('module_preuninstall', [$module, $sync_status]);
+      $this->moduleHandler->invokeAll('module_preuninstall', [$module, $sync_status]);
 
       // Uninstall the module.
       $this->moduleHandler->loadInclude($module, 'install');
@@ -607,7 +604,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       if ($core_extension->get('profile') === $module) {
         $core_extension->clear('profile');
       }
-      $core_extension->save(TRUE);
+      $core_extension->save();
 
       // Update the module handler to remove the module.
       // The current ModuleHandler instance is obsolete with the kernel rebuild
@@ -652,12 +649,12 @@ class ModuleInstaller implements ModuleInstallerInterface {
     \Drupal::service('router.builder')->rebuild();
 
     // Let other modules react.
-    $this->invokeAll('modules_uninstalled', [$module_list, $sync_status]);
+    $this->moduleHandler->invokeAll('modules_uninstalled', [$module_list, $sync_status]);
 
     // Flush all persistent caches.
     // Any cache entry might implicitly depend on the uninstalled modules,
     // so clear all of them explicitly.
-    $this->invokeAll('cache_flush');
+    $this->moduleHandler->invokeAll('cache_flush');
     foreach (Cache::getBins() as $cache_backend) {
       $cache_backend->deleteAll();
     }
@@ -707,18 +704,11 @@ class ModuleInstaller implements ModuleInstallerInterface {
    *   The list of installed modules.
    */
   protected function updateKernel($module_filenames) {
-    // Save current state of config installer, so it can be restored after the
-    // container is rebuilt.
-    /** @var \Drupal\Core\Config\ConfigInstallerInterface $config_installer */
-    $config_installer = $this->kernel->getContainer()->get('config.installer');
-    $sync_status = $config_installer->isSyncing();
-    $source_storage = $config_installer->getSourceStorage();
-
     if (!empty($module_filenames)) {
-      // This reboots the kernel to register the module's bundle and its services
-      // in the service container. The $module_filenames argument is taken over as
-      // %container.modules% parameter, which is passed to a fresh ModuleHandler
-      // instance upon first retrieval.
+      // This reboots the kernel to register the module's bundle and its
+      // services in the service container. The $module_filenames argument is
+      // taken over as %container.modules% parameter, which is passed to a fresh
+      // ModuleHandler instance upon first retrieval.
       $this->kernel->updateModules($module_filenames, $module_filenames);
       $container = $this->kernel->getContainer();
     }
@@ -731,13 +721,6 @@ class ModuleInstaller implements ModuleInstallerInterface {
     $this->moduleHandler = $container->get('module_handler');
     $this->connection = $container->get('database');
     $this->updateRegistry = $container->get('update.update_hook_registry');
-
-    // Restore state of config installer.
-    if ($sync_status) {
-      $container->get('config.installer')
-        ->setSyncing(TRUE)
-        ->setSourceStorage($source_storage);
-    }
   }
 
   /**
@@ -794,7 +777,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
   }
 
   /**
-   * Call procedural hooks in all installed modules during installation.
+   * Call a procedural hook in an installed module during installation.
    *
    * Hooks called during install will remain procedural.
    * - hook_install()
@@ -805,21 +788,6 @@ class ModuleInstaller implements ModuleInstallerInterface {
    * - hook_uninstall()
    * - hook_update_last_removed()
    * - hook_update_N()
-   *
-   * @param string $hook
-   *   The name of the hook to invoke.
-   * @param array $args
-   *   Arguments to pass to the hook.
-   */
-  protected function invokeAll($hook, $args = []): void {
-    $this->moduleHandler->loadAll();
-    $this->moduleHandler->invokeAll($hook, $args);
-  }
-
-  /**
-   * Call a procedural hook in an installed module during installation.
-   *
-   * Hook_install(), hook_uninstall() etc. will remain procedural.
    *
    * @param string $module
    *   The module (it can be a profile, too).
