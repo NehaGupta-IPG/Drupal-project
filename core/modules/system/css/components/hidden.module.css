@@ -33,6 +33,14 @@
 }
 
 /**
+ * Prevent NVDA screen reader from concatenating adjacent visually-hidden span text.
+ */
+a > span.visually-hidden::before,
+a > span.visually-hidden::after {
+  content: " ";
+}
+
+/**
  * The .focusable class extends the .visually-hidden class to allow
  * the element to be focusable when navigated to via the keyboard.
  */
