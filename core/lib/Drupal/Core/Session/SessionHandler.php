@@ -26,15 +26,19 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
    *   The database connection.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
-   * @param array $options
+   * @param array|null $options
    *   An associative array of session ini settings.
    */
   public function __construct(
     protected RequestStack $requestStack,
     protected Connection $connection,
     protected TimeInterface $time,
-    protected array $options,
+    protected ?array $options = NULL,
   ) {
+    if ($options === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $options argument is deprecated in drupal:12.0.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/project/drupal/issues/3522112', E_USER_DEPRECATED);
+      $this->options = \Drupal::getContainer()->getParameter('session.storage.options');
+    }
   }
 
   /**
