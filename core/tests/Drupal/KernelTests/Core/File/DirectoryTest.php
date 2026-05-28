@@ -230,9 +230,9 @@ class DirectoryTest extends FileTestBase {
     $this->assertTrue($file_system->mkdir($files_dir_stream_wrapper, 0775, TRUE));
 
     // Creating two immediate directories defined with absolute path
-    $files_dir_stream_wrapper = 'public://bar_bar/baz/';
-    $files_dir_realpath = $file_system->realpath($files_dir_stream_wrapper);
-    $this->assertTrue($file_system->mkdir($files_dir_realpath, 0775, TRUE));
+    $files_dir_realpath = $file_system->realpath('public://');
+    $files_dir_absolute = $files_dir_realpath . '/bar_bar/baz';
+    $this->assertTrue($file_system->mkdir($files_dir_absolute, 0775, TRUE));
   }
 
   /**
