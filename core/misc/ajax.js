@@ -772,6 +772,20 @@
    *   Triggered event.
    */
   Drupal.Ajax.prototype.eventResponse = function (element, event) {
+    // For links, allow browser "open in new tab/window" gestures to behave
+    // normally instead of forcing the AJAX behavior.
+    // This covers:
+    // - Ctrl+click (Windows/Linux)
+    // - Meta/Cmd+click (macOS)
+    // - Shift+click (open in new window)
+    // - Middle mouse button (button === 1)
+    if (
+        element.tagName === 'A' &&
+        (event.ctrlKey || event.metaKey || event.shiftKey || event.button === 1)
+    ) {
+        return;
+    }
+
     event.preventDefault();
     event.stopPropagation();
 
