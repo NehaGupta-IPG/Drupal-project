@@ -781,7 +781,10 @@
    *   The HTML markup for the modified accessible name.
    */
   Drupal.theme.nameWithRequiredMarker = (nameHtml) =>
-    `${nameHtml}<span class="js-required hidden" aria-hidden="true"> ${Drupal.t(
-      '(required)',
-    )}</span>`;
+    Drupal.t(
+      '@title <span aria-hidden="true" class="hidden"> (required)</span>',
+      {
+        '@title': nameHtml,
+      },
+    );
 })(jQuery, Drupal);
