@@ -29,7 +29,7 @@ class TaxonomyPermissions implements PermissionProviderInterface {
    * {@inheritdoc}
    */
   public function getPermissions(): array {
-    return $this->generatePermissions(Vocabulary::loadMultiple(), [$this, 'buildPermissions']);
+    return $this->generatePermissions($this->entityTypeManager->getStorage('taxonomy_vocabulary')->loadMultiple(), [$this, 'buildPermissions']);
   }
 
   /**
