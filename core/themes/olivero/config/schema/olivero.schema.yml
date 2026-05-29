@@ -38,3 +38,11 @@ olivero.settings:
     base_primary_color:
       type: color_hex
       label: 'Base Primary Color'
+    comment_form_position:
+      type: string
+      label: 'Comment form position'
+      constraints:
+        Choice:
+          choices:
+            - before
+            - after

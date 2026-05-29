@@ -521,6 +521,9 @@ class OliveroHooks {
       }
       $variables['#cache']['contexts'][] = 'user';
     }
+
+    $variables['comment_form_position'] = \Drupal::service(ThemeSettingsProvider::class)
+      ->getSetting('comment_form_position');
   }
 
   /**
