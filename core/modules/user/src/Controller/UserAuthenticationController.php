@@ -176,6 +176,13 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
       throw new BadRequestHttpException('Missing credentials.pass.');
     }
 
+    if (!is_string($credentials['name'])) {
+      throw new BadRequestHttpException('credentials.name must be a string.');
+    }
+    if (!is_string($credentials['pass'])) {
+      throw new BadRequestHttpException('credentials.pass must be a string.');
+    }
+
     $this->floodControl($request, $credentials['name']);
 
     $account = $this->userAuth->lookupAccount($credentials['name']);
