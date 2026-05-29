@@ -7,7 +7,6 @@ namespace Drupal\taxonomy;
 use Drupal\Core\Entity\BundlePermissionHandlerTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\user\PermissionProviderInterface;
 
 /**
@@ -26,10 +25,21 @@ class TaxonomyPermissions implements PermissionProviderInterface {
   }
 
   /**
+   * Get taxonomy permissions.
+   *
+   * @return array
+   *   Permissions array.
+   */
+  public function permissions() {
+    @trigger_error(__METHOD__ . ' is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Call the getPermissions() method instead. See https://www.drupal.org/node/3421580', E_USER_DEPRECATED);
+    return $this->getPermissions();
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getPermissions(): array {
-    return $this->generatePermissions($this->entityTypeManager->getStorage('taxonomy_vocabulary')->loadMultiple(), [$this, 'buildPermissions']);
+    return $this->generatePermissions($this->entityTypeManager->getStorage('taxonomy_vocabulary')->loadMultiple(), $this->buildPermissions(...));
   }
 
   /**
