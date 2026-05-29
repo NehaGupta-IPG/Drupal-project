@@ -117,9 +117,8 @@ class SearchHelpSearch extends SearchPluginBase implements AccessibleInterface, 
   /**
    * Finds the search results.
    *
-   * @return \Drupal\Core\Database\StatementInterface|null
-   *   Results from search query execute() method, or NULL if the search
-   *   failed.
+   * @return array
+   *   Results from search query execute() method.
    */
   protected function findResults() {
     // We need to check access for the current user to see the topics that
