@@ -80,6 +80,13 @@ function system_post_update_migrate_compress_setting(): void {
 }
 
 /**
+ * Remove non-admin routes state key.
+ */
+function system_post_update_remove_non_admin_routes_state(): void {
+  \Drupal::state()->delete('routing.non_admin_routes');
+}
+
+/**
  * Set hide_untranslated_menu_links config.
  */
 function system_post_update_implement_schema_for_hide_untranslated_menu_links(&$sandbox = NULL): void {
