@@ -32,7 +32,7 @@ default:
     name: $_CONFIG_DOCKERHUB_ROOT/php-$_TARGET_PHP-apache:production
 
 
-'Rector test annotations to attributes':
+'Rector test code':
   stage: Rector
   variables:
     KUBERNETES_CPU_REQUEST: ""
