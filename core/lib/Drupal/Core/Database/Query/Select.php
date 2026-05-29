@@ -878,9 +878,9 @@ class Select extends Query implements SelectInterface {
     }
 
     // WHERE.
-    if (count($this->condition)) {
-      // There is an implicit string cast on $this->condition.
-      $query .= "\nWHERE " . $this->condition;
+    $where = (string) $this->condition;
+    if ($where) {
+      $query .= "\nWHERE " . $where;
     }
 
     // GROUP BY.
