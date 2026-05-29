@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Config;
 
-use Drupal\Core\Database\Connection;
 use Drupal\Core\Lock\LockBackendInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -23,19 +22,12 @@ final class ExportStorageManager implements StorageManagerInterface {
   const LOCK_NAME = 'config_storage_export_manager';
 
   /**
-   * The database storage.
-   *
-   * @var \Drupal\Core\Config\DatabaseStorage
-   */
-  protected $storage;
-
-  /**
    * ExportStorageManager constructor.
    *
    * @param \Drupal\Core\Config\StorageInterface $active
    *   The active config storage to prime the export storage.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
+   * @param \Drupal\Core\Config\StorageInterface $storage
+   *   The export storage.
    * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $eventDispatcher
    *   The event dispatcher.
    * @param \Drupal\Core\Lock\LockBackendInterface $lock
@@ -43,14 +35,10 @@ final class ExportStorageManager implements StorageManagerInterface {
    */
   public function __construct(
     protected StorageInterface $active,
-    protected Connection $connection,
+    protected StorageInterface $storage,
     protected EventDispatcherInterface $eventDispatcher,
     protected LockBackendInterface $lock,
-  ) {
-    // The point of this service is to provide the storage and dispatch the
-    // event when needed, so the storage itself can not be a service.
-    $this->storage = new DatabaseStorage($connection, 'config_export');
-  }
+  ) {}
 
   /**
    * {@inheritdoc}
