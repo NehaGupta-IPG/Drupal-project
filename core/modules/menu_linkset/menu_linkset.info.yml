@@ -1,0 +1,5 @@
+name: 'Menu Linkset'
+type: module
+description: 'Provides a Decoupled Menus linkset endpoint that exposes menu trees as application/linkset+json responses.'
+package: Core
+version: VERSION

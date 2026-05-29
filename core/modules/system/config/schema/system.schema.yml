@@ -499,16 +499,6 @@ condition.plugin.response_status:
             # HTTP 200 OK, HTTP 403 FORBIDDEN, HTTP 404 NOT FOUND.
             choices: [200, 403, 404]
 
-system.feature_flags:
-  type: config_object
-  label: 'System Feature Flags'
-  constraints:
-    FullyValidatable: ~
-  mapping:
-    linkset_endpoint:
-      type: boolean
-      label: 'Enable the menu linkset endpoint'
-
 condition.plugin.current_theme:
   type: condition.plugin
   mapping:

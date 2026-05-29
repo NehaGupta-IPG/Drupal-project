@@ -21122,12 +21122,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/src/Controller/DbUpdateController.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\system\\\\Controller\\\\LinksetController\\:\\:processCustomLinkAttributes\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Controller/LinksetController.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\system\\\\Controller\\\\SystemController\\:\\:systemAdminMenuBlockPage\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -21270,12 +21264,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/src/Form/ImageToolkitForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\system\\\\Form\\\\MenuLinksetSettingsForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Form/MenuLinksetSettingsForm.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\system\\\\Form\\\\ModulesListConfirmForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
@@ -21486,24 +21474,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/src/Routing/AssetRoutes.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\system\\\\Routing\\\\MenuLinksetRoutes\\:\\:alterRoutes\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Routing/MenuLinksetRoutes.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\system\\\\Routing\\\\MenuLinksetRoutes\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Routing/MenuLinksetRoutes.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\system\\\\Routing\\\\MenuLinksetRoutes\\:\\:onConfigSave\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Routing/MenuLinksetRoutes.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$violation_messages might not be defined\\.$#',
@@ -23102,18 +23072,6 @@ $ignoreErrors[] = [
 	'identifier' => 'empty.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/tests/src/Functional/Menu/BreadcrumbTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\Menu\\\\LinksetControllerTestBase\\:\\:assertDrupalResponseCacheability\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/src/Functional/Menu/LinksetControllerTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\Menu\\\\LinksetControllerTestBase\\:\\:enableEndpoint\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/src/Functional/Menu/LinksetControllerTestBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$test_meta in empty\\(\\) always exists and is not falsy\\.$#',

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\system\Functional\Menu;
+namespace Drupal\Tests\menu_linkset\Functional;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Language\LanguageInterface;
@@ -19,7 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  *
  * @see https://tools.ietf.org/html/draft-ietf-httpapi-linkset-00
  */
-#[Group('decoupled_menus')]
+#[Group('menu_linkset')]
 #[RunTestsInSeparateProcesses]
 final class LinksetControllerMultiLingualTest extends LinksetControllerTestBase {
 
@@ -113,12 +113,6 @@ final class LinksetControllerMultiLingualTest extends LinksetControllerTestBase 
       ->setDefaultLangcode('dd')
       ->setLanguageAlterable(TRUE)
       ->save();
-    $this->config('system.feature_flags')
-      ->set('linkset_endpoint', TRUE)
-      ->save();
-    // Using rebuildIfNeeded here to implicitly test that router is only rebuilt
-    // when necessary.
-    $this->rebuildIfNeeded();
     $this->drupalLogout();
 
     $permissions = [
@@ -205,7 +199,7 @@ final class LinksetControllerMultiLingualTest extends LinksetControllerTestBase 
    */
   public function testBasicMultilingualFunctions(): void {
     foreach (['aa', 'bb', 'cc', 'dd'] as $language_code) {
-      $expected_linkset = $this->getReferenceLinksetDataFromFile(__DIR__ . '/../../../fixtures/linkset/linkset-menu-main-multilingual-' . $language_code . '.json');
+      $expected_linkset = $this->getReferenceLinksetDataFromFile(__DIR__ . '/../../fixtures/linkset/linkset-menu-main-multilingual-' . $language_code . '.json');
       $response = $this->doRequest('GET', Url::fromUri('base:/' . $language_code . '/system/menu/main/linkset'));
       $this->assertSame($expected_linkset, Json::decode((string) $response->getBody()));
     }
@@ -217,7 +211,7 @@ final class LinksetControllerMultiLingualTest extends LinksetControllerTestBase 
    * @throws \Exception
    */
   public function testDefaultMultilingualFunctions(): void {
-    $expected_linkset = $this->getReferenceLinksetDataFromFile(__DIR__ . '/../../../fixtures/linkset/linkset-menu-main-multilingual-default.json');
+    $expected_linkset = $this->getReferenceLinksetDataFromFile(__DIR__ . '/../../fixtures/linkset/linkset-menu-main-multilingual-default.json');
     $response = $this->doRequest('GET', Url::fromUri('base:/system/menu/main/linkset'));
     $this->assertSame($expected_linkset, Json::decode((string) $response->getBody()));
   }

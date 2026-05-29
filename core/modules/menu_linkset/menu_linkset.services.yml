@@ -1,0 +1,5 @@
+services:
+  _defaults:
+    autoconfigure: true
+    autowire: true
+  Drupal\menu_linkset\Routing\MenuLinksetRoutes: ~

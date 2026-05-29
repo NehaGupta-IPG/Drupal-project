@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\system\Controller;
+namespace Drupal\menu_linkset\Controller;
 
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Cache\CacheableJsonResponse;
@@ -210,7 +210,7 @@ final class LinksetController extends ControllerBase {
    * @param array $attributes
    *   Attributes available for the link.
    */
-  private function processCustomLinkAttributes(array &$link, array $attributes = []) {
+  private function processCustomLinkAttributes(array &$link, array $attributes = []): void {
     $attribute_keys_to_ignore = [
       'hreflang',
       'media',

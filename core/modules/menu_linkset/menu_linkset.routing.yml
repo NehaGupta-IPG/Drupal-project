@@ -1,0 +1,11 @@
+menu_linkset.linkset:
+  path: '/system/menu/{menu}/linkset'
+  defaults:
+    _controller: 'Drupal\menu_linkset\Controller\LinksetController::process'
+  requirements:
+    _access: 'TRUE'
+    _format: 'json'
+  options:
+    parameters:
+      menu:
+        type: entity:menu

@@ -60,10 +60,6 @@ services:
   Drupal\system\SecurityAdvisories\SecurityAdvisoriesFetcher: '@system.sa_fetcher'
   system.advisories_config_subscriber:
     class: Drupal\system\EventSubscriber\AdvisoriesConfigSubscriber
-  Drupal\system\Routing\MenuLinksetRoutes: '@system.menus.route_subscriber'
-  system.menus.route_subscriber:
-    class: Drupal\system\Routing\MenuLinksetRoutes
-    arguments: ['%authentication_providers%', '@config.factory', '@router.builder']
   Drupal\system\ModuleAdminLinksHelper: '@system.module_admin_links_helper'
   system.module_admin_links_helper:
     class: Drupal\system\ModuleAdminLinksHelper
