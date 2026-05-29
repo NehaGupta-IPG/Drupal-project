@@ -243,7 +243,7 @@ class SearchNode extends ConfigurableSearchPluginBase implements AccessibleInter
       ->groupBy('i.langcode')
       ->limit(10)
       ->execute();
-    $find = $result->fetchAll() ?: [];
+    $find = $result ? $result->fetchAll() : [];
 
     // Check query status and set messages if needed.
     $status = $query->getStatus();
