@@ -230,53 +230,47 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
       return;
     }
 
-    // Lock cache writes to help avoid stampedes.
+    // Lock cache writes to help avoid stampedes. Try to acquire the lock, but
+    // continue even if it cannot be acquired: a ::set() or ::delete() during
+    // this request may have invalidated the cache item, and that invalidation
+    // must be propagated whether or not the lock is held. Only the cache write
+    // itself depends on the lock.
     $cid = $this->getCid();
     $lock_name = $cid . ':' . __CLASS__;
-    $write_cache = TRUE;
     $lock_acquired = FALSE;
-    // Try to acquire a lock. However even if the lock is not acquired,
-    // run all of the logic except for setting the cache item anyway, since we
-    // may need to delete the item due to operations taken in ::set().
     if ($lock) {
       $lock_acquired = $this->lock->acquire($lock_name);
     }
-    // Set and delete operations invalidate the cache item. Try to also load
-    // an eventually invalidated cache entry. Only update an invalidated cache
-    // entry if the creation date did not change, as this could result in an
-    // inconsistent cache.
-    if ($cache = $this->cache->get($cid, $this->cacheInvalidated)) {
-      // If a cache item exists, but either there wasn't a cache item at the
-      // beginning of this request, or it has changed, prevent writing back to
-      // the cache.
-      if ($cache->created !== $this->cacheCreated) {
-        $write_cache = FALSE;
+
+    // Set and delete operations invalidate the cache item, so load an
+    // invalidated cache entry too if this request invalidated it. The item is
+    // "unchanged" if it is in the same state as when it was loaded earlier this
+    // request: present with the same creation time, or absent in both cases. If
+    // it changed, another request is responsible for it and this request must
+    // not overwrite that work.
+    $cache = $this->cache->get($cid, $this->cacheInvalidated);
+    $unchanged = $cache ? $cache->created === $this->cacheCreated : !$this->cacheCreated;
+
+    if ($cache && $this->cacheInvalidated) {
+      // This request invalidated the cache item via ::set() or ::delete() and a
+      // cache item still exists. Delete it so that a later request rebuilds it
+      // cleanly; the up-to-date value is written within a lock by the caller
+      // (see ::set()). This happens whether or not the lock was acquired.
+      $this->cache->delete($cid);
+    }
+    elseif ($unchanged && (!$lock || $lock_acquired)) {
+      // The cache item is in the same state as when it was loaded, so it is
+      // safe to write back the data collected during this request, merged with
+      // any existing cache data and with deleted keys removed.
+      if ($cache) {
+        $data = array_merge($cache->data, $data);
       }
-      // If this request invalidated the cache, ensure the cache item is
-      // invalidated. This always needs to happen whether the lock was acquired
-      // or not.
-      if ($this->cacheInvalidated) {
-        $write_cache = FALSE;
-        $this->cache->delete($cid);
+      foreach ($this->keysToRemove as $delete_key) {
+        unset($data[$delete_key]);
       }
-      $data = array_merge($cache->data, $data);
-    }
-    elseif ($this->cacheCreated) {
-      // Getting here indicates that there was a cache entry at the
-      // beginning of the request, but now it's gone (some other process
-      // must have cleared it). We back out to prevent corrupting the cache
-      // with incomplete data, since we won't be able to properly merge
-      // the existing cache data from earlier with the new data.
-      // A future request will properly hydrate the cache from scratch.
-      $write_cache = FALSE;
-    }
-    // Remove keys marked for deletion.
-    foreach ($this->keysToRemove as $delete_key) {
-      unset($data[$delete_key]);
-    }
-    if ($write_cache && (!$lock || $lock_acquired)) {
       $this->cache->set($cid, $data, Cache::PERMANENT, $this->tags);
     }
+
     if ($lock_acquired) {
       $this->lock->release($lock_name);
     }
