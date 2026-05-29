@@ -1,11 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\system\Hook;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Datetime\Entity\DateFormat;
+use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Routing\RequestContext;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Utility\Token;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 
 /**
@@ -15,11 +25,23 @@ class SystemTokensHooks {
 
   use StringTranslationTrait;
 
+  public function __construct(
+    protected ConfigFactoryInterface $configFactory,
+    protected DateFormatterInterface $dateFormatter,
+    protected RendererInterface $renderer,
+    protected RequestStack $requestStack,
+    protected RequestContext $requestContext,
+    protected LanguageManagerInterface $languageManager,
+    protected Token $token,
+    protected TimeInterface $time,
+  ) {}
+
   /**
    * Implements hook_token_info().
    */
   #[Hook('token_info')]
   public function tokenInfo(): array {
+    $request = $this->requestStack->getCurrentRequest();
     $types['site'] = [
       'name' => $this->t("Site information"),
       'description' => $this->t("Tokens for site-wide settings and other global information."),
@@ -35,13 +57,13 @@ class SystemTokensHooks {
     $site['base-url'] = [
       'name' => $this->t("Base URL"),
       'description' => $this->t("The base URL of the site, currently: @base_url", [
-        '@base_url' => \Drupal::service('router.request_context')->getCompleteBaseUrl(),
+        '@base_url' => $this->requestContext->getCompleteBaseUrl(),
       ]),
     ];
     $site['base-path'] = [
       'name' => $this->t("Base path"),
       'description' => $this->t("The base path of the site, currently: @base_path", [
-        '@base_path' => \Drupal::request()->getBasePath(),
+        '@base_path' => $request?->getBasePath(),
       ]),
     ];
     $site['url'] = [
@@ -56,10 +78,9 @@ class SystemTokensHooks {
       'name' => $this->t("Login page"),
       'description' => $this->t("The URL of the site's login page."),
     ];
-    /** @var \Drupal\Core\Datetime\DateFormatterInterface $date_formatter */
-    $date_formatter = \Drupal::service('date.formatter');
+    $date_formatter = $this->dateFormatter;
     // Date related tokens.
-    $request_time = \Drupal::time()->getRequestTime();
+    $request_time = $this->time->getRequestTime();
     $date['short'] = [
       'name' => $this->t("Short format"),
       'description' => $this->t("The current date in 'short' format. (%date)", [
@@ -94,7 +115,13 @@ class SystemTokensHooks {
         '%date' => $request_time,
       ]),
     ];
-    return ['types' => $types, 'tokens' => ['site' => $site, 'date' => $date]];
+    return [
+      'types' => $types,
+      'tokens' => [
+        'site' => $site,
+        'date' => $date,
+      ],
+    ];
   }
 
   /**
@@ -102,10 +129,9 @@ class SystemTokensHooks {
    */
   #[Hook('tokens')]
   public function tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata): array {
-    $token_service = \Drupal::token();
     $url_options = ['absolute' => TRUE];
     if (isset($options['langcode'])) {
-      $url_options['language'] = \Drupal::languageManager()->getLanguage($options['langcode']);
+      $url_options['language'] = $this->languageManager->getLanguage($options['langcode']);
       $langcode = $options['langcode'];
     }
     else {
@@ -113,38 +139,35 @@ class SystemTokensHooks {
     }
     $replacements = [];
     if ($type == 'site') {
+      $config = $this->configFactory->get('system.site');
+      $request = $this->requestStack->getCurrentRequest();
       foreach ($tokens as $name => $original) {
         switch ($name) {
           case 'name':
-            $config = \Drupal::config('system.site');
             $bubbleable_metadata->addCacheableDependency($config);
-            $site_name = $config->get('name');
-            $replacements[$original] = $site_name;
+            $replacements[$original] = $config->get('name');
             break;
 
           case 'slogan':
-            $config = \Drupal::config('system.site');
             $bubbleable_metadata->addCacheableDependency($config);
-            $slogan = $config->get('slogan');
-            $build = ['#markup' => $slogan];
+            $build = ['#markup' => $config->get('slogan')];
             // @todo Fix in https://www.drupal.org/node/2577827
-            $replacements[$original] = \Drupal::service('renderer')->renderInIsolation($build);
+            $replacements[$original] = $this->renderer->renderInIsolation($build);
             break;
 
           case 'mail':
-            $config = \Drupal::config('system.site');
             $bubbleable_metadata->addCacheableDependency($config);
             $replacements[$original] = $config->get('mail');
             break;
 
           case 'base-url':
             $bubbleable_metadata->addCacheContexts(['url.site']);
-            $replacements[$original] = \Drupal::service('router.request_context')->getCompleteBaseUrl();
+            $replacements[$original] = $this->requestContext->getCompleteBaseUrl();
             break;
 
           case 'base-path':
             $bubbleable_metadata->addCacheContexts(['url.site']);
-            $replacements[$original] = \Drupal::request()->getBasePath();
+            $replacements[$original] = $request?->getBasePath();
             break;
 
           case 'url':
@@ -172,7 +195,7 @@ class SystemTokensHooks {
     }
     elseif ($type == 'date') {
       if (empty($data['date'])) {
-        $date = \Drupal::time()->getRequestTime();
+        $date = $this->time->getRequestTime();
         // We depend on the current request time, so the tokens are not
         // cacheable at all.
         $bubbleable_metadata->setCacheMaxAge(0);
@@ -187,11 +210,11 @@ class SystemTokensHooks {
           case 'long':
             $date_format = DateFormat::load($name);
             $bubbleable_metadata->addCacheableDependency($date_format);
-            $replacements[$original] = \Drupal::service('date.formatter')->format($date, $name, '', NULL, $langcode);
+            $replacements[$original] = $this->dateFormatter->format($date, $name, '', NULL, $langcode);
             break;
 
           case 'since':
-            $replacements[$original] = \Drupal::service('date.formatter')->formatTimeDiffSince($date, ['langcode' => $langcode]);
+            $replacements[$original] = $this->dateFormatter->formatTimeDiffSince($date, ['langcode' => $langcode]);
             $bubbleable_metadata->setCacheMaxAge(0);
             break;
 
@@ -200,9 +223,9 @@ class SystemTokensHooks {
             break;
         }
       }
-      if ($created_tokens = $token_service->findWithPrefix($tokens, 'custom')) {
+      if ($created_tokens = $this->token->findWithPrefix($tokens, 'custom')) {
         foreach ($created_tokens as $name => $original) {
-          $replacements[$original] = \Drupal::service('date.formatter')->format($date, 'custom', $name, NULL, $langcode);
+          $replacements[$original] = $this->dateFormatter->format($date, 'custom', $name, NULL, $langcode);
         }
       }
     }

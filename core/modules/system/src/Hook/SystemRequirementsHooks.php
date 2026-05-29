@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\system\Hook;
 
 use Drupal\Component\Utility\Bytes;
@@ -24,6 +26,24 @@ use Drupal\Core\Url;
 use Drupal\Core\Utility\PhpRequirements;
 use Drupal\system\Install\Requirements\SystemRequirements;
 use Symfony\Component\HttpFoundation\Request;
+use Drupal\Core\Extension\ModuleExtensionList;
+use Drupal\Core\Extension\ThemeExtensionList;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Extension\ThemeHandlerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Drupal\Core\Update\UpdateRegistry;
+use Drupal\Core\Update\UpdateHookRegistry;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
+use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\Datetime\DateFormatterInterface;
+use Drupal\Core\State\StateInterface;
+use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\File\HtaccessWriterInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Requirements hook implementations for system module.
@@ -31,6 +51,31 @@ use Symfony\Component\HttpFoundation\Request;
 class SystemRequirementsHooks {
 
   use StringTranslationTrait;
+
+  public function __construct(
+    protected ConfigFactoryInterface $configFactory,
+    protected StateInterface $state,
+    protected KeyValueFactoryInterface $keyValueFactory,
+    protected RequestStack $requestStack,
+    protected TimeInterface $time,
+    protected DateFormatterInterface $dateFormatter,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected ThemeHandlerInterface $themeHandler,
+    protected ModuleExtensionList $moduleExtensionList,
+    protected ThemeExtensionList $themeExtensionList,
+    protected UpdateHookRegistry $updateHookRegistry,
+    #[Autowire(service: 'update.post_update_registry')]
+    protected UpdateRegistry $postUpdateRegistry,
+    protected RendererInterface $renderer,
+    protected FileSystemInterface $fileSystem,
+    protected HtaccessWriterInterface $htaccessWriter,
+    #[Autowire(value: '%site.path%')]
+    private string $sitePath,
+    #[Autowire(value: '%password.algorithm%')]
+    private string|int|null $passwordAlgorithm,
+  ) {}
 
   /**
    * Implements hook_update_requirements().
@@ -64,11 +109,9 @@ class SystemRequirementsHooks {
     $minimum_supported_php = PhpRequirements::getMinimumSupportedPhp();
 
     // Reset the extension lists.
-    /** @var \Drupal\Core\Extension\ModuleExtensionList $module_extension_list */
-    $module_extension_list = \Drupal::service('extension.list.module');
+    $module_extension_list = $this->moduleExtensionList;
     $module_extension_list->reset();
-    /** @var \Drupal\Core\Extension\ThemeExtensionList $theme_extension_list */
-    $theme_extension_list = \Drupal::service('extension.list.theme');
+    $theme_extension_list = $this->themeExtensionList;
     $theme_extension_list->reset();
     $requirements = [];
 
@@ -83,7 +126,7 @@ class SystemRequirementsHooks {
 
       // Display the currently active installation profile, if the site
       // is not running the default installation profile.
-      $profile = \Drupal::installProfile();
+      $profile = $this->configFactory->get('core.extension')->get('profile') ?? 'standard';
       if ($profile != 'standard' && !empty($profile)) {
         $info = $module_extension_list->getExtensionInfo($profile);
         $requirements['install_profile'] = [
@@ -102,7 +145,7 @@ class SystemRequirementsHooks {
       $obsolete_extensions = [];
       $deprecated_modules = [];
       $experimental_modules = [];
-      $enabled_modules = \Drupal::moduleHandler()->getModuleList();
+      $enabled_modules = $this->moduleHandler->getModuleList();
       foreach ($enabled_modules as $module => $data) {
         $info = $module_extension_list->getExtensionInfo($module);
         if (isset($info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER])) {
@@ -148,7 +191,7 @@ class SystemRequirementsHooks {
       // Gather all obsolete and experimental themes being installed.
       $experimental_themes = [];
       $deprecated_themes = [];
-      $installed_themes = \Drupal::service('theme_handler')->listInfo();
+      $installed_themes = $this->themeHandler->listInfo();
       foreach ($installed_themes as $theme => $data) {
         $info = $theme_extension_list->getExtensionInfo($theme);
         if (isset($info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER])) {
@@ -205,8 +248,8 @@ class SystemRequirementsHooks {
     }
 
     // Web server information.
-    $request_object = \Drupal::request();
-    $software = $request_object->server->get('SERVER_SOFTWARE');
+    $request_object = $this->requestStack->getCurrentRequest();
+    $software = $request_object?->server->get('SERVER_SOFTWARE');
     $requirements['webserver'] = [
       'title' => $this->t('Web server'),
       'value' => $software,
@@ -566,7 +609,7 @@ class SystemRequirementsHooks {
       // Find the site path. Kernel service is not always available at this
       // point, but is preferred, when available.
       if (\Drupal::hasService('kernel')) {
-        $site_path = \Drupal::getContainer()->getParameter('site.path');
+        $site_path = $this->sitePath;
       }
       else {
         $site_path = DrupalKernel::findSitePath(Request::createFromGlobals());
@@ -629,8 +672,7 @@ class SystemRequirementsHooks {
     if ($phase == 'runtime' && Settings::get('auto_create_htaccess', TRUE)) {
       // Try to write the .htaccess files first, to prevent false alarms in
       // case (for example) the /tmp directory was wiped.
-      /** @var \Drupal\Core\File\HtaccessWriterInterface $htaccessWriter */
-      $htaccessWriter = \Drupal::service("file.htaccess_writer");
+      $htaccessWriter = $this->htaccessWriter;
       $htaccessWriter->ensure();
       foreach ($htaccessWriter->defaultProtectedDirs() as $protected_dir) {
         $htaccess_file = $protected_dir->getPath() . '/.htaccess';
@@ -657,21 +699,21 @@ class SystemRequirementsHooks {
 
     // Report cron status.
     if ($phase == 'runtime') {
-      $cron_config = \Drupal::config('system.cron');
+      $cron_config = $this->configFactory->get('system.cron');
       // Cron warning threshold defaults to two days.
       $threshold_warning = $cron_config->get('threshold.requirements_warning');
       // Cron error threshold defaults to two weeks.
       $threshold_error = $cron_config->get('threshold.requirements_error');
 
       // Determine when cron last ran.
-      $cron_last = \Drupal::state()->get('system.cron_last');
+      $cron_last = $this->state->get('system.cron_last');
       if (!is_numeric($cron_last)) {
-        $cron_last = \Drupal::state()->get('install_time', 0);
+        $cron_last = $this->state->get('install_time', 0);
       }
 
       // Determine severity based on time since cron last ran.
       $severity = RequirementSeverity::Info;
-      $request_time = \Drupal::time()->getRequestTime();
+      $request_time = $this->time->getRequestTime();
       if ($request_time - $cron_last > $threshold_error) {
         $severity = RequirementSeverity::Error;
       }
@@ -680,7 +722,7 @@ class SystemRequirementsHooks {
       }
 
       // Set summary and description based on values determined above.
-      $summary = $this->t('Last run @time ago', ['@time' => \Drupal::service('date.formatter')->formatTimeDiffSince($cron_last)]);
+      $summary = $this->t('Last run @time ago', ['@time' => $this->dateFormatter->formatTimeDiffSince($cron_last)]);
 
       $requirements['cron'] = [
         'title' => $this->t('Cron maintenance tasks'),
@@ -759,7 +801,7 @@ class SystemRequirementsHooks {
       // files to be secure the admin needs to provide a path outside the
       // webroot.
       PrivateStream::basePath(),
-      \Drupal::service('file_system')->getTempDirectory(),
+      $this->fileSystem->getTempDirectory(),
     ];
 
     $error = '';
@@ -799,7 +841,7 @@ class SystemRequirementsHooks {
       else {
         // This function can be called before the config_cache table has been
         // created.
-        if (\Drupal::config('system.file')->get('default_scheme') == 'public') {
+        if ($this->configFactory->get('system.file')->get('default_scheme') === 'public') {
           $requirements['file system']['value'] = $this->t('Writable (<em>public</em> download method)');
         }
         else {
@@ -817,9 +859,8 @@ class SystemRequirementsHooks {
 
       // Check installed modules.
       $has_pending_updates = FALSE;
-      /** @var \Drupal\Core\Update\UpdateHookRegistry $update_registry */
-      $update_registry = \Drupal::service('update.update_hook_registry');
-      foreach (\Drupal::moduleHandler()->getModuleList() as $module => $filename) {
+      $update_registry = $this->updateHookRegistry;
+      foreach ($this->moduleHandler->getModuleList() as $module => $filename) {
         $updates = $update_registry->getAvailableUpdates($module);
         if ($updates) {
           $default = $update_registry->getInstalledVersion($module);
@@ -830,8 +871,7 @@ class SystemRequirementsHooks {
         }
       }
       if (!$has_pending_updates) {
-        /** @var \Drupal\Core\Update\UpdateRegistry $post_update_registry */
-        $post_update_registry = \Drupal::service('update.post_update_registry');
+        $post_update_registry = $this->postUpdateRegistry;
         $missing_post_update_functions = $post_update_registry->getPendingUpdateFunctions();
         if (!empty($missing_post_update_functions)) {
           $has_pending_updates = TRUE;
@@ -849,10 +889,10 @@ class SystemRequirementsHooks {
         'value' => $this->t('Up to date'),
       ];
       // Verify that no entity updates are pending.
-      if ($change_list = \Drupal::entityDefinitionUpdateManager()->getChangeSummary()) {
+      if ($change_list = $this->entityDefinitionUpdateManager->getChangeSummary()) {
         $build = [];
         foreach ($change_list as $entity_type_id => $changes) {
-          $entity_type = \Drupal::entityTypeManager()->getDefinition($entity_type_id);
+          $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
           $build[] = [
             '#theme' => 'item_list',
             '#title' => $entity_type->getLabel(),
@@ -860,7 +900,7 @@ class SystemRequirementsHooks {
           ];
         }
 
-        $entity_update_issues = \Drupal::service('renderer')->renderInIsolation($build);
+        $entity_update_issues = $this->renderer->renderInIsolation($build);
         $requirements['entity_update']['severity'] = RequirementSeverity::Error;
         $requirements['entity_update']['value'] = $this->t('Mismatched entity and/or field definitions');
         $requirements['entity_update']['description'] = $this->t('The following changes were detected in the entity type and field definitions. @updates', ['@updates' => $entity_update_issues]);
@@ -927,7 +967,9 @@ class SystemRequirementsHooks {
         'severity' => RequirementSeverity::Error,
       ];
     };
-    $profile = \Drupal::installProfile();
+    $profile = $this->configFactory
+      ->get('core.extension')
+      ->get('profile');
     $files = $module_extension_list->getList();
     $files += $theme_extension_list->getList();
     $core_incompatible_extensions = [];
@@ -1055,7 +1097,7 @@ class SystemRequirementsHooks {
       );
     }
 
-    $extension_config = \Drupal::configFactory()->get('core.extension');
+    $extension_config = $this->configFactory->get('core.extension');
 
     // Look for removed core modules.
     $is_removed_module = function ($extension_name) use ($module_extension_list) {
@@ -1207,7 +1249,7 @@ class SystemRequirementsHooks {
 
     if ($phase == 'runtime') {
       // Check for update status module.
-      if (!\Drupal::moduleHandler()->moduleExists('update')) {
+      if (!$this->moduleHandler->moduleExists('update')) {
         $requirements['update status'] = [
           'value' => $this->t('Not enabled'),
           'severity' => RequirementSeverity::Warning,
@@ -1291,10 +1333,10 @@ class SystemRequirementsHooks {
     // providing module is installed.
     $connection = Database::getConnection();
     $provider = $connection->getProvider();
-    if ($provider !== 'core' && !\Drupal::moduleHandler()->moduleExists($provider)) {
+    if ($provider !== 'core' && !$this->moduleHandler->moduleExists($provider)) {
       $autoload = $connection->getConnectionOptions()['autoload'] ?? '';
       if (str_contains($autoload, 'src/Driver/Database/')) {
-        $post_update_registry = \Drupal::service('update.post_update_registry');
+        $post_update_registry = $this->postUpdateRegistry;
         $pending_updates = $post_update_registry->getPendingUpdateInformation();
         if (!in_array('enable_provider_database_driver', array_keys($pending_updates['system']['pending'] ?? []), TRUE)) {
           // Only show the warning when the post update function has run and
@@ -1381,9 +1423,8 @@ class SystemRequirementsHooks {
     // Ensure that no module has a current schema version that is lower than the
     // one that was last removed.
     if ($phase == 'update') {
-      $module_handler = \Drupal::moduleHandler();
-      /** @var \Drupal\Core\Update\UpdateHookRegistry $update_registry */
-      $update_registry = \Drupal::service('update.update_hook_registry');
+      $module_handler = $this->moduleHandler;
+      $update_registry = $this->updateHookRegistry;
       $module_list = [];
       // hook_update_last_removed() is a procedural hook hook because we
       // do not have classes loaded that would be needed.
@@ -1437,9 +1478,9 @@ class SystemRequirementsHooks {
       // error for hook_update_N().
       $missing_updates = [];
       if (empty($module_list)) {
-        $existing_updates = \Drupal::service('keyvalue')->get('post_update')->get('existing_updates', []);
-        $post_update_registry = \Drupal::service('update.post_update_registry');
-        $modules = \Drupal::moduleHandler()->getModuleList();
+        $existing_updates = $this->keyValueFactory->get('post_update')->get('existing_updates', []);
+        $post_update_registry = $this->postUpdateRegistry;
+        $modules = $this->moduleHandler->getModuleList();
         foreach ($modules as $module => $extension) {
           $module_info = $module_extension_list->get($module);
           $removed_post_updates = $post_update_registry->getRemovedPostUpdates($module);
@@ -1503,7 +1544,7 @@ class SystemRequirementsHooks {
 
     // Add warning when twig debug option is enabled.
     if ($phase === 'runtime') {
-      $development_settings = \Drupal::keyValue('development_settings');
+      $development_settings = $this->keyValueFactory->get('development_settings');
       $twig_debug = $development_settings->get('twig_debug', FALSE);
       $twig_cache_disable = $development_settings->get('twig_cache_disable', FALSE);
       if ($twig_debug || $twig_cache_disable) {
@@ -1544,7 +1585,7 @@ class SystemRequirementsHooks {
    */
   protected function checkPasswordHashing(): array {
     $availableAlgorithms = password_algos();
-    $hashingAlgorithm = \Drupal::getContainer()->getParameter('password.algorithm') ?? PASSWORD_DEFAULT;
+    $hashingAlgorithm = $this->passwordAlgorithm ?? PASSWORD_DEFAULT;
 
     if (!in_array($hashingAlgorithm, $availableAlgorithms, TRUE)) {
       return [
