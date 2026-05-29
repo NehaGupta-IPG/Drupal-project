@@ -13,4 +13,5 @@ services:
     class: Drupal\taxonomy\ContextProvider\TermRouteContext
     tags:
       - { name: 'context_provider' }
-  Drupal\taxonomy\TaxonomyPermissions: ~
+  Drupal\taxonomy\TaxonomyPermissions:
+    public: false
