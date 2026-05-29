@@ -77,6 +77,13 @@ function system_post_update_migrate_compress_setting(): void {
 }
 
 /**
+ * Remove non-admin routes state key.
+ */
+function system_post_update_remove_non_admin_routes_state(): void {
+  \Drupal::state()->delete('routing.non_admin_routes');
+}
+
+/**
  * Move the menu linkset endpoint to the menu_linkset module.
  */
 function system_post_update_move_linkset_to_module(): void {
