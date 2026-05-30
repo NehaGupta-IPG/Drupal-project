@@ -17,14 +17,14 @@ abstract class ResultBase implements \Iterator {
  /**
    * Holds the default fetch mode.
    */
-  protected FetchAs $fetchMode = FetchAs::Object;
+  public protected(set) FetchAs $fetchMode = FetchAs::Object;
 
   /**
    * Holds fetch options.
    *
    * @var array{'class': class-string, 'constructor_args': list<mixed>, 'column': int}
    */
-  protected array $fetchOptions = [
+  public protected(set) array $fetchOptions = [
     'class' => 'stdClass',
     'constructor_args' => [],
     'column' => 0,
@@ -103,10 +103,10 @@ abstract class ResultBase implements \Iterator {
   /**
    * Returns an array containing all of the result set rows.
    *
-   * @param \Drupal\Core\Database\Statement\FetchAs $mode
-   *   One of the cases of the FetchAs enum.
-   * @param array{class?: class-string, constructor_args?: list<mixed>, column?: int, cursor_orientation?: int, cursor_offset?: int} $fetchOptions
-   *   An array of fetch options.
+   * @param \Drupal\Core\Database\Statement\FetchAs|null $mode
+   *   One of the cases of the FetchAs enum, or NULL to use current mode.
+   * @param array{class?: class-string, constructor_args?: list<mixed>, column?: int, cursor_orientation?: int, cursor_offset?: int}|null $fetchOptions
+   *   An array of fetch options, or NULL to use the current options.
    *
    * @return array
    *   An array of results.

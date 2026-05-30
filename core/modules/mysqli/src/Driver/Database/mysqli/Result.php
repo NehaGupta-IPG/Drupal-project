@@ -72,7 +72,7 @@ class Result extends ResultBase {
   /**
    * {@inheritdoc}
    */
-  public function fetch(FetchAs $mode, array $fetchOptions): array|object|int|float|string|bool|NULL {
+  public function fetch(?FetchAs $mode, ?array $fetchOptions = NULL): array|object|int|float|string|bool|NULL {
     assert($this->mysqliResult instanceof \mysqli_result);
 
     $mysqli_row = $this->mysqliResult->fetch_assoc();

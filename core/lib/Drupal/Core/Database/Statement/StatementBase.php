@@ -325,22 +325,65 @@ abstract class StatementBase implements \Iterator, StatementInterface {
     }
   }
 
+  /**
+   * Returns the current element.
+   *
+   * @see https://www.php.net/manual/en/iterator.current.php
+   *
+   * @internal This method should not be called directly.
+   */
   public function current(): mixed {
     return $this->result->current();
   }
 
+  /**
+   * Returns the key of the current element.
+   *
+   * @see https://www.php.net/manual/en/iterator.key.php
+   *
+   * @internal This method should not be called directly.
+   */
   public function key(): mixed {
     return $this->result->key();
   }
 
+  /**
+   * Rewinds back to the first element of the Iterator.
+   *
+   * This is the first method called when starting a foreach loop. It will not
+   * be executed after foreach loops.
+   *
+   * @see https://www.php.net/manual/en/iterator.rewind.php
+   *
+   * @internal This method should not be called directly.
+   */
   public function rewind(): void {
     $this->result->rewind();
   }
 
+  /**
+   * Moves the current position to the next element.
+   *
+   * This method is called after each foreach loop.
+   *
+   * @see https://www.php.net/manual/en/iterator.next.php
+   *
+   * @internal This method should not be called directly.
+   */
   public function next(): void {
     $this->result->next();
   }
 
+  /**
+   * Checks if current position is valid.
+   *
+   * This method is called after ::rewind() and ::next() to check if the
+   * current position is valid.
+   *
+   * @see https://www.php.net/manual/en/iterator.valid.php
+   *
+   * @internal This method should not be called directly.
+   */
   public function valid(): bool {
     return $this->result->valid();
   }
