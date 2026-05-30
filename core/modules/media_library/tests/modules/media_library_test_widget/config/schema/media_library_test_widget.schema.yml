@@ -1,5 +1,5 @@
 field.widget.settings.media_library_inception_widget:
-  type: mapping
+  type: field.widget.settings.base
   label: 'Media library inception widget settings'
   mapping:
     media_types:

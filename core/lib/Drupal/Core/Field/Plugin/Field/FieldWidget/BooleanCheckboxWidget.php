@@ -32,6 +32,8 @@ class BooleanCheckboxWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
+    $element = parent::settingsForm($form, $form_state);
+
     $element['display_label'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Use field label instead of the "On" label as the label.'),
@@ -45,7 +47,7 @@ class BooleanCheckboxWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function settingsSummary() {
-    $summary = [];
+    $summary = parent::settingsSummary();
 
     $display_label = $this->getSetting('display_label');
     $summary[] = $this->t('Use field label: @display_label', ['@display_label' => ($display_label ? $this->t('Yes') : $this->t('No'))]);

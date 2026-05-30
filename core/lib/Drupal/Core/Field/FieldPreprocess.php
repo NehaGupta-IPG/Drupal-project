@@ -202,4 +202,73 @@ class FieldPreprocess {
     }
   }
 
+  /**
+   * Prepares variables for individual form element templates.
+   *
+   * Default template: field-multiple-value-without-order-form.html.twig.
+   *
+   * Combines multiple values without drag-n-drop reordering.
+   *
+   * @param array $variables
+   *   An associative array containing:
+   *   - element: A render element representing the form element.
+   */
+  public function preprocessFieldMultipleValueWithoutOrderForm(array &$variables): void {
+    $element = $variables['element'];
+    $variables['multiple'] = $element['#cardinality_multiple'];
+
+    if ($variables['multiple']) {
+      $items = [];
+      $variables['button'] = [];
+      foreach (Element::children($element) as $key) {
+        if ($key === 'add_more') {
+          $variables['button'] = &$element[$key];
+        }
+        else {
+          $items[$key] = &$element[$key];
+          if (isset($items[$key]['_weight'])) {
+            $items[$key]['_weight']['#access'] = FALSE;
+          }
+        }
+      }
+      usort($items, function ($a, $b) {
+        // Sorts using ['_weight']['#value'].
+        $a_weight = (is_array($a) && isset($a['_weight']['#value']) ? $a['_weight']['#value'] : 0);
+        $b_weight = (is_array($b) && isset($b['_weight']['#value']) ? $b['_weight']['#value'] : 0);
+        return $a_weight - $b_weight;
+      });
+
+      // Make required available as a top-level variable for templates.
+      $variables['required'] = !empty($element['#required']) ? $element['#required'] : FALSE;
+
+      // Prepare title attributes for themes that need it (e.g., Stable9).
+      $variables['title_attributes'] = new Attribute();
+
+      $variables['title'] = [];
+      if (!empty($element['#title'])) {
+        $variables['title'] = [
+          '#type' => 'label',
+          '#title' => $element['#title'],
+          '#required' => $variables['required'],
+          '#title_display' => 'before',
+        ];
+      }
+      $variables['items'] = $items;
+
+      if (!empty($element['#description'])) {
+        $variables['description_display'] = $element['#description_display'] ?? 'after';
+        $description_id = $element['#attributes']['aria-describedby'];
+        $description_attributes['id'] = $description_id;
+        $variables['description']['attributes'] = new Attribute($description_attributes);
+        $variables['description']['content'] = $element['#description'];
+      }
+    }
+    else {
+      $variables['elements'] = [];
+      foreach (Element::children($element) as $key) {
+        $variables['elements'][] = $element[$key];
+      }
+    }
+  }
+
 }

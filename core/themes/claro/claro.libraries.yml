@@ -6,6 +6,12 @@ variables:
     base:
       css/base/variables.css: { }
 
+form--field-multiple-without-order:
+  version: VERSION
+  css:
+    component:
+      css/components/form--field-multiple-without-order.css: {}
+
 global-styling:
   aggregate_target:
     css: claro

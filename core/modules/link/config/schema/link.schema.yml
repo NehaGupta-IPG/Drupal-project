@@ -25,7 +25,7 @@ field.formatter.settings.link_separate:
   label: 'Link format settings'
 
 field.widget.settings.link_default:
-  type: mapping
+  type: field.widget.settings.base
   label: 'Link format settings'
   mapping:
     placeholder_url:

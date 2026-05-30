@@ -190,12 +190,20 @@ core.entity_form_display.*.*.*:
 field.formatter.settings.*:
   type: mapping
 
+# Base type for field widget settings with orderable functionality.
+field.widget.settings.base:
+  type: mapping
+  mapping:
+    orderable:
+      type: boolean
+      label: 'Orderable'
+
 # Default schema for entity form display field with undefined type.
 field.widget.settings.*:
-  type: mapping
+  type: field.widget.settings.base
 
 field.widget.settings.string_textfield:
-  type: mapping
+  type: field.widget.settings.base
   label: 'Text field display format settings'
   mapping:
     size:
@@ -206,7 +214,7 @@ field.widget.settings.string_textfield:
       label: 'Placeholder'
 
 field.widget.settings.string_textarea:
-  type: mapping
+  type: field.widget.settings.base
   label: 'Textarea display format settings'
   mapping:
     rows:
@@ -217,7 +225,7 @@ field.widget.settings.string_textarea:
       label: 'Placeholder'
 
 field.widget.settings.uri:
-  type: mapping
+  type: field.widget.settings.base
   label: 'URI field'
   mapping:
     size:
@@ -228,7 +236,7 @@ field.widget.settings.uri:
       label: 'Placeholder'
 
 field.widget.settings.email_default:
-  type: mapping
+  type: field.widget.settings.base
   label: 'Email field display format settings'
   mapping:
     placeholder:
@@ -239,11 +247,11 @@ field.widget.settings.email_default:
       label: 'Size of email field'
 
 field.widget.settings.datetime_timestamp:
-  type: mapping
+  type: field.widget.settings.base
   label: 'Datetime timestamp display format settings'
 
 field.widget.settings.boolean_checkbox:
-  type: mapping
+  type: field.widget.settings.base
   label: 'Boolean checkbox display format settings'
   mapping:
     display_label:
@@ -255,7 +263,7 @@ field.widget.settings.hidden:
   label: '- Hidden - format settings'
 
 field.widget.settings.number:
-  type: mapping
+  type: field.widget.settings.base
   label: 'Number default display format settings'
   mapping:
     placeholder:
@@ -263,7 +271,7 @@ field.widget.settings.number:
       label: 'Placeholder'
 
 field.widget.settings.checkbox:
-  type: mapping
+  type: field.widget.settings.base
   label: 'Single on/off checkbox format settings'
   mapping:
     display_label:
@@ -271,7 +279,7 @@ field.widget.settings.checkbox:
       label: 'Use field label instead of the "On value" as label'
 
 field.widget.settings.language_select:
-  type: mapping
+  type: field.widget.settings.base
   label: 'Language format settings'
   mapping:
     include_locked:
@@ -279,7 +287,7 @@ field.widget.settings.language_select:
       label: 'Include locked languages'
 
 field.widget.settings.entity_reference_autocomplete_tags:
-  type: mapping
+  type: field.widget.settings.base
   label: 'Entity reference autocomplete (Tags style) display format settings'
   mapping:
     match_operator:
@@ -296,7 +304,7 @@ field.widget.settings.entity_reference_autocomplete_tags:
       label: 'Placeholder'
 
 field.widget.settings.entity_reference_autocomplete:
-  type: mapping
+  type: field.widget.settings.base
   label: 'Entity reference autocomplete display format settings'
   mapping:
     match_operator:

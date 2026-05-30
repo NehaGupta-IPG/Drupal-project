@@ -181,7 +181,7 @@ field.formatter.settings.file_url_plain:
   label: 'URL to file format settings'
 
 field.widget.settings.file_generic:
-  type: mapping
+  type: field.widget.settings.base
   label: 'File format settings'
   mapping:
     progress_indicator:

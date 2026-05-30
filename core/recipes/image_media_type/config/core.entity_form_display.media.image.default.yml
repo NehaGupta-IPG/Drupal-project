@@ -31,7 +31,8 @@ content:
     type: path
     weight: 30
     region: content
-    settings: {  }
+    settings:
+      orderable: true
     third_party_settings: {  }
   status:
     type: boolean_checkbox

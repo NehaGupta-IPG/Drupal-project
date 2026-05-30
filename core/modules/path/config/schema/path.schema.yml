@@ -1,5 +1,5 @@
 # Schema for the configuration files of the Path module.
 
 field.widget.settings.path:
-  type: mapping
+  type: field.widget.settings.base
   label: 'Link format settings'

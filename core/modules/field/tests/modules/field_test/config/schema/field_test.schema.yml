@@ -34,7 +34,7 @@ field.formatter.settings.field_test_with_prepare_view:
       label: 'Test setting'
 
 field.widget.settings.test_field_widget:
-  type: mapping
+  type: field.widget.settings.base
   label: 'Test field widget settings'
   mapping:
     test_widget_setting:
@@ -48,7 +48,7 @@ field.widget.settings.test_field_widget:
       label: 'A 2nd referenced role'
 
 field.widget.settings.test_field_widget_multiple:
-  type: mapping
+  type: field.widget.settings.base
   label: 'Test multiple field widget settings'
   mapping:
     test_widget_setting_multiple:
@@ -56,7 +56,7 @@ field.widget.settings.test_field_widget_multiple:
       label: 'Test setting'
 
 field.widget.settings.test_field_widget_multiple_single_value:
-  type: mapping
+  type: field.widget.settings.base
   label: 'Test multiple field widget settings: single values'
   mapping:
     test_widget_setting_multiple:
