@@ -284,24 +284,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Component/Annotation/Doctrine/StaticReflectionClass.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Component\\\\Annotation\\\\Doctrine\\\\StaticReflectionClass\\:\\:getInterfaces\\(\\) return type with generic class ReflectionClass does not specify its types\\: T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Component/Annotation/Doctrine/StaticReflectionClass.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Component\\\\Annotation\\\\Doctrine\\\\StaticReflectionClass\\:\\:getParentClass\\(\\) return type with generic class ReflectionClass does not specify its types\\: T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Component/Annotation/Doctrine/StaticReflectionClass.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Component\\\\Annotation\\\\Doctrine\\\\StaticReflectionClass\\:\\:getTraits\\(\\) return type with generic class ReflectionClass does not specify its types\\: T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Component/Annotation/Doctrine/StaticReflectionClass.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Component\\\\Annotation\\\\Plugin\\:\\:get\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -3338,36 +3320,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Config/TypedConfigManager.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\TypedConfigManager\\:\\:createFromNameAndData\\(\\) return type with generic interface Drupal\\\\Core\\\\TypedData\\\\TraversableTypedDataInterface does not specify its types\\: I, T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Config/TypedConfigManager.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\TypedConfigManager\\:\\:get\\(\\) return type with generic interface Drupal\\\\Core\\\\TypedData\\\\TraversableTypedDataInterface does not specify its types\\: I, T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Config/TypedConfigManager.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\TypedConfigManager\\:\\:getStaticTypeRoot\\(\\) return type with generic interface Drupal\\\\Core\\\\TypedData\\\\TraversableTypedDataInterface does not specify its types\\: I, T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Config/TypedConfigManager.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\TypedConfigManagerInterface\\:\\:createFromNameAndData\\(\\) return type with generic interface Drupal\\\\Core\\\\TypedData\\\\TraversableTypedDataInterface does not specify its types\\: I, T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Config/TypedConfigManagerInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\TypedConfigManagerInterface\\:\\:get\\(\\) return type with generic interface Drupal\\\\Core\\\\TypedData\\\\TraversableTypedDataInterface does not specify its types\\: I, T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Config/TypedConfigManagerInterface.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Controller\\\\ControllerBase\\:\\:setMessenger\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -5324,24 +5276,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Event/BundleConfigImportValidate.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Entity\\\\FieldableEntityInterface\\:\\:get\\(\\) return type with generic interface Drupal\\\\Core\\\\Field\\\\FieldItemListInterface does not specify its types\\: T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/FieldableEntityInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Entity\\\\FieldableEntityInterface\\:\\:getFields\\(\\) return type with generic interface Drupal\\\\Core\\\\Field\\\\FieldItemListInterface does not specify its types\\: T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/FieldableEntityInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Entity\\\\FieldableEntityInterface\\:\\:getTranslatableFields\\(\\) return type with generic interface Drupal\\\\Core\\\\Field\\\\FieldItemListInterface does not specify its types\\: T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/FieldableEntityInterface.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Entity\\\\FieldableEntityInterface\\:\\:onChange\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -6990,12 +6924,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Field/FormatterInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Field\\\\FormatterPluginManager\\:\\:getInstance\\(\\) return type with generic interface Drupal\\\\Core\\\\Field\\\\FormatterInterface does not specify its types\\: T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Field/FormatterPluginManager.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Field\\\\Plugin\\\\Field\\\\FieldFormatter\\\\EntityReferenceFormatterBase\\:\\:prepareView\\(\\) has no return type specified\\.$#',
@@ -8822,12 +8750,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Plugin/Discovery/AnnotatedClassDiscovery.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Plugin\\\\Discovery\\\\DirectoryWithMetadataDiscovery\\:\\:getDirectoryIterator\\(\\) return type with generic class RecursiveIteratorIterator does not specify its types\\: T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Plugin/Discovery/DirectoryWithMetadataDiscovery.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Parameter \\#3 \\$flags of class RecursiveIteratorIterator constructor expects 0\\|16, 4096 given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 1,
@@ -9404,12 +9326,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Routing/CurrentRouteMatch.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Routing\\\\Enhancer\\\\ParamConversionEnhancer\\:\\:copyRawVariables\\(\\) return type with generic class Symfony\\\\Component\\\\HttpFoundation\\\\InputBag does not specify its types\\: TInput$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Routing/Enhancer/ParamConversionEnhancer.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Routing\\\\Enhancer\\\\ParamConversionEnhancer\\:\\:onException\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -9504,24 +9420,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Routing/RouteBuilderInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Routing\\\\RoutePreloader\\:\\:onAlterRoutes\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Routing/RoutePreloader.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Routing\\\\RoutePreloader\\:\\:onFinishedRoutes\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Routing/RoutePreloader.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Routing\\\\RoutePreloader\\:\\:onRequest\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Routing/RoutePreloader.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Routing\\\\RouteProvider\\:\\:addExtraCacheKeyPart\\(\\) has no return type specified\\.$#',
@@ -10118,12 +10016,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/TypedData/Plugin/DataType/DurationIso8601.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\TypedData\\\\Plugin\\\\DataType\\\\ItemList\\:\\:getIterator\\(\\) return type with generic class ArrayIterator does not specify its types\\: TKey, TValue$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/TypedData/Plugin/DataType/ItemList.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\TypedData\\\\Plugin\\\\DataType\\\\ItemList\\:\\:onChange\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -10232,18 +10124,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/TypedData/TypedData.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\TypedData\\\\TypedData\\:\\:getParent\\(\\) return type with generic interface Drupal\\\\Core\\\\TypedData\\\\TraversableTypedDataInterface does not specify its types\\: I, T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/TypedData/TypedData.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\TypedData\\\\TypedData\\:\\:getRoot\\(\\) return type with generic interface Drupal\\\\Core\\\\TypedData\\\\TraversableTypedDataInterface does not specify its types\\: I, T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/TypedData/TypedData.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\TypedData\\\\TypedData\\:\\:setContext\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -10258,18 +10138,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\TypedData\\\\TypedDataInterface\\:\\:createInstance\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/TypedData/TypedDataInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\TypedData\\\\TypedDataInterface\\:\\:getParent\\(\\) return type with generic interface Drupal\\\\Core\\\\TypedData\\\\TraversableTypedDataInterface does not specify its types\\: I, T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/TypedData/TypedDataInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\TypedData\\\\TypedDataInterface\\:\\:getRoot\\(\\) return type with generic interface Drupal\\\\Core\\\\TypedData\\\\TraversableTypedDataInterface does not specify its types\\: I, T$#',
-	'identifier' => 'missingType.generics',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/TypedData/TypedDataInterface.php',
 ];
@@ -16280,12 +16148,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/layout_builder/src/Plugin/Block/FieldBlock.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\layout_builder\\\\Plugin\\\\Block\\\\FieldBlock\\:\\:getFormatter\\(\\) return type with generic interface Drupal\\\\Core\\\\Field\\\\FormatterInterface does not specify its types\\: T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/src/Plugin/Block/FieldBlock.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\layout_builder\\\\Plugin\\\\Block\\\\InlineBlock\\:\\:blockSubmit\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -19046,12 +18908,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/node/src/Entity/Node.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Entity\\\\Node\\:\\:preDelete\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Entity/Node.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\node\\\\Entity\\\\Node\\:\\:preSave\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -19320,48 +19176,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/node/src/NodeViewBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Plugin\\\\Search\\\\NodeSearch\\:\\:addNodeRankings\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Plugin/Search/NodeSearch.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Plugin\\\\Search\\\\NodeSearch\\:\\:indexClear\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Plugin/Search/NodeSearch.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Plugin\\\\Search\\\\NodeSearch\\:\\:markForReindex\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Plugin/Search/NodeSearch.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Plugin\\\\Search\\\\NodeSearch\\:\\:searchFormAlter\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Plugin/Search/NodeSearch.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Plugin\\\\Search\\\\NodeSearch\\:\\:submitConfigurationForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Plugin/Search/NodeSearch.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Plugin\\\\Search\\\\NodeSearch\\:\\:updateIndex\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Plugin/Search/NodeSearch.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$query of method Drupal\\\\node\\\\Plugin\\\\Search\\\\NodeSearch\\:\\:addNodeRankings\\(\\) expects Drupal\\\\Core\\\\Database\\\\Query\\\\SelectExtender, Drupal\\\\Core\\\\Database\\\\Query\\\\ExtendableInterface given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Plugin/Search/NodeSearch.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\node\\\\Plugin\\\\views\\\\argument\\\\Type\\:\\:node_type\\(\\) has no return type specified\\.$#',
@@ -20376,18 +20190,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/rest/tests/src/Functional/ResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\RestLoginHttpTest\\:\\:assertMailPattern\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/RestLoginHttpTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\RestLoginHttpTest\\:\\:assertMailString\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/RestLoginHttpTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Kernel\\\\StubRequestHandlerResourcePlugin\\:\\:delete\\(\\) has no return type specified\\.$#',
@@ -28216,12 +28018,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/src/Plugin/views/field/EntityField.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\field\\\\EntityField\\:\\:getFormatterInstance\\(\\) return type with generic interface Drupal\\\\Core\\\\Field\\\\FormatterInterface does not specify its types\\: T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/src/Plugin/views/field/EntityField.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\field\\\\EntityField\\:\\:init\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -34355,12 +34151,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/DependencyInjection/DependencySerializationTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Entity\\\\EntityFieldManagerTest\\:\\:setUpEntityWithFieldDefinition\\(\\) return type with generic interface Prophecy\\\\Prophecy\\\\ProphecyInterface does not specify its types\\: T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityFieldManagerTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Entity\\\\BasicControllerClass\\:\\:exampleControllerMethod\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -34829,12 +34619,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/WebAssert.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\PHPStan\\\\Tests\\\\ComponentTestDoesNotExtendCoreTestTest\\:\\:getRule\\(\\) return type with generic interface PHPStan\\\\Rules\\\\Rule does not specify its types\\: TNodeType$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/PHPStan/tests/ComponentTestDoesNotExtendCoreTestTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Function drupal_phpunit_populate_class_loader\\(\\) has no return type specified\\.$#',
