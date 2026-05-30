@@ -15,7 +15,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Ensure that password reset methods work as expected.
+ * Ensure that one-time login / password reset methods work as expected.
  */
 #[Group('user')]
 #[RunTestsInSeparateProcesses]
@@ -353,17 +353,17 @@ class UserPasswordResetTest extends BrowserTestBase {
   /**
    * Tests user password reset while logged in.
    */
-  public function testUserPasswordResetLoggedIn(): void {
+  public function testUserPasswordResetLoggedIn($use_direct_login_link = FALSE): void {
+    // Log in, reset password, get reset URL.
     $another_account = $this->drupalCreateUser();
     $this->drupalLogin($another_account);
     $this->drupalGet('user/password');
     $this->submitForm([], 'Submit');
-
-    // Click the reset URL while logged and change our password.
     $resetURL = $this->getResetURL();
-    // Log in as a different user.
+
+    // Log in as a different user, then try to use the URL.
     $this->drupalLogin($this->account);
-    $this->drupalGet($resetURL);
+    $this->drupalGet($resetURL . ($use_direct_login_link ? '/login' : ''));
     $this->assertSession()->pageTextContains("Another user ({$this->account->getAccountName()}) is already logged into the site on this computer, but you tried to use a one-time link for user {$another_account->getAccountName()}. Log out and try using the link again.");
     $this->assertSession()->linkExists('Log out');
     $this->assertSession()->linkByHrefExists(Url::fromRoute('user.logout')->toString());
@@ -376,34 +376,38 @@ class UserPasswordResetTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('The one-time login link you clicked is invalid.');
 
     $another_account->delete();
-    $this->drupalGet($resetURL);
+    $this->drupalGet($resetURL . ($use_direct_login_link ? '/login' : ''));
     $this->assertSession()->pageTextContains('The one-time login link you clicked is invalid.');
 
-    // Log in.
+    // Log in, reset password, get reset URL.
     $this->drupalLogin($this->account);
-
-    // Reset the password by username via the password reset page.
     $this->drupalGet('user/password');
     $this->submitForm([], 'Submit');
-
-    // Click the reset URL while logged and change our password.
     $resetURL = $this->getResetURL();
-    $this->drupalGet($resetURL);
-    $this->submitForm([], 'Log in');
 
+    // Verify using the URL works fine while logged in as the same user, and
+    // redirects to the user edit form where the password can be changed
+    // without knowing the old password.
+    $this->drupalGet($resetURL . ($use_direct_login_link ? '/login' : ''));
+    if (!$use_direct_login_link) {
+      $this->submitForm([], 'Log in');
+    }
     // Change the password.
     $password = \Drupal::service('password_generator')->generate();
     $edit = ['pass[pass1]' => $password, 'pass[pass2]' => $password];
     $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains('The changes have been saved.');
 
-    // Logged in users should not be able to access the user.reset.login or the
-    // user.reset.form routes.
-    $timestamp = \Drupal::time()->getRequestTime() - 1;
-    $this->drupalGet("user/reset/" . $this->account->id() . "/$timestamp/" . user_pass_rehash($this->account, $timestamp) . '/login');
-    $this->assertSession()->statusCodeEquals(403);
+    // Logged in users should not be able to access the user.reset.form route.
     $this->drupalGet("user/reset/" . $this->account->id());
     $this->assertSession()->statusCodeEquals(403);
+  }
+
+  /**
+   * Test direct login link (password reset with "/login") while logged in.
+   */
+  public function testUserDirectLoginLoggedIn(): void {
+    $this->testUserPasswordResetLoggedIn(TRUE);
   }
 
   /**
