@@ -14,21 +14,15 @@ class PdoResult extends ResultBase {
   /**
    * Constructor.
    *
-   * @param \Drupal\Core\Database\Statement\FetchAs $fetchMode
-   *   The fetch mode.
-   * @param array{class: class-string, constructor_args: list<mixed>, column: int, cursor_orientation?: int, cursor_offset?: int} $fetchOptions
-   *   The fetch options.
    * @param \PDOStatement $clientStatement
    *   The PDO Statement object. PDO does not provide a separate object for
    *   results, se we need to fetch data from the Statement.
    */
   public function __construct(
-    FetchAs $fetchMode,
-    array $fetchOptions,
     protected readonly \PDOStatement $clientStatement,
     bool $valid,
   ) {
-    parent::__construct($fetchMode, $fetchOptions, $valid);
+    parent::__construct($valid);
   }
 
   /**
