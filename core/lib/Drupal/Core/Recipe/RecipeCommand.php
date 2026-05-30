@@ -67,6 +67,14 @@ final class RecipeCommand extends Command {
     // Recipes can only be applied to an already-installed site.
     $container = $this->boot()->getContainer();
 
+    $lock = $container->get('lock.persistent');
+    $lock_name = 'recipe';
+
+    if (!$lock->acquire($lock_name)) {
+      $io->error('Attempting to apply a recipe, but another recipe process is already running.');
+      return 1;
+    }
+
     /** @var \Drupal\Core\Config\Checkpoint\CheckpointStorageInterface $checkpoint_storage */
     $checkpoint_storage = $container->get('config.storage.checkpoint');
     $recipe = Recipe::createFromDirectory($recipe_path);
@@ -136,6 +144,9 @@ final class RecipeCommand extends Command {
         $io->error($importer_exception->getMessage());
       }
       throw $e;
+    }
+    finally {
+      $lock->release($lock_name);
     }
   }
 

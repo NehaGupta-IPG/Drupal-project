@@ -37,6 +37,14 @@ class RecipeCommandTest extends BrowserTestBase {
    */
   protected $strictConfigSchema = FALSE;
 
+  protected function tearDown(): void {
+    // Release the 'recipe_import' lock to avoid conflicts between tests.
+    \Drupal::service('lock')->release('recipe');
+
+    // Call the parent tearDown() method to ensure the rest of the cleanup is done.
+    parent::tearDown();
+  }
+
   public function testRecipeCommand(): void {
     $this->assertFalse(\Drupal::moduleHandler()->moduleExists('node'), 'The node module is not installed');
     $this->assertCheckpointsExist([]);
@@ -107,6 +115,60 @@ class RecipeCommandTest extends BrowserTestBase {
     $output = trim(preg_replace('/\s+/', ' ', $process->getOutput()));
     $this->assertSame('[ERROR] The supplied path core/tests/fixtures/recipes/does_not_exist is not a directory', $output);
     $this->assertEmpty($process->getErrorOutput());
+  }
+
+  /**
+   * Tests that the lock prevents concurrent recipe executions.
+   */
+  public function testLockPreventsConcurrentExecution(): void {
+    // Simulate acquiring the lock.
+    $lock = \Drupal::service('lock.persistent');
+    $lock_name = 'recipe';
+    $lock->acquire($lock_name);
+
+    // Attempt to apply the recipe while the lock is held.
+    $process = $this->applyRecipe('core/tests/fixtures/recipes/install_node_with_config', 1);
+
+    $this->assertSame(1, $process->getExitCode());
+
+    // Release the lock after testing.
+    $lock->release($lock_name);
+  }
+
+  /**
+   * Tests that the lock is released after successful recipe execution.
+   */
+  public function testLockReleasedAfterExecution(): void {
+    $lock = \Drupal::service('lock.persistent');
+    $lock_name = 'recipe';
+
+    // Ensure the lock is available before starting.
+    $this->assertTrue($lock->lockMayBeAvailable($lock_name));
+
+    // Apply a recipe and ensure it acquires the lock and completes successfully.
+    $process = $this->applyRecipe('core/tests/fixtures/recipes/install_node_with_config');
+    $this->assertSame(0, $process->getExitCode());
+
+    // Check that the lock has been released.
+    $this->assertTrue($lock->lockMayBeAvailable($lock_name));
+  }
+
+  /**
+   * Tests that the lock is released after a failed recipe execution.
+   */
+  public function testLockReleasedAfterFailure(): void {
+    $lock = \Drupal::service('lock.persistent');
+    $lock_name = 'recipe';
+
+    // Ensure the lock is available before starting.
+    $this->assertTrue($lock->lockMayBeAvailable($lock_name));
+
+    // Apply a recipe that will fail, ensuring it handles the lock correctly.
+    $process = $this->applyRecipe('core/tests/fixtures/recipes/invalid_config', 1);
+    $this->assertStringContainsString('There were validation errors', $process->getErrorOutput());
+
+    // Check that the lock has been released after failure.
+    $this->assertTrue($lock->lockMayBeAvailable($lock_name));
   }
 
   /**
