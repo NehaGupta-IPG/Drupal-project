@@ -103,12 +103,10 @@ class Statement extends StatementBase {
       // different object than the statement itself.
       $return = $this->getClientStatement()->execute($args);
       $this->result = new Result(
-        $this->fetchMode,
-        $this->fetchOptions,
         $this->getClientStatement()->get_result(),
         $this->clientConnection,
+        $return,
       );
-      $this->markResultsetIterable($return);
     }
     catch (\Exception $e) {
       $this->dispatchStatementExecutionFailureEvent($startEvent, $e);

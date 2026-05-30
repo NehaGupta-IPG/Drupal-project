@@ -36,12 +36,11 @@ class PrefetchedResult extends ResultBase {
    *   The row count.
    */
   public function __construct(
-    FetchAs $fetchMode,
-    array $fetchOptions,
     protected array $data,
     public readonly ?int $rowCount,
+    bool $valid,
   ) {
-    parent::__construct($fetchMode, $fetchOptions);
+    parent::__construct($valid);
     $this->columnNames = isset($this->data[0]) ? array_keys($this->data[0]) : [];
     $this->currentRowIndex = -1;
   }
@@ -57,25 +56,26 @@ class PrefetchedResult extends ResultBase {
    * {@inheritdoc}
    */
   public function setFetchMode(FetchAs $mode, array $fetchOptions): bool {
-    // We do not really need to do anything here, since calls to any of this
-    // class' methods require an explicit fetch mode to be passed in, and we
-    // have no longer an active client statement to which we may want to pass
-    // the default fetch mode. Just return TRUE.
+    $this->fetchMode = $mode;
+    $this->fetchOptions = array_merge($this->fetchOptions, $fetchOptions);
     return TRUE;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function fetch(FetchAs $mode, array $fetchOptions): array|object|int|float|string|bool|NULL {
+  public function fetch(?FetchAs $mode, ?array $fetchOptions = NULL): array|object|int|float|string|bool|NULL {
     $this->currentRowIndex++;
     if (!isset($this->data[$this->currentRowIndex])) {
       $this->currentRowIndex = NULL;
+      $this->markResultsetFetchingComplete();
       return FALSE;
     }
     $rowAssoc = $this->data[$this->currentRowIndex];
     unset($this->data[$this->currentRowIndex]);
-    return $this->assocToFetchMode($rowAssoc, $mode, $fetchOptions);
+    $row = $this->assocToFetchMode($rowAssoc, $mode ?? $this->fetchMode, $fetchOptions ?? $this->fetchOptions);
+    $this->setResultsetCurrentRow($row);
+    return $row;
   }
 
   /**

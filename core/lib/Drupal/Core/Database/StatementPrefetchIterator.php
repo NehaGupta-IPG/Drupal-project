@@ -76,8 +76,7 @@ class StatementPrefetchIterator extends StatementBase {
     }
     catch (\Exception $e) {
       $this->dispatchStatementExecutionFailureEvent($startEvent, $e);
-      // @phpstan-ignore unset.possiblyHookedProperty
-      unset($this->clientStatement);
+      $this->clientStatement = NULL;
       throw $e;
     }
 
@@ -85,14 +84,11 @@ class StatementPrefetchIterator extends StatementBase {
     // as possible. Then, destroy the client statement. See the documentation
     // of \Drupal\sqlite\Driver\Database\sqlite\Statement for an explanation.
     $this->result = new PrefetchedResult(
-      $this->fetchMode,
-      $this->fetchOptions,
       $this->clientFetchAll(FetchAs::Associative),
       $this->rowCountEnabled ? $this->clientRowCount() : NULL,
+      $return,
     );
-    // @phpstan-ignore unset.possiblyHookedProperty
-    unset($this->clientStatement);
-    $this->markResultsetIterable($return);
+    $this->clientStatement = NULL;
 
     if (isset($options['fetch'])) {
       if (is_string($options['fetch'])) {

@@ -19,22 +19,17 @@ class Result extends ResultBase {
   /**
    * Constructor.
    *
-   * @param \Drupal\Core\Database\Statement\FetchAs $fetchMode
-   *   The fetch mode.
-   * @param array{class: class-string, constructor_args: list<mixed>, column: int, cursor_orientation?: int, cursor_offset?: int} $fetchOptions
-   *   The fetch options.
    * @param \mysqli_result|false $mysqliResult
    *   The MySQLi result object.
    * @param \mysqli $mysqliConnection
    *   Client database connection object.
    */
   public function __construct(
-    FetchAs $fetchMode,
-    array $fetchOptions,
     protected readonly \mysqli_result|false $mysqliResult,
     protected readonly \mysqli $mysqliConnection,
+    bool $valid,
   ) {
-    parent::__construct($fetchMode, $fetchOptions);
+    parent::__construct($valid);
   }
 
   /**

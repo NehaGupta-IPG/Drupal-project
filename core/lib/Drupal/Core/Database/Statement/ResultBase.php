@@ -4,14 +4,49 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Database\Statement;
 
+use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\FetchModeTrait;
 
 /**
  * Base class for results of a data query language (DQL) statement.
  */
-abstract class ResultBase {
+abstract class ResultBase implements \Iterator {
 
   use FetchModeTrait;
+
+ /**
+   * Holds the default fetch mode.
+   */
+  protected FetchAs $fetchMode = FetchAs::Object;
+
+  /**
+   * Holds fetch options.
+   *
+   * @var array{'class': class-string, 'constructor_args': list<mixed>, 'column': int}
+   */
+  protected array $fetchOptions = [
+    'class' => 'stdClass',
+    'constructor_args' => [],
+    'column' => 0,
+  ];
+
+  /**
+   * Traces if rows can be fetched from the resultset.
+   */
+  protected bool $isIterable = FALSE;
+
+  /**
+   * The current row, retrieved in the current fetch format.
+   */
+  protected mixed $resultsetRow = NULL;
+
+  /**
+   * The index of the current row.
+   *
+   * This keeps the index of rows fetched from the underlying statement. It is
+   * set to -1 when no rows have been fetched yet.
+   */
+  protected int $resultsetIndex = -1;
 
   /**
    * Constructor.
@@ -22,9 +57,9 @@ abstract class ResultBase {
    *   The fetch options.
    */
   public function __construct(
-    protected FetchAs $fetchMode,
-    protected array $fetchOptions,
+    bool $valid,
   ) {
+    $this->markResultsetIterable($valid);
   }
 
   /**
@@ -63,7 +98,7 @@ abstract class ResultBase {
    * @return array|object|int|float|string|bool|null
    *   A result, formatted according to $mode, or FALSE on failure.
    */
-  abstract public function fetch(FetchAs $mode, array $fetchOptions): array|object|int|float|string|bool|NULL;
+  abstract public function fetch(?FetchAs $mode, ?array $fetchOptions = NULL): array|object|int|float|string|bool|NULL;
 
   /**
    * Returns an array containing all of the result set rows.
@@ -76,10 +111,10 @@ abstract class ResultBase {
    * @return array
    *   An array of results.
    */
-  public function fetchAll(FetchAs $mode, array $fetchOptions): array {
+  public function fetchAll(?FetchAs $mode, ?array $fetchOptions = NULL): array {
     $result = [];
     while ($rowAssoc = $this->fetch(FetchAs::Associative, $fetchOptions)) {
-      $result[] = $this->assocToFetchMode($rowAssoc, $mode, $fetchOptions);
+      $result[] = $this->assocToFetchMode($rowAssoc, $mode ?? $this->fetchMode, $fetchOptions ?? $this->fetchOptions);
     }
     return $result;
   }
@@ -131,12 +166,115 @@ abstract class ResultBase {
    * @return array
    *   An associative array, or an empty array if there is no result set.
    */
-  public function fetchAllAssoc(string $column, FetchAs $mode, array $fetchOptions): array {
+  public function fetchAllAssoc(string $column, ?FetchAs $mode = NULL, ?array $fetchOptions = NULL): array {
     $result = [];
     while ($rowAssoc = $this->fetch(FetchAs::Associative, [])) {
-      $result[$rowAssoc[$column]] = $this->assocToFetchMode($rowAssoc, $mode, $fetchOptions);
+      $result[$rowAssoc[$column]] = $this->assocToFetchMode($rowAssoc, $mode ?? $this->fetchMode, $fetchOptions ?? $this->fetchOptions);
     }
     return $result;
+  }
+
+  /**
+   * Informs the iterator whether rows can be fetched from the resultset.
+   *
+   * @param bool $valid
+   *   The result of the execution of the client statement.
+   */
+  protected function markResultsetIterable(bool $valid): void {
+    $this->isIterable = $valid;
+    $this->resultsetRow = NULL;
+    if ($valid === TRUE) {
+      $this->resultsetIndex = -1;
+    }
+  }
+
+  /**
+   * Sets the current resultset row for the iterator, and increments the key.
+   *
+   * @param mixed $row
+   *   The last row fetched from the client statement.
+   */
+  protected function setResultsetCurrentRow(mixed $row): void {
+    $this->resultsetRow = $row;
+    $this->resultsetIndex++;
+  }
+
+  /**
+   * Informs the iterator that no more rows can be fetched from the resultset.
+   */
+  protected function markResultsetFetchingComplete(): void {
+    $this->markResultsetIterable(FALSE);
+  }
+
+  /**
+   * Returns the current element.
+   *
+   * @see https://www.php.net/manual/en/iterator.current.php
+   *
+   * @internal This method should not be called directly.
+   */
+  public function current(): mixed {
+    return $this->resultsetRow;
+  }
+
+  /**
+   * Returns the key of the current element.
+   *
+   * @see https://www.php.net/manual/en/iterator.key.php
+   *
+   * @internal This method should not be called directly.
+   */
+  public function key(): mixed {
+    return $this->resultsetIndex;
+  }
+
+  /**
+   * Rewinds back to the first element of the Iterator.
+   *
+   * This is the first method called when starting a foreach loop. It will not
+   * be executed after foreach loops.
+   *
+   * @see https://www.php.net/manual/en/iterator.rewind.php
+   *
+   * @internal This method should not be called directly.
+   */
+  public function rewind(): void {
+    // Nothing to do: our DatabaseStatement can't be rewound. Error out when
+    // attempted.
+    if ($this->resultsetIndex >= 0) {
+      $this->markResultsetIterable(FALSE);
+      throw new DatabaseExceptionWrapper('Attempted rewinding a StatementInterface object when fetching has already started. Refactor your code to avoid rewinding statement objects.');
+    }
+  }
+
+  /**
+   * Moves the current position to the next element.
+   *
+   * This method is called after each foreach loop.
+   *
+   * @see https://www.php.net/manual/en/iterator.next.php
+   *
+   * @internal This method should not be called directly.
+   */
+  public function next(): void {
+    $this->fetch($this->fetchMode, $this->fetchOptions);
+  }
+
+  /**
+   * Checks if current position is valid.
+   *
+   * This method is called after ::rewind() and ::next() to check if the
+   * current position is valid.
+   *
+   * @see https://www.php.net/manual/en/iterator.valid.php
+   *
+   * @internal This method should not be called directly.
+   */
+  public function valid(): bool {
+    if ($this->isIterable && $this->resultsetIndex === -1) {
+      $this->fetch($this->fetchMode, $this->fetchOptions);
+    }
+    return $this->isIterable;
   }
 
 }

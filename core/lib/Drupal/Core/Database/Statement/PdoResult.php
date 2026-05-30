@@ -26,8 +26,9 @@ class PdoResult extends ResultBase {
     FetchAs $fetchMode,
     array $fetchOptions,
     protected readonly \PDOStatement $clientStatement,
+    bool $valid,
   ) {
-    parent::__construct($fetchMode, $fetchOptions);
+    parent::__construct($fetchMode, $fetchOptions, $valid);
   }
 
   /**
