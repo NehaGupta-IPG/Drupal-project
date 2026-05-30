@@ -18,22 +18,19 @@ class EntityChangedConstraintValidator extends ConstraintValidator {
       /** @var \Drupal\Core\Entity\EntityInterface $entity */
       if (!$entity->isNew()) {
         $saved_entity = \Drupal::entityTypeManager()->getStorage($entity->getEntityTypeId())->loadUnchanged($entity->id());
-        // Ensure that all the entity translations are the same as or newer
-        // than their current version in the storage in order to avoid
-        // reverting other changes. In fact the entity object that is being
-        // saved might contain an older entity translation when different
-        // translations are being concurrently edited.
+        // Ensure that the entity translation being saved is the same as or
+        // newer than the version in storage to avoid reverting concurrent
+        // changes. Only the active translation is checked because:
+        // - Saving a translation only writes that translation's data to
+        //   storage; other translations are not affected.
+        // - Other translations in the entity object may carry stale changed
+        //   timestamps when the form was loaded before another user saved
+        //   those translations (e.g. after an AJAX form rebuild), which would
+        //   produce false "concurrent modification" violations.
         if ($saved_entity) {
-          $common_translation_languages = array_intersect_key($entity->getTranslationLanguages(), $saved_entity->getTranslationLanguages());
-          foreach (array_keys($common_translation_languages) as $langcode) {
-            // Merely comparing the latest changed timestamps across all
-            // translations is not sufficient since other translations may have
-            // been edited and saved in the meanwhile. Therefore, compare the
-            // changed timestamps of each entity translation individually.
-            if ($saved_entity->getTranslation($langcode)->getChangedTime() > $entity->getTranslation($langcode)->getChangedTime()) {
-              $this->context->addViolation($constraint->message);
-              break;
-            }
+          $langcode = $entity->language()->getId();
+          if ($saved_entity->hasTranslation($langcode) && $saved_entity->getTranslation($langcode)->getChangedTime() > $entity->getTranslation($langcode)->getChangedTime()) {
+            $this->context->addViolation($constraint->message);
           }
         }
       }

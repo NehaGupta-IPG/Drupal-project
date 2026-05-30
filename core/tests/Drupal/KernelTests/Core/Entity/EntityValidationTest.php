@@ -306,4 +306,64 @@ class EntityValidationTest extends EntityKernelTestBase {
     $this->assertEquals('The content has either been modified by another user, or you have already submitted modifications. As a result, your changes cannot be saved.', $violations[0]->getMessage());
   }
 
+  /**
+   * Tests EntityChangedConstraint allows concurrent saves of different translations.
+   *
+   * Regression test for https://www.drupal.org/project/drupal/issues/3574382.
+   *
+   * When User A saves translation A and User B is concurrently editing
+   * translation B, User B's entity object carries the stale changed timestamp
+   * for translation A (from before User A's save). Saving translation B must
+   * not be blocked by this stale timestamp because translation B's save does
+   * not affect translation A's storage data.
+   */
+  public function testEntityChangedConstraintAllowsConcurrentTranslationSaves(): void {
+    $this->installEntitySchema('entity_test_mulrev_changed');
+    $storage = \Drupal::entityTypeManager()
+      ->getStorage('entity_test_mulrev_changed');
+
+    // Create a test entity with a DE translation.
+    $entity = $this->createTestEntity('entity_test_mulrev_changed');
+    $entity->save();
+    $entity = $storage->loadUnchanged($entity->id());
+    $entity->addTranslation('de');
+    $entity->save();
+
+    // Simulate User B loading the DE translation form at this point in time.
+    // The entity object has the current EN and DE changed timestamps.
+    $user_b_de_entity = $storage->loadUnchanged($entity->id())->getTranslation('de');
+
+    // Simulate User A saving the default (EN) translation, which updates
+    // EN's changed timestamp in storage to a newer value.
+    $user_a_entity = $storage->loadUnchanged($entity->id());
+    // Use a guaranteed-newer timestamp to avoid same-second collisions.
+    $user_a_entity->setChangedTime($user_a_entity->getChangedTime() + 100);
+    $user_a_entity->save();
+
+    // User B's DE entity still has the old EN changed timestamp (stale), but
+    // its own DE changed timestamp has been updated (simulating updateChangedTime
+    // called during form submit before validation).
+    $user_b_de_entity->setChangedTime($user_b_de_entity->getChangedTime() + 50);
+
+    // Saving DE must succeed: DE's own changed time is fresh, and the stale EN
+    // changed time in User B's entity should not trigger a false violation.
+    $violations = $user_b_de_entity->validate();
+    $entity_changed_violations = array_filter(
+      iterator_to_array($violations),
+      fn($v) => str_contains((string) $v->getMessage(), 'modified by another user'),
+    );
+    $this->assertCount(0, $entity_changed_violations, 'No EntityChanged violation when saving DE translation while EN was concurrently updated.');
+
+    // Sanity check: saving the same translation with a stale changed time MUST
+    // still produce a violation (the real concurrent-edit protection must work).
+    $stale_de_entity = $storage->loadUnchanged($entity->id())->getTranslation('de');
+    $stale_de_entity->setChangedTime($stale_de_entity->getChangedTime() - 1);
+    $violations = $stale_de_entity->validate();
+    $entity_changed_violations = array_filter(
+      iterator_to_array($violations),
+      fn($v) => str_contains((string) $v->getMessage(), 'modified by another user'),
+    );
+    $this->assertCount(1, $entity_changed_violations, 'EntityChanged violation fires when DE translation itself has a stale changed time.');
+  }
+
 }
