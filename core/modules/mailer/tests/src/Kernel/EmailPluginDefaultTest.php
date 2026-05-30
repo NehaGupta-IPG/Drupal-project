@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\mailer\Kernel;
 
 use Drupal\Core\Mailer\EmailManager;
+use Drupal\Core\Mailer\EmailPluginDefault;
 use Drupal\Core\Mailer\EmailPluginInterface;
-use Drupal\Core\Mailer\Plugin\Email\EmailPluginDefault;
 use Drupal\Core\Test\MailerCaptureTrait;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;

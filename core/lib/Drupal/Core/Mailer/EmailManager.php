@@ -10,7 +10,6 @@ use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Mailer\Attribute\Email as EmailAttribute;
-use Drupal\Core\Mailer\Plugin\Email\EmailPluginDefault;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\AttributeClassDiscovery;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
@@ -35,7 +34,7 @@ use Symfony\Component\Mime\Email;
  *     description: STRING
  * @endcode
  *
- * @see \Drupal\Core\Mailer\Plugin\Email\EmailPluginDefault
+ * @see \Drupal\Core\Mailer\EmailPluginDefault
  * @see \Drupal\Core\Mailer\EmailPluginInterface
  */
 class EmailManager extends DefaultPluginManager {
