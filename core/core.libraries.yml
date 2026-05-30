@@ -244,7 +244,6 @@ drupal.ajax:
     - core/jquery
     - core/drupal
     - core/drupalSettings
-    - core/drupal.progress
     - core/once
     - core/tabbable
     - core/loadjs
@@ -329,7 +328,6 @@ drupal.batch:
     - core/drupal
     - core/drupalSettings
     - core/drupal.ajax
-    - core/drupal.progress
     - core/once
 
 drupal.checkbox:
