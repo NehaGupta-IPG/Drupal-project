@@ -725,7 +725,7 @@
         // Avoids duplicate required markers on initialization.
         if (!$label.hasClass('js-form-required').length) {
           $label.addClass('js-form-required form-required');
-          if (!$label.find('.js-required').length) {
+          if (!$label.find('[data-drupal-required]').length) {
             $label.html(Drupal.theme('nameWithRequiredMarker', $label.html()));
           }
         }
@@ -735,7 +735,7 @@
           .closest('.js-form-item, .js-form-wrapper')
           .find('label.js-form-required')
           .removeClass('js-form-required form-required')
-          .find('.js-required')
+          .find('[data-drupal-required]')
           .remove();
       }
     }
@@ -782,7 +782,7 @@
    */
   Drupal.theme.nameWithRequiredMarker = (nameHtml) =>
     Drupal.t(
-      '@title <span aria-hidden="true" class="js-required hidden"> (required)</span>',
+      '@title <span aria-hidden="true" class="hidden" data-drupal-required>> (required)</span>',
       {
         '@title': nameHtml,
       },

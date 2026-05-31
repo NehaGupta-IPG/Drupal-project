@@ -246,7 +246,7 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
     // We also don't want to add "(required)" with HTML to 'title' attributes.
     // @todo Adjust condition after https://www.drupal.org/i/933004.
     if (!empty($element['#required']) && !empty($element['#title']) && $element['#title_display'] !== 'attribute') {
-      $element['#title'] = new TranslatableMarkup('@title <span aria-hidden="true" class="hidden"> (required)</span>', ['@title' => $element['#title']]);
+      $element['#title'] = new TranslatableMarkup('@title <span aria-hidden="true" class="hidden" data-drupal-required> (required)</span>', ['@title' => $element['#title']]);
     }
 
     return $element;

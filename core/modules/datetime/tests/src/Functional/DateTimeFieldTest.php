@@ -66,7 +66,7 @@ class DateTimeFieldTest extends DateTestBase {
       $this->assertSession()->elementExists('xpath', '//div[@id="edit-' . $field_name . '-0-value--description"]');
       // Make sure heading element from datetime-wrapper.html.twig contains
       // a "(required)" text.
-      $this->assertSession()->elementExists('xpath', '//*[@id="edit-' . $field_name . '-wrapper"]//h4[contains(@class,"js-form-required")]//span[@aria-hidden="true" and @class="hidden" and contains(text(), " (required)")]');
+      $this->assertSession()->elementExists('xpath', '//*[@id="edit-' . $field_name . '-wrapper"]//h4[contains(@class,"js-form-required")]//span[@aria-hidden="true" and @class="hidden" and @data-drupal-required and contains(text(), " (required)")]');
 
       // Build up a date in the UTC timezone. Note that using this will also
       // mimic the user in a different timezone simply entering '2012-12-31' via

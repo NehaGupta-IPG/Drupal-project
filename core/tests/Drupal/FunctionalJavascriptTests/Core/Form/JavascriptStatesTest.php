@@ -91,7 +91,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $textfield_invisible_element = $page->findField('textfield_invisible_when_checkbox_trigger_checked');
     $this->assertNotEmpty($textfield_invisible_element);
     $textfield_required_element = $page->findField('textfield_required_when_checkbox_trigger_checked');
-    $textfield_required_element_label_required_text_xpath = '//label[@for="edit-textfield-required-when-checkbox-trigger-checked"]//span[@aria-hidden="true" and @class="js-required hidden" and contains(text(), " (required)")]';
+    $textfield_required_element_label_required_text_xpath = '//label[@for="edit-textfield-required-when-checkbox-trigger-checked"]//span[@aria-hidden="true" and @class="hidden" and @data-drupal-required and contains(text(), " (required)")]';
     $this->assertNotEmpty($textfield_required_element);
     $textfield_readonly_element = $page->findField('textfield_readonly_when_checkbox_trigger_checked');
     $this->assertNotEmpty($textfield_readonly_element);
@@ -348,7 +348,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $select_visible_target = $page->findField('select_visible_when_textfield_trigger_filled');
     $this->assertNotEmpty($select_visible_target);
     $textfield_required_target = $page->findField('textfield_required_when_textfield_trigger_filled');
-    $textfield_required_target_label_required_text_xpath = '//label[@for="edit-textfield-required-when-textfield-trigger-filled"]//span[@aria-hidden="true" and @class="js-required hidden" and contains(text(), " (required)")]';
+    $textfield_required_target_label_required_text_xpath = '//label[@for="edit-textfield-required-when-textfield-trigger-filled"]//span[@aria-hidden="true" and @class="hidden" and @data-drupal-required and contains(text(), " (required)")]';
     $this->assertNotEmpty($textfield_required_target);
     $details = $this->assertSession()->elementExists('css', '#edit-details-expanded-when-textfield-trigger-filled');
     $textfield_in_details = $details->findField('textfield_in_details');
@@ -399,7 +399,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $textfield_invisible_target = $page->findField('textfield_invisible_when_radios_trigger_has_value2');
     $this->assertNotEmpty($textfield_invisible_target);
     $select_required_target = $page->findField('select_required_when_radios_trigger_has_value2');
-    $select_required_target_label_required_text_xpath = '//label[@for="edit-select-required-when-radios-trigger-has-value2"]//span[@aria-hidden="true" and @class="js-required hidden" and contains(text(), " (required)")]';
+    $select_required_target_label_required_text_xpath = '//label[@for="edit-select-required-when-radios-trigger-has-value2"]//span[@aria-hidden="true" and @class="hidden" and @data-drupal-required and contains(text(), " (required)")]';
     $this->assertNotEmpty($select_required_target);
     $details = $this->assertSession()->elementExists('css', '#edit-details-expanded-when-radios-trigger-has-value3');
     $textfield_in_details = $details->findField('textfield_in_details');

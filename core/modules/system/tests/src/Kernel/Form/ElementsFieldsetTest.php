@@ -166,7 +166,7 @@ class ElementsFieldsetTest extends KernelTestBase implements FormInterface {
     $field_id = 'edit-fieldset-required';
 
     // Verify that element contains a "(required)" text.
-    $elements = $this->xpath('//fieldset[@id="' . $field_id . '"]//legend//span[contains(@class,"js-form-required")]//span[@aria-hidden="true" and @class="hidden" and contains(text(), " (required)")]');
+    $elements = $this->xpath('//fieldset[@id="' . $field_id . '"]//legend//span[contains(@class,"js-form-required")]//span[@aria-hidden="true" and @class="hidden" and @data-drupal-required and contains(text(), " (required)")]');
     $this->assertCount(1, $elements);
   }
 

@@ -129,7 +129,7 @@ class TimestampTest extends BrowserTestBase {
     $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "field--widget-datetime-timestamp") and @id="edit-field-timestamp-wrapper"]', 1);
     // Make sure heading element from datetime-wrapper.html.twig contains
     // a "(required)" text.
-    $this->assertSession()->elementExists('xpath', '//*[@id="edit-field-timestamp-wrapper"]//h4[contains(@class,"js-form-required")]//span[@aria-hidden="true" and @class="hidden" and contains(text(), " (required)")]');
+    $this->assertSession()->elementExists('xpath', '//*[@id="edit-field-timestamp-wrapper"]//h4[contains(@class,"js-form-required")]//span[@aria-hidden="true" and @class="hidden" and @data-drupal-required and contains(text(), " (required)")]');
 
     // Look for the widget elements and make sure they are empty.
     $this->assertSession()->fieldExists('field_timestamp[0][value][date]');

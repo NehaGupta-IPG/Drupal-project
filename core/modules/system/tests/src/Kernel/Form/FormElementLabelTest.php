@@ -58,7 +58,7 @@ class FormElementLabelTest extends KernelTestBase {
       '#title_display' => 'above',
     ];
     $this->render($render_array);
-    $elements = $this->xpath('//label[@class="js-form-required form-required"]/span[@aria-hidden="true" and @class="hidden" and contains(text(), " (required)")]');
+    $elements = $this->xpath('//label[@class="js-form-required form-required"]/span[@aria-hidden="true" and @class="hidden" and @data-drupal-required and contains(text(), " (required)")]');
     $this->assertCount(1, $elements);
   }
 
