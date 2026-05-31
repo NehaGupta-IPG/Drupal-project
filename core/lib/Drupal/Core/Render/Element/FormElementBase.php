@@ -243,7 +243,10 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
     // Add "(required)" to '#title' of required elements.
     // Drupal currently allows empty '#title' values to hide labels.
     // We don't want to blindly add text to these.
-    // We also don't want to add "(required)" with HTML to 'title' attributes.
+    // We don't add "(required)" with HTML to 'title' attributes.
+    // Only checkboxes and radios support 'attribute' for '#title_display',
+    // and CompositeFormElementTrait::preRenderCompositeFormElement()
+    // adds "(Required)" to 'title' attributes for these cases.
     // @todo Adjust condition after https://www.drupal.org/i/933004.
     if (!empty($element['#required']) && !empty($element['#title']) && $element['#title_display'] !== 'attribute') {
       $element['#title'] = new TranslatableMarkup('@title <span aria-hidden="true" class="hidden" data-drupal-required> (required)</span>', ['@title' => $element['#title']]);
