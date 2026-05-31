@@ -782,7 +782,7 @@
    */
   Drupal.theme.nameWithRequiredMarker = (nameHtml) =>
     Drupal.t(
-      '@title <span aria-hidden="true" class="hidden" data-drupal-required>> (required)</span>',
+      '@title <span aria-hidden="true" class="hidden" data-drupal-required> (required)</span>',
       {
         '@title': nameHtml,
       },
