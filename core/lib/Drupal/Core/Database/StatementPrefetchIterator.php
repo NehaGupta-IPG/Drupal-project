@@ -3,7 +3,6 @@
 namespace Drupal\Core\Database;
 
 use Drupal\Core\Database\Statement\FetchAs;
-use Drupal\Core\Database\Statement\PdoTrait;
 use Drupal\Core\Database\Statement\PrefetchedResult;
 use Drupal\Core\Database\Statement\StatementBase;
 
@@ -15,8 +14,6 @@ use Drupal\Core\Database\Statement\StatementBase;
  * manipulate those results.
  */
 class StatementPrefetchIterator extends StatementBase {
-
-  use PdoTrait;
 
   /**
    * Constructs a StatementPrefetchIterator object.
@@ -72,7 +69,7 @@ class StatementPrefetchIterator extends StatementBase {
     // Prepare and execute the statement.
     try {
       $this->clientStatement = $this->getStatement($this->queryString, $args);
-      $return = $this->clientExecute($args, $options);
+      $return = $this->getClientStatement()->execute($args);
     }
     catch (\Exception $e) {
       $this->dispatchStatementExecutionFailureEvent($startEvent, $e);
@@ -84,8 +81,8 @@ class StatementPrefetchIterator extends StatementBase {
     // as possible. Then, destroy the client statement. See the documentation
     // of \Drupal\sqlite\Driver\Database\sqlite\Statement for an explanation.
     $this->result = new PrefetchedResult(
-      $this->clientFetchAll(FetchAs::Associative),
-      $this->rowCountEnabled ? $this->clientRowCount() : NULL,
+      $this->getClientStatement()->fetchAll(\PDO::FETCH_ASSOC),
+      $this->rowCountEnabled ? $this->getClientStatement()->rowCount() : NULL,
       $return,
     );
     $this->clientStatement = NULL;

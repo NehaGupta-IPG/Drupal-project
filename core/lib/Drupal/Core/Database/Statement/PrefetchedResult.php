@@ -26,14 +26,13 @@ class PrefetchedResult extends ResultBase {
   /**
    * Constructor.
    *
-   * @param \Drupal\Core\Database\Statement\FetchAs $fetchMode
-   *   The fetch mode.
-   * @param array{class: class-string, constructor_args: list<mixed>, column: int, cursor_orientation?: int, cursor_offset?: int} $fetchOptions
-   *   The fetch options.
    * @param array $data
    *   The prefetched data, in FetchAs::Associative format.
    * @param int|null $rowCount
    *   The row count.
+   * @param bool $valid
+   *   TRUE if the statement's ::execute() call was successful, or FALSE on
+   *   failure.
    */
   public function __construct(
     protected array $data,

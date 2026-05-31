@@ -14,9 +14,10 @@ abstract class ResultBase implements \Iterator {
 
   use FetchModeTrait;
 
- /**
+  /**
    * Holds the default fetch mode.
    */
+  // @phpcs:ignore Drupal.Commenting.VariableComment.Missing
   public protected(set) FetchAs $fetchMode = FetchAs::Object;
 
   /**
@@ -24,6 +25,7 @@ abstract class ResultBase implements \Iterator {
    *
    * @var array{'class': class-string, 'constructor_args': list<mixed>, 'column': int}
    */
+  // @phpcs:ignore Drupal.Commenting.VariableComment.Missing
   public protected(set) array $fetchOptions = [
     'class' => 'stdClass',
     'constructor_args' => [],
@@ -51,10 +53,9 @@ abstract class ResultBase implements \Iterator {
   /**
    * Constructor.
    *
-   * @param \Drupal\Core\Database\Statement\FetchAs $fetchMode
-   *   The fetch mode.
-   * @param array{class: class-string, constructor_args: list<mixed>, column: int, cursor_orientation?: int, cursor_offset?: int} $fetchOptions
-   *   The fetch options.
+   * @param bool $valid
+   *   TRUE if the statement's ::execute() call was successful, or FALSE on
+   *   failure.
    */
   public function __construct(
     bool $valid,

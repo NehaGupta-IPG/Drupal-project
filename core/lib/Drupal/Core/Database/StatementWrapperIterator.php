@@ -4,15 +4,12 @@ namespace Drupal\Core\Database;
 
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Statement\PdoResult;
-use Drupal\Core\Database\Statement\PdoTrait;
 use Drupal\Core\Database\Statement\StatementBase;
 
 /**
  * StatementInterface iterator implementation.
  */
 class StatementWrapperIterator extends StatementBase {
-
-  use PdoTrait;
 
   /**
    * Constructs a StatementWrapperIterator object.
@@ -77,7 +74,7 @@ class StatementWrapperIterator extends StatementBase {
     $startEvent = $this->dispatchStatementExecutionStartEvent($args ?? []);
 
     try {
-      $return = $this->clientExecute($args, $options);
+      $return = $this->getClientStatement()->execute($args);
       $this->result = new PdoResult(
         $this->getClientStatement(),
         $return,

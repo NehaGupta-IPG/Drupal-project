@@ -7,6 +7,11 @@ namespace Drupal\Core\Database;
  *
  * Implements the methods required by StatementInterface objects that implement
  * the \Iterator interface.
+ *
+ * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Iteration
+ *   control is moved to ResultBase.
+ *
+ * @see https://www.drupal.org/node/7654123
  */
 trait StatementIteratorTrait {
 
