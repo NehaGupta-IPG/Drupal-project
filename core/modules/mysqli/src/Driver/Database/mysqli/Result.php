@@ -23,6 +23,9 @@ class Result extends ResultBase {
    *   The MySQLi result object.
    * @param \mysqli $mysqliConnection
    *   Client database connection object.
+   * @param bool $valid
+   *   TRUE if the statement's ::execute() call was successful, or FALSE on
+   *   failure.
    */
   public function __construct(
     protected readonly \mysqli_result|false $mysqliResult,
