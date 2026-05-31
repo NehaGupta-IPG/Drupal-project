@@ -171,10 +171,13 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
       // are potentially invalid if older than the last time the bin was
       // written to in the consistent backend, so only keep ones that aren't.
       foreach ($items as $item) {
-        if ($item->created < $last_write_timestamp) {
+        if (!is_array($item->data) || !isset($item->data['binLastWriteTimestamp']) || $item->data['binLastWriteTimestamp'] < $last_write_timestamp) {
           $cids[array_search($item->cid, $cids_copy)] = $item->cid;
         }
         else {
+          // When returning items from the cache, set $items->data back to its
+          // original value.
+          $item->data = $item->data['data'];
           $cache[$item->cid] = $item;
         }
       }
@@ -190,6 +193,11 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
         // than $last_write_timestamp the next time it is retrieved, to
         // avoid wasted writes.
         if ((!$allow_invalid || $item->valid) && $compare > $last_write_timestamp) {
+          $item = clone $item;
+          // Store the bin last write timestamp alongside the original cache
+          // data so that it can be compared with the current value on
+          // retrieval.
+          $item->data = ['binLastWriteTimestamp' => $last_write_timestamp, 'data' => $item->data];
           $this->fastBackend->set($item->cid, $item->data, $item->expire, $item->tags);
         }
       }

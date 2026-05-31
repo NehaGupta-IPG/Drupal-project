@@ -47,8 +47,9 @@ class ChainedFastBackendTest extends UnitTestCase {
   public function testGetDoesNotHitConsistentBackend(): void {
     $consistent_cache = $this->createMock('Drupal\Core\Cache\CacheBackendInterface');
     $timestamp_cid = ChainedFastBackend::LAST_WRITE_TIMESTAMP_PREFIX . 'cache_foo';
+    $timestamp = (int) $_SERVER['REQUEST_TIME'] - 60;
     // Use the request time because that is what we will be comparing against.
-    $timestamp_item = (object) ['cid' => $timestamp_cid, 'data' => (int) $_SERVER['REQUEST_TIME'] - 60];
+    $timestamp_item = (object) ['cid' => $timestamp_cid, 'data' => $timestamp];
     $consistent_cache->expects($this->once())
       ->method('get')->with($timestamp_cid)
       ->willReturn($timestamp_item);
@@ -58,7 +59,7 @@ class ChainedFastBackendTest extends UnitTestCase {
       ->method('set');
 
     $fast_cache = new MemoryBackend(new Time());
-    $fast_cache->set('foo', 'baz');
+    $fast_cache->set('foo', ['binLastWriteTimestamp' => $timestamp, 'data' => 'baz']);
 
     $chained_fast_backend = new ChainedFastBackend(
       $consistent_cache,
@@ -240,9 +241,10 @@ class ChainedFastBackendTest extends UnitTestCase {
   public function testFallThroughToConsistentCache(): void {
     // Make the last_write_timestamp two seconds in the past so that everything
     // is written back to the fast backend.
+    $last_write_timestamp = time() - 2;
     $timestamp_item = (object) [
       'cid' => ChainedFastBackend::LAST_WRITE_TIMESTAMP_PREFIX . 'cache_foo',
-      'data' => time() - 2,
+      'data' => $last_write_timestamp,
     ];
     $cache_item = (object) [
       'cid' => 'foo',
@@ -253,6 +255,9 @@ class ChainedFastBackendTest extends UnitTestCase {
       'expire' => time() + 3600,
       'tags' => ['tag'],
     ];
+
+    $fast_cache_item = clone $cache_item;
+    $fast_cache_item->data = ['binLastWriteTimestamp' => time() - 60, 'data' => $cache_item->data];
 
     $consistent_cache = $this->createMock(CacheBackendInterface::class);
     $fast_cache = $this->createMock(CacheBackendInterface::class);
@@ -273,12 +278,12 @@ class ChainedFastBackendTest extends UnitTestCase {
     $fast_cache->expects($this->once())
       ->method('getMultiple')
       ->with([$cache_item->cid])
-      ->willReturn([$cache_item->cid => $cache_item]);
+      ->willReturn([$cache_item->cid => $fast_cache_item]);
 
     // We should get a call to set the cache item on the fast backend.
     $fast_cache->expects($this->once())
       ->method('set')
-      ->with($cache_item->cid, $cache_item->data, $cache_item->expire);
+      ->with($cache_item->cid, ['binLastWriteTimestamp' => $last_write_timestamp, 'data' => $cache_item->data], $cache_item->expire);
 
     $chained_fast_backend = new ChainedFastBackend(
       $consistent_cache,
