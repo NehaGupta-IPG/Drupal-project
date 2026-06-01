@@ -140,7 +140,9 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
     // backend will begin to take over from the consistent backend again.
     $compare = round(microtime(TRUE), 3);
 
-    if ($last_write_timestamp && $compare > $last_write_timestamp) {
+    // Because clocks can drift
+
+    if ($last_write_timestamp && $compare < $last_write_timestamp) {
       // Items in the fast backend might be invalid based on their timestamp,
       // but we can't check the timestamp prior to getting the item, which
       // includes unserializing it. However, unserializing an invalid item can
@@ -167,11 +169,12 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
         $items = [];
       }
 
-      // Even if items were successfully fetched from the fast backend, they
-      // are potentially invalid if older than the last time the bin was
-      // written to in the consistent backend, so only keep ones that aren't.
+      // When items are found in the fast backend, the binLastWriteTimestamp
+      // must exactly match the last_write_timestamp stored in the persistent
+      // bin. This ensures that even if different servers have clock drift, that
+      // the most recent server to write the timestamp stays canonical.
       foreach ($items as $item) {
-        if (!is_array($item->data) || !isset($item->data['binLastWriteTimestamp']) || $item->data['binLastWriteTimestamp'] < $last_write_timestamp) {
+        if (!is_array($item->data) || !isset($item->data['binLastWriteTimestamp']) || $item->data['binLastWriteTimestamp'] !== $last_write_timestamp) {
           $cids[array_search($item->cid, $cids_copy)] = $item->cid;
         }
         else {
