@@ -317,6 +317,8 @@ class BlockUiTest extends BrowserTestBase {
     ]);
     $config->save();
 
+    $default_theme = $this->config('system.theme')->get('default');
+
     // Select the 'Powered by Drupal' block to be placed.
     $block = [];
     $block['id'] = $this->randomMachineName();
@@ -324,7 +326,7 @@ class BlockUiTest extends BrowserTestBase {
     $block['region'] = 'content';
 
     // After adding a block, it will indicate which block was just added.
-    $this->drupalGet('admin/structure/block/add/system_powered_by_block');
+    $this->drupalGet('admin/structure/block/add/system_powered_by_block/' . $default_theme);
     $this->submitForm($block, 'Save block');
     $this->assertSession()->addressEquals('admin/structure/block/list/stark?block-placement=' . Html::getClass($block['id']));
 

@@ -38,7 +38,7 @@ class BlockAddTest extends WebDriverTestBase {
       'administer blocks',
     ]));
 
-    $this->drupalGet('admin/structure/block/add/system_powered_by_block');
+    $this->drupalGet('admin/structure/block/add/system_powered_by_block/claro');
     $assert_session = $this->assertSession();
     // Pick a theme with a region that does not exist in another theme.
     $assert_session->selectExists('Theme')->selectOption('claro');

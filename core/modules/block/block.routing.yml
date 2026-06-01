@@ -76,6 +76,7 @@ block.admin_add:
     theme: null
     _title: 'Configure block'
   requirements:
+    _access_theme: 'TRUE'
     _permission: 'administer blocks'
 
 block.category_autocomplete:

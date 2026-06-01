@@ -312,7 +312,7 @@ class BlockTest extends BlockTestBase {
       $block['id'] = $this->randomMachineName();
       $block['theme'] = $theme;
       $block['region'] = 'content';
-      $this->drupalGet('admin/structure/block/add/system_powered_by_block');
+      $this->drupalGet('admin/structure/block/add/system_powered_by_block/' . $theme);
       $this->submitForm($block, 'Save block');
       $this->assertSession()->statusMessageContains('The block configuration has been saved.', 'status');
       $this->assertSession()->addressEquals('admin/structure/block/list/' . $theme . '?block-placement=' . Html::getClass($block['id']));
