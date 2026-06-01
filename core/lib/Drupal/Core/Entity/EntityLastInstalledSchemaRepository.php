@@ -4,13 +4,24 @@ namespace Drupal\Core\Entity;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\DestructableInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 
 /**
  * Provides a repository for installed entity definitions.
  */
-class EntityLastInstalledSchemaRepository implements EntityLastInstalledSchemaRepositoryInterface {
+class EntityLastInstalledSchemaRepository implements EntityLastInstalledSchemaRepositoryInterface, DestructableInterface {
+
+  /**
+   * Whether to update the persistent cache at the end of the request.
+   */
+  protected bool $updatePersistentCache = FALSE;
+
+  /**
+   * All of the entity schema definitions as loaded from key/value.
+   */
+  protected array $allDefinitions;
 
   /**
    * The key-value factory.
@@ -72,13 +83,13 @@ class EntityLastInstalledSchemaRepository implements EntityLastInstalledSchemaRe
       return $this->entityTypeDefinitions;
     }
 
-    $all_definitions = $this->keyValueFactory->get('entity.definitions.installed')->getAll();
+    $this->allDefinitions = $this->keyValueFactory->get('entity.definitions.installed')->getAll();
 
     // Filter out field storage definitions.
-    $filtered_keys = array_filter(array_keys($all_definitions), function ($key) {
+    $filtered_keys = array_filter(array_keys($this->allDefinitions), function ($key) {
         return str_ends_with($key, '.entity_type');
     });
-    $entity_type_definitions = array_intersect_key($all_definitions, array_flip($filtered_keys));
+    $entity_type_definitions = array_intersect_key($this->allDefinitions, array_flip($filtered_keys));
 
     // Ensure that the returned array is keyed by the entity type ID.
     $keys = array_keys($entity_type_definitions);
@@ -89,24 +100,14 @@ class EntityLastInstalledSchemaRepository implements EntityLastInstalledSchemaRe
 
     $this->entityTypeDefinitions = array_combine($keys, $entity_type_definitions);
 
-    // Also populate the static and persistent cache for the field storage
-    // definitions to avoid a separate key/value lookup when all definitions are
-    // looked up first.
-    $items = [
-      'entity_type_definitions.installed' => [
-        'data' => $this->entityTypeDefinitions,
-        'expires' => Cache::PERMANENT,
-      ],
-    ];
+    // Populate the static cache for the field storage definitions to avoid a
+    // separate key/value lookup when all definitions are looked up first.
     foreach ($keys as $key) {
-      $this->entityFieldStorageDefinitions[$key] = $all_definitions[$key . '.field_storage_definitions'] ?? [];
-      $items[$key . '.field_storage_definitions.installed'] = [
-        'data' => $this->entityFieldStorageDefinitions[$key],
-        'expires' => Cache::PERMANENT,
-      ];
+      $this->entityFieldStorageDefinitions[$key] = $this->allDefinitions[$key . '.field_storage_definitions'] ?? [];
     }
 
-    $this->cacheBackend->setMultiple($items);
+    $this->updatePersistentCache = TRUE;
+
     return $this->entityTypeDefinitions;
   }
 
@@ -184,6 +185,43 @@ class EntityLastInstalledSchemaRepository implements EntityLastInstalledSchemaRe
     unset($definitions[$storage_definition->getName()]);
     unset($this->entityFieldStorageDefinitions[$entity_type_id]);
     $this->setLastInstalledFieldStorageDefinitions($entity_type_id, $definitions);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function destruct(): void {
+    if ($this->updatePersistentCache && isset($this->entityTypeDefinitions)) {
+      // Populate the persistent cache for both the entity type definitions and
+      // field storage definitions if another process has not populated it
+      // first.
+      $keys = array_keys($this->entityTypeDefinitions);
+      // Also populate the static and persistent cache for the field storage
+      // definitions to avoid a separate key/value lookup when all definitions
+      // are looked up first.
+      $items = [
+        'entity_type_definitions.installed' => [
+          'data' => $this->entityTypeDefinitions,
+          'expires' => Cache::PERMANENT,
+        ],
+      ];
+      foreach ($keys as $key) {
+        if (isset($this->entityFieldStorageDefinitions[$key])) {
+          $items[$key . '.field_storage_definitions.installed'] = [
+            'data' => $this->entityFieldStorageDefinitions[$key],
+            'expires' => Cache::PERMANENT,
+          ];
+        }
+      }
+
+      $cache_keys = array_keys($items);
+      $cached = $this->cacheBackend->getMultiple($cache_keys);
+
+      $not_cached = array_diff_key($items, $cached);
+      if ($not_cached) {
+        $this->cacheBackend->setMultiple($not_cached);
+      }
+    }
   }
 
 }
