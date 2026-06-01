@@ -24,6 +24,10 @@ services:
   system.manager:
     class: Drupal\system\SystemManager
   Drupal\system\SystemManager: '@system.manager'
+  system.site:
+    class: Drupal\system\SiteManager
+    arguments: ['@system.manager', '@request_stack', '@config.factory', '@plugin.manager.site_property']
+  Drupal\system\SiteManager: '@system.site'
   system.breadcrumb.default:
     class: Drupal\system\PathBasedBreadcrumbBuilder
     tags:
@@ -70,3 +74,6 @@ services:
     arguments: ['@menu.link_tree', '@cache.memory']
   system.access_route_alter_subscriber:
     class: Drupal\system\EventSubscriber\AccessRouteAlterSubscriber
+  plugin.manager.site_property:
+    class: Drupal\system\SitePropertyPluginManager
+    parent: default_plugin_manager
