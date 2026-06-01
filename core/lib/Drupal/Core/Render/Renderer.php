@@ -15,6 +15,7 @@ use Drupal\Core\Render\Element\RenderCallbackInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Security\DoTrustedCallbackTrait;
 use Drupal\Core\Theme\ThemeManagerInterface;
+use Drupal\Core\Utility\Task;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Core\Utility\FiberResumeType;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -616,31 +617,39 @@ class Renderer implements RendererInterface {
     // Set the provided context and call the callable, it will use that context.
     $this->setCurrentRenderContext($context);
 
-    $fiber = new \Fiber(static fn () => $callable());
-    $fiber->start();
-    $resume_type = NULL;
-    while (!$fiber->isTerminated()) {
-      if ($fiber->isSuspended()) {
-        // When ::executeInRenderContext() is executed within a Fiber, which is
-        // always the case when rendering placeholders, if the callback results
-        // in this fiber being suspended, we need to suspend again up to the
-        // parent Fiber. Doing so allows other placeholders to be rendered
-        // before returning here.
-        if (\Fiber::getCurrent() !== NULL) {
-          $this->setCurrentRenderContext($previous_context);
-          \Fiber::suspend(FiberResumeType::Immediate);
-          $this->setCurrentRenderContext($context);
+    $task = Task::async($callable);
+
+    // Same as Task::await() but with special treatment of parent render
+    // context.
+    if ($task instanceof \Fiber) {
+      $task->start();
+      $resume_type = NULL;
+      while (!$task->isTerminated()) {
+        if ($task->isSuspended()) {
+          // When ::executeInRenderContext() is executed within a Fiber, which
+          // is always the case when rendering placeholders, if the callback
+          // results in this fiber being suspended, we need to suspend again up
+          // to the parent Fiber. Doing so allows other placeholders to be
+          // rendered before returning here.
+          if (\Fiber::getCurrent() !== NULL) {
+            $this->setCurrentRenderContext($previous_context);
+            \Fiber::suspend(FiberResumeType::Immediate);
+            $this->setCurrentRenderContext($context);
+          }
+          $resume_type = $task->resume();
         }
-        $resume_type = $fiber->resume();
+        // If the fiber has been suspended and has not signaled that it can be
+        // immediately resumed, assume that the fiber is waiting on an async
+        // operation and wait a bit.
+        if (!$task->isTerminated() && $resume_type !== FiberResumeType::Immediate) {
+          usleep(500);
+        }
       }
-      // If the fiber has been suspended and has not signaled that it can be
-      // immediately resumed, assume that the fiber is waiting on an async
-      // operation and wait a bit.
-      if (!$fiber->isTerminated() && $resume_type !== FiberResumeType::Immediate) {
-        usleep(500);
-      }
+      $result = $task->getReturn();
     }
-    $result = $fiber->getReturn();
+    else {
+      $result = $task();
+    }
     assert($context->count() <= 1, 'Bubbling failed.');
 
     // Restore the original render context.
@@ -734,47 +743,25 @@ class Renderer implements RendererInterface {
 
     // First render all placeholders except 'status messages' placeholders.
     $message_placeholders = [];
-    $fibers = [];
+    $tasks = [];
     foreach ($elements['#attached']['placeholders'] as $placeholder => $placeholder_element) {
       if (isset($placeholder_element['#lazy_builder']) && $placeholder_element['#lazy_builder'][0] === 'Drupal\Core\Render\Element\StatusMessages::renderMessages') {
         $message_placeholders[] = $placeholder;
       }
       else {
         // Get the render array for the given placeholder.
-        $fibers[$placeholder] = new \Fiber(function () use ($placeholder_element) {
+        $tasks[$placeholder] = Task::async(function () use ($placeholder_element) {
           return [$this->doRenderPlaceholder($placeholder_element), $placeholder_element];
         });
       }
     }
-    $iterations = 0;
-    while (count($fibers) > 0) {
-      foreach ($fibers as $placeholder => $fiber) {
-        if (!$fiber->isStarted()) {
-          $fiber->start();
-        }
-        elseif ($fiber->isSuspended()) {
-          $fiber->resume();
-        }
-        // If the Fiber hasn't terminated by this point, move onto the next
-        // placeholder, we'll resume this fiber again when we get back here.
-        if (!$fiber->isTerminated()) {
-          // If we've gone through the placeholders once already, and they're
-          // still not finished, then start to allow code higher up the stack to
-          // get on with something else.
-          if ($iterations) {
-            $fiber = \Fiber::getCurrent();
-            if ($fiber !== NULL) {
-              $fiber->suspend(FiberResumeType::Immediate);
-            }
-          }
-          continue;
-        }
-        [$markup, $placeholder_element] = $fiber->getReturn();
-
-        $elements = $this->doReplacePlaceholder($placeholder, $markup, $elements, $placeholder_element);
-        unset($fibers[$placeholder]);
-      }
-      $iterations++;
+    [$results, $errors] = Task::awaitAll($tasks);
+    if (count($errors) > 0) {
+      throw(reset($errors));
+    }
+    foreach ($results as $placeholder => [$markup, $placeholder_element]) {
+      $elements = $this->doReplacePlaceholder($placeholder, $markup, $elements, $placeholder_element);
+      unset($tasks[$placeholder]);
     }
 
     // Then render 'status messages' placeholders.
