@@ -29,7 +29,7 @@ class UserSessionTest extends UnitTestCase {
    * @return \Drupal\Core\Session\AccountInterface
    *   The created user session.
    */
-  protected function createUserSession(array $rids = [], $authenticated = FALSE) {
+  protected function createUserSession(array $rids = [], $authenticated = FALSE): UserSession {
     array_unshift($rids, $authenticated ? RoleInterface::AUTHENTICATED_ID : RoleInterface::ANONYMOUS_ID);
     return new UserSession(['roles' => $rids]);
   }
@@ -80,6 +80,19 @@ class UserSessionTest extends UnitTestCase {
     $this->assertTrue($user3->hasRole(RoleInterface::AUTHENTICATED_ID));
     $this->assertFalse($user3->hasRole(RoleInterface::ANONYMOUS_ID));
     $this->assertTrue($user4->hasRole(RoleInterface::ANONYMOUS_ID));
+  }
+
+  /**
+   * Tests that ::getLastAccessedTime() returns an integer.
+   *
+   * @legacy-covers ::getLastAccessedTime
+   */
+  public function testGetLastAccessedTime(): void {
+    $user = new UserSession([
+      'access' => '1234567890',
+    ]);
+
+    $this->assertSame(1234567890, $user->getLastAccessedTime());
   }
 
 }
