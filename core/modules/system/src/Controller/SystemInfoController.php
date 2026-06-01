@@ -2,7 +2,10 @@
 
 namespace Drupal\system\Controller;
 
+use Drupal\Core\Link;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\Url;
+use Drupal\system\SiteManager;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -26,11 +29,19 @@ class SystemInfoController implements ContainerInjectionInterface {
   protected $systemManager;
 
   /**
+   * Site Manager Service.
+   *
+   * @var \Drupal\system\SiteManager
+   */
+  protected $siteManager;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('system.manager')
+      $container->get('system.manager'),
+      $container->get('system.site')
     );
   }
 
@@ -39,9 +50,12 @@ class SystemInfoController implements ContainerInjectionInterface {
    *
    * @param \Drupal\system\SystemManager $systemManager
    *   System manager service.
+   * @param \Drupal\system\SiteManager $siteManager
+   *   Site manager service.
    */
-  public function __construct(SystemManager $systemManager) {
+  public function __construct(SystemManager $systemManager, SiteManager $siteManager) {
     $this->systemManager = $systemManager;
+    $this->siteManager = $siteManager;
   }
 
   /**
@@ -59,7 +73,41 @@ class SystemInfoController implements ContainerInjectionInterface {
   )]
   public function status() {
     $requirements = $this->systemManager->listRequirements();
-    return ['#type' => 'status_report_page', '#requirements' => $requirements];
+
+    $properties = $this->siteManager->getPropertyPlugins();
+
+    $build = [
+      '#type' => 'container',
+      '#attributes' => [
+        'class' => ['system-status-general-info__items']
+      ]
+    ];
+    foreach ($properties as $name => $property) {
+      $build[$name] = [
+        '#type' => 'container',
+        '#attributes' => [
+          'class' => ['system-status-general-info__item card']
+        ],
+        'label' => [
+          '#type' => 'html_tag',
+          '#tag' => 'h3',
+          '#attributes' => [
+            'class' => ['system-status-general-info__item-title']
+          ],
+          '#value' => $property->label(),
+        ],
+        'view' => $property->view(),
+      ];
+    }
+
+    // @TODO: Move this into its own RenderElement.
+    return [
+      'properties' => $build,
+      'status' => [
+        '#type' => 'status_report_page',
+        '#requirements' => $requirements,
+      ],
+    ];
   }
 
   /**

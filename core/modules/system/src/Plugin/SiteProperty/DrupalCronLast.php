@@ -5,6 +5,7 @@ namespace Drupal\system\Plugin\SiteProperty;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Url;
+use Drupal\Core\Link;
 use Drupal\system\SitePropertyPluginBase;
 
 /**
@@ -19,19 +20,39 @@ use Drupal\system\SitePropertyPluginBase;
  * )
  */
 class DrupalCronLast extends SitePropertyPluginBase {
+
+  /**
+   * {@inheritdoc}
+   */
   public function value() {
     return \Drupal::state()->get('system.cron_last');
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function view() {
     return [
-      '#type' => 'item',
-      '#title' => t('Last cron run'),
-      '#markup' => \Drupal::service('date.formatter')->format($this->value()),
-      '#description' => t(":interval ago", [
-        ':interval' => \Drupal::service('date.formatter')->formatInterval(time() - $this->value()),
-      ]),
-      '#description_display' => 'after'
+      'ago' => [
+        '#type' => 'container',
+        '#markup' => t(":interval ago", [
+          ':interval' => \Drupal::service('date.formatter')->formatInterval(time() - $this->value()),
+        ]),  
+      ],
+      'run_cron' => Link::createFromRoute('Run Cron', 'system.run_cron', [], [
+        'attributes' => [
+          'class'=> [
+            'button', 'button--small', 'button--primary',
+          ]
+        ]
+      ])->toRenderable(),
+      'configure' => Link::createFromRoute('Configure', 'system.cron_settings', [], [
+        'attributes' => [
+          'class'=> [
+            'button', 'button--small', 'button--secondary',
+          ]
+        ]
+      ])->toRenderable(),
     ];
   }
 }

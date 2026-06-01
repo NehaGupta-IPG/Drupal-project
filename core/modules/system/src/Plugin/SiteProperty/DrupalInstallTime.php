@@ -23,19 +23,28 @@ use Drupal\Component\Datetime\time;
  */
 class DrupalInstallTime extends SitePropertyPluginBase {
 
+/**
+   * {@inheritdoc}
+   */ 
   public function value() {
     return \Drupal::state()->get('install_time');
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function view() {
     return [
-      '#type' => 'item',
-      '#title' => t('Installed on'),
-      '#markup' => \Drupal::service('date.formatter')->format($this->value()),
-      '#description' => t(":interval ago", [
-        ':interval' => \Drupal::service('date.formatter')->formatInterval(time() - $this->value()),
-      ]),
-      '#description_display' => 'after'
+      'date' => [
+        '#type' => 'container',
+        '#markup' => \Drupal::service('date.formatter')->format($this->value()),
+      ],
+      'ago' => [
+        '#type' => 'container',
+        '#markup' => t(":interval ago", [
+          ':interval' => \Drupal::service('date.formatter')->formatInterval(time() - $this->value()),
+        ]),  
+      ],
     ];
   }
 }

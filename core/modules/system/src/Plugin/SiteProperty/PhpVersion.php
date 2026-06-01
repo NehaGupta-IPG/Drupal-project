@@ -25,4 +25,23 @@ class PhpVersion extends SitePropertyPluginBase {
   public function value() {
     return phpversion();
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function view() {
+    $memory_limit = ini_get('memory_limit');
+    return [
+      'version' => [
+        '#type' => 'item',
+        '#title' => t('Version'),
+        '#markup' => $this->value(),
+      ],
+      'memory_limit' => [
+        '#type' => 'item',
+        '#title' => t('Memory Limit'),
+        '#markup' =>  $memory_limit == -1 ? t('-1 (Unlimited)') : $memory_limit,
+      ],
+    ];
+  }
 }
