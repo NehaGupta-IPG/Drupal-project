@@ -47,4 +47,12 @@ interface BatchStorageInterface {
    */
   public function cleanup();
 
+  /**
+   * Returns a new batch id.
+   *
+   * @return int
+   *   A batch id.
+   */
+  public function getId(): int;
+
 }
