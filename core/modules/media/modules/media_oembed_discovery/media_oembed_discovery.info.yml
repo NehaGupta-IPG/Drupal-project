@@ -1,0 +1,7 @@
+name: 'Media oEmbed Discovery'
+type: module
+description: 'Parses HTML for oEmbed links when a media URL does not match any registered provider.'
+package: Core
+version: VERSION
+dependencies:
+  - drupal:media
