@@ -63,9 +63,15 @@ class PdoResult extends ResultBase {
    */
   public function fetch(?FetchAs $mode, ?array $fetchOptions = NULL): array|object|int|float|string|bool|NULL {
     if (!empty($fetchOptions)) {
-      $this->setFetchMode($mode, $fetchOptions);
+      $this->setFetchMode($mode ?? $this->fetchMode, $fetchOptions);
     }
-    return $this->clientFetch($mode);
+    $row = $this->clientFetch($mode ?? $this->fetchMode);
+    if ($row === FALSE) {
+      $this->markResultsetFetchingComplete();
+      return FALSE;
+    }
+    $this->setResultsetCurrentRow($row);
+    return $row;
   }
 
   /**
