@@ -35,3 +35,4 @@ services:
     calls:
       - [setLogger, ['@logger.channel.file']]
   Drupal\file\FileReferenceResolver: ~
+  Drupal\file\FileBulkUpdate: ~

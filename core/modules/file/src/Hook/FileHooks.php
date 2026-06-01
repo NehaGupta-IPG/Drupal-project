@@ -2,11 +2,13 @@
 
 namespace Drupal\file\Hook;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
+use Drupal\file\FileBulkUpdate;
 use Drupal\user\UserInterface;
 
 /**
@@ -16,6 +18,11 @@ class FileHooks {
 
   // cspell:ignore widthx
   use StringTranslationTrait;
+
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected FileBulkUpdate $fileBulkUpdate,
+  ) {}
 
   /**
    * Implements hook_help().
@@ -90,10 +97,11 @@ class FileHooks {
     if ($method !== 'user_cancel_reassign') {
       return;
     }
-    \Drupal::database()->update('file_managed')
-      ->fields(['uid' => 0])
+    $fids = $this->entityTypeManager->getStorage('file')->getQuery()
+      ->accessCheck(FALSE)
       ->condition('uid', $account->id())
       ->execute();
+    $this->fileBulkUpdate->process($fids, ['uid' => 0], TRUE);
   }
 
 }
