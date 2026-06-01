@@ -56,6 +56,13 @@ parameters:
     # session cookie name is unique on different installations on the same
     # domain and path (for example, when migrating from Drupal 7).
     name_suffix: ''
+  session.handler.options:
+    # Set the session time-to-live (TTL) in seconds.  If more than this amount
+    # of time has elapsed since the user's last visit the session is considered
+    # expired and is not loaded. This is independent of session garbage
+    # collection which removes expired session data at a later time.
+    # @default 200000
+    ttl: 200000
   twig.config:
     # Twig debugging:
     #

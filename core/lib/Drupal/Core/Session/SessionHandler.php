@@ -37,7 +37,7 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
   ) {
     if ($options === NULL) {
       @trigger_error('Calling ' . __METHOD__ . '() without the $options argument is deprecated in drupal:11.4.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/project/drupal/issues/3522112', E_USER_DEPRECATED);
-      $this->options = \Drupal::getContainer()->getParameter('session.storage.options');
+      $this->options = \Drupal::getContainer()->getParameter('session.handler.options');
     }
   }
 
@@ -59,7 +59,7 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
         $query = $this->connection
           ->queryRange('SELECT [session] FROM {sessions} WHERE [sid] = :sid AND [timestamp] >= :timestamp', 0, 1, [
             ':sid' => Crypt::hashBase64($sessionId),
-            ':timestamp' => $this->time->getRequestTime() - $this->options['gc_maxlifetime'],
+            ':timestamp' => $this->time->getRequestTime() - $this->options['ttl'],
           ]);
         $data = (string) $query->fetchField();
       }
