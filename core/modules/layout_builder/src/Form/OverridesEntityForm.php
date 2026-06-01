@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceDynamicSafeFormInterface;
+use Drupal\layout_builder\LayoutEntityHelperTrait;
 use Drupal\layout_builder\LayoutTempstoreRepositoryInterface;
 use Drupal\layout_builder\OverridesSectionStorageInterface;
 use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
@@ -26,6 +27,7 @@ class OverridesEntityForm extends ContentEntityForm implements WorkspaceDynamicS
 
   use PreviewToggleTrait;
   use LayoutBuilderEntityFormTrait;
+  use LayoutEntityHelperTrait;
   use WorkspaceSafeFormTrait;
 
   /**
@@ -78,7 +80,10 @@ class OverridesEntityForm extends ContentEntityForm implements WorkspaceDynamicS
     parent::init($form_state);
 
     $form_display = EntityFormDisplay::collectRenderDisplay($this->entity, $this->getOperation(), FALSE);
-    $form_display->setComponent(OverridesSectionStorage::FIELD_NAME, [
+    $field_name = static::isTranslation($this->sectionStorage) ?
+      OverridesSectionStorage::TRANSLATED_CONFIGURATION_FIELD_NAME :
+      OverridesSectionStorage::FIELD_NAME;
+    $form_display->setComponent($field_name, [
       'type' => 'layout_builder_widget',
       'weight' => -10,
       'settings' => [],
@@ -107,6 +112,7 @@ class OverridesEntityForm extends ContentEntityForm implements WorkspaceDynamicS
     //   restricts all access to the field, explicitly allow access here until
     //   https://www.drupal.org/node/2942975 is resolved.
     $form[OverridesSectionStorage::FIELD_NAME]['#access'] = TRUE;
+    $form[OverridesSectionStorage::TRANSLATED_CONFIGURATION_FIELD_NAME]['#access'] = TRUE;
 
     $form['layout_builder_message'] = $this->buildMessage($section_storage->getContextValue('entity'), $section_storage);
     return $form;
@@ -175,14 +181,16 @@ class OverridesEntityForm extends ContentEntityForm implements WorkspaceDynamicS
     $actions['delete']['#access'] = FALSE;
 
     $actions['discard_changes']['#limit_validation_errors'] = [];
-    // @todo This button should be conditionally displayed, see
-    //   https://www.drupal.org/node/2917777.
-    $actions['revert'] = [
-      '#type' => 'submit',
-      '#value' => $this->t('Revert to defaults'),
-      '#submit' => ['::redirectOnSubmit'],
-      '#redirect' => 'revert',
-    ];
+    if (!static::isTranslation($this->sectionStorage)) {
+      // @todo This button should be conditionally displayed, see
+      //   https://www.drupal.org/node/2917777.
+      $actions['revert'] = [
+        '#type' => 'submit',
+        '#value' => $this->t('Revert to defaults'),
+        '#submit' => ['::redirectOnSubmit'],
+        '#redirect' => 'revert',
+      ];
+    }
     return $actions;
   }
 
