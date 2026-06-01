@@ -12,7 +12,7 @@ use Drupal\views\Tests\ViewTestData;
 /**
  * Test the taxonomy term index filter.
  *
- * @see \Drupal\taxonomy\Plugin\views\filter\TaxonomyIndexTid
+ * @coversDefaultClass \Drupal\taxonomy\Plugin\views\filter\TaxonomyIndexTid
  *
  * @group taxonomy
  */
@@ -99,6 +99,34 @@ class TaxonomyIndexTidFilterTest extends TaxonomyTestBase {
         'user',
       ],
     ], $view->calculateDependencies()->getDependencies());
+  }
+
+  /**
+   * Tests 'taxonomy_index_tid' filter handler vocabulary dependencies.
+   *
+   * @covers ::calculateDependencies
+   * @group legacy
+   */
+  public function testMultipleVocabularies(): void {
+    $this->expectDeprecation("The 'vid' key in 'views.filter.taxonomy_index_tid' config schema is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Update your view to use the 'vids' key instead. See https://www.drupal.org/node/3162414");
+    /** @var \Drupal\views\Entity\View $view */
+    $view = View::load('test_filter_taxonomy_index_tid__non_existing_dependency');
+
+    // Add a second vocabulary to the view 'tid' filter handler.
+    Vocabulary::create([
+      'vid' => 'second_vocab',
+      'name' => 'Second vocabulary',
+    ])->save();
+    $displays = $view->get('display');
+    $displays['default']['display_options']['filters']['tid']['vids'][] = 'second_vocab';
+    $view->set('display', $displays);
+    $view->save();
+
+    // Check that the dependencies were updated.
+    $this->assertSame([
+      'taxonomy.vocabulary.second_vocab',
+      'taxonomy.vocabulary.tags',
+    ], $view->getDependencies()['config']);
   }
 
 }

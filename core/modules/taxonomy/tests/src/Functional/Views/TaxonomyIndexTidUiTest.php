@@ -67,50 +67,99 @@ class TaxonomyIndexTidUiTest extends UITestBase {
     ]);
     $this->drupalLogin($this->adminUser);
 
-    Vocabulary::create([
-      'vid' => 'tags',
-      'name' => 'Tags',
-    ])->save();
+    $this->terms = $this->createVocabularyAndTerms('tags');
 
-    // Setup a hierarchy which looks like this:
-    // term 0.0
-    // term 1.0
-    // - term 1.1
-    // term 2.0
-    // - term 2.1
-    // - term 2.2
-    for ($i = 0; $i < 3; $i++) {
-      for ($j = 0; $j <= $i; $j++) {
-        $this->terms[$i][$j] = $term = Term::create([
-          'vid' => 'tags',
-          'name' => "Term $i.$j",
-          'parent' => isset($this->terms[$i][0]) ? $this->terms[$i][0]->id() : 0,
-        ]);
-        $term->save();
-      }
-    }
-    ViewTestData::createTestViews(static::class, ['taxonomy_test_views']);
-
-    // Extra taxonomy and terms.
     Vocabulary::create([
       'vid' => 'other_tags',
       'name' => 'Other tags',
     ])->save();
 
-    $this->terms[3][0] = $term = Term::create([
-      'vid' => 'tags',
-      'name' => "Term 3.0",
-    ]);
-    $term->save();
-
     Vocabulary::create([
       'vid' => 'empty_vocabulary',
       'name' => 'Empty Vocabulary',
     ])->save();
+
+    ViewTestData::createTestViews(get_class($this), ['taxonomy_test_views']);
+  }
+
+  /**
+   * Creates a vocabulary and terms for it, ensuring unique term names within the vocabulary.
+   *
+   * @param string $vocab_id
+   *   The vocabulary ID.
+   *
+   * @return \Drupal\taxonomy\TermInterface[][]
+   *   The terms.
+   *
+   * @throws \Drupal\Core\Entity\EntityStorageException
+   */
+  protected function createVocabularyAndTerms(string $vocab_id): array {
+    // Load the vocabulary or create it if it doesn't exist.
+    $vocab = Vocabulary::load($vocab_id);
+    if (!$vocab) {
+      $vocab = Vocabulary::create([
+        'vid' => $vocab_id,
+        'name' => 'Test Vocabulary ' . $vocab_id,
+      ]);
+      $vocab->save();
+    }
+
+    // Initialize a local array to store terms.
+    $terms = [];
+
+    // Setup a hierarchy with unique term names.
+    for ($i = 0; $i < 3; $i++) {
+      for ($j = 0; $j <= $i; $j++) {
+        $term_name = "Term $i.$j $vocab_id";
+
+        // Check if the term already exists in the vocabulary.
+        $existing_term = \Drupal::entityTypeManager()
+          ->getStorage('taxonomy_term')
+          ->loadByProperties(['name' => $term_name, 'vid' => $vocab_id]);
+
+        // If the term does not exist, create it.
+        if (empty($existing_term)) {
+          $parent_term_id = isset($terms[$i][0]) ? $terms[$i][0]->id() : 0;
+          $terms[$i][$j] = Term::create([
+            'vid' => $vocab_id,
+            'name' => $term_name,
+            'parent' => $parent_term_id,
+          ]);
+          $terms[$i][$j]->save();
+        }
+        else {
+          // If the term exists, load the first match.
+          $terms[$i][$j] = reset($existing_term);
+        }
+      }
+    }
+
+    // Create a standalone term for Term 3.0
+    $term_name = "Term 3.0";
+
+    // Check if the term already exists.
+    $existing_term = \Drupal::entityTypeManager()
+      ->getStorage('taxonomy_term')
+      ->loadByProperties(['name' => $term_name, 'vid' => $vocab_id]);
+
+    if (empty($existing_term)) {
+      $terms[3][0] = Term::create([
+        'vid' => $vocab_id,
+        'name' => $term_name,
+      ]);
+      $terms[3][0]->save();
+    }
+    else {
+      $terms[3][0] = reset($existing_term);
+    }
+
+    return $terms;
   }
 
   /**
    * Tests the filter UI.
+   *
+   * @group legacy
    */
   public function testFilterUI(): void {
     $this->drupalGet('admin/structure/views/nojs/handler/test_filter_taxonomy_index_tid/default/filter/tid');
@@ -157,7 +206,94 @@ class TaxonomyIndexTidUiTest extends UITestBase {
   }
 
   /**
+   * Tests the filter UI with multiple vocabularies.
+   *
+   * @group legacy
+   */
+  public function testFilterUIWithMultipleVocabularies(): void {
+    $this->expectDeprecation("The 'vid' key in 'views.filter.taxonomy_index_tid' config schema is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Update your view to use the 'vids' key instead. See https://www.drupal.org/node/3162414");
+    $terms2 = $this->createVocabularyAndTerms('tags2');
+    $node_type = $this->drupalCreateContentType(['type' => 'page']);
+    // Create the tag field itself.
+    $field_name = 'taxonomy_tags';
+    $this->createEntityReferenceField('node', $node_type->id(), $field_name, NULL, 'taxonomy_term');
+    // Create three nodes: 1 with a term from the first vocabulary,
+    // and 1 with a term from the second vocabulary, and 1 with terms from both.
+    $node0 = $this->drupalCreateNode([
+      'type' => 'page',
+      'taxonomy_tags' => $this->terms[0][0]->id(),
+    ]);
+    $node0->save();
+    $node1 = $this->drupalCreateNode([
+      'type' => 'page',
+      'taxonomy_tags' => $terms2[0][0]->id(),
+    ]);
+    $node1->save();
+    $node2 = $this->drupalCreateNode([
+      'type' => 'page',
+      'taxonomy_tags' => [$this->terms[0][0]->id(), $terms2[0][0]->id()],
+    ]);
+    $node2->save();
+    // Edit the view to use the second vocabulary.
+    $edit = [
+      'options[vids][tags]' => TRUE,
+      'options[vids][tags2]' => TRUE,
+      'options[type]' => 'textfield',
+    ];
+    $this->drupalGet('admin/structure/views/nojs/handler-extra/test_filter_taxonomy_index_tid/default/filter/tid');
+    $this->submitForm($edit, 'Apply');
+    // Expose the filter.
+    $this->drupalGet('admin/structure/views/nojs/handler/test_filter_taxonomy_index_tid/default/filter/tid');
+    $this->submitForm([], 'Expose filter');
+
+    $edit = [
+      'options[operator]' => 'and',
+      'options[value]' => '',
+      'options[reduce_duplicates]' => TRUE,
+    ];
+    $this->submitForm($edit, 'Apply');
+    $this->submitForm([], 'Save');
+    // Check that the terms from both vocabularies are available in the UI.
+    $this->drupalGet('test-filter-taxonomy-index-tid', ['query' => ['tid' => '']]);
+    $xpath = $this->xpath('//div[@class="views-row"]//a');
+    $this->assertCount(3, $xpath);
+    // The nodes tagged with the term from the first vocabulary should be shown.
+    $this->drupalGet('test-filter-taxonomy-index-tid', ['query' => ['tid' => "{$this->terms[0][0]->getName()}"]]);
+    $xpath = $this->xpath('//div[@class="views-row"]//a');
+    $this->assertCount(2, $xpath);
+    $xpath = $this->xpath('//div[@class="views-row"]//a[@href=:href]', [
+      ':href' => $node0->toUrl()->toString(),
+    ]);
+    $this->assertCount(1, $xpath);
+    $xpath = $this->xpath('//div[@class="views-row"]//a[@href=:href]', [
+      ':href' => $node2->toUrl()->toString(),
+    ]);
+    $this->assertCount(1, $xpath);
+    $this->drupalGet('test-filter-taxonomy-index-tid', ['query' => ['tid' => "{$terms2[0][0]->getName()}"]]);
+    $xpath = $this->xpath('//div[@class="views-row"]//a');
+    $this->assertCount(2, $xpath);
+    $xpath = $this->xpath('//div[@class="views-row"]//a[@href=:href]', [
+      ':href' => $node1->toUrl()->toString(),
+    ]);
+    $this->assertCount(1, $xpath);
+    $xpath = $this->xpath('//div[@class="views-row"]//a[@href=:href]', [
+      ':href' => $node2->toUrl()->toString(),
+    ]);
+    $this->assertCount(1, $xpath);
+    $this->drupalGet('test-filter-taxonomy-index-tid', ['query' => ['tid' => "{$this->terms[0][0]->getName()}, {$terms2[0][0]->getName()}"]]);
+    $xpath = $this->xpath('//div[@class="views-row"]//a');
+    $this->assertCount(1, $xpath);
+    $xpath = $this->xpath('//div[@class="views-row"]//a[@href=:href]', [
+      ':href' => $node2->toUrl()->toString(),
+    ]);
+    $this->assertCount(1, $xpath);
+  }
+
+
+  /**
    * Tests exposed taxonomy filters.
+   *
+   * @group legacy
    */
   public function testExposedFilter(): void {
     $node_type = $this->drupalCreateContentType(['type' => 'page']);
@@ -261,8 +397,12 @@ class TaxonomyIndexTidUiTest extends UITestBase {
     $this->drupalGet('admin/structure/views/nojs/add-handler/test_taxonomy_term_name/default/filter');
     $this->submitForm($edit, 'Add and configure filter criteria');
     // Select 'Empty Vocabulary' and 'Autocomplete' from the list of options.
+    $edit = [
+      'options[vids][empty_vocabulary]' => TRUE,
+      'options[type]' => 'textfield',
+    ];
     $this->drupalGet('admin/structure/views/nojs/handler-extra/test_taxonomy_term_name/default/filter/tid');
-    $this->submitForm([], 'Apply and continue');
+    $this->submitForm($edit, 'Apply and continue');
     // Expose the filter.
     $edit = ['options[expose_button][checkbox][checkbox]' => TRUE];
     $this->drupalGet('admin/structure/views/nojs/handler/test_taxonomy_term_name/default/filter/tid');
@@ -289,6 +429,8 @@ class TaxonomyIndexTidUiTest extends UITestBase {
 
   /**
    * Tests exposed grouped taxonomy filters.
+   *
+   * @group legacy
    */
   public function testExposedGroupedFilter(): void {
     // Create a content type with a taxonomy field.
@@ -304,7 +446,7 @@ class TaxonomyIndexTidUiTest extends UITestBase {
       $nodes[] = $this->drupalCreateNode($node);
     }
 
-    $this->drupalGet('/admin/structure/views/nojs/handler/test_taxonomy_exposed_grouped_filter/page_1/filter/field_views_testing_tags_target_id');
+    $this->drupalGet('admin/structure/views/nojs/handler/test_taxonomy_exposed_grouped_filter/page_1/filter/field_views_testing_tags_target_id');
     $edit = [
       'options[group_info][group_items][1][value][]' => [$this->terms[0][0]->id(), $this->terms[1][0]->id()],
       'options[group_info][group_items][2][value][]' => [$this->terms[1][0]->id(), $this->terms[2][0]->id()],
@@ -314,7 +456,7 @@ class TaxonomyIndexTidUiTest extends UITestBase {
     $this->submitForm([], 'Save');
 
     // Visit the view's page URL and validate the results.
-    $this->drupalGet('/test-taxonomy-exposed-grouped-filter');
+    $this->drupalGet('test-taxonomy-exposed-grouped-filter');
     $this->submitForm(['field_views_testing_tags_target_id' => 1], 'Apply');
     $this->assertSession()->pageTextContains($nodes[0]->getTitle());
     $this->assertSession()->pageTextContains($nodes[1]->getTitle());
@@ -333,6 +475,8 @@ class TaxonomyIndexTidUiTest extends UITestBase {
 
   /**
    * Tests that an exposed taxonomy filter doesn't show unpublished terms.
+   *
+   * @group legacy
    */
   public function testExposedUnpublishedFilterOptions(): void {
     $this->terms[1][0]->setUnpublished()->save();

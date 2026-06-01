@@ -172,7 +172,7 @@ class Node extends WizardPluginBase {
         'table' => 'taxonomy_index',
         'field' => 'tid',
         'value' => $tids,
-        'vid' => $vid,
+        'vids' => [$vid],
         'plugin_id' => 'taxonomy_index_tid',
       ];
       // If the user entered more than one valid term in the autocomplete

@@ -123,6 +123,12 @@ views.filter.taxonomy_index_tid:
     vid:
       type: string
       label: 'Vocabulary'
+    vids:
+      type: sequence
+      label: 'Vocabularies'
+      sequence:
+        type: string
+        label: 'Vocabulary'
     type:
       type: string
       label: 'Selection type'

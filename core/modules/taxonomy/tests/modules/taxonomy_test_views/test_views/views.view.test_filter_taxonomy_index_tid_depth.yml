@@ -164,7 +164,8 @@ display:
           reduce_duplicates: false
           type: select
           limit: true
-          vid: views_testing_tags
+          vids:
+            - views_testing_tags
           hierarchy: true
           depth: -2
           error_message: true

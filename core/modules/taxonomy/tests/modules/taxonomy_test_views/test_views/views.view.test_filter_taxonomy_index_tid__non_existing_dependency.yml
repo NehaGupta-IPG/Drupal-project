@@ -166,7 +166,8 @@ display:
           reduce_duplicates: false
           type: select
           limit: true
-          vid: tags
+          vids:
+            - tags
           hierarchy: true
           error_message: true
           plugin_id: taxonomy_index_tid

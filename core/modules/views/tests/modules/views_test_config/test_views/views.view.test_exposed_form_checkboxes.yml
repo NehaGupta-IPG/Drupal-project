@@ -107,7 +107,8 @@ display:
           reduce_duplicates: false
           type: select
           limit: true
-          vid: test_exposed_checkboxes
+          vids:
+            - test_exposed_checkboxes
           hierarchy: false
           error_message: true
           plugin_id: taxonomy_index_tid
