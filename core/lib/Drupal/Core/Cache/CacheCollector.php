@@ -78,7 +78,7 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
    * This is used to check if an invalidated cache item has been overwritten in
    * the meantime.
    *
-   * @var int
+   * @var float
    */
   protected $cacheCreated;
 
@@ -159,9 +159,9 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
    * persistent caching in procedural code. Extending classes may wish to alter
    * this behavior, for example by adding a call to persist(). If you are
    * writing data to somewhere in addition to the cache item in ::set(), you
-   * should call static::updateCache() at the end of your ::set implementation.
-   * This avoids a race condition if another request starts with an empty cache
-   * before your ::set() call. For example: Drupal\Core\State\State.
+   * should invalidate the cache item within a lock to ensure that another
+   * request that starts with an empty cache item does not overwrite with the
+   * previous value. For example: Drupal\Core\State\State.
    */
   public function set($key, $value) {
     $this->lazyLoadCache();
@@ -230,53 +230,49 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
       return;
     }
 
-    // Lock cache writes to help avoid stampedes.
+    // Lock cache writes to help avoid stampedes. Try to acquire the lock, but
+    // continue even if it cannot be acquired: a ::set() or ::delete() during
+    // this request may have invalidated the cache item, and that invalidation
+    // must be propagated whether or not the lock is held. Only the cache write
+    // itself depends on the lock.
     $cid = $this->getCid();
     $lock_name = $cid . ':' . __CLASS__;
-    if (!$lock || $this->lock->acquire($lock_name)) {
-      // Set and delete operations invalidate the cache item. Try to also load
-      // an eventually invalidated cache entry, only update an invalidated cache
-      // entry if the creation date did not change as this could result in an
-      // inconsistent cache.
-      if ($cache = $this->cache->get($cid, $this->cacheInvalidated)) {
-        if ($this->cacheInvalidated && $cache->created != $this->cacheCreated) {
-          // We have invalidated the cache in this request and got a different
-          // cache entry. Do not attempt to overwrite data that might have been
-          // changed in a different request. We'll let the cache rebuild in
-          // later requests.
-          $this->cache->delete($cid);
-          $this->lock->release($lock_name);
-          return;
-        }
-        // If there wasn't a cache item at the beginning of the request, but
-        // there is now, then there has been a cache write in the interim.
-        // Discard our data if so since the cache may have been written by
-        // a request that was also setting data.
-        if (!$this->cacheCreated) {
-          return;
-        }
+    $lock_acquired = FALSE;
+    if ($lock) {
+      $lock_acquired = $this->lock->acquire($lock_name);
+    }
+
+    // Set and delete operations invalidate the cache item, so load an
+    // invalidated cache entry too if this request invalidated it. The item is
+    // "unchanged" if it is in the same state as when it was loaded earlier this
+    // request: present with the same creation time, or absent in both cases. If
+    // it changed, another request is responsible for it and this request must
+    // not overwrite that work.
+    $cache = $this->cache->get($cid, $this->cacheInvalidated);
+    $unchanged = $cache ? $cache->created === $this->cacheCreated : !$this->cacheCreated;
+
+    if ($cache && $this->cacheInvalidated) {
+      // This request invalidated the cache item via ::set() or ::delete() and a
+      // cache item still exists. Delete it so that a later request rebuilds it
+      // cleanly; the up-to-date value is written within a lock by the caller
+      // (see ::set()). This happens whether or not the lock was acquired.
+      $this->cache->delete($cid);
+    }
+    elseif ($unchanged && (!$lock || $lock_acquired)) {
+      // The cache item is in the same state as when it was loaded, so it is
+      // safe to write back the data collected during this request, merged with
+      // any existing cache data and with deleted keys removed.
+      if ($cache) {
         $data = array_merge($cache->data, $data);
       }
-      elseif ($this->cacheCreated) {
-        // Getting here indicates that there was a cache entry at the
-        // beginning of the request, but now it's gone (some other process
-        // must have cleared it). We back out to prevent corrupting the cache
-        // with incomplete data, since we won't be able to properly merge
-        // the existing cache data from earlier with the new data.
-        // A future request will properly hydrate the cache from scratch.
-        if ($lock) {
-          $this->lock->release($lock_name);
-        }
-        return;
-      }
-      // Remove keys marked for deletion.
       foreach ($this->keysToRemove as $delete_key) {
         unset($data[$delete_key]);
       }
       $this->cache->set($cid, $data, Cache::PERMANENT, $this->tags);
-      if ($lock) {
-        $this->lock->release($lock_name);
-      }
+    }
+
+    if ($lock_acquired) {
+      $this->lock->release($lock_name);
     }
 
     $this->keysToPersist = [];
