@@ -231,7 +231,6 @@ abstract class StatementBase implements \Iterator, StatementInterface {
 
     }
 
-    // If the result object is missing, just do with the properties setting.
     try {
       if ($this->result) {
         return $this->result->setFetchMode($mode, $fetchOptions ?? []);

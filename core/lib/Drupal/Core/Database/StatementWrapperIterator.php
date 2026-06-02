@@ -62,15 +62,6 @@ class StatementWrapperIterator extends StatementBase {
   public function execute($args = [], $options = []) {
     assert(!isset($options['fetch']) || $options['fetch'] instanceof FetchAs || is_string($options['fetch']), 'The "fetch" option passed to execute() must contain a FetchAs enum case or a string. See https://www.drupal.org/node/3488338');
 
-    if (isset($options['fetch'])) {
-      if (is_string($options['fetch'])) {
-        $this->setFetchMode(FetchAs::ClassObject, $options['fetch']);
-      }
-      else {
-        $this->setFetchMode($options['fetch']);
-      }
-    }
-
     $startEvent = $this->dispatchStatementExecutionStartEvent($args ?? []);
 
     try {
@@ -79,6 +70,14 @@ class StatementWrapperIterator extends StatementBase {
         $this->getClientStatement(),
         $return,
       );
+      if (isset($options['fetch'])) {
+        if (is_string($options['fetch'])) {
+          $this->setFetchMode(FetchAs::ClassObject, $options['fetch']);
+        }
+        else {
+          $this->setFetchMode($options['fetch']);
+        }
+      }
     }
     catch (\Exception $e) {
       $this->dispatchStatementExecutionFailureEvent($startEvent, $e);

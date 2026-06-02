@@ -51,6 +51,8 @@ class PdoResult extends ResultBase {
    * {@inheritdoc}
    */
   public function setFetchMode(FetchAs $mode, array $fetchOptions): bool {
+    $this->fetchMode = $mode;
+    $this->fetchOptions = array_merge($this->fetchOptions, $fetchOptions);
     return match ($mode) {
       FetchAs::ClassObject => $this->clientSetFetchMode($mode, $fetchOptions['class'], $fetchOptions['constructor_args'] ?? NULL),
       FetchAs::Column => $this->clientSetFetchMode($mode, $fetchOptions['column']),
