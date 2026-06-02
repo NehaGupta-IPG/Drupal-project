@@ -677,8 +677,8 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       //   apply to the default language. See
       //   https://www.drupal.org/node/1866330.
       // Default to the original entity language if not explicitly specified
-      // otherwise.
-      if (!array_key_exists($this->defaultLangcodeKey, $values)) {
+      // otherwise. Skip this condition if this is only a UUID lookup.
+      if (!array_key_exists($this->defaultLangcodeKey, $values) && !array_keys($values) === [$this->uuidKey]) {
         $values[$this->defaultLangcodeKey] = 1;
       }
       // If the 'default_langcode' flag is explicitly not set, we do not care
