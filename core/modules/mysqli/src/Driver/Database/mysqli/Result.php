@@ -94,7 +94,7 @@ class Result extends ResultBase {
     // Stringify all non-NULL column values.
     $row = array_map(fn ($value) => $value === NULL ? NULL : (string) $value, $mysqli_row);
 
-    $row = $this->assocToFetchMode($row, $mode, $fetchOptions);
+    $row = $this->assocToFetchMode($row, $mode ?? $this->fetchMode, $fetchOptions ?? $this->fetchOptions);
     $this->setResultsetCurrentRow($row);
     return $row;
   }
