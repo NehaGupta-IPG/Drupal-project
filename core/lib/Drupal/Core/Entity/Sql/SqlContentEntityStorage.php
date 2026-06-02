@@ -672,13 +672,14 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    * {@inheritdoc}
    */
   protected function buildPropertyQuery(QueryInterface $entity_query, array $values) {
-    if ($this->dataTable) {
+    // Skip this condition if this is only a UUID lookup.
+    if ($this->dataTable && !array_keys($values) === [$this->uuidKey]) {
       // @todo We should not be using a condition to specify whether conditions
       //   apply to the default language. See
       //   https://www.drupal.org/node/1866330.
       // Default to the original entity language if not explicitly specified
-      // otherwise. Skip this condition if this is only a UUID lookup.
-      if (!array_key_exists($this->defaultLangcodeKey, $values) && !array_keys($values) === [$this->uuidKey]) {
+      // otherwise.
+      if (!array_key_exists($this->defaultLangcodeKey, $values)) {
         $values[$this->defaultLangcodeKey] = 1;
       }
       // If the 'default_langcode' flag is explicitly not set, we do not care
