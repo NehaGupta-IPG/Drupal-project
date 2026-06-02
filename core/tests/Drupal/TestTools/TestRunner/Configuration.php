@@ -80,13 +80,17 @@ final class Configuration {
 
     $input = new ArgvInput($arguments, self::commandLineDefinition());
 
-    if ($input->getOption('color')) {
-      $_SERVER['FORCE_COLOR'] = '1';
+    if ($input->getOption('directory') && ($input->getOption('file') || $input->getOption('class'))) {
+      throw new \RuntimeException("--directory cannot be specified together with the --class or --file options.");
     }
 
     $concurrency = $input->getOption('concurrency');
     if (!is_numeric($concurrency) || $concurrency <= 0) {
       throw new \RuntimeException("--concurrency must be a strictly positive integer.");
+    }
+
+    if ($input->getOption('color')) {
+      $_SERVER['FORCE_COLOR'] = '1';
     }
 
     if ($input->getArgument('tests')) {
