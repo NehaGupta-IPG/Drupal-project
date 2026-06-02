@@ -180,33 +180,6 @@ class BlockHooks {
   }
 
   /**
-   * Implements hook_rebuild().
-   */
-  #[Hook('rebuild')]
-  public function rebuild(): void {
-    foreach ($this->themeHandler->listInfo() as $theme => $theme_extension) {
-      if ($theme_extension->status) {
-        $regions = $theme_extension->listAllRegions();
-        /** @var \Drupal\block\BlockInterface[] $blocks */
-        $blocks = \Drupal::entityTypeManager()->getStorage('block')->loadByProperties(['theme' => $theme]);
-        foreach ($blocks as $block_id => $block) {
-          // Disable blocks in invalid regions.
-          if (!isset($regions[$block->getRegion()])) {
-            if ($block->status()) {
-              \Drupal::messenger()
-                ->addWarning($this->t('The block %info was assigned to the invalid region %region and has been disabled.', [
-                  '%info' => $block_id,
-                  '%region' => $block->getRegion(),
-                ]));
-            }
-            $block->setRegion($theme_extension->getDefaultRegion())->disable()->save();
-          }
-        }
-      }
-    }
-  }
-
-  /**
    * Implements hook_ENTITY_TYPE_delete() for user_role entities.
    *
    * Removes deleted role from blocks that use it.
