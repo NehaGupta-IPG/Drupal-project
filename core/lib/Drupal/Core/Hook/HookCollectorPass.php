@@ -470,7 +470,7 @@ class HookCollectorPass implements CompilerPassInterface {
   }
 
   /**
-   * Blah.
+   * Collects Attribute hook implementations in registered services.
    *
    * @param array<string, string> $namespaces
    *   Map of namespace to directory.
