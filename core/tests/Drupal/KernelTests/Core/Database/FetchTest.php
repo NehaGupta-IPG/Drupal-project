@@ -389,4 +389,13 @@ class FetchTest extends DatabaseTestBase {
     $this->assertTrue($exception, 'Exception was thrown');
   }
 
+  /**
+   * Confirms that we can not fetch after a DML statement.
+   */
+  public function testFetchAfterInsertStatement(): void {
+    $statement = $this->connection->query("INSERT INTO {test} (name) VALUES ('test12345678')");
+    $this->assertInstanceOf(StatementInterface::class, $statement);
+    $this->assertFalse($statement->fetch());
+  }
+
 }

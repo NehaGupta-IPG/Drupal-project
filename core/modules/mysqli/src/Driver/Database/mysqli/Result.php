@@ -32,7 +32,7 @@ class Result extends ResultBase {
     protected readonly \mysqli $mysqliConnection,
     bool $valid,
   ) {
-    parent::__construct($valid);
+    parent::__construct($valid && (bool) $mysqliResult);
   }
 
   /**
@@ -68,6 +68,8 @@ class Result extends ResultBase {
    * {@inheritdoc}
    */
   public function setFetchMode(FetchAs $mode, array $fetchOptions): bool {
+    $this->fetchMode = $mode;
+    $this->fetchOptions = array_merge($this->fetchOptions, $fetchOptions);
     // There are no methods to set fetch mode in \mysqli_result.
     return TRUE;
   }
@@ -76,18 +78,25 @@ class Result extends ResultBase {
    * {@inheritdoc}
    */
   public function fetch(?FetchAs $mode, ?array $fetchOptions = NULL): array|object|int|float|string|bool|NULL {
+    if ($this->mysqliResult === FALSE) {
+      return FALSE;
+    }
+
     assert($this->mysqliResult instanceof \mysqli_result);
 
     $mysqli_row = $this->mysqliResult->fetch_assoc();
 
     if (!$mysqli_row) {
+      $this->markResultsetFetchingComplete();
       return FALSE;
     }
 
     // Stringify all non-NULL column values.
     $row = array_map(fn ($value) => $value === NULL ? NULL : (string) $value, $mysqli_row);
 
-    return $this->assocToFetchMode($row, $mode, $fetchOptions);
+    $row = $this->assocToFetchMode($row, $mode, $fetchOptions);
+    $this->setResultsetCurrentRow($row);
+    return $row;
   }
 
 }

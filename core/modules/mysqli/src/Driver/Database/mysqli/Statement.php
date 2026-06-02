@@ -69,15 +69,6 @@ class Statement extends StatementBase {
    * {@inheritdoc}
    */
   public function execute($args = [], $options = []) {
-    if (isset($options['fetch'])) {
-      if (is_string($options['fetch'])) {
-        $this->setFetchMode(FetchAs::ClassObject, $options['fetch']);
-      }
-      else {
-        $this->setFetchMode($options['fetch']);
-      }
-    }
-
     $startEvent = $this->dispatchStatementExecutionStartEvent($args ?? []);
 
     try {
@@ -107,6 +98,14 @@ class Statement extends StatementBase {
         $this->clientConnection,
         $return,
       );
+      if (isset($options['fetch'])) {
+        if (is_string($options['fetch'])) {
+          $this->setFetchMode(FetchAs::ClassObject, $options['fetch']);
+        }
+        else {
+          $this->setFetchMode($options['fetch']);
+        }
+      }
     }
     catch (\Exception $e) {
       $this->dispatchStatementExecutionFailureEvent($startEvent, $e);
