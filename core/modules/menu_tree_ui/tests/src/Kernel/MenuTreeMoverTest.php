@@ -11,13 +11,13 @@ use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\menu_link_content\MenuLinkContentInterface;
 use Drupal\menu_tree_ui\Service\MenuTreeMover;
 use Drupal\system\Entity\Menu;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests MenuTreeMover validation paths that are not exercised by FJS tests.
- *
- * @group menu_tree_ui
  */
+#[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
 final class MenuTreeMoverTest extends KernelTestBase {
 

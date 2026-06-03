@@ -3,7 +3,7 @@
  * IntersectionObserver-based row windowing for the menu tree.
  *
  * Strategy: every row is a normal DOM node, but rows far outside the viewport
- * get `data-virtualised="true"`, which the CSS uses to skip rendering the row
+ * get `data-virtualized="true"`, which the CSS uses to skip rendering the row
  * content (and reserve a fixed height). The browser's own `content-visibility:
  * auto` carries most of the load — this layer also handles stricter cases like
  * a subtree with thousands of siblings, where we want off-screen content to
@@ -21,7 +21,7 @@
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
 
   /**
-   * Flags rows as virtualised when they leave the preload zone.
+   * Flags rows as virtualized when they leave the preload zone.
    *
    * @param {IntersectionObserverEntry[]} entries
    *   The observer entries.
@@ -30,9 +30,9 @@
     entries.forEach((entry) => {
       const row = entry.target;
       if (entry.isIntersecting) {
-        delete row.dataset.virtualised;
+        delete row.dataset.virtualized;
       } else {
-        row.dataset.virtualised = 'true';
+        row.dataset.virtualized = 'true';
       }
     });
   }
@@ -80,7 +80,7 @@
     /**
      * Starts tracking a row's visibility.
      *
-     * Deliberately does not pre-stamp `data-virtualised="true"`: the observer
+     * Deliberately does not pre-stamp `data-virtualized="true"`: the observer
      * callback fires asynchronously (next layout pass), so a freshly-observed
      * row would otherwise spend ~1 frame with its content hidden — visible to
      * the user as an empty row, especially right after a drag-drop refresh
@@ -102,7 +102,7 @@
      */
     unobserve(row) {
       this.observer.unobserve(row);
-      delete row.dataset.virtualised;
+      delete row.dataset.virtualized;
     }
 
     /**

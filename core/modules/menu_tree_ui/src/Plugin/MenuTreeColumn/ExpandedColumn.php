@@ -19,7 +19,7 @@ use Drupal\menu_tree_ui\MenuTreeUiConstants;
  * state. This column exposes it as an inline toggle so editors never need to
  * open the full edit form just to flip this flag.
  *
- * Static/yml-defined links do not have a writeable expanded property; for those
+ * Static/yml-defined links do not have a writable expanded property; for those
  * the cell is rendered as a read-only indicator.
  */
 #[MenuTreeColumn(

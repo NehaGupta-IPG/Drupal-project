@@ -12,7 +12,7 @@ this module matures.
 ## What works
 
 - Lazy-loaded tree: only the top level loads on page open; each subtree fetches on expand.
-- Browser-native row virtualisation via `content-visibility: auto`, plus an `IntersectionObserver` fallback that flips deep off-screen rows to `visibility: hidden` with a reserved height.
+- Browser-native row virtualization via `content-visibility: auto`, plus an `IntersectionObserver` fallback that flips deep off-screen rows to `visibility: hidden` with a reserved height.
 - Full WAI-ARIA tree keyboard navigation (Up/Down/Left/Right/Home/End/Enter, roving `tabindex`).
 - Pointer drag-and-drop reorder and reparent, plus two keyboard equivalents: Shift+Up / Shift+Down for a quick sibling reorder, and a grab/select move mode (Space to pick up, arrows to choose a before/after/child position, Enter to drop, Escape to cancel) that steps through the same drop-intent space as drag and commits through the same path.
 - A "Keyboard commands" dialog, linked at the top of the page so assistive-technology users meet it early.
@@ -47,7 +47,7 @@ Files load in dependency order (see `menu_tree_ui.libraries.yml`) and share help
 through a single `Drupal.menuTreeUi` namespace:
 
 - `js/tree-nav.js` — visible-row enumeration + roving-tabindex focus.
-- `js/windowing.js` — `IntersectionObserver` row virtualisation (`RowWindow`).
+- `js/windowing.js` — `IntersectionObserver` row virtualization (`RowWindow`).
 - `js/row-builder.js` — JSON → DOM (`buildGroup`, `buildRow`).
 - `js/expand.js` — lazy-load + collapse/expand + group refresh (`ExpandManager`).
 - `js/keyboard.js` — WAI-ARIA tree navigation keys.
@@ -68,7 +68,7 @@ The `<menu-tree>` element upgrades the server-rendered top level (from
 
 ## Constraints inherited from core
 
-- **9-level depth cap.** `menu_tree.p1`–`p9` is the materialised path columns in core. Links deeper than 9 don't work in Drupal at all — not specific to this module.
+- **9-level depth cap.** `menu_tree.p1`–`p9` is the materialized path columns in core. Links deeper than 9 don't work in Drupal at all — not specific to this module.
 
 ## Generating a test dataset
 

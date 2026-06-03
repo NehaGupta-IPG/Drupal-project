@@ -1,6 +1,6 @@
 /**
  * @file
- * Dismissal behaviour for the htmx-driven search results popover.
+ * Dismissal behavior for the htmx-driven search results popover.
  *
  * htmx swaps results into #menu-tree-ui-search-results on keyup; the popover
  * self-hides when empty (CSS `:not(:has(*))`). This module empties it - without
@@ -48,7 +48,7 @@
     };
 
     // Escape hides the popover but keeps the query - preventDefault stops the
-    // browser's native "clear the search field" behaviour.
+    // browser's native "clear the search field" behavior.
     const onKeyDown = (event) => {
       if (event.key === 'Escape' && results.firstElementChild) {
         event.preventDefault();

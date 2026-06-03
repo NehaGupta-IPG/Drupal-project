@@ -3,27 +3,27 @@
  *
  * Strategy: define a thin bridge layer of --color-* / --space-* variables
  * that cascade from Gin's --gin-* tokens when Gin is active, or fall back
- * to Claro-compatible values otherwise. All colour and spacing rules in this
+ * to Claro-compatible values otherwise. All color and spacing rules in this
  * file use ONLY those bridge variables — never hardcoded hex.
  *
  * Two perf-critical techniques:
  *  1. content-visibility: auto on every row — browser skips paint/layout for
  *     off-screen rows for free.
- *  2. [data-virtualised="true"] — set by RowWindow (IntersectionObserver) for
+ *  2. [data-virtualized="true"] — set by RowWindow (IntersectionObserver) for
  *     rows that are deep off-screen; hard-floors cost via visibility:hidden +
  *     fixed height.
  */
 
 :root {
-  --mtu-color-divider:           var(--gin-border-color,         #e0e0e0);
-  --mtu-color-divider-light:     var(--gin-border-color-layer,   #f0f0f0);
-  --mtu-color-bg:                var(--gin-bg-layer,             #fff);
-  --mtu-color-text:              var(--gin-color-text,           #1a1a1a);
-  --mtu-color-text-muted:        var(--gin-color-text-light,     #757575);
-  --mtu-color-text-muted-strong: var(--gin-color-text,           #4a4a4a);
-  --mtu-color-focus:             var(--gin-color-focus-border,   #2563eb);
-  --mtu-color-link:              var(--gin-color-primary,        #2563eb);
-  --mtu-color-focus-bg:          rgba(37, 99, 235, 0.08);
+  --mtu-color-divider: var(--gin-border-color, #e0e0e0);
+  --mtu-color-divider-light: var(--gin-border-color-layer, #f0f0f0);
+  --mtu-color-bg: var(--gin-bg-layer, #fff);
+  --mtu-color-text: var(--gin-color-text, #1a1a1a);
+  --mtu-color-text-muted: var(--gin-color-text-light, #757575);
+  --mtu-color-text-muted-strong: var(--gin-color-text, #4a4a4a);
+  --mtu-color-focus: var(--gin-color-focus-border, #2563eb);
+  --mtu-color-link: var(--gin-color-primary, #2563eb);
+  --mtu-color-focus-bg: rgb(37, 99, 235, 0.08);
 }
 
 .menu-tree-ui {
@@ -54,17 +54,17 @@
  */
 .menu-tree-ui__search-results {
   position: absolute;
+  z-index: 10;
   top: calc(100% + 0.25rem);
-  left: 0;
   right: 0;
-  max-height: 60vh;
+  left: 0;
   overflow-y: auto;
+  max-height: 60vh;
   padding: 0.5rem 0.75rem;
-  background: var(--mtu-color-bg);
   border: 1px solid var(--mtu-color-divider);
   border-radius: 4px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  z-index: 10;
+  background: var(--mtu-color-bg);
+  box-shadow: 0 8px 24px rgb(0, 0, 0, 0.12);
 }
 
 .menu-tree-ui__search-results:not(:has(*)) {
@@ -79,9 +79,9 @@
 }
 
 .menu-tree-ui-search-results__list {
-  list-style: none;
   margin: 0;
   padding: 0;
+  list-style: none;
 }
 
 .menu-tree-ui-search-results__item {
@@ -96,13 +96,13 @@
 .menu-tree-ui-search-results__title {
   display: inline-block;
   padding: 0;
-  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  color: var(--mtu-color-link);
   border: 0;
+  background: transparent;
   font: inherit;
   font-weight: 600;
-  color: var(--mtu-color-link);
-  text-align: left;
-  cursor: pointer;
 }
 
 .menu-tree-ui-search-results__title:hover,
@@ -117,8 +117,8 @@
 }
 
 .menu-tree-ui-search-results__breadcrumb {
-  font-size: 0.8rem;
   color: var(--mtu-color-text-muted);
+  font-size: 0.8rem;
 }
 
 .menu-tree-ui-search-results__item--disabled .menu-tree-ui-search-results__title {
@@ -133,12 +133,12 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.25rem 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--mtu-color-text-muted);
+  border-bottom: 1px solid var(--mtu-color-divider);
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--mtu-color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  border-bottom: 1px solid var(--mtu-color-divider);
 }
 
 .menu-tree-ui__column-header--title {
@@ -153,8 +153,8 @@
 
 /* <menu-tree> hosts the absolutely-positioned drop indicator. */
 menu-tree {
-  display: block;
   position: relative;
+  display: block;
 }
 
 /*
@@ -169,16 +169,16 @@ ul[role="group"],
 li[role="treeitem"],
 .menu-tree-ui-row__operations li,
 .menu-tree-ui-row__operations ul {
-  list-style: none;
-  list-style-type: none;
   margin: 0;
   padding: 0;
+  list-style: none;
+  list-style-type: none;
 }
 
 .menu-tree-ui__list {
-  list-style: none;
   margin: 0;
   padding: 0;
+  list-style: none;
 }
 
 .menu-tree-ui__list--root {
@@ -227,13 +227,17 @@ li[role="treeitem"],
 .menu-tree-ui-row:focus {
   position: relative;
   z-index: 1;
-  box-shadow: inset 0 0 0 2px var(--mtu-color-focus);
   border-radius: 2px;
+  box-shadow: inset 0 0 0 2px var(--mtu-color-focus);
 }
 
 @keyframes menu-tree-ui-flash {
-  0% { background-color: var(--mtu-color-focus-bg); }
-  100% { background-color: transparent; }
+  0% {
+    background-color: var(--mtu-color-focus-bg);
+  }
+  100% {
+    background-color: transparent;
+  }
 }
 
 .menu-tree-ui-row--flash {
@@ -251,23 +255,23 @@ li[role="treeitem"],
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
   min-height: 2.5rem;
+  padding: 0.5rem 0.75rem;
 }
 
 .menu-tree-ui-row__handle {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
   width: 1.875rem;
   height: 2.25rem;
-  flex: 0 0 auto;
-  color: var(--mtu-color-text-muted-strong);
   cursor: grab;
   user-select: none;
   touch-action: none;
-  font-size: 1.275rem;
   letter-spacing: -1px;
+  color: var(--mtu-color-text-muted-strong);
+  font-size: 1.275rem;
 }
 
 .menu-tree-ui-row__handle:hover,
@@ -278,8 +282,8 @@ li[role="treeitem"],
 .menu-tree-ui-row__handle--locked {
   cursor: default;
   pointer-events: none;
-  color: var(--mtu-color-text-muted-strong);
   opacity: 0.3;
+  color: var(--mtu-color-text-muted-strong);
   font-size: 0.6rem;
 }
 
@@ -326,13 +330,13 @@ li[role="treeitem"],
 
 .menu-tree-ui-drop-indicator {
   position: absolute;
+  z-index: 5;
   display: none;
   height: 3px;
   margin-top: -1.5px;
-  background: var(--mtu-color-focus);
-  border-radius: 1.5px;
   pointer-events: none;
-  z-index: 5;
+  border-radius: 1.5px;
+  background: var(--mtu-color-focus);
   box-shadow: -3px 0 0 var(--mtu-color-focus);
 }
 
@@ -343,10 +347,10 @@ li[role="treeitem"],
   width: 2rem;
   height: 2rem;
   padding: 0;
-  background: transparent;
-  border: 0;
   cursor: pointer;
   color: var(--mtu-color-text);
+  border: 0;
+  background: transparent;
 }
 
 .menu-tree-ui-row__toggle--spacer {
@@ -358,15 +362,15 @@ li[role="treeitem"],
  * Collapsed: rotate(45deg) → right.  Expanded: rotate(135deg) → down.
  */
 .menu-tree-ui-row__chevron {
-  font-size: 0;
   display: inline-block;
   width: 0.5rem;
   height: 0.5rem;
-  border-top: 0.125rem solid currentColor;
-  border-right: 0.125rem solid currentColor;
+  transition: transform 160ms ease;
   transform: rotate(45deg);
   transform-origin: 50% 50%;
-  transition: transform 160ms ease;
+  border-top: 0.125rem solid currentColor;
+  border-right: 0.125rem solid currentColor;
+  font-size: 0;
 }
 
 .menu-tree-ui-row[aria-expanded="true"] > .menu-tree-ui-row__content .menu-tree-ui-row__chevron {
@@ -380,44 +384,44 @@ li[role="treeitem"],
 }
 
 .menu-tree-ui-row__title {
+  overflow: hidden;
   flex: 1 1 auto;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .menu-tree-ui-row__badge {
-  font-size: 0.75rem;
+  padding: 0 0.3rem;
   text-transform: uppercase;
   color: var(--mtu-color-text-muted);
   border: 1px solid currentColor;
-  padding: 0 0.3rem;
   border-radius: 2px;
+  font-size: 0.75rem;
 }
 
 .menu-tree-ui-row--disabled .menu-tree-ui-row__title {
-  color: var(--mtu-color-text-muted);
   text-decoration: line-through;
+  color: var(--mtu-color-text-muted);
 }
 
 /*
- * Hard-floor virtualisation: rows deep off-screen hide their content but
+ * Hard-floor virtualization: rows deep off-screen hide their content but
  * keep their height so the scrollbar stays accurate.
  */
-.menu-tree-ui-row[data-virtualised="true"] > .menu-tree-ui-row__content {
+.menu-tree-ui-row[data-virtualized="true"] > .menu-tree-ui-row__content {
   visibility: hidden;
 }
 
-.menu-tree-ui-row[data-virtualised="true"] {
+.menu-tree-ui-row[data-virtualized="true"] {
   height: 2.5rem;
 }
 
 /* ────────────────────────────────────────────────────── column cells */
 
 .menu-tree-ui-row__column {
-  flex: 0 0 auto;
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
   min-width: 3rem;
@@ -435,12 +439,12 @@ li[role="treeitem"],
   width: 2.25rem;
   height: 1.25rem;
   padding: 0;
-  border: 0;
-  border-radius: 0.625rem;
-  background: var(--mtu-color-divider);
   cursor: pointer;
   transition: background 120ms ease;
   vertical-align: middle;
+  border: 0;
+  border-radius: 0.625rem;
+  background: var(--mtu-color-divider);
 }
 
 .menu-tree-ui-row__column-toggle[aria-checked="true"] {
@@ -454,16 +458,16 @@ li[role="treeitem"],
 
 /* Knob */
 .menu-tree-ui-row__column-toggle::after {
-  content: '';
   position: absolute;
   top: 0.1875rem;
   left: 0.1875rem;
   width: 0.875rem;
   height: 0.875rem;
+  content: "";
+  transition: transform 120ms ease;
   border-radius: 50%;
   background: #fff;
-  transition: transform 120ms ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 1px 3px rgb(0, 0, 0, 0.25);
 }
 
 .menu-tree-ui-row__column-toggle[aria-checked="true"]::after {
@@ -494,12 +498,12 @@ li[role="treeitem"],
 .menu-tree-ui__help-toggle {
   align-self: flex-start;
   padding: 0;
-  background: transparent;
-  border: 0;
-  font: inherit;
-  color: var(--mtu-color-link);
-  text-decoration: underline;
   cursor: pointer;
+  text-decoration: underline;
+  color: var(--mtu-color-link);
+  border: 0;
+  background: transparent;
+  font: inherit;
 }
 
 .menu-tree-ui__help-toggle:focus-visible {
@@ -508,17 +512,17 @@ li[role="treeitem"],
 }
 
 .menu-tree-ui__help-dialog {
-  max-width: 32rem;
   width: calc(100% - 2rem);
+  max-width: 32rem;
   padding: 0;
+  color: var(--mtu-color-text);
   border: 1px solid var(--mtu-color-divider);
   border-radius: 6px;
   background: var(--mtu-color-bg);
-  color: var(--mtu-color-text);
 }
 
 .menu-tree-ui__help-dialog::backdrop {
-  background: rgba(0, 0, 0, 0.4);
+  background: rgb(0, 0, 0, 0.4);
 }
 
 .menu-tree-ui__help-dialog-inner {
@@ -537,8 +541,8 @@ li[role="treeitem"],
 }
 
 .menu-tree-ui__help-list dt {
-  font-weight: 600;
   white-space: nowrap;
+  font-weight: 600;
 }
 
 .menu-tree-ui__help-list dd {

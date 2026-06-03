@@ -8,13 +8,13 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\menu_tree_ui\MenuTreeColumnManager;
 use Drupal\menu_tree_ui\Plugin\MenuTreeColumn\MenuTreeColumnInterface;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Verifies plugin discovery wiring for MenuTreeColumnManager.
- *
- * @group menu_tree_ui
  */
+#[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
 final class MenuTreeColumnManagerTest extends KernelTestBase {
 

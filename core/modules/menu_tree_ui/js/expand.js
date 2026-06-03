@@ -55,7 +55,7 @@
      * @param {string} childrenUrl
      *   The endpoint returning one level of children as JSON.
      * @param {?Drupal.menuTreeUi.RowWindow} rowWindow
-     *   The windowing helper, or undefined when virtualisation is off.
+     *   The windowing helper, or undefined when virtualization is off.
      * @param {HTMLUListElement} tree
      *   The root tree element.
      */

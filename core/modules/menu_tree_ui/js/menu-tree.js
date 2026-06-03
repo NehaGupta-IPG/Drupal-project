@@ -17,7 +17,7 @@
  *  - drag/            pointer-event drag reorder
  *  - tree-nav.js      visible-row enumeration + focus
  *  - row-builder.js   JSON → DOM
- *  - windowing.js     IntersectionObserver row virtualisation
+ *  - windowing.js     IntersectionObserver row virtualization
  *
  * No Drupal.behaviors: the custom element's connectedCallback fires
  * automatically when a <menu-tree> enters the DOM — including htmx-swapped

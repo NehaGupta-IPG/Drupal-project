@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\menu_tree_ui\FunctionalJavascript;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\menu_link_content\MenuLinkContentInterface;
 use Drupal\system\Entity\Menu;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests the menu_tree_ui drag-and-drop behaviour end-to-end.
+ * Tests the menu_tree_ui drag-and-drop behavior end-to-end.
  *
  * Each scenario fires synthetic pointer events at the real DragController
  * pipeline, then verifies three layers:
@@ -19,9 +21,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  *  - DOM: sibling order inside the destination container is correct.
  *  - Persistence: the underlying menu_link_content entity's `parent` field
  *    is set to the expected plugin ID (or '' for root).
- *
- * @group menu_tree_ui
  */
+#[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
 final class MenuTreeUiDragDropTest extends WebDriverTestBase {
 
@@ -281,7 +282,7 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     $this->assertChildCount(NULL, 5);
     $this->assertNoDuplicateRows();
     $this->assertNoBlankRows();
-    $this->assertNoVirtualisedRows();
+    $this->assertNoVirtualizedRows();
   }
 
   /**
@@ -296,7 +297,7 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     $this->assertChildCount('A', 3);
     $this->assertNoDuplicateRows();
     $this->assertNoBlankRows();
-    $this->assertNoVirtualisedRows();
+    $this->assertNoVirtualizedRows();
   }
 
   /**
@@ -310,7 +311,7 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     $this->assertChildCount('L', 1);
     $this->assertNoDuplicateRows();
     $this->assertNoBlankRows();
-    $this->assertNoVirtualisedRows();
+    $this->assertNoVirtualizedRows();
   }
 
   /**
@@ -324,7 +325,7 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     $this->assertChildCount('D', 2);
     $this->assertNoDuplicateRows();
     $this->assertNoBlankRows();
-    $this->assertNoVirtualisedRows();
+    $this->assertNoVirtualizedRows();
   }
 
   /**
@@ -341,7 +342,7 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     $this->assertChildCount('A2', 0);
     $this->assertNoDuplicateRows();
     $this->assertNoBlankRows();
-    $this->assertNoVirtualisedRows();
+    $this->assertNoVirtualizedRows();
   }
 
   /**
@@ -423,7 +424,7 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
   /**
    * Returns the DOM row for a labelled link, or NULL if not in DOM.
    */
-  private function row(string $label) {
+  private function row(string $label): ?NodeElement {
     $id = $this->linkIds[$label] ?? NULL;
     if ($id === NULL) {
       return NULL;
@@ -452,7 +453,7 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
    *
    * Template formula: `padding-inline-start: (depth - 1) * 1.25rem`. Chromium
    * defaults to 16px so we compare in resolved pixels — deterministic
-   * regardless of how the inline rem value is serialised.
+   * regardless of how the inline rem value is serialized.
    */
   private function assertIndent(string $label, int $expected_depth): void {
     $id = $this->linkIds[$label] ?? NULL;
@@ -588,10 +589,10 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
   }
 
   /**
-   * Asserts no row currently in the test viewport is marked virtualised.
+   * Asserts no row currently in the test viewport is marked virtualized.
    *
-   * The IntersectionObserver virtualisation in windowing.js sets
-   * `data-virtualised="true"` to hide content of off-screen rows and reserve
+   * The IntersectionObserver virtualization in windowing.js sets
+   * `data-virtualized="true"` to hide content of off-screen rows and reserve
    * fixed height. When the move pipeline re-observes already-visible rows,
    * they can get stuck with that flag set — appearing as empty rows even
    * though they're in the viewport. This catches that.
@@ -600,17 +601,17 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
    * (Selenium's default is 1280x720+) so there should be no legitimately
    * off-screen rows after a move.
    */
-  private function assertNoVirtualisedRows(): void {
+  private function assertNoVirtualizedRows(): void {
     // Give the IntersectionObserver a frame to deliver its initial entries.
     $this->getSession()->wait(150);
-    $virtualised = $this->getSession()->evaluateScript(
-      'return Array.from(document.querySelectorAll(\'menu-tree li[role="treeitem"][data-virtualised="true"]\')).map(r => r.dataset.id);',
+    $virtualized = $this->getSession()->evaluateScript(
+      'return Array.from(document.querySelectorAll(\'menu-tree li[role="treeitem"][data-virtualized="true"]\')).map(r => r.dataset.id);',
     );
     $this->assertSame(
       [],
-      $virtualised,
-      'Rows stuck marked data-virtualised="true" after the move (will render as empty): '
-      . json_encode($virtualised),
+      $virtualized,
+      'Rows stuck marked data-virtualized="true" after the move (will render as empty): '
+      . json_encode($virtualized),
     );
   }
 

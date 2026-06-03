@@ -223,7 +223,7 @@ final class MenuTreeController extends ControllerBase {
     if (!str_starts_with($link_id, MenuTreeUiConstants::CONTENT_PLUGIN_PREFIX)) {
       return new JsonResponse([
         'ok' => FALSE,
-        'code' => 'not_updateable',
+        'code' => 'not_updatable',
         'message' => 'Only user-created menu links can be updated.',
       ], 400);
     }
@@ -245,7 +245,7 @@ final class MenuTreeController extends ControllerBase {
     $column = $this->columnManager->createInstance($column_id);
 
     if (!$column->handleUpdate($entity, $value)) {
-      return new JsonResponse(['ok' => FALSE, 'code' => 'not_updateable', 'message' => 'Column is read-only.'], 400);
+      return new JsonResponse(['ok' => FALSE, 'code' => 'not_updatable', 'message' => 'Column is read-only.'], 400);
     }
 
     return new JsonResponse(['ok' => TRUE]);
@@ -254,17 +254,17 @@ final class MenuTreeController extends ControllerBase {
   // Private helpers.
 
   /**
-   * Serialises a tree element to the JSON shape consumed by <menu-tree>.
+   * Serializes a tree element to the JSON shape consumed by <menu-tree>.
    *
    * @param \Drupal\Core\Menu\MenuLinkTreeElement $element
-   *   The tree element to serialise.
+   *   The tree element to serialize.
    * @param array<string, \Drupal\menu_link_content\MenuLinkContentInterface> $entity_map
    *   Pre-loaded entities keyed by plugin ID.
    * @param \Drupal\menu_tree_ui\Plugin\MenuTreeColumn\MenuTreeColumnInterface[] $columns
    *   The active column plugins keyed by plugin ID.
    *
    * @return array
-   *   The serialised row, matching the JSON shape consumed by <menu-tree>.
+   *   The serialized row, matching the JSON shape consumed by <menu-tree>.
    */
   private function serializeElement(MenuLinkTreeElement $element, array $entity_map, array $columns): array {
     $link = $element->link;
@@ -301,7 +301,7 @@ final class MenuTreeController extends ControllerBase {
    * renders the operations with the active theme, exactly as the Twig-rendered
    * top level does, and the client injects the result verbatim. The dropbutton
    * library is already on the page from the top level, and
-   * Drupal.attachBehaviors upgrades the injected markup, so behaviour matches
+   * Drupal.attachBehaviors upgrades the injected markup, so behavior matches
    * the server-rendered rows.
    *
    * @param \Drupal\Core\Menu\MenuLinkTreeElement $element

@@ -10,13 +10,13 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\menu_link_content\MenuLinkContentInterface;
 use Drupal\menu_tree_ui\Plugin\MenuTreeColumn\ExpandedColumn;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests ExpandedColumn cell data shape and persistence in isolation.
- *
- * @group menu_tree_ui
  */
+#[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
 final class ExpandedColumnTest extends KernelTestBase {
 

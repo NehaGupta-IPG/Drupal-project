@@ -39,7 +39,7 @@ final class MenuTreeMover {
   ) {}
 
   /**
-   * Applies a move and returns an outcome the controller can serialise.
+   * Applies a move and returns an outcome the controller can serialize.
    *
    * @param string $menu_name
    *   The menu the move is happening within.
@@ -151,7 +151,7 @@ final class MenuTreeMover {
   /**
    * Walks ancestors of $candidate_parent_id; TRUE if $moved_id appears there.
    *
-   * Uses the materialised path (getRootPathIds) — O(1) lookups against the
+   * Uses the materialized path (getRootPathIds) — O(1) lookups against the
    * menu_tree table rather than walking with N entity loads.
    */
   private function isDescendant(string $candidate_parent_id, string $moved_id): bool {

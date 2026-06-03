@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\menu_tree_ui\FunctionalJavascript;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\menu_link_content\MenuLinkContentInterface;
 use Drupal\system\Entity\Menu;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -21,9 +23,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  *
  * Depth-cap rejection is exercised at the service level in the MenuTreeMover
  * kernel test rather than re-driven here.
- *
- * @group menu_tree_ui
  */
+#[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
 final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
 
@@ -156,7 +157,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
     $this->assertChildCount('A', 3);
     $this->assertNoDuplicateRows();
     $this->assertNoBlankRows();
-    $this->assertNoVirtualisedRows();
+    $this->assertNoVirtualizedRows();
   }
 
   /**
@@ -394,7 +395,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
   /**
    * Returns the DOM row for a labelled link, or NULL if not in DOM.
    */
-  private function row(string $label) {
+  private function row(string $label): ?NodeElement {
     $id = $this->linkIds[$label] ?? NULL;
     if ($id === NULL) {
       return NULL;
@@ -549,17 +550,17 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
   }
 
   /**
-   * Asserts no row currently in the test viewport is marked virtualised.
+   * Asserts no row currently in the test viewport is marked virtualized.
    */
-  private function assertNoVirtualisedRows(): void {
+  private function assertNoVirtualizedRows(): void {
     $this->getSession()->wait(150);
-    $virtualised = $this->getSession()->evaluateScript(
-      'return Array.from(document.querySelectorAll(\'menu-tree li[role="treeitem"][data-virtualised="true"]\')).map(r => r.dataset.id);',
+    $virtualized = $this->getSession()->evaluateScript(
+      'return Array.from(document.querySelectorAll(\'menu-tree li[role="treeitem"][data-virtualized="true"]\')).map(r => r.dataset.id);',
     );
     $this->assertSame(
       [],
-      $virtualised,
-      'Rows stuck marked data-virtualised="true" after the move: ' . json_encode($virtualised),
+      $virtualized,
+      'Rows stuck marked data-virtualized="true" after the move: ' . json_encode($virtualized),
     );
   }
 

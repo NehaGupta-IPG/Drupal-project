@@ -29,7 +29,7 @@ final class MenuTreeSeederCommands extends DrushCommands {
   private const int BATCH_SIZE = 500;
 
   /**
-   * Hard cap matching core's menu_tree.p1..p9 materialised-path schema.
+   * Hard cap matching core's menu_tree.p1..p9 materialized-path schema.
    */
   private const int MAX_DEPTH = 9;
 
@@ -39,6 +39,7 @@ final class MenuTreeSeederCommands extends DrushCommands {
    * Real lorem so search has variety to filter against and humans can scan
    * results.
    */
+  // cspell:disable - lorem ipsum filler, not real words.
   private const array LOREM = [
     'lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing',
     'elit', 'sed', 'eiusmod', 'tempor', 'incididunt', 'labore', 'dolore',
@@ -49,6 +50,7 @@ final class MenuTreeSeederCommands extends DrushCommands {
     'sint', 'occaecat', 'cupidatat', 'proident', 'culpa', 'officia',
     'deserunt', 'mollit', 'anim', 'laborum',
   ];
+  // cspell:enable
 
   public function __construct(
     private readonly EntityTypeManagerInterface $entityTypeManager,
@@ -287,7 +289,7 @@ final class MenuTreeSeederCommands extends DrushCommands {
   }
 
   /**
-   * Returns "prefix Word [word [word]]" — 1–3 lorem words, first capitalised.
+   * Returns "prefix Word [word [word]]" — 1–3 lorem words, first capitalized.
    *
    * The prefix is kept on every title so the purge command can scope deletion
    * by LIKE 'prefix%' without touching real menu content.

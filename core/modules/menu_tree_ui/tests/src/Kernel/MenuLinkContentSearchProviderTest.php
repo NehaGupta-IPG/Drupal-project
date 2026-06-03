@@ -8,13 +8,13 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\menu_tree_ui\SearchProvider\MenuLinkContentSearchProvider;
 use Drupal\system\Entity\Menu;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests MenuLinkContentSearchProvider, including the ancestor chain shape.
- *
- * @group menu_tree_ui
  */
+#[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
 final class MenuLinkContentSearchProviderTest extends KernelTestBase {
 

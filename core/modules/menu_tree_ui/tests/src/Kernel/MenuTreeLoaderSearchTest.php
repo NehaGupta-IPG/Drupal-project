@@ -9,13 +9,13 @@ use Drupal\Core\Menu\MenuTreeStorageInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\menu_tree_ui\SearchProvider\MenuTreeSearchProviderInterface;
 use Drupal\menu_tree_ui\Service\MenuTreeLoader;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests MenuTreeLoader::search() provider collection, dedup, and alter hook.
- *
- * @group menu_tree_ui
  */
+#[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
 final class MenuTreeLoaderSearchTest extends KernelTestBase {
 

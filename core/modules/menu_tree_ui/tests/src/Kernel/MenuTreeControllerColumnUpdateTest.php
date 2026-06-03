@@ -9,6 +9,7 @@ use Drupal\system\MenuInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\menu_tree_ui\Controller\MenuTreeController;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -18,9 +19,8 @@ use Symfony\Component\HttpFoundation\Request;
  * Uses direct controller instantiation rather than real HTTP so we stay in the
  * kernel layer without a full browser stack. The controller is wired from the
  * DI container so all real dependencies are exercised.
- *
- * @group menu_tree_ui
  */
+#[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
 final class MenuTreeControllerColumnUpdateTest extends KernelTestBase {
 
@@ -118,7 +118,7 @@ final class MenuTreeControllerColumnUpdateTest extends KernelTestBase {
     $data = $this->decodeJson($response);
 
     $this->assertSame(400, $response->getStatusCode());
-    $this->assertSame('not_updateable', $data['code']);
+    $this->assertSame('not_updatable', $data['code']);
   }
 
   /**
