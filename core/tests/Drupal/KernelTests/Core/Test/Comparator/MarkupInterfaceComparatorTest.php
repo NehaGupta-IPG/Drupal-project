@@ -23,7 +23,6 @@ use SebastianBergmann\Comparator\Factory;
  */
 #[CoversClass(MarkupInterfaceComparator::class)]
 #[Group('Test')]
-#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class MarkupInterfaceComparatorTest extends KernelTestBase {
 
@@ -186,7 +185,7 @@ class MarkupInterfaceComparatorTest extends KernelTestBase {
    * Tests accepts.
    */
   #[DataProvider('dataSetProvider')]
-  public function testAccepts($expected, $actual, bool $accepts_result, $equals_result): void {
+  public function testAccepts(FormattableMarkup|string|int|\stdClass $expected, FormattableMarkup|string|int|array $actual, bool $accepts_result, bool|string $equals_result): void {
     if ($accepts_result) {
       $this->assertTrue($this->comparator->accepts($expected, $actual));
     }
@@ -199,7 +198,7 @@ class MarkupInterfaceComparatorTest extends KernelTestBase {
    * Tests assert equals.
    */
   #[DataProvider('dataSetProvider')]
-  public function testAssertEquals($expected, $actual, bool $accepts_result, $equals_result): void {
+  public function testAssertEquals(FormattableMarkup|string|int|\stdClass $expected, FormattableMarkup|string|int|array $actual, bool $accepts_result, bool|string $equals_result): void {
     try {
       $this->assertNull($this->comparator->assertEquals($expected, $actual));
       $this->assertTrue($equals_result);
