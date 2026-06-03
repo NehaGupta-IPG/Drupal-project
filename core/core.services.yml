@@ -861,7 +861,7 @@ services:
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']
   plugin.manager.menu.link:
     class: Drupal\Core\Menu\MenuLinkManager
-    arguments: ['@menu.tree_storage', '@menu_link.static.overrides', '@module_handler']
+    arguments: ['@menu.tree_storage', '@menu_link.static.overrides', '@module_handler', '@container.namespaces']
   Drupal\Core\Menu\MenuLinkManagerInterface: '@plugin.manager.menu.link'
   menu.link_tree:
     class: Drupal\Core\Menu\MenuLinkTree
