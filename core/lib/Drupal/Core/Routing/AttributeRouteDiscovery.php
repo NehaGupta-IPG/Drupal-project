@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Routing;
 
+use Drupal\Core\Discovery\AttributeScanner;
 use Symfony\Component\Routing\Attribute\DeprecatedAlias;
 use Symfony\Component\Routing\Attribute\Route as RouteAttribute;
 use Symfony\Component\Routing\Exception\InvalidArgumentException;
@@ -37,59 +38,23 @@ class AttributeRouteDiscovery extends StaticRouteDiscoveryBase {
    * {@inheritdoc}
    */
   protected function collectRoutes(): iterable {
-    foreach ($this->namespaces as $namespace => $directory) {
-      $directory .= '/Controller';
-      $namespace .= '\\Controller';
-      if (is_dir($directory)) {
-        $iterator = new \RecursiveIteratorIterator(
-          new \RecursiveDirectoryIterator($directory, \RecursiveDirectoryIterator::SKIP_DOTS)
-        );
-        foreach ($iterator as $fileinfo) {
-          if ($fileinfo->getExtension() == 'php') {
-            // Skip files that do not contain a Route attribute.
-            $contents = file_get_contents($fileinfo->getPathname());
-            if (!str_contains($contents, '#[Route') && !str_contains($contents, 'Routing\\Attribute\\Route')) {
-              continue;
-            }
-            $subPath = $iterator->getSubIterator()->getSubPath();
-            $subPath = $subPath ? str_replace(DIRECTORY_SEPARATOR, '\\', $subPath) . '\\' : '';
-            $class = $namespace . '\\' . $subPath . $fileinfo->getBasename('.php');
-            yield $this->createRouteCollection($class);
-          }
-        }
-      }
+    $scanner = new AttributeScanner($this->namespaces);
+    foreach ($scanner->scan(RouteAttribute::class, 'Controller') as $class) {
+      yield $this->createRouteCollection($class);
     }
   }
 
   /**
    * Creates a route collection from a class's attributed methods.
    *
-   * @param class-string $className
-   *   The class to generate a route collection for.
+   * @param \ReflectionClass $class
+   *   The instantiable controller class to generate a route collection for.
    *
    * @return \Symfony\Component\Routing\RouteCollection
    *   The route collection.
    */
-  private function createRouteCollection(string $className): RouteCollection {
+  private function createRouteCollection(\ReflectionClass $class): RouteCollection {
     $collection = new RouteCollection();
-
-    try {
-      if (!class_exists($className)) {
-        // In Symfony code this triggers an exception. It is removed here
-        // because Drupal already has traits, interfaces and other things in
-        // this folder. Alternatively, we could remove this if clause and then
-        // check what the resulting reflection object is.
-        return $collection;
-      }
-    }
-    catch (\Error) {
-      return $collection;
-    }
-    $class = new \ReflectionClass($className);
-    if ($class->isAbstract()) {
-      return $collection;
-    }
-
     $globals = $this->getGlobals($class);
     $fqcnAlias = FALSE;
 
