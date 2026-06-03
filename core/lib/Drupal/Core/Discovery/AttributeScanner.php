@@ -106,6 +106,39 @@ class AttributeScanner {
   }
 
   /**
+   * Gets attribute instances declared on a class and its public methods.
+   *
+   * This is the per-class counterpart to ::scan(): given a class already in
+   * hand, it reads the attributes a consumer cares about. Matching is by
+   * \ReflectionAttribute::IS_INSTANCEOF, so a subclass or implementation of
+   * the requested attribute is matched too; unlike the source-text filter in
+   * ::scan(), this works on the loaded class and is safe for polymorphic
+   * attribute hierarchies.
+   *
+   * @param \ReflectionClass<object> $class
+   *   The class to read attributes from.
+   * @param class-string $attributeName
+   *   The attribute class or interface to read.
+   *
+   * @return array<string, list<object>>
+   *   Lists of attribute instances keyed by the name of the method they are
+   *   declared on; attributes declared on the class itself are keyed by
+   *   '__invoke'.
+   */
+  public static function getAttributeInstances(\ReflectionClass $class, string $attributeName): array {
+    $attributes = [];
+    $reflections = $class->getMethods(\ReflectionMethod::IS_PUBLIC);
+    $reflections[] = $class;
+    foreach ($reflections as $reflection) {
+      if ($reflectionAttributes = $reflection->getAttributes($attributeName, \ReflectionAttribute::IS_INSTANCEOF)) {
+        $method = $reflection instanceof \ReflectionMethod ? $reflection->getName() : '__invoke';
+        $attributes[$method] = array_map(static fn(\ReflectionAttribute $ra) => $ra->newInstance(), $reflectionAttributes);
+      }
+    }
+    return $attributes;
+  }
+
+  /**
    * Derives the markers used to filter files for an attribute.
    *
    * Two markers are returned, mirroring the two realistic ways an attribute is
