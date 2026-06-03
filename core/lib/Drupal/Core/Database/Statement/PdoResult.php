@@ -63,11 +63,11 @@ class PdoResult extends ResultBase {
   /**
    * {@inheritdoc}
    */
-  public function fetch(?FetchAs $mode, ?array $fetchOptions = NULL): array|object|int|float|string|bool|NULL {
+  public function fetch(FetchAs $mode, array $fetchOptions): array|object|int|float|string|bool|NULL {
     if (!empty($fetchOptions)) {
-      $this->setFetchMode($mode ?? $this->fetchMode, $fetchOptions);
+      $this->setFetchMode($mode, $fetchOptions);
     }
-    $row = $this->clientFetch($mode ?? $this->fetchMode);
+    $row = $this->clientFetch($mode);
     if ($row === FALSE) {
       $this->markResultsetFetchingComplete();
       return FALSE;
@@ -79,7 +79,7 @@ class PdoResult extends ResultBase {
   /**
    * {@inheritdoc}
    */
-  public function fetchAll(?FetchAs $mode, ?array $fetchOptions = NULL): array {
+  public function fetchAll(FetchAs $mode, array $fetchOptions): array {
     $result = $this->clientFetchAll($mode, $fetchOptions['column'] ?? $fetchOptions['class'] ?? NULL, $fetchOptions['constructor_args'] ?? NULL);
     $this->markResultsetFetchingComplete();
     return $result;

@@ -246,7 +246,7 @@ abstract class StatementBase implements \Iterator, StatementInterface {
    * {@inheritdoc}
    */
   public function fetch(?FetchAs $mode = NULL) {
-    return $this->result->fetch($mode);
+    return $this->result->fetch($mode ?? $this->result->fetchMode, $this->result->fetchOptions);
   }
 
   /**
@@ -287,7 +287,7 @@ abstract class StatementBase implements \Iterator, StatementInterface {
       $fetchOptions['constructor_args'] = $constructorArguments;
     }
 
-    return $this->result->fetchAll($mode, $fetchOptions);
+    return $this->result->fetchAll($mode ?? $this->result->fetchMode, $fetchOptions ?? $this->result->fetchOptions);
   }
 
   /**
@@ -301,7 +301,7 @@ abstract class StatementBase implements \Iterator, StatementInterface {
    * {@inheritdoc}
    */
   public function fetchAllAssoc(string $key, ?FetchAs $fetch = NULL) {
-    return $this->result->fetchAllAssoc($key, $fetch);
+    return $this->result->fetchAllAssoc($key, $fetch ?? $this->result->fetchMode, $this->result->fetchOptions);
   }
 
   /**

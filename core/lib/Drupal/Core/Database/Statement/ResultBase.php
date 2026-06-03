@@ -99,23 +99,23 @@ abstract class ResultBase implements \Iterator {
    * @return array|object|int|float|string|bool|null
    *   A result, formatted according to $mode, or FALSE on failure.
    */
-  abstract public function fetch(?FetchAs $mode, ?array $fetchOptions = NULL): array|object|int|float|string|bool|NULL;
+  abstract public function fetch(FetchAs $mode, array $fetchOptions): array|object|int|float|string|bool|NULL;
 
   /**
    * Returns an array containing all of the result set rows.
    *
-   * @param \Drupal\Core\Database\Statement\FetchAs|null $mode
-   *   One of the cases of the FetchAs enum, or NULL to use current mode.
-   * @param array{class?: class-string, constructor_args?: list<mixed>, column?: int, cursor_orientation?: int, cursor_offset?: int}|null $fetchOptions
-   *   An array of fetch options, or NULL to use the current options.
+   * @param \Drupal\Core\Database\Statement\FetchAs $mode
+   *   One of the cases of the FetchAs enum.
+   * @param array{class?: class-string, constructor_args?: list<mixed>, column?: int, cursor_orientation?: int, cursor_offset?: int} $fetchOptions
+   *   An array of fetch options.
    *
    * @return array
    *   An array of results.
    */
-  public function fetchAll(?FetchAs $mode, ?array $fetchOptions = NULL): array {
+  public function fetchAll(FetchAs $mode, array $fetchOptions): array {
     $result = [];
     while ($rowAssoc = $this->fetch(FetchAs::Associative, $fetchOptions)) {
-      $result[] = $this->assocToFetchMode($rowAssoc, $mode ?? $this->fetchMode, $fetchOptions ?? $this->fetchOptions);
+      $result[] = $this->assocToFetchMode($rowAssoc, $mode, $fetchOptions);
     }
     return $result;
   }
@@ -167,10 +167,10 @@ abstract class ResultBase implements \Iterator {
    * @return array
    *   An associative array, or an empty array if there is no result set.
    */
-  public function fetchAllAssoc(string $column, ?FetchAs $mode = NULL, ?array $fetchOptions = NULL): array {
+  public function fetchAllAssoc(string $column, FetchAs $mode, array $fetchOptions): array {
     $result = [];
     while ($rowAssoc = $this->fetch(FetchAs::Associative, [])) {
-      $result[$rowAssoc[$column]] = $this->assocToFetchMode($rowAssoc, $mode ?? $this->fetchMode, $fetchOptions ?? $this->fetchOptions);
+      $result[$rowAssoc[$column]] = $this->assocToFetchMode($rowAssoc, $mode, $fetchOptions);
     }
     return $result;
   }

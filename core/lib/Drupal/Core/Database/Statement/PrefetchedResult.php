@@ -63,7 +63,7 @@ class PrefetchedResult extends ResultBase {
   /**
    * {@inheritdoc}
    */
-  public function fetch(?FetchAs $mode, ?array $fetchOptions = NULL): array|object|int|float|string|bool|NULL {
+  public function fetch(FetchAs $mode, array $fetchOptions): array|object|int|float|string|bool|NULL {
     $this->currentRowIndex++;
     if (!isset($this->data[$this->currentRowIndex])) {
       $this->currentRowIndex = NULL;
@@ -72,7 +72,7 @@ class PrefetchedResult extends ResultBase {
     }
     $rowAssoc = $this->data[$this->currentRowIndex];
     unset($this->data[$this->currentRowIndex]);
-    $row = $this->assocToFetchMode($rowAssoc, $mode ?? $this->fetchMode, $fetchOptions ?? $this->fetchOptions);
+    $row = $this->assocToFetchMode($rowAssoc, $mode, $fetchOptions);
     $this->setResultsetCurrentRow($row);
     return $row;
   }
