@@ -19,13 +19,6 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
   use LoggerChannelTrait;
 
   /**
-   * The current active user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $currentUser;
-
-  /**
    * Local cache for language negotiation method instances.
    *
    * @var array
@@ -47,6 +40,7 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
     protected ConfigFactoryInterface $configFactory,
     protected Settings $settings,
     protected RequestStack $requestStack,
+    protected AccountInterface $currentUser,
   ) {}
 
   /**
