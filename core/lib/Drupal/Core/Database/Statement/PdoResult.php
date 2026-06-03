@@ -76,7 +76,9 @@ class PdoResult extends ResultBase {
       $this->setFetchMode($mode, $fetchOptions);
     }
     $row = $this->clientFetch($mode);
-    if ($row === FALSE) {
+    // PostgreSql returns a \stdClass object with no content when fetching on
+    // a result from a DML statement.
+    if ($row === FALSE || ($mode === FetchAs::Object && empty((array) $row))) {
       $this->markResultsetFetchingComplete();
       return FALSE;
     }

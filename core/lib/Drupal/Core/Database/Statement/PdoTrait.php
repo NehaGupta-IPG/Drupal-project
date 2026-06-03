@@ -107,7 +107,7 @@ trait PdoTrait {
       ),
       FetchAs::ClassObject => $this->getClientStatement()->setFetchMode(
         \PDO::FETCH_CLASS,
-        $columnOrClass ?? $this->fetchOptions['class'] ?? 'stdClass',
+        $columnOrClass ?? $this->fetchOptions['class'] ?? \stdClass::class,
         $constructorArguments ?? $this->fetchOptions['constructor_args'] ?? [],
       ),
       default => $this->getClientStatement()->setFetchMode(
@@ -213,7 +213,7 @@ trait PdoTrait {
       ),
       FetchAs::ClassObject => $this->getClientStatement()->fetchAll(
         \PDO::FETCH_CLASS,
-        $columnOrClass ?? $this->fetchOptions['class'] ?? 'stdClass',
+        $columnOrClass ?? $this->fetchOptions['class'] ?? \stdClass::class,
         $constructorArguments ?? $this->fetchOptions['constructor_args'] ?? [],
       ),
       default => $this->getClientStatement()->fetchAll(
