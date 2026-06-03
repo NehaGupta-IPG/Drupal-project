@@ -11,6 +11,7 @@ use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Link;
+use Drupal\Core\Menu\Attribute\MenuLink;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -63,6 +64,11 @@ class SystemController extends ControllerBase {
       'link_id' => 'system.admin_config',
       '_title' => new TranslatableMarkup('Configuration'),
     ],
+  )]
+  #[MenuLink(
+    title: new TranslatableMarkup('Configuration'),
+    description: new TranslatableMarkup('Administer settings.'),
+    parent: 'system.admin',
   )]
   public function overview($link_id) {
     // Check for status report errors.
@@ -154,11 +160,24 @@ class SystemController extends ControllerBase {
     requirements: ['_permission' => 'access administration pages'],
     defaults: ['_title' => new TranslatableMarkup('Administration')],
   )]
+  #[MenuLink(
+    title: new TranslatableMarkup('Administration'),
+    menu_name: 'admin',
+    weight: 9,
+    route: 'system.admin',
+  )]
   #[Route(
     path: '/admin/structure',
     name: 'system.admin_structure',
     requirements: ['_permission' => 'access administration pages'],
     defaults: ['_title' => new TranslatableMarkup('Structure')],
+  )]
+  #[MenuLink(
+    title: new TranslatableMarkup('Structure'),
+    description: new TranslatableMarkup('Administer blocks, content types, menus, etc.'),
+    parent: 'system.admin',
+    weight: -8,
+    route: 'system.admin_structure',
   )]
   #[Route(
     path: '/admin/reports',
@@ -166,11 +185,24 @@ class SystemController extends ControllerBase {
     requirements: ['_permission' => 'access site reports'],
     defaults: ['_title' => new TranslatableMarkup('Reports')],
   )]
+  #[MenuLink(
+    title: new TranslatableMarkup('Reports'),
+    description: new TranslatableMarkup('View reports, updates, and errors.'),
+    parent: 'system.admin',
+    weight: 5,
+    route: 'system.admin_reports',
+  )]
   #[Route(
     path: '/admin/config/media',
     name: 'system.admin_config_media',
     requirements: ['_permission' => 'access administration pages'],
     defaults: ['_title' => new TranslatableMarkup('Media')],
+  )]
+  #[MenuLink(
+    title: new TranslatableMarkup('Media'),
+    parent: 'system.admin_config',
+    weight: -10,
+    route: 'system.admin_config_media',
   )]
   #[Route(
     path: '/admin/config/services',
@@ -178,11 +210,23 @@ class SystemController extends ControllerBase {
     requirements: ['_permission' => 'access administration pages'],
     defaults: ['_title' => new TranslatableMarkup('Web services')],
   )]
+  #[MenuLink(
+    title: new TranslatableMarkup('Web services'),
+    parent: 'system.admin_config',
+    route: 'system.admin_config_services',
+  )]
   #[Route(
     path: '/admin/config/development',
     name: 'system.admin_config_development',
     requirements: ['_permission' => 'access administration pages'],
     defaults: ['_title' => new TranslatableMarkup('Development')],
+  )]
+  #[MenuLink(
+    title: new TranslatableMarkup('Development'),
+    description: new TranslatableMarkup('Configure and use development tools.'),
+    parent: 'system.admin_config',
+    weight: -10,
+    route: 'system.admin_config_development',
   )]
   #[Route(
     path: '/admin/config/regional',
@@ -190,11 +234,25 @@ class SystemController extends ControllerBase {
     requirements: ['_permission' => 'access administration pages'],
     defaults: ['_title' => new TranslatableMarkup('Region and language')],
   )]
+  #[MenuLink(
+    title: new TranslatableMarkup('Region and language'),
+    description: new TranslatableMarkup('Configure regional settings, localization, and translation.'),
+    parent: 'system.admin_config',
+    weight: -5,
+    route: 'system.admin_config_regional',
+  )]
   #[Route(
     path: '/admin/config/search',
     name: 'system.admin_config_search',
     requirements: ['_permission' => 'access administration pages'],
     defaults: ['_title' => new TranslatableMarkup('Search and metadata')],
+  )]
+  #[MenuLink(
+    title: new TranslatableMarkup('Search and metadata'),
+    description: new TranslatableMarkup('Configure site search, metadata, and search engine optimization.'),
+    parent: 'system.admin_config',
+    weight: -10,
+    route: 'system.admin_config_search',
   )]
   #[Route(
     path: '/admin/config/system',
@@ -202,11 +260,25 @@ class SystemController extends ControllerBase {
     requirements: ['_permission' => 'access administration pages'],
     defaults: ['_title' => new TranslatableMarkup('System')],
   )]
+  #[MenuLink(
+    title: new TranslatableMarkup('System'),
+    description: new TranslatableMarkup('Configure basic site settings, actions, and cron.'),
+    parent: 'system.admin_config',
+    weight: -20,
+    route: 'system.admin_config_system',
+  )]
   #[Route(
     path: '/admin/config/user-interface',
     name: 'system.admin_config_ui',
     requirements: ['_permission' => 'access administration pages'],
     defaults: ['_title' => new TranslatableMarkup('User interface')],
+  )]
+  #[MenuLink(
+    title: new TranslatableMarkup('User interface'),
+    description: new TranslatableMarkup('Configure the administrative user interface.'),
+    parent: 'system.admin_config',
+    weight: -15,
+    route: 'system.admin_config_ui',
   )]
   #[Route(
     path: '/admin/config/workflow',
@@ -214,17 +286,38 @@ class SystemController extends ControllerBase {
     requirements: ['_permission' => 'access administration pages'],
     defaults: ['_title' => new TranslatableMarkup('Workflow')],
   )]
+  #[MenuLink(
+    title: new TranslatableMarkup('Workflow'),
+    description: new TranslatableMarkup('Manage the content workflow.'),
+    parent: 'system.admin_config',
+    weight: 5,
+    route: 'system.admin_config_workflow',
+  )]
   #[Route(
     path: '/admin/config/content',
     name: 'system.admin_config_content',
     requirements: ['_permission' => 'access administration pages'],
     defaults: ['_title' => new TranslatableMarkup('Content authoring')],
   )]
+  #[MenuLink(
+    title: new TranslatableMarkup('Content authoring'),
+    description: new TranslatableMarkup('Configure content formatting and authoring.'),
+    parent: 'system.admin_config',
+    weight: -15,
+    route: 'system.admin_config_content',
+  )]
   #[Route(
     path: '/admin/content',
     name: 'system.admin_content',
     requirements: ['_permission' => 'access administration pages'],
     defaults: ['_title' => new TranslatableMarkup('Content')],
+  )]
+  #[MenuLink(
+    title: new TranslatableMarkup('Content'),
+    description: new TranslatableMarkup('Find and manage content.'),
+    parent: 'system.admin',
+    weight: -10,
+    route: 'system.admin_content',
   )]
   public function systemAdminMenuBlockPage() {
     return $this->systemManager->getBlockContents();
@@ -243,6 +336,12 @@ class SystemController extends ControllerBase {
     name: 'system.themes_page',
     requirements: ['_permission' => 'administer themes'],
     defaults: ['_title' => new TranslatableMarkup('Appearance')],
+  )]
+  #[MenuLink(
+    title: new TranslatableMarkup('Appearance'),
+    description: new TranslatableMarkup('Select and configure themes.'),
+    parent: 'system.admin',
+    weight: -6,
   )]
   public function themesPage() {
     $config = $this->config('system.theme');
