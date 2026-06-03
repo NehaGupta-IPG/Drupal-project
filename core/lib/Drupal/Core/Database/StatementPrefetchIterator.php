@@ -77,29 +77,27 @@ class StatementPrefetchIterator extends StatementBase {
       throw $e;
     }
 
+    if (isset($options['fetch'])) {
+      if (is_string($options['fetch'])) {
+        $fetchMode = FetchAs::ClassObject;
+        $fetchOptions = ['class' => $options['fetch']];
+      }
+      else {
+        $fetchMode = $options['fetch'];
+      }
+    }
+
     // Fetch all the data from the reply, in order to release any lock as soon
     // as possible. Then, destroy the client statement. See the documentation
     // of \Drupal\sqlite\Driver\Database\sqlite\Statement for an explanation.
     $this->result = new PrefetchedResult(
-      FetchAs::Object,
-      [],
+      $fetchMode ?? FetchAs::Object,
+      $fetchOptions ?? [],
       $this->getClientStatement()->fetchAll(\PDO::FETCH_ASSOC),
       $this->rowCountEnabled ? $this->getClientStatement()->rowCount() : NULL,
       $return,
     );
     $this->clientStatement = NULL;
-
-    if (isset($options['fetch'])) {
-      if (is_string($options['fetch'])) {
-        // Default to an object. Note: db fields will be added to the object
-        // before the constructor is run. If you need to assign fields after
-        // the constructor is run. See https://www.drupal.org/node/315092.
-        $this->setFetchMode(FetchAs::ClassObject, $options['fetch']);
-      }
-      else {
-        $this->setFetchMode($options['fetch']);
-      }
-    }
 
     $this->dispatchStatementExecutionEndEvent($startEvent);
 

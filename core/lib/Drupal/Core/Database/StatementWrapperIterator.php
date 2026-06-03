@@ -66,20 +66,23 @@ class StatementWrapperIterator extends StatementBase {
 
     try {
       $return = $this->getClientStatement()->execute($args);
+
+      if (isset($options['fetch'])) {
+        if (is_string($options['fetch'])) {
+          $fetchMode = FetchAs::ClassObject;
+          $fetchOptions = ['class' => $options['fetch']];
+        }
+        else {
+          $fetchMode = $options['fetch'];
+        }
+      }
+
       $this->result = new PdoResult(
-        FetchAs::Object,
-        [],
+        $fetchMode ?? FetchAs::Object,
+        $fetchOptions ?? [],
         $this->getClientStatement(),
         $return,
       );
-      if (isset($options['fetch'])) {
-        if (is_string($options['fetch'])) {
-          $this->setFetchMode(FetchAs::ClassObject, $options['fetch']);
-        }
-        else {
-          $this->setFetchMode($options['fetch']);
-        }
-      }
     }
     catch (\Exception $e) {
       $this->dispatchStatementExecutionFailureEvent($startEvent, $e);

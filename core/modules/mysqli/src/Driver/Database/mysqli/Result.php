@@ -11,6 +11,8 @@ use Drupal\Core\Database\Statement\ResultBase;
 
 /**
  * Class for mysqli-provided results of a data query language (DQL) statement.
+ *
+ * @phpstan-import-type FetchOptions from \Drupal\Core\Database\Statement\ResultBase
  */
 class Result extends ResultBase {
 
@@ -19,6 +21,10 @@ class Result extends ResultBase {
   /**
    * Constructor.
    *
+   * @param \Drupal\Core\Database\Statement\FetchAs $fetchMode
+   *   The fetch mode.
+   * @param FetchOptions $fetchOptions
+   *   The fetch options.
    * @param \mysqli_result|false $mysqliResult
    *   The MySQLi result object.
    * @param \mysqli $mysqliConnection
@@ -28,11 +34,13 @@ class Result extends ResultBase {
    *   failure.
    */
   public function __construct(
+    FetchAs $fetchMode,
+    array $fetchOptions,
     protected readonly \mysqli_result|false $mysqliResult,
     protected readonly \mysqli $mysqliConnection,
     bool $valid,
   ) {
-    parent::__construct($valid && (bool) $mysqliResult);
+    parent::__construct($fetchMode, $fetchOptions, $valid && (bool) $mysqliResult);
   }
 
   /**
@@ -69,7 +77,7 @@ class Result extends ResultBase {
    */
   public function setFetchMode(FetchAs $mode, array $fetchOptions): bool {
     $this->fetchMode = $mode;
-    $this->fetchOptions = array_merge($this->fetchOptions, $fetchOptions);
+    $this->fetchOptions = $fetchOptions;
     // There are no methods to set fetch mode in \mysqli_result.
     return TRUE;
   }
@@ -77,7 +85,7 @@ class Result extends ResultBase {
   /**
    * {@inheritdoc}
    */
-  public function fetch(?FetchAs $mode, ?array $fetchOptions = NULL): array|object|int|float|string|bool|NULL {
+  public function fetch(FetchAs $mode, array $fetchOptions): array|object|int|float|string|bool|NULL {
     if ($this->mysqliResult === FALSE) {
       return FALSE;
     }
@@ -94,7 +102,7 @@ class Result extends ResultBase {
     // Stringify all non-NULL column values.
     $row = array_map(fn ($value) => $value === NULL ? NULL : (string) $value, $mysqli_row);
 
-    $row = $this->assocToFetchMode($row, $mode ?? $this->fetchMode, $fetchOptions ?? $this->fetchOptions);
+    $row = $this->assocToFetchMode($row, $mode, $fetchOptions);
     $this->setResultsetCurrentRow($row);
     return $row;
   }
