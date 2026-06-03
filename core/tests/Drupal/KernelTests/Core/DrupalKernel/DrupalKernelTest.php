@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\DrupalKernel;
 
 use Composer\Autoload\ClassLoader;
+use Drupal\Core\AppContext;
 use Drupal\Core\Config\ConfigInstallerInterface;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\DrupalKernelInterface;
+use Drupal\Core\Runtime\AppContextTrait;
 use Drupal\KernelTests\KernelTestBase;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -28,6 +30,10 @@ use Symfony\Component\HttpFoundation\Request;
 #[Group('DrupalKernel')]
 #[RunTestsInSeparateProcesses]
 class DrupalKernelTest extends KernelTestBase {
+
+  use AppContextTrait {
+    getBaseUrlAndPath as private;
+  }
 
   /**
    * {@inheritdoc}
@@ -64,7 +70,17 @@ class DrupalKernelTest extends KernelTestBase {
   protected function getTestKernel(Request $request, ?array $modules_enabled = NULL) {
     // Manually create kernel to avoid replacing settings.
     $class_loader = require $this->root . '/autoload.php';
-    $kernel = DrupalKernel::createFromRequest($request, $class_loader, 'testing');
+    [
+      'base_path' => $base_path,
+      'base_url' => $base_url,
+    ] = $this->getBaseUrlAndPath($request);
+    $app_context = new AppContext(
+      $this->root,
+      $this->siteDirectory,
+      $base_url,
+      $base_path,
+    );
+    $kernel = DrupalKernel::createFromRequest($request, $class_loader, 'testing', TRUE, $app_context);
     $this->setSetting('container_yamls', []);
     $this->setSetting('hash_salt', $this->databasePrefix);
     if (isset($modules_enabled)) {
@@ -193,6 +209,16 @@ class DrupalKernelTest extends KernelTestBase {
   public function testRepeatedBootWithDifferentEnvironment(): void {
     $request = Request::createFromGlobals();
     $class_loader = require $this->root . '/autoload.php';
+    [
+      'base_path' => $base_path,
+      'base_url' => $base_url,
+    ] = $this->getBaseUrlAndPath($request);
+    $app_context = new AppContext(
+      $this->root,
+      $this->siteDirectory,
+      $base_url,
+      $base_path,
+    );
 
     $environments = [
       'testing1',
@@ -202,7 +228,7 @@ class DrupalKernelTest extends KernelTestBase {
     ];
 
     foreach ($environments as $environment) {
-      $kernel = DrupalKernel::createFromRequest($request, $class_loader, $environment);
+      $kernel = DrupalKernel::createFromRequest($request, $class_loader, $environment, TRUE, $app_context);
       $this->setSetting('container_yamls', []);
       $this->setSetting('hash_salt', $this->databasePrefix);
       $this->assertInstanceOf(DrupalKernelInterface::class, $kernel->boot(), "Environment $environment should boot.");
@@ -223,6 +249,9 @@ class DrupalKernelTest extends KernelTestBase {
     $kernel = $this->getTestKernel($request, $modules_enabled);
     $pass = FALSE;
     try {
+      // This tests specific behavior of the deprecated method so it can not be
+      // removed yet.
+      // @phpstan-ignore-next-line method.deprecated
       $kernel->setSitePath('/dev/null');
     }
     catch (\LogicException) {
@@ -232,7 +261,13 @@ class DrupalKernelTest extends KernelTestBase {
 
     // Ensure no LogicException if DrupalKernel::setSitePath() is called with
     // identical path after boot.
+    // This tests specific behavior of the deprecated method so it can not be
+    // removed yet.
+    // @phpstan-ignore-next-line method.deprecated
     $path = $kernel->getSitePath();
+    // This tests specific behavior of the deprecated method so it can not be
+    // removed yet.
+    // @phpstan-ignore-next-line method.deprecated
     $kernel->setSitePath($path);
   }
 
@@ -294,8 +329,13 @@ class DrupalKernelTest extends KernelTestBase {
     }
 
     // Create a kernel suitable for testing.
-    $kernel = new DrupalKernel('test', $classloader->reveal(), FALSE, vfsStream::url('root'));
-    $kernel->setSitePath(vfsStream::url('root/sites/default'));
+    $app_context = new AppContext(
+      vfsStream::url('root'),
+      vfsStream::url('root/sites/default'),
+      '',
+      '/',
+    );
+    $kernel = new DrupalKernel('test', $classloader->reveal(), FALSE, $app_context);
     $kernel->boot();
   }
 

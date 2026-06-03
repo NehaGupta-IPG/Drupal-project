@@ -3,8 +3,8 @@
 namespace Drupal\Core\StreamWrapper;
 
 use Drupal\Component\Utility\UrlHelper;
-use Drupal\Core\DrupalKernel;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StaticAppContextProvider;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -112,7 +112,7 @@ class PublicStream extends LocalStream {
       else {
         // If there is no kernel available yet, we call the static
         // findSitePath().
-        $site_path = DrupalKernel::findSitePath(Request::createFromGlobals());
+        $site_path = StaticAppContextProvider::findSitePath(Request::createFromGlobals());
       }
     }
     return Settings::get('file_public_path', $site_path . '/files');

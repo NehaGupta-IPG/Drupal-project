@@ -9,6 +9,7 @@
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StaticAppContextProvider;
 use Symfony\Component\HttpFoundation\Request;
 
 if (PHP_SAPI !== 'cli') {
@@ -18,7 +19,7 @@ if (PHP_SAPI !== 'cli') {
 $autoloader = require __DIR__ . '/../../autoload.php';
 
 $request = Request::createFromGlobals();
-Settings::initialize(DRUPAL_ROOT, DrupalKernel::findSitePath($request), $autoloader);
+Settings::initialize(DRUPAL_ROOT, StaticAppContextProvider::findSitePath($request), $autoloader);
 
 $timestamp = time();
 $token = Crypt::hmacBase64($timestamp, Settings::get('hash_salt'));

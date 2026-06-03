@@ -16,6 +16,7 @@ use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\Session\UserSession;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Site\SettingsEditor;
+use Drupal\Core\StaticAppContextProvider;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Tests\SessionTestTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -430,7 +431,8 @@ trait FunctionalTestSetupTrait {
    *   The container.
    */
   protected function initKernel(Request $request) {
-    $this->kernel = DrupalKernel::createFromRequest($request, $this->classLoader, 'prod', TRUE);
+    $this->appContext = StaticAppContextProvider::getAppContext($request);
+    $this->kernel = DrupalKernel::createFromRequest($request, $this->classLoader, 'prod', TRUE, $this->appContext);
     $this->kernel->boot();
     // Add our request to the stack and route context.
     $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, new Route('<none>'));
@@ -663,15 +665,16 @@ trait FunctionalTestSetupTrait {
    * filesystem and configuration directories.
    */
   protected function prepareEnvironment() {
-    // Bootstrap Drupal so we can use Drupal's built in functions.
-    $this->classLoader = require __DIR__ . '/../../../../../autoload.php';
     $request = Request::createFromGlobals();
-    $kernel = TestRunnerKernel::createFromRequest($request, $this->classLoader);
+    $app_context = StaticAppContextProvider::getAppContext($request);
+    // Bootstrap Drupal so we can use Drupal's built in functions.
+    $this->classLoader = require $app_context->getAppRoot() . '/autoload.php';
+    $kernel = TestRunnerKernel::createFromRequest($request, $this->classLoader, 'test_runner', TRUE, $app_context);
     $kernel->boot();
     $kernel->preHandle($request);
     $this->prepareDatabasePrefix();
 
-    $this->originalSite = $kernel->findSitePath($request);
+    $this->originalSite = $app_context->getSitePath();
 
     // Create test directory ahead of installation so fatal errors and debug
     // information can be logged during installation process.

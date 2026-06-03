@@ -7,9 +7,12 @@ namespace Drupal\Core\Command;
 use Composer\Autoload\ClassLoader;
 use Composer\Semver\VersionParser;
 use Drupal\Component\Serialization\Yaml;
+use Drupal\Core\AppContext;
+use Drupal\Core\AppContextInterface;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Extension\InfoParser;
+use Drupal\Core\StaticAppContextProvider;
 use Drupal\Core\Theme\StarterKitInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Filesystem\Filesystem;
@@ -30,11 +33,9 @@ use function Symfony\Component\String\u;
 class GenerateTheme extends Command {
 
   /**
-   * The path for the Drupal root.
-   *
-   * @var string
+   * The application context for Drupal.
    */
-  private $root;
+  private AppContextInterface $appContext;
 
   /**
    * GenerateTheme constructor.
@@ -42,13 +43,30 @@ class GenerateTheme extends Command {
    * @param string|null $name
    *   The name of the command; passing null means it must be set in
    *   configure().
-   * @param string|null $root
-   *   The path for the Drupal root.
+   * @param \Drupal\Core\AppContextInterface|string|null $app_context
+   *   The path for the Drupal root. Providing a string or NULL is deprecated
+   *   in Drupal 11.4.0 and will be unsupported in 12.0.0.
    */
-  public function __construct(?string $name = NULL, ?string $root = NULL) {
+  public function __construct(?string $name = NULL, /* \Drupal\Core\AppContextInterface\AppContextInterface */ $app_context = NULL) {
     parent::__construct($name);
 
-    $this->root = $root ?? dirname(__DIR__, 5);
+    if (is_string($app_context)) {
+      @trigger_error('Calling ' . __CLASS__ . '::' . __FUNCTION__ . '() with a second argument of type "string" is deprecated in drupal:11.4.0 and is unsupported in drupal:12.0.0. Provide an AppContext instance instead. See https://www.drupal.org/node/3590362', E_USER_DEPRECATED);
+      $app_root = $app_context;
+      $app_context = StaticAppContextProvider::getAppContext();
+      $app_context = new AppContext(
+        $app_root,
+        $app_context->getSitePath(),
+        $app_context->getBaseUrl(),
+        $app_context->getBasePath(),
+      );
+    }
+    elseif ($app_context === NULL) {
+      @trigger_error('Calling ' . __CLASS__ . '::' . __FUNCTION__ . '() with a second argument of NULL is deprecated in drupal:11.4.0 and is unsupported in drupal:12.0.0. Provide an AppContext instance instead. See https://www.drupal.org/node/3590362', E_USER_DEPRECATED);
+      $app_context = StaticAppContextProvider::getAppContext();
+    }
+
+    $this->appContext = $app_context;
   }
 
   /**
@@ -75,7 +93,7 @@ class GenerateTheme extends Command {
     }
 
     // Change the directory to the Drupal root.
-    chdir($this->root);
+    chdir($this->appContext->getAppRoot());
   }
 
   /**
@@ -260,12 +278,12 @@ class GenerateTheme extends Command {
    *   The extension info array. NULL if the theme_name is not discovered.
    */
   private function getThemeInfo(string $theme_name): ? Extension {
-    $extension_discovery = new ExtensionDiscovery($this->root, FALSE, []);
+    $extension_discovery = new ExtensionDiscovery($this->appContext->getAppRoot(), FALSE, []);
     $themes = $extension_discovery->scan('theme');
 
     $theme = $themes[$theme_name] ?? NULL;
     if ($theme !== NULL) {
-      $theme->info = (new InfoParser($this->root))->parse($theme->getPathname());
+      $theme->info = (new InfoParser($this->appContext->getAppRoot()))->parse($theme->getPathname());
     }
 
     return $theme;

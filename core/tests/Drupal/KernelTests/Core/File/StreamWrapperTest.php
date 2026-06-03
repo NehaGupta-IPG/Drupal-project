@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\File;
 
-use Drupal\Core\DrupalKernel;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StaticAppContextProvider;
 use Drupal\Core\StreamWrapper\PublicStream;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -47,7 +47,7 @@ class StreamWrapperTest extends FileTestBase {
 
     // Add file_private_path setting.
     $request = Request::create('/');
-    $site_path = DrupalKernel::findSitePath($request);
+    $site_path = StaticAppContextProvider::findSitePath($request);
     $this->setSetting('file_private_path', $site_path . '/private');
   }
 

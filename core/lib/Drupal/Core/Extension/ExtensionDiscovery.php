@@ -2,9 +2,9 @@
 
 namespace Drupal\Core\Extension;
 
-use Drupal\Core\DrupalKernel;
 use Drupal\Core\Extension\Discovery\RecursiveExtensionFilterCallback;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StaticAppContextProvider;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -189,7 +189,7 @@ class ExtensionDiscovery {
       $search_dirs[static::ORIGIN_SITE] = \Drupal::getContainer()->getParameter('site.path');
     }
     else {
-      $search_dirs[static::ORIGIN_SITE] = $this->sitePath ?: DrupalKernel::findSitePath(Request::createFromGlobals());
+      $search_dirs[static::ORIGIN_SITE] = $this->sitePath ?: StaticAppContextProvider::findSitePath(Request::createFromGlobals());
     }
 
     // Unless an explicit value has been passed, manually check whether we are

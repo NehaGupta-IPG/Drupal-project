@@ -7,13 +7,13 @@ use Drupal\Component\Utility\Environment;
 use Drupal\Component\Utility\OpCodeCache;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\Database;
-use Drupal\Core\DrupalKernel;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StaticAppContextProvider;
 use Drupal\Core\StreamWrapper\PrivateStream;
 use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\Core\StringTranslation\ByteSizeMarkup;
@@ -569,7 +569,7 @@ class SystemRequirementsHooks {
         $site_path = \Drupal::getContainer()->getParameter('site.path');
       }
       else {
-        $site_path = DrupalKernel::findSitePath(Request::createFromGlobals());
+        $site_path = StaticAppContextProvider::findSitePath(Request::createFromGlobals());
       }
       // Allow system administrators to disable permissions hardening for the
       // site directory. This allows additional files in the site directory to

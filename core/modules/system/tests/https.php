@@ -10,6 +10,7 @@
 
 declare(strict_types=1);
 
+use Drupal\Core\StaticAppContextProvider;
 use Drupal\Core\Test\TestKernel;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -27,9 +28,11 @@ foreach ($_SERVER as &$value) {
   $value = str_replace('http://', 'https://', $value);
 }
 
-$kernel = new TestKernel('testing', $autoloader, TRUE);
-
 $request = Request::createFromGlobals();
+
+$app_context = StaticAppContextProvider::getAppContext($request);
+$kernel = new TestKernel('testing', $autoloader, TRUE, $app_context);
+
 $response = $kernel->handle($request);
 $response->send();
 

@@ -6,11 +6,13 @@ namespace Drupal\Tests\Core\DrupalKernel;
 
 use Composer\Autoload\ClassLoader;
 use Drupal\Core\DrupalKernel;
+use Drupal\Core\StaticAppContextProvider;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -116,6 +118,7 @@ class DrupalKernelTest extends UnitTestCase {
    * This test is run in a separate process since it defines DRUPAL_ROOT. This
    * stops any possible pollution of other tests.
    */
+  #[IgnoreDeprecations]
   #[RunInSeparateProcess]
   public function testFindSitePath(): void {
     $vfs_root = vfsStream::setup('drupal_root');
@@ -149,7 +152,8 @@ EOD;
    */
   #[RunInSeparateProcess]
   public function testUnBootedTerminate(): void {
-    $kernel = new DrupalKernel('test', new ClassLoader());
+    $app_context = StaticAppContextProvider::getAppContext();
+    $kernel = new DrupalKernel('test', new ClassLoader(), TRUE, $app_context);
     $kernel->terminate(new Request(), new Response());
     $this->assertTrue(TRUE, "\Drupal\Core\DrupalKernel::terminate() called without error on kernel which has not booted");
   }

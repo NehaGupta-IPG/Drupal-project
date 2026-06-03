@@ -3,6 +3,7 @@
 namespace Drupal\Core\Command;
 
 use Drupal\Component\Utility\Crypt;
+use Drupal\Core\AppContextInterface;
 use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DrupalKernel;
@@ -39,8 +40,13 @@ class InstallCommand extends Command {
    *
    * @param object $class_loader
    *   The class loader.
+   * @param \Drupal\Core\AppContextInterface $appContext
+   *   The application context.
    */
-  public function __construct($class_loader) {
+  public function __construct(
+    $class_loader,
+    protected AppContextInterface $appContext,
+  ) {
     parent::__construct('install');
     $this->classLoader = $class_loader;
   }
@@ -73,7 +79,7 @@ class InstallCommand extends Command {
     }
 
     // Change the directory to the Drupal root.
-    chdir(dirname(__DIR__, 5));
+    chdir($this->appContext->getAppRoot());
 
     // Check whether there is already an installation.
     if ($this->isDrupalInstalled()) {
@@ -130,10 +136,9 @@ class InstallCommand extends Command {
    */
   protected function isDrupalInstalled() {
     try {
-      $kernel = new DrupalKernel('prod', $this->classLoader, FALSE);
-      $kernel::bootEnvironment();
-      $kernel->setSitePath($this->getSitePath());
-      Settings::initialize($kernel->getAppRoot(), $kernel->getSitePath(), $this->classLoader);
+      $kernel = new DrupalKernel('prod', $this->classLoader, FALSE, $this->appContext);
+      $kernel::bootEnvironment($this->appContext->getAppRoot());
+      Settings::initialize($this->appContext->getAppRoot(), $this->appContext->getSitePath(), $this->classLoader);
       $kernel->boot();
     }
     catch (ConnectionNotDefinedException) {

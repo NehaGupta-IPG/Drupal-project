@@ -83,6 +83,10 @@ interface DrupalKernelInterface extends HttpKernelInterface {
    *
    * @throws \LogicException
    *   In case the kernel is already booted.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Provide an
+   *     AppContextInterface class to the constructor instead.
+   * @see https://www.drupal.org/node/3590362
    */
   public function setSitePath($path);
 
@@ -91,6 +95,10 @@ interface DrupalKernelInterface extends HttpKernelInterface {
    *
    * @return string
    *   The current site path directory.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Access the
+   *      AppContext instance outside of the Kernel instead.
+   * @see https://www.drupal.org/node/3590362
    */
   public function getSitePath();
 
@@ -99,6 +107,10 @@ interface DrupalKernelInterface extends HttpKernelInterface {
    *
    * @return string
    *   The path of the application root.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Access the
+   *       AppContext instance outside of the Kernel instead.
+   * @see https://www.drupal.org/node/3590362
    */
   public function getAppRoot();
 

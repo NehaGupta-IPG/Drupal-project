@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\DrupalKernel;
+use Drupal\Core\StaticAppContextProvider;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -28,8 +29,8 @@ function drupal_rebuild($class_loader, Request $request): void {
 
   // Invalidate the container.
   // Bootstrap up to where caches exist and clear them.
-  $kernel = new DrupalKernel('prod', $class_loader);
-  $kernel->setSitePath(DrupalKernel::findSitePath($request));
+  $app_context = StaticAppContextProvider::getAppContext($request);
+  $kernel = new DrupalKernel('prod', $class_loader, TRUE, $app_context);
   $kernel->invalidateContainer();
   $kernel->boot();
   $kernel->preHandle($request);

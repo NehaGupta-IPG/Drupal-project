@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Command;
 
+use Drupal\Core\AppContextInterface;
 use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\DrupalKernelInterface;
@@ -37,8 +38,13 @@ class ServerCommand extends Command {
    *
    * @param object $class_loader
    *   The class loader.
+   * @param \Drupal\Core\AppContextInterface $appContext
+   *   The application context.
    */
-  public function __construct($class_loader) {
+  public function __construct(
+    $class_loader,
+    protected AppContextInterface $appContext,
+  ) {
     parent::__construct('server');
     $this->classLoader = $class_loader;
   }
@@ -83,23 +89,23 @@ class ServerCommand extends Command {
   /**
    * Boots up a Drupal environment.
    *
-   * @return \Drupal\Core\DrupalKernelInterface
-   *   The Drupal kernel.
+   * @return \Drupal\Core\DrupalKernel
+   *   The Drupal Kernel.
    *
    * @throws \Exception
    *   Exception thrown if kernel does not boot.
    */
   protected function boot() {
-    $kernel = new DrupalKernel('prod', $this->classLoader, FALSE);
-    $kernel::bootEnvironment();
-    $kernel->setSitePath($this->getSitePath());
-    Settings::initialize($kernel->getAppRoot(), $kernel->getSitePath(), $this->classLoader);
+    $request = Request::createFromGlobals();
+    $kernel = new DrupalKernel('prod', $this->classLoader, FALSE, $this->appContext);
+    $kernel::bootEnvironment($this->appContext->getAppRoot());
+    Settings::initialize($this->appContext->getAppRoot(), $this->appContext->getSitePath(), $this->classLoader);
     $kernel->boot();
     // Some services require a request to work. For example, CommentManager.
     // This is needed as generating the URL fires up entity load hooks.
     $kernel->getContainer()
       ->get('request_stack')
-      ->push(Request::createFromGlobals());
+      ->push($request);
 
     return $kernel;
   }
@@ -232,7 +238,7 @@ class ServerCommand extends Command {
       '-S',
       $host . ':' . $port,
       '.ht.router.php',
-    ], $kernel->getAppRoot(), [], NULL, NULL);
+    ], $this->appContext->getAppRoot(), [], NULL, NULL);
     if ($io->isVerbose()) {
       $io->writeln("<info>Server command:</info> {$process->getCommandLine()}");
     }
@@ -242,7 +248,7 @@ class ServerCommand extends Command {
     $descriptors[0] = STDIN;
     $descriptors[1] = ['pipe', 'w'];
     $descriptors[2] = ['pipe', 'w'];
-    $server = proc_open($process->getCommandLine(), $descriptors, $pipes, $kernel->getAppRoot());
+    $server = proc_open($process->getCommandLine(), $descriptors, $pipes, $this->appContext->getAppRoot());
     if (is_resource($server)) {
       if ($io->isVerbose()) {
         // Write a blank line so that server output and the useful information

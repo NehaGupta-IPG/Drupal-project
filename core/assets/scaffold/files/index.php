@@ -8,10 +8,11 @@
  * See COPYRIGHT.txt and LICENSE.txt files in the "core" directory.
  */
 
+use Drupal\Core\AppContextInterface;
 use Drupal\Core\DrupalKernel;
 
 require_once 'autoload_runtime.php';
 
-return static function () {
-  return new DrupalKernel('prod', require 'autoload.php');
+return static function (AppContextInterface $app_context) {
+  return new DrupalKernel('prod', require 'autoload.php', TRUE, $app_context);
 };

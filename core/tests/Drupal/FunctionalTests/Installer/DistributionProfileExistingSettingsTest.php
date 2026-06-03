@@ -6,7 +6,7 @@ namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Component\Serialization\Yaml;
 use Drupal\Core\Database\Database;
-use Drupal\Core\DrupalKernel;
+use Drupal\Core\StaticAppContextProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
@@ -70,7 +70,7 @@ class DistributionProfileExistingSettingsTest extends InstallerTestBase {
 
     // Use the kernel to find the site path because the site.path service should
     // not be available at this point in the install process.
-    $site_path = DrupalKernel::findSitePath(Request::createFromGlobals());
+    $site_path = StaticAppContextProvider::findSitePath(Request::createFromGlobals());
     // Pre-configure config directories.
     $this->settings['settings']['config_sync_directory'] = (object) [
       'value' => $site_path . '/files/config_staging',

@@ -3,6 +3,7 @@
 namespace Drupal\Core\Test;
 
 use Drupal\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\AppContextInterface;
 use Drupal\Core\Database\Database;
 
 /**
@@ -75,6 +76,13 @@ trait TestSetupTrait {
    * @see \Drupal\Core\Config\Testing\ConfigSchemaChecker
    */
   protected $strictConfigSchema = TRUE;
+
+  /**
+   * The application context used in the test.
+   *
+   * @var \Drupal\Core\AppContextInterface
+   */
+  protected AppContextInterface $appContext;
 
   /**
    * The DrupalKernel instance used in the test.

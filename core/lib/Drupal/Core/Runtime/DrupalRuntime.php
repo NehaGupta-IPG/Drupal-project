@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Runtime;
 
+use Drupal\Core\AppContextInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Runtime\Internal\MissingDotenv;
 use Symfony\Component\Runtime\SymfonyRuntime;
 
@@ -14,6 +16,13 @@ use Symfony\Component\Runtime\SymfonyRuntime;
  * front-controllers need to instantiate the DrupalKernel.
  */
 class DrupalRuntime extends SymfonyRuntime {
+
+  use AppContextTrait;
+
+  /**
+   * The current request.
+   */
+  private Request $request;
 
   public function __construct(array $options = []) {
     // Unless explicitly opted-in, we disable Symfony's runtime handler.
@@ -38,6 +47,58 @@ class DrupalRuntime extends SymfonyRuntime {
     }
 
     parent::__construct($options);
+  }
+
+  /**
+   * Resolves an argument requested by the front-controller closure.
+   *
+   * @param \ReflectionParameter $parameter
+   *   The reflection information of the parameter that's requested (such
+   *   as the name).
+   * @param string|null $type
+   *   The parameter's type declaration. NULL if the argument is not strictly
+   *   typed.
+   *
+   * @return mixed
+   *   The value that the runtime provides for the requested argument.
+   *
+   * @throws \InvalidArgumentException
+   *   In case the requested parameter and type combination aren't supported by
+   *   the runtime and cannot be resolved to a valid value.
+   */
+  protected function getArgument(\ReflectionParameter $parameter, ?string $type): mixed {
+    // In Symfony 8.1 and later SymfonyRuntime::getArgument will call
+    // resolveType for us, before that we need to do it ourselves.
+    if (!method_exists(SymfonyRuntime::class, 'resolveType')) {
+      return $this->resolveType($type) ?? parent::getArgument($parameter, $type);
+    }
+    return parent::getArgument($parameter, $type);
+  }
+
+  /**
+   * Resolves for the value of a specific type.
+   *
+   * Ensures that types that may be provided by getArgument but also used in the
+   * runtime can be instantiated only once, without having a lot of individual
+   * getter methods or duplicated static var with elvis patterns.
+   *
+   * @param string|null $type
+   *   The type of the variable to retrieve.
+   *
+   * @return mixed
+   *   The value for the resolved type or NULL if the type has no associated
+   *   value.
+   */
+  protected function resolveType(?string $type) {
+    return match ($type) {
+      AppContextInterface::class => $this->getAppContext($this->resolveType(Request::class), !($this->options['disable_multisite'] ?? FALSE)),
+      // This can be removed in symfony/runtime 8.1 as it is then included in
+      // SymfonyRuntime::resolveType.
+      Request::class => $this->request ??= Request::createFromGlobals(),
+      // Until https://github.com/phpstan/phpstan/issues/9592 is fixed.
+      // @phpstan-ignore-next-line staticMethod.notFound
+      default => method_exists(SymfonyRuntime::class, 'resolveType') ? parent::resolveType($type) : NULL,
+    };
   }
 
 }

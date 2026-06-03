@@ -28,7 +28,7 @@ class SitesDirectoryHardeningTest extends BrowserTestBase {
    * Checks both the current sites directory and settings.php.
    */
   public function testSitesDirectoryHardening(): void {
-    $site_path = $this->kernel->getSitePath();
+    $site_path = $this->appContext->getSitePath();
     $settings_file = $this->settingsFile($site_path);
 
     // First, we check based on what the initial install has set.
@@ -49,7 +49,7 @@ class SitesDirectoryHardeningTest extends BrowserTestBase {
    * Tests writable files remain writable when directory hardening is disabled.
    */
   public function testSitesDirectoryHardeningConfig(): void {
-    $site_path = $this->kernel->getSitePath();
+    $site_path = $this->appContext->getSitePath();
     $settings_file = $this->settingsFile($site_path);
 
     // Disable permissions enforcement.

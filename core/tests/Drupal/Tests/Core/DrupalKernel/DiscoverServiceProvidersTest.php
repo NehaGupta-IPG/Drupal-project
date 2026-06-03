@@ -7,6 +7,7 @@ namespace Drupal\Tests\Core\DrupalKernel;
 use Composer\Autoload\ClassLoader;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StaticAppContextProvider;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -30,7 +31,8 @@ class DiscoverServiceProvidersTest extends UnitTestCase {
       ],
     ]);
 
-    $kernel = new DrupalKernel('prod', new ClassLoader());
+    $app_context = StaticAppContextProvider::getAppContext();
+    $kernel = new DrupalKernel('prod', new ClassLoader(), TRUE, $app_context);
     $kernel->discoverServiceProviders();
 
     $reflected_yamls = (new \ReflectionObject($kernel))->getProperty('serviceYamls');
@@ -51,7 +53,8 @@ class DiscoverServiceProvidersTest extends UnitTestCase {
    */
   public function testDiscoverServiceNoContainerYamls(): void {
     new Settings([]);
-    $kernel = new DrupalKernel('prod', new ClassLoader());
+    $app_context = StaticAppContextProvider::getAppContext();
+    $kernel = new DrupalKernel('prod', new ClassLoader(), TRUE, $app_context);
     $kernel->discoverServiceProviders();
 
     $reflected_yamls = (new \ReflectionObject($kernel))->getProperty('serviceYamls');

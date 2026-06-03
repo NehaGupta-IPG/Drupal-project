@@ -5,6 +5,7 @@ namespace Drupal\Core\Test;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Core\DrupalKernel;
+use Drupal\Core\StaticAppContextProvider;
 
 /**
  * Kernel that is only used by mock front controllers.
@@ -14,14 +15,14 @@ class TestKernel extends DrupalKernel {
   /**
    * {@inheritdoc}
    */
-  public function __construct($environment, $class_loader, $allow_dumping = TRUE) {
+  public function __construct($environment, $class_loader, $allow_dumping = TRUE, $app_context = NULL) {
     // Exit if we should be in a test environment but aren't.
     if (!drupal_valid_test_ua()) {
       header($_SERVER['SERVER_PROTOCOL'] . ' 403 Forbidden');
       exit;
     }
 
-    parent::__construct($environment, $class_loader, $allow_dumping);
+    parent::__construct($environment, $class_loader, $allow_dumping, $app_context ?? StaticAppContextProvider::getAppContext());
   }
 
   /**
@@ -32,7 +33,8 @@ class TestKernel extends DrupalKernel {
    */
   public static function setContainerWithKernel() {
     $container = new ContainerBuilder();
-    $kernel = new DrupalKernel('test', NULL);
+    $app_context = StaticAppContextProvider::getAppContext();
+    $kernel = new DrupalKernel('test', NULL, TRUE, $app_context);
     // Objects of the same type will have access to each others private and
     // protected members even though they are not the same instances. This is
     // because the implementation specific details are already known when

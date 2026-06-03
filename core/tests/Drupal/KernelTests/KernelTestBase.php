@@ -21,6 +21,7 @@ use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StaticAppContextProvider;
 use Drupal\Core\Test\EventSubscriber\FieldStorageCreateCheckSubscriber;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\Tests\BrowserHtmlDebugTrait;
@@ -312,8 +313,9 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     }
 
     // Bootstrap the kernel. Do not use createFromRequest() to retain Settings.
-    $kernel = new DrupalKernel('testing', $this->classLoader, FALSE);
-    $kernel->setSitePath($this->siteDirectory);
+    $request = Request::create('/');
+    $app_context = StaticAppContextProvider::getAppContextWithSitePath($request, $this->siteDirectory);
+    $kernel = new DrupalKernel('testing', $this->classLoader, FALSE, $app_context);
     // Boot a new one-time container from scratch. Set the module list upfront
     // to avoid a subsequent rebuild or setting the kernel into the
     // pre-installer mode.
@@ -322,7 +324,6 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
 
     // DrupalKernel::boot() is not sufficient as it does not invoke preHandle(),
     // which is required to initialize legacy global variables.
-    $request = Request::create('/');
     $kernel->boot();
     $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, new Route('<none>'));
     $request->attributes->set(RouteObjectInterface::ROUTE_NAME, '<none>');

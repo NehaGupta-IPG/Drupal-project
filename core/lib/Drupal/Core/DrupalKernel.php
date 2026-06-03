@@ -264,6 +264,16 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   protected static $isEnvironmentInitialized = FALSE;
 
   /**
+   * The application context.
+   *
+   * Contains information about the Drupal directories and the site URL.
+   *
+   * @todo Promote readonly property in Drupal 12 when setSitePath is removed.
+   * @readonly
+   */
+  protected AppContextInterface $appContext;
+
+  /**
    * The site path directory.
    *
    * Site path is relative to the app root directory.
@@ -272,6 +282,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * By default, Drupal uses sites/default.
    *
    * @var string
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use
+   *     getSitePath() on appContext property instead.
+   * @see https://www.drupal.org/node/3590362
    */
   protected $sitePath;
 
@@ -279,6 +293,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * The app root.
    *
    * @var string
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use
+   *    getAppRoot() on appContext property instead.
+   * @see https://www.drupal.org/node/3590362
    */
   protected $root;
 
@@ -295,18 +313,34 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @param bool $allow_dumping
    *   (optional) FALSE to stop the container from being written to or read
    *   from disk. Defaults to TRUE.
-   * @param string $app_root
-   *   (optional) The path to the application root as a string. If not supplied,
-   *   the application root will be computed.
+   * @param \Drupal\Core\AppContextInterface|string|null $app_context
+   *   The context for the application that includes the application root.
+   *   Providing this value as a string or NULL is deprecated and will cause
+   *   errors in Drupal 12.
    *
    * @return static
    *
    * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
    *   In case the host name in the request is not trusted.
    */
-  public static function createFromRequest(Request $request, $class_loader, $environment, $allow_dumping = TRUE, $app_root = NULL) {
-    $kernel = new static($environment, $class_loader, $allow_dumping, $app_root);
-    static::bootEnvironment($app_root);
+  public static function createFromRequest(Request $request, $class_loader, $environment, $allow_dumping = TRUE, $app_context = NULL) {
+    if ($app_context === NULL) {
+      @trigger_error('Calling ' . __CLASS__ . '::' . __FUNCTION__ . '() with `$app_context = NULL` is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use the runtime to retrieve an AppContext or instantiate AppContext yourself instead. See https://www.drupal.org/node/3590362', E_USER_DEPRECATED);
+      $app_context = StaticAppContextProvider::getAppContext($request);
+    }
+    if (is_string($app_context)) {
+      @trigger_error('Calling ' . __CLASS__ . '::' . __FUNCTION__ . '() with `string $app_context` is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use the runtime to retrieve an AppContext or instantiate AppContext yourself instead. See https://www.drupal.org/node/3590362', E_USER_DEPRECATED);
+      $app_root = $app_context;
+      $app_context = StaticAppContextProvider::getAppContext();
+      $app_context = new AppContext(
+        $app_root,
+        $app_context->getSitePath(),
+        $app_context->getBaseUrl(),
+        $app_context->getBasePath(),
+      );
+    }
+    $kernel = new static($environment, $class_loader, $allow_dumping, $app_context);
+    static::bootEnvironment($app_context instanceof AppContext ? $app_context->getAppRoot() : $app_context);
     $kernel->initializeSettings($request);
     return $kernel;
   }
@@ -322,18 +356,38 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @param bool $allow_dumping
    *   (optional) FALSE to stop the container from being written to or read
    *   from disk. Defaults to TRUE.
-   * @param string $app_root
-   *   (optional) The path to the application root as a string. If not supplied,
-   *   the application root will be computed.
+   * @param \Drupal\Core\AppContextInterface|string|null $app_context
+   *   The context for the application that includes the application root.
+   *   Providing this value as a string or NULL is deprecated and will cause
+   *   errors in Drupal 12.
    */
-  public function __construct($environment, $class_loader, $allow_dumping = TRUE, $app_root = NULL) {
+  public function __construct($environment, $class_loader, $allow_dumping = TRUE, $app_context = NULL) {
     $this->environment = $environment;
     $this->classLoader = $class_loader;
     $this->allowDumping = $allow_dumping;
-    if ($app_root === NULL) {
-      $app_root = static::guessApplicationRoot();
+    if ($app_context === NULL) {
+      @trigger_error('Calling ' . __CLASS__ . '::' . __FUNCTION__ . '() with `$app_context = NULL` is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use the runtime to retrieve an AppContext or instantiate AppContext yourself instead. See https://www.drupal.org/node/3590362', E_USER_DEPRECATED);
+      $app_context = StaticAppContextProvider::getAppContext();
     }
-    $this->root = $app_root;
+    if (is_string($app_context)) {
+      @trigger_error('Calling ' . __CLASS__ . '::' . __FUNCTION__ . '() with `string $app_context` is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use the runtime to retrieve an AppContext or instantiate AppContext yourself instead. See https://www.drupal.org/node/3590362', E_USER_DEPRECATED);
+      $app_root = $app_context;
+      $app_context = StaticAppContextProvider::getAppContext();
+      $app_context = new AppContext(
+        $app_root,
+        $app_context->getSitePath(),
+        $app_context->getBaseUrl(),
+        $app_context->getBasePath(),
+      );
+    }
+    $this->appContext = $app_context;
+    // We set the following deprecated properties in this class and keep using
+    // them consistently so that overriding classes can still rely on them until
+    // Drupal 12.0.0.
+    // @phpstan-ignore property.deprecated
+    $this->root = $app_context->getAppRoot();
+    // @phpstan-ignore property.deprecated
+    $this->sitePath = $app_context->getSitePath();
   }
 
   /**
@@ -341,13 +395,14 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *
    * @return string
    *   The application root.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0.
+   *    Use AppContext::getAppRoot() instead.
+   * @see https://www.drupal.org/node/3590362
    */
   protected static function guessApplicationRoot() {
-    // Determine the application root by:
-    // - Removing the namespace directories from the path.
-    // - Getting the path to the directory two levels up from the path
-    //   determined in the previous step.
-    return dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__)), 2);
+    @trigger_error(__CLASS__ . "::" . __FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use getExtensionsParameter() instead. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
+    return StaticAppContextProvider::getApplicationRoot();
   }
 
   /**
@@ -401,68 +456,18 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
    *   In case the host name in the request is invalid.
    *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0.
+   *   Use \Drupal\Core\StaticAppContextProvider::findSitePath() instead.
+   * @see https://www.drupal.org/node/3590362
+   *
    * @see \Drupal\Core\DrupalKernelInterface::getSitePath()
    * @see \Drupal\Core\DrupalKernelInterface::setSitePath()
    * @see default.settings.php
    * @see example.sites.php
    */
   public static function findSitePath(Request $request, $require_settings = TRUE, $app_root = NULL) {
-    if (static::validateHostname($request) === FALSE) {
-      throw new BadRequestHttpException();
-    }
-
-    if ($app_root === NULL) {
-      $app_root = static::guessApplicationRoot();
-    }
-
-    // Check for a test override.
-    if ($test_prefix = drupal_valid_test_ua()) {
-      $test_db = new TestDatabase($test_prefix);
-      return $test_db->getTestSitePath();
-    }
-
-    // Determine whether multi-site functionality is enabled. If not, return
-    // the default directory.
-    if (!is_file($app_root . '/sites/sites.php')) {
-      return 'sites/default';
-    }
-
-    // Pre-populate host and script variables, then include sites.php which may
-    // populate $sites with a site-directory mapping.
-    $script_name = $request->server->get('SCRIPT_NAME');
-    if (!$script_name) {
-      $script_name = $request->server->get('SCRIPT_FILENAME');
-    }
-    $http_host = $request->getHttpHost();
-
-    $sites = [];
-    include $app_root . '/sites/sites.php';
-
-    // Construct an identifier from pieces of the (port plus) host plus script
-    // path (excluding the filename). Loop over all possibilities starting from
-    // most specific, then dropping pieces from the start of the port/hostname
-    // while keeping the full path, then gradually dropping pieces from the end
-    // of the path... until we find a directory corresponding to the identifier.
-    $path_parts = explode('/', $script_name);
-    $host_parts = explode('.', implode('.', array_reverse(explode(':', rtrim($http_host, '.')))));
-    for ($i = count($path_parts) - 1; $i > 0; $i--) {
-      for ($j = count($host_parts); $j > 0; $j--) {
-        // Assume the path has a leading slash, so the imploded path parts are
-        // either a path identifier with leading dot, or an empty string.
-        $site_id = implode('.', array_slice($host_parts, -$j)) . implode('.', array_slice($path_parts, 0, $i));
-
-        // If the identifier is a key in $sites, check for a directory matching
-        // the corresponding value. Otherwise, check for a directory matching
-        // the identifier.
-        if (isset($sites[$site_id]) && is_dir($app_root . '/sites/' . $sites[$site_id])) {
-          $site_id = $sites[$site_id];
-        }
-        if (is_file($app_root . '/sites/' . $site_id . '/settings.php') || (!$require_settings && is_file($app_root . '/sites/' . $site_id))) {
-          return "sites/$site_id";
-        }
-      }
-    }
-    return 'sites/default';
+    @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use \Drupal\Core\StaticAppContextProvider::findSitePath() instead. See https://www.drupal.org/node/3590362', E_USER_DEPRECATED);
+    return StaticAppContextProvider::findSitePath($request, $app_root, $require_settings);
   }
 
   /**
@@ -472,21 +477,29 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if ($this->booted && $path !== $this->sitePath) {
       throw new \LogicException('Site path cannot be changed after calling boot()');
     }
+    @trigger_error(__CLASS__ . "::" . __FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Provide the site path through AppContext for the kernel instead. See https://www.drupal.org/node/3590362', E_USER_DEPRECATED);
     $this->sitePath = $path;
+    // Ensure our appContext stays in sync.
+    $this->appContext = new AppContext(
+      $this->appContext->getAppRoot(),
+      $path,
+      $this->appContext->getBaseUrl(),
+      $this->appContext->getBasePath(),
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function getSitePath() {
-    return $this->sitePath;
+    return $this->appContext->getSitePath();
   }
 
   /**
    * {@inheritdoc}
    */
   public function getAppRoot() {
-    return $this->root;
+    return $this->appContext->getAppRoot();
   }
 
   /**
@@ -498,6 +511,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     }
 
     // Ensure that findSitePath is set.
+    // @phpstan-ignore property.deprecated
     if (!$this->sitePath) {
       throw new \Exception('Kernel does not have site path set before calling boot()');
     }
@@ -516,7 +530,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       }
     }
     FileCacheFactory::setConfiguration($configuration);
-    FileCacheFactory::setPrefix(Settings::getApcuPrefix('file_cache', $this->root));
+    FileCacheFactory::setPrefix(Settings::getApcuPrefix('file_cache', $this->appContext->getAppRoot()));
 
     $this->bootstrapContainer = new $this->bootstrapContainerClass(Settings::get('bootstrap_container_definition', $this->defaultBootstrapContainerDefinition));
 
@@ -529,7 +543,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       // class_exists() checks to determine functionality.
       $installed_extensions = array_keys($this->container->getParameter('container.modules') + $this->container->getParameter('container.themes'));
       $id = 'class_loader:' . crc32(implode(':', $installed_extensions));
-      $prefix = Settings::getApcuPrefix($id, $this->root);
+      $prefix = Settings::getApcuPrefix($id, $this->appContext->getAppRoot());
       $this->classLoader->setApcuPrefix($prefix);
     }
 
@@ -584,11 +598,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * {@inheritdoc}
    */
   public function loadLegacyIncludes() {
-    require_once $this->root . '/core/includes/common.inc';
-    require_once $this->root . '/core/includes/module.inc';
-    require_once $this->root . '/core/includes/theme.inc';
-    require_once $this->root . '/core/includes/form.inc';
-    require_once $this->root . '/core/includes/errors.inc';
+    require_once $this->appContext->getAppRoot() . '/core/includes/common.inc';
+    require_once $this->appContext->getAppRoot() . '/core/includes/module.inc';
+    require_once $this->appContext->getAppRoot() . '/core/includes/theme.inc';
+    require_once $this->appContext->getAppRoot() . '/core/includes/form.inc';
+    require_once $this->appContext->getAppRoot() . '/core/includes/errors.inc';
   }
 
   /**
@@ -743,7 +757,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = TRUE): Response {
     // Ensure sane PHP environment variables.
-    static::bootEnvironment();
+    static::bootEnvironment($this->appContext->getAppRoot());
 
     try {
       if (!$this->booted) {
@@ -822,7 +836,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   private function setExtensionData(): void {
     // First, find profiles.
-    $listing = new ExtensionDiscovery($this->root);
+    $listing = new ExtensionDiscovery($this->appContext->getAppRoot());
     $listing->setProfileDirectories([]);
     $all_profiles = $listing->scan('profile');
     $profiles = array_intersect_key($all_profiles, $this->moduleList);
@@ -1055,8 +1069,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if (isset($container_definition)) {
       // Drupal provides two dynamic parameters to access specific paths that
       // are determined from the request.
-      $container_definition['parameters']['app.root'] = $this->getAppRoot();
-      $container_definition['parameters']['site.path'] = $this->getSitePath();
+      $container_definition['parameters']['app.root'] = $this->appContext->getAppRoot();
+      $container_definition['parameters']['site.path'] = $this->appContext->getSitePath();
       $class = Settings::get('container_base_class', '\Drupal\Core\DependencyInjection\Container');
       $container = new $class($container_definition);
     }
@@ -1135,7 +1149,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     // Determine the application root if it's not supplied.
     if ($app_root === NULL) {
-      $app_root = static::guessApplicationRoot();
+      @trigger_error('Calling ' . __CLASS__ . '::' . __FUNCTION__ . '() with `$app_context = NULL` is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Provide the app_root from AppContext instead. See https://www.drupal.org/node/3590362', E_USER_DEPRECATED);
+      $app_root = StaticAppContextProvider::getApplicationRoot();
     }
 
     error_reporting(E_ALL);
@@ -1205,9 +1220,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *   In case the host name in the request is not trusted.
    */
   protected function initializeSettings(Request $request) {
-    $site_path = static::findSitePath($request);
-    $this->setSitePath($site_path);
-    Settings::initialize($this->root, $site_path, $this->classLoader);
+    Settings::initialize($this->appContext->getAppRoot(), $this->appContext->getSitePath(), $this->classLoader);
 
     // Initialize our list of trusted HTTP Host headers to protect against
     // header attacks.
@@ -1233,28 +1246,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     global $base_path, $base_root;
     global $base_secure_url, $base_insecure_url;
 
-    // Create base URL.
+    $base_url = $this->appContext->getBaseUrl();
+    $base_path = $this->appContext->getBasePath();
     $base_root = $request->getSchemeAndHttpHost();
-    $base_url = $base_root;
-
-    // For a request URI of '/index.php/foo', $_SERVER['SCRIPT_NAME'] is
-    // '/index.php', whereas $_SERVER['PHP_SELF'] is '/index.php/foo'.
-    if ($dir = rtrim(dirname($request->server->get('SCRIPT_NAME')), '\/')) {
-      // Remove "core" directory if present, allowing install.php, rebuild.php,
-      // and others to auto-detect a base path.
-      $core_position = strrpos($dir, '/core');
-      if ($core_position !== FALSE && strlen($dir) - 5 == $core_position) {
-        $base_path = substr($dir, 0, $core_position);
-      }
-      else {
-        $base_path = $dir;
-      }
-      $base_url .= $base_path;
-      $base_path .= '/';
-    }
-    else {
-      $base_path = '/';
-    }
     $base_secure_url = str_replace('http://', 'https://', $base_url);
     $base_insecure_url = str_replace('https://', 'http://', $base_url);
   }
@@ -1486,7 +1480,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     foreach (['Core', 'Component'] as $parent_directory) {
       $path = 'core/lib/Drupal/' . $parent_directory;
       $parent_namespace = 'Drupal\\' . $parent_directory;
-      foreach (new \DirectoryIterator($this->root . '/' . $path) as $component) {
+      foreach (new \DirectoryIterator($this->appContext->getAppRoot() . '/' . $path) as $component) {
         /** @var \DirectoryIterator $component */
         $pathname = $component->getPathname();
         if (!$component->isDot() && $component->isDir() && (
@@ -1556,8 +1550,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     }
     $container->setParameter('persist_ids', $persist_ids);
 
-    $container->setParameter('app.root', $this->getAppRoot());
-    $container->setParameter('site.path', $this->getSitePath());
+    $container->setParameter('app.root', $this->appContext->getAppRoot());
+    $container->setParameter('site.path', $this->appContext->getSitePath());
 
     $container->compile();
     return $container;
@@ -1736,11 +1730,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     foreach ($namespaces as $prefix => $paths) {
       if (is_array($paths)) {
         foreach ($paths as $key => $value) {
-          $paths[$key] = $this->root . '/' . $value;
+          $paths[$key] = $this->appContext->getAppRoot() . '/' . $value;
         }
       }
       elseif (is_string($paths)) {
-        $paths = $this->root . '/' . $paths;
+        $paths = $this->appContext->getAppRoot() . '/' . $paths;
       }
       $class_loader->addPsr4($prefix . '\\', $paths);
     }
