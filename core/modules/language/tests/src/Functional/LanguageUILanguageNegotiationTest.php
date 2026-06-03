@@ -635,7 +635,7 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
   /**
    * Test if attributes inside block are rendered when the requested URL has no language.
    */
-  public function testAttributesBlock() {
+  public function testAttributesBlock(): void {
 
     // Add the Spanish language.
     $langcode_browser_fallback = 'es';
@@ -644,7 +644,8 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
     // Enable the path prefix for the default language: this way any unprefixed
     // URL must have a valid fallback value.
     $edit = ['prefix[en]' => 'en'];
-    $this->drupalPostForm('admin/config/regional/language/detection/url', $edit, t('Save configuration'));
+    $this->drupalGet('admin/config/regional/language/detection/url');
+    $this->submitForm($edit, 'Save configuration');
 
     // Enable the language switcher block.
     $this->drupalPlaceBlock('language_block:' . LanguageInterface::TYPE_INTERFACE, ['id' => 'test_language_block']);
@@ -665,7 +666,7 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
 
     // Check attribute lang exist.
     $args = [':id' => 'block-test-language-block', ':lang' => 'en'];
-    /* @var \Behat\Mink\Element\NodeElement[] $fields */
+    /** @var \Behat\Mink\Element\NodeElement[] $fields */
     $field = $this->xpath('//div[@id=:id]//a[@class="language-link is-active"]', $args);
 
     if (!empty($field)) {
@@ -674,4 +675,5 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
       }
     }
   }
+
 }
