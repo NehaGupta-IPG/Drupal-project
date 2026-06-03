@@ -80,12 +80,29 @@ class AttributeMenuLinkDiscoveryDecoratorTest extends UnitTestCase {
   }
 
   /**
+   * Tests that a single-route link inherits its title from the route.
+   */
+  public function testTitleInheritedFromRoute(): void {
+    $definitions = $this->decorator('valid')->getDefinitions();
+    $this->assertEquals(new TranslatableMarkup('Single'), $definitions['menu_link_test.single']['title']);
+  }
+
+  /**
    * Tests that a multi-route method without an explicit route fails.
    */
   public function testAmbiguousRouteThrows(): void {
     $this->expectException(\LogicException::class);
     $this->expectExceptionMessage('must specify a "route"');
     $this->decorator('invalid')->getDefinitions();
+  }
+
+  /**
+   * Tests that a link with no resolvable title fails.
+   */
+  public function testMissingTitleThrows(): void {
+    $this->expectException(\LogicException::class);
+    $this->expectExceptionMessage('must define a "title"');
+    $this->decorator('no_title')->getDefinitions();
   }
 
 }

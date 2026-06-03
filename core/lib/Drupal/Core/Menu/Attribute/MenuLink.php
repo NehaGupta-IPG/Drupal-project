@@ -37,8 +37,9 @@ class MenuLink {
   /**
    * Constructs a MenuLink attribute.
    *
-   * @param string|\Drupal\Core\StringTranslation\TranslatableMarkup $title
-   *   The static title for the menu link.
+   * @param string|\Drupal\Core\StringTranslation\TranslatableMarkup|null $title
+   *   The static title for the menu link. When omitted, it defaults to the
+   *   '_title' default of the route the link points to, if any.
    * @param string|\Drupal\Core\StringTranslation\TranslatableMarkup $description
    *   The description of the menu link.
    * @param string|null $parent
@@ -65,7 +66,7 @@ class MenuLink {
    *   Parameters for the route variables when generating the link.
    */
   public function __construct(
-    public readonly string|TranslatableMarkup $title = '',
+    public readonly string|TranslatableMarkup|null $title = NULL,
     public readonly string|TranslatableMarkup $description = '',
     public readonly ?string $parent = NULL,
     public readonly int $weight = 0,

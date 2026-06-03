@@ -19,9 +19,8 @@ class MenuLinkTestController {
    * @return array
    *   A render array.
    */
-  #[Route(path: '/menu-link-test/single', name: 'menu_link_test.single')]
+  #[Route(path: '/menu-link-test/single', name: 'menu_link_test.single', defaults: ['_title' => new TranslatableMarkup('Single')])]
   #[MenuLink(
-    title: new TranslatableMarkup('Single'),
     parent: 'system.admin',
     weight: 5,
   )]

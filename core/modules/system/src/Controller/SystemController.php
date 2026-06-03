@@ -66,7 +66,6 @@ class SystemController extends ControllerBase {
     ],
   )]
   #[MenuLink(
-    title: new TranslatableMarkup('Configuration'),
     description: new TranslatableMarkup('Administer settings.'),
     parent: 'system.admin',
   )]
@@ -161,7 +160,6 @@ class SystemController extends ControllerBase {
     defaults: ['_title' => new TranslatableMarkup('Administration')],
   )]
   #[MenuLink(
-    title: new TranslatableMarkup('Administration'),
     menu_name: 'admin',
     weight: 9,
     route: 'system.admin',
@@ -173,7 +171,6 @@ class SystemController extends ControllerBase {
     defaults: ['_title' => new TranslatableMarkup('Structure')],
   )]
   #[MenuLink(
-    title: new TranslatableMarkup('Structure'),
     description: new TranslatableMarkup('Administer blocks, content types, menus, etc.'),
     parent: 'system.admin',
     weight: -8,
@@ -186,7 +183,6 @@ class SystemController extends ControllerBase {
     defaults: ['_title' => new TranslatableMarkup('Reports')],
   )]
   #[MenuLink(
-    title: new TranslatableMarkup('Reports'),
     description: new TranslatableMarkup('View reports, updates, and errors.'),
     parent: 'system.admin',
     weight: 5,
@@ -199,7 +195,6 @@ class SystemController extends ControllerBase {
     defaults: ['_title' => new TranslatableMarkup('Media')],
   )]
   #[MenuLink(
-    title: new TranslatableMarkup('Media'),
     parent: 'system.admin_config',
     weight: -10,
     route: 'system.admin_config_media',
@@ -211,7 +206,6 @@ class SystemController extends ControllerBase {
     defaults: ['_title' => new TranslatableMarkup('Web services')],
   )]
   #[MenuLink(
-    title: new TranslatableMarkup('Web services'),
     parent: 'system.admin_config',
     route: 'system.admin_config_services',
   )]
@@ -222,7 +216,6 @@ class SystemController extends ControllerBase {
     defaults: ['_title' => new TranslatableMarkup('Development')],
   )]
   #[MenuLink(
-    title: new TranslatableMarkup('Development'),
     description: new TranslatableMarkup('Configure and use development tools.'),
     parent: 'system.admin_config',
     weight: -10,
@@ -235,7 +228,6 @@ class SystemController extends ControllerBase {
     defaults: ['_title' => new TranslatableMarkup('Region and language')],
   )]
   #[MenuLink(
-    title: new TranslatableMarkup('Region and language'),
     description: new TranslatableMarkup('Configure regional settings, localization, and translation.'),
     parent: 'system.admin_config',
     weight: -5,
@@ -248,7 +240,6 @@ class SystemController extends ControllerBase {
     defaults: ['_title' => new TranslatableMarkup('Search and metadata')],
   )]
   #[MenuLink(
-    title: new TranslatableMarkup('Search and metadata'),
     description: new TranslatableMarkup('Configure site search, metadata, and search engine optimization.'),
     parent: 'system.admin_config',
     weight: -10,
@@ -261,7 +252,6 @@ class SystemController extends ControllerBase {
     defaults: ['_title' => new TranslatableMarkup('System')],
   )]
   #[MenuLink(
-    title: new TranslatableMarkup('System'),
     description: new TranslatableMarkup('Configure basic site settings, actions, and cron.'),
     parent: 'system.admin_config',
     weight: -20,
@@ -274,7 +264,6 @@ class SystemController extends ControllerBase {
     defaults: ['_title' => new TranslatableMarkup('User interface')],
   )]
   #[MenuLink(
-    title: new TranslatableMarkup('User interface'),
     description: new TranslatableMarkup('Configure the administrative user interface.'),
     parent: 'system.admin_config',
     weight: -15,
@@ -287,7 +276,6 @@ class SystemController extends ControllerBase {
     defaults: ['_title' => new TranslatableMarkup('Workflow')],
   )]
   #[MenuLink(
-    title: new TranslatableMarkup('Workflow'),
     description: new TranslatableMarkup('Manage the content workflow.'),
     parent: 'system.admin_config',
     weight: 5,
@@ -300,7 +288,6 @@ class SystemController extends ControllerBase {
     defaults: ['_title' => new TranslatableMarkup('Content authoring')],
   )]
   #[MenuLink(
-    title: new TranslatableMarkup('Content authoring'),
     description: new TranslatableMarkup('Configure content formatting and authoring.'),
     parent: 'system.admin_config',
     weight: -15,
@@ -313,7 +300,6 @@ class SystemController extends ControllerBase {
     defaults: ['_title' => new TranslatableMarkup('Content')],
   )]
   #[MenuLink(
-    title: new TranslatableMarkup('Content'),
     description: new TranslatableMarkup('Find and manage content.'),
     parent: 'system.admin',
     weight: -10,
@@ -338,7 +324,6 @@ class SystemController extends ControllerBase {
     defaults: ['_title' => new TranslatableMarkup('Appearance')],
   )]
   #[MenuLink(
-    title: new TranslatableMarkup('Appearance'),
     description: new TranslatableMarkup('Select and configure themes.'),
     parent: 'system.admin',
     weight: -6,
