@@ -35,7 +35,7 @@
         "phpspec/prophecy": "^1.23",
         "phpspec/prophecy-phpunit": "^2.4",
         "phpstan/extension-installer": "^1.4.3",
-        "phpstan/phpstan": "^2.1.54",
+        "phpstan/phpstan": "^2.2.0",
         "phpstan/phpstan-phpunit": "^2.0.16",
         "phpunit/phpunit": "^12.5.14",
         "spaze/phpstan-disallowed-calls": "^4.12.0",
@@ -139,8 +139,8 @@
             "Drupal\\Composer\\Composer::generateMetapackages",
             "Drupal\\Composer\\Composer::generateComponentPackages"
         ],
-        "phpcs": "phpcs --standard=core/phpcs.xml.dist --parallel=\"$( (nproc || sysctl -n hw.logicalcpu || echo 4) 2>/dev/null)\" --",
-        "phpcbf": "phpcbf --standard=core/phpcs.xml.dist --parallel=\"$( (nproc || sysctl -n hw.logicalcpu || echo 4) 2>/dev/null)\" --",
+        "phpcs": "phpcs -d memory_limit=-1 --standard=core/phpcs.xml.dist --parallel=\"$( (nproc || sysctl -n hw.logicalcpu || echo 4) 2>/dev/null)\" --",
+        "phpcbf": "phpcbf -d memory_limit=-1 --standard=core/phpcs.xml.dist --parallel=\"$( (nproc || sysctl -n hw.logicalcpu || echo 4) 2>/dev/null)\" --",
         "phpstan": "phpstan analyze --memory-limit=-1 --configuration=core/phpstan.neon.dist --",
         "phpstan-baseline": "phpstan analyze --memory-limit=-1 --configuration=core/phpstan.neon.dist --generate-baseline=core/.phpstan-baseline.php"
     },
