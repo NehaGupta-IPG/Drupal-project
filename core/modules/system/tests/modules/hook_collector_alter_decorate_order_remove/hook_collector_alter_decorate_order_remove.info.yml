@@ -1,0 +1,7 @@
+name: 'Hook collector alter decorate order remove'
+type: module
+description: 'Provides hooks that order, reorder, and remove hooks that are altered or decorated'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:hook_collector_alter_decorate_target

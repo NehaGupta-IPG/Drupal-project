@@ -1,0 +1,6 @@
+services:
+
+  Drupal\hook_collector_decorate_hook_class\TestHooksDecorated:
+    class: Drupal\hook_collector_decorate_hook_class\TestHooksDecorated
+    decorates: Drupal\hook_collector_alter_decorate_target\Hook\TestHooks
+    public: false

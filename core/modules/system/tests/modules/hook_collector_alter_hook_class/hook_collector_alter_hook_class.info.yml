@@ -1,0 +1,7 @@
+name: 'Hook collector alter hook class'
+type: module
+description: 'Alters the test class for a Hook service provided by another class'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:hook_collector_alter_decorate_target
