@@ -9,6 +9,8 @@ use Drupal\Core\Database\FetchModeTrait;
 
 /**
  * Base class for results of a data query language (DQL) statement.
+ *
+ * @phpstan-type FetchOptions array{'class'?: class-string, 'constructor_args'?: list<mixed>, 'column'?: int}
  */
 abstract class ResultBase implements \Iterator {
 
@@ -18,19 +20,15 @@ abstract class ResultBase implements \Iterator {
    * Holds the default fetch mode.
    */
   // @phpcs:ignore Drupal.Commenting.VariableComment.Missing
-  public protected(set) FetchAs $fetchMode = FetchAs::Object;
+  public protected(set) FetchAs $fetchMode;
 
   /**
    * Holds fetch options.
    *
-   * @var array{'class': class-string, 'constructor_args': list<mixed>, 'column': int}
+   * @var FetchOptions
    */
   // @phpcs:ignore Drupal.Commenting.VariableComment.Missing
-  public protected(set) array $fetchOptions = [
-    'class' => 'stdClass',
-    'constructor_args' => [],
-    'column' => 0,
-  ];
+  public protected(set) array $fetchOptions;
 
   /**
    * Traces if rows can be fetched from the resultset.
@@ -53,14 +51,21 @@ abstract class ResultBase implements \Iterator {
   /**
    * Constructor.
    *
+   * @param \Drupal\Core\Database\Statement\FetchAs $fetchMode
+   *   The fetch mode.
+   * @param FetchOptions $fetchOptions
+   *   The fetch options.
    * @param bool $valid
    *   TRUE if the statement's ::execute() call was successful, or FALSE on
    *   failure.
    */
   public function __construct(
+    FetchAs $fetchMode,
+    array $fetchOptions,
     bool $valid,
   ) {
     $this->markResultsetIterable($valid);
+    $this->setFetchMode($fetchMode, $fetchOptions);
   }
 
   /**
@@ -80,7 +85,7 @@ abstract class ResultBase implements \Iterator {
    *
    * @param \Drupal\Core\Database\Statement\FetchAs $mode
    *   One of the cases of the FetchAs enum.
-   * @param array{class: class-string, constructor_args: list<mixed>, column: int, cursor_orientation?: int, cursor_offset?: int} $fetchOptions
+   * @param FetchOptions $fetchOptions
    *   An array of fetch options.
    *
    * @return bool
@@ -93,7 +98,7 @@ abstract class ResultBase implements \Iterator {
    *
    * @param \Drupal\Core\Database\Statement\FetchAs $mode
    *   One of the cases of the FetchAs enum.
-   * @param array{class?: class-string, constructor_args?: list<mixed>, column?: int, cursor_orientation?: int, cursor_offset?: int} $fetchOptions
+   * @param FetchOptions $fetchOptions
    *   An array of fetch options.
    *
    * @return array|object|int|float|string|bool|null
@@ -106,7 +111,7 @@ abstract class ResultBase implements \Iterator {
    *
    * @param \Drupal\Core\Database\Statement\FetchAs $mode
    *   One of the cases of the FetchAs enum.
-   * @param array{class?: class-string, constructor_args?: list<mixed>, column?: int, cursor_orientation?: int, cursor_offset?: int} $fetchOptions
+   * @param FetchOptions $fetchOptions
    *   An array of fetch options.
    *
    * @return array
@@ -161,7 +166,7 @@ abstract class ResultBase implements \Iterator {
    *   or FetchAs::List the returned value with be an array of arrays. For any
    *   other value it will be an array of objects. If not specified, defaults to
    *   what is specified by setFetchMode().
-   * @param array{class?: class-string, constructor_args?: list<mixed>, column?: int, cursor_orientation?: int, cursor_offset?: int} $fetchOptions
+   * @param FetchOptions $fetchOptions
    *   An array of fetch options.
    *
    * @return array

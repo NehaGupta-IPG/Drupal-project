@@ -8,6 +8,8 @@ use Drupal\Core\Database\FetchModeTrait;
 
 /**
  * Class for prefetched results of a data query language (DQL) statement.
+ *
+ * @phpstan-import-type FetchOptions from \Drupal\Core\Database\Statement\ResultBase
  */
 class PrefetchedResult extends ResultBase {
 
@@ -26,6 +28,10 @@ class PrefetchedResult extends ResultBase {
   /**
    * Constructor.
    *
+   * @param \Drupal\Core\Database\Statement\FetchAs $fetchMode
+   *   The fetch mode.
+   * @param FetchOptions $fetchOptions
+   *   The fetch options.
    * @param array $data
    *   The prefetched data, in FetchAs::Associative format.
    * @param int|null $rowCount
@@ -35,11 +41,13 @@ class PrefetchedResult extends ResultBase {
    *   failure.
    */
   public function __construct(
+    FetchAs $fetchMode,
+    array $fetchOptions,
     protected array $data,
     public readonly ?int $rowCount,
     bool $valid,
   ) {
-    parent::__construct($valid);
+    parent::__construct($fetchMode, $fetchOptions, $valid);
     $this->columnNames = isset($this->data[0]) ? array_keys($this->data[0]) : [];
     $this->currentRowIndex = -1;
   }
@@ -56,7 +64,7 @@ class PrefetchedResult extends ResultBase {
    */
   public function setFetchMode(FetchAs $mode, array $fetchOptions): bool {
     $this->fetchMode = $mode;
-    $this->fetchOptions = array_merge($this->fetchOptions, $fetchOptions);
+    $this->fetchOptions = $fetchOptions;
     return TRUE;
   }
 

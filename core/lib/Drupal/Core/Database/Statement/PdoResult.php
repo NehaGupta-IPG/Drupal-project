@@ -6,6 +6,8 @@ namespace Drupal\Core\Database\Statement;
 
 /**
  * Class for PDO-provided results of a data query language (DQL) statement.
+ *
+ * @phpstan-import-type FetchOptions from \Drupal\Core\Database\Statement\ResultBase
  */
 class PdoResult extends ResultBase {
 
@@ -14,6 +16,10 @@ class PdoResult extends ResultBase {
   /**
    * Constructor.
    *
+   * @param \Drupal\Core\Database\Statement\FetchAs $fetchMode
+   *   The fetch mode.
+   * @param FetchOptions $fetchOptions
+   *   The fetch options.
    * @param \PDOStatement $clientStatement
    *   The PDO Statement object. PDO does not provide a separate object for
    *   results, se we need to fetch data from the Statement.
@@ -22,10 +28,12 @@ class PdoResult extends ResultBase {
    *   failure.
    */
   public function __construct(
+    FetchAs $fetchMode,
+    array $fetchOptions,
     protected readonly \PDOStatement $clientStatement,
     bool $valid,
   ) {
-    parent::__construct($valid);
+    parent::__construct($fetchMode, $fetchOptions, $valid);
   }
 
   /**
@@ -52,7 +60,7 @@ class PdoResult extends ResultBase {
    */
   public function setFetchMode(FetchAs $mode, array $fetchOptions): bool {
     $this->fetchMode = $mode;
-    $this->fetchOptions = array_merge($this->fetchOptions, $fetchOptions);
+    $this->fetchOptions = $fetchOptions;
     return match ($mode) {
       FetchAs::ClassObject => $this->clientSetFetchMode($mode, $fetchOptions['class'], $fetchOptions['constructor_args'] ?? NULL),
       FetchAs::Column => $this->clientSetFetchMode($mode, $fetchOptions['column']),

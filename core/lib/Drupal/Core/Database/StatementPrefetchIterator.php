@@ -81,6 +81,8 @@ class StatementPrefetchIterator extends StatementBase {
     // as possible. Then, destroy the client statement. See the documentation
     // of \Drupal\sqlite\Driver\Database\sqlite\Statement for an explanation.
     $this->result = new PrefetchedResult(
+      FetchAs::Object,
+      [],
       $this->getClientStatement()->fetchAll(\PDO::FETCH_ASSOC),
       $this->rowCountEnabled ? $this->getClientStatement()->rowCount() : NULL,
       $return,
