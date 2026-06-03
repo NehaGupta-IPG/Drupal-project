@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Core\Routing;
 
 use Drupal\Component\Assertion\Inspector;
+use Drupal\Core\Discovery\AttributeScanner;
 use Drupal\Core\Form\FormInterface;
 use Symfony\Component\Routing\Attribute\DeprecatedAlias;
 use Symfony\Component\Routing\Attribute\Route as RouteAttribute;
@@ -42,34 +43,10 @@ class AttributeRouteDiscovery extends StaticRouteDiscoveryBase {
       'Controller' => $this->createControllerRouteCollection(...),
       'Form' => $this->createFormRouteCollection(...),
     ];
-
-    foreach ($this->namespaces as $namespace => $directories) {
-      foreach ((array) $directories as $directory) {
-        foreach ($routeTypes as $routeType => $factory) {
-          $routeDirectory = $directory . '/' . $routeType;
-          $routeNamespace = $namespace . '\\' . $routeType;
-          if (is_dir($routeDirectory)) {
-            $iterator = new \RecursiveIteratorIterator(
-              new \RecursiveDirectoryIterator($routeDirectory, \RecursiveDirectoryIterator::SKIP_DOTS)
-            );
-            foreach ($iterator as $fileinfo) {
-              if ($fileinfo->getExtension() == 'php') {
-                // Skip files that do not contain a Route attribute.
-                $contents = file_get_contents($fileinfo->getPathname());
-                if (!str_contains($contents, '#[Route') && !str_contains($contents, 'Routing\\Attribute\\Route')) {
-                  continue;
-                }
-                $subPath = $iterator->getSubIterator()->getSubPath();
-                $subPath = $subPath ? str_replace(DIRECTORY_SEPARATOR, '\\', $subPath) . '\\' : '';
-                $class = $routeNamespace . '\\' . $subPath . $fileinfo->getBasename('.php');
-                $reflectionClass = $this->getReflectionClass($class);
-                if ($reflectionClass !== NULL) {
-                  yield $factory($reflectionClass);
-                }
-              }
-            }
-          }
-        }
+    $scanner = new AttributeScanner($this->namespaces);
+    foreach ($routeTypes as $routeType => $factory) {
+      foreach ($scanner->scan(RouteAttribute::class, $routeType) as $class) {
+        yield $factory($class);
       }
     }
   }

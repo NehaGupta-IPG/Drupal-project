@@ -233,6 +233,7 @@ EOF
     $this->assertNotNull($this->routeCollection->get('router_test.method_attribute'));
     $this->assertNotNull($this->routeCollection->get('router_test.class_invoke'));
     $this->assertNull($this->routeCollection->get('router_test.missing_dependency'));
+    $this->assertNull($this->routeCollection->get('router_test.abstract'));
   }
 
   /**
