@@ -525,7 +525,7 @@ class ConfigTranslationListUiTest extends BrowserTestBase {
     $xpath = new \DOMXPath(Html::load($this->getSession()->getPage()->getHtml()));
     $expected_labels = [
       'Boolean format settings',
-      "Bool field label Field: field_boolean, type: Boolean",
+      'Bool field label Field: field_boolean, type: Boolean',
       'Block settings',
       'Bool field label',
       'Components',
