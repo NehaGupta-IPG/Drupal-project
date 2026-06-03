@@ -670,15 +670,25 @@ class FileUploadTest extends ResourceTestBase {
     $this->assertResponseData($expected, $response);
     $this->assertFileExists('public://foobar/example_6.cgi_.png_.txt');
 
-    // Add .php as an allowed extension without .txt. Since insecure uploads are
-    // are not allowed, .php files will be rejected.
-    $this->field->setSetting('file_extensions', 'php')->save();
-    $response = $this->fileRequest($uri, $php_string, ['Content-Disposition' => 'filename="example_7.php"']);
-    $this->assertResourceErrorResponse(422, "Unprocessable Entity: file validation failed.\nFor security reasons, your upload has been rejected.", $uri, $response);
+    $php_executable_extensions = ['php', 'php3', 'php4', 'php5', 'php7', 'php8', 'pht'];
 
-    // Make sure that no file was saved.
-    $this->assertFileDoesNotExist('public://foobar/example_7.php');
-    $this->assertFileDoesNotExist('public://foobar/example_7.php.txt');
+    // PHP executable extensions should also be rejected when explicitly
+    // allowed without .txt.
+    $file_number = 7;
+    foreach ($php_executable_extensions as $extension) {
+      $this->field->setSetting('file_extensions', $extension)->save();
+
+      $filename = "example_{$file_number}.{$extension}";
+      $response = $this->fileRequest($uri, $php_string, [
+        'Content-Disposition' => "filename=\"$filename\"",
+      ]);
+      $this->assertResourceErrorResponse(422, "Unprocessable Entity: file validation failed.\nFor security reasons, your upload has been rejected.", $uri, $response);
+
+      $this->assertFileDoesNotExist("public://foobar/$filename");
+      $this->assertFileDoesNotExist("public://foobar/$filename.txt");
+
+      $file_number++;
+    }
 
     // Now allow insecure uploads.
     \Drupal::configFactory()
@@ -689,14 +699,24 @@ class FileUploadTest extends ResourceTestBase {
     $this->field->setSetting('file_extensions', '')->save();
     \Drupal::service('router.builder')->rebuild();
 
-    $response = $this->fileRequest($uri, $php_string, ['Content-Disposition' => 'filename="example_7.php"']);
-    $expected = $this->getExpectedDocument(7, 'example_7.php', TRUE);
-    // Override the expected filesize.
-    $expected['data']['attributes']['filesize'] = strlen($php_string);
-    // The file mime should also now be PHP.
-    $expected['data']['attributes']['filemime'] = 'application/x-httpd-php';
-    $this->assertResponseData($expected, $response);
-    $this->assertFileExists('public://foobar/example_7.php');
+    // With insecure uploads allowed, the same extensions should be accepted.
+    $file_id = 7;
+    $mime_type_guesser = \Drupal::service('file.mime_type.guesser');
+    foreach ($php_executable_extensions as $extension) {
+      $filename = "example_{$file_number}.{$extension}";
+      $response = $this->fileRequest($uri, $php_string, [
+        'Content-Disposition' => "filename=\"$filename\"",
+      ]);
+      $expected = $this->getExpectedDocument($file_id, $filename, TRUE);
+      // Override the expected filesize.
+      $expected['data']['attributes']['filesize'] = strlen($php_string);
+      $expected['data']['attributes']['filemime'] = $mime_type_guesser->guessMimeType($filename);
+      $this->assertResponseData($expected, $response);
+      $this->assertFileExists("public://foobar/$filename");
+
+      $file_number++;
+      $file_id++;
+    }
   }
 
   /**
