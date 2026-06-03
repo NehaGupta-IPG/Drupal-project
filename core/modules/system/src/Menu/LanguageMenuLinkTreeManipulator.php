@@ -38,7 +38,7 @@ class LanguageMenuLinkTreeManipulator implements MenuLinkTreeContextualManipulat
         continue;
       }
 
-      if ($link->link->isTranslatable() && !$link->link->hasTranslation($current_language)) {
+      if (($link->link->isTranslatable() || $link->link->getEntity()->getUntranslated()->language()->isLocked()) && !$link->link->hasTranslation($current_language)) {
         $access = new AccessResultForbidden();
 
         // Instead of removing the menu link, mark it inaccessible so that its
