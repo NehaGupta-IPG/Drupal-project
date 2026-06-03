@@ -632,4 +632,46 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
     $this->assertNull($block, 'Language switcher block was removed.');
   }
 
+  /**
+   * Test if attributes inside block are rendered when the requested URL has no language.
+   */
+  public function testAttributesBlock() {
+
+    // Add the Spanish language.
+    $langcode_browser_fallback = 'es';
+    ConfigurableLanguage::createFromLangcode($langcode_browser_fallback)->save();
+
+    // Enable the path prefix for the default language: this way any unprefixed
+    // URL must have a valid fallback value.
+    $edit = ['prefix[en]' => 'en'];
+    $this->drupalPostForm('admin/config/regional/language/detection/url', $edit, t('Save configuration'));
+
+    // Enable the language switcher block.
+    $this->drupalPlaceBlock('language_block:' . LanguageInterface::TYPE_INTERFACE, ['id' => 'test_language_block']);
+
+    // Log out, because for anonymous users, the "active" class is set by PHP
+    // (which means we can easily test it here), whereas for authenticated users
+    // it is set by JavaScript.
+    $this->drupalLogout();
+
+    // Place a site branding block in the header region.
+    $this->drupalPlaceBlock('system_branding_block', ['region' => 'header']);
+
+    // Access the front page without specifying any valid URL language prefix
+    // and having as browser language preference a non-default language.
+    $http_header = ["Accept-Language" => "$langcode_browser_fallback;q=1"];
+    $language = new Language(['id' => '']);
+    $this->drupalGet('', ['language' => $language], $http_header);
+
+    // Check attribute lang exist.
+    $args = [':id' => 'block-test-language-block', ':lang' => 'en'];
+    /* @var \Behat\Mink\Element\NodeElement[] $fields */
+    $field = $this->xpath('//div[@id=:id]//a[@class="language-link is-active"]', $args);
+
+    if (!empty($field)) {
+      if ($field[0]->getAttribute('lang') !== 'en') {
+        $this->assertSame($field[0]->getText(), 'Drupal', "Lang attribute doesn't exist or doesn't match the value of the language.");
+      }
+    }
+  }
 }

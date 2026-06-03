@@ -216,7 +216,7 @@ class LanguageNegotiationUrl extends LanguageNegotiationMethodBase implements In
         'url' => clone $url,
         'title' => $language->getName(),
         'language' => $language,
-        'attributes' => ['class' => ['language-link']],
+        'attributes' => ['class' => ['language-link'], 'lang' => $language->getId()],
         'query' => $query,
       ];
     }

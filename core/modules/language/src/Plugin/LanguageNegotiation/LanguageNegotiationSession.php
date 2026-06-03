@@ -172,7 +172,7 @@ class LanguageNegotiationSession extends LanguageNegotiationMethodBase implement
         // object, so if we use the same one, they would be set for all links.
         'url' => clone $url,
         'title' => $language->getName(),
-        'attributes' => ['class' => ['language-link']],
+        'attributes' => ['class' => ['language-link'], 'lang' => $language->getId()],
         'query' => $query,
       ];
       if ($language_query != $langcode) {
