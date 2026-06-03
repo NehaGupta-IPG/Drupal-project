@@ -38,8 +38,14 @@ final class MenuTreeSeederCommands extends DrushCommands {
    *
    * Real lorem so search has variety to filter against and humans can scan
    * results.
+   *
+   * cspell:ignore lorem ipsum dolor amet consectetur adipiscing elit eiusmod
+   * cspell:ignore tempor incididunt labore dolore aliqua enim veniam quis
+   * cspell:ignore nostrud exercitation ullamco laboris aliquip commodo
+   * cspell:ignore consequat duis aute irure reprehenderit voluptate velit
+   * cspell:ignore cillum fugiat nulla pariatur excepteur occaecat cupidatat
+   * cspell:ignore proident culpa officia deserunt mollit anim laborum
    */
-  // cspell:disable - lorem ipsum filler, not real words.
   private const array LOREM = [
     'lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing',
     'elit', 'sed', 'eiusmod', 'tempor', 'incididunt', 'labore', 'dolore',
@@ -50,7 +56,6 @@ final class MenuTreeSeederCommands extends DrushCommands {
     'sint', 'occaecat', 'cupidatat', 'proident', 'culpa', 'officia',
     'deserunt', 'mollit', 'anim', 'laborum',
   ];
-  // cspell:enable
 
   public function __construct(
     private readonly EntityTypeManagerInterface $entityTypeManager,
