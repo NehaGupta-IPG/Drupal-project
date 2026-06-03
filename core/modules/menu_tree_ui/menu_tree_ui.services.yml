@@ -1,0 +1,30 @@
+services:
+  menu_tree_ui.loader:
+    class: Drupal\menu_tree_ui\Service\MenuTreeLoader
+    arguments:
+      - '@menu.link_tree'
+      - '@menu.tree_storage'
+      - '@module_handler'
+      - !tagged_iterator menu_tree_ui.search_provider
+
+  menu_tree_ui.mover:
+    class: Drupal\menu_tree_ui\Service\MenuTreeMover
+    arguments:
+      - '@menu.tree_storage'
+      - '@database'
+      - '@module_handler'
+      - '@menu_tree_ui.loader'
+      - '@plugin.manager.menu.link'
+
+  plugin.manager.menu_tree_column:
+    class: Drupal\menu_tree_ui\MenuTreeColumnManager
+    parent: default_plugin_manager
+
+  menu_tree_ui.search_provider.menu_link_content:
+    class: Drupal\menu_tree_ui\SearchProvider\MenuLinkContentSearchProvider
+    arguments:
+      - '@entity_type.manager'
+      - '@menu.tree_storage'
+      - '@database'
+    tags:
+      - { name: menu_tree_ui.search_provider, priority: 0 }

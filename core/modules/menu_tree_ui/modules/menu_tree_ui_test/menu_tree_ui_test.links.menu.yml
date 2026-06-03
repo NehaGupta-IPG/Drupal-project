@@ -1,0 +1,8 @@
+# A static, module-defined menu link used as a test fixture for reordering
+# content links around an immovable (non-menu_link_content) sibling — the
+# scenario the real "Home" / front-page link represents.
+menu_tree_ui_test.static_fixture:
+  title: 'Static fixture'
+  route_name: '<nolink>'
+  menu_name: test
+  weight: 0

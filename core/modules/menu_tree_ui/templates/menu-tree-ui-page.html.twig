@@ -1,0 +1,125 @@
+{#
+/**
+ * @file
+ * Tree UI for one menu. Server-renders the top level so:
+ *  - no-JS users see at least the top level
+ *  - the custom element upgrades existing DOM rather than rebuilding
+ *  - first paint is the actual tree, not a loading spinner.
+ *
+ * Available variables:
+ * - menu:             the menu entity
+ * - top_level:        rendered row render-arrays for the root level
+ * - columns:          array of column header info keyed by plugin ID,
+ *                     each entry: { id, label }
+ * - search_action:    URL for the search partial endpoint
+ * - children_action:  URL for the children JSON endpoint
+ */
+#}
+<div class="menu-tree-ui">
+  <noscript>
+    <div class="messages messages--warning">
+      {{ 'This tree UI needs JavaScript to expand levels and search. To edit @menu without JavaScript, use the classic menu admin:'|t({ '@menu': menu.label }) }}
+      <a href="{{ path('entity.menu.edit_form', { menu: menu.id }) }}">{{ 'Open the classic admin for @menu'|t({ '@menu': menu.label }) }}</a>
+    </div>
+  </noscript>
+
+  {#
+    Keyboard commands. Placed first inside the region (before search and the
+    tree) so screen-reader and keyboard users meet it early. The trigger opens
+    a native <dialog>; the close button uses <form method="dialog"> so closing
+    needs no JS. menu-tree.js wires the open click.
+  #}
+  <button type="button" class="menu-tree-ui__help-toggle">{{ 'Keyboard commands'|t }}</button>
+  <dialog class="menu-tree-ui__help-dialog" aria-labelledby="menu-tree-ui-help-title">
+    <div class="menu-tree-ui__help-dialog-inner">
+      <h2 id="menu-tree-ui-help-title">{{ 'Keyboard commands'|t }}</h2>
+
+      <h3>{{ 'Moving around'|t }}</h3>
+      <dl class="menu-tree-ui__help-list">
+        <dt><kbd>{{ 'Up'|t }}</kbd> / <kbd>{{ 'Down'|t }}</kbd></dt>
+        <dd>{{ 'Move between items.'|t }}</dd>
+        <dt><kbd>{{ 'Right'|t }}</kbd></dt>
+        <dd>{{ 'Open an item that has children, or move to its first child.'|t }}</dd>
+        <dt><kbd>{{ 'Left'|t }}</kbd></dt>
+        <dd>{{ 'Close an item, or move to its parent.'|t }}</dd>
+        <dt><kbd>{{ 'Home'|t }}</kbd> / <kbd>{{ 'End'|t }}</kbd></dt>
+        <dd>{{ 'Jump to the first or last item.'|t }}</dd>
+        <dt><kbd>{{ 'Enter'|t }}</kbd></dt>
+        <dd>{{ 'Open or close an item that has children.'|t }}</dd>
+      </dl>
+
+      <h3>{{ 'Moving an item'|t }}</h3>
+      <dl class="menu-tree-ui__help-list">
+        <dt><kbd>{{ 'Space'|t }}</kbd></dt>
+        <dd>{{ 'Pick up the focused item to move it.'|t }}</dd>
+        <dt><kbd>{{ 'Up'|t }}</kbd> / <kbd>{{ 'Down'|t }}</kbd></dt>
+        <dd>{{ 'Move the drop position up or down through the menu.'|t }}</dd>
+        <dt><kbd>{{ 'Right'|t }}</kbd></dt>
+        <dd>{{ 'Nest onto the highlighted item, opening it if it is closed so you can drop among its children.'|t }}</dd>
+        <dt><kbd>{{ 'Left'|t }}</kbd></dt>
+        <dd>{{ 'Close the highlighted item.'|t }}</dd>
+        <dt><kbd>{{ 'Enter'|t }}</kbd> / <kbd>{{ 'Space'|t }}</kbd></dt>
+        <dd>{{ 'Drop the item at the position you chose.'|t }}</dd>
+        <dt><kbd>{{ 'Escape'|t }}</kbd></dt>
+        <dd>{{ 'Cancel the move and put the item back.'|t }}</dd>
+      </dl>
+
+      <h3>{{ 'Quick reorder'|t }}</h3>
+      <dl class="menu-tree-ui__help-list">
+        <dt><kbd>{{ 'Shift'|t }}</kbd> + <kbd>{{ 'Up'|t }}</kbd> / <kbd>{{ 'Shift'|t }}</kbd> + <kbd>{{ 'Down'|t }}</kbd></dt>
+        <dd>{{ 'Move an item up or down among its siblings.'|t }}</dd>
+      </dl>
+
+      <form method="dialog">
+        <button class="menu-tree-ui__help-close">{{ 'Close'|t }}</button>
+      </form>
+    </div>
+  </dialog>
+
+  {# Search bar above the list, with results popover anchored to the input. #}
+  <div class="menu-tree-ui__search-container" role="search">
+    <label for="menu-tree-ui-search-input" class="visually-hidden">
+      {{ 'Search @menu'|t({ '@menu': menu.label }) }}
+    </label>
+    <input
+      id="menu-tree-ui-search-input"
+      type="search"
+      name="q"
+      class="menu-tree-ui__search-input form-element"
+      placeholder="{{ 'Search menu links…'|t }}"
+      autocomplete="off"
+      hx-get="{{ search_action }}"
+      hx-trigger="keyup changed delay:250ms, search"
+      hx-target="#menu-tree-ui-search-results"
+      hx-swap="innerHTML"
+    >
+    <div
+      id="menu-tree-ui-search-results"
+      class="menu-tree-ui__search-results"
+      aria-live="polite"
+    ></div>
+  </div>
+
+  {# Column header strip — only rendered when plugins have added columns. #}
+  {% if columns %}
+    <div class="menu-tree-ui__column-headers" aria-hidden="true">
+      <span class="menu-tree-ui__column-header menu-tree-ui__column-header--title">{{ 'Name'|t }}</span>
+      {% for col in columns %}
+        <span class="menu-tree-ui__column-header">{{ col.label }}</span>
+      {% endfor %}
+      <span class="menu-tree-ui__column-header menu-tree-ui__column-header--operations">{{ 'Operations'|t }}</span>
+    </div>
+  {% endif %}
+
+  <menu-tree
+    class="menu-tree-ui__tree"
+    data-menu="{{ menu.id }}"
+    data-children-url="{{ children_action }}"
+  >
+    <ul role="tree" aria-label="{{ menu.label }}" class="menu-tree-ui__list menu-tree-ui__list--root">
+      {% for row in top_level %}
+        {{ row }}
+      {% endfor %}
+    </ul>
+  </menu-tree>
+</div>

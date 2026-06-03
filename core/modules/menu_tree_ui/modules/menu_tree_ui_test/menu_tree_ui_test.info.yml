@@ -1,0 +1,9 @@
+name: 'Menu tree UI — test seeder'
+type: module
+description: 'Drush commands for seeding and purging large test menus. Not for production sites.'
+package: 'Testing'
+version: VERSION
+hidden: true
+dependencies:
+  - drupal:menu_tree_ui
+  - drupal:menu_link_content

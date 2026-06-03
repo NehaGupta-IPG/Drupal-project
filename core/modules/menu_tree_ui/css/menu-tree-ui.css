@@ -1,0 +1,555 @@
+/*
+ * Menu tree UI styles.
+ *
+ * Strategy: define a thin bridge layer of --color-* / --space-* variables
+ * that cascade from Gin's --gin-* tokens when Gin is active, or fall back
+ * to Claro-compatible values otherwise. All colour and spacing rules in this
+ * file use ONLY those bridge variables — never hardcoded hex.
+ *
+ * Two perf-critical techniques:
+ *  1. content-visibility: auto on every row — browser skips paint/layout for
+ *     off-screen rows for free.
+ *  2. [data-virtualised="true"] — set by RowWindow (IntersectionObserver) for
+ *     rows that are deep off-screen; hard-floors cost via visibility:hidden +
+ *     fixed height.
+ */
+
+:root {
+  --mtu-color-divider:           var(--gin-border-color,         #e0e0e0);
+  --mtu-color-divider-light:     var(--gin-border-color-layer,   #f0f0f0);
+  --mtu-color-bg:                var(--gin-bg-layer,             #fff);
+  --mtu-color-text:              var(--gin-color-text,           #1a1a1a);
+  --mtu-color-text-muted:        var(--gin-color-text-light,     #757575);
+  --mtu-color-text-muted-strong: var(--gin-color-text,           #4a4a4a);
+  --mtu-color-focus:             var(--gin-color-focus-border,   #2563eb);
+  --mtu-color-link:              var(--gin-color-primary,        #2563eb);
+  --mtu-color-focus-bg:          rgba(37, 99, 235, 0.08);
+}
+
+.menu-tree-ui {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/*
+ * The search container anchors the results popover. `position: relative`
+ * scopes the absolutely-positioned results below.
+ */
+.menu-tree-ui__search-container {
+  position: relative;
+}
+
+/*
+ * The search <input> carries the `form-element` class so Gin/Claro supply
+ * its padding, border, border-radius, and font — no overrides needed here.
+ */
+.menu-tree-ui__search-input {
+  width: 100%;
+}
+
+/*
+ * Autocomplete-style results popover. Hangs from the input on its z-axis.
+ * `:not(:has(*))` hides it when the htmx swap leaves no element children.
+ */
+.menu-tree-ui__search-results {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  left: 0;
+  right: 0;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 0.5rem 0.75rem;
+  background: var(--mtu-color-bg);
+  border: 1px solid var(--mtu-color-divider);
+  border-radius: 4px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 10;
+}
+
+.menu-tree-ui__search-results:not(:has(*)) {
+  display: none;
+}
+
+.menu-tree-ui-search-results__empty,
+.menu-tree-ui-search-results__summary {
+  margin: 0 0 0.25rem;
+  color: var(--mtu-color-text-muted);
+  font-size: 0.85rem;
+}
+
+.menu-tree-ui-search-results__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu-tree-ui-search-results__item {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--mtu-color-divider-light);
+}
+
+.menu-tree-ui-search-results__item:last-child {
+  border-bottom: 0;
+}
+
+.menu-tree-ui-search-results__title {
+  display: inline-block;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--mtu-color-link);
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu-tree-ui-search-results__title:hover,
+.menu-tree-ui-search-results__title:focus {
+  text-decoration: underline;
+  outline: none;
+}
+
+.menu-tree-ui-search-results__title:focus-visible {
+  outline: 2px solid var(--mtu-color-focus);
+  outline-offset: 2px;
+}
+
+.menu-tree-ui-search-results__breadcrumb {
+  font-size: 0.8rem;
+  color: var(--mtu-color-text-muted);
+}
+
+.menu-tree-ui-search-results__item--disabled .menu-tree-ui-search-results__title {
+  text-decoration: line-through;
+  color: var(--mtu-color-text-muted);
+}
+
+/* ─────────────────────────────────────────────────────── column headers */
+
+.menu-tree-ui__column-headers {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--mtu-color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--mtu-color-divider);
+}
+
+.menu-tree-ui__column-header--title {
+  flex: 1 1 auto;
+}
+
+.menu-tree-ui__column-header--operations {
+  flex: 0 0 auto;
+}
+
+/* ──────────────────────────────────────────────────────────────── tree */
+
+/* <menu-tree> hosts the absolutely-positioned drop indicator. */
+menu-tree {
+  display: block;
+  position: relative;
+}
+
+/*
+ * Hard reset for all ARIA tree/group/row elements and any <ul>/<li> nested
+ * inside them. Admin themes apply list margins, padding, and list-style to
+ * generic li/ul selectors; those bleed into our custom-element tree and
+ * misalign child rows and add bullet markers to dropbutton items.
+ * Scoping to role attributes avoids touching any other lists on the page.
+ */
+ul[role="tree"],
+ul[role="group"],
+li[role="treeitem"],
+.menu-tree-ui-row__operations li,
+.menu-tree-ui-row__operations ul {
+  list-style: none;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu-tree-ui__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu-tree-ui__list--root {
+  border: 1px solid var(--mtu-color-divider);
+  border-radius: 4px;
+  background: var(--mtu-color-bg);
+}
+
+.menu-tree-ui-row {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 2.5rem;
+  border-bottom: 1px solid var(--mtu-color-divider-light);
+}
+
+.menu-tree-ui-row:last-child {
+  border-bottom: 0;
+}
+
+.menu-tree-ui-row[aria-expanded="true"] > ul[role="group"] {
+  display: block;
+}
+
+.menu-tree-ui-row[aria-expanded="false"] > ul[role="group"],
+.menu-tree-ui-row > ul[role="group"][hidden] {
+  display: none;
+}
+
+/*
+ * Focus indicator. Inset box-shadow instead of outline because:
+ *  - content-visibility: auto applies paint containment, clipping outlines
+ *  - inset shadow paints inside the padding box, unaffected by containment
+ *
+ * :has() lifts content-visibility off ancestor rows so the focused row's
+ * shadow is never clipped by a parent's contain: paint boundary.
+ */
+.menu-tree-ui-row:focus {
+  outline: none;
+}
+
+.menu-tree-ui-row:focus,
+.menu-tree-ui-row:has(.menu-tree-ui-row:focus),
+.menu-tree-ui-row:has(.dropbutton-wrapper.open) {
+  content-visibility: visible;
+}
+
+.menu-tree-ui-row:focus {
+  position: relative;
+  z-index: 1;
+  box-shadow: inset 0 0 0 2px var(--mtu-color-focus);
+  border-radius: 2px;
+}
+
+@keyframes menu-tree-ui-flash {
+  0% { background-color: var(--mtu-color-focus-bg); }
+  100% { background-color: transparent; }
+}
+
+.menu-tree-ui-row--flash {
+  animation: menu-tree-ui-flash 1.2s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-tree-ui-row--flash {
+    animation: none;
+    background-color: var(--mtu-color-focus-bg);
+  }
+}
+
+.menu-tree-ui-row__content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  min-height: 2.5rem;
+}
+
+.menu-tree-ui-row__handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.875rem;
+  height: 2.25rem;
+  flex: 0 0 auto;
+  color: var(--mtu-color-text-muted-strong);
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  font-size: 1.275rem;
+  letter-spacing: -1px;
+}
+
+.menu-tree-ui-row__handle:hover,
+.menu-tree-ui-row__handle:focus-visible {
+  color: var(--mtu-color-text);
+}
+
+.menu-tree-ui-row__handle--locked {
+  cursor: default;
+  pointer-events: none;
+  color: var(--mtu-color-text-muted-strong);
+  opacity: 0.3;
+  font-size: 0.6rem;
+}
+
+.menu-tree-ui-row--dragging {
+  opacity: 0.4;
+}
+
+.menu-tree-ui-row--dragging .menu-tree-ui-row__handle {
+  cursor: grabbing;
+}
+
+.menu-tree-ui-row--drop-as-child > .menu-tree-ui-row__content {
+  outline: 2px solid var(--mtu-color-focus);
+  outline-offset: -2px;
+  background-color: var(--mtu-color-focus-bg);
+}
+
+/*
+ * Keyboard move mode shows "child" (drop as first child) as the solid
+ * drop-as-child box above; "before"/"after" reuse the absolutely-positioned
+ * drop-indicator line, drawn indented to the target row's depth so stacked
+ * outdent positions stay distinguishable. Lift paint containment so the box
+ * outline is never clipped.
+ */
+.menu-tree-ui-row--drop-as-child {
+  content-visibility: visible;
+}
+
+/*
+ * The row currently picked up in keyboard move mode. Dashed (vs the solid
+ * drop-as-child target outline) reads as "in hand, not yet placed". The
+ * grabbed row keeps focus, so content-visibility is already lifted off it;
+ * the explicit rule keeps the dashed outline from being clipped regardless.
+ */
+.menu-tree-ui-row--grabbed {
+  content-visibility: visible;
+}
+
+.menu-tree-ui-row--grabbed > .menu-tree-ui-row__content {
+  outline: 2px dashed var(--mtu-color-focus);
+  outline-offset: -2px;
+  background-color: var(--mtu-color-focus-bg);
+}
+
+.menu-tree-ui-drop-indicator {
+  position: absolute;
+  display: none;
+  height: 3px;
+  margin-top: -1.5px;
+  background: var(--mtu-color-focus);
+  border-radius: 1.5px;
+  pointer-events: none;
+  z-index: 5;
+  box-shadow: -3px 0 0 var(--mtu-color-focus);
+}
+
+.menu-tree-ui-row__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: var(--mtu-color-text);
+}
+
+.menu-tree-ui-row__toggle--spacer {
+  cursor: default;
+}
+
+/*
+ * CSS-drawn chevron (font-size:0 hides the ▸ glyph; borders form the arrow).
+ * Collapsed: rotate(45deg) → right.  Expanded: rotate(135deg) → down.
+ */
+.menu-tree-ui-row__chevron {
+  font-size: 0;
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-top: 0.125rem solid currentColor;
+  border-right: 0.125rem solid currentColor;
+  transform: rotate(45deg);
+  transform-origin: 50% 50%;
+  transition: transform 160ms ease;
+}
+
+.menu-tree-ui-row[aria-expanded="true"] > .menu-tree-ui-row__content .menu-tree-ui-row__chevron {
+  transform: rotate(135deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-tree-ui-row__chevron {
+    transition: none;
+  }
+}
+
+.menu-tree-ui-row__title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu-tree-ui-row__badge {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--mtu-color-text-muted);
+  border: 1px solid currentColor;
+  padding: 0 0.3rem;
+  border-radius: 2px;
+}
+
+.menu-tree-ui-row--disabled .menu-tree-ui-row__title {
+  color: var(--mtu-color-text-muted);
+  text-decoration: line-through;
+}
+
+/*
+ * Hard-floor virtualisation: rows deep off-screen hide their content but
+ * keep their height so the scrollbar stays accurate.
+ */
+.menu-tree-ui-row[data-virtualised="true"] > .menu-tree-ui-row__content {
+  visibility: hidden;
+}
+
+.menu-tree-ui-row[data-virtualised="true"] {
+  height: 2.5rem;
+}
+
+/* ────────────────────────────────────────────────────── column cells */
+
+.menu-tree-ui-row__column {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3rem;
+}
+
+/*
+ * Toggle switch — role="switch" aria-checked button.
+ *
+ * Rendered as a pill with a knob. The knob position is driven entirely by
+ * aria-checked via attribute selectors so there is no JS class toggle needed.
+ */
+.menu-tree-ui-row__column-toggle {
+  position: relative;
+  display: inline-block;
+  width: 2.25rem;
+  height: 1.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0.625rem;
+  background: var(--mtu-color-divider);
+  cursor: pointer;
+  transition: background 120ms ease;
+  vertical-align: middle;
+}
+
+.menu-tree-ui-row__column-toggle[aria-checked="true"] {
+  background: var(--mtu-color-focus);
+}
+
+.menu-tree-ui-row__column-toggle:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+/* Knob */
+.menu-tree-ui-row__column-toggle::after {
+  content: '';
+  position: absolute;
+  top: 0.1875rem;
+  left: 0.1875rem;
+  width: 0.875rem;
+  height: 0.875rem;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 120ms ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.menu-tree-ui-row__column-toggle[aria-checked="true"]::after {
+  transform: translateX(1rem);
+}
+
+.menu-tree-ui-row__column-toggle:focus-visible {
+  outline: 2px solid var(--mtu-color-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-tree-ui-row__column-toggle,
+  .menu-tree-ui-row__column-toggle::after {
+    transition: none;
+  }
+}
+
+/* ─────────────────────────────────────────────────────── operations */
+
+.menu-tree-ui-row__operations {
+  flex: 0 0 auto;
+  margin-inline-start: auto;
+}
+
+/* ──────────────────────────────────────────────────── keyboard help */
+
+.menu-tree-ui__help-toggle {
+  align-self: flex-start;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  color: var(--mtu-color-link);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.menu-tree-ui__help-toggle:focus-visible {
+  outline: 2px solid var(--mtu-color-focus);
+  outline-offset: 2px;
+}
+
+.menu-tree-ui__help-dialog {
+  max-width: 32rem;
+  width: calc(100% - 2rem);
+  padding: 0;
+  border: 1px solid var(--mtu-color-divider);
+  border-radius: 6px;
+  background: var(--mtu-color-bg);
+  color: var(--mtu-color-text);
+}
+
+.menu-tree-ui__help-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.menu-tree-ui__help-dialog-inner {
+  padding: 1.25rem 1.5rem;
+}
+
+.menu-tree-ui__help-dialog h2 {
+  margin-top: 0;
+}
+
+.menu-tree-ui__help-list {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.35rem 1rem;
+  margin: 0 0 1rem;
+}
+
+.menu-tree-ui__help-list dt {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.menu-tree-ui__help-list dd {
+  margin: 0;
+}
+
+.menu-tree-ui__help-dialog kbd {
+  display: inline-block;
+  padding: 0.05rem 0.35rem;
+  border: 1px solid var(--mtu-color-divider);
+  border-radius: 3px;
+  background: var(--mtu-color-divider-light);
+  font-size: 0.85em;
+}

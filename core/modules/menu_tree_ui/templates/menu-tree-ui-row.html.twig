@@ -1,0 +1,93 @@
+{#
+/**
+ * @file
+ * A single row in the menu tree.
+ *
+ * Variables:
+ * - element:    \Drupal\Core\Menu\MenuLinkTreeElement
+ * - depth:      1-based depth (matches aria-level)
+ * - pos_in_set: 1-based position among siblings
+ * - set_size:   total siblings at this level
+ * - operations: #type=>'operations' render array (Edit, Delete, …)
+ * - columns:    keyed by column plugin ID, each a cell data array
+ */
+#}
+{% set link = element.link %}
+{% set has_children = element.hasChildren %}
+{% set plugin_id = link.getPluginId() %}
+{% set title = link.getTitle() %}
+{% set enabled = link.isEnabled() %}
+
+<li
+  role="treeitem"
+  class="menu-tree-ui-row {{ enabled ? '' : 'menu-tree-ui-row--disabled' }} {{ has_children ? 'menu-tree-ui-row--parent' : 'menu-tree-ui-row--leaf' }}"
+  data-id="{{ plugin_id }}"
+  data-has-children="{{ has_children ? 'true' : 'false' }}"
+  data-movable="{{ movable ? 'true' : 'false' }}"
+  aria-level="{{ depth }}"
+  aria-posinset="{{ pos_in_set }}"
+  aria-setsize="{{ set_size }}"
+  {% if has_children %}aria-expanded="false"{% endif %}
+  tabindex="{{ pos_in_set == 1 and depth == 1 ? '0' : '-1' }}"
+>
+  <div class="menu-tree-ui-row__content" style="padding-inline-start: {{ (depth - 1) * 1.25 }}rem;">
+    {#
+      Drag handle. Movable links (content links and static links that support
+      parent/weight overrides) get a grab handle; the rest render a non-grab
+      spacer so column alignment holds. See \Drupal\menu_tree_ui\MenuLinkMovability.
+    #}
+    {% if movable %}
+      <span
+        class="menu-tree-ui-row__handle"
+        role="button"
+        tabindex="-1"
+        aria-label="{{ 'Drag to reorder @title'|t({ '@title': title }) }}"
+        title="{{ 'Drag to reorder'|t }}"
+      >⋮⋮</span>
+    {% else %}
+      <span class="menu-tree-ui-row__handle menu-tree-ui-row__handle--locked" aria-hidden="true">·</span>
+    {% endif %}
+
+    {% if has_children %}
+      <button
+        type="button"
+        class="menu-tree-ui-row__toggle"
+        aria-label="{{ 'Toggle children of @title'|t({ '@title': title }) }}"
+        tabindex="-1"
+      >
+        <span aria-hidden="true" class="menu-tree-ui-row__chevron">▸</span>
+      </button>
+    {% else %}
+      <span class="menu-tree-ui-row__toggle menu-tree-ui-row__toggle--spacer" aria-hidden="true"></span>
+    {% endif %}
+
+    <span class="menu-tree-ui-row__title">{{ title }}</span>
+
+    {% if not enabled %}
+      <span class="menu-tree-ui-row__badge">{{ 'disabled'|t }}</span>
+    {% endif %}
+
+    {# Column cells — one slot per active column plugin. #}
+    {% for col_id, cell in columns %}
+      <div class="menu-tree-ui-row__column" data-column="{{ col_id }}">
+        {% if cell.type == 'toggle' %}
+          <button
+            type="button"
+            role="switch"
+            class="menu-tree-ui-row__column-toggle"
+            aria-checked="{{ cell.value ? 'true' : 'false' }}"
+            aria-label="{{ cell.label }}"
+            {% if not cell.interactive %}disabled{% endif %}
+            data-column-id="{{ col_id }}"
+            data-link-id="{{ plugin_id }}"
+          ><span class="visually-hidden">{{ cell.value ? 'On'|t : 'Off'|t }}</span></button>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    {# Operations dropbutton — replaces the old single "Edit" link. #}
+    {% if operations %}
+      <div class="menu-tree-ui-row__operations">{{ operations }}</div>
+    {% endif %}
+  </div>
+</li>

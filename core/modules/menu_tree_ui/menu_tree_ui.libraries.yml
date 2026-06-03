@@ -1,0 +1,25 @@
+menu_tree_ui:
+  version: VERSION
+  js:
+    js/tree-nav.js: {}
+    js/windowing.js: {}
+    js/row-builder.js: {}
+    js/expand.js: {}
+    js/keyboard.js: {}
+    js/jump-to.js: {}
+    js/search.js: {}
+    js/reorder-keys.js: {}
+    js/drag/intent.js: {}
+    js/drag/indicator.js: {}
+    js/drag/commit.js: {}
+    js/drag/controller.js: {}
+    js/move-mode.js: {}
+    js/menu-tree.js: {}
+  css:
+    component:
+      css/menu-tree-ui.css: {}
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+    - core/htmx
+    - core/drupal.htmx

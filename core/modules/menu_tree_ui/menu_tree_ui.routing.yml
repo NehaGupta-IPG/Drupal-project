@@ -1,0 +1,66 @@
+menu_tree_ui.edit:
+  path: '/admin/structure/menu-tree-ui/{menu}'
+  defaults:
+    _controller: '\Drupal\menu_tree_ui\Controller\MenuTreeController::page'
+    _title_callback: '\Drupal\menu_tree_ui\Controller\MenuTreeController::pageTitle'
+  requirements:
+    _entity_access: 'menu.update'
+  options:
+    _admin_route: true
+    parameters:
+      menu:
+        type: entity:menu
+
+menu_tree_ui.children:
+  path: '/admin/structure/menu-tree-ui/{menu}/children'
+  defaults:
+    _controller: '\Drupal\menu_tree_ui\Controller\MenuTreeController::children'
+  requirements:
+    _entity_access: 'menu.update'
+  options:
+    _admin_route: true
+    parameters:
+      menu:
+        type: entity:menu
+
+menu_tree_ui.search:
+  path: '/admin/structure/menu-tree-ui/{menu}/search'
+  defaults:
+    _controller: '\Drupal\menu_tree_ui\Controller\MenuTreeController::search'
+  requirements:
+    _entity_access: 'menu.update'
+  options:
+    _admin_route: true
+    parameters:
+      menu:
+        type: entity:menu
+
+menu_tree_ui.move:
+  path: '/admin/structure/menu-tree-ui/{menu}/move'
+  defaults:
+    _controller: '\Drupal\menu_tree_ui\Controller\MenuTreeController::move'
+  methods: [POST]
+  requirements:
+    _entity_access: 'menu.update'
+    _csrf_request_header_token: 'TRUE'
+  options:
+    _admin_route: true
+    no_cache: TRUE
+    parameters:
+      menu:
+        type: entity:menu
+
+menu_tree_ui.column_update:
+  path: '/admin/structure/menu-tree-ui/{menu}/column-update'
+  defaults:
+    _controller: '\Drupal\menu_tree_ui\Controller\MenuTreeController::columnUpdate'
+  methods: [POST]
+  requirements:
+    _entity_access: 'menu.update'
+    _csrf_request_header_token: 'TRUE'
+  options:
+    _admin_route: true
+    no_cache: TRUE
+    parameters:
+      menu:
+        type: entity:menu
