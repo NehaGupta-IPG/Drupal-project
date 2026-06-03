@@ -7,6 +7,7 @@ namespace Drupal\Core\Hook;
 use Drupal\Component\Annotation\Doctrine\StaticReflectionParser;
 use Drupal\Component\Annotation\Reflection\MockFileFinder;
 use Drupal\Component\FileCache\FileCacheFactory;
+use Drupal\Core\Discovery\AttributeScanner;
 use Drupal\Core\Extension\ProceduralCall;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\HookAttributeInterface;
@@ -380,7 +381,7 @@ class HookCollectorPass implements CompilerPassInterface {
           $attributes = [];
           if (class_exists($class)) {
             $reflectionClass = new \ReflectionClass($class);
-            $attributes = self::getAttributeInstances($reflectionClass);
+            $attributes = AttributeScanner::getAttributeInstances($reflectionClass, HookAttributeInterface::class);
             $hook_file_cache->set($filename, ['class' => $class, 'attributes' => $attributes]);
           }
         }
@@ -544,28 +545,6 @@ class HookCollectorPass implements CompilerPassInterface {
     if (in_array($hookAttribute->hook, $staticDenyHooks) || preg_match('/^(post_update_|update_\d+$)/', $hookAttribute->hook)) {
       throw new \LogicException("The hook $hookAttribute->hook on class $class does not support attributes and must remain procedural.");
     }
-  }
-
-  /**
-   * Get attribute instances from class and method reflections.
-   *
-   * @param \ReflectionClass $reflectionClass
-   *   A reflected class.
-   *
-   * @return array<string, list<\Drupal\Core\Hook\Attribute\HookAttributeInterface>>
-   *   Lists of Hook attribute instances by method name.
-   */
-  protected static function getAttributeInstances(\ReflectionClass $reflectionClass): array {
-    $attributes = [];
-    $reflections = $reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC);
-    $reflections[] = $reflectionClass;
-    foreach ($reflections as $reflection) {
-      if ($reflectionAttributes = $reflection->getAttributes(HookAttributeInterface::class, \ReflectionAttribute::IS_INSTANCEOF)) {
-        $method = $reflection instanceof \ReflectionMethod ? $reflection->getName() : '__invoke';
-        $attributes[$method] = array_map(static fn (\ReflectionAttribute $ra) => $ra->newInstance(), $reflectionAttributes);
-      }
-    }
-    return $attributes;
   }
 
 }

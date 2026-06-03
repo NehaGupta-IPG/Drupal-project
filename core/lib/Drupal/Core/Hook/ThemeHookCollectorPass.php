@@ -7,6 +7,7 @@ namespace Drupal\Core\Hook;
 use Drupal\Component\Annotation\Doctrine\StaticReflectionParser;
 use Drupal\Component\Annotation\Reflection\MockFileFinder;
 use Drupal\Component\FileCache\FileCacheFactory;
+use Drupal\Core\Discovery\AttributeScanner;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\HookAttributeInterface;
 use Drupal\Core\Hook\Attribute\LegacyHook;
@@ -236,7 +237,7 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
           $attributes = [];
           if (class_exists($class)) {
             $reflectionClass = new \ReflectionClass($class);
-            $attributes = self::getAttributeInstances($reflectionClass);
+            $attributes = AttributeScanner::getAttributeInstances($reflectionClass, HookAttributeInterface::class);
             $hookFileCache->set($filename, ['class' => $class, 'attributes' => $attributes]);
           }
         }
@@ -376,28 +377,6 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
     if ($hookAttribute->order !== NULL) {
       throw new \LogicException("The 'order' parameter on the #[Hook] attribute is not allowed in themes. Found in $class.");
     }
-  }
-
-  /**
-   * Get attribute instances from class and method reflections.
-   *
-   * @param \ReflectionClass $reflectionClass
-   *   A reflected class.
-   *
-   * @return array<string, list<\Drupal\Core\Hook\Attribute\HookAttributeInterface>>
-   *   Lists of Hook attribute instances by method name.
-   */
-  protected static function getAttributeInstances(\ReflectionClass $reflectionClass): array {
-    $attributes = [];
-    $reflections = $reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC);
-    $reflections[] = $reflectionClass;
-    foreach ($reflections as $reflection) {
-      if ($reflectionAttributes = $reflection->getAttributes(HookAttributeInterface::class, \ReflectionAttribute::IS_INSTANCEOF)) {
-        $method = $reflection instanceof \ReflectionMethod ? $reflection->getName() : '__invoke';
-        $attributes[$method] = array_map(static fn(\ReflectionAttribute $ra) => $ra->newInstance(), $reflectionAttributes);
-      }
-    }
-    return $attributes;
   }
 
 }
