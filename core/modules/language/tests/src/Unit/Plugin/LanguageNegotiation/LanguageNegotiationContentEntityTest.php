@@ -222,7 +222,10 @@ class LanguageNegotiationContentEntityTest extends LanguageNegotiationTestBase {
       'de' => [
         'url' => $url,
         'title' => $this->languages['de']->getName(),
-        'attributes' => ['class' => ['language-link']],
+        'attributes' => [
+          'class' => ['language-link'],
+          'lang' => 'de',
+        ],
         'query' => [
           LanguageNegotiationContentEntity::QUERY_PARAMETER => 'de',
           'param1' => 'xyz',
@@ -231,7 +234,10 @@ class LanguageNegotiationContentEntityTest extends LanguageNegotiationTestBase {
       'en' => [
         'url' => $url,
         'title' => $this->languages['en']->getName(),
-        'attributes' => ['class' => ['language-link']],
+        'attributes' => [
+          'class' => ['language-link'],
+          'lang' => 'en',
+        ],
         'query' => [
           LanguageNegotiationContentEntity::QUERY_PARAMETER => 'en',
           'param1' => 'xyz',
