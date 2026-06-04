@@ -143,8 +143,8 @@ class ContentTranslationHandlerTest extends KernelTestBase {
     // duplicate is new (has no ID) but keeps the existing-translation status.
     $storage = $this->entityTypeManager->getStorage($this->entityTypeId);
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-    $entity = $storage->create();
-    $entity->addTranslation($this->translationLangcode);
+    $entity = $storage->create(['name' => 'Original']);
+    $entity->addTranslation($this->translationLangcode, ['name' => 'Original translation']);
     $entity->save();
 
     $duplicate = $entity->createDuplicate();
