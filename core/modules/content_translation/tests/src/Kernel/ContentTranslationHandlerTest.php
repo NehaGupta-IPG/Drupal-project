@@ -137,6 +137,11 @@ class ContentTranslationHandlerTest extends KernelTestBase {
    */
   public function testEntityFormAlterDuplicateTranslation(): void {
     $this->state->set('entity_test.translation', TRUE);
+    // Enabling content translation installs the content_translation_status
+    // base field, which the published-status checkbox in entityFormAlter()
+    // reads through the metadata wrapper.
+    $this->container->get('content_translation.manager')
+      ->setEnabled($this->entityTypeId, $this->entityTypeId, TRUE);
     $this->entityTypeBundleInfo->clearCachedBundles();
 
     // Create and save an entity with a translation, then duplicate it. The
