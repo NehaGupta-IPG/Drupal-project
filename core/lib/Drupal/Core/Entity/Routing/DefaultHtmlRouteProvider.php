@@ -113,7 +113,7 @@ class DefaultHtmlRouteProvider implements EntityRouteProviderInterface, EntityHa
    *
    * Merges the extra defaults, requirements and options declared in the entity
    * type's route settings into the generated routes. This lets entity types
-   * customise their generated routes with static metadata instead of a custom
+   * customize their generated routes with static metadata instead of a custom
    * route provider subclass.
    *
    * A 'route_name' key renames the generated route in place. Use this to
