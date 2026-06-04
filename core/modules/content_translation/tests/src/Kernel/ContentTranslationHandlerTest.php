@@ -166,15 +166,19 @@ class ContentTranslationHandlerTest extends KernelTestBase {
     $form_state->set('langcode', $this->translationLangcode);
     $form_state->set('entity_default_langcode', $entity->getUntranslated()->language()->getId());
 
+    // Mimic the actions a real entity form provides, including the #submit
+    // arrays the handler prepends its own submit callback to.
     $form = [
       'actions' => [
         'submit' => [
           '#type' => 'submit',
           '#weight' => 5,
+          '#submit' => [],
         ],
         'delete' => [
           '#type' => 'submit',
           '#weight' => 10,
+          '#submit' => [],
         ],
       ],
     ];
