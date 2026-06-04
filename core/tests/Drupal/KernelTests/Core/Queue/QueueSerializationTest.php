@@ -29,6 +29,8 @@ class QueueSerializationTest extends KernelTestBase implements FormInterface {
   protected static $modules = ['system', 'user'];
 
   /**
+   * The queue object.
+   *
    * @var \Drupal\Core\Queue\DatabaseQueue
    */
   protected DatabaseQueue $queue;
@@ -36,7 +38,7 @@ class QueueSerializationTest extends KernelTestBase implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'queue_test_injection_form';
   }
 
@@ -56,7 +58,7 @@ class QueueSerializationTest extends KernelTestBase implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['#process'][] = [$this, 'process'];
     return $form;
   }
@@ -64,7 +66,7 @@ class QueueSerializationTest extends KernelTestBase implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {}
+  public function validateForm(array &$form, FormStateInterface $form_state): void {}
 
   /**
    * {@inheritdoc}

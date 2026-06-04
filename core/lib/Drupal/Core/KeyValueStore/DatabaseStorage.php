@@ -122,6 +122,24 @@ class DatabaseStorage extends StorageBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function getAllKeys(): iterable {
+    try {
+      $values = $this->connection->query(
+        'SELECT [name] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection',
+        [
+          ':collection' => $this->collection,
+        ])->fetchCol();
+      return $values;
+    }
+    catch (\Exception $e) {
+      $this->catchException($e);
+    }
+    return [];
+  }
+
+  /**
    * Saves a value for a given key.
    *
    * This will be called by set() within a try block.
@@ -156,6 +174,20 @@ class DatabaseStorage extends StorageBase {
       else {
         throw $e;
       }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setMultiple(array $data): void {
+    $transaction = $this->connection->startTransaction();
+    try {
+      parent::setMultiple($data);
+      $transaction->commitOrRelease();
+    }
+    catch (\Exception) {
+      $transaction->rollback();
     }
   }
 

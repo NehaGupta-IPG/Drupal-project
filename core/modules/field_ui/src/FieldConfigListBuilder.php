@@ -4,6 +4,7 @@ namespace Drupal\field_ui;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -187,7 +188,7 @@ class FieldConfigListBuilder extends ConfigEntityListBuilder {
           'label' => [
             '#type' => 'html_tag',
             '#tag' => 'span',
-            '#value' => $field_config->getLabel(),
+            '#plain_text' => $field_config->getLabel(),
             '#attributes' => [
               'class' => ['field-label-text'],
             ],
@@ -195,7 +196,7 @@ class FieldConfigListBuilder extends ConfigEntityListBuilder {
           'machine_name' => [
             '#type' => 'html_tag',
             '#tag' => 'span',
-            '#value' => ' ' . $field_config->getName(),
+            '#plain_text' => ' ' . $field_config->getName(),
             '#attributes' => [
               'class' => ['field-ui-secondary-text', 'field-machine-name'],
             ],
@@ -250,11 +251,13 @@ class FieldConfigListBuilder extends ConfigEntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  protected function getDefaultOperations(EntityInterface $entity/* , ?CacheableMetadata $cacheability = NULL */) {
+  protected function getDefaultOperations(EntityInterface $entity, CacheableMetadata $cacheability) {
     /** @var \Drupal\field\FieldConfigInterface $entity */
-    $operations = parent::getDefaultOperations($entity);
+    $operations = parent::getDefaultOperations($entity, $cacheability);
 
-    if ($entity->access('update') && $entity->hasLinkTemplate("{$entity->getTargetEntityTypeId()}-field-edit-form")) {
+    $update_access = $entity->access('update', return_as_object: TRUE);
+    $cacheability->addCacheableDependency($update_access);
+    if ($update_access->isAllowed() && $entity->hasLinkTemplate("{$entity->getTargetEntityTypeId()}-field-edit-form")) {
       $operations['edit'] = [
         'title' => $this->t('Edit'),
         'weight' => 10,
@@ -269,7 +272,9 @@ class FieldConfigListBuilder extends ConfigEntityListBuilder {
         ],
       ];
     }
-    if ($entity->access('delete') && $entity->hasLinkTemplate("{$entity->getTargetEntityTypeId()}-field-delete-form")) {
+    $delete_access = $entity->access('delete', return_as_object: TRUE);
+    $cacheability->addCacheableDependency($delete_access);
+    if ($delete_access->isAllowed() && $entity->hasLinkTemplate("{$entity->getTargetEntityTypeId()}-field-delete-form")) {
       $operations['delete'] = [
         'title' => $this->t('Delete'),
         'weight' => 100,

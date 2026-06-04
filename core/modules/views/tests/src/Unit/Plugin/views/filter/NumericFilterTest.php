@@ -21,11 +21,9 @@ class NumericFilterTest extends UnitTestCase {
 
   /**
    * Tests the acceptExposedInput method.
-   *
-   * @legacy-covers ::acceptExposedInput
    */
   #[DataProvider('provideAcceptExposedInput')]
-  public function testAcceptExposedInput($options, $value, $expected): void {
+  public function testAcceptExposedInput(array $options, array $value, bool $expected): void {
     $plugin_definition = [
       'title' => $this->randomMachineName(),
     ];

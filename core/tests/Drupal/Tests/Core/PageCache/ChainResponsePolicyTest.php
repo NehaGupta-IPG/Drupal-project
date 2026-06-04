@@ -86,7 +86,7 @@ class ChainResponsePolicyTest extends UnitTestCase {
    * @legacy-covers ::check
    */
   #[DataProvider('providerChainExceptionOnInvalidReturnValue')]
-  public function testChainExceptionOnInvalidReturnValue($return_value): void {
+  public function testChainExceptionOnInvalidReturnValue(bool|int|\stdClass|array $return_value): void {
     $rule = $this->createMock('Drupal\Core\PageCache\ResponsePolicyInterface');
     $rule->expects($this->once())
       ->method('check')
@@ -105,7 +105,7 @@ class ChainResponsePolicyTest extends UnitTestCase {
    * @return array
    *   Test input and expected result.
    */
-  public static function providerChainExceptionOnInvalidReturnValue() {
+  public static function providerChainExceptionOnInvalidReturnValue(): array {
     return [
       [FALSE],
       [0],

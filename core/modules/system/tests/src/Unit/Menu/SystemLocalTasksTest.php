@@ -39,12 +39,12 @@ class SystemLocalTasksTest extends LocalTaskIntegrationTestBase {
     $theme = new Extension($this->root, 'theme', 'core/themes/olivero', 'olivero.info.yml');
     $theme->status = 1;
     $theme->info = ['name' => 'olivero'];
-    $this->themeHandler->expects($this->any())
+    $this->themeHandler->expects($this->once())
       ->method('listInfo')
       ->willReturn([
         'olivero' => $theme,
       ]);
-    $this->themeHandler->expects($this->any())
+    $this->themeHandler->expects($this->once())
       ->method('hasUi')
       ->with('olivero')
       ->willReturn(TRUE);
@@ -56,8 +56,8 @@ class SystemLocalTasksTest extends LocalTaskIntegrationTestBase {
       ->method('hasLinkTemplate')
       ->with('version-history')
       ->willReturn(TRUE);
-    $entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
-    $entityTypeManager->expects($this->any())
+    $entityTypeManager = $this->createStub(EntityTypeManagerInterface::class);
+    $entityTypeManager
       ->method('getDefinitions')
       ->willReturn([
         'foo' => $fooEntityDefinition,
@@ -69,14 +69,14 @@ class SystemLocalTasksTest extends LocalTaskIntegrationTestBase {
    * Tests local task existence.
    */
   #[DataProvider('getSystemAdminRoutes')]
-  public function testSystemAdminLocalTasks($route, $expected): void {
+  public function testSystemAdminLocalTasks(string $route, array $expected): void {
     $this->assertLocalTasks($route, $expected);
   }
 
   /**
    * Provides a list of routes to test.
    */
-  public static function getSystemAdminRoutes() {
+  public static function getSystemAdminRoutes(): array {
     return [
       ['system.admin_content', [['system.admin_content']]],
       [

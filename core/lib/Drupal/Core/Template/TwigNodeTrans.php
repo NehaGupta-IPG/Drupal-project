@@ -51,7 +51,7 @@ class TwigNodeTrans extends Node {
   /**
    * {@inheritdoc}
    */
-  public function compile(Compiler $compiler) {
+  public function compile(Compiler $compiler): void {
     $compiler->addDebugInfo($this);
 
     [$singular, $tokens] = $this->compileString($this->getNode('body'));
@@ -138,6 +138,9 @@ class TwigNodeTrans extends Node {
           // Support TwigExtension->renderVar() function in chain.
           if ($args instanceof FunctionExpression) {
             $args = $n->getNode('arguments')->getNode(0);
+          }
+          if ($args instanceof CheckToStringNode) {
+            $args = $args->getNode('expr');
           }
 
           // Detect if a token implements one of the filters reserved for
