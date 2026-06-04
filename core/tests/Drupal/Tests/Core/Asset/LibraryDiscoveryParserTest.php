@@ -20,6 +20,7 @@ use Drupal\Core\Theme\ComponentPluginManager;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Utility\YamlCacheCollector;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -788,6 +789,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
    * @legacy-covers ::getLatestOverridePath
    * @legacy-covers ::setLatestOverridePath
    */
+  #[AllowMockObjectsWithoutExpectations]
   public function testLatestOverridePath(): void {
     $latest = $this->libraryDiscoveryParser->getLatestOverridePath('original-path', 'type', 'library_name', 'extension');
     $this->assertEquals('original-path', $latest);
