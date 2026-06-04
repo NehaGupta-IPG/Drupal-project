@@ -125,7 +125,6 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
       // change to rely on the latest state.
       $static_cache_keys = array_merge($cache_keys, ['user:' . $account->id()]);
       $static_initial_cacheability = clone $initial_cacheability;
-      $static_initial_cacheability->addCacheTags(['user:' . $account->id()]);
       $static_initial_cacheability->setCacheContexts($this->filterUserCacheContexts($initial_cacheability->getCacheContexts()));
       // Retrieve the permissions from the static cache if available.
       if ($static_cache = $this->variationStatic->get($static_cache_keys, $static_initial_cacheability)) {
@@ -195,6 +194,7 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
       // warm static cache.
       $calculated_permissions = new CalculatedPermissions($calculated_permissions);
       $cacheability->setCacheContexts($this->filterUserCacheContexts($cacheability->getCacheContexts()));
+      $cacheability->addCacheTags(['user:' . $account->id()]);
       $this->variationStatic->set($static_cache_keys, $calculated_permissions, $cacheability, $static_initial_cacheability);
 
       // Return the permissions as an immutable value object.
