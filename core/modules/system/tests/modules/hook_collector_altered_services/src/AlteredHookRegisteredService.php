@@ -6,15 +6,15 @@ namespace Drupal\hook_collector_altered_services;
 
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Test\Hook\TrackHookInvocationsTrait;
-use Drupal\hook_collector_hook_attribute\Random\Test\Namespace\AnotherServiceWithHook;
+use Drupal\hook_collector_hook_attribute\Hook\HookRegisteredService;
 
 /**
  * Class that replaces AnotherServiceWithHook in service definition.
  *
- * Altering hook services is not support, so installing the
- * hook_collector_altered_services should throw and exception.
+ * Altering Hook-namespaced services is not supported, so installing the
+ * hook_collector_altered_services module should trigger a deprecation.
  */
-class AlteredServiceWithHook extends AnotherServiceWithHook {
+class AlteredHookRegisteredService extends HookRegisteredService {
 
   use TrackHookInvocationsTrait;
 

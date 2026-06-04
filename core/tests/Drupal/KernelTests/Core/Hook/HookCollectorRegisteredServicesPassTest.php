@@ -28,18 +28,21 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 class HookCollectorRegisteredServicesPassTest extends KernelTestBase {
 
   /**
+   * {@inheritdoc}
+   */
+  protected static $modules = ['hook_collector_hook_attribute'];
+
+  /**
    * Tests that the implementation of hooks in declared services run.
    */
   #[IgnoreDeprecations]
   public function testHookInDeclaredService(): void {
-    \Drupal::service('module_installer')->install(['hook_collector_hook_attribute']);
     $invocations = [];
 
     // Test that implementations of test_hook_1 are invoked the right number of
     // times and in the right order.
     \Drupal::moduleHandler()->invokeAll('test_hook_1', [&$invocations]);
     $this->assertSame([
-
       TestHookService::class . '::testHook1' => 1,
       HookRegisteredService::class . '::__invoke' => 1,
       EventSubscriberWithHook::class . '::testHook1' => 1,
@@ -93,7 +96,8 @@ class HookCollectorRegisteredServicesPassTest extends KernelTestBase {
     // Any hook implementations in service decorators are ignored.
     $invocations = [];
     $this->assertTrue(method_exists($decoratedService, 'testHookInDecorator'));
-    \Drupal::moduleHandler()->invokeAll('test_hook_in_decorator', [&$invocations]);
+    \Drupal::moduleHandler()
+      ->invokeAll('test_hook_in_decorator', [&$invocations]);
     $this->assertEmpty($invocations);
 
     // Confirm that an event subscriber service that contains a hook
@@ -106,8 +110,15 @@ class HookCollectorRegisteredServicesPassTest extends KernelTestBase {
     $invocations = $event->getInvocations();
     $this->assertSame([EventSubscriberWithHook::class . '::onEvent' => 1], $invocations);
     $this->assertSame(get_class(\Drupal::service(EventSubscriberWithHook::class)), get_class(\Drupal::service('hook.' . EventSubscriberWithHook::class)));
+  }
 
-    $this->expectExceptionMessage('Hook service "Drupal\hook_collector_hook_attribute\Hook\HookRegisteredService" can not be altered or decorated');
+  /**
+   * Tests that replacing hook services is deprecated or throws an exception.
+   */
+  #[IgnoreDeprecations]
+  public function testHookServiceDecorationAlterationPrevention(): void {
+    $this->expectUserDeprecationMessage('Altering hook service Drupal\\hook_collector_hook_attribute\\Hook\\HookRegisteredService is deprecated in drupal:11.5.0 and is not supported in drupal:12.0.0. Use the ReorderHook or RemoveHook attributes to control hook methods instead. See https://www.drupal.org/node/3526437');
+    $this->expectExceptionMessage('Service(s) "Drupal\hook_collector_altered_services\AnotherServiceWithHookDecorator" can not decorate a hook service');
     $this->expectException(\LogicException::class);
     \Drupal::service(ModuleInstallerInterface::class)->install(['hook_collector_altered_services']);
   }

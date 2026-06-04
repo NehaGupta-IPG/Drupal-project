@@ -19,7 +19,7 @@ class HookCollectorAlteredServicesServiceProvider implements ServiceModifierInte
   public function alter(ContainerBuilder $container): void {
     if ($container->has(HookRegisteredService::class)) {
       $definition = $container->getDefinition(HookRegisteredService::class);
-      $definition->setClass(AlteredServiceWithHook::class);
+      $definition->setClass(AlteredHookRegisteredService::class);
     }
   }
 
