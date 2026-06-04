@@ -156,7 +156,7 @@ class VariationCache implements VariationCacheInterface {
     }
 
     // Track the potential effect of cache context optimization on cache tags.
-    $optimized_cacheability = CacheableMetadata::createFromObject($cacheability);
+    $optimized_cacheability = CacheableMetadata::createFromObject($initial_cacheability);
     $cid = $this->createCacheId($keys, $optimized_cacheability);
 
     // Check whether we had any cache redirects leading to the cache ID already.
