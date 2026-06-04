@@ -76,6 +76,7 @@ class ContentTranslationHandlerTest extends KernelTestBase {
     $this->entityTypeBundleInfo = $this->container->get('entity_type.bundle.info');
     $this->entityTypeManager = $this->container->get('entity_type.manager');
 
+    $this->installEntitySchema('user');
     $this->installEntitySchema($this->entityTypeId);
     ConfigurableLanguage::createFromLangcode($this->translationLangcode)->save();
   }
