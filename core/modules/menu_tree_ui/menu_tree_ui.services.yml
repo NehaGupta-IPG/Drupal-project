@@ -6,15 +6,12 @@ services:
       - '@menu.tree_storage'
       - '@module_handler'
       - !tagged_iterator menu_tree_ui.search_provider
+  Drupal\menu_tree_ui\Service\MenuTreeLoader: '@menu_tree_ui.loader'
 
   menu_tree_ui.mover:
     class: Drupal\menu_tree_ui\Service\MenuTreeMover
-    arguments:
-      - '@menu.tree_storage'
-      - '@database'
-      - '@module_handler'
-      - '@menu_tree_ui.loader'
-      - '@plugin.manager.menu.link'
+    autowire: true
+  Drupal\menu_tree_ui\Service\MenuTreeMover: '@menu_tree_ui.mover'
 
   plugin.manager.menu_tree_column:
     class: Drupal\menu_tree_ui\MenuTreeColumnManager
@@ -22,9 +19,7 @@ services:
 
   menu_tree_ui.search_provider.menu_link_content:
     class: Drupal\menu_tree_ui\SearchProvider\MenuLinkContentSearchProvider
-    arguments:
-      - '@entity_type.manager'
-      - '@menu.tree_storage'
-      - '@database'
+    autowire: true
     tags:
       - { name: menu_tree_ui.search_provider, priority: 0 }
+  Drupal\menu_tree_ui\SearchProvider\MenuTreeSearchProviderInterface: '@menu_tree_ui.search_provider.menu_link_content'
