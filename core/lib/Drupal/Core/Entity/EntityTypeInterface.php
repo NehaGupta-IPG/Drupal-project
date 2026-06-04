@@ -478,6 +478,35 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
   public function setLinkTemplate($key, $path);
 
   /**
+   * Gets the route settings for all link relationship types.
+   *
+   * Route settings allow a route provider to enrich the routes it generates
+   * from link templates with extra defaults, requirements and options, without
+   * requiring a custom route provider class. Each entry is keyed by the link
+   * relationship type (the same key used by the link templates) and may
+   * contain any of 'route_name', 'defaults', 'requirements', and 'options'.
+   *
+   * @return array
+   *   Additional route settings keyed by link relationship type.
+   *
+   * @see \Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider
+   */
+  public function getRouteSettings(): array;
+
+  /**
+   * Gets the route settings for a given link relationship type.
+   *
+   * @param string $rel
+   *   The link relationship type, e.g. 'canonical' or 'edit-form'.
+   *
+   * @return array
+   *   The route settings for this link, or an empty array if none exist.
+   *
+   * @see \Drupal\Core\Entity\EntityTypeInterface::getRouteSettings()
+   */
+  public function getRouteSetting(string $rel): array;
+
+  /**
    * Gets the name of the entity type which provides bundles.
    *
    * @return string|null

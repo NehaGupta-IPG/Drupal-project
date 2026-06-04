@@ -114,6 +114,25 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
   protected $links = [];
 
   /**
+   * Additional route settings keyed by link relationship type.
+   *
+   * Lets a route provider enrich the routes it generates from link templates
+   * with extra defaults, requirements and options, without requiring a custom
+   * route provider class. Each entry is keyed by the link relationship type
+   * (the same key used in $links) and may contain any of:
+   * - route_name: A route name to use in place of the conventional
+   *   "entity.{type}.{rel}" name, to preserve a historical route name for
+   *   backwards compatibility.
+   * - defaults: An array of route defaults to add (e.g. _controller, _title).
+   * - requirements: An array of route requirements to add.
+   * - options: An array of route options to add (e.g. _admin_route).
+   *
+   * @var array
+   */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  protected $route_settings = [];
+
+  /**
    * The name of the entity type which provides bundles.
    *
    * @var string
@@ -716,6 +735,20 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
 
     $this->links[$key] = $path;
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRouteSettings(): array {
+    return $this->route_settings;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRouteSetting(string $rel): array {
+    return $this->route_settings[$rel] ?? [];
   }
 
   /**
