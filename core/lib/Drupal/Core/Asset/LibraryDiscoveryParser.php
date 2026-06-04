@@ -492,13 +492,19 @@ class LibraryDiscoveryParser {
             // Loop through the CSS categories.
             foreach ($value as $library_entries) {
               foreach (array_keys($library_entries) as $library_path) {
-                $this->originalLibraryPaths[$this->resolveThemeAssetPath($extension_path, $library_path)] = $library_path;
+                $resolved = $this->resolveThemeAssetPath($extension_path, $library_path);
+                if ($resolved !== $library_path) {
+                  $this->originalLibraryPaths[$resolved] = $library_path;
+                }
               }
             }
           }
           else {
             foreach (array_keys($value) as $library_path) {
-              $this->originalLibraryPaths[$this->resolveThemeAssetPath($extension_path, $library_path)] = $library_path;
+              $resolved = $this->resolveThemeAssetPath($extension_path, $library_path);
+              if ($resolved !== $library_path) {
+                $this->originalLibraryPaths[$resolved] = $library_path;
+              }
             }
           }
         }
