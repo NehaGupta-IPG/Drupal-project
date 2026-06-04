@@ -46,6 +46,7 @@ final class CurrentImport {
    *   The CurrentImport object.
    */
   public static function createFromFile(LocaleFile $file): self {
+    // @phpstan-ignore property.deprecated
     $currentImport = new CurrentImport($file->project, $file->langcode, $file->version, $file->hash, $file->timestamp, $file->last_checked ?? NULL);
     return $currentImport;
   }
@@ -53,13 +54,13 @@ final class CurrentImport {
   /**
    * Creates a CurrentImport from a source object.
    *
-   * @param object $source
+   * @param \Drupal\locale\LocaleTranslationSource $source
    *   The source object containing the primer information.
    *
    * @return self
    *   The CurrentImport object.
    */
-  public static function createFromSource(object $source): self {
+  public static function createFromSource(LocaleTranslationSource $source): self {
     $currentImport = new CurrentImport($source->project, $source->langcode, $source->version, $source->hash, $source->timestamp, $source->last_checked ?? NULL);
     return $currentImport;
   }

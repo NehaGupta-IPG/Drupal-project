@@ -37,6 +37,11 @@ class LocaleTranslationSource {
    * The server pattern.
    *
    * @var string
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use the
+   *   server pattern of the project instead.
+   *
+   * @see https://www.drupal.org/node/3593802
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public string $server_pattern = '';
@@ -45,6 +50,11 @@ class LocaleTranslationSource {
    * The project name.
    *
    * @var string
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use the
+   *   project property instead.
+   *
+   * @see https://www.drupal.org/node/3593802
    */
   public string $name;
 
@@ -59,6 +69,11 @@ class LocaleTranslationSource {
    * The core for the Server pattern, always "all".
    *
    * @var string
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There is
+   *   no replacement.
+   *
+   * @see https://www.drupal.org/node/3593802
    */
   public string $core = 'all';
 
@@ -70,6 +85,7 @@ class LocaleTranslationSource {
     public string $hash = '',
     public int $last_checked = 0,
   ) {
+    // @phpstan-ignore property.deprecated
     $this->name = $project;
   }
 
@@ -85,6 +101,7 @@ class LocaleTranslationSource {
    */
   public static function fromProject(LocaleTranslatableProject $project, string $langcode): static {
     $source = new static($project->name, $langcode);
+    // @phpstan-ignore property.deprecated
     $source->server_pattern = $project->server_pattern;
     $source->version = $project->version;
     return $source;

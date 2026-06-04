@@ -27,6 +27,14 @@ class LocaleBuildTest extends KernelTestBase {
   ];
 
   /**
+   * {@inheritdoc}
+   */
+  public function setUp(): void {
+    parent::setUp();
+    $this->installSchema('locale', 'locale_file');
+  }
+
+  /**
    * Checks if a list of translatable projects gets built.
    */
   public function testBuildProjects(): void {
@@ -42,11 +50,10 @@ class LocaleBuildTest extends KernelTestBase {
     // Confirm the project name and core value before the module is altered.
     $projects = \Drupal::service(LocaleProjectRepository::class)->buildProjects();
     $this->assertSame('locale_test', $projects['locale_test']->name);
-    $this->assertSame('all', $projects['locale_test']->core);
     $this->assertSame(0, $projects['locale_test']->getWeight());
 
-    $projects['locale_test']->setLangcode('de');
-    $this->assertSame('/all/locale_test/locale_test-1.2.de.po', \Drupal::service(LocaleSource::class)->buildServerPattern($projects['locale_test'], '/%core/%project/%project-%version.%language.po'));
+    $locale_test_source = \Drupal::service(LocaleSource::class)->loadSource('locale_test', 'de');
+    $this->assertSame('/all/locale_test/locale_test-1.2.de.po', \Drupal::service(LocaleSource::class)->buildServerPattern($locale_test_source, '/%core/%project/%project-%version.%language.po'));
 
     // Alter both the name and core value of the project.
     \Drupal::state()->set('locale.test_system_info_alter_name_core', TRUE);
@@ -55,16 +62,14 @@ class LocaleBuildTest extends KernelTestBase {
     // Confirm the name and core value are changed in $module->info.
     $module = $module_list->get('locale_test');
     $this->assertSame('locale_test_alter', $module->info['name']);
-    $this->assertSame('8.6.7', $module->info['core']);
     $this->assertSame('locale_test', $module->getName());
 
     // Confirm the name and core value are not changed in the project.
     $projects = \Drupal::service(LocaleProjectRepository::class)->buildProjects();
     $this->assertSame('locale_test', $projects['locale_test']->name);
-    $this->assertSame('all', $projects['locale_test']->core);
 
-    $projects['locale_test']->setLangcode('de');
-    $this->assertSame('/all/locale_test/locale_test-1.2.de.po', \Drupal::service(LocaleSource::class)->buildServerPattern($projects['locale_test'], '/%core/%project/%project-%version.%language.po'));
+    $locale_test_source = \Drupal::service(LocaleSource::class)->loadSource('locale_test', 'de');
+    $this->assertSame('/all/locale_test/locale_test-1.2.de.po', \Drupal::service(LocaleSource::class)->buildServerPattern($locale_test_source, '/%core/%project/%project-%version.%language.po'));
 
     \Drupal::state()->set('locale.test_projects_alter.weight', TRUE);
     $projects = \Drupal::service(LocaleProjectRepository::class)->buildProjects();

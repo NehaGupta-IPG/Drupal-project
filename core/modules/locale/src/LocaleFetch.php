@@ -179,7 +179,7 @@ class LocaleFetch {
           '%langcode' => $langcode,
           '%project' => $source->project,
         ]);
-        $this->localeSource->saveSource($source->name, $source->langcode, SourceType::Local->value, $file);
+        $this->localeSource->saveSource($source->project, $source->langcode, SourceType::Local->value, $file);
       }
       else {
         $context['results']['failed_files'][] = $source->getFile(SourceType::Remote);
@@ -324,7 +324,7 @@ class LocaleFetch {
     // Check the status of local translation files.
     if ($source->getFile(SourceType::Local)) {
       if ($file = $this->localeSource->sourceCheckFile($source)) {
-        $this->localeSource->saveSource($source->name, $source->langcode, SourceType::Local->value, $file);
+        $this->localeSource->saveSource($source->project, $source->langcode, SourceType::Local->value, $file);
       }
       $checked = TRUE;
     }
@@ -347,7 +347,7 @@ class LocaleFetch {
         if ($remoteFileInfo->lastModified) {
           $remote_file->uri = $remoteFileInfo->location ?? $remote_file->uri;
           $remote_file->timestamp = $remoteFileInfo->lastModified;
-          $this->localeSource->saveSource($source->name, $source->langcode, SourceType::Remote->value, $remote_file);
+          $this->localeSource->saveSource($source->project, $source->langcode, SourceType::Remote->value, $remote_file);
         }
         // @todo What to do with when the file is not found (404)? To prevent
         //   re-checking within the TTL (1day, 1week) we can set a last_checked
@@ -362,10 +362,10 @@ class LocaleFetch {
     // Provide user feedback and record success or failure for reporting at the
     // end of the batch.
     if ($options['finish_feedback'] && $checked) {
-      $context['results']['files'][] = $source->name;
+      $context['results']['files'][] = $source->project;
     }
     if ($failure && !$checked) {
-      $context['results']['failed_files'][] = $source->name;
+      $context['results']['failed_files'][] = $source->project;
     }
     $context['message'] = $this->t('Checked %langcode translation for %project.', [
       '%langcode' => $langcode,

@@ -150,12 +150,13 @@ class LocaleSource {
         break;
 
       case SourceType::Current->value:
-        $data->last_checked = $request_time;
         $project_sources[$langcode]->timestamp = $data->timestamp;
         $project_sources[$langcode]->hash = $data->hash;
-        $project_sources[$langcode]->last_checked = $data->last_checked;
+        $project_sources[$langcode]->last_checked = $request_time;
         $project_sources[$langcode]->type = $type;
-        $this->currentImportStorage->save(CurrentImport::createFromSource($data));
+        $current_import = $data instanceof LocaleFile ? CurrentImport::createFromFile($data) : $data;
+        $current_import->last_checked = $request_time;
+        $this->currentImportStorage->save($current_import);
         break;
     }
 
@@ -237,7 +238,7 @@ class LocaleSource {
     foreach ($projects as $project) {
       foreach ($langcodes as $langcode) {
         $source = $this->sourceBuild($project, $langcode);
-        $sources[$source->name][$source->langcode] = $source;
+        $sources[$source->project][$source->langcode] = $source;
       }
     }
     return $sources;
@@ -304,9 +305,9 @@ class LocaleSource {
     // translations directory has been defined. If the server_pattern is a local
     // file path we will only check for a file in the local file system.
     $files = [];
-    if ($this->fileIsRemote($source->server_pattern)) {
-      $remote_filename = $this->buildServerPattern($source, basename($source->server_pattern));
-      $remote_uri = $this->buildServerPattern($source, $source->server_pattern);
+    if ($this->fileIsRemote($project->server_pattern)) {
+      $remote_filename = $this->buildServerPattern($source, basename($project->server_pattern));
+      $remote_uri = $this->buildServerPattern($source, $project->server_pattern);
       $remote_file = new LocaleFile($remote_filename, $remote_uri, '', NULL, $langcode, $project->name, $project->version);
       $remote_file->type = SourceType::Remote->value;
       $files[SourceType::Remote->value] = $remote_file;
@@ -315,15 +316,17 @@ class LocaleSource {
       $local_uri = 'translations://' . $local_filename;
       $local_file = new LocaleFile($local_filename, $local_uri, '', NULL, $langcode, $project->name, $project->version);
       $local_file->type = SourceType::Local->value;
+      // @phpstan-ignore property.deprecated
       $local_file->directory = 'translations://';
       $files[SourceType::Local->value] = $local_file;
     }
     else {
-      $local_directory = $this->buildServerPattern($source, $this->fileSystem->dirname($source->server_pattern));
-      $local_filename = $this->buildServerPattern($source, basename($source->server_pattern));
+      $local_directory = $this->buildServerPattern($source, $this->fileSystem->dirname($project->server_pattern));
+      $local_filename = $this->buildServerPattern($source, basename($project->server_pattern));
       $local_uri = $local_directory . '/' . $local_filename;
       $local_file = new LocaleFile($local_filename, $local_uri, '', NULL, $langcode, $project->name, $project->version);
       $local_file->type = SourceType::Local->value;
+      // @phpstan-ignore property.deprecated
       $local_file->directory = $local_directory;
       $files[SourceType::Local->value] = $local_file;
     }
@@ -349,24 +352,29 @@ class LocaleSource {
   /**
    * Build path to translation source, out of a server path replacement pattern.
    *
-   * @param object $project
-   *   Project object containing data to be inserted in the template.
+   * @param \Drupal\locale\LocaleTranslationSource $source
+   *   Translation soruce object containing data to be inserted in the template.
    * @param string $template
    *   String containing placeholders. Available placeholders:
    *   - "%project": Project name.
    *   - "%version": Project version.
-   *   - "%core": Project core version.
+   *   - "%core": Always "all", core version no longer varies.
    *   - "%language": Language code.
    *
    * @return string
    *   String with replaced placeholders.
    */
-  public function buildServerPattern($project, $template): string {
+  public function buildServerPattern(/* LocaleTranslationSource */ $source, string $template): string {
+    if (!$source instanceof LocaleTranslationSource) {
+      @trigger_error('The first argument to ' . __METHOD__ . '() not being a LocaleTranslationSource is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3593802', E_USER_DEPRECATED);
+    }
     $variables = [
-      '%project' => $project->name,
-      '%version' => $project->version,
-      '%core' => $project->core,
-      '%language' => $project->langcode,
+      // Fall back to name in case a project object is passed in.
+      // @phpstan-ignore property.deprecated
+      '%project' => $source->project ?? $source->name,
+      '%version' => $source->version,
+      '%core' => 'all',
+      '%language' => $source->langcode,
     ];
     return strtr($template, $variables);
   }

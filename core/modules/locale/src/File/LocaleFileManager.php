@@ -206,6 +206,7 @@ class LocaleFileManager {
         $version = $source_file->version ?? NULL;
         $file = new LocaleFile($filename, $uri, $hash, filemtime($uri), $langcode, $project, $version);
         $file->type = SourceType::Local->value;
+        // @phpstan-ignore property.deprecated
         $file->directory = $directory;
         return $file;
       }
