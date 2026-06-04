@@ -372,7 +372,7 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
       }
 
       // Replace the delete button with the delete translation one.
-      if (!$new_translation) {
+      if (!$new_translation && !$entity->isNew()) {
         $weight = 100;
         foreach (['delete', 'submit'] as $key) {
           if (isset($form['actions'][$key]['weight'])) {
