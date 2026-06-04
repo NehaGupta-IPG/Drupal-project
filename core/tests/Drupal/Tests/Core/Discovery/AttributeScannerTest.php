@@ -47,9 +47,9 @@ class AttributeScannerTest extends UnitTestCase {
   }
 
   /**
-   * Tests that uninstantiable and unloadable classes are skipped.
+   * Tests that non-instantiable and non-loadable classes are skipped.
    */
-  public function testScanSkipsUninstantiableClasses(): void {
+  public function testScanSkipsNonLoadableClasses(): void {
     $classes = $this->scanFixtures();
 
     // A class that cannot be autoloaded because it extends a class from a
@@ -61,7 +61,7 @@ class AttributeScannerTest extends UnitTestCase {
     // instantiated.
     $this->assertNotContains('Drupal\router_test\Controller\TestAbstractController', $classes);
 
-    // A class with no reference to the attribute never passes the prefilter.
+    // A class with no reference to the attribute never passes the filter.
     $this->assertNotContains('Drupal\router_test\Controller\TestInvalidController', $classes);
   }
 
