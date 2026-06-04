@@ -247,13 +247,14 @@ class LibraryDiscoveryIntegrationTest extends KernelTestBase {
    * Tests previous behavior of using the last overridden path.
    */
   #[Group('legacy')]
+  #[IgnoreDeprecations]
   public function testLibrariesOverrideLegacyOverride(): void {
     // Activate a sub-theme that overrides a library override.
     $this->activateTheme('test_legacy_subtheme');
+    $this->expectUserDeprecationMessage('Overriding a library asset using an overridden path as the key is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use the original path (/core/modules/system/tests/themes/test_base_theme/css/base-libraries-extend.css) as the key. See https://www.drupal.org/node/3489303');
     // Assert that effective libraries override is from the test_legacy_subtheme.
     $this->assertNoAssetInLibrary('core/modules/system/tests/themes/test_base_theme/base-add.sub-remove.css', 'test_base_theme', 'global-styling', 'css');
     $this->assertAssetInLibrary('core/modules/system/tests/themes/test_legacy_subtheme/css/legacy-sub-theme-libraries-extend.css', 'test_base_theme', 'global-styling', 'css');
-    $this->expectDeprecation('Overriding a library asset using an overridden path as the key is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use the original path (/core/modules/system/tests/themes/test_base_theme/css/base-libraries-extend.css) as the key. See https://www.drupal.org/node/3489303');
   }
 
   /**
