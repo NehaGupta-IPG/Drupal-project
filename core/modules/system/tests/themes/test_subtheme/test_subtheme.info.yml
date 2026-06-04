@@ -21,5 +21,5 @@ libraries-override:
         misc/vertical-tabs.css: css/vertical-tabs.css
 
 libraries-extend:
-  starterkit_theme/base:
+  test_base_theme/base:
     - test_subtheme/global-styling

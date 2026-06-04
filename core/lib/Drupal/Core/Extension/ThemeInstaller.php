@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Extension;
 
-use Drupal\Component\Plugin\Discovery\CachedDiscoveryInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Asset\AssetCollectionOptimizerInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -41,12 +40,8 @@ class ThemeInstaller implements ThemeInstallerInterface {
     protected Registry $themeRegistry,
     protected ThemeExtensionList $themeExtensionList,
     #[Autowire(service: 'kernel')]
-    protected DrupalKernelInterface|CachedDiscoveryInterface|null $kernel = NULL,
+    protected DrupalKernelInterface $kernel,
   ) {
-    if (!$this->kernel instanceof DrupalKernelInterface) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $kernel argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
-      $this->kernel = \Drupal::service('kernel');
-    }
   }
 
   /**
@@ -153,11 +148,10 @@ class ThemeInstaller implements ThemeInstallerInterface {
       // configuration then stop installing.
       $this->configInstaller->checkConfigurationToInstall('theme', $key);
 
-      // The value is not used; the weight is ignored for themes currently. Do
-      // not check schema when saving the configuration.
+      // The value is not used; the weight is ignored for themes currently.
       $extension_config
         ->set("theme.$key", 0)
-        ->save(TRUE);
+        ->save();
 
       // Reset theme listing.
       $this->themeHandler->reset();
@@ -174,7 +168,6 @@ class ThemeInstaller implements ThemeInstallerInterface {
       $this->logger->info('%theme theme installed.', ['%theme' => $key]);
     }
 
-    $this->cssCollectionOptimizer->deleteAll();
     // Add new themes to the list of installed themes.
     $register_themes = array_merge(array_keys($installed_themes), $themes_installed);
     // Get list of extensions for the new list of themes.
@@ -225,9 +218,7 @@ class ThemeInstaller implements ThemeInstallerInterface {
       // Remove all configuration belonging to the theme.
       $this->configManager->uninstall('theme', $key);
     }
-    // Don't check schema when uninstalling a theme since we are only clearing
-    // keys.
-    $extension_config->save(TRUE);
+    $extension_config->save();
 
     // Refresh theme info.
     $this->themeHandler->reset();

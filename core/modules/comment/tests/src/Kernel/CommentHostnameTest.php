@@ -29,8 +29,6 @@ class CommentHostnameTest extends KernelTestBase {
 
   /**
    * Tests hostname default value callback.
-   *
-   * @legacy-covers ::getDefaultHostname
    */
   public function testGetDefaultHostname(): void {
     // Create a fake request to be used for testing.
@@ -53,7 +51,7 @@ class CommentHostnameTest extends KernelTestBase {
     \Drupal::configFactory()
       ->getEditable('comment.settings')
       ->set('log_ip_addresses', TRUE)
-      ->save(TRUE);
+      ->save();
     // Check that the hostname was set correctly.
     $comment = Comment::create(['comment_type' => 'foo']);
     $this->assertEquals('203.0.113.1', $comment->getHostname());

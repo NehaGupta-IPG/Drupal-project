@@ -14,6 +14,7 @@ use Drupal\Core\Entity\EntityTypeEvents;
 use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldException;
+use Drupal\Core\Field\FieldPurger;
 use Drupal\Core\Field\FieldStorageDefinitionEvents;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -135,8 +136,6 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
 
   /**
    * Tests creating a fieldable entity type that doesn't exist in code anymore.
-   *
-   * @legacy-covers ::installFieldableEntityType
    */
   public function testInstallFieldableEntityTypeWithoutInCodeDefinition(): void {
     $entity_type = clone $this->entityTypeManager->getDefinition('entity_test_update');
@@ -153,8 +152,6 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
 
   /**
    * Tests updating an entity type that doesn't exist in code anymore.
-   *
-   * @legacy-covers ::updateEntityType
    */
   public function testUpdateEntityTypeWithoutInCodeDefinition(): void {
     $entity_type = clone $this->entityTypeManager->getDefinition('entity_test_update');
@@ -173,8 +170,6 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
 
   /**
    * Tests updating a fieldable entity type that doesn't exist in code anymore.
-   *
-   * @legacy-covers ::updateFieldableEntityType
    */
   public function testUpdateFieldableEntityTypeWithoutInCodeDefinition(): void {
     $entity_type = clone $this->entityTypeManager->getDefinition('entity_test_update');
@@ -195,8 +190,6 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
 
   /**
    * Tests uninstalling an entity type that doesn't exist in code anymore.
-   *
-   * @legacy-covers ::uninstallEntityType
    */
   public function testUninstallEntityTypeWithoutInCodeDefinition(): void {
     $entity_type = clone $this->entityTypeManager->getDefinition('entity_test_update');
@@ -541,7 +534,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
 
     // Purge field data, and check that the storage definition has been
     // completely removed once the data is purged.
-    field_purge_batch(10);
+    \Drupal::service(FieldPurger::class)->purgeBatch(10);
     $deleted_field_definitions = \Drupal::service('entity_field.deleted_fields_repository')->getFieldDefinitions();
     $this->assertEmpty($deleted_field_definitions, 'The bundle field has been deleted.');
     $deleted_storage_definitions = \Drupal::service('entity_field.deleted_fields_repository')->getFieldStorageDefinitions();
@@ -1000,7 +993,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
       $this->fail('Using a non-existent field as initial value does not work.');
     }
     catch (FieldException $e) {
-      $this->assertEquals('Illegal initial value definition on new_base_field: The field field_that_does_not_exist does not exist.', $e->getMessage());
+      $this->assertEquals('Invalid initial value definition on new_base_field: The field field_that_does_not_exist does not exist.', $e->getMessage());
     }
 
     try {
@@ -1012,7 +1005,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
       $this->fail('Using a field of a different type as initial value does not work.');
     }
     catch (FieldException $e) {
-      $this->assertEquals('Illegal initial value definition on new_base_field: The field types do not match.', $e->getMessage());
+      $this->assertEquals('Invalid initial value definition on new_base_field: The field types do not match.', $e->getMessage());
     }
 
     try {
@@ -1038,7 +1031,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
       $this->fail('Using a field that is not stored in the shared tables as initial value does not work.');
     }
     catch (FieldException $e) {
-      $this->assertEquals('Illegal initial value definition on new_base_field: Both fields have to be stored in the shared entity tables.', $e->getMessage());
+      $this->assertEquals('Invalid initial value definition on new_base_field: Both fields have to be stored in the shared entity tables.', $e->getMessage());
     }
   }
 

@@ -17,6 +17,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Tests entity access control handler custom internal cache ID.
@@ -27,17 +28,13 @@ class EntityCreateAccessCustomCidTest extends UnitTestCase {
 
   /**
    * A mock entity type.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeInterface
    */
-  protected EntityTypeInterface $entityType;
+  protected EntityTypeInterface&Stub $entityType;
 
   /**
    * A mock account.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
    */
-  protected AccountInterface $account;
+  protected AccountInterface&Stub $account;
 
   /**
    * A language code.
@@ -48,35 +45,29 @@ class EntityCreateAccessCustomCidTest extends UnitTestCase {
 
   /**
    * A mock module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
-  protected ModuleHandlerInterface $moduleHandler;
+  protected ModuleHandlerInterface&Stub $moduleHandler;
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->entityType = $this->getMockBuilder(EntityTypeInterface::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->entityType->expects($this->any())
+    $this->entityType = $this->createStub(EntityTypeInterface::class);
+    $this->entityType
       ->method('id')
       ->willReturn($this->randomMachineName());
 
-    $this->account = $this->getMockBuilder(AccountInterface::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->account->expects($this->any())
+    $this->account = $this->createStub(AccountInterface::class);
+    $this->account
       ->method('id')
       ->willReturn(rand());
 
     $language_ids = array_keys(LanguageManager::getStandardLanguageList());
     $this->langcode = $language_ids[array_rand($language_ids)];
 
-    $this->moduleHandler = $this->createMock(ModuleHandlerInterface::class);
-    $this->moduleHandler->expects($this->any())
+    $this->moduleHandler = $this->createStub(ModuleHandlerInterface::class);
+    $this->moduleHandler
       ->method('invokeAll')
       ->willReturn([]);
   }
@@ -222,8 +213,8 @@ class EntityCreateAccessCustomCidTest extends UnitTestCase {
 
     // Drupal\Core\Cache is used when merging access results in
     // checkCreateAccess(), and it calls the cache context manager service.
-    $cache_context_manager = $this->createMock(CacheContextsManager::class);
-    $cache_context_manager->expects($this->any())
+    $cache_context_manager = $this->createStub(CacheContextsManager::class);
+    $cache_context_manager
       ->method('assertValidTokens')
       ->willReturn(TRUE);
     $container = new ContainerBuilder();
