@@ -36,8 +36,8 @@ class UrlIntegrationTest extends KernelTestBase {
     $role_without_access = Role::create(['id' => 'role_without_access', 'label' => 'Without access']);
     $role_without_access->save();
 
-    $user_with_access = User::create(['roles' => ['role_with_access']]);
-    $user_without_access = User::create(['roles' => ['role_without_access']]);
+    $user_with_access = User::create(['uid' => 1, 'roles' => ['role_with_access']]);
+    $user_without_access = User::create(['uid' => 2, 'roles' => ['role_without_access']]);
 
     $url_always_access = new Url('router_test.1');
     $this->assertTrue($url_always_access->access($user_with_access));
