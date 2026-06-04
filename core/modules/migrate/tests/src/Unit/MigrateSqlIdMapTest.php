@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Unit;
 
+use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateMessageInterface;
 use Drupal\migrate\Plugin\MigrateDestinationInterface;
@@ -335,7 +336,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
       $id_map->saveMessage(['source_id_property' => $key], $message, $original_value['level']);
     }
 
-    foreach ($id_map->getMessages() as $message_row) {
+    foreach ($id_map->getMessages()->fetchAll() as $message_row) {
       $key = $message_row->source_ids_hash;
       $this->assertEquals($expected_results[$key]['message'], $message_row->message);
       $this->assertEquals($expected_results[$key]['level'], $message_row->level);
@@ -344,7 +345,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     // Insert with default level.
     $message_default = 'Hello world default.';
     $id_map->saveMessage(['source_id_property' => 5], $message_default);
-    $messages = $id_map->getMessages(['source_id_property' => 5]);
+    $messages = $id_map->getMessages(['source_id_property' => 5])->fetchAll();
     $count = 0;
     foreach ($messages as $key => $message_row) {
       $count = 1;
@@ -354,7 +355,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     $this->assertEquals(1, $count);
 
     // Retrieve messages with a specific level.
-    $messages = $id_map->getMessages([], MigrationInterface::MESSAGE_WARNING);
+    $messages = $id_map->getMessages([], MigrationInterface::MESSAGE_WARNING)->fetchAll();
     $count = 0;
     foreach ($messages as $key => $message_row) {
       $count = 1;
@@ -1061,19 +1062,11 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
    *   The contents of an ID map.
    */
   private function getIdMapContents(): array {
-    $result = $this->database
+    return $this->database
       ->select('migrate_map_sql_idmap_test', 't')
       ->fields('t')
-      ->execute();
-
-    // The return value needs to be countable, or it will fail certain
-    // assertions. iterator_to_array() will not suffice because it won't
-    // respect the PDO fetch mode, if specified.
-    $contents = [];
-    foreach ($result as $row) {
-      $contents[] = (array) $row;
-    }
-    return $contents;
+      ->execute()
+      ->fetchAll(FetchAs::Associative);
   }
 
   /**

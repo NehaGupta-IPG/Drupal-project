@@ -149,7 +149,7 @@ class DbLogController extends ControllerBase {
     $result = $query
       ->limit(50)
       ->orderByHeader($header)
-      ->execute();
+      ->execute()->fetchAll();
 
     foreach ($result as $dblog) {
       $message = $this->formatMessage($dblog);

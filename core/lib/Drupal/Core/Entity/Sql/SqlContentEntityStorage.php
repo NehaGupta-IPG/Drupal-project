@@ -1354,8 +1354,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
 
     $is_not_null = fn($value) => !is_null($value);
 
-    foreach ($results as $row) {
-      $row = (array) $row;
+    while ($row = $results->fetch(FetchAs::Associative)) {
       $value_key = $row[$base_id_key];
       $bundle = $this->bundleKey ? $values[$value_key][$this->bundleKey][LanguageInterface::LANGCODE_DEFAULT] : $this->entityTypeId;
       // Field values in default language are stored with
@@ -1435,8 +1434,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
 
       $results = $query->execute();
 
-      foreach ($results as $row) {
-        $row = (array) $row;
+      while ($row = $results->fetch(FetchAs::Associative)) {
         $value_key = $row[$base_id_key];
         // Field values in default language are stored with
         // LanguageInterface::LANGCODE_DEFAULT as key.
@@ -1897,14 +1895,14 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
 
     $entities = [];
     $items_by_entity = [];
-    foreach ($entity_query->execute() as $row) {
+    foreach ($entity_query->execute()?->fetchAll() ?: [] as $row) {
       $item_query = $this->database->select($table_name, 't', ['fetch' => FetchAs::Associative])
         ->fields('t')
         ->condition('entity_id', $row['entity_id'])
         ->condition('deleted', 1)
         ->orderBy('delta');
 
-      foreach ($item_query->execute() as $item_row) {
+      foreach ($item_query->execute()?->fetchAll() ?: [] as $item_row) {
         if (!isset($entities[$item_row['revision_id']])) {
           // Create entity with the right revision id and entity id combination.
           $item_row['entity_type'] = $this->entityTypeId;

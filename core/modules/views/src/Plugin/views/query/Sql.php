@@ -1571,7 +1571,7 @@ class Sql extends QueryPluginBase {
         $result->setFetchMode(FetchAs::ClassObject, 'Drupal\views\ResultRow');
 
         // Setup the result row objects.
-        $view->result = iterator_to_array($result);
+        $view->result = $result->fetchAll();
         array_walk($view->result, function (ResultRow $row, $index) {
           $row->index = $index;
         });

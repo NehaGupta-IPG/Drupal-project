@@ -163,7 +163,7 @@ class WorkspaceTracker implements WorkspaceTrackerInterface, EventSubscriberInte
     }
 
     $tracked_revisions = [];
-    foreach ($query->execute() as $record) {
+    foreach ($query->execute()->fetchAll() as $record) {
       $target_id = $record->{static::getIdField($record->target_entity_type_id)};
       $tracked_revisions[$record->target_entity_type_id][$record->target_entity_revision_id] = $target_id;
     }
@@ -198,7 +198,7 @@ class WorkspaceTracker implements WorkspaceTrackerInterface, EventSubscriberInte
       ->condition('workspace', $workspace_id);
 
     $tracked_revisions = [];
-    foreach ($query->execute() as $record) {
+    foreach ($query->execute()->fetchAll() as $record) {
       $target_id = $record->{static::getIdField($record->target_entity_type_id)};
       $tracked_revisions[$record->target_entity_type_id][$record->target_entity_revision_id] = $target_id;
     }
@@ -273,7 +273,7 @@ class WorkspaceTracker implements WorkspaceTrackerInterface, EventSubscriberInte
         ->orderBy('target_entity_revision_id')
         ->condition('workspace', $workspace_candidates, 'IN');
 
-      foreach ($query->execute() as $record) {
+      foreach ($query->execute()?->fetchAll() ?: [] as $record) {
         $target_id = $record->{static::getIdField($record->target_entity_type_id)};
 
         // Always add to associatedRevisions for all workspace candidates.

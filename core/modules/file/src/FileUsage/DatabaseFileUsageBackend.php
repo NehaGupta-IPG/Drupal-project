@@ -103,7 +103,8 @@ class DatabaseFileUsageBackend extends FileUsageBase {
       ->fields('f', ['module', 'type', 'id', 'count'])
       ->condition('fid', $file->id())
       ->condition('count', 0, '>')
-      ->execute();
+      ->execute()
+      ->fetchAll();
     $references = [];
     foreach ($result as $usage) {
       $references[$usage->module][$usage->type][$usage->id] = $usage->count;

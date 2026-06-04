@@ -83,7 +83,7 @@ class StatementWrapperIterator extends StatementBase {
         $this->fetchOptions,
         $this->getClientStatement(),
       );
-      $this->markResultsetIterable($return);
+      $this->result->markResultsetIterable($return);
     }
     catch (\Exception $e) {
       $this->dispatchStatementExecutionFailureEvent($startEvent, $e);

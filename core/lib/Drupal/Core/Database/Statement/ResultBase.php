@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace Drupal\Core\Database\Statement;
 
 use Drupal\Core\Database\FetchModeTrait;
+use Drupal\Core\Database\StatementIteratorTrait;
 
 /**
  * Base class for results of a data query language (DQL) statement.
  */
-abstract class ResultBase {
+abstract class ResultBase implements \Iterator {
 
   use FetchModeTrait;
+  use StatementIteratorTrait;
 
   /**
    * Constructor.
