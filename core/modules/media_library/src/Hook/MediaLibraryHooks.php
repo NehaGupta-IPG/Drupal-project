@@ -113,7 +113,7 @@ class MediaLibraryHooks {
       $classes = array_merge($classes, $classes_to_add);
       $option = implode(' ', array_unique($classes));
     };
-    if ($view->id() === 'media_library') {
+    if (str_starts_with($view->id(), 'media_library')) {
       if ($view->current_display === 'page') {
         $add_classes($view->style_plugin->options['row_class'], ['js-media-library-item', 'js-click-to-select']);
         if (array_key_exists('media_bulk_form', $view->field)) {
