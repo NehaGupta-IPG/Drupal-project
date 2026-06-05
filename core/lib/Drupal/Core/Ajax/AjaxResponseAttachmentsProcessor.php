@@ -11,6 +11,7 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\AttachmentsInterface;
 use Drupal\Core\Render\AttachmentsResponseProcessorInterface;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Site\MaintenanceModeResolver;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -48,6 +49,8 @@ class AjaxResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
    *   The module handler.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
+   * @param \Drupal\Core\Site\MaintenanceModeResolver|null $maintenanceModeResolver
+   *   The maintenance mode resolver.
    */
   public function __construct(
     protected AssetResolverInterface $assetResolver,
@@ -58,7 +61,12 @@ class AjaxResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     protected RendererInterface $renderer,
     protected ModuleHandlerInterface $moduleHandler,
     protected LanguageManagerInterface $languageManager,
+    protected ?MaintenanceModeResolver $maintenanceModeResolver = NULL,
   ) {
+    if ($this->maintenanceModeResolver === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $maintenanceModeResolver argument is deprecated in drupal:11.4.0 and will be required in drupal:13.0.0. See https://www.drupal.org/project/drupal/issues/3000229', E_USER_DEPRECATED);
+      $this->maintenanceModeResolver = \Drupal::service(MaintenanceModeResolver::class);
+    }
     $this->config = $config_factory->get('system.performance');
   }
 
@@ -90,7 +98,7 @@ class AjaxResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
    */
   protected function buildAttachmentsCommands(AjaxResponse $response, Request $request) {
     $ajax_page_state = $request->attributes->get('ajax_page_state');
-    $maintenance_mode = defined('MAINTENANCE_MODE') || \Drupal::state()->get('system.maintenance_mode');
+    $maintenance_mode = $this->maintenanceModeResolver->isMaintenance();
 
     // Aggregate CSS/JS if necessary, but only during normal site operation.
     $optimize_css = !$maintenance_mode && $this->config->get('css.preprocess');

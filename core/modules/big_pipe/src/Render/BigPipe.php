@@ -11,6 +11,7 @@ use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Asset\AttachedAssetsInterface;
+use Drupal\Core\Error\ErrorDisplayLevel;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\EnforcedResponseException;
@@ -386,7 +387,7 @@ class BigPipe {
         $elements = $this->renderPlaceholder($placeholder, $placeholder_plus_cumulative_settings);
       }
       catch (\Exception $e) {
-        if ($this->configFactory->get('system.logging')->get('error_level') === ERROR_REPORTING_DISPLAY_VERBOSE) {
+        if ($this->configFactory->get('system.logging')->get('error_level') === ErrorDisplayLevel::Verbose->value) {
           throw $e;
         }
         else {
@@ -422,7 +423,7 @@ class BigPipe {
         $html_response = $this->filterEmbeddedResponse($fake_request, $html_response);
       }
       catch (\Exception $e) {
-        if ($this->configFactory->get('system.logging')->get('error_level') === ERROR_REPORTING_DISPLAY_VERBOSE) {
+        if ($this->configFactory->get('system.logging')->get('error_level') === ErrorDisplayLevel::Verbose->value) {
           throw $e;
         }
         else {
@@ -628,7 +629,7 @@ EOF;
         }
         catch (\Exception $e) {
           unset($fibers[$placeholder_id]);
-          if ($this->configFactory->get('system.logging')->get('error_level') === ERROR_REPORTING_DISPLAY_VERBOSE) {
+          if ($this->configFactory->get('system.logging')->get('error_level') === ErrorDisplayLevel::Verbose->value) {
             throw $e;
           }
           else {

@@ -6,6 +6,7 @@ namespace Drupal\Tests\field_ui\Functional;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Core\Error\ErrorDisplayLevel;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 use Drupal\user\Entity\User;
@@ -52,7 +53,7 @@ class ManageFieldsTest extends BrowserTestBase {
     $this->adminUser = $this->drupalCreateUser(['administer node fields']);
     $this->drupalLogin($this->adminUser);
     $this->config('system.logging')
-      ->set('error_level', ERROR_REPORTING_DISPLAY_ALL)
+      ->set('error_level', ErrorDisplayLevel::All->value)
       ->save();
   }
 

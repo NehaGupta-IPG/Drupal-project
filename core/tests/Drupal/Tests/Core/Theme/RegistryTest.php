@@ -14,6 +14,7 @@ use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Theme\ActiveTheme;
 use Drupal\Core\Theme\Registry;
 use Drupal\Core\Theme\ThemeManagerInterface;
+use Drupal\Core\Site\MaintenanceModeResolver;
 use Drupal\Tests\UnitTestCase;
 use Drupal\theme_test\Hook\ThemeTestHooks;
 use PHPUnit\Framework\MockObject\Stub;
@@ -81,6 +82,11 @@ class RegistryTest extends UnitTestCase {
   protected KeyValueFactoryInterface $keyValueFactory;
 
   /**
+   * The maintenance mode resolver.
+   */
+  protected MaintenanceModeResolver&Stub $maintenanceModeResolver;
+
+  /**
    * The list of functions that get_defined_functions() should provide.
    *
    * @var array
@@ -102,8 +108,9 @@ class RegistryTest extends UnitTestCase {
     $this->moduleList = $this->createStub(ModuleExtensionList::class);
     $this->kernel = $this->createStub(HttpKernelInterface::class);
     $this->keyValueFactory = new KeyValueMemoryFactory();
+    $this->maintenanceModeResolver = $this->createStub(MaintenanceModeResolver::class);
 
-    $this->registry = new Registry($this->cache, $this->lock, $this->moduleHandler, $this->themeHandler, $this->runtimeCache, $this->moduleList, $this->kernel, $this->keyValueFactory);
+    $this->registry = new Registry($this->cache, $this->lock, $this->moduleHandler, $this->themeHandler, $this->runtimeCache, $this->moduleList, $this->kernel, $this->keyValueFactory, $this->maintenanceModeResolver);
     $this->registry->setThemeManager($this->themeManager);
   }
 

@@ -7,6 +7,8 @@ use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableResponse;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Error\DrupalErrorHandler;
+use Drupal\Core\Error\ErrorDisplayLevel;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Utility\Error;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -82,6 +84,15 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
    */
   public function onException(ExceptionEvent $event) {
     $exception = $event->getThrowable();
+
+    // When error enhancers are enabled, run Symfony's error enhancers to
+    // produce better error messages (e.g. "Did you mean bundle()?").
+    $handler = DrupalErrorHandler::getInstance();
+    if ($handler?->isErrorEnhancersEnabled()) {
+      $exception = $handler->getSymfonyHandler()->enhanceError($exception);
+      $event->setThrowable($exception);
+    }
+
     $error = Error::decodeException($exception);
 
     // Display the message if the current error reporting level allows this type
@@ -187,22 +198,20 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
    *   TRUE when verbose reporting is enabled, FALSE otherwise.
    */
   protected function isErrorLevelVerbose() {
-    return $this->getErrorLevel() === ERROR_REPORTING_DISPLAY_VERBOSE;
+    return ErrorDisplayLevel::tryFrom($this->getErrorLevel())?->isVerbose() ?? FALSE;
   }
 
   /**
-   * Wrapper for error_displayable().
+   * Determines whether an error should be displayed.
    *
    * @param array $error
-   *   Optional error to examine for ERROR_REPORTING_DISPLAY_SOME.
+   *   Optional error to examine for the Some display level.
    *
    * @return bool
    *   TRUE if an error should be displayed, FALSE otherwise.
-   *
-   * @see \error_displayable
    */
   protected function isErrorDisplayable($error) {
-    return error_displayable($error);
+    return ErrorDisplayLevel::resolve()->isDisplayable($error);
   }
 
   /**

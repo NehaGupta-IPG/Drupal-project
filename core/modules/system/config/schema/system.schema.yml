@@ -175,8 +175,8 @@ system.logging:
     error_level:
       type: string
       label: 'Error messages to display'
-      # @see core/includes/bootstrap.inc
-      # @todo Update this to use enum in https://www.drupal.org/project/drupal/issues/2951046
+      # @see \Drupal\Core\Error\ErrorDisplayLevel
+      # @todo Update Choice constraint to use enum in https://www.drupal.org/project/drupal/issues/2951046
       constraints:
         Choice:
           choices:
@@ -184,6 +184,14 @@ system.logging:
             - 'some'
             - 'all'
             - 'verbose'
+    error_enhancers:
+      type: boolean
+      label: 'Enable error message enhancers'
+      requiredKey: false
+    log_silenced:
+      type: boolean
+      label: 'Log silenced errors'
+      requiredKey: false
 
 system.performance:
   type: config_object

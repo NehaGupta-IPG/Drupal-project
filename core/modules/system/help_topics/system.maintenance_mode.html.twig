@@ -11,6 +11,7 @@ related:
 <p>{% trans %}Put your site in maintenance mode to perform maintenance operations, and then return to normal mode when finished.{% endtrans %}</p>
 <h2>{% trans %}What is maintenance mode?{% endtrans %}</h2>
 <p>{% trans %}When your site is in maintenance mode, most site visitors will see a simple maintenance mode message page, rather than being able to use the full functionality of the site. Users with <em>Use the site in maintenance mode</em> permission who are already logged in will be able to use the full site, and the log in page at <em>/user</em> will also be accessible to anyone.{% endtrans %}</p>
+<p>{% trans %}Maintenance mode is also used internally during technical operations such as site installation and software updates. In these cases, it is enabled automatically to ensure data integrity while the system is being modified.{% endtrans %}</p>
 <h2>{% trans %}Steps{% endtrans %}</h2>
 <ol>
   <li>{% trans %}In the <em>Manage</em> administrative menu, navigate to <em>Configuration</em> &gt; <em>Development</em> &gt; <em>{{ maintenance_link }}</em>.{% endtrans %}</li>

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\System;
 
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Error\ErrorDisplayLevel;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -13,6 +14,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Performs tests on the Drupal error and exception handler.
  */
 #[Group('system')]
+#[Group('legacy')]
 #[RunTestsInSeparateProcesses]
 class ErrorHandlerTest extends BrowserTestBase {
 
@@ -30,6 +32,7 @@ class ErrorHandlerTest extends BrowserTestBase {
    * Tests the error handler.
    */
   public function testErrorHandler(): void {
+    $this->expectOutputRegex('/.*/');
     $config = $this->config('system.logging');
     $error_notice = [
       '%type' => 'Notice',
@@ -51,7 +54,7 @@ class ErrorHandlerTest extends BrowserTestBase {
     ];
 
     // Set error reporting to display verbose notices.
-    $this->config('system.logging')->set('error_level', ERROR_REPORTING_DISPLAY_VERBOSE)->save();
+    $this->config('system.logging')->set('error_level', ErrorDisplayLevel::Verbose->value)->save();
     $this->drupalGet('error-test/generate-warnings');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertErrorMessage($error_notice);
@@ -63,10 +66,10 @@ class ErrorHandlerTest extends BrowserTestBase {
     $this->assertSession()->responseNotContains('&amp;amp;');
 
     // Set error reporting to display verbose notices.
-    $this->config('system.logging')->set('error_level', ERROR_REPORTING_DISPLAY_VERBOSE)->save();
+    $this->config('system.logging')->set('error_level', ErrorDisplayLevel::Verbose->value)->save();
 
     // Set error reporting to collect notices.
-    $config->set('error_level', ERROR_REPORTING_DISPLAY_ALL)->save();
+    $config->set('error_level', ErrorDisplayLevel::All->value)->save();
     $this->drupalGet('error-test/generate-warnings');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertErrorMessage($error_notice);
@@ -75,7 +78,7 @@ class ErrorHandlerTest extends BrowserTestBase {
     $this->assertSession()->responseNotContains('<pre class="backtrace">');
 
     // Set error reporting to not collect notices.
-    $config->set('error_level', ERROR_REPORTING_DISPLAY_SOME)->save();
+    $config->set('error_level', ErrorDisplayLevel::Some->value)->save();
     $this->drupalGet('error-test/generate-warnings');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertNoErrorMessage($error_notice);
@@ -84,7 +87,7 @@ class ErrorHandlerTest extends BrowserTestBase {
     $this->assertSession()->responseNotContains('<pre class="backtrace">');
 
     // Set error reporting to not show any errors.
-    $config->set('error_level', ERROR_REPORTING_HIDE)->save();
+    $config->set('error_level', ErrorDisplayLevel::Hide->value)->save();
     $this->drupalGet('error-test/generate-warnings');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertNoErrorMessage($error_notice);
@@ -98,6 +101,7 @@ class ErrorHandlerTest extends BrowserTestBase {
    * Tests a custom error handler set in settings.php.
    */
   public function testCustomErrorHandler(): void {
+    $this->expectOutputRegex('/.*/');
     $settings_filename = $this->siteDirectory . '/settings.php';
     chmod($settings_filename, 0777);
     $settings_php = file_get_contents($settings_filename);
@@ -122,6 +126,7 @@ class ErrorHandlerTest extends BrowserTestBase {
    * Tests the exception handler.
    */
   public function testExceptionHandler(): void {
+    $this->expectOutputRegex('/.*/');
     $error_exception = [
       '%type' => 'Exception',
       '@message' => 'Drupal & awesome',
@@ -167,7 +172,7 @@ class ErrorHandlerTest extends BrowserTestBase {
 
     // Disable error reporting, ensure that 5xx responses are not cached.
     $this->config('system.logging')
-      ->set('error_level', ERROR_REPORTING_HIDE)
+      ->set('error_level', ErrorDisplayLevel::Hide->value)
       ->save();
 
     $this->drupalGet('error-test/trigger-exception');

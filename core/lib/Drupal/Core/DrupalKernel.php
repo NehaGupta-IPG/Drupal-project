@@ -16,6 +16,7 @@ use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\DependencyInjection\YamlFileLoader;
+use Drupal\Core\Error\DrupalErrorHandler;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\File\MimeType\MimeTypeGuesser;
@@ -588,6 +589,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     require_once $this->root . '/core/includes/module.inc';
     require_once $this->root . '/core/includes/theme.inc';
     require_once $this->root . '/core/includes/form.inc';
+    // @todo Remove errors.inc include in drupal:13.0.0 once all procedural
+    //   error handler functions are removed. The OOP replacements are in the
+    //   Drupal\Core\Error namespace.
+    //   @see https://www.drupal.org/project/drupal/issues/3000229
     require_once $this->root . '/core/includes/errors.inc';
   }
 
@@ -608,6 +613,12 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     }
 
     $this->loadLegacyIncludes();
+
+    // Upgrade the error handler's logger from the early-boot buffering logger
+    // to the real Drupal logger. This replays any errors captured during boot.
+    if ($handler = DrupalErrorHandler::getInstance()) {
+      $handler->upgradeLogger($this->container->get('logger.factory')->get('php'));
+    }
 
     // Load all enabled modules.
     $this->container->get('module_handler')->loadAll();
@@ -1188,9 +1199,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       }
     }
 
-    // Set the Drupal custom error handler.
-    set_error_handler('_drupal_error_handler');
-    set_exception_handler('_drupal_exception_handler');
+    // Register the Drupal error handler backed by Symfony's ErrorHandler.
+    // This captures ALL errors from the earliest possible moment, including
+    // fatal errors detected at shutdown.
+    DrupalErrorHandler::register();
 
     static::$isEnvironmentInitialized = TRUE;
   }

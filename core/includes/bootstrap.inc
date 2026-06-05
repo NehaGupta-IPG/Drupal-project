@@ -8,27 +8,44 @@
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\Core\Utility\Error;
+use Drupal\Core\Error\ErrorDisplayLevel;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 // cspell:ignore htkey
 
 /**
  * Error reporting level: display no errors.
+ *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\Core\Error\ErrorDisplayLevel::Hide instead.
+ * @see https://www.drupal.org/project/drupal/issues/3000229
  */
 const ERROR_REPORTING_HIDE = 'hide';
 
 /**
  * Error reporting level: display errors and warnings.
+ *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\Core\Error\ErrorDisplayLevel::Some instead.
+ * @see https://www.drupal.org/project/drupal/issues/3000229
  */
 const ERROR_REPORTING_DISPLAY_SOME = 'some';
 
 /**
  * Error reporting level: display all messages.
+ *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\Core\Error\ErrorDisplayLevel::All instead.
+ * @see https://www.drupal.org/project/drupal/issues/3000229
  */
 const ERROR_REPORTING_DISPLAY_ALL = 'all';
 
 /**
  * Error reporting level: display all messages, plus backtrace information.
+ *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\Core\Error\ErrorDisplayLevel::Verbose instead.
+ * @see https://www.drupal.org/project/drupal/issues/3000229
  */
 const ERROR_REPORTING_DISPLAY_VERBOSE = 'verbose';
 
@@ -98,8 +115,14 @@ function t($string, array $args = [], array $options = []) {
  *   (optional) The filename that the error was raised in.
  * @param int $line
  *   (optional) The line number the error was raised at.
+ *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Error
+ *   handling is now managed by \Drupal\Core\Error\DrupalErrorHandler which
+ *   wraps Symfony's ErrorHandler component.
+ * @see https://www.drupal.org/project/drupal/issues/3000229
  */
 function _drupal_error_handler($error_level, $message, $filename = NULL, $line = NULL): void {
+  @trigger_error('_drupal_error_handler() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Error handling is now managed by \Drupal\Core\Error\DrupalErrorHandler. See https://www.drupal.org/project/drupal/issues/3000229', E_USER_DEPRECATED);
   require_once __DIR__ . '/errors.inc';
   _drupal_error_handler_real($error_level, $message, $filename, $line);
 }
@@ -113,8 +136,13 @@ function _drupal_error_handler($error_level, $message, $filename = NULL, $line =
  *
  * @param \Exception|\Throwable $exception
  *   The exception object that was thrown.
+ *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Exception
+ *   handling is now managed by \Drupal\Core\Error\DrupalExceptionRenderer.
+ * @see https://www.drupal.org/project/drupal/issues/3000229
  */
 function _drupal_exception_handler($exception): void {
+  @trigger_error('_drupal_exception_handler() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Exception handling is now managed by \Drupal\Core\Error\DrupalExceptionRenderer. See https://www.drupal.org/project/drupal/issues/3000229', E_USER_DEPRECATED);
   require_once __DIR__ . '/errors.inc';
 
   try {
@@ -134,8 +162,13 @@ function _drupal_exception_handler($exception): void {
  *   The first exception object that was thrown.
  * @param \Exception|\Throwable $exception2
  *   The second exception object that was thrown.
+ *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\Core\Error\DrupalExceptionRenderer::renderException() instead.
+ * @see https://www.drupal.org/project/drupal/issues/3000229
  */
 function _drupal_exception_handler_additional($exception, $exception2): void {
+  @trigger_error('_drupal_exception_handler_additional() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Error\DrupalExceptionRenderer::renderException() instead. See https://www.drupal.org/project/drupal/issues/3000229', E_USER_DEPRECATED);
   // Another uncaught exception was thrown while handling the first one.
   // If we are displaying errors, then do so with no possibility of a further
   // uncaught exception being thrown.
@@ -529,8 +562,7 @@ function _drupal_shutdown_function_handle_exception($exception): void {
   if (!function_exists('fastcgi_finish_request')) {
     // If we are displaying errors, then do so with no possibility of a
     // further uncaught exception being thrown.
-    require_once __DIR__ . '/errors.inc';
-    if (error_displayable()) {
+    if (ErrorDisplayLevel::resolve()->isDisplayable()) {
       print '<h1>Uncaught exception thrown in shutdown function.</h1>';
       print '<p>' . Error::renderExceptionSafe($exception) . '</p><hr />';
     }

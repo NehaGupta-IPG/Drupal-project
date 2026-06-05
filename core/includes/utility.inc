@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\DrupalKernel;
+use Drupal\Core\Error\DrupalErrorHandler;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -44,7 +45,6 @@ function drupal_rebuild($class_loader, Request $request): void {
   \Drupal::service('page_cache_kill_switch')->trigger();
 
   // Restore Drupal's error and exception handlers.
-  // @see \Drupal\Core\DrupalKernel::boot()
-  set_error_handler('_drupal_error_handler');
-  set_exception_handler('_drupal_exception_handler');
+  // @see \Drupal\Core\DrupalKernel::bootEnvironment()
+  DrupalErrorHandler::register();
 }

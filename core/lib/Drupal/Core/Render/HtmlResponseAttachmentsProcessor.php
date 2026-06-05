@@ -13,6 +13,7 @@ use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Form\EnforcedResponseException;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Site\MaintenanceModeResolver;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -51,10 +52,15 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     protected ModuleHandlerInterface $moduleHandler,
     protected LanguageManagerInterface $languageManager,
     protected ?FileUrlGeneratorInterface $fileUrlGenerator = NULL,
+    protected ?MaintenanceModeResolver $maintenanceModeResolver = NULL,
   ) {
     if (!isset($fileUrlGenerator)) {
       $this->fileUrlGenerator = \Drupal::service('file_url_generator');
       @trigger_error('Constructing HtmlResponseAttachmentsProcessor without a file url generator is deprecated in drupal:11.4.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3366561', E_USER_DEPRECATED);
+    }
+    if (!isset($maintenanceModeResolver)) {
+      $this->maintenanceModeResolver = \Drupal::service(MaintenanceModeResolver::class);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $maintenanceModeResolver argument is deprecated in drupal:11.4.0 and will be required in drupal:13.0.0. See https://www.drupal.org/project/drupal/issues/3000229', E_USER_DEPRECATED);
     }
     $this->config = $config_factory->get('system.performance');
   }
@@ -286,7 +292,7 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
   protected function processAssetLibraries(AttachedAssetsInterface $assets, array $placeholders) {
     $variables = [];
 
-    $maintenance_mode = defined('MAINTENANCE_MODE') || \Drupal::state()->get('system.maintenance_mode');
+    $maintenance_mode = $this->maintenanceModeResolver->isMaintenance();
 
     // Print styles - if present.
     if (isset($placeholders['styles'])) {

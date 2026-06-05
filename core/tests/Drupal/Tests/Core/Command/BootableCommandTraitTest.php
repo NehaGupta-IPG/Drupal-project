@@ -7,10 +7,12 @@ namespace Drupal\Tests\Core\Command;
 use Composer\Autoload\ClassLoader;
 use Drupal\Core\Command\BootableCommandTrait;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Error\DrupalErrorHandler;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use Psr\Log\NullLogger;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,6 +23,7 @@ use Symfony\Component\Console\Tester\CommandTester;
  * Tests the trait that helps console commands boot Drupal.
  */
 #[Group('Command')]
+#[Group('legacy')]
 #[CoversTrait(BootableCommandTrait::class)]
 #[RequiresPhpExtension('pdo_sqlite')]
 class BootableCommandTraitTest extends UnitTestCase {
@@ -58,6 +61,7 @@ class BootableCommandTraitTest extends UnitTestCase {
    * Tests that commands are initialized with a reasonable base URL.
    */
   public function testRequestUrlIsValid(): void {
+    $this->expectOutputRegex('/.*/');
     // Create a fake command that boots Drupal and outputs the base URL.
     $this->application->addCommand(new class ($this->classLoader) extends Command {
 
@@ -73,6 +77,9 @@ class BootableCommandTraitTest extends UnitTestCase {
        */
       protected function execute(InputInterface $input, OutputInterface $output): int {
         $this->boot();
+        if ($handler = DrupalErrorHandler::getInstance()) {
+          $handler->upgradeLogger(new NullLogger());
+        }
         $output->write($GLOBALS['base_url']);
 
         // Symfony Console apparently changes the error and exception handlers,

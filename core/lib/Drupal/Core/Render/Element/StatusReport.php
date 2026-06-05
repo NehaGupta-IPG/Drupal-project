@@ -4,6 +4,8 @@ namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Render\Attribute\RenderElement;
+use Drupal\Core\Site\MaintenanceModeResolver;
+use Drupal\Core\Site\MaintenanceType;
 
 /**
  * Creates status report page element.
@@ -42,7 +44,7 @@ class StatusReport extends RenderElementBase {
       if (isset($requirement['severity'])) {
         $severity = $requirement['severity'] === RequirementSeverity::OK ? RequirementSeverity::Info : $requirement['severity'];
       }
-      elseif (defined('MAINTENANCE_MODE') && MAINTENANCE_MODE == 'install') {
+      elseif (\Drupal::service(MaintenanceModeResolver::class)->is(MaintenanceType::Install)) {
         $severity = RequirementSeverity::OK;
       }
 

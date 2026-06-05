@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Hook;
 
+use Drupal\Core\Site\MaintenanceModeResolver;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\StreamWrapper\LocalStream;
 use Drupal\Core\Site\Settings;
@@ -240,7 +241,7 @@ class SystemHooks {
       $loaded_libraries = $library_dependency_resolver->getLibrariesWithDependencies($assets->getAlreadyLoadedLibraries());
     }
     if (isset($settings['ajaxPageState']) || in_array('core/drupal.ajax', $loaded_libraries) || in_array('core/drupal.htmx', $loaded_libraries)) {
-      if (!defined('MAINTENANCE_MODE')) {
+      if (!\Drupal::service(MaintenanceModeResolver::class)->isMaintenance()) {
         // The theme token is only validated when the theme requested is not the
         // default, so don't generate it unless necessary.
         // @see \Drupal\Core\Theme\AjaxBasePageNegotiator::determineActiveTheme()

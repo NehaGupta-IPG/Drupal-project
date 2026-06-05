@@ -8,6 +8,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\StackedRouteMatchInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
+use Drupal\Core\Site\MaintenanceModeResolver;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\AttributeHelper;
 use Drupal\Core\Utility\CallableResolver;
@@ -67,7 +68,12 @@ class ThemeManager implements ThemeManagerInterface {
     protected KeyValueFactoryInterface $keyValueFactory,
     #[Autowire(service: 'cache.bootstrap')]
     protected CacheBackendInterface $cache,
+    protected ?MaintenanceModeResolver $maintenanceModeResolver = NULL,
   ) {
+    if ($this->maintenanceModeResolver === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $maintenanceModeResolver argument is deprecated in drupal:11.4.0 and will be required in drupal:13.0.0. See https://www.drupal.org/project/drupal/issues/3000229', E_USER_DEPRECATED);
+      $this->maintenanceModeResolver = \Drupal::service(MaintenanceModeResolver::class);
+    }
   }
 
   /**
@@ -602,7 +608,7 @@ class ThemeManager implements ThemeManagerInterface {
         'content_attributes' => [],
         'title_prefix' => [],
         'title_suffix' => [],
-        'db_is_active' => !defined('MAINTENANCE_MODE'),
+        'db_offline' => $this->maintenanceModeResolver->isMaintenance(),
         'is_admin' => FALSE,
         'logged_in' => FALSE,
       ];
