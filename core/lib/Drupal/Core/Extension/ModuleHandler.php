@@ -331,7 +331,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    * {@inheritdoc}
    */
   public function invokeAll($hook, array $args = []) {
-    $return = [];
+    $results = [];
     $list = $this->getHookImplementationList($hook);
     foreach ($list->iterateByModule() as $listener) {
       $result = $listener(...$args);
@@ -339,12 +339,13 @@ class ModuleHandler implements ModuleHandlerInterface {
         continue;
       }
       if (is_array($result)) {
-        $return = NestedArray::mergeDeep($return, $result);
-      } else {
-        $return[] = $result;
+        $results = NestedArray::mergeDeep($results, $result);
+      }
+      else {
+        $results[] = $result;
       }
     }
-    return $return;
+    return $results;
   }
 
   /**
