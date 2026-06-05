@@ -36,7 +36,7 @@ class VariableTest extends TestCase {
         "$mock::fake",
       ],
       'closure' => [
-        function () {
+        function (): null {
           return NULL;
         },
         '[closure]',
@@ -77,7 +77,7 @@ class VariableTest extends TestCase {
    *   The expected human-readable name of the callable.
    */
   #[DataProvider('providerCallableToString')]
-  public function testCallableToString($callable, string $expected_name): void {
+  public function testCallableToString(string|\Closure|\stdClass|bool|array $callable, string $expected_name): void {
     $this->assertSame($expected_name, Variable::callableToString($callable));
   }
 
@@ -151,11 +151,7 @@ class VariableTest extends TestCase {
         new \stdClass(),
       ],
       [
-        // A not-stdClass object. Since PHP 8.2 exported namespace is prefixed,
-        // see https://github.com/php/php-src/pull/8233 for reasons.
-        PHP_VERSION_ID >= 80200 ?
-        "\Drupal\Tests\Component\Utility\StubVariableTestClass::__set_state(array(\n))" :
-        "Drupal\Tests\Component\Utility\StubVariableTestClass::__set_state(array(\n))",
+        "\Drupal\Tests\Component\Utility\StubVariableTestClass::__set_state(array(\n))",
         new StubVariableTestClass(),
       ],
     ];
@@ -170,7 +166,7 @@ class VariableTest extends TestCase {
    *   The variable to be exported.
    */
   #[DataProvider('providerTestExport')]
-  public function testExport($expected, $variable): void {
+  public function testExport(string $expected, bool|string|\stdClass|StubVariableTestClass|array $variable): void {
     $this->assertEquals($expected, Variable::export($variable));
   }
 
