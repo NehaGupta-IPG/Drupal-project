@@ -60,8 +60,20 @@ class SystemRequirementsHooks {
    *   hook_runtime_requirements() and hook_update_requirements().
    */
   public function checkRequirements(string $phase): array {
-    // Get the current default PHP requirements for this version of Drupal.
     $minimum_supported_php = PhpRequirements::getMinimumSupportedPhp();
+  $requirements = [];
+
+    if ($phase == 'runtime') {
+      $properties = \Drupal::service('system.site')->getPropertyPlugins();
+      foreach ($properties as $id => $property) {
+        $requirements[$id] = [
+          'title' => $property->label(),
+          'value' => $property->view(),
+          'view' => $property,
+          'weight' => -100,
+        ];
+      }
+    }
 
     // Reset the extension lists.
     /** @var \Drupal\Core\Extension\ModuleExtensionList $module_extension_list */
@@ -70,33 +82,9 @@ class SystemRequirementsHooks {
     /** @var \Drupal\Core\Extension\ThemeExtensionList $theme_extension_list */
     $theme_extension_list = \Drupal::service('extension.list.theme');
     $theme_extension_list->reset();
-    $requirements = [];
 
     // Report Drupal version
     if ($phase == 'runtime') {
-      $requirements['drupal'] = [
-        'title' => $this->t('Drupal'),
-        'value' => \Drupal::VERSION,
-        'severity' => RequirementSeverity::Info,
-        'weight' => -10,
-      ];
-
-      // Display the currently active installation profile, if the site
-      // is not running the default installation profile.
-      $profile = \Drupal::installProfile();
-      if ($profile != 'standard' && !empty($profile)) {
-        $info = $module_extension_list->getExtensionInfo($profile);
-        $requirements['install_profile'] = [
-          'title' => $this->t('Installation profile'),
-          'value' => $this->t('%profile_name (%profile%version)', [
-            '%profile_name' => $info['name'],
-            '%profile' => $profile,
-            '%version' => !empty($info['version']) ? '-' . $info['version'] : '',
-          ]),
-          'severity' => RequirementSeverity::Info,
-          'weight' => -9,
-        ];
-      }
 
       // Gather all obsolete and experimental modules being enabled.
       $obsolete_extensions = [];
@@ -224,22 +212,11 @@ class SystemRequirementsHooks {
         ':url' => (new Url('system.php'))->toString(),
       ]);
     }
-    $requirements['php'] = [
-      'title' => $this->t('PHP'),
-      'value' => $phpversion_label,
-    ];
+
 
     // Check if the PHP version is below what Drupal supports.
     if (version_compare($phpversion, $minimum_supported_php) < 0) {
-      $requirements['php']['description'] = $this->t(
-        'Your PHP installation is too old. Drupal requires at least PHP %version. It is recommended to upgrade to PHP version %recommended or higher for the best ongoing support. See <a href="http://php.net/supported-versions.php">PHP\'s version support documentation</a> and the <a href=":php_requirements">Drupal PHP requirements</a> page for more information.',
-        [
-          '%version' => $minimum_supported_php,
-          '%recommended' => \Drupal::RECOMMENDED_PHP,
-          ':php_requirements' => 'https://www.drupal.org/docs/system-requirements/php-requirements',
-        ]
-      );
-
+      
       // If the PHP version is also below the absolute minimum allowed, it's not
       // safe to continue with the requirements check, and should always be an
       // error.
@@ -255,15 +232,8 @@ class SystemRequirementsHooks {
     // inform users of what's recommended, allowing them to take action before
     // it becomes urgent.
     elseif ($phase === 'runtime' && version_compare($phpversion, \Drupal::RECOMMENDED_PHP) < 0) {
-      $requirements['php']['description'] = $this->t('It is recommended to upgrade to PHP version %recommended or higher for the best ongoing support.  See <a href="http://php.net/supported-versions.php">PHP\'s version support documentation</a> and the <a href=":php_requirements">Drupal PHP requirements</a> page for more information.',
-        [
-          '%recommended' => \Drupal::RECOMMENDED_PHP,
-          ':php_requirements' => 'https://www.drupal.org/docs/system-requirements/php-requirements',
-        ]
-      );
       $requirements['php']['severity'] = RequirementSeverity::Info;
     }
-
     // Test for PHP extensions.
     $requirements['php_extensions'] = [
       'title' => $this->t('PHP extensions'),
@@ -657,7 +627,7 @@ class SystemRequirementsHooks {
 
     // Report cron status.
     if ($phase == 'runtime') {
-      $cron_config = \Drupal::config('system.cron');
+       $cron_config = \Drupal::config('system.cron');
       // Cron warning threshold defaults to two days.
       $threshold_warning = $cron_config->get('threshold.requirements_warning');
       // Cron error threshold defaults to two weeks.
@@ -679,42 +649,10 @@ class SystemRequirementsHooks {
         $severity = RequirementSeverity::Warning;
       }
 
-      // Set summary and description based on values determined above.
-      $summary = $this->t('Last run @time ago', ['@time' => \Drupal::service('date.formatter')->formatTimeDiffSince($cron_last)]);
-
       $requirements['cron'] = [
-        'title' => $this->t('Cron maintenance tasks'),
         'severity' => $severity,
-        'value' => $summary,
       ];
-      if ($severity != RequirementSeverity::Info) {
-        $requirements['cron']['description'][] = [
-          [
-            '#markup' => $this->t('Cron has not run recently.'),
-            '#suffix' => ' ',
-          ],
-          [
-            '#markup' => $this->t('For more information, see the online handbook entry for <a href=":cron-handbook">configuring cron jobs</a>.', [':cron-handbook' => 'https://www.drupal.org/docs/administering-a-drupal-site/cron-automated-tasks/cron-automated-tasks-overview']),
-            '#suffix' => ' ',
-          ],
-        ];
-      }
-      $requirements['cron']['description'][] = [
-        [
-          '#type' => 'link',
-          '#prefix' => '(',
-          '#title' => $this->t('more information'),
-          '#suffix' => ')',
-          '#url' => Url::fromRoute('system.cron_settings'),
-        ],
-        [
-          '#prefix' => '<span class="cron-description__run-cron">',
-          '#suffix' => '</span>',
-          '#type' => 'link',
-          '#title' => $this->t('Run cron'),
-          '#url' => Url::fromRoute('system.run_cron'),
-        ],
-      ];
+      
     }
 
     // Check the config directory if it is defined in settings.php. If it isn't
@@ -1367,8 +1305,6 @@ class SystemRequirementsHooks {
         // owners have access to edit their settings.php as it may be
         // controlled by their hosting provider.
         $requirements['install_profile_in_settings'] = [
-          'title' => $this->t('Install profile in settings'),
-          'value' => $this->t("Drupal 9 no longer uses the \$settings['install_profile'] value in settings.php and it should be removed."),
           'severity' => RequirementSeverity::Warning,
         ];
       }
