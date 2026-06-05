@@ -488,8 +488,10 @@ class ComponentRenderTest extends ComponentKernelTestBase {
    */
   public function testRenderSlots(): void {
     $slot_pairs = [
-      'This is the contents of the banner body.',
-      'This is the contents of the nested slot.',
+      [
+        'This is the contents of the banner body.',
+        'This is the contents of the nested slot.',
+      ],
       [
         ['#plain_text' => 'This is the contents of the banner body.'],
         ['#plain_text' => 'This is the contents of the nested slot.'],
