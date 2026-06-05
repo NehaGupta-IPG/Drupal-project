@@ -50,10 +50,10 @@ class EntityRouteProviderSubscriber implements EventSubscriberInterface {
           // backwards compatibility the entity type is passed to them
           // explicitly.
           // @todo Remove this BC layer in drupal:13.0.0.
-          // @see https://www.drupal.org/node/2977140
+          // @see https://www.drupal.org/node/3593831
           $parameters = (new \ReflectionMethod($route_provider, 'getRoutes'))->getParameters();
           if (isset($parameters[0]) && !$parameters[0]->isOptional()) {
-            @trigger_error('Implementing ' . get_class($route_provider) . '::getRoutes() with a required $entity_type parameter is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. The $entity_type parameter must be optional. See https://www.drupal.org/node/2977140', E_USER_DEPRECATED);
+            @trigger_error('Implementing ' . get_class($route_provider) . '::getRoutes() with a required $entity_type parameter is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. The $entity_type parameter must be optional. See https://www.drupal.org/node/3593831', E_USER_DEPRECATED);
             $routes = $route_provider->getRoutes($entity_type);
           }
           else {

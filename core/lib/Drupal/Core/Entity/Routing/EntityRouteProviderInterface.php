@@ -27,7 +27,7 @@ interface EntityRouteProviderInterface {
    *   Returns a route collection or an array of routes keyed by name, like
    *   route_callbacks inside 'routing.yml' files.
    *
-   * @see https://www.drupal.org/node/2977140
+   * @see https://www.drupal.org/node/3593831
    */
   public function getRoutes(EntityTypeInterface $entity_type);
 
