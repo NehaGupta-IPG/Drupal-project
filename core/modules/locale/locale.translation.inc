@@ -6,8 +6,9 @@
 
 @trigger_error(__FILE__ . ' is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. All functions and constants have been deprecated. See https://www.drupal.org/node/3569330', E_USER_DEPRECATED);
 
-use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\locale\LocaleDefaultOptions;
+use Drupal\locale\LocaleFetch;
+use Drupal\locale\LocaleProjectRepository;
 use Drupal\locale\LocaleSource;
 
 /**
@@ -19,7 +20,6 @@ use Drupal\locale\LocaleSource;
  *   There is no replacement.
  *
  * @see https://www.drupal.org/node/3569330
- * @see _locale_translation_source_compare()
  */
 const LOCALE_TRANSLATION_SOURCE_COMPARE_LT = -1;
 
@@ -32,7 +32,6 @@ const LOCALE_TRANSLATION_SOURCE_COMPARE_LT = -1;
  *   There is no replacement.
  *
  * @see https://www.drupal.org/node/3569330
- * @see _locale_translation_source_compare()
  */
 const LOCALE_TRANSLATION_SOURCE_COMPARE_EQ = 0;
 
@@ -45,7 +44,6 @@ const LOCALE_TRANSLATION_SOURCE_COMPARE_EQ = 0;
  *   There is no replacement.
  *
  * @see https://www.drupal.org/node/3569330
- * @see _locale_translation_source_compare()
  */
 const LOCALE_TRANSLATION_SOURCE_COMPARE_GT = 1;
 
@@ -68,29 +66,31 @@ const LOCALE_TRANSLATION_SOURCE_COMPARE_GT = 1;
  * @return array
  *   Array of project data for translation update.
  *
- * @see locale_translation_build_projects()
+ * @see Drupal\locale\LocaleProjectRepository::buildProjects()
  *
  * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
- *   \Drupal::service('locale.project')->getProjects($project_names) instead.
+ *   \Drupal::service(LocaleProjectRepository::class)
+ *     ->getAll() or \Drupal::service(LocaleProjectRepository::class)
+ *     ->getMultiple($project_names)instead.
  *
  * @see https://www.drupal.org/node/3569330
  */
 function locale_translation_get_projects(array $project_names = []) {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal::service("locale.project")->getProjects($project_names) instead. See https://www.drupal.org/node/3569330', E_USER_DEPRECATED);
-  return \Drupal::service('locale.project')->getProjects($project_names);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal::service(LocaleProjectRepository::class)->getAll() or \Drupal::service(LocaleProjectRepository::class)->getMultiple($project_names) instead. See https://www.drupal.org/node/3569330', E_USER_DEPRECATED);
+  return \Drupal::service(LocaleProjectRepository::class)->getMultiple($project_names);
 }
 
 /**
  * Clears the projects cache.
  *
  * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
- *   \Drupal::service('locale.project')->resetCache() instead.
+ *   \Drupal::service('cache.memory')->delete('locale_get_projects') instead.
  *
  * @see https://www.drupal.org/node/3569330
  */
 function locale_translation_clear_cache_projects(): void {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal::service(\'locale.project\')->resetCache() instead. See https://www.drupal.org/node/3569330', E_USER_DEPRECATED);
-  \Drupal::service('locale.project')->resetCache();
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal::service("cache.memory")->delete("locale_get_projects") instead. See https://www.drupal.org/node/3569330', E_USER_DEPRECATED);
+  \Drupal::service('cache.memory')->delete('locale_get_projects');
 }
 
 /**
@@ -132,13 +132,23 @@ function locale_translation_load_sources(?array $projects = NULL, ?array $langco
  *
  * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
  *   \Drupal::service(LocaleSource::class)
- *   ->buildSources($projects, $langcodes) instead.
+ *   ->sourceBuild($project, $langcode) instead.
  *
  * @see https://www.drupal.org/node/3569330
  */
 function locale_translation_build_sources(array $projects = [], array $langcodes = []): array {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal::service(LocaleSource::class)->buildSources($projects, $langcodes) instead. See https://www.drupal.org/node/3569330', E_USER_DEPRECATED);
-  return \Drupal::service(LocaleSource::class)->buildSources($projects, $langcodes);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal::service(LocaleSource::class)->sourceBuild($project, $langcode) instead. See https://www.drupal.org/node/3569330', E_USER_DEPRECATED);
+  if (empty($projects)) {
+    $projects = array_keys(\Drupal::service(LocaleProjectRepository::class)->getAll());
+  }
+  $sources = [];
+  $locale_source = \Drupal::service(LocaleSource::class);
+  foreach ($projects as $project) {
+    foreach ($langcodes as $langcode) {
+      $sources[$project][$langcode] = $locale_source->sourceBuild($project, $langcode);
+    }
+  }
+  return $sources;
 }
 
 /**
@@ -270,7 +280,7 @@ function locale_cron_fill_queue(): void {
   // Determine which project+language should be updated.
   $request_time = \Drupal::time()->getRequestTime();
   $last = $request_time - $config->get('translation.update_interval_days') * 3600 * 24;
-  $projects = \Drupal::service('locale.project')->getAll();
+  $projects = \Drupal::service(LocaleProjectRepository::class)->getAll();
   $projects = array_filter($projects, function ($project) {
     return $project['status'] == 1;
   });
@@ -300,103 +310,10 @@ function locale_cron_fill_queue(): void {
     $queue = \Drupal::queue('locale_translation', TRUE);
 
     foreach ($updates as $project => $languages) {
-      $batch = locale_translation_batch_update_build([$project], $languages, $options);
+      $batch = \Drupal::service(LocaleFetch::class)->buildUpdateBatch([$project], $languages, $options);
       foreach ($batch['operations'] as $item) {
         $queue->createItem($item);
       }
     }
   }
-}
-
-/**
- * Determine if a file is a remote file.
- *
- * @param string $uri
- *   The URI or URI pattern of the file.
- *
- * @return bool
- *   TRUE if the $uri is a remote file.
- *
- * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There
- *   is no replacement.
- *
- * @see https://www.drupal.org/node/3569330
- */
-function _locale_translation_file_is_remote($uri) {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3569330', E_USER_DEPRECATED);
-  $scheme = StreamWrapperManager::getScheme($uri);
-  if ($scheme) {
-    return !\Drupal::service('file_system')->realpath($scheme . '://');
-  }
-  return FALSE;
-}
-
-/**
- * Compare two update sources, looking for the newer one.
- *
- * The timestamp property of the source objects are used to determine which is
- * the newer one.
- *
- * @param object $source1
- *   Source object of the first translation source.
- * @param object $source2
- *   Source object of available update.
- *
- * @return int
- *   - "LOCALE_TRANSLATION_SOURCE_COMPARE_LT": $source1 < $source2 OR $source1
- *     is missing.
- *   - "LOCALE_TRANSLATION_SOURCE_COMPARE_EQ":  $source1 == $source2 OR both
- *     $source1 and $source2 are missing.
- *   - "LOCALE_TRANSLATION_SOURCE_COMPARE_GT":  $source1 > $source2 OR $source2
- *     is missing.
- *
- * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There
- *   is no replacement.
- *
- * @see https://www.drupal.org/node/3569330
- */
-function _locale_translation_source_compare($source1, $source2) {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3569330', E_USER_DEPRECATED);
-  if (isset($source1->timestamp) && isset($source2->timestamp)) {
-    if ($source1->timestamp == $source2->timestamp) {
-      return LOCALE_TRANSLATION_SOURCE_COMPARE_EQ;
-    }
-    else {
-      return $source1->timestamp > $source2->timestamp ? LOCALE_TRANSLATION_SOURCE_COMPARE_GT : LOCALE_TRANSLATION_SOURCE_COMPARE_LT;
-    }
-  }
-  elseif (isset($source1->timestamp) && !isset($source2->timestamp)) {
-    return LOCALE_TRANSLATION_SOURCE_COMPARE_GT;
-  }
-  elseif (!isset($source1->timestamp) && isset($source2->timestamp)) {
-    return LOCALE_TRANSLATION_SOURCE_COMPARE_LT;
-  }
-  else {
-    return LOCALE_TRANSLATION_SOURCE_COMPARE_EQ;
-  }
-}
-
-/**
- * Returns default import options for translation update.
- *
- * @return array
- *   Array of translation import options.
- *
- * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There
- *   is no replacement.
- *
- * @see https://www.drupal.org/node/3569330
- */
-function _locale_translation_default_update_options() {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3569330', E_USER_DEPRECATED);
-  $config = \Drupal::config('locale.settings');
-  return [
-    'customized' => LOCALE_NOT_CUSTOMIZED,
-    'overwrite_options' => [
-      'not_customized' => $config->get('translation.overwrite_not_customized'),
-      'customized' => $config->get('translation.overwrite_customized'),
-    ],
-    'finish_feedback' => TRUE,
-    'use_remote' => locale_translation_use_remote_source(),
-  ];
 }

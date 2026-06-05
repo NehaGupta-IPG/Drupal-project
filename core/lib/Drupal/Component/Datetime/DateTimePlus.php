@@ -2,8 +2,6 @@
 
 namespace Drupal\Component\Datetime;
 
-use Drupal\Component\Utility\ToStringTrait;
-
 /**
  * Wraps DateTime().
  *
@@ -37,9 +35,7 @@ use Drupal\Component\Utility\ToStringTrait;
  * @method int getTimestamp()
  * @method \DateTimeZone getTimezone()
  */
-class DateTimePlus {
-
-  use ToStringTrait;
+class DateTimePlus implements \Stringable {
 
   const FORMAT = 'Y-m-d H:i:s';
 
@@ -567,7 +563,7 @@ class DateTimePlus {
    * @return bool
    *   TRUE if the datetime parts contain valid values, otherwise FALSE.
    */
-  public static function checkArray($array) {
+  protected static function checkArray($array) {
     $valid_time = TRUE;
     // Check for a valid date using checkdate(). Only values that
     // meet that test are valid. An empty value, either a string or a 0, is not
@@ -680,6 +676,16 @@ class DateTimePlus {
    */
   public function getPhpDateTime() {
     return clone $this->dateTimeObject;
+  }
+
+  /**
+   * Returns the string representation of this object.
+   *
+   * @return string
+   *   The string representation.
+   */
+  public function __toString(): string {
+    return (string) $this->render();
   }
 
 }
