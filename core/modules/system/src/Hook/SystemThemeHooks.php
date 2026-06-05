@@ -77,13 +77,7 @@ class SystemThemeHooks {
       ],
       'status_report_general_info' => [
         'variables' => [
-          'drupal' => [],
-          'cron' => [],
-          'database_system' => [],
-          'database_system_version' => [],
-          'php' => [],
-          'php_memory_limit' => [],
-          'webserver' => [],
+          'properties' => [],
         ],
       ],
       'admin_page' => [

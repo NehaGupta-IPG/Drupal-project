@@ -97,7 +97,7 @@ class SystemManager {
     uasort($requirements, function ($a, $b) {
       if (!isset($a['weight'])) {
         if (!isset($b['weight'])) {
-          return strcasecmp($a['title'], $b['title']);
+          return strcasecmp($a['title'] ?? '', $b['title'] ?? '');
         }
         return -$b['weight'];
       }

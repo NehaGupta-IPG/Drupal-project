@@ -36,37 +36,14 @@ class StatusReportPage extends RenderElementBase {
     $element['#general_info'] = [
       '#theme' => 'status_report_general_info',
     ];
-    foreach ($element['#requirements'] as $key => $requirement) {
-      switch ($key) {
-        case 'cron':
-          foreach ($requirement['description'] as &$description_elements) {
-            foreach ($description_elements as &$description_element) {
-              if (isset($description_element['#url']) && $description_element['#url']->getRouteName() == 'system.run_cron') {
-                $description_element['#attributes']['class'][] = 'button';
-                $description_element['#attributes']['class'][] = 'button--small';
-                $description_element['#attributes']['class'][] = 'button--primary';
-                $description_element['#attributes']['class'][] = 'system-status-general-info__run-cron';
-              }
-            }
-          }
-          // Intentional fall-through.
 
-        case 'drupal':
-        case 'webserver':
-        case 'database_system':
-        case 'database_system_version':
-        case 'php':
-        case 'php_memory_limit':
-          $element['#general_info']['#' . $key] = $requirement;
-          if (isset($requirement['severity']) &&
-            in_array($requirement['severity'], [RequirementSeverity::Info, RequirementSeverity::OK], TRUE)
-          ) {
-            unset($element['#requirements'][$key]);
-          }
-          break;
-      }
+    $properties = \Drupal::service('system.site')->getPropertyPlugins();
+    foreach ($properties as $id => $property) {
+      $element['#general_info']['#properties'][$id] = [
+        'label' => $property->label(),
+        'view' => $property->view(),
+      ];  
     }
-
     return $element;
   }
 

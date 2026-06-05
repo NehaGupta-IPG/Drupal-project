@@ -74,35 +74,8 @@ class SystemInfoController implements ContainerInjectionInterface {
   public function status() {
     $requirements = $this->systemManager->listRequirements();
 
-    $properties = $this->siteManager->getPropertyPlugins();
-
-    $build = [
-      '#type' => 'container',
-      '#attributes' => [
-        'class' => ['system-status-general-info__items']
-      ]
-    ];
-    foreach ($properties as $name => $property) {
-      $build[$name] = [
-        '#type' => 'container',
-        '#attributes' => [
-          'class' => ['system-status-general-info__item card']
-        ],
-        'label' => [
-          '#type' => 'html_tag',
-          '#tag' => 'h3',
-          '#attributes' => [
-            'class' => ['system-status-general-info__item-title']
-          ],
-          '#value' => $property->label(),
-        ],
-        'view' => $property->view(),
-      ];
-    }
-
     // @TODO: Move this into its own RenderElement.
     return [
-      'properties' => $build,
       'status' => [
         '#type' => 'status_report_page',
         '#requirements' => $requirements,
