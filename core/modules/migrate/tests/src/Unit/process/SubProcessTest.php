@@ -22,13 +22,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 class SubProcessTest extends MigrateProcessTestCase {
 
   /**
-   * The sub_process plugin being tested.
-   *
-   * @var \Drupal\migrate\Plugin\migrate\process\SubProcess
-   */
-  protected $plugin;
-
-  /**
    * The default migration configuration.
    *
    * @var array
@@ -41,7 +34,7 @@ class SubProcessTest extends MigrateProcessTestCase {
    * Tests the sub_process process plugin.
    */
   #[DataProvider('providerTestSubProcess')]
-  public function testSubProcess($process_configuration, $source_values = []): void {
+  public function testSubProcess(array $process_configuration, array $source_values = []): void {
     $migration = $this->getMigration();
     // Set up the properties for the sub_process.
     $plugin = new SubProcess($process_configuration, 'sub_process', []);
@@ -52,14 +45,13 @@ class SubProcessTest extends MigrateProcessTestCase {
     }
     // Set up the key plugins.
     $key_plugin['key'][] = new Get(['source' => '@id'], 'get', []);
-    $migration->expects($this->exactly(2))
+    $migration
       ->method('getProcessPlugins')
       ->willReturnOnConsecutiveCalls(
         $sub_process_plugins,
         $key_plugin,
       );
-    $event_dispatcher = $this->createMock(EventDispatcherInterface::class);
-    $migrate_executable = new MigrateExecutable($migration, $this->createMock(MigrateMessageInterface::class), $event_dispatcher);
+    $migrate_executable = new MigrateExecutable($migration, $this->createStub(MigrateMessageInterface::class), $this->createStub(EventDispatcherInterface::class));
 
     // The current value of the pipeline.
     $current_value = [
@@ -87,7 +79,7 @@ class SubProcessTest extends MigrateProcessTestCase {
   /**
    * Data provider for testSubProcess().
    */
-  public static function providerTestSubProcess() {
+  public static function providerTestSubProcess(): array {
     return [
       'no source context' => [
         'process_configuration' => [
@@ -134,7 +126,7 @@ class SubProcessTest extends MigrateProcessTestCase {
    * Tests the sub_process process plugin.
    */
   #[DataProvider('providerTestNotFoundSubProcess')]
-  public function testNotFoundSubProcess($process_configuration, $source_values = []): void {
+  public function testNotFoundSubProcess(array $process_configuration, $source_values = []): void {
     $migration = $this->getMigration();
     // Set up the properties for the sub_process.
     $plugin = new SubProcess($process_configuration, 'sub_process', []);
@@ -144,14 +136,13 @@ class SubProcessTest extends MigrateProcessTestCase {
       $sub_process_plugins[$destination][] = new Get(['source' => $source], 'get', []);
     }
     $key_plugin['key'][] = new Get(['source' => '@id'], 'get', []);
-    $migration->expects($this->exactly(2))
+    $migration
       ->method('getProcessPlugins')
       ->willReturnOnConsecutiveCalls(
         $sub_process_plugins,
         $key_plugin,
       );
-    $event_dispatcher = $this->createMock(EventDispatcherInterface::class);
-    $migrate_executable = new MigrateExecutable($migration, $this->createMock(MigrateMessageInterface::class), $event_dispatcher);
+    $migrate_executable = new MigrateExecutable($migration, $this->createStub(MigrateMessageInterface::class), $this->createStub(EventDispatcherInterface::class));
 
     // The current value of the pipeline.
     $current_value = [
@@ -173,7 +164,7 @@ class SubProcessTest extends MigrateProcessTestCase {
   /**
    * Data provider for testNotFoundSubProcess().
    */
-  public static function providerTestNotFoundSubProcess() {
+  public static function providerTestNotFoundSubProcess(): array {
     return [
       'no key' => [
         'process_configuration' => [
@@ -199,7 +190,7 @@ class SubProcessTest extends MigrateProcessTestCase {
    * Tests behavior when source children are not arrays.
    */
   #[DataProvider('providerTestSourceNotArray')]
-  public function testSourceNotArray($source_values, $type): void {
+  public function testSourceNotArray(array $source_values, string $type): void {
     $process = new SubProcess(['process' => ['foo' => 'source_foo']], 'sub_process', []);
     $this->expectException(MigrateException::class);
     $this->expectExceptionMessage("Input array should hold elements of type array, instead element was of type '$type'");
@@ -209,7 +200,7 @@ class SubProcessTest extends MigrateProcessTestCase {
   /**
    * Data provider for testSourceNotArray().
    */
-  public static function providerTestSourceNotArray() {
+  public static function providerTestSourceNotArray(): array {
     return [
       'strings cannot be subprocess items' => [
         ['strings', 'cannot', 'be', 'children'],

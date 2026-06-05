@@ -9,6 +9,7 @@ use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests the CSS asset optimizer.
@@ -25,10 +26,8 @@ class CssOptimizerUnitTest extends UnitTestCase {
 
   /**
    * The file URL generator mock.
-   *
-   * @var \Drupal\Core\File\FileUrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $fileUrlGenerator;
+  protected FileUrlGeneratorInterface&MockObject $fileUrlGenerator;
 
   /**
    * {@inheritdoc}
@@ -36,7 +35,7 @@ class CssOptimizerUnitTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     $this->fileUrlGenerator = $this->createMock(FileUrlGeneratorInterface::class);
-    $this->fileUrlGenerator->expects($this->any())
+    $this->fileUrlGenerator
       ->method('generateString')
       ->with($this->isString())
       ->willReturnCallback(function (string $uri): string {

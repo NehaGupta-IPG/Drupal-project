@@ -2,6 +2,7 @@
 
 namespace Drupal\jsonapi\Normalizer;
 
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -20,6 +21,7 @@ use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\jsonapi\ResourceType\ResourceTypeField;
 use Drupal\jsonapi\Serializer\Serializer;
 use Drupal\serialization\Normalizer\SchematicNormalizerTrait;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -35,46 +37,13 @@ class ResourceObjectNormalizer extends NormalizerBase {
 
   use SchematicNormalizerTrait;
 
-  /**
-   * The entity normalization cacher.
-   *
-   * @var \Drupal\jsonapi\EventSubscriber\ResourceObjectNormalizationCacher
-   */
-  protected $cacher;
-
-  /**
-   * @var mixed|\Symfony\Component\EventDispatcher\EventDispatcherInterface
-   */
-  private EventDispatcherInterface $eventDispatcher;
-
-  /**
-   * @var mixed|\Drupal\Core\Entity\EntityFieldManagerInterface
-   */
-  private EntityFieldManagerInterface $entityFieldManager;
-
-  /**
-   * @var mixed|\Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  private EntityTypeManagerInterface $entityTypeManager;
-
-  /**
-   * Constructs a ResourceObjectNormalizer object.
-   *
-   * @param \Drupal\jsonapi\EventSubscriber\ResourceObjectNormalizationCacher $cacher
-   *   The entity normalization cacher.
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
-   *   The event dispatcher.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   The entity field manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
-  public function __construct(ResourceObjectNormalizationCacher $cacher, EventDispatcherInterface $event_dispatcher, EntityFieldManagerInterface $entity_field_manager, EntityTypeManagerInterface $entity_type_manager) {
-    $this->cacher = $cacher;
-    $this->eventDispatcher = $event_dispatcher;
-    $this->entityFieldManager = $entity_field_manager;
-    $this->entityTypeManager = $entity_type_manager;
-  }
+  public function __construct(
+    #[Autowire(service: 'jsonapi.normalization_cacher')]
+    protected ResourceObjectNormalizationCacher $cacher,
+    private EventDispatcherInterface $eventDispatcher,
+    private EntityFieldManagerInterface $entityFieldManager,
+    private EntityTypeManagerInterface $entityTypeManager,
+  ) {}
 
   /**
    * {@inheritdoc}
@@ -84,7 +53,18 @@ class ResourceObjectNormalizer extends NormalizerBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Normalizes data into a set of arrays/scalars.
+   *
+   * @param \Drupal\jsonapi\JsonApiResource\ResourceObject $object
+   *   Data to normalize.
+   * @param string|null $format
+   *   Format the normalization result will be encoded as.
+   * @param array<string, mixed> $context
+   *   Context options for the normalizer.
+   *
+   * @return array|string|int|float|bool|\ArrayObject<mixed, mixed>|null
+   *   \ArrayObject is used to make sure an empty object is encoded as an
+   *   object not an array.
    */
   public function doNormalize($object, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
     assert($object instanceof ResourceObject);
@@ -228,6 +208,12 @@ class ResourceObjectNormalizer extends NormalizerBase {
         $normalized_field = $this->serializer->normalize($field, $format, $context);
       }
       assert($normalized_field instanceof CacheableNormalization);
+
+      // Add cacheability metadata if field item list provides some.
+      if ($field instanceof CacheableDependencyInterface) {
+        $normalized_field = $normalized_field->withCacheableDependency($field);
+      }
+
       return $normalized_field->withCacheableDependency(CacheableMetadata::createFromObject($field_access_result));
     }
     else {

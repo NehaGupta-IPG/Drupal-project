@@ -21,21 +21,13 @@ use PHPUnit\Framework\Attributes\Group;
 class ConfigEntityTypeTest extends UnitTestCase {
 
   /**
-   * The mocked typed config manager.
-   *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface|\PHPUnit\Framework\MockObject\MockObject
-   */
-  protected $typedConfigManager;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
 
-    $this->typedConfigManager = $this->createMock(TypedConfigManagerInterface::class);
     $container = new ContainerBuilder();
-    $container->set('config.typed', $this->typedConfigManager);
+    $container->set('config.typed', $this->createStub(TypedConfigManagerInterface::class));
     \Drupal::setContainer($container);
   }
 
@@ -157,7 +149,7 @@ class ConfigEntityTypeTest extends UnitTestCase {
    * Tests get properties to export.
    */
   #[DataProvider('providerGetPropertiesToExport')]
-  public function testGetPropertiesToExport($definition, $expected): void {
+  public function testGetPropertiesToExport(array $definition, $expected): void {
     $entity_type = $this->setUpConfigEntityType($definition);
     $properties_to_export = $entity_type->getPropertiesToExport();
     $this->assertSame($expected, $properties_to_export);
