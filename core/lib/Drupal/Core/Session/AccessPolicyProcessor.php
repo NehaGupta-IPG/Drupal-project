@@ -141,7 +141,9 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
         // conversion every time we call for the calculated permissions from a
         // warm static cache.
         $calculated_permissions = new CalculatedPermissions($calculated_permissions);
-        $this->variationStatic->set($cache_keys, $calculated_permissions, $cacheability, $initial_cacheability);
+        $cacheability->setCacheContexts($this->filterUserCacheContexts($cacheability->getCacheContexts()));
+        $cacheability->addCacheTags(['user:' . $account->id()]);
+        $this->variationStatic->set($cache_keys, $calculated_permissions, $cacheability, $static_initial_cacheability);
         return $calculated_permissions;
       }
 
