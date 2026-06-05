@@ -1,0 +1,886 @@
+diff --git a/phpunit.xsd b/phpunit.xsd
+index 1b49e514054..4687e73b134 100644
+--- a/phpunit.xsd
++++ b/phpunit.xsd
+@@ -214,6 +214,7 @@
+         <xs:attribute name="numberOfTestsBeforeGarbageCollection" type="xs:integer" default="100"/>
+         <xs:attribute name="requireCoverageMetadata" type="xs:boolean" default="false"/>
+         <xs:attribute name="requireSealedMockObjects" type="xs:boolean" default="false"/>
++        <xs:attribute name="deferToPreviousErrorHandler" type="xs:boolean" default="false"/>
+         <xs:attribute name="processIsolation" type="xs:boolean" default="false"/>
+         <xs:attribute name="failOnAllIssues" type="xs:boolean" default="false"/>
+         <xs:attribute name="failOnDeprecation" type="xs:boolean" default="false"/>
+diff --git a/src/Framework/TestRunner/ErrorHandlerBootstrapper.php b/src/Framework/TestRunner/ErrorHandlerBootstrapper.php
+index 7ac5badab57..decbfd14249 100644
+--- a/src/Framework/TestRunner/ErrorHandlerBootstrapper.php
++++ b/src/Framework/TestRunner/ErrorHandlerBootstrapper.php
+@@ -24,6 +24,10 @@
+ {
+     public static function bootstrap(Configuration $configuration): void
+     {
++        if ($configuration->deferToPreviousErrorHandler()) {
++            ErrorHandler::instance()->enableDeferToPreviousErrorHandler();
++        }
++
+         $deprecationTriggers = [
+             'functions' => [],
+             'methods'   => [],
+diff --git a/src/Runner/ErrorHandler.php b/src/Runner/ErrorHandler.php
+index 9d604094168..4829c755dd7 100644
+--- a/src/Runner/ErrorHandler.php
++++ b/src/Runner/ErrorHandler.php
+@@ -74,6 +74,8 @@ final class ErrorHandler
+     private ExcludeList $excludeList;
+     private bool $enabled                     = false;
+     private ?int $originalErrorReportingLevel = null;
++    private bool $deferToPreviousErrorHandler = false;
++    private bool $handlingDeferredIssue       = false;
+ 
+     /**
+      * @var ?callable
+@@ -135,18 +137,206 @@ private function __construct(bool $identifyIssueTrigger)
+      * @throws NoTestCaseObjectOnCallStackException
+      */
+     public function __invoke(int $errorNumber, string $errorString, string $errorFile, int $errorLine): bool
++    {
++        if ($this->deferToPreviousErrorHandler &&
++            !$this->handlingDeferredIssue &&
++            $this->previousErrorHandler !== null) {
++            $this->handlingDeferredIssue = true;
++
++            try {
++                $handledByPreviousErrorHandler = (bool) ($this->previousErrorHandler)($errorNumber, $errorString, $errorFile, $errorLine);
++            } finally {
++                $this->handlingDeferredIssue = false;
++            }
++
++            if ($handledByPreviousErrorHandler) {
++                return true;
++            }
++
++            return $this->handle($errorNumber, $errorString, $errorFile, $errorLine, false);
++        }
++
++        return $this->handle($errorNumber, $errorString, $errorFile, $errorLine, !$this->deferToPreviousErrorHandler);
++    }
++
++    public function handleNonTestCaseIssue(int $errorNumber, string $errorString, string $errorFile, int $errorLine): true
++    {
++        if ($this->deferToPreviousErrorHandler &&
++            !$this->handlingDeferredIssue &&
++            $this->previousNonTestCaseErrorHandler !== null) {
++            $this->handlingDeferredIssue = true;
++
++            try {
++                $handledByPreviousErrorHandler = (bool) ($this->previousNonTestCaseErrorHandler)($errorNumber, $errorString, $errorFile, $errorLine);
++            } finally {
++                $this->handlingDeferredIssue = false;
++            }
++
++            if ($handledByPreviousErrorHandler) {
++                return true;
++            }
++
++            return $this->handleNonTestCaseIssueInternal($errorNumber, $errorString, $errorFile, $errorLine, false);
++        }
++
++        return $this->handleNonTestCaseIssueInternal($errorNumber, $errorString, $errorFile, $errorLine, !$this->deferToPreviousErrorHandler);
++    }
++
++    public function registerForNonTestCaseContext(): void
++    {
++        $previousHandler = set_error_handler(
++            [self::instance(), 'handleNonTestCaseIssue'],
++            E_DEPRECATED | E_USER_DEPRECATED | E_NOTICE | E_USER_NOTICE | E_WARNING | E_USER_WARNING,
++        );
++
++        if ($previousHandler !== null) {
++            $this->previousNonTestCaseErrorHandler = $previousHandler;
++        }
++    }
++
++    public function restoreForNonTestCaseContext(): void
++    {
++        restore_error_handler();
++
++        $this->previousNonTestCaseErrorHandler = null;
++    }
++
++    public function enable(TestCase $test): void
++    {
++        assert(!$this->enabled);
++
++        $previousErrorHandler = set_error_handler($this);
++
++        if ($previousErrorHandler !== null) {
++            $this->previousErrorHandler = $previousErrorHandler;
++        }
++
++        $this->enabled                     = true;
++        $this->originalErrorReportingLevel = error_reporting();
++
++        $this->triggerTestCaseContextIssues($test);
++
++        error_reporting($this->originalErrorReportingLevel & self::UNHANDLEABLE_LEVELS);
++    }
++
++    public function disable(): void
++    {
++        if (!$this->enabled) {
++            return;
++        }
++
++        restore_error_handler();
++
++        error_reporting(error_reporting() | $this->originalErrorReportingLevel);
++
++        $this->enabled                     = false;
++        $this->originalErrorReportingLevel = null;
++        $this->previousErrorHandler        = null;
++    }
++
++    /**
++     * @return list<non-empty-string>
++     */
++    public function snapshotErrorHandlers(): array
++    {
++        $messages = [];
++
++        $this->backupErrorHandlers = $this->activeErrorHandlers($messages);
++
++        return $messages;
++    }
++
++    /**
++     * @return list<non-empty-string>
++     */
++    public function restoreErrorHandlers(bool $inIsolation): array
++    {
++        $messages            = [];
++        $activeErrorHandlers = $this->activeErrorHandlers($messages);
++        $backupErrorHandlers = $this->backupErrorHandlers;
++
++        assert($backupErrorHandlers !== null);
++
++        $activeAbove = $this->handlersAboveSelf($activeErrorHandlers);
++        $backupAbove = $this->handlersAboveSelf($backupErrorHandlers);
++
++        if ($this->isOnStack($backupErrorHandlers) &&
++            !$this->isOnStack($activeErrorHandlers)) {
++            $messages[] = 'Test code or tested code removed error handlers other than its own';
++        } elseif ($activeAbove !== $backupAbove) {
++            if (count($activeAbove) > count($backupAbove)) {
++                if (!$inIsolation) {
++                    $messages[] = 'Test code or tested code did not remove its own error handlers';
++                }
++            } else {
++                $messages[] = 'Test code or tested code removed error handlers other than its own';
++            }
++        }
++
++        if ($activeErrorHandlers !== $backupErrorHandlers) {
++            foreach ($activeErrorHandlers as $handler) {
++                restore_error_handler();
++            }
++
++            foreach ($backupErrorHandlers as $handler) {
++                set_error_handler($handler);
++            }
++        }
++
++        $this->backupErrorHandlers = null;
++
++        return $messages;
++    }
++
++    public function useBaseline(Baseline $baseline): void
++    {
++        $this->baseline = $baseline;
++    }
++
++    public function enableDeferToPreviousErrorHandler(): void
++    {
++        $this->deferToPreviousErrorHandler = true;
++    }
++
++    /**
++     * @param DeprecationTriggers $deprecationTriggers
++     */
++    public function useDeprecationTriggers(array $deprecationTriggers): void
++    {
++        $this->deprecationTriggers = $deprecationTriggers;
++    }
++
++    public function addIssueTriggerResolver(IssueTriggerResolver $resolver): void
++    {
++        array_unshift($this->issueTriggerResolvers, $resolver);
++    }
++
++    public function enterTestCaseContext(string $className, string $methodName): void
++    {
++        $this->testCaseContext = $this->testCaseContext($className, $methodName);
++    }
++
++    public function leaveTestCaseContext(): void
++    {
++        $this->testCaseContext = null;
++    }
++
++    /**
++     * @throws NoTestCaseObjectOnCallStackException
++     */
++    private function handle(int $errorNumber, string $errorString, string $errorFile, int $errorLine, bool $forwardToPreviousErrorHandler): bool
+     {
+         $suppressed = (error_reporting() & ~self::INSUPPRESSIBLE_LEVELS) === 0;
+ 
+         if ($suppressed && $this->excludeList->isExcluded($errorFile)) {
+             // @codeCoverageIgnoreStart
+-            return $this->forwardToPreviousErrorHandler($errorNumber, $errorString, $errorFile, $errorLine);
++            return $this->forwardIfRequested($forwardToPreviousErrorHandler, $errorNumber, $errorString, $errorFile, $errorLine);
+             // @codeCoverageIgnoreEnd
+         }
+ 
+         if ($errorString === '' || $errorFile === '' || $errorLine < 1) {
+             // @codeCoverageIgnoreStart
+-            return $this->forwardToPreviousErrorHandler($errorNumber, $errorString, $errorFile, $errorLine);
++            return $this->forwardIfRequested($forwardToPreviousErrorHandler, $errorNumber, $errorString, $errorFile, $errorLine);
+             // @codeCoverageIgnoreEnd
+         }
+ 
+@@ -260,13 +450,13 @@ public function __invoke(int $errorNumber, string $errorString, string $errorFil
+                 throw new ErrorException('E_USER_ERROR was triggered');
+ 
+             default:
+-                return $this->forwardToPreviousErrorHandler($errorNumber, $errorString, $errorFile, $errorLine);
++                return $this->forwardIfRequested($forwardToPreviousErrorHandler, $errorNumber, $errorString, $errorFile, $errorLine);
+         }
+ 
+-        return $this->forwardToPreviousErrorHandler($errorNumber, $errorString, $errorFile, $errorLine);
++        return $this->forwardIfRequested($forwardToPreviousErrorHandler, $errorNumber, $errorString, $errorFile, $errorLine);
+     }
+ 
+-    public function handleNonTestCaseIssue(int $errorNumber, string $errorString, string $errorFile, int $errorLine): true
++    private function handleNonTestCaseIssueInternal(int $errorNumber, string $errorString, string $errorFile, int $errorLine, bool $forwardToPreviousErrorHandler): true
+     {
+         $suppressed = (error_reporting() & ~self::INSUPPRESSIBLE_LEVELS) === 0;
+ 
+@@ -282,7 +472,7 @@ public function handleNonTestCaseIssue(int $errorNumber, string $errorString, st
+ 
+         if ($errorString === '' || $errorFile === '' || $errorLine < 1) {
+             // @codeCoverageIgnoreStart
+-            if ($this->previousNonTestCaseErrorHandler !== null) {
++            if ($forwardToPreviousErrorHandler && $this->previousNonTestCaseErrorHandler !== null) {
+                 ($this->previousNonTestCaseErrorHandler)($errorNumber, $errorString, $errorFile, $errorLine);
+             }
+ 
+@@ -388,147 +578,13 @@ public function handleNonTestCaseIssue(int $errorNumber, string $errorString, st
+                 break;
+         }
+ 
+-        if ($this->previousNonTestCaseErrorHandler !== null) {
++        if ($forwardToPreviousErrorHandler && $this->previousNonTestCaseErrorHandler !== null) {
+             ($this->previousNonTestCaseErrorHandler)($errorNumber, $errorString, $errorFile, $errorLine);
+         }
+ 
+         return true;
+     }
+ 
+-    public function registerForNonTestCaseContext(): void
+-    {
+-        $previousHandler = set_error_handler(
+-            [self::instance(), 'handleNonTestCaseIssue'],
+-            E_DEPRECATED | E_USER_DEPRECATED | E_NOTICE | E_USER_NOTICE | E_WARNING | E_USER_WARNING,
+-        );
+-
+-        if ($previousHandler !== null) {
+-            $this->previousNonTestCaseErrorHandler = $previousHandler;
+-        }
+-    }
+-
+-    public function restoreForNonTestCaseContext(): void
+-    {
+-        restore_error_handler();
+-
+-        $this->previousNonTestCaseErrorHandler = null;
+-    }
+-
+-    public function enable(TestCase $test): void
+-    {
+-        assert(!$this->enabled);
+-
+-        $previousErrorHandler = set_error_handler($this);
+-
+-        if ($previousErrorHandler !== null) {
+-            $this->previousErrorHandler = $previousErrorHandler;
+-        }
+-
+-        $this->enabled                     = true;
+-        $this->originalErrorReportingLevel = error_reporting();
+-
+-        $this->triggerTestCaseContextIssues($test);
+-
+-        error_reporting($this->originalErrorReportingLevel & self::UNHANDLEABLE_LEVELS);
+-    }
+-
+-    public function disable(): void
+-    {
+-        if (!$this->enabled) {
+-            return;
+-        }
+-
+-        restore_error_handler();
+-
+-        error_reporting(error_reporting() | $this->originalErrorReportingLevel);
+-
+-        $this->enabled                     = false;
+-        $this->originalErrorReportingLevel = null;
+-        $this->previousErrorHandler        = null;
+-    }
+-
+-    /**
+-     * @return list<non-empty-string>
+-     */
+-    public function snapshotErrorHandlers(): array
+-    {
+-        $messages = [];
+-
+-        $this->backupErrorHandlers = $this->activeErrorHandlers($messages);
+-
+-        return $messages;
+-    }
+-
+-    /**
+-     * @return list<non-empty-string>
+-     */
+-    public function restoreErrorHandlers(bool $inIsolation): array
+-    {
+-        $messages            = [];
+-        $activeErrorHandlers = $this->activeErrorHandlers($messages);
+-        $backupErrorHandlers = $this->backupErrorHandlers;
+-
+-        assert($backupErrorHandlers !== null);
+-
+-        $activeAbove = $this->handlersAboveSelf($activeErrorHandlers);
+-        $backupAbove = $this->handlersAboveSelf($backupErrorHandlers);
+-
+-        if ($this->isOnStack($backupErrorHandlers) &&
+-            !$this->isOnStack($activeErrorHandlers)) {
+-            $messages[] = 'Test code or tested code removed error handlers other than its own';
+-        } elseif ($activeAbove !== $backupAbove) {
+-            if (count($activeAbove) > count($backupAbove)) {
+-                if (!$inIsolation) {
+-                    $messages[] = 'Test code or tested code did not remove its own error handlers';
+-                }
+-            } else {
+-                $messages[] = 'Test code or tested code removed error handlers other than its own';
+-            }
+-        }
+-
+-        if ($activeErrorHandlers !== $backupErrorHandlers) {
+-            foreach ($activeErrorHandlers as $handler) {
+-                restore_error_handler();
+-            }
+-
+-            foreach ($backupErrorHandlers as $handler) {
+-                set_error_handler($handler);
+-            }
+-        }
+-
+-        $this->backupErrorHandlers = null;
+-
+-        return $messages;
+-    }
+-
+-    public function useBaseline(Baseline $baseline): void
+-    {
+-        $this->baseline = $baseline;
+-    }
+-
+-    /**
+-     * @param DeprecationTriggers $deprecationTriggers
+-     */
+-    public function useDeprecationTriggers(array $deprecationTriggers): void
+-    {
+-        $this->deprecationTriggers = $deprecationTriggers;
+-    }
+-
+-    public function addIssueTriggerResolver(IssueTriggerResolver $resolver): void
+-    {
+-        array_unshift($this->issueTriggerResolvers, $resolver);
+-    }
+-
+-    public function enterTestCaseContext(string $className, string $methodName): void
+-    {
+-        $this->testCaseContext = $this->testCaseContext($className, $methodName);
+-    }
+-
+-    public function leaveTestCaseContext(): void
+-    {
+-        $this->testCaseContext = null;
+-    }
+-
+     /**
+      * @param non-empty-string $file
+      * @param positive-int     $line
+@@ -992,4 +1048,13 @@ private function forwardToPreviousErrorHandler(int $errorNumber, string $errorSt
+ 
+         return (bool) ($this->previousErrorHandler)($errorNumber, $errorString, $errorFile, $errorLine);
+     }
++
++    private function forwardIfRequested(bool $forwardToPreviousErrorHandler, int $errorNumber, string $errorString, string $errorFile, int $errorLine): bool
++    {
++        if (!$forwardToPreviousErrorHandler) {
++            return true;
++        }
++
++        return $this->forwardToPreviousErrorHandler($errorNumber, $errorString, $errorFile, $errorLine);
++    }
+ }
+diff --git a/src/TextUI/Application.php b/src/TextUI/Application.php
+index 5164135393d..e4cfd78f55e 100644
+--- a/src/TextUI/Application.php
++++ b/src/TextUI/Application.php
+@@ -205,6 +205,8 @@ public function run(array $argv): int
+ 
+             EventFacade::instance()->seal();
+ 
++            $this->configureErrorHandlerDeferral($configuration);
++
+             ErrorHandler::instance()->registerForNonTestCaseContext();
+ 
+             $testSuite = $this->buildTestSuite($configuration);
+@@ -883,6 +885,21 @@ private function filteredTests(Configuration $configuration, TestSuite $suite):
+         return $suite->collect();
+     }
+ 
++    private function configureErrorHandlerDeferral(Configuration $configuration): void
++    {
++        if (!$configuration->deferToPreviousErrorHandler()) {
++            return;
++        }
++
++        ErrorHandler::instance()->enableDeferToPreviousErrorHandler();
++
++        EventFacade::emitter()->testRunnerTriggeredPhpunitNotice(
++            'Issue handling has been deferred to an error handler registered before PHPUnit (deferToPreviousErrorHandler="true"). ' .
++            'PHPUnit cannot guarantee the integrity of its reporting of deprecations, notices, warnings, and errors because the ' .
++            'decision whether such an issue is processed, ignored, or reported is made outside of PHPUnit\'s control.',
++        );
++    }
++
+     private function configureDeprecationTriggers(Configuration $configuration): void
+     {
+         $deprecationTriggers = [
+diff --git a/src/TextUI/Configuration/Configuration.php b/src/TextUI/Configuration/Configuration.php
+index 4ddb4809ca4..5f80cc8ed8c 100644
+--- a/src/TextUI/Configuration/Configuration.php
++++ b/src/TextUI/Configuration/Configuration.php
+@@ -359,6 +359,7 @@
+     private bool $reverseDefectList;
+     private bool $requireCoverageMetadata;
+     private bool $requireSealedMockObjects;
++    private bool $deferToPreviousErrorHandler;
+     private bool $noProgress;
+     private bool $noResults;
+     private bool $noOutput;
+@@ -541,7 +542,7 @@
+      * @param null|non-empty-string                                                       $generateBaseline
+      * @param non-negative-int                                                            $shortenArraysForExportThreshold
+      */
+-    public function __construct(array $cliArguments, ?string $testFilesFile, ?string $configurationFile, ?string $bootstrap, array $bootstrapForTestSuite, bool $cacheResult, ?string $cacheDirectory, ?string $coverageCacheDirectory, Source $source, string $testResultCacheFile, ?string $coverageClover, ?string $coverageCobertura, ?string $coverageCrap4j, int $coverageCrap4jThreshold, ?string $coverageHtml, int $coverageHtmlLowUpperBound, int $coverageHtmlHighLowerBound, string $coverageHtmlColorSuccessLow, string $coverageHtmlColorSuccessLowDark, string $coverageHtmlColorSuccessMedium, string $coverageHtmlColorSuccessMediumDark, string $coverageHtmlColorSuccessHigh, string $coverageHtmlColorSuccessHighDark, string $coverageHtmlColorSuccessBar, string $coverageHtmlColorSuccessBarDark, string $coverageHtmlColorWarning, string $coverageHtmlColorWarningDark, string $coverageHtmlColorWarningBar, string $coverageHtmlColorWarningBarDark, string $coverageHtmlColorDanger, string $coverageHtmlColorDangerDark, string $coverageHtmlColorDangerBar, string $coverageHtmlColorDangerBarDark, string $coverageHtmlColorBreadcrumbs, string $coverageHtmlColorBreadcrumbsDark, ?string $coverageHtmlCustomCssFile, ?string $coverageOpenClover, ?string $coveragePhp, ?string $coverageText, bool $coverageTextShowUncoveredFiles, bool $coverageTextShowOnlySummary, ?string $coverageXml, bool $coverageXmlIncludeSource, bool $pathCoverage, bool $branchCoverage, bool $ignoreDeprecatedCodeUnitsFromCodeCoverage, bool $disableCodeCoverageIgnore, bool $disableCoverageTargeting, bool $failOnAllIssues, bool $failOnDeprecation, bool $failOnPhpunitDeprecation, bool $failOnPhpunitNotice, bool $failOnPhpunitWarning, bool $failOnEmptyTestSuite, bool $failOnIncomplete, bool $failOnNotice, bool $failOnRisky, bool $failOnSkipped, bool $failOnWarning, bool $doNotFailOnDeprecation, bool $doNotFailOnPhpunitDeprecation, bool $doNotFailOnPhpunitNotice, bool $doNotFailOnPhpunitWarning, bool $doNotFailOnEmptyTestSuite, bool $doNotFailOnIncomplete, bool $doNotFailOnNotice, bool $doNotFailOnRisky, bool $doNotFailOnSkipped, bool $doNotFailOnWarning, int $stopOnDefect, int $stopOnDeprecation, ?string $specificDeprecationToStopOn, int $stopOnError, int $stopOnFailure, int $stopOnIncomplete, int $stopOnNotice, int $stopOnRisky, int $stopOnSkipped, int $stopOnWarning, bool $outputToStandardErrorStream, int $columns, bool $noExtensions, ?string $pharExtensionDirectory, array $extensionBootstrappers, bool $backupGlobals, bool $backupStaticProperties, bool $beStrictAboutChangesToGlobalState, bool $colors, bool $processIsolation, bool $enforceTimeLimit, int $defaultTimeLimit, int $diffContext, int $timeoutForSmallTests, int $timeoutForMediumTests, int $timeoutForLargeTests, bool $reportUselessTests, bool $strictCoverage, bool $requireCoverageContribution, bool $disallowTestOutput, bool $displayDetailsOnAllIssues, bool $displayDetailsOnIncompleteTests, bool $displayDetailsOnSkippedTests, bool $displayDetailsOnTestsThatTriggerDeprecations, bool $displayDetailsOnPhpunitDeprecations, bool $displayDetailsOnPhpunitNotices, bool $displayDetailsOnTestsThatTriggerErrors, bool $displayDetailsOnTestsThatTriggerNotices, bool $displayDetailsOnTestsThatTriggerWarnings, bool $reverseDefectList, bool $requireCoverageMetadata, bool $requireSealedMockObjects, bool $noProgress, bool $noResults, bool $noOutput, int $executionOrder, int $executionOrderDefects, bool $resolveDependencies, ?string $logfileTeamcity, ?string $logfileJunit, ?string $logfileOtr, bool $includeGitInformation, bool $includeGitInformationInOtrLogfile, ?string $logfileTestdoxHtml, ?string $logfileTestdoxText, ?string $logEventsText, ?string $logEventsVerboseText, bool $compactOutput, bool $teamCityOutput, bool $testDoxOutput, bool $testDoxOutputSummary, ?array $testsCovering, ?array $testsUsing, ?array $testsRequiringPhpExtension, ?string $filter, ?string $excludeFilter, ?string $testIdFilterFile, ?string $testIdFilter, array $groups, array $excludeGroups, int $randomOrderSeed, bool $includeUncoveredFiles, TestSuiteCollection $testSuite, string $includeTestSuite, string $excludeTestSuite, ?string $defaultTestSuite, bool $ignoreTestSelectionInXmlConfiguration, array $testSuffixes, Php $php, bool $controlGarbageCollector, int $numberOfTestsBeforeGarbageCollection, ?string $generateBaseline, bool $debug, bool $withTelemetry, int $shortenArraysForExportThreshold)
++    public function __construct(array $cliArguments, ?string $testFilesFile, ?string $configurationFile, ?string $bootstrap, array $bootstrapForTestSuite, bool $cacheResult, ?string $cacheDirectory, ?string $coverageCacheDirectory, Source $source, string $testResultCacheFile, ?string $coverageClover, ?string $coverageCobertura, ?string $coverageCrap4j, int $coverageCrap4jThreshold, ?string $coverageHtml, int $coverageHtmlLowUpperBound, int $coverageHtmlHighLowerBound, string $coverageHtmlColorSuccessLow, string $coverageHtmlColorSuccessLowDark, string $coverageHtmlColorSuccessMedium, string $coverageHtmlColorSuccessMediumDark, string $coverageHtmlColorSuccessHigh, string $coverageHtmlColorSuccessHighDark, string $coverageHtmlColorSuccessBar, string $coverageHtmlColorSuccessBarDark, string $coverageHtmlColorWarning, string $coverageHtmlColorWarningDark, string $coverageHtmlColorWarningBar, string $coverageHtmlColorWarningBarDark, string $coverageHtmlColorDanger, string $coverageHtmlColorDangerDark, string $coverageHtmlColorDangerBar, string $coverageHtmlColorDangerBarDark, string $coverageHtmlColorBreadcrumbs, string $coverageHtmlColorBreadcrumbsDark, ?string $coverageHtmlCustomCssFile, ?string $coverageOpenClover, ?string $coveragePhp, ?string $coverageText, bool $coverageTextShowUncoveredFiles, bool $coverageTextShowOnlySummary, ?string $coverageXml, bool $coverageXmlIncludeSource, bool $pathCoverage, bool $branchCoverage, bool $ignoreDeprecatedCodeUnitsFromCodeCoverage, bool $disableCodeCoverageIgnore, bool $disableCoverageTargeting, bool $failOnAllIssues, bool $failOnDeprecation, bool $failOnPhpunitDeprecation, bool $failOnPhpunitNotice, bool $failOnPhpunitWarning, bool $failOnEmptyTestSuite, bool $failOnIncomplete, bool $failOnNotice, bool $failOnRisky, bool $failOnSkipped, bool $failOnWarning, bool $doNotFailOnDeprecation, bool $doNotFailOnPhpunitDeprecation, bool $doNotFailOnPhpunitNotice, bool $doNotFailOnPhpunitWarning, bool $doNotFailOnEmptyTestSuite, bool $doNotFailOnIncomplete, bool $doNotFailOnNotice, bool $doNotFailOnRisky, bool $doNotFailOnSkipped, bool $doNotFailOnWarning, int $stopOnDefect, int $stopOnDeprecation, ?string $specificDeprecationToStopOn, int $stopOnError, int $stopOnFailure, int $stopOnIncomplete, int $stopOnNotice, int $stopOnRisky, int $stopOnSkipped, int $stopOnWarning, bool $outputToStandardErrorStream, int $columns, bool $noExtensions, ?string $pharExtensionDirectory, array $extensionBootstrappers, bool $backupGlobals, bool $backupStaticProperties, bool $beStrictAboutChangesToGlobalState, bool $colors, bool $processIsolation, bool $enforceTimeLimit, int $defaultTimeLimit, int $diffContext, int $timeoutForSmallTests, int $timeoutForMediumTests, int $timeoutForLargeTests, bool $reportUselessTests, bool $strictCoverage, bool $requireCoverageContribution, bool $disallowTestOutput, bool $displayDetailsOnAllIssues, bool $displayDetailsOnIncompleteTests, bool $displayDetailsOnSkippedTests, bool $displayDetailsOnTestsThatTriggerDeprecations, bool $displayDetailsOnPhpunitDeprecations, bool $displayDetailsOnPhpunitNotices, bool $displayDetailsOnTestsThatTriggerErrors, bool $displayDetailsOnTestsThatTriggerNotices, bool $displayDetailsOnTestsThatTriggerWarnings, bool $reverseDefectList, bool $requireCoverageMetadata, bool $requireSealedMockObjects, bool $deferToPreviousErrorHandler, bool $noProgress, bool $noResults, bool $noOutput, int $executionOrder, int $executionOrderDefects, bool $resolveDependencies, ?string $logfileTeamcity, ?string $logfileJunit, ?string $logfileOtr, bool $includeGitInformation, bool $includeGitInformationInOtrLogfile, ?string $logfileTestdoxHtml, ?string $logfileTestdoxText, ?string $logEventsText, ?string $logEventsVerboseText, bool $compactOutput, bool $teamCityOutput, bool $testDoxOutput, bool $testDoxOutputSummary, ?array $testsCovering, ?array $testsUsing, ?array $testsRequiringPhpExtension, ?string $filter, ?string $excludeFilter, ?string $testIdFilterFile, ?string $testIdFilter, array $groups, array $excludeGroups, int $randomOrderSeed, bool $includeUncoveredFiles, TestSuiteCollection $testSuite, string $includeTestSuite, string $excludeTestSuite, ?string $defaultTestSuite, bool $ignoreTestSelectionInXmlConfiguration, array $testSuffixes, Php $php, bool $controlGarbageCollector, int $numberOfTestsBeforeGarbageCollection, ?string $generateBaseline, bool $debug, bool $withTelemetry, int $shortenArraysForExportThreshold)
+     {
+         $this->cliArguments                                 = $cliArguments;
+         $this->testFilesFile                                = $testFilesFile;
+@@ -654,6 +655,7 @@ public function __construct(array $cliArguments, ?string $testFilesFile, ?string
+         $this->reverseDefectList                            = $reverseDefectList;
+         $this->requireCoverageMetadata                      = $requireCoverageMetadata;
+         $this->requireSealedMockObjects                     = $requireSealedMockObjects;
++        $this->deferToPreviousErrorHandler                  = $deferToPreviousErrorHandler;
+         $this->noProgress                                   = $noProgress;
+         $this->noResults                                    = $noResults;
+         $this->noOutput                                     = $noOutput;
+@@ -1756,6 +1758,11 @@ public function requireSealedMockObjects(): bool
+         return $this->requireSealedMockObjects;
+     }
+ 
++    public function deferToPreviousErrorHandler(): bool
++    {
++        return $this->deferToPreviousErrorHandler;
++    }
++
+     public function noProgress(): bool
+     {
+         return $this->noProgress;
+diff --git a/src/TextUI/Configuration/Merger.php b/src/TextUI/Configuration/Merger.php
+index b87dd0ff612..44fee7d5b11 100644
+--- a/src/TextUI/Configuration/Merger.php
++++ b/src/TextUI/Configuration/Merger.php
+@@ -698,6 +698,8 @@ public function merge(CliConfiguration $cliConfiguration, XmlConfiguration $xmlC
+         $requireCoverageMetadata  = $xmlConfiguration->phpunit()->requireCoverageMetadata();
+         $requireSealedMockObjects = $xmlConfiguration->phpunit()->requireSealedMockObjects();
+ 
++        $deferToPreviousErrorHandler = $xmlConfiguration->phpunit()->deferToPreviousErrorHandler();
++
+         if ($cliConfiguration->hasExecutionOrder()) {
+             $executionOrder = $cliConfiguration->executionOrder();
+         } else {
+@@ -1253,6 +1255,7 @@ public function merge(CliConfiguration $cliConfiguration, XmlConfiguration $xmlC
+             $reverseDefectList,
+             $requireCoverageMetadata,
+             $requireSealedMockObjects,
++            $deferToPreviousErrorHandler,
+             $noProgress,
+             $noResults,
+             $noOutput,
+diff --git a/src/TextUI/Configuration/Xml/DefaultConfiguration.php b/src/TextUI/Configuration/Xml/DefaultConfiguration.php
+index cfa66aec381..cebbd800c86 100644
+--- a/src/TextUI/Configuration/Xml/DefaultConfiguration.php
++++ b/src/TextUI/Configuration/Xml/DefaultConfiguration.php
+@@ -120,6 +120,7 @@ public static function create(): self
+                 false,
+                 false,
+                 false,
++                false,
+                 null,
+                 [],
+                 false,
+diff --git a/src/TextUI/Configuration/Xml/Loader.php b/src/TextUI/Configuration/Xml/Loader.php
+index 2d253146529..52bf55e01a8 100644
+--- a/src/TextUI/Configuration/Xml/Loader.php
++++ b/src/TextUI/Configuration/Xml/Loader.php
+@@ -1169,6 +1169,12 @@ private function phpunit(string $filename, DOMDocument $document, DOMXPath $xpat
+             $requireSealedMockObjects = $this->parseBooleanAttribute($documentElement, 'requireSealedMockObjects', false);
+         }
+ 
++        $deferToPreviousErrorHandler = false;
++
++        if ($documentElement->hasAttribute('deferToPreviousErrorHandler')) {
++            $deferToPreviousErrorHandler = $this->parseBooleanAttribute($documentElement, 'deferToPreviousErrorHandler', false);
++        }
++
+         $beStrictAboutCoverageMetadata = false;
+ 
+         if ($documentElement->hasAttribute('beStrictAboutCoverageMetadata')) {
+@@ -1205,6 +1211,7 @@ private function phpunit(string $filename, DOMDocument $document, DOMXPath $xpat
+             $this->parseBooleanAttribute($documentElement, 'reverseDefectList', false),
+             $requireCoverageMetadata,
+             $requireSealedMockObjects,
++            $deferToPreviousErrorHandler,
+             $bootstrap,
+             $this->bootstrapForTestSuite($filename, $xpath),
+             $this->parseBooleanAttribute($documentElement, 'processIsolation', false),
+diff --git a/src/TextUI/Configuration/Xml/PHPUnit.php b/src/TextUI/Configuration/Xml/PHPUnit.php
+index 8793234aac4..51e1145a5c1 100644
+--- a/src/TextUI/Configuration/Xml/PHPUnit.php
++++ b/src/TextUI/Configuration/Xml/PHPUnit.php
+@@ -42,6 +42,7 @@
+     private bool $reverseDefectList;
+     private bool $requireCoverageMetadata;
+     private bool $requireSealedMockObjects;
++    private bool $deferToPreviousErrorHandler;
+ 
+     /**
+      * @var ?non-empty-string
+@@ -194,7 +195,7 @@
+      * @param non-negative-int                          $shortenArraysForExportThreshold
+      * @param positive-int                              $diffContext
+      */
+-    public function __construct(?string $cacheDirectory, bool $cacheResult, int|string $columns, string $colors, bool $stderr, bool $displayDetailsOnAllIssues, bool $displayDetailsOnIncompleteTests, bool $displayDetailsOnSkippedTests, bool $displayDetailsOnTestsThatTriggerDeprecations, bool $displayDetailsOnPhpunitDeprecations, bool $displayDetailsOnPhpunitNotices, bool $displayDetailsOnTestsThatTriggerErrors, bool $displayDetailsOnTestsThatTriggerNotices, bool $displayDetailsOnTestsThatTriggerWarnings, bool $reverseDefectList, bool $requireCoverageMetadata, bool $requireSealedMockObjects, ?string $bootstrap, array $bootstrapForTestSuite, bool $processIsolation, bool $failOnAllIssues, bool $failOnDeprecation, bool $failOnPhpunitDeprecation, bool $failOnPhpunitNotice, bool $failOnPhpunitWarning, bool $failOnEmptyTestSuite, bool $hasFailOnEmptyTestSuite, bool $failOnIncomplete, bool $failOnNotice, bool $failOnRisky, bool $failOnSkipped, bool $failOnWarning, int $stopOnDefect, int $stopOnDeprecation, int $stopOnError, int $stopOnFailure, int $stopOnIncomplete, int $stopOnNotice, int $stopOnRisky, int $stopOnSkipped, int $stopOnWarning, ?string $extensionsDirectory, bool $beStrictAboutChangesToGlobalState, bool $beStrictAboutOutputDuringTests, bool $beStrictAboutTestsThatDoNotTestAnything, bool $beStrictAboutCoverageMetadata, bool $requireCoverageContribution, bool $enforceTimeLimit, int $defaultTimeLimit, int $timeoutForSmallTests, int $timeoutForMediumTests, int $timeoutForLargeTests, ?string $defaultTestSuite, int $executionOrder, bool $resolveDependencies, bool $defectsFirst, bool $backupGlobals, bool $backupStaticProperties, bool $testdoxPrinter, bool $testdoxPrinterSummary, bool $controlGarbageCollector, int $numberOfTestsBeforeGarbageCollection, int $shortenArraysForExportThreshold, int $diffContext)
++    public function __construct(?string $cacheDirectory, bool $cacheResult, int|string $columns, string $colors, bool $stderr, bool $displayDetailsOnAllIssues, bool $displayDetailsOnIncompleteTests, bool $displayDetailsOnSkippedTests, bool $displayDetailsOnTestsThatTriggerDeprecations, bool $displayDetailsOnPhpunitDeprecations, bool $displayDetailsOnPhpunitNotices, bool $displayDetailsOnTestsThatTriggerErrors, bool $displayDetailsOnTestsThatTriggerNotices, bool $displayDetailsOnTestsThatTriggerWarnings, bool $reverseDefectList, bool $requireCoverageMetadata, bool $requireSealedMockObjects, bool $deferToPreviousErrorHandler, ?string $bootstrap, array $bootstrapForTestSuite, bool $processIsolation, bool $failOnAllIssues, bool $failOnDeprecation, bool $failOnPhpunitDeprecation, bool $failOnPhpunitNotice, bool $failOnPhpunitWarning, bool $failOnEmptyTestSuite, bool $hasFailOnEmptyTestSuite, bool $failOnIncomplete, bool $failOnNotice, bool $failOnRisky, bool $failOnSkipped, bool $failOnWarning, int $stopOnDefect, int $stopOnDeprecation, int $stopOnError, int $stopOnFailure, int $stopOnIncomplete, int $stopOnNotice, int $stopOnRisky, int $stopOnSkipped, int $stopOnWarning, ?string $extensionsDirectory, bool $beStrictAboutChangesToGlobalState, bool $beStrictAboutOutputDuringTests, bool $beStrictAboutTestsThatDoNotTestAnything, bool $beStrictAboutCoverageMetadata, bool $requireCoverageContribution, bool $enforceTimeLimit, int $defaultTimeLimit, int $timeoutForSmallTests, int $timeoutForMediumTests, int $timeoutForLargeTests, ?string $defaultTestSuite, int $executionOrder, bool $resolveDependencies, bool $defectsFirst, bool $backupGlobals, bool $backupStaticProperties, bool $testdoxPrinter, bool $testdoxPrinterSummary, bool $controlGarbageCollector, int $numberOfTestsBeforeGarbageCollection, int $shortenArraysForExportThreshold, int $diffContext)
+     {
+         $this->cacheDirectory                               = $cacheDirectory;
+         $this->cacheResult                                  = $cacheResult;
+@@ -213,6 +214,7 @@ public function __construct(?string $cacheDirectory, bool $cacheResult, int|stri
+         $this->reverseDefectList                            = $reverseDefectList;
+         $this->requireCoverageMetadata                      = $requireCoverageMetadata;
+         $this->requireSealedMockObjects                     = $requireSealedMockObjects;
++        $this->deferToPreviousErrorHandler                  = $deferToPreviousErrorHandler;
+         $this->bootstrap                                    = $bootstrap;
+         $this->bootstrapForTestSuite                        = $bootstrapForTestSuite;
+         $this->processIsolation                             = $processIsolation;
+@@ -367,6 +369,11 @@ public function requireSealedMockObjects(): bool
+         return $this->requireSealedMockObjects;
+     }
+ 
++    public function deferToPreviousErrorHandler(): bool
++    {
++        return $this->deferToPreviousErrorHandler;
++    }
++
+     /**
+      * @phpstan-assert-if-true !null $this->bootstrap
+      */
+diff --git a/tests/end-to-end/error-handler/_files/defer-to-previous-error-handler-file-scope/phpunit.xml b/tests/end-to-end/error-handler/_files/defer-to-previous-error-handler-file-scope/phpunit.xml
+new file mode 100644
+index 00000000000..70ef3526457
+--- /dev/null
++++ b/tests/end-to-end/error-handler/_files/defer-to-previous-error-handler-file-scope/phpunit.xml
+@@ -0,0 +1,12 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
++         xsi:noNamespaceSchemaLocation="../../../../../phpunit.xsd"
++         bootstrap="vendor/autoload.php"
++         deferToPreviousErrorHandler="true"
++>
++    <testsuites>
++        <testsuite name="default">
++            <directory>tests</directory>
++        </testsuite>
++    </testsuites>
++</phpunit>
+diff --git a/tests/end-to-end/error-handler/_files/defer-to-previous-error-handler-file-scope/tests/DeferToPreviousErrorHandlerFileScopeTest.php b/tests/end-to-end/error-handler/_files/defer-to-previous-error-handler-file-scope/tests/DeferToPreviousErrorHandlerFileScopeTest.php
+new file mode 100644
+index 00000000000..6125ec5112e
+--- /dev/null
++++ b/tests/end-to-end/error-handler/_files/defer-to-previous-error-handler-file-scope/tests/DeferToPreviousErrorHandlerFileScopeTest.php
+@@ -0,0 +1,25 @@
++<?php declare(strict_types=1);
++/*
++ * This file is part of PHPUnit.
++ *
++ * (c) Sebastian Bergmann <sebastian@phpunit.de>
++ *
++ * For the full copyright and license information, please view the LICENSE
++ * file that was distributed with this source code.
++ */
++namespace PHPUnit\TestFixture\ErrorHandler\DeferToPreviousErrorHandlerFileScope;
++
++use const E_USER_DEPRECATED;
++use function trigger_error;
++use PHPUnit\Framework\TestCase;
++
++trigger_error('please ignore this deprecation at file scope', E_USER_DEPRECATED);
++trigger_error('report this deprecation at file scope', E_USER_DEPRECATED);
++
++final class DeferToPreviousErrorHandlerFileScopeTest extends TestCase
++{
++    public function testOne(): void
++    {
++        $this->assertTrue(true);
++    }
++}
+diff --git a/tests/end-to-end/error-handler/_files/defer-to-previous-error-handler-file-scope/vendor/autoload.php b/tests/end-to-end/error-handler/_files/defer-to-previous-error-handler-file-scope/vendor/autoload.php
+new file mode 100644
+index 00000000000..8837f0d6fa6
+--- /dev/null
++++ b/tests/end-to-end/error-handler/_files/defer-to-previous-error-handler-file-scope/vendor/autoload.php
+@@ -0,0 +1,13 @@
++<?php declare(strict_types=1);
++/*
++ * Simulates an error handler that is registered before PHPUnit (for example in a
++ * bootstrap file) and that suppresses some deprecations before PHPUnit can see them,
++ * while delegating all other issues to PHPUnit by returning false.
++ */
++set_error_handler(static function (int $errorNumber, string $errorString): bool {
++    if ($errorNumber === E_USER_DEPRECATED && str_contains($errorString, 'please ignore this deprecation')) {
++        return true;
++    }
++
++    return false;
++});
+diff --git a/tests/end-to-end/error-handler/_files/defer-to-previous-error-handler/phpunit.xml b/tests/end-to-end/error-handler/_files/defer-to-previous-error-handler/phpunit.xml
+new file mode 100644
+index 00000000000..70ef3526457
+--- /dev/null
++++ b/tests/end-to-end/error-handler/_files/defer-to-previous-error-handler/phpunit.xml
+@@ -0,0 +1,12 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
++         xsi:noNamespaceSchemaLocation="../../../../../phpunit.xsd"
++         bootstrap="vendor/autoload.php"
++         deferToPreviousErrorHandler="true"
++>
++    <testsuites>
++        <testsuite name="default">
++            <directory>tests</directory>
++        </testsuite>
++    </testsuites>
++</phpunit>
+diff --git a/tests/end-to-end/error-handler/_files/defer-to-previous-error-handler/tests/DeferToPreviousErrorHandlerTest.php b/tests/end-to-end/error-handler/_files/defer-to-previous-error-handler/tests/DeferToPreviousErrorHandlerTest.php
+new file mode 100644
+index 00000000000..46b4b0c182f
+--- /dev/null
++++ b/tests/end-to-end/error-handler/_files/defer-to-previous-error-handler/tests/DeferToPreviousErrorHandlerTest.php
+@@ -0,0 +1,25 @@
++<?php declare(strict_types=1);
++/*
++ * This file is part of PHPUnit.
++ *
++ * (c) Sebastian Bergmann <sebastian@phpunit.de>
++ *
++ * For the full copyright and license information, please view the LICENSE
++ * file that was distributed with this source code.
++ */
++namespace PHPUnit\TestFixture\ErrorHandler\DeferToPreviousErrorHandler;
++
++use const E_USER_DEPRECATED;
++use function trigger_error;
++use PHPUnit\Framework\TestCase;
++
++final class DeferToPreviousErrorHandlerTest extends TestCase
++{
++    public function testOne(): void
++    {
++        trigger_error('please ignore this deprecation', E_USER_DEPRECATED);
++        trigger_error('report this deprecation', E_USER_DEPRECATED);
++
++        $this->assertTrue(true);
++    }
++}
+diff --git a/tests/end-to-end/error-handler/_files/defer-to-previous-error-handler/vendor/autoload.php b/tests/end-to-end/error-handler/_files/defer-to-previous-error-handler/vendor/autoload.php
+new file mode 100644
+index 00000000000..f8af141e11b
+--- /dev/null
++++ b/tests/end-to-end/error-handler/_files/defer-to-previous-error-handler/vendor/autoload.php
+@@ -0,0 +1,18 @@
++<?php declare(strict_types=1);
++/*
++ * Simulates an error handler that is registered before PHPUnit (for example in a
++ * bootstrap file, like Drupal's BootstrapErrorHandler) and that suppresses some
++ * deprecations before PHPUnit can see them, while delegating all other issues back
++ * into PHPUnit's own error handler.
++ *
++ * The delegation back into PHPUnit's handler exercises the re-entrancy guard in
++ * PHPUnit\Runner\ErrorHandler: without it, PHPUnit would call this handler, this
++ * handler would call PHPUnit, and PHPUnit would call this handler again, ad infinitum.
++ */
++set_error_handler(static function (int $errorNumber, string $errorString, string $errorFile, int $errorLine): bool {
++    if ($errorNumber === E_USER_DEPRECATED && str_contains($errorString, 'please ignore this deprecation')) {
++        return true;
++    }
++
++    return (bool) PHPUnit\Runner\ErrorHandler::instance()($errorNumber, $errorString, $errorFile, $errorLine);
++});
+diff --git a/tests/end-to-end/error-handler/defer-to-previous-error-handler-file-scope.phpt b/tests/end-to-end/error-handler/defer-to-previous-error-handler-file-scope.phpt
+new file mode 100644
+index 00000000000..2473b8e5e04
+--- /dev/null
++++ b/tests/end-to-end/error-handler/defer-to-previous-error-handler-file-scope.phpt
+@@ -0,0 +1,37 @@
++--TEST--
++deferToPreviousErrorHandler="true" also applies to issues triggered outside of tests (e.g. at file scope)
++--FILE--
++<?php declare(strict_types=1);
++$_SERVER['argv'][] = '--do-not-cache-result';
++$_SERVER['argv'][] = '--debug';
++$_SERVER['argv'][] = '--configuration';
++$_SERVER['argv'][] = __DIR__ . '/_files/defer-to-previous-error-handler-file-scope';
++
++require __DIR__ . '/../../bootstrap.php';
++
++(new PHPUnit\TextUI\Application)->run($_SERVER['argv']);
++--EXPECTF--
++PHPUnit Started (PHPUnit %s using %s)
++Test Runner Configured
++Bootstrap Finished (%sautoload.php)
++Event Facade Sealed
++Test Runner Triggered PHPUnit Notice (%s)
++Test Runner Triggered Deprecation (unknown if issue was triggered in first-party code or third-party code) in %sDeferToPreviousErrorHandlerFileScopeTest.php:%d
++report this deprecation at file scope
++Test Suite Loaded (1 test)
++Test Runner Started
++Test Suite Sorted
++Test Runner Execution Started (1 test)
++Test Suite Started (%sphpunit.xml, 1 test)
++Test Suite Started (default, 1 test)
++Test Suite Started (PHPUnit\TestFixture\ErrorHandler\DeferToPreviousErrorHandlerFileScope\DeferToPreviousErrorHandlerFileScopeTest, 1 test)
++Test Preparation Started (PHPUnit\TestFixture\ErrorHandler\DeferToPreviousErrorHandlerFileScope\DeferToPreviousErrorHandlerFileScopeTest::testOne)
++Test Prepared (PHPUnit\TestFixture\ErrorHandler\DeferToPreviousErrorHandlerFileScope\DeferToPreviousErrorHandlerFileScopeTest::testOne)
++Test Passed (PHPUnit\TestFixture\ErrorHandler\DeferToPreviousErrorHandlerFileScope\DeferToPreviousErrorHandlerFileScopeTest::testOne)
++Test Finished (PHPUnit\TestFixture\ErrorHandler\DeferToPreviousErrorHandlerFileScope\DeferToPreviousErrorHandlerFileScopeTest::testOne)
++Test Suite Finished (PHPUnit\TestFixture\ErrorHandler\DeferToPreviousErrorHandlerFileScope\DeferToPreviousErrorHandlerFileScopeTest, 1 test)
++Test Suite Finished (default, 1 test)
++Test Suite Finished (%sphpunit.xml, 1 test)
++Test Runner Execution Finished
++Test Runner Finished
++PHPUnit Finished (Shell Exit Code: 0)
+diff --git a/tests/end-to-end/error-handler/defer-to-previous-error-handler-isolation.phpt b/tests/end-to-end/error-handler/defer-to-previous-error-handler-isolation.phpt
+new file mode 100644
+index 00000000000..a82bd659fca
+--- /dev/null
++++ b/tests/end-to-end/error-handler/defer-to-previous-error-handler-isolation.phpt
+@@ -0,0 +1,40 @@
++--TEST--
++deferToPreviousErrorHandler="true" also applies when tests are run in separate processes
++--FILE--
++<?php declare(strict_types=1);
++$_SERVER['argv'][] = '--do-not-cache-result';
++$_SERVER['argv'][] = '--debug';
++$_SERVER['argv'][] = '--process-isolation';
++$_SERVER['argv'][] = '--configuration';
++$_SERVER['argv'][] = __DIR__ . '/_files/defer-to-previous-error-handler';
++
++require __DIR__ . '/../../bootstrap.php';
++
++(new PHPUnit\TextUI\Application)->run($_SERVER['argv']);
++--EXPECTF--
++PHPUnit Started (PHPUnit %s using %s)
++Test Runner Configured
++Bootstrap Finished (%sautoload.php)
++Event Facade Sealed
++Test Runner Triggered PHPUnit Notice (%s)
++Test Suite Loaded (1 test)
++Test Runner Started
++Test Suite Sorted
++Test Runner Execution Started (1 test)
++Test Suite Started (%sphpunit.xml, 1 test)
++Test Suite Started (default, 1 test)
++Test Suite Started (PHPUnit\TestFixture\ErrorHandler\DeferToPreviousErrorHandler\DeferToPreviousErrorHandlerTest, 1 test)
++Child Process Started
++Test Preparation Started (PHPUnit\TestFixture\ErrorHandler\DeferToPreviousErrorHandler\DeferToPreviousErrorHandlerTest::testOne)
++Test Prepared (PHPUnit\TestFixture\ErrorHandler\DeferToPreviousErrorHandler\DeferToPreviousErrorHandlerTest::testOne)
++Test Triggered Deprecation (PHPUnit\TestFixture\ErrorHandler\DeferToPreviousErrorHandler\DeferToPreviousErrorHandlerTest::testOne, unknown if issue was triggered in first-party code or third-party code) in %s:%d
++report this deprecation
++Test Passed (PHPUnit\TestFixture\ErrorHandler\DeferToPreviousErrorHandler\DeferToPreviousErrorHandlerTest::testOne)
++Test Finished (PHPUnit\TestFixture\ErrorHandler\DeferToPreviousErrorHandler\DeferToPreviousErrorHandlerTest::testOne)
++Child Process Finished
++Test Suite Finished (PHPUnit\TestFixture\ErrorHandler\DeferToPreviousErrorHandler\DeferToPreviousErrorHandlerTest, 1 test)
++Test Suite Finished (default, 1 test)
++Test Suite Finished (%sphpunit.xml, 1 test)
++Test Runner Execution Finished
++Test Runner Finished
++PHPUnit Finished (Shell Exit Code: 0)
+diff --git a/tests/end-to-end/error-handler/defer-to-previous-error-handler.phpt b/tests/end-to-end/error-handler/defer-to-previous-error-handler.phpt
+new file mode 100644
+index 00000000000..4f9059e86d5
+--- /dev/null
++++ b/tests/end-to-end/error-handler/defer-to-previous-error-handler.phpt
+@@ -0,0 +1,37 @@
++--TEST--
++deferToPreviousErrorHandler="true" lets an error handler registered before PHPUnit suppress issues before PHPUnit processes them
++--FILE--
++<?php declare(strict_types=1);
++$_SERVER['argv'][] = '--do-not-cache-result';
++$_SERVER['argv'][] = '--debug';
++$_SERVER['argv'][] = '--configuration';
++$_SERVER['argv'][] = __DIR__ . '/_files/defer-to-previous-error-handler';
++
++require __DIR__ . '/../../bootstrap.php';
++
++(new PHPUnit\TextUI\Application)->run($_SERVER['argv']);
++--EXPECTF--
++PHPUnit Started (PHPUnit %s using %s)
++Test Runner Configured
++Bootstrap Finished (%sautoload.php)
++Event Facade Sealed
++Test Runner Triggered PHPUnit Notice (%s)
++Test Suite Loaded (1 test)
++Test Runner Started
++Test Suite Sorted
++Test Runner Execution Started (1 test)
++Test Suite Started (%sphpunit.xml, 1 test)
++Test Suite Started (default, 1 test)
++Test Suite Started (PHPUnit\TestFixture\ErrorHandler\DeferToPreviousErrorHandler\DeferToPreviousErrorHandlerTest, 1 test)
++Test Preparation Started (PHPUnit\TestFixture\ErrorHandler\DeferToPreviousErrorHandler\DeferToPreviousErrorHandlerTest::testOne)
++Test Prepared (PHPUnit\TestFixture\ErrorHandler\DeferToPreviousErrorHandler\DeferToPreviousErrorHandlerTest::testOne)
++Test Triggered Deprecation (PHPUnit\TestFixture\ErrorHandler\DeferToPreviousErrorHandler\DeferToPreviousErrorHandlerTest::testOne, unknown if issue was triggered in first-party code or third-party code) in %s:%d
++report this deprecation
++Test Passed (PHPUnit\TestFixture\ErrorHandler\DeferToPreviousErrorHandler\DeferToPreviousErrorHandlerTest::testOne)
++Test Finished (PHPUnit\TestFixture\ErrorHandler\DeferToPreviousErrorHandler\DeferToPreviousErrorHandlerTest::testOne)
++Test Suite Finished (PHPUnit\TestFixture\ErrorHandler\DeferToPreviousErrorHandler\DeferToPreviousErrorHandlerTest, 1 test)
++Test Suite Finished (default, 1 test)
++Test Suite Finished (%sphpunit.xml, 1 test)
++Test Runner Execution Finished
++Test Runner Finished
++PHPUnit Finished (Shell Exit Code: 0)

@@ -156,6 +156,7 @@ default:
   - composer install --optimize-autoloader
   - composer run-script drupal-phpunit-upgrade-check
   - echo -e "\e[0Ksection_end:`date +%s`:composer_setup\r\e[0K"
+  - patch -p1 -d vendor/phpunit/phpunit <6708.diff
 
 .download-cache: &download-cache
   - |
