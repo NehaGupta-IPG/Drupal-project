@@ -6,11 +6,16 @@ use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Plugin\Context\LazyContextRepository;
 use Drupal\Core\Plugin\ContextAwarePluginAssignmentTrait;
 use Drupal\Core\Plugin\ContextAwarePluginTrait;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
+use Drupal\Core\Utility\PhpRequirements;
 
 /**
  * Base class for site_property plugins.
  */
 abstract class SitePropertyPluginBase extends PluginBase implements SitePropertyInterface {
+
+  use StringTranslationTrait;
 
   /**
    * @var mixed The name of this property.
@@ -37,6 +42,14 @@ abstract class SitePropertyPluginBase extends PluginBase implements SiteProperty
       $plugin_definition,
     );
   }
+
+  /**
+   * return the plugin ID.
+   */
+  public function id() {
+    return $this->pluginDefinition['id'];
+  }
+
 
   /**
    * {@inheritdoc}
