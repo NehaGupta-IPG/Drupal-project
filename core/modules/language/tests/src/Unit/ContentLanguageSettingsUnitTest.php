@@ -331,7 +331,7 @@ class ContentLanguageSettingsUnitTest extends UnitTestCase {
         $defaultConfig,
         LanguageInterface::LANGCODE_SITE_DEFAULT,
         FALSE,
-        1
+        1,
       ],
       ['test_entity_type.null_bundle', NULL, LanguageInterface::LANGCODE_SITE_DEFAULT, FALSE, 2],
     ];
