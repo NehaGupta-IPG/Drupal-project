@@ -165,7 +165,7 @@ class ImageTest extends TestCase {
    */
   public function testInvalidGetKeywordOffset(): void {
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage('Invalid anchor \'foo\' provided to getKeywordOffset()');
+    $this->expectExceptionMessageIs('Invalid anchor \'foo\' provided to getKeywordOffset()');
     Image::getKeywordOffset('foo', 0, 0);
   }
 

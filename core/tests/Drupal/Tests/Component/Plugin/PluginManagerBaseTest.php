@@ -120,7 +120,7 @@ class PluginManagerBaseTest extends TestCase {
     $manager = new StubPluginManagerBase();
     // Set the expected exception thrown by ::getInstance.
     $this->expectException(\BadMethodCallException::class);
-    $this->expectExceptionMessage(sprintf('%s does not support this method unless %s::$mapper is set.', get_class($manager), get_class($manager)));
+    $this->expectExceptionMessageIs(sprintf('%s does not support this method unless %s::$mapper is set.', get_class($manager), get_class($manager)));
     $manager->getInstance($options);
   }
 

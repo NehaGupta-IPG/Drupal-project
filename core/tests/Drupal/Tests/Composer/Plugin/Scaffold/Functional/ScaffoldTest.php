@@ -173,7 +173,7 @@ class ScaffoldTest extends TestCase {
   public function testScaffoldWithExpectedException(string $fixture_name, string $expected_exception_message, bool $is_link): void {
     // Test scaffold. Expect an error.
     $this->expectException(\Exception::class);
-    $this->expectExceptionMessage($expected_exception_message);
+    $this->expectExceptionMessageIs($expected_exception_message);
     $this->scaffoldSut($fixture_name, $is_link);
   }
 

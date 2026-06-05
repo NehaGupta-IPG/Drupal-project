@@ -270,7 +270,7 @@ class CssOptimizerUnitTest extends UnitTestCase {
     $this->setUpOptimizer(0);
 
     $this->expectException('Exception');
-    $this->expectExceptionMessage('Only file CSS assets with preprocessing enabled can be optimized.');
+    $this->expectExceptionMessageIs('Only file CSS assets with preprocessing enabled can be optimized.');
 
     $css_asset = [
       'group' => -100,
@@ -292,7 +292,7 @@ class CssOptimizerUnitTest extends UnitTestCase {
     $this->setUpOptimizer(0);
 
     $this->expectException('Exception');
-    $this->expectExceptionMessage('Only file CSS assets can be optimized.');
+    $this->expectExceptionMessageIs('Only file CSS assets can be optimized.');
 
     $css_asset = [
       'group' => -100,

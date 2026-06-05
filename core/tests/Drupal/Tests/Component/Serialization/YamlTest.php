@@ -70,7 +70,7 @@ class YamlTest extends YamlTestBase {
    */
   public function testEncodeObjectSupportDisabled(): void {
     $this->expectException(InvalidDataTypeException::class);
-    $this->expectExceptionMessage('Object support when dumping a YAML file has been disabled.');
+    $this->expectExceptionMessageIs('Object support when dumping a YAML file has been disabled.');
     $object = new \stdClass();
     $object->foo = 'bar';
     Yaml::encode([$object]);

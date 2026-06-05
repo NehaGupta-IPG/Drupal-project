@@ -53,7 +53,7 @@ class FrontMatterTest extends TestCase {
    */
   public function testFrontMatterSerializerException(): void {
     $this->expectException(\AssertionError::class);
-    $this->expectExceptionMessage('The $serializer parameter must reference a class that implements Drupal\Component\Serialization\SerializationInterface.');
+    $this->expectExceptionMessageIs('The $serializer parameter must reference a class that implements Drupal\Component\Serialization\SerializationInterface.');
     FrontMatter::create('', '');
   }
 
@@ -67,7 +67,7 @@ class FrontMatterTest extends TestCase {
    */
   public function testFrontMatterBroken(): void {
     $this->expectException(FrontMatterParseException::class);
-    $this->expectExceptionMessage('An error occurred when attempting to parse front matter data on line 4');
+    $this->expectExceptionMessageIs('An error occurred when attempting to parse front matter data on line 4');
     $source = "---\ncollection:\n-  key: foo\n  foo: bar\n---\n";
     FrontMatter::create($source)->getData();
   }

@@ -66,7 +66,7 @@ class FileCacheFactoryTest extends TestCase {
   public function testGetNoPrefix(): void {
     FileCacheFactory::setPrefix(NULL);
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage('Required prefix configuration is missing');
+    $this->expectExceptionMessageIs('Required prefix configuration is missing');
     FileCacheFactory::get('test_foo_settings', []);
   }
 

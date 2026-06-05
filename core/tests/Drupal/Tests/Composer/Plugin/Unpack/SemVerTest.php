@@ -44,7 +44,7 @@ class SemVerTest extends TestCase {
   #[TestWith(["^6.1", "^5.1", ">=6.3.0.0-dev, <7.0.0.0-dev"])]
   public function testMinimizeConstraintsWhichDoNotIntersect(string $constraint_a, string $constraint_b, string $expected): void {
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('The constraints "^6.1" and "^5.1" do not intersect and cannot be minimized.');
+    $this->expectExceptionMessageIs('The constraints "^6.1" and "^5.1" do not intersect and cannot be minimized.');
     $this->assertSame($expected, SemVer::minimizeConstraints(new VersionParser(), $constraint_a, $constraint_b));
   }
 

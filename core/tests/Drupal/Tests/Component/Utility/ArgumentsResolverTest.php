@@ -132,7 +132,7 @@ class ArgumentsResolverTest extends TestCase {
 
     $callable = function ($route): void {};
     $this->expectException(\RuntimeException::class);
-    $this->expectExceptionMessage('requires a value for the "$route" argument.');
+    $this->expectExceptionMessageIs('requires a value for the "$route" argument.');
     $resolver->getArguments($callable);
   }
 
@@ -161,7 +161,7 @@ class ArgumentsResolverTest extends TestCase {
 
     $callable = function (\stdClass $foo): void {};
     $this->expectException(\RuntimeException::class);
-    $this->expectExceptionMessage('requires a value for the "$foo" argument.');
+    $this->expectExceptionMessageIs('requires a value for the "$foo" argument.');
     $resolver->getArguments($callable);
   }
 
@@ -172,7 +172,7 @@ class ArgumentsResolverTest extends TestCase {
   public function testHandleUnresolvedArgument(callable $callable): void {
     $resolver = new ArgumentsResolver([], [], []);
     $this->expectException(\RuntimeException::class);
-    $this->expectExceptionMessage('requires a value for the "$foo" argument.');
+    $this->expectExceptionMessageIs('requires a value for the "$foo" argument.');
     $resolver->getArguments($callable);
   }
 

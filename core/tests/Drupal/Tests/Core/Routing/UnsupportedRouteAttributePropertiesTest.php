@@ -28,7 +28,7 @@ class UnsupportedRouteAttributePropertiesTest extends UnitTestCase {
     $reflection = new \ReflectionClass($discovery);
     $method = $reflection->getMethod('createRouteCollection');
     $this->expectException(UnsupportedRouteAttributePropertyException::class);
-    $this->expectExceptionMessage($message);
+    $this->expectExceptionMessageIs($message);
     $method->invoke($discovery, $class);
   }
 

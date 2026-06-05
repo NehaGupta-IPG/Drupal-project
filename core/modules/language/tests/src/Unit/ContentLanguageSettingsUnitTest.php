@@ -8,7 +8,6 @@ use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityTypeRepositoryInterface;
@@ -327,7 +326,13 @@ class ContentLanguageSettingsUnitTest extends UnitTestCase {
     return [
       ['test_entity_type.test_bundle', $alteredLanguage, LanguageInterface::LANGCODE_SITE_DEFAULT, TRUE, 1],
       ['test_entity_type.test_fixed_language_bundle', $alteredDefaultLangcode, $langcode, FALSE, 1],
-      ['test_entity_type.test_default_language_bundle', $defaultConfig, LanguageInterface::LANGCODE_SITE_DEFAULT, FALSE, 1],
+      [
+        'test_entity_type.test_default_language_bundle',
+        $defaultConfig,
+        LanguageInterface::LANGCODE_SITE_DEFAULT,
+        FALSE,
+        1
+      ],
       ['test_entity_type.null_bundle', NULL, LanguageInterface::LANGCODE_SITE_DEFAULT, FALSE, 2],
     ];
   }

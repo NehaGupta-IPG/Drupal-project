@@ -89,7 +89,7 @@ class NestedArrayTest extends TestCase {
     $this->assertTrue($this->form['details']['element']['#required'], 'New nested element value found.');
 
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('Cannot create key "child" on non-array value.');
+    $this->expectExceptionMessageIs('Cannot create key "child" on non-array value.');
     NestedArray::setValue($this->form, ['details', 'element', '#value', 'child'], $new_value);
   }
 

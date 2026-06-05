@@ -23,7 +23,7 @@ class PoStreamReaderTest extends TestCase {
     $reader = new PoStreamReader();
     $reader->setURI('fake');
     $this->expectException(\RuntimeException::class);
-    $this->expectExceptionMessage('Cannot open stream for uri fake');
+    $this->expectExceptionMessageIs('Cannot open stream for uri fake');
     $reader->open();
   }
 

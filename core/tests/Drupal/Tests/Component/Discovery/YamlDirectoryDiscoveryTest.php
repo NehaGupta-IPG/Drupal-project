@@ -178,7 +178,7 @@ class YamlDirectoryDiscoveryTest extends TestCase {
    */
   public function testDiscoveryNoIdException(): void {
     $this->expectException(DiscoveryException::class);
-    $this->expectExceptionMessage('The vfs://modules/test_1' . DIRECTORY_SEPARATOR . 'item_1.test.yml contains no data in the identifier key \'id\'');
+    $this->expectExceptionMessageIs('The vfs://modules/test_1' . DIRECTORY_SEPARATOR . 'item_1.test.yml contains no data in the identifier key \'id\'');
     vfsStream::setup('modules', NULL, [
       'test_1' => [
         'item_1.test.yml' => "",
@@ -199,7 +199,7 @@ class YamlDirectoryDiscoveryTest extends TestCase {
    */
   public function testDiscoveryInvalidYamlException(): void {
     $this->expectException(DiscoveryException::class);
-    $this->expectExceptionMessage('The vfs://modules/test_1' . DIRECTORY_SEPARATOR . 'item_1.test.yml contains invalid YAML');
+    $this->expectExceptionMessageIs('The vfs://modules/test_1' . DIRECTORY_SEPARATOR . 'item_1.test.yml contains invalid YAML');
     vfsStream::setup('modules', NULL, [
       'test_1' => [
         'item_1.test.yml' => "id: invalid\nfoo : [bar}",
