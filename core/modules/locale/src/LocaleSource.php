@@ -353,7 +353,7 @@ class LocaleSource {
    * Build path to translation source, out of a server path replacement pattern.
    *
    * @param \Drupal\locale\LocaleTranslationSource $source
-   *   Translation soruce object containing data to be inserted in the template.
+   *   Translation source object containing data to be inserted in the template.
    * @param string $template
    *   String containing placeholders. Available placeholders:
    *   - "%project": Project name.
