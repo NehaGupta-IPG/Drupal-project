@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Drupal\TestTools\ErrorHandler;
 
 use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
-use PHPUnit\Event\Code\NoTestCaseObjectOnCallStackException;
-use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
 
 /**
  * Drupal's PHPUnit base error handler.

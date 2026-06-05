@@ -12,7 +12,6 @@ declare(strict_types=1);
 use Drupal\TestTools\ErrorHandler\BootstrapErrorHandler;
 use Drupal\TestTools\ErrorHandler\DrupalDebugClassLoader;
 use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
-use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
 
 /**
  * Finds all valid extension directories recursively within a given directory.

@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests;
 
-use Drupal\TestTools\ErrorHandler\BootstrapErrorHandler;
-use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
 use Drupal\TestTools\Extension\Dump\DebugDump;
-use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\BeforeClass;
 use Symfony\Component\VarDumper\VarDumper;
