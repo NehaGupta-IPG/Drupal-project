@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Hook;
 
 /**
- * @group Hook
+ * Provides methods to support testing hooks.
  */
 trait HookOrderTestTrait {
 
@@ -32,7 +32,7 @@ trait HookOrderTestTrait {
         return '[]';
       }
       $parts = array_map(
-        static function (string $call_string) {
+        static function (string $call_string): string {
           if (preg_match('@^(\w+\\\\)*(\w+)::(\w+)@', $call_string, $matches)) {
             [,, $class_shortname, $method] = $matches;
             return $class_shortname . '::class . ' . var_export('::' . $method, TRUE);

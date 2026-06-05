@@ -36,13 +36,6 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
   protected $logMessages = [];
 
   /**
-   * Config Importer object used for testing.
-   *
-   * @var \Drupal\Core\Config\ConfigImporter
-   */
-  protected $configImporter;
-
-  /**
    * {@inheritdoc}
    */
   protected static $modules = [
@@ -120,7 +113,15 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
     $this->assertEquals($entity_one->uuid(), \Drupal::state()->get('config_import_test.config_import_missing_content_one'), 'The missing content event is fired during configuration import.');
     $this->assertEquals($entity_two->uuid(), \Drupal::state()->get('config_import_test.config_import_missing_content_two'), 'The missing content event is fired during configuration import.');
     $original_dynamic_data = $storage->read($dynamic_name);
-    $this->assertEquals([$entity_one->getConfigDependencyName(), $entity_two->getConfigDependencyName(), $entity_three->getConfigDependencyName()], $original_dynamic_data['dependencies']['content'], 'The imported configuration entity has the missing content entity dependency.');
+    $this->assertEquals(
+      [
+        $entity_one->getConfigDependencyName(),
+        $entity_two->getConfigDependencyName(),
+        $entity_three->getConfigDependencyName(),
+      ],
+      $original_dynamic_data['dependencies']['content'],
+      'The imported configuration entity has the missing content entity dependency.'
+    );
   }
 
   /**

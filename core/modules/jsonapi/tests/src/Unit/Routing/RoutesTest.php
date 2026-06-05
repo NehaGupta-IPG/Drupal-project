@@ -71,8 +71,6 @@ class RoutesTest extends UnitTestCase {
 
   /**
    * Tests routes collection.
-   *
-   * @legacy-covers ::routes
    */
   public function testRoutesCollection(): void {
     // Get the route collection and start making assertions.
@@ -109,8 +107,6 @@ class RoutesTest extends UnitTestCase {
 
   /**
    * Tests routes individual.
-   *
-   * @legacy-covers ::routes
    */
   public function testRoutesIndividual(): void {
     // Get the route collection and start making assertions.
@@ -154,8 +150,6 @@ class RoutesTest extends UnitTestCase {
 
   /**
    * Tests routes related.
-   *
-   * @legacy-covers ::routes
    */
   public function testRoutesRelated(): void {
     // Get the route collection and start making assertions.
@@ -177,8 +171,6 @@ class RoutesTest extends UnitTestCase {
 
   /**
    * Tests routes relationships.
-   *
-   * @legacy-covers ::routes
    */
   public function testRoutesRelationships(): void {
     // Get the route collection and start making assertions.
@@ -202,14 +194,14 @@ class RoutesTest extends UnitTestCase {
    * Ensures that the expected routes are created or not created.
    */
   #[DataProvider('expectedRoutes')]
-  public function testRoutes($route): void {
+  public function testRoutes(string $route): void {
     $this->assertArrayHasKey($route, $this->routes['ok']->routes()->all());
   }
 
   /**
    * Lists routes which should have been created.
    */
-  public static function expectedRoutes() {
+  public static function expectedRoutes(): array {
     return [
       ['jsonapi.entity_type_1--bundle_1_1.individual'],
       ['jsonapi.entity_type_1--bundle_1_1.collection'],
@@ -235,14 +227,14 @@ class RoutesTest extends UnitTestCase {
    * Ensures that no routes are created for internal resources.
    */
   #[DataProvider('notExpectedRoutes')]
-  public function testInternalRoutes($route): void {
+  public function testInternalRoutes(string $route): void {
     $this->assertArrayNotHasKey($route, $this->routes['ok']->routes()->all());
   }
 
   /**
    * Lists routes which should have been created.
    */
-  public static function notExpectedRoutes() {
+  public static function notExpectedRoutes(): array {
     return [
       ['jsonapi.entity_type_2--bundle_2_1.individual'],
       ['jsonapi.entity_type_2--bundle_2_1.collection'],

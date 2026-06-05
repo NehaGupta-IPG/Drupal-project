@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Installer;
 
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Session\UserSession;
@@ -13,7 +14,6 @@ use Drupal\Core\Utility\PhpRequirements;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\RequirementsPageTrait;
 use GuzzleHttp\HandlerStack;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -82,7 +82,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function installParameters() {
+  protected function installParameters(): array {
     $params = parent::installParameters();
     // Set the checkbox values to FALSE so that
     // \Drupal\Tests\BrowserTestBase::translatePostValues() does not remove
@@ -95,7 +95,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
   /**
    * We are testing the installer, so set up a minimal environment for that.
    */
-  public function installDrupal() {
+  public function installDrupal(): void {
     // Define information about the user 1 account.
     $this->rootUser = new UserSession([
       'uid' => 1,
@@ -123,7 +123,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
     // @see install_begin_request()
     $request = Request::create($GLOBALS['base_url'] . '/core/install.php', 'GET', [], $_COOKIE, [], $_SERVER);
     $request->setSession(new Session(new MockArraySessionStorage()));
-    $this->container = new ContainerBuilder();
+    \Drupal::setContainer(new ContainerBuilder());
     $request_stack = new RequestStack();
     $request_stack->push($request);
     $this->container
@@ -150,7 +150,6 @@ abstract class InstallerTestBase extends BrowserTestBase {
 
     $this->container
       ->setParameter('app.root', DRUPAL_ROOT);
-    \Drupal::setContainer($this->container);
   }
 
   /**
@@ -192,7 +191,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
       // BrowserTestBase::tearDown() will delete the entire test site directory.
       // Not using File API; a potential error must trigger a PHP warning.
       chmod($this->container->getParameter('app.root') . '/' . $this->siteDirectory, 0777);
-      $this->kernel = DrupalKernel::createFromRequest($request, $class_loader, 'prod', FALSE);
+      $this->kernel = DrupalKernel::createFromRequest($request, $class_loader, 'prod');
       $this->kernel->boot();
       $this->kernel->preHandle($request);
       $this->container = $this->kernel->getContainer();
@@ -219,7 +218,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function initFrontPage() {
+  protected function initFrontPage(): void {
     // We don't want to visit the front page with the installer when
     // initializing Mink, so we do nothing here.
   }
@@ -227,7 +226,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
   /**
    * Visits the interactive installer.
    */
-  protected function visitInstaller() {
+  protected function visitInstaller(): void {
     $this->drupalGet($GLOBALS['base_url'] . '/core/install.php');
   }
 
@@ -236,7 +235,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
    *
    * @see \Drupal\Core\Installer\Form\SelectLanguageForm
    */
-  protected function setUpLanguage() {
+  protected function setUpLanguage(): void {
     $edit = [
       'langcode' => $this->langcode,
     ];
@@ -247,7 +246,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
   /**
    * Installer step: Select installation profile.
    */
-  protected function setUpProfile() {
+  protected function setUpProfile(): void {
     $edit = [
       'profile' => $this->profile,
     ];
@@ -257,7 +256,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
   /**
    * Installer step: Configure settings.
    */
-  protected function setUpSettings() {
+  protected function setUpSettings(): void {
     $parameters = $this->parameters['forms']['install_settings_form'];
     $driver = $parameters['driver'];
     unset($parameters[$driver]['dependencies']);
@@ -273,7 +272,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
    *
    * @see \Drupal\system\Install\SystemRequirements
    */
-  protected function setUpRequirementsProblem() {
+  protected function setUpRequirementsProblem(): void {
     if (version_compare(phpversion(), PhpRequirements::getMinimumSupportedPhp()) < 0) {
       $this->continueOnExpectedWarnings(['PHP']);
     }
@@ -282,7 +281,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
   /**
    * Final installer step: Configure site.
    */
-  protected function setUpSite() {
+  protected function setUpSite(): void {
     $edit = $this->translatePostValues($this->parameters['forms']['install_configure_form']);
     $this->submitForm($edit, $this->translations['Save and continue']);
     // If we've got to this point the site is installed using the regular
@@ -296,7 +295,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
    * FunctionalTestSetupTrait::refreshVariables() tries to operate on persistent
    * storage, which is only available after the installer completed.
    */
-  protected function refreshVariables() {
+  protected function refreshVariables(): void {
     if ($this->isInstalled) {
       parent::refreshVariables();
     }

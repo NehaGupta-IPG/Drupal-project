@@ -72,7 +72,7 @@ class ReadOnlyStorageTest extends UnitTestCase {
    * @return array
    *   The data.
    */
-  public static function readMethodsProvider() {
+  public static function readMethodsProvider(): array {
     $fixture = [
       StorageInterface::DEFAULT_COLLECTION => ['config.a', 'config.b', 'other.a'],
     ];
@@ -99,7 +99,7 @@ class ReadOnlyStorageTest extends UnitTestCase {
    * @legacy-covers ::deleteAll
    */
   #[DataProvider('writeMethodsProvider')]
-  public function testWriteOperations($method, $arguments, $fixture): void {
+  public function testWriteOperations(string $method, $arguments, $fixture): void {
     $this->setRandomFixtureConfig($fixture);
 
     // Create an independent memory storage as a backup.
@@ -124,7 +124,7 @@ class ReadOnlyStorageTest extends UnitTestCase {
    * @return array
    *   The data
    */
-  public static function writeMethodsProvider() {
+  public static function writeMethodsProvider(): array {
     $fixture = [
       StorageInterface::DEFAULT_COLLECTION => ['config.a', 'config.b'],
     ];
