@@ -3,7 +3,6 @@ description:
   length: 128
 icon:
   directory: 'core/modules/file/icons'
-  langcode: en
 make_unused_managed_files_temporary: false
 filename_sanitization:
   transliterate: false
@@ -12,3 +11,4 @@ filename_sanitization:
   deduplicate_separators: false
   lowercase: false
   replacement_character: '-'
+langcode: en
