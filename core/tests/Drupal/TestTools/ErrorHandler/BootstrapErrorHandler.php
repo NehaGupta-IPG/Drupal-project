@@ -13,24 +13,13 @@ use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
  *
  * This code works in coordination with DeprecationHandler.
  *
- * This error handler is registered during PHPUnit's runner bootstrap, and
- * overrides PHPUnit's own error handler.
+ * This error handler is registered during PHPUnit's runner bootstrap.
  *
  * @see \Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler
  *
  * @internal
  */
 final class BootstrapErrorHandler {
-
-  /**
-   * @param \PHPUnit\Runner\ErrorHandler $phpUnitErrorHandler
-   *   An instance of PHPUnit's runner own error handler. Any error not
-   *   managed here will fall back to it.
-   */
-  public function __construct(
-    private readonly PhpUnitErrorHandler $phpUnitErrorHandler,
-  ) {
-  }
 
   /**
    * Executes when the object is called as a function.
@@ -59,18 +48,7 @@ final class BootstrapErrorHandler {
       return TRUE;
     }
 
-    // In all other cases (errors, warnings, deprecations to be reported), we
-    // fall back to PHPUnit's error handler, an instance of which was created
-    // when this error handler was created.
-    try {
-      call_user_func($this->phpUnitErrorHandler, $errorNumber, $errorString, $errorFile, $errorLine);
-    }
-    catch (NoTestCaseObjectOnCallStackException) {
-      // If we end up here, it's likely because a test's processing has
-      // finished already and we are processing an error that occurred while
-      // dealing with STDOUT rewinding or truncating. Do nothing.
-    }
-    return TRUE;
+    return FALSE;
   }
 
 }
