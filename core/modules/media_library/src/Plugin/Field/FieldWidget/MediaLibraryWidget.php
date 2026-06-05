@@ -248,8 +248,8 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     if ($displays) {
       $elements['media_library_view_display'] = [
         '#type' => 'select',
-        '#title' => t('Media Library View display'),
-        '#description' => t('Select a view display the modal should rendered in.'),
+        '#title' => $this->t('Media Library View display'),
+        '#description' => $this->t('Select a view display the modal should rendered in.'),
         '#options' => $displays,
         '#default_value' => $this->getSetting('media_library_view_display'),
         '#required' => FALSE,
@@ -259,8 +259,8 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       $media_entity_view_modes = $this->entityDisplayRepository->getViewModes('media');
       $elements['media_entity_view_mode'] = [
         '#type' => 'select',
-        '#title' => t('Media item view mode'),
-        '#description' => t('Select a view mode the media items should be rendered in.'),
+        '#title' => $this->t('Media item view mode'),
+        '#description' => $this->t('Select a view mode the media items should be rendered in.'),
         '#options' => array_combine(
           array_keys($media_entity_view_modes),
           array_column($media_entity_view_modes, 'label')
@@ -326,15 +326,18 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
 
     list($view, $display) = explode('.', $this->getSetting('media_library_view_display'));
     if (!($view = $this->entityTypeManager->getStorage('view')->load($view))) {
-      return [t('The selected view does not exists anymore.')];
+      return [$this->t('The selected view does not exists anymore.')];
     }
 
     $display = $view->get('display')[$display];
     // Media entity type selected view mode.
     $view_mode = $this->entityDisplayRepository->getViewModes('media')[$this->getSetting('media_entity_view_mode')];
 
-    $summary[] = t('Media library view display: @view - @display', ['@view' => $view->label(), '@display' => $display['display_title']]);
-    $summary[] = t('Media entity view mode: @view_mode', ['@view_mode' => $view_mode['label']]);
+    $summary[] = $this->t('Media library view display: @view - @display', [
+      '@view' => $view->label(),
+      '@display' => $display['display_title'],
+    ]);
+    $summary[] = $this->t('Media entity view mode: @view_mode', ['@view_mode' => $view_mode['label']]);
 
     return $summary;
   }

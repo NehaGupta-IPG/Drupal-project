@@ -167,9 +167,9 @@ class MediaLibraryState extends ParameterBag implements CacheableDependencyInter
    *   The number of remaining items the user is allowed to select or add in the
    *   library.
    * @param string $view_id
-   * The ID of the view to use for the media library.
+   *   The ID of the view to use for the media library.
    * @param string $display_id
-   * The ID of the display to use for the media library.
+   *   The ID of the display to use for the media library.
    *
    * @throws \InvalidArgumentException
    *   If one of the passed arguments is missing or does not pass the
