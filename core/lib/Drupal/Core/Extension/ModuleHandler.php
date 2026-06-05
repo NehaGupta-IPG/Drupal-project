@@ -334,7 +334,7 @@ class ModuleHandler implements ModuleHandlerInterface {
     $results = [];
     $list = $this->getHookImplementationList($hook);
     foreach ($list->iterateByModule() as $listener) {
-      $result = $listener(...$args);
+      $result = $listener(...array_values($args));
       if ($result === NULL) {
         continue;
       }
