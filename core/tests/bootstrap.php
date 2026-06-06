@@ -9,7 +9,6 @@
 
 declare(strict_types=1);
 
-use Drupal\TestTools\ErrorHandler\BootstrapErrorHandler;
 use Drupal\TestTools\ErrorHandler\DrupalDebugClassLoader;
 use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
 
@@ -166,10 +165,6 @@ date_default_timezone_set('Australia/Sydney');
 // deprecations.
 if ($deprecationBridgeConfiguration = DeprecationHandler::getConfiguration()) {
   DeprecationHandler::init($deprecationBridgeConfiguration['ignoreFile'] ?? NULL);
-
-  // Need to have an early error handler to manage deprecations triggered by
-  // DebugClassLoader, that occur before tests' setUp() methods are called.
-  set_error_handler(new BootstrapErrorHandler());
 
   // Enable the DebugClassLoader to get deprecations for methods' signature
   // changes.
