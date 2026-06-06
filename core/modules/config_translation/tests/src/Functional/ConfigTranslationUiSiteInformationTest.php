@@ -24,11 +24,11 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
     $site_name = 'Name of the site for testing configuration translation';
     $site_slogan = 'Site slogan for testing configuration translation';
     $site_name_label = 'Site name';
-    $site_frontpage = '/node';
+    $site_frontpage = '/node/add';
     $fr_site_name = 'Nom du site pour tester la configuration traduction';
     $fr_site_slogan = 'Slogan du site pour tester la traduction de configuration';
     $fr_site_name_label = 'Libellé du champ "Nom du site"';
-    $fr_site_frontpage = '/admin/config';
+    $fr_site_frontpage = '/filter-test/text-format';
     $translation_base_url = 'admin/config/system/site-information/translate';
 
     // Set site name and slogan for default language.
@@ -83,7 +83,7 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
 
     // Check French translation of site name and slogan are in place.
     $this->drupalGet('fr');
-    $this->assertSession()->addressEquals("fr$fr_site_frontpage");
+    $this->assertSession()->pageTextContains('All text formats');
     $this->assertSession()->pageTextContains($fr_site_name);
     $this->assertSession()->pageTextContains($fr_site_slogan);
 
