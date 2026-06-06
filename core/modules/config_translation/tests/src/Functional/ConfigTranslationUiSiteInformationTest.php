@@ -197,7 +197,7 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
     $override = \Drupal::languageManager()->getLanguageConfigOverride('fr', 'system.site');
 
     // Expect no language specific file.
-    $this->assertTrue($override->getRawData() === ['page' => []]);
+    $this->assertTrue($override->isNew());
 
     // Check configuration page with translator user. Should have no access.
     $this->drupalLogout();
