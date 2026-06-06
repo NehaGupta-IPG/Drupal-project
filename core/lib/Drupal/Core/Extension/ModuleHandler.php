@@ -336,19 +336,37 @@ class ModuleHandler implements ModuleHandlerInterface {
       return [];
     }
     $results = [];
+    $has_array = FALSE;
+    $has_non_array = FALSE;
     foreach ($list->listeners as $listener) {
       $result = call_user_func_array($listener, $args);
       if ($result === NULL) {
         continue;
       }
       if (is_array($result)) {
-        $results = NestedArray::mergeDeep($results, $result);
+        $has_array = TRUE;
       }
       else {
-        $results[] = $result;
+        $has_non_array = TRUE;
+      }
+      $results[] = $result;
+    }
+    if (!$has_array) {
+      return $results;
+    }
+    if (!$has_non_array) {
+      return NestedArray::mergeDeep(...$results);
+    }
+    $merged_results = [];
+    foreach ($results as $result) {
+      if (is_array($result)) {
+        $merged_results = NestedArray::mergeDeep($merged_results, $result);
+      }
+      else {
+        $merged_results[] = $result;
       }
     }
-    return $results;
+    return $merged_results;
   }
 
   /**
