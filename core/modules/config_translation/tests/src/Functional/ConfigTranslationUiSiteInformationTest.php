@@ -81,9 +81,9 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
     // Place branding block with site name and slogan into header region.
     $this->drupalPlaceBlock('system_branding_block', ['region' => 'header']);
 
-    // Check French translation of site name and slogan are in place.
+    // Check French translation of site name, slogan and headline are in place.
     $this->drupalGet('fr');
-    $this->assertSession()->pageTextContains('All text formats');
+    $this->assertSession()->pageTextContains('Text format test forms');
     $this->assertSession()->pageTextContains($fr_site_name);
     $this->assertSession()->pageTextContains($fr_site_slogan);
 
@@ -197,7 +197,7 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
     $override = \Drupal::languageManager()->getLanguageConfigOverride('fr', 'system.site');
 
     // Expect no language specific file.
-    $this->assertTrue($override->isNew());
+    $this->assertTrue($override->getRawData() === ['page'=>[]]);
 
     // Check configuration page with translator user. Should have no access.
     $this->drupalLogout();
