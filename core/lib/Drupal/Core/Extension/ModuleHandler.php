@@ -333,7 +333,7 @@ class ModuleHandler implements ModuleHandlerInterface {
   public function invokeAll($hook, array $args = []) {
     $results = [];
     $list = $this->getHookImplementationList($hook);
-    foreach ($list->iterateByModule() as $listener) {
+    foreach ($list->listeners as $listener) {
       $result = $listener(...array_values($args));
       if ($result === NULL) {
         continue;
