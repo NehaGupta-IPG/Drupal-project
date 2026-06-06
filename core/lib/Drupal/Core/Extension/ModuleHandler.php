@@ -331,8 +331,11 @@ class ModuleHandler implements ModuleHandlerInterface {
    * {@inheritdoc}
    */
   public function invokeAll($hook, array $args = []) {
-    $results = [];
     $list = $this->getHookImplementationList($hook);
+    if (!$list->listeners) {
+      return [];
+    }
+    $results = [];
     foreach ($list->listeners as $listener) {
       $result = $listener(...array_values($args));
       if ($result === NULL) {
