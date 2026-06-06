@@ -335,10 +335,9 @@ class ModuleHandler implements ModuleHandlerInterface {
     if (!$list->listeners) {
       return [];
     }
-    $args = array_values($args);
     $results = [];
     foreach ($list->listeners as $listener) {
-      $result = $listener(...$args);
+      $result = call_user_func_array($listener, $args);
       if ($result === NULL) {
         continue;
       }
