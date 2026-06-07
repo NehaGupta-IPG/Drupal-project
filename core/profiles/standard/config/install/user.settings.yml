@@ -3,6 +3,8 @@ anonymous: Anonymous
 verify_mail: true
 notify:
   cancel_confirm: true
+  mail_change_notification: true
+  mail_change_verification: true
   password_reset: true
   status_activated: true
   status_blocked: false
@@ -12,5 +14,6 @@ notify:
   register_pending_approval: true
 register: admin_only
 cancel_method: user_cancel_block
+mail_change_timeout: 86400
 password_reset_timeout: 86400
 password_strength: true

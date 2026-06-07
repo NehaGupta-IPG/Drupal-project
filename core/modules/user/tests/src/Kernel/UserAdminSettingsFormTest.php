@@ -90,6 +90,22 @@ class UserAdminSettingsFormTest extends ConfigFormTestBase {
         '#config_name' => 'user.mail',
         '#config_key' => 'status_canceled.subject',
       ],
+      'mail_change_notification' => [
+        '#value' => [
+          'subject' => $this->randomString(),
+          'body' => $this->randomString(),
+        ],
+        '#config_name' => 'user.mail',
+        '#config_key' => 'mail_change_notification',
+      ],
+      'mail_change_verification' => [
+        '#value' => [
+          'subject' => $this->randomString(),
+          'body' => $this->randomString(),
+        ],
+        '#config_name' => 'user.mail',
+        '#config_key' => 'mail_change_verification',
+      ],
     ];
   }
 

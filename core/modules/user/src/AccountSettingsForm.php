@@ -169,7 +169,7 @@ class AccountSettingsForm extends ConfigFormBase {
     ];
     // These email tokens are shared for all settings, so just define
     // the list once to help ensure they stay in sync.
-    $email_token_help = $this->t('Available variables are: [site:name], [site:url], [user:display-name], [user:account-name], [user:mail], [site:login-url], [site:url-brief], [user:edit-url], [user:one-time-login-url], [user:cancel-url].');
+    $email_token_help = $this->t('Available variables are: [site:name], [site:url], [site:mail], [user:display-name], [user:account-name], [user:mail], [site:login-url], [site:url-brief], [user:edit-url], [user:one-time-login-url], [user:mail-change-url], [user:cancel-url].');
 
     $form['email_admin_created'] = [
       '#type' => 'details',
@@ -274,6 +274,77 @@ class AccountSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Body'),
       '#config_target' => 'user.mail:password_reset.body',
       '#rows' => 12,
+    ];
+
+    $form['mail_change'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Account email changing'),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+      '#group' => 'email',
+      '#weight' => 11,
+    ];
+    $form['mail_change']['mail_change_notification'] = [
+      '#type' => 'details',
+      '#tree' => TRUE,
+      '#title' => $this->t('Notification of old email'),
+      '#description' => $this->t("Edit the email message sent to the user's old email address when the email address is changed.") . ' ' . $email_token_help,
+      '#open' => TRUE,
+    ];
+    $form['mail_change']['mail_change_notification']['enabled'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Notify user when email changes'),
+      '#config_target' => 'user.settings:notify.mail_change_notification',
+    ];
+    $states = [
+      'invisible' => [
+        'input[name="mail_change_notification[enabled]"]' => ['checked' => FALSE],
+      ],
+    ];
+    $form['mail_change']['mail_change_notification']['subject'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Subject'),
+      '#config_target' => 'user.mail:mail_change_notification.subject',
+      '#maxlength' => 180,
+      '#states' => $states,
+    ];
+    $form['mail_change']['mail_change_notification']['body'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Body'),
+      '#config_target' => 'user.mail:mail_change_notification.body',
+      '#rows' => 12,
+      '#states' => $states,
+    ];
+    $form['mail_change']['mail_change_verification'] = [
+      '#type' => 'details',
+      '#tree' => TRUE,
+      '#title' => $this->t('Verification of new email'),
+      '#description' => $this->t("Edit the email message sent to user's new email address when the email address is changed.") . ' ' . $email_token_help,
+      '#open' => TRUE,
+    ];
+    $form['mail_change']['mail_change_verification']['enabled'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Require email verification when a user changes their email address'),
+      '#config_target' => 'user.settings:notify.mail_change_verification',
+    ];
+    $states = [
+      'invisible' => [
+        'input[name="mail_change_verification[enabled]"]' => ['checked' => FALSE],
+      ],
+    ];
+    $form['mail_change']['mail_change_verification']['subject'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Subject'),
+      '#config_target' => 'user.mail:mail_change_verification.subject',
+      '#maxlength' => 180,
+      '#states' => $states,
+    ];
+    $form['mail_change']['mail_change_verification']['body'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Body'),
+      '#config_target' => 'user.mail:mail_change_verification.body',
+      '#rows' => 12,
+      '#states' => $states,
     ];
 
     $form['email_activated'] = [
