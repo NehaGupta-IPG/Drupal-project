@@ -514,7 +514,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
     $this->keyValueStore->expects($this->never())
       ->method('delete');
     $this->expectException(EntityStorageException::class);
-    $this->expectExceptionMessageIs("'test_entity_type' entity with ID 'foo' already exists");
+    $this->expectExceptionMessageIs("'test_entity_type' entity with ID 'foo' already exists.");
     $this->entityStorage->save($entity);
   }
 
