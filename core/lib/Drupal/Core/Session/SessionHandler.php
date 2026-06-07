@@ -26,8 +26,11 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
    *   The database connection.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
-   * @param array|null $options
-   *   An associative array of session ini settings.
+   * @param array{ttl?: int<0, max>}|null $options
+   *   An associative array containing the following key value pairs:
+   *   - ttl: (int) The session time-to-live (TTL) in seconds. If more than this
+   *     amount of time has elapsed since the user's last visit the session is
+   *     considered expired and is not loaded.
    */
   public function __construct(
     protected RequestStack $requestStack,
