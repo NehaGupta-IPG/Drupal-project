@@ -109,6 +109,34 @@ class RequirementsTest extends BrowserTestBase {
   }
 
   /**
+   * Tests requirements with a semicolon in a table name.
+   */
+  public function testTableNameWithSemicolon(): void {
+    $connection = Database::getConnection();
+    $query_options = ['allow_delimiter_in_query' => TRUE];
+    $connection->query(
+      'CREATE TABLE {test;table} (id INT UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY (id))',
+      [],
+      $query_options,
+    );
+
+    try {
+      $admin_user = $this->drupalCreateUser([
+        'administer site configuration',
+        'access site reports',
+      ]);
+      $this->drupalLogin($admin_user);
+      $this->drupalGet('admin/reports/status');
+
+      $this->assertSession()->pageTextContains('Transaction isolation level');
+      $this->assertSession()->pageTextNotContains('test;table');
+    }
+    finally {
+      $connection->query('DROP TABLE {test;table}', [], $query_options);
+    }
+  }
+
+  /**
    * Writes the isolation level in settings.php.
    *
    * @param string $isolation_level
