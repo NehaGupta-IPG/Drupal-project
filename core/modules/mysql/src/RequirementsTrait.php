@@ -29,9 +29,23 @@ trait RequirementsTrait {
     // Tables missing primary key.
     $tables_missing_primary_key = [];
     $tables = $connection->schema()->findTables('%');
+    $prefix = $connection->getPrefix();
+    $database = $connection->getConnectionOptions()['database'];
+    if (($pos = strpos($prefix, '.')) !== FALSE) {
+      $database = substr($prefix, 0, $pos);
+      $prefix = substr($prefix, $pos + 1);
+    }
     foreach ($tables as $table) {
-      $primary_key_column = $connection->query("SHOW KEYS FROM {" . $table . "} WHERE Key_name = 'PRIMARY'")->fetchAllAssoc('Column_name');
-      if (empty($primary_key_column)) {
+      $table_name = $prefix . $table;
+      $has_primary_key = (bool) $connection->query(
+        'SELECT 1 FROM information_schema.statistics WHERE table_schema = :database AND table_name = :table AND index_name = :index LIMIT 1',
+        [
+          ':database' => $database,
+          ':table' => $table_name,
+          ':index' => 'PRIMARY',
+        ],
+      )->fetchField();
+      if (!$has_primary_key) {
         $tables_missing_primary_key[] = $table;
       }
     }
