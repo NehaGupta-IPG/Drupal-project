@@ -490,7 +490,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
     $options['label'] = ['default' => ''];
     // Some styles (for example table) should have labels enabled by default.
     $style = $this->view->getStyle();
-    if (isset($style) && $style->defaultFieldLabels()) {
+    if ($style && $style->defaultFieldLabels()) {
       $options['label']['default'] = $this->definition['title'];
     }
 

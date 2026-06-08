@@ -314,8 +314,8 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       }
     }
 
+    $transaction = $this->connection->startTransaction();
     try {
-      $transaction = $this->connection->startTransaction();
       if (!$original) {
         // Generate a new mlid.
         $link['mlid'] = $this->connection->insert($this->table, $this->options)
@@ -341,9 +341,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       $transaction->commitOrRelease();
     }
     catch (\Exception $e) {
-      if (isset($transaction)) {
-        $transaction->rollBack();
-      }
+      $transaction->rollBack();
       throw $e;
     }
     return $affected_menus;

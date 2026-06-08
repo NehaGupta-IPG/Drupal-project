@@ -179,13 +179,9 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
         $child['#group_details'] = TRUE;
         // Inject the element as new child element.
         $element[] = $child;
-
-        $sort = TRUE;
       }
       // Re-sort the element's children if we injected group member elements.
-      if (isset($sort)) {
-        $element['#sorted'] = FALSE;
-      }
+      $element['#sorted'] = FALSE;
     }
 
     if (isset($element['#group'])) {

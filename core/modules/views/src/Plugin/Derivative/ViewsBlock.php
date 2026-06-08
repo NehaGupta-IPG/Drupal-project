@@ -82,7 +82,7 @@ class ViewsBlock implements ContainerDeriverInterface {
       $executable = $view->getExecutable();
       $executable->initDisplay();
       foreach ($executable->displayHandlers as $display) {
-        /** @var \Drupal\views\Plugin\views\display\DisplayPluginInterface $display */
+        /** @var \Drupal\views\Plugin\views\display\DisplayPluginInterface|null $display */
         // Add a block plugin definition for each block display.
         if (isset($display) && !empty($display->definition['uses_hook_block'])) {
           $delta = $view->id() . '-' . $display->display['id'];

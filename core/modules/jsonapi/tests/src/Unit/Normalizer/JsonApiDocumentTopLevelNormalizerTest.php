@@ -215,7 +215,7 @@ class JsonApiDocumentTopLevelNormalizerTest extends UnitTestCase {
   /**
    * Ensures only valid UUIDs can be specified.
    *
-   * @param string $id
+   * @param string|int|null $id
    *   The input UUID. May be invalid.
    * @param bool $expect_exception
    *   Whether to expect an exception.

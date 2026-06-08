@@ -19,7 +19,7 @@ class UserMailRequiredValidator extends ConstraintValidator {
    */
   public function validate($items, Constraint $constraint): void {
     /** @var \Drupal\Core\Field\FieldItemListInterface $items */
-    /** @var \Drupal\user\UserInterface $account */
+    /** @var \Drupal\user\UserInterface|null $account */
     $account = $items->getEntity();
     if (!isset($account)) {
       return;
@@ -37,7 +37,7 @@ class UserMailRequiredValidator extends ConstraintValidator {
 
     $required = !(!$existing_value && \Drupal::currentUser()->hasPermission('administer users'));
 
-    if ($required && (!isset($items) || $items->isEmpty())) {
+    if ($required && $items->isEmpty()) {
       $this->context->addViolation($constraint->message, ['@name' => $account->getFieldDefinition('mail')->getLabel()]);
     }
   }

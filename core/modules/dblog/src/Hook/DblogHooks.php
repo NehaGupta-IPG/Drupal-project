@@ -106,7 +106,7 @@ class DblogHooks {
    */
   #[Hook('views_pre_render')]
   public function viewsPreRender(ViewExecutable $view): void {
-    if (isset($view) && $view->storage->get('base_table') == 'watchdog') {
+    if ($view->storage->get('base_table') == 'watchdog') {
       $view->element['#attached']['library'][] = 'dblog/drupal.dblog';
     }
   }

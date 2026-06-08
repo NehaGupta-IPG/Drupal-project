@@ -166,9 +166,7 @@ class MenuLinkDefaultForm implements MenuLinkFormInterface, ContainerInjectionIn
     if (!empty($menu_name)) {
       $new_definition['menu_name'] = $menu_name;
     }
-    if (isset($parent)) {
-      $new_definition['parent'] = $parent;
-    }
+    $new_definition['parent'] = $parent;
     return $new_definition;
   }
 

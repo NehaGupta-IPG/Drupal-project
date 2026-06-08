@@ -62,7 +62,7 @@ class ViewsTestDataViewsExecutionHooks {
   #[Hook('views_pre_render')]
   public function viewsPreRender(ViewExecutable $view): void {
     \Drupal::state()->set('views_hook_test_views_pre_render', TRUE);
-    if (isset($view) && $view->storage->id() == 'test_cache_header_storage') {
+    if ($view->storage->id() == 'test_cache_header_storage') {
       $view->element['#attached']['library'][] = 'views_test_data/test';
       $view->element['#attached']['drupalSettings']['foo'] = 'bar';
       $view->element['#attached']['placeholders']['non-existing-placeholder-just-for-testing-purposes']['#lazy_builder'] = [
@@ -103,7 +103,7 @@ class ViewsTestDataViewsExecutionHooks {
   #[Hook('views_post_build')]
   public function viewsPostBuild(ViewExecutable $view): void {
     \Drupal::state()->set('views_hook_test_views_post_build', TRUE);
-    if (isset($view) && $view->storage->id() == 'test_page_display') {
+    if ($view->storage->id() == 'test_page_display') {
       if ($view->current_display == 'page_1') {
         $view->build_info['denied'] = TRUE;
       }

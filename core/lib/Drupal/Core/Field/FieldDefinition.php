@@ -170,8 +170,9 @@ class FieldDefinition extends ListDataDefinition implements FieldDefinitionInter
   /**
    * Set the default value callback for the field.
    *
-   * @param string $callback
-   *   The default value callback.
+   * @param string|null $callback
+   *   The default value callback. Pass NULL to unset a callback that was set
+   *   previously.
    *
    * @return $this
    */

@@ -848,17 +848,15 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       }
     }
 
-    if (isset($form_id)) {
-      $form['form_id'] = [
-        '#type' => 'hidden',
-        '#value' => $form_id,
-        '#id' => Html::getUniqueId("edit-$form_id"),
-        // Form processing and validation require this value. Ensure the
-        // submitted form value appears literally, regardless of custom #tree
-        // and #parents being set elsewhere.
-        '#parents' => ['form_id'],
-      ];
-    }
+    $form['form_id'] = [
+      '#type' => 'hidden',
+      '#value' => $form_id,
+      '#id' => Html::getUniqueId("edit-$form_id"),
+      // Form processing and validation require this value. Ensure the
+      // submitted form value appears literally, regardless of custom #tree
+      // and #parents being set elsewhere.
+      '#parents' => ['form_id'],
+    ];
     if (!isset($form['#id'])) {
       $form['#id'] = Html::getUniqueId($form_id);
       // Provide a selector usable by JavaScript. As the ID is unique, it's not
