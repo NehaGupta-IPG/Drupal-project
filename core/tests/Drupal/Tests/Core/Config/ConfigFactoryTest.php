@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Config;
 
+use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\Config\StorageInterface;
+use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Tests Drupal\Core\Config\ConfigFactory.
@@ -27,31 +33,23 @@ class ConfigFactoryTest extends UnitTestCase {
 
   /**
    * Storage.
-   *
-   * @var \Drupal\Core\Config\StorageInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $storage;
+  protected StorageInterface&MockObject $storage;
 
   /**
    * Event Dispatcher.
-   *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $eventDispatcher;
+  protected EventDispatcherInterface&Stub $eventDispatcher;
 
   /**
    * Typed Config.
-   *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $typedConfig;
+  protected TypedConfigManagerInterface&Stub $typedConfig;
 
   /**
    * The mocked cache tags invalidator.
-   *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $cacheTagsInvalidator;
+  protected CacheTagsInvalidatorInterface&MockObject $cacheTagsInvalidator;
 
   /**
    * {@inheritdoc}
@@ -60,8 +58,8 @@ class ConfigFactoryTest extends UnitTestCase {
     parent::setUp();
 
     $this->storage = $this->createMock('Drupal\Core\Config\StorageInterface');
-    $this->eventDispatcher = $this->createMock('Symfony\Contracts\EventDispatcher\EventDispatcherInterface');
-    $this->typedConfig = $this->createMock('\Drupal\Core\Config\TypedConfigManagerInterface');
+    $this->eventDispatcher = $this->createStub(EventDispatcherInterface::class);
+    $this->typedConfig = $this->createStub(TypedConfigManagerInterface::class);
     $this->configFactory = new ConfigFactory($this->storage, $this->eventDispatcher, $this->typedConfig);
 
     $this->cacheTagsInvalidator = $this->createMock('Drupal\Core\Cache\CacheTagsInvalidatorInterface');
@@ -73,8 +71,6 @@ class ConfigFactoryTest extends UnitTestCase {
 
   /**
    * Tests rename.
-   *
-   * @legacy-covers ::rename
    */
   public function testRename(): void {
     $old = new Config($this->randomMachineName(), $this->storage, $this->eventDispatcher, $this->typedConfig);

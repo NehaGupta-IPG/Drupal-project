@@ -23,7 +23,7 @@ class KernelTestBaseDatabaseDriverModuleTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getDatabaseConnectionInfo() {
+  protected function getDatabaseConnectionInfo(): array {
     // If the test is run with argument SIMPLETEST_DB then use it.
     $db_url = getenv('SIMPLETEST_DB');
     if (empty($db_url)) {

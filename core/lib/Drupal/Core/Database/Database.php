@@ -439,8 +439,6 @@ abstract class Database {
    *
    * @param string $url
    *   The URL.
-   * @param string|bool|null $root
-   *   (deprecated) The root directory of the Drupal installation.
    * @param bool|null $include_test_drivers
    *   (optional) Whether to include test extensions. If FALSE, all 'tests'
    *   directories are excluded in the search. When NULL will be determined by
@@ -460,16 +458,8 @@ abstract class Database {
    *
    * @see https://www.drupal.org/node/7654123
    */
-  public static function convertDbUrlToConnectionInfo(string $url, $root = NULL, ?bool $include_test_drivers = NULL): ConnectionParametersInterface {
+  public static function convertDbUrlToConnectionInfo(string $url, ?bool $include_test_drivers = NULL): ConnectionParametersInterface {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ConnectionParametersFactory::createFromUrl() instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
-    if ($root !== NULL) {
-      if (is_bool($root)) {
-        $include_test_drivers = $root;
-      }
-      else {
-        @trigger_error("Passing a string \$root value to " . __METHOD__ . "() is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3511287", E_USER_DEPRECATED);
-      }
-    }
     return ConnectionParametersFactory::createFromUrl($url, $include_test_drivers);
   }
 

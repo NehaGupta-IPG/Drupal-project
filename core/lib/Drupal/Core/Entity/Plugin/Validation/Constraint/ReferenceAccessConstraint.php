@@ -17,11 +17,12 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class ReferenceAccessConstraint extends SymfonyConstraint {
 
-  /**
-   * The default violation message.
-   *
-   * @var string
-   */
-  public $message = 'You do not have access to the referenced entity (%type: %id).';
+  public function __construct(
+    public $message = 'You do not have access to the referenced entity (%type: %id).',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct(groups: $groups, payload: $payload);
+  }
 
 }

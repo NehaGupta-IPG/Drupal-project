@@ -6,7 +6,6 @@ namespace Drupal\Tests\mysql\Kernel\mysql;
 
 use Drupal\KernelTests\Core\Database\DriverSpecificKernelTestBase;
 use Drupal\mysql\Driver\Database\mysql\Connection;
-use Drupal\Tests\Core\Database\Stub\StubPDO;
 use Pdo\Mysql;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -25,8 +24,7 @@ class MysqlDriverTest extends DriverSpecificKernelTestBase {
    */
   public function testConnection(): void {
     $connection = new Connection(
-      // @phpstan-ignore class.notFound
-      $this->createMock(\PHP_VERSION_ID >= 80400 ? Mysql::class : StubPDO::class),
+      $this->createStub(Mysql::class),
       ['driver' => 'mysql', 'database' => 'foo'],
     );
     $this->assertInstanceOf(Connection::class, $connection);

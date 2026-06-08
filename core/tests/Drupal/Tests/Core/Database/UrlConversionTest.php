@@ -12,7 +12,6 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 
@@ -35,7 +34,7 @@ class UrlConversionTest extends UnitTestCase {
    */
   #[DataProvider('providerConvertDbUrlToConnectionInfo')]
   #[IgnoreDeprecations]
-  public function testDbUrlToConnectionConversion($url, $database_array, $include_test_drivers): void {
+  public function testDbUrlToConnectionConversion(string $url, array $database_array, bool $include_test_drivers): void {
     $result = Database::convertDbUrlToConnectionInfo($url, $include_test_drivers);
     $this->assertInstanceOf(ConnectionParametersInterface::class, $result);
     $this->assertEquals($database_array, array_intersect_key($result->toArray(), $database_array));
@@ -294,7 +293,7 @@ class UrlConversionTest extends UnitTestCase {
    * Tests ConnectionParametersFactory::createFromUrl() exception.
    */
   #[DataProvider('providerInvalidArgumentsUrlConversion')]
-  public function testGetInvalidArgumentExceptionInUrlConversion($url, $expected_exception_message): void {
+  public function testGetInvalidArgumentExceptionInUrlConversion(string $url, string $expected_exception_message): void {
     $this->expectException(\InvalidArgumentException::class);
     $this->expectExceptionMessage($expected_exception_message);
     ConnectionParametersFactory::createFromUrl($url);
@@ -341,14 +340,12 @@ class UrlConversionTest extends UnitTestCase {
 
   /**
    * Tests get connection info as url.
-   *
-   * @legacy-covers ::getConnectionInfoAsUrl
    */
   #[DataProvider('providerGetConnectionInfoAsUrl')]
   #[IgnoreDeprecations]
   #[PreserveGlobalState(FALSE)]
   #[RunInSeparateProcess]
-  public function testGetConnectionInfoAsUrl(array $info, $expected_url): void {
+  public function testGetConnectionInfoAsUrl(array $info, string $expected_url): void {
     Database::addConnectionInfo('default', 'default', $info);
     $url = Database::getConnectionInfoAsUrl();
     $this->assertEquals($expected_url, $url);
@@ -510,7 +507,7 @@ class UrlConversionTest extends UnitTestCase {
    */
   #[DataProvider('providerInvalidArgumentGetConnectionInfoAsUrl')]
   #[IgnoreDeprecations]
-  public function testGetInvalidArgumentGetConnectionInfoAsUrl(array $connection_options, $expected_exception_message): void {
+  public function testGetInvalidArgumentGetConnectionInfoAsUrl(array $connection_options, string $expected_exception_message): void {
     $this->expectException(\TypeError::class);
     $this->expectExceptionMessageMatches($expected_exception_message);
     Database::addConnectionInfo('default', 'default', $connection_options);
@@ -558,17 +555,6 @@ class UrlConversionTest extends UnitTestCase {
     $this->expectException(UnknownExtensionException::class);
     $this->expectExceptionMessage("The database_driver Drupal\\driver_test\\Driver\\Database\\driver_test_mysql does not exist.");
     ConnectionParametersFactory::createFromUrl($url, TRUE);
-  }
-
-  /**
-   * Tests deprecation of root parameter.
-   *
-   * @legacy-covers ::convertDbUrlToConnectionInfo
-   */
-  #[IgnoreDeprecations]
-  public function testDeprecationOfRootParameter(): void {
-    $this->expectDeprecation('Passing a string $root value to Drupal\\Core\\Database\\Database::convertDbUrlToConnectionInfo() is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3511287');
-    Database::convertDbUrlToConnectionInfo('sqlite://localhost/test_database', $this->root, TRUE);
   }
 
 }
