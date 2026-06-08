@@ -207,6 +207,7 @@ class ManyToOneHelper {
                     'numeric' => !empty($this->handler->definition['numeric']),
                   ],
                 ];
+
               }
             }
             $this->handler->tableAlias = $this->addTable($join);
