@@ -211,7 +211,8 @@ class ManyToOneHelper {
               }
             }
             $this->handler->tableAlias = $this->addTable($join);
-          } else {
+          }
+          else {
             $this->handler->tableAlias = $this->handler->query->ensureTable($this->handler->table, $this->handler->relationship, $join);
             $this->handler->view->many_to_one_tables[$field] = $this->handler->value;
           }
