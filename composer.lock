@@ -7865,16 +7865,16 @@
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "14.2.0",
+            "version": "14.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "ab8a36c9bd98c51f6cfe665a732bfadf72e18e8d"
+                "reference": "ed4f43a9a69d6be9f92d50397044ccb862bd8133"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/ab8a36c9bd98c51f6cfe665a732bfadf72e18e8d",
-                "reference": "ab8a36c9bd98c51f6cfe665a732bfadf72e18e8d",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/ed4f43a9a69d6be9f92d50397044ccb862bd8133",
+                "reference": "ed4f43a9a69d6be9f92d50397044ccb862bd8133",
                 "shasum": ""
             },
             "require": {
@@ -7893,7 +7893,7 @@
                 "theseer/tokenizer": "^2.0.1"
             },
             "require-dev": {
-                "phpunit/phpunit": "^13.1.14"
+                "phpunit/phpunit": "^13.2.0"
             },
             "suggest": {
                 "ext-pcov": "PHP extension that provides line coverage",
@@ -7931,7 +7931,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/php-code-coverage/issues",
                 "security": "https://github.com/sebastianbergmann/php-code-coverage/security/policy",
-                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/14.2.0"
+                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/14.2.1"
             },
             "funding": [
                 {
@@ -7951,7 +7951,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-06-05T02:59:08+00:00"
+            "time": "2026-06-07T09:07:04+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -8252,12 +8252,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "a7b8522dfd14d0fc7777d9597d7f578070575f0f"
+                "reference": "3ae334f17ba47d4ec15ca9ed00218b74611006e3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/a7b8522dfd14d0fc7777d9597d7f578070575f0f",
-                "reference": "a7b8522dfd14d0fc7777d9597d7f578070575f0f",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/3ae334f17ba47d4ec15ca9ed00218b74611006e3",
+                "reference": "3ae334f17ba47d4ec15ca9ed00218b74611006e3",
                 "shasum": ""
             },
             "require": {
@@ -8271,7 +8271,7 @@
                 "phar-io/manifest": "^2.0.4",
                 "phar-io/version": "^3.2.1",
                 "php": ">=8.4.1",
-                "phpunit/php-code-coverage": "^14.2",
+                "phpunit/php-code-coverage": "^14.2.1",
                 "phpunit/php-file-iterator": "^7.0.0",
                 "phpunit/php-invoker": "^7.0.0",
                 "phpunit/php-text-template": "^6.0.0",
@@ -8337,7 +8337,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2026-06-06T08:13:55+00:00"
+            "time": "2026-06-08T09:51:38+00:00"
         },
         {
             "name": "ramsey/collection",
