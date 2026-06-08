@@ -6,6 +6,7 @@
  * Provides CLI commands for Drupal.
  */
 
+use Composer\Autoload\ClassLoader;
 use Drupal\Core\Command\GenerateTheme;
 use Drupal\Core\Command\QuickStartCommand;
 use Drupal\Core\Command\InstallCommand;
@@ -21,9 +22,7 @@ if (PHP_SAPI !== 'cli') {
 
 require_once __DIR__ . '/../../autoload_runtime.php';
 
-return static function () {
-  $classloader = require __DIR__ . '/../../autoload.php';
-
+return static function (ClassLoader $classloader) {
   $application = new Application('drupal', \Drupal::VERSION);
 
   $application->addCommand(new QuickStartCommand());

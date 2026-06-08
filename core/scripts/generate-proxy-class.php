@@ -13,6 +13,7 @@
  * @see lazy_services
  */
 
+use Composer\Autoload\ClassLoader;
 use Drupal\Core\Command\GenerateProxyClassApplication;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\ProxyBuilder\ProxyBuilder;
@@ -25,13 +26,11 @@ if (PHP_SAPI !== 'cli') {
 
 require_once __DIR__ . '/../../autoload_runtime.php';
 
-return static function () {
+return static function (string $environment, ClassLoader $autoloader) {
   // Bootstrap.
-  // @todo Move from front-controller into runtime on request.
-  $autoloader = require __DIR__ . '/../../autoload.php';
   $request = Request::createFromGlobals();
   Settings::initialize(dirname(__DIR__, 2), DrupalKernel::findSitePath($request), $autoloader);
-  DrupalKernel::createFromRequest($request, $autoloader, 'prod')->boot();
+  DrupalKernel::createFromRequest($request, $autoloader, $environment)->boot();
 
   // Run the database dump command.
   return new GenerateProxyClassApplication(new ProxyBuilder());
