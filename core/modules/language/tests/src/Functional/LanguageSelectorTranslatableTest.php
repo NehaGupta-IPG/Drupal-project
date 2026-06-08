@@ -7,6 +7,7 @@ namespace Drupal\Tests\language\Functional;
 use Drupal\language\Form\ContentLanguageSettingsForm;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\language\Traits\LanguageTestTrait;
+use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 class LanguageSelectorTranslatableTest extends BrowserTestBase {
 
+  use ContentTypeCreationTrait;
   use LanguageTestTrait;
 
   /**
@@ -109,6 +111,27 @@ class LanguageSelectorTranslatableTest extends BrowserTestBase {
     $this->drupalGet('admin/config/regional/content-language');
     $this->assertSession()->pageTextContains('Content language');
     $this->assertSession()->pageTextNotContains('Content language and translation');
+  }
+
+  /**
+   * Tests that duplicate bundle labels are disambiguated by machine name.
+   */
+  public function testDuplicateBundleLabels(): void {
+    // Two bundles sharing the same label but with distinct machine names, plus
+    // a bundle with a unique label.
+    $this->drupalCreateContentType(['type' => 'text', 'name' => 'Text']);
+    $this->drupalCreateContentType(['type' => 'sidebar_text', 'name' => 'Text']);
+    $this->drupalCreateContentType(['type' => 'unique', 'name' => 'Unique']);
+
+    $this->drupalGet('admin/config/regional/content-language');
+
+    // Duplicate labels are suffixed with the machine name.
+    $this->assertSession()->pageTextContains('Text (text)');
+    $this->assertSession()->pageTextContains('Text (sidebar_text)');
+
+    // A unique label is left untouched.
+    $this->assertSession()->pageTextContains('Unique');
+    $this->assertSession()->pageTextNotContains('Unique (unique)');
   }
 
 }
