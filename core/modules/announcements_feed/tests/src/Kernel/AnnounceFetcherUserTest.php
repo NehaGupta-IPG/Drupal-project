@@ -4,14 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\announcements_feed\Kernel;
 
+use Drupal\announcements_feed\AnnounceFetcher;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\announcements_feed\AnnounceFetcher
- *
- * @group announcements_feed
+ * Tests Drupal\announcements_feed\AnnounceFetcher.
  */
+#[CoversClass(AnnounceFetcher::class)]
+#[Group('announcements_feed')]
+#[RunTestsInSeparateProcesses]
 class AnnounceFetcherUserTest extends AnnounceTestBase {
 
   use UserCreationTrait;
@@ -22,6 +27,11 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
   protected static $modules = [
     'toolbar',
   ];
+
+  /**
+   * Version constraint.
+   */
+  protected string $constraint;
 
   /**
    * {@inheritdoc}
@@ -36,6 +46,10 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
       'access announcements',
     ];
     $this->setUpCurrentUser(['uid' => 1], $permissions);
+
+    // Set version constraint to current major version.
+    $version = explode('.', \Drupal::VERSION, 2);
+    $this->constraint = "^$version[0]";
   }
 
   /**
@@ -44,8 +58,6 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
    * First time accessing the announcements.
    */
   public function testAllAnnouncementsFirst(): void {
-    $this->markTestSkipped('Skipped due to major version-specific logic. See https://www.drupal.org/project/drupal/issues/3359322');
-
     $feed_items = $this->providerShowAnnouncements();
 
     // First time access.
@@ -86,6 +98,7 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
    * Data provider for testAllAnnouncements().
    */
   public function providerShowAnnouncements(): array {
+
     return [
       [
         'id' => '1001',
@@ -94,7 +107,7 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
         'content_html' => 'Test teaser 1',
         '_drupalorg' => [
           'featured' => TRUE,
-          'version' => '^10',
+          'version' => $this->constraint,
         ],
         'date_modified' => date('c', 1611041378),
         'date_published' => date('c', 1610958578),
@@ -106,7 +119,7 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
         'content_html' => 'Test teaser 2',
         '_drupalorg' => [
           'featured' => TRUE,
-          'version' => '^10',
+          'version' => $this->constraint,
         ],
         'date_modified' => date('c', 1611041378),
         'date_published' => date('c', 1610958578),
@@ -119,7 +132,7 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
         'content_html' => 'Test teaser 3',
         '_drupalorg' => [
           'featured' => TRUE,
-          'version' => '^10',
+          'version' => $this->constraint,
         ],
         'date_modified' => date('c', 1611041378),
         'date_published' => date('c', 1610958578),
@@ -131,7 +144,7 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
         'content_html' => 'Test teaser 4',
         '_drupalorg' => [
           'featured' => TRUE,
-          'version' => '^10',
+          'version' => $this->constraint,
         ],
         'date_modified' => date('c', 1611041378),
         'date_published' => date('c', 1610958578),
@@ -143,8 +156,9 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
    * Data provider for testAllAnnouncements().
    */
   public function providerShowUpdatedAnnouncements(): array {
+    $version = explode('.', \Drupal::VERSION, 2);
+    $this->constraint = "^$version[0]";
     return [
-
       [
         'id' => '1005',
         'title' => 'Drupal security update Test new',
@@ -152,7 +166,7 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
         'content_html' => 'Test teaser 1',
         '_drupalorg' => [
           'featured' => TRUE,
-          'version' => '^10',
+          'version' => $this->constraint,
         ],
         'date_modified' => date('c', 1611041378),
         'date_published' => date('c', 1610958578),
@@ -164,7 +178,7 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
         'content_html' => 'Test teaser 1',
         '_drupalorg' => [
           'featured' => TRUE,
-          'version' => '^10',
+          'version' => $this->constraint,
         ],
         'date_modified' => date('c', 1611041378),
         'date_published' => date('c', 1610958578),
@@ -176,7 +190,7 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
         'content_html' => 'Test teaser 2',
         '_drupalorg' => [
           'featured' => TRUE,
-          'version' => '^10',
+          'version' => $this->constraint,
         ],
         'date_modified' => date('c', 1611041378),
         'date_published' => date('c', 1610958578),
@@ -189,7 +203,7 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
         'content_html' => 'Test teaser 3',
         '_drupalorg' => [
           'featured' => TRUE,
-          'version' => '^10',
+          'version' => $this->constraint,
         ],
         'date_modified' => date('c', 1611041378),
         'date_published' => date('c', 1610958578),
@@ -201,7 +215,7 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
         'content_html' => 'Test teaser 4',
         '_drupalorg' => [
           'featured' => TRUE,
-          'version' => '^10',
+          'version' => $this->constraint,
         ],
         'date_modified' => date('c', 1611041378),
         'date_published' => date('c', 1610958578),

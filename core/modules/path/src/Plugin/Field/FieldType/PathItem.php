@@ -75,27 +75,53 @@ class PathItem extends FieldItemBase {
     $pid = $this->get('pid')->getValue();
     $langcode = $this->get('langcode')->getValue();
 
-    // If specified, rely on the langcode property for the language, so that the
-    // existing language of an alias can be kept. That could for example be
-    // unspecified even if the field/entity has a specific langcode.
-    $alias_langcode = ($langcode && $pid) ? $langcode : $this->getLangcode();
+    // If an explicit alias langcode is provided, use it. This allows code to
+    // preserve an existing alias language or set a specific language,
+    // including language-neutral, when creating or updating an alias.
+    // Otherwise, fall back to the field/entity langcode.
+    $alias_langcode = $langcode ?: $this->getLangcode();
 
     // If we have an alias, we need to create or update a path alias entity.
     if ($alias) {
-      if (!$update || !$pid) {
-        $path_alias = $path_alias_storage->create([
-          'path' => '/' . $entity->toUrl()->getInternalPath(),
-          'alias' => $alias,
-          'langcode' => $alias_langcode,
-        ]);
+      $properties = [
+        'path' => '/' . $entity->toUrl()->getInternalPath(),
+        'alias' => $alias,
+        'langcode' => $alias_langcode,
+      ];
+
+      if (!$pid) {
+        // Try to load it from storage before creating it. In some cases the
+        // path alias could be created before this function runs. For example,
+        // \Drupal\workspaces\EntityOperations::entityTranslationInsert will
+        // create a translation, and an associated path alias will be created
+        // with it.
+        $query = $path_alias_storage->getQuery()->accessCheck(FALSE);
+        foreach ($properties as $field => $value) {
+          $query->condition($field, $value);
+        }
+        $ids = $query->execute();
+        $pid = $ids ? reset($ids) : $pid;
+      }
+
+      if (!$pid) {
+        $path_alias = $path_alias_storage->create($properties);
         $path_alias->save();
         $this->set('pid', $path_alias->id());
       }
       else {
         $path_alias = $path_alias_storage->load($pid);
+        $path_alias_changed = FALSE;
 
         if ($alias != $path_alias->getAlias()) {
           $path_alias->setAlias($alias);
+          $path_alias_changed = TRUE;
+        }
+        // Persist langcode-only updates when the alias text is unchanged.
+        if ($alias_langcode !== $path_alias->language()->getId()) {
+          $path_alias->set('langcode', $alias_langcode);
+          $path_alias_changed = TRUE;
+        }
+        if ($path_alias_changed) {
           $path_alias->save();
         }
       }
