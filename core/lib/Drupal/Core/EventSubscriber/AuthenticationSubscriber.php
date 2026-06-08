@@ -53,11 +53,7 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
     // For backward compatibility, fetch from container if not provided.
     if ($this->authenticationCollector === NULL) {
 
-      @trigger_error(
-        'Calling ' . __METHOD__ . ' without the $authenticationCollector argument is deprecated in drupal:11.4.0 and
-          will be required in drupal:12.0.0. See https://www.drupal.org/node/3546804',
-        E_USER_DEPRECATED
-      );
+      @trigger_error('Calling ' . __METHOD__ . ' without the $authenticationCollector argument is deprecated in drupal:11.4.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3594314', E_USER_DEPRECATED);
 
       $this->authenticationCollector = \Drupal::service('authentication_collector');
     }
