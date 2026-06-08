@@ -34,40 +34,27 @@ class MenuLinkManager implements MenuLinkManagerInterface {
   protected $factory;
 
   /**
-   * The menu link tree storage.
-   *
-   * @var \Drupal\Core\Menu\MenuTreeStorageInterface
-   */
-  protected $treeStorage;
-
-  /**
-   * Service providing overrides for static links.
-   *
-   * @var \Drupal\Core\Menu\StaticMenuLinkOverridesInterface
-   */
-  protected $overrides;
-
-  /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
    * Constructs a \Drupal\Core\Menu\MenuLinkManager object.
    *
-   * @param \Drupal\Core\Menu\MenuTreeStorageInterface $tree_storage
+   * @param \Drupal\Core\Menu\MenuTreeStorageInterface $treeStorage
    *   The menu link tree storage.
    * @param \Drupal\Core\Menu\StaticMenuLinkOverridesInterface $overrides
    *   The service providing overrides for static links.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
+   * @param \Traversable<string, string>|null $namespaces
+   *   The root paths keyed by namespace.
    */
-  public function __construct(MenuTreeStorageInterface $tree_storage, StaticMenuLinkOverridesInterface $overrides, ModuleHandlerInterface $module_handler) {
-    $this->treeStorage = $tree_storage;
-    $this->overrides = $overrides;
-    $this->moduleHandler = $module_handler;
+  public function __construct(
+    protected MenuTreeStorageInterface $treeStorage,
+    protected StaticMenuLinkOverridesInterface $overrides,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected ?\Traversable $namespaces = NULL,
+  ) {
+    if ($this->namespaces === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $namespaces argument is deprecated in drupal:11.4.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/9999999', E_USER_DEPRECATED);
+      $this->namespaces = \Drupal::service('container.namespaces');
+    }
   }
 
   /**
@@ -101,7 +88,8 @@ class MenuLinkManager implements MenuLinkManagerInterface {
       $yaml_discovery = new YamlDiscovery('links.menu', $this->moduleHandler->getModuleDirectories());
       $yaml_discovery->addTranslatableProperty('title', 'title_context');
       $yaml_discovery->addTranslatableProperty('description', 'description_context');
-      $this->discovery = new ContainerDerivativeDiscoveryDecorator($yaml_discovery);
+      $attribute_discovery = new AttributeMenuLinkDiscoveryDecorator($yaml_discovery, $this->namespaces);
+      $this->discovery = new ContainerDerivativeDiscoveryDecorator($attribute_discovery);
     }
     return $this->discovery;
   }
