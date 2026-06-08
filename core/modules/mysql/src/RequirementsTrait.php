@@ -37,6 +37,10 @@ trait RequirementsTrait {
     }
     foreach ($tables as $table) {
       $table_name = $prefix . $table;
+      // Query information_schema with a bound table name because table names
+      // can contain SQL delimiters such as semicolons. Using {table}
+      // placeholders here would put the delimiter in the SQL string and fail
+      // Drupal's single-statement protection before the query is prepared.
       $has_primary_key = (bool) $connection->query(
         'SELECT 1 FROM information_schema.statistics WHERE table_schema = :database AND table_name = :table AND index_name = :index LIMIT 1',
         [
