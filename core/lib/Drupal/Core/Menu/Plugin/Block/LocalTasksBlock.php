@@ -41,21 +41,21 @@ class LocalTasksBlock extends BlockBase implements ContainerFactoryPluginInterfa
 
   /**
    * The language manager.
-   * 
+   *
    * @var \Drupal\Core\Language\LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The translation manager.
-   * 
+   *
    * @var \Drupal\Core\StringTranslation\TranslationManager
    */
   protected $translationManager;
 
   /**
    * The current_user service.
-   * 
+   *
    * @var \Drupal\Core\Session\AccountInterface
    */
   protected $currentUser;
@@ -73,6 +73,12 @@ class LocalTasksBlock extends BlockBase implements ContainerFactoryPluginInterfa
    *   The local task manager.
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The route match.
+   * @param Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager.
+   * @param Drupal\Core\StringTranslation\TranslationManager $translation_manager
+   *   The translation manager.
+   * @param Drupal\Core\Session\AccountInterface $current_user
+   *   The current user.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, LocalTaskManagerInterface $local_task_manager, RouteMatchInterface $route_match, LanguageManagerInterface $language_manager, TranslationManager $translation_manager, AccountInterface $current_user) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
