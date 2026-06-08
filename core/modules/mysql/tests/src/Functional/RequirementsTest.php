@@ -120,23 +120,17 @@ class RequirementsTest extends BrowserTestBase {
       $query_options,
     );
 
-    // BrowserTestBase cleanup uses schema()->dropTable(), which builds a
-    // query containing the table name. Drop this table with delimiter support
-    // before teardown reaches it.
-    try {
-      $admin_user = $this->drupalCreateUser([
-        'administer site configuration',
-        'access site reports',
-      ]);
-      $this->drupalLogin($admin_user);
-      $this->drupalGet('admin/reports/status');
+    $admin_user = $this->drupalCreateUser([
+      'administer site configuration',
+      'access site reports',
+    ]);
+    $this->drupalLogin($admin_user);
+    $this->drupalGet('admin/reports/status');
 
-      $this->assertSession()->pageTextContains('Transaction isolation level');
-      $this->assertSession()->pageTextNotContains('test;table');
-    }
-    finally {
-      $connection->query('DROP TABLE {test;table}', [], $query_options);
-    }
+    $this->assertSession()->pageTextContains('Transaction isolation level');
+    $this->assertSession()->pageTextNotContains('test;table');
+
+    $connection->query('DROP TABLE {test;table}', [], $query_options);
   }
 
   /**
