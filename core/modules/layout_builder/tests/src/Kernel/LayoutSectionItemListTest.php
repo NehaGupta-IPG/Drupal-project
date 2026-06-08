@@ -24,14 +24,6 @@ class LayoutSectionItemListTest extends SectionListTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = [
-    'field',
-    'text',
-  ];
-
-  /**
-   * {@inheritdoc}
-   */
   protected function getSectionList(array $section_data) {
     $this->installEntitySchema('entity_test_base_field_display');
     LayoutBuilderEntityViewDisplay::create([
@@ -44,7 +36,7 @@ class LayoutSectionItemListTest extends SectionListTestBase {
       ->setOverridable()
       ->save();
 
-    array_map(function ($row) {
+    array_map(function ($row): array {
       return ['section' => $row];
     }, $section_data);
     $entity = EntityTestBaseFieldDisplay::create([
@@ -57,8 +49,6 @@ class LayoutSectionItemListTest extends SectionListTestBase {
 
   /**
    * Tests equals.
-   *
-   * @legacy-covers ::equals
    */
   public function testEquals(): void {
     $this->sectionList->getSection(0)->setLayoutSettings(['foo' => 1]);
@@ -72,8 +62,6 @@ class LayoutSectionItemListTest extends SectionListTestBase {
 
   /**
    * Tests equals non section.
-   *
-   * @legacy-covers ::equals
    */
   public function testEqualsNonSection(): void {
     $list = $this->prophesize(FieldItemListInterface::class);

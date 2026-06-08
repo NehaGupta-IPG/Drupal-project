@@ -20,7 +20,7 @@ class ManagedStorageTest extends ConfigStorageTestBase implements StorageManager
   /**
    * {@inheritdoc}
    */
-  public function getStorage() {
+  public function getStorage(): MemoryStorage {
     // We return a new storage every time to make sure the managed storage
     // only calls this once and retains the configuration by itself.
     return new MemoryStorage();
@@ -37,7 +37,7 @@ class ManagedStorageTest extends ConfigStorageTestBase implements StorageManager
   /**
    * {@inheritdoc}
    */
-  protected function read($name) {
+  protected function read($name): array|object {
     return $this->storage->read($name);
   }
 

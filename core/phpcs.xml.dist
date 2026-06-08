@@ -2,6 +2,8 @@
 <!-- cspell:ignore Openercase -->
 <ruleset name="drupal_core">
   <arg name="extensions" value="engine,inc,install,module,php,profile,test,theme,yml"/>
+  <!-- Scan files that are explicitly listed via <file> elements as PHP. -->
+  <arg name="filter" value="core/tests/phpcs/PhpScriptFilter.php"/>
   <description>Default PHP CodeSniffer configuration for Drupal core.</description>
 
   <!--Exclude folders used by common frontend tools. These folders match the file_scan_ignore_directories setting in default.settings.php-->
@@ -22,6 +24,7 @@
 
   <file>.</file>
   <file>../composer</file>
+  <file>scripts/drupal</file>
   <file>scripts/password-hash.sh</file>
   <file>scripts/rebuild_token_calculator.sh</file>
   <file>scripts/run-tests.sh</file>
@@ -31,15 +34,7 @@
 
   <!-- Drupal sniffs -->
   <rule ref="Drupal.Arrays.Array"/>
-  <rule ref="Drupal.Arrays.Array.LongLineDeclaration">
-    <include-pattern>core/*/Unit/*</include-pattern>
-    <include-pattern>core/*/FunctionalJavascript/*</include-pattern>
-    <include-pattern>core/*/Kernel/*</include-pattern>
-    <include-pattern>core/*/Functional/*</include-pattern>
-    <include-pattern>core/lib/*</include-pattern>
-    <include-pattern>core/modules/*/tests/modules/*</include-pattern>
-    <include-pattern>core/modules/*/Plugin/*</include-pattern>
-  </rule>
+  <rule ref="Drupal.Arrays.Array.LongLineDeclaration"/>
   <rule ref="Drupal.Classes.ClassCreateInstance"/>
   <rule ref="Drupal.Classes.ClassDeclaration"/>
   <rule ref="Drupal.Classes.ClassFileName"/>
@@ -60,6 +55,7 @@
     <exclude name="Drupal.Commenting.DocComment.LongFullStop"/>
   </rule>
   <rule  ref="Drupal.Commenting.DocComment.MissingShort">
+    <include-pattern>core/*/KernelTests/*</include-pattern>
     <include-pattern>core/*/Unit/*</include-pattern>
     <include-pattern>core/*/FunctionalJavascript/*</include-pattern>
   </rule>
@@ -77,6 +73,7 @@
     <include-pattern>*/Functional/*</include-pattern>
     <include-pattern>*/Unit/*</include-pattern>
     <include-pattern>core/lib/*</include-pattern>
+    <include-pattern>core/modules/system/tests/modules/HookOrder/*</include-pattern>
   </rule>
   <rule ref="Drupal.Commenting.FunctionComment.MissingParamType"/>
   <rule ref="Drupal.Commenting.FunctionComment.MissingReturnComment"/>
@@ -119,6 +116,9 @@
   <rule ref="Drupal.NamingConventions.ValidClassName"/>
   <rule ref="Drupal.NamingConventions.ValidEnumCase"/>
   <rule ref="Drupal.NamingConventions.ValidGlobal"/>
+  <rule ref="Drupal.NamingConventions.ValidGlobal.GlobalUnderScore">
+    <exclude-pattern>scripts/run-tests.sh</exclude-pattern>
+  </rule>
   <rule ref="Drupal.NamingConventions.ValidVariableName"/>
   <rule ref="Drupal.NamingConventions.ValidVariableName.LowerCamelName"/>
   <rule ref="Drupal.Scope.MethodScope"/>

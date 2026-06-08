@@ -52,10 +52,8 @@ class ContentModerationStateTest extends KernelTestBase {
     'user',
     'system',
     'language',
-    'content_translation',
     'text',
     'workflows',
-    'path_alias',
     'taxonomy',
   ];
 
@@ -91,6 +89,7 @@ class ContentModerationStateTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installConfig('system');
     $this->installSchema('node', 'node_access');
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');
@@ -104,7 +103,7 @@ class ContentModerationStateTest extends KernelTestBase {
     $this->installEntitySchema('content_moderation_state');
     $this->installConfig('content_moderation');
     $this->installSchema('file', 'file_usage');
-    $this->installConfig(['field', 'file', 'filter', 'image', 'media', 'node', 'system']);
+    $this->installConfig(['field', 'file', 'filter', 'image', 'media', 'node']);
 
     // Add the French language.
     ConfigurableLanguage::createFromLangcode('fr')->save();
@@ -184,7 +183,7 @@ class ContentModerationStateTest extends KernelTestBase {
   /**
    * Test cases for basic moderation test.
    */
-  public static function basicModerationTestCases() {
+  public static function basicModerationTestCases(): array {
     return [
       'Nodes' => [
         'node',
@@ -507,7 +506,7 @@ class ContentModerationStateTest extends KernelTestBase {
    * Tests that entities with special languages can be moderated.
    */
   #[DataProvider('moderationWithSpecialLanguagesTestCases')]
-  public function testModerationWithSpecialLanguages($original_language, $updated_language): void {
+  public function testModerationWithSpecialLanguages(string $original_language, string $updated_language): void {
     $workflow = $this->createEditorialWorkflow();
     $this->addEntityTypeAndBundleToWorkflow($workflow, $this->revEntityTypeId, $this->revEntityTypeId);
 
@@ -529,7 +528,7 @@ class ContentModerationStateTest extends KernelTestBase {
   /**
    * Test cases for ::testModerationWithSpecialLanguages().
    */
-  public static function moderationWithSpecialLanguagesTestCases() {
+  public static function moderationWithSpecialLanguagesTestCases(): array {
     return [
       'Not specified to not specified' => [
         LanguageInterface::LANGCODE_NOT_SPECIFIED,

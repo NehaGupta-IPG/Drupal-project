@@ -21,15 +21,13 @@ class HighWaterNotJoinableTest extends MigrateSqlSourceTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'migrate',
-    'migrate_drupal',
     'migrate_high_water_test',
   ];
 
   /**
    * {@inheritdoc}
    */
-  public static function providerSource() {
+  public static function providerSource(): array {
     $tests = [];
 
     // Test high water when the map is not joinable.

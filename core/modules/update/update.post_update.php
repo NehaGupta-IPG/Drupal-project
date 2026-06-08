@@ -14,13 +14,15 @@ function update_remove_post_updates() {
   return [
     'update_post_update_add_view_update_notifications_permission' => '10.0.0',
     'update_post_update_set_blank_fetch_url_to_null' => '11.0.0',
+    'update_post_update_clear_disk_cache' => '12.0.0',
+    'update_post_update_fix_update_emails' => '12.0.0',
   ];
 }
 
 /**
- * Removes the legacy 'Update Manager' disk cache.
+ * Removes the legacy 'Update Manager' disk cache (again).
  */
-function update_post_update_clear_disk_cache(): void {
+function update_post_update_clear_disk_cache_again(): void {
   // @see _update_manager_unique_id()
   $id = substr(hash('sha256', Settings::getHashSalt()), 0, 8);
   // List of legacy 'Update Manager' cache directories.
@@ -34,17 +36,5 @@ function update_post_update_clear_disk_cache(): void {
     if (is_dir($directory)) {
       \Drupal::service('file_system')->deleteRecursive($directory);
     }
-  }
-}
-
-/**
- * Remove empty email addresses from update.settings configuration.
- */
-function update_post_update_fix_update_emails(): void {
-  $config = \Drupal::configFactory()->getEditable('update.settings');
-  $emails = $config->get('notification.emails');
-  $filtered_emails = array_filter($emails);
-  if ($emails !== $filtered_emails) {
-    $config->set('notification.emails', $filtered_emails)->save();
   }
 }

@@ -55,7 +55,7 @@ class ConfigTargetTest extends UnitTestCase {
     ) extends ConfigFormBase {
       use RedundantEditableConfigNamesTrait;
 
-      public function getFormId() {
+      public function getFormId(): string {
         return 'test';
       }
 
@@ -84,13 +84,17 @@ class ConfigTargetTest extends UnitTestCase {
       ],
     ];
 
+    $config = $this->prophesize(Config::class);
+    $config->getCacheTags()->willReturn([]);
+    $config_factory = $this->prophesize(ConfigFactoryInterface::class);
+    $config_factory->getEditable('system.site')->willReturn($config->reveal());
     $test_form = new class(
-      $this->prophesize(ConfigFactoryInterface::class)->reveal(),
+      $config_factory->reveal(),
       $this->prophesize(TypedConfigManagerInterface::class)->reveal(),
     ) extends ConfigFormBase {
       use RedundantEditableConfigNamesTrait;
 
-      public function getFormId() {
+      public function getFormId(): string {
         return 'test';
       }
 
@@ -357,6 +361,7 @@ class ConfigTargetTest extends UnitTestCase {
   /**
    * Tests set value multi target to config return value.
    */
+  // phpcs:disable Drupal.Arrays.Array.LongLineDeclaration
   #[TestWith(["this string was returned by toConfig", "The toConfig callable returned a string, but it must be an array with a key-value pair for each of the targeted property paths."])]
   #[TestWith([TRUE, "The toConfig callable returned a boolean, but it must be an array with a key-value pair for each of the targeted property paths."])]
   #[TestWith([42, "The toConfig callable returned a integer, but it must be an array with a key-value pair for each of the targeted property paths."])]
@@ -366,6 +371,7 @@ class ConfigTargetTest extends UnitTestCase {
   #[TestWith([["second" => 42], "The toConfig callable returned an array that is missing key-value pairs for the following targeted property paths: first."])]
   #[TestWith([["first" => 42], "The toConfig callable returned an array that is missing key-value pairs for the following targeted property paths: second."])]
   #[TestWith([["first" => 42, "second" => 1337, "yar" => "har"], "The toConfig callable returned an array that contains key-value pairs that do not match targeted property paths: yar."])]
+  // phpcs:enable
   public function testSetValueMultiTargetToConfigReturnValue(mixed $toConfigReturnValue, string $expected_exception_message): void {
     $config_target = new ConfigTarget(
       'foo.settings',

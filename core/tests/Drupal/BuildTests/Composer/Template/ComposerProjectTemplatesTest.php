@@ -34,7 +34,7 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
    *
    * @see https://getcomposer.org/doc/04-schema.md#minimum-stability
    */
-  protected const MINIMUM_STABILITY = 'beta';
+  protected const MINIMUM_STABILITY = 'stable';
 
   /**
    * The order of stability strings from least stable to most stable.
@@ -55,7 +55,7 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
    * @return string[]
    *   Array of paths, indexed by package name.
    */
-  public function getPathReposForType($workspace_directory, $subdir) {
+  public function getPathReposForType(string $workspace_directory, string $subdir): array {
     // Find the Composer items that we want to be path repos.
     /** @var \SplFileInfo[] $path_repos */
     $path_repos = Composer::composerSubprojectPaths($workspace_directory, $subdir);
@@ -69,7 +69,7 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
     return $data;
   }
 
-  public static function provideTemplateCreateProject() {
+  public static function provideTemplateCreateProject(): array {
     return [
       'recommended-project' => [
         'drupal/recommended-project',
@@ -110,6 +110,7 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
 
     $minimum_stability_order_index = $stability_order_indexes[static::MINIMUM_STABILITY];
 
+    $project_stabilities = [];
     $exclude = [
       'drupal/core',
       'drupal/core-composer-scaffold',
@@ -176,7 +177,7 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
   }
 
   #[DataProvider('provideTemplateCreateProject')]
-  public function testTemplateCreateProject($project, $package_dir, $docroot_dir): void {
+  public function testTemplateCreateProject(string $project, string $package_dir, string $docroot_dir): void {
     // Make a working COMPOSER_HOME directory for setting global composer config.
     $composer_home = $this->getWorkspaceDirectory() . '/composer-home';
     mkdir($composer_home);

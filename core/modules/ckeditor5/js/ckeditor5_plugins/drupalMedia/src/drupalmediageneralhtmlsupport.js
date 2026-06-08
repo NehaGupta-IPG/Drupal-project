@@ -1,7 +1,9 @@
 /* eslint-disable import/no-extraneous-dependencies */
 // cspell:ignore datafilter eventinfo downcastdispatcher generalhtmlsupport
-import { Plugin } from 'ckeditor5/src/core';
-import { setViewAttributes } from '@ckeditor/ckeditor5-html-support/src/utils';
+import {
+  Plugin,
+  _setHtmlSupportViewAttributes as setViewAttributes,
+} from 'ckeditor5';
 
 /**
  * View-to-model conversion helper for Drupal Media.
@@ -89,7 +91,6 @@ function modelToDataAttributeConverter(evt, data, conversionApi) {
   }
 
   const viewElement = conversionApi.mapper.toViewElement(data.item);
-
   setViewAttributes(conversionApi.writer, data.attributeNewValue, viewElement);
 }
 
@@ -218,7 +219,13 @@ export default class DrupalMediaGeneralHtmlSupport extends Plugin {
       }
 
       schema.extend('drupalMedia', {
-        allowAttributes: ['htmlLinkAttributes', 'htmlAttributes'],
+        allowAttributes: [
+          'htmlLinkAttributes',
+          'htmlAttributes',
+          'drupalLinkEntityType',
+          'drupalLinkEntityUuid',
+          'drupalLinkEntityMetadata',
+        ],
       });
 
       conversion

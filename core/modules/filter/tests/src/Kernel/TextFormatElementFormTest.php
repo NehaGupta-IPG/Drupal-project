@@ -35,7 +35,6 @@ class TextFormatElementFormTest extends KernelTestBase implements FormInterface 
     'user',
     'filter',
     'filter_test',
-    'editor',
   ];
 
   /**
@@ -80,14 +79,14 @@ class TextFormatElementFormTest extends KernelTestBase implements FormInterface 
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'test_text_area_element';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     // A text_format field.
     $form['text_format'] = [
       '#type' => 'text_format',

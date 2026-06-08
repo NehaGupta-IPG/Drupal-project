@@ -7,7 +7,9 @@ namespace Drupal\KernelTests\Core\DefaultContent;
 use Drupal\Core\DefaultContent\Finder;
 use Drupal\Core\DefaultContent\Importer;
 use Drupal\Core\DefaultContent\PreEntityImportEvent;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -32,6 +34,15 @@ class ImporterTest extends KernelTestBase implements EventSubscriberInterface {
   protected static $modules = ['system', 'user', 'entity_test'];
 
   /**
+   * Whether the imported content entities were syncing.
+   *
+   * @var bool
+   *
+   * @see ::onPreSave()
+   */
+  private bool $wasSyncing = FALSE;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -52,6 +63,14 @@ class ImporterTest extends KernelTestBase implements EventSubscriberInterface {
   }
 
   /**
+   * Implements hook_ENTITY_TYPE_presave() for entity_test entities.
+   */
+  #[Hook('entity_test_presave')]
+  public function onPreSave(ContentEntityInterface $entity): void {
+    $this->wasSyncing = $entity->isSyncing();
+  }
+
+  /**
    * Modify entity data before it is imported.
    *
    * @param \Drupal\Core\DefaultContent\PreEntityImportEvent $event
@@ -60,7 +79,7 @@ class ImporterTest extends KernelTestBase implements EventSubscriberInterface {
   public function onPreEntityImport(PreEntityImportEvent $event): void {
     self::assertSame('entity_test', $event->metadata['entity_type']);
 
-    if ($event->metadata['uuid'] === '01234567-89ab-cdef-0123-456789abcdef') {
+    if ($event->metadata['uuid'] === '2ab4da9f-7132-4578-99ac-3ee46ce8ce09') {
       $event->data['default']['name'] = [
         ['value' => 'Changed name'],
       ];
@@ -75,11 +94,12 @@ class ImporterTest extends KernelTestBase implements EventSubscriberInterface {
   public function testChangeDataOnImport(): void {
     $this->setUpCurrentUser(admin: TRUE);
 
-    $finder = new Finder($this->getDrupalRoot() . '/core/tests/fixtures/pre_entity_import_default_content');
+    $finder = new Finder($this->root . '/core/tests/fixtures/pre_entity_import_default_content');
     $this->container->get(Importer::class)->importContent($finder);
+    self::assertTrue($this->wasSyncing);
 
     $entity = $this->container->get(EntityRepositoryInterface::class)
-      ->loadEntityByUuid('entity_test', '01234567-89ab-cdef-0123-456789abcdef');
+      ->loadEntityByUuid('entity_test', '2ab4da9f-7132-4578-99ac-3ee46ce8ce09');
     self::assertSame('Changed name', $entity?->label());
   }
 
