@@ -7,10 +7,13 @@ use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Menu\LocalTaskManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslationManager;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
@@ -37,6 +40,27 @@ class LocalTasksBlock extends BlockBase implements ContainerFactoryPluginInterfa
   protected $routeMatch;
 
   /**
+   * The language manager.
+   * 
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
+   * The translation manager.
+   * 
+   * @var \Drupal\Core\StringTranslation\TranslationManager
+   */
+  protected $translationManager;
+
+  /**
+   * The current_user service.
+   * 
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $currentUser;
+
+  /**
    * Creates a LocalTasksBlock instance.
    *
    * @param array $configuration
@@ -50,10 +74,13 @@ class LocalTasksBlock extends BlockBase implements ContainerFactoryPluginInterfa
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The route match.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, LocalTaskManagerInterface $local_task_manager, RouteMatchInterface $route_match) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, LocalTaskManagerInterface $local_task_manager, RouteMatchInterface $route_match, LanguageManagerInterface $language_manager, TranslationManager $translation_manager, AccountInterface $current_user) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->localTaskManager = $local_task_manager;
     $this->routeMatch = $route_match;
+    $this->languageManager = $language_manager;
+    $this->translationManager = $translation_manager;
+    $this->currentUser = $current_user;
   }
 
   /**
@@ -83,6 +110,20 @@ class LocalTasksBlock extends BlockBase implements ContainerFactoryPluginInterfa
       }
     }
 
+    // Switch to the user's preferred admin language before resolving local task
+    // titles. Unlike toolbar links, local task titles are cast to a plain
+    // string inside LocalTaskManager::getTasksBuild(), so the language must be
+    // active at call time rather than deferred to a #pre_render callback.
+    $originalLangcode = NULL;
+    $userAdminLangcode = $this->currentUser->getPreferredAdminLangcode(FALSE);
+    if ($userAdminLangcode && ($this->currentUser->hasPermission('access administration pages') || $this->currentUser->hasPermission('view the administration theme'))) {
+      $originalLangcode = $this->languageManager->getCurrentLanguage()->getId();
+      $adminLanguage = $this->languageManager->getLanguage($userAdminLangcode);
+      $this->languageManager->setCurrentLanguage($adminLanguage);
+      $this->translationManager->setDefaultLangcode($userAdminLangcode);
+      $this->languageManager->setConfigOverrideLanguage($adminLanguage);
+    }
+
     $tabs = [
       '#theme' => 'menu_local_tasks',
     ];
@@ -105,7 +146,16 @@ class LocalTasksBlock extends BlockBase implements ContainerFactoryPluginInterfa
       ];
     }
 
+    // Restore the original language after resolving titles.
+    if ($originalLangcode !== NULL) {
+      $originalLanguage = $this->languageManager->getLanguage($originalLangcode);
+      $this->languageManager->setCurrentLanguage($originalLanguage);
+      $this->translationManager->setDefaultLangcode($originalLangcode);
+      $this->languageManager->setConfigOverrideLanguage($originalLanguage);
+    }
+
     $build = [];
+    $cacheability->addCacheContexts(['user.admin_language']);
     $cacheability->applyTo($build);
     if (empty($tabs['#primary']) && empty($tabs['#secondary'])) {
       return $build;
