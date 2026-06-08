@@ -26,7 +26,9 @@ trait RequirementsTrait {
     $query = $connection->isMariaDb() ? 'SELECT @@SESSION.tx_isolation' : 'SELECT @@SESSION.transaction_isolation';
     $isolation_level = $connection->query($query)->fetchField();
 
-    // Tables missing primary key.
+    // Tables missing primary key. The requirements check can encounter tables
+    // created outside Drupal, including tables whose names contain SQL
+    // delimiters such as semicolons.
     $tables_missing_primary_key = [];
     $tables = $connection->schema()->findTables('%');
     $prefix = $connection->getPrefix();
@@ -37,9 +39,8 @@ trait RequirementsTrait {
     }
     foreach ($tables as $table) {
       $table_name = $prefix . $table;
-      // Query information_schema with a bound table name because table names
-      // can contain SQL delimiters such as semicolons. Using {table}
-      // placeholders here would put the delimiter in the SQL string and fail
+      // Query information_schema with a bound table name. Using a {table}
+      // placeholder here would put the delimiter in the SQL string and fail
       // Drupal's single-statement protection before the query is prepared.
       $has_primary_key = (bool) $connection->query(
         'SELECT 1 FROM information_schema.statistics WHERE table_schema = :database AND table_name = :table AND index_name = :index LIMIT 1',
