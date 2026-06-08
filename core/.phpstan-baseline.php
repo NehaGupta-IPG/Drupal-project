@@ -24616,18 +24616,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/user/tests/src/Functional/UserLoginHttpTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$name of method Drupal\\\\Tests\\\\user\\\\Functional\\\\UserLoginHttpTest\\:\\:loginRequest\\(\\) expects string, null given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/user/tests/src/Functional/UserLoginHttpTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#2 \\$pass of method Drupal\\\\Tests\\\\user\\\\Functional\\\\UserLoginHttpTest\\:\\:loginRequest\\(\\) expects string, null given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/user/tests/src/Functional/UserLoginHttpTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\UserLoginTest\\:\\:assertMailPattern\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
