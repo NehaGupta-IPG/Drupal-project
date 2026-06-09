@@ -105,7 +105,6 @@ commenters
 configentity
 configurator
 contentblock
-Contenido
 contextuals
 controlgroup
 conv
@@ -371,7 +370,6 @@ preuninstall
 prewarmable
 prewarmer
 prewarmers
-Prueba
 prophesize
 protossl
 pseudotag
@@ -387,7 +385,6 @@ rasterizable
 rasterizes
 realpaths
 realword
-Receta
 rebuilder
 refback
 referenceables
@@ -500,12 +497,10 @@ tablesort
 tablesorts
 tabset
 tabwidth
-Tartalomtípus
 tbachert
 tenderwolf
 testbot
 testlogger
-Teszt
 textareas
 textfields
 themename
@@ -517,7 +512,6 @@ threecol
 tids
 timegate
 timemap
-Tipo
 timespan
 tinyint
 tinytext

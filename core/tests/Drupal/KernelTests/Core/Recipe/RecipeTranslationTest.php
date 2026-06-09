@@ -67,14 +67,14 @@ class RecipeTranslationTest extends KernelTestBase {
     // Pre-save a Spanish translation for the content type name in the locale database.
     $locale_storage = \Drupal::service('locale.storage');
     $source_string = $locale_storage->createString([
-      'source' => 'Recipe Test Content Type',
+      'source' => 'Recipe Test Content Type English',
       'context' => '',
     ])->save();
 
     $locale_storage->createTranslation([
       'lid' => $source_string->getId(),
       'language' => 'es',
-      'translation' => 'Tipo de Contenido de Receta de Prueba',
+      'translation' => 'Recipe Test Content Type Spanish',
     ])->save();
 
     // Add the translation to the configuration location so it gets picked up.
@@ -92,13 +92,13 @@ class RecipeTranslationTest extends KernelTestBase {
     $this->assertSame('es', $config->get('langcode'), 'The imported configuration has Spanish as the language code');
 
     // Verify that the Spanish translation was applied to the configuration.
-    $this->assertSame('Tipo de Contenido de Receta de Prueba', $config->get('name'), 'The Spanish translation was applied to the content type name');
+    $this->assertSame('Recipe Test Content Type Spanish', $config->get('name'), 'The Spanish translation was applied to the content type name');
 
     // Verify that the node type entity exists and is correct.
     $node_type = NodeType::load('recipe_test');
     $this->assertInstanceOf(NodeType::class, $node_type, 'The node type entity was created');
     $this->assertSame('es', $node_type->language()->getId(), 'The node type entity has Spanish as the language');
-    $this->assertSame('Tipo de Contenido de Receta de Prueba', $node_type->label(), 'The node type entity has the Spanish translated label');
+    $this->assertSame('Recipe Test Content Type Spanish', $node_type->label(), 'The node type entity has the Spanish translated label');
   }
 
   /**
@@ -125,7 +125,7 @@ class RecipeTranslationTest extends KernelTestBase {
     // Pre-save translations for both languages in the locale database.
     $locale_storage = \Drupal::service('locale.storage');
     $source_string = $locale_storage->createString([
-      'source' => 'Recipe Test Content Type',
+      'source' => 'Recipe Test Content Type English',
       'context' => '',
     ])->save();
 
@@ -133,14 +133,14 @@ class RecipeTranslationTest extends KernelTestBase {
     $locale_storage->createTranslation([
       'lid' => $source_string->getId(),
       'language' => 'es',
-      'translation' => 'Tipo de Contenido de Receta de Prueba',
+      'translation' => 'Recipe Test Content Type Spanish',
     ])->save();
 
     // Add Hungarian translation.
     $locale_storage->createTranslation([
       'lid' => $source_string->getId(),
       'language' => 'hu',
-      'translation' => 'Recept Teszt Tartalomtípus',
+      'translation' => 'Recipe Test Content Type Hungarian',
     ])->save();
 
     // Add the translation to the configuration location so it gets picked up.
@@ -154,19 +154,19 @@ class RecipeTranslationTest extends KernelTestBase {
     $this->assertTrue($this->container->get('config.storage')->exists('node.type.recipe_test'), 'The recipe test content type configuration exists');
     $config = $this->config('node.type.recipe_test');
     $this->assertSame('es', $config->get('langcode'), 'The imported configuration has Spanish as the language code');
-    $this->assertSame('Tipo de Contenido de Receta de Prueba', $config->get('name'), 'The Spanish translation was applied to the content type name');
+    $this->assertSame('Recipe Test Content Type Spanish', $config->get('name'), 'The Spanish translation was applied to the content type name');
 
     // Verify that Hungarian translation overrides were created.
     $hungarian_override = \Drupal::service('language_manager')->getLanguageConfigOverride('hu', 'node.type.recipe_test');
     $this->assertFalse($hungarian_override->isNew(), 'Hungarian language override was created');
     $hungarian_data = $hungarian_override->get();
-    $this->assertSame('Recept Teszt Tartalomtípus', $hungarian_data['name'], 'Hungarian translation override has the correct translated name');
+    $this->assertSame('Recipe Test Content Type Hungarian', $hungarian_data['name'], 'Hungarian translation override has the correct translated name');
 
     // Verify that the node type entity works correctly in Spanish.
     $node_type = NodeType::load('recipe_test');
     $this->assertInstanceOf(NodeType::class, $node_type, 'The node type entity was created');
     $this->assertSame('es', $node_type->language()->getId(), 'The node type entity has Spanish as the language');
-    $this->assertSame('Tipo de Contenido de Receta de Prueba', $node_type->label(), 'The node type entity has the Spanish translated label');
+    $this->assertSame('Recipe Test Content Type Spanish', $node_type->label(), 'The node type entity has the Spanish translated label');
   }
 
   /**
@@ -190,14 +190,14 @@ class RecipeTranslationTest extends KernelTestBase {
     // Pre-save a Spanish translation for the content type name in the locale database.
     $locale_storage = \Drupal::service('locale.storage');
     $source_string = $locale_storage->createString([
-      'source' => 'Recipe Test Content Type',
+      'source' => 'Recipe Test Content Type English',
       'context' => '',
     ])->save();
 
     $locale_storage->createTranslation([
       'lid' => $source_string->getId(),
       'language' => 'es',
-      'translation' => 'Tipo de Contenido de Receta de Prueba',
+      'translation' => 'Recipe Test Content Type Spanish',
     ])->save();
 
     // Add the translation to the configuration location so it gets picked up.
@@ -211,19 +211,19 @@ class RecipeTranslationTest extends KernelTestBase {
     $this->assertTrue($this->container->get('config.storage')->exists('node.type.recipe_test'), 'The recipe test content type configuration exists');
     $config = $this->config('node.type.recipe_test');
     $this->assertSame('en', $config->get('langcode'), 'The imported configuration keeps English as the language code');
-    $this->assertSame('Recipe Test Content Type', $config->get('name'), 'The original English name is preserved in the configuration');
+    $this->assertSame('Recipe Test Content Type English', $config->get('name'), 'The original English name is preserved in the configuration');
 
     // Verify that Spanish translation overrides were created.
     $spanish_override = \Drupal::service('language_manager')->getLanguageConfigOverride('es', 'node.type.recipe_test');
     $this->assertFalse($spanish_override->isNew(), 'Spanish language override was created');
     $spanish_data = $spanish_override->get();
-    $this->assertSame('Tipo de Contenido de Receta de Prueba', $spanish_data['name'], 'Spanish translation override has the correct translated name');
+    $this->assertSame('Recipe Test Content Type Spanish', $spanish_data['name'], 'Spanish translation override has the correct translated name');
 
     // Verify that the node type entity works correctly in English.
     $node_type = NodeType::load('recipe_test');
     $this->assertInstanceOf(NodeType::class, $node_type, 'The node type entity was created');
     $this->assertSame('en', $node_type->language()->getId(), 'The node type entity has English as the language');
-    $this->assertSame('Recipe Test Content Type', $node_type->label(), 'The node type entity has the original English label');
+    $this->assertSame('Recipe Test Content Type English', $node_type->label(), 'The node type entity has the original English label');
   }
 
   /**
@@ -247,7 +247,7 @@ class RecipeTranslationTest extends KernelTestBase {
     // Pre-save translations for both languages in the locale database.
     $locale_storage = \Drupal::service('locale.storage');
     $source_string = $locale_storage->createString([
-      'source' => 'Recipe Test Content Type',
+      'source' => 'Recipe Test Content Type English',
       'context' => '',
     ])->save();
 
@@ -255,7 +255,7 @@ class RecipeTranslationTest extends KernelTestBase {
     $locale_storage->createTranslation([
       'lid' => $source_string->getId(),
       'language' => 'hu',
-      'translation' => 'Recept Teszt Tartalomtípus',
+      'translation' => 'Recipe Test Content Type Hungarian',
     ])->save();
 
     // Note: English is the source language, so we don't need to create a translation for it.
@@ -271,19 +271,19 @@ class RecipeTranslationTest extends KernelTestBase {
     $this->assertTrue($this->container->get('config.storage')->exists('node.type.recipe_test'), 'The recipe test content type configuration exists');
     $config = $this->config('node.type.recipe_test');
     $this->assertSame('hu', $config->get('langcode'), 'The imported configuration has Hungarian as the language code');
-    $this->assertSame('Recept Teszt Tartalomtípus', $config->get('name'), 'The Hungarian translation was applied to the content type name');
+    $this->assertSame('Recipe Test Content Type Hungarian', $config->get('name'), 'The Hungarian translation was applied to the content type name');
 
     // Verify that English translation overrides were created.
     $english_override = \Drupal::service('language_manager')->getLanguageConfigOverride('en', 'node.type.recipe_test');
     $this->assertFalse($english_override->isNew(), 'English language override was created');
     $english_data = $english_override->get();
-    $this->assertSame('Recipe Test Content Type', $english_data['name'], 'English translation override has the original English name');
+    $this->assertSame('Recipe Test Content Type English', $english_data['name'], 'English translation override has the original English name');
 
     // Verify that the node type entity works correctly in Hungarian.
     $node_type = NodeType::load('recipe_test');
     $this->assertInstanceOf(NodeType::class, $node_type, 'The node type entity was created');
     $this->assertSame('hu', $node_type->language()->getId(), 'The node type entity has Hungarian as the language');
-    $this->assertSame('Recept Teszt Tartalomtípus', $node_type->label(), 'The node type entity has the Hungarian translated label');
+    $this->assertSame('Recipe Test Content Type Hungarian', $node_type->label(), 'The node type entity has the Hungarian translated label');
   }
 
 }
