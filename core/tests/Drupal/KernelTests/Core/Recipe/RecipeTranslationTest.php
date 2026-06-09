@@ -226,4 +226,64 @@ class RecipeTranslationTest extends KernelTestBase {
     $this->assertSame('Recipe Test Content Type', $node_type->label(), 'The node type entity has the original English label');
   }
 
+  /**
+   * Tests recipe translation with Hungarian as default and English as additional.
+   *
+   * This test verifies that when a recipe is applied to a site with Hungarian
+   * as the default language but also having English available, the Hungarian
+   * translation is applied to the main config and English overrides are created.
+   */
+  public function testRecipeHungarianDefaultWithEnglish(): void {
+    $language_storage = \Drupal::entityTypeManager()->getStorage('configurable_language');
+
+    // Install Hungarian language and set as default.
+    $hungarian = $language_storage->create(['id' => 'hu', 'label' => 'Hungarian']);
+    $hungarian->save();
+
+    // Set Hungarian as the default language.
+    \Drupal::configFactory()->getEditable('system.site')->set('default_langcode', 'hu')->save();
+    \Drupal::service('language.default')->set($hungarian);
+
+    // Pre-save translations for both languages in the locale database.
+    $locale_storage = \Drupal::service('locale.storage');
+    $source_string = $locale_storage->createString([
+      'source' => 'Recipe Test Content Type',
+      'context' => '',
+    ])->save();
+
+    // Add Hungarian translation.
+    $locale_storage->createTranslation([
+      'lid' => $source_string->getId(),
+      'language' => 'hu',
+      'translation' => 'Recept Teszt Tartalomtípus',
+    ])->save();
+
+    // Note: English is the source language, so we don't need to create a translation for it.
+
+    // Add the translation to the configuration location so it gets picked up.
+    $source_string->addLocation('configuration', 'node.type.recipe_test')->save();
+
+    // Apply the recipe with English configuration.
+    $recipe = Recipe::createFromDirectory('core/tests/fixtures/recipes/recipe_translation_test');
+    RecipeRunner::processRecipe($recipe);
+
+    // Verify the configuration was imported with Hungarian as the langcode.
+    $this->assertTrue($this->container->get('config.storage')->exists('node.type.recipe_test'), 'The recipe test content type configuration exists');
+    $config = $this->config('node.type.recipe_test');
+    $this->assertSame('hu', $config->get('langcode'), 'The imported configuration has Hungarian as the language code');
+    $this->assertSame('Recept Teszt Tartalomtípus', $config->get('name'), 'The Hungarian translation was applied to the content type name');
+
+    // Verify that English translation overrides were created.
+    $english_override = \Drupal::service('language_manager')->getLanguageConfigOverride('en', 'node.type.recipe_test');
+    $this->assertFalse($english_override->isNew(), 'English language override was created');
+    $english_data = $english_override->get();
+    $this->assertSame('Recipe Test Content Type', $english_data['name'], 'English translation override has the original English name');
+
+    // Verify that the node type entity works correctly in Hungarian.
+    $node_type = NodeType::load('recipe_test');
+    $this->assertInstanceOf(NodeType::class, $node_type, 'The node type entity was created');
+    $this->assertSame('hu', $node_type->language()->getId(), 'The node type entity has Hungarian as the language');
+    $this->assertSame('Recept Teszt Tartalomtípus', $node_type->label(), 'The node type entity has the Hungarian translated label');
+  }
+
 }
