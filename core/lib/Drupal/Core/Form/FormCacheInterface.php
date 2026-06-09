@@ -22,8 +22,8 @@ interface FormCacheInterface {
    *
    * @param string $form_build_id
    *   The unique form build ID.
-   * @param array $form
-   *   The form to cache.
+   * @param array|null $form
+   *   The form to cache, or NULL to only cache the form state.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */

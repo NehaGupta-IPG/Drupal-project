@@ -173,11 +173,13 @@ class FormCache implements FormCacheInterface {
     }
 
     // Cache form structure.
-    if ($this->currentUser->isAuthenticated()) {
-      $form['#cache_token'] = $this->csrfToken->get();
+    if (isset($form)) {
+      if ($this->currentUser->isAuthenticated()) {
+        $form['#cache_token'] = $this->csrfToken->get();
+      }
+      unset($form['#build_id_old']);
+      $this->keyValueExpirableFactory->get('form')->setWithExpire($form_build_id, $form, $expire);
     }
-    unset($form['#build_id_old']);
-    $this->keyValueExpirableFactory->get('form')->setWithExpire($form_build_id, $form, $expire);
 
     if ($data = $form_state->getCacheableArray()) {
       $this->keyValueExpirableFactory->get('form_state')->setWithExpire($form_build_id, $data, $expire);
