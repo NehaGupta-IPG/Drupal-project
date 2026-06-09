@@ -86,17 +86,19 @@
     width: 5px;
   }
 
-  .touchevents & .draggable td {
-    padding: 0 10px;
-  }
+  @media (pointer: coarse) {
+    .draggable td {
+      padding: 0 10px;
+    }
 
-  .touchevents & .draggable .menu-item__link {
-    display: inline-block;
-    padding: 10px 0;
-  }
+    .draggable .menu-item__link {
+      display: inline-block;
+      padding: 10px 0;
+    }
 
-  .touchevents & a.tabledrag-handle {
-    width: 40px;
-    height: 44px;
+    a.tabledrag-handle {
+      width: 40px;
+      height: 44px;
+    }
   }
 }

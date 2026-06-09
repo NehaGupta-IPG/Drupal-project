@@ -69,7 +69,7 @@ class OffCanvasDialogTest extends BrowserTestBase {
     $ajax_result = $this->drupalGet('ajax-test/dialog-contents', ['query' => [MainContentViewSubscriber::WRAPPER_FORMAT => $wrapper_format]]);
     $ajax_result = Json::decode($ajax_result);
 
-    $this->assertSame($off_canvas_expected_response, $ajax_result[4], 'off-canvas dialog JSON response matches.');
+    $this->assertSame($off_canvas_expected_response, $ajax_result[3], 'off-canvas dialog JSON response matches.');
   }
 
   /**

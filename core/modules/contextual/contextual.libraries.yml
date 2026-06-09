@@ -19,7 +19,6 @@ drupal.contextual-links:
     - core/drupal
     - core/drupalSettings
     - core/once
-    - core/drupal.touchevents-test
 
 drupal.contextual-toolbar:
   version: VERSION

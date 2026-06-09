@@ -113,9 +113,10 @@
       color: #737373;
     }
   }
-
-  .no-touchevents & .button--small {
-    padding: 2px 1em;
-    font-size: 0.8125rem;
+  @media (pointer: fine) {
+    .button--small {
+      padding: 2px 1em;
+      font-size: 0.8125rem;
+    }
   }
 }

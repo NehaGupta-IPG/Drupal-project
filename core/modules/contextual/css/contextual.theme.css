@@ -104,14 +104,18 @@
   font-weight: normal;
   line-height: 0.8em;
 }
-.touchevents .contextual-region .contextual .contextual-links a {
-  font-size: large;
+@media (pointer: coarse) {
+  .contextual-region .contextual .contextual-links a {
+    font-size: large;
+  }
 }
 .contextual-region .contextual .contextual-links a,
 .contextual-region .contextual .contextual-links a:hover {
   text-decoration: none;
 }
-.no-touchevents .contextual-region .contextual .contextual-links li a:hover {
-  color: #000;
-  background: #f7fcff;
+@media (pointer: fine) {
+  .contextual-region .contextual .contextual-links li a:hover {
+    color: #000;
+    background: #f7fcff;
+  }
 }

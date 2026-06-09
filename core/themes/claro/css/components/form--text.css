@@ -24,12 +24,14 @@
   appearance: none; /* Being able to control inner box shadow on iOS. */
 }
 
-.no-touchevents .form-element--extrasmall,
-.no-touchevents .form-element[name$="][_weight]"] {
-  min-height: calc(((var(--input--extrasmall-padding-vertical) + var(--input-border-size)) * 2) + var(--input--extrasmall-line-height)); /* iOS. */
-  padding: var(--input--extrasmall-padding-vertical) var(--input--extrasmall-padding-horizontal);
-  font-size: var(--input--extrasmall-font-size);
-  line-height: var(--input--extrasmall-line-height);
+@media (pointer: fine) {
+  .form-element--extrasmall,
+  .form-element[name$="][_weight]"] {
+    min-height: calc(((var(--input--extrasmall-padding-vertical) + var(--input-border-size)) * 2) + var(--input--extrasmall-line-height)); /* iOS. */
+    padding: var(--input--extrasmall-padding-vertical) var(--input--extrasmall-padding-horizontal);
+    font-size: var(--input--extrasmall-font-size);
+    line-height: var(--input--extrasmall-line-height);
+  }
 }
 
 /**

@@ -57,9 +57,10 @@
     float: right;
   }
 }
-
-.no-touchevents .table-file-multiple-widget .checkbox .form-type--boolean {
-  line-height: var(--line-height);
+@media (pointer: fine) {
+  .table-file-multiple-widget .checkbox .form-type--boolean {
+    line-height: var(--line-height);
+  }
 }
 
 /**
