@@ -81,6 +81,7 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
       '#type' => 'container',
       '#attributes' => [
         'id' => 'media-library-messages',
+        'class' => ['media-library-messages'],
       ],
       '#weight' => -10,
     ];
@@ -162,8 +163,14 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
 
     $current_selection = $form_state->getValue('media_library_select_form_selection');
     $available_slots = $state->getAvailableSlots();
-    $selected_count = count(explode(',', $current_selection));
-    if ($available_slots > 0 && $selected_count > $available_slots) {
+    $selected_count = count(array_filter(explode(',', $current_selection)));
+    if ($selected_count === 0) {
+      $response = new AjaxResponse();
+      $error = t('No items selected.');
+      $response->addCommand(new MessageCommand($error, '#media-library-messages', ['type' => 'error']));
+      return $response;
+    }
+    elseif ($available_slots > 0 && $selected_count > $available_slots) {
       $response = new AjaxResponse();
       $error = \Drupal::translation()->formatPlural($selected_count - $available_slots, 'There are currently @total items selected. The maximum number of items for the field is @max. Remove @count item from the selection.', 'There are currently @total items selected. The maximum number of items for the field is @max. Remove @count items from the selection.', [
         '@total' => $selected_count,
@@ -177,16 +184,6 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
       ->get($state)
       ->getSelectionResponse($state, $selected_ids)
       ->addCommand(new CloseDialogCommand());
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function viewsFormValidate(array &$form, FormStateInterface $form_state) {
-    $selected = array_filter($form_state->getValue($this->options['id']));
-    if (empty($selected)) {
-      $form_state->setErrorByName('', $this->t('No items selected.'));
-    }
   }
 
   /**

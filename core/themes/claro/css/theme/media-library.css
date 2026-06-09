@@ -317,6 +317,10 @@
   flex-basis: 100%;
 }
 
+.media-library-messages {
+  flex-basis: 100%;
+}
+
 .media-library-views-form__header {
   flex-basis: 100%;
 }

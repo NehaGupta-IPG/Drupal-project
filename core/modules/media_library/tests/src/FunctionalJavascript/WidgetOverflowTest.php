@@ -157,6 +157,32 @@ class WidgetOverflowTest extends MediaLibraryTestBase {
   }
 
   /**
+   * Tests that clicking "Insert selected" with no items shows an error.
+   */
+  public function testInsertSelectedWithNoItems(): void {
+    $assert_session = $this->assertSession();
+    $this->drupalGet('node/add/basic_page');
+
+    // Open the media library and upload a single file.
+    $this->openMediaLibraryForField('field_twin_media');
+    $this->uploadFiles(1);
+    $this->pressSaveButton();
+
+    // Deselect the auto-selected item so nothing is selected.
+    $this->deselectMediaItem(0);
+
+    // Clicking "Insert selected" with nothing selected should show an error
+    // message instead of closing the dialog.
+    $this->pressInsertSelected(NULL, FALSE);
+    $this->waitForElementTextContains('.messages--error', 'No items selected.');
+    $assert_session->elementExists('css', '.ui-dialog-buttonpane');
+
+    // Close the dialog via its title bar close button and verify it closes.
+    $this->getSession()->getPage()->find('css', '.ui-dialog-titlebar-close')->click();
+    $this->waitForNoText('Add or select media');
+  }
+
+  /**
    * Tests that unlimited fields' selection count is not constrained.
    *
    * @param string|null $selected_operation
