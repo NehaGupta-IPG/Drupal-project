@@ -121,10 +121,23 @@ class Xss {
    * - Makes sure no HTML tags contain URLs with a disallowed protocol (e.g.
    *   javascript:).
    *
+   * The $allowed_html_tags argument can also be used to restrict allowed
+   * attributes:
+   * @code
+   * Xss::filter($userInput, [
+   *   // Allow any attribute.
+   *   'b',
+   *   // Allow specific attributes.
+   *   'a' => ['href'],
+   *   // Don't allow any attribute.
+   *   'span' => []
+   * ]);
+   * @endcode
+   *
    * @param string $string
    *   The string with raw HTML in it. It will be stripped of everything that
    *   can cause an XSS attack.
-   * @param string[]|null $allowed_html_tags
+   * @param string[]|string[][]|null $allowed_html_tags
    *   An array of allowed HTML tags.
    *
    * @return string
@@ -158,7 +171,13 @@ class Xss {
     $string = preg_replace('/&amp;#[Xx]0*((?:[0-9A-Fa-f]{2})+;)/', '&#x\1', $string);
     // Named entities.
     $string = preg_replace('/&amp;([A-Za-z][A-Za-z0-9]*;)/', '&\1', $string);
-    $allowed_html_tags = array_flip($allowed_html_tags);
+    foreach ($allowed_html_tags as $key => $html_tag) {
+      if (is_string($html_tag)) {
+        // Special syntax to allow every attribute.
+        $allowed_html_tags[$html_tag] = ['*'];
+        unset($allowed_html_tags[$key]);
+      }
+    }
     // Late static binding does not work inside anonymous functions.
     $class = static::class;
     $splitter = function ($matches) use ($allowed_html_tags, $class) {
@@ -262,7 +281,7 @@ class Xss {
     $xhtml_slash = $count ? ' /' : '';
 
     // Clean up attributes.
-    $attr2 = implode(' ', $class::attributes($attributes));
+    $attr2 = implode(' ', $class::attributes($attributes, $html_tags[$elem] ?? NULL));
     $attr2 = preg_replace('/[<>]/', '', $attr2);
     $attr2 = strlen($attr2) ? ' ' . $attr2 : '';
 
@@ -274,11 +293,13 @@ class Xss {
    *
    * @param string $attributes
    *   The html attribute to process.
+   * @param array|null $allowed_attributes
+   *   The list of allowed attributes.
    *
    * @return array
    *   Cleaned up version of the HTML attributes.
    */
-  protected static function attributes($attributes) {
+  protected static function attributes($attributes, ?array $allowed_attributes) {
     $attributes_array = [];
     $mode = 0;
     $attribute_name = '';
@@ -294,7 +315,15 @@ class Xss {
           // Attribute name, href for instance.
           if (preg_match('/^([-a-zA-Z][-a-zA-Z0-9]*)/', $attributes, $match)) {
             $attribute_name = strtolower($match[1]);
+            if (isset($allowed_attributes)) {
+              $attribute_is_allowed = in_array($attribute_name, $allowed_attributes)
+                || in_array('*', $allowed_attributes);
+            }
+            else {
+              $attribute_is_allowed = TRUE;
+            }
             $skip = (
+              !$attribute_is_allowed ||
               in_array($attribute_name, ['style', 'srcdoc'], TRUE) ||
               str_starts_with($attribute_name, 'on') ||
               str_starts_with($attribute_name, 'data-hx') ||

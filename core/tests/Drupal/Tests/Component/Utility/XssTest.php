@@ -673,6 +673,41 @@ class XssTest extends TestCase {
         'Link tag with an attribute starting with . and a valid attribute afterwards',
         ['a'],
       ],
+      [
+        '<img src="http://example.com/">',
+        '<img>',
+        '<img>',
+        'No attribute allowed.',
+        ['img' => []],
+      ],
+      [
+        '<img src="http://example.com/" alt="">',
+        '<img src="http://example.com/">',
+        '<img src="http://example.com/">',
+        'Some attributes allowed.',
+        ['img' => ['src']],
+      ],
+      [
+        '<img src="http://example.com/" alt="">',
+        '<img src="http://example.com/" alt="">',
+        '<img src="http://example.com/" alt>',
+        'Explicitly allow every attribute.',
+        ['img' => ['*']],
+      ],
+      [
+        '<img src="http://example.com/" alt=""><a href="http://example.com/"></a>',
+        '<img src="http://example.com/"><a href="http://example.com/"></a>',
+        '<img src="http://example.com/"><a href="http://example.com/"></a>',
+        'Mix of both syntaxes.',
+        ['img' => ['src'], 'a'],
+      ],
+      [
+        '<img onerror="alert(0)">',
+        '<img>',
+        '<img>',
+        "Can't allow dangerous attributes.",
+        ['img' => ['onerror']],
+      ],
     ];
     for ($attr_name_length = 96; $attr_name_length < 103; $attr_name_length++) {
       $attr_name = str_repeat('z', $attr_name_length);
