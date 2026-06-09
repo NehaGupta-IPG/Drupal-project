@@ -41,7 +41,7 @@ class HookCollectorKeyValueWritePass implements CompilerPassInterface {
       }
       elseif (!empty($definition->getChanges()['decorated_service'])) {
         if (preg_match('/Drupal\\\[^\\\]+\\\Hook\\\/', $id)) {
-          @trigger_error(sprintf('Defining service %s to decorate a hook service is deprecated in drupal:11.5.0 and is not supported in drupal:12.0.0. Use the ReorderHook or RemoveHook attributes to control hook methods instead instead. See https://www.drupal.org/node/3526437', $id), E_USER_DEPRECATED);
+          @trigger_error(sprintf('Defining service %s to decorate a hook service is deprecated in drupal:11.5.0 and is not supported in drupal:12.0.0. Use the ReorderHook or RemoveHook attributes to control hook methods instead. See https://www.drupal.org/node/3526437', $id), E_USER_DEPRECATED);
           continue;
         }
 
