@@ -5,10 +5,13 @@ namespace Drupal\Core\Recipe;
 use Drupal\Core\Config\DefaultConfigStorageInterface;
 
 /**
- * Provides a wrapper around existing default config storage to add a recipe
- * config storage as a configuration source. This allows locale system to read
- * configuration from the recipe when determining translatability.
- * 
+ * Provides a wrapper around existing default config storage.
+ *
+ * Adds a recipe config storage as a configuration source.
+ *
+ * This allows locale system to read configuration from the recipe when
+ * determining translatability.
+ *
  * @see \Drupal\locale\LocaleDefaultConfigStorage
  */
 class RecipeDefaultConfigStorage implements DefaultConfigStorageInterface {
@@ -77,13 +80,13 @@ class RecipeDefaultConfigStorage implements DefaultConfigStorageInterface {
    */
   public function getComponentNames($type, array $list) {
     if ($type === 'recipe') {
-          $names = [];
-          /* @var \Drupal\Core\Recipe\Recipe $recipe */
-          foreach ($list as $recipe) {
-            $recipe_names = $recipe->config->getConfigStorage()->listAll();
-            $names = array_merge($names, $recipe_names);
-          }
-          return $names;
+      $names = [];
+      /** @var \Drupal\Core\Recipe\Recipe $recipe */
+      foreach ($list as $recipe) {
+        $recipe_names = $recipe->config->getConfigStorage()->listAll();
+        $names = array_merge($names, $recipe_names);
+      }
+      return $names;
     }
     else {
       return $this->defaultConfigStorage->getComponentNames($type, $list);

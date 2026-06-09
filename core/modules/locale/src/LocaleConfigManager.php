@@ -68,7 +68,7 @@ class LocaleConfigManager {
    *
    * @return \Drupal\Core\Config\DefaultConfigStorageInterface
    *   The default config storage.
-   */ 
+   */
   public function getDefaultConfigStorage(): DefaultConfigStorageInterface {
     return $this->defaultConfigStorage;
   }

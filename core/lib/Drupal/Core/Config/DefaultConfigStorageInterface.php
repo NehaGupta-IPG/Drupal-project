@@ -17,7 +17,7 @@ interface DefaultConfigStorageInterface {
    *   Configuration data from install storage or default language.
    */
   public function read($name);
-  
+
   /**
    * Return the list of configuration in install storage and current languages.
    *
@@ -39,6 +39,6 @@ interface DefaultConfigStorageInterface {
    *   module this list is extended with configured languages that have
    *   predefined names as well.
    */
-  public function getComponentNames($type, array $list) ;
+  public function getComponentNames($type, array $list);
 
 }
