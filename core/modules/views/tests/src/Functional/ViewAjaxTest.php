@@ -85,6 +85,19 @@ class ViewAjaxTest extends ViewTestBase {
       ->responseHeaderEquals('X-Drupal-Cache-Contexts', 'languages:language_interface route theme url.query_args user.permissions');
     $this->assertSession()
       ->responseHeaderEquals('X-Drupal-Cache-Max-Age', '-1 (Permanent)');
+    $this->assertSession()
+      ->responseHeaderEquals('X-Drupal-Cache', 'MISS');
+
+    // Call the same page again to check if it has been cached.
+    $this->drupalGet('views/ajax', [
+      'query' => [
+        'view_name' => 'test_ajax_view',
+        'view_display_id' => 'page_1',
+      ],
+    ]);
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()
+      ->responseHeaderEquals('X-Drupal-Cache', 'HIT');
   }
 
 }
