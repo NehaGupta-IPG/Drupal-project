@@ -800,6 +800,8 @@ services:
   entity.last_installed_schema.repository:
     class: Drupal\Core\Entity\EntityLastInstalledSchemaRepository
     arguments: ['@keyvalue', '@cache.discovery']
+    tags:
+      - { name: needs_destruction }
   Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface: '@entity.last_installed_schema.repository'
   entity_field.deleted_fields_repository:
     class: Drupal\Core\Field\DeletedFieldsRepository
