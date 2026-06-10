@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\announcements_feed\FunctionalJavascript;
 
-use Drupal\Tests\system\FunctionalJavascript\OffCanvasTestBase;
 use Drupal\announce_feed_test\AnnounceTestHttpClientMiddleware;
+use Drupal\Tests\system\FunctionalJavascript\OffCanvasTestBase;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test the access announcement according to json feed changes.
- *
- * @group announcements_feed
  */
+#[Group('announcements_feed')]
+#[RunTestsInSeparateProcesses]
 class AlertsJsonFeedTest extends OffCanvasTestBase {
 
   /**
@@ -51,13 +53,19 @@ class AlertsJsonFeedTest extends OffCanvasTestBase {
     );
 
     AnnounceTestHttpClientMiddleware::setAnnounceTestEndpoint('/announce-feed-json/community-feeds');
+
+    // Change the version constraint in the updated json feed.
+    $contents = file_get_contents(dirname(__DIR__, 2) . '/announce_feed/updated.json');
+    $version = explode('.', \Drupal::VERSION, 2);
+    $constraint = "^$version[0]";
+    $new_contents = str_replace("^10", $constraint, $contents);
+    file_put_contents($this->publicFilesDirectory . '/updated.json', $new_contents);
   }
 
   /**
    * Check the status of the announcements when the feed is updated and removed.
    */
   public function testAnnounceFeedUpdatedAndRemoved(): void {
-    $this->markTestSkipped('Skipped due to major version-specific logic. See https://www.drupal.org/project/drupal/issues/3359322');
     $this->drupalLogin($this->user);
     $this->drupalGet('<front>');
     $this->clickLink('Announcements');

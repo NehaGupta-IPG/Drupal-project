@@ -99,7 +99,8 @@ abstract class ReadOnlyStream implements StreamWrapperInterface {
    *   (optional) The stream wrapper URI to be converted to a canonical
    *   absolute path. This may point to a directory or another type of file.
    *
-   * @return string|bool
+   * phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn
+   * @return string|false
    *   If $uri is not set, returns the canonical absolute path of the URI
    *   previously set by the
    *   Drupal\Core\StreamWrapper\StreamWrapperInterface::setUri() function.
@@ -115,7 +116,6 @@ abstract class ReadOnlyStream implements StreamWrapperInterface {
    *   prevent static analysis errors. In D11, consider changing it to an
    *   abstract method.
    */
-  // phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn
   protected function getLocalPath($uri = NULL) {
     throw new \BadMethodCallException(get_class($this) . '::getLocalPath() not implemented.');
   }

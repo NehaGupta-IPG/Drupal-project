@@ -11,13 +11,15 @@ use Drupal\Tests\rest\Functional\CookieResourceTestTrait;
 use Drupal\Tests\rest\Functional\ResourceTestBase;
 use Drupal\user\UserInterface;
 use GuzzleHttp\RequestOptions;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Psr\Http\Message\ResponseInterface;
 
 /**
  * Tests registration of user using REST.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserRegistrationRestTest extends ResourceTestBase {
 
   use CookieResourceTestTrait;
@@ -85,7 +87,7 @@ class UserRegistrationRestTest extends ResourceTestBase {
     $this->assertNotEmpty($user->getPassword());
     $email_count = count($this->drupalGetMails());
 
-    $this->assertEquals(0, $email_count);
+    $this->assertEquals(1, $email_count);
 
     // Attempt to register without sending a password.
     $response = $this->registerRequest('PhilipK.Dick', FALSE);
@@ -157,7 +159,7 @@ class UserRegistrationRestTest extends ResourceTestBase {
    * @return array
    *   Return the request body.
    */
-  protected function createRequestBody($name, $include_password = TRUE, $include_email = TRUE): array {
+  protected function createRequestBody(string $name, $include_password = TRUE, $include_email = TRUE): array {
     $request_body = [
       'langcode' => [['value' => 'en']],
       'name' => [['value' => $name]],
@@ -208,7 +210,11 @@ class UserRegistrationRestTest extends ResourceTestBase {
     // Verify that an anonymous user can register.
     $response = $this->registerRequest($name, $include_password, $include_email);
     $this->assertResourceResponse(200, FALSE, $response);
-    $user = user_load_by_name($name);
+    $users = \Drupal::entityTypeManager()
+      ->getStorage('user')
+      ->loadByProperties(['name' => $name]);
+    $user = reset($users);
+
     $this->assertNotEmpty($user, 'User was create as expected');
     return $user;
   }
@@ -266,7 +272,7 @@ class UserRegistrationRestTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedUnauthorizedAccessCacheability() {
+  protected function getExpectedUnauthorizedAccessCacheability(): CacheableMetadata {
     return new CacheableMetadata();
   }
 

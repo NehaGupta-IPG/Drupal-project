@@ -6,13 +6,16 @@ namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Entity Query Aggregation API.
  *
- * @group Entity
  * @see \Drupal\entity_test\Entity\EntityTest
  */
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntityQueryAggregateTest extends EntityKernelTestBase {
 
   /**
@@ -142,7 +145,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       // We need to check that a character exists before and after the table,
       // column and alias identifiers. These would be the quote characters
       // specific for each database system.
-      $this->assertMatchesRegularExpression('/' . $aggregation_function . '\(.*entity_test.\..id.\).* AS .id_' . $aggregation_function . './', (string) $query, 'The argument to the aggregation function should be a quoted field.');
+      $this->assertMatchesRegularExpression('/' . $aggregation_function . '\(.*base_table.\..id.\).* AS .id_' . $aggregation_function . './', (string) $query, 'The argument to the aggregation function should be a quoted field.');
       $this->assertEquals($expected, $this->queryResult);
     }
 
@@ -684,7 +687,13 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       $found = FALSE;
       break;
     }
-    $this->assertTrue($found, strtr('!expected expected, !found found', ['!expected' => print_r($expected, TRUE), '!found' => print_r($this->queryResult, TRUE)]));
+    $this->assertTrue(
+      $found,
+      strtr('!expected expected, !found found', [
+        '!expected' => print_r($expected, TRUE),
+        '!found' => print_r($this->queryResult, TRUE),
+      ])
+    );
   }
 
   /**

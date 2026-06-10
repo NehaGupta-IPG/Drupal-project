@@ -10,19 +10,16 @@ use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the core Drupal\views\Plugin\views\filter\InOperator handler.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class FilterInOperatorTest extends ViewsKernelTestBase {
   use StringTranslationTrait;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
 
   /**
    * Views used by this test.
@@ -126,7 +123,7 @@ class FilterInOperatorTest extends ViewsKernelTestBase {
     $filters = $this->getGroupedExposedFilters();
     $view = Views::getView('test_view');
 
-    // Filter: Age, Operator: in, Value: 26, 30
+    // Filter: Age, Operator: in, Value: 26, 30.
     $filters['age']['group_info']['default_group'] = 1;
     $view->setDisplay();
     $view->displayHandlers->get('default')->overrideOption('filters', $filters);
@@ -155,7 +152,7 @@ class FilterInOperatorTest extends ViewsKernelTestBase {
     $filters = $this->getGroupedExposedFilters();
     $view = Views::getView('test_view');
 
-    // Filter: Age, Operator: in, Value: 26, 30
+    // Filter: Age, Operator: in, Value: 26, 30.
     $filters['age']['group_info']['default_group'] = 2;
     $view->setDisplay();
     $view->displayHandlers->get('default')->overrideOption('filters', $filters);
@@ -254,6 +251,47 @@ class FilterInOperatorTest extends ViewsKernelTestBase {
       ],
     ];
     return $filters;
+  }
+
+  /**
+   * Tests exposed filter with reduce as TRUE.
+   */
+  public function testFilterExposedReduce(): void {
+    $view = Views::getView('test_view');
+    $view->setDisplay();
+
+    $view->displayHandlers->get('default')->overrideOption('filters', [
+      'age' => [
+        'id' => 'age',
+        'field' => 'age',
+        'table' => 'views_test_data',
+        'value' => [25 => 25, 27 => 27],
+        'operator' => 'in',
+        'exposed' => TRUE,
+        'expose' => [
+          'operator' => 'age_op',
+          'label' => 'age',
+          'identifier' => 'age',
+          'reduce' => TRUE,
+        ],
+      ],
+    ]);
+
+    $this->executeView($view);
+
+    $expected_result = [
+      [
+        'name' => 'John',
+        'age' => 25,
+      ],
+      [
+        'name' => 'George',
+        'age' => 27,
+      ],
+    ];
+
+    $this->assertCount(2, $view->result);
+    $this->assertIdenticalResultset($view, $expected_result, $this->columnMap);
   }
 
   /**

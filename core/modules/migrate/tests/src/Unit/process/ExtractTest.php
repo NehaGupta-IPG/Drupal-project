@@ -6,11 +6,15 @@ namespace Drupal\Tests\migrate\Unit\process;
 
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\migrate\process\Extract;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\migrate\Plugin\migrate\process\Extract
- * @group migrate
+ * Tests Drupal\migrate\Plugin\migrate\process\Extract.
  */
+#[CoversClass(Extract::class)]
+#[Group('migrate')]
 class ExtractTest extends MigrateProcessTestCase {
 
   /**
@@ -32,9 +36,8 @@ class ExtractTest extends MigrateProcessTestCase {
 
   /**
    * Tests invalid input.
-   *
-   * @dataProvider providerTestExtractInvalid
    */
+  #[DataProvider('providerTestExtractInvalid')]
   public function testExtractInvalid($value): void {
     $this->expectException(MigrateException::class);
     $type = gettype($value);
@@ -71,10 +74,9 @@ class ExtractTest extends MigrateProcessTestCase {
    *   The expected transformed value.
    *
    * @throws \Drupal\migrate\MigrateException
-   *
-   * @dataProvider providerExtractDefault
    */
-  public function testExtractDefault(array $value, array $configuration, $expected): void {
+  #[DataProvider('providerExtractDefault')]
+  public function testExtractDefault(array $value, array $configuration, string|bool|null $expected): void {
     $this->plugin = new Extract($configuration, 'map', []);
 
     $value = $this->plugin->transform($value, $this->migrateExecutable, $this->row, 'destination_property');
@@ -84,7 +86,7 @@ class ExtractTest extends MigrateProcessTestCase {
   /**
    * Data provider for testExtractDefault.
    */
-  public static function providerExtractDefault() {
+  public static function providerExtractDefault(): array {
     return [
       [
         ['foo' => 'bar'],
@@ -140,7 +142,7 @@ class ExtractTest extends MigrateProcessTestCase {
   /**
    * Provides data for the testExtractInvalid.
    */
-  public static function providerTestExtractInvalid() {
+  public static function providerTestExtractInvalid(): array {
     $xml_str = <<<XML
     <xml version='1.0'?>
       <authors>

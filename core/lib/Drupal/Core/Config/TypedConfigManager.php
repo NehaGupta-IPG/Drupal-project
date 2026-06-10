@@ -191,7 +191,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    * @param \Drupal\Core\TypedData\TraversableTypedDataInterface $object
    *   A config schema object to get the static type root for.
    *
-   * @return \Drupal\Core\TypedData\TraversableTypedDataInterface
+   * @return \Drupal\Core\TypedData\TraversableTypedDataInterface<int|string, \Drupal\Core\TypedData\TypedDataInterface>
    *   The ancestral config schema object at which the static type root lies:
    *   either the first ancestor with a dynamic type (for example:
    *   `block.block.*:settings`, which has the `block.settings.[%parent.plugin]`
@@ -376,14 +376,13 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       else {
         // No definition for this level. Collapse multiple wildcards to a single
         // wildcard to see if there is a greedy match. For example,
-        // breakpoint.breakpoint.*.* becomes
-        // breakpoint.breakpoint.*
+        // "breakpoint.breakpoint.*.*" becomes "breakpoint.breakpoint.*".
         $one_star = preg_replace('/\.([:\.\*]*)$/', '.*', $replaced);
         if ($one_star != $replaced && isset($this->definitions[$one_star])) {
           return $one_star;
         }
-        // Check for next level. For example, if breakpoint.breakpoint.* has
-        // been checked and no match found then check breakpoint.*.*
+        // Check for next level. For example, if "breakpoint.breakpoint.*" has
+        // been checked and no match found then check "breakpoint.*.*".
         return $this->getFallbackName($replaced);
       }
     }

@@ -4,17 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media\Functional;
 
+use Drupal\media\OEmbed\UrlResolver;
 use Drupal\Tests\media\Traits\OEmbedTestTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore dailymotion
-
 /**
  * Tests the oEmbed URL resolver service.
- *
- * @coversDefaultClass \Drupal\media\OEmbed\UrlResolver
- *
- * @group media
  */
+#[CoversClass(UrlResolver::class)]
+#[Group('media')]
+#[RunTestsInSeparateProcesses]
 class UrlResolverTest extends MediaFunctionalTestBase {
 
   use OEmbedTestTrait;
@@ -41,7 +45,7 @@ class UrlResolverTest extends MediaFunctionalTestBase {
    * @return array
    *   An array of test data.
    */
-  public static function providerEndpointMatching() {
+  public static function providerEndpointMatching(): array {
     return [
       'match by endpoint: Twitter' => [
         'https://twitter.com/Dries/status/999985431595880448',
@@ -70,11 +74,11 @@ class UrlResolverTest extends MediaFunctionalTestBase {
    * @param string $resource_url
    *   The expected oEmbed resource URL of the asset.
    *
-   * @covers ::getProviderByUrl
-   * @covers ::getResourceUrl
-   * @dataProvider providerEndpointMatching
+   * @legacy-covers ::getProviderByUrl
+   * @legacy-covers ::getResourceUrl
    */
-  public function testEndpointMatching($url, $resource_url): void {
+  #[DataProvider('providerEndpointMatching')]
+  public function testEndpointMatching(string $url, string $resource_url): void {
     $this->assertSame(
       $resource_url,
       $this->container->get('media.oembed.url_resolver')->getResourceUrl($url)
@@ -83,9 +87,8 @@ class UrlResolverTest extends MediaFunctionalTestBase {
 
   /**
    * Tests that hook_oembed_resource_url_alter() is invoked.
-   *
-   * @depends testEndpointMatching
    */
+  #[Depends('testEndpointMatching')]
   public function testResourceUrlAlterHook(): void {
     $this->container->get('module_installer')->install(['media_test_oembed']);
 
@@ -106,7 +109,7 @@ class UrlResolverTest extends MediaFunctionalTestBase {
    * @return array
    *   An array of test data.
    */
-  public static function providerUrlDiscovery() {
+  public static function providerUrlDiscovery(): array {
     return [
       'JSON resource' => [
         'video_vimeo.html',
@@ -127,13 +130,12 @@ class UrlResolverTest extends MediaFunctionalTestBase {
    * @param string $resource_url
    *   The expected oEmbed resource URL of the asset.
    *
-   * @covers ::discoverResourceUrl
-   * @covers ::getProviderByUrl
-   * @covers ::getResourceUrl
-   *
-   * @dataProvider providerUrlDiscovery
+   * @legacy-covers ::discoverResourceUrl
+   * @legacy-covers ::getProviderByUrl
+   * @legacy-covers ::getResourceUrl
    */
-  public function testUrlDiscovery($url, $resource_url): void {
+  #[DataProvider('providerUrlDiscovery')]
+  public function testUrlDiscovery(string $url, string $resource_url): void {
     $this->assertSame(
       $this->container->get('media.oembed.url_resolver')->getResourceUrl($url),
       $resource_url
