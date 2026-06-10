@@ -84,40 +84,38 @@ class DefaultHtmlRouteProvider implements EntityRouteProviderInterface, EntityHa
   public function getRoutes(?EntityTypeInterface $entity_type = NULL) {
     if ($entity_type !== NULL) {
       @trigger_error('Passing $entity_type to ' . __METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. The entity type is passed on construction. See https://www.drupal.org/node/3593831', E_USER_DEPRECATED);
-    }
-    else {
-      $entity_type = $this->entityType;
+      $this->entityType = $entity_type;
     }
     $collection = new RouteCollection();
 
-    $entity_type_id = $entity_type->id();
+    $entity_type_id = $this->entityType->id();
 
-    if ($add_page_route = $this->getAddPageRoute($entity_type)) {
+    if ($add_page_route = $this->getAddPageRoute($this->entityType)) {
       $collection->add("entity.{$entity_type_id}.add_page", $add_page_route);
     }
 
-    if ($add_form_route = $this->getAddFormRoute($entity_type)) {
+    if ($add_form_route = $this->getAddFormRoute($this->entityType)) {
       $collection->add("entity.{$entity_type_id}.add_form", $add_form_route);
     }
 
-    if ($canonical_route = $this->getCanonicalRoute($entity_type)) {
+    if ($canonical_route = $this->getCanonicalRoute($this->entityType)) {
       $collection->add("entity.{$entity_type_id}.canonical", $canonical_route);
     }
 
-    if ($edit_route = $this->getEditFormRoute($entity_type)) {
+    if ($edit_route = $this->getEditFormRoute($this->entityType)) {
       $collection->add("entity.{$entity_type_id}.edit_form", $edit_route);
     }
 
-    if ($delete_route = $this->getDeleteFormRoute($entity_type)) {
+    if ($delete_route = $this->getDeleteFormRoute($this->entityType)) {
       $collection->add("entity.{$entity_type_id}.delete_form", $delete_route);
     }
 
-    if ($collection_route = $this->getCollectionRoute($entity_type)) {
+    if ($collection_route = $this->getCollectionRoute($this->entityType)) {
       $collection->add("entity.{$entity_type_id}.collection", $collection_route);
     }
 
-    if ($delete_multiple_route = $this->getDeleteMultipleFormRoute($entity_type)) {
-      $collection->add('entity.' . $entity_type->id() . '.delete_multiple_form', $delete_multiple_route);
+    if ($delete_multiple_route = $this->getDeleteMultipleFormRoute($this->entityType)) {
+      $collection->add("entity.{$entity_type_id}.delete_multiple_form", $delete_multiple_route);
     }
 
     return $collection;
