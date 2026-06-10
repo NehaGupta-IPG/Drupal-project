@@ -32,6 +32,8 @@ a.tabledrag-handle,
 }
 
 a.tabledrag-handle .handle {
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box;
   width: var(--sp2);
   height: var(--sp2);
   margin: 0;

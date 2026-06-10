@@ -37,6 +37,7 @@ a.tabledrag-handle,
 }
 
 a.tabledrag-handle .handle {
+  box-sizing: content-box;
   width: var(--sp2);
   height: var(--sp2);
   margin: 0;
