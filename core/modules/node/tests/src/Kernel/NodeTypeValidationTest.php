@@ -85,9 +85,13 @@ class NodeTypeValidationTest extends ConfigEntityValidationTestBase {
   }
 
   /**
+<<<<<<< HEAD
+   * @testWith [true, {"third_party_settings.menu_ui": ["'parent' is a required key.", "'link_enabled' is a required key."]}]
+   *           [false, {}]
+=======
    * Tests third party settings menu UI.
    */
-  #[TestWith([TRUE, ["third_party_settings.menu_ui" => "'parent' is a required key.", "'link_enabled' is a required key."]])]
+  #[TestWith([TRUE, ["third_party_settings.menu_ui" => ["'parent' is a required key.", "'link_enabled' is a required key."]]])]
   #[TestWith([FALSE, []])]
   public function testThirdPartySettingsMenuUi(bool $third_party_settings_menu_ui_fully_validatable, array $expected_validation_errors): void {
     $this->enableModules(['menu_ui']);
