@@ -321,9 +321,9 @@ class SystemHooks {
   #[Hook('mail')]
   public function mail($key, &$message, $params): void {
     $token_service = \Drupal::token();
-    $context = $params['context'];
-    $subject = PlainTextOutput::renderFromHtml($token_service->replace($context['subject'], $context));
-    $body = $token_service->replace($context['message'], $context);
+    $context = $params['context'] ?? [];
+    $subject = PlainTextOutput::renderFromHtml($token_service->replace($context['subject'] ?? '', $context));
+    $body = $token_service->replace($context['message'] ?? '', $context);
     $message['subject'] .= str_replace(["\r", "\n"], '', $subject);
     $message['body'][] = $body;
   }
