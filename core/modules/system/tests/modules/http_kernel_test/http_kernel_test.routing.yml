@@ -25,4 +25,3 @@ http_kernel_test.content:
     _controller: '\Drupal\http_kernel_test\Controller\TestController::testPageContent'
   requirements:
     _access: 'TRUE'
-
