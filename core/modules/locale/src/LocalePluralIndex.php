@@ -13,8 +13,7 @@ class LocalePluralIndex implements PluralIndexInterface {
 
   use DependencySerializationTrait;
 
-  public function __construct(protected PluralFormulaInterface $pluralFormula, protected LanguageManagerInterface $languageManager) {
-  }
+  public function __construct(protected PluralFormulaInterface $pluralFormula, protected LanguageManagerInterface $languageManager) {}
 
   /**
    * {@inheritdoc}
