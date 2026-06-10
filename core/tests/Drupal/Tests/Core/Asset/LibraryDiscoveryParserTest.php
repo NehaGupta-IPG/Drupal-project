@@ -817,6 +817,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
     $this->assertCount(0, $library['dependencies']);
     // The location is determined by the libraries directory file finder.
     $this->assertEquals('sites/example.com/libraries/third_party_library/css/example.css', $library['css'][0]['data']);
+    $this->assertEquals(CSS_AGGREGATE_DEFAULT, $library['css'][0]['group']);
   }
 
   /**

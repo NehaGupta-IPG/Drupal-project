@@ -52,7 +52,11 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
           // together items that share the same 'group' value. The CSS optimizer
           // adds inline 'media' statements for everything except 'print', so
           // only vary groups based on that.
-          $group_keys = $item['preprocess'] ? [$item['type'], $item['group'], $item['media'] === 'print'] : FALSE;
+          $group_keys = $item['group'] == -1
+            ? FALSE
+            : ($item['preprocess']
+              ? [$item['type'], $item['group'], $item['media'] === 'print']
+              : FALSE);
           break;
 
         case 'external':

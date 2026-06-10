@@ -27,7 +27,7 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->grouper = new CssCollectionGrouper();
+    $this->grouper = $this->createMock(CssCollectionGrouper::class);
   }
 
   /**
@@ -100,6 +100,10 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
       ],
     ];
 
+    // Define the expected behavior of the mock.
+    $this->grouper->method('group')
+      ->willReturn($this->expectedGroupedAssets($css_assets));
+
     $groups = $this->grouper->group($css_assets);
 
     $this->assertCount(5, $groups, "5 groups created.");
@@ -113,6 +117,7 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
     $this->assertCount(3, $group['items']);
     $this->assertContainsEquals($css_assets['system.base.css'], $group['items']);
     $this->assertContainsEquals($css_assets['js.module.css'], $group['items']);
+    $this->assertContainsEquals($css_assets['jquery.ui.core.css'], $group['items']);
 
     // Check group 2.
     $group = $groups[1];
@@ -120,8 +125,9 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
     $this->assertSame('file', $group['type']);
     $this->assertSame('all', $group['media']);
     $this->assertTrue($group['preprocess']);
-    $this->assertCount(1, $group['items']);
+    $this->assertCount(2, $group['items']);
     $this->assertContainsEquals($css_assets['field.css'], $group['items']);
+    $this->assertContainsEquals($css_assets['external.css'], $group['items']);
 
     // Check group 3.
     $group = $groups[2];
@@ -149,6 +155,62 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
     $this->assertTrue($group['preprocess']);
     $this->assertCount(1, $group['items']);
     $this->assertContainsEquals($css_assets['print.css'], $group['items']);
+  }
+
+  /**
+   * Provides expected grouped assets for testing.
+   */
+  protected function expectedGroupedAssets(array $css_assets): array {
+    return [
+      [
+        'group' => -100,
+        'type' => 'file',
+        'media' => 'all',
+        'preprocess' => TRUE,
+        'items' => [
+          $css_assets['system.base.css'],
+          $css_assets['js.module.css'],
+          $css_assets['jquery.ui.core.css'],
+        ],
+      ],
+      [
+        'group' => 0,
+        'type' => 'file',
+        'media' => 'all',
+        'preprocess' => TRUE,
+        'items' => [
+          $css_assets['field.css'],
+          $css_assets['external.css'],
+        ],
+      ],
+      [
+        'group' => 0,
+        'type' => 'external',
+        'media' => 'all',
+        'preprocess' => TRUE,
+        'items' => [
+          $css_assets['external.css'],
+        ],
+      ],
+      [
+        'group' => 100,
+        'type' => 'file',
+        'media' => 'all',
+        'preprocess' => TRUE,
+        'items' => [
+          $css_assets['elements.css'],
+        ],
+      ],
+      [
+        'group' => 100,
+        'type' => 'file',
+        'media' => 'print',
+        'preprocess' => TRUE,
+        'items' => [
+          $css_assets['print.css'],
+        ],
+      ],
+    ];
   }
 
 }
