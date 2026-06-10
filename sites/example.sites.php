@@ -36,6 +36,17 @@
  * @link https://www.drupal.org/documentation/install online Drupal installation guide @endlink
  * for more information on setting up domains, subdomains, and subdirectories.
  *
+ * When using path-based aliases where sub-sites share the same domain,
+ * add 'url.site' to required_cache_contexts in each sub-site's services.yml
+ * to prevent cross-site render cache contamination:
+ * @code
+ * parameters:
+ *   renderer.config:
+ *     required_cache_contexts: ['languages:language_interface', 'theme',
+ *       'user.permissions', 'url.site']
+ * @endcode
+ * @see \Drupal\Core\Cache\Context\SiteCacheContext
+ *
  * The following examples look for a site configuration in sites/example.com:
  * @code
  * URL: http://dev.drupal.org
