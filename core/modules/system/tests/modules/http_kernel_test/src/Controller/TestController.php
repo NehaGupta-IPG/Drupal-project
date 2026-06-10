@@ -7,6 +7,7 @@ namespace Drupal\http_kernel_test\Controller;
 use Drupal\Core\DependencyInjection\AutowireTrait;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\DrupalKernelInterface;
+use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -33,6 +34,23 @@ class TestController implements ContainerInjectionInterface {
   public function subRequest(): Response {
     $sub_request = Request::create('/http-kernel-test-sub-sub-request');
     return $this->kernel->handle($sub_request, KernelInterface::SUB_REQUEST);
+  }
+
+  /**
+   * Returns a test page.
+   */
+  public function testPageContent(): array {
+    $build = [];
+
+    $build['test_message'] = ['#markup' => 'This is a test page.'];
+
+    $build['link'] = [
+      '#type' => 'link',
+      '#title' => 'Query link',
+      '#url' => Url::fromUri('internal:?query=cake'),
+    ];
+
+    return $build;
   }
 
 }
