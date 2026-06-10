@@ -213,4 +213,71 @@ class FormErrorHandlerTest extends UnitTestCase {
     $this->assertSame('element is invisible', $this->testForm['test6']['#errors']);
   }
 
+  /**
+   * Tests that an error on a field widget links to the field wrapper.
+   *
+   * A field widget is themed with 'field_multiple_value_form' and does not
+   * render its own #id, so the error link must point to the field wrapper
+   * element (the widget's parent), whose #id is always rendered.
+   *
+   * @legacy-covers ::displayErrorMessages
+   * @legacy-covers ::getErrorElementId
+   */
+  public function testErrorMessageLinkUsesFieldWrapper(): void {
+    $form = [
+      '#parents' => [],
+      '#array_parents' => [],
+    ];
+    // Mimic the structure of a field widget: a wrapper container whose 'widget'
+    // child is the actual widget. The widget's #id is not rendered, but the
+    // wrapper's #id is, so the link must target the wrapper.
+    $form['field_test'] = [
+      '#type' => 'container',
+      '#parents' => ['field_test_wrapper'],
+      '#array_parents' => ['field_test'],
+      '#id' => 'edit-field-test-wrapper',
+      'widget' => [
+        '#theme' => 'field_multiple_value_form',
+        '#field_name' => 'field_test',
+        '#title' => 'Field test',
+        '#parents' => ['field_test'],
+        '#array_parents' => ['field_test', 'widget'],
+        '#id' => 'edit-field-test',
+        0 => [
+          '#parents' => ['field_test', 0],
+          '#array_parents' => ['field_test', 'widget', 0],
+          '#id' => 'edit-field-test-0',
+          'value' => [
+            '#type' => 'textfield',
+            '#input' => TRUE,
+            '#parents' => ['field_test', 0, 'value'],
+            '#array_parents' => ['field_test', 'widget', 0, 'value'],
+            '#id' => 'edit-field-test-0-value',
+          ],
+        ],
+      ],
+    ];
+
+    $fragments = [];
+    $this->renderer->expects($this->once())
+      ->method('renderInIsolation')
+      ->willReturnCallback(function ($render_array) use (&$fragments) {
+        foreach ($render_array[1]['#items'] as $item) {
+          $fragments[] = $item['#url']->getOption('fragment');
+        }
+        return 'rendered';
+      });
+
+    $this->messenger->expects($this->once())
+      ->method('addError');
+
+    $form_state = new FormState();
+    $form_state->setErrorByName('field_test', 'invalid');
+    $this->formErrorHandler->handleFormErrors($form, $form_state);
+
+    // The link targets the field wrapper, not the widget whose #id is never
+    // rendered.
+    $this->assertSame(['edit-field-test-wrapper'], $fragments);
+  }
+
 }
