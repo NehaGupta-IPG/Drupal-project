@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\StringTranslation;
 
+// cspell:ignore bajt bajty bajtów
 /**
  * Interface for providing the plural index.
  *
