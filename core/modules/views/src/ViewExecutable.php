@@ -2339,6 +2339,30 @@ class ViewExecutable {
   }
 
   /**
+   * Gets the configuration of a handler instance on a given display.
+   *
+   * @param string $display_id
+   *   The machine name of the display.
+   * @param string $type
+   *   The type of handler to retrieve.
+   * @param string $id
+   *   The ID of the handler to retrieve.
+   *
+   * @return array|null
+   *   Either the handler instance's configuration, or NULL if the handler is
+   *   not used on the display.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+   *   self::getHandlerConfiguration() instead.
+   *
+   * @see https://www.drupal.org/node/3034692
+   */
+  public function getHandler($display_id, $type, $id) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use self::getHandlerConfiguration() instead. See https://www.drupal.org/node/3034692', E_USER_DEPRECATED);
+    return $this->getHandlerConfiguration($display_id, $type, $id);
+  }
+
+  /**
    * Sets the configuration of a handler instance on a given display.
    *
    * @param string $display_id

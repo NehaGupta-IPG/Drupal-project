@@ -24,6 +24,7 @@ use Drupal\views\ViewExecutableFactory;
 use Drupal\views\Views;
 use Drupal\views_test_data\Plugin\views\display\DisplayTest;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -430,6 +431,18 @@ class ViewExecutableTest extends ViewsKernelTestBase {
 
     // getHandlers() shouldn't change the active display.
     $this->assertEquals('page_1', $view->current_display, "The display shouldn't change after getHandlers()");
+  }
+
+  /**
+   * Tests the ViewExecutable::getHandler() deprecation.
+   */
+  #[IgnoreDeprecations]
+  public function testGetHandlerDeprecation(): void {
+    $view = Views::getView('test_executable_displays');
+    $view->setHandler('page_1', 'field', 'id', ['table' => 'views_test_data', 'field' => 'id']);
+
+    $this->expectUserDeprecationMessage('Drupal\views\ViewExecutable::getHandler() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use self::getHandlerConfiguration() instead. See https://www.drupal.org/node/3034692');
+    $this->assertSame($view->getHandlerConfiguration('page_1', 'field', 'id'), $view->getHandler('page_1', 'field', 'id'));
   }
 
   /**
