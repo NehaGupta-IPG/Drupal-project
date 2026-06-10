@@ -28,6 +28,7 @@ class KernelTestHttpRequestTest extends KernelTestBase {
   protected static $modules = [
     'system',
     'system_test',
+    'http_kernel_test',
     'test_page_test',
   ];
 
@@ -42,9 +43,19 @@ class KernelTestHttpRequestTest extends KernelTestBase {
    * Tests making a request.
    */
   public function testRequest(): void {
-    $this->drupalGet('/system-test/main-content-handling');
+    $this->drupalGet('/http-kernel-test-content');
     $this->assertEquals(Response::HTTP_OK, $this->getSession()->getStatusCode());
-    $this->assertSession()->pageTextContains('Content to test main content fallback');
+    $this->assertSession()->pageTextContains('This is a test page');
+
+    // Test reloading the current page.
+    $this->drupalGet($this->getUrl());
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('This is a test page');
+
+    // Test clicking a link with a relative query.
+    $this->clickLink('Query link');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('This is a test page');
 
     // Test drupalGet() with Url options.
     $this->drupalGet('/system-test/set-header', [
