@@ -151,4 +151,51 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
     $this->assertContainsEquals($css_assets['print.css'], $group['items']);
   }
 
+  /**
+   * Tests that media types are preserved for assets that cannot be aggregated.
+   */
+  public function testGrouperMediaPreserved(): void {
+    $css_assets = [
+      'external_screen.css' => [
+        'group' => 0,
+        'type' => 'external',
+        'weight' => 0.001,
+        'media' => 'screen',
+        'preprocess' => TRUE,
+        'data' => 'http://example.com/external_screen.css',
+        'basename' => 'external_screen.css',
+      ],
+      'unpreprocessed_screen.css' => [
+        'group' => 0,
+        'type' => 'file',
+        'weight' => 0.002,
+        'media' => 'screen',
+        'preprocess' => FALSE,
+        'data' => 'core/themes/example/css/screen.css',
+        'basename' => 'unpreprocessed_screen.css',
+      ],
+      'preprocessed_screen.css' => [
+        'group' => 0,
+        'type' => 'file',
+        'weight' => 0.003,
+        'media' => 'screen',
+        'preprocess' => TRUE,
+        'data' => 'core/themes/example/css/screen2.css',
+        'basename' => 'preprocessed_screen.css',
+      ],
+    ];
+
+    $groups = $this->grouper->group($css_assets);
+
+    $this->assertCount(3, $groups);
+    // External assets are rendered as individual link elements whose contents
+    // cannot be rewritten, so the media type must be preserved.
+    $this->assertSame('screen', $groups[0]['media']);
+    // Files with preprocessing disabled are also rendered individually.
+    $this->assertSame('screen', $groups[1]['media']);
+    // Preprocessed files have their media query moved into the aggregate's
+    // contents by CssOptimizer, so the group uses 'all'.
+    $this->assertSame('all', $groups[2]['media']);
+  }
+
 }

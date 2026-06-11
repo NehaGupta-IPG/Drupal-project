@@ -14,9 +14,11 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
    * 'file' type are groupable if their 'preprocess' flag is TRUE, and items of
    * the 'external' type are never groupable. Items with a media type of 'print'
    * will be put into their own group so that they are not loaded on regular
-   * page requests. Items with a media type of 'all' or 'screen' will be grouped
+   * page requests. Groupable items with a media type of 'all' or 'screen' will be grouped
    * together (with media queries where necessary), to minimize the number of
-   * separate aggregates.
+   * separate aggregates. Items that cannot be grouped (external files and
+   * files that are not preprocessed) are rendered as individual link elements
+   * and keep their declared media type.
    *
    * Also ensures that the process of grouping items does not change their
    * relative order. This requirement may result in multiple groups for the same
@@ -70,7 +72,13 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
         // properties are unique to the item and should not be carried over to
         // the group.
         $groups[$i] = $item;
-        if ($item['media'] !== 'print') {
+        // Groups that can be aggregated have their media query moved into the
+        // aggregate's contents by CssOptimizer, so the group itself can use
+        // 'media: all' to minimize the number of aggregates. Assets that
+        // cannot be aggregated (external files and files with preprocessing
+        // disabled) are rendered as individual link elements with no chance
+        // to rewrite their contents, so their media type must be preserved.
+        if ($group_keys !== FALSE && $item['media'] !== 'print') {
           $groups[$i]['media'] = 'all';
         }
         unset($groups[$i]['data'], $groups[$i]['weight'], $groups[$i]['basename']);
