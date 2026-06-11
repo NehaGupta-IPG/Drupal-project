@@ -14,11 +14,11 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
    * 'file' type are groupable if their 'preprocess' flag is TRUE, and items of
    * the 'external' type are never groupable. Items with a media type of 'print'
    * will be put into their own group so that they are not loaded on regular
-   * page requests. Groupable items with a media type of 'all' or 'screen' will be grouped
-   * together (with media queries where necessary), to minimize the number of
-   * separate aggregates. Items that cannot be grouped (external files and
-   * files that are not preprocessed) are rendered as individual link elements
-   * and keep their declared media type.
+   * page requests. Groupable items with a media type of 'all' or 'screen' will
+   * be grouped together (with media queries where necessary), to minimize the
+   * number of separate aggregates. Items that cannot be grouped (external
+   * files and files that are not preprocessed) are rendered as individual link
+   * elements and keep their declared media type.
    *
    * Also ensures that the process of grouping items does not change their
    * relative order. This requirement may result in multiple groups for the same
@@ -41,12 +41,11 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
       // If the item can't be grouped with other items, set $group_keys to
       // FALSE. We put items into a group that can be aggregated together:
       // whether they will be aggregated is up to the _drupal_css_aggregate()
-      // function or an
-      // override of that function specified in hook_css_alter(), but regardless
-      // of the details of that function, a group represents items that can be
-      // aggregated. Since a group may be rendered with a single HTML tag, all
-      // items in the group must share the same information that would need to
-      // be part of that HTML tag.
+      // function or an override of that function specified in hook_css_alter(),
+      // but regardless of the details of that function, a group represents
+      // items that can be aggregated. Since a group may be rendered with a
+      // single HTML tag, all items in the group must share the same information
+      // that would need to be part of that HTML tag.
       switch ($item['type']) {
         case 'file':
           // Group file items if their 'preprocess' flag is TRUE.
