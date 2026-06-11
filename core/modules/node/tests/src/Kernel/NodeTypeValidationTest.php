@@ -85,10 +85,6 @@ class NodeTypeValidationTest extends ConfigEntityValidationTestBase {
   }
 
   /**
-<<<<<<< HEAD
-   * @testWith [true, {"third_party_settings.menu_ui": ["'parent' is a required key.", "'link_enabled' is a required key."]}]
-   *           [false, {}]
-=======
    * Tests third party settings menu UI.
    */
   #[TestWith([TRUE, ["third_party_settings.menu_ui" => ["'parent' is a required key.", "'link_enabled' is a required key."]]])]
