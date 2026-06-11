@@ -165,14 +165,14 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
         'data' => 'http://example.com/external_screen.css',
         'basename' => 'external_screen.css',
       ],
-      'unpreprocessed_screen.css' => [
+      'non_preprocessed_screen.css' => [
         'group' => 0,
         'type' => 'file',
         'weight' => 0.002,
         'media' => 'screen',
         'preprocess' => FALSE,
         'data' => 'core/themes/example/css/screen.css',
-        'basename' => 'unpreprocessed_screen.css',
+        'basename' => 'non_preprocessed_screen.css',
       ],
       'preprocessed_screen.css' => [
         'group' => 0,
