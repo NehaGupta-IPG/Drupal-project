@@ -28,14 +28,13 @@ class ManyToOneHelperTest extends UnitTestCase {
    *   simulate a handler whose table is not reached through a relationship and
    *   therefore has no join definition.
    *
-   * @return \Drupal\views\Plugin\views\filter\ManyToOne|\PHPUnit\Framework\MockObject\MockObject
-   *   The mocked handler.
+   * @return \Drupal\views\Plugin\views\filter\ManyToOne|\PHPUnit\Framework\MockObject\Stub
+   *   The handler test stub.
    */
   protected function createHandler($join) {
-    $handler = $this->getMockBuilder(ManyToOne::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['getJoin'])
-      ->getMock();
+    // A stub (not a mock): the helper only reads the handler's public
+    // properties and its getJoin() return value, so no call expectations apply.
+    $handler = $this->createStub(ManyToOne::class);
     $handler->method('getJoin')->willReturn($join);
 
     $handler->table = 'test_table';
@@ -48,9 +47,8 @@ class ManyToOneHelperTest extends UnitTestCase {
     $handler->definition = ['numeric' => TRUE];
     $handler->tableAlias = NULL;
 
-    $handler->view = $this->getMockBuilder(ViewExecutable::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+    // A stub: only used to carry the many_to_one_tables property.
+    $handler->view = $this->createStub(ViewExecutable::class);
     $handler->view->many_to_one_tables = [];
 
     return $handler;
@@ -87,9 +85,8 @@ class ManyToOneHelperTest extends UnitTestCase {
    * @legacy-covers ::ensureMyTable
    */
   public function testEnsureMyTableFirstFilterAddsInnerJoin(): void {
-    $join = $this->getMockBuilder(JoinPluginBase::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+    // A stub: only its public 'type' property is read and written.
+    $join = $this->createStub(JoinPluginBase::class);
 
     $handler = $this->createHandler($join);
     $handler->query = $this->createMock(Sql::class);
