@@ -60,6 +60,10 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
           // Do not group external items.
           $group_keys = FALSE;
           break;
+
+        default:
+          // Do not group items of unknown types.
+          $group_keys = FALSE;
       }
 
       // If the group keys don't match the most recent group we're working with,
