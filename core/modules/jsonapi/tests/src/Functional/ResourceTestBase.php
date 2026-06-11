@@ -2969,7 +2969,12 @@ abstract class ResourceTestBase extends BrowserTestBase {
     }
 
     // Ensure that targeting a revision does not bypass access.
-    $result = $entity->access('view all revisions', $this->account, TRUE);
+    // For entities with view access control, the server uses the 'view' access
+    // reason in the 403 response. For entities without view access control
+    // ($noViewAccessControl = TRUE), use 'view all revisions' instead.
+    $result = static::$noViewAccessControl
+      ? $entity->access('view all revisions', $this->account, TRUE)
+      : $entity->access('view', $this->account, TRUE);
     $actual_response = $this->request('GET', $original_revision_id_url, $request_options);
     $expected_cacheability = $this->getExpectedUnauthorizedAccessCacheability();
     $detail = 'The current user is not allowed to GET the selected resource. The user does not have access to the requested version.';
