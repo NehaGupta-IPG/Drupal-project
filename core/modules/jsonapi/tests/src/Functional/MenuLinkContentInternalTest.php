@@ -73,6 +73,7 @@ class MenuLinkContentInternalTest extends MenuLinkContentTest {
         'type' => 'menu_link_content--menu_link_content',
         'links' => [
           'self' => ['href' => $self_url->toString()],
+          'working-copy' => ['href' => (clone $base_url)->setOption('query', ['resourceVersion' => 'rel:working-copy'])->toString()],
         ],
         'attributes' => [
           'bundle' => 'menu_link_content',
