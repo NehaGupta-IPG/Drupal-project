@@ -65,6 +65,7 @@ abstract class MenuLinkContentResourceTestBase extends EntityResourceTestBase {
       'description' => 'Llama Gabilondo',
       'link' => [
         'uri' => 'https://nl.wikipedia.org/wiki/Llama',
+        'resolvable_uri' => 'https://nl.wikipedia.org/wiki/Llama#a-fragment',
         'options' => [
           'fragment' => 'a-fragment',
           'attributes' => [

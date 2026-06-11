@@ -83,6 +83,7 @@ class MenuLinkContentTest extends ResourceTestBase {
       'title' => 'Llama Gabilondo',
       'description' => 'Llama Gabilondo',
       'link' => 'https://nl.wikipedia.org/wiki/Llama',
+      'resolvable_uri' => 'https://nl.wikipedia.org/wiki/Llama',
       'weight' => 0,
       'menu_name' => 'main',
     ]);
