@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
-use Drupal\Core\Cache\Cache;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use PHPUnit\Framework\Attributes\Group;
@@ -29,7 +27,7 @@ class MenuLinkContentInternalTest extends MenuLinkContentTest {
    * {@inheritdoc}
    */
   protected function setUpAuthorization($method): void {
-    $this->grantPermissionsToTestedRole(['administer menu']);
+    $this->grantPermissionsToTestedRole(['administer menu', 'link to any page']);
   }
 
   /**
@@ -62,7 +60,7 @@ class MenuLinkContentInternalTest extends MenuLinkContentTest {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => ['href' => 'http://jsonapi.org/format/1.1/'],
+            'self' => ['href' => 'https://jsonapi.org/format/1.1/'],
           ],
         ],
         'version' => '1.1',
@@ -80,6 +78,7 @@ class MenuLinkContentInternalTest extends MenuLinkContentTest {
           'bundle' => 'menu_link_content',
           'link' => [
             'uri' => 'entity:user/1',
+            'resolvable_uri' => $this->entity->get('link')->first()->get('resolvable_uri')->getValue(),
             'title' => NULL,
             'options' => [],
           ],
@@ -126,28 +125,6 @@ class MenuLinkContentInternalTest extends MenuLinkContentTest {
     // @see \Drupal\Tests\jsonapi\Functional\ResourceTestBase::doTestRelationshipMutation()
     $this->grantPermissionsToTestedRole(['access user profiles']);
     parent::testRelationships();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getExpectedCacheTags(?array $sparse_fieldset = NULL) {
-    $tags = parent::getExpectedCacheTags($sparse_fieldset);
-    if ($sparse_fieldset === NULL || in_array('link', $sparse_fieldset)) {
-      $tags = Cache::mergeTags($tags, ['user:1']);
-    }
-    return $tags;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static function getExpectedCollectionCacheability(AccountInterface $account, array $collection, ?array $sparse_fieldset = NULL, $filtered = FALSE) {
-    $cacheability = parent::getExpectedCollectionCacheability($account, $collection, $sparse_fieldset, $filtered);
-    if ($account->hasPermission('access user profiles')) {
-      $cacheability->addCacheTags(['user:1']);
-    }
-    return $cacheability;
   }
 
   /**
