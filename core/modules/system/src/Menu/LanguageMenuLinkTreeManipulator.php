@@ -11,6 +11,7 @@ use Drupal\Core\Menu\InaccessibleMenuLink;
 use Drupal\Core\Menu\MenuLinkTranslationInterface;
 use Drupal\Core\Menu\MenuLinkTreeContextualManipulatorInterface;
 use Drupal\Core\Menu\OnlyShowTranslatedMenuLinksInterface;
+use Drupal\menu_link_content\Plugin\Menu\MenuLinkContent;
 
 /**
  * Provides a menu link language manipulator.
@@ -38,7 +39,7 @@ class LanguageMenuLinkTreeManipulator implements MenuLinkTreeContextualManipulat
         continue;
       }
 
-      if ($link->link->isTranslatable() && !$link->link->hasTranslation($current_language)) {
+      if (($link->link->isTranslatable() || ($link->link instanceof MenuLinkContent && $link->link->getEntity()->language()->isLocked())) && !$link->link->hasTranslation($current_language)) {
         $access = new AccessResultForbidden();
 
         // Instead of removing the menu link, mark it inaccessible so that its
