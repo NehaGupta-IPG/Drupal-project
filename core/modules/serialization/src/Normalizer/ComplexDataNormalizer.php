@@ -44,9 +44,7 @@ class ComplexDataNormalizer extends NormalizerBase {
     }
     /** @var \Drupal\Core\TypedData\TypedDataInterface $property */
     foreach ($object as $name => $property) {
-      if (!isset($context['sparse_properties']) || in_array($name, $context['sparse_properties'])) {
-        $attributes[$name] = $this->serializer->normalize($property, $format, $context);
-      }
+      $attributes[$name] = $this->serializer->normalize($property, $format, $context);
     }
     return $attributes;
   }
