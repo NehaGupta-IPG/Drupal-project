@@ -7,12 +7,14 @@
 
 use Drupal\Component\Utility\Unicode;
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Extension\Dependency;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Extension\InstallRequirementsInterface;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Installer\InstallerKernel;
+use Drupal\Core\Recipe\Recipe;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
@@ -548,6 +550,86 @@ function drupal_requirements_url(RequirementSeverity $severity): string {
  */
 function drupal_check_profile($profile): array {
   $info = install_profile_info($profile);
+
+  // Collect requirement testing results.
+  $requirements = drupal_check_modules($info['install']);
+
+  // Add the profile requirements.
+  $function = $profile . '_requirements';
+  if (function_exists($function)) {
+    $requirements = array_merge($requirements, $function('install'));
+  }
+
+  $extension = \Drupal::service('extension.list.profile')->get($profile);
+  $requirements = array_merge($requirements, install_check_class_requirements($extension));
+
+  return $requirements;
+}
+
+/**
+ * Checks config requirements.
+ *
+ * @param string $config
+ *   Config install path.
+ *
+ * @return array
+ *   Array of config requirements.
+ */
+function drupal_check_config($config): array {
+  $sync = new FileStorage($config);
+  $core_extension = $sync->read('core.extension');
+  if (!empty($core_extension['module']) && is_array($core_extension['module'])) {
+    $modules = array_keys($core_extension['module']);
+  }
+
+  // Collect requirement testing results.
+  $requirements = drupal_check_modules($modules);
+
+  return $requirements;
+}
+
+/**
+ * Checks a recipe's requirements.
+ *
+ * @param string $recipe
+ *   Directory of recipe to check.
+ *
+ * @return array
+ *   Array of the recipe's requirements.
+ */
+function drupal_check_recipe($recipe): array {
+  try {
+    $modules = drupal_recipe_modules(Recipe::createFromDirectory($recipe));
+
+    // Collect requirement testing results.
+    $requirements = drupal_check_modules($modules);
+
+    return $requirements;
+  }
+  catch (\Throwable) {
+    // We don't check for invalid recipes here.
+    return [];
+  }
+}
+
+function drupal_recipe_modules(Recipe $recipe): array {
+  $modules = $recipe->install->modules;
+  foreach ($recipe->recipes->recipes as $sub_recipe) {
+    $modules = array_merge($modules, drupal_recipe_modules($sub_recipe));
+  }
+  return array_unique($modules);
+}
+
+/**
+ * Checks installation requirements for a list of modules.
+ *
+ * @param string[] $modules
+ *   List of modules to check.
+ *
+ * @return array
+ *   Array of the installation profile's requirements.
+ */
+function drupal_check_modules(array $modules): array {
   // Collect requirement testing results.
   $requirements = [];
   // Performs an ExtensionDiscovery scan as the system module is unavailable and
@@ -556,7 +638,7 @@ function drupal_check_profile($profile): array {
   $drupal_root = \Drupal::root();
   $module_list = (new ExtensionDiscovery($drupal_root))->scan('module');
 
-  foreach ($info['install'] as $module) {
+  foreach ($modules as $module) {
     // If the module is in the module list we know it exists and we can continue
     // including and registering it.
     // @see \Drupal\Core\Extension\ExtensionDiscovery::scanDirectory()
@@ -576,15 +658,6 @@ function drupal_check_profile($profile): array {
       $requirements = array_merge($requirements, install_check_class_requirements($module_list[$module]));
     }
   }
-
-  // Add the profile requirements.
-  $function = $profile . '_requirements';
-  if (function_exists($function)) {
-    $requirements = array_merge($requirements, $function('install'));
-  }
-
-  $extension = \Drupal::service('extension.list.profile')->get($profile);
-  $requirements = array_merge($requirements, install_check_class_requirements($extension));
 
   return $requirements;
 }
