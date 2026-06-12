@@ -7,6 +7,7 @@ namespace Drupal\Core\Command;
 use Composer\Autoload\ClassLoader;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Site\Settings;
+use Drupal\TestTools\TestRunner\Command\TestListCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\HelpCommand;
@@ -59,6 +60,7 @@ class DrupalApplication extends Application {
     $default_commands[] = new CacheRebuildCommand($this->classloader);
     $default_commands[] = new ServerCommand($this->classloader);
     $default_commands[] = new GenerateTheme();
+    $default_commands[] = new TestListCommand();
 
     return $default_commands;
   }
