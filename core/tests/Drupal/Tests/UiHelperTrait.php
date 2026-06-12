@@ -170,7 +170,25 @@ trait UiHelperTrait {
       $storage = \Drupal::entityTypeManager()->getStorage('user');
       /** @var \Drupal\user\UserInterface $accountUnchanged */
       $accountUnchanged = $storage->loadUnchanged($account->id());
-      $login = user_pass_reset_url($accountUnchanged) . '/login?destination=user/' . $account->id();
+      // The code below will be replaced with a service call in 11.4.x.
+      // See https://www.drupal.org/project/drupal/issues/3581056.
+      $timestamp = \Drupal::time()->getCurrentTime();
+      $langcode = $account->getPreferredLangcode();
+      $login = Url::fromRoute(
+        'user.reset.login',
+        [
+          'uid' => $accountUnchanged->id(),
+          'timestamp' => $timestamp,
+          'hash' => user_pass_rehash($accountUnchanged, $timestamp),
+        ],
+        [
+          'absolute' => TRUE,
+          'language' => \Drupal::languageManager()->getLanguage($langcode),
+          'query' => [
+            'destination' => 'user/' . $account->id(),
+          ],
+        ],
+      )->toString();
       $this->drupalGet($login);
     }
     else {
