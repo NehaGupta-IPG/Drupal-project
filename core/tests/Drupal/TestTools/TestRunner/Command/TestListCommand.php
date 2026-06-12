@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\TestTools\TestRunner\Command;
 
 use Drupal\Core\Test\PhpUnitTestDiscovery;
+use Drupal\TestTools\TestRunner\PopulateClassLoader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -31,6 +32,7 @@ class TestListCommand extends TestCommandBase {
    * {@inheritdoc}
    */
   protected function configure(): void {
+    parent::configure();
     $this
       ->addTestFilteringOptions()
       ->addOption(
@@ -70,6 +72,8 @@ class TestListCommand extends TestCommandBase {
       $io->error('PHPUnit testing framework is required. Run "composer install" to ensure it is present.');
       return self::EXIT_FAILURE;
     }
+
+    PopulateClassLoader::execute($this->classLoader, $this->appRoot);
 
     $testDiscovery = PhpUnitTestDiscovery::instance()
       ->setConfigurationFilePath($this->getPhpunitConfigurationPath());

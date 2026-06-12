@@ -60,7 +60,9 @@ class DrupalApplication extends Application {
     $default_commands[] = new CacheRebuildCommand($this->classloader);
     $default_commands[] = new ServerCommand($this->classloader);
     $default_commands[] = new GenerateTheme();
-    $default_commands[] = new TestListCommand();
+
+    $this->classloader->addPsr4('Drupal\\TestTools\\', __DIR__ . '/../../../../tests/Drupal/TestTools');
+    $default_commands[] = new TestListCommand($this->classloader);
 
     return $default_commands;
   }

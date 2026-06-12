@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\TestTools\TestRunner\Command;
 
+use Composer\Autoload\ClassLoader;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -30,12 +31,24 @@ abstract class TestCommandBase extends Command {
    */
   protected string $appRoot;
 
-  /**
-   * Constructor.
-   */
-  public function __construct() {
+  public function __construct(
+    protected readonly ClassLoader $classLoader,
+  ) {
     parent::__construct();
-    $this->appRoot = \Drupal::root();
+    $this->appRoot = dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__)), 2);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function configure(): void {
+    $this
+      ->addOption(
+        'phpunit-configuration',
+        NULL,
+        InputOption::VALUE_REQUIRED,
+        'Path to PHPUnit configuration file.'
+      );
   }
 
   /**
@@ -136,12 +149,6 @@ abstract class TestCommandBase extends Command {
         NULL,
         InputOption::VALUE_NONE,
         'Keep the test results table.'
-      )
-      ->addOption(
-        'phpunit-configuration',
-        NULL,
-        InputOption::VALUE_REQUIRED,
-        'Path to PHPUnit configuration file.'
       )
       ->addOption(
         'verbose',
