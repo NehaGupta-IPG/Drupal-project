@@ -441,7 +441,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
     $view = Views::getView('test_executable_displays');
     $view->setHandler('page_1', 'field', 'id', ['table' => 'views_test_data', 'field' => 'id']);
 
-    $this->expectUserDeprecationMessage('Drupal\views\ViewExecutable::getHandler() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use self::getHandlerConfiguration() instead. See https://www.drupal.org/node/3034692');
+    $this->expectUserDeprecationMessage('Drupal\views\ViewExecutable::getHandler() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use self::getHandlerConfiguration() instead. See https://www.drupal.org/node/3598241');
     $this->assertSame($view->getHandlerConfiguration('page_1', 'field', 'id'), $view->getHandler('page_1', 'field', 'id'));
   }
 

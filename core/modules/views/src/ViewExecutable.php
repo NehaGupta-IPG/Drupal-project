@@ -2355,10 +2355,10 @@ class ViewExecutable {
    * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
    *   self::getHandlerConfiguration() instead.
    *
-   * @see https://www.drupal.org/node/3034692
+   * @see https://www.drupal.org/node/3598241
    */
   public function getHandler($display_id, $type, $id) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use self::getHandlerConfiguration() instead. See https://www.drupal.org/node/3034692', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use self::getHandlerConfiguration() instead. See https://www.drupal.org/node/3598241', E_USER_DEPRECATED);
     return $this->getHandlerConfiguration($display_id, $type, $id);
   }
 
