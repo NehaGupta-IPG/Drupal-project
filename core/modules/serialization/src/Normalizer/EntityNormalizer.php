@@ -7,6 +7,8 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityTypeRepositoryInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\TypedData\ComplexDataInterface;
+use Drupal\Core\TypedData\TypedDataInternalPropertiesHelper;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
@@ -30,6 +32,30 @@ class EntityNormalizer extends ComplexDataNormalizer implements DenormalizerInte
     $this->entityTypeManager = $entity_type_manager;
     $this->entityTypeRepository = $entity_type_repository;
     $this->entityFieldManager = $entity_field_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function normalize($object, $format = NULL, array $context = []): array {
+    $attributes = [];
+    // $object will not always match getSupportedTypes().
+    // @see \Drupal\serialization\Normalizer\EntityNormalizer
+    // Other normalizers that extend this class may only provide $object that
+    // implements \Traversable.
+    if ($object instanceof ComplexDataInterface) {
+      // If there are no properties to normalize, just normalize the value.
+      $object = !empty($object->getProperties(TRUE))
+        ? TypedDataInternalPropertiesHelper::getNonInternalProperties($object)
+        : $object->getValue();
+    }
+    /** @var \Drupal\Core\TypedData\TypedDataInterface $property */
+    foreach ($object as $name => $property) {
+      if (empty($context['sparse_fieldset']) || in_array($name, $context['sparse_fieldset'])) {
+        $attributes[$name] = $this->serializer->normalize($property, $format, $context);
+      }
+    }
+    return $attributes;
   }
 
   /**
