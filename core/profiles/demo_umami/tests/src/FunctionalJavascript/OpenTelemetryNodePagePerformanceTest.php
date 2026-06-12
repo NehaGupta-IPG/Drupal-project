@@ -55,11 +55,11 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
     $this->assertSession()->pageTextContains('quiche');
 
     $expected = [
-      'QueryCount' => 195,
-      'CacheGetCount' => 215,
-      'CacheSetCount' => 219,
+      'QueryCount' => 201,
+      'CacheGetCount' => 224,
+      'CacheSetCount' => 226,
       'CacheDeleteCount' => 0,
-      'CacheTagLookupQueryCount' => 23,
+      'CacheTagLookupQueryCount' => 24,
       'CacheTagInvalidationCount' => 0,
       'ScriptCount' => 1,
       'ScriptBytes' => 12000,
@@ -118,12 +118,12 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
     $this->assertSession()->pageTextContains('quiche');
 
     $expected = [
-      'QueryCount' => 70,
-      'CacheGetCount' => 162,
-      'CacheSetCount' => 58,
+      'QueryCount' => 71,
+      'CacheGetCount' => 168,
+      'CacheSetCount' => 59,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 18,
+      'CacheTagLookupQueryCount' => 19,
       'ScriptCount' => 1,
       'ScriptBytes' => 12000,
       'StylesheetCount' => 2,
@@ -216,22 +216,23 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 56,
-      'CacheGetCount' => 158,
+      'CacheGetCount' => 163,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 34,
         'bootstrap' => 12,
         'discovery' => 67,
-        'data' => 7,
+        'data' => 6,
         'entity' => 21,
         'dynamic_page_cache' => 1,
-        'render' => 12,
+        'routes' => 5,
+        'render' => 13,
         'default' => 3,
       ],
       'CacheSetCount' => 41,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 18,
+      'CacheTagLookupQueryCount' => 19,
       'CacheTagGroupedLookups' => [
         [
           'entity_types',
@@ -275,9 +276,11 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
           'taxonomy_term:31',
         ],
         [
+          'config:block_list',
+        ],
+        [
           'block_content:1',
           'block_content:2',
-          'config:block_list',
           'config:configurable_language_list',
         ],
         ['config:system.menu.footer'],
