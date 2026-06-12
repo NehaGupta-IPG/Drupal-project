@@ -9,7 +9,7 @@ use Drupal\Core\StreamWrapper\LocalStream;
 /**
  * A non-public, non-private local stream wrapper for image style access tests.
  *
- * Mimics a contributed stream wrapper (e.g. s3fs, flysystem) so tests can
+ * Mimics a contributed stream wrapper (e.g. s3fs) so tests can
  * cover the case where image style derivatives are served from a scheme
  * that is neither core 'public' nor core 'private'.
  */
