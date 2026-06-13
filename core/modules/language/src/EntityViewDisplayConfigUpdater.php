@@ -48,7 +48,7 @@ class EntityViewDisplayConfigUpdater {
     }
 
     $langcode['label'] = 'above';
-      // Set to show it as plain text.
+    // Set to show it as plain text.
     $langcode['settings'] = [
       'link_to_entity' => FALSE,
       'native_language' => FALSE,
