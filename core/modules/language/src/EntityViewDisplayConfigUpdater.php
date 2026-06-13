@@ -43,21 +43,16 @@ class EntityViewDisplayConfigUpdater {
     }
 
     $langcode = $entityViewDisplay->getComponent('langcode');
-    if ($entityViewDisplay->getComponent('langcode') === NULL) {
+    if ($langcode === NULL) {
       return FALSE;
     }
 
-    if (empty($langcode['label'])) {
-      $langcode['label'] = 'above';
-    }
-
-    if (empty($langcode['settings'])) {
+    $langcode['label'] = 'above';
       // Set to show it as plain text.
-      $langcode['settings'] = [
-        'link_to_entity' => FALSE,
-        'native_language' => FALSE,
-      ];
-    }
+    $langcode['settings'] = [
+      'link_to_entity' => FALSE,
+      'native_language' => FALSE,
+    ];
 
     $entityViewDisplay->setComponent('langcode', $langcode);
     return TRUE;
