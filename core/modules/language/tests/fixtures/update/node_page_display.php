@@ -4,7 +4,7 @@
  * @file
  * Additional updates to database for testing the upgrade path.
  *
- * Contains database additions to drupal-10.3.0.bare.standard.php.gz for testing
+ * Contains database additions to drupal-11.3.0.bare.standard.php.gz for testing
  * the upgrade path of https://www.drupal.org/node/2637808.
  */
 
