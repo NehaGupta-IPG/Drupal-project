@@ -72,21 +72,18 @@ class ConstraintManager extends DefaultPluginManager {
    *
    * @param string $name
    *   The name or plugin id of the constraint.
-   * @param mixed $options
+   * @param array<string, mixed>|null $options
    *   The options to pass to the constraint class. Required and supported
    *   options depend on the constraint class.
    *
-   * @return \Symfony\Component\Validator\Constraint
+   * @return \Symfony\Component\Validator\Constraint|object|\Drupal\Core\Plugin\ContainerFactoryPluginInterface
    *   A validation constraint plugin.
    */
-  public function create($name, $options) {
-    if (!is_array($options)) {
-      // Plugins need an array as configuration, so make sure we have one.
-      // The constraint classes support passing the options as part of the
-      // 'value' key also.
-      $options = isset($options) ? ['value' => $options] : [];
+  public function create(string $name, ?array $options) {
+    if ($options && array_is_list($options)) {
+      throw new \InvalidArgumentException('$options must be an associative array or NULL.');
     }
-    return $this->createInstance($name, $options);
+    return $this->createInstance($name, $options ?? []);
   }
 
   /**

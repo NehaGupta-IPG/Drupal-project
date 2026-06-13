@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Runs UpdatePathTestBase with a dump filled with content.
  */
 #[Group('Update')]
+#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
 
@@ -28,7 +29,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
    * {@inheritdoc}
    */
   protected function setDatabaseDumpFiles(): void {
-    $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz';
+    $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/drupal-11.3.0.filled.standard.php.gz';
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/drupal-8.update-test-schema-enabled.php';
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/drupal-8.update-test-semver-update-n-enabled.php';
   }
@@ -218,32 +219,28 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->drupalGet('admin/structure/comment/manage/test_comment_type/fields');
     $this->assertSession()->pageTextContains('comment_body');
 
-    // Make sure our contact form exists.
-    $this->drupalGet('admin/structure/contact');
-    $this->assertSession()->pageTextContains('Test contact form');
     $this->drupalGet('admin/structure/types');
     $this->assertSession()->pageTextContains('Test content type description');
     $this->drupalGet('admin/structure/types/manage/test_content_type/fields');
 
     // Make sure fields are the right type.
-    $assert_session->elementContains('css', '#body', 'Text (formatted, long, with summary)');
+    $assert_session->elementContains('css', '#body', 'Long text with summary');
     $assert_session->elementContains('css', '#field-test-1', 'Boolean');
     $assert_session->elementContains('css', '#field-test-2', 'Comments');
     $assert_session->elementContains('css', '#field-test-3', 'Date');
     $assert_session->elementContains('css', '#field-test-4', 'Email');
     $assert_session->elementContains('css', '#field-test-5', 'Link');
-    $assert_session->elementContains('css', '#field-test-6', 'List (float)');
-    $assert_session->elementContains('css', '#field-test-7', 'Telephone number');
+    $assert_session->elementContains('css', '#field-test-6', 'Float');
     $assert_session->elementContains('css', '#field-test-8', 'Entity reference');
     $assert_session->elementContains('css', '#field-test-9', 'File');
     $assert_session->elementContains('css', '#field-test-10', 'Image');
-    $assert_session->elementContains('css', '#field-test-15', 'Text (plain, long)');
-    $assert_session->elementContains('css', '#field-test-16', 'List (text)');
-    $assert_session->elementContains('css', '#field-test-17', 'Text (formatted)');
-    $assert_session->elementContains('css', '#field-test-18', 'Text (formatted, long)');
-    $assert_session->elementContains('css', '#field-test-20', 'List (integer)');
-    $assert_session->elementContains('css', '#field-test-22', 'Number (float)');
-    $assert_session->elementContains('css', '#field-test-23', 'Number (integer)');
+    $assert_session->elementContains('css', '#field-test-15', 'Long text');
+    $assert_session->elementContains('css', '#field-test-16', 'Text');
+    $assert_session->elementContains('css', '#field-test-17', 'Short text');
+    $assert_session->elementContains('css', '#field-test-18', 'Long text');
+    $assert_session->elementContains('css', '#field-test-20', 'Integer');
+    $assert_session->elementContains('css', '#field-test-22', 'Float');
+    $assert_session->elementContains('css', '#field-test-23', 'Integer');
 
     // Make sure our form mode exists.
     $this->drupalGet('admin/structure/display-modes/form');
@@ -316,16 +313,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->drupalGet('taxonomy/term/2/translations');
     $this->assertSession()->linkExists('Test root term - Spanish');
 
-    // Make sure our contact form exists.
-    $this->drupalGet('admin/structure/contact');
-    $this->assertSession()->pageTextContains('Test contact form');
-    $this->drupalGet('admin/structure/contact/manage/test_contact_form');
-    $this->assertSession()->pageTextContains('test@example.com');
-    $this->assertSession()->pageTextContains('Hello');
-    $this->drupalGet('admin/structure/contact/manage/test_contact_form/translate/es/edit');
-    $this->assertSession()->pageTextContains('Hola');
-    $this->assertSession()->responseContains('Test contact form Spanish');
-
     // Make sure our modules are still enabled.
     $expected_enabled_modules = [
       'basic_auth',
@@ -336,7 +323,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
       'comment',
       'config',
       'config_translation',
-      'contact',
       'content_translation',
       'contextual',
       'datetime',
@@ -347,14 +333,12 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
       'file',
       'filter',
       'help',
-      'history',
       'image',
       'language',
       'link',
       'locale',
       'menu_ui',
       'migrate',
-      'migrate_drupal',
       'node',
       'options',
       'page_cache',
@@ -368,7 +352,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
       'syslog',
       'system',
       'taxonomy',
-      'telephone',
       'text',
       'toolbar',
       'update',

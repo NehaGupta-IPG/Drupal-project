@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Functional\Wizard;
 
+use Drupal\Tests\Traits\Core\Config\RawConfigWriterTrait;
 use Drupal\views\Entity\View;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('views')]
 #[RunTestsInSeparateProcesses]
 class ItemsPerPageTest extends WizardTestBase {
+  use RawConfigWriterTrait;
 
   /**
    * {@inheritdoc}
@@ -134,7 +136,7 @@ class ItemsPerPageTest extends WizardTestBase {
     // Asserts that the 3 newest articles are listed, which is the configuration
     // for the `block` display in the view. In other words: the `items_per_page`
     // setting in the `View` config entity is respected.
-    $assert_3_newest_nodes = function () use ($node5, $node4, $node3, $node2, $node1, $page_node) {
+    $assert_3_newest_nodes = function () use ($node5, $node4, $node3, $node2, $node1, $page_node): void {
       $this->drupalGet('user');
       $content = $this->getSession()->getPage()->getContent();
       $this->assertSession()->pageTextContains($node5->label());
@@ -193,8 +195,8 @@ class ItemsPerPageTest extends WizardTestBase {
     // @see \Drupal\views\Hook\ViewsHooks::blockPresave()
     $block->set('settings', [
       'items_per_page' => 'none',
-    ])->trustData()->save();
-    $this->expectDeprecation('Saving a views block with "none" items per page is deprecated in drupal:11.2.0 and removed in drupal:12.0.0. To use the items per page defined by the view, use NULL. See https://www.drupal.org/node/3522240');
+      'label' => 'Test',
+    ])->save();
     self::assertNull($block->get('settings')['items_per_page']);
     self::assertSame(4, View::load($view['id'])->toArray()['display']['default']['display_options']['pager']['options']['items_per_page']);
     self::assertSame(3, View::load($view['id'])->toArray()['display']['block_1']['display_options']['pager']['options']['items_per_page']);
@@ -209,7 +211,9 @@ class ItemsPerPageTest extends WizardTestBase {
     // Explicitly set the `items_per_page` setting to a string without casting.
     $block->set('settings', [
       'items_per_page' => '5',
-    ])->trustData()->save();
+      'label' => 'Test',
+    ]);
+    $this->writeRawConfigEntity($block);
     self::assertSame('5', $block->get('settings')['items_per_page']);
     self::assertSame(4, View::load($view['id'])->toArray()['display']['default']['display_options']['pager']['options']['items_per_page']);
     self::assertSame(3, View::load($view['id'])->toArray()['display']['block_1']['display_options']['pager']['options']['items_per_page']);
