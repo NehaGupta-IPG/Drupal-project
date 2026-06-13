@@ -36,10 +36,8 @@ class TimezoneController {
     }
 
     $is_daylight_saving_time = $is_daylight_saving_time ?? -1;
-    $original = intval($is_daylight_saving_time);
-    $is_daylight_saving_time = min(1, max(-1, $original));
-    // Catch if out of boundary.
-    if ($original !== $is_daylight_saving_time) {
+    // Catch if out of boundary. Valid values are -1, 0 or 1.
+    if (abs($is_daylight_saving_time) > 1) {
       return new JsonResponse(FALSE);
     }
 
