@@ -25,7 +25,7 @@ class ViewsFormTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'olivero';
+  protected $defaultTheme = 'stark';
 
   /**
    * Tests the Views form wrapper.
