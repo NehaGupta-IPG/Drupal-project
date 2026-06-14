@@ -6,6 +6,7 @@ use Drupal\Core\Cache\CacheableResponse;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\jsonapi\Normalizer\Value\CacheableNormalization;
 use Drupal\jsonapi\ResourceResponse;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,22 +39,10 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class ResourceResponseSubscriber implements EventSubscriberInterface {
 
-  /**
-   * The serializer.
-   *
-   * @var \Symfony\Component\Serializer\SerializerInterface
-   */
-  protected $serializer;
-
-  /**
-   * Constructs a ResourceResponseSubscriber object.
-   *
-   * @param \Symfony\Component\Serializer\SerializerInterface $serializer
-   *   The serializer.
-   */
-  public function __construct(SerializerInterface $serializer) {
-    $this->serializer = $serializer;
-  }
+  public function __construct(
+    #[Autowire(service: 'jsonapi.serializer')]
+    protected SerializerInterface $serializer,
+  ) {}
 
   /**
    * {@inheritdoc}
@@ -62,7 +51,7 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
    * @see \Drupal\dynamic_page_cache\EventSubscriber\DynamicPageCacheSubscriber
    */
   public static function getSubscribedEvents(): array {
-    // Run before the dynamic page cache subscriber (priority 100), so that
+    // Run before the dynamic page cache subscriber (priority 7), so that
     // Dynamic Page Cache can cache flattened responses.
     $events[KernelEvents::RESPONSE][] = ['onResponse', 128];
     return $events;

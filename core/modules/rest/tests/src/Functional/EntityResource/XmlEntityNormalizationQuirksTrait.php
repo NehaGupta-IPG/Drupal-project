@@ -28,6 +28,20 @@ trait XmlEntityNormalizationQuirksTrait {
   /**
    * {@inheritdoc}
    */
+  protected function doTestPost(): void {
+    // Deserialization of the XML format is not supported.
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function doTestPatch(): void {
+    // Deserialization of the XML format is not supported.
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function getExpectedNormalizedEntity() {
     $default_normalization = parent::getExpectedNormalizedEntity();
 
@@ -56,7 +70,7 @@ trait XmlEntityNormalizationQuirksTrait {
    *
    * @see \Symfony\Component\Serializer\Encoder\XmlEncoder
    */
-  protected function applyXmlFieldDecodingQuirks(array $normalization) {
+  protected function applyXmlFieldDecodingQuirks(array $normalization): array {
     foreach ($this->entity->getFields(TRUE) as $field_name => $field) {
       // Not every field is accessible.
       if (!isset($normalization[$field_name])) {
@@ -146,22 +160,6 @@ trait XmlEntityNormalizationQuirksTrait {
     }
 
     return $normalization;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function testPost() {
-    // Deserialization of the XML format is not supported.
-    $this->markTestSkipped();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function testPatch() {
-    // Deserialization of the XML format is not supported.
-    $this->markTestSkipped();
   }
 
 }

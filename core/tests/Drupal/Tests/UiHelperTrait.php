@@ -11,6 +11,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Test\RefreshVariablesTrait;
 use Drupal\Core\Url;
+use Drupal\user\OneTimeAuthentication;
 use Symfony\Component\CssSelector\CssSelectorConverter;
 
 /**
@@ -24,9 +25,14 @@ trait UiHelperTrait {
   /**
    * The current user logged in using the Mink controlled browser.
    *
-   * @var \Drupal\user\UserInterface
+   * @var \Drupal\user\UserInterface|false
    */
   protected $loggedInUser = FALSE;
+
+  /**
+   * Use one-time login links instead of submitting the login form.
+   */
+  protected bool $useOneTimeLoginLinks = TRUE;
 
   /**
    * The number of meta refresh redirects to follow, or NULL if unlimited.
@@ -67,15 +73,19 @@ trait UiHelperTrait {
    */
   protected function submitForm(array $edit, $submit, $form_html_id = NULL) {
     $assert_session = $this->assertSession();
-
+    $submit_button = $assert_session->buttonExists($submit);
+    // Check if button has a form attribute set.
+    if ($form_id = $submit_button->getAttribute('form')) {
+      $form = $assert_session->elementExists('xpath', "//form[@id='$form_id']");
+      $action = $form->getAttribute('action');
+    }
     // Get the form.
-    if (isset($form_html_id)) {
+    elseif (isset($form_html_id)) {
       $form = $assert_session->elementExists('xpath', "//form[@id='$form_html_id']");
       $submit_button = $assert_session->buttonExists($submit, $form);
       $action = $form->getAttribute('action');
     }
     else {
-      $submit_button = $assert_session->buttonExists($submit);
       $form = $assert_session->elementExists('xpath', './ancestor::form', $submit_button);
       $action = $form->getAttribute('action');
     }
@@ -138,7 +148,7 @@ trait UiHelperTrait {
    * For example:
    * @code
    *   // Create a user.
-   *   $account = $this->drupalCreateUser(array());
+   *   $account = $this->drupalCreateUser([]);
    *   $this->drupalLogin($account);
    *   // Load real user object.
    *   $pass_raw = $account->passRaw;
@@ -156,11 +166,24 @@ trait UiHelperTrait {
       $this->drupalLogout();
     }
 
-    $this->drupalGet(Url::fromRoute('user.login'));
-    $this->submitForm([
-      'name' => $account->getAccountName(),
-      'pass' => $account->passRaw,
-    ], 'Log in');
+    if ($this->useOneTimeLoginLinks) {
+      // Reload to get latest login timestamp.
+      $storage = \Drupal::entityTypeManager()->getStorage('user');
+      /** @var \Drupal\user\UserInterface $accountUnchanged */
+      $accountUnchanged = $storage->loadUnchanged($account->id());
+      $login = \Drupal::service(OneTimeAuthentication::class)
+        ->generateOneTimeLoginUrl($accountUnchanged, immediate: TRUE)
+        ->mergeOptions(['query' => ['destination' => 'user/' . $account->id()]])
+        ->toString();
+      $this->drupalGet($login);
+    }
+    else {
+      $this->drupalGet(Url::fromRoute('user.login'));
+      $this->submitForm([
+        'name' => $account->getAccountName(),
+        'pass' => $account->passRaw,
+      ], 'Log in');
+    }
 
     // @see ::drupalUserIsLoggedIn()
     $account->sessionId = $this->getSession()->getCookie(\Drupal::service('session_configuration')->getOptions(\Drupal::request())['name']);
@@ -181,10 +204,20 @@ trait UiHelperTrait {
     // screen.
     $assert_session = $this->assertSession();
     $destination = Url::fromRoute('user.page')->toString();
-    $this->drupalGet(Url::fromRoute('user.logout', [], ['query' => ['destination' => $destination]]));
+    $this->drupalGet(Url::fromRoute('user.logout.confirm', options: ['query' => ['destination' => $destination]]));
+    // Target the submit button using the name rather than the value to work
+    // regardless of the user interface language.
+    $this->submitForm([], 'op', 'user-logout-confirm');
     $assert_session->fieldExists('name');
     $assert_session->fieldExists('pass');
 
+    $this->drupalResetSession();
+  }
+
+  /**
+   * Resets the current active session back to Anonymous session.
+   */
+  protected function drupalResetSession(): void {
     // @see BrowserTestBase::drupalUserIsLoggedIn()
     unset($this->loggedInUser->sessionId);
     $this->loggedInUser = FALSE;
@@ -200,7 +233,7 @@ trait UiHelperTrait {
    * @return \Drupal\Tests\WebAssert
    *   A new web-assert option for asserting the presence of elements with.
    */
-  public function assertSession($name = NULL) {
+  public function assertSession($name = NULL): WebAssert {
     $this->addToAssertionCount(1);
     return new WebAssert($this->getSession($name), $this->baseUrl);
   }
@@ -226,7 +259,7 @@ trait UiHelperTrait {
    *
    * @see \Drupal\Tests\BrowserTestBase::getHttpClient()
    */
-  protected function drupalGet($path, array $options = [], array $headers = []) {
+  protected function drupalGet($path, array $options = [], array $headers = []): string {
     $options['absolute'] = TRUE;
     $url = $this->buildUrl($path, $options);
 
@@ -234,16 +267,6 @@ trait UiHelperTrait {
 
     $this->prepareRequest();
     foreach ($headers as $header_name => $header_value) {
-      if (is_int($header_name)) {
-        // @todo Trigger deprecation in
-        //   https://www.drupal.org/project/drupal/issues/3421105.
-        [$header_name, $header_value] = explode(':', $header_value);
-      }
-      if (is_null($header_value)) {
-        // @todo Trigger deprecation in
-        //   https://www.drupal.org/project/drupal/issues/3421105.
-        $header_value = '';
-      }
       $session->setRequestHeader($header_name, $header_value);
     }
 
@@ -300,6 +323,10 @@ trait UiHelperTrait {
       $length = strlen($base_path);
       if (substr($path, 0, $length) === $base_path) {
         $path = substr($path, $length);
+      }
+      // Additionally strip any forward slashes.
+      if (strlen($path) > 1) {
+        $path = ltrim($path, '/');
       }
 
       $force_internal = isset($options['external']) && $options['external'] == FALSE;
@@ -374,7 +401,7 @@ trait UiHelperTrait {
    * @return bool
    *   Return TRUE if the user is logged in, FALSE otherwise.
    */
-  protected function drupalUserIsLoggedIn(AccountInterface $account) {
+  protected function drupalUserIsLoggedIn(AccountInterface $account): bool {
     $logged_in = FALSE;
 
     if (isset($account->sessionId)) {
@@ -391,7 +418,7 @@ trait UiHelperTrait {
    * @param string $css_selector
    *   The CSS selector identifying the element to click.
    */
-  protected function click($css_selector) {
+  protected function click(string $css_selector) {
     $starting_url = $this->getSession()->getCurrentUrl();
     $this->getSession()->getDriver()->click($this->cssSelectToXpath($css_selector));
     // Log only for WebDriverTestBase tests because for BrowserKitDriver we log
@@ -497,7 +524,7 @@ trait UiHelperTrait {
    * @return string
    *   The equivalent XPath of a CSS expression.
    */
-  protected function cssSelectToXpath($selector, $html = TRUE, $prefix = 'descendant-or-self::') {
+  protected function cssSelectToXpath(string $selector, $html = TRUE, string $prefix = 'descendant-or-self::'): string {
     return (new CssSelectorConverter($html))->toXPath($selector, $prefix);
   }
 
@@ -507,7 +534,7 @@ trait UiHelperTrait {
    * @return bool
    *   TRUE if test is using DrupalTestBrowser.
    */
-  protected function isTestUsingGuzzleClient() {
+  protected function isTestUsingGuzzleClient(): bool {
     $driver = $this->getSession()->getDriver();
     if ($driver instanceof BrowserKitDriver) {
       return $driver->getClient() instanceof DrupalTestBrowser;

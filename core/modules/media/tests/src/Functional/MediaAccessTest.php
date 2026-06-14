@@ -10,13 +10,14 @@ use Drupal\media\Entity\Media;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Basic access tests for Media.
- *
- * @group media
- * @group #slow
  */
+#[Group('media')]
+#[RunTestsInSeparateProcesses]
 class MediaAccessTest extends MediaFunctionalTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -46,14 +47,14 @@ class MediaAccessTest extends MediaFunctionalTestBase {
   /**
    * Tests some access control functionality.
    */
-  public function testMediaAccess() {
+  public function testMediaAccess(): void {
     $assert_session = $this->assertSession();
     $media_type = $this->createMediaType('test');
 
     \Drupal::configFactory()
       ->getEditable('media.settings')
       ->set('standalone_url', TRUE)
-      ->save(TRUE);
+      ->save();
 
     $this->container->get('router.builder')->rebuild();
 
@@ -131,7 +132,7 @@ class MediaAccessTest extends MediaFunctionalTestBase {
     $this->assertCacheContext('user');
     $assert_session->statusCodeEquals(200);
     $this->drupalGet('media/' . $user_media->id() . '/revisions/' . $previous_revision . '/view');
-    $this->assertCacheContext('user.permissions');
+    $this->assertCacheContext('user');
     $assert_session->statusCodeEquals(200);
     $role->revokePermission('view own unpublished media')->save();
     $this->drupalGet('media/' . $user_media->id() . '/revisions/' . $user_media->getRevisionId() . '/view');
@@ -219,9 +220,9 @@ class MediaAccessTest extends MediaFunctionalTestBase {
 
     // Create a new role, which implicitly checks if the permission exists.
     $mediaOverviewRole = $this->createRole(['access content overview', 'access media overview']);
-    $this->nonAdminUser->addRole($mediaOverviewRole);
-    $this->nonAdminUser->save();
+    $this->nonAdminUser->addRole($mediaOverviewRole)->save();
 
+    $this->grantPermissions($role, ['access user profiles']);
     $this->drupalGet('admin/content');
     $assert_session->linkByHrefExists('/admin/content/media');
     $this->clickLink('Media');
@@ -239,14 +240,14 @@ class MediaAccessTest extends MediaFunctionalTestBase {
   /**
    * Tests view access control on the canonical page.
    */
-  public function testCanonicalMediaAccess() {
+  public function testCanonicalMediaAccess(): void {
     $media_type = $this->createMediaType('test');
     $assert_session = $this->assertSession();
 
     \Drupal::configFactory()
       ->getEditable('media.settings')
       ->set('standalone_url', TRUE)
-      ->save(TRUE);
+      ->save();
 
     $this->container->get('router.builder')->rebuild();
 
@@ -283,11 +284,11 @@ class MediaAccessTest extends MediaFunctionalTestBase {
   /**
    * Tests unpublished media access.
    */
-  public function testUnpublishedMediaUserAccess() {
+  public function testUnpublishedMediaUserAccess(): void {
     \Drupal::configFactory()
       ->getEditable('media.settings')
       ->set('standalone_url', TRUE)
-      ->save(TRUE);
+      ->save();
 
     $this->container->get('router.builder')->rebuild();
 
@@ -325,11 +326,11 @@ class MediaAccessTest extends MediaFunctionalTestBase {
   /**
    * Tests media access of anonymous user.
    */
-  public function testMediaAnonymousUserAccess() {
+  public function testMediaAnonymousUserAccess(): void {
     \Drupal::configFactory()
       ->getEditable('media.settings')
       ->set('standalone_url', TRUE)
-      ->save(TRUE);
+      ->save();
 
     $this->container->get('router.builder')->rebuild();
 
@@ -364,11 +365,11 @@ class MediaAccessTest extends MediaFunctionalTestBase {
   /**
    * Tests access for embedded medias.
    */
-  public function testReferencedRendering() {
+  public function testReferencedRendering(): void {
     \Drupal::configFactory()
       ->getEditable('media.settings')
       ->set('standalone_url', TRUE)
-      ->save(TRUE);
+      ->save();
 
     $this->container->get('router.builder')->rebuild();
 

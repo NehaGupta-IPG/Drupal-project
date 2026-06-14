@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\form_test\Form;
 
 use Drupal\Core\Form\FormBase;
@@ -29,7 +31,7 @@ class FormTestProgrammaticForm extends FormBase {
     ];
 
     $form['checkboxes'] = [
-      '#title' => t('Checkboxes'),
+      '#title' => $this->t('Checkboxes'),
       '#type' => 'checkboxes',
       '#options' => [
         1 => 'First checkbox',
@@ -86,16 +88,16 @@ class FormTestProgrammaticForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
     if ($form_state->isValueEmpty('textfield')) {
-      $form_state->setErrorByName('textfield', t('Textfield is required.'));
+      $form_state->setErrorByName('textfield', $this->t('Textfield is required.'));
     }
   }
 
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $form_state->set('programmatic_form_submit', $form_state->getValues());
   }
 

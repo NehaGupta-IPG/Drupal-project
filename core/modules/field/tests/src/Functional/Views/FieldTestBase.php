@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Drupal\Tests\field\Functional\Views;
 
 use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\views\Functional\ViewTestBase;
-use Drupal\field\Entity\FieldStorageConfig;
 
 /**
  * Provides some helper methods for testing fieldapi integration into views.
@@ -22,9 +22,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 abstract class FieldTestBase extends ViewTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'field_test_views'];
 
@@ -55,6 +53,9 @@ abstract class FieldTestBase extends ViewTestBase {
     ])->save();
   }
 
+  /**
+   * Sets up field storages for testing.
+   */
   public function setUpFieldStorages($amount = 3, $type = 'string') {
     // Create three fields.
     $field_names = [];
@@ -70,7 +71,10 @@ abstract class FieldTestBase extends ViewTestBase {
     return $field_names;
   }
 
-  public function setUpFields($bundle = 'page') {
+  /**
+   * Sets up fields for a given bundle.
+   */
+  public function setUpFields($bundle = 'page'): void {
     foreach ($this->fieldStorages as $key => $field_storage) {
       $this->fields[$key] = FieldConfig::create([
         'field_storage' => $field_storage,

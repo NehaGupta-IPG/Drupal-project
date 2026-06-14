@@ -3,7 +3,6 @@
 namespace Drupal\Core\Session;
 
 use Drupal\Component\Datetime\TimeInterface;
-use Drupal\Core\Database\Connection;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
@@ -18,8 +17,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
  * storing and retrieving session data has been extracted from it in Symfony 2.1
  * but the class name was not changed.
  *
- * @todo
- *   In fact the NativeSessionStorage class already implements all of the
+ * @todo In fact the NativeSessionStorage class already implements all of the
  *   functionality required by a typical Symfony application. Normally it is not
  *   necessary to subclass it at all. In order to reach the point where Drupal
  *   can use the Symfony session management unmodified, the code implemented
@@ -31,27 +29,6 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
   use DependencySerializationTrait;
 
   /**
-   * The request stack.
-   *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
-   */
-  protected $requestStack;
-
-  /**
-   * The database connection to use.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $connection;
-
-  /**
-   * The session configuration.
-   *
-   * @var \Drupal\Core\Session\SessionConfigurationInterface
-   */
-  protected $sessionConfiguration;
-
-  /**
    * Whether a lazy session has been started.
    *
    * @var bool
@@ -59,54 +36,29 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
   protected $startedLazy;
 
   /**
-   * The write safe session handler.
-   *
-   * @todo: This reference should be removed once all database queries
-   *   are removed from the session manager class.
-   *
-   * @var \Drupal\Core\Session\WriteSafeSessionHandlerInterface
-   */
-  protected $writeSafeHandler;
-
-  /**
    * Constructs a new session manager instance.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
-   * @param \Drupal\Core\Session\MetadataBag $metadata_bag
-   *   The session metadata bag.
-   * @param \Drupal\Core\Session\SessionConfigurationInterface $session_configuration
-   *   The session configuration interface.
-   * @param \Drupal\Component\Datetime\TimeInterface|null|\Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy|\SessionHandlerInterface $time
-   *   The time service.
    * @param \Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy|\SessionHandlerInterface|null $handler
    *   The object to register as a PHP session handler.
+   * @param \Drupal\Core\Session\MetadataBag $metadata_bag
+   *   The session metadata bag.
+   * @param \Drupal\Core\Session\SessionConfigurationInterface $sessionConfiguration
+   *   The session configuration interface.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The time service.
    *
    * @see \Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage::setSaveHandler()
    */
   public function __construct(
-    RequestStack $request_stack,
-    Connection $connection,
+    protected RequestStack $requestStack,
+    AbstractProxy|\SessionHandlerInterface|null $handler,
     MetadataBag $metadata_bag,
-    SessionConfigurationInterface $session_configuration,
-    protected TimeInterface|AbstractProxy|\SessionHandlerInterface|null $time = NULL,
-    $handler = NULL,
+    protected SessionConfigurationInterface $sessionConfiguration,
+    protected TimeInterface $time,
   ) {
-    $options = [];
-    $this->sessionConfiguration = $session_configuration;
-    $this->requestStack = $request_stack;
-    $this->connection = $connection;
-    if (!$time || $time instanceof AbstractProxy || $time instanceof \SessionHandlerInterface) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $time argument is deprecated in drupal:10.3.0 and it will be the 5th argument in drupal:11.0.0. See https://www.drupal.org/node/3387233', E_USER_DEPRECATED);
-      if ($time instanceof AbstractProxy || $time instanceof \SessionHandlerInterface) {
-        $handler = $time;
-      }
-      $this->time = \Drupal::service(TimeInterface::class);
-    }
-
-    parent::__construct($options, $handler, $metadata_bag);
+    parent::__construct([], $handler, $metadata_bag);
   }
 
   /**
@@ -229,24 +181,6 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
   /**
    * {@inheritdoc}
    */
-  public function delete($uid) {
-    // Nothing to do if we are not allowed to change the session.
-    if (!$this->writeSafeHandler->isSessionWritable() || $this->isCli()) {
-      return;
-    }
-    // The sessions table may not have been created yet.
-    try {
-      $this->connection->delete('sessions')
-        ->condition('uid', $uid)
-        ->execute();
-    }
-    catch (\Exception) {
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function destroy() {
     if ($this->isCli()) {
       return;
@@ -272,18 +206,12 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public function setWriteSafeHandler(WriteSafeSessionHandlerInterface $handler) {
-    $this->writeSafeHandler = $handler;
-  }
-
-  /**
    * Returns whether the current PHP process runs on CLI.
    *
    * Command line clients do not support cookies nor sessions.
    *
    * @return bool
+   *   TRUE if the current PHP process runs on CLI, otherwise FALSE>
    */
   protected function isCli() {
     return PHP_SAPI === 'cli';

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\module_test;
 
 use Drupal\Core\Plugin\DefaultPluginManager;
@@ -40,7 +42,7 @@ class PluginManagerCacheClearer extends DefaultPluginManager {
    *
    * @see \Drupal\Component\Plugin\Discovery\CachedDiscoveryInterface::clearCachedDefinitions()
    */
-  public function clearCachedDefinitions() {
+  public function clearCachedDefinitions(): void {
     $this->state->set(self::class, isset($this->optionalService));
   }
 

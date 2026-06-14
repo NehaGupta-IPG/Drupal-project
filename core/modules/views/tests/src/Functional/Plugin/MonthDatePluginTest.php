@@ -6,12 +6,14 @@ namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Core\Url;
 use Drupal\Tests\views\Functional\ViewTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Month Date Plugin.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class MonthDatePluginTest extends ViewTestBase {
 
   /**
@@ -22,9 +24,7 @@ class MonthDatePluginTest extends ViewTestBase {
   public static $testViews = ['test_month_date_plugin'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node'];
 
@@ -65,7 +65,7 @@ class MonthDatePluginTest extends ViewTestBase {
   /**
    * Tests the Month Date Plugin.
    */
-  public function testMonthDatePlugin() {
+  public function testMonthDatePlugin(): void {
     $assert_session = $this->assertSession();
 
     // Test fallback value.

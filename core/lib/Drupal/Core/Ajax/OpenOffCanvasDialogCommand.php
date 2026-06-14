@@ -38,6 +38,14 @@ class OpenOffCanvasDialogCommand extends OpenDialogCommand {
    *   (optional) The position to render the off-canvas dialog.
    */
   public function __construct(string|\Stringable|null $title, $content, array $dialog_options = [], $settings = NULL, $position = 'side') {
+    $classes = [];
+    if (isset($dialog_options['classes']['ui-dialog'])) {
+      $classes[] = $dialog_options['classes']['ui-dialog'];
+    }
+    $classes[] = 'ui-dialog-off-canvas';
+    $classes[] = "ui-dialog-position-$position";
+    $dialog_options['classes']['ui-dialog'] = implode(' ', $classes);
+
     parent::__construct('#drupal-off-canvas', $title, $content, $dialog_options, $settings);
     $this->dialogOptions['modal'] = FALSE;
     $this->dialogOptions['autoResize'] = FALSE;
@@ -45,9 +53,7 @@ class OpenOffCanvasDialogCommand extends OpenDialogCommand {
     $this->dialogOptions['draggable'] = FALSE;
     $this->dialogOptions['drupalAutoButtons'] = FALSE;
     $this->dialogOptions['drupalOffCanvasPosition'] = $position;
-    if (empty($dialog_options['dialogClass'])) {
-      $this->dialogOptions['dialogClass'] = "ui-dialog-off-canvas ui-dialog-position-$position";
-    }
+
     // Add CSS class to #drupal-off-canvas element. This enables developers to
     // select previous versions of off-canvas styles by using custom selector:
     // #drupal-off-canvas:not(.drupal-off-canvas-reset).

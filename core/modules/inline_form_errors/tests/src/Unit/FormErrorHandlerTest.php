@@ -9,11 +9,14 @@ use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\inline_form_errors\FormErrorHandler;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\inline_form_errors\FormErrorHandler
- * @group InlineFormErrors
+ * Tests Drupal\inline_form_errors\FormErrorHandler.
  */
+#[CoversClass(FormErrorHandler::class)]
+#[Group('InlineFormErrors')]
 class FormErrorHandlerTest extends UnitTestCase {
 
   /**
@@ -36,13 +39,6 @@ class FormErrorHandlerTest extends UnitTestCase {
    * @var \Drupal\Core\Render\RendererInterface|\PHPUnit\Framework\MockObject\MockObject
    */
   protected $renderer;
-
-  /**
-   * The link generator.
-   *
-   * @var \Drupal\Core\Utility\LinkGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject
-   */
-  protected $linkGenerator;
 
   /**
    * Form for testing.
@@ -115,11 +111,13 @@ class FormErrorHandlerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::handleFormErrors
-   * @covers ::displayErrorMessages
-   * @covers ::setElementErrorsFromFormState
+   * Tests error messages inline.
+   *
+   * @legacy-covers ::handleFormErrors
+   * @legacy-covers ::displayErrorMessages
+   * @legacy-covers ::setElementErrorsFromFormState
    */
-  public function testErrorMessagesInline() {
+  public function testErrorMessagesInline(): void {
     $messages = [
       'no title given',
       'element is invisible',
@@ -138,7 +136,7 @@ class FormErrorHandlerTest extends UnitTestCase {
 
     $this->renderer->expects($this->once())
       ->method('renderInIsolation')
-      ->willReturnCallback(function ($render_array) {
+      ->willReturnCallback(function ($render_array): string {
         $links = [];
         foreach ($render_array[1]['#items'] as $item) {
           $links[] = htmlspecialchars($item['#title']);
@@ -169,7 +167,7 @@ class FormErrorHandlerTest extends UnitTestCase {
   /**
    * Tests that opting out of Inline Form Errors works.
    */
-  public function testErrorMessagesNotInline() {
+  public function testErrorMessagesNotInline(): void {
     // Asserts all messages are summarized.
     $messages = [
       'invalid',

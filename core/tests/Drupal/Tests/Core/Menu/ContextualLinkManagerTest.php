@@ -4,22 +4,31 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Menu;
 
+use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
 use Drupal\Component\Plugin\Exception\PluginException;
+use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Controller\ControllerResolverInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Menu\ContextualLinkDefault;
 use Drupal\Core\Menu\ContextualLinkManager;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * @coversDefaultClass \Drupal\Core\Menu\ContextualLinkManager
- * @group Menu
+ * Tests Drupal\Core\Menu\ContextualLinkManager.
  */
+#[CoversClass(ContextualLinkManager::class)]
+#[Group('Menu')]
 class ContextualLinkManagerTest extends UnitTestCase {
 
   /**
@@ -31,17 +40,13 @@ class ContextualLinkManagerTest extends UnitTestCase {
 
   /**
    * The mocked plugin discovery.
-   *
-   * @var \Drupal\Component\Plugin\Discovery\DiscoveryInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $pluginDiscovery;
+  protected DiscoveryInterface&MockObject $pluginDiscovery;
 
   /**
    * The cache backend used in the test.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $cacheBackend;
+  protected CacheBackendInterface&Stub $cacheBackend;
 
   /**
    * The mocked module handler.
@@ -51,18 +56,14 @@ class ContextualLinkManagerTest extends UnitTestCase {
   protected $moduleHandler;
 
   /**
-   * The mocked access manager.
-   *
-   * @var \Drupal\Core\Access\AccessManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The access manager.
    */
-  protected $accessManager;
+  protected AccessManagerInterface&Stub $accessManager;
 
   /**
-   * The mocked account.
-   *
-   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The account.
    */
-  protected $account;
+  protected AccountInterface&Stub $account;
 
   /**
    * {@inheritdoc}
@@ -70,19 +71,18 @@ class ContextualLinkManagerTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $language_manager = $this->createMock(LanguageManagerInterface::class);
-    $language_manager->expects($this->any())
+    $language_manager = $this->createStub(LanguageManagerInterface::class);
+    $language_manager
       ->method('getCurrentLanguage')
       ->willReturn(new Language(['id' => 'en']));
 
     $this->moduleHandler = $this->prophesize(ModuleHandlerInterface::class);
-    $this->pluginDiscovery = $this->createMock('Drupal\Component\Plugin\Discovery\DiscoveryInterface');
-    $this->cacheBackend = $this->createMock('Drupal\Core\Cache\CacheBackendInterface');
-    $this->accessManager = $this->createMock('Drupal\Core\Access\AccessManagerInterface');
-    $this->account = $this->createMock('Drupal\Core\Session\AccountInterface');
+    $this->cacheBackend = $this->createStub(CacheBackendInterface::class);
+    $this->accessManager = $this->createStub(AccessManagerInterface::class);
+    $this->account = $this->createStub(AccountInterface::class);
 
     $this->contextualLinkManager = new ContextualLinkManager(
-      $this->createMock(ControllerResolverInterface::class),
+      $this->createStub(ControllerResolverInterface::class),
       $this->moduleHandler->reveal(),
       $this->cacheBackend,
       $language_manager,
@@ -90,9 +90,24 @@ class ContextualLinkManagerTest extends UnitTestCase {
       $this->account,
       new RequestStack()
     );
+  }
 
-    $property = new \ReflectionProperty('Drupal\Core\Menu\ContextualLinkManager', 'discovery');
-    $property->setValue($this->contextualLinkManager, $this->pluginDiscovery);
+  /**
+   * Reinitializes the cache backend as a mock object.
+   */
+  protected function setUpMockCacheBackend(): void {
+    $this->cacheBackend = $this->createMock(CacheBackendInterface::class);
+    $reflection = new \ReflectionProperty($this->contextualLinkManager, 'cacheBackend');
+    $reflection->setValue($this->contextualLinkManager, $this->cacheBackend);
+  }
+
+  /**
+   * Initializes the plugin discovery as a mock object.
+   */
+  protected function setUpMockDiscovery(): void {
+    $this->pluginDiscovery = $this->createMock(DiscoveryInterface::class);
+    $reflection = new \ReflectionProperty(ContextualLinkManager::class, 'discovery');
+    $reflection->setValue($this->contextualLinkManager, $this->pluginDiscovery);
   }
 
   /**
@@ -100,7 +115,7 @@ class ContextualLinkManagerTest extends UnitTestCase {
    *
    * @see \Drupal\Core\Menu\ContextualLinkManager::getContextualLinkPluginsByGroup()
    */
-  public function testGetContextualLinkPluginsByGroup() {
+  public function testGetContextualLinkPluginsByGroup(): void {
     $definitions = [
       'test_plugin1' => [
         'id' => 'test_plugin1',
@@ -121,6 +136,7 @@ class ContextualLinkManagerTest extends UnitTestCase {
         'route_name' => 'test_router3',
       ],
     ];
+    $this->setUpMockDiscovery();
     $this->pluginDiscovery->expects($this->once())
       ->method('getDefinitions')
       ->willReturn($definitions);
@@ -139,7 +155,9 @@ class ContextualLinkManagerTest extends UnitTestCase {
   /**
    * Tests the getContextualLinkPluginsByGroup method with a prefilled cache.
    */
-  public function testGetContextualLinkPluginsByGroupWithCache() {
+  public function testGetContextualLinkPluginsByGroupWithCache(): void {
+    $this->setUpMockCacheBackend();
+
     $definitions = [
       'test_plugin1' => [
         'id' => 'test_plugin1',
@@ -174,7 +192,7 @@ class ContextualLinkManagerTest extends UnitTestCase {
    *
    * @see \Drupal\Core\Menu\ContextualLinkManager::processDefinition()
    */
-  public function testProcessDefinitionWithoutRoute() {
+  public function testProcessDefinitionWithoutRoute(): void {
     $definition = [
       'class' => '\Drupal\Core\Menu\ContextualLinkDefault',
       'group' => 'example',
@@ -189,7 +207,7 @@ class ContextualLinkManagerTest extends UnitTestCase {
    *
    * @see \Drupal\Core\Menu\ContextualLinkManager::processDefinition()
    */
-  public function testProcessDefinitionWithoutGroup() {
+  public function testProcessDefinitionWithoutGroup(): void {
     $definition = [
       'class' => '\Drupal\Core\Menu\ContextualLinkDefault',
       'route_name' => 'example',
@@ -204,7 +222,7 @@ class ContextualLinkManagerTest extends UnitTestCase {
    *
    * @see \Drupal\Core\Menu\ContextualLinkManager::getContextualLinksArrayByGroup()
    */
-  public function testGetContextualLinksArrayByGroup() {
+  public function testGetContextualLinksArrayByGroup(): void {
     $definitions = [
       'test_plugin1' => [
         'id' => 'test_plugin1',
@@ -235,11 +253,12 @@ class ContextualLinkManagerTest extends UnitTestCase {
       ],
     ];
 
+    $this->setUpMockDiscovery();
     $this->pluginDiscovery->expects($this->once())
       ->method('getDefinitions')
       ->willReturn($definitions);
 
-    $this->accessManager->expects($this->any())
+    $this->accessManager
       ->method('checkNamedRoute')
       ->willReturn(AccessResult::allowed());
 
@@ -264,7 +283,7 @@ class ContextualLinkManagerTest extends UnitTestCase {
    *
    * @see \Drupal\Core\Menu\ContextualLinkManager::getContextualLinksArrayByGroup()
    */
-  public function testGetContextualLinksArrayByGroupAccessCheck() {
+  public function testGetContextualLinksArrayByGroupAccessCheck(): void {
     $definitions = [
       'test_plugin1' => [
         'id' => 'test_plugin1',
@@ -286,11 +305,12 @@ class ContextualLinkManagerTest extends UnitTestCase {
       ],
     ];
 
+    $this->setUpMockDiscovery();
     $this->pluginDiscovery->expects($this->once())
       ->method('getDefinitions')
       ->willReturn($definitions);
 
-    $this->accessManager->expects($this->any())
+    $this->accessManager
       ->method('checkNamedRoute')
       ->willReturnMap([
         ['test_route', ['key' => 'value'], $this->account, FALSE, TRUE],
@@ -307,7 +327,7 @@ class ContextualLinkManagerTest extends UnitTestCase {
   /**
    * Tests the plugins alter hook.
    */
-  public function testPluginDefinitionAlter() {
+  public function testPluginDefinitionAlter(): void {
     $definitions['test_plugin'] = [
       'id' => 'test_plugin',
       'class' => ContextualLinkDefault::class,
@@ -318,6 +338,7 @@ class ContextualLinkManagerTest extends UnitTestCase {
       'options' => ['key' => 'value'],
     ];
 
+    $this->setUpMockDiscovery();
     $this->pluginDiscovery->expects($this->once())
       ->method('getDefinitions')
       ->willReturn($definitions);

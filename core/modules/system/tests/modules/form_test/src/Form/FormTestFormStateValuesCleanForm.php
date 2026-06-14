@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\form_test\Form;
 
 use Drupal\Component\Serialization\Json;
@@ -27,11 +29,11 @@ class FormTestFormStateValuesCleanForm extends FormBase {
     // Build an example form containing multiple submit and button elements; not
     // only on the top-level.
     $form = ['#tree' => TRUE];
-    $form['foo'] = ['#type' => 'submit', '#value' => t('Submit')];
-    $form['bar'] = ['#type' => 'submit', '#value' => t('Submit')];
+    $form['foo'] = ['#type' => 'submit', '#value' => $this->t('Submit')];
+    $form['bar'] = ['#type' => 'submit', '#value' => $this->t('Submit')];
     $form['beer'] = ['#type' => 'value', '#value' => 1000];
-    $form['baz']['foo'] = ['#type' => 'button', '#value' => t('Submit')];
-    $form['baz']['baz'] = ['#type' => 'submit', '#value' => t('Submit')];
+    $form['baz']['foo'] = ['#type' => 'button', '#value' => $this->t('Submit')];
+    $form['baz']['baz'] = ['#type' => 'submit', '#value' => $this->t('Submit')];
     $form['baz']['beer'] = ['#type' => 'value', '#value' => 2000];
 
     // Add an arbitrary element and manually set it to be cleaned.
@@ -49,14 +51,14 @@ class FormTestFormStateValuesCleanForm extends FormBase {
   /**
    * Helper function to clean a value on an element.
    */
-  public static function cleanValue(&$element, FormStateInterface $form_state, &$complete_form) {
+  public static function cleanValue(&$element, FormStateInterface $form_state, &$complete_form): void {
     $form_state->addCleanValueKey('wine');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $form_state->cleanValues();
     // This won't have a proper JSON header, but Drupal doesn't check for that
     // anyway so this is fine until it's replaced with a JsonResponse.

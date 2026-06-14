@@ -6,21 +6,23 @@ namespace Drupal\Tests\comment\Functional\Views;
 
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
-use Drupal\comment\CommentInterface;
+use Drupal\comment\AnonymousContact;
+use Drupal\comment\CommentingStatus;
 use Drupal\comment\Entity\Comment;
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
-use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\Tests\comment\Functional\CommentTestBase as CommentBrowserTestBase;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Unicode;
+use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\Tests\comment\Functional\CommentTestBase as CommentBrowserTestBase;
 use Drupal\user\RoleInterface;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests comment approval functionality.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentAdminTest extends CommentBrowserTestBase {
 
   /**
@@ -55,7 +57,7 @@ class CommentAdminTest extends CommentBrowserTestBase {
   /**
    * Tests comment approval functionality through admin/content/comment.
    */
-  public function testApprovalAdminInterface() {
+  public function testApprovalAdminInterface(): void {
     // Set anonymous comments to require approval.
     user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
       'access comments' => TRUE,
@@ -65,7 +67,7 @@ class CommentAdminTest extends CommentBrowserTestBase {
     $this->drupalPlaceBlock('page_title_block');
     $this->drupalLogin($this->adminUser);
     // Ensure that doesn't require contact info.
-    $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MAYNOT_CONTACT);
+    $this->setCommentAnonymous(AnonymousContact::Forbidden);
 
     // Test that the comments page loads correctly when there are no comments.
     $this->drupalGet('admin/content/comment');
@@ -205,7 +207,7 @@ class CommentAdminTest extends CommentBrowserTestBase {
   /**
    * Tests commented entity label of admin view.
    */
-  public function testCommentedEntityLabel() {
+  public function testCommentedEntityLabel(): void {
     \Drupal::service('module_installer')->install(['block_content']);
     \Drupal::service('router.builder')->rebuildIfNeeded();
     $bundle = BlockContentType::create([
@@ -222,7 +224,7 @@ class CommentAdminTest extends CommentBrowserTestBase {
     $block_content->save();
 
     // Create comment field on block_content.
-    $this->addDefaultCommentField('block_content', 'basic', 'block_comment', CommentItemInterface::OPEN, 'block_comment');
+    $this->addDefaultCommentField('block_content', 'basic', 'block_comment', CommentingStatus::Open, 'block_comment');
     $this->drupalLogin($this->webUser);
     // Post a comment to node.
     $node_comment = $this->postComment($this->node, $this->randomMachineName(), $this->randomMachineName(), TRUE);

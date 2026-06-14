@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\ajax_test\Form;
 
 use Drupal\ajax_test\Ajax\AjaxTestCommandReturnPromise;
@@ -66,7 +68,7 @@ class AjaxTestFormPromise extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     // An empty implementation, as we never submit the actual form.
   }
 

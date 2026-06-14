@@ -1,23 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\field_test\Plugin\Field\FieldType;
 
-use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\TypedData\DataDefinition;
+use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldItemBase;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\TypedData\DataDefinition;
+use Drupal\field_test\FieldTestHelper;
 
 /**
  * Defines the 'test_field' entity field item.
- *
- * @FieldType(
- *   id = "test_field",
- *   label = @Translation("Test field"),
- *   default_widget = "test_field_widget",
- *   default_formatter = "field_test_default"
- * )
  */
+#[FieldType(
+  id: "test_field",
+  label: new TranslatableMarkup("Test field"),
+  default_widget: "test_field_widget",
+  default_formatter: "field_test_default"
+)]
 class TestItem extends FieldItemBase {
 
   /**
@@ -110,9 +113,9 @@ class TestItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public function delete() {
+  public function delete(): void {
     // Reports that delete() method is executed for testing purposes.
-    field_test_memorize('field_test_field_delete', [$this->getEntity()]);
+    FieldTestHelper::memorize('field_test_field_delete', [$this->getEntity()]);
   }
 
   /**
@@ -123,10 +126,16 @@ class TestItem extends FieldItemBase {
     $constraints = parent::getConstraints();
 
     $constraints[] = $constraint_manager->create('ComplexData', [
-      'value' => [
-        'TestField' => [
-          'value' => -1,
-          'message' => $this->t('%name does not accept the value @value.', ['%name' => $this->getFieldDefinition()->getLabel(), '@value' => -1]),
+      'properties' => [
+        'value' => [
+          'TestField' => [
+            'value' => -1,
+            'message' => $this->t('%name does not accept the value @value.', [
+              '%name' => $this->getFieldDefinition()
+                ->getLabel(),
+              '@value' => -1,
+            ]),
+          ],
         ],
       ],
     ]);

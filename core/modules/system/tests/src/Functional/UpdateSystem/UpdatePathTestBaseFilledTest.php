@@ -6,17 +6,18 @@ namespace Drupal\Tests\system\Functional\UpdateSystem;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use Drupal\node\Entity\Node;
-use Drupal\node\Entity\NodeType;
+use Drupal\system\Entity\Action;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
-// cspell:ignore hola usuario
-
+// cspell:ignore hola testblock usuario
 /**
  * Runs UpdatePathTestBase with a dump filled with content.
- *
- * @group #slow
- * @group Update
  */
+#[Group('Update')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
 
   /**
@@ -27,8 +28,8 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setDatabaseDumpFiles() {
-    $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/drupal-9.4.0.filled.standard.php.gz';
+  protected function setDatabaseDumpFiles(): void {
+    $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/drupal-11.3.0.filled.standard.php.gz';
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/drupal-8.update-test-schema-enabled.php';
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/drupal-8.update-test-semver-update-n-enabled.php';
   }
@@ -36,7 +37,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
   /**
    * Tests that the content and configuration were properly updated.
    */
-  public function testUpdatedSite() {
+  public function testUpdatedSite(): void {
     $assert_session = $this->assertSession();
 
     $this->runUpdates();
@@ -45,7 +46,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
 
     $expected_node_data = [
       [1, 'article', 'en', 'Test Article - New title'],
-      [2, 'book', 'en', 'Book page'],
       [4, 'page', 'en', 'Test page'],
       [8, 'test_content_type', 'en', 'Test title'],
     ];
@@ -85,7 +85,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->assertSession()->pageTextNotContains('Test 12');
     // Make sure all other field labels are there.
     for ($i = 1; $i <= 23; $i++) {
-      if ($i != 12) {
+      if (($i != 11) && ($i != 12)) {
         $this->assertSession()->pageTextContains('Test ' . $i);
       }
     }
@@ -123,7 +123,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->assertSession()->pageTextContains('Test Article - New title');
     $this->assertSession()->pageTextContains('test.txt');
     $this->assertSession()->pageTextContains('druplicon.small');
-    $this->assertSession()->responseContains('General discussion');
     $this->assertSession()->pageTextContains('Test Article - New title');
     $this->assertSession()->pageTextContains('Test 1');
     $this->assertSession()->responseContains('0.01');
@@ -153,8 +152,8 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->drupalGet('admin/structure/views/view/test_view');
     $this->assertSession()->pageTextContains('Test view');
 
-    // Make sure the book node exists.
-    $this->drupalGet('admin/structure/book');
+    // Make sure the node/1 node exists.
+    $this->drupalGet('node/1');
     $this->clickLink('Test Article - New title');
     $this->assertSession()->pageTextContains('Body');
     $this->assertSession()->pageTextContains('Tags');
@@ -183,7 +182,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->drupalGet('admin/structure/block/manage/testblock');
     $this->assertSession()->checkboxNotChecked('edit-visibility-language-langcodes-es');
     $this->assertSession()->checkboxChecked('edit-visibility-language-langcodes-en');
-    $this->assertSession()->checkboxNotChecked('edit-visibility-entity-bundlenode-bundles-book');
     $this->assertSession()->checkboxChecked('edit-visibility-entity-bundlenode-bundles-test-content-type');
 
     // Make sure our block is still translated.
@@ -221,32 +219,28 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->drupalGet('admin/structure/comment/manage/test_comment_type/fields');
     $this->assertSession()->pageTextContains('comment_body');
 
-    // Make sure our contact form exists.
-    $this->drupalGet('admin/structure/contact');
-    $this->assertSession()->pageTextContains('Test contact form');
     $this->drupalGet('admin/structure/types');
     $this->assertSession()->pageTextContains('Test content type description');
     $this->drupalGet('admin/structure/types/manage/test_content_type/fields');
 
     // Make sure fields are the right type.
-    $assert_session->elementContains('css', '#body', 'Text (formatted, long, with summary)');
+    $assert_session->elementContains('css', '#body', 'Long text with summary');
     $assert_session->elementContains('css', '#field-test-1', 'Boolean');
     $assert_session->elementContains('css', '#field-test-2', 'Comments');
     $assert_session->elementContains('css', '#field-test-3', 'Date');
     $assert_session->elementContains('css', '#field-test-4', 'Email');
     $assert_session->elementContains('css', '#field-test-5', 'Link');
-    $assert_session->elementContains('css', '#field-test-6', 'List (float)');
-    $assert_session->elementContains('css', '#field-test-7', 'Telephone number');
+    $assert_session->elementContains('css', '#field-test-6', 'Float');
     $assert_session->elementContains('css', '#field-test-8', 'Entity reference');
     $assert_session->elementContains('css', '#field-test-9', 'File');
     $assert_session->elementContains('css', '#field-test-10', 'Image');
-    $assert_session->elementContains('css', '#field-test-15', 'Text (plain, long)');
-    $assert_session->elementContains('css', '#field-test-16', 'List (text)');
-    $assert_session->elementContains('css', '#field-test-17', 'Text (formatted)');
-    $assert_session->elementContains('css', '#field-test-18', 'Text (formatted, long)');
-    $assert_session->elementContains('css', '#field-test-20', 'List (integer)');
-    $assert_session->elementContains('css', '#field-test-22', 'Number (float)');
-    $assert_session->elementContains('css', '#field-test-23', 'Number (integer)');
+    $assert_session->elementContains('css', '#field-test-15', 'Long text');
+    $assert_session->elementContains('css', '#field-test-16', 'Text');
+    $assert_session->elementContains('css', '#field-test-17', 'Short text');
+    $assert_session->elementContains('css', '#field-test-18', 'Long text');
+    $assert_session->elementContains('css', '#field-test-20', 'Integer');
+    $assert_session->elementContains('css', '#field-test-22', 'Float');
+    $assert_session->elementContains('css', '#field-test-23', 'Integer');
 
     // Make sure our form mode exists.
     $this->drupalGet('admin/structure/display-modes/form');
@@ -303,15 +297,8 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->assertSession()->pageTextContains('Comentario completo');
 
     // Make sure our custom action is still there.
-    $this->drupalGet('admin/config/system/actions');
-    $this->assertSession()->pageTextContains('Test action');
-    $this->drupalGet('admin/config/system/actions/configure/test_action');
-    $this->assertSession()->fieldValueEquals('id', 'test_action');
-    $this->assertSession()->responseContains('drupal.org');
-
-    // Make sure our ban still exists.
-    $this->drupalGet('admin/config/people/ban');
-    $this->assertSession()->pageTextContains('8.8.8.8');
+    $action = Action::load('test_action');
+    $this->assertEquals('Test action', $action->label());
 
     // Make sure our vocabulary exists.
     $this->drupalGet('admin/structure/taxonomy/manage/test_vocabulary/overview');
@@ -326,30 +313,16 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->drupalGet('taxonomy/term/2/translations');
     $this->assertSession()->linkExists('Test root term - Spanish');
 
-    // Make sure our contact form exists.
-    $this->drupalGet('admin/structure/contact');
-    $this->assertSession()->pageTextContains('Test contact form');
-    $this->drupalGet('admin/structure/contact/manage/test_contact_form');
-    $this->assertSession()->pageTextContains('test@example.com');
-    $this->assertSession()->pageTextContains('Hello');
-    $this->drupalGet('admin/structure/contact/manage/test_contact_form/translate/es/edit');
-    $this->assertSession()->pageTextContains('Hola');
-    $this->assertSession()->responseContains('Test contact form Spanish');
-
     // Make sure our modules are still enabled.
     $expected_enabled_modules = [
-      'action',
-      'ban',
       'basic_auth',
       'block',
       'block_content',
-      'book',
       'breakpoint',
       'ckeditor5',
       'comment',
       'config',
       'config_translation',
-      'contact',
       'content_translation',
       'contextual',
       'datetime',
@@ -360,14 +333,12 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
       'file',
       'filter',
       'help',
-      'history',
       'image',
       'language',
       'link',
       'locale',
       'menu_ui',
       'migrate',
-      'migrate_drupal',
       'node',
       'options',
       'page_cache',
@@ -381,10 +352,8 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
       'syslog',
       'system',
       'taxonomy',
-      'telephone',
       'text',
       'toolbar',
-      'tracker',
       'update',
       'user',
       'views_ui',
@@ -405,25 +374,19 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     foreach ($expected_enabled_themes as $theme) {
       $this->assertTrue($this->container->get('theme_handler')->themeExists($theme), 'The "' . $theme . '" is still enabled.');
     }
-
-    // Ensure that the Book module's node type does not have duplicated enforced
-    // dependencies.
-    // @see system_post_update_fix_enforced_dependencies()
-    $book_node_type = NodeType::load('book');
-    $this->assertEquals(['enforced' => ['module' => ['book']]], $book_node_type->get('dependencies'));
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function replaceUser1() {
+  protected function replaceUser1(): void {
     // Do not replace the user from our dump.
   }
 
   /**
    * Tests that the database was properly loaded.
    */
-  public function testDatabaseProperlyLoaded() {
+  public function testDatabaseProperlyLoaded(): void {
     $this->testDatabaseLoaded();
   }
 

@@ -9,16 +9,18 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\filter\Entity\FilterFormat;
+use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\filter\Render\FilteredMarkup;
 use Drupal\Tests\field\Functional\FunctionalString\StringFieldTest;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the creation of text fields.
- *
- * @group text
- * @group #slow
  */
+#[Group('text')]
+#[RunTestsInSeparateProcesses]
 class TextFieldTest extends StringFieldTest {
 
   use TestFileCreationTrait {
@@ -59,7 +61,7 @@ class TextFieldTest extends StringFieldTest {
   /**
    * Tests text field validation.
    */
-  public function testTextFieldValidation() {
+  public function testTextFieldValidation(): void {
     // Create a field with settings to validate.
     $max_length = 3;
     $field_name = $this->randomMachineName();
@@ -94,7 +96,7 @@ class TextFieldTest extends StringFieldTest {
   /**
    * Tests required long text with file upload.
    */
-  public function testRequiredLongTextWithFileUpload() {
+  public function testRequiredLongTextWithFileUpload(): void {
     // Create a text field.
     $text_field_name = 'text_long';
     $field_storage = FieldStorageConfig::create([
@@ -156,7 +158,7 @@ class TextFieldTest extends StringFieldTest {
   /**
    * Tests widgets.
    */
-  public function testTextfieldWidgets() {
+  public function testTextfieldWidgets(): void {
     $this->_testTextfieldWidgets('text', 'text_textfield');
     $this->_testTextfieldWidgets('text_long', 'text_textarea');
   }
@@ -164,7 +166,7 @@ class TextFieldTest extends StringFieldTest {
   /**
    * Tests widgets + 'formatted_text' setting.
    */
-  public function testTextfieldWidgetsFormatted() {
+  public function testTextfieldWidgetsFormatted(): void {
     $this->_testTextfieldWidgetsFormatted('text', 'text_textfield');
     $this->_testTextfieldWidgetsFormatted('text_long', 'text_textarea');
   }
@@ -172,7 +174,7 @@ class TextFieldTest extends StringFieldTest {
   /**
    * Test widgets for fields with selected allowed formats.
    */
-  public function testTextfieldWidgetsAllowedFormats() {
+  public function testTextfieldWidgetsAllowedFormats(): void {
     // Create one text format.
     $this->drupalLogin($this->adminUser);
     $format1 = FilterFormat::create([
@@ -308,7 +310,7 @@ class TextFieldTest extends StringFieldTest {
   /**
    * Helper function for testTextfieldWidgetsFormatted().
    */
-  public function _testTextfieldWidgetsFormatted($field_type, $widget_type) {
+  public function _testTextfieldWidgetsFormatted($field_type, $widget_type): void {
     // Create a field.
     $field_name = $this->randomMachineName();
     $field_storage = FieldStorageConfig::create([
@@ -335,7 +337,7 @@ class TextFieldTest extends StringFieldTest {
 
     // Disable all text formats besides the plain text fallback format.
     $this->drupalLogin($this->adminUser);
-    foreach (filter_formats() as $format) {
+    foreach (\Drupal::service(FilterFormatRepositoryInterface::class)->getAllFormats() as $format) {
       if (!$format->isFallbackFormat()) {
         $this->drupalGet('admin/config/content/formats/manage/' . $format->id() . '/disable');
         $this->submitForm([], 'Disable');
@@ -376,7 +378,6 @@ class TextFieldTest extends StringFieldTest {
     ];
     $this->drupalGet('admin/config/content/formats/add');
     $this->submitForm($edit, 'Save configuration');
-    filter_formats_reset();
     $format = FilterFormat::load($edit['format']);
     $format_id = $format->id();
     $permission = $format->getPermissionName();
@@ -399,7 +400,6 @@ class TextFieldTest extends StringFieldTest {
     $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been updated.');
 
     // Display the entity.
-    $this->container->get('entity_type.manager')->getStorage('entity_test')->resetCache([$id]);
     $entity = EntityTest::load($id);
     $display = $display_repository->getViewDisplay($entity->getEntityTypeId(), $entity->bundle(), 'full');
     $content = $display->build($entity);

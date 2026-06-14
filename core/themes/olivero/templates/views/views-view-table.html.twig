@@ -28,7 +28,7 @@
  * - sticky: A flag indicating whether table header is sticky.
  * - summary_element: A render array with table summary information (if any).
  *
- * @see template_preprocess_views_view_table()
+ * @see \Drupal\views\Hook\ViewsThemeHooks::preprocessViewsViewTable()
  *
  * @ingroup themeable
  */
@@ -38,7 +38,7 @@
     'views-table',
     'cols-' ~ header|length,
     responsive ? 'responsive-enabled',
-    sticky ? 'sticky-enabled',
+    sticky ? 'sticky-header',
   ]
 %}
 <table{{ attributes.addClass(classes) }}>

@@ -8,13 +8,18 @@ use Drupal\Core\Path\CurrentPathStack;
 use Drupal\path_alias\AliasManagerInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\Plugin\views\argument_default\Raw;
+use Drupal\views\Plugin\views\display\DisplayPluginBase;
+use Drupal\views\ViewExecutable;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * @coversDefaultClass \Drupal\views\Plugin\views\argument_default\Raw
- * @group views
+ * Tests Drupal\views\Plugin\views\argument_default\Raw.
  */
+#[CoversClass(Raw::class)]
+#[Group('views')]
 class RawTest extends UnitTestCase {
 
   /**
@@ -22,18 +27,14 @@ class RawTest extends UnitTestCase {
    *
    * @see \Drupal\views\Plugin\views\argument_default\Raw::getArgument()
    */
-  public function testGetArgument() {
-    $view = $this->getMockBuilder('Drupal\views\ViewExecutable')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $display_plugin = $this->getMockBuilder('Drupal\views\Plugin\views\display\DisplayPluginBase')
-      ->disableOriginalConstructor()
-      ->getMock();
+  public function testGetArgument(): void {
+    $view = $this->createStub(ViewExecutable::class);
+    $display_plugin = $this->createStub(DisplayPluginBase::class);
     $current_path = new CurrentPathStack(new RequestStack());
 
     $request = new Request();
     $current_path->setPath('/test/example', $request);
-    $view->expects($this->any())
+    $view
       ->method('getRequest')
       ->willReturn($request);
     $alias_manager = $this->createMock(AliasManagerInterface::class);
@@ -75,7 +76,7 @@ class RawTest extends UnitTestCase {
 
     // Setup an alias manager with a path alias.
     $alias_manager = $this->createMock(AliasManagerInterface::class);
-    $alias_manager->expects($this->any())
+    $alias_manager->expects($this->exactly(4))
       ->method('getAliasByPath')
       ->with($this->equalTo('/test/example'))
       ->willReturn('/other/example');

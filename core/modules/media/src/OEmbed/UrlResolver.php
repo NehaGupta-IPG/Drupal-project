@@ -8,6 +8,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use GuzzleHttp\ClientInterface;
 use Psr\Http\Client\ClientExceptionInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 // cspell:ignore omitscript
 
@@ -15,34 +16,6 @@ use Psr\Http\Client\ClientExceptionInterface;
  * Converts oEmbed media URLs into endpoint-specific resource URLs.
  */
 class UrlResolver implements UrlResolverInterface {
-
-  /**
-   * The HTTP client.
-   *
-   * @var \GuzzleHttp\Client
-   */
-  protected $httpClient;
-
-  /**
-   * The OEmbed provider repository service.
-   *
-   * @var \Drupal\media\OEmbed\ProviderRepositoryInterface
-   */
-  protected $providers;
-
-  /**
-   * The OEmbed resource fetcher service.
-   *
-   * @var \Drupal\media\OEmbed\ResourceFetcherInterface
-   */
-  protected $resourceFetcher;
-
-  /**
-   * The module handler service.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
 
   /**
    * Static cache of discovered oEmbed resource URLs, keyed by canonical URL.
@@ -54,34 +27,14 @@ class UrlResolver implements UrlResolverInterface {
    */
   protected $urlCache = [];
 
-  /**
-   * The cache backend.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
-   */
-  protected $cacheBackend;
-
-  /**
-   * Constructs a UrlResolver object.
-   *
-   * @param \Drupal\media\OEmbed\ProviderRepositoryInterface $providers
-   *   The oEmbed provider repository service.
-   * @param \Drupal\media\OEmbed\ResourceFetcherInterface $resource_fetcher
-   *   The OEmbed resource fetcher service.
-   * @param \GuzzleHttp\ClientInterface $http_client
-   *   The HTTP client.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler service.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
-   *   The cache backend.
-   */
-  public function __construct(ProviderRepositoryInterface $providers, ResourceFetcherInterface $resource_fetcher, ClientInterface $http_client, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend) {
-    $this->providers = $providers;
-    $this->resourceFetcher = $resource_fetcher;
-    $this->httpClient = $http_client;
-    $this->moduleHandler = $module_handler;
-    $this->cacheBackend = $cache_backend;
-  }
+  public function __construct(
+    protected ProviderRepositoryInterface $providers,
+    protected ResourceFetcherInterface $resourceFetcher,
+    protected ClientInterface $httpClient,
+    protected ModuleHandlerInterface $moduleHandler,
+    #[Autowire(service: 'cache.default')]
+    protected CacheBackendInterface $cacheBackend,
+  ) {}
 
   /**
    * Runs oEmbed discovery and returns the endpoint URL if successful.
@@ -89,7 +42,7 @@ class UrlResolver implements UrlResolverInterface {
    * @param string $url
    *   The resource's URL.
    *
-   * @return string|bool
+   * @return string|false
    *   URL of the oEmbed endpoint, or FALSE if the discovery was unsuccessful.
    */
   protected function discoverResourceUrl($url) {
@@ -100,8 +53,14 @@ class UrlResolver implements UrlResolverInterface {
       return FALSE;
     }
 
+    // Only care about HTML responses.
+    $response_type = strtolower($response->getHeaderLine('Content-Type'));
+    if (!str_contains($response_type, 'text/html')) {
+      return FALSE;
+    }
+
     $document = Html::load((string) $response->getBody());
-    $xpath = new \DOMXpath($document);
+    $xpath = new \DOMXPath($document);
 
     return $this->findUrl($xpath, 'json') ?: $this->findUrl($xpath, 'xml');
   }
@@ -141,7 +100,7 @@ class UrlResolver implements UrlResolverInterface {
       return $this->resourceFetcher->fetchResource($resource_url)->getProvider();
     }
 
-    throw new ResourceException('No matching provider found.', $url);
+    throw new ResourceException("No matching oEmbed provider found for resource: \"{$url}\"", $url);
   }
 
   /**

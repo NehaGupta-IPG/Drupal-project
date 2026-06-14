@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Drupal\Tests\taxonomy\Traits;
 
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\taxonomy\Entity\Vocabulary;
+use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\TermInterface;
 use Drupal\taxonomy\VocabularyInterface;
 
@@ -24,7 +25,7 @@ trait TaxonomyTestTrait {
    * @return \Drupal\taxonomy\VocabularyInterface
    *   A vocabulary used for testing.
    */
-  public function createVocabulary(array $values = []) {
+  protected function createVocabulary(array $values = []) {
     $values += [
       'name' => $this->randomMachineName(),
       'description' => $this->randomMachineName(),
@@ -49,13 +50,13 @@ trait TaxonomyTestTrait {
    * @return \Drupal\taxonomy\TermInterface
    *   The new taxonomy term object.
    */
-  public function createTerm(VocabularyInterface $vocabulary, $values = []) {
+  protected function createTerm(VocabularyInterface $vocabulary, $values = []) {
     $term = Term::create($values + [
       'name' => $this->randomMachineName(),
       'description' => [
         'value' => $this->randomMachineName(),
         // Use the fallback text format.
-        'format' => filter_fallback_format(),
+        'format' => \Drupal::service(FilterFormatRepositoryInterface::class)->getFallbackFormatId(),
       ],
       'vid' => $vocabulary->id(),
       'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
@@ -73,7 +74,7 @@ trait TaxonomyTestTrait {
    * @return \Drupal\taxonomy\TermInterface
    *   The new taxonomy term object.
    */
-  protected function createTaxonomyTermRevision(TermInterface $term) {
+  protected function createTaxonomyTermRevision(TermInterface $term): TermInterface {
     $term->set('name', $this->randomMachineName());
     $term->setNewRevision();
     $term->save();

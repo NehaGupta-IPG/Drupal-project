@@ -9,6 +9,7 @@ use Drupal\Core\Utility\Error;
 use GuzzleHttp\ClientInterface;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Fetches project information from remote locations.
@@ -37,40 +38,22 @@ class UpdateFetcher implements UpdateFetcherInterface {
   protected $updateSettings;
 
   /**
-   * The HTTP client to fetch the feed data with.
-   *
-   * @var \GuzzleHttp\ClientInterface
-   */
-  protected $httpClient;
-
-  /**
    * Whether to use HTTP fallback if HTTPS fails.
    *
    * @var bool
    */
   protected $withHttpFallback;
 
-  /**
-   * Constructs an UpdateFetcher.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \GuzzleHttp\ClientInterface $http_client
-   *   A Guzzle client object.
-   * @param \Drupal\Core\Site\Settings $settings
-   *   The settings instance.
-   * @param \Psr\Log\LoggerInterface|null $logger
-   *   The logger.
-   */
-  public function __construct(ConfigFactoryInterface $config_factory, ClientInterface $http_client, Settings $settings, protected ?LoggerInterface $logger = NULL) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    protected ClientInterface $httpClient,
+    Settings $settings,
+    #[Autowire(service: 'logger.channel.update')]
+    protected LoggerInterface $logger,
+  ) {
     $this->fetchUrl = $config_factory->get('update.settings')->get('fetch.url');
-    $this->httpClient = $http_client;
     $this->updateSettings = $config_factory->get('update.settings');
     $this->withHttpFallback = $settings->get('update_fetch_with_http_fallback', FALSE);
-    if ($this->logger === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $logger argument is deprecated in drupal:10.1.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/2932520', E_USER_DEPRECATED);
-      $this->logger = \Drupal::service('logger.channel.update');
-    }
   }
 
   /**

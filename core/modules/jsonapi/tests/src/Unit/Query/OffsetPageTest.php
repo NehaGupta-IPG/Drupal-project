@@ -8,15 +8,19 @@ use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\jsonapi\Query\OffsetPage;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
- * @coversDefaultClass \Drupal\jsonapi\Query\OffsetPage
- * @group jsonapi
+ * Tests Drupal\jsonapi\Query\OffsetPage.
  *
  * @internal
  */
+#[CoversClass(OffsetPage::class)]
+#[Group('jsonapi')]
 class OffsetPageTest extends UnitTestCase {
 
   /**
@@ -34,10 +38,10 @@ class OffsetPageTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::createFromQueryParameter
-   * @dataProvider parameterProvider
+   * Tests create from query parameter.
    */
-  public function testCreateFromQueryParameter($original, $expected) {
+  #[DataProvider('parameterProvider')]
+  public function testCreateFromQueryParameter(array $original, array $expected): void {
     $actual = OffsetPage::createFromQueryParameter($original);
     $this->assertEquals($expected['offset'], $actual->getOffset());
     $this->assertEquals($expected['limit'], $actual->getSize());
@@ -46,7 +50,7 @@ class OffsetPageTest extends UnitTestCase {
   /**
    * Data provider for testCreateFromQueryParameter.
    */
-  public static function parameterProvider() {
+  public static function parameterProvider(): array {
     return [
       [['offset' => 12, 'limit' => 20], ['offset' => 12, 'limit' => 20]],
       [['offset' => 12, 'limit' => 60], ['offset' => 12, 'limit' => 50]],
@@ -57,9 +61,9 @@ class OffsetPageTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::createFromQueryParameter
+   * Tests create from query parameter fail.
    */
-  public function testCreateFromQueryParameterFail() {
+  public function testCreateFromQueryParameterFail(): void {
     $this->expectException(BadRequestHttpException::class);
     OffsetPage::createFromQueryParameter('lorem');
   }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\Kernel;
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
@@ -117,7 +119,7 @@ abstract class LayoutBuilderCompatibilityTestBase extends EntityKernelTestBase {
     $build = $view_builder->view($entity);
     $this->render($build);
 
-    $actual = array_map(function (\SimpleXMLElement $element) {
+    $actual = array_map(function (\SimpleXMLElement $element): string {
       return (string) $element->attributes();
     }, $this->cssSelect('.field'));
     $this->assertSame($attributes, $actual);
