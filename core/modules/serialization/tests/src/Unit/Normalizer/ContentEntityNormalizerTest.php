@@ -95,6 +95,30 @@ class ContentEntityNormalizerTest extends UnitTestCase {
   }
 
   /**
+   * Tests the normalize() method with sparse_fieldset.
+   */
+  public function testNormalizeSparseFieldset(): void {
+    $this->serializer->normalize(Argument::type(FieldItemListInterface::class),
+      'test_format', ['account' => NULL, 'sparse_fieldset' => ['field_accessible_external']])->willReturn('test');
+
+    $definitions = [
+      'field_accessible_external' => $this->createMockFieldListItem(TRUE, FALSE, TRUE),
+      'field_non-accessible_external' => $this->createMockFieldListItem(FALSE, FALSE, FALSE),
+      'field_accessible_internal' => $this->createMockFieldListItem(TRUE, TRUE, FALSE),
+      'field_non-accessible_internal' => $this->createMockFieldListItem(FALSE, TRUE, FALSE),
+    ];
+    $content_entity_mock = $this->createStubForContentEntity($definitions);
+
+    $normalized = $this->contentEntityNormalizer->normalize($content_entity_mock, 'test_format', ['sparse_fieldset' => ['field_accessible_external']]);
+
+    $this->assertArrayHasKey('field_accessible_external', $normalized);
+    $this->assertEquals('test', $normalized['field_accessible_external']);
+    $this->assertArrayNotHasKey('field_non-accessible_external', $normalized);
+    $this->assertArrayNotHasKey('field_accessible_internal', $normalized);
+    $this->assertArrayNotHasKey('field_non-accessible_internal', $normalized);
+  }
+
+  /**
    * Tests the normalize() method with account context passed.
    */
   public function testNormalizeWithAccountContext(): void {
@@ -110,8 +134,8 @@ class ContentEntityNormalizerTest extends UnitTestCase {
     // The mock account should get passed directly into the access() method on
     // field items from $context['account'].
     $definitions = [
-      'field_1' => $this->createMockFieldListItem(TRUE, FALSE, $mock_account),
-      'field_2' => $this->createMockFieldListItem(FALSE, FALSE, $mock_account),
+      'field_1' => $this->createMockFieldListItem(TRUE, FALSE, TRUE, $mock_account),
+      'field_2' => $this->createMockFieldListItem(FALSE, FALSE, TRUE, $mock_account),
     ];
     $content_entity_mock = $this->createStubForContentEntity($definitions);
 
@@ -151,13 +175,15 @@ class ContentEntityNormalizerTest extends UnitTestCase {
    *   The value that access() will return.
    * @param bool $internal
    *   The value that isInternal() will return.
+   * @param bool $access_check
+   *   Whether an access check expectation should be set.
    * @param \Drupal\Core\Session\AccountInterface|null $user_context
    *   The user context used for the access check.
    *
    * @return \Drupal\Core\Field\FieldItemListInterface<\Drupal\Core\Field\FieldItemInterface>&\PHPUnit\Framework\MockObject\MockObject
    *   The mock field list item.
    */
-  protected function createMockFieldListItem(bool $access, bool $internal, ?AccountInterface $user_context = NULL): FieldItemListInterface&MockObject {
+  protected function createMockFieldListItem(bool $access, bool $internal, $access_check = TRUE, ?AccountInterface $user_context = NULL): FieldItemListInterface&MockObject {
     $data_definition = $this->prophesize(DataDefinitionInterface::class);
     $mock = $this->createMock(FieldItemListInterface::class);
     $mock->expects($this->once())
@@ -166,7 +192,7 @@ class ContentEntityNormalizerTest extends UnitTestCase {
     $data_definition->isInternal()
       ->willReturn($internal)
       ->shouldBeCalled();
-    if (!$internal) {
+    if (!$internal && $access_check) {
       $mock->expects($this->once())
         ->method('access')
         ->with('view', $user_context)

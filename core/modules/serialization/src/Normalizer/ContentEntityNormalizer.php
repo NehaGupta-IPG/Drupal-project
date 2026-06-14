@@ -34,7 +34,7 @@ class ContentEntityNormalizer extends EntityNormalizer {
       if (
         (empty($context['sparse_fieldset']) || in_array($name, $context['sparse_fieldset']))
         && $field_items->access('view', $context['account'])
-        ) {
+      ) {
         $attributes[$name] = $this->serializer->normalize($field_items, $format, $context);
       }
     }
