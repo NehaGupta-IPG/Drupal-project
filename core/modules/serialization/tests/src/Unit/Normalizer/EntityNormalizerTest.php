@@ -113,6 +113,41 @@ class EntityNormalizerTest extends UnitTestCase {
   }
 
   /**
+   * Tests the normalize() method with sparse_fieldset.
+   */
+  public function testNormalizeSparseFieldset(): void {
+    $this->entityFieldManager->expects($this->never())
+      ->method('getBaseFieldDefinitions');
+    $this->entityTypeManager->expects($this->never())
+      ->method('getDefinition');
+    $this->entityTypeManager->expects($this->never())
+      ->method('getStorage');
+
+    $list_item_1 = $this->createStub(TypedDataInterface::class);
+    $list_item_2 = $this->createStub(TypedDataInterface::class);
+
+    $definitions = [
+      'field_1' => $list_item_1,
+      'field_2' => $list_item_2,
+    ];
+
+    $content_entity = $this->getMockBuilder(ContentEntityBaseMockableClass::class)
+      ->disableOriginalConstructor()
+      ->onlyMethods(['getFields'])
+      ->getMock();
+    $content_entity->expects($this->once())
+      ->method('getFields')
+      ->willReturn($definitions);
+
+    $serializer = $this->prophesize('Symfony\Component\Serializer\Serializer');
+    $serializer->normalize($list_item_1, 'test_format', ['sparse_fieldset' => ['field_1']])->shouldBeCalled();
+
+    $this->entityNormalizer->setSerializer($serializer->reveal());
+
+    $this->entityNormalizer->normalize($content_entity, 'test_format', ['sparse_fieldset' => ['field_1']]);
+  }
+
+  /**
    * Tests the denormalize() method with no entity type provided in context.
    */
   public function testDenormalizeWithNoEntityType(): void {
