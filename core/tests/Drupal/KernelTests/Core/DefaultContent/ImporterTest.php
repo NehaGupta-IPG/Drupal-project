@@ -6,9 +6,11 @@ namespace Drupal\KernelTests\Core\DefaultContent;
 
 use Drupal\Core\DefaultContent\Finder;
 use Drupal\Core\DefaultContent\Importer;
+use Drupal\Core\DefaultContent\ImportException;
 use Drupal\Core\DefaultContent\PreEntityImportEvent;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
@@ -101,6 +103,32 @@ class ImporterTest extends KernelTestBase implements EventSubscriberInterface {
     $entity = $this->container->get(EntityRepositoryInterface::class)
       ->loadEntityByUuid('entity_test', '2ab4da9f-7132-4578-99ac-3ee46ce8ce09');
     self::assertSame('Changed name', $entity?->label());
+  }
+
+  /**
+   * Tests that circular dependencies abort imports before anything is saved.
+   */
+  public function testCircularDependencyImportFailsBeforeWrite(): void {
+    $this->setUpCurrentUser(admin: TRUE);
+
+    $storage = $this->container->get(EntityTypeManagerInterface::class)
+      ->getStorage('entity_test');
+    self::assertSame(0, (int) $storage->getQuery()->accessCheck(FALSE)->count()->execute());
+
+    $dir = $this->getDrupalRoot() . '/core/tests/fixtures/default_content_circular_entity_test';
+    try {
+      $finder = new Finder($dir);
+      $this->container->get(Importer::class)->importContent($finder);
+      $this->fail('Expected an ImportException for a circular dependency.');
+    }
+    catch (ImportException $e) {
+      $message = $e->getMessage();
+      self::assertStringStartsWith('The following default content entities form a circular dependency: ', $message);
+      self::assertStringContainsString($dir . '/entity_test/aaaaaaaa-0000-4000-8000-000000000001.yml', $message);
+      self::assertStringContainsString($dir . '/entity_test/bbbbbbbb-0000-4000-8000-000000000002.yml', $message);
+    }
+
+    self::assertSame(0, (int) $storage->getQuery()->accessCheck(FALSE)->count()->execute());
   }
 
 }

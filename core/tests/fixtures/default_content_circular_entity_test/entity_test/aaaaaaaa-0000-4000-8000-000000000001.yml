@@ -1,0 +1,15 @@
+_meta:
+  version: '1.0'
+  entity_type: entity_test
+  uuid: aaaaaaaa-0000-4000-8000-000000000001
+  bundle: entity_test
+  default_langcode: en
+  depends:
+    bbbbbbbb-0000-4000-8000-000000000002: entity_test
+default:
+  name:
+    -
+      value: 'Cyclic Entity One (depends on Two)'
+  langcode:
+    -
+      value: en
