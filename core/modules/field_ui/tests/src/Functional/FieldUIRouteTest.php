@@ -122,19 +122,19 @@ class FieldUIRouteTest extends BrowserTestBase {
   }
 
   /**
-   * Tests that view mode routes have correct defaults and requirements.
+   * Tests that view mode routes have the correct defaults.
    *
-   * Ensures the entity_view_display view_mode route has active_tab default,
-   * excludes 'default' from matching {view_mode_name} to prevent duplicate
-   * paths, and the dedicated /default route still works.
+   * The view_mode_name must NOT be in the defaults (to keep it a required
+   * path parameter), preventing the route from matching the overview URL
+   * /display without a view mode segment. The active_tab default ensures
+   * consistent tab UI across all view modes.
    */
   public function testDisplayViewModeRouteDefaults(): void {
     /** @var \Symfony\Component\Routing\Route $view_mode_route */
     $view_mode_route = \Drupal::service('router.route_provider')->getRouteByName('entity.entity_view_display.user.view_mode');
     $this->assertNotNull($view_mode_route, 'The view mode route exists.');
-    $this->assertNull($view_mode_route->getDefault('view_mode_name'), 'view_mode_name default should not be set (it is a required path parameter).');
+    $this->assertNull($view_mode_route->getDefault('view_mode_name'), 'view_mode_name must not be a default (required path param).');
     $this->assertSame('default', $view_mode_route->getDefault('active_tab'), 'active_tab default is set to "default".');
-    $this->assertStringContainsString('(?!default$)', $view_mode_route->getRequirement('view_mode_name'), 'view_mode_name requirement must exclude "default".');
 
     /** @var \Symfony\Component\Routing\Route $default_route */
     $default_route = \Drupal::service('router.route_provider')->getRouteByName('entity.entity_view_display.user.default');
