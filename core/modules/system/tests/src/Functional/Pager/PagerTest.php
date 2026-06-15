@@ -7,7 +7,6 @@ namespace Drupal\Tests\system\Functional\Pager;
 use Behat\Mink\Element\NodeElement;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -114,195 +113,84 @@ class PagerTest extends BrowserTestBase {
   /**
    * Tests proper functioning of multiple pagers.
    */
-  #[DataProvider('providerTestMultiplePagers')]
-  public function testMultiplePagers($input_query, $pagers): void {
+  public function testMultiplePagers(): void {
     // First page.
     $this->drupalGet('pager-test/multiple-pagers');
 
-    // We loop through the page with the test data query parameters, and check
-    // that the active page for each pager element has the expected page
-    // (1-indexed) and resulting query parameter.
-    $input_query = str_replace(' ', '%20', $input_query);
-    $this->drupalGet($this->getAbsoluteUrl(parse_url($this->getUrl())['path'] . $input_query), ['external' => TRUE]);
-    foreach ([0, 1, 4] as $pager_element) {
-      $active_page = $this->cssSelect("div.test-pager-{$pager_element} ul.pager__items li.is-active:contains('{$pagers[$pager_element]['expected_page']}')");
-      $destination = str_replace('%2C', ',', $active_page[0]->find('css', 'a')->getAttribute('href'));
-      $this->assertStringEndsWith($pagers[$pager_element]['expected_query'], $destination);
-    }
-  }
-
-  /**
-   * Provides test cases for PagerTest::testMultiplePagers().
-   */
-  public static function providerTestMultiplePagers(): array {
     // Test data.
     // Expected URL query string param is 0-indexed.
     // Expected page per pager is 1-indexed.
-    return [
+    $test_data = [
       // With no query, all pagers set to first page.
       [
         'input_query' => '',
-        'pagers' => [
-          0 => [
-            'expected_page' => '1',
-            'expected_query' => '/pager-test/multiple-pagers?page=0',
-          ],
-          1 => [
-            'expected_page' => '1',
-            'expected_query' => '/pager-test/multiple-pagers?page=,0',
-          ],
-          4 => [
-            'expected_page' => '1',
-            'expected_query' => '/pager-test/multiple-pagers?page=,,,,0',
-          ],
-        ],
+        'expected_page' => [0 => '1', 1 => '1', 4 => '1'],
+        'expected_query' => '?page=0,0,,,0',
       ],
       // Blanks around page numbers should not be relevant.
       [
         'input_query' => '?page=2  ,    10,,,   5     ,,',
-        'pagers' => [
-          0 => [
-            'expected_page' => '3',
-            'expected_query' => '/pager-test/multiple-pagers?page=2,10,,,5,,',
-          ],
-          1 => [
-            'expected_page' => '11',
-            'expected_query' => '/pager-test/multiple-pagers?page=2,10,,,5,,',
-          ],
-          4 => [
-            'expected_page' => '6',
-            'expected_query' => '/pager-test/multiple-pagers?page=2,10,,,5,,',
-          ],
-        ],
+        'expected_page' => [0 => '3', 1 => '11', 4 => '6'],
+        'expected_query' => '?page=2,10,,,5',
       ],
       // Blanks within page numbers should lead to only the first integer
       // to be considered.
       [
         'input_query' => '?page=2  ,   3 0,,,   4  13    ,,',
-        'pagers' => [
-          0 => [
-            'expected_page' => '3',
-            'expected_query' => '/pager-test/multiple-pagers?page=2,3,,,4,,',
-          ],
-          1 => [
-            'expected_page' => '4',
-            'expected_query' => '/pager-test/multiple-pagers?page=2,3,,,4,,',
-          ],
-          4 => [
-            'expected_page' => '5',
-            'expected_query' => '/pager-test/multiple-pagers?page=2,3,,,4,,',
-          ],
-        ],
+        'expected_page' => [0 => '3', 1 => '4', 4 => '5'],
+        'expected_query' => '?page=2,3,,,4',
       ],
       // If floats are passed as page numbers, only the integer part is
+      // returned.
       [
         'input_query' => '?page=2.1,6.999,,,5.',
-        'pagers' => [
-          0 => [
-            'expected_page' => '3',
-            'expected_query' => '/pager-test/multiple-pagers?page=2,6,,,5',
-          ],
-          1 => [
-            'expected_page' => '7',
-            'expected_query' => '/pager-test/multiple-pagers?page=2,6,,,5',
-          ],
-          4 => [
-            'expected_page' => '6',
-            'expected_query' => '/pager-test/multiple-pagers?page=2,6,,,5',
-          ],
-        ],
+        'expected_page' => [0 => '3', 1 => '7', 4 => '6'],
+        'expected_query' => '?page=2,6,,,5',
       ],
       // Partial page fragment, undefined pagers set to first page.
       [
         'input_query' => '?page=5,2',
-        'pagers' => [
-          0 => [
-            'expected_page' => '6',
-            'expected_query' => '/pager-test/multiple-pagers?page=5,2',
-          ],
-          1 => [
-            'expected_page' => '3',
-            'expected_query' => '/pager-test/multiple-pagers?page=5,2',
-          ],
-          4 => [
-            'expected_page' => '1',
-            'expected_query' => '/pager-test/multiple-pagers?page=5,2,,,0',
-          ],
-        ],
+        'expected_page' => [0 => '6', 1 => '3', 4 => '1'],
+        'expected_query' => '?page=5,2,,,0',
       ],
       // Partial page fragment, undefined pagers set to first page.
       [
         'input_query' => '?page=,2',
-        'pagers' => [
-          0 => [
-            'expected_page' => '1',
-            'expected_query' => '/pager-test/multiple-pagers?page=0,2',
-          ],
-          1 => [
-            'expected_page' => '3',
-            'expected_query' => '/pager-test/multiple-pagers?page=,2',
-          ],
-          4 => [
-            'expected_page' => '1',
-            'expected_query' => '/pager-test/multiple-pagers?page=,2,,,0',
-          ],
-        ],
+        'expected_page' => [0 => '1', 1 => '3', 4 => '1'],
+        'expected_query' => '?page=0,2,,,0',
       ],
       // Partial page fragment, undefined pagers set to first page.
       [
         'input_query' => '?page=,',
-        'pagers' => [
-          0 => [
-            'expected_page' => '1',
-            'expected_query' => '/pager-test/multiple-pagers?page=0,',
-          ],
-          1 => [
-            'expected_page' => '1',
-            'expected_query' => '/pager-test/multiple-pagers?page=,0',
-          ],
-          4 => [
-            'expected_page' => '1',
-            'expected_query' => '/pager-test/multiple-pagers?page=,,,,0',
-          ],
-        ],
+        'expected_page' => [0 => '1', 1 => '1', 4 => '1'],
+        'expected_query' => '?page=0,0,,,0',
       ],
       // With overflow pages, all pagers set to max page.
       [
         'input_query' => '?page=99,99,,,99',
-        'pagers' => [
-          0 => [
-            'expected_page' => '16',
-            'expected_query' => '/pager-test/multiple-pagers?page=15,99,,,99',
-          ],
-          1 => [
-            'expected_page' => '16',
-            'expected_query' => '/pager-test/multiple-pagers?page=99,15,,,99',
-          ],
-          4 => [
-            'expected_page' => '16',
-            'expected_query' => '/pager-test/multiple-pagers?page=99,99,,,15',
-          ],
-        ],
+        'expected_page' => [0 => '16', 1 => '16', 4 => '16'],
+        'expected_query' => '?page=15,15,,,15',
       ],
       // Wrong value for the page resets pager to first page.
       [
         'input_query' => '?page=bar,5,foo,qux,bet',
-        'pagers' => [
-          0 => [
-            'expected_page' => '1',
-            'expected_query' => '/pager-test/multiple-pagers?page=0,5,0,0,0',
-          ],
-          1 => [
-            'expected_page' => '6',
-            'expected_query' => '/pager-test/multiple-pagers?page=0,5,0,0,0',
-          ],
-          4 => [
-            'expected_page' => '1',
-            'expected_query' => '/pager-test/multiple-pagers?page=0,5,0,0,0',
-          ],
-        ],
+        'expected_page' => [0 => '1', 1 => '6', 4 => '1'],
+        'expected_query' => '?page=0,5,,,0',
       ],
     ];
+
+    // We loop through the page with the test data query parameters, and check
+    // that the active page for each pager element has the expected page
+    // (1-indexed) and resulting query parameter.
+    foreach ($test_data as $data) {
+      $input_query = str_replace(' ', '%20', $data['input_query']);
+      $this->drupalGet($this->getAbsoluteUrl(parse_url($this->getUrl())['path'] . $input_query), ['external' => TRUE]);
+      foreach ([0, 1, 4] as $pager_element) {
+        $active_page = $this->cssSelect("div.test-pager-{$pager_element} ul.pager__items li.is-active:contains('{$data['expected_page'][$pager_element]}')");
+        $destination = str_replace('%2C', ',', $active_page[0]->find('css', 'a')->getAttribute('href'));
+        $this->assertStringEndsWith($data['expected_query'], $destination);
+      }
+    }
   }
 
   /**
