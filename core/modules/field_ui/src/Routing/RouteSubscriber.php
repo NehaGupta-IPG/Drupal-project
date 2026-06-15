@@ -198,18 +198,20 @@ class RouteSubscriber extends RouteSubscriberBase {
         );
         $collection->add("entity.entity_view_display.{$entity_type_id}.default", $route);
 
-        // Other view mode routes.
+        // Other view mode routes (excludes 'default', which has its own route).
         $route = new Route(
           "$path/display/{view_mode_name}",
           [
             '_entity_form' => 'entity_view_display.edit',
             '_title' => 'Manage display',
-            'view_mode_name' => 'default',
             'active_tab' => 'default',
           ] + $defaults,
-          ['_field_ui_view_mode_access' => 'administer ' . $entity_type_id . ' display'],
+          [
+            '_field_ui_view_mode_access' => 'administer ' . $entity_type_id . ' display',
+          ],
           $options
         );
+        $route->setRequirement('view_mode_name', '(?!default$).+');
         $collection->add("entity.entity_view_display.{$entity_type_id}.view_mode", $route);
 
         // Enable/disable routes for AJAX.
