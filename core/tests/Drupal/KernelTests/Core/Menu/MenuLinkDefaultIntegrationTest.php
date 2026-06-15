@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Menu;
 
+use Drupal\Core\Menu\Form\MenuLinkDefaultForm;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -53,6 +54,25 @@ class MenuLinkDefaultIntegrationTest extends KernelTestBase {
     $this->assertEquals('menu_test.child', $tree['menu_test.child']->link->getPluginId());
 
     $this->assertTrue(TRUE);
+  }
+
+  /**
+   * Tests that MenuLinkDefaultForm serialization works correctly.
+   *
+   * Without DependencySerializationTrait, service objects are serialized
+   * directly instead of being replaced by their service IDs. This can cause
+   * "database connection serialization errors" during AJAX form operations.
+   */
+  public function testMenuLinkDefaultFormSerialization(): void {
+    $container = \Drupal::getContainer();
+    $form_object = MenuLinkDefaultForm::create($container);
+    $this->assertInstanceOf(MenuLinkDefaultForm::class, $form_object);
+
+    $serialized = @serialize($form_object);
+    $this->assertNotFalse($serialized, 'MenuLinkDefaultForm must be serializable without errors.');
+
+    $restored_form = @unserialize($serialized);
+    $this->assertInstanceOf(MenuLinkDefaultForm::class, $restored_form);
   }
 
 }
