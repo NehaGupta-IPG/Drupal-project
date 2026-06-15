@@ -327,8 +327,18 @@ class MenuLinkManager implements MenuLinkManagerInterface {
     $instance = $this->createInstance($id);
     if ($instance) {
       $new_definition_values['id'] = $id;
-      $changed_definition = $instance->updateLink($new_definition_values, $persist);
+
+      // Update link just to get the definition but do not persist menu link entity.
+      $changed_definition = $instance->updateLink($new_definition_values, FALSE);
+
+      // Update tree using the definition.
       $this->treeStorage->save($changed_definition);
+      // Update link and persist.
+      // This re-call to MenuLinkInterface::updateLink to persist it after menu tree update was made to help
+      // fixing the pathauto issue https://www.drupal.org/project/pathauto/issues/3016532
+      if ($persist === TRUE) {
+        $instance->updateLink($new_definition_values, TRUE);
+      }
     }
     return $instance;
   }
