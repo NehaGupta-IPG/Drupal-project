@@ -380,6 +380,10 @@ trait PerformanceTestTrait {
     // not.
     foreach ($stylesheet_urls as $url) {
       $stylesheet_count++;
+      // Skip external stylesheets.
+      if (parse_url($url, PHP_URL_HOST) !== parse_url($this->baseUrl, PHP_URL_HOST)) {
+        continue;
+      }
       if ($GLOBALS['base_path'] === '/') {
         $filename = ltrim(parse_url($url, PHP_URL_PATH), '/');
         $stylesheet_bytes += strlen(file_get_contents($filename));
@@ -393,6 +397,10 @@ trait PerformanceTestTrait {
     }
     foreach ($script_urls as $url) {
       $script_count++;
+      // Skip external scripts.
+      if (parse_url($url, PHP_URL_HOST) !== parse_url($this->baseUrl, PHP_URL_HOST)) {
+        continue;
+      }
       if ($GLOBALS['base_path'] === '/') {
         $filename = ltrim(parse_url($url, PHP_URL_PATH), '/');
       }
