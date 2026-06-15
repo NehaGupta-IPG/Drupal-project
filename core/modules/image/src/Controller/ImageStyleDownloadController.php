@@ -295,7 +295,7 @@ class ImageStyleDownloadController extends FileDownloadController implements Ima
   /**
    * {@inheritdoc}
    */
-  public function isSchemePublic($token_is_valid, $scheme, $derivative_scheme): bool {
+  public function isSchemePublic(bool $token_is_valid, string $scheme, string $derivative_scheme): bool {
     if ($token_is_valid) {
       $is_public = ($scheme !== 'private');
     }
