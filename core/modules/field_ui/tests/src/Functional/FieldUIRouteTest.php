@@ -122,6 +122,47 @@ class FieldUIRouteTest extends BrowserTestBase {
   }
 
   /**
+   * Tests that view mode routes have correct default parameters.
+   *
+   * Ensures the entity_view_display view_mode route has view_mode_name and
+   * active_tab defaults, preventing duplicate paths and inconsistent markup
+   * in the admin UI for the Default view mode.
+   */
+  public function testDisplayViewModeRouteDefaults(): void {
+    /** @var \Symfony\Component\Routing\Route $view_mode_route */
+    $view_mode_route = \Drupal::service('router.route_provider')->getRouteByName('entity.entity_view_display.user.view_mode');
+    $this->assertNotNull($view_mode_route, 'The view mode route exists.');
+    $this->assertSame('default', $view_mode_route->getDefault('view_mode_name'), 'view_mode_name default is set to "default".');
+    $this->assertSame('default', $view_mode_route->getDefault('active_tab'), 'active_tab default is set to "default".');
+
+    /** @var \Symfony\Component\Routing\Route $default_route */
+    $default_route = \Drupal::service('router.route_provider')->getRouteByName('entity.entity_view_display.user.default');
+    $this->assertNotNull($default_route, 'The default display route exists.');
+    $this->assertSame('default', $default_route->getDefault('view_mode_name'), 'Default route has view_mode_name set to "default".');
+    $this->assertNull($default_route->getDefault('active_tab'), 'Default route does not need active_tab default.');
+
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer user display',
+      'access administration pages',
+    ]));
+
+    $this->drupalGet('admin/config/people/accounts/display/default');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->titleEquals('Manage display | Drupal');
+  }
+
+  /**
+   * Tests that form display routes have correct default parameters.
+   */
+  public function testFormDisplayModeRouteDefaults(): void {
+    /** @var \Symfony\Component\Routing\Route $form_mode_route */
+    $form_mode_route = \Drupal::service('router.route_provider')->getRouteByName('entity.entity_form_display.user.form_mode');
+    $this->assertNotNull($form_mode_route, 'The form mode route exists.');
+    $this->assertNull($form_mode_route->getDefault('form_mode_name'), 'form_mode_name default is not set on form_mode route.');
+    $this->assertNull($form_mode_route->getDefault('active_tab'), 'active_tab default is not set on form_mode route.');
+  }
+
+  /**
    * Asserts that local tasks exists.
    *
    * @internal
