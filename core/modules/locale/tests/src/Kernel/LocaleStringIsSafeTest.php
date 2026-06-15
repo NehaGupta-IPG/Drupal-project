@@ -6,12 +6,14 @@ namespace Drupal\Tests\locale\Kernel;
 
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests locale translation safe string handling.
- *
- * @group locale
  */
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocaleStringIsSafeTest extends KernelTestBase {
 
   use StringTranslationTrait;
@@ -43,6 +45,11 @@ class LocaleStringIsSafeTest extends KernelTestBase {
 
     // Check a translatable string which includes a token in an href attribute.
     $string = 'Hi <a href="[current-user:url]">user</a>';
+    $result = locale_string_is_safe($string);
+    $this->assertTrue($result);
+
+    // Check a translatable string which includes a wbr tag.
+    $string = 'DrupalLocaleModule<wbr>Test<wbr>Example';
     $result = locale_string_is_safe($string);
     $this->assertTrue($result);
   }

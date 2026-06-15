@@ -9,7 +9,6 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\PagerSelectExtender;
 use Drupal\Core\Database\Query\TableSortExtender;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
@@ -37,21 +36,13 @@ class DatabaseTestController extends ControllerBase {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('database')
-    );
-  }
-
-  /**
    * Runs a pager query and returns the results.
    *
    * This function does care about the page GET parameter, as set by the
    * test HTTP call.
    *
    * @return \Symfony\Component\HttpFoundation\JsonResponse
+   *   A JSON response containing the names of the test entries.
    */
   public function pagerQueryEven($limit) {
     $query = $this->connection->select('test', 't');
@@ -78,6 +69,7 @@ class DatabaseTestController extends ControllerBase {
    * test HTTP call.
    *
    * @return \Symfony\Component\HttpFoundation\JsonResponse
+   *   A JSON response containing the names of the test entries.
    */
   public function pagerQueryOdd($limit) {
     $query = $this->connection->select('test_task', 't');
@@ -104,6 +96,7 @@ class DatabaseTestController extends ControllerBase {
    * test HTTP call.
    *
    * @return \Symfony\Component\HttpFoundation\JsonResponse
+   *   A JSON response containing the test tasks.
    */
   public function testTablesort() {
     $header = [
@@ -136,6 +129,7 @@ class DatabaseTestController extends ControllerBase {
    * test HTTP call.
    *
    * @return \Symfony\Component\HttpFoundation\JsonResponse
+   *   A JSON response containing the test tasks.
    */
   public function testTablesortFirst() {
     $header = [

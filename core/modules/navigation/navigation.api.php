@@ -65,10 +65,10 @@ function hook_navigation_content_top_alter(array &$content_top): void {
  *    specific settings:
  *      - id: The Navigation Block plugin ID.
  *      - label: The block label.
- *      -label_display: 0 or 1 depending on whether the label should be
- *      displayed or not.
+ *      - label_display: '0' or 'visible' depending on whether the label should
+ *        be displayed or not.
  *      - provider: The module that provides the block. In general, the module
- *      that defines the Navigation block.
+ *        that defines the Navigation block.
  */
 function hook_navigation_defaults(): array {
   $blocks = [];
@@ -78,7 +78,7 @@ function hook_navigation_defaults(): array {
     'configuration' => [
       'id' => 'navigation_test',
       'label' => 'My test block',
-      'label_display' => 1,
+      'label_display' => 'visible',
       'provider' => 'navigation_test_block',
       'test_block_setting_foo' => 'Foo',
       'test_block_setting_bar' => 1,
@@ -86,6 +86,30 @@ function hook_navigation_defaults(): array {
   ];
 
   return $blocks;
+}
+
+/**
+ * Alter the content of a given Navigation menu link tree.
+ *
+ * @param array &$tree
+ *   The Navigation link tree.
+ *
+ * @see \Drupal\navigation\Menu\NavigationMenuLinkTree::transform()
+ */
+function hook_navigation_menu_link_tree_alter(array &$tree): void {
+  foreach ($tree as $key => $item) {
+    // Skip elements where menu is not the 'admin' one.
+    $menu_name = $item->link->getMenuName();
+    if ($menu_name != 'admin') {
+      continue;
+    }
+
+    // Remove unwanted Help menu link.
+    $plugin_id = $item->link->getPluginId();
+    if ($plugin_id == 'help.main') {
+      unset($tree[$key]);
+    }
+  }
 }
 
 /**

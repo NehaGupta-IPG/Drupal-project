@@ -90,7 +90,7 @@ abstract class ViewTestBase extends BrowserTestBase {
    */
   protected function orderResultSet($result_set, $column, $reverse = FALSE) {
     $order = $reverse ? -1 : 1;
-    usort($result_set, function ($a, $b) use ($column, $order) {
+    usort($result_set, function (array $a, array $b) use ($column, $order): int {
       return $order * ($a[$column] <=> $b[$column]);
     });
     return $result_set;
@@ -100,7 +100,7 @@ abstract class ViewTestBase extends BrowserTestBase {
    * Asserts the existence of a button with a certain ID and label.
    *
    * @param string $id
-   *   The HTML ID of the button
+   *   The HTML ID of the button.
    * @param string $expected_label
    *   The expected label for the button.
    * @param string $message

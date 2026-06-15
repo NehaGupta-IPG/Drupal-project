@@ -61,7 +61,14 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static($plugin_id, $plugin_definition, $configuration['field_definition'], $configuration['settings'], $configuration['third_party_settings']);
+    return static::createInstanceAutowired(
+      $container,
+      $plugin_id,
+      $plugin_definition,
+      $configuration['field_definition'],
+      $configuration['settings'],
+      $configuration['third_party_settings'],
+    );
   }
 
   /**
@@ -153,7 +160,10 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
       'items' => $items,
       'default' => $this->isDefaultValueWidget($form_state),
     ];
-    \Drupal::moduleHandler()->alter(['field_widget_complete_form', 'field_widget_complete_' . $this->getPluginId() . '_form'], $field_widget_complete_form, $form_state, $context);
+    \Drupal::moduleHandler()->alter([
+      'field_widget_complete_form',
+      'field_widget_complete_' . $this->getPluginId() . '_form',
+    ], $field_widget_complete_form, $form_state, $context);
 
     return $field_widget_complete_form;
   }
@@ -283,6 +293,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
           '#name' => strtr($id_prefix, '-', '_') . '_add_more',
           '#value' => $this->t('Add another item'),
           '#attributes' => ['class' => ['field-add-more-submit']],
+          '#button_type' => 'small',
           '#limit_validation_errors' => [],
           '#submit' => [[static::class, 'addMoreSubmit']],
           '#ajax' => [
@@ -468,7 +479,10 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
         'delta' => $delta,
         'default' => $this->isDefaultValueWidget($form_state),
       ];
-      \Drupal::moduleHandler()->alter(['field_widget_single_element_form', 'field_widget_single_element_' . $this->getPluginId() . '_form'], $element, $form_state, $context);
+      \Drupal::moduleHandler()->alter([
+        'field_widget_single_element_form',
+        'field_widget_single_element_' . $this->getPluginId() . '_form',
+      ], $element, $form_state, $context);
     }
 
     return $element;
@@ -618,9 +632,11 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
    *   The location of processing information within $form_state.
    */
   protected static function getWidgetStateParents(array $parents, $field_name) {
+    // phpcs:disable Drupal.Files.LineLength
     // Field processing data is placed at
-    // $form_state->get(['field_storage', '#parents', ...$parents..., '#fields', $field_name]),
+    // "$form_state->get(['field_storage', '#parents', ...$parents..., '#fields', $field_name])"
     // to avoid clashes between field names and $parents parts.
+    // phpcs:enable
     return array_merge(['field_storage', '#parents'], $parents, ['#fields', $field_name]);
   }
 

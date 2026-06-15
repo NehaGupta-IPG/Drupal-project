@@ -11,6 +11,7 @@ use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Asset\AttachedAssetsInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\EnforcedResponseException;
 use Drupal\Core\Messenger\MessengerInterface;
@@ -18,6 +19,7 @@ use Drupal\Core\Render\HtmlResponse;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\LocalRedirectResponse;
 use Drupal\Core\Routing\RequestContext;
+use Drupal\Core\Utility\FiberResumeType;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -188,6 +190,7 @@ class BigPipe {
     protected MessengerInterface $messenger,
     protected RequestContext $requestContext,
     protected LoggerInterface $logger,
+    protected bool $debugCacheabilityHeaders = FALSE,
   ) {
   }
 
@@ -248,7 +251,7 @@ class BigPipe {
     // that strings in inline JavaScript or CDATA sections aren't used instead.
     $parts = explode('</body>', $content);
     $post_body = array_pop($parts);
-    $pre_body = implode('', $parts);
+    $pre_body = implode('</body>', $parts);
 
     $this->sendPreBody($pre_body, $nojs_placeholders, $cumulative_assets);
     $this->sendPlaceholders($placeholders, $this->getPlaceholderOrder($pre_body, $placeholders), $cumulative_assets);
@@ -290,7 +293,7 @@ class BigPipe {
       // Create a new HtmlResponse. Ensure the CSS and (non-bottom) JS is sent
       // before the HTML they're associated with.
       // @see \Drupal\Core\Render\HtmlResponseSubscriber
-      // @see template_preprocess_html()
+      // @see \Drupal\Core\Theme\ThemePreprocess::preprocessHtml()
       $js_bottom_placeholder = '<nojs-bigpipe-placeholder-scripts-bottom-placeholder token="' . Crypt::randomBytesBase64(55) . '">';
 
       $html_response = new HtmlResponse();
@@ -396,7 +399,7 @@ class BigPipe {
       // before the HTML they're associated with. In other words: ensure the
       // critical assets for this placeholder's markup are loaded first.
       // @see \Drupal\Core\Render\HtmlResponseSubscriber
-      // @see template_preprocess_html()
+      // @see \Drupal\Core\Theme\ThemePreprocess::preprocessHtml()
       $css_placeholder = '<nojs-bigpipe-placeholder-styles-placeholder token="' . $token . '">';
       $js_placeholder = '<nojs-bigpipe-placeholder-scripts-placeholder token="' . $token . '">';
       $elements['#markup'] = BigPipeMarkup::create($css_placeholder . $js_placeholder . (string) $elements['#markup']);
@@ -414,7 +417,7 @@ class BigPipe {
       // - the HTML to load the CSS can be rendered.
       // - the HTML to load the JS (at the top) can be rendered.
       $fake_request = $this->requestStack->getMainRequest()->duplicate();
-      $fake_request->query->set('ajax_page_state', ['libraries' => implode(',', $cumulative_assets->getAlreadyLoadedLibraries())]);
+      $fake_request->attributes->set('ajax_page_state', ['libraries' => implode(',', $cumulative_assets->getAlreadyLoadedLibraries())]);
       try {
         $html_response = $this->filterEmbeddedResponse($fake_request, $html_response);
       }
@@ -487,6 +490,9 @@ class BigPipe {
 
     // Create a Fiber for each placeholder.
     $fibers = [];
+
+    $cacheable_metadata = new CacheableMetadata();
+
     foreach ($placeholder_order as $placeholder_id) {
       if (!isset($placeholders[$placeholder_id])) {
         continue;
@@ -513,13 +519,18 @@ class BigPipe {
             if ($iterations) {
               $fiber = \Fiber::getCurrent();
               if ($fiber !== NULL) {
-                $fiber->suspend();
+                $fiber->suspend(FiberResumeType::Immediate);
               }
             }
             continue;
           }
           $elements = $fiber->getReturn();
           unset($fibers[$placeholder_id]);
+
+          if ($this->debugCacheabilityHeaders) {
+            $cacheable_metadata->addCacheableDependency(CacheableMetadata::createFromRenderArray($elements));
+          }
+
           // Create a new AjaxResponse.
           $ajax_response = new AjaxResponse();
           // JavaScript's querySelector automatically decodes HTML entities in
@@ -550,7 +561,7 @@ class BigPipe {
           // which allows us to track the total set of asset libraries sent in
           // the initial HTML response plus all embedded AJAX responses sent so
           // far.
-          $fake_request->query->set('ajax_page_state', ['libraries' => implode(',', $cumulative_assets->getAlreadyLoadedLibraries())] + $cumulative_assets->getSettings()['ajaxPageState']);
+          $fake_request->attributes->set('ajax_page_state', ['libraries' => implode(',', $cumulative_assets->getAlreadyLoadedLibraries())] + $cumulative_assets->getSettings()['ajaxPageState']);
           $ajax_response = $this->filterEmbeddedResponse($fake_request, $ajax_response);
           // Send this embedded AJAX response.
           $json = $ajax_response->getContent();
@@ -626,6 +637,11 @@ EOF;
         }
       }
       $iterations++;
+    }
+
+    if ($this->debugCacheabilityHeaders) {
+      $this->sendChunk("\n<!-- big_pipe cache tags: " . implode(' ', $cacheable_metadata->getCacheTags()) . " -->\n");
+      $this->sendChunk("\n<!-- big_pipe cache contexts: " . implode(' ', $cacheable_metadata->getCacheContexts()) . " -->\n");
     }
 
     // Send the stop signal.

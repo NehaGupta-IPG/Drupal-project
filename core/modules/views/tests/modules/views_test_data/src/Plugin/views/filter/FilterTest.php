@@ -18,6 +18,7 @@ class FilterTest extends FilterPluginBase {
    * Overrides Drupal\views\Plugin\views\row\RowPluginBase::defineOptions().
    *
    * @return array
+   *   An array of options.
    */
   protected function defineOptions() {
     $options = parent::defineOptions();
@@ -29,7 +30,7 @@ class FilterTest extends FilterPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
+  public function buildOptionsForm(&$form, FormStateInterface $form_state): void {
     parent::buildOptionsForm($form, $form_state);
 
     $form['test_enable'] = [
@@ -42,7 +43,7 @@ class FilterTest extends FilterPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function query() {
+  public function query(): void {
     // Call the parent if this option is enabled.
     if ($this->options['test_enable']) {
       parent::query();

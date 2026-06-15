@@ -11,12 +11,14 @@ use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests exposed forms functionality.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class ExposedFormCheckboxesTest extends ViewTestBase {
 
   use EntityReferenceFieldCreationTrait;
@@ -61,7 +63,7 @@ class ExposedFormCheckboxesTest extends ViewTestBase {
     // vocabulary is in place to meet the view dependencies.
     $vocabulary = Vocabulary::create([
       'name' => 'test_exposed_checkboxes',
-      'vid' => 'tags',
+      'vid' => 'test_exposed_checkboxes',
       'nodes' => ['article' => 'article'],
     ]);
     $vocabulary->save();

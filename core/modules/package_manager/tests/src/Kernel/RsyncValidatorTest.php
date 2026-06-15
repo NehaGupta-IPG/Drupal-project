@@ -12,13 +12,20 @@ use Drupal\package_manager\Validator\RsyncValidator;
 use PhpTuf\ComposerStager\API\Exception\LogicException;
 use PhpTuf\ComposerStager\API\Finder\Service\ExecutableFinderInterface;
 use PhpTuf\ComposerStager\API\Translation\Factory\TranslatableFactoryInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * @covers \Drupal\package_manager\Validator\RsyncValidator
- * @group package_manager
+ * Tests Rsync Validator.
+ *
  * @internal
  */
+#[Group('package_manager')]
+#[CoversClass(RsyncValidator::class)]
+#[RunTestsInSeparateProcesses]
 class RsyncValidatorTest extends PackageManagerKernelTestBase {
 
   use StringTranslationTrait;
@@ -28,7 +35,7 @@ class RsyncValidatorTest extends PackageManagerKernelTestBase {
    *
    * @var \PhpTuf\ComposerStager\API\Finder\Service\ExecutableFinderInterface
    */
-  private $executableFinder;
+  private ObjectProphecy $executableFinder;
 
   /**
    * {@inheritdoc}
@@ -74,6 +81,15 @@ class RsyncValidatorTest extends PackageManagerKernelTestBase {
       $this->t('<code>rsync</code> is not available. See the <a href="/admin/help/package_manager#package-manager-faq-rsync">Package Manager help</a> for more information on how to resolve this.'),
     ]);
     $this->assertResults([$result], PreCreateEvent::class);
+  }
+
+  /**
+   * Tests that the presence of rsync is not checked in direct-write mode.
+   */
+  public function testRsyncNotNeededForDirectWrite(): void {
+    $this->executableFinder->find('rsync')->shouldNotBeCalled();
+    $this->setSetting('package_manager_allow_direct_write', TRUE);
+    $this->createStage(TestDirectWriteSandboxManager::class)->create();
   }
 
 }

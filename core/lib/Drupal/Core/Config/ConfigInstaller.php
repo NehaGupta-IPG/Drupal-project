@@ -9,6 +9,9 @@ use Drupal\Core\Extension\ExtensionPathResolver;
 use Drupal\Core\Installer\InstallerKernel;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * The config installer.
+ */
 class ConfigInstaller implements ConfigInstallerInterface {
 
   /**
@@ -423,14 +426,14 @@ class ConfigInstaller implements ConfigInstallerInterface {
           $entity = $entity_storage->createFromStorageRecord($new_config->get());
         }
         if ($entity->isInstallable()) {
-          $entity->trustData()->save();
+          $entity->save();
           if ($id !== $entity->id()) {
             throw new \LogicException(sprintf('The configuration name "%s" does not match the ID "%s"', $name, $entity->id()));
           }
         }
       }
       else {
-        $new_config->save(TRUE);
+        $new_config->save();
       }
     }
   }

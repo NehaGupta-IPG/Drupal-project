@@ -31,7 +31,7 @@ use Drupal\jsonapi\ResourceType\ResourceType;
  * @see https://www.drupal.org/project/drupal/issues/3032787
  * @see jsonapi.api.php
  *
- * @see http://jsonapi.org/format/#document-resource-object-relationships
+ * @see https://jsonapi.org/format/#document-resource-object-relationships
  * @see https://github.com/json-api/json-api/pull/1156#issuecomment-325377995
  * @see https://www.drupal.org/project/drupal/issues/2864680
  */
@@ -390,7 +390,7 @@ class ResourceIdentifier implements ResourceIdentifierInterface {
    *   The entity reference item for which to determine the entity property
    *   name.
    *
-   * @return string
+   * @return string|null
    *   The property name which has an entity as its value.
    */
   protected static function getDataReferencePropertyName(EntityReferenceItem $item) {
@@ -399,6 +399,7 @@ class ResourceIdentifier implements ResourceIdentifierInterface {
         return $property_name;
       }
     }
+    return NULL;
   }
 
   /**
