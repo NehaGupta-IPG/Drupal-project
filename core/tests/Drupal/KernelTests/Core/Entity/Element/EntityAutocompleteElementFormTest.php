@@ -395,6 +395,46 @@ class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements 
   }
 
   /**
+   * Tests that a single-value entity_autocomplete element rejects multiple values.
+   *
+   * When #tags is FALSE, submitting a comma-separated list of entities should
+   * produce a form error instead of silently discarding extra values.
+   */
+  public function testSingleElementRejectsMultipleValues(): void {
+    $form_state = (new FormState())
+      ->setValues([
+        'single' => $this->getAutocompleteInput($this->referencedEntities[0]) . ', ' . $this->getAutocompleteInput($this->referencedEntities[1]),
+      ]);
+    $form_builder = $this->container->get('form_builder');
+    $form_builder->submitForm($this, $form_state);
+
+    $this->assertCount(1, $form_state->getErrors());
+    $this->assertEquals('This element can only have one value', $form_state->getErrors()['single']);
+  }
+
+  /**
+   * Tests that a tags (multi-value) entity_autocomplete still accepts multiple values.
+   *
+   * Regression test to ensure #tags = TRUE elements are unaffected by any
+   * single-value validation changes.
+   */
+  public function testTagsElementStillAcceptsMultipleValues(): void {
+    $form_state = (new FormState())
+      ->setValues([
+        'tags' => $this->getAutocompleteInput($this->referencedEntities[0]) . ', ' . $this->getAutocompleteInput($this->referencedEntities[1]),
+      ]);
+    $form_builder = $this->container->get('form_builder');
+    $form_builder->submitForm($this, $form_state);
+
+    $this->assertCount(0, $form_state->getErrors());
+    $expected = [
+      ['target_id' => $this->referencedEntities[0]->id()],
+      ['target_id' => $this->referencedEntities[1]->id()],
+    ];
+    $this->assertEquals($expected, $form_state->getValue('tags'));
+  }
+
+  /**
    * Returns an entity label in format needed by the EntityAutocomplete element.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
