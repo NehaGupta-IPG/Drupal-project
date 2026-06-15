@@ -305,7 +305,7 @@ class EntityAutocomplete extends Textfield {
           $form_state->setError($element, t('This element can only have one value'));
         }
         else {
-          $value = isset($value[0]['target_id']) ? $value[0]['target_id'] : $value[0];
+          $value = $value[0]['target_id'] ?? $value[0];
         }
       }
     }
