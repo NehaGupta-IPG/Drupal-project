@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Drupal\Core\Command;
 
 use Drupal\Component\Utility\Crypt;
+use Drupal\Core\Cache\NullBackend;
 use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DrupalKernel;
+use Drupal\Core\Extension\DatabaseDriverList;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Extension\InfoParserDynamic;
 use Drupal\Core\Site\Settings;
@@ -190,10 +192,24 @@ class InstallCommand extends Command {
    */
   protected function install($class_loader, SymfonyStyle $io, $profile, $langcode, $site_path, $site_name, string $recipe, #[\SensitiveParameter] ?string $password = NULL, array $connection_options = []) {
     $password ??= Crypt::randomBytesBase64(12);
-    if ($connection_options['driver'] === 'sqlite') {
-      $connection_options['database'] = $site_path . '/files/' . $connection_options['database'];
+
+    $driver_name = $connection_options['driver'];
+    $namespace = NULL;
+    $databaseDriverList = new DatabaseDriverList(DRUPAL_ROOT, 'database_driver', new NullBackend('database_driver'));
+    foreach ($databaseDriverList->getInstallableList() as $driver) {
+      if ($driver->getDriverName() === $driver_name) {
+        $namespace = $driver->getNamespace();
+
+        if ($driver_name === 'sqlite') {
+          $connection_options['database'] = $site_path . '/files/' . $connection_options['database'];
+        }
+      }
     }
-    $driver = $connection_options['driver'];
+
+    if (!$namespace) {
+      $io->error("The namespace for the specified database driver name '{$driver_name}' is not found");
+    }
+
     $parameters = [
       'interactive' => FALSE,
       'site_path' => $site_path,
@@ -203,8 +219,8 @@ class InstallCommand extends Command {
       ],
       'forms' => [
         'install_settings_form' => [
-          'driver' => $driver,
-          "$driver" => [
+          'driver' => $namespace,
+          "$namespace" => [
             'username' => $connection_options['username'],
             'password' => $connection_options['password'],
             'database' => $connection_options['database'],
