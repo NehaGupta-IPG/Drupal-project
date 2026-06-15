@@ -61,12 +61,18 @@ class QuickStartCommand {
   ): int {
     $command = $application->find('install');
 
+    if (!extension_loaded('pdo_sqlite')) {
+      $output->writeln('<error>You must have the pdo_sqlite PHP extension installed. See core/INSTALL.sqlite.txt for instructions.</error>');
+      return 1;
+    }
+
     $arguments = [
       'command' => 'install',
       'install-profile-or-recipe' => $install_profile_or_recipe,
       '--langcode' => $langcode,
       '--password' => $password,
       '--site-name' => $site_name,
+      '--database-name' => '.sqlite',
     ];
 
     $installInput = new ArrayInput($arguments);
