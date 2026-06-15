@@ -15,6 +15,7 @@ use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system_mail_failure_test\Plugin\Mail\TestPhpMailFailure;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -387,6 +388,46 @@ class MailTest extends KernelTestBase {
       $expected_html = MailFormatHelper::wrapMail($expected_html);
       $this->assertSame($expected_html, $sent_message['body']);
     }
+  }
+
+  /**
+   * Tests that the system mail hook handles missing context gracefully.
+   *
+   * Ensures that SystemHooks::mail() does not throw a TypeError when
+   * $params['context'] is missing or when context keys are absent.
+   */
+  #[DataProvider('providerMailContext')]
+  public function testMailContext(?array $context, ?string $subject, ?string $message): void {
+    $language = \Drupal::languageManager()->getCurrentLanguage();
+    \Drupal::state()->set('system.test_mail_collector', []);
+
+    $params = [];
+    if ($context !== NULL) {
+      $params['context'] = $context;
+    }
+    if ($subject !== NULL) {
+      $params['context']['subject'] = $subject;
+    }
+    if ($message !== NULL) {
+      $params['context']['message'] = $message;
+    }
+
+    \Drupal::service('plugin.manager.mail')->mail('system', 'test_context_handling', 'test@example.com', $language->getId(), $params);
+    $captured_emails = \Drupal::state()->get('system.test_mail_collector');
+    $sent_message = end($captured_emails);
+    $this->assertNotFalse($sent_message, 'The email was sent without a TypeError.');
+  }
+
+  /**
+   * Data provider for ::testMailContext().
+   */
+  public static function providerMailContext(): array {
+    return [
+      'no context at all' => [NULL, NULL, NULL],
+      'empty context array' => [[], NULL, NULL],
+      'context without subject key' => [['message' => 'Body without subject'], NULL, 'Body without subject'],
+      'context without message key' => [['subject' => 'Subject without body'], 'Subject without body', NULL],
+    ];
   }
 
   /**
