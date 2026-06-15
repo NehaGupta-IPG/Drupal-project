@@ -395,7 +395,7 @@ class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements 
   }
 
   /**
-   * Tests that a single-value entity_autocomplete element rejects multiple values.
+   * Tests that a single-value entity_autocomplete rejects multiple values.
    *
    * When #tags is FALSE, submitting a comma-separated list of entities should
    * produce a form error instead of silently discarding extra values.
@@ -413,7 +413,7 @@ class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements 
   }
 
   /**
-   * Tests that a tags (multi-value) entity_autocomplete still accepts multiple values.
+   * Tests tags entity_autocomplete still accepts multiple values.
    *
    * Regression test to ensure #tags = TRUE elements are unaffected by any
    * single-value validation changes.
