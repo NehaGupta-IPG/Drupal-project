@@ -85,6 +85,7 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
       return $build;
     }
 
+    $build['#cache']['tags'] = $entity->getCacheTags();
     $entity_label = $this->getEntityLabel($entity);
     if (!$entity_label) {
       return $build;
