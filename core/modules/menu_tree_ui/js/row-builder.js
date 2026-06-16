@@ -63,7 +63,6 @@
     if (item.movable) {
       handle.className = 'menu-tree-ui-row__handle';
       handle.title = Drupal.t('Drag to reorder');
-      icon.textContent = '⋮⋮';
       label.textContent = Drupal.t('Reorder @title, level @level', {
         '@title': item.title,
         '@level': depth,

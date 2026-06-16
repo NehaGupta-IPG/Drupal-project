@@ -295,9 +295,26 @@ menu-tree {
   color: var(--mtu-color-text-muted-strong);
 }
 
+/*
+ * Movable handles reuse core's tabledrag move icon so the affordance matches
+ * the classic menu admin. The icon swaps to the darker 000000 variant on
+ * hover/focus, exactly as tabledrag does. The locked variant overrides this
+ * back to a dimmed dot below.
+ */
 .menu-tree-ui-row__handle-icon {
-  letter-spacing: -1px;
-  font-size: 1.275rem;
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background-image: url(../../../misc/icons/787878/move.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-size: 0;
+}
+
+.menu-tree-ui-row__handle:hover .menu-tree-ui-row__handle-icon,
+.menu-tree-ui-row__handle:focus-visible .menu-tree-ui-row__handle-icon {
+  background-image: url(../../../misc/icons/000000/move.svg);
 }
 
 .menu-tree-ui-row__handle:hover,
@@ -316,6 +333,9 @@ menu-tree {
 }
 
 .menu-tree-ui-row__handle--locked .menu-tree-ui-row__handle-icon {
+  width: auto;
+  height: auto;
+  background-image: none;
   font-size: 0.6rem;
 }
 
