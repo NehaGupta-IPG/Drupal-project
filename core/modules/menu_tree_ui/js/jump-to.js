@@ -19,7 +19,8 @@
    * loading its children if needed), then scrolls and focuses the target.
    *
    * @param {object} ctx
-   *   Context: {tree: HTMLTableElement, expand: ExpandManager}.
+   *   Context: {tree: HTMLTableElement, expand: ExpandManager, moveMode?:
+   *   MoveModeController}.
    * @param {string} targetId
    *   The link plugin ID to jump to.
    * @param {string[]} pathIds
@@ -56,7 +57,13 @@
       return;
     }
     target.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    focusRow(ctx.tree, target);
+    // If a move is in progress, the editor searched for a destination: keep the
+    // grab and re-aim the cursor at the jumped-to row instead of stealing focus.
+    if (ctx.moveMode?.isActive()) {
+      ctx.moveMode.aimAt(target);
+    } else {
+      focusRow(ctx.tree, target);
+    }
     target.classList.add('menu-tree-ui-row--flash');
     window.setTimeout(() => {
       target.classList.remove('menu-tree-ui-row--flash');

@@ -2,38 +2,45 @@
  * @file
  * Keyboard grab/select move mode for the menu tree.
  *
- * The keyboard counterpart to pointer drag. Space picks up the focused row;
- * the arrow keys move a drop position through the tree; Enter drops; Escape
- * cancels. It commits through the SAME commitMove() path as drag, so both
- * produce identical server moves and announcements.
+ * The keyboard counterpart to pointer drag. Space picks up the focused row; the
+ * arrow keys move a drop position through the tree; Enter drops; Escape cancels.
+ * It commits through the SAME commitMove() path as drag, so both produce
+ * identical server moves and announcements.
+ *
+ * Instead of drawing a borrowed drop indicator, this carries the grabbed row
+ * itself: as the cursor steps, the row (with its descendant subtree) is moved in
+ * the DOM to the candidate slot and re-indented to the landing depth, so the
+ * editor sees exactly where it will land. The carry is purely visual — on commit
+ * the row is restored to its origin and the normal commitMove() runs against the
+ * pre-move DOM; on cancel it is restored and left.
  *
  * Position model. Stops are precomputed in visual (pre-order) order:
- *  - "child" of a row   - a filled BOX on the row    - drop as its FIRST child.
- *  - "before"/"after"   - an indented LINE at the row - drop as a sibling above
- *                         the first row / below a row, indented to that row's
- *                         depth. "after" sits at the bottom of the row's whole
- *                         subtree, so at an outdent boundary the stacked
- *                         "after ancestor" lines differ only by indentation -
- *                         which is exactly what disambiguates the levels.
+ *  - "child" of a row   - drop as its FIRST child (one level deeper).
+ *  - "before"/"after"   - drop as a sibling above the first row / below a row.
  * A row's "after" stop is emitted after its subtree, so Up/Down read top to
  * bottom. Right nests onto the current row, opening it if it is a closed parent
- * so its children become navigable; Left closes it. The grabbed row keeps focus
- * throughout; each stop is announced via the shared DropIndicator's live region
- * and mirrored on the host as data-mtu-drop. On commit, commitMove focuses the
- * landed row.
+ * so its children become navigable; Left closes it. A pointer click on a row
+ * while a row is grabbed sets the cursor to the clicked zone (reusing the drag
+ * intent zones), so keyboard select and mouse positioning combine. The move also
+ * survives a search: focus moving to the search field does not cancel it, and
+ * jumping to a result re-aims the cursor at that row.
  *
  * Exposes Drupal.menuTreeUi.MoveModeController.
  */
 
 ((Drupal) => {
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
-  const { commitMove, sameIntent, resolveNewParentId, resolveBeforeId } =
-    Drupal.menuTreeUi.drag;
+  const {
+    commitMove,
+    sameIntent,
+    resolveNewParentId,
+    resolveBeforeId,
+    computeIntent,
+  } = Drupal.menuTreeUi.drag;
   const { descendantRows, lastDescendantRow, nextSiblingRow, visibleRows } =
     Drupal.menuTreeUi.treeNav;
 
   const CLASS_GRABBED = 'menu-tree-ui-row--grabbed';
-  const CLASS_CHILD = 'menu-tree-ui-row--drop-as-child';
 
   /**
    * Announces a message through Drupal's live-region announcer.
@@ -62,6 +69,35 @@
     return (
       row.querySelector('.menu-tree-ui-row__title')?.textContent?.trim() ?? ''
     );
+  }
+
+  /**
+   * The 1-based level (depth) of a row.
+   *
+   * @param {HTMLElement} row
+   *   The row.
+   *
+   * @return {number}
+   *   The aria-level.
+   */
+  function levelOf(row) {
+    return Number(row.getAttribute('aria-level'));
+  }
+
+  /**
+   * Sets a row's level: aria-level plus the name cell's indent.
+   *
+   * @param {HTMLElement} row
+   *   The row.
+   * @param {number} level
+   *   The 1-based level to apply.
+   */
+  function setRowLevel(row, level) {
+    row.setAttribute('aria-level', String(level));
+    const name = row.querySelector('.menu-tree-ui-row__name');
+    if (name) {
+      name.style.paddingInlineStart = `${(level - 1) * 1.25}rem`;
+    }
   }
 
   /**
@@ -120,10 +156,14 @@
 
       this.active = false;
       this.grabbed = null;
+      this.block = [];
+      this.blockDelta = new Map();
+      this.origLevel = 1;
+      this.originParent = null;
+      this.originNext = null;
       this.positions = [];
       this.posIndex = -1;
       this.intent = null;
-      this.box = null;
     }
 
     /**
@@ -155,6 +195,7 @@
         return false;
       }
       this.grabbed = row;
+      this.snapshotOrigin();
       this.buildPositions();
       if (this.positions.length === 0) {
         this.grabbed = null;
@@ -164,6 +205,9 @@
 
       this.active = true;
       row.classList.add(CLASS_GRABBED);
+      // Focus follows the grabbed row (not its handle) through the move, so the
+      // <tr> is made focusable for the duration; end() restores it.
+      row.tabIndex = 0;
       this.setIntentByIndex(this.findCurrentSlotIndex(), false);
 
       announce(
@@ -173,6 +217,22 @@
         'assertive',
       );
       return true;
+    }
+
+    /**
+     * Records the grabbed row's subtree and original slot, for carry + restore.
+     */
+    snapshotOrigin() {
+      this.origLevel = levelOf(this.grabbed);
+      this.block = descendantRows(this.grabbed);
+      this.blockDelta = new Map(
+        this.block.map((r) => [r, levelOf(r) - this.origLevel]),
+      );
+      const last = this.block.length
+        ? this.block[this.block.length - 1]
+        : this.grabbed;
+      this.originParent = this.grabbed.parentNode;
+      this.originNext = last.nextElementSibling;
     }
 
     /**
@@ -212,6 +272,62 @@
     }
 
     /**
+     * Sets the cursor from a pointer click on a row, so mouse and keyboard
+     * positioning combine.
+     *
+     * @param {MouseEvent} event
+     *   The click event.
+     *
+     * @return {boolean}
+     *   True if the click set a position (caller should preventDefault).
+     */
+    handlePointer(event) {
+      if (!this.active || !(event.target instanceof Element)) {
+        return false;
+      }
+      // Leave row controls (toggle, column switch, operations) clickable so the
+      // editor can still expand a parent to aim inside it.
+      if (
+        event.target.closest(
+          '.menu-tree-ui-row__toggle, .menu-tree-ui-row__column, .menu-tree-ui-row__operations',
+        )
+      ) {
+        return false;
+      }
+      const row = event.target.closest('tr[role="row"]');
+      if (!row || row === this.grabbed || this.block.includes(row)) {
+        return false;
+      }
+      const intent = computeIntent(row, event.clientY);
+      const i = this.indexOfStop(intent.kind, intent.target);
+      if (i === -1) {
+        return false;
+      }
+      this.setIntentByIndex(i);
+      return true;
+    }
+
+    /**
+     * Re-aims the cursor at a row reached via search jump-to, keeping the grab.
+     *
+     * @param {HTMLElement} row
+     *   The jumped-to row.
+     */
+    aimAt(row) {
+      if (!this.active || row === this.grabbed || this.block.includes(row)) {
+        return;
+      }
+      this.buildPositions();
+      let i = this.indexOfStop('before', row);
+      if (i === -1) {
+        i = this.indexOfStop('child', row);
+      }
+      if (i !== -1) {
+        this.setIntentByIndex(i);
+      }
+    }
+
+    /**
      * Rebuilds the ordered list of drop positions from the current tree.
      *
      * Pre-order walk (skipping the grabbed row and its subtree): one "before"
@@ -222,8 +338,7 @@
      */
     buildPositions() {
       const positions = [];
-      const { grabbed } = this;
-      const skip = new Set([grabbed, ...descendantRows(grabbed)]);
+      const skip = new Set([this.grabbed, ...this.block]);
       const rows = visibleRows(this.tree).filter((row) => !skip.has(row));
 
       // Defer each row's "after" stop until its whole (visible) subtree has
@@ -242,7 +357,7 @@
         positions.push({ kind: 'before', target: rows[0] });
       }
       rows.forEach((row) => {
-        const level = Number(row.getAttribute('aria-level'));
+        const level = levelOf(row);
         flush(level);
         positions.push({ kind: 'child', target: row });
         pending.push({ level, stop: { kind: 'after', target: row } });
@@ -357,12 +472,12 @@
       this.buildPositions();
       const i = this.indexOfStop('child', target);
       if (i !== -1) {
-        this.posIndex = i;
+        this.setIntentByIndex(i);
       }
     }
 
     /**
-     * Selects the position at an index: stores, highlights, and announces it.
+     * Selects the position at an index: carries the row there and announces it.
      *
      * @param {number} i
      *   The position index.
@@ -380,31 +495,56 @@
         return;
       }
       this.intent = intent;
-      this.renderHighlight(intent);
+      this.carryTo(intent);
       if (doAnnounce) {
         this.indicator.announce(intent);
       }
     }
 
     /**
-     * Shows the current intent: a box for "child", an indented line otherwise.
+     * Moves the grabbed row (and its subtree) to the candidate slot.
+     *
+     * The unit is detached first so the geometry helpers see a clean tree, then
+     * re-indented to the landing depth and re-inserted: before the target, after
+     * the target's whole subtree, or — for a "child" drop — immediately after
+     * the target as its first child.
      *
      * @param {object} intent
      *   The DropIntent.
      */
-    renderHighlight(intent) {
-      this.clearHighlight();
+    carryTo(intent) {
+      const { target } = intent;
+      const targetLevel = levelOf(target);
+      // Detach first so the insertion reference is computed against a clean
+      // tree: otherwise lastDescendantRow(target) could resolve to the carried
+      // row itself (when it was previously dropped inside this target), and
+      // re-inserting against a detached anchor would leave the row out of DOM.
+      this.detachUnit();
+      let depth;
+      let ref;
+      let after;
       if (intent.kind === 'child') {
-        this.indicator.hideLine();
-        intent.target.classList.add(CLASS_CHILD);
-        this.box = intent.target;
+        depth = targetLevel + 1;
+        ref = target;
+        after = true;
+      } else if (intent.kind === 'before') {
+        depth = targetLevel;
+        ref = target;
+        after = false;
       } else {
-        const geo = this.lineGeometry(intent);
-        if (geo) {
-          this.indicator.lineAt(geo.top, geo.left, geo.width);
-        }
+        depth = targetLevel;
+        ref = lastDescendantRow(target) ?? target;
+        after = true;
       }
-      intent.target.scrollIntoView({ block: 'nearest' });
+
+      this.setUnitLevel(depth);
+      this.insertUnit(ref, after);
+      // Detaching the focused row dropped focus; put it back on the carried row
+      // so the editor keeps control. The host's focusout handler defers its
+      // cancel check and reads activeElement, which this restores.
+      this.grabbed.focus();
+
+      this.grabbed.scrollIntoView({ block: 'nearest' });
       this.tree
         .closest('menu-tree')
         ?.setAttribute(
@@ -414,57 +554,79 @@
     }
 
     /**
-     * Removes the current box and line, if any.
+     * The grabbed row plus its descendant block, in document order.
+     *
+     * @return {HTMLElement[]}
+     *   The unit's rows.
      */
-    clearHighlight() {
-      if (this.box) {
-        this.box.classList.remove(CLASS_CHILD);
-        this.box = null;
-      }
-      this.indicator.hideLine();
+    unit() {
+      return [this.grabbed, ...this.block];
     }
 
     /**
-     * Computes a host-relative line for a "before"/"after" intent.
-     *
-     * The line aligns with the target row's title (so its indent shows the
-     * insertion depth) and sits at the row's top ("before") or the bottom of
-     * its whole subtree ("after").
-     *
-     * @param {object} intent
-     *   The DropIntent.
-     *
-     * @return {?{top: number, left: number, width: number}}
-     *   The geometry, or null if the row's content is missing.
+     * Detaches the grabbed unit from the DOM (references are retained).
      */
-    lineGeometry(intent) {
-      const host = this.tree.closest('menu-tree');
-      const name = intent.target.querySelector('.menu-tree-ui-row__name');
-      if (!host || !name) {
-        return null;
+    detachUnit() {
+      this.unit().forEach((row) => row.remove());
+    }
+
+    /**
+     * Re-indents the grabbed unit so the grabbed row sits at the given depth.
+     *
+     * @param {number} depth
+     *   The grabbed row's new level; block rows keep their relative offsets.
+     */
+    setUnitLevel(depth) {
+      setRowLevel(this.grabbed, depth);
+      this.block.forEach((row) => {
+        setRowLevel(row, depth + this.blockDelta.get(row));
+      });
+    }
+
+    /**
+     * Inserts the grabbed unit before or after a reference row.
+     *
+     * @param {HTMLElement} ref
+     *   The reference row.
+     * @param {boolean} after
+     *   True to insert after ref, false to insert before it.
+     */
+    insertUnit(ref, after) {
+      const rows = this.unit();
+      if (after) {
+        let anchor = ref;
+        rows.forEach((row) => {
+          anchor.after(row);
+          anchor = row;
+        });
+      } else {
+        rows.forEach((row) => ref.parentNode.insertBefore(row, ref));
       }
-      const hostRect = host.getBoundingClientRect();
-      const nameRect = name.getBoundingClientRect();
-      // "after" sits below the target's whole visible subtree, so measure the
-      // bottom of its last descendant when expanded; "before" sits at its top.
-      const expanded = intent.target.getAttribute('aria-expanded') === 'true';
-      const bottomRow = expanded
-        ? (lastDescendantRow(intent.target) ?? intent.target)
-        : intent.target;
-      const y =
-        intent.kind === 'before'
-          ? intent.target.getBoundingClientRect().top
-          : bottomRow.getBoundingClientRect().bottom;
-      const pad = parseFloat(getComputedStyle(name).paddingInlineStart) || 0;
-      return {
-        top: y - hostRect.top,
-        left: nameRect.left + pad - hostRect.left,
-        width: Math.max(0, nameRect.right - (nameRect.left + pad)),
-      };
+    }
+
+    /**
+     * Restores the grabbed unit to its original slot and indentation.
+     */
+    restoreToOrigin() {
+      this.detachUnit();
+      this.setUnitLevel(this.origLevel);
+      const rows = this.unit();
+      if (this.originNext && this.originNext.parentNode === this.originParent) {
+        rows.forEach((row) =>
+          this.originParent.insertBefore(row, this.originNext),
+        );
+      } else {
+        rows.forEach((row) => this.originParent.appendChild(row));
+      }
+      this.grabbed.focus();
     }
 
     /**
      * Commits the move, unless it resolves to the row's current slot (no-op).
+     *
+     * The carried row is restored to its origin first, so the no-op guard and
+     * commitMove() resolve against the pre-move DOM exactly as a pointer drag
+     * does; commitMove then re-fetches and lands the row at its destination.
      */
     commit() {
       if (!this.intent || !this.grabbed) {
@@ -473,6 +635,7 @@
       }
       const { grabbed, intent } = this;
       const movedId = grabbed.dataset.id;
+      this.restoreToOrigin();
 
       // No-op guard: resolve the intent the way commitMove will, and compare to
       // the row's current slot. A before_id pointing at the grabbed row itself
@@ -505,26 +668,35 @@
     }
 
     /**
-     * Cancels an in-progress move, leaving the tree unchanged.
+     * Cancels an in-progress move, restoring the row to where it started.
      */
     cancel() {
       if (!this.active) {
         return;
       }
+      this.restoreToOrigin();
       announce('Move cancelled.', 'assertive');
       this.end();
     }
 
     /**
-     * Idempotent teardown: drops the grabbed state and clears the highlight.
+     * Idempotent teardown: drops the grabbed state and clears the indicator.
+     *
+     * Callers that end a carried move (commit, cancel) restore the row first.
      */
     end() {
       this.grabbed?.classList.remove(CLASS_GRABBED);
-      this.clearHighlight();
+      // Drop the row out of the tab order without blurring it — removing the
+      // attribute outright would blur the focused row to the body.
+      if (this.grabbed) {
+        this.grabbed.tabIndex = -1;
+      }
       this.indicator.clear();
       this.tree.closest('menu-tree')?.removeAttribute('data-mtu-drop');
       this.active = false;
       this.grabbed = null;
+      this.block = [];
+      this.blockDelta = new Map();
       this.positions = [];
       this.posIndex = -1;
       this.intent = null;

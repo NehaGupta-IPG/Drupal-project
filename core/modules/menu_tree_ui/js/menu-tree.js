@@ -53,7 +53,7 @@
       super();
       this.onClick = this.onClick.bind(this);
       this.onKeyDown = this.onKeyDown.bind(this);
-      this.onFocusOut = this.onFocusOut.bind(this);
+      this.onOutsidePointer = this.onOutsidePointer.bind(this);
     }
 
     /**
@@ -106,10 +106,11 @@
 
       this.tree.addEventListener('click', this.onClick);
       this.tree.addEventListener('keydown', this.onKeyDown);
-      this.tree.addEventListener('focusout', this.onFocusOut);
+      document.addEventListener('mousedown', this.onOutsidePointer);
       this.jumpHandler = ns.attachJumpClickHandler({
         tree: this.tree,
         expand: this.expand,
+        moveMode: this.moveMode,
       });
       this.setupHelpDialog();
       const container = this.closest('.menu-tree-ui');
@@ -174,7 +175,7 @@
       this.drag?.detach();
       this.tree?.removeEventListener('click', this.onClick);
       this.tree?.removeEventListener('keydown', this.onKeyDown);
-      this.tree?.removeEventListener('focusout', this.onFocusOut);
+      document.removeEventListener('mousedown', this.onOutsidePointer);
       if (this.jumpHandler) {
         document.removeEventListener('click', this.jumpHandler);
       }
@@ -211,11 +212,17 @@
      * @param {FocusEvent} event
      *   The focusout event.
      */
-    onFocusOut(event) {
-      if (
-        this.moveMode?.isActive() &&
-        !this.tree.contains(event.relatedTarget)
-      ) {
+    onOutsidePointer(event) {
+      // A keyboard move is not cancelled by focus leaving the tree: carrying the
+      // row blurs it transiently, and searching for a destination moves focus to
+      // the search field (the move must survive both). Instead, a pointer press
+      // genuinely outside the component cancels it; Escape and a successful drop
+      // are the other exits.
+      if (!this.moveMode?.isActive() || !(event.target instanceof Node)) {
+        return;
+      }
+      const container = this.closest('.menu-tree-ui');
+      if (container && !container.contains(event.target)) {
         this.moveMode.cancel();
       }
     }
@@ -255,6 +262,14 @@
     onClick(event) {
       const { target } = event;
       if (!(target instanceof Element)) {
+        return;
+      }
+
+      // While a row is grabbed, a click on another row sets the drop cursor
+      // there (mouse + keyboard combined). Clicks on row controls fall through
+      // so a parent can still be expanded to aim inside it.
+      if (this.moveMode?.isActive() && this.moveMode.handlePointer(event)) {
+        event.preventDefault();
         return;
       }
 

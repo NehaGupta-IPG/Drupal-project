@@ -279,6 +279,76 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
   }
 
   /**
+   * A click on a row while grabbed sets the drop cursor to the clicked zone.
+   *
+   * Mouse and keyboard combine: after picking B up with the keyboard, clicking
+   * the middle of leaf L aims the cursor at "child of L", and Enter drops there.
+   */
+  public function testClickSetsDropCursorThenDrops(): void {
+    $this->dispatchKeys('B', [' ']);
+    $this->clickRowZone('L', 0.5);
+
+    $this->assertSame(
+      'child:' . $this->linkIds['L'],
+      $this->readDrop(),
+      'Clicking the middle of L should aim the cursor at child-of-L.',
+    );
+
+    $this->dispatchKeys('B', ['Enter']);
+    $this->settle();
+    $this->assertIsParentRow('L');
+    $this->assertSiblings(['B'], $this->childRowsSelector('L'));
+  }
+
+  /**
+   * Focusing the search field does not cancel an in-progress move.
+   *
+   * The editor can search for a destination mid-move; the grab must stick (the
+   * move is cancelled only by Escape, a drop, or a click outside the UI).
+   */
+  public function testMoveSurvivesSearchFieldFocus(): void {
+    $this->dispatchKeys('B', [' ']);
+    $this->assertTrue(
+      $this->row('B')->hasClass('menu-tree-ui-row--grabbed'),
+      'B should be grabbed.',
+    );
+
+    $this->getSession()->getPage()->find('css', '#menu-tree-ui-search-input')->click();
+
+    $this->assertTrue(
+      $this->row('B')->hasClass('menu-tree-ui-row--grabbed'),
+      'The move should survive focusing the search field.',
+    );
+  }
+
+  /**
+   * Dispatches a click on a row at a vertical zone (0 = top, 1 = bottom).
+   *
+   * The click lands on the title so it never hits a row control, and carries a
+   * clientY in the chosen zone so the move-mode intent (before/child/after) is
+   * computed from it.
+   *
+   * @param string $label
+   *   The row label to click.
+   * @param float $ratio
+   *   The vertical position within the row, 0..1.
+   */
+  private function clickRowZone(string $label, float $ratio): void {
+    $id = $this->linkIds[$label];
+    $script = <<<JS
+      const row = document.querySelector('tr[role="row"][data-id="$id"]');
+      const rect = row.getBoundingClientRect();
+      const x = rect.left + rect.width * 0.5;
+      const y = rect.top + rect.height * $ratio;
+      const hit = row.querySelector('.menu-tree-ui-row__title') || row;
+      hit.dispatchEvent(new MouseEvent('click', {
+        bubbles: true, cancelable: true, clientX: x, clientY: y,
+      }));
+    JS;
+    $this->getSession()->executeScript($script);
+  }
+
+  /**
    * Grabs $source, walks the cursor to "$kind:$target", drops, and settles.
    */
   private function moveTo(string $source, string $kind, string $target_label): void {
