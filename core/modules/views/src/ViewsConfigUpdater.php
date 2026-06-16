@@ -67,10 +67,47 @@ class ViewsConfigUpdater {
    *   Whether the view was updated.
    */
   public function updateAll(ViewEntityInterface $view) {
-    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type, $key, $display_id) {
-      // @todo leaving this here now but new update hooks will need to update.
-      return FALSE;
-    });
+    return $this->updateTableSortableCounter($view);
+  }
+
+  /**
+   * Updates table style settings so result counters are not click sortable.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   View to update.
+   *
+   * @return bool
+   *   Whether the view was updated.
+   */
+  public function updateTableSortableCounter(ViewEntityInterface $view): bool {
+    $changed = FALSE;
+    $displays = $view->get('display');
+
+    foreach ($displays as &$display) {
+      if (($display['display_options']['style']['type'] ?? NULL) !== 'table') {
+        continue;
+      }
+      if (empty($display['display_options']['fields']) || empty($display['display_options']['style']['options']['info'])) {
+        continue;
+      }
+
+      foreach ($display['display_options']['fields'] as $field_id => $field) {
+        if (($field['table'] ?? NULL) !== 'views' || ($field['field'] ?? NULL) !== 'counter') {
+          continue;
+        }
+        if (!empty($display['display_options']['style']['options']['info'][$field_id]['sortable'])) {
+          $display['display_options']['style']['options']['info'][$field_id]['sortable'] = FALSE;
+          $changed = TRUE;
+        }
+      }
+    }
+    unset($display);
+
+    if ($changed) {
+      $view->set('display', $displays);
+    }
+
+    return $changed;
   }
 
   /**

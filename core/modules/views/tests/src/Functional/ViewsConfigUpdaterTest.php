@@ -7,6 +7,7 @@ namespace Drupal\Tests\views\Functional;
 use Drupal\Core\Database\Database;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\UpdatePathTestTrait;
+use Drupal\views\Entity\View;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -36,6 +37,14 @@ class ViewsConfigUpdaterTest extends BrowserTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $view = View::create([
+      'base_table' => 'views',
+      'id' => 'test_views_config_updater',
+      'label' => 'Test views config updater',
+    ]);
+    $view->addDisplay('default');
+    $view->save();
+
     $connection = Database::getConnection();
 
     // Enable views_test_config_updater via the database so post_update hooks
@@ -61,9 +70,11 @@ class ViewsConfigUpdaterTest extends BrowserTestBase {
    * Tests ViewsConfigUpdater.
    */
   public function testViewsConfigUpdater(): void {
-    // ViewsConfigUpdater currently contains no actual configuration update
-    // logic. Replace this method with a real test when it does.
-    $this->markTestSkipped();
+    $this->assertNull(\Drupal::keyValue('views_test_config_updater')->get('deprecations_enabled'));
+
+    $this->runUpdates();
+
+    $this->assertFalse(\Drupal::keyValue('views_test_config_updater')->get('deprecations_enabled'));
   }
 
 }

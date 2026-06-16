@@ -1,0 +1,86 @@
+uuid: 0dbd1abd-b94b-4fd8-81e9-3e959b8a593c
+langcode: en
+status: true
+dependencies: {  }
+id: test_table_sortable_counter
+label: test_table_sortable_counter
+module: views
+description: ''
+tag: ''
+base_table: views_test_data
+base_field: nid
+display:
+  default:
+    display_plugin: default
+    id: default
+    display_title: Default
+    position: 0
+    display_options:
+      fields:
+        counter:
+          id: counter
+          table: views
+          field: counter
+          relationship: none
+          plugin_id: counter
+        counter_alias:
+          id: counter_alias
+          table: views
+          field: counter
+          relationship: none
+          plugin_id: counter
+        name:
+          id: name
+          table: views_test_data
+          field: name
+          relationship: none
+          plugin_id: string
+      style:
+        type: table
+        options:
+          columns:
+            counter: counter
+            counter_alias: counter_alias
+            name: name
+          info:
+            counter:
+              sortable: true
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            counter_alias:
+              sortable: true
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            name:
+              sortable: true
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+      row:
+        type: fields
+  page_1:
+    display_plugin: page
+    id: page_1
+    display_title: Page
+    position: 1
+    display_options:
+      fields:
+        counter:
+          id: counter
+          table: views
+          field: counter
+          relationship: none
+          plugin_id: counter
+      style:
+        type: default
+      row:
+        type: fields
+      path: test-table-sortable-counter

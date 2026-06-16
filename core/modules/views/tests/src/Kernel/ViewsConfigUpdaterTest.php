@@ -33,9 +33,23 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
    * Tests ViewsConfigUpdater.
    */
   public function testViewsConfigUpdater(): void {
-    // ViewsConfigUpdater currently contains no actual configuration update
-    // logic. Replace this method with a real test when it does.
-    $this->markTestSkipped();
+    $view = $this->loadTestView('views.view.test_table_sortable_counter');
+    $display = $view->get('display');
+    $this->assertTrue($display['default']['display_options']['style']['options']['info']['counter']['sortable']);
+    $this->assertTrue($display['default']['display_options']['style']['options']['info']['counter_alias']['sortable']);
+    $this->assertTrue($display['default']['display_options']['style']['options']['info']['name']['sortable']);
+    $non_table_display = $display['page_1'];
+
+    /** @var \Drupal\views\ViewsConfigUpdater $views_config_updater */
+    $views_config_updater = $this->container->get(ViewsConfigUpdater::class);
+    $this->assertTrue($views_config_updater->updateAll($view));
+
+    $display = $view->get('display');
+    $this->assertFalse($display['default']['display_options']['style']['options']['info']['counter']['sortable']);
+    $this->assertFalse($display['default']['display_options']['style']['options']['info']['counter_alias']['sortable']);
+    $this->assertTrue($display['default']['display_options']['style']['options']['info']['name']['sortable']);
+    $this->assertSame($non_table_display, $display['page_1']);
+    $this->assertFalse($views_config_updater->updateAll($view));
   }
 
   /**
