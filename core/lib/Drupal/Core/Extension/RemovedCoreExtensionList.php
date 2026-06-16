@@ -9,6 +9,8 @@ namespace Drupal\Core\Extension;
  */
 final class RemovedCoreExtensionList {
 
+  // cspell:ignore quickedit
+
   /**
    * Modules removed from Drupal core, keyed by machine name.
    *

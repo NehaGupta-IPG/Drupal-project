@@ -28,8 +28,6 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class SystemRequirements implements InstallRequirementsInterface {
 
-  // cspell:ignore quickedit
-
   /**
    * An array of machine names of modules that were removed from Drupal core.
    *
