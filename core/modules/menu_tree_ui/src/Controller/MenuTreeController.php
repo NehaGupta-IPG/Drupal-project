@@ -8,6 +8,7 @@ use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Menu\MenuLinkTreeElement;
+use Drupal\Core\Menu\MenuTreeStorage;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
@@ -376,6 +377,20 @@ final class MenuTreeController extends ControllerBase {
         'title' => $this->t('Delete'),
         'url' => $entity->toUrl('delete-form'),
         'weight' => 100,
+      ];
+    }
+
+    // "Add child" mirrors menu_ui's MenuForm: a child sits one level deeper, so
+    // offer it only while that stays within the materialized-path depth cap.
+    if ($element->depth < MenuTreeStorage::MAX_DEPTH) {
+      $operations['add-child'] = [
+        'title' => $this->t('Add child'),
+        'url' => Url::fromRoute(
+          'entity.menu.add_link_form',
+          ['menu' => $link->getMenuName()],
+          ['query' => ['parent' => $link->getPluginId()]],
+        ),
+        'weight' => 20,
       ];
     }
 
