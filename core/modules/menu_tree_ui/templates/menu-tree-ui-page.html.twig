@@ -100,6 +100,27 @@
     ></div>
   </div>
 
+  {#
+    Save / Cancel action bar. Moves are recorded in a per-user working copy
+    rather than written immediately, so the editor can apply many changes and
+    then keep or discard them. working-copy.js posts to the save/cancel routes
+    and reveals the unsaved notice after the first change.
+  #}
+  {% if locked %}
+    <div class="menu-tree-ui__lock messages messages--warning" role="alert">
+      {{ '@user is currently editing this menu. Your changes cannot be saved until they finish.'|t({ '@user': lock_owner }) }}
+    </div>
+  {% endif %}
+
+  <div class="menu-tree-ui__actions">
+    <div
+      class="menu-tree-ui__unsaved messages messages--warning{{ has_changes ? '' : ' js-hide' }}"
+      aria-live="polite"
+    >{{ 'You have unsaved changes.'|t }}</div>
+    <button type="button" class="menu-tree-ui__save button button--primary" data-mtu-action="save"{{ locked ? ' disabled' : '' }}>{{ 'Save'|t }}</button>
+    <button type="button" class="menu-tree-ui__cancel button" data-mtu-action="cancel"{{ locked ? ' disabled' : '' }}>{{ 'Cancel'|t }}</button>
+  </div>
+
   <menu-tree
     class="menu-tree-ui__tree"
     data-menu="{{ menu.id }}"

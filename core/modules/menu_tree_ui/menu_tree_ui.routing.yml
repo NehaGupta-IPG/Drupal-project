@@ -64,3 +64,33 @@ menu_tree_ui.column_update:
     parameters:
       menu:
         type: entity:menu
+
+menu_tree_ui.save:
+  path: '/admin/structure/menu-tree-ui/{menu}/save'
+  defaults:
+    _controller: '\Drupal\menu_tree_ui\Controller\MenuTreeController::save'
+  methods: [POST]
+  requirements:
+    _entity_access: 'menu.update'
+    _csrf_request_header_token: 'TRUE'
+  options:
+    _admin_route: true
+    no_cache: TRUE
+    parameters:
+      menu:
+        type: entity:menu
+
+menu_tree_ui.cancel:
+  path: '/admin/structure/menu-tree-ui/{menu}/cancel'
+  defaults:
+    _controller: '\Drupal\menu_tree_ui\Controller\MenuTreeController::cancel'
+  methods: [POST]
+  requirements:
+    _entity_access: 'menu.update'
+    _csrf_request_header_token: 'TRUE'
+  options:
+    _admin_route: true
+    no_cache: TRUE
+    parameters:
+      menu:
+        type: entity:menu

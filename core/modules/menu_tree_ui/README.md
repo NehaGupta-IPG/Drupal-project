@@ -18,6 +18,13 @@ this module matures.
 - A "Keyboard commands" dialog, linked at the top of the page so assistive-technology users meet it early.
 - htmx-driven search panel returning HTML partials, with jump-to-result.
 - Edits delegated to core's existing per-link form.
+- Save / Cancel working copy: reorders (drag and keyboard) are recorded in a
+  per-user shared tempstore rather than written immediately, and the tree
+  overlays them so unsaved changes are visible. **Save** replays the recorded
+  moves to storage; **Cancel** discards them. A second editor of the same menu
+  sees a lock notice and cannot save over the first. Column toggles (e.g.
+  "Expanded") and the per-row Edit/Delete forms still commit immediately —
+  the working copy covers reorder structure only.
 
 ## Architecture
 
@@ -28,8 +35,10 @@ Routes, by intent:
 | `/admin/structure/menu-tree-ui/{menu}` | Full HTML page with top level rendered | Direct browser visit (linked from the "Menu tree" operation on `/admin/structure/menu`) |
 | `/admin/structure/menu-tree-ui/{menu}/children?parent={id}` | JSON `{ parent, items[] }` | `<menu-tree>` element on expand |
 | `/admin/structure/menu-tree-ui/{menu}/search?q=…` | HTML fragment | htmx swap from the search input |
-| `/admin/structure/menu-tree-ui/{menu}/move` | JSON `{ ok, … }` | Drag/keyboard reorder commit (POST) |
+| `/admin/structure/menu-tree-ui/{menu}/move` | JSON `{ ok, … }` | Drag/keyboard reorder — records to the working copy (POST) |
 | `/admin/structure/menu-tree-ui/{menu}/column-update` | JSON `{ ok, … }` | Column switch toggle (POST) |
+| `/admin/structure/menu-tree-ui/{menu}/save` | JSON `{ ok, … }` | Commit the working copy's moves to storage (POST) |
+| `/admin/structure/menu-tree-ui/{menu}/cancel` | JSON `{ ok }` | Discard the working copy (POST) |
 
 `MenuTreeLoader::loadLevel()` wraps `MenuLinkTreeInterface::load()` with
 `MenuTreeParameters::setRoot()->excludeRoot()->setMaxDepth(1)` to fetch exactly one

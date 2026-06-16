@@ -126,6 +126,19 @@
   color: var(--mtu-color-text-muted);
 }
 
+/* ───────────────────────────────────────────────────── save / cancel */
+
+.menu-tree-ui__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.menu-tree-ui__unsaved {
+  flex: 1 1 auto;
+  margin: 0;
+}
+
 /* ──────────────────────────────────────────────────────────────── tree */
 
 /* <menu-tree> hosts the absolutely-positioned drop indicator. */

@@ -1,4 +1,11 @@
 services:
+  menu_tree_ui.working_copy:
+    class: Drupal\menu_tree_ui\Service\MenuTreeWorkingCopy
+    arguments:
+      - '@tempstore.shared'
+      - '@current_user'
+  Drupal\menu_tree_ui\Service\MenuTreeWorkingCopy: '@menu_tree_ui.working_copy'
+
   menu_tree_ui.loader:
     class: Drupal\menu_tree_ui\Service\MenuTreeLoader
     arguments:
@@ -6,6 +13,8 @@ services:
       - '@menu.tree_storage'
       - '@module_handler'
       - !tagged_iterator menu_tree_ui.search_provider
+      - '@menu_tree_ui.working_copy'
+      - '@plugin.manager.menu.link'
   Drupal\menu_tree_ui\Service\MenuTreeLoader: '@menu_tree_ui.loader'
 
   menu_tree_ui.mover:

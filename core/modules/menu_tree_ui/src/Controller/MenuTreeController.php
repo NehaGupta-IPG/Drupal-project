@@ -18,6 +18,7 @@ use Drupal\menu_tree_ui\MenuTreeColumnManager;
 use Drupal\menu_tree_ui\MenuTreeUiConstants;
 use Drupal\menu_tree_ui\Service\MenuTreeLoader;
 use Drupal\menu_tree_ui\Service\MenuTreeMover;
+use Drupal\menu_tree_ui\Service\MenuTreeWorkingCopy;
 use Drupal\system\MenuInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -41,6 +42,7 @@ final class MenuTreeController extends ControllerBase {
     private readonly MenuTreeMover $mover,
     private readonly RendererInterface $renderer,
     private readonly MenuTreeColumnManager $columnManager,
+    private readonly MenuTreeWorkingCopy $workingCopy,
   ) {}
 
   /**
@@ -52,6 +54,7 @@ final class MenuTreeController extends ControllerBase {
       $container->get('menu_tree_ui.mover'),
       $container->get('renderer'),
       $container->get('plugin.manager.menu_tree_column'),
+      $container->get('menu_tree_ui.working_copy'),
     );
   }
 
@@ -59,7 +62,7 @@ final class MenuTreeController extends ControllerBase {
    * Admin page for a single menu — server-renders the top level.
    */
   public function page(MenuInterface $menu): array {
-    $top_level = $this->loader->loadLevel($menu->id(), NULL);
+    $top_level = $this->loader->loadLevelForEditing($menu->id(), NULL);
     $columns = $this->columnManager->getSortedColumns();
     $entity_map = $this->loadContentEntitiesForElements($top_level);
 
@@ -88,28 +91,36 @@ final class MenuTreeController extends ControllerBase {
       ];
     }
 
-    $move_url = Url::fromRoute('menu_tree_ui.move', ['menu' => $menu->id()])->toString();
-    $column_update_url = Url::fromRoute('menu_tree_ui.column_update', ['menu' => $menu->id()])->toString();
+    $menu_name = $menu->id();
+    $has_changes = $this->workingCopy->hasChanges($menu_name);
+    $locked = $this->workingCopy->isLocked($menu_name);
+    $lock_owner = $locked ? $this->lockOwnerName($menu_name) : '';
 
     return [
       '#theme' => 'menu_tree_ui_page',
       '#menu' => $menu,
       '#top_level' => $rendered_rows,
       '#columns' => $column_headers,
-      '#search_action' => Url::fromRoute('menu_tree_ui.search', ['menu' => $menu->id()])->toString(),
-      '#children_action' => Url::fromRoute('menu_tree_ui.children', ['menu' => $menu->id()])->toString(),
+      '#has_changes' => $has_changes,
+      '#locked' => $locked,
+      '#lock_owner' => $lock_owner,
+      '#search_action' => Url::fromRoute('menu_tree_ui.search', ['menu' => $menu_name])->toString(),
+      '#children_action' => Url::fromRoute('menu_tree_ui.children', ['menu' => $menu_name])->toString(),
       '#attached' => [
         'library' => ['menu_tree_ui/menu_tree_ui'],
         'drupalSettings' => [
           'menuTreeUi' => [
-            'moveUrl' => $move_url,
-            'columnUpdateUrl' => $column_update_url,
+            'moveUrl' => Url::fromRoute('menu_tree_ui.move', ['menu' => $menu_name])->toString(),
+            'columnUpdateUrl' => Url::fromRoute('menu_tree_ui.column_update', ['menu' => $menu_name])->toString(),
+            'saveUrl' => Url::fromRoute('menu_tree_ui.save', ['menu' => $menu_name])->toString(),
+            'cancelUrl' => Url::fromRoute('menu_tree_ui.cancel', ['menu' => $menu_name])->toString(),
           ],
         ],
       ],
+      // The rendered tree reflects the per-user working copy in tempstore,
+      // which page cache metadata cannot express, so the page is not cached.
       '#cache' => [
-        'contexts' => ['user.permissions', 'session'],
-        'tags' => array_merge($menu->getCacheTags(), ['config:system.menu.' . $menu->id()]),
+        'max-age' => 0,
       ],
     ];
   }
@@ -129,7 +140,7 @@ final class MenuTreeController extends ControllerBase {
    */
   public function children(MenuInterface $menu, Request $request): CacheableJsonResponse {
     $parent_id = $request->query->get('parent', '') ?: NULL;
-    $elements = $this->loader->loadLevel($menu->id(), $parent_id);
+    $elements = $this->loader->loadLevelForEditing($menu->id(), $parent_id);
     $columns = $this->columnManager->getSortedColumns();
     $entity_map = $this->loadContentEntitiesForElements($elements);
 
@@ -197,8 +208,63 @@ final class MenuTreeController extends ControllerBase {
       }
     }
 
-    $result = $this->mover->move($menu->id(), $id, $new_parent, $before_id);
-    return new JsonResponse($result, $result['ok'] ? 200 : 400);
+    $menu_name = $menu->id();
+    if ($this->workingCopy->isLocked($menu_name)) {
+      return new JsonResponse(
+        ['ok' => FALSE, 'code' => 'locked', 'message' => $this->lockedMessage($menu_name)],
+        409,
+      );
+    }
+
+    // Validate against the live tree, then record the move in the working copy
+    // instead of writing it. Save replays it (re-validating) to persist.
+    $validation = $this->mover->validateMove($menu_name, $id, $new_parent, $before_id);
+    if (!$validation['ok']) {
+      return new JsonResponse($validation, 400);
+    }
+
+    $this->workingCopy->addOp($menu_name, [
+      'type' => 'move',
+      'id' => $id,
+      'new_parent' => $new_parent,
+      'before_id' => $before_id,
+    ]);
+
+    return new JsonResponse(['ok' => TRUE, 'dirty' => TRUE]);
+  }
+
+  /**
+   * Commits the menu's pending working-copy moves to live storage.
+   */
+  public function save(MenuInterface $menu): JsonResponse {
+    $menu_name = $menu->id();
+    if ($this->workingCopy->isLocked($menu_name)) {
+      return new JsonResponse(
+        ['ok' => FALSE, 'code' => 'locked', 'message' => $this->lockedMessage($menu_name)],
+        409,
+      );
+    }
+
+    $result = $this->mover->commitWorkingCopy($menu_name, $this->workingCopy->getOps($menu_name));
+    if (!empty($result['ok'])) {
+      $this->workingCopy->clear($menu_name);
+    }
+    return new JsonResponse($result, !empty($result['ok']) ? 200 : 400);
+  }
+
+  /**
+   * Discards the menu's pending working-copy moves.
+   */
+  public function cancel(MenuInterface $menu): JsonResponse {
+    $menu_name = $menu->id();
+    if ($this->workingCopy->isLocked($menu_name)) {
+      return new JsonResponse(
+        ['ok' => FALSE, 'code' => 'locked', 'message' => $this->lockedMessage($menu_name)],
+        409,
+      );
+    }
+    $this->workingCopy->clear($menu_name);
+    return new JsonResponse(['ok' => TRUE]);
   }
 
   /**
@@ -254,6 +320,39 @@ final class MenuTreeController extends ControllerBase {
   }
 
   // Private helpers.
+
+  /**
+   * The display name of the user holding the menu's working copy.
+   *
+   * @param string $menu_name
+   *   The menu entity ID.
+   *
+   * @return string
+   *   The owner's display name, or their user ID if the account is gone.
+   */
+  private function lockOwnerName(string $menu_name): string {
+    $lock = $this->workingCopy->getLockMetadata($menu_name);
+    if ($lock === NULL) {
+      return '';
+    }
+    $owner = $this->entityTypeManager()->getStorage('user')->load($lock->getOwnerId());
+    return $owner ? $owner->getDisplayName() : (string) $lock->getOwnerId();
+  }
+
+  /**
+   * The "another user is editing" message for a locked working copy.
+   *
+   * @param string $menu_name
+   *   The menu entity ID.
+   *
+   * @return string
+   *   The user-facing lock message.
+   */
+  private function lockedMessage(string $menu_name): string {
+    return (string) $this->t('@user is currently editing this menu. Your changes cannot be saved until they finish.', [
+      '@user' => $this->lockOwnerName($menu_name),
+    ]);
+  }
 
   /**
    * Serializes a tree element to the JSON shape consumed by <menu-tree>.

@@ -270,6 +270,9 @@
     }
 
     announce('Menu link moved.', 'polite');
+    // Tell the working-copy action bar a change was recorded so it can reveal
+    // the unsaved notice (the bar lives outside the <menu-tree> element).
+    document.dispatchEvent(new CustomEvent('menu-tree-ui:changed'));
   }
 
   /**

@@ -169,6 +169,8 @@ final class MenuTreeLoaderSearchTest extends KernelTestBase {
       $this->createStub(MenuTreeStorageInterface::class),
       $module_handler ?? $this->container->get('module_handler'),
       $providers,
+      $this->container->get('menu_tree_ui.working_copy'),
+      $this->container->get('plugin.manager.menu.link'),
     );
   }
 

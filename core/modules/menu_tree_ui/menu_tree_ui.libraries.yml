@@ -15,11 +15,13 @@ menu_tree_ui:
     js/drag/controller.js: {}
     js/move-mode.js: {}
     js/menu-tree.js: {}
+    js/working-copy.js: {}
   css:
     component:
       css/menu-tree-ui.css: {}
   dependencies:
     - core/drupal
     - core/drupalSettings
+    - core/once
     - core/htmx
     - core/drupal.htmx

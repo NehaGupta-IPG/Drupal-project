@@ -7,7 +7,6 @@ namespace Drupal\Tests\menu_tree_ui\FunctionalJavascript;
 use Behat\Mink\Element\NodeElement;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
-use Drupal\menu_link_content\MenuLinkContentInterface;
 use Drupal\system\Entity\Menu;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -16,11 +15,14 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests the menu_tree_ui drag-and-drop behavior end-to-end.
  *
  * Each scenario fires synthetic pointer events at the real DragController
- * pipeline, then verifies three layers:
+ * pipeline, then verifies the move via the overlaid DOM:
  *  - DOM: the moved row's `aria-level` matches the destination level.
  *  - DOM: sibling order inside the destination container is correct.
- *  - Persistence: the underlying menu_link_content entity's `parent` field
- *    is set to the expected plugin ID (or '' for root).
+ *
+ * Moves are no longer written to storage on drop; they accumulate in a
+ * server-side working copy until saved, so these tests assert the overlaid
+ * tree rather than the persisted entity. Persistence is covered by
+ * MenuTreeUiSaveCancelTest.
  */
 #[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
@@ -111,7 +113,6 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     $this->assertSiblings(['A', 'C', 'B', 'D', 'L'], $this->childRowsSelector(NULL));
     $this->assertDepth('C', 1);
     $this->assertIndent('C', 1);
-    $this->assertPersistedParent('C', NULL);
   }
 
   /**
@@ -122,7 +123,6 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     $this->assertSiblings(['A', 'C', 'B', 'D', 'L'], $this->childRowsSelector(NULL));
     $this->assertDepth('B', 1);
     $this->assertIndent('B', 1);
-    $this->assertPersistedParent('B', NULL);
   }
 
   /**
@@ -136,7 +136,6 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     $this->drag('B', 'A', 'child');
     $this->assertDepth('B', 2);
     $this->assertIndent('B', 2);
-    $this->assertPersistedParent('B', 'A');
     $this->assertSiblings(['B', 'A1', 'A2'], $this->childRowsSelector('A'));
     // Top level should now exclude B.
     $this->assertSiblings(['A', 'C', 'D', 'L'], $this->childRowsSelector(NULL));
@@ -152,7 +151,6 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     $this->drag('B', 'L', 'child');
     $this->assertDepth('B', 2);
     $this->assertIndent('B', 2);
-    $this->assertPersistedParent('B', 'L');
     $this->assertIsParentRow('L');
   }
 
@@ -163,7 +161,6 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     $this->drag('B', 'D', 'child');
     $this->assertDepth('B', 2);
     $this->assertIndent('B', 2);
-    $this->assertPersistedParent('B', 'D');
     $this->assertSame(
       'true',
       $this->row('D')->getAttribute('aria-expanded'),
@@ -194,7 +191,6 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
 
     $this->assertDepth('A2a', 1);
     $this->assertIndent('A2a', 1);
-    $this->assertPersistedParent('A2a', NULL);
     $this->assertSiblings(['A', 'B', 'C', 'D', 'L', 'A2a'], $this->childRowsSelector(NULL));
 
     $this->assertIsLeafRow('A2');
@@ -255,7 +251,6 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
   public function testCannotDropOntoSelf(): void {
     $this->drag('A', 'A', 'after');
     $this->assertSiblings(['A', 'B', 'C', 'D', 'L'], $this->childRowsSelector(NULL));
-    $this->assertPersistedParent('A', NULL);
   }
 
   /**
@@ -265,7 +260,6 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     $this->expandRow('A');
     $this->drag('A', 'A1', 'after');
     $this->assertSiblings(['A', 'B', 'C', 'D', 'L'], $this->childRowsSelector(NULL));
-    $this->assertPersistedParent('A1', 'A');
   }
 
   /**
@@ -524,23 +518,6 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
   }
 
   /**
-   * Asserts the persisted parent of a labelled link matches expectations.
-   *
-   * NULL means "should be at root" (parent = '').
-   */
-  private function assertPersistedParent(string $label, ?string $expected_parent_label): void {
-    $entity = $this->reloadEntity($label);
-    $expected = $expected_parent_label === NULL
-      ? ''
-      : $this->linkIds[$expected_parent_label];
-    $this->assertSame(
-      $expected,
-      $entity->getParentId(),
-      "Persisted parent of $label.",
-    );
-  }
-
-  /**
    * Asserts the number of direct child rows of a parent.
    *
    * Rows are flat siblings; direct children carry data-parent-id = the parent's
@@ -677,24 +654,6 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
   private function labelFor(string $plugin_id): ?string {
     $label = array_search($plugin_id, $this->linkIds, TRUE);
     return $label === FALSE ? NULL : (string) $label;
-  }
-
-  /**
-   * Reloads a labelled link entity fresh from storage (no cache).
-   */
-  private function reloadEntity(string $label): MenuLinkContentInterface {
-    $plugin_id = $this->linkIds[$label];
-    $uuid = substr($plugin_id, strlen('menu_link_content:'));
-    $storage = \Drupal::entityTypeManager()->getStorage('menu_link_content');
-    $storage->resetCache();
-    $ids = $storage->getQuery()
-      ->accessCheck(FALSE)
-      ->condition('uuid', $uuid)
-      ->execute();
-    $this->assertNotEmpty($ids, "Entity for $label not found in storage.");
-    /** @var \Drupal\menu_link_content\MenuLinkContentInterface $entity */
-    $entity = $storage->load(reset($ids));
-    return $entity;
   }
 
 }

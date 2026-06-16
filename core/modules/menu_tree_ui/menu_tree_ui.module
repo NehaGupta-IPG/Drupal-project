@@ -25,6 +25,12 @@ function menu_tree_ui_theme(): array {
         // Array of column header info: keyed by plugin ID, each entry has
         // 'id' (string) and 'label' (TranslatableMarkup).
         'columns' => [],
+        // Whether the menu has pending (unsaved) working-copy moves.
+        'has_changes' => FALSE,
+        // Whether another user holds the working copy.
+        'locked' => FALSE,
+        // Display name of the user holding the working copy, when locked.
+        'lock_owner' => '',
       ],
     ],
     'menu_tree_ui_row' => [

@@ -7,7 +7,6 @@ namespace Drupal\Tests\menu_tree_ui\FunctionalJavascript;
 use Behat\Mink\Element\NodeElement;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
-use Drupal\menu_link_content\MenuLinkContentInterface;
 use Drupal\system\Entity\Menu;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -20,6 +19,11 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * and Enter commits through the SAME commitMove() path as drag. Each stop
  * references a row and is mirrored on the host as data-mtu-drop ("kind:id"),
  * which these tests walk to deterministically rather than counting keystrokes.
+ *
+ * Moves are no longer written to storage on commit; they accumulate in a
+ * server-side working copy until saved, so these tests verify each move via
+ * the overlaid DOM rather than the persisted entity. Persistence is covered
+ * by MenuTreeUiSaveCancelTest.
  *
  * Depth-cap rejection is exercised at the service level in the MenuTreeMover
  * kernel test rather than re-driven here.
@@ -113,7 +117,6 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
     $this->moveTo('C', 'after', 'A');
     $this->assertSiblings(['A', 'C', 'B', 'D', 'L'], $this->childRowsSelector(NULL));
     $this->assertDepth('C', 1);
-    $this->assertPersistedParent('C', NULL);
   }
 
   /**
@@ -125,7 +128,6 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
     $this->moveTo('B', 'before', 'A');
     $this->assertSiblings(['B', 'A', 'C', 'D', 'L'], $this->childRowsSelector(NULL));
     $this->assertDepth('B', 1);
-    $this->assertPersistedParent('B', NULL);
   }
 
   /**
@@ -135,7 +137,6 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
     $this->moveTo('B', 'after', 'C');
     $this->assertSiblings(['A', 'C', 'B', 'D', 'L'], $this->childRowsSelector(NULL));
     $this->assertDepth('B', 1);
-    $this->assertPersistedParent('B', NULL);
   }
 
   /**
@@ -146,7 +147,6 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
     $this->moveTo('B', 'child', 'A');
     $this->assertDepth('B', 2);
     $this->assertIndent('B', 2);
-    $this->assertPersistedParent('B', 'A');
     $this->assertSiblings(['B', 'A1', 'A2'], $this->childRowsSelector('A'));
     $this->assertSiblings(['A', 'C', 'D', 'L'], $this->childRowsSelector(NULL));
 
@@ -164,7 +164,6 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
     $this->moveTo('B', 'child', 'L');
     $this->assertDepth('B', 2);
     $this->assertIndent('B', 2);
-    $this->assertPersistedParent('B', 'L');
     $this->assertIsParentRow('L');
   }
 
@@ -174,7 +173,6 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
   public function testGrabAndDropAsChildOfCollapsedParentAutoExpands(): void {
     $this->moveTo('B', 'child', 'D');
     $this->assertDepth('B', 2);
-    $this->assertPersistedParent('B', 'D');
     $this->assertSame(
       'true',
       $this->row('D')->getAttribute('aria-expanded'),
@@ -223,7 +221,6 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
     $this->dispatchKeys('B', ['Enter']);
     $this->settle();
 
-    $this->assertPersistedParent('B', 'D');
     $this->assertSiblings(['D1', 'B'], $this->childRowsSelector('D'));
   }
 
@@ -235,7 +232,6 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
     $this->expandRow('A2');
     $this->moveTo('A2a', 'after', 'L');
     $this->assertDepth('A2a', 1);
-    $this->assertPersistedParent('A2a', NULL);
     $this->assertSiblings(['A', 'B', 'C', 'D', 'L', 'A2a'], $this->childRowsSelector(NULL));
     $this->assertIsLeafRow('A2');
   }
@@ -263,7 +259,6 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
   public function testEscapeCancelsMove(): void {
     $this->dispatchKeys('B', [' ', 'ArrowDown', 'ArrowDown', 'Escape']);
     $this->assertSiblings(['A', 'B', 'C', 'D', 'L'], $this->childRowsSelector(NULL));
-    $this->assertPersistedParent('B', NULL);
     $this->assertSame(
       $this->linkIds['B'],
       $this->getSession()->evaluateScript('return document.activeElement?.dataset.id;'),
@@ -281,7 +276,6 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
     $this->dispatchKeys('B', [' ', 'Enter']);
     $this->settle();
     $this->assertSiblings(['A', 'B', 'C', 'D', 'L'], $this->childRowsSelector(NULL));
-    $this->assertPersistedParent('B', NULL);
   }
 
   /**
@@ -493,23 +487,6 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
   }
 
   /**
-   * Asserts the persisted parent of a labelled link matches expectations.
-   *
-   * NULL means "should be at root" (parent = '').
-   */
-  private function assertPersistedParent(string $label, ?string $expected_parent_label): void {
-    $entity = $this->reloadEntity($label);
-    $expected = $expected_parent_label === NULL
-      ? ''
-      : $this->linkIds[$expected_parent_label];
-    $this->assertSame(
-      $expected,
-      $entity->getParentId(),
-      "Persisted parent of $label.",
-    );
-  }
-
-  /**
    * Asserts the number of direct child rows of a parent.
    *
    * Rows are flat siblings; direct children carry data-parent-id = the parent's
@@ -627,24 +604,6 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
   private function labelFor(string $plugin_id): ?string {
     $label = array_search($plugin_id, $this->linkIds, TRUE);
     return $label === FALSE ? NULL : (string) $label;
-  }
-
-  /**
-   * Reloads a labelled link entity fresh from storage (no cache).
-   */
-  private function reloadEntity(string $label): MenuLinkContentInterface {
-    $plugin_id = $this->linkIds[$label];
-    $uuid = substr($plugin_id, strlen('menu_link_content:'));
-    $storage = \Drupal::entityTypeManager()->getStorage('menu_link_content');
-    $storage->resetCache();
-    $ids = $storage->getQuery()
-      ->accessCheck(FALSE)
-      ->condition('uuid', $uuid)
-      ->execute();
-    $this->assertNotEmpty($ids, "Entity for $label not found in storage.");
-    /** @var \Drupal\menu_link_content\MenuLinkContentInterface $entity */
-    $entity = $storage->load(reset($ids));
-    return $entity;
   }
 
 }
