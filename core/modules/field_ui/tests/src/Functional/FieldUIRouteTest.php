@@ -83,9 +83,6 @@ class FieldUIRouteTest extends BrowserTestBase {
     $this->drupalGet('admin/config/people/accounts/display');
     $this->assertSession()->titleEquals('Manage display | Drupal');
     $this->assertLocalTasks();
-    $this->drupalGet('admin/config/people/accounts/display/default');
-    $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->titleEquals('Manage display | Drupal');
 
     $xpath = "//tr[@id='display-mode-user-user-compact']//a[contains(., 'Enable')]";
     $this->assertSession()->elementExists('xpath', $xpath);
@@ -139,6 +136,10 @@ class FieldUIRouteTest extends BrowserTestBase {
     $this->drupalGet('admin/config/people/accounts/form-display');
     $this->submitForm($edit, 'Save');
     $this->assertSession()->linkExists('Test');
+
+    $this->drupalGet('admin/config/people/accounts/display/default');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->titleEquals('Manage display | Drupal');
   }
 
   /**
