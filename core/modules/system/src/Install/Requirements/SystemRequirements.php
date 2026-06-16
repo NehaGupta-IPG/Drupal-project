@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\system\Install\Requirements;
 
 use Drupal\Core\Extension\InstallRequirementsInterface;
+use Drupal\Core\Extension\RemovedCoreExtensionList;
 use Drupal\Component\FileSystem\FileSystem as FileSystemComponent;
 use Drupal\Component\Utility\Environment;
 use Drupal\Component\Utility\OpCodeCache;
@@ -31,37 +32,23 @@ class SystemRequirements implements InstallRequirementsInterface {
 
   /**
    * An array of machine names of modules that were removed from Drupal core.
+   *
+   * @deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use
+   *   \Drupal\Core\Extension\RemovedCoreExtensionList::MODULES instead.
+   *
+   * @see https://www.drupal.org/node/3601118
    */
-  public const DRUPAL_CORE_REMOVED_MODULE_LIST = [
-    'action' => 'Action UI',
-    'ban' => 'Ban',
-    'book' => 'Book',
-    'aggregator' => 'Aggregator',
-    'ckeditor' => 'CKEditor',
-    'color' => 'Color',
-    'contact' => 'Contact',
-    'field_layout' => 'Field Layout',
-    'forum' => 'Forum',
-    'hal' => 'HAL',
-    'history' => 'History',
-    'migrate_drupal_ui' => 'Migrate Drupal UI',
-    'migrate_drupal' => 'Migrate Drupal',
-    'quickedit' => 'Quick Edit',
-    'rdf' => 'RDF',
-    'statistics' => 'Statistics',
-    'tour' => 'Tour',
-    'tracker' => 'Tracker',
-  ];
+  public const DRUPAL_CORE_REMOVED_MODULE_LIST = RemovedCoreExtensionList::MODULES;
 
   /**
    * An array of machine names of themes that were removed from Drupal core.
+   *
+   * @deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use
+   *   \Drupal\Core\Extension\RemovedCoreExtensionList::THEMES instead.
+   *
+   * @see https://www.drupal.org/node/3601118
    */
-  public const DRUPAL_CORE_REMOVED_THEME_LIST = [
-    'bartik' => 'Bartik',
-    'classy' => 'Classy',
-    'seven' => 'Seven',
-    'stable' => 'Stable',
-  ];
+  public const DRUPAL_CORE_REMOVED_THEME_LIST = RemovedCoreExtensionList::THEMES;
 
   /**
    * {@inheritdoc}
