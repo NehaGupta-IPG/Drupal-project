@@ -77,9 +77,19 @@ class Datetime extends DateElementBase {
     $element += ['#date_timezone' => date_default_timezone_get()];
 
     if ($input !== FALSE) {
+      // The input is already a DrupalDateTime, skip processing.
+      if ($input instanceof DrupalDateTime) {
+        $date_format = DateFormat::load('html_date')->getPattern();
+        $time_format = DateFormat::load('html_time')->getPattern();
+        return [
+          'date' => $input->format($date_format),
+          'time' => $input->format($time_format),
+          'object' => $input,
+        ];
+      }
       if ($element['#date_date_element'] === 'datetime-local' && !empty($input['date'])) {
         // With a datetime-local input, the date value is always normalized to
-        // the format Y-m-d\TH:i
+        // the format Y-m-d\TH:i.
         // @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/datetime-local
         // 'html_datetime' is not a valid format to pass to
         // DrupalDateTime::createFromFormat()
@@ -245,7 +255,7 @@ class Datetime extends DateElementBase {
 
       $date_format = $element['#date_date_element'] != 'none' ? static::getHtml5DateFormat($element) : '';
       // With a datetime-local input, the date value is always normalized to
-      // the format Y-m-d\TH:i
+      // the format Y-m-d\TH:i.
       // @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/datetime-local
       // 'html_datetime' returned by static::getHtml5DateFormat($element) is not
       // a valid format.
@@ -369,10 +379,7 @@ class Datetime extends DateElementBase {
     $input = NestedArray::getValue($form_state->getValues(), $element['#parents'], $input_exists);
     if ($input_exists) {
 
-      // If the value has already been validated and replaced with a
-      // DrupalDateTime object (or NULL), skip re-validation to avoid
-      // "Cannot use object as array" fatal errors when the form is
-      // rebuilt and validated multiple times in the same request.
+      // Skip re-validation if the value is already a DrupalDateTime object.
       if ($input instanceof DrupalDateTime || ($input === NULL && !$element['#required'])) {
         return;
       }

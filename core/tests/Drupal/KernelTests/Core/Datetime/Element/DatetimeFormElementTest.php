@@ -214,24 +214,15 @@ class DatetimeFormElementTest extends EntityKernelTestBase implements FormInterf
   }
 
   /**
-   * Verifies re-validating a datetime element does not cause a fatal error.
-   *
-   * When a form with a datetime element is rebuilt and validated more than
-   * once in the same request (e.g., during AJAX rebuilds), the element's
-   * value is already a DrupalDateTime object from the first validation pass.
-   * The second validation must handle this gracefully instead of trying to
-   * access the object as an array.
+   * Verifies re-validation with DrupalDateTime objects does not cause errors.
    */
   public function testNoFatalOnDoubleValidation(): void {
-    // Submit the form with valid datetime values first.
     $form_state = new FormState();
     $form_state->setValue('datetime_local_picker', ['date' => '2025-02-18T12:00']);
     $form_state->setValue('datetime_time_only', ['time' => '12:00']);
     $this->formBuilder->submitForm($this, $form_state);
     $this->assertEmpty($form_state->getErrors());
 
-    // Simulate a rebuild where validation runs again with already-processed
-    // values (DrupalDateTime objects from the first validation pass).
     $processed_values = $form_state->getValues();
     $form_state2 = new FormState();
     $form_state2->setValues($processed_values);
