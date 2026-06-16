@@ -6,6 +6,7 @@ namespace Drupal\menu_test\Hook;
 
 use Drupal\Core\Url;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\menu_test\MenuTestHelper;
 
@@ -61,6 +62,25 @@ class MenuTestHooks {
       ];
     }
     $cacheability->addCacheTags(['kittens:dwarf-cat']);
+  }
+
+  /**
+   * Implements hook_menu_link_content_presave().
+   */
+  #[Hook('menu_link_content_presave')]
+  public function menuLinkContentPresave(EntityInterface $entity): void {
+    $menu_link_manager = \Drupal::service('plugin.manager.menu.link');
+    $expected_parent = $entity->getParentId();
+    try {
+      $actual_parent = $menu_link_manager->getDefinition($entity->getPluginId())['parent'] ?? '';
+    }
+    catch (\Exception) {
+      $actual_parent = NULL;
+    }
+    \Drupal::state()->set('menu_test.presave_parent', [
+      'expected' => $expected_parent,
+      'actual' => $actual_parent,
+    ]);
   }
 
 }
