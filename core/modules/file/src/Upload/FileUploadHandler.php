@@ -33,13 +33,6 @@ class FileUploadHandler implements FileUploadHandlerInterface {
    */
   const DEFAULT_EXTENSIONS = 'jpg jpeg gif png txt doc xls pdf ppt pps odt ods odp';
 
-  /**
-   * The file validator.
-   *
-   * @var \Drupal\file\Validation\FileValidatorInterface
-   */
-  protected FileValidatorInterface $fileValidator;
-
   public function __construct(
     protected FileSystemInterface $fileSystem,
     protected EntityTypeManagerInterface $entityTypeManager,
@@ -50,30 +43,17 @@ class FileUploadHandler implements FileUploadHandlerInterface {
     protected AccountInterface $currentUser,
     protected RequestStack $requestStack,
     protected FileRepositoryInterface $fileRepository,
-    protected FileValidatorInterface $file_validator,
+    protected FileValidatorInterface $fileValidator,
     #[Autowire(service: 'lock')]
     protected LockBackendInterface $lock,
     protected BasicRecursiveValidatorFactory $validatorFactory,
   ) {
-    $this->fileSystem = $fileSystem;
-    $this->entityTypeManager = $entityTypeManager;
-    $this->streamWrapperManager = $streamWrapperManager;
-    $this->eventDispatcher = $eventDispatcher;
-    $this->mimeTypeGuesser = $mimeTypeGuesser;
-    $this->currentUser = $currentUser;
-    $this->requestStack = $requestStack;
-    $this->fileRepository = $fileRepository;
-    $this->fileValidator = $file_validator;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function handleFileUpload(UploadedFileInterface $uploadedFile, array $validators = [], string $destination = 'temporary://', /*FileExists*/$fileExists = FileExists::Replace): FileUploadResult {
-    if (!$fileExists instanceof FileExists) {
-      // @phpstan-ignore staticMethod.deprecated
-      $fileExists = FileExists::fromLegacyInt($fileExists, __METHOD__);
-    }
+  public function handleFileUpload(UploadedFileInterface $uploadedFile, array $validators = [], string $destination = 'temporary://', FileExists $fileExists = FileExists::Replace): FileUploadResult {
     $result = new FileUploadResult();
 
     $violations = $uploadedFile->validate($this->validatorFactory->createValidator());

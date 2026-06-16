@@ -14,6 +14,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests translation of configuration strings.
  */
 #[Group('locale')]
+#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class LocaleConfigTranslationTest extends BrowserTestBase {
 
@@ -288,7 +289,7 @@ class LocaleConfigTranslationTest extends BrowserTestBase {
 
     // Check the optional default configuration in node module.
     $string = $this->storage->findString([
-      'source' => 'No front page content has been created yet.<br/>Follow the <a target="_blank" href="https://www.drupal.org/docs/user_guide/en/index.html">User Guide</a> to start building your site.',
+      'source' => 'No promoted content has been created yet.<br/>Follow the <a target="_blank" href="https://www.drupal.org/docs/user_guide/en/index.html">User Guide</a> to start building your site.',
       'context' => '',
       'type' => 'configuration',
     ]);
