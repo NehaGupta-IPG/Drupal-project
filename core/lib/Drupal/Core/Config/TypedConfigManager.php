@@ -191,7 +191,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    * @param \Drupal\Core\TypedData\TraversableTypedDataInterface $object
    *   A config schema object to get the static type root for.
    *
-   * @return \Drupal\Core\TypedData\TraversableTypedDataInterface
+   * @return \Drupal\Core\TypedData\TraversableTypedDataInterface<int|string, \Drupal\Core\TypedData\TypedDataInterface>
    *   The ancestral config schema object at which the static type root lies:
    *   either the first ancestor with a dynamic type (for example:
    *   `block.block.*:settings`, which has the `block.settings.[%parent.plugin]`
@@ -298,7 +298,9 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       }
       // Unset type so we try the merge only once per type.
       unset($definition['type']);
-      $this->definitions[$type] = $definition;
+      if (!empty($replacements)) {
+        $this->definitions[$type] = $definition;
+      }
     }
     // Add type and default definition class.
     $definition += [

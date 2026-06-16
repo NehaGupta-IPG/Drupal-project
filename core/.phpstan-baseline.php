@@ -284,24 +284,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Component/Annotation/Doctrine/StaticReflectionClass.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Component\\\\Annotation\\\\Doctrine\\\\StaticReflectionClass\\:\\:getInterfaces\\(\\) return type with generic class ReflectionClass does not specify its types\\: T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Component/Annotation/Doctrine/StaticReflectionClass.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Component\\\\Annotation\\\\Doctrine\\\\StaticReflectionClass\\:\\:getParentClass\\(\\) return type with generic class ReflectionClass does not specify its types\\: T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Component/Annotation/Doctrine/StaticReflectionClass.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Component\\\\Annotation\\\\Doctrine\\\\StaticReflectionClass\\:\\:getTraits\\(\\) return type with generic class ReflectionClass does not specify its types\\: T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Component/Annotation/Doctrine/StaticReflectionClass.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Component\\\\Annotation\\\\Plugin\\:\\:get\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -3338,36 +3320,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Config/TypedConfigManager.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\TypedConfigManager\\:\\:createFromNameAndData\\(\\) return type with generic interface Drupal\\\\Core\\\\TypedData\\\\TraversableTypedDataInterface does not specify its types\\: I, T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Config/TypedConfigManager.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\TypedConfigManager\\:\\:get\\(\\) return type with generic interface Drupal\\\\Core\\\\TypedData\\\\TraversableTypedDataInterface does not specify its types\\: I, T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Config/TypedConfigManager.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\TypedConfigManager\\:\\:getStaticTypeRoot\\(\\) return type with generic interface Drupal\\\\Core\\\\TypedData\\\\TraversableTypedDataInterface does not specify its types\\: I, T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Config/TypedConfigManager.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\TypedConfigManagerInterface\\:\\:createFromNameAndData\\(\\) return type with generic interface Drupal\\\\Core\\\\TypedData\\\\TraversableTypedDataInterface does not specify its types\\: I, T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Config/TypedConfigManagerInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\TypedConfigManagerInterface\\:\\:get\\(\\) return type with generic interface Drupal\\\\Core\\\\TypedData\\\\TraversableTypedDataInterface does not specify its types\\: I, T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Config/TypedConfigManagerInterface.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Controller\\\\ControllerBase\\:\\:setMessenger\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -3764,10 +3716,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Datetime/Entity/DateFormat.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$storage of method Drupal\\\\Core\\\\DefaultContent\\\\ContentExportCommand\\:\\:loadEntities\\(\\) expects Drupal\\\\Core\\\\Entity\\\\ContentEntityStorageInterface, Drupal\\\\Core\\\\Entity\\\\EntityStorageInterface given\\.$#',
+	'message' => '#^Parameter \\#1 \\$storage of method Drupal\\\\Core\\\\DefaultContent\\\\Command\\\\ContentExportCommand\\:\\:loadEntities\\(\\) expects Drupal\\\\Core\\\\Entity\\\\ContentEntityStorageInterface, Drupal\\\\Core\\\\Entity\\\\EntityStorageInterface given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/DefaultContent/ContentExportCommand.php',
+	'path' => __DIR__ . '/lib/Drupal/Core/DefaultContent/Command/ContentExportCommand.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\DependencyInjection\\\\Compiler\\\\TaggedHandlersPass\\:\\:processServiceCollectorPass\\(\\) has no return type specified\\.$#',
@@ -5322,24 +5274,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Event/BundleConfigImportValidate.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Entity\\\\FieldableEntityInterface\\:\\:get\\(\\) return type with generic interface Drupal\\\\Core\\\\Field\\\\FieldItemListInterface does not specify its types\\: T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/FieldableEntityInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Entity\\\\FieldableEntityInterface\\:\\:getFields\\(\\) return type with generic interface Drupal\\\\Core\\\\Field\\\\FieldItemListInterface does not specify its types\\: T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/FieldableEntityInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Entity\\\\FieldableEntityInterface\\:\\:getTranslatableFields\\(\\) return type with generic interface Drupal\\\\Core\\\\Field\\\\FieldItemListInterface does not specify its types\\: T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/FieldableEntityInterface.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Entity\\\\FieldableEntityInterface\\:\\:onChange\\(\\) has no return type specified\\.$#',
@@ -6990,12 +6924,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Field/FormatterInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Field\\\\FormatterPluginManager\\:\\:getInstance\\(\\) return type with generic interface Drupal\\\\Core\\\\Field\\\\FormatterInterface does not specify its types\\: T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Field/FormatterPluginManager.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Field\\\\Plugin\\\\Field\\\\FieldFormatter\\\\EntityReferenceFormatterBase\\:\\:prepareView\\(\\) has no return type specified\\.$#',
@@ -8822,12 +8750,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Plugin/Discovery/AnnotatedClassDiscovery.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Plugin\\\\Discovery\\\\DirectoryWithMetadataDiscovery\\:\\:getDirectoryIterator\\(\\) return type with generic class RecursiveIteratorIterator does not specify its types\\: T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Plugin/Discovery/DirectoryWithMetadataDiscovery.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Parameter \\#3 \\$flags of class RecursiveIteratorIterator constructor expects 0\\|16, 4096 given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 1,
@@ -9404,12 +9326,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Routing/CurrentRouteMatch.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Routing\\\\Enhancer\\\\ParamConversionEnhancer\\:\\:copyRawVariables\\(\\) return type with generic class Symfony\\\\Component\\\\HttpFoundation\\\\InputBag does not specify its types\\: TInput$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Routing/Enhancer/ParamConversionEnhancer.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Routing\\\\Enhancer\\\\ParamConversionEnhancer\\:\\:onException\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -9504,24 +9420,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Routing/RouteBuilderInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Routing\\\\RoutePreloader\\:\\:onAlterRoutes\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Routing/RoutePreloader.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Routing\\\\RoutePreloader\\:\\:onFinishedRoutes\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Routing/RoutePreloader.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Routing\\\\RoutePreloader\\:\\:onRequest\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Routing/RoutePreloader.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Routing\\\\RouteProvider\\:\\:addExtraCacheKeyPart\\(\\) has no return type specified\\.$#',
@@ -10118,12 +10016,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/TypedData/Plugin/DataType/DurationIso8601.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\TypedData\\\\Plugin\\\\DataType\\\\ItemList\\:\\:getIterator\\(\\) return type with generic class ArrayIterator does not specify its types\\: TKey, TValue$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/TypedData/Plugin/DataType/ItemList.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\TypedData\\\\Plugin\\\\DataType\\\\ItemList\\:\\:onChange\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -10232,18 +10124,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/TypedData/TypedData.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\TypedData\\\\TypedData\\:\\:getParent\\(\\) return type with generic interface Drupal\\\\Core\\\\TypedData\\\\TraversableTypedDataInterface does not specify its types\\: I, T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/TypedData/TypedData.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\TypedData\\\\TypedData\\:\\:getRoot\\(\\) return type with generic interface Drupal\\\\Core\\\\TypedData\\\\TraversableTypedDataInterface does not specify its types\\: I, T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/TypedData/TypedData.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\TypedData\\\\TypedData\\:\\:setContext\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -10258,18 +10138,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\TypedData\\\\TypedDataInterface\\:\\:createInstance\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/TypedData/TypedDataInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\TypedData\\\\TypedDataInterface\\:\\:getParent\\(\\) return type with generic interface Drupal\\\\Core\\\\TypedData\\\\TraversableTypedDataInterface does not specify its types\\: I, T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/TypedData/TypedDataInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\TypedData\\\\TypedDataInterface\\:\\:getRoot\\(\\) return type with generic interface Drupal\\\\Core\\\\TypedData\\\\TraversableTypedDataInterface does not specify its types\\: I, T$#',
-	'identifier' => 'missingType.generics',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/TypedData/TypedDataInterface.php',
 ];
@@ -10994,6 +10862,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/BlockContentTypeTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Variable \\$trail in empty\\(\\) always exists and is always falsy\\.$#',
+	'identifier' => 'empty.variable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/BlockContentTypeTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\block_content\\\\Functional\\\\PageEditTest\\:\\:assertBreadcrumb\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -11013,6 +10887,12 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$parts in empty\\(\\) always exists and is always falsy\\.$#',
+	'identifier' => 'empty.variable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/PageEditTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Variable \\$trail in empty\\(\\) always exists and is always falsy\\.$#',
 	'identifier' => 'empty.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/PageEditTest.php',
@@ -13034,6 +12914,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/dblog/tests/src/Functional/DbLogTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Variable \\$trail in empty\\(\\) always exists and is always falsy\\.$#',
+	'identifier' => 'empty.variable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/dblog/tests/src/Functional/DbLogTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\dblog\\\\Kernel\\\\DbLogFormInjectionTest\\:\\:validateForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -13754,12 +13640,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/file/src/FileUsage/FileUsageInterface.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#4 \\$field_type of function file_get_file_references expects string, null given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/src/Hook/FileDownloadHook.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Variable \\$rows in empty\\(\\) always exists and is not falsy\\.$#',
 	'identifier' => 'empty.variable',
 	'count' => 1,
@@ -14264,28 +14144,34 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/help/src/HelpTopicTwigLoader.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\help\\\\Functional\\\\HelpTopicTest\\:\\:assertBreadcrumb\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\help\\\\Kernel\\\\HelpTopicTest\\:\\:assertBreadcrumb\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/help/tests/src/Functional/HelpTopicTest.php',
+	'path' => __DIR__ . '/modules/help/tests/src/Kernel/HelpTopicTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\help\\\\Functional\\\\HelpTopicTest\\:\\:assertBreadcrumbParts\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\help\\\\Kernel\\\\HelpTopicTest\\:\\:assertBreadcrumbParts\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/help/tests/src/Functional/HelpTopicTest.php',
+	'path' => __DIR__ . '/modules/help/tests/src/Kernel/HelpTopicTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\help\\\\Functional\\\\HelpTopicTest\\:\\:assertMenuActiveTrail\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\help\\\\Kernel\\\\HelpTopicTest\\:\\:assertMenuActiveTrail\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/help/tests/src/Functional/HelpTopicTest.php',
+	'path' => __DIR__ . '/modules/help/tests/src/Kernel/HelpTopicTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$parts in empty\\(\\) always exists and is always falsy\\.$#',
 	'identifier' => 'empty.variable',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/help/tests/src/Functional/HelpTopicTest.php',
+	'path' => __DIR__ . '/modules/help/tests/src/Kernel/HelpTopicTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Variable \\$trail in empty\\(\\) always exists and is always falsy\\.$#',
+	'identifier' => 'empty.variable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/help/tests/src/Kernel/HelpTopicTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#2 \\$module_handler of class Drupal\\\\help\\\\HelpTopicTwigLoader constructor expects Drupal\\\\Core\\\\Extension\\\\ModuleHandlerInterface, Drupal\\\\Core\\\\Extension\\\\ThemeHandlerInterface\\|Prophecy\\\\Prophecy\\\\ObjectProphecy given\\.$#',
@@ -15902,6 +15788,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/language/tests/src/Functional/LanguageBreadcrumbTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Variable \\$trail in empty\\(\\) always exists and is always falsy\\.$#',
+	'identifier' => 'empty.variable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/language/tests/src/Functional/LanguageBreadcrumbTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\language\\\\Kernel\\\\Views\\\\LanguageTestBase\\:\\:dataSet\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -16282,12 +16174,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\layout_builder\\\\Plugin\\\\Block\\\\FieldBlock\\:\\:formatterSettingsProcessCallback\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/src/Plugin/Block/FieldBlock.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\layout_builder\\\\Plugin\\\\Block\\\\FieldBlock\\:\\:getFormatter\\(\\) return type with generic interface Drupal\\\\Core\\\\Field\\\\FormatterInterface does not specify its types\\: T$#',
-	'identifier' => 'missingType.generics',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/layout_builder/src/Plugin/Block/FieldBlock.php',
 ];
@@ -16710,12 +16596,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/link/src/Plugin/Validation/Constraint/LinkAccessConstraintValidator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Function locale_config_batch_update_components\\(\\) should return array but return statement is missing\\.$#',
-	'identifier' => 'return.missing',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/locale/locale.bulk.inc',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Function locale_string_is_safe\\(\\) has no return type specified\\.$#',
@@ -19058,12 +18938,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/node/src/Entity/Node.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Entity\\\\Node\\:\\:preDelete\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Entity/Node.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\node\\\\Entity\\\\Node\\:\\:preSave\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -19334,48 +19208,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/node/src/NodeViewBuilder.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Plugin\\\\Search\\\\NodeSearch\\:\\:addNodeRankings\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Plugin/Search/NodeSearch.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Plugin\\\\Search\\\\NodeSearch\\:\\:indexClear\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Plugin/Search/NodeSearch.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Plugin\\\\Search\\\\NodeSearch\\:\\:markForReindex\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Plugin/Search/NodeSearch.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Plugin\\\\Search\\\\NodeSearch\\:\\:searchFormAlter\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Plugin/Search/NodeSearch.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Plugin\\\\Search\\\\NodeSearch\\:\\:submitConfigurationForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Plugin/Search/NodeSearch.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Plugin\\\\Search\\\\NodeSearch\\:\\:updateIndex\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Plugin/Search/NodeSearch.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$query of method Drupal\\\\node\\\\Plugin\\\\Search\\\\NodeSearch\\:\\:addNodeRankings\\(\\) expects Drupal\\\\Core\\\\Database\\\\Query\\\\SelectExtender, Drupal\\\\Core\\\\Database\\\\Query\\\\ExtendableInterface given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Plugin/Search/NodeSearch.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\node\\\\Plugin\\\\views\\\\argument\\\\Type\\:\\:node_type\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -19538,6 +19370,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/node/tests/src/Functional/NodeTitleTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Variable \\$trail in empty\\(\\) always exists and is always falsy\\.$#',
+	'identifier' => 'empty.variable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/tests/src/Functional/NodeTitleTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\NodeTranslationUITest\\:\\:getNewEntityValues\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -19569,6 +19407,12 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$parts in empty\\(\\) always exists and is always falsy\\.$#',
+	'identifier' => 'empty.variable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/tests/src/Functional/NodeTypeTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Variable \\$trail in empty\\(\\) always exists and is always falsy\\.$#',
 	'identifier' => 'empty.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/node/tests/src/Functional/NodeTypeTest.php',
@@ -20388,18 +20232,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/rest/tests/src/Functional/ResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\RestLoginHttpTest\\:\\:assertMailPattern\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/RestLoginHttpTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\RestLoginHttpTest\\:\\:assertMailString\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/RestLoginHttpTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Kernel\\\\StubRequestHandlerResourcePlugin\\:\\:delete\\(\\) has no return type specified\\.$#',
@@ -23290,6 +23122,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/tests/src/Functional/Menu/BreadcrumbFrontCacheContextsTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Variable \\$trail in empty\\(\\) always exists and is always falsy\\.$#',
+	'identifier' => 'empty.variable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/tests/src/Functional/Menu/BreadcrumbFrontCacheContextsTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\Menu\\\\BreadcrumbTest\\:\\:assertBreadcrumb\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -23309,6 +23147,12 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$parts in empty\\(\\) always exists and is always falsy\\.$#',
+	'identifier' => 'empty.variable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/tests/src/Functional/Menu/BreadcrumbTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Variable \\$trail in empty\\(\\) always exists and is always falsy\\.$#',
 	'identifier' => 'empty.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/tests/src/Functional/Menu/BreadcrumbTest.php',
@@ -23860,64 +23704,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationFieldViewTest\\:\\:enableTranslation\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationFieldViewTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationFieldViewTest\\:\\:setUpTermReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationFieldViewTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationFieldViewTest\\:\\:setupLanguages\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationFieldViewTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationTest\\:\\:assertBreadcrumb\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationTest\\:\\:assertBreadcrumbParts\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationTest\\:\\:assertMenuActiveTrail\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationTest\\:\\:enableTranslation\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationTest\\:\\:setUpTermReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationTest\\:\\:setupLanguages\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$parts in empty\\(\\) always exists and is always falsy\\.$#',
+	'message' => '#^Variable \\$trail in empty\\(\\) always exists and is always falsy\\.$#',
 	'identifier' => 'empty.variable',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationTest.php',
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationUITest\\:\\:getEditValues\\(\\) has no return type specified\\.$#',
@@ -23938,34 +23728,100 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Views/TaxonomyTestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Views\\\\TermTranslationViewsTest\\:\\:enableTranslation\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Views/TermTranslationViewsTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Views\\\\TermTranslationViewsTest\\:\\:setUpTermReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Views/TermTranslationViewsTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Views\\\\TermTranslationViewsTest\\:\\:setupLanguages\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Views/TermTranslationViewsTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\PendingRevisionTest\\:\\:getTaxonomyIndex\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/PendingRevisionTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\TermTranslationFieldViewTest\\:\\:enableTranslation\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationFieldViewTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\TermTranslationFieldViewTest\\:\\:setUpTermReferenceField\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationFieldViewTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\TermTranslationFieldViewTest\\:\\:setupLanguages\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationFieldViewTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\TermTranslationTest\\:\\:assertBreadcrumb\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\TermTranslationTest\\:\\:assertBreadcrumbParts\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\TermTranslationTest\\:\\:assertMenuActiveTrail\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\TermTranslationTest\\:\\:enableTranslation\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\TermTranslationTest\\:\\:setUpTermReferenceField\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\TermTranslationTest\\:\\:setupLanguages\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Variable \\$parts in empty\\(\\) always exists and is always falsy\\.$#',
+	'identifier' => 'empty.variable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Variable \\$trail in empty\\(\\) always exists and is always falsy\\.$#',
+	'identifier' => 'empty.variable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\Views\\\\TaxonomyTestBase\\:\\:mockStandardInstall\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/Views/TaxonomyTestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\Views\\\\TermTranslationViewsTest\\:\\:enableTranslation\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/Views/TermTranslationViewsTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\Views\\\\TermTranslationViewsTest\\:\\:setUpTermReferenceField\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/Views/TermTranslationViewsTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\Views\\\\TermTranslationViewsTest\\:\\:setupLanguages\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/Views/TermTranslationViewsTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\text\\\\Plugin\\\\Field\\\\FieldType\\\\TextFieldItemList\\:\\:defaultValuesFormValidate\\(\\) has no return type specified\\.$#',
@@ -28224,12 +28080,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\field\\\\EntityField\\:\\:documentSelfTokens\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/src/Plugin/views/field/EntityField.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\field\\\\EntityField\\:\\:getFormatterInstance\\(\\) return type with generic interface Drupal\\\\Core\\\\Field\\\\FormatterInterface does not specify its types\\: T$#',
-	'identifier' => 'missingType.generics',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/src/Plugin/views/field/EntityField.php',
 ];
@@ -32794,12 +32644,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceMerger.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$transaction in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceMerger.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\workspaces\\\\WorkspaceMergerInterface\\:\\:merge\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -34355,12 +34199,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/DependencyInjection/DependencySerializationTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Entity\\\\EntityFieldManagerTest\\:\\:setUpEntityWithFieldDefinition\\(\\) return type with generic interface Prophecy\\\\Prophecy\\\\ProphecyInterface does not specify its types\\: T$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityFieldManagerTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Entity\\\\BasicControllerClass\\:\\:exampleControllerMethod\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -34829,12 +34667,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/WebAssert.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\PHPStan\\\\Tests\\\\ComponentTestDoesNotExtendCoreTestTest\\:\\:getRule\\(\\) return type with generic interface PHPStan\\\\Rules\\\\Rule does not specify its types\\: TNodeType$#',
-	'identifier' => 'missingType.generics',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/PHPStan/tests/ComponentTestDoesNotExtendCoreTestTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Function drupal_phpunit_populate_class_loader\\(\\) has no return type specified\\.$#',
