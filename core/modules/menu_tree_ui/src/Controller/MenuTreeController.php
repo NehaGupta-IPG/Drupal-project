@@ -77,6 +77,7 @@ final class MenuTreeController extends ControllerBase {
       $rendered_rows[] = [
         '#theme' => 'menu_tree_ui_row',
         '#element' => $element,
+        '#parent_id' => '',
         '#operations' => $this->renderOperations($element, $entity_map),
         '#columns' => $this->buildColumnCells($element, $columns),
         '#depth' => 1,
@@ -133,7 +134,7 @@ final class MenuTreeController extends ControllerBase {
 
     $data = [];
     foreach ($elements as $element) {
-      $data[] = $this->serializeElement($element, $entity_map, $columns);
+      $data[] = $this->serializeElement($element, $entity_map, $columns, $parent_id ?? '');
     }
 
     $response = new CacheableJsonResponse([
@@ -262,11 +263,13 @@ final class MenuTreeController extends ControllerBase {
    *   Pre-loaded entities keyed by plugin ID.
    * @param \Drupal\menu_tree_ui\Plugin\MenuTreeColumn\MenuTreeColumnInterface[] $columns
    *   The active column plugins keyed by plugin ID.
+   * @param string $parent_id
+   *   The parent link plugin ID, or '' for the top level.
    *
    * @return array
    *   The serialized row, matching the JSON shape consumed by <menu-tree>.
    */
-  private function serializeElement(MenuLinkTreeElement $element, array $entity_map, array $columns): array {
+  private function serializeElement(MenuLinkTreeElement $element, array $entity_map, array $columns, string $parent_id): array {
     $link = $element->link;
 
     $column_data = [];
@@ -279,6 +282,7 @@ final class MenuTreeController extends ControllerBase {
 
     return [
       'id' => $link->getPluginId(),
+      'parent_id' => $parent_id,
       'title' => (string) $link->getTitle(),
       'enabled' => $link->isEnabled(),
       'has_children' => $element->hasChildren,

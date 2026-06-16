@@ -126,29 +126,6 @@
   color: var(--mtu-color-text-muted);
 }
 
-/* ─────────────────────────────────────────────────────── column headers */
-
-.menu-tree-ui__column-headers {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.25rem 0.75rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--mtu-color-text-muted);
-  border-bottom: 1px solid var(--mtu-color-divider);
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.menu-tree-ui__column-header--title {
-  flex: 1 1 auto;
-}
-
-.menu-tree-ui__column-header--operations {
-  flex: 0 0 auto;
-}
-
 /* ──────────────────────────────────────────────────────────────── tree */
 
 /* <menu-tree> hosts the absolutely-positioned drop indicator. */
@@ -158,15 +135,75 @@ menu-tree {
 }
 
 /*
- * Hard reset for all ARIA tree/group/row elements and any <ul>/<li> nested
- * inside them. Admin themes apply list margins, padding, and list-style to
- * generic li/ul selectors; those bleed into our custom-element tree and
- * misalign child rows and add bullet markers to dropbutton items.
- * Scoping to role attributes avoids touching any other lists on the page.
+ * The treegrid keeps table semantics (role attributes) but lays out as block +
+ * flex rows. content-visibility / containment is spec-disallowed on real
+ * display:table-row elements (it no-ops or breaks column sizing), so we drop
+ * display:table and size cells with flex instead — which keeps the row
+ * virtualization in windowing.js working exactly as it did on the old flex
+ * rows. Admin themes also style generic table cells; the resets below stop that
+ * bleeding into the tree.
  */
-ul[role="tree"],
-ul[role="group"],
-li[role="treeitem"],
+.menu-tree-ui__table {
+  display: block;
+  border: 1px solid var(--mtu-color-divider);
+  border-radius: 4px;
+  background: var(--mtu-color-bg);
+}
+
+.menu-tree-ui__table thead,
+.menu-tree-ui__table tbody {
+  display: block;
+}
+
+.menu-tree-ui__table thead tr,
+.menu-tree-ui-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.menu-tree-ui__table th,
+.menu-tree-ui-row__cell {
+  display: block;
+  padding: 0;
+  border: 0;
+  text-align: start;
+}
+
+/* Column widths — header cells must mirror body cells to stay aligned. */
+.menu-tree-ui__col--handle,
+.menu-tree-ui-row__cell--handle {
+  flex: 0 0 1.875rem;
+}
+
+.menu-tree-ui__col--name,
+.menu-tree-ui-row__cell--name {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.menu-tree-ui__col--data,
+.menu-tree-ui-row__column {
+  flex: 0 0 auto;
+  min-width: 3rem;
+}
+
+.menu-tree-ui__col--operations,
+.menu-tree-ui-row__cell--operations {
+  flex: 0 0 auto;
+  margin-inline-start: auto;
+}
+
+.menu-tree-ui__table thead tr {
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--mtu-color-text-muted);
+  border-bottom: 1px solid var(--mtu-color-divider);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
 .menu-tree-ui-row__operations li,
 .menu-tree-ui-row__operations ul {
   margin: 0;
@@ -175,21 +212,10 @@ li[role="treeitem"],
   list-style-type: none;
 }
 
-.menu-tree-ui__list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.menu-tree-ui__list--root {
-  border: 1px solid var(--mtu-color-divider);
-  border-radius: 4px;
-  background: var(--mtu-color-bg);
-}
-
 .menu-tree-ui-row {
   content-visibility: auto;
   contain-intrinsic-size: auto 2.5rem;
+  min-height: 2.5rem;
   border-bottom: 1px solid var(--mtu-color-divider-light);
 }
 
@@ -197,12 +223,8 @@ li[role="treeitem"],
   border-bottom: 0;
 }
 
-.menu-tree-ui-row[aria-expanded="true"] > ul[role="group"] {
-  display: block;
-}
-
-.menu-tree-ui-row[aria-expanded="false"] > ul[role="group"],
-.menu-tree-ui-row > ul[role="group"][hidden] {
+/* Collapsed descendants are flagged data-hidden by expand.js. */
+.menu-tree-ui-row[data-hidden="true"] {
   display: none;
 }
 
@@ -214,17 +236,20 @@ li[role="treeitem"],
  * :has() lifts content-visibility off ancestor rows so the focused row's
  * shadow is never clipped by a parent's contain: paint boundary.
  */
-.menu-tree-ui-row:focus {
-  outline: none;
-}
-
-.menu-tree-ui-row:focus,
-.menu-tree-ui-row:has(.menu-tree-ui-row:focus),
+/*
+ * Focus lives on a control inside the row (the handle, the toggle, a switch, a
+ * dropbutton link), so highlight the row via :focus-within. Inset box-shadow
+ * instead of outline because content-visibility: auto applies paint
+ * containment, which clips outlines; the inset shadow paints inside the box,
+ * unaffected. Lift containment while focused (and while a dropbutton is open)
+ * so the shadow is never clipped.
+ */
+.menu-tree-ui-row:focus-within,
 .menu-tree-ui-row:has(.dropbutton-wrapper.open) {
   content-visibility: visible;
 }
 
-.menu-tree-ui-row:focus {
+.menu-tree-ui-row:focus-within {
   position: relative;
   z-index: 1;
   border-radius: 2px;
@@ -251,17 +276,15 @@ li[role="treeitem"],
   }
 }
 
-.menu-tree-ui-row__content {
+.menu-tree-ui-row__name {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  min-height: 2.5rem;
-  padding: 0.5rem 0.75rem;
+  min-width: 0;
 }
 
 .menu-tree-ui-row__handle {
   display: inline-flex;
-  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
   width: 1.875rem;
@@ -269,8 +292,11 @@ li[role="treeitem"],
   cursor: grab;
   user-select: none;
   touch-action: none;
-  letter-spacing: -1px;
   color: var(--mtu-color-text-muted-strong);
+}
+
+.menu-tree-ui-row__handle-icon {
+  letter-spacing: -1px;
   font-size: 1.275rem;
 }
 
@@ -279,11 +305,17 @@ li[role="treeitem"],
   color: var(--mtu-color-text);
 }
 
+.menu-tree-ui-row__handle:focus-visible {
+  outline: 2px solid var(--mtu-color-focus);
+  outline-offset: -2px;
+}
+
 .menu-tree-ui-row__handle--locked {
   cursor: default;
-  pointer-events: none;
   opacity: 0.3;
-  color: var(--mtu-color-text-muted-strong);
+}
+
+.menu-tree-ui-row__handle--locked .menu-tree-ui-row__handle-icon {
   font-size: 0.6rem;
 }
 
@@ -295,7 +327,7 @@ li[role="treeitem"],
   cursor: grabbing;
 }
 
-.menu-tree-ui-row--drop-as-child > .menu-tree-ui-row__content {
+.menu-tree-ui-row--drop-as-child {
   outline: 2px solid var(--mtu-color-focus);
   outline-offset: -2px;
   background-color: var(--mtu-color-focus-bg);
@@ -320,9 +352,6 @@ li[role="treeitem"],
  */
 .menu-tree-ui-row--grabbed {
   content-visibility: visible;
-}
-
-.menu-tree-ui-row--grabbed > .menu-tree-ui-row__content {
   outline: 2px dashed var(--mtu-color-focus);
   outline-offset: -2px;
   background-color: var(--mtu-color-focus-bg);
@@ -373,7 +402,7 @@ li[role="treeitem"],
   font-size: 0;
 }
 
-.menu-tree-ui-row[aria-expanded="true"] > .menu-tree-ui-row__content .menu-tree-ui-row__chevron {
+.menu-tree-ui-row[aria-expanded="true"] .menu-tree-ui-row__chevron {
   transform: rotate(135deg);
 }
 
@@ -409,7 +438,7 @@ li[role="treeitem"],
  * Hard-floor virtualization: rows deep off-screen hide their content but
  * keep their height so the scrollbar stays accurate.
  */
-.menu-tree-ui-row[data-virtualized="true"] > .menu-tree-ui-row__content {
+.menu-tree-ui-row[data-virtualized="true"] > .menu-tree-ui-row__cell {
   visibility: hidden;
 }
 

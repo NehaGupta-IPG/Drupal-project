@@ -29,8 +29,9 @@
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
   const { commitMove, sameIntent, resolveNewParentId, resolveBeforeId } =
     Drupal.menuTreeUi.drag;
+  const { descendantRows, lastDescendantRow, nextSiblingRow, visibleRows } =
+    Drupal.menuTreeUi.treeNav;
 
-  const ROW = 'li[role="treeitem"]';
   const CLASS_GRABBED = 'menu-tree-ui-row--grabbed';
   const CLASS_CHILD = 'menu-tree-ui-row--drop-as-child';
 
@@ -49,7 +50,7 @@
   }
 
   /**
-   * Reads a row's own title text (scoped to its header, not a descendant's).
+   * Reads a row's own title text.
    *
    * @param {HTMLElement} row
    *   The row.
@@ -59,11 +60,7 @@
    */
   function titleOf(row) {
     return (
-      row
-        .querySelector(
-          ':scope > .menu-tree-ui-row__content .menu-tree-ui-row__title',
-        )
-        ?.textContent?.trim() ?? ''
+      row.querySelector('.menu-tree-ui-row__title')?.textContent?.trim() ?? ''
     );
   }
 
@@ -88,23 +85,7 @@
   }
 
   /**
-   * Reads the parent plugin id from a child's container. '' for the root.
-   *
-   * @param {?Element} container
-   *   The row's parent element.
-   *
-   * @return {string}
-   *   The parent plugin ID, or ''.
-   */
-  function parentIdOfContainer(container) {
-    if (!container || container.matches('ul[role="tree"]')) {
-      return '';
-    }
-    return container.closest(ROW)?.dataset.id ?? '';
-  }
-
-  /**
-   * Reads the plugin id of a row's following treeitem sibling, or null.
+   * Reads the plugin id of a row's following sibling row, or null.
    *
    * @param {HTMLElement} row
    *   The row.
@@ -113,17 +94,13 @@
    *   The next sibling's data-id, or null at end-of-list.
    */
   function nextSiblingId(row) {
-    const next = row.nextElementSibling;
-    return next instanceof HTMLElement &&
-      next.getAttribute('role') === 'treeitem'
-      ? (next.dataset.id ?? null)
-      : null;
+    return nextSiblingRow(row)?.dataset.id ?? null;
   }
 
   class MoveModeController {
     /**
-     * @param {HTMLUListElement} tree
-     *   The root tree element.
+     * @param {HTMLTableElement} tree
+     *   The root treegrid element.
      * @param {string} moveUrl
      *   The move endpoint.
      * @param {Drupal.menuTreeUi.ExpandManager} expand
@@ -246,28 +223,31 @@
     buildPositions() {
       const positions = [];
       const { grabbed } = this;
-      const emit = (row) => {
-        if (row === grabbed) {
-          return;
+      const skip = new Set([grabbed, ...descendantRows(grabbed)]);
+      const rows = visibleRows(this.tree).filter((row) => !skip.has(row));
+
+      // Defer each row's "after" stop until its whole (visible) subtree has
+      // been emitted, so Up/Down reads top to bottom and the after-line lands
+      // below the descendant run. A stack of pending afters keyed by level
+      // flushes any row at the next row's level or shallower before its child
+      // stop, and the tail flushes the rest.
+      const pending = [];
+      const flush = (level) => {
+        while (pending.length && pending[pending.length - 1].level >= level) {
+          positions.push(pending.pop().stop);
         }
-        positions.push({ kind: 'child', target: row });
-        if (row.getAttribute('aria-expanded') === 'true') {
-          const group = row.querySelector(':scope > ul[role="group"]');
-          if (group) {
-            [...group.children]
-              .filter((c) => c.matches(ROW))
-              .forEach((c) => emit(c));
-          }
-        }
-        positions.push({ kind: 'after', target: row });
       };
 
-      const tops = [...this.tree.children].filter((c) => c.matches(ROW));
-      const firstTop = tops.find((c) => c !== grabbed);
-      if (firstTop) {
-        positions.push({ kind: 'before', target: firstTop });
+      if (rows.length) {
+        positions.push({ kind: 'before', target: rows[0] });
       }
-      tops.forEach((row) => emit(row));
+      rows.forEach((row) => {
+        const level = Number(row.getAttribute('aria-level'));
+        flush(level);
+        positions.push({ kind: 'child', target: row });
+        pending.push({ level, stop: { kind: 'after', target: row } });
+      });
+      flush(1);
       this.positions = positions;
     }
 
@@ -278,7 +258,7 @@
      *   The index, or 0 if no exact match is found.
      */
     findCurrentSlotIndex() {
-      const parent = parentIdOfContainer(this.grabbed.parentElement);
+      const parent = this.grabbed.dataset.parentId ?? '';
       const before = nextSiblingId(this.grabbed);
       const idx = this.positions.findIndex((p) => {
         let pb = resolveBeforeId(p);
@@ -459,21 +439,27 @@
      */
     lineGeometry(intent) {
       const host = this.tree.closest('menu-tree');
-      const content = intent.target.querySelector(
-        ':scope > .menu-tree-ui-row__content',
-      );
-      if (!host || !content) {
+      const name = intent.target.querySelector('.menu-tree-ui-row__name');
+      if (!host || !name) {
         return null;
       }
       const hostRect = host.getBoundingClientRect();
-      const contentRect = content.getBoundingClientRect();
-      const liRect = intent.target.getBoundingClientRect();
-      const pad = parseFloat(getComputedStyle(content).paddingInlineStart) || 0;
-      const y = intent.kind === 'before' ? liRect.top : liRect.bottom;
+      const nameRect = name.getBoundingClientRect();
+      // "after" sits below the target's whole visible subtree, so measure the
+      // bottom of its last descendant when expanded; "before" sits at its top.
+      const expanded = intent.target.getAttribute('aria-expanded') === 'true';
+      const bottomRow = expanded
+        ? (lastDescendantRow(intent.target) ?? intent.target)
+        : intent.target;
+      const y =
+        intent.kind === 'before'
+          ? intent.target.getBoundingClientRect().top
+          : bottomRow.getBoundingClientRect().bottom;
+      const pad = parseFloat(getComputedStyle(name).paddingInlineStart) || 0;
       return {
         top: y - hostRect.top,
-        left: contentRect.left + pad - hostRect.left,
-        width: Math.max(0, contentRect.right - (contentRect.left + pad)),
+        left: nameRect.left + pad - hostRect.left,
+        width: Math.max(0, nameRect.right - (nameRect.left + pad)),
       };
     }
 
@@ -496,7 +482,7 @@
       if (beforeId === movedId) {
         beforeId = nextSiblingId(grabbed);
       }
-      const currentParentId = parentIdOfContainer(grabbed.parentElement);
+      const currentParentId = grabbed.dataset.parentId ?? '';
       if (
         newParentId === currentParentId &&
         beforeId === nextSiblingId(grabbed)

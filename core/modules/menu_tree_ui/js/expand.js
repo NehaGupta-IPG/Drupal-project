@@ -2,9 +2,11 @@
  * @file
  * Lazy-load + expand/collapse for the menu tree.
  *
- * Re-expanding a previously-loaded subtree just unhides the existing DOM — the
- * children <ul> stays in place, hidden via `hidden`, between collapse and
- * re-expand. That's "is it already loaded" tracking without a parallel Set.
+ * Collapse flags a row's descendant run with data-hidden (CSS hides them) and
+ * leaves the rows in the DOM; re-expand clears the flag. There are no nested
+ * <ul role="group"> elements — children are sibling <tr>s right after their
+ * parent. "Is this subtree already loaded" is tracked by row.dataset.loaded
+ * rather than the presence of a child <ul>.
  *
  * Hands off row construction to row-builder and visibility tracking to
  * RowWindow. Exposes Drupal.menuTreeUi.ExpandManager.
@@ -12,18 +14,21 @@
 
 ((Drupal) => {
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
-  const { buildGroup, buildRow } = Drupal.menuTreeUi;
+  const ns = Drupal.menuTreeUi;
+  const { buildRows, buildRow } = ns;
+  const { descendantRows, lastDescendantRow, childRows, levelOf, findRow } =
+    ns.treeNav;
 
-  const ROW = 'li[role="treeitem"]';
+  const ROW = 'tr[role="row"]';
 
   /**
-   * Rewrites a row's aria-level and indent, cascading into any subtree it
-   * brought along so descendant levels stay consistent.
+   * Rewrites a row's aria-level and indent, cascading into its child rows so
+   * descendant levels stay consistent.
    *
    * No-op when the depth hasn't changed, so reused rows in a same-level
    * reorder pay only a single attribute read.
    *
-   * @param {HTMLLIElement} row
+   * @param {HTMLTableRowElement} row
    *   The row to rebase.
    * @param {number} newDepth
    *   The depth the row should now render at.
@@ -35,18 +40,12 @@
     }
 
     row.setAttribute('aria-level', String(newDepth));
-    const content = row.querySelector(':scope > .menu-tree-ui-row__content');
-    if (content) {
-      content.style.paddingInlineStart = `${(newDepth - 1) * 1.25}rem`;
+    const name = row.querySelector('.menu-tree-ui-row__name');
+    if (name) {
+      name.style.paddingInlineStart = `${(newDepth - 1) * 1.25}rem`;
     }
-    const childGroup = row.querySelector(':scope > ul[role="group"]');
-    if (!childGroup) {
-      return;
-    }
-    Array.from(childGroup.children).forEach((child) => {
-      if (child instanceof HTMLLIElement && child.matches(ROW)) {
-        rebaseRowLevel(child, newDepth + 1);
-      }
+    childRows(row).forEach((child) => {
+      rebaseRowLevel(child, newDepth + 1);
     });
   }
 
@@ -56,8 +55,8 @@
      *   The endpoint returning one level of children as JSON.
      * @param {?Drupal.menuTreeUi.RowWindow} rowWindow
      *   The windowing helper, or undefined when virtualization is off.
-     * @param {HTMLUListElement} tree
-     *   The root tree element.
+     * @param {HTMLTableElement} tree
+     *   The root treegrid element.
      */
     constructor(childrenUrl, rowWindow, tree) {
       this.childrenUrl = childrenUrl;
@@ -99,10 +98,9 @@
       }
       row.setAttribute('aria-expanded', 'true');
 
-      const group = row.querySelector(':scope > ul[role="group"]');
-      if (group) {
-        group.hidden = false;
-        this.observeAll(group);
+      if (row.dataset.loaded === 'true') {
+        this.showSubtree(row);
+        descendantRows(row).forEach((r) => this.rowWindow?.observe(r));
         return;
       }
 
@@ -122,7 +120,7 @@
     }
 
     /**
-     * Collapses a row, hiding its already-loaded children.
+     * Collapses a row, hiding its already-loaded descendant rows.
      *
      * @param {HTMLElement} row
      *   The parent row.
@@ -130,9 +128,51 @@
     // eslint-disable-next-line class-methods-use-this
     collapse(row) {
       row.setAttribute('aria-expanded', 'false');
-      const group = row.querySelector(':scope > ul[role="group"]');
-      if (group) {
-        group.hidden = true;
+      this.hideSubtree(row);
+    }
+
+    /**
+     * Flags a row's whole descendant run as hidden.
+     *
+     * @param {HTMLElement} row
+     *   The parent row.
+     */
+    // eslint-disable-next-line class-methods-use-this
+    hideSubtree(row) {
+      descendantRows(row).forEach((r) => {
+        r.dataset.hidden = 'true';
+      });
+    }
+
+    /**
+     * Reveals a row's descendants, respecting still-collapsed intermediates.
+     *
+     * Walks the descendant run; a row deeper than a still-collapsed ancestor
+     * stays hidden so re-expanding a parent doesn't pop open grandchildren the
+     * user had closed.
+     *
+     * @param {HTMLElement} row
+     *   The parent row.
+     */
+    // eslint-disable-next-line class-methods-use-this
+    showSubtree(row) {
+      const base = levelOf(row);
+      let n = row.nextElementSibling;
+      let hideBelow = Infinity;
+      while (n && n.matches(ROW)) {
+        const lvl = levelOf(n);
+        if (lvl <= base) {
+          break;
+        }
+        if (lvl <= hideBelow) {
+          delete n.dataset.hidden;
+          hideBelow =
+            n.dataset.hasChildren === 'true' &&
+            n.getAttribute('aria-expanded') !== 'true'
+              ? lvl
+              : Infinity;
+        }
+        n = n.nextElementSibling;
       }
     }
 
@@ -140,22 +180,23 @@
      * Reconciles a parent's children in the DOM against the server's truth.
      *
      * Surgical diff rather than blow-the-children-away-and-rebuild: existing
-     * rows are reused by data-id so their subtrees and state survive; rows new
-     * in the server response are freshly built; rows gone from the response
-     * are removed; order follows the server; rows whose level changed are
-     * rebased. Creates the group element first if the parent row exists but
-     * has no group yet (leaf-just-became-a-parent). No-ops when the parent row
-     * isn't in the DOM.
+     * rows are reused by data-id so their subtrees and state survive (each
+     * carries its descendant run as a block); rows new in the server response
+     * are freshly built; rows gone from the response are removed with their
+     * blocks; order follows the server; reused rows whose level changed are
+     * rebased. No-ops when the parent row isn't in the DOM.
      *
      * @param {string} parentId
      *   Plugin ID of the parent, or '' for the root level.
      *
      * @return {Promise<void>}
-     *   Resolves once the group is reconciled.
+     *   Resolves once the children are reconciled.
      */
     async refresh(parentId) {
-      const groupEl = this.ensureGroupElement(parentId);
-      if (!groupEl) {
+      const isRoot = parentId === '';
+      const tbody = this.tree.querySelector('tbody');
+      const parentRow = isRoot ? tbody : findRow(this.tree, parentId);
+      if (!parentRow) {
         return;
       }
 
@@ -164,66 +205,76 @@
         return;
       }
 
-      const depth = this.depthForGroup(groupEl);
-      this.reconcileGroup(groupEl, items, depth);
-      if (Drupal.attachBehaviors) {
-        Drupal.attachBehaviors(groupEl);
-      }
-      this.observeAll(groupEl);
-    }
-
-    /**
-     * Diffs and reorders the direct child rows of a group to match items.
-     *
-     * Children of those rows are left alone so subtrees survive.
-     *
-     * @param {HTMLUListElement} groupEl
-     *   The group whose children to reconcile.
-     * @param {Array<object>} items
-     *   The server's child items.
-     * @param {number} depth
-     *   The depth the children should render at.
-     */
-    // eslint-disable-next-line class-methods-use-this
-    reconcileGroup(groupEl, items, depth) {
-      const existing = new Map();
-      Array.from(groupEl.children).forEach((child) => {
-        if (
-          child instanceof HTMLLIElement &&
-          child.matches('li[role="treeitem"]')
-        ) {
-          const { id } = child.dataset;
-          if (id) {
-            existing.set(id, child);
-          }
+      // Snapshot existing direct children with their descendant blocks BEFORE
+      // any DOM change, so reused rows can carry their subtrees across.
+      const existingRows = isRoot
+        ? Array.from(tbody.querySelectorAll(`:scope > ${ROW}`)).filter(
+            (r) => r.dataset.parentId === '',
+          )
+        : childRows(parentRow);
+      const blocks = new Map();
+      existingRows.forEach((child) => {
+        const { id } = child.dataset;
+        if (id) {
+          blocks.set(id, { row: child, block: descendantRows(child) });
         }
       });
 
+      const childDepth = isRoot ? 1 : levelOf(parentRow) + 1;
       const setSize = items.length;
-      const ordered = [];
+      const result = [];
+      const kept = new Set();
       items.forEach((item, index) => {
         const posInSet = index + 1;
-        const reused = existing.get(item.id);
-        let li;
-        if (reused) {
-          existing.delete(item.id);
-          rebaseRowLevel(reused, depth);
-          reused.setAttribute('aria-posinset', String(posInSet));
-          reused.setAttribute('aria-setsize', String(setSize));
-          li = reused;
+        const entry = blocks.get(item.id);
+        if (entry) {
+          kept.add(item.id);
+          rebaseRowLevel(entry.row, childDepth);
+          entry.row.dataset.parentId = parentId;
+          entry.row.setAttribute('aria-posinset', String(posInSet));
+          entry.row.setAttribute('aria-setsize', String(setSize));
+          result.push({ row: entry.row, block: entry.block, fresh: false });
         } else {
-          li = buildRow(item, depth, posInSet, setSize);
+          result.push({
+            row: buildRow(item, childDepth, posInSet, setSize),
+            block: [],
+            fresh: true,
+          });
         }
-        ordered.push(li);
       });
 
-      existing.forEach((orphan) => {
-        orphan.remove();
+      // Remove orphan children (and their descendant blocks).
+      blocks.forEach((entry, id) => {
+        if (!kept.has(id)) {
+          entry.block.forEach((r) => r.remove());
+          entry.row.remove();
+        }
       });
-      // appendChild on an existing child is a move (no clone), so this works
-      // both as a reorder and as an insert for fresh rows.
-      ordered.forEach((li) => {
-        groupEl.appendChild(li);
+
+      // Re-insert in server order. insertBefore/after on an existing node is a
+      // move (no clone), so this reorders kept rows and inserts fresh ones.
+      let anchor = isRoot ? null : parentRow;
+      result.forEach(({ row, block }) => {
+        if (anchor) {
+          anchor.after(row);
+        } else {
+          tbody.insertBefore(row, tbody.firstChild);
+        }
+        anchor = row;
+        block.forEach((r) => {
+          anchor.after(r);
+          anchor = r;
+        });
+      });
+
+      // Attach behaviors + observe only the freshly-built rows.
+      result.forEach(({ row, fresh }) => {
+        if (fresh) {
+          if (Drupal.attachBehaviors) {
+            Drupal.attachBehaviors(row);
+          }
+          this.rowWindow?.observe(row);
+        }
       });
     }
 
@@ -261,7 +312,7 @@
     }
 
     /**
-     * Loads and appends a row's children on first expand.
+     * Loads and inserts a row's children on first expand.
      *
      * @param {HTMLElement} row
      *   The parent row.
@@ -269,7 +320,7 @@
      *   The parent's plugin ID.
      *
      * @return {Promise<void>}
-     *   Resolves once children are appended (or the fetch failed).
+     *   Resolves once children are inserted (or the fetch failed).
      */
     async loadChildren(row, parentId) {
       row.dataset.loading = 'true';
@@ -279,84 +330,21 @@
           row.setAttribute('aria-expanded', 'false');
           return;
         }
-        const depth = Number(row.getAttribute('aria-level') ?? '1') + 1;
-        const group = buildGroup(items, depth);
-        row.appendChild(group);
-        if (Drupal.attachBehaviors) {
-          Drupal.attachBehaviors(group);
-        }
-        this.observeAll(group);
+        const depth = levelOf(row) + 1;
+        const fragment = buildRows(items, depth);
+        const inserted = Array.from(fragment.children);
+        const anchor = lastDescendantRow(row) ?? row;
+        anchor.after(fragment);
+        row.dataset.loaded = 'true';
+        inserted.forEach((r) => {
+          if (Drupal.attachBehaviors) {
+            Drupal.attachBehaviors(r);
+          }
+          this.rowWindow?.observe(r);
+        });
       } finally {
         delete row.dataset.loading;
       }
-    }
-
-    /**
-     * Resolves the <ul> holding the direct children of a parent.
-     *
-     * Creates an empty group for a non-root parent if the row exists but has
-     * no group yet (the leaf-just-became-a-parent case). Returns null only
-     * when the parent's row itself isn't in the DOM.
-     *
-     * @param {string} parentId
-     *   Plugin ID of the parent, or '' for the root level.
-     *
-     * @return {?HTMLUListElement}
-     *   The group element, or null.
-     */
-    ensureGroupElement(parentId) {
-      if (parentId === '') {
-        return this.tree;
-      }
-      const row = this.tree.querySelector(
-        `${ROW}[data-id="${CSS.escape(parentId)}"]`,
-      );
-      if (!row) {
-        return null;
-      }
-      const existing = row.querySelector(':scope > ul[role="group"]');
-      if (existing) {
-        return existing;
-      }
-      const group = document.createElement('ul');
-      group.setAttribute('role', 'group');
-      group.className = 'menu-tree-ui__list';
-      row.appendChild(group);
-      return group;
-    }
-
-    /**
-     * The depth at which a group's children should render.
-     *
-     * Root → 1; nested → parent row's aria-level + 1.
-     *
-     * @param {HTMLUListElement} groupEl
-     *   The group element.
-     *
-     * @return {number}
-     *   The child depth.
-     */
-    depthForGroup(groupEl) {
-      if (groupEl === this.tree) {
-        return 1;
-      }
-      const parentRow = groupEl.closest(ROW);
-      return Number(parentRow?.getAttribute('aria-level') ?? '0') + 1;
-    }
-
-    /**
-     * Observes every row within a scope for windowing.
-     *
-     * @param {Element} scope
-     *   The element whose descendant rows to observe.
-     */
-    observeAll(scope) {
-      if (!this.rowWindow) {
-        return;
-      }
-      scope.querySelectorAll(ROW).forEach((row) => {
-        this.rowWindow.observe(row);
-      });
     }
   }
 

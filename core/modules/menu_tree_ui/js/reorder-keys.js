@@ -6,13 +6,38 @@
  * shape. Kept in its own module because it spans DOM mutation + fetch +
  * announce, which doesn't really belong in keyboard.js.
  *
+ * A row carries its descendant run as a block, so reordering moves the whole
+ * subtree past the previous/next sibling block as a unit.
+ *
  * Exposes Drupal.menuTreeUi.reorderSibling.
  */
 
 ((Drupal) => {
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
+  const { descendantRows, lastDescendantRow, nextSiblingRow, handleOf } =
+    Drupal.menuTreeUi.treeNav;
 
-  const ROW = 'li[role="treeitem"]';
+  const ROW = 'tr[role="row"]';
+
+  /**
+   * The previous sibling row at the same level under the same parent.
+   *
+   * @param {HTMLElement} row
+   *   The reference row.
+   *
+   * @return {?HTMLElement}
+   *   The previous sibling row, or null when the row is first.
+   */
+  function previousSiblingRow(row) {
+    let prev = row.previousElementSibling;
+    while (prev && prev.matches(ROW)) {
+      if (prev.dataset.parentId === row.dataset.parentId) {
+        return prev;
+      }
+      prev = prev.previousElementSibling;
+    }
+    return null;
+  }
 
   /**
    * Reorders a row among its siblings, persisting via POST /move.
@@ -37,40 +62,51 @@
     }
 
     const sibling =
-      direction === 'up' ? row.previousElementSibling : row.nextElementSibling;
-    if (
-      !(sibling instanceof HTMLElement) ||
-      sibling.getAttribute('role') !== 'treeitem'
-    ) {
-      return false;
-    }
-    const container = row.parentElement;
-    if (!(container instanceof HTMLUListElement)) {
+      direction === 'up' ? previousSiblingRow(row) : nextSiblingRow(row);
+    if (!sibling) {
       return false;
     }
 
-    const parentId = container.closest(ROW)?.dataset.id ?? '';
-    const oldNext = row.nextElementSibling;
+    const parentId = row.dataset.parentId ?? '';
+    const block = descendantRows(row);
+    // Snapshot the original position so a failed move can restore it: the row
+    // currently sits before this node.
+    const oldNext = (lastDescendantRow(row) ?? row).nextElementSibling;
 
-    // Optimistic swap.
+    // Optimistic swap: move the row (and its block) past the sibling block.
+    const insert = (before) => {
+      const parent = row.parentNode;
+      let anchor = row;
+      parent.insertBefore(row, before);
+      block.forEach((r) => {
+        anchor.after(r);
+        anchor = r;
+      });
+    };
     if (direction === 'up') {
-      container.insertBefore(row, sibling);
+      insert(sibling);
     } else {
-      container.insertBefore(row, sibling.nextElementSibling);
+      const siblingEnd = (lastDescendantRow(sibling) ?? sibling)
+        .nextElementSibling;
+      insert(siblingEnd);
     }
 
-    const newNext = row.nextElementSibling;
-    const beforeId =
-      newNext instanceof HTMLElement &&
-      newNext.getAttribute('role') === 'treeitem'
-        ? (newNext.dataset.id ?? null)
-        : null;
+    const beforeId = nextSiblingRow(row)?.dataset.id ?? null;
 
-    row.focus();
+    handleOf(row)?.focus();
     row.classList.add('menu-tree-ui-row--flash');
     window.setTimeout(() => {
       row.classList.remove('menu-tree-ui-row--flash');
     }, 600);
+
+    const restore = () => {
+      let anchor = row;
+      row.parentNode.insertBefore(row, oldNext);
+      block.forEach((r) => {
+        anchor.after(r);
+        anchor = r;
+      });
+    };
 
     try {
       const response = await fetch(moveUrl, {
@@ -88,13 +124,13 @@
         }),
       });
       if (!response.ok) {
-        container.insertBefore(row, oldNext);
+        restore();
         if (Drupal.announce) {
           Drupal.announce('Move failed — restored.', 'assertive');
         }
       }
     } catch (e) {
-      container.insertBefore(row, oldNext);
+      restore();
       // eslint-disable-next-line no-console
       console.error('[menu-tree] reorder failed', e);
     }

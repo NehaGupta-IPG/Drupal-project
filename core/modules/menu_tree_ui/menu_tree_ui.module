@@ -30,6 +30,9 @@ function menu_tree_ui_theme(): array {
     'menu_tree_ui_row' => [
       'variables' => [
         'element' => NULL,
+        // Parent link plugin ID, or '' for the top level. Carries the tree
+        // hierarchy in the flat <tr> markup (tables cannot nest rows).
+        'parent_id' => '',
         'depth' => 0,
         'pos_in_set' => 1,
         'set_size' => 1,

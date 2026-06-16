@@ -61,7 +61,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
     $this->drupalGet('/admin/structure/menu-tree-ui/test');
     $this->assertSession()->waitForElement(
       'css',
-      'menu-tree ul[role="tree"] > li[role="treeitem"]'
+      'menu-tree table[role="treegrid"] tbody tr[role="row"]'
     );
   }
 
@@ -111,7 +111,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
    */
   public function testGrabAndDropBetweenSiblings(): void {
     $this->moveTo('C', 'after', 'A');
-    $this->assertSiblings(['A', 'C', 'B', 'D', 'L'], 'ul[role="tree"]');
+    $this->assertSiblings(['A', 'C', 'B', 'D', 'L'], $this->childRowsSelector(NULL));
     $this->assertDepth('C', 1);
     $this->assertPersistedParent('C', NULL);
   }
@@ -123,7 +123,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
    */
   public function testGrabAndDropBeforeFirstItem(): void {
     $this->moveTo('B', 'before', 'A');
-    $this->assertSiblings(['B', 'A', 'C', 'D', 'L'], 'ul[role="tree"]');
+    $this->assertSiblings(['B', 'A', 'C', 'D', 'L'], $this->childRowsSelector(NULL));
     $this->assertDepth('B', 1);
     $this->assertPersistedParent('B', NULL);
   }
@@ -133,7 +133,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
    */
   public function testGrabAndDropAfterSibling(): void {
     $this->moveTo('B', 'after', 'C');
-    $this->assertSiblings(['A', 'C', 'B', 'D', 'L'], 'ul[role="tree"]');
+    $this->assertSiblings(['A', 'C', 'B', 'D', 'L'], $this->childRowsSelector(NULL));
     $this->assertDepth('B', 1);
     $this->assertPersistedParent('B', NULL);
   }
@@ -147,11 +147,8 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
     $this->assertDepth('B', 2);
     $this->assertIndent('B', 2);
     $this->assertPersistedParent('B', 'A');
-    $this->assertSiblings(
-      ['B', 'A1', 'A2'],
-      sprintf('li[data-id="%s"] > ul[role="group"]', $this->linkIds['A']),
-    );
-    $this->assertSiblings(['A', 'C', 'D', 'L'], 'ul[role="tree"]');
+    $this->assertSiblings(['B', 'A1', 'A2'], $this->childRowsSelector('A'));
+    $this->assertSiblings(['A', 'C', 'D', 'L'], $this->childRowsSelector(NULL));
 
     $this->assertChildCount(NULL, 4);
     $this->assertChildCount('A', 3);
@@ -185,7 +182,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
     );
     $children = $this->getSession()->getPage()->findAll(
       'css',
-      sprintf('li[data-id="%s"] > ul[role="group"] > li[role="treeitem"]', $this->linkIds['D']),
+      $this->childRowsSelector('D'),
     );
     $labels = array_map(fn ($el) => $this->labelFor($el->getAttribute('data-id')), $children);
     $this->assertContains('D1', $labels, 'D1 should remain a child of D.');
@@ -207,9 +204,13 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
     $this->assertSession()->waitForElement(
       'css',
       sprintf(
-        'li[role="treeitem"][data-id="%s"][aria-expanded="true"] > ul[role="group"] > li[role="treeitem"]',
+        'tr[role="row"][data-id="%s"][aria-expanded="true"]',
         $this->linkIds['D'],
       ),
+    );
+    $this->assertSession()->waitForElement(
+      'css',
+      sprintf('tr[role="row"][data-parent-id="%s"]', $this->linkIds['D']),
     );
     $this->assertSame(
       'true',
@@ -223,10 +224,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
     $this->settle();
 
     $this->assertPersistedParent('B', 'D');
-    $this->assertSiblings(
-      ['D1', 'B'],
-      sprintf('li[data-id="%s"] > ul[role="group"]', $this->linkIds['D']),
-    );
+    $this->assertSiblings(['D1', 'B'], $this->childRowsSelector('D'));
   }
 
   /**
@@ -238,7 +236,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
     $this->moveTo('A2a', 'after', 'L');
     $this->assertDepth('A2a', 1);
     $this->assertPersistedParent('A2a', NULL);
-    $this->assertSiblings(['A', 'B', 'C', 'D', 'L', 'A2a'], 'ul[role="tree"]');
+    $this->assertSiblings(['A', 'B', 'C', 'D', 'L', 'A2a'], $this->childRowsSelector(NULL));
     $this->assertIsLeafRow('A2');
   }
 
@@ -264,7 +262,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
    */
   public function testEscapeCancelsMove(): void {
     $this->dispatchKeys('B', [' ', 'ArrowDown', 'ArrowDown', 'Escape']);
-    $this->assertSiblings(['A', 'B', 'C', 'D', 'L'], 'ul[role="tree"]');
+    $this->assertSiblings(['A', 'B', 'C', 'D', 'L'], $this->childRowsSelector(NULL));
     $this->assertPersistedParent('B', NULL);
     $this->assertSame(
       $this->linkIds['B'],
@@ -282,7 +280,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
   public function testNoOpDropLeavesOrderUnchanged(): void {
     $this->dispatchKeys('B', [' ', 'Enter']);
     $this->settle();
-    $this->assertSiblings(['A', 'B', 'C', 'D', 'L'], 'ul[role="tree"]');
+    $this->assertSiblings(['A', 'B', 'C', 'D', 'L'], $this->childRowsSelector(NULL));
     $this->assertPersistedParent('B', NULL);
   }
 
@@ -350,7 +348,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
     $keys_json = json_encode(array_values($keys));
 
     $script = <<<JS
-      const source = document.querySelector('li[role="treeitem"][data-id="$source_id"]');
+      const source = document.querySelector('tr[role="row"][data-id="$source_id"]');
       if (!source) throw new Error('source row not in DOM');
       source.scrollIntoView({block: 'center'});
       source.tabIndex = 0;
@@ -383,12 +381,18 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
   private function expandRow(string $label): void {
     $row = $this->row($label);
     $this->assertNotNull($row, "Row $label not in DOM.");
-    $toggle = $row->find('css', ':scope > .menu-tree-ui-row__content button.menu-tree-ui-row__toggle');
+    $toggle = $row->find('css', '.menu-tree-ui-row__name button.menu-tree-ui-row__toggle');
     $this->assertNotNull($toggle, "Row $label has no toggle button.");
     $toggle->click();
+    // After expand, the parent is open and at least one child row exists as a
+    // sibling carrying data-parent-id = the parent's plugin ID.
     $this->assertSession()->waitForElement(
       'css',
-      sprintf('li[role="treeitem"][data-id="%s"][aria-expanded="true"] > ul[role="group"] > li', $this->linkIds[$label]),
+      sprintf('tr[role="row"][data-id="%s"][aria-expanded="true"]', $this->linkIds[$label]),
+    );
+    $this->assertSession()->waitForElement(
+      'css',
+      sprintf('tr[role="row"][data-parent-id="%s"]', $this->linkIds[$label]),
     );
   }
 
@@ -402,7 +406,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
     }
     return $this->getSession()->getPage()->find(
       'css',
-      sprintf('li[role="treeitem"][data-id="%s"]', $id),
+      sprintf('tr[role="row"][data-id="%s"]', $id),
     );
   }
 
@@ -426,7 +430,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
     $id = $this->linkIds[$label] ?? NULL;
     $this->assertNotNull($id, "Unknown label $label.");
     $script = sprintf(
-      "return window.getComputedStyle(document.querySelector('li[data-id=\"%s\"] > .menu-tree-ui-row__content')).paddingInlineStart;",
+      "return window.getComputedStyle(document.querySelector('tr[role=\"row\"][data-id=\"%s\"] .menu-tree-ui-row__name')).paddingInlineStart;",
       $id,
     );
     $actual = (string) $this->getSession()->evaluateScript($script);
@@ -452,7 +456,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
     );
     $toggle = $row->find(
       'css',
-      ':scope > .menu-tree-ui-row__content > button.menu-tree-ui-row__toggle',
+      '.menu-tree-ui-row__name > button.menu-tree-ui-row__toggle',
     );
     $this->assertNotNull(
       $toggle,
@@ -474,13 +478,13 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
     $this->assertNull(
       $row->find(
         'css',
-        ':scope > .menu-tree-ui-row__content > button.menu-tree-ui-row__toggle',
+        '.menu-tree-ui-row__name > button.menu-tree-ui-row__toggle',
       ),
       "Row $label should no longer have a <button> toggle.",
     );
     $spacer = $row->find(
       'css',
-      ':scope > .menu-tree-ui-row__content > span.menu-tree-ui-row__toggle--spacer',
+      '.menu-tree-ui-row__name > span.menu-tree-ui-row__toggle--spacer',
     );
     $this->assertNotNull(
       $spacer,
@@ -506,19 +510,20 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
   }
 
   /**
-   * Asserts the number of direct `<li role="treeitem">` children of a parent.
+   * Asserts the number of direct child rows of a parent.
    *
-   * Pass NULL for the parent label to count direct top-level rows.
+   * Rows are flat siblings; direct children carry data-parent-id = the parent's
+   * plugin ID (or '' for the top level). Pass NULL for the top level.
    */
   private function assertChildCount(?string $parent_label, int $expected): void {
     if ($parent_label === NULL) {
-      $selector = 'menu-tree > ul[role="tree"] > li[role="treeitem"]';
+      $selector = 'menu-tree tbody tr[role="row"][data-parent-id=""]';
       $where = 'top-level';
     }
     else {
       $id = $this->linkIds[$parent_label] ?? throw new \InvalidArgumentException("Unknown label $parent_label");
       $selector = sprintf(
-        'li[data-id="%s"] > ul[role="group"] > li[role="treeitem"]',
+        'menu-tree tbody tr[role="row"][data-parent-id="%s"]',
         $id,
       );
       $where = "under $parent_label";
@@ -538,7 +543,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
    */
   private function assertNoDuplicateRows(): void {
     $ids = $this->getSession()->evaluateScript(
-      'return Array.from(document.querySelectorAll(\'menu-tree li[role="treeitem"][data-id]\')).map(r => r.dataset.id);',
+      'return Array.from(document.querySelectorAll(\'menu-tree tr[role="row"][data-id]\')).map(r => r.dataset.id);',
     );
     $this->assertIsArray($ids);
     $counts = array_count_values($ids);
@@ -555,7 +560,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
   private function assertNoVirtualizedRows(): void {
     $this->getSession()->wait(150);
     $virtualized = $this->getSession()->evaluateScript(
-      'return Array.from(document.querySelectorAll(\'menu-tree li[role="treeitem"][data-virtualized="true"]\')).map(r => r.dataset.id);',
+      'return Array.from(document.querySelectorAll(\'menu-tree tr[role="row"][data-virtualized="true"]\')).map(r => r.dataset.id);',
     );
     $this->assertSame(
       [],
@@ -569,9 +574,9 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
    */
   private function assertNoBlankRows(): void {
     $blanks = $this->getSession()->evaluateScript(<<<'JS'
-      return Array.from(document.querySelectorAll('menu-tree li[role="treeitem"]'))
+      return Array.from(document.querySelectorAll('menu-tree tr[role="row"]'))
         .filter(r => {
-          const t = r.querySelector(':scope > .menu-tree-ui-row__content > .menu-tree-ui-row__title');
+          const t = r.querySelector('.menu-tree-ui-row__title');
           return !t || !t.textContent || t.textContent.trim() === '';
         })
         .map(r => r.dataset.id || '(no data-id)');
@@ -581,23 +586,39 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
   }
 
   /**
-   * Asserts the ordered DOM siblings inside a container.
+   * Asserts the ordered DOM rows that are direct children of a parent.
+   *
+   * Rows are flat siblings in one <tbody>; a row's parent is read from
+   * data-parent-id, and document order in the table is the visual order.
    *
    * @param string[] $expected_labels
    *   Labels in the order they should appear as direct children.
-   * @param string $container_selector
-   *   CSS for the parent UL.
+   * @param string $row_selector
+   *   CSS matching the direct child rows (a `tr[data-parent-id="…"]` set).
    */
-  private function assertSiblings(array $expected_labels, string $container_selector): void {
-    $rows = $this->getSession()->getPage()->findAll(
-      'css',
-      $container_selector . ' > li[role="treeitem"]',
-    );
+  private function assertSiblings(array $expected_labels, string $row_selector): void {
+    $rows = $this->getSession()->getPage()->findAll('css', $row_selector);
     $actual = [];
     foreach ($rows as $row) {
       $actual[] = $this->labelFor($row->getAttribute('data-id')) ?? '?';
     }
-    $this->assertSame($expected_labels, $actual, "Sibling order under $container_selector.");
+    $this->assertSame($expected_labels, $actual, "Sibling order matching $row_selector.");
+  }
+
+  /**
+   * Builds the CSS selector for the direct child rows of a parent.
+   *
+   * @param ?string $parent_label
+   *   The parent label, or NULL for the top level.
+   *
+   * @return string
+   *   The row selector.
+   */
+  private function childRowsSelector(?string $parent_label): string {
+    $parent_id = $parent_label === NULL
+      ? ''
+      : ($this->linkIds[$parent_label] ?? throw new \InvalidArgumentException("Unknown label $parent_label"));
+    return sprintf('tr[role="row"][data-parent-id="%s"]', $parent_id);
   }
 
   /**

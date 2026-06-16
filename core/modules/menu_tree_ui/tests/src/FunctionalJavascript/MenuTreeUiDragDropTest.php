@@ -61,7 +61,7 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     // row in DOM — that's the "page upgraded" signal.
     $this->assertSession()->waitForElement(
       'css',
-      'menu-tree ul[role="tree"] > li[role="treeitem"]'
+      'menu-tree table[role="treegrid"] tbody tr[role="row"]'
     );
   }
 
@@ -108,7 +108,7 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
    */
   public function testDropBeforeSibling(): void {
     $this->drag('C', 'B', 'before');
-    $this->assertSiblings(['A', 'C', 'B', 'D', 'L'], 'ul[role="tree"]');
+    $this->assertSiblings(['A', 'C', 'B', 'D', 'L'], $this->childRowsSelector(NULL));
     $this->assertDepth('C', 1);
     $this->assertIndent('C', 1);
     $this->assertPersistedParent('C', NULL);
@@ -119,7 +119,7 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
    */
   public function testDropAfterSibling(): void {
     $this->drag('B', 'C', 'after');
-    $this->assertSiblings(['A', 'C', 'B', 'D', 'L'], 'ul[role="tree"]');
+    $this->assertSiblings(['A', 'C', 'B', 'D', 'L'], $this->childRowsSelector(NULL));
     $this->assertDepth('B', 1);
     $this->assertIndent('B', 1);
     $this->assertPersistedParent('B', NULL);
@@ -137,12 +137,9 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     $this->assertDepth('B', 2);
     $this->assertIndent('B', 2);
     $this->assertPersistedParent('B', 'A');
-    $this->assertSiblings(
-      ['B', 'A1', 'A2'],
-      sprintf('li[data-id="%s"] > ul[role="group"]', $this->linkIds['A']),
-    );
+    $this->assertSiblings(['B', 'A1', 'A2'], $this->childRowsSelector('A'));
     // Top level should now exclude B.
-    $this->assertSiblings(['A', 'C', 'D', 'L'], 'ul[role="tree"]');
+    $this->assertSiblings(['A', 'C', 'D', 'L'], $this->childRowsSelector(NULL));
   }
 
   /**
@@ -175,7 +172,7 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     // D1 (pre-existing child) should still be inside D alongside the moved B.
     $children = $this->getSession()->getPage()->findAll(
       'css',
-      sprintf('li[data-id="%s"] > ul[role="group"] > li[role="treeitem"]', $this->linkIds['D']),
+      $this->childRowsSelector('D'),
     );
     $labels = array_map(fn ($el) => $this->labelFor($el->getAttribute('data-id')), $children);
     $this->assertContains('D1', $labels, 'D1 should remain a child of D.');
@@ -198,7 +195,7 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     $this->assertDepth('A2a', 1);
     $this->assertIndent('A2a', 1);
     $this->assertPersistedParent('A2a', NULL);
-    $this->assertSiblings(['A', 'B', 'C', 'D', 'L', 'A2a'], 'ul[role="tree"]');
+    $this->assertSiblings(['A', 'B', 'C', 'D', 'L', 'A2a'], $this->childRowsSelector(NULL));
 
     $this->assertIsLeafRow('A2');
   }
@@ -214,12 +211,12 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     $target_id = $this->linkIds['D'];
 
     $start_drag = <<<JS
-      const source = document.querySelector('li[role="treeitem"][data-id="$source_id"]');
-      const target = document.querySelector('li[role="treeitem"][data-id="$target_id"]');
+      const source = document.querySelector('tr[role="row"][data-id="$source_id"]');
+      const target = document.querySelector('tr[role="row"][data-id="$target_id"]');
       target.scrollIntoView({block: 'center'});
       const handle = source.querySelector('.menu-tree-ui-row__handle:not(.menu-tree-ui-row__handle--locked)');
       const hRect = handle.getBoundingClientRect();
-      const tRect = target.querySelector(':scope > .menu-tree-ui-row__content').getBoundingClientRect();
+      const tRect = target.getBoundingClientRect();
       const startX = hRect.left + hRect.width / 2;
       const startY = hRect.top + hRect.height / 2;
       const endX = tRect.left + tRect.width / 2;
@@ -241,7 +238,7 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     // 1s timer + render slack.
     $opened = $this->assertSession()->waitForElement(
       'css',
-      sprintf('li[role="treeitem"][data-id="%s"][aria-expanded="true"]', $target_id),
+      sprintf('tr[role="row"][data-id="%s"][aria-expanded="true"]', $target_id),
       1500,
     );
     $this->assertNotNull($opened, 'Collapsed parent should auto-expand after a 1s hover during drag.');
@@ -257,7 +254,7 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
    */
   public function testCannotDropOntoSelf(): void {
     $this->drag('A', 'A', 'after');
-    $this->assertSiblings(['A', 'B', 'C', 'D', 'L'], 'ul[role="tree"]');
+    $this->assertSiblings(['A', 'B', 'C', 'D', 'L'], $this->childRowsSelector(NULL));
     $this->assertPersistedParent('A', NULL);
   }
 
@@ -267,7 +264,7 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
   public function testCannotDropOntoDescendant(): void {
     $this->expandRow('A');
     $this->drag('A', 'A1', 'after');
-    $this->assertSiblings(['A', 'B', 'C', 'D', 'L'], 'ul[role="tree"]');
+    $this->assertSiblings(['A', 'B', 'C', 'D', 'L'], $this->childRowsSelector(NULL));
     $this->assertPersistedParent('A1', 'A');
   }
 
@@ -348,8 +345,8 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
   /**
    * Drags the row labelled $source into the $zone of the row labelled $target.
    *
-   * Zones map to vertical position inside the target's header (the row's
-   * .menu-tree-ui-row__content rect, not the whole li including subtree):
+   * Zones map to vertical position inside the target row's rect (the <tr> holds
+   * only its own cells, never its subtree, so the row rect IS the header):
    *  - 'before' → 10% from top (top zone)
    *  - 'child'  → 50% (middle zone)
    *  - 'after'  → 90% (bottom zone)
@@ -368,15 +365,14 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     };
 
     $script = <<<JS
-      const sourceRow = document.querySelector('li[role="treeitem"][data-id="$source_id"]');
-      const targetRow = document.querySelector('li[role="treeitem"][data-id="$target_id"]');
+      const sourceRow = document.querySelector('tr[role="row"][data-id="$source_id"]');
+      const targetRow = document.querySelector('tr[role="row"][data-id="$target_id"]');
       if (!sourceRow || !targetRow) throw new Error('source or target row not in DOM');
       targetRow.scrollIntoView({block: 'center'});
       const handle = sourceRow.querySelector('.menu-tree-ui-row__handle:not(.menu-tree-ui-row__handle--locked)');
       if (!handle) throw new Error('no draggable handle on source row');
       const hRect = handle.getBoundingClientRect();
-      const tHeader = targetRow.querySelector(':scope > .menu-tree-ui-row__content');
-      const tRect = tHeader.getBoundingClientRect();
+      const tRect = targetRow.getBoundingClientRect();
       const startX = hRect.left + hRect.width / 2;
       const startY = hRect.top + hRect.height / 2;
       const endX = tRect.left + tRect.width / 2;
@@ -412,12 +408,18 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
   private function expandRow(string $label): void {
     $row = $this->row($label);
     $this->assertNotNull($row, "Row $label not in DOM.");
-    $toggle = $row->find('css', ':scope > .menu-tree-ui-row__content button.menu-tree-ui-row__toggle');
+    $toggle = $row->find('css', '.menu-tree-ui-row__name button.menu-tree-ui-row__toggle');
     $this->assertNotNull($toggle, "Row $label has no toggle button.");
     $toggle->click();
+    // After expand, the parent is open and at least one child row exists as a
+    // sibling carrying data-parent-id = the parent's plugin ID.
     $this->assertSession()->waitForElement(
       'css',
-      sprintf('li[role="treeitem"][data-id="%s"][aria-expanded="true"] > ul[role="group"] > li', $this->linkIds[$label]),
+      sprintf('tr[role="row"][data-id="%s"][aria-expanded="true"]', $this->linkIds[$label]),
+    );
+    $this->assertSession()->waitForElement(
+      'css',
+      sprintf('tr[role="row"][data-parent-id="%s"]', $this->linkIds[$label]),
     );
   }
 
@@ -431,7 +433,7 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     }
     return $this->getSession()->getPage()->find(
       'css',
-      sprintf('li[role="treeitem"][data-id="%s"]', $id),
+      sprintf('tr[role="row"][data-id="%s"]', $id),
     );
   }
 
@@ -459,7 +461,7 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     $id = $this->linkIds[$label] ?? NULL;
     $this->assertNotNull($id, "Unknown label $label.");
     $script = sprintf(
-      "return window.getComputedStyle(document.querySelector('li[data-id=\"%s\"] > .menu-tree-ui-row__content')).paddingInlineStart;",
+      "return window.getComputedStyle(document.querySelector('tr[role=\"row\"][data-id=\"%s\"] .menu-tree-ui-row__name')).paddingInlineStart;",
       $id,
     );
     $actual = (string) $this->getSession()->evaluateScript($script);
@@ -485,7 +487,7 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     );
     $toggle = $row->find(
       'css',
-      ':scope > .menu-tree-ui-row__content > button.menu-tree-ui-row__toggle',
+      '.menu-tree-ui-row__name > button.menu-tree-ui-row__toggle',
     );
     $this->assertNotNull(
       $toggle,
@@ -507,13 +509,13 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     $this->assertNull(
       $row->find(
         'css',
-        ':scope > .menu-tree-ui-row__content > button.menu-tree-ui-row__toggle',
+        '.menu-tree-ui-row__name > button.menu-tree-ui-row__toggle',
       ),
       "Row $label should no longer have a <button> toggle.",
     );
     $spacer = $row->find(
       'css',
-      ':scope > .menu-tree-ui-row__content > span.menu-tree-ui-row__toggle--spacer',
+      '.menu-tree-ui-row__name > span.menu-tree-ui-row__toggle--spacer',
     );
     $this->assertNotNull(
       $spacer,
@@ -539,22 +541,21 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
   }
 
   /**
-   * Asserts the number of direct `<li role="treeitem">` children of a parent.
+   * Asserts the number of direct child rows of a parent.
    *
-   * Pass NULL for the parent label to count direct top-level rows under
-   * `<ul role="tree">`. For a row that has no `<ul role="group">` in DOM
-   * (a leaf — or a former parent demoted to leaf after losing its only
-   * child) the expected count must be 0.
+   * Rows are flat siblings; direct children carry data-parent-id = the parent's
+   * plugin ID (or '' for the top level). For a leaf — or a former parent demoted
+   * to leaf after losing its only child — the expected count must be 0.
    */
   private function assertChildCount(?string $parent_label, int $expected): void {
     if ($parent_label === NULL) {
-      $selector = 'menu-tree > ul[role="tree"] > li[role="treeitem"]';
+      $selector = 'menu-tree tbody tr[role="row"][data-parent-id=""]';
       $where = 'top-level';
     }
     else {
       $id = $this->linkIds[$parent_label] ?? throw new \InvalidArgumentException("Unknown label $parent_label");
       $selector = sprintf(
-        'li[data-id="%s"] > ul[role="group"] > li[role="treeitem"]',
+        'menu-tree tbody tr[role="row"][data-parent-id="%s"]',
         $id,
       );
       $where = "under $parent_label";
@@ -572,12 +573,12 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
   /**
    * Asserts every `data-id` in the tree is unique.
    *
-   * Catches refresh / move bugs that leave a row in its source group while
+   * Catches refresh / move bugs that leave a row in its source position while
    * also adding it to the destination.
    */
   private function assertNoDuplicateRows(): void {
     $ids = $this->getSession()->evaluateScript(
-      'return Array.from(document.querySelectorAll(\'menu-tree li[role="treeitem"][data-id]\')).map(r => r.dataset.id);',
+      'return Array.from(document.querySelectorAll(\'menu-tree tr[role="row"][data-id]\')).map(r => r.dataset.id);',
     );
     $this->assertIsArray($ids);
     $counts = array_count_values($ids);
@@ -605,7 +606,7 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     // Give the IntersectionObserver a frame to deliver its initial entries.
     $this->getSession()->wait(150);
     $virtualized = $this->getSession()->evaluateScript(
-      'return Array.from(document.querySelectorAll(\'menu-tree li[role="treeitem"][data-virtualized="true"]\')).map(r => r.dataset.id);',
+      'return Array.from(document.querySelectorAll(\'menu-tree tr[role="row"][data-virtualized="true"]\')).map(r => r.dataset.id);',
     );
     $this->assertSame(
       [],
@@ -618,14 +619,14 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
   /**
    * Asserts every row in DOM has its title element populated.
    *
-   * Catches "empty row" regressions: a row whose `__content` was wiped
-   * or never built, leaving an `<li>` shell with no visible label.
+   * Catches "empty row" regressions: a row whose cells were wiped or never
+   * built, leaving a `<tr>` shell with no visible label.
    */
   private function assertNoBlankRows(): void {
     $blanks = $this->getSession()->evaluateScript(<<<'JS'
-      return Array.from(document.querySelectorAll('menu-tree li[role="treeitem"]'))
+      return Array.from(document.querySelectorAll('menu-tree tr[role="row"]'))
         .filter(r => {
-          const t = r.querySelector(':scope > .menu-tree-ui-row__content > .menu-tree-ui-row__title');
+          const t = r.querySelector('.menu-tree-ui-row__title');
           return !t || !t.textContent || t.textContent.trim() === '';
         })
         .map(r => r.dataset.id || '(no data-id)');
@@ -635,24 +636,39 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
   }
 
   /**
-   * Asserts the ordered DOM siblings inside a container.
+   * Asserts the ordered DOM rows that are direct children of a parent.
+   *
+   * Rows are flat siblings in one <tbody>; a row's parent is read from
+   * data-parent-id, and document order in the table is the visual order.
    *
    * @param string[] $expected_labels
-   *   Labels in the order they should appear as direct children of the
-   *   matched container.
-   * @param string $container_selector
-   *   CSS for the parent UL.
+   *   Labels in the order they should appear as direct children.
+   * @param string $row_selector
+   *   CSS matching the direct child rows (a `tr[data-parent-id="…"]` set).
    */
-  private function assertSiblings(array $expected_labels, string $container_selector): void {
-    $rows = $this->getSession()->getPage()->findAll(
-      'css',
-      $container_selector . ' > li[role="treeitem"]',
-    );
+  private function assertSiblings(array $expected_labels, string $row_selector): void {
+    $rows = $this->getSession()->getPage()->findAll('css', $row_selector);
     $actual = [];
     foreach ($rows as $row) {
       $actual[] = $this->labelFor($row->getAttribute('data-id')) ?? '?';
     }
-    $this->assertSame($expected_labels, $actual, "Sibling order under $container_selector.");
+    $this->assertSame($expected_labels, $actual, "Sibling order matching $row_selector.");
+  }
+
+  /**
+   * Builds the CSS selector for the direct child rows of a parent.
+   *
+   * @param ?string $parent_label
+   *   The parent label, or NULL for the top level.
+   *
+   * @return string
+   *   The row selector.
+   */
+  private function childRowsSelector(?string $parent_label): string {
+    $parent_id = $parent_label === NULL
+      ? ''
+      : ($this->linkIds[$parent_label] ?? throw new \InvalidArgumentException("Unknown label $parent_label"));
+    return sprintf('tr[role="row"][data-parent-id="%s"]', $parent_id);
   }
 
   /**

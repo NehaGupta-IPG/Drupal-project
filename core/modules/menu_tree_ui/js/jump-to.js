@@ -19,7 +19,7 @@
    * loading its children if needed), then scrolls and focuses the target.
    *
    * @param {object} ctx
-   *   Context: {tree: HTMLUListElement, expand: ExpandManager}.
+   *   Context: {tree: HTMLTableElement, expand: ExpandManager}.
    * @param {string} targetId
    *   The link plugin ID to jump to.
    * @param {string[]} pathIds
@@ -67,7 +67,7 @@
    * Wires document-level click handling for [data-mtu-jump-id].
    *
    * @param {object} ctx
-   *   Context: {tree: HTMLUListElement, expand: ExpandManager}.
+   *   Context: {tree: HTMLTableElement, expand: ExpandManager}.
    *
    * @return {function(MouseEvent): void}
    *   The bound handler, so the caller can remove it on teardown.

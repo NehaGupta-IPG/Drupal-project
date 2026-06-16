@@ -25,19 +25,26 @@
  *
  * DOM contract:
  *   <menu-tree data-children-url="...">
- *     <ul role="tree">
- *       <li role="treeitem" data-id="..." ...> ... </li>
- *       ...
- *     </ul>
+ *     <table role="treegrid">
+ *       <thead>…</thead>
+ *       <tbody>
+ *         <tr role="row" data-id="..." data-parent-id="..." aria-level="..."> … </tr>
+ *         ...
+ *       </tbody>
+ *     </table>
  *   </menu-tree>
+ *
+ * Rows are flat siblings in one <tbody>; hierarchy is carried by aria-level +
+ * data-parent-id, not by nesting (see js/tree-nav.js).
  */
 
 ((Drupal, drupalSettings) => {
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
   const ns = Drupal.menuTreeUi;
+  const { rowOf } = ns.treeNav;
 
-  const TREE = 'ul[role="tree"]';
-  const ROW = 'li[role="treeitem"]';
+  const TREE = 'table[role="treegrid"]';
+  const ROW = 'tr[role="row"]';
   const TOGGLE = '.menu-tree-ui-row__toggle';
   const COLUMN_TOGGLE = '.menu-tree-ui-row__column-toggle';
 
@@ -57,7 +64,7 @@
       if (!tree) {
         // eslint-disable-next-line no-console
         console.warn(
-          '[menu-tree] Missing <ul role="tree"> — skipping upgrade.',
+          '[menu-tree] Missing <table role="treegrid"> — skipping upgrade.',
         );
         return;
       }
@@ -317,8 +324,7 @@
       // Space grabs a movable row to start a keyboard move; on a non-movable
       // parent it falls through to the expand toggle (its pre-move-mode role).
       if (event.key === ' ') {
-        const row =
-          event.target instanceof Element ? event.target.closest(ROW) : null;
+        const row = rowOf(event.target);
         if (row) {
           if (this.moveMode && this.moveMode.tryGrab(row)) {
             event.preventDefault();

@@ -2,66 +2,159 @@
  * @file
  * Tree-walking and focus helpers for <menu-tree>.
  *
- * "Visible" here means "in DOM and not under a collapsed ancestor" — not
- * "in the viewport". Used by keyboard nav, drag intent, and jump-to.
+ * The tree is a flat <table role="treegrid">: every row is a sibling <tr> in
+ * one <tbody>, and hierarchy is read from aria-level (depth) plus data-parent-id
+ * (linkage). The load-bearing primitive is descendantRows(): a row's descendants
+ * are the contiguous run of <tr>s immediately after it, up to the first row at a
+ * shallower-or-equal level. childRows()/lastDescendantRow() build on it. These
+ * replace the structural :scope > ul[role="group"] queries the nested-list tree
+ * used.
  *
- * Exposes helpers on Drupal.menuTreeUi.treeNav. No build step: this file is
- * a plain script loaded (in dependency order) by menu_tree_ui.libraries.yml.
+ * "Visible" means "in DOM and not flagged data-hidden by a collapsed ancestor"
+ * — not "in the viewport". Focus lives on a row's drag handle (the per-row tab
+ * target), not the <tr>.
+ *
+ * Exposes helpers on Drupal.menuTreeUi.treeNav. No build step: this file is a
+ * plain script loaded (in dependency order) by menu_tree_ui.libraries.yml.
  */
 
 ((Drupal) => {
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
 
-  const ROW = 'li[role="treeitem"]';
+  const ROW = 'tr[role="row"]';
+  const HANDLE = '.menu-tree-ui-row__handle';
+
+  /**
+   * The level (depth) of a row.
+   *
+   * @param {HTMLElement} row
+   *   The row.
+   *
+   * @return {number}
+   *   The 1-based aria-level.
+   */
+  function levelOf(row) {
+    return Number(row.getAttribute('aria-level'));
+  }
+
+  /**
+   * All descendant rows of a row, in document order.
+   *
+   * The contiguous run of <tr>s immediately following the row, up to (not
+   * including) the first row whose aria-level is shallower than or equal to the
+   * row's. Holds because a parent's whole subtree is always kept contiguous,
+   * directly after the parent.
+   *
+   * @param {HTMLElement} row
+   *   The row whose descendants to collect.
+   *
+   * @return {HTMLElement[]}
+   *   The descendant rows, in document order.
+   */
+  function descendantRows(row) {
+    const level = levelOf(row);
+    const out = [];
+    let next = row.nextElementSibling;
+    while (next && next.matches(ROW)) {
+      if (levelOf(next) <= level) {
+        break;
+      }
+      out.push(next);
+      next = next.nextElementSibling;
+    }
+    return out;
+  }
+
+  /**
+   * The last descendant of a row, for computing an insertion anchor.
+   *
+   * @param {HTMLElement} row
+   *   The row.
+   *
+   * @return {?HTMLElement}
+   *   The last descendant, or null when the row has none.
+   */
+  function lastDescendantRow(row) {
+    const rows = descendantRows(row);
+    return rows.length ? rows[rows.length - 1] : null;
+  }
+
+  /**
+   * The direct child rows of a row (one level deeper).
+   *
+   * @param {HTMLElement} row
+   *   The parent row.
+   *
+   * @return {HTMLElement[]}
+   *   The direct children, in document order.
+   */
+  function childRows(row) {
+    const childLevel = levelOf(row) + 1;
+    return descendantRows(row).filter((r) => levelOf(r) === childLevel);
+  }
+
+  /**
+   * The next sibling row at the same level under the same parent.
+   *
+   * Skips the row's own descendant run, so for an expanded parent it returns
+   * the next sibling rather than the parent's first child.
+   *
+   * @param {HTMLElement} row
+   *   The reference row.
+   *
+   * @return {?HTMLElement}
+   *   The next sibling row, or null when the row is last among its siblings.
+   */
+  function nextSiblingRow(row) {
+    const last = lastDescendantRow(row) ?? row;
+    const next = last.nextElementSibling;
+    if (
+      next &&
+      next.matches(ROW) &&
+      next.dataset.parentId === row.dataset.parentId
+    ) {
+      return next;
+    }
+    return null;
+  }
 
   /**
    * Collects all visible rows in document order.
    *
-   * Walks the tree depth-first, skipping subtrees of any row whose
-   * aria-expanded is 'false'. O(n) over rows currently in DOM; because
-   * subtrees only enter the DOM after an expand, the working set stays small.
+   * Visible = a body row not flagged data-hidden (collapse sets that flag on a
+   * row's descendant run). O(n) over rows currently in DOM; because subtrees
+   * only enter the DOM after an expand, the working set stays small.
    *
-   * @param {HTMLUListElement} tree
-   *   The root tree element.
+   * @param {HTMLTableElement} tree
+   *   The root treegrid element.
    *
    * @return {HTMLElement[]}
    *   The visible rows, in document order.
    */
   function visibleRows(tree) {
-    const out = [];
-    function walk(list) {
-      if (!list) {
-        return;
-      }
-      list.querySelectorAll(`:scope > ${ROW}`).forEach((li) => {
-        out.push(li);
-        if (li.getAttribute('aria-expanded') === 'true') {
-          walk(li.querySelector(':scope > ul[role="group"]'));
-        }
-      });
-    }
-    walk(tree);
-    return out;
+    return Array.from(tree.querySelectorAll(ROW)).filter(
+      (row) => row.dataset.hidden !== 'true',
+    );
   }
 
   /**
    * Finds the first visible row in document order.
    *
-   * @param {HTMLUListElement} tree
-   *   The root tree element.
+   * @param {HTMLTableElement} tree
+   *   The root treegrid element.
    *
    * @return {?HTMLElement}
    *   The first row, or null.
    */
   function firstVisibleRow(tree) {
-    return tree.querySelector(ROW);
+    return visibleRows(tree)[0] ?? null;
   }
 
   /**
-   * Finds the last visible row, walking through expanded subtrees.
+   * Finds the last visible row in document order.
    *
-   * @param {HTMLUListElement} tree
-   *   The root tree element.
+   * @param {HTMLTableElement} tree
+   *   The root treegrid element.
    *
    * @return {?HTMLElement}
    *   The last row, or null.
@@ -74,8 +167,8 @@
   /**
    * Finds the next visible row after a given row.
    *
-   * @param {HTMLUListElement} tree
-   *   The root tree element.
+   * @param {HTMLTableElement} tree
+   *   The root treegrid element.
    * @param {HTMLElement} row
    *   The reference row.
    *
@@ -91,8 +184,8 @@
   /**
    * Finds the previous visible row before a given row.
    *
-   * @param {HTMLUListElement} tree
-   *   The root tree element.
+   * @param {HTMLTableElement} tree
+   *   The root treegrid element.
    * @param {HTMLElement} row
    *   The reference row.
    *
@@ -108,8 +201,8 @@
   /**
    * Finds a row by its data-id anywhere in the tree.
    *
-   * @param {HTMLUListElement} tree
-   *   The root tree element.
+   * @param {HTMLTableElement} tree
+   *   The root treegrid element.
    * @param {string} id
    *   The link plugin ID stored in data-id.
    *
@@ -121,13 +214,39 @@
   }
 
   /**
-   * Applies the roving tabindex and moves focus to a row.
+   * The focusable drag handle of a row (the per-row keyboard target).
    *
-   * Clears tabindex on all rows, sets it to 0 on the target, and focuses it.
-   * No-op on null so callers can pass null safely.
+   * @param {?HTMLElement} row
+   *   The row, or null.
    *
-   * @param {HTMLUListElement} tree
-   *   The root tree element.
+   * @return {?HTMLElement}
+   *   The handle element, or null.
+   */
+  function handleOf(row) {
+    return row ? row.querySelector(HANDLE) : null;
+  }
+
+  /**
+   * Resolves the owning row from an element (e.g. an event target).
+   *
+   * @param {?EventTarget} el
+   *   The element, or null.
+   *
+   * @return {?HTMLElement}
+   *   The owning row, or null.
+   */
+  function rowOf(el) {
+    return el instanceof Element ? el.closest(ROW) : null;
+  }
+
+  /**
+   * Moves focus to a row by focusing its handle, and marks it selected.
+   *
+   * Clears aria-selected on all rows, sets it on the target, and focuses the
+   * target's handle. No-op on null so callers can pass null safely.
+   *
+   * @param {HTMLTableElement} tree
+   *   The root treegrid element.
    * @param {?HTMLElement} row
    *   The row to focus, or null.
    */
@@ -136,19 +255,26 @@
       return;
     }
     tree.querySelectorAll(ROW).forEach((r) => {
-      r.tabIndex = -1;
+      r.setAttribute('aria-selected', 'false');
     });
-    row.tabIndex = 0;
-    row.focus();
+    row.setAttribute('aria-selected', 'true');
+    (handleOf(row) ?? row).focus();
   }
 
   Drupal.menuTreeUi.treeNav = {
+    levelOf,
+    descendantRows,
+    lastDescendantRow,
+    childRows,
+    nextSiblingRow,
     visibleRows,
     firstVisibleRow,
     lastVisibleRow,
     nextVisibleRow,
     previousVisibleRow,
     findRow,
+    handleOf,
+    rowOf,
     focusRow,
   };
 })(Drupal);

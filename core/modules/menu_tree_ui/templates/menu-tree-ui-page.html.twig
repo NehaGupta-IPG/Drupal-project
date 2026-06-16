@@ -100,26 +100,29 @@
     ></div>
   </div>
 
-  {# Column header strip — only rendered when plugins have added columns. #}
-  {% if columns %}
-    <div class="menu-tree-ui__column-headers" aria-hidden="true">
-      <span class="menu-tree-ui__column-header menu-tree-ui__column-header--title">{{ 'Name'|t }}</span>
-      {% for col in columns %}
-        <span class="menu-tree-ui__column-header">{{ col.label }}</span>
-      {% endfor %}
-      <span class="menu-tree-ui__column-header menu-tree-ui__column-header--operations">{{ 'Operations'|t }}</span>
-    </div>
-  {% endif %}
-
   <menu-tree
     class="menu-tree-ui__tree"
     data-menu="{{ menu.id }}"
     data-children-url="{{ children_action }}"
   >
-    <ul role="tree" aria-label="{{ menu.label }}" class="menu-tree-ui__list menu-tree-ui__list--root">
-      {% for row in top_level %}
-        {{ row }}
-      {% endfor %}
-    </ul>
+    <table role="treegrid" aria-label="{{ menu.label }}" class="menu-tree-ui__table">
+      <thead>
+        <tr>
+          <th scope="col" class="menu-tree-ui__col menu-tree-ui__col--handle">
+            <span class="visually-hidden">{{ 'Reorder'|t }}</span>
+          </th>
+          <th scope="col" class="menu-tree-ui__col menu-tree-ui__col--name">{{ 'Name'|t }}</th>
+          {% for col in columns %}
+            <th scope="col" class="menu-tree-ui__col menu-tree-ui__col--data">{{ col.label }}</th>
+          {% endfor %}
+          <th scope="col" class="menu-tree-ui__col menu-tree-ui__col--operations">{{ 'Operations'|t }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in top_level %}
+          {{ row }}
+        {% endfor %}
+      </tbody>
+    </table>
   </menu-tree>
 </div>

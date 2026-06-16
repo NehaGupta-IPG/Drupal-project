@@ -20,13 +20,13 @@
 
   const DRAG_THRESHOLD_PX = 5;
   const HOVER_EXPAND_MS = 1000;
-  const ROW = 'li[role="treeitem"]';
+  const ROW = 'tr[role="row"]';
   const HANDLE = '.menu-tree-ui-row__handle';
 
   class DragController {
     /**
-     * @param {HTMLUListElement} tree
-     *   The root tree element.
+     * @param {HTMLTableElement} tree
+     *   The root treegrid element.
      * @param {string} moveUrl
      *   The move endpoint.
      * @param {Drupal.menuTreeUi.ExpandManager} expand

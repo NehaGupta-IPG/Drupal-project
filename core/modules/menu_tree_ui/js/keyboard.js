@@ -12,14 +12,15 @@
 ((Drupal) => {
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
   const {
+    childRows,
+    findRow,
     firstVisibleRow,
     focusRow,
     lastVisibleRow,
     nextVisibleRow,
     previousVisibleRow,
+    rowOf,
   } = Drupal.menuTreeUi.treeNav;
-
-  const ROW = 'li[role="treeitem"]';
 
   /**
    * Handles a keydown on the tree.
@@ -27,15 +28,11 @@
    * @param {KeyboardEvent} event
    *   The keydown event.
    * @param {object} ctx
-   *   Context: {tree: HTMLUListElement, expand: ExpandManager,
+   *   Context: {tree: HTMLTableElement, expand: ExpandManager,
    *   reorder: function(HTMLElement, ('up'|'down')): boolean}.
    */
   function handleKeyDown(event, ctx) {
-    const { target } = event;
-    if (!(target instanceof HTMLElement)) {
-      return;
-    }
-    const row = target.closest(ROW);
+    const row = rowOf(event.target);
     if (!row) {
       return;
     }
@@ -68,10 +65,7 @@
         if (row.getAttribute('aria-expanded') === 'false') {
           ctx.expand.expand(row);
         } else {
-          const firstChild = row.querySelector(`ul[role="group"] > ${ROW}`);
-          if (firstChild) {
-            focusRow(ctx.tree, firstChild);
-          }
+          focusRow(ctx.tree, childRows(row)[0] ?? null);
         }
         break;
       }
@@ -80,10 +74,7 @@
         if (row.getAttribute('aria-expanded') === 'true') {
           ctx.expand.collapse(row);
         } else {
-          const parentRow = row.parentElement?.closest(ROW);
-          if (parentRow) {
-            focusRow(ctx.tree, parentRow);
-          }
+          focusRow(ctx.tree, findRow(ctx.tree, row.dataset.parentId));
         }
         break;
       }

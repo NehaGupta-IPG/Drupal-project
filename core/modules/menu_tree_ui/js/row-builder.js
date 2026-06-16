@@ -3,13 +3,15 @@
  * Builds row DOM from the JSON children response.
  *
  * NB: Mirrors templates/menu-tree-ui-row.html.twig. If you change one, change
- * the other — there is no shared template source.
+ * the other — there is no shared template source. Rows are flat <tr role="row">
+ * elements (see js/tree-nav.js); children are inserted as siblings after their
+ * parent, never nested.
  *
  * Mirrors the JSON contract MenuTreeController::serializeElement() emits:
  *   ChildItem: {
- *     id: string, title: string, enabled: boolean, has_children: boolean,
- *     depth: number, url: string, weight: number, movable: boolean,
- *     operations_html: string,
+ *     id: string, parent_id: string, title: string, enabled: boolean,
+ *     has_children: boolean, depth: number, url: string, weight: number,
+ *     movable: boolean, operations_html: string,
  *     columns: Object<string, {type: 'toggle', value: boolean, label: string,
  *                              interactive: boolean, link_id: string}>
  *   }
@@ -20,41 +22,67 @@
  * MenuTreeController::renderOperationsHtml() for why the markup isn't rebuilt
  * here.
  *
- * Exposes Drupal.menuTreeUi.buildGroup and Drupal.menuTreeUi.buildRow.
+ * Exposes Drupal.menuTreeUi.buildRows and Drupal.menuTreeUi.buildRow.
  */
 
 ((Drupal) => {
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
 
   /**
-   * Builds the drag handle span for a row.
+   * Builds the handle cell for a row.
    *
-   * Movable rows (content links and static links that persist parent/weight
-   * overrides) get a grab handle; the rest render a non-grab spacer. The server
-   * decides via \Drupal\menu_tree_ui\MenuLinkMovability and sends item.movable.
+   * The handle is the per-row keyboard focus target (a real tab stop), with a
+   * visually-hidden level indicator. Movable rows grab to reorder; the rest are
+   * focusable for navigation but aria-disabled. The server decides via
+   * \Drupal\menu_tree_ui\MenuLinkMovability and sends item.movable.
    *
    * @param {object} item
    *   The ChildItem.
+   * @param {number} depth
+   *   The row's 1-based depth.
    *
-   * @return {HTMLSpanElement}
-   *   The handle element.
+   * @return {HTMLTableCellElement}
+   *   The handle <td>.
    */
-  function buildHandle(item) {
+  function buildHandleCell(item, depth) {
+    const cell = document.createElement('td');
+    cell.setAttribute('role', 'gridcell');
+    cell.className = 'menu-tree-ui-row__cell menu-tree-ui-row__cell--handle';
+
     const handle = document.createElement('span');
+    handle.setAttribute('role', 'button');
+    handle.tabIndex = 0;
+
+    const icon = document.createElement('span');
+    icon.setAttribute('aria-hidden', 'true');
+    icon.className = 'menu-tree-ui-row__handle-icon';
+
+    const label = document.createElement('span');
+    label.className = 'visually-hidden';
+
     if (item.movable) {
       handle.className = 'menu-tree-ui-row__handle';
-      handle.setAttribute('role', 'button');
-      handle.tabIndex = -1;
-      handle.setAttribute('aria-label', `Drag to reorder ${item.title}`);
-      handle.title = 'Drag to reorder';
-      handle.textContent = '⋮⋮';
+      handle.title = Drupal.t('Drag to reorder');
+      icon.textContent = '⋮⋮';
+      label.textContent = Drupal.t('Reorder @title, level @level', {
+        '@title': item.title,
+        '@level': depth,
+      });
     } else {
       handle.className =
         'menu-tree-ui-row__handle menu-tree-ui-row__handle--locked';
-      handle.setAttribute('aria-hidden', 'true');
-      handle.textContent = '·';
+      handle.setAttribute('aria-disabled', 'true');
+      icon.textContent = '·';
+      label.textContent = Drupal.t('@title, level @level (locked)', {
+        '@title': item.title,
+        '@level': depth,
+      });
     }
-    return handle;
+
+    handle.appendChild(icon);
+    handle.appendChild(label);
+    cell.appendChild(handle);
+    return cell;
   }
 
   /**
@@ -77,8 +105,10 @@
     const toggle = document.createElement('button');
     toggle.type = 'button';
     toggle.className = 'menu-tree-ui-row__toggle';
-    toggle.tabIndex = -1;
-    toggle.setAttribute('aria-label', `Toggle children of ${item.title}`);
+    toggle.setAttribute(
+      'aria-label',
+      Drupal.t('Toggle children of @title', { '@title': item.title }),
+    );
     const chevron = document.createElement('span');
     chevron.setAttribute('aria-hidden', 'true');
     chevron.className = 'menu-tree-ui-row__chevron';
@@ -88,42 +118,48 @@
   }
 
   /**
-   * Builds the link title span.
+   * Builds the name cell — indent wrapper, toggle, title, disabled badge.
    *
-   * @param {string} text
-   *   The link title.
+   * @param {object} item
+   *   The ChildItem.
+   * @param {number} depth
+   *   The row's 1-based depth.
    *
-   * @return {HTMLSpanElement}
-   *   The title element.
+   * @return {HTMLTableCellElement}
+   *   The name <td>.
    */
-  function buildTitle(text) {
+  function buildNameCell(item, depth) {
+    const cell = document.createElement('td');
+    cell.setAttribute('role', 'gridcell');
+    cell.className = 'menu-tree-ui-row__cell menu-tree-ui-row__cell--name';
+
+    const name = document.createElement('div');
+    name.className = 'menu-tree-ui-row__name';
+    name.style.paddingInlineStart = `${(depth - 1) * 1.25}rem`;
+
+    name.appendChild(buildToggle(item));
+
     const title = document.createElement('span');
     title.className = 'menu-tree-ui-row__title';
-    title.textContent = text;
-    return title;
+    title.textContent = item.title;
+    name.appendChild(title);
+
+    if (!item.enabled) {
+      const badge = document.createElement('span');
+      badge.className = 'menu-tree-ui-row__badge';
+      badge.textContent = Drupal.t('disabled');
+      name.appendChild(badge);
+    }
+
+    cell.appendChild(name);
+    return cell;
   }
 
   /**
-   * Builds a small status badge (e.g. "disabled").
+   * Builds one column cell <td>.
    *
-   * @param {string} text
-   *   The badge text.
-   *
-   * @return {HTMLSpanElement}
-   *   The badge element.
-   */
-  function buildBadge(text) {
-    const badge = document.createElement('span');
-    badge.className = 'menu-tree-ui-row__badge';
-    badge.textContent = text;
-    return badge;
-  }
-
-  /**
-   * Builds one column cell div.
-   *
-   * Only the 'toggle' cell type is supported in v1. Unknown types are silently
-   * skipped so future column types can be added without breaking old JS.
+   * Only the 'toggle' cell type is supported in v1. Unknown types render an
+   * empty cell so future column types can be added without breaking old JS.
    *
    * @param {string} colId
    *   The column plugin ID.
@@ -132,13 +168,14 @@
    * @param {string} rowId
    *   The owning row's link ID.
    *
-   * @return {HTMLDivElement}
-   *   The cell wrapper.
+   * @return {HTMLTableCellElement}
+   *   The column <td>.
    */
   function buildColumnCell(colId, cell, rowId) {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'menu-tree-ui-row__column';
-    wrapper.dataset.column = colId;
+    const td = document.createElement('td');
+    td.setAttribute('role', 'gridcell');
+    td.className = 'menu-tree-ui-row__cell menu-tree-ui-row__column';
+    td.dataset.column = colId;
 
     if (cell.type === 'toggle') {
       const btn = document.createElement('button');
@@ -155,16 +192,43 @@
 
       const sr = document.createElement('span');
       sr.className = 'visually-hidden';
-      sr.textContent = cell.value ? 'On' : 'Off';
+      sr.textContent = cell.value ? Drupal.t('On') : Drupal.t('Off');
       btn.appendChild(sr);
-      wrapper.appendChild(btn);
+      td.appendChild(btn);
     }
 
-    return wrapper;
+    return td;
   }
 
   /**
-   * Builds one <li role="treeitem"> row from a ChildItem.
+   * Builds the operations cell <td>.
+   *
+   * The dropbutton markup is rendered server-side with the active admin theme
+   * (see MenuTreeController::renderOperationsHtml) and injected verbatim;
+   * Drupal.attachBehaviors upgrades it to a working dropbutton.
+   *
+   * @param {object} item
+   *   The ChildItem.
+   *
+   * @return {HTMLTableCellElement}
+   *   The operations <td>.
+   */
+  function buildOperationsCell(item) {
+    const cell = document.createElement('td');
+    cell.setAttribute('role', 'gridcell');
+    cell.className =
+      'menu-tree-ui-row__cell menu-tree-ui-row__cell--operations';
+    if (item.operations_html) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'menu-tree-ui-row__operations';
+      wrapper.innerHTML = item.operations_html;
+      cell.appendChild(wrapper);
+    }
+    return cell;
+  }
+
+  /**
+   * Builds one <tr role="row"> row from a ChildItem.
    *
    * @param {object} item
    *   The ChildItem.
@@ -175,23 +239,24 @@
    * @param {number} setSize
    *   The number of siblings.
    *
-   * @return {HTMLLIElement}
+   * @return {HTMLTableRowElement}
    *   The row element.
    */
   function buildRow(item, depth, posInSet, setSize) {
-    const li = document.createElement('li');
-    li.setAttribute('role', 'treeitem');
-    li.dataset.id = item.id;
-    li.dataset.hasChildren = String(item.has_children);
-    li.dataset.movable = String(item.movable);
-    li.setAttribute('aria-level', String(depth));
-    li.setAttribute('aria-posinset', String(posInSet));
-    li.setAttribute('aria-setsize', String(setSize));
+    const tr = document.createElement('tr');
+    tr.setAttribute('role', 'row');
+    tr.dataset.id = item.id;
+    tr.dataset.parentId = item.parent_id ?? '';
+    tr.dataset.hasChildren = String(item.has_children);
+    tr.dataset.movable = String(item.movable);
+    tr.setAttribute('aria-level', String(depth));
+    tr.setAttribute('aria-posinset', String(posInSet));
+    tr.setAttribute('aria-setsize', String(setSize));
     if (item.has_children) {
-      li.setAttribute('aria-expanded', 'false');
+      tr.setAttribute('aria-expanded', 'false');
     }
-    li.tabIndex = -1;
-    li.className = [
+    tr.setAttribute('aria-selected', 'false');
+    tr.className = [
       'menu-tree-ui-row',
       item.enabled ? '' : 'menu-tree-ui-row--disabled',
       item.has_children ? 'menu-tree-ui-row--parent' : 'menu-tree-ui-row--leaf',
@@ -199,59 +264,36 @@
       .filter(Boolean)
       .join(' ');
 
-    const content = document.createElement('div');
-    content.className = 'menu-tree-ui-row__content';
-    content.style.paddingInlineStart = `${(depth - 1) * 1.25}rem`;
-
-    content.appendChild(buildHandle(item));
-    content.appendChild(buildToggle(item));
-    content.appendChild(buildTitle(item.title));
-
-    if (!item.enabled) {
-      content.appendChild(buildBadge('disabled'));
-    }
-
-    // Column cells.
+    tr.appendChild(buildHandleCell(item, depth));
+    tr.appendChild(buildNameCell(item, depth));
     Object.entries(item.columns).forEach(([colId, cell]) => {
-      content.appendChild(buildColumnCell(colId, cell, item.id));
+      tr.appendChild(buildColumnCell(colId, cell, item.id));
     });
+    tr.appendChild(buildOperationsCell(item));
 
-    // Operations dropbutton. The markup is rendered server-side with the active
-    // admin theme (see MenuTreeController::renderOperationsHtml) and injected
-    // verbatim; Drupal.attachBehaviors upgrades it to a working dropbutton.
-    if (item.operations_html) {
-      const opsWrapper = document.createElement('div');
-      opsWrapper.className = 'menu-tree-ui-row__operations';
-      opsWrapper.innerHTML = item.operations_html;
-      content.appendChild(opsWrapper);
-    }
-
-    li.appendChild(content);
-    return li;
+    return tr;
   }
 
   /**
-   * Builds a <ul role="group"> populated with rows from items.
+   * Builds a DocumentFragment of sibling rows from items.
    *
    * @param {Array<object>} items
    *   The ChildItems.
    * @param {number} depth
    *   The depth at which to render the rows.
    *
-   * @return {HTMLUListElement}
-   *   The populated group.
+   * @return {DocumentFragment}
+   *   The fragment of <tr> rows.
    */
-  function buildGroup(items, depth) {
-    const ul = document.createElement('ul');
-    ul.setAttribute('role', 'group');
-    ul.className = 'menu-tree-ui__list';
+  function buildRows(items, depth) {
+    const fragment = document.createDocumentFragment();
     const setSize = items.length;
     items.forEach((item, i) => {
-      ul.appendChild(buildRow(item, depth, i + 1, setSize));
+      fragment.appendChild(buildRow(item, depth, i + 1, setSize));
     });
-    return ul;
+    return fragment;
   }
 
-  Drupal.menuTreeUi.buildGroup = buildGroup;
+  Drupal.menuTreeUi.buildRows = buildRows;
   Drupal.menuTreeUi.buildRow = buildRow;
 })(Drupal);

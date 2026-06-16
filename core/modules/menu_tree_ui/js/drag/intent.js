@@ -2,15 +2,15 @@
  * @file
  * Drop-intent computation for tree drag.
  *
- * Splits the target row's HEADER (just the .menu-tree-ui-row__content box, not
- * the whole subtree height) into three zones:
+ * Splits the target row into three zones:
  *   top 30% → before
  *   middle  → child
  *   bottom 30% → after
  *
- * Using the header instead of the row's full bounding rect means parents with
- * many expanded children still have a usable middle zone — otherwise "child of
- * this parent" would only be hittable on a 0.4-of-very-tall sliver.
+ * The row IS its own header now: a <tr> holds only its own cells, never its
+ * subtree (children are sibling rows), so the row's bounding rect is the header
+ * box and the middle "child" zone stays usable on parents with many expanded
+ * children.
  *
  * Drop-as-child on a collapsed parent stays as 'child' — commitMove is
  * responsible for expanding the destination before applying the move, so the
@@ -29,8 +29,8 @@
   const CHILD_ZONE_TO = 0.7;
 
   /**
-   * The row's header box — the visible content row, not the whole li (which
-   * includes any expanded children's subtree).
+   * The row's header box — the <tr> rect, which holds only the row's own cells
+   * (children are sibling rows, not nested in this one).
    *
    * @param {HTMLElement} row
    *   The row.
@@ -39,10 +39,7 @@
    *   The header bounding rect.
    */
   function rowHeaderRect(row) {
-    const content = row.querySelector(':scope > .menu-tree-ui-row__content');
-    return content
-      ? content.getBoundingClientRect()
-      : row.getBoundingClientRect();
+    return row.getBoundingClientRect();
   }
 
   /**

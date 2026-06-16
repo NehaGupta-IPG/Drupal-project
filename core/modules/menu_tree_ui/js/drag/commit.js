@@ -3,8 +3,8 @@
  * Translates a DropIntent into a server move + visible-state refresh.
  *
  * Server is the only source of truth. We POST to /move with no DOM mutation up
- * front; on success we re-fetch the affected <ul>s (from-parent and to-parent)
- * and rebuild them in place. The whole class of "client moved the DOM but
+ * front; on success we re-fetch the affected levels (from-parent and to-parent)
+ * and rebuild their rows in place. The whole class of "client moved the DOM but
  * forgot to update attribute X" bugs goes away — any attribute the row needs
  * is set by row-builder from the server's JSON.
  *
@@ -19,9 +19,10 @@
 ((Drupal) => {
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
   Drupal.menuTreeUi.drag = Drupal.menuTreeUi.drag || {};
-  const { findRow, focusRow } = Drupal.menuTreeUi.treeNav;
+  const { childRows, descendantRows, findRow, focusRow, nextSiblingRow } =
+    Drupal.menuTreeUi.treeNav;
 
-  const ROW = 'li[role="treeitem"]';
+  const ROW = 'tr[role="row"]';
 
   /**
    * Announces a message through Drupal's live-region announcer.
@@ -38,26 +39,6 @@
   }
 
   /**
-   * Reads the parent id from a child's container. Returns '' for the root.
-   *
-   * @param {?Element} container
-   *   The child's parent element.
-   *
-   * @return {string}
-   *   The parent plugin ID, or ''.
-   */
-  function parentIdOfContainer(container) {
-    if (!container) {
-      return '';
-    }
-    if (container.matches('ul[role="tree"]')) {
-      return '';
-    }
-    const ownerRow = container.closest(ROW);
-    return ownerRow?.dataset.id ?? '';
-  }
-
-  /**
    * Resolves the parent id the moved row should end up under.
    *
    * @param {object} intent
@@ -70,7 +51,7 @@
     if (intent.kind === 'child') {
       return intent.target.dataset.id ?? '';
     }
-    return parentIdOfContainer(intent.target.parentElement);
+    return intent.target.dataset.parentId ?? '';
   }
 
   /**
@@ -91,21 +72,12 @@
    */
   function resolveBeforeId(intent) {
     if (intent.kind === 'child') {
-      const group = intent.target.querySelector(':scope > ul[role="group"]');
-      const firstChild = group?.querySelector(':scope > li[role="treeitem"]');
-      return firstChild?.dataset.id ?? null;
+      return childRows(intent.target)[0]?.dataset.id ?? null;
     }
     if (intent.kind === 'before') {
       return intent.target.dataset.id ?? null;
     }
-    const next = intent.target.nextElementSibling;
-    if (
-      next instanceof HTMLElement &&
-      next.getAttribute('role') === 'treeitem'
-    ) {
-      return next.dataset.id ?? null;
-    }
-    return null;
+    return nextSiblingRow(intent.target)?.dataset.id ?? null;
   }
 
   /**
@@ -146,8 +118,8 @@
   }
 
   /**
-   * Syncs a parent row's "parent or leaf" attributes to whatever its
-   * <ul role="group"> now actually contains.
+   * Syncs a parent row's "parent or leaf" attributes to whatever its direct
+   * child rows now actually are.
    *
    * /children?parent=X returns X's children, not X's metadata, so this is the
    * one piece of state derived client-side after a refresh. Skipped when
@@ -166,32 +138,26 @@
     if (!row) {
       return;
     }
-    const group = row.querySelector(':scope > ul[role="group"]');
-    const hasChildrenNow = !!group && group.children.length > 0;
+    const hasChildrenNow = childRows(row).length > 0;
     row.dataset.hasChildren = hasChildrenNow ? 'true' : 'false';
 
-    const content = row.querySelector(':scope > .menu-tree-ui-row__content');
-    if (!content) {
+    const name = row.querySelector('.menu-tree-ui-row__name');
+    if (!name) {
       return;
     }
-    const existing = content.querySelector(
-      ':scope > .menu-tree-ui-row__toggle',
-    );
+    const existing = name.querySelector(':scope > .menu-tree-ui-row__toggle');
 
     if (hasChildrenNow) {
       row.setAttribute('aria-expanded', 'true');
       if (!existing || existing.tagName.toLowerCase() !== 'button') {
         const title =
-          row
-            .querySelector(
-              ':scope > .menu-tree-ui-row__content .menu-tree-ui-row__title',
-            )
-            ?.textContent?.trim() ?? '';
+          name.querySelector('.menu-tree-ui-row__title')?.textContent?.trim() ??
+          '';
         const button = makeToggleButton(title);
         if (existing) {
           existing.replaceWith(button);
         } else {
-          content.appendChild(button);
+          name.prepend(button);
         }
       }
     } else {
@@ -199,14 +165,16 @@
       if (existing && existing.tagName.toLowerCase() === 'button') {
         existing.replaceWith(makeToggleSpacer());
       }
-      group?.remove();
+      // On becoming a leaf, remove any stale descendant rows left behind.
+      descendantRows(row).forEach((r) => r.remove());
+      delete row.dataset.loaded;
     }
   }
 
   /**
    * The inner commit pipeline (wrapped by commitMove for the in-flight flag).
    *
-   * @param {HTMLLIElement} row
+   * @param {HTMLTableRowElement} row
    *   The moved row.
    * @param {object} intent
    *   The DropIntent.
@@ -214,8 +182,8 @@
    *   The move endpoint.
    * @param {Drupal.menuTreeUi.ExpandManager} expand
    *   The expand manager, for destination auto-expand + group refreshes.
-   * @param {?HTMLUListElement} tree
-   *   The root tree element.
+   * @param {?HTMLTableElement} tree
+   *   The root treegrid element.
    * @param {string} movedId
    *   The moved row's plugin ID.
    * @param {string} [csrfToken]
@@ -233,7 +201,7 @@
     movedId,
     csrfToken,
   ) {
-    const oldParentId = parentIdOfContainer(row.parentElement);
+    const oldParentId = row.dataset.parentId ?? '';
     const newParentId = resolveNewParentId(intent);
     const { target } = intent;
 
@@ -310,7 +278,7 @@
    * Tests wait on the data-mtu-moving flag's absence to know all asynchronous
    * refresh work is done; humans never see it.
    *
-   * @param {HTMLLIElement} row
+   * @param {HTMLTableRowElement} row
    *   The moved row.
    * @param {object} intent
    *   The DropIntent.
@@ -330,7 +298,7 @@
       return;
     }
 
-    const tree = row.closest('ul[role="tree"]');
+    const tree = row.closest('table[role="treegrid"]');
     const host = tree?.closest('menu-tree') ?? null;
     host?.setAttribute('data-mtu-moving', 'true');
     try {
