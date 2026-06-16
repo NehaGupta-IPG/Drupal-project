@@ -41,7 +41,7 @@
 ((Drupal, drupalSettings) => {
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
   const ns = Drupal.menuTreeUi;
-  const { rowOf } = ns.treeNav;
+  const { rowOf, childRows } = ns.treeNav;
 
   const TREE = 'table[role="treegrid"]';
   const ROW = 'tr[role="row"]';
@@ -116,6 +116,7 @@
       if (container) {
         this.detachSearchPanel = ns.attachSearchPanel(container);
       }
+      this.autoExpandSmall();
 
       // Fetch the CSRF token once, then wire up drag-and-drop and keyboard
       // reorder. Drupal's CSRF check accepts the token in the X-CSRF-Token
@@ -127,6 +128,41 @@
         .then((r) => r.text())
         .then((token) => this.setupDrag(token))
         .catch(() => this.setupDrag(undefined));
+    }
+
+    /**
+     * Expands an extra level on initial load for very small menus.
+     *
+     * A menu with only one or two top-level items (e.g. Administration) opens
+     * fully collapsed otherwise, hiding all of its structure. Expanding a
+     * bounded extra level keeps the lazy-load posture — a couple of /children
+     * fetches, never the whole tree.
+     *
+     * @return {Promise<void>}
+     *   Resolves once the bounded auto-expand finishes.
+     */
+    async autoExpandSmall() {
+      const threshold = drupalSettings.menuTreeUi?.autoExpandThreshold ?? 2;
+      const topRows = Array.from(this.tree.querySelectorAll(ROW));
+      if (topRows.length === 0 || topRows.length > threshold) {
+        return;
+      }
+      const topParents = topRows.filter(
+        (row) => row.dataset.hasChildren === 'true',
+      );
+      await Promise.all(topParents.map((row) => this.expand.expand(row)));
+
+      // A single top-level item gets one more level when that level is small
+      // too, so a one-root menu shows more than just its root's children.
+      if (topRows.length === 1 && topParents.length === 1) {
+        const children = childRows(topParents[0]);
+        if (children.length <= threshold) {
+          const childParents = children.filter(
+            (row) => row.dataset.hasChildren === 'true',
+          );
+          await Promise.all(childParents.map((row) => this.expand.expand(row)));
+        }
+      }
     }
 
     /**
