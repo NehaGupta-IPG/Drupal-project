@@ -112,10 +112,9 @@ class FieldPreprocess {
             '#value' => $element['#title'],
             '#attributes' => $header_attributes,
           ],
-          'colspan' => 2,
+          'colspan' => 3,
           'class' => ['field-label'],
         ],
-        '',
         $this->t('Order', [], ['context' => 'Sort order']),
       ];
       $rows = [];
