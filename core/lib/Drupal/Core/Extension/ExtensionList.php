@@ -447,7 +447,7 @@ abstract class ExtensionList {
         $this->state->set($cache_id, $this->pathNames);
       }
     }
-    return $this->pathNames;
+    return $this->addedPathNames + $this->pathNames;
   }
 
   /**
@@ -526,10 +526,17 @@ abstract class ExtensionList {
    *   The drupal-root relative filename and path of the requested extension's
    *   .info.yml file.
    *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+   *   ::getPath() for the extension directory or ::getPathNames() for the
+   *   .info.yml path instead.
+   *
+   * @see https://www.drupal.org/node/3601481
+   *
    * @throws \Drupal\Core\Extension\Exception\UnknownExtensionException
    *   If there is no extension with the supplied machine name.
    */
   public function getPathname($extension_name) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use ::getPath() for the extension directory or ::getPathNames() for the .info.yml path instead. See https://www.drupal.org/node/3601481', E_USER_DEPRECATED);
     if (isset($this->addedPathNames[$extension_name])) {
       return $this->addedPathNames[$extension_name];
     }
@@ -558,7 +565,19 @@ abstract class ExtensionList {
    *   If there is no extension with the supplied name.
    */
   public function getPath($extension_name) {
-    return dirname($this->getPathname($extension_name));
+    if (isset($this->addedPathNames[$extension_name])) {
+      $info_file_path = $this->addedPathNames[$extension_name];
+    }
+    elseif (isset($this->pathNames[$extension_name])) {
+      $info_file_path = $this->pathNames[$extension_name];
+    }
+    elseif (($path_names = $this->getPathNames()) && isset($path_names[$extension_name])) {
+      $info_file_path = $path_names[$extension_name];
+    }
+    else {
+      throw new UnknownExtensionException("The {$this->type} $extension_name does not exist.");
+    }
+    return dirname($info_file_path);
   }
 
   /**

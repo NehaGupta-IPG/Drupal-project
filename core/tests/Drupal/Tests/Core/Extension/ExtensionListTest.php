@@ -18,6 +18,7 @@ use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Prophecy\Argument;
 
 /**
@@ -157,9 +158,11 @@ class ExtensionListTest extends UnitTestCase {
   /**
    * Tests get pathname.
    */
+  #[IgnoreDeprecations]
   public function testGetPathname(): void {
     $test_extension_list = $this->setupTestExtensionList();
 
+    $this->expectUserDeprecationMessage('Drupal\Core\Extension\ExtensionList::getPathname() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use ::getPath() for the extension directory or ::getPathNames() for the .info.yml path instead. See https://www.drupal.org/node/3601481');
     $pathname = $test_extension_list->getPathname('test_name');
     $this->assertEquals('example/test_name/test_name.info.yml', $pathname);
   }
@@ -168,32 +171,33 @@ class ExtensionListTest extends UnitTestCase {
    * Tests set pathname.
    *
    * @legacy-covers ::setPathname
-   * @legacy-covers ::getPathname
+   * @legacy-covers ::getPath
    */
   public function testSetPathname(): void {
     $test_extension_list = $this->setupTestExtensionList();
 
     $test_extension_list->setPathname('test_name', 'vfs://drupal_root/example2/test_name/test_name.info.yml');
-    $this->assertEquals('vfs://drupal_root/example2/test_name/test_name.info.yml', $test_extension_list->getPathname('test_name'));
+    $this->assertEquals('vfs://drupal_root/example2/test_name', $test_extension_list->getPath('test_name'));
   }
 
   /**
-   * Tests that set pathname survives reset.
+   * Tests that an added pathname survives reset.
    *
-   * @legacy-covers ::setPathname
-   * @legacy-covers ::getPathname
+   * @legacy-covers ::getPath
+   * @legacy-covers ::getPathNames
    * @legacy-covers ::reset
    */
-  public function testSetPathnameSurvivesReset(): void {
+  public function testAddedPathnameSurvivesReset(): void {
     $test_extension_list = $this->setupTestExtensionList();
 
     $pathname = 'vfs://drupal_root/example2/test_name/test_name.info.yml';
-    $test_extension_list->setPathname('test_name', $pathname);
-    $this->assertSame($pathname, $test_extension_list->getPathname('test_name'));
+    $test_extension_list->addPathname('test_name', $pathname);
+    $this->assertSame($pathname, $test_extension_list->getPathNames()['test_name']);
+    $this->assertSame('vfs://drupal_root/example2/test_name', $test_extension_list->getPath('test_name'));
 
     $test_extension_list->reset();
 
-    $this->assertSame($pathname, $test_extension_list->getPathname('test_name'));
+    $this->assertSame($pathname, $test_extension_list->getPathNames()['test_name']);
     $this->assertSame('vfs://drupal_root/example2/test_name', $test_extension_list->getPath('test_name'));
   }
 
@@ -208,6 +212,19 @@ class ExtensionListTest extends UnitTestCase {
   }
 
   /**
+   * Tests get path with a seeded pathname.
+   */
+  public function testGetPathWithAddedPathname(): void {
+    [$cache, $info_parser, $module_handler, $state] = $this->getMocks();
+    $state->get(Argument::any())->shouldNotBeCalled();
+    $test_extension_list = new TestExtension($this->randomMachineName(), 'test_extension', $cache->reveal(), $info_parser->reveal(), $module_handler->reveal(), $state->reveal(), 'testing');
+    $test_extension_list->addPathname('test_name', 'example/test_name/test_name.info.yml');
+
+    $path = $test_extension_list->getPath('test_name');
+    $this->assertEquals('example/test_name', $path);
+  }
+
+  /**
    * Tests reset.
    */
   public function testReset(): void {
@@ -215,8 +232,6 @@ class ExtensionListTest extends UnitTestCase {
 
     $path = $test_extension_list->getPath('test_name');
     $this->assertEquals('example/test_name', $path);
-    $pathname = $test_extension_list->getPathname('test_name');
-    $this->assertEquals('example/test_name/test_name.info.yml', $pathname);
     $filenames = $test_extension_list->getPathNames();
     $this->assertEquals([
       'test_name' => 'example/test_name/test_name.info.yml',
@@ -227,8 +242,6 @@ class ExtensionListTest extends UnitTestCase {
     // Ensure that everything is still usable after the resetting.
     $path = $test_extension_list->getPath('test_name');
     $this->assertEquals('example/test_name', $path);
-    $pathname = $test_extension_list->getPathname('test_name');
-    $this->assertEquals('example/test_name/test_name.info.yml', $pathname);
     $filenames = $test_extension_list->getPathNames();
     $this->assertEquals([
       'test_name' => 'example/test_name/test_name.info.yml',
@@ -373,6 +386,10 @@ class TestExtension extends ExtensionList {
 
   public function setInstalledExtensions(array $extension_names): void {
     $this->installedExtensions = $extension_names;
+  }
+
+  public function addPathname(string $extension_name, string $pathname): void {
+    $this->addedPathNames[$extension_name] = $pathname;
   }
 
   /**

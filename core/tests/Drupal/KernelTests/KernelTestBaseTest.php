@@ -303,8 +303,8 @@ class KernelTestBaseTest extends KernelTestBase {
   public function testProfileModules(): void {
     $this->assertFileExists('core/profiles/demo_umami/modules/demo_umami_content/demo_umami_content.info.yml');
     $this->assertSame(
-      'core/profiles/demo_umami/modules/demo_umami_content/demo_umami_content.info.yml',
-      \Drupal::service('extension.list.module')->getPathname('demo_umami_content')
+      'core/profiles/demo_umami/modules/demo_umami_content',
+      \Drupal::service('extension.list.module')->getPath('demo_umami_content')
     );
   }
 
