@@ -15,7 +15,7 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 #[FieldWidget(
   id: 'text_textarea',
   label: new TranslatableMarkup('Text area (multiple rows)'),
-  field_types: ['text_long'],
+  field_types: ['text', 'text_long'],
 )]
 class TextareaWidget extends StringTextareaWidget {
 
