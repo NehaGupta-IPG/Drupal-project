@@ -148,92 +148,30 @@ menu-tree {
 }
 
 /*
- * The treegrid keeps table semantics (role attributes) but lays out as block +
- * flex rows. content-visibility / containment is spec-disallowed on real
- * display:table-row elements (it no-ops or breaks column sizing), so we drop
- * display:table and size cells with flex instead — which keeps the row
- * virtualization in windowing.js working exactly as it did on the old flex
- * rows. Admin themes also style generic table cells; the resets below stop that
- * bleeding into the tree.
+ * The tree is a real <table>, so the admin theme styles the header, cell
+ * padding, borders, and row hover for free — matching the classic menu admin.
+ * Only the tree-specific bits below are layered on top.
  */
 .menu-tree-ui__table {
-  display: block;
-  border: 1px solid var(--mtu-color-divider);
-  border-radius: 4px;
-  background: var(--mtu-color-bg);
+  width: 100%;
 }
 
-.menu-tree-ui__table thead,
-.menu-tree-ui__table tbody {
-  display: block;
+.menu-tree-ui__table td {
+  vertical-align: middle;
 }
 
-.menu-tree-ui__table thead tr,
-.menu-tree-ui-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
-}
-
-.menu-tree-ui__table th,
-.menu-tree-ui-row__cell {
-  display: block;
-  padding: 0;
-  border: 0;
-  text-align: start;
-}
-
-/* Column widths — header cells must mirror body cells to stay aligned. */
-.menu-tree-ui__col--handle,
-.menu-tree-ui-row__cell--handle {
-  flex: 0 0 1.875rem;
-}
-
-.menu-tree-ui__col--name,
-.menu-tree-ui-row__cell--name {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
+/* The "Expanded"-style column toggles sit centred under their header. */
 .menu-tree-ui__col--data,
 .menu-tree-ui-row__column {
-  flex: 0 0 auto;
-  min-width: 3rem;
+  text-align: center;
 }
 
-.menu-tree-ui__col--operations,
-.menu-tree-ui-row__cell--operations {
-  flex: 0 0 auto;
-  margin-inline-start: auto;
-}
-
-.menu-tree-ui__table thead tr {
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--mtu-color-text-muted);
-  border-bottom: 1px solid var(--mtu-color-divider);
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
+/* The operations dropbutton is a list; drop the theme's bullets and margins. */
 .menu-tree-ui-row__operations li,
 .menu-tree-ui-row__operations ul {
   margin: 0;
   padding: 0;
   list-style: none;
-  list-style-type: none;
-}
-
-.menu-tree-ui-row {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 2.5rem;
-  min-height: 2.5rem;
-  border-bottom: 1px solid var(--mtu-color-divider-light);
-}
-
-.menu-tree-ui-row:last-child {
-  border-bottom: 0;
 }
 
 /* Collapsed descendants are flagged data-hidden by expand.js. */
@@ -241,32 +179,9 @@ menu-tree {
   display: none;
 }
 
-/*
- * Focus indicator. Inset box-shadow instead of outline because:
- *  - content-visibility: auto applies paint containment, clipping outlines
- *  - inset shadow paints inside the padding box, unaffected by containment
- *
- * :has() lifts content-visibility off ancestor rows so the focused row's
- * shadow is never clipped by a parent's contain: paint boundary.
- */
-/*
- * Focus lives on a control inside the row (the handle, the toggle, a switch, a
- * dropbutton link), so highlight the row via :focus-within. Inset box-shadow
- * instead of outline because content-visibility: auto applies paint
- * containment, which clips outlines; the inset shadow paints inside the box,
- * unaffected. Lift containment while focused (and while a dropbutton is open)
- * so the shadow is never clipped.
- */
-.menu-tree-ui-row:focus-within,
-.menu-tree-ui-row:has(.dropbutton-wrapper.open) {
-  content-visibility: visible;
-}
-
+/* Highlight the row that holds focus (on its handle, toggle, switch, or links). */
 .menu-tree-ui-row:focus-within {
-  position: relative;
-  z-index: 1;
-  border-radius: 2px;
-  box-shadow: inset 0 0 0 2px var(--mtu-color-focus);
+  background-color: var(--mtu-color-focus-bg);
 }
 
 @keyframes menu-tree-ui-flash {
@@ -360,6 +275,7 @@ menu-tree {
   cursor: grabbing;
 }
 
+/* Pointer drop-as-child target. */
 .menu-tree-ui-row--drop-as-child {
   outline: 2px solid var(--mtu-color-focus);
   outline-offset: -2px;
@@ -367,24 +283,10 @@ menu-tree {
 }
 
 /*
- * Keyboard move mode shows "child" (drop as first child) as the solid
- * drop-as-child box above; "before"/"after" reuse the absolutely-positioned
- * drop-indicator line, drawn indented to the target row's depth so stacked
- * outdent positions stay distinguishable. Lift paint containment so the box
- * outline is never clipped.
- */
-.menu-tree-ui-row--drop-as-child {
-  content-visibility: visible;
-}
-
-/*
  * The row currently picked up in keyboard move mode. Dashed (vs the solid
- * drop-as-child target outline) reads as "in hand, not yet placed". The
- * grabbed row keeps focus, so content-visibility is already lifted off it;
- * the explicit rule keeps the dashed outline from being clipped regardless.
+ * drop-as-child target outline) reads as "in hand, not yet placed".
  */
 .menu-tree-ui-row--grabbed {
-  content-visibility: visible;
   outline: 2px dashed var(--mtu-color-focus);
   outline-offset: -2px;
   background-color: var(--mtu-color-focus-bg);
@@ -480,14 +382,6 @@ menu-tree {
 }
 
 /* ────────────────────────────────────────────────────── column cells */
-
-.menu-tree-ui-row__column {
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  min-width: 3rem;
-}
 
 /*
  * Toggle switch — role="switch" aria-checked button.

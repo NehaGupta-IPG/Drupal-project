@@ -29,26 +29,23 @@
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
 
   /**
-   * Builds the handle cell for a row.
+   * Builds the drag handle for a row.
    *
    * The handle is the per-row keyboard focus target (a real tab stop), with a
    * visually-hidden level indicator. Movable rows grab to reorder; the rest are
    * focusable for navigation but aria-disabled. The server decides via
-   * \Drupal\menu_tree_ui\MenuLinkMovability and sends item.movable.
+   * \Drupal\menu_tree_ui\MenuLinkMovability and sends item.movable. It lives
+   * inside the name cell so it indents with the title (see the row template).
    *
    * @param {object} item
    *   The ChildItem.
    * @param {number} depth
    *   The row's 1-based depth.
    *
-   * @return {HTMLTableCellElement}
-   *   The handle <td>.
+   * @return {HTMLSpanElement}
+   *   The handle element.
    */
-  function buildHandleCell(item, depth) {
-    const cell = document.createElement('td');
-    cell.setAttribute('role', 'gridcell');
-    cell.className = 'menu-tree-ui-row__cell menu-tree-ui-row__cell--handle';
-
+  function buildHandle(item, depth) {
     const handle = document.createElement('span');
     handle.setAttribute('role', 'button');
     handle.tabIndex = 0;
@@ -80,8 +77,7 @@
 
     handle.appendChild(icon);
     handle.appendChild(label);
-    cell.appendChild(handle);
-    return cell;
+    return handle;
   }
 
   /**
@@ -136,6 +132,7 @@
     name.className = 'menu-tree-ui-row__name';
     name.style.paddingInlineStart = `${(depth - 1) * 1.25}rem`;
 
+    name.appendChild(buildHandle(item, depth));
     name.appendChild(buildToggle(item));
 
     const title = document.createElement('span');
@@ -263,7 +260,6 @@
       .filter(Boolean)
       .join(' ');
 
-    tr.appendChild(buildHandleCell(item, depth));
     tr.appendChild(buildNameCell(item, depth));
     Object.entries(item.columns).forEach(([colId, cell]) => {
       tr.appendChild(buildColumnCell(colId, cell, item.id));

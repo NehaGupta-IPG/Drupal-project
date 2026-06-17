@@ -131,9 +131,6 @@
     <table role="treegrid" aria-label="{{ menu.label }}" class="menu-tree-ui__table">
       <thead>
         <tr>
-          <th scope="col" class="menu-tree-ui__col menu-tree-ui__col--handle">
-            <span class="visually-hidden">{{ 'Reorder'|t }}</span>
-          </th>
           <th scope="col" class="menu-tree-ui__col menu-tree-ui__col--name">{{ 'Name'|t }}</th>
           {% for col in columns %}
             <th scope="col" class="menu-tree-ui__col menu-tree-ui__col--data">{{ col.label }}</th>

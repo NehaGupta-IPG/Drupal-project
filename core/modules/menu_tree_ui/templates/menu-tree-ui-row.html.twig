@@ -40,39 +40,38 @@
   aria-selected="false"
 >
   {#
-    Handle cell. The handle is the per-row keyboard focus target (a real tab
-    stop), so it carries a visually-hidden level indicator and the link title.
-    Movable links (content links and static links that support parent/weight
-    overrides) grab to reorder; the rest are focusable for navigation but
-    aria-disabled. See \Drupal\menu_tree_ui\MenuLinkMovability.
+    Menu-link cell. Like the classic menu admin, the drag handle, expand toggle,
+    and title share one cell, and the whole group is indented by depth — so the
+    handle moves with the item. The handle is the per-row keyboard focus target
+    (a real tab stop) and carries a visually-hidden level indicator. Movable
+    links (content links and static links that support parent/weight overrides)
+    grab to reorder; the rest are focusable for navigation but aria-disabled.
+    See \Drupal\menu_tree_ui\MenuLinkMovability.
   #}
-  <td role="gridcell" class="menu-tree-ui-row__cell menu-tree-ui-row__cell--handle">
-    {% if movable %}
-      <span
-        class="menu-tree-ui-row__handle"
-        role="button"
-        tabindex="0"
-        title="{{ 'Drag to reorder'|t }}"
-      >
-        <span aria-hidden="true" class="menu-tree-ui-row__handle-icon"></span>
-        <span class="visually-hidden">{{ 'Reorder @title, level @level'|t({ '@title': title, '@level': depth }) }}</span>
-      </span>
-    {% else %}
-      <span
-        class="menu-tree-ui-row__handle menu-tree-ui-row__handle--locked"
-        role="button"
-        tabindex="0"
-        aria-disabled="true"
-      >
-        <span aria-hidden="true" class="menu-tree-ui-row__handle-icon">·</span>
-        <span class="visually-hidden">{{ '@title, level @level (locked)'|t({ '@title': title, '@level': depth }) }}</span>
-      </span>
-    {% endif %}
-  </td>
-
-  {# Name cell — indent + expand/collapse toggle + title + disabled badge. #}
   <td role="gridcell" class="menu-tree-ui-row__cell menu-tree-ui-row__cell--name">
     <div class="menu-tree-ui-row__name" style="padding-inline-start: {{ (depth - 1) * 1.25 }}rem;">
+      {% if movable %}
+        <span
+          class="menu-tree-ui-row__handle"
+          role="button"
+          tabindex="0"
+          title="{{ 'Drag to reorder'|t }}"
+        >
+          <span aria-hidden="true" class="menu-tree-ui-row__handle-icon"></span>
+          <span class="visually-hidden">{{ 'Reorder @title, level @level'|t({ '@title': title, '@level': depth }) }}</span>
+        </span>
+      {% else %}
+        <span
+          class="menu-tree-ui-row__handle menu-tree-ui-row__handle--locked"
+          role="button"
+          tabindex="0"
+          aria-disabled="true"
+        >
+          <span aria-hidden="true" class="menu-tree-ui-row__handle-icon">·</span>
+          <span class="visually-hidden">{{ '@title, level @level (locked)'|t({ '@title': title, '@level': depth }) }}</span>
+        </span>
+      {% endif %}
+
       {% if has_children %}
         <button
           type="button"
