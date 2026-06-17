@@ -3,16 +3,14 @@
  * IntersectionObserver-based row windowing for the menu tree.
  *
  * Strategy: every row is a normal DOM node, but rows far outside the viewport
- * get `data-virtualized="true"`, which the CSS uses to skip rendering the row
- * content (and reserve a fixed height). The browser's own `content-visibility:
- * auto` carries most of the load — this layer also handles stricter cases like
- * a subtree with thousands of siblings, where we want off-screen content to
- * cost ~nothing.
+ * get `data-virtualized="true"`, which the CSS uses to hide the row content
+ * (visibility:hidden) and reserve a fixed height. The tree is a real table, so
+ * every row is laid out regardless — this layer skips the *paint* of far-off
+ * rows, which is what keeps a level with thousands of siblings cheap to scroll.
  *
- * Why not pure content-visibility? Its heuristic still maintains the content's
- * layout box, and for very long lists the cumulative box-allocation cost is
- * non-zero. Forcing `visibility:hidden` + fixed height via this windowing is a
- * hard floor.
+ * (An earlier version paired this with `content-visibility: auto` to also skip
+ * off-screen layout, but containment is disallowed on table rows, so the table
+ * markup the admin theme styles wins out and layout cost is borne up front.)
  *
  * Exposes Drupal.menuTreeUi.RowWindow.
  */
@@ -67,9 +65,16 @@
      * @param {HTMLElement} root
      *   The host element rows live inside.
      * @param {string} [rootMargin]
-     *   Preload buffer for the IntersectionObserver.
+     *   Preload buffer for the IntersectionObserver — how far outside the
+     *   viewport a row is un-hidden ahead of being scrolled to. Generous on
+     *   purpose: on a large level the observer's callbacks lag, so a small
+     *   buffer leaves rows blank for a moment as they scroll in. The cost of a
+     *   wider buffer is only extra paint (every row is laid out regardless), so
+     *   we trade some paint for smoother scrolling. A scrollbar drag that
+     *   teleports past the buffer still flashes briefly; only true windowing
+     *   would remove that.
      */
-    constructor(root, rootMargin = '400px 0px') {
+    constructor(root, rootMargin = '1500px 0px') {
       this.observer = new IntersectionObserver(onIntersect, {
         root: findScrollParent(root),
         rootMargin,
