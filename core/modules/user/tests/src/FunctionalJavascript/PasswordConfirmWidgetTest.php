@@ -111,6 +111,12 @@ class PasswordConfirmWidgetTest extends WebDriverTestBase {
     $this->assertTrue($password_confirm_item->find('css', "$password_confirm_selector + .password-suggestions > ul > li")->isVisible());
     $this->assert->elementContains('css', "$password_confirm_widget_selector $password_parent_selector", '<div aria-live="polite" aria-atomic="true" class="password-strength__title">Password strength: <span class="password-strength__text" data-drupal-selector="password-strength-text">Weak</span></div>');
 
+    // Increasing password length should increase bar width.
+    $password_confirm_widget->fillField('Password', 'oooooo');
+    $this->assert->elementAttributeContains('css', 'input.js-password-field + .password-strength > [data-drupal-selector="password-strength-meter"] [data-drupal-selector="password-strength-indicator"]', 'style', 'width: 33.0421%;');
+    $password_confirm_widget->fillField('Password', 'ooooooo');
+    $this->assert->elementAttributeContains('css', 'input.js-password-field + .password-strength > [data-drupal-selector="password-strength-meter"] [data-drupal-selector="password-strength-indicator"]', 'style', 'width: 38.7489%;');
+
     // Now fill both the main and confirm input.
     $password_confirm_widget->fillField('Password', 'oooooooooO0∘');
     $password_confirm_widget->fillField('Confirm password', 'oooooooooO0∘');

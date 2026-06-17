@@ -272,7 +272,7 @@
     let indicatorText;
     let indicatorClass;
     let weaknesses = 0;
-    let strength = 100;
+    let strength = 20;
     let msg = [];
 
     const hasLowercase = /[a-z]/.test(password);
@@ -288,10 +288,12 @@
         ? $usernameBox[0].value
         : passwordSettings.username;
 
-    // Lose 5 points for every character less than 12, plus a 30 point penalty.
+    // Starting with 20 points for the first character, assign a decreasing
+    // number of strength points for each additional character.
+    strength += (password.length ** 0.2375 - 1) * 100;
+
     if (password.length < 12) {
       msg.push(passwordSettings.tooShort);
-      strength -= (12 - password.length) * 5 + 30;
     }
 
     // Count weaknesses.
@@ -327,6 +329,8 @@
         strength -= 40;
         break;
     }
+
+    strength = Math.min(strength, 100);
 
     // Check if password is the same as the username.
     if (password !== '' && password.toLowerCase() === username.toLowerCase()) {
