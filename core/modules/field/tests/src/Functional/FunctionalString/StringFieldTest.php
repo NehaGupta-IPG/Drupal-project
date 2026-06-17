@@ -116,4 +116,49 @@ class StringFieldTest extends BrowserTestBase {
     $this->assertStringContainsString($value, (string) $rendered_entity);
   }
 
+  /**
+   * Tests the textarea widget with a string field respects max_length.
+   */
+  public function testStringFieldWithTextareaWidget(): void {
+    $field_name = $this->randomMachineName();
+    $max_length = 50;
+
+    FieldStorageConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'entity_test',
+      'type' => 'string',
+      'settings' => [
+        'max_length' => $max_length,
+      ],
+    ])->save();
+    FieldConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'entity_test',
+      'bundle' => 'entity_test',
+      'label' => 'Test textarea string',
+    ])->save();
+
+    \Drupal::service('entity_display.repository')
+      ->getFormDisplay('entity_test', 'entity_test')
+      ->setComponent($field_name, [
+        'type' => 'string_textarea',
+        'settings' => [
+          'rows' => 3,
+        ],
+      ])
+      ->save();
+
+    $this->drupalGet('entity_test/add');
+    $this->assertSession()->fieldExists("{$field_name}[0][value]");
+    // Verify the textarea has the maxlength attribute.
+    $element = $this->assertSession()->elementExists('css', "textarea[name='{$field_name}[0][value]']");
+    $this->assertEquals($max_length, $element->getAttribute('maxlength'));
+
+    // Submit a value within the limit.
+    $value = $this->randomMachineName(20);
+    $this->submitForm(["{$field_name}[0][value]" => $value], 'Save');
+    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    $this->assertSession()->pageTextContains('entity_test ' . $match[1] . ' has been created.');
+  }
+
 }
