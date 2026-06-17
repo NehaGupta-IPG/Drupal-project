@@ -169,7 +169,7 @@ class LocalTasksBlock extends BlockBase implements ContainerFactoryPluginInterfa
    * {@inheritdoc}
    */
   public function createPlaceholder(): bool {
-    return TRUE;
+    return FALSE;
   }
 
 }

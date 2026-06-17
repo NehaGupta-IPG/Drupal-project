@@ -87,7 +87,7 @@ class LocalActionsBlock extends BlockBase implements ContainerFactoryPluginInter
    * {@inheritdoc}
    */
   public function createPlaceholder(): bool {
-    return TRUE;
+    return FALSE;
   }
 
 }
