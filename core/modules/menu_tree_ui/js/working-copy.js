@@ -71,7 +71,10 @@
    */
   function setupActions(bar) {
     const settings = drupalSettings.menuTreeUi ?? {};
-    const notice = bar.querySelector('.menu-tree-ui__unsaved');
+    // The unsaved notice lives at the top of the region, not in the action bar.
+    const notice = bar
+      .closest('.menu-tree-ui')
+      ?.querySelector('.menu-tree-ui__unsaved');
     const save = bar.querySelector('[data-mtu-action="save"]');
     const cancel = bar.querySelector('[data-mtu-action="cancel"]');
 
