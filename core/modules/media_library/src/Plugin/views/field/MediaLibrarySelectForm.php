@@ -184,7 +184,14 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
    */
   public function viewsFormValidate(array &$form, FormStateInterface $form_state) {
     $selected = array_filter($form_state->getValue($this->options['id']));
-    if (empty($selected)) {
+
+    // Also check the hidden selection field which contains selections from other pages.
+    $selection_field_id = $this->options['id'] . '_selection';
+    $hidden_selection = $form_state->getValue($selection_field_id);
+    $hidden_selected = $hidden_selection ? array_filter(explode(',', $hidden_selection)) : [];
+
+    // If no items are selected on current page and no items in hidden selection, show error.
+    if (empty($selected) && empty($hidden_selected)) {
       $form_state->setErrorByName('', $this->t('No items selected.'));
     }
   }
