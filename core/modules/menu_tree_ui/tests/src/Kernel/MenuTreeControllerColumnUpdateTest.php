@@ -78,6 +78,40 @@ final class MenuTreeControllerColumnUpdateTest extends KernelTestBase {
   }
 
   /**
+   * Renders the tree page without fataling on an orphaned content link.
+   *
+   * A content link whose entity has been deleted can linger in the menu tree as
+   * an orphaned plugin definition; resolving its edit route loads the missing
+   * entity and throws. The page must still render — the row from its cached
+   * definition, just without the Edit/Delete operations.
+   */
+  public function testOrphanedLinkDoesNotFatalPage(): void {
+    $entity = MenuLinkContent::create([
+      'title' => 'Orphan',
+      'link' => ['uri' => 'internal:/'],
+      'menu_name' => 'main',
+    ]);
+    $entity->save();
+
+    // Delete the entity's storage rows directly, bypassing the entity delete
+    // hook that would otherwise clean up the menu link — leaving the tree row
+    // behind as an orphan, the way a corrupted tree looks in the wild.
+    $storage = $this->container->get('entity_type.manager')->getStorage('menu_link_content');
+    $database = $this->container->get('database');
+    foreach ($storage->getTableMapping()->getTableNames() as $table) {
+      $database->delete($table)->condition('id', $entity->id())->execute();
+    }
+    $storage->resetCache();
+
+    // page() builds each row's operations eagerly; an unguarded edit route
+    // would throw on the orphan and take down the whole page.
+    $build = $this->controller->page($this->menu);
+
+    $this->assertIsArray($build);
+    $this->assertSame('menu_tree_ui_page', $build['#theme']);
+  }
+
+  /**
    * A valid JSON body with missing column_id/link_id must return 400.
    */
   public function testMissingFieldsReturns400(): void {

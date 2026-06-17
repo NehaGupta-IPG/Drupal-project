@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\menu_tree_ui\Controller;
 
+use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
@@ -462,7 +463,18 @@ final class MenuTreeController extends ControllerBase {
     $link = $element->link;
     $operations = [];
 
-    if ($edit_route = $link->getEditRoute()) {
+    // A content link whose entity was deleted can linger in the menu tree as an
+    // orphaned plugin definition; resolving its edit route loads the missing
+    // entity and throws. Skip the edit operation for such links rather than
+    // fataling the whole tree — the row still renders from the cached
+    // definition, and Delete is already omitted (the entity is not loaded).
+    try {
+      $edit_route = $link->getEditRoute();
+    }
+    catch (PluginException) {
+      $edit_route = NULL;
+    }
+    if ($edit_route) {
       $operations['edit'] = [
         'title' => $this->t('Edit'),
         'url' => $edit_route,
