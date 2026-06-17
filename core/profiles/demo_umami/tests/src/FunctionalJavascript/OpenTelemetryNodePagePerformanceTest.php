@@ -56,10 +56,10 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 201,
-      'CacheGetCount' => 224,
-      'CacheSetCount' => 226,
+      'CacheGetCount' => 223,
+      'CacheSetCount' => 225,
       'CacheDeleteCount' => 0,
-      'CacheTagLookupQueryCount' => 24,
+      'CacheTagLookupQueryCount' => 23,
       'CacheTagInvalidationCount' => 0,
       'ScriptCount' => 1,
       'ScriptBytes' => 12000,
@@ -119,11 +119,11 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 71,
-      'CacheGetCount' => 168,
+      'CacheGetCount' => 167,
       'CacheSetCount' => 59,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 19,
+      'CacheTagLookupQueryCount' => 18,
       'ScriptCount' => 1,
       'ScriptBytes' => 12000,
       'StylesheetCount' => 2,
@@ -216,7 +216,7 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 56,
-      'CacheGetCount' => 163,
+      'CacheGetCount' => 162,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 34,
@@ -226,13 +226,13 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
         'entity' => 21,
         'dynamic_page_cache' => 1,
         'routes' => 5,
-        'render' => 13,
+        'render' => 12,
         'default' => 3,
       ],
       'CacheSetCount' => 41,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 19,
+      'CacheTagLookupQueryCount' => 18,
       'CacheTagGroupedLookups' => [
         [
           'entity_types',
@@ -276,11 +276,9 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
           'taxonomy_term:31',
         ],
         [
-          'config:block_list',
-        ],
-        [
           'block_content:1',
           'block_content:2',
+          'config:block_list',
           'config:configurable_language_list',
         ],
         ['config:system.menu.footer'],
