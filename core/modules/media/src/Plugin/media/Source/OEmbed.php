@@ -4,6 +4,7 @@ namespace Drupal\media\Plugin\media\Source;
 
 use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Component\Utility\Crypt;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
@@ -11,17 +12,21 @@ use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\File\Exception\FileException;
+use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\GeneratedUrl;
 use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\Token;
+use Drupal\media\Attribute\OEmbedMediaSource;
 use Drupal\media\IFrameUrlHelper;
+use Drupal\media\MediaInterface;
+use Drupal\media\MediaSourceBase;
+use Drupal\media\MediaTypeInterface;
 use Drupal\media\OEmbed\Resource;
 use Drupal\media\OEmbed\ResourceException;
-use Drupal\media\MediaSourceBase;
-use Drupal\media\MediaInterface;
-use Drupal\media\MediaTypeInterface;
 use Drupal\media\OEmbed\ResourceFetcherInterface;
 use Drupal\media\OEmbed\UrlResolverInterface;
 use GuzzleHttp\ClientInterface;
@@ -65,17 +70,15 @@ use Symfony\Component\Mime\MimeTypes;
  * define a new class which extends it. With the code above, you will able to
  * create media types which use the "Artwork" source plugin, and use those media
  * types to link to assets on Deviantart and Flickr.
- *
- * @MediaSource(
- *   id = "oembed",
- *   label = @Translation("oEmbed source"),
- *   description = @Translation("Use oEmbed URL for reusable media."),
- *   allowed_field_types = {"string"},
- *   default_thumbnail_filename = "no-thumbnail.png",
- *   deriver = "Drupal\media\Plugin\media\Source\OEmbedDeriver",
- *   providers = {},
- * )
  */
+#[OEmbedMediaSource(
+  id: "oembed",
+  label: new TranslatableMarkup("oEmbed source"),
+  description: new TranslatableMarkup("Use oEmbed URL for reusable media."),
+  allowed_field_types: ["string"],
+  default_thumbnail_filename: "no-thumbnail.png",
+  deriver: OEmbedDeriver::class,
+)]
 class OEmbed extends MediaSourceBase implements OEmbedInterface {
 
   /**
@@ -140,7 +143,7 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -301,6 +304,14 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
       case 'html':
         return $resource->getHtml();
 
+      case self::METADATA_ATTRIBUTE_LINK_TARGET:
+        // @see \Drupal\media\Entity\MediaLinkTarget
+        return (new GeneratedUrl())
+          ->setGeneratedUrl($media_url)
+          // No processing means permanent cacheability: this only changes when
+          // the parent Media entity changes.
+          ->setCacheMaxAge(Cache::PERMANENT);
+
       default:
         break;
     }
@@ -387,7 +398,7 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
    *
    * @param \Drupal\media\OEmbed\Resource $resource
    *   The oEmbed resource.
-   * @param \Drupal\media\MediaInterface|null $media
+   * @param \Drupal\media\MediaInterface $media
    *   The media entity that contains the resource.
    *
    * @return string|null
@@ -399,14 +410,8 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
    * toggle-able. See https://www.drupal.org/project/drupal/issues/2962751 for
    * more information.
    */
-  protected function getLocalThumbnailUri(Resource $resource, MediaInterface $media = NULL) {
-    if (is_null($media)) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $media argument is deprecated in drupal:10.3.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/3432920', E_USER_DEPRECATED);
-      $token_data = [];
-    }
-    else {
-      $token_data = ['date' => $media->getCreatedTime()];
-    }
+  protected function getLocalThumbnailUri(Resource $resource, MediaInterface $media) {
+    $token_data = ['date' => $media->getCreatedTime()];
 
     // If there is no remote thumbnail, there's nothing for us to fetch here.
     $remote_thumbnail_url = $resource->getThumbnailUrl();
@@ -451,7 +456,7 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
       $response = $this->httpClient->request('GET', $remote_thumbnail_url);
       if ($response->getStatusCode() === 200) {
         $local_thumbnail_uri = $directory . DIRECTORY_SEPARATOR . $hash . '.' . $this->getThumbnailFileExtensionFromUrl($remote_thumbnail_url, $response);
-        $this->fileSystem->saveData((string) $response->getBody(), $local_thumbnail_uri, FileSystemInterface::EXISTS_REPLACE);
+        $this->fileSystem->saveData((string) $response->getBody(), $local_thumbnail_uri, FileExists::Replace);
         return $local_thumbnail_uri;
       }
     }
@@ -460,7 +465,7 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
         '%error' => $e->getMessage(),
       ]);
     }
-    catch (FileException $e) {
+    catch (FileException) {
       $this->logger->warning('Could not download remote thumbnail from {url}.', [
         'url' => $remote_thumbnail_url,
       ]);

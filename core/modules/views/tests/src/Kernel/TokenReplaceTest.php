@@ -1,19 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel;
 
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests core view token replacement.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class TokenReplaceTest extends ViewsKernelTestBase {
-
-  protected static $modules = ['system'];
 
   /**
    * Views used by this test.
@@ -25,7 +27,7 @@ class TokenReplaceTest extends ViewsKernelTestBase {
   /**
    * Tests core token replacements generated from a view.
    */
-  public function testTokenReplacement() {
+  public function testTokenReplacement(): void {
     $token_handler = \Drupal::token();
     $view = Views::getView('test_tokens');
     $view->setDisplay('page_1');
@@ -72,7 +74,7 @@ class TokenReplaceTest extends ViewsKernelTestBase {
   /**
    * Tests core token replacements generated from a view.
    */
-  public function testTokenReplacementWithMiniPager() {
+  public function testTokenReplacementWithMiniPager(): void {
     $token_handler = \Drupal::token();
     $view = Views::getView('test_tokens');
     $view->setDisplay('page_3');
@@ -143,7 +145,7 @@ class TokenReplaceTest extends ViewsKernelTestBase {
   /**
    * Tests core token replacements generated from a view without results.
    */
-  public function testTokenReplacementNoResults() {
+  public function testTokenReplacementNoResults(): void {
     $token_handler = \Drupal::token();
     $view = Views::getView('test_tokens');
     $view->setDisplay('page_2');
@@ -162,7 +164,7 @@ class TokenReplaceTest extends ViewsKernelTestBase {
   /**
    * Tests path token replacements generated from a view without a path.
    */
-  public function testTokenReplacementNoPath() {
+  public function testTokenReplacementNoPath(): void {
     $token_handler = \Drupal::token();
     $view = Views::getView('test_invalid_tokens');
     $view->setDisplay('block_1');

@@ -6,12 +6,14 @@ namespace Drupal\Tests\content_translation\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that contextual links are available for content translation.
- *
- * @group content_translation
  */
+#[Group('content_translation')]
+#[RunTestsInSeparateProcesses]
 class ContentTranslationContextualLinksTest extends WebDriverTestBase {
 
   /**
@@ -61,7 +63,7 @@ class ContentTranslationContextualLinksTest extends WebDriverTestBase {
   /**
    * Tests that a contextual link is available for translating a node.
    */
-  public function testContentTranslationContextualLinks() {
+  public function testContentTranslationContextualLinks(): void {
     $node = $this->drupalCreateNode(['type' => 'page', 'title' => 'Test']);
 
     // Check that the translate link appears on the node page.

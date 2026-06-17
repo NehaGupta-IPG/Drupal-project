@@ -6,6 +6,7 @@ use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\UpdateBuildIdCommand;
 use Drupal\Core\Render\MainContent\MainContentRendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Utility\CallableResolver;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -17,31 +18,11 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  */
 class FormAjaxResponseBuilder implements FormAjaxResponseBuilderInterface {
 
-  /**
-   * The main content to AJAX Response renderer.
-   *
-   * @var \Drupal\Core\Render\MainContent\MainContentRendererInterface
-   */
-  protected $ajaxRenderer;
-
-  /**
-   * The current route match.
-   *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
-   */
-  protected $routeMatch;
-
-  /**
-   * Constructs a new FormAjaxResponseBuilder.
-   *
-   * @param \Drupal\Core\Render\MainContent\MainContentRendererInterface $ajax_renderer
-   *   The ajax renderer.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The current route match.
-   */
-  public function __construct(MainContentRendererInterface $ajax_renderer, RouteMatchInterface $route_match) {
-    $this->ajaxRenderer = $ajax_renderer;
-    $this->routeMatch = $route_match;
+  public function __construct(
+    protected MainContentRendererInterface $ajaxRenderer,
+    protected RouteMatchInterface $routeMatch,
+    protected CallableResolver $callableResolver,
+  ) {
   }
 
   /**
@@ -63,8 +44,14 @@ class FormAjaxResponseBuilder implements FormAjaxResponseBuilderInterface {
       $callback = $triggering_element['#ajax']['callback'];
     }
     $callback = $form_state->prepareCallback($callback);
-    if (empty($callback) || !is_callable($callback)) {
+    if (empty($callback)) {
       throw new HttpException(500, 'The specified #ajax callback is empty or not callable.');
+    }
+    try {
+      $callback = $this->callableResolver->getCallableFromDefinition($callback);
+    }
+    catch (\InvalidArgumentException $e) {
+      throw new HttpException(500, 'The specified #ajax callback is empty or not callable.', $e);
     }
     $result = call_user_func_array($callback, [&$form, &$form_state, $request]);
 
@@ -79,7 +66,7 @@ class FormAjaxResponseBuilder implements FormAjaxResponseBuilderInterface {
       // At this point we know callback returned a render element. If the
       // element is part of the group (#group is set on it) it won't be rendered
       // unless we remove #group from it. This is caused by
-      // \Drupal\Core\Render\Element\RenderElement::preRenderGroup(), which
+      // \Drupal\Core\Render\Element\RenderElementBase::preRenderGroup(), which
       // prevents all members of groups from being rendered directly.
       if (!empty($result['#group'])) {
         unset($result['#group']);

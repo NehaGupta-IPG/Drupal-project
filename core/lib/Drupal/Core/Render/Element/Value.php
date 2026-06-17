@@ -3,7 +3,6 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Render\Attribute\FormElement;
-use Drupal\Core\Render\Element\FormElement as FormElementBase;
 
 /**
  * Provides a form element for storage of internal information.
@@ -17,7 +16,7 @@ use Drupal\Core\Render\Element\FormElement as FormElementBase;
  *
  * Usage Example:
  * @code
- * $form['entity_id'] = array('#type' => 'value', '#value' => $entity_id);
+ * $form['entity_id'] = ['#type' => 'value', '#value' => $entity_id];
  * @endcode
  */
 #[FormElement('value')]

@@ -5,108 +5,40 @@
  * Post update functions for the Help module.
  */
 
-use Drupal\Core\Config\Entity\ConfigEntityUpdater;
-use Drupal\search\Entity\SearchPage;
-use Drupal\user\RoleInterface;
-
 /**
- * Install or update config for help topics if the search module installed.
+ * Implements hook_removed_post_updates().
  */
-function help_post_update_help_topics_search() {
-  $module_handler = \Drupal::moduleHandler();
-  if (!$module_handler->moduleExists('search')) {
-    // No dependencies to update or install.
-    return;
-  }
-  if ($module_handler->moduleExists('help_topics')) {
-    if ($page = SearchPage::load('help_search')) {
-      // Resave to update module dependency.
-      $page->save();
-    }
-  }
-  else {
-    $factory = \Drupal::configFactory();
-    // Install optional config for the search page.
-    $config = $factory->getEditable('search.page.help_search');
-    $config->setData([
-      'langcode' => 'en',
-      'status' => TRUE,
-      'dependencies' => [
-        'module' => [
-          'help',
-        ],
-      ],
-      'id' => 'help_search',
-      'label' => 'Help',
-      'path' => 'help',
-      'weight' => 0,
-      'plugin' => 'help_search',
-      'configuration' => [],
-    ])->save(TRUE);
-    if (\Drupal::service('theme_handler')->themeExists('claro') && $factory->get('block.block.claro_help_search')->isNew()) {
-      // Optional block only if it's not created manually earlier.
-      $config = $factory->getEditable('block.block.claro_help_search');
-      $config->setData([
-        'langcode' => 'en',
-        'status' => TRUE,
-        'dependencies' => [
-          'module' => [
-            'search',
-            'system',
-          ],
-          'theme' => [
-            'claro',
-          ],
-          'enforced' => [
-            'config' => [
-              'search.page.help_search',
-            ],
-          ],
-        ],
-        'id' => 'claro_help_search',
-        'theme' => 'claro',
-        'region' => 'help',
-        'weight' => -4,
-        'provider' => NULL,
-        'plugin' => 'search_form_block',
-        'settings' => [
-          'id' => 'search_form_block',
-          'label' => 'Search help',
-          'label_display' => 'visible',
-          'provider' => 'search',
-          'page_id' => 'help_search',
-        ],
-        'visibility' => [
-          'request_path' => [
-            'id' => 'request_path',
-            'negate' => FALSE,
-            'context_mapping' => [],
-            'pages' => '/admin/help',
-          ],
-        ],
-      ])->save(TRUE);
-    }
-  }
+function help_removed_post_updates(): array {
+  return [
+    'help_post_update_help_topics_search' => '11.0.0',
+    'help_post_update_help_topics_uninstall' => '11.0.0',
+    'help_post_update_add_permissions_to_roles' => '11.0.0',
+  ];
 }
 
 /**
- * Uninstall the help_topics module if installed.
+ * Update config entity dependencies to the Search Help module, if necessary.
+ *
+ * @see system_update_11400()
  */
-function help_post_update_help_topics_uninstall() {
-  if (\Drupal::moduleHandler()->moduleExists('help_topics')) {
-    \Drupal::service('module_installer')->uninstall(['help_topics'], FALSE);
-  }
-}
-
-/**
- * Grant all admin roles the 'access help pages' permission.
- */
-function help_post_update_add_permissions_to_roles(?array &$sandbox = []): void {
-  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'user_role', function (RoleInterface $role): bool {
-    if ($role->isAdmin() || !$role->hasPermission('access administration pages')) {
-      return FALSE;
+function help_post_update_search_help_dependencies(): void {
+  if (\Drupal::moduleHandler()->moduleExists('search')) {
+    // @todo https://www.drupal.org/project/drupal/issues/3587570 Determine why
+    //   the search.page.help_search config entity does not have a UUID in the
+    //   11.3 test database dump. This means it is not discovered as a config
+    //   entity dependency of the help module.
+    $search_page_config = \Drupal::configFactory()->getEditable('search.page.help_search');
+    if (!$search_page_config->isNew() && $search_page_config->get('uuid') === NULL) {
+      $search_page_config->set('uuid', \Drupal::service('uuid')->generate())->save();
     }
-    $role->grantPermission('access help pages');
-    return TRUE;
-  });
+
+    // Update the dependencies of all help config entities if they have
+    // changed.
+    foreach (\Drupal::service('config.manager')->findConfigEntityDependenciesAsEntities('module', ['help']) as $entity) {
+      $dependencies = $entity->getDependencies();
+      if ($entity->calculateDependencies()->getDependencies() !== $dependencies) {
+        $entity->save();
+      }
+    }
+  }
 }

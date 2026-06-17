@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\action_bulk_test\Plugin\Action;
 
 use Drupal\Core\Access\AccessResult;
@@ -23,14 +25,14 @@ class TestAction extends ActionBase {
   /**
    * {@inheritdoc}
    */
-  public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE): bool|AccessResultInterface {
+  public function access($object, ?AccountInterface $account = NULL, $return_as_object = FALSE): bool|AccessResultInterface {
     return $return_as_object ? AccessResult::allowed() : TRUE;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function execute(): void {
+  public function execute(?object $object = NULL): void {
   }
 
 }

@@ -4,19 +4,24 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\serialization\Unit\EntityResolver;
 
-use Drupal\Tests\UnitTestCase;
 use Drupal\serialization\EntityResolver\ChainEntityResolver;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * @coversDefaultClass \Drupal\serialization\EntityResolver\ChainEntityResolver
- * @group serialization
+ * Tests Drupal\serialization\EntityResolver\ChainEntityResolver.
  */
+#[CoversClass(ChainEntityResolver::class)]
+#[Group('serialization')]
 class ChainEntityResolverTest extends UnitTestCase {
 
   /**
    * A mocked normalizer.
    *
-   * @var \Symfony\Component\Serializer\Normalizer\NormalizerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Symfony\Component\Serializer\Normalizer\NormalizerInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $testNormalizer;
 
@@ -40,17 +45,17 @@ class ChainEntityResolverTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->testNormalizer = $this->createMock('Symfony\Component\Serializer\Normalizer\NormalizerInterface');
+    $this->testNormalizer = $this->createStub(NormalizerInterface::class);
     $this->testData = new \stdClass();
   }
 
   /**
    * Tests the resolve method with no matching resolvers.
    *
-   * @covers ::__construct
-   * @covers ::resolve
+   * @legacy-covers ::__construct
+   * @legacy-covers ::resolve
    */
-  public function testResolverWithNoneResolved() {
+  public function testResolverWithNoneResolved(): void {
     $resolvers = [
       $this->createEntityResolverMock(),
       $this->createEntityResolverMock(),
@@ -64,10 +69,10 @@ class ChainEntityResolverTest extends UnitTestCase {
   /**
    * Tests the resolve method with no matching resolvers, using addResolver.
    *
-   * @covers ::addResolver
-   * @covers ::resolve
+   * @legacy-covers ::addResolver
+   * @legacy-covers ::resolve
    */
-  public function testResolverWithNoneResolvedUsingAddResolver() {
+  public function testResolverWithNoneResolvedUsingAddResolver(): void {
     $resolver = new ChainEntityResolver();
     $resolver->addResolver($this->createEntityResolverMock());
     $resolver->addResolver($this->createEntityResolverMock());
@@ -78,10 +83,10 @@ class ChainEntityResolverTest extends UnitTestCase {
   /**
    * Tests the resolve method with a matching resolver first.
    *
-   * @covers ::__construct
-   * @covers ::resolve
+   * @legacy-covers ::__construct
+   * @legacy-covers ::resolve
    */
-  public function testResolverWithFirstResolved() {
+  public function testResolverWithFirstResolved(): void {
     $resolvers = [
       $this->createEntityResolverMock(10),
       $this->createEntityResolverMock(NULL, FALSE),
@@ -95,10 +100,10 @@ class ChainEntityResolverTest extends UnitTestCase {
   /**
    * Tests the resolve method with a matching resolver last.
    *
-   * @covers ::__construct
-   * @covers ::resolve
+   * @legacy-covers ::__construct
+   * @legacy-covers ::resolve
    */
-  public function testResolverWithLastResolved() {
+  public function testResolverWithLastResolved(): void {
     $resolvers = [
       $this->createEntityResolverMock(),
       $this->createEntityResolverMock(10),
@@ -112,10 +117,10 @@ class ChainEntityResolverTest extends UnitTestCase {
   /**
    * Tests the resolve method where one resolver returns 0.
    *
-   * @covers ::__construct
-   * @covers ::resolve
+   * @legacy-covers ::__construct
+   * @legacy-covers ::resolve
    */
-  public function testResolverWithResolvedToZero() {
+  public function testResolverWithResolvedToZero(): void {
     $resolvers = [
       $this->createEntityResolverMock(0),
       $this->createEntityResolverMock(NULL, FALSE),
@@ -137,7 +142,7 @@ class ChainEntityResolverTest extends UnitTestCase {
    * @return \Drupal\serialization\EntityResolver\EntityResolverInterface|\PHPUnit\Framework\MockObject\MockObject
    *   The mocked entity resolver.
    */
-  protected function createEntityResolverMock($return = NULL, $called = TRUE) {
+  protected function createEntityResolverMock($return = NULL, $called = TRUE): MockObject {
     $mock = $this->createMock('Drupal\serialization\EntityResolver\EntityResolverInterface');
 
     if ($called) {

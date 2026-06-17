@@ -9,19 +9,21 @@ use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
 use Drupal\update\UpdateFetcher;
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Psr\Log\LoggerInterface;
 
 /**
  * Tests update functionality unrelated to the database.
- *
- * @coversDefaultClass \Drupal\update\UpdateFetcher
- *
- * @group update
  */
+#[CoversClass(UpdateFetcher::class)]
+#[Group('update')]
 class UpdateFetcherTest extends UnitTestCase {
 
   /**
@@ -72,7 +74,7 @@ class UpdateFetcherTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     $this->mockConfigFactory = $this->getConfigFactoryStub(['update.settings' => ['fetch_url' => 'http://www.example.com']]);
-    $this->mockHttpClient = $this->createMock('\GuzzleHttp\ClientInterface');
+    $this->mockHttpClient = $this->createStub(ClientInterface::class);
     $settings = new Settings([]);
     $this->logger = new TestLogger();
     $this->updateFetcher = new UpdateFetcher($this->mockConfigFactory, $this->mockHttpClient, $settings, $this->logger);
@@ -98,11 +100,10 @@ class UpdateFetcherTest extends UnitTestCase {
    * @param string $expected
    *   The expected URL returned from UpdateFetcher::buildFetchUrl()
    *
-   * @dataProvider providerTestUpdateBuildFetchUrl
-   *
    * @see \Drupal\update\UpdateFetcher::buildFetchUrl()
    */
-  public function testUpdateBuildFetchUrl(array $project, $site_key, $expected) {
+  #[DataProvider('providerTestUpdateBuildFetchUrl')]
+  public function testUpdateBuildFetchUrl(array $project, $site_key, $expected): void {
     $url = $this->updateFetcher->buildFetchUrl($project, $site_key);
     $this->assertEquals($url, $expected);
     $this->assertFalse($this->logger->hasErrorRecords());
@@ -117,7 +118,7 @@ class UpdateFetcherTest extends UnitTestCase {
    *   - 'site_key' - An arbitrary site key.
    *   - 'expected' - The expected URL from UpdateFetcher::buildFetchUrl().
    */
-  public static function providerTestUpdateBuildFetchUrl() {
+  public static function providerTestUpdateBuildFetchUrl(): array {
     $data = [];
 
     // First test that we didn't break the trivial case.
@@ -160,10 +161,10 @@ class UpdateFetcherTest extends UnitTestCase {
   /**
    * Mocks the HTTP client.
    *
-   * @param \GuzzleHttp\Psr7\Response ...
+   * @param \GuzzleHttp\Psr7\Response ...$responses
    *   Variable number of Response objects that the mocked client should return.
    */
-  protected function mockClient(Response ...$responses) {
+  protected function mockClient(Response ...$responses): void {
     // Create a mock and queue responses.
     $mock_handler = new MockHandler($responses);
     $handler_stack = HandlerStack::create($mock_handler);
@@ -173,10 +174,12 @@ class UpdateFetcherTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::doRequest
-   * @covers ::fetchProjectData
+   * Tests update fetcher no fallback.
+   *
+   * @legacy-covers ::doRequest
+   * @legacy-covers ::fetchProjectData
    */
-  public function testUpdateFetcherNoFallback() {
+  public function testUpdateFetcherNoFallback(): void {
     // First, try without the HTTP fallback setting, and HTTPS mocked to fail.
     $settings = new Settings([]);
     $this->mockClient(
@@ -196,16 +199,18 @@ class UpdateFetcherTest extends UnitTestCase {
     $this->assertEquals(500, $response->getStatusCode());
     $this->assertEmpty($data);
 
-    $this->assertTrue($this->logger->hasErrorThatPasses(function (array $record) {
+    $this->assertTrue($this->logger->hasErrorThatPasses(function (array $record): bool {
       return $record['context']['@message'] === "Server error: `GET https://www.example.com/update_test/current` resulted in a `500 Internal Server Error` response:\nHTTPS failed\n";
     }));
   }
 
   /**
-   * @covers ::doRequest
-   * @covers ::fetchProjectData
+   * Tests update fetcher http fallback.
+   *
+   * @legacy-covers ::doRequest
+   * @legacy-covers ::fetchProjectData
    */
-  public function testUpdateFetcherHttpFallback() {
+  public function testUpdateFetcherHttpFallback(): void {
     $settings = new Settings(['update_fetch_with_http_fallback' => TRUE]);
     $this->mockClient(
       new Response(500, [], 'HTTPS failed'),
@@ -232,7 +237,7 @@ class UpdateFetcherTest extends UnitTestCase {
     // Although this is a bogus mocked response, it's what fetchProjectData()
     // should return in this case.
     $this->assertEquals('HTTP worked', $data);
-    $this->assertTrue($this->logger->hasErrorThatPasses(function (array $record) {
+    $this->assertTrue($this->logger->hasErrorThatPasses(function (array $record): bool {
       return $record['context']['@message'] === "Server error: `GET https://www.example.com/update_test/current` resulted in a `500 Internal Server Error` response:\nHTTPS failed\n";
     }));
   }

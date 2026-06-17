@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\language\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests language picker compatibility with hook_entity_field_access.
- *
- * @group language
  */
+#[Group('language')]
+#[RunTestsInSeparateProcesses]
 class LanguageEntityFieldAccessHookTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'node',
@@ -35,7 +35,7 @@ class LanguageEntityFieldAccessHookTest extends BrowserTestBase {
   /**
    * Tests compatibility with hook_entity_field_access().
    */
-  public function testHookEntityFieldAccess() {
+  public function testHookEntityFieldAccess(): void {
     // Create an admin user and do the login.
     $user = $this->drupalCreateUser([], NULL, TRUE);
     $this->drupalLogin($user);

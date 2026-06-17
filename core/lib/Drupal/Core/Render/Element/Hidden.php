@@ -4,7 +4,6 @@ namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
-use Drupal\Core\Render\Element\FormElement as FormElementBase;
 
 /**
  * Provides a form element for an HTML 'hidden' input element.
@@ -19,7 +18,7 @@ use Drupal\Core\Render\Element\FormElement as FormElementBase;
  *
  * Usage example:
  * @code
- * $form['entity_id'] = array('#type' => 'hidden', '#value' => $entity_id);
+ * $form['entity_id'] = ['#type' => 'hidden', '#value' => $entity_id];
  * @endcode
  *
  * @see \Drupal\Core\Render\Element\Value
@@ -31,14 +30,13 @@ class Hidden extends FormElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#input' => TRUE,
       '#process' => [
-        [$class, 'processAjaxForm'],
+        [static::class, 'processAjaxForm'],
       ],
       '#pre_render' => [
-        [$class, 'preRenderHidden'],
+        [static::class, 'preRenderHidden'],
       ],
       '#theme' => 'input__hidden',
     ];

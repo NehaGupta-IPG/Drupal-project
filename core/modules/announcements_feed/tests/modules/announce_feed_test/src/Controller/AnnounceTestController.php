@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\announce_feed_test\Controller;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -30,6 +32,11 @@ class AnnounceTestController {
     if (!is_file($file)) {
       // Return an empty response.
       return new Response('', 404, $headers);
+    }
+    // The updated json feed is changed by the test to use the current major
+    // version and save in the public file system.
+    if ($json_name === "updated") {
+      return new JsonResponse(file_get_contents("public://updated.json"), 200, $headers, TRUE);
     }
     return new JsonResponse(file_get_contents($file), 200, $headers, TRUE);
   }

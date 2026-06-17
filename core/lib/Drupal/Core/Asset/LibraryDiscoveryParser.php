@@ -2,8 +2,6 @@
 
 namespace Drupal\Core\Asset;
 
-use Drupal\Component\FileCache\FileCacheFactory;
-use Drupal\Component\FileCache\FileCacheInterface;
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Asset\Exception\IncompleteLibraryDefinitionException;
@@ -12,10 +10,11 @@ use Drupal\Core\Asset\Exception\InvalidLibraryFileException;
 use Drupal\Core\Asset\Exception\LibraryDefinitionMissingLicenseException;
 use Drupal\Core\Extension\ExtensionPathResolver;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Drupal\Core\Theme\ComponentPluginManager;
+use Drupal\Core\Theme\ActiveTheme;
 use Drupal\Core\Theme\ThemeManagerInterface;
+use Drupal\Core\Utility\YamlCacheCollector;
 use Drupal\Core\Plugin\Component;
 
 /**
@@ -23,93 +22,20 @@ use Drupal\Core\Plugin\Component;
  */
 class LibraryDiscoveryParser {
 
-  /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * The theme manager.
-   *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface
-   */
-  protected $themeManager;
-
-  /**
-   * The app root.
-   *
-   * @var string
-   */
-  protected $root;
-
-  /**
-   * The stream wrapper manager.
-   *
-   * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface
-   */
-  protected $streamWrapperManager;
-
-  /**
-   * The libraries directory file finder.
-   *
-   * @var \Drupal\Core\Asset\LibrariesDirectoryFileFinder
-   */
-  protected $librariesDirectoryFileFinder;
-
-  /**
-   * The component plugin manager.
-   *
-   * @var \Drupal\Core\Theme\ComponentPluginManager
-   */
-  protected $componentPluginManager;
-
-  /**
-   * The extension path resolver.
-   *
-   * @var \Drupal\Core\Extension\ExtensionPathResolver
-   */
-  protected $extensionPathResolver;
-
-  /**
-   * The file cache.
-   *
-   * @var \Drupal\Component\FileCache\FileCacheInterface
-   */
-  protected FileCacheInterface $fileCache;
-
-  /**
-   * Constructs a new LibraryDiscoveryParser instance.
-   *
-   * @param string $root
-   *   The app root.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
-   *   The theme manager.
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager
-   *   The stream wrapper manager.
-   * @param \Drupal\Core\Asset\LibrariesDirectoryFileFinder $libraries_directory_file_finder
-   *   The libraries directory file finder.
-   * @param \Drupal\Core\Extension\ExtensionPathResolver $extension_path_resolver
-   *   The extension path resolver.
-   * @param \Drupal\Core\Theme\ComponentPluginManager|null $component_plugin_manager
-   *   The component plugin manager.
-   */
-  public function __construct($root, ModuleHandlerInterface $module_handler, ThemeManagerInterface $theme_manager, StreamWrapperManagerInterface $stream_wrapper_manager, LibrariesDirectoryFileFinder $libraries_directory_file_finder, ExtensionPathResolver $extension_path_resolver, ?ComponentPluginManager $component_plugin_manager = NULL) {
-    $this->root = $root;
-    $this->moduleHandler = $module_handler;
-    $this->themeManager = $theme_manager;
-    $this->streamWrapperManager = $stream_wrapper_manager;
-    $this->librariesDirectoryFileFinder = $libraries_directory_file_finder;
-    $this->extensionPathResolver = $extension_path_resolver;
-    $this->fileCache = FileCacheFactory::get('library_parser');
-    if (!isset($component_plugin_manager)) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $component_plugin_manager argument is deprecated in drupal:10.3.0 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3410260', E_USER_DEPRECATED);
-      $component_plugin_manager = \Drupal::service('plugin.manager.sdc');
+  public function __construct(
+    protected string $appRoot,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected ThemeManagerInterface $themeManager,
+    protected StreamWrapperManagerInterface $streamWrapperManager,
+    protected LibrariesDirectoryFileFinder $librariesDirectoryFileFinder,
+    protected ExtensionPathResolver $extensionPathResolver,
+    protected ComponentPluginManager $componentPluginManager,
+    protected ?YamlCacheCollector $yamlCacheCollector = NULL,
+  ) {
+    if (!isset($yamlCacheCollector)) {
+      $this->yamlCacheCollector = \Drupal::service('libraries.parsing_cache');
+      @trigger_error('Calling ' . __METHOD__ . '() without the $yamlCacheCollector argument is deprecated in drupal:11.4.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3486503', E_USER_DEPRECATED);
     }
-    $this->componentPluginManager = $component_plugin_manager;
   }
 
   /**
@@ -160,7 +86,7 @@ class LibraryDiscoveryParser {
       if (!isset($library['js']) && !isset($library['css']) && !isset($library['drupalSettings']) && !isset($library['dependencies'])) {
         throw new IncompleteLibraryDefinitionException(sprintf("Incomplete library definition for definition '%s' in extension '%s'", $id, $extension));
       }
-      $library += ['dependencies' => [], 'js' => [], 'css' => []];
+      $library += ['dependencies' => [], 'js' => [], 'css' => [], 'fonts' => []];
 
       if (isset($library['header']) && !is_bool($library['header'])) {
         throw new \LogicException(sprintf("The 'header' key in the library definition '%s' in extension '%s' is invalid: it must be a boolean.", $id, $extension));
@@ -185,13 +111,13 @@ class LibraryDiscoveryParser {
       // Assign Drupal's license to libraries that don't have license info.
       if (!isset($library['license'])) {
         $library['license'] = [
-          'name' => 'GNU-GPL-2.0-or-later',
+          'name' => 'GPL-2.0-or-later',
           'url' => 'https://www.drupal.org/licensing/faq',
           'gpl-compatible' => TRUE,
         ];
       }
 
-      foreach (['js', 'css'] as $type) {
+      foreach (['js', 'css', 'fonts'] as $type) {
         // Prepare (flatten) the SMACSS-categorized definitions.
         // @todo After Asset(ic) changes, retain the definitions as-is and
         //   properly resolve dependencies for all (css) libraries per category,
@@ -230,7 +156,10 @@ class LibraryDiscoveryParser {
             $options['group'] = JS_LIBRARY;
           }
           elseif ($type == 'css') {
-            $options['group'] = $extension_type == 'theme' ? CSS_AGGREGATE_THEME : CSS_AGGREGATE_DEFAULT;
+            // Component stylesheets should be added in the "theme" aggregate
+            // group to load them alongside the theme.
+            // @see \Drupal\Core\Plugin\Component::getLibraryName
+            $options['group'] = ($extension_type == 'theme' || str_starts_with($id, 'components.')) ? CSS_AGGREGATE_THEME : CSS_AGGREGATE_DEFAULT;
           }
           // By default, all library assets are files.
           if (!isset($options['type'])) {
@@ -264,7 +193,7 @@ class LibraryDiscoveryParser {
             elseif ($this->streamWrapperManager->isValidUri($source)) {
               $options['data'] = $source;
             }
-            // A regular URI (e.g., http://example.com/example.js) without
+            // A regular URI (e.g., https://example.com/example.js) without
             // 'external' explicitly specified, which may happen if, e.g.
             // libraries-override is used.
             elseif ($this->isValidUri($source)) {
@@ -361,7 +290,9 @@ class LibraryDiscoveryParser {
    *   repository URL for reference.
    * - license: If the remote property is set, the license information is
    *   required. It has 3 properties:
-   *   - name: The human-readable name of the license.
+   *   - name: A System Package Data Exchange (SPDX) license identifier such as
+   *     "GPL-2.0-or-later" (see https://spdx.org/licenses/), or if not
+   *     applicable, the human-readable name of the license.
    *   - url: The URL of the license file/information for the version of the
    *     library used.
    *   - gpl-compatible: A Boolean for whether this library is GPL compatible.
@@ -384,23 +315,18 @@ class LibraryDiscoveryParser {
     $libraries = [];
 
     $library_file = $path . '/' . $extension . '.libraries.yml';
-    $library_path = $this->root . '/' . $library_file;
+    $library_path = $this->appRoot . '/' . $library_file;
 
-    if (file_exists($library_path)) {
-      $libraries = $this->fileCache->get($library_path);
-      if ($libraries === NULL) {
-        try {
-          $libraries = Yaml::decode(file_get_contents($this->root . '/' . $library_file)) ?? [];
-          $this->fileCache->set($library_path, $libraries);
-        }
-        catch (InvalidDataTypeException $e) {
-          // Rethrow a more helpful exception to provide context.
-          throw new InvalidLibraryFileException(sprintf('Invalid library definition in %s: %s', $library_file, $e->getMessage()), 0, $e);
-        }
-      }
+    try {
+      $libraries = $this->yamlCacheCollector->get($library_path);
     }
+    catch (InvalidDataTypeException $e) {
+      // Rethrow a more helpful exception to provide context.
+      throw new InvalidLibraryFileException(sprintf('Invalid library definition in %s: %s', $library_file, $e->getMessage()), 0, $e);
+    }
+
     // Core also provides additional libraries that don't come from the YAML,
-    // file nor the hook_library_info_build. They come from single directory
+    // file nor the hook_library_info_build. They come from single-directory
     // component definitions.
     $additional_libraries = $extension === 'core'
       ? $this->librariesForComponents()
@@ -421,10 +347,64 @@ class LibraryDiscoveryParser {
   }
 
   /**
-   * Builds the dynamic library definitions for single directory components.
+   * Apply overrides to files that have moved.
+   *
+   * @param array $library
+   *   The library definition.
+   * @param string $library_name
+   *   The library name.
+   * @param string $extension
+   *   The extension name.
+   * @param array $overrides
+   *   The library overrides.
+   * @param \Drupal\Core\Theme\ActiveTheme $active_theme
+   *   The active theme.
    *
    * @return array
-   *   The core library definitions for Single Directory Components.
+   *   The modified library overrides.
+   */
+  protected function applyLibrariesMovedOverrides(array $library, string $library_name, string $extension, array $overrides, ActiveTheme $active_theme): array {
+    if (!isset($library['moved_files'])) {
+      return $overrides;
+    }
+    foreach ($library['moved_files'] as $old_library_name => $moved_files) {
+      $deprecation_version = $moved_files['deprecation_version'];
+      $removed_version = $moved_files['removed_version'];
+      $deprecation_link = $moved_files['deprecation_link'];
+      if (isset($overrides[$old_library_name]['css']) && isset($moved_files['css'])) {
+        foreach ($overrides[$old_library_name]['css'] as $key => $files) {
+          foreach ($files as $original => $target) {
+            if (isset($moved_files['css'][$key][$original])) {
+              $new_key = array_key_first($moved_files['css'][$key][$original]);
+              $new_file = $moved_files['css'][$key][$original][$new_key];
+              $theme_name = $active_theme->getName();
+              // phpcs:ignore
+              @trigger_error("Targeting $old_library_name $original from $theme_name library_overrides is deprecated in $deprecation_version and will be removed in $removed_version. Target $extension/$library_name $new_file instead. See $deprecation_link", E_USER_DEPRECATED);
+              $overrides[$extension . '/' . $library_name]['css'][$new_key][$new_file] = $target;
+            }
+          }
+        }
+      }
+      if (isset($overrides[$old_library_name]['js']) && isset($moved_files['js'])) {
+        foreach ($overrides[$old_library_name]['js'] as $original => $target) {
+          if (isset($moved_files['js'][$original])) {
+            $new_file = $moved_files['js'][$original];
+            $theme_name = $active_theme->getName();
+            // phpcs:ignore
+            @trigger_error("Targeting $old_library_name $original from $theme_name library_overrides is deprecated in $deprecation_version and will be removed in $removed_version. Target $extension/$library_name $new_file instead. See $deprecation_link", E_USER_DEPRECATED);
+            $overrides[$extension . '/' . $library_name]['js'][$new_file] = $target;
+          }
+        }
+      }
+    }
+    return $overrides;
+  }
+
+  /**
+   * Builds the dynamic library definitions for single-directory components.
+   *
+   * @return array
+   *   The core library definitions for Single-Directory Components.
    */
   protected function librariesForComponents(): array {
     // Iterate over all the components to get the CSS and JS files.
@@ -469,10 +449,12 @@ class LibraryDiscoveryParser {
     $all_libraries_overrides = $active_theme->getLibrariesOverride();
     foreach ($all_libraries_overrides as $theme_path => $libraries_overrides) {
       foreach ($libraries as $library_name => $library) {
+        $libraries_overrides = $this->applyLibrariesMovedOverrides($library, $library_name, $extension, $libraries_overrides, $active_theme);
+
         // Process libraries overrides.
         if (isset($libraries_overrides["$extension/$library_name"])) {
           if (isset($library['deprecated'])) {
-            $override_message = sprintf('Theme "%s" is overriding a deprecated library.', $extension);
+            $override_message = sprintf('Theme "%s" is overriding a deprecated library.', $active_theme->getName());
             $library_deprecation = str_replace('%library_id%', "$extension/$library_name", $library['deprecated']);
             // phpcs:ignore Drupal.Semantics.FunctionTriggerError
             @trigger_error("$override_message $library_deprecation", E_USER_DEPRECATED);
@@ -483,7 +465,7 @@ class LibraryDiscoveryParser {
             // A string or boolean definition implies an override (or removal)
             // for the whole library. Use the override key to specify that this
             // library will be overridden when it is called.
-            // @see \Drupal\Core\Asset\LibraryDiscovery::getLibraryByName()
+            // @see \Drupal\Core\Asset\LibraryDiscoveryCollector::getLibraryByName()
             if ($override_definition) {
               $libraries[$library_name]['override'] = $override_definition;
             }
@@ -579,8 +561,8 @@ class LibraryDiscoveryParser {
   protected function resolveThemeAssetPath($theme_path, $overriding_asset) {
     if ($overriding_asset[0] !== '/' && !$this->isValidUri($overriding_asset)) {
       // The destination is not an absolute path and it's not a URI (e.g.
-      // public://generated_js/example.js or http://example.com/js/my_js.js), so
-      // it's relative to the theme.
+      // public://generated_js/example.js or https://example.com/js/my_js.js),
+      // so it's relative to the theme.
       return '/' . $theme_path . '/' . $overriding_asset;
     }
     return $overriding_asset;

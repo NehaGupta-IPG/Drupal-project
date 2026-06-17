@@ -4,18 +4,25 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\rest\Unit;
 
-use Drupal\Tests\UnitTestCase;
+use Drupal\Core\Authentication\AuthenticationCollectorInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Routing\RouteProviderInterface;
+use Drupal\Core\State\StateInterface;
 use Drupal\rest\Plugin\views\display\RestExport;
+use Drupal\Tests\UnitTestCase;
 use Drupal\views\Entity\View;
+use Drupal\views\Plugin\views\access\None;
+use Drupal\views\ViewExecutable;
+use PHPUnit\Framework\Attributes\Group;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Tests the REST export view plugin.
- *
- * @group rest
  */
+#[Group('rest')]
 class CollectRoutesTest extends UnitTestCase {
 
   /**
@@ -27,6 +34,8 @@ class CollectRoutesTest extends UnitTestCase {
 
   /**
    * The RouteCollection.
+   *
+   * @var \Symfony\Component\Routing\RouteCollection
    */
   protected $routes;
 
@@ -37,18 +46,10 @@ class CollectRoutesTest extends UnitTestCase {
     parent::setUp();
 
     $container = new ContainerBuilder();
-
-    $request = $this->getMockBuilder('\Symfony\Component\HttpFoundation\Request')
-      ->disableOriginalConstructor()
-      ->getMock();
-
     $view = new View(['id' => 'test_view'], 'view');
 
-    $view_executable = $this->getMockBuilder('\Drupal\views\ViewExecutable')
-      ->onlyMethods(['initHandlers', 'getTitle'])
-      ->disableOriginalConstructor()
-      ->getMock();
-    $view_executable->expects($this->any())
+    $view_executable = $this->createStub(ViewExecutable::class);
+    $view_executable
       ->method('getTitle')
       ->willReturn('View title');
 
@@ -65,25 +66,33 @@ class CollectRoutesTest extends UnitTestCase {
       ->getMock();
     $container->set('plugin.manager.views.access', $access_manager);
 
-    $route_provider = $this->getMockBuilder('\Drupal\Core\Routing\RouteProviderInterface')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $route_provider = $this->createStub(RouteProviderInterface::class);
     $container->set('router.route_provider', $route_provider);
 
     $container->setParameter('authentication_providers', ['basic_auth' => 'basic_auth']);
 
-    $state = $this->createMock('\Drupal\Core\State\StateInterface');
+    $state = $this->createStub(StateInterface::class);
     $container->set('state', $state);
 
     $style_manager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
       ->disableOriginalConstructor()
       ->getMock();
     $container->set('plugin.manager.views.style', $style_manager);
-    $container->set('renderer', $this->createMock('Drupal\Core\Render\RendererInterface'));
+    $container->set('renderer', $this->createStub(RendererInterface::class));
 
-    $authentication_collector = $this->createMock('\Drupal\Core\Authentication\AuthenticationCollectorInterface');
+    $locator = $this->createStub(ServiceLocator::class);
+    $locator
+      ->method('get')
+      ->willReturnCallback(fn($type) => match ($type) {
+        'access' => $access_manager,
+        'display' => $display_manager,
+        'style' => $style_manager,
+      });
+    $container->set('views.plugin_managers', $locator);
+
+    $authentication_collector = $this->createStub(AuthenticationCollectorInterface::class);
     $container->set('authentication_collector', $authentication_collector);
-    $authentication_collector->expects($this->any())
+    $authentication_collector
       ->method('getSortedProviders')
       ->willReturn(['basic_auth' => 'data', 'cookie' => 'data']);
 
@@ -107,9 +116,7 @@ class CollectRoutesTest extends UnitTestCase {
       ->method('getDefinition')
       ->willReturn(['id' => 'test', 'provider' => 'test']);
 
-    $none = $this->getMockBuilder('\Drupal\views\Plugin\views\access\None')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $none = $this->createStub(None::class);
 
     $access_manager->expects($this->once())
       ->method('createInstance')
@@ -143,7 +150,7 @@ class CollectRoutesTest extends UnitTestCase {
   /**
    * Tests if adding a requirement to a route only modify one route.
    */
-  public function testRoutesRequirements() {
+  public function testRoutesRequirements(): void {
     $this->restExport->collectRoutes($this->routes);
 
     $requirements_1 = $this->routes->get('test_1')->getRequirements();

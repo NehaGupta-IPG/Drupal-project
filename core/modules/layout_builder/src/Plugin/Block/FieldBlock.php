@@ -22,10 +22,11 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\field\FieldConfigInterface;
 use Drupal\layout_builder\Plugin\Derivative\FieldBlockDeriver;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\field\FieldLabelOptionsTrait;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Provides a block that renders a field from an entity.
@@ -114,7 +115,17 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
    * @param \Psr\Log\LoggerInterface $logger
    *   The logger.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityFieldManagerInterface $entity_field_manager, FormatterPluginManager $formatter_manager, ModuleHandlerInterface $module_handler, LoggerInterface $logger) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    EntityFieldManagerInterface $entity_field_manager,
+    #[Autowire(service: 'plugin.manager.field.formatter')]
+    FormatterPluginManager $formatter_manager,
+    ModuleHandlerInterface $module_handler,
+    #[Autowire(service: 'logger.channel.layout_builder')]
+    LoggerInterface $logger,
+  ) {
     $this->entityFieldManager = $entity_field_manager;
     $this->formatterManager = $formatter_manager;
     $this->moduleHandler = $module_handler;
@@ -127,21 +138,6 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
     $this->fieldName = $field_name;
 
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('entity_field.manager'),
-      $container->get('plugin.manager.field.formatter'),
-      $container->get('module_handler'),
-      $container->get('logger.channel.layout_builder')
-    );
   }
 
   /**
@@ -174,7 +170,10 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
     }
     catch (\Exception $e) {
       $build = [];
-      $this->logger->warning('The field "%field" failed to render with the error of "%error".', ['%field' => $this->fieldName, '%error' => $e->getMessage()]);
+      $this->logger->warning('The field "%field" failed to render with the error of "%error".', [
+        '%field' => $this->fieldName,
+        '%error' => $e->getMessage(),
+      ]);
     }
     CacheableMetadata::createFromRenderArray($build)->addCacheableDependency($this)->applyTo($build);
     return $build;
@@ -212,13 +211,7 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
     }
 
     // Check to see if the field has any values or a default value.
-    if ($field->isEmpty() && !$field->getFieldDefinition()->getDefaultValue($entity)) {
-      // @todo Remove special handling of image fields after
-      //   https://www.drupal.org/project/drupal/issues/3005528.
-      if ($field->getFieldDefinition()->getType() === 'image' && !empty($field->getFieldDefinition()->getSetting('default_image')['uuid'])) {
-        return $access;
-      }
-
+    if ($field->isEmpty() && !$this->entityFieldHasDefaultValue()) {
       return $access->andIf(AccessResult::forbidden());
     }
     return $access;
@@ -229,7 +222,7 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
    */
   public function defaultConfiguration() {
     return [
-      'label_display' => FALSE,
+      'label_display' => '0',
       'formatter' => [
         'label' => 'above',
         'type' => $this->pluginDefinition['default_formatter'],
@@ -391,7 +384,7 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    *
-   * @return \Drupal\Core\Field\FormatterInterface
+   * @return \Drupal\Core\Field\FormatterInterface<\Drupal\Core\Field\FieldItemListInterface<\Drupal\Core\Field\FieldItemInterface>>
    *   The formatter object.
    */
   protected function getFormatter(array $parents, FormStateInterface $form_state) {
@@ -412,6 +405,35 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
       'view_mode' => EntityDisplayBase::CUSTOM_MODE,
       'prepare' => TRUE,
     ]);
+  }
+
+  /**
+   * Checks whether there is a default value set on the field.
+   *
+   * @return bool
+   *   TRUE if default value set, FALSE otherwise.
+   */
+  protected function entityFieldHasDefaultValue(): bool {
+    $entity = $this->getEntity();
+    $field = $entity->get($this->fieldName);
+    $definition = $field->getFieldDefinition();
+    if ($definition->getDefaultValue($entity)) {
+      return TRUE;
+    }
+
+    // @todo Remove special handling of image fields after
+    // https://www.drupal.org/project/drupal/issues/3005528.
+    if ($definition->getType() !== 'image') {
+      return FALSE;
+    }
+
+    $default_image = $definition->getSetting('default_image');
+    // If we are dealing with a configurable field, look in both instance-level
+    // and field-level settings.
+    if (empty($default_image['uuid']) && ($definition instanceof FieldConfigInterface)) {
+      $default_image = $definition->getFieldStorageDefinition()->getSetting('default_image');
+    }
+    return !empty($default_image['uuid']);
   }
 
 }

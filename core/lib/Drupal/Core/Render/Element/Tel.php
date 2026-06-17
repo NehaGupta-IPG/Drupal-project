@@ -4,7 +4,6 @@ namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
-use Drupal\Core\Render\Element\FormElement as FormElementBase;
 
 /**
  * Provides a form element for entering a telephone number.
@@ -18,11 +17,11 @@ use Drupal\Core\Render\Element\FormElement as FormElementBase;
  *
  * Usage example:
  * @code
- * $form['phone'] = array(
+ * $form['phone'] = [
  *   '#type' => 'tel',
  *   '#title' => $this->t('Phone'),
  *   '#pattern' => '[^\d]*',
- * );
+ * ];
  * @endcode
  *
  * @see \Drupal\Core\Render\Element
@@ -34,19 +33,18 @@ class Tel extends FormElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#input' => TRUE,
       '#size' => 30,
       '#maxlength' => 128,
       '#autocomplete_route_name' => FALSE,
       '#process' => [
-        [$class, 'processAutocomplete'],
-        [$class, 'processAjaxForm'],
-        [$class, 'processPattern'],
+        [static::class, 'processAutocomplete'],
+        [static::class, 'processAjaxForm'],
+        [static::class, 'processPattern'],
       ],
       '#pre_render' => [
-        [$class, 'preRenderTel'],
+        [static::class, 'preRenderTel'],
       ],
       '#theme' => 'input__tel',
       '#theme_wrappers' => ['form_element'],

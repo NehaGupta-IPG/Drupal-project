@@ -7,6 +7,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Client\ClientExceptionInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 // cspell:ignore nocdata
 
@@ -15,41 +16,13 @@ use Psr\Http\Client\ClientExceptionInterface;
  */
 class ResourceFetcher implements ResourceFetcherInterface {
 
-  /**
-   * The HTTP client.
-   *
-   * @var \GuzzleHttp\Client
-   */
-  protected $httpClient;
-
-  /**
-   * The oEmbed provider repository service.
-   *
-   * @var \Drupal\media\OEmbed\ProviderRepositoryInterface
-   */
-  protected $providers;
-
-  /**
-   * The cache backend.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
-   */
-  protected $cacheBackend;
-
-  /**
-   * Constructs a ResourceFetcher object.
-   *
-   * @param \GuzzleHttp\ClientInterface $http_client
-   *   The HTTP client.
-   * @param \Drupal\media\OEmbed\ProviderRepositoryInterface $providers
-   *   The oEmbed provider repository service.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
-   *   The cache backend.
-   */
-  public function __construct(ClientInterface $http_client, ProviderRepositoryInterface $providers, CacheBackendInterface $cache_backend) {
-    $this->httpClient = $http_client;
-    $this->providers = $providers;
-    $this->cacheBackend = $cache_backend;
+  public function __construct(
+    protected ClientInterface $httpClient,
+    protected ProviderRepositoryInterface $providers,
+    #[Autowire(service: 'cache.default')]
+    protected CacheBackendInterface $cacheBackend,
+    protected int $timeout = 5,
+  ) {
   }
 
   /**
@@ -65,7 +38,7 @@ class ResourceFetcher implements ResourceFetcherInterface {
 
     try {
       $response = $this->httpClient->request('GET', $url, [
-        RequestOptions::TIMEOUT => 5,
+        RequestOptions::TIMEOUT => $this->timeout,
       ]);
     }
     catch (ClientExceptionInterface $e) {

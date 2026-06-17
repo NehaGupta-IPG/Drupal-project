@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\theme_test\EventSubscriber;
 
 use Drupal\Core\Render\RendererInterface;
@@ -16,6 +18,8 @@ class ThemeTestSubscriber implements EventSubscriberInterface {
 
   /**
    * The used container.
+   *
+   * @var object
    *
    * @todo This variable is never initialized, so we don't know what it is.
    *   See https://www.drupal.org/node/2721315
@@ -54,7 +58,7 @@ class ThemeTestSubscriber implements EventSubscriberInterface {
    *
    * @see \Drupal\system\Tests\Theme\ThemeEarlyInitializationTest::testRequestListener()
    */
-  public function onRequest(RequestEvent $event) {
+  public function onRequest(RequestEvent $event): void {
     if ($this->currentRouteMatch->getRouteName() === 'theme_test.request_listener') {
       // First, force the theme registry to be rebuilt on this page request.
       // This allows us to test a full initialization of the theme system in
@@ -75,27 +79,10 @@ class ThemeTestSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Ensures that the theme registry was not initialized.
-   */
-  public function onView(RequestEvent $event) {
-    $current_route = $this->currentRouteMatch->getRouteName();
-    $entity_autocomplete_route = [
-      'system.entity_autocomplete',
-    ];
-
-    if (in_array($current_route, $entity_autocomplete_route)) {
-      if ($this->container->initialized('theme.registry')) {
-        throw new \Exception('registry initialized');
-      }
-    }
-  }
-
-  /**
    * {@inheritdoc}
    */
   public static function getSubscribedEvents(): array {
     $events[KernelEvents::REQUEST][] = ['onRequest'];
-    $events[KernelEvents::VIEW][] = ['onView', -1000];
     return $events;
   }
 

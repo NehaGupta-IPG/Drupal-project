@@ -1,14 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\locale\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\locale\LocaleProjectRepository;
+use Drupal\locale\LocaleSource;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests building the translatable project information.
- *
- * @group locale
  */
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocaleBuildTest extends KernelTestBase {
 
   /**
@@ -17,13 +23,12 @@ class LocaleBuildTest extends KernelTestBase {
   protected static $modules = [
     'locale',
     'locale_test',
-    'system',
   ];
 
   /**
    * Checks if a list of translatable projects gets built.
    */
-  public function testBuildProjects() {
+  public function testBuildProjects(): void {
     $this->container->get('module_handler')->loadInclude('locale', 'compare.inc');
     /** @var \Drupal\Core\Extension\ExtensionList $module_list */
     $module_list = \Drupal::service('extension.list.module');
@@ -34,16 +39,15 @@ class LocaleBuildTest extends KernelTestBase {
     \Drupal::state()->set('locale.test_system_info_alter', TRUE);
 
     // Confirm the project name and core value before the module is altered.
-    $projects = locale_translation_build_projects();
+    $projects = \Drupal::service(LocaleProjectRepository::class)->buildProjects();
     $this->assertSame('locale_test', $projects['locale_test']->name);
     $this->assertSame('all', $projects['locale_test']->core);
 
-    $projects['locale_test']->langcode = 'de';
-    $this->assertSame('/all/locale_test/locale_test-1.2.de.po', locale_translation_build_server_pattern($projects['locale_test'], '/%core/%project/%project-%version.%language.po'));
+    $projects['locale_test']->setLangcode('de');
+    $this->assertSame('/all/locale_test/locale_test-1.2.de.po', \Drupal::service(LocaleSource::class)->buildServerPattern($projects['locale_test'], '/%core/%project/%project-%version.%language.po'));
 
     // Alter both the name and core value of the project.
     \Drupal::state()->set('locale.test_system_info_alter_name_core', TRUE);
-    drupal_static_reset('locale_translation_project_list');
     $module_list->reset();
 
     // Confirm the name and core value are changed in $module->info.
@@ -53,12 +57,12 @@ class LocaleBuildTest extends KernelTestBase {
     $this->assertSame('locale_test', $module->getName());
 
     // Confirm the name and core value are not changed in the project.
-    $projects = locale_translation_build_projects();
+    $projects = \Drupal::service(LocaleProjectRepository::class)->buildProjects();
     $this->assertSame('locale_test', $projects['locale_test']->name);
     $this->assertSame('all', $projects['locale_test']->core);
 
-    $projects['locale_test']->langcode = 'de';
-    $this->assertSame('/all/locale_test/locale_test-1.2.de.po', locale_translation_build_server_pattern($projects['locale_test'], '/%core/%project/%project-%version.%language.po'));
+    $projects['locale_test']->setLangcode('de');
+    $this->assertSame('/all/locale_test/locale_test-1.2.de.po', \Drupal::service(LocaleSource::class)->buildServerPattern($projects['locale_test'], '/%core/%project/%project-%version.%language.po'));
   }
 
 }

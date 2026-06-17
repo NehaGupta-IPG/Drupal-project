@@ -1,4 +1,10 @@
+parameters:
+  toolbar.skip_procedural_hook_scan: true
+
 services:
+  _defaults:
+    autoconfigure: true
+    autowire: true
   cache.toolbar:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
@@ -11,4 +17,3 @@ services:
       - { name: page_cache_request_policy }
   toolbar.menu_tree:
     class: Drupal\toolbar\Menu\ToolbarMenuLinkTree
-    arguments: ['@menu.tree_storage', '@plugin.manager.menu.link', '@router.route_provider', '@menu.active_trail', '@callable_resolver']

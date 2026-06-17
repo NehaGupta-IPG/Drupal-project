@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Kernel;
 
 use Drupal\field\Entity\FieldConfig;
@@ -19,10 +21,10 @@ abstract class JsonapiKernelTestBase extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['jsonapi', 'file'];
+  protected static $modules = ['jsonapi', 'file', 'jsonapi_response_validator'];
 
   /**
-   * Creates a field of an entity reference field storage on the bundle.
+   * Creates a field of a text field storage on the bundle.
    *
    * @param string $entity_type
    *   The type of entity the field will be attached to.

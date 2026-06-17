@@ -4,6 +4,7 @@ namespace Drupal\taxonomy;
 
 use Drupal\Core\Breadcrumb\BreadcrumbBuilderInterface;
 use Drupal\Core\Breadcrumb\Breadcrumb;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Link;
@@ -46,7 +47,8 @@ class TermBreadcrumbBuilder implements BreadcrumbBuilderInterface {
   /**
    * {@inheritdoc}
    */
-  public function applies(RouteMatchInterface $route_match) {
+  public function applies(RouteMatchInterface $route_match, CacheableMetadata $cacheable_metadata) {
+    $cacheable_metadata->addCacheContexts(['route']);
     return $route_match->getRouteName() == 'entity.taxonomy_term.canonical'
       && $route_match->getParameter('taxonomy_term') instanceof TermInterface;
   }
@@ -73,10 +75,6 @@ class TermBreadcrumbBuilder implements BreadcrumbBuilderInterface {
       $breadcrumb->addCacheableDependency($term);
       $breadcrumb->addLink(Link::createFromRoute($term->getName(), 'entity.taxonomy_term.canonical', ['taxonomy_term' => $term->id()]));
     }
-
-    // This breadcrumb builder is based on a route parameter, and hence it
-    // depends on the 'route' cache context.
-    $breadcrumb->addCacheContexts(['route']);
 
     return $breadcrumb;
   }

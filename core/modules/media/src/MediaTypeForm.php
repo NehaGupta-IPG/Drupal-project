@@ -176,7 +176,13 @@ class MediaTypeForm extends EntityForm {
     }
     else {
       $options = [MediaSourceInterface::METADATA_FIELD_EMPTY => $this->t('- Skip field -')];
+      $source_field_name = $source->getSourceFieldDefinition($this->entity)?->getName();
       foreach ($this->entityFieldManager->getFieldDefinitions('media', $this->entity->id()) as $field_name => $field) {
+        // The source field cannot be the target of a field mapping, because
+        // this would cause it to be overwritten, probably with invalid data.
+        if ($field_name === $source_field_name) {
+          continue;
+        }
         if (!($field instanceof BaseFieldDefinition) || $field_name === 'name') {
           $options[$field_name] = $field->getLabel();
         }
@@ -303,7 +309,8 @@ class MediaTypeForm extends EntityForm {
 
     parent::submitForm($form, $form_state);
 
-    $this->entity->setQueueThumbnailDownloadsStatus((bool) $form_state->getValue(['options', 'queue_thumbnail_downloads']))
+    $this->entity->setQueueThumbnailDownloadsStatus(
+      (bool) $form_state->getValue(['options', 'queue_thumbnail_downloads']))
       ->setStatus((bool) $form_state->getValue(['options', 'status']))
       ->setNewRevision((bool) $form_state->getValue(['options', 'new_revision']));
 

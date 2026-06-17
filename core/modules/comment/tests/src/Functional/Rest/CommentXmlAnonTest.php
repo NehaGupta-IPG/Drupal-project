@@ -6,11 +6,14 @@ namespace Drupal\Tests\comment\Functional\Rest;
 
 use Drupal\Tests\rest\Functional\AnonResourceTestTrait;
 use Drupal\Tests\rest\Functional\EntityResource\XmlEntityNormalizationQuirksTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @group rest
- * @group #slow
+ * Tests Comment Xml Anon.
  */
+#[Group('rest')]
+#[RunTestsInSeparateProcesses]
 class CommentXmlAnonTest extends CommentResourceTestBase {
 
   use AnonResourceTestTrait;
@@ -24,7 +27,7 @@ class CommentXmlAnonTest extends CommentResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $mimeType = 'text/xml; charset=UTF-8';
+  protected static $mimeType = 'text/xml; charset=utf-8';
 
   /**
    * {@inheritdoc}
@@ -51,21 +54,5 @@ class CommentXmlAnonTest extends CommentResourceTestBase {
     'entity_type',
     'field_name',
   ];
-
-  /**
-   * {@inheritdoc}
-   */
-  public function testPostDxWithoutCriticalBaseFields() {
-    // Deserialization of the XML format is not supported.
-    $this->markTestSkipped();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function testPostSkipCommentApproval() {
-    // Deserialization of the XML format is not supported.
-    $this->markTestSkipped();
-  }
 
 }
