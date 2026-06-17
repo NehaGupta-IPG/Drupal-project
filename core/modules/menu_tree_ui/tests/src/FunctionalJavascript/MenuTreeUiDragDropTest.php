@@ -487,6 +487,13 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
       $toggle,
       "Row $label should have a real <button> toggle (not a spacer).",
     );
+    // The toggle must stay in the tab order, including when a move promotes a
+    // leaf to a parent (the toggle is then built client-side).
+    $this->assertNotSame(
+      '-1',
+      $toggle->getAttribute('tabindex'),
+      "Row $label's toggle must stay keyboard-reachable.",
+    );
   }
 
   /**

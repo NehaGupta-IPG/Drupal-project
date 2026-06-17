@@ -135,8 +135,13 @@
     name.appendChild(buildHandle(item, depth));
     name.appendChild(buildToggle(item));
 
-    const title = document.createElement('span');
+    // Link the title to the menu link's destination (the classic admin
+    // pattern); routeless links (<nolink> etc.) stay plain text.
+    const title = document.createElement(item.linked ? 'a' : 'span');
     title.className = 'menu-tree-ui-row__title';
+    if (item.linked) {
+      title.href = item.url;
+    }
     title.textContent = item.title;
     name.appendChild(title);
 

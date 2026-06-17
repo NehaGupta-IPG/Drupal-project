@@ -93,7 +93,6 @@
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'menu-tree-ui-row__toggle';
-    button.tabIndex = -1;
     button.setAttribute('aria-label', `Toggle children of ${title}`);
     const chevron = document.createElement('span');
     chevron.setAttribute('aria-hidden', 'true');

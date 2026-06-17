@@ -112,6 +112,30 @@ final class MenuTreeControllerColumnUpdateTest extends KernelTestBase {
   }
 
   /**
+   * The children JSON links a navigable title and leaves a routeless one plain.
+   */
+  public function testChildrenJsonMarksNavigableTitles(): void {
+    MenuLinkContent::create([
+      'title' => 'Linked',
+      'link' => ['uri' => 'https://example.com'],
+      'menu_name' => 'main',
+    ])->save();
+    MenuLinkContent::create([
+      'title' => 'Plain',
+      'link' => ['uri' => 'route:<nolink>'],
+      'menu_name' => 'main',
+    ])->save();
+
+    $response = $this->controller->children($this->menu, Request::create('/children'));
+    $items = json_decode($response->getContent(), TRUE)['items'];
+    $by_title = array_column($items, NULL, 'title');
+
+    $this->assertTrue($by_title['Linked']['linked']);
+    $this->assertSame('https://example.com', $by_title['Linked']['url']);
+    $this->assertFalse($by_title['Plain']['linked']);
+  }
+
+  /**
    * A valid JSON body with missing column_id/link_id must return 400.
    */
   public function testMissingFieldsReturns400(): void {

@@ -8,6 +8,7 @@ use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Core\Menu\MenuTreeStorage;
 use Drupal\Core\Render\RendererInterface;
@@ -83,6 +84,8 @@ final class MenuTreeController extends ControllerBase {
         '#theme' => 'menu_tree_ui_row',
         '#element' => $element,
         '#parent_id' => '',
+        '#url' => $element->link->getUrlObject()->toString(),
+        '#linked' => $this->isLinked($element->link),
         '#operations' => $this->renderOperations($element, $entity_map),
         '#columns' => $this->buildColumnCells($element, $columns),
         '#depth' => 1,
@@ -323,6 +326,27 @@ final class MenuTreeController extends ControllerBase {
   // Private helpers.
 
   /**
+   * Whether a link's title should render as a link to its destination.
+   *
+   * Mirrors the classic menu admin, which links each title to the menu link's
+   * URL. Routeless destinations (<nolink> and the like) have nowhere to go, so
+   * their title renders as plain text.
+   *
+   * @param \Drupal\Core\Menu\MenuLinkInterface $link
+   *   The menu link.
+   *
+   * @return bool
+   *   TRUE if the title should be a link.
+   */
+  private function isLinked(MenuLinkInterface $link): bool {
+    $url = $link->getUrlObject();
+    if (!$url->isRouted()) {
+      return TRUE;
+    }
+    return !in_array($url->getRouteName(), ['<nolink>', '<none>', '<button>'], TRUE);
+  }
+
+  /**
    * The display name of the user holding the menu's working copy.
    *
    * @param string $menu_name
@@ -389,6 +413,7 @@ final class MenuTreeController extends ControllerBase {
       'has_children' => $element->hasChildren,
       'depth' => $element->depth,
       'url' => $link->getUrlObject()->toString(),
+      'linked' => $this->isLinked($link),
       'weight' => $link->getWeight(),
       'movable' => MenuLinkMovability::isMovable($link),
       'operations_html' => $this->renderOperationsHtml($element, $entity_map),

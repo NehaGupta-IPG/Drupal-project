@@ -39,6 +39,10 @@ function menu_tree_ui_theme(): array {
         // Parent link plugin ID, or '' for the top level. Carries the tree
         // hierarchy in the flat <tr> markup (tables cannot nest rows).
         'parent_id' => '',
+        // The link's destination URL (string) and whether to render the title
+        // as a link to it (FALSE for <nolink> and the like).
+        'url' => '',
+        'linked' => FALSE,
         'depth' => 0,
         'pos_in_set' => 1,
         'set_size' => 1,

@@ -84,7 +84,11 @@
         <span class="menu-tree-ui-row__toggle menu-tree-ui-row__toggle--spacer" aria-hidden="true"></span>
       {% endif %}
 
-      <span class="menu-tree-ui-row__title">{{ title }}</span>
+      {% if linked %}
+        <a href="{{ url }}" class="menu-tree-ui-row__title">{{ title }}</a>
+      {% else %}
+        <span class="menu-tree-ui-row__title">{{ title }}</span>
+      {% endif %}
 
       {% if not enabled %}
         <span class="menu-tree-ui-row__badge">{{ 'disabled'|t }}</span>
