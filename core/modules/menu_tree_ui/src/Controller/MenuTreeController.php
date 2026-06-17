@@ -373,12 +373,12 @@ final class MenuTreeController extends ControllerBase {
   private function serializeElement(MenuLinkTreeElement $element, array $entity_map, array $columns, string $parent_id): array {
     $link = $element->link;
 
+    // Emit a cell for every active column, empty when the column has no data
+    // for this row (e.g. the "expanded" toggle on a childless link), so each
+    // row has the same cell count as the header and the columns stay aligned.
     $column_data = [];
     foreach ($columns as $col_id => $column) {
-      $cell = $column->getCellData($element);
-      if ($cell) {
-        $column_data[$col_id] = $cell;
-      }
+      $column_data[$col_id] = $column->getCellData($element) ?: [];
     }
 
     return [
@@ -537,12 +537,11 @@ final class MenuTreeController extends ControllerBase {
    *   Cell data arrays keyed by column plugin ID.
    */
   private function buildColumnCells(MenuLinkTreeElement $element, array $columns): array {
+    // A cell per active column, empty when there is no data for this row, so
+    // every row matches the header's cell count and the columns stay aligned.
     $cells = [];
     foreach ($columns as $col_id => $column) {
-      $cell = $column->getCellData($element);
-      if ($cell) {
-        $cells[$col_id] = $cell;
-      }
+      $cells[$col_id] = $column->getCellData($element) ?: [];
     }
     return $cells;
   }

@@ -115,12 +115,12 @@
   {% endif %}
 
   <div class="menu-tree-ui__actions">
-    <div
-      class="menu-tree-ui__unsaved messages messages--warning{{ has_changes ? '' : ' js-hide' }}"
-      aria-live="polite"
-    >{{ 'You have unsaved changes.'|t }}</div>
     <button type="button" class="menu-tree-ui__save button button--primary" data-mtu-action="save"{{ locked ? ' disabled' : '' }}>{{ 'Save'|t }}</button>
     <button type="button" class="menu-tree-ui__cancel button" data-mtu-action="cancel"{{ locked ? ' disabled' : '' }}>{{ 'Cancel'|t }}</button>
+    <span
+      class="menu-tree-ui__unsaved{{ has_changes ? '' : ' js-hide' }}"
+      aria-live="polite"
+    >{{ 'You have unsaved changes.'|t }}</span>
   </div>
 
   <menu-tree
