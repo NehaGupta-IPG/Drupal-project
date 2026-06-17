@@ -148,7 +148,7 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
     ];
     $it_edit_url = $this->getEditUrl($entity->getTranslation('it'));
     $this->drupalGet($it_edit_url);
-    $this->submitForm($edit, $this->t('Save (this translation)'));
+    $this->submitForm($edit, 'Save (this translation)');
 
     // Mark the French node as a draft.
     $edit = [
@@ -157,7 +157,7 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
     ];
     $fr_edit_url = $this->getEditUrl($entity->getTranslation('fr'));
     $this->drupalGet($fr_edit_url);
-    $this->submitForm($edit, $this->t('Save (this translation)'));
+    $this->submitForm($edit, 'Save (this translation)');
 
     // Store the latest affected revisions for Italian and French.
     $latest_affected_revision_id_it = $storage->getLatestTranslationAffectedRevisionId($id, 'it');
@@ -170,7 +170,7 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
       'content_translation[retranslate]' => 1,
     ];
     $this->drupalGet($en_edit_url);
-    $this->submitForm($edit, $this->t('Save (this translation)'));
+    $this->submitForm($edit, 'Save (this translation)');
 
     // Assert that the stored Italian revision is outdated.
     $latest_affected_revision_it = $storage->loadRevisionUnchanged($latest_affected_revision_id_it)->getTranslation('it');
@@ -198,7 +198,7 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
       'content_translation[outdated]' => 0,
     ];
     $this->drupalGet($it_edit_url);
-    $this->submitForm($edit, $this->t('Save (this translation)'));
+    $this->submitForm($edit, 'Save (this translation)');
 
     // Assert the latest affected revision id for It is not the one we have
     // stored.
@@ -218,7 +218,7 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
       'content_translation[outdated]' => 0,
     ];
     $this->drupalGet($fr_edit_url);
-    $this->submitForm($edit, $this->t('Save (this translation)'));
+    $this->submitForm($edit, 'Save (this translation)');
 
     // Assert the latest affected revision id for Fr is not the one we have
     // stored.
@@ -247,7 +247,7 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
       'content_translation[retranslate]' => 1,
     ];
     $this->drupalGet($en_edit_url);
-    $this->submitForm($edit, $this->t('Save (this translation)'));
+    $this->submitForm($edit, 'Save (this translation)');
 
     // Verify that the outdated flag is read from the last affected
     // translation revision.
@@ -265,7 +265,7 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
       'content_translation[outdated]' => 0,
     ];
     $this->drupalGet($it_edit_url);
-    $this->submitForm($edit, $this->t('Save (this translation)'));
+    $this->submitForm($edit, 'Save (this translation)');
 
     // Assert the Italian revision we have stored is no longer the latest
     // affected revision.
@@ -292,7 +292,7 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
       'content_translation[outdated]' => 1,
     ];
     $this->drupalGet($fr_edit_url);
-    $this->submitForm($edit, $this->t('Save (this translation)'));
+    $this->submitForm($edit, 'Save (this translation)');
 
     // Assert that the stored French version is no longer the latest affected
     // revision.
@@ -315,7 +315,7 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
       'content_translation[outdated]' => 0,
     ];
     $this->drupalGet($fr_edit_url);
-    $this->submitForm($edit, $this->t('Save (this translation)'));
+    $this->submitForm($edit, 'Save (this translation)');
 
     // Assert that the stored French version is no longer the latest affected
     // revision.
