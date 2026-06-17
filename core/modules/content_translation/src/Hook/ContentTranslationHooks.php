@@ -517,9 +517,9 @@ class ContentTranslationHooks {
     if ($metadata->isOutdated()) {
       $latest_revision = $storage->loadRevisionUnchanged($latest_affected_revision_id);
       $latest_revision_translation = $latest_revision->getTranslation($langcode);
-      $metadata = $this->contentTranslationManager->getTranslationMetadata($latest_revision_translation);
-      if ($metadata->isOutdated()) {
-        $metadata->setOutdated(FALSE);
+      $latest_revision_translation_metadata = $this->contentTranslationManager->getTranslationMetadata($latest_revision_translation);
+      if ($latest_revision_translation_metadata->isOutdated()) {
+        $latest_revision_translation_metadata->setOutdated(FALSE);
         // Avoid creating another revision: we are just syncing metadata on the
         // already-stored revision.
         $latest_revision_translation->setSyncing(TRUE);
