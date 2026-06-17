@@ -72,8 +72,6 @@ class CronTest extends UnitTestCase {
 
     // Create a mock logger to set a flag in the resulting state.
     $logger = $this->prophesize('Drupal\Core\Logger\LoggerChannelInterface');
-    // Safely ignore the cron success message.
-    $logger->info('Cron run completed.')->shouldBeCalled();
     // Set a flag to track when a message is logged by adding a callback
     // function for each logging method.
     foreach (get_class_methods(LoggerInterface::class) as $logger_method) {
@@ -92,6 +90,7 @@ class CronTest extends UnitTestCase {
     // Create a mock config factory and config object.
     $config_factory = $this->prophesize(ConfigFactoryInterface::class);
     $config = $this->prophesize(ImmutableConfig::class);
+    // Do not log "Cron is completed" by default.
     $config->get('logging')->willReturn(FALSE);
     $config_factory->get('system.cron')->willReturn($config->reveal());
 
@@ -216,6 +215,31 @@ class CronTest extends UnitTestCase {
     $this->assertIsInt($actual_requeue_count);
     // Ensure that the actual requeue count matches the expected value.
     $this->assertEquals(self::REQUEUE_COUNT, $actual_requeue_count);
+  }
+
+  /**
+   * Tests that completion message is logged when detailed logging is enabled.
+   */
+  public function testProcessQueuesWithLoggingEnabled(): void {
+    // Creates a new config factory mock that returns
+    // detailed logging as TRUE.
+    $config_factory = $this->prophesize(ConfigFactoryInterface::class);
+    $config = $this->prophesize(ImmutableConfig::class);
+    $config->get('logging')->willReturn(TRUE);
+    $config_factory->get('system.cron')->willReturn($config->reveal());
+    \Drupal::getContainer()->set('config.factory', $config_factory->reveal());
+
+    $this->resetTestingState();
+    $this->queue->createItem('Complete');
+    $this->assertEquals(1, $this->queue->numberOfItems());
+    // Just make sure no message exists before.
+    $this->assertFalse($this->state->get('cron_test.message_logged'));
+
+    $this->cron->run();
+
+    // One message should be logged ("Cron run completed").
+    $this->assertTrue($this->state->get('cron_test.message_logged'));
+    $this->assertEquals(0, $this->queue->numberOfItems());
   }
 
 }

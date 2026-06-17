@@ -59,7 +59,7 @@ class DbLogTest extends KernelTestBase {
     // Test disabling of detailed cron logging.
     $this->config('system.cron')->set('logging', FALSE)->save();
     $cron_count = $this->runCron();
-    $this->assertEquals(1, $cron_count, "Cron added $cron_count of 1 new log entries");
+    $this->assertEquals(0, $cron_count, "Cron added $cron_count of 1 new log entries");
   }
 
   /**

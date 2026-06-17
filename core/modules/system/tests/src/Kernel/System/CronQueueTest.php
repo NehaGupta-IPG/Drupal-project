@@ -71,6 +71,10 @@ class CronQueueTest extends KernelTestBase {
 
     $this->connection = Database::getConnection();
 
+    // Install default config
+    // to make sure details logging is enabled.
+    $this->installConfig('system');
+
     $time = $this->prophesize('Drupal\Component\Datetime\TimeInterface');
     $time->getCurrentTime()->willReturn($this->currentTime);
     $time->getCurrentMicroTime()->willReturn(100.0);
@@ -174,6 +178,20 @@ class CronQueueTest extends KernelTestBase {
    * @see \Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestException
    */
   public function testUncaughtExceptions(): void {
+    $messages = [
+      'Starting execution of @module_cron().',
+      'Execution of @module_previous_cron() took @time.',
+      'Cron run completed.',
+    ];
+
+    foreach ($messages as $message) {
+      $this->logger->log(
+        RfcLogLevel::INFO,
+        $message,
+        Argument::cetera()
+      )->shouldBeCalled();
+    }
+
     $this->logger->log(
       RfcLogLevel::ERROR,
       '%type: @message in %function (line %line of %file).',
@@ -181,12 +199,6 @@ class CronQueueTest extends KernelTestBase {
         return $args['@message'] === 'That is not supposed to happen.'
           && $args['exception'] instanceof \Exception;
       })
-    )->shouldBeCalled();
-
-    $this->logger->log(
-      RfcLogLevel::INFO,
-      'Cron run completed.',
-      Argument::cetera()
     )->shouldBeCalled();
 
     // Get the queue to test the normal Exception.
@@ -225,18 +237,26 @@ class CronQueueTest extends KernelTestBase {
    * @covers \Drupal\Core\Queue\SuspendQueueException
    */
   public function testSuspendQueueException(): void {
+    $messages = [
+      'Starting execution of @module_cron().',
+      'Execution of @module_previous_cron() took @time.',
+      'Cron run completed.',
+    ];
+
+    foreach ($messages as $message) {
+      $this->logger->log(
+        RfcLogLevel::INFO,
+        $message,
+        Argument::cetera()
+      )->shouldBeCalled();
+    }
+
     $this->logger->log(
       RfcLogLevel::DEBUG,
       'A worker for @queue queue suspended further processing of the queue.',
       Argument::that(function ($args) {
         return $args['@queue'] === CronQueueTestSuspendQueue::PLUGIN_ID;
       })
-    )->shouldBeCalled();
-
-    $this->logger->log(
-      RfcLogLevel::INFO,
-      'Cron run completed.',
-      Argument::cetera()
     )->shouldBeCalled();
 
     // Get the queue to test the specific SuspendQueueException.
