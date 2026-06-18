@@ -6,13 +6,16 @@ namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the attachment display plugin.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\display\Attachment
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class DisplayAttachmentTest extends ViewTestBase {
 
   /**
@@ -20,7 +23,7 @@ class DisplayAttachmentTest extends ViewTestBase {
    *
    * @var array
    */
-  public static $testViews = ['test_display_attachment', 'test_attached_disabled'];
+  public static $testViews = ['test_display_attachment', 'test_attached_disabled', 'test_display_attachment_pager'];
 
   /**
    * {@inheritdoc}
@@ -101,6 +104,15 @@ class DisplayAttachmentTest extends ViewTestBase {
     $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "view-content")]', 1);
     // Verify that the attachment_2 is not rendered.
     $this->assertSession()->elementNotExists('xpath', '//div[contains(@class, "attachment-after")]');
+  }
+
+  /**
+   * Tests the attachment display pager is rendered in the page.
+   */
+  public function testAttachmentPager(): void {
+    $this->drupalGet('test-display-attachment-pager');
+    // Verify that there are two pagers rendered.
+    $this->assertSession()->elementsCount('xpath', '//nav[contains(@class, "pager")]', 2);
   }
 
 }
