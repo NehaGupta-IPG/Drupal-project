@@ -16,6 +16,7 @@ function navigation_install(bool $is_syncing): void {
 
   $blocks = \Drupal::moduleHandler()->invokeAll('navigation_defaults');
   $manager = \Drupal::service('plugin.manager.config_action');
+
   foreach ($blocks as $block) {
     $manager->applyAction('addNavigationBlock', 'navigation.block_layout', $block);
   }

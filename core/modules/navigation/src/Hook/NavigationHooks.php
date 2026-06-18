@@ -224,7 +224,7 @@ class NavigationHooks {
       $blocks = $this->moduleHandler->invoke($module, 'navigation_defaults');
 
       if (!is_array($blocks)) {
-        return;
+        continue;
       }
 
       foreach ($blocks as $block) {
