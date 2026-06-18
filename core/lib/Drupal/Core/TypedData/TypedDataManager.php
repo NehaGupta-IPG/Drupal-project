@@ -44,6 +44,11 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
   protected $prototypes = [];
 
   /**
+   * Cache key parts for each unique root definition object.
+   */
+  protected \SplObjectStorage $parts;
+
+  /**
    * The class resolver.
    *
    * @var \Drupal\Core\DependencyInjection\ClassResolverInterface
@@ -67,6 +72,8 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
     $this->alterInfo('data_type_info');
     $this->setCacheBackend($cache_backend, 'typed_data_types_plugins');
     $this->classResolver = $class_resolver;
+
+    $this->parts = new \SplObjectStorage();
 
     parent::__construct(
       'Plugin/DataType',
@@ -169,12 +176,19 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
       $root_definition = $root_definition->getItemDefinition();
     }
 
-    // Root data type and settings.
-    $parts[] = $root_definition->getDataType();
-    if ($settings = $root_definition->getSettings()) {
-      // Include the settings serialized as JSON as part of the key. The JSON is
-      // a shorter string than the serialized form, so array access is faster.
-      $parts[] = json_encode($settings);
+    if (isset($this->parts[$root_definition])) {
+      $parts = $this->parts[$root_definition];
+    }
+    else {
+      // Root data type and settings.
+      $parts[] = $root_definition->getDataType();
+      if ($settings = $root_definition->getSettings()) {
+        // Include the settings serialized as JSON as part of the key. The JSON
+        // is a shorter string than the serialized form, so array access is
+        // faster.
+        $parts[] = json_encode($settings);
+      }
+      $this->parts[$root_definition] = $parts;
     }
     // Property path for the requested data object.
     $parts[] = $object->getPropertyPath();
