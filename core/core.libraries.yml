@@ -679,7 +679,7 @@ internal.jquery.form:
     url: https://raw.githubusercontent.com/jquery-form/form/master/LICENSE
     gpl-compatible: true
   js:
-    misc/jquery.form.js: {}
+    assets/vendor/jquery-form/jquery.form.min.js: { minified: true, weight: -19 }
   dependencies:
     - core/jquery
 
@@ -712,7 +712,7 @@ once:
     url: https://git.drupalcode.org/project/once/-/raw/v1.0.1/LICENSE.md
     gpl-compatible: true
   js:
-    assets/vendor/once/once.min.js: { weight: -19, minified: true }
+    assets/vendor/once/once.min.js: { weight: -19 }
 
 sortable:
   remote: https://github.com/SortableJS/Sortable
