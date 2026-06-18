@@ -243,6 +243,7 @@
           token,
           this.indicator,
           () => this.moveMode?.cancel(),
+          (row) => this.pickUpRow(row),
         );
         this.drag.attach();
       } else {
@@ -251,6 +252,24 @@
           '[menu-tree] drupalSettings.menuTreeUi.moveUrl missing — drag disabled.',
         );
       }
+    }
+
+    /**
+     * Picks a row up into keyboard move mode from a mouse tap on its handle.
+     *
+     * Lets a mouse user start a move the same way Space does: pick the row up,
+     * click a destination row to set the drop position, then confirm with the
+     * keyboard. A tap while a move is already running is ignored here — the
+     * tree's click handler positions the cursor instead.
+     *
+     * @param {HTMLElement} row
+     *   The tapped row.
+     */
+    pickUpRow(row) {
+      if (!this.moveMode || this.moveMode.isActive()) {
+        return;
+      }
+      this.moveMode.tryGrab(row);
     }
 
     /**

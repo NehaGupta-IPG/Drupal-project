@@ -14,11 +14,12 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Tests the menu_tree_ui keyboard grab/select move mode end-to-end.
  *
- * Move mode is the keyboard counterpart to pointer drag: Space picks up the
- * focused row, the arrow keys move a box-style drop position through the tree,
- * and Enter commits through the SAME commitMove() path as drag. Each stop
- * references a row and is mirrored on the host as data-mtu-drop ("kind:id"),
- * which these tests walk to deterministically rather than counting keystrokes.
+ * Move mode is the keyboard counterpart to pointer drag: Space (or a click on
+ * the drag handle) picks up the focused row, Up/Down move it one visual
+ * position, Left/Right change the landing depth, and Enter commits through the
+ * SAME commitMove() path as drag. The cursor's prospective drop is mirrored on
+ * the host as data-mtu-drop ("kind:id"), which these tests walk to
+ * deterministically rather than counting keystrokes.
  *
  * Moves are no longer written to storage on commit; they accumulate in a
  * server-side working copy until saved, so these tests verify each move via
@@ -322,6 +323,176 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
   }
 
   /**
+   * Down/Up move a held row one visual position; Left/Right change its depth.
+   *
+   * Grabs A1 (first child of expanded A) and walks the cursor with the new
+   * orthogonal controls: one Down lands it as a sibling after A2 (still depth
+   * 2), then Left pulls it out to the top level after A. This is the model the
+   * "up/down move one position, left/right change depth" request describes.
+   */
+  public function testUpDownMoveOnePositionLeftRightChangeDepth(): void {
+    $this->expandRow('A');
+    $this->dispatchKeys('A1', [' ']);
+
+    // Grab starts on A1's own slot (before A2): after:A as A's first child.
+    $this->stepToDrop('A1', 'child:' . $this->linkIds['A']);
+    $this->assertDepth('A1', 2);
+
+    // One Down moves it one position: now after A2, still a child of A.
+    $this->dispatchKeys('A1', ['ArrowDown']);
+    $this->assertSame(
+      'after:' . $this->linkIds['A2'],
+      $this->readDrop(),
+      'Down should move the held row one position, to after A2.',
+    );
+    $this->assertDepth('A1', 2);
+
+    // Left changes only the depth: out of A, to the top level after A.
+    $this->dispatchKeys('A1', ['ArrowLeft']);
+    $this->assertSame(
+      'after:' . $this->linkIds['A'],
+      $this->readDrop(),
+      'Left should outdent the held row to the top level without moving it.',
+    );
+    $this->assertDepth('A1', 1);
+
+    $this->dispatchKeys('A1', ['Enter']);
+    $this->settle();
+    $this->assertSiblings(['A', 'A1', 'B', 'C', 'D', 'L'], $this->childRowsSelector(NULL));
+  }
+
+  /**
+   * The held row stays visible and no key closes the section it sits in.
+   *
+   * Regression guard for the "cursor gets lost when the section closes"
+   * report: carry B inside expanded A, then press Left. The old Left collapsed
+   * the highlighted item, which hid the carried row; now A stays open and B
+   * stays visible.
+   */
+  public function testHeldRowStaysVisibleAndKeepsItsSectionOpen(): void {
+    $this->expandRow('A');
+    $this->dispatchKeys('B', [' ']);
+    $this->stepToDrop('B', 'child:' . $this->linkIds['A']);
+
+    $this->assertSame(
+      'true',
+      $this->row('A')->getAttribute('aria-expanded'),
+      'A should be open while B is carried inside it.',
+    );
+    $this->assertHeldRowVisible('B');
+
+    // The held row is wedged between A and A1, so its depth is pinned; Left
+    // must leave the section open rather than collapse it and lose the row.
+    $this->dispatchKeys('B', ['ArrowLeft']);
+    $this->assertSame(
+      'true',
+      $this->row('A')->getAttribute('aria-expanded'),
+      'Left must not close the section the held row is displayed in.',
+    );
+    $this->assertHeldRowVisible('B');
+
+    // Clicking A's collapse toggle mid-move must also leave it open: folding it
+    // would hide the carried row and lose the cursor.
+    $this->row('A')
+      ->find('css', '.menu-tree-ui-row__name button.menu-tree-ui-row__toggle')
+      ->click();
+    $this->assertSame(
+      'true',
+      $this->row('A')->getAttribute('aria-expanded'),
+      'Clicking the toggle must not collapse a section holding the carried row.',
+    );
+    $this->assertHeldRowVisible('B');
+  }
+
+  /**
+   * A click on the drag handle picks the row up into keyboard move mode.
+   *
+   * The mouse entry point the request asks for: click to pick up, then drive
+   * with the keyboard. A plain tap (no drag threshold crossed) enters move
+   * mode rather than starting a drag.
+   */
+  public function testClickHandlePicksUpRowForMoveMode(): void {
+    $this->tapHandle('B');
+    $grabbed = $this->assertSession()->waitForElement(
+      'css',
+      sprintf(
+        'tr[role="row"][data-id="%s"].menu-tree-ui-row--grabbed',
+        $this->linkIds['B'],
+      ),
+    );
+    $this->assertNotNull(
+      $grabbed,
+      'Clicking the handle should pick the row up into move mode.',
+    );
+
+    // The keyboard then drives the move: drop B after C and confirm with Enter.
+    $this->stepToDrop('B', 'after:' . $this->linkIds['C']);
+    $this->dispatchKeys('B', ['Enter']);
+    $this->settle();
+    $this->assertSiblings(['A', 'C', 'B', 'D', 'L'], $this->childRowsSelector(NULL));
+  }
+
+  /**
+   * Fires a tap (pointerdown + pointerup, no drag) on a row's handle.
+   *
+   * Mirrors the synthetic pointer events the drag test uses, but without the
+   * intervening pointermove, so the DragController treats it as a click rather
+   * than a drag and routes it to move-mode pickup.
+   *
+   * @param string $label
+   *   The row label whose handle to tap.
+   */
+  private function tapHandle(string $label): void {
+    $id = $this->linkIds[$label];
+    $script = <<<JS
+      const row = document.querySelector('tr[role="row"][data-id="$id"]');
+      if (!row) throw new Error('row not in DOM');
+      row.scrollIntoView({block: 'center'});
+      const handle = row.querySelector('.menu-tree-ui-row__handle:not(.menu-tree-ui-row__handle--locked)');
+      if (!handle) throw new Error('no draggable handle on row');
+      const r = handle.getBoundingClientRect();
+      const x = r.left + r.width / 2;
+      const y = r.top + r.height / 2;
+      function send(type) {
+        handle.dispatchEvent(new PointerEvent(type, {
+          bubbles: true, cancelable: true, composed: true,
+          pointerId: 1, isPrimary: true, button: 0,
+          clientX: x, clientY: y, screenX: x, screenY: y,
+        }));
+      }
+      send('pointerdown');
+      send('pointerup');
+    JS;
+    $this->getSession()->executeScript($script);
+  }
+
+  /**
+   * Asserts a held row is in the DOM, not hidden, and laid out (visible).
+   *
+   * @param string $label
+   *   The held row's label.
+   */
+  private function assertHeldRowVisible(string $label): void {
+    $id = $this->linkIds[$label];
+    $script = <<<JS
+      return (function () {
+        const row = document.querySelector('tr[role="row"][data-id="$id"]');
+        if (!row) return 'missing';
+        if (row.dataset.hidden === 'true') return 'data-hidden';
+        const visible = typeof row.checkVisibility === 'function'
+          ? row.checkVisibility()
+          : row.offsetParent !== null;
+        return visible ? 'visible' : 'not-visible';
+      })();
+    JS;
+    $this->assertSame(
+      'visible',
+      (string) $this->getSession()->evaluateScript($script),
+      "Held row $label should remain visible.",
+    );
+  }
+
+  /**
    * Dispatches a click on a row at a vertical zone (0 = top, 1 = bottom).
    *
    * The click lands on the title so it never hits a row control, and carries a
@@ -361,21 +532,33 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
   /**
    * Walks the move cursor to a wanted "kind:id" drop position.
    *
-   * Goes to the top of the list, then steps down until the host's
-   * data-mtu-drop matches - deterministic regardless of where the grab began.
+   * The cursor is two-dimensional now: Up/Down move it one visual position and
+   * Left/Right change the landing depth. This parks at the top, then for each
+   * gap sweeps depth from shallowest (Left) to deepest (Right), checking the
+   * host's data-mtu-drop after each press - deterministic regardless of where
+   * the grab began. Right may open a collapsed parent (the documented
+   * behaviour), which only adds reachable positions.
    *
    * @param string $source
    *   Label of the grabbed row (the node keydowns are dispatched on).
    * @param string $want
    *   The wanted data-mtu-drop value, "kind:pluginId".
    * @param int $max
-   *   Safety bound on the number of steps.
+   *   Safety bound on the number of gaps / depths swept.
    */
-  private function stepToDrop(string $source, string $want, int $max = 50): void {
+  private function stepToDrop(string $source, string $want, int $max = 40): void {
     $this->dispatchKeys($source, array_fill(0, $max, 'ArrowUp'));
-    for ($i = 0; $i <= $max; $i++) {
-      if ($this->readDrop() === $want) {
-        return;
+    for ($gap = 0; $gap <= $max; $gap++) {
+      $this->dispatchKeys($source, array_fill(0, $max, 'ArrowLeft'));
+      for ($depth = 0; $depth <= $max; $depth++) {
+        if ($this->readDrop() === $want) {
+          return;
+        }
+        $before = $this->readDrop();
+        $this->dispatchKeys($source, ['ArrowRight']);
+        if ($this->readDrop() === $before) {
+          break;
+        }
       }
       $this->dispatchKeys($source, ['ArrowDown']);
     }

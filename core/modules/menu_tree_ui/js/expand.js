@@ -127,6 +127,17 @@
      */
     // eslint-disable-next-line class-methods-use-this
     collapse(row) {
+      // Never fold away a section that holds a row being carried in move mode:
+      // the editor must always be able to see the row they are moving, and the
+      // cursor would be lost if it vanished. The grabbed row carries a marker
+      // class for the duration of the move.
+      if (
+        descendantRows(row).some((r) =>
+          r.classList.contains('menu-tree-ui-row--grabbed'),
+        )
+      ) {
+        return;
+      }
       row.setAttribute('aria-expanded', 'false');
       this.hideSubtree(row);
     }

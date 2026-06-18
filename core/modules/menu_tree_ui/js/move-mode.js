@@ -1,29 +1,36 @@
 /**
+ * @param Drupal
  * @file
  * Keyboard grab/select move mode for the menu tree.
  *
- * The keyboard counterpart to pointer drag. Space picks up the focused row; the
- * arrow keys move a drop position through the tree; Enter drops; Escape cancels.
- * It commits through the SAME commitMove() path as drag, so both produce
- * identical server moves and announcements.
+ * The keyboard counterpart to pointer drag. Space (or a click on the drag
+ * handle) picks up the focused row; the arrow keys move it; Enter drops;
+ * Escape cancels. It commits through the SAME commitMove() path as drag, so
+ * both produce identical server moves and announcements.
  *
  * Instead of drawing a borrowed drop indicator, this carries the grabbed row
- * itself: as the cursor steps, the row (with its descendant subtree) is moved in
- * the DOM to the candidate slot and re-indented to the landing depth, so the
- * editor sees exactly where it will land. The carry is purely visual — on commit
- * the row is restored to its origin and the normal commitMove() runs against the
- * pre-move DOM; on cancel it is restored and left.
+ * itself: as the cursor moves, the row (with its descendant subtree) is moved
+ * in the DOM to the candidate slot and re-indented to the landing depth, so the
+ * editor sees exactly where it will land. The carry is purely visual — on
+ * commit the row is restored to its origin and the normal commitMove() runs
+ * against the pre-move DOM; on cancel it is restored and left.
  *
- * Position model. Stops are precomputed in visual (pre-order) order:
- *  - "child" of a row   - drop as its FIRST child (one level deeper).
- *  - "before"/"after"   - drop as a sibling above the first row / below a row.
- * A row's "after" stop is emitted after its subtree, so Up/Down read top to
- * bottom. Right nests onto the current row, opening it if it is a closed parent
- * so its children become navigable; Left closes it. A pointer click on a row
- * while a row is grabbed sets the cursor to the clicked zone (reusing the drag
- * intent zones), so keyboard select and mouse positioning combine. The move also
- * survives a search: focus moving to the search field does not cancel it, and
- * jumping to a result re-aims the cursor at that row.
+ * Position model. The cursor is a (gap, depth) pair over the visible rows
+ * (excluding the carried row and its subtree):
+ *  - gap is a slot between two consecutive visible rows. Up/Down move it one
+ *    visual position, so the carried row travels straight up and down the list.
+ *  - depth is the level the row would land at in that gap. Left/Right change it,
+ *    clamped to what the neighbours allow: at most one level deeper than the row
+ *    above, and no shallower than the row below. Right onto a closed parent
+ *    opens it so the row can nest among its children; the held row stays visible
+ *    throughout — no gesture closes the section it sits in.
+ *
+ * A (gap, depth) pair resolves to a DropIntent {kind, target} so the carry and
+ * commit reuse the drag code. A pointer click on a row while a row is grabbed
+ * sets the cursor to the clicked zone (reusing the drag intent zones), so
+ * keyboard select and mouse positioning combine. The move also survives a
+ * search: focus moving to the search field does not cancel it, and jumping to a
+ * result re-aims the cursor at that row.
  *
  * Exposes Drupal.menuTreeUi.MoveModeController.
  */
@@ -37,10 +44,32 @@
     resolveBeforeId,
     computeIntent,
   } = Drupal.menuTreeUi.drag;
-  const { descendantRows, lastDescendantRow, nextSiblingRow, visibleRows } =
-    Drupal.menuTreeUi.treeNav;
+  const {
+    descendantRows,
+    lastDescendantRow,
+    nextSiblingRow,
+    visibleRows,
+    findRow,
+  } = Drupal.menuTreeUi.treeNav;
 
   const CLASS_GRABBED = 'menu-tree-ui-row--grabbed';
+
+  /**
+   * Clamps a number to an inclusive range.
+   *
+   * @param {number} value
+   *   The value.
+   * @param {number} min
+   *   The lower bound.
+   * @param {number} max
+   *   The upper bound.
+   *
+   * @return {number}
+   *   The clamped value.
+   */
+  function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+  }
 
   /**
    * Announces a message through Drupal's live-region announcer.
@@ -161,9 +190,15 @@
       this.origLevel = 1;
       this.originParent = null;
       this.originNext = null;
-      this.positions = [];
-      this.posIndex = -1;
+      // The cursor: a slot index between visible rows, and the depth the row
+      // would land at there.
+      this.gap = 0;
+      this.depth = 1;
       this.intent = null;
+      // Bumped on every cursor move. openInto() captures it before its async
+      // expand and bails on return if the cursor has moved since, so a slow
+      // open never yanks the row back from where later keys put it.
+      this.cursorSeq = 0;
     }
 
     /**
@@ -196,8 +231,7 @@
       }
       this.grabbed = row;
       this.snapshotOrigin();
-      this.buildPositions();
-      if (this.positions.length === 0) {
+      if (this.visibleList().length === 0) {
         this.grabbed = null;
         announce('There is nowhere to move this item.', 'assertive');
         return false;
@@ -208,11 +242,11 @@
       // Focus follows the grabbed row (not its handle) through the move, so the
       // <tr> is made focusable for the duration; end() restores it.
       row.tabIndex = 0;
-      this.setIntentByIndex(this.findCurrentSlotIndex(), false);
+      this.setInitialCursor();
 
       announce(
         `Picked up ${titleOf(row)}. Will drop ${describe(this.intent)}. ` +
-          'Use Up and Down to choose a position, Right to nest inside an item, ' +
+          'Use Up and Down to move it, Left and Right to change its indent, ' +
           'Enter to drop, or Escape to cancel.',
         'assertive',
       );
@@ -254,10 +288,10 @@
           this.step(-1);
           return true;
         case 'ArrowRight':
-          this.enter();
+          this.deepen();
           return true;
         case 'ArrowLeft':
-          this.leave();
+          this.shallow();
           return true;
         case 'Enter':
         case ' ':
@@ -298,12 +332,15 @@
       if (!row || row === this.grabbed || this.block.includes(row)) {
         return false;
       }
-      const intent = computeIntent(row, event.clientY);
-      const i = this.indexOfStop(intent.kind, intent.target);
-      if (i === -1) {
+      const list = this.visibleList();
+      const placed = this.gapDepthForIntent(
+        computeIntent(row, event.clientY),
+        list,
+      );
+      if (!placed) {
         return false;
       }
-      this.setIntentByIndex(i);
+      this.setCursor(placed.gap, placed.depth, list);
       return true;
     }
 
@@ -317,180 +354,232 @@
       if (!this.active || row === this.grabbed || this.block.includes(row)) {
         return;
       }
-      this.buildPositions();
-      let i = this.indexOfStop('before', row);
-      if (i === -1) {
-        i = this.indexOfStop('child', row);
+      const list = this.visibleList();
+      const gap = list.indexOf(row);
+      if (gap === -1) {
+        return;
       }
-      if (i !== -1) {
-        this.setIntentByIndex(i);
-      }
+      const { min, max } = this.gapBounds(gap, list);
+      this.setCursor(gap, clamp(this.depth, min, max), list);
     }
 
     /**
-     * Rebuilds the ordered list of drop positions from the current tree.
+     * The visible rows the cursor moves over: every visible row except the
+     * carried row and its subtree.
      *
-     * Pre-order walk (skipping the grabbed row and its subtree): one "before"
-     * stop at the very top, then for each visible row a "child" stop, its
-     * descendants, and finally its "after" stop - so the after-stop sits below
-     * the row's whole subtree and the list reads top to bottom. Called on grab
-     * and after any open/close that changes which rows are visible.
+     * @return {HTMLElement[]}
+     *   The candidate rows, in document order.
      */
-    buildPositions() {
-      const positions = [];
+    visibleList() {
       const skip = new Set([this.grabbed, ...this.block]);
-      const rows = visibleRows(this.tree).filter((row) => !skip.has(row));
+      return visibleRows(this.tree).filter((row) => !skip.has(row));
+    }
 
-      // Defer each row's "after" stop until its whole (visible) subtree has
-      // been emitted, so Up/Down reads top to bottom and the after-line lands
-      // below the descendant run. A stack of pending afters keyed by level
-      // flushes any row at the next row's level or shallower before its child
-      // stop, and the tail flushes the rest.
-      const pending = [];
-      const flush = (level) => {
-        while (pending.length && pending[pending.length - 1].level >= level) {
-          positions.push(pending.pop().stop);
-        }
-      };
+    /**
+     * The depth range allowed at a gap.
+     *
+     * The carried row can be at most one level deeper than the row above the
+     * gap, and no shallower than the row below it (going shallower there would
+     * orphan that row). With no row above, only the root level is allowed.
+     *
+     * @param {number} gap
+     *   The gap index (0..list.length).
+     * @param {HTMLElement[]} list
+     *   The visible candidate rows.
+     *
+     * @return {{prev: ?HTMLElement, next: ?HTMLElement, min: number, max: number}}
+     *   The neighbours and the inclusive depth bounds.
+     */
+    // eslint-disable-next-line class-methods-use-this
+    gapBounds(gap, list) {
+      const prev = list[gap - 1] ?? null;
+      const next = list[gap] ?? null;
+      const max = prev ? levelOf(prev) + 1 : 1;
+      const min = Math.min(next ? levelOf(next) : 1, max);
+      return { prev, next, min, max };
+    }
 
-      if (rows.length) {
-        positions.push({ kind: 'before', target: rows[0] });
+    /**
+     * Resolves a (gap, depth) cursor to a DropIntent.
+     *
+     * Above the first row it is a "before" drop. Otherwise the row lands after
+     * the row above (prev): one level deeper makes it prev's first child;
+     * otherwise it is a sibling placed after the subtree of prev's ancestor at
+     * the chosen depth.
+     *
+     * @param {number} gap
+     *   The gap index.
+     * @param {number} depth
+     *   The chosen depth.
+     * @param {HTMLElement[]} list
+     *   The visible candidate rows.
+     *
+     * @return {?object}
+     *   The DropIntent, or null when there is nowhere to drop.
+     */
+    resolveIntent(gap, depth, list) {
+      const prev = list[gap - 1] ?? null;
+      if (!prev) {
+        return list[0] ? { kind: 'before', target: list[0] } : null;
       }
-      rows.forEach((row) => {
-        const level = levelOf(row);
-        flush(level);
-        positions.push({ kind: 'child', target: row });
-        pending.push({ level, stop: { kind: 'after', target: row } });
-      });
-      flush(1);
-      this.positions = positions;
+      if (depth >= levelOf(prev) + 1) {
+        return { kind: 'child', target: prev };
+      }
+      let ancestor = prev;
+      while (ancestor && levelOf(ancestor) > depth) {
+        ancestor = findRow(this.tree, ancestor.dataset.parentId);
+      }
+      return { kind: 'after', target: ancestor ?? prev };
     }
 
     /**
-     * Finds the position index representing the grabbed row's current slot.
+     * Maps a pointer-zone DropIntent to the (gap, depth) the cursor uses.
      *
-     * @return {number}
-     *   The index, or 0 if no exact match is found.
+     * @param {object} intent
+     *   A {kind, target} intent from computeIntent().
+     * @param {HTMLElement[]} list
+     *   The visible candidate rows.
+     *
+     * @return {?{gap: number, depth: number}}
+     *   The cursor, or null when the target isn't a candidate row.
      */
-    findCurrentSlotIndex() {
-      const parent = this.grabbed.dataset.parentId ?? '';
-      const before = nextSiblingId(this.grabbed);
-      const idx = this.positions.findIndex((p) => {
-        let pb = resolveBeforeId(p);
-        if (pb === this.grabbed.dataset.id) {
-          pb = nextSiblingId(this.grabbed);
-        }
-        return resolveNewParentId(p) === parent && (pb ?? null) === before;
-      });
-      return idx === -1 ? 0 : idx;
+    // eslint-disable-next-line class-methods-use-this
+    gapDepthForIntent(intent, list) {
+      const i = list.indexOf(intent.target);
+      if (i === -1) {
+        return null;
+      }
+      const level = levelOf(intent.target);
+      if (intent.kind === 'child') {
+        return { gap: i + 1, depth: level + 1 };
+      }
+      if (intent.kind === 'before') {
+        return { gap: i, depth: level };
+      }
+      // 'after' lands past the target's whole visible subtree.
+      let j = i + 1;
+      while (j < list.length && levelOf(list[j]) > level) {
+        j += 1;
+      }
+      return { gap: j, depth: level };
     }
 
     /**
-     * Returns the index of a {kind, target} stop, or -1.
-     *
-     * @param {string} kind
-     *   The intent kind.
-     * @param {HTMLElement} target
-     *   The target row.
-     *
-     * @return {number}
-     *   The index, or -1.
+     * Sets the initial cursor to the grabbed row's current slot, so an
+     * immediate Enter is a no-op and the arrows start from where the row is.
      */
-    indexOfStop(kind, target) {
-      return this.positions.findIndex(
-        (p) => p.kind === kind && p.target === target,
-      );
+    setInitialCursor() {
+      const list = this.visibleList();
+      const gap =
+        this.originNext && list.includes(this.originNext)
+          ? list.indexOf(this.originNext)
+          : list.length;
+      const { min, max } = this.gapBounds(gap, list);
+      this.setCursor(gap, clamp(this.origLevel, min, max), list, false);
     }
 
     /**
-     * Moves the cursor up (-1) or down (+1) one stop, clamped at the ends.
+     * Moves the cursor up (-1) or down (+1) one visual position, keeping the
+     * depth where the new gap allows it.
      *
      * @param {number} direction
      *   -1 for up, +1 for down.
      */
     step(direction) {
-      const i = this.posIndex + direction;
-      if (i >= 0 && i < this.positions.length) {
-        this.setIntentByIndex(i);
+      const list = this.visibleList();
+      const gap = clamp(this.gap + direction, 0, list.length);
+      if (gap === this.gap) {
+        return;
       }
+      const { min, max } = this.gapBounds(gap, list);
+      this.setCursor(gap, clamp(this.depth, min, max), list);
     }
 
     /**
-     * Right-arrow: nest onto the current row, opening it if it is a closed
-     * parent so its children become navigable.
+     * Right-arrow: nest one level deeper, opening a closed parent so the row
+     * can land among its children.
      */
-    enter() {
-      const { target } = this.positions[this.posIndex];
-      const childIndex = this.indexOfStop('child', target);
-      if (childIndex !== -1) {
-        this.setIntentByIndex(childIndex);
+    deepen() {
+      const list = this.visibleList();
+      const { prev, max } = this.gapBounds(this.gap, list);
+      if (this.depth >= max) {
+        return;
       }
-      this.openIfCollapsed(target);
-    }
-
-    /**
-     * Left-arrow: close the current row if it is an open parent.
-     */
-    leave() {
-      const { target } = this.positions[this.posIndex];
+      const depth = this.depth + 1;
+      this.setCursor(this.gap, depth, list);
       if (
-        target.dataset.hasChildren === 'true' &&
-        target.getAttribute('aria-expanded') === 'true'
+        prev &&
+        depth === levelOf(prev) + 1 &&
+        prev.dataset.hasChildren === 'true' &&
+        prev.getAttribute('aria-expanded') !== 'true'
       ) {
-        this.expand.collapse(target);
-        announce(`Closed ${titleOf(target)}.`);
-        this.buildPositions();
-        const i = this.indexOfStop('child', target);
-        if (i !== -1) {
-          this.setIntentByIndex(i);
-        }
+        this.openInto(prev);
       }
     }
 
     /**
-     * Opens a collapsed parent, rebuilds positions, and keeps the cursor on it.
+     * Left-arrow: pull the row out one level, down to what the gap allows.
      *
-     * @param {HTMLElement} target
-     *   The row to open.
+     * Never collapses anything — the carried row stays visible (see the file
+     * docblock); going shallower simply re-targets the drop to a higher
+     * ancestor.
+     */
+    shallow() {
+      const list = this.visibleList();
+      const { min } = this.gapBounds(this.gap, list);
+      if (this.depth <= min) {
+        return;
+      }
+      this.setCursor(this.gap, this.depth - 1, list);
+    }
+
+    /**
+     * Opens a collapsed parent the cursor just nested into, then keeps the
+     * carried row as its first child.
+     *
+     * @param {HTMLElement} prev
+     *   The parent row to open.
      *
      * @return {Promise<void>}
-     *   Resolves once the children are in DOM and positions are rebuilt.
+     *   Resolves once the children are in DOM and the cursor is re-placed.
      */
-    async openIfCollapsed(target) {
-      if (
-        target.dataset.hasChildren !== 'true' ||
-        target.getAttribute('aria-expanded') === 'true'
-      ) {
+    async openInto(prev) {
+      const seq = this.cursorSeq;
+      await this.expand.expand(prev);
+      // The move may have been committed or cancelled during the fetch, or the
+      // editor may have moved the cursor on - in which case the open is done
+      // (the section is now navigable) but the cursor must be left where it is.
+      if (!this.active || !this.grabbed || this.cursorSeq !== seq) {
         return;
       }
-      await this.expand.expand(target);
-      // The move may have been committed or cancelled during the fetch.
-      if (!this.active || !this.grabbed) {
-        return;
-      }
-      announce(`Opened ${titleOf(target)}.`);
-      this.buildPositions();
-      const i = this.indexOfStop('child', target);
-      if (i !== -1) {
-        this.setIntentByIndex(i);
-      }
+      announce(`Opened ${titleOf(prev)}.`);
+      const list = this.visibleList();
+      const gap = list.indexOf(prev) + 1;
+      const { min, max } = this.gapBounds(gap, list);
+      this.setCursor(gap, clamp(levelOf(prev) + 1, min, max), list);
     }
 
     /**
-     * Selects the position at an index: carries the row there and announces it.
+     * Selects a (gap, depth) cursor: carries the row there and announces it.
      *
-     * @param {number} i
-     *   The position index.
+     * @param {number} gap
+     *   The gap index.
+     * @param {number} depth
+     *   The chosen depth.
+     * @param {HTMLElement[]} list
+     *   The visible candidate rows the cursor was computed against.
      * @param {boolean} [doAnnounce]
      *   Whether to announce the position (the grab path passes false and
      *   announces a fuller message itself).
      */
-    setIntentByIndex(i, doAnnounce = true) {
-      if (i < 0 || i >= this.positions.length) {
+    setCursor(gap, depth, list, doAnnounce = true) {
+      const intent = this.resolveIntent(gap, depth, list);
+      if (!intent) {
         return;
       }
-      this.posIndex = i;
-      const intent = this.positions[i];
+      this.gap = gap;
+      this.depth = depth;
+      this.cursorSeq += 1;
       if (sameIntent(this.intent, intent)) {
         return;
       }
@@ -539,6 +628,9 @@
 
       this.setUnitLevel(depth);
       this.insertUnit(ref, after);
+      // The carried row must always be visible, even when it lands inside a
+      // collapsed run (see request: "I should always be able to see it").
+      delete this.grabbed.dataset.hidden;
       // Detaching the focused row dropped focus; put it back on the carried row
       // so the editor keeps control. The host's focusout handler defers its
       // cancel check and reads activeElement, which this restores.
@@ -697,8 +789,8 @@
       this.grabbed = null;
       this.block = [];
       this.blockDelta = new Map();
-      this.positions = [];
-      this.posIndex = -1;
+      this.gap = 0;
+      this.depth = 1;
       this.intent = null;
     }
   }

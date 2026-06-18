@@ -38,14 +38,27 @@
      * @param {function()} [onGestureStart]
      *   Called when a drag arms, so the host can cancel any active keyboard
      *   move mode before the pointer gesture takes over the shared indicator.
+     * @param {function(HTMLElement)} [onTap]
+     *   Called when a handle is clicked without dragging, so a mouse user can
+     *   pick a row up into keyboard move mode (click to pick up, click a
+     *   destination, confirm with the keyboard).
      */
-    constructor(tree, moveUrl, expand, csrfToken, indicator, onGestureStart) {
+    constructor(
+      tree,
+      moveUrl,
+      expand,
+      csrfToken,
+      indicator,
+      onGestureStart,
+      onTap,
+    ) {
       this.tree = tree;
       this.moveUrl = moveUrl;
       this.expand = expand;
       this.csrfToken = csrfToken;
       this.indicator = indicator;
       this.onGestureStart = onGestureStart;
+      this.onTap = onTap;
 
       this.pointerId = null;
       this.moved = null;
@@ -106,10 +119,6 @@
         return;
       }
 
-      // A pointer drag is taking over; cancel any active keyboard move so the
-      // two gestures never share the one drop indicator at the same time.
-      this.onGestureStart?.();
-
       this.moved = row;
       this.activeHandle = handle;
       this.pointerId = event.pointerId;
@@ -141,6 +150,11 @@
           return;
         }
         this.dragging = true;
+        // A pointer drag is taking over; cancel any active keyboard move so the
+        // two gestures never share the one drop indicator at the same time. A
+        // mere press-and-release (a tap) never reaches here, so it can pick a
+        // row up into move mode instead (see onPointerUp).
+        this.onGestureStart?.();
         this.moved.classList.add('menu-tree-ui-row--dragging');
       }
       this.updateIntent(event.clientX, event.clientY);
@@ -163,7 +177,13 @@
         this.cleanup();
         commitMove(row, intent, this.moveUrl, this.expand, this.csrfToken);
       } else {
+        // A tap (press and release without crossing the drag threshold): pick
+        // the row up into keyboard move mode rather than starting a drag.
+        const row = this.moved;
         this.cleanup();
+        if (row) {
+          this.onTap?.(row);
+        }
       }
     }
 
