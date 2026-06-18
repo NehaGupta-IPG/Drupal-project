@@ -7,7 +7,6 @@ namespace Drupal\Tests\views\Functional;
 use Drupal\Core\Database\Database;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\UpdatePathTestTrait;
-use Drupal\views\Entity\View;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -37,13 +36,6 @@ class ViewsConfigUpdaterTest extends BrowserTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $view = View::create([
-      'base_table' => 'views',
-      'id' => 'test_views_config_updater',
-      'label' => 'Test views config updater',
-    ]);
-    $view->addDisplay('default');
-    $view->save();
 
     $connection = Database::getConnection();
 

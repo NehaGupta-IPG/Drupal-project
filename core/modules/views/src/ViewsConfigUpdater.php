@@ -108,8 +108,6 @@ class ViewsConfigUpdater {
         }
       }
     }
-    unset($display);
-
     if ($changed) {
       $view->set('display', $displays);
     }
