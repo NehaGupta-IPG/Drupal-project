@@ -113,7 +113,7 @@ trait SerializedColumnNormalizerTrait {
       if (is_array($serialized_fields) && isset($serialized_fields[$field_name]) && is_array($serialized_fields[$field_name])) {
         return $serialized_fields[$field_name];
       }
-      if (isset($definition['serialized_property_names']) && is_array($definition['serialized_property_names'])) {
+      if (!empty($definition['serialized_property_names']) && is_array($definition['serialized_property_names'])) {
         trigger_error('Support serialized_fields_property_names is deprecated in drupal:11.5.0 and will be removed in drupal:13.0.0. Handle unserialization manually or switch to a JSON column. See https://www.drupal.org/project/drupal/issues/3603923', E_USER_DEPRECATED);
         return $definition['serialized_property_names'];
       }
