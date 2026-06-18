@@ -174,8 +174,15 @@ menu-tree {
   display: none;
 }
 
-/* Highlight the row that holds focus (on its handle, toggle, switch, or links). */
+/*
+ * Highlight the row that holds focus (on its handle, toggle, switch, or links).
+ * Raise it above its neighbours so the focused control's focus ring — which the
+ * theme draws as a box-shadow extending outside the element — is not painted
+ * over by the adjacent rows.
+ */
 .menu-tree-ui-row:focus-within {
+  position: relative;
+  z-index: 1;
   background-color: var(--mtu-color-focus-bg);
 }
 
