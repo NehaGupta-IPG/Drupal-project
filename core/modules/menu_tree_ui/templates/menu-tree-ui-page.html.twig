@@ -87,6 +87,17 @@
     </div>
   </dialog>
 
+  {#
+    Add link. The primary create action for the menu, kept distinct from the
+    Save/Cancel bar (which keeps or discards reorders). It links to the standard
+    menu-link add form with a destination back to this page.
+  #}
+  {% if add_link_url %}
+    <div class="menu-tree-ui__primary-actions">
+      <a href="{{ add_link_url }}" class="button button--action button--primary menu-tree-ui__add-link">{{ 'Add link'|t }}</a>
+    </div>
+  {% endif %}
+
   {# Search bar above the list, with results popover anchored to the input. #}
   <div class="menu-tree-ui__search-container" role="search">
     <label for="menu-tree-ui-search-input" class="visually-hidden">

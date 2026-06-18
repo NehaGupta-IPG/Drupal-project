@@ -506,3 +506,9 @@ menu-tree {
   background: var(--mtu-color-divider-light);
   font-size: 0.85em;
 }
+
+/* "Add link" primary action, above the search box. */
+.menu-tree-ui__primary-actions {
+  margin-block-end: 1rem;
+}
+

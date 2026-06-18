@@ -22,6 +22,9 @@ function menu_tree_ui_theme(): array {
         'top_level' => [],
         'search_action' => '',
         'children_action' => '',
+        // URL of the "Add link" form for this menu, with a destination back to
+        // this page.
+        'add_link_url' => '',
         // Array of column header info: keyed by plugin ID, each entry has
         // 'id' (string) and 'label' (TranslatableMarkup).
         'columns' => [],

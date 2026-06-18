@@ -108,6 +108,11 @@ final class MenuTreeController extends ControllerBase {
       '#has_changes' => $has_changes,
       '#locked' => $locked,
       '#lock_owner' => $lock_owner,
+      '#add_link_url' => Url::fromRoute('entity.menu.add_link_form', ['menu' => $menu_name], [
+        'query' => [
+          'destination' => Url::fromRoute('menu_tree_ui.edit', ['menu' => $menu_name])->toString(),
+        ],
+      ])->toString(),
       '#search_action' => Url::fromRoute('menu_tree_ui.search', ['menu' => $menu_name])->toString(),
       '#children_action' => Url::fromRoute('menu_tree_ui.children', ['menu' => $menu_name])->toString(),
       '#attached' => [
