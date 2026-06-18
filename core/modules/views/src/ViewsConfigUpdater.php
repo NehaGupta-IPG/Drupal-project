@@ -67,13 +67,7 @@ class ViewsConfigUpdater {
    *   Whether the view was updated.
    */
   public function updateAll(ViewEntityInterface $view) {
-    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type, $key, $display_id) use ($view) {
-      $changed = FALSE;
-      if ($this->updateTableSortableCounter($view)) {
-        $changed = TRUE;
-      }
-      return $changed;
-    });
+    return $this->updateTableSortableCounter($view);
   }
 
   /**
