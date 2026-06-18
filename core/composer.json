@@ -29,19 +29,19 @@
         "symfony/mailer": "^8.0.12",
         "symfony/mime": "^8.0.12",
         "symfony/routing": "^8.0.13",
+        "symfony/runtime": "^8.0",
         "symfony/serializer": "^8.0",
         "symfony/validator": "^8.0",
         "symfony/process": "^8.0",
         "symfony/polyfill-iconv": "^1.32",
         "symfony/polyfill-php86": "^1.37",
-        "symfony/runtime": "^8.0",
         "symfony/yaml": "^8.0.12",
         "revolt/event-loop": "^1.0",
         "twig/twig": "^3.27.0",
         "doctrine/lexer": "^2 || ^3",
         "drupal/core-composer-scaffold": "self.version",
         "guzzlehttp/guzzle": "^7.10",
-        "guzzlehttp/psr7": "^2.8.0",
+        "guzzlehttp/psr7": "^2.10.2",
         "egulias/email-validator": "^3.2.1|^4.0",
         "masterminds/html5": "^2.7",
         "symfony/psr-http-message-bridge": "^8.0",
@@ -123,6 +123,9 @@
             "includes/bootstrap.inc"
         ]
     },
+    "bin": [
+        "scripts/dr"
+    ],
     "config": {
         "preferred-install": "dist"
     },
