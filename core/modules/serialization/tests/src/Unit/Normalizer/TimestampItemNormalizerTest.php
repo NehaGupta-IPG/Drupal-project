@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\serialization\Unit\Normalizer;
 
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\CreatedItem;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\Core\Field\Plugin\Field\FieldType\TimestampItem;
+use Drupal\Core\Field\TypedData\FieldItemDataDefinitionInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\TypedData\DataDefinitionInterface;
+use Drupal\Core\TypedData\TraversableTypedDataInterface;
 use Drupal\Core\TypedData\Plugin\DataType\Timestamp;
 use Drupal\serialization\Normalizer\TimestampItemNormalizer;
 use Drupal\Tests\UnitTestCase;
@@ -42,6 +44,8 @@ class TimestampItemNormalizerTest extends UnitTestCase {
     parent::setUp();
 
     $this->normalizer = new TimestampItemNormalizer();
+
+    new Settings(['support_serialized_field_property_names' => FALSE]);
   }
 
   /**
@@ -118,37 +122,30 @@ class TimestampItemNormalizerTest extends UnitTestCase {
     ];
     $timestamp_data_denormalization = $this->randomMachineName();
 
-    $timestamp_item = $this->createTimestampItemProphecy();
-    // The field item should get the Timestamp @DataType denormalization set as
-    // a value, in FieldItemNormalizer::denormalize().
-    $timestamp_item->setValue(['value' => $timestamp_data_denormalization])
+    $parent = $this->prophesize(TraversableTypedDataInterface::class);
+
+    // The following code ends up calling TimestampItem::schema() which is
+    // static, so use the real field item class with mocked dependencies.
+    $field_data_definition = $this->prophesize(FieldItemDataDefinitionInterface::class);
+    $field_data_definition->getPropertyDefinitions()
+      ->willReturn([])
       ->shouldBeCalled();
 
-    // Avoid a static method call by returning dummy serialized property data.
     $field_definition = $this->prophesize(FieldDefinitionInterface::class);
-    $timestamp_item
-      ->getFieldDefinition()
+    $field_storage_definition = $this->prophesize(FieldStorageDefinitionInterface::class);
+
+    $field_definition->getFieldStorageDefinition()
+      ->willReturn($field_storage_definition)
+      ->shouldBeCalled();
+
+    $field_data_definition->getFieldDefinition()
       ->willReturn($field_definition->reveal())
       ->shouldBeCalled();
-    $timestamp_item->getPluginDefinition()
-      ->willReturn([
-        'serialized_property_names' => [
-          'foo' => 'bar',
-        ],
-      ])
-      ->shouldBeCalled();
-    $entity = $this->prophesize(EntityInterface::class);
-    $entity_type = $this->prophesize(EntityTypeInterface::class);
-    $entity->getEntityType()
-      ->willReturn($entity_type->reveal())
-      ->shouldBeCalled();
-    $timestamp_item
-      ->getEntity()
-      ->willReturn($entity->reveal())
-      ->shouldBeCalled();
+
+    $timestamp_item = new TimestampItem($field_data_definition->reveal(), 'timestamp', $parent->reveal());
 
     $context = [
-      'target_instance' => $timestamp_item->reveal(),
+      'target_instance' => $timestamp_item,
       'datetime_allowed_formats' => [\DateTime::RFC3339],
     ];
 
