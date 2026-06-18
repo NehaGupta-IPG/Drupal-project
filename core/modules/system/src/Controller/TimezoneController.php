@@ -35,6 +35,9 @@ class TimezoneController {
       return new JsonResponse(FALSE);
     }
 
+    if ($is_daylight_saving_time === NULL) {
+      @trigger_error('Passing NULL to ' . __METHOD__ . '() is deprecated in drupal:12.0.0 and will be removed in drupal:13.0.0. Pass -1 instead. See https://www.drupal.org/node/3585397', E_USER_DEPRECATED);
+    }
     $is_daylight_saving_time = $is_daylight_saving_time ?? -1;
     // Catch if out of boundary. Valid values are -1, 0 or 1.
     if (abs($is_daylight_saving_time) > 1) {
