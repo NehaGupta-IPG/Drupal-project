@@ -67,7 +67,13 @@ class ViewsConfigUpdater {
    *   Whether the view was updated.
    */
   public function updateAll(ViewEntityInterface $view) {
-    return $this->updateTableSortableCounter($view);
+    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type, $key, $display_id) use ($view) {
+      $changed = FALSE;
+      if ($this->updateTableSortableCounter($view)) {
+        $changed = TRUE;
+      }
+      return $changed;
+    });
   }
 
   /**
@@ -84,10 +90,11 @@ class ViewsConfigUpdater {
     $displays = $view->get('display');
 
     foreach ($displays as &$display) {
-      if (($display['display_options']['style']['type'] ?? NULL) !== 'table') {
-        continue;
-      }
-      if (empty($display['display_options']['fields']) || empty($display['display_options']['style']['options']['info'])) {
+      if (
+        ($display['display_options']['style']['type'] ?? NULL) !== 'table'
+        || empty($display['display_options']['fields'])
+        || empty($display['display_options']['style']['options']['info'])
+      ) {
         continue;
       }
 

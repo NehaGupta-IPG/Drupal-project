@@ -67,9 +67,12 @@ class ViewsConfigUpdaterTest extends BrowserTestBase {
   }
 
   /**
-   * Tests ViewsConfigUpdater.
+   * Tests the deprecationsEnabled flag persists from post_update to presave.
+   *
+   * @see views_test_config_updater_post_update_set_deprecations_disabled
+   * @see \Drupal\views_test_config_updater\Hook\ViewsTestConfigUpdaterHooks::viewPresave()
    */
-  public function testViewsConfigUpdater(): void {
+  public function testDeprecationsFlagPersists(): void {
     $this->assertNull(\Drupal::keyValue('views_test_config_updater')->get('deprecations_enabled'));
 
     $this->runUpdates();

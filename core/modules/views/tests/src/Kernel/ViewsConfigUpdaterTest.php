@@ -30,9 +30,9 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
   ];
 
   /**
-   * Tests ViewsConfigUpdater.
+   * Tests updateTableSortableCounter.
    */
-  public function testViewsConfigUpdater(): void {
+  public function testUpdateTableSortableCounter(): void {
     $view = $this->loadTestView('views.view.test_table_sortable_counter');
     $display = $view->get('display');
     $this->assertTrue($display['default']['display_options']['style']['options']['info']['counter']['sortable']);

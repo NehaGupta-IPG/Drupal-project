@@ -6,14 +6,14 @@ namespace Drupal\Tests\views\Functional\Update;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use Drupal\views\Entity\View;
+use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests update path for table style result counter sorting.
- *
- * @see views_post_update_counter_field_table_sortable()
  */
+#[CoversFunction('views_post_update_counter_field_table_sortable')]
 #[Group('update')]
 #[RunTestsInSeparateProcesses]
 class CounterFieldTableSortableUpdateTest extends UpdatePathTestBase {
