@@ -160,7 +160,12 @@ final class Importer implements LoggerAwareInterface {
     assert(is_string($destination));
 
     // If the source file doesn't exist, there's nothing we can do.
+    // The exporter names files using getFilename() (URL-decoded), but the URI
+    // may be URL-encoded. Try both to handle either convention.
     $source = $path . '/' . basename($destination);
+    if (!file_exists($source)) {
+      $source = $path . '/' . $entity->getFilename();
+    }
     if (!file_exists($source)) {
       $this->logger?->warning("File entity %name was imported, but the associated file (@path) was not found.", [
         '%name' => $entity->label(),
