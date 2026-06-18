@@ -115,7 +115,7 @@ abstract class ContentTranslationTestBase extends BrowserTestBase {
    * Returns an array of permissions needed for the translator.
    */
   protected function getTranslatorPermissions() {
-    return array_filter([$this->getTranslatePermission(), 'create content translations', 'update content translations', 'delete content translations']);
+    return array_filter([$this->getTranslatePermission(), 'create content translations', 'update content translations', 'delete content translations', 'translate any entity']);
   }
 
   /**
