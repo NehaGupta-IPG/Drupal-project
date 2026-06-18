@@ -32,7 +32,7 @@ final class MenuTreeUiHooks {
       $output .= '<h2>' . $this->t('Uses') . '</h2>';
       $output .= '<dl>';
       $output .= '<dt>' . $this->t('Editing a menu at scale') . '</dt>';
-      $output .= '<dd>' . $this->t('When enabled, the module adds an "Edit menu" operation to each menu on the Menus administration page (Structure » Menus). The screen loads one level of the tree at a time and fetches deeper levels on demand, so it stays responsive on menus with thousands of links.') . '</dd>';
+      $output .= '<dd>' . $this->t('When enabled, the module becomes the "Links" tab for each menu (Structure » Menus » Edit links), with the classic form kept as a "Links (no js)" fallback. The screen loads one level of the tree at a time and fetches deeper levels on demand, so it stays responsive on menus with thousands of links.') . '</dd>';
       $output .= '<dt>' . $this->t('Reordering links') . '</dt>';
       $output .= '<dd>' . $this->t('Links can be reordered and re-nested with pointer drag-and-drop or entirely from the keyboard. A "Keyboard commands" dialog at the top of the screen lists the available shortcuts.') . '</dd>';
       $output .= '<dt>' . $this->t('Searching') . '</dt>';
@@ -46,17 +46,10 @@ final class MenuTreeUiHooks {
   /**
    * Implements hook_entity_operation_alter().
    *
-   * On the menu listing (/admin/structure/menu) this promotes the tree editor
-   * to the primary "Edit menu" dropbutton action and demotes menu_ui's classic
-   * form to "Edit menu (no JS)". The alter runs after hook_entity_operation
-   * and EntityListBuilder::getDefaultOperations() have both merged their
-   * contributions, so the 'edit' key is already present with menu_ui's title.
-   *
-   * Result (sorted by weight):
-   *   0   "Edit menu"       → /admin/structure/menu-tree-ui/{menu}
-   *   5   "Edit menu (no JS)" → /admin/structure/menu/manage/{menu}
-   *   20  "Add link"
-   *   100 "Delete menu"
+   * The menu listing's "Edit links" action lands on the link list. With the
+   * tree present that list is the scalable tree editor, so point the action at
+   * it (rather than menu_ui's classic tabledrag page). The classic page stays
+   * reachable as the "Links (no js)" tab once there.
    *
    * @param array $operations
    *   The merged operations array, keyed by operation ID.
@@ -71,16 +64,25 @@ final class MenuTreeUiHooks {
     if (!isset($operations['edit'])) {
       return;
     }
-    // Demote the classic form — rename and push it just below the tree UI.
-    $operations['edit']['title'] = $this->t('Edit menu (no JS)');
-    $operations['edit']['weight'] = 5;
+    $operations['edit']['url'] = Url::fromRoute('menu_tree_ui.edit', ['menu' => $entity->id()]);
+  }
 
-    // Promote the tree editor to the primary action.
-    $operations['menu-tree-ui'] = [
-      'title' => $this->t('Edit menu'),
-      'url' => Url::fromRoute('menu_tree_ui.edit', ['menu' => $entity->id()]),
-      'weight' => 0,
-    ];
+  /**
+   * Implements hook_local_tasks_alter().
+   *
+   * With the tree present it becomes the "Links" tab (see
+   * menu_tree_ui.links.task.yml); menu_ui's classic tabledrag overview is
+   * demoted to the "Links (no js)" fallback tab just after it.
+   *
+   * @param array $local_tasks
+   *   The local task plugin definitions, keyed by plugin ID.
+   */
+  #[Hook('local_tasks_alter')]
+  public function localTasksAlter(array &$local_tasks): void {
+    if (isset($local_tasks['entity.menu.links'])) {
+      $local_tasks['entity.menu.links']['title'] = $this->t('Links (no js)');
+      $local_tasks['entity.menu.links']['weight'] = 20;
+    }
   }
 
 }

@@ -58,7 +58,7 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     $this->seedMenu();
     $admin = $this->drupalCreateUser(['administer menu']);
     $this->drupalLogin($admin);
-    $this->drupalGet('/admin/structure/menu-tree-ui/test');
+    $this->drupalGet('/admin/structure/menu/manage/test/tree');
     // Wait until the <menu-tree> custom element has at least one top-level
     // row in DOM — that's the "page upgraded" signal.
     $this->assertSession()->waitForElement(

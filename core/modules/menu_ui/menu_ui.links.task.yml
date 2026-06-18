@@ -1,7 +1,14 @@
 entity.menu.edit_form:
-  title: 'Edit menu'
+  title: 'Edit'
   route_name: entity.menu.edit_form
   base_route: entity.menu.edit_form
+  weight: 0
+
+entity.menu.links:
+  title: 'Links'
+  route_name: entity.menu.links
+  base_route: entity.menu.edit_form
+  weight: 10
 
 entity.menu.collection:
   title: 'List'

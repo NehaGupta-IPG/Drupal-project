@@ -203,7 +203,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->assertSession()->pageTextContains('Test menu');
 
     // Make sure our custom menu exists.
-    $this->drupalGet('admin/structure/menu/manage/test-menu');
+    $this->drupalGet('admin/structure/menu/manage/test-menu/links');
     $this->clickLink('Admin');
     // Make sure the translation for the menu is still correct.
     $this->drupalGet('admin/structure/menu/manage/test-menu/translate/es/edit');

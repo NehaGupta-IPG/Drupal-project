@@ -68,7 +68,7 @@ class MenuLinkResetForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    return new Url('entity.menu.edit_form', [
+    return new Url('entity.menu.links', [
       'menu' => $this->link->getMenuName(),
     ]);
   }

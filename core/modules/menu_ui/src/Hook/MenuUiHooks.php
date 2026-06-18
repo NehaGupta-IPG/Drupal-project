@@ -85,7 +85,7 @@ class MenuUiHooks {
   #[Hook('entity_type_build')]
   public function entityTypeBuild(array &$entity_types): void {
     /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
-    $entity_types['menu']->setFormClass('add', 'Drupal\menu_ui\MenuForm')->setFormClass('edit', 'Drupal\menu_ui\MenuForm')->setFormClass('delete', 'Drupal\menu_ui\Form\MenuDeleteForm')->setListBuilderClass('Drupal\menu_ui\MenuListBuilder')->setLinkTemplate('add-form', '/admin/structure/menu/add')->setLinkTemplate('delete-form', '/admin/structure/menu/manage/{menu}/delete')->setLinkTemplate('edit-form', '/admin/structure/menu/manage/{menu}')->setLinkTemplate('add-link-form', '/admin/structure/menu/manage/{menu}/add')->setLinkTemplate('collection', '/admin/structure/menu');
+    $entity_types['menu']->setFormClass('add', 'Drupal\menu_ui\MenuForm')->setFormClass('edit', 'Drupal\menu_ui\MenuForm')->setFormClass('delete', 'Drupal\menu_ui\Form\MenuDeleteForm')->setListBuilderClass('Drupal\menu_ui\MenuListBuilder')->setLinkTemplate('add-form', '/admin/structure/menu/add')->setLinkTemplate('delete-form', '/admin/structure/menu/manage/{menu}/delete')->setLinkTemplate('edit-form', '/admin/structure/menu/manage/{menu}')->setLinkTemplate('links', '/admin/structure/menu/manage/{menu}/links')->setLinkTemplate('add-link-form', '/admin/structure/menu/manage/{menu}/add')->setLinkTemplate('collection', '/admin/structure/menu');
   }
 
   /**
@@ -444,9 +444,9 @@ class MenuUiHooks {
     // the menu in which the link is found.
     if ($route_match->getRouteName() == 'menu_ui.link_edit' && ($menu_link = $route_match->getParameter('menu_link_plugin'))) {
       if ($menu_link instanceof MenuLinkInterface) {
-        // Add a link to the menu admin screen.
+        // Add a link to the menu's link list (where the editor came from).
         $menu = Menu::load($menu_link->getMenuName());
-        $breadcrumb->addLink(Link::createFromRoute($menu->label(), 'entity.menu.edit_form', ['menu' => $menu->id()]));
+        $breadcrumb->addLink(Link::createFromRoute($menu->label(), 'entity.menu.links', ['menu' => $menu->id()]));
       }
     }
   }

@@ -1,5 +1,5 @@
 menu_tree_ui.edit:
-  path: '/admin/structure/menu-tree-ui/{menu}'
+  path: '/admin/structure/menu/manage/{menu}/tree'
   defaults:
     _controller: '\Drupal\menu_tree_ui\Controller\MenuTreeController::page'
     _title_callback: '\Drupal\menu_tree_ui\Controller\MenuTreeController::pageTitle'

@@ -59,7 +59,7 @@ final class MenuTreeUiAddLinkTest extends BrowserTestBase {
    * The tree page offers an "Add link" action pointing back to itself.
    */
   public function testAddLinkActionPresent(): void {
-    $tree_path = '/admin/structure/menu-tree-ui/' . $this->menu->id();
+    $tree_path = '/admin/structure/menu/manage/' . $this->menu->id() . '/tree';
     $this->drupalGet($tree_path);
     $this->assertSession()->statusCodeEquals(200);
 
@@ -81,7 +81,7 @@ final class MenuTreeUiAddLinkTest extends BrowserTestBase {
    * Adding a link from the tree page returns to the tree with the new link.
    */
   public function testAddLinkRoundTrip(): void {
-    $tree_path = '/admin/structure/menu-tree-ui/' . $this->menu->id();
+    $tree_path = '/admin/structure/menu/manage/' . $this->menu->id() . '/tree';
     $this->drupalGet($tree_path);
     $this->clickLink('Add link');
 

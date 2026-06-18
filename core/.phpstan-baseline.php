@@ -33408,12 +33408,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/menu_ui/src/MenuForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\menu_ui\\\\MenuForm\\:\\:buildOverviewForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/menu_ui/src/MenuForm.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\menu_ui\\\\MenuForm\\:\\:form\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -33422,18 +33416,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\menu_ui\\\\MenuForm\\:\\:save\\(\\) should return int but return statement is missing\\.$#',
 	'identifier' => 'return.missing',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/menu_ui/src/MenuForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\menu_ui\\\\MenuForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/menu_ui/src/MenuForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\menu_ui\\\\MenuForm\\:\\:submitOverviewForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/menu_ui/src/MenuForm.php',
 ];

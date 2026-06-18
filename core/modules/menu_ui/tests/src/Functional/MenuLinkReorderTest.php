@@ -56,7 +56,7 @@ class MenuLinkReorderTest extends BrowserTestBase {
     $edit = [
       'links[menu_plugin_id:test_page_test.front_page][weight]' => -10,
     ];
-    $this->drupalGet('admin/structure/menu/manage/main');
+    $this->drupalGet('admin/structure/menu/manage/main/links');
     $this->submitForm($edit, 'Save');
 
     // The link is still there.

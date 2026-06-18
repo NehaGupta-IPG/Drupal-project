@@ -63,7 +63,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
     $this->seedMenu();
     $admin = $this->drupalCreateUser(['administer menu']);
     $this->drupalLogin($admin);
-    $this->drupalGet('/admin/structure/menu-tree-ui/test');
+    $this->drupalGet('/admin/structure/menu/manage/test/tree');
     $this->assertSession()->waitForElement(
       'css',
       'menu-tree table[role="treegrid"] tbody tr[role="row"]'
