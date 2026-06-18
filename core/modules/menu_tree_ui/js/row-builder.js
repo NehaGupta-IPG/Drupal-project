@@ -113,7 +113,7 @@
   }
 
   /**
-   * Builds the name cell — indent wrapper, toggle, title, disabled badge.
+   * Builds the name cell — indent wrapper, handle, toggle, and title.
    *
    * @param {object} item
    *   The ChildItem.
@@ -144,13 +144,6 @@
     }
     title.textContent = item.title;
     name.appendChild(title);
-
-    if (!item.enabled) {
-      const badge = document.createElement('span');
-      badge.className = 'menu-tree-ui-row__badge';
-      badge.textContent = Drupal.t('disabled');
-      name.appendChild(badge);
-    }
 
     cell.appendChild(name);
     return cell;

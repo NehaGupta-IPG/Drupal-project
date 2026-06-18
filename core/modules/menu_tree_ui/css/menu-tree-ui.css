@@ -350,15 +350,6 @@ menu-tree {
   text-overflow: ellipsis;
 }
 
-.menu-tree-ui-row__badge {
-  padding: 0 0.3rem;
-  text-transform: uppercase;
-  color: var(--mtu-color-text-muted);
-  border: 1px solid currentColor;
-  border-radius: 2px;
-  font-size: 0.75rem;
-}
-
 .menu-tree-ui-row--disabled .menu-tree-ui-row__title {
   text-decoration: line-through;
   color: var(--mtu-color-text-muted);
