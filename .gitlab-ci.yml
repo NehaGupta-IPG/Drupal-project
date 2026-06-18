@@ -123,8 +123,8 @@ default:
   needs:
     - job: '🧹 PHP Coding standards (PHPCS)'
       optional: true
-    - job: '🧹 PHP Static Analysis (phpstan)'
-      optional: true
+#    - job: '🧹 PHP Static Analysis (phpstan)'
+#      optional: true
     - job: '📦 Composer'
       optional: true
 
