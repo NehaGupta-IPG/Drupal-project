@@ -23,7 +23,7 @@
  * - suffix: The content to add after the fieldset children.
  *
  * @see template_preprocess_fieldset()
- * @see gin_preprocess_fieldset()
+ * @see \Drupal\default_admin\Hook\PreprocessHooks::preprocessFieldset()
  */
 #}
 {% set show_description_toggle = description_toggle and description.content %}
@@ -77,8 +77,10 @@
     </legend>
   {% endif %}
   {% if show_description_toggle %}
-      {{ attach_library('gin/description_toggle') }}
-      <button class="help-icon__description-toggle"></button>
+      {{ attach_library('default_admin/description_toggle') }}
+      <button class="help-icon__description-toggle">
+        <span class="visually-hidden">{{ 'Toggle form description'|t }}</span>
+      </button>
     </div>
   {% endif %}
   <div{{ content_attributes.addClass(wrapper_classes) }}>

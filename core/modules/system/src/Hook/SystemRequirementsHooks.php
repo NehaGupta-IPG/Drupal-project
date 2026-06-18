@@ -63,13 +63,10 @@ class SystemRequirementsHooks {
     // Get the current default PHP requirements for this version of Drupal.
     $minimum_supported_php = PhpRequirements::getMinimumSupportedPhp();
 
-    // Reset the extension lists.
     /** @var \Drupal\Core\Extension\ModuleExtensionList $module_extension_list */
     $module_extension_list = \Drupal::service('extension.list.module');
-    $module_extension_list->reset();
     /** @var \Drupal\Core\Extension\ThemeExtensionList $theme_extension_list */
     $theme_extension_list = \Drupal::service('extension.list.theme');
-    $theme_extension_list->reset();
     $requirements = [];
 
     // Report Drupal version
@@ -928,8 +925,8 @@ class SystemRequirementsHooks {
       ];
     };
     $profile = \Drupal::installProfile();
-    $files = $module_extension_list->getList();
-    $files += $theme_extension_list->getList();
+    $files = $module_extension_list->getList(TRUE);
+    $files += $theme_extension_list->getList(TRUE);
     $core_incompatible_extensions = [];
     $php_incompatible_extensions = [];
     foreach ($files as $extension_name => $file) {
@@ -1230,6 +1227,16 @@ class SystemRequirementsHooks {
           'value' => $this->t('Enabled'),
           'severity' => RequirementSeverity::Error,
           'description' => $this->t('The rebuild_access setting is enabled in settings.php. It is recommended to have this setting disabled unless you are performing a rebuild.'),
+        ];
+      }
+
+      // Warn about HTML5 validation setting removal in Drupal 13.
+      if (Settings::get('enable_html5_validation') === TRUE) {
+        $requirements['enable_html5_validation'] = [
+          'title' => $this->t('HTML5 validation'),
+          'value' => $this->t('Enabled'),
+          'severity' => RequirementSeverity::Warning,
+          'description' => $this->t('The enable_html5_validation setting will be removed in Drupal 13, and HTML5 validation will be disabled on all forms.  Make sure your forms will still work the way you expect before upgrading by setting the value to FALSE in a test environment. See <a href=":url">the change record</a> for more information.', [':url' => 'https://www.drupal.org/node/3537128']),
         ];
       }
     }
