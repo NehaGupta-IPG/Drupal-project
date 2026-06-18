@@ -469,7 +469,7 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
     if (!in_array($this->operator, $this->operatorValues(1))) {
       $errors[] = $this->t('The operator is invalid on filter: @filter.', ['@filter' => $this->adminLabel(TRUE)]);
     }
-    if (is_array($this->value)) {
+    if (is_array($this->value) && count($this->value) > 0) {
       if (!isset($this->valueOptions)) {
         // Don't validate if there are none value options provided, for example
         // for special handlers.
