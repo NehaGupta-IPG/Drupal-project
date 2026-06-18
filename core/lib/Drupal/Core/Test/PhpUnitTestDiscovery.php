@@ -7,7 +7,6 @@ namespace Drupal\Core\Test;
 use Drupal\Core\Test\Exception\MissingGroupException;
 use PHPUnit\Event\EventFacadeIsSealedException;
 use PHPUnit\Event\Facade as EventFacade;
-use PHPUnit\Framework\DataProviderTestSuite;
 use PHPUnit\Framework\Test;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestSuite;
@@ -333,7 +332,7 @@ class PhpUnitTestDiscovery {
     // backed by data providers).
     $tmp = [];
     foreach ($testClass as $test) {
-      if ($test instanceof DataProviderTestSuite) {
+      if ($test instanceof TestSuite) {
         foreach ($test as $testWithData) {
           if ($testWithData->valueObjectForEvents()->metadata()->isGroup()->isEmpty()) {
             throw new MissingGroupException(sprintf('Missing group metadata in test %s', $testWithData->valueObjectForEvents()->id()));

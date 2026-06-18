@@ -12,6 +12,7 @@ use Drupal\locale\LocaleProjectRepository;
 use Drupal\locale\CurrentImport;
 use Drupal\locale\LocaleSource;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Repeat;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore extraday lundi
@@ -122,6 +123,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
    *  - Source: remote and local files
    *  - Import overwrite: all existing translations.
    */
+  #[Repeat(3, 2)]
   public function testUpdateImportSourceRemote(): void {
     $config = $this->config('locale.settings');
 
