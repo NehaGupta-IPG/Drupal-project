@@ -46,7 +46,7 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
   /**
    * Cache key parts for each unique root definition object.
    */
-  protected \SplObjectStorage $parts;
+  protected ?\SplObjectStorage $parts = NULL;
 
   /**
    * The class resolver.
@@ -72,8 +72,6 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
     $this->alterInfo('data_type_info');
     $this->setCacheBackend($cache_backend, 'typed_data_types_plugins');
     $this->classResolver = $class_resolver;
-
-    $this->parts = new \SplObjectStorage();
 
     parent::__construct(
       'Plugin/DataType',
@@ -174,6 +172,9 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
     // settings of its item definition.
     if ($root_definition instanceof ListDataDefinition) {
       $root_definition = $root_definition->getItemDefinition();
+    }
+    if (!isset($this->parts)) {
+      $this->parts = new \SplObjectStorage();
     }
 
     if (isset($this->parts[$root_definition])) {
@@ -306,6 +307,7 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
   public function clearCachedDefinitions() {
     parent::clearCachedDefinitions();
     $this->prototypes = [];
+    $this->parts = new \SplObjectStorage();
   }
 
   /**
