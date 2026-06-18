@@ -12,7 +12,7 @@ menu_tree_ui.edit:
         type: entity:menu
 
 menu_tree_ui.children:
-  path: '/admin/structure/menu-tree-ui/{menu}/children'
+  path: '/admin/structure/menu/manage/{menu}/tree/children'
   defaults:
     _controller: '\Drupal\menu_tree_ui\Controller\MenuTreeController::children'
   requirements:
@@ -24,7 +24,7 @@ menu_tree_ui.children:
         type: entity:menu
 
 menu_tree_ui.search:
-  path: '/admin/structure/menu-tree-ui/{menu}/search'
+  path: '/admin/structure/menu/manage/{menu}/tree/search'
   defaults:
     _controller: '\Drupal\menu_tree_ui\Controller\MenuTreeController::search'
   requirements:
@@ -36,7 +36,7 @@ menu_tree_ui.search:
         type: entity:menu
 
 menu_tree_ui.move:
-  path: '/admin/structure/menu-tree-ui/{menu}/move'
+  path: '/admin/structure/menu/manage/{menu}/tree/move'
   defaults:
     _controller: '\Drupal\menu_tree_ui\Controller\MenuTreeController::move'
   methods: [POST]
@@ -51,7 +51,7 @@ menu_tree_ui.move:
         type: entity:menu
 
 menu_tree_ui.column_update:
-  path: '/admin/structure/menu-tree-ui/{menu}/column-update'
+  path: '/admin/structure/menu/manage/{menu}/tree/column-update'
   defaults:
     _controller: '\Drupal\menu_tree_ui\Controller\MenuTreeController::columnUpdate'
   methods: [POST]
@@ -66,7 +66,7 @@ menu_tree_ui.column_update:
         type: entity:menu
 
 menu_tree_ui.save:
-  path: '/admin/structure/menu-tree-ui/{menu}/save'
+  path: '/admin/structure/menu/manage/{menu}/tree/save'
   defaults:
     _controller: '\Drupal\menu_tree_ui\Controller\MenuTreeController::save'
   methods: [POST]
@@ -81,7 +81,7 @@ menu_tree_ui.save:
         type: entity:menu
 
 menu_tree_ui.cancel:
-  path: '/admin/structure/menu-tree-ui/{menu}/cancel'
+  path: '/admin/structure/menu/manage/{menu}/tree/cancel'
   defaults:
     _controller: '\Drupal\menu_tree_ui\Controller\MenuTreeController::cancel'
   methods: [POST]

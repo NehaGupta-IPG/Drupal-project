@@ -46,10 +46,11 @@ final class MenuTreeUiHooks {
   /**
    * Implements hook_entity_operation_alter().
    *
-   * The menu listing's "Edit links" action lands on the link list. With the
-   * tree present that list is the scalable tree editor, so point the action at
-   * it (rather than menu_ui's classic tabledrag page). The classic page stays
-   * reachable as the "Links (no js)" tab once there.
+   * The menu listing's primary "Edit links" action lands on the link list.
+   * With the tree present that list is the scalable tree editor, so point the
+   * primary action at it and add the classic tabledrag overview alongside as an
+   * "Edit links (no js)" action. The dropbutton ends up: "Edit links" (tree),
+   * "Edit links (no js)" (classic), "Edit" (settings).
    *
    * @param array $operations
    *   The merged operations array, keyed by operation ID.
@@ -61,10 +62,15 @@ final class MenuTreeUiHooks {
     if (!$entity instanceof MenuInterface) {
       return;
     }
-    if (!isset($operations['edit'])) {
+    if (!isset($operations['edit-links'])) {
       return;
     }
-    $operations['edit']['url'] = Url::fromRoute('menu_tree_ui.edit', ['menu' => $entity->id()]);
+    $operations['edit-links']['url'] = Url::fromRoute('menu_tree_ui.edit', ['menu' => $entity->id()]);
+    $operations['edit-links-no-js'] = [
+      'title' => $this->t('Edit links (no js)'),
+      'weight' => 5,
+      'url' => $entity->toUrl('links'),
+    ];
   }
 
   /**

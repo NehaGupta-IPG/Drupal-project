@@ -65,4 +65,18 @@ final class MenuTreeUiTabsTest extends BrowserTestBase {
     $assert->pageTextNotContains('There are no menu links yet');
   }
 
+  /**
+   * The Menus list dropbutton has Edit links (tree), Edit links (no js), Edit.
+   */
+  public function testListDropbutton(): void {
+    $this->drupalGet('/admin/structure/menu');
+    $assert = $this->assertSession();
+    $assert->linkExists('Edit links');
+    $assert->linkExists('Edit links (no js)');
+    $assert->linkExists('Edit');
+    // The primary action is the tree; the no-JS action is the classic page.
+    $assert->linkByHrefExists('/admin/structure/menu/manage/tabs-test/tree');
+    $assert->linkByHrefExists('/admin/structure/menu/manage/tabs-test/links');
+  }
+
 }

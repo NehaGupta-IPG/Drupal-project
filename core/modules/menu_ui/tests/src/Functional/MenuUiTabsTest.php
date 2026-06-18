@@ -62,6 +62,19 @@ final class MenuUiTabsTest extends BrowserTestBase {
   }
 
   /**
+   * The Menus list dropbutton leads with "Edit links", then "Edit" settings.
+   */
+  public function testListDropbutton(): void {
+    $this->drupalGet('/admin/structure/menu');
+    $assert = $this->assertSession();
+    $assert->linkExists('Edit links');
+    $assert->linkExists('Edit');
+    // No tree, so no separate no-JS action.
+    $assert->linkNotExists('Edit links (no js)');
+    $assert->linkByHrefExists('/admin/structure/menu/manage/tabs-test/links');
+  }
+
+  /**
    * The Links tab carries the overview table and the Add link action.
    */
   public function testLinksTab(): void {
