@@ -21,6 +21,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -36,10 +37,8 @@ class UrlGeneratorTest extends UnitTestCase {
 
   /**
    * The route provider.
-   *
-   * @var \Drupal\Core\Routing\RouteProviderInterface
    */
-  protected $provider;
+  protected RouteProviderInterface $provider;
 
   /**
    * The URL generator to test.
@@ -50,17 +49,13 @@ class UrlGeneratorTest extends UnitTestCase {
 
   /**
    * The alias manager.
-   *
-   * @var \Drupal\path_alias\AliasManager|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $aliasManager;
+  protected AliasManager&Stub $aliasManager;
 
   /**
-   * The mock route processor manager.
-   *
-   * @var \Drupal\Core\RouteProcessor\RouteProcessorManager
+   * The route processor manager.
    */
-  protected $routeProcessorManager;
+  protected RouteProcessorManager&Stub $routeProcessorManager;
 
   /**
    * The request stack.
@@ -101,12 +96,16 @@ class UrlGeneratorTest extends UnitTestCase {
     $third_route = new Route('/test/two/');
     $fourth_route = new Route('/test/four', [], [], [], '', ['https']);
     $none_route = new Route('', [], [], ['_no_path' => TRUE]);
+    $path_route = new Route('/test-path/{path}/bar', [], ['path' => '.+']);
+    $tail_route = new Route('/test-tail/{path}', [], ['path' => '.+']);
 
     $routes->add('test_1', $first_route);
     $routes->add('test_2', $second_route);
     $routes->add('test_3', $third_route);
     $routes->add('test_4', $fourth_route);
     $routes->add('<none>', $none_route);
+    $routes->add('test_path', $path_route);
+    $routes->add('test_tail', $tail_route);
 
     // Create a route provider stub.
     $provider = $this->createStub(RouteProvider::class);
@@ -134,6 +133,14 @@ class UrlGeneratorTest extends UnitTestCase {
       [
         'route_name' => '<none>',
         'return' => $none_route,
+      ],
+      [
+        'route_name' => 'test_path',
+        'return' => $path_route,
+      ],
+      [
+        'route_name' => 'test_tail',
+        'return' => $tail_route,
       ],
     ];
     foreach ($return_map_values as $values) {
@@ -345,7 +352,7 @@ class UrlGeneratorTest extends UnitTestCase {
     // No cacheability to test; UrlGenerator::generate() doesn't support
     // collecting cacheability metadata.
 
-    $this->routeProcessorManager
+    $this->routeProcessorManager->expects($this->exactly(9))
       ->method('processOutbound')
       ->with($this->anything());
 
@@ -578,6 +585,18 @@ class UrlGeneratorTest extends UnitTestCase {
   }
 
   /**
+   * Tests generate with chained relative path segments.
+   */
+  public function testEncodingOfChainedRelativePathSegments(): void {
+    $this->assertGenerateFromRoute('test_path', ['path' => '../../..'], [], '/test-path/%2E%2E/%2E%2E/%2E%2E/bar', (new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT));
+    $this->assertGenerateFromRoute('test_path', ['path' => '././.'], [], '/test-path/%2E/%2E/%2E/bar', (new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT));
+    $this->assertGenerateFromRoute('test_path', ['path' => '../././..'], [], '/test-path/%2E%2E/%2E/%2E/%2E%2E/bar', (new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT));
+
+    $this->assertGenerateFromRoute('test_tail', ['path' => '../../..'], [], '/test-tail/%2E%2E/%2E%2E/%2E%2E', (new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT));
+    $this->assertGenerateFromRoute('test_tail', ['path' => '././.'], [], '/test-tail/%2E/%2E/%2E', (new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT));
+  }
+
+  /**
    * Asserts \Drupal\Core\Routing\UrlGenerator::generateFromRoute()'s output.
    *
    * @param string $route_name
@@ -614,7 +633,7 @@ class UrlGeneratorTest extends UnitTestCase {
 
     $path_processor->expects($this->atLeastOnce())
       ->method('processOutbound')
-      ->willReturnCallback(function ($path, &$options = []) {
+      ->willReturnCallback(function ($path, array &$options = []) {
         // Assert that 'route_name' exists in options and is the expected value.
         $this->assertArrayHasKey('route_name', $options);
         $this->assertEquals('test_1', $options['route_name']);
