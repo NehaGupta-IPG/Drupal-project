@@ -1,0 +1,61 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\menu_tree_ui\Plugin\MenuTreeColumn;
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Menu\MenuLinkTreeElement;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\menu_link_content\MenuLinkContentInterface;
+use Drupal\menu_tree_ui\Attribute\MenuTreeColumn;
+use Drupal\menu_tree_ui\MenuTreeUiConstants;
+
+/**
+ * Column plugin for the menu_link_content 'enabled' field.
+ *
+ * "Enabled" controls whether a menu link appears in rendered menus. This column
+ * exposes it as an inline toggle so editors can disable a link without opening
+ * the full edit form. Unlike "Expanded", it applies to every link, leaf or
+ * parent, and sorts ahead of "Expanded".
+ *
+ * Static/yml-defined links have no writable enabled property here; for those
+ * the cell is rendered as a read-only indicator.
+ */
+#[MenuTreeColumn(
+  id: 'enabled',
+  title: new TranslatableMarkup('Enabled'),
+  description: new TranslatableMarkup('Whether this menu link appears in rendered menus.'),
+  weight: 5,
+)]
+final class EnabledColumn extends MenuTreeColumnBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCellData(MenuLinkTreeElement $element): array {
+    $link = $element->link;
+    $plugin_id = $link->getPluginId();
+
+    return [
+      'type' => 'toggle',
+      'value' => $link->isEnabled(),
+      'label' => (string) $this->t('Enabled'),
+      'interactive' => str_starts_with($plugin_id, MenuTreeUiConstants::CONTENT_PLUGIN_PREFIX),
+      'link_id' => $plugin_id,
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function handleUpdate(EntityInterface $entity, mixed $value): bool {
+    if (!$entity instanceof MenuLinkContentInterface) {
+      return FALSE;
+    }
+    $entity->set('enabled', (bool) $value);
+    $entity->save();
+    return TRUE;
+  }
+
+}
