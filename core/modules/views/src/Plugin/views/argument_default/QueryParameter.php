@@ -72,6 +72,10 @@ class QueryParameter extends ArgumentDefaultPluginBase implements CacheableDepen
     if ($current_request->query->has($path[0])) {
       $query = $current_request->query->all();
       $param = NestedArray::getValue($query, $path);
+      // If the parameter is empty, return the fallback value.
+      if (empty($param)) {
+        return $this->options['fallback'];
+      }
       if (is_array($param)) {
         $conjunction = ($this->options['multiple'] == 'and') ? ',' : '+';
         $param = implode($conjunction, $param);
