@@ -5,6 +5,7 @@ namespace Drupal\Core\Entity\Plugin\Validation\Constraint;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
@@ -30,16 +31,26 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
   protected $entityTypeManager;
 
   /**
+   * The entity type bundle info.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   */
+  protected $entityTypeBundleInfo;
+
+  /**
    * Constructs a ValidReferenceConstraintValidator object.
    *
    * @param \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface $selection_manager
    *   The selection plugin manager.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   *   The entity type bundle info.
    */
-  public function __construct(SelectionPluginManagerInterface $selection_manager, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(SelectionPluginManagerInterface $selection_manager, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info) {
     $this->selectionManager = $selection_manager;
     $this->entityTypeManager = $entity_type_manager;
+    $this->entityTypeBundleInfo = $entity_type_bundle_info;
   }
 
   /**
@@ -48,7 +59,8 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('plugin.manager.entity_reference_selection'),
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('entity_type.bundle.info')
     );
   }
 
@@ -112,6 +124,7 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
       foreach ($invalid_new_entities as $delta => $entity) {
         $this->context->buildViolation($constraint->invalidAutocreateMessage)
           ->setParameter('%type', $target_type_id)
+          ->setParameter('%bundle', $this->getBundleLabel($target_type_id, $entity->bundle()))
           ->setParameter('%label', $entity->label())
           ->atPath((string) $delta . '.entity')
           ->setInvalidValue($entity)
@@ -146,6 +159,7 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
           $message = isset($existing_entities[$target_id]) ? $constraint->message : $constraint->nonExistingMessage;
           $this->context->buildViolation($message)
             ->setParameter('%type', $target_type_id)
+            ->setParameter('%bundle', $this->getBundleLabel($target_type_id, $existing_entities[$target_id]->bundle()))
             ->setParameter('%id', $target_id)
             ->atPath((string) $delta . '.target_id')
             ->setInvalidValue($target_id)
@@ -153,6 +167,27 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
         }
       }
     }
+  }
+
+  /**
+   * Gets the human-readable label for a bundle.
+   *
+   * @param string $entity_type_id
+   *   The entity type ID.
+   * @param string $bundle
+   *   The bundle machine name.
+   *
+   * @return string
+   *   The bundle label or machine name if label is not available.
+   */
+  protected function getBundleLabel($entity_type_id, $bundle) {
+    $bundles = $this->entityTypeBundleInfo->getBundleInfo($entity_type_id);
+    if (isset($bundles[$bundle]['label'])) {
+      return $bundles[$bundle]['label'];
+    }
+
+    // Fallback to bundle machine name
+    return $bundle;
   }
 
 }
