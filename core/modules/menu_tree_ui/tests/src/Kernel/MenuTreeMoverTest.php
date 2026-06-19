@@ -140,6 +140,7 @@ final class MenuTreeMoverTest extends KernelTestBase {
       $mock_handler,
       $this->container->get('menu_tree_ui.loader'),
       $this->container->get('plugin.manager.menu.link'),
+      $this->container->get('logger.channel.menu_tree_ui'),
     );
 
     $result = $mover->move('test', $entity->getPluginId(), '', NULL);
@@ -174,6 +175,46 @@ final class MenuTreeMoverTest extends KernelTestBase {
     // (The static link's weight is rewritten too, which is why this holds.)
     $this->assertSame($weight_of($static_id) - 1, $weight_of($b->getPluginId()));
     $this->assertSame($weight_of($b->getPluginId()), $result['weight']);
+  }
+
+  /**
+   * A save that renumbers a level with an orphaned sibling still succeeds.
+   *
+   * An orphaned link (a menu_tree definition whose backing entity has gone)
+   * cannot be reweighted, but it must not abort the whole save; the remaining
+   * links reorder and the move commits.
+   */
+  public function testRenumberSkipsOrphanedSibling(): void {
+    $a = $this->createLink('test');
+    $b = $this->createLink('test');
+    $c = $this->createLink('test');
+
+    // Orphan B: delete its entity rows directly, leaving the menu_tree
+    // definition behind, then drop it from the storage cache so it cannot be
+    // loaded — exactly the state that crashed save in the field.
+    $id = $b->id();
+    $database = $this->container->get('database');
+    $database->delete('menu_link_content')->condition('id', $id)->execute();
+    $database->delete('menu_link_content_data')->condition('id', $id)->execute();
+    $this->container->get('entity_type.manager')
+      ->getStorage('menu_link_content')
+      ->resetCache([$id]);
+
+    // Moving C above A renumbers the whole root level, which would reweight the
+    // orphaned B. The save must still report success.
+    $result = $this->mover->move('test', $c->getPluginId(), '', $a->getPluginId());
+    $this->assertTrue($result['ok'], 'The move succeeds despite an orphaned sibling.');
+
+    // C now sits before A in the root order.
+    $order = [];
+    foreach ($this->container->get('menu_tree_ui.loader')->loadLevel('test', NULL) as $element) {
+      $order[] = $element->link->getPluginId();
+    }
+    $this->assertLessThan(
+      array_search($a->getPluginId(), $order, TRUE),
+      array_search($c->getPluginId(), $order, TRUE),
+      'C was reordered above A even though a sibling was orphaned.',
+    );
   }
 
   // Helpers.

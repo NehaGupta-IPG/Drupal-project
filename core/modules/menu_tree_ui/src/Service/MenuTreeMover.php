@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\menu_tree_ui\Service;
 
+use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Menu\MenuTreeStorageInterface;
 use Drupal\menu_tree_ui\MenuLinkMovability;
+use Psr\Log\LoggerInterface;
 
 /**
  * Moves a menu link to a new parent + position.
@@ -36,6 +38,7 @@ final class MenuTreeMover {
     private readonly ModuleHandlerInterface $moduleHandler,
     private readonly MenuTreeLoader $loader,
     private readonly MenuLinkManagerInterface $menuLinkManager,
+    private readonly LoggerInterface $logger,
   ) {}
 
   /**
@@ -387,7 +390,20 @@ final class MenuTreeMover {
         continue;
       }
       if (($current_weight[$id] ?? NULL) !== $offset) {
-        $this->menuLinkManager->updateDefinition($id, ['weight' => $offset]);
+        try {
+          $this->menuLinkManager->updateDefinition($id, ['weight' => $offset]);
+        }
+        catch (PluginException $e) {
+          // A sibling whose backing entity has gone (an orphaned menu link)
+          // must not abort the whole save. Skip it - it keeps its old weight,
+          // the remaining links stay correctly ordered - and log it so the
+          // stale row can be cleaned up.
+          $this->logger->warning('Could not reweight menu link %id while saving menu %menu; its backing entity is missing. %message', [
+            '%id' => $id,
+            '%menu' => $menu_name,
+            '%message' => $e->getMessage(),
+          ]);
+        }
       }
     }
     return $assigned_weight;
