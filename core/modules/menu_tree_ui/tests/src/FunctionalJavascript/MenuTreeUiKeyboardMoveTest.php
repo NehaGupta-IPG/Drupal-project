@@ -788,7 +788,12 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
    * Asserts no row currently in the test viewport is marked virtualized.
    */
   private function assertNoVirtualizedRows(): void {
-    $this->getSession()->wait(150);
+    // Wait for the IntersectionObserver to clear the flag on visible rows,
+    // rather than guessing a fixed delay that flakes on a loaded runner.
+    $this->getSession()->wait(
+      2000,
+      'Array.from(document.querySelectorAll(\'menu-tree tr[role="row"][data-virtualized="true"]\')).length === 0',
+    );
     $virtualized = $this->getSession()->evaluateScript(
       'return Array.from(document.querySelectorAll(\'menu-tree tr[role="row"][data-virtualized="true"]\')).map(r => r.dataset.id);',
     );

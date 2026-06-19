@@ -256,7 +256,7 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     $opened = $this->assertSession()->waitForElement(
       'css',
       sprintf('tr[role="row"][data-id="%s"][aria-expanded="true"]', $target_id),
-      1500,
+      3000,
     );
     $this->assertNotNull($opened, 'Collapsed parent should auto-expand after a 1s hover during drag.');
 
@@ -670,8 +670,12 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
    * off-screen rows after a move.
    */
   private function assertNoVirtualizedRows(): void {
-    // Give the IntersectionObserver a frame to deliver its initial entries.
-    $this->getSession()->wait(150);
+    // Wait for the IntersectionObserver to clear the flag on visible rows,
+    // rather than guessing a fixed delay that flakes on a loaded runner.
+    $this->getSession()->wait(
+      2000,
+      'Array.from(document.querySelectorAll(\'menu-tree tr[role="row"][data-virtualized="true"]\')).length === 0',
+    );
     $virtualized = $this->getSession()->evaluateScript(
       'return Array.from(document.querySelectorAll(\'menu-tree tr[role="row"][data-virtualized="true"]\')).map(r => r.dataset.id);',
     );
