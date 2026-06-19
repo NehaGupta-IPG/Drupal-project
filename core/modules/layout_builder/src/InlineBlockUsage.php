@@ -31,6 +31,9 @@ class InlineBlockUsage implements InlineBlockUsageInterface {
    * {@inheritdoc}
    */
   public function addUsage($block_content_id, EntityInterface $entity) {
+    if (empty($block_content_id)) {
+      return;
+    }
     $this->database->merge('inline_block_usage')
       ->keys([
         'block_content_id' => $block_content_id,
