@@ -25,7 +25,6 @@ use Drupal\menu_tree_ui\MenuTreeUiConstants;
 #[MenuTreeColumn(
   id: 'expanded',
   title: new TranslatableMarkup('Expanded'),
-  description: new TranslatableMarkup("Whether this item's children are shown expanded in navigation blocks."),
   weight: 10,
 )]
 final class ExpandedColumn extends MenuTreeColumnBase {
@@ -46,7 +45,7 @@ final class ExpandedColumn extends MenuTreeColumnBase {
       'type' => 'toggle',
       'value' => !empty($definition['expanded']),
       'label' => (string) $this->t('Show as expanded'),
-      'interactive' => str_starts_with($plugin_id, MenuTreeUiConstants::CONTENT_PLUGIN_PREFIX),
+      'interactive' => MenuTreeUiConstants::isContentLink($plugin_id),
       'link_id' => $plugin_id,
     ];
   }

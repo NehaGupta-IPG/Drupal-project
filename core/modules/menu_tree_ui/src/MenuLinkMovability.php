@@ -33,7 +33,7 @@ final class MenuLinkMovability {
    *   TRUE if the link's parent and weight changes will persist.
    */
   public static function isMovable(MenuLinkInterface $link): bool {
-    return str_starts_with($link->getPluginId(), MenuTreeUiConstants::CONTENT_PLUGIN_PREFIX)
+    return MenuTreeUiConstants::isContentLink($link->getPluginId())
       || $link instanceof MenuLinkDefault;
   }
 

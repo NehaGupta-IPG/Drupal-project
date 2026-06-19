@@ -305,7 +305,8 @@ final class MenuTreeController extends ControllerBase {
     if (!$this->columnManager->hasDefinition($column_id)) {
       return new JsonResponse(['ok' => FALSE, 'code' => 'unknown_column', 'message' => 'Unknown column.'], 400);
     }
-    if (!str_starts_with($link_id, MenuTreeUiConstants::CONTENT_PLUGIN_PREFIX)) {
+    $uuid = MenuTreeUiConstants::uuidFromPluginId($link_id);
+    if ($uuid === NULL) {
       return new JsonResponse([
         'ok' => FALSE,
         'code' => 'not_updatable',
@@ -313,7 +314,6 @@ final class MenuTreeController extends ControllerBase {
       ], 400);
     }
 
-    $uuid = substr($link_id, strlen(MenuTreeUiConstants::CONTENT_PLUGIN_PREFIX));
     $storage = $this->entityTypeManager()->getStorage('menu_link_content');
     $ids = $storage->getQuery()
       ->accessCheck(TRUE)
@@ -591,9 +591,9 @@ final class MenuTreeController extends ControllerBase {
   private function loadContentEntitiesForElements(array $elements): array {
     $uuids = [];
     foreach ($elements as $element) {
-      $plugin_id = $element->link->getPluginId();
-      if (str_starts_with($plugin_id, MenuTreeUiConstants::CONTENT_PLUGIN_PREFIX)) {
-        $uuids[] = substr($plugin_id, strlen(MenuTreeUiConstants::CONTENT_PLUGIN_PREFIX));
+      $uuid = MenuTreeUiConstants::uuidFromPluginId($element->link->getPluginId());
+      if ($uuid !== NULL) {
+        $uuids[] = $uuid;
       }
     }
     if (!$uuids) {

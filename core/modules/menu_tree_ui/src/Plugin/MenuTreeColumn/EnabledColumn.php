@@ -25,7 +25,6 @@ use Drupal\menu_tree_ui\MenuTreeUiConstants;
 #[MenuTreeColumn(
   id: 'enabled',
   title: new TranslatableMarkup('Enabled'),
-  description: new TranslatableMarkup('Whether this menu link appears in rendered menus.'),
   weight: 5,
 )]
 final class EnabledColumn extends MenuTreeColumnBase {
@@ -41,7 +40,7 @@ final class EnabledColumn extends MenuTreeColumnBase {
       'type' => 'toggle',
       'value' => $link->isEnabled(),
       'label' => (string) $this->t('Enabled'),
-      'interactive' => str_starts_with($plugin_id, MenuTreeUiConstants::CONTENT_PLUGIN_PREFIX),
+      'interactive' => MenuTreeUiConstants::isContentLink($plugin_id),
       'link_id' => $plugin_id,
     ];
   }
