@@ -24,12 +24,10 @@
   </noscript>
 
   {#
-    Keyboard commands. Placed first inside the region (before search and the
-    tree) so screen-reader and keyboard users meet it early. The trigger opens
-    a native <dialog>; the close button uses <form method="dialog"> so closing
-    needs no JS. menu-tree.js wires the open click.
+    The "Keyboard commands" dialog. A native <dialog> opened by the trigger at
+    the end of the instruction line below; the close button uses
+    <form method="dialog"> so closing needs no JS. menu-tree.js wires the open.
   #}
-  <button type="button" class="menu-tree-ui__help-toggle">{{ 'Keyboard commands'|t }}</button>
   <dialog class="menu-tree-ui__help-dialog" aria-labelledby="menu-tree-ui-help-title">
     <div class="menu-tree-ui__help-dialog-inner">
       <h2 id="menu-tree-ui-help-title">{{ 'Keyboard commands'|t }}</h2>
@@ -140,13 +138,15 @@
   </div>
 
   {#
-    Always-visible interaction hint. The tree is one stop in the page tab order
-    and is then driven with the arrow keys, which is easy to miss; this names the
-    keys up front (the dialog above has the full list) and is referenced by the
-    treegrid's aria-describedby so assistive tech announces it on entry.
+    Always-visible interaction hint, with the "Keyboard commands" dialog trigger
+    at the end of the line. The tree is one tab stop and is then driven with the
+    arrow keys, which is easy to miss; this names the keys up front and is the
+    treegrid's aria-describedby target, so assistive tech announces it on entry.
+    The full shortcut list is in the dialog the trigger opens.
   #}
-  <p class="menu-tree-ui__instructions" id="menu-tree-ui-instructions">
-    {{ 'Use the arrow keys to move between items. Press Space to pick up the focused item and move it.'|t }}
+  <p class="menu-tree-ui__instructions">
+    <span id="menu-tree-ui-instructions">{{ 'Use the arrow keys to move between items, and Space to pick one up and move it.'|t }}</span>
+    <button type="button" class="menu-tree-ui__help-toggle">{{ 'Keyboard commands'|t }}</button>
   </p>
 
   <menu-tree

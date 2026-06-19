@@ -157,12 +157,16 @@
 /*
  * The unsaved notice rides in the action bar rather than the message space:
  * sized to its content and pushed to the right edge when it shares the row with
- * the buttons (wrap-reverse lifts it above them when it cannot fit).
+ * the buttons (wrap-reverse lifts it above them when it cannot fit). Its
+ * vertical padding is trimmed to the Save/Cancel row height so revealing it does
+ * not grow the sticky bar and shift the tree below it; the descendant selector
+ * outranks the themed .messages padding it would otherwise inherit.
  */
-.menu-tree-ui__unsaved {
+.menu-tree-ui__actionbar .menu-tree-ui__unsaved {
   flex: 0 1 auto;
   margin: 0;
   margin-inline-start: auto;
+  padding-block: 0.25rem;
 }
 
 /* ──────────────────────────────────────────────────────────────── tree */
