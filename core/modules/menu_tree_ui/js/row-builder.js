@@ -101,6 +101,8 @@
     const toggle = document.createElement('button');
     toggle.type = 'button';
     toggle.className = 'menu-tree-ui-row__toggle';
+    // Operated from the row (Left/Right/Enter), not via Tab; mouse-clickable.
+    toggle.tabIndex = -1;
     toggle.setAttribute(
       'aria-label',
       Drupal.t('Toggle children of @title', { '@title': item.title }),

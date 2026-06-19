@@ -208,6 +208,17 @@ final class MenuTreeUiTreegridFocusTest extends WebDriverTestBase {
   }
 
   /**
+   * Expand toggles are operated from the row, never a Tab stop themselves.
+   */
+  public function testExpandToggleIsNotATabStop(): void {
+    $tabbable = (int) $this->getSession()->evaluateScript(
+      "return Array.from(document.querySelectorAll('menu-tree button.menu-tree-ui-row__toggle'))"
+      . ".filter((b) => b.getAttribute('tabindex') !== '-1').length;",
+    );
+    $this->assertSame(0, $tabbable, 'No expand toggle is in the tab order.');
+  }
+
+  /**
    * JS that counts tabbable row controls outside the active row.
    *
    * @return string
