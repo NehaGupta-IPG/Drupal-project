@@ -367,7 +367,7 @@ class DateTimeItemTest extends FieldKernelTestBase {
   public function testRelativeDefaultValueRespectsTimeService(): void {
     // Lock Drupal's time to a fixed instant distinct from the system clock.
     $fixed = new \DateTime('2020-07-07 00:00:00', new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE));
-    $time = $this->createMock(TimeInterface::class);
+    $time = $this->createStub(TimeInterface::class);
     $time->method('getCurrentTime')->willReturn($fixed->getTimestamp());
     $time->method('getRequestTime')->willReturn($fixed->getTimestamp());
     // In Kernel tests $this->container is \Drupal::getContainer(), so this
