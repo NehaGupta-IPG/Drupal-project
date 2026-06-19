@@ -171,6 +171,7 @@ class TermTest extends TaxonomyTestBase {
     }
 
     // Test sorting for specific weight and name.
+    $taxonomy_storage = $this->container->get('entity_type.manager')->getStorage('taxonomy_term');
     $children = $taxonomy_storage->loadChildren($term1->id());
     $first_children = current($children);
     $last_children = end($children);
