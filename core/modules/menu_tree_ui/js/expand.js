@@ -101,8 +101,9 @@
       row.setAttribute('aria-expanded', 'true');
 
       if (row.dataset.loaded === 'true') {
+        // showSubtree re-observes each row it reveals; rows that stay collapsed
+        // are left unobserved so the observer only ever tracks visible rows.
         this.showSubtree(row);
-        descendantRows(row).forEach((r) => this.rowWindow?.observe(r));
         return;
       }
 
@@ -150,10 +151,12 @@
      * @param {HTMLElement} row
      *   The parent row.
      */
-    // eslint-disable-next-line class-methods-use-this
     hideSubtree(row) {
       descendantRows(row).forEach((r) => {
         r.dataset.hidden = 'true';
+        // Stop tracking hidden rows: otherwise the observer's entry set grows
+        // with every loaded row and never shrinks as sections are collapsed.
+        this.rowWindow?.unobserve(r);
       });
     }
 
@@ -167,7 +170,6 @@
      * @param {HTMLElement} row
      *   The parent row.
      */
-    // eslint-disable-next-line class-methods-use-this
     showSubtree(row) {
       const base = levelOf(row);
       let n = row.nextElementSibling;
@@ -179,6 +181,7 @@
         }
         if (lvl <= hideBelow) {
           delete n.dataset.hidden;
+          this.rowWindow?.observe(n);
           hideBelow =
             n.dataset.hasChildren === 'true' &&
             n.getAttribute('aria-expanded') !== 'true'

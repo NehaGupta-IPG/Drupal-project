@@ -18,6 +18,24 @@
 
   let csrfToken;
 
+  // Bound once for the page lifetime (see attach). A per-bar document listener
+  // would accumulate: once() only guards re-wiring the same bar element, so an
+  // htmx swap that injects a new action bar would add another permanent listener
+  // and retain the detached one's closure.
+  let changedListenerBound = false;
+
+  /**
+   * Reveals the unsaved-changes notice when a change is recorded.
+   *
+   * Queries the notice fresh rather than closing over one, so a single listener
+   * serves whatever action bar is currently in the DOM.
+   */
+  function revealUnsavedNotices() {
+    document
+      .querySelectorAll('.menu-tree-ui__unsaved')
+      .forEach((notice) => notice.classList.remove('js-hide'));
+  }
+
   /**
    * Fetches (and caches) the CSRF token for the working-copy POSTs.
    *
@@ -79,10 +97,6 @@
     const save = bar.querySelector('[data-mtu-action="save"]');
     const cancel = bar.querySelector('[data-mtu-action="cancel"]');
 
-    document.addEventListener('menu-tree-ui:changed', () => {
-      notice?.classList.remove('js-hide');
-    });
-
     save?.addEventListener('click', async () => {
       if (!settings.saveUrl) {
         return;
@@ -116,6 +130,10 @@
 
   Drupal.behaviors.menuTreeUiWorkingCopy = {
     attach(context) {
+      if (!changedListenerBound) {
+        document.addEventListener('menu-tree-ui:changed', revealUnsavedNotices);
+        changedListenerBound = true;
+      }
       once('mtu-working-copy', '.menu-tree-ui__actions', context).forEach(
         setupActions,
       );
