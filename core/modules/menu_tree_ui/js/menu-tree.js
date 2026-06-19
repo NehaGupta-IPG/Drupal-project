@@ -354,7 +354,7 @@
       btn.setAttribute('aria-checked', String(newValue));
       const sr = btn.querySelector('.visually-hidden');
       if (sr) {
-        sr.textContent = newValue ? 'On' : 'Off';
+        sr.textContent = newValue ? Drupal.t('On') : Drupal.t('Off');
       }
 
       try {
@@ -376,16 +376,16 @@
           // Revert on server rejection.
           btn.setAttribute('aria-checked', String(currentChecked));
           if (sr) {
-            sr.textContent = currentChecked ? 'On' : 'Off';
+            sr.textContent = currentChecked ? Drupal.t('On') : Drupal.t('Off');
           }
-          announce(data.message ?? 'Update failed.', 'assertive');
+          announce(data.message ?? Drupal.t('Update failed.'), 'assertive');
         }
       } catch (e) {
         btn.setAttribute('aria-checked', String(currentChecked));
         if (sr) {
-          sr.textContent = currentChecked ? 'On' : 'Off';
+          sr.textContent = currentChecked ? Drupal.t('On') : Drupal.t('Off');
         }
-        announce('Update failed.', 'assertive');
+        announce(Drupal.t('Update failed.'), 'assertive');
       }
     }
 

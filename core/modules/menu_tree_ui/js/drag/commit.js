@@ -162,7 +162,10 @@
     ) {
       await expand.expand(target);
       if (target.getAttribute('aria-expanded') !== 'true') {
-        announce('Could not open destination — move cancelled.', 'assertive');
+        announce(
+          Drupal.t('Could not open destination — move cancelled.'),
+          'assertive',
+        );
         return;
       }
     }
@@ -190,13 +193,13 @@
       });
       body = await response.json().catch(() => ({ ok: false }));
       if (!response.ok || !body.ok) {
-        announce(body.message ?? 'Move failed.', 'assertive');
+        announce(body.message ?? Drupal.t('Move failed.'), 'assertive');
         return;
       }
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('[menu-tree] move fetch failed', e);
-      announce('Network error — move cancelled.', 'assertive');
+      announce(Drupal.t('Network error — move cancelled.'), 'assertive');
       return;
     }
 
@@ -219,7 +222,7 @@
       }
     }
 
-    announce('Menu link moved.', 'polite');
+    announce(Drupal.t('Menu link moved.'), 'polite');
     // Tell the working-copy action bar a change was recorded so it can reveal
     // the unsaved notice (the bar lives outside the <menu-tree> element).
     document.dispatchEvent(new CustomEvent('menu-tree-ui:changed'));

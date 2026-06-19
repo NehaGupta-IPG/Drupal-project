@@ -90,23 +90,37 @@
   }
 
   /**
-   * Describes a prospective drop, for the grab announcement.
+   * The translated "picked up" announcement for a prospective drop.
    *
+   * Built as three full sentences (one per drop kind) rather than concatenating
+   * translated fragments, so each is translatable on its own.
+   *
+   * @param {string} item
+   *   The title of the picked-up item.
    * @param {object} intent
    *   The DropIntent.
    *
    * @return {string}
-   *   A phrase like "before X", "after X", or "as a child of X".
+   *   The translated placement sentence.
    */
-  function describe(intent) {
-    const title = titleOf(intent.target);
+  function placementMessage(item, intent) {
+    const target = titleOf(intent.target);
     if (intent.kind === 'child') {
-      return `as a child of ${title}`;
+      return Drupal.t('Picked up @item. It will drop as a child of @target.', {
+        '@item': item,
+        '@target': target,
+      });
     }
     if (intent.kind === 'before') {
-      return `before ${title}`;
+      return Drupal.t('Picked up @item. It will drop before @target.', {
+        '@item': item,
+        '@target': target,
+      });
     }
-    return `after ${title}`;
+    return Drupal.t('Picked up @item. It will drop after @target.', {
+      '@item': item,
+      '@target': target,
+    });
   }
 
   /**
@@ -204,7 +218,7 @@
       this.snapshotOrigin();
       if (this.visibleList().length === 0) {
         this.grabbed = null;
-        announce('There is nowhere to move this item.', 'assertive');
+        announce(Drupal.t('There is nowhere to move this item.'), 'assertive');
         return false;
       }
 
@@ -220,10 +234,11 @@
       row.setAttribute('aria-selected', 'true');
       this.setInitialCursor();
 
+      const instructions = Drupal.t(
+        'Use the Up and Down arrows to move it, Left and Right to change its indent, Enter to drop, or Escape to cancel.',
+      );
       announce(
-        `Picked up ${titleOf(row)}. Will drop ${describe(this.intent)}. ` +
-          'Use Up and Down to move it, Left and Right to change its indent, ' +
-          'Enter to drop, or Escape to cancel.',
+        `${placementMessage(titleOf(row), this.intent)} ${instructions}`,
         'assertive',
       );
       return true;
@@ -529,7 +544,7 @@
       if (!this.active || !this.grabbed || this.cursorSeq !== seq) {
         return;
       }
-      announce(`Opened ${titleOf(prev)}.`);
+      announce(Drupal.t('Opened @title.', { '@title': titleOf(prev) }));
       const list = this.visibleList();
       const gap = list.indexOf(prev) + 1;
       const { min, max } = this.gapBounds(gap, list);
@@ -718,7 +733,10 @@
         newParentId === currentParentId &&
         beforeId === nextSiblingId(grabbed)
       ) {
-        announce('Move cancelled. The item is already there.', 'assertive');
+        announce(
+          Drupal.t('Move cancelled. The item is already there.'),
+          'assertive',
+        );
         this.end();
         return;
       }
@@ -743,7 +761,7 @@
         return;
       }
       this.restoreToOrigin();
-      announce('Move cancelled.', 'assertive');
+      announce(Drupal.t('Move cancelled.'), 'assertive');
       this.end();
     }
 

@@ -126,7 +126,7 @@
       });
       if (!response.ok) {
         restore();
-        announce('Move failed — restored.', 'assertive');
+        announce(Drupal.t('Move failed — restored.'), 'assertive');
       }
     } catch (e) {
       restore();

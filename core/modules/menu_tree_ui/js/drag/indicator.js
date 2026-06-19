@@ -86,11 +86,11 @@
           ?.textContent?.trim() ?? '';
       let message;
       if (intent.kind === 'child') {
-        message = `Drop as child of ${title}`;
+        message = Drupal.t('Drop as child of @title', { '@title': title });
       } else if (intent.kind === 'before') {
-        message = `Drop before ${title}`;
+        message = Drupal.t('Drop before @title', { '@title': title });
       } else {
-        message = `Drop after ${title}`;
+        message = Drupal.t('Drop after @title', { '@title': title });
       }
       this.liveRegion.textContent = message;
       if (Drupal.announce) {
