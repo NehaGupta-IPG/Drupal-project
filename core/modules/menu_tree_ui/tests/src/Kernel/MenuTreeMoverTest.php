@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\menu_tree_ui\Kernel;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Menu\MenuTreeStorage;
 use Drupal\Core\Menu\MenuTreeStorageInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
@@ -110,6 +111,43 @@ final class MenuTreeMoverTest extends KernelTestBase {
 
     $this->assertFalse($result['ok']);
     $this->assertSame('self_target', $result['code']);
+  }
+
+  /**
+   * Moving a link under its own descendant must be rejected as a cycle.
+   */
+  public function testCycleIsRejected(): void {
+    $parent = $this->createLink('test');
+    $child = $this->createLink('test', $parent->getPluginId());
+
+    $result = $this->mover->validateMove(
+      'test',
+      $parent->getPluginId(),
+      $child->getPluginId(),
+      NULL,
+    );
+
+    $this->assertFalse($result['ok']);
+    $this->assertSame('cycle', $result['code']);
+  }
+
+  /**
+   * A move that would push a link past the depth cap must be rejected.
+   */
+  public function testDepthCapIsRejected(): void {
+    $max = MenuTreeStorage::MAX_DEPTH;
+    // Build a chain as deep as the cap allows; the last link sits at the cap.
+    $deepest = '';
+    for ($i = 0; $i < $max; $i++) {
+      $deepest = $this->createLink('test', $deepest)->getPluginId();
+    }
+
+    // Anything moved under the deepest link would land one level too deep.
+    $link = $this->createLink('test');
+    $result = $this->mover->validateMove('test', $link->getPluginId(), $deepest, NULL);
+
+    $this->assertFalse($result['ok']);
+    $this->assertSame('too_deep', $result['code']);
   }
 
   /**
@@ -238,12 +276,21 @@ final class MenuTreeMoverTest extends KernelTestBase {
 
   /**
    * Creates and saves a menu_link_content entity in the given menu.
+   *
+   * @param string $menu_name
+   *   The menu to create the link in.
+   * @param string $parent
+   *   The parent link plugin ID, or '' for the top level.
+   *
+   * @return \Drupal\menu_link_content\MenuLinkContentInterface
+   *   The saved link.
    */
-  private function createLink(string $menu_name): MenuLinkContentInterface {
+  private function createLink(string $menu_name, string $parent = ''): MenuLinkContentInterface {
     $entity = MenuLinkContent::create([
       'title' => 'Test link',
       'link' => ['uri' => 'internal:/'],
       'menu_name' => $menu_name,
+      'parent' => $parent,
     ]);
     $entity->save();
     return $entity;
