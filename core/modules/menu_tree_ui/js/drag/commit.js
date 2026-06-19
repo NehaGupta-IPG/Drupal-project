@@ -21,6 +21,7 @@
   Drupal.menuTreeUi.drag = Drupal.menuTreeUi.drag || {};
   const { childRows, descendantRows, findRow, focusRow, nextSiblingRow } =
     Drupal.menuTreeUi.treeNav;
+  const { buildToggle } = Drupal.menuTreeUi;
 
   const ROW = 'tr[role="row"]';
 
@@ -81,42 +82,6 @@
   }
 
   /**
-   * Builds a fresh expand/collapse toggle button.
-   *
-   * @param {string} title
-   *   The link title, for the aria-label.
-   *
-   * @return {HTMLButtonElement}
-   *   The toggle button.
-   */
-  function makeToggleButton(title) {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'menu-tree-ui-row__toggle';
-    button.setAttribute('aria-label', `Toggle children of ${title}`);
-    const chevron = document.createElement('span');
-    chevron.setAttribute('aria-hidden', 'true');
-    chevron.className = 'menu-tree-ui-row__chevron';
-    chevron.textContent = '▸';
-    button.appendChild(chevron);
-    return button;
-  }
-
-  /**
-   * Builds a toggle spacer (used when a parent becomes a leaf).
-   *
-   * @return {HTMLSpanElement}
-   *   The spacer span.
-   */
-  function makeToggleSpacer() {
-    const spacer = document.createElement('span');
-    spacer.className =
-      'menu-tree-ui-row__toggle menu-tree-ui-row__toggle--spacer';
-    spacer.setAttribute('aria-hidden', 'true');
-    return spacer;
-  }
-
-  /**
    * Syncs a parent row's "parent or leaf" attributes to whatever its direct
    * child rows now actually are.
    *
@@ -152,7 +117,7 @@
         const title =
           name.querySelector('.menu-tree-ui-row__title')?.textContent?.trim() ??
           '';
-        const button = makeToggleButton(title);
+        const button = buildToggle({ has_children: true, title });
         if (existing) {
           existing.replaceWith(button);
         } else {
@@ -162,7 +127,7 @@
     } else {
       row.removeAttribute('aria-expanded');
       if (existing && existing.tagName.toLowerCase() === 'button') {
-        existing.replaceWith(makeToggleSpacer());
+        existing.replaceWith(buildToggle({ has_children: false }));
       }
       // On becoming a leaf, remove any stale descendant rows left behind.
       descendantRows(row).forEach((r) => r.remove());

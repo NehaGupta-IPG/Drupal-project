@@ -207,10 +207,10 @@
     }
 
     /**
-     * Cancels an active keyboard move when focus leaves the tree.
+     * Cancels an active keyboard move on a pointer press outside the component.
      *
-     * @param {FocusEvent} event
-     *   The focusout event.
+     * @param {MouseEvent} event
+     *   The mousedown event.
      */
     onOutsidePointer(event) {
       // A keyboard move is not cancelled by focus leaving the tree: carrying the

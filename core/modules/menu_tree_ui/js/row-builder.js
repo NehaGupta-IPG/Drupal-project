@@ -289,4 +289,7 @@
 
   Drupal.menuTreeUi.buildRows = buildRows;
   Drupal.menuTreeUi.buildRow = buildRow;
+  // Shared so drag/commit.js can rebuild a row's toggle after a refresh without
+  // duplicating the markup (and its translated aria-label).
+  Drupal.menuTreeUi.buildToggle = buildToggle;
 })(Drupal);

@@ -50,6 +50,7 @@
     nextSiblingRow,
     visibleRows,
     findRow,
+    levelOf,
   } = Drupal.menuTreeUi.treeNav;
 
   const CLASS_GRABBED = 'menu-tree-ui-row--grabbed';
@@ -98,19 +99,6 @@
     return (
       row.querySelector('.menu-tree-ui-row__title')?.textContent?.trim() ?? ''
     );
-  }
-
-  /**
-   * The 1-based level (depth) of a row.
-   *
-   * @param {HTMLElement} row
-   *   The row.
-   *
-   * @return {number}
-   *   The aria-level.
-   */
-  function levelOf(row) {
-    return Number(row.getAttribute('aria-level'));
   }
 
   /**
@@ -277,7 +265,8 @@
      *
      * @return {boolean}
      *   True if the key was consumed (caller should preventDefault). Tab and
-     *   any other key return false so focus can leave (focusout then cancels).
+     *   any other key return false so focus can leave; the move survives that
+     *   and is ended only by Escape, a drop, or a pointer press outside the UI.
      */
     handleKey(event) {
       switch (event.key) {
@@ -387,8 +376,8 @@
      * @param {HTMLElement[]} list
      *   The visible candidate rows.
      *
-     * @return {{prev: ?HTMLElement, next: ?HTMLElement, min: number, max: number}}
-     *   The neighbours and the inclusive depth bounds.
+     * @return {{prev: ?HTMLElement, min: number, max: number}}
+     *   The row above the gap and the inclusive depth bounds.
      */
     // eslint-disable-next-line class-methods-use-this
     gapBounds(gap, list) {
@@ -396,7 +385,7 @@
       const next = list[gap] ?? null;
       const max = prev ? levelOf(prev) + 1 : 1;
       const min = Math.min(next ? levelOf(next) : 1, max);
-      return { prev, next, min, max };
+      return { prev, min, max };
     }
 
     /**
@@ -632,8 +621,7 @@
       // collapsed run (see request: "I should always be able to see it").
       delete this.grabbed.dataset.hidden;
       // Detaching the focused row dropped focus; put it back on the carried row
-      // so the editor keeps control. The host's focusout handler defers its
-      // cancel check and reads activeElement, which this restores.
+      // so the keyboard keeps driving the move.
       this.grabbed.focus();
 
       this.grabbed.scrollIntoView({ block: 'nearest' });
