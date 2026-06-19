@@ -232,12 +232,20 @@ final class MenuTreeController extends ControllerBase {
       return new JsonResponse($validation, 400);
     }
 
-    $this->workingCopy->addOp($menu_name, [
+    // addOp is the authoritative lock gate: it refuses if the working copy was
+    // claimed by another editor between the check above and this write. Honour
+    // that refusal rather than reporting a success that did not happen.
+    if (!$this->workingCopy->addOp($menu_name, [
       'type' => 'move',
       'id' => $id,
       'new_parent' => $new_parent,
       'before_id' => $before_id,
-    ]);
+    ])) {
+      return new JsonResponse(
+        ['ok' => FALSE, 'code' => 'locked', 'message' => $this->lockedMessage($menu_name)],
+        409,
+      );
+    }
 
     return new JsonResponse(['ok' => TRUE, 'dirty' => TRUE]);
   }
