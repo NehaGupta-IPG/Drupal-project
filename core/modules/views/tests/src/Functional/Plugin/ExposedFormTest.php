@@ -610,7 +610,7 @@ class ExposedFormTest extends ViewTestBase {
     $args = ['@url' => $this->getUrl()];
 
     if (!$elements = $this->xpath('//*[@id]')) {
-      $this->fail(new FormattableMarkup('The page @url contains no HTML IDs.', $args));
+      $this->fail((string) new FormattableMarkup('The page @url contains no HTML IDs.', $args));
       return;
     }
 
