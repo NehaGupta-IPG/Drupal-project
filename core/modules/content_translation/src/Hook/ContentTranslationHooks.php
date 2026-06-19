@@ -531,39 +531,32 @@ class ContentTranslationHooks {
    * history in sync, the old latest affected revision translation must be
    * reset before the next affected revision translation is created.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
    *   The entity currently being edited.
    */
   private function resetLastRevisionOutdatedStatus(ContentEntityInterface $entity): void {
-    $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
-    $langcode = $entity->language()->getId();
-
-    // Identify the current latest translation-affected revision before a new
-    // one is recorded.
-    $latest_affected_revision_id = $storage->getLatestTranslationAffectedRevisionId($entity->id(), $langcode);
-    if (!$latest_affected_revision_id) {
+    // Avoid an infinite loop if the entity is being synced.
+    if ($entity->isSyncing()) {
       return;
     }
 
-    $metadata = $this->contentTranslationManager->getTranslationMetadata($entity);
+    $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
+    $langcode = $entity->language()->getId();
 
-    // If the user is saving the translation with the outdated flag kept
-    // checked, then a new affected revision will be created upon save and
-    // should carry the outdated flag. To keep history accurate, the
-    // previous latest affected revision should be marked as not outdated.
-    // If the user is saving the translation with the outdated flag
-    // unchecked, nothing needs to be done.
-    if ($metadata->isOutdated()) {
-      $latest_revision = $storage->loadRevisionUnchanged($latest_affected_revision_id);
-      $latest_revision_translation = $latest_revision->getTranslation($langcode);
-      $latest_revision_translation_metadata = $this->contentTranslationManager->getTranslationMetadata($latest_revision_translation);
-      if ($latest_revision_translation_metadata->isOutdated()) {
-        $latest_revision_translation_metadata->setOutdated(FALSE);
-        // Avoid creating another revision: we are just syncing metadata on the
-        // already-stored revision.
-        $latest_revision_translation->setSyncing(TRUE);
-        $storage->save($latest_revision_translation);
-      }
+    $latest_affected_revision_id = $storage->getLatestTranslationAffectedRevisionId($entity->id(), $langcode);
+    if (!$latest_affected_revision_id || ($latest_affected_revision_id === $entity->getRevisionId())) {
+      return;
+    }
+
+    $latest_revision = $storage->loadRevisionUnchanged($latest_affected_revision_id);
+    $latest_revision_translation = $latest_revision->getTranslation($langcode);
+    $latest_revision_translation_metadata = $this->contentTranslationManager->getTranslationMetadata($latest_revision_translation);
+    if ($latest_revision_translation_metadata->isOutdated()) {
+      $latest_revision_translation_metadata->setOutdated(FALSE);
+      // Avoid creating another revision: we are just syncing metadata on the
+      // already-stored revision.
+      $latest_revision_translation->setSyncing(TRUE);
+      $storage->save($latest_revision_translation);
     }
   }
 
