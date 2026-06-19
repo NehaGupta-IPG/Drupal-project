@@ -94,7 +94,7 @@ final class MenuTreeSeederCommands extends DrushCommands {
 
     $counts = $this->parseCounts((string) $options['counts']);
     if ($counts === NULL) {
-      $this->io()->error('--counts must be a comma-separated list of positive integers, max ' . self::MAX_DEP1TH . ' levels.');
+      $this->io()->error('--counts must be a comma-separated list of positive integers, max ' . self::MAX_DEPTH . ' levels.');
       return DrushCommands::EXIT_FAILURE;
     }
 
