@@ -829,6 +829,11 @@ $settings['entity_update_backup'] = TRUE;
 # $settings['media_oembed_discovery_trusted_host_patterns'] = [];
 
 /**
+ * JavaScript libraries with these attributes will be aggregated together.
+ */
+$settings['aggregated_js_attributes'] = ['async', 'defer'];
+
+/**
  * Load local development override configuration, if available.
  *
  * Create a settings.local.php file to override variables on secondary (staging,

@@ -31,6 +31,14 @@ js-attributes:
         foo: bar
         defer: true
 
+# Library to test JS files with assets that allow aggregation.
+js-aggregated-attributes:
+  version: 1
+  js:
+    deferred.js: { attributes: { defer: true } }
+    async.js: { attributes: { async: true } }
+    fetchpriority.js: { attributes: { fetchpriority: 'high' } }
+
 js-header:
   header: true
   js:

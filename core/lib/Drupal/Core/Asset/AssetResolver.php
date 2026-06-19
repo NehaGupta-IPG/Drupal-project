@@ -10,6 +10,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\Theme\ThemeManagerInterface;
 
 /**
@@ -383,8 +384,14 @@ class AssetResolver implements AssetResolverInterface {
           $options['scope'] = in_array($library, $header_js_libraries) ? 'header' : 'footer';
 
           // Preprocess can only be set if caching is enabled and no
-          // attributes are set.
-          $options['preprocess'] = $options['cache'] && empty($options['attributes']) ? $options['preprocess'] : FALSE;
+          // attributes other than 'async' or 'defer' are set.
+          $aggregatedJsAttributes = Settings::get('aggregated_js_attributes', ['async', 'defer']);
+          $options['preprocess'] = $options['cache'] && (
+            empty($options['attributes']) ||
+            count(\array_diff_key(
+              $options['attributes'], array_combine($aggregatedJsAttributes, $aggregatedJsAttributes))
+            ) === 0
+          ) ? $options['preprocess'] : FALSE;
 
           // Always add a tiny value to the weight, to conserve the insertion
           // order.
