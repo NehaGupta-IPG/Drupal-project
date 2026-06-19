@@ -71,7 +71,8 @@
    */
   function setupActions(bar) {
     const settings = drupalSettings.menuTreeUi ?? {};
-    // The unsaved notice lives at the top of the region, not in the action bar.
+    // The unsaved notice sits in the action bar beside these buttons; scope the
+    // lookup to the whole region so it is found wherever in the bar it renders.
     const notice = bar
       .closest('.menu-tree-ui')
       ?.querySelector('.menu-tree-ui__unsaved');

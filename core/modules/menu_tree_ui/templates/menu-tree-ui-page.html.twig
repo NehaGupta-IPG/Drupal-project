@@ -16,17 +16,6 @@
  */
 #}
 <div class="menu-tree-ui">
-  {#
-    Unsaved-changes notice. A full-width warning at the top of the region, in
-    the standard message space (the Views UI pattern), toggled by
-    working-copy.js after the first recorded change.
-  #}
-  <div
-    class="menu-tree-ui__unsaved messages messages--warning{{ has_changes ? '' : ' js-hide' }}"
-    aria-live="polite"
-    role="status"
-  >{{ 'You have unsaved changes.'|t }}</div>
-
   <noscript>
     <div class="messages messages--warning">
       {{ 'This tree UI needs JavaScript to expand levels and search. To edit @menu without JavaScript, use the classic menu admin:'|t({ '@menu': menu.label }) }}
@@ -122,21 +111,32 @@
     ></div>
   </div>
 
-  {#
-    Save / Cancel action bar. Moves are recorded in a per-user working copy
-    rather than written immediately, so the editor can apply many changes and
-    then keep or discard them. working-copy.js posts to the save/cancel routes
-    and reveals the unsaved notice after the first change.
-  #}
   {% if locked %}
     <div class="menu-tree-ui__lock messages messages--warning" role="alert">
       {{ '@user is currently editing this menu. Your changes cannot be saved until they finish.'|t({ '@user': lock_owner }) }}
     </div>
   {% endif %}
 
-  <div class="menu-tree-ui__actions">
-    <button type="button" class="menu-tree-ui__save button button--primary" data-mtu-action="save"{{ locked ? ' disabled' : '' }}>{{ 'Save'|t }}</button>
-    <button type="button" class="menu-tree-ui__cancel button" data-mtu-action="cancel"{{ locked ? ' disabled' : '' }}>{{ 'Cancel'|t }}</button>
+  {#
+    Save / Cancel action bar. Moves are recorded in a per-user working copy
+    rather than written immediately, so the editor can apply many changes and
+    then keep or discard them. working-copy.js posts to the save/cancel routes
+    and toggles the unsaved notice after the first change.
+
+    The bar (and only the bar) is sticky at the top while the tree scrolls.
+    Save/Cancel lead; the unsaved notice sits to their right and wraps above
+    them when the row is too narrow. Other page messages use the normal space.
+  #}
+  <div class="menu-tree-ui__actionbar">
+    <div class="menu-tree-ui__actions">
+      <button type="button" class="menu-tree-ui__save button button--primary" data-mtu-action="save"{{ locked ? ' disabled' : '' }}>{{ 'Save'|t }}</button>
+      <button type="button" class="menu-tree-ui__cancel button" data-mtu-action="cancel"{{ locked ? ' disabled' : '' }}>{{ 'Cancel'|t }}</button>
+    </div>
+    <div
+      class="menu-tree-ui__unsaved messages messages--warning{{ has_changes ? '' : ' js-hide' }}"
+      aria-live="polite"
+      role="status"
+    >{{ 'You have unsaved changes.'|t }}</div>
   </div>
 
   <menu-tree

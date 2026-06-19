@@ -128,10 +128,41 @@
 
 /* ───────────────────────────────────────────────────── save / cancel */
 
+/*
+ * The action bar sticks to the top while the tree scrolls (the column header
+ * is intentionally not sticky). wrap-reverse keeps Save/Cancel on the left with
+ * the unsaved notice pushed to their right, and sends the notice to a line
+ * ABOVE the buttons (not below) once the row is too narrow. A solid background
+ * keeps scrolled rows from showing through; the z-index sits above the rows but
+ * below the search results popover (z-index 10).
+ */
+.menu-tree-ui__actionbar {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap-reverse;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding-block: 0.5rem;
+  background: var(--mtu-color-bg);
+}
+
 .menu-tree-ui__actions {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+}
+
+/*
+ * The unsaved notice rides in the action bar rather than the message space:
+ * sized to its content and pushed to the right edge when it shares the row with
+ * the buttons (wrap-reverse lifts it above them when it cannot fit).
+ */
+.menu-tree-ui__unsaved {
+  flex: 0 1 auto;
+  margin: 0;
+  margin-inline-start: auto;
 }
 
 /* ──────────────────────────────────────────────────────────────── tree */
