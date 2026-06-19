@@ -1,5 +1,4 @@
 /**
- * @param Drupal
  * @file
  * Keyboard grab/select move mode for the menu tree.
  *
