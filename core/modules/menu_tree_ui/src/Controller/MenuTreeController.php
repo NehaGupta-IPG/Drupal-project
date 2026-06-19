@@ -162,10 +162,14 @@ final class MenuTreeController extends ControllerBase {
       'parent' => $parent_id,
       'items' => $data,
     ]);
+    // Like ::page(), this level reflects the per-user working copy in
+    // tempstore, which cache metadata cannot express, so it is not cached.
+    // Without this a second editor sharing the same permissions could be
+    // served the first editor's pending overlay from the dynamic page cache.
     $cache = (new CacheableMetadata())
+      ->setCacheMaxAge(0)
       ->addCacheTags($menu->getCacheTags())
-      ->addCacheTags(['config:system.menu.' . $menu->id()])
-      ->addCacheContexts(['user.permissions', 'url.query_args:parent']);
+      ->addCacheTags(['config:system.menu.' . $menu->id()]);
     $response->addCacheableDependency($cache);
     return $response;
   }
