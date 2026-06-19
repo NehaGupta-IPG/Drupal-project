@@ -37,15 +37,21 @@
   aria-posinset="{{ pos_in_set }}"
   aria-setsize="{{ set_size }}"
   {% if has_children %}aria-expanded="false"{% endif %}
-  aria-selected="false"
+  {#
+    The row is the keyboard cursor and the tree's single roving tab stop: the
+    first top-level row is the initial stop, every other row starts at -1 and is
+    promoted as the cursor moves (see js/tree-nav.js focusRow). aria-selected is
+    added only while a row is picked up for a move (see js/move-mode.js).
+  #}
+  tabindex="{{ (parent_id == '' and pos_in_set == 1) ? '0' : '-1' }}"
 >
   {#
     Menu-link cell. Like the classic menu admin, the drag handle, expand toggle,
     and title share one cell, and the whole group is indented by depth — so the
-    handle moves with the item. The handle is the per-row keyboard focus target
-    (a real tab stop) and carries a visually-hidden level indicator. Movable
-    links (content links and static links that support parent/weight overrides)
-    grab to reorder; the rest are focusable for navigation but aria-disabled.
+    handle moves with the item. Keyboard focus lives on the row, not the handle:
+    the handle is a mouse and drag affordance (tabindex="-1"), carrying a
+    visually-hidden label. Movable links (content links and static links that
+    support parent/weight overrides) grab to reorder; the rest are aria-disabled.
     See \Drupal\menu_tree_ui\MenuLinkMovability.
   #}
   <td role="gridcell" class="menu-tree-ui-row__cell menu-tree-ui-row__cell--name">
@@ -54,7 +60,7 @@
         <span
           class="menu-tree-ui-row__handle"
           role="button"
-          tabindex="0"
+          tabindex="-1"
           title="{{ 'Drag to reorder, or click to pick up'|t }}"
         >
           <span aria-hidden="true" class="menu-tree-ui-row__handle-icon"></span>
@@ -64,7 +70,7 @@
         <span
           class="menu-tree-ui-row__handle menu-tree-ui-row__handle--locked"
           role="button"
-          tabindex="0"
+          tabindex="-1"
           aria-disabled="true"
         >
           <span aria-hidden="true" class="menu-tree-ui-row__handle-icon">·</span>

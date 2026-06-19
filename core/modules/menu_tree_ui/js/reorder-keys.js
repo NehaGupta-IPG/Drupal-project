@@ -14,7 +14,7 @@
 
 ((Drupal) => {
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
-  const { descendantRows, lastDescendantRow, nextSiblingRow, handleOf } =
+  const { descendantRows, lastDescendantRow, nextSiblingRow } =
     Drupal.menuTreeUi.treeNav;
   const { announce } = Drupal.menuTreeUi;
 
@@ -94,7 +94,7 @@
 
     const beforeId = nextSiblingRow(row)?.dataset.id ?? null;
 
-    handleOf(row)?.focus();
+    row.focus();
     row.classList.add('menu-tree-ui-row--flash');
     window.setTimeout(() => {
       row.classList.remove('menu-tree-ui-row--flash');

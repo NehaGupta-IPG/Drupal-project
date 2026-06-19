@@ -199,9 +199,14 @@
 
       this.active = true;
       row.classList.add(CLASS_GRABBED);
-      // Focus follows the grabbed row (not its handle) through the move, so the
-      // <tr> is made focusable for the duration; end() restores it.
+      // The grabbed row is the selection (aria-selected) and the single tab stop
+      // while it is held; the cursor (focus) follows it through the carry.
+      const prevStop = this.tree.querySelector('tr[role="row"][tabindex="0"]');
+      if (prevStop && prevStop !== row) {
+        prevStop.setAttribute('tabindex', '-1');
+      }
       row.tabIndex = 0;
+      row.setAttribute('aria-selected', 'true');
       this.setInitialCursor();
 
       announce(
@@ -738,11 +743,10 @@
      */
     end() {
       this.grabbed?.classList.remove(CLASS_GRABBED);
-      // Drop the row out of the tab order without blurring it — removing the
-      // attribute outright would blur the focused row to the body.
-      if (this.grabbed) {
-        this.grabbed.tabIndex = -1;
-      }
+      // The dropped (or restored) row stays the cursor and the single tab stop,
+      // so leave its tabindex at 0; just clear the picked-up selection marker.
+      // After a commit, commit.js re-focuses the rebuilt row via focusRow.
+      this.grabbed?.removeAttribute('aria-selected');
       this.indicator.clear();
       this.tree.closest('menu-tree')?.removeAttribute('data-mtu-drop');
       this.active = false;

@@ -139,12 +139,22 @@
     >{{ 'You have unsaved changes.'|t }}</div>
   </div>
 
+  {#
+    Always-visible interaction hint. The tree is one stop in the page tab order
+    and is then driven with the arrow keys, which is easy to miss; this names the
+    keys up front (the dialog above has the full list) and is referenced by the
+    treegrid's aria-describedby so assistive tech announces it on entry.
+  #}
+  <p class="menu-tree-ui__instructions" id="menu-tree-ui-instructions">
+    {{ 'Use the arrow keys to move between items. Press Space to pick up the focused item and move it.'|t }}
+  </p>
+
   <menu-tree
     class="menu-tree-ui__tree"
     data-menu="{{ menu.id }}"
     data-children-url="{{ children_action }}"
   >
-    <table role="treegrid" aria-label="{{ menu.label }}" class="menu-tree-ui__table">
+    <table role="treegrid" aria-label="{{ menu.label }}" aria-describedby="menu-tree-ui-instructions" class="menu-tree-ui__table">
       <thead>
         <tr>
           <th scope="col" class="menu-tree-ui__col menu-tree-ui__col--name">{{ 'Name'|t }}</th>

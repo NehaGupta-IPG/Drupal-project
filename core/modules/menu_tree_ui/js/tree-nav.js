@@ -11,8 +11,8 @@
  * used.
  *
  * "Visible" means "in DOM and not flagged data-hidden by a collapsed ancestor"
- * — not "in the viewport". Focus lives on a row's drag handle (the per-row tab
- * target), not the <tr>.
+ * — not "in the viewport". Focus lives on the <tr>, which is the single roving
+ * tab stop; the handle is a mouse and drag affordance only.
  *
  * Exposes helpers on Drupal.menuTreeUi.treeNav. No build step: this file is a
  * plain script loaded (in dependency order) by menu_tree_ui.libraries.yml.
@@ -22,7 +22,6 @@
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
 
   const ROW = 'tr[role="row"]';
-  const HANDLE = '.menu-tree-ui-row__handle';
 
   /**
    * The level (depth) of a row.
@@ -248,19 +247,6 @@
   }
 
   /**
-   * The focusable drag handle of a row (the per-row keyboard target).
-   *
-   * @param {?HTMLElement} row
-   *   The row, or null.
-   *
-   * @return {?HTMLElement}
-   *   The handle element, or null.
-   */
-  function handleOf(row) {
-    return row ? row.querySelector(HANDLE) : null;
-  }
-
-  /**
    * Resolves the owning row from an element (e.g. an event target).
    *
    * @param {?EventTarget} el
@@ -274,10 +260,12 @@
   }
 
   /**
-   * Moves focus to a row by focusing its handle, and marks it selected.
+   * Moves focus to a row and makes it the single roving tab stop.
    *
-   * Clears aria-selected on all rows, sets it on the target, and focuses the
-   * target's handle. No-op on null so callers can pass null safely.
+   * Focus goes on the <tr> itself, which carries the row's level, position, and
+   * expanded state, so a screen reader announces the hierarchy. The previously
+   * focused row drops to tabindex="-1" so the tree stays one stop in the page's
+   * tab order. No-op on null so callers can pass null safely.
    *
    * @param {HTMLTableElement} tree
    *   The root treegrid element.
@@ -288,11 +276,12 @@
     if (!row) {
       return;
     }
-    tree.querySelectorAll(ROW).forEach((r) => {
-      r.setAttribute('aria-selected', 'false');
-    });
-    row.setAttribute('aria-selected', 'true');
-    (handleOf(row) ?? row).focus();
+    const current = tree.querySelector(`${ROW}[tabindex="0"]`);
+    if (current && current !== row) {
+      current.setAttribute('tabindex', '-1');
+    }
+    row.setAttribute('tabindex', '0');
+    row.focus();
   }
 
   Drupal.menuTreeUi.treeNav = {
@@ -308,7 +297,6 @@
     nextVisibleRow,
     previousVisibleRow,
     findRow,
-    handleOf,
     rowOf,
     focusRow,
   };

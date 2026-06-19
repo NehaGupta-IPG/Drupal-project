@@ -49,7 +49,7 @@
   function buildHandle(item, depth) {
     const handle = document.createElement('span');
     handle.setAttribute('role', 'button');
-    handle.tabIndex = 0;
+    handle.tabIndex = -1;
 
     const icon = document.createElement('span');
     icon.setAttribute('aria-hidden', 'true');
@@ -249,7 +249,10 @@
     if (item.has_children) {
       tr.setAttribute('aria-expanded', 'false');
     }
-    tr.setAttribute('aria-selected', 'false');
+    // Lazy-loaded rows are never the initial tab stop; the active row is set as
+    // the cursor moves (see treeNav.focusRow). aria-selected is added only while
+    // a row is picked up for a move (see move-mode), so it is absent here.
+    tr.setAttribute('tabindex', '-1');
     tr.className = [
       'menu-tree-ui-row',
       item.enabled ? '' : 'menu-tree-ui-row--disabled',

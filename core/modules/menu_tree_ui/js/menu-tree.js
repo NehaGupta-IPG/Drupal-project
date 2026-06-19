@@ -41,13 +41,14 @@
 ((Drupal, drupalSettings) => {
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
   const ns = Drupal.menuTreeUi;
-  const { rowOf, childRows } = ns.treeNav;
+  const { rowOf, childRows, focusRow } = ns.treeNav;
   const { announce } = ns;
 
   const TREE = 'table[role="treegrid"]';
   const ROW = 'tr[role="row"]';
   const TOGGLE = '.menu-tree-ui-row__toggle';
   const COLUMN_TOGGLE = '.menu-tree-ui-row__column-toggle';
+  const OPERATIONS = '.menu-tree-ui-row__operations';
 
   class MenuTreeElement extends HTMLElement {
     constructor() {
@@ -302,6 +303,12 @@
 
       const toggle = target.closest(TOGGLE);
       if (!toggle) {
+        // A plain click elsewhere on a row moves the cursor there. Skip clicks
+        // inside the operations dropbutton, which manages its own focus.
+        const clicked = rowOf(target);
+        if (clicked && !target.closest(OPERATIONS)) {
+          focusRow(this.tree, clicked);
+        }
         return;
       }
       const row = toggle.closest(ROW);
