@@ -235,13 +235,51 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
   }
 
   /**
+   * Marks revision translations as outdated.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $translation
+   *   The entity translation marking the other translations outdated.
+   */
+  protected function markRevisionTranslationsOutdated(EntityInterface $translation): void {
+    /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
+    $storage = $this->entityTypeManager->getStorage($this->entityTypeId);
+    $active_langcode = $translation->language()->getId();
+    $entity_id = $translation->id();
+
+    foreach ($this->languageManager->getLanguages() as $langcode => $language) {
+      if ($langcode === $active_langcode) {
+        continue;
+      }
+      $revision_id = $storage->getLatestTranslationAffectedRevisionId($entity_id, $langcode);
+      if (!$revision_id) {
+        continue;
+      }
+
+      /** @var \Drupal\Core\Entity\ContentEntityInterface $revision */
+      $revision = $storage->loadRevision($revision_id);
+      $revision_translation = $revision->getTranslation($langcode);
+      $metadata = $this->manager->getTranslationMetadata($revision_translation);
+      if (!$metadata->isOutdated()) {
+        $metadata->setOutdated(TRUE);
+        $revision_translation->setSyncing(TRUE);
+        $storage->save($revision_translation);
+      }
+    }
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function retranslate(EntityInterface $entity, $langcode = NULL) {
-    $updated_langcode = !empty($langcode) ? $langcode : $entity->language()->getId();
-    foreach ($entity->getTranslationLanguages() as $langcode => $language) {
-      $this->manager->getTranslationMetadata($entity->getTranslation($langcode))
-        ->setOutdated($langcode != $updated_langcode);
+    if (!ContentTranslationManager::isPendingRevisionSupportEnabled($entity->getEntityTypeId(), $entity->bundle())) {
+      $updated_langcode = !empty($langcode) ? $langcode : $entity->language()->getId();
+      foreach ($entity->getTranslationLanguages() as $langcode => $language) {
+        $this->manager->getTranslationMetadata($entity->getTranslation($langcode))
+          ->setOutdated($langcode != $updated_langcode);
+      }
+    }
+    else {
+      $this->markRevisionTranslationsOutdated($entity);
     }
   }
 
@@ -445,20 +483,35 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
         '#disabled' => !$enabled,
       ];
 
-      $translate = !$new_translation && $metadata->isOutdated();
-      $outdated_access = !ContentTranslationManager::isPendingRevisionSupportEnabled($entity->getEntityTypeId(), $entity->bundle());
-      if (!$outdated_access) {
-        $form['content_translation']['outdated'] = [
-          '#markup' => $this->t('Translations cannot be flagged as outdated when content is moderated.'),
-        ];
+      $is_outdated = $metadata->isOutdated();
+
+      // If the entity type is revisionable, we should set $is_outdated based on
+      // the latest translation affected revision.
+      $entity_type = $entity->getEntityType();
+      $use_latest_revisions = $entity_type->isRevisionable() && ContentTranslationManager::isPendingRevisionSupportEnabled($entity_type->id(), $entity->bundle());
+      if ($use_latest_revisions) {
+        /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
+        $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
+        $latest_revision_id = $storage->getLatestTranslationAffectedRevisionId($entity->id(), $entity->language()->getId());
+        // If the latest affected revision id is already the currently
+        // loaded entity, then there is no need to do anything.
+        if ($latest_revision_id && $latest_revision_id !== $entity->getRevisionId()) {
+          /** @var \Drupal\Core\Entity\ContentEntityInterface $latest_revision */
+          $latest_revision = $storage->loadRevision($latest_revision_id);
+          $default_revision = $storage->load($entity->id());
+          if (!$latest_revision->wasDefaultRevision() || $default_revision->hasTranslation($entity->language()->getId())) {
+            $is_outdated = $this->manager->getTranslationMetadata($latest_revision->getTranslation($entity->language()->getId()))->isOutdated();
+          }
+        }
       }
-      elseif (!$translate) {
+
+      $translate = !$new_translation && $is_outdated;
+      if (!$translate) {
         $form['content_translation']['retranslate'] = [
           '#type' => 'checkbox',
           '#title' => $this->t('Flag other translations as outdated'),
           '#default_value' => FALSE,
           '#description' => $this->t('If you made a significant change, which means the other translations should be updated, you can flag all translations of this content as outdated. This will not change any other property of them, like whether they are published or not.'),
-          '#access' => $outdated_access,
         ];
       }
       else {
@@ -467,7 +520,6 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
           '#title' => $this->t('This translation needs to be updated'),
           '#default_value' => $translate,
           '#description' => $this->t('When this option is checked, this translation needs to be updated. Uncheck when the translation is up to date again.'),
-          '#access' => $outdated_access,
         ];
         $form['content_translation']['#open'] = TRUE;
       }
@@ -518,6 +570,7 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
     foreach (Element::children($form['actions']) as $action) {
       if (isset($form['actions'][$action]['#type']) && $form['actions'][$action]['#type'] == 'submit') {
         array_unshift($form['actions'][$action]['#submit'], [$this, 'entityFormSubmit']);
+        $form['actions'][$action]['#submit'][] = [$this, 'entityFormPostSave'];
       }
     }
   }
@@ -662,9 +715,27 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
     $metadata->setAuthor(!empty($values['uid']) ? User::load($values['uid']) : User::load(0));
     $metadata->setPublished(!empty($values['status']));
     $metadata->setCreatedTime(!empty($values['created']) ? strtotime($values['created']) : $this->time->getRequestTime());
-
     $metadata->setOutdated(!empty($values['outdated']));
-    if (!empty($values['retranslate'])) {
+
+    if (!empty($values['retranslate']) && !ContentTranslationManager::isPendingRevisionSupportEnabled($entity->getEntityTypeId(), $entity->bundle())) {
+      $this->retranslate($entity, $form_langcode);
+    }
+  }
+
+  /**
+   * Form submission handler for ContentTranslationHandler::entityFormAlter().
+   *
+   * Performs required tasks after the entity has been saved.
+   */
+  public function entityFormPostSave($form, FormStateInterface $form_state): void {
+    $values = $form_state->getValue('content_translation');
+    if (empty($values['retranslate'])) {
+      return;
+    }
+    $form_object = $form_state->getFormObject();
+    $form_langcode = $form_object->getFormLangcode($form_state);
+    $entity = $form_object->getEntity();
+    if (ContentTranslationManager::isPendingRevisionSupportEnabled($entity->getEntityTypeId(), $entity->bundle())) {
       $this->retranslate($entity, $form_langcode);
     }
   }
