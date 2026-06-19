@@ -245,7 +245,7 @@
           token,
           this.indicator,
           () => this.moveMode?.cancel(),
-          (row) => this.pickUpRow(row),
+          (row) => this.onHandleTap(row),
         );
         this.drag.attach();
       } else {
@@ -257,18 +257,27 @@
     }
 
     /**
-     * Picks a row up into keyboard move mode from a mouse tap on its handle.
+     * Handles a tap (mouse, no drag) on a row's drag handle.
      *
-     * Lets a mouse user start a move the same way Space does: pick the row up,
-     * click a destination row to set the drop position, then confirm with the
-     * keyboard. A tap while a move is already running is ignored here — the
-     * tree's click handler positions the cursor instead.
+     * With no move running, the tap picks the row up into move mode — the
+     * single-pointer counterpart to Space. While a move is running, tapping the
+     * carried item's handle drops it: the single-pointer commit, symmetric with
+     * the pick-up tap and needing no keyboard, which is what makes the drag
+     * reorder satisfy WCAG 2.5.7. Taps on other rows' handles are ignored so the
+     * item is never dropped somewhere unintended; destination rows are aimed at
+     * by clicking the row (see move-mode handlePointer).
      *
      * @param {HTMLElement} row
-     *   The tapped row.
+     *   The row whose handle was tapped.
      */
-    pickUpRow(row) {
-      if (!this.moveMode || this.moveMode.isActive()) {
+    onHandleTap(row) {
+      if (!this.moveMode) {
+        return;
+      }
+      if (this.moveMode.isActive()) {
+        if (this.moveMode.isGrabbed(row)) {
+          this.moveMode.commit();
+        }
         return;
       }
       this.moveMode.tryGrab(row);

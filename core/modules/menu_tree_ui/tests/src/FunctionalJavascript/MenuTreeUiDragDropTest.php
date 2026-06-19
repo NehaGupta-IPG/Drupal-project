@@ -126,6 +126,27 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
   }
 
   /**
+   * A pointer-only move commits on a handle tap, with no keyboard step.
+   *
+   * Exercises the single-pointer path WCAG 2.5.7 requires: tapping C's handle
+   * picks it up, clicking the top of B aims it before B, and tapping C's handle
+   * again drops it. Order becomes A, C, B, D, L without ever pressing Enter.
+   */
+  public function testPointerOnlyMoveCommitsOnHandleTap(): void {
+    $this->tapHandle('C');
+    $this->aimAtRow('B', 'before');
+    $this->tapHandle('C');
+    $this->getSession()->wait(
+      5000,
+      '!document.querySelector(\'menu-tree[data-mtu-moving="true"]\')'
+      . ' && !document.querySelector(\'.menu-tree-ui-row--grabbed\')'
+      . ' && !document.querySelector(\'[data-loading="true"]\')',
+    );
+    $this->assertSiblings(['A', 'C', 'B', 'D', 'L'], $this->childRowsSelector(NULL));
+    $this->assertDepth('C', 1);
+  }
+
+  /**
    * Drop B in the middle of expanded A → B becomes A's first child at level 2.
    *
    * Dropping "on" a parent lands the row as the first child (right under the
@@ -394,6 +415,68 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
       . ' && !document.querySelector(\'.menu-tree-ui-row--dragging\')'
       . ' && !document.querySelector(\'[data-loading="true"]\')',
     );
+  }
+
+  /**
+   * Taps a row's drag handle: pointerdown + pointerup with no movement.
+   *
+   * Stays below the 5px drag threshold, so it fires the controller's tap path
+   * rather than a drag — a pickup when idle, a drop when a move is running.
+   */
+  private function tapHandle(string $label): void {
+    $id = $this->linkIds[$label] ?? throw new \InvalidArgumentException("Unknown label: $label");
+    $script = <<<JS
+      const row = document.querySelector('tr[role="row"][data-id="$id"]');
+      if (!row) throw new Error('row not in DOM');
+      row.scrollIntoView({block: 'center'});
+      const handle = row.querySelector('.menu-tree-ui-row__handle:not(.menu-tree-ui-row__handle--locked)');
+      if (!handle) throw new Error('no draggable handle on row');
+      const r = handle.getBoundingClientRect();
+      const x = r.left + r.width / 2;
+      const y = r.top + r.height / 2;
+      function send(type) {
+        handle.dispatchEvent(new PointerEvent(type, {
+          bubbles: true, cancelable: true, composed: true,
+          pointerId: 1, isPrimary: true, button: 0,
+          clientX: x, clientY: y, screenX: x, screenY: y,
+        }));
+      }
+      send('pointerdown');
+      send('pointerup');
+    JS;
+    $this->getSession()->executeScript($script);
+  }
+
+  /**
+   * Clicks a destination row in the given zone to aim the active move at it.
+   *
+   * @param string $label
+   *   The destination row label.
+   * @param string $zone
+   *   Where in the row to click: 'before' (top), 'child' (middle) or 'after'
+   *   (bottom).
+   */
+  private function aimAtRow(string $label, string $zone): void {
+    $id = $this->linkIds[$label] ?? throw new \InvalidArgumentException("Unknown label: $label");
+    $ratio = match ($zone) {
+      'before' => 0.1,
+      'child'  => 0.5,
+      'after'  => 0.9,
+      default  => throw new \InvalidArgumentException("Unknown zone: $zone"),
+    };
+    $script = <<<JS
+      const row = document.querySelector('tr[role="row"][data-id="$id"]');
+      if (!row) throw new Error('destination row not in DOM');
+      row.scrollIntoView({block: 'center'});
+      const rect = row.getBoundingClientRect();
+      const x = rect.left + rect.width / 2;
+      const y = rect.top + rect.height * $ratio;
+      row.dispatchEvent(new MouseEvent('click', {
+        bubbles: true, cancelable: true, composed: true,
+        clientX: x, clientY: y, button: 0,
+      }));
+    JS;
+    $this->getSession()->executeScript($script);
   }
 
   /**

@@ -170,6 +170,17 @@
     }
 
     /**
+     * @param {?HTMLElement} row
+     *   The row to test, or null.
+     *
+     * @return {boolean}
+     *   Whether the row is the picked-up row or part of its carried subtree.
+     */
+    isGrabbed(row) {
+      return !!row && (row === this.grabbed || this.block.includes(row));
+    }
+
+    /**
      * Picks up a row to start a keyboard move.
      *
      * @param {HTMLElement} row
