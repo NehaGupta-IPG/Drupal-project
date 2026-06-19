@@ -66,6 +66,18 @@ final class MenuTreeUiTabsTest extends BrowserTestBase {
   }
 
   /**
+   * The tree route is denied to a user without menu administration access.
+   *
+   * Every tree route requires _entity_access: 'menu.update', granted by the
+   * 'administer menu' permission; a user without it must be refused.
+   */
+  public function testTreeRouteRequiresAccess(): void {
+    $this->drupalLogin($this->drupalCreateUser(['access administration pages']));
+    $this->drupalGet('/admin/structure/menu/manage/tabs-test/tree');
+    $this->assertSession()->statusCodeEquals(403);
+  }
+
+  /**
    * The Menus list dropbutton has Edit links (tree), Edit links (no js), Edit.
    */
   public function testListDropbutton(): void {
