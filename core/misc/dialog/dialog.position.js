@@ -132,11 +132,22 @@
       $(window)
         .on('resize.dialogResize scroll.dialogResize', eventData, autoResize)
         .trigger('resize.dialogResize');
-      $(document).on(
-        'drupalViewportOffsetChange.dialogResize',
-        eventData,
-        autoResize,
+
+      const viewportResizeListener = () => {
+        autoResize({ data: eventData });
+      };
+
+      document.addEventListener(
+        'drupalViewportOffsetChange',
+        viewportResizeListener,
       );
+
+      window.addEventListener('dialog:beforeclose', () => {
+        document.removeEventListener(
+          'drupalViewportOffsetChange',
+          viewportResizeListener,
+        );
+      });
     }
   });
 

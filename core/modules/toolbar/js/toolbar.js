@@ -165,11 +165,10 @@
         // menu subtrees.
         Drupal.toolbar.views.toolbarVisualView.loadSubtrees();
 
-        $(document)
-          // Update the model when the viewport offset changes.
-          .on('drupalViewportOffsetChange.toolbar', (event, offsets) => {
-            model.set('offsets', offsets);
-          });
+        // Update the model when the viewport offset changes.
+        document.addEventListener('drupalViewportOffsetChange', (e) =>
+          model.set('offsets', e?.offsets),
+        );
 
         // Broadcast model changes to other modules.
         model
