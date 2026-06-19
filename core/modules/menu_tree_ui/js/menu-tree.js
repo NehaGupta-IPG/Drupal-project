@@ -41,7 +41,7 @@
 ((Drupal, drupalSettings) => {
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
   const ns = Drupal.menuTreeUi;
-  const { rowOf, childRows, focusRow } = ns.treeNav;
+  const { rowOf, childRows, focusRow, initRovingTabindex } = ns.treeNav;
   const { announce } = ns;
 
   const TREE = 'table[role="treegrid"]';
@@ -120,6 +120,16 @@
         this.detachSearchPanel = ns.attachSearchPanel(container);
       }
       this.autoExpandSmall();
+      // Upgrade the server-rendered dropbuttons now so their toggle buttons
+      // exist before priming; otherwise a non-active row's toggle, added by a
+      // later attachBehaviors pass, would stay in the tab order.
+      if (Drupal.attachBehaviors) {
+        Drupal.attachBehaviors(this.tree);
+      }
+      // The tree is one Tab stop: only the active row's controls are tabbable.
+      // Newly built rows start inactive (see expand.js), so priming the rows
+      // present now is enough; focusRow moves the tabbable set as the cursor does.
+      initRovingTabindex(this.tree);
 
       // Fetch the CSRF token once, then wire up drag-and-drop and keyboard
       // reorder. Drupal's CSRF check accepts the token in the X-CSRF-Token

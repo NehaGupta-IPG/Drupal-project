@@ -172,6 +172,80 @@ final class MenuTreeUiTreegridFocusTest extends WebDriverTestBase {
   }
 
   /**
+   * The tree is one Tab stop: only the active row's controls are tabbable.
+   */
+  public function testOnlyActiveRowControlsAreTabbable(): void {
+    $this->assertSame(
+      0,
+      (int) $this->getSession()->evaluateScript($this->strayTabbableScript()),
+      'No control outside the active row is in the tab order.',
+    );
+    $this->assertGreaterThan(
+      0,
+      $this->activeOperationCount(),
+      'The active row exposes its operations to Tab.',
+    );
+  }
+
+  /**
+   * The tabbable control set follows the cursor as it moves between rows.
+   */
+  public function testTabbableSetFollowsCursor(): void {
+    $this->assertGreaterThan(0, $this->activeOperationCount());
+
+    $this->pressKeyOnRow('B', 'ArrowDown');
+
+    $this->assertSame(
+      0,
+      (int) $this->getSession()->evaluateScript($this->strayTabbableScript()),
+      'Moving the cursor left no stray tabbable controls behind.',
+    );
+    $this->assertGreaterThan(
+      0,
+      $this->activeOperationCount(),
+      'The newly active row exposes its operations to Tab.',
+    );
+  }
+
+  /**
+   * JS that counts tabbable row controls outside the active row.
+   *
+   * @return string
+   *   An expression returning the stray-control count.
+   */
+  private function strayTabbableScript(): string {
+    return <<<JS
+      (() => {
+        const sel = 'a.menu-tree-ui-row__title, .menu-tree-ui-row__column-toggle,'
+          + ' .menu-tree-ui-row__operations a, .menu-tree-ui-row__operations button';
+        const active = document.querySelector('menu-tree tr[role="row"][tabindex="0"]');
+        return Array.from(document.querySelectorAll('menu-tree ' + sel))
+          .filter((c) => c.getAttribute('tabindex') !== '-1')
+          .filter((c) => c.closest('tr[role="row"]') !== active)
+          .length;
+      })()
+    JS;
+  }
+
+  /**
+   * The number of tabbable operation controls in the active row.
+   *
+   * @return int
+   *   The count.
+   */
+  private function activeOperationCount(): int {
+    return (int) $this->getSession()->evaluateScript(<<<JS
+      (() => {
+        const active = document.querySelector('menu-tree tr[role="row"][tabindex="0"]');
+        if (!active) return 0;
+        return Array.from(active.querySelectorAll(
+          '.menu-tree-ui-row__operations a, .menu-tree-ui-row__operations button',
+        )).filter((c) => c.getAttribute('tabindex') === '0').length;
+      })()
+    JS);
+  }
+
+  /**
    * Seeds a small menu with a leaf first and a parent second.
    *
    * Top level: B (leaf), then A (with A1, A2 (with A2a)). B is deliberately a

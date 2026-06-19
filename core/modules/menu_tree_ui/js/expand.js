@@ -23,6 +23,7 @@
     levelOf,
     findRow,
     setRowLevel,
+    setRowControlsActive,
   } = ns.treeNav;
 
   const ROW = 'tr[role="row"]';
@@ -289,6 +290,9 @@
           if (Drupal.attachBehaviors) {
             Drupal.attachBehaviors(row);
           }
+          // Built rows are not the active row, so keep their controls out of the
+          // tab order (set after attachBehaviors, which upgrades the dropbutton).
+          setRowControlsActive(row, false);
           this.rowWindow?.observe(row);
         }
       });
@@ -356,6 +360,9 @@
           if (Drupal.attachBehaviors) {
             Drupal.attachBehaviors(r);
           }
+          // Built rows are not the active row, so keep their controls out of the
+          // tab order (set after attachBehaviors, which upgrades the dropbutton).
+          setRowControlsActive(r, false);
           this.rowWindow?.observe(r);
         });
       } finally {

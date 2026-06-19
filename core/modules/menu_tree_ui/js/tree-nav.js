@@ -22,6 +22,16 @@
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
 
   const ROW = 'tr[role="row"]';
+  // Controls that join the active row's tab sequence. The row is the cursor and
+  // the arrow keys drive the tree, so these are the controls not otherwise
+  // reachable from the row: the link, the column switch, and the operations. The
+  // drag handle (mouse/drag) and expand toggle (Left/Right/Enter) are excluded.
+  const ROW_CONTROLS = [
+    'a.menu-tree-ui-row__title',
+    '.menu-tree-ui-row__column-toggle',
+    '.menu-tree-ui-row__operations a',
+    '.menu-tree-ui-row__operations button',
+  ].join(', ');
 
   /**
    * The level (depth) of a row.
@@ -260,12 +270,43 @@
   }
 
   /**
+   * The within-row controls that join the active row's tab sequence.
+   *
+   * @param {?HTMLElement} row
+   *   The row, or null.
+   *
+   * @return {NodeListOf<HTMLElement>|HTMLElement[]}
+   *   The controls, or an empty array for null.
+   */
+  function rowControls(row) {
+    return row ? row.querySelectorAll(ROW_CONTROLS) : [];
+  }
+
+  /**
+   * Adds or removes a row's controls from the page tab order.
+   *
+   * Only the active row's controls are tabbable, so the whole tree is one Tab
+   * stop: Tab from the focused row steps through its controls, then leaves.
+   *
+   * @param {?HTMLElement} row
+   *   The row, or null.
+   * @param {boolean} active
+   *   TRUE to make the controls tabbable, FALSE to take them out.
+   */
+  function setRowControlsActive(row, active) {
+    rowControls(row).forEach((control) => {
+      control.setAttribute('tabindex', active ? '0' : '-1');
+    });
+  }
+
+  /**
    * Moves focus to a row and makes it the single roving tab stop.
    *
    * Focus goes on the <tr> itself, which carries the row's level, position, and
    * expanded state, so a screen reader announces the hierarchy. The previously
-   * focused row drops to tabindex="-1" so the tree stays one stop in the page's
-   * tab order. No-op on null so callers can pass null safely.
+   * focused row and its controls drop to tabindex="-1" while the new row and its
+   * controls become tabbable, so the tree stays one stop in the page's tab
+   * order. No-op on null so callers can pass null safely.
    *
    * @param {HTMLTableElement} tree
    *   The root treegrid element.
@@ -279,9 +320,29 @@
     const current = tree.querySelector(`${ROW}[tabindex="0"]`);
     if (current && current !== row) {
       current.setAttribute('tabindex', '-1');
+      setRowControlsActive(current, false);
     }
     row.setAttribute('tabindex', '0');
+    setRowControlsActive(row, true);
     row.focus();
+  }
+
+  /**
+   * Primes the roving tab order across the whole tree.
+   *
+   * Takes every row's controls out of the tab order, then restores the active
+   * row's (the one already carrying tabindex="0"). Run once the tree is in the
+   * DOM; per-row transitions are handled by focusRow and newly built rows start
+   * inactive.
+   *
+   * @param {HTMLTableElement} tree
+   *   The root treegrid element.
+   */
+  function initRovingTabindex(tree) {
+    tree
+      .querySelectorAll(ROW)
+      .forEach((row) => setRowControlsActive(row, false));
+    setRowControlsActive(tree.querySelector(`${ROW}[tabindex="0"]`), true);
   }
 
   Drupal.menuTreeUi.treeNav = {
@@ -299,6 +360,9 @@
     findRow,
     rowOf,
     focusRow,
+    rowControls,
+    setRowControlsActive,
+    initRovingTabindex,
   };
   // A module-wide announce helper (not tree-specific) so every file can speak
   // through the one live region without re-checking Drupal.announce.
