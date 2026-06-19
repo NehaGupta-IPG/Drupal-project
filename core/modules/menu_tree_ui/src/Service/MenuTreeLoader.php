@@ -155,7 +155,7 @@ final class MenuTreeLoader {
           }
           $by_id[$moved] = $element;
         }
-        $order = $this->spliceBefore($order, $moved, $before_id);
+        $order = self::spliceBefore($order, $moved, $before_id);
       }
       elseif ($in_list) {
         $order = array_values(array_filter($order, static fn(string $id): bool => $id !== $moved));
@@ -175,9 +175,10 @@ final class MenuTreeLoader {
   /**
    * Inserts a link id before another in an ordered list (or appends it).
    *
-   * Mirrors MenuTreeMover::renumberSiblings(): the moved id is removed if
-   * already present, then placed immediately before $before_id, or at the end
-   * when there is no anchor or the anchor is absent.
+   * The moved id is removed if already present, then placed immediately before
+   * $before_id, or at the end when there is no anchor or the anchor is absent.
+   * Shared by the read-side overlay here and the write-side reweight in
+   * MenuTreeMover::renumberSiblings() so both produce the same order.
    *
    * @param string[] $order
    *   The current ordered ids.
@@ -189,7 +190,7 @@ final class MenuTreeLoader {
    * @return string[]
    *   The new order.
    */
-  private function spliceBefore(array $order, string $moved, ?string $before_id): array {
+  public static function spliceBefore(array $order, string $moved, ?string $before_id): array {
     $order = array_values(array_filter($order, static fn(string $id): bool => $id !== $moved));
     $out = [];
     $inserted = FALSE;

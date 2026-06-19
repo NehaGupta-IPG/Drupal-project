@@ -21,23 +21,9 @@
   Drupal.menuTreeUi.drag = Drupal.menuTreeUi.drag || {};
   const { childRows, descendantRows, findRow, focusRow, nextSiblingRow } =
     Drupal.menuTreeUi.treeNav;
-  const { buildToggle } = Drupal.menuTreeUi;
+  const { buildToggle, announce } = Drupal.menuTreeUi;
 
   const ROW = 'tr[role="row"]';
-
-  /**
-   * Announces a message through Drupal's live-region announcer.
-   *
-   * @param {string} message
-   *   The message.
-   * @param {('polite'|'assertive')} priority
-   *   The live-region priority.
-   */
-  function announce(message, priority) {
-    if (Drupal.announce) {
-      Drupal.announce(message, priority);
-    }
-  }
 
   /**
    * Resolves the parent id the moved row should end up under.

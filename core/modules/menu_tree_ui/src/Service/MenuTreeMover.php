@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\menu_tree_ui\Service;
 
 use Drupal\Component\Plugin\Exception\PluginException;
-use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Menu\MenuLinkManagerInterface;
@@ -34,60 +33,11 @@ final class MenuTreeMover {
 
   public function __construct(
     private readonly MenuTreeStorageInterface $treeStorage,
-    private readonly Connection $database,
     private readonly ModuleHandlerInterface $moduleHandler,
     private readonly MenuTreeLoader $loader,
     private readonly MenuLinkManagerInterface $menuLinkManager,
     private readonly LoggerInterface $logger,
   ) {}
-
-  /**
-   * Applies a move and returns an outcome the controller can serialize.
-   *
-   * @param string $menu_name
-   *   The menu the move is happening within.
-   * @param string $moved_id
-   *   Plugin ID of the link being moved.
-   * @param string $new_parent_id
-   *   Plugin ID of the new parent, or empty string for the menu root.
-   * @param string|null $before_id
-   *   Plugin ID of the sibling that should sit immediately after the moved
-   *   link, or NULL to drop at the end of the parent's children list.
-   *
-   * @return array{ok: bool, code?: string, message?: string, weight?: int}
-   *   On success: ['ok' => TRUE, 'weight' => int].
-   *   On failure: ['ok' => FALSE, 'code' => string, 'message' => string].
-   */
-  public function move(
-    string $menu_name,
-    string $moved_id,
-    string $new_parent_id,
-    ?string $before_id,
-  ): array {
-    $validation = $this->validateMove($menu_name, $moved_id, $new_parent_id, $before_id);
-    if (!$validation['ok']) {
-      return $validation;
-    }
-
-    // Wrap the sibling renumber + the moved link's update in a transaction so a
-    // mid-operation failure cannot leave siblings with stale weights under the
-    // new parent.
-    $txn = $this->database->startTransaction();
-    try {
-      $new_weight = $this->persistMove($menu_name, $moved_id, $new_parent_id, $before_id);
-    }
-    catch (\Exception $e) {
-      $txn->rollBack();
-      throw $e;
-    }
-
-    $this->moduleHandler->invokeAll(
-      'menu_tree_ui_post_move',
-      [$menu_name, $moved_id, $new_parent_id, $new_weight],
-    );
-
-    return ['ok' => TRUE, 'weight' => $new_weight];
-  }
 
   /**
    * Writes a validated move to live storage (no transaction, no validation).
@@ -363,24 +313,10 @@ final class MenuTreeMover {
       $current_weight[$id] = (int) $element->link->getWeight();
     }
 
-    // Pluck the moved link out, then splice it back in before $before_id (or
-    // push to the end when there is no anchor, or the anchor has vanished).
-    $without_moved = array_values(array_filter(
-      $ordered,
-      static fn(string $id): bool => $id !== $moved_id,
-    ));
-    $reordered = [];
-    $inserted = FALSE;
-    foreach ($without_moved as $id) {
-      if (!$inserted && $before_id !== NULL && $id === $before_id) {
-        $reordered[] = $moved_id;
-        $inserted = TRUE;
-      }
-      $reordered[] = $id;
-    }
-    if (!$inserted) {
-      $reordered[] = $moved_id;
-    }
+    // Pluck the moved link out and splice it back in before $before_id (or at
+    // the end). Shared with MenuTreeLoader::spliceBefore() so the read overlay
+    // and this write-side reweight produce the same order.
+    $reordered = MenuTreeLoader::spliceBefore($ordered, $moved_id, $before_id);
 
     $assigned_weight = 0;
     foreach ($reordered as $offset => $id) {

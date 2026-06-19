@@ -16,6 +16,7 @@
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
   const { descendantRows, lastDescendantRow, nextSiblingRow, handleOf } =
     Drupal.menuTreeUi.treeNav;
+  const { announce } = Drupal.menuTreeUi;
 
   const ROW = 'tr[role="row"]';
 
@@ -125,9 +126,7 @@
       });
       if (!response.ok) {
         restore();
-        if (Drupal.announce) {
-          Drupal.announce('Move failed — restored.', 'assertive');
-        }
+        announce('Move failed — restored.', 'assertive');
       }
     } catch (e) {
       restore();

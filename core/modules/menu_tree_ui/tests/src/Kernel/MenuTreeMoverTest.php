@@ -15,7 +15,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests MenuTreeMover validation paths that are not exercised by FJS tests.
+ * Tests MenuTreeMover validation and commit paths not covered by FJS tests.
  */
 #[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
@@ -64,7 +64,7 @@ final class MenuTreeMoverTest extends KernelTestBase {
    */
   public function testCrossMenuMoveIsRejected(): void {
     $entity = $this->createLink('main');
-    $result = $this->mover->move('other', $entity->getPluginId(), '', NULL);
+    $result = $this->mover->validateMove('other', $entity->getPluginId(), '', NULL);
 
     $this->assertFalse($result['ok']);
     $this->assertSame('menu_mismatch', $result['code']);
@@ -74,7 +74,7 @@ final class MenuTreeMoverTest extends KernelTestBase {
    * Moving a link whose plugin ID is unknown is rejected.
    */
   public function testUnknownLinkIsNotMoveable(): void {
-    $result = $this->mover->move('test', 'does.not.exist', '', NULL);
+    $result = $this->mover->validateMove('test', 'does.not.exist', '', NULL);
 
     $this->assertFalse($result['ok']);
     $this->assertSame('not_moveable', $result['code']);
@@ -91,7 +91,7 @@ final class MenuTreeMoverTest extends KernelTestBase {
     $static_id = 'menu_tree_ui_test.static_fixture';
     $parent = $this->createLink('test');
 
-    $result = $this->mover->move('test', $static_id, $parent->getPluginId(), NULL);
+    $result = $this->commitMove($static_id, $parent->getPluginId(), NULL);
     $this->assertTrue($result['ok'], $result['message'] ?? '');
 
     // The static link's parent override now points at the content link.
@@ -106,7 +106,7 @@ final class MenuTreeMoverTest extends KernelTestBase {
     $entity = $this->createLink('test');
     $id = $entity->getPluginId();
 
-    $result = $this->mover->move('test', $id, $id, NULL);
+    $result = $this->mover->validateMove('test', $id, $id, NULL);
 
     $this->assertFalse($result['ok']);
     $this->assertSame('self_target', $result['code']);
@@ -136,14 +136,13 @@ final class MenuTreeMoverTest extends KernelTestBase {
 
     $mover = new MenuTreeMover(
       $this->createStub(MenuTreeStorageInterface::class),
-      $this->container->get('database'),
       $mock_handler,
       $this->container->get('menu_tree_ui.loader'),
       $this->container->get('plugin.manager.menu.link'),
       $this->container->get('logger.channel.menu_tree_ui'),
     );
 
-    $result = $mover->move('test', $entity->getPluginId(), '', NULL);
+    $result = $mover->validateMove('test', $entity->getPluginId(), '', NULL);
 
     $this->assertFalse($result['ok']);
     $this->assertSame('vetoed', $result['code']);
@@ -164,7 +163,7 @@ final class MenuTreeMoverTest extends KernelTestBase {
     $this->createLink('test');
     $b = $this->createLink('test');
 
-    $result = $this->mover->move('test', $b->getPluginId(), '', $static_id);
+    $result = $this->commitMove($b->getPluginId(), '', $static_id);
     $this->assertTrue($result['ok'], $result['message'] ?? '');
 
     $menu_link_manager = $this->container->get('plugin.manager.menu.link');
@@ -174,7 +173,6 @@ final class MenuTreeMoverTest extends KernelTestBase {
     // landed above it, not dumped at the end of the list as before the fix.
     // (The static link's weight is rewritten too, which is why this holds.)
     $this->assertSame($weight_of($static_id) - 1, $weight_of($b->getPluginId()));
-    $this->assertSame($weight_of($b->getPluginId()), $result['weight']);
   }
 
   /**
@@ -202,7 +200,7 @@ final class MenuTreeMoverTest extends KernelTestBase {
 
     // Moving C above A renumbers the whole root level, which would reweight the
     // orphaned B. The save must still report success.
-    $result = $this->mover->move('test', $c->getPluginId(), '', $a->getPluginId());
+    $result = $this->commitMove($c->getPluginId(), '', $a->getPluginId());
     $this->assertTrue($result['ok'], 'The move succeeds despite an orphaned sibling.');
 
     // C now sits before A in the root order.
@@ -218,6 +216,25 @@ final class MenuTreeMoverTest extends KernelTestBase {
   }
 
   // Helpers.
+
+  /**
+   * Commits a single move through the working-copy path (the live write path).
+   *
+   * @param string $id
+   *   Plugin ID of the link to move.
+   * @param string $new_parent
+   *   New parent plugin ID, or '' for the root.
+   * @param string|null $before_id
+   *   Sibling to sit before, or NULL for the end.
+   *
+   * @return array
+   *   The commitWorkingCopy() outcome.
+   */
+  private function commitMove(string $id, string $new_parent, ?string $before_id): array {
+    return $this->mover->commitWorkingCopy('test', [
+      ['type' => 'move', 'id' => $id, 'new_parent' => $new_parent, 'before_id' => $before_id],
+    ]);
+  }
 
   /**
    * Creates and saves a menu_link_content entity in the given menu.

@@ -51,7 +51,9 @@
     visibleRows,
     findRow,
     levelOf,
+    setRowLevel,
   } = Drupal.menuTreeUi.treeNav;
+  const { announce } = Drupal.menuTreeUi;
 
   const CLASS_GRABBED = 'menu-tree-ui-row--grabbed';
 
@@ -73,20 +75,6 @@
   }
 
   /**
-   * Announces a message through Drupal's live-region announcer.
-   *
-   * @param {string} message
-   *   The message.
-   * @param {('polite'|'assertive')} [priority]
-   *   The live-region priority.
-   */
-  function announce(message, priority) {
-    if (Drupal.announce) {
-      Drupal.announce(message, priority);
-    }
-  }
-
-  /**
    * Reads a row's own title text.
    *
    * @param {HTMLElement} row
@@ -99,22 +87,6 @@
     return (
       row.querySelector('.menu-tree-ui-row__title')?.textContent?.trim() ?? ''
     );
-  }
-
-  /**
-   * Sets a row's level: aria-level plus the name cell's indent.
-   *
-   * @param {HTMLElement} row
-   *   The row.
-   * @param {number} level
-   *   The 1-based level to apply.
-   */
-  function setRowLevel(row, level) {
-    row.setAttribute('aria-level', String(level));
-    const name = row.querySelector('.menu-tree-ui-row__name');
-    if (name) {
-      name.style.paddingInlineStart = `${(level - 1) * 1.25}rem`;
-    }
   }
 
   /**

@@ -27,6 +27,7 @@
 
 ((Drupal) => {
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
+  const { setRowLevel } = Drupal.menuTreeUi.treeNav;
 
   /**
    * Builds the drag handle for a row.
@@ -130,7 +131,7 @@
 
     const name = document.createElement('div');
     name.className = 'menu-tree-ui-row__name';
-    name.style.paddingInlineStart = `${(depth - 1) * 1.25}rem`;
+    // The indent is applied by setRowLevel() once the row is assembled.
 
     name.appendChild(buildHandle(item, depth));
     name.appendChild(buildToggle(item));
@@ -243,7 +244,6 @@
     tr.dataset.parentId = item.parent_id ?? '';
     tr.dataset.hasChildren = String(item.has_children);
     tr.dataset.movable = String(item.movable);
-    tr.setAttribute('aria-level', String(depth));
     tr.setAttribute('aria-posinset', String(posInSet));
     tr.setAttribute('aria-setsize', String(setSize));
     if (item.has_children) {
@@ -259,6 +259,8 @@
       .join(' ');
 
     tr.appendChild(buildNameCell(item, depth));
+    // aria-level + indent in one place (the name cell now exists in the row).
+    setRowLevel(tr, depth);
     Object.entries(item.columns).forEach(([colId, cell]) => {
       tr.appendChild(buildColumnCell(colId, cell, item.id));
     });

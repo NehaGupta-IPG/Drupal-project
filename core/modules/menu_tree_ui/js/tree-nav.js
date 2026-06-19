@@ -38,6 +38,40 @@
   }
 
   /**
+   * Sets a row's depth: its aria-level and the name cell's indent.
+   *
+   * The one place the indent step (1.25rem per level) lives; row construction
+   * (row-builder), lazy-load rebasing (expand), and the keyboard carry
+   * (move-mode) all route through here.
+   *
+   * @param {HTMLElement} row
+   *   The row.
+   * @param {number} level
+   *   The 1-based level to apply.
+   */
+  function setRowLevel(row, level) {
+    row.setAttribute('aria-level', String(level));
+    const name = row.querySelector('.menu-tree-ui-row__name');
+    if (name) {
+      name.style.paddingInlineStart = `${(level - 1) * 1.25}rem`;
+    }
+  }
+
+  /**
+   * Announces a message through Drupal's live-region announcer, if present.
+   *
+   * @param {string} message
+   *   The message.
+   * @param {('polite'|'assertive')} [priority]
+   *   The live-region priority.
+   */
+  function announce(message, priority) {
+    if (Drupal.announce) {
+      Drupal.announce(message, priority);
+    }
+  }
+
+  /**
    * All descendant rows of a row, in document order.
    *
    * The contiguous run of <tr>s immediately following the row, up to (not
@@ -263,6 +297,7 @@
 
   Drupal.menuTreeUi.treeNav = {
     levelOf,
+    setRowLevel,
     descendantRows,
     lastDescendantRow,
     childRows,
@@ -277,4 +312,7 @@
     rowOf,
     focusRow,
   };
+  // A module-wide announce helper (not tree-specific) so every file can speak
+  // through the one live region without re-checking Drupal.announce.
+  Drupal.menuTreeUi.announce = announce;
 })(Drupal);

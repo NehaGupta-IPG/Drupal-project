@@ -16,8 +16,14 @@
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
   const ns = Drupal.menuTreeUi;
   const { buildRows, buildRow } = ns;
-  const { descendantRows, lastDescendantRow, childRows, levelOf, findRow } =
-    ns.treeNav;
+  const {
+    descendantRows,
+    lastDescendantRow,
+    childRows,
+    levelOf,
+    findRow,
+    setRowLevel,
+  } = ns.treeNav;
 
   const ROW = 'tr[role="row"]';
 
@@ -39,11 +45,7 @@
       return;
     }
 
-    row.setAttribute('aria-level', String(newDepth));
-    const name = row.querySelector('.menu-tree-ui-row__name');
-    if (name) {
-      name.style.paddingInlineStart = `${(newDepth - 1) * 1.25}rem`;
-    }
+    setRowLevel(row, newDepth);
     childRows(row).forEach((child) => {
       rebaseRowLevel(child, newDepth + 1);
     });

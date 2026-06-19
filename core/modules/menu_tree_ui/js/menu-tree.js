@@ -42,6 +42,7 @@
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
   const ns = Drupal.menuTreeUi;
   const { rowOf, childRows } = ns.treeNav;
+  const { announce } = ns;
 
   const TREE = 'table[role="treegrid"]';
   const ROW = 'tr[role="row"]';
@@ -361,18 +362,14 @@
           if (sr) {
             sr.textContent = currentChecked ? 'On' : 'Off';
           }
-          if (Drupal.announce) {
-            Drupal.announce(data.message ?? 'Update failed.', 'assertive');
-          }
+          announce(data.message ?? 'Update failed.', 'assertive');
         }
       } catch (e) {
         btn.setAttribute('aria-checked', String(currentChecked));
         if (sr) {
           sr.textContent = currentChecked ? 'On' : 'Off';
         }
-        if (Drupal.announce) {
-          Drupal.announce('Update failed.', 'assertive');
-        }
+        announce('Update failed.', 'assertive');
       }
     }
 
