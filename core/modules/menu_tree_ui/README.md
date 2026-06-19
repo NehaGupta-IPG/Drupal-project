@@ -3,11 +3,11 @@
 Experimental, scalable replacement for core's `menu_ui` admin form, designed to
 handle menus with thousands of links without falling over.
 
-This is an experimental core module. It coexists with `menu_ui`: enabling it adds
-a **Menu tree** operation to every menu on `/admin/structure/menu` (sitting just
-below `menu_ui`'s "Edit menu", which stays the primary action) and a **Menu tree**
-link under Administration » Structure. `menu_ui` remains the favoured UI while
-this module matures.
+This is an experimental core module. It coexists with `menu_ui`: enabling it makes
+the tree the primary **Edit links** action and the "Links" tab for each menu (under
+Administration » Structure » Menus), and demotes `menu_ui`'s classic tabledrag
+overview to an "Edit links (no js)" action and a "Links (no js)" tab alongside it.
+The classic UI stays available as the no-JS fallback while this module matures.
 
 ## What works
 
@@ -32,13 +32,13 @@ Routes, by intent:
 
 | Route | Returns | Used by |
 | --- | --- | --- |
-| `/admin/structure/menu-tree-ui/{menu}` | Full HTML page with top level rendered | Direct browser visit (linked from the "Menu tree" operation on `/admin/structure/menu`) |
-| `/admin/structure/menu-tree-ui/{menu}/children?parent={id}` | JSON `{ parent, items[] }` | `<menu-tree>` element on expand |
-| `/admin/structure/menu-tree-ui/{menu}/search?q=…` | HTML fragment | htmx swap from the search input |
-| `/admin/structure/menu-tree-ui/{menu}/move` | JSON `{ ok, … }` | Drag/keyboard reorder — records to the working copy (POST) |
-| `/admin/structure/menu-tree-ui/{menu}/column-update` | JSON `{ ok, … }` | Column switch toggle (POST) |
-| `/admin/structure/menu-tree-ui/{menu}/save` | JSON `{ ok, … }` | Commit the working copy's moves to storage (POST) |
-| `/admin/structure/menu-tree-ui/{menu}/cancel` | JSON `{ ok }` | Discard the working copy (POST) |
+| `/admin/structure/menu/manage/{menu}/tree` | Full HTML page with top level rendered | Direct browser visit (the "Edit links" operation / "Links" tab on a menu) |
+| `/admin/structure/menu/manage/{menu}/tree/children?parent={id}` | JSON `{ parent, items[] }` | `<menu-tree>` element on expand |
+| `/admin/structure/menu/manage/{menu}/tree/search?q=…` | HTML fragment | htmx swap from the search input |
+| `/admin/structure/menu/manage/{menu}/tree/move` | JSON `{ ok, … }` | Drag/keyboard reorder — records to the working copy (POST) |
+| `/admin/structure/menu/manage/{menu}/tree/column-update` | JSON `{ ok, … }` | Column switch toggle (POST) |
+| `/admin/structure/menu/manage/{menu}/tree/save` | JSON `{ ok, … }` | Commit the working copy's moves to storage (POST) |
+| `/admin/structure/menu/manage/{menu}/tree/cancel` | JSON `{ ok }` | Discard the working copy (POST) |
 
 `MenuTreeLoader::loadLevel()` wraps `MenuLinkTreeInterface::load()` with
 `MenuTreeParameters::setRoot()->excludeRoot()->setMaxDepth(1)` to fetch exactly one

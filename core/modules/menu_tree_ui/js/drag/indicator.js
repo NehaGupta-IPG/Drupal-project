@@ -99,27 +99,6 @@
     }
 
     /**
-     * Positions the drop line explicitly, in host-relative pixels.
-     *
-     * Used by keyboard move mode to draw an indented line at a chosen depth
-     * (drag positions the line from the pointer via render() instead).
-     *
-     * @param {number} top
-     *   Top offset within the host, in px.
-     * @param {number} left
-     *   Left offset within the host, in px.
-     * @param {number} width
-     *   Line width, in px.
-     */
-    lineAt(top, left, width) {
-      this.clearChildHighlight();
-      this.line.style.display = 'block';
-      this.line.style.top = `${top}px`;
-      this.line.style.left = `${left}px`;
-      this.line.style.width = `${width}px`;
-    }
-
-    /**
      * Hides the drop line.
      */
     hideLine() {

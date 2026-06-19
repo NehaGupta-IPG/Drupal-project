@@ -138,8 +138,8 @@
  */
 .menu-tree-ui__actionbar {
   position: sticky;
-  top: 0;
   z-index: 4;
+  top: 0;
   display: flex;
   flex-wrap: wrap-reverse;
   align-items: center;
@@ -542,4 +542,3 @@ menu-tree {
 .menu-tree-ui__primary-actions {
   margin-block-end: 1rem;
 }
-
