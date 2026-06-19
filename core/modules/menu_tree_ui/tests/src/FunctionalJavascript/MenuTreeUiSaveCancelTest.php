@@ -60,7 +60,9 @@ final class MenuTreeUiSaveCancelTest extends WebDriverTestBase {
   }
 
   /**
-   * Seeds a flat menu with three top-level links A, B, C (weights 0, 1, 2).
+   * Seeds a menu with three top-level links A, B, C (A has one child, A1).
+   *
+   * A1 lets a test expand A and check that a Save keeps it open.
    */
   private function seedMenu(): void {
     Menu::create([
@@ -72,6 +74,7 @@ final class MenuTreeUiSaveCancelTest extends WebDriverTestBase {
     foreach (['A', 'B', 'C'] as $label) {
       $this->linkIds[$label] = $this->createLink($label, '', $weight++);
     }
+    $this->linkIds['A1'] = $this->createLink('A1', $this->linkIds['A'], 0);
   }
 
   /**
@@ -114,9 +117,10 @@ final class MenuTreeUiSaveCancelTest extends WebDriverTestBase {
   public function testSavePersistsMoves(): void {
     $this->moveCBeforeA();
 
-    $this->getSession()->executeScript('window.__mtuReload = true;');
     $this->getSession()->getPage()->find('css', '.menu-tree-ui__save')->click();
-    $this->waitForReload();
+    // Save no longer reloads the page; the unsaved notice hiding again is the
+    // signal that the working copy was committed.
+    $this->waitForSave();
 
     $a = $this->reloadEntityByLabel('A');
     $b = $this->reloadEntityByLabel('B');
@@ -132,9 +136,53 @@ final class MenuTreeUiSaveCancelTest extends WebDriverTestBase {
       'After Save, A should sort before B.',
     );
 
-    $this->assertTrue(
-      $this->getSession()->getPage()->find('css', '.menu-tree-ui__unsaved')->hasClass('js-hide'),
-      'After Save and reload the unsaved notice should be hidden again.',
+    // The saved order stays on screen without a reload.
+    $this->assertSiblings(['C', 'A', 'B'], $this->childRowsSelector(NULL));
+  }
+
+  /**
+   * Save keeps expanded sections open (it does not reload/collapse the tree).
+   */
+  public function testSaveKeepsExpansionOpen(): void {
+    // Open A so its child A1 is loaded and visible.
+    $toggle = $this->getSession()->getPage()->find(
+      'css',
+      sprintf('tr[role="row"][data-id="%s"] button.menu-tree-ui-row__toggle', $this->linkIds['A']),
+    );
+    $this->assertNotNull($toggle, 'A should have an expand toggle.');
+    $toggle->click();
+    $this->assertSession()->waitForElement(
+      'css',
+      sprintf('tr[role="row"][data-parent-id="%s"]', $this->linkIds['A']),
+    );
+
+    $this->moveCBeforeA();
+    $this->getSession()->getPage()->find('css', '.menu-tree-ui__save')->click();
+    $this->waitForSave();
+
+    // A is still expanded and its child is still in the DOM - no collapse.
+    $this->assertSame(
+      'true',
+      $this->getSession()->getPage()
+        ->find('css', sprintf('tr[role="row"][data-id="%s"]', $this->linkIds['A']))
+        ->getAttribute('aria-expanded'),
+      'A should remain expanded after Save.',
+    );
+    $this->assertNotNull(
+      $this->getSession()->getPage()->find(
+        'css',
+        sprintf('tr[role="row"][data-id="%s"]', $this->linkIds['A1']),
+      ),
+      'A1 should still be present after Save (the tree was not rebuilt).',
+    );
+  }
+
+  /**
+   * Waits for a Save to commit, signalled by the unsaved notice hiding again.
+   */
+  private function waitForSave(): void {
+    $this->assertJsCondition(
+      "document.querySelector('.menu-tree-ui__unsaved').classList.contains('js-hide')",
     );
   }
 

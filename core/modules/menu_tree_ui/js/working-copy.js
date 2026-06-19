@@ -89,7 +89,14 @@
       }
       const result = await post(settings.saveUrl);
       if (result.ok) {
-        window.location.reload();
+        // The tree already shows the saved order (it was rendering the working
+        // copy, which is now committed), so there is nothing to re-fetch. Don't
+        // reload — that would collapse every expanded section and lose scroll
+        // position on large menus. Just retire the unsaved notice.
+        notice?.classList.add('js-hide');
+        if (Drupal.announce) {
+          Drupal.announce(Drupal.t('Changes saved.'), 'polite');
+        }
       } else if (Drupal.announce) {
         Drupal.announce(
           result.message ?? Drupal.t('Save failed.'),
