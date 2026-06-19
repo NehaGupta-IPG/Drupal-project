@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\datetime\Kernel;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItem;
@@ -352,6 +353,47 @@ class DateTimeItemTest extends FieldKernelTestBase {
       // Wrong input type.
       [['2014', '01', '01']],
     ];
+  }
+
+  /**
+   * Tests that relative date defaults are based on Drupal's time service.
+   *
+   * A relative default value (e.g. "+2 weeks") must be calculated from
+   * \Drupal::time()->getCurrentTime() so that the time can be controlled for
+   * testing, rather than from the system clock.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3173778
+   */
+  public function testRelativeDefaultValueRespectsTimeService(): void {
+    // Lock Drupal's time to a fixed instant distinct from the system clock.
+    $fixed = new \DateTime('2020-07-07 00:00:00', new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE));
+    $time = $this->createMock(TimeInterface::class);
+    $time->method('getCurrentTime')->willReturn($fixed->getTimestamp());
+    $time->method('getRequestTime')->willReturn($fixed->getTimestamp());
+    // In Kernel tests $this->container is \Drupal::getContainer(), so this
+    // makes \Drupal::time() return the mock.
+    $this->container->set('datetime.time', $time);
+
+    // Configure the field with a relative default value.
+    $this->field
+      ->setDefaultValue([
+        [
+          'default_date_type' => 'relative',
+          'default_date' => '+2 weeks',
+        ],
+      ])
+      ->save();
+    \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
+
+    // Creating an entity applies the default value via
+    // DateTimeFieldItemList::processDefaultValue().
+    $entity = EntityTest::create([]);
+    $expected = (clone $fixed)->modify('+2 weeks')->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT);
+    $this->assertEquals(
+      $expected,
+      $entity->get('field_datetime')->value,
+      'Relative date default is computed from Drupal::time(), not the system clock.'
+    );
   }
 
 }
