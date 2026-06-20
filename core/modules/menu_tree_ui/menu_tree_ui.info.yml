@@ -7,3 +7,4 @@ lifecycle: experimental
 dependencies:
   - drupal:menu_ui
   - drupal:menu_link_content
+  - drupal:treegrid

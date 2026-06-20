@@ -14,12 +14,12 @@
  * — not "in the viewport". Focus lives on the <tr>, which is the single roving
  * tab stop; the handle is a mouse and drag affordance only.
  *
- * Exposes helpers on Drupal.menuTreeUi.treeNav. No build step: this file is a
- * plain script loaded (in dependency order) by menu_tree_ui.libraries.yml.
+ * Exposes helpers on Drupal.treegrid.treeNav. No build step: this file is a
+ * plain script loaded (in dependency order) by treegrid.libraries.yml.
  */
 
 ((Drupal) => {
-  Drupal.menuTreeUi = Drupal.menuTreeUi || {};
+  Drupal.treegrid = Drupal.treegrid || {};
 
   const ROW = 'tr[role="row"]';
   // Controls that join the active row's tab sequence. The row is the cursor and
@@ -345,7 +345,7 @@
     setRowControlsActive(tree.querySelector(`${ROW}[tabindex="0"]`), true);
   }
 
-  Drupal.menuTreeUi.treeNav = {
+  Drupal.treegrid.treeNav = {
     levelOf,
     setRowLevel,
     descendantRows,
@@ -366,5 +366,5 @@
   };
   // A module-wide announce helper (not tree-specific) so every file can speak
   // through the one live region without re-checking Drupal.announce.
-  Drupal.menuTreeUi.announce = announce;
+  Drupal.treegrid.announce = announce;
 })(Drupal);

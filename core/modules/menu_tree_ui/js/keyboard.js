@@ -20,7 +20,7 @@
     nextVisibleRow,
     previousVisibleRow,
     rowOf,
-  } = Drupal.menuTreeUi.treeNav;
+  } = Drupal.treegrid.treeNav;
 
   /**
    * Handles a keydown on the tree.

@@ -12,11 +12,11 @@
  * off-screen layout, but containment is disallowed on table rows, so the table
  * markup the admin theme styles wins out and layout cost is borne up front.)
  *
- * Exposes Drupal.menuTreeUi.RowWindow.
+ * Exposes Drupal.treegrid.RowWindow.
  */
 
 ((Drupal) => {
-  Drupal.menuTreeUi = Drupal.menuTreeUi || {};
+  Drupal.treegrid = Drupal.treegrid || {};
 
   /**
    * Flags rows as virtualized when they leave the preload zone.
@@ -118,5 +118,5 @@
     }
   }
 
-  Drupal.menuTreeUi.RowWindow = RowWindow;
+  Drupal.treegrid.RowWindow = RowWindow;
 })(Drupal);

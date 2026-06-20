@@ -27,7 +27,7 @@
 
 ((Drupal) => {
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
-  const { setRowLevel } = Drupal.menuTreeUi.treeNav;
+  const { setRowLevel } = Drupal.treegrid.treeNav;
 
   /**
    * Builds the drag handle for a row.

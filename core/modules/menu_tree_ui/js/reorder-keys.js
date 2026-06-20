@@ -15,8 +15,8 @@
 ((Drupal) => {
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
   const { descendantRows, lastDescendantRow, nextSiblingRow } =
-    Drupal.menuTreeUi.treeNav;
-  const { announce } = Drupal.menuTreeUi;
+    Drupal.treegrid.treeNav;
+  const { announce } = Drupal.treegrid;
 
   const ROW = 'tr[role="row"]';
 

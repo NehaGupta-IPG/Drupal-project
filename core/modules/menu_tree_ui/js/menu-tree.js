@@ -41,8 +41,9 @@
 ((Drupal, drupalSettings) => {
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
   const ns = Drupal.menuTreeUi;
-  const { rowOf, childRows, focusRow, initRovingTabindex } = ns.treeNav;
-  const { announce } = ns;
+  const { rowOf, childRows, focusRow, initRovingTabindex } =
+    Drupal.treegrid.treeNav;
+  const { announce } = Drupal.treegrid;
 
   const TREE = 'table[role="treegrid"]';
   const ROW = 'tr[role="row"]';
@@ -82,7 +83,7 @@
       this.moveUrl = drupalSettings.menuTreeUi?.moveUrl;
       this.columnUpdateUrl = drupalSettings.menuTreeUi?.columnUpdateUrl;
 
-      this.rowWindow = new ns.RowWindow(this);
+      this.rowWindow = new Drupal.treegrid.RowWindow(this);
       this.tree.querySelectorAll(ROW).forEach((row) => {
         this.rowWindow.observe(row);
       });

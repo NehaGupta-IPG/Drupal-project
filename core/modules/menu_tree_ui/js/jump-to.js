@@ -10,7 +10,7 @@
 
 ((Drupal) => {
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
-  const { findRow, focusRow } = Drupal.menuTreeUi.treeNav;
+  const { findRow, focusRow } = Drupal.treegrid.treeNav;
 
   const FLASH_MS = 1200;
 

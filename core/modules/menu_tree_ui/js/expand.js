@@ -24,7 +24,7 @@
     findRow,
     setRowLevel,
     setRowControlsActive,
-  } = ns.treeNav;
+  } = Drupal.treegrid.treeNav;
 
   const ROW = 'tr[role="row"]';
 

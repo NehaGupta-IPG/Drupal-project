@@ -51,8 +51,8 @@
     findRow,
     levelOf,
     setRowLevel,
-  } = Drupal.menuTreeUi.treeNav;
-  const { announce } = Drupal.menuTreeUi;
+  } = Drupal.treegrid.treeNav;
+  const { announce } = Drupal.treegrid;
 
   const CLASS_GRABBED = 'menu-tree-ui-row--grabbed';
 

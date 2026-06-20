@@ -1,8 +1,6 @@
 menu_tree_ui:
   version: VERSION
   js:
-    js/tree-nav.js: {}
-    js/windowing.js: {}
     js/row-builder.js: {}
     js/expand.js: {}
     js/keyboard.js: {}
@@ -25,3 +23,4 @@ menu_tree_ui:
     - core/once
     - core/htmx
     - core/drupal.htmx
+    - treegrid/treegrid

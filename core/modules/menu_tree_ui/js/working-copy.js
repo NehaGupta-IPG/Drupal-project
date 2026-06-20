@@ -108,9 +108,9 @@
         // reload — that would collapse every expanded section and lose scroll
         // position on large menus. Just retire the unsaved notice.
         notice?.classList.add('js-hide');
-        Drupal.menuTreeUi.announce(Drupal.t('Changes saved.'), 'polite');
+        Drupal.treegrid.announce(Drupal.t('Changes saved.'), 'polite');
       } else {
-        Drupal.menuTreeUi.announce(
+        Drupal.treegrid.announce(
           result.message ?? Drupal.t('Save failed.'),
           'assertive',
         );

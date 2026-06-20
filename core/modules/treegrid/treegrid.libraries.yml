@@ -1,6 +1,7 @@
 treegrid:
   version: VERSION
   js:
+    js/tree-nav.js: {}
     js/windowing.js: {}
   dependencies:
     - core/drupal

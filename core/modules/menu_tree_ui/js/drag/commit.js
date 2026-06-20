@@ -20,8 +20,9 @@
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
   Drupal.menuTreeUi.drag = Drupal.menuTreeUi.drag || {};
   const { childRows, descendantRows, findRow, focusRow, nextSiblingRow } =
-    Drupal.menuTreeUi.treeNav;
-  const { buildToggle, announce } = Drupal.menuTreeUi;
+    Drupal.treegrid.treeNav;
+  const { buildToggle } = Drupal.menuTreeUi;
+  const { announce } = Drupal.treegrid;
 
   const ROW = 'tr[role="row"]';
 
