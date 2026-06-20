@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\menu_tree_ui\Plugin\MenuTreeColumn;
+namespace Drupal\treegrid\Plugin\TreegridColumn;
 
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Entity\EntityInterface;
@@ -11,14 +11,14 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
- * Base class for MenuTreeColumn plugins.
+ * Base class for TreegridColumn plugins.
  *
  * Concrete columns must implement getCellData(). handleUpdate() defaults to
  * FALSE (read-only) — override it for interactive columns.
  *
  * @api
  */
-abstract class MenuTreeColumnBase extends PluginBase implements MenuTreeColumnInterface {
+abstract class TreegridColumnBase extends PluginBase implements TreegridColumnInterface {
 
   use StringTranslationTrait;
 

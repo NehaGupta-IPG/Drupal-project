@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Drupal\menu_tree_ui\Attribute;
+namespace Drupal\treegrid\Attribute;
 
 use Drupal\Component\Plugin\Attribute\Plugin;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
- * Defines the MenuTreeColumn plugin attribute.
+ * Defines the TreegridColumn plugin attribute.
  *
- * Modules add columns to the admin tree by placing a class that implements
- * MenuTreeColumnInterface in src/Plugin/MenuTreeColumn/ and decorating it
- * with this attribute.
+ * Modules add columns to a treegrid admin UI by placing a class that implements
+ * TreegridColumnInterface in src/Plugin/TreegridColumn/ and decorating it with
+ * this attribute.
  *
  * @code
- * #[MenuTreeColumn(
+ * #[TreegridColumn(
  *   id: 'my_column',
  *   title: new TranslatableMarkup('My column'),
  *   weight: 20,
@@ -23,7 +23,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  * @endcode
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
-final class MenuTreeColumn extends Plugin {
+final class TreegridColumn extends Plugin {
 
   public function __construct(
     public readonly string $id,

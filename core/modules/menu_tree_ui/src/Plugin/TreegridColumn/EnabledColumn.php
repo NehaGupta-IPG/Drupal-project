@@ -2,14 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Drupal\menu_tree_ui\Plugin\MenuTreeColumn;
+namespace Drupal\menu_tree_ui\Plugin\TreegridColumn;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\menu_link_content\MenuLinkContentInterface;
-use Drupal\menu_tree_ui\Attribute\MenuTreeColumn;
 use Drupal\menu_tree_ui\MenuTreeUiConstants;
+use Drupal\treegrid\Attribute\TreegridColumn;
+use Drupal\treegrid\Plugin\TreegridColumn\TreegridColumnBase;
 
 /**
  * Column plugin for the menu_link_content 'enabled' field.
@@ -22,12 +23,12 @@ use Drupal\menu_tree_ui\MenuTreeUiConstants;
  * Static/yml-defined links have no writable enabled property here; for those
  * the cell is rendered as a read-only indicator.
  */
-#[MenuTreeColumn(
+#[TreegridColumn(
   id: 'enabled',
   title: new TranslatableMarkup('Enabled'),
   weight: 5,
 )]
-final class EnabledColumn extends MenuTreeColumnBase {
+final class EnabledColumn extends TreegridColumnBase {
 
   /**
    * {@inheritdoc}

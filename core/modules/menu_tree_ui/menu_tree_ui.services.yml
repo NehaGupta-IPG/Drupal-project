@@ -28,10 +28,6 @@ services:
     parent: logger.channel_base
     arguments: ['menu_tree_ui']
 
-  plugin.manager.menu_tree_column:
-    class: Drupal\menu_tree_ui\MenuTreeColumnManager
-    parent: default_plugin_manager
-
   menu_tree_ui.search_provider.menu_link_content:
     class: Drupal\menu_tree_ui\SearchProvider\MenuLinkContentSearchProvider
     autowire: true

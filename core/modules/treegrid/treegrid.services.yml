@@ -1,0 +1,4 @@
+services:
+  plugin.manager.treegrid_column:
+    class: Drupal\treegrid\TreegridColumnManager
+    parent: default_plugin_manager

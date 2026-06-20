@@ -9,7 +9,7 @@ use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\menu_link_content\MenuLinkContentInterface;
-use Drupal\menu_tree_ui\Plugin\MenuTreeColumn\ExpandedColumn;
+use Drupal\menu_tree_ui\Plugin\TreegridColumn\ExpandedColumn;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -27,6 +27,7 @@ final class ExpandedColumnTest extends KernelTestBase {
     'link',
     'menu_link_content',
     'menu_tree_ui',
+    'treegrid',
     'system',
     'user',
   ];
@@ -34,7 +35,7 @@ final class ExpandedColumnTest extends KernelTestBase {
   /**
    * The column plugin under test.
    *
-   * @var \Drupal\menu_tree_ui\Plugin\MenuTreeColumn\ExpandedColumn
+   * @var \Drupal\menu_tree_ui\Plugin\TreegridColumn\ExpandedColumn
    */
   private ExpandedColumn $column;
 
@@ -47,8 +48,8 @@ final class ExpandedColumnTest extends KernelTestBase {
     $this->installEntitySchema('user');
     $this->installConfig(['system']);
 
-    /** @var \Drupal\menu_tree_ui\MenuTreeColumnManager $manager */
-    $manager = $this->container->get('plugin.manager.menu_tree_column');
+    /** @var \Drupal\treegrid\TreegridColumnManager $manager */
+    $manager = $this->container->get('plugin.manager.treegrid_column');
     $this->column = $manager->createInstance('expanded');
   }
 

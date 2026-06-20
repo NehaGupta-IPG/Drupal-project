@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Drupal\menu_tree_ui;
+namespace Drupal\treegrid;
 
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
-use Drupal\menu_tree_ui\Attribute\MenuTreeColumn;
-use Drupal\menu_tree_ui\Plugin\MenuTreeColumn\MenuTreeColumnInterface;
+use Drupal\treegrid\Attribute\TreegridColumn;
+use Drupal\treegrid\Plugin\TreegridColumn\TreegridColumnInterface;
 
 /**
- * Discovers and instantiates MenuTreeColumn plugins.
+ * Discovers and instantiates TreegridColumn plugins.
  *
- * Modules add columns by placing a class implementing MenuTreeColumnInterface
- * inside src/Plugin/MenuTreeColumn/ and decorating it with #[MenuTreeColumn].
- * The alter hook hook_menu_tree_column_info_alter() lets modules modify or
+ * Modules add columns by placing a class implementing TreegridColumnInterface
+ * inside src/Plugin/TreegridColumn/ and decorating it with #[TreegridColumn].
+ * The alter hook hook_treegrid_column_info_alter() lets modules modify or
  * remove definitions after discovery.
  */
-final class MenuTreeColumnManager extends DefaultPluginManager {
+final class TreegridColumnManager extends DefaultPluginManager {
 
   public function __construct(
     \Traversable $namespaces,
@@ -26,20 +26,20 @@ final class MenuTreeColumnManager extends DefaultPluginManager {
     ModuleHandlerInterface $module_handler,
   ) {
     parent::__construct(
-      'Plugin/MenuTreeColumn',
+      'Plugin/TreegridColumn',
       $namespaces,
       $module_handler,
-      MenuTreeColumnInterface::class,
-      MenuTreeColumn::class,
+      TreegridColumnInterface::class,
+      TreegridColumn::class,
     );
-    $this->alterInfo('menu_tree_column_info');
-    $this->setCacheBackend($cache_backend, 'menu_tree_column_plugins');
+    $this->alterInfo('treegrid_column_info');
+    $this->setCacheBackend($cache_backend, 'treegrid_column_plugins');
   }
 
   /**
    * Memoised sorted column instances.
    *
-   * @var \Drupal\menu_tree_ui\Plugin\MenuTreeColumn\MenuTreeColumnInterface[]|null
+   * @var \Drupal\treegrid\Plugin\TreegridColumn\TreegridColumnInterface[]|null
    */
   private ?array $sortedColumns = NULL;
 
@@ -49,7 +49,7 @@ final class MenuTreeColumnManager extends DefaultPluginManager {
    * Result is memoised: instances are shared across calls within the same
    * request to avoid redundant createInstance() work.
    *
-   * @return \Drupal\menu_tree_ui\Plugin\MenuTreeColumn\MenuTreeColumnInterface[]
+   * @return \Drupal\treegrid\Plugin\TreegridColumn\TreegridColumnInterface[]
    *   Keyed by plugin ID, sorted by the 'weight' attribute property.
    */
   public function getSortedColumns(): array {

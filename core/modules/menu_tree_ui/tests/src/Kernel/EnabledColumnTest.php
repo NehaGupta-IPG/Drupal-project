@@ -8,7 +8,7 @@ use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\menu_link_content\MenuLinkContentInterface;
-use Drupal\menu_tree_ui\Plugin\MenuTreeColumn\EnabledColumn;
+use Drupal\menu_tree_ui\Plugin\TreegridColumn\EnabledColumn;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -27,6 +27,7 @@ final class EnabledColumnTest extends KernelTestBase {
     'link',
     'menu_link_content',
     'menu_tree_ui',
+    'treegrid',
     'system',
     'user',
   ];
@@ -34,7 +35,7 @@ final class EnabledColumnTest extends KernelTestBase {
   /**
    * The column plugin under test.
    *
-   * @var \Drupal\menu_tree_ui\Plugin\MenuTreeColumn\EnabledColumn
+   * @var \Drupal\menu_tree_ui\Plugin\TreegridColumn\EnabledColumn
    */
   private EnabledColumn $column;
 
@@ -47,8 +48,8 @@ final class EnabledColumnTest extends KernelTestBase {
     $this->installEntitySchema('user');
     $this->installConfig(['system']);
 
-    /** @var \Drupal\menu_tree_ui\MenuTreeColumnManager $manager */
-    $manager = $this->container->get('plugin.manager.menu_tree_column');
+    /** @var \Drupal\treegrid\TreegridColumnManager $manager */
+    $manager = $this->container->get('plugin.manager.treegrid_column');
     $this->column = $manager->createInstance('enabled');
   }
 
@@ -56,7 +57,7 @@ final class EnabledColumnTest extends KernelTestBase {
    * The column sorts ahead of "Expanded".
    */
   public function testSortsBeforeExpanded(): void {
-    $columns = array_keys($this->container->get('plugin.manager.menu_tree_column')->getSortedColumns());
+    $columns = array_keys($this->container->get('plugin.manager.treegrid_column')->getSortedColumns());
     $this->assertLessThan(
       array_search('expanded', $columns, TRUE),
       array_search('enabled', $columns, TRUE),

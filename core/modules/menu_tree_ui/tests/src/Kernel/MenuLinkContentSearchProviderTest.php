@@ -25,6 +25,7 @@ final class MenuLinkContentSearchProviderTest extends KernelTestBase {
     'link',
     'menu_link_content',
     'menu_tree_ui',
+    'treegrid',
     'system',
     'user',
   ];

@@ -55,7 +55,7 @@ function menu_tree_ui_theme(): array {
         // #type => 'operations' render array for the row's dropbutton.
         'operations' => [],
         // Keyed by column plugin ID, each entry is a cell data array
-        // as returned by MenuTreeColumnInterface::getCellData().
+        // as returned by TreegridColumnInterface::getCellData().
         'columns' => [],
       ],
     ],

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\menu_tree_ui\Plugin\MenuTreeColumn;
+namespace Drupal\treegrid\Plugin\TreegridColumn;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -10,12 +10,12 @@ use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
- * Interface for MenuTreeColumn plugins.
+ * Interface for TreegridColumn plugins.
  *
- * A column plugin contributes one column to the menu tree admin UI. The same
- * data shape must be renderable by both the Twig template (server-rendered top
- * level) and row-builder.js (JS-rendered lazy-loaded children). Cells declare
- * a 'type' key so both renderers know how to draw them.
+ * A column plugin contributes one column to a treegrid admin UI. The same data
+ * shape must be renderable by both the Twig template (server-rendered top
+ * level) and row-builder.js (JS-rendered lazy-loaded children). Cells declare a
+ * 'type' key so both renderers know how to draw them.
  *
  * Supported cell types in v1:
  *   - 'toggle': a boolean switch, optionally interactive.
@@ -24,7 +24,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  *
  * @api
  */
-interface MenuTreeColumnInterface extends PluginInspectionInterface {
+interface TreegridColumnInterface extends PluginInspectionInterface {
 
   /**
    * Returns the column header label.
@@ -62,7 +62,7 @@ interface MenuTreeColumnInterface extends PluginInspectionInterface {
   /**
    * Applies a value change to the underlying entity.
    *
-   * Called by MenuTreeController::columnUpdate() when the client POSTs a
+   * Called by the treegrid column-update controller when the client POSTs a
    * toggle interaction. Return FALSE for read-only columns — the controller
    * will respond with a 400 rather than saving. Implementations should also
    * return FALSE when $entity is not the expected type.

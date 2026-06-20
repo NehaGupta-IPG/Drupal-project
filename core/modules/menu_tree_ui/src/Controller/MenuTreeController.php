@@ -16,8 +16,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\menu_link_content\MenuLinkContentInterface;
 use Drupal\menu_tree_ui\MenuLinkMovability;
-use Drupal\menu_tree_ui\MenuTreeColumnManager;
 use Drupal\menu_tree_ui\MenuTreeUiConstants;
+use Drupal\treegrid\TreegridColumnManager;
 use Drupal\menu_tree_ui\Service\MenuTreeLoader;
 use Drupal\menu_tree_ui\Service\MenuTreeMover;
 use Drupal\menu_tree_ui\Service\MenuTreeWorkingCopy;
@@ -43,7 +43,7 @@ final class MenuTreeController extends ControllerBase {
     private readonly MenuTreeLoader $loader,
     private readonly MenuTreeMover $mover,
     private readonly RendererInterface $renderer,
-    private readonly MenuTreeColumnManager $columnManager,
+    private readonly TreegridColumnManager $columnManager,
     private readonly MenuTreeWorkingCopy $workingCopy,
   ) {}
 
@@ -55,7 +55,7 @@ final class MenuTreeController extends ControllerBase {
       $container->get('menu_tree_ui.loader'),
       $container->get('menu_tree_ui.mover'),
       $container->get('renderer'),
-      $container->get('plugin.manager.menu_tree_column'),
+      $container->get('plugin.manager.treegrid_column'),
       $container->get('menu_tree_ui.working_copy'),
     );
   }
@@ -403,7 +403,7 @@ final class MenuTreeController extends ControllerBase {
    *   The tree element to serialize.
    * @param array<string, \Drupal\menu_link_content\MenuLinkContentInterface> $entity_map
    *   Pre-loaded entities keyed by plugin ID.
-   * @param \Drupal\menu_tree_ui\Plugin\MenuTreeColumn\MenuTreeColumnInterface[] $columns
+   * @param \Drupal\treegrid\Plugin\TreegridColumn\TreegridColumnInterface[] $columns
    *   The active column plugins keyed by plugin ID.
    * @param string $parent_id
    *   The parent link plugin ID, or '' for the top level.
@@ -564,7 +564,7 @@ final class MenuTreeController extends ControllerBase {
    *
    * @param \Drupal\Core\Menu\MenuLinkTreeElement $element
    *   The tree element whose cells to build.
-   * @param \Drupal\menu_tree_ui\Plugin\MenuTreeColumn\MenuTreeColumnInterface[] $columns
+   * @param \Drupal\treegrid\Plugin\TreegridColumn\TreegridColumnInterface[] $columns
    *   The active column plugins keyed by plugin ID.
    *
    * @return array

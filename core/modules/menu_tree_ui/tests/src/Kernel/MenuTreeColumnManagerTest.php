@@ -6,13 +6,13 @@ namespace Drupal\Tests\menu_tree_ui\Kernel;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\menu_tree_ui\MenuTreeColumnManager;
-use Drupal\menu_tree_ui\Plugin\MenuTreeColumn\MenuTreeColumnInterface;
+use Drupal\treegrid\Plugin\TreegridColumn\TreegridColumnInterface;
+use Drupal\treegrid\TreegridColumnManager;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Verifies plugin discovery wiring for MenuTreeColumnManager.
+ * Verifies TreegridColumnManager discovers menu_tree_ui's columns.
  */
 #[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
@@ -25,6 +25,7 @@ final class MenuTreeColumnManagerTest extends KernelTestBase {
     'link',
     'menu_link_content',
     'menu_tree_ui',
+    'treegrid',
     'system',
     'user',
   ];
@@ -32,9 +33,9 @@ final class MenuTreeColumnManagerTest extends KernelTestBase {
   /**
    * The column plugin manager under test.
    *
-   * @var \Drupal\menu_tree_ui\MenuTreeColumnManager
+   * @var \Drupal\treegrid\TreegridColumnManager
    */
-  private MenuTreeColumnManager $manager;
+  private TreegridColumnManager $manager;
 
   /**
    * {@inheritdoc}
@@ -42,7 +43,7 @@ final class MenuTreeColumnManagerTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('menu_link_content');
-    $this->manager = $this->container->get('plugin.manager.menu_tree_column');
+    $this->manager = $this->container->get('plugin.manager.treegrid_column');
   }
 
   /**
@@ -68,7 +69,7 @@ final class MenuTreeColumnManagerTest extends KernelTestBase {
 
     $this->assertNotEmpty($columns);
     $this->assertArrayHasKey('expanded', $columns);
-    $this->assertInstanceOf(MenuTreeColumnInterface::class, $columns['expanded']);
+    $this->assertInstanceOf(TreegridColumnInterface::class, $columns['expanded']);
 
     $definitions = $this->manager->getDefinitions();
     $prev_weight = PHP_INT_MIN;
@@ -85,7 +86,7 @@ final class MenuTreeColumnManagerTest extends KernelTestBase {
   public function testCreateInstanceProducesValidPlugin(): void {
     $instance = $this->manager->createInstance('expanded');
 
-    $this->assertInstanceOf(MenuTreeColumnInterface::class, $instance);
+    $this->assertInstanceOf(TreegridColumnInterface::class, $instance);
     $this->assertInstanceOf(
       TranslatableMarkup::class,
       $instance->getHeader(),
@@ -110,7 +111,7 @@ final class MenuTreeColumnManagerTest extends KernelTestBase {
   public function testAlterHookDoesNotError(): void {
     $definitions = $this->manager->getDefinitions();
     // Manually fire the alter (no modules implement it yet — just must not throw).
-    $this->container->get('module_handler')->alter('menu_tree_column_info', $definitions);
+    $this->container->get('module_handler')->alter('treegrid_column_info', $definitions);
     $this->assertArrayHasKey('expanded', $definitions);
   }
 
