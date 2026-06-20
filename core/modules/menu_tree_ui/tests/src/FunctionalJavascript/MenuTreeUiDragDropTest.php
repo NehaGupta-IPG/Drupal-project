@@ -59,11 +59,11 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     $admin = $this->drupalCreateUser(['administer menu']);
     $this->drupalLogin($admin);
     $this->drupalGet('/admin/structure/menu/manage/test/tree');
-    // Wait until the <menu-tree> custom element has at least one top-level
+    // Wait until the <drupal-treegrid> custom element has at least one top-level
     // row in DOM — that's the "page upgraded" signal.
     $this->assertSession()->waitForElement(
       'css',
-      'menu-tree table[role="treegrid"] tbody tr[role="row"]'
+      'drupal-treegrid table[role="treegrid"] tbody tr[role="row"]'
     );
   }
 
@@ -138,7 +138,7 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     $this->tapHandle('C');
     $this->getSession()->wait(
       5000,
-      '!document.querySelector(\'menu-tree[data-mtu-moving="true"]\')'
+      '!document.querySelector(\'drupal-treegrid[data-mtu-moving="true"]\')'
       . ' && !document.querySelector(\'.menu-tree-ui-row--grabbed\')'
       . ' && !document.querySelector(\'[data-loading="true"]\')',
     );
@@ -406,12 +406,12 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     JS;
 
     $this->getSession()->executeScript($script);
-    // commitMove flags the <menu-tree> host with data-mtu-moving while the
+    // commitMove flags the <drupal-treegrid> host with data-mtu-moving while the
     // server-first POST + group refresh is in flight; wait for that to clear
     // before assertions run on the rebuilt DOM.
     $this->getSession()->wait(
       5000,
-      '!document.querySelector(\'menu-tree[data-mtu-moving="true"]\')'
+      '!document.querySelector(\'drupal-treegrid[data-mtu-moving="true"]\')'
       . ' && !document.querySelector(\'.menu-tree-ui-row--dragging\')'
       . ' && !document.querySelector(\'[data-loading="true"]\')',
     );
@@ -618,13 +618,13 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
    */
   private function assertChildCount(?string $parent_label, int $expected): void {
     if ($parent_label === NULL) {
-      $selector = 'menu-tree tbody tr[role="row"][data-parent-id=""]';
+      $selector = 'drupal-treegrid tbody tr[role="row"][data-parent-id=""]';
       $where = 'top-level';
     }
     else {
       $id = $this->linkIds[$parent_label] ?? throw new \InvalidArgumentException("Unknown label $parent_label");
       $selector = sprintf(
-        'menu-tree tbody tr[role="row"][data-parent-id="%s"]',
+        'drupal-treegrid tbody tr[role="row"][data-parent-id="%s"]',
         $id,
       );
       $where = "under $parent_label";
@@ -647,7 +647,7 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
    */
   private function assertNoDuplicateRows(): void {
     $ids = $this->getSession()->evaluateScript(
-      'return Array.from(document.querySelectorAll(\'menu-tree tr[role="row"][data-id]\')).map(r => r.dataset.id);',
+      'return Array.from(document.querySelectorAll(\'drupal-treegrid tr[role="row"][data-id]\')).map(r => r.dataset.id);',
     );
     $this->assertIsArray($ids);
     $counts = array_count_values($ids);
@@ -676,10 +676,10 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     // rather than guessing a fixed delay that flakes on a loaded runner.
     $this->getSession()->wait(
       2000,
-      'Array.from(document.querySelectorAll(\'menu-tree tr[role="row"][data-virtualized="true"]\')).length === 0',
+      'Array.from(document.querySelectorAll(\'drupal-treegrid tr[role="row"][data-virtualized="true"]\')).length === 0',
     );
     $virtualized = $this->getSession()->evaluateScript(
-      'return Array.from(document.querySelectorAll(\'menu-tree tr[role="row"][data-virtualized="true"]\')).map(r => r.dataset.id);',
+      'return Array.from(document.querySelectorAll(\'drupal-treegrid tr[role="row"][data-virtualized="true"]\')).map(r => r.dataset.id);',
     );
     $this->assertSame(
       [],
@@ -697,7 +697,7 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
    */
   private function assertNoBlankRows(): void {
     $blanks = $this->getSession()->evaluateScript(<<<'JS'
-      return Array.from(document.querySelectorAll('menu-tree tr[role="row"]'))
+      return Array.from(document.querySelectorAll('drupal-treegrid tr[role="row"]'))
         .filter(r => {
           const t = r.querySelector('.menu-tree-ui-row__title');
           return !t || !t.textContent || t.textContent.trim() === '';

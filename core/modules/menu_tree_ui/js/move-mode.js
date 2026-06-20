@@ -628,7 +628,7 @@
 
       this.grabbed.scrollIntoView({ block: 'nearest' });
       this.tree
-        .closest('menu-tree')
+        .closest('drupal-treegrid')
         ?.setAttribute(
           'data-mtu-drop',
           `${intent.kind}:${intent.target.dataset.id ?? ''}`,
@@ -776,7 +776,7 @@
       // After a commit, commit.js re-focuses the rebuilt row via focusRow.
       this.grabbed?.removeAttribute('aria-selected');
       this.indicator.clear();
-      this.tree.closest('menu-tree')?.removeAttribute('data-mtu-drop');
+      this.tree.closest('drupal-treegrid')?.removeAttribute('data-mtu-drop');
       this.active = false;
       this.grabbed = null;
       this.block = [];

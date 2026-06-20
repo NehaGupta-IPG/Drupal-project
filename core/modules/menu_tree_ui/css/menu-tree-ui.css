@@ -172,7 +172,7 @@
 /* ──────────────────────────────────────────────────────────────── tree */
 
 /* <menu-tree> hosts the absolutely-positioned drop indicator. */
-menu-tree {
+drupal-treegrid {
   position: relative;
   display: block;
 }

@@ -149,8 +149,9 @@
     <button type="button" class="menu-tree-ui__help-toggle">{{ 'Keyboard commands'|t }}</button>
   </p>
 
-  <menu-tree
+  <drupal-treegrid
     class="menu-tree-ui__tree"
+    data-provider="menu_tree_ui"
     data-menu="{{ menu.id }}"
     data-children-url="{{ children_action }}"
   >
@@ -170,5 +171,5 @@
         {% endfor %}
       </tbody>
     </table>
-  </menu-tree>
+  </drupal-treegrid>
 </div>

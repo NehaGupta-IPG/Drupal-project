@@ -2,9 +2,9 @@
  * @file
  * WAI-ARIA tree keyboard pattern.
  *
- * Pure handler — takes the event plus a context object of callbacks. Shift+
- * Arrow sibling reorder lives in reorder-keys.js; this file only covers
- * navigation and expand/collapse keys.
+ * Pure handler — takes the event plus a context object. Covers navigation and
+ * expand/collapse only; reorder and other features intercept keys ahead of this
+ * through the element's key-handler registry (see <drupal-treegrid>).
  *
  * Exposes Drupal.treegrid.handleKeyDown.
  */
@@ -28,23 +28,11 @@
    * @param {KeyboardEvent} event
    *   The keydown event.
    * @param {object} ctx
-   *   Context: {tree: HTMLTableElement, expand: ExpandManager,
-   *   reorder: function(HTMLElement, ('up'|'down')): boolean}.
+   *   Context: {tree: HTMLTableElement, expand: ExpandManager}.
    */
   function handleKeyDown(event, ctx) {
     const row = rowOf(event.target);
     if (!row) {
-      return;
-    }
-
-    if (
-      event.shiftKey &&
-      (event.key === 'ArrowUp' || event.key === 'ArrowDown')
-    ) {
-      const handled = ctx.reorder(row, event.key === 'ArrowUp' ? 'up' : 'down');
-      if (handled) {
-        event.preventDefault();
-      }
       return;
     }
 
@@ -87,8 +75,10 @@
         focusRow(ctx.tree, lastVisibleRow(ctx.tree));
         break;
       case 'Enter':
-        // Enter toggles expand/collapse on parents. Space is reserved for the
-        // grab/select move mode and is handled upstream in menu-tree.js.
+      case ' ':
+        // Enter and Space toggle expand/collapse on parents. A feature (e.g.
+        // reorder) may claim Space ahead of this via the key-handler registry;
+        // it only reaches here when no feature consumed it.
         if (row.dataset.hasChildren === 'true') {
           event.preventDefault();
           ctx.expand.toggle(row);

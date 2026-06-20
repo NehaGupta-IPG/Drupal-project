@@ -55,7 +55,7 @@ final class MenuTreeUiSaveCancelTest extends WebDriverTestBase {
     $this->drupalGet('/admin/structure/menu/manage/test/tree');
     $this->assertSession()->waitForElement(
       'css',
-      'menu-tree table[role="treegrid"] tbody tr[role="row"]'
+      'drupal-treegrid table[role="treegrid"] tbody tr[role="row"]'
     );
   }
 
@@ -251,7 +251,7 @@ final class MenuTreeUiSaveCancelTest extends WebDriverTestBase {
     $this->getSession()->executeScript($script);
     $this->getSession()->wait(
       5000,
-      '!document.querySelector(\'menu-tree[data-mtu-moving="true"]\')'
+      '!document.querySelector(\'drupal-treegrid[data-mtu-moving="true"]\')'
       . ' && !document.querySelector(\'.menu-tree-ui-row--dragging\')'
       . ' && !document.querySelector(\'[data-loading="true"]\')',
     );
@@ -312,7 +312,7 @@ final class MenuTreeUiSaveCancelTest extends WebDriverTestBase {
     $this->getSession()->wait(10000, 'typeof window.__mtuReload === "undefined"');
     $this->assertSession()->waitForElement(
       'css',
-      'menu-tree table[role="treegrid"] tbody tr[role="row"]',
+      'drupal-treegrid table[role="treegrid"] tbody tr[role="row"]',
     );
   }
 

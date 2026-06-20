@@ -101,6 +101,9 @@
     const toggle = document.createElement('button');
     toggle.type = 'button';
     toggle.className = 'menu-tree-ui-row__toggle';
+    // The generic <drupal-treegrid> element finds the disclosure control by this
+    // hook, so it needs no knowledge of menu CSS classes.
+    toggle.setAttribute('data-treegrid-toggle', '');
     // Operated from the row (Left/Right/Enter), not via Tab; mouse-clickable.
     toggle.tabIndex = -1;
     toggle.setAttribute(
@@ -299,4 +302,9 @@
   // Shared so drag/commit.js can rebuild a row's toggle after a refresh without
   // duplicating the markup (and its translated aria-label).
   Drupal.menuTreeUi.buildToggle = buildToggle;
+
+  // Register the menu renderer with the generic treegrid element. registerProvider
+  // adopts any <drupal-treegrid data-provider="menu_tree_ui"> already connected
+  // (the treegrid library loads, and the element upgrades, before this runs).
+  Drupal.treegrid.registerProvider('menu_tree_ui', { buildRows, buildRow });
 })(Drupal);

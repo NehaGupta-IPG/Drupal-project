@@ -256,7 +256,7 @@
     }
 
     const tree = row.closest('table[role="treegrid"]');
-    const host = tree?.closest('menu-tree') ?? null;
+    const host = tree?.closest('drupal-treegrid') ?? null;
     host?.setAttribute('data-mtu-moving', 'true');
     try {
       await runCommit(row, intent, moveUrl, expand, tree, movedId, csrfToken);

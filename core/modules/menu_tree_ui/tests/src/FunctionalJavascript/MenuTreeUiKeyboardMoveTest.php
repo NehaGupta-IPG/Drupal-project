@@ -66,7 +66,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
     $this->drupalGet('/admin/structure/menu/manage/test/tree');
     $this->assertSession()->waitForElement(
       'css',
-      'menu-tree table[role="treegrid"] tbody tr[role="row"]'
+      'drupal-treegrid table[role="treegrid"] tbody tr[role="row"]'
     );
   }
 
@@ -574,14 +574,14 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
    */
   private function readDrop(): ?string {
     return $this->getSession()->evaluateScript(
-      "return document.querySelector('menu-tree').getAttribute('data-mtu-drop');",
+      "return document.querySelector('drupal-treegrid').getAttribute('data-mtu-drop');",
     );
   }
 
   /**
    * Focuses the source row and dispatches a sequence of keydown events on it.
    *
-   * The keydowns bubble to the tree, where the <menu-tree> element routes them
+   * The keydowns bubble to the tree, where the <drupal-treegrid> element routes them
    * to the MoveModeController. Focus stays on the grabbed row throughout move
    * mode, so the whole sequence targets one node.
    *
@@ -616,7 +616,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
   private function settle(): void {
     $this->getSession()->wait(
       5000,
-      '!document.querySelector(\'menu-tree[data-mtu-moving="true"]\')'
+      '!document.querySelector(\'drupal-treegrid[data-mtu-moving="true"]\')'
       . ' && !document.querySelector(\'.menu-tree-ui-row--grabbed\')'
       . ' && !document.querySelector(\'[data-loading="true"]\')',
     );
@@ -747,13 +747,13 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
    */
   private function assertChildCount(?string $parent_label, int $expected): void {
     if ($parent_label === NULL) {
-      $selector = 'menu-tree tbody tr[role="row"][data-parent-id=""]';
+      $selector = 'drupal-treegrid tbody tr[role="row"][data-parent-id=""]';
       $where = 'top-level';
     }
     else {
       $id = $this->linkIds[$parent_label] ?? throw new \InvalidArgumentException("Unknown label $parent_label");
       $selector = sprintf(
-        'menu-tree tbody tr[role="row"][data-parent-id="%s"]',
+        'drupal-treegrid tbody tr[role="row"][data-parent-id="%s"]',
         $id,
       );
       $where = "under $parent_label";
@@ -773,7 +773,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
    */
   private function assertNoDuplicateRows(): void {
     $ids = $this->getSession()->evaluateScript(
-      'return Array.from(document.querySelectorAll(\'menu-tree tr[role="row"][data-id]\')).map(r => r.dataset.id);',
+      'return Array.from(document.querySelectorAll(\'drupal-treegrid tr[role="row"][data-id]\')).map(r => r.dataset.id);',
     );
     $this->assertIsArray($ids);
     $counts = array_count_values($ids);
@@ -792,10 +792,10 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
     // rather than guessing a fixed delay that flakes on a loaded runner.
     $this->getSession()->wait(
       2000,
-      'Array.from(document.querySelectorAll(\'menu-tree tr[role="row"][data-virtualized="true"]\')).length === 0',
+      'Array.from(document.querySelectorAll(\'drupal-treegrid tr[role="row"][data-virtualized="true"]\')).length === 0',
     );
     $virtualized = $this->getSession()->evaluateScript(
-      'return Array.from(document.querySelectorAll(\'menu-tree tr[role="row"][data-virtualized="true"]\')).map(r => r.dataset.id);',
+      'return Array.from(document.querySelectorAll(\'drupal-treegrid tr[role="row"][data-virtualized="true"]\')).map(r => r.dataset.id);',
     );
     $this->assertSame(
       [],
@@ -809,7 +809,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
    */
   private function assertNoBlankRows(): void {
     $blanks = $this->getSession()->evaluateScript(<<<'JS'
-      return Array.from(document.querySelectorAll('menu-tree tr[role="row"]'))
+      return Array.from(document.querySelectorAll('drupal-treegrid tr[role="row"]'))
         .filter(r => {
           const t = r.querySelector('.menu-tree-ui-row__title');
           return !t || !t.textContent || t.textContent.trim() === '';

@@ -5,5 +5,6 @@ treegrid:
     js/keyboard.js: {}
     js/expand.js: {}
     js/windowing.js: {}
+    js/treegrid-element.js: {}
   dependencies:
     - core/drupal

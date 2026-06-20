@@ -60,7 +60,7 @@ final class MenuTreeUiTreegridFocusTest extends WebDriverTestBase {
     $this->drupalGet('/admin/structure/menu/manage/test/tree');
     $this->assertSession()->waitForElement(
       'css',
-      'menu-tree table[role="treegrid"] tbody tr[role="row"]',
+      'drupal-treegrid table[role="treegrid"] tbody tr[role="row"]',
     );
   }
 
@@ -69,17 +69,17 @@ final class MenuTreeUiTreegridFocusTest extends WebDriverTestBase {
    */
   public function testSingleRowTabStop(): void {
     $rows_at_zero = (int) $this->getSession()->evaluateScript(
-      "return document.querySelectorAll('menu-tree tr[role=\"row\"][tabindex=\"0\"]').length;",
+      "return document.querySelectorAll('drupal-treegrid tr[role=\"row\"][tabindex=\"0\"]').length;",
     );
     $this->assertSame(1, $rows_at_zero, 'Exactly one row is the tab stop.');
 
     $handles_at_zero = (int) $this->getSession()->evaluateScript(
-      "return document.querySelectorAll('menu-tree .menu-tree-ui-row__handle[tabindex=\"0\"]').length;",
+      "return document.querySelectorAll('drupal-treegrid .menu-tree-ui-row__handle[tabindex=\"0\"]').length;",
     );
     $this->assertSame(0, $handles_at_zero, 'No handle is a tab stop.');
 
     $handles_not_minus_one = (int) $this->getSession()->evaluateScript(
-      "return document.querySelectorAll('menu-tree .menu-tree-ui-row__handle:not([tabindex=\"-1\"])').length;",
+      "return document.querySelectorAll('drupal-treegrid .menu-tree-ui-row__handle:not([tabindex=\"-1\"])').length;",
     );
     $this->assertSame(0, $handles_not_minus_one, 'Every handle is tabindex="-1".');
   }
@@ -126,7 +126,7 @@ final class MenuTreeUiTreegridFocusTest extends WebDriverTestBase {
     $this->assertSame(
       0,
       (int) $this->getSession()->evaluateScript(
-        "return document.querySelectorAll('menu-tree tr[aria-selected=\"true\"]').length;",
+        "return document.querySelectorAll('drupal-treegrid tr[aria-selected=\"true\"]').length;",
       ),
       'Navigating does not select a row.',
     );
@@ -142,7 +142,7 @@ final class MenuTreeUiTreegridFocusTest extends WebDriverTestBase {
     $this->assertSame(
       0,
       (int) $this->getSession()->evaluateScript(
-        "return document.querySelectorAll('menu-tree tr[aria-selected=\"true\"]').length;",
+        "return document.querySelectorAll('drupal-treegrid tr[aria-selected=\"true\"]').length;",
       ),
       'Cancelling the move clears the selection.',
     );
@@ -212,7 +212,7 @@ final class MenuTreeUiTreegridFocusTest extends WebDriverTestBase {
    */
   public function testExpandToggleIsNotATabStop(): void {
     $tabbable = (int) $this->getSession()->evaluateScript(
-      "return Array.from(document.querySelectorAll('menu-tree button.menu-tree-ui-row__toggle'))"
+      "return Array.from(document.querySelectorAll('drupal-treegrid button.menu-tree-ui-row__toggle'))"
       . ".filter((b) => b.getAttribute('tabindex') !== '-1').length;",
     );
     $this->assertSame(0, $tabbable, 'No expand toggle is in the tab order.');
@@ -229,8 +229,8 @@ final class MenuTreeUiTreegridFocusTest extends WebDriverTestBase {
       (() => {
         const sel = 'a.menu-tree-ui-row__title, .menu-tree-ui-row__column-toggle,'
           + ' .menu-tree-ui-row__operations a, .menu-tree-ui-row__operations button';
-        const active = document.querySelector('menu-tree tr[role="row"][tabindex="0"]');
-        return Array.from(document.querySelectorAll('menu-tree ' + sel))
+        const active = document.querySelector('drupal-treegrid tr[role="row"][tabindex="0"]');
+        return Array.from(document.querySelectorAll('drupal-treegrid ' + sel))
           .filter((c) => c.getAttribute('tabindex') !== '-1')
           .filter((c) => c.closest('tr[role="row"]') !== active)
           .length;
@@ -247,7 +247,7 @@ final class MenuTreeUiTreegridFocusTest extends WebDriverTestBase {
   private function activeOperationCount(): int {
     return (int) $this->getSession()->evaluateScript(<<<JS
       (() => {
-        const active = document.querySelector('menu-tree tr[role="row"][tabindex="0"]');
+        const active = document.querySelector('drupal-treegrid tr[role="row"][tabindex="0"]');
         if (!active) return 0;
         return Array.from(active.querySelectorAll(
           '.menu-tree-ui-row__operations a, .menu-tree-ui-row__operations button',
