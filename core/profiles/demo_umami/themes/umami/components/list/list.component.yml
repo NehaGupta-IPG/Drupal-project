@@ -1,0 +1,31 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+
+# The human readable name.
+name: List
+
+# Status can be: "experimental", "stable", "deprecated", "obsolete".
+status: experimental
+
+# Schema for the props. We support www.json-schema.org. Learn more about the
+# syntax there.
+props:
+  type: object
+
+  properties:
+    html_tag:
+      type: string
+      title: HTML tag for list
+      # Limit the available options by using enums.
+      enum:
+        - ul
+        - ol
+      meta:enum:
+        ul: Unordered list
+        ol: Ordered list
+      x-translation-context: Umami list HTML tag options
+      # Provide a default value
+      default: ul
+
+slots:
+  items:
+    title: Item
