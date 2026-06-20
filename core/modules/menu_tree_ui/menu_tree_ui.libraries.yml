@@ -2,7 +2,6 @@ menu_tree_ui:
   version: VERSION
   js:
     js/row-builder.js: {}
-    js/expand.js: {}
     js/jump-to.js: {}
     js/search.js: {}
     js/reorder-keys.js: {}

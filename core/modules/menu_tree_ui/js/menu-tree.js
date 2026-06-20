@@ -87,10 +87,11 @@
       this.tree.querySelectorAll(ROW).forEach((row) => {
         this.rowWindow.observe(row);
       });
-      this.expand = new ns.ExpandManager(
+      this.expand = new Drupal.treegrid.ExpandManager(
         childrenUrl,
         this.rowWindow,
         this.tree,
+        { buildRows: ns.buildRows, buildRow: ns.buildRow },
       );
 
       // One drop indicator, shared by pointer drag and keyboard move mode so

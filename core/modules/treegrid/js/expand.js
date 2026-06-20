@@ -8,14 +8,12 @@
  * parent. "Is this subtree already loaded" is tracked by row.dataset.loaded
  * rather than the presence of a child <ul>.
  *
- * Hands off row construction to row-builder and visibility tracking to
- * RowWindow. Exposes Drupal.menuTreeUi.ExpandManager.
+ * Hands off row construction to an injected renderer and visibility tracking to
+ * RowWindow. Exposes Drupal.treegrid.ExpandManager.
  */
 
 ((Drupal) => {
-  Drupal.menuTreeUi = Drupal.menuTreeUi || {};
-  const ns = Drupal.menuTreeUi;
-  const { buildRows, buildRow } = ns;
+  Drupal.treegrid = Drupal.treegrid || {};
   const {
     descendantRows,
     lastDescendantRow,
@@ -56,15 +54,26 @@
     /**
      * @param {string} childrenUrl
      *   The endpoint returning one level of children as JSON.
-     * @param {?Drupal.menuTreeUi.RowWindow} rowWindow
+     * @param {?Drupal.treegrid.RowWindow} rowWindow
      *   The windowing helper, or undefined when virtualization is off.
      * @param {HTMLTableElement} tree
      *   The root treegrid element.
+     * @param {object} rowBuilder
+     *   The consumer's row renderer.
+     * @param {function} rowBuilder.buildRows
+     *   Builds a DocumentFragment of sibling rows from items at a depth.
+     * @param {function} rowBuilder.buildRow
+     *   Builds a single row element from one item.
      */
-    constructor(childrenUrl, rowWindow, tree) {
+    constructor(childrenUrl, rowWindow, tree, rowBuilder) {
       this.childrenUrl = childrenUrl;
       this.rowWindow = rowWindow;
       this.tree = tree;
+      // The row renderer is injected so the engine stays consumer-agnostic; the
+      // consumer supplies how its items become DOM (see row-builder in
+      // menu_tree_ui). rowBuilder = { buildRows, buildRow }.
+      this.buildRows = rowBuilder.buildRows;
+      this.buildRow = rowBuilder.buildRow;
       this.inFlight = new Map();
     }
 
@@ -253,7 +262,7 @@
           result.push({ row: entry.row, block: entry.block, fresh: false });
         } else {
           result.push({
-            row: buildRow(item, childDepth, posInSet, setSize),
+            row: this.buildRow(item, childDepth, posInSet, setSize),
             block: [],
             fresh: true,
           });
@@ -351,7 +360,7 @@
           return;
         }
         const depth = levelOf(row) + 1;
-        const fragment = buildRows(items, depth);
+        const fragment = this.buildRows(items, depth);
         const inserted = Array.from(fragment.children);
         const anchor = lastDescendantRow(row) ?? row;
         anchor.after(fragment);
@@ -371,5 +380,5 @@
     }
   }
 
-  Drupal.menuTreeUi.ExpandManager = ExpandManager;
+  Drupal.treegrid.ExpandManager = ExpandManager;
 })(Drupal);
