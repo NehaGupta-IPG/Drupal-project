@@ -19,6 +19,7 @@ ckeditor5_essentials:
     elements:
       - <br>
     conditions: []
+    is_inline: true
 
 ckeditor5_paragraph:
   ckeditor5:
@@ -28,6 +29,7 @@ ckeditor5_paragraph:
     admin_library: ckeditor5/internal.admin.essentials
     elements:
       - <p>
+    is_inline: true
 
 ckeditor5_heading:
   ckeditor5:
@@ -89,6 +91,7 @@ ckeditor5_htmlComments:
     elements: false
     # @see \Drupal\ckeditor5\Plugin\CKEditor5PluginManagerInterface::getEnabledDefinitions()
     conditions: []
+    is_inline: true
 
 ckeditor5_arbitraryHtmlSupport:
   ckeditor5:
@@ -142,6 +145,7 @@ ckeditor5_globalAttributeDir:
       - <* dir="ltr rtl">
     conditions:
       filter: filter_html
+    is_inline: true
 
 # https://html.spec.whatwg.org/multipage/dom.html#attr-lang
 ckeditor5_globalAttributeLang:
@@ -162,6 +166,7 @@ ckeditor5_globalAttributeLang:
       - <* lang>
     conditions:
       filter: filter_html
+    is_inline: true
 
 ckeditor5_specialCharacters:
   ckeditor5:
@@ -175,6 +180,7 @@ ckeditor5_specialCharacters:
       specialCharacters:
         label: Special characters
     elements: false
+    is_inline: true
 
 ckeditor5_sourceEditing:
   ckeditor5:
@@ -193,6 +199,7 @@ ckeditor5_sourceEditing:
     toolbar_items:
       sourceEditing:
         label: Source
+    is_inline: true
 
 ckeditor5_bold:
   ckeditor5:
@@ -205,6 +212,7 @@ ckeditor5_bold:
         label: Bold
     elements:
       - <strong>
+    is_inline: true
 
 ckeditor5_emphasis:
   ckeditor5:
@@ -220,6 +228,7 @@ ckeditor5_emphasis:
         label: Italic
     elements:
       - <em>
+    is_inline: true
 
 ckeditor5_underline:
   ckeditor5:
@@ -232,6 +241,7 @@ ckeditor5_underline:
         label: Underline
     elements:
       - <u>
+    is_inline: true
 
 ckeditor5_code:
   ckeditor5:
@@ -244,6 +254,7 @@ ckeditor5_code:
         label: Code
     elements:
       - <code>
+    is_inline: true
 
 ckeditor5_codeBlock:
   ckeditor5:
@@ -281,6 +292,7 @@ ckeditor5_strikethrough:
         label: Strikethrough
     elements:
       - <s>
+    is_inline: true
 
 ckeditor5_subscript:
   ckeditor5:
@@ -293,6 +305,7 @@ ckeditor5_subscript:
         label: Subscript
     elements:
       - <sub>
+    is_inline: true
 
 ckeditor5_superscript:
   ckeditor5:
@@ -305,6 +318,7 @@ ckeditor5_superscript:
         label: Superscript
     elements:
       - <sup>
+    is_inline: true
 
 ckeditor5_blockquote:
   ckeditor5:
@@ -336,6 +350,7 @@ ckeditor5_link:
     elements:
       - <a>
       - <a href>
+    is_inline: true
 
 ckeditor5_link_entity_suggestions:
   ckeditor5:
@@ -351,6 +366,7 @@ ckeditor5_link_entity_suggestions:
       filter: entity_links
       plugins:
         - ckeditor5_link
+    is_inline: true
 
 ckeditor5_linkImage:
   ckeditor5:
@@ -467,6 +483,15 @@ ckeditor5_autoformat:
     label: Autoformat
     elements: false
 
+ckeditor5_singleLine:
+  ckeditor5:
+    plugins: []
+  drupal:
+    label: Single line editing
+    class: Drupal\ckeditor5\Plugin\CKEditor5Plugin\SingleLine
+    elements: false
+    conditions: []
+
 ckeditor5_removeFormat:
   ckeditor5:
     plugins: [removeFormat.RemoveFormat]
@@ -477,6 +502,7 @@ ckeditor5_removeFormat:
       removeFormat:
         label: Remove Format
     elements: false
+    is_inline: true
 
 ckeditor5_pasteFromOffice:
   ckeditor5:

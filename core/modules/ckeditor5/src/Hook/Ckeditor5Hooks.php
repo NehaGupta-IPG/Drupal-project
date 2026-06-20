@@ -15,6 +15,7 @@ use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Asset\LibraryDependencyResolverInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -29,6 +30,8 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\editor\EditorInterface;
+use Drupal\field\FieldConfigInterface;
+use Drupal\filter\Entity\FilterFormat;
 
 /**
  * Hook implementations for ckeditor5.
@@ -409,7 +412,38 @@ class Ckeditor5Hooks {
   }
 
   /**
+   * Implements hook_form_FORM_ID_alter() for field_config_edit_form.
+   *
+   * Adds a note when the field is the short (single-line) text type that the
+   * selected format's toolbar and features may be limited to inline features.
+   *
+   * @internal
+   */
+  #[Hook('form_field_config_edit_form_alter')]
+  public function formFieldConfigEditFormAlter(array &$form, FormStateInterface $form_state, string $form_id): void {
+    $form_object = $form_state->getFormObject();
+    if (!$form_object instanceof EntityForm) {
+      return;
+    }
+    $entity = $form_object->getEntity();
+    if (!$entity instanceof FieldConfigInterface) {
+      return;
+    }
+    // Only the "text" (short text) field type uses the single-line widget.
+    // text_long and text_with_summary use the textarea.
+    if ($entity->getFieldStorageDefinition()->getType() !== 'text') {
+      return;
+    }
+    if (!isset($form['settings']['allowed_formats'])) {
+      return;
+    }
+    $form['settings']['allowed_formats']['#description'] .= ' ' . $this->t("When this field is used as a single-line (inline) text field, the selected format's toolbar and features may be limited to inline-only options.");
+  }
+
+  /**
    * Implements hook_field_widget_single_element_form_alter().
+   *
+   * @internal
    */
   #[Hook('field_widget_single_element_form_alter')]
   public function fieldWidgetSingleElementFormAlter(&$element, FormStateInterface $form_state, $context): void {
@@ -422,7 +456,150 @@ class Ckeditor5Hooks {
       $element['#attributes']['data-ckeditor5-host-entity-type'] = $host_entity->getEntityTypeId();
       $element['#attributes']['data-ckeditor5-host-entity-bundle'] = $host_entity->bundle();
       $element['#attributes']['data-ckeditor5-host-entity-langcode'] = $host_entity->language()->getId();
+
+      // Check if this is a text_textfield widget. Ensure it uses 'text_format'
+      // type so TextFormat::processFormat() handles format selection properly.
+      $widget = $context['widget'];
+      if ($widget->getPluginId() === 'text_textfield') {
+        // Ensure the element is 'text_format' type to leverage
+        // \Drupal\filter\Element\TextFormat::processFormat().
+        $element['#type'] = 'text_format';
+        // CKEditor 5 requires textarea, not textfield.
+        $element['#base_type'] = 'textarea';
+        // Add after_build callback to apply single-line enhancements after
+        // TextFormat::processFormat() has run and the format is determined.
+        $element['#after_build'][] = [
+          static::class,
+          'applySingleLineEnhancementsAfterBuild',
+        ];
+      }
     }
+  }
+
+  /**
+   * After build callback to apply single-line enhancements.
+   *
+   * This runs after TextFormat::processFormat() has processed the element,
+   * so we can access the determined format from the element structure.
+   *
+   * @param array $element
+   *   The form element (already processed by TextFormat::processFormat()).
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   *
+   * @return array
+   *   The modified element.
+   *
+   * @internal
+   */
+  public static function applySingleLineEnhancementsAfterBuild(array $element, FormStateInterface $form_state): array {
+    // Get the format that was determined by TextFormat::processFormat().
+    $format_id = $element['format']['format']['#value'] ?? $element['format']['format']['#default_value'] ?? NULL;
+    if (!$format_id) {
+      return $element;
+    }
+
+    // Check if this format uses CKEditor 5.
+    if (!static::usesCKEditor5($format_id)) {
+      return $element;
+    }
+
+    // Set the attribute on the value element where CKEditor attaches.
+    // TextFormat::processFormat() doesn't copy #attributes, so we set it here.
+    if (isset($element['value'])) {
+      if (!isset($element['value']['#attributes'])) {
+        $element['value']['#attributes'] = [];
+      }
+      $element['value']['#attributes']['data-drupal-ckeditor5-single-line'] = 'true';
+    }
+
+    // Apply other single-line enhancements (library, config, validation).
+    static::applySingleLineEnhancements($element, $format_id);
+    return $element;
+  }
+
+  /**
+   * Applies single-line enhancements to a form element.
+   *
+   * @param array $element
+   *   The form element to enhance.
+   * @param string|null $format_id
+   *   (optional) The text format ID to use for dynamic configuration.
+   *
+   * @internal
+   */
+  protected static function applySingleLineEnhancements(array &$element, ?string $format_id = NULL): void {
+    // After TextFormat::processFormat(), the structure has 'value' as a child.
+    // Apply enhancements to the 'value' element where CKEditor 5 will attach.
+    $value_element = &$element['value'];
+    if (!isset($value_element['#rows'])) {
+      $value_element['#rows'] = 1;
+    }
+
+    // The attribute is already set in applySingleLineEnhancementsAfterBuild().
+    // Just attach the library and other enhancements.
+    $element['#attached']['library'][] = 'ckeditor5/internal.drupal.ckeditor5.singleLine';
+
+    // Add validation handler to normalize the value to a single line.
+    // This needs to be on the parent element, not the value child.
+    $element['#element_validate'][] = [static::class, 'normalizeSingleLineValue'];
+  }
+
+  /**
+   * Checks if a text format uses CKEditor 5 (regardless of single-line mode).
+   *
+   * @param string $format_id
+   *   The text format ID.
+   *
+   * @return bool
+   *   TRUE if the format uses CKEditor 5, FALSE otherwise.
+   *
+   * @internal
+   */
+  protected static function usesCKEditor5(string $format_id): bool {
+    $format = FilterFormat::load($format_id);
+    if (!$format) {
+      return FALSE;
+    }
+
+    // Get the editor configuration for this format.
+    $editor_storage = \Drupal::entityTypeManager()
+      ->getStorage('editor');
+    $editor = $editor_storage->load($format_id);
+    return $editor instanceof EditorInterface && $editor->getEditor() === 'ckeditor5';
+  }
+
+  /**
+   * Element validation handler to normalize the value to a single line.
+   *
+   * @param array $element
+   *   The form element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   * @param array $form
+   *   The form array.
+   *
+   * @internal
+   *   This is a static validation callback used by the form system.
+   */
+  public static function normalizeSingleLineValue(array &$element, FormStateInterface $form_state, array &$form): void {
+    $value = $element['value']['#value'] ?? '';
+    if ($value === '') {
+      return;
+    }
+
+    $normalized = preg_replace('/[\r\n]+/u', ' ', (string) $value);
+    $normalized = trim($normalized);
+
+    // If CKEditor 5 wrapped the content in a single <p>…</p>, strip that
+    // wrapper so the stored value is just the inline content. This preserves
+    // any inline markup (e.g. <strong>, <a>) while avoiding an extra block.
+    if (preg_match('/^<p(?: [^>]*)?>(.*)<\/p>$/si', $normalized, $matches)) {
+      $normalized = $matches[1];
+      $normalized = trim($normalized);
+    }
+
+    $form_state->setValueForElement($element['value'], $normalized);
   }
 
   /**

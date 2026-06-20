@@ -100,6 +100,16 @@ internal.drupal.ckeditor5.mediaAlign:
   dependencies:
     - ckeditor5/internal.drupal.ckeditor5.media
 
+internal.drupal.ckeditor5.singleLine:
+  js:
+    js/build/drupalSingleLine.js: { minified: true }
+  css:
+    component:
+      css/single-line.css: {}
+  dependencies:
+    - core/ckeditor5
+    - ckeditor5/internal.drupal.ckeditor5
+
 internal.drupal.ckeditor5.filter.admin:
   js:
     js/ckeditor5.filter.admin.js: {}

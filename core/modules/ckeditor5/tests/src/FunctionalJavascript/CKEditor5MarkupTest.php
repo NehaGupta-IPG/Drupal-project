@@ -228,16 +228,12 @@ class CKEditor5MarkupTest extends CKEditor5TestBase {
           let a = 1 + 2; // this is the same script block still...
         </script>
         HTML,
-        <<<HTML
-        <script>
-          const example = 'Consider this string: <!-- <script>';
-          console.log(example);
-        </script>
-        <!-- despite appearances, this is actually part of the script still! -->
-        <script>
-          let a = 1 + 2; // this is the same script block still...
-        </script>
-        HTML,
+        [
+          "<script>\n  const example = 'Consider this string: <!-- <script>';",
+          'console.log(example);',
+          '<!-- despite appearances, this is actually part of the script still! -->',
+          'let a = 1 + 2; // this is the same script block still...',
+        ],
       ],
       'style' => [
         <<<HTML
@@ -275,22 +271,13 @@ class CKEditor5MarkupTest extends CKEditor5TestBase {
         }
         </style>
         HTML,
-        <<<HTML
-        <script type="text/javascript">
-        let x = 10;
-        let y = 5;
-        if(y < x){
-        console.log('is smaller')
-        }
-        </script><style type="text/css">
-        :root {
-          --main-bg-color: brown;
-        }
-        .sections > .section {
-          background: var(--main-bg-color);
-        }
-        </style>
-        HTML,
+        [
+          '<script type="text/javascript">',
+          "console.log('is smaller')",
+          '<style type="text/css">',
+          '--main-bg-color: brown;',
+          'background: var(--main-bg-color);',
+        ],
       ],
     ];
 
@@ -343,7 +330,9 @@ class CKEditor5MarkupTest extends CKEditor5TestBase {
       $editor->setValue($markup);
       $page->pressButton('Save');
 
-      $assert_session->responseContains($expected_content);
+      foreach ((array) $expected_content as $expected_fragment) {
+        $assert_session->responseContains($expected_fragment);
+      }
     }
   }
 

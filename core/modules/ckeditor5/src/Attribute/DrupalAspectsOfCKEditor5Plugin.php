@@ -9,7 +9,7 @@ use Drupal\Component\Plugin\Attribute\Plugin;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
- * Define a Drupal aspects of CKEditor5 plugin.
+ * Defines a Drupal aspects of CKEditor5 plugin.
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class DrupalAspectsOfCKEditor5Plugin extends Plugin {
@@ -53,6 +53,9 @@ class DrupalAspectsOfCKEditor5Plugin extends Plugin {
    *   (optional) List of toolbar items the plugin provides.
    * @param array|false $conditions
    *   (optional) List of conditions to enable this plugin.
+   * @param bool $is_inline
+   *   (optional) Whether this plugin is an inline formatting plugin compatible
+   *   with single-line editing. Defaults to FALSE.
    * @param class-string|null $deriver
    *   (optional) The deriver class.
    *
@@ -66,6 +69,7 @@ class DrupalAspectsOfCKEditor5Plugin extends Plugin {
     public readonly array|false|null $elements = NULL,
     public readonly array $toolbar_items = [],
     public readonly array|false $conditions = FALSE,
+    public readonly bool $is_inline = FALSE,
     public readonly ?string $deriver = NULL,
   ) {}
 

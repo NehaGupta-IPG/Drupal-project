@@ -159,6 +159,14 @@ use Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition;
  *   toolbar items or multiple filters, have not yet been identified. If this
  *   need arises, see
  *   https://www.drupal.org/docs/drupal-apis/ckeditor-5-api/overview#conditions.
+ * - drupal.is_inline: (optional) Whether this plugin is an inline formatting
+ *   plugin compatible with single-line editing. Defaults to FALSE. Only inline
+ *   formatting plugins (such as bold, italic, link) should set this to TRUE.
+ *   When a CKEditor 5 editor is configured for single-line editing, plugins
+ *   that are not marked as inline (is_inline: FALSE) are automatically
+ *   disabled: their toolbar buttons are hidden and their commands are prevented
+ *   from executing. This ensures that block-level elements (headings, lists,
+ *   images, blockquotes, etc.) cannot be inserted in single-line editors.
  *
  * All of these can be defined in YAML or attributes. A given plugin should
  * choose one or the other, as a definition can't parse both at once.
@@ -209,6 +217,41 @@ use Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition;
  *   \Drupal\ckeditor5\Plugin\Validation\Constraint\TextEditorObjectDependentValidatorTrait.
  *
  * @}
+ */
+
+/**
+ * @defgroup ckeditor5_single_line CKEditor 5 single-line widgets
+ * @{
+ * Single-line editing support for formatted short text fields.
+ *
+ * The CKEditor 5 module provides a single-line editor integration intended for
+ * use with formatted short text fields:
+ * - The ckeditor5_singleLine CKEditor 5 plugin disables Enter/Shift+Enter and
+ *   normalizes pasted content to a single line.
+ * - Non-inline features (e.g., lists, blockquotes, images) are automatically
+ *   disabled: their toolbar buttons are hidden and their commands are
+ *   prevented from executing. Plugin developers should mark their inline
+ *   plugins with drupal.is_inline: TRUE in their plugin definition to ensure
+ *   they are available in single-line editors.
+ * - When using the text_textfield widget with a text format that has CKEditor 5
+ *   configured with the ckeditor5_singleLine plugin enabled, the widget is
+ *   automatically enhanced to provide single-line editing behavior. This is
+ *   done via hook_field_widget_single_element_form_alter().
+ *
+ * Site builders can enable this experience by:
+ * - Creating or updating a text format to use the CKEditor 5 editor and a
+ *   minimal set of allowed HTML tags (e.g., `<strong> <em> <a href>`).
+ * - Ensuring the text format's editor configuration includes the
+ *   ckeditor5_singleLine plugin and only inline-compatible toolbar items.
+ * - Configuring a text field to use the "Text field" widget (text_textfield)
+ *   and selecting the appropriate text format. The single-line behavior will
+ *   be automatically applied when the ckeditor5_singleLine plugin is enabled.
+ *
+ * @see \Drupal\ckeditor5\Plugin\CKEditor5Plugin\SingleLine
+ * @see \Drupal\ckeditor5\Hook\Ckeditor5Hooks::fieldWidgetSingleElementFormAlter()
+ * @see \Drupal\ckeditor5\Attribute\DrupalAspectsOfCKEditor5Plugin::$is_inline
+ *
+ * @} End of "defgroup ckeditor5_single_line".
  */
 
 /**

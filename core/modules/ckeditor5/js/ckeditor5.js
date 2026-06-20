@@ -368,11 +368,53 @@
      */
     attach(element, format) {
       const { toolbar, plugins, config, language } = format.editorSettings;
-      const extraPlugins = selectPlugins(plugins);
+      let filteredPlugins = plugins;
       const pluginConfig = processConfig(config);
+
+      // Filter plugins and toolbar items for single-line editors to exclude
+      // block-level features. Automatically enable single-line mode for
+      // text_textfield widgets.
+      let filteredToolbar = toolbar;
+      const isSingleLine =
+        element.getAttribute('data-drupal-ckeditor5-single-line') === 'true';
+      if (isSingleLine) {
+        const singleLineConfig = pluginConfig.drupalSingleLine || {};
+        const blockCKEditor5Plugins =
+          singleLineConfig.blockCKEditor5Plugins || [];
+        const blockToolbarItems = singleLineConfig.blockToolbarItems || [];
+
+        // Filter out non-inline plugins to prevent them from loading.
+        const blockPluginSet = new Set(blockCKEditor5Plugins);
+        filteredPlugins = plugins.filter((pluginString) => {
+          return !blockPluginSet.has(pluginString);
+        });
+
+        filteredToolbar = {
+          ...toolbar,
+          items: toolbar.items.filter((item) => {
+            // Keep separators ('|') and items that are not block-level.
+            return item === '|' || !blockToolbarItems.includes(item);
+          }),
+        };
+      }
+
+      let extraPlugins = selectPlugins(filteredPlugins);
+
+      // Load the single-line plugin if available for single-line editors.
+      if (
+        isSingleLine &&
+        CKEditor5.drupalSingleLine &&
+        CKEditor5.drupalSingleLine.DrupalSingleLineEditing
+      ) {
+        extraPlugins = [
+          ...extraPlugins,
+          CKEditor5.drupalSingleLine.DrupalSingleLineEditing,
+        ];
+      }
+
       const editorConfig = {
         extraPlugins,
-        toolbar,
+        toolbar: filteredToolbar,
         ...pluginConfig,
         // Language settings have a conflict between the editor localization
         // settings and the "language" plugin.
@@ -420,18 +462,31 @@
           // Save a reference to the initialized instance.
           Drupal.CKEditor5Instances.set(id, editor);
 
-          // Set the minimum height of the editable area to correspond with the
-          // value of the number of rows. We attach this custom property to
-          // the `.ck-editor` element, as that doesn't get its inline styles
-          // cleared on focus. The editable element is then set to use this
-          // property within the stylesheet.
-          const rows = editor.sourceElement.getAttribute('rows');
-          editor.ui.view.editable.element
-            .closest('.ck-editor')
-            .style.setProperty(
+          // Copy single-line attribute to CKEditor element for CSS targeting.
+          const singleLineAttr = element.getAttribute(
+            'data-drupal-ckeditor5-single-line',
+          );
+          const ckEditorElement =
+            editor.ui.view.editable.element.closest('.ck-editor');
+          if (singleLineAttr) {
+            ckEditorElement.setAttribute(
+              'data-drupal-ckeditor5-single-line',
+              singleLineAttr,
+            );
+            // For single-line editors, set a compact min-height that fits one line of text.
+            ckEditorElement.style.setProperty('--ck-min-height', '2.25rem');
+          } else {
+            // Set the minimum height of the editable area to correspond with the
+            // value of the number of rows. We attach this custom property to
+            // the `.ck-editor` element, as that doesn't get its inline styles
+            // cleared on focus. The editable element is then set to use this
+            // property within the stylesheet.
+            const rows = editor.sourceElement.getAttribute('rows');
+            ckEditorElement.style.setProperty(
               '--ck-min-height',
               `${calculateLineHeight(rows)}px`,
             );
+          }
 
           // CKEditor 4 had a feature to remove the required attribute
           // see: https://www.drupal.org/project/drupal/issues/1954968
