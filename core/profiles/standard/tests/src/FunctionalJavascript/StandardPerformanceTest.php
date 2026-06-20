@@ -423,6 +423,10 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'INSERT INTO "watchdog" ("uid", "type", "message", "variables", "severity", "link", "location", "referer", "hostname", "timestamp") VALUES ("2", "user", "Session opened for %name.", "WATCHDOG_DATA", 6, "", "LOCATION", "REFERER", "CLIENT_IP", "TIMESTAMP")',
       'UPDATE "users_field_data" SET "login"="TIMESTAMP" WHERE "uid" = "2"',
       'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
+      // The MySQL upsert performs a one-off SELECT VERSION() to determine
+      // whether the server supports the row alias syntax (MySQL 8.0.19+). This
+      // runs on both MySQL and MariaDB, regardless of the syntax chosen.
+      'SELECT VERSION()',
       $this->getExpectedSessionUpsertQuery(),
       'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
       'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = "2" AND "u"."default_langcode" = 1',
@@ -439,7 +443,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'ScriptCount' => 1,
       'StylesheetBytes' => 1429,
       'StylesheetCount' => 1,
-      'QueryCount' => 15,
+      'QueryCount' => 16,
       'CacheGetCount' => 71,
       'CacheSetCount' => 1,
       'CacheDeleteCount' => 1,
@@ -520,6 +524,10 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'INSERT INTO "watchdog" ("uid", "type", "message", "variables", "severity", "link", "location", "referer", "hostname", "timestamp") VALUES ("2", "user", "Session opened for %name.", "WATCHDOG_DATA", 6, "", "LOCATION", "REFERER", "CLIENT_IP", "TIMESTAMP")',
       'UPDATE "users_field_data" SET "login"="TIMESTAMP" WHERE "uid" = "2"',
       'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
+      // The MySQL upsert performs a one-off SELECT VERSION() to determine
+      // whether the server supports the row alias syntax (MySQL 8.0.19+). This
+      // runs on both MySQL and MariaDB, regardless of the syntax chosen.
+      'SELECT VERSION()',
       $this->getExpectedSessionUpsertQuery(),
       'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
       'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = "2" AND "u"."default_langcode" = 1',
@@ -528,7 +536,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $recorded_queries = $performance_data->getQueries();
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
-      'QueryCount' => 15,
+      'QueryCount' => 16,
       'CacheGetCount' => 100,
       'CacheSetCount' => 1,
       'CacheDeleteCount' => 1,
