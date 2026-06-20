@@ -3,7 +3,7 @@
  * The <drupal-treegrid> custom element: the reusable treegrid spine.
  *
  * Upgrades a server-rendered <table role="treegrid"> into an interactive,
- * lazy-loaded, keyboard-navigable tree. It owns the generic behaviour — row
+ * lazy-loaded, keyboard-navigable tree. It owns the generic behavior — row
  * windowing, lazy expand/collapse, WAI-ARIA navigation, and the roving-tabindex
  * focus model — and nothing domain-specific.
  *
@@ -56,10 +56,10 @@
   const pending = new Set();
 
   /**
-   * Initialises an element if its provider is registered, else parks it.
+   * Initializes an element if its provider is registered, else parks it.
    *
    * @param {TreegridElement} element
-   *   The element to initialise.
+   *   The element to initialize.
    */
   function tryInit(element) {
     const provider = Drupal.treegrid.providers[element.dataset.provider];
@@ -118,7 +118,7 @@
     }
 
     /**
-     * Validates the markup and initialises (or parks) the element on insert.
+     * Validates the markup and initializes (or parks) the element on insert.
      */
     connectedCallback() {
       const tree = this.querySelector(TREE);

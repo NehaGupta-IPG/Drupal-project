@@ -79,7 +79,7 @@ final class MenuTreeControllerColumnUpdateTest extends KernelTestBase {
   }
 
   /**
-   * Renders the tree page without fataling on an orphaned content link.
+   * Renders the tree page without crashing on an orphaned content link.
    *
    * A content link whose entity has been deleted can linger in the menu tree as
    * an orphaned plugin definition; resolving its edit route loads the missing
@@ -113,7 +113,7 @@ final class MenuTreeControllerColumnUpdateTest extends KernelTestBase {
   }
 
   /**
-   * The children JSON links a navigable title and leaves a routeless one plain.
+   * The children JSON links a navigable title and leaves a route-less one plain.
    */
   public function testChildrenJsonMarksNavigableTitles(): void {
     MenuLinkContent::create([

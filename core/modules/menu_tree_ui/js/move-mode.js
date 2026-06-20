@@ -19,7 +19,7 @@
  *  - gap is a slot between two consecutive visible rows. Up/Down move it one
  *    visual position, so the carried row travels straight up and down the list.
  *  - depth is the level the row would land at in that gap. Left/Right change it,
- *    clamped to what the neighbours allow: at most one level deeper than the row
+ *    clamped to what the neighbors allow: at most one level deeper than the row
  *    above, and no shallower than the row below. Right onto a closed parent
  *    opens it so the row can nest among its children; the held row stays visible
  *    throughout — no gesture closes the section it sits in.

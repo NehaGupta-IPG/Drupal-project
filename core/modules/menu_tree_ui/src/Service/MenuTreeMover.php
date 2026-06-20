@@ -43,7 +43,7 @@ final class MenuTreeMover {
    * Writes a validated move to live storage (no transaction, no validation).
    *
    * Renumbers the destination siblings first — reading their current order
-   * (before the move) and reweighting everything except the moved link, which
+   * (before the move) and re-weighting everything except the moved link, which
    * yields the weight the moved link should take — then writes the moved link's
    * parent and weight together through the menu link manager, which routes to
    * the entity or to StaticMenuLinkOverrides. Callers own the transaction so a
@@ -276,7 +276,7 @@ final class MenuTreeMover {
    *  - $before_id may point at a static (module-defined) link such as the front
    *    page; an entity-only query would never find it, so the moved link would
    *    silently fall through to the end of the list.
-   *  - Static links must be reweighted alongside content links to keep the
+   *  - Static links must be re-weighted alongside content links to keep the
    *    overall order intact — exactly as core's menu overview form does via
    *    MenuLinkManager::updateDefinition(). Leaving them untouched is what made
    *    a link dropped above the front page jump to the bottom.
@@ -315,7 +315,7 @@ final class MenuTreeMover {
 
     // Pluck the moved link out and splice it back in before $before_id (or at
     // the end). Shared with MenuTreeLoader::spliceBefore() so the read overlay
-    // and this write-side reweight produce the same order.
+    // and this write-side re-weight produce the same order.
     $reordered = MenuTreeLoader::spliceBefore($ordered, $moved_id, $before_id);
 
     $assigned_weight = 0;
@@ -334,7 +334,7 @@ final class MenuTreeMover {
           // must not abort the whole save. Skip it - it keeps its old weight,
           // the remaining links stay correctly ordered - and log it so the
           // stale row can be cleaned up.
-          $this->logger->warning('Could not reweight menu link %id while saving menu %menu; its backing entity is missing. %message', [
+          $this->logger->warning('Could not re-weight menu link %id while saving menu %menu; its backing entity is missing. %message', [
             '%id' => $id,
             '%menu' => $menu_name,
             '%message' => $e->getMessage(),

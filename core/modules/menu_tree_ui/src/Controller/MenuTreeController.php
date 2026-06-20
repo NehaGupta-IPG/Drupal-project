@@ -346,7 +346,7 @@ final class MenuTreeController extends ControllerBase {
    * Whether a link's title should render as a link to its destination.
    *
    * Mirrors the classic menu admin, which links each title to the menu link's
-   * URL. Routeless destinations (<nolink> and the like) have nowhere to go, so
+   * URL. Route-less destinations (<nolink> and the like) have nowhere to go, so
    * their title renders as plain text.
    *
    * @param \Drupal\Core\Menu\MenuLinkInterface $link
@@ -500,7 +500,7 @@ final class MenuTreeController extends ControllerBase {
     // A content link whose entity was deleted can linger in the menu tree as an
     // orphaned plugin definition; resolving its edit route loads the missing
     // entity and throws. Skip the edit operation for such links rather than
-    // fataling the whole tree — the row still renders from the cached
+    // crashing the whole tree — the row still renders from the cached
     // definition, and Delete is already omitted (the entity is not loaded).
     try {
       $edit_route = $link->getEditRoute();

@@ -537,7 +537,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
    * gap sweeps depth from shallowest (Left) to deepest (Right), checking the
    * host's data-mtu-drop after each press - deterministic regardless of where
    * the grab began. Right may open a collapsed parent (the documented
-   * behaviour), which only adds reachable positions.
+   * behavior), which only adds reachable positions.
    *
    * @param string $source
    *   Label of the grabbed row (the node keydowns are dispatched on).

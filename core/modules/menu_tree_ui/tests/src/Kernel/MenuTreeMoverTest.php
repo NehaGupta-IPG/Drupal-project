@@ -193,7 +193,7 @@ final class MenuTreeMoverTest extends KernelTestBase {
    * Regression test: renumberSiblings() used to query only menu_link_content,
    * so a $before_id pointing at a static (module-defined) link — e.g. the front
    * page — was never matched and the moved link fell through to the bottom of
-   * the list. The mover now reweights every link type via the menu link
+   * the list. The mover now re-weights every link type via the menu link
    * manager, so the moved link lands immediately before the static sibling.
    */
   public function testDropAboveStaticLinkLandsAboveIt(): void {
@@ -218,7 +218,7 @@ final class MenuTreeMoverTest extends KernelTestBase {
    * A save that renumbers a level with an orphaned sibling still succeeds.
    *
    * An orphaned link (a menu_tree definition whose backing entity has gone)
-   * cannot be reweighted, but it must not abort the whole save; the remaining
+   * cannot be re-weighted, but it must not abort the whole save; the remaining
    * links reorder and the move commits.
    */
   public function testRenumberSkipsOrphanedSibling(): void {
@@ -237,7 +237,7 @@ final class MenuTreeMoverTest extends KernelTestBase {
       ->getStorage('menu_link_content')
       ->resetCache([$id]);
 
-    // Moving C above A renumbers the whole root level, which would reweight the
+    // Moving C above A renumbers the whole root level, which would re-weight the
     // orphaned B. The save must still report success.
     $result = $this->commitMove($c->getPluginId(), '', $a->getPluginId());
     $this->assertTrue($result['ok'], 'The move succeeds despite an orphaned sibling.');

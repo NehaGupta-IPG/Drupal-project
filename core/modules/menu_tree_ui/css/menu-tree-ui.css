@@ -136,7 +136,7 @@
  * keeps scrolled rows from showing through; the z-index sits above the rows but
  * below the search results popover (z-index 10).
  */
-.menu-tree-ui__actionbar {
+.menu-tree-ui__action-bar {
   position: sticky;
   z-index: 4;
   top: 0;
@@ -162,7 +162,7 @@
  * not grow the sticky bar and shift the tree below it; the descendant selector
  * outranks the themed .messages padding it would otherwise inherit.
  */
-.menu-tree-ui__actionbar .menu-tree-ui__unsaved {
+.menu-tree-ui__action-bar .menu-tree-ui__unsaved {
   flex: 0 1 auto;
   margin: 0;
   margin-inline-start: auto;
@@ -211,7 +211,7 @@ drupal-treegrid {
 
 /*
  * Highlight the row that holds focus (on its handle, toggle, switch, or links).
- * Raise it above its neighbours so the focused control's focus ring — which the
+ * Raise it above its neighbors so the focused control's focus ring — which the
  * theme draws as a box-shadow extending outside the element — is not painted
  * over by the adjacent rows.
  */

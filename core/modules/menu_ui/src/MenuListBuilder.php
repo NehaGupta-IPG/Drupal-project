@@ -53,7 +53,7 @@ class MenuListBuilder extends ConfigEntityListBuilder {
     if (isset($operations['edit'])) {
       // The default "edit" action keeps its natural meaning: the menu's own
       // settings. Managing links is the more common task, so it leads the
-      // dropbutton as the primary action. The menu_tree_ui module repoints
+      // dropbutton as the primary action. The menu_tree_ui module re-points
       // "Edit links" to its scalable tree when enabled.
       $operations['edit']['title'] = $this->t('Edit');
       $operations['edit']['weight'] = 10;

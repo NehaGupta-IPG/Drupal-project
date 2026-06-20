@@ -177,7 +177,7 @@ final class MenuTreeLoader {
    *
    * The moved id is removed if already present, then placed immediately before
    * $before_id, or at the end when there is no anchor or the anchor is absent.
-   * Shared by the read-side overlay here and the write-side reweight in
+   * Shared by the read-side overlay here and the write-side re-weight in
    * MenuTreeMover::renumberSiblings() so both produce the same order.
    *
    * @param string[] $order

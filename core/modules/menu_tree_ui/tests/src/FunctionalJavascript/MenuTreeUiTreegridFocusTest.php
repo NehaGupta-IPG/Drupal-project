@@ -261,7 +261,7 @@ final class MenuTreeUiTreegridFocusTest extends WebDriverTestBase {
    *
    * Top level: B (leaf), then A (with A1, A2 (with A2a)). B is deliberately a
    * leaf placed first so that ArrowDown from it always lands on A, regardless of
-   * the "auto-expand for very small menus" behaviour: a leaf has no children to
+   * the "auto-expand for very small menus" behavior: a leaf has no children to
    * descend into, so the row after it is always the next top-level item.
    */
   private function seedMenu(): void {
