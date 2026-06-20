@@ -1526,12 +1526,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Asset/AssetCollectionOptimizerInterface.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$group_keys might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 2,
-	'path' => __DIR__ . '/lib/Drupal/Core/Asset/CssCollectionGrouper.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Asset\\\\CssCollectionOptimizerLazy\\:\\:deleteAll\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
