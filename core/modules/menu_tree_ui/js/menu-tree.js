@@ -432,7 +432,7 @@
         }
       }
 
-      ns.handleKeyDown(event, {
+      Drupal.treegrid.handleKeyDown(event, {
         tree: this.tree,
         expand: this.expand,
         reorder: (row, direction) => {

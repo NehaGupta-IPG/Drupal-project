@@ -3,7 +3,6 @@ menu_tree_ui:
   js:
     js/row-builder.js: {}
     js/expand.js: {}
-    js/keyboard.js: {}
     js/jump-to.js: {}
     js/search.js: {}
     js/reorder-keys.js: {}

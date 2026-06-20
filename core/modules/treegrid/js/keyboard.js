@@ -6,11 +6,11 @@
  * Arrow sibling reorder lives in reorder-keys.js; this file only covers
  * navigation and expand/collapse keys.
  *
- * Exposes Drupal.menuTreeUi.handleKeyDown.
+ * Exposes Drupal.treegrid.handleKeyDown.
  */
 
 ((Drupal) => {
-  Drupal.menuTreeUi = Drupal.menuTreeUi || {};
+  Drupal.treegrid = Drupal.treegrid || {};
   const {
     childRows,
     findRow,
@@ -99,5 +99,5 @@
     }
   }
 
-  Drupal.menuTreeUi.handleKeyDown = handleKeyDown;
+  Drupal.treegrid.handleKeyDown = handleKeyDown;
 })(Drupal);
