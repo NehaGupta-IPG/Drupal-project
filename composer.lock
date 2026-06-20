@@ -368,7 +368,7 @@
             "dist": {
                 "type": "path",
                 "url": "core",
-                "reference": "e933fcb998ab9c646a7a20b63a56c3bf942c53d9"
+                "reference": "6c309103cd8d4128ea94c31ec41cfcb734a54035"
             },
             "require": {
                 "asm89/stack-cors": "^2.3",
@@ -8261,12 +8261,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "43c2cd7b96ee1e800b35e4df23b419a88b53111d"
+                "reference": "ea25442a475d1b01e19a5389d545306ca96b2092"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/43c2cd7b96ee1e800b35e4df23b419a88b53111d",
-                "reference": "43c2cd7b96ee1e800b35e4df23b419a88b53111d",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/ea25442a475d1b01e19a5389d545306ca96b2092",
+                "reference": "ea25442a475d1b01e19a5389d545306ca96b2092",
                 "shasum": ""
             },
             "require": {
@@ -8346,7 +8346,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2026-06-17T05:51:02+00:00"
+            "time": "2026-06-20T11:37:12+00:00"
         },
         {
             "name": "ramsey/collection",
