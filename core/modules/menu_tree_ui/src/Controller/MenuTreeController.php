@@ -16,6 +16,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\menu_link_content\MenuLinkContentInterface;
 use Drupal\menu_tree_ui\MenuLinkMovability;
+use Drupal\menu_tree_ui\MenuTreeRowContext;
 use Drupal\menu_tree_ui\MenuTreeUiConstants;
 use Drupal\treegrid\TreegridColumnManager;
 use Drupal\menu_tree_ui\Service\MenuTreeLoader;
@@ -87,7 +88,7 @@ final class MenuTreeController extends ControllerBase {
         '#url' => $element->link->getUrlObject()->toString(),
         '#linked' => $this->isLinked($element->link),
         '#operations' => $this->renderOperations($element, $entity_map),
-        '#columns' => $this->buildColumnCells($element, $columns),
+        '#columns' => $this->buildColumnCells($element, $entity_map[$element->link->getPluginId()] ?? NULL, $columns),
         '#depth' => 1,
         '#pos_in_set' => ++$i,
         '#set_size' => $set_size,
@@ -426,7 +427,7 @@ final class MenuTreeController extends ControllerBase {
       'weight' => $link->getWeight(),
       'movable' => MenuLinkMovability::isMovable($link),
       'operations_html' => $this->renderOperationsHtml($element, $entity_map),
-      'columns' => $this->buildColumnCells($element, $columns),
+      'columns' => $this->buildColumnCells($element, $entity_map[$link->getPluginId()] ?? NULL, $columns),
     ];
   }
 
@@ -564,18 +565,21 @@ final class MenuTreeController extends ControllerBase {
    *
    * @param \Drupal\Core\Menu\MenuLinkTreeElement $element
    *   The tree element whose cells to build.
+   * @param \Drupal\menu_link_content\MenuLinkContentInterface|null $entity
+   *   The row's pre-loaded content entity, or NULL for a static/yml link.
    * @param \Drupal\treegrid\Plugin\TreegridColumn\TreegridColumnInterface[] $columns
    *   The active column plugins keyed by plugin ID.
    *
    * @return array
    *   Cell data arrays keyed by column plugin ID.
    */
-  private function buildColumnCells(MenuLinkTreeElement $element, array $columns): array {
+  private function buildColumnCells(MenuLinkTreeElement $element, ?MenuLinkContentInterface $entity, array $columns): array {
     // A cell per active column, empty when there is no data for this row, so
     // every row matches the header's cell count and the columns stay aligned.
+    $context = new MenuTreeRowContext($element, $entity);
     $cells = [];
     foreach ($columns as $col_id => $column) {
-      $cells[$col_id] = $column->getCellData($element) ?: [];
+      $cells[$col_id] = $column->getCellData($context) ?: [];
     }
     return $cells;
   }

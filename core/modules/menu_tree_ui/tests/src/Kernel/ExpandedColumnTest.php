@@ -9,6 +9,7 @@ use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\menu_link_content\MenuLinkContentInterface;
+use Drupal\menu_tree_ui\MenuTreeRowContext;
 use Drupal\menu_tree_ui\Plugin\TreegridColumn\ExpandedColumn;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -60,7 +61,7 @@ final class ExpandedColumnTest extends KernelTestBase {
     $entity = $this->createMenuLinkContent(expanded: FALSE);
     $element = $this->elementFromEntity($entity, hasChildren: FALSE);
 
-    $cell = $this->column->getCellData($element);
+    $cell = $this->column->getCellData(new MenuTreeRowContext($element, $entity));
 
     $this->assertSame([], $cell);
   }
@@ -72,7 +73,7 @@ final class ExpandedColumnTest extends KernelTestBase {
     $entity = $this->createMenuLinkContent(expanded: FALSE);
     $element = $this->elementFromEntity($entity, hasChildren: TRUE);
 
-    $cell = $this->column->getCellData($element);
+    $cell = $this->column->getCellData(new MenuTreeRowContext($element, $entity));
 
     $this->assertSame('checkbox', $cell['type']);
     $this->assertFalse($cell['value']);
@@ -89,7 +90,7 @@ final class ExpandedColumnTest extends KernelTestBase {
     $entity = $this->createMenuLinkContent(expanded: TRUE);
     $element = $this->elementFromEntity($entity, hasChildren: TRUE);
 
-    $cell = $this->column->getCellData($element);
+    $cell = $this->column->getCellData(new MenuTreeRowContext($element, $entity));
 
     $this->assertTrue($cell['value']);
   }

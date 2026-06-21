@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Drupal\menu_tree_ui\Plugin\TreegridColumn;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\menu_link_content\MenuLinkContentInterface;
+use Drupal\menu_tree_ui\MenuTreeRowContext;
 use Drupal\menu_tree_ui\MenuTreeUiConstants;
 use Drupal\treegrid\Attribute\TreegridColumn;
 use Drupal\treegrid\Plugin\TreegridColumn\TreegridColumnBase;
@@ -16,9 +16,9 @@ use Drupal\treegrid\Plugin\TreegridColumn\TreegridColumnBase;
  * Column plugin for the menu_link_content 'enabled' field.
  *
  * "Enabled" controls whether a menu link appears in rendered menus. This column
- * exposes it as an inline checkbox so editors can disable a link without opening
- * the full edit form. Unlike "Expanded", it applies to every link, leaf or
- * parent, and sorts ahead of "Expanded".
+ * exposes it as an inline checkbox so editors can disable a link without
+ * opening the full edit form. Unlike "Expanded", it applies to every link, leaf
+ * or parent, and sorts ahead of "Expanded".
  *
  * Static/yml-defined links have no writable enabled property here; for those
  * the checkbox is rendered disabled.
@@ -34,8 +34,8 @@ final class EnabledColumn extends TreegridColumnBase {
    * {@inheritdoc}
    */
   public function getCellData(object $context): array {
-    assert($context instanceof MenuLinkTreeElement);
-    $link = $context->link;
+    assert($context instanceof MenuTreeRowContext);
+    $link = $context->element->link;
     $plugin_id = $link->getPluginId();
 
     return [

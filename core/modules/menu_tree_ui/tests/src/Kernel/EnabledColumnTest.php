@@ -8,6 +8,7 @@ use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\menu_link_content\MenuLinkContentInterface;
+use Drupal\menu_tree_ui\MenuTreeRowContext;
 use Drupal\menu_tree_ui\Plugin\TreegridColumn\EnabledColumn;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
@@ -72,7 +73,7 @@ final class EnabledColumnTest extends KernelTestBase {
     $entity = $this->createMenuLinkContent(enabled: TRUE);
     $element = $this->elementFromEntity($entity, hasChildren: FALSE);
 
-    $cell = $this->column->getCellData($element);
+    $cell = $this->column->getCellData(new MenuTreeRowContext($element, $entity));
 
     $this->assertSame('checkbox', $cell['type']);
     $this->assertTrue($cell['value']);
@@ -89,7 +90,7 @@ final class EnabledColumnTest extends KernelTestBase {
     $entity = $this->createMenuLinkContent(enabled: FALSE);
     $element = $this->elementFromEntity($entity, hasChildren: FALSE);
 
-    $cell = $this->column->getCellData($element);
+    $cell = $this->column->getCellData(new MenuTreeRowContext($element, $entity));
 
     $this->assertFalse($cell['value']);
   }

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Drupal\menu_tree_ui\Plugin\TreegridColumn;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\menu_link_content\MenuLinkContentInterface;
+use Drupal\menu_tree_ui\MenuTreeRowContext;
 use Drupal\menu_tree_ui\MenuTreeUiConstants;
 use Drupal\treegrid\Attribute\TreegridColumn;
 use Drupal\treegrid\Plugin\TreegridColumn\TreegridColumnBase;
@@ -34,12 +34,13 @@ final class ExpandedColumn extends TreegridColumnBase {
    * {@inheritdoc}
    */
   public function getCellData(object $context): array {
-    assert($context instanceof MenuLinkTreeElement);
-    if (!$context->hasChildren) {
+    assert($context instanceof MenuTreeRowContext);
+    $element = $context->element;
+    if (!$element->hasChildren) {
       return [];
     }
 
-    $link = $context->link;
+    $link = $element->link;
     $plugin_id = $link->getPluginId();
     $definition = $link->getPluginDefinition();
 
