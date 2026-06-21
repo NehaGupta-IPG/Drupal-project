@@ -120,7 +120,7 @@ final class MenuTreeOverlayTest extends KernelTestBase {
   }
 
   /**
-   * A pending reparent drops the link from its old level and adds it to the new.
+   * A pending re-parent drops the link from its old level and adds it to the new.
    */
   public function testOverlayMovesLinkBetweenLevels(): void {
     [$a, $b, $c] = $this->ids;

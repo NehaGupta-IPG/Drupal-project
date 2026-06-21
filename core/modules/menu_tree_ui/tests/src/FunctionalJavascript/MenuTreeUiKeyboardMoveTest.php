@@ -540,7 +540,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
    * behavior), which only adds reachable positions.
    *
    * @param string $source
-   *   Label of the grabbed row (the node keydowns are dispatched on).
+   *   Label of the grabbed row (the node keydown events are dispatched on).
    * @param string $want
    *   The wanted data-treegrid-drop value, "kind:pluginId".
    * @param int $max
@@ -581,7 +581,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
   /**
    * Focuses the source row and dispatches a sequence of keydown events on it.
    *
-   * The keydowns bubble to the tree, where the <drupal-treegrid> element routes them
+   * The keydown events bubble to the tree, where the <drupal-treegrid> element routes them
    * to the MoveModeController. Focus stays on the grabbed row throughout move
    * mode, so the whole sequence targets one node.
    *

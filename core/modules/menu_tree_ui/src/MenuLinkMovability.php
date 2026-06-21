@@ -8,7 +8,7 @@ use Drupal\Core\Menu\MenuLinkDefault;
 use Drupal\Core\Menu\MenuLinkInterface;
 
 /**
- * Decides whether a menu link can be reordered/reparented in the tree UI.
+ * Decides whether a menu link can be reordered or re-parented in the tree UI.
  *
  * The UI lets a link be dragged (or keyboard-reordered) only when a parent +
  * weight change will actually persist:

@@ -84,7 +84,7 @@ final class MenuTreeMoverTest extends KernelTestBase {
   }
 
   /**
-   * A static MenuLinkDefault link can be reparented; the override persists.
+   * A static MenuLinkDefault link can be re-parented; the override persists.
    *
    * Static yml-defined links such as the front page are movable now: parent and
    * weight changes are written as overrides through the menu link manager, the

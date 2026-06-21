@@ -109,7 +109,6 @@ datestamp
 datetimeiso
 dburl
 dealerdirect
-dedup
 defaultable
 defgroup
 delayable
@@ -223,7 +222,6 @@ javascripts
 jessebeach
 jqueryui
 justinrainbow
-keydowns
 keypresses
 keyup
 kinberg
@@ -266,7 +264,6 @@ metatags
 mikey
 mimetypes
 minusthick
-misalign
 mlfr
 mocktail
 mocktails
@@ -362,8 +359,6 @@ referer
 refinable
 reindexing
 renderables
-reparent
-reparented
 replyto
 resaved
 resaving
@@ -377,8 +372,6 @@ revisionable
 revisioned
 revisionid
 revisioning
-reweighted
-reweights
 rowspans
 rtsp
 sameorigin
@@ -500,7 +493,6 @@ undoable
 unfieldable
 ungroup
 ungroupable
-unhides
 unindexed
 uninstallations
 unminified

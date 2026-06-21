@@ -14,7 +14,7 @@ The classic UI stays available as the no-JS fallback while this module matures.
 - Lazy-loaded tree: only the top level loads on page open; each subtree fetches on expand.
 - Browser-native row virtualization via `content-visibility: auto`, plus an `IntersectionObserver` fallback that flips deep off-screen rows to `visibility: hidden` with a reserved height.
 - Full WAI-ARIA tree keyboard navigation (Up/Down/Left/Right/Home/End/Enter, roving `tabindex`).
-- Pointer drag-and-drop reorder and reparent, plus two keyboard equivalents: Shift+Up / Shift+Down for a quick sibling reorder, and a grab/select move mode (Space to pick up, arrows to choose a before/after/child position, Enter to drop, Escape to cancel) that steps through the same drop-intent space as drag and commits through the same path.
+- Pointer drag-and-drop reorder and re-parent, plus two keyboard equivalents: Shift+Up / Shift+Down for a quick sibling reorder, and a grab/select move mode (Space to pick up, arrows to choose a before/after/child position, Enter to drop, Escape to cancel) that steps through the same drop-intent space as drag and commits through the same path.
 - A "Keyboard commands" dialog, linked at the top of the page so assistive-technology users meet it early.
 - htmx-driven search panel returning HTML partials, with jump-to-result.
 - Edits delegated to core's existing per-link form.

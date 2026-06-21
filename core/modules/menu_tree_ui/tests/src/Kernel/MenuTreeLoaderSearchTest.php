@@ -13,7 +13,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests MenuTreeLoader::search() provider collection, dedup, and alter hook.
+ * Tests MenuTreeLoader::search() provider collection, deduplication, and alter hook.
  */
 #[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
@@ -104,7 +104,7 @@ final class MenuTreeLoaderSearchTest extends KernelTestBase {
     $this->assertContains('menu_link_content:shared', $ids);
     $this->assertContains('menu_link_content:only1', $ids);
     $this->assertContains('menu_link_content:only2', $ids);
-    // First-provider title must win the dedup.
+    // First-provider title must win deduplication.
     $shared_result = current(array_filter($results, fn($r) => $r['id'] === 'menu_link_content:shared'));
     $this->assertSame('Shared', $shared_result['title']);
   }
