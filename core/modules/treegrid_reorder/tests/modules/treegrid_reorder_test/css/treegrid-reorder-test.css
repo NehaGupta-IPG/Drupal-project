@@ -1,0 +1,41 @@
+/**
+ * @file
+ * Minimal styling for the reorder gesture test consumer.
+ *
+ * Only what the gestures need: a drag handle, the absolutely-positioned
+ * drop line (the host gets its positioning context from treegrid's own CSS),
+ * and visible drag/grab/flash states. Not meant to be pretty.
+ */
+
+.reorder-test-handle {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  margin-inline-end: 0.5rem;
+  cursor: grab;
+  vertical-align: middle;
+  background: #ccc;
+}
+
+.reorder-test-dragging {
+  opacity: 0.5;
+}
+
+.reorder-test-grabbed {
+  outline: 2px solid blue;
+}
+
+.reorder-test-drop-indicator {
+  position: absolute;
+  display: none;
+  height: 2px;
+  background: blue;
+}
+
+.reorder-test-drop-as-child {
+  outline: 1px dashed green;
+}
+
+.reorder-test-flash {
+  background: yellow;
+}
