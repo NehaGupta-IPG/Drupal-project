@@ -333,7 +333,7 @@ class PhpUnitTestDiscovery {
     }
 
     $groups = array_filter(array_unique($tmp), function (string $value): bool {
-      return $value!== 'default' && !str_starts_with($value, '__phpunit');
+      return $value !== 'default' && !str_starts_with($value, '__phpunit');
     });
     if (empty($groups)) {
       throw new MissingGroupException(sprintf('Missing group metadata in test %s', $testClass->name()));
