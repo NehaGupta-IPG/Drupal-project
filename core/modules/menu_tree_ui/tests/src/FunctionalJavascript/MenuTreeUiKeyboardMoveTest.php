@@ -18,7 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * the drag handle) picks up the focused row, Up/Down move it one visual
  * position, Left/Right change the landing depth, and Enter commits through the
  * SAME commitMove() path as drag. The cursor's prospective drop is mirrored on
- * the host as data-mtu-drop ("kind:id"), which these tests walk to
+ * the host as data-treegrid-drop ("kind:id"), which these tests walk to
  * deterministically rather than counting keystrokes.
  *
  * Moves are no longer written to storage on commit; they accumulate in a
@@ -535,14 +535,14 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
    * The cursor is two-dimensional now: Up/Down move it one visual position and
    * Left/Right change the landing depth. This parks at the top, then for each
    * gap sweeps depth from shallowest (Left) to deepest (Right), checking the
-   * host's data-mtu-drop after each press - deterministic regardless of where
+   * host's data-treegrid-drop after each press - deterministic regardless of where
    * the grab began. Right may open a collapsed parent (the documented
    * behavior), which only adds reachable positions.
    *
    * @param string $source
    *   Label of the grabbed row (the node keydowns are dispatched on).
    * @param string $want
-   *   The wanted data-mtu-drop value, "kind:pluginId".
+   *   The wanted data-treegrid-drop value, "kind:pluginId".
    * @param int $max
    *   Safety bound on the number of gaps / depths swept.
    */
@@ -574,7 +574,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
    */
   private function readDrop(): ?string {
     return $this->getSession()->evaluateScript(
-      "return document.querySelector('drupal-treegrid').getAttribute('data-mtu-drop');",
+      "return document.querySelector('drupal-treegrid').getAttribute('data-treegrid-drop');",
     );
   }
 
@@ -616,7 +616,7 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
   private function settle(): void {
     $this->getSession()->wait(
       5000,
-      '!document.querySelector(\'drupal-treegrid[data-mtu-moving="true"]\')'
+      '!document.querySelector(\'drupal-treegrid[data-treegrid-moving="true"]\')'
       . ' && !document.querySelector(\'.menu-tree-ui-row--grabbed\')'
       . ' && !document.querySelector(\'[data-loading="true"]\')',
     );

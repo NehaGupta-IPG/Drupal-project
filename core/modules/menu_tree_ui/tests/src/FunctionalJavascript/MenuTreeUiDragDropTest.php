@@ -138,7 +138,7 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     $this->tapHandle('C');
     $this->getSession()->wait(
       5000,
-      '!document.querySelector(\'drupal-treegrid[data-mtu-moving="true"]\')'
+      '!document.querySelector(\'drupal-treegrid[data-treegrid-moving="true"]\')'
       . ' && !document.querySelector(\'.menu-tree-ui-row--grabbed\')'
       . ' && !document.querySelector(\'[data-loading="true"]\')',
     );
@@ -406,12 +406,12 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
     JS;
 
     $this->getSession()->executeScript($script);
-    // commitMove flags the <drupal-treegrid> host with data-mtu-moving while the
+    // commitMove flags the <drupal-treegrid> host with data-treegrid-moving while the
     // server-first POST + group refresh is in flight; wait for that to clear
     // before assertions run on the rebuilt DOM.
     $this->getSession()->wait(
       5000,
-      '!document.querySelector(\'drupal-treegrid[data-mtu-moving="true"]\')'
+      '!document.querySelector(\'drupal-treegrid[data-treegrid-moving="true"]\')'
       . ' && !document.querySelector(\'.menu-tree-ui-row--dragging\')'
       . ' && !document.querySelector(\'[data-loading="true"]\')',
     );

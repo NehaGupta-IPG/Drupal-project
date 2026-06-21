@@ -181,7 +181,7 @@
   /**
    * Commits a drag-and-drop move, flagging the host while in-flight.
    *
-   * Tests wait on the data-mtu-moving flag's absence to know all asynchronous
+   * Tests wait on the data-treegrid-moving flag's absence to know all asynchronous
    * refresh work is done; humans never see it.
    *
    * @param {HTMLTableRowElement} row
@@ -208,7 +208,7 @@
 
     const tree = row.closest('table[role="treegrid"]');
     const host = tree?.closest('drupal-treegrid') ?? null;
-    host?.setAttribute('data-mtu-moving', 'true');
+    host?.setAttribute('data-treegrid-moving', 'true');
     try {
       await runCommit(
         row,
@@ -221,7 +221,7 @@
         options,
       );
     } finally {
-      host?.removeAttribute('data-mtu-moving');
+      host?.removeAttribute('data-treegrid-moving');
     }
   }
 

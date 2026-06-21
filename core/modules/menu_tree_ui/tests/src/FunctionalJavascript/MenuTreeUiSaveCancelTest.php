@@ -215,7 +215,7 @@ final class MenuTreeUiSaveCancelTest extends WebDriverTestBase {
    * Drags row C into the "before" zone of row A and waits for the commit.
    *
    * Fires the same synthetic PointerEvent sequence the drag test uses against
-   * the live DragController, then waits for the host to clear data-mtu-moving
+   * the live DragController, then waits for the host to clear data-treegrid-moving
    * and for the top-level order to read A, C (C lifted above its old slot).
    */
   private function moveCBeforeA(): void {
@@ -251,7 +251,7 @@ final class MenuTreeUiSaveCancelTest extends WebDriverTestBase {
     $this->getSession()->executeScript($script);
     $this->getSession()->wait(
       5000,
-      '!document.querySelector(\'drupal-treegrid[data-mtu-moving="true"]\')'
+      '!document.querySelector(\'drupal-treegrid[data-treegrid-moving="true"]\')'
       . ' && !document.querySelector(\'.menu-tree-ui-row--dragging\')'
       . ' && !document.querySelector(\'[data-loading="true"]\')',
     );
