@@ -1,0 +1,7 @@
+name: 'Tree grid test'
+type: module
+description: 'Provides test column plugins for Tree grid kernel tests.'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:treegrid
