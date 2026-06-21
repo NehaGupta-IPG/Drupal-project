@@ -327,29 +327,17 @@ class PhpUnitTestDiscovery {
   private function getTestClassInfo(Test $testClass, string $testSuite): array {
     $reflection = new \ReflectionClass($testClass->name());
 
-    // In PHPUnit 11+, we need to coalesce the groups from individual tests
-    // as they may not be available from the test class level (when tests are
-    // backed by data providers).
     $tmp = [];
-    foreach ($testClass as $test) {
-      if ($test instanceof TestSuite) {
-        foreach ($test as $testWithData) {
-          if ($testWithData->valueObjectForEvents()->metadata()->isGroup()->isEmpty()) {
-            throw new MissingGroupException(sprintf('Missing group metadata in test %s', $testWithData->valueObjectForEvents()->id()));
-          }
-          $tmp = array_merge($tmp, $testWithData->groups());
-        }
-      }
-      else {
-        if ($test->valueObjectForEvents()->metadata()->isGroup()->isEmpty()) {
-          throw new MissingGroupException(sprintf('Missing group metadata in test %s', $test->valueObjectForEvents()->id()));
-        }
-        $tmp = array_merge($tmp, $test->groups());
-      }
+    foreach ($testClass->tests() as $test) {
+      $tmp = array_merge($tmp, $this->getTestGroups($test));
     }
+
     $groups = array_filter(array_unique($tmp), function (string $value): bool {
-      return !str_starts_with($value, '__phpunit');
+      return $value!== 'default' && !str_starts_with($value, '__phpunit');
     });
+    if (empty($groups)) {
+      throw new MissingGroupException(sprintf('Missing group metadata in test %s', $testClass->name()));
+    }
 
     // Let PHPUnit API return the class coverage information.
     $test = $testClass;
@@ -385,6 +373,32 @@ class PhpUnitTestDiscovery {
       'file' => $reflection->getFileName(),
       'tests_count' => $count,
     ];
+  }
+
+  /**
+   * Returns the test groups.
+   *
+   * @param \PHPUnit\Framework\Test $test
+   *   The test.
+   * @param list<string> $groups
+   *   The test groups collected so far in recursion.
+   *
+   * @return list<string>
+   *   The test groups.
+   */
+  private function getTestGroups(Test $test, array $groups = []): array {
+    // In PHPUnit 11+, we need to coalesce the groups from individual tests
+    // as they may not be available from the test class level (when tests are
+    // backed by data providers).
+    if ($test instanceof TestSuite) {
+      foreach ($test as $testItem) {
+        $groups = $this->getTestGroups($testItem, $groups);
+      }
+    }
+    else {
+      $groups = array_merge($groups, $test->groups());
+    }
+    return $groups;
   }
 
   /**
