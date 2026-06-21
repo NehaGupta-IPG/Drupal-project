@@ -46,7 +46,7 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
   /**
    * Cache key parts for each unique root definition object.
    */
-  protected ?\SplObjectStorage $parts = NULL;
+  protected ?\WeakMap $parts = NULL;
 
   /**
    * The class resolver.
@@ -170,7 +170,7 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
     // We also cache aspects of the cache key building when this occurs for
     // identical objects and root objects.
     if (!isset($this->parts)) {
-      $this->parts = new \SplObjectStorage();
+      $this->parts = new \WeakMap();
     }
     if (isset($this->parts[$object])) {
       $parts = $this->parts[$object];
@@ -196,11 +196,6 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
           $parts[] = json_encode($settings);
         }
         $this->parts[$root_definition] = $parts;
-
-        // Ensure that the static cache of key parts doesn't grow unbounded.
-        if ($this->parts->count() > 3000) {
-          $this->parts->removeAllExcept(new \SplObjectStorage());
-        }
       }
       // Property path for the requested data object.
       $parts[] = $object->getPropertyPath();
