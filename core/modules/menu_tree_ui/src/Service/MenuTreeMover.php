@@ -10,14 +10,21 @@ use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Menu\MenuTreeStorageInterface;
 use Drupal\menu_tree_ui\MenuLinkMovability;
+use Drupal\treegrid_reorder\MoveIntent;
+use Drupal\treegrid_reorder\TreeMoveHandlerInterface;
+use Drupal\treegrid_reorder\TreeReorderManager;
 use Psr\Log\LoggerInterface;
 
 /**
  * Moves a menu link to a new parent + position.
  *
  * Read paths live on MenuTreeLoader; this service owns the single write
- * operation in v1 (drag-and-drop / keyboard reorder). Keeping reads and writes
- * apart makes the responsibilities obvious and the controller DI shape clearer.
+ * operation in v1 (drag-and-drop / keyboard reorder). The universal parts of a
+ * move — the self-target and cycle checks, and the validate-then-apply commit
+ * loop — belong to TreeReorderManager; this class is the menu move handler it
+ * delegates to, supplying the menu-specific rules and the write. Its public
+ * validateMove()/commitWorkingCopy() are thin facades over the manager so the
+ * controller's surface is unchanged.
  *
  * Both menu_link_content links and static (*.links.menu.yml) links that support
  * parent/weight overrides are moveable — see MenuLinkMovability. Writes go
@@ -26,10 +33,19 @@ use Psr\Log\LoggerInterface;
  * does. Links whose plugin can't persist the change are refused up front.
  *
  * Extension without subclassing:
- *   - hook_menu_tree_ui_pre_move_alter() — veto a move before validation.
+ *   - hook_menu_tree_ui_pre_move_alter() — veto a move before the menu checks.
  *   - hook_menu_tree_ui_post_move() — react after a successful move.
  */
-final class MenuTreeMover {
+final class MenuTreeMover implements TreeMoveHandlerInterface {
+
+  /**
+   * The generic reorder orchestrator.
+   *
+   * Stateless and dependency-free, so it is instantiated rather than injected:
+   * making it a container service would force every consumer's container to
+   * resolve a cross-module reference at install time for no benefit.
+   */
+  private readonly TreeReorderManager $reorderManager;
 
   public function __construct(
     private readonly MenuTreeStorageInterface $treeStorage,
@@ -37,7 +53,136 @@ final class MenuTreeMover {
     private readonly MenuTreeLoader $loader,
     private readonly MenuLinkManagerInterface $menuLinkManager,
     private readonly LoggerInterface $logger,
-  ) {}
+  ) {
+    $this->reorderManager = new TreeReorderManager();
+  }
+
+  /**
+   * Validates a move without persisting it.
+   *
+   * Thin facade over TreeReorderManager: the manager runs the universal
+   * structural checks (self-target, cycle) and then calls back into this
+   * handler's menu rules. The editing UI records a move only after this
+   * passes, and Save re-runs it, so a move that became invalid after an earlier
+   * pending change (or a concurrent edit) is caught at commit time.
+   *
+   * @param string $menu_name
+   *   The menu the move is happening within.
+   * @param string $moved_id
+   *   Plugin ID of the link being moved.
+   * @param string $new_parent_id
+   *   Plugin ID of the new parent, or empty string for the menu root.
+   * @param string|null $before_id
+   *   Plugin ID of the sibling the moved link should sit before, or NULL.
+   *
+   * @return array{ok: bool, code?: string, message?: string}
+   *   ['ok' => TRUE] when the move is allowed, otherwise an error outcome.
+   */
+  public function validateMove(
+    string $menu_name,
+    string $moved_id,
+    string $new_parent_id,
+    ?string $before_id,
+  ): array {
+    return $this->reorderManager->validateMove(
+      $menu_name,
+      new MoveIntent($moved_id, $new_parent_id, $before_id),
+      $this,
+    );
+  }
+
+  /**
+   * Commits a menu's pending working-copy moves to live storage.
+   *
+   * Thin facade over TreeReorderManager::commitWorkingCopy(); the manager owns
+   * the validate-all-then-apply-in-order replay and calls back into this
+   * handler to validate and write each move. Menu link writes are not safe to
+   * wrap in a database transaction — the menu storage rebuild closes it — so
+   * this is ordered, best-effort application, matching core's menu overview
+   * form. The caller clears the working copy after a successful commit.
+   *
+   * @param string $menu_name
+   *   The menu whose working copy to commit.
+   * @param array<int, array<string, mixed>> $ops
+   *   The recorded ops, in order.
+   *
+   * @return array{ok: bool, code?: string, message?: string, failed_op?: int}
+   *   ['ok' => TRUE] on success, otherwise the first failing op's outcome.
+   */
+  public function commitWorkingCopy(string $menu_name, array $ops): array {
+    return $this->reorderManager->commitWorkingCopy($menu_name, $ops, $this);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateConstraints(string $tree_id, MoveIntent $intent): array {
+    // Allow modules to veto the move before the menu's own checks.
+    // Implementing hook_menu_tree_ui_pre_move_alter() and setting
+    // $veto['veto'] = TRUE will block the move; set $veto['message'] to
+    // provide a user-facing reason. alter() binds its context arguments by
+    // reference, so they are passed as locals rather than readonly MoveIntent
+    // properties.
+    $menu_name = $tree_id;
+    $moved_id = $intent->id;
+    $new_parent_id = $intent->newParent;
+    $before_id = $intent->beforeId;
+    $veto = [];
+    $this->moduleHandler->alter('menu_tree_ui_pre_move', $veto, $menu_name, $moved_id, $new_parent_id, $before_id);
+    if (!empty($veto['veto'])) {
+      return [
+        'ok' => FALSE,
+        'code' => 'vetoed',
+        'message' => $veto['message'] ?? 'Move blocked by a module.',
+      ];
+    }
+
+    $link = $this->loadLink($intent->id);
+    if ($link === NULL || !MenuLinkMovability::isMovable($link)) {
+      return [
+        'ok' => FALSE,
+        'code' => 'not_moveable',
+        'message' => 'This menu link cannot be reordered.',
+      ];
+    }
+    if ($link->getMenuName() !== $tree_id) {
+      return [
+        'ok' => FALSE,
+        'code' => 'menu_mismatch',
+        'message' => 'Link belongs to a different menu.',
+      ];
+    }
+
+    if (!$this->fitsWithinDepthCap($intent->id, $intent->newParent)) {
+      return [
+        'ok' => FALSE,
+        'code' => 'too_deep',
+        'message' => 'Moving here would exceed the 9-level depth limit.',
+      ];
+    }
+
+    return ['ok' => TRUE];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAncestorIds(string $tree_id, string $parent_id): array {
+    // The materialized path (root → … → parent) gives O(1) lookups against the
+    // menu_tree table rather than walking with N entity loads.
+    return $this->treeStorage->getRootPathIds($parent_id);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function applyMove(string $tree_id, MoveIntent $intent): void {
+    $weight = $this->persistMove($tree_id, $intent->id, $intent->newParent, $intent->beforeId);
+    $this->moduleHandler->invokeAll(
+      'menu_tree_ui_post_move',
+      [$tree_id, $intent->id, $intent->newParent, $weight],
+    );
+  }
 
   /**
    * Writes a validated move to live storage (no transaction, no validation).
@@ -77,167 +222,6 @@ final class MenuTreeMover {
   }
 
   /**
-   * Validates a move without persisting it.
-   *
-   * Runs the pre-move veto hook and every structural check (movability, menu
-   * match, self-target, cycle, depth cap) against the live tree. The editing
-   * UI records a move only after this passes, and Save re-runs the full move()
-   * — which calls this again — so a move that became invalid after an earlier
-   * pending change (or a concurrent edit) is caught at commit time.
-   *
-   * @param string $menu_name
-   *   The menu the move is happening within.
-   * @param string $moved_id
-   *   Plugin ID of the link being moved.
-   * @param string $new_parent_id
-   *   Plugin ID of the new parent, or empty string for the menu root.
-   * @param string|null $before_id
-   *   Plugin ID of the sibling the moved link should sit before, or NULL.
-   *
-   * @return array{ok: bool, code?: string, message?: string}
-   *   ['ok' => TRUE] when the move is allowed, otherwise an error outcome.
-   */
-  public function validateMove(
-    string $menu_name,
-    string $moved_id,
-    string $new_parent_id,
-    ?string $before_id,
-  ): array {
-    // Allow modules to veto the move before any validation runs.
-    // Implementing hook_menu_tree_ui_pre_move_alter() and setting
-    // $veto['veto'] = TRUE will block the move; set $veto['message'] to
-    // provide a user-facing reason.
-    $veto = [];
-    $this->moduleHandler->alter('menu_tree_ui_pre_move', $veto, $menu_name, $moved_id, $new_parent_id, $before_id);
-    if (!empty($veto['veto'])) {
-      return [
-        'ok' => FALSE,
-        'code' => 'vetoed',
-        'message' => $veto['message'] ?? 'Move blocked by a module.',
-      ];
-    }
-
-    $link = $this->loadLink($moved_id);
-    if ($link === NULL || !MenuLinkMovability::isMovable($link)) {
-      return [
-        'ok' => FALSE,
-        'code' => 'not_moveable',
-        'message' => 'This menu link cannot be reordered.',
-      ];
-    }
-    if ($link->getMenuName() !== $menu_name) {
-      return [
-        'ok' => FALSE,
-        'code' => 'menu_mismatch',
-        'message' => 'Link belongs to a different menu.',
-      ];
-    }
-
-    if ($new_parent_id === $moved_id) {
-      return ['ok' => FALSE, 'code' => 'self_target', 'message' => 'Cannot drop a link onto itself.'];
-    }
-
-    if ($new_parent_id !== '' && $this->isDescendant($new_parent_id, $moved_id)) {
-      return ['ok' => FALSE, 'code' => 'cycle', 'message' => 'Cannot drop a link into one of its own descendants.'];
-    }
-
-    if (!$this->fitsWithinDepthCap($moved_id, $new_parent_id)) {
-      return [
-        'ok' => FALSE,
-        'code' => 'too_deep',
-        'message' => 'Moving here would exceed the 9-level depth limit.',
-      ];
-    }
-
-    return ['ok' => TRUE];
-  }
-
-  /**
-   * Commits a menu's pending working-copy moves to live storage.
-   *
-   * Validates every recorded move against live storage first, so a move that is
-   * individually invalid (unknown, immovable, cross-menu, self, cycle, too
-   * deep) aborts the commit before anything is written. It then applies the
-   * moves in order, re-validating each immediately before its write so a move
-   * made invalid by an earlier applied one (e.g. a newly formed cycle) is also
-   * caught. Menu link writes are not safe to wrap in a database transaction —
-   * the menu storage rebuild closes it — so this is ordered, best-effort
-   * application, matching core's menu overview form. Non-move ops are ignored
-   * (column toggles and entity edits commit on their own). The caller clears
-   * the working copy after a successful commit.
-   *
-   * @param string $menu_name
-   *   The menu whose working copy to commit.
-   * @param array<int, array<string, mixed>> $ops
-   *   The recorded ops, in order.
-   *
-   * @return array{ok: bool, code?: string, message?: string, failed_op?: int}
-   *   ['ok' => TRUE] on success, otherwise the first failing op's outcome.
-   */
-  public function commitWorkingCopy(string $menu_name, array $ops): array {
-    $moves = array_values(array_filter(
-      $ops,
-      static fn(array $op): bool => ($op['type'] ?? '') === 'move',
-    ));
-    if ($moves === []) {
-      return ['ok' => TRUE];
-    }
-
-    $normalized = array_map(static function (array $op): array {
-      $before_id = $op['before_id'] ?? NULL;
-      return [
-        'id' => (string) ($op['id'] ?? ''),
-        'new_parent' => (string) ($op['new_parent'] ?? ''),
-        'before_id' => $before_id === NULL ? NULL : (string) $before_id,
-      ];
-    }, $moves);
-
-    // Pre-flight: reject the batch if any op is individually invalid, before
-    // writing anything.
-    foreach ($normalized as $index => $op) {
-      $validation = $this->validateMove($menu_name, $op['id'], $op['new_parent'], $op['before_id']);
-      if (!$validation['ok']) {
-        return $this->commitFailure($validation, $index);
-      }
-    }
-
-    // Apply in order, re-validating against the now-current live state.
-    foreach ($normalized as $index => $op) {
-      $validation = $this->validateMove($menu_name, $op['id'], $op['new_parent'], $op['before_id']);
-      if (!$validation['ok']) {
-        return $this->commitFailure($validation, $index);
-      }
-      $weight = $this->persistMove($menu_name, $op['id'], $op['new_parent'], $op['before_id']);
-      $this->moduleHandler->invokeAll(
-        'menu_tree_ui_post_move',
-        [$menu_name, $op['id'], $op['new_parent'], $weight],
-      );
-    }
-
-    return ['ok' => TRUE];
-  }
-
-  /**
-   * Shapes a failed-op outcome for commitWorkingCopy().
-   *
-   * @param array{code?: string, message?: string} $validation
-   *   The failing validateMove() result.
-   * @param int $index
-   *   The index of the failing move within the batch.
-   *
-   * @return array{ok: false, code: string, message: string, failed_op: int}
-   *   The commit failure outcome.
-   */
-  private function commitFailure(array $validation, int $index): array {
-    return [
-      'ok' => FALSE,
-      'code' => $validation['code'] ?? 'commit_failed',
-      'message' => $validation['message'] ?? 'A pending change could not be saved.',
-      'failed_op' => $index,
-    ];
-  }
-
-  /**
    * Loads the menu link plugin instance by plugin ID, or NULL if unknown.
    */
   private function loadLink(string $plugin_id): ?MenuLinkInterface {
@@ -245,17 +229,6 @@ final class MenuTreeMover {
       return NULL;
     }
     return $this->menuLinkManager->createInstance($plugin_id);
-  }
-
-  /**
-   * Walks ancestors of $candidate_parent_id; TRUE if $moved_id appears there.
-   *
-   * Uses the materialized path (getRootPathIds) — O(1) lookups against the
-   * menu_tree table rather than walking with N entity loads.
-   */
-  private function isDescendant(string $candidate_parent_id, string $moved_id): bool {
-    $path_ids = $this->treeStorage->getRootPathIds($candidate_parent_id);
-    return in_array($moved_id, $path_ids, TRUE);
   }
 
   /**

@@ -30,6 +30,7 @@ final class MenuTreeMoverTest extends KernelTestBase {
     'menu_link_content',
     'menu_tree_ui',
     'treegrid',
+    'treegrid_reorder',
     'menu_tree_ui_test',
     'system',
     'user',
