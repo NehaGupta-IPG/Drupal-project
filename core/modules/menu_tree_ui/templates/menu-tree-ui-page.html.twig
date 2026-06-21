@@ -160,9 +160,8 @@
         <tr>
           <th scope="col" class="menu-tree-ui__col menu-tree-ui__col--name">{{ 'Name'|t }}</th>
           {% for col in columns %}
-            <th scope="col" class="menu-tree-ui__col menu-tree-ui__col--data">{{ col.label }}</th>
+            <th scope="col" class="menu-tree-ui__col {{ col.id == 'operations' ? 'menu-tree-ui__col--operations' : 'menu-tree-ui__col--data' }}">{{ col.label }}</th>
           {% endfor %}
-          <th scope="col" class="menu-tree-ui__col menu-tree-ui__col--operations">{{ 'Operations'|t }}</th>
         </tr>
       </thead>
       <tbody>

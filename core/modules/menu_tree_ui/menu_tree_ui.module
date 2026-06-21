@@ -52,10 +52,9 @@ function menu_tree_ui_theme(): array {
         // Whether the row can be dragged / keyboard-reordered. See
         // \Drupal\menu_tree_ui\MenuLinkMovability.
         'movable' => FALSE,
-        // #type => 'operations' render array for the row's dropbutton.
-        'operations' => [],
-        // Keyed by column plugin ID, each entry is a cell data array
-        // as returned by TreegridColumnInterface::getCellData().
+        // Keyed by column plugin ID, each entry is a cell data array as
+        // returned by TreegridColumnInterface::getCellData(). The operations
+        // dropbutton is one such column (a 'markup' cell), sorted last.
         'columns' => [],
       ],
     ],

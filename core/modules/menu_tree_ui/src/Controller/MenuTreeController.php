@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\menu_tree_ui\Controller;
 
-use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Menu\MenuLinkTreeElement;
-use Drupal\Core\Menu\MenuTreeStorage;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
@@ -87,7 +85,6 @@ final class MenuTreeController extends ControllerBase {
         '#parent_id' => '',
         '#url' => $element->link->getUrlObject()->toString(),
         '#linked' => $this->isLinked($element->link),
-        '#operations' => $this->renderOperations($element, $entity_map),
         '#columns' => $this->buildColumnCells($element, $entity_map[$element->link->getPluginId()] ?? NULL, $columns),
         '#depth' => 1,
         '#pos_in_set' => ++$i,
@@ -426,138 +423,8 @@ final class MenuTreeController extends ControllerBase {
       'linked' => $this->isLinked($link),
       'weight' => $link->getWeight(),
       'movable' => MenuLinkMovability::isMovable($link),
-      'operations_html' => $this->renderOperationsHtml($element, $entity_map),
       'columns' => $this->buildColumnCells($element, $entity_map[$link->getPluginId()] ?? NULL, $columns),
     ];
-  }
-
-  /**
-   * Renders a row's operations as a finished HTML string.
-   *
-   * Children are built client-side by row-builder.js, but the dropbutton's
-   * appearance is owned by the active admin theme's CSS (Claro, default_admin,
-   * Gin, …), each of which expects different markup. Rather than have the JS
-   * reproduce one theme's structure — and break under the others — the server
-   * renders the operations with the active theme, exactly as the Twig-rendered
-   * top level does, and the client injects the result verbatim. The dropbutton
-   * library is already on the page from the top level, and
-   * Drupal.attachBehaviors upgrades the injected markup, so behavior matches
-   * the server-rendered rows.
-   *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement $element
-   *   The tree element whose operations to render.
-   * @param array<string, \Drupal\menu_link_content\MenuLinkContentInterface> $entity_map
-   *   Pre-loaded entities keyed by plugin ID.
-   *
-   * @return string
-   *   The rendered operations markup, or '' when there are no operations.
-   */
-  private function renderOperationsHtml(MenuLinkTreeElement $element, array $entity_map): string {
-    $build = $this->renderOperations($element, $entity_map);
-    if (empty($build['#links'])) {
-      return '';
-    }
-    return (string) $this->renderer->renderInIsolation($build);
-  }
-
-  /**
-   * Builds a #type 'operations' render array for a Twig-rendered row.
-   *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement $element
-   *   The tree element whose operations to render.
-   * @param array<string, \Drupal\menu_link_content\MenuLinkContentInterface> $entity_map
-   *   Pre-loaded entities keyed by plugin ID.
-   *
-   * @return array
-   *   The operations render array.
-   */
-  private function renderOperations(MenuLinkTreeElement $element, array $entity_map): array {
-    return [
-      '#type' => 'operations',
-      '#links' => $this->buildOperationsLinks($element, $entity_map),
-    ];
-  }
-
-  /**
-   * Assembles the operations list for a row.
-   *
-   * Returns a keyed array of ['title', 'url', 'weight'] entries — the same
-   * shape as hook_entity_operation(). Invokes
-   * hook_menu_tree_ui_row_operations_alter() so third-party modules can add,
-   * modify, or remove operations.
-   *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement $element
-   *   The tree element whose operations to build.
-   * @param array<string, \Drupal\menu_link_content\MenuLinkContentInterface> $entity_map
-   *   Pre-loaded entities keyed by plugin ID.
-   *
-   * @return array
-   *   Operations keyed by ID; each has 'title', 'url' and 'weight'.
-   */
-  private function buildOperationsLinks(MenuLinkTreeElement $element, array $entity_map): array {
-    $link = $element->link;
-    $operations = [];
-
-    // A content link whose entity was deleted can linger in the menu tree as an
-    // orphaned plugin definition; resolving its edit route loads the missing
-    // entity and throws. Skip the edit operation for such links rather than
-    // crashing the whole tree — the row still renders from the cached
-    // definition, and Delete is already omitted (the entity is not loaded).
-    try {
-      $edit_route = $link->getEditRoute();
-    }
-    catch (PluginException) {
-      $edit_route = NULL;
-    }
-    if ($edit_route) {
-      $operations['edit'] = [
-        'title' => $this->t('Edit'),
-        'url' => $edit_route,
-        'weight' => 0,
-      ];
-    }
-
-    $entity = $entity_map[$link->getPluginId()] ?? NULL;
-    if ($entity instanceof MenuLinkContentInterface) {
-      $operations['delete'] = [
-        'title' => $this->t('Delete'),
-        'url' => $entity->toUrl('delete-form'),
-        'weight' => 100,
-      ];
-    }
-
-    // "Add child" mirrors menu_ui's MenuForm: a child sits one level deeper, so
-    // offer it only while that stays within the materialized-path depth cap.
-    if ($element->depth < MenuTreeStorage::MAX_DEPTH) {
-      $operations['add-child'] = [
-        'title' => $this->t('Add child'),
-        'url' => Url::fromRoute(
-          'entity.menu.add_link_form',
-          ['menu' => $link->getMenuName()],
-          ['query' => ['parent' => $link->getPluginId()]],
-        ),
-        'weight' => 20,
-      ];
-    }
-
-    $this->moduleHandler()->alter('menu_tree_ui_row_operations', $operations, $element);
-
-    // Every row action returns to this menu-tree page, regardless of how deep
-    // the row is nested. Operation URLs otherwise inherit the *current request*
-    // as their destination: harmless for the server-rendered top level, but a
-    // row from the children endpoint would send the user back to its JSON
-    // response after saving. Setting the destination explicitly keeps all
-    // levels consistent.
-    $destination = Url::fromRoute('menu_tree_ui.edit', ['menu' => $link->getMenuName()])->toString();
-    foreach ($operations as &$operation) {
-      if (($operation['url'] ?? NULL) instanceof Url) {
-        $operation['url']->setOption('query', ['destination' => $destination] + ($operation['url']->getOption('query') ?? []));
-      }
-    }
-    unset($operation);
-
-    uasort($operations, static fn(array $a, array $b): int => ($a['weight'] ?? 0) <=> ($b['weight'] ?? 0));
-    return $operations;
   }
 
   /**
@@ -588,7 +455,7 @@ final class MenuTreeController extends ControllerBase {
    * Batch-loads menu_link_content entities for a set of tree elements.
    *
    * One IN query for all menu_link_content links in the level, keyed by
-   * plugin ID. Avoids per-row queries in buildOperationsLinks().
+   * plugin ID, so column plugins (e.g. operations) never query per row.
    *
    * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $elements
    *   The tree elements to load content entities for.

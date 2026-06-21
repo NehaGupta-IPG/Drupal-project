@@ -16,8 +16,8 @@
  * - pos_in_set: 1-based position among siblings
  * - set_size:   total siblings at this level
  * - movable:    whether the link supports parent/weight changes
- * - operations: #type=>'operations' render array (Edit, Delete, …)
- * - columns:    keyed by column plugin ID, each a cell data array
+ * - columns:    keyed by column plugin ID, each a cell data array (the
+ *               operations dropbutton is the last column, a 'markup' cell)
  */
 #}
 {% set link = element.link %}
@@ -118,9 +118,4 @@
       {% endif %}
     </td>
   {% endfor %}
-
-  {# Operations dropbutton — Edit, Delete, Add child, … #}
-  <td role="gridcell" class="menu-tree-ui-row__cell menu-tree-ui-row__cell--operations">
-    {% if operations %}<div class="menu-tree-ui-row__operations">{{ operations }}</div>{% endif %}
-  </td>
 </tr>

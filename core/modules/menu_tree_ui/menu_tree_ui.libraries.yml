@@ -21,4 +21,5 @@ menu_tree_ui:
     - core/once
     - core/htmx
     - core/drupal.htmx
+    - core/drupal.dropbutton
     - treegrid/treegrid

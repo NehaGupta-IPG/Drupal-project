@@ -11,16 +11,15 @@
  *   ChildItem: {
  *     id: string, parent_id: string, title: string, enabled: boolean,
  *     has_children: boolean, depth: number, url: string, weight: number,
- *     movable: boolean, operations_html: string,
- *     columns: Object<string, {type: 'checkbox', value: boolean, label: string,
- *                              interactive: boolean, link_id: string}>
+ *     movable: boolean,
+ *     columns: Object<string, cell>
  *   }
  *
- * operations_html is the dropbutton, pre-rendered server-side with the active
- * admin theme so it matches the Twig-rendered top level under any theme. We
- * inject it verbatim and let Drupal.attachBehaviors upgrade it — see
- * MenuTreeController::renderOperationsHtml() for why the markup isn't rebuilt
- * here.
+ * Each cell carries a 'type' and is drawn by the treegrid cell renderer
+ * registered for it (see treegrid/js/cells.js). The operations dropbutton is
+ * the last column — a 'markup' cell whose html is pre-rendered server-side with
+ * the active admin theme, injected verbatim, and upgraded by
+ * Drupal.attachBehaviors (see OperationsColumn for why it isn't rebuilt here).
  *
  * Exposes Drupal.menuTreeUi.buildRows and Drupal.menuTreeUi.buildRow.
  */
@@ -187,33 +186,6 @@
   }
 
   /**
-   * Builds the operations cell <td>.
-   *
-   * The dropbutton markup is rendered server-side with the active admin theme
-   * (see MenuTreeController::renderOperationsHtml) and injected verbatim;
-   * Drupal.attachBehaviors upgrades it to a working dropbutton.
-   *
-   * @param {object} item
-   *   The ChildItem.
-   *
-   * @return {HTMLTableCellElement}
-   *   The operations <td>.
-   */
-  function buildOperationsCell(item) {
-    const cell = document.createElement('td');
-    cell.setAttribute('role', 'gridcell');
-    cell.className =
-      'menu-tree-ui-row__cell menu-tree-ui-row__cell--operations';
-    if (item.operations_html) {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'menu-tree-ui-row__operations';
-      wrapper.innerHTML = item.operations_html;
-      cell.appendChild(wrapper);
-    }
-    return cell;
-  }
-
-  /**
    * Builds one <tr role="row"> row from a ChildItem.
    *
    * @param {object} item
@@ -258,7 +230,6 @@
     Object.entries(item.columns).forEach(([colId, cell]) => {
       tr.appendChild(buildColumnCell(colId, cell, item.id));
     });
-    tr.appendChild(buildOperationsCell(item));
 
     return tr;
   }
