@@ -1,0 +1,106 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\Tests\treegrid_reorder\Kernel;
+
+use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\treegrid_reorder\TreegridWorkingCopy;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+
+/**
+ * Tests the generic working copy: ordered op recording, clearing, and locking.
+ */
+#[Group('treegrid_reorder')]
+#[RunTestsInSeparateProcesses]
+final class TreegridWorkingCopyTest extends KernelTestBase {
+
+  use UserCreationTrait;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static $modules = [
+    'treegrid_reorder',
+    'system',
+    'user',
+  ];
+
+  /**
+   * The working copy under test, on a test collection.
+   */
+  private TreegridWorkingCopy $workingCopy;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+    $this->installEntitySchema('user');
+
+    $request = Request::create('/');
+    $request->setSession(new Session(new MockArraySessionStorage()));
+    $request->server->set('REQUEST_TIME', 1234567890);
+    $this->container->get('request_stack')->push($request);
+    $this->setUpCurrentUser(['uid' => 1]);
+
+    $this->workingCopy = new TreegridWorkingCopy(
+      $this->container->get('tempstore.shared'),
+      $this->container->get('current_user'),
+      'treegrid_reorder_test',
+    );
+  }
+
+  /**
+   * Ops are recorded in order, reported as changes, and cleared.
+   */
+  public function testRecordAndClear(): void {
+    $this->assertFalse($this->workingCopy->hasChanges('alpha'));
+
+    $this->workingCopy->addOp('alpha', ['type' => 'move', 'id' => 'one']);
+    $this->workingCopy->addOp('alpha', ['type' => 'move', 'id' => 'two']);
+
+    $this->assertTrue($this->workingCopy->hasChanges('alpha'));
+    $this->assertSame(['one', 'two'], array_column($this->workingCopy->getOps('alpha'), 'id'));
+
+    $this->workingCopy->clear('alpha');
+    $this->assertFalse($this->workingCopy->hasChanges('alpha'));
+    $this->assertSame([], $this->workingCopy->getOps('alpha'));
+  }
+
+  /**
+   * Ids within a collection are independent of one another.
+   */
+  public function testIdsAreIsolated(): void {
+    $this->workingCopy->addOp('alpha', ['type' => 'move', 'id' => 'one']);
+
+    $this->assertTrue($this->workingCopy->hasChanges('alpha'));
+    $this->assertFalse($this->workingCopy->hasChanges('beta'));
+  }
+
+  /**
+   * A second user is locked out of writing while another holds the copy.
+   */
+  public function testLockBlocksOtherUser(): void {
+    $owner = $this->createUser([], 'owner');
+    $other = $this->createUser([], 'other');
+
+    $this->setCurrentUser($owner);
+    $this->assertTrue($this->workingCopy->addOp('alpha', ['type' => 'move', 'id' => 'one']));
+    $this->assertFalse($this->workingCopy->isLocked('alpha'));
+
+    $this->setCurrentUser($other);
+    $this->assertTrue($this->workingCopy->isLocked('alpha'));
+    $this->assertFalse($this->workingCopy->addOp('alpha', ['type' => 'move', 'id' => 'two']));
+    $this->assertSame(
+      (string) $owner->id(),
+      (string) $this->workingCopy->getLockMetadata('alpha')->getOwnerId(),
+    );
+  }
+
+}

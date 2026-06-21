@@ -8,3 +8,4 @@ dependencies:
   - drupal:menu_ui
   - drupal:menu_link_content
   - drupal:treegrid
+  - drupal:treegrid_reorder

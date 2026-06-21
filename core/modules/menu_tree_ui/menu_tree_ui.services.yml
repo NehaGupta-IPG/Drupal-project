@@ -1,10 +1,11 @@
 services:
   menu_tree_ui.working_copy:
-    class: Drupal\menu_tree_ui\Service\MenuTreeWorkingCopy
+    class: Drupal\treegrid_reorder\TreegridWorkingCopy
     arguments:
       - '@tempstore.shared'
       - '@current_user'
-  Drupal\menu_tree_ui\Service\MenuTreeWorkingCopy: '@menu_tree_ui.working_copy'
+      - 'menu_tree_ui.working_copy'
+  Drupal\treegrid_reorder\TreegridWorkingCopy: '@menu_tree_ui.working_copy'
 
   menu_tree_ui.loader:
     class: Drupal\menu_tree_ui\Service\MenuTreeLoader

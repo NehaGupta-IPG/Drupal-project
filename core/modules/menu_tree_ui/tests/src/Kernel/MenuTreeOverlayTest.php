@@ -9,9 +9,9 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\menu_link_content\MenuLinkContentInterface;
 use Drupal\menu_tree_ui\Service\MenuTreeLoader;
-use Drupal\menu_tree_ui\Service\MenuTreeWorkingCopy;
 use Drupal\system\Entity\Menu;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\treegrid_reorder\TreegridWorkingCopy;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,6 +39,7 @@ final class MenuTreeOverlayTest extends KernelTestBase {
     'menu_link_content',
     'menu_tree_ui',
     'treegrid',
+    'treegrid_reorder',
     'system',
     'user',
   ];
@@ -51,7 +52,7 @@ final class MenuTreeOverlayTest extends KernelTestBase {
   /**
    * The working copy used to record pending moves.
    */
-  private MenuTreeWorkingCopy $workingCopy;
+  private TreegridWorkingCopy $workingCopy;
 
   /**
    * Top-level link plugin IDs, in their live order.

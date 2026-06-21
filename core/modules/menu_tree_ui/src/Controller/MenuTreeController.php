@@ -19,7 +19,7 @@ use Drupal\menu_tree_ui\MenuTreeUiConstants;
 use Drupal\treegrid\TreegridColumnManager;
 use Drupal\menu_tree_ui\Service\MenuTreeLoader;
 use Drupal\menu_tree_ui\Service\MenuTreeMover;
-use Drupal\menu_tree_ui\Service\MenuTreeWorkingCopy;
+use Drupal\treegrid_reorder\TreegridWorkingCopy;
 use Drupal\system\MenuInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -43,7 +43,7 @@ final class MenuTreeController extends ControllerBase {
     private readonly MenuTreeMover $mover,
     private readonly RendererInterface $renderer,
     private readonly TreegridColumnManager $columnManager,
-    private readonly MenuTreeWorkingCopy $workingCopy,
+    private readonly TreegridWorkingCopy $workingCopy,
   ) {}
 
   /**

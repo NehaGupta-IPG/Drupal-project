@@ -10,13 +10,14 @@ use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Menu\MenuTreeStorageInterface;
+use Drupal\treegrid_reorder\TreegridWorkingCopy;
 
 /**
  * Loads slices of a menu tree for lazy-loaded admin UI consumption.
  *
  * Read paths come in two forms. loadLevel() returns the live tree.
  * loadLevelForEditing() returns the live tree with the menu's pending
- * working-copy moves overlaid (see MenuTreeWorkingCopy), so the UI reflects
+ * working-copy moves overlaid (see TreegridWorkingCopy), so the UI reflects
  * unsaved reorders without writing them; the overlay is bounded by the number
  * of edits, never the menu size. search() is a thin orchestrator: it collects
  * from all tagged MenuTreeSearchProviderInterface services, deduplicates, and
@@ -35,7 +36,7 @@ final class MenuTreeLoader {
    *   The module handler.
    * @param iterable<\Drupal\menu_tree_ui\SearchProvider\MenuTreeSearchProviderInterface> $searchProviders
    *   Tagged iterator: all services tagged menu_tree_ui.search_provider.
-   * @param \Drupal\menu_tree_ui\Service\MenuTreeWorkingCopy $workingCopy
+   * @param \Drupal\treegrid_reorder\TreegridWorkingCopy $workingCopy
    *   The per-menu working copy of pending moves.
    * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menuLinkManager
    *   The menu link manager, for materializing moved-in elements.
@@ -45,7 +46,7 @@ final class MenuTreeLoader {
     private readonly MenuTreeStorageInterface $treeStorage,
     private readonly ModuleHandlerInterface $moduleHandler,
     private readonly iterable $searchProviders,
-    private readonly MenuTreeWorkingCopy $workingCopy,
+    private readonly TreegridWorkingCopy $workingCopy,
     private readonly MenuLinkManagerInterface $menuLinkManager,
   ) {}
 
