@@ -1,0 +1,12 @@
+treegrid_test_ui:
+  version: VERSION
+  js:
+    js/treegrid-test-ui.js: {}
+  css:
+    component:
+      css/treegrid-test-ui.css: {}
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+    - core/once
+    - treegrid/treegrid
