@@ -12,7 +12,7 @@
  *     id: string, parent_id: string, title: string, enabled: boolean,
  *     has_children: boolean, depth: number, url: string, weight: number,
  *     movable: boolean, operations_html: string,
- *     columns: Object<string, {type: 'toggle', value: boolean, label: string,
+ *     columns: Object<string, {type: 'checkbox', value: boolean, label: string,
  *                              interactive: boolean, link_id: string}>
  *   }
  *
@@ -158,8 +158,9 @@
   /**
    * Builds one column cell <td>.
    *
-   * Only the 'toggle' cell type is supported in v1. Unknown types render an
-   * empty cell so future column types can be added without breaking old JS.
+   * The widget inside is built by the treegrid cell-renderer registered for
+   * cell.type (see treegrid/js/cells.js). An unregistered type renders an empty
+   * cell, so a new column type does not break an older client.
    *
    * @param {string} colId
    *   The column plugin ID.
@@ -177,24 +178,9 @@
     td.className = 'menu-tree-ui-row__cell menu-tree-ui-row__column';
     td.dataset.column = colId;
 
-    if (cell.type === 'toggle') {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.setAttribute('role', 'switch');
-      btn.className = 'menu-tree-ui-row__column-toggle';
-      btn.setAttribute('aria-checked', String(cell.value));
-      btn.setAttribute('aria-label', cell.label);
-      if (!cell.interactive) {
-        btn.disabled = true;
-      }
-      btn.dataset.columnId = colId;
-      btn.dataset.linkId = rowId;
-
-      const sr = document.createElement('span');
-      sr.className = 'visually-hidden';
-      sr.textContent = cell.value ? Drupal.t('On') : Drupal.t('Off');
-      btn.appendChild(sr);
-      td.appendChild(btn);
+    const widget = Drupal.treegrid.renderCell(cell, { colId, rowId });
+    if (widget) {
+      td.appendChild(widget);
     }
 
     return td;

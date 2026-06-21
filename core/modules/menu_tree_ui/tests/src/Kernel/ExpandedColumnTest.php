@@ -74,7 +74,7 @@ final class ExpandedColumnTest extends KernelTestBase {
 
     $cell = $this->column->getCellData($element);
 
-    $this->assertSame('toggle', $cell['type']);
+    $this->assertSame('checkbox', $cell['type']);
     $this->assertFalse($cell['value']);
     $this->assertIsString($cell['label']);
     $this->assertNotEmpty($cell['label']);

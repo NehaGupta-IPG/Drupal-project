@@ -190,7 +190,7 @@ drupal-treegrid {
   vertical-align: middle;
 }
 
-/* The "Expanded"-style column toggles sit centred under their header. */
+/* The "Expanded"-style column controls sit centered under their header. */
 .menu-tree-ui__col--data,
 .menu-tree-ui-row__column {
   text-align: center;
@@ -407,67 +407,6 @@ drupal-treegrid {
 
 .menu-tree-ui-row[data-virtualized="true"] {
   height: 2.5rem;
-}
-
-/* ────────────────────────────────────────────────────── column cells */
-
-/*
- * Toggle switch — role="switch" aria-checked button.
- *
- * Rendered as a pill with a knob. The knob position is driven entirely by
- * aria-checked via attribute selectors so there is no JS class toggle needed.
- */
-.menu-tree-ui-row__column-toggle {
-  position: relative;
-  display: inline-block;
-  width: 2.25rem;
-  height: 1.25rem;
-  padding: 0;
-  cursor: pointer;
-  transition: background 120ms ease;
-  vertical-align: middle;
-  border: 0;
-  border-radius: 0.625rem;
-  background: var(--mtu-color-divider);
-}
-
-.menu-tree-ui-row__column-toggle[aria-checked="true"] {
-  background: var(--mtu-color-focus);
-}
-
-.menu-tree-ui-row__column-toggle:disabled {
-  cursor: default;
-  opacity: 0.45;
-}
-
-/* Knob */
-.menu-tree-ui-row__column-toggle::after {
-  position: absolute;
-  top: 0.1875rem;
-  left: 0.1875rem;
-  width: 0.875rem;
-  height: 0.875rem;
-  content: "";
-  transition: transform 120ms ease;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 1px 3px rgb(0, 0, 0, 0.25);
-}
-
-.menu-tree-ui-row__column-toggle[aria-checked="true"]::after {
-  transform: translateX(1rem);
-}
-
-.menu-tree-ui-row__column-toggle:focus-visible {
-  outline: 2px solid var(--mtu-color-focus);
-  outline-offset: 2px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .menu-tree-ui-row__column-toggle,
-  .menu-tree-ui-row__column-toggle::after {
-    transition: none;
-  }
 }
 
 /* ─────────────────────────────────────────────────────── operations */

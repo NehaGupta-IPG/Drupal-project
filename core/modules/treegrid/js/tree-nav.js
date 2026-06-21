@@ -28,7 +28,7 @@
   // drag handle (mouse/drag) and expand toggle (Left/Right/Enter) are excluded.
   const ROW_CONTROLS = [
     'a.menu-tree-ui-row__title',
-    '.menu-tree-ui-row__column-toggle',
+    '.treegrid-cell-checkbox',
     '.menu-tree-ui-row__operations a',
     '.menu-tree-ui-row__operations button',
   ].join(', ');

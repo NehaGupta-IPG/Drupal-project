@@ -17,11 +17,11 @@ use Drupal\treegrid\Plugin\TreegridColumn\TreegridColumnBase;
  *
  * "Expanded" controls whether a menu item's children are shown pre-expanded
  * in navigation blocks on the front end — it is NOT the admin tree expansion
- * state. This column exposes it as an inline toggle so editors never need to
+ * state. This column exposes it as an inline checkbox so editors never need to
  * open the full edit form just to flip this flag.
  *
  * Static/yml-defined links do not have a writable expanded property; for those
- * the cell is rendered as a read-only indicator.
+ * the checkbox is rendered disabled.
  */
 #[TreegridColumn(
   id: 'expanded',
@@ -44,7 +44,7 @@ final class ExpandedColumn extends TreegridColumnBase {
     $definition = $link->getPluginDefinition();
 
     return [
-      'type' => 'toggle',
+      'type' => 'checkbox',
       'value' => !empty($definition['expanded']),
       'label' => (string) $this->t('Show as expanded'),
       'interactive' => MenuTreeUiConstants::isContentLink($plugin_id),

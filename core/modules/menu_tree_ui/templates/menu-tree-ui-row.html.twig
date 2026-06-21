@@ -103,17 +103,18 @@
   {# Column cells — one gridcell per active column plugin. #}
   {% for col_id, cell in columns %}
     <td role="gridcell" class="menu-tree-ui-row__cell menu-tree-ui-row__column" data-column="{{ col_id }}">
-      {% if cell.type == 'toggle' %}
-        <button
-          type="button"
-          role="switch"
-          class="menu-tree-ui-row__column-toggle"
-          aria-checked="{{ cell.value ? 'true' : 'false' }}"
-          aria-label="{{ cell.label }}"
+      {% if cell.type == 'checkbox' %}
+        <input
+          type="checkbox"
+          class="treegrid-cell-checkbox"
+          {% if cell.value %}checked{% endif %}
           {% if not cell.interactive %}disabled{% endif %}
+          aria-label="{{ cell.label }}"
           data-column-id="{{ col_id }}"
           data-link-id="{{ plugin_id }}"
-        ><span class="visually-hidden">{{ cell.value ? 'On'|t : 'Off'|t }}</span></button>
+        >
+      {% elseif cell.type == 'markup' %}
+        <div class="treegrid-cell-markup">{{ cell.html|raw }}</div>
       {% endif %}
     </td>
   {% endfor %}

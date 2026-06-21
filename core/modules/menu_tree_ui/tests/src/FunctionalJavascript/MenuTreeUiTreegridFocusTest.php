@@ -227,7 +227,7 @@ final class MenuTreeUiTreegridFocusTest extends WebDriverTestBase {
   private function strayTabbableScript(): string {
     return <<<JS
       (() => {
-        const sel = 'a.menu-tree-ui-row__title, .menu-tree-ui-row__column-toggle,'
+        const sel = 'a.menu-tree-ui-row__title, .treegrid-cell-checkbox,'
           + ' .menu-tree-ui-row__operations a, .menu-tree-ui-row__operations button';
         const active = document.querySelector('drupal-treegrid tr[role="row"][tabindex="0"]');
         return Array.from(document.querySelectorAll('drupal-treegrid ' + sel))

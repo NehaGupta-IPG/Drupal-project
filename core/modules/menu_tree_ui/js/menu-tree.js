@@ -24,13 +24,17 @@
   const { rowOf } = Drupal.treegrid.treeNav;
   const { announce } = Drupal.treegrid;
 
-  const COLUMN_TOGGLE = '.menu-tree-ui-row__column-toggle';
+  const COLUMN_TOGGLE = '.treegrid-cell-checkbox';
 
   /**
-   * Optimistically toggles a column switch and persists it.
+   * Persists a column checkbox change, reverting it if the server rejects it.
    *
-   * @param {HTMLButtonElement} btn
-   *   The toggled switch button.
+   * The click is not prevented, so the browser has already flipped the checkbox
+   * by the time this runs; the new value is read from .checked and only rolled
+   * back on failure.
+   *
+   * @param {HTMLInputElement} checkbox
+   *   The toggled checkbox.
    * @param {string} url
    *   The column-update endpoint.
    * @param {function(): (string|undefined)} getToken
@@ -39,25 +43,16 @@
    * @return {Promise<void>}
    *   Resolves once the update round-trips (or is reverted).
    */
-  async function handleColumnToggle(btn, url, getToken) {
+  async function handleColumnToggle(checkbox, url, getToken) {
     if (!url) {
       return;
     }
-    const { columnId } = btn.dataset;
-    const { linkId } = btn.dataset;
+    const { columnId, linkId } = checkbox.dataset;
     if (!columnId || !linkId) {
       return;
     }
 
-    const currentChecked = btn.getAttribute('aria-checked') === 'true';
-    const newValue = !currentChecked;
-
-    // Optimistic update.
-    btn.setAttribute('aria-checked', String(newValue));
-    const sr = btn.querySelector('.visually-hidden');
-    if (sr) {
-      sr.textContent = newValue ? Drupal.t('On') : Drupal.t('Off');
-    }
+    const newValue = checkbox.checked;
 
     try {
       const response = await fetch(url, {
@@ -75,18 +70,11 @@
       });
       const data = await response.json();
       if (!data.ok) {
-        // Revert on server rejection.
-        btn.setAttribute('aria-checked', String(currentChecked));
-        if (sr) {
-          sr.textContent = currentChecked ? Drupal.t('On') : Drupal.t('Off');
-        }
+        checkbox.checked = !newValue;
         announce(data.message ?? Drupal.t('Update failed.'), 'assertive');
       }
     } catch (e) {
-      btn.setAttribute('aria-checked', String(currentChecked));
-      if (sr) {
-        sr.textContent = currentChecked ? Drupal.t('On') : Drupal.t('Off');
-      }
+      checkbox.checked = !newValue;
       announce(Drupal.t('Update failed.'), 'assertive');
     }
   }
@@ -148,7 +136,7 @@
       }
       const columnToggle = event.target.closest(COLUMN_TOGGLE);
       if (columnToggle) {
-        event.preventDefault();
+        // Let the native checkbox flip (no preventDefault), then persist.
         handleColumnToggle(columnToggle, columnUpdateUrl, getToken);
         return true;
       }

@@ -2,6 +2,7 @@ treegrid:
   version: VERSION
   js:
     js/tree-nav.js: {}
+    js/cells.js: {}
     js/keyboard.js: {}
     js/expand.js: {}
     js/windowing.js: {}

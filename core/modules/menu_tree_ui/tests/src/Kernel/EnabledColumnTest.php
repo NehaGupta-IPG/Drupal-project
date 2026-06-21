@@ -66,7 +66,7 @@ final class EnabledColumnTest extends KernelTestBase {
   }
 
   /**
-   * GetCellData() returns a toggle for every link, including leaves.
+   * GetCellData() returns a checkbox for every link, including leaves.
    */
   public function testGetCellDataAppliesToLeaves(): void {
     $entity = $this->createMenuLinkContent(enabled: TRUE);
@@ -74,7 +74,7 @@ final class EnabledColumnTest extends KernelTestBase {
 
     $cell = $this->column->getCellData($element);
 
-    $this->assertSame('toggle', $cell['type']);
+    $this->assertSame('checkbox', $cell['type']);
     $this->assertTrue($cell['value']);
     $this->assertIsString($cell['label']);
     $this->assertNotEmpty($cell['label']);
