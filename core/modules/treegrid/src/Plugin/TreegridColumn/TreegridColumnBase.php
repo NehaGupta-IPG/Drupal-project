@@ -6,7 +6,6 @@ namespace Drupal\treegrid\Plugin\TreegridColumn;
 
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
@@ -32,7 +31,7 @@ abstract class TreegridColumnBase extends PluginBase implements TreegridColumnIn
   /**
    * {@inheritdoc}
    */
-  abstract public function getCellData(MenuLinkTreeElement $element): array;
+  abstract public function getCellData(object $context): array;
 
   /**
    * {@inheritdoc}

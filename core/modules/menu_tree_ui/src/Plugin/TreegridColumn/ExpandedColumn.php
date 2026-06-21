@@ -33,12 +33,13 @@ final class ExpandedColumn extends TreegridColumnBase {
   /**
    * {@inheritdoc}
    */
-  public function getCellData(MenuLinkTreeElement $element): array {
-    if (!$element->hasChildren) {
+  public function getCellData(object $context): array {
+    assert($context instanceof MenuLinkTreeElement);
+    if (!$context->hasChildren) {
       return [];
     }
 
-    $link = $element->link;
+    $link = $context->link;
     $plugin_id = $link->getPluginId();
     $definition = $link->getPluginDefinition();
 

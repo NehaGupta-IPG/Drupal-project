@@ -33,8 +33,9 @@ final class EnabledColumn extends TreegridColumnBase {
   /**
    * {@inheritdoc}
    */
-  public function getCellData(MenuLinkTreeElement $element): array {
-    $link = $element->link;
+  public function getCellData(object $context): array {
+    assert($context instanceof MenuLinkTreeElement);
+    $link = $context->link;
     $plugin_id = $link->getPluginId();
 
     return [

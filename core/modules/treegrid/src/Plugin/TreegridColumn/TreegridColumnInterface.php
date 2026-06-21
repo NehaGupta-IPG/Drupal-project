@@ -6,19 +6,19 @@ namespace Drupal\treegrid\Plugin\TreegridColumn;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Interface for TreegridColumn plugins.
  *
- * A column plugin contributes one column to a treegrid admin UI. The same data
- * shape must be renderable by both the Twig template (server-rendered top
- * level) and row-builder.js (JS-rendered lazy-loaded children). Cells declare a
- * 'type' key so both renderers know how to draw them.
- *
- * Supported cell types in v1:
- *   - 'toggle': a boolean switch, optionally interactive.
+ * A column plugin contributes one column to a treegrid admin UI. The same cell
+ * data shape must be renderable by both the Twig template (server-rendered top
+ * level) and a JS cell renderer (lazy-loaded children). Cells declare a 'type'
+ * key naming the widget; a matching JS renderer is registered with
+ * Drupal.treegrid.registerCellRenderer(type, fn), and the Twig template draws
+ * the same markup. treegrid ships these cell types:
+ *   - 'checkbox': a boolean control, optionally interactive.
+ *   - 'markup': an opaque server-rendered HTML string, injected verbatim.
  *
  * Read-only columns return FALSE from handleUpdate().
  *
@@ -32,32 +32,34 @@ interface TreegridColumnInterface extends PluginInspectionInterface {
   public function getHeader(): TranslatableMarkup;
 
   /**
-   * Returns structured cell data for a given tree element.
+   * Returns structured cell data for a given row.
    *
    * Return an empty array to indicate that this column has no cell for the
-   * given element (e.g. a column that only applies to parent items should
-   * return [] for leaves). Callers filter empty returns and do not render a
-   * cell at all — no wrapper div is emitted.
+   * given row (e.g. a column that only applies to parent items should return
+   * [] for leaves). Callers filter empty returns and do not render a cell at
+   * all — no wrapper is emitted.
    *
-   * When a non-empty array is returned it MUST contain a 'type' key. All
-   * other keys are type-specific. Example for type 'toggle':
+   * When a non-empty array is returned it MUST contain a 'type' key naming the
+   * cell widget. All other keys are type-specific. Example for type 'checkbox':
    * @code
    * [
-   *   'type'        => 'toggle',
+   *   'type'        => 'checkbox',
    *   'value'       => bool,
    *   'label'       => string,   // aria-label for the control
-   *   'interactive' => bool,     // FALSE → render as read-only indicator
+   *   'interactive' => bool,     // FALSE → render disabled
    *   'link_id'     => string,   // plugin ID sent back on update
    * ]
    * @endcode
    *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement $element
-   *   The tree element being rendered.
+   * @param object $context
+   *   The row context. Its concrete type is defined by the consumer module
+   *   that registers the column and calls this method — treegrid passes it
+   *   through opaquely. For menu_tree_ui it is a MenuLinkTreeElement.
    *
    * @return array<string, mixed>
    *   Cell data array with a 'type' key, or [] to skip this cell entirely.
    */
-  public function getCellData(MenuLinkTreeElement $element): array;
+  public function getCellData(object $context): array;
 
   /**
    * Applies a value change to the underlying entity.
