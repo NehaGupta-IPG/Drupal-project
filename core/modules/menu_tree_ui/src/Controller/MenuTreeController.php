@@ -395,7 +395,7 @@ final class MenuTreeController extends ControllerBase {
   }
 
   /**
-   * Serializes a tree element to the JSON shape consumed by <menu-tree>.
+   * Serializes a tree element to the JSON shape consumed by <drupal-treegrid>.
    *
    * @param \Drupal\Core\Menu\MenuLinkTreeElement $element
    *   The tree element to serialize.
@@ -407,7 +407,7 @@ final class MenuTreeController extends ControllerBase {
    *   The parent link plugin ID, or '' for the top level.
    *
    * @return array
-   *   The serialized row, matching the JSON shape consumed by <menu-tree>.
+   *   The serialized row, in the JSON shape consumed by <drupal-treegrid>.
    */
   private function serializeElement(MenuLinkTreeElement $element, array $entity_map, array $columns, string $parent_id): array {
     $link = $element->link;

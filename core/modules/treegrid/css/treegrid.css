@@ -1,0 +1,14 @@
+/**
+ * @file
+ * Baseline styling for the <drupal-treegrid> custom element.
+ */
+
+/*
+ * Custom elements are inline by default; the treegrid must lay out as a block.
+ * It also establishes a positioning context so features can place an
+ * absolutely-positioned overlay (such as the reorder drop indicator) within it.
+ */
+drupal-treegrid {
+  position: relative;
+  display: block;
+}

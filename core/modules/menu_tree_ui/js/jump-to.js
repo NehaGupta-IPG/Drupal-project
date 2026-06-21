@@ -2,7 +2,7 @@
  * @file
  * Jump-to from a search result.
  *
- * Search results live in the htmx-injected sidebar, outside <menu-tree>. The
+ * Search results live in the htmx-injected sidebar, outside <drupal-treegrid>. The
  * listener attaches at document level so it works across swaps.
  *
  * Exposes Drupal.menuTreeUi.attachJumpClickHandler.

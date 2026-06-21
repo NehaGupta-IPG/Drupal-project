@@ -171,12 +171,6 @@
 
 /* ──────────────────────────────────────────────────────────────── tree */
 
-/* <menu-tree> hosts the absolutely-positioned drop indicator. */
-drupal-treegrid {
-  position: relative;
-  display: block;
-}
-
 /*
  * The tree is a real <table>, so the admin theme styles the header, cell
  * padding, borders, and row hover for free — matching the classic menu admin.

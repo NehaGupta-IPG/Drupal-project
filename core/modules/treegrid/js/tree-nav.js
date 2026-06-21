@@ -1,6 +1,6 @@
 /**
  * @file
- * Tree-walking and focus helpers for <menu-tree>.
+ * Tree-walking and focus helpers for <drupal-treegrid>.
  *
  * The tree is a flat <table role="treegrid">: every row is a sibling <tr> in
  * one <tbody>, and hierarchy is read from aria-level (depth) plus data-parent-id

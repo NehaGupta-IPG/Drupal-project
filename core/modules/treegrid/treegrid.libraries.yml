@@ -7,5 +7,8 @@ treegrid:
     js/expand.js: {}
     js/windowing.js: {}
     js/treegrid-element.js: {}
+  css:
+    component:
+      css/treegrid.css: {}
   dependencies:
     - core/drupal

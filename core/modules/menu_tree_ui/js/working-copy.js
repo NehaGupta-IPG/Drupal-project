@@ -7,7 +7,7 @@
  * discard them. This posts to the save/cancel routes and reveals the "unsaved
  * changes" notice after the first recorded change.
  *
- * It is a Drupal.behaviors attach rather than part of the <menu-tree> custom
+ * It is a Drupal.behaviors attach rather than part of the <drupal-treegrid> custom
  * element because the action bar lives in the page template, outside the
  * element. It listens for the menu-tree-ui:changed event the move commit
  * dispatches, keeping the two decoupled.
