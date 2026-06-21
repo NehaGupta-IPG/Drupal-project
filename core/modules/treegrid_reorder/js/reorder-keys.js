@@ -2,18 +2,18 @@
  * @file
  * Shift+Arrow sibling reorder.
  *
- * Same server endpoint as drag (POST /move). Same optimistic-then-revert
- * shape. Kept in its own module because it spans DOM mutation + fetch +
- * announce, which doesn't really belong in keyboard.js.
+ * Same server endpoint as drag (the move POST). Same optimistic-then-revert
+ * shape. Kept in its own file because it spans DOM mutation + fetch + announce,
+ * which doesn't really belong in the navigation keyboard handler.
  *
  * A row carries its descendant run as a block, so reordering moves the whole
  * subtree past the previous/next sibling block as a unit.
  *
- * Exposes Drupal.menuTreeUi.reorderSibling.
+ * Exposes Drupal.treegridReorder.reorderSibling.
  */
 
 ((Drupal) => {
-  Drupal.menuTreeUi = Drupal.menuTreeUi || {};
+  Drupal.treegridReorder = Drupal.treegridReorder || {};
   const { descendantRows, lastDescendantRow, nextSiblingRow } =
     Drupal.treegrid.treeNav;
   const { announce } = Drupal.treegrid;
@@ -41,22 +41,21 @@
   }
 
   /**
-   * Reorders a row among its siblings, persisting via POST /move.
+   * Reorders a row among its siblings, persisting via the move POST.
    *
    * @param {HTMLElement} row
    *   The row to move.
    * @param {('up'|'down')} direction
    *   Which way to move it.
-   * @param {string} moveUrl
-   *   The move endpoint.
-   * @param {string} [csrfToken]
-   *   The X-CSRF-Token value; the move route requires it, so the same token
-   *   the drag-commit path uses is sent here too.
+   * @param {object} options
+   *   { moveUrl, csrfToken, flashClass } — the move endpoint, the X-CSRF-Token
+   *   value (the move route requires it), and the consumer's brief-flash class.
    *
    * @return {Promise<boolean>}
    *   True if the handler took the key (so the caller preventDefaults).
    */
-  async function reorderSibling(row, direction, moveUrl, csrfToken) {
+  async function reorderSibling(row, direction, options) {
+    const { moveUrl, csrfToken, flashClass } = options;
     const movedId = row.dataset.id;
     if (!movedId || row.dataset.movable !== 'true') {
       return false;
@@ -95,9 +94,9 @@
     const beforeId = nextSiblingRow(row)?.dataset.id ?? null;
 
     row.focus();
-    row.classList.add('menu-tree-ui-row--flash');
+    row.classList.add(flashClass);
     window.setTimeout(() => {
-      row.classList.remove('menu-tree-ui-row--flash');
+      row.classList.remove(flashClass);
     }, 600);
 
     const restore = () => {
@@ -131,10 +130,10 @@
     } catch (e) {
       restore();
       // eslint-disable-next-line no-console
-      console.error('[menu-tree] reorder failed', e);
+      console.error('[treegrid-reorder] reorder failed', e);
     }
     return true;
   }
 
-  Drupal.menuTreeUi.reorderSibling = reorderSibling;
+  Drupal.treegridReorder.reorderSibling = reorderSibling;
 })(Drupal);

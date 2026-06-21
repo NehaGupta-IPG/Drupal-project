@@ -4,24 +4,33 @@
  * "as-child" outline highlight, with an aria-live announcement so screen
  * readers track what would happen on release.
  *
- * Exposes Drupal.menuTreeUi.drag.DropIndicator.
+ * The consumer supplies its own CSS class names and the row-title selector, so
+ * this carries no domain-specific markup knowledge.
+ *
+ * Exposes Drupal.treegridReorder.DropIndicator.
  */
 
 ((Drupal) => {
-  Drupal.menuTreeUi = Drupal.menuTreeUi || {};
-  Drupal.menuTreeUi.drag = Drupal.menuTreeUi.drag || {};
-  const { rowHeaderRect } = Drupal.menuTreeUi.drag;
+  Drupal.treegridReorder = Drupal.treegridReorder || {};
+  const { rowHeaderRect } = Drupal.treegridReorder;
 
   class DropIndicator {
     /**
      * @param {HTMLElement} host
-     *   The <menu-tree> host the indicator positions itself within.
+     *   The element the indicator positions itself within.
+     * @param {object} options
+     *   { lineClass, dropAsChildClass, titleSelector } — the consumer's CSS
+     *   class for the drop line, the class toggled on an as-child target, and
+     *   the selector for a row's title text used in announcements.
      */
-    constructor(host) {
+    constructor(host, options) {
       this.host = host;
+      this.lineClass = options.lineClass;
+      this.dropAsChildClass = options.dropAsChildClass;
+      this.titleSelector = options.titleSelector;
       this.highlighted = null;
       this.line = document.createElement('div');
-      this.line.className = 'menu-tree-ui-drop-indicator';
+      this.line.className = this.lineClass;
       this.line.setAttribute('aria-hidden', 'true');
       this.liveRegion = document.createElement('div');
       this.liveRegion.className = 'visually-hidden';
@@ -50,7 +59,7 @@
         this.hideLine();
         if (this.highlighted !== intent.target) {
           this.clearChildHighlight();
-          intent.target.classList.add('menu-tree-ui-row--drop-as-child');
+          intent.target.classList.add(this.dropAsChildClass);
           this.highlighted = intent.target;
         }
         return;
@@ -81,9 +90,8 @@
      */
     announce(intent) {
       const title =
-        intent.target
-          .querySelector('.menu-tree-ui-row__title')
-          ?.textContent?.trim() ?? '';
+        intent.target.querySelector(this.titleSelector)?.textContent?.trim() ??
+        '';
       let message;
       if (intent.kind === 'child') {
         message = Drupal.t('Drop as child of @title', { '@title': title });
@@ -110,11 +118,11 @@
      */
     clearChildHighlight() {
       if (this.highlighted) {
-        this.highlighted.classList.remove('menu-tree-ui-row--drop-as-child');
+        this.highlighted.classList.remove(this.dropAsChildClass);
         this.highlighted = null;
       }
     }
   }
 
-  Drupal.menuTreeUi.drag.DropIndicator = DropIndicator;
+  Drupal.treegridReorder.DropIndicator = DropIndicator;
 })(Drupal);

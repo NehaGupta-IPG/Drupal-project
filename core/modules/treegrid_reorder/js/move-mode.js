@@ -1,6 +1,6 @@
 /**
  * @file
- * Keyboard grab/select move mode for the menu tree.
+ * Keyboard grab/select move mode for a treegrid.
  *
  * The keyboard counterpart to pointer drag. Space (or a click on the drag
  * handle) picks up the focused row; the arrow keys move it; Enter drops;
@@ -31,18 +31,20 @@
  * search: focus moving to the search field does not cancel it, and jumping to a
  * result re-aims the cursor at that row.
  *
- * Exposes Drupal.menuTreeUi.MoveModeController.
+ * The consumer supplies its CSS class/selector names via the options object.
+ *
+ * Exposes Drupal.treegridReorder.MoveModeController.
  */
 
 ((Drupal) => {
-  Drupal.menuTreeUi = Drupal.menuTreeUi || {};
+  Drupal.treegridReorder = Drupal.treegridReorder || {};
   const {
     commitMove,
     sameIntent,
     resolveNewParentId,
     resolveBeforeId,
     computeIntent,
-  } = Drupal.menuTreeUi.drag;
+  } = Drupal.treegridReorder;
   const {
     descendantRows,
     lastDescendantRow,
@@ -53,8 +55,6 @@
     setRowLevel,
   } = Drupal.treegrid.treeNav;
   const { announce } = Drupal.treegrid;
-
-  const CLASS_GRABBED = 'menu-tree-ui-row--grabbed';
 
   /**
    * Clamps a number to an inclusive range.
@@ -78,14 +78,14 @@
    *
    * @param {HTMLElement} row
    *   The row.
+   * @param {string} titleSelector
+   *   The consumer's selector for a row's title.
    *
    * @return {string}
    *   The trimmed title, or ''.
    */
-  function titleOf(row) {
-    return (
-      row.querySelector('.menu-tree-ui-row__title')?.textContent?.trim() ?? ''
-    );
+  function titleOf(row, titleSelector) {
+    return row.querySelector(titleSelector)?.textContent?.trim() ?? '';
   }
 
   /**
@@ -98,12 +98,14 @@
    *   The title of the picked-up item.
    * @param {object} intent
    *   The DropIntent.
+   * @param {string} titleSelector
+   *   The consumer's selector for a row's title.
    *
    * @return {string}
    *   The translated placement sentence.
    */
-  function placementMessage(item, intent) {
-    const target = titleOf(intent.target);
+  function placementMessage(item, intent, titleSelector) {
+    const target = titleOf(intent.target, titleSelector);
     if (intent.kind === 'child') {
       return Drupal.t('Picked up @item. It will drop as a child of @target.', {
         '@item': item,
@@ -123,7 +125,7 @@
   }
 
   /**
-   * Reads the plugin id of a row's following sibling row, or null.
+   * Reads the id of a row's following sibling row, or null.
    *
    * @param {HTMLElement} row
    *   The row.
@@ -141,20 +143,28 @@
      *   The root treegrid element.
      * @param {string} moveUrl
      *   The move endpoint.
-     * @param {Drupal.menuTreeUi.ExpandManager} expand
-     *   The expand manager, for open/close and passed through to commitMove.
-     * @param {Drupal.menuTreeUi.drag.DropIndicator} indicator
+     * @param {object} expand
+     *   The treegrid ExpandManager, for open/close and passed to commitMove.
+     * @param {Drupal.treegridReorder.DropIndicator} indicator
      *   The shared drop indicator (its live region is reused for speech).
      * @param {function():(string|undefined)} getCsrfToken
      *   Returns the current X-CSRF-Token. Read late because the token may
      *   arrive after construction; keyboard users should not have to wait.
+     * @param {object} options
+     *   { grabbedClass, titleSelector, rowControlsSelector,
+     *   applyParentMetadata, onCommitted } — the consumer's CSS names and the
+     *   commit callbacks.
      */
-    constructor(tree, moveUrl, expand, indicator, getCsrfToken) {
+    constructor(tree, moveUrl, expand, indicator, getCsrfToken, options) {
       this.tree = tree;
       this.moveUrl = moveUrl;
       this.expand = expand;
       this.indicator = indicator;
       this.getCsrfToken = getCsrfToken;
+      this.options = options;
+      this.grabbedClass = options.grabbedClass;
+      this.titleSelector = options.titleSelector;
+      this.rowControlsSelector = options.rowControlsSelector;
 
       this.active = false;
       this.grabbed = null;
@@ -222,7 +232,7 @@
       }
 
       this.active = true;
-      row.classList.add(CLASS_GRABBED);
+      row.classList.add(this.grabbedClass);
       // The grabbed row is the selection (aria-selected) and the single tab stop
       // while it is held; the cursor (focus) follows it through the carry.
       const prevStop = this.tree.querySelector('tr[role="row"][tabindex="0"]');
@@ -237,7 +247,7 @@
         'Use the Up and Down arrows to move it, Left and Right to change its indent, Enter to drop, or Escape to cancel.',
       );
       announce(
-        `${placementMessage(titleOf(row), this.intent)} ${instructions}`,
+        `${placementMessage(titleOf(row, this.titleSelector), this.intent, this.titleSelector)} ${instructions}`,
         'assertive',
       );
       return true;
@@ -312,11 +322,7 @@
       }
       // Leave row controls (toggle, column switch, operations) clickable so the
       // editor can still expand a parent to aim inside it.
-      if (
-        event.target.closest(
-          '.menu-tree-ui-row__toggle, .menu-tree-ui-row__column, .menu-tree-ui-row__operations',
-        )
-      ) {
+      if (event.target.closest(this.rowControlsSelector)) {
         return false;
       }
       const row = event.target.closest('tr[role="row"]');
@@ -543,7 +549,11 @@
       if (!this.active || !this.grabbed || this.cursorSeq !== seq) {
         return;
       }
-      announce(Drupal.t('Opened @title.', { '@title': titleOf(prev) }));
+      announce(
+        Drupal.t('Opened @title.', {
+          '@title': titleOf(prev, this.titleSelector),
+        }),
+      );
       const list = this.visibleList();
       const gap = list.indexOf(prev) + 1;
       const { min, max } = this.gapBounds(gap, list);
@@ -749,6 +759,7 @@
         this.moveUrl,
         this.expand,
         this.getCsrfToken(),
+        this.options,
       );
     }
 
@@ -770,7 +781,7 @@
      * Callers that end a carried move (commit, cancel) restore the row first.
      */
     end() {
-      this.grabbed?.classList.remove(CLASS_GRABBED);
+      this.grabbed?.classList.remove(this.grabbedClass);
       // The dropped (or restored) row stays the cursor and the single tab stop,
       // so leave its tabindex at 0; just clear the picked-up selection marker.
       // After a commit, commit.js re-focuses the rebuilt row via focusRow.
@@ -787,5 +798,5 @@
     }
   }
 
-  Drupal.menuTreeUi.MoveModeController = MoveModeController;
+  Drupal.treegridReorder.MoveModeController = MoveModeController;
 })(Drupal);

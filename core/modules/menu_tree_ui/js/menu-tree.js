@@ -21,10 +21,88 @@
 ((Drupal, drupalSettings, once) => {
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
   const ns = Drupal.menuTreeUi;
-  const { rowOf } = Drupal.treegrid.treeNav;
+  const rr = Drupal.treegridReorder;
+  const { rowOf, childRows, descendantRows } = Drupal.treegrid.treeNav;
   const { announce } = Drupal.treegrid;
 
+  const ROW = 'tr[role="row"]';
   const COLUMN_TOGGLE = '.treegrid-cell-checkbox';
+
+  /**
+   * Syncs a parent row's "parent or leaf" attributes to its current children.
+   *
+   * The treegrid_reorder commit pipeline calls this (as a configured callback)
+   * after a move refresh: /children?parent=X returns X's children, not X's own
+   * metadata, so this is the one piece of state derived client-side. It is
+   * menu-specific — it rebuilds the disclosure toggle and reads menu row markup
+   * — so it stays here rather than in the generic module. Skipped when parentId
+   * is '' (root has no enclosing row) or the row isn't in the DOM.
+   *
+   * @param {string} parentId
+   *   The parent plugin ID.
+   */
+  function applyParentMetadata(parentId) {
+    if (parentId === '') {
+      return;
+    }
+    const row = document.querySelector(
+      `${ROW}[data-id="${CSS.escape(parentId)}"]`,
+    );
+    if (!row) {
+      return;
+    }
+    const hasChildrenNow = childRows(row).length > 0;
+    row.dataset.hasChildren = hasChildrenNow ? 'true' : 'false';
+
+    const name = row.querySelector('.menu-tree-ui-row__name');
+    if (!name) {
+      return;
+    }
+    const existing = name.querySelector(':scope > .menu-tree-ui-row__toggle');
+
+    if (hasChildrenNow) {
+      row.setAttribute('aria-expanded', 'true');
+      if (!existing || existing.tagName.toLowerCase() !== 'button') {
+        const title =
+          name.querySelector('.menu-tree-ui-row__title')?.textContent?.trim() ??
+          '';
+        const button = ns.buildToggle({ has_children: true, title });
+        if (existing) {
+          existing.replaceWith(button);
+        } else {
+          name.prepend(button);
+        }
+      }
+    } else {
+      row.removeAttribute('aria-expanded');
+      if (existing && existing.tagName.toLowerCase() === 'button') {
+        existing.replaceWith(ns.buildToggle({ has_children: false }));
+      }
+      // On becoming a leaf, remove any stale descendant rows left behind.
+      descendantRows(row).forEach((r) => r.remove());
+      delete row.dataset.loaded;
+    }
+  }
+
+  // The menu's CSS class/selector names and commit callbacks, handed to the
+  // generic treegrid_reorder controllers so they carry no menu markup knowledge.
+  const REORDER_CONFIG = {
+    handleSelector: '.menu-tree-ui-row__handle',
+    lockedClass: 'menu-tree-ui-row__handle--locked',
+    draggingClass: 'menu-tree-ui-row--dragging',
+    grabbedClass: 'menu-tree-ui-row--grabbed',
+    lineClass: 'menu-tree-ui-drop-indicator',
+    dropAsChildClass: 'menu-tree-ui-row--drop-as-child',
+    titleSelector: '.menu-tree-ui-row__title',
+    rowControlsSelector:
+      '.menu-tree-ui-row__toggle, .menu-tree-ui-row__column, .menu-tree-ui-row__operations',
+    flashClass: 'menu-tree-ui-row--flash',
+    applyParentMetadata,
+    // Tell the working-copy action bar a change was recorded so it can reveal
+    // the unsaved notice (the bar lives outside the <drupal-treegrid> element).
+    onCommitted: () =>
+      document.dispatchEvent(new CustomEvent('menu-tree-ui:changed')),
+  };
 
   /**
    * Persists a column checkbox change, reverting it if the server rejects it.
@@ -100,9 +178,16 @@
 
     // One drop indicator, shared by pointer drag and keyboard move mode so the
     // two never render into separate live regions. The host owns its position.
-    const indicator = new ns.drag.DropIndicator(element);
+    const indicator = new rr.DropIndicator(element, REORDER_CONFIG);
     const moveMode = moveUrl
-      ? new ns.MoveModeController(tree, moveUrl, expand, indicator, getToken)
+      ? new rr.MoveModeController(
+          tree,
+          moveUrl,
+          expand,
+          indicator,
+          getToken,
+          REORDER_CONFIG,
+        )
       : null;
 
     /**
@@ -167,12 +252,11 @@
       ) {
         const row = rowOf(event.target);
         if (row && moveUrl) {
-          ns.reorderSibling(
-            row,
-            event.key === 'ArrowUp' ? 'up' : 'down',
+          rr.reorderSibling(row, event.key === 'ArrowUp' ? 'up' : 'down', {
             moveUrl,
             csrfToken,
-          );
+            flashClass: REORDER_CONFIG.flashClass,
+          });
           event.preventDefault();
           return true;
         }
@@ -233,7 +317,7 @@
           );
           return;
         }
-        drag = new ns.drag.DragController(
+        drag = new rr.DragController(
           tree,
           moveUrl,
           expand,
@@ -241,6 +325,7 @@
           indicator,
           () => moveMode?.cancel(),
           (row) => onHandleTap(row),
+          REORDER_CONFIG,
         );
         drag.attach();
       });

@@ -2,29 +2,30 @@
  * @file
  * Translates a DropIntent into a server move + visible-state refresh.
  *
- * Server is the only source of truth. We POST to /move with no DOM mutation up
- * front; on success we re-fetch the affected levels (from-parent and to-parent)
- * and rebuild their rows in place. The whole class of "client moved the DOM but
- * forgot to update attribute X" bugs goes away — any attribute the row needs
- * is set by row-builder from the server's JSON.
+ * Server is the only source of truth. We POST to the move endpoint with no DOM
+ * mutation up front; on success we re-fetch the affected levels (from-parent and
+ * to-parent) and rebuild their rows in place. The whole class of "client moved
+ * the DOM but forgot to update attribute X" bugs goes away — any attribute the
+ * row needs is set by the renderer from the server's JSON.
  *
  * Trade-off: a moved row's previously-expanded descendants collapse after the
  * refresh. Acceptable for v1 — replay-expansion can be added later.
  *
  * The move response shape is {ok: boolean, weight?, code?, message?}.
  *
- * Exposes Drupal.menuTreeUi.drag.commitMove.
+ * Per-row metadata that the children endpoint cannot express (e.g. whether a
+ * parent now has children) is the consumer's concern: it is supplied as the
+ * options.applyParentMetadata callback, and options.onCommitted fires after a
+ * successful move so the consumer can react (reveal an unsaved notice, etc.).
+ *
+ * Exposes Drupal.treegridReorder.commitMove.
  */
 
 ((Drupal) => {
-  Drupal.menuTreeUi = Drupal.menuTreeUi || {};
-  Drupal.menuTreeUi.drag = Drupal.menuTreeUi.drag || {};
-  const { childRows, descendantRows, findRow, focusRow, nextSiblingRow } =
+  Drupal.treegridReorder = Drupal.treegridReorder || {};
+  const { childRows, findRow, focusRow, nextSiblingRow } =
     Drupal.treegrid.treeNav;
-  const { buildToggle } = Drupal.menuTreeUi;
   const { announce } = Drupal.treegrid;
-
-  const ROW = 'tr[role="row"]';
 
   /**
    * Resolves the parent id the moved row should end up under.
@@ -33,7 +34,7 @@
    *   The DropIntent.
    *
    * @return {string}
-   *   The destination parent plugin ID, or ''.
+   *   The destination parent id, or ''.
    */
   function resolveNewParentId(intent) {
     if (intent.kind === 'child') {
@@ -43,7 +44,7 @@
   }
 
   /**
-   * Resolves the before_id payload for /move.
+   * Resolves the before_id payload for the move.
    *
    * 'before' → the target; 'after' → the target's next sibling row (or null
    * for end-of-list); 'child' → the target's first existing child, so the
@@ -69,60 +70,6 @@
   }
 
   /**
-   * Syncs a parent row's "parent or leaf" attributes to whatever its direct
-   * child rows now actually are.
-   *
-   * /children?parent=X returns X's children, not X's metadata, so this is the
-   * one piece of state derived client-side after a refresh. Skipped when
-   * parentId is '' (root has no enclosing row) or the row isn't in the DOM.
-   *
-   * @param {string} parentId
-   *   The parent plugin ID.
-   */
-  function applyParentMetadata(parentId) {
-    if (parentId === '') {
-      return;
-    }
-    const row = document.querySelector(
-      `${ROW}[data-id="${CSS.escape(parentId)}"]`,
-    );
-    if (!row) {
-      return;
-    }
-    const hasChildrenNow = childRows(row).length > 0;
-    row.dataset.hasChildren = hasChildrenNow ? 'true' : 'false';
-
-    const name = row.querySelector('.menu-tree-ui-row__name');
-    if (!name) {
-      return;
-    }
-    const existing = name.querySelector(':scope > .menu-tree-ui-row__toggle');
-
-    if (hasChildrenNow) {
-      row.setAttribute('aria-expanded', 'true');
-      if (!existing || existing.tagName.toLowerCase() !== 'button') {
-        const title =
-          name.querySelector('.menu-tree-ui-row__title')?.textContent?.trim() ??
-          '';
-        const button = buildToggle({ has_children: true, title });
-        if (existing) {
-          existing.replaceWith(button);
-        } else {
-          name.prepend(button);
-        }
-      }
-    } else {
-      row.removeAttribute('aria-expanded');
-      if (existing && existing.tagName.toLowerCase() === 'button') {
-        existing.replaceWith(buildToggle({ has_children: false }));
-      }
-      // On becoming a leaf, remove any stale descendant rows left behind.
-      descendantRows(row).forEach((r) => r.remove());
-      delete row.dataset.loaded;
-    }
-  }
-
-  /**
    * The inner commit pipeline (wrapped by commitMove for the in-flight flag).
    *
    * @param {HTMLTableRowElement} row
@@ -131,14 +78,17 @@
    *   The DropIntent.
    * @param {string} moveUrl
    *   The move endpoint.
-   * @param {Drupal.menuTreeUi.ExpandManager} expand
-   *   The expand manager, for destination auto-expand + group refreshes.
+   * @param {object} expand
+   *   The treegrid ExpandManager, for destination auto-expand + group
+   *   refreshes.
    * @param {?HTMLTableElement} tree
    *   The root treegrid element.
    * @param {string} movedId
-   *   The moved row's plugin ID.
-   * @param {string} [csrfToken]
-   *   The X-CSRF-Token value.
+   *   The moved row's id.
+   * @param {string} csrfToken
+   *   The X-CSRF-Token value, or ''.
+   * @param {object} options
+   *   { applyParentMetadata, onCommitted } consumer callbacks.
    *
    * @return {Promise<void>}
    *   Resolves once the move is committed and refreshed (or bailed).
@@ -151,6 +101,7 @@
     tree,
     movedId,
     csrfToken,
+    options,
   ) {
     const oldParentId = row.dataset.parentId ?? '';
     const newParentId = resolveNewParentId(intent);
@@ -199,7 +150,7 @@
       }
     } catch (e) {
       // eslint-disable-next-line no-console
-      console.error('[menu-tree] move fetch failed', e);
+      console.error('[treegrid-reorder] move fetch failed', e);
       announce(Drupal.t('Network error — move cancelled.'), 'assertive');
       return;
     }
@@ -212,8 +163,8 @@
       await expand.refresh(newParentId);
     }
 
-    applyParentMetadata(oldParentId);
-    applyParentMetadata(newParentId);
+    options.applyParentMetadata?.(oldParentId);
+    options.applyParentMetadata?.(newParentId);
 
     // row and intent.target are detached after refresh — re-find by id.
     if (tree) {
@@ -223,10 +174,8 @@
       }
     }
 
-    announce(Drupal.t('Menu link moved.'), 'polite');
-    // Tell the working-copy action bar a change was recorded so it can reveal
-    // the unsaved notice (the bar lives outside the <menu-tree> element).
-    document.dispatchEvent(new CustomEvent('menu-tree-ui:changed'));
+    announce(Drupal.t('Item moved.'), 'polite');
+    options.onCommitted?.();
   }
 
   /**
@@ -241,15 +190,17 @@
    *   The DropIntent.
    * @param {string} moveUrl
    *   The move endpoint.
-   * @param {Drupal.menuTreeUi.ExpandManager} expand
-   *   The expand manager.
-   * @param {string} [csrfToken]
-   *   The X-CSRF-Token value.
+   * @param {object} expand
+   *   The treegrid ExpandManager.
+   * @param {string} csrfToken
+   *   The X-CSRF-Token value, or ''.
+   * @param {object} options
+   *   { applyParentMetadata, onCommitted } consumer callbacks.
    *
    * @return {Promise<void>}
    *   Resolves once the commit completes.
    */
-  async function commitMove(row, intent, moveUrl, expand, csrfToken) {
+  async function commitMove(row, intent, moveUrl, expand, csrfToken, options) {
     const movedId = row.dataset.id;
     if (!movedId) {
       return;
@@ -259,15 +210,24 @@
     const host = tree?.closest('drupal-treegrid') ?? null;
     host?.setAttribute('data-mtu-moving', 'true');
     try {
-      await runCommit(row, intent, moveUrl, expand, tree, movedId, csrfToken);
+      await runCommit(
+        row,
+        intent,
+        moveUrl,
+        expand,
+        tree,
+        movedId,
+        csrfToken,
+        options,
+      );
     } finally {
       host?.removeAttribute('data-mtu-moving');
     }
   }
 
-  Drupal.menuTreeUi.drag.commitMove = commitMove;
+  Drupal.treegridReorder.commitMove = commitMove;
   // Exported so keyboard move mode can resolve an intent to {new_parent,
   // before_id} for its no-op-drop guard, without duplicating the logic.
-  Drupal.menuTreeUi.drag.resolveNewParentId = resolveNewParentId;
-  Drupal.menuTreeUi.drag.resolveBeforeId = resolveBeforeId;
+  Drupal.treegridReorder.resolveNewParentId = resolveNewParentId;
+  Drupal.treegridReorder.resolveBeforeId = resolveBeforeId;
 })(Drupal);

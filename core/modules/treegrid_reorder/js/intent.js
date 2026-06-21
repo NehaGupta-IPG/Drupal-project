@@ -7,10 +7,9 @@
  *   middle  → child
  *   bottom 30% → after
  *
- * The row IS its own header now: a <tr> holds only its own cells, never its
- * subtree (children are sibling rows), so the row's bounding rect is the header
- * box and the middle "child" zone stays usable on parents with many expanded
- * children.
+ * The row IS its own header: a <tr> holds only its own cells, never its subtree
+ * (children are sibling rows), so the row's bounding rect is the header box and
+ * the middle "child" zone stays usable on parents with many expanded children.
  *
  * Drop-as-child on a collapsed parent stays as 'child' — commitMove is
  * responsible for expanding the destination before applying the move, so the
@@ -18,12 +17,11 @@
  *
  * A DropIntent is {kind: ('before'|'after'|'child'), target: HTMLElement}.
  *
- * Exposes Drupal.menuTreeUi.drag.{computeIntent, rowHeaderRect, sameIntent}.
+ * Exposes Drupal.treegridReorder.{computeIntent, rowHeaderRect, sameIntent}.
  */
 
 ((Drupal) => {
-  Drupal.menuTreeUi = Drupal.menuTreeUi || {};
-  Drupal.menuTreeUi.drag = Drupal.menuTreeUi.drag || {};
+  Drupal.treegridReorder = Drupal.treegridReorder || {};
 
   const CHILD_ZONE_FROM = 0.3;
   const CHILD_ZONE_TO = 0.7;
@@ -84,7 +82,7 @@
     return a.kind === b.kind && a.target === b.target;
   }
 
-  Drupal.menuTreeUi.drag.rowHeaderRect = rowHeaderRect;
-  Drupal.menuTreeUi.drag.computeIntent = computeIntent;
-  Drupal.menuTreeUi.drag.sameIntent = sameIntent;
+  Drupal.treegridReorder.rowHeaderRect = rowHeaderRect;
+  Drupal.treegridReorder.computeIntent = computeIntent;
+  Drupal.treegridReorder.sameIntent = sameIntent;
 })(Drupal);

@@ -4,12 +4,6 @@ menu_tree_ui:
     js/row-builder.js: {}
     js/jump-to.js: {}
     js/search.js: {}
-    js/reorder-keys.js: {}
-    js/drag/intent.js: {}
-    js/drag/indicator.js: {}
-    js/drag/commit.js: {}
-    js/drag/controller.js: {}
-    js/move-mode.js: {}
     js/menu-tree.js: {}
     js/working-copy.js: {}
   css:
@@ -23,3 +17,4 @@ menu_tree_ui:
     - core/drupal.htmx
     - core/drupal.dropbutton
     - treegrid/treegrid
+    - treegrid_reorder/treegrid_reorder

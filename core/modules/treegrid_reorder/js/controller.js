@@ -1,6 +1,6 @@
 /**
  * @file
- * Pointer-event drag controller for the menu tree.
+ * Pointer-event drag controller for a treegrid.
  *
  * Owns the state machine (idle / armed / dragging) and dispatches to:
  *  - intent.js for zone math
@@ -10,18 +10,19 @@
  * Drag threshold of 5 px so a tap on the handle doesn't start a drag — this
  * matters more on touch (every tap has some pointer drift) than mouse.
  *
- * Exposes Drupal.menuTreeUi.drag.DragController.
+ * The consumer supplies its CSS class/selector names (handle, locked, dragging)
+ * and the commit callbacks via the options object.
+ *
+ * Exposes Drupal.treegridReorder.DragController.
  */
 
 ((Drupal) => {
-  Drupal.menuTreeUi = Drupal.menuTreeUi || {};
-  Drupal.menuTreeUi.drag = Drupal.menuTreeUi.drag || {};
-  const { commitMove, computeIntent, sameIntent } = Drupal.menuTreeUi.drag;
+  Drupal.treegridReorder = Drupal.treegridReorder || {};
+  const { commitMove, computeIntent, sameIntent } = Drupal.treegridReorder;
 
   const DRAG_THRESHOLD_PX = 5;
   const HOVER_EXPAND_MS = 1000;
   const ROW = 'tr[role="row"]';
-  const HANDLE = '.menu-tree-ui-row__handle';
 
   class DragController {
     /**
@@ -29,19 +30,22 @@
      *   The root treegrid element.
      * @param {string} moveUrl
      *   The move endpoint.
-     * @param {Drupal.menuTreeUi.ExpandManager} expand
-     *   The expand manager, for hover-to-expand and commit refreshes.
-     * @param {string} [csrfToken]
-     *   The X-CSRF-Token value passed to commit.
-     * @param {Drupal.menuTreeUi.drag.DropIndicator} indicator
+     * @param {object} expand
+     *   The treegrid ExpandManager, for hover-to-expand and commit refreshes.
+     * @param {string} csrfToken
+     *   The X-CSRF-Token value passed to commit, or ''.
+     * @param {Drupal.treegridReorder.DropIndicator} indicator
      *   The shared drop indicator (owned by the host, also used by move mode).
-     * @param {function()} [onGestureStart]
+     * @param {function()} onGestureStart
      *   Called when a drag arms, so the host can cancel any active keyboard
      *   move mode before the pointer gesture takes over the shared indicator.
-     * @param {function(HTMLElement)} [onTap]
+     * @param {function(HTMLElement)} onTap
      *   Called when a handle is clicked without dragging, so a mouse user can
      *   pick a row up into keyboard move mode (click to pick up, click a
      *   destination, confirm with the keyboard).
+     * @param {object} options
+     *   { handleSelector, lockedClass, draggingClass, applyParentMetadata,
+     *   onCommitted } — the consumer's CSS names and the commit callbacks.
      */
     constructor(
       tree,
@@ -51,6 +55,7 @@
       indicator,
       onGestureStart,
       onTap,
+      options,
     ) {
       this.tree = tree;
       this.moveUrl = moveUrl;
@@ -59,6 +64,10 @@
       this.indicator = indicator;
       this.onGestureStart = onGestureStart;
       this.onTap = onTap;
+      this.options = options;
+      this.handleSelector = options.handleSelector;
+      this.lockedClass = options.lockedClass;
+      this.draggingClass = options.draggingClass;
 
       this.pointerId = null;
       this.moved = null;
@@ -107,11 +116,8 @@
       if (!(target instanceof Element)) {
         return;
       }
-      const handle = target.closest(HANDLE);
-      if (
-        !handle ||
-        handle.classList.contains('menu-tree-ui-row__handle--locked')
-      ) {
+      const handle = target.closest(this.handleSelector);
+      if (!handle || handle.classList.contains(this.lockedClass)) {
         return;
       }
       const row = handle.closest(ROW);
@@ -155,7 +161,7 @@
         // mere press-and-release (a tap) never reaches here, so it can pick a
         // row up into move mode instead (see onPointerUp).
         this.onGestureStart?.();
-        this.moved.classList.add('menu-tree-ui-row--dragging');
+        this.moved.classList.add(this.draggingClass);
       }
       this.updateIntent(event.clientX, event.clientY);
     }
@@ -175,7 +181,14 @@
         const { intent } = this;
         // Snapshot before cleanup, then commit asynchronously.
         this.cleanup();
-        commitMove(row, intent, this.moveUrl, this.expand, this.csrfToken);
+        commitMove(
+          row,
+          intent,
+          this.moveUrl,
+          this.expand,
+          this.csrfToken,
+          this.options,
+        );
       } else {
         // A tap (press and release without crossing the drag threshold): pick
         // the row up into keyboard move mode rather than starting a drag.
@@ -293,7 +306,7 @@
           this.activeHandle.releasePointerCapture(this.pointerId);
         }
       }
-      this.moved?.classList.remove('menu-tree-ui-row--dragging');
+      this.moved?.classList.remove(this.draggingClass);
       this.indicator.clear();
       this.moved = null;
       this.activeHandle = null;
@@ -303,5 +316,5 @@
     }
   }
 
-  Drupal.menuTreeUi.drag.DragController = DragController;
+  Drupal.treegridReorder.DragController = DragController;
 })(Drupal);
