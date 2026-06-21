@@ -354,14 +354,7 @@ class PhpUnitTestDiscovery {
     // Find the test cases count.
     $count = 0;
     foreach ($testClass->tests() as $testCase) {
-      if ($testCase instanceof TestCase) {
-        // If it's a straight test method, counts 1.
-        $count++;
-      }
-      else {
-        // It's a data provider test suite, count 1 per data set provided.
-        $count += count($testCase->tests());
-      }
+      $count += $this->getTestCaseCount($testCase);
     }
 
     return [
@@ -378,6 +371,9 @@ class PhpUnitTestDiscovery {
   /**
    * Returns the test groups.
    *
+   * In PHPUnit 13+, we need to recursively scan the test structure to find
+   * test cases, as there may be nested TestSuite collections.
+   *
    * @param \PHPUnit\Framework\Test $test
    *   The test.
    * @param list<string> $groups
@@ -387,9 +383,6 @@ class PhpUnitTestDiscovery {
    *   The test groups.
    */
   private function getTestGroups(Test $test, array $groups = []): array {
-    // In PHPUnit 11+, we need to coalesce the groups from individual tests
-    // as they may not be available from the test class level (when tests are
-    // backed by data providers).
     if ($test instanceof TestSuite) {
       foreach ($test as $testItem) {
         $groups = $this->getTestGroups($testItem, $groups);
@@ -399,6 +392,29 @@ class PhpUnitTestDiscovery {
       $groups = array_merge($groups, $test->groups());
     }
     return $groups;
+  }
+
+  /**
+   * Returns the count of test cases.
+   *
+   * @param \PHPUnit\Framework\Test $test
+   *   The test.
+   * @param int $count
+   *   The count collected so far in recursion.
+   *
+   * @return int
+   *   The count of test cases.
+   */
+  private function getTestCaseCount(Test $test, int $count = 0): int {
+    if ($test instanceof TestSuite) {
+      foreach ($test as $testItem) {
+        $count = $this->getTestCaseCount($testItem, $count);
+      }
+    }
+    else {
+      $count++;
+    }
+    return $count;
   }
 
   /**
