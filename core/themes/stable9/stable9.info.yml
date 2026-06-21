@@ -302,6 +302,11 @@ libraries-override:
       component:
         css/views.module.css: css/views/views.module.css
 
+  views/views.bulk_form:
+    css:
+      component:
+        css/views.bulk_form.css: css/views/views.bulk_form.css
+
   views_ui/admin.styling:
     css:
       component:

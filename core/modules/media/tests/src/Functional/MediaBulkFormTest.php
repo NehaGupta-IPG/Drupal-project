@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media\Functional;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\media\Entity\Media;
 use Drupal\views\Views;
 
@@ -74,16 +75,18 @@ class MediaBulkFormTest extends MediaFunctionalTestBase {
 
     // Check the operations are accessible to the logged in user.
     $this->drupalGet('test-media-bulk-form');
-    // Current available actions: Delete, Save, Publish, Unpublish.
-    $available_actions = [
-      'media_delete_action',
+
+    // Tests that actions are sorted according to the view configured order.
+    $actual_actions = $this->xpath('//select[@id="edit-action"]//option');
+    $expected_actions = [
       'media_publish_action',
-      'media_save_action',
       'media_unpublish_action',
+      'media_save_action',
+      'media_delete_action',
     ];
-    foreach ($available_actions as $action_name) {
-      $assert_session->optionExists('action', $action_name);
-    }
+    $this->assertSame($expected_actions, array_values(array_filter(array_map(function (NodeElement $action): string {
+      return $action->getValue();
+    }, $actual_actions))));
 
     // Test unpublishing in bulk.
     $page->checkField('media_bulk_form[0]');

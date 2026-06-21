@@ -217,6 +217,9 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
     $options['selected_actions'] = [
       'default' => [],
     ];
+    $options['actions_order'] = [
+      'default' => [],
+    ];
     return $options;
   }
 
@@ -240,13 +243,52 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
       ],
       '#default_value' => $this->options['include_exclude'],
     ];
+
     $form['selected_actions'] = [
-      '#type' => 'checkboxes',
+      '#type' => 'table',
       '#title' => $this->t('Selected actions'),
-      '#options' => $this->getBulkOptions(FALSE),
-      '#default_value' => $this->options['selected_actions'],
+      '#tabledrag' => [
+        [
+          'action' => 'order',
+          'relationship' => 'sibling',
+          'group' => 'action-order-weight',
+        ],
+      ],
+      '#tree' => FALSE,
+      '#input' => FALSE,
+      '#theme_wrappers' => ['form_element'],
+      '#attached' => ['library' => ['views/views.bulk_form']],
     ];
 
+    $weight = 0;
+    foreach ($this->getBulkOptions(FALSE) as $action_id => $action_label) {
+      $form['selected_actions'][$action_id]['#attributes']['class'][] = 'draggable';
+      $form['selected_actions'][$action_id]['#weight'] = $weight++;
+
+      $arguments = ['@title' => $action_label];
+      $form['selected_actions'][$action_id]['selected'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Select @title', $arguments),
+        '#title_display' => 'attribute',
+        '#default_value' => in_array($action_id, $this->options['selected_actions'], TRUE),
+        '#parents' => ['options', 'selected_actions', $action_id, 'selected'],
+      ];
+
+      $form['selected_actions'][$action_id]['action'] = [
+        '#markup' => $action_label,
+      ];
+
+      $form['selected_actions'][$action_id]['weight'] = [
+        '#type' => 'weight',
+        '#title' => $this->t('Weight for @title', $arguments),
+        '#title_display' => 'invisible',
+        '#delta' => 50,
+        '#default_value' => $weight,
+        '#parents' => ['options', 'selected_actions', $action_id, 'weight'],
+        '#attributes' => ['class' => ['action-order-weight']],
+      ];
+
+    }
     parent::buildOptionsForm($form, $form_state);
   }
 
@@ -256,8 +298,16 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
   public function validateOptionsForm(&$form, FormStateInterface $form_state) {
     parent::validateOptionsForm($form, $form_state);
 
-    $selected_actions = $form_state->getValue(['options', 'selected_actions']);
-    $form_state->setValue(['options', 'selected_actions'], array_values(array_filter($selected_actions)));
+    $selected_actions = $actions_order = [];
+    foreach ($form_state->getValue(['options', 'selected_actions']) as $action_id => $action_data) {
+      if ($action_data['selected']) {
+        $selected_actions[] = $action_id;
+      }
+      $actions_order[$action_id] = (int) $action_data['weight'];
+    }
+    $form_state->setValue(['options', 'selected_actions'], $selected_actions);
+    asort($actions_order);
+    $form_state->setValue(['options', 'actions_order'], array_keys($actions_order));
   }
 
   /**
@@ -327,6 +377,11 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
 
       // Replace the form submit button label.
       $form['actions']['submit']['#value'] = $this->t('Apply to selected items');
+      $form['actions']['submit']['#states'] = [
+        'disabled' => [
+          'select[name="action"]' => ['value' => ''],
+        ],
+      ];
 
       // Ensure a consistent container for filters/operations in the view
       // header.
@@ -345,6 +400,7 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
         '#title' => $this->options['action_title'],
         '#options' => $this->getBulkOptions(),
         '#empty_option' => $this->t('- Select -'),
+        '#required' => TRUE,
       ];
 
       // Duplicate the form actions into the action container in the header.
@@ -367,8 +423,18 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
    */
   protected function getBulkOptions($filtered = TRUE) {
     $options = [];
+
+    $actions = $this->actions;
+
+    // Only order if there is a user specified order.
+    if ($actions && $this->options['actions_order']) {
+      // Some actions might have been removed. Keep only existing actions.
+      $actions_order = array_intersect($this->options['actions_order'], array_keys($actions));
+      $actions = array_merge(array_flip($actions_order), $actions);
+    }
+
     // Filter the action list.
-    foreach ($this->actions as $id => $action) {
+    foreach ($actions as $id => $action) {
       if ($filtered) {
         $in_selected = in_array($id, $this->options['selected_actions']);
         // If the field is configured to include only the selected actions,

@@ -97,6 +97,11 @@ libraries-override:
       state:
         css/toolbar.menu.css: css/state/toolbar.menu.css
 
+  views/views.bulk_form:
+    css:
+      component:
+        css/views.bulk_form.css: css/components/views.bulk_form.css
+
   views_ui/admin.styling:
     css:
       component:

@@ -121,7 +121,7 @@ class BulkFormTest extends UserTestBase {
     $action_id = 'user_add_role_action.' . $role;
     $edit = [
       'options[include_exclude]' => 'exclude',
-      "options[selected_actions][$action_id]" => $action_id,
+      "options[selected_actions][$action_id][selected]" => TRUE,
     ];
     $this->drupalGet('admin/structure/views/nojs/handler/test_user_bulk_form/default/field/user_bulk_form');
     $this->submitForm($edit, 'Apply');

@@ -97,6 +97,7 @@ function views_post_update_block_items_per_page(?array &$sandbox = NULL): void {
   if (!\Drupal::moduleHandler()->moduleExists('block')) {
     return;
   }
+  \Drupal::classResolver(ViewsConfigUpdater::class)->setDeprecationsEnabled(FALSE);
   \Drupal::classResolver(ConfigEntityUpdater::class)
     ->update($sandbox, 'block', function (BlockInterface $block): bool {
       if (str_starts_with($block->getPluginId(), 'views_block:')) {
@@ -109,4 +110,16 @@ function views_post_update_block_items_per_page(?array &$sandbox = NULL): void {
       }
       return FALSE;
     });
+}
+
+/**
+ * Add the actions order option to all bulk form field configurations.
+ */
+function views_post_update_bulk_form_action_order(?array &$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+  $view_config_updater->setDeprecationsEnabled(FALSE);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
+    return $view_config_updater->needsBulkFormActionsOrderUpdate($view);
+  });
 }
