@@ -18,7 +18,9 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  * Drupal.treegrid.registerCellRenderer(type, fn), and the Twig template draws
  * the same markup. treegrid ships these cell types:
  *   - 'checkbox': a boolean control, optionally interactive.
- *   - 'markup': an opaque server-rendered HTML string, injected verbatim.
+ *   - 'markup': an opaque server-rendered HTML string, injected verbatim. It
+ *     MUST be trusted server-rendered markup — it is written through |raw and
+ *     innerHTML, so user-supplied input in a markup cell is an XSS vector.
  *
  * Read-only columns return FALSE from handleUpdate().
  *
@@ -64,10 +66,13 @@ interface TreegridColumnInterface extends PluginInspectionInterface {
   /**
    * Applies a value change to the underlying entity.
    *
-   * Called by the treegrid column-update controller when the client POSTs a
-   * toggle interaction. Return FALSE for read-only columns — the controller
-   * will respond with a 400 rather than saving. Implementations should also
-   * return FALSE when $entity is not the expected type.
+   * Called by the consumer's column-update controller when the client POSTs an
+   * interactive cell change. treegrid defines this contract but ships no route
+   * or controller for it — the consumer owns the persistence endpoint (e.g.
+   * menu_tree_ui's MenuTreeController::columnUpdate). Return FALSE for
+   * read-only columns — the controller responds with a 400 rather than saving.
+   * Implementations should also return FALSE when $entity is not the expected
+   * type.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity backing the link that was toggled.

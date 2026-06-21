@@ -21,7 +21,8 @@
  * the active admin theme, injected verbatim, and upgraded by
  * Drupal.attachBehaviors (see OperationsColumn for why it isn't rebuilt here).
  *
- * Exposes Drupal.menuTreeUi.buildRows and Drupal.menuTreeUi.buildRow.
+ * Registers the menu row renderer as a treegrid provider, and exposes
+ * Drupal.menuTreeUi.buildToggle for the reorder feature's post-move refresh.
  */
 
 ((Drupal) => {
@@ -254,10 +255,10 @@
     return fragment;
   }
 
-  Drupal.menuTreeUi.buildRows = buildRows;
-  Drupal.menuTreeUi.buildRow = buildRow;
-  // Shared so drag/commit.js can rebuild a row's toggle after a refresh without
-  // duplicating the markup (and its translated aria-label).
+  // buildToggle is shared so menu-tree.js's applyParentMetadata can rebuild a
+  // row's disclosure toggle after a move refresh without duplicating the markup
+  // (and its translated aria-label). buildRows/buildRow reach the spine through
+  // the registered provider object below, so they need no namespace export.
   Drupal.menuTreeUi.buildToggle = buildToggle;
 
   // Register the menu renderer with the generic treegrid element. registerProvider

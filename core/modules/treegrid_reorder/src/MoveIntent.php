@@ -10,6 +10,8 @@ namespace Drupal\treegrid_reorder;
  * The same shape the client POSTs ({id, new_parent, before_id}) and that the
  * working copy records, carried across the reorder seam so the manager and the
  * consumer's move handler share one vocabulary.
+ *
+ * @api
  */
 final readonly class MoveIntent {
 

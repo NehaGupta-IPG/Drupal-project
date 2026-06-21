@@ -20,6 +20,13 @@ use Drupal\treegrid\Plugin\TreegridColumn\TreegridColumnInterface;
  */
 final class TreegridColumnManager extends DefaultPluginManager {
 
+  /**
+   * Memoised sorted column instances.
+   *
+   * @var \Drupal\treegrid\Plugin\TreegridColumn\TreegridColumnInterface[]|null
+   */
+  private ?array $sortedColumns = NULL;
+
   public function __construct(
     \Traversable $namespaces,
     CacheBackendInterface $cache_backend,
@@ -35,13 +42,6 @@ final class TreegridColumnManager extends DefaultPluginManager {
     $this->alterInfo('treegrid_column_info');
     $this->setCacheBackend($cache_backend, 'treegrid_column_plugins');
   }
-
-  /**
-   * Memoised sorted column instances.
-   *
-   * @var \Drupal\treegrid\Plugin\TreegridColumn\TreegridColumnInterface[]|null
-   */
-  private ?array $sortedColumns = NULL;
 
   /**
    * Returns all column plugin instances sorted by weight.

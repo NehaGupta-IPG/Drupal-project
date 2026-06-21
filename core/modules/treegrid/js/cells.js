@@ -10,11 +10,13 @@
  *
  * treegrid ships:
  *  - 'checkbox': a boolean control. Non-interactive cells render disabled;
- *    interactive ones carry data-column-id / data-link-id so a consumer can
- *    persist a change through its column-update endpoint.
+ *    interactive ones carry data-column-id / data-link-id so the consumer's
+ *    column-update endpoint can persist the change — treegrid ships the cell
+ *    type, not the route or controller.
  *  - 'markup': an opaque server-rendered HTML string, injected verbatim — the
  *    escape hatch for cells a client renderer cannot reproduce (e.g. a themed
- *    dropbutton).
+ *    dropbutton). It MUST be trusted server-rendered markup: it is written via
+ *    innerHTML, so user-supplied input in a markup cell is an XSS vector.
  *
  * Exposes Drupal.treegrid.registerCellRenderer and Drupal.treegrid.renderCell.
  */
@@ -76,6 +78,8 @@
   Drupal.treegrid.registerCellRenderer('markup', (cell) => {
     const wrapper = document.createElement('div');
     wrapper.className = 'treegrid-cell-markup';
+    // cell.html must be trusted server-rendered markup (see the @file note);
+    // never a client- or user-supplied string.
     wrapper.innerHTML = cell.html;
     return wrapper;
   });

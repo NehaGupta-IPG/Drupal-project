@@ -27,6 +27,8 @@ final class TreegridReorderHooks {
         ':treegrid' => 'https://www.drupal.org/docs/core-modules-and-themes/core-modules/tree-grid-module',
         ':documentation' => 'https://www.drupal.org/docs/core-modules-and-themes/core-modules/tree-grid-reorder-module',
       ]) . '</p>';
+      $output .= '<h2>' . $this->t('For developers') . '</h2>';
+      $output .= '<p>' . $this->t('A consuming module implements TreeMoveHandlerInterface (movability, ancestry, domain constraints, the write) and runs moves through the TreeReorderManager, which adds the universal self-target and cycle checks and the Save-time replay. To buffer pending moves for a Save/Cancel workflow, instantiate the TreegridWorkingCopy service with a tempstore collection name unique to the module, so two consumers editing same-named trees do not collide. On the client, the module loads the treegrid_reorder/treegrid_reorder library and passes a configuration object naming its own CSS classes, so the gesture code carries no markup knowledge of its own.') . '</p>';
       return $output;
     }
     return NULL;

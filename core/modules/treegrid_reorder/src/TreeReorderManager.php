@@ -53,6 +53,11 @@ final class TreeReorderManager {
    * order, re-validating each against the now-current state. Non-move ops are
    * ignored. The caller clears the working copy after a successful commit.
    *
+   * Application is best-effort, not transactional: the pre-flight pass prevents
+   * a known-bad batch from writing anything, but if a move fails partway
+   * through (e.g. a cycle formed by an earlier applied move), the moves already
+   * applied stand — applyMove() is not assumed to be wrapped in a transaction.
+   *
    * @param string $tree_id
    *   The tree whose working copy to commit.
    * @param array<int, array<string, mixed>> $ops
