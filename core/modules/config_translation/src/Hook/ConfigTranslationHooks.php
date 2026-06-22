@@ -205,6 +205,7 @@ class ConfigTranslationHooks {
   public function configSchemaInfoAlter(&$definitions): void {
     $map = [
       'label' => '\Drupal\config_translation\FormElement\Textfield',
+      'translatable_uri' => '\Drupal\config_translation\FormElement\Textfield',
       'text' => '\Drupal\config_translation\FormElement\Textarea',
       'date_format' => '\Drupal\config_translation\FormElement\DateFormat',
       'text_format' => '\Drupal\config_translation\FormElement\TextFormat',
