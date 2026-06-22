@@ -217,4 +217,21 @@ class LinkItemTest extends FieldKernelTestBase {
     $this->assertNull($entity->field_test->title);
   }
 
+  /**
+   * Tests that the default value URI of a link field is translatable.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3595275
+   */
+  public function testLinkFieldDefaultValueUriIsTranslatable(): void {
+    $field = FieldConfig::load('entity_test.entity_test.field_test');
+    $field
+      ->setDefaultValue([['uri' => 'https://example.com', 'title' => 'Example']])
+      ->save();
+
+    $typed_config = \Drupal::service('config.typed')
+      ->get('field.field.entity_test.entity_test.field_test');
+    $uri = $typed_config->get('default_value')->get(0)->get('uri');
+    $this->assertTrue($uri->getDataDefinition()['translatable']);
+  }
+
 }

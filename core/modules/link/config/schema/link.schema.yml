@@ -60,7 +60,7 @@ field.value.link:
           type: label
           label: 'Link text'
     uri:
-      type: string
+      type: translatable_uri
       label: 'URL'
     title:
       type: label
