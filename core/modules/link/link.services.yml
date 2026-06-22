@@ -8,3 +8,4 @@ services:
   Drupal\link\EventSubscriber\DefaultContentSubscriber: ~
   link.entity_link_suggestions:
     class: Drupal\link\EntityLinkSuggestions
+  Drupal\link\EntityLinkSuggestions: '@link.entity_link_suggestions'

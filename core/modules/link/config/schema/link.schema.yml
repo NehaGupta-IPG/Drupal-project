@@ -35,6 +35,14 @@ field.widget.settings.link_default:
       type: label
       label: 'Placeholder for link text'
 
+field.widget.settings.link_autocomplete:
+  type: field.widget.settings.link_default
+  label: 'Link autocomplete widget settings'
+  mapping:
+    auto_link_text:
+      type: boolean
+      label: 'Automatically populate link text from entity label'
+
 # This field type has no field storage settings, so no specific config schema type.
 # @see `type: field.storage_settings.*`
 field.field_settings.link:

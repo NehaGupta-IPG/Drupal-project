@@ -410,10 +410,15 @@ class LinkAutocompleteWidget extends LinkWidget {
   protected function getEntityFromUri($uri) {
     // Strip out potential query and fragment from the URI.
     $uri = strtok(strtok($uri, "?"), "#");
-    // Remove the schema, if any. Otherwise, remove the forwarding "/".
-    if (strpos($uri, 'entity:') !== FALSE) {
-      $uri_parts = explode(':', $uri);
-      $uri = $uri_parts[1] ?? $uri;
+
+    // Reduce the URI to a "<entity type>/<id>" string. Only "entity:" URIs and
+    // bare paths point at an entity; a URI with any other scheme (internal:,
+    // route:, http:, ...) does not, so bail before parsing it as one.
+    if (str_starts_with($uri, 'entity:')) {
+      $uri = substr($uri, strlen('entity:'));
+    }
+    elseif (str_contains($uri, ':')) {
+      return NULL;
     }
     else {
       $uri = trim($uri, '/');

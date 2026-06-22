@@ -196,6 +196,7 @@ class EntityLinkSuggestionTest extends KernelTestBase {
       'group' => 'Content - Basic page',
       'label' => 'foo',
       'path' => '/node/1',
+      'href' => '/node/1',
     ];
     $suggestion_node_1_de = [
       'description' => 'by sofie on Tue, 19 Sep 2023 - 03:31',
@@ -204,6 +205,7 @@ class EntityLinkSuggestionTest extends KernelTestBase {
       'group' => 'Content - Basic page',
       'label' => 'Deutsch foo',
       'path' => '/node/1',
+      'href' => '/node/1',
     ];
     $suggestion_node_2_en = [
       'description' => 'by sofie on Tue, 19 Sep 2023 - 03:32',
@@ -212,6 +214,7 @@ class EntityLinkSuggestionTest extends KernelTestBase {
       'group' => 'Content - Article',
       'label' => 'doo',
       'path' => '/node/2',
+      'href' => '/node/2',
     ];
     $suggestion_node_2_de = [
       'description' => 'by sofie on Tue, 19 Sep 2023 - 03:32',
@@ -220,6 +223,7 @@ class EntityLinkSuggestionTest extends KernelTestBase {
       'group' => 'Content - Article',
       'label' => 'Deutsch doo',
       'path' => '/node/2',
+      'href' => '/node/2',
     ];
 
     $suggestion_tag_1_en = [
@@ -229,6 +233,7 @@ class EntityLinkSuggestionTest extends KernelTestBase {
       'group' => 'Taxonomy term - Tags',
       'label' => 'tag',
       'path' => '/taxonomy/term/1',
+      'href' => '/taxonomy/term/1',
     ];
 
     $suggestion_tag_1_de = [
@@ -238,6 +243,7 @@ class EntityLinkSuggestionTest extends KernelTestBase {
       'group' => 'Taxonomy term - Tags',
       'label' => 'tag DE',
       'path' => '/taxonomy/term/1',
+      'href' => '/taxonomy/term/1',
     ];
 
     $suggestion_tag_2_en = [
@@ -247,6 +253,7 @@ class EntityLinkSuggestionTest extends KernelTestBase {
       'group' => 'Taxonomy term - Tags',
       'label' => 'doo term',
       'path' => '/taxonomy/term/2',
+      'href' => '/taxonomy/term/2',
     ];
 
     $suggestion_tag_2_de = [
@@ -256,6 +263,7 @@ class EntityLinkSuggestionTest extends KernelTestBase {
       'group' => 'Taxonomy term - Tags',
       'label' => 'doo term DE',
       'path' => '/taxonomy/term/2',
+      'href' => '/taxonomy/term/2',
     ];
 
     // "f", single result due to (different) suggestion restrictions.

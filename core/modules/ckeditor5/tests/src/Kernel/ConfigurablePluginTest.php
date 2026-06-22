@@ -29,6 +29,8 @@ class ConfigurablePluginTest extends KernelTestBase {
     // @see \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition::validateDrupalAspects()
     'filter',
     'editor',
+    // Provides the link_entity_suggestions plugin (provider: link).
+    'link',
   ];
 
   /**
