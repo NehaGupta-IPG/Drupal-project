@@ -9,13 +9,15 @@
  * Sighted users see a colored box. See https://www.w3.org/TR/WCAG-TECHS/H69.html
  * for info.
  *
- * Each message block exposes an ARIA live region role so assistive technology
- * user agents announce it appropriately: "alert" for errors and warnings
- * (assertive) and "status" for other message types (polite). This matches the
- * role assignment used by Drupal.theme.message() for messages added by
- * JavaScript. The "contentinfo" landmark role is reserved for the page footer
- * and is intentionally not used here, which avoids duplicate landmark and
- * non-unique landmark accessibility violations.
+ * Add an ARIA label to the contentinfo area so that assistive technology
+ * user agents will better describe this landmark.
+ *
+ * Themes overriding this template must include the following markup:
+ * - The tag enclosing each message type must have a `data-drupal-message-set`
+ *   attribute.
+ * - The tag enclosing the rendered messages must have a `data-drupal-message-list-type`
+ *   attribute.  This data attribute must have a value corresponds to the message type.
+ * @see \Drupal\Core\Render\Element\StatusMessages::renderMessages()
  *
  * Available variables:
  * - message_list: List of messages to be displayed, grouped by type.
@@ -28,19 +30,18 @@
 #}
 <div data-drupal-messages>
 {% for type, messages in message_list %}
-  <div role="{{ type in ['error', 'warning'] ? 'alert' : 'status' }}" aria-label="{{ status_headings[type] }}"{{ attributes|without('role', 'aria-label') }}>
+  <div role="contentinfo" aria-label="{{ status_headings[type] }}"{{ attributes|without('role', 'aria-label') }} data-drupal-message-set>
+    {% if type == 'error' %}
+      <div role="alert">
+    {% endif %}
     {% if status_headings[type] %}
       <h2 class="visually-hidden">{{ status_headings[type] }}</h2>
     {% endif %}
-    {% if messages|length > 1 %}
-      <ul>
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
+      <ul data-drupal-message-list-type="{{ type }}">
+        {%- for message in messages %}
+          {{ message }}
+        {%- endfor -%}
       </ul>
-    {% else %}
-      {{ messages|first }}
-    {% endif %}
   </div>
 {% endfor %}
 </div>

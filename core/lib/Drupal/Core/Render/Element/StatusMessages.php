@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Render\Element;
 
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\big_pipe\Render\Placeholder\BigPipeStrategy;
 
@@ -110,18 +111,31 @@ class StatusMessages extends RenderElementBase {
       $messages = \Drupal::messenger()->deleteAll();
     }
 
-    if ($messages) {
+      $messageItems = [
+        MessengerInterface::TYPE_ERROR => [],
+        MessengerInterface::TYPE_WARNING => [],
+        MessengerInterface::TYPE_STATUS => [],
+      ];
+      foreach ($messages as $type => $messageList) {
+        foreach ($messageList as $message) {
+          $item = [
+            '#theme' => 'status_message_item',
+            '#message' => $message,
+          ];
+          $messageItems[$type][] = $item;
+        }
+      }
       // Render the messages.
       $render = [
         '#theme' => 'status_messages',
-        '#message_list' => $messages,
+        '#message_list' => $messageItems,
         '#status_headings' => [
           'status' => t('Status message'),
           'error' => t('Error message'),
           'warning' => t('Warning message'),
         ],
       ];
-    }
+
     return $render;
   }
 

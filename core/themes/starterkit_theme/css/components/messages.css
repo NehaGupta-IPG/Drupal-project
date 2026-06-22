@@ -67,3 +67,12 @@
 .messages--error p.error {
   color: #a51b00;
 }
+
+[data-drupal-message-set]:has([data-drupal-message-list-type]:empty) {
+  position: absolute !important;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  width: 1px;
+  height: 1px;
+  word-wrap: normal;
+}
