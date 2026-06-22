@@ -213,7 +213,11 @@ final class MenuTreeUiTreegridFocusTest extends WebDriverTestBase {
 
     $hint = $this->getSession()->getPage()->find('css', '#' . $described_by);
     $this->assertNotNull($hint, 'The aria-describedby target exists.');
-    $this->assertNotSame('', trim($hint->getText()), 'The interaction hint has text.');
+    $hint_text = trim($hint->getText());
+    $this->assertNotSame('', $hint_text, 'The interaction hint has text.');
+    // The roving-tabindex model is non-obvious, so the hint must point out that
+    // Tab reaches a row's controls.
+    $this->assertStringContainsStringIgnoringCase('Tab', $hint_text, 'The hint mentions Tab reaches a row\'s controls.');
   }
 
   /**
