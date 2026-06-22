@@ -404,8 +404,8 @@ class MenuTreeStorageTest extends KernelTestBase {
     // invalidated; the content-only menu is left untouched.
     $this->treeStorage->rebuild(['rebuilt_link' => ['id' => 'rebuilt_link', 'menu_name' => 'rebuilt_menu'] + $link]);
 
-    $this->assertFalse($cache->get('rebuilt'), 'The rebuilt menu cache tag was invalidated.');
-    $this->assertNotEmpty($cache->get('content'), 'The content-only menu cache tag was not invalidated.');
+    $this->assertFalse($cache->get('rebuilt'), 'Rebuilding a menu should invalidate its own cache tag.');
+    $this->assertNotEmpty($cache->get('content'), 'Rebuilding a menu should not invalidate the cache tag of an unrelated content-only menu.');
   }
 
   /**
