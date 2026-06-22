@@ -221,6 +221,31 @@ final class MenuTreeUiTreegridFocusTest extends WebDriverTestBase {
   }
 
   /**
+   * The rows carry a scroll offset so the cursor clears the sticky action bar.
+   *
+   * Focusing a row lets the browser scroll it into view, which ignores the
+   * sticky Save/Cancel bar; without an offset the cursor lands hidden under it.
+   * menu-tree.js measures the bar into --mtu-sticky-offset, which the rows'
+   * scroll-margin reads.
+   */
+  public function testCursorClearsStickyActionBar(): void {
+    $bar_height = (int) $this->getSession()->evaluateScript(
+      "return document.querySelector('.menu-tree-ui__action-bar').offsetHeight;",
+    );
+    $this->assertGreaterThan(0, $bar_height, 'The action bar has a height.');
+
+    $offset = (string) $this->getSession()->evaluateScript(
+      "return getComputedStyle(document.querySelector('.menu-tree-ui'))"
+      . ".getPropertyValue('--mtu-sticky-offset').trim();",
+    );
+    $this->assertSame(
+      $bar_height . 'px',
+      $offset,
+      'Rows offset their scroll position by the sticky bar height.',
+    );
+  }
+
+  /**
    * The tree is one Tab stop: only the active row's controls are tabbable.
    */
   public function testOnlyActiveRowControlsAreTabbable(): void {

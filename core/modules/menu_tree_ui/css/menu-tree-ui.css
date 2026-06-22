@@ -206,6 +206,18 @@
 }
 
 /*
+ * Keep the keyboard cursor clear of the sticky action bar. focusRow() lets the
+ * browser scroll a focused row into view, and the browser ignores the sticky
+ * overlay, so without this the cursor can land hidden under the bar. The offset
+ * is the bar's live height: menu-tree.js measures it into --mtu-sticky-offset
+ * and keeps it current as the bar wraps; the fallback covers the moment before
+ * that script runs.
+ */
+.menu-tree-ui-row {
+  scroll-margin-block-start: var(--mtu-sticky-offset, 4rem);
+}
+
+/*
  * Highlight the row that holds focus (on its handle, toggle, switch, or links).
  * Raise it above its neighbors so the focused control's focus ring — which the
  * theme draws as a box-shadow extending outside the element — is not painted

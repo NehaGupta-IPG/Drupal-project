@@ -172,6 +172,23 @@
     const { moveUrl, columnUpdateUrl } = settings;
     const container = element.closest('.menu-tree-ui');
 
+    // Keep the keyboard cursor clear of the sticky action bar: when focusRow()
+    // scrolls a focused row into view the browser ignores the sticky overlay,
+    // so the rows' scroll-margin (see CSS) must match the bar's height. The bar
+    // grows when the unsaved notice wraps above the buttons, so track it live.
+    const actionBar = container?.querySelector('.menu-tree-ui__action-bar');
+    let stickyObserver = null;
+    if (actionBar && container && 'ResizeObserver' in window) {
+      const syncStickyOffset = () =>
+        container.style.setProperty(
+          '--mtu-sticky-offset',
+          `${actionBar.offsetHeight}px`,
+        );
+      syncStickyOffset();
+      stickyObserver = new ResizeObserver(syncStickyOffset);
+      stickyObserver.observe(actionBar);
+    }
+
     let csrfToken;
     let drag = null;
     const getToken = () => csrfToken;
@@ -335,6 +352,7 @@
       () => {
         moveMode?.cancel();
         drag?.detach();
+        stickyObserver?.disconnect();
         document.removeEventListener('mousedown', onOutsidePointer);
         if (jumpHandler) {
           document.removeEventListener('click', jumpHandler);
