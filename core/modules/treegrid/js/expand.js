@@ -50,6 +50,27 @@
     });
   }
 
+  /**
+   * Announces a toggled row by name through the live region.
+   *
+   * A screen reader announces the expanded/collapsed state itself from the
+   * row's aria-expanded change, but labels that change positionally ("row N",
+   * counting the header row) instead of by name. This adds the row's name (its
+   * aria-label, set by the consumer's row renderer) so the editor hears which
+   * item changed. The state word is deliberately left out so the screen reader
+   * does not speak it twice. Skipped when a consumer leaves rows unnamed.
+   *
+   * @param {HTMLElement} row
+   *   The toggled row.
+   */
+  function announceToggle(row) {
+    const name = row.getAttribute('aria-label');
+    if (!name) {
+      return;
+    }
+    Drupal.treegrid.announce(name);
+  }
+
   class ExpandManager {
     /**
      * @param {string} childrenUrl
@@ -88,9 +109,9 @@
      */
     async toggle(row) {
       if (row.getAttribute('aria-expanded') === 'true') {
-        this.collapse(row);
+        this.collapse(row, true);
       } else {
-        await this.expand(row);
+        await this.expand(row, true);
       }
     }
 
@@ -99,16 +120,21 @@
      *
      * @param {HTMLElement} row
      *   The parent row.
+     * @param {boolean} [announce]
+     *   Whether to announce the new state by name (user-initiated toggles do).
      *
      * @return {Promise<void>}
      *   Resolves once children are present.
      */
-    async expand(row) {
+    async expand(row, announce = false) {
       const { id } = row.dataset;
       if (!id) {
         return;
       }
       row.setAttribute('aria-expanded', 'true');
+      if (announce) {
+        announceToggle(row);
+      }
 
       if (row.dataset.loaded === 'true') {
         // showSubtree re-observes each row it reveals; rows that stay collapsed
@@ -137,9 +163,11 @@
      *
      * @param {HTMLElement} row
      *   The parent row.
+     * @param {boolean} [announce]
+     *   Whether to announce the new state by name (user-initiated toggles do).
      */
     // eslint-disable-next-line class-methods-use-this
-    collapse(row) {
+    collapse(row, announce = false) {
       // Never fold away a section that holds a row being carried in move mode:
       // the editor must always be able to see the row they are moving, and the
       // cursor would be lost if it vanished. The grabbed row carries a marker
@@ -152,6 +180,9 @@
         return;
       }
       row.setAttribute('aria-expanded', 'false');
+      if (announce) {
+        announceToggle(row);
+      }
       this.hideSubtree(row);
     }
 

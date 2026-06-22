@@ -32,52 +32,38 @@
   /**
    * Builds the drag handle for a row.
    *
-   * The handle is the per-row keyboard focus target (a real tab stop), with a
-   * visually-hidden level indicator. Movable rows grab to reorder; the rest are
-   * focusable for navigation but aria-disabled. The server decides via
-   * \Drupal\menu_tree_ui\MenuLinkMovability and sends item.movable. It lives
-   * inside the name cell so it indents with the title (see the row template).
+   * The handle is a pointer/drag affordance only: pointer drag arms on it (see
+   * the treegrid_reorder controller's handleSelector) and a click picks the row
+   * up. Keyboard users reorder from the row itself (Space), so the handle is
+   * hidden from assistive technology (aria-hidden) and the row's aria-label
+   * carries the name. The server decides movability via
+   * \Drupal\menu_tree_ui\MenuLinkMovability and sends item.movable; non-movable
+   * rows keep the locked class so the controller skips them. It lives inside
+   * the name cell so it indents with the title (see the row template).
    *
    * @param {object} item
    *   The ChildItem.
-   * @param {number} depth
-   *   The row's 1-based depth.
    *
    * @return {HTMLSpanElement}
    *   The handle element.
    */
-  function buildHandle(item, depth) {
+  function buildHandle(item) {
     const handle = document.createElement('span');
-    handle.setAttribute('role', 'button');
-    handle.tabIndex = -1;
+    handle.setAttribute('aria-hidden', 'true');
 
     const icon = document.createElement('span');
-    icon.setAttribute('aria-hidden', 'true');
     icon.className = 'menu-tree-ui-row__handle-icon';
-
-    const label = document.createElement('span');
-    label.className = 'visually-hidden';
 
     if (item.movable) {
       handle.className = 'menu-tree-ui-row__handle';
-      handle.title = Drupal.t('Drag to reorder');
-      label.textContent = Drupal.t('Reorder @title, level @level', {
-        '@title': item.title,
-        '@level': depth,
-      });
+      handle.title = Drupal.t('Drag to reorder, or click to pick up');
     } else {
       handle.className =
         'menu-tree-ui-row__handle menu-tree-ui-row__handle--locked';
-      handle.setAttribute('aria-disabled', 'true');
       icon.textContent = '·';
-      label.textContent = Drupal.t('@title, level @level (locked)', {
-        '@title': item.title,
-        '@level': depth,
-      });
     }
 
     handle.appendChild(icon);
-    handle.appendChild(label);
     return handle;
   }
 
@@ -123,13 +109,11 @@
    *
    * @param {object} item
    *   The ChildItem.
-   * @param {number} depth
-   *   The row's 1-based depth.
    *
    * @return {HTMLTableCellElement}
    *   The name <td>.
    */
-  function buildNameCell(item, depth) {
+  function buildNameCell(item) {
     const cell = document.createElement('td');
     cell.setAttribute('role', 'gridcell');
     cell.className = 'menu-tree-ui-row__cell menu-tree-ui-row__cell--name';
@@ -138,7 +122,7 @@
     name.className = 'menu-tree-ui-row__name';
     // The indent is applied by setRowLevel() once the row is assembled.
 
-    name.appendChild(buildHandle(item, depth));
+    name.appendChild(buildHandle(item));
     name.appendChild(buildToggle(item));
 
     // Link the title to the menu link's destination (the classic admin
@@ -213,6 +197,16 @@
     if (item.has_children) {
       tr.setAttribute('aria-expanded', 'false');
     }
+    // The row's accessible name: the title, plus "(locked)" when it cannot be
+    // reordered. An explicit name keeps a screen reader from flattening the
+    // in-row controls into one utterance; per-column state is announced by each
+    // cell's control on Tab, so this stays column-agnostic (see the template).
+    tr.setAttribute(
+      'aria-label',
+      item.movable
+        ? item.title
+        : Drupal.t('@title (locked)', { '@title': item.title }),
+    );
     // Lazy-loaded rows are never the initial tab stop; the active row is set as
     // the cursor moves (see treeNav.focusRow). aria-selected is added only while
     // a row is picked up for a move (see move-mode), so it is absent here.
@@ -225,7 +219,7 @@
       .filter(Boolean)
       .join(' ');
 
-    tr.appendChild(buildNameCell(item, depth));
+    tr.appendChild(buildNameCell(item));
     // aria-level + indent in one place (the name cell now exists in the row).
     setRowLevel(tr, depth);
     Object.entries(item.columns).forEach(([colId, cell]) => {

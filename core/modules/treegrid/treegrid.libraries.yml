@@ -12,3 +12,4 @@ treegrid:
       css/treegrid.css: {}
   dependencies:
     - core/drupal
+    - core/drupal.announce

@@ -51,7 +51,7 @@
           break;
         }
         if (row.getAttribute('aria-expanded') === 'false') {
-          ctx.expand.expand(row);
+          ctx.expand.expand(row, true);
         } else {
           focusRow(ctx.tree, childRows(row)[0] ?? null);
         }
@@ -60,7 +60,7 @@
       case 'ArrowLeft': {
         event.preventDefault();
         if (row.getAttribute('aria-expanded') === 'true') {
-          ctx.expand.collapse(row);
+          ctx.expand.collapse(row, true);
         } else {
           focusRow(ctx.tree, findRow(ctx.tree, row.dataset.parentId));
         }

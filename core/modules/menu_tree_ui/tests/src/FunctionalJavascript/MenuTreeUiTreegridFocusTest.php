@@ -73,15 +73,17 @@ final class MenuTreeUiTreegridFocusTest extends WebDriverTestBase {
     );
     $this->assertSame(1, $rows_at_zero, 'Exactly one row is the tab stop.');
 
-    $handles_at_zero = (int) $this->getSession()->evaluateScript(
-      "return document.querySelectorAll('drupal-treegrid .menu-tree-ui-row__handle[tabindex=\"0\"]').length;",
+    // The handle is a pointer/drag affordance: it carries no tabindex (so it is
+    // never focusable) and is hidden from assistive technology.
+    $focusable_handles = (int) $this->getSession()->evaluateScript(
+      "return document.querySelectorAll('drupal-treegrid .menu-tree-ui-row__handle[tabindex]').length;",
     );
-    $this->assertSame(0, $handles_at_zero, 'No handle is a tab stop.');
+    $this->assertSame(0, $focusable_handles, 'No handle is focusable.');
 
-    $handles_not_minus_one = (int) $this->getSession()->evaluateScript(
-      "return document.querySelectorAll('drupal-treegrid .menu-tree-ui-row__handle:not([tabindex=\"-1\"])').length;",
+    $exposed_handles = (int) $this->getSession()->evaluateScript(
+      "return document.querySelectorAll('drupal-treegrid .menu-tree-ui-row__handle:not([aria-hidden=\"true\"])').length;",
     );
-    $this->assertSame(0, $handles_not_minus_one, 'Every handle is tabindex="-1".');
+    $this->assertSame(0, $exposed_handles, 'Every handle is hidden from assistive technology.');
   }
 
   /**
@@ -116,6 +118,49 @@ final class MenuTreeUiTreegridFocusTest extends WebDriverTestBase {
     $this->assertSame('1', $level, 'The focused element carries aria-level.');
     $this->assertSame('2', $pos, 'The focused element carries aria-posinset.');
     $this->assertSame('2', $size, 'The focused element carries aria-setsize.');
+  }
+
+  /**
+   * The focused row announces one curated name, not its flattened controls.
+   *
+   * The row's aria-label is the link title, so a screen reader reads that (with
+   * the level, position, and expanded state from the other ARIA attributes)
+   * rather than concatenating the handle, toggle, title, and every column
+   * control into one utterance.
+   */
+  public function testFocusedRowAnnouncesItsName(): void {
+    $this->pressKeyOnRow('B', 'ArrowDown');
+
+    $label = $this->getSession()->evaluateScript(
+      "return document.activeElement.getAttribute('aria-label');",
+    );
+    $this->assertSame('Item A', $label, 'The row is named by its title alone.');
+
+    // No row leaves its name to be computed from the controls inside it.
+    $unnamed = (int) $this->getSession()->evaluateScript(
+      "return Array.from(document.querySelectorAll('drupal-treegrid tr[role=\"row\"]'))"
+      . ".filter((r) => !r.getAttribute('aria-label')).length;",
+    );
+    $this->assertSame(0, $unnamed, 'Every row has an accessible name.');
+  }
+
+  /**
+   * Toggling a row announces it by name, not by the screen reader's row number.
+   *
+   * A screen reader labels an aria-expanded change positionally ("row N",
+   * counting the header row); the tree posts a live-region message naming the
+   * row instead. The expanded/collapsed state is left to the screen reader
+   * (from aria-expanded), so the message carries only the name.
+   */
+  public function testToggleAnnouncesRowName(): void {
+    // Focus the parent row A, then normalize it to collapsed.
+    $this->pressKeyOnRow('B', 'ArrowDown');
+    if ($this->row('A')->getAttribute('aria-expanded') === 'true') {
+      $this->pressKeyOnRow('A', 'ArrowLeft');
+    }
+
+    $this->pressKeyOnRow('A', 'ArrowRight');
+    $this->assertAnnounced('Item A');
   }
 
   /**
@@ -365,6 +410,22 @@ final class MenuTreeUiTreegridFocusTest extends WebDriverTestBase {
     return $this->getSession()->evaluateScript(
       "return document.activeElement && document.activeElement.matches('tr[role=\"row\"]')"
       . ' ? document.activeElement.dataset.id : null;',
+    );
+  }
+
+  /**
+   * Asserts the live-region announcer eventually carries the given text.
+   *
+   * @param string $needle
+   *   The expected substring of the announcement.
+   */
+  private function assertAnnounced(string $needle): void {
+    $needle_json = json_encode($needle);
+    // Null-safe: the live region is created lazily on the first announcement,
+    // so the expression must return false (not throw) until it exists.
+    $this->assertJsCondition(
+      "((document.getElementById('drupal-live-announce') || {}).textContent || '')"
+      . ".includes($needle_json)",
     );
   }
 
