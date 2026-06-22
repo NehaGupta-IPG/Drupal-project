@@ -315,7 +315,7 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
   public function clearCachedDefinitions() {
     parent::clearCachedDefinitions();
     $this->prototypes = [];
-    $this->parts = new \SplObjectStorage();
+    $this->parts = new \WeakMap();
   }
 
   /**
