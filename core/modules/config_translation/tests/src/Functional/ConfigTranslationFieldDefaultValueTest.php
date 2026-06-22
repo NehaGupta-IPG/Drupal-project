@@ -28,7 +28,10 @@ class ConfigTranslationFieldDefaultValueTest extends ConfigTranslationUiTestBase
    * Tests that the default value URI of a link field is translatable.
    */
   public function testLinkFieldDefaultValueTranslation(): void {
-    $this->assertFieldDefaultValueUriIsTranslatable('link', 'uri', ['uri' => 'https://example.com', 'title' => 'Example']);
+    $this->assertFieldDefaultValueUriIsTranslatable('link', 'uri', [
+      'uri' => 'https://example.com',
+      'title' => 'Example',
+    ]);
   }
 
   /**
@@ -48,7 +51,11 @@ class ConfigTranslationFieldDefaultValueTest extends ConfigTranslationUiTestBase
    * @param array $default_value
    *   The default value to set on the field.
    */
-  protected function assertFieldDefaultValueUriIsTranslatable(string $field_type, string $value_key, array $default_value): void {
+  protected function assertFieldDefaultValueUriIsTranslatable(
+    string $field_type,
+    string $value_key,
+    array $default_value,
+  ): void {
     $field_name = $this->randomMachineName();
     FieldStorageConfig::create([
       'field_name' => $field_name,
