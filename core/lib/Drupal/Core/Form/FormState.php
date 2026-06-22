@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Stores information about the state of a form.
  */
-class FormState implements FormStateInterface {
+class FormState implements FormStateInterface, FormStateMultipleErrorsInterface {
 
   use FormStateValuesTrait;
 
@@ -458,6 +458,15 @@ class FormState implements FormStateInterface {
    * @var array
    */
   protected $errors = [];
+
+  /**
+   * Contains all errors for this form.
+   *
+   * This property is uncacheable.
+   *
+   * @var array
+   */
+  protected $allErrors = [];
 
   /**
    * Stores which errors should be limited during validation.
@@ -1144,8 +1153,12 @@ class FormState implements FormStateInterface {
       if ($record) {
         $errors[$name] = $message;
         $this->errors = $errors;
+        $this->allErrors[$name] = [$message];
         static::setAnyErrors();
       }
+    }
+    else {
+      $this->allErrors[$name][] = $message;
     }
 
     return $this;
@@ -1186,8 +1199,32 @@ class FormState implements FormStateInterface {
   /**
    * {@inheritdoc}
    */
+  public function getAllErrorsForElement(array $element) {
+    if ($errors = $this->getAllErrors()) {
+      $parents = [];
+      foreach ($element['#parents'] as $parent) {
+        $parents[] = $parent;
+        $key = implode('][', $parents);
+        if (isset($errors[$key])) {
+          return $errors[$key];
+        }
+      }
+    }
+  }
+
+
+  /**
+   * {@inheritdoc}
+   */
   public function getErrors() {
     return $this->errors;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAllErrors() {
+    return $this->allErrors;
   }
 
   /**
