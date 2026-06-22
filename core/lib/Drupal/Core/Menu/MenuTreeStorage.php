@@ -139,9 +139,9 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       $this->preloadedOriginals = [];
     }
 
-    // Fetch the list of existing menus, in case some are not longer populated
-    // after the rebuild.
-    $before_menus = $this->getMenuNames();
+    // Fetch the list of existing menus that contain discovered links, in case
+    // some are no longer populated after the rebuild.
+    $before_menus = $this->getDiscoveredMenuNames();
     if ($definitions) {
       foreach ($definitions as $id => $link) {
         // Flag this link as discovered, i.e. saved via rebuild().
@@ -188,8 +188,8 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       $this->purgeMultiple($result);
     }
     $this->resetDefinitions();
-    $affected_menus = $this->getMenuNames() + $before_menus;
-    // Invalidate any cache tagged with any menu name.
+    $affected_menus = $this->getDiscoveredMenuNames() + $before_menus;
+    // Invalidate any cache tagged with any affected menu name.
     $cache_tags = Cache::buildTags('config:system.menu', $affected_menus, '.');
     $this->cacheTagsInvalidator->invalidateTags($cache_tags);
     $this->resetDefinitions();
@@ -1074,6 +1074,20 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
   public function getMenuNames() {
     $query = $this->connection->select($this->table, NULL, $this->options);
     $query->addField($this->table, 'menu_name');
+    $query->distinct();
+    return $this->safeExecuteSelect($query)->fetchAllKeyed(0, 0);
+  }
+
+  /**
+   * Gets the names of the menus that contain discovered (rebuilt) links.
+   *
+   * @return array
+   *   An array of menu names, keyed by menu name.
+   */
+  protected function getDiscoveredMenuNames(): array {
+    $query = $this->connection->select($this->table, NULL, $this->options);
+    $query->addField($this->table, 'menu_name');
+    $query->condition('discovered', 1);
     $query->distinct();
     return $this->safeExecuteSelect($query)->fetchAllKeyed(0, 0);
   }

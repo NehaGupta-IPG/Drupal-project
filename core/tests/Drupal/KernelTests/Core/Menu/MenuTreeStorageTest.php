@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Menu;
 
 use Drupal\Component\Plugin\Exception\PluginException;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Menu\MenuTreeStorage;
@@ -374,6 +375,37 @@ class MenuTreeStorageTest extends KernelTestBase {
     $this->assertEquals(3, $this->treeStorage->getSubtreeHeight('child2'));
     $this->assertEquals(2, $this->treeStorage->getSubtreeHeight('child3'));
     $this->assertEquals(1, $this->treeStorage->getSubtreeHeight('child4'));
+  }
+
+  /**
+   * Tests that a rebuild only invalidates cache tags for the menus it rebuilt.
+   */
+  public function testRebuildInvalidatesOnlyDiscoveredMenus(): void {
+    $link = [
+      'route_name' => 'test',
+      'route_parameters' => [],
+      'title' => 'test',
+      'parent' => '',
+      'options' => [],
+      'metadata' => [],
+    ];
+
+    // Populate one menu with a link managed outside of rebuild() (discovered =
+    // 0), as content menu links are.
+    $this->treeStorage->save(['id' => 'content_link', 'menu_name' => 'content_menu'] + $link);
+
+    // Prime a cache item tagged with each menu's cache tag, so the tags
+    // invalidated by a rebuild can be observed through the real cache backend.
+    $cache = \Drupal::cache();
+    $cache->set('content', TRUE, Cache::PERMANENT, ['config:system.menu.content_menu']);
+    $cache->set('rebuilt', TRUE, Cache::PERMANENT, ['config:system.menu.rebuilt_menu']);
+
+    // Rebuild a second, separate menu. Only that menu's cache tag should be
+    // invalidated; the content-only menu is left untouched.
+    $this->treeStorage->rebuild(['rebuilt_link' => ['id' => 'rebuilt_link', 'menu_name' => 'rebuilt_menu'] + $link]);
+
+    $this->assertFalse($cache->get('rebuilt'), 'The rebuilt menu cache tag was invalidated.');
+    $this->assertNotEmpty($cache->get('content'), 'The content-only menu cache tag was not invalidated.');
   }
 
   /**
