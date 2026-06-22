@@ -7,6 +7,8 @@ namespace Drupal\Core\Render\MainContent;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Controller\TitleResolverInterface;
+use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\Render\Element\StatusMessages;
 use Drupal\Core\Render\HtmlResponse;
 use Drupal\Core\Render\RenderCacheInterface;
 use Drupal\Core\Render\RenderContext;
@@ -56,6 +58,32 @@ class HtmxRenderer implements MainContentRendererInterface {
    */
   public function renderResponse(array $main_content, Request $request, RouteMatchInterface $route_match) {
     $token = Crypt::randomBytesBase64(55);
+    // Assemble any status messages to update using hx-partials
+    // @see https://four.htmx.org/docs#partials-hx-partial
+    $messageTypes = [
+      MessengerInterface::TYPE_ERROR,
+      MessengerInterface::TYPE_WARNING,
+      MessengerInterface::TYPE_STATUS,
+    ];
+    $messages = [];
+    foreach ($messageTypes as $type) {
+      $messageArray = StatusMessages::renderMessages($type);
+      if (!empty($messageArray[$type])) {
+        $messages[] = [
+          '#type' => 'inline_template',
+          '#template' => <<<HTMX_MESSAGES
+<hx-partial hx-target='[data-drupal-message-list-type="{{ type }}"]' hx-swap="beforeend">
+  {{items}}
+</hx-partial>
+HTMX_MESSAGES,
+          '#context' => [
+            'type' => $type,
+            'items' => $messageArray[$type],
+          ],
+        ];
+      }
+    }
+    // Assemble the full response.
     $html = [
       '#type' => 'inline_template',
       // Add a noindex meta tag to make sure this response will not be indexed.
@@ -75,7 +103,7 @@ HTMX_RESPONSE,
       '#context' => [
         'title' => $main_content['#title'] ?? $this->titleResolver->getTitle($request, $route_match->getRouteObject()),
         'content' => [
-          'messages' => ['#type' => 'status_messages'],
+          'messages' => $messages,
           'main_content' => $main_content,
         ],
         'placeholder_token' => $token,

@@ -42,6 +42,9 @@
           {{ message }}
         {%- endfor -%}
       </ul>
+    {% if type == 'error' %}
+      </div>
+    {% endif %}
   </div>
 {% endfor %}
 </div>
