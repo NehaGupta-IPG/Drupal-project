@@ -75,6 +75,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->doMultipleTriggerTests();
     $this->doNestedTriggerTests();
     $this->doElementsDisabledStateTests();
+    $this->doClassesTriggerTests();
   }
 
   /**
@@ -626,6 +627,31 @@ class JavascriptStatesTest extends WebDriverTestBase {
     // The textarea should be enabled when the checkbox is checked.
     $session->elementExists('css', 'input[name="checkbox_enable_textarea"]')->check();
     $this->assertFalse($textarea->hasAttribute('disabled'));
+  }
+
+  /**
+   * Tests the classes state of elements triggered by a select element.
+   */
+  protected function doClassesTriggerTests(): void {
+    $this->drupalGet('form-test/javascript-states-form');
+    $page = $this->getSession()->getPage();
+
+    $trigger = $page->findField('select_trigger');
+    $this->assertNotEmpty($trigger);
+    $input = $this->assertSession()->elementExists('css', 'input[name="textfield_has_classes_when_select_trigger_has_value2"]');
+    $wrapper = $input->find('xpath', 'ancestor::*[contains(@class, "js-form-item")][1]');
+    $this->assertNotEmpty($wrapper);
+
+    $this->assertFalse($wrapper->hasClass('states-test-class-one'));
+    $this->assertFalse($wrapper->hasClass('states-test-class-two'));
+
+    $trigger->setValue('value2');
+    $this->assertTrue($wrapper->hasClass('states-test-class-one'));
+    $this->assertTrue($wrapper->hasClass('states-test-class-two'));
+
+    $trigger->setValue('value3');
+    $this->assertFalse($wrapper->hasClass('states-test-class-one'));
+    $this->assertFalse($wrapper->hasClass('states-test-class-two'));
   }
 
 }

@@ -766,4 +766,22 @@
       }
     }
   });
+
+  $document.on('state:classes', (e) => {
+    if (e.trigger) {
+      const statesConfig = JSON.parse(
+        e.target.getAttribute('data-drupal-states') || '{}',
+      );
+      const classNames = statesConfig.classes?.class;
+      if (!Array.isArray(classNames)) {
+        return;
+      }
+      const $element = $(e.target).closest(
+        '.js-form-item, .js-form-submit, .js-form-wrapper',
+      );
+      classNames.forEach((className) => {
+        $element.toggleClass(className, e.value);
+      });
+    }
+  });
 })(jQuery, Drupal);

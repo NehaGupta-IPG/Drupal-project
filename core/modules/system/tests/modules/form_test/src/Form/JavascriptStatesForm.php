@@ -482,6 +482,16 @@ class JavascriptStatesForm extends FormBase {
         ],
       ],
     ];
+    $form['textfield_has_classes_when_select_trigger_has_value2'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield has classes when select trigger has value2',
+      '#states' => [
+        'classes' => [
+          ':input[name="select_trigger"]' => ['value' => 'value2'],
+          'class' => ['states-test-class-one', 'states-test-class-two'],
+        ],
+      ],
+    ];
 
     // Multiple select trigger.
     $form['header_multiple_select'] = [
