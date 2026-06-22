@@ -23,7 +23,7 @@ The classic UI stays available as the no-JS fallback while this module matures.
   overlays them so unsaved changes are visible. **Save** replays the recorded
   moves to storage; **Cancel** discards them. A second editor of the same menu
   sees a lock notice and cannot save over the first. Column toggles (e.g.
-  "Expanded") and the per-row Edit/Delete forms still commit immediately —
+  "Enabled") and the per-row Edit/Delete forms still commit immediately —
   the working copy covers reorder structure only.
 
 ## Architecture
@@ -41,7 +41,7 @@ extracted from it:
   Save/Cancel working copy.
 
 Menu tree UI supplies the menu-specific pieces on top: the row renderer, the
-`Enabled` / `Expanded` / `Operations` column plugins, the move handler (which
+`Enabled` / `Operations` column plugins, the move handler (which
 links may move, the 9-level depth cap, and the write through the menu link
 manager), and the routes below.
 

@@ -55,14 +55,14 @@ final class EnabledColumnTest extends KernelTestBase {
   }
 
   /**
-   * The column sorts ahead of "Expanded".
+   * The column sorts ahead of "Operations".
    */
-  public function testSortsBeforeExpanded(): void {
+  public function testSortsBeforeOperations(): void {
     $columns = array_keys($this->container->get('plugin.manager.treegrid_column')->getSortedColumns());
     $this->assertLessThan(
-      array_search('expanded', $columns, TRUE),
+      array_search('operations', $columns, TRUE),
       array_search('enabled', $columns, TRUE),
-      'The enabled column should sort before the expanded column.',
+      'The enabled column should sort before the operations column.',
     );
   }
 

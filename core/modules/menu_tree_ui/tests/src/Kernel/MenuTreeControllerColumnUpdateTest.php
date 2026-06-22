@@ -169,7 +169,7 @@ final class MenuTreeControllerColumnUpdateTest extends KernelTestBase {
    */
   public function testNonContentLinkReturns400(): void {
     $request = $this->jsonRequest([
-      'column_id' => 'expanded',
+      'column_id' => 'enabled',
       'link_id' => 'system.admin',
       'value' => TRUE,
     ]);
@@ -188,13 +188,13 @@ final class MenuTreeControllerColumnUpdateTest extends KernelTestBase {
       'title' => 'Test link',
       'link' => ['uri' => 'internal:/'],
       'menu_name' => 'main',
-      'expanded' => FALSE,
+      'enabled' => FALSE,
     ]);
     $entity->save();
 
     $plugin_id = 'menu_link_content:' . $entity->uuid();
     $request = $this->jsonRequest([
-      'column_id' => 'expanded',
+      'column_id' => 'enabled',
       'link_id' => $plugin_id,
       'value' => TRUE,
     ]);
@@ -209,7 +209,7 @@ final class MenuTreeControllerColumnUpdateTest extends KernelTestBase {
       ->getStorage('menu_link_content');
     $storage->resetCache([$entity->id()]);
     $reloaded = $storage->load($entity->id());
-    $this->assertTrue((bool) $reloaded->get('expanded')->value);
+    $this->assertTrue((bool) $reloaded->get('enabled')->value);
   }
 
   /**
@@ -217,7 +217,7 @@ final class MenuTreeControllerColumnUpdateTest extends KernelTestBase {
    */
   public function testUnknownUuidReturns404(): void {
     $request = $this->jsonRequest([
-      'column_id' => 'expanded',
+      'column_id' => 'enabled',
       'link_id' => 'menu_link_content:00000000-0000-0000-0000-000000000000',
       'value' => TRUE,
     ]);

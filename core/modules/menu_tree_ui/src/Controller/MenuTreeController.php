@@ -34,7 +34,7 @@ use Symfony\Component\HttpFoundation\Response;
  *   - children():     JSON for one level (called on expand).
  *   - search():       HTML partial swapped in by htmx.
  *   - move():         drag-and-drop / keyboard reorder.
- *   - columnUpdate(): interactive column toggle (e.g. "expanded").
+ *   - columnUpdate(): interactive column toggle (e.g. "enabled").
  */
 final class MenuTreeController extends ControllerBase {
 

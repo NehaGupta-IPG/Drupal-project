@@ -184,7 +184,7 @@
   vertical-align: middle;
 }
 
-/* The "Expanded"-style column controls sit centered under their header. The
+/* The checkbox column controls sit centered under their header. The
    operations column is a full column too, but its dropbutton keeps the default
    alignment. */
 .menu-tree-ui__col--data,

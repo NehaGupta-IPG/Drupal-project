@@ -17,8 +17,7 @@ use Drupal\treegrid\Plugin\TreegridColumn\TreegridColumnBase;
  *
  * "Enabled" controls whether a menu link appears in rendered menus. This column
  * exposes it as an inline checkbox so editors can disable a link without
- * opening the full edit form. Unlike "Expanded", it applies to every link, leaf
- * or parent, and sorts ahead of "Expanded".
+ * opening the full edit form. It applies to every link, leaf or parent.
  *
  * Static/yml-defined links have no writable enabled property here; for those
  * the checkbox is rendered disabled.
