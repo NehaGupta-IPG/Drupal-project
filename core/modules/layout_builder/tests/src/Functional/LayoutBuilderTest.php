@@ -361,6 +361,8 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
     $page->fillField('id', 'my-other-menu');
     $page->pressButton('Save');
 
+    // The Add link action lives on the menu's dedicated links tab.
+    $this->drupalGet('admin/structure/menu/manage/my-other-menu/links');
     $page->clickLink('Add link');
     $page->fillField('title[0][value]', 'My link');
     $page->fillField('link[0][uri]', '/');
