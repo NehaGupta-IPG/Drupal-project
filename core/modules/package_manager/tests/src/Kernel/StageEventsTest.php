@@ -30,6 +30,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * @internal
  */
 #[Group('package_manager')]
+#[Group('#slow')]
 #[CoversClass(SandboxEvent::class)]
 #[RunTestsInSeparateProcesses]
 class StageEventsTest extends PackageManagerKernelTestBase implements EventSubscriberInterface {
@@ -41,14 +42,14 @@ class StageEventsTest extends PackageManagerKernelTestBase implements EventSubsc
    *
    * @var string[]
    */
-  private $events = [];
+  private array $events = [];
 
   /**
    * The stage under test.
    *
    * @var \Drupal\package_manager\SandboxManagerBase
    */
-  private $stage;
+  private TestSandboxManager $stage;
 
   /**
    * {@inheritdoc}
@@ -169,7 +170,7 @@ class StageEventsTest extends PackageManagerKernelTestBase implements EventSubsc
     $warning = ValidationResult::createWarning([
       $this->t('The path ahead is scary...'),
     ]);
-    $excluded_paths = $this->createMock(PathListInterface::class);
+    $excluded_paths = $this->createStub(PathListInterface::class);
 
     // Status check events can accept both errors and warnings.
     $event = new StatusCheckEvent($stage, $excluded_paths);

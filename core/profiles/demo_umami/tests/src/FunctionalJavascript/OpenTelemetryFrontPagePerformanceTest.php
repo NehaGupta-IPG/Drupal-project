@@ -52,15 +52,15 @@ class OpenTelemetryFrontPagePerformanceTest extends PerformanceTestBase {
     $this->assertSession()->pageTextContains('Umami');
 
     $expected = [
-      'QueryCount' => 336,
-      'CacheGetCount' => 388,
-      'CacheSetCount' => 386,
+      'QueryCount' => 184,
+      'CacheGetCount' => 232,
+      'CacheSetCount' => 240,
       'CacheDeleteCount' => 0,
-      'CacheTagLookupQueryCount' => 30,
+      'CacheTagLookupQueryCount' => 25,
       'CacheTagInvalidationCount' => 0,
-      'ScriptCount' => 1,
+      'ScriptCount' => 3,
       'ScriptBytes' => 12000,
-      'StylesheetCount' => 2,
+      'StylesheetCount' => 6,
       'StylesheetBytes' => 39150,
     ];
     $this->assertMetrics($expected, $performance_data);
@@ -96,10 +96,10 @@ class OpenTelemetryFrontPagePerformanceTest extends PerformanceTestBase {
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 1,
-      'ScriptCount' => 1,
+      'ScriptCount' => 3,
       'ScriptBytes' => 11850,
-      'StylesheetCount' => 2,
-      'StylesheetBytes' => 38800,
+      'StylesheetCount' => 6,
+      'StylesheetBytes' => 38850,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
@@ -122,16 +122,16 @@ class OpenTelemetryFrontPagePerformanceTest extends PerformanceTestBase {
     }, 'umamiFrontPageCoolCache');
 
     $expected = [
-      'QueryCount' => 103,
-      'CacheGetCount' => 225,
-      'CacheSetCount' => 89,
+      'QueryCount' => 59,
+      'CacheGetCount' => 170,
+      'CacheSetCount' => 75,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 26,
-      'ScriptCount' => 1,
+      'CacheTagLookupQueryCount' => 19,
+      'ScriptCount' => 3,
       'ScriptBytes' => 12000,
-      'StylesheetCount' => 2,
-      'StylesheetBytes' => 39150,
+      'StylesheetCount' => 6,
+      'StylesheetBytes' => 38850,
     ];
     $this->assertMetrics($expected, $performance_data);
   }

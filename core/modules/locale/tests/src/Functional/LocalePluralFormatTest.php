@@ -399,13 +399,13 @@ class LocalePluralFormatTest extends BrowserTestBase {
   /**
    * Returns a .po file with a simple plural formula.
    */
-  public function getPoFileWithSimplePlural() {
+  public function getPoFileWithSimplePlural(): string {
     return <<< EOF
 msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Type: text/plain; charset=utf-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\\n"
 
@@ -427,13 +427,13 @@ EOF;
   /**
    * Returns a .po file with a complex plural formula.
    */
-  public function getPoFileWithComplexPlural() {
+  public function getPoFileWithComplexPlural(): string {
     return <<< EOF
 msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Type: text/plain; charset=utf-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\\n"
 
@@ -451,13 +451,13 @@ EOF;
   /**
    * Returns a .po file with a missing plural formula.
    */
-  public function getPoFileWithMissingPlural() {
+  public function getPoFileWithMissingPlural(): string {
     return <<< EOF
 msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Type: text/plain; charset=utf-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 
 msgid "Monday"
@@ -468,13 +468,13 @@ EOF;
   /**
    * Returns a .po file with a broken plural formula.
    */
-  public function getPoFileWithBrokenPlural() {
+  public function getPoFileWithBrokenPlural(): string {
     return <<< EOF
 msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Type: text/plain; charset=utf-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 "Plural-Forms: broken, will not parse\\n"
 

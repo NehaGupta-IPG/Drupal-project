@@ -93,14 +93,14 @@ class NodeTypeTranslationTest extends BrowserTestBase {
    *
    * @see https://www.drupal.org/node/2584603
    */
-  protected function installParameters() {
+  protected function installParameters(): array {
     $parameters = parent::installParameters();
     $parameters['parameters']['langcode'] = $this->defaultLangcode;
     // Create an empty po file so we don't attempt to download one from
     // localize.drupal.org. It does not need to match the version exactly as the
     // multi-lingual system will fallback.
     \Drupal::service('file_system')->mkdir($this->publicFilesDirectory . '/translations', NULL, TRUE);
-    file_put_contents($this->publicFilesDirectory . "/translations/drupal-8.0.0.{$this->defaultLangcode}.po", '');
+    file_put_contents($this->publicFilesDirectory . '/translations/drupal-' . \Drupal::VERSION . ".{$this->defaultLangcode}.po", '');
     return $parameters;
   }
 

@@ -30,7 +30,7 @@ class RoleAccessCheckTest extends UnitTestCase {
    * @return \Symfony\Component\Routing\RouteCollection
    *   Returns the test route collection.
    */
-  protected function getTestRouteCollection() {
+  protected function getTestRouteCollection(): RouteCollection {
     $route_collection = new RouteCollection();
     $route_collection->add('role_test_1', new Route('/role_test_1',
       [
@@ -91,7 +91,7 @@ class RoleAccessCheckTest extends UnitTestCase {
    *
    * @see \Drupal\Tests\Core\Route\RouterRoleTest::testRoleAccess
    */
-  public static function roleAccessProvider() {
+  public static function roleAccessProvider(): array {
     // Setup two different roles used in the test.
     $rid_1 = 'role_test_1';
     $rid_2 = 'role_test_2';
@@ -144,7 +144,7 @@ class RoleAccessCheckTest extends UnitTestCase {
    * @see \Drupal\Tests\Core\Route\RouterRoleTest::roleAccessProvider
    */
   #[DataProvider('roleAccessProvider')]
-  public function testRoleAccess($path, $grant_accounts, $deny_accounts): void {
+  public function testRoleAccess(string $path, array $grant_accounts, array $deny_accounts): void {
     $cache_contexts_manager = $this->prophesize(CacheContextsManager::class);
     $cache_contexts_manager->assertValidTokens()->willReturn(TRUE);
     $cache_contexts_manager->reveal();

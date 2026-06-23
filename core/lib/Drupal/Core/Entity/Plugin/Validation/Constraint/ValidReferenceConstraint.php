@@ -17,32 +17,15 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class ValidReferenceConstraint extends SymfonyConstraint {
 
-  /**
-   * The default violation message.
-   *
-   * @var string
-   */
-  public $message = 'This entity (%type: %id) cannot be referenced.';
-
-  /**
-   * Violation message when the entity does not exist.
-   *
-   * @var string
-   */
-  public $nonExistingMessage = 'The referenced entity (%type: %id) does not exist.';
-
-  /**
-   * Violation message when a new entity ("autocreate") is invalid.
-   *
-   * @var string
-   */
-  public $invalidAutocreateMessage = 'This entity (%type: %label) cannot be referenced.';
-
-  /**
-   * Violation message when the target_id is empty.
-   *
-   * @var string
-   */
-  public $nullMessage = 'This value should not be null.';
+  public function __construct(
+    public $message = 'This entity (%type: %id) cannot be referenced.',
+    public $nonExistingMessage = 'The referenced entity (%type: %id) does not exist.',
+    public $invalidAutocreateMessage = 'This entity (%type: %label) cannot be referenced.',
+    public $nullMessage = 'This value should not be null.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct(groups: $groups, payload: $payload);
+  }
 
 }

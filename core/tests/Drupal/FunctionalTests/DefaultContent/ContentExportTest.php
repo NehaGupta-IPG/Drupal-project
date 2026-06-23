@@ -7,7 +7,7 @@ namespace Drupal\FunctionalTests\DefaultContent;
 use ColinODell\PsrTestLogger\TestLogger;
 use Drupal\Component\Serialization\Yaml;
 use Drupal\Component\Utility\SortArray;
-use Drupal\Core\DefaultContent\ContentExportCommand;
+use Drupal\Core\DefaultContent\Command\ContentExportCommand;
 use Drupal\Core\DefaultContent\Exporter;
 use Drupal\Core\DefaultContent\Finder;
 use Drupal\Core\DefaultContent\Importer;
@@ -38,6 +38,7 @@ use Psr\Log\LogLevel;
 #[CoversClass(Exporter::class)]
 #[Group('DefaultContent')]
 #[Group('Recipe')]
+#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class ContentExportTest extends BrowserTestBase {
 
@@ -73,7 +74,7 @@ class ContentExportTest extends BrowserTestBase {
 
     // Apply the recipe that sets up the fields and configuration for our
     // default content.
-    $fixtures_dir = $this->getDrupalRoot() . '/core/tests/fixtures';
+    $fixtures_dir = $this->root . '/core/tests/fixtures';
     $this->applyRecipe($fixtures_dir . '/recipes/default_content_base');
 
     // We need an administrative user to import and export content.
@@ -158,9 +159,22 @@ class ContentExportTest extends BrowserTestBase {
   }
 
   /**
+   * Tests various entity export scenarios.
+   */
+  public function testEntityExportScenarios(): void {
+    $this->doTestExportSingleEntityToDirectory();
+    $this->doTestExportWithDependencies();
+    $this->doTestCircularDependency();
+    $this->doTestMissingDependenciesAreLogged();
+    $this->doTestExportFileEntityWithMissingPhysicalFile();
+    $this->doTestExportedPasswordIsPreserved();
+    $this->doTestExportEntitiesFilteredByType();
+  }
+
+  /**
    * Tests that an exported user account can be logged in with after import.
    */
-  public function testExportedPasswordIsPreserved(): void {
+  protected function doTestExportedPasswordIsPreserved(): void {
     $account = $this->createUser();
     $this->assertNotEmpty($account->passRaw);
 
@@ -171,7 +185,7 @@ class ContentExportTest extends BrowserTestBase {
       $account->id(),
     ]);
     $this->assertSame(0, $process->wait());
-    $dir = 'public://content';
+    $dir = 'public://user-content';
     mkdir($dir);
     file_put_contents($dir . '/user.yml', $process->getOutput());
 
@@ -182,7 +196,12 @@ class ContentExportTest extends BrowserTestBase {
     // Ensure the import succeeded, and that we can log in with the imported
     // account. We want to use the standard login form, rather than a one-time
     // login link, to ensure the password is preserved.
-    $this->assertIsObject(user_load_by_name($account->getAccountName()));
+    $users = \Drupal::entityTypeManager()
+      ->getStorage('user')
+      ->loadByProperties(['name' => $account->getAccountName()]);
+    $user = reset($users);
+
+    $this->assertIsObject($user);
     $this->useOneTimeLoginLinks = FALSE;
     $this->drupalLogin($account);
     $this->assertSession()->addressMatches('/\/user\/[0-9]+$/');
@@ -191,7 +210,7 @@ class ContentExportTest extends BrowserTestBase {
   /**
    * Tests exporting a single entity to a directory with attachments.
    */
-  public function testExportSingleEntityToDirectory(): void {
+  protected function doTestExportSingleEntityToDirectory(): void {
     $file = $this->container->get(EntityRepositoryInterface::class)
       ->loadEntityByUuid('file', '7fb09f9f-ba5f-4db4-82ed-aa5ccf7d425d');
     $this->assertInstanceOf(File::class, $file);
@@ -212,7 +231,7 @@ class ContentExportTest extends BrowserTestBase {
   /**
    * Tests exporting a piece of content with its dependencies.
    */
-  public function testExportWithDependencies(): void {
+  protected function doTestExportWithDependencies(): void {
     $image_uri = $this->getRandomGenerator()
       ->image(uniqid('public://') . '.png', '200x200', '300x300');
     $file = File::create(['uri' => $image_uri]);
@@ -263,7 +282,7 @@ class ContentExportTest extends BrowserTestBase {
   /**
    * Tests that the exporter handles circular dependencies gracefully.
    */
-  public function testCircularDependency(): void {
+  protected function doTestCircularDependency(): void {
     $this->createEntityReferenceField('node', 'article', 'field_related', 'Related Content', 'node', selection_handler_settings: [
       'target_bundles' => ['page' => 'page'],
     ]);
@@ -298,7 +317,7 @@ class ContentExportTest extends BrowserTestBase {
   /**
    * Tests that the exporter handles missing dependencies gracefully.
    */
-  public function testMissingDependenciesAreLogged(): void {
+  protected function doTestMissingDependenciesAreLogged(): void {
     $this->createEntityReferenceField('node', 'article', 'field_related', 'Related Content', 'node', selection_handler_settings: [
       'target_bundles' => ['page' => 'page'],
     ]);
@@ -345,7 +364,7 @@ class ContentExportTest extends BrowserTestBase {
   /**
    * Tests exporting file entities without an accompanying physical file.
    */
-  public function testExportFileEntityWithMissingPhysicalFile(): void {
+  protected function doTestExportFileEntityWithMissingPhysicalFile(): void {
     $file = $this->container->get(EntityRepositoryInterface::class)
       ->loadEntityByUuid('file', '2b8e0616-3ef0-4a91-8cfb-b31d9128f9f8');
     $this->assertInstanceOf(File::class, $file);
@@ -376,7 +395,7 @@ class ContentExportTest extends BrowserTestBase {
   /**
    * Tests exporting entities filtered by type.
    */
-  public function testExportEntitiesFilteredByType(): void {
+  protected function doTestExportEntitiesFilteredByType(): void {
     // We should get an error if we try to export a non-existent entity type.
     $process = $this->runDrupalCommand(['content:export', 'camels']);
     $this->assertSame(1, $process->wait());

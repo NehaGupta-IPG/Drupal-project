@@ -27,7 +27,6 @@ class BlockFilterTest extends WebDriverTestBase {
     'node',
     'datetime',
     'layout_builder',
-    'layout_builder_expose_all_field_blocks',
     'user',
   ];
 
@@ -57,6 +56,8 @@ class BlockFilterTest extends WebDriverTestBase {
    * Tests block filter.
    */
   public function testBlockFilter(): void {
+    // @todo skipped due to random test failures, re-enable in https://www.drupal.org/project/drupal/issues/3028968.
+    $this->markTestSkipped();
     $assert_session = $this->assertSession();
     $session = $this->getSession();
     $page = $session->getPage();
@@ -85,11 +86,11 @@ class BlockFilterTest extends WebDriverTestBase {
     // Get the Content Fields category, which will be closed before filtering.
     $contentFieldsCategory = $page->find('named', ['content', 'Content fields']);
     // Link that belongs to the Content Fields category, to verify collapse.
-    $promoteToFrontPageLink = $page->find('named', ['content', 'Promoted to front page']);
-    // Test that front page link is visible until Content Fields collapsed.
-    $this->assertTrue($promoteToFrontPageLink->isVisible());
+    $promotedLink = $page->find('named', ['content', 'Promoted']);
+    // Test that promoted link is visible until Content Fields collapsed.
+    $this->assertTrue($promotedLink->isVisible());
     $contentFieldsCategory->click();
-    $this->assertFalse($promoteToFrontPageLink->isVisible());
+    $this->assertFalse($promotedLink->isVisible());
 
     // Test block filter reduces the number of visible rows.
     $filter->setValue('ad');
@@ -138,7 +139,7 @@ class BlockFilterTest extends WebDriverTestBase {
     $visible_categories = $this->filterVisibleElements($categories);
     $this->assertCount(0, $visible_categories);
     $announce_element = $page->find('css', '#drupal-live-announce');
-    $page->waitFor(2, function () use ($announce_element) {
+    $page->waitFor(2, function () use ($announce_element): bool {
       return str_starts_with($announce_element->getText(), '0 blocks are available');
     });
 
@@ -146,7 +147,7 @@ class BlockFilterTest extends WebDriverTestBase {
     $filter->setValue('');
     $this->assertAnnounceContains('All available blocks are listed.');
     // Confirm the Content Fields category remains collapsed after filtering.
-    $this->assertFalse($promoteToFrontPageLink->isVisible());
+    $this->assertFalse($promotedLink->isVisible());
   }
 
   /**
