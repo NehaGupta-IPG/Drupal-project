@@ -661,6 +661,18 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
    * Asserts a labelled row's depth (aria-level) matches the expected value.
    */
   private function assertDepth(string $label, int $expected): void {
+    $id = $this->linkIds[$label] ?? NULL;
+    $this->assertNotNull($id, "Unknown label $label.");
+    // The reorder commit is server-first; wait for the row to settle at its new
+    // depth so a slower CI commit does not race the assertion.
+    $this->getSession()->wait(
+      10000,
+      sprintf(
+        "((r) => !!r && r.getAttribute('aria-level') === %s)(document.querySelector(%s))",
+        json_encode((string) $expected),
+        json_encode(sprintf('tr[role="row"][data-id="%s"]', $id)),
+      ),
+    );
     $row = $this->row($label);
     $this->assertNotNull($row, "Row $label not in DOM.");
     $this->assertSame(
@@ -832,6 +844,20 @@ final class MenuTreeUiKeyboardMoveTest extends WebDriverTestBase {
    *   CSS matching the direct child rows (a `tr[data-parent-id="…"]` set).
    */
   private function assertSiblings(array $expected_labels, string $row_selector): void {
+    // The reorder commit is server-first; wait for the expected order so a
+    // slower CI commit does not race the assertion.
+    $expected_ids = array_map(
+      fn (string $label): string => $this->linkIds[$label] ?? '',
+      $expected_labels,
+    );
+    $this->getSession()->wait(
+      10000,
+      sprintf(
+        "Array.from(document.querySelectorAll(%s)).map((r) => r.dataset.id).join(',') === %s",
+        json_encode($row_selector),
+        json_encode(implode(',', $expected_ids)),
+      ),
+    );
     $rows = $this->getSession()->getPage()->findAll('css', $row_selector);
     $actual = [];
     foreach ($rows as $row) {
