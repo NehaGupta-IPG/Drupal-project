@@ -2,8 +2,10 @@
 
 namespace Drupal\locale;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\locale\File\LocaleFile;
 
@@ -17,40 +19,195 @@ class LocaleSource {
    */
   public const string LOCAL_FILE_HASH_ALGO = 'xxh128';
 
+  /**
+   * They key for the last checked information in the key value store.
+   */
+  protected const string LAST_CHECKED = 'last-checked';
+
   public function __construct(
-    protected readonly LocaleProjectStorageInterface $projectStorage,
+    protected readonly LocaleProjectRepository $localeProjectRepository,
     protected readonly FileSystemInterface $fileSystem,
     protected readonly ConfigFactoryInterface $configFactory,
+    protected readonly CurrentImportStorage $currentImportStorage,
+    protected readonly KeyValueFactoryInterface $keyValueFactory,
+    protected readonly TimeInterface $time,
   ) {}
 
   /**
    * Loads cached translation sources containing current translation status.
    *
-   * @param array $projects
+   * @param array|null $projects
    *   Array of project names. Defaults to all translatable projects.
-   * @param array $langcodes
+   * @param array|null $langcodes
    *   Array of language codes. Defaults to all translatable languages.
    *
-   * @return array
+   * @return \Drupal\locale\LocaleTranslationSource[][]
    *   Array of source objects. Keyed with <project name>:<language code>.
    *
    * @see sourceBuild()
    */
   public function loadSources(?array $projects = NULL, ?array $langcodes = NULL): array {
-    $sources = [];
-    $projects = $projects ?: array_keys($this->projectStorage->getProjects());
+    $projects = $projects ?: array_keys($this->localeProjectRepository->getAll());
     $langcodes = $langcodes ?: array_keys(locale_translatable_language_list());
 
-    // Load source data from locale_translation_status cache.
-    $status = locale_translation_get_status();
+    // If there are no translatable languages, return early.
+    if (!$langcodes) {
+      return [];
+    }
 
-    // Use only the selected projects and languages for update.
-    foreach ($projects as $project) {
+    // Load source data from locale_translation_status key value store.
+    $sources = $this->keyValueFactory->get('locale.translation_status')->getMultiple($projects);
+
+    // Build sources that are missing.
+    foreach ($projects as $project_name) {
       foreach ($langcodes as $langcode) {
-        $sources[$project][$langcode] = $status[$project][$langcode] ?? NULL;
+        if (!isset($sources[$project_name][$langcode])) {
+          $project = $this->localeProjectRepository->getMultiple([$project_name])[$project_name];
+          $sources[$project_name][$langcode] = $this->sourceBuild($project, $langcode);
+        }
       }
     }
     return $sources;
+  }
+
+  /**
+   * Loads a single translation source containing current translation status.
+   *
+   * @param string $project_name
+   *   The project name.
+   * @param string $langcode
+   *   The language code.
+   *
+   * @return \Drupal\locale\LocaleTranslationSource
+   *   The source object.
+   */
+  public function loadSource(string $project_name, string $langcode): LocaleTranslationSource {
+    return $this->loadSources([$project_name], [$langcode])[$project_name][$langcode];
+  }
+
+  /**
+   * Saves the status of translation sources in static cache.
+   *
+   * @param string $project
+   *   Machine readable project name.
+   * @param string $langcode
+   *   Language code.
+   * @param string $type
+   *   Type of data to be stored.
+   * @param \Drupal\locale\File\LocaleFile|\Drupal\locale\CurrentImport $data
+   *   Locale file or current import object.
+   */
+  public function saveSource(string $project, string $langcode, string $type, LocaleFile|CurrentImport $data): void {
+    // Load the translation status.
+    $project_sources = $this->loadSources([$project])[$project];
+
+    // Merge the new status data with the existing status.
+    $request_time = $this->time->getRequestTime();
+    switch ($type) {
+      case LOCALE_TRANSLATION_REMOTE:
+        // Add the source data to the status array.
+        $project_sources[$langcode]->files[$type] = $data;
+
+        // Check if this translation is the most recent one. Set timestamp and
+        // data type of the most recent translation source.
+        if (isset($data->timestamp) && $data->timestamp) {
+          if ($data->timestamp > $project_sources[$langcode]->timestamp) {
+            $project_sources[$langcode]->timestamp = $data->timestamp;
+            $project_sources[$langcode]->last_checked = $request_time;
+            $project_sources[$langcode]->type = $type;
+          }
+        }
+        break;
+
+      case LOCALE_TRANSLATION_LOCAL:
+        // Add the source data to the status array.
+        $project_sources[$langcode]->files[$type] = $data;
+
+        // Determine if the translation source has changed by comparing by
+        // content hash (mtime is unreliable).
+        $current_hash = $project_sources[$langcode]->hash ?? '';
+        if (!empty($current_hash)) {
+          if ($data->hash !== $current_hash) {
+            $project_sources[$langcode]->timestamp = $data->timestamp;
+            $project_sources[$langcode]->last_checked = $request_time;
+            $project_sources[$langcode]->type = $type;
+            $project_sources[$langcode]->hash = $data->hash;
+          }
+        }
+        // For legacy rows (pre-hash column being added), fall back to
+        // timestamp comparison. This may trigger a one-time re-import, after
+        // which a hash is stored and used for all future comparisons.
+        elseif (isset($data->timestamp) && $data->timestamp) {
+          if ($data->timestamp > $project_sources[$langcode]->timestamp) {
+            $project_sources[$langcode]->timestamp = $data->timestamp;
+            $project_sources[$langcode]->last_checked = $request_time;
+            $project_sources[$langcode]->type = $type;
+            $project_sources[$langcode]->hash = $data->hash;
+          }
+        }
+        break;
+
+      case LOCALE_TRANSLATION_CURRENT:
+        $data->last_checked = $request_time;
+        $project_sources[$langcode]->timestamp = $data->timestamp;
+        $project_sources[$langcode]->hash = $data->hash;
+        $project_sources[$langcode]->last_checked = $data->last_checked;
+        $project_sources[$langcode]->type = $type;
+        $this->currentImportStorage->save(CurrentImport::createFromSource($data));
+        break;
+    }
+
+    $this->keyValueFactory->get('locale.translation_status')->set($project, $project_sources);
+  }
+
+  /**
+   * Delete project entries from the status cache.
+   *
+   * @param array $projects
+   *   Project name(s) to be deleted from the cache.
+   */
+  public function deleteSources(array $projects): void {
+    $this->keyValueFactory->get('locale.translation_status')->deleteMultiple($projects);
+  }
+
+  /**
+   * Deletes sources for a given language code.
+   *
+   * @param string $langcode
+   *   The language code to delete.
+   */
+  public function deleteSourcesByLanguage(string $langcode): void {
+    $sources = $this->loadSources();
+    foreach ($sources as $project_name => $project_sources) {
+      if (isset($project_sources[$langcode])) {
+        unset($project_sources[$langcode]);
+        $this->keyValueFactory->get('locale.translation_status')->set($project_name, $project_sources);
+      }
+    }
+  }
+
+  /**
+   * Clear the translation status cache.
+   */
+  public function clearSources(): void {
+    $this->keyValueFactory->get('locale.translation_status')->deleteAll();
+  }
+
+  /**
+   * Updates the last checked timestamp.
+   */
+  public function updateLastChecked(): void {
+    $this->keyValueFactory->get('locale.translation_status')->set(static::LAST_CHECKED, $this->time->getRequestTime());
+  }
+
+  /**
+   * Returns the last checked timestamp.
+   *
+   * @return int|null
+   *   The last checked timestamp or NULL if not set.
+   */
+  public function getLastChecked(): ?int {
+    return $this->keyValueFactory->get('locale.translation_status')->get(static::LAST_CHECKED);
   }
 
   /**
@@ -64,11 +221,15 @@ class LocaleSource {
    * @return array
    *   Array of source objects. Keyed by project name and language code.
    *
-   * @see sourceBuild()
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+   *    \Drupal::service(LocaleSource::class)->buildSource($project, $langcodes)
+   *    instead.
+   *
+   * @see https://www.drupal.org/node/3569330
    */
-  public function buildSources(array $projects = [], array $langcodes = []): array {
+  public function buildSources(array $projects, array $langcodes = []): array {
     $sources = [];
-    $projects = $this->projectStorage->getProjects($projects);
+    $projects = $this->localeProjectRepository->getMultiple($projects);
     $langcodes = $langcodes ?: array_keys(locale_translatable_language_list());
 
     foreach ($projects as $project) {
@@ -107,17 +268,10 @@ class LocaleSource {
   public function sourceCheckFile($source) {
     if (isset($source->files[LOCALE_TRANSLATION_LOCAL])) {
       $source_file = $source->files[LOCALE_TRANSLATION_LOCAL];
-      $directory = $source_file->directory;
-      $filename = '/' . preg_quote($source_file->filename) . '$/';
-
-      if (is_dir($directory)) {
-        if ($files = $this->fileSystem->scanDirectory($directory, $filename, ['key' => 'name', 'recurse' => FALSE])) {
-          $file = current($files);
-          $source_file->uri = $file->uri;
-          $source_file->timestamp = filemtime($file->uri);
-          $source_file->hash = hash_file(self::LOCAL_FILE_HASH_ALGO, $file->uri);
-          return $source_file;
-        }
+      if (isset($source_file->uri) && file_exists($source_file->uri)) {
+        $source_file->timestamp = filemtime($source_file->uri);
+        $source_file->hash = hash_file(self::LOCAL_FILE_HASH_ALGO, $source_file->uri);
+        return $source_file;
       }
     }
     return FALSE;
@@ -126,7 +280,7 @@ class LocaleSource {
   /**
    * Builds abstract translation source.
    *
-   * @param object $project
+   * @param \Drupal\locale\LocaleTranslatableProject $project
    *   Project object.
    * @param string $langcode
    *   Language code.
@@ -134,50 +288,12 @@ class LocaleSource {
    *   (optional) File name of translation file. May contain placeholders.
    *   Defaults to the default translation filename from the settings.
    *
-   * @return object
-   *   Source object:
-   *   - "project": Project name.
-   *   - "name": Project name (inherited from project).
-   *   - "language": Language code.
-   *   - "core": Core version (inherited from project).
-   *   - "version": Project version (inherited from project).
-   *   - "project_type": Project type (inherited from project).
-   *   - "files": Array of file objects containing properties of local and
-   *     remote translation files.
-   *   Other processes can add the following properties:
-   *   - "type": Most recent translation source found. LOCALE_TRANSLATION_REMOTE
-   *      and LOCALE_TRANSLATION_LOCAL indicate available new translations,
-   *      LOCALE_TRANSLATION_CURRENT indicate that the current translation is
-   *      them most recent. "type" corresponds with a key of the "files" array.
-   *   - "timestamp": The creation time of the "type" translation (file).
-   *   - "last_checked": The time when the "type" translation was last checked.
-   *   The "files" array can hold file objects of type:
-   *   LOCALE_TRANSLATION_LOCAL, LOCALE_TRANSLATION_REMOTE and
-   *   LOCALE_TRANSLATION_CURRENT. Each contains following properties:
-   *   - "type": The object type (LOCALE_TRANSLATION_LOCAL,
-   *     LOCALE_TRANSLATION_REMOTE, etc. see above).
-   *   - "project": Project name.
-   *   - "langcode": Language code.
-   *   - "version": Project version.
-   *   - "uri": Local or remote file path.
-   *   - "directory": Directory of the local po file.
-   *   - "filename": File name.
-   *   - "timestamp": Timestamp of the file.
-   *   - "keep": TRUE to keep the downloaded file.
+   * @return \Drupal\locale\LocaleTranslationSource
+   *   The locale translation source object.
    */
-  public function sourceBuild($project, $langcode, $filename = NULL) {
-    // Follow-up issue: https://www.drupal.org/node/1842380.
-    // Convert $source object to a TranslatableProject class and use a typed
-    // class for $source-file.
-
+  public function sourceBuild(LocaleTranslatableProject $project, string $langcode, ?string $filename = NULL): LocaleTranslationSource {
     // Create a source object with data of the project object.
-    $source = clone $project;
-    $source->project = $project->name;
-    $source->langcode = $langcode;
-    $source->type = '';
-    $source->timestamp = 0;
-    $source->hash = '';
-    $source->last_checked = 0;
+    $source = LocaleTranslationSource::fromProject($project, $langcode);
 
     $filename = $filename ?: $this->configFactory->get('locale.settings')->get('translation.default_filename');
 
@@ -214,16 +330,15 @@ class LocaleSource {
     // If this project+language is already translated, we add its status and
     // update the current translation timestamp and last_updated time. If the
     // project+language is not translated before, create a new record.
-    $history = locale_translation_get_file_history();
-    if (isset($history[$project->name][$langcode]) && $history[$project->name][$langcode]->timestamp) {
-      $source->files[LOCALE_TRANSLATION_CURRENT] = $history[$project->name][$langcode];
+    $current_import_state = $this->currentImportStorage->get($project->name, $langcode);
+    if ($current_import_state instanceof CurrentImport && $current_import_state->timestamp) {
       $source->type = LOCALE_TRANSLATION_CURRENT;
-      $source->timestamp = $history[$project->name][$langcode]->timestamp;
-      $source->hash = $history[$project->name][$langcode]->hash;
-      $source->last_checked = $history[$project->name][$langcode]->last_checked;
+      $source->timestamp = $current_import_state->timestamp;
+      $source->hash = $current_import_state->hash;
+      $source->last_checked = $current_import_state->last_checked ?? NULL;
     }
-    else {
-      locale_translation_update_file_history($source);
+    elseif (!$current_import_state) {
+      $this->currentImportStorage->save(CurrentImport::createFromSource($source));
     }
 
     return $source;
@@ -249,7 +364,7 @@ class LocaleSource {
       '%project' => $project->name,
       '%version' => $project->version,
       '%core' => $project->core,
-      '%language' => $project->langcode ?? '%language',
+      '%language' => $project->langcode,
     ];
     return strtr($template, $variables);
   }
