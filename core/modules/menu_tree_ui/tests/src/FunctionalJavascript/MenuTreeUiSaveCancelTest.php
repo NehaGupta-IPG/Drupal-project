@@ -57,6 +57,12 @@ final class MenuTreeUiSaveCancelTest extends WebDriverTestBase {
       'css',
       'drupal-treegrid table[role="treegrid"] tbody tr[role="row"]'
     );
+    // Reorder wiring is deferred until the CSRF token fetch resolves; wait for
+    // it so a move is not dispatched before the drag controller is listening.
+    $this->assertSession()->waitForElement(
+      'css',
+      'drupal-treegrid[data-treegrid-reorder-ready="true"]',
+    );
   }
 
   /**

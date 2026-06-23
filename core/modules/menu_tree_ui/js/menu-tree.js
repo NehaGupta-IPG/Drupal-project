@@ -345,6 +345,11 @@
           REORDER_CONFIG,
         );
         drag.attach();
+        // Reorder is now interactive: the CSRF token has resolved (keyboard and
+        // pointer commits need it) and the drag controller is listening. Tests
+        // wait on this before dispatching a move so they do not race the
+        // deferred wiring.
+        element.dataset.treegridReorderReady = 'true';
       });
 
     element.addEventListener(
