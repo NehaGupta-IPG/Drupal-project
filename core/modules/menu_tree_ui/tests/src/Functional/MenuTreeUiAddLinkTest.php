@@ -70,9 +70,15 @@ final class MenuTreeUiAddLinkTest extends BrowserTestBase {
       $href,
       'Add link points at the standard menu-link add form.',
     );
-    $this->assertStringContainsString(
-      'destination=' . $tree_path,
-      $href,
+    // The destination carries the base path (e.g. /subdirectory) on a
+    // subdirectory install, so assert the tree path is its suffix rather than
+    // matching a fixed prefix.
+    $query = [];
+    parse_str((string) parse_url($href, PHP_URL_QUERY), $query);
+    $this->assertArrayHasKey('destination', $query, 'Add link sets a destination.');
+    $this->assertStringEndsWith(
+      $tree_path,
+      $query['destination'],
       'Add link returns to the tree page after the link is added.',
     );
   }
