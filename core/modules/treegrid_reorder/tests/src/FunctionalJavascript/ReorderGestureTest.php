@@ -53,7 +53,7 @@ final class ReorderGestureTest extends WebDriverTestBase {
     $this->dragBefore('3', '1');
     $this->settle();
 
-    $this->assertSame(['3', '1', '2', '4'], $this->rowOrder());
+    $this->assertRowOrder(['3', '1', '2', '4']);
     $this->assertPersistedOrder(['3', '1', '2', '4']);
   }
 
@@ -64,7 +64,7 @@ final class ReorderGestureTest extends WebDriverTestBase {
     // Move item 1 down past item 2: 2, 1, 3, 4.
     $this->dispatchKey('1', 'ArrowDown', shift: TRUE);
 
-    $this->assertSame(['2', '1', '3', '4'], $this->rowOrder());
+    $this->assertRowOrder(['2', '1', '3', '4']);
     $this->assertPersistedOrder(['2', '1', '3', '4']);
   }
 
@@ -78,7 +78,7 @@ final class ReorderGestureTest extends WebDriverTestBase {
     $this->dispatchKey('1', 'Enter');
     $this->settle();
 
-    $this->assertSame(['2', '3', '4', '1'], $this->rowOrder());
+    $this->assertRowOrder(['2', '3', '4', '1']);
     $this->assertPersistedOrder(['2', '3', '4', '1']);
   }
 
@@ -111,6 +111,27 @@ final class ReorderGestureTest extends WebDriverTestBase {
       $ids[] = $row->getAttribute('data-id');
     }
     return $ids;
+  }
+
+  /**
+   * Asserts the top-level DOM row order, polling for the commit to land.
+   *
+   * The server-first commit reorders the DOM only once the move POST and
+   * refresh land, and settle() can return before that starts, so wait for the
+   * expected order rather than reading it immediately.
+   *
+   * @param string[] $expected
+   *   The expected ordered list of row data-ids.
+   */
+  private function assertRowOrder(array $expected): void {
+    $this->getSession()->wait(
+      10000,
+      sprintf(
+        "Array.from(document.querySelectorAll('drupal-treegrid tr[role=\"row\"]')).map((r) => r.dataset.id).join(',') === %s",
+        json_encode(implode(',', $expected)),
+      ),
+    );
+    $this->assertSame($expected, $this->rowOrder());
   }
 
   /**
