@@ -42,7 +42,7 @@ class ManagedFileUploadAjaxCallbackTest extends UnitTestCase {
   }
 
   /**
-   * Tests that uploadAjaxCallback does not emit a warning when #prefix absent.
+   * Tests uploadAjaxCallback() when no #prefix is defined.
    */
   public function testUploadAjaxCallbackWithoutPrefix(): void {
     $form = [
@@ -67,7 +67,7 @@ class ManagedFileUploadAjaxCallbackTest extends UnitTestCase {
   }
 
   /**
-   * Tests that an existing #prefix value is preserved after the fix.
+   * Tests uploadAjaxCallback() with an existing #prefix.
    */
   public function testUploadAjaxCallbackPreservesExistingPrefix(): void {
     $existing_prefix = '<div id="managed-file-wrapper">';
