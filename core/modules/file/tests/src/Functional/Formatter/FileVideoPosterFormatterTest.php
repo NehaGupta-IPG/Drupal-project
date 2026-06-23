@@ -257,7 +257,7 @@ class FileVideoPosterFormatterTest extends FileFieldTestBase {
       'entity_type' => 'node',
       'field_name' => $poster_fieldname,
       'type' => 'entity_reference',
-      'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_SINGLE,
+      'cardinality' => 1,
       'settings' => ['target_type' => 'media'],
     ])->save();
     FieldConfig::create([
