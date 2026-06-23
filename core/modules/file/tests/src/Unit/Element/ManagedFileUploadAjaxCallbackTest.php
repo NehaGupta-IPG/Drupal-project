@@ -104,7 +104,7 @@ class ManagedFileUploadAjaxCallbackTest extends UnitTestCase {
   /**
    * Tests that an existing #prefix value is preserved after the fix.
    *
-   * The null-coalescing initialisation must not clobber a #prefix that was
+   * The null-coalescing initialization must not clobber a #prefix that was
    * legitimately set by processManagedFile().
    */
   public function testUploadAjaxCallbackPreservesExistingPrefix(): void {
