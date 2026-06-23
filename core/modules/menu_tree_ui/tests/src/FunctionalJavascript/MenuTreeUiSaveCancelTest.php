@@ -249,9 +249,19 @@ final class MenuTreeUiSaveCancelTest extends WebDriverTestBase {
     JS;
 
     $this->getSession()->executeScript($script);
+    // Wait on the end state - the top level reading C, A, B with the host done
+    // moving/loading - rather than only the cleared flags. The cleared flags
+    // can read true before the reorder lands, racing a slower commit on CI.
+    $expected_ids = implode(',', [
+      $this->linkIds['C'],
+      $this->linkIds['A'],
+      $this->linkIds['B'],
+    ]);
     $this->getSession()->wait(
-      5000,
-      '!document.querySelector(\'drupal-treegrid[data-treegrid-moving="true"]\')'
+      10000,
+      "Array.from(document.querySelectorAll('tr[role=\"row\"][data-parent-id=\"\"]'))"
+      . ".map((r) => r.dataset.id).join(',') === '$expected_ids'"
+      . ' && !document.querySelector(\'drupal-treegrid[data-treegrid-moving="true"]\')'
       . ' && !document.querySelector(\'.menu-tree-ui-row--dragging\')'
       . ' && !document.querySelector(\'[data-loading="true"]\')',
     );
