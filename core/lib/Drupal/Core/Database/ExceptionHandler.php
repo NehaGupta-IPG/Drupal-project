@@ -25,7 +25,7 @@ class ExceptionHandler {
    *
    * @throws \Drupal\Core\Database\DatabaseExceptionWrapper
    */
-  public function handleStatementException(\Exception $exception, string $sql, array $options = []): void {
+  public function handleStatementException(\Exception $exception, string $sql, array $options = []): never {
     if ($exception instanceof \PDOException) {
       // Wrap the exception in another exception, because PHP does not allow
       // overriding Exception::getMessage(). Its message is the extra database
@@ -53,7 +53,7 @@ class ExceptionHandler {
    * @throws \Drupal\Core\Database\DatabaseExceptionWrapper
    * @throws \Drupal\Core\Database\IntegrityConstraintViolationException
    */
-  public function handleExecutionException(\Exception $exception, StatementInterface $statement, array $arguments = [], array $options = []): void {
+  public function handleExecutionException(\Exception $exception, StatementInterface $statement, array $arguments = [], array $options = []): never {
     if ($exception instanceof \PDOException) {
       // Wrap the exception in another exception, because PHP does not allow
       // overriding Exception::getMessage(). Its message is the extra database
