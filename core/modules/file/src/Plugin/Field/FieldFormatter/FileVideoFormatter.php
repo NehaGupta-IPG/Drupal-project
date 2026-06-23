@@ -5,6 +5,8 @@ namespace Drupal\file\Plugin\Field\FieldFormatter;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -15,6 +17,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\Core\Url;
+use Drupal\file\FileInterface;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\image\ImageDerivativeUtilities;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -46,7 +49,9 @@ class FileVideoFormatter extends FileMediaFormatterBase {
       $configuration['third_party_settings'],
       $container->get('current_user'),
       $container->get('entity_type.manager')->getStorage('image_style'),
-      $container->get('entity_field.manager')
+      $container->get('entity_field.manager'),
+      $container->get('module_handler'),
+      $container->get('entity_type.manager')->getStorage('file')
     );
   }
 
@@ -61,8 +66,15 @@ class FileVideoFormatter extends FileMediaFormatterBase {
     protected AccountInterface $currentUser,
     protected EntityStorageInterface $imageStyleStorage,
     protected EntityFieldManagerInterface $entityFieldManager,
+    protected ?ModuleHandlerInterface $moduleHandler = NULL,
+    protected ?EntityStorageInterface $fileStorage = NULL,
   ) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
+    // The last two arguments are optional to avoid a BC break for subclasses
+    // that call the parent constructor positionally. Lazily fall back to the
+    // container when they are not provided.
+    $this->moduleHandler = $moduleHandler ?: \Drupal::moduleHandler();
+    $this->fileStorage = $fileStorage ?: \Drupal::entityTypeManager()->getStorage('file');
   }
 
   /**
@@ -92,11 +104,19 @@ class FileVideoFormatter extends FileMediaFormatterBase {
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $fields = $this->entityFieldManager->getFieldDefinitions($form['#entity_type'], $form['#bundle']);
 
-    // Get all image fields for html5 poster.
-    $image_fields = [];
+    // Get all eligible fields for the html5 poster: image fields, and - when
+    // the media module is enabled - entity reference fields targeting media.
+    // The media's image is resolved at render time. The media module is only
+    // consulted via the module handler so that the file module keeps no
+    // dependency on the media module.
+    $poster_fields = [];
+    $media_enabled = $this->moduleHandler->moduleExists('media');
     foreach ($fields as $field) {
       if ($field->getType() == 'image') {
-        $image_fields[$field->getName()] = $field->getLabel();
+        $poster_fields[$field->getName()] = $field->getLabel();
+      }
+      elseif ($media_enabled && $field->getType() === 'entity_reference' && $field->getSetting('target_type') === 'media') {
+        $poster_fields[$field->getName()] = $field->getLabel();
       }
     }
     $image_styles = \Drupal::service(ImageDerivativeUtilities::class)->styleOptions();
@@ -139,9 +159,9 @@ class FileVideoFormatter extends FileMediaFormatterBase {
       'poster' => [
         '#type' => 'select',
         '#title' => $this->t('Poster field'),
-        '#description' => $this->t('An image field to use as the source of the poster attribute'),
+        '#description' => $this->t('An image field, or a media reference field whose media has an image, to use as the source of the poster attribute.'),
         '#default_value' => $this->getSetting('poster'),
-        '#options' => $image_fields,
+        '#options' => $poster_fields,
         '#empty_option' => $this->t('- None -'),
       ],
       'poster_image_style' => [
@@ -209,7 +229,39 @@ class FileVideoFormatter extends FileMediaFormatterBase {
     if (!empty($this->getSetting('poster')) && !$entity->get($this->getSetting('poster'))->isEmpty()) {
       $poster_file_item = $entity->get($this->getSetting('poster'))[0];
 
-      $poster_file_entity = $poster_file_item->entity;
+      $referenced = $poster_file_item->entity;
+      $poster_file_entity = NULL;
+      if ($referenced instanceof FileInterface) {
+        // The selected field references the poster file directly (image field).
+        $poster_file_entity = $referenced;
+      }
+      elseif ($referenced instanceof FieldableEntityInterface && $referenced->getEntityTypeId() === 'media' && method_exists($referenced, 'getSource')) {
+        // The selected field references a media entity. The rendered output
+        // depends on this media entity as soon as it is inspected, so add its
+        // cacheability now - on both the success and bail-out paths - so that a
+        // later non-image to image change invalidates the host render cache.
+        CacheableMetadata::createFromObject($referenced)->applyTo($elements);
+        // Resolve its source file and accept it only when it is an image. This
+        // is done via duck typing (getSource()) and the file storage so that
+        // the file module keeps no dependency on the media module.
+        $source = $referenced->getSource();
+        if ($source !== NULL) {
+          $source_value = $source->getSourceFieldValue($referenced);
+          if ($source_value !== NULL) {
+            $file = $this->fileStorage->load($source_value);
+            if ($file instanceof FileInterface && str_starts_with((string) $file->getMimeType(), 'image/')) {
+              $poster_file_entity = $file;
+            }
+          }
+        }
+      }
+
+      // Bail out when no usable image poster could be resolved (for example a
+      // non-image media reference).
+      if ($poster_file_entity === NULL) {
+        return $elements;
+      }
+
       // Set the entity in the correct language for display.
       if ($poster_file_entity instanceof TranslatableInterface && $poster_file_entity->hasTranslation($langcode)) {
         $poster_file_entity = $poster_file_entity->getTranslation($langcode);
