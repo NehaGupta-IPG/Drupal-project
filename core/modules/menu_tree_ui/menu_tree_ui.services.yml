@@ -20,9 +20,12 @@ services:
 
   menu_tree_ui.mover:
     class: Drupal\menu_tree_ui\Service\MenuTreeMover
-    autowire: true
     arguments:
-      $logger: '@logger.channel.menu_tree_ui'
+      - '@menu.tree_storage'
+      - '@module_handler'
+      - '@menu_tree_ui.loader'
+      - '@plugin.manager.menu.link'
+      - '@logger.channel.menu_tree_ui'
   Drupal\menu_tree_ui\Service\MenuTreeMover: '@menu_tree_ui.mover'
 
   logger.channel.menu_tree_ui:
