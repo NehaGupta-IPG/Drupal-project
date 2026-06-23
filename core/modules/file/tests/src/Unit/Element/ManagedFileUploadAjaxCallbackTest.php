@@ -20,6 +20,9 @@ use Symfony\Component\HttpFoundation\Request;
 #[Group('file')]
 class ManagedFileUploadAjaxCallbackTest extends UnitTestCase {
 
+  /**
+   * The renderer.
+   */
   protected RendererInterface $renderer;
 
   /**
