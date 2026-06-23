@@ -122,6 +122,9 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
    *
    * @return \Drupal\Core\Template\AttributeValueBase
    *   An AttributeValueBase representation of the attribute's value.
+   *
+   * @throws \InvalidArgumentException
+   *   If $value is an object without a __toString() method.
    */
   protected function createAttributeValue($name, $value) {
     // If the value is already an AttributeValueBase object,
@@ -152,8 +155,16 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
       $value = PlainTextOutput::renderFromHtml($value);
       $value = new AttributeString($name, $value);
     }
-    elseif (!is_object($value)) {
+    elseif (!is_object($value) || method_exists($value, '__toString')) {
+      // Scalars or objects implementing __toString() can be cast to strings,
+      // and can therefore be passed directly.
       $value = new AttributeString($name, $value);
+    }
+    elseif (is_object($value)) {
+      // Objects not implementing __toString() are not printable.
+      // Detect this case here instead of letting Twig throw an exception.
+      $class = get_class($value);
+      throw new \InvalidArgumentException("Attribute '{$name}' of type '{$class}' cannot be printed.");
     }
     return $value;
   }

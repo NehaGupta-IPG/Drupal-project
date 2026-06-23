@@ -7,11 +7,15 @@ namespace Drupal\Tests\Core\Template;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\AttributeArray;
+use Drupal\Core\Template\AttributeBoolean;
 use Drupal\Core\Template\AttributeString;
+use Drupal\Core\Template\AttributeValueBase;
 use Drupal\Core\Template\Loader\StringLoader;
 use Drupal\Tests\UnitTestCase;
+use Drupal\TestTools\Random;
 use Twig\Environment;
 
 /**
@@ -356,7 +360,7 @@ class AttributeTest extends UnitTestCase {
   public function testPrint(): void {
     $attribute = new Attribute(['class' => ['example-class'], 'id' => 'example-id', 'enabled' => TRUE]);
 
-    $content = $this->randomMachineName();
+    $content = Random::machineName();
     $html = '<div' . (string) $attribute . '>' . $content . '</div>';
     $this->assertClass('example-class', $html);
     $this->assertNoClass('example-class2', $html);
@@ -531,6 +535,91 @@ class AttributeTest extends UnitTestCase {
     $attributes = new Attribute(['class' => ['example-class']]);
     $this->expectException(\TypeError::class);
     $attributes->merge('not an array');
+  }
+
+  /**
+   * @covers ::createAttributeValue()
+   * @dataProvider providerTestCreateAttributeValues
+   */
+  public function testCreateAttributeValue(string $name, $value, Attribute $result): void {
+    $attribute = new Attribute();
+    $createAttributeValueMethod = $this->getCreateAttributeValueMethod();
+    $this->assertEquals($result, $createAttributeValueMethod->invokeArgs($attribute, [$name, $value]));
+  }
+
+  /**
+   * Provides test data sets for testCreateAttributeValue().
+   *
+   * @see $this->testCreateAttributeValue()
+   *
+   * @return array
+   *   An array of test data each containing an array of the name & value of the
+   *   attribute, and the expected result.
+   */
+  public static function providerTestCreateAttributeValues(): array {
+    $testCases = [];
+
+    // Test a pure string.
+    $name = Random::machineName();
+    $value = Random::machineName();
+    $testCases[] = [$name, $value, new AttributeString($name, $value)];
+
+    // Test an AttributeValue instance.
+    $value = $this->createMock(AttributeValueBase::class);
+    $testCases[] = [$name, $value, $value];
+
+    // Test an array.
+    $value = [Random::getGenerator()->string(), Random::getGenerator()->string() => Random::getGenerator()->string()];
+    $testCases[] = [$name, $value, new AttributeArray($name, $value)];
+
+    // Test an object passed with the name "class".
+    $value = Random::getGenerator()->object();
+    $testCases[] = ['class', $value, new AttributeArray('class', (array) $value)];
+
+    // Test boolean values.
+    $testCases[] = [$name, FALSE, new AttributeBoolean($name, FALSE)];
+    $testCases[] = [$name, TRUE, new AttributeBoolean($name, TRUE)];
+
+    // Test NULL.
+    $testCases[] = [$name, NULL, new AttributeString($name, NULL)];
+
+    // Test object with render and __toString methods that is not an instance of
+    // AttributeValueBase.
+    $value = $this->createMock(TranslatableMarkup::class);
+    $testCases[] = [$name, $value, new AttributeString($name, $value)];
+
+    return $testCases;
+  }
+
+  /**
+   * @covers ::createAttributeValue()
+   *
+   * @throws \ReflectionException
+   */
+  public function testCreateAttributeValueException(): void {
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage("Attribute 'Random string !@#$' of type 'stdClass' cannot be printed.");
+    $attribute = new Attribute();
+    $name = 'Random string !@#$';
+    $value = Random::getGenerator()->object();
+    $createAttributeValueMethod = $this->getCreateAttributeValueMethod();
+
+    $createAttributeValueMethod->invokeArgs($attribute, [$name, $value]);
+  }
+
+  /**
+   * Helper method to get protected createAttributeValue method.
+   *
+   * @return \ReflectionMethod
+   *   A createAttributeValue method.
+   *
+   * @throws \ReflectionException
+   */
+  protected function getCreateAttributeValueMethod(): \ReflectionMethod {
+    $attributeClass = new \ReflectionClass(Attribute::class);
+    $method = $attributeClass->getMethod('createAttributeValue');
+    $method->setAccessible(TRUE);
+    return $method;
   }
 
 }

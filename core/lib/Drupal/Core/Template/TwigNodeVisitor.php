@@ -6,7 +6,6 @@ use Twig\Environment;
 use Twig\Node\Nodes;
 use Twig\TwigFunction;
 use Twig\Node\Expression\FilterExpression;
-use Twig\Node\Expression\FunctionExpression;
 use Twig\Node\Node;
 use Twig\Node\PrintNode;
 use Twig\NodeVisitor\NodeVisitorInterface;
@@ -48,11 +47,14 @@ class TwigNodeVisitor implements NodeVisitorInterface {
       }
       $class = get_class($node);
       $line = $node->getTemplateLine();
+      $expr = (string) $node->getNode('expr');
+      // Pass the expression's source as an extra argument to render_var().
       return new $class(
-        new FunctionExpression(
+        new TwigFunctionExpression(
           new TwigFunction('render_var', [$env->getExtension(TwigExtension::class), 'renderVar']),
           new Nodes([$node->getNode('expr')]),
-          $line
+          $line,
+          [$expr],
         ),
         $line
       );
