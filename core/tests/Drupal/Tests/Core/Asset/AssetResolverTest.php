@@ -95,6 +95,13 @@ class AssetResolverTest extends UnitTestCase {
   protected array $libraries = [];
 
   /**
+   * The mocked request stack.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack|\PHPUnit\Framework\MockObject\Stub
+   */
+  protected $requestStack;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -200,9 +207,15 @@ class AssetResolverTest extends UnitTestCase {
 
     $this->themeHandler = $this->createStub(ThemeHandlerInterface::class);
 
-    $request_stack = new RequestStack();
-    $request_stack->push(Request::create('/'));
-    $this->assetResolver = new AssetResolver($this->libraryDiscovery, $this->libraryDependencyResolver, $this->moduleHandler, $this->themeManager, $this->languageManager, $this->cache, $this->themeHandler, $request_stack);
+    $request = $this->createStub(Request::class);
+    $request
+      ->method('getBasePath')
+      ->willReturn('');
+    $this->requestStack = $this->createStub(RequestStack::class);
+    $this->requestStack
+      ->method('getCurrentRequest')
+      ->willReturn($request);
+    $this->assetResolver = new AssetResolver($this->libraryDiscovery, $this->libraryDependencyResolver, $this->moduleHandler, $this->themeManager, $this->languageManager, $this->cache, $this->themeHandler, $this->requestStack);
   }
 
   /**
