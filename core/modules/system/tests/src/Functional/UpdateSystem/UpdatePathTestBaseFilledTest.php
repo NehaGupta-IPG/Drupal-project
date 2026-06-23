@@ -32,7 +32,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/drupal-11.3.0.filled.standard.php.gz';
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/drupal-8.update-test-schema-enabled.php';
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/drupal-8.update-test-semver-update-n-enabled.php';
-    $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/install-mysqli.php';
   }
 
   /**
@@ -232,7 +231,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $assert_session->elementContains('css', '#field-test-4', 'Email');
     $assert_session->elementContains('css', '#field-test-5', 'Link');
     $assert_session->elementContains('css', '#field-test-6', 'Float');
-    $assert_session->elementContains('css', '#field-test-7', 'Telephone number');
     $assert_session->elementContains('css', '#field-test-8', 'Entity reference');
     $assert_session->elementContains('css', '#field-test-9', 'File');
     $assert_session->elementContains('css', '#field-test-10', 'Image');
@@ -354,7 +352,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
       'syslog',
       'system',
       'taxonomy',
-      'telephone',
       'text',
       'toolbar',
       'update',

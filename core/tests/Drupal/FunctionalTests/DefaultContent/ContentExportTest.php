@@ -7,7 +7,7 @@ namespace Drupal\FunctionalTests\DefaultContent;
 use ColinODell\PsrTestLogger\TestLogger;
 use Drupal\Component\Serialization\Yaml;
 use Drupal\Component\Utility\SortArray;
-use Drupal\Core\DefaultContent\ContentExportCommand;
+use Drupal\Core\DefaultContent\Command\ContentExportCommand;
 use Drupal\Core\DefaultContent\Exporter;
 use Drupal\Core\DefaultContent\Finder;
 use Drupal\Core\DefaultContent\Importer;
@@ -74,7 +74,7 @@ class ContentExportTest extends BrowserTestBase {
 
     // Apply the recipe that sets up the fields and configuration for our
     // default content.
-    $fixtures_dir = $this->getDrupalRoot() . '/core/tests/fixtures';
+    $fixtures_dir = $this->root . '/core/tests/fixtures';
     $this->applyRecipe($fixtures_dir . '/recipes/default_content_base');
 
     // We need an administrative user to import and export content.

@@ -132,6 +132,11 @@ services:
     arguments: ['@request_stack']
     tags:
       - { name: cache.context }
+  cache_context.exception_status_code:
+    class: Drupal\Core\Cache\Context\ExceptionStatusCodeCacheContext
+    arguments: ['@request_stack']
+    tags:
+      - { name: cache.context }
   cache_context.url:
     class: Drupal\Core\Cache\Context\UrlCacheContext
     arguments: ['@request_stack']
@@ -345,12 +350,25 @@ services:
       - { name: cache.bin, default_backend: cache.backend.chainedfast }
     factory: ['@cache_factory', 'get']
     arguments: [discovery]
+  cache.routes:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin, default_backend: cache.backend.chainedfast }
+    factory: ['@cache_factory', 'get']
+    arguments: [routes]
   cache.memory:
     class: Drupal\Core\Cache\MemoryCache\MemoryCacheInterface
     tags:
       - { name: cache.bin.memory, default_backend: cache.backend.memory.memory }
     factory: ['@cache_factory', 'get']
     arguments: [memory]
+  cache.file_parsing:
+    # The cache.bin service tag is intentionally omitted because items in this
+    # bin are designed to persist between cache clears. Invalidation happens via
+    # filemtime checks instead.
+    class: Drupal\Core\Cache\CacheBackendInterface
+    factory: ['@cache_factory', 'get']
+    arguments: [file_parsing]
   cache_prewarmer:
     class: Drupal\Core\PreWarm\CachePreWarmer
     arguments: ['@class_resolver']
@@ -1104,16 +1122,13 @@ services:
   Drupal\Core\Routing\AdminContext: '@router.admin_context'
   router.route_provider:
     class: Drupal\Core\Routing\RouteProvider
-    arguments: ['@database', '@state', '@path.current', '@cache.data', '@path_processor_manager', '@cache_tags.invalidator', 'router', '@language_manager']
+    arguments: ['@database', '@state', '@path.current', '@cache.data', '@path_processor_manager', '@cache_tags.invalidator', '@cache.routes', 'router', '@language_manager']
     tags:
       - { name: backend_overridable }
   Drupal\Core\Routing\RouteProviderInterface: '@router.route_provider'
   router.route_provider.lazy_builder:
     class: Drupal\Core\Routing\RouteProviderLazyBuilder
     arguments: ['@router.route_provider', '@router.builder']
-  router.route_preloader:
-    class: Drupal\Core\Routing\RoutePreloader
-    arguments: ['@router.route_provider', '@state']
   url_generator.non_bubbling:
     class: Drupal\Core\Routing\UrlGenerator
     arguments: ['@router.route_provider', '@path_processor_manager', '@route_processor_manager', '@request_stack', '%filter_protocols%']
@@ -1184,9 +1199,12 @@ services:
   router.builder.attributes:
     class: Drupal\Core\Routing\AttributeRouteDiscovery
     arguments: ['@container.namespaces']
+  router.yaml_cache_collector:
+    class: Drupal\Core\Utility\YamlCacheCollector
+    arguments: ['router.parsing_cache', '@cache.file_parsing', '@lock', '@datetime.time']
   router.builder.yaml:
     class: Drupal\Core\Routing\YamlRouteDiscovery
-    arguments: ['@module_handler', '@controller_resolver']
+    arguments: ['@module_handler', '@controller_resolver', '@router.yaml_cache_collector']
   menu.rebuild_subscriber:
     class: Drupal\Core\EventSubscriber\MenuRouterRebuildSubscriber
     arguments: ['@lock', '@plugin.manager.menu.link', '@database', '@database.replica_kill_switch', '@logger.channel.menu']
@@ -1771,8 +1789,13 @@ services:
   Drupal\Core\Asset\LibraryDiscoveryInterface: '@library.discovery'
   library.discovery.parser:
     class: Drupal\Core\Asset\LibraryDiscoveryParser
-    arguments: ['%app.root%', '@module_handler', '@theme.manager', '@stream_wrapper_manager', '@library.libraries_directory_file_finder', '@extension.path.resolver', '@plugin.manager.sdc']
+    arguments: ['%app.root%', '@module_handler', '@theme.manager', '@stream_wrapper_manager', '@library.libraries_directory_file_finder', '@extension.path.resolver', '@plugin.manager.sdc', '@library.parsing_cache']
   Drupal\Core\Asset\LibraryDiscoveryParser: '@library.discovery.parser'
+  library.parsing_cache:
+    class: Drupal\Core\Utility\YamlCacheCollector
+    arguments: ['library.parsing_cache', '@cache.file_parsing', '@lock', '@datetime.time']
+    tags:
+      - { name: needs_destruction }
   library.libraries_directory_file_finder:
     class: Drupal\Core\Asset\LibrariesDirectoryFileFinder
     arguments: ['%app.root%', '%site.path%', '@extension.list.profile', '%install_profile%']
@@ -1854,6 +1877,18 @@ services:
     class: Drupal\Core\Template\Loader\StringLoader
     tags:
       - { name: twig.loader, priority: -100 }
+  # Service holding the commands made available to the `dr` command.
+  # The service is completed with ConsoleCompilerPass.
+  console.command_loader:
+    class: Symfony\Component\Console\CommandLoader\CommandLoaderInterface
+  logger.console:
+    class: Drupal\Core\Command\DrupalConsoleLogger
+    arguments: ['@logger.log_message_parser']
+    tags:
+      - { name: logger }
+  Drupal\Core\Command\DrupalConsoleLogger: '@logger.console'
+  Drupal\Core\Command\EventSubscriber\ConsoleSubscriber:
+    autowire: true
   element_info:
     alias: plugin.manager.element_info
   file.htaccess_writer:
