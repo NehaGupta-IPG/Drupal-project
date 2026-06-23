@@ -368,6 +368,19 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   }
 
   /**
+   * Stops field item lists from being held as weak references.
+   *
+   * Field values applied without notifying the entity, such as item-level
+   * default values, would otherwise be held only by a weak reference and lost
+   * before the entity is saved.
+   *
+   * @internal
+   */
+  public function disableWeakFieldReferences(): void {
+    $this->createWeakReferences = FALSE;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function isDefaultRevision($new_value = NULL) {
@@ -515,15 +528,13 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    * {@inheritdoc}
    */
   public function save() {
-    // SqlContentStorage::mapToStorageRecord() relies on creating field item
-    // lists for entity keys just as ID, bundle etc. which are otherwise rarely
-    // or never accessed in this way. These have to persist after the save call
-    // so that calling code is able to retrieve the ID, since they are not also
+    // SqlContentEntityStorage::mapToStorageRecord() creates field item lists
+    // for entity keys such as the ID and bundle which are otherwise rarely or
+    // never accessed in this way. These have to persist after the save call so
+    // that calling code is able to retrieve the ID, since they are not also
     // written to $entity->values.
     $this->createWeakReferences = FALSE;
-    $storage = $this->entityTypeManager()->getStorage($this->entityTypeId);
-    $return = $storage->save($this);
-    return $return;
+    return $this->entityTypeManager()->getStorage($this->entityTypeId)->save($this);
   }
 
   /**
@@ -890,6 +901,20 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    * {@inheritdoc}
    */
   public function onChange($name) {
+    // A field value has changed. If the field item list is currently held only
+    // via a weak reference, promote it to a strong reference so the change
+    // persists even when the calling code does not retain the field object.
+    if (isset($this->fieldWeakReferences[$name])) {
+      foreach ($this->fieldWeakReferences[$name] as $langcode => $weak_reference) {
+        if (!isset($this->fields[$name][$langcode])) {
+          $field = $weak_reference->get();
+          if ($field !== NULL) {
+            $this->fields[$name][$langcode] = $field;
+          }
+        }
+      }
+    }
+
     // Check if the changed name is the value of any entity keys and if any of
     // those values are currently cached, if so, reset it. Exclude the bundle
     // from that check, as it ready only and must not change, unsetting it could
@@ -965,8 +990,6 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     // Populate entity translation object cache so it will be available for all
     // translation objects.
     if (!isset($this->translations[$this->activeLangcode]['entity'])) {
-      // Ensure field references are persistent.
-      $this->createWeakReferences = FALSE;
       $this->translations[$this->activeLangcode]['entity'] = $this;
     }
 
@@ -1352,8 +1375,11 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
       }
       foreach ($fields_by_langcode as $langcode => $items) {
         if (!isset($this->fields[$name][$langcode])) {
-          if ($items->get() !== NULL) {
-            $this->fields[$name][$langcode] = clone $items->get();
+          $field = $items->get();
+          if ($field !== NULL) {
+            // Promote the live field to a strong reference; the loop below
+            // clones it onto the cloned entity along with the other fields.
+            $this->fields[$name][$langcode] = $field;
           }
         }
       }
