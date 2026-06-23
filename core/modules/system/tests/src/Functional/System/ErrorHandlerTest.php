@@ -76,6 +76,12 @@ class ErrorHandlerTest extends BrowserTestBase {
     $this->assertSession()->responseNotContains($error_user_notice);
     $this->assertNoMessages();
     $this->assertSession()->responseNotContains('<pre class="backtrace">');
+
+    $config->set('error_level', ERROR_REPORTING_DISPLAY_ALL)->save();
+    $this->drupalGet('error-test/generate-xss-warning');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseNotContains('<script>alert("xss")</script>');
+    $this->assertSession()->responseContains('alert("xss")');
   }
 
   /**

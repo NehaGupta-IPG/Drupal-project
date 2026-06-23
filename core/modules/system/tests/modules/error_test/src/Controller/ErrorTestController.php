@@ -58,6 +58,15 @@ class ErrorTestController extends ControllerBase {
   }
 
   /**
+   * Generates a warning whose message contains HTML.
+   */
+  public function generateXssWarning(): array {
+    define('SIMPLETEST_COLLECT_ERRORS', FALSE);
+    trigger_error('<script>alert("xss")</script>', E_USER_WARNING);
+    return ['#markup' => 'done'];
+  }
+
+  /**
    * Generate fatal errors to test the error handler.
    */
   public function generateFatalErrors() {
