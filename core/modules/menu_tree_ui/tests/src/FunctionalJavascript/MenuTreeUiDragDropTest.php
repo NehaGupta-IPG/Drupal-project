@@ -518,6 +518,17 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
    * Asserts a labelled row's depth (aria-level) matches the expected value.
    */
   private function assertDepth(string $label, int $expected): void {
+    $id = $this->linkIds[$label] ?? NULL;
+    $this->assertNotNull($id, "Unknown label $label.");
+    // Wait for the server-first reorder to settle this row at its new depth.
+    $this->getSession()->wait(
+      10000,
+      sprintf(
+        "((r) => !!r && r.getAttribute('aria-level') === %s)(document.querySelector(%s))",
+        json_encode((string) $expected),
+        json_encode(sprintf('tr[role="row"][data-id="%s"]', $id)),
+      ),
+    );
     $row = $this->row($label);
     $this->assertNotNull($row, "Row $label not in DOM.");
     $this->assertSame(
@@ -629,6 +640,11 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
       );
       $where = "under $parent_label";
     }
+    // Wait for the server-first reorder to settle the child count.
+    $this->getSession()->wait(
+      10000,
+      sprintf('document.querySelectorAll(%s).length === %d', json_encode($selector), $expected),
+    );
     $count = (int) $this->getSession()->evaluateScript(
       sprintf("return document.querySelectorAll(%s).length;", json_encode($selector)),
     );
@@ -720,6 +736,21 @@ final class MenuTreeUiDragDropTest extends WebDriverTestBase {
    *   CSS matching the direct child rows (a `tr[data-parent-id="…"]` set).
    */
   private function assertSiblings(array $expected_labels, string $row_selector): void {
+    // The commit is server-first: rows reorder only once the POST + refresh
+    // lands, and drag()'s flag wait can return before that even starts. Wait
+    // for the expected order so a slower CI commit does not race the assertion.
+    $expected_ids = array_map(
+      fn (string $label): string => $this->linkIds[$label] ?? '',
+      $expected_labels,
+    );
+    $this->getSession()->wait(
+      10000,
+      sprintf(
+        "Array.from(document.querySelectorAll(%s)).map((r) => r.dataset.id).join(',') === %s",
+        json_encode($row_selector),
+        json_encode(implode(',', $expected_ids)),
+      ),
+    );
     $rows = $this->getSession()->getPage()->findAll('css', $row_selector);
     $actual = [];
     foreach ($rows as $row) {
