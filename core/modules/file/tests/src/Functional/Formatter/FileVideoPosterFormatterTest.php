@@ -11,7 +11,6 @@ use Drupal\file\Entity\File;
 use Drupal\file\Plugin\Field\FieldFormatter\FileVideoFormatter;
 use Drupal\Tests\file\Functional\FileFieldTestBase;
 use Drupal\media\Entity\Media;
-use Drupal\node\NodeInterface;
 use Drupal\Tests\image\Kernel\ImageFieldCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
