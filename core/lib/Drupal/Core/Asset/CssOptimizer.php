@@ -114,7 +114,7 @@ class CssOptimizer implements AssetOptimizerInterface {
    * it is not on the AssetOptimizerInterface, so any future refactoring can
    * make it protected.
    *
-   * @param string $file
+   * @param string|null $file
    *   Name of the stylesheet to be processed.
    * @param bool|null $optimize
    *   Defines if CSS contents should be compressed or not.
@@ -124,7 +124,7 @@ class CssOptimizer implements AssetOptimizerInterface {
    * @return string
    *   Contents of the stylesheet, including any resolved @import commands.
    */
-  public function loadFile($file, $optimize = NULL, $reset_base_path = TRUE) {
+  public function loadFile($file = NULL, $optimize = NULL, $reset_base_path = TRUE) {
     // These statics are not cache variables, so we don't use drupal_static().
     static $_optimize, $base_path;
     if ($reset_base_path) {
@@ -143,7 +143,7 @@ class CssOptimizer implements AssetOptimizerInterface {
     // Store the parent base path to restore it later.
     $parent_base_path = $base_path;
     // Set the current base path to process possible child imports.
-    $base_path = dirname($file);
+    $base_path = dirname($file ?? '');
 
     // Load the CSS stylesheet. We suppress errors because themes may specify
     // stylesheets in their .info.yml file that don't exist in the theme's path,
