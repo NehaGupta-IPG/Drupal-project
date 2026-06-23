@@ -142,10 +142,16 @@ class BreadcrumbTest extends BrowserTestBase {
     ];
     $this->assertBreadcrumb('admin/structure/menu/manage/tools', $trail);
 
+    // Editing a menu link sends the breadcrumb to the menu's link list (see
+    // menu_ui's hook_system_breadcrumb_alter()), which is its own route.
+    $this->assertBreadcrumb(
+      'admin/structure/menu/link/node.add_page/edit',
+      $trail + ['admin/structure/menu/manage/tools/links' => 'Tools'],
+    );
+    // The add-link page keeps the path-based crumb to the menu page itself.
     $trail += [
       'admin/structure/menu/manage/tools' => 'Tools',
     ];
-    $this->assertBreadcrumb("admin/structure/menu/link/node.add_page/edit", $trail);
     $this->assertBreadcrumb('admin/structure/menu/manage/tools/add', $trail);
 
     // Verify Node administration breadcrumbs.
