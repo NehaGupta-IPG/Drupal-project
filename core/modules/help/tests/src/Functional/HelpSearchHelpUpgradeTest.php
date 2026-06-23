@@ -26,14 +26,13 @@ class HelpSearchHelpUpgradeTest extends UpdatePathTestBase {
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../system/tests/fixtures/update/drupal-11.3.0.bare.standard.php.gz',
-      __DIR__ . '/../../../../system/tests/fixtures/update/install-mysqli.php',
     ];
   }
 
   /**
-   * Tests help_update_12000() and help_post_update_search_help_dependencies().
+   * Tests system_update_11400() and help_post_update_search_help_dependencies().
    *
-   * @see help_update_12000()
+   * @see system_update_11400()
    * @see help_post_update_search_help_dependencies()
    */
   public function testSearchHelpInstall(): void {
