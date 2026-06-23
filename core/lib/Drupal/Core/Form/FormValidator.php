@@ -199,7 +199,15 @@ class FormValidator implements FormValidatorInterface {
     $elements_sorted = $elements;
     foreach (Element::children($elements_sorted, TRUE) as $key) {
       if (isset($elements[$key]) && $elements[$key]) {
-        $this->doValidateForm($elements[$key], $form_state);
+        if (isset($elements[$key]) && $elements[$key]) {
+          if (($key === 'delta' || isset($elements[$key]['#is_weight'])) &&
+            (isset($elements[$key]['#value']) && $elements[$key]['#value'] === '')
+          ) {
+            $elements[$key]['#value'] = $elements[$key]['#default_value'] ?? 0;
+          }
+
+          $this->doValidateForm($elements[$key], $form_state);
+        }
       }
     }
 
