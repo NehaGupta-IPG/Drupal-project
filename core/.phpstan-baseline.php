@@ -7700,12 +7700,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Installer/Form/SelectLanguageForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Installer\\\\Form\\\\SelectProfileForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Installer/Form/SelectProfileForm.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Installer\\\\Form\\\\SiteConfigureForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -32626,12 +32620,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceMerger.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$transaction in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceMerger.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\workspaces\\\\WorkspaceMergerInterface\\:\\:merge\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -33124,6 +33112,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/FunctionalJavascriptTests/Tests/DrupalSelenium2DriverTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Installer\\\\InstallerTestBase\\:\\:setUpProfile\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Installer/InstallerTestBase.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\FunctionalTests\\\\MailCaptureTest\\:\\:assertMailPattern\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -33365,7 +33359,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConfig\\(\\) of class GuzzleHttp\\\\Client\\:
-Client\\:\\:getConfig will be removed in guzzlehttp/guzzle\\:8\\.0\\.$#',
+ClientInterface\\:\\:getConfig will be removed in guzzlehttp/guzzle\\:8\\.0\\.$#',
 	'identifier' => 'method.deprecated',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/BrowserTestBase.php',
@@ -34380,7 +34374,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConfig\\(\\) of class GuzzleHttp\\\\Client\\:
-Client\\:\\:getConfig will be removed in guzzlehttp/guzzle\\:8\\.0\\.$#',
+ClientInterface\\:\\:getConfig will be removed in guzzlehttp/guzzle\\:8\\.0\\.$#',
 	'identifier' => 'method.deprecated',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Http/ClientFactoryTest.php',
