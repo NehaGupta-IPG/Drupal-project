@@ -57,7 +57,7 @@ class DatabaseFileUsageBackend extends FileUsageBase {
       ])
       ->updateValues([
         'count' => [
-          'expression' => '[count] + :count',
+          'expression' => "{{$this->tableName}}.[count] + :count",
           'arguments' => [':count' => $count],
         ],
       ])

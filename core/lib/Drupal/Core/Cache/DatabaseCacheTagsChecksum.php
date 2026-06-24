@@ -42,7 +42,7 @@ class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTags
             'invalidations' => 1,
           ])
           ->updateValues([
-            'invalidations' => '[invalidations] + 1',
+            'invalidations' => '{cachetags}.[invalidations] + 1',
           ])
           ->execute();
       }

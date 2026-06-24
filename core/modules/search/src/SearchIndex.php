@@ -179,7 +179,7 @@ class SearchIndex implements SearchIndexInterface {
           ])
           ->updateValues([
             'score' => [
-              'expression' => '[score] + :score',
+              'expression' => '{search_index}.[score] + :score',
               'arguments' => [':score' => $score],
             ],
           ])
