@@ -175,13 +175,10 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
       return;
     }
 
-    $duplicate_blocks = FALSE;
     if ($sections = $this->getEntitySections($entity)) {
-      if ($this->originalEntityUsesDefaultStorage($entity)) {
-        // This is a new override from a default and the blocks need to be
-        // duplicated.
-        $duplicate_blocks = TRUE;
-      }
+      // This is a new entity or a new override from a default and the blocks
+      // need to be duplicated.
+      $duplicate_blocks = $entity->isNew() || $this->originalEntityUsesDefaultStorage($entity);
       // Since multiple parent entity revisions may reference common block
       // revisions, when a block is modified, it must always result in the
       // creation of a new block revision.
@@ -255,7 +252,7 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
     $pre_save_configuration = $plugin->getConfiguration();
     $plugin->saveBlockContent($new_revision, $duplicate_blocks);
     $post_save_configuration = $plugin->getConfiguration();
-    if ($entity->id() !== NULL && ($duplicate_blocks || (empty($pre_save_configuration['block_revision_id']) && !empty($post_save_configuration['block_revision_id'])))) {
+    if (!$entity->isNew() && ($duplicate_blocks || (empty($pre_save_configuration['block_revision_id']) && !empty($post_save_configuration['block_revision_id'])))) {
       $id = $this->getPluginBlockId($plugin);
       if (!$id) {
         // The standard getPluginBlockId() didn't return an id, let's use
