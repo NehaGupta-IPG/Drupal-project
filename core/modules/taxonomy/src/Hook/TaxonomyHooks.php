@@ -221,7 +221,7 @@ class TaxonomyHooks {
       if (!empty($tid_all)) {
         $connection = \Drupal::database();
         foreach ($tid_all as $tid) {
-          $connection->merge('taxonomy_index')
+          $connection->upsert('taxonomy_index')
             ->key(['nid', 'tid'])
             ->fields([
               'nid' => $node->id(),
