@@ -101,21 +101,20 @@ class ContentEntityNormalizerTest extends UnitTestCase {
     $this->serializer->normalize(Argument::type(FieldItemListInterface::class),
       'test_format', ['account' => NULL, 'sparse_fieldset' => ['field_accessible_external']])->willReturn('test');
 
-    $definitions = [
-      'field_accessible_external' => $this->createMockFieldListItem(TRUE, FALSE, TRUE),
-      'field_non-accessible_external' => $this->createMockFieldListItem(FALSE, FALSE, FALSE),
-      'field_accessible_internal' => $this->createMockFieldListItem(TRUE, TRUE, FALSE),
-      'field_non-accessible_internal' => $this->createMockFieldListItem(FALSE, TRUE, FALSE),
-    ];
-    $content_entity_mock = $this->createStubForContentEntity($definitions);
+    $field_accessible_external = $this->createMockFieldListItem(TRUE, FALSE, TRUE);
 
-    $normalized = $this->contentEntityNormalizer->normalize($content_entity_mock, 'test_format', ['sparse_fieldset' => ['field_accessible_external']]);
+    $content_entity = $this->getMockBuilder(ContentEntityBaseMockableClass::class)
+      ->disableOriginalConstructor()
+      ->onlyMethods(['get'])
+      ->getMock();
+    $content_entity->expects($this->once())
+      ->method('get')
+      ->willReturn($field_accessible_external);
+
+    $normalized = $this->contentEntityNormalizer->normalize($content_entity, 'test_format', ['sparse_fieldset' => ['field_accessible_external']]);
 
     $this->assertArrayHasKey('field_accessible_external', $normalized);
     $this->assertEquals('test', $normalized['field_accessible_external']);
-    $this->assertArrayNotHasKey('field_non-accessible_external', $normalized);
-    $this->assertArrayNotHasKey('field_accessible_internal', $normalized);
-    $this->assertArrayNotHasKey('field_non-accessible_internal', $normalized);
   }
 
   /**
