@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\link\Functional;
 
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\link\LinkItemInterface;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\BrowserTestBase;
@@ -31,6 +33,9 @@ class LinkFieldTest extends BrowserTestBase {
     'entity_test',
     'link',
     'node',
+    'locale',
+    'language',
+    'content_translation',
   ];
 
   /**
@@ -93,6 +98,7 @@ class LinkFieldTest extends BrowserTestBase {
       'bundle' => 'entity_test',
       'settings' => [
         'title' => DRUPAL_DISABLED,
+        'language' => DRUPAL_DISABLED,
         'link_type' => LinkItemInterface::LINK_GENERIC,
       ],
     ]);
@@ -289,6 +295,7 @@ class LinkFieldTest extends BrowserTestBase {
       'label' => 'Read more about this entity',
       'settings' => [
         'title' => DRUPAL_OPTIONAL,
+        'language' => DRUPAL_DISABLED,
         'link_type' => LinkItemInterface::LINK_GENERIC,
       ],
     ]);
@@ -393,6 +400,112 @@ class LinkFieldTest extends BrowserTestBase {
 
     $output = $this->renderTestEntity($id);
     $expected_link = (string) Link::fromTextAndUrl($title, Url::fromUri($value))->toString();
+    $this->assertStringContainsString($expected_link, $output);
+  }
+
+  /**
+   * Tests the preferred language settings of a link field.
+   */
+  public function testLinkLanguage() {
+    ConfigurableLanguage::create(['id' => 'nl'])->save();
+
+    $translatable_entity = EntityTest::create(['name' => 'Name english']);
+    $translatable_entity->addTranslation('nl', ['name' => 'Name dutch']);
+    $translatable_entity->save();
+
+    $field_name = mb_strtolower($this->randomMachineName());
+    // Create a field with settings to validate.
+    $this->fieldStorage = FieldStorageConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'entity_test',
+      'type' => 'link',
+    ]);
+    $this->fieldStorage->save();
+    $this->field = FieldConfig::create([
+      'field_storage' => $this->fieldStorage,
+      'bundle' => 'entity_test',
+      'label' => 'Read more about this entity',
+      'settings' => [
+        'title' => DRUPAL_DISABLED,
+        'language' => DRUPAL_OPTIONAL,
+        'link_type' => LinkItemInterface::LINK_GENERIC,
+      ],
+    ]);
+    $this->field->save();
+    /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
+    $display_repository = \Drupal::service('entity_display.repository');
+    $display_repository->getFormDisplay('entity_test', 'entity_test')
+      ->setComponent($field_name, [
+        'type' => 'link_default',
+        'settings' => [
+          'placeholder_url' => 'http://example.com',
+          'placeholder_title' => 'Enter the text for this link',
+        ],
+      ])
+      ->save();
+    $display_repository->getViewDisplay('entity_test', 'entity_test', 'full')
+      ->setComponent($field_name, [
+        'type' => 'link',
+        'label' => 'hidden',
+      ])
+      ->save();
+
+    // Verify that the link text field works according to the field setting.
+    foreach ([DRUPAL_DISABLED, DRUPAL_REQUIRED, DRUPAL_OPTIONAL] as $language_setting) {
+      // Update the preferred language field setting.
+      $this->field->setSetting('language', $language_setting);
+      $this->field->save();
+
+      // Display creation form.
+      $this->drupalGet('entity_test/add');
+      // Assert field is shown.
+      $this->assertSession()->pageTextContains('Read more about this entity');
+      $this->assertSession()->fieldValueEquals("{$field_name}[0][uri]", '');
+
+      if ($language_setting === DRUPAL_DISABLED) {
+        $this->assertSession()->fieldNotExists("{$field_name}[0][language]");
+      }
+      else {
+        $this->assertSession()->fieldExists("{$field_name}[0][language]");
+        if ($language_setting === DRUPAL_REQUIRED) {
+          // Verify that the preferred language is required.
+          $this->assertSession()->optionNotExists("{$field_name}[0][language]", LanguageInterface::LANGCODE_NOT_SPECIFIED);
+        }
+        elseif ($language_setting === DRUPAL_OPTIONAL) {
+          $this->assertSession()->optionExists("{$field_name}[0][language]", LanguageInterface::LANGCODE_NOT_SPECIFIED);
+        }
+      }
+    }
+
+    // Verify that a link with a unspecified language is rendered in the default
+    // language.
+    $uri = 'entity:entity_test/' . $translatable_entity->id();
+    $edit = [
+      "{$field_name}[0][uri]" => $uri,
+      "{$field_name}[0][language]" => LanguageInterface::LANGCODE_NOT_SPECIFIED,
+    ];
+    $this->submitForm($edit, 'Save');
+    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    $id = $match[1];
+    $this->assertSession()->statusMessageContains('entity_test ' . $id . ' has been created.', 'status');
+
+    $output = $this->renderTestEntity($id);
+    $url = Url::fromUri($uri, ['language' => \Drupal::languageManager()->getLanguage(LanguageInterface::LANGCODE_NOT_SPECIFIED)]);
+    $expected_link = Link::fromTextAndUrl($url->toString(), $url)->getText();
+    $this->assertStringContainsString($expected_link, $output);
+
+    // Verify that a link with a specified language is rendered in the correct
+    // language.
+    $edit = [
+      "{$field_name}[0][language]" => 'nl',
+    ];
+    $this->drupalGet("entity_test/manage/{$id}/edit");
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->statusMessageContains('entity_test ' . $id . ' has been updated.', 'status');
+
+    $output = $this->renderTestEntity($id);
+    $url = Url::fromUri($uri, ['language' => \Drupal::languageManager()->getLanguage('nl')]);
+    $expected_link = Link::fromTextAndUrl($url->toString(), $url)->getText();
     $this->assertStringContainsString($expected_link, $output);
   }
 
@@ -502,6 +615,7 @@ class LinkFieldTest extends BrowserTestBase {
       'bundle' => 'entity_test',
       'settings' => [
         'title' => DRUPAL_OPTIONAL,
+        'language' => DRUPAL_DISABLED,
         'link_type' => LinkItemInterface::LINK_GENERIC,
       ],
     ])->save();

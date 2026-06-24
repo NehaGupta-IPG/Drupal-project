@@ -9,6 +9,7 @@ use Drupal\Core\Entity\Element\EntityAutocomplete;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\link\LinkItemInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
@@ -307,6 +308,19 @@ class LinkWidget extends WidgetBase {
       '#attributes' => ['class' => ['link-field-widget-attributes']],
     ];
 
+    $language_setting = $this->getFieldSetting('language');
+    $access = $language_setting && $language_setting !== DRUPAL_DISABLED && $this->supportsInternalLinks();
+    $default_value = $access ? LanguageInterface::LANGCODE_NOT_SPECIFIED : NULL;
+
+    $element['language'] = [
+      '#type' => 'language_select',
+      '#title' => $this->t('Preferred language'),
+      '#description' => $this->t('Select the preferred language for the URL. This only applies to internal paths. If the internal path is not available in the preferred language, the default language of the internal path is used.'),
+      '#default_value' => isset($items[$delta]->options['language']) ? $items[$delta]->options['language']->getId() : $default_value,
+      '#languages' => $this->getFieldSetting('language') === DRUPAL_REQUIRED ? LanguageInterface::STATE_CONFIGURABLE : 1,
+      '#access' => $access,
+    ];
+
     // If cardinality is 1, ensure a proper label is output for the field.
     if ($this->fieldDefinition->getFieldStorageDefinition()->getCardinality() == 1) {
       // If the link title is disabled, use the field definition label as the
@@ -429,6 +443,9 @@ class LinkWidget extends WidgetBase {
     foreach ($values as &$value) {
       $value['uri'] = static::getUserEnteredStringAsUri($value['uri']);
       $value += ['options' => []];
+      if (!empty($value['language'])) {
+        $value['options']['language'] = \Drupal::languageManager()->getLanguage($value['language']);
+      }
     }
     return $values;
   }
