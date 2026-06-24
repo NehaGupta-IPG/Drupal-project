@@ -38,9 +38,12 @@ class ComplexDataNormalizer extends NormalizerBase {
     // implements \Traversable.
     if ($object instanceof ComplexDataInterface) {
       // If there are no properties to normalize, just normalize the value.
-      $object = !empty($object->getProperties(TRUE))
-        ? TypedDataInternalPropertiesHelper::getNonInternalProperties($object)
-        : $object->getValue();
+      if ($non_internal_properties = TypedDataInternalPropertiesHelper::getNonInternalProperties($object)) {
+        $object = $non_internal_properties;
+      }
+      else {
+        $object = $object->getValue();
+      }
     }
     /** @var \Drupal\Core\TypedData\TypedDataInterface $property */
     foreach ($object as $name => $property) {
