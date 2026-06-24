@@ -672,8 +672,10 @@ class InlineBlockTest extends InlineBlockTestBase {
     $new_id = $cloned->id();
     $this->drupalGet('node/' . $new_id);
     $cloned_block_id = $this->getLatestBlockEntityId();
+    $this->assertNotEquals($node_1_block_id, $cloned_block_id);
     $cloned_usage = $usage->getUsage($cloned_block_id);
     $this->assertNotEmpty($cloned_usage);
+    
 
     // Confirm cloned inline block has the right layout entity.
     $this->assertEquals($new_id, $cloned_usage->layout_entity_id);
@@ -689,11 +691,11 @@ class InlineBlockTest extends InlineBlockTestBase {
     $page->pressButton('Delete');
     $this->drupalGet('node/1');
     $this->assertNull($node_storage->loadUnchanged(1));
-    $cron->run();
-
-    // Ensure entity block was kept for clone.
-    $this->assertNull($this->blockStorage->loadUnchanged($node_1_block_id));
+    // Ensure inline block usage and inline block itself were removed.
     $this->assertFalse($usage->getUsage($node_1_block_id));
+
+    $cron->run();
+    $this->assertNull($this->blockStorage->loadUnchanged($node_1_block_id));
     $this->assertCount(1, $this->blockStorage->loadMultiple());
   }
 
