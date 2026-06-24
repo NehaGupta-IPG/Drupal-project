@@ -66,6 +66,13 @@ class Upsert extends QueryUpsert {
         }
       }
     }
+    foreach ($this->updateValues as $update_value) {
+      if (is_array($update_value)) {
+        foreach ($update_value['arguments'] as $argument => $value) {
+          $stmt->getClientStatement()->bindParam($argument, $value);
+        }
+      }
+    }
 
     $options = $this->queryOptions;
     if (!empty($table_information->sequences)) {
@@ -115,6 +122,12 @@ class Upsert extends QueryUpsert {
       return $this->connection->escapeField($field);
     }, $insert_fields);
 
+    // Escape column names of update values.
+    $update_values = [];
+    foreach ($this->updateValues as $column => $expression) {
+      $update_values[$this->connection->escapeField($column)] = is_array($expression) ? $expression['expression'] : $expression;
+    }
+
     $query = $comments . 'INSERT INTO {' . $this->table . '} (' . implode(', ', $insert_fields) . ') VALUES ';
 
     $values = $this->getInsertPlaceholderFragment($this->insertValues, $this->defaultFields);
@@ -129,7 +142,7 @@ class Upsert extends QueryUpsert {
     foreach ($insert_fields as $field) {
       // The "excluded." prefix causes the field to refer to the value for field
       // that would have been inserted had there been no conflict.
-      $update[] = "$field = EXCLUDED.$field";
+      $update[] = isset($update_values[$field]) ? "$field = $update_values[$field]" : "$field = EXCLUDED.$field";
     }
 
     $query .= ' ON CONFLICT (' . implode(', ', $keys) . ') DO UPDATE SET ' . implode(', ', $update);
