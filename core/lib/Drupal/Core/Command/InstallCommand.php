@@ -184,10 +184,6 @@ class InstallCommand extends Command {
     foreach ($databaseDriverList->getInstallableList() as $driver) {
       if ($driver->getDriverName() === $driver_name) {
         $namespace = $driver->getNamespace();
-
-        if ($driver_name === 'sqlite') {
-          $connection_options['database'] = $site_path . '/files/' . $connection_options['database'];
-        }
       }
     }
 
