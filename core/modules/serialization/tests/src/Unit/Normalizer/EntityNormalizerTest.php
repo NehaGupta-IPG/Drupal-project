@@ -123,22 +123,15 @@ class EntityNormalizerTest extends UnitTestCase {
     $this->entityTypeManager->expects($this->never())
       ->method('getStorage');
 
-    $list_item_1 = $this->createStub(TypedDataInterface::class);
-    $list_item_2 = $this->createStub(TypedDataInterface::class);
-
-    $definitions = [
-      'field_1' => $list_item_1,
-      'field_2' => $list_item_2,
-    ];
-
+    $list_item_1 = $this->createStub(FieldItemListInterface::class);
     $content_entity = $this->getMockBuilder(ContentEntityBaseMockableClass::class)
       ->disableOriginalConstructor()
-      ->onlyMethods(['getFields'])
+      ->onlyMethods(['get'])
       ->getMock();
-    $content_entity->expects($this->once())
-      ->method('getFields')
-      ->willReturn($definitions);
 
+    $content_entity->expects($this->once())
+      ->method('get')
+      ->willReturn($list_item_1);
     $serializer = $this->prophesize('Symfony\Component\Serializer\Serializer');
     $serializer->normalize($list_item_1, 'test_format', ['sparse_fieldset' => ['field_1']])->shouldBeCalled();
 
