@@ -692,7 +692,9 @@ class InlineBlockTest extends InlineBlockTestBase {
     $cron->run();
 
     // Ensure entity block was kept for clone.
+    $this->assertNull($this->blockStorage->loadUnchanged($node_1_block_id));
     $this->assertFalse($usage->getUsage($node_1_block_id));
+    $this->assertCount(1, $this->blockStorage->loadMultiple());
   }
 
   /**
