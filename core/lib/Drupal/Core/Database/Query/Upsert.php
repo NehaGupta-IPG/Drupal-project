@@ -23,6 +23,19 @@ abstract class Upsert extends Query implements \Countable {
   protected $key;
 
   /**
+   * Explicit updates to be done in case of insert failure.
+   *
+   * If the insert part of the upsert fails, the default behaviour is to update
+   * the existing record with the values passed in. However, in some cases you
+   * may want to see what is the value of a column of the existing record, and
+   * manipulate that - typically, counters or the like. This array contains
+   * such overrides.
+   *
+   * @var array<string,string>
+   */
+  protected array $updateValues = [];
+
+  /**
    * Constructs an Upsert object.
    *
    * @param \Drupal\Core\Database\Connection $connection
@@ -48,6 +61,19 @@ abstract class Upsert extends Query implements \Countable {
   public function key(string|array $field) {
     $this->key = (array) $field;
 
+    return $this;
+  }
+
+  /**
+   * Sets the explicit update values to use when insert fails.
+   *
+   * @param array<string,string>
+   *   An array of expressions to use, keyed by column name.
+   *
+   * @return $this
+   */
+  public function updateValues(array $updateValues) {
+    $this->updateValues = $updateValues;
     return $this;
   }
 

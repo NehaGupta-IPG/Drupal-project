@@ -35,11 +35,15 @@ class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTags
   protected function doInvalidateTags(array $tags) {
     try {
       foreach ($tags as $tag) {
-        // @todo convert to ::upsert().
-        $this->connection->merge('cachetags')
-          ->insertFields(['invalidations' => 1])
-          ->expression('invalidations', '[invalidations] + 1')
-          ->key('tag', $tag)
+        $this->connection->upsert('cachetags')
+          ->key(['tag'])
+          ->fields([
+            'tag' => $tag,
+            'invalidations' => 1,
+          ])
+          ->updateValues([
+            'invalidations' => '[invalidations] + 1',
+          ])
           ->execute();
       }
     }
