@@ -154,6 +154,7 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
     // after the entity is saved.
     if ($sections = $this->getEntitySections($entity)) {
       foreach ($this->getInlineBlockComponents($sections) as $component) {
+        /** @var \Drupal\layout_builder\Plugin\Block\InlineBlock $plugin */
         $plugin = $component->getPlugin();
         $block_id = $this->getPluginBlockId($plugin);
         $this->usage->addUsage($block_id, $entity);
