@@ -174,7 +174,7 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
       return;
     }
 
-    $duplicate_blocks = $entity->isNew();
+    $duplicate_blocks = FALSE;
     if ($sections = $this->getEntitySections($entity)) {
       if ($this->originalEntityUsesDefaultStorage($entity)) {
         // This is a new override from a default and the blocks need to be
@@ -261,7 +261,6 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
         // reflection to get it off of the $plugin.
         // We have to use reflection for this as it's a protected method.
         $reflectionMethod = new \ReflectionMethod($plugin, 'getEntity');
-        $reflectionMethod->setAccessible(TRUE);
         $new_entity = $reflectionMethod->invoke($plugin);
         $id = $new_entity->id();
       }
