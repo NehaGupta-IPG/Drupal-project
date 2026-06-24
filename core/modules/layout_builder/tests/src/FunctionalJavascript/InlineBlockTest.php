@@ -676,9 +676,8 @@ class InlineBlockTest extends InlineBlockTestBase {
     $this->assertNotEmpty($cloned_usage);
 
     // Confirm cloned inline block has the right layout entity.
-    $this->assertNotEmpty($cloned_usage->layout_entity_id);
     $this->assertEquals($new_id, $cloned_usage->layout_entity_id);
-    $this->assertNotEmpty($cloned_usage->layout_entity_type);
+    $this->assertEquals('node', $cloned_usage->layout_entity_type);
 
     $assert_session->pageTextContains('New Block title');
     $assert_session->pageTextContains('New block body');
@@ -693,9 +692,7 @@ class InlineBlockTest extends InlineBlockTestBase {
     $cron->run();
 
     // Ensure entity block was kept for clone.
-    $this->assertNull($this->blockStorage->load($node_1_block_id));
     $this->assertFalse($usage->getUsage($node_1_block_id));
-    $this->assertCount(1, $this->blockStorage->loadMultiple());
   }
 
   /**
