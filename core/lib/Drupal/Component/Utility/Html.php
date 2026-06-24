@@ -419,7 +419,7 @@ class Html {
    * output of Html::escape() to '#markup' is not recommended. Use the
    * '#plain_text' key instead and the renderer will autoescape the text.
    *
-   * @param string|null $text
+   * @param ?string $text
    *   The input text.
    *
    * @return string
