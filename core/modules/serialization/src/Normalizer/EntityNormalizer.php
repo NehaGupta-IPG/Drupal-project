@@ -50,8 +50,15 @@ class EntityNormalizer extends ComplexDataNormalizer implements DenormalizerInte
         : $object->getValue();
     }
     /** @var \Drupal\Core\TypedData\TypedDataInterface $property */
-    foreach ($object as $name => $property) {
-      if (empty($context['sparse_fieldset']) || in_array($name, $context['sparse_fieldset'])) {
+
+    if (!empty($context['sparse_fieldset'])) {
+      foreach ($context['sparse_fieldset'] as $name) {
+        $property = $object->get($name);
+        $attributes[$name] = $this->serializer->normalize($property, $format, $context);
+      }
+    }
+    else {
+      foreach ($object as $name => $property) {
         $attributes[$name] = $this->serializer->normalize($property, $format, $context);
       }
     }
