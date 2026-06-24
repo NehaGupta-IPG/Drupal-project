@@ -620,8 +620,6 @@ class InlineBlockTest extends InlineBlockTestBase {
    * Tests that Inline Blocks are added to duplicated entities.
    */
   public function testDuplicateEntityInlineBlockUsage(): void {
-    /** @var \Drupal\Core\Cron $cron */
-    $cron = \Drupal::service('cron');
     /** @var \Drupal\layout_builder\InlineBlockUsageInterface $usage */
     $usage = \Drupal::service('inline_block.usage');
     $this->drupalLogin($this->drupalCreateUser([
@@ -691,9 +689,10 @@ class InlineBlockTest extends InlineBlockTestBase {
     $this->drupalGet('node/1');
     $this->assertNull($node_storage->loadUnchanged(1));
     // Ensure inline block usage and inline block itself were removed.
-    $this->assertEmpty($usage->getUsage($node_1_block_id));
+    $this->assertNull($usage->getUsage($node_1_block_id)->layout_entity_id);
+    $this->assertNull($usage->getUsage($node_1_block_id)->layout_entity_type);
     // Unused blocks are removed on cron.
-    $cron->run();
+    \Drupal::service('cron')->run();
     $this->assertNull($this->blockStorage->loadUnchanged($node_1_block_id));
     $this->assertCount(1, $this->blockStorage->loadMultiple());
   }
