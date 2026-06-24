@@ -6,6 +6,7 @@ use Drupal\Component\Serialization\SerializationInterface;
 use Drupal\Core\Database\Query\Merge;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 
 /**
@@ -246,15 +247,19 @@ class DatabaseStorage extends StorageBase {
    *   TRUE if the data was set, FALSE if it already existed.
    */
   protected function doSetIfNotExists($key, $value) {
-    $result = $this->connection->upsert($this->table)
-      ->key(['collection', 'name'])
-      ->fields([
-        'collection' => $this->collection,
-        'name' => $key,
-        'value' => $this->serializer->encode($value),
-      ])
-      ->execute();
-    return $result == Merge::STATUS_INSERT;
+    try {
+      $this->connection->insert($this->table)
+        ->fields([
+          'collection' => $this->collection,
+          'name' => $key,
+          'value' => $this->serializer->encode($value),
+        ])
+        ->execute();
+      return TRUE;
+    }
+    catch (IntegrityConstraintViolationException) {
+      return FALSE;
+    }
   }
 
   /**

@@ -41,6 +41,7 @@ class GarbageCollectionTest extends KernelTestBase {
         ->fields([
           'name' => 'key_' . $i,
           'collection' => $collection,
+          'value' => '',
           'expire' => \Drupal::time()->getRequestTime() - 1,
         ])
         ->execute();
