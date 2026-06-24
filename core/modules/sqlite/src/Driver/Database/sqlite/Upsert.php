@@ -29,7 +29,7 @@ class Upsert extends QueryUpsert {
       return $this->connection->escapeField($field);
     }, $insert_fields);
 
-    // Escape update values.
+    // Escape column names of update values.
     $update_values = [];
     foreach ($this->updateValues as $column => $expression) {
       $update_values[$this->connection->escapeField($column)] = $expression;
