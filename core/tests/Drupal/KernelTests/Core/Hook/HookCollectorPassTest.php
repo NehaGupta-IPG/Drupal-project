@@ -368,9 +368,6 @@ class HookCollectorPassTest extends KernelTestBase {
     ];
     include_once 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1/src/Hook/ModuleHandlerTestAll1Hooks.php';
     $container->setParameter('container.modules', $module_filenames);
-    $keyvalue = new KeyValueMemoryFactory();
-    $container->set('keyvalue', $keyvalue);
-    $container->set('cache.bootstrap', new NullBackend('bootstrap'));
     // Pre-register all1's hook class without autoconfiguration to verify it is
     // not overwritten, while user_hooks_test's class is left for auto-registration.
     $container->register(ModuleHandlerTestAll1Hooks::class, ModuleHandlerTestAll1Hooks::class)

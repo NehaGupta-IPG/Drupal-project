@@ -137,9 +137,6 @@ class ThemeHookCollectorPassTest extends KernelTestBase {
       ],
     ];
     $container->setParameter('container.themes', $theme_filenames);
-    $keyvalue = new KeyValueMemoryFactory();
-    $container->set('keyvalue', $keyvalue);
-    $container->set('cache.bootstrap', new NullBackend('bootstrap'));
     // Pre-register procedural_hook_theme's hook class without autoconfiguration
     // to verify it is not overwritten, while oop_hook_theme's class is left for
     // auto-registration.
