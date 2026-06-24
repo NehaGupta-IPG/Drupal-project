@@ -282,7 +282,8 @@ class HookCollectorPass implements CompilerPassInterface {
       if (!$container->hasDefinition($class)) {
         $container
           ->register($class, $class)
-          ->setAutowired(TRUE);
+          ->setAutowired(TRUE)
+          ->setAutoconfigured(TRUE);
       }
     }
   }
