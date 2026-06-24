@@ -168,6 +168,7 @@ class SearchIndex implements SearchIndexInterface {
         // If a word already exists in the database, its score gets increased
         // appropriately. If not, we create a new record with the appropriate
         // starting score.
+        // @todo convert to ::upsert().
         $this->connection->merge('search_index')
           ->keys([
             'word' => $word,

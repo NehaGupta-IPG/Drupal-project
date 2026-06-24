@@ -246,14 +246,13 @@ class DatabaseStorage extends StorageBase {
    *   TRUE if the data was set, FALSE if it already existed.
    */
   protected function doSetIfNotExists($key, $value) {
-    $result = $this->connection->merge($this->table)
-      ->insertFields([
+    $result = $this->connection->upsert($this->table)
+      ->key(['collection', 'name'])
+      ->fields([
         'collection' => $this->collection,
         'name' => $key,
         'value' => $this->serializer->encode($value),
       ])
-      ->condition('collection', $this->collection)
-      ->condition('name', $key)
       ->execute();
     return $result == Merge::STATUS_INSERT;
   }

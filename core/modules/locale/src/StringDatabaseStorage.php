@@ -148,9 +148,14 @@ class StringDatabaseStorage implements StringStorageInterface {
           }
           elseif ($lid === TRUE) {
             // This is a new location to add, take care not to duplicate.
-            $this->connection->merge('locales_location', $this->options)
-              ->keys(['sid' => $string->getId(), 'type' => $type, 'name' => $name])
-              ->fields(['version' => \Drupal::VERSION])
+            $this->connection->upsert('locales_location', $this->options)
+              ->key(['sid', 'type', 'name'])
+              ->fields([
+                'sid' => $string->getId(),
+                'type' => $type,
+                'name' => $name,
+                'version' => \Drupal::VERSION,
+              ])
               ->execute();
             $created = TRUE;
           }
