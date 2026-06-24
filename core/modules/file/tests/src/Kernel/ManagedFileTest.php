@@ -7,8 +7,10 @@ namespace Drupal\Tests\file\Kernel;
 use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\file\Element\ManagedFile;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Managed file element test.
@@ -56,6 +58,28 @@ class ManagedFileTest extends FileManagedUnitTestBase implements FormInterface {
     $this->container->get('form_builder')->submitForm($this, $form_state);
     // Should submit without any errors.
     $this->assertEquals(0, count($form_state->getErrors()));
+  }
+
+  /**
+   * Tests uploadAjaxCallback() when no #prefix is defined on the element.
+   */
+  public function testUploadAjaxCallbackWithoutPrefix(): void {
+    $form = [
+      'file_upload' => [
+        '#type' => 'managed_file',
+        '#attached' => [],
+      ],
+    ];
+
+    $form_state = new FormState();
+    $form_state->set('file_upload_delta_initial', 99);
+
+    $request = Request::create('/file/ajax');
+    $request->query->set('element_parents', 'file_upload');
+    $request->query->set('form_build_id', 'test_build_id');
+
+    $response = ManagedFile::uploadAjaxCallback($form, $form_state, $request);
+    $this->assertNotNull($response);
   }
 
 }
