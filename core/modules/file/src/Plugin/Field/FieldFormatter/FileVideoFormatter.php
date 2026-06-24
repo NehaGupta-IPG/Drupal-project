@@ -71,10 +71,17 @@ class FileVideoFormatter extends FileMediaFormatterBase {
   ) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
     // The last two arguments are optional to avoid a BC break for subclasses
-    // that call the parent constructor positionally. Lazily fall back to the
-    // container when they are not provided.
-    $this->moduleHandler = $moduleHandler ?: \Drupal::moduleHandler();
-    $this->fileStorage = $fileStorage ?: \Drupal::entityTypeManager()->getStorage('file');
+    // that call the parent constructor positionally. They will be required in
+    // the next major. Trigger a deprecation when they are omitted and fall back
+    // to the container.
+    if ($this->moduleHandler === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $moduleHandler argument is deprecated in drupal:11.x.0 and will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3604036', E_USER_DEPRECATED);
+      $this->moduleHandler = \Drupal::moduleHandler();
+    }
+    if ($this->fileStorage === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $fileStorage argument is deprecated in drupal:11.x.0 and will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3604036', E_USER_DEPRECATED);
+      $this->fileStorage = \Drupal::entityTypeManager()->getStorage('file');
+    }
   }
 
   /**
