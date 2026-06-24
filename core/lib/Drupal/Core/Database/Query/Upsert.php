@@ -25,7 +25,7 @@ abstract class Upsert extends Query implements \Countable {
   /**
    * Explicit updates to be done in case of insert failure.
    *
-   * If the insert part of the upsert fails, the default behaviour is to update
+   * If the insert part of the upsert fails, the default behavior is to update
    * the existing record with the values passed in. However, in some cases you
    * may want to see what is the value of a column of the existing record, and
    * manipulate that - typically, counters or the like. This array contains
@@ -67,12 +67,12 @@ abstract class Upsert extends Query implements \Countable {
   /**
    * Sets the explicit update values to use when insert fails.
    *
-   * @param array<string,string>
+   * @param array<string,string> $updateValues
    *   An array of expressions to use, keyed by column name.
    *
    * @return $this
    */
-  public function updateValues(array $updateValues) {
+  public function updateValues(array $updateValues): static {
     $this->updateValues = $updateValues;
     return $this;
   }
