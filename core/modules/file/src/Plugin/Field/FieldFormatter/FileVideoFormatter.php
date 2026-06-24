@@ -75,11 +75,11 @@ class FileVideoFormatter extends FileMediaFormatterBase {
     // the next major. Trigger a deprecation when they are omitted and fall back
     // to the container.
     if ($this->moduleHandler === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $moduleHandler argument is deprecated in drupal:11.x.0 and will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3604036', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $moduleHandler argument is deprecated in drupal:11.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3604036', E_USER_DEPRECATED);
       $this->moduleHandler = \Drupal::moduleHandler();
     }
     if ($this->fileStorage === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $fileStorage argument is deprecated in drupal:11.x.0 and will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3604036', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $fileStorage argument is deprecated in drupal:11.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3604036', E_USER_DEPRECATED);
       $this->fileStorage = \Drupal::entityTypeManager()->getStorage('file');
     }
   }
