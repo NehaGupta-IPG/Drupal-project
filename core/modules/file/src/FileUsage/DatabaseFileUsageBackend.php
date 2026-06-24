@@ -46,18 +46,22 @@ class DatabaseFileUsageBackend extends FileUsageBase {
    * {@inheritdoc}
    */
   public function add(FileInterface $file, $module, $type, $id, $count = 1) {
-    // @todo convert to ::upsert().
-    $this->connection->merge($this->tableName)
-      ->keys([
+    $this->connection->upsert($this->tableName)
+      ->key(['fid', 'type', 'id', 'module'])
+      ->fields([
         'fid' => $file->id(),
-        'module' => $module,
         'type' => $type,
         'id' => $id,
+        'module' => $module,
+        'count' => $count,
       ])
-      ->fields(['count' => $count])
-      ->expression('count', '[count] + :count', [':count' => $count])
+      ->updateValues([
+        'count' => [
+          'expression' => '[count] + :count',
+          'arguments' => [':count' => $count],
+        ],
+      ])
       ->execute();
-
     parent::add($file, $module, $type, $id, $count);
   }
 

@@ -31,7 +31,7 @@ abstract class Upsert extends Query implements \Countable {
    * manipulate that - typically, counters or the like. This array contains
    * such overrides.
    *
-   * @var array<string,string>
+   * @var array<string, string|array{expression: string, arguments: array<string, mixed>}>
    */
   protected array $updateValues = [];
 
@@ -67,7 +67,7 @@ abstract class Upsert extends Query implements \Countable {
   /**
    * Sets the explicit update values to use when insert fails.
    *
-   * @param array<string,string> $updateValues
+   * @param array<string, string|array{expression: string, arguments: array<string, mixed>}> $updateValues
    *   An array of expressions to use, keyed by column name.
    *
    * @return $this
@@ -128,6 +128,13 @@ abstract class Upsert extends Query implements \Countable {
     foreach ($this->insertValues as $insert_values) {
       foreach ($insert_values as $value) {
         $values[':db_insert_placeholder_' . $max_placeholder++] = $value;
+      }
+    }
+    foreach ($this->updateValues as $update_value) {
+      if (is_array($update_value)) {
+        foreach ($update_value['arguments'] as $argument => $value) {
+          $values[$argument] = $value;
+        }
       }
     }
 

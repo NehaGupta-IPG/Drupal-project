@@ -168,16 +168,21 @@ class SearchIndex implements SearchIndexInterface {
         // If a word already exists in the database, its score gets increased
         // appropriately. If not, we create a new record with the appropriate
         // starting score.
-        // @todo convert to ::upsert().
-        $this->connection->merge('search_index')
-          ->keys([
+        $this->connection->upsert('search_index')
+          ->key(['word', 'sid', 'langcode', 'type'])
+          ->fields([
             'word' => $word,
             'sid' => $sid,
             'langcode' => $langcode,
             'type' => $type,
+            'score' => $score,
           ])
-          ->fields(['score' => $score])
-          ->expression('score', '[score] + :score', [':score' => $score])
+          ->updateValues([
+            'score' => [
+              'expression' => '[score] + :score',
+              'arguments' => [':score' => $score],
+            ],
+          ])
           ->execute();
         $current_words[$word] = TRUE;
       }
