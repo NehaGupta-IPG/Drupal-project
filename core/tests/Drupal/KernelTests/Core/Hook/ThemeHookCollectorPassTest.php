@@ -8,6 +8,8 @@ use Drupal\Core\Cache\NullBackend;
 use Drupal\Core\Hook\ThemeHookCollectorPass;
 use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\oop_hook_theme\Hook\TestHookCollectionHooks;
+use Drupal\procedural_hook_theme\Hook\ProceduralHookThemeHooks;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -119,6 +121,35 @@ class ThemeHookCollectorPassTest extends KernelTestBase {
     $container->setParameter('preprocess_for_suggestions', []);
     $container->setDefinition('theme.manager', new Definition());
     (new ThemeHookCollectorPass())->process($container);
+  }
+
+  /**
+   * Tests theme hook service autowire/autoconfigure.
+   */
+  public function testRegisterHookServices(): void {
+    $container = new ContainerBuilder();
+    $theme_filenames = [
+      'oop_hook_theme' => [
+        'pathname' => 'core/modules/system/tests/themes/HookCollector/oop_hook_theme/oop_hook_theme.info.yml',
+      ],
+      'procedural_hook_theme' => [
+        'pathname' => 'core/modules/system/tests/themes/HookCollector/procedural_hook_theme/procedural_hook_theme.info.yml',
+      ],
+    ];
+    $container->setParameter('container.themes', $theme_filenames);
+    $keyvalue = new KeyValueMemoryFactory();
+    $container->set('keyvalue', $keyvalue);
+    $container->set('cache.bootstrap', new NullBackend('bootstrap'));
+    // Pre-register procedural_hook_theme's hook class without autoconfiguration
+    // to verify it is not overwritten, while oop_hook_theme's class is left for
+    // auto-registration.
+    $container->register(ProceduralHookThemeHooks::class, ProceduralHookThemeHooks::class)
+      ->setAutoconfigured(FALSE);
+    (new ThemeHookCollectorPass())->process($container);
+
+    $this->assertFalse($container->getDefinition(ProceduralHookThemeHooks::class)->isAutoconfigured());
+    $this->assertTrue($container->getDefinition(TestHookCollectionHooks::class)->isAutowired());
+    $this->assertTrue($container->getDefinition(TestHookCollectionHooks::class)->isAutoconfigured());
   }
 
   /**
