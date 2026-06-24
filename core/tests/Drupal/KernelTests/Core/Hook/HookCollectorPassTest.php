@@ -358,6 +358,31 @@ class HookCollectorPassTest extends KernelTestBase {
   }
 
   /**
+   * Tests hook service autowire/autoconfigure.
+   */
+  public function testHookServicesAutowireAutoconfigure(): void {
+    $container = new ContainerBuilder();
+    $module_filenames = [
+      'module_handler_test_all1' => ['pathname' => "core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1/module_handler_test_all1.info.yml"],
+      'user_hooks_test' => ['pathname' => "core/modules/user/tests/modules/user_hooks_test/user_hooks_test.info.yml"],
+    ];
+    include_once 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1/src/Hook/ModuleHandlerTestAll1Hooks.php';
+    $container->setParameter('container.modules', $module_filenames);
+    $keyvalue = new KeyValueMemoryFactory();
+    $container->set('keyvalue', $keyvalue);
+    $container->set('cache.bootstrap', new NullBackend('bootstrap'));
+    // Pre-register all1's hook class without autoconfiguration to verify it is
+    // not overwritten, while user_hooks_test's class is left for auto-registration.
+    $container->register(ModuleHandlerTestAll1Hooks::class, ModuleHandlerTestAll1Hooks::class)
+      ->setAutoconfigured(FALSE);
+    (new HookCollectorPass())->process($container);
+
+    $this->assertFalse($container->getDefinition(ModuleHandlerTestAll1Hooks::class)->isAutoconfigured());
+    $this->assertTrue($container->getDefinition(UserHooksTest::class)->isAutowired());
+    $this->assertTrue($container->getDefinition(UserHooksTest::class)->isAutoconfigured());
+  }
+
+  /**
    * Asserts that given hook implementations are registered in the container.
    *
    * @param array<string, array<string, string>> $implementationsByHook
