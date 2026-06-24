@@ -72,7 +72,7 @@ class QuickStartCommand {
       '--langcode' => $langcode,
       '--password' => $password,
       '--site-name' => $site_name,
-      '--database-name' => '.sqlite',
+      '--db-url' => 'sqlite://' . $this->getSitePath() . '/.sqlite',
     ];
 
     $installInput = new ArrayInput($arguments);
@@ -92,6 +92,19 @@ class QuickStartCommand {
       $returnCode = $command->run($serverInput, $output);
     }
     return $returnCode;
+  }
+
+  /**
+   * Gets the site path.
+   *
+   * Defaults to 'sites/default'. For testing purposes this can be overridden
+   * using the DRUPAL_DEV_SITE_PATH environment variable.
+   *
+   * @return string
+   *   The site path to use.
+   */
+  protected function getSitePath() {
+    return getenv('DRUPAL_DEV_SITE_PATH') ?: 'sites/default';
   }
 
 }

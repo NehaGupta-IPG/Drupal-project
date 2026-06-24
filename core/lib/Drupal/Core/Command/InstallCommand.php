@@ -6,6 +6,7 @@ namespace Drupal\Core\Command;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Cache\NullBackend;
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DrupalKernel;
@@ -59,17 +60,11 @@ class InstallCommand extends Command {
       ->addOption('langcode', NULL, InputOption::VALUE_OPTIONAL, 'The language to install the site in.', 'en')
       ->addOption('password', NULL, InputOption::VALUE_OPTIONAL, 'The password to use for the site. Defaults to random password.')
       ->addOption('site-name', NULL, InputOption::VALUE_OPTIONAL, 'Set the site name.', 'Drupal')
-      ->addOption('database-driver', NULL, InputOption::VALUE_REQUIRED, 'Sets the database driver to use.', 'sqlite')
-      ->addOption('database-username', NULL, InputOption::VALUE_REQUIRED, 'Sets the database user.', '')
-      ->addOption('database-password', NULL, InputOption::VALUE_REQUIRED, 'Sets the database password.', '')
-      ->addOption('database-host', NULL, InputOption::VALUE_REQUIRED, 'Sets the database host name.', 'localhost')
-      ->addOption('database-port', NULL, InputOption::VALUE_REQUIRED, 'Sets the database port.', '')
-      ->addOption('database-name', NULL, InputOption::VALUE_REQUIRED, 'Sets the database to use either a database name or file path.', 'drupal')
-      ->addOption('database-prefix', NULL, InputOption::VALUE_REQUIRED, 'Sets an optional database prefix.', '')
+      ->addOption('db-url', NULL, InputOption::VALUE_REQUIRED, 'Sets the database URL.', 'sqlite://sites/default/files/.sqlite')
       ->addUsage('demo_umami --langcode fr')
       ->addUsage('standard --site-name QuickInstall')
       ->addUsage('core/recipes/standard --site-name RecipeBuiltSite')
-      ->addUsage('standard --database-driver mysql --database-username DB_USER --database-password DB_PASS --database-port 3306 --database-name DB_NAME --site-name "My Awesome Web Site"');
+      ->addUsage('standard --db-url mysql://db:db@db:3306/db --site-name "My Awesome Web Site"');
 
     parent::configure();
   }
@@ -127,17 +122,7 @@ class InstallCommand extends Command {
       return 1;
     }
 
-    $connection_info = [
-      'driver' => $input->getOption('database-driver'),
-      'username' => $input->getOption('database-username'),
-      'password' => $input->getOption('database-password'),
-      'host' => $input->getOption('database-host'),
-      'database' => $input->getOption('database-name'),
-      'prefix' => $input->getOption('database-prefix'),
-    ];
-    if ($input->hasOption('database-port')) {
-      $connection_info['port'] = $input->getOption('database-port');
-    }
+    $connection_info = Connection::createConnectionOptionsFromUrl($input->getOption('db-url'));
 
     return $this->install($this->classLoader, $io, $install_profile ?? '', $input->getOption('langcode'), $this->getSitePath(), $input->getOption('site-name'), $recipe ?? '', $input->getOption('password'), $connection_info);
   }
