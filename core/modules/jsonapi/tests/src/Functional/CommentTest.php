@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
+use Drupal\comment\CommentingStatus;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Entity\CommentType;
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
@@ -26,6 +26,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * JSON:API integration test for the "Comment" content entity type.
  */
 #[Group('jsonapi')]
+#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class CommentTest extends ResourceTestBase {
 
@@ -120,7 +121,7 @@ class CommentTest extends ResourceTestBase {
     $this->commentedEntity = EntityTest::create([
       'name' => 'Camelids',
       'type' => 'bar',
-      'comment' => CommentItemInterface::OPEN,
+      'comment' => CommentingStatus::Open->value,
     ]);
     $this->commentedEntity->save();
 

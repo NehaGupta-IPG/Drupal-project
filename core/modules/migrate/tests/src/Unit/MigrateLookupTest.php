@@ -24,8 +24,6 @@ class MigrateLookupTest extends MigrateTestCase {
 
   /**
    * Tests the lookup function.
-   *
-   * @legacy-covers ::lookup
    */
   public function testLookup(): void {
     $source_ids = ['id' => '1'];
@@ -54,7 +52,7 @@ class MigrateLookupTest extends MigrateTestCase {
    * Tests message logged when a single migration is not found.
    */
   #[DataProvider('providerExceptionOnMigrationNotFound')]
-  public function testExceptionOnMigrationNotFound($migrations, $message): void {
+  public function testExceptionOnMigrationNotFound(string|array $migrations, string $message): void {
     $migration_plugin_manager = $this->prophesize(MigrationPluginManagerInterface::class);
     $migration_plugin_manager->createInstances($migrations)->willReturn([]);
     $this->expectException(PluginNotFoundException::class);
@@ -66,7 +64,7 @@ class MigrateLookupTest extends MigrateTestCase {
   /**
    * Provides data for testExceptionOnMigrationNotFound.
    */
-  public static function providerExceptionOnMigrationNotFound() {
+  public static function providerExceptionOnMigrationNotFound(): array {
     return [
       'string' => [
         'bad_plugin',
@@ -83,7 +81,7 @@ class MigrateLookupTest extends MigrateTestCase {
    * Tests message logged when multiple migrations are not found.
    */
   #[DataProvider('providerExceptionOnMultipleMigrationsNotFound')]
-  public function testExceptionOnMultipleMigrationsNotFound($migrations, $message): void {
+  public function testExceptionOnMultipleMigrationsNotFound(array $migrations, string $message): void {
     $migration_plugin_manager = $this->prophesize(MigrationPluginManagerInterface::class);
     $migration_plugin_manager->createInstances($migrations)->willReturn([]);
     $this->expectException(PluginException::class);
@@ -95,7 +93,7 @@ class MigrateLookupTest extends MigrateTestCase {
   /**
    * Provides data for testExceptionOnMultipleMigrationsNotFound.
    */
-  public static function providerExceptionOnMultipleMigrationsNotFound() {
+  public static function providerExceptionOnMultipleMigrationsNotFound(): array {
     return [
       'array two items' => [
         ['foo', 'bar'],

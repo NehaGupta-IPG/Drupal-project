@@ -86,11 +86,9 @@ class FormatDateTest extends MigrateProcessTestCase {
    *   The source value for the migration process plugin.
    * @param string $expected
    *   The expected value of the migration process plugin.
-   *
-   * @legacy-covers ::transform
    */
   #[DataProvider('datesDataProvider')]
-  public function testTransform($configuration, $value, $expected): void {
+  public function testTransform(array $configuration, string|int $value, string $expected): void {
     $this->plugin = new FormatDate($configuration, 'test_format_date', []);
     $actual = $this->plugin->transform($value, $this->migrateExecutable, $this->row, 'field_date');
 
@@ -103,7 +101,7 @@ class FormatDateTest extends MigrateProcessTestCase {
    * @return array
    *   Array of date formats and actual/expected values.
    */
-  public static function datesDataProvider() {
+  public static function datesDataProvider(): array {
     return [
       'datetime_date' => [
         'configuration' => [

@@ -24,8 +24,6 @@ class FilteredPluginManagerTraitTest extends UnitTestCase {
 
   /**
    * Tests get filtered definitions.
-   *
-   * @legacy-covers ::getFilteredDefinitions
    */
   #[DataProvider('providerTestGetFilteredDefinitions')]
   public function testGetFilteredDefinitions($contexts, $expected): void {
@@ -62,7 +60,7 @@ class FilteredPluginManagerTraitTest extends UnitTestCase {
   /**
    * Provides test data for ::testGetFilteredDefinitions().
    */
-  public static function providerTestGetFilteredDefinitions() {
+  public static function providerTestGetFilteredDefinitions(): array {
     $data = [];
     $data['populated context'] = [
       ['context1' => 'fake context'],
@@ -93,31 +91,23 @@ class TestFilteredPluginManager extends PluginManagerBase implements FilteredPlu
 
   /**
    * An array of plugin definitions.
-   *
-   * @var array
    */
-  protected $definitions = [];
+  protected array $definitions;
 
   /**
    * The module handler.
-   *
-   * @var Drupal\Core\Extension\ModuleHandlerInterface
    */
-  protected $moduleHandler;
+  protected ModuleHandlerInterface $moduleHandler;
 
   /**
    * The theme manager.
-   *
-   * @var Drupal\Core\Theme\ThemeManagerInterface
    */
-  protected $themeManager;
+  protected ThemeManagerInterface $themeManager;
 
   /**
    * The context handler.
-   *
-   * @var Drupal\Core\Plugin\Context\ContextHandlerInterface
    */
-  protected $contextHandler;
+  protected ContextHandlerInterface $contextHandler;
 
   public function __construct(array $definitions, ModuleHandlerInterface $module_handler, ThemeManagerInterface $theme_manager, ContextHandlerInterface $context_handler) {
     $this->definitions = $definitions;
@@ -126,15 +116,15 @@ class TestFilteredPluginManager extends PluginManagerBase implements FilteredPlu
     $this->contextHandler = $context_handler;
   }
 
-  protected function contextHandler() {
+  protected function contextHandler(): ContextHandlerInterface {
     return $this->contextHandler;
   }
 
-  protected function moduleHandler() {
+  protected function moduleHandler(): ModuleHandlerInterface {
     return $this->moduleHandler;
   }
 
-  protected function themeManager() {
+  protected function themeManager(): ThemeManagerInterface {
     return $this->themeManager;
   }
 
@@ -142,7 +132,7 @@ class TestFilteredPluginManager extends PluginManagerBase implements FilteredPlu
     return 'the_type';
   }
 
-  public function getDefinitions() {
+  public function getDefinitions(): array {
     return $this->definitions;
   }
 

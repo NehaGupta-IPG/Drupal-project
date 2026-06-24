@@ -39,14 +39,13 @@ class NodeFieldTokensTest extends NodeTestBase {
     // Create a user and a node.
     $account = $this->createUser();
     $body = $this->randomMachineName(32);
-    $summary = $this->randomMachineName(16);
 
     /** @var \Drupal\node\NodeInterface $node */
     $node = Node::create([
       'type' => 'article',
       'uid' => $account->id(),
       'title' => 'Testing Views tokens',
-      'body' => [['value' => $body, 'summary' => $summary, 'format' => 'plain_text']],
+      'body' => [['value' => $body, 'format' => 'plain_text']],
     ]);
     $node->save();
 
@@ -57,9 +56,6 @@ class NodeFieldTokensTest extends NodeTestBase {
 
     // Raw value: "{{ body__value }}<br />".
     $this->assertSession()->responseContains("Raw value: $body");
-
-    // Raw summary: "{{ body__summary }}<br />".
-    $this->assertSession()->responseContains("Raw summary: $summary");
 
     // Raw format: "{{ body__format }}<br />".
     $this->assertSession()->responseContains("Raw format: plain_text");

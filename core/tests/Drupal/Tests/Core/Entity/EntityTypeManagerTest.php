@@ -9,14 +9,16 @@ use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityHandlerBase;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManager;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Exception\InvalidLinkTemplateException;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Form\FormBase;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -99,8 +101,8 @@ class EntityTypeManagerTest extends UnitTestCase {
    * @param \Drupal\Core\Entity\EntityTypeInterface[]|\Prophecy\Prophecy\ProphecyInterface[] $definitions
    *   (optional) An array of entity type definitions.
    */
-  protected function setUpEntityTypeDefinitions($definitions = []): void {
-    $class = get_class($this->createMock(EntityInterface::class));
+  protected function setUpEntityTypeDefinitions(array $definitions = []): void {
+    $class = get_class($this->createStub(EntityInterface::class));
     foreach ($definitions as $key => $entity_type) {
       // \Drupal\Core\Entity\EntityTypeInterface::getLinkTemplates() is called
       // by \Drupal\Core\Entity\EntityTypeManager::processDefinition() so it
@@ -110,6 +112,7 @@ class EntityTypeManagerTest extends UnitTestCase {
       // Give the entity type a legitimate class to return.
       $entity_type->getClass()->willReturn($class);
       $entity_type->setClass($class)->willReturn($entity_type->reveal());
+      $entity_type->get('entity_bundle_info')->willReturn(NULL);
 
       $definitions[$key] = $entity_type->reveal();
     }
@@ -134,11 +137,9 @@ class EntityTypeManagerTest extends UnitTestCase {
 
   /**
    * Tests the hasHandler() method.
-   *
-   * @legacy-covers ::hasHandler
    */
   #[DataProvider('providerTestHasHandler')]
-  public function testHasHandler($entity_type_id, $expected): void {
+  public function testHasHandler(string $entity_type_id, bool $expected): void {
     $apple = $this->prophesize(EntityTypeInterface::class);
     $apple->hasHandlerClass('storage')->willReturn(TRUE);
 
@@ -160,7 +161,7 @@ class EntityTypeManagerTest extends UnitTestCase {
    * @return array
    *   Test data.
    */
-  public static function providerTestHasHandler() {
+  public static function providerTestHasHandler(): array {
     return [
       ['apple', TRUE],
       ['banana', FALSE],
@@ -170,8 +171,6 @@ class EntityTypeManagerTest extends UnitTestCase {
 
   /**
    * Tests the getStorage() method.
-   *
-   * @legacy-covers ::getStorage
    */
   public function testGetStorage(): void {
     $entity = $this->prophesize(EntityTypeInterface::class);
@@ -183,8 +182,6 @@ class EntityTypeManagerTest extends UnitTestCase {
 
   /**
    * Tests the getListBuilder() method.
-   *
-   * @legacy-covers ::getListBuilder
    */
   public function testGetListBuilder(): void {
     $entity = $this->prophesize(EntityTypeInterface::class);
@@ -196,8 +193,6 @@ class EntityTypeManagerTest extends UnitTestCase {
 
   /**
    * Tests the getViewBuilder() method.
-   *
-   * @legacy-covers ::getViewBuilder
    */
   public function testGetViewBuilder(): void {
     $entity = $this->prophesize(EntityTypeInterface::class);
@@ -209,8 +204,6 @@ class EntityTypeManagerTest extends UnitTestCase {
 
   /**
    * Tests the getAccessControlHandler() method.
-   *
-   * @legacy-covers ::getAccessControlHandler
    */
   public function testGetAccessControlHandler(): void {
     $entity = $this->prophesize(EntityTypeInterface::class);
@@ -222,8 +215,6 @@ class EntityTypeManagerTest extends UnitTestCase {
 
   /**
    * Tests the getFormObject() method.
-   *
-   * @legacy-covers ::getFormObject
    */
   public function testGetFormObject(): void {
     $apple = $this->prophesize(EntityTypeInterface::class);
@@ -272,8 +263,6 @@ class EntityTypeManagerTest extends UnitTestCase {
 
   /**
    * Tests the getFormObject() method with an invalid operation.
-   *
-   * @legacy-covers ::getFormObject
    */
   #[DataProvider('provideFormObjectInvalidOperationData')]
   public function testGetFormObjectInvalidOperation(string $entity_type_id, string $operation, string $form_class, string $exception_message): void {
@@ -295,9 +284,24 @@ class EntityTypeManagerTest extends UnitTestCase {
   }
 
   /**
-   * Tests the getHandler() method.
+   * Tests the getFormObject() method with an invalid class.
    *
-   * @legacy-covers ::getHandler
+   * @legacy-covers ::getFormObject
+   */
+  public function testGetFormObjectInvalidClass(): void {
+    $donkey = $this->prophesize(EntityTypeInterface::class);
+    $donkey->getFormClass('default')->willReturn(TestNotAnEntityForm::class);
+
+    $this->setUpEntityTypeDefinitions([
+      'donkey' => $donkey,
+    ]);
+    $this->expectException(InvalidPluginDefinitionException::class);
+    $this->expectExceptionMessage('The "default" form handler of the "donkey" entity type specifies a class "Drupal\Tests\Core\Entity\TestNotAnEntityForm" that does not extend "Drupal\Core\Entity\EntityFormInterface".');
+    $this->entityTypeManager->getFormObject('donkey', 'default');
+  }
+
+  /**
+   * Tests the getHandler() method.
    */
   public function testGetHandler(): void {
     $apple = $this->prophesize(EntityTypeInterface::class);
@@ -338,11 +342,9 @@ class EntityTypeManagerTest extends UnitTestCase {
 
   /**
    * Tests the getHandler() method when no controller is defined.
-   *
-   * @legacy-covers ::getHandler
    */
   #[DataProvider('provideMissingHandlerData')]
-  public function testGetHandlerMissingHandler(string $entity_type, string $handler_name, string $handler_class, $exception_message) : void {
+  public function testGetHandlerMissingHandler(string $entity_type, string $handler_name, string $handler_class, string $exception_message) : void {
     $entity = $this->prophesize(EntityTypeInterface::class);
     $entity->getHandlerClass($handler_name)->willReturn(NULL);
     if (!$handler_class) {
@@ -359,8 +361,6 @@ class EntityTypeManagerTest extends UnitTestCase {
 
   /**
    * Tests get route providers.
-   *
-   * @legacy-covers ::getRouteProviders
    */
   public function testGetRouteProviders(): void {
     $apple = $this->prophesize(EntityTypeInterface::class);
@@ -378,8 +378,6 @@ class EntityTypeManagerTest extends UnitTestCase {
 
   /**
    * Tests the processDefinition() method.
-   *
-   * @legacy-covers ::processDefinition
    */
   public function testProcessDefinition(): void {
     $apple = $this->prophesize(EntityTypeInterface::class);
@@ -395,11 +393,9 @@ class EntityTypeManagerTest extends UnitTestCase {
 
   /**
    * Tests the getDefinition() method.
-   *
-   * @legacy-covers ::getDefinition
    */
   #[DataProvider('providerTestGetDefinition')]
-  public function testGetDefinition($entity_type_id, $expected): void {
+  public function testGetDefinition(string $entity_type_id, bool $expected): void {
     $entity = $this->prophesize(EntityTypeInterface::class);
 
     $this->setUpEntityTypeDefinitions([
@@ -422,7 +418,7 @@ class EntityTypeManagerTest extends UnitTestCase {
    * @return array
    *   Test data.
    */
-  public static function providerTestGetDefinition() {
+  public static function providerTestGetDefinition(): array {
     return [
       ['apple', TRUE],
       ['banana', TRUE],
@@ -432,8 +428,6 @@ class EntityTypeManagerTest extends UnitTestCase {
 
   /**
    * Tests the getDefinition() method with an invalid definition.
-   *
-   * @legacy-covers ::getDefinition
    */
   public function testGetDefinitionInvalidException(): void {
     $this->setUpEntityTypeDefinitions();
@@ -465,7 +459,7 @@ class TestEntityTypeManager extends EntityTypeManager {
 /**
  * Provides a test entity form.
  */
-class TestEntityForm extends EntityHandlerBase {
+class TestEntityForm extends EntityForm {
 
   /**
    * {@inheritdoc}
@@ -476,49 +470,6 @@ class TestEntityForm extends EntityHandlerBase {
    * {@inheritdoc}
    */
   public $stringTranslation;
-
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getBaseFormId() {
-    return 'the_base_form_id';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getFormId() {
-    return 'the_form_id';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setEntity(EntityInterface $entity) {
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setOperation($operation) {
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setEntityTypeManager(EntityTypeManagerInterface $entity_type_manager) {
-    $this->entityTypeManager = $entity_type_manager;
-    return $this;
-  }
 
 }
 
@@ -547,8 +498,31 @@ class TestEntityFormInjected extends TestEntityForm implements ContainerInjectio
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     return new static('yellow');
+  }
+
+}
+
+/**
+ * Provides a test entity form that doesn't extend EntityForm.
+ */
+class TestNotAnEntityForm extends FormBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFormId(): string {
+    return 'not_an_entity_form';
+  }
+
+  public function buildForm(array $form, FormStateInterface $form_state): array {
+    // No-op.
+    return $form;
+  }
+
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
+    // No-op.
   }
 
 }

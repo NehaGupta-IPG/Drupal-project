@@ -91,13 +91,6 @@ class EntityResourceTest extends JsonapiKernelTestBase {
   protected Node $node4;
 
   /**
-   * A fake request.
-   *
-   * @var \Symfony\Component\HttpFoundation\Request
-   */
-  protected $request;
-
-  /**
    * The EntityResource under test.
    *
    * @var \Drupal\jsonapi\Controller\EntityResource
@@ -173,7 +166,7 @@ class EntityResourceTest extends JsonapiKernelTestBase {
 
     // Give anonymous users permission to view user profiles, so that we can
     // verify the cache tags of cached versions of user profile pages.
-    array_map(function ($role_id) {
+    array_map(function (string $role_id): void {
       Role::create([
         'id' => $role_id,
         'permissions' => [
@@ -193,7 +186,7 @@ class EntityResourceTest extends JsonapiKernelTestBase {
    * @return \Drupal\jsonapi\Controller\EntityResource
    *   An EntityResource instance.
    */
-  protected function createEntityResource() {
+  protected function createEntityResource(): ?object {
     return $this->container->get('jsonapi.entity_resource');
   }
 
@@ -238,7 +231,7 @@ class EntityResourceTest extends JsonapiKernelTestBase {
     $request->query = new InputBag(['filter' => ['id' => 'invalid']]);
 
     // Get the response.
-    $resource_type = new ResourceType('node', 'article', NULL);
+    $resource_type = new ResourceType('node', 'article', Node::class);
     $response = $this->entityResource->getCollection($resource_type, $request);
 
     // Assertions.

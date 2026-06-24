@@ -39,7 +39,7 @@ class FieldItemNormalizerTest extends JsonapiKernelTestBase {
    *
    * @var \Drupal\jsonapi\Normalizer\FieldItemNormalizer
    */
-  private $normalizer;
+  private FieldItemNormalizer $normalizer;
 
   /**
    * {@inheritdoc}
@@ -60,8 +60,6 @@ class FieldItemNormalizerTest extends JsonapiKernelTestBase {
 
   /**
    * Tests a field item that has no properties.
-   *
-   * @legacy-covers ::normalize
    */
   public function testNormalizeFieldItemWithoutProperties(): void {
     $item = $this->prophesize(FieldItemInterface::class);
@@ -86,6 +84,7 @@ class FieldItemNormalizerTest extends JsonapiKernelTestBase {
           'options' => [
             'query' => 'foo=bar',
           ],
+          'resolvable_uri' => 'https://www.drupal.org',
         ],
       ],
       'internal_property_value' => [
@@ -114,6 +113,7 @@ class FieldItemNormalizerTest extends JsonapiKernelTestBase {
       'options' => [
         'query' => 'foo=bar',
       ],
+      'resolvable_uri' => 'https://www.drupal.org',
     ], $result->getNormalization());
 
     // Verify a field with one public property and one internal only returns the

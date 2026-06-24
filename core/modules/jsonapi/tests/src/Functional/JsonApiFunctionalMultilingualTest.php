@@ -77,7 +77,7 @@ class JsonApiFunctionalMultilingualTest extends JsonApiFunctionalTestBase {
     $output = Json::decode($this->drupalGet('/ca/jsonapi/node/article/' . $this->nodes[0]->uuid(), ['query' => ['include' => 'field_tags,field_image'] + $default_sort]));
     $this->assertEquals($this->nodes[0]->getTranslation('ca')->getTitle(), $output['data']['attributes']['title']);
     $this->assertSame('ca', $output['data']['attributes']['langcode']);
-    $included_tags = array_filter($output['included'], function ($entry) {
+    $included_tags = array_filter($output['included'], function (array $entry): bool {
       return $entry['type'] === 'taxonomy_term--tags';
     });
     $tag_name = $this->nodes[0]->get('field_tags')->entity
@@ -102,7 +102,7 @@ class JsonApiFunctionalMultilingualTest extends JsonApiFunctionalTestBase {
    * Tests updating a translation.
    */
   public function testPatchTranslation(): void {
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
     $node = $this->nodes[0];
     $uuid = $node->uuid();
 
@@ -201,7 +201,7 @@ class JsonApiFunctionalMultilingualTest extends JsonApiFunctionalTestBase {
    * Tests updating a translation fallback.
    */
   public function testPatchTranslationFallback(): void {
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
     $node = $this->nodes[0];
     $uuid = $node->uuid();
 
@@ -242,7 +242,7 @@ class JsonApiFunctionalMultilingualTest extends JsonApiFunctionalTestBase {
    * Tests creating a translation.
    */
   public function testPostTranslation(): void {
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
     $this->grantPermissions(Role::load(RoleInterface::ANONYMOUS_ID), [
       'bypass node access',
     ]);
@@ -306,7 +306,7 @@ class JsonApiFunctionalMultilingualTest extends JsonApiFunctionalTestBase {
    * Tests deleting multilingual content.
    */
   public function testDeleteMultilingual(): void {
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
     $this->grantPermissions(Role::load(RoleInterface::ANONYMOUS_ID), [
       'bypass node access',
     ]);

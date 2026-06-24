@@ -24,8 +24,6 @@ class ExtensionVersionTest extends UnitTestCase {
    *   The version string to test.
    * @param array $expected_version_info
    *   The expected version information.
-   *
-   * @legacy-covers ::getMajorVersion
    */
   #[DataProvider('providerVersionInfos')]
   public function testGetMajorVersion(string $version, array $expected_version_info): void {
@@ -40,8 +38,6 @@ class ExtensionVersionTest extends UnitTestCase {
    *   The version string to test.
    * @param array $expected_version_info
    *   The expected version information.
-   *
-   * @legacy-covers ::getMinorVersion
    */
   #[DataProvider('providerVersionInfos')]
   public function testGetMinorVersion(string $version, array $expected_version_info): void {
@@ -56,8 +52,6 @@ class ExtensionVersionTest extends UnitTestCase {
    *   The version string to test.
    * @param array $expected_version_info
    *   The expected version information.
-   *
-   * @legacy-covers ::getVersionExtra
    */
   #[DataProvider('providerVersionInfos')]
   public function testGetVersionExtra(string $version, array $expected_version_info): void {
@@ -360,8 +354,6 @@ class ExtensionVersionTest extends UnitTestCase {
    *   The branch to test.
    * @param string $expected_major
    *   The expected major version.
-   *
-   * @legacy-covers ::createFromSupportBranch
    */
   #[DataProvider('providerCreateFromSupportBranch')]
   public function testCreateFromSupportBranch(string $branch, string $expected_major): void {
@@ -453,12 +445,17 @@ class ExtensionVersionTest extends UnitTestCase {
    *   as a single item array
    */
   protected static function createKeyedTestCases(array $test_arguments): array {
-    return array_combine(
+    $return = array_combine(
       $test_arguments,
-      array_map(function ($test_argument) {
+      array_map(function (string $test_argument): array {
         return [$test_argument];
       }, $test_arguments)
     );
+    if (isset($return[''])) {
+      $return['empty_string'] = $return[''];
+      unset($return['']);
+    }
+    return $return;
   }
 
 }

@@ -22,14 +22,12 @@ class SectionListTraitTest extends SectionListTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getSectionList(array $section_data) {
+  protected function getSectionList(array $section_data): TestSectionList {
     return new TestSectionList($section_data);
   }
 
   /**
    * Tests add blank section.
-   *
-   * @legacy-covers ::addBlankSection
    */
   public function testAddBlankSection(): void {
     $this->expectException(\Exception::class);

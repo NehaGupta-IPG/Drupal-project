@@ -36,14 +36,12 @@ class RenderedEntityTest extends UnitTestCase {
 
   /**
    * Tests the render method when getEntity returns NULL.
-   *
-   * @legacy-covers ::render
    */
   public function testRenderNullEntity(): void {
     $row = new ResultRow();
-    $field = new RenderedEntity(['entity_type' => 'foo', 'entity field' => 'bar'], '', [], $this->createMock(EntityTypeManagerInterface::class), $this->createMock(LanguageManagerInterface::class), $this->createMock(EntityRepositoryInterface::class), $this->createMock(EntityDisplayRepositoryInterface::class));
-    $view = $this->createMock(ViewExecutable::class);
-    $display = $this->createMock(DisplayPluginBase::class);
+    $field = new RenderedEntity(['entity_type' => 'foo', 'entity field' => 'bar'], '', [], $this->createStub(EntityTypeManagerInterface::class), $this->createStub(LanguageManagerInterface::class), $this->createStub(EntityRepositoryInterface::class), $this->createStub(EntityDisplayRepositoryInterface::class));
+    $view = $this->createStub(ViewExecutable::class);
+    $display = $this->createStub(DisplayPluginBase::class);
     $field->init($view, $display);
     $this->assertEmpty($field->render($row));
   }

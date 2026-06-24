@@ -110,8 +110,6 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
 
   /**
    * Tests get installed packages list.
-   *
-   * @legacy-covers ::getInstalledPackagesList
    */
   public function testGetInstalledPackagesList(): void {
     $project_root = $this->container->get(PathLocator::class)
@@ -309,8 +307,6 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
 
   /**
    * Tests get version.
-   *
-   * @legacy-covers ::getVersion
    */
   #[TestWith(["2.5.6"])]
   #[TestWith([NULL])]
@@ -506,9 +502,10 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
         [
           'example/plugin-a' => TRUE,
           'example/plugin-b' => FALSE,
-          // The scaffold plugin is explicitly disallowed by the fake_site
-          // fixture.
+          // The scaffold and runtime plugins are explicitly disallowed by the
+          // fake_site fixture.
           'drupal/core-composer-scaffold' => FALSE,
+          'symfony/runtime' => FALSE,
         ],
       ],
     ];

@@ -49,7 +49,7 @@ class BlockViewBuilder extends EntityViewBuilder implements TrustedCallbackInter
       $cache_tags = Cache::mergeTags($cache_tags, $plugin->getCacheTags());
 
       // Create the render array for the block as a whole.
-      // @see template_preprocess_block().
+      // @see \Drupal\block\Hook\BlockHooks::preprocessBlock().
       $build[$entity_id] = [
         '#cache' => [
           'contexts' => Cache::mergeContexts(
@@ -143,7 +143,7 @@ class BlockViewBuilder extends EntityViewBuilder implements TrustedCallbackInter
     }
 
     // Create the render array for the block as a whole.
-    // @see template_preprocess_block().
+    // @see \Drupal\block\Hook\BlockHooks::preprocessBlock().
     $build = [
       '#theme' => 'block',
       '#attributes' => [],
@@ -171,6 +171,15 @@ class BlockViewBuilder extends EntityViewBuilder implements TrustedCallbackInter
     $module_handler->alter(['block_view', "block_view_$base_id"], $build, $plugin);
 
     return $build;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags() {
+    // Blocks do not use a view cache tag, they have no mechanisms that would
+    // require an invalidation of view related caches.
+    return [];
   }
 
   /**
@@ -225,11 +234,13 @@ class BlockViewBuilder extends EntityViewBuilder implements TrustedCallbackInter
       // #contextual_links is information about the *entire* block. Therefore,
       // we must move these properties from $content and merge them into the
       // top-level element.
-      foreach (['#attributes', '#contextual_links'] as $property) {
-        if (isset($content[$property])) {
-          $build[$property] += $content[$property];
-          unset($content[$property]);
-        }
+      if (isset($content['#contextual_links'])) {
+        $build['#contextual_links'] += $content['#contextual_links'];
+        unset($content['#contextual_links']);
+      }
+      if (isset($content['#wrapper_attributes'])) {
+        $build['#attributes'] += $content['#wrapper_attributes'];
+        unset($content['#wrapper_attributes']);
       }
       $build['content'] = $content;
     }

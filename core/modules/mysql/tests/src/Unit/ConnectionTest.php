@@ -32,8 +32,7 @@ class ConnectionTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     $this->connection = $this->getMockBuilder(Connection::class)
-      // @phpstan-ignore class.notFound
-      ->setConstructorArgs([$this->createMock(\PHP_VERSION_ID >= 80400 ? Mysql::class : \PDO::class), []])
+      ->setConstructorArgs([$this->createStub(Mysql::class), []])
       ->onlyMethods(['getServerVersion'])
       ->getMock();
   }
@@ -46,7 +45,7 @@ class ConnectionTest extends UnitTestCase {
    */
   #[DataProvider('providerVersionAndIsMariaDb')]
   public function testVersionAndIsMariaDb(bool $expected_is_mariadb, string $server_version, string $expected_version): void {
-    $this->connection
+    $this->connection->expects($this->atLeastOnce())
       ->method('getServerVersion')
       ->willReturn($server_version);
 

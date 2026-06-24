@@ -33,8 +33,6 @@ class FileUploadSanitizeNameEventTest extends UnitTestCase {
 
   /**
    * Tests set filename exception.
-   *
-   * @legacy-covers ::setFilename
    */
   public function testSetFilenameException(): void {
     $event = new FileUploadSanitizeNameEvent('foo.txt', '');
@@ -90,7 +88,7 @@ class FileUploadSanitizeNameEventTest extends UnitTestCase {
    * @return array
    *   Arrays with original file name.
    */
-  public static function provideFilenames() {
+  public static function provideFilenames(): array {
     return [
       'ASCII filename with extension' => [
         'example.txt',
@@ -112,8 +110,6 @@ class FileUploadSanitizeNameEventTest extends UnitTestCase {
 
   /**
    * Tests stop propagation.
-   *
-   * @legacy-covers ::stopPropagation
    */
   public function testStopPropagation(): void {
     $this->expectException(\RuntimeException::class);

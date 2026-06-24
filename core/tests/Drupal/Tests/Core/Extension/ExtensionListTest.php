@@ -29,8 +29,6 @@ class ExtensionListTest extends UnitTestCase {
 
   /**
    * Tests get name with non existing extension.
-   *
-   * @legacy-covers ::getName
    */
   public function testGetNameWithNonExistingExtension(): void {
     [$cache, $info_parser, $module_handler, $state] = $this->getMocks();
@@ -46,8 +44,6 @@ class ExtensionListTest extends UnitTestCase {
 
   /**
    * Tests get name.
-   *
-   * @legacy-covers ::getName
    */
   public function testGetName(): void {
     $test_extension_list = $this->setupTestExtensionList();
@@ -57,8 +53,6 @@ class ExtensionListTest extends UnitTestCase {
 
   /**
    * Tests get with non existing extension.
-   *
-   * @legacy-covers ::get
    */
   public function testGetWithNonExistingExtension(): void {
     [$cache, $info_parser, $module_handler, $state] = $this->getMocks();
@@ -74,8 +68,6 @@ class ExtensionListTest extends UnitTestCase {
 
   /**
    * Tests get.
-   *
-   * @legacy-covers ::get
    */
   public function testGet(): void {
     $test_extension_list = $this->setupTestExtensionList();
@@ -87,8 +79,6 @@ class ExtensionListTest extends UnitTestCase {
 
   /**
    * Tests get list.
-   *
-   * @legacy-covers ::getList
    */
   public function testGetList(): void {
     $test_extension_list = $this->setupTestExtensionList();
@@ -119,8 +109,6 @@ class ExtensionListTest extends UnitTestCase {
 
   /**
    * Tests get all available info.
-   *
-   * @legacy-covers ::getAllAvailableInfo
    */
   public function testGetAllAvailableInfo(): void {
     $test_extension_list = $this->setupTestExtensionList();
@@ -138,8 +126,6 @@ class ExtensionListTest extends UnitTestCase {
 
   /**
    * Tests get all installed info.
-   *
-   * @legacy-covers ::getAllInstalledInfo
    */
   public function testGetAllInstalledInfo(): void {
     $test_extension_list = $this->setupTestExtensionList(['test_name', 'test_name_2']);
@@ -158,8 +144,6 @@ class ExtensionListTest extends UnitTestCase {
 
   /**
    * Tests get path names.
-   *
-   * @legacy-covers ::getPathNames
    */
   public function testGetPathNames(): void {
     $test_extension_list = $this->setupTestExtensionList();
@@ -172,8 +156,6 @@ class ExtensionListTest extends UnitTestCase {
 
   /**
    * Tests get pathname.
-   *
-   * @legacy-covers ::getPathname
    */
   public function testGetPathname(): void {
     $test_extension_list = $this->setupTestExtensionList();
@@ -196,9 +178,27 @@ class ExtensionListTest extends UnitTestCase {
   }
 
   /**
-   * Tests get path.
+   * Tests that set pathname survives reset.
    *
-   * @legacy-covers ::getPath
+   * @legacy-covers ::setPathname
+   * @legacy-covers ::getPathname
+   * @legacy-covers ::reset
+   */
+  public function testSetPathnameSurvivesReset(): void {
+    $test_extension_list = $this->setupTestExtensionList();
+
+    $pathname = 'vfs://drupal_root/example2/test_name/test_name.info.yml';
+    $test_extension_list->setPathname('test_name', $pathname);
+    $this->assertSame($pathname, $test_extension_list->getPathname('test_name'));
+
+    $test_extension_list->reset();
+
+    $this->assertSame($pathname, $test_extension_list->getPathname('test_name'));
+    $this->assertSame('vfs://drupal_root/example2/test_name', $test_extension_list->getPath('test_name'));
+  }
+
+  /**
+   * Tests get path.
    */
   public function testGetPath(): void {
     $test_extension_list = $this->setupTestExtensionList();
@@ -209,8 +209,6 @@ class ExtensionListTest extends UnitTestCase {
 
   /**
    * Tests reset.
-   *
-   * @legacy-covers ::reset
    */
   public function testReset(): void {
     $test_extension_list = $this->setupTestExtensionList();
@@ -239,11 +237,9 @@ class ExtensionListTest extends UnitTestCase {
 
   /**
    * Tests check incompatibility.
-   *
-   * @legacy-covers ::checkIncompatibility
    */
   #[DataProvider('providerCheckIncompatibility')]
-  public function testCheckIncompatibility($additional_settings, $expected): void {
+  public function testCheckIncompatibility(array $additional_settings, bool $expected): void {
     $test_extension_list = $this->setupTestExtensionList(['test_name'], $additional_settings);
     $this->assertSame($expected, $test_extension_list->checkIncompatibility('test_name'));
   }
@@ -251,7 +247,7 @@ class ExtensionListTest extends UnitTestCase {
   /**
    * Data provider for testCheckIncompatibility().
    */
-  public static function providerCheckIncompatibility() {
+  public static function providerCheckIncompatibility(): array {
     return [
       'core_incompatible true' => [
         [
@@ -309,7 +305,7 @@ class ExtensionListTest extends UnitTestCase {
    * @return \Drupal\Tests\Core\Extension\TestExtension
    *   The test extension list.
    */
-  protected function setupTestExtensionList(array $extension_names = ['test_name'], array $additional_info_values = []) {
+  protected function setupTestExtensionList(array $extension_names = ['test_name'], array $additional_info_values = []): TestExtension {
     vfsStream::setup('drupal_root');
 
     $folders = ['example' => []];

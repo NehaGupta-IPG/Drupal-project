@@ -39,6 +39,7 @@ class FileThemeHooks {
           'file' => NULL,
           'description' => NULL,
           'attributes' => [],
+          'with_size' => TRUE,
         ],
         'initial preprocess' => static::class . ':preprocessFileLink',
       ],
@@ -86,6 +87,7 @@ class FileThemeHooks {
    *   - description: A description to be displayed instead of the filename.
    *   - attributes: An associative array of attributes to be placed in the a
    *     tag.
+   *   - with_size: A Boolean indicating if the file size should be displayed.
    */
   public function preprocessFileLink(array &$variables): void {
     $file = $variables['file'];
@@ -117,7 +119,7 @@ class FileThemeHooks {
     // Set file classes to the options array.
     $variables['attributes'] = new Attribute($variables['attributes']);
     $variables['attributes']->addClass($classes);
-    $variables['file_size'] = $file->getSize() !== NULL ? ByteSizeMarkup::create($file->getSize()) : '';
+    $variables['file_size'] = ($variables['with_size'] ?? TRUE) && $file->getSize() !== NULL ? ByteSizeMarkup::create($file->getSize()) : '';
 
     $variables['link'] = (new Link($link_text, $url->mergeOptions($options)))->toRenderable();
   }
@@ -259,7 +261,7 @@ class FileThemeHooks {
       $operations_elements = [];
       foreach (Element::children($widget) as $key) {
         if (isset($widget[$key]['#type']) && $widget[$key]['#type'] == 'submit') {
-          hide($widget[$key]);
+          $widget[$key]['#printed'] = TRUE;
           $operations_elements[] = &$widget[$key];
         }
       }
@@ -267,9 +269,9 @@ class FileThemeHooks {
       // Delay rendering of the "Display" option and the weight selector, so
       // that each can be rendered later in its own column.
       if ($element['#display_field']) {
-        hide($widget['display']);
+        $widget['display']['#printed'] = TRUE;
       }
-      hide($widget['_weight']);
+      $widget['_weight']['#printed'] = TRUE;
       $widget['_weight']['#attributes']['class'] = [$weight_class];
 
       // Render everything else together in a column, without the normal
@@ -291,9 +293,10 @@ class FileThemeHooks {
       ];
 
       // Show the buttons that had previously been marked as hidden in this
-      // preprocess function. We use show() to undo the earlier hide().
+      // preprocess function. We use ['#printed'] = FALSE to undo the earlier
+      // ['#printed'] = TRUE.
       foreach (Element::children($operations_elements) as $key) {
-        show($operations_elements[$key]);
+        $operations_elements[$key]['#printed'] = FALSE;
       }
       $row[] = [
         'data' => $operations_elements,

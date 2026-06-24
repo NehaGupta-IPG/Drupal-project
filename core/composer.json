@@ -18,33 +18,33 @@
         "ext-tokenizer": "*",
         "ext-xml": "*",
         "ext-zlib": "*",
-        "php": ">=8.3.0",
-        "symfony/console": "^7.4@beta",
-        "symfony/dependency-injection": "^7.4@beta",
-        "symfony/event-dispatcher": "^7.4@beta",
-        "symfony/filesystem": "^7.4@beta",
-        "symfony/finder": "^7.4@beta",
-        "symfony/http-foundation": "^7.4@beta",
-        "symfony/http-kernel": "^7.4@beta",
-        "symfony/mailer": "^7.4@beta",
-        "symfony/mime": "^7.4@beta",
-        "symfony/routing": "^7.4@beta",
-        "symfony/serializer": "^7.4@beta",
-        "symfony/validator": "^7.4@beta",
-        "symfony/process": "^7.4@beta",
+        "php": ">=8.5.0",
+        "symfony/console": "^8.0",
+        "symfony/dependency-injection": "^8.0",
+        "symfony/event-dispatcher": "^8.0",
+        "symfony/filesystem": "^8.0",
+        "symfony/finder": "^8.0",
+        "symfony/http-foundation": "^8.0.13",
+        "symfony/http-kernel": "^8.0.12",
+        "symfony/mailer": "^8.0.12",
+        "symfony/mime": "^8.0.12",
+        "symfony/routing": "^8.0.13",
+        "symfony/runtime": "^8.0",
+        "symfony/serializer": "^8.0",
+        "symfony/validator": "^8.0",
+        "symfony/process": "^8.0",
         "symfony/polyfill-iconv": "^1.32",
-        "symfony/polyfill-php84": "^1.32",
-        "symfony/polyfill-php85": "^1.32",
-        "symfony/yaml": "^7.4@beta",
+        "symfony/polyfill-php86": "^1.37",
+        "symfony/yaml": "^8.0.12",
         "revolt/event-loop": "^1.0",
-        "twig/twig": "^3.21.0",
+        "twig/twig": "^3.27.0",
         "doctrine/lexer": "^2 || ^3",
         "drupal/core-composer-scaffold": "self.version",
         "guzzlehttp/guzzle": "^7.10",
         "guzzlehttp/psr7": "^2.8.0",
         "egulias/email-validator": "^3.2.1|^4.0",
         "masterminds/html5": "^2.7",
-        "symfony/psr-http-message-bridge": "^7.4@beta",
+        "symfony/psr-http-message-bridge": "^8.0",
         "composer-runtime-api": "^2.1",
         "composer/semver": "^3.3",
         "asm89/stack-cors": "^2.3",
@@ -52,7 +52,9 @@
         "psr/log": "^3.0",
         "mck89/peast": "^1.17.4",
         "sebastian/diff": "^4 || ^5 || ^6 || ^7",
-        "php-tuf/composer-stager": "^2.0"
+        "php-tuf/composer-stager": "^2.0",
+        "justinrainbow/json-schema": "^5.2 || ^6.5.2",
+        "twig/html-extra": "^3.23"
     },
     "conflict": {
         "drupal/automatic_updates": "<4",
@@ -121,13 +123,16 @@
             "includes/bootstrap.inc"
         ]
     },
+    "bin": [
+        "scripts/dr"
+    ],
     "config": {
         "preferred-install": "dist"
     },
-    "suggest": {
-        "ext-zip": "Needed to extend the plugin.manager.archiver service capability with the handling of files in the ZIP format."
-    },
     "extra": {
+        "branch-alias": {
+            "dev-main": "12.x-dev"
+        },
         "drupal-scaffold": {
             "file-mapping": {
                 "[project-root]/.editorconfig": "assets/scaffold/files/editorconfig",
@@ -157,6 +162,12 @@
         }
     },
     "scripts": {
-        "pre-autoload-dump": "Drupal\\Core\\Composer\\Composer::preAutoloadDump"
-    }
+        "pre-autoload-dump": "Drupal\\Composer\\Plugin\\Scaffold\\Plugin::preAutoloadDump"
+    },
+    "funding": [
+        {
+            "type": "other",
+            "url": "https://www.drupal.org/composer-fund"
+        }
+    ]
 }

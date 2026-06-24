@@ -96,8 +96,6 @@ class EntityRevisionTest extends UnitTestCase {
 
   /**
    * Tests that passed old destination values are used by default.
-   *
-   * @legacy-covers ::getEntity
    */
   public function testGetEntityDestinationValues(): void {
     $destination = $this->getEntityRevisionDestination([]);
@@ -114,8 +112,6 @@ class EntityRevisionTest extends UnitTestCase {
 
   /**
    * Tests that revision updates update.
-   *
-   * @legacy-covers ::getEntity
    */
   public function testGetEntityUpdateRevision(): void {
     $destination = $this->getEntityRevisionDestination([]);
@@ -136,8 +132,6 @@ class EntityRevisionTest extends UnitTestCase {
 
   /**
    * Tests that new revisions are flagged to be written as new.
-   *
-   * @legacy-covers ::getEntity
    */
   public function testGetEntityNewRevision(): void {
     $destination = $this->getEntityRevisionDestination([]);
@@ -161,8 +155,6 @@ class EntityRevisionTest extends UnitTestCase {
 
   /**
    * Tests entity load failure.
-   *
-   * @legacy-covers ::getEntity
    */
   public function testGetEntityLoadFailure(): void {
     $destination = $this->getEntityRevisionDestination([]);
@@ -179,8 +171,6 @@ class EntityRevisionTest extends UnitTestCase {
 
   /**
    * Tests entity revision save.
-   *
-   * @legacy-covers ::save
    */
   public function testSave(): void {
     $entity = $this->prophesize(ContentEntityInterface::class);
@@ -211,7 +201,7 @@ class EntityRevisionTest extends UnitTestCase {
    *
    * @see \Drupal\Tests\migrate\Unit\Destination\EntityRevision
    */
-  protected function getEntityRevisionDestination(array $configuration = [], $plugin_id = 'entity_revision', array $plugin_definition = []) {
+  protected function getEntityRevisionDestination(array $configuration = [], $plugin_id = 'entity_revision', array $plugin_definition = []): EntityRevision {
     return new EntityRevision($configuration, $plugin_id, $plugin_definition,
       $this->migration,
       $this->storage->reveal(),
@@ -259,7 +249,7 @@ class EntityRevision extends RealEntityRevision {
    * @return \Drupal\Core\Entity\EntityInterface
    *   An updated entity from row values.
    */
-  protected function updateEntity(EntityInterface $entity, Row $row) {
+  protected function updateEntity(EntityInterface $entity, Row $row): EntityInterface {
     return $entity;
   }
 

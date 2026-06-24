@@ -7,6 +7,7 @@ namespace Drupal\Core\Hook;
 use Drupal\Component\Annotation\Doctrine\StaticReflectionParser;
 use Drupal\Component\Annotation\Reflection\MockFileFinder;
 use Drupal\Component\FileCache\FileCacheFactory;
+use Drupal\Component\Utility\OpCodeCache;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\HookAttributeInterface;
 use Drupal\Core\Hook\Attribute\LegacyHook;
@@ -133,7 +134,7 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
     foreach ($implementationsByHookOrig as $hook => $hookImplementations) {
       if (is_string($hook) && str_starts_with($hook, 'preprocess_') && str_contains($hook, '__')) {
         foreach ($hookImplementations as $theme) {
-          $this->preprocessForSuggestions[$theme . '_' . $hook] = TRUE;
+          $this->preprocessForSuggestions[$theme . '_' . $hook] = 'theme';
         }
       }
     }
@@ -221,13 +222,21 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
       $fileExtension = $fileinfo->getExtension();
       $filename = $fileinfo->getPathname();
 
-      if ($fileExtension === 'php') {
+      $isThemeSettings = str_ends_with($filename, 'theme-settings.php');
+
+      if ($fileExtension === 'php' && !$isThemeSettings) {
         $cached = $hookFileCache->get($filename);
         if ($cached) {
           $class = $cached['class'];
           $attributes = $cached['attributes'];
         }
         else {
+          // Immediately after a deployment, opcache may not yet have refreshed
+          // depending on the value of opcache.revalidation_freq which defaults
+          // to 2 seconds. Ensure that reflection operates on the new code by
+          // forcibly invalidating the opcode cache.
+          // @see https://www.php.net/manual/en/opcache.configuration.php#ini.opcache.revalidate-freq
+          OpCodeCache::invalidate($filename);
           $namespace = preg_replace('#^src/#', "Drupal/$theme/", $iterator->getSubPath());
           $class = $namespace . '/' . $fileinfo->getBasename('.php');
           $class = str_replace('/', '\\', $class);
@@ -350,6 +359,9 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
       }
       // glob() doesn't support streams but scandir() does.
       return !in_array($fileInfo->getFilename(), ['tests', 'js', 'css', 'templates']) && !array_filter(scandir($key), static fn($filename) => str_ends_with($filename, '.info.yml'));
+    }
+    if ($fileInfo->getFilename() === 'theme-settings.php') {
+      return TRUE;
     }
     return in_array($extension, ['inc', 'theme']);
   }
