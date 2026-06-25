@@ -383,11 +383,7 @@ class DateTimeItemTest extends FieldKernelTestBase {
     // DateTimeFieldItemList::processDefaultValue().
     $entity = EntityTest::create([]);
     $expected = (clone $fixed)->modify('+2 weeks')->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT);
-    $this->assertEquals(
-      $expected,
-      $entity->get('field_datetime')->value,
-      'Relative date default is computed from Drupal::time(), not the system clock.'
-    );
+    $this->assertEquals($expected, $entity->get('field_datetime')->value);
   }
 
 }
