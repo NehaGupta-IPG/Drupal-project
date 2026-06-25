@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Plugin;
 
 use Drupal\Component\Plugin\ConfigurableInterface;
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
+use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Plugin\DefaultLazyPluginCollection;
@@ -57,8 +57,8 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
    */
   public function testGetNotExistingPlugin(): void {
     $this->setupPluginCollection();
-    $this->expectException(PluginNotFoundException::class);
-    $this->expectExceptionMessage("Plugin ID 'pear' was not found.");
+    $this->expectException(PluginException::class);
+    $this->expectExceptionMessage("Missing key \"id\" in configuration for plugin ID \"pear\".");
     $this->defaultPluginCollection->get('pear');
   }
 

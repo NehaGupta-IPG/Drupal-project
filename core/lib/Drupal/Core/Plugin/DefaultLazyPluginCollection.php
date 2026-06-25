@@ -3,6 +3,7 @@
 namespace Drupal\Core\Plugin;
 
 use Drupal\Component\Plugin\ConfigurableInterface;
+use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Plugin\LazyPluginCollection;
 use Drupal\Component\Plugin\PluginManagerInterface;
@@ -74,9 +75,14 @@ class DefaultLazyPluginCollection extends LazyPluginCollection {
    * {@inheritdoc}
    */
   protected function initializePlugin($instance_id) {
-    $configuration = $this->configurations[$instance_id] ?? [];
-    if (!isset($configuration[$this->pluginKey])) {
+    if (!isset($this->configuration[$instance_id])) {
       throw new PluginNotFoundException($instance_id);
+    }
+    $configuration = $this->configurations[$instance_id];
+    if (!isset($configuration[$this->pluginKey])) {
+      throw new PluginException(
+        "Missing key \"{$this->pluginKey}\" in configuration for plugin ID \"{$instance_id}\"."
+      );
     }
     $this->set($instance_id, $this->manager->createInstance($configuration[$this->pluginKey], $configuration));
   }
