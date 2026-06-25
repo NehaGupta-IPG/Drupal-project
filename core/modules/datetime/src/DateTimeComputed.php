@@ -51,6 +51,11 @@ class DateTimeComputed extends TypedData {
       return NULL;
     }
 
+    // A DrupalDateTime object cannot be instantiated with empty values.
+    if (is_array($value) && (empty($value['date']) || empty($value['object']))) {
+      return NULL;
+    }
+
     $datetime_type = $item->getFieldDefinition()->getSetting('datetime_type');
     $storage_format = $datetime_type === DateTimeItem::DATETIME_TYPE_DATE ? DateTimeItemInterface::DATE_STORAGE_FORMAT : DateTimeItemInterface::DATETIME_STORAGE_FORMAT;
     try {

@@ -222,6 +222,20 @@ class DateTimeItemTest extends FieldKernelTestBase {
   }
 
   /**
+   * Tests that empty date-list values do not create a computed date.
+   */
+  public function testEmptyDateListValue(): void {
+    $entity = EntityTest::create();
+    $item = $entity->get('field_datetime')->appendItem();
+    $item->value = [
+      'date' => '',
+      'object' => NULL,
+    ];
+
+    $this->assertNull($item->date);
+  }
+
+  /**
    * Tests setting the value of the DateTimeItem directly.
    */
   public function testSetValueProperty(): void {
