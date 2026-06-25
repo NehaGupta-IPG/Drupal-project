@@ -4,6 +4,7 @@ namespace Drupal\responsive_image\Hook;
 
 use Drupal\breakpoint\BreakpointManagerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Image\ImageFactory;
 use Drupal\responsive_image\Entity\ResponsiveImageStyle;
 use Drupal\responsive_image\ResponsiveImageBuilder;
 use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
@@ -18,6 +19,7 @@ class ResponsiveImageThemeHooks {
     #[AutowireServiceClosure('logger.responsive_image')]
     protected \Closure $loggerClosure,
     protected ResponsiveImageBuilder $responsiveImageBuilder,
+    protected ImageFactory $imageFactory,
   ) {
 
   }
@@ -137,7 +139,7 @@ class ResponsiveImageThemeHooks {
     }
     // Gracefully handle zero-byte or otherwise unreadable image files to avoid
     // fatal errors when the image toolkit tries to parse them.
-    if (!$this->responsiveImageBuilder->isImageValid($variables['uri'])) {
+    if (!$this->imageFactory->get($variables['uri'])->isValid()) {
       $variables['img_element'] = [];
       ($this->loggerClosure)()->warning('Image file is not valid (possibly zero bytes) for URI “@uri”. Responsive image style “@style” was not applied.', [
         '@uri' => $variables['uri'],

@@ -316,20 +316,6 @@ class ResponsiveImageBuilder {
   }
 
   /**
-   * Checks whether the image file at the given URI is valid and non-empty.
-   *
-   * @param string $uri
-   *   The URI of the image file.
-   *
-   * @return bool
-   *   TRUE if the image is valid, FALSE if it is zero-byte or otherwise
-   *   unreadable.
-   */
-  public function isImageValid(string $uri): bool {
-    return $this->imageFactory->get($uri)->isValid();
-  }
-
-  /**
    * Returns the given image style URL.
    *
    * Explicitly supports the special empty image as aa data: URL.
