@@ -11,9 +11,11 @@ use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
 use Drupal\hook_collector_depends_test\Hook\DependsOnModuleClassHooks;
 use Drupal\hook_collector_depends_test\Hook\DependsOnModuleMethodHooks;
 use Drupal\hook_collector_depends_test\Hook\DependsOnModuleMultipleHooks;
+use Drupal\hook_collector_logger_aware_test\Hook\LoggerAwareHook;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\module_handler_test_all1\Hook\ModuleHandlerTestAll1Hooks;
 use Drupal\user_hooks_test\Hook\UserHooksTest;
+use Psr\Log\LoggerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -377,6 +379,15 @@ class HookCollectorPassTest extends KernelTestBase {
     $this->assertFalse($container->getDefinition(ModuleHandlerTestAll1Hooks::class)->isAutoconfigured());
     $this->assertTrue($container->getDefinition(UserHooksTest::class)->isAutowired());
     $this->assertTrue($container->getDefinition(UserHooksTest::class)->isAutoconfigured());
+  }
+
+  /**
+   * Tests autoconfiguring a logger in a hooks class.
+   */
+  public function testHookServiceLoggerAwareAutoconfiguration(): void {
+    $this->enableModules(['hook_collector_logger_aware_test']);
+    $service = $this->container->get(LoggerAwareHook::class);
+    $this->assertInstanceOf(LoggerInterface::class, $service->getLogger());
   }
 
   /**

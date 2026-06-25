@@ -1,0 +1,4 @@
+services:
+  logger.channel.hook_collector_logger_aware_test:
+    parent: logger.channel_base
+    arguments: ['hook_collector_logger_aware_test']
