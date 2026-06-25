@@ -11470,6 +11470,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/ckeditor5/tests/src/Kernel/CKEditor5PluginManagerTest.php',
 ];
 $ignoreErrors[] = [
+  'message' => '#^Parameter \\#1 \\$entity of method Drupal\\\\comment\\\\CommentAccessControlHandler\\:\\:checkAccess\\(\\) expects Drupal\\\\Core\\\\Entity\\\\EntityInterface, Drupal\\\\user\\\\EntityOwnerInterface given\\.$#',
+  'identifier' => 'argument.type',
+  'count' => 1,
+  'path' => __DIR__ . '/modules/comment/src/CommentAccessControlHandler.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\comment\\\\CommentForm\\:\\:flagViolations\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
