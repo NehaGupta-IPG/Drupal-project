@@ -145,7 +145,7 @@ class UserHooks {
     if ($account->isAuthenticated() && $display->getComponent('member_for')) {
       $build['member_for'] = [
         '#type' => 'item',
-        '#markup' => '<h4 class="label">' . $this->t('Member for') . '</h4> ' . \Drupal::service('date.formatter')->formatTimeDiffSince($account->getCreatedTime()),
+        '#markup' => '<div class="field__label">' . $this->t('Member for') . '</div> ' . \Drupal::service('date.formatter')->formatTimeDiffSince($account->getCreatedTime()),
         '#post_render' => [[self::class, 'triggerMemberForDeprecation']],
       ];
     }
