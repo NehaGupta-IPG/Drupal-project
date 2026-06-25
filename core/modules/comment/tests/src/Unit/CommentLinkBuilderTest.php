@@ -9,6 +9,7 @@ use Drupal\comment\CommentLinkBuilder;
 use Drupal\comment\CommentManagerInterface;
 use Drupal\comment\FormLocation;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
@@ -258,9 +259,7 @@ class CommentLinkBuilderTest extends UnitTestCase {
     if (empty($this->timestamp)) {
       $this->timestamp = time();
     }
-    $field_item = $this->getMockBuilder('\Drupal\Core\Field\FieldItemListInterface')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $field_item = $this->createStub(FieldItemListInterface::class);
     $field_item
       ->method('__get')
       ->willReturnMap([
