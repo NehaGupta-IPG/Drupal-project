@@ -3,7 +3,6 @@
 namespace Drupal\locale;
 
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Database\Query\PagerSelectExtender;
 
 /**
@@ -148,21 +147,11 @@ class StringDatabaseStorage implements StringStorageInterface {
               ->execute();
           }
           elseif ($lid === TRUE) {
-            // This is a new location to add, the 'string_type_name_version'
-            // unique key takes care not to duplicate.
-            try {
-              $this->connection->insert('locales_location', $this->options)
-                ->fields([
-                  'sid' => $string->getId(),
-                  'type' => $type,
-                  'name' => $name,
-                  'version' => \Drupal::VERSION,
-                ])
-                ->execute();
-            }
-            catch (IntegrityConstraintViolationException) {
-              // Do nothing, the record existed already.
-            }
+            // This is a new location to add, take care not to duplicate.
+            $this->connection->merge('locales_location', $this->options)
+              ->keys(['sid' => $string->getId(), 'type' => $type, 'name' => $name])
+              ->fields(['version' => \Drupal::VERSION])
+              ->execute();
             $created = TRUE;
           }
           // Loaded locations have 'lid' integer value, nor FALSE, nor TRUE.

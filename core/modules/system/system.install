@@ -94,13 +94,3 @@ function system_update_12001(): TranslatableMarkup|null {
   }
   return NULL;
 }
-
-/**
- * Adds unique key to {locales_location}.
- */
-function system_update_12002(): void {
-  $schema = \Drupal::database()->schema();
-  if ($schema->tableExists('locales_location') && !$schema->indexExists('locales_location', 'string_type_name_version')) {
-    $schema->addUniqueKey('locales_location', 'string_type_name_version', ['sid', 'type', 'name', 'version']);
-  }
-}
