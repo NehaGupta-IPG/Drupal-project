@@ -2083,9 +2083,11 @@ function install_check_requirements($install_state) {
   if (!empty($install_state['config_install_path'])) {
     $requirements = drupal_check_config($install_state['config_install_path']);
   }
-  elseif (!empty($install_state['parameters']['recipe'])) {
-    $requirements = drupal_check_recipe($install_state['parameters']['recipe']);
+
+  if (!empty($install_state['parameters']['recipe'])) {
+    $requirements = array_merge($requirements, drupal_check_recipe($install_state['parameters']['recipe']));
   }
+
   if ($profile !== FALSE) {
     // Check the profile requirements.
     $requirements = array_merge($requirements, drupal_check_profile($profile));

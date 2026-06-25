@@ -540,33 +540,6 @@ function drupal_requirements_url(RequirementSeverity $severity): string {
 }
 
 /**
- * Checks an installation profile's requirements.
- *
- * @param string $profile
- *   Name of installation profile to check.
- *
- * @return array
- *   Array of the installation profile's requirements.
- */
-function drupal_check_profile($profile): array {
-  $info = install_profile_info($profile);
-
-  // Collect requirement testing results.
-  $requirements = drupal_check_modules($info['install']);
-
-  // Add the profile requirements.
-  $function = $profile . '_requirements';
-  if (function_exists($function)) {
-    $requirements = array_merge($requirements, $function('install'));
-  }
-
-  $extension = \Drupal::service('extension.list.profile')->get($profile);
-  $requirements = array_merge($requirements, install_check_class_requirements($extension));
-
-  return $requirements;
-}
-
-/**
  * Checks config requirements.
  *
  * @param string $config
@@ -668,6 +641,33 @@ function drupal_check_modules(array $modules): array {
       $requirements = array_merge($requirements, install_check_class_requirements($module_list[$module]));
     }
   }
+
+  return $requirements;
+}
+
+/**
+ * Checks an installation profile's requirements.
+ *
+ * @param string $profile
+ *   Name of installation profile to check.
+ *
+ * @return array
+ *   Array of the installation profile's requirements.
+ */
+function drupal_check_profile($profile): array {
+  $info = install_profile_info($profile);
+
+  // Collect requirement testing results.
+  $requirements = drupal_check_modules($info['install']);
+
+  // Add the profile requirements.
+  $function = $profile . '_requirements';
+  if (function_exists($function)) {
+    $requirements = array_merge($requirements, $function('install'));
+  }
+
+  $extension = \Drupal::service('extension.list.profile')->get($profile);
+  $requirements = array_merge($requirements, install_check_class_requirements($extension));
 
   return $requirements;
 }
