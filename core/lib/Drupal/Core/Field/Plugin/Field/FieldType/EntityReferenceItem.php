@@ -467,11 +467,24 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
       '#process' => [[static::class, 'formProcessMergeParent']],
     ];
 
+    $stored_handler = $field->getSetting('handler');
+    if (!array_key_exists($stored_handler, $handlers_options)) {
+      // The stored handler (e.g. 'default:filter_existing_terms') may belong to
+      // a group whose representative option uses the target-type suffix (e.g.
+      // 'default:taxonomy_term'). Fall back to that representative so the
+      // select does not silently fall back to the first option.
+      $handler_group = explode(':', $stored_handler)[0];
+      $handler_with_type = $handler_group . ':' . $this->getSetting('target_type');
+      if (array_key_exists($handler_with_type, $handlers_options)) {
+        $stored_handler = $handler_with_type;
+      }
+    }
+
     $form['handler']['handler'] = [
       '#type' => 'select',
       '#title' => $this->t('Reference method'),
       '#options' => $handlers_options,
-      '#default_value' => $field->getSetting('handler'),
+      '#default_value' => $stored_handler,
       '#required' => TRUE,
       // Use a form process callback to build #ajax property properly and also
       // to avoid code duplication.
