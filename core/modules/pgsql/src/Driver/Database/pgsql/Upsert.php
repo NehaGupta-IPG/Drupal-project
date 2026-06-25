@@ -138,6 +138,8 @@ class Upsert extends QueryUpsert {
       unset($insert_fields[$key]);
     }
 
+    assert($insert_fields !== [], 'There must be at least one column to update in an upsert operation.');
+
     $update = [];
     foreach ($insert_fields as $field) {
       // The "excluded." prefix causes the field to refer to the value for field

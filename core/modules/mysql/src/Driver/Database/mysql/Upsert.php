@@ -39,6 +39,8 @@ class Upsert extends QueryUpsert {
       unset($insert_fields[$key]);
     }
 
+    assert($insert_fields !== [], 'There must be at least one column to update in an upsert operation.');
+
     $update = [];
     foreach ($insert_fields as $field) {
       $update[] = isset($update_values[$field]) ? "$field = $update_values[$field]" : "$field = VALUES($field)";
