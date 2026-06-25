@@ -356,13 +356,7 @@ class DateTimeItemTest extends FieldKernelTestBase {
   }
 
   /**
-   * Tests that relative date defaults are based on Drupal's time service.
-   *
-   * A relative default value (e.g. "+2 weeks") must be calculated from
-   * \Drupal::time()->getCurrentTime() so that the time can be controlled for
-   * testing, rather than from the system clock.
-   *
-   * @see https://www.drupal.org/project/drupal/issues/3173778
+   * Tests that relative date defaults use Drupal's time service.
    */
   public function testRelativeDefaultValueRespectsTimeService(): void {
     // Lock Drupal's time to a fixed instant distinct from the system clock.
