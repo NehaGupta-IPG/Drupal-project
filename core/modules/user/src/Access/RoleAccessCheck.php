@@ -30,8 +30,8 @@ class RoleAccessCheck implements AccessInterface {
   public function access(Route $route, AccountInterface $account) {
 
     $roles = $account->getRoles();
-    // Forbidden return if user does not have any role defined.
-    // This is an error condition and should not occur.
+    // Forbidden return if user does not have any role defined. This is an error
+    // condition and should not occur.
     if (empty($roles)) {
       return AccessResult::forbidden('No user roles found.');
     }
