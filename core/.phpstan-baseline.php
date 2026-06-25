@@ -34584,48 +34584,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Render/RendererTestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^@dataProvider roleAccessProvider related method must be static in PHPUnit 10 and newer\\.$#',
-	'identifier' => 'phpunit.dataProviderStatic',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Route/RoleAccessCheckTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Route\\\\RoleAccessCheckTest\\:\\:roleAccessProvider\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Route/RoleAccessCheckTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Route\\\\RoleAccessCheckTest\\:\\:testRoleAccess\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Route/RoleAccessCheckTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Test class Drupal\\\\Tests\\\\Core\\\\Route\\\\RoleAccessCheckTest must have attribute \\\\PHPUnit\\\\Framework\\\\Attributes\\\\Group\\.$#',
-	'identifier' => 'testClass.missingAttribute.Group',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Route/RoleAccessCheckTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Test class Drupal\\\\Tests\\\\Core\\\\Route\\\\RoleAccessCheckTest must not add annotation @coversDefaultClass\\.$#',
-	'identifier' => 'testClass.metadataForbidden',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Route/RoleAccessCheckTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Test class Drupal\\\\Tests\\\\Core\\\\Route\\\\RoleAccessCheckTest must not add annotation @group\\.$#',
-	'identifier' => 'testClass.metadataForbidden',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Route/RoleAccessCheckTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Test method testRoleAccess must not add annotation @dataProvider\\.$#',
-	'identifier' => 'testMethod.metadataForbidden',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Route/RoleAccessCheckTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Routing\\\\MockRouterInterface\\:\\:add\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
