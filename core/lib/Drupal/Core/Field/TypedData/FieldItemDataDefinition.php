@@ -16,6 +16,11 @@ use Drupal\Core\TypedData\DataDefinition;
 class FieldItemDataDefinition extends DataDefinition implements FieldItemDataDefinitionInterface {
 
   /**
+   * A WeakMap cache of the property definitions keyed by field definition.
+   */
+  protected static ?\WeakMap $propertyDefinitions = NULL;
+
+  /**
    * The field definition the item definition belongs to.
    *
    * @var \Drupal\Core\Field\FieldDefinitionInterface
@@ -62,7 +67,13 @@ class FieldItemDataDefinition extends DataDefinition implements FieldItemDataDef
    * {@inheritdoc}
    */
   public function getPropertyDefinitions() {
-    return $this->fieldDefinition->getFieldStorageDefinition()->getPropertyDefinitions();
+    if (!isset(static::$propertyDefinitions[$this->fieldDefinition])) {
+      if (static::$propertyDefinitions === NULL) {
+        static::$propertyDefinitions = new \WeakMap();
+      }
+      static::$propertyDefinitions[$this->fieldDefinition] = $this->fieldDefinition->getFieldStorageDefinition()->getPropertyDefinitions();
+    }
+    return static::$propertyDefinitions[$this->fieldDefinition];
   }
 
   /**
