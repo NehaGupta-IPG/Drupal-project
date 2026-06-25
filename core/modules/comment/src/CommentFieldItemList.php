@@ -2,7 +2,6 @@
 
 namespace Drupal\comment;
 
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Cache\CacheableMetadata;
@@ -68,9 +67,9 @@ class CommentFieldItemList extends FieldItemList {
       // field must still be accessible so the formatter can display a
       // login-to-comment prompt.
       if (!$result->isAllowed()) {
-        $status = (int) ($this->first()->getValue()['status'] ?? CommentItemInterface::HIDDEN);
+        $status = CommentingStatus::tryFrom((int) $this->status);
         $result = $result->orIf(
-          AccessResult::allowedIf($status === CommentItemInterface::OPEN)
+          AccessResult::allowedIf($status === CommentingStatus::Open)
             ->addCacheableDependency($this->getEntity())
         );
       }

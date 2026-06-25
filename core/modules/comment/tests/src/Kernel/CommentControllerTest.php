@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Kernel;
 
+use Drupal\comment\CommentingStatus;
 use Drupal\comment\Controller\CommentController;
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Core\Cache\Cache;
 use Drupal\KernelTests\KernelTestBase;
@@ -108,7 +108,7 @@ class CommentControllerTest extends KernelTestBase {
     $this->assertSame($node->getCacheTags(), $access_result->getCacheTags());
 
     // Close commenting on this node.
-    $node->get('comment')->status = CommentItemInterface::CLOSED;
+    $node->get('comment')->status = CommentingStatus::Closed->value;
 
     // Check that is not possible to comment when comments are closed.
     $access_result = $this->controller->replyFormAccess($node, 'comment');
@@ -116,7 +116,7 @@ class CommentControllerTest extends KernelTestBase {
     $this->assertSame($node->getCacheTags(), $access_result->getCacheTags());
 
     // Reopen commenting on this node.
-    $node->get('comment')->status = CommentItemInterface::OPEN;
+    $node->get('comment')->status = CommentingStatus::Open->value;
 
     // Cannot reply to a non-existing comment.
     $non_existing_comment_id = (int) $this->container->get('database')->query("SELECT MAX(cid) FROM {comment}")->fetchField() + 1;

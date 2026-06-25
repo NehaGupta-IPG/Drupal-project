@@ -2,7 +2,6 @@
 
 namespace Drupal\comment;
 
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityFormBuilderInterface;
 use Drupal\Core\Entity\EntityInterface;
