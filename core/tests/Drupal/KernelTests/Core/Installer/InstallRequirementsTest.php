@@ -50,7 +50,7 @@ theme: {  }
 profile: testing
 YAML);
 
-    $requirements = install_check_requirements([
+    $requirements = $this->installCheckRequirements([
       'config_install_path' => $sync_directory,
       'parameters' => [
         'profile' => 'minimal',
@@ -62,13 +62,39 @@ YAML);
   }
 
   /**
+   * Tests existing configuration install checks profile requirements.
+   */
+  public function testExistingConfigInstallProfileRequirementsFailure(): void {
+    require_once 'core/includes/install.inc';
+    require_once 'core/includes/install.core.inc';
+    require_once 'core/profiles/tests/testing_site_config/testing_site_config.install';
+    $sync_directory = $this->siteDirectory . '/config/sync';
+    mkdir($sync_directory, 0777, TRUE);
+    file_put_contents($sync_directory . '/core.extension.yml', <<<YAML
+module: {  }
+theme: {  }
+profile: testing_site_config
+YAML);
+
+    $requirements = $this->installCheckRequirements([
+      'config_install_path' => $sync_directory,
+      'parameters' => [
+        'profile' => 'testing_site_config',
+      ],
+      'settings_verified' => TRUE,
+    ]);
+
+    $this->assertConfigInstallProfileRequirements($requirements);
+  }
+
+  /**
    * Tests recipe install checks module requirements.
    */
   public function testRecipeInstallRequirementsFailure(): void {
     require_once 'core/includes/install.inc';
     require_once 'core/includes/install.core.inc';
 
-    $requirements = install_check_requirements([
+    $requirements = $this->installCheckRequirements([
       'parameters' => [
         'profile' => FALSE,
         'recipe' => 'core/tests/fixtures/recipes/install_unmet_requirements',
@@ -77,6 +103,21 @@ YAML);
     ]);
 
     $this->assertUnmetRequirements($requirements);
+  }
+
+  /**
+   * Checks install requirements using an installer-like global state.
+   *
+   * @param mixed[] $install_state
+   *   The install state.
+   *
+   * @return mixed[]
+   *   The requirements.
+   */
+  private function installCheckRequirements(array $install_state): array {
+    $install_state += ['interactive' => FALSE];
+    $GLOBALS['install_state'] = $install_state;
+    return install_check_requirements($install_state);
   }
 
   /**
@@ -89,6 +130,18 @@ YAML);
     $this->assertArrayHasKey('testing_requirements', $requirements);
     $this->assertSame(RequirementSeverity::Error, $requirements['testing_requirements']['severity']);
     $this->assertSame('Testing requirements failed requirements.', (string) $requirements['testing_requirements']['description']);
+  }
+
+  /**
+   * Asserts config install profile requirements fixture is present.
+   *
+   * @param mixed[] $requirements
+   *   The requirements to check.
+   */
+  private function assertConfigInstallProfileRequirements(array $requirements): void {
+    $this->assertArrayHasKey('config_install', $requirements);
+    $this->assertSame(RequirementSeverity::Error, $requirements['config_install']['severity']);
+    $this->assertSame('testing_site_config', $requirements['config_install']['value']);
   }
 
 }

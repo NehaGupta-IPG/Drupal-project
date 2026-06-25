@@ -2086,9 +2086,9 @@ function install_check_requirements($install_state) {
   elseif (!empty($install_state['parameters']['recipe'])) {
     $requirements = drupal_check_recipe($install_state['parameters']['recipe']);
   }
-  elseif ($profile !== FALSE) {
+  if ($profile !== FALSE) {
     // Check the profile requirements.
-    $requirements = drupal_check_profile($profile);
+    $requirements = array_merge($requirements, drupal_check_profile($profile));
   }
 
   if ($install_state['settings_verified']) {
