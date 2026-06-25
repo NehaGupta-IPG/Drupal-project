@@ -382,7 +382,7 @@ class HookCollectorPassTest extends KernelTestBase {
   }
 
   /**
-   * Tests autoconfiguring a logger in a hooks class.
+   * Tests autoconfigure of a logger in a hooks class.
    */
   public function testHookServiceLoggerAwareAutoconfiguration(): void {
     $this->enableModules(['hook_collector_logger_aware_test']);
