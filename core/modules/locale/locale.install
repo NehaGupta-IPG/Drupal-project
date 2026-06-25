@@ -178,7 +178,7 @@ function locale_schema(): array {
       ],
     ],
     'unique keys' => [
-      'string_type_name' => ['sid', 'type', 'name'],
+      'string_type_name_version' => ['sid', 'type', 'name', 'version'],
     ],
     'indexes' => [
       'string_type' => ['sid', 'type'],

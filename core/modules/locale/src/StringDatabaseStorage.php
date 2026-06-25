@@ -149,7 +149,7 @@ class StringDatabaseStorage implements StringStorageInterface {
           elseif ($lid === TRUE) {
             // This is a new location to add, take care not to duplicate.
             $this->connection->upsert('locales_location', $this->options)
-              ->key(['sid', 'type', 'name'])
+              ->key(['sid', 'type', 'name', 'version'])
               ->fields([
                 'sid' => $string->getId(),
                 'type' => $type,
