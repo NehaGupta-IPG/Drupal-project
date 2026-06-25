@@ -53,8 +53,10 @@ class EntityNormalizer extends ComplexDataNormalizer implements DenormalizerInte
 
     if (!empty($context['sparse_fieldset'])) {
       foreach ($context['sparse_fieldset'] as $name) {
-        $property = $object->get($name);
-        $attributes[$name] = $this->serializer->normalize($property, $format, $context);
+        if ($object->hasField($name)) {
+          $property = $object->get($name);
+          $attributes[$name] = $this->serializer->normalize($property, $format, $context);
+        }
       }
     }
     else {

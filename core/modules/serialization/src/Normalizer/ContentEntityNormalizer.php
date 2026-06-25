@@ -31,9 +31,11 @@ class ContentEntityNormalizer extends EntityNormalizer {
     $attributes = [];
     if (!empty($context['sparse_fieldset'])) {
       foreach ($context['sparse_fieldset'] as $name) {
-        $field_items = $entity->get($name);
-        if (!$field_items->getDataDefinition()->isInternal() && $field_items->access('view', $context['account'])) {
-          $attributes[$name] = $this->serializer->normalize($field_items, $format, $context);
+        if ($entity->hasField($name)) {
+          $field_items = $entity->get($name);
+          if (!$field_items->getDataDefinition()->isInternal() && $field_items->access('view', $context['account'])) {
+            $attributes[$name] = $this->serializer->normalize($field_items, $format, $context);
+          }
         }
       }
     }
