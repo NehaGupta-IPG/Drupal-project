@@ -378,9 +378,6 @@ class CommentFieldAccessTest extends EntityKernelTestBase {
    * entirely and no prompt is ever shown.
    */
   public function testFieldViewAccessForLoginPrompt(): void {
-    $this->createCommentType('entity_test');
-    $this->addDefaultCommentField('entity_test', 'entity_test', 'comment');
-
     $host = EntityTest::create();
     $host->save();
 
@@ -404,14 +401,14 @@ class CommentFieldAccessTest extends EntityKernelTestBase {
     $this->assertTrue($comment_field->access('view', $anonymous, TRUE)->isAllowed());
 
     // Closed: nothing to show (no comments, no form, no prompt).
-    $host->comment->status = CommentItemInterface::CLOSED;
+    $host->comment->status = CommentingStatus::Closed->value;
     $host->save();
     $host = EntityTest::load($host->id());
     $comment_field = $host->get('comment');
     $this->assertFalse($comment_field->access('view', $anonymous));
 
     // Hidden: field is completely suppressed.
-    $host->comment->status = CommentItemInterface::HIDDEN;
+    $host->comment->status = CommentingStatus::Hidden->value;
     $host->save();
     $host = EntityTest::load($host->id());
     $comment_field = $host->get('comment');
