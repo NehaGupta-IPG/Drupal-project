@@ -1,0 +1,4 @@
+name: 'Install unmet requirements'
+type: 'Testing'
+install:
+  - module_install_unmet_requirements

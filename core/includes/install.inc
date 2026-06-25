@@ -578,6 +578,7 @@ function drupal_check_profile($profile): array {
 function drupal_check_config($config): array {
   $sync = new FileStorage($config);
   $core_extension = $sync->read('core.extension');
+  $modules = [];
   if (!empty($core_extension['module']) && is_array($core_extension['module'])) {
     $modules = array_keys($core_extension['module']);
   }
@@ -612,6 +613,15 @@ function drupal_check_recipe($recipe): array {
   }
 }
 
+/**
+ * Returns the modules installed by a recipe and its dependencies.
+ *
+ * @param \Drupal\Core\Recipe\Recipe $recipe
+ *   The recipe to inspect.
+ *
+ * @return string[]
+ *   The list of module names.
+ */
 function drupal_recipe_modules(Recipe $recipe): array {
   $modules = $recipe->install->modules;
   foreach ($recipe->recipes->recipes as $sub_recipe) {
@@ -627,7 +637,7 @@ function drupal_recipe_modules(Recipe $recipe): array {
  *   List of modules to check.
  *
  * @return array
- *   Array of the installation profile's requirements.
+ *   Array of the modules' requirements.
  */
 function drupal_check_modules(array $modules): array {
   // Collect requirement testing results.
