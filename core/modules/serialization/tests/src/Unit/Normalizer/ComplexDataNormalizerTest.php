@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Drupal\Tests\serialization\Unit\Normalizer;
 
 use Drupal\Core\TypedData\ComplexDataInterface;
+use Drupal\Core\TypedData\ComplexDataDefinitionInterface;
+use Drupal\Core\TypedData\DataDefinitionInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\serialization\Normalizer\ComplexDataNormalizer;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -59,7 +62,7 @@ class ComplexDataNormalizerTest extends UnitTestCase {
   public function testNormalizeComplexData(): void {
     $serializer_prophecy = $this->prophesize(Serializer::class);
 
-    $non_internal_property = $this->getTypedDataProperty(FALSE);
+    $non_internal_property = $this->prophesize(TypedDataInterface::class)->reveal();
 
     $serializer_prophecy->normalize($non_internal_property, static::TEST_FORMAT, [])
       ->willReturn('A-normalized')
@@ -70,9 +73,33 @@ class ComplexDataNormalizerTest extends UnitTestCase {
     $complex_data = $this->prophesize(ComplexDataInterface::class);
     $complex_data->getProperties(TRUE)
       ->willReturn([
-        'prop:a' => $non_internal_property,
-        'prop:internal' => $this->getTypedDataProperty(TRUE),
+         'prop:a' => $non_internal_property,
+         'prop:internal' => $this->prophesize(TypedDataInterface::class)->reveal(),
+        ])
+     ->shouldBeCalled();
+
+    $prop_a_definition = $this->prophesize(DataDefinitionInterface::class);
+    $prop_a_definition->isInternal()
+      ->willReturn(FALSE)
+      ->shouldBeCalled();
+    $prop_internal_definition = $this->prophesize(DataDefinitionInterface::class);
+    $prop_internal_definition->isInternal()
+      ->willReturn(TRUE)
+      ->shouldBeCalled();
+
+    $complex_data_definition = $this->prophesize(ComplexDataDefinitionInterface::class);
+    $complex_data_definition->getPropertyDefinitions()
+      ->willReturn([
+        'prop:a' => $prop_a_definition->reveal(),
+        'prop_internal' => $prop_internal_definition->reveal(),
       ])
+      ->shouldBeCalled();
+    $complex_data->getDataDefinition()
+      ->willReturn($complex_data_definition->reveal())
+      ->shouldBeCalled();
+
+    $complex_data->get('prop:a')
+      ->willReturn($non_internal_property)
       ->shouldBeCalled();
 
     $normalized = $this->normalizer->normalize($complex_data->reveal(), static::TEST_FORMAT);
