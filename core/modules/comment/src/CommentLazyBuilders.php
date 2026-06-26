@@ -119,7 +119,6 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
     // handlers and buildCreateAccessCid() have the full picture.
     $commented_entity = $this->entityTypeManager->getStorage($commented_entity_type_id)->load($commented_entity_id);
     $context = ['commented_entity' => $commented_entity];
-    /** @var \Drupal\Core\Access\AccessResultInterface $access */
     $access = $this->entityTypeManager->getAccessControlHandler('comment')
       ->createAccess($comment_type_id, $this->currentUser, $context, TRUE);
     $form = $access->isAllowed() ? $this->entityFormBuilder->getForm($comment) : [];
