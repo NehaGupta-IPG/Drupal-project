@@ -644,7 +644,7 @@ default:
         _TARGET_DB: [sqlite-3]
 
 'FrankenPHP (PHP 8.5 MySQL 8.4)':
-  <<: [ *default-stage, *run-on-mr ]
+  <<: [ *recursive-trigger, *run-on-mr ]
   variables:
     _TARGET_PHP: "8.5-ubuntu"
     _TARGET_DB: "mysql-8.4"
