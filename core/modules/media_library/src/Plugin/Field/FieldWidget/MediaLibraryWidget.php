@@ -174,7 +174,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
-    $elements = [];
+    $elements = parent::settingsForm($form, $form_state);
     $media_type_ids = $this->getAllowedMediaTypeIdsSorted();
 
     if (count($media_type_ids) <= 1) {

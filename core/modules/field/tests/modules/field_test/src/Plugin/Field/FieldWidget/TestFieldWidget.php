@@ -42,6 +42,7 @@ class TestFieldWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
+    $element = parent::settingsForm($form, $form_state);
     $element['test_widget_setting'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Field test field widget setting'),

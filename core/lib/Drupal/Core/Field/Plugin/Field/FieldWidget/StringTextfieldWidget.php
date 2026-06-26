@@ -32,6 +32,7 @@ class StringTextfieldWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
+    $element = parent::settingsForm($form, $form_state);
     $element['size'] = [
       '#type' => 'number',
       '#title' => $this->t('Size of textfield'),

@@ -23,6 +23,49 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface, ContainerFactoryPluginInterface {
 
   /**
+   * {@inheritdoc}
+   */
+  public static function defaultSettings() {
+    return [
+      'cardinality_display' => 1,
+    ] + parent::defaultSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsForm(array $form, FormStateInterface $form_state) {
+    $element = [];
+    if ($this->isCardinalityMultiple()) {
+      $element['cardinality_display'] = [
+        '#type' => 'number',
+        '#title' => $this->t('Extra inputs to display'),
+        '#description' => $this->t('<ul>
+          <li><strong>0</strong>: None extra input will be displayed for the user. In add form only the input will be displayed and none extra input on the edit form.</li>
+          <li><strong>1 (Default)</strong>: An extra input will be displayed for the user on add/edit form.</li>
+          <li><strong>More than 1</strong>: The quantity of input that will be displayed on add form. In edit form if field is empty display the quantity defined, otherwise the inputs values with none extra input.</li>
+        </ul>'),
+        '#default_value' => $this->getSetting('cardinality_display'),
+        '#min' => 0,
+      ];
+    }
+    return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsSummary() {
+    $summary = [];
+
+    if ($this->isCardinalityMultiple()) {
+      $summary[] = $this->t('Cardinality Display: @cardinality_display', ['@cardinality_display' => $this->getSetting('cardinality_display')]);
+    }
+
+    return $summary;
+  }
+
+  /**
    * The field definition.
    *
    * @var \Drupal\Core\Field\FieldDefinitionInterface
@@ -69,6 +112,11 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
       $configuration['settings'],
       $configuration['third_party_settings'],
     );
+  }
+
+  protected function isCardinalityMultiple() {
+    $cardinality = $this->fieldDefinition->getFieldStorageDefinition()->getCardinality();
+    return $cardinality === FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED || $cardinality > 1;
   }
 
   /**
@@ -182,6 +230,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
     $is_multiple = $this->fieldDefinition->getFieldStorageDefinition()->isMultiple();
     $is_unlimited_not_programmed = FALSE;
     $parents = $form['#parents'];
+    $user_input = $form_state->getUserInput();
 
     // Determine the number of widgets to display.
     switch ($cardinality) {
@@ -200,8 +249,63 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
     $description = $this->getFilteredDescription();
     $id_prefix = implode('-', array_merge($parents, [$field_name]));
     $wrapper_id = Html::getUniqueId($id_prefix . '-add-more-wrapper');
-
+    $is_new_entity = $items->getEntity()->isNew();
     $elements = [];
+    // Update max items to be displayed:
+    $cardinality_display = $this->getSetting('cardinality_display');
+    if ($this->isCardinalityMultiple() && $cardinality_display != 1) {
+      $max_add_more_calculated = $form_state->getTemporaryValue($field_name . '_max_calculated');
+      $max = $max_add_more_calculated ?? $max;
+      if (empty($max_add_more_calculated)) {
+        $triggered_value = $user_input['_triggering_element_value'] ?? NULL;
+        $is_adding_more = $triggered_value === (string) $this->t('Add another item');
+        $is_removing_item = $triggered_value === (string) $this->t('Remove');
+        $has_button_triggered = $is_adding_more || $is_removing_item;
+
+        // Count total inputs displayed.
+        $inputs_displayed = NULL;
+        if (isset($user_input[$field_name])) {
+          $inputs_displayed = count(array_filter($user_input[$field_name], function ($item) {
+            $value_not_null = isset($item['value']) && !is_null($item['value']);
+            $target_id_not_null = isset($item['target_id']) && !is_null($item['target_id']);
+            return $value_not_null || $target_id_not_null;
+          }));
+        }
+
+        // If the count items is less than configured value.
+        // The user are editing the element and added fewer items than
+        // was configured to show in the first time.
+        // In this case, we need to follow the order of items added just
+        // adding on more item per time.
+        if ($inputs_displayed && $inputs_displayed <= $cardinality_display) {
+          $cardinality_display = $inputs_displayed;
+        }
+
+        // On page load set the display quantity items if was defined.
+        if ($is_new_entity && !$has_button_triggered && $cardinality_display) {
+          $max = $cardinality_display;
+        }
+
+        // Decrease one item because the for condition is <=.
+        $max = $max > 0 ? $max - 1 : $max;
+
+        // If user are adding or removing item, update the max value.
+        if ($has_button_triggered) {
+          if ($is_adding_more) {
+            $max = $inputs_displayed;
+          }
+          // If removing decrease one item to be displayed.
+          elseif ($inputs_displayed > 1) {
+            $max = $inputs_displayed - 1;
+          }
+
+          // If max found set it calculated.
+          if ($max > 0 && $is_adding_more) {
+            $form_state->setTemporaryValue($field_name . '_max_calculated', $max);
+          }
+        }
+      }
+    }
 
     for ($delta = 0; $delta <= $max; $delta++) {
       // Add a new empty item if it doesn't exist yet at this delta.
@@ -638,20 +742,6 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
     // to avoid clashes between field names and $parents parts.
     // phpcs:enable
     return array_merge(['field_storage', '#parents'], $parents, ['#fields', $field_name]);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function settingsForm(array $form, FormStateInterface $form_state) {
-    return [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function settingsSummary() {
-    return [];
   }
 
   /**

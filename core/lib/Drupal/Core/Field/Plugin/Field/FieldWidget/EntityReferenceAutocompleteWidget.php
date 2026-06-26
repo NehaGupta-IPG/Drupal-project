@@ -37,6 +37,7 @@ class EntityReferenceAutocompleteWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
+    $element = parent::settingsForm($form, $form_state);
     $element['match_operator'] = [
       '#type' => 'radios',
       '#title' => $this->t('Autocomplete matching'),
