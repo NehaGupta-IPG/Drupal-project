@@ -70,7 +70,7 @@ class WorkspaceMerger implements WorkspaceMergerInterface {
       }
       $transaction->commitOrRelease();
     }
-    catch (\Exception $e) {
+    catch (\Throwable $e) {
       $transaction->rollBack();
       Error::logException($this->logger, $e);
       throw $e;

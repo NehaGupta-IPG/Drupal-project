@@ -131,7 +131,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 32,
-      'CacheGetCount' => 93,
+      'CacheGetCount' => 94,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 18,
@@ -139,7 +139,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
         'discovery' => 37,
         'bootstrap' => 10,
         'dynamic_page_cache' => 1,
-        'render' => 8,
+        'render' => 9,
         'default' => 5,
         'routes' => 4,
         'entity' => 2,
@@ -173,7 +173,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
         ['config:system.menu.main'],
         ['config:user.role.anonymous'],
       ],
-      'StylesheetCount' => 1,
+      'StylesheetCount' => 2,
       'StylesheetBytes' => 1450,
     ];
     $this->assertMetrics($expected, $performance_data);
@@ -206,7 +206,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 8,
-      'CacheGetCount' => 66,
+      'CacheGetCount' => 67,
       'CacheSetCount' => 17,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
@@ -262,7 +262,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 10,
-      'CacheGetCount' => 55,
+      'CacheGetCount' => 56,
       'CacheSetCount' => 17,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
@@ -307,7 +307,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 3,
-      'CacheGetCount' => 63,
+      'CacheGetCount' => 64,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 11,
@@ -315,7 +315,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
         'discovery' => 21,
         'bootstrap' => 8,
         'dynamic_page_cache' => 2,
-        'render' => 9,
+        'render' => 10,
         'default' => 3,
         'routes' => 3,
         'entity' => 1,
@@ -361,7 +361,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
         ],
         ['config:core.extension', 'views_data'],
       ],
-      'StylesheetCount' => 1,
+      'StylesheetCount' => 2,
       'StylesheetBytes' => 1300,
     ];
     $this->assertMetrics($expected, $performance_data);
@@ -402,8 +402,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'INSERT INTO "watchdog" ("uid", "type", "message", "variables", "severity", "link", "location", "referer", "hostname", "timestamp") VALUES ("2", "user", "Session opened for %name.", "WATCHDOG_DATA", 6, "", "LOCATION", "REFERER", "CLIENT_IP", "TIMESTAMP")',
       'UPDATE "users_field_data" SET "login"="TIMESTAMP" WHERE "uid" = "2"',
       'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
-      'SELECT 1 AS "expression" FROM "sessions" "sessions" WHERE "sid" = "SESSION_ID"',
-      'INSERT INTO "sessions" ("sid", "uid", "hostname", "session", "timestamp") VALUES ("SESSION_ID", "2", "CLIENT_IP", "SESSION_DATA", "TIMESTAMP")',
+      'INSERT INTO "sessions" ("sid", "uid", "hostname", "session", "timestamp") VALUES ("SESSION_ID", "2", "CLIENT_IP", "SESSION_DATA", "TIMESTAMP") ON DUPLICATE KEY UPDATE "uid" = VALUES("uid"), "hostname" = VALUES("hostname"), "session" = VALUES("session"), "timestamp" = VALUES("timestamp")',
       'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
       'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = "2" AND "u"."default_langcode" = 1',
       'SELECT "roles_target_id" FROM "user__roles" WHERE "entity_id" = "2"',
@@ -416,11 +415,11 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'ScriptBytes' => 6500,
-      'ScriptCount' => 1,
+      'ScriptCount' => 2,
       'StylesheetBytes' => 1429,
       'StylesheetCount' => 1,
-      'QueryCount' => 16,
-      'CacheGetCount' => 70,
+      'QueryCount' => 15,
+      'CacheGetCount' => 71,
       'CacheSetCount' => 1,
       'CacheDeleteCount' => 1,
       'CacheTagInvalidationCount' => 0,
@@ -500,8 +499,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'INSERT INTO "watchdog" ("uid", "type", "message", "variables", "severity", "link", "location", "referer", "hostname", "timestamp") VALUES ("2", "user", "Session opened for %name.", "WATCHDOG_DATA", 6, "", "LOCATION", "REFERER", "CLIENT_IP", "TIMESTAMP")',
       'UPDATE "users_field_data" SET "login"="TIMESTAMP" WHERE "uid" = "2"',
       'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
-      'SELECT 1 AS "expression" FROM "sessions" "sessions" WHERE "sid" = "SESSION_ID"',
-      'INSERT INTO "sessions" ("sid", "uid", "hostname", "session", "timestamp") VALUES ("SESSION_ID", "2", "CLIENT_IP", "SESSION_DATA", "TIMESTAMP")',
+      'INSERT INTO "sessions" ("sid", "uid", "hostname", "session", "timestamp") VALUES ("SESSION_ID", "2", "CLIENT_IP", "SESSION_DATA", "TIMESTAMP") ON DUPLICATE KEY UPDATE "uid" = VALUES("uid"), "hostname" = VALUES("hostname"), "session" = VALUES("session"), "timestamp" = VALUES("timestamp")',
       'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
       'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = "2" AND "u"."default_langcode" = 1',
       'SELECT "roles_target_id" FROM "user__roles" WHERE "entity_id" = "2"',
@@ -509,7 +507,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $recorded_queries = $performance_data->getQueries();
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
-      'QueryCount' => 16,
+      'QueryCount' => 15,
       'CacheGetCount' => 100,
       'CacheSetCount' => 1,
       'CacheDeleteCount' => 1,
@@ -559,14 +557,14 @@ class StandardPerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 4,
-      'CacheGetCount' => 44,
+      'CacheGetCount' => 45,
       'CacheGetCountByBin' => [
         'config' => 10,
         'data' => 4,
         'discovery' => 9,
         'bootstrap' => 8,
         'dynamic_page_cache' => 1,
-        'render' => 7,
+        'render' => 8,
         'routes' => 4,
         'menu' => 1,
       ],
@@ -577,9 +575,9 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 6,
-      'ScriptCount' => 3,
+      'ScriptCount' => 9,
       'ScriptBytes' => 141352,
-      'StylesheetCount' => 2,
+      'StylesheetCount' => 3,
       'StylesheetBytes' => 42533,
     ];
     $this->assertMetrics($expected, $performance_data);
