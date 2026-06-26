@@ -457,6 +457,83 @@ class ContentModerationStateTest extends KernelTestBase {
   }
 
   /**
+   * Tests when a multilingual node exists but has no moderation state.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3056670
+   */
+  public function testMultilingualNoModerationState(): void {
+    $this->createContentType([
+      'type' => 'example',
+    ]);
+
+    $workflow = $this->createEditorialWorkflow();
+    $this->addEntityTypeAndBundleToWorkflow($workflow, 'node', 'example');
+
+    $english_node = Node::create([
+      'type' => 'example',
+      'title' => 'Test title',
+      'moderation_state' => 'published',
+    ]);
+    $english_node->setPublished();
+    $english_node->save();
+    $english_node = $this->reloadEntity($english_node);
+    $this->assertEquals('published', $english_node->moderation_state->value);
+    $this->assertTrue($english_node->isPublished());
+
+    // Create a French translation.
+    $french_node = $english_node->addTranslation('fr', [
+      'title' => 'French title',
+      'moderation_state' => 'published',
+    ]);
+    $french_node->setPublished();
+    $french_node->save();
+    $this->assertEquals('published', $french_node->moderation_state->value);
+    $this->assertTrue($french_node->isPublished());
+
+    // Simulate a multilingual node that was created without going through
+    // the content moderation workflow by deleting the moderation state
+    // entities.
+    $storage = \Drupal::entityTypeManager()->getStorage('content_moderation_state');
+    $moderation_state_entities = $storage->loadByProperties([
+      'content_entity_type_id' => 'node',
+      'content_entity_id' => $english_node->id(),
+    ]);
+
+    $this->assertCount(1, $moderation_state_entities);
+    $storage->delete($moderation_state_entities);
+
+    // Now, if we unpublish the french node there should be two moderation
+    // state entities, the default translation should be created as published
+    // and the translation as archived.
+    $english_node = $this->reloadEntity($english_node);
+    $french_node = $english_node->getTranslation('fr');
+    $french_node->set('moderation_state', 'archived');
+    $french_node->save();
+
+    $storage->resetCache([$english_node->id()]);
+    $moderation_state_entities = $storage->loadByProperties([
+      'content_entity_type_id' => 'node',
+      'content_entity_id' => $english_node->id(),
+    ]);
+
+    $this->assertCount(1, $moderation_state_entities);
+
+    $moderation_state_entity = reset($moderation_state_entities);
+    // Use a map to make sure we actually test each langcode.
+    $this->assertEquals('en', $moderation_state_entity->langcode->value);
+    $this->assertEquals('published', $moderation_state_entity->getUntranslated()->moderation_state->value);
+
+    $moderation_state_translation = $moderation_state_entity->getTranslation('fr');
+    $this->assertEquals('fr', $moderation_state_translation->langcode->value);
+    $this->assertEquals('archived', $moderation_state_translation->moderation_state->value);
+
+    $english_node = $this->reloadEntity($english_node);
+    $this->assertTrue($english_node->isPublished());
+    $french_node = $english_node->getTranslation('fr');
+    $this->assertFalse($french_node->isPublished());
+  }
+
+  /**
    * Tests moderation when the moderation_state field has a config override.
    */
   public function testModerationWithFieldConfigOverride(): void {
