@@ -10,6 +10,7 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\CreatedItem;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\Core\Field\Plugin\Field\FieldType\TimestampItem;
+use Drupal\Core\TypedData\ComplexDataDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\Plugin\DataType\Timestamp;
 use Drupal\serialization\Normalizer\TimestampItemNormalizer;
@@ -83,14 +84,26 @@ class TimestampItemNormalizerTest extends UnitTestCase {
       ->willReturn(FALSE)
       ->shouldBeCalled();
     $timestamp = $this->prophesize(Timestamp::class);
-    $timestamp->getDataDefinition()
-      ->willReturn($data_definition->reveal())
-      ->shouldBeCalled();
+
     $timestamp = $timestamp->reveal();
+
+    $complex_data_definition = $this->prophesize(ComplexDataDefinitionInterface::class);
+    $complex_data_definition->getPropertyDefinitions()
+      ->willReturn(['value' => $data_definition])
+      ->shouldBeCalled();
+
     $timestamp_item = $this->createTimestampItemProphecy();
+    $timestamp_item->getDataDefinition()
+      ->willReturn($complex_data_definition->reveal())
+      ->shouldBeCalled();
+
     $timestamp_item->getProperties(TRUE)
       ->willReturn(['value' => $timestamp])
       ->shouldBeCalled();
+
+    $timestamp_item->get('value')
+       ->willReturn($timestamp)
+       ->shouldBeCalled();
 
     // Mock Serializer service, to assert that the Timestamp @DataType
     // normalizer would be called.
