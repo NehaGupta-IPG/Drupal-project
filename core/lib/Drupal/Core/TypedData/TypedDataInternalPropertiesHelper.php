@@ -24,6 +24,9 @@ class TypedDataInternalPropertiesHelper {
   public static function getNonInternalProperties(ComplexDataInterface $data) {
     $properties = [];
     $definition = $data->getDataDefinition();
+    if ($definition === NULL) {
+      return [];
+    }
     // When normalizing a large number of entities, calculating which properties
     // are not internal can be expensive. Also by first checking the property
     // definitions and only then getting the property values, this saves
@@ -38,7 +41,6 @@ class TypedDataInternalPropertiesHelper {
           $non_internal_properties[] = $name;
         }
       }
-
       static::$nonInternalPropertyNames[$definition] = $non_internal_properties;
     }
     foreach (static::$nonInternalPropertyNames[$definition] as $name) {

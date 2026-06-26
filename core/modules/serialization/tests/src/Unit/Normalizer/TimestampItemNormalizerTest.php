@@ -102,8 +102,8 @@ class TimestampItemNormalizerTest extends UnitTestCase {
       ->shouldBeCalled();
 
     $timestamp_item->get('value')
-       ->willReturn($timestamp)
-       ->shouldBeCalled();
+      ->willReturn($timestamp)
+      ->shouldBeCalled();
 
     // Mock Serializer service, to assert that the Timestamp @DataType
     // normalizer would be called.
