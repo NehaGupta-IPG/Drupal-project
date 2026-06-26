@@ -94,7 +94,7 @@ class ManyPlaceholderTest extends UnitTestCase {
     $captured_libraries = [];
     $event_dispatcher = $this->prophesize(EventDispatcherInterface::class);
     $event_dispatcher->dispatch(Argument::cetera())
-      ->will(function ($args) use (&$captured_libraries): void {
+      ->will(function ($args) use (&$captured_libraries) {
         $event = $args[0];
         $page_state = $event->getRequest()->attributes->get('ajax_page_state');
         if (isset($page_state['libraries'])) {
@@ -103,10 +103,16 @@ class ManyPlaceholderTest extends UnitTestCase {
         $response = new HtmlResponse();
         $response->setAttachments(['library' => ['core/jquery'], 'drupalSettings' => []]);
         $event->setResponse($response);
+        return $event;
       });
 
     $request_stack = $this->prophesize(RequestStack::class);
     $request_stack->getMainRequest()->willReturn(new Request());
+
+    $config = $this->prophesize(ImmutableConfig::class);
+    $config->get('error_level')->willReturn('hide');
+    $config_factory = $this->prophesize(ConfigFactoryInterface::class);
+    $config_factory->get('system.logging')->willReturn($config->reveal());
 
     $bigpipe = new BigPipe(
       $renderer->reveal(),
@@ -114,7 +120,7 @@ class ManyPlaceholderTest extends UnitTestCase {
       $request_stack->reveal(),
       $this->prophesize(HttpKernelInterface::class)->reveal(),
       $event_dispatcher->reveal(),
-      $this->prophesize(ConfigFactoryInterface::class)->reveal(),
+      $config_factory->reveal(),
       $this->prophesize(MessengerInterface::class)->reveal(),
       $this->prophesize(RequestContext::class)->reveal(),
       $this->prophesize(LoggerInterface::class)->reveal(),
