@@ -12,6 +12,7 @@ use Drupal\Core\Entity\EntityTypeRepositoryInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\TypedData\ComplexDataInterface;
+use Drupal\Core\TypedData\ComplexDataDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\serialization\Normalizer\ContentEntityNormalizer;
 use Drupal\Tests\Core\Entity\ContentEntityBaseMockableClass;
@@ -136,6 +137,19 @@ class ContentEntityNormalizerTest extends UnitTestCase {
     $typed_data = $this->prophesize(ComplexDataInterface::class);
     $typed_data->getProperties(TRUE)
       ->willReturn($definitions)
+      ->shouldBeCalled();
+
+    $complex_data_definition = $this->prophesize(ComplexDataDefinitionInterface::class);
+
+    $property_definitions = [];
+    foreach ($definitions as $name => $definition) {
+      $property_definitions[$name] = $definition->getDataDefinition();
+    }
+    $complex_data_definition->getPropertyDefinitions()
+      ->willReturn($property_definitions)
+      ->shouldBeCalled();
+    $typed_data->getDataDefinition()
+      ->willReturn($complex_data_definition)
       ->shouldBeCalled();
     $content_entity_mock
       ->method('getTypedData')
