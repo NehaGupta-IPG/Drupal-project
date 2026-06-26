@@ -8,6 +8,11 @@ namespace Drupal\Core\TypedData;
 class TypedDataInternalPropertiesHelper {
 
   /**
+   * A WeakMap static cache of internal property names.
+   */
+  protected static ?\WeakMap $nonInternalPropertyNames;
+
+  /**
    * Gets an array non-internal properties from a complex data object.
    *
    * @param \Drupal\Core\TypedData\ComplexDataInterface $data
@@ -17,9 +22,29 @@ class TypedDataInternalPropertiesHelper {
    *   The non-internal properties, keyed by property name.
    */
   public static function getNonInternalProperties(ComplexDataInterface $data) {
-    return array_filter($data->getProperties(TRUE), function (TypedDataInterface $property) {
-      return !$property->getDataDefinition()->isInternal();
-    });
+    $properties = [];
+    $definition = $data->getDataDefinition();
+    // When normalizing a large number of entities, calculating which properties
+    // are not internal can be expensive. Also by first checking the property
+    // definitions and only then getting the property values, this saves
+    // initializing properties that won't be returned.
+    if (!isset(static::$nonInternalPropertyNames[$definition])) {
+      if (!isset(static::$nonInternalPropertyNames)) {
+        static::$nonInternalPropertyNames = new \WeakMap();
+      }
+      $non_internal_properties = [];
+      foreach ($definition->getPropertyDefinitions() as $name => $property_definition) {
+        if (!$property_definition->isInternal()) {
+          $non_internal_properties[] = $name;
+        }
+      }
+
+      static::$nonInternalPropertyNames[$definition] = $non_internal_properties;
+    }
+    foreach (static::$nonInternalPropertyNames[$definition] as $name) {
+      $properties[$name] = $data->get($name);
+    }
+    return $properties;
   }
 
 }

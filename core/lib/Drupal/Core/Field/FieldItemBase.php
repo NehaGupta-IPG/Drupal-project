@@ -20,6 +20,11 @@ use Drupal\Core\TypedData\TypedDataInterface;
 abstract class FieldItemBase extends Map implements FieldItemInterface {
 
   /**
+   * A weakmap static cache of property keys.
+   */
+  protected static ?\WeakMap $keyCache;
+
+  /**
    * {@inheritdoc}
    */
   public static function defaultStorageSettings() {
@@ -119,7 +124,20 @@ abstract class FieldItemBase extends Map implements FieldItemInterface {
     // Treat the values as property value of the first property, if no array is
     // given.
     if (isset($values) && !is_array($values)) {
-      $keys = array_keys($this->definition->getPropertyDefinitions());
+      // This method gets called for every field for every entity when they are
+      // accessed via the Typed Data system, so minimize the time taken to
+      // calculate the property definitions since usually there will be multiple
+      // entities of the same type on each request.
+      if (isset(static::$keyCache[$this->definition])) {
+        $keys = static::$keyCache[$this->definition];
+      }
+      else {
+        if (!isset(static::$keyCache)) {
+          static::$keyCache = new \WeakMap();
+        }
+        static::$keyCache[$this->definition] = $keys = array_keys($this->definition->getPropertyDefinitions());
+      }
+
       $values = [$keys[0] => $values];
     }
     parent::setValue($values, $notify);
