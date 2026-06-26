@@ -176,7 +176,7 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
     $commented_entity = $context['commented_entity'] ?? NULL;
     unset($context['commented_entity']);
 
-    // Without a specific commented entity the CID would be ambiguous across
+    // Without a specific commented entity, the CID would be ambiguous across
     // entities and could cause stale cache hits for the wrong entity context.
     if ($commented_entity === NULL) {
       return NULL;
