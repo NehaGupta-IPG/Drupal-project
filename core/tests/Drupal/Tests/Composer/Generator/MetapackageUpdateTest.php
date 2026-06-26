@@ -33,6 +33,7 @@ class MetapackageUpdateTest extends TestCase {
         'composer/Metapackage/DevDependencies',
       ],
       [
+        // @phpstan-ignore classConstant.deprecatedClass
         DrupalPinnedDevDependenciesBuilder::class,
         'composer/Metapackage/PinnedDevDependencies',
       ],
@@ -54,7 +55,7 @@ class MetapackageUpdateTest extends TestCase {
    *   The relative path to the metapackage.
    */
   #[DataProvider('updatedTestData')]
-  public function testUpdated($builderClass, $path): void {
+  public function testUpdated(string $builderClass, string $path): void {
     // Create a DrupalCoreComposer for the System Under Test (current repo)
     $repositoryRoot = dirname(__DIR__, 6);
     $drupalCoreInfo = DrupalCoreComposer::createFromPath($repositoryRoot);

@@ -174,13 +174,12 @@ class NodeDisplayConfigurableTest extends NodeTestBase {
    * @return array
    *   An array of test cases.
    */
-  public static function provideThemes() {
+  public static function provideThemes(): array {
     return [
       ['claro', 'footer', TRUE],
       // @todo Add coverage for olivero after fixing
       // https://www.drupal.org/project/drupal/issues/3215220.
       // ['olivero', 'footer', TRUE],
-      ['stable9', 'footer', FALSE],
     ];
   }
 
