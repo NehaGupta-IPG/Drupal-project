@@ -108,6 +108,8 @@ class ManyPlaceholderTest extends UnitTestCase {
 
     $request_stack = $this->prophesize(RequestStack::class);
     $request_stack->getMainRequest()->willReturn(new Request());
+    $request_stack->push(Argument::type(Request::class))->willReturn(null);
+    $request_stack->pop()->willReturn(null);
 
     $config = $this->prophesize(ImmutableConfig::class);
     $config->get('error_level')->willReturn('hide');
