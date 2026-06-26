@@ -16,7 +16,7 @@ class NodeRouteProvider extends DefaultHtmlRouteProvider {
    */
   public function getRoutes(?EntityTypeInterface $entity_type = NULL) {
     if ($entity_type !== NULL) {
-      @trigger_error('Passing $entity_type to ' . __METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. The entity type is passed on construction. See https://www.drupal.org/node/3593831', E_USER_DEPRECATED);
+      @trigger_error('Passing $entity_type to ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. The entity type is passed on construction. See https://www.drupal.org/node/3593831', E_USER_DEPRECATED);
     }
     $routes = parent::getRoutes();
     // Rename the entity.node.add_form and entity.node.add_page routes to keep

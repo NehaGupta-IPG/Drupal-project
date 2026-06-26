@@ -13,7 +13,7 @@ interface EntityRouteProviderInterface {
    * Provides routes for entities.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type definition. Deprecated as of drupal:11.4.0; the entity
+   *   The entity type definition. Deprecated as of drupal:11.5.0; the entity
    *   type is now passed on construction via
    *   \Drupal\Core\Entity\EntityHandlerInterface::createInstance() and the
    *   $entity_type parameter is no longer passed by core. Implementations
