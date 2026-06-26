@@ -8,15 +8,14 @@ use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the addition of the year_range setting.
  *
  * @see datetime_post_update_default_year_range()
- *
- * @group Update
- * @group legacy
  */
+#[Group('update')]
 class YearRangeUpdateTest extends UpdatePathTestBase {
 
   /**

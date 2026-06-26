@@ -5,16 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\datetime_range\Functional;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\datetime_range\Plugin\Field\FieldWidget\DateRangeDatelistWidget;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the year range settings of the date range field.
- *
- * @group datetime_range
  */
+#[Group('datetime_range')]
 class DateRangeYearRangeTest extends BrowserTestBase {
 
   /**
@@ -74,7 +76,7 @@ class DateRangeYearRangeTest extends BrowserTestBase {
    * @return \Drupal\Core\Entity\EntityInterface
    *   Form display.
    */
-  protected function getEntityFormDisplay($entity_type, $bundle, $form_mode) {
+  protected function getEntityFormDisplay(string $entity_type, string $bundle, string $form_mode): EntityInterface {
     $entity_form_display = EntityFormDisplay::load($entity_type . '.' . $bundle . '.' . $form_mode);
 
     // If not found, create a fresh entity object. We do not preemptively create
@@ -96,9 +98,8 @@ class DateRangeYearRangeTest extends BrowserTestBase {
 
   /**
    * Test the year range widget setting.
-   *
-   * @dataProvider providerTestDateRangeYearRange
    */
+  #[DataProvider('providerTestDateRangeYearRange')]
   public function testDateRangeYearRange($from, $to, $from_year = NULL, $to_year = NULL): void {
     $from_year = $from_year ?: $from;
     $to_year = $to_year ?: $to;

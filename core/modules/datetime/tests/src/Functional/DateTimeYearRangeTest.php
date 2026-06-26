@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace Drupal\Tests\datetime\Functional;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\datetime\Plugin\Field\FieldWidget\DateTimeDatelistWidget;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the year range settings of the date time field.
- *
- * @group datetime
  */
+#[Group('datetime')]
 class DateTimeYearRangeTest extends BrowserTestBase {
 
   /**
@@ -73,7 +74,7 @@ class DateTimeYearRangeTest extends BrowserTestBase {
    * @return \Drupal\Core\Entity\EntityInterface
    *   Form display.
    */
-  protected function getEntityFormDisplay($entity_type, $bundle, $form_mode) {
+  protected function getEntityFormDisplay(string $entity_type, string $bundle, string $form_mode): EntityInterface {
     $entity_form_display = EntityFormDisplay::load($entity_type . '.' . $bundle . '.' . $form_mode);
 
     // If not found, create a fresh entity object. We do not preemptively create

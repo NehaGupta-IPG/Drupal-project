@@ -16,7 +16,7 @@ use Drupal\Tests\UnitTestCase;
 class YearRangeTest extends UnitTestCase {
 
   /**
-   * @covers ::valueCallback
+   * @legacy-covers ::valueCallback
    */
   public function testValueCallback(): void {
     $expected = ['years_back' => '-3', 'years_forward' => '+3'];
@@ -26,7 +26,7 @@ class YearRangeTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::processRange
+   * @legacy-covers ::processRange
    */
   public function testProcessRange(): void {
     $form_state = new FormState();
