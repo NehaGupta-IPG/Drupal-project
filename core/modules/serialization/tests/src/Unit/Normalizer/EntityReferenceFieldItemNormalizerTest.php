@@ -14,6 +14,8 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\Core\Field\TypedData\FieldItemDataDefinition;
 use Drupal\Core\GeneratedUrl;
+use Drupal\Core\TypedData\ComplexDataDefinitionInterface;
+use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\Type\IntegerInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\Url;
@@ -250,19 +252,38 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
     $field_definition = $this->prophesize(FieldDefinitionInterface::class);
     $field_definition->getSetting('target_type')
       ->willReturn('taxonomy_term');
-
-    $this->fieldItem->getFieldDefinition()
+    $field_item = $this->prophesize(EntityReferenceItem::class);
+    $field_item->getFieldDefinition()
       ->willReturn($field_definition->reveal());
 
-    $this->fieldItem->get('entity')
+    $target_id = $this->prophesize(DataDefinitionInterface::class);
+    $target_id->isInternal()
+      ->willReturn(FALSE)
+      ->shouldBeCalled();
+    $entity = $this->prophesize(DataDefinitionInterface::class);
+    $entity->isInternal()
+      ->willReturn(TRUE)
+      ->shouldBeCalled();
+    $complex_data_definition = $this->prophesize(ComplexDataDefinitionInterface::class);
+    $complex_data_definition->getPropertyDefinitions()
+      ->willReturn(['target_id' => $target_id, 'entity' => $entity])
+      ->shouldBeCalled();
+
+    $field_item->getDataDefinition()
+                    ->willReturn($complex_data_definition)
+                  ->shouldBeCalled();
+
+    $field_item->getProperties(TRUE)
+      ->willReturn(['target_id' => $this->prophesize(TypedDataInterface::class)->reveal()])
+      ->shouldBeCalled();
+    $field_item->get('entity')
+      ->willReturn($entity_reference)
+      ->shouldBeCalled();
+    $field_item->get('target_id')
       ->willReturn($entity_reference)
       ->shouldBeCalled();
 
-    $this->fieldItem->getProperties(TRUE)
-      ->willReturn(['target_id' => $this->getTypedDataProperty(FALSE)])
-      ->shouldBeCalled();
-
-    $normalized = $this->normalizer->normalize($this->fieldItem->reveal());
+    $normalized = $this->normalizer->normalize($field_item->reveal());
 
     $expected = [
       'target_id' => NULL,
