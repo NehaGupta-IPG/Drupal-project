@@ -423,8 +423,7 @@ class LayoutBuilderHooks {
    */
   #[Hook('config_schema_info_alter', order: Order::Last)]
   public function configSchemaInfoAlter(&$definitions): void {
-    // It's needed to run after field_ui module in order to perform
-    // our alterations for the form element once main logic is done.
+    // This must run after the main logic is done in the field_ui module hooks.
     $map = [
       'core.entity_view_display.*.*.*.third_party.layout_builder' => LayoutBuilderDisplayElement::class,
       'core.entity_form_display.*.*.*' => LayoutBuilderEntityDisplayElement::class,
@@ -432,8 +431,8 @@ class LayoutBuilderHooks {
     ];
 
     // Provide specific handling for entity view display layout builder settings
-    // and enhance entity view and form display definitions in order to
-    // generate translatable labels.
+    // and enhance entity view and form display definitions in order to generate
+    // translatable labels.
     foreach ($definitions as $type => &$definition) {
       if (isset($map[$type])) {
         $definition['form_element_class'] = $map[$type];
