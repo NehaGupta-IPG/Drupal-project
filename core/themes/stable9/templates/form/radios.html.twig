@@ -9,5 +9,7 @@
  *
  * @see \Drupal\Core\Form\FormPreprocess::preprocessRadios()
  */
+ @todo: remove this file once https://www.drupal.org/node/1819284 is resolved.
+ This is identical to core/modules/system/templates/container.html.twig
 #}
-<div{{ attributes }}>{{ children }}</div>
+<div{{ attributes.addClass('form-radios') }}>{{ children }}</div>
