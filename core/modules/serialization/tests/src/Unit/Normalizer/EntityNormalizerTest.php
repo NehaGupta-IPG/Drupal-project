@@ -97,7 +97,7 @@ class EntityNormalizerTest extends UnitTestCase {
 
     $content_entity = $this->getMockBuilder(ContentEntityBaseMockableClass::class)
       ->disableOriginalConstructor()
-      ->onlyMethods(['getFields'])
+      ->onlyMethods(['getFields', 'getTypedData'])
       ->getMock();
     $content_entity->expects($this->once())
       ->method('getFields')
