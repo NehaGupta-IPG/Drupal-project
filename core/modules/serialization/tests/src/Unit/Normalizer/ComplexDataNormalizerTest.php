@@ -73,10 +73,10 @@ class ComplexDataNormalizerTest extends UnitTestCase {
     $complex_data = $this->prophesize(ComplexDataInterface::class);
     $complex_data->getProperties(TRUE)
       ->willReturn([
-         'prop:a' => $non_internal_property,
-         'prop:internal' => $this->prophesize(TypedDataInterface::class)->reveal(),
-        ])
-     ->shouldBeCalled();
+        'prop:a' => $non_internal_property,
+        'prop:internal' => $this->prophesize(TypedDataInterface::class)->reveal(),
+      ])
+      ->shouldBeCalled();
 
     $prop_a_definition = $this->prophesize(DataDefinitionInterface::class);
     $prop_a_definition->isInternal()

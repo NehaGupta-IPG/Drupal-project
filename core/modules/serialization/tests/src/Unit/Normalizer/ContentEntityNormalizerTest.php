@@ -135,15 +135,18 @@ class ContentEntityNormalizerTest extends UnitTestCase {
   protected function createStubForContentEntity(array $definitions): Stub {
     $content_entity_mock = $this->createStub(ContentEntityBaseMockableClass::class);
     $typed_data = $this->prophesize(ComplexDataInterface::class);
-    $typed_data->getProperties(TRUE)
-      ->willReturn($definitions)
-      ->shouldBeCalled();
 
     $complex_data_definition = $this->prophesize(ComplexDataDefinitionInterface::class);
 
     $property_definitions = [];
     foreach ($definitions as $name => $definition) {
       $property_definitions[$name] = $definition->getDataDefinition();
+      // Non-internal definitions will be retrieved.
+      if (!$definition->getDataDefinition()->isInternal()) {
+        $typed_data->get($name)
+          ->willReturn($definition)
+          ->shouldBeCalled();
+      }
     }
     $complex_data_definition->getPropertyDefinitions()
       ->willReturn($property_definitions)
@@ -174,7 +177,7 @@ class ContentEntityNormalizerTest extends UnitTestCase {
   protected function createMockFieldListItem(bool $access, bool $internal, ?AccountInterface $user_context = NULL): FieldItemListInterface&MockObject {
     $data_definition = $this->prophesize(DataDefinitionInterface::class);
     $mock = $this->createMock(FieldItemListInterface::class);
-    $mock->expects($this->once())
+    $mock->expects($this->atLeastOnce())
       ->method('getDataDefinition')
       ->willReturn($data_definition->reveal());
     $data_definition->isInternal()
