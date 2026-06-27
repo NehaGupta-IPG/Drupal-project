@@ -20,9 +20,6 @@
    *   const input = document.querySelector('#my-input');
    *   input.addEventListener('listFilter:settings', (event) => {
    *     event.detail.settings.minLength = 5;
-   *     event.detail.settings.hideElement = (el) => {
-   *       el.style.display = 'none'; return el;
-   *     };
    *   });
    *
    *   // search results will be announced using the 'listFilter:searchingFinished' event:

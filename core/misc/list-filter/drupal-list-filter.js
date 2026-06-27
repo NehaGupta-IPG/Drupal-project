@@ -13,7 +13,6 @@
  *   // Attach your event listener BEFORE ListFilter is instantiated:
  *   input.addEventListener('listFilter:settings', (event) => {
  *     event.detail.options.minLength = 5;
- *     event.detail.options.hideElement = (el) => { el.style.display = 'none'; };
  *   });
  *
  * @example <caption>Listening for search completion</caption>
