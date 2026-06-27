@@ -161,7 +161,7 @@ function hook_email_pre_render_alter(array &$email_data, array $context): void {
  *     - text: A \Stringable or a render array (or NULL) representing the text
  *       part of a message.
  *   - assets: An instance of Drupal\Core\Asset\AttachedAssetsInterface which
- *     contains settings and assets ccollected while rendering the email body.
+ *     contains settings and assets collected while rendering the email body.
  *
  * @ingroup mailer
  */
