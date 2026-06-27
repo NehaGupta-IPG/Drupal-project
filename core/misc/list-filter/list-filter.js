@@ -100,12 +100,6 @@
         containerSelector: null,
         itemsSelector: null,
         targetsSelector: null,
-        hideElement: null,
-        showElement: null,
-        normalizeString: null,
-        searchMethod: null,
-        announce: null,
-        filterItemsBuilder: null,
       };
     }
 
@@ -144,18 +138,12 @@
       this.announceFull = consolidateSettings.announceFull;
       this.minLength = consolidateSettings.minLength;
       this.searchStartOfWords = consolidateSettings.searchStartOfWords;
-      this.hideElement =
-        consolidateSettings.hideElement || ListFilter._hideElementImpl;
-      this.showElement =
-        consolidateSettings.showElement || ListFilter._showElementImpl;
-      this.normalizeString =
-        consolidateSettings.normalizeString || ListFilter._normalizeStringImpl;
-      this.searchMethod =
-        consolidateSettings.searchMethod || ListFilter._searchMethodImpl;
-      this.announce = consolidateSettings.announce || ListFilter._announceImpl;
-      this.filterItemsBuilder =
-        consolidateSettings.filterItemsBuilder ||
-        ListFilter._filterItemsBuilderImpl;
+      this.hideElement = ListFilter._hideElementImpl;
+      this.showElement = ListFilter._showElementImpl;
+      this.normalizeString = ListFilter._normalizeStringImpl;
+      this.searchMethod = ListFilter._searchMethodImpl;
+      this.announce = ListFilter._announceImpl;
+      this.filterItemsBuilder = ListFilter._filterItemsBuilderImpl;
 
       this._initialize();
     }
