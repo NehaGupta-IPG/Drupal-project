@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\update\Unit;
 
 use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Render\MetadataBubblingUrlGenerator;
 use Drupal\Core\Session\AccountProxy;
@@ -77,7 +78,7 @@ class UpdateMailTest extends UnitTestCase {
    * Test the subject and body of update text.
    */
   #[DataProvider('providerTestUpdateEmail')]
-  public function testUpdateEmail(string $notification_threshold, array $params, string $expected_subject, array $expected_body): void {
+  public function testUpdateEmail(string $notification_threshold, array $params, string $expected_subject, array $expected_body, string $fetch_status): void {
     $langcode = 'en';
     $available_updates_url = 'https://example.com/admin/reports/updates';
     $update_settings_url = 'https://example.com/admin/reports/updates/settings';
@@ -114,15 +115,27 @@ class UpdateMailTest extends UnitTestCase {
       ->willReturn($notification_threshold);
 
     $this->configFactory
-      ->expects($this->any())
+      ->expects($this->exactly(2))
       ->method('get')
       ->willReturnMap([
         ['system.site', $config_site_name],
         ['update.settings', $config_notification],
       ]);
 
+    if ($fetch_status === 'failed') {
+      $accessManager = $this->createMock('\Drupal\Core\Access\AccessManager');
+      $accessManager
+        ->expects($this->once())
+        ->method('checkNamedRoute')
+        ->willReturn(TRUE);
+    }
+    if ($fetch_status === 'core_contrib_failed') {
+      // Access manger not called, so use a stub.
+      $accessManager = $this->createStub(AccessManagerInterface::class);
+    }
+
     $this->urlGenerator
-      ->expects($this->any())
+      ->expects($this->atLeastOnce())
       ->method('generateFromRoute')
       ->willReturnMap([
         ['update.status', [], ['absolute' => TRUE, 'language' => $langcode], FALSE, $available_updates_url],
@@ -135,6 +148,10 @@ class UpdateMailTest extends UnitTestCase {
     $this->container->set('url_generator', $this->urlGenerator);
     $this->container->set('config.factory', $this->configFactory);
     $this->container->set('current_user', $this->currentUser);
+    // The access manager is only called when a fetch has failed.
+    if ($fetch_status !== 'success') {
+      $this->container->set('access_manager', $accessManager);
+    }
     \Drupal::setContainer($this->container);
 
     // Generate the email message.
@@ -175,6 +192,7 @@ class UpdateMailTest extends UnitTestCase {
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
           'Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, https://example.com/admin/reports/updates/settings.',
         ],
+        'success',
       ],
       // Configured to notify for all available releases. Drupal Core is missing
       // a security release, there are no contrib modules installed.
@@ -189,6 +207,7 @@ class UpdateMailTest extends UnitTestCase {
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
           'Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, https://example.com/admin/reports/updates/settings.',
         ],
+        'success',
       ],
       // Configured to notify for all available releases. Drupal Core is missing
       // an available update, contrib is up to date.
@@ -205,6 +224,7 @@ class UpdateMailTest extends UnitTestCase {
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
           'Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, https://example.com/admin/reports/updates/settings.',
         ],
+        'success',
       ],
       // Configured to notify for all available releases. Drupal Core is up to
       // date, but contrib is missing an available update.
@@ -221,6 +241,7 @@ class UpdateMailTest extends UnitTestCase {
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
           'Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, https://example.com/admin/reports/updates/settings.',
         ],
+        'success',
       ],
       // Configured to notify for all available releases. Both Drupal Core and
       // contrib are missing available updates.
@@ -237,6 +258,7 @@ class UpdateMailTest extends UnitTestCase {
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
           'Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, https://example.com/admin/reports/updates/settings.',
         ],
+        'success',
       ],
       // Configured to notify for all available releases. Core is missing a
       // security release, contrib is up to date.
@@ -253,6 +275,7 @@ class UpdateMailTest extends UnitTestCase {
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
           'Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, https://example.com/admin/reports/updates/settings.',
         ],
+        'success',
       ],
       // Configured to notify for all available releases. Core is missing a
       // security release, contrib is missing a regular update.
@@ -269,6 +292,7 @@ class UpdateMailTest extends UnitTestCase {
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
           'Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, https://example.com/admin/reports/updates/settings.',
         ],
+        'success',
       ],
       // Configured to notify for all available releases. Core is up to date,
       // but contrib is missing a security update.
@@ -285,6 +309,7 @@ class UpdateMailTest extends UnitTestCase {
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
           'Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, https://example.com/admin/reports/updates/settings.',
         ],
+        'success',
       ],
       // Configured to notify for all available releases. Core is missing a
       // regular update, contrib is missing a security update.
@@ -301,6 +326,7 @@ class UpdateMailTest extends UnitTestCase {
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
           'Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, https://example.com/admin/reports/updates/settings.',
         ],
+        'success',
       ],
       // Configured to notify for all available releases. Both core and contrib
       // are missing a security update.
@@ -317,6 +343,7 @@ class UpdateMailTest extends UnitTestCase {
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
           'Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, https://example.com/admin/reports/updates/settings.',
         ],
+        'success',
       ],
       // Configured to only show security notifications. Core is missing a
       // security release, no contrib modules installed.
@@ -331,6 +358,7 @@ class UpdateMailTest extends UnitTestCase {
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
           'Your site is currently configured to send these emails only when security updates are available. To get notified for any available updates, https://example.com/admin/reports/updates/settings.',
         ],
+        'success',
       ],
       // Configured to only show security notifications. Core is missing a
       // security release, contrib is up to date.
@@ -347,6 +375,7 @@ class UpdateMailTest extends UnitTestCase {
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
           'Your site is currently configured to send these emails only when security updates are available. To get notified for any available updates, https://example.com/admin/reports/updates/settings.',
         ],
+        'success',
       ],
       // Configured to only show security notifications. Core is missing a
       // security release, contrib is missing a regular release.
@@ -363,6 +392,7 @@ class UpdateMailTest extends UnitTestCase {
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
           'Your site is currently configured to send these emails only when security updates are available. To get notified for any available updates, https://example.com/admin/reports/updates/settings.',
         ],
+        'success',
       ],
       // Configured to only show security notifications. Core is up to date, but
       // contrib is missing a security update.
@@ -379,6 +409,7 @@ class UpdateMailTest extends UnitTestCase {
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
           'Your site is currently configured to send these emails only when security updates are available. To get notified for any available updates, https://example.com/admin/reports/updates/settings.',
         ],
+        'success',
       ],
       // Configured to only show security notifications. Core is missing a
       // regular update, contrib is missing a security update.
@@ -395,6 +426,7 @@ class UpdateMailTest extends UnitTestCase {
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
           'Your site is currently configured to send these emails only when security updates are available. To get notified for any available updates, https://example.com/admin/reports/updates/settings.',
         ],
+        'success',
       ],
       // Configured to only show security notifications. Both core and contrib
       // are missing a security update.
@@ -411,6 +443,7 @@ class UpdateMailTest extends UnitTestCase {
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
           'Your site is currently configured to send these emails only when security updates are available. To get notified for any available updates, https://example.com/admin/reports/updates/settings.',
         ],
+        'success',
       ],
       // Failure to fetch available update data for Drupal Core.
       'all: only core, fetcher failed' => [
@@ -424,6 +457,7 @@ class UpdateMailTest extends UnitTestCase {
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
           'Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, https://example.com/admin/reports/updates/settings.',
         ],
+        'failed',
       ],
       // Failed to fetch release history for core, but contrib is missing
       // available updates. Subject should say there are new releases available,
@@ -441,6 +475,7 @@ class UpdateMailTest extends UnitTestCase {
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
           'Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, https://example.com/admin/reports/updates/settings.',
         ],
+        'failed',
       ],
       // Core is missing available updates, error fetching history for
       // contrib. Subject should mention the new release for core, body should
@@ -458,6 +493,7 @@ class UpdateMailTest extends UnitTestCase {
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
           'Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, https://example.com/admin/reports/updates/settings.',
         ],
+        'failed',
       ],
       // Errors fetching release history for both core and contrib. Subject
       // should mention the error case, and the body should mention both
@@ -475,6 +511,7 @@ class UpdateMailTest extends UnitTestCase {
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
           'Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, https://example.com/admin/reports/updates/settings.',
         ],
+        'core_contrib_failed',
       ],
       // Configured to only show security notifications. Core is missing a
       // security release, errors fetching contrib history.
@@ -491,6 +528,7 @@ class UpdateMailTest extends UnitTestCase {
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
           'Your site is currently configured to send these emails only when security updates are available. To get notified for any available updates, https://example.com/admin/reports/updates/settings.',
         ],
+        'failed',
       ],
       // Configured to only show security notifications. Errors fetching core
       // history, contrib is missing a security release.
@@ -507,6 +545,7 @@ class UpdateMailTest extends UnitTestCase {
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates",
           'Your site is currently configured to send these emails only when security updates are available. To get notified for any available updates, https://example.com/admin/reports/updates/settings.',
         ],
+        'failed',
       ],
     ];
   }

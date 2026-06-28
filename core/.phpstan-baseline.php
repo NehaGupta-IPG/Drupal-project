@@ -24100,6 +24100,19 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/update/tests/src/Functional/UpdateTestBase.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method any\\(\\) of class PHPUnit\\\\Framework\\\\TestCase\\:
+https\\://github\\.com/sebastianbergmann/phpunit/issues/6461$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/update/tests/src/Unit/UpdateMailTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Variable \\$accessManager might not be defined\\.$#',
+	'identifier' => 'variable.undefined',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/update/tests/src/Unit/UpdateMailTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Function _update_no_data\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
