@@ -183,10 +183,11 @@ class UpdateHooks {
     // Add the message "footer" that appears regardless of reasons.
     $message['body'][] = $this->t('See the available updates page for more information:',
         [],
-        ['langcode' => $langcode]) . "\n" . Url::fromRoute('update.status', [], [
-        'absolute' => TRUE,
-        'language' => $language,
-      ])->toString();
+        ['langcode' => $langcode]) . "\n" . Url::fromRoute(
+          'update.status',
+          [],
+          ['absolute' => TRUE, 'language' => $language]
+        )->toString();
 
     $settings_url = Url::fromRoute('update.settings', [], ['absolute' => TRUE])->toString();
     if (\Drupal::config('update.settings')->get('notification.threshold') == 'all') {
@@ -274,7 +275,10 @@ class UpdateHooks {
     $incompatible = [];
     /** @var \Drupal\Core\File\FileSystemInterface $file_system */
     $file_system = \Drupal::service('file_system');
-    $files = $file_system->scanDirectory("{$directory}/{$project}", '/.*\.info.yml$/', ['key' => 'name', 'min_depth' => 0]);
+    $files = $file_system->scanDirectory("{$directory}/{$project}", '/.*\.info.yml$/', [
+      'key' => 'name',
+      'min_depth' => 0,
+    ]);
     foreach ($files as $file) {
       // Get the .info.yml file for the module or theme this file belongs to.
       $info = \Drupal::service('info_parser')->parse($file->uri);
