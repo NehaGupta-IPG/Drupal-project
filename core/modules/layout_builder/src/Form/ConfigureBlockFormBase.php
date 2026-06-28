@@ -173,10 +173,13 @@ abstract class ConfigureBlockFormBase extends FormBase implements BaseFormIdInte
     $subform_state = SubformState::createForSubform($form['settings'], $form, $form_state);
     $form['settings'] = $this->getPluginForm($this->block)->buildConfigurationForm($form['settings'], $subform_state);
 
-    $form['actions']['submit'] = [
-      '#type' => 'submit',
-      '#value' => $this->submitLabel(),
-      '#button_type' => 'primary',
+    $form['actions'] = [
+      '#type' => 'actions',
+      'submit' => [
+        '#type' => 'submit',
+        '#value' => $this->submitLabel(),
+        '#button_type' => 'primary',
+      ],
     ];
     if ($this->isAjax()) {
       $form['actions']['submit']['#ajax']['callback'] = '::ajaxSubmit';
