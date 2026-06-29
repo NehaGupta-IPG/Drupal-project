@@ -11,6 +11,9 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 
+/**
+ * Tests the year range element.
+ */
 #[Group('render')]
 #[CoversClass(YearRange::class)]
 class YearRangeTest extends UnitTestCase {
