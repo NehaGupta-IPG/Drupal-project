@@ -4,6 +4,8 @@ namespace Drupal\file\FileUsage;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Query\Expression;
+use Drupal\Core\Database\Query\UpsertValue;
 use Drupal\file\FileInterface;
 
 /**
@@ -53,13 +55,10 @@ class DatabaseFileUsageBackend extends FileUsageBase {
         'type' => $type,
         'id' => $id,
         'module' => $module,
-        'count' => $count,
-      ])
-      ->updateValues([
-        'count' => [
-          'expression' => "{{$this->tableName}}.[count] + :count",
-          'arguments' => [':count' => $count],
-        ],
+        'count' => new UpsertValue(
+          insert: $count,
+          update: new Expression("{{$this->tableName}}.[count] + :count", [':count' => $count]),
+        ),
       ])
       ->execute();
     parent::add($file, $module, $type, $id, $count);

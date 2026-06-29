@@ -4,6 +4,8 @@ namespace Drupal\Core\Cache;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\Query\Expression;
+use Drupal\Core\Database\Query\UpsertValue;
 
 /**
  * Cache tags invalidations checksum implementation that uses the database.
@@ -39,10 +41,10 @@ class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTags
           ->key(['tag'])
           ->fields([
             'tag' => $tag,
-            'invalidations' => 1,
-          ])
-          ->updateValues([
-            'invalidations' => '{cachetags}.[invalidations] + 1',
+            'invalidations' => new UpsertValue(
+              insert: 1,
+              update: new Expression('{cachetags}.[invalidations] + 1'),
+            ),
           ])
           ->execute();
       }

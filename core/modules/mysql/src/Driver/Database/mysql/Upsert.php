@@ -24,9 +24,9 @@ class Upsert extends QueryUpsert {
     }, $insert_fields);
 
     // Escape column names of update values.
-    $update_values = [];
-    foreach ($this->updateValues as $column => $expression) {
-      $update_values[$this->connection->escapeField($column)] = is_array($expression) ? $expression['expression'] : $expression;
+    $update_expressions = [];
+    foreach ($this->updateExpressions as $column => $expression) {
+      $update_expressions[$this->connection->escapeField($column)] = is_array($expression) ? $expression['expression'] : $expression;
     }
 
     $query = $comments . 'INSERT INTO {' . $this->table . '} (' . implode(', ', $insert_fields) . ') VALUES ';
@@ -43,7 +43,7 @@ class Upsert extends QueryUpsert {
 
     $update = [];
     foreach ($insert_fields as $field) {
-      $update[] = isset($update_values[$field]) ? "$field = $update_values[$field]" : "$field = VALUES($field)";
+      $update[] = isset($update_expressions[$field]) ? "$field = $update_expressions[$field]" : "$field = VALUES($field)";
     }
 
     $query .= ' ON DUPLICATE KEY UPDATE ' . implode(', ', $update);

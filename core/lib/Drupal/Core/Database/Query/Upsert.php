@@ -31,9 +31,9 @@ abstract class Upsert extends Query implements \Countable {
    * manipulate that - typically, counters or the like. This array contains
    * such overrides.
    *
-   * @var array<string, string|array{expression: string, arguments: array<string, mixed>}>
+   * @var array<string,\Drupal\Core\Database\Query\Expression>
    */
-  protected array $updateValues = [];
+  protected array $updateExpressions = [];
 
   /**
    * Constructs an Upsert object.
@@ -65,15 +65,49 @@ abstract class Upsert extends Query implements \Countable {
   }
 
   /**
-   * Sets the explicit update values to use when insert fails.
+   * Adds a set of column->value pairs to be inserted.
    *
-   * @param array<string, string|array{expression: string, arguments: array<string, mixed>}> $updateValues
-   *   An array of expressions to use, keyed by column name.
+   * This method may only be called once. Calling it a second time will be
+   * ignored. To queue up multiple sets of values to be inserted at once,
+   * use the values() method.
+   *
+   * @param list<string>|array<string,string|int|float|bool|array|\Drupal\Core\Database\Query\UpsertValue> $fields
+   *   An array of columns on which to insert. This array may be indexed or
+   *   associative. If indexed, the array is taken to be the list of columns.
+   *   If associative, the keys of the array are taken to be the columns and
+   *   the values are taken to be corresponding values to insert. If a
+   *   $values argument is provided, $fields must be indexed.
+   * @param list<string|int|float|bool|array|\Drupal\Core\Database\Query\UpsertValue> $values
+   *   (optional) An array of values to insert into the database. The values
+   *   must be specified in the same order as the $fields array.
    *
    * @return $this
+   *   The called object.
    */
-  public function updateValues(array $updateValues): static {
-    $this->updateValues = $updateValues;
+  public function fields(array $fields, array $values = []): static {
+    if (empty($this->insertFields)) {
+      if (empty($values)) {
+        if (!is_numeric(key($fields))) {
+          $values = array_values($fields);
+          $fields = array_keys($fields);
+        }
+      }
+      $this->insertFields = $fields;
+      if (!empty($values)) {
+        $tmp = [];
+        foreach ($values as $i => $value) {
+          if ($value instanceof UpsertValue) {
+            $tmp[] = $value->insert;
+            $this->updateExpressions[$fields[$i]] = $value->update;
+          }
+          else {
+            $tmp[] = $value;
+          }
+        }
+        $this->insertValues[] = $tmp;
+      }
+    }
+
     return $this;
   }
 
@@ -130,11 +164,9 @@ abstract class Upsert extends Query implements \Countable {
         $values[':db_insert_placeholder_' . $max_placeholder++] = $value;
       }
     }
-    foreach ($this->updateValues as $update_value) {
-      if (is_array($update_value)) {
-        foreach ($update_value['arguments'] as $argument => $value) {
-          $values[$argument] = $value;
-        }
+    foreach ($this->updateExpressions as $update_expression) {
+      foreach ($update_expression->arguments as $argument => $value) {
+        $values[$argument] = $value;
       }
     }
 
