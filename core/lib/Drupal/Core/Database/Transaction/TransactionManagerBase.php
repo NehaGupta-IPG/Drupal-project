@@ -287,7 +287,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     }
 
     // Define a unique ID for the transaction.
-    $id = uniqid('', TRUE);
+    $id = bin2hex(random_bytes(12));
 
     // Do the client-level processing, ensuring the manager state is properly
     // set.

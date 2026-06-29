@@ -3,6 +3,7 @@
 namespace Drupal\Core;
 
 use Composer\Autoload\ClassLoader;
+use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Component\EventDispatcher\Event;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Serialization\PhpSerialize;
@@ -12,7 +13,6 @@ use Drupal\Core\ClassLoader\BackwardsCompatibilityClassLoader;
 use Drupal\Core\Config\BootstrapConfigStorageFactory;
 use Drupal\Core\Config\NullStorage;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\DependencyInjection\YamlFileLoader;
@@ -995,11 +995,17 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $all_messages = [];
     $config_is_syncing = FALSE;
     $source_storage = NULL;
+    $stream_wrappers_registered = FALSE;
     if (isset($this->container)) {
       // Save the id of the currently logged in user.
       if ($this->container->initialized('current_user')) {
         $current_user_id = $this->container->get('current_user')->id();
       }
+
+      if ($this->container->initialized('stream_wrapper_manager') && !empty($this->container->get('stream_wrapper_manager')->getWrappers())) {
+        $stream_wrappers_registered = TRUE;
+      }
+
       // After rebuilding the container some objects will have stale services.
       // Record a map of objects to service IDs prior to rebuilding the
       // container in order to ensure
@@ -1060,6 +1066,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $this->container = $container;
     if ($session_started) {
       $this->container->get('session')->start();
+    }
+
+    if ($stream_wrappers_registered) {
+      // Re-register the stream wrappers with the manager service.
+      $this->container->get('stream_wrapper_manager')->register();
     }
 
     // The request stack is preserved across container rebuilds. Re-inject the
@@ -1153,7 +1164,29 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     mb_internal_encoding('utf-8');
     mb_language('uni');
 
-    // Indicate that code is operating in a test child site.
+    // Set DRUPAL_TEST_IN_CHILD_SITE if we're inside a test.
+    static::setupDrupalTestInChildSite($app_root);
+
+    // Set the Drupal custom error handler.
+    set_error_handler('_drupal_error_handler');
+    set_exception_handler('_drupal_exception_handler');
+
+    static::$isEnvironmentInitialized = TRUE;
+  }
+
+  /**
+   * Define the DRUPAL_TEST_IN_CHILD_SITE constant as appropriate.
+   *
+   * @param string $app_root
+   *   The path to the application root.
+   *
+   * @internal This method is only intended to be called by this class and
+   *   \Drupal\Core\Command\DrupalApplication. We aim to remove the need for it
+   *   without a BC layer during Drupal 12.
+   * @see https://www.drupal.org/node/2690035
+   */
+  public static function setupDrupalTestInChildSite(string $app_root): void {
+    // Indicate if code is operating in a test child site or not.
     if (!defined('DRUPAL_TEST_IN_CHILD_SITE')) {
       if ($test_prefix = drupal_valid_test_ua()) {
         $test_db = new TestDatabase($test_prefix);
@@ -1176,12 +1209,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         define('DRUPAL_TEST_IN_CHILD_SITE', FALSE);
       }
     }
-
-    // Set the Drupal custom error handler.
-    set_error_handler('_drupal_error_handler');
-    set_exception_handler('_drupal_exception_handler');
-
-    static::$isEnvironmentInitialized = TRUE;
   }
 
   /**
@@ -1479,6 +1506,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         /** @var \DirectoryIterator $component */
         $pathname = $component->getPathname();
         if (!$component->isDot() && $component->isDir() && (
+          is_dir($pathname . '/Command') ||
           is_dir($pathname . '/Plugin') ||
           is_dir($pathname . '/Entity') ||
           is_dir($pathname . '/Element')

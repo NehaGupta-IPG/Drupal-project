@@ -107,6 +107,7 @@ class AssetResolverTest extends UnitTestCase {
     $this->libraries = [
       'core/drupal' => [
         'version' => '1.0.0',
+        'aggregate_target' => ['css' => FALSE, 'js' => FALSE],
         'css' => [],
         'js' =>
           [
@@ -116,6 +117,7 @@ class AssetResolverTest extends UnitTestCase {
       ],
       'core/jquery' => [
         'version' => '1.0.0',
+        'aggregate_target' => ['css' => FALSE, 'js' => FALSE],
         'css' => [],
         'js' =>
           [
@@ -125,29 +127,39 @@ class AssetResolverTest extends UnitTestCase {
       ],
       'llama/css' => [
         'version' => '1.0.0',
+        'aggregate_target' => ['css' => FALSE, 'js' => FALSE],
         'css' =>
           [
             'core/misc/llama.css' => ['data' => 'core/misc/llama.css'],
           ],
         'js' => [],
+        'fonts' => [],
         'license' => '',
       ],
       'piggy/css' => [
         'version' => '1.0.0',
+        'aggregate_target' => ['css' => FALSE, 'js' => FALSE],
         'css' =>
           [
             'core/misc/piggy.css' => ['data' => 'core/misc/piggy.css'],
           ],
         'js' => [],
+        'fonts' => [
+          'fonts/font.woff2' => [
+            'data' => 'fonts/font.woff2',
+            'preload' => TRUE,
+          ],
+        ],
         'license' => '',
       ],
       'core/ckeditor5' => [
         'remote' => 'https://github.com/ckeditor/ckeditor5',
         'version' => '1.0.0',
         'license' => '',
+        'aggregate_target' => ['css' => FALSE, 'js' => FALSE],
         'js' => [
-          'assets/vendor/ckeditor5/ckeditor5-dll/ckeditor5-dll.js' => [
-            'data' => 'assets/vendor/ckeditor5/ckeditor5-dll/ckeditor5-dll.js',
+          'assets/vendor/ckeditor5/ckeditor5.umd.js' => [
+            'data' => 'assets/vendor/ckeditor5/ckeditor5.umd.js',
             'preprocess' => FALSE,
             'minified' => TRUE,
           ],
@@ -257,6 +269,34 @@ class AssetResolverTest extends UnitTestCase {
         (new AttachedAssets())->setAlreadyLoadedLibraries([])->setLibraries(['core/drupal', 'core/jquery'])->setSettings(['currentTime' => $time]),
         2,
         4,
+      ],
+    ];
+  }
+
+  /**
+   * Tests get font assets.
+   */
+  #[DataProvider('providerAttachedFontAssets')]
+  public function testGetFontAssets($libraries, $expected): void {
+    $assets = new AttachedAssets()->setAlreadyLoadedLibraries([])->setLibraries($libraries);
+    $fonts = $this->assetResolver->getFontAssets($assets, $this->english);
+    $this->assertSame($expected, $fonts);
+  }
+
+  public static function providerAttachedFontAssets(): array {
+    return [
+      [
+        ['piggy/css'],
+        [
+          [
+            'data' => 'fonts/font.woff2',
+            'preload' => TRUE,
+          ],
+        ],
+      ],
+      [
+        ['llama/css'],
+        [],
       ],
     ];
   }
