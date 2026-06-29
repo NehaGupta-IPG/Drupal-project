@@ -87,7 +87,7 @@ class Upsert extends QueryUpsert {
       if (isset($savepoint)) {
         $savepoint->commitOrRelease();
       }
-      return $stmt->rowCount();
+      return $this->queryOptions['void_execute_return'] ? NULL : $stmt->rowCount();
     }
     catch (\Exception $e) {
       if (isset($savepoint)) {
