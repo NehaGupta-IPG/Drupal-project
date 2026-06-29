@@ -8,6 +8,7 @@ use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -112,10 +113,9 @@ class OptionsFieldTest extends OptionsFieldUnitTestBase {
 
   /**
    * Tests the 'option_label' property for 'Options' field types.
-   *
-   * @dataProvider providerOptions
    */
-  public function testOptionLabelProperty(string $type, array $allowed_values) {
+  #[DataProvider('providerOptions')]
+  public function testOptionLabelProperty(string $type, array $allowed_values): void {
     // Remove field storage set by OptionsFieldUnitTestBase() to allow for
     // field storage to be dynamically created with data
     // from providerOptions().
@@ -151,7 +151,7 @@ class OptionsFieldTest extends OptionsFieldUnitTestBase {
   /**
    * The dataProvider for testOptionLabelProperty().
    */
-  public function providerOptions() {
+  public static function providerOptions(): array {
     return [
       'list_float' => [
         // Field type.
