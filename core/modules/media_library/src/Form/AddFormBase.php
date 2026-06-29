@@ -779,7 +779,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
 
     return $this->openerResolver->get($state)
       ->getSelectionResponse($state, $media_ids)
-      ->addCommand(new CloseDialogCommand());
+      ->addCommand(new CloseDialogCommand($state->getDialogSelector()));
   }
 
   /**
