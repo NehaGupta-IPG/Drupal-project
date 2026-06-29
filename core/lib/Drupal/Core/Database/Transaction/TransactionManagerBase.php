@@ -289,7 +289,8 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     // Define a unique ID for the transaction.
     $id = uniqid('', TRUE);
 
-    // Do the client-level processing.
+    // Do the client-level processing, ensuring the manager state is properly
+    // set.
     if ($this->stackDepth() === 0) {
       $this->beginClientTransaction();
       $type = StackItemType::Root;
