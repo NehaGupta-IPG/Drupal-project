@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Entity;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Entity\EntityDefinitionUpdateManager;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Field\FieldPurger;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -33,13 +34,6 @@ class EntityDefinitionUpdateProviderTest extends EntityKernelTestBase {
   protected $entityDefinitionUpdateManager;
 
   /**
-   * The entity field manager.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
-   */
-  protected $entityFieldManager;
-
-  /**
    * The database connection.
    *
    * @var \Drupal\Core\Database\Connection
@@ -57,7 +51,6 @@ class EntityDefinitionUpdateProviderTest extends EntityKernelTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->entityDefinitionUpdateManager = $this->container->get('entity.definition_update_manager');
-    $this->entityFieldManager = $this->container->get('entity_field.manager');
     $this->database = $this->container->get('database');
 
     // Install every entity type's schema that wasn't installed in the parent
@@ -210,7 +203,7 @@ class EntityDefinitionUpdateProviderTest extends EntityKernelTestBase {
 
     // Purge field data, and check that the storage definition has been
     // completely removed once the data is purged.
-    field_purge_batch(10);
+    \Drupal::service(FieldPurger::class)->purgeBatch(10);
     $deleted_storage_definitions = \Drupal::service('entity_field.deleted_fields_repository')->getFieldStorageDefinitions();
     $this->assertEmpty($deleted_storage_definitions, 'The base field has been deleted.');
     $this->assertFalse($schema_handler->tableExists($dedicated_deleted_table_name), 'A dedicated field table was deleted after new_base_field was purged.');

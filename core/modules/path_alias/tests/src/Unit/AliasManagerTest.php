@@ -39,7 +39,7 @@ class AliasManagerTest extends UnitTestCase {
   /**
    * Alias prefix list.
    *
-   * @var \Drupal\path_alias\AliasPrefixListInterface|\PHPUnit\Framework\MockObject\Stub
+   * @var \Drupal\path_alias\AliasPrefixListInterface
    */
   protected $aliasPrefixList;
 
@@ -58,20 +58,6 @@ class AliasManagerTest extends UnitTestCase {
   protected $cache;
 
   /**
-   * The internal cache key used by the alias manager.
-   *
-   * @var string
-   */
-  protected $cacheKey = 'preload-paths:key';
-
-  /**
-   * The cache key passed to the alias manager.
-   *
-   * @var string
-   */
-  protected $path = 'key';
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -84,6 +70,15 @@ class AliasManagerTest extends UnitTestCase {
 
     $this->aliasManager = new AliasManager($this->aliasRepository, $this->aliasPrefixList, $this->languageManager, $this->cache, new Time());
 
+  }
+
+  /**
+   * Reinitializes the alias prefix list as a mock object.
+   */
+  protected function setUpMockAliasPrefixList(): void {
+    $this->aliasPrefixList = $this->createMock(AliasPrefixListInterface::class);
+    $reflection = new \ReflectionProperty($this->aliasManager, 'pathPrefixes');
+    $reflection->setValue($this->aliasManager, $this->aliasPrefixList);
   }
 
   /**
@@ -154,7 +149,9 @@ class AliasManagerTest extends UnitTestCase {
   /**
    * Tests the getAliasByPath method for a path that is not in the prefix list.
    */
-  public function testGetAliasByPathPrefixList() {
+  public function testGetAliasByPathPrefixList(): void {
+    $this->setUpMockAliasPrefixList();
+
     $path_part1 = $this->randomMachineName();
     $path_part2 = $this->randomMachineName();
     $path = '/' . $path_part1 . '/' . $path_part2;
@@ -164,7 +161,7 @@ class AliasManagerTest extends UnitTestCase {
     $this->languageManager->expects($this->atLeastOnce())
       ->method('getCurrentLanguage');
 
-    $this->aliasPrefixList
+    $this->aliasPrefixList->expects($this->once())
       ->method('get')
       ->with($path_part1)
       ->willReturn(FALSE);
@@ -181,6 +178,8 @@ class AliasManagerTest extends UnitTestCase {
    * Tests the getAliasByPath method for a path that has no matching alias.
    */
   public function testGetAliasByPathNoMatch(): void {
+    $this->setUpMockAliasPrefixList();
+
     $path_part1 = $this->randomMachineName();
     $path_part2 = $this->randomMachineName();
     $path = '/' . $path_part1 . '/' . $path_part2;
@@ -190,7 +189,7 @@ class AliasManagerTest extends UnitTestCase {
     $this->languageManager->expects($this->atLeastOnce())
       ->method('getCurrentLanguage');
 
-    $this->aliasPrefixList
+    $this->aliasPrefixList->expects($this->atLeastOnce())
       ->method('get')
       ->with($path_part1)
       ->willReturn(TRUE);
@@ -222,6 +221,8 @@ class AliasManagerTest extends UnitTestCase {
    * Tests the getAliasByPath method for a path that has a matching alias.
    */
   public function testGetAliasByPathMatch(): void {
+    $this->setUpMockAliasPrefixList();
+
     $path_part1 = $this->randomMachineName();
     $path_part2 = $this->randomMachineName();
     $path = '/' . $path_part1 . '/' . $path_part2;
@@ -232,7 +233,7 @@ class AliasManagerTest extends UnitTestCase {
     $this->languageManager->expects($this->atLeastOnce())
       ->method('getCurrentLanguage');
 
-    $this->aliasPrefixList
+    $this->aliasPrefixList->expects($this->atLeastOnce())
       ->method('get')
       ->with($path_part1)
       ->willReturn(TRUE);
@@ -251,6 +252,8 @@ class AliasManagerTest extends UnitTestCase {
    * Tests the getAliasByPath cache when a different language is requested.
    */
   public function testGetAliasByPathCachedMissLanguage(): void {
+    $this->setUpMockAliasPrefixList();
+
     $path_part1 = $this->randomMachineName();
     $path_part2 = $this->randomMachineName();
     $path = '/' . $path_part1 . '/' . $path_part2;
@@ -263,7 +266,7 @@ class AliasManagerTest extends UnitTestCase {
     $this->languageManager->expects($this->atLeastOnce())
       ->method('getCurrentLanguage');
 
-    $this->aliasPrefixList
+    $this->aliasPrefixList->expects($this->atLeastOnce())
       ->method('get')
       ->with($path_part1)
       ->willReturn(TRUE);
@@ -324,7 +327,7 @@ class AliasManagerTest extends UnitTestCase {
    * @return \Drupal\Core\Language\LanguageInterface
    *   The current language object.
    */
-  protected function setUpCurrentLanguage() {
+  protected function setUpCurrentLanguage(): Language {
     $language = new Language(['id' => 'en']);
 
     $this->languageManager

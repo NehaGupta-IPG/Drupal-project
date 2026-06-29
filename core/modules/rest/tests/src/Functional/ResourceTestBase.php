@@ -216,6 +216,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @param string $method
    *   The HTTP method for which to set up authentication.
    *
+   * @return void
+   *   Returns nothing.
+   *
    * @see ::grantPermissionsToAnonymousRole()
    * @see ::grantPermissionsToAuthenticatedRole()
    */
@@ -228,6 +231,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   HTTP method.
    * @param \Psr\Http\Message\ResponseInterface $response
    *   The response to assert.
+   *
+   * @return void
+   *   Returns nothing.
    */
   abstract protected function assertResponseWhenMissingAuthentication($method, ResponseInterface $response);
 
@@ -242,6 +248,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   URL to request.
    * @param array $request_options
    *   Request options to apply.
+   *
+   * @return void
+   *   Returns nothing.
    *
    * @see \GuzzleHttp\ClientInterface::request()
    */
@@ -259,6 +268,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @param array $request_options
    *   Request options to apply.
    *
+   * @return void
+   *   Returns nothing.
+   *
    * @see \GuzzleHttp\ClientInterface::request()
    */
   abstract protected function assertAuthenticationEdgeCases($method, Url $url, array $request_options);
@@ -275,6 +287,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * Initializes authentication.
    *
    * E.g. for cookie authentication, we first need to get a cookie.
+   *
+   * @return void
+   *   Returns nothing.
    */
   protected function initAuthentication() {}
 
@@ -375,13 +390,19 @@ abstract class ResourceTestBase extends BrowserTestBase {
 
     // Expected cache tags: X-Drupal-Cache-Tags header.
     $this->assertSame($expected_cache_tags !== FALSE, $response->hasHeader('X-Drupal-Cache-Tags'));
-    if (is_array($expected_cache_tags)) {
+    if ($expected_cache_tags === []) {
+      $this->assertSame('', $response->getHeader('X-Drupal-Cache-Tags')[0]);
+    }
+    elseif (is_array($expected_cache_tags)) {
       $this->assertEqualsCanonicalizing($expected_cache_tags, explode(' ', $response->getHeader('X-Drupal-Cache-Tags')[0]));
     }
 
     // Expected cache contexts: X-Drupal-Cache-Contexts header.
     $this->assertSame($expected_cache_contexts !== FALSE, $response->hasHeader('X-Drupal-Cache-Contexts'));
-    if (is_array($expected_cache_contexts)) {
+    if ($expected_cache_contexts === []) {
+      $this->assertSame('', $response->getHeader('X-Drupal-Cache-Contexts')[0]);
+    }
+    elseif (is_array($expected_cache_contexts)) {
       $optimized_expected_cache_contexts = \Drupal::service('cache_contexts_manager')->optimizeTokens($expected_cache_contexts);
       $this->assertEqualsCanonicalizing($optimized_expected_cache_contexts, explode(' ', $response->getHeader('X-Drupal-Cache-Contexts')[0]));
     }
@@ -401,7 +422,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->assertSame($expected_dynamic_page_cache_header_value, $response->getHeader('X-Drupal-Dynamic-Cache')[0]);
     }
     elseif ($response->hasHeader('X-Drupal-Dynamic-Cache')) {
-      $this->assertMatchesRegularExpression('#^UNCACHEABLE \(((no|poor) cacheability|(request|response) policy)\)$#', $response->getHeader('X-Drupal-Dynamic-Cache')[0]);
+      $this->assertMatchesRegularExpression('#^UNCACHEABLE \(((no|poor) cacheability|(request|response) policy|\d{3}(, sub-request: (HIT|MISS))?)\)$#', $response->getHeader('X-Drupal-Dynamic-Cache')[0]);
     }
   }
 

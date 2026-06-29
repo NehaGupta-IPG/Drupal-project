@@ -14,13 +14,9 @@ use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
-use Drupal\TestTools\Extension\Dump\DebugDump;
-use PHPUnit\Framework\Attributes\BeforeClass;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * Provides a base class and helpers for Drupal unit tests.
@@ -41,27 +37,8 @@ use Symfony\Component\VarDumper\VarDumper;
 abstract class UnitTestCase extends TestCase {
 
   use DrupalTestCaseTrait;
-  use PhpUnitCompatibilityTrait;
   use ProphecyTrait;
-  use ExpectDeprecationTrait;
   use RandomGeneratorTrait;
-
-  /**
-   * The app root.
-   *
-   * @var string
-   */
-  protected $root;
-
-  /**
-   * Registers the dumper CLI handler when the DebugDump extension is enabled.
-   */
-  #[BeforeClass]
-  public static function setDebugDumpHandler(): void {
-    if (DebugDump::isEnabled()) {
-      VarDumper::setHandler(DebugDump::class . '::cliHandler');
-    }
-  }
 
   /**
    * {@inheritdoc}
@@ -78,7 +55,6 @@ abstract class UnitTestCase extends TestCase {
     // Ensure that FileCacheFactory has a prefix.
     FileCacheFactory::setPrefix('prefix');
 
-    $this->root = dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__)), 2);
     chdir($this->root);
   }
 
@@ -219,20 +195,20 @@ abstract class UnitTestCase extends TestCase {
    * \Iterator which requires setting up five methods. Instead, this helper
    * can be used.
    *
-   * @param \PHPUnit\Framework\MockObject\MockObject&\Iterator $mock
-   *   A mock object mocking a traversable class.
+   * @param \PHPUnit\Framework\MockObject\Stub&\Iterator $mock
+   *   A mocked object mocking a traversable class.
    * @param array $items
-   *   The items to return when this mock is iterated.
+   *   The items to return when this object is iterated.
    *
-   * @return \PHPUnit\Framework\MockObject\MockObject&\Iterator
-   *   The same mock object ready to be iterated.
+   * @return \PHPUnit\Framework\MockObject\Stub&\Iterator
+   *   The same mocked object ready to be iterated.
    *
-   * @template T of \PHPUnit\Framework\MockObject\MockObject&\Iterator
+   * @template T of \PHPUnit\Framework\MockObject\Stub&\Iterator
    * @phpstan-param T $mock
    * @phpstan-return T
    * @see https://github.com/sebastianbergmann/phpunit-mock-objects/issues/103
    */
-  protected function setupMockIterator(MockObject&\Iterator $mock, array $items): MockObject&\Iterator {
+  protected function setupMockIterator(Stub&\Iterator $mock, array $items): Stub&\Iterator {
     $iterator = new \ArrayIterator($items);
     foreach (get_class_methods(\Iterator::class) as $method) {
       $mock->method($method)->willReturnCallback([$iterator, $method]);
