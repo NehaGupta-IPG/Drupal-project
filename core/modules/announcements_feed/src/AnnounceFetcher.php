@@ -8,6 +8,7 @@ use Composer\Semver\Semver;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\ImmutableConfig;
+use Drupal\Core\KeyValueStore\KeyValueExpirableFactory;
 use Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface;
 use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
 use Drupal\Core\Utility\Error;
@@ -33,7 +34,7 @@ final class AnnounceFetcher {
    *
    * @var \Drupal\Core\KeyValueStore\KeyValueExpirableFactory
    */
-  protected KeyValueStoreInterface $tempStore;
+  protected KeyValueExpirableFactory $tempStore;
 
   /**
    * Construct an AnnounceFetcher service.
