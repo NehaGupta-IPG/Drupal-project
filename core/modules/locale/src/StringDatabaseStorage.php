@@ -488,9 +488,8 @@ class StringDatabaseStorage implements StringStorageInterface {
    * @param \Drupal\locale\StringInterface $string
    *   The string object.
    *
-   * @return bool|int
-   *   If the record update failed, returns FALSE. If it succeeded, returns
-   *   SAVED_NEW or SAVED_UPDATED.
+   * @return true
+   *   If the record upsert succeeded.
    *
    * @throws \Drupal\locale\StringStorageException
    *   If the string is not suitable for this storage, an exception is thrown.
@@ -503,10 +502,12 @@ class StringDatabaseStorage implements StringStorageInterface {
       $values = $string->getValues(['translation', 'customized']);
     }
     if (!empty($values) && $keys = $this->dbStringKeys($string)) {
-      return $this->connection->upsert($this->dbStringTable($string), $this->options)
+      $queryOptions = array_merge($this->options, ['void_execute_return' => TRUE]);
+      $this->connection->upsert($this->dbStringTable($string), $queryOptions)
         ->key(array_keys($keys))
         ->fields(array_merge($keys, $values))
         ->execute();
+      return TRUE;
     }
     else {
       throw new StringStorageException('The string cannot be updated: ' . $string->getString());

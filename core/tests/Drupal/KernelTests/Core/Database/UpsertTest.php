@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Database;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -42,9 +43,7 @@ class UpsertTest extends DatabaseTestBase {
       'name' => 'Meredith',
     ]);
 
-    $result = $upsert->execute();
-    $this->assertIsInt($result);
-    $this->assertGreaterThanOrEqual(2, $result, 'The result of the upsert operation should report that at least two rows were affected.');
+    $upsert->execute();
 
     $num_records_after = $connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();
     $this->assertEquals($num_records_before + 1, $num_records_after, 'Rows were inserted and updated properly.');
@@ -67,6 +66,51 @@ class UpsertTest extends DatabaseTestBase {
     $num_records_before = $this->connection->query('SELECT COUNT(*) FROM {select}')->fetchField();
 
     $upsert = $this->connection->upsert('select', ['void_execute_return' => TRUE])
+      ->key('id')
+      ->fields(['id', 'update']);
+
+    // Add a new row.
+    $upsert->values([
+      // Test a non sequence ID for better testing of the default return value.
+      'id' => 3,
+      'update' => 'Update value 2',
+    ]);
+
+    // Update an existing row.
+    $upsert->values([
+      'id' => 1,
+      'update' => 'Update value 1 updated',
+    ]);
+
+    $upsert->execute();
+
+    $num_records_after = $this->connection->query('SELECT COUNT(*) FROM {select}')->fetchField();
+    $this->assertEquals($num_records_before + 1, $num_records_after, 'Rows were inserted and updated properly.');
+
+    $record = $this->connection->query('SELECT * FROM {select} WHERE [id] = :id', [':id' => 1])->fetch();
+    $this->assertEquals('Update value 1 updated', $record->update);
+
+    $record = $this->connection->query('SELECT * FROM {select} WHERE [id] = :id', [':id' => 3])->fetch();
+    $this->assertEquals('Update value 2', $record->update);
+
+    // An upsert should be re-usable.
+    $upsert->values([
+      'id' => 4,
+      'update' => 'Another value',
+    ]);
+    $upsert->execute();
+    $record = $this->connection->query('SELECT * FROM {select} WHERE [id] = :id', [':id' => 4])->fetch();
+    $this->assertEquals('Another value', $record->update);
+  }
+
+  /**
+   * Confirms that we deprecated returing a value from Upsert::execute().
+   */
+  #[IgnoreDeprecations]
+  public function testDeprecatedUpsertExecuteReturningValue(): void {
+    $num_records_before = $this->connection->query('SELECT COUNT(*) FROM {select}')->fetchField();
+
+    $upsert = $this->connection->upsert('select')
       ->key('id')
       ->fields(['id', 'update']);
 
