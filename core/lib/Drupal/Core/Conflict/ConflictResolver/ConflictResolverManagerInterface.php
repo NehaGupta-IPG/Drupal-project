@@ -31,14 +31,14 @@ interface ConflictResolverManagerInterface {
    *   the conflict resolutions will be applied on the ours entity.
    * @param \Symfony\Component\HttpFoundation\ParameterBag $context
    *   (optional) The context parameter bag.
-   * @param null|array<string, \Drupal\Core\Conflict\ConflictTypeInterface> $conflicts
+   * @param null|array<string, \UnitEnum> $conflicts
    *   (optional) The conflicts as returned by ::getConflicts() or a sub-set of
    *   them in order to limit the conflict resolution only to certain conflicts.
    *   If a null value is passed then a conflict detection will be performed.
    *   Passing an empty array signals will not discover any conflicts or perform
    *   any resolution.
    *
-   * @return array<string, \Drupal\Core\Conflict\ConflictTypeInterface>
+   * @return array<string, \UnitEnum>
    *   An associative array keyed by the conflicting top-level properties,
    *   having as values the corresponding conflict type.
    */
@@ -67,7 +67,7 @@ interface ConflictResolverManagerInterface {
    * @param \Symfony\Component\HttpFoundation\ParameterBag $context
    *   (optional) The context parameter bag.
    *
-   * @return array<string, \Drupal\Core\Conflict\ConflictTypeInterface>
+   * @return array<string, \UnitEnum>
    *   An associative array keyed by the conflicting top-level properties,
    *   having as values the corresponding conflict type.
    */

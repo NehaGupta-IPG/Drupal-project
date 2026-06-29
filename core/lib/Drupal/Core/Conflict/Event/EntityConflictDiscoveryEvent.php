@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Conflict\Event;
 
-use Drupal\Core\Conflict\ConflictTypeInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -20,7 +19,7 @@ class EntityConflictDiscoveryEvent extends Event {
    * The keys are the property names and the values the respective conflict
    * type.
    *
-   * @var array<string, \Drupal\Core\Conflict\ConflictTypeInterface>
+   * @var array<string, \UnitEnum>
    */
   protected array $conflicts = [];
 
@@ -69,10 +68,10 @@ class EntityConflictDiscoveryEvent extends Event {
    *
    * @param string $property
    *   The property name.
-   * @param \Drupal\Core\Conflict\ConflictTypeInterface $type
+   * @param \UnitEnum $type
    *   The conflict type.
    */
-  public function addConflict(string $property, ConflictTypeInterface $type): static {
+  public function addConflict(string $property, \UnitEnum $type): static {
     $this->conflicts[$property] = $type;
     return $this;
   }
@@ -80,7 +79,7 @@ class EntityConflictDiscoveryEvent extends Event {
   /**
    * Returns the conflicts.
    *
-   * @return array<string, \Drupal\Core\Conflict\ConflictTypeInterface>
+   * @return array<string, \UnitEnum>
    *   Array of conflict types keyed by property name.
    */
   public function getConflicts() : array {

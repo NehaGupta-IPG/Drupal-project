@@ -9,7 +9,6 @@ use Drupal\Core\Conflict\ConflictDiscovery\DefaultConflictDiscovery;
 use Drupal\Core\Conflict\ConflictResolution\MergeTheirsOnlyChanges;
 use Drupal\Core\Conflict\ConflictResolution\MergeStrategyBase;
 use Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface;
-use Drupal\Core\Conflict\ConflictTypeInterface;
 use Drupal\Core\Conflict\Event\EntityConflictDiscoveryEvent;
 use Drupal\Core\Conflict\Event\EntityConflictResolutionEvent;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -268,7 +267,7 @@ class NoConflict extends ConflictDiscoveryBase {
 
 }
 
-enum CustomFooBarConflictType: string implements ConflictTypeInterface {
+enum CustomFooBarConflictType: string {
   case Foo = 'foo';
   case Bar = 'bar';
   case Custom = 'custom';

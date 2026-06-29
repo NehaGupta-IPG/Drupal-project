@@ -9,9 +9,9 @@ namespace Drupal\Core\Conflict;
  *
  * In a 3-way comparison (ours, theirs, base) only two conflict types are
  * possible. Contrib modules can define additional semantic conflict types by
- * implementing ConflictTypeInterface.
+ * providing their own enum.
  */
-enum ConflictType: string implements ConflictTypeInterface {
+enum ConflictType: string {
 
   /* Indicates a change only on the theirs version. */
   case TheirsOnly = 'conflict_theirs_only';
