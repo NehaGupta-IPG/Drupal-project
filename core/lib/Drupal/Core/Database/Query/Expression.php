@@ -13,7 +13,7 @@ class Expression {
    * @param string $expression
    *   The expression text.
    * @param array<string,string|int|float|bool|array> $arguments
-   *   The expression arguments.
+   *   (optional) The expression arguments.
    */
   public function __construct(
     public readonly string $expression,
