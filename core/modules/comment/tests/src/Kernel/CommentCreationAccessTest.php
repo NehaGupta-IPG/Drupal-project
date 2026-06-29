@@ -12,6 +12,7 @@ use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\comment\Traits\CommentCreationTrait;
 use Drupal\user\Entity\Role;
+use Drupal\user\Entity\User;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
@@ -171,7 +172,7 @@ class CommentCreationAccessTest extends KernelTestBase {
     $access_handler = $this->container->get('entity_type.manager')
       ->getAccessControlHandler('comment');
 
-    $account = $this->container->get('current_user');
+    $account = User::getAnonymousUser();
 
     $access_handler->createAccess('comment', $account, [], TRUE);
     $this->assertSame($state->get('comment_test.create_access.account'), $account->id());
@@ -214,7 +215,7 @@ class CommentCreationAccessTest extends KernelTestBase {
 
     $access_handler = $this->container->get('entity_type.manager')
       ->getAccessControlHandler('comment');
-    $account = $this->container->get('current_user');
+    $account = User::getAnonymousUser();
 
     $access_handler->createAccess('comment', $account, ['commented_entity' => $entity_test], TRUE);
     $context = $state->get('comment_test.create_access.context');
