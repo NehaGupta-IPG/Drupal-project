@@ -107,8 +107,6 @@ class CommentCreationAccessTest extends KernelTestBase {
    * Tests that the lazy builder passes context to createAccess().
    */
   public function testLazyBuilderPassesContextToCreateAccess(): void {
-    $state = $this->container->get('state');
-
     $entity = EntityTest::create();
     $entity->save();
 
@@ -118,7 +116,7 @@ class CommentCreationAccessTest extends KernelTestBase {
       'comment',
       'comment',
     );
-    $create_access_context = $state->get('comment_test.create_access.context');
+    $create_access_context = $this->container->get('state')->get('comment_test.create_access.context');
     $this->assertSame($entity->id(), $create_access_context['commented_entity']->id());
   }
 
