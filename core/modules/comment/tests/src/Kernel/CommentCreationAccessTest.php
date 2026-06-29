@@ -174,7 +174,7 @@ class CommentCreationAccessTest extends KernelTestBase {
     $account = $this->container->get('current_user');
 
     $access_handler->createAccess('comment', $account, [], TRUE);
-    $this->assertNotNull($state->get('comment_test.create_access.account'));
+    $this->assertSame($state->get('comment_test.create_access.account'), $account->id());
 
     $state->delete('comment_test.create_access.account');
 
@@ -182,8 +182,9 @@ class CommentCreationAccessTest extends KernelTestBase {
     // be a cache hit on "create:comment:0" and checkCreateAccess() would NOT
     // fire again. With the fix (NULL CID) caching is skipped entirely.
     $access_handler->createAccess('comment', $account, [], TRUE);
-    $this->assertNotNull(
+    $this->assertSame(
       $state->get('comment_test.create_access.account'),
+      $account->id(),
       'checkCreateAccess() must be called again when no commented entity context is provided.',
     );
   }
