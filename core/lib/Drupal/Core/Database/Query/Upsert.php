@@ -32,7 +32,12 @@ abstract class Upsert extends Query implements \Countable {
    * @param array $options
    *   (optional) An array of database options.
    */
-  public function __construct(Connection $connection, $table, array $options = []) {
+  public function __construct(
+    Connection $connection,
+    string $table,
+    array $options = [],
+  ) {
+    $options = array_merge(['void_execute_return' => FALSE], $options);
     parent::__construct($connection, $options);
     $this->table = $table;
   }
@@ -87,12 +92,16 @@ abstract class Upsert extends Query implements \Countable {
   /**
    * Executes the UPSERT operation.
    *
-   * @return int
+   * @return int|null
    *   An integer indicating the number of rows affected by the operation. Do
    *   not rely on this value as a precise indication of the actual rows
    *   affected: different database engines return different values.
    */
   public function execute() {
+    if ($this->queryOptions['void_execute_return'] !== TRUE) {
+      @trigger_error(__METHOD__ . '() returning a value is deprecated in drupal:42.1.0 and is removed in drupal:43.0.0. Pass \'void_execute_return\' => TRUE in the $options for now to silence the deprecation, and adjust any code handling a returned value to not rely on it. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+    }
+
     if (!$this->preExecute()) {
       return NULL;
     }
@@ -117,7 +126,7 @@ abstract class Upsert extends Query implements \Countable {
     // Re-initialize the values array so that we can re-use this query.
     $this->insertValues = [];
 
-    return $affected_rows;
+    return $this->queryOptions['void_execute_return'] ? NULL : $affected_rows;
   }
 
 }

@@ -23,7 +23,7 @@ class UpsertTest extends DatabaseTestBase {
     $connection = Database::getConnection();
     $num_records_before = $connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();
 
-    $upsert = $connection->upsert('test_people')
+    $upsert = $connection->upsert('test_people', ['void_execute_return' => TRUE])
       ->key('job')
       ->fields(['job', 'age', 'name']);
 
@@ -66,7 +66,7 @@ class UpsertTest extends DatabaseTestBase {
   public function testUpsertWithKeywords(): void {
     $num_records_before = $this->connection->query('SELECT COUNT(*) FROM {select}')->fetchField();
 
-    $upsert = $this->connection->upsert('select')
+    $upsert = $this->connection->upsert('select', ['void_execute_return' => TRUE])
       ->key('id')
       ->fields(['id', 'update']);
 
@@ -116,7 +116,7 @@ class UpsertTest extends DatabaseTestBase {
    */
   public function testUpsertNonExistingTable(): void {
     $this->expectException(DatabaseExceptionWrapper::class);
-    $upsert = $this->connection->upsert('a-table-that-does-not-exist')
+    $upsert = $this->connection->upsert('a-table-that-does-not-exist', ['void_execute_return' => TRUE])
       ->key('id')
       ->fields(['id', 'update']);
     $upsert->values([
@@ -150,7 +150,7 @@ class UpsertTest extends DatabaseTestBase {
 
     $num_records_before = $connection->query('SELECT COUNT(*) FROM {test_composite_primary}')->fetchField();
 
-    $upsert = $connection->upsert('test_composite_primary')
+    $upsert = $connection->upsert('test_composite_primary', ['void_execute_return' => TRUE])
       ->key(['name', 'age'])
       // Add a new row directly from ::fields().
       ->fields([
@@ -218,7 +218,7 @@ class UpsertTest extends DatabaseTestBase {
     $r = $this->connection->query('SELECT * FROM {test_one_blob} WHERE [id] = :id', [':id' => $id])->fetchAssoc();
     $this->assertSame('test', $r['blob1']);
 
-    $this->connection->upsert('test_one_blob')
+    $this->connection->upsert('test_one_blob', ['void_execute_return' => TRUE])
       ->key('id')
       ->fields(['id', 'blob1'])
       ->values(['id' => $id, 'blob1' => NULL])

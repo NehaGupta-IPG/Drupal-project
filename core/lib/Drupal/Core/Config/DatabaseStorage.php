@@ -164,7 +164,7 @@ class DatabaseStorage implements StorageInterface {
    *   TRUE when the write was successful, FALSE otherwise.
    */
   protected function doWrite($name, $data) {
-    return (bool) $this->connection->upsert($this->table, $this->options)
+    $this->connection->upsert($this->table, array_merge($this->options, ['void_execute_return' => TRUE]))
       ->key(['collection', 'name'])
       ->fields([
         'collection' => $this->collection,
@@ -172,6 +172,7 @@ class DatabaseStorage implements StorageInterface {
         'data' => $data,
       ])
       ->execute();
+    return TRUE;
   }
 
   /**

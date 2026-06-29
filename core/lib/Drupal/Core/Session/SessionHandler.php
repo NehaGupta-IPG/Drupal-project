@@ -67,7 +67,7 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
     $try_again = FALSE;
     $request = $this->requestStack->getCurrentRequest();
     $doWrite = fn() =>
-      $this->connection->upsert('sessions')
+      $this->connection->upsert('sessions', ['void_execute_return' => TRUE])
         ->key('sid')
         ->fields([
           'sid' => Crypt::hashBase64($sessionId),

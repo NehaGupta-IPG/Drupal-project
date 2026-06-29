@@ -111,7 +111,7 @@ function taxonomy_build_node_index($node): void {
     if (!empty($tid_all)) {
       $connection = \Drupal::database();
       foreach ($tid_all as $tid) {
-        $connection->upsert('taxonomy_index')
+        $connection->upsert('taxonomy_index', ['void_execute_return' => TRUE])
           ->key(['nid', 'tid'])
           ->fields([
             'nid' => $node->id(),

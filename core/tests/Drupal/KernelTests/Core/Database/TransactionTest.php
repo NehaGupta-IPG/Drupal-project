@@ -885,7 +885,7 @@ class TransactionTest extends DatabaseTestBase {
 
     // Test a failed upsert query.
     try {
-      $this->connection->upsert('test')
+      $this->connection->upsert('test', ['void_execute_return' => TRUE])
         ->key('job')
         ->fields(['job', 'age', 'name'])
         ->values([

@@ -84,7 +84,7 @@ class CurrentImportStorage {
    *   CurrentImport representing the project just imported.
    */
   public function save(CurrentImport $currentImport): void {
-    $this->database->upsert('locale_file')
+    $this->database->upsert('locale_file', ['void_execute_return' => TRUE])
       ->key(['project', 'langcode'])
       ->fields([
         'project' => $currentImport->project,

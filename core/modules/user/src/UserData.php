@@ -78,7 +78,7 @@ class UserData implements UserDataInterface {
     if ($serialized) {
       $value = serialize($value);
     }
-    $this->connection->upsert('users_data')
+    $this->connection->upsert('users_data', ['void_execute_return' => TRUE])
       ->key(['uid', 'module', 'name'])
       ->fields([
         'uid' => $uid,

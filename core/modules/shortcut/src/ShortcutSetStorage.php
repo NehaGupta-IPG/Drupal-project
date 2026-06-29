@@ -90,7 +90,7 @@ class ShortcutSetStorage extends ConfigEntityStorage implements ShortcutSetStora
    */
   public function assignUser(ShortcutSetInterface $shortcut_set, $account) {
     $current_shortcut_set = $this->getDisplayedToUser($account);
-    $this->connection->upsert('shortcut_set_users')
+    $this->connection->upsert('shortcut_set_users', ['void_execute_return' => TRUE])
       ->key('uid')
       ->fields([
         'uid' => $account->id(),

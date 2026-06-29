@@ -234,7 +234,7 @@ class CommentStatistics implements CommentStatisticsInterface {
         ->execute()
         ->fetchObject();
       // Use upsert here because entity could be created before comment field.
-      $this->database->upsert('comment_entity_statistics')
+      $this->database->upsert('comment_entity_statistics', ['void_execute_return' => TRUE])
         ->key(['entity_id', 'entity_type', 'field_name'])
         ->fields([
           'entity_id' => $comment->getCommentedEntityId(),

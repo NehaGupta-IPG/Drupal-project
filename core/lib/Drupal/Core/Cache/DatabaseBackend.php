@@ -295,7 +295,7 @@ class DatabaseBackend implements CacheBackendInterface {
       // Use an upsert query which is atomic and optimized for multiple-row
       // merges.
       $query = $this->connection
-        ->upsert($this->bin)
+        ->upsert($this->bin, ['void_execute_return' => TRUE])
         ->key('cid')
         ->fields(['cid', 'expire', 'created', 'tags', 'checksum', 'data', 'serialized']);
       foreach ($values as $fields) {

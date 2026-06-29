@@ -269,7 +269,7 @@ class SearchIndex implements SearchIndexInterface {
           ->fetchField();
         // Apply Zipf's law to equalize the probability distribution.
         $total = log10(1 + 1 / (max(1, $total)));
-        $this->connection->upsert('search_total')
+        $this->connection->upsert('search_total', ['void_execute_return' => TRUE])
           ->key('word')
           ->fields([
             'word' => $word,
