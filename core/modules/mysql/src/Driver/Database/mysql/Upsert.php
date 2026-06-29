@@ -26,7 +26,7 @@ class Upsert extends QueryUpsert {
     // Escape column names of update values.
     $update_expressions = [];
     foreach ($this->updateExpressions as $column => $expression) {
-      $update_expressions[$this->connection->escapeField($column)] = is_array($expression) ? $expression['expression'] : $expression;
+      $update_expressions[$this->connection->escapeField($column)] = $expression->expression;
     }
 
     $query = $comments . 'INSERT INTO {' . $this->table . '} (' . implode(', ', $insert_fields) . ') VALUES ';
