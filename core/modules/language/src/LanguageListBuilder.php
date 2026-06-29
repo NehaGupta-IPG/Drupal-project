@@ -2,6 +2,7 @@
 
 namespace Drupal\language;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\Entity\DraggableListBuilder;
 use Drupal\Core\Entity\EntityInterface;
@@ -154,6 +155,8 @@ class LanguageListBuilder extends DraggableListBuilder {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
+    // Invalidate custom language fallback cache tag.
+    Cache::invalidateTags(['language_fallback_order']);
 
     // Save the default language if changed.
     $new_id = $form_state->getValue('site_default_language');

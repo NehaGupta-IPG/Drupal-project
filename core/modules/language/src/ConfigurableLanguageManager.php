@@ -382,6 +382,15 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
    */
   public function getFallbackCandidates(array $context = []) {
     if ($this->isMultilingual()) {
+      // Add custom cache tag for language fallback order dependency.
+      // This ensures that content depending on language fallback gets
+      // invalidated when language order changes.
+      $renderer = \Drupal::service('renderer');
+      if ($renderer->hasRenderContext()) {
+        $build = [];
+        $build['#cache']['tags'][] = 'language_fallback_order';
+        $renderer->render($build);
+      }
       $candidates = [];
       if (empty($context['operation']) || $context['operation'] != 'locale_lookup') {
         // If the fallback context is not locale_lookup, initialize the
