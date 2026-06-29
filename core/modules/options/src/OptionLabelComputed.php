@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\options;
 
 use Drupal\Core\Field\FieldItemInterface;
@@ -13,7 +15,7 @@ class OptionLabelComputed extends TypedData {
   /**
    * {@inheritdoc}
    */
-  public function getValue() {
+  public function getValue(): mixed {
     $item = $this->getParent();
     if (!$item instanceof FieldItemInterface) {
       throw new \LogicException('The parent item must be a field item.');
