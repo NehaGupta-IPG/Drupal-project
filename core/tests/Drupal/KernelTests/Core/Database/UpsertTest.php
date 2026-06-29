@@ -104,7 +104,7 @@ class UpsertTest extends DatabaseTestBase {
   }
 
   /**
-   * Confirms that we deprecated returing a value from Upsert::execute().
+   * Confirms that we deprecated returning a value from Upsert::execute().
    */
   #[IgnoreDeprecations]
   public function testDeprecatedUpsertExecuteReturningValue(): void {
