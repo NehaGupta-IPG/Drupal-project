@@ -14,9 +14,9 @@ namespace Drupal\Core\Conflict;
 enum ConflictType: string implements ConflictTypeInterface {
 
   /* Indicates a change only on the theirs version. */
-  case Theirs = 'conflict_theirs';
+  case TheirsOnly = 'conflict_theirs_only';
 
   /* Indicates a different change both on the ours and theirs version. */
-  case OursTheirs = 'conflict_ours_theirs';
+  case Both = 'conflict_both';
 
 }

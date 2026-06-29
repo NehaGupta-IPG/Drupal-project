@@ -53,7 +53,7 @@ class DefaultConflictDiscovery extends ConflictDiscoveryBase {
       // Check for changes between ours, theirs and base versions.
       if (!$field_items_ours->equals($field_items_theirs) && !$field_items_theirs->equals($field_items_base)) {
         // Check for changes between the ours and the base entity versions.
-        $conflict_type = $field_items_ours->equals($field_items_base) ? ConflictType::Theirs : ConflictType::OursTheirs;
+        $conflict_type = $field_items_ours->equals($field_items_base) ? ConflictType::TheirsOnly : ConflictType::Both;
         $event->addConflict($field_name, $conflict_type);
       }
     }

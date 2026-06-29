@@ -33,7 +33,7 @@ class MergeTheirsOnlyChanges extends MergeStrategyBase {
     \assert($result_entity instanceof ContentEntityInterface);
 
     foreach ($event->getConflicts() as $property => $conflict_type) {
-      if ($conflict_type === ConflictType::Theirs) {
+      if ($conflict_type === ConflictType::TheirsOnly) {
         $result_entity->set($property, $theirs_entity->get($property)->getValue());
         $event->resolveConflict($property);
       }
