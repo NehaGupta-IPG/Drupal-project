@@ -11,11 +11,13 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the year range settings of the date time field.
  */
 #[Group('datetime')]
+#[RunTestsInSeparateProcesses]
 class DateTimeYearRangeTest extends BrowserTestBase {
 
   /**

@@ -8,11 +8,11 @@ use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\YearRange;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
-/**
- * @coversDefaultClass \Drupal\Core\Render\Element\YearRange
- * @group Render
- */
+#[Group('render')]
+#[CoversClass(YearRange::class)]
 class YearRangeTest extends UnitTestCase {
 
   /**

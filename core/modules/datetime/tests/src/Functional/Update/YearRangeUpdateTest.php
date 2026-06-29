@@ -9,6 +9,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the addition of the year_range setting.
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @see datetime_post_update_default_year_range()
  */
 #[Group('update')]
+#[RunTestsInSeparateProcesses]
 class YearRangeUpdateTest extends UpdatePathTestBase {
 
   /**
