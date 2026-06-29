@@ -43,7 +43,7 @@ class Upsert extends QueryUpsert {
 
     $update = [];
     foreach ($insert_fields as $field) {
-      $update[] = isset($update_expressions[$field]) ? "$field = $update_expressions[$field]" : "$field = VALUES($field)";
+      $update[] = isset($update_expressions[$field]) ? "$field = {$update_expressions[$field]->expression}" : "$field = VALUES($field)";
     }
 
     $query .= ' ON DUPLICATE KEY UPDATE ' . implode(', ', $update);

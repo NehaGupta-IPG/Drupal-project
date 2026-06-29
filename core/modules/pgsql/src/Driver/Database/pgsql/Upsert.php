@@ -142,7 +142,7 @@ class Upsert extends QueryUpsert {
     foreach ($insert_fields as $field) {
       // The "excluded." prefix causes the field to refer to the value for field
       // that would have been inserted had there been no conflict.
-      $update[] = isset($update_expressions[$field]) ? "$field = $update_expressions[$field]" : "$field = EXCLUDED.$field";
+      $update[] = isset($update_expressions[$field]) ? "$field = {$update_expressions[$field]->expression}" : "$field = EXCLUDED.$field";
     }
 
     $query .= ' ON CONFLICT (' . implode(', ', $keys) . ') DO UPDATE SET ' . implode(', ', $update);
