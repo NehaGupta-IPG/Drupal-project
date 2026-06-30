@@ -359,6 +359,11 @@ class NodeAdminTest extends NodeTestBase {
       'label' => 'Spanish',
     ])->save();
 
+    // With no content yet, there are no languages to filter by, so the exposed
+    // language filter is not shown.
+    $this->drupalGet('admin/content');
+    $this->assertSession()->fieldNotExists('langcode');
+
     $this->drupalCreateNode(['type' => 'page', 'title' => 'English title'])
       ->addTranslation('es')
       ->setTitle('Spanish title')
@@ -375,28 +380,53 @@ class NodeAdminTest extends NodeTestBase {
     $this->assertSession()->pageTextContains('English title');
     $this->assertSession()->pageTextContains('Spanish title');
 
-    $this->drupalGet('admin/content', ['query' => ['langcode' => '***LANGUAGE_site_default***']]);
-    $this->assertSession()->pageTextContains('English title');
-    $this->assertSession()->pageTextNotContains('Spanish title');
+    // The exposed filter only lists the languages the content uses (English and
+    // Spanish) plus the "- Any -" option. It does not offer languages with no
+    // content, nor the special options (such as the site default or interface
+    // language) that the "Language" filter exposes for non-exposed use.
+    $this->assertSession()->optionExists('langcode', 'en');
+    $this->assertSession()->optionExists('langcode', 'es');
+    $this->assertSession()->optionNotExists('langcode', '***LANGUAGE_site_default***');
+    $this->assertSession()->optionNotExists('langcode', '***LANGUAGE_language_interface***');
+    $this->assertSession()->optionNotExists('langcode', 'und');
+    $this->assertSession()->optionNotExists('langcode', 'zxx');
 
+    // Filtering by an installed language shows only that language's content.
     $this->drupalGet('admin/content', ['query' => ['langcode' => 'en']]);
     $this->assertSession()->pageTextContains('English title');
     $this->assertSession()->pageTextNotContains('Spanish title');
 
-    $this->drupalGet('admin/content', ['query' => ['langcode' => 'und']]);
+    $this->drupalGet('admin/content', ['query' => ['langcode' => 'es']]);
     $this->assertSession()->pageTextNotContains('English title');
-    $this->assertSession()->pageTextNotContains('Spanish title');
+    $this->assertSession()->pageTextContains('Spanish title');
 
-    $this->drupalGet('admin/content', ['query' => ['langcode' => 'zxx']]);
-    $this->assertSession()->pageTextNotContains('English title');
-    $this->assertSession()->pageTextNotContains('Spanish title');
+    // The filter's default value can be set to a dynamic language, such as the
+    // current interface language. Visitors then see the resolved language (the
+    // actual language, not the dynamic option) selected in the exposed filter,
+    // and the content is filtered accordingly until they choose another
+    // installed language.
+    $this->config('views.view.content')
+      ->set('display.default.display_options.filters.langcode.value', ['***LANGUAGE_language_interface***' => '***LANGUAGE_language_interface***'])
+      ->save();
 
-    $this->drupalGet('admin/content', ['query' => ['langcode' => html_entity_decode('***LANGUAGE_language_interface***')]]);
+    $this->drupalGet('admin/content');
+    $this->assertSession()->fieldValueEquals('langcode', 'en');
     $this->assertSession()->pageTextContains('English title');
     $this->assertSession()->pageTextNotContains('Spanish title');
 
-    $this->drupalGet('es/admin/content', ['query' => ['langcode' => html_entity_decode('***LANGUAGE_language_interface***')]]);
+    $this->drupalGet('es/admin/content');
+    $this->assertSession()->fieldValueEquals('langcode', 'es');
     $this->assertSession()->pageTextNotContains('English title');
+    $this->assertSession()->pageTextContains('Spanish title');
+
+    // Add a language that no content uses. When the default resolves to it
+    // (here through the interface language), the filter is not set to it,
+    // because it is not an offered option. Visitors see "- Any -" and all the
+    // content, rather than a value they could not otherwise select.
+    ConfigurableLanguage::createFromLangcode('de')->save();
+    $this->drupalGet('de/admin/content');
+    $this->assertSession()->fieldValueEquals('langcode', 'All');
+    $this->assertSession()->pageTextContains('English title');
     $this->assertSession()->pageTextContains('Spanish title');
   }
 

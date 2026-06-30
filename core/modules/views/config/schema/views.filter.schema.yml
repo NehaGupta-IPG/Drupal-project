@@ -181,6 +181,10 @@ views.filter_value.combine:
 views.filter.language:
   type: views.filter.in_operator
   label: 'Language'
+  mapping:
+    limit_to_content_languages:
+      type: boolean
+      label: 'Limit to the languages used by the content'
 
 views.filter.latest_revision:
   type: views_filter

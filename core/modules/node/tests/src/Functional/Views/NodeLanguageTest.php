@@ -199,9 +199,6 @@ class NodeLanguageTest extends NodeTestBase {
     }
     // When filtered, only the specific languages should show.
     foreach ($this->nodeTitles as $langcode => $titles) {
-      if ($langcode == LanguageInterface::LANGCODE_NOT_SPECIFIED) {
-        continue;
-      }
       $this->drupalGet('admin/content', ['query' => ['langcode' => $langcode]]);
       foreach ($titles as $title) {
         $this->assertSession()->pageTextContains($title);

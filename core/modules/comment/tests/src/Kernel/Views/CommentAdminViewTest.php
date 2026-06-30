@@ -165,10 +165,11 @@ class CommentAdminViewTest extends ViewsKernelTestBase {
     $build = $executable->preview($display_id);
     $this->setRawContent($renderer->renderRoot($build));
 
-    // Assert the exposed filters on the admin page.
+    // Assert the exposed filters on the admin page. The language filter is only
+    // shown once the comments use more than one language; it is exercised below
+    // after the translations are created.
     $this->assertField('subject');
     $this->assertField('author_name');
-    $this->assertField('langcode');
 
     $elements = $this->cssSelect('input[type="checkbox"]');
     $this->assertCount(2, $elements, 'There are two comments on the page.');

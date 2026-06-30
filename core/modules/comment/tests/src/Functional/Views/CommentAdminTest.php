@@ -73,10 +73,11 @@ class CommentAdminTest extends CommentBrowserTestBase {
     $this->drupalGet('admin/content/comment');
     $this->assertSession()->pageTextContains('No comments available.');
 
-    // Assert the expose filters on the admin page.
+    // Assert the exposed filters on the admin page. With no comments there are
+    // no languages to filter by, so the language filter is not shown.
     $this->assertSession()->fieldExists('subject');
     $this->assertSession()->fieldExists('author_name');
-    $this->assertSession()->fieldExists('langcode');
+    $this->assertSession()->fieldNotExists('langcode');
 
     $this->drupalLogout();
 
@@ -129,10 +130,12 @@ class CommentAdminTest extends CommentBrowserTestBase {
     $this->drupalGet('admin/content/comment/approval');
     $this->assertSession()->pageTextContains('Unapproved comments (2)');
 
-    // Assert the expose filters on the admin page.
+    // Assert the exposed filters on the admin page. The comments all use a
+    // single language, so the language filter has nothing to offer and is not
+    // shown.
     $this->assertSession()->fieldExists('subject');
     $this->assertSession()->fieldExists('author_name');
-    $this->assertSession()->fieldExists('langcode');
+    $this->assertSession()->fieldNotExists('langcode');
 
     $edit = [
       "action" => 'comment_publish_action',
