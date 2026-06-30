@@ -68,7 +68,7 @@ class AssetResolver implements AssetResolverInterface {
   /**
    * A url helper to compress libraries.
    *
-   * @var \Drupal\Core\Asset\LibraryUrlHelper $libraryUrlHelper
+   * @var \Drupal\Core\Asset\LibraryUrlHelper
    */
   protected LibraryUrlHelper $libraryUrlHelper;
 

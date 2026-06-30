@@ -12,12 +12,29 @@ readonly class LibraryUrlHelper {
   /**
    * Constructs a new LibraryUrlHelper.
    *
-   * @param LibraryDiscoveryInterface $libraryDiscovery $
+   * @param LibraryDiscoveryInterface $libraryDiscovery
+   *   The library discovery service.
    */
   public function __construct(
     private LibraryDiscoveryInterface $libraryDiscovery,
   ) {}
 
+  /**
+   * Compresses the library string to a lookup map imploded to a string.
+   *
+   * We take the libraries and create a lookup map where the indices of the
+   * library are replacing the names which will result in a much smaller
+   * string to be compressed by UrlHelper::compressQueryParameter.
+   *
+   * If no index can be found the original name will be appended to the string
+   * ensuring no library is lost.
+   *
+   * @param string $data
+   *   The data that will be compressed
+   *
+   * @return string
+   *   A string of libraries.
+   */
   public function compress(string $data): string {
     // To reduce the length of the ajax_page_state parameter, replace library
     // names with their index from the list of libraries for that extension.
@@ -44,6 +61,21 @@ readonly class LibraryUrlHelper {
     return UrlHelper::compressQueryParameter($data);
   }
 
+  /**
+   * Uncompress a library string that was compressed using indices.
+   *
+   * We get a string with extensions and library indices and translate them
+   * back to a string with library names.
+   *
+   * If the index is not a number it is probably a library name so we will treat
+   * it as such when appending it to the map.
+   *
+   * @param string $compressed
+   *   The string that will be uncompressed.
+   *
+   * @return string
+   *   An uncompressed string of libraries.
+   */
   public function uncompress(string $compressed): string {
     $uncompressed = UrlHelper::uncompressQueryParameter($compressed);
 
