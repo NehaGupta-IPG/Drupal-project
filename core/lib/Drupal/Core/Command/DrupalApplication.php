@@ -111,7 +111,9 @@ class DrupalApplication extends Application {
       // @todo Refactor `bootEnvironment()' so that we can use the parts we need
       // but leave the error handler alone.
       // @see https://www.drupal.org/node/2690035
-      $sitePath = DrupalKernel::findSitePath($request, TRUE);
+      // Define the DRUPAL_TEST_IN_CHILD_SITE based on if we're inside a test.
+      DrupalKernel::setupDrupalTestInChildSite($kernel->getAppRoot());
+      $sitePath = getenv('DRUPAL_DEV_SITE_PATH') ?: DrupalKernel::findSitePath($request, TRUE);
       $kernel->setSitePath($sitePath);
       Settings::initialize($kernel->getAppRoot(), $kernel->getSitePath(), $this->classloader);
       $kernel->boot();

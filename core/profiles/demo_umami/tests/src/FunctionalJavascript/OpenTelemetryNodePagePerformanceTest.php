@@ -56,14 +56,14 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 201,
-      'CacheGetCount' => 223,
+      'CacheGetCount' => 224,
       'CacheSetCount' => 226,
       'CacheDeleteCount' => 0,
-      'CacheTagLookupQueryCount' => 23,
+      'CacheTagLookupQueryCount' => 24,
       'CacheTagInvalidationCount' => 0,
-      'ScriptCount' => 1,
+      'ScriptCount' => 3,
       'ScriptBytes' => 12000,
-      'StylesheetCount' => 2,
+      'StylesheetCount' => 6,
       'StylesheetBytes' => 40800,
     ];
     $this->assertMetrics($expected, $performance_data);
@@ -92,9 +92,9 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 1,
-      'ScriptCount' => 1,
+      'ScriptCount' => 3,
       'ScriptBytes' => 12000,
-      'StylesheetCount' => 2,
+      'StylesheetCount' => 6,
       'StylesheetBytes' => 40800,
     ];
     $this->assertMetrics($expected, $performance_data);
@@ -119,14 +119,14 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 71,
-      'CacheGetCount' => 167,
+      'CacheGetCount' => 168,
       'CacheSetCount' => 59,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 18,
-      'ScriptCount' => 1,
+      'CacheTagLookupQueryCount' => 19,
+      'ScriptCount' => 3,
       'ScriptBytes' => 12000,
-      'StylesheetCount' => 2,
+      'StylesheetCount' => 6,
       'StylesheetBytes' => 40800,
     ];
     $this->assertMetrics($expected, $performance_data);
@@ -216,7 +216,7 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 56,
-      'CacheGetCount' => 162,
+      'CacheGetCount' => 163,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 34,
@@ -226,13 +226,13 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
         'entity' => 21,
         'dynamic_page_cache' => 1,
         'routes' => 5,
-        'render' => 12,
+        'render' => 13,
         'default' => 3,
       ],
       'CacheSetCount' => 41,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 18,
+      'CacheTagLookupQueryCount' => 19,
       'CacheTagGroupedLookups' => [
         [
           'entity_types',
@@ -276,9 +276,11 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
           'taxonomy_term:31',
         ],
         [
+          'config:block_list',
+        ],
+        [
           'block_content:1',
           'block_content:2',
-          'config:block_list',
           'config:configurable_language_list',
         ],
         ['config:system.menu.footer'],
@@ -313,9 +315,9 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
         ['config:workflows.workflow.editorial'],
         ['config:user.role.anonymous'],
       ],
-      'ScriptCount' => 1,
+      'ScriptCount' => 3,
       'ScriptBytes' => 12000,
-      'StylesheetCount' => 2,
+      'StylesheetCount' => 6,
       'StylesheetBytes' => 40500,
     ];
     $this->assertMetrics($expected, $performance_data);
