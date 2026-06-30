@@ -87,7 +87,7 @@ class OptionsHooks {
       }
       if (_options_values_in_use($field_storage->getTargetEntityTypeId(), $field_storage->getName(), $lost_keys)) {
         $lost_keys_string = implode(', ', $lost_keys);
-        throw new FieldStorageDefinitionUpdateForbiddenException("A list field '{$field_storage->getName()}' with existing data cannot have its keys changed. The keys that would be removed are'{$lost_keys_string}'.");
+        throw new FieldStorageDefinitionUpdateForbiddenException("A list field '{$field_storage->getName()}' with existing data cannot have its keys changed. The keys that would be removed are '{$lost_keys_string}'.");
       }
     }
   }
