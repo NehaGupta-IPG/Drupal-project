@@ -75,11 +75,19 @@ class OptionsHooks {
   public function fieldStorageConfigUpdateForbid(FieldStorageConfigInterface $field_storage, FieldStorageConfigInterface $prior_field_storage): void {
     if ($field_storage->getTypeProvider() == 'options' && $field_storage->hasData()) {
       // Forbid any update that removes allowed values with actual data.
-      $allowed_values = $field_storage->getSetting('allowed_values');
       $prior_allowed_values = $prior_field_storage->getSetting('allowed_values');
-      $lost_keys = array_keys(array_diff_key($prior_allowed_values, $allowed_values));
+      if (!empty($field_storage->getSetting('allowed_values_function'))) {
+        $function = $field_storage->getSetting('allowed_values_function');
+        $allowed_values_from_function = $function($field_storage);
+        $lost_keys = array_keys(array_diff_key($prior_allowed_values, $allowed_values_from_function));
+      }
+      else {
+        $allowed_values = $field_storage->getSetting('allowed_values');
+        $lost_keys = array_keys(array_diff_key($prior_allowed_values, $allowed_values));
+      }
       if (_options_values_in_use($field_storage->getTargetEntityTypeId(), $field_storage->getName(), $lost_keys)) {
-        throw new FieldStorageDefinitionUpdateForbiddenException("A list field '{$field_storage->getName()}' with existing data cannot have its keys changed.");
+        $lost_keys_string = implode(', ', $lost_keys);
+        throw new FieldStorageDefinitionUpdateForbiddenException("A list field '{$field_storage->getName()}' with existing data cannot have its keys changed. The keys that would be removed are'{$lost_keys_string}'.");
       }
     }
   }
