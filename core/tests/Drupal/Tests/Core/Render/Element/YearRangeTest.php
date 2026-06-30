@@ -15,7 +15,7 @@ use PHPUnit\Framework\Attributes\Group;
 /**
  * Tests the year range element.
  */
-#[Group('render2')]
+#[Group('render')]
 #[CoversClass(YearRange::class)]
 class YearRangeTest extends UnitTestCase {
 
