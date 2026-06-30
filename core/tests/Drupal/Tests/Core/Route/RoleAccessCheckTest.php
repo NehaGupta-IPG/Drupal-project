@@ -174,7 +174,7 @@ class RoleAccessCheckTest extends UnitTestCase {
     }
 
     foreach ($forbidden_accounts as $account) {
-      $message = sprintf('Access not forbidden for user with the no roles on path: %s', $path);
+      $message = sprintf('Access not forbidden for user with no roles on path: %s', $path);
       $this->assertEquals(AccessResult::forbidden('No user roles found.'), $role_access_check->access($collection->get($path), $account), $message);
     }
   }
