@@ -55,6 +55,7 @@ final readonly class UnpackManager {
         $this->io,
       );
       $unpacker->unpackDependencies();
+      $unpacker->writeUnpackedVersion();
       $this->io->write("<info>{$package->getName()}</info> unpacked.");
     }
 
