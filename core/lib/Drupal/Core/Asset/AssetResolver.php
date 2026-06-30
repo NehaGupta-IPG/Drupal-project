@@ -417,6 +417,21 @@ class AssetResolver implements AssetResolverInterface {
       // Allow modules and themes to alter the JavaScript settings.
       $this->moduleHandler->alter('js_settings', $settings, $assets);
       $this->themeManager->alter('js_settings', $settings, $assets);
+
+      if (isset($settings['ajaxPageState']['theme'])) {
+        $request = \Drupal::request();
+        $initial_ajax_page_state = NULL;
+        if ($request->request->has('ajax_page_state')) {
+          $initial_ajax_page_state = $request->request->all('ajax_page_state');
+        }
+        elseif ($request->query->has('ajax_page_state')) {
+          $initial_ajax_page_state = $request->query->all('ajax_page_state');
+        }
+        if (isset($initial_ajax_page_state['theme']) && $initial_ajax_page_state['theme'] != $settings['ajaxPageState']['theme']) {
+          throw new \UnexpectedValueException(sprintf('Ajax page state theme (%s) does not match initial theme (%s)', $settings['ajaxPageState']['theme'], $initial_ajax_page_state['theme']));
+        }
+      }
+
       // Update the $assets object accordingly, so that it reflects the final
       // settings.
       $assets->setSettings($settings);
