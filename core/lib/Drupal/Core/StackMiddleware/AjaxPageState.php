@@ -2,7 +2,8 @@
 
 namespace Drupal\Core\StackMiddleware;
 
-use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\Asset\LibraryUrlHelper;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -11,15 +12,21 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  * Expands the compressed ajax_page_state query parameter into an array.
  */
 class AjaxPageState implements HttpKernelInterface {
-
   /**
    * Constructs a new AjaxPageState instance.
    *
    * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
    *   The wrapped HTTP kernel.
+   * @param  \Drupal\Core\Asset\LibraryUrlHelper  $libraryUrlHelper
+   *    A Url helper for (un)compressing the library names.
    */
-  public function __construct(protected readonly HttpKernelInterface $httpKernel) {
+  public function __construct(
+    protected readonly HttpKernelInterface $httpKernel,
+    #[Autowire(service: 'Drupal\Core\Asset\LibraryUrlHelper')]
+    protected readonly LibraryUrlHelper $libraryUrlHelper,
+  ) {
   }
+
 
   /**
    * {@inheritdoc}
@@ -75,7 +82,7 @@ class AjaxPageState implements HttpKernelInterface {
    *   changed to be uncompressed.
    */
   private function parseAjaxPageState(array $ajax_page_state): array {
-    $ajax_page_state['libraries'] = UrlHelper::uncompressQueryParameter($ajax_page_state['libraries']);
+    $ajax_page_state['libraries'] = $this->libraryUrlHelper->uncompress($ajax_page_state['libraries']);
     return $ajax_page_state;
   }
 

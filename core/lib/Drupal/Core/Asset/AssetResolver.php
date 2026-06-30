@@ -67,6 +67,13 @@ class AssetResolver implements AssetResolverInterface {
   protected $themeHandler;
 
   /**
+   * A url helper to compress libraries.
+   *
+   * @var \Drupal\Core\Asset\LibraryUrlHelper $libraryUrl
+   */
+  protected LibraryUrlHelper $libraryUrlHelper;
+
+  /**
    * Constructs a new AssetResolver instance.
    *
    * @param \Drupal\Core\Asset\LibraryDiscoveryInterface $library_discovery
@@ -84,7 +91,7 @@ class AssetResolver implements AssetResolverInterface {
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
    *   The theme handler service.
    */
-  public function __construct(LibraryDiscoveryInterface $library_discovery, LibraryDependencyResolverInterface $library_dependency_resolver, ModuleHandlerInterface $module_handler, ThemeManagerInterface $theme_manager, LanguageManagerInterface $language_manager, CacheBackendInterface $cache, ThemeHandlerInterface $theme_handler) {
+  public function __construct(LibraryDiscoveryInterface $library_discovery, LibraryDependencyResolverInterface $library_dependency_resolver, ModuleHandlerInterface $module_handler, ThemeManagerInterface $theme_manager, LanguageManagerInterface $language_manager, CacheBackendInterface $cache, ThemeHandlerInterface $theme_handler, LibraryUrlHelper $library_url_helper) {
     $this->libraryDiscovery = $library_discovery;
     $this->libraryDependencyResolver = $library_dependency_resolver;
     $this->moduleHandler = $module_handler;
@@ -92,6 +99,7 @@ class AssetResolver implements AssetResolverInterface {
     $this->languageManager = $language_manager;
     $this->cache = $cache;
     $this->themeHandler = $theme_handler;
+    $this->libraryUrlHelper = $library_url_helper;
   }
 
   /**
@@ -470,7 +478,7 @@ class AssetResolver implements AssetResolverInterface {
       // Convert ajaxPageState to a compressed string from an array, since it is
       // used by ajax.js to pass to AJAX requests as a query parameter.
       if (isset($settings['ajaxPageState']['libraries'])) {
-        $settings['ajaxPageState']['libraries'] = UrlHelper::compressQueryParameter($settings['ajaxPageState']['libraries']);
+        $settings['ajaxPageState']['libraries'] = $this->libraryUrlHelper->compress($settings['ajaxPageState']['libraries']);
       }
       $settings_as_inline_javascript = [
         'type' => 'setting',

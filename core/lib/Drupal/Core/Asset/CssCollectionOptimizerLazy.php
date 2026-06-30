@@ -54,6 +54,7 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
     protected readonly FileUrlGeneratorInterface $fileUrlGenerator,
     protected readonly TimeInterface $time,
     protected readonly LanguageManagerInterface $languageManager,
+    protected readonly LibraryUrlHelper $libraryUrlHelper,
   ) {}
 
   /**
@@ -108,12 +109,12 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
     $query_args = [
       'language' => $this->languageManager->getCurrentLanguage()->getId(),
       'theme' => $this->themeManager->getActiveTheme()->getName(),
-      'include' => UrlHelper::compressQueryParameter(implode(',', $this->dependencyResolver->getMinimalRepresentativeSubset($libraries))),
+      'include' => $this->libraryUrlHelper->compress(implode(',', $this->dependencyResolver->getMinimalRepresentativeSubset($libraries))),
     ];
     $ajax_page_state = $this->requestStack->getCurrentRequest()->attributes->get('ajax_page_state');
     $already_loaded = isset($ajax_page_state) ? explode(',', $ajax_page_state['libraries']) : [];
     if ($already_loaded) {
-      $query_args['exclude'] = UrlHelper::compressQueryParameter(implode(',', $this->dependencyResolver->getMinimalRepresentativeSubset($already_loaded)));
+      $query_args['exclude'] = $this->libraryUrlHelper->compress(implode(',', $this->dependencyResolver->getMinimalRepresentativeSubset($already_loaded)));
     }
     // When an asset corresponds 1-1 with a single library, we don't need
     // either the include or exclude query arguments. Replace this with just

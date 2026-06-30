@@ -55,10 +55,6 @@ class SettingsCommand implements CommandInterface {
    * Implements Drupal\Core\Ajax\CommandInterface:render().
    */
   public function render() {
-    if (isset($this->settings['ajax_page_state']['libraries'])) {
-      $this->settings['ajax_page_state']['libraries'] = UrlHelper::compressQueryParameter($this->settings['ajax_page_state']['libraries']);
-    }
-
     return [
       'command' => 'settings',
       'settings' => $this->settings,

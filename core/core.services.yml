@@ -1007,8 +1007,10 @@ services:
       - { name: http_middleware, priority: 140 }
   http_middleware.ajax_page_state:
     class: Drupal\Core\StackMiddleware\AjaxPageState
+    autowire: true
     tags:
-      - { name: http_middleware, priority: 500 }
+      # Must run after the session middleware.
+      - { name: http_middleware, priority: 49 }
   http_middleware.negotiation:
     class: Drupal\Core\StackMiddleware\NegotiationMiddleware
     tags:
@@ -1462,7 +1464,7 @@ services:
     arguments: ['@current_user']
   ajax_response.attachments_processor:
     class: Drupal\Core\Ajax\AjaxResponseAttachmentsProcessor
-    arguments: ['@asset.resolver', '@config.factory', '@asset.css.collection_renderer', '@asset.js.collection_renderer', '@request_stack', '@renderer', '@module_handler', '@language_manager']
+    arguments: ['@asset.resolver', '@config.factory', '@asset.css.collection_renderer', '@asset.js.collection_renderer', '@request_stack', '@renderer', '@module_handler', '@language_manager', '@Drupal\Core\Asset\LibraryUrlHelper']
   html_response.attachments_processor:
     class: Drupal\Core\Render\HtmlResponseAttachmentsProcessor
     arguments: ['@asset.resolver', '@config.factory', '@asset.css.collection_renderer', '@asset.js.collection_renderer', '@request_stack', '@renderer', '@module_handler', '@language_manager', '@file_url_generator']
@@ -1758,7 +1760,7 @@ services:
     arguments: [ '@asset.query_string', '@file_url_generator' ]
   asset.css.collection_optimizer:
     class: Drupal\Core\Asset\CssCollectionOptimizerLazy
-    arguments: [ '@asset.css.collection_grouper', '@asset.css.optimizer', '@theme.manager', '@library.dependency_resolver', '@request_stack', '@file_system', '@config.factory', '@file_url_generator', '@datetime.time', '@language_manager']
+    arguments: [ '@asset.css.collection_grouper', '@asset.css.optimizer', '@theme.manager', '@library.dependency_resolver', '@request_stack', '@file_system', '@config.factory', '@file_url_generator', '@datetime.time', '@language_manager', '@Drupal\Core\Asset\LibraryUrlHelper']
   asset.css.optimizer:
     class: Drupal\Core\Asset\CssOptimizer
     arguments: ['@file_url_generator']
@@ -1772,7 +1774,7 @@ services:
     arguments: [ '@asset.query_string','@file_url_generator', '@datetime.time' ]
   asset.js.collection_optimizer:
     class: Drupal\Core\Asset\JsCollectionOptimizerLazy
-    arguments: [ '@asset.js.collection_grouper', '@asset.js.optimizer', '@theme.manager', '@library.dependency_resolver', '@request_stack', '@file_system', '@config.factory', '@file_url_generator', '@datetime.time', '@language_manager']
+    arguments: [ '@asset.js.collection_grouper', '@asset.js.optimizer', '@theme.manager', '@library.dependency_resolver', '@request_stack', '@file_system', '@config.factory', '@file_url_generator', '@datetime.time', '@language_manager', '@Drupal\Core\Asset\LibraryUrlHelper']
   asset.js.optimizer:
     class: Drupal\Core\Asset\JsOptimizer
     arguments: ['@logger.channel.default']
@@ -1804,6 +1806,8 @@ services:
     class: Drupal\Core\Asset\LibraryDependencyResolver
     arguments: ['@library.discovery']
   Drupal\Core\Asset\LibraryDependencyResolverInterface: '@library.dependency_resolver'
+  Drupal\Core\Asset\LibraryUrlHelper:
+    autowire: true
   # Set up a cache chain for asset caching as the same assets may be
   # requested several times, non-public as they are not meant to be reused.
   cache.asset_chain:
@@ -1814,7 +1818,7 @@ services:
       - [ appendBackend, [ '@cache.data' ] ]
   asset.resolver:
     class: Drupal\Core\Asset\AssetResolver
-    arguments: ['@library.discovery', '@library.dependency_resolver', '@module_handler', '@theme.manager', '@language_manager', '@cache.asset_chain', '@theme_handler']
+    arguments: ['@library.discovery', '@library.dependency_resolver', '@module_handler', '@theme.manager', '@language_manager', '@cache.asset_chain', '@theme_handler', '@Drupal\Core\Asset\LibraryUrlHelper']
   Drupal\Core\Asset\AssetResolverInterface: '@asset.resolver'
   info_parser:
     class: Drupal\Core\Extension\InfoParser
