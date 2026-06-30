@@ -261,42 +261,50 @@ final class Importer implements LoggerAwareInterface {
       }
     }
 
-    ['entity_type' => $entity_type] = $data['_meta'];
-    assert(is_string($entity_type));
-    /** @var \Drupal\Core\Entity\EntityTypeInterface $entity_type */
-    $entity_type = $this->entityTypeManager->getDefinition($entity_type);
+    try {
+      ['entity_type' => $entity_type] = $data['_meta'];
+      assert(is_string($entity_type));
+      /** @var \Drupal\Core\Entity\EntityTypeInterface $entity_type */
+      $entity_type = $this->entityTypeManager->getDefinition($entity_type);
 
-    $values = [
-      'uuid' => $data['_meta']['uuid'],
-    ];
-    if (!empty($data['_meta']['bundle'])) {
-      $values[$entity_type->getKey('bundle')] = $data['_meta']['bundle'];
-    }
+      $values = [
+        'uuid' => $data['_meta']['uuid'],
+      ];
+      if (!empty($data['_meta']['bundle'])) {
+        $values[$entity_type->getKey('bundle')] = $data['_meta']['bundle'];
+      }
 
-    if (!empty($data['_meta']['default_langcode'])) {
-      $data = $this->verifyNormalizedLanguage($data);
-      $values[$entity_type->getKey('langcode')] = $data['_meta']['default_langcode'];
-    }
+      if (!empty($data['_meta']['default_langcode'])) {
+        $data = $this->verifyNormalizedLanguage($data);
+        $values[$entity_type->getKey('langcode')] = $data['_meta']['default_langcode'];
+      }
 
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-    $entity = $this->entityTypeManager->getStorage($entity_type->id())->create($values);
-    foreach ($data['default'] as $field_name => $values) {
-      $this->setFieldValues($entity, $field_name, $values);
-    }
+      /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+      $entity = $this->entityTypeManager->getStorage($entity_type->id())->create($values);
+      foreach ($data['default'] as $field_name => $values) {
+        $this->setFieldValues($entity, $field_name, $values);
+      }
 
-    foreach ($data['translations'] ?? [] as $langcode => $translation_data) {
-      if ($this->languageManager->getLanguage($langcode)) {
-        $translation = $entity->addTranslation($langcode, $entity->toArray());
-        foreach ($translation_data as $field_name => $values) {
-          $this->setFieldValues($translation, $field_name, $values);
+      foreach ($data['translations'] ?? [] as $langcode => $translation_data) {
+        if ($this->languageManager->getLanguage($langcode)) {
+          $translation = $entity->addTranslation($langcode, $entity->toArray());
+          foreach ($translation_data as $field_name => $values) {
+            $this->setFieldValues($translation, $field_name, $values);
+          }
         }
       }
-    }
 
-    if ($is_root) {
-      $this->dependencies = NULL;
+      return $entity;
     }
-    return $entity;
+    finally {
+      // Reset the dependencies even if building the entity throws, so a failed
+      // import (e.g. an entity referencing content that was skipped) does not
+      // leave stale dependencies that break resolution for entities imported
+      // afterwards through the same (shared) importer instance.
+      if ($is_root) {
+        $this->dependencies = NULL;
+      }
+    }
   }
 
   /**
