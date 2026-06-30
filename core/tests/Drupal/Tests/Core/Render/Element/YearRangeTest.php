@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Render\Element;
 
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\YearRange;
@@ -14,9 +15,19 @@ use PHPUnit\Framework\Attributes\Group;
 /**
  * Tests the year range element.
  */
-#[Group('render')]
+#[Group('render2')]
 #[CoversClass(YearRange::class)]
 class YearRangeTest extends UnitTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+    $container = new ContainerBuilder();
+    $container->set('string_translation', $this->getStringTranslationStub());
+    \Drupal::setContainer($container);
+  }
 
   /**
    * @legacy-covers ::valueCallback
