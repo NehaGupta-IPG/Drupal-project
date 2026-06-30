@@ -118,11 +118,7 @@ class CommentCreationAccessTest extends KernelTestBase {
   }
 
   /**
-   * Tests that forbiddenMessage() shows a login link with post permission.
-   *
-   * CommentManager::forbiddenMessage() checks whether authenticated users can
-   * post comments by loading the authenticated role and checking its
-   * permissions directly, rather than proxying through a dummy user session.
+   * Tests that forbiddenMessage() shows login link when authenticated can post.
    */
   public function testForbiddenMessageWithPostPermission(): void {
     $this->installConfig(['user']);
