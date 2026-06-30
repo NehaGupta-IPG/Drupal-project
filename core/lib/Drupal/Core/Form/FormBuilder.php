@@ -1175,7 +1175,11 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
         $user_input = $form_state->getUserInput();
         $buttons = $form_state->getButtons();
         $invalid_triggering_element = FALSE;
-        if (!empty($user_input['_triggering_element_name'])) {
+
+        $request = $this->requestStack->getCurrentRequest();
+        $is_ajax = $request->query->has(static::AJAX_FORM_REQUEST) || $request->isXmlHttpRequest();
+
+        if (!$is_ajax && !empty($user_input['_triggering_element_name'])) {
           // If a triggering element is set in the user input,
           // but no triggering element could be determined,
           // the user probably didn't want to submit this.
@@ -1183,7 +1187,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
           $form_state->setError($element, new TranslatableMarkup('The form submission is invalid.'));
           $invalid_triggering_element = TRUE;
         }
-        elseif (!empty($buttons)) {
+        elseif (!$is_ajax && !empty($buttons)) {
           // If a button element is set in the user input,
           // but no triggering element could be determined,
           // the user probably didn't want to submit this.
