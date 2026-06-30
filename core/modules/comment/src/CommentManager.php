@@ -46,13 +46,6 @@ class CommentManager implements CommentManagerInterface {
   protected $entityTypeManager;
 
   /**
-   * Whether the \Drupal\user\RoleInterface::AUTHENTICATED_ID can post comments.
-   *
-   * @var bool
-   */
-  protected $authenticatedCanPostComments;
-
-  /**
    * The user settings config object.
    *
    * @var \Drupal\Core\Config\Config
@@ -152,23 +145,21 @@ class CommentManager implements CommentManagerInterface {
   public function forbiddenMessage(EntityInterface $entity, $field_name) {
     // Get comments-field.
     $field = $entity->get($field_name);
-    if (!isset($this->authenticatedCanPostComments)) {
-      // We only output a link if we are certain that users will get the
-      // permission to post comments by logging in, so check 'create' access for
-      // authenticated user using CommentAccessControlHandler (proxying over
-      // field). Simulate authenticated user by creating a dummy user session
-      // with uid = '-1', which is actually not valid, but avoid real user
-      // access cache.
-      $dummy_authenticated_user = new UserSession([
-        'uid' => -1,
-        'roles' => [
-          UserInterface::AUTHENTICATED_ROLE,
-        ],
-      ]);
-      $this->authenticatedCanPostComments = $field->access('create', $dummy_authenticated_user);
-    }
+    // We only output a link if we are certain that users will get the
+    // permission to post comments by logging in, so check 'create' access for
+    // authenticated user using CommentAccessControlHandler (proxying over
+    // field). Simulate authenticated user by creating a dummy user session
+    // with uid = '-1', which is actually not valid, but avoid real user
+    // access cache.
+    $dummy_authenticated_user = new UserSession([
+      'uid' => -1,
+      'roles' => [
+        UserInterface::AUTHENTICATED_ROLE,
+      ],
+    ]);
+    $authenticatedCanPostComments = $field->access('create', $dummy_authenticated_user);
 
-    if ($this->authenticatedCanPostComments) {
+    if ($authenticatedCanPostComments) {
       // We cannot use the redirect.destination service here because these links
       // sometimes appear on /node and taxonomy listing pages.
       if ($field->getFieldDefinition()->getSetting('form_location') == FormLocation::SeparatePage->value) {
