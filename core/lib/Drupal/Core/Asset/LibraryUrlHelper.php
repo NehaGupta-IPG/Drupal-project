@@ -5,12 +5,17 @@ namespace Drupal\Core\Asset;
 use Drupal\Component\Utility\UrlHelper;
 
 /**
- * A CacheCollector implementation for building library extension info.
+ * A Url helper implementation for (un)compressing library information.
  */
-class LibraryUrlHelper {
+readonly class LibraryUrlHelper {
 
+  /**
+   * Constructs a new LibraryUrlHelper.
+   *
+   * @param LibraryDiscoveryInterface $libraryDiscovery $
+   */
   public function __construct(
-    private readonly LibraryDiscoveryInterface $libraryDiscovery,
+    private LibraryDiscoveryInterface $libraryDiscovery,
   ) {}
 
   public function compress(string $data): string {
@@ -31,7 +36,7 @@ class LibraryUrlHelper {
 
     $data = [];
     foreach ($map as $extension => $indices) {
-      $data[] = $extension.'/'.implode('+', $indices);
+      $data[] = $extension . '/' . implode('+', $indices);
     }
 
     $data = implode(',', $data);
@@ -56,8 +61,8 @@ class LibraryUrlHelper {
         // When dealing with an index, lookup the library name, otherwise treat
         // the item as a library name.
         $map[] = (int) $item == $item
-          ? $extension.'/'.$extension_library_names[$item]
-          : $extension.'/'.$item;
+          ? $extension . '/' . $extension_library_names[$item]
+          : $extension . '/' . $item;
       }
     }
 

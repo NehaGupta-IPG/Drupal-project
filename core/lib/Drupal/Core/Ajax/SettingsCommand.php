@@ -2,8 +2,6 @@
 
 namespace Drupal\Core\Ajax;
 
-use Drupal\Component\Utility\UrlHelper;
-
 /**
  * AJAX command for adjusting Drupal's JavaScript settings.
  *

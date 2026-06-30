@@ -4,7 +4,6 @@ namespace Drupal\Core\Asset;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\NestedArray;
-use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
@@ -69,7 +68,7 @@ class AssetResolver implements AssetResolverInterface {
   /**
    * A url helper to compress libraries.
    *
-   * @var \Drupal\Core\Asset\LibraryUrlHelper $libraryUrl
+   * @var \Drupal\Core\Asset\LibraryUrlHelper $libraryUrlHelper
    */
   protected LibraryUrlHelper $libraryUrlHelper;
 
@@ -90,6 +89,8 @@ class AssetResolver implements AssetResolverInterface {
    *   The cache backend.
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
    *   The theme handler service.
+   * @param \Drupal\Core\Asset\LibraryUrlHelper $library_url_helper
+   *   The Url helper for (un)compressing the library names.
    */
   public function __construct(LibraryDiscoveryInterface $library_discovery, LibraryDependencyResolverInterface $library_dependency_resolver, ModuleHandlerInterface $module_handler, ThemeManagerInterface $theme_manager, LanguageManagerInterface $language_manager, CacheBackendInterface $cache, ThemeHandlerInterface $theme_handler, LibraryUrlHelper $library_url_helper) {
     $this->libraryDiscovery = $library_discovery;

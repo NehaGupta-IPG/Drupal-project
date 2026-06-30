@@ -42,6 +42,8 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
    *   The time service.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
+   * @param \Drupal\Core\Asset\LibraryUrlHelper $libraryUrlHelper
+   *   The Url helper for (un)compressing the library names.
    */
   public function __construct(
     protected readonly AssetCollectionGrouperInterface $grouper,

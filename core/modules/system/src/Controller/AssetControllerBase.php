@@ -2,7 +2,6 @@
 
 namespace Drupal\system\Controller;
 
-use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Asset\AssetCollectionGrouperInterface;
 use Drupal\Core\Asset\AssetCollectionOptimizerInterface;
 use Drupal\Core\Asset\AssetDumperUriInterface;
@@ -83,6 +82,8 @@ abstract class AssetControllerBase extends FileDownloadController {
    *   The asset collection optimizer.
    * @param \Drupal\Core\Asset\AssetDumperUriInterface $dumper
    *   The asset dumper.
+   * @param \Drupal\Core\Asset\LibraryUrlHelper $libraryUrlHelper
+   *   The Url helper for (un)compressing the library names.
    */
   public function __construct(
     StreamWrapperManagerInterface $streamWrapperManager,

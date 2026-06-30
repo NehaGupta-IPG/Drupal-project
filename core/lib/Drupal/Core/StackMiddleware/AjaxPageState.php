@@ -12,13 +12,14 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  * Expands the compressed ajax_page_state query parameter into an array.
  */
 class AjaxPageState implements HttpKernelInterface {
+
   /**
    * Constructs a new AjaxPageState instance.
    *
    * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
    *   The wrapped HTTP kernel.
-   * @param  \Drupal\Core\Asset\LibraryUrlHelper  $libraryUrlHelper
-   *    A Url helper for (un)compressing the library names.
+   * @param \Drupal\Core\Asset\LibraryUrlHelper $libraryUrlHelper
+   *   The Url helper for (un)compressing the library names.
    */
   public function __construct(
     protected readonly HttpKernelInterface $httpKernel,
@@ -26,7 +27,6 @@ class AjaxPageState implements HttpKernelInterface {
     protected readonly LibraryUrlHelper $libraryUrlHelper,
   ) {
   }
-
 
   /**
    * {@inheritdoc}
