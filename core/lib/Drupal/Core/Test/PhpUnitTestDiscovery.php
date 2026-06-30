@@ -407,7 +407,7 @@ class PhpUnitTestDiscovery {
 
     return [
       'name' => $testClass->name(),
-      'group' => $groups[0],
+      'group' => array_first($groups),
       'groups' => $groups,
       'type' => $testSuite,
       'description' => $description,
