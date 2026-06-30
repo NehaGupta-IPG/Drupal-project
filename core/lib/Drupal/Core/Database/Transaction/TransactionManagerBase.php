@@ -318,7 +318,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
       return;
     }
 
-    // We deprecate auto-commit on destruction, but in case an exception is
+    // Auto-commit on destruction is not supported, but in case an exception is
     // thrown, we still need to destruct and cleanup objects in relation to the
     // underlying database transaction, so we do not trigger the error in such
     // circumstance.
@@ -326,11 +326,8 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
       assert(FALSE, 'Database commit or release savepoint by letting a Transaction object go out of scope is not supported');
     }
 
-    // Commit the transaction.
-    // When we get here, the transaction (or savepoint) is still active on the
-    // database. We can unpile it, and if we are left with no more items in the
-    // stack, we can also process the post transaction callbacks.
-    $this->commit($name, $id);
+    // When we get here, the transaction (or savepoint) is no longer active on
+    // the database. We can process the post transaction callbacks.
     $this->removeStackItem($id);
     if ($this->rootId === $id) {
       $this->processPostTransactionCallbacks();
