@@ -10,6 +10,7 @@ use Drupal\BuildTests\Framework\BuildTestBase;
 use Drupal\Tests\Composer\Plugin\ExecTrait;
 use Drupal\Tests\Composer\Plugin\Unpack\Fixtures;
 use PHPUnit\Framework\Attributes\Group;
+use Symfony\Component\Finder\Finder;
 
 /**
  * Tests recipe unpacking.
@@ -49,6 +50,16 @@ class UnpackRecipeTest extends BuildTestBase {
       'COMPOSER_INSTALLERS' => InstalledVersions::getInstallPath('composer/installers'),
     ];
     $this->fixtures->cloneFixtureProjects($this->fixturesDir, $replacements);
+
+    // The recipes' `composer.json` files shouldn't have an explicit version;
+    // Composer should infer it.
+    $finder = Finder::create()
+      ->files()
+      ->name('composer.json')
+      ->in($this->fixturesDir . '/recipes');
+    foreach ($finder as $composer_json) {
+      $this->assertArrayNotHasKey('version', $this->getFileContents($composer_json->getPathname()));
+    }
   }
 
   /**
@@ -675,6 +686,14 @@ class UnpackRecipeTest extends BuildTestBase {
     // Ensure recipe files exist.
     $this->assertFileExists($root_project_path . '/recipes/recipe-a/recipe.yml');
     $this->assertFileExists($root_project_path . '/recipes/recipe-b/recipe.yml');
+
+    // A version should have been written to each recipe's `composer.json`.
+    $this->assertNotEmpty(
+      $this->getFileContents($root_project_path . '/recipes/recipe-a/composer.json')['version'],
+    );
+    $this->assertNotEmpty(
+      $this->getFileContents($root_project_path . '/recipes/recipe-b/composer.json')['version'],
+    );
 
     // Ensure composer.lock is ordered correctly.
     $root_composer_lock = $this->getFileContents($root_project_path . '/composer.lock');
