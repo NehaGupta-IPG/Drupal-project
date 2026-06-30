@@ -60,7 +60,9 @@ class MediaOverviewPageTest extends MediaFunctionalTestBase {
     $assert_session->fieldExists('Media name');
     $assert_session->selectExists('type');
     $assert_session->selectExists('status');
-    $assert_session->selectExists('langcode');
+    // The language filter only appears once the media uses more than one
+    // language; with no media there is nothing to filter by.
+    $assert_session->fieldNotExists('langcode');
     $assert_session->buttonExists('Filter');
     $header = $assert_session->elementExists('css', 'th#view-thumbnail-target-id-table-column');
     $this->assertSame('Thumbnail', $header->getText());

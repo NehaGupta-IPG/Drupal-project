@@ -636,7 +636,6 @@ display:
           plugin_id: language
           operator: in
           value: {  }
-          limit_to_content_languages: true
           group: 1
           exposed: true
           expose:
@@ -666,6 +665,7 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
+          limit_to_content_languages: true
         moderation_state_1:
           id: moderation_state_1
           table: node_field_revision
