@@ -484,11 +484,20 @@ export default class DrupalMediaEditing extends Plugin {
       // model element remains untouched and that the caption is not rendered
       // into the preview.
       const clonedModelElement = writer.cloneElement(modelElement, false);
-      // Remove attributes from the model element to ensure they are not
-      // downcast into the preview request. For example, the `linkHref` model
-      // attribute would downcast into a wrapping `<a>` element, which the
-      // preview endpoint would not be able to handle.
-      const attributeIgnoreList = ['linkHref'];
+      // Remove attributes that would wrap the media in the preview request.
+      // `linkHref` would add an `<a>`, and the list attributes would add a
+      // `<ul>`/`<ol>` + `<li>` around a media placed in a list item, which the
+      // preview endpoint would render back, duplicating the list in the widget.
+      const attributeIgnoreList = [
+        'linkHref',
+        'listItemId',
+        'listType',
+        'listIndent',
+        'listStyle',
+        'listReversed',
+        'listStart',
+      ];
+
       attributeIgnoreList.forEach((attribute) => {
         writer.removeAttribute(attribute, clonedModelElement);
       });
