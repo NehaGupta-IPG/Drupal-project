@@ -3,6 +3,7 @@
 namespace Drupal\Core\Database;
 
 use Drupal\Core\Database\Query\PlaceholderInterface;
+use Drupal\Core\Database\SchemaDefinition\Table as TableDefinition;
 
 /**
  * Provides a base implementation for Database Schema.
@@ -628,7 +629,34 @@ abstract class Schema implements PlaceholderInterface {
   abstract public function changeField($table, $field, $field_new, $spec, $keys_new = []);
 
   /**
-   * Create a new table from a Drupal table definition.
+   * Create a new table from a table schema definition.
+   *
+   * @param \Drupal\Core\Database\SchemaDefinition\Table|string|int $table
+   *   A Schema API table definition, or the name of the table if $data is
+   *   specified, or an index of an array of TableDefinition objects.
+   * @param array|\Drupal\Core\Database\SchemaDefinition\Table|null $data
+   *   (optional) A legacy table data definition in array format, or a
+   *   TableDefinition object.
+   *
+   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   *   If the specified table already exists.
+   * @throws \BadMethodCallException
+   *   When concrete driver class is missing implementations.
+   */
+  final public function createTableFromDefinition(TableDefinition|string|int $table, array|TableDefinition|null $data = NULL): void {
+    if ($table instanceof TableDefinition) {
+      $this->createTable($table->name, $table->toArray());
+    }
+    elseif ($data instanceof TableDefinition) {
+      $this->createTable($data->name, $data->toArray());
+    }
+    else {
+      $this->createTable($table, $data);
+    }
+  }
+
+  /**
+   * Create a new table from a Drupal array table definition.
    *
    * @param string $name
    *   The name of the table to create.

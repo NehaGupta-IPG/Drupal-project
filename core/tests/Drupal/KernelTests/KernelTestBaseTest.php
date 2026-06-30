@@ -6,6 +6,9 @@ namespace Drupal\KernelTests;
 
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\TestTools\Extension\Dump\DebugDump;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\visitor\vfsStreamStructureVisitor;
@@ -80,15 +83,17 @@ class KernelTestBaseTest extends KernelTestBase {
     $this->assertEquals($this, $GLOBALS['conf']['container_service_providers']['test']);
 
     $database = $this->container->get('database');
-    $database->schema()->createTable('foo', [
-      'fields' => [
-        'number' => [
-          'type' => 'int',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-        ],
+    $database->schema()->createTableFromDefinition(new Table(
+      name: 'foo',
+      columns: [
+        new Column(
+          name: 'number',
+          type: ColumnType::Int,
+          unsigned: TRUE,
+          notNull: TRUE,
+        ),
       ],
-    ]);
+    ));
     $this->assertTrue($database->schema()->tableExists('foo'));
 
     $this->assertNotNull(FileCacheFactory::getPrefix());

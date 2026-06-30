@@ -6,6 +6,9 @@ namespace Drupal\KernelTests\Core\Entity\Sql;
 
 use Drupal\Core\Database\Event\StatementEvent;
 use Drupal\Core\Database\Log;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Sql\DefaultTableMapping;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -77,26 +80,31 @@ class SqlContentEntityStorageTest extends EntityKernelTestBase {
 
     // Create the dummy dedicated data tables.
     $schema = $storage->database->schema();
-    $schema->createTable('dedicated_table', [
-      'fields' => [
-        'entity_id' => [
-          'type' => 'int',
-          'not null' => TRUE,
-        ],
+    $schema->createTableFromDefinition(new Table(
+      name: 'dedicated_table',
+      columns: [
+        new Column(
+          name: 'entity_id',
+          type: ColumnType::Int,
+          notNull: TRUE,
+        ),
       ],
-    ]);
-    $schema->createTable('dedicated_revision_table', [
-      'fields' => [
-        'entity_id' => [
-          'type' => 'int',
-          'not null' => TRUE,
-        ],
-        'vid' => [
-          'type' => 'int',
-          'not null' => TRUE,
-        ],
+    ));
+    $schema->createTableFromDefinition(new Table(
+      name: 'dedicated_revision_table',
+      columns: [
+        new Column(
+          name: 'entity_id',
+          type: ColumnType::Int,
+          notNull: TRUE,
+        ),
+        new Column(
+          name: 'vid',
+          type: ColumnType::Int,
+          notNull: TRUE,
+        ),
       ],
-    ]);
+    ));
 
     // Set up a test query logger to capture executed queries.
     $logger = new Log();

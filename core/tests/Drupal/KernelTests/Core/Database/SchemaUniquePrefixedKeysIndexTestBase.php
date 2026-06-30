@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\Exception\SchemaDefinitionException;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\UniqueKey;
+use Drupal\Core\Database\SchemaDefinition\Table;
 
 /**
  * Tests adding UNIQUE keys to tables.
@@ -28,19 +33,21 @@ abstract class SchemaUniquePrefixedKeysIndexTestBase extends DriverSpecificDatab
    * Tests UNIQUE keys put directly on the table definition.
    */
   public function testCreateTable(): void {
-    $this->connection->schema()->createTable('test_unique', [
-      'fields' => [
-        'field' => [
-          'type' => 'varchar',
-          'length' => 50,
-        ],
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessage('Limited length columns not allowed in this context');
+    $this->connection->schema()->createTableFromDefinition(new Table(
+      name: 'test_unique',
+      columns: [
+        new Column(
+          name: 'field',
+          type: ColumnType::Varchar,
+          length: 50,
+        ),
       ],
-      'unique keys' => [
-        'field' => [['field', 10]],
+      uniqueKeys: [
+        new UniqueKey(name: 'field', columns:[['field', 10]]),
       ],
-    ]);
-
-    $this->checkUniqueConstraintException('test_unique', 'field');
+    ));
   }
 
   /**

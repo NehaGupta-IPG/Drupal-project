@@ -7,6 +7,10 @@ namespace Drupal\KernelTests\Core\Config\Storage;
 use Drupal\Core\Config\DatabaseStorage;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\NullValue;
+use Drupal\Core\Database\SchemaDefinition\Table;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -70,15 +74,18 @@ class DatabaseStorageTest extends ConfigStorageTestBase {
     Database::getConnection()->schema()->dropTable('config');
     // In order to simulate database issue create a table with an incorrect
     // specification.
-    $table_specification = [
-      'fields' => [
-        'id'  => [
-          'type' => 'int',
-          'default' => NULL,
+    Database::getConnection()->schema()->createTableFromDefinition(
+      new Table(
+        name: 'config',
+        columns: [
+          new Column(
+            name: 'id',
+            type: ColumnType::Int,
+            default: new NullValue(),
+          ),
         ],
-      ],
-    ];
-    Database::getConnection()->schema()->createTable('config', $table_specification);
+      ),
+    );
 
     try {
       $this->storage->exists('config.settings');

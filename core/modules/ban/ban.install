@@ -5,31 +5,44 @@
  * Install, update and uninstall functions for the Ban module.
  */
 
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\Index;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\StringValue;
+use Drupal\Core\Database\SchemaDefinition\Table;
+
 /**
  * Implements hook_schema().
  */
-function ban_schema(): array {
-  $schema['ban_ip'] = [
-    'description' => 'Stores banned IP addresses.',
-    'fields' => [
-      'iid' => [
-        'description' => 'Primary Key: unique ID for IP addresses.',
-        'type' => 'serial',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ],
-      'ip' => [
-        'description' => 'IP address',
-        'type' => 'varchar_ascii',
-        'length' => 40,
-        'not null' => TRUE,
-        'default' => '',
-      ],
+function ban_schema(): Schema {
+  return new Schema(
+    name: 'ban',
+    tables: [
+      new Table(
+        name: 'ban_ip',
+        description: 'Stores banned IP addresses.',
+        columns: [
+          new Column(
+            name: 'iid',
+            description: 'Primary Key: unique ID for IP addresses.',
+            type: ColumnType::Serial,
+          ),
+          new Column(
+            name: 'ip',
+            description: 'IP address',
+            type: ColumnType::VarcharAscii,
+            length: 40,
+            notNull: TRUE,
+            default: new StringValue(''),
+          ),
+        ],
+        primaryKey: new PrimaryKey(['iid']),
+        indexes: [
+          new Index(name: 'ip', columns: ['ip']),
+        ],
+      ),
     ],
-    'indexes' => [
-      'ip' => ['ip'],
-    ],
-    'primary key' => ['iid'],
-  ];
-  return $schema;
+  );
 }

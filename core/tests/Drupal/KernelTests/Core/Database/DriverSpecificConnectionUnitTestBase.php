@@ -6,6 +6,9 @@ namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\Table;
 
 // cspell:ignore processlist
 
@@ -177,14 +180,18 @@ abstract class DriverSpecificConnectionUnitTestBase extends DriverSpecificKernel
   public function testOpenSelectQueryClose(): void {
     // Create a table.
     $name = 'foo';
-    Database::getConnection(static::TEST_TARGET_CONNECTION)->schema()->createTable($name, [
-      'fields' => [
-        'name' => [
-          'type' => 'varchar',
-          'length' => 255,
+    Database::getConnection(static::TEST_TARGET_CONNECTION)->schema()->createTableFromDefinition(
+      new Table(
+        name: $name,
+        columns: [
+          new Column(
+            name: 'name',
+            type: ColumnType::Varchar,
+            length: 255,
+          ),
         ],
-      ],
-    ]);
+      ),
+    );
 
     // Execute a query.
     Database::getConnection(static::TEST_TARGET_CONNECTION)->select('foo', 'f')

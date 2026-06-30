@@ -6,6 +6,10 @@ namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\Transaction;
 use Drupal\Core\Database\Transaction\ClientConnectionTransactionState;
 use Drupal\Core\Database\Transaction\StackItem;
@@ -710,17 +714,16 @@ class TransactionTest extends DatabaseTestBase {
    */
   protected function executeDDLStatement(): void {
     static $count = 0;
-    $table = [
-      'fields' => [
-        'id' => [
-          'type' => 'serial',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-        ],
+    $this->connection->schema()->createTableFromDefinition(new Table(
+      name: 'database_test_' . ++$count,
+      columns: [
+        new Column(
+          name: 'id',
+          type: ColumnType::Serial,
+        ),
       ],
-      'primary key' => ['id'],
-    ];
-    $this->connection->schema()->createTable('database_test_' . ++$count, $table);
+      primaryKey: new PrimaryKey(['id']),
+    ));
   }
 
   /**
