@@ -1571,8 +1571,11 @@
       }
 
       if (response.merge) {
-        if (drupalSettings.ajaxPageState.theme !== response.settings.ajaxPageState.theme) {
-          throw new Error('The theme in ajax_page_state should not be changed after it is set.');
+        if (drupalSettings.ajaxPageState.theme !==
+          response.settings.ajaxPageState.theme) {
+          throw new Error(
+            'The theme in ajax_page_state should not be changed after it is set.'
+          );
         }
 
         $.extend(true, drupalSettings, response.settings);
