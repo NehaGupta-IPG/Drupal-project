@@ -1295,28 +1295,13 @@ class TransactionTest extends DatabaseTestBase {
   }
 
   /**
-   * Tests deprecation of implicit commit.
+   * Tests failure of implicit commit.
    */
-  #[IgnoreDeprecations]
   public function testDeprecationOfImplicitCommit(): void {
     $this->expectUserDeprecationMessage('Database commit by letting a Transaction object go out of scope is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Commit explicitly via Transaction::commitOrRelease() instead. See https://www.drupal.org/node/3524461');
     $transaction = $this->createRootTransaction();
     unset($transaction);
     $this->assertRowPresent('David');
-  }
-
-  /**
-   * Tests deprecation of ::commitAll().
-   */
-  #[IgnoreDeprecations]
-  public function testDeprecationOfCommitAll(): void {
-    $this->expectUserDeprecationMessage('Committing transactions via Drupal\\Core\\Database\\Transaction\\TransactionManagerBase::commitAll() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3524461');
-    $transaction = $this->createRootTransaction();
-    $savepoint = $this->createFirstSavepointTransaction();
-    $this->connection->commitAll();
-    $this->assertRowPresent('David');
-    $this->assertRowPresent('Roger');
-    unset($transaction, $savepoint);
   }
 
   /**
