@@ -136,7 +136,9 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * When destructing, $stack must have been already emptied.
    */
   public function __destruct() {
-    assert($this->stack === [], "Transaction \$stack was not empty. Active stack: " . $this->dumpStackItemsAsString());
+    if (!$this->exceptionThrown) {
+      assert($this->stack === [], "Transaction \$stack was not empty. Active stack: " . $this->dumpStackItemsAsString());
+    }
   }
 
   /**
@@ -323,6 +325,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     // underlying database transaction, so we do not trigger the error in such
     // circumstance.
     if (!$this->exceptionThrown) {
+      $this->exceptionThrown = TRUE;
       assert(FALSE, 'Database commit or release savepoint by letting a Transaction object go out of scope is not supported');
     }
 
