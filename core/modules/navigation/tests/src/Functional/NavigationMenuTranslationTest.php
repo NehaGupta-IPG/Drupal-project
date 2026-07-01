@@ -9,6 +9,7 @@ use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore rakenne nayta profiili
 /**
  * Tests that the navigation is shown in the preferred admin language.
  *
