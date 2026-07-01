@@ -148,11 +148,11 @@ class DrupalKernelTest extends KernelTestBase {
 
     // Check that the location of the new module is registered.
     $modules = $container->getParameter('container.modules');
-    $module_extension_list = $container->get('extension.list.module');
+    $path_names = $container->get('extension.list.module')->getPathNames();
     $this->assertEquals(
       [
         'type' => 'module',
-        'pathname' => $module_extension_list->getPathname('service_provider_test'),
+        'pathname' => $path_names['service_provider_test'],
         'filename' => NULL,
       ],
       $modules['service_provider_test']

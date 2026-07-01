@@ -13,6 +13,7 @@ use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -26,68 +27,77 @@ class ExtensionPathResolverTest extends KernelTestBase {
   /**
    * Tests extension path resolving.
    *
-   * @legacy-covers ::getPathname
+   * @legacy-covers ::getPath
    */
   public function testExtensionPathResolving(): void {
     // Retrieving the location of a module.
-    $this->assertSame('core/modules/system/system.info.yml', \Drupal::service('extension.list.module')
-      ->getPathname('system'));
+    $this->assertSame('core/modules/system', \Drupal::service('extension.list.module')
+      ->getPath('system'));
 
     // Retrieving the location of a theme.
     \Drupal::service('theme_installer')->install(['stark']);
-    $this->assertSame('core/themes/stark/stark.info.yml', \Drupal::service('extension.list.theme')
-      ->getPathname('stark'));
+    $this->assertSame('core/themes/stark', \Drupal::service('extension.list.theme')
+      ->getPath('stark'));
 
     // Retrieving the location of a profile. Profiles are a special case with
     // a fixed location and naming.
-    $this->assertSame('core/profiles/tests/testing/testing.info.yml', \Drupal::service('extension.list.profile')
-      ->getPathname('testing'));
+    $this->assertSame('core/profiles/tests/testing', \Drupal::service('extension.list.profile')
+      ->getPath('testing'));
   }
 
   /**
    * Tests extension path resolving path.
    *
-   * @legacy-covers ::getPath
+   * @legacy-covers ::getPathNames
    */
   public function testExtensionPathResolvingPath(): void {
-    $this->assertSame('core/modules/system/tests/modules/driver_test', \Drupal::service('extension.list.module')
-      ->getPath('driver_test'));
+    $path_names = \Drupal::service('extension.list.module')->getPathNames();
+    $this->assertSame('core/modules/system/tests/modules/driver_test/driver_test.info.yml', $path_names['driver_test']);
   }
 
   /**
-   * Tests extension path resolving with non existing module.
+   * Tests extension path resolving with a non-existing module.
    *
-   * @legacy-covers ::getPathname
+   * @legacy-covers ::getPath
    */
   public function testExtensionPathResolvingWithNonExistingModule(): void {
     $this->expectException(UnknownExtensionException::class);
     $this->expectExceptionMessage('The module there_is_a_module_for_that does not exist.');
-    $this->assertNull(\Drupal::service('extension.list.module')
-      ->getPathname('there_is_a_module_for_that'), 'Searching for an item that does not exist returns NULL.');
+    \Drupal::service('extension.list.module')
+      ->getPath('there_is_a_module_for_that');
   }
 
   /**
-   * Tests extension path resolving with non existing theme.
+   * Tests extension path resolving with a non-existing theme.
    *
-   * @legacy-covers ::getPathname
+   * @legacy-covers ::getPath
    */
   public function testExtensionPathResolvingWithNonExistingTheme(): void {
     $this->expectException(UnknownExtensionException::class);
     $this->expectExceptionMessage('The theme there_is_a_theme_for_you does not exist.');
-    $this->assertNull(\Drupal::service('extension.list.theme')
-      ->getPathname('there_is_a_theme_for_you'), 'Searching for an item that does not exist returns NULL.');
+    \Drupal::service('extension.list.theme')
+      ->getPath('there_is_a_theme_for_you');
   }
 
   /**
-   * Tests extension path resolving with non existing profile.
+   * Tests extension path resolving with a non-existing profile.
    *
-   * @legacy-covers ::getPathname
+   * @legacy-covers ::getPath
    */
   public function testExtensionPathResolvingWithNonExistingProfile(): void {
     $this->expectException(UnknownExtensionException::class);
     $this->expectExceptionMessage('The profile there_is_an_install_profile_for_you does not exist.');
-    $this->assertNull(\Drupal::service('extension.list.profile')
-      ->getPathname('there_is_an_install_profile_for_you'), 'Searching for an item that does not exist returns NULL.');
+    \Drupal::service('extension.list.profile')
+      ->getPath('there_is_an_install_profile_for_you');
+  }
+
+  /**
+   * Tests deprecation of getPathname().
+   */
+  #[IgnoreDeprecations]
+  public function testGetPathnameDeprecation(): void {
+    $this->expectUserDeprecationMessage('Drupal\Core\Extension\ExtensionPathResolver::getPathname() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use ::getPath() instead. See https://www.drupal.org/node/3601481');
+    $this->assertSame('core/modules/system/system.info.yml', \Drupal::service('extension.path.resolver')->getPathname('module', 'system'));
   }
 
   /**

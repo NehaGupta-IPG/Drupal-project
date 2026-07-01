@@ -37,8 +37,14 @@ class ExtensionPathResolver {
    *
    * @return string|null
    *   The extension path, or NULL if unknown.
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+   *   ::getPath() instead.
+   *
+   * @see https://www.drupal.org/node/3601481
    */
   public function getPathname(string $type, string $name): ?string {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use ::getPath() instead. See https://www.drupal.org/node/3601481', E_USER_DEPRECATED);
     if ($type === 'core') {
       return 'core/core.info.yml';
     }
@@ -46,7 +52,7 @@ class ExtensionPathResolver {
       throw new UnknownExtensionTypeException(sprintf('Extension type %s is unknown.', $type));
     }
     try {
-      return $this->extensionLists[$type]->getPathname($name);
+      return $this->extensionLists[$type]->getPath($name) . '/' . $name . '.info.yml';
     }
     catch (UnknownExtensionException) {
       // Catch the exception. This will result in triggering an error.
@@ -73,7 +79,13 @@ class ExtensionPathResolver {
    *   If the extension is unknown.
    */
   public function getPath(string $type, string $name): string {
-    return dirname($this->getPathname($type, $name));
+    if ($type === 'core') {
+      return 'core';
+    }
+    if (!isset($this->extensionLists[$type])) {
+      throw new UnknownExtensionTypeException(sprintf('Extension type %s is unknown.', $type));
+    }
+    return $this->extensionLists[$type]->getPath($name);
   }
 
 }
