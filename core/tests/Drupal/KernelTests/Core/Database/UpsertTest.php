@@ -63,6 +63,18 @@ class UpsertTest extends DatabaseTestBase {
   }
 
   /**
+   * Confirms that an upsert with no columns to update fails.
+   */
+  public function testUpsertFailOnNoUpdateColumns(): void {
+    $this->expectException(\LogicException::class);
+    $this->expectExceptionMessage('There must be at least one column to update in an upsert operation');
+    $this->connection->upsert('test_people')
+      ->key('job')
+      ->fields(['job' => 'Plumber'])
+      ->execute();
+  }
+
+  /**
    * Confirms that we can upsert using UpsertValue value objects.
    */
   public function testUpsertWithUpsertValue(): void {
