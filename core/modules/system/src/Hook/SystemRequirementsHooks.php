@@ -9,7 +9,6 @@ use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Extension\ExtensionLifecycle;
-use Drupal\Core\Extension\RemovedCoreExtensionList;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Link;
@@ -24,6 +23,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\PhpRequirements;
 use Drupal\system\Install\Requirements\SystemRequirements;
+use Drupal\system\RemovedCoreExtensionList;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

@@ -8,7 +8,7 @@ use Drupal\Component\Serialization\Yaml;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Url;
 use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\Core\Extension\RemovedCoreExtensionList;
+use Drupal\system\RemovedCoreExtensionList;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\RequirementsPageTrait;
 use Drupal\TestTools\Extension\InfoWriterTrait;

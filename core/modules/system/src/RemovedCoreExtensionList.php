@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Core\Extension;
+namespace Drupal\system;
 
 /**
  * Lists extensions removed from Drupal core.

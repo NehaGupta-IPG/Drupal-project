@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\system\Install\Requirements;
 
 use Drupal\Core\Extension\InstallRequirementsInterface;
-use Drupal\Core\Extension\RemovedCoreExtensionList;
 use Drupal\Component\FileSystem\FileSystem as FileSystemComponent;
 use Drupal\Component\Utility\Environment;
 use Drupal\Component\Utility\OpCodeCache;
@@ -20,6 +19,7 @@ use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\Error;
 use Drupal\Core\Utility\PhpRequirements;
+use Drupal\system\RemovedCoreExtensionList;
 use Psr\Http\Client\ClientExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -32,7 +32,7 @@ class SystemRequirements implements InstallRequirementsInterface {
    * An array of machine names of modules that were removed from Drupal core.
    *
    * @deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use
-   *   \Drupal\Core\Extension\RemovedCoreExtensionList::MODULES instead.
+   *   \Drupal\system\RemovedCoreExtensionList::MODULES instead.
    *
    * @see https://www.drupal.org/node/3601118
    */
@@ -42,7 +42,7 @@ class SystemRequirements implements InstallRequirementsInterface {
    * An array of machine names of themes that were removed from Drupal core.
    *
    * @deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use
-   *   \Drupal\Core\Extension\RemovedCoreExtensionList::THEMES instead.
+   *   \Drupal\system\RemovedCoreExtensionList::THEMES instead.
    *
    * @see https://www.drupal.org/node/3601118
    */
