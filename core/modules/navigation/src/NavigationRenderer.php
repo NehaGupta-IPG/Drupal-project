@@ -20,6 +20,7 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Security\Attribute\TrustedCallback;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\language\AdminLanguageRender;
 use Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -94,11 +95,31 @@ final class NavigationRenderer {
    */
   #[TrustedCallback]
   public function doBuildNavigation(): array {
-    $build = [];
+    // Render the navigation in the user's preferred admin language. The switch
+    // added here runs (and is restored) around ::renderNavigation() below, so
+    // that the menu link titles it builds are translated in the admin language
+    // even on non-admin pages.
+    $build = [
+      '#pre_render' => ['navigation.renderer:renderNavigation'],
+    ];
+    if ($this->moduleHandler->moduleExists('language')) {
+      $build = AdminLanguageRender::applyTo($build);
+    }
+    return $build;
+  }
+
+  /**
+   * Pre-render callback that builds the navigation content.
+   */
+  #[TrustedCallback]
+  public function renderNavigation(array $element): array {
     $logo_settings = $this->configFactory->get('navigation.settings');
     $logo_provider = $logo_settings->get('logo.provider');
 
-    $cacheability = new CacheableMetadata();
+    // Start from the incoming element so any cacheability already set on it
+    // (for example, the admin-language contexts added by ::doBuildNavigation())
+    // is preserved.
+    $cacheability = CacheableMetadata::createFromRenderArray($element);
     $contexts = [
       'navigation' => new Context(ContextDefinition::create('string'), 'navigation'),
     ];
@@ -106,7 +127,7 @@ final class NavigationRenderer {
 
     if ($storage) {
       foreach ($storage->getSections() as $delta => $section) {
-        $build[$delta] = $section->toRenderArray([]);
+        $element[$delta] = $section->toRenderArray([]);
       }
     }
     // The render array is built based on decisions made by SectionStorage
@@ -114,28 +135,29 @@ final class NavigationRenderer {
     // cacheability of those decisions.
     $cacheability->addCacheableDependency($logo_settings)
       ->addCacheableDependency($this->configFactory->get('navigation.block_layout'));
-    $cacheability->applyTo($build);
+    $cacheability->applyTo($element);
 
     $defaults = [
       '#settings' => ['hide_logo' => $logo_provider === self::LOGO_PROVIDER_HIDE],
     ];
-    $build[0] = NestedArray::mergeDeepArray([$build[0], $defaults]);
+    $element[0] = NestedArray::mergeDeepArray([$element[0], $defaults]);
 
-    $build[0]['content_top'] = $this->getContentTop();
+    $element[0]['content_top'] = $this->getContentTop();
 
     if ($logo_provider === self::LOGO_PROVIDER_CUSTOM) {
       $logo_path = $logo_settings->get('logo.path');
       if (!empty($logo_path) && is_file($logo_path)) {
         $logo_managed_url = $this->fileUrlGenerator->generateAbsoluteString($logo_path);
         $image = $this->imageFactory->get($logo_path);
-        $build[0]['#settings']['logo_path'] = $logo_managed_url;
+        $element[0]['#settings']['logo_path'] = $logo_managed_url;
         if ($image->isValid()) {
-          $build[0]['#settings']['logo_width'] = $image->getWidth();
-          $build[0]['#settings']['logo_height'] = $image->getHeight();
+          $element[0]['#settings']['logo_width'] = $image->getWidth();
+          $element[0]['#settings']['logo_height'] = $image->getHeight();
         }
       }
     }
-    return $build;
+
+    return $element;
   }
 
   /**
