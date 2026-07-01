@@ -8261,12 +8261,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "00aa859048db1adceed88164aad26cd681b0a713"
+                "reference": "28efa9bc0b1df4a0942797e9a71dd0cf8118fc1d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/00aa859048db1adceed88164aad26cd681b0a713",
-                "reference": "00aa859048db1adceed88164aad26cd681b0a713",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/28efa9bc0b1df4a0942797e9a71dd0cf8118fc1d",
+                "reference": "28efa9bc0b1df4a0942797e9a71dd0cf8118fc1d",
                 "shasum": ""
             },
             "require": {
@@ -8346,7 +8346,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2026-06-21T12:31:13+00:00"
+            "time": "2026-07-01T01:23:55+00:00"
         },
         {
             "name": "ramsey/collection",
