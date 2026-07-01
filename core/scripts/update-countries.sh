@@ -101,10 +101,9 @@ ksort($countries);
 // Produce PHP code.
 $out = '';
 foreach ($countries as $code => $name) {
-  // For .po translation file's sake, use double-quotes instead of escaped
-  // single-quotes.
-  $name = str_contains($name, '\'') ? '"' . $name . '"' : "'" . $name . "'";
-  $out .= '      ' . var_export($code, TRUE) . ' => t(' . $name . '),' . "\n";
+  // Encode names with var_export() so untrusted CLDR data cannot inject code
+  // into the generated PHP.
+  $out .= '      ' . var_export($code, TRUE) . ' => t(' . var_export($name, TRUE) . '),' . "\n";
 }
 
 // Replace the actual PHP code in standard.inc.
