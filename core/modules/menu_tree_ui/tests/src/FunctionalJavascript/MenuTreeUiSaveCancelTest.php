@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\menu_tree_ui\FunctionalJavascript;
 
-use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
-use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\menu_link_content\MenuLinkContentInterface;
-use Drupal\system\Entity\Menu;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -22,80 +19,21 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
-final class MenuTreeUiSaveCancelTest extends WebDriverTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = [
-    'menu_link_content',
-    'menu_tree_ui',
-  ];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $defaultTheme = 'stark';
-
-  /**
-   * Plugin IDs of seeded menu links keyed by single-letter label.
-   *
-   * @var array<string, string>
-   */
-  private array $linkIds = [];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-    $this->seedMenu();
-    $admin = $this->drupalCreateUser(['administer menu']);
-    $this->drupalLogin($admin);
-    $this->drupalGet('/admin/structure/menu/manage/test/tree');
-    $this->assertSession()->waitForElement(
-      'css',
-      'drupal-treegrid table[role="treegrid"] tbody tr[role="row"]'
-    );
-    // Reorder wiring is deferred until the CSRF token fetch resolves; wait for
-    // it so a move is not dispatched before the drag controller is listening.
-    $this->assertSession()->waitForElement(
-      'css',
-      'drupal-treegrid[data-treegrid-reorder-ready="true"]',
-    );
-  }
+final class MenuTreeUiSaveCancelTest extends MenuTreeUiJavascriptTestBase {
 
   /**
    * Seeds a menu with three top-level links A, B, C (A has one child, A1).
    *
    * A1 lets a test expand A and check that a Save keeps it open.
    */
-  private function seedMenu(): void {
-    Menu::create([
-      'id' => 'test',
-      'label' => 'Test',
-    ])->save();
+  protected function seedMenu(): void {
+    $this->createTestMenu();
 
     $weight = 0;
     foreach (['A', 'B', 'C'] as $label) {
       $this->linkIds[$label] = $this->createLink($label, '', $weight++);
     }
     $this->linkIds['A1'] = $this->createLink('A1', $this->linkIds['A'], 0);
-  }
-
-  /**
-   * Creates one menu_link_content entity and returns its plugin ID.
-   */
-  private function createLink(string $title, string $parent_plugin_id, int $weight): string {
-    $entity = MenuLinkContent::create([
-      'menu_name' => 'test',
-      'title' => $title,
-      'link' => ['uri' => 'route:<nolink>'],
-      'parent' => $parent_plugin_id,
-      'weight' => $weight,
-    ]);
-    $entity->save();
-    return $entity->getPluginId();
   }
 
   /**
@@ -273,47 +211,6 @@ final class MenuTreeUiSaveCancelTest extends WebDriverTestBase {
     );
 
     $this->assertSiblings(['C', 'A', 'B'], $this->childRowsSelector(NULL));
-  }
-
-  /**
-   * Asserts the ordered DOM rows that are direct children of a parent.
-   *
-   * @param string[] $expected_labels
-   *   Labels in the order they should appear as direct children.
-   * @param string $row_selector
-   *   CSS matching the direct child rows (a `tr[data-parent-id="…"]` set).
-   */
-  private function assertSiblings(array $expected_labels, string $row_selector): void {
-    $rows = $this->getSession()->getPage()->findAll('css', $row_selector);
-    $actual = [];
-    foreach ($rows as $row) {
-      $actual[] = $this->labelFor($row->getAttribute('data-id')) ?? '?';
-    }
-    $this->assertSame($expected_labels, $actual, "Sibling order matching $row_selector.");
-  }
-
-  /**
-   * Builds the CSS selector for the direct child rows of a parent.
-   *
-   * @param ?string $parent_label
-   *   The parent label, or NULL for the top level.
-   *
-   * @return string
-   *   The row selector.
-   */
-  private function childRowsSelector(?string $parent_label): string {
-    $parent_id = $parent_label === NULL
-      ? ''
-      : ($this->linkIds[$parent_label] ?? throw new \InvalidArgumentException("Unknown label $parent_label"));
-    return sprintf('tr[role="row"][data-parent-id="%s"]', $parent_id);
-  }
-
-  /**
-   * Returns the test label for a plugin ID, or NULL if unknown.
-   */
-  private function labelFor(string $plugin_id): ?string {
-    $label = array_search($plugin_id, $this->linkIds, TRUE);
-    return $label === FALSE ? NULL : (string) $label;
   }
 
   /**
