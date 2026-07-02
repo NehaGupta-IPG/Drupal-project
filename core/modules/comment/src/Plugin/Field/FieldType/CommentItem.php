@@ -4,9 +4,11 @@ namespace Drupal\comment\Plugin\Field\FieldType;
 
 use Drupal\comment\AnonymousContact;
 use Drupal\comment\CommentFieldItemList;
+use Drupal\comment\CommentingStatus;
 use Drupal\comment\CommentManagerInterface;
 use Drupal\comment\CommentPreviewMode;
 use Drupal\comment\Entity\CommentType;
+use Drupal\comment\FormLocation;
 use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
@@ -47,7 +49,7 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
     return [
       'default_mode' => CommentManagerInterface::COMMENT_MODE_THREADED,
       'per_page' => 50,
-      'form_location' => CommentItemInterface::FORM_BELOW,
+      'form_location' => FormLocation::Below->value,
       'anonymous' => AnonymousContact::Forbidden->value,
       'preview' => CommentPreviewMode::Optional->value,
     ] + parent::defaultFieldSettings();
@@ -157,9 +159,8 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
    * {@inheritdoc}
    */
   public function isEmpty() {
-    // There is always a value for this field, it is one of
-    // CommentItemInterface::OPEN, CommentItemInterface::CLOSED or
-    // CommentItemInterface::HIDDEN.
+    // There is always a value for this field, it is one of the values of the
+    // \Drupal\comment\CommentingStatus enum.
     return FALSE;
   }
 
@@ -195,11 +196,7 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
    * {@inheritdoc}
    */
   public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
-    $statuses = [
-      CommentItemInterface::HIDDEN,
-      CommentItemInterface::CLOSED,
-      CommentItemInterface::OPEN,
-    ];
+    $statuses = array_column(CommentingStatus::cases(), 'value');
     return [
       'status' => $statuses[mt_rand(0, count($statuses) - 1)],
     ];

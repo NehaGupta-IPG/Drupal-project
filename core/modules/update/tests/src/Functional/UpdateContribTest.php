@@ -13,7 +13,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests how Update Status handles contributed modules and themes.
  */
 #[Group('update')]
-#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class UpdateContribTest extends UpdateTestBase {
   use UpdateTestTrait;
@@ -649,7 +648,7 @@ class UpdateContribTest extends UpdateTestBase {
    *   - 8.x-1.1
    *   - 8.x-1.0
    */
-  public static function securityUpdateAvailabilityProvider() {
+  public static function securityUpdateAvailabilityProvider(): array {
     return [
       // Security releases available for module major release 1.
       // No releases for next major.
