@@ -25,6 +25,12 @@ class ClassResolver implements ClassResolverInterface {
    */
   public function getInstanceFromDefinition($definition) {
     if ($this->container->has($definition)) {
+      // Re-sync the synthetic kernel onto a stale container builder during
+      // install so OOP-hook services autowiring @kernel can be constructed.
+      if ($this->container instanceof \Symfony\Component\DependencyInjection\ContainerBuilder
+          && !$this->container->initialized('kernel') && \Drupal::hasContainer()) {
+        $this->container->set('kernel', \Drupal::service('kernel'));
+      }
       $instance = $this->container->get($definition);
     }
     else {
