@@ -55,7 +55,8 @@ interface TreegridColumnInterface extends PluginInspectionInterface {
    * @param object $context
    *   The row context. Its concrete type is defined by the consumer module
    *   that registers the column and calls this method — treegrid passes it
-   *   through opaquely. For menu_tree_ui it is a MenuLinkTreeElement.
+   *   through opaquely (e.g. a consumer editing menu links would pass a menu
+   *   link tree element).
    *
    * @return array<string, mixed>
    *   Cell data array with a 'type' key, or [] to skip this cell entirely.
@@ -67,9 +68,9 @@ interface TreegridColumnInterface extends PluginInspectionInterface {
    *
    * Called by the consumer's column-update controller when the client POSTs an
    * interactive cell change. treegrid defines this contract but ships no route
-   * or controller for it — the consumer owns the persistence endpoint (e.g.
-   * menu_tree_ui's MenuTreeController::columnUpdate). Return FALSE for
-   * read-only columns — the controller responds with a 400 rather than saving.
+   * or controller for it — the consumer owns the persistence endpoint. Return
+   * FALSE for read-only columns — the controller responds with a 400 rather
+   * than saving.
    * Implementations should also return FALSE when the row is not one this
    * column can update.
    *

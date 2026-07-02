@@ -1,6 +1,6 @@
 /**
  * @file
- * IntersectionObserver-based row windowing for the menu tree.
+ * IntersectionObserver-based row windowing for the treegrid.
  *
  * Strategy: every row is a normal DOM node, but rows far outside the viewport
  * get `data-virtualized="true"`, which the CSS uses to hide the row content

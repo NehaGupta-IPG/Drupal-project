@@ -10,9 +10,9 @@ namespace Drupal\treegrid_reorder;
  * TreeReorderManager owns the universal parts of a move — the self-target and
  * cycle checks, and the validate-then-apply commit loop — and delegates
  * everything domain-specific to an implementation of this interface. A consumer
- * (e.g. menu_tree_ui) implements it to say which items may move, what local
- * rules apply (such as a depth cap), how ancestry is resolved, and how a move
- * is written. Nothing here knows about the manager's orchestration, and the
+ * module implements it to say which items may move, what local rules apply
+ * (such as a depth cap), how ancestry is resolved, and how a move is written.
+ * Nothing here knows about the manager's orchestration, and the
  * manager knows nothing about the consumer's storage — they meet only at this
  * contract.
  *

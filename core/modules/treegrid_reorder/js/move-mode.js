@@ -233,6 +233,10 @@
 
       this.active = true;
       row.classList.add(this.grabbedClass);
+      // Tell the treegrid to keep this row visible: its collapse guard refuses
+      // to fold a section containing a data-treegrid-keep-visible row, so the
+      // carried row never vanishes mid-move.
+      row.dataset.treegridKeepVisible = 'true';
       // The grabbed row is the selection (aria-selected) and the single tab stop
       // while it is held; the cursor (focus) follows it through the carry.
       const prevStop = this.tree.querySelector('tr[role="row"][tabindex="0"]');
@@ -794,6 +798,7 @@
      */
     end() {
       this.grabbed?.classList.remove(this.grabbedClass);
+      delete this.grabbed?.dataset.treegridKeepVisible;
       // The dropped (or restored) row stays the cursor and the single tab stop,
       // so leave its tabindex at 0; just clear the picked-up selection marker.
       // After a commit, commit.js re-focuses the rebuilt row via focusRow.

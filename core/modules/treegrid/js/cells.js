@@ -71,6 +71,8 @@
     }
     input.dataset.columnId = colId;
     input.dataset.linkId = rowId;
+    // An interactive cell control joins the active row's roving tab order.
+    input.dataset.treegridControl = '';
     return input;
   });
 

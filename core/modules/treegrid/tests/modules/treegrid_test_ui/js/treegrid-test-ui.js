@@ -4,10 +4,11 @@
  *
  * Registers a row renderer as a <drupal-treegrid> provider so the element,
  * lazy expand, keyboard navigation, and the cell-renderer registry can be
- * tested within the treegrid module rather than only through menu_tree_ui. It
- * adds no behavior of its own: the spine (element, tree-nav, keyboard, expand,
- * cells) is all treegrid's. Column cells go through Drupal.treegrid.renderCell
- * so the checkbox/markup renderers are covered on lazily-built rows.
+ * tested within the treegrid module itself, with no consuming module involved.
+ * It adds no behavior of its own: the spine (element, tree-nav, keyboard,
+ * expand, cells) is all treegrid's. Column cells go through
+ * Drupal.treegrid.renderCell so the checkbox/markup renderers are covered on
+ * lazily-built rows.
  */
 
 ((Drupal) => {
@@ -44,6 +45,7 @@
     const name = document.createElement('td');
     name.setAttribute('role', 'gridcell');
     name.className = 'tgu-name';
+    name.dataset.treegridNameCell = '';
     if (item.has_children) {
       const toggle = document.createElement('button');
       toggle.type = 'button';

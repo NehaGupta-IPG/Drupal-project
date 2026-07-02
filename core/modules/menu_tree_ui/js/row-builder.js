@@ -120,7 +120,8 @@
 
     const name = document.createElement('div');
     name.className = 'menu-tree-ui-row__name';
-    // The indent is applied by setRowLevel() once the row is assembled.
+    // The treegrid spine indents this cell (setRowLevel) via this hook.
+    name.dataset.treegridNameCell = '';
 
     name.appendChild(buildHandle(item));
     name.appendChild(buildToggle(item));
@@ -131,6 +132,8 @@
     title.className = 'menu-tree-ui-row__title';
     if (item.linked) {
       title.href = item.url;
+      // The title link joins the active row's roving tab order.
+      title.dataset.treegridControl = '';
     }
     title.textContent = item.title;
     name.appendChild(title);

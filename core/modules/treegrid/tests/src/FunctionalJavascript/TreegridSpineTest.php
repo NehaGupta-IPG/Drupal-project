@@ -14,7 +14,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  *
  * Exercises the <drupal-treegrid> element upgrade, the roving-tabindex focus
  * model, keyboard navigation, lazy expand/collapse, and the client cell-renderer
- * registry — without going through menu_tree_ui, so the spine has its own
+ * registry — with no consuming module involved, so the spine has its own
  * coverage. Row windowing (IntersectionObserver / content-visibility) is left
  * out: it is nondeterministic under WebDriver.
  */

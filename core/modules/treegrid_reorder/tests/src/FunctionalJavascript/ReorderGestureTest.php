@@ -14,7 +14,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  *
  * The treegrid_reorder_test module is a minimal consumer (a flat list of four
  * movable rows backed by State), so this covers the generic drag, keyboard
- * move-mode, and Shift+Arrow gesture code without going through menu_tree_ui.
+ * move-mode, and Shift+Arrow gesture code with no other consuming module.
  * Each gesture is checked for both its visible DOM effect and that the move
  * reached storage through TreeReorderManager + the test handler.
  */

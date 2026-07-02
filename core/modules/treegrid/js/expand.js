@@ -1,6 +1,6 @@
 /**
  * @file
- * Lazy-load + expand/collapse for the menu tree.
+ * Lazy-load + expand/collapse for the treegrid.
  *
  * Collapse flags a row's descendant run with data-hidden (CSS hides them) and
  * leaves the rows in the DOM; re-expand clears the flag. There are no nested
@@ -91,8 +91,8 @@
       this.rowWindow = rowWindow;
       this.tree = tree;
       // The row renderer is injected so the engine stays consumer-agnostic; the
-      // consumer supplies how its items become DOM (see row-builder in
-      // menu_tree_ui). rowBuilder = { buildRows, buildRow }.
+      // consumer supplies how its items become DOM through the registered
+      // provider. rowBuilder = { buildRows, buildRow }.
       this.buildRows = rowBuilder.buildRows;
       this.buildRow = rowBuilder.buildRow;
       this.inFlight = new Map();
@@ -168,13 +168,13 @@
      */
     // eslint-disable-next-line class-methods-use-this
     collapse(row, announce = false) {
-      // Never fold away a section that holds a row being carried in move mode:
-      // the editor must always be able to see the row they are moving, and the
-      // cursor would be lost if it vanished. The grabbed row carries a marker
-      // class for the duration of the move.
+      // Never fold away a section that holds a row a feature has asked to keep
+      // visible (e.g. a row being carried in move mode): the editor must be able
+      // to see it, and the cursor would be lost if it vanished. The feature
+      // marks such a row with data-treegrid-keep-visible for the duration.
       if (
-        descendantRows(row).some((r) =>
-          r.classList.contains('menu-tree-ui-row--grabbed'),
+        descendantRows(row).some(
+          (r) => r.dataset.treegridKeepVisible === 'true',
         )
       ) {
         return;
@@ -366,14 +366,14 @@
         });
         if (!response.ok) {
           // eslint-disable-next-line no-console
-          console.error('[menu-tree] children fetch failed', response.status);
+          console.error('[treegrid] children fetch failed', response.status);
           return null;
         }
         const data = await response.json();
         return data.items;
       } catch (e) {
         // eslint-disable-next-line no-console
-        console.error('[menu-tree] children fetch error', e);
+        console.error('[treegrid] children fetch error', e);
         return null;
       }
     }

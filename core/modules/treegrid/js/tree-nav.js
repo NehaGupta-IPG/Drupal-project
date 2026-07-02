@@ -23,15 +23,10 @@
 
   const ROW = 'tr[role="row"]';
   // Controls that join the active row's tab sequence. The row is the cursor and
-  // the arrow keys drive the tree, so these are the controls not otherwise
-  // reachable from the row: the link, the column switch, and the operations. The
-  // drag handle (mouse/drag) and expand toggle (Left/Right/Enter) are excluded.
-  const ROW_CONTROLS = [
-    'a.menu-tree-ui-row__title',
-    '.treegrid-cell-checkbox',
-    '.menu-tree-ui-row__operations a',
-    '.menu-tree-ui-row__operations button',
-  ].join(', ');
+  // the arrow keys drive the tree, so a consumer marks the controls that should
+  // be tabbable with data-treegrid-control. Anything not so marked (e.g. a drag
+  // handle, or the expand toggle operated by Left/Right/Enter) stays out.
+  const ROW_CONTROLS = '[data-treegrid-control]';
 
   /**
    * The level (depth) of a row.
@@ -60,7 +55,7 @@
    */
   function setRowLevel(row, level) {
     row.setAttribute('aria-level', String(level));
-    const name = row.querySelector('.menu-tree-ui-row__name');
+    const name = row.querySelector('[data-treegrid-name-cell]');
     if (name) {
       name.style.paddingInlineStart = `${(level - 1) * 1.25}rem`;
     }
@@ -269,17 +264,37 @@
     return el instanceof Element ? el.closest(ROW) : null;
   }
 
+  // Focusable elements a marked control (or the descendants of a marked
+  // control container) can be.
+  const FOCUSABLE = 'a, button, input, select, textarea';
+
   /**
    * The within-row controls that join the active row's tab sequence.
+   *
+   * A consumer marks controls with data-treegrid-control. A marked element that
+   * is itself focusable is a control; a marked container (e.g. a rendered
+   * operations dropbutton) contributes its focusable descendants, so the
+   * container itself never becomes a tab stop.
    *
    * @param {?HTMLElement} row
    *   The row, or null.
    *
-   * @return {NodeListOf<HTMLElement>|HTMLElement[]}
+   * @return {HTMLElement[]}
    *   The controls, or an empty array for null.
    */
   function rowControls(row) {
-    return row ? row.querySelectorAll(ROW_CONTROLS) : [];
+    if (!row) {
+      return [];
+    }
+    const controls = [];
+    row.querySelectorAll(ROW_CONTROLS).forEach((el) => {
+      if (el.matches(FOCUSABLE)) {
+        controls.push(el);
+      } else {
+        el.querySelectorAll(FOCUSABLE).forEach((child) => controls.push(child));
+      }
+    });
+    return controls;
   }
 
   /**

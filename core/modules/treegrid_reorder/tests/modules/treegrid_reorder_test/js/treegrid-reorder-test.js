@@ -2,11 +2,11 @@
  * @file
  * A minimal treegrid consumer that wires only the reorder gestures.
  *
- * Mirrors menu_tree_ui's menu-tree.js, stripped to reorder: it registers a row
- * renderer as a <drupal-treegrid> provider and, on each upgraded element,
- * instantiates the generic Drupal.treegridReorder controllers with this
- * module's own CSS class names. It exists so the reorder gesture JS is tested
- * within treegrid_reorder, not only through menu_tree_ui.
+ * A minimal reorder consumer: it registers a row renderer as a
+ * <drupal-treegrid> provider and, on each upgraded element, instantiates the
+ * generic Drupal.treegridReorder controllers with this module's own CSS class
+ * names. It exists so the reorder gesture JS is tested within treegrid_reorder
+ * itself, with no other consuming module involved.
  */
 
 ((Drupal, drupalSettings, once) => {

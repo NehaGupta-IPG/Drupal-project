@@ -69,7 +69,12 @@ final class OperationsColumn extends TreegridColumnBase implements ContainerFact
 
     $build = [
       '#type' => 'container',
-      '#attributes' => ['class' => ['menu-tree-ui-row__operations']],
+      '#attributes' => [
+        'class' => ['menu-tree-ui-row__operations'],
+        // The treegrid roving tab order includes this container's focusable
+        // operation links for the active row.
+        'data-treegrid-control' => '',
+      ],
       'operations' => [
         '#type' => 'operations',
         '#links' => $links,
