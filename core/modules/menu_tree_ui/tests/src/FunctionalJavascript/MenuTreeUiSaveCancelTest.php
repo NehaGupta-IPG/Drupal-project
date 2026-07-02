@@ -10,9 +10,9 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Tests the menu_tree_ui working-copy Save and Cancel flows end-to-end.
  *
- * A drag or keyboard move no longer writes to storage; it records the move in
- * a per-user server-side working copy and overlays it on the rendered tree.
- * The change is only persisted when the user clicks Save; Cancel discards it.
+ * A drag or keyboard move records the move in a per-user server-side working
+ * copy and overlays it on the rendered tree. The change is only persisted
+ * when the user clicks Save; Cancel discards it.
  * These tests drive one drag, then assert the unsaved notice, and that Save
  * and Cancel each leave the expected order on screen. Committing and
  * discarding the working copy against storage is covered by the kernel
@@ -66,8 +66,8 @@ final class MenuTreeUiSaveCancelTest extends MenuTreeUiJavascriptTestBase {
     $this->moveCBeforeA();
 
     $this->getSession()->getPage()->find('css', '.menu-tree-ui__save')->click();
-    // Save no longer reloads the page; the unsaved notice hiding again is the
-    // signal that the working copy was committed.
+    // Save does not reload the page; the unsaved notice hiding again signals
+    // that the working copy was committed.
     $this->waitForSave();
 
     $this->assertSiblings(['C', 'A', 'B'], $this->childRowsSelector(NULL));
@@ -111,7 +111,7 @@ final class MenuTreeUiSaveCancelTest extends MenuTreeUiJavascriptTestBase {
   }
 
   /**
-   * Waits for a Save to commit, signalled by the unsaved notice hiding again.
+   * Waits for a Save to commit, signaled by the unsaved notice hiding again.
    */
   private function waitForSave(): void {
     $this->assertJsCondition(

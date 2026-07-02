@@ -26,6 +26,7 @@ services:
       - '@menu_tree_ui.loader'
       - '@plugin.manager.menu.link'
       - '@logger.channel.menu_tree_ui'
+      - '@string_translation'
   Drupal\menu_tree_ui\Service\MenuTreeMover: '@menu_tree_ui.mover'
 
   logger.channel.menu_tree_ui:

@@ -18,10 +18,9 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * behind. Exact sibling order is owned by the kernel overlay/mover tests and
  * the spliceBefore unit table, not re-asserted here.
  *
- * Moves are no longer written to storage on drop; they accumulate in a
- * server-side working copy until saved, so these tests assert the overlaid
- * tree rather than the persisted entity. Persistence is covered by
- * MenuTreeUiSaveCancelTest.
+ * A drop records the move in a server-side working copy until saved, so
+ * these tests assert the overlaid tree rather than the persisted entity.
+ * Persistence is covered by MenuTreeUiSaveCancelTest.
  */
 #[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
@@ -201,7 +200,7 @@ final class MenuTreeUiDragDropTest extends MenuTreeUiJavascriptTestBase {
    * Hovering over a collapsed parent for one second mid-drag auto-expands it.
    *
    * No pointerup is fired — we only assert the parent opened. The drag is
-   * then cancelled so subsequent tests aren't polluted.
+   * then canceled so subsequent tests aren't polluted.
    */
   public function testHoverOverCollapsedParentExpands(): void {
     $source_id = $this->linkIds['B'];

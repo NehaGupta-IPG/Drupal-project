@@ -96,7 +96,7 @@ abstract class MenuTreeUiJavascriptTestBase extends WebDriverTestBase {
   }
 
   /**
-   * Returns the DOM row for a labelled link, or NULL if not in DOM.
+   * Returns the DOM row for a labeled link, or NULL if not in DOM.
    */
   protected function row(string $label): ?NodeElement {
     $id = $this->linkIds[$label] ?? NULL;
@@ -197,7 +197,7 @@ abstract class MenuTreeUiJavascriptTestBase extends WebDriverTestBase {
   }
 
   /**
-   * Asserts a labelled row's depth (aria-level) matches the expected value.
+   * Asserts a labeled row's depth (aria-level) matches the expected value.
    */
   protected function assertDepth(string $label, int $expected): void {
     $id = $this->linkIds[$label] ?? NULL;

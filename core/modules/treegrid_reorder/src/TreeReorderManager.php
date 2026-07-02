@@ -18,9 +18,9 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
  * write) is delegated to a TreeMoveHandlerInterface, so this class never knows
  * how a particular tree is stored.
  *
- * Instantiated directly rather than injected (see the constructor note on
- * MenuTreeMover), so it has no constructor-injected translation service;
- * StringTranslationTrait::getStringTranslation() falls back to
+ * Instantiated directly rather than injected (see the constructor note on the
+ * consuming move handler), so it has no constructor-injected translation
+ * service; StringTranslationTrait::getStringTranslation() falls back to
  * \Drupal::translation() in that case, which is acceptable here since the
  * messages below are only ever reached from within a running Drupal request.
  *

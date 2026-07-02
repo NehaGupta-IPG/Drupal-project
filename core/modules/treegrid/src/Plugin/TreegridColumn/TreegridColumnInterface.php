@@ -55,8 +55,8 @@ interface TreegridColumnInterface extends PluginInspectionInterface {
    * @param object $context
    *   The row context. Its concrete type is defined by the consumer module
    *   that registers the column and calls this method — treegrid passes it
-   *   through opaquely (e.g. a consumer editing menu links would pass a menu
-   *   link tree element).
+   *   through opaquely (e.g. a consumer editing taxonomy terms would pass a
+   *   term tree element).
    *
    * @return array<string, mixed>
    *   Cell data array with a 'type' key, or [] to skip this cell entirely.
@@ -76,7 +76,7 @@ interface TreegridColumnInterface extends PluginInspectionInterface {
    *
    * @param string $link_id
    *   The row identifier, as reported in the cell's 'link_id' key. Its meaning
-   *   (e.g. a menu link plugin ID) is defined by the consumer module that
+   *   (e.g. an entity ID or plugin ID) is defined by the consumer module that
    *   registers the column; treegrid passes it through opaquely.
    * @param mixed $value
    *   The new value sent from the client (e.g. TRUE/FALSE for a toggle).

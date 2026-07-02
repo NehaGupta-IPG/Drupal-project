@@ -15,8 +15,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  *    intent (e.g. released over the moved row's own subtree) must not fall
  *    through to the tap path and pick the row up into keyboard move mode.
  *  - Dropping a parent onto one of its own descendants must never form a
- *    drop intent client-side (previously relied on a POST + server
- *    rejection to block it).
+ *    drop intent client-side; the server rejection is a backstop, not the
+ *    guard.
  *  - A second concurrent pointer (e.g. multi-touch) must be ignored while a
  *    gesture is already in progress, rather than clobbering the first.
  */
@@ -44,7 +44,7 @@ final class MenuTreeUiDragGuardsTest extends MenuTreeUiJavascriptTestBase {
    * Covers the descendant-drop guard in updateIntent(): C is a descendant of
    * P, so no intent should ever form. Since the release lands mid-drag with
    * no valid intent, this also covers the tap-routing fix in onPointerUp():
-   * a cancelled drag must not fall through to the tap path and pick P up
+   * a canceled drag must not fall through to the tap path and pick P up
    * into keyboard move mode.
    */
   public function testCannotDropParentOntoOwnChild(): void {
@@ -59,7 +59,7 @@ final class MenuTreeUiDragGuardsTest extends MenuTreeUiJavascriptTestBase {
     );
     $this->assertFalse(
       $grabbed,
-      'A drag cancelled over an invalid target must not pick the row up into move mode.',
+      'A drag canceled over an invalid target must not pick the row up into move mode.',
     );
   }
 

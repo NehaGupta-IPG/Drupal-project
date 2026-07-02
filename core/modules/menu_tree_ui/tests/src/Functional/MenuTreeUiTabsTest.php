@@ -61,7 +61,7 @@ final class MenuTreeUiTabsTest extends BrowserTestBase {
     $assert->linkByHrefExists('/admin/structure/menu/manage/tabs-test/tree');
     $assert->linkByHrefExists('/admin/structure/menu/manage/tabs-test/links');
 
-    // The settings page itself no longer lists links.
+    // The settings page itself does not list links.
     $assert->pageTextNotContains('There are no menu links yet');
   }
 

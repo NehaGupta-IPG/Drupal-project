@@ -27,7 +27,7 @@ use Drupal\Core\TempStore\SharedTempStoreFactory;
  * Layout Builder use.
  *
  * Each consumer owns a tempstore collection (passed at construction) and keys
- * entries within it by a tree id (e.g. a menu name); collections keep two
+ * entries within it by a tree id; collections keep two
  * consumers' ids from colliding.
  */
 final class TreegridWorkingCopy {

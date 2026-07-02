@@ -279,7 +279,7 @@ final class MenuTreeController extends ControllerBase {
     }
 
     // addOp is the authoritative lock gate: it refuses if the working copy was
-    // claimed by another editor between the check above and this write. Honour
+    // claimed by another editor between the check above and this write. Honor
     // that refusal rather than reporting a success that did not happen.
     if (!$this->workingCopy->addOp($menu_name, [
       'type' => 'move',

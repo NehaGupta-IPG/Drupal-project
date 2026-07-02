@@ -547,7 +547,7 @@
     async openInto(prev) {
       const seq = this.cursorSeq;
       await this.expand.expand(prev);
-      // The move may have been committed or cancelled during the fetch, or the
+      // The move may have been committed or canceled during the fetch, or the
       // editor may have moved the cursor on - in which case the open is done
       // (the section is now navigable) but the cursor must be left where it is.
       if (!this.active || !this.grabbed || this.cursorSeq !== seq) {
@@ -759,7 +759,7 @@
         beforeId === nextSiblingId(grabbed)
       ) {
         announce(
-          Drupal.t('Move cancelled. The item is already there.'),
+          Drupal.t('Move canceled. The item is already there.'),
           'assertive',
         );
         this.end();
@@ -787,7 +787,7 @@
         return;
       }
       this.restoreToOrigin();
-      announce(Drupal.t('Move cancelled.'), 'assertive');
+      announce(Drupal.t('Move canceled.'), 'assertive');
       this.end();
     }
 

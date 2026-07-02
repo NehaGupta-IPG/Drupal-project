@@ -53,7 +53,7 @@ same batch (a newly formed cycle) is caught rather than silently applied.
 
 **To buffer moves for Save/Cancel**, instantiate `TreegridWorkingCopy` with a
 tempstore collection name unique to your module, so two consumers editing
-same-named trees (for example, two menus) do not collide.
+same-named trees do not collide.
 
 **On the client**, load the `treegrid_reorder/treegrid_reorder` library and
 pass a configuration object naming your own CSS classes and selectors — for

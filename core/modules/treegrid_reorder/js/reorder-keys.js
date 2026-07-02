@@ -206,7 +206,7 @@
       const body = await response.json().catch(() => ({ ok: false }));
       if (!response.ok || !body.ok) {
         restore();
-        announce(Drupal.t('Move failed — restored.'), 'assertive');
+        announce(Drupal.t('Move failed. Order restored.'), 'assertive');
       } else {
         onCommitted?.();
         announce(
@@ -216,7 +216,7 @@
       }
     } catch (e) {
       restore();
-      announce(Drupal.t('Network error — move restored.'), 'assertive');
+      announce(Drupal.t('Network error. Order restored.'), 'assertive');
       // eslint-disable-next-line no-console
       console.error('[treegrid-reorder] reorder failed', e);
     } finally {

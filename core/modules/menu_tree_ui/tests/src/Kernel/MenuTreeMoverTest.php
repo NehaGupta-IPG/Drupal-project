@@ -262,6 +262,7 @@ final class MenuTreeMoverTest extends KernelTestBase {
       $this->container->get('menu_tree_ui.loader'),
       $this->container->get('plugin.manager.menu.link'),
       $this->container->get('logger.channel.menu_tree_ui'),
+      $this->container->get('string_translation'),
     );
 
     $result = $mover->validateMove('test', $entity->getPluginId(), '', NULL);

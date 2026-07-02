@@ -115,7 +115,7 @@
       await expand.expand(target);
       if (target.getAttribute('aria-expanded') !== 'true') {
         announce(
-          Drupal.t('Could not open destination — move cancelled.'),
+          Drupal.t('Could not open the destination. Move canceled.'),
           'assertive',
         );
         return;
@@ -158,7 +158,7 @@
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('[treegrid-reorder] move fetch failed', e);
-      announce(Drupal.t('Network error — move cancelled.'), 'assertive');
+      announce(Drupal.t('Network error. Move canceled.'), 'assertive');
       return;
     }
 
@@ -174,7 +174,7 @@
     // duplicated row, or no tab stop). Reload so the tree resyncs from the
     // server rather than continuing from an inconsistent DOM.
     if (!okFrom || !okTo) {
-      announce(Drupal.t('Could not refresh the menu — reloading.'), 'assertive');
+      announce(Drupal.t('Could not refresh the tree. Reloading.'), 'assertive');
       window.location.reload();
       return;
     }

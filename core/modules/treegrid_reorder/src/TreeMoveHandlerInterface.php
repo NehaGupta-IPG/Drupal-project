@@ -29,7 +29,7 @@ interface TreeMoveHandlerInterface {
    * NOT re-implement the structural checks.
    *
    * @param string $tree_id
-   *   The tree the move happens within (e.g. a menu name).
+   *   The tree the move happens within.
    * @param \Drupal\treegrid_reorder\MoveIntent $intent
    *   The requested move.
    *

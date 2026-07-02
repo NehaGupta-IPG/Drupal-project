@@ -21,7 +21,7 @@ use Drupal\treegrid\Plugin\TreegridColumn\TreegridColumnInterface;
 final class TreegridColumnManager extends DefaultPluginManager {
 
   /**
-   * Memoised sorted column instances.
+   * Memoized sorted column instances.
    *
    * @var \Drupal\treegrid\Plugin\TreegridColumn\TreegridColumnInterface[]|null
    */
@@ -46,7 +46,7 @@ final class TreegridColumnManager extends DefaultPluginManager {
   /**
    * Returns all column plugin instances sorted by weight.
    *
-   * Result is memoised: instances are shared across calls within the same
+   * Result is memoized: instances are shared across calls within the same
    * request to avoid redundant createInstance() work.
    *
    * @return \Drupal\treegrid\Plugin\TreegridColumn\TreegridColumnInterface[]

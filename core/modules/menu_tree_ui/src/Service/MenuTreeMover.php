@@ -10,6 +10,7 @@ use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Menu\MenuTreeStorageInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\menu_tree_ui\MenuLinkMovability;
 use Drupal\treegrid_reorder\MoveIntent;
 use Drupal\treegrid_reorder\TreeMoveHandlerInterface;
@@ -37,9 +38,8 @@ use Psr\Log\LoggerInterface;
  *   - hook_menu_tree_ui_pre_move_alter() — veto a move before the menu checks.
  *   - hook_menu_tree_ui_post_move() — react after a successful move.
  *
- * Uses StringTranslationTrait for the user-facing messages below; the trait's
- * getStringTranslation() falls back to \Drupal::translation() since none is
- * injected here.
+ * Uses StringTranslationTrait for the user-facing messages below, with the
+ * translation service injected.
  */
 final class MenuTreeMover implements TreeMoveHandlerInterface {
 
@@ -73,7 +73,9 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
     private readonly MenuTreeLoader $loader,
     private readonly MenuLinkManagerInterface $menuLinkManager,
     private readonly LoggerInterface $logger,
+    TranslationInterface $string_translation,
   ) {
+    $this->stringTranslation = $string_translation;
     $this->reorderManager = new TreeReorderManager();
   }
 

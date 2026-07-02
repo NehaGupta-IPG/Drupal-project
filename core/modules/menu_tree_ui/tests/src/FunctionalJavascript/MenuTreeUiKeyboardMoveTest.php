@@ -25,10 +25,9 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * changes with Left/Right, search-field focus surviving a grab, and the held
  * row staying visible with its section open.
  *
- * Moves are no longer written to storage on commit; they accumulate in a
- * server-side working copy until saved, so these tests verify each move via
- * the overlaid DOM rather than the persisted entity. Persistence is covered
- * by MenuTreeUiSaveCancelTest.
+ * A commit records the move in a server-side working copy until saved, so
+ * these tests verify each move via the overlaid DOM rather than the
+ * persisted entity. Persistence is covered by MenuTreeUiSaveCancelTest.
  *
  * Depth-cap rejection is exercised at the service level in the MenuTreeMover
  * kernel test rather than re-driven here. Exact sibling order is owned by the
@@ -183,7 +182,7 @@ final class MenuTreeUiKeyboardMoveTest extends MenuTreeUiJavascriptTestBase {
    * Focusing the search field does not cancel an in-progress move.
    *
    * The editor can search for a destination mid-move; the grab must stick (the
-   * move is cancelled only by Escape, a drop, or a click outside the UI).
+   * move is canceled only by Escape, a drop, or a click outside the UI).
    */
   public function testMoveSurvivesSearchFieldFocus(): void {
     $this->dispatchKeys('B', [' ']);
@@ -243,9 +242,8 @@ final class MenuTreeUiKeyboardMoveTest extends MenuTreeUiJavascriptTestBase {
    * The held row stays visible and no key closes the section it sits in.
    *
    * Regression guard for the "cursor gets lost when the section closes"
-   * report: carry B inside expanded A, then press Left. The old Left collapsed
-   * the highlighted item, which hid the carried row; now A stays open and B
-   * stays visible.
+   * report: carry B inside expanded A, then press Left. A must stay open and
+   * B must stay visible; collapsing the section would hide the carried row.
    */
   public function testHeldRowStaysVisibleAndKeepsItsSectionOpen(): void {
     $this->expandRow('A');

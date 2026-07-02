@@ -200,7 +200,7 @@
         // the row up into keyboard move mode rather than starting a drag. A
         // gesture that did cross the threshold but ends up with no valid
         // intent (released over the moved row itself, its subtree, or off
-        // any row) is a cancelled drag, not a tap, and should not pick the
+        // any row) is a canceled drag, not a tap, and should not pick the
         // row up.
         const row = this.moved;
         const wasTap = !this.dragging;

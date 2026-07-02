@@ -14,7 +14,7 @@ namespace Drupal\Tests\menu_tree_ui\FunctionalJavascript;
 trait MenuTreeUiDragGestureTrait {
 
   /**
-   * Drags the row labelled $source into the $zone of the row labelled $target.
+   * Drags the row labeled $source into the $zone of the row labeled $target.
    *
    * Zones map to vertical position inside the target row's rect (the <tr> holds
    * only its own cells, never its subtree, so the row rect IS the header):
