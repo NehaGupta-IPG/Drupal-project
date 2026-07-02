@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Config;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\StringTranslation\TranslationInterface;
 
 /**
@@ -91,12 +90,8 @@ class UnmetDependenciesException extends ConfigException {
    *   An exception for the extension with a list of configuration objects.
    */
   public static function create($extension, array $config_objects) {
-    $message = new FormattableMarkup('Configuration objects provided by %extension have unmet dependencies: %config_names',
-      [
-        '%config_names' => static::formatConfigObjectList($config_objects),
-        '%extension' => $extension,
-      ]
-    );
+    $config_names = static::formatConfigObjectList($config_objects);
+    $message = "Configuration objects provided by $extension have unmet dependencies: $config_names";
     $e = new static($message);
     $e->configObjects = $config_objects;
     $e->extension = $extension;

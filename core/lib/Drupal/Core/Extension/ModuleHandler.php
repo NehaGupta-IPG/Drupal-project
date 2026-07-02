@@ -3,7 +3,6 @@
 namespace Drupal\Core\Extension;
 
 use Drupal\Component\Graph\Graph;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
@@ -527,12 +526,10 @@ class ModuleHandler implements ModuleHandlerInterface {
    *   String identifier of the hook listener.
    */
   protected function triggerErrorForDuplicateAlterHookListener(array $hooks, string $module, string $other_module, callable $listener, string $identifier): void {
-    $log_message_replacements = [
-      '@implementation' => is_array($listener)
+    $implementation = is_array($listener)
         ? ('method ' . $identifier . '()')
-        : ('function ' . $listener[1] . '()'),
-      '@hooks' => "['" . implode("', '", $hooks) . "']",
-    ];
+        : ('function ' . $listener[1] . '()');
+    $hooks = "['" . implode("', '", $hooks) . "']";
     if ($other_module !== $module) {
       // There is conflicting information about which module this
       // implementation is registered for. At this point we cannot even
@@ -541,22 +538,14 @@ class ModuleHandler implements ModuleHandlerInterface {
       // unclear if the intention is to execute the code multiple times. This
       // can be resolved by using a separate method for alter hooks that
       // implement on behalf of other modules.
-      trigger_error((string) new FormattableMarkup(
-        'The @implementation is registered for more than one of the alter hooks @hooks from the current ->alter() call, on behalf of different modules @module and @other_module. Only one instance will be part of the implementation list for this hook combination. For the purpose of ordering, the module @module will be used.',
-        [
-          ...$log_message_replacements,
-          '@module' => "'$module'",
-          '@other_module' => "'$other_module'",
-        ],
-      ), E_USER_WARNING);
+      $message = "The $implementation is registered for more than one of the alter hooks $hooks from the current ->alter() call, on behalf of different modules $module and $other_module. Only one instance will be part of the implementation list for this hook combination. For the purpose of ordering, the module @module will be used.";
+      trigger_error($message, E_USER_WARNING);
     }
     else {
       // There is no conflict, but probably one or more redundant #[Hook]
       // attributes should be removed.
-      trigger_error((string) new FormattableMarkup(
-        'The @implementation is registered for more than one of the alter hooks @hooks from the current ->alter() call. Only one instance will be part of the implementation list for this hook combination.',
-        $log_message_replacements,
-      ), E_USER_NOTICE);
+      $message = "The $implementation is registered for more than one of the alter hooks $hooks from the current ->alter() call. Only one instance will be part of the implementation list for this hook combination.";
+      trigger_error($message, E_USER_NOTICE);
     }
   }
 
