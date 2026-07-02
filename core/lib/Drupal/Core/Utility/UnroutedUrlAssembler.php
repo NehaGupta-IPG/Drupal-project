@@ -139,7 +139,12 @@ class UnroutedUrlAssembler implements UnroutedUrlAssemblerInterface {
     $current_base_path = $request->getBasePath() . '/';
 
     if ($options['absolute']) {
-      $current_base_url = $request->getSchemeAndHttpHost() . $current_base_path;
+      if (empty($options['base_url'])) {
+        $current_base_url = $request->getSchemeAndHttpHost() . $current_base_path;
+      }
+      else {
+        $current_base_url = rtrim($options['base_url'], '/') . '/';
+      }
       if (isset($options['https'])) {
         if (!empty($options['https'])) {
           $base = str_replace('http://', 'https://', $current_base_url);

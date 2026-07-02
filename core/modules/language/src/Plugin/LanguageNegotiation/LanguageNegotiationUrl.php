@@ -5,13 +5,16 @@ namespace Drupal\language\Plugin\LanguageNegotiation;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\PathProcessor\InboundPathProcessorInterface;
 use Drupal\Core\PathProcessor\OutboundPathProcessorInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\language\Attribute\LanguageNegotiation;
 use Drupal\language\LanguageNegotiationMethodBase;
 use Drupal\language\LanguageSwitcherInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class for identifying language via URL prefix or domain.
@@ -27,7 +30,7 @@ use Symfony\Component\HttpFoundation\Request;
   description: new TranslatableMarkup("Language from the URL (Path prefix or domain)."),
   config_route_name: 'language.negotiation_url'
 )]
-class LanguageNegotiationUrl extends LanguageNegotiationMethodBase implements InboundPathProcessorInterface, OutboundPathProcessorInterface, LanguageSwitcherInterface {
+class LanguageNegotiationUrl extends LanguageNegotiationMethodBase implements InboundPathProcessorInterface, OutboundPathProcessorInterface, LanguageSwitcherInterface, ContainerFactoryPluginInterface {
 
   /**
    * The language negotiation method id.
@@ -43,6 +46,32 @@ class LanguageNegotiationUrl extends LanguageNegotiationMethodBase implements In
    * URL language negotiation: use the domain as URL language indicator.
    */
   const CONFIG_DOMAIN = 'domain';
+
+  /**
+   * The request stack.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack
+   */
+  protected RequestStack $requestStack;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    $service = new static();
+    $service->setRequestStack($container->get('request_stack'));
+    return $service;
+  }
+
+  /**
+   * Sets the request stack.
+   *
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   The request stack.
+   */
+  public function setRequestStack(RequestStack $requestStack): void {
+    $this->requestStack = $requestStack;
+  }
 
   /**
    * {@inheritdoc}
@@ -126,6 +155,9 @@ class LanguageNegotiationUrl extends LanguageNegotiationMethodBase implements In
   public function processOutbound($path, &$options = [], ?Request $request = NULL, ?BubbleableMetadata $bubbleable_metadata = NULL) {
     $url_scheme = 'http';
     $port = 80;
+    if (!$request) {
+      $request = $this->requestStack->getMainRequest();
+    }
     if ($request) {
       $url_scheme = $request->getScheme();
       $port = $request->getPort();

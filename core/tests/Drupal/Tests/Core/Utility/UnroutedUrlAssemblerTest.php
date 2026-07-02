@@ -163,6 +163,7 @@ class UnroutedUrlAssemblerTest extends UnitTestCase {
   public static function providerTestAssembleWithLocalUri(): array {
     return [
       ['base:example', [], FALSE, '/example'],
+      ['base:example', ['absolute' => TRUE, 'base_url' => 'https://test.com'], FALSE, 'https://test.com/example'],
       ['base:example', ['query' => ['foo' => 'bar']], FALSE, '/example?foo=bar'],
       ['base:example', ['query' => ['foo' => '"bar"']], FALSE, '/example?foo=%22bar%22'],
       ['base:example', ['query' => ['foo' => '"bar"', 'zoo' => 'baz']], FALSE, '/example?foo=%22bar%22&zoo=baz'],
