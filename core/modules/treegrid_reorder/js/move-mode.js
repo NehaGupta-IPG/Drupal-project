@@ -146,7 +146,7 @@
      * @param {object} expand
      *   The treegrid ExpandManager, for open/close and passed to commitMove.
      * @param {Drupal.treegridReorder.DropIndicator} indicator
-     *   The shared drop indicator (its live region is reused for speech).
+     *   The shared drop indicator (its announce() is reused for speech).
      * @param {function():(string|undefined)} getCsrfToken
      *   Returns the current X-CSRF-Token. Read late because the token may
      *   arrive after construction; keyboard users should not have to wait.

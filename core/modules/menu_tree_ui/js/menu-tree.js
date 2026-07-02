@@ -27,6 +27,11 @@
 
   const ROW = 'tr[role="row"]';
   const COLUMN_TOGGLE = '.treegrid-cell-checkbox';
+  // Elements that must keep their native/authored key behavior instead of the
+  // row's, e.g. Enter on the title link or Space on the Enabled checkbox. The
+  // expand toggle is exempted: it is a <button> that legitimately takes focus
+  // on mouse click and must keep responding to Enter/Space.
+  const INTERACTIVE = 'a, button, input, select, textarea';
 
   /**
    * Syncs a parent row's "parent or leaf" attributes to its current children.
@@ -246,18 +251,31 @@
     });
 
     element.addKeyHandler((event) => {
-      // While a row is picked up, move mode owns every key.
+      // While a row is picked up, move mode owns every key, even one landing
+      // on a control — the carried row must keep taking Space/Enter (drop)
+      // and Escape (cancel) regardless of where focus sits.
       if (moveMode?.isActive()) {
         if (moveMode.handleKey(event)) {
           event.preventDefault();
         }
         return true;
       }
+
+      const row = rowOf(event.target);
+      if (!row) {
+        return false;
+      }
+      // Let a focused in-row control (title link, checkbox, operations
+      // button) handle its own keys instead of the row hijacking them.
+      const control = event.target !== row && event.target.closest(INTERACTIVE);
+      if (control && !control.closest('[data-treegrid-toggle]')) {
+        return false;
+      }
+
       // Space grabs a movable row; if it cannot grab, fall through so the spine
       // toggles expand on a parent (Space's pre-move-mode role).
       if (event.key === ' ') {
-        const row = rowOf(event.target);
-        if (row && moveMode && moveMode.tryGrab(row)) {
+        if (moveMode && moveMode.tryGrab(row)) {
           event.preventDefault();
           return true;
         }
@@ -267,8 +285,7 @@
         event.shiftKey &&
         (event.key === 'ArrowUp' || event.key === 'ArrowDown')
       ) {
-        const row = rowOf(event.target);
-        if (row && moveUrl) {
+        if (moveUrl) {
           rr.reorderSibling(row, event.key === 'ArrowUp' ? 'up' : 'down', {
             moveUrl,
             csrfToken,

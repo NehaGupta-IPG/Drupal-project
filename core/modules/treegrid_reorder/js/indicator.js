@@ -32,12 +32,7 @@
       this.line = document.createElement('div');
       this.line.className = this.lineClass;
       this.line.setAttribute('aria-hidden', 'true');
-      this.liveRegion = document.createElement('div');
-      this.liveRegion.className = 'visually-hidden';
-      this.liveRegion.setAttribute('role', 'status');
-      this.liveRegion.setAttribute('aria-live', 'polite');
       host.appendChild(this.line);
-      host.appendChild(this.liveRegion);
     }
 
     /**
@@ -45,7 +40,6 @@
      */
     destroy() {
       this.line.remove();
-      this.liveRegion.remove();
     }
 
     /**
@@ -100,7 +94,6 @@
       } else {
         message = Drupal.t('Drop after @title', { '@title': title });
       }
-      this.liveRegion.textContent = message;
       if (Drupal.announce) {
         Drupal.announce(message);
       }

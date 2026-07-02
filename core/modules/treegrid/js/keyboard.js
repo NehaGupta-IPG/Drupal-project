@@ -22,6 +22,12 @@
     rowOf,
   } = Drupal.treegrid.treeNav;
 
+  // Elements that must keep their native/authored key behavior instead of the
+  // row's, e.g. Enter on a link or Space on a checkbox. The expand toggle is
+  // exempted: it is a <button> that legitimately takes focus on mouse click
+  // and must keep responding to Enter/Space.
+  const INTERACTIVE = 'a, button, input, select, textarea';
+
   /**
    * Handles a keydown on the tree.
    *
@@ -33,6 +39,13 @@
   function handleKeyDown(event, ctx) {
     const row = rowOf(event.target);
     if (!row) {
+      return;
+    }
+
+    // Let a focused in-row control (title link, checkbox, operations button)
+    // handle its own keys instead of the row hijacking them.
+    const control = event.target !== row && event.target.closest(INTERACTIVE);
+    if (control && !control.closest('[data-treegrid-toggle]')) {
       return;
     }
 
