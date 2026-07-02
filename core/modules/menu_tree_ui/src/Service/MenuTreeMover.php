@@ -47,6 +47,19 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
    */
   private readonly TreeReorderManager $reorderManager;
 
+  /**
+   * Pending re-parents to overlay on live ancestry, or NULL for live-only.
+   *
+   * Set only for the duration of a record-time validateMove() so the cycle and
+   * depth checks see the tree the editor is looking at (live storage with the
+   * menu's pending working-copy moves applied). NULL during commit, where ops
+   * are replayed against live storage as they apply and the overlay must not be
+   * counted on top.
+   *
+   * @var array<string, string>|null
+   */
+  private ?array $overlayEffectiveParents = NULL;
+
   public function __construct(
     private readonly MenuTreeStorageInterface $treeStorage,
     private readonly ModuleHandlerInterface $moduleHandler,
@@ -84,11 +97,20 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
     string $new_parent_id,
     ?string $before_id,
   ): array {
-    return $this->reorderManager->validateMove(
-      $menu_name,
-      new MoveIntent($moved_id, $new_parent_id, $before_id),
-      $this,
-    );
+    // Validate against the overlaid tree the editor sees: live storage with the
+    // menu's already-pending moves applied. The move being recorded is not yet
+    // in the working copy, so it is not double-counted.
+    $this->overlayEffectiveParents = $this->loader->getPendingParentMap($menu_name);
+    try {
+      return $this->reorderManager->validateMove(
+        $menu_name,
+        new MoveIntent($moved_id, $new_parent_id, $before_id),
+        $this,
+      );
+    }
+    finally {
+      $this->overlayEffectiveParents = NULL;
+    }
   }
 
   /**
@@ -206,8 +228,12 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
     if (!$this->menuLinkManager->hasDefinition($parent_id)) {
       return [];
     }
-    // The materialized path (root → … → parent) gives O(1) lookups against the
-    // menu_tree table rather than walking with N entity loads.
+    // During a record-time validation, walk the effective chain so a pending
+    // move that relocated an ancestor is reflected; otherwise the materialized
+    // path (root → … → parent) gives O(1) lookups against the menu_tree table.
+    if ($this->overlayEffectiveParents !== NULL) {
+      return $this->overlayAncestorChain($parent_id);
+    }
     return $this->treeStorage->getRootPathIds($parent_id);
   }
 
@@ -271,12 +297,67 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
 
   /**
    * Checks that moved subtree height + new parent depth <= core's 9 limit.
+   *
+   * During a record-time validation the new parent's depth is measured on the
+   * overlaid tree, so a pending move that deepened the parent is accounted for.
    */
   private function fitsWithinDepthCap(string $moved_id, string $new_parent_id): bool {
     $max = $this->treeStorage->maxDepth();
-    $new_parent_depth = $new_parent_id === '' ? 0 : count($this->treeStorage->getRootPathIds($new_parent_id));
+    if ($new_parent_id === '') {
+      $new_parent_depth = 0;
+    }
+    elseif ($this->overlayEffectiveParents !== NULL) {
+      $new_parent_depth = count($this->overlayAncestorChain($new_parent_id));
+    }
+    else {
+      $new_parent_depth = count($this->treeStorage->getRootPathIds($new_parent_id));
+    }
     $moved_height = $this->treeStorage->getSubtreeHeight($moved_id);
     return ($new_parent_depth + $moved_height) <= $max;
+  }
+
+  /**
+   * The ancestor chain of a link, following pending moves.
+   *
+   * Walks from $start up to the menu root, taking each step's parent from the
+   * pending overlay when the link was moved and from live storage otherwise.
+   * The chain includes $start itself, matching getRootPathIds(). A visited set
+   * and the depth cap guard against a malformed pending set forming a loop.
+   *
+   * @param string $start
+   *   Plugin ID to walk up from.
+   *
+   * @return string[]
+   *   The chain from $start to the root, $start first.
+   */
+  private function overlayAncestorChain(string $start): array {
+    $chain = [];
+    $seen = [];
+    $current = $start;
+    $limit = $this->treeStorage->maxDepth() + 1;
+    while ($current !== '' && !isset($seen[$current]) && count($chain) < $limit) {
+      $seen[$current] = TRUE;
+      $chain[] = $current;
+      $current = $this->effectiveParent($current);
+    }
+    return $chain;
+  }
+
+  /**
+   * The parent of a link under the pending overlay, else its live parent.
+   *
+   * @param string $link_id
+   *   Plugin ID whose parent to resolve.
+   *
+   * @return string
+   *   The parent plugin ID, or '' for the menu root.
+   */
+  private function effectiveParent(string $link_id): string {
+    if (isset($this->overlayEffectiveParents[$link_id])) {
+      return $this->overlayEffectiveParents[$link_id];
+    }
+    $definition = $this->menuLinkManager->getDefinition($link_id, FALSE);
+    return $definition === NULL ? '' : (string) ($definition['parent'] ?? '');
   }
 
   /**

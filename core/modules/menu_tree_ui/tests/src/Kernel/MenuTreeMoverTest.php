@@ -12,8 +12,13 @@ use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\menu_link_content\MenuLinkContentInterface;
 use Drupal\menu_tree_ui\Service\MenuTreeMover;
 use Drupal\system\Entity\Menu;
+use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\treegrid_reorder\TreegridWorkingCopy;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
  * Tests MenuTreeMover validation and commit paths not covered by FJS tests.
@@ -21,6 +26,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
 final class MenuTreeMoverTest extends KernelTestBase {
+
+  use UserCreationTrait;
 
   /**
    * {@inheritdoc}
@@ -44,6 +51,11 @@ final class MenuTreeMoverTest extends KernelTestBase {
   private MenuTreeMover $mover;
 
   /**
+   * The working copy used to record pending moves for overlay-aware checks.
+   */
+  private TreegridWorkingCopy $workingCopy;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -51,6 +63,15 @@ final class MenuTreeMoverTest extends KernelTestBase {
     $this->installEntitySchema('menu_link_content');
     $this->installEntitySchema('user');
     $this->installConfig(['system']);
+
+    // The shared tempstore that backs the working copy stamps writes with an
+    // owner and REQUEST_TIME; give it a request with a session and an
+    // authenticated user so recording a pending move works.
+    $request = Request::create('/');
+    $request->setSession(new Session(new MockArraySessionStorage()));
+    $request->server->set('REQUEST_TIME', 1234567890);
+    $this->container->get('request_stack')->push($request);
+    $this->setUpCurrentUser(['uid' => 1]);
 
     Menu::create(['id' => 'test', 'label' => 'Test'])->save();
     Menu::create(['id' => 'other', 'label' => 'Other'])->save();
@@ -60,6 +81,7 @@ final class MenuTreeMoverTest extends KernelTestBase {
     $this->container->get('plugin.manager.menu.link')->rebuild();
 
     $this->mover = $this->container->get('menu_tree_ui.mover');
+    $this->workingCopy = $this->container->get('menu_tree_ui.working_copy');
   }
 
   /**
@@ -313,6 +335,95 @@ final class MenuTreeMoverTest extends KernelTestBase {
       array_search($c->getPluginId(), $order, TRUE),
       'C was reordered above A even though a sibling was orphaned.',
     );
+  }
+
+  /**
+   * A pending move that relocates a child unblocks a formerly-cyclic move.
+   *
+   * The editor sees the overlaid tree, so validation must too: once a pending
+   * op has moved C out from under P, moving P under C is no longer a cycle.
+   */
+  public function testOverlayPreventsFalseCycleRejection(): void {
+    $p = $this->createLink('test');
+    $c = $this->createLink('test', $p->getPluginId());
+
+    // Baseline: live, C is under P, so moving P under C is a cycle.
+    $live = $this->mover->validateMove('test', $p->getPluginId(), $c->getPluginId(), NULL);
+    $this->assertFalse($live['ok']);
+    $this->assertSame('cycle', $live['code']);
+
+    // Pending: move C out to the root. Now moving P under C is legal.
+    $this->workingCopy->addOp('test', [
+      'type' => 'move',
+      'id' => $c->getPluginId(),
+      'new_parent' => '',
+      'before_id' => NULL,
+    ]);
+
+    $result = $this->mover->validateMove('test', $p->getPluginId(), $c->getPluginId(), NULL);
+    $this->assertTrue($result['ok'], $result['message'] ?? '');
+  }
+
+  /**
+   * A cycle that exists only in the overlay is still rejected.
+   *
+   * P and C are unrelated live, so moving P under C is fine — until a pending
+   * op puts C under P, which makes P an ancestor of C in the overlaid tree.
+   */
+  public function testOverlayRejectsCycleFormedByPendingMove(): void {
+    $p = $this->createLink('test');
+    $c = $this->createLink('test');
+
+    // Baseline: siblings at the root, so moving P under C is allowed.
+    $live = $this->mover->validateMove('test', $p->getPluginId(), $c->getPluginId(), NULL);
+    $this->assertTrue($live['ok'], $live['message'] ?? '');
+
+    // Pending: move C under P. P is now C's ancestor in the overlay.
+    $this->workingCopy->addOp('test', [
+      'type' => 'move',
+      'id' => $c->getPluginId(),
+      'new_parent' => $p->getPluginId(),
+      'before_id' => NULL,
+    ]);
+
+    $result = $this->mover->validateMove('test', $p->getPluginId(), $c->getPluginId(), NULL);
+    $this->assertFalse($result['ok']);
+    $this->assertSame('cycle', $result['code']);
+  }
+
+  /**
+   * The depth cap is measured on the overlaid tree, not live storage.
+   *
+   * A pending move that deepens a parent must push a later move under it over
+   * the cap even though the same move fits against live storage.
+   */
+  public function testOverlayDepthUsesPendingParent(): void {
+    $max = MenuTreeStorage::MAX_DEPTH;
+    // A chain (max - 1) deep at the root: the deepest link sits at depth max-1.
+    $chain_root = $this->createLink('test');
+    $deepest = $chain_root->getPluginId();
+    for ($i = 1; $i < $max - 1; $i++) {
+      $deepest = $this->createLink('test', $deepest)->getPluginId();
+    }
+    $leaf = $this->createLink('test');
+    $x = $this->createLink('test');
+
+    // Baseline: live, a leaf under the deepest link lands at depth max — OK.
+    $live = $this->mover->validateMove('test', $leaf->getPluginId(), $deepest, NULL);
+    $this->assertTrue($live['ok'], $live['message'] ?? '');
+
+    // Pending: move the chain one level deeper under X, so the deepest link now
+    // sits at depth max and a leaf under it would exceed the cap.
+    $this->workingCopy->addOp('test', [
+      'type' => 'move',
+      'id' => $chain_root->getPluginId(),
+      'new_parent' => $x->getPluginId(),
+      'before_id' => NULL,
+    ]);
+
+    $result = $this->mover->validateMove('test', $leaf->getPluginId(), $deepest, NULL);
+    $this->assertFalse($result['ok']);
+    $this->assertSame('too_deep', $result['code']);
   }
 
   // Helpers.

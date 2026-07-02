@@ -111,6 +111,33 @@ final class MenuTreeLoader {
   }
 
   /**
+   * Returns the pending re-parent of each moved link, keyed by plugin ID.
+   *
+   * Collapses the menu's working-copy move ops into a map of link plugin ID to
+   * its pending new parent (last move wins). Callers overlay this on live
+   * parent lookups so validation reflects the tree the editor is looking at,
+   * not just live storage. The root-level key ('') is never present.
+   *
+   * @param string $menu_name
+   *   Menu entity ID.
+   *
+   * @return array<string, string>
+   *   Plugin ID => pending new parent plugin ID ('' for the menu root).
+   */
+  public function getPendingParentMap(string $menu_name): array {
+    $map = [];
+    foreach ($this->workingCopy->getOps($menu_name) as $op) {
+      if (($op['type'] ?? '') === 'move') {
+        $moved = (string) ($op['id'] ?? '');
+        if ($moved !== '') {
+          $map[$moved] = (string) ($op['new_parent'] ?? '');
+        }
+      }
+    }
+    return $map;
+  }
+
+  /**
    * Replays pending move ops against one level's membership and order.
    *
    * Simulates the recorded moves sequentially on a working list that starts as
