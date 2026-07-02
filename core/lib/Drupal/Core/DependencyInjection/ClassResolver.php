@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -27,7 +28,7 @@ class ClassResolver implements ClassResolverInterface {
     if ($this->container->has($definition)) {
       // Re-sync the synthetic kernel onto a stale container builder during
       // install so OOP-hook services autowiring @kernel can be constructed.
-      if ($this->container instanceof \Symfony\Component\DependencyInjection\ContainerBuilder
+      if ($this->container instanceof ContainerBuilder
           && !$this->container->initialized('kernel') && \Drupal::hasContainer()) {
         $this->container->set('kernel', \Drupal::service('kernel'));
       }
