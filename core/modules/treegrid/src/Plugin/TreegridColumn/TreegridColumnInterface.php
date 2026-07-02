@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\treegrid\Plugin\TreegridColumn;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
@@ -64,25 +63,27 @@ interface TreegridColumnInterface extends PluginInspectionInterface {
   public function getCellData(object $context): array;
 
   /**
-   * Applies a value change to the underlying entity.
+   * Applies a value change to the row identified by $link_id.
    *
    * Called by the consumer's column-update controller when the client POSTs an
    * interactive cell change. treegrid defines this contract but ships no route
    * or controller for it — the consumer owns the persistence endpoint (e.g.
    * menu_tree_ui's MenuTreeController::columnUpdate). Return FALSE for
    * read-only columns — the controller responds with a 400 rather than saving.
-   * Implementations should also return FALSE when $entity is not the expected
-   * type.
+   * Implementations should also return FALSE when the row is not one this
+   * column can update.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity backing the link that was toggled.
+   * @param string $link_id
+   *   The row identifier, as reported in the cell's 'link_id' key. Its meaning
+   *   (e.g. a menu link plugin ID) is defined by the consumer module that
+   *   registers the column; treegrid passes it through opaquely.
    * @param mixed $value
    *   The new value sent from the client (e.g. TRUE/FALSE for a toggle).
    *
    * @return bool
    *   TRUE if the update was applied, FALSE if this column is read-only or
-   *   the entity type is not supported by this column.
+   *   the row is not supported by this column.
    */
-  public function handleUpdate(EntityInterface $entity, mixed $value): bool;
+  public function handleUpdate(string $link_id, mixed $value): bool;
 
 }

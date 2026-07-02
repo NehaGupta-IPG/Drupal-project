@@ -170,9 +170,10 @@ final class MenuTreeController extends ControllerBase {
     $parent_id = $request->query->get('parent', '') ?: NULL;
     if ($parent_id !== NULL) {
       $parent_definition = $this->menuLinkManager->getDefinition($parent_id, FALSE);
-      if ($parent_definition === NULL || $parent_definition['menu_name'] !== $menu->id()) {
+      if (!$parent_definition || $parent_definition['menu_name'] !== $menu->id()) {
         // Access is checked for the route's menu only; without this, a
         // parent id from another menu would return that menu's children.
+        // getDefinition() returns FALSE (not NULL) for an unknown id.
         throw new NotFoundHttpException();
       }
     }
@@ -364,32 +365,21 @@ final class MenuTreeController extends ControllerBase {
     if (!$this->columnManager->hasDefinition($column_id)) {
       return new JsonResponse(['ok' => FALSE, 'code' => 'unknown_column', 'message' => 'Unknown column.'], 400);
     }
-    $uuid = MenuTreeUiConstants::uuidFromPluginId($link_id);
-    if ($uuid === NULL) {
-      return new JsonResponse([
-        'ok' => FALSE,
-        'code' => 'not_updatable',
-        'message' => 'Only user-created menu links can be updated.',
-      ], 400);
-    }
 
-    $storage = $this->entityTypeManager()->getStorage('menu_link_content');
-    $ids = $storage->getQuery()
-      ->accessCheck(TRUE)
-      ->condition('menu_name', $menu->id())
-      ->condition('uuid', $uuid)
-      ->range(0, 1)
-      ->execute();
-    if (!$ids) {
+    $link_definition = $this->menuLinkManager->getDefinition($link_id, FALSE);
+    if (!$link_definition || $link_definition['menu_name'] !== $menu->id()) {
+      // Access is checked for the route's menu only; without this, a link ID
+      // from another menu would let a column update reach it.
       return new JsonResponse(['ok' => FALSE, 'code' => 'not_found', 'message' => 'Link not found.'], 404);
     }
 
-    /** @var \Drupal\menu_link_content\MenuLinkContentInterface $entity */
-    $entity = $storage->load(reset($ids));
     $column = $this->columnManager->createInstance($column_id);
-
-    if (!$column->handleUpdate($entity, $value)) {
-      return new JsonResponse(['ok' => FALSE, 'code' => 'not_updatable', 'message' => 'Column is read-only.'], 400);
+    if (!$column->handleUpdate($link_id, $value)) {
+      return new JsonResponse([
+        'ok' => FALSE,
+        'code' => 'not_updatable',
+        'message' => (string) $this->t('This value cannot be updated.'),
+      ], 400);
     }
 
     return new JsonResponse(['ok' => TRUE]);

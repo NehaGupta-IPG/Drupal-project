@@ -9,6 +9,7 @@ use Drupal\system\MenuInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\menu_tree_ui\Controller\MenuTreeController;
+use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,6 +24,8 @@ use Symfony\Component\HttpFoundation\Request;
 #[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
 final class MenuTreeControllerColumnUpdateTest extends KernelTestBase {
+
+  use UserCreationTrait;
 
   /**
    * {@inheritdoc}
@@ -61,6 +64,15 @@ final class MenuTreeControllerColumnUpdateTest extends KernelTestBase {
     $this->menu = $this->container->get('entity_type.manager')
       ->getStorage('menu')
       ->load('main');
+
+    // Content-link updates check $entity->access('update'), which requires
+    // 'administer menu' and, for a routed destination, 'link to any page' so
+    // the check does not also depend on the destination route's own access.
+    $this->setUpCurrentUser([], ['administer menu', 'link to any page']);
+
+    // Static links are only present in the plugin manager's tree storage once
+    // it has rebuilt from the *.links.menu.yml discovery.
+    $this->container->get('plugin.manager.menu.link')->rebuild();
 
     $this->controller = MenuTreeController::create($this->container);
   }
@@ -165,9 +177,13 @@ final class MenuTreeControllerColumnUpdateTest extends KernelTestBase {
   }
 
   /**
-   * A static/yml link ID (no menu_link_content: prefix) must return 400.
+   * A link ID that belongs to a different menu must return 404.
+   *
+   * Mirrors the children() cross-menu guard: access is checked for the
+   * route's menu only, so a link ID from another menu must not be reachable.
    */
-  public function testNonContentLinkReturns400(): void {
+  public function testCrossMenuLinkIdReturns404(): void {
+    // 'system.admin' is a static link that belongs to the 'admin' menu.
     $request = $this->jsonRequest([
       'column_id' => 'enabled',
       'link_id' => 'system.admin',
@@ -176,8 +192,89 @@ final class MenuTreeControllerColumnUpdateTest extends KernelTestBase {
     $response = $this->controller->columnUpdate($this->menu, $request);
     $data = $this->decodeJson($response);
 
+    $this->assertSame(404, $response->getStatusCode());
+    $this->assertSame('not_found', $data['code']);
+  }
+
+  /**
+   * A static/movable link within the target menu can be toggled and persists.
+   */
+  public function testStaticLinkInMenuCanBeToggled(): void {
+    $link_manager = $this->container->get('plugin.manager.menu.link');
+    // Move a static link into the controller's menu so it is in scope.
+    $link_manager->updateDefinition('system.admin', ['menu_name' => 'main']);
+    $this->assertTrue($link_manager->createInstance('system.admin')->isEnabled());
+
+    $request = $this->jsonRequest([
+      'column_id' => 'enabled',
+      'link_id' => 'system.admin',
+      'value' => FALSE,
+    ]);
+    $response = $this->controller->columnUpdate($this->menu, $request);
+    $data = $this->decodeJson($response);
+
+    $this->assertSame(200, $response->getStatusCode());
+    $this->assertTrue($data['ok']);
+    $this->assertFalse($link_manager->createInstance('system.admin')->isEnabled());
+  }
+
+  /**
+   * A content link with a pending revision must be refused.
+   */
+  public function testPendingRevisionLinkReturns400(): void {
+    $entity = MenuLinkContent::create([
+      'title' => 'Test link',
+      'link' => ['uri' => 'internal:/'],
+      'menu_name' => 'main',
+      'enabled' => TRUE,
+    ]);
+    $entity->save();
+    /** @var \Drupal\menu_link_content\MenuLinkContentStorageInterface $storage */
+    $storage = $this->container->get('entity_type.manager')->getStorage('menu_link_content');
+    $storage->createRevision($entity, FALSE)->save();
+
+    $request = $this->jsonRequest([
+      'column_id' => 'enabled',
+      'link_id' => 'menu_link_content:' . $entity->uuid(),
+      'value' => FALSE,
+    ]);
+    $response = $this->controller->columnUpdate($this->menu, $request);
+    $data = $this->decodeJson($response);
+
     $this->assertSame(400, $response->getStatusCode());
     $this->assertSame('not_updatable', $data['code']);
+
+    $storage->resetCache([$entity->id()]);
+    $this->assertTrue((bool) $storage->load($entity->id())->get('enabled')->value);
+  }
+
+  /**
+   * A content link the current user cannot edit must be refused.
+   */
+  public function testDeniedEntityAccessReturns400(): void {
+    $entity = MenuLinkContent::create([
+      'title' => 'Test link',
+      'link' => ['uri' => 'internal:/'],
+      'menu_name' => 'main',
+      'enabled' => TRUE,
+    ]);
+    $entity->save();
+    $this->setCurrentUser($this->createUser());
+
+    $request = $this->jsonRequest([
+      'column_id' => 'enabled',
+      'link_id' => 'menu_link_content:' . $entity->uuid(),
+      'value' => FALSE,
+    ]);
+    $response = $this->controller->columnUpdate($this->menu, $request);
+    $data = $this->decodeJson($response);
+
+    $this->assertSame(400, $response->getStatusCode());
+    $this->assertSame('not_updatable', $data['code']);
+
+    $storage = $this->container->get('entity_type.manager')->getStorage('menu_link_content');
+    $storage->resetCache([$entity->id()]);
+    $this->assertTrue((bool) $storage->load($entity->id())->get('enabled')->value);
   }
 
   /**

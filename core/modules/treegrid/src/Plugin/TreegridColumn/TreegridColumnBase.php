@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\treegrid\Plugin\TreegridColumn;
 
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
@@ -38,7 +37,7 @@ abstract class TreegridColumnBase extends PluginBase implements TreegridColumnIn
    *
    * Read-only by default. Interactive columns must override this.
    */
-  public function handleUpdate(EntityInterface $entity, mixed $value): bool {
+  public function handleUpdate(string $link_id, mixed $value): bool {
     return FALSE;
   }
 

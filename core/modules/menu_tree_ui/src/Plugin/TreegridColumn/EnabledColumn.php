@@ -4,30 +4,60 @@ declare(strict_types=1);
 
 namespace Drupal\menu_tree_ui\Plugin\TreegridColumn;
 
-use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Menu\MenuLinkManagerInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\menu_link_content\MenuLinkContentInterface;
+use Drupal\menu_link_content\MenuLinkContentStorageInterface;
+use Drupal\menu_tree_ui\MenuLinkMovability;
 use Drupal\menu_tree_ui\MenuTreeRowContext;
 use Drupal\menu_tree_ui\MenuTreeUiConstants;
 use Drupal\treegrid\Attribute\TreegridColumn;
 use Drupal\treegrid\Plugin\TreegridColumn\TreegridColumnBase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Column plugin for the menu_link_content 'enabled' field.
+ * Column plugin for the menu link 'enabled' flag.
  *
  * "Enabled" controls whether a menu link appears in rendered menus. This column
  * exposes it as an inline checkbox so editors can disable a link without
  * opening the full edit form. It applies to every link, leaf or parent.
  *
- * Static/yml-defined links have no writable enabled property here; for those
- * the checkbox is rendered disabled.
+ * The checkbox is interactive for any movable link — a menu_link_content
+ * entity or a static MenuLinkDefault link overridden via
+ * StaticMenuLinkOverrides — and disabled for links backed by a bespoke plugin
+ * class that supports neither.
  */
 #[TreegridColumn(
   id: 'enabled',
   title: new TranslatableMarkup('Enabled'),
   weight: 5,
 )]
-final class EnabledColumn extends TreegridColumnBase {
+final class EnabledColumn extends TreegridColumnBase implements ContainerFactoryPluginInterface {
+
+  public function __construct(
+    array $configuration,
+    string $plugin_id,
+    mixed $plugin_definition,
+    private readonly MenuLinkManagerInterface $menuLinkManager,
+    private readonly EntityTypeManagerInterface $entityTypeManager,
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('plugin.manager.menu.link'),
+      $container->get('entity_type.manager'),
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -35,25 +65,74 @@ final class EnabledColumn extends TreegridColumnBase {
   public function getCellData(object $context): array {
     assert($context instanceof MenuTreeRowContext);
     $link = $context->element->link;
-    $plugin_id = $link->getPluginId();
 
     return [
       'type' => 'checkbox',
       'value' => $link->isEnabled(),
       'label' => (string) $this->t('Enabled'),
-      'interactive' => MenuTreeUiConstants::isContentLink($plugin_id),
-      'link_id' => $plugin_id,
+      'interactive' => MenuLinkMovability::isMovable($link),
+      'link_id' => $link->getPluginId(),
     ];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function handleUpdate(EntityInterface $entity, mixed $value): bool {
-    if (!$entity instanceof MenuLinkContentInterface) {
+  public function handleUpdate(string $link_id, mixed $value): bool {
+    if (!$this->menuLinkManager->hasDefinition($link_id)) {
       return FALSE;
     }
-    $entity->set('enabled', (bool) $value);
+
+    if (MenuTreeUiConstants::isContentLink($link_id)) {
+      return $this->handleContentLinkUpdate($link_id, (bool) $value);
+    }
+
+    $link = $this->menuLinkManager->createInstance($link_id);
+    if (!MenuLinkMovability::isMovable($link)) {
+      return FALSE;
+    }
+
+    $this->menuLinkManager->updateDefinition($link_id, ['enabled' => (bool) $value]);
+    return TRUE;
+  }
+
+  /**
+   * Applies an enabled-flag update to a menu_link_content-backed link.
+   *
+   * @param string $link_id
+   *   The "menu_link_content:{uuid}" plugin ID.
+   * @param bool $value
+   *   The new enabled value.
+   *
+   * @return bool
+   *   TRUE if the update was applied, FALSE if the entity does not exist, is
+   *   not editable by the current user, or has a pending revision.
+   */
+  private function handleContentLinkUpdate(string $link_id, bool $value): bool {
+    $uuid = MenuTreeUiConstants::uuidFromPluginId($link_id);
+    /** @var \Drupal\menu_link_content\MenuLinkContentStorageInterface $storage */
+    $storage = $this->entityTypeManager->getStorage('menu_link_content');
+    $ids = $storage->getQuery()
+      ->accessCheck(TRUE)
+      ->condition('uuid', $uuid)
+      ->range(0, 1)
+      ->execute();
+    if (!$ids) {
+      return FALSE;
+    }
+
+    /** @var \Drupal\menu_link_content\MenuLinkContentInterface $entity */
+    $entity = $storage->load(reset($ids));
+    if (!$entity instanceof MenuLinkContentInterface || !$entity->access('update')) {
+      return FALSE;
+    }
+
+    assert($storage instanceof MenuLinkContentStorageInterface);
+    if (in_array($entity->id(), $storage->getMenuLinkIdsWithPendingRevisions(), TRUE)) {
+      return FALSE;
+    }
+
+    $entity->set('enabled', $value);
     $entity->save();
     return TRUE;
   }

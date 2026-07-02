@@ -11,7 +11,6 @@ use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\menu_link_content\MenuLinkContentInterface;
 use Drupal\menu_tree_ui\MenuTreeRowContext;
 use Drupal\menu_tree_ui\Plugin\TreegridColumn\OperationsColumn;
-use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -115,10 +114,9 @@ final class OperationsColumnTest extends KernelTestBase {
    * The column is read-only: handleUpdate() always returns FALSE.
    */
   public function testIsReadOnly(): void {
-    $user = User::create(['name' => 'test_user_' . mt_rand()]);
-    $user->save();
+    $entity = $this->createMenuLinkContent();
 
-    $this->assertFalse($this->column->handleUpdate($user, TRUE));
+    $this->assertFalse($this->column->handleUpdate('menu_link_content:' . $entity->uuid(), TRUE));
   }
 
   // Helpers.
