@@ -115,9 +115,18 @@ The element upgrades the server-rendered top level (from
 
 ## Generating a test dataset
 
-The hidden `menu_tree_ui_test` submodule ships a Drush command for seeding and
-purging large test menus (handy for manually exercising the UI at scale; not for
-production). It requires Drush to be installed in your environment.
+The `menu_tree_ui_test` submodule (under `tests/modules/`) ships a Drush
+command for seeding and purging large test menus (handy for manually
+exercising the UI at scale; not for production). It requires Drush to be
+installed in your environment.
+
+Because it is a test module, it is not discovered on a normal site. To enable
+it on a development site, allow test extensions to be scanned first — add to
+`settings.php` (or `settings.local.php`):
+
+```php
+$settings['extension_discovery_scan_tests'] = TRUE;
+```
 
 ```bash
 drush en menu_tree_ui_test
