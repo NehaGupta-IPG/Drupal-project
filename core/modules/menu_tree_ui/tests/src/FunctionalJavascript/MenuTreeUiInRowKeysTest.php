@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\menu_tree_ui\FunctionalJavascript;
 
-use Behat\Mink\Element\NodeElement;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
-use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\system\Entity\Menu;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -26,6 +24,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 final class MenuTreeUiInRowKeysTest extends WebDriverTestBase {
 
+  use MenuTreeUiKeyboardNavTrait;
+
   /**
    * {@inheritdoc}
    */
@@ -38,13 +38,6 @@ final class MenuTreeUiInRowKeysTest extends WebDriverTestBase {
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
-
-  /**
-   * Menu link plugin IDs, keyed by the labels used in the tests.
-   *
-   * @var array<string, string>
-   */
-  private array $linkIds = [];
 
   /**
    * {@inheritdoc}
@@ -139,54 +132,9 @@ final class MenuTreeUiInRowKeysTest extends WebDriverTestBase {
    */
   private function seedMenu(): void {
     Menu::create(['id' => 'test', 'label' => 'Test'])->save();
-    $this->linkIds['B'] = $this->createLink('Item B', 'route:<nolink>', '', 0);
-    $this->linkIds['A'] = $this->createLink('Item A', 'internal:/', '', 1);
-    $this->linkIds['A1'] = $this->createLink('Item A1', 'route:<nolink>', $this->linkIds['A'], 0);
-  }
-
-  /**
-   * Creates a menu link and returns its plugin ID.
-   *
-   * @param string $title
-   *   The link title.
-   * @param string $uri
-   *   The link URI.
-   * @param string $parent_plugin_id
-   *   The parent link plugin ID, or '' for the top level.
-   * @param int $weight
-   *   The link weight.
-   *
-   * @return string
-   *   The created link's plugin ID.
-   */
-  private function createLink(string $title, string $uri, string $parent_plugin_id, int $weight): string {
-    $entity = MenuLinkContent::create([
-      'menu_name' => 'test',
-      'title' => $title,
-      'link' => ['uri' => $uri],
-      'parent' => $parent_plugin_id,
-      'weight' => $weight,
-    ]);
-    $entity->save();
-    return $entity->getPluginId();
-  }
-
-  /**
-   * Finds a row by its label.
-   *
-   * @param string $label
-   *   The label used when seeding.
-   *
-   * @return \Behat\Mink\Element\NodeElement
-   *   The row element.
-   */
-  private function row(string $label): NodeElement {
-    $row = $this->getSession()->getPage()->find(
-      'css',
-      sprintf('tr[role="row"][data-id="%s"]', $this->linkIds[$label]),
-    );
-    $this->assertNotNull($row, sprintf('Row %s is in the DOM.', $label));
-    return $row;
+    $this->linkIds['B'] = $this->createLink('Item B', '', 0, 'route:<nolink>');
+    $this->linkIds['A'] = $this->createLink('Item A', '', 1, 'internal:/');
+    $this->linkIds['A1'] = $this->createLink('Item A1', $this->linkIds['A'], 0, 'route:<nolink>');
   }
 
   /**
@@ -203,29 +151,6 @@ final class MenuTreeUiInRowKeysTest extends WebDriverTestBase {
     if ($this->row($label)->getAttribute('aria-expanded') === 'true') {
       $this->pressKeyOnRow($label, 'ArrowLeft');
     }
-  }
-
-  /**
-   * Focuses a row and dispatches a keydown on it.
-   *
-   * @param string $label
-   *   The row label.
-   * @param string $key
-   *   The KeyboardEvent.key value to dispatch.
-   */
-  private function pressKeyOnRow(string $label, string $key): void {
-    $id = $this->linkIds[$label];
-    $key_json = json_encode($key);
-    $script = <<<JS
-      const row = document.querySelector('tr[role="row"][data-id="$id"]');
-      if (!row) throw new Error('row $label not in DOM');
-      row.scrollIntoView({block: 'center'});
-      row.focus();
-      row.dispatchEvent(new KeyboardEvent('keydown', {
-        key: $key_json, bubbles: true, cancelable: true,
-      }));
-    JS;
-    $this->getSession()->executeScript($script);
   }
 
   /**
@@ -260,31 +185,6 @@ final class MenuTreeUiInRowKeysTest extends WebDriverTestBase {
       })();
     JS;
     return (bool) $this->getSession()->evaluateScript($script);
-  }
-
-  /**
-   * The tag name of the currently focused element.
-   *
-   * @return string|null
-   *   The uppercase tag name, or NULL when nothing is focused.
-   */
-  private function activeTag(): ?string {
-    return $this->getSession()->evaluateScript(
-      'return document.activeElement ? document.activeElement.tagName : null;',
-    );
-  }
-
-  /**
-   * The data-id of the currently focused row, when a row is focused.
-   *
-   * @return string|null
-   *   The focused row's data-id, or NULL when the focus is not on a row.
-   */
-  private function activeRowId(): ?string {
-    return $this->getSession()->evaluateScript(
-      "return document.activeElement && document.activeElement.matches('tr[role=\"row\"]')"
-      . ' ? document.activeElement.dataset.id : null;',
-    );
   }
 
 }
