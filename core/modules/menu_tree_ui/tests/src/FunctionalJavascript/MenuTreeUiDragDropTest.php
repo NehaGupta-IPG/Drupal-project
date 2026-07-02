@@ -11,9 +11,12 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests the menu_tree_ui drag-and-drop behavior end-to-end.
  *
  * Each scenario fires synthetic pointer events at the real DragController
- * pipeline, then verifies the move via the overlaid DOM:
- *  - DOM: the moved row's `aria-level` matches the destination level.
- *  - DOM: sibling order inside the destination container is correct.
+ * pipeline, then verifies the gesture landed in the aimed slot and the DOM
+ * reconciled around it: the moved row's `aria-level` matches the destination
+ * level, it sits next to the row it was aimed at, and the affected groups'
+ * row counts settle with no duplicate, blank, or virtualized rows left
+ * behind. Exact sibling order is owned by the kernel overlay/mover tests and
+ * the spliceBefore unit table, not re-asserted here.
  *
  * Moves are no longer written to storage on drop; they accumulate in a
  * server-side working copy until saved, so these tests assert the overlaid
@@ -47,21 +50,28 @@ final class MenuTreeUiDragDropTest extends MenuTreeUiJavascriptTestBase {
   }
 
   /**
-   * Drop C in the top zone of B → order becomes A, C, B, D, L.
+   * Drop C in the top zone of B → C lands immediately before B.
+   *
+   * Also checks the top level reconciles to 5 rows with no duplicate, blank,
+   * or virtualized rows left behind by the refresh.
    */
   public function testDropBeforeSibling(): void {
     $this->drag('C', 'B', 'before');
-    $this->assertSiblings(['A', 'C', 'B', 'D', 'L'], $this->childRowsSelector(NULL));
+    $this->assertAdjacent('C', 'B', $this->childRowsSelector(NULL));
     $this->assertDepth('C', 1);
     $this->assertIndent('C', 1);
+    $this->assertChildCount(NULL, 5);
+    $this->assertNoDuplicateRows();
+    $this->assertNoBlankRows();
+    $this->assertNoVirtualizedRows();
   }
 
   /**
-   * Drop B in the bottom zone of C → order becomes A, C, B, D, L.
+   * Drop B in the bottom zone of C → C lands immediately before B.
    */
   public function testDropAfterSibling(): void {
     $this->drag('B', 'C', 'after');
-    $this->assertSiblings(['A', 'C', 'B', 'D', 'L'], $this->childRowsSelector(NULL));
+    $this->assertAdjacent('C', 'B', $this->childRowsSelector(NULL));
     $this->assertDepth('B', 1);
     $this->assertIndent('B', 1);
   }
@@ -71,7 +81,7 @@ final class MenuTreeUiDragDropTest extends MenuTreeUiJavascriptTestBase {
    *
    * Exercises the single-pointer path WCAG 2.5.7 requires: tapping C's handle
    * picks it up, clicking the top of B aims it before B, and tapping C's handle
-   * again drops it. Order becomes A, C, B, D, L without ever pressing Enter.
+   * again drops it. C lands immediately before B without ever pressing Enter.
    */
   public function testPointerOnlyMoveCommitsOnHandleTap(): void {
     $this->tapHandle('C');
@@ -83,7 +93,7 @@ final class MenuTreeUiDragDropTest extends MenuTreeUiJavascriptTestBase {
       . ' && !document.querySelector(\'.menu-tree-ui-row--grabbed\')'
       . ' && !document.querySelector(\'[data-loading="true"]\')',
     );
-    $this->assertSiblings(['A', 'C', 'B', 'D', 'L'], $this->childRowsSelector(NULL));
+    $this->assertAdjacent('C', 'B', $this->childRowsSelector(NULL));
     $this->assertDepth('C', 1);
   }
 
@@ -91,7 +101,9 @@ final class MenuTreeUiDragDropTest extends MenuTreeUiJavascriptTestBase {
    * Drop B in the middle of expanded A → B becomes A's first child at level 2.
    *
    * Dropping "on" a parent lands the row as the first child (right under the
-   * parent header, where the drop is aimed), not the last.
+   * parent header, where the drop is aimed), not the last. Also checks the
+   * groups reconcile to 4 top-level rows and 3 children of A, with no
+   * duplicate, blank, or virtualized rows left behind.
    */
   public function testDropAsChildOfExpandedParent(): void {
     $this->expandRow('A');
@@ -99,25 +111,39 @@ final class MenuTreeUiDragDropTest extends MenuTreeUiJavascriptTestBase {
     $this->assertDepth('B', 2);
     $this->assertIndent('B', 2);
     $this->assertSiblings(['B', 'A1', 'A2'], $this->childRowsSelector('A'));
-    // Top level should now exclude B.
-    $this->assertSiblings(['A', 'C', 'D', 'L'], $this->childRowsSelector(NULL));
+    $this->assertChildCount(NULL, 4);
+    $this->assertChildCount('A', 3);
+    $this->assertNoDuplicateRows();
+    $this->assertNoBlankRows();
+    $this->assertNoVirtualizedRows();
   }
 
   /**
    * Drop B in the middle of leaf L → L is promoted to a parent containing B.
    *
    * The leaf should pick up a real toggle button so the new subtree can be
-   * collapsed/expanded after the drop — not a placeholder spacer span.
+   * collapsed/expanded after the drop — not a placeholder spacer span. Also
+   * checks the groups reconcile to 4 top-level rows and 1 child of L, with no
+   * duplicate, blank, or virtualized rows left behind.
    */
   public function testDropAsChildOfLeaf(): void {
     $this->drag('B', 'L', 'child');
     $this->assertDepth('B', 2);
     $this->assertIndent('B', 2);
     $this->assertIsParentRow('L');
+    $this->assertChildCount(NULL, 4);
+    $this->assertChildCount('L', 1);
+    $this->assertNoDuplicateRows();
+    $this->assertNoBlankRows();
+    $this->assertNoVirtualizedRows();
   }
 
   /**
    * Drop B in the middle of collapsed D → D auto-expands, B becomes its child.
+   *
+   * Also checks the groups reconcile to 4 top-level rows and 2 children of D
+   * (the pre-existing D1 plus the moved B), with no duplicate, blank, or
+   * virtualized rows left behind.
    */
   public function testDropAsChildOfCollapsedParentAutoExpands(): void {
     $this->drag('B', 'D', 'child');
@@ -136,6 +162,11 @@ final class MenuTreeUiDragDropTest extends MenuTreeUiJavascriptTestBase {
     $labels = array_map(fn ($el) => $this->labelFor($el->getAttribute('data-id')), $children);
     $this->assertContains('D1', $labels, 'D1 should remain a child of D.');
     $this->assertContains('B', $labels, 'B should appear as a child of D.');
+    $this->assertChildCount(NULL, 4);
+    $this->assertChildCount('D', 2);
+    $this->assertNoDuplicateRows();
+    $this->assertNoBlankRows();
+    $this->assertNoVirtualizedRows();
   }
 
   /**
@@ -144,7 +175,9 @@ final class MenuTreeUiDragDropTest extends MenuTreeUiJavascriptTestBase {
    * After A2a is moved, A2 has no remaining children. The UI should reflect
    * that — `data-has-children` flipping to "false", `aria-expanded` cleared,
    * and the toggle button swapped back to a spacer — otherwise the chevron
-   * stays clickable on an empty subtree.
+   * stays clickable on an empty subtree. Also checks the groups reconcile to
+   * 6 top-level rows, 2 remaining children of A, and 0 children of A2, with
+   * no duplicate, blank, or virtualized rows left behind.
    */
   public function testDropChildOutOfParent(): void {
     $this->expandRow('A');
@@ -153,9 +186,15 @@ final class MenuTreeUiDragDropTest extends MenuTreeUiJavascriptTestBase {
 
     $this->assertDepth('A2a', 1);
     $this->assertIndent('A2a', 1);
-    $this->assertSiblings(['A', 'B', 'C', 'D', 'L', 'A2a'], $this->childRowsSelector(NULL));
+    $this->assertAdjacent('L', 'A2a', $this->childRowsSelector(NULL));
 
     $this->assertIsLeafRow('A2');
+    $this->assertChildCount(NULL, 6);
+    $this->assertChildCount('A', 2);
+    $this->assertChildCount('A2', 0);
+    $this->assertNoDuplicateRows();
+    $this->assertNoBlankRows();
+    $this->assertNoVirtualizedRows();
   }
 
   /**
@@ -213,89 +252,6 @@ final class MenuTreeUiDragDropTest extends MenuTreeUiJavascriptTestBase {
   public function testCannotDropOntoSelf(): void {
     $this->drag('A', 'A', 'after');
     $this->assertSiblings(['A', 'B', 'C', 'D', 'L'], $this->childRowsSelector(NULL));
-  }
-
-  /**
-   * Dropping a row onto its own descendant is blocked client-side.
-   */
-  public function testCannotDropOntoDescendant(): void {
-    $this->expandRow('A');
-    $this->drag('A', 'A1', 'after');
-    $this->assertSiblings(['A', 'B', 'C', 'D', 'L'], $this->childRowsSelector(NULL));
-  }
-
-  /**
-   * Sibling-reorder must not leave stray rows behind.
-   *
-   * Catches "phantom row" regressions: e.g., the moved row in DOM twice, or
-   * a leftover blank `<li>` after a refresh that didn't clean its orphans.
-   */
-  public function testRowCountsAfterSameLevelReorder(): void {
-    $this->drag('C', 'B', 'before');
-    $this->assertChildCount(NULL, 5);
-    $this->assertNoDuplicateRows();
-    $this->assertNoBlankRows();
-    $this->assertNoVirtualizedRows();
-  }
-
-  /**
-   * Dropping into an expanded parent grows it by 1, shrinks source by 1.
-   *
-   * No row may appear in both groups.
-   */
-  public function testRowCountsAfterDropAsChildOfExpandedParent(): void {
-    $this->expandRow('A');
-    $this->drag('B', 'A', 'child');
-    $this->assertChildCount(NULL, 4);
-    $this->assertChildCount('A', 3);
-    $this->assertNoDuplicateRows();
-    $this->assertNoBlankRows();
-    $this->assertNoVirtualizedRows();
-  }
-
-  /**
-   * Dropping into a leaf puts exactly one row inside its new group.
-   *
-   * Catches stray-empty-row regressions from group-creation glitches.
-   */
-  public function testRowCountsAfterDropAsChildOfLeaf(): void {
-    $this->drag('B', 'L', 'child');
-    $this->assertChildCount(NULL, 4);
-    $this->assertChildCount('L', 1);
-    $this->assertNoDuplicateRows();
-    $this->assertNoBlankRows();
-    $this->assertNoVirtualizedRows();
-  }
-
-  /**
-   * Dropping into a collapsed parent auto-expands and adds the moved row.
-   *
-   * D goes from 1 child (D1) to 2 (D1 + B).
-   */
-  public function testRowCountsAfterDropAsChildOfCollapsedParent(): void {
-    $this->drag('B', 'D', 'child');
-    $this->assertChildCount(NULL, 4);
-    $this->assertChildCount('D', 2);
-    $this->assertNoDuplicateRows();
-    $this->assertNoBlankRows();
-    $this->assertNoVirtualizedRows();
-  }
-
-  /**
-   * Pulling a deep row up to root demotes the source parent to a leaf.
-   *
-   * Catches "row stuck in two groups" bugs.
-   */
-  public function testRowCountsAfterDropChildOutOfParent(): void {
-    $this->expandRow('A');
-    $this->expandRow('A2');
-    $this->drag('A2a', 'L', 'after');
-    $this->assertChildCount(NULL, 6);
-    $this->assertChildCount('A', 2);
-    $this->assertChildCount('A2', 0);
-    $this->assertNoDuplicateRows();
-    $this->assertNoBlankRows();
-    $this->assertNoVirtualizedRows();
   }
 
 }

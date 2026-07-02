@@ -441,4 +441,47 @@ abstract class MenuTreeUiJavascriptTestBase extends WebDriverTestBase {
     $this->assertSame($expected_labels, $actual, "Sibling order matching $row_selector.");
   }
 
+  /**
+   * Asserts a row is immediately followed by another within a row set.
+   *
+   * Rows are flat siblings in one <tbody>; document order in the table is the
+   * visual order. The commit is server-first: rows reorder only once the
+   * POST + refresh lands, so this waits for the pair to become adjacent
+   * before asserting, to avoid racing a slower commit on CI.
+   *
+   * @param string $before
+   *   The label expected immediately before $after.
+   * @param string $after
+   *   The label expected immediately after $before.
+   * @param string $row_selector
+   *   CSS matching the row set to search within (a `tr[data-parent-id="…"]`
+   *   set).
+   */
+  protected function assertAdjacent(string $before, string $after, string $row_selector): void {
+    $before_id = $this->linkIds[$before] ?? throw new \InvalidArgumentException("Unknown label $before");
+    $after_id = $this->linkIds[$after] ?? throw new \InvalidArgumentException("Unknown label $after");
+    $this->getSession()->wait(
+      10000,
+      sprintf(
+        '(() => { const ids = Array.from(document.querySelectorAll(%s))'
+        . '.map((r) => r.dataset.id); const i = ids.indexOf(%s);'
+        . ' return i !== -1 && ids[i + 1] === %s; })()',
+        json_encode($row_selector),
+        json_encode($before_id),
+        json_encode($after_id),
+      ),
+    );
+    $ids = array_map(
+      static fn (NodeElement $row): ?string => $row->getAttribute('data-id'),
+      $this->getSession()->getPage()->findAll('css', $row_selector),
+    );
+    $index = array_search($before_id, $ids, TRUE);
+    $this->assertNotFalse($index, "Row $before not found matching $row_selector.");
+    $this->assertSame(
+      $after_id,
+      $ids[$index + 1] ?? NULL,
+      "Row $after should immediately follow row $before matching $row_selector.",
+    );
+  }
+
 }

@@ -37,6 +37,7 @@
     tr.dataset.hasChildren = String(item.has_children);
     tr.setAttribute('aria-posinset', String(posInSet));
     tr.setAttribute('aria-setsize', String(setSize));
+    tr.setAttribute('aria-label', `Row ${item.id}`);
     if (item.has_children) {
       tr.setAttribute('aria-expanded', 'false');
     }

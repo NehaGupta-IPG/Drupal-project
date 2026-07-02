@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\treegrid_reorder\FunctionalJavascript;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\treegrid_reorder_test\TestTreeMoveHandler;
 use PHPUnit\Framework\Attributes\Group;
@@ -16,7 +17,9 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * movable rows backed by State), so this covers the generic drag, keyboard
  * move-mode, and Shift+Arrow gesture code with no other consuming module.
  * Each gesture is checked for both its visible DOM effect and that the move
- * reached storage through TreeReorderManager + the test handler.
+ * reached storage through TreeReorderManager + the test handler. The move-mode
+ * lifecycle (grab, cancel, no-op drop) and a keyboard move to a boundary
+ * position (before the first row) are covered alongside the completed moves.
  */
 #[Group('treegrid_reorder')]
 #[RunTestsInSeparateProcesses]
@@ -82,7 +85,75 @@ final class ReorderGestureTest extends WebDriverTestBase {
     $this->assertPersistedOrder(['2', '3', '4', '1']);
   }
 
+  /**
+   * Escape cancels a grabbed row, and dropping on its own slot is a no-op.
+   */
+  public function testMoveModeLifecycle(): void {
+    $this->dispatchKey('1', ' ');
+    $this->assertSame('true', $this->row('1')->getAttribute('aria-selected'));
+    $this->assertNull($this->row('2')->getAttribute('aria-selected'));
+    $this->assertNull($this->row('3')->getAttribute('aria-selected'));
+    $this->assertNull($this->row('4')->getAttribute('aria-selected'));
+
+    $this->dispatchKey('1', 'Escape');
+    $this->assertJsCondition(
+      '!document.querySelector(\'tr[role="row"][aria-selected]\')',
+    );
+    $this->assertSame('1', $this->activeRowId());
+    $this->assertRowOrder(['1', '2', '3', '4']);
+    $this->assertPersistedOrder(['1', '2', '3', '4']);
+
+    // Grab and drop on the same slot: a no-op must not commit a move.
+    $this->dispatchKey('1', ' ');
+    $this->dispatchKey('1', 'Enter');
+    $this->settle();
+
+    $this->assertRowOrder(['1', '2', '3', '4']);
+    $this->assertPersistedOrder(['1', '2', '3', '4']);
+  }
+
+  /**
+   * Keyboard move mode can drop before the first row.
+   */
+  public function testKeyboardMoveBeforeFirst(): void {
+    $this->dispatchKey('2', ' ');
+    $this->stepToDrop('2', 'before:1', 'ArrowUp');
+    $this->dispatchKey('2', 'Enter');
+    $this->settle();
+
+    $this->assertRowOrder(['2', '1', '3', '4']);
+    $this->assertPersistedOrder(['2', '1', '3', '4']);
+  }
+
   // Helpers.
+
+  /**
+   * Finds a row by its data-id.
+   *
+   * @param string $id
+   *   The row ID.
+   *
+   * @return \Behat\Mink\Element\NodeElement
+   *   The row element.
+   */
+  private function row(string $id): NodeElement {
+    $row = $this->getSession()->getPage()->find('css', sprintf('tr[role="row"][data-id="%s"]', $id));
+    $this->assertNotNull($row, "Row $id should be present.");
+    return $row;
+  }
+
+  /**
+   * The data-id of the currently focused row, when a row is focused.
+   *
+   * @return string|null
+   *   The focused row's data-id, or NULL when the focus is not on a row.
+   */
+  private function activeRowId(): ?string {
+    return $this->getSession()->evaluateScript(
+      "return document.activeElement && document.activeElement.matches('tr[role=\"row\"]')"
+      . ' ? document.activeElement.dataset.id : null;',
+    );
+  }
 
   /**
    * Loads the test page and waits for the upgraded treegrid.
@@ -147,8 +218,7 @@ final class ReorderGestureTest extends WebDriverTestBase {
   /**
    * Drags one row's handle into the "before" zone of another row.
    *
-   * Fires the same synthetic PointerEvent sequence the menu drag test uses
-   * against the live DragController.
+   * Fires a synthetic PointerEvent sequence against the live DragController.
    *
    * @param string $source_id
    *   The data-id of the row to move.
@@ -211,7 +281,7 @@ final class ReorderGestureTest extends WebDriverTestBase {
   }
 
   /**
-   * Steps the move-mode cursor with ArrowDown until it reaches a drop position.
+   * Steps the move-mode cursor until it reaches a drop position.
    *
    * Move mode records the live drop position on the host as data-treegrid-drop
    * ("kind:id"); walking to a wanted value is deterministic regardless of where
@@ -221,8 +291,10 @@ final class ReorderGestureTest extends WebDriverTestBase {
    *   The data-id of the grabbed (focused) row.
    * @param string $wanted
    *   The wanted data-treegrid-drop value, "kind:id".
+   * @param string $key
+   *   The KeyboardEvent key value used to step the cursor.
    */
-  private function stepToDrop(string $grabbed_id, string $wanted): void {
+  private function stepToDrop(string $grabbed_id, string $wanted, string $key = 'ArrowDown'): void {
     for ($i = 0; $i < 10; $i++) {
       $drop = $this->getSession()->evaluateScript(
         "return document.querySelector('drupal-treegrid').getAttribute('data-treegrid-drop');",
@@ -230,7 +302,7 @@ final class ReorderGestureTest extends WebDriverTestBase {
       if ($drop === $wanted) {
         return;
       }
-      $this->dispatchKey($grabbed_id, 'ArrowDown');
+      $this->dispatchKey($grabbed_id, $key);
     }
     $this->fail("Move cursor never reached '$wanted'.");
   }

@@ -162,7 +162,7 @@ final class TreegridTestUiController extends ControllerBase {
       . '" data-has-children="' . ($has_children ? 'true' : 'false') . '"'
       . ' aria-level="' . $item['depth'] . '" aria-posinset="' . $pos_in_set
       . '" aria-setsize="' . $set_size . '"' . ($has_children ? ' aria-expanded="false"' : '')
-      . ' tabindex="' . $tabindex . '">'
+      . ' aria-label="Row ' . $id . '" tabindex="' . $tabindex . '">'
       . '<td role="gridcell" class="tgu-name">' . $disclosure
       . '<span class="tgu-title">' . Html::escape($item['title']) . '</span></td>'
       . '<td role="gridcell" data-column="check">' . $checkbox . '</td>'

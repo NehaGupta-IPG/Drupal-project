@@ -17,13 +17,22 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * the host as data-treegrid-drop ("kind:id"), which these tests walk to
  * deterministically rather than counting keystrokes.
  *
+ * The generic grab/step/drop lifecycle, Escape cancel with focus return, the
+ * no-op drop, and the before-first-item stop are covered by the
+ * treegrid_reorder module's ReorderGestureTest. This suite covers the menu's
+ * own wiring on top of that lifecycle: hierarchical placement (child of a
+ * leaf, an expanded parent, or an auto-expanding collapsed parent), depth
+ * changes with Left/Right, search-field focus surviving a grab, and the held
+ * row staying visible with its section open.
+ *
  * Moves are no longer written to storage on commit; they accumulate in a
  * server-side working copy until saved, so these tests verify each move via
  * the overlaid DOM rather than the persisted entity. Persistence is covered
  * by MenuTreeUiSaveCancelTest.
  *
  * Depth-cap rejection is exercised at the service level in the MenuTreeMover
- * kernel test rather than re-driven here.
+ * kernel test rather than re-driven here. Exact sibling order is owned by the
+ * kernel overlay/mover tests and the spliceBefore unit table.
  */
 #[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
@@ -49,38 +58,6 @@ final class MenuTreeUiKeyboardMoveTest extends MenuTreeUiJavascriptTestBase {
     $this->linkIds['A2']  = $this->createLink('A2', $this->linkIds['A'], 1);
     $this->linkIds['A2a'] = $this->createLink('A2a', $this->linkIds['A2'], 0);
     $this->linkIds['D1']  = $this->createLink('D1', $this->linkIds['D'], 0);
-  }
-
-  /**
-   * Drop C between A and B: order becomes A, C, B, D, L.
-   *
-   * The gap between two siblings is a single stop on the upper one ("after A"),
-   * so this navigates to after A rather than a separate "before B".
-   */
-  public function testGrabAndDropBetweenSiblings(): void {
-    $this->moveTo('C', 'after', 'A');
-    $this->assertSiblings(['A', 'C', 'B', 'D', 'L'], $this->childRowsSelector(NULL));
-    $this->assertDepth('C', 1);
-  }
-
-  /**
-   * Drop B before the very first item (A): order becomes B, A, C, D, L.
-   *
-   * The top-of-list "before" stop is the one place a before-box appears.
-   */
-  public function testGrabAndDropBeforeFirstItem(): void {
-    $this->moveTo('B', 'before', 'A');
-    $this->assertSiblings(['B', 'A', 'C', 'D', 'L'], $this->childRowsSelector(NULL));
-    $this->assertDepth('B', 1);
-  }
-
-  /**
-   * Drop B after C (sibling): order becomes A, C, B, D, L.
-   */
-  public function testGrabAndDropAfterSibling(): void {
-    $this->moveTo('B', 'after', 'C');
-    $this->assertSiblings(['A', 'C', 'B', 'D', 'L'], $this->childRowsSelector(NULL));
-    $this->assertDepth('B', 1);
   }
 
   /**
@@ -176,50 +153,8 @@ final class MenuTreeUiKeyboardMoveTest extends MenuTreeUiJavascriptTestBase {
     $this->expandRow('A2');
     $this->moveTo('A2a', 'after', 'L');
     $this->assertDepth('A2a', 1);
-    $this->assertSiblings(['A', 'B', 'C', 'D', 'L', 'A2a'], $this->childRowsSelector(NULL));
+    $this->assertAdjacent('L', 'A2a', $this->childRowsSelector(NULL));
     $this->assertIsLeafRow('A2');
-  }
-
-  /**
-   * Space enters move mode (grabbed class on); Escape leaves it cleanly.
-   */
-  public function testGrabEntersAndEscapeExitsMoveMode(): void {
-    $this->dispatchKeys('B', [' ']);
-    $this->assertTrue(
-      $this->row('B')->hasClass('menu-tree-ui-row--grabbed'),
-      'B should carry the grabbed class once picked up.',
-    );
-
-    $this->dispatchKeys('B', ['Escape']);
-    $this->assertFalse(
-      $this->row('B')->hasClass('menu-tree-ui-row--grabbed'),
-      'B should drop the grabbed class after Escape.',
-    );
-  }
-
-  /**
-   * Escape after navigating leaves the tree and persistence unchanged.
-   */
-  public function testEscapeCancelsMove(): void {
-    $this->dispatchKeys('B', [' ', 'ArrowDown', 'ArrowDown', 'Escape']);
-    $this->assertSiblings(['A', 'B', 'C', 'D', 'L'], $this->childRowsSelector(NULL));
-    $this->assertSame(
-      $this->linkIds['B'],
-      $this->getSession()->evaluateScript('return document.activeElement?.dataset.id;'),
-      'Focus should return to the grabbed row after cancelling.',
-    );
-  }
-
-  /**
-   * Dropping a row back into its own slot is a no-op (no server round-trip).
-   *
-   * The grab starts the cursor on the row's current slot, so pressing Enter
-   * immediately should leave the order untouched.
-   */
-  public function testNoOpDropLeavesOrderUnchanged(): void {
-    $this->dispatchKeys('B', [' ', 'Enter']);
-    $this->settle();
-    $this->assertSiblings(['A', 'B', 'C', 'D', 'L'], $this->childRowsSelector(NULL));
   }
 
   /**
@@ -372,7 +307,7 @@ final class MenuTreeUiKeyboardMoveTest extends MenuTreeUiJavascriptTestBase {
     $this->stepToDrop('B', 'after:' . $this->linkIds['C']);
     $this->dispatchKeys('B', ['Enter']);
     $this->settle();
-    $this->assertSiblings(['A', 'C', 'B', 'D', 'L'], $this->childRowsSelector(NULL));
+    $this->assertAdjacent('C', 'B', $this->childRowsSelector(NULL));
   }
 
 }

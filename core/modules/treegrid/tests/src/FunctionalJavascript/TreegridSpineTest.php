@@ -13,10 +13,12 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests the treegrid spine JS against an in-module test consumer.
  *
  * Exercises the <drupal-treegrid> element upgrade, the roving-tabindex focus
- * model, keyboard navigation, lazy expand/collapse, and the client cell-renderer
- * registry — with no consuming module involved, so the spine has its own
- * coverage. Row windowing (IntersectionObserver / content-visibility) is left
- * out: it is nondeterministic under WebDriver.
+ * model (arrow keys and click), the hierarchy exposed on the focused row
+ * through aria-level/aria-posinset/aria-setsize, keyboard navigation, lazy
+ * expand/collapse with its live-region announcement, and the client
+ * cell-renderer registry — with no consuming module involved, so the spine
+ * has its own coverage. Row windowing (IntersectionObserver /
+ * content-visibility) is left out: it is nondeterministic under WebDriver.
  */
 #[Group('treegrid')]
 #[RunTestsInSeparateProcesses]
@@ -132,6 +134,46 @@ final class TreegridSpineTest extends WebDriverTestBase {
     );
     $this->assertNotNull($markup, 'The lazy child renders a markup cell.');
     $this->assertStringContainsString('m-c1a', $markup->getText());
+  }
+
+  /**
+   * Clicking a row's content focuses it and moves the roving tab stop.
+   */
+  public function testClickToFocusRow(): void {
+    $markup = $this->getSession()->getPage()->find(
+      'css',
+      'tr[role="row"][data-id="p2"] .treegrid-cell-markup',
+    );
+    $this->assertNotNull($markup, 'Row p2 should render a markup cell.');
+    $markup->click();
+
+    $this->assertSame('p2', $this->activeRowId());
+    $this->assertSame('0', $this->row('p2')->getAttribute('tabindex'));
+    $this->assertSame('-1', $this->row('p1')->getAttribute('tabindex'));
+  }
+
+  /**
+   * The focused row exposes its level, position, and sibling count.
+   */
+  public function testFocusedRowExposesHierarchy(): void {
+    $this->pressKeyOnRow('p1', 'ArrowDown');
+    $this->assertSame('p2', $this->activeRowId());
+
+    $active = $this->row('p2');
+    $this->assertSame('1', $active->getAttribute('aria-level'));
+    $this->assertSame('2', $active->getAttribute('aria-posinset'));
+    $this->assertSame('3', $active->getAttribute('aria-setsize'));
+  }
+
+  /**
+   * Expanding a row announces its name through the live region.
+   */
+  public function testToggleAnnouncesRowName(): void {
+    $this->pressKeyOnRow('p1', 'ArrowRight');
+
+    $this->assertJsCondition(
+      "((document.getElementById('drupal-live-announce') || {}).textContent || '').includes('Row p1')",
+    );
   }
 
   // Helpers.

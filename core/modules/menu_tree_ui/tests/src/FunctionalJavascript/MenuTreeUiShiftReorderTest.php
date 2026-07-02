@@ -50,6 +50,18 @@ final class MenuTreeUiShiftReorderTest extends MenuTreeUiJavascriptTestBase {
       "!document.querySelector('.menu-tree-ui__unsaved').classList.contains('js-hide')",
     );
     $this->assertSiblings(['B', 'A'], $this->childRowsSelector(NULL));
+
+    // The swap should renumber both rows' aria-posinset to their new slots.
+    $this->assertSame(
+      '1',
+      $this->row('B')->getAttribute('aria-posinset'),
+      'B should report position 1 after moving ahead of A.',
+    );
+    $this->assertSame(
+      '2',
+      $this->row('A')->getAttribute('aria-posinset'),
+      'A should report position 2 after B passed it.',
+    );
   }
 
   /**

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\menu_tree_ui\FunctionalJavascript;
 
-use Drupal\menu_link_content\MenuLinkContentInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,8 +13,10 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * A drag or keyboard move no longer writes to storage; it records the move in
  * a per-user server-side working copy and overlays it on the rendered tree.
  * The change is only persisted when the user clicks Save; Cancel discards it.
- * These tests drive one drag, then assert the unsaved notice, Save (persists)
- * and Cancel (discards) against the reloaded menu_link_content entities.
+ * These tests drive one drag, then assert the unsaved notice, and that Save
+ * and Cancel each leave the expected order on screen. Committing and
+ * discarding the working copy against storage is covered by the kernel
+ * MenuTreeWorkingCopyTest.
  */
 #[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
@@ -56,9 +57,12 @@ final class MenuTreeUiSaveCancelTest extends MenuTreeUiJavascriptTestBase {
   }
 
   /**
-   * Save persists the pending reorder: top-level order becomes C, A, B.
+   * Save commits the working copy: the new order stays on screen, no reload.
+   *
+   * Persisting the reordered weights is covered by the kernel
+   * MenuTreeWorkingCopyTest::testCommitAppliesMoves.
    */
-  public function testSavePersistsMoves(): void {
+  public function testSaveCommitsWorkingCopy(): void {
     $this->moveCBeforeA();
 
     $this->getSession()->getPage()->find('css', '.menu-tree-ui__save')->click();
@@ -66,21 +70,6 @@ final class MenuTreeUiSaveCancelTest extends MenuTreeUiJavascriptTestBase {
     // signal that the working copy was committed.
     $this->waitForSave();
 
-    $a = $this->reloadEntityByLabel('A');
-    $b = $this->reloadEntityByLabel('B');
-    $c = $this->reloadEntityByLabel('C');
-    $this->assertLessThan(
-      $a->getWeight(),
-      $c->getWeight(),
-      'After Save, C should sort before A.',
-    );
-    $this->assertLessThan(
-      $b->getWeight(),
-      $a->getWeight(),
-      'After Save, A should sort before B.',
-    );
-
-    // The saved order stays on screen without a reload.
     $this->assertSiblings(['C', 'A', 'B'], $this->childRowsSelector(NULL));
   }
 
@@ -131,7 +120,10 @@ final class MenuTreeUiSaveCancelTest extends MenuTreeUiJavascriptTestBase {
   }
 
   /**
-   * Cancel discards the pending reorder: the seed order A, B, C is unchanged.
+   * Cancel discards the pending reorder: the reload shows the seed order.
+   *
+   * Discarding the working copy is covered by the kernel
+   * MenuTreeWorkingCopyTest::testRecordAndClear.
    */
   public function testCancelDiscardsMoves(): void {
     $this->moveCBeforeA();
@@ -140,19 +132,7 @@ final class MenuTreeUiSaveCancelTest extends MenuTreeUiJavascriptTestBase {
     $this->getSession()->getPage()->find('css', '.menu-tree-ui__cancel')->click();
     $this->waitForReload();
 
-    $a = $this->reloadEntityByLabel('A');
-    $b = $this->reloadEntityByLabel('B');
-    $c = $this->reloadEntityByLabel('C');
-    $this->assertLessThan(
-      $b->getWeight(),
-      $a->getWeight(),
-      'After Cancel, A should still sort before B.',
-    );
-    $this->assertLessThan(
-      $c->getWeight(),
-      $b->getWeight(),
-      'After Cancel, B should still sort before C.',
-    );
+    $this->assertSiblings(['A', 'B', 'C'], $this->childRowsSelector(NULL));
   }
 
   /**
@@ -227,22 +207,6 @@ final class MenuTreeUiSaveCancelTest extends MenuTreeUiJavascriptTestBase {
       'css',
       'drupal-treegrid table[role="treegrid"] tbody tr[role="row"]',
     );
-  }
-
-  /**
-   * Reloads the link entity whose title equals $label, fresh from storage.
-   */
-  private function reloadEntityByLabel(string $label): MenuLinkContentInterface {
-    $storage = \Drupal::entityTypeManager()->getStorage('menu_link_content');
-    $storage->resetCache();
-    $ids = $storage->getQuery()
-      ->accessCheck(FALSE)
-      ->condition('title', $label)
-      ->execute();
-    $this->assertNotEmpty($ids, "Entity titled $label not found in storage.");
-    /** @var \Drupal\menu_link_content\MenuLinkContentInterface $entity */
-    $entity = $storage->load(reset($ids));
-    return $entity;
   }
 
 }
