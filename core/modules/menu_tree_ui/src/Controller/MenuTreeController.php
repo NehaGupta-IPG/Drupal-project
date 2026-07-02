@@ -67,7 +67,12 @@ final class MenuTreeController extends ControllerBase {
    * Admin page for a single menu — server-renders the top level.
    */
   public function page(MenuInterface $menu): array {
-    $top_level = $this->loader->loadLevelForEditing($menu->id(), NULL);
+    $all_top_level = $this->loader->loadLevelForEditing($menu->id(), NULL);
+    $top_level_total = count($all_top_level);
+    // Render only the first page on the server; the client fetches the rest as
+    // the editor scrolls. Slicing before the entity load and cell build bounds
+    // the cost that scales with width (see MenuTreeUiConstants).
+    $top_level = array_slice($all_top_level, 0, MenuTreeUiConstants::TOP_LEVEL_PAGE_SIZE);
     $columns = $this->columnManager->getSortedColumns();
     $entity_map = $this->loadContentEntitiesForElements($top_level);
 
@@ -80,7 +85,7 @@ final class MenuTreeController extends ControllerBase {
     }
 
     $rendered_rows = [];
-    $set_size = count($top_level);
+    $set_size = $top_level_total;
     $i = 0;
     foreach ($top_level as $element) {
       $rendered_rows[] = [
@@ -107,6 +112,9 @@ final class MenuTreeController extends ControllerBase {
       '#menu' => $menu,
       '#top_level' => $rendered_rows,
       '#columns' => $column_headers,
+      '#total' => $top_level_total,
+      '#page_size' => MenuTreeUiConstants::TOP_LEVEL_PAGE_SIZE,
+      '#truncated' => $top_level_total > MenuTreeUiConstants::TOP_LEVEL_PAGE_SIZE,
       '#has_changes' => $has_changes,
       '#locked' => $locked,
       '#lock_owner' => $lock_owner,
@@ -159,18 +167,28 @@ final class MenuTreeController extends ControllerBase {
         throw new NotFoundHttpException();
       }
     }
+    $offset = max(0, (int) $request->query->get('offset', 0));
     $elements = $this->loader->loadLevelForEditing($menu->id(), $parent_id);
+    $total = count($elements);
+    // Only the top level is paged; deeper levels return all their children so
+    // the expand path, which does not page, is unaffected.
+    $page = $parent_id === NULL
+      ? array_slice($elements, $offset, MenuTreeUiConstants::TOP_LEVEL_PAGE_SIZE)
+      : $elements;
     $columns = $this->columnManager->getSortedColumns();
-    $entity_map = $this->loadContentEntitiesForElements($elements);
+    $entity_map = $this->loadContentEntitiesForElements($page);
 
     $data = [];
-    foreach ($elements as $element) {
+    foreach ($page as $element) {
       $data[] = $this->serializeElement($element, $entity_map, $columns, $parent_id ?? '');
     }
 
     $response = new CacheableJsonResponse([
       'parent' => $parent_id,
       'items' => $data,
+      'offset' => $offset,
+      'has_more' => $parent_id === NULL && ($offset + count($page) < $total),
+      'total' => $total,
     ]);
     // Like ::page(), this level reflects the per-user working copy in
     // tempstore, which cache metadata cannot express, so it is not cached.

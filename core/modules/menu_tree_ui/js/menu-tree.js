@@ -317,6 +317,9 @@
       ? ns.attachSearchPanel(container)
       : null;
 
+    // Stream the rest of a truncated top level in as the editor scrolls.
+    const detachPaging = ns.attachTopLevelPaging(element);
+
     // "Keyboard commands" dialog. Closing uses a native <form method="dialog">,
     // so only opening needs JS; degrades to a no-op without dialog.showModal.
     const helpToggle = container?.querySelector('.menu-tree-ui__help-toggle');
@@ -380,6 +383,7 @@
           document.removeEventListener('click', jumpHandler);
         }
         detachSearchPanel?.();
+        detachPaging?.();
         if (helpToggle && openHelp) {
           helpToggle.removeEventListener('click', openHelp);
         }

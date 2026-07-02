@@ -18,6 +18,17 @@ final class MenuTreeUiConstants {
   const string CONTENT_PLUGIN_PREFIX = 'menu_link_content:';
 
   /**
+   * Maximum top-level rows server-rendered, and the client fetch page size.
+   *
+   * The top level is server-rendered for first paint and the no-JS fallback. A
+   * very wide top level (thousands of siblings) would make that render, and its
+   * per-row operations dropbuttons, expensive. The first TOP_LEVEL_PAGE_SIZE
+   * rows render on the server; the client fetches the rest one page of this
+   * size at a time as the editor scrolls.
+   */
+  const int TOP_LEVEL_PAGE_SIZE = 200;
+
+  /**
    * Whether a plugin ID belongs to a menu_link_content entity link.
    *
    * @param string $plugin_id

@@ -493,3 +493,12 @@
 .menu-tree-ui__primary-actions {
   margin-block-end: 1rem;
 }
+
+/*
+ * Scroll sentinel for top-level paging: an empty, non-interactive marker after
+ * the table. A small height keeps the IntersectionObserver reliable across
+ * browsers.
+ */
+.menu-tree-ui__paging-sentinel {
+  height: 1px;
+}

@@ -18,8 +18,12 @@
 <div class="menu-tree-ui">
   <noscript>
     <div class="messages messages--warning">
-      {{ 'This tree UI needs JavaScript to expand levels and search. To edit @menu without JavaScript, use the classic menu admin:'|t({ '@menu': menu.label }) }}
-      <a href="{{ path('entity.menu.edit_form', { menu: menu.id }) }}">{{ 'Open the classic admin for @menu'|t({ '@menu': menu.label }) }}</a>
+      {% if truncated %}
+        {{ 'Only the first @shown of @total links are shown. This tree UI needs JavaScript to load the rest, expand levels, and search. To edit @menu without JavaScript, use the classic menu administration:'|t({ '@shown': page_size, '@total': total, '@menu': menu.label }) }}
+      {% else %}
+        {{ 'This tree UI needs JavaScript to expand levels and search. To edit @menu without JavaScript, use the classic menu administration:'|t({ '@menu': menu.label }) }}
+      {% endif %}
+      <a href="{{ path('entity.menu.links', { menu: menu.id }) }}">{{ 'Open the classic administration for @menu'|t({ '@menu': menu.label }) }}</a>
     </div>
   </noscript>
 
@@ -149,11 +153,19 @@
     <button type="button" class="menu-tree-ui__help-toggle">{{ 'All keyboard commands'|t }}</button>
   </p>
 
+  {% if truncated %}
+    <div class="menu-tree-ui__truncation messages messages--status" role="status">
+      {{ 'Showing the first @shown of @total links. The rest load as you scroll.'|t({ '@shown': page_size, '@total': total }) }}
+    </div>
+  {% endif %}
+
   <drupal-treegrid
     class="menu-tree-ui__tree"
     data-provider="menu_tree_ui"
     data-menu="{{ menu.id }}"
     data-children-url="{{ children_action }}"
+    data-treegrid-top-total="{{ total }}"
+    data-treegrid-page-size="{{ page_size }}"
   >
     <table role="treegrid" aria-label="{{ menu.label }}" aria-describedby="menu-tree-ui-instructions" class="menu-tree-ui__table">
       <thead>

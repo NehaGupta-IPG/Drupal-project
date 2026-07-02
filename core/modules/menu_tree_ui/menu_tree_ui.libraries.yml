@@ -2,6 +2,7 @@ menu_tree_ui:
   version: VERSION
   js:
     js/row-builder.js: {}
+    js/top-level-paging.js: {}
     js/jump-to.js: {}
     js/search.js: {}
     js/menu-tree.js: {}

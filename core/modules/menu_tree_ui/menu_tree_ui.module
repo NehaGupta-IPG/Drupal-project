@@ -28,6 +28,12 @@ function menu_tree_ui_theme(): array {
         // Array of column header info: keyed by plugin ID, each entry has
         // 'id' (string) and 'label' (TranslatableMarkup).
         'columns' => [],
+        // Total number of top-level links in the menu.
+        'total' => 0,
+        // Number of top-level links rendered on the server (the page size).
+        'page_size' => 0,
+        // Whether the top level was truncated to the first page.
+        'truncated' => FALSE,
         // Whether the menu has pending (unsaved) working-copy moves.
         'has_changes' => FALSE,
         // Whether another user holds the working copy.
