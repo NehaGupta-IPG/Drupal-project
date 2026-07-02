@@ -10,6 +10,8 @@ use Drupal\Core\Database\Connection;
  * This class works like Insert except the rows will be set to the desired
  * values even if the key existed before. It supports both single-field and
  * composite (multi-field) unique or primary key constraints.
+ *
+ * @todo remove commented out QueryExecutionVoidInterface in drupal:43.0.0.
  */
 abstract class Upsert extends Query implements \Countable /* , QueryExecutionVoidInterface */ {
 
@@ -152,6 +154,7 @@ abstract class Upsert extends Query implements \Countable /* , QueryExecutionVoi
   /**
    * Executes the UPSERT operation.
    *
+   * phpcs:ignore Drupal.Commenting.FunctionComment.InvalidReturnVoid
    * @return void
    *   No return value.
    */
