@@ -8,7 +8,7 @@ use Drupal\Component\Serialization\Yaml;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Url;
 use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\system\Install\Requirements\SystemRequirements;
+use Drupal\system\RemovedCoreExtensionList;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\RequirementsPageTrait;
 use Drupal\TestTools\Extension\InfoWriterTrait;
@@ -378,10 +378,10 @@ class UpdateScriptTest extends BrowserTestBase {
       $error_url = 'https://www.drupal.org/node/3223395#s-recommendations-for-deprecated-modules';
       $extension_base_info += ['package' => 'Core'];
       if ($type === 'module') {
-        $removed_core_list = SystemRequirements::DRUPAL_CORE_REMOVED_MODULE_LIST;
+        $removed_core_list = RemovedCoreExtensionList::MODULES;
       }
       else {
-        $removed_core_list = SystemRequirements::DRUPAL_CORE_REMOVED_THEME_LIST;
+        $removed_core_list = RemovedCoreExtensionList::THEMES;
       }
 
       foreach ($extensions as $extension) {

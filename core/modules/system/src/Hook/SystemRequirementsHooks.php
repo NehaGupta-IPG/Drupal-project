@@ -23,6 +23,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\PhpRequirements;
 use Drupal\system\Install\Requirements\SystemRequirements;
+use Drupal\system\RemovedCoreExtensionList;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -1057,7 +1058,7 @@ class SystemRequirementsHooks {
     // Look for removed core modules.
     $is_removed_module = function ($extension_name) use ($module_extension_list) {
       return !$module_extension_list->exists($extension_name)
-        && array_key_exists($extension_name, SystemRequirements::DRUPAL_CORE_REMOVED_MODULE_LIST);
+        && RemovedCoreExtensionList::isRemovedModule($extension_name);
     };
     $removed_modules = array_filter(array_keys($extension_config->get('module')), $is_removed_module);
     if (!empty($removed_modules)) {
@@ -1065,7 +1066,7 @@ class SystemRequirementsHooks {
       foreach ($removed_modules as $removed_module) {
         $list[] = $this->t('<a href=":url">@module</a>', [
           ':url' => "https://www.drupal.org/project/$removed_module",
-          '@module' => SystemRequirements::DRUPAL_CORE_REMOVED_MODULE_LIST[$removed_module],
+          '@module' => RemovedCoreExtensionList::MODULES[$removed_module],
         ]);
       }
       $requirements['removed_module'] = $create_extension_incompatibility_list(
@@ -1095,7 +1096,7 @@ class SystemRequirementsHooks {
     // Look for removed core themes.
     $is_removed_theme = function ($extension_name) use ($theme_extension_list) {
       return !$theme_extension_list->exists($extension_name)
-        && array_key_exists($extension_name, SystemRequirements::DRUPAL_CORE_REMOVED_THEME_LIST);
+        && RemovedCoreExtensionList::isRemovedTheme($extension_name);
     };
     $removed_themes = array_filter(array_keys($extension_config->get('theme')), $is_removed_theme);
     if (!empty($removed_themes)) {
@@ -1103,7 +1104,7 @@ class SystemRequirementsHooks {
       foreach ($removed_themes as $removed_theme) {
         $list[] = $this->t('<a href=":url">@theme</a>', [
           ':url' => "https://www.drupal.org/project/$removed_theme",
-          '@theme' => SystemRequirements::DRUPAL_CORE_REMOVED_THEME_LIST[$removed_theme],
+          '@theme' => RemovedCoreExtensionList::THEMES[$removed_theme],
         ]);
       }
       $requirements['removed_theme'] = $create_extension_incompatibility_list(
@@ -1132,7 +1133,7 @@ class SystemRequirementsHooks {
 
     // Look for missing modules.
     $is_missing_module = fn($extension_name) => !$module_extension_list->exists($extension_name)
-      && !array_key_exists($extension_name, SystemRequirements::DRUPAL_CORE_REMOVED_MODULE_LIST);
+      && !RemovedCoreExtensionList::isRemovedModule($extension_name);
 
     $invalid_modules = array_filter(array_keys($extension_config->get('module')), $is_missing_module);
 
@@ -1154,7 +1155,7 @@ class SystemRequirementsHooks {
 
     // Look for invalid themes.
     $is_missing_theme = fn($extension_name) => !$theme_extension_list->exists($extension_name)
-      && !array_key_exists($extension_name, SystemRequirements::DRUPAL_CORE_REMOVED_THEME_LIST);
+      && !RemovedCoreExtensionList::isRemovedTheme($extension_name);
 
     $invalid_themes = array_filter(array_keys($extension_config->get('theme')), $is_missing_theme);
     if (!empty($invalid_themes)) {
