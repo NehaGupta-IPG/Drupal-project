@@ -219,6 +219,9 @@ abstract class Connection {
   /**
    * Commits all the open transactions.
    *
+   * @return void
+   *   No return value.
+   *
    * @internal
    *   This method exists only to work around a bug caused by Drupal incorrectly
    *   relying on object destruction order to commit transactions. Xdebug 3.3.0
@@ -337,6 +340,9 @@ abstract class Connection {
    *
    * @param string $prefix
    *   A single prefix.
+   *
+   * @return void
+   *   No return value.
    */
   protected function setPrefix($prefix) {
     assert(is_string($prefix), 'The \'$prefix\' argument to ' . __METHOD__ . '() must be a string');
@@ -501,6 +507,9 @@ abstract class Connection {
    *
    * @param string $target
    *   (optional) The target this connection is for.
+   *
+   * @return void
+   *   No return value.
    */
   public function setTarget($target = NULL) {
     if (!isset($this->target)) {
@@ -523,6 +532,9 @@ abstract class Connection {
    *
    * @param string $key
    *   The key this connection is for.
+   *
+   * @return void
+   *   No return value.
    */
   public function setKey($key) {
     if (!isset($this->key)) {
@@ -545,6 +557,9 @@ abstract class Connection {
    *
    * @param \Drupal\Core\Database\Log $logger
    *   The logging object we want to use.
+   *
+   * @return void
+   *   No return value.
    */
   public function setLogger(Log $logger) {
     $this->logger = $logger;
@@ -740,7 +755,7 @@ abstract class Connection {
    * @param string $class
    *   The class for which we want the potentially driver-specific class.
    *
-   * @return string
+   * @return class-string
    *   The name of the class that should be used for this driver.
    */
   public function getDriverClass($class) {
@@ -1238,6 +1253,9 @@ abstract class Connection {
    *
    * @param string $database
    *   The name of the database to create.
+   *
+   * @return void
+   *   No return value.
    */
   abstract public function createDatabase($database);
 

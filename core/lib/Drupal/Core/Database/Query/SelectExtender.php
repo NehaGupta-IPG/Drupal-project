@@ -515,6 +515,9 @@ class SelectExtender implements SelectInterface {
    * cannot know in advance what those methods will be, so we cannot provide
    * wrapping implementations as we do above.  Instead, we use this slower
    * catch-all method to handle any additional methods.
+   *
+   * @return mixed
+   *   The value returned by the called method.
    */
   public function __call($method, $args) {
     $return = call_user_func_array([$this->query, $method], $args);

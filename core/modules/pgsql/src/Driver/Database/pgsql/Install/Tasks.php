@@ -6,6 +6,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Install\Tasks as InstallTasks;
 use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 // cspell:ignore proname trgm
 
@@ -59,21 +60,21 @@ class Tasks extends InstallTasks {
   /**
    * {@inheritdoc}
    */
-  public function name() {
+  public function name(): TranslatableMarkup {
     return $this->t('PostgreSQL');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function minimumVersion() {
+  public function minimumVersion(): ?string {
     return static::PGSQL_MINIMUM_VERSION;
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function connect() {
+  protected function connect(): bool {
     try {
       // This doesn't actually test the connection.
       Database::setActiveConnection();
@@ -131,7 +132,7 @@ class Tasks extends InstallTasks {
   /**
    * Check encoding is UTF8.
    */
-  protected function checkEncoding() {
+  protected function checkEncoding(): void {
     try {
       if (Database::getConnection()->query('SHOW server_encoding')->fetchField() == 'UTF8') {
         $this->pass($this->t('Database is encoded in UTF-8'));
@@ -153,7 +154,7 @@ class Tasks extends InstallTasks {
    *
    * Unserializing does not work on Postgresql 9 when bytea_output is 'hex'.
    */
-  public function checkBinaryOutput() {
+  public function checkBinaryOutput(): void {
     $database_connection = Database::getConnection();
     if (!$this->checkBinaryOutputSuccess()) {
       // First try to alter the database. If it fails, raise an error telling
@@ -193,7 +194,7 @@ class Tasks extends InstallTasks {
   /**
    * Verify that a binary data roundtrip returns the original string.
    */
-  protected function checkBinaryOutputSuccess() {
+  protected function checkBinaryOutputSuccess(): bool {
     $bytea_output = Database::getConnection()->query("SHOW bytea_output")->fetchField();
     return ($bytea_output == 'escape');
   }
@@ -205,7 +206,7 @@ class Tasks extends InstallTasks {
    * treat backslashes literally, as specified in the SQL standard. This allows
    * Drupal to convert between bytea, text and varchar columns.
    */
-  public function checkStandardConformingStrings() {
+  public function checkStandardConformingStrings(): void {
     $database_connection = Database::getConnection();
     if (!$this->checkStandardConformingStringsSuccess()) {
       // First try to alter the database. If it fails, raise an error telling
@@ -245,7 +246,7 @@ class Tasks extends InstallTasks {
   /**
    * Verifies the standard_conforming_strings setting.
    */
-  protected function checkStandardConformingStringsSuccess() {
+  protected function checkStandardConformingStringsSuccess(): bool {
     $standard_conforming_strings = Database::getConnection()->query("SHOW standard_conforming_strings")->fetchField();
     return ($standard_conforming_strings == 'on');
   }
@@ -253,7 +254,7 @@ class Tasks extends InstallTasks {
   /**
    * Generic function to check postgresql extensions.
    */
-  public function checkExtensions() {
+  public function checkExtensions(): void {
     $connection = Database::getConnection();
     try {
       // Enable pg_trgm for PostgreSQL 13 or higher.
@@ -277,7 +278,7 @@ class Tasks extends InstallTasks {
   /**
    * Make PostgreSQL Drupal friendly.
    */
-  public function initializeDatabase() {
+  public function initializeDatabase(): void {
     // We create some functions using global names instead of prefixing them
     // like we do with table names. This is so that we don't double up if more
     // than one instance of Drupal is running on a single database. We therefore
@@ -319,7 +320,7 @@ class Tasks extends InstallTasks {
   /**
    * {@inheritdoc}
    */
-  public function getFormOptions(array $database) {
+  public function getFormOptions(array $database): array {
     $form = parent::getFormOptions($database);
     if (empty($form['advanced_options']['port']['#default_value'])) {
       $form['advanced_options']['port']['#default_value'] = '5432';

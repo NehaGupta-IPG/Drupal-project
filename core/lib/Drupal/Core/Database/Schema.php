@@ -109,6 +109,9 @@ abstract class Schema implements PlaceholderInterface {
    * Create names for indexes, primary keys and constraints.
    *
    * This prevents using {} around non-table names like indexes and keys.
+   *
+   * @return string
+   *   The database object name.
    */
   public function prefixNonTable($table) {
     $args = func_get_args();
@@ -305,6 +308,9 @@ abstract class Schema implements PlaceholderInterface {
    * @param string $new_name
    *   The new name for the table.
    *
+   * @return void
+   *   No return value.
+   *
    * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
    *   If the specified table doesn't exist.
    * @throws \Drupal\Core\Database\SchemaObjectExistsException
@@ -347,6 +353,9 @@ abstract class Schema implements PlaceholderInterface {
    *   or index including it in this array. See ::changeField() for more
    *   explanation why.
    *
+   * @return void
+   *   No return value.
+   *
    * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
    *   If the specified table doesn't exist.
    * @throws \Drupal\Core\Database\SchemaObjectExistsException
@@ -388,6 +397,9 @@ abstract class Schema implements PlaceholderInterface {
    *   The table to be altered.
    * @param array $fields
    *   Fields for the primary key.
+   *
+   * @return void
+   *   No return value.
    *
    * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
    *   If the specified table doesn't exist.
@@ -437,6 +449,9 @@ abstract class Schema implements PlaceholderInterface {
    *   The name of the key.
    * @param array $fields
    *   An array of field names.
+   *
+   * @return void
+   *   No return value.
    *
    * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
    *   If the specified table doesn't exist.
@@ -508,6 +523,9 @@ abstract class Schema implements PlaceholderInterface {
    *   Note that the above is a partial table definition and that we would
    *   usually pass a complete table definition as obtained through
    *   hook_schema() instead.
+   *
+   * @return void
+   *   No return value.
    *
    * @see schemaapi
    * @see hook_schema()
@@ -620,6 +638,9 @@ abstract class Schema implements PlaceholderInterface {
    *   table along with changing the field. The format is the same as a
    *   table specification but without the 'fields' element.
    *
+   * @return void
+   *   No return value.
+   *
    * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
    *   If the specified table or source field doesn't exist.
    * @throws \Drupal\Core\Database\SchemaObjectExistsException
@@ -634,6 +655,9 @@ abstract class Schema implements PlaceholderInterface {
    *   The name of the table to create.
    * @param array $table
    *   A Schema API table definition array.
+   *
+   * @return void
+   *   No return value.
    *
    * @throws \Drupal\Core\Database\SchemaObjectExistsException
    *   If the specified table already exists.
@@ -743,6 +767,9 @@ abstract class Schema implements PlaceholderInterface {
    * @param array $fields
    *   An array containing the field specifications of the table, as per the
    *   schema data structure format.
+   *
+   * @return void
+   *   No return value.
    *
    * @throws \Drupal\Core\Database\SchemaException
    *   Thrown if any primary key field specification does not exist or if they

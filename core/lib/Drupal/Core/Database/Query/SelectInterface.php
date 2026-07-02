@@ -575,6 +575,9 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
    *
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection for which to compile the clause.
+   *
+   * @return void
+   *   No return value.
    */
   public function havingCompile(Connection $connection);
 

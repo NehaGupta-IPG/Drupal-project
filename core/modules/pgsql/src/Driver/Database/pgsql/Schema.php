@@ -89,7 +89,7 @@ class Schema extends DatabaseSchema {
    * @return string
    *   The index/constraint/pkey identifier.
    */
-  protected function ensureIdentifiersLength($table_identifier_part, $column_identifier_part, $tag, $separator = '__') {
+  protected function ensureIdentifiersLength($table_identifier_part, $column_identifier_part, $tag, $separator = '__'): string {
     $info = $this->getPrefixInfo($table_identifier_part);
     $table_identifier_part = $info['table'];
     $identifierName = implode($separator, [$table_identifier_part, $column_identifier_part, $tag]);
@@ -118,7 +118,7 @@ class Schema extends DatabaseSchema {
    * @param string $table
    *   The non-prefixed name of the table.
    *
-   * @return mixed|object
+   * @return \StdClass
    *   An object with two member variables:
    *   - 'blob_fields' that lists all the blob fields in the table.
    *   - 'sequences' that lists the sequences used in that table.
@@ -126,7 +126,7 @@ class Schema extends DatabaseSchema {
    * @throws \Exception
    *   Exception thrown when the query for the table information fails.
    */
-  public function queryTableInformation($table) {
+  public function queryTableInformation($table): \StdClass {
     // Generate a key to reference this table's information on.
     $prefixed_table = $this->connection->getPrefix() . $table;
     $key = $this->connection->prefixTables('{' . $table . '}');
@@ -213,7 +213,7 @@ EOD;
    * @return string
    *   PostgreSQL's temporary namespace name.
    */
-  protected function getTempNamespaceName() {
+  protected function getTempNamespaceName(): string {
     if (!isset($this->tempNamespaceName)) {
       $this->tempNamespaceName = $this->connection->query('SELECT nspname FROM pg_namespace WHERE oid = pg_my_temp_schema()')->fetchField();
     }
@@ -225,8 +225,11 @@ EOD;
    *
    * @param string $table
    *   The non-prefixed name of the table.
+   *
+   * @return void
+   *   No return value.
    */
-  protected function resetTableInformation($table) {
+  protected function resetTableInformation($table): void {
     $key = $this->defaultSchema . '.' . $this->connection->getPrefix() . $table;
     unset($this->tableInformation[$key]);
   }
@@ -259,7 +262,7 @@ EOD;
    * @throws \Exception
    *   Exception thrown when the query for the table information fails.
    */
-  public function queryFieldInformation($table, $field, $constraint_type = 'c') {
+  public function queryFieldInformation($table, $field, $constraint_type = 'c'): array {
     assert(in_array($constraint_type, ['c', 'f', 'p', 'u', 't', 'x']));
     $prefixInfo = $this->getPrefixInfo($table, TRUE);
 
@@ -298,7 +301,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  protected function createTableSql($name, $table) {
+  protected function createTableSql($name, $table): array {
     $sql_fields = [];
     foreach ($table['fields'] as $field_name => $field) {
       $sql_fields[] = $this->createFieldSql($field_name, $this->processField($field));
@@ -356,8 +359,11 @@ EOD;
    *   Name of the field.
    * @param array $spec
    *   The field specification, as per the schema data structure format.
+   *
+   * @return string
+   *   The SQL string.
    */
-  protected function createFieldSql($name, $spec) {
+  protected function createFieldSql($name, $spec): string {
     // The PostgreSQL server converts names into lowercase, unless quoted.
     $sql = '"' . $name . '" ' . $spec['pgsql_type'];
 
@@ -397,8 +403,11 @@ EOD;
    *
    * @param array $field
    *   A field description array, as specified in the schema documentation.
+   *
+   * @return array
+   *   Database-engine specific properties.
    */
-  protected function processField($field) {
+  protected function processField($field): array {
     if (!isset($field['size'])) {
       $field['size'] = 'normal';
     }
@@ -442,7 +451,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function getFieldTypeMap() {
+  public function getFieldTypeMap(): array {
     // Put :normal last so it gets preserved by array_flip. This makes
     // it much easier for modules (such as schema.module) to map
     // database types back into schema types.
@@ -488,7 +497,7 @@ EOD;
   /**
    * Creates the SQL key for the given fields.
    */
-  protected function _createKeySql($fields) {
+  protected function _createKeySql($fields): string {
     $return = [];
     foreach ($fields as $field) {
       if (is_array($field)) {
@@ -508,7 +517,7 @@ EOD;
    * that requires a separate database lookup for each column in the key. The
    * key length defined in the schema is ignored.
    */
-  protected function createPrimaryKeySql($fields) {
+  protected function createPrimaryKeySql($fields): string {
     $return = [];
     foreach ($fields as $field) {
       if (is_array($field)) {
@@ -524,7 +533,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function tableExists($table, $add_prefix = TRUE) {
+  public function tableExists($table, $add_prefix = TRUE): bool {
     $prefixInfo = $this->getPrefixInfo($table, $add_prefix);
 
     return (bool) $this->connection->query("SELECT 1 FROM pg_tables WHERE schemaname = :schema AND tablename = :table", [
@@ -536,7 +545,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function findTables($table_expression) {
+  public function findTables($table_expression): array {
     $prefix = $this->connection->getPrefix();
     $prefix_length = strlen($prefix);
     $tables = [];
@@ -574,7 +583,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function renameTable($table, $new_name) {
+  public function renameTable($table, $new_name): void {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("Cannot rename '$table' to '$new_name': table '$table' doesn't exist.");
     }
@@ -647,7 +656,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function dropTable($table) {
+  public function dropTable($table): bool {
     if (!$this->tableExists($table)) {
       return FALSE;
     }
@@ -660,7 +669,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function addField($table, $field, $spec, $new_keys = []) {
+  public function addField($table, $field, $spec, $new_keys = []): void {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("Cannot add field '$table.$field': table doesn't exist.");
     }
@@ -722,7 +731,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function dropField($table, $field) {
+  public function dropField($table, $field): bool {
     if (!$this->fieldExists($table, $field)) {
       return FALSE;
     }
@@ -735,7 +744,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function fieldExists($table, $column) {
+  public function fieldExists($table, $column): bool {
     $prefixInfo = $this->getPrefixInfo($table);
 
     return (bool) $this->connection->query("SELECT 1 FROM pg_attribute WHERE attrelid = :key::regclass AND attname = :column AND NOT attisdropped AND attnum > 0", [
@@ -747,7 +756,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function indexExists($table, $name) {
+  public function indexExists($table, $name): bool {
     // Details https://www.postgresql.org/docs/12/view-pg-indexes.html
     $index_name = $this->ensureIdentifiersLength($table, $name, 'idx');
     // Remove leading and trailing quotes because the index name is in a WHERE
@@ -773,7 +782,7 @@ EOD;
    * @return bool
    *   TRUE if the constraint exists, FALSE otherwise.
    */
-  public function constraintExists($table, $name) {
+  public function constraintExists($table, $name): bool {
     // ::ensureIdentifiersLength() expects three parameters, although not
     // explicitly stated in its signature, thus we split our constraint name in
     // a proper name and a suffix.
@@ -796,7 +805,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function addPrimaryKey($table, $fields) {
+  public function addPrimaryKey($table, $fields): void {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("Cannot add primary key to table '$table': table doesn't exist.");
     }
@@ -811,7 +820,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function dropPrimaryKey($table) {
+  public function dropPrimaryKey($table): bool {
     if (!$this->constraintExists($table, 'pkey')) {
       return FALSE;
     }
@@ -824,7 +833,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  protected function findPrimaryKeyColumns($table) {
+  protected function findPrimaryKeyColumns($table): array|false {
     if (!$this->tableExists($table)) {
       return FALSE;
     }
@@ -834,7 +843,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function addUniqueKey($table, $name, $fields) {
+  public function addUniqueKey($table, $name, $fields): void {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("Cannot add unique key '$name' to table '$table': table doesn't exist.");
     }
@@ -852,7 +861,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function dropUniqueKey($table, $name) {
+  public function dropUniqueKey($table, $name): bool {
     if (!$this->constraintExists($table, $name . '__key')) {
       return FALSE;
     }
@@ -865,7 +874,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function addIndex($table, $name, $fields, array $spec) {
+  public function addIndex($table, $name, $fields, array $spec): void {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("Cannot add index '$name' to table '$table': table doesn't exist.");
     }
@@ -880,7 +889,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function dropIndex($table, $name) {
+  public function dropIndex($table, $name): bool {
     if (!$this->indexExists($table, $name)) {
       return FALSE;
     }
@@ -893,7 +902,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  protected function introspectIndexSchema($table) {
+  protected function introspectIndexSchema($table): array {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("The table $table doesn't exist.");
     }
@@ -927,7 +936,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function changeField($table, $field, $field_new, $spec, $new_keys = []) {
+  public function changeField($table, $field, $field_new, $spec, $new_keys = []): void {
     if (!$this->fieldExists($table, $field)) {
       throw new SchemaObjectDoesNotExistException("Cannot change the definition of field '$table.$field': field doesn't exist.");
     }
@@ -1049,7 +1058,7 @@ EOD;
   /**
    * Creates a statement for an SQL index for the given fields.
    */
-  protected function _createIndexSql($table, $name, $fields) {
+  protected function _createIndexSql($table, $name, $fields): string {
     $query = 'CREATE INDEX ' . $this->ensureIdentifiersLength($table, $name, 'idx') . ' ON {' . $table . '} (';
     $query .= $this->_createKeySql($fields) . ')';
     return $query;
@@ -1058,7 +1067,7 @@ EOD;
   /**
    * Adds keys for an SQL table.
    */
-  protected function _createKeys($table, $new_keys) {
+  protected function _createKeys($table, $new_keys): void {
     if (isset($new_keys['primary key'])) {
       $this->addPrimaryKey($table, $new_keys['primary key']);
     }
@@ -1088,7 +1097,7 @@ EOD;
    * @return string|false
    *   The table or column comment. FALSE if the table or column does not exist.
    */
-  public function getComment($table, $column = NULL) {
+  public function getComment($table, $column = NULL): string|false {
     $info = $this->getPrefixInfo($table);
     // Don't use {} around pg_class, pg_attribute tables.
     if (isset($column)) {
@@ -1118,7 +1127,7 @@ EOD;
    *   A base-64 encoded sha-256 hash, with + and / replaced with _ and any =
    *   padding characters removed.
    */
-  protected function hashBase64($data) {
+  protected function hashBase64($data): string {
     $hash = base64_encode(hash('sha256', $data, TRUE));
     // Modify the hash so it's safe to use in PostgreSQL identifiers.
     return strtr($hash, ['+' => '_', '/' => '_', '=' => '']);

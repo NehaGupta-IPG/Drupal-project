@@ -9,6 +9,7 @@ use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseAccessDeniedException;
 use Drupal\Core\Database\DatabaseNotFoundException;
+use Drupal\Core\Database\ExceptionHandler as BaseExceptionHandler;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 use Drupal\mysql\Driver\Database\mysql\Connection as BaseMySqlConnection;
 
@@ -55,7 +56,7 @@ class Connection extends BaseMySqlConnection {
   /**
    * {@inheritdoc}
    */
-  public static function open(array &$connection_options = []) {
+  public static function open(array &$connection_options = []): \mysqli {
     // Sets mysqli error reporting mode to report errors from mysqli function
     // calls and to throw mysqli_sql_exception for errors.
     // @see https://www.php.net/manual/en/mysqli-driver.report-mode.php
@@ -132,14 +133,14 @@ class Connection extends BaseMySqlConnection {
   /**
    * {@inheritdoc}
    */
-  public function driver() {
+  public function driver(): string {
     return 'mysqli';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function clientVersion() {
+  public function clientVersion(): string {
     return \mysqli_get_client_info();
   }
 
@@ -163,7 +164,7 @@ class Connection extends BaseMySqlConnection {
   /**
    * {@inheritdoc}
    */
-  public function quote($string, $parameter_type = \PDO::PARAM_STR) {
+  public function quote($string, $parameter_type = \PDO::PARAM_STR): string {
     return "'" . $this->connection->escape_string((string) $string) . "'";
   }
 
@@ -177,7 +178,7 @@ class Connection extends BaseMySqlConnection {
   /**
    * {@inheritdoc}
    */
-  public function exceptionHandler() {
+  public function exceptionHandler(): BaseExceptionHandler {
     return new ExceptionHandler();
   }
 

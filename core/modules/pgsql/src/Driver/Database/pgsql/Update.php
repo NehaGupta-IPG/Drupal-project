@@ -13,7 +13,7 @@ class Update extends QueryUpdate {
   /**
    * {@inheritdoc}
    */
-  public function execute() {
+  public function execute(): ?int {
     $max_placeholder = 0;
     $blobs = [];
     $blob_count = 0;
@@ -87,6 +87,8 @@ class Update extends QueryUpdate {
       }
       $this->connection->exceptionHandler()->handleExecutionException($e, $stmt, [], $this->queryOptions);
     }
+
+    return NULL;
   }
 
 }

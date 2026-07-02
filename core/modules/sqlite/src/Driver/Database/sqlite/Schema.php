@@ -28,7 +28,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function tableExists($table, $add_prefix = TRUE) {
+  public function tableExists($table, $add_prefix = TRUE): bool {
     $info = $this->getPrefixInfo($table, $add_prefix);
 
     // Don't use {} around sqlite_master table.
@@ -41,7 +41,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function fieldExists($table, $column) {
+  public function fieldExists($table, $column): bool {
     $schema = $this->introspectSchema($table);
     return !empty($schema['fields'][$column]);
   }
@@ -49,7 +49,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function createTableSql($name, $table) {
+  public function createTableSql($name, $table): array {
     if (!empty($table['primary key']) && is_array($table['primary key'])) {
       $this->ensureNotNullPrimaryKey($table['primary key'], $table['fields']);
     }
@@ -62,7 +62,7 @@ class Schema extends DatabaseSchema {
   /**
    * Build the SQL expression for indexes.
    */
-  protected function createIndexSql($tablename, $schema) {
+  protected function createIndexSql($tablename, $schema): array {
     $sql = [];
     $info = $this->getPrefixInfo($tablename);
     if (!empty($schema['unique keys'])) {
@@ -81,7 +81,7 @@ class Schema extends DatabaseSchema {
   /**
    * Build the SQL expression for creating columns.
    */
-  protected function createColumnsSql($tablename, $schema) {
+  protected function createColumnsSql($tablename, $schema): string {
     $sql_array = [];
 
     // Add the SQL statement for each field.
@@ -105,7 +105,7 @@ class Schema extends DatabaseSchema {
   /**
    * Build the SQL expression for keys.
    */
-  protected function createKeySql($fields) {
+  protected function createKeySql($fields): string {
     $return = [];
     foreach ($fields as $field) {
       if (is_array($field)) {
@@ -124,7 +124,7 @@ class Schema extends DatabaseSchema {
    * @param array $field
    *   A field description array, as specified in the schema documentation.
    */
-  protected function processField($field) {
+  protected function processField($field): array {
     if (!isset($field['size'])) {
       $field['size'] = 'normal';
     }
@@ -162,7 +162,7 @@ class Schema extends DatabaseSchema {
    * @param array $spec
    *   The field specification, as per the schema data structure format.
    */
-  protected function createFieldSql($name, $spec) {
+  protected function createFieldSql($name, $spec): string {
     $name = $this->connection->escapeField($name);
     if (!empty($spec['auto_increment'])) {
       $sql = $name . " INTEGER PRIMARY KEY AUTOINCREMENT";
@@ -213,7 +213,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function getFieldTypeMap() {
+  public function getFieldTypeMap(): array {
     // Put :normal last so it gets preserved by array_flip. This makes
     // it much easier for modules (such as schema.module) to map
     // database types back into schema types.
@@ -264,7 +264,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function renameTable($table, $new_name) {
+  public function renameTable($table, $new_name): void {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("Cannot rename '$table' to '$new_name': table '$table' doesn't exist.");
     }
@@ -304,7 +304,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function dropTable($table) {
+  public function dropTable($table): bool {
     if (!$this->tableExists($table)) {
       return FALSE;
     }
@@ -316,7 +316,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function addField($table, $field, $specification, $keys_new = []) {
+  public function addField($table, $field, $specification, $keys_new = []): void {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("Cannot add field '$table.$field': table doesn't exist.");
     }
@@ -422,7 +422,7 @@ class Schema extends DatabaseSchema {
    *     - an associative array with two keys 'expression' and 'arguments',
    *       that will be used as an expression field.
    */
-  protected function alterTable($table, $old_schema, $new_schema, array $mapping = []) {
+  protected function alterTable($table, $old_schema, $new_schema, array $mapping = []): void {
     $i = 0;
     do {
       $new_table = $table . '_' . $i++;
@@ -481,7 +481,7 @@ class Schema extends DatabaseSchema {
    * @throws \Exception
    *   If a column of the table could not be parsed.
    */
-  protected function introspectSchema($table) {
+  protected function introspectSchema($table): array {
     $mapped_fields = array_flip($this->getFieldTypeMap());
     $schema = [
       'fields' => [],
@@ -571,7 +571,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function dropField($table, $field) {
+  public function dropField($table, $field): bool {
     if (!$this->fieldExists($table, $field)) {
       return FALSE;
     }
@@ -607,7 +607,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function changeField($table, $field, $field_new, $spec, $keys_new = []) {
+  public function changeField($table, $field, $field_new, $spec, $keys_new = []): void {
     if (!$this->fieldExists($table, $field)) {
       throw new SchemaObjectDoesNotExistException("Cannot change the definition of field '$table.$field': field doesn't exist.");
     }
@@ -662,7 +662,7 @@ class Schema extends DatabaseSchema {
    * @param array $mapping
    *   The new mapping.
    */
-  protected function mapKeyDefinition(array $key_definition, array $mapping) {
+  protected function mapKeyDefinition(array $key_definition, array $mapping): array {
     foreach ($key_definition as &$field) {
       // The key definition can be an array such as [$field, $length].
       if (is_array($field)) {
@@ -680,7 +680,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function addIndex($table, $name, $fields, array $spec) {
+  public function addIndex($table, $name, $fields, array $spec): void {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("Cannot add index '$name' to table '$table': table doesn't exist.");
     }
@@ -698,7 +698,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function indexExists($table, $name) {
+  public function indexExists($table, $name): bool {
     $info = $this->getPrefixInfo($table);
 
     return $this->connection->query('PRAGMA [' . $info['schema'] . '].index_info([' . $info['table'] . '_' . $name . '])')->fetchField() != '';
@@ -707,7 +707,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function dropIndex($table, $name) {
+  public function dropIndex($table, $name): bool {
     if (!$this->indexExists($table, $name)) {
       return FALSE;
     }
@@ -721,7 +721,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function addUniqueKey($table, $name, $fields) {
+  public function addUniqueKey($table, $name, $fields): void {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("Cannot add unique key '$name' to table '$table': table doesn't exist.");
     }
@@ -739,7 +739,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function dropUniqueKey($table, $name) {
+  public function dropUniqueKey($table, $name): bool {
     if (!$this->indexExists($table, $name)) {
       return FALSE;
     }
@@ -753,7 +753,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function addPrimaryKey($table, $fields) {
+  public function addPrimaryKey($table, $fields): void {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("Cannot add primary key to table '$table': table doesn't exist.");
     }
@@ -773,7 +773,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function dropPrimaryKey($table) {
+  public function dropPrimaryKey($table): bool {
     $old_schema = $this->introspectSchema($table);
     $new_schema = $old_schema;
 
@@ -789,7 +789,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  protected function findPrimaryKeyColumns($table) {
+  protected function findPrimaryKeyColumns($table): array|false {
     if (!$this->tableExists($table)) {
       return FALSE;
     }
@@ -800,7 +800,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  protected function introspectIndexSchema($table) {
+  protected function introspectIndexSchema($table): array {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("The table $table doesn't exist.");
     }
@@ -812,7 +812,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function findTables($table_expression) {
+  public function findTables($table_expression): array {
     $tables = [];
 
     // The SQLite implementation doesn't need to use the same filtering strategy

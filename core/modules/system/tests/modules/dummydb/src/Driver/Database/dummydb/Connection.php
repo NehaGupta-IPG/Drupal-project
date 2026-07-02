@@ -16,14 +16,14 @@ class Connection extends CoreConnection {
   /**
    * {@inheritdoc}
    */
-  public function driver() {
+  public function driver(): string {
     return 'dummydb';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function databaseType() {
+  public function databaseType(): string {
     return 'dummydb';
   }
 

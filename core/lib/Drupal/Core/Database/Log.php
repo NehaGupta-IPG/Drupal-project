@@ -62,6 +62,9 @@ class Log {
    *   The identification key for this log request. By specifying different
    *   logging keys we are able to start and stop multiple logging runs
    *   simultaneously without them colliding.
+   *
+   * @return void
+   *   No return value.
    */
   public function start($logging_key) {
     if (empty($this->queryLog[$logging_key])) {
@@ -90,6 +93,9 @@ class Log {
    *
    * @param string $logging_key
    *   The logging key to empty.
+   *
+   * @return void
+   *   No return value.
    */
   public function clear($logging_key) {
     $this->queryLog[$logging_key] = [];
@@ -100,6 +106,9 @@ class Log {
    *
    * @param string $logging_key
    *   The logging key to stop.
+   *
+   * @return void
+   *   No return value.
    */
   public function end($logging_key) {
     unset($this->queryLog[$logging_key]);

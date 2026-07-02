@@ -101,6 +101,9 @@ abstract class Tasks {
 
   /**
    * Asserts test as failed.
+   *
+   * @return void
+   *   No return value.
    */
   protected function fail($message) {
     $this->results['fail'][] = $message;
@@ -108,6 +111,9 @@ abstract class Tasks {
 
   /**
    * Asserts test as a pass.
+   *
+   * @return void
+   *   No return value.
    */
   protected function pass($message) {
     $this->results['pass'][] = $message;
@@ -126,7 +132,7 @@ abstract class Tasks {
   /**
    * Returns the human-readable name of the driver.
    *
-   * @return string
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
    *   The human-readable name of the driver.
    */
   abstract public function name();
@@ -205,6 +211,9 @@ abstract class Tasks {
 
   /**
    * Ensures the database can execute commands with the current user.
+   *
+   * @return ?bool
+   *   NULL in case of success, or a bool in case of an exception was thrown.
    */
   protected function runTestQuery($query, $pass, $fail, $fatal = FALSE) {
     try {
@@ -217,10 +226,14 @@ abstract class Tasks {
       $this->fail($this->t($fail, ['%query' => $query, '%error' => $e->getMessage(), '%name' => $this->name()]));
       return !$fatal;
     }
+    return NULL;
   }
 
   /**
    * Checks the engine version.
+   *
+   * @return void
+   *   No return value.
    */
   protected function checkEngineVersion() {
     // Ensure that the database server has the right version.
@@ -404,6 +417,9 @@ abstract class Tasks {
 
   /**
    * Checks the database json support.
+   *
+   * @return void
+   *   No return value.
    */
   protected function checkJsonSupport() {
     if ($this->getConnection()->hasJson()) {

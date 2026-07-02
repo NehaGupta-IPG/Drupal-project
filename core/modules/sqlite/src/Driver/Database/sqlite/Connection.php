@@ -96,7 +96,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public static function open(array &$connection_options = []) {
+  public static function open(array &$connection_options = []): SqliteConnection {
     // Allow PDO options to be overridden.
     $connection_options += [
       'pdo' => [],
@@ -222,21 +222,21 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    *
    * @see \Drupal\sqlite\Driver\Database\sqlite\Connection::__construct()
    */
-  public function getAttachedDatabases() {
+  public function getAttachedDatabases(): array {
     return $this->attachedDatabases;
   }
 
   /**
    * SQLite compatibility implementation for the IF() SQL function.
    */
-  public static function sqlFunctionIf($condition, $expr1, $expr2 = NULL) {
+  public static function sqlFunctionIf($condition, $expr1, $expr2 = NULL): mixed {
     return $condition ? $expr1 : $expr2;
   }
 
   /**
    * SQLite compatibility implementation for the GREATEST() SQL function.
    */
-  public static function sqlFunctionGreatest() {
+  public static function sqlFunctionGreatest(): mixed {
     $args = func_get_args();
     foreach ($args as $v) {
       if (!isset($v)) {
@@ -254,7 +254,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * SQLite compatibility implementation for the LEAST() SQL function.
    */
-  public static function sqlFunctionLeast() {
+  public static function sqlFunctionLeast(): mixed {
     // Remove all NULL, FALSE and empty strings values but leaves 0 (zero)
     // values.
     $values = FilterArray::removeEmptyStrings(func_get_args());
@@ -265,7 +265,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * SQLite compatibility implementation for the CONCAT() SQL function.
    */
-  public static function sqlFunctionConcat() {
+  public static function sqlFunctionConcat(): string {
     $args = func_get_args();
     return implode('', $args);
   }
@@ -275,7 +275,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    *
    * @see http://dev.mysql.com/doc/refman/5.6/en/string-functions.html#function_concat-ws
    */
-  public static function sqlFunctionConcatWs() {
+  public static function sqlFunctionConcatWs(): ?string {
     $args = func_get_args();
     $separator = array_shift($args);
     // If the separator is NULL, the result is NULL.
@@ -292,14 +292,14 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * SQLite compatibility implementation for the SUBSTRING() SQL function.
    */
-  public static function sqlFunctionSubstring($string, $from, $length) {
+  public static function sqlFunctionSubstring($string, $from, $length): string {
     return substr($string, $from - 1, $length);
   }
 
   /**
    * SQLite compatibility implementation for the SUBSTRING_INDEX() SQL function.
    */
-  public static function sqlFunctionSubstringIndex($string, $delimiter, $count) {
+  public static function sqlFunctionSubstringIndex($string, $delimiter, $count): string {
     // If string is empty, simply return an empty string.
     if (empty($string)) {
       return '';
@@ -317,7 +317,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * SQLite compatibility implementation for the RAND() SQL function.
    */
-  public static function sqlFunctionRand($seed = NULL) {
+  public static function sqlFunctionRand($seed = NULL): float {
     if (isset($seed)) {
       mt_srand($seed);
     }
@@ -331,7 +331,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    *
    * @see http://www.sqlite.org/lang_expr.html#regexp
    */
-  public static function sqlFunctionRegexp($pattern, $subject) {
+  public static function sqlFunctionRegexp($pattern, $subject): mixed {
     // preg_quote() cannot be used here, since $pattern may contain reserved
     // regular expression characters already (such as ^, $, etc). Therefore,
     // use a rare character as PCRE delimiter.
@@ -349,7 +349,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * @see https://sqlite.org/pragma.html#pragma_case_sensitive_like
    * @see https://sqlite.org/lang_expr.html#like
    */
-  public static function sqlFunctionLikeBinary($pattern, $subject) {
+  public static function sqlFunctionLikeBinary($pattern, $subject): mixed {
     // Replace the SQL LIKE wildcard meta-characters with the equivalent regular
     // expression meta-characters and escape the delimiter that will be used for
     // matching.
@@ -360,14 +360,14 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public function queryRange($query, $from, $count, array $args = [], array $options = []) {
+  public function queryRange($query, $from, $count, array $args = [], array $options = []): Statement {
     return $this->query($query . ' LIMIT ' . (int) $from . ', ' . (int) $count, $args, $options);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function queryTemporary($query, array $args = [], array $options = []) {
+  public function queryTemporary($query, array $args = [], array $options = []): string {
     $tablename = 'db_temporary_' . bin2hex(random_bytes(12));
 
     $this->query('CREATE TEMPORARY TABLE ' . $tablename . ' AS ' . $query, $args, $options);
@@ -383,14 +383,14 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public function driver() {
+  public function driver(): string {
     return 'sqlite';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function databaseType() {
+  public function databaseType(): string {
     return 'sqlite';
   }
 
@@ -402,7 +402,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    *
    * @throws \Drupal\Core\Database\DatabaseNotFoundException
    */
-  public function createDatabase($database) {
+  public function createDatabase($database): void {
     // Verify the database is writable.
     $db_directory = new \SplFileInfo(dirname($database));
     if (!$db_directory->isDir() && !\Drupal::service('file_system')->mkdir($db_directory->getPathName(), 0755, TRUE)) {
@@ -413,7 +413,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public function mapConditionOperator($operator) {
+  public function mapConditionOperator($operator): ?array {
     return static::$sqliteConditionOperatorMap[$operator] ?? NULL;
   }
 
@@ -437,7 +437,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public function getFullQualifiedTableName($table) {
+  public function getFullQualifiedTableName($table): string {
     $prefix = $this->getPrefix();
 
     // Don't include the SQLite database file name as part of the table name.
@@ -447,7 +447,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public static function createConnectionOptionsFromUrl($url) {
+  public static function createConnectionOptionsFromUrl($url): array {
     $database = parent::createConnectionOptionsFromUrl($url);
 
     // A SQLite database path with two leading slashes indicates a system path.
@@ -471,7 +471,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public static function createUrlFromConnectionOptions(array $connection_options) {
+  public static function createUrlFromConnectionOptions(array $connection_options): string {
     if (!isset($connection_options['driver'], $connection_options['database'])) {
       throw new \InvalidArgumentException("As a minimum, the connection options array must contain at least the 'driver' and 'database' keys");
     }
@@ -488,42 +488,42 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public function exceptionHandler() {
+  public function exceptionHandler(): ExceptionHandler {
     return new ExceptionHandler();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function select($table, $alias = NULL, array $options = []) {
+  public function select($table, $alias = NULL, array $options = []): Select {
     return new Select($this, $table, $alias, $options);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function insert($table, array $options = []) {
+  public function insert($table, array $options = []): Insert {
     return new Insert($this, $table, $options);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function upsert($table, array $options = []) {
+  public function upsert($table, array $options = []): Upsert {
     return new Upsert($this, $table, $options);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function truncate($table, array $options = []) {
+  public function truncate($table, array $options = []): Truncate {
     return new Truncate($this, $table, $options);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function schema() {
+  public function schema(): Schema {
     if (empty($this->schema)) {
       $this->schema = new Schema($this);
     }

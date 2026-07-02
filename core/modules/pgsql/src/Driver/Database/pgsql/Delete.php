@@ -12,7 +12,7 @@ class Delete extends QueryDelete {
   /**
    * {@inheritdoc}
    */
-  public function execute() {
+  public function execute(): int {
     if ($this->connection->inTransaction()) {
       $savepoint = $this->connection->startTransaction('mimic_implicit_commit');
     }

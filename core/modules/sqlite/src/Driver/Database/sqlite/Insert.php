@@ -4,6 +4,7 @@ namespace Drupal\sqlite\Driver\Database\sqlite;
 
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\Query\Insert as QueryInsert;
+use Drupal\Core\Database\StatementInterface;
 
 /**
  * SQLite implementation of \Drupal\Core\Database\Query\Insert.
@@ -17,7 +18,7 @@ class Insert extends QueryInsert {
   /**
    * {@inheritdoc}
    */
-  public function execute() {
+  public function execute(): int|string|StatementInterface|null {
     if (!$this->preExecute()) {
       return NULL;
     }

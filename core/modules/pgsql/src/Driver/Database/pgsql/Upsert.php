@@ -14,7 +14,7 @@ class Upsert extends QueryUpsert {
   /**
    * {@inheritdoc}
    */
-  public function execute() {
+  public function execute(): ?int {
     if (!$this->preExecute()) {
       return NULL;
     }
@@ -95,6 +95,8 @@ class Upsert extends QueryUpsert {
       }
       $this->connection->exceptionHandler()->handleExecutionException($e, $stmt, [], $options);
     }
+
+    return NULL;
   }
 
   /**

@@ -4,10 +4,11 @@ namespace Drupal\mysql\Driver\Database\mysql\Install;
 
 use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\Install\Tasks as InstallTasks;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\mysql\Driver\Database\mysql\Connection;
-use Drupal\Core\Database\DatabaseNotFoundException;
 
 /**
  * Specifies installation tasks for MySQL and equivalent databases.
@@ -46,7 +47,7 @@ class Tasks extends InstallTasks {
   /**
    * {@inheritdoc}
    */
-  public function name() {
+  public function name(): TranslatableMarkup {
     try {
       if (!$this->isConnectionActive() || !$this->getConnection() instanceof Connection) {
         throw new ConnectionNotDefinedException('The database connection is not active or not a MySql connection');
@@ -64,7 +65,7 @@ class Tasks extends InstallTasks {
   /**
    * {@inheritdoc}
    */
-  public function minimumVersion() {
+  public function minimumVersion(): ?string {
     if ($this->getConnection()->isMariaDb()) {
       return static::MARIADB_MINIMUM_VERSION;
     }
@@ -74,7 +75,7 @@ class Tasks extends InstallTasks {
   /**
    * {@inheritdoc}
    */
-  protected function connect() {
+  protected function connect(): bool {
     try {
       // This doesn't actually test the connection.
       Database::setActiveConnection();
@@ -132,7 +133,7 @@ class Tasks extends InstallTasks {
   /**
    * {@inheritdoc}
    */
-  public function getFormOptions(array $database) {
+  public function getFormOptions(array $database): array {
     $form = parent::getFormOptions($database);
     if (empty($form['advanced_options']['port']['#default_value'])) {
       $form['advanced_options']['port']['#default_value'] = '3306';
@@ -156,8 +157,11 @@ class Tasks extends InstallTasks {
 
   /**
    * Ensure that InnoDB is available.
+   *
+   * @return void
+   *   No return value.
    */
-  public function ensureInnoDbAvailable() {
+  public function ensureInnoDbAvailable(): void {
     $engines = Database::getConnection()->query('SHOW ENGINES')->fetchAllKeyed();
     if (isset($engines['MyISAM']) && $engines['MyISAM'] == 'DEFAULT' && !isset($engines['InnoDB'])) {
       $this->fail($this->t('The MyISAM storage engine is not supported.'));

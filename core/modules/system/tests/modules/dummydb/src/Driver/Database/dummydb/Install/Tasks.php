@@ -6,6 +6,7 @@ declare(strict_types=1);
 
 namespace Drupal\dummydb\Driver\Database\dummydb\Install;
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\mysql\Driver\Database\mysql\Install\Tasks as CoreTasks;
 
 /**
@@ -16,7 +17,7 @@ class Tasks extends CoreTasks {
   /**
    * {@inheritdoc}
    */
-  public function name() {
+  public function name(): TranslatableMarkup {
     return $this->t('DummyDB');
   }
 

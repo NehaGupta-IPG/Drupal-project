@@ -86,7 +86,7 @@ class Statement extends StatementPrefetchIterator implements StatementInterface 
   /**
    * {@inheritdoc}
    */
-  public function execute($args = [], $options = []) {
+  public function execute($args = [], $options = []): bool {
     assert(!isset($options['fetch']) || $options['fetch'] instanceof FetchAs || is_string($options['fetch']), 'The "fetch" option passed to execute() must contain a FetchAs enum case or a string. See https://www.drupal.org/node/3488338');
 
     try {

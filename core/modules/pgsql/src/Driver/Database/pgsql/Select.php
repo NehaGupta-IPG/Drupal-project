@@ -3,6 +3,7 @@
 namespace Drupal\pgsql\Driver\Database\pgsql;
 
 use Drupal\Core\Database\Query\Select as QuerySelect;
+use Drupal\Core\Database\StatementInterface;
 
 /**
  * @addtogroup database
@@ -17,7 +18,7 @@ class Select extends QuerySelect {
   /**
    * {@inheritdoc}
    */
-  public function orderRandom() {
+  public function orderRandom(): static {
     $alias = $this->addExpression('RANDOM()', 'random_field');
     $this->orderBy($alias);
     return $this;
@@ -52,7 +53,7 @@ class Select extends QuerySelect {
    * additional fields, this is done as an override instead of implementing it
    * directly in SelectQuery::orderBy().
    */
-  public function orderBy($field, $direction = 'ASC') {
+  public function orderBy($field, $direction = 'ASC'): static {
     // Only allow ASC and DESC, default to ASC.
     // Emulate MySQL default behavior to sort NULL values first for ascending,
     // and last for descending.
@@ -117,7 +118,7 @@ class Select extends QuerySelect {
   /**
    * {@inheritdoc}
    */
-  public function addExpression($expression, $alias = NULL, $arguments = []) {
+  public function addExpression($expression, $alias = NULL, $arguments = []): string {
     if (empty($alias)) {
       $alias = 'expression';
     }
@@ -142,7 +143,7 @@ class Select extends QuerySelect {
   /**
    * {@inheritdoc}
    */
-  public function execute() {
+  public function execute(): ?StatementInterface {
     if ($this->connection->inTransaction()) {
       $savepoint = $this->connection->startTransaction('mimic_implicit_commit');
     }
