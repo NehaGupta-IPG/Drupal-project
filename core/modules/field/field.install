@@ -5,9 +5,52 @@
  * Install, update and uninstall functions for the field module.
  */
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Config\Entity\ConfigEntityUpdater;
+use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\field\FieldStorageConfigInterface;
+
 /**
  * Implements hook_update_last_removed().
  */
 function field_update_last_removed(): int {
   return 8500;
+}
+
+/**
+ * Adds default config for Show add more button for multivalued fields.
+ */
+function field_update_9001(&$sandbox): void {
+  \Drupal::classResolver(ConfigEntityUpdater::class)
+    ->update($sandbox, 'field_storage_config', function (FieldStorageConfigInterface $field_storage): bool {
+      $exclude_field_types = ['list_string', 'list_float', 'list_integer'];
+      if ($field_storage->getCardinality() <= 1 || in_array($field_storage->getType(), $exclude_field_types)) {
+        return FALSE;
+      }
+
+      $entity_type_id = $field_storage->getTargetEntityTypeId();
+      $field_name = $field_storage->getName();
+      $bundle_field_map = Drupal::getContainer()?->get(EntityFieldManagerInterface::class)
+        ?->getFieldMapByFieldType($field_storage->getType())[$entity_type_id][$field_name] ?? NULL;
+
+      if (!$bundle_field_map) {
+        return FALSE;
+      }
+
+      $changed = FALSE;
+      $entity_form_storage = Drupal::getContainer()?->get(EntityTypeManagerInterface::class)
+        ?->getStorage('entity_form_display');
+
+      foreach ($bundle_field_map['bundles'] as $bundle) {
+
+        /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity_form_display */
+        $entity_form_display = $entity_form_storage->load("$entity_type_id.$bundle.default");
+        if ($entity_form_display && $component = $entity_form_display->getComponent($field_name)) {
+          $component['settings']['add_more'] = FALSE;
+          $entity_form_display->setComponent($field_name, $component)->save();
+          $changed = TRUE;
+        }
+      }
+      return $changed;
+    });
 }

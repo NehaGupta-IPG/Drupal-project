@@ -62,6 +62,9 @@ field.widget.settings.test_field_widget_multiple_single_value:
     test_widget_setting_multiple:
       type: string
       label: 'Test setting'
+    add_more:
+      type: boolean
+      label: Show add more button
 
 field.widget.settings.test_field_widget_multilingual:
   type: field.widget.settings.test_field_widget

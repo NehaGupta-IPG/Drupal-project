@@ -34,6 +34,9 @@ field.widget.settings.link_default:
     placeholder_title:
       type: label
       label: 'Placeholder for link text'
+    add_more:
+      type: boolean
+      label: 'Show add more button'
 
 # This field type has no field storage settings, so no specific config schema type.
 # @see `type: field.storage_settings.*`

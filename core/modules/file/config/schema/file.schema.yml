@@ -187,6 +187,9 @@ field.widget.settings.file_generic:
     progress_indicator:
       type: string
       label: 'Progress indicator'
+    add_more:
+      type: boolean
+      label: 'Show add more button'
 
 field_formatter_settings_base_file:
   type: mapping

@@ -75,7 +75,14 @@ field.widget.settings.datetime_datelist:
     time_type:
       type: string
       label: 'Time type'
+    add_more:
+      type: boolean
+      label: 'Show add more button'
 
 field.widget.settings.datetime_default:
   type: mapping
   label: 'Datetime default display format settings'
+  mapping:
+    add_more:
+      type: boolean
+      label: 'Show add more button'

@@ -15,6 +15,9 @@ field.widget.settings.telephone_default:
     placeholder:
       type: label
       label: 'Placeholder'
+    add_more:
+      type: boolean
+      label: 'Show add more button'
 
 field.value.telephone:
   type: mapping

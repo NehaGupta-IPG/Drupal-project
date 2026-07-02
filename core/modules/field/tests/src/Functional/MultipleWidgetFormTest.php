@@ -140,6 +140,63 @@ class MultipleWidgetFormTest extends FieldTestBase {
     $this->drupalGet('entity_test/manage/' . $id . '/edit');
     $name = str_replace('_', '-', $field_name);
     $session->responseContains('data-drupal-selector="edit-' . $name . '"');
+
+    // Test the field with 'Show add more button' option enabled.
+    $form = \Drupal::service('entity_display.repository')->getFormDisplay($this->field['entity_type'], $this->field['bundle'], 'default')
+      ->setComponent($field_name, [
+        'type' => 'test_field_widget_multiple_single_value',
+        'settings' => ['add_more' => TRUE],
+      ]);
+    $form->save();
+    $this->drupalGet('entity_test/add');
+    // Verify that only one input field is rendered.
+    $this->assertSession()->fieldExists("{$field_name}[0][value]");
+    $this->assertSession()->fieldNotExists("{$field_name}[1][value]");
+    // Verify that 'Add another item' button is present.
+    $this->assertSession()->buttonExists('field_multiple_add_more');
+    // The 'Add another item' button should disappear once all input fields are
+    // rendered.
+    $cardinality = $field_storage['cardinality'];
+    for ($i = 1; $i <= $cardinality; $i++) {
+      if ($i == $cardinality) {
+        $this->assertSession()->buttonNotExists('field_multiple_add_more');
+      }
+      else {
+        $this->submitForm([], 'Add another item');
+        $this->assertSession()->fieldExists("{$field_name}[{$i}][value]");
+        $this->assertSession()->fieldNotExists("{$field_name}[" . ($i + 1) . "][value]");
+      }
+    }
+    // Save the form by adding value in 2 fields.
+    $edit = [
+      "{$field_name}[0][value]" => 1,
+      "{$field_name}[1][value]" => 2,
+    ];
+    $this->submitForm($edit, 'Save');
+    // Open entity edit form.
+    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    $id = $match[1];
+    $this->drupalGet('entity_test/manage/' . $id . '/edit');
+    // Verify that a new empty input field and 'Add another item' button are
+    // present.
+    $this->assertSession()->fieldExists("{$field_name}[2][value]");
+    $this->assertSession()->fieldValueEquals("{$field_name}[2][value]", '');
+    $this->assertSession()->buttonExists('field_multiple_add_more');
+
+    // Test again with 'Show add more button' disabled.
+    $form = \Drupal::service('entity_display.repository')->getFormDisplay($this->field['entity_type'], $this->field['bundle'], 'default')
+      ->setComponent($field_name, [
+        'type' => 'test_field_widget_multiple_single_value',
+        'settings' => ['add_more' => FALSE],
+      ]);
+    $form->save();
+    $this->drupalGet('entity_test/add');
+    // Verify that all input fields are rendered by default while creating a
+    // new entity.
+    $this->assertSession()->buttonNotExists('field_multiple_add_more');
+    for ($i = 0; $i < $cardinality; $i++) {
+      $this->assertSession()->fieldExists("{$field_name}[{$i}][value]");
+    }
   }
 
   /**

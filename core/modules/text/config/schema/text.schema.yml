@@ -130,6 +130,9 @@ field.widget.settings.text_textarea:
     placeholder:
       type: text
       label: 'Placeholder'
+    add_more:
+      type: boolean
+      label: 'Show add more button'
 
 field.widget.settings.text_textarea_with_summary:
   type: mapping
@@ -147,6 +150,9 @@ field.widget.settings.text_textarea_with_summary:
     show_summary:
       type: boolean
       label: 'Always show summary'
+    add_more:
+      type: boolean
+      label: 'Show add more button'
 
 field.widget.settings.text_textfield:
   type: mapping
@@ -158,3 +164,6 @@ field.widget.settings.text_textfield:
     placeholder:
       type: label
       label: 'Placeholder'
+    add_more:
+      type: boolean
+      label: 'Show add more button'

@@ -184,16 +184,11 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
     $parents = $form['#parents'];
 
     // Determine the number of widgets to display.
-    switch ($cardinality) {
-      case FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED:
-        $field_state = static::getWidgetState($parents, $field_name, $form_state);
-        $max = $field_state['items_count'];
-        $is_unlimited_not_programmed = !$form_state->isProgrammed();
-        break;
-
-      default:
-        $max = $cardinality - 1;
-        break;
+    $max = $cardinality - 1;
+    if (($cardinality === FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED) || $this->getSetting('add_more')) {
+      $field_state = static::getWidgetState($parents, $field_name, $form_state);
+      $max = $field_state['items_count'];
+      $is_unlimited_not_programmed = !$form_state->isProgrammed();
     }
 
     $title = $this->fieldDefinition->getLabel();
@@ -301,6 +296,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
             'wrapper' => $wrapper_id,
             'effect' => 'fade',
           ],
+          '#access' => $cardinality === FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED || $max < $cardinality - 1,
         ];
       }
     }
@@ -357,7 +353,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
     $element = NestedArray::getValue($form, array_slice($button['#array_parents'], 0, -1));
 
     // Ensure the widget allows adding additional items.
-    if ($element['#cardinality'] != FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED) {
+    if ($element['#cardinality'] != FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED && $element['#max_delta'] >= $element['#cardinality']) {
       return;
     }
 

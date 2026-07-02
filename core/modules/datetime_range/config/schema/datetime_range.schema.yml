@@ -91,7 +91,14 @@ field.widget.settings.daterange_datelist:
     time_type:
       type: string
       label: 'Time type'
+    add_more:
+      type: boolean
+      label: 'Show add more button'
 
 field.widget.settings.daterange_default:
   type: mapping
   label: 'Date range default display format settings'
+  mapping:
+    add_more:
+      type: boolean
+      label: 'Show add more button'

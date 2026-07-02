@@ -402,6 +402,14 @@ abstract class EntityDisplayFormBase extends EntityForm {
             ],
           ];
           $field_row['#attributes']['class'][] = 'field-plugin-settings-editing';
+
+          if ($field_definition->getFieldStorageDefinition()->getCardinality() > 1) {
+            $field_row['plugin']['settings_edit_form']['add_more'] = [
+              '#type' => 'checkbox',
+              '#title' => $this->t('Show add more button'),
+              '#default_value' => $display_options['settings']['add_more'] ?? FALSE,
+            ];
+          }
         }
       }
     }
@@ -571,6 +579,10 @@ abstract class EntityDisplayFormBase extends EntityForm {
           $default_settings = $this->pluginManager->getDefaultSettings($options['type']);
           $options['settings'] = isset($values['settings_edit_form']['settings']) ? array_intersect_key($values['settings_edit_form']['settings'], $default_settings) : [];
           $options['third_party_settings'] = $values['settings_edit_form']['third_party_settings'] ?? [];
+
+          if ($values['settings_edit_form']['add_more'] ?? FALSE) {
+            $options['settings']['add_more'] = TRUE;
+          }
           $form_state->set('plugin_settings_update', NULL);
         }
 
