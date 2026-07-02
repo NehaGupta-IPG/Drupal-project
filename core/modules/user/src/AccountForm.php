@@ -267,10 +267,13 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
         $config = \Drupal::config('language.negotiation');
         $show_admin_language = $config->get('admin_language.allow_user_change') ?? TRUE;
        
-        // Get the language name for the default admin language.
-        if ($admin_langcode_default) {
-          $language = $this->languageManager->getLanguage($admin_langcode_default);
-            $admin_language_name = $language->getName();
+        // Get the default admin language and resolve site_default to actual language ID.
+        $admin_langcode_default = $config->get('admin_language.default_langcode');
+        if ($admin_langcode_default === LanguageInterface::LANGCODE_SITE_DEFAULT) {
+          $admin_language_name = $this->languageManager->getDefaultLanguage()->getName();
+        }
+        else {
+          $admin_language_name = $this->languageManager->getLanguage($admin_langcode_default)->getName();
         }
       }
     }
@@ -280,7 +283,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       '#languages' => LanguageInterface::STATE_CONFIGURABLE,
       '#default_value' => $register ? '' : $account->getPreferredAdminLangcode(FALSE),
       '#access' => $show_admin_language,
-      '#empty_option' => $admin_language_name ? $this->t('- Site default administration language (@language) -', ['@language' => $admin_language_name]) : $this->t('- No preference -'),
+      '#empty_option' => $admin_language_name ? $this->t("Site's administration language (@language)", ['@language' => $admin_language_name]) : $this->t("Site's administration language"),
       '#empty_value' => '',
     ];
 
