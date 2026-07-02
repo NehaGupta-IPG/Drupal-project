@@ -560,6 +560,16 @@ class EntityViewBuilder extends EntityHandlerBase implements EntityHandlerInterf
     // recursively rendered. If not already being rendered,
     // add an entry to track that it is.
     $recursion_key = $this->getRenderRecursionKey($build);
+    // An entity rendered in a non-cacheable context has no cache keys, so the
+    // recursion key is empty. A blank key cannot identify an entity and must
+    // never be treated as recursion (issue #3399945); returning early here is
+    // also what lets the same entity legitimately nest in a non-cacheable
+    // render (e.g. a content block used as a Views entity-area header that also
+    // appears among that view's rows) render correctly, with no arbitrary
+    // render limit (Drupal 11.4 removed that; https://www.drupal.org/node/3316878).
+    if ($recursion_key === '') {
+      return $build;
+    }
     if (isset(static::$recursionKeys[$recursion_key])) {
       trigger_error(sprintf('Recursive rendering attempt aborted for %s. In progress: %s', $recursion_key, print_r(static::$recursionKeys, TRUE)), E_USER_WARNING);
       $build['#printed'] = TRUE;
@@ -575,9 +585,12 @@ class EntityViewBuilder extends EntityHandlerBase implements EntityHandlerInterf
    */
   public function unsetRecursiveRenderProtection(string $renderedEntity, array $build): string {
     // Removes rendered entity matching cache keys from recursive render
-    // tracking, once the entity has been rendered.
+    // tracking, once the entity has been rendered. Non-cacheable renders have
+    // an empty key and were never tracked (see setRecursiveRenderProtection()).
     $recursion_key = $this->getRenderRecursionKey($build);
-    unset(static::$recursionKeys[$recursion_key]);
+    if ($recursion_key !== '') {
+      unset(static::$recursionKeys[$recursion_key]);
+    }
 
     return $renderedEntity;
   }
@@ -592,43 +605,27 @@ class EntityViewBuilder extends EntityHandlerBase implements EntityHandlerInterf
    *   The key to ID the build array within recursion tracking.
    */
   protected function getRenderRecursionKey(array $build): string {
-    /** @var \Drupal\Core\Entity\EntityInterface $entity */
-    $entity = $build['#' . $this->entityTypeId];
-
-    $recursion_keys = [
-      $entity->getEntityTypeId(),
-    ];
-
-    // If entity is new and has no ID, generate unique ID from entity object.
-    // This is to prevent false positives, for example when previewing a new
-    // node that is referencing a new node without either node yet being saved.
-    if ($entity->id()) {
-      $recursion_keys[] = 'entity_id';
-      $recursion_keys[] = $entity->id();
-      if ($entity instanceof RevisionableInterface) {
-        $recursion_keys[] = $entity->getRevisionId();
-      }
-    }
-    else {
-      $recursion_keys[] = 'object_id';
-      $recursion_keys[] = spl_object_id($entity);
+    // Track recursion by the render array's own cache keys, per the design of
+    // https://www.drupal.org/node/3316878. An entity rendered in a
+    // non-cacheable context has no cache keys: it is intentionally NOT tracked
+    // (the caller treats an empty key as "not recursion"; see #3399945), which
+    // is what allows the same entity to be rendered repeatedly or legitimately
+    // nested without any arbitrary render limit. The cache keys already encode
+    // the entity type, id, view mode and langcode, so the same entity rendered
+    // in a genuinely recursive loop re-enters with identical keys and is still
+    // caught, while distinct render contexts get distinct keys.
+    $keys = $build['#cache']['keys'] ?? [];
+    if (!$keys) {
+      return '';
     }
 
     // Ensure that recursion keys are not leaking between Fibers.
     if ($fiber = \Fiber::getCurrent()) {
-      $recursion_keys[] = 'fiber_id';
-      $recursion_keys[] = spl_object_id($fiber);
+      $keys[] = 'fiber_id';
+      $keys[] = spl_object_id($fiber);
     }
 
-    if ($entity instanceof TranslatableDataInterface) {
-      $recursion_keys[] = $entity->language()->getId();
-    }
-
-    $recursion_keys[] = $build['#view_mode'];
-
-    // It seems very unlikely that the same entity displayed in the same view
-    // mode would be recursively nested and meant to be displayed differently.
-    return implode(':', $recursion_keys);
+    return implode(':', $keys);
   }
 
 }
