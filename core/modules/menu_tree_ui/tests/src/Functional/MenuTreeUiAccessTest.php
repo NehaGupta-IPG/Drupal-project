@@ -106,4 +106,66 @@ final class MenuTreeUiAccessTest extends BrowserTestBase {
     $this->assertNotEquals(200, $result->getStatusCode());
   }
 
+  /**
+   * A user without 'administer menu' is denied the break-lock form.
+   */
+  public function testBreakLockRequiresPermission(): void {
+    $this->drupalLogin($this->drupalCreateUser());
+    $this->drupalGet('/admin/structure/menu/manage/access-test-a/tree/break-lock');
+    $this->assertSession()->statusCodeEquals(403);
+  }
+
+  /**
+   * Confirming the break-lock form clears an existing working copy.
+   *
+   * A pending move is recorded by one user, locking the working copy; a
+   * second user with the same permission then breaks the lock, and the
+   * pending move must be gone afterwards.
+   */
+  public function testBreakLockClearsWorkingCopy(): void {
+    $link = MenuLinkContent::create([
+      'title' => 'A link',
+      'link' => ['uri' => 'internal:/'],
+      'menu_name' => 'access-test-a',
+    ]);
+    $link->save();
+
+    $owner = $this->drupalCreateUser(['administer menu']);
+    $admin = $this->drupalCreateUser(['administer menu']);
+
+    // Record a pending move as the lock owner via the move route.
+    $this->drupalLogin($owner);
+    $csrf_token = $this->drupalGet('/session/token');
+
+    $client = $this->getHttpClient();
+    $move_url = Url::fromRoute('menu_tree_ui.move', ['menu' => 'access-test-a'])
+      ->setAbsolute(TRUE)
+      ->toString();
+    $result = $client->post($move_url, [
+      'cookies' => $this->getSessionCookies(),
+      'headers' => [
+        'Content-Type' => 'application/json',
+        'X-CSRF-Token' => $csrf_token,
+      ],
+      'body' => json_encode(['id' => $link->getPluginId(), 'new_parent' => '', 'before_id' => NULL]),
+      'http_errors' => FALSE,
+    ]);
+    $this->assertSame(200, $result->getStatusCode(), (string) $result->getBody());
+
+    // The owner's own working copy is not locked to them, so the second user
+    // holds the lock once they have recorded a move; log in as a different
+    // user with the same permission and break it.
+    $this->drupalLogin($admin);
+    $this->drupalGet('/admin/structure/menu/manage/access-test-a/tree');
+    $this->assertSession()->pageTextContains('is currently editing this menu');
+    $this->assertSession()->linkExists('Break lock');
+
+    $this->drupalGet('/admin/structure/menu/manage/access-test-a/tree/break-lock');
+    $this->submitForm([], 'Break lock');
+    $this->assertSession()->pageTextContains('The lock has been broken.');
+
+    $this->drupalGet('/admin/structure/menu/manage/access-test-a/tree');
+    $this->assertSession()->pageTextNotContains('is currently editing this menu');
+  }
+
 }

@@ -116,6 +116,12 @@
   {% if locked %}
     <div class="menu-tree-ui__lock messages messages--warning" role="alert">
       {{ '@user is currently editing this menu. Your changes cannot be saved until they finish.'|t({ '@user': lock_owner }) }}
+      {% if lock_updated %}
+        {{ 'Their changes were last saved @time.'|t({ '@time': lock_updated|format_date('short') }) }}
+      {% endif %}
+      {% if break_lock_url %}
+        <a href="{{ break_lock_url }}">{{ 'Break lock'|t }}</a>
+      {% endif %}
     </div>
   {% endif %}
 

@@ -80,6 +80,19 @@ menu_tree_ui.save:
       menu:
         type: entity:menu
 
+menu_tree_ui.break_lock:
+  path: '/admin/structure/menu/manage/{menu}/tree/break-lock'
+  defaults:
+    _form: '\Drupal\menu_tree_ui\Form\MenuTreeBreakLockForm'
+    _title: 'Break lock'
+  requirements:
+    _entity_access: 'menu.update'
+  options:
+    _admin_route: true
+    parameters:
+      menu:
+        type: entity:menu
+
 menu_tree_ui.cancel:
   path: '/admin/structure/menu/manage/{menu}/tree/cancel'
   defaults:

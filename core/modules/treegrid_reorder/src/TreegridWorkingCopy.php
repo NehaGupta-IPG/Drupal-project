@@ -67,6 +67,15 @@ final class TreegridWorkingCopy {
   /**
    * Appends a pending operation to a tree's working copy.
    *
+   * Recording is atomic against a concurrent editor: an isLocked() check
+   * followed by an unconditional write would let a second editor pass the
+   * check and then overwrite (and re-own) the first editor's working copy
+   * before it writes. Instead the write itself is the gate — setIfNotExists()
+   * for the first op on a tree only succeeds if no entry exists yet, and
+   * setIfOwner() for later ops only succeeds if the entry still belongs to the
+   * current user, so a race between two editors leaves exactly one of them
+   * owning the copy.
+   *
    * @param string $id
    *   The tree id.
    * @param array<string, mixed> $op
@@ -76,14 +85,16 @@ final class TreegridWorkingCopy {
    *   TRUE if recorded; FALSE when another user holds the working copy.
    */
   public function addOp(string $id, array $op): bool {
-    if ($this->isLocked($id)) {
-      return FALSE;
-    }
-    $ops = $this->getOps($id);
+    $existing = $this->getOps($id);
+    $ops = $existing;
     $ops[] = $op;
-    $this->store()->set($id, ['ops' => $ops]);
-    $this->cache[$id] = $ops;
-    return TRUE;
+    $set = $existing === []
+      ? $this->store()->setIfNotExists($id, ['ops' => $ops])
+      : $this->store()->setIfOwner($id, ['ops' => $ops]);
+    if ($set) {
+      $this->cache[$id] = $ops;
+    }
+    return $set;
   }
 
   /**
@@ -102,12 +113,64 @@ final class TreegridWorkingCopy {
   /**
    * Discards a tree's working copy.
    *
+   * Only clears a working copy owned by the current user, so a Cancel cannot
+   * discard another editor's pending changes. To release someone else's
+   * abandoned lock, use breakLock().
+   *
    * @param string $id
    *   The tree id.
    */
   public function clear(string $id): void {
+    if ($this->store()->deleteIfOwner($id)) {
+      unset($this->cache[$id]);
+    }
+  }
+
+  /**
+   * Discards a tree's working copy regardless of who owns it.
+   *
+   * Bypasses ownership deliberately: this exists for an administrator to
+   * release a lock abandoned by another user (e.g. a closed browser tab),
+   * not for a user's own Cancel — see clear() for that.
+   *
+   * @param string $id
+   *   The tree id.
+   */
+  public function breakLock(string $id): void {
     $this->store()->delete($id);
     unset($this->cache[$id]);
+  }
+
+  /**
+   * Drops specific recorded operations from a tree's working copy.
+   *
+   * Used after a partial commit: operations already written to live storage
+   * must not remain in the working copy, or a retry would replay them.
+   *
+   * @param string $id
+   *   The tree id.
+   * @param array<int, int> $indices
+   *   The zero-based indices (as returned by getOps()) of the operations to
+   *   remove.
+   *
+   * @return bool
+   *   TRUE if the working copy was updated (or there was nothing to drop);
+   *   FALSE when another user now holds the working copy.
+   */
+  public function dropOps(string $id, array $indices): bool {
+    if ($indices === []) {
+      return TRUE;
+    }
+    $ops = $this->getOps($id);
+    if ($ops === []) {
+      return TRUE;
+    }
+    $remaining = array_values(array_diff_key($ops, array_flip($indices)));
+    $set = $this->store()->setIfOwner($id, ['ops' => $remaining]);
+    if ($set) {
+      $this->cache[$id] = $remaining;
+    }
+    return $set;
   }
 
   /**

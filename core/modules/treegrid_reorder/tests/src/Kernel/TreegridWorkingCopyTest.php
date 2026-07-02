@@ -103,4 +103,24 @@ final class TreegridWorkingCopyTest extends KernelTestBase {
     );
   }
 
+  /**
+   * A second user cannot clear another user's working copy; breakLock() can.
+   */
+  public function testClearRespectsOwnershipButBreakLockDoesNot(): void {
+    $owner = $this->createUser([], 'owner');
+    $other = $this->createUser([], 'other');
+
+    $this->setCurrentUser($owner);
+    $this->assertTrue($this->workingCopy->addOp('alpha', ['type' => 'move', 'id' => 'one']));
+
+    $this->setCurrentUser($other);
+    $this->workingCopy->clear('alpha');
+    $this->assertTrue($this->workingCopy->hasChanges('alpha'), "Another user's clear() must not discard the owner's working copy.");
+    $this->assertSame(['one'], array_column($this->workingCopy->getOps('alpha'), 'id'));
+
+    $this->workingCopy->breakLock('alpha');
+    $this->assertFalse($this->workingCopy->hasChanges('alpha'));
+    $this->assertNull($this->workingCopy->getLockMetadata('alpha'));
+  }
+
 }

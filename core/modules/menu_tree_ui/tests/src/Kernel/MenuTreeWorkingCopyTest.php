@@ -8,6 +8,7 @@ use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\menu_link_content\MenuLinkContentInterface;
+use Drupal\menu_tree_ui\Controller\MenuTreeController;
 use Drupal\menu_tree_ui\Service\MenuTreeLoader;
 use Drupal\menu_tree_ui\Service\MenuTreeMover;
 use Drupal\system\Entity\Menu;
@@ -176,6 +177,72 @@ final class MenuTreeWorkingCopyTest extends KernelTestBase {
     // Pre-flight validation caught the bad op, so the valid first op was never
     // applied: live order is unchanged.
     $this->assertSame([$a, $b, $c], $this->idsOf($this->loader->loadLevel('test', NULL)));
+  }
+
+  /**
+   * A second user cannot clear another user's working copy; breakLock() can.
+   */
+  public function testClearRespectsOwnershipButBreakLockDoesNot(): void {
+    $owner = $this->createUser([], 'owner');
+    $other = $this->createUser([], 'other');
+
+    $this->setCurrentUser($owner);
+    $this->assertTrue($this->workingCopy->addOp('test', ['type' => 'move', 'id' => 'one']));
+
+    $this->setCurrentUser($other);
+    $this->workingCopy->clear('test');
+    $this->assertTrue($this->workingCopy->hasChanges('test'), "Another user's clear() must not discard the owner's working copy.");
+    $this->assertSame(['one'], array_column($this->workingCopy->getOps('test'), 'id'));
+
+    $this->workingCopy->breakLock('test');
+    $this->assertFalse($this->workingCopy->hasChanges('test'));
+    $this->assertNull($this->workingCopy->getLockMetadata('test'));
+  }
+
+  /**
+   * A partial commit failure drops the applied move from the working copy.
+   *
+   * The second recorded move only becomes invalid because of the first move's
+   * effect (it forms a cycle once the first has actually moved a link), so the
+   * batch passes pre-flight validation but fails partway through the apply
+   * loop — the scenario MenuTreeController::save() must reconcile.
+   */
+  public function testPartialCommitDropsAppliedOps(): void {
+    $x = $this->createLink('X', 10);
+    $y = $this->createLink('Y', 11);
+    $x_id = $x->getPluginId();
+    $y_id = $y->getPluginId();
+
+    $this->workingCopy->addOp('test', [
+      'type' => 'move',
+      'id' => $x_id,
+      'new_parent' => $y_id,
+      'before_id' => NULL,
+    ]);
+    $this->workingCopy->addOp('test', [
+      'type' => 'move',
+      'id' => $y_id,
+      'new_parent' => $x_id,
+      'before_id' => NULL,
+    ]);
+
+    $controller = MenuTreeController::create($this->container);
+    $response = $controller->save(Menu::load('test'));
+    $result = json_decode((string) $response->getContent(), TRUE);
+
+    $this->assertFalse($result['ok']);
+    $this->assertSame([0], $result['applied_ops']);
+    $this->assertStringContainsString('Saved 1 of 2', $result['message']);
+
+    // The applied move is live: X's parent is now Y.
+    $definition = $this->container->get('plugin.manager.menu.link')->getDefinition($x_id);
+    $this->assertSame($y_id, $definition['parent']);
+
+    // The applied op is gone from the working copy; the failed one remains
+    // pending for a retry.
+    $remaining = $this->workingCopy->getOps('test');
+    $this->assertCount(1, $remaining);
+    $this->assertSame($y_id, $remaining[0]['id']);
   }
 
   // Helpers.

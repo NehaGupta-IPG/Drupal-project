@@ -105,7 +105,14 @@ final class MenuTreeController extends ControllerBase {
     $menu_name = $menu->id();
     $has_changes = $this->workingCopy->hasChanges($menu_name);
     $locked = $this->workingCopy->isLocked($menu_name);
-    $lock_owner = $locked ? $this->lockOwnerName($menu_name) : '';
+    $lock_owner = '';
+    $lock_updated = 0;
+    $break_lock_url = '';
+    if ($locked) {
+      $lock_owner = $this->lockOwnerName($menu_name);
+      $lock_updated = $this->workingCopy->getLockMetadata($menu_name)?->getUpdated() ?? 0;
+      $break_lock_url = Url::fromRoute('menu_tree_ui.break_lock', ['menu' => $menu_name])->toString();
+    }
 
     return [
       '#theme' => 'menu_tree_ui_page',
@@ -118,6 +125,8 @@ final class MenuTreeController extends ControllerBase {
       '#has_changes' => $has_changes,
       '#locked' => $locked,
       '#lock_owner' => $lock_owner,
+      '#lock_updated' => $lock_updated,
+      '#break_lock_url' => $break_lock_url,
       '#add_link_url' => Url::fromRoute('entity.menu.add_link_form', ['menu' => $menu_name], [
         'query' => [
           'destination' => Url::fromRoute('menu_tree_ui.edit', ['menu' => $menu_name])->toString(),
@@ -284,6 +293,11 @@ final class MenuTreeController extends ControllerBase {
 
   /**
    * Commits the menu's pending working-copy moves to live storage.
+   *
+   * A partial failure (one move invalidated by an earlier one in the same
+   * batch) leaves the already-applied moves written; those are dropped from
+   * the working copy so a retry does not replay them, and the response names
+   * how many of the batch went through.
    */
   public function save(MenuInterface $menu): JsonResponse {
     $menu_name = $menu->id();
@@ -294,11 +308,24 @@ final class MenuTreeController extends ControllerBase {
       );
     }
 
-    $result = $this->mover->commitWorkingCopy($menu_name, $this->workingCopy->getOps($menu_name));
+    $ops = $this->workingCopy->getOps($menu_name);
+    $result = $this->mover->commitWorkingCopy($menu_name, $ops);
     if (!empty($result['ok'])) {
       $this->workingCopy->clear($menu_name);
+      return new JsonResponse($result);
     }
-    return new JsonResponse($result, !empty($result['ok']) ? 200 : 400);
+
+    $applied = $result['applied_ops'] ?? [];
+    if ($applied !== []) {
+      $this->workingCopy->dropOps($menu_name, $applied);
+      $total = count(array_filter($ops, static fn(array $op): bool => ($op['type'] ?? '') === 'move'));
+      $result['message'] = (string) $this->t('Saved @applied of @total changes; the rest could not be saved. @reason', [
+        '@applied' => count($applied),
+        '@total' => $total,
+        '@reason' => $result['message'] ?? '',
+      ]);
+    }
+    return new JsonResponse($result, 400);
   }
 
   /**

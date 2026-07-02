@@ -40,6 +40,10 @@ function menu_tree_ui_theme(): array {
         'locked' => FALSE,
         // Display name of the user holding the working copy, when locked.
         'lock_owner' => '',
+        // Unix timestamp the working copy was last updated, when locked.
+        'lock_updated' => 0,
+        // URL of the break-lock confirmation form, when locked.
+        'break_lock_url' => '',
       ],
     ],
     'menu_tree_ui_row' => [

@@ -106,8 +106,9 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
    * @param array<int, array<string, mixed>> $ops
    *   The recorded ops, in order.
    *
-   * @return array{ok: bool, code?: string, message?: string, failed_op?: int}
-   *   ['ok' => TRUE] on success, otherwise the first failing op's outcome.
+   * @return array{ok: bool, code?: string, message?: string, failed_op?: int, applied_ops?: array<int, int>}
+   *   ['ok' => TRUE] on success, otherwise the first failing op's outcome plus
+   *   the $ops indices of any moves from this batch already applied.
    */
   public function commitWorkingCopy(string $menu_name, array $ops): array {
     return $this->reorderManager->commitWorkingCopy($menu_name, $ops, $this);

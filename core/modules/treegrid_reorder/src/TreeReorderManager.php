@@ -57,6 +57,8 @@ final class TreeReorderManager {
    * a known-bad batch from writing anything, but if a move fails partway
    * through (e.g. a cycle formed by an earlier applied move), the moves already
    * applied stand — applyMove() is not assumed to be wrapped in a transaction.
+   * The returned 'applied_ops' lets the caller reconcile the working copy with
+   * what actually got written.
    *
    * @param string $tree_id
    *   The tree whose working copy to commit.
@@ -65,43 +67,51 @@ final class TreeReorderManager {
    * @param \Drupal\treegrid_reorder\TreeMoveHandlerInterface $handler
    *   The consumer's move handler.
    *
-   * @return array{ok: bool, code?: string, message?: string, failed_op?: int}
-   *   ['ok' => TRUE] on success, otherwise the first failing op's outcome.
+   * @return array{ok: bool, code?: string, message?: string, failed_op?: int, applied_ops?: array<int, int>}
+   *   ['ok' => TRUE] on success, otherwise the first failing op's outcome plus
+   *   the $ops indices of any moves from this batch already applied before the
+   *   failure — the caller must drop those from the working copy so a retry
+   *   does not replay them.
    */
   public function commitWorkingCopy(string $tree_id, array $ops, TreeMoveHandlerInterface $handler): array {
-    $moves = array_values(array_filter(
-      $ops,
-      static fn(array $op): bool => ($op['type'] ?? '') === 'move',
-    ));
-    if ($moves === []) {
+    $move_indices = [];
+    foreach ($ops as $index => $op) {
+      if (($op['type'] ?? '') === 'move') {
+        $move_indices[] = $index;
+      }
+    }
+    if ($move_indices === []) {
       return ['ok' => TRUE];
     }
 
-    $intents = array_map(static function (array $op): MoveIntent {
+    $intents = array_map(static function (int $index) use ($ops): MoveIntent {
+      $op = $ops[$index];
       $before_id = $op['before_id'] ?? NULL;
       return new MoveIntent(
         (string) ($op['id'] ?? ''),
         (string) ($op['new_parent'] ?? ''),
         $before_id === NULL ? NULL : (string) $before_id,
       );
-    }, $moves);
+    }, $move_indices);
 
     // Pre-flight: reject the batch if any op is individually invalid, before
     // writing anything.
-    foreach ($intents as $index => $intent) {
+    foreach ($intents as $i => $intent) {
       $validation = $this->validateMove($tree_id, $intent, $handler);
       if (!$validation['ok']) {
-        return $this->commitFailure($validation, $index);
+        return $this->commitFailure($validation, $move_indices[$i]);
       }
     }
 
     // Apply in order, re-validating against the now-current state.
-    foreach ($intents as $index => $intent) {
+    $applied = [];
+    foreach ($intents as $i => $intent) {
       $validation = $this->validateMove($tree_id, $intent, $handler);
       if (!$validation['ok']) {
-        return $this->commitFailure($validation, $index);
+        return $this->commitFailure($validation, $move_indices[$i], $applied);
       }
       $handler->applyMove($tree_id, $intent);
+      $applied[] = $move_indices[$i];
     }
 
     return ['ok' => TRUE];
@@ -113,17 +123,20 @@ final class TreeReorderManager {
    * @param array{code?: string, message?: string} $validation
    *   The failing validateMove() result.
    * @param int $index
-   *   The index of the failing move within the batch.
+   *   The $ops index of the failing move.
+   * @param array<int, int> $applied
+   *   The $ops indices of moves from this batch already applied.
    *
-   * @return array{ok: false, code: string, message: string, failed_op: int}
+   * @return array{ok: false, code: string, message: string, failed_op: int, applied_ops: array<int, int>}
    *   The commit failure outcome.
    */
-  private function commitFailure(array $validation, int $index): array {
+  private function commitFailure(array $validation, int $index, array $applied = []): array {
     return [
       'ok' => FALSE,
       'code' => $validation['code'] ?? 'commit_failed',
       'message' => $validation['message'] ?? 'A pending change could not be saved.',
       'failed_op' => $index,
+      'applied_ops' => $applied,
     ];
   }
 
