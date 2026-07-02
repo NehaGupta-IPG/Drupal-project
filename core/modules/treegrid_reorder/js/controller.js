@@ -19,6 +19,7 @@
 ((Drupal) => {
   Drupal.treegridReorder = Drupal.treegridReorder || {};
   const { commitMove, computeIntent, sameIntent } = Drupal.treegridReorder;
+  const { descendantRows } = Drupal.treegrid.treeNav;
 
   const DRAG_THRESHOLD_PX = 5;
   const HOVER_EXPAND_MS = 1000;
@@ -109,6 +110,11 @@
      *   The pointerdown event.
      */
     onPointerDown(event) {
+      if (this.pointerId !== null) {
+        // A gesture is already in progress; ignore a second concurrent
+        // pointer (e.g. multi-touch) rather than clobbering the first.
+        return;
+      }
       if (event.button !== undefined && event.button !== 0) {
         return;
       }
@@ -191,10 +197,15 @@
         );
       } else {
         // A tap (press and release without crossing the drag threshold): pick
-        // the row up into keyboard move mode rather than starting a drag.
+        // the row up into keyboard move mode rather than starting a drag. A
+        // gesture that did cross the threshold but ends up with no valid
+        // intent (released over the moved row itself, its subtree, or off
+        // any row) is a cancelled drag, not a tap, and should not pick the
+        // row up.
         const row = this.moved;
+        const wasTap = !this.dragging;
         this.cleanup();
-        if (row) {
+        if (wasTap && row) {
           this.onTap?.(row);
         }
       }
@@ -227,7 +238,11 @@
       }
       const elem = document.elementFromPoint(x, y);
       const target = elem?.closest(ROW) ?? null;
-      if (!target || target === this.moved || this.moved.contains(target)) {
+      if (
+        !target ||
+        target === this.moved ||
+        descendantRows(this.moved).includes(target)
+      ) {
         this.intent = null;
         this.indicator.clear();
         this.clearHoverExpand();
