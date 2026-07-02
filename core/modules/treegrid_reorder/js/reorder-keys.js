@@ -20,6 +20,11 @@
 
   const ROW = 'tr[role="row"]';
 
+  // Rows with a Shift+Arrow move currently round-tripping to the server.
+  // Guards against mashing the key firing overlapping optimistic swaps + POSTs,
+  // where a later failure would restore against a stale captured position.
+  const movesInFlight = new WeakSet();
+
   /**
    * The previous sibling row at the same level under the same parent.
    *
@@ -41,6 +46,69 @@
   }
 
   /**
+   * Renumbers aria-posinset/aria-setsize across a row's sibling group.
+   *
+   * The optimistic swap moves the row in the DOM ahead of the server's
+   * response, which leaves the affected siblings' position attributes stale
+   * (screen readers announce "item N of M" from these, not document order).
+   * Scoped to the row's own table so an unrelated tree on the page (there
+   * should only ever be one) can't be touched.
+   *
+   * @param {HTMLElement} row
+   *   Any row in the affected sibling group.
+   */
+  function renumberSiblings(row) {
+    const tree = row.closest('table[role="treegrid"]');
+    if (!tree) {
+      return;
+    }
+    const parentId = row.dataset.parentId ?? '';
+    const siblings = Array.from(
+      tree.querySelectorAll(`${ROW}[data-parent-id="${CSS.escape(parentId)}"]`),
+    );
+    siblings.forEach((sibling, index) => {
+      sibling.setAttribute('aria-posinset', String(index + 1));
+      sibling.setAttribute('aria-setsize', String(siblings.length));
+    });
+  }
+
+  /**
+   * Reads a row's own title text.
+   *
+   * @param {HTMLElement} row
+   *   The row.
+   * @param {string} titleSelector
+   *   The consumer's selector for a row's title.
+   *
+   * @return {string}
+   *   The trimmed title, or ''.
+   */
+  function titleOf(row, titleSelector) {
+    return row.querySelector(titleSelector)?.textContent?.trim() ?? '';
+  }
+
+  /**
+   * The translated "moved" announcement for a completed reorder.
+   *
+   * Built as two full sentences (one per direction) rather than concatenating
+   * translated fragments, so each is translatable on its own.
+   *
+   * @param {string} title
+   *   The moved row's title.
+   * @param {('up'|'down')} direction
+   *   Which way it moved.
+   *
+   * @return {string}
+   *   The translated confirmation sentence.
+   */
+  function movedMessage(title, direction) {
+    if (direction === 'up') {
+      return Drupal.t('@title moved up.', { '@title': title });
+    }
+    return Drupal.t('@title moved down.', { '@title': title });
+  }
+
+  /**
    * Reorders a row among its siblings, persisting via the move POST.
    *
    * @param {HTMLElement} row
@@ -48,16 +116,25 @@
    * @param {('up'|'down')} direction
    *   Which way to move it.
    * @param {object} options
-   *   { moveUrl, csrfToken, flashClass } — the move endpoint, the X-CSRF-Token
-   *   value (the move route requires it), and the consumer's brief-flash class.
+   *   { moveUrl, csrfToken, flashClass, onCommitted, titleSelector } — the move
+   *   endpoint, the X-CSRF-Token value (the move route requires it), the
+   *   consumer's brief-flash class, the callback fired after a persisted move
+   *   (reveals the unsaved-changes notice), and the consumer's row-title
+   *   selector (for the announcement).
    *
    * @return {Promise<boolean>}
    *   True if the handler took the key (so the caller preventDefaults).
    */
   async function reorderSibling(row, direction, options) {
-    const { moveUrl, csrfToken, flashClass } = options;
+    const { moveUrl, csrfToken, flashClass, onCommitted, titleSelector } =
+      options;
     const movedId = row.dataset.id;
     if (!movedId || row.dataset.movable !== 'true') {
+      return false;
+    }
+    if (movesInFlight.has(row)) {
+      // A previous Shift+Arrow on this row is still round-tripping; ignore the
+      // new key rather than stacking optimistic swaps on an unsettled DOM.
       return false;
     }
 
@@ -90,6 +167,7 @@
         .nextElementSibling;
       insert(siblingEnd);
     }
+    renumberSiblings(row);
 
     const beforeId = nextSiblingRow(row)?.dataset.id ?? null;
 
@@ -106,8 +184,10 @@
         anchor.after(r);
         anchor = r;
       });
+      renumberSiblings(row);
     };
 
+    movesInFlight.add(row);
     try {
       const response = await fetch(moveUrl, {
         method: 'POST',
@@ -123,14 +203,24 @@
           before_id: beforeId,
         }),
       });
-      if (!response.ok) {
+      const body = await response.json().catch(() => ({ ok: false }));
+      if (!response.ok || !body.ok) {
         restore();
         announce(Drupal.t('Move failed — restored.'), 'assertive');
+      } else {
+        onCommitted?.();
+        announce(
+          movedMessage(titleOf(row, titleSelector), direction),
+          'polite',
+        );
       }
     } catch (e) {
       restore();
+      announce(Drupal.t('Network error — move restored.'), 'assertive');
       // eslint-disable-next-line no-console
       console.error('[treegrid-reorder] reorder failed', e);
+    } finally {
+      movesInFlight.delete(row);
     }
     return true;
   }

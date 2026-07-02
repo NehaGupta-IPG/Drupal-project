@@ -51,9 +51,15 @@
       const response = await fetch(`${base}session/token`, {
         credentials: 'same-origin',
       });
+      if (!response.ok) {
+        // Don't cache a failure: an error page body would otherwise become the
+        // "token" forever. Leave csrfToken undefined so the next Save/Cancel
+        // retries the fetch.
+        return '';
+      }
       csrfToken = await response.text();
     } catch (e) {
-      csrfToken = '';
+      return '';
     }
     return csrfToken;
   }
@@ -124,6 +130,11 @@
       const result = await post(settings.cancelUrl);
       if (result.ok) {
         window.location.reload();
+      } else {
+        Drupal.treegrid.announce(
+          result.message ?? Drupal.t('Cancel failed.'),
+          'assertive',
+        );
       }
     });
   }

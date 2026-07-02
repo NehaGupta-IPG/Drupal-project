@@ -549,6 +549,18 @@
       if (!this.active || !this.grabbed || this.cursorSeq !== seq) {
         return;
       }
+      // loadChildren() reverts aria-expanded to 'false' when the children fetch
+      // fails; announce that instead of a success that didn't happen, and leave
+      // the cursor where it is rather than re-placing it as if it opened.
+      if (prev.getAttribute('aria-expanded') !== 'true') {
+        announce(
+          Drupal.t('Could not open @title.', {
+            '@title': titleOf(prev, this.titleSelector),
+          }),
+          'assertive',
+        );
+        return;
+      }
       announce(
         Drupal.t('Opened @title.', {
           '@title': titleOf(prev, this.titleSelector),

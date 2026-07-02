@@ -303,6 +303,8 @@
             moveUrl,
             csrfToken,
             flashClass: REORDER_CONFIG.flashClass,
+            onCommitted: REORDER_CONFIG.onCommitted,
+            titleSelector: REORDER_CONFIG.titleSelector,
           });
           event.preventDefault();
           return true;
