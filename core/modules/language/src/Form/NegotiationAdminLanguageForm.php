@@ -43,9 +43,8 @@ class NegotiationAdminLanguageForm extends ConfigFormBase {
 
     $form['allow_user_change'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Allow users to change the administration language'),
+      '#title' => $this->t('Allow users to set their own administration language'),
       '#default_value' => $config->get('admin_language.allow_user_change') ?? FALSE,
-      '#description' => $this->t('If checked, admins can set their own administration language preference on their account page.'),
     ];
 
     return parent::buildForm($form, $form_state);
