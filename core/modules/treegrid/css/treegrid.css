@@ -12,3 +12,8 @@ drupal-treegrid {
   position: relative;
   display: block;
 }
+
+/* Collapse marks a row's descendant run with data-hidden; see expand.js. */
+tr[role="row"][data-hidden="true"] {
+  display: none;
+}

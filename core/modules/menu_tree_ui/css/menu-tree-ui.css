@@ -1,32 +1,30 @@
 /*
  * Menu tree UI styles.
  *
- * Strategy: define a thin bridge layer of --color-* / --space-* variables
- * that cascade from Gin's --gin-* tokens when Gin is active, or fall back
- * to Claro-compatible values otherwise. All color and spacing rules in this
- * file use ONLY those bridge variables — never hardcoded hex.
+ * Strategy: define a thin bridge layer of --mtu-color-* variables, scoped to
+ * .menu-tree-ui, with neutral default values. All color rules in this file
+ * use ONLY those bridge variables — never hardcoded hex — so an admin theme
+ * (Gin, Claro, or otherwise) can override the bridge variables on its own
+ * selectors without this module referencing that theme's custom properties.
  *
- * Two perf-critical techniques:
- *  1. content-visibility: auto on every row — browser skips paint/layout for
- *     off-screen rows for free.
- *  2. [data-virtualized="true"] — set by RowWindow (IntersectionObserver) for
- *     rows that are deep off-screen; hard-floors cost via visibility:hidden +
- *     fixed height.
+ * Virtualization: [data-virtualized="true"] is set by RowWindow
+ * (IntersectionObserver, see treegrid/js/windowing.js) for rows deep
+ * off-screen; the rule below hard-floors their cost via visibility:hidden +
+ * fixed height.
  */
 
-:root {
-  --mtu-color-divider: var(--gin-border-color, #e0e0e0);
-  --mtu-color-divider-light: var(--gin-border-color-layer, #f0f0f0);
-  --mtu-color-bg: var(--gin-bg-layer, #fff);
-  --mtu-color-text: var(--gin-color-text, #1a1a1a);
-  --mtu-color-text-muted: var(--gin-color-text-light, #757575);
-  --mtu-color-text-muted-strong: var(--gin-color-text, #4a4a4a);
-  --mtu-color-focus: var(--gin-color-focus-border, #2563eb);
-  --mtu-color-link: var(--gin-color-primary, #2563eb);
-  --mtu-color-focus-bg: rgb(37, 99, 235, 0.08);
-}
-
 .menu-tree-ui {
+  --mtu-color-divider: #e0e0e0;
+  --mtu-color-divider-light: #f0f0f0;
+  --mtu-color-bg: #fff;
+  --mtu-color-text: #1a1a1a;
+  --mtu-color-text-muted: #757575;
+  --mtu-color-text-muted-strong: #4a4a4a;
+  /* Neutral defaults; the admin theme overrides these. */
+  --mtu-color-focus: #2563eb;
+  --mtu-color-link: #2563eb;
+  --mtu-color-focus-bg: rgb(37, 99, 235, 0.08);
+
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -198,11 +196,6 @@
   margin: 0;
   padding: 0;
   list-style: none;
-}
-
-/* Collapsed descendants are flagged data-hidden by expand.js. */
-.menu-tree-ui-row[data-hidden="true"] {
-  display: none;
 }
 
 /*
