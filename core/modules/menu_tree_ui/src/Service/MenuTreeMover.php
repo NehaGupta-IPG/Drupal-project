@@ -9,6 +9,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Menu\MenuTreeStorageInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\menu_tree_ui\MenuLinkMovability;
 use Drupal\treegrid_reorder\MoveIntent;
 use Drupal\treegrid_reorder\TreeMoveHandlerInterface;
@@ -35,8 +36,14 @@ use Psr\Log\LoggerInterface;
  * Extension without subclassing:
  *   - hook_menu_tree_ui_pre_move_alter() — veto a move before the menu checks.
  *   - hook_menu_tree_ui_post_move() — react after a successful move.
+ *
+ * Uses StringTranslationTrait for the user-facing messages below; the trait's
+ * getStringTranslation() falls back to \Drupal::translation() since none is
+ * injected here.
  */
 final class MenuTreeMover implements TreeMoveHandlerInterface {
+
+  use StringTranslationTrait;
 
   /**
    * The generic reorder orchestrator.
@@ -156,7 +163,7 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
       return [
         'ok' => FALSE,
         'code' => 'vetoed',
-        'message' => $veto['message'] ?? 'Move blocked by a module.',
+        'message' => $veto['message'] ?? (string) $this->t('Move blocked by a module.'),
       ];
     }
 
@@ -165,14 +172,14 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
       return [
         'ok' => FALSE,
         'code' => 'not_moveable',
-        'message' => 'This menu link cannot be reordered.',
+        'message' => (string) $this->t('This menu link cannot be reordered.'),
       ];
     }
     if ($link->getMenuName() !== $tree_id) {
       return [
         'ok' => FALSE,
         'code' => 'menu_mismatch',
-        'message' => 'Link belongs to a different menu.',
+        'message' => (string) $this->t('Link belongs to a different menu.'),
       ];
     }
 
@@ -180,7 +187,7 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
       return [
         'ok' => FALSE,
         'code' => 'before_self',
-        'message' => 'A link cannot be placed before itself.',
+        'message' => (string) $this->t('A link cannot be placed before itself.'),
       ];
     }
 
@@ -193,7 +200,7 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
         return [
           'ok' => FALSE,
           'code' => 'unknown_parent',
-          'message' => 'The destination no longer exists.',
+          'message' => (string) $this->t('The destination no longer exists.'),
         ];
       }
       $new_parent_definition = $this->menuLinkManager->getDefinition($intent->newParent);
@@ -201,7 +208,7 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
         return [
           'ok' => FALSE,
           'code' => 'parent_menu_mismatch',
-          'message' => 'The destination is in a different menu.',
+          'message' => (string) $this->t('The destination is in a different menu.'),
         ];
       }
     }
@@ -210,7 +217,7 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
       return [
         'ok' => FALSE,
         'code' => 'too_deep',
-        'message' => 'Moving here would exceed the 9-level depth limit.',
+        'message' => (string) $this->t('Moving here would exceed the 9-level depth limit.'),
       ];
     }
 

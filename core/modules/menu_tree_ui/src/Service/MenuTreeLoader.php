@@ -177,7 +177,7 @@ final class MenuTreeLoader {
 
       if ($new_parent === $parent_id) {
         if (!$in_list) {
-          $element = $this->materializeElement($moved);
+          $element = $this->materializeElement($moved, $parent_id);
           if ($element === NULL) {
             continue;
           }
@@ -240,21 +240,30 @@ final class MenuTreeLoader {
    *
    * The link's own properties (title, route, access) are unaffected by a move,
    * so a freshly built element is sufficient; only parent/weight change, which
-   * the overlay already encodes through placement.
+   * the overlay already encodes through placement. The depth is derived from
+   * the destination parent's live root path rather than the link's own (now
+   * stale) live depth, so OperationsColumn's depth-cap check sees where the
+   * link is pending to land, not where it currently lives. This does not
+   * account for the destination parent itself being pending-moved elsewhere in
+   * the same working copy — a rare double-pending case left as an
+   * approximation.
    *
    * @param string $plugin_id
    *   The moved link's plugin ID.
+   * @param string $parent_id
+   *   The destination parent's plugin ID, or '' for the menu root.
    *
    * @return \Drupal\Core\Menu\MenuLinkTreeElement|null
    *   The element, or NULL when the link no longer exists.
    */
-  private function materializeElement(string $plugin_id): ?MenuLinkTreeElement {
+  private function materializeElement(string $plugin_id, string $parent_id): ?MenuLinkTreeElement {
     if (!$this->menuLinkManager->hasDefinition($plugin_id)) {
       return NULL;
     }
     $link = $this->menuLinkManager->createInstance($plugin_id);
     $has_children = $this->treeStorage->getSubtreeHeight($plugin_id) > 1;
-    return new MenuLinkTreeElement($link, $has_children, 1, FALSE, []);
+    $depth = $parent_id === '' ? 1 : count($this->treeStorage->getRootPathIds($parent_id)) + 1;
+    return new MenuLinkTreeElement($link, $has_children, $depth, FALSE, []);
   }
 
   /**

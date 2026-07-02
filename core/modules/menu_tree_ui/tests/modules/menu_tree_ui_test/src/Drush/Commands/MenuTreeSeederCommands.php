@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\menu_tree_ui_test\Drush\Commands;
 
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\ByteSizeMarkup;
@@ -59,6 +60,7 @@ final class MenuTreeSeederCommands extends DrushCommands {
 
   public function __construct(
     private readonly EntityTypeManagerInterface $entityTypeManager,
+    private readonly Connection $database,
   ) {
     parent::__construct();
   }
@@ -197,7 +199,7 @@ final class MenuTreeSeederCommands extends DrushCommands {
       ->accessCheck(FALSE)
       ->condition('menu_name', $menu);
     if ($prefix !== '') {
-      $query->condition('title', $prefix . '%', 'LIKE');
+      $query->condition('title', $this->database->escapeLike($prefix) . '%', 'LIKE');
     }
     $ids = $query->execute();
     $count = count($ids);
@@ -369,7 +371,7 @@ final class MenuTreeSeederCommands extends DrushCommands {
     $ids = $storage->getQuery()
       ->accessCheck(FALSE)
       ->condition('menu_name', $menu)
-      ->condition('title', $prefix . '%', 'LIKE')
+      ->condition('title', $this->database->escapeLike($prefix) . '%', 'LIKE')
       ->sort('parent')
       ->sort('id')
       ->execute();

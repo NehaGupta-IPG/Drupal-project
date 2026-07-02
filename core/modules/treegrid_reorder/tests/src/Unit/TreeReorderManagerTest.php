@@ -32,6 +32,7 @@ final class TreeReorderManagerTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     $this->manager = new TreeReorderManager();
+    $this->manager->setStringTranslation($this->getStringTranslationStub());
     $this->handler = new class() implements TreeMoveHandlerInterface {
 
       /**

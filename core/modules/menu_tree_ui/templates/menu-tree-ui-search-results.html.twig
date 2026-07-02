@@ -25,7 +25,11 @@
     </p>
   {% else %}
     <p class="menu-tree-ui-search-results__summary">
-      {{ '@count results for "@q"'|t({ '@count': results|length, '@q': query }) }}
+      {% trans %}
+        1 result for "{{ query }}"
+      {% plural results|length %}
+        @count results for "{{ query }}"
+      {% endtrans %}
     </p>
     <ul class="menu-tree-ui-search-results__list">
       {% for result in results %}

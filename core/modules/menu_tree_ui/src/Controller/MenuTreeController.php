@@ -243,12 +243,16 @@ final class MenuTreeController extends ControllerBase {
   public function move(MenuInterface $menu, Request $request): JsonResponse {
     $payload = json_decode((string) $request->getContent(), TRUE);
     if (!is_array($payload)) {
-      return new JsonResponse(['ok' => FALSE, 'code' => 'bad_request', 'message' => 'JSON body required.'], 400);
+      return new JsonResponse([
+        'ok' => FALSE,
+        'code' => 'bad_request',
+        'message' => (string) $this->t('JSON body required.'),
+      ], 400);
     }
 
     $id = (string) ($payload['id'] ?? '');
     if ($id === '') {
-      return new JsonResponse(['ok' => FALSE, 'code' => 'bad_request', 'message' => 'Missing id.'], 400);
+      return new JsonResponse(['ok' => FALSE, 'code' => 'bad_request', 'message' => (string) $this->t('Missing id.')], 400);
     }
     $new_parent = (string) ($payload['new_parent'] ?? '');
     $before_id = $payload['before_id'] ?? NULL;
@@ -352,7 +356,11 @@ final class MenuTreeController extends ControllerBase {
   public function columnUpdate(MenuInterface $menu, Request $request): JsonResponse {
     $payload = json_decode((string) $request->getContent(), TRUE);
     if (!is_array($payload)) {
-      return new JsonResponse(['ok' => FALSE, 'code' => 'bad_request', 'message' => 'JSON body required.'], 400);
+      return new JsonResponse([
+        'ok' => FALSE,
+        'code' => 'bad_request',
+        'message' => (string) $this->t('JSON body required.'),
+      ], 400);
     }
 
     $column_id = (string) ($payload['column_id'] ?? '');
@@ -360,17 +368,25 @@ final class MenuTreeController extends ControllerBase {
     $value = $payload['value'] ?? NULL;
 
     if ($column_id === '' || $link_id === '') {
-      return new JsonResponse(['ok' => FALSE, 'code' => 'bad_request', 'message' => 'Missing column_id or link_id.'], 400);
+      return new JsonResponse([
+        'ok' => FALSE,
+        'code' => 'bad_request',
+        'message' => (string) $this->t('Missing column_id or link_id.'),
+      ], 400);
     }
     if (!$this->columnManager->hasDefinition($column_id)) {
-      return new JsonResponse(['ok' => FALSE, 'code' => 'unknown_column', 'message' => 'Unknown column.'], 400);
+      return new JsonResponse([
+        'ok' => FALSE,
+        'code' => 'unknown_column',
+        'message' => (string) $this->t('Unknown column.'),
+      ], 400);
     }
 
     $link_definition = $this->menuLinkManager->getDefinition($link_id, FALSE);
     if (!$link_definition || $link_definition['menu_name'] !== $menu->id()) {
       // Access is checked for the route's menu only; without this, a link ID
       // from another menu would let a column update reach it.
-      return new JsonResponse(['ok' => FALSE, 'code' => 'not_found', 'message' => 'Link not found.'], 404);
+      return new JsonResponse(['ok' => FALSE, 'code' => 'not_found', 'message' => (string) $this->t('Link not found.')], 404);
     }
 
     $column = $this->columnManager->createInstance($column_id);

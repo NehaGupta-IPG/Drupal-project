@@ -138,6 +138,28 @@ final class MenuTreeOverlayTest extends KernelTestBase {
     $this->assertSame([$c], $this->idsOf($this->loader->loadLevelForEditing('test', $a)));
   }
 
+  /**
+   * A materialized (pending-moved-in) element carries the destination depth.
+   *
+   * A is a top-level link (depth 1), so C's materialized element at its new
+   * position under A must report depth 2, not the link's own stale live depth
+   * or a hardcoded 1 — OperationsColumn relies on this for its "Add child"
+   * depth-cap check.
+   */
+  public function testOverlayMaterializedElementHasCorrectDepth(): void {
+    [$a, , $c] = $this->ids;
+    $this->workingCopy->addOp('test', [
+      'type' => 'move',
+      'id' => $c,
+      'new_parent' => $a,
+      'before_id' => NULL,
+    ]);
+
+    $children = $this->loader->loadLevelForEditing('test', $a);
+    $this->assertCount(1, $children);
+    $this->assertSame(2, $children[0]->depth);
+  }
+
   // Helpers.
 
   /**

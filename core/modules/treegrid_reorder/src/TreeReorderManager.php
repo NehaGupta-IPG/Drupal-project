@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\treegrid_reorder;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+
 /**
  * Orchestrates a tree move: universal validation and the commit replay.
  *
@@ -16,9 +18,17 @@ namespace Drupal\treegrid_reorder;
  * write) is delegated to a TreeMoveHandlerInterface, so this class never knows
  * how a particular tree is stored.
  *
+ * Instantiated directly rather than injected (see the constructor note on
+ * MenuTreeMover), so it has no constructor-injected translation service;
+ * StringTranslationTrait::getStringTranslation() falls back to
+ * \Drupal::translation() in that case, which is acceptable here since the
+ * messages below are only ever reached from within a running Drupal request.
+ *
  * @api
  */
 final class TreeReorderManager {
+
+  use StringTranslationTrait;
 
   /**
    * Validates a single move: the universal checks, then the domain rules.
@@ -35,11 +45,19 @@ final class TreeReorderManager {
    */
   public function validateMove(string $tree_id, MoveIntent $intent, TreeMoveHandlerInterface $handler): array {
     if ($intent->newParent === $intent->id) {
-      return ['ok' => FALSE, 'code' => 'self_target', 'message' => 'Cannot drop an item onto itself.'];
+      return [
+        'ok' => FALSE,
+        'code' => 'self_target',
+        'message' => (string) $this->t('Cannot drop an item onto itself.'),
+      ];
     }
 
     if ($intent->newParent !== '' && in_array($intent->id, $handler->getAncestorIds($tree_id, $intent->newParent), TRUE)) {
-      return ['ok' => FALSE, 'code' => 'cycle', 'message' => 'Cannot drop an item into one of its own descendants.'];
+      return [
+        'ok' => FALSE,
+        'code' => 'cycle',
+        'message' => (string) $this->t('Cannot drop an item into one of its own descendants.'),
+      ];
     }
 
     return $handler->validateConstraints($tree_id, $intent);
@@ -134,7 +152,7 @@ final class TreeReorderManager {
     return [
       'ok' => FALSE,
       'code' => $validation['code'] ?? 'commit_failed',
-      'message' => $validation['message'] ?? 'A pending change could not be saved.',
+      'message' => $validation['message'] ?? (string) $this->t('A pending change could not be saved.'),
       'failed_op' => $index,
       'applied_ops' => $applied,
     ];
