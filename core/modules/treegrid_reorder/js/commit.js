@@ -125,7 +125,14 @@
     // Resolve before_id AFTER any auto-expand: for a 'child' drop the first
     // child is only in the DOM once the parent is open, and first-child
     // placement depends on finding it.
-    const beforeId = resolveBeforeId(intent);
+    let beforeId = resolveBeforeId(intent);
+    // A drop released just below the row above the dragged row resolves to
+    // the dragged row's own id, i.e. "before yourself", which the server
+    // treats as end-of-list. Remap to the current next sibling, as move mode
+    // already does for its own no-op guard.
+    if (beforeId === movedId) {
+      beforeId = nextSiblingRow(row)?.dataset.id ?? null;
+    }
 
     let body;
     try {

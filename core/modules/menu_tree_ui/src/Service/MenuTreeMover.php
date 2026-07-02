@@ -153,6 +153,36 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
       ];
     }
 
+    if ($intent->beforeId !== NULL && $intent->beforeId === $intent->id) {
+      return [
+        'ok' => FALSE,
+        'code' => 'before_self',
+        'message' => 'A link cannot be placed before itself.',
+      ];
+    }
+
+    // MenuTreeStorage::preSave() derives a link's menu from its parent, so a
+    // move into another menu's parent would silently re-home the link if this
+    // were not caught here, before the depth-cap check reads the parent's
+    // root path.
+    if ($intent->newParent !== '') {
+      if (!$this->menuLinkManager->hasDefinition($intent->newParent)) {
+        return [
+          'ok' => FALSE,
+          'code' => 'unknown_parent',
+          'message' => 'The destination no longer exists.',
+        ];
+      }
+      $new_parent_definition = $this->menuLinkManager->getDefinition($intent->newParent);
+      if ($new_parent_definition['menu_name'] !== $tree_id) {
+        return [
+          'ok' => FALSE,
+          'code' => 'parent_menu_mismatch',
+          'message' => 'The destination is in a different menu.',
+        ];
+      }
+    }
+
     if (!$this->fitsWithinDepthCap($intent->id, $intent->newParent)) {
       return [
         'ok' => FALSE,
@@ -168,6 +198,13 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
    * {@inheritdoc}
    */
   public function getAncestorIds(string $tree_id, string $parent_id): array {
+    // A parent id that no longer exists (e.g. deleted by a concurrent editor)
+    // has no ancestors to check against; returning an empty list here lets
+    // validateConstraints() report a clean 'unknown_parent' outcome instead of
+    // MenuTreeStorage::getRootPathIds() throwing on an unknown id.
+    if (!$this->menuLinkManager->hasDefinition($parent_id)) {
+      return [];
+    }
     // The materialized path (root → … → parent) gives O(1) lookups against the
     // menu_tree table rather than walking with N entity loads.
     return $this->treeStorage->getRootPathIds($parent_id);

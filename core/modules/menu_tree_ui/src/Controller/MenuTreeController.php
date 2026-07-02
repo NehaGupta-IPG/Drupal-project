@@ -8,6 +8,7 @@ use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Menu\MenuLinkInterface;
+use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -25,6 +26,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Routes for the lazy-loaded menu tree UI.
@@ -44,6 +46,7 @@ final class MenuTreeController extends ControllerBase {
     private readonly RendererInterface $renderer,
     private readonly TreegridColumnManager $columnManager,
     private readonly TreegridWorkingCopy $workingCopy,
+    private readonly MenuLinkManagerInterface $menuLinkManager,
   ) {}
 
   /**
@@ -56,6 +59,7 @@ final class MenuTreeController extends ControllerBase {
       $container->get('renderer'),
       $container->get('plugin.manager.treegrid_column'),
       $container->get('menu_tree_ui.working_copy'),
+      $container->get('plugin.manager.menu.link'),
     );
   }
 
@@ -147,6 +151,14 @@ final class MenuTreeController extends ControllerBase {
    */
   public function children(MenuInterface $menu, Request $request): CacheableJsonResponse {
     $parent_id = $request->query->get('parent', '') ?: NULL;
+    if ($parent_id !== NULL) {
+      $parent_definition = $this->menuLinkManager->getDefinition($parent_id, FALSE);
+      if ($parent_definition === NULL || $parent_definition['menu_name'] !== $menu->id()) {
+        // Access is checked for the route's menu only; without this, a
+        // parent id from another menu would return that menu's children.
+        throw new NotFoundHttpException();
+      }
+    }
     $elements = $this->loader->loadLevelForEditing($menu->id(), $parent_id);
     $columns = $this->columnManager->getSortedColumns();
     $entity_map = $this->loadContentEntitiesForElements($elements);

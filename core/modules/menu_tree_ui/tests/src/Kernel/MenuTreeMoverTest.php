@@ -103,6 +103,66 @@ final class MenuTreeMoverTest extends KernelTestBase {
   }
 
   /**
+   * Moving a link to a parent that belongs to a different menu is rejected.
+   *
+   * MenuTreeStorage::preSave() derives a link's menu from its parent, so a
+   * move into another menu's parent would silently re-home the link if this
+   * were not caught.
+   */
+  public function testMoveToParentInAnotherMenuIsRejected(): void {
+    $link = $this->createLink('test');
+    $other_parent = $this->createLink('other');
+
+    $result = $this->mover->validateMove('test', $link->getPluginId(), $other_parent->getPluginId(), NULL);
+
+    $this->assertFalse($result['ok']);
+    $this->assertSame('parent_menu_mismatch', $result['code']);
+  }
+
+  /**
+   * Moving to a nonexistent parent is rejected cleanly, not fatally.
+   *
+   * A bogus new_parent (e.g. a concurrently deleted link) must not reach
+   * MenuTreeStorage::getRootPathIds(), which throws a TypeError on an
+   * unknown id.
+   */
+  public function testMoveToNonexistentParentIsRejectedNotFatal(): void {
+    $link = $this->createLink('test');
+
+    try {
+      $result = $this->mover->validateMove(
+        'test',
+        $link->getPluginId(),
+        'menu_link_content:00000000-0000-0000-0000-000000000000',
+        NULL,
+      );
+    }
+    catch (\Throwable $e) {
+      $this->fail('validateMove() threw ' . get_class($e) . ': ' . $e->getMessage());
+    }
+
+    $this->assertFalse($result['ok']);
+    $this->assertSame('unknown_parent', $result['code']);
+  }
+
+  /**
+   * Using the moved link's own id as before_id must be rejected.
+   *
+   * The drag path can resolve before_id to the moved link's own id when the
+   * drop lands just below the row above it; the server refuses this rather
+   * than silently appending the link to the end of the list.
+   */
+  public function testMoveBeforeItselfIsRejected(): void {
+    $entity = $this->createLink('test');
+    $id = $entity->getPluginId();
+
+    $result = $this->mover->validateMove('test', $id, '', $id);
+
+    $this->assertFalse($result['ok']);
+    $this->assertSame('before_self', $result['code']);
+  }
+
+  /**
    * Dropping a link onto itself must be rejected.
    */
   public function testSelfDropIsRejected(): void {
