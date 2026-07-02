@@ -83,8 +83,13 @@
       if (existing && existing.tagName.toLowerCase() === 'button') {
         existing.replaceWith(ns.buildToggle({ has_children: false }));
       }
-      // On becoming a leaf, remove any stale descendant rows left behind.
-      descendantRows(row).forEach((r) => r.remove());
+      // On becoming a leaf, remove any stale descendant rows left behind,
+      // unobserving each so the row window does not retain detached nodes.
+      const rowWindow = row.closest('drupal-treegrid')?.rowWindow;
+      descendantRows(row).forEach((r) => {
+        rowWindow?.unobserve(r);
+        r.remove();
+      });
       delete row.dataset.loaded;
     }
   }
@@ -169,10 +174,18 @@
    *   The element, already connected (element.tree / element.expand are set).
    */
   function wireFeatures(element) {
-    const { tree, expand } = element;
-    if (!tree || !expand) {
+    if (!element.expand) {
+      // The element has not finished initializing yet (its provider can
+      // register after this behavior runs). Wire once it announces it is ready
+      // via treegrid:connected, rather than silently doing nothing.
+      element.addEventListener(
+        'treegrid:connected',
+        () => wireFeatures(element),
+        { once: true },
+      );
       return;
     }
+    const { tree, expand } = element;
     const settings = drupalSettings.menuTreeUi ?? {};
     const { moveUrl, columnUpdateUrl } = settings;
     const container = element.closest('.menu-tree-ui');

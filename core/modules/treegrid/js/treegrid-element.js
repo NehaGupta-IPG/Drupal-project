@@ -255,7 +255,8 @@
      *   Resolves once the bounded auto-expand finishes.
      */
     async autoExpandSmall() {
-      const threshold = parseInt(this.dataset.autoExpandThreshold, 10) || 2;
+      const parsed = parseInt(this.dataset.autoExpandThreshold, 10);
+      const threshold = Number.isNaN(parsed) ? 2 : parsed;
       const topRows = Array.from(this.tree.querySelectorAll(ROW));
       if (topRows.length === 0 || topRows.length > threshold) {
         return;

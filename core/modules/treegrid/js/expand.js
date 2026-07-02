@@ -246,20 +246,21 @@
      * @param {string} parentId
      *   Plugin ID of the parent, or '' for the root level.
      *
-     * @return {Promise<void>}
-     *   Resolves once the children are reconciled.
+     * @return {Promise<boolean>}
+     *   True once the children are reconciled (or there was nothing to do);
+     *   false when the server fetch failed, so the caller can recover.
      */
     async refresh(parentId) {
       const isRoot = parentId === '';
       const tbody = this.tree.querySelector('tbody');
       const parentRow = isRoot ? tbody : findRow(this.tree, parentId);
       if (!parentRow) {
-        return;
+        return true;
       }
 
       const items = await this.fetchChildren(parentId);
       if (items === null) {
-        return;
+        return false;
       }
 
       // Snapshot existing direct children with their descendant blocks BEFORE
@@ -300,10 +301,15 @@
         }
       });
 
-      // Remove orphan children (and their descendant blocks).
+      // Remove orphan children (and their descendant blocks), unobserving each
+      // so the row window does not retain detached nodes.
       blocks.forEach((entry, id) => {
         if (!kept.has(id)) {
-          entry.block.forEach((r) => r.remove());
+          entry.block.forEach((r) => {
+            this.rowWindow?.unobserve(r);
+            r.remove();
+          });
+          this.rowWindow?.unobserve(entry.row);
           entry.row.remove();
         }
       });
@@ -336,6 +342,7 @@
           this.rowWindow?.observe(row);
         }
       });
+      return true;
     }
 
     /**
@@ -405,6 +412,12 @@
           setRowControlsActive(r, false);
           this.rowWindow?.observe(r);
         });
+        // The row may have been collapsed while this fetch was in flight, when
+        // there were no child rows yet to hide. Hide the children that just
+        // arrived so they do not show under a now-collapsed row.
+        if (row.getAttribute('aria-expanded') !== 'true') {
+          this.hideSubtree(row);
+        }
       } finally {
         delete row.dataset.loading;
       }

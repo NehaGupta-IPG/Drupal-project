@@ -165,18 +165,31 @@
     // Server confirmed. Re-fetch the visible state of both affected groups.
     // When from === to (sibling reorder under the same parent) the second
     // refresh is a no-op but harmless.
-    await expand.refresh(oldParentId);
+    const okFrom = await expand.refresh(oldParentId);
+    let okTo = true;
     if (newParentId !== oldParentId) {
-      await expand.refresh(newParentId);
+      okTo = await expand.refresh(newParentId);
+    }
+    // A refresh whose fetch failed would leave the tree half-synced (a
+    // duplicated row, or no tab stop). Reload so the tree resyncs from the
+    // server rather than continuing from an inconsistent DOM.
+    if (!okFrom || !okTo) {
+      announce(Drupal.t('Could not refresh the menu — reloading.'), 'assertive');
+      window.location.reload();
+      return;
     }
 
     options.applyParentMetadata?.(oldParentId);
     options.applyParentMetadata?.(newParentId);
 
-    // row and intent.target are detached after refresh — re-find by id.
+    // row and intent.target are detached after refresh — re-find by id. Only
+    // pull focus back to the tree if it is still there (or on body because the
+    // refresh detached the focused row); a user who moved to the search field
+    // during the async round-trip keeps their place.
     if (tree) {
       const fresh = findRow(tree, movedId);
-      if (fresh) {
+      const active = document.activeElement;
+      if (fresh && (active === document.body || tree.contains(active))) {
         focusRow(tree, fresh);
       }
     }
