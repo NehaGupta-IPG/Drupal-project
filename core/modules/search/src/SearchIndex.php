@@ -6,6 +6,8 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Query\Expression;
+use Drupal\Core\Database\Query\UpsertValue;
 use Drupal\search\Exception\SearchIndexException;
 
 /**
@@ -168,15 +170,18 @@ class SearchIndex implements SearchIndexInterface {
         // If a word already exists in the database, its score gets increased
         // appropriately. If not, we create a new record with the appropriate
         // starting score.
-        $this->connection->merge('search_index')
-          ->keys([
+        $this->connection->upsert('search_index')
+          ->key(['word', 'sid', 'langcode', 'type'])
+          ->fields([
             'word' => $word,
             'sid' => $sid,
             'langcode' => $langcode,
             'type' => $type,
+            'score' => new UpsertValue(
+              insert: $score,
+              update: new Expression('{search_index}.[score] + :score', [':score' => $score]),
+            ),
           ])
-          ->fields(['score' => $score])
-          ->expression('score', '[score] + :score', [':score' => $score])
           ->execute();
         $current_words[$word] = TRUE;
       }

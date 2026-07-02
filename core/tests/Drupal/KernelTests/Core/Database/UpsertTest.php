@@ -6,6 +6,8 @@ namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
+use Drupal\Core\Database\Query\Expression;
+use Drupal\Core\Database\Query\UpsertValue;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -57,6 +59,61 @@ class UpsertTest extends DatabaseTestBase {
     $this->assertEquals('Speaker', $person->job, 'Job was not changed.');
     $this->assertEquals(32, $person->age, 'Age updated correctly.');
     $this->assertEquals('Meredith', $person->name, 'Name was not changed.');
+  }
+
+  /**
+   * Confirms that an upsert with no columns to update fails.
+   */
+  public function testUpsertFailOnNoUpdateColumns(): void {
+    $this->expectException(\LogicException::class);
+    $this->expectExceptionMessage('There must be at least one column to update in an upsert operation');
+    $this->connection->upsert('test_people')
+      ->key('job')
+      ->fields(['job' => 'Plumber'])
+      ->execute();
+  }
+
+  /**
+   * Confirms that we can upsert using UpsertValue value objects.
+   */
+  public function testUpsertWithUpsertValue(): void {
+    $connection = Database::getConnection();
+    $num_records_before = $connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();
+
+    // Insert a new row.
+    $upsert = $connection->upsert('test_people')
+      ->key('job')
+      ->fields([
+        'job' => 'Presenter',
+        'age' => new UpsertValue(
+          insert: 31,
+          update: new Expression('{test_people}.[age] + 5'),
+        ),
+        'name' => 'Tiffany',
+      ]);
+
+    // Update an existing row.
+    $upsert->values([
+      'job' => 'Speaker',
+      // The initial age was 30.
+      'age' => 32,
+      'name' => 'Meredith',
+    ]);
+
+    $upsert->execute();
+
+    $num_records_after = $connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();
+    $this->assertEquals($num_records_before + 1, $num_records_after);
+
+    $person = $connection->query('SELECT * FROM {test_people} WHERE [job] = :job', [':job' => 'Presenter'])->fetch();
+    $this->assertSame('Presenter', $person->job);
+    $this->assertSame('31', $person->age);
+    $this->assertSame('Tiffany', $person->name);
+
+    $person = $connection->query('SELECT * FROM {test_people} WHERE [job] = :job', [':job' => 'Speaker'])->fetch();
+    $this->assertSame('Speaker', $person->job);
+    $this->assertSame('35', $person->age, 'Age should have been updated to 35.');
+    $this->assertSame('Meredith', $person->name);
   }
 
   /**
