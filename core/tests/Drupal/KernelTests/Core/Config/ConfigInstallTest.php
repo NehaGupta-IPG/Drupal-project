@@ -232,7 +232,7 @@ class ConfigInstallTest extends KernelTestBase {
         ],
         $e->getConfigObjects()
       );
-      $this->assertEquals('Configuration objects provided by <em class="placeholder">config_install_dependency_test</em> have unmet dependencies: <em class="placeholder">config_test.dynamic.other_module_test_with_dependency (config_other_module_config_test, config_test.dynamic.dotted.english)</em>', $e->getMessage());
+      $this->assertEquals('Configuration objects provided by config_install_dependency_test have unmet dependencies: config_test.dynamic.other_module_test_with_dependency (config_other_module_config_test, config_test.dynamic.dotted.english)', $e->getMessage());
     }
     try {
       $this->installModules(['config_install_double_dependency_test']);
@@ -249,7 +249,7 @@ class ConfigInstallTest extends KernelTestBase {
         ],
         $e->getConfigObjects()
       );
-      $this->assertEquals('Configuration objects provided by <em class="placeholder">config_install_double_dependency_test</em> have unmet dependencies: <em class="placeholder">config_test.dynamic.other_module_test_with_dependency (config_other_module_config_test, config_test.dynamic.dotted.english)</em>', $e->getMessage());
+      $this->assertEquals('Configuration objects provided by config_install_double_dependency_test have unmet dependencies: config_test.dynamic.other_module_test_with_dependency (config_other_module_config_test, config_test.dynamic.dotted.english)', $e->getMessage());
     }
     $this->installModules(['config_test_language']);
     try {
@@ -259,7 +259,7 @@ class ConfigInstallTest extends KernelTestBase {
     catch (UnmetDependenciesException $e) {
       $this->assertEquals('config_install_dependency_test', $e->getExtension());
       $this->assertEquals(['config_test.dynamic.other_module_test_with_dependency' => ['config_other_module_config_test']], $e->getConfigObjects());
-      $this->assertEquals('Configuration objects provided by <em class="placeholder">config_install_dependency_test</em> have unmet dependencies: <em class="placeholder">config_test.dynamic.other_module_test_with_dependency (config_other_module_config_test)</em>', $e->getMessage());
+      $this->assertEquals('Configuration objects provided by config_install_dependency_test have unmet dependencies: config_test.dynamic.other_module_test_with_dependency (config_other_module_config_test)', $e->getMessage());
     }
     $this->installModules(['config_other_module_config_test']);
     $this->installModules(['config_install_dependency_test']);
