@@ -18,14 +18,15 @@ use Symfony\Component\Routing\Exception\ExceptionInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 
 /**
- * Identifies admin language from the user preferences.
+ * Identifies admin language from global settings and user preferences.
  */
 #[LanguageNegotiation(
   id: LanguageNegotiationUserAdmin::METHOD_ID,
-  name: new TranslatableMarkup('Account administration pages'),
+  name: new TranslatableMarkup('Administration language'),
   types: [LanguageInterface::TYPE_INTERFACE],
   weight: -10,
-  description: new TranslatableMarkup('Account administration pages language setting.')
+  description: new TranslatableMarkup('Dedicated language for site administration.'),
+  config_route_name: 'language.negotiation_admin_language'
 )]
 class LanguageNegotiationUserAdmin extends LanguageNegotiationMethodBase implements ContainerFactoryPluginInterface {
 
@@ -100,14 +101,42 @@ class LanguageNegotiationUserAdmin extends LanguageNegotiationMethodBase impleme
    * {@inheritdoc}
    */
   public function getLangcode(?Request $request = NULL) {
-    $langcode = NULL;
-
-    // User preference (only for administrators).
-    if (($this->currentUser->hasPermission('access administration pages') || $this->currentUser->hasPermission('view the administration theme')) && ($preferred_admin_langcode = $this->currentUser->getPreferredAdminLangcode(FALSE)) && $this->isAdminPath($request)) {
-      $langcode = $preferred_admin_langcode;
+    // Check if we're on an admin path.
+    if (!$this->isAdminPath($request)) {
+      return NULL;
+    }
+    // Check if the user is an admin.
+    if (!($this->currentUser->hasPermission('access administration pages') || $this->currentUser->hasPermission('view the administration theme'))) {
+      return NULL;
     }
 
-    // Not an admin, no admin language preference or not on an admin path.
+    // Get the configuration.
+    $config = $this->config->get('language.negotiation');
+    $allow_user_change = $config->get('admin_language.allow_user_change') ?? FALSE;
+    $default_admin_langcode = $config->get('admin_language.default_langcode');
+    // Handle the special 'site_default' value.
+    if ($default_admin_langcode === LanguageInterface::LANGCODE_SITE_DEFAULT) {
+      $site_default_language = $this->languageManager->getDefaultLanguage();
+      $default_admin_langcode = $site_default_language ? $site_default_language->getId() : NULL;
+    }
+
+    // If users are allowed to change the admin language, check for user preference.
+    $langcode = NULL;
+    if ($allow_user_change) {
+      $preferred_admin_langcode = $this->currentUser->getPreferredAdminLangcode(FALSE);
+      if (!empty($preferred_admin_langcode)) {
+        $langcode = $preferred_admin_langcode;
+      }
+      else if (!empty($default_admin_langcode)) {
+        // Fall back to global default if user has no preference.
+        $langcode = $default_admin_langcode;
+      }
+    }
+    else if (!empty($default_admin_langcode)) {
+      // Users are not allowed to change it, use global default.
+      $langcode = $default_admin_langcode;
+    }
+
     return $langcode;
   }
 

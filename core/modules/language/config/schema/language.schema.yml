@@ -73,6 +73,16 @@ language.negotiation:
     selected_langcode:
       type: langcode
       label: 'Selected language'
+    admin_language:
+      type: mapping
+      label: 'Administration language'
+      mapping:
+        default_langcode:
+          type: langcode
+          label: 'Default administration language'
+        allow_user_change:
+          type: boolean
+          label: 'Allow users to change administration language'
 
 language.mappings:
   type: config_object
