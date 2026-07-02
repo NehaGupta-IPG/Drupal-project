@@ -1,3 +1,9 @@
+# Tugboat configuration for building Drupal core preview environments.
+#
+# Tugboat builds an ephemeral, running Drupal site for each merge request so
+# reviewers can test changes without needing their own local environment.
+#
+# @see https://www.drupal.org/case-study/drupalorg-integration-with-tugboatqa-for-live-previews-on-core-issues
 services:
   php:
     image: tugboatqa/php:8.5-apache
