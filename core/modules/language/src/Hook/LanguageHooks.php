@@ -112,7 +112,7 @@ class LanguageHooks {
         return $output;
 
       case 'language.negotiation_admin_language':
-        $output = '<p>' . $this->t('The administration language applies to pages and interface elements that are accessible to users with the <em>Use the administration pages</em> or <em>View the administration theme</em> permission.') . '</p>';
+        $output = '<p>' . $this->t('Applies to administrative interfaces accessible to users with <em>Use the administration pages</em> or <em>View the administration theme</em> permission.') . '</p>';
         return $output;
 
       case 'language.negotiation_browser':
