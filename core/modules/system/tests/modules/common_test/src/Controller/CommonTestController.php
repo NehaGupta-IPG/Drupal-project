@@ -69,6 +69,28 @@ class CommonTestController {
           'set_active_class' => TRUE,
         ],
       ],
+      'with_zero_query' => [
+        '#type' => 'link',
+        '#title' => $this->t('Link with zero query value'),
+        '#url' => Url::fromRoute('<current>'),
+        '#options' => [
+          'query' => [
+            'count' => '0',
+          ],
+          'set_active_class' => TRUE,
+        ],
+      ],
+      'with_empty_query' => [
+        '#type' => 'link',
+        '#title' => $this->t('Link with empty query value'),
+        '#url' => Url::fromRoute('<current>'),
+        '#options' => [
+          'query' => [
+            'status' => '',
+          ],
+          'set_active_class' => TRUE,
+        ],
+      ],
     ];
   }
 

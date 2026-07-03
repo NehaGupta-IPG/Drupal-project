@@ -684,6 +684,75 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
       'attributes' => $attributes + ['aria-current' => 'page'],
     ];
 
+    // Subset query matching cases from issue #2845319.
+    $subset_cases = [
+      [
+        ['path' => 'llama', 'front' => FALSE, 'language' => 'en', 'query' => []],
+        TRUE,
+        ['data-drupal-link-system-path' => 'llama'],
+      ],
+      [
+        ['path' => 'llama', 'front' => FALSE, 'language' => 'en', 'query' => ['page' => '3']],
+        TRUE,
+        ['data-drupal-link-system-path' => 'llama'],
+      ],
+      [
+        ['path' => 'llama', 'front' => FALSE, 'language' => 'en', 'query' => ['page' => '3', 'filter' => 'xxx']],
+        TRUE,
+        [
+          'data-drupal-link-system-path' => 'llama',
+          'data-drupal-link-query' => Json::encode(['filter' => 'xxx']),
+        ],
+      ],
+      [
+        ['path' => 'llama', 'front' => FALSE, 'language' => 'en', 'query' => []],
+        FALSE,
+        [
+          'data-drupal-link-system-path' => 'llama',
+          'data-drupal-link-query' => Json::encode(['page' => '3']),
+        ],
+      ],
+      [
+        ['path' => 'llama', 'front' => FALSE, 'language' => 'en', 'query' => ['page' => '3']],
+        FALSE,
+        [
+          'data-drupal-link-system-path' => 'llama',
+          'data-drupal-link-query' => Json::encode(['page' => '3', 'filter' => 'xxx']),
+        ],
+      ],
+      [
+        ['path' => 'llama', 'front' => FALSE, 'language' => 'en', 'query' => ['page' => '3', 'filter' => 'xxx']],
+        FALSE,
+        [
+          'data-drupal-link-system-path' => 'llama',
+          'data-drupal-link-query' => Json::encode(['page' => '3', 'filter' => 'yyy']),
+        ],
+      ],
+      [
+        ['path' => 'llama', 'front' => FALSE, 'language' => 'en', 'query' => ['funding_project_status' => '']],
+        TRUE,
+        [
+          'data-drupal-link-system-path' => 'llama',
+          'data-drupal-link-query' => Json::encode(['funding_project_status' => '']),
+        ],
+      ],
+      [
+        ['path' => 'llama', 'front' => FALSE, 'language' => 'en', 'query' => ['count' => '0']],
+        TRUE,
+        [
+          'data-drupal-link-system-path' => 'llama',
+          'data-drupal-link-query' => Json::encode(['count' => '0']),
+        ],
+      ],
+    ];
+    foreach ($subset_cases as [$context, $is_active, $attributes]) {
+      $situations[] = [
+        'context' => $context,
+        'is active' => $is_active,
+        'attributes' => $attributes + ($is_active ? ['aria-current' => 'page'] : []),
+      ];
+    }
+
     // Loop over the surrounding HTML variations.
     $data = [];
     for ($h = 0; $h < count($html); $h++) {

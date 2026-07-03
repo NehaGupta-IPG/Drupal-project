@@ -22,7 +22,7 @@
     attach(context) {
       // Start by finding all potentially active links.
       const path = drupalSettings.path;
-      path.currentQuery = path.currentQuery ?? [];
+      path.currentQuery = path.currentQuery ?? {};
       const originalSelectors = [
         `[data-drupal-link-system-path="${CSS.escape(path.currentPath)}"]`,
       ];
@@ -58,7 +58,7 @@
           !activeLink.hasAttribute('data-drupal-link-query') ||
           !Object.entries(
             JSON.parse(activeLink.getAttribute('data-drupal-link-query')),
-          ).find(([key, value]) => value !== (path.currentQuery[key] || null));
+          ).some(([key, value]) => value !== (path.currentQuery[key] ?? null));
 
         if (queryMatch) {
           activeLink.classList.add('is-active');
