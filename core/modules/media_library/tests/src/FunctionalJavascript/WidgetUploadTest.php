@@ -893,9 +893,16 @@ class WidgetUploadTest extends MediaLibraryTestBase {
 
     // Select the pre-created item and insert it from the inner (topmost) modal.
     // The inner modal must close while the outer add form modal stays open.
-    $this->selectMediaItem(0);
     $modals = $page->findAll('css', '.media-library-widget-modal');
-    end($modals)->pressButton('Insert selected');
+    $inner = end($modals);
+    $this->assertNotEmpty($inner);
+    // Select the item with the visible click-to-select trigger (the checkbox
+    // input itself is hidden), scoped to the inner modal so the outer add form
+    // is not touched.
+    $trigger = $inner->waitFor(10, fn ($inner) => $inner->find('css', '.js-media-library-item .js-click-to-select-trigger'));
+    $this->assertNotEmpty($trigger);
+    $trigger->click();
+    $inner->pressButton('Insert selected');
     $this->waitForElementsCount('css', '.media-library-widget-modal', 1);
 
     // The outer add form is still open and now shows the nested selection.
