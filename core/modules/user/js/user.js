@@ -64,6 +64,7 @@
     attach(context, settings) {
       const cssClasses = Drupal.user.password.css;
       once('password', 'input.js-password-field', context).forEach((value) => {
+        let tmp = '';
         const $mainInput = $(value);
         const $mainInputParent = $mainInput
           .parent()
@@ -80,21 +81,10 @@
           .find('[data-drupal-selector="password-match-status-text"]')
           .first();
 
-        const $confirmInputParent = $confirmInput
+        $confirmInput
           .parent()
           .addClass('confirm-parent')
           .append($passwordConfirmMessage);
-
-        // List of classes to be removed from the strength bar on a state
-        // change.
-        const passwordStrengthBarClassesToRemove = [
-          cssClasses.passwordWeak || '',
-          cssClasses.passwordFair || '',
-          cssClasses.passwordGood || '',
-          cssClasses.passwordStrong || '',
-        ]
-          .join(' ')
-          .trim();
 
         // List of classes to be removed from the text wrapper on a state
         // change.
@@ -120,22 +110,14 @@
 
         // If the password strength indicator is enabled, add its markup.
         if (settings.password.showStrengthIndicator) {
-          const $passwordStrength = $(
-            Drupal.theme('passwordStrength', settings.password),
-          );
-          password.$strengthBar = $passwordStrength
-            .find('[data-drupal-selector="password-strength-indicator"]')
-            .first();
-          password.$strengthTextWrapper = $passwordStrength
-            .find('[data-drupal-selector="password-strength-text"]')
-            .first();
+          const suggestionId = `${$mainInput[0].id}-suggestions`;
           password.$suggestions = $(
             Drupal.theme('passwordSuggestions', settings.password, []),
           );
+          password.$suggestions.attr('id', suggestionId);
 
-          password.$suggestions.hide();
-          $mainInputParent.append($passwordStrength);
-          $confirmInputParent.after(password.$suggestions);
+          $mainInputParent.append(password.$suggestions);
+          $mainInput.attr('aria-details', suggestionId);
         }
 
         /**
@@ -201,31 +183,23 @@
                 result.messageTips,
               ),
             );
+            if (result.messageTips.length === 0) {
+              Drupal.announce(Drupal.t('Password requirements met'));
+            }
+            else if (result.messageTips[0] !== tmp) {
+              Drupal.announce(result.messageTips[0]);
+              tmp = result.messageTips[0];
+            }
 
             // Update the suggestions for how to improve the password if needed.
             if (
-              password.$suggestions.html() !==
-              $currentPasswordSuggestions.html()
+              password.$suggestions.contents() !==
+              $currentPasswordSuggestions.contents()
             ) {
-              password.$suggestions.replaceWith($currentPasswordSuggestions);
-              password.$suggestions = $currentPasswordSuggestions.toggle(
-                // Only show the description box if a weakness exists in the
-                // password.
-                result.strength !== 100,
-              );
+              password.$suggestions
+                .empty()
+                .append($currentPasswordSuggestions.contents());
             }
-
-            if (passwordStrengthBarClassesToRemove) {
-              password.$strengthBar.removeClass(
-                passwordStrengthBarClassesToRemove,
-              );
-            }
-            // Adjust the length of the strength indicator.
-            password.$strengthBar[0].style.width = `${result.strength}%`;
-            password.$strengthBar.addClass(result.indicatorClass);
-
-            // Update the strength indication text.
-            password.$strengthTextWrapper.html(result.indicatorText);
           }
 
           // Check the value in the confirm input and show results.
@@ -249,7 +223,27 @@
         // Monitor input events.
         $mainInput.on('input', passwordCheck);
         $confirmInput.on('input', passwordCheck);
+        passwordCheck();
       });
+    },
+  };
+
+  Drupal.strengthTests = {
+    addLowerCase: {
+      test: (password) => /[a-z]/.test(password),
+      message: (settings) => settings.addLowerCase,
+    },
+    addUpperCase: {
+      test: (password) => /[A-Z]/.test(password),
+      message: (settings) => settings.addUpperCase,
+    },
+    addNumbers: {
+      test: (password) => /[0-9]/.test(password),
+      message: (settings) => settings.addNumbers,
+    },
+    addPunctuation: {
+      test: (password) => /[^a-zA-Z0-9]/.test(password),
+      message: (settings) => settings.addPunctuation,
     },
   };
 
@@ -269,16 +263,8 @@
    */
   Drupal.evaluatePasswordStrength = (password, passwordSettings) => {
     password = password.trim();
-    let indicatorText;
-    let indicatorClass;
     let weaknesses = 0;
-    let strength = 100;
-    let msg = [];
-
-    const hasLowercase = /[a-z]/.test(password);
-    const hasUppercase = /[A-Z]/.test(password);
-    const hasNumbers = /[0-9]/.test(password);
-    const hasPunctuation = /[^a-zA-Z0-9]/.test(password);
+    const messageTips = [];
 
     // If there is a username edit box on the page, compare password to that,
     // otherwise use value from the database.
@@ -288,81 +274,32 @@
         ? $usernameBox[0].value
         : passwordSettings.username;
 
-    // Lose 5 points for every character less than 12, plus a 30 point penalty.
+    // Handle length different.
+    // TODO Make length configurable.
     if (password.length < 12) {
-      msg.push(passwordSettings.tooShort);
-      strength -= (12 - password.length) * 5 + 30;
+      messageTips.push(passwordSettings.tooShort);
+      weaknesses += 1;
     }
 
     // Count weaknesses.
-    if (!hasLowercase) {
-      msg.push(passwordSettings.addLowerCase);
-      weaknesses += 1;
-    }
-    if (!hasUppercase) {
-      msg.push(passwordSettings.addUpperCase);
-      weaknesses += 1;
-    }
-    if (!hasNumbers) {
-      msg.push(passwordSettings.addNumbers);
-      weaknesses += 1;
-    }
-    if (!hasPunctuation) {
-      msg.push(passwordSettings.addPunctuation);
-      weaknesses += 1;
-    }
+    Object.values(Drupal.strengthTests).forEach((test) => {
+      if (!test.test(password)) {
+        messageTips.push(test.message(passwordSettings));
+        weaknesses += 1;
+      }
+    });
 
-    // Apply penalty for each weakness (balanced against length penalty).
-    switch (weaknesses) {
-      case 1:
-        strength -= 12.5;
-        break;
-
-      case 2:
-        strength -= 25;
-        break;
-
-      case 3:
-      case 4:
-        strength -= 40;
-        break;
-    }
+    let strength = (weaknesses / Drupal.strengthTests.length + 1) * 100;
 
     // Check if password is the same as the username.
     if (password !== '' && password.toLowerCase() === username.toLowerCase()) {
-      msg.push(passwordSettings.sameAsUsername);
+      messageTips.push(passwordSettings.sameAsUsername);
       // Passwords the same as username are always very weak.
       strength = 5;
     }
 
-    const cssClasses = Drupal.user.password.css;
-
-    // Based on the strength, work out what text should be shown by the
-    // password strength meter.
-    if (strength < 60) {
-      indicatorText = passwordSettings.weak;
-      indicatorClass = cssClasses.passwordWeak;
-    } else if (strength < 70) {
-      indicatorText = passwordSettings.fair;
-      indicatorClass = cssClasses.passwordFair;
-    } else if (strength < 80) {
-      indicatorText = passwordSettings.good;
-      indicatorClass = cssClasses.passwordGood;
-    } else if (strength <= 100) {
-      indicatorText = passwordSettings.strong;
-      indicatorClass = cssClasses.passwordStrong;
-    }
-
-    // Assemble the final message while keeping the original message array.
-    const messageTips = msg;
-    msg = `${passwordSettings.hasWeaknesses}<ul><li>${msg.join(
-      '</li><li>',
-    )}</li></ul>`;
-
     return {
       strength,
-      indicatorText,
-      indicatorClass,
       messageTips,
     };
   };
