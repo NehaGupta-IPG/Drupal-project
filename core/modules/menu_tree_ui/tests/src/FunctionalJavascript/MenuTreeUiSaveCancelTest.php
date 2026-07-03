@@ -22,6 +22,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 final class MenuTreeUiSaveCancelTest extends MenuTreeUiJavascriptTestBase {
 
+  use MenuTreeUiDragGestureTrait;
+
   /**
    * Seeds a menu with three top-level links A, B, C (A has one child, A1).
    *
@@ -138,58 +140,13 @@ final class MenuTreeUiSaveCancelTest extends MenuTreeUiJavascriptTestBase {
   /**
    * Drags row C into the "before" zone of row A and waits for the commit.
    *
-   * Fires the same synthetic PointerEvent sequence the drag test uses against
-   * the live DragController, then waits for the host to clear data-treegrid-moving
-   * and for the top-level order to read A, C (C lifted above its old slot).
+   * The drag() helper waits for the host to clear its moving/loading flags,
+   * and the waited assertSiblings() then polls for the reordered top level.
+   * Waiting on the end-state order matters: the cleared flags can read true
+   * before the reorder lands, racing a slower commit on CI.
    */
   private function moveCBeforeA(): void {
-    $source_id = $this->linkIds['C'];
-    $target_id = $this->linkIds['A'];
-
-    $script = <<<JS
-      const sourceRow = document.querySelector('tr[role="row"][data-id="$source_id"]');
-      const targetRow = document.querySelector('tr[role="row"][data-id="$target_id"]');
-      if (!sourceRow || !targetRow) throw new Error('source or target row not in DOM');
-      targetRow.scrollIntoView({block: 'center'});
-      const handle = sourceRow.querySelector('.menu-tree-ui-row__handle:not(.menu-tree-ui-row__handle--locked)');
-      if (!handle) throw new Error('no draggable handle on source row');
-      const hRect = handle.getBoundingClientRect();
-      const tRect = targetRow.getBoundingClientRect();
-      const startX = hRect.left + hRect.width / 2;
-      const startY = hRect.top + hRect.height / 2;
-      const endX = tRect.left + tRect.width / 2;
-      const endY = tRect.top + tRect.height * 0.1;
-      function send(t, type, x, y) {
-        t.dispatchEvent(new PointerEvent(type, {
-          bubbles: true, cancelable: true, composed: true,
-          pointerId: 1, isPrimary: true, button: 0,
-          clientX: x, clientY: y, screenX: x, screenY: y,
-        }));
-      }
-      send(handle, 'pointerdown', startX, startY);
-      send(handle, 'pointermove', startX + 10, startY + 10);
-      send(handle, 'pointermove', endX, endY);
-      send(handle, 'pointerup', endX, endY);
-    JS;
-
-    $this->getSession()->executeScript($script);
-    // Wait on the end state - the top level reading C, A, B with the host done
-    // moving/loading - rather than only the cleared flags. The cleared flags
-    // can read true before the reorder lands, racing a slower commit on CI.
-    $expected_ids = implode(',', [
-      $this->linkIds['C'],
-      $this->linkIds['A'],
-      $this->linkIds['B'],
-    ]);
-    $this->getSession()->wait(
-      10000,
-      "Array.from(document.querySelectorAll('tr[role=\"row\"][data-parent-id=\"\"]'))"
-      . ".map((r) => r.dataset.id).join(',') === '$expected_ids'"
-      . ' && !document.querySelector(\'drupal-treegrid[data-treegrid-moving="true"]\')'
-      . ' && !document.querySelector(\'.menu-tree-ui-row--dragging\')'
-      . ' && !document.querySelector(\'[data-loading="true"]\')',
-    );
-
+    $this->drag('C', 'A', 'before');
     $this->assertSiblings(['C', 'A', 'B'], $this->childRowsSelector(NULL));
   }
 

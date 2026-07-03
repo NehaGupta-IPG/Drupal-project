@@ -31,7 +31,7 @@
   function attachTopLevelPaging(element) {
     const total = parseInt(element.dataset.treegridTopTotal, 10) || 0;
     const pageSize = parseInt(element.dataset.treegridPageSize, 10) || 0;
-    const childrenUrl = element.dataset.childrenUrl;
+    const { childrenUrl } = element.dataset;
     const { tree } = element;
     const noop = () => {};
     if (!tree || !childrenUrl || pageSize <= 0) {
@@ -57,12 +57,16 @@
     sentinel.setAttribute('aria-hidden', 'true');
     element.appendChild(sentinel);
 
+    // Reassigned to disconnect the observer once it exists, so teardown()
+    // can be defined (and called from loadNext) before the observer is.
+    let stopObserving = noop;
+
     /**
      * Stops paging: disconnect the observer and drop the sentinel.
      */
     function teardown() {
       done = true;
-      observer.disconnect();
+      stopObserving();
       sentinel.remove();
     }
 
@@ -124,6 +128,7 @@
       { root: null, rootMargin: '400px 0px' },
     );
     observer.observe(sentinel);
+    stopObserving = () => observer.disconnect();
 
     return teardown;
   }
