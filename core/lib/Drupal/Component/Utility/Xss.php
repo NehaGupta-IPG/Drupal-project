@@ -316,8 +316,8 @@ class Xss {
           if (preg_match('/^([-a-zA-Z][-a-zA-Z0-9]*)/', $attributes, $match)) {
             $attribute_name = strtolower($match[1]);
             if (isset($allowed_attributes)) {
-              $attribute_is_allowed = in_array($attribute_name, $allowed_attributes)
-                || in_array('*', $allowed_attributes);
+              $attribute_is_allowed = in_array($attribute_name, $allowed_attributes, TRUE)
+                || in_array('*', $allowed_attributes, TRUE);
             }
             else {
               $attribute_is_allowed = TRUE;
