@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\comment\Functional;
 
 use Drupal\comment\AnonymousContact;
-use Drupal\comment\CommentPreviewMode;
-use Drupal\Component\Render\FormattableMarkup;
-use Drupal\comment\Entity\CommentType;
-use Drupal\comment\Entity\Comment;
 use Drupal\comment\CommentInterface;
+use Drupal\comment\CommentPreviewMode;
+use Drupal\comment\Entity\Comment;
+use Drupal\comment\Entity\CommentType;
+use Drupal\comment\FormLocation;
 use Drupal\comment\Tests\CommentTestTrait;
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\field\Entity\FieldConfig;
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\BrowserTestBase;
 
@@ -119,7 +119,7 @@ abstract class CommentTestBase extends BrowserTestBase {
    * @return \Drupal\comment\CommentInterface|null
    *   The posted comment or NULL when posted comment was not found.
    */
-  protected function postComment($entity, $comment, $subject = '', $contact = NULL, $field_name = 'comment') {
+  protected function postComment($entity, string|int|float|bool $comment, $subject = '', $contact = NULL, string $field_name = 'comment') {
     $edit = [];
     $edit['comment_body[0][value]'] = $comment;
 
@@ -285,7 +285,7 @@ abstract class CommentTestBase extends BrowserTestBase {
    *   Defaults to 'comment'.
    */
   protected function setCommentForm($enabled, $field_name = 'comment') {
-    $this->setCommentSettings('form_location', ($enabled ? CommentItemInterface::FORM_BELOW : CommentItemInterface::FORM_SEPARATE_PAGE), 'Comment controls ' . ($enabled ? 'enabled' : 'disabled') . '.', $field_name);
+    $this->setCommentSettings('form_location', ($enabled ? FormLocation::Below->value : FormLocation::SeparatePage->value), 'Comment controls ' . ($enabled ? 'enabled' : 'disabled') . '.', $field_name);
   }
 
   /**
@@ -379,7 +379,7 @@ abstract class CommentTestBase extends BrowserTestBase {
    * @return int
    *   Comment id.
    */
-  protected function getUnapprovedComment($subject) {
+  protected function getUnapprovedComment(string $subject) {
     $this->drupalGet('admin/content/comment/approval');
     preg_match('/href="(.*?)#comment-([^"]+)"(.*?)>(' . $subject . ')/', $this->getSession()->getPage()->getContent(), $match);
 
