@@ -169,7 +169,8 @@ class UserAdminLanguageTest extends BrowserTestBase {
 
     // Unset the preferred language code for the user. The global site admin
     // language will still be used for user editing regardless of the URL,
-    // because that is considered an admin path for admin users.
+    // because that is considered an admin path for admin users and is now
+    // configured higher priority.
     $edit = [];
     $edit['preferred_admin_langcode'] = '';
     $this->drupalGet($path);
