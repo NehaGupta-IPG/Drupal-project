@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+third_party_settings: {  }
+name: 'Locale lifecycle'
+type: locale_lifecycle
+description: 'Shipped content type for locale default language switch tests.'
+help: null
+new_revision: false
+preview_mode: 1
+display_submitted: true

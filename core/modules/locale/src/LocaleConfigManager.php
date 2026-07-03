@@ -563,6 +563,107 @@ class LocaleConfigManager {
   }
 
   /**
+   * Updates config translations and overrides for a site default language switch.
+   *
+   * @param array $names
+   *   Array of names of configuration objects to update.
+   * @param string $old_default_langcode
+   *   Previous site default language code.
+   *
+   * @return int
+   *   Total number of configuration override and active configuration objects
+   *   updated (saved or removed).
+   */
+  public function updateConfigTranslationsForDefaultLanguageSwitch(array $names, string $old_default_langcode = 'en') {
+    $this->isUpdatingFromLocale = TRUE;
+    $count = 0;
+    $new_default_langcode = $this->languageManager->getDefaultLanguage()->getId();
+
+    // Nothing to update if the default language did not change.
+    if ($new_default_langcode === $old_default_langcode) {
+      return 0;
+    }
+
+    // Check one by one each config, we may need to do different things.
+    foreach ($names as $name) {
+      $config = $this->configStorage->read($name);
+      if (!is_array($config)) {
+        continue;
+      }
+
+      // Only deal with configuration that came from an extension.
+      $translatable = $this->getTranslatableDefaultConfig($name);
+      if (empty($translatable)) {
+        continue;
+      }
+
+      // Case 1: new text values from default override storage.
+      $new_src_storage = $this->languageManager->getLanguageConfigOverrideStorage($new_default_langcode);
+      $new_translation = $new_src_storage->read($name);
+      $new_translation = is_array($new_translation) ? $new_translation : [];
+
+      // Case 2: if the new default is English and there is no override,
+      // fall back to shipped default config.
+      if ($new_default_langcode === 'en' && empty($new_translation)) {
+        $new_translation = $this->extractTranslatableOverrideData($this->defaultConfigStorage->read($name), $translatable) ?: [];
+      }
+
+      if (!empty($new_translation)) {
+        // Previous values come from the active storage. Save them as overrides
+        // so that they are not lost as the active config changes.
+        $old_translation = $this->extractTranslatableOverrideData($config, $translatable);
+        $this->saveTranslationOverride($name, $old_default_langcode, $old_translation);
+        $count++;
+
+        // Merge the new default language values into the active configuration.
+        $new_active = NestedArray::mergeDeepArray([$config, $new_translation], TRUE);
+        if ($new_active !== $config) {
+          $this->saveTranslationActive($name, $new_active);
+          $count++;
+        }
+
+        // Delete the override in the new default language since we already
+        // merged it to active config.
+        $new_src_storage->delete($name);
+        $count++;
+      }
+    }
+
+    $this->isUpdatingFromLocale = FALSE;
+    return $count;
+  }
+
+  /**
+   * Extracts only translatable keys from configuration data.
+   *
+   * @param array $data
+   *   Configuration data.
+   * @param array $translatable
+   *   Translatable data array. @see self::getTranslatableData()
+   *
+   * @return array
+   *   Configuration data containing only translatable keys.
+   */
+  protected function extractTranslatableOverrideData(array $data, array $translatable): array {
+    $extracted = [];
+    foreach ($translatable as $key => $item) {
+      if (!array_key_exists($key, $data)) {
+        continue;
+      }
+      if (is_array($item) && is_array($data[$key])) {
+        $nested = $this->extractTranslatableOverrideData($data[$key], $item);
+        if (!empty($nested)) {
+          $extracted[$key] = $nested;
+        }
+      }
+      elseif (!is_array($item)) {
+        $extracted[$key] = $data[$key];
+      }
+    }
+    return $extracted;
+  }
+
+  /**
    * Filters override data based on default translatable items.
    *
    * @param array $override_data
@@ -598,34 +699,62 @@ class LocaleConfigManager {
   }
 
   /**
-   * Updates default configuration when new modules or themes are installed.
+   * Updates default configuration when modules/themes are installed or when
+   * the site default language changes.
+   *
+   * @param string|null $old_default_langcode
+   *   (optional) The previous site default language code. When provided,
+   *   configuration objects with this langcode may be changed to the current
+   *   default language.
    */
-  public function updateDefaultConfigLangcodes() {
+  public function updateDefaultConfigLangcodes(?string $old_default_langcode = NULL) {
     $this->isUpdatingFromLocale = TRUE;
-    // Need to rewrite some default configuration language codes if the default
-    // site language is not English.
     $default_langcode = $this->languageManager->getDefaultLanguage()->getId();
-    if ($default_langcode != 'en') {
-      // Update active configuration copies of all prior shipped configuration
-      // if they are still English. It is not enough to change configuration
-      // shipped with the components just installed, because installing a
-      // component such as views may bring in default configuration from prior
-      // components.
-      $names = $this->getComponentNames();
-      foreach ($names as $name) {
-        $config = $this->configFactory->reset($name)->getEditable($name);
-        // Should only update if still exists in active configuration. If locale
-        // module is enabled later, then some configuration may not exist
-        // anymore.
-        if (!$config->isNew()) {
-          $typed_config = $this->typedConfigManager->createFromNameAndData($config->getName(), $config->getRawData());
-          $langcode = $config->get('langcode');
-          // Only set a `langcode` if this config actually contains translatable
-          // data.
-          // @see \Drupal\Core\Config\Plugin\Validation\Constraint\LangcodeRequiredIfTranslatableValuesConstraint
-          if (!empty($this->getTranslatableData($typed_config)) && (empty($langcode) || $langcode == 'en')) {
-            $config->set('langcode', $default_langcode)->save();
-          }
+    if (($default_langcode === $old_default_langcode) || ($default_langcode === 'en' && $old_default_langcode === NULL)) {
+      // Nothing to update if the default language did not change or if the
+      // default language is English and there was no previous default
+      // language.
+      $this->isUpdatingFromLocale = FALSE;
+      return;
+    }
+    // Update active configuration copies of all installed shipped
+    // configuration if they are not using the current site default language
+    // code. In installation it is not enough to change configuration shipped
+    // with the components just installed, because installing a component such
+    // as views may bring in default configuration from prior components.
+    $names = $this->getComponentNames();
+    foreach ($names as $name) {
+      $config = $this->configFactory->reset($name)->getEditable($name);
+      // Should only update if still exists in active configuration. If locale
+      // module is enabled later, then some configuration may not exist
+      // anymore.
+      if (!$config->isNew()) {
+        $typed_config = $this->typedConfigManager->createFromNameAndData($config->getName(), $config->getRawData());
+        $langcode = $config->get('langcode');
+
+        // Decide whether this config langcode should be changed to the
+        // current default language.
+        // - During install/extension flows there is no previous default
+        //   language provided, so only English-tagged config is changed.
+        // - During default-language-change flows with a previous default,
+        //   config is changed from that previous default to the new default.
+        if (!$old_default_langcode) {
+          $langcode_condition =
+            (empty($langcode) || $langcode === 'en')
+            && $default_langcode !== 'en';
+        }
+        else {
+          $langcode_condition =
+            (($old_default_langcode === 'en' && (empty($langcode) || $langcode === 'en'))
+            || ($old_default_langcode !== 'en' && $langcode === $old_default_langcode))
+            && $langcode !== $default_langcode;
+        }
+
+        // Only set a `langcode` if this config actually contains 
+        // translatable data.
+        // @see \Drupal\Core\Config\Plugin\Validation\Constraint\LangcodeRequiredIfTranslatableValuesConstraint
+        if (!empty($this->getTranslatableData($typed_config)) && $langcode_condition) {
+          $config->set('langcode', $default_langcode)->save();
         }
       }
     }

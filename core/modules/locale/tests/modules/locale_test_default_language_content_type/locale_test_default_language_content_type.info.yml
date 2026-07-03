@@ -1,0 +1,8 @@
+name: 'Locale test default language content type'
+type: module
+description: 'Provides shipped content type configuration for locale default-language-switch tests.'
+package: Testing
+version: VERSION
+hidden: true
+dependencies:
+  - drupal:node

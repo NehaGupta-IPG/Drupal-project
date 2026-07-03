@@ -33,6 +33,8 @@ class LocaleConfigBatch {
    *   An array with options that can have the following elements:
    *   - 'finish_feedback': (optional) Whether or not to give feedback to the
    *     user when the batch is finished. Defaults to TRUE.
+    *   - 'previous_default_langcode': (optional) Previous site default
+    *     language code.
    * @param array $langcodes
    *   (optional) Array of language codes. Defaults to all translatable
    *   languages.
@@ -57,19 +59,19 @@ class LocaleConfigBatch {
         ->setInitMessage($this->t('Starting configuration update'))
         ->setErrorMessage($this->t('Error updating configuration translations'));
 
-      if ($update_default_config_langcodes && $this->languageManager->getDefaultLanguage()->getId() !== 'en') {
-        $batch_builder->addOperation(self::class . ':batchUpdateDefaultConfigLangcodes');
+      if ($update_default_config_langcodes && ($this->languageManager->getDefaultLanguage()->getId() !== 'en' || !empty($options['previous_default_langcode']))) {
+        $batch_builder->addOperation(self::class . ':batchUpdateDefaultConfigLangcodes', [$options['previous_default_langcode'] ?? NULL]);
       }
 
       // Chunking the array of names into batches of 20 for better performance.
-      $name_chunks = array_chunk($names, 20);
+      $name_chunks = array_chunk($names, 20); 
 
       foreach ($name_chunks as $chunk) {
         // During installation the caching of configuration objects is disabled
         // so it is very expensive to initialize the \Drupal::config() object
         // on each request. We batch a small number of configuration object
         // upgrades together to improve the overall performance of the process.
-        $batch_builder->addOperation(self::class . ':batchUpdateConfigTranslations', [$chunk, $langcodes]);
+        $batch_builder->addOperation(self::class . ':batchUpdateConfigTranslations', [$chunk, $langcodes, $options['previous_default_langcode'] ?? NULL]);
       }
 
       if (!empty($options['finish_feedback'])) {
@@ -85,11 +87,13 @@ class LocaleConfigBatch {
    *
    * Updates default configuration when new modules or themes are installed.
    *
+   * @param string|null $previous_default_langcode
+   *   (optional) Previous site default language code.
    * @param array|\ArrayAccess $context
    *   The batch context.
    */
-  public function batchUpdateDefaultConfigLangcodes(array|\ArrayAccess &$context): void {
-    $this->localeConfigManager->updateDefaultConfigLangcodes();
+  public function batchUpdateDefaultConfigLangcodes(?string $previous_default_langcode, array|\ArrayAccess &$context): void {
+    $this->localeConfigManager->updateDefaultConfigLangcodes($previous_default_langcode);
     $context['finished'] = 1;
     $context['message'] = $this->t('Updated default configuration to %langcode', ['%langcode' => $this->languageManager->getDefaultLanguage()->getId()]);
   }
@@ -103,16 +107,23 @@ class LocaleConfigBatch {
    *   An array of names of configuration objects to update.
    * @param array $langcodes
    *   (optional) Array of language codes to update. Defaults to all languages.
+  * @param string|null $previous_default_langcode
+  *   (optional) Previous site default language code.
    * @param array|\ArrayAccess $context
    *   Contains a list of files imported.
    *
    * @see \Drupal\locale\LocaleConfigBatch::buildBatch()
    */
-  public function batchUpdateConfigTranslations(array $names, array $langcodes, array|\ArrayAccess &$context): void {
+  public function batchUpdateConfigTranslations(array $names, array $langcodes, ?string $previous_default_langcode, array|\ArrayAccess &$context): void {
     if (!isset($context['results']['stats']['config'])) {
       $context['results']['stats']['config'] = 0;
     }
-    $context['results']['stats']['config'] += $this->localeConfigManager->updateConfigTranslations($names, $langcodes);
+    if ($previous_default_langcode) {
+      $context['results']['stats']['config'] += $this->localeConfigManager->updateConfigTranslationsForDefaultLanguageSwitch($names, $previous_default_langcode);
+    }
+    else {
+      $context['results']['stats']['config'] += $this->localeConfigManager->updateConfigTranslations($names, $langcodes);
+    }
     foreach ($names as $name) {
       $context['results']['names'][] = $name;
     }

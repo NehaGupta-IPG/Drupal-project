@@ -3,8 +3,10 @@
 namespace Drupal\locale\Hook;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -25,6 +27,8 @@ class LocaleFormHooks {
   public function __construct(
     protected StringStorageInterface $stringStorage,
     protected readonly ConfigFactoryInterface $configFactory,
+    protected readonly KeyValueExpirableFactoryInterface $keyValueExpirableFactory,
+    protected readonly AccountProxyInterface $currentUser,
     /**
      * @var \Closure(): \Drupal\locale\LocaleFetch
      */
@@ -75,6 +79,65 @@ class LocaleFormHooks {
       $operations = $form['languages'][$langcode]['operations'];
       unset($form['languages'][$langcode]['operations']);
       $form['languages'][$langcode]['operations'] = $operations;
+    }
+
+    if (!isset($form['#validate'])) {
+      $form['#validate'] = [];
+    }
+    array_unshift($form['#validate'], self::class . ':formLanguageAdminOverviewFormAlterValidate');
+
+    if (!isset($form['#submit'])) {
+      $form['#submit'] = [];
+    }
+    $form['#submit'][] = self::class . ':formLanguageAdminOverviewFormAlterSubmit';
+  }
+
+  /**
+   * Validate handler for language_admin_overview_form.
+   */
+  public function formLanguageAdminOverviewFormAlterValidate(array &$form, FormStateInterface $form_state): void {
+    $new_default_langcode = $form_state->getValue('site_default_language');
+    $current_default_langcode = $this->configFactory->get('system.site')->get('default_langcode');
+
+    if ($new_default_langcode && $new_default_langcode !== $current_default_langcode) {
+      $submitted_languages = $form_state->getValue('languages') ?? [];
+      $weights = [];
+      foreach ($submitted_languages as $id => $submitted_language) {
+        if (isset($submitted_language['weight']) && is_numeric($submitted_language['weight'])) {
+          $weights[$id] = (int) $submitted_language['weight'];
+        }
+      }
+
+      $this->keyValueExpirableFactory
+        ->get('locale.default_language_change')
+        ->setWithExpire((string) $this->currentUser->id(), [
+          'langcode' => $new_default_langcode,
+          'old_langcode' => $current_default_langcode,
+          'weights' => $weights,
+        ], 300);
+      // Short-circuit normal submit handlers. The actual default language
+      // update and language reordering are applied only after confirmation.
+      $form_state->setSubmitHandlers([self::class . ':formLanguageAdminOverviewFormAlterSubmit']);
+    }
+    else {
+      // Ensure stale pending changes do not affect later submissions.
+      $this->keyValueExpirableFactory
+        ->get('locale.default_language_change')
+        ->delete((string) $this->currentUser->id());
+    }
+  }
+
+  /**
+   * Submit handler for language_admin_overview_form.
+   */
+  public function formLanguageAdminOverviewFormAlterSubmit(array &$form, FormStateInterface $form_state): void {
+    $current_default_langcode = $this->configFactory->get('system.site')->get('default_langcode');
+    $pending = $this->keyValueExpirableFactory
+      ->get('locale.default_language_change')
+      ->get((string) $this->currentUser->id());
+
+    if (!empty($pending['langcode']) && $pending['langcode'] !== $current_default_langcode) {
+      $form_state->setRedirect('locale.default_language_confirm');
     }
   }
 
