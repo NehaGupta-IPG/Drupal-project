@@ -353,17 +353,22 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
     $account->preferred_admin_langcode = NULL;
     $account->save();
 
+    // Enable per-user administration language customization.
+    $this->config('language.negotiation')
+      ->set('admin_language.allow_user_change', TRUE)
+      ->save();
+
     $test = [
       'language_negotiation' => [LanguageNegotiationUserAdmin::METHOD_ID, LanguageNegotiationSelected::METHOD_ID],
       'path' => 'admin/config',
       'expect' => $default_string,
-      'expected_method_id' => LanguageNegotiatorInterface::METHOD_ID,
+      'expected_method_id' => LanguageNegotiationUserAdmin::METHOD_ID,
       'http_header' => [],
-      'message' => 'USER ADMIN > DEFAULT: no preferred user admin language setting, the UI language is default',
+      'message' => 'USER ADMIN > DEFAULT: no preferred user admin language setting, the global admin language is default',
     ];
     $this->doRunTest($test);
 
-    // Set preferred admin langcode for user to unknown language.
+    // Set preferred admin langcode for user to an unknown language.
     $account->preferred_admin_langcode = $langcode_unknown;
     $account->save();
 
@@ -371,9 +376,9 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
       'language_negotiation' => [LanguageNegotiationUserAdmin::METHOD_ID, LanguageNegotiationSelected::METHOD_ID],
       'path' => 'admin/config',
       'expect' => $default_string,
-      'expected_method_id' => LanguageNegotiatorInterface::METHOD_ID,
+      'expected_method_id' => LanguageNegotiationUserAdmin::METHOD_ID,
       'http_header' => [],
-      'message' => 'USER ADMIN > DEFAULT: invalid preferred user admin language setting, the UI language is default',
+      'message' => 'USER ADMIN > DEFAULT: invalid preferred user admin language setting, the global admin language is default',
     ];
     $this->doRunTest($test);
 

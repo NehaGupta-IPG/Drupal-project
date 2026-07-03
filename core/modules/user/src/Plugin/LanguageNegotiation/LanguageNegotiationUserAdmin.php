@@ -101,12 +101,13 @@ class LanguageNegotiationUserAdmin extends LanguageNegotiationMethodBase impleme
    * {@inheritdoc}
    */
   public function getLangcode(?Request $request = NULL) {
-    // Check if we're on an admin path.
-    if (!$this->isAdminPath($request)) {
+    // Check if the user has admin access first, to avoid an expensive admin
+    // path check (which triggers path alias resolution) for non-admin users.
+    if (!($this->currentUser->hasPermission('access administration pages') || $this->currentUser->hasPermission('view the administration theme'))) {
       return NULL;
     }
-    // Check if the user is an admin.
-    if (!($this->currentUser->hasPermission('access administration pages') || $this->currentUser->hasPermission('view the administration theme'))) {
+    // Check if we're on an admin path.
+    if (!$this->isAdminPath($request)) {
       return NULL;
     }
 
@@ -125,11 +126,12 @@ class LanguageNegotiationUserAdmin extends LanguageNegotiationMethodBase impleme
     $langcode = NULL;
     if ($allow_user_change) {
       $preferred_admin_langcode = $this->currentUser->getPreferredAdminLangcode(FALSE);
-      if (!empty($preferred_admin_langcode)) {
+      if (!empty($preferred_admin_langcode) && $this->languageManager->getLanguage($preferred_admin_langcode)) {
         $langcode = $preferred_admin_langcode;
       }
       elseif (!empty($default_admin_langcode)) {
-        // Fall back to global default if user has no preference.
+        // Fall back to global default if user has no preference or an
+        // invalid preference.
         $langcode = $default_admin_langcode;
       }
     }

@@ -194,6 +194,9 @@ class UserAdminLanguageTest extends BrowserTestBase {
     ];
     $this->drupalGet('admin/config/regional/language/detection');
     $this->submitForm($edit, 'Save settings');
+    // Enable per-user language customization for administration pages.
+    $this->drupalGet('admin/config/regional/language/detection/admin_language');
+    $this->submitForm(['allow_user_change' => TRUE], 'Save configuration');
   }
 
   /**
