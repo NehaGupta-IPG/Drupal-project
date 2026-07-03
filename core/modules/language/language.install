@@ -20,6 +20,6 @@ function language_update_11001(): string {
   $config->set('admin_language.default_langcode', 'site_default');
   $config->set('admin_language.allow_user_change', TRUE);
   $config->save();
-  
+
   return 'Set new options for administration language method.';
 }

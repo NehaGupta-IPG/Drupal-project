@@ -120,19 +120,20 @@ class LanguageNegotiationUserAdmin extends LanguageNegotiationMethodBase impleme
       $default_admin_langcode = $site_default_language ? $site_default_language->getId() : NULL;
     }
 
-    // If users are allowed to change the admin language, check for user preference.
+    // If users are allowed to change the admin language, check for user
+    // preference.
     $langcode = NULL;
     if ($allow_user_change) {
       $preferred_admin_langcode = $this->currentUser->getPreferredAdminLangcode(FALSE);
       if (!empty($preferred_admin_langcode)) {
         $langcode = $preferred_admin_langcode;
       }
-      else if (!empty($default_admin_langcode)) {
+      elseif (!empty($default_admin_langcode)) {
         // Fall back to global default if user has no preference.
         $langcode = $default_admin_langcode;
       }
     }
-    else if (!empty($default_admin_langcode)) {
+    elseif (!empty($default_admin_langcode)) {
       // Users are not allowed to change it, use global default.
       $langcode = $default_admin_langcode;
     }

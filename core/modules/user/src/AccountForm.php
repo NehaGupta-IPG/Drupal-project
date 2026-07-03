@@ -266,8 +266,9 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
         // Check if users are allowed to change the administration language.
         $config = \Drupal::config('language.negotiation');
         $show_admin_language = $config->get('admin_language.allow_user_change') ?? TRUE;
-       
-        // Get the default admin language and resolve site_default to actual language ID.
+
+        // Get the default admin language and resolve site_default to actual
+        // language ID.
         $admin_langcode_default = $config->get('admin_language.default_langcode');
         if ($admin_langcode_default === LanguageInterface::LANGCODE_SITE_DEFAULT) {
           $admin_language_name = $this->languageManager->getDefaultLanguage()->getName();

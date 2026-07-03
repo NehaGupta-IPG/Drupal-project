@@ -53,7 +53,7 @@ class NegotiationAdminLanguageForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->config('language.negotiation')
       ->set('admin_language.default_langcode', $form_state->getValue('default_langcode'))
       ->set('admin_language.allow_user_change', $form_state->getValue('allow_user_change'))
