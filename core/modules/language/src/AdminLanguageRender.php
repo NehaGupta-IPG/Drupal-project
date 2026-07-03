@@ -8,6 +8,8 @@ use Drupal\Core\Render\Markup;
 use Drupal\Core\Security\Attribute\TrustedCallback;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslationManager;
+use Drupal\user\Plugin\LanguageNegotiation\LanguageNegotiationUserAdmin;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Provides a render element in the user's preferred admin language.
@@ -26,7 +28,7 @@ class AdminLanguageRender {
    */
   public function __construct(
     protected LanguageManagerInterface $languageManager,
-    protected TranslationManager $translationManager,
+    #[Autowire(service: 'string_translation')] protected TranslationManager $translationManager,
     protected AccountInterface $currentUser,
   ) {}
 
@@ -65,13 +67,9 @@ class AdminLanguageRender {
    */
   #[TrustedCallback]
   public function switchToUserAdminLanguage(array $element): array {
-    $userAdminLangcode = $this->currentUser->getPreferredAdminLangcode(FALSE);
-
-    if ($userAdminLangcode && ($this->currentUser->hasPermission('access administration pages') || $this->currentUser->hasPermission('view the administration theme'))) {
-      $element['#original_langcode'] = $this->languageManager->getCurrentLanguage()->getId();
-      $this->languageManager->setCurrentLanguage($this->languageManager->getLanguage($userAdminLangcode));
-      $this->translationManager->setDefaultLangcode($userAdminLangcode);
-      $this->languageManager->setConfigOverrideLanguage($this->languageManager->getLanguage($userAdminLangcode));
+    $originalLangcode = $this->switchToAdminLanguage();
+    if ($originalLangcode !== NULL) {
+      $element['#original_langcode'] = $originalLangcode;
     }
 
     // Add the correct cache contexts in.
@@ -96,14 +94,56 @@ class AdminLanguageRender {
   #[TrustedCallback]
   public function restoreLanguage(Markup $content, array $element): Markup {
     if (isset($element['#original_langcode'])) {
-      $langcode = $element['#original_langcode'];
-      $language = $this->languageManager->getLanguage($langcode);
-      $this->languageManager->setCurrentLanguage($language);
-      $this->translationManager->setDefaultLangcode($langcode);
-      $this->languageManager->setConfigOverrideLanguage($language);
+      $this->restoreAdminLanguage($element['#original_langcode']);
     }
 
     return $content;
+  }
+
+  /**
+   * Switches to the current user's preferred admin language, if applicable.
+   *
+   * No switch happens if the admin language negotiation method is disabled,
+   * the user has no admin language preference, or the user does not have
+   * access to the administration pages.
+   *
+   * @return string|null
+   *   The langcode that was active before switching, or NULL if no switch
+   *   took place.
+   */
+  public function switchToAdminLanguage(): ?string {
+    if (!$this->languageManager instanceof ConfigurableLanguageManagerInterface) {
+      return NULL;
+    }
+    $negotiator = $this->languageManager->getNegotiator();
+    if (!$negotiator || !$negotiator->isNegotiationMethodEnabled(LanguageNegotiationUserAdmin::METHOD_ID)) {
+      return NULL;
+    }
+
+    $userAdminLangcode = $this->currentUser->getPreferredAdminLangcode(FALSE);
+    if (!$userAdminLangcode || !($this->currentUser->hasPermission('access administration pages') || $this->currentUser->hasPermission('view the administration theme'))) {
+      return NULL;
+    }
+
+    $originalLangcode = $this->languageManager->getCurrentLanguage()->getId();
+    $adminLanguage = $this->languageManager->getLanguage($userAdminLangcode);
+    $this->languageManager->setCurrentLanguage($adminLanguage);
+    $this->translationManager->setDefaultLangcode($userAdminLangcode);
+    $this->languageManager->setConfigOverrideLanguage($adminLanguage);
+    return $originalLangcode;
+  }
+
+  /**
+   * Restores the language that was active before switchToAdminLanguage().
+   *
+   * @param string $langcode
+   *   The langcode returned by switchToAdminLanguage().
+   */
+  public function restoreAdminLanguage(string $langcode): void {
+    $language = $this->languageManager->getLanguage($langcode);
+    $this->languageManager->setCurrentLanguage($language);
+    $this->translationManager->setDefaultLangcode($langcode);
+    $this->languageManager->setConfigOverrideLanguage($language);
   }
 
 }

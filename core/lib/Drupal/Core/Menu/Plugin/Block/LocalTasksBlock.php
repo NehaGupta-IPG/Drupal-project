@@ -7,15 +7,12 @@ use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Menu\LocalTaskManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\StringTranslation\TranslationManager;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Drupal\language\AdminLanguageRender;
 
 /**
  * Provides a "Tabs" block to display the local tasks.
@@ -41,27 +38,6 @@ class LocalTasksBlock extends BlockBase implements ContainerFactoryPluginInterfa
   protected $routeMatch;
 
   /**
-   * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
-   */
-  protected $languageManager;
-
-  /**
-   * The translation manager.
-   *
-   * @var \Drupal\Core\StringTranslation\TranslationManager
-   */
-  protected $translationManager;
-
-  /**
-   * The current_user service.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $currentUser;
-
-  /**
    * Creates a LocalTasksBlock instance.
    *
    * @param array $configuration
@@ -74,20 +50,11 @@ class LocalTasksBlock extends BlockBase implements ContainerFactoryPluginInterfa
    *   The local task manager.
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The route match.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\StringTranslation\TranslationManager $translation_manager
-   *   The translation manager.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, LocalTaskManagerInterface $local_task_manager, RouteMatchInterface $route_match, LanguageManagerInterface $language_manager, #[Autowire(service: 'string_translation')] TranslationManager $translation_manager, AccountInterface $current_user) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, LocalTaskManagerInterface $local_task_manager, RouteMatchInterface $route_match) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->localTaskManager = $local_task_manager;
     $this->routeMatch = $route_match;
-    $this->languageManager = $language_manager;
-    $this->translationManager = $translation_manager;
-    $this->currentUser = $current_user;
   }
 
   /**
@@ -122,13 +89,8 @@ class LocalTasksBlock extends BlockBase implements ContainerFactoryPluginInterfa
     // string inside LocalTaskManager::getTasksBuild(), so the language must be
     // active at call time rather than deferred to a #pre_render callback.
     $originalLangcode = NULL;
-    $userAdminLangcode = $this->currentUser->getPreferredAdminLangcode(FALSE);
-    if ($userAdminLangcode && ($this->currentUser->hasPermission('access administration pages') || $this->currentUser->hasPermission('view the administration theme'))) {
-      $originalLangcode = $this->languageManager->getCurrentLanguage()->getId();
-      $adminLanguage = $this->languageManager->getLanguage($userAdminLangcode);
-      $this->languageManager->setCurrentLanguage($adminLanguage);
-      $this->translationManager->setDefaultLangcode($userAdminLangcode);
-      $this->languageManager->setConfigOverrideLanguage($adminLanguage);
+    if (\Drupal::moduleHandler()->moduleExists('language')) {
+      $originalLangcode = \Drupal::service(AdminLanguageRender::class)->switchToAdminLanguage();
     }
 
     $tabs = [
@@ -155,10 +117,7 @@ class LocalTasksBlock extends BlockBase implements ContainerFactoryPluginInterfa
 
     // Restore the original language after resolving titles.
     if ($originalLangcode !== NULL) {
-      $originalLanguage = $this->languageManager->getLanguage($originalLangcode);
-      $this->languageManager->setCurrentLanguage($originalLanguage);
-      $this->translationManager->setDefaultLangcode($originalLangcode);
-      $this->languageManager->setConfigOverrideLanguage($originalLanguage);
+      \Drupal::service(AdminLanguageRender::class)->restoreAdminLanguage($originalLangcode);
     }
 
     $build = [];
