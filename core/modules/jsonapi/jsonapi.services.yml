@@ -52,7 +52,7 @@ services:
       - ['setRequestStack', ['@request_stack']]
   serializer.normalizer.content_entity.jsonapi:
     class: Drupal\jsonapi\Normalizer\FieldableEntityDenormalizer
-    deprecated: The "%service_id%" service is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. You should use the 'serializer.normalizer.fieldable_entity.jsonapi' service instead.
+    deprecated: The "%service_id%" service is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. You should use the 'serializer.normalizer.fieldable_entity.jsonapi' service instead.
     tags:
       - { name: jsonapi_normalizer }
   serializer.normalizer.fieldable_entity.jsonapi:
