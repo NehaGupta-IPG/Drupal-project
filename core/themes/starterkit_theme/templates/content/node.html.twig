@@ -37,7 +37,7 @@
  *     teaser would result in: "node--view-mode-teaser", and
  *     full: "node--view-mode-full".
  *   The following are controlled through the node publishing options.
- *   - node--promoted: Appears on nodes promoted to the front page.
+ *   - node--promoted: Appears on promoted nodes.
  *   - node--sticky: Appears on nodes ordered above other non-sticky nodes in
  *     teaser listings.
  *   - node--unpublished: Appears on unpublished nodes visible only to site
@@ -53,7 +53,6 @@
  * - title_suffix: Additional output populated by modules, intended to be
  *   displayed after the main title tag that appears in the template.
  * - view_mode: View mode; for example, "teaser" or "full".
- * - teaser: Flag for the teaser state. Will be true if view_mode is 'teaser'.
  *
  * @see \Drupal\node\Hook\NodeThemeHooks::preprocessNode()
  *
@@ -85,7 +84,6 @@
       {{ author_picture }}
       <div{{ author_attributes.addClass('node__submitted') }}>
         {% trans %}Submitted by {{ author_name }} on {{ date }}{% endtrans %}
-        {{ metadata }}
       </div>
     </footer>
   {% endif %}

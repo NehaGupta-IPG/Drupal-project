@@ -857,7 +857,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
               throw new \LogicException(get_class($this) . '::operators() not implemented');
             }
             if (!$this instanceof FilterOperatorsInterface) {
-              @trigger_error('Implementing operators() in class ' . get_class($this) . ' without it implementing \Drupal\views\Plugin\views\filter\FilterOperatorsInterface is deprecated in drupal:10.3.0 and will throw a LogicException in drupal:12.0.0. See https://www.drupal.org/node/3412013', E_USER_DEPRECATED);
+              throw new \LogicException(get_class($this) . ' must implement \Drupal\views\Plugin\views\filter\FilterOperatorsInterface');
             }
             $operators = $this->operators();
             if ($operators[$group['operator']]['values'] == 0) {
@@ -900,7 +900,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
       $error = $this->t('This identifier is not allowed.');
     }
     elseif (preg_match('/[^a-zA-Z0-9_~\.\-]+/', $identifier)) {
-      $error = $this->t('This identifier has illegal characters.');
+      $error = $this->t('This identifier has invalid characters.');
     }
 
     if ($form_state && !$this->view->display_handler->isIdentifierUnique($form_state->get('id'), $identifier)) {

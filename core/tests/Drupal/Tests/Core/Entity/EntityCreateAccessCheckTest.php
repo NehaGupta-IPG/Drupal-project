@@ -8,10 +8,14 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\Entity\EntityCreateAccessCheck;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpFoundation\InputBag;
 
 /**
@@ -23,11 +27,9 @@ use Symfony\Component\HttpFoundation\InputBag;
 class EntityCreateAccessCheckTest extends UnitTestCase {
 
   /**
-   * The mocked entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The entity type manager.
    */
-  public $entityTypeManager;
+  public EntityTypeManagerInterface&Stub $entityTypeManager;
 
   /**
    * {@inheritdoc}
@@ -42,7 +44,7 @@ class EntityCreateAccessCheckTest extends UnitTestCase {
     $container->set('cache_contexts_manager', $cache_contexts_manager);
     \Drupal::setContainer($container);
 
-    $this->entityTypeManager = $this->createMock('Drupal\Core\Entity\EntityTypeManagerInterface');
+    $this->entityTypeManager = $this->createStub(EntityTypeManagerInterface::class);
   }
 
   /**
@@ -73,7 +75,7 @@ class EntityCreateAccessCheckTest extends UnitTestCase {
    * Tests the method for checking access to routes.
    */
   #[DataProvider('providerTestAccess')]
-  public function testAccess($entity_bundle, $requirement, $access, $expected, $expect_permission_context = TRUE): void {
+  public function testAccess(string $entity_bundle, string $requirement, bool $access, bool $expected, bool $expect_permission_context = TRUE): void {
 
     // Set up the access result objects for allowing or denying access.
     $access_result = $access ? AccessResult::allowed()->cachePerPermissions() : AccessResult::neutral()->cachePerPermissions();
@@ -94,7 +96,7 @@ class EntityCreateAccessCheckTest extends UnitTestCase {
         ->with($entity_bundle)
         ->willReturn($access_result);
 
-      $this->entityTypeManager->expects($this->any())
+      $this->entityTypeManager
         ->method('getAccessControlHandler')
         ->willReturn($access_control_handler);
     }
@@ -104,7 +106,7 @@ class EntityCreateAccessCheckTest extends UnitTestCase {
     $route = $this->getMockBuilder('Symfony\Component\Routing\Route')
       ->disableOriginalConstructor()
       ->getMock();
-    $route->expects($this->any())
+    $route
       ->method('getRequirement')
       ->with('_entity_create_access')
       ->willReturn($requirement);
@@ -114,12 +116,12 @@ class EntityCreateAccessCheckTest extends UnitTestCase {
       $raw_variables->set('bundle_argument', $entity_bundle);
     }
 
-    $route_match = $this->createMock('Drupal\Core\Routing\RouteMatchInterface');
-    $route_match->expects($this->any())
+    $route_match = $this->createStub(RouteMatchInterface::class);
+    $route_match
       ->method('getRawParameters')
       ->willReturn($raw_variables);
 
-    $account = $this->createMock('Drupal\Core\Session\AccountInterface');
+    $account = $this->createStub(AccountInterface::class);
     $this->assertEquals($expected_access_result, $applies_check->access($route, $route_match, $account));
   }
 

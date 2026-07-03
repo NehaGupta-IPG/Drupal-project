@@ -21,17 +21,13 @@ class RouteProcessorCsrf implements OutboundRouteProcessorInterface, TrustedCall
    *
    * @param \Drupal\Core\Access\CsrfTokenGenerator $csrfToken
    *   The CSRF token generator.
-   * @param \Symfony\Component\HttpFoundation\RequestStack|null $requestStack
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
    */
   public function __construct(
     protected CsrfTokenGenerator $csrfToken,
-    protected ?RequestStack $requestStack = NULL,
+    protected RequestStack $requestStack,
   ) {
-    if ($requestStack === NULL) {
-      @trigger_error('Calling ' . __CLASS__ . ' constructor without the $requestStack argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3485174', E_USER_DEPRECATED);
-      $this->requestStack = \Drupal::service('request_stack');
-    }
   }
 
   /**
@@ -44,6 +40,9 @@ class RouteProcessorCsrf implements OutboundRouteProcessorInterface, TrustedCall
       // string when the route is compiled.
       if (!$bubbleable_metadata || $this->requestStack->getCurrentRequest()->getRequestFormat() !== 'html') {
         $parameters['token'] = $this->csrfToken->get($path);
+        // Tokens are per session; the response carrying the URL must vary by
+        // session so it isn't cached across users sharing other contexts.
+        $bubbleable_metadata?->addCacheContexts(['session']);
       }
       else {
         // Generate a placeholder and a render array to replace it.
