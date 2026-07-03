@@ -252,6 +252,13 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
   /**
    * {@inheritdoc}
    */
+  public function getAdminLangcode(): string {
+    return $this->negotiator ? $this->negotiator->getAdminLangcode() : '';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function reset($type = NULL) {
     if (!isset($type)) {
       $this->initialized = FALSE;

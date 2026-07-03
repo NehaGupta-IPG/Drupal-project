@@ -6,9 +6,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Security\Attribute\TrustedCallback;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslationManager;
-use Drupal\user\Plugin\LanguageNegotiation\LanguageNegotiationUserAdmin;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
@@ -23,13 +21,10 @@ class AdminLanguageRender {
    *   The language manager.
    * @param \Drupal\Core\StringTranslation\TranslationManager $translationManager
    *   The translation manager.
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
-   *   The current user.
    */
   public function __construct(
     protected LanguageManagerInterface $languageManager,
     #[Autowire(service: 'string_translation')] protected TranslationManager $translationManager,
-    protected AccountInterface $currentUser,
   ) {}
 
   /**
@@ -115,13 +110,8 @@ class AdminLanguageRender {
     if (!$this->languageManager instanceof ConfigurableLanguageManagerInterface) {
       return NULL;
     }
-    $negotiator = $this->languageManager->getNegotiator();
-    if (!$negotiator || !$negotiator->isNegotiationMethodEnabled(LanguageNegotiationUserAdmin::METHOD_ID)) {
-      return NULL;
-    }
-
-    $userAdminLangcode = $this->currentUser->getPreferredAdminLangcode(FALSE);
-    if (!$userAdminLangcode || !($this->currentUser->hasPermission('access administration pages') || $this->currentUser->hasPermission('view the administration theme'))) {
+    $userAdminLangcode = $this->languageManager->getAdminLangcode();
+    if ($userAdminLangcode === '') {
       return NULL;
     }
 

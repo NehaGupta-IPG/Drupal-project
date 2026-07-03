@@ -5,6 +5,7 @@ namespace Drupal\language;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Logger\LoggerChannelTrait;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Site\Settings;
@@ -191,6 +192,30 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
   public function getPrimaryNegotiationMethod($type) {
     $enabled_methods = $this->getEnabledNegotiators($type);
     return empty($enabled_methods) ? LanguageNegotiatorInterface::METHOD_ID : key($enabled_methods);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAdminLangcode(): string {
+    // The current user is set when the request language is negotiated. When
+    // it is missing, for example because the site is not multilingual, there
+    // is no administration language to resolve.
+    if (!$this->currentUser) {
+      return '';
+    }
+    foreach ($this->getEnabledNegotiators(LanguageInterface::TYPE_INTERFACE) as $method_id => $info) {
+      try {
+        $method = $this->getNegotiationMethodInstance($method_id);
+      }
+      catch (PluginNotFoundException) {
+        continue;
+      }
+      if ($method instanceof AdminLanguageNegotiationInterface && ($langcode = $method->getAdminLangcode()) !== '') {
+        return $langcode;
+      }
+    }
+    return '';
   }
 
   /**

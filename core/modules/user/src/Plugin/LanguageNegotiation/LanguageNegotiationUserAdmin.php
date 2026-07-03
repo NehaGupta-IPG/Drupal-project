@@ -8,6 +8,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\AdminContext;
 use Drupal\Core\Routing\StackedRouteMatchInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\language\AdminLanguageNegotiationInterface;
 use Drupal\language\Attribute\LanguageNegotiation;
 use Drupal\language\LanguageNegotiationMethodBase;
 use Drupal\Core\Routing\RouteObjectInterface;
@@ -27,7 +28,7 @@ use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
   weight: -10,
   description: new TranslatableMarkup('Account administration pages language setting.')
 )]
-class LanguageNegotiationUserAdmin extends LanguageNegotiationMethodBase implements ContainerFactoryPluginInterface {
+class LanguageNegotiationUserAdmin extends LanguageNegotiationMethodBase implements ContainerFactoryPluginInterface, AdminLanguageNegotiationInterface {
 
   /**
    * The language negotiation method id.
@@ -100,15 +101,22 @@ class LanguageNegotiationUserAdmin extends LanguageNegotiationMethodBase impleme
    * {@inheritdoc}
    */
   public function getLangcode(?Request $request = NULL) {
-    $langcode = NULL;
-
-    // User preference (only for administrators).
-    if (($this->currentUser->hasPermission('access administration pages') || $this->currentUser->hasPermission('view the administration theme')) && ($preferred_admin_langcode = $this->currentUser->getPreferredAdminLangcode(FALSE)) && $this->isAdminPath($request)) {
-      $langcode = $preferred_admin_langcode;
+    // The administration language only applies on administration paths.
+    if ($this->isAdminPath($request) && ($langcode = $this->getAdminLangcode()) !== '') {
+      return $langcode;
     }
+    return NULL;
+  }
 
-    // Not an admin, no admin language preference or not on an admin path.
-    return $langcode;
+  /**
+   * {@inheritdoc}
+   */
+  public function getAdminLangcode(): string {
+    // Only administrators have an administration language.
+    if (!$this->currentUser->hasPermission('access administration pages') && !$this->currentUser->hasPermission('view the administration theme')) {
+      return '';
+    }
+    return $this->currentUser->getPreferredAdminLangcode(FALSE);
   }
 
   /**

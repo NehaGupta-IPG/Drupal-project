@@ -200,7 +200,7 @@ services:
       - { name: cache.context}
   cache_context.user.admin_language:
     class: Drupal\Core\Cache\Context\AccountAdminLanguageCacheContext
-    arguments: [ '@current_user', '@language_manager' ]
+    arguments: [ '@language_manager' ]
     tags:
       - { name: cache.context }
   cache_context.user.permissions:

@@ -4,9 +4,7 @@ namespace Drupal\Core\Cache\Context;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\language\ConfigurableLanguageManagerInterface;
-use Drupal\user\Plugin\LanguageNegotiation\LanguageNegotiationUserAdmin;
 
 /**
  * Defines an AdminLanguageCacheContext service, for "admin language" caching.
@@ -18,13 +16,10 @@ class AccountAdminLanguageCacheContext implements CacheContextInterface {
   /**
    * Constructs a new AccountAdminLanguageCacheContext service.
    *
-   * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
-   *   The current user.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
    */
   public function __construct(
-    protected AccountProxyInterface $currentUser,
     protected LanguageManagerInterface $languageManager,
   ) {}
 
@@ -39,25 +34,24 @@ class AccountAdminLanguageCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public function getContext(): string {
-    // The admin language preference only affects rendering when the "Account
-    // administration pages" negotiation method is enabled. Otherwise the
-    // stored preference is unused, and this context must not vary by it.
+    // Resolve through language negotiation so this context stays consistent
+    // with the language the administration pages render in. The langcode is
+    // empty when no enabled negotiation method provides an administration
+    // language for the current user, so the context does not vary by an
+    // unused preference.
     if (!$this->languageManager instanceof ConfigurableLanguageManagerInterface) {
       return '';
     }
-    $negotiator = $this->languageManager->getNegotiator();
-    if (!$negotiator || !$negotiator->isNegotiationMethodEnabled(LanguageNegotiationUserAdmin::METHOD_ID)) {
-      return '';
-    }
-
-    return $this->currentUser->getPreferredAdminLangcode(FALSE);
+    return $this->languageManager->getAdminLangcode();
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCacheableMetadata(): CacheableMetadata {
-    return new CacheableMetadata();
+    // The resolved value depends on which negotiation methods are enabled,
+    // which is stored in the language.types configuration.
+    return (new CacheableMetadata())->addCacheTags(['config:language.types']);
   }
 
 }
