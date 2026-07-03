@@ -810,7 +810,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $this->addMediaFileToField('Add files', $this->container->get('file_system')->realpath($file_image->uri));
     $this->assertMediaAdded();
     $assert_session->elementExists('css', '.js-media-library-add-form[data-input]');
-    
+
     // We do not have pre-selected items, so the container should not be added
     // to the form.
     $assert_session->pageTextNotContains('Additional selected media');
@@ -819,11 +819,11 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $file = array_pop($files);
     $this->assertSame('public://type-three-dir', $file_system->dirname($file->getFileUri()));
     $this->assertTrue($file->isTemporary());
-    
+
     // Assert the revision_log_message field is not shown.
     $upload_form = $assert_session->elementExists('css', '.js-media-library-add-form');
     $assert_session->fieldNotExists('Revision log message', $upload_form);
-    
+
     // Assert the name field contains the filename and the alt text is required.
     $assert_session->fieldValueEquals('Name', $file_image->filename);
     $page->fillField('Alternative text', $this->randomString());
