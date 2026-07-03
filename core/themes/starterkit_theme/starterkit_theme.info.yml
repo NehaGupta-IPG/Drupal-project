@@ -5,9 +5,10 @@ hidden: true
 version: VERSION
 libraries:
   - starterkit_theme/base
-  - starterkit_theme/messages
   - core/normalize
 libraries-extend:
+  core/drupal.message:
+    - starterkit_theme/messages
   user/drupal.user:
     - starterkit_theme/user
   core/drupal.dropbutton:
