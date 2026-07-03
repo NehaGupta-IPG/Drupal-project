@@ -38,9 +38,19 @@ class InstallerExistingConfigMultilingualTest extends InstallerConfigDirectoryTe
     $count = (int) \Drupal::database()->select('watchdog', 'w')->fields('w')->condition('severity', RfcLogLevel::WARNING, '<=')->countQuery()->execute()->fetchField();
     $this->assertSame(0, $count);
 
-    // Ensure the correct message is logged from locale_config_batch_finished().
+    // Ensure the correct message is logged from \Drupal\locale\LocaleConfigBatch::batchFinished().
     $count = (int) \Drupal::database()->select('watchdog', 'w')->fields('w')->condition('message', 'The configuration was successfully updated. %number configuration objects updated.')->countQuery()->execute()->fetchField();
     $this->assertSame(1, $count);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpLanguage(): void {
+    // This step is skipped because of an incredibly fiddly logic chain. In
+    // install_load_profile(), the language is automatically detected from the
+    // config sync directory included in the profile that was generated for this
+    // test (see ::prepareEnvironment() and its parents).
   }
 
 }
