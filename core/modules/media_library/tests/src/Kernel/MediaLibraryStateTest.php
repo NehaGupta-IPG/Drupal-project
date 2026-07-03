@@ -86,6 +86,41 @@ class MediaLibraryStateTest extends KernelTestBase {
   }
 
   /**
+   * Tests the modal selector used to host the media library.
+   */
+  public function testGetModalSelector(): void {
+    $allowed_media_type_ids = ['document', 'image'];
+
+    // Non field widget openers share the default modal selector.
+    $state = MediaLibraryState::create('test', $allowed_media_type_ids, 'image', 1);
+    $this->assertSame('#modal-media-library', $state->getModalSelector());
+
+    // Field widget libraries can be nested, so each gets a selector unique to
+    // its opener state. This keeps closing an inner modal from tearing down the
+    // outer one.
+    $opener = 'media_library.opener.field_widget';
+    $state = MediaLibraryState::create($opener, $allowed_media_type_ids, 'image', 1);
+    $selector = $state->getModalSelector();
+    $this->assertStringStartsWith('#modal-media-library-', $selector);
+    $this->assertNotSame('#modal-media-library', $selector);
+
+    // The selector is deterministic for the same state.
+    $same_state = MediaLibraryState::create($opener, $allowed_media_type_ids, 'image', 1);
+    $this->assertSame($selector, $same_state->getModalSelector());
+
+    // A field widget library opened for a different field (a distinct opener
+    // parameter, as happens with a nested media reference field) gets a
+    // different selector.
+    $outer = MediaLibraryState::create($opener, $allowed_media_type_ids, 'image', 1, [
+      'field_widget_id' => 'outer',
+    ]);
+    $inner = MediaLibraryState::create($opener, $allowed_media_type_ids, 'image', 1, [
+      'field_widget_id' => 'inner',
+    ]);
+    $this->assertNotSame($outer->getModalSelector(), $inner->getModalSelector());
+  }
+
+  /**
    * Tests the media library state creation.
    *
    * @param string $opener_id

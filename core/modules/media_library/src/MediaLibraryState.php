@@ -211,6 +211,27 @@ class MediaLibraryState extends ParameterBag implements CacheableDependencyInter
   }
 
   /**
+   * Returns the DOM selector for the modal that hosts this library.
+   *
+   * Field widget libraries can be nested: a media entity created or edited in
+   * the library may itself have a media reference field rendered with a media
+   * library widget, which opens another library. If every level shared the same
+   * '#modal-media-library' id, closing the inner modal would tear down the
+   * outer one too. Give each field widget library a selector unique to its
+   * opener state so the levels stay independent. Other openers keep the shared
+   * selector.
+   *
+   * @return string
+   *   The modal DOM selector, including the leading '#'.
+   */
+  public function getModalSelector() {
+    if ($this->getOpenerId() === 'media_library.opener.field_widget') {
+      return '#modal-media-library-' . substr(hash('sha256', $this->getHash()), 0, 20);
+    }
+    return '#modal-media-library';
+  }
+
+  /**
    * Returns the ID of the media library opener service.
    *
    * @return string

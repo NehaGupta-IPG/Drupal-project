@@ -120,7 +120,7 @@ class MediaLibraryUiBuilder {
     }
     else {
       return [
-        '#modal_selector' => '#modal-media-library',
+        '#modal_selector' => $state->getModalSelector(),
         '#theme' => 'media_library_wrapper',
         '#attributes' => [
           'id' => 'media-library-wrapper',

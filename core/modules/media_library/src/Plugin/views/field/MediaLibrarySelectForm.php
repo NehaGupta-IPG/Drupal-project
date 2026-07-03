@@ -176,7 +176,7 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
     return \Drupal::service('media_library.opener_resolver')
       ->get($state)
       ->getSelectionResponse($state, $selected_ids)
-      ->addCommand(new CloseModalDialogCommand(FALSE, '#modal-media-library'));
+      ->addCommand(new CloseModalDialogCommand(FALSE, $state->getModalSelector()));
   }
 
   /**

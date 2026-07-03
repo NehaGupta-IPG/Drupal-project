@@ -817,10 +817,11 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    */
   public static function openMediaLibrary(array $form, FormStateInterface $form_state) {
     $triggering_element = $form_state->getTriggeringElement();
-    $library_ui = \Drupal::service('media_library.ui_builder')->buildUi($triggering_element['#media_library_state']);
+    $state = $triggering_element['#media_library_state'];
+    $library_ui = \Drupal::service('media_library.ui_builder')->buildUi($state);
     $dialog_options = MediaLibraryUiBuilder::dialogOptions();
     return (new AjaxResponse())
-      ->addCommand(new OpenModalDialogCommand($dialog_options['title'], $library_ui, $dialog_options, NULL, '#modal-media-library'));
+      ->addCommand(new OpenModalDialogCommand($dialog_options['title'], $library_ui, $dialog_options, NULL, $state->getModalSelector()));
   }
 
   /**
