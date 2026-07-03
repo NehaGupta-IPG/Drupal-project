@@ -141,7 +141,10 @@
           "items": {
             "type": "string"
           }
-        }
+        },
+        "header": {
+          "type": "boolean"
+        },
       }
     },
     "machineName": {
