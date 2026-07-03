@@ -3,16 +3,26 @@ status: true
 dependencies:
   config:
     - core.entity_form_mode.media.media_library
+    - field.field.media.type_three.field_media_nested
     - field.field.media.type_three.field_media_test_image
     - image.style.thumbnail
     - media.type.type_three
   module:
     - image
+    - media_library
 id: media.type_three.media_library
 targetEntityType: media
 bundle: type_three
 mode: media_library
 content:
+  field_media_nested:
+    type: media_library_widget
+    weight: 2
+    region: content
+    settings:
+      media_types:
+        - type_one
+    third_party_settings: {  }
   field_media_test_image:
     type: image_image
     weight: 1

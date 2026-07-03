@@ -836,4 +836,71 @@ class WidgetUploadTest extends MediaLibraryTestBase {
 
   }
 
+  /**
+   * Tests nested field widget media libraries in stacked modals.
+   *
+   * When a media item created in the library has its own media reference field
+   * rendered with a media library widget, that inner library opens in a second
+   * modal on top of the outer one. Inserting in the inner library must close
+   * only the inner modal and leave the outer one open. Before the modal
+   * selector was scoped per opener, both levels shared '#modal-media-library'
+   * and closing the inner modal tore down the outer one too.
+   *
+   * @see \Drupal\media_library\MediaLibraryState::getModalSelector()
+   */
+  public function testNestedFieldWidgetModals(): void {
+    $assert_session = $this->assertSession();
+    $page = $this->getSession()->getPage();
+
+    // A file to create the outer (type_three) media item with.
+    $file_image = NULL;
+    foreach ($this->getTestFiles('image') as $image) {
+      if (in_array(pathinfo($image->filename, PATHINFO_EXTENSION), ['jpg', 'png'], TRUE)) {
+        $file_image = $image;
+        break;
+      }
+    }
+    $this->assertNotNull($file_image, 'Expected test image is missing.');
+
+    // A type_one item to select in the inner (nested) library.
+    $this->createMediaItems(['type_one' => ['Nested item one']]);
+
+    $user = $this->drupalCreateUser([
+      'access content',
+      'create basic_page content',
+      'create type_three media',
+      'view media',
+    ]);
+    $this->drupalLogin($user);
+
+    $this->drupalGet('node/add/basic_page');
+
+    // Open the outer library and upload a file to create a type_three item. Its
+    // add form renders the nested field_media_nested media library widget.
+    $this->openMediaLibraryForField('field_twin_media');
+    $this->addMediaFileToField('Add files', $this->container->get('file_system')->realpath($file_image->uri));
+    $this->assertMediaAdded();
+
+    // Only the outer media library modal is open.
+    $this->waitForElementsCount('css', '.media-library-widget-modal', 1);
+
+    // Open the nested library from the type_three add form. It stacks a second
+    // modal on top of the outer one.
+    $nested_wrapper = $assert_session->waitForElementVisible('css', '[id^="field_media_nested-media-library-wrapper"]');
+    $this->assertNotNull($nested_wrapper);
+    $nested_wrapper->pressButton('Add media');
+    $this->waitForElementsCount('css', '.media-library-widget-modal', 2);
+
+    // Select the pre-created item and insert it from the inner (topmost) modal.
+    // The inner modal must close while the outer add form modal stays open.
+    $this->selectMediaItem(0);
+    $modals = $page->findAll('css', '.media-library-widget-modal');
+    end($modals)->pressButton('Insert selected');
+    $this->waitForElementsCount('css', '.media-library-widget-modal', 1);
+
+    // The outer add form is still open and now shows the nested selection.
+    $assert_session->elementExists('css', '.js-media-library-add-form');
+    $assert_session->waitForElementVisible('css', '[id^="field_media_nested-media-library-wrapper"] .js-media-library-item');
+  }
+
 }
