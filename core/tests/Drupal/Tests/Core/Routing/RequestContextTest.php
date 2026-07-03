@@ -1,16 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Routing;
 
 use Drupal\Core\Routing\RequestContext;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * @coversDefaultClass \Drupal\Core\Routing\RequestContext
- * @group Routing
+ * Tests Drupal\Core\Routing\RequestContext.
  */
+#[CoversClass(RequestContext::class)]
+#[Group('Routing')]
 class RequestContextTest extends UnitTestCase {
 
   /**
@@ -20,8 +25,6 @@ class RequestContextTest extends UnitTestCase {
    * rebuild triggered from a module's install hook or event subscriber
    * while running `drush site:install`, where the request stack has no
    * current request yet.
-   *
-   * @covers ::fromRequestStack
    */
   public function testFromRequestStackWithEmptyStack(): void {
     $request_context = new RequestContext();
@@ -39,8 +42,6 @@ class RequestContextTest extends UnitTestCase {
 
   /**
    * Tests that a populated request stack still populates the context.
-   *
-   * @covers ::fromRequestStack
    */
   public function testFromRequestStackWithCurrentRequest(): void {
     $request_context = new RequestContext();
