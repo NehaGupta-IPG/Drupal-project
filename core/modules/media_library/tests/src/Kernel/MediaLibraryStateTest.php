@@ -108,6 +108,12 @@ class MediaLibraryStateTest extends KernelTestBase {
     $same_state = MediaLibraryState::create($opener, $allowed_media_type_ids, 'image', 1);
     $this->assertSame($selector, $same_state->getModalSelector());
 
+    // The selected type and remaining slots change as the user navigates inside
+    // the library, but the modal is created once on open, so they must not
+    // change the selector.
+    $navigated = MediaLibraryState::create($opener, $allowed_media_type_ids, 'document', 2);
+    $this->assertSame($selector, $navigated->getModalSelector());
+
     // A field widget library opened for a different field (a distinct opener
     // parameter, as happens with a nested media reference field) gets a
     // different selector.
