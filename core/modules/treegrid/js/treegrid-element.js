@@ -281,6 +281,4 @@
   if (!customElements.get('drupal-treegrid')) {
     customElements.define('drupal-treegrid', TreegridElement);
   }
-
-  Drupal.treegrid.TreegridElement = TreegridElement;
 })(Drupal);

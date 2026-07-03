@@ -40,6 +40,8 @@ use Psr\Log\LoggerInterface;
  *
  * Uses StringTranslationTrait for the user-facing messages below, with the
  * translation service injected.
+ *
+ * @internal
  */
 final class MenuTreeMover implements TreeMoveHandlerInterface {
 

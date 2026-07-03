@@ -26,6 +26,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * markup, so the server renders the dropbutton — exactly as the classic menu
  * admin does — and the client injects the finished HTML verbatim (see the
  * markup renderer in treegrid/js/cells.js). The column is read-only and last.
+ *
+ * @internal
  */
 #[TreegridColumn(
   id: 'operations',

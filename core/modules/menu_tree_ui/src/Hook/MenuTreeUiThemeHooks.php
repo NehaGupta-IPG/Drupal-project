@@ -8,6 +8,8 @@ use Drupal\Core\Hook\Attribute\Hook;
 
 /**
  * Theme hook implementations for the menu_tree_ui module.
+ *
+ * @internal
  */
 final class MenuTreeUiThemeHooks {
 

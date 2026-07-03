@@ -20,6 +20,8 @@ use Drupal\Core\Menu\MenuLinkInterface;
  *
  * Links backed by a bespoke plugin class that does not support those overrides
  * stay locked, so the UI never implies a move it cannot honor.
+ *
+ * @internal
  */
 final class MenuLinkMovability {
 

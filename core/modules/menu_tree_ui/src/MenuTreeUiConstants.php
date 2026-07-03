@@ -6,6 +6,8 @@ namespace Drupal\menu_tree_ui;
 
 /**
  * Shared constants for the menu_tree_ui module.
+ *
+ * @internal
  */
 final class MenuTreeUiConstants {
 

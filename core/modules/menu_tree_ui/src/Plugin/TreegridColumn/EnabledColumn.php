@@ -28,6 +28,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * entity or a static MenuLinkDefault link overridden via
  * StaticMenuLinkOverrides — and disabled for links backed by a bespoke plugin
  * class that supports neither.
+ *
+ * @internal
  */
 #[TreegridColumn(
   id: 'enabled',

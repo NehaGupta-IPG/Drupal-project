@@ -13,6 +13,8 @@ use Drupal\system\MenuInterface;
 
 /**
  * Hooks for the menu_tree_ui module.
+ *
+ * @internal
  */
 final class MenuTreeUiHooks {
 

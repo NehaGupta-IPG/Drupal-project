@@ -37,6 +37,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *   - search():       HTML partial swapped in by htmx.
  *   - move():         drag-and-drop / keyboard reorder.
  *   - columnUpdate(): interactive column toggle (e.g. "enabled").
+ *
+ * @internal
  */
 final class MenuTreeController extends ControllerBase {
 

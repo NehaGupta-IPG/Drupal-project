@@ -14,6 +14,8 @@ use Drupal\Core\Menu\MenuTreeStorageInterface;
  * Covers user-created menu links (the dominant link type in large menus).
  * Static links defined by *.links.menu.yml are intentionally excluded here;
  * a separate provider can be added to cover them.
+ *
+ * @internal
  */
 final class MenuLinkContentSearchProvider implements MenuTreeSearchProviderInterface {
 

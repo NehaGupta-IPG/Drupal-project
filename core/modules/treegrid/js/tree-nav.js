@@ -375,7 +375,6 @@
     findRow,
     rowOf,
     focusRow,
-    rowControls,
     setRowControlsActive,
     initRovingTabindex,
   };

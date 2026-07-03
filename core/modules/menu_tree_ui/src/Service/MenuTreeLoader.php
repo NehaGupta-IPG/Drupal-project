@@ -22,6 +22,8 @@ use Drupal\treegrid_reorder\TreegridWorkingCopy;
  * of edits, never the menu size. search() is a thin orchestrator: it collects
  * from all tagged MenuTreeSearchProviderInterface services, deduplicates, and
  * fires hook_menu_tree_ui_search_results_alter() before returning.
+ *
+ * @internal
  */
 final class MenuTreeLoader {
 

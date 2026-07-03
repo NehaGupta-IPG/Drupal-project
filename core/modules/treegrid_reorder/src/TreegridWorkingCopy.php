@@ -29,6 +29,8 @@ use Drupal\Core\TempStore\SharedTempStoreFactory;
  * Each consumer owns a tempstore collection (passed at construction) and keys
  * entries within it by a tree id; collections keep two
  * consumers' ids from colliding.
+ *
+ * @api
  */
 final class TreegridWorkingCopy {
 
@@ -39,6 +41,18 @@ final class TreegridWorkingCopy {
    */
   private array $cache = [];
 
+  /**
+   * Constructs the working copy store.
+   *
+   * @param \Drupal\Core\TempStore\SharedTempStoreFactory $tempStoreFactory
+   *   The shared tempstore factory.
+   * @param \Drupal\Core\Session\AccountInterface $currentUser
+   *   The current user, recorded as the owner of locks and pending edits.
+   * @param string $collection
+   *   The tempstore collection name. Must be unique to the consuming module
+   *   (e.g. 'my_module.working_copy') so two consumers editing same-named
+   *   trees do not collide.
+   */
   public function __construct(
     private readonly SharedTempStoreFactory $tempStoreFactory,
     private readonly AccountInterface $currentUser,

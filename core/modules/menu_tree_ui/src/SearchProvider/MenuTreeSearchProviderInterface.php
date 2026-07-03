@@ -21,6 +21,12 @@ interface MenuTreeSearchProviderInterface {
   /**
    * Returns search results matching $query in $menu_name.
    *
+   * Matching semantics are the provider's choice; the default provider does a
+   * case-insensitive substring match on the link title, with entity access
+   * checks applied. Results are returned in the provider's display order (the
+   * default provider sorts by title); the loader preserves that order within
+   * each provider's slice of the merged list.
+   *
    * @param string $menu_name
    *   Menu entity ID (e.g. 'main').
    * @param string $query
@@ -36,6 +42,8 @@ interface MenuTreeSearchProviderInterface {
    *   breadcrumb: string[],
    *   breadcrumb_ids: string[],
    *   }>
+   *   The results. A NULL edit_url means the result has no edit form; the
+   *   results list then renders the title without an Edit link.
    */
   public function search(string $menu_name, string $query, int $limit): array;
 

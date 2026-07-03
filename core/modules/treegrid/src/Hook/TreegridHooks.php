@@ -10,6 +10,8 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Hooks for the treegrid module.
+ *
+ * @internal
  */
 final class TreegridHooks {
 

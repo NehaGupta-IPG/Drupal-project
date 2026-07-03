@@ -10,6 +10,8 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Hooks for the treegrid_reorder module.
+ *
+ * @internal
  */
 final class TreegridReorderHooks {
 

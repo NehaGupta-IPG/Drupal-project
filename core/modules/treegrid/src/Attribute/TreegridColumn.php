@@ -25,6 +25,19 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 final class TreegridColumn extends Plugin {
 
+  /**
+   * Constructs the attribute.
+   *
+   * @param string $id
+   *   The column plugin ID.
+   * @param \Drupal\Core\StringTranslation\TranslatableMarkup $title
+   *   The column header label.
+   * @param int $weight
+   *   Sort order: columns render left to right by ascending weight.
+   * @param string|null $deriver
+   *   Optional deriver class that expands this definition into multiple
+   *   column definitions.
+   */
   public function __construct(
     public readonly string $id,
     public readonly TranslatableMarkup $title,

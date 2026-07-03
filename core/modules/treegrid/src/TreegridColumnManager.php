@@ -17,6 +17,8 @@ use Drupal\treegrid\Plugin\TreegridColumn\TreegridColumnInterface;
  * inside src/Plugin/TreegridColumn/ and decorating it with #[TreegridColumn].
  * The alter hook hook_treegrid_column_info_alter() lets modules modify or
  * remove definitions after discovery.
+ *
+ * @api
  */
 final class TreegridColumnManager extends DefaultPluginManager {
 
