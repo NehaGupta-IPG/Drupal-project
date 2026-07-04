@@ -23,6 +23,9 @@ class ExceptionHandler {
    *   An associative array of options to control how the database operation is
    *   run.
    *
+   * @return never
+   *   This method only throws exceptions.
+   *
    * @throws \Drupal\Core\Database\DatabaseExceptionWrapper
    */
   public function handleStatementException(\Exception $exception, string $sql, array $options = []): void {
@@ -49,6 +52,9 @@ class ExceptionHandler {
    * @param array $options
    *   An associative array of options to control how the database operation is
    *   run.
+   *
+   * @return never
+   *   This method only throws exceptions.
    *
    * @throws \Drupal\Core\Database\DatabaseExceptionWrapper
    * @throws \Drupal\Core\Database\IntegrityConstraintViolationException
