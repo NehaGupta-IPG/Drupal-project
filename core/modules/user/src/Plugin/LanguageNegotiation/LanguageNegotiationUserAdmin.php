@@ -102,7 +102,11 @@ class LanguageNegotiationUserAdmin extends LanguageNegotiationMethodBase impleme
    */
   public function getLangcode(?Request $request = NULL) {
     // The administration language only applies on administration paths.
-    if ($this->isAdminPath($request) && ($langcode = $this->getAdminLangcode()) !== '') {
+    // Resolve the langcode first: when the route is not available yet,
+    // isAdminPath() runs inbound path processing and routes the request,
+    // which is too expensive to do for users without an administration
+    // language.
+    if (($langcode = $this->getAdminLangcode()) !== '' && $this->isAdminPath($request)) {
       return $langcode;
     }
     return NULL;
