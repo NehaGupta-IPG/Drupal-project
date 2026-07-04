@@ -4,14 +4,13 @@
  * @file
  */
 
-use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Batch\BatchBuilder;
+use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AnonymousUserSession;
-use Drupal\Core\Site\Settings;
-use Drupal\Core\Url;
 use Drupal\user\Entity\User;
 use Drupal\user\Hook\UserThemeHooks;
+use Drupal\user\OneTimeAuthentication;
 use Drupal\user\UserInterface;
 
 /**
@@ -37,9 +36,14 @@ function user_picture_enabled() {
  *   A fully-loaded $user object upon successful user load or FALSE if user
  *   cannot be loaded.
  *
- * @see \Drupal\user\Entity\User::loadMultiple()
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0.
+ *   Use \Drupal::entityTypeManager()->getStorage('user')->loadByProperties()
+ *   instead.
+ *
+ * @see https://www.drupal.org/node/3555936
  */
 function user_load_by_mail($mail) {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use entityTypeManager()->getStorage("user")->loadByProperties() instead. See https://www.drupal.org/node/3555936', E_USER_DEPRECATED);
   $users = \Drupal::entityTypeManager()->getStorage('user')
     ->loadByProperties(['mail' => $mail]);
   return $users ? reset($users) : FALSE;
@@ -55,79 +59,17 @@ function user_load_by_mail($mail) {
  *   A fully-loaded $user object upon successful user load or FALSE if user
  *   cannot be loaded.
  *
- * @see \Drupal\user\Entity\User::loadMultiple()
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0.
+ *   Use \Drupal::entityTypeManager()->getStorage('user')->loadByProperties()
+ *   instead.
+ *
+ * @see https://www.drupal.org/node/3555936
  */
 function user_load_by_name($name) {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use entityTypeManager()->getStorage("user")->loadByProperties() instead. See https://www.drupal.org/node/3555936', E_USER_DEPRECATED);
   $users = \Drupal::entityTypeManager()->getStorage('user')
     ->loadByProperties(['name' => $name]);
   return $users ? reset($users) : FALSE;
-}
-
-/**
- * Verify the syntax of the given name.
- *
- * @param string $name
- *   The user name to validate.
- *
- * @return string|null
- *   A translated violation message if the name is invalid or NULL if the name
- *   is valid.
- *
- * @deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use
- *   \Drupal\user\UserNameValidator::validateName() instead.
- *
- * @see https://www.drupal.org/node/3431205
- */
-function user_validate_name($name) {
-  @trigger_error(__METHOD__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use \Drupal\user\UserNameValidator::validateName() instead. See https://www.drupal.org/node/3431205', E_USER_DEPRECATED);
-  $violations = \Drupal::service('user.name_validator')->validateName($name);
-  if (count($violations) > 0) {
-    return $violations[0]->getMessage();
-  }
-}
-
-/**
- * Checks for usernames blocked by user administration.
- *
- * @param string $name
- *   A string containing a name of the user.
- *
- * @return bool
- *   TRUE if the user is blocked, FALSE otherwise.
- *
- * @deprecated in drupal:11.0.0 and is removed from drupal:12.0.0. Use
- * Drupal\user\UserInterface::isBlocked() instead.
- * @see https://www.drupal.org/node/3411040
- */
-function user_is_blocked($name) {
-  @trigger_error('user_is_blocked() is deprecated in drupal:11.0.0 and is removed from drupal:12.0.0. Use \Drupal\user\UserInterface::isBlocked() instead. See https://www.drupal.org/node/3411040', E_USER_DEPRECATED);
-  return (bool) \Drupal::entityQuery('user')
-    ->accessCheck(FALSE)
-    ->condition('name', $name)
-    ->condition('status', 0)
-    ->execute();
-}
-
-/**
- * Prepares variables for username templates.
- *
- * Default template: username.html.twig.
- *
- * Modules that make any changes to variables like 'name' or 'extra' must ensure
- * that the final string is safe.
- *
- * @param array $variables
- *   An associative array containing:
- *   - account: The user account (\Drupal\Core\Session\AccountInterface).
- *
- * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial
- *    template_preprocess functions are registered directly in hook_theme().
- *
- * @see https://www.drupal.org/node/3504125
- */
-function template_preprocess_username(&$variables): void {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
-  \Drupal::service(UserThemeHooks::class)->preprocessUsername($variables);
 }
 
 /**
@@ -180,21 +122,14 @@ function user_login_finalize(UserInterface $account): void {
  * @return string
  *   A unique URL that provides a one-time log in for the user, from which
  *   they can change their password.
+ *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\user\OneTimeAuthentication::generateOneTimeLoginUrl() instead.
+ * @see https://www.drupal.org/node/3581062
  */
 function user_pass_reset_url($account, $options = []) {
-  $timestamp = \Drupal::time()->getCurrentTime();
-  $langcode = $options['langcode'] ?? $account->getPreferredLangcode();
-  return Url::fromRoute('user.reset',
-    [
-      'uid' => $account->id(),
-      'timestamp' => $timestamp,
-      'hash' => user_pass_rehash($account, $timestamp),
-    ],
-    [
-      'absolute' => TRUE,
-      'language' => \Drupal::languageManager()->getLanguage($langcode),
-    ]
-  )->toString();
+  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\user\OneTimeAuthentication::generateOneTimeLoginUrl() instead. See https://www.drupal.org/node/3581062', E_USER_DEPRECATED);
+  return \Drupal::service(OneTimeAuthentication::class)->generateOneTimeLoginUrl($account, $options)->toString();
 }
 
 /**
@@ -211,18 +146,16 @@ function user_pass_reset_url($account, $options = []) {
  *   A unique URL that may be used to confirm the cancellation of the user
  *   account.
  *
- * @see user_mail_tokens()
+ * @see \Drupal\user\OneTimeAuthentication::tokens()
  * @see \Drupal\user\Controller\UserController::confirmCancel()
+ *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\user\OneTimeAuthentication::generateCancelConfirmUrl() instead.
+ * @see https://www.drupal.org/node/3581062
  */
 function user_cancel_url(UserInterface $account, $options = []) {
-  $timestamp = \Drupal::time()->getRequestTime();
-  $langcode = $options['langcode'] ?? $account->getPreferredLangcode();
-  $url_options = ['absolute' => TRUE, 'language' => \Drupal::languageManager()->getLanguage($langcode)];
-  return Url::fromRoute('user.cancel_confirm', [
-    'user' => $account->id(),
-    'timestamp' => $timestamp,
-    'hashed_pass' => user_pass_rehash($account, $timestamp),
-  ], $url_options)->toString();
+  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\user\OneTimeAuthentication::generateCancelConfirmUrl() instead. See https://www.drupal.org/node/3581062', E_USER_DEPRECATED);
+  return \Drupal::service(OneTimeAuthentication::class)->generateCancelConfirmUrl($account, $options)->toString();
 }
 
 /**
@@ -234,7 +167,8 @@ function user_cancel_url(UserInterface $account, $options = []) {
  * same information, and compared to the hash value from the URL. The hash
  * contains the time stamp, the user's last login time, the numeric user ID,
  * and the user's email address.
- * For a usage example, see user_cancel_url() and
+ * For a usage example, see
+ * \Drupal\user\OneTimeAuthentication::generateCancelConfirmUrl() and
  * \Drupal\user\Controller\UserController::confirmCancel().
  *
  * @param \Drupal\user\UserInterface $account
@@ -244,13 +178,14 @@ function user_cancel_url(UserInterface $account, $options = []) {
  *
  * @return string
  *   A string that is safe for use in URLs and SQL statements.
+ *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\user\OneTimeAuthentication::generateHmac() instead.
+ * @see https://www.drupal.org/node/3581062
  */
 function user_pass_rehash(UserInterface $account, $timestamp) {
-  $data = $timestamp;
-  $data .= ':' . $account->getLastLoginTime();
-  $data .= ':' . $account->id();
-  $data .= ':' . $account->getEmail();
-  return Crypt::hmacBase64($data, Settings::getHashSalt() . $account->getPassword());
+  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\user\OneTimeAuthentication::generateHmac() instead. See https://www.drupal.org/node/3581062', E_USER_DEPRECATED);
+  return \Drupal::service(OneTimeAuthentication::class)->generateHmac($account, $timestamp);
 }
 
 /**
@@ -459,12 +394,15 @@ function user_cancel_methods(): array {
  * @param array $options
  *   A keyed array of settings and flags to control the token replacement
  *   process. See \Drupal\Core\Utility\Token::replace().
+ *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\user\OneTimeAuthentication::tokens() instead.
+ * @see https://www.drupal.org/node/3581062
  */
 function user_mail_tokens(&$replacements, $data, $options): void {
-  if (isset($data['user'])) {
-    $replacements['[user:one-time-login-url]'] = user_pass_reset_url($data['user'], $options);
-    $replacements['[user:cancel-url]'] = user_cancel_url($data['user'], $options);
-  }
+  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\user\OneTimeAuthentication::tokens() instead. See https://www.drupal.org/node/3581062', E_USER_DEPRECATED);
+  $bubbleableMetadata = new BubbleableMetadata();
+  \Drupal::service(OneTimeAuthentication::class)->tokens($replacements, $data, $options, $bubbleableMetadata);
 }
 
 /**
@@ -577,7 +515,7 @@ function user_role_revoke_permissions($rid, array $permissions = []): void {
  *   \Drupal\Core\Mail\MailManagerInterface::mail() for details. Or null if the
  *   account does not have an email address.
  *
- * @see user_mail_tokens()
+ * @see \Drupal\user\OneTimeAuthentication::tokens()
  */
 function _user_mail_notify($op, AccountInterface $account) {
 
@@ -590,9 +528,6 @@ function _user_mail_notify($op, AccountInterface $account) {
     // default for this.
     if (empty($site_mail)) {
       $site_mail = \Drupal::config('system.site')->get('mail');
-    }
-    if (empty($site_mail)) {
-      $site_mail = ini_get('sendmail_from');
     }
     if ($account->getEmail()) {
       $mail = \Drupal::service('plugin.manager.mail')->mail('user', $op, $account->getEmail(), $account->getPreferredLangcode(), $params, $site_mail);
@@ -618,38 +553,16 @@ function _user_mail_notify($op, AccountInterface $account) {
  * This #process handler is automatically invoked for 'password_confirm' form
  * elements to add the JavaScript and string translations for dynamic password
  * validation.
+ *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+ *   UserThemeHooks::processPasswordConfirm() instead.
+ *
+ * @see https://www.drupal.org/node/3582107
+ * @see Drupal\user\Hook\UserThemeHooks::processPasswordConfirm()
  */
 function user_form_process_password_confirm($element) {
-  $password_settings = [
-    'confirmTitle' => t('Passwords match:'),
-    'confirmSuccess' => t('yes'),
-    'confirmFailure' => t('no'),
-    'showStrengthIndicator' => FALSE,
-  ];
-
-  if (\Drupal::config('user.settings')->get('password_strength')) {
-    $password_settings['showStrengthIndicator'] = TRUE;
-    $password_settings += [
-      'strengthTitle' => t('Password strength:'),
-      'hasWeaknesses' => t('Recommendations to make your password stronger:'),
-      'tooShort' => t('Make it at least 12 characters'),
-      'addLowerCase' => t('Add lowercase letters'),
-      'addUpperCase' => t('Add uppercase letters'),
-      'addNumbers' => t('Add numbers'),
-      'addPunctuation' => t('Add punctuation'),
-      'sameAsUsername' => t('Make it different from your username'),
-      'weak' => t('Weak'),
-      'fair' => t('Fair'),
-      'good' => t('Good'),
-      'strong' => t('Strong'),
-      'username' => \Drupal::currentUser()->getAccountName(),
-    ];
-  }
-
-  $element['#attached']['library'][] = 'user/drupal.user';
-  $element['#attached']['drupalSettings']['password'] = $password_settings;
-
-  return $element;
+  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use UserThemeHooks::processPasswordConfirm() instead. See https://www.drupal.org/node/3582107', E_USER_DEPRECATED);
+  return \Drupal::service(UserThemeHooks::class)->processPasswordConfirm($element);
 }
 
 /**
@@ -657,8 +570,14 @@ function user_form_process_password_confirm($element) {
  *
  * @param array $values
  *   An array of key/value pairs to be saved into a cookie.
+ *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no
+ *   replacement.
+ *
+ * @see https://www.drupal.org/node/3581570
  */
 function user_cookie_save(array $values): void {
+  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3581570', E_USER_DEPRECATED);
   $request_time = \Drupal::time()->getRequestTime();
   foreach ($values as $field => $value) {
     // Set cookie for 365 days.
@@ -671,8 +590,14 @@ function user_cookie_save(array $values): void {
  *
  * @param string $cookie_name
  *   A cookie name such as 'homepage'.
+ *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no
+ *   replacement.
+ *
+ * @see https://www.drupal.org/node/3581570
  */
 function user_cookie_delete($cookie_name): void {
+  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3581570', E_USER_DEPRECATED);
   setrawcookie('Drupal.visitor.' . $cookie_name, '', \Drupal::time()->getRequestTime() - 3600, '/');
 }
 
@@ -693,27 +618,4 @@ function user_logout(): void {
   // @see https://github.com/symfony/symfony/issues/12375
   \Drupal::service('session_manager')->destroy();
   $user->setAccount(new AnonymousUserSession());
-}
-
-/**
- * Prepares variables for user templates.
- *
- * Default template: user.html.twig.
- *
- * @param array $variables
- *   An associative array containing:
- *   - elements: An associative array containing the user information and any
- *     fields attached to the user. Properties used:
- *     - #user: A \Drupal\user\Entity\User object. The user account of the
- *       profile being viewed.
- *   - attributes: HTML attributes for the containing element.
- *
- * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial
- *    template_preprocess functions are registered directly in hook_theme().
- *
- * @see https://www.drupal.org/node/3504125
- */
-function template_preprocess_user(&$variables): void {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
-  \Drupal::service(UserThemeHooks::class)->preprocessUser($variables);
 }

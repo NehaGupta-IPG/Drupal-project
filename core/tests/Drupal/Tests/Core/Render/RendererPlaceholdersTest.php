@@ -17,7 +17,6 @@ use Drupal\Core\Security\TrustedCallbackInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\Builder\InvocationMocker;
 
 /**
  * Tests Drupal\Core\Render\Renderer.
@@ -987,10 +986,10 @@ class RendererPlaceholdersTest extends RendererTestBase {
   public function testRenderChildrenPlaceholdersDifferentArguments(): void {
     $this->setUpRequest();
     $this->setupMemoryCache();
-    $this->cacheContextsManager->expects($this->any())
+    $this->cacheContextsManager
       ->method('convertTokensToKeys')
       ->willReturnArgument(0);
-    $this->callableResolver->expects($this->any())
+    $this->callableResolver
       ->method('getCallableFromDefinition')
       ->willReturnArgument(0);
     $this->setupThemeManagerForDetails();
@@ -1089,10 +1088,10 @@ HTML;
     $this->renderCache = new TestPlaceholderingRenderCache($this->requestStack, $this->cacheFactory, $this->cacheContextsManager, $this->placeholderGenerator);
     $this->renderer = new Renderer($this->callableResolver, $this->themeManager, $this->elementInfo, $this->placeholderGenerator, $this->renderCache, $this->requestStack, $this->rendererConfig);
 
-    $this->cacheContextsManager->expects($this->any())
+    $this->cacheContextsManager
       ->method('convertTokensToKeys')
       ->willReturnArgument(0);
-    $this->callableResolver->expects($this->any())
+    $this->callableResolver
       ->method('getCallableFromDefinition')
       ->willReturnArgument(0);
 
@@ -1176,12 +1175,9 @@ HTML;
 
   /**
    * Sets up the theme manager for the <details>-tag.
-   *
-   * @return \Drupal\Core\Theme\ThemeManagerInterface|\PHPUnit\Framework\MockObject\Builder\InvocationMocker
-   *   The mocked theme manager.
    */
-  protected function setupThemeManagerForDetails(): InvocationMocker {
-    return $this->themeManager->expects($this->any())
+  protected function setupThemeManagerForDetails(): void {
+    $this->themeManager
       ->method('render')
       ->willReturnCallback(function ($theme, array $vars): array|string {
         $output = <<<'EOS'

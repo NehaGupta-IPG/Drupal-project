@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\migrate\Unit\process;
 
 use Drupal\migrate\Plugin\migrate\process\Get;
+use Drupal\migrate\Row;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
@@ -18,6 +19,7 @@ class GetTest extends MigrateProcessTestCase {
    * Tests the Get plugin when source is a string.
    */
   public function testTransformSourceString(): void {
+    $this->row = $this->createMock(Row::class);
     $this->row->expects($this->once())
       ->method('get')
       ->with('test')
@@ -36,9 +38,10 @@ class GetTest extends MigrateProcessTestCase {
       'test2' => 'source_value2',
     ];
     $this->plugin = new Get(['source' => ['test1', 'test2']], '', []);
+    $this->row = $this->createMock(Row::class);
     $this->row->expects($this->exactly(2))
       ->method('get')
-      ->willReturnCallback(function ($argument) use ($map) {
+      ->willReturnCallback(function ($argument) use ($map): string {
         return $map[$argument];
       });
     $value = $this->plugin->transform(NULL, $this->migrateExecutable, $this->row, 'destination_property');
@@ -49,6 +52,7 @@ class GetTest extends MigrateProcessTestCase {
    * Tests the Get plugin when source is a string pointing to destination.
    */
   public function testTransformSourceStringAt(): void {
+    $this->row = $this->createMock(Row::class);
     $this->row->expects($this->once())
       ->method('get')
       ->with('@@test')
@@ -69,9 +73,10 @@ class GetTest extends MigrateProcessTestCase {
       'test4' => 'source_value4',
     ];
     $this->plugin = new Get(['source' => ['test1', '@@test2', '@@test3', 'test4']], '', []);
+    $this->row = $this->createMock(Row::class);
     $this->row->expects($this->exactly(4))
       ->method('get')
-      ->willReturnCallback(function ($argument) use ($map) {
+      ->willReturnCallback(function ($argument) use ($map): string {
         return $map[$argument];
       });
     $value = $this->plugin->transform(NULL, $this->migrateExecutable, $this->row, 'destination_property');
@@ -82,7 +87,8 @@ class GetTest extends MigrateProcessTestCase {
    * Tests the Get plugin when source has integer values.
    */
   #[DataProvider('integerValuesDataProvider')]
-  public function testIntegerValues($source, $expected_value): void {
+  public function testIntegerValues(array $source, array $expected_value): void {
+    $this->row = $this->createMock(Row::class);
     $this->row->expects($this->atMost(2))
       ->method('get')
       ->willReturnOnConsecutiveCalls('val1', 'val2');
@@ -98,7 +104,7 @@ class GetTest extends MigrateProcessTestCase {
    * @return array
    *   An array of data for the test.
    */
-  public static function integerValuesDataProvider() {
+  public static function integerValuesDataProvider(): array {
     return [
       [
         'source' => [0 => 0, 1 => 'test'],

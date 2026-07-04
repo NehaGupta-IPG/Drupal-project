@@ -2,8 +2,6 @@
 
 namespace Drupal\Component\Datetime;
 
-use Drupal\Component\Utility\ToStringTrait;
-
 /**
  * Wraps DateTime().
  *
@@ -37,9 +35,7 @@ use Drupal\Component\Utility\ToStringTrait;
  * @method int getTimestamp()
  * @method \DateTimeZone getTimezone()
  */
-class DateTimePlus {
-
-  use ToStringTrait;
+class DateTimePlus implements \Stringable {
 
   const FORMAT = 'Y-m-d H:i:s';
 
@@ -68,10 +64,8 @@ class DateTimePlus {
 
   /**
    * The DateTime object.
-   *
-   * @var \DateTime
    */
-  protected $dateTimeObject = NULL;
+  protected ?\DateTimeInterface $dateTimeObject = NULL;
 
   /**
    * Creates a date object from an input date object.
@@ -680,6 +674,16 @@ class DateTimePlus {
    */
   public function getPhpDateTime() {
     return clone $this->dateTimeObject;
+  }
+
+  /**
+   * Returns the string representation of this object.
+   *
+   * @return string
+   *   The string representation.
+   */
+  public function __toString(): string {
+    return (string) $this->render();
   }
 
 }

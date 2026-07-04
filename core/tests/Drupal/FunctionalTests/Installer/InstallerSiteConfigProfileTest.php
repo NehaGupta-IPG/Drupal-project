@@ -41,7 +41,7 @@ class InstallerSiteConfigProfileTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function installParameters() {
+  protected function installParameters(): array {
     $parameters = parent::installParameters();
 
     // Don't override the site email address, allowing it to default to the one
@@ -58,11 +58,11 @@ class InstallerSiteConfigProfileTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpSite() {
+  protected function setUpSite(): void {
     $this->assertSession()->fieldValueEquals('site_mail', self::EXPECTED_SITE_MAIL);
     $this->assertSession()->fieldValueEquals('date_default_timezone', self::EXPECTED_TIMEZONE);
 
-    return parent::setUpSite();
+    parent::setUpSite();
   }
 
   /**
