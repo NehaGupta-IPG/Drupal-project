@@ -157,8 +157,8 @@ readonly class LocaleProjectRepository {
         }
       }
 
-      // Check for the `extension://` prefix in the translation server pattern and
-      // replace it to the current extension path.
+      // Check for the `extension://` prefix in the translation server pattern
+      // and replace it to the current extension path.
       if (
         isset($data['info']['interface translation server pattern'])
         && str_starts_with($data['info']['interface translation server pattern'], 'extension://')
