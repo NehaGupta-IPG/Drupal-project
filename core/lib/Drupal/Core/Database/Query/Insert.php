@@ -2,6 +2,9 @@
 
 namespace Drupal\Core\Database\Query;
 
+use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Statement\PlaceholderType;
+
 /**
  * General class for an abstracted INSERT query.
  *
@@ -18,18 +21,13 @@ class Insert extends Query implements \Countable {
    */
   protected $fromQuery;
 
-  /**
-   * Constructs an Insert object.
-   *
-   * @param \Drupal\Core\Database\Connection $connection
-   *   A Connection object.
-   * @param string $table
-   *   Name of the table to associate with this query.
-   * @param array $options
-   *   Array of database options.
-   */
-  public function __construct($connection, $table, array $options = []) {
-    parent::__construct($connection, $options);
+  public function __construct(
+    Connection $connection,
+    string $table,
+    array $options = [],
+    ?PlaceholderType $placeholderType = NULL,
+  ) {
+    parent::__construct($connection, $options + ['placeholder_format' => $placeholderType ?? $connection->placeholderFormat()]);
     $this->table = $table;
   }
 

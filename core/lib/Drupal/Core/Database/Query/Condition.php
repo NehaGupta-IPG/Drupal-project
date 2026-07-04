@@ -5,7 +5,6 @@ namespace Drupal\Core\Database\Query;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\InvalidQueryException;
 use Drupal\Core\Database\Statement\PlaceholderType;
-use Doctrine\SqlFormatter\Tokenizer;
 
 /**
  * Generic class for a series of conditions in a query.
@@ -333,13 +332,6 @@ class Condition implements ConditionInterface, \Countable {
           }
           $value_fragment = $operator['prefix'] . implode($operator['delimiter'], $value_fragment) . $operator['postfix'];
         }
-
-global $xx; if($xx) {
-  $xa = trim(implode(' ', [$field_fragment, $operator_fragment, $value_fragment]));
-  dump([$xa]);
-  $t = new Tokenizer();
-  dump($t->tokenize($xa));
-}
 
         // Concatenate the left hand part, operator and right hand part.
         $condition_fragments[] = trim(implode(' ', [$field_fragment, $operator_fragment, $value_fragment]));

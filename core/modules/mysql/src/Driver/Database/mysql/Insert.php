@@ -25,7 +25,7 @@ class Insert extends QueryInsert {
       $values = [];
       foreach ($this->insertValues as $insert_values) {
         foreach ($insert_values as $value) {
-          $placeholderKey = match ($this->connection->placeholderFormat()) {
+          $placeholderKey = match ($this->queryOptions['placeholder_format']) {
             PlaceholderType::Named => ':db_insert_placeholder_' . $max_placeholder++,
             PlaceholderType::Positional => $max_placeholder++,
           };
@@ -37,8 +37,7 @@ class Insert extends QueryInsert {
       $values = $this->fromQuery->getArguments();
     }
 
-    $options = array_merge($this->queryOptions, ['placeholder_format' => $this->connection->placeholderFormat()]);
-    $statement = $this->connection->prepareStatement((string) $this, $options);
+    $statement = $this->connection->prepareStatement((string) $this, $this->queryOptions);
     try {
       $statement->execute($values, $this->queryOptions);
       $last_insert_id = $this->connection->lastInsertId();

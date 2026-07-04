@@ -12,6 +12,7 @@ use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\Statement\PlaceholderType;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 use Drupal\mysql\Driver\Database\mysql\Connection as BaseMySqlConnection;
+use Drupal\mysql\Driver\Database\mysql\Insert;
 
 /**
  * MySQLi implementation of \Drupal\Core\Database\Connection.
@@ -165,7 +166,7 @@ class Connection extends BaseMySqlConnection {
    * {@inheritdoc}
    */
   public function placeholderFormat(): PlaceholderType {
-    return PlaceholderType::Positional;
+    return PlaceholderType::Named;
   }
 
   /**
@@ -187,6 +188,13 @@ class Connection extends BaseMySqlConnection {
    */
   public function exceptionHandler() {
     return new ExceptionHandler();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function insert($table, array $options = []) {
+    return new Insert($this, $table, $options, PlaceholderType::Positional);
   }
 
   /**

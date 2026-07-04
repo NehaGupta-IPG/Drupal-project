@@ -163,7 +163,7 @@ trait InsertTrait {
 
         $new_placeholder = $max_placeholder + count($insert_values);
         for ($i = $max_placeholder; $i < $new_placeholder; ++$i) {
-          $placeholders[] = match ($this->connection->placeholderFormat()) {
+          $placeholders[] = match ($this->queryOptions['placeholder_format']) {
             PlaceholderType::Named => ':db_insert_placeholder_' . $i,
             PlaceholderType::Positional => '?',
           };
