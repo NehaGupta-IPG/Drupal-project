@@ -37,13 +37,13 @@ class Insert extends QueryInsert {
       $values = $this->fromQuery->getArguments();
     }
 
-    $statement = $this->connection->prepareStatement((string) $this, $this->queryOptions);
+    $stmt = $this->connection->prepareStatement((string) $this, $this->queryOptions);
     try {
-      $statement->execute($values, $this->queryOptions);
+      $stmt->execute($values, $this->queryOptions);
       $last_insert_id = $this->connection->lastInsertId();
     }
     catch (\Exception $e) {
-      $this->connection->exceptionHandler()->handleExecutionException($e, $statement, $values, $this->queryOptions);
+      $this->connection->exceptionHandler()->handleExecutionException($e, $stmt, $values, $this->queryOptions);
     }
 
     // Re-initialize the values array so that we can re-use this query.

@@ -10,6 +10,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseAccessDeniedException;
 use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\Statement\PlaceholderType;
+use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 use Drupal\mysql\Driver\Database\mysql\Connection as BaseMySqlConnection;
 use Drupal\mysql\Driver\Database\mysql\Insert;
@@ -18,11 +19,6 @@ use Drupal\mysql\Driver\Database\mysql\Insert;
  * MySQLi implementation of \Drupal\Core\Database\Connection.
  */
 class Connection extends BaseMySqlConnection {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $statementWrapperClass = Statement::class;
 
   public function __construct(
     \mysqli $connection,
@@ -167,6 +163,20 @@ class Connection extends BaseMySqlConnection {
    */
   public function placeholderFormat(): PlaceholderType {
     return PlaceholderType::Named;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function prepareStatement(string $query, array $options, bool $allow_row_count = FALSE): StatementInterface {
+    try {
+      $query = $this->preprocessStatement($query, $options);
+      $statement = new Statement($this, $this->connection, $query, $options['placeholder_format'] ?? $this->placeholderFormat(), [], $allow_row_count);
+      return $statement;
+    }
+    catch (\Exception $e) {
+      $this->exceptionHandler()->handleStatementException($e, $query, $options);
+    }
   }
 
   /**

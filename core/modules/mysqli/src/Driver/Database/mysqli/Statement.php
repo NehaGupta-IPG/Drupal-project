@@ -38,14 +38,18 @@ class Statement extends StatementBase {
    *   (optional) Array of query options.
    * @param bool $rowCountEnabled
    *   (optional) Enables counting the rows affected. Defaults to FALSE.
+   * @param \Drupal\Core\Database\Statement\PlaceholderType $placeholderType
+   *   The type of placeholders in the query string.
    */
   public function __construct(
     Connection $connection,
     \mysqli $clientConnection,
     string $queryString,
+    protected readonly PlaceholderType $placeholderType,
     protected array $driverOpts = [],
     bool $rowCountEnabled = FALSE,
   ) {
+    assert($placeholderType !== NULL);
     parent::__construct($connection, $clientConnection, $queryString, $rowCountEnabled);
     $this->setFetchMode(FetchAs::Object);
   }
@@ -85,7 +89,7 @@ class Statement extends StatementBase {
       // Prepare the lower-level statement if it's not been prepared already.
       if (!$this->hasClientStatement()) {
         // Replace named placeholders with positional ones if needed.
-        if (($this->driverOpts['placeholder_format'] ?? PlaceholderType::Named) === PlaceholderType::Positional) {
+        if ($this->placeholderType === PlaceholderType::Positional) {
           $convertedQueryString = $this->queryString;
         }
         else {
