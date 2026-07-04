@@ -29,13 +29,8 @@ class ExistingDrupal8StyleDatabaseConnectionInSettingsPhpTest extends BrowserTes
     parent::setUp();
 
     $driver = Database::getConnection()->driver();
-<<<<<<< HEAD
-    if (!in_array($driver, ['mysql', 'mysqli', 'pgsql', 'sqlite'])) {
-      $this->markTestSkipped("This test does not support the {$driver} database driver.");
-=======
     if (!in_array($driver, ['mysql', 'pgsql', 'sqlite'])) {
       $this->markTestSkipped("This test is only relevant for database drivers that were available in Drupal prior to database drivers becoming part of modules. The {$driver} database driver is not qualifying.");
->>>>>>> main
     }
 
     $filename = $this->siteDirectory . '/settings.php';

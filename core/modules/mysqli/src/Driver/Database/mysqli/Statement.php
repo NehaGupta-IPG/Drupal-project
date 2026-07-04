@@ -93,7 +93,7 @@ class Statement extends StatementBase {
           $converter->parse($this->queryString, $args);
           [$convertedQueryString, $args] = [$converter->getConvertedSQL(), $converter->getConvertedParameters()];
         }
-        $this->clientStatement = $this->clientConnection->prepare($executableQueryString);
+        $this->clientStatement = $this->clientConnection->prepare($convertedQueryString);
       }
       else {
         // Transform the $args to positional.

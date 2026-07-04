@@ -204,12 +204,19 @@ abstract class Database {
     // arrays. Those have the wrong 'namespace' key set, or not set at all
     // for core supported database drivers.
     if (empty($info['namespace']) || str_starts_with($info['namespace'], 'Drupal\\Core\\Database\\Driver\\')) {
-      $info['namespace'] = match (strtolower($info['driver'])) {
-        'mysql' => 'Drupal\\mysql\\Driver\\Database\\mysql',
-        'mysqli' => 'Drupal\\mysqli\\Driver\\Database\\mysqli',
-        'pgsql' => 'Drupal\\pgsql\\Driver\\Database\\pgsql',
-        'sqlite' => 'Drupal\\sqlite\\Driver\\Database\\sqlite',
-      };
+      switch (strtolower($info['driver'])) {
+        case 'mysql':
+          $info['namespace'] = 'Drupal\\mysql\\Driver\\Database\\mysql';
+          break;
+
+        case 'pgsql':
+          $info['namespace'] = 'Drupal\\pgsql\\Driver\\Database\\pgsql';
+          break;
+
+        case 'sqlite':
+          $info['namespace'] = 'Drupal\\sqlite\\Driver\\Database\\sqlite';
+          break;
+      }
     }
     // Backwards compatibility layer for Drupal 8 style database connection
     // arrays. Those do not have the 'autoload' key set for core database
@@ -218,14 +225,6 @@ abstract class Database {
       switch (trim($info['namespace'], '\\')) {
         case "Drupal\\mysql\\Driver\\Database\\mysql":
           $info['autoload'] = "core/modules/mysql/src/Driver/Database/mysql/";
-          break;
-
-        case "Drupal\\mysqli\\Driver\\Database\\mysqli":
-          $info['autoload'] = "core/modules/mysqli/src/Driver/Database/mysqli/";
-          $info['dependencies']['mysql'] = [
-            'namespace' => 'Drupal\\mysql',
-            'autoload' => 'core/modules/mysql/src/',
-          ];
           break;
 
         case "Drupal\\pgsql\\Driver\\Database\\pgsql":

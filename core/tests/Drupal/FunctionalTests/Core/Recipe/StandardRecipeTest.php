@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests\Core\Recipe;
 
 use Drupal\Core\Extension\ModuleExtensionList;
-<<<<<<< HEAD
-use Drupal\shortcut\Entity\Shortcut;
-=======
->>>>>>> main
 use Drupal\Tests\standard\Functional\StandardTest;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
@@ -47,11 +43,7 @@ class StandardRecipeTest extends StandardTest {
     $database_modules[] = \Drupal::database()->getProvider();
     $keep = array_merge(['user', 'system', 'path_alias'], $database_modules);
     $uninstall = array_diff(array_keys(\Drupal::moduleHandler()->getModuleList()), $keep);
-<<<<<<< HEAD
-    foreach (['shortcut', 'field_config', 'filter_format', 'field_storage_config'] as $entity_type) {
-=======
     foreach (['field_config', 'filter_format', 'field_storage_config'] as $entity_type) {
->>>>>>> main
       $storage = \Drupal::entityTypeManager()->getStorage($entity_type);
       $storage->delete($storage->loadMultiple());
     }
