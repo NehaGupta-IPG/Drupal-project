@@ -162,6 +162,8 @@ class LinkFieldUITest extends BrowserTestBase {
     $field_edit = [
       'description' => $description,
       'settings[link_type]' => (int) $link_type,
+      'settings[handler]' => 'default:node',
+      'settings[handler_settings][target_bundles][' . $this->contentType->id() . ']' => $this->contentType->id(),
     ];
     if (!empty($default_uri)) {
       $field_edit['set_default_value'] = '1';

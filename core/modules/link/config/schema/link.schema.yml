@@ -34,6 +34,12 @@ field.widget.settings.link_default:
     placeholder_title:
       type: label
       label: 'Placeholder for link text'
+    match_operator:
+      type: string
+      label: 'Autocomplete matching'
+    match_limit:
+      type: integer
+      label: 'Maximum number of autocomplete suggestions.'
 
 # This field type has no field storage settings, so no specific config schema type.
 # @see `type: field.storage_settings.*`
@@ -47,6 +53,12 @@ field.field_settings.link:
     link_type:
       type: integer
       label: 'Allowed link type'
+    handler:
+      type: string
+      label: 'Reference method'
+    handler_settings:
+      type: entity_reference_selection.[%parent.handler]
+      label: 'Entity reference selection plugin settings'
 
 field.value.link:
   type: mapping

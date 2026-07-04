@@ -44,7 +44,11 @@ class LinkItemTest extends FieldKernelTestBase {
       'entity_type' => 'entity_test',
       'field_name' => 'field_test',
       'bundle' => 'entity_test',
-      'settings' => ['link_type' => LinkItemInterface::LINK_GENERIC],
+      'settings' => [
+        'link_type' => LinkItemInterface::LINK_GENERIC,
+        'handler' => 'default',
+        'handler_settings' => [],
+      ],
     ])->save();
     FieldStorageConfig::create([
       'field_name' => 'field_test_external',
@@ -55,7 +59,11 @@ class LinkItemTest extends FieldKernelTestBase {
       'entity_type' => 'entity_test',
       'field_name' => 'field_test_external',
       'bundle' => 'entity_test',
-      'settings' => ['link_type' => LinkItemInterface::LINK_EXTERNAL],
+      'settings' => [
+        'link_type' => LinkItemInterface::LINK_EXTERNAL,
+        'handler' => 'default',
+        'handler_settings' => [],
+      ],
     ])->save();
     FieldStorageConfig::create([
       'field_name' => 'field_test_internal',
@@ -66,7 +74,11 @@ class LinkItemTest extends FieldKernelTestBase {
       'entity_type' => 'entity_test',
       'field_name' => 'field_test_internal',
       'bundle' => 'entity_test',
-      'settings' => ['link_type' => LinkItemInterface::LINK_INTERNAL],
+      'settings' => [
+        'link_type' => LinkItemInterface::LINK_INTERNAL,
+        'handler' => 'default',
+        'handler_settings' => [],
+      ],
     ])->save();
   }
 

@@ -19,4 +19,6 @@ default_value_callback: ''
 settings:
   title: 2
   link_type: 17
+  handler: default
+  handler_settings: {  }
 field_type: link

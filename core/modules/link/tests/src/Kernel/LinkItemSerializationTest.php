@@ -52,7 +52,11 @@ class LinkItemSerializationTest extends FieldKernelTestBase {
       'entity_type' => 'entity_test',
       'field_name' => 'field_test',
       'bundle' => 'entity_test',
-      'settings' => ['link_type' => LinkItemInterface::LINK_GENERIC],
+      'settings' => [
+        'link_type' => LinkItemInterface::LINK_GENERIC,
+        'handler' => 'default',
+        'handler_settings' => [],
+      ],
     ])->save();
   }
 

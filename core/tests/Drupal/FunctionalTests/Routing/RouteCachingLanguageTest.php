@@ -93,6 +93,8 @@ class RouteCachingLanguageTest extends BrowserTestBase {
       'settings' => [
         'title' => LinkTitleVisibility::Optional->value,
         'link_type' => LinkItemInterface::LINK_GENERIC,
+        'handler' => 'default',
+        'handler_settings' => [],
       ],
     ]);
     $field->save();

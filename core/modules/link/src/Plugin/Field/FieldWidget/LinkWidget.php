@@ -32,6 +32,8 @@ class LinkWidget extends WidgetBase {
     return [
       'placeholder_url' => '',
       'placeholder_title' => '',
+      'match_operator' => 'CONTAINS',
+      'match_limit' => 10,
     ] + parent::defaultSettings();
   }
 
@@ -231,6 +233,11 @@ class LinkWidget extends WidgetBase {
       // The link widget is doing its own processing in
       // static::getUriAsDisplayableString().
       $element['uri']['#process_default_value'] = FALSE;
+
+      $element['uri']['#selection_handler'] = $this->getFieldSetting('handler');
+      $element['uri']['#selection_settings'] = $this->getFieldSetting('handler_settings');
+      $element['uri']['#selection_settings']['match_limit'] = $this->getSetting('match_limit');
+      $element['uri']['#selection_settings']['match_operator'] = $this->getSetting('match_operator');
     }
 
     // If the field is configured to allow only internal links, add a useful
@@ -362,6 +369,19 @@ class LinkWidget extends WidgetBase {
   }
 
   /**
+   * Returns the options for the match operator.
+   *
+   * @return array
+   *   List of options.
+   */
+  protected function getMatchOperatorOptions(): array {
+    return [
+      'STARTS_WITH' => $this->t('Starts with'),
+      'CONTAINS' => $this->t('Contains'),
+    ];
+  }
+
+  /**
    * Indicates enabled support for link to routes.
    *
    * @return bool
@@ -391,6 +411,22 @@ class LinkWidget extends WidgetBase {
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $elements = parent::settingsForm($form, $form_state);
 
+    if ($this->supportsInternalLinks()) {
+      $elements['match_operator'] = [
+        '#type' => 'radios',
+        '#title' => $this->t('Autocomplete matching'),
+        '#default_value' => $this->getSetting('match_operator'),
+        '#options' => $this->getMatchOperatorOptions(),
+        '#description' => $this->t('Select the method used to collect autocomplete suggestions. Note that <em>Contains</em> can cause performance issues on sites with thousands of entities.'),
+      ];
+      $elements['match_limit'] = [
+        '#type' => 'number',
+        '#title' => $this->t('Number of results'),
+        '#default_value' => $this->getSetting('match_limit'),
+        '#min' => 0,
+        '#description' => $this->t('The number of suggestions that will be listed. Use <em>0</em> to remove the limit.'),
+      ];
+    }
     $elements['placeholder_url'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Placeholder for URL'),
@@ -418,6 +454,12 @@ class LinkWidget extends WidgetBase {
   public function settingsSummary() {
     $summary = [];
 
+    if ($this->supportsInternalLinks()) {
+      $operators = $this->getMatchOperatorOptions();
+      $summary[] = $this->t('Autocomplete matching: @match_operator', ['@match_operator' => $operators[$this->getSetting('match_operator')]]);
+      $size = $this->getSetting('match_limit') ?: $this->t('unlimited');
+      $summary[] = $this->t('Autocomplete suggestion list size: @size', ['@size' => $size]);
+    }
     $placeholder_title = $this->getSetting('placeholder_title');
     $placeholder_url = $this->getSetting('placeholder_url');
     if (empty($placeholder_title) && empty($placeholder_url)) {

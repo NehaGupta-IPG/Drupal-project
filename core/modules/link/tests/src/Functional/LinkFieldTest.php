@@ -97,6 +97,8 @@ class LinkFieldTest extends BrowserTestBase {
       'settings' => [
         'title' => LinkTitleVisibility::Disabled->value,
         'link_type' => LinkItemInterface::LINK_GENERIC,
+        'handler' => 'default',
+        'handler_settings' => [],
       ],
     ]);
     $this->field->save();
@@ -107,6 +109,8 @@ class LinkFieldTest extends BrowserTestBase {
         'type' => 'link_default',
         'settings' => [
           'placeholder_url' => 'http://example.com',
+          'match_limit' => 10,
+          'match_operator' => 'CONTAINS',
         ],
       ])
       ->save();
@@ -301,6 +305,8 @@ class LinkFieldTest extends BrowserTestBase {
       'settings' => [
         'title' => LinkTitleVisibility::Optional->value,
         'link_type' => LinkItemInterface::LINK_GENERIC,
+        'handler' => 'default',
+        'handler_settings' => [],
       ],
     ]);
     $this->field->save();
@@ -312,6 +318,8 @@ class LinkFieldTest extends BrowserTestBase {
         'settings' => [
           'placeholder_url' => 'http://example.com',
           'placeholder_title' => 'Enter the text for this link',
+          'match_limit' => 10,
+          'match_operator' => 'CONTAINS',
         ],
       ])
       ->save();
@@ -518,6 +526,8 @@ class LinkFieldTest extends BrowserTestBase {
       'settings' => [
         'title' => LinkTitleVisibility::Optional->value,
         'link_type' => LinkItemInterface::LINK_GENERIC,
+        'handler' => 'default',
+        'handler_settings' => [],
       ],
     ])->save();
 
@@ -527,6 +537,10 @@ class LinkFieldTest extends BrowserTestBase {
       ->load('entity_test.entity_test.default')
       ->setComponent($field_name, [
         'type' => 'link_default',
+        'settings' => [
+          'match_limit' => 10,
+          'match_operator' => 'CONTAINS',
+        ],
       ])
       ->save();
 
