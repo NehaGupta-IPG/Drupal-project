@@ -18,6 +18,7 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\file\Entity\File;
+use Drupal\image\Plugin\Field\FieldType\ImageItem;
 use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 use Drupal\user\Entity\Role;
 
@@ -179,6 +180,44 @@ class ImageItemTest extends FieldKernelTestBase {
     $imageItem = $entity->image_test_generation->first()->getValue();
     $this->assertEquals('800', $imageItem['width']);
     $this->assertEquals('800', $imageItem['height']);
+  }
+
+  /**
+   * Tests that deleting a file does not break the generation of sample items.
+   */
+  public function testImageGenerationFileDeletion(): void {
+    // Use the image test that only has one extension and will fill up the
+    // max 5 items to be generated.
+    $fieldDefinition = FieldConfig::loadByName('entity_test', 'entity_test', 'image_test');
+    $sampleItems = [];
+    for ($i = 0; $i < 5; $i++) {
+      $sampleItems[] = ImageItem::generateSampleValue($fieldDefinition);
+    }
+
+    // Assert 5 different files.
+    $this->assertCount(5, array_unique(array_map(function ($item) {
+      return $item['target_id'];
+    }, $sampleItems)));
+
+    // Simulate that some other process or functionality, has for some reason
+    // deleted the files during the request.
+    foreach ($sampleItems as $sampleItem) {
+      $file = File::load($sampleItem['target_id']);
+      $file->delete();
+    }
+
+    // Ensure that the sample items can be generated again.
+    $newSampleItems = [];
+    for ($i = 0; $i < 5; $i++) {
+      $newSampleItems[] = ImageItem::generateSampleValue($fieldDefinition);
+    }
+
+    // Assert that the 5 files are all different from the previous ones.
+    $this->assertEmpty(array_intersect(array_map(function ($item) {
+      return $item['target_id'];
+    }, $sampleItems), array_map(function ($item) {
+      return $item['target_id'];
+    }, $newSampleItems)));
   }
 
   /**

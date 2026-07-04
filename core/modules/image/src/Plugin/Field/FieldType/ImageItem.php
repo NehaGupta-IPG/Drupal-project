@@ -368,6 +368,13 @@ class ImageItem extends FileItem {
     }
     $max_resolution = "$max[0]x$max[1]";
 
+    if (isset($images[$extension][$min_resolution][$max_resolution])) {
+      // Filter out images that do not exist in the file system.
+      $images[$extension][$min_resolution][$max_resolution] = array_filter($images[$extension][$min_resolution][$max_resolution], function ($file) {
+        return file_exists($file->getFileUri());
+      });
+    }
+
     // Generate a max of 5 different images.
     if (!isset($images[$extension][$min_resolution][$max_resolution]) || count($images[$extension][$min_resolution][$max_resolution]) <= 5) {
       /** @var \Drupal\Core\File\FileSystemInterface $file_system */
