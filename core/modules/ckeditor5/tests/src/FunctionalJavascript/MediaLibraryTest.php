@@ -168,7 +168,7 @@ class MediaLibraryTest extends WebDriverTestBase {
     $this->pressEditorButton('Insert Media');
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
-    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-modal #media-library-content'));
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#modal-media-library #media-library-content'));
     $this->assertSession()->elementAttributeContains('css', '.ui-dialog', 'class', 'media-library-widget-modal');
 
     // Ensure that the tab order is correct.
@@ -208,7 +208,7 @@ class MediaLibraryTest extends WebDriverTestBase {
     $this->drupalGet('/node/add/blog');
     $this->waitForEditor();
     $this->pressEditorButton('Insert Media');
-    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-modal #media-library-content'));
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#modal-media-library #media-library-content'));
     $assert_session->elementExists('css', '.js-media-library-item')->click();
     $assert_session->elementExists('css', '.ui-dialog-buttonpane')->pressButton('Insert selected');
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', $media_preview_selector, 1000));
@@ -256,7 +256,7 @@ class MediaLibraryTest extends WebDriverTestBase {
       $this->pressEditorButton('Insert Media');
 
       $assert_session = $this->assertSession();
-      $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-modal #media-library-wrapper'));
+      $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#modal-media-library #media-library-wrapper'));
 
       if (empty($allowed_media_types) || count($allowed_media_types) === 2) {
         $menu = $assert_session->elementExists('css', '.js-media-library-menu');
@@ -287,7 +287,7 @@ class MediaLibraryTest extends WebDriverTestBase {
     $this->drupalGet('/node/add/blog');
     $this->waitForEditor();
     $this->pressEditorButton('Insert Media');
-    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-modal #media-library-content'));
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#modal-media-library #media-library-content'));
     $assert_session->elementExists('css', '.js-media-library-item')->click();
     $assert_session->elementExists('css', '.ui-dialog-buttonpane')->pressButton('Insert selected');
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.ck-widget.drupal-media img'));
