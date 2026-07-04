@@ -34,12 +34,12 @@ class Statement extends StatementBase {
    *   Client database connection object.
    * @param string $queryString
    *   The SQL query string.
+   * @param \Drupal\Core\Database\Statement\PlaceholderType $placeholderType
+   *   The type of placeholders in the query string.
    * @param array $driverOpts
    *   (optional) Array of query options.
    * @param bool $rowCountEnabled
    *   (optional) Enables counting the rows affected. Defaults to FALSE.
-   * @param \Drupal\Core\Database\Statement\PlaceholderType $placeholderType
-   *   The type of placeholders in the query string.
    */
   public function __construct(
     Connection $connection,

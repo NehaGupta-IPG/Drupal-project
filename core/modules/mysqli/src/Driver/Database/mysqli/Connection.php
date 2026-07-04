@@ -172,11 +172,11 @@ class Connection extends BaseMySqlConnection {
     try {
       $query = $this->preprocessStatement($query, $options);
       $statement = new Statement($this, $this->connection, $query, $options['placeholder_format'] ?? $this->placeholderFormat(), [], $allow_row_count);
-      return $statement;
     }
     catch (\Exception $e) {
       $this->exceptionHandler()->handleStatementException($e, $query, $options);
     }
+    return $statement;
   }
 
   /**
