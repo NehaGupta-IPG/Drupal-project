@@ -49,7 +49,6 @@ class Statement extends StatementBase {
     protected array $driverOpts = [],
     bool $rowCountEnabled = FALSE,
   ) {
-    assert($placeholderType !== NULL);
     parent::__construct($connection, $clientConnection, $queryString, $rowCountEnabled);
     $this->setFetchMode(FetchAs::Object);
   }
