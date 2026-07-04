@@ -9,6 +9,7 @@ use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseAccessDeniedException;
 use Drupal\Core\Database\DatabaseNotFoundException;
+use Drupal\Core\Database\Statement\PlaceholderType;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 use Drupal\mysql\Driver\Database\mysql\Connection as BaseMySqlConnection;
 
@@ -158,6 +159,13 @@ class Connection extends BaseMySqlConnection {
     catch (\Exception $e) {
       throw new DatabaseNotFoundException($e->getMessage());
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function placeholderFormat(): PlaceholderType {
+    return PlaceholderType::Positional;
   }
 
   /**

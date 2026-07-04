@@ -6,6 +6,7 @@ namespace Drupal\mysqli\Driver\Database\mysqli;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Statement\FetchAs;
+use Drupal\Core\Database\Statement\PlaceholderType;
 use Drupal\Core\Database\Statement\StatementBase;
 
 /**
