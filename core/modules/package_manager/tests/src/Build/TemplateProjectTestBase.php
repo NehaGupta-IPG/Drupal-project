@@ -43,6 +43,13 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
   private string $webRoot;
 
   /**
+   * The project root of the test site, relative to the workspace directory.
+   *
+   * @var string
+   */
+  const string PROJECT_ROOT_RELATIVE = 'project/';
+
+  /**
    * A secondary server instance, to serve XML metadata about available updates.
    *
    * @var \Symfony\Component\Process\Process
@@ -83,7 +90,9 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
    * {@inheritdoc}
    */
   protected function tearDown(): void {
-    $this->metadataServer?->stop();
+    if (isset($this->metadataServer)) {
+      $this->metadataServer?->stop();
+    }
     parent::tearDown();
   }
 
@@ -185,7 +194,7 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
    * {@inheritdoc}
    */
   public function installQuickStart($profile, $working_dir = NULL): void {
-    parent::installQuickStart("$profile --no-ansi", $working_dir ?: $this->webRoot);
+    parent::installQuickStart("$profile --no-ansi", $working_dir ?: self::PROJECT_ROOT_RELATIVE);
 
     // Allow package_manager to be installed, since it is hidden by default.
     // Always allow test modules to be installed in the UI and, for easier
@@ -201,7 +210,7 @@ END;
   /**
    * {@inheritdoc}
    */
-  public function visit($request_uri = '/', $working_dir = NULL): Mink {
+  public function visit(string $request_uri = '/', $working_dir = NULL): Mink {
     return parent::visit($request_uri, $working_dir ?: $this->webRoot);
   }
 
@@ -222,7 +231,7 @@ END;
    * @param string $working_directory
    *   (optional) The Composer working directory. Defaults to 'project'.
    */
-  protected function addRepository(string $name, string $path, $working_directory = 'project'): void {
+  protected function addRepository(string $name, string $path, ?string $working_directory = 'project'): void {
     $this->assertDirectoryExists($path);
 
     $repository = json_encode([
@@ -320,12 +329,12 @@ END;
     // ignores .htaccess files and everything in them, so a Composer-generated
     // .htaccess file won't cause this test to fail.
     if ($template === 'RecommendedProject') {
-      $this->assertFileDoesNotExist("$workspace_dir/project/.htaccess");
+      $this->assertFileDoesNotExist($workspace_dir . '/' . self::PROJECT_ROOT_RELATIVE . '.htaccess');
     }
 
     // Now that we know the project was created successfully, we can set the
     // web root with confidence.
-    $this->webRoot = 'project/' . $data['extra']['drupal-scaffold']['locations']['web-root'];
+    $this->webRoot = self::PROJECT_ROOT_RELATIVE . $data['extra']['drupal-scaffold']['locations']['web-root'];
 
     // Install Drupal.
     $this->installQuickStart('minimal');
@@ -343,7 +352,7 @@ END;
 
     // Ensure Package Manager logs Composer Stager's process output to a file
     // named for the current test.
-    $log = $this->getDrupalRoot() . '/sites/simpletest/browser_output';
+    $log = $this->root . '/sites/simpletest/browser_output';
     @mkdir($log, recursive: TRUE);
     $this->assertDirectoryIsWritable($log);
     $log .= '/' . str_replace('\\', '_', static::class) . '-' . $this->name();
@@ -493,6 +502,12 @@ END;
         // scaffold files, like Drupal core.
         'extra' => $package_info['extra'] ?? [],
       ];
+
+      if ($name === 'drupal/core') {
+        $packages[$name][$version]['bin'] = [
+          'scripts/dr',
+        ];
+      }
     }
     $data = json_encode(['packages' => $packages], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
     file_put_contents($workspace_dir . '/vendor.json', $data);
@@ -617,7 +632,7 @@ END;
     }
     $this->assertNotEmpty($expected_events);
 
-    $log_file = $this->getWorkspaceDirectory() . '/project/' . EventLogSubscriber::LOG_FILE_NAME;
+    $log_file = $this->getWorkspaceDirectory() . '/' . self::PROJECT_ROOT_RELATIVE . EventLogSubscriber::LOG_FILE_NAME;
     $max_wait = time() + $wait;
     do {
       $this->assertFileIsReadable($log_file);
@@ -731,7 +746,7 @@ END;
   /**
    * {@inheritdoc}
    */
-  public function copyCodebase(?\Iterator $iterator = NULL, $working_dir = NULL): void {
+  public function copyCodebase(?\Iterator $iterator = NULL, ?string $working_dir = NULL): void {
     parent::copyCodebase($iterator, $working_dir);
 
     // Create a local Composer repository for all third-party dependencies and
