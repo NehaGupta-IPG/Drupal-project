@@ -8,15 +8,21 @@ use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
 use Drupal\entity_test\Entity\EntityTestBundle;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\jsonapi\Context\FieldResolver;
 use Drupal\Tests\jsonapi\Kernel\JsonapiKernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\jsonapi\Context\FieldResolver
- * @group jsonapi
- * @group #slow
+ * Tests Drupal\jsonapi\Context\FieldResolver.
  *
  * @internal
  */
+#[CoversClass(FieldResolver::class)]
+#[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class FieldResolverTest extends JsonapiKernelTestBase {
 
   /**
@@ -25,7 +31,6 @@ class FieldResolverTest extends JsonapiKernelTestBase {
   protected static $modules = [
     'entity_test',
     'field',
-    'file',
     'jsonapi_test_field_aliasing',
     'jsonapi_test_field_filter_access',
     'serialization',
@@ -86,10 +91,12 @@ class FieldResolverTest extends JsonapiKernelTestBase {
   }
 
   /**
-   * @covers ::resolveInternalEntityQueryPath
-   * @dataProvider resolveInternalIncludePathProvider
+   * Tests resolve internal include path.
+   *
+   * @legacy-covers ::resolveInternalEntityQueryPath
    */
-  public function testResolveInternalIncludePath($expect, $external_path, $entity_type_id = 'entity_test_with_bundle', $bundle = 'bundle1'): void {
+  #[DataProvider('resolveInternalIncludePathProvider')]
+  public function testResolveInternalIncludePath(array $expect, string $external_path, $entity_type_id = 'entity_test_with_bundle', $bundle = 'bundle1'): void {
     $path_parts = explode('.', $external_path);
     $resource_type = $this->resourceTypeRepository->get($entity_type_id, $bundle);
     $this->assertEquals($expect, $this->sut->resolveInternalIncludePath($resource_type, $path_parts));
@@ -98,7 +105,7 @@ class FieldResolverTest extends JsonapiKernelTestBase {
   /**
    * Provides test cases for resolveInternalEntityQueryPath.
    */
-  public static function resolveInternalIncludePathProvider() {
+  public static function resolveInternalIncludePathProvider(): array {
     return [
       'entity reference' => [[['field_test_ref2']], 'field_test_ref2'],
       'entity reference with multi target bundles' => [[['field_test_ref1']], 'field_test_ref1'],
@@ -127,11 +134,9 @@ class FieldResolverTest extends JsonapiKernelTestBase {
    *   The external field path to resolve.
    * @param string $expected_message
    *   (optional) An expected exception message.
-   *
-   * @covers ::resolveInternalIncludePath
-   * @dataProvider resolveInternalIncludePathErrorProvider
    */
-  public function testResolveInternalIncludePathError($entity_type, $bundle, $external_path, $expected_message = ''): void {
+  #[DataProvider('resolveInternalIncludePathErrorProvider')]
+  public function testResolveInternalIncludePathError(string $entity_type, string $bundle, string $external_path, string $expected_message = ''): void {
     $path_parts = explode('.', $external_path);
     $this->expectException(CacheableBadRequestHttpException::class);
     if (!empty($expected_message)) {
@@ -144,7 +149,7 @@ class FieldResolverTest extends JsonapiKernelTestBase {
   /**
    * Provides test cases for ::testResolveInternalIncludePathError.
    */
-  public static function resolveInternalIncludePathErrorProvider() {
+  public static function resolveInternalIncludePathErrorProvider(): array {
     return [
       // Should fail because none of these bundles have these fields.
       ['entity_test_with_bundle', 'bundle1', 'host.fail!!.deep'],
@@ -171,10 +176,10 @@ class FieldResolverTest extends JsonapiKernelTestBase {
   }
 
   /**
-   * @covers ::resolveInternalEntityQueryPath
-   * @dataProvider resolveInternalEntityQueryPathProvider
+   * Tests resolve internal entity query path.
    */
-  public function testResolveInternalEntityQueryPath($expect, $external_path, $entity_type_id = 'entity_test_with_bundle', $bundle = 'bundle1'): void {
+  #[DataProvider('resolveInternalEntityQueryPathProvider')]
+  public function testResolveInternalEntityQueryPath(string $expect, string $external_path, string $entity_type_id = 'entity_test_with_bundle', string $bundle = 'bundle1'): void {
     $resource_type = $this->resourceTypeRepository->get($entity_type_id, $bundle);
     $this->assertEquals($expect, $this->sut->resolveInternalEntityQueryPath($resource_type, $external_path));
   }
@@ -182,7 +187,7 @@ class FieldResolverTest extends JsonapiKernelTestBase {
   /**
    * Provides test cases for ::testResolveInternalEntityQueryPath.
    */
-  public static function resolveInternalEntityQueryPathProvider() {
+  public static function resolveInternalEntityQueryPathProvider(): array {
     return [
       'config entity as base' => [
         'uuid', 'id', 'entity_test_bundle', 'entity_test_bundle',
@@ -308,11 +313,9 @@ class FieldResolverTest extends JsonapiKernelTestBase {
    *   The external field path to resolve.
    * @param string $expected_message
    *   (optional) An expected exception message.
-   *
-   * @covers ::resolveInternalEntityQueryPath
-   * @dataProvider resolveInternalEntityQueryPathErrorProvider
    */
-  public function testResolveInternalEntityQueryPathError($entity_type, $bundle, $external_path, $expected_message = ''): void {
+  #[DataProvider('resolveInternalEntityQueryPathErrorProvider')]
+  public function testResolveInternalEntityQueryPathError(string $entity_type, string $bundle, string $external_path, string $expected_message = ''): void {
     $this->expectException(CacheableBadRequestHttpException::class);
     if (!empty($expected_message)) {
       $this->expectExceptionMessage($expected_message);
@@ -324,7 +327,7 @@ class FieldResolverTest extends JsonapiKernelTestBase {
   /**
    * Provides test cases for ::testResolveInternalEntityQueryPathError.
    */
-  public static function resolveInternalEntityQueryPathErrorProvider() {
+  public static function resolveInternalEntityQueryPathErrorProvider(): array {
     return [
       'nested fields' => [
         'entity_test_with_bundle', 'bundle1', 'none.of.these.exist',

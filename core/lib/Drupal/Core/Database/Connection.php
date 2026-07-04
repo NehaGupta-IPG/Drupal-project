@@ -443,9 +443,7 @@ abstract class Connection {
    */
   public function prepareStatement(string $query, array $options, bool $allow_row_count = FALSE): StatementInterface {
     assert(!isset($options['return']), 'Passing "return" option to prepareStatement() has no effect. See https://www.drupal.org/node/3185520');
-    if (isset($options['fetch']) && is_int($options['fetch'])) {
-      @trigger_error("Passing the 'fetch' key as an integer to \$options in prepareStatement() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
-    }
+    assert(!isset($options['fetch']) || $options['fetch'] instanceof FetchAs || is_string($options['fetch']), 'The "fetch" option passed to prepareStatement() must contain a FetchAs enum case or a string. See https://www.drupal.org/node/3488338');
 
     try {
       $query = $this->preprocessStatement($query, $options);
@@ -664,9 +662,7 @@ abstract class Connection {
     assert(is_string($query), 'The \'$query\' argument to ' . __METHOD__ . '() must be a string');
     assert(!isset($options['return']), 'Passing "return" option to query() has no effect. See https://www.drupal.org/node/3185520');
     assert(!isset($options['target']), 'Passing "target" option to query() has no effect. See https://www.drupal.org/node/2993033');
-    if (isset($options['fetch']) && is_int($options['fetch'])) {
-      @trigger_error("Passing the 'fetch' key as an integer to \$options in query() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
-    }
+    assert(!isset($options['fetch']) || $options['fetch'] instanceof FetchAs || is_string($options['fetch']), 'The "fetch" option passed to query() must contain a FetchAs enum case or a string. See https://www.drupal.org/node/3488338');
 
     // Use default values if not already set.
     $options += $this->defaultOptions();
@@ -1123,13 +1119,13 @@ abstract class Connection {
    * \Drupal\Core\Database\Transaction\TransactionManagerBase, and instantiate
    * it here.
    *
+   * phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn
    * @return \Drupal\Core\Database\Transaction\TransactionManagerInterface
    *   The transaction manager.
    *
    * @throws \LogicException
    *   If the transaction manager is undefined or unavailable.
    */
-  // phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn, Drupal.Commenting.FunctionComment.Missing
   protected function driverTransactionManager(): TransactionManagerInterface {
     throw new \LogicException('The database driver has no TransactionManager implementation');
   }
@@ -1283,7 +1279,7 @@ abstract class Connection {
    *   (optional) Provides a data type hint for drivers that have alternate
    *   quoting styles. Defaults to \PDO::PARAM_STR.
    *
-   * @return string|bool
+   * @return string|false
    *   A quoted string that is theoretically safe to pass into an SQL statement.
    *   Returns FALSE if the driver does not support quoting in this way.
    *
@@ -1325,9 +1321,6 @@ abstract class Connection {
    *
    * @param string $url
    *   The URL.
-   * @param string $root
-   *   The root directory of the Drupal installation. Some database drivers,
-   *   like for example SQLite, need this information.
    *
    * @return array
    *   The connection options.
@@ -1342,7 +1335,7 @@ abstract class Connection {
    *
    * @see \Drupal\Core\Database\Database::convertDbUrlToConnectionInfo()
    */
-  public static function createConnectionOptionsFromUrl($url, $root) {
+  public static function createConnectionOptionsFromUrl($url) {
     $url_components = parse_url($url);
     if (!isset($url_components['scheme'], $url_components['host'], $url_components['path'])) {
       throw new \InvalidArgumentException("The database connection URL '$url' is invalid. The minimum requirement is: 'driver://host/database'");
@@ -1452,7 +1445,7 @@ abstract class Connection {
     // The namespace for Drupal modules is Drupal\MODULE_NAME, and the module
     // name must be all lowercase. Second-level namespaces containing uppercase
     // letters (e.g., "Core", "Component", "Driver") are not modules.
-    // @see \Drupal\Core\DrupalKernel::getModuleNamespacesPsr4()
+    // @see \Drupal\Core\DrupalKernel::getExtensionNamespacesPsr4()
     // @see https://www.drupal.org/docs/8/creating-custom-modules/naming-and-placing-your-drupal-8-module#s-name-your-module
     return ($first === 'Drupal' && strtolower($second) === $second) ? $second : 'core';
   }

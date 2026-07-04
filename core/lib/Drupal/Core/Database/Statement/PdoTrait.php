@@ -10,9 +10,32 @@ namespace Drupal\Core\Database\Statement;
 trait PdoTrait {
 
   /**
+   * Map FETCH_* modes to their literal for inclusion in messages.
+   *
+   * @see https://github.com/php/php-src/blob/master/ext/pdo/php_pdo_driver.h#L65-L80
+   */
+  protected array $fetchModeLiterals = [
+    \PDO::FETCH_DEFAULT => 'FETCH_DEFAULT',
+    \PDO::FETCH_LAZY => 'FETCH_LAZY',
+    \PDO::FETCH_ASSOC => 'FETCH_ASSOC',
+    \PDO::FETCH_NUM => 'FETCH_NUM',
+    \PDO::FETCH_BOTH => 'FETCH_BOTH',
+    \PDO::FETCH_OBJ => 'FETCH_OBJ',
+    \PDO::FETCH_BOUND => 'FETCH_BOUND',
+    \PDO::FETCH_COLUMN => 'FETCH_COLUMN',
+    \PDO::FETCH_CLASS => 'FETCH_CLASS',
+    \PDO::FETCH_INTO => 'FETCH_INTO',
+    \PDO::FETCH_FUNC => 'FETCH_FUNC',
+    \PDO::FETCH_NAMED => 'FETCH_NAMED',
+    \PDO::FETCH_KEY_PAIR => 'FETCH_KEY_PAIR',
+    \PDO::FETCH_CLASS | \PDO::FETCH_CLASSTYPE => 'FETCH_CLASS | FETCH_CLASSTYPE',
+    \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE => 'FETCH_CLASS | FETCH_PROPS_LATE',
+  ];
+
+  /**
    * Converts a FetchAs mode to a \PDO::FETCH_* constant value.
    *
-   * @param \Drupal\Core\Database\FetchAs $mode
+   * @param \Drupal\Core\Database\Statement\FetchAs $mode
    *   The FetchAs mode.
    *
    * @return int
@@ -34,7 +57,7 @@ trait PdoTrait {
    * @param int $mode
    *   The \PDO::FETCH_* constant value.
    *
-   * @return \Drupal\Core\Database\FetchAs
+   * @return \Drupal\Core\Database\Statement\FetchAs
    *   A FetchAs mode.
    */
   protected function pdoToFetchAs(int $mode): FetchAs {
@@ -64,7 +87,7 @@ trait PdoTrait {
   /**
    * Sets the default fetch mode for the PDO statement.
    *
-   * @param \Drupal\Core\Database\FetchAs $mode
+   * @param \Drupal\Core\Database\Statement\FetchAs $mode
    *   One of the cases of the FetchAs enum.
    * @param int|class-string|null $columnOrClass
    *   If $mode is FetchAs::Column, the index of the column to fetch.
@@ -112,7 +135,7 @@ trait PdoTrait {
   /**
    * Fetches the next row from the PDO statement.
    *
-   * @param \Drupal\Core\Database\FetchAs|null $mode
+   * @param \Drupal\Core\Database\Statement\FetchAs|null $mode
    *   (Optional) one of the cases of the FetchAs enum. If not specified,
    *   defaults to what is specified by setFetchMode().
    * @param int|null $cursorOrientation
@@ -169,7 +192,7 @@ trait PdoTrait {
   /**
    * Returns an array containing all of the result set rows.
    *
-   * @param \Drupal\Core\Database\FetchAs|null $mode
+   * @param \Drupal\Core\Database\Statement\FetchAs|null $mode
    *   (Optional) one of the cases of the FetchAs enum. If not specified,
    *   defaults to what is specified by setFetchMode().
    * @param int|class-string|null $columnOrClass
@@ -182,7 +205,6 @@ trait PdoTrait {
    * @return array<array<scalar|null>|object|scalar|null>
    *   An array of results.
    */
-  // phpcs:ignore Drupal.Commenting.FunctionComment.InvalidReturn, Drupal.Commenting.FunctionComment.Missing
   protected function clientFetchAll(?FetchAs $mode = NULL, int|string|null $columnOrClass = NULL, array|null $constructorArguments = NULL): array {
     return match ($mode) {
       FetchAs::Column => $this->getClientStatement()->fetchAll(

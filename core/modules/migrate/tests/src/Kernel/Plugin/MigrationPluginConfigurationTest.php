@@ -5,13 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\migrate\Kernel\Plugin;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\migrate\Plugin\MigratePluginManager;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the migration plugin manager.
- *
- * @coversDefaultClass \Drupal\migrate\Plugin\MigratePluginManager
- * @group migrate
  */
+#[CoversClass(MigratePluginManager::class)]
+#[Group('migrate')]
+#[RunTestsInSeparateProcesses]
 class MigrationPluginConfigurationTest extends KernelTestBase {
 
   /**
@@ -19,18 +24,15 @@ class MigrationPluginConfigurationTest extends KernelTestBase {
    */
   protected static $modules = [
     'migrate',
-    'migrate_drupal',
     // Test with a simple migration.
     'migrate_plugin_config_test',
-    'locale',
   ];
 
   /**
    * Tests merging configuration into a plugin through the plugin manager.
-   *
-   * @dataProvider mergeProvider
    */
-  public function testConfigurationMerge($id, $configuration, $expected): void {
+  #[DataProvider('mergeProvider')]
+  public function testConfigurationMerge(string $id, array $configuration, array $expected): void {
     /** @var \Drupal\migrate\Plugin\MigrationInterface $migration */
     $migration = $this->container->get('plugin.manager.migration')
       ->createInstance($id, $configuration);
@@ -41,7 +43,7 @@ class MigrationPluginConfigurationTest extends KernelTestBase {
   /**
    * Provide configuration data for testing.
    */
-  public static function mergeProvider() {
+  public static function mergeProvider(): array {
     return [
       // Tests adding new configuration to a migration.
       [
@@ -78,25 +80,25 @@ class MigrationPluginConfigurationTest extends KernelTestBase {
       ],
       // New configuration.
       [
-        'locale_settings',
+        'has_source_config_migration',
         [
           'source' => [
-            'plugin' => 'variable',
+            'plugin' => 'simple_source',
             'variables' => [
-              'locale_cache_strings',
-              'locale_js_directory',
+              'foo',
+              'bar',
             ],
-            'source_module' => 'locale',
+            'source_module' => 'custom',
           ],
         ],
         // Expected final source and process configuration.
         [
-          'plugin' => 'variable',
+          'plugin' => 'simple_source',
           'variables' => [
-            'locale_cache_strings',
-            'locale_js_directory',
+            'foo',
+            'bar',
           ],
-          'source_module' => 'locale',
+          'source_module' => 'custom',
         ],
       ],
     ];

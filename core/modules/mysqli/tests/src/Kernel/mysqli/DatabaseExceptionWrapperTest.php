@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\mysqli\Kernel\mysqli;
 
 use Drupal\Tests\mysql\Kernel\mysql\DatabaseExceptionWrapperTest as BaseMySqlTest;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests exceptions thrown by queries.
- *
- * @group Database
  */
+#[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class DatabaseExceptionWrapperTest extends BaseMySqlTest {
 
   /**

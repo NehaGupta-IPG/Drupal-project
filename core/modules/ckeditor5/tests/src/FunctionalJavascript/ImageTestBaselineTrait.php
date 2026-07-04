@@ -186,10 +186,10 @@ trait ImageTestBaselineTrait {
       $link_image_button->press();
       // Assert structure of link form balloon.
       $balloon = $this->assertVisibleBalloon('.ck-link-form');
-      $url_input = $balloon->find('css', '.ck-labeled-field-view__input-wrapper .ck-input-text');
-      // Fill in link form balloon's <input> and hit "Save".
+      $url_input = $balloon->find('css', '.ck-labeled-field-view__input-wrapper .ck-input-text[inputmode=url]');
+      // Fill in link form balloon's <input> and hit "Insert".
       $url_input->setValue('http://www.drupal.org/association');
-      $balloon->pressButton('Save');
+      $balloon->pressButton('Insert');
 
       // Assert the "editingDowncast" HTML after making changes. First assert
       // the link exists, then assert the expected DOM structure in detail.
@@ -229,9 +229,10 @@ trait ImageTestBaselineTrait {
       $page->pressButton('Save');
 
       // Assert the HTML the end user sees.
-      $assert_session->elementExists('css', $unrestricted
+      $this->assertNotEmpty($assert_session->waitForElement('css', $unrestricted
         ? 'a[href="http://www.drupal.org/association"].trusted img[src*="' . $src . '"]'
-        : 'a[href="http://www.drupal.org/association"] img[src*="' . $src . '"]');
+        : 'a[href="http://www.drupal.org/association"] img[src*="' . $src . '"]'
+      ));
 
       // Go back to edit the now *linked* <drupal-media>. Everything from this
       // point onwards is effectively testing "upcasting" and proving there is

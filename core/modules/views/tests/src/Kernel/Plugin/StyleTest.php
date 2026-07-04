@@ -6,19 +6,21 @@ namespace Drupal\Tests\views\Kernel\Plugin;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
-use Drupal\views\Views;
-use Drupal\views_test_data\Plugin\views\row\RowTest;
 use Drupal\views\Plugin\views\row\Fields;
 use Drupal\views\ResultRow;
+use Drupal\views\Views;
+use Drupal\views_test_data\Plugin\views\row\RowTest;
 use Drupal\views_test_data\Plugin\views\style\StyleTest as StyleTestPlugin;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests general style functionality.
  *
- * @group views
- *
  * @see \Drupal\views_test_data\Plugin\views\style\StyleTest.
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class StyleTest extends ViewsKernelTestBase {
 
   /**
@@ -314,7 +316,7 @@ class StyleTest extends ViewsKernelTestBase {
    * @return \SimpleXMLElement|null
    *   The HTML DOM.
    */
-  protected function getHtmlDom($output) {
+  protected function getHtmlDom($output): ?\SimpleXMLElement {
     $html_dom = Html::load($output);
     if ($html_dom) {
       // It's much easier to work with simplexml than DOM, luckily enough

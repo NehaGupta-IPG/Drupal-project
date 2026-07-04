@@ -14,23 +14,32 @@ use Drupal\Tests\UnitTestCase;
 /**
  * Base test class for entity migration destination functionality.
  */
-class EntityTestBase extends UnitTestCase {
+abstract class EntityTestBase extends UnitTestCase {
 
   /**
+   * The migration entity.
+   *
    * @var \Drupal\migrate\Plugin\MigrationInterface
    */
   protected $migration;
 
   /**
+   * The entity storage.
+   *
    * @var \Drupal\Core\Entity\EntityStorageInterface
    */
   protected $storage;
 
   /**
+   * The entity type manager.
+   *
    * @var \Drupal\Core\Entity\EntityTypeInterface
    */
   protected $entityType;
+
   /**
+   * The entity field manager service.
+   *
    * @var \Drupal\Core\Entity\EntityFieldManagerInterface
    */
   protected $entityFieldManager;
@@ -62,21 +71,21 @@ class BaseFieldDefinitionTest extends BaseFieldDefinition {
   /**
    * {@inheritdoc}
    */
-  public static function create($type) {
+  public static function create($type): static {
     return new static([]);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getSettings() {
+  public function getSettings(): array {
     return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getType() {
+  public function getType(): string {
     return 'integer';
   }
 

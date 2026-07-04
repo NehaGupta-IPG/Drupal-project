@@ -6,15 +6,19 @@ namespace Drupal\Tests\Core\EventSubscriber;
 
 use Drupal\Core\EventSubscriber\SpecialAttributesRouteSubscriber;
 use Drupal\Core\Routing\RouteBuildEvent;
-use Drupal\Tests\UnitTestCase;
 use Drupal\Core\Routing\RouteObjectInterface;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * @coversDefaultClass \Drupal\Core\EventSubscriber\SpecialAttributesRouteSubscriber
- * @group EventSubscriber
+ * Tests Drupal\Core\EventSubscriber\SpecialAttributesRouteSubscriber.
  */
+#[CoversClass(SpecialAttributesRouteSubscriber::class)]
+#[Group('EventSubscriber')]
 class SpecialAttributesRouteSubscriberTest extends UnitTestCase {
 
   /**
@@ -23,7 +27,7 @@ class SpecialAttributesRouteSubscriberTest extends UnitTestCase {
    * @return array
    *   An array of invalid routes.
    */
-  public static function providerTestOnRouteBuildingInvalidVariables() {
+  public static function providerTestOnRouteBuildingInvalidVariables(): array {
     // Build an array of mock route objects based on paths.
     $routes = [];
     $paths = [
@@ -49,7 +53,7 @@ class SpecialAttributesRouteSubscriberTest extends UnitTestCase {
    * @return array
    *   An array of valid routes.
    */
-  public static function providerTestOnRouteBuildingValidVariables() {
+  public static function providerTestOnRouteBuildingValidVariables(): array {
     // Build an array of mock route objects based on paths.
     $routes = [];
     $paths = [
@@ -72,10 +76,9 @@ class SpecialAttributesRouteSubscriberTest extends UnitTestCase {
    * @param \Symfony\Component\Routing\Route $route
    *   The route to check.
    *
-   * @dataProvider providerTestOnRouteBuildingValidVariables
-   *
-   * @covers ::onAlterRoutes
+   * @legacy-covers ::onAlterRoutes
    */
+  #[DataProvider('providerTestOnRouteBuildingValidVariables')]
   public function testOnRouteBuildingValidVariables(Route $route): void {
     $route_collection = new RouteCollection();
     $route_collection->add('test', $route);
@@ -91,9 +94,9 @@ class SpecialAttributesRouteSubscriberTest extends UnitTestCase {
    * @param \Symfony\Component\Routing\Route $route
    *   The route to check.
    *
-   * @dataProvider providerTestOnRouteBuildingInvalidVariables
-   * @covers ::onAlterRoutes
+   * @legacy-covers ::onAlterRoutes
    */
+  #[DataProvider('providerTestOnRouteBuildingInvalidVariables')]
   public function testOnRouteBuildingInvalidVariables(Route $route): void {
     $route_collection = new RouteCollection();
     $route_collection->add('test', $route);

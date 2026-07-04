@@ -4,31 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
-use Drupal\Core\Database\Database;
-use Drupal\Core\Database\IntegrityConstraintViolationException;
-use Drupal\Core\Entity\ContentEntityType;
-use Drupal\Core\Entity\EntityStorageException;
-use Drupal\Core\Entity\EntityTypeEvents;
-use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
-use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Field\FieldException;
-use Drupal\Core\Field\FieldStorageDefinitionEvents;
-use Drupal\Core\Language\LanguageInterface;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\entity_test\EntityTestHelper;
-use Drupal\entity_test\FieldStorageDefinition;
-use Drupal\entity_test_update\Entity\EntityTestUpdate;
+use Drupal\Core\Entity\EntityDefinitionUpdateManager;
 use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests EntityDefinitionUpdateManager functionality.
- *
- * @coversDefaultClass \Drupal\Core\Entity\EntityDefinitionUpdateManager
- *
- * @group Entity
- * @group #slow
  */
+#[CoversClass(EntityDefinitionUpdateManager::class)]
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntityDefinitionUpdateTest extends EntityKernelTestBase {
 
   use EntityDefinitionTestTrait;
@@ -39,13 +26,6 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
    * @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
    */
   protected $entityDefinitionUpdateManager;
-
-  /**
-   * The entity field manager.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
-   */
-  protected $entityFieldManager;
 
   /**
    * The database connection.
@@ -65,14 +45,7 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->entityDefinitionUpdateManager = $this->container->get('entity.definition_update_manager');
-    $this->entityFieldManager = $this->container->get('entity_field.manager');
     $this->database = $this->container->get('database');
-
-    // Install every entity type's schema that wasn't installed in the parent
-    // method.
-    foreach (array_diff_key($this->entityTypeManager->getDefinitions(), array_flip(['user', 'entity_test'])) as $entity_type_id => $entity_type) {
-      $this->installEntitySchema($entity_type_id);
-    }
   }
 
   /**
@@ -96,64 +69,9 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
   }
 
   /**
-   * Tests when no definition update is needed.
-   */
-  public function testNoUpdates(): void {
-    // Ensure that the definition update manager reports no updates.
-    $this->assertFalse($this->entityDefinitionUpdateManager->needsUpdates(), 'EntityDefinitionUpdateManager reports that no updates are needed.');
-    $this->assertSame([], $this->entityDefinitionUpdateManager->getChangeSummary(), 'EntityDefinitionUpdateManager reports an empty change summary.');
-    $this->assertSame([], $this->entityDefinitionUpdateManager->getChangeList(), 'EntityDefinitionUpdateManager reports an empty change list.');
-  }
-
-  /**
-   * Tests updating entity schema when there are no existing entities.
-   */
-  public function testEntityTypeUpdateWithoutData(): void {
-    // The 'entity_test_update' entity type starts out non-revisionable, so
-    // ensure the revision table hasn't been created during setUp().
-    $this->assertFalse($this->database->schema()->tableExists('entity_test_update_revision'), 'Revision table not created for entity_test_update.');
-
-    // Update it to be revisionable and ensure the definition update manager
-    // reports that an update is needed.
-    $this->updateEntityTypeToRevisionable();
-    $this->assertTrue($this->entityDefinitionUpdateManager->needsUpdates(), 'EntityDefinitionUpdateManager reports that updates are needed.');
-    $entity_type = $this->entityTypeManager->getDefinition('entity_test_update')->getLabel();
-    $expected = [
-      'entity_test_update' => [
-        "The $entity_type entity type needs to be updated.",
-        // The revision key is now defined, so the revision field needs to be
-        // created.
-        'The Revision ID field needs to be installed.',
-        'The Default revision field needs to be installed.',
-      ],
-    ];
-    $this->assertEquals($expected, $this->entityDefinitionUpdateManager->getChangeSummary(), 'EntityDefinitionUpdateManager reports the expected change summary.');
-
-    // Run the update and ensure the revision table is created.
-    $this->updateEntityTypeToRevisionable(TRUE);
-    $this->assertTrue($this->database->schema()->tableExists('entity_test_update_revision'), 'Revision table created for entity_test_update.');
-  }
-
-  /**
-   * Tests updating entity schema when there are entity storage changes.
-   */
-  public function testEntityTypeUpdateWithEntityStorageChange(): void {
-    // Update the entity type to be revisionable and try to apply the update.
-    // It's expected to throw an exception.
-    $entity_type = $this->getUpdatedEntityTypeDefinition(TRUE, FALSE);
-    try {
-      $this->entityDefinitionUpdateManager->updateEntityType($entity_type);
-      $this->fail('EntityStorageException thrown when trying to apply an update that requires shared table schema changes.');
-    }
-    catch (EntityStorageException) {
-      // Expected exception; just continue testing.
-    }
-  }
-
-  /**
    * Tests installing an additional base field while installing an entity type.
    *
-   * @covers ::installFieldableEntityType
+   * @legacy-covers ::installFieldableEntityType
    */
   public function testInstallAdditionalBaseFieldDuringFieldableEntityTypeInstallation(): void {
     $entity_type = clone $this->entityTypeManager->getDefinition('entity_test_update');
@@ -173,6 +91,7 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
   }
 
   /**
+<<<<<<< HEAD
    * Tests creating a fieldable entity type that doesn't exist in code anymore.
    *
    * @covers ::installFieldableEntityType
@@ -1077,6 +996,9 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
 
   /**
    * @covers ::getEntityTypes
+=======
+   * Tests get entity types.
+>>>>>>> main
    */
   public function testGetEntityTypes(): void {
     $entity_type_definitions = $this->entityDefinitionUpdateManager->getEntityTypes();

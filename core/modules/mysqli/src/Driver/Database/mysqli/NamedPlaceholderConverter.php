@@ -13,24 +13,42 @@ namespace Drupal\mysqli\Driver\Database\mysqli;
  * and a simplified copy of the parser implementation done by the Doctrine DBAL
  * project.
  *
- * @internal
+ * This class is a near-copy of Doctrine\DBAL\SQL\Parser, which is part of the
+ * Doctrine project: <http://www.doctrine-project.org>. It was copied from
+ * version 4.0.0.
  *
- * @see https://github.com/doctrine/dbal/blob/3.6.x/src/SQL/Parser.php
+ * Original copyright:
+ *
+ * Copyright (c) 2006-2018 Doctrine Project
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * @see https://github.com/doctrine/dbal/blob/4.0.0/src/SQL/Parser.php
+ *
+ * @internal
  */
 final class NamedPlaceholderConverter {
   /**
    * A list of regex patterns for parsing.
    */
-  private const SPECIAL_CHARS = ':\?\'"`\\[\\-\\/';
-  private const BACKTICK_IDENTIFIER = '`[^`]*`';
-  private const BRACKET_IDENTIFIER = '(?<!\b(?i:ARRAY))\[(?:[^\]])*\]';
-  private const MULTICHAR = ':{2,}';
-  private const NAMED_PARAMETER = ':[a-zA-Z0-9_]+';
-  private const POSITIONAL_PARAMETER = '(?<!\\?)\\?(?!\\?)';
-  private const ONE_LINE_COMMENT = '--[^\r\n]*';
-  private const MULTI_LINE_COMMENT = '/\*([^*]+|\*+[^/*])*\**\*/';
-  private const SPECIAL = '[' . self::SPECIAL_CHARS . ']';
-  private const OTHER = '[^' . self::SPECIAL_CHARS . ']+';
+  private const string SPECIAL_CHARS = ':\?\'"`\\[\\-\\/';
+  private const string BACKTICK_IDENTIFIER = '`[^`]*`';
+  private const string BRACKET_IDENTIFIER = '(?<!\b(?i:ARRAY))\[(?:[^\]])*\]';
+  private const string MULTICHAR = ':{2,}';
+  private const string NAMED_PARAMETER = ':[a-zA-Z0-9_]+';
+  private const string POSITIONAL_PARAMETER = '(?<!\\?)\\?(?!\\?)';
+  private const string ONE_LINE_COMMENT = '--[^\r\n]*';
+  private const string MULTI_LINE_COMMENT = '/\*([^*]+|\*+[^/*])*\**\*/';
+  private const string SPECIAL = '[' . self::SPECIAL_CHARS . ']';
+  private const string OTHER = '[^' . self::SPECIAL_CHARS . ']+';
 
   /**
    * The combined regex pattern for parsing.
@@ -41,6 +59,8 @@ final class NamedPlaceholderConverter {
    * The list of original named arguments.
    *
    * The initial placeholder colon is removed.
+   *
+   * @var array<string|int, mixed>
    */
   private array $originalParameters = [];
 
@@ -55,14 +75,14 @@ final class NamedPlaceholderConverter {
   /**
    * The converted SQL statement in its parts.
    *
-   * @var string[]
+   * @var list<string>
    */
   private array $convertedSQL = [];
 
   /**
    * The list of converted arguments.
    *
-   * @var mixed[]
+   * @var list<mixed>
    */
   private array $convertedParameters = [];
 
@@ -83,15 +103,21 @@ final class NamedPlaceholderConverter {
   /**
    * Parses an SQL statement with named placeholders.
    *
-   * This methods explodes the SQL statement in parts that can be reassembled
+   * This method explodes the SQL statement in parts that can be reassembled
    * into a string with positional placeholders.
    *
    * @param string $sql
    *   The SQL statement with named placeholders.
-   * @param mixed[] $args
+   * @param array<string|int, mixed> $args
    *   The statement arguments.
    */
   public function parse(string $sql, array $args): void {
+    // Reset the object state.
+    $this->originalParameters = [];
+    $this->originalParameterIndex = 0;
+    $this->convertedSQL = [];
+    $this->convertedParameters = [];
+
     foreach ($args as $key => $value) {
       if (is_int($key)) {
         // Positional placeholder; edge case.
@@ -103,9 +129,6 @@ final class NamedPlaceholderConverter {
         $this->originalParameters[$parameter] = $value;
       }
     }
-    $this->originalParameterIndex = 0;
-    $this->convertedSQL = [];
-    $this->convertedParameters = [];
 
     /** @var array<string,callable> $patterns */
     $patterns = [
@@ -143,7 +166,7 @@ final class NamedPlaceholderConverter {
   }
 
   /**
-   * Helper to return a regex pattern from a delimiter character..
+   * Helper to return a regex pattern from a delimiter character.
    *
    * @param string $delimiter
    *   A delimiter character.
@@ -217,7 +240,7 @@ final class NamedPlaceholderConverter {
   /**
    * Returns the array of arguments for use with positional placeholders.
    *
-   * @return mixed[]
+   * @return list<mixed>
    *   The array of arguments for use with positional placeholders.
    */
   public function getConvertedParameters(): array {

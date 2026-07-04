@@ -12,12 +12,14 @@ use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests for the administrative UI.
- *
- * @group entity_reference
  */
+#[Group('entity_reference')]
+#[RunTestsInSeparateProcesses]
 class EntityReferenceAdminTest extends BrowserTestBase {
 
   use FieldUiTestTrait;
@@ -192,7 +194,7 @@ class EntityReferenceAdminTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('Multiple content items match this reference;');
     $this->assertSession()->pageTextContains($node1->getTitle() . ' (' . $node1->id() . ')');
     $this->assertSession()->pageTextContains($node2->getTitle() . ' (' . $node2->id() . ')');
-    $this->assertSession()->pageTextContains('Specify the one you want by appending the id in parentheses, like "' . $node2->getTitle() . ' (' . $node2->id() . ')' . '".');
+    $this->assertSession()->pageTextContains('Specify the one you want by appending the id in parentheses, like "' . $node2->getTitle() . ' (' . $node2->id() . ')".');
 
     $edit = [
       'title[0][value]' => 'Test',
@@ -277,7 +279,7 @@ class EntityReferenceAdminTest extends BrowserTestBase {
     $date_format_field_name = $this->createEntityReferenceField('date_format');
 
     // Display all newly created Entity Reference configuration.
-    $this->drupalGet('admin/structure/types/manage/' . $this->type . '/display');
+    $this->drupalGet('admin/structure/types/manage/' . $this->type . '/display/default');
 
     // Check for Taxonomy Term select box values.
     // Test if Taxonomy Term Entity Reference Field has the correct formatters.
@@ -391,7 +393,7 @@ class EntityReferenceAdminTest extends BrowserTestBase {
    * @return string
    *   Returns the generated field name
    */
-  protected function createEntityReferenceField($target_type, $bundles = []) {
+  protected function createEntityReferenceField($target_type, $bundles = []): string {
     // Generates a bundle path for the newly created content type.
     $bundle_path = 'admin/structure/types/manage/' . $this->type;
 
@@ -422,7 +424,7 @@ class EntityReferenceAdminTest extends BrowserTestBase {
    */
   protected function assertFieldSelectOptions(string $name, array $expected_options): void {
     $options = $this->assertSession()->selectExists($name)->findAll('xpath', 'option');
-    array_walk($options, function (NodeElement &$option) {
+    array_walk($options, function (NodeElement &$option): void {
       $option = $option->getValue();
     });
     $this->assertEqualsCanonicalizing($expected_options, $options);

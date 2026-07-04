@@ -5,38 +5,41 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Entity;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Entity\EntityBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Link;
+use Drupal\Core\Utility\LinkGeneratorInterface;
 use Drupal\Tests\Core\Config\Entity\StubConfigEntity;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
- * @coversDefaultClass \Drupal\Core\Entity\EntityBase
- * @group Entity
+ * Tests Drupal\Core\Entity\EntityBase.
  */
+#[CoversClass(EntityBase::class)]
+#[Group('Entity')]
 class EntityLinkTest extends UnitTestCase {
 
   /**
    * The mocked entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface&MockObject $entityTypeManager;
 
   /**
    * The tested link generator.
-   *
-   * @var \Drupal\Core\Utility\LinkGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $linkGenerator;
+  protected LinkGeneratorInterface&Stub $linkGenerator;
 
   /**
    * The mocked language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $languageManager;
+  protected LanguageManagerInterface&MockObject $languageManager;
 
   /**
    * {@inheritdoc}
@@ -45,7 +48,7 @@ class EntityLinkTest extends UnitTestCase {
     parent::setUp();
 
     $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
-    $this->linkGenerator = $this->createMock('Drupal\Core\Utility\LinkGeneratorInterface');
+    $this->linkGenerator = $this->createStub(LinkGeneratorInterface::class);
     $this->languageManager = $this->createMock('Drupal\Core\Language\LanguageManagerInterface');
 
     $container = new ContainerBuilder();
@@ -57,15 +60,12 @@ class EntityLinkTest extends UnitTestCase {
 
   /**
    * Tests for the EntityBase::toLink() method.
-   *
-   * @covers ::toLink
-   *
-   * @dataProvider providerTestLink
    */
-  public function testToLink($entity_label, $link_text, $expected_text, $link_rel = 'canonical', array $link_options = []): void {
+  #[DataProvider('providerTestLink')]
+  public function testToLink($entity_label, $link_text, $expected_text, string $link_rel = 'canonical', array $link_options = []): void {
     $language = new Language(['id' => 'es']);
     $link_options += ['language' => $language];
-    $this->languageManager->expects($this->any())
+    $this->languageManager->expects($this->atLeastOnce())
       ->method('getLanguage')
       ->with('es')
       ->willReturn($language);
@@ -82,7 +82,7 @@ class EntityLinkTest extends UnitTestCase {
     $entity_type->expects($this->once())
       ->method('getLinkTemplates')
       ->willReturn($route_name_map);
-    $entity_type->expects($this->any())
+    $entity_type->expects($this->atLeastOnce())
       ->method('getKey')
       ->willReturnMap([
         ['label', 'label'],
@@ -90,7 +90,7 @@ class EntityLinkTest extends UnitTestCase {
       ]);
 
     $this->entityTypeManager
-      ->expects($this->any())
+      ->expects($this->atLeastOnce())
       ->method('getDefinition')
       ->with($entity_type_id)
       ->willReturn($entity_type);
@@ -114,7 +114,7 @@ class EntityLinkTest extends UnitTestCase {
   /**
    * Provides test data for testLink().
    */
-  public static function providerTestLink() {
+  public static function providerTestLink(): array {
     $data = [];
     $data[] = [
       'some_entity_label',

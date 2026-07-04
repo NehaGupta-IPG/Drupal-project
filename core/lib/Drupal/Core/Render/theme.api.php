@@ -5,6 +5,8 @@
  * Hooks and documentation related to the theme and render system.
  */
 
+use Drupal\Core\Extension\ThemeSettingsProvider;
+
 /**
  * @defgroup themeable Theme system overview
  * @{
@@ -25,17 +27,17 @@
  * arrays and rendering.
  *
  * @section sec_twig_theme Twig Templating Engine
- * Drupal 8 uses the templating engine Twig. Twig offers developers a fast,
- * secure, and flexible method for building templates for Drupal 8 sites. Twig
+ * Drupal uses the templating engine Twig. Twig offers developers a fast,
+ * secure, and flexible method for building templates for Drupal sites. Twig
  * also offers substantial usability improvements over PHPTemplate, and does
  * not require front-end developers to know PHP to build and manipulate Drupal
- * 8 themes.
+ * themes.
  *
- * For further information on theming in Drupal 8 see
- * https://www.drupal.org/docs/8/theming
+ * For further information on theming in Drupal see
+ * https://www.drupal.org/docs/develop/theming-drupal
  *
  * For further Twig documentation see
- * https://twig.symfony.com/doc/1.x/templates.html
+ * https://twig.symfony.com/doc/3.x/templates.html
  *
  * @section sec_theme_hooks Theme Hooks
  * The theme system is invoked in \Drupal\Core\Render\Renderer::doRender() by
@@ -47,7 +49,8 @@
  * implementing hook_theme() also need to provide a default implementation for
  * each of their theme hooks in a Twig file, and they may also provide
  * preprocessing functions. For example, the core Search module defines a theme
- * hook for a search result item in search_theme():
+ * hook for a search result item in
+ * \Drupal\search\Hook\SearchThemeHooks::theme():
  * @code
  * return [
  *   'search_result' => [
@@ -55,15 +58,15 @@
  *       'result' => NULL,
  *       'plugin_id' => NULL,
  *     ],
- *    'file' => 'search.pages.inc',
+ *    'initial preprocess' => static::class . ':preprocessSearchResult',
  *   ],
  * ];
  * @endcode
  * Given this definition, the template file with the default implementation is
  * search-result.html.twig, which can be found in the
  * core/modules/search/templates directory, and the variables for rendering are
- * the search result and the plugin ID. In addition, there is a function
- * template_preprocess_search_result(), located in file search.pages.inc, which
+ * the search result and the plugin ID. In addition, there is the initial
+ * preprocess method preprocessSearchResult in the same class, which
  * preprocesses the information from the input variables so that it can be
  * rendered by the Twig template; the processed variables that the Twig template
  * receives are documented in the header of the default Twig template file.
@@ -107,8 +110,9 @@
  * the data is preprocessed, before it is passed to the theme template:
  * - ThemeManager::addDefaultTemplateVariables(&$variables): Creates a default
  *   set of variables for all theme hooks. Provided by Drupal Core.
- * - template_preprocess_HOOK(&$variables): Should be implemented by the module
- *   that registers the theme hook, to set up default variables.
+ * - initial preprocess: A callback set on the theme hook definition,
+ *   to set up default variables. Supports services with the service:method
+ *   syntax, see \Drupal\Core\Utility\CallableResolver and hook_theme().
  * - MODULE_preprocess(&$variables, $hook): hook_preprocess() is invoked on all
  *   implementing modules.
  * - MODULE_preprocess_HOOK(&$variables): hook_preprocess_HOOK() is invoked on
@@ -226,7 +230,7 @@
  * same, which gives users fewer user interface patterns to learn.
  *
  * For further information on the Theme and Render APIs, see:
- * - https://www.drupal.org/docs/8/theming
+ * - https://www.drupal.org/docs/develop/theming-drupal
  * - https://www.drupal.org/developing/api/8/render
  * - @link themeable Theme system overview @endlink.
  *
@@ -536,7 +540,7 @@ function hook_form_system_theme_settings_alter(&$form, \Drupal\Core\Form\FormSta
   $form['toggle_breadcrumb'] = [
     '#type' => 'checkbox',
     '#title' => t('Display the breadcrumb'),
-    '#default_value' => theme_get_setting('features.breadcrumb'),
+    '#default_value' => \Drupal::service(ThemeSettingsProvider::class)->getSetting('features.breadcrumb'),
     '#description'   => t('Show a trail of links from the homepage to the current page.'),
   ];
 }
@@ -604,8 +608,9 @@ function hook_preprocess(&$variables, $hook): void {
  *   The variables array (modify in place).
  */
 function hook_preprocess_HOOK(&$variables): void {
-  // This example is from node_preprocess_html(). It adds the node type to
-  // the body classes, when on an individual node page or node preview page.
+  // This example is from \Drupal\node\Hook\NodeThemeHooks::preprocessHtml().
+  // It adds the node type to the body classes, when on an individual node page
+  // or node preview page.
   if (($node = \Drupal::routeMatch()->getParameter('node')) || ($node = \Drupal::routeMatch()->getParameter('node_preview'))) {
     if ($node instanceof NodeInterface) {
       $variables['node_type'] = $node->getType();
@@ -664,6 +669,11 @@ function hook_theme_suggestions_HOOK(array $variables): array {
   $suggestions = [];
 
   $suggestions[] = 'hookname__' . $variables['elements']['#langcode'];
+
+  // Theme suggestions can be deprecated by specifying them in the __DEPRECATED
+  // key.
+  $suggestions[] = 'hookname__outdated';
+  $suggestions['__DEPRECATED']['hookname__outdated'] = 'Theme suggestion hookname__outdated is deprecated in drupal:X.0.0 and is removed from drupal:Y.0.0. See http://drupal.org/node/the-change-notice-nid.';
 
   return $suggestions;
 }
@@ -779,7 +789,7 @@ function hook_theme_suggestions_HOOK_alter(array &$suggestions, array &$variable
  */
 function hook_themes_installed($theme_list): void {
   foreach ($theme_list as $theme) {
-    block_theme_initialize($theme);
+    // ...perform some action based on the $theme.
   }
 }
 
@@ -1203,9 +1213,6 @@ function hook_page_bottom(array &$page_bottom): void {
  *     renderable element or element tree to pass to the template. This name is
  *     used as the name of the variable that holds the renderable element or
  *     tree in preprocess and process functions.
- *   - file: The file that any preprocess implementations reside in. This file
- *     will be included prior to the template being rendered, to make sure that
- *     the preprocess function (as needed) is actually loaded.
  *   - path: If specified, overrides the path to the directory that contains the
  *     file to be used. This path should be relative to the Drupal root
  *     directory. If not provided, the path will be set to the module or theme's
@@ -1231,9 +1238,12 @@ function hook_page_bottom(array &$page_bottom): void {
  *     implementation to have a dynamic name. The default is to use __ to
  *     differentiate the dynamic portion of the theme. Implementations
  *     can specify a different pattern if required.
+ *   - initial preprocess: A string or array callback supported by
+ *     \Drupal\Core\Utility\CallableResolver to set up the initial and default
+ *     variables for the template. Can be set as
+ *     static::class . ':preprocessSomething' on hook classes.
  *   - preprocess functions: A list of functions used to preprocess this data.
- *     Ordinarily this won't be used; it's automatically filled in. By default,
- *     for a module this will be filled in as template_preprocess_HOOK. For
+ *     Ordinarily this won't be used; it's automatically filled in. For
  *     a theme this will be filled in as twig_preprocess and
  *     twig_preprocess_HOOK as well as themename_preprocess and
  *     themename_preprocess_HOOK.
@@ -1265,6 +1275,7 @@ function hook_theme($existing, $type, $theme, $path): array {
         'sortby' => NULL,
         'my_module_per_page' => NULL,
       ],
+      'initial preprocess' => 'PreprocessClass::preprocessDisplay',
     ],
     'my_module_list' => [
       'variables' => [
@@ -1272,6 +1283,7 @@ function hook_theme($existing, $type, $theme, $path): array {
         'parents' => NULL,
         'tid' => NULL,
       ],
+      'initial preprocess' => 'service.name:preprocessList',
     ],
     'my_module_icon' => [
       'variables' => [
@@ -1283,7 +1295,6 @@ function hook_theme($existing, $type, $theme, $path): array {
     ],
     'status_report' => [
       'render element' => 'requirements',
-      'file' => 'system.admin.inc',
     ],
   ];
 }
@@ -1304,21 +1315,18 @@ function hook_theme($existing, $type, $theme, $path): array {
  *
  * For example:
  * @code
- * $theme_registry['block_content_add_list'] = [
- *   'template' => 'block-content-add-list',
- *   'path' => 'core/themes/claro/templates',
+ * $theme_registry['entity_add_list'] = [
+ *   'variables' => [
+ *     'bundles' => [],
+ *     'add_bundle_message' => NULL,
+ *   ],
+ *   'template' => 'entity-add-list',
+ *   'initial preprocess' => 'Drupal\\system\\Hook\\SystemThemeHooks:preprocessEntityAddList',
  *   'type' => 'theme_engine',
  *   'theme path' => 'core/themes/claro',
- *   'includes' => [
- *     0 => 'core/modules/block_content/block_content.pages.inc',
- *   ],
- *   'variables' => [
- *     'content' => NULL,
- *   ],
+ *   'path' => 'core/themes/claro/templates',
  *   'preprocess functions' => [
- *     1 => 'template_preprocess_block_content_add_list',
- *     2 => 'contextual_preprocess',
- *     3 => 'claro_preprocess_block_content_add_list',
+ *     0 => 'claro_preprocess_entity_add_list',
  *   ],
  * ];
  * @endcode
@@ -1362,6 +1370,21 @@ function hook_theme_registry_alter(&$theme_registry) {
  */
 function hook_template_preprocess_default_variables_alter(&$variables) {
   $variables['is_admin'] = \Drupal::currentUser()->hasPermission('access administration pages');
+}
+
+/**
+ * Alter icon pack definitions.
+ *
+ * Allows modules to modify icon pack definitions.
+ *
+ * @param array $icon_packs
+ *   The array of icon pack definitions, keyed by icon pack ID.
+ */
+function hook_icon_pack_alter(array &$icon_packs): void {
+  // Example: Change the label of an icon pack.
+  if (isset($icon_packs['navigation'])) {
+    $icon_packs['navigation']['label'] = 'Custom navigation icons';
+  }
 }
 
 /**

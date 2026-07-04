@@ -4,16 +4,22 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\filter\Unit;
 
-use Drupal\Tests\UnitTestCase;
 use Drupal\filter\Plugin\Filter\FilterHtml;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\filter\Plugin\Filter\FilterHtml
- * @group filter
+ * Tests Drupal\filter\Plugin\Filter\FilterHtml.
  */
+#[CoversClass(FilterHtml::class)]
+#[Group('filter')]
 class FilterHtmlTest extends UnitTestCase {
 
   /**
+   * The filter to test.
+   *
    * @var \Drupal\filter\Plugin\Filter\FilterHtml
    */
   protected $filter;
@@ -33,16 +39,15 @@ class FilterHtmlTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::filterAttributes
-   *
-   * @dataProvider providerFilterAttributes
+   * Tests filter attributes.
    *
    * @param string $html
    *   Input HTML.
    * @param string $expected
    *   The expected output string.
    */
-  public function testFilterAttributes($html, $expected): void {
+  #[DataProvider('providerFilterAttributes')]
+  public function testFilterAttributes(string $html, string $expected): void {
     $this->assertSame($expected, $this->filter->filterAttributes($html));
   }
 
@@ -52,7 +57,7 @@ class FilterHtmlTest extends UnitTestCase {
    * @return array
    *   An array of test data.
    */
-  public static function providerFilterAttributes() {
+  public static function providerFilterAttributes(): array {
     return [
       ['<a href="/blog" title="Blog">Blog</a>', '<a href="/blog">Blog</a>'],
       ['<p dir="rtl" />', '<p dir="rtl"></p>'],
@@ -113,7 +118,7 @@ class FilterHtmlTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::setConfiguration
+   * Tests set configuration.
    */
   public function testSetConfiguration(): void {
     $configuration['settings'] = [

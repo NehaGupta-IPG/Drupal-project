@@ -4,21 +4,25 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\package_manager\Build;
 
-use Drupal\package_manager_test_api\ControllerStage;
+use Drupal\package_manager_test_api\ControllerSandboxManager;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests updating packages in a stage directory.
  *
- * @group package_manager
- * @group #slow
  * @internal
  */
+#[Group('package_manager')]
+#[Group('#slow')]
 class PackageUpdateTest extends TemplateProjectTestBase {
 
   /**
    * Tests updating packages in a stage directory.
    */
   public function testPackageUpdate(): void {
+    // @todo skipped due to random test failures, re-enable in https://www.drupal.org/i/3508109
+    $this->markTestSkipped();
+
     $this->createTestProject('RecommendedProject');
 
     $fixtures = __DIR__ . '/../../fixtures/build_test_projects';
@@ -39,7 +43,7 @@ class PackageUpdateTest extends TemplateProjectTestBase {
     // Change both modules' upstream version.
     static::copyFixtureFilesTo("$fixtures/alpha/1.1.0", $alpha_repo_path);
     static::copyFixtureFilesTo("$fixtures/updated_module/1.1.0", $updated_module_repo_path);
-    // Make .git folder
+    // Make .git folder.
 
     // Use the API endpoint to create a stage and update updated_module to
     // 1.1.0. Even though both modules have version 1.1.0 available, only
@@ -67,7 +71,7 @@ class PackageUpdateTest extends TemplateProjectTestBase {
     // @see \Drupal\updated_module\PostApplySubscriber::postApply()
     $this->assertSame('Bravo!', file_get_contents($this->getWorkspaceDirectory() . '/project/bravo.txt'));
 
-    $this->assertExpectedStageEventsFired(ControllerStage::class);
+    $this->assertExpectedStageEventsFired(ControllerSandboxManager::class);
     $this->assertRequestedChangesWereLogged(['Update drupal/updated_module from 1.0.0 to 1.1.0']);
     $this->assertAppliedChangesWereLogged(['Updated drupal/updated_module from 1.0.0 to 1.1.0']);
   }

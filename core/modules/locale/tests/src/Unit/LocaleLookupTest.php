@@ -5,16 +5,23 @@ declare(strict_types=1);
 namespace Drupal\Tests\locale\Unit;
 
 use Drupal\Component\Gettext\PoItem;
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\locale\LocaleLookup;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * @coversDefaultClass \Drupal\locale\LocaleLookup
- * @group locale
+ * Tests Drupal\locale\LocaleLookup.
  */
+#[CoversClass(LocaleLookup::class)]
+#[Group('locale')]
 class LocaleLookupTest extends UnitTestCase {
 
   /**
@@ -23,13 +30,6 @@ class LocaleLookupTest extends UnitTestCase {
    * @var \Drupal\locale\StringStorageInterface|\PHPUnit\Framework\MockObject\MockObject
    */
   protected $storage;
-
-  /**
-   * A mocked cache object.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
-   */
-  protected $cache;
 
   /**
    * A mocked lock object.
@@ -41,7 +41,7 @@ class LocaleLookupTest extends UnitTestCase {
   /**
    * A mocked user object built from AccountInterface.
    *
-   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $user;
 
@@ -55,7 +55,7 @@ class LocaleLookupTest extends UnitTestCase {
   /**
    * A mocked language manager built from LanguageManagerInterface.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $languageManager;
 
@@ -73,19 +73,18 @@ class LocaleLookupTest extends UnitTestCase {
     parent::setUp();
 
     $this->storage = $this->createMock('Drupal\locale\StringStorageInterface');
-    $this->cache = $this->createMock('Drupal\Core\Cache\CacheBackendInterface');
     $this->lock = $this->createMock('Drupal\Core\Lock\LockBackendInterface');
     $this->lock->expects($this->never())
       ->method($this->anything());
 
-    $this->user = $this->createMock('Drupal\Core\Session\AccountInterface');
-    $this->user->expects($this->any())
+    $this->user = $this->createStub(AccountInterface::class);
+    $this->user
       ->method('getRoles')
       ->willReturn(['anonymous']);
 
     $this->configFactory = $this->getConfigFactoryStub(['locale.settings' => ['cache_strings' => FALSE]]);
 
-    $this->languageManager = $this->createMock('Drupal\Core\Language\LanguageManagerInterface');
+    $this->languageManager = $this->createStub(LanguageManagerInterface::class);
     $this->requestStack = new RequestStack();
 
     $container = new ContainerBuilder();
@@ -95,8 +94,6 @@ class LocaleLookupTest extends UnitTestCase {
 
   /**
    * Tests locale lookups without fallback.
-   *
-   * @covers ::resolveCacheMiss
    */
   public function testResolveCacheMissWithoutFallback(): void {
     $args = [
@@ -109,7 +106,8 @@ class LocaleLookupTest extends UnitTestCase {
       'translation' => 'test',
     ];
 
-    $this->cache->expects($this->once())
+    $cache = $this->createMock(CacheBackendInterface::class);
+    $cache->expects($this->once())
       ->method('get')
       ->with('locale:en:irrelevant:anonymous', FALSE);
 
@@ -123,7 +121,7 @@ class LocaleLookupTest extends UnitTestCase {
         'en',
         'irrelevant',
         $this->storage,
-        $this->cache,
+        $cache,
         $this->lock,
         $this->configFactory,
         $this->languageManager,
@@ -140,12 +138,9 @@ class LocaleLookupTest extends UnitTestCase {
    * Tests locale lookups with fallback.
    *
    * Note that context is irrelevant here. It is not used but it is required.
-   *
-   * @covers ::resolveCacheMiss
-   *
-   * @dataProvider resolveCacheMissWithFallbackProvider
    */
-  public function testResolveCacheMissWithFallback($langcode, $string, $context, $expected): void {
+  #[DataProvider('resolveCacheMissWithFallbackProvider')]
+  public function testResolveCacheMissWithFallback(string $langcode, string $string, string $context, string $expected): void {
     // These are fake words!
     // cSpell:disable
     $translations = [
@@ -168,9 +163,9 @@ class LocaleLookupTest extends UnitTestCase {
       ],
     ];
     // cSpell:enable
-    $this->storage->expects($this->any())
+    $this->storage->expects($this->atLeastOnce())
       ->method('findTranslation')
-      ->willReturnCallback(function ($argument) use ($translations) {
+      ->willReturnCallback(function (array $argument) use ($translations) {
         if (isset($translations[$argument['language']][$argument['source']])) {
           return (object) ['translation' => $translations[$argument['language']][$argument['source']]];
         }
@@ -178,9 +173,9 @@ class LocaleLookupTest extends UnitTestCase {
         return TRUE;
       });
 
-    $this->languageManager->expects($this->any())
+    $this->languageManager
       ->method('getFallbackCandidates')
-      ->willReturnCallback(function (array $context = []) {
+      ->willReturnCallback(function (array $context = []): array {
         switch ($context['langcode']) {
           case 'pl':
             return ['cs', 'en'];
@@ -193,18 +188,19 @@ class LocaleLookupTest extends UnitTestCase {
         }
       });
 
-    $this->cache->expects($this->once())
+    $cache = $this->createMock(CacheBackendInterface::class);
+    $cache->expects($this->once())
       ->method('get')
       ->with('locale:' . $langcode . ':' . $context . ':anonymous', FALSE);
 
-    $locale_lookup = new LocaleLookup($langcode, $context, $this->storage, $this->cache, $this->lock, $this->configFactory, $this->languageManager, $this->requestStack);
+    $locale_lookup = new LocaleLookup($langcode, $context, $this->storage, $cache, $this->lock, $this->configFactory, $this->languageManager, $this->requestStack);
     $this->assertSame($expected, $locale_lookup->get($string));
   }
 
   /**
    * Provides test data for testResolveCacheMissWithFallback().
    */
-  public static function resolveCacheMissWithFallbackProvider() {
+  public static function resolveCacheMissWithFallbackProvider(): array {
     // cSpell:disable
     return [
       ['cs', 'test', 'irrelevant', 'test v české'],
@@ -225,8 +221,6 @@ class LocaleLookupTest extends UnitTestCase {
 
   /**
    * Tests locale lookups with persistent tracking.
-   *
-   * @covers ::resolveCacheMiss
    */
   public function testResolveCacheMissWithPersist(): void {
     $args = [
@@ -250,7 +244,7 @@ class LocaleLookupTest extends UnitTestCase {
         'en',
         'irrelevant',
         $this->storage,
-        $this->cache,
+        $this->createStub(CacheBackendInterface::class),
         $this->lock,
         $this->configFactory,
         $this->languageManager,
@@ -266,14 +260,13 @@ class LocaleLookupTest extends UnitTestCase {
 
   /**
    * Tests locale lookups without a found translation.
-   *
-   * @covers ::resolveCacheMiss
    */
   public function testResolveCacheMissNoTranslation(): void {
     $string = $this->createMock('Drupal\locale\StringInterface');
     $string->expects($this->once())
       ->method('addLocation')
       ->willReturnSelf();
+
     $this->storage->expects($this->once())
       ->method('findTranslation')
       ->willReturn(NULL);
@@ -289,7 +282,7 @@ class LocaleLookupTest extends UnitTestCase {
         'en',
         'irrelevant',
         $this->storage,
-        $this->cache,
+        $this->createStub(CacheBackendInterface::class),
         $this->lock,
         $this->configFactory,
         $this->languageManager,
@@ -315,20 +308,20 @@ class LocaleLookupTest extends UnitTestCase {
    * @param bool $is_fix
    *   The flag about expected fix translation.
    *
-   * @covers ::resolveCacheMiss
-   * @dataProvider providerFixOldPluralTranslationProvider
+   * @legacy-covers ::resolveCacheMiss
    */
-  public function testFixOldPluralStyleTranslations($translations, $langcode, $string, $is_fix): void {
-    $this->storage->expects($this->any())
+  #[DataProvider('providerFixOldPluralTranslationProvider')]
+  public function testFixOldPluralStyleTranslations(array $translations, string $langcode, string $string, bool $is_fix): void {
+    $this->storage->expects($this->atLeastOnce())
       ->method('findTranslation')
-      ->willReturnCallback(function ($argument) use ($translations) {
+      ->willReturnCallback(function (array $argument) use ($translations) {
         if (isset($translations[$argument['language']][$argument['source']])) {
           return (object) ['translation' => $translations[$argument['language']][$argument['source']]];
         }
 
         return TRUE;
       });
-    $this->languageManager->expects($this->any())
+    $this->languageManager
       ->method('getFallbackCandidates')
       ->willReturnCallback(function (array $context = []) {
         switch ($context['langcode']) {
@@ -336,11 +329,12 @@ class LocaleLookupTest extends UnitTestCase {
             return ['ru'];
         }
       });
-    $this->cache->expects($this->once())
+    $cache = $this->createMock(CacheBackendInterface::class);
+    $cache->expects($this->once())
       ->method('get')
       ->with('locale:' . $langcode . '::anonymous', FALSE);
 
-    $locale_lookup = new LocaleLookup($langcode, '', $this->storage, $this->cache, $this->lock, $this->configFactory, $this->languageManager, $this->requestStack);
+    $locale_lookup = new LocaleLookup($langcode, '', $this->storage, $cache, $this->lock, $this->configFactory, $this->languageManager, $this->requestStack);
     if ($is_fix) {
       $this->assertStringNotContainsString('@count[2]', $locale_lookup->get($string));
     }
@@ -352,7 +346,7 @@ class LocaleLookupTest extends UnitTestCase {
   /**
    * Provides test data for testResolveCacheMissWithFallback().
    */
-  public static function providerFixOldPluralTranslationProvider() {
+  public static function providerFixOldPluralTranslationProvider(): array {
     $translations = [
       'by' => [
         'word1' => '@count[2] word-by',
@@ -372,13 +366,15 @@ class LocaleLookupTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getCid
-   *
-   * @dataProvider getCidProvider
+   * Tests get cid.
    */
-  public function testGetCid(array $roles, $expected): void {
-    $this->user = $this->createMock('Drupal\Core\Session\AccountInterface');
-    $this->user->expects($this->any())
+  #[DataProvider('getCidProvider')]
+  public function testGetCid(array $roles, string $expected): void {
+    $this->storage->expects($this->never())
+      ->method('findTranslation');
+
+    $this->user = $this->createStub(AccountInterface::class);
+    $this->user
       ->method('getRoles')
       ->willReturn($roles);
 
@@ -386,18 +382,16 @@ class LocaleLookupTest extends UnitTestCase {
     $container->set('current_user', $this->user);
     \Drupal::setContainer($container);
 
-    $locale_lookup = $this->getMockBuilder('Drupal\locale\LocaleLookup')
-      ->setConstructorArgs([
-        'en',
-        'irrelevant',
-        $this->storage,
-        $this->cache,
-        $this->lock,
-        $this->configFactory,
-        $this->languageManager,
-        $this->requestStack,
-      ])
-      ->getMock();
+    $locale_lookup = new LocaleLookup(
+      'en',
+      'irrelevant',
+      $this->storage,
+      $this->createStub(CacheBackendInterface::class),
+      $this->lock,
+      $this->configFactory,
+      $this->languageManager,
+      $this->requestStack,
+    );
 
     $o = new \ReflectionObject($locale_lookup);
     $method = $o->getMethod('getCid');
@@ -409,7 +403,7 @@ class LocaleLookupTest extends UnitTestCase {
   /**
    * Provides test data for testGetCid().
    */
-  public static function getCidProvider() {
+  public static function getCidProvider(): array {
     return [
       [
         ['a'], 'locale:en:irrelevant:a',

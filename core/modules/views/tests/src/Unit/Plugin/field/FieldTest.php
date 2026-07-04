@@ -7,18 +7,34 @@ namespace Drupal\Tests\views\Unit\Plugin\field;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
+use Drupal\Core\Entity\Sql\TableMappingInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Field\FieldTypePluginManagerInterface;
+use Drupal\Core\Field\FormatterPluginManager;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\field\FieldStorageConfigInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\Tests\views\Unit\Plugin\HandlerTestTrait;
+use Drupal\views\Entity\View;
+use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\field\EntityField;
 use Drupal\views\ResultRow;
+use Drupal\views\ViewsData;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * @coversDefaultClass \Drupal\views\Plugin\views\field\EntityField
- * @group views
+ * Tests Drupal\views\Plugin\views\field\EntityField.
  */
+#[CoversClass(EntityField::class)]
+#[Group('views')]
 class FieldTest extends UnitTestCase {
 
   use HandlerTestTrait;
@@ -26,56 +42,56 @@ class FieldTest extends UnitTestCase {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
    */
   protected $entityFieldManager;
 
   /**
    * The entity repository.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityRepositoryInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $entityRepository;
 
   /**
    * The mocked formatter plugin manager.
    *
-   * @var \Drupal\Core\Field\FormatterPluginManager|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Field\FormatterPluginManager|\PHPUnit\Framework\MockObject\Stub
    */
   protected $formatterPluginManager;
 
   /**
    * The mocked language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $languageManager;
 
   /**
    * The mocked field type plugin manager.
    *
-   * @var \Drupal\Core\Field\FieldTypePluginManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Field\FieldTypePluginManagerInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $fieldTypePluginManager;
 
   /**
    * The entity type bundle info service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $entityTypeBundleInfo;
 
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Render\RendererInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $renderer;
 
@@ -92,30 +108,26 @@ class FieldTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
-    $this->entityFieldManager = $this->createMock(EntityFieldManagerInterface::class);
-    $this->entityTypeBundleInfo = $this->createMock(EntityTypeBundleInfoInterface::class);
-    $this->entityRepository = $this->createMock(EntityRepositoryInterface::class);
-    $this->formatterPluginManager = $this->getMockBuilder('Drupal\Core\Field\FormatterPluginManager')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $this->entityTypeManager = $this->createStub(EntityTypeManagerInterface::class);
+    $this->entityFieldManager = $this->createStub(EntityFieldManagerInterface::class);
+    $this->entityTypeBundleInfo = $this->createStub(EntityTypeBundleInfoInterface::class);
+    $this->entityRepository = $this->createStub(EntityRepositoryInterface::class);
+    $this->formatterPluginManager = $this->createStub(FormatterPluginManager::class);
 
-    $this->fieldTypePluginManager = $this->createMock('Drupal\Core\Field\FieldTypePluginManagerInterface');
-    $this->fieldTypePluginManager->expects($this->any())
+    $this->fieldTypePluginManager = $this->createStub(FieldTypePluginManagerInterface::class);
+    $this->fieldTypePluginManager
       ->method('getDefaultStorageSettings')
       ->willReturn([]);
-    $this->fieldTypePluginManager->expects($this->any())
+    $this->fieldTypePluginManager
       ->method('getDefaultFieldSettings')
       ->willReturn([]);
 
-    $this->languageManager = $this->createMock('Drupal\Core\Language\LanguageManagerInterface');
-    $this->renderer = $this->createMock('Drupal\Core\Render\RendererInterface');
+    $this->languageManager = $this->createStub(LanguageManagerInterface::class);
+    $this->renderer = $this->createStub(RendererInterface::class);
 
     $this->setupExecutableAndView();
     $this->setupViewsData();
-    $this->display = $this->getMockBuilder('Drupal\views\Plugin\views\display\DisplayPluginBase')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $this->display = $this->createStub(DisplayPluginBase::class);
 
     $this->container = new ContainerBuilder();
     $this->container->set('plugin.manager.field.field_type', $this->fieldTypePluginManager);
@@ -123,7 +135,9 @@ class FieldTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::__construct
+   * Tests construct.
+   *
+   * @legacy-covers ::__construct
    */
   public function testConstruct(): void {
     $definition = [
@@ -138,9 +152,10 @@ class FieldTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::defineOptions
+   * Tests define options with no options.
    */
   public function testDefineOptionsWithNoOptions(): void {
+    $this->entityFieldManager = $this->createMock(EntityFieldManagerInterface::class);
     $definition = [
       'entity_type' => 'test_entity',
       'field_name' => 'title',
@@ -165,9 +180,10 @@ class FieldTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::defineOptions
+   * Tests define options with default formatter on field definition.
    */
   public function testDefineOptionsWithDefaultFormatterOnFieldDefinition(): void {
+    $this->entityFieldManager = $this->createMock(EntityFieldManagerInterface::class);
     $definition = [
       'entity_type' => 'test_entity',
       'field_name' => 'title',
@@ -193,9 +209,10 @@ class FieldTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::defineOptions
+   * Tests define options with default formatter on field type.
    */
   public function testDefineOptionsWithDefaultFormatterOnFieldType(): void {
+    $this->entityFieldManager = $this->createMock(EntityFieldManagerInterface::class);
     $definition = [
       'entity_type' => 'test_entity',
       'field_name' => 'title',
@@ -220,9 +237,10 @@ class FieldTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::calculateDependencies
+   * Tests calculate dependencies with base field.
    */
   public function testCalculateDependenciesWithBaseField(): void {
+    $this->entityFieldManager = $this->createMock(EntityFieldManagerInterface::class);
     $definition = [
       'entity_type' => 'test_entity',
       'field_name' => 'title',
@@ -242,9 +260,10 @@ class FieldTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::calculateDependencies
+   * Tests calculate dependencies with configured field.
    */
   public function testCalculateDependenciesWithConfiguredField(): void {
+    $this->entityFieldManager = $this->createMock(EntityFieldManagerInterface::class);
     $definition = [
       'entity_type' => 'test_entity',
       'field_name' => 'body',
@@ -259,7 +278,7 @@ class FieldTest extends UnitTestCase {
         'body' => $body_storage,
       ]);
 
-    $body_storage->expects($this->atLeastOnce())
+    $body_storage
       ->method('getConfigDependencyName')
       ->willReturn('field.field_storage_config.body');
 
@@ -268,9 +287,14 @@ class FieldTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::access
+   * Tests access.
    */
   public function testAccess(): void {
+    $this->entityFieldManager = $this->createMock(EntityFieldManagerInterface::class);
+    $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
+    $this->view = $this->createMock(View::class);
+    $this->executable->storage = $this->view;
+    $this->viewsData = $this->createMock(ViewsData::class);
     $definition = [
       'entity_type' => 'test_entity',
       'field_name' => 'title',
@@ -305,7 +329,7 @@ class FieldTest extends UnitTestCase {
         'title' => $title_storage,
       ]);
 
-    $account = $this->createMock('Drupal\Core\Session\AccountInterface');
+    $account = $this->createStub(AccountInterface::class);
 
     $access_control_handler->expects($this->atLeastOnce())
       ->method('fieldAccess')
@@ -316,16 +340,18 @@ class FieldTest extends UnitTestCase {
   }
 
   /**
-   * @dataProvider providerSortOrders
+   * Tests the click sort order.
    *
    * @param string $order
    *   The sort order.
    */
-  public function testClickSortWithOutConfiguredColumn($order): void {
+  #[DataProvider('providerSortOrders')]
+  public function testClickSortWithOutConfiguredColumn(string $order): void {
     $definition = [
       'entity_type' => 'test_entity',
       'field_name' => 'title',
     ];
+    $this->entityFieldManager = $this->createMock(EntityFieldManagerInterface::class);
     $handler = new EntityField([], 'field', $definition, $this->entityTypeManager, $this->formatterPluginManager, $this->fieldTypePluginManager, $this->languageManager, $this->renderer, $this->entityRepository, $this->entityFieldManager, $this->entityTypeBundleInfo);
     $handler->view = $this->executable;
 
@@ -336,14 +362,15 @@ class FieldTest extends UnitTestCase {
   }
 
   /**
-   * @dataProvider providerSortOrders
+   * Tests click sort with base field.
    *
    * @param string $order
    *   The sort order.
-   *
-   * @covers ::clickSort
    */
-  public function testClickSortWithBaseField($order): void {
+  #[DataProvider('providerSortOrders')]
+  public function testClickSortWithBaseField(string $order): void {
+    $this->entityFieldManager = $this->createMock(EntityFieldManagerInterface::class);
+    $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
     $definition = [
       'entity_type' => 'test_entity',
       'field_name' => 'title',
@@ -396,14 +423,15 @@ class FieldTest extends UnitTestCase {
   }
 
   /**
-   * @dataProvider providerSortOrders
+   * Tests click sort with configured field.
    *
    * @param string $order
    *   The sort order.
-   *
-   * @covers ::clickSort
    */
-  public function testClickSortWithConfiguredField($order): void {
+  #[DataProvider('providerSortOrders')]
+  public function testClickSortWithConfiguredField(string $order): void {
+    $this->entityFieldManager = $this->createMock(EntityFieldManagerInterface::class);
+    $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
     $definition = [
       'entity_type' => 'test_entity',
       'field_name' => 'body',
@@ -456,9 +484,11 @@ class FieldTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::query
+   * Tests query with group by for base field.
    */
   public function testQueryWithGroupByForBaseField(): void {
+    $this->entityFieldManager = $this->createMock(EntityFieldManagerInterface::class);
+    $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
     $definition = [
       'entity_type' => 'test_entity',
       'field_name' => 'title',
@@ -470,24 +500,23 @@ class FieldTest extends UnitTestCase {
     $this->setupLanguageRenderer($handler, $definition);
 
     $field_storage = $this->getBaseFieldStorage();
-    $this->entityFieldManager->expects($this->any())
+    $this->entityFieldManager->expects($this->atLeastOnce())
       ->method('getFieldStorageDefinitions')
       ->with('test_entity')
       ->willReturn([
         'title' => $field_storage,
       ]);
 
-    $table_mapping = $this->createMock('Drupal\Core\Entity\Sql\TableMappingInterface');
-    $table_mapping
-      ->expects($this->any())
+    $table_mapping = $this->createMock(TableMappingInterface::class);
+    $table_mapping->expects($this->once())
       ->method('getFieldColumnName')
       ->with($field_storage, 'value')
       ->willReturn('title');
-    $entity_storage = $this->createMock('Drupal\Core\Entity\Sql\SqlEntityStorageInterface');
-    $entity_storage->expects($this->any())
+    $entity_storage = $this->createStub(SqlEntityStorageInterface::class);
+    $entity_storage
       ->method('getTableMapping')
       ->willReturn($table_mapping);
-    $this->entityTypeManager->expects($this->any())
+    $this->entityTypeManager->expects($this->once())
       ->method('getStorage')
       ->with('test_entity')
       ->willReturn($entity_storage);
@@ -518,9 +547,11 @@ class FieldTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::query
+   * Tests query with group by for config field.
    */
   public function testQueryWithGroupByForConfigField(): void {
+    $this->entityFieldManager = $this->createMock(EntityFieldManagerInterface::class);
+    $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
     $definition = [
       'entity_type' => 'test_entity',
       'field_name' => 'body',
@@ -532,24 +563,23 @@ class FieldTest extends UnitTestCase {
     $this->setupLanguageRenderer($handler, $definition);
 
     $field_storage = $this->getConfigFieldStorage();
-    $this->entityFieldManager->expects($this->any())
+    $this->entityFieldManager->expects($this->atLeastOnce())
       ->method('getFieldStorageDefinitions')
       ->with('test_entity')
       ->willReturn([
         'body' => $field_storage,
       ]);
 
-    $table_mapping = $this->createMock('Drupal\Core\Entity\Sql\TableMappingInterface');
-    $table_mapping
-      ->expects($this->any())
+    $table_mapping = $this->createMock(TableMappingInterface::class);
+    $table_mapping->expects($this->once())
       ->method('getFieldColumnName')
       ->with($field_storage, 'value')
       ->willReturn('body_value');
-    $entity_storage = $this->createMock('Drupal\Core\Entity\Sql\SqlEntityStorageInterface');
-    $entity_storage->expects($this->any())
+    $entity_storage = $this->createStub(SqlEntityStorageInterface::class);
+    $entity_storage
       ->method('getTableMapping')
       ->willReturn($table_mapping);
-    $this->entityTypeManager->expects($this->any())
+    $this->entityTypeManager->expects($this->once())
       ->method('getStorage')
       ->with('test_entity')
       ->willReturn($entity_storage);
@@ -580,11 +610,11 @@ class FieldTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::prepareItemsByDelta
-   *
-   * @dataProvider providerTestPrepareItemsByDelta
+   * Tests prepare items by delta.
    */
+  #[DataProvider('providerTestPrepareItemsByDelta')]
   public function testPrepareItemsByDelta(array $options, array $expected_values): void {
+    $this->entityFieldManager = $this->createMock(EntityFieldManagerInterface::class);
     $definition = [
       'entity_type' => 'test_entity',
       'field_name' => 'integer',
@@ -596,31 +626,16 @@ class FieldTest extends UnitTestCase {
     $this->setupLanguageRenderer($handler, $definition);
 
     $field_storage = $this->getConfigFieldStorage();
-    $field_storage->expects($this->any())
+    $field_storage
       ->method('getCardinality')
       ->willReturn(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
 
-    $this->entityFieldManager->expects($this->any())
+    $this->entityFieldManager->expects($this->atLeastOnce())
       ->method('getFieldStorageDefinitions')
       ->with('test_entity')
       ->willReturn([
         'integer' => $field_storage,
       ]);
-
-    $table_mapping = $this->createMock('Drupal\Core\Entity\Sql\TableMappingInterface');
-    $table_mapping
-      ->expects($this->any())
-      ->method('getFieldColumnName')
-      ->with($field_storage, 'value')
-      ->willReturn('integer_value');
-    $entity_storage = $this->createMock('Drupal\Core\Entity\Sql\SqlEntityStorageInterface');
-    $entity_storage->expects($this->any())
-      ->method('getTableMapping')
-      ->willReturn($table_mapping);
-    $this->entityTypeManager->expects($this->any())
-      ->method('getStorage')
-      ->with('test_entity')
-      ->willReturn($entity_storage);
 
     $options = [
       'group_column' => 'value',
@@ -639,7 +654,7 @@ class FieldTest extends UnitTestCase {
   /**
    * Provides test data for testPrepareItemsByDelta().
    */
-  public static function providerTestPrepareItemsByDelta() {
+  public static function providerTestPrepareItemsByDelta(): array {
     $data = [];
 
     // Let's display all values.
@@ -664,40 +679,40 @@ class FieldTest extends UnitTestCase {
   }
 
   /**
-   * Returns a mocked base field storage object.
+   * Returns a stub base field storage object.
    *
-   * @return \Drupal\Core\Field\FieldStorageDefinitionInterface|\PHPUnit\Framework\MockObject\MockObject
-   *   The mocked field storage object.
+   * @return \Drupal\Core\Field\FieldStorageDefinitionInterface|\PHPUnit\Framework\MockObject\Stub
+   *   The stub field storage object.
    */
   protected function getBaseFieldStorage() {
-    $title_storage = $this->createMock('Drupal\Core\Field\FieldStorageDefinitionInterface');
-    $title_storage->expects($this->any())
+    $title_storage = $this->createStub(FieldStorageDefinitionInterface::class);
+    $title_storage
       ->method('getColumns')
       ->willReturn(['value' => ['type' => 'varchar']]);
-    $title_storage->expects($this->any())
+    $title_storage
       ->method('getSettings')
       ->willReturn([]);
-    $title_storage->expects($this->any())
+    $title_storage
       ->method('getConstraints')
       ->willReturn([]);
     return $title_storage;
   }
 
   /**
-   * Returns a mocked configurable field storage object.
+   * Returns a stub configurable field storage object.
    *
-   * @return \Drupal\field\FieldStorageConfigInterface|\PHPUnit\Framework\MockObject\MockObject
-   *   The mocked field storage object.
+   * @return \Drupal\field\FieldStorageConfigInterface|\PHPUnit\Framework\MockObject\Stub
+   *   The stub field storage object.
    */
   protected function getConfigFieldStorage() {
-    $title_storage = $this->createMock('Drupal\field\FieldStorageConfigInterface');
-    $title_storage->expects($this->any())
+    $title_storage = $this->createStub(FieldStorageConfigInterface::class);
+    $title_storage
       ->method('getColumns')
       ->willReturn(['value' => ['type' => 'varchar']]);
-    $title_storage->expects($this->any())
+    $title_storage
       ->method('getSettings')
       ->willReturn([]);
-    $title_storage->expects($this->any())
+    $title_storage
       ->method('getConstraints')
       ->willReturn([]);
     return $title_storage;
@@ -709,7 +724,7 @@ class FieldTest extends UnitTestCase {
    * @return array
    *   An array of sort orders.
    */
-  public static function providerSortOrders() {
+  public static function providerSortOrders(): array {
     return [
       ['asc'],
       ['desc'],
@@ -726,31 +741,26 @@ class FieldTest extends UnitTestCase {
    * @param array $definition
    *   An array with entity type definition data.
    */
-  protected function setupLanguageRenderer(EntityField $handler, $definition): void {
-    $display_handler = $this->getMockBuilder('\Drupal\views\Plugin\views\display\DisplayPluginBase')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $display_handler->expects($this->any())
+  protected function setupLanguageRenderer(EntityField $handler, array $definition): void {
+    $display_handler = $this->createStub(DisplayPluginBase::class);
+    $display_handler
       ->method('getOption')
-      ->with($this->equalTo('rendering_language'))
       ->willReturn('en');
     $handler->view->display_handler = $display_handler;
 
     $data['table']['entity type'] = $definition['entity_type'];
-    $views_data = $this->getMockBuilder('\Drupal\views\ViewsData')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $views_data->expects($this->any())
+    $views_data = $this->createStub(ViewsData::class);
+    $views_data
       ->method('get')
       ->willReturn($data);
     $this->container->set('views.views_data', $views_data);
 
-    $entity_type = $this->createMock('\Drupal\Core\Entity\EntityTypeInterface');
-    $entity_type->expects($this->any())
+    $entity_type = $this->createStub(EntityTypeInterface::class);
+    $entity_type
       ->method('id')
       ->willReturn($definition['entity_type']);
 
-    $this->entityTypeManager->expects($this->any())
+    $this->entityTypeManager
       ->method('getDefinition')
       ->willReturn($entity_type);
   }

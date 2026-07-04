@@ -8,19 +8,21 @@ use Drupal\Component\Utility\Environment;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Tests\mysql\Kernel\mysql\LargeQueryTest as BaseMySqlTest;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests handling of large queries.
- *
- * @group Database
  */
+#[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class LargeQueryTest extends BaseMySqlTest {
 
   /**
    * Tests truncation of messages when max_allowed_packet exception occurs.
    */
   public function testMaxAllowedPacketQueryTruncating(): void {
-    $connectionInfo = Database::getConnectionInfo('default');
+    $connectionInfo = Database::getConnectionInfo();
     Database::addConnectionInfo('default', 'testMaxAllowedPacketQueryTruncating', $connectionInfo['default']);
     $testConnection = Database::getConnection('testMaxAllowedPacketQueryTruncating');
 
@@ -44,7 +46,7 @@ class LargeQueryTest extends BaseMySqlTest {
       $this->assertInstanceOf(DatabaseExceptionWrapper::class, $e);
       $this->assertEquals(1153, $e->getPrevious()->getCode());
       // 'max_allowed_packet' exception message truncated.
-      // Use strlen() to count the bytes exactly, not the unicode chars.
+      // Use strlen() to count the bytes exactly, not the Unicode chars.
       $this->assertLessThanOrEqual($max_allowed_packet, strlen($e->getMessage()));
     }
   }

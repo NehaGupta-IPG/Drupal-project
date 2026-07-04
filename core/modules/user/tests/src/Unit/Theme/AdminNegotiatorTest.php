@@ -9,19 +9,22 @@ use Drupal\Core\Routing\RouteMatch;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\Theme\AdminNegotiator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests AdminNegotiator class.
- *
- * @group user
- * @coversDefaultClass \Drupal\user\Theme\AdminNegotiator
  */
+#[CoversClass(AdminNegotiator::class)]
+#[Group('user')]
 class AdminNegotiatorTest extends UnitTestCase {
 
   /**
-   * @dataProvider getThemes
+   * Tests determining the active theme.
    */
-  public function testDetermineActiveTheme($admin_theme, $expected): void {
+  #[DataProvider('getThemes')]
+  public function testDetermineActiveTheme(?string $admin_theme, ?string $expected): void {
     $user = $this->prophesize(AccountInterface::class);
     $config_factory = $this->getConfigFactoryStub(['system.theme' => ['admin' => $admin_theme]]);
     $admin_context = $this->prophesize(AdminContext::class);
@@ -33,7 +36,7 @@ class AdminNegotiatorTest extends UnitTestCase {
   /**
    * Provides a list of theme names to test.
    */
-  public static function getThemes() {
+  public static function getThemes(): array {
     return [
       ['claro', 'claro'],
       [NULL, NULL],

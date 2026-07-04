@@ -87,10 +87,7 @@ class Result extends ResultBase {
     }
 
     // Stringify all non-NULL column values.
-    $row = [];
-    foreach ($mysqli_row as $column => $value) {
-      $row[$column] = $value === NULL ? NULL : (string) $value;
-    }
+    $row = array_map(fn ($value) => $value === NULL ? NULL : (string) $value, $mysqli_row);
 
     return $this->assocToFetchMode($row, $mode, $fetchOptions);
   }

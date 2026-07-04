@@ -18,11 +18,12 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class MediaMappingsConstraint extends SymfonyConstraint {
 
-  /**
-   * The error message if source is used in media mapping.
-   *
-   * @var string
-   */
-  public string $invalidMappingMessage = 'It is not possible to map the source field @source_field_name of a media type.';
+  public function __construct(
+    public string $invalidMappingMessage = 'It is not possible to map the source field @source_field_name of a media type.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct(groups: $groups, payload: $payload);
+  }
 
 }

@@ -320,8 +320,8 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
 
     // The "All" state for this type of filter could have a default value. If
     // this is a non-multiple and non-required option, then this filter will
-    // participate by using the default settings *if* 'limit' is true.
-    if (empty($this->options['expose']['multiple']) && empty($this->options['expose']['required']) && !empty($this->options['expose']['limit'])) {
+    // participate by using the default settings if 'reduce' is true.
+    if (empty($this->options['expose']['multiple']) && empty($this->options['expose']['required']) && !empty($this->options['expose']['reduce'])) {
       $identifier = $this->options['expose']['identifier'];
       if ($input[$identifier] == 'All') {
         return TRUE;
@@ -496,7 +496,11 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
       }
     }
     elseif (!empty($this->value) && ($this->operator == 'in' || $this->operator == 'not in')) {
-      $errors[] = $this->t('The value @value is not an array for @operator on filter: @filter', ['@value' => var_export($this->value, TRUE), '@operator' => $this->operator, '@filter' => $this->adminLabel(TRUE)]);
+      $errors[] = $this->t('The value @value is not an array for @operator on filter: @filter', [
+        '@value' => var_export($this->value, TRUE),
+        '@operator' => $this->operator,
+        '@filter' => $this->adminLabel(TRUE),
+      ]);
     }
     return $errors;
   }

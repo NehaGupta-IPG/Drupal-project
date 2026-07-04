@@ -2,6 +2,7 @@
 
 namespace Drupal\update\Hook;
 
+use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\update\UpdateManagerInterface;
 use Drupal\Core\Url;
@@ -24,14 +25,14 @@ class UpdateHooks {
       case 'help.page.update':
         $output = '';
         $output .= '<h2>' . $this->t('About') . '</h2>';
-        $output .= '<p>' . $this->t('The Update Manager module periodically checks for new versions of your site\'s software (including contributed modules and themes), and alerts administrators to available updates. The Update Manager system is also used by some other modules to manage updates and downloads; for example, the Interface Translation module uses the Update Manager to download translations from the localization server. Note that whenever the Update Manager system is used, anonymous usage statistics are sent to Drupal.org. If desired, you may uninstall the Update Manager module from the <a href=":modules">Extend page</a>; if you do so, functionality that depends on the Update Manager system will not work. For more information, see the <a href=":update">online documentation for the Update Manager module</a>.', [
+        $output .= '<p>' . $this->t('The Update Status module periodically checks for new versions of your site\'s software (including contributed modules and themes), and alerts administrators to available updates. The Update Status system is also used by some other modules to manage updates and downloads; for example, the Interface Translation module uses the Update Status to download translations from the localization server. Note that whenever the Update Status system is used, anonymous usage statistics are sent to Drupal.org. If desired, you may uninstall the Update Status module from the <a href=":modules">Extend page</a>; if you do so, functionality that depends on the Update Status system will not work. For more information, see the <a href=":update">online documentation for the Update Status module</a>.', [
           ':update' => 'https://www.drupal.org/documentation/modules/update',
           ':modules' => Url::fromRoute('system.modules_list')->toString(),
         ]) . '</p>';
         $output .= '<h2>' . $this->t('Uses') . '</h2>';
         $output .= '<dl>';
         $output .= '<dt>' . $this->t('Checking for available updates') . '</dt>';
-        $output .= '<dd>' . $this->t('The <a href=":update-report">Available updates report</a> displays core, contributed modules, and themes for which there are new releases available for download. On the report page, you can also check manually for updates. You can configure the frequency of update checks, which are performed during cron runs, and whether notifications are sent on the <a href=":update-settings">Update Manager settings page</a>.', [
+        $output .= '<dd>' . $this->t('The <a href=":update-report">Available updates report</a> displays core, contributed modules, and themes for which there are new releases available for download. On the report page, you can also check manually for updates. You can configure the frequency of update checks, which are performed during cron runs, and whether notifications are sent on the <a href=":update-settings">Update Status settings page</a>.', [
           ':update-report' => Url::fromRoute('update.status')->toString(),
           ':update-settings' => Url::fromRoute('update.settings')->toString(),
         ]) . '</dd>';
@@ -65,7 +66,9 @@ class UpdateHooks {
         case 'update.status':
         case 'update.settings':
         case 'system.status':
+        case 'system.modules_uninstall':
         case 'system.theme_install':
+        case 'system.theme_uninstall':
         case 'system.batch_page.html':
           return;
 
@@ -77,8 +80,7 @@ class UpdateHooks {
           $verbose = TRUE;
           break;
       }
-      \Drupal::moduleHandler()->loadInclude('update', 'install');
-      $status = update_requirements('runtime');
+      $status = \Drupal::moduleHandler()->invoke('update', 'runtime_requirements');
       foreach (['core', 'contrib'] as $report_type) {
         $type = 'update_' . $report_type;
         // hook_requirements() supports render arrays therefore we need to
@@ -89,10 +91,10 @@ class UpdateHooks {
         }
         if (!empty($verbose)) {
           if (isset($status[$type]['severity'])) {
-            if ($status[$type]['severity'] == REQUIREMENT_ERROR) {
+            if ($status[$type]['severity'] === RequirementSeverity::Error) {
               \Drupal::messenger()->addError($status[$type]['description']);
             }
-            elseif ($status[$type]['severity'] == REQUIREMENT_WARNING) {
+            elseif ($status[$type]['severity'] === RequirementSeverity::Warning) {
               \Drupal::messenger()->addWarning($status[$type]['description']);
             }
           }
@@ -107,82 +109,6 @@ class UpdateHooks {
   }
 
   /**
-   * Implements hook_theme().
-   */
-  #[Hook('theme')]
-  public function theme() : array {
-    return [
-      'update_last_check' => [
-        'variables' => [
-          'last' => 0,
-        ],
-      ],
-      'update_report' => [
-        'variables' => [
-          'data' => NULL,
-        ],
-        'file' => 'update.report.inc',
-      ],
-      'update_project_status' => [
-        'variables' => [
-          'project' => [],
-        ],
-        'file' => 'update.report.inc',
-      ],
-      // We are using template instead of '#type' => 'table' here to keep markup
-      // out of preprocess and allow for easier changes to markup.
-      'update_version' => [
-        'variables' => [
-          'version' => NULL,
-          'title' => NULL,
-          'attributes' => [],
-        ],
-        'file' => 'update.report.inc',
-      ],
-      'update_fetch_error_message' => [
-        'file' => 'update.report.inc',
-        'render element' => 'element',
-        'variables' => [
-          'error_message' => [],
-        ],
-      ],
-    ];
-  }
-
-  /**
-   * Implements hook_cron().
-   */
-  #[Hook('cron')]
-  public function cron(): void {
-    $update_config = \Drupal::config('update.settings');
-    $frequency = $update_config->get('check.interval_days');
-    $interval = 60 * 60 * 24 * $frequency;
-    $last_check = \Drupal::state()->get('update.last_check', 0);
-    $request_time = \Drupal::time()->getRequestTime();
-    if ($request_time - $last_check > $interval) {
-      // If the configured update interval has elapsed, we want to invalidate
-      // the data for all projects, attempt to re-fetch, and trigger any
-      // configured notifications about the new status.
-      update_refresh();
-      update_fetch_data();
-    }
-    else {
-      // Otherwise, see if any individual projects are now stale or still
-      // missing data, and if so, try to fetch the data.
-      update_get_available(TRUE);
-    }
-    $last_email_notice = \Drupal::state()->get('update.last_email_notification', 0);
-    if ($request_time - $last_email_notice > $interval) {
-      // If configured time between notifications elapsed, send email about
-      // updates possibly available.
-      \Drupal::moduleHandler()->loadInclude('update', 'inc', 'update.fetch');
-      _update_cron_notify();
-    }
-    // Clear garbage from disk.
-    update_clear_update_disk_cache();
-  }
-
-  /**
    * Implements hook_themes_installed().
    *
    * If themes are installed, we invalidate the information of available
@@ -190,7 +116,7 @@ class UpdateHooks {
    */
   #[Hook('themes_installed')]
   public function themesInstalled($themes): void {
-    // Clear all update module data.
+    // Clear all Update Status module data.
     update_storage_clear();
   }
 
@@ -202,7 +128,7 @@ class UpdateHooks {
    */
   #[Hook('themes_uninstalled')]
   public function themesUninstalled($themes): void {
-    // Clear all update module data.
+    // Clear all Update Status module data.
     update_storage_clear();
   }
 
@@ -214,7 +140,7 @@ class UpdateHooks {
    */
   #[Hook('modules_installed')]
   public function modulesInstalled($modules): void {
-    // Clear all update module data.
+    // Clear all Update Status module data.
     update_storage_clear();
   }
 
@@ -226,7 +152,7 @@ class UpdateHooks {
    */
   #[Hook('modules_uninstalled')]
   public function modulesUninstalled($modules): void {
-    // Clear all update module data.
+    // Clear all Update Status module data.
     update_storage_clear();
   }
 
@@ -236,7 +162,7 @@ class UpdateHooks {
    * Constructs the email notification message when the site is out of date.
    *
    * @see \Drupal\Core\Mail\MailManagerInterface::mail()
-   * @see _update_cron_notify()
+   * @see \Drupal\update\Hook\UpdateCronHooks::notify()
    * @see _update_message_text()
    * @see \Drupal\update\UpdateManagerInterface
    */
@@ -246,9 +172,15 @@ class UpdateHooks {
     $language = \Drupal::languageManager()->getLanguage($langcode);
     $message['subject'] .= $this->t('New release(s) available for @site_name', ['@site_name' => \Drupal::config('system.site')->get('name')], ['langcode' => $langcode]);
     foreach ($params as $msg_type => $msg_reason) {
-      $message['body'][] = _update_message_text($msg_type, $msg_reason, $langcode);
+      $message['body'][] = _update_message_text($msg_type, $msg_reason, $langcode, TRUE);
     }
-    $message['body'][] = $this->t('See the available updates page for more information:', [], ['langcode' => $langcode]) . "\n" . Url::fromRoute('update.status', [], ['absolute' => TRUE, 'language' => $language])->toString();
+    $message['body'][] = $this->t('See the available updates page for more information:',
+      [],
+      ['langcode' => $langcode]
+    ) . "\n" . Url::fromRoute('update.status', [], [
+      'absolute' => TRUE,
+      'language' => $language,
+    ])->toString();
     $settings_url = Url::fromRoute('update.settings', [], ['absolute' => TRUE])->toString();
     if (\Drupal::config('update.settings')->get('notification.threshold') == 'all') {
       $message['body'][] = $this->t('Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, @url.', ['@url' => $settings_url]);
@@ -256,65 +188,6 @@ class UpdateHooks {
     else {
       $message['body'][] = $this->t('Your site is currently configured to send these emails only when security updates are available. To get notified for any available updates, @url.', ['@url' => $settings_url]);
     }
-  }
-
-  /**
-   * Implements hook_verify_update_archive().
-   *
-   * First, we ensure that the archive isn't a copy of Drupal core, which the
-   * update manager does not yet support. See
-   * https://www.drupal.org/node/606592.
-   *
-   * Then, we make sure that at least one module included in the archive file
-   * has an .info.yml file which claims that the code is compatible with the
-   * current version of Drupal core.
-   *
-   * @see \Drupal\Core\Extension\ExtensionDiscovery
-   */
-  #[Hook('verify_update_archive')]
-  public function verifyUpdateArchive($project, $archive_file, $directory): array {
-    $errors = [];
-    // Make sure this isn't a tarball of Drupal core.
-    if (file_exists("{$directory}/{$project}/index.php") && file_exists("{$directory}/{$project}/core/install.php") && file_exists("{$directory}/{$project}/core/includes/bootstrap.inc") && file_exists("{$directory}/{$project}/core/modules/node/node.module") && file_exists("{$directory}/{$project}/core/modules/system/system.module")) {
-      return [
-        'no-core' => $this->t('Automatic updating of Drupal core is not supported. See the <a href=":update-guide">Updating Drupal guide</a> for information on how to update Drupal core manually.', [
-          ':update-guide' => 'https://www.drupal.org/docs/updating-drupal',
-        ]),
-      ];
-    }
-    // Parse all the .info.yml files and make sure at least one is compatible
-    // with this version of Drupal core. If one is compatible, then the project
-    // as a whole is considered compatible (since, for example, the project may
-    // ship with some out-of-date modules that are not necessary for its overall
-    // functionality).
-    $compatible_project = FALSE;
-    $incompatible = [];
-    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
-    $file_system = \Drupal::service('file_system');
-    $files = $file_system->scanDirectory("{$directory}/{$project}", '/.*\.info.yml$/', ['key' => 'name', 'min_depth' => 0]);
-    foreach ($files as $file) {
-      // Get the .info.yml file for the module or theme this file belongs to.
-      $info = \Drupal::service('info_parser')->parse($file->uri);
-      // If the module or theme is incompatible with Drupal core, set an error.
-      if ($info['core_incompatible']) {
-        $incompatible[] = !empty($info['name']) ? $info['name'] : $this->t('Unknown');
-      }
-      else {
-        $compatible_project = TRUE;
-        break;
-      }
-    }
-    if (empty($files)) {
-      $errors[] = $this->t('%archive_file does not contain any .info.yml files.', ['%archive_file' => $file_system->basename($archive_file)]);
-    }
-    elseif (!$compatible_project) {
-      $errors[] = \Drupal::translation()->formatPlural(count($incompatible), '%archive_file contains a version of %names that is not compatible with Drupal @version.', '%archive_file contains versions of modules or themes that are not compatible with Drupal @version: %names', [
-        '@version' => \Drupal::VERSION,
-        '%archive_file' => $file_system->basename($archive_file),
-        '%names' => implode(', ', $incompatible),
-      ]);
-    }
-    return $errors;
   }
 
 }

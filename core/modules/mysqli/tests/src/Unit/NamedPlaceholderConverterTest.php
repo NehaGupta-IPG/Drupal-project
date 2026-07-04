@@ -6,19 +6,25 @@ namespace Drupal\Tests\mysqli\Unit;
 
 use Drupal\mysqli\Driver\Database\mysqli\NamedPlaceholderConverter;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\mysqli\Driver\Database\mysqli\NamedPlaceholderConverter
- * @group Database
+ * Tests \Drupal\mysqli\Driver\Database\mysqli\NamedPlaceholderConverter.
  */
+#[CoversClass(NamedPlaceholderConverter::class)]
+#[Group('Database')]
 class NamedPlaceholderConverterTest extends UnitTestCase {
 
   /**
-   * @covers ::parse
-   * @covers ::getConvertedSQL
-   * @covers ::getConvertedParameters
-   * @dataProvider statementsWithParametersProvider
+   * Tests ::parse().
+   *
+   * @legacy-covers ::parse
+   * @legacy-covers ::getConvertedSQL
+   * @legacy-covers ::getConvertedParameters
    */
+  #[DataProvider('statementsWithParametersProvider')]
   public function testParse(string $sql, array $parameters, string $expectedSql, array $expectedParameters): void {
     $converter = new NamedPlaceholderConverter();
     $converter->parse($sql, $parameters);
@@ -206,9 +212,9 @@ class NamedPlaceholderConverterTest extends UnitTestCase {
     ];
 
     yield [
-      "SELECT table.column1, ARRAY['3']::integer[] FROM schema.table table" . " WHERE table.f1 = :foo AND ARRAY['3']::integer[]",
+      "SELECT table.column1, ARRAY['3']::integer[] FROM schema.table table WHERE table.f1 = :foo AND ARRAY['3']::integer[]",
       [':foo' => 'qux'],
-      "SELECT table.column1, ARRAY['3']::integer[] FROM schema.table table" . " WHERE table.f1 = ? AND ARRAY['3']::integer[]",
+      "SELECT table.column1, ARRAY['3']::integer[] FROM schema.table table WHERE table.f1 = ? AND ARRAY['3']::integer[]",
       ['qux'],
     ];
 
@@ -257,16 +263,16 @@ SQL,
     ];
 
     yield [
-      'SELECT data.age AS age, data.id AS id, data.name AS name, data.id AS id FROM test_data data' . " WHERE (data.description LIKE :condition_0 ESCAPE '\\\\')" . " AND (data.description LIKE :condition_1 ESCAPE '\\\\') ORDER BY id ASC",
+      'SELECT data.age AS age, data.id AS id, data.name AS name, data.id AS id FROM test_data data WHERE (data.description LIKE :condition_0 ESCAPE \'\\\\\') AND (data.description LIKE :condition_1 ESCAPE \'\\\\\') ORDER BY id ASC',
       [':condition_0' => 'qux', ':condition_1' => 'git'],
-      'SELECT data.age AS age, data.id AS id, data.name AS name, data.id AS id FROM test_data data' . " WHERE (data.description LIKE ? ESCAPE '\\\\')" . " AND (data.description LIKE ? ESCAPE '\\\\') ORDER BY id ASC",
+      'SELECT data.age AS age, data.id AS id, data.name AS name, data.id AS id FROM test_data data WHERE (data.description LIKE ? ESCAPE \'\\\\\') AND (data.description LIKE ? ESCAPE \'\\\\\') ORDER BY id ASC',
       ['qux', 'git'],
     ];
 
     yield [
-      'SELECT data.age AS age, data.id AS id, data.name AS name, data.id AS id FROM test_data data' . ' WHERE (data.description LIKE :condition_0 ESCAPE "\\\\")' . ' AND (data.description LIKE :condition_1 ESCAPE "\\\\") ORDER BY id ASC',
+      'SELECT data.age AS age, data.id AS id, data.name AS name, data.id AS id FROM test_data data WHERE (data.description LIKE :condition_0 ESCAPE "\\\\") AND (data.description LIKE :condition_1 ESCAPE "\\\\") ORDER BY id ASC',
       [':condition_0' => 'qux', ':condition_1' => 'git'],
-      'SELECT data.age AS age, data.id AS id, data.name AS name, data.id AS id FROM test_data data' . ' WHERE (data.description LIKE ? ESCAPE "\\\\")' . ' AND (data.description LIKE ? ESCAPE "\\\\") ORDER BY id ASC',
+      'SELECT data.age AS age, data.id AS id, data.name AS name, data.id AS id FROM test_data data WHERE (data.description LIKE ? ESCAPE "\\\\") AND (data.description LIKE ? ESCAPE "\\\\") ORDER BY id ASC',
       ['qux', 'git'],
     ];
 
@@ -288,9 +294,9 @@ SQL,
     ];
 
     yield [
-      'SELECT data.age AS age, data.id AS id, data.name AS name, data.id AS id FROM test_data data' . ' WHERE (data.description LIKE :condition_0 ESCAPE `\\\\`)' . ' AND (data.description LIKE :condition_1 ESCAPE `\\\\`) ORDER BY id ASC',
+      'SELECT data.age AS age, data.id AS id, data.name AS name, data.id AS id FROM test_data data WHERE (data.description LIKE :condition_0 ESCAPE `\\\\`) AND (data.description LIKE :condition_1 ESCAPE `\\\\`) ORDER BY id ASC',
       [':condition_0' => 'qux', ':condition_1' => 'git'],
-      'SELECT data.age AS age, data.id AS id, data.name AS name, data.id AS id FROM test_data data' . ' WHERE (data.description LIKE ? ESCAPE `\\\\`)' . ' AND (data.description LIKE ? ESCAPE `\\\\`) ORDER BY id ASC',
+      'SELECT data.age AS age, data.id AS id, data.name AS name, data.id AS id FROM test_data data WHERE (data.description LIKE ? ESCAPE `\\\\`) AND (data.description LIKE ? ESCAPE `\\\\`) ORDER BY id ASC',
       ['qux', 'git'],
     ];
 
@@ -371,6 +377,24 @@ SELECT '{"a":null}'::jsonb ?? ?
 SQL,
       ['qux'],
     ];
+  }
+
+  /**
+   * Tests reusing the parser object.
+   *
+   * @legacy-covers ::parse
+   * @legacy-covers ::getConvertedSQL
+   * @legacy-covers ::getConvertedParameters
+   */
+  public function testParseReuseObject(): void {
+    $converter = new NamedPlaceholderConverter();
+    $converter->parse('SELECT ?', ['foo']);
+    $this->assertSame('SELECT ?', $converter->getConvertedSQL());
+    $this->assertSame(['foo'], $converter->getConvertedParameters());
+
+    $this->expectException(\RuntimeException::class);
+    $this->expectExceptionMessage('Missing Positional Parameter 0');
+    $converter->parse('SELECT ?', []);
   }
 
 }
