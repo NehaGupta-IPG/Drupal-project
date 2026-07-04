@@ -900,12 +900,11 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $modals = $page->findAll('css', '.media-library-widget-modal');
     $inner = end($modals);
     $this->assertNotEmpty($inner);
-    // Select the item with the visible click-to-select trigger (the checkbox
-    // input itself is hidden), scoped to the inner modal so the outer add form
-    // is not touched.
-    $trigger = $inner->waitFor(10, fn ($inner) => $inner->find('css', '.js-media-library-item .js-click-to-select-trigger'));
-    $this->assertNotEmpty($trigger);
-    $trigger->click();
+    // Clicking the media item selects it, as in the other media library tests;
+    // scope to the inner modal so the outer add form is not touched.
+    $item = $inner->waitFor(10, fn ($inner) => $inner->find('css', '.js-media-library-item'));
+    $this->assertNotEmpty($item);
+    $item->click();
     $inner->pressButton('Insert selected');
     $this->waitForElementsCount('css', '.media-library-widget-modal', 1);
 
