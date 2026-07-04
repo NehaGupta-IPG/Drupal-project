@@ -34,8 +34,14 @@ class FileDownloadCspSubscriber implements EventSubscriberInterface {
     }
 
     if (
-      $response->headers->get('Content-Type') === 'image/svg+xml' &&
-      !$response->headers->has('Content-Security-Policy')
+      ($response->headers->get('Content-Type') === 'image/svg+xml'
+        || in_array(
+          pathinfo($event->getRequest()->getPathInfo(), PATHINFO_EXTENSION),
+          ['svg', 'svgz'],
+          TRUE
+        )
+      )
+      && !$response->headers->has('Content-Security-Policy')
     ) {
       $response->headers->set('Content-Security-Policy', FileSecurity::CSP_SVG_HEADER, FALSE);
     }

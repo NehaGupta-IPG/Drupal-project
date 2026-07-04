@@ -96,6 +96,14 @@ class DownloadTest extends FileManagedTestBase {
     $url = $this->fileUrlGenerator->generateAbsoluteString($file_svg->getFileUri());
     $this->drupalGet($url);
     $this->assertSession()->responseHeaderEquals('Content-Security-Policy', "default-src 'none'; img-src data:; style-src 'unsafe-inline'");
+
+    // Also test with svgz file.
+    $file_svgz = $this->createFile($filename . '.svgz', $this->randomString(), 'private');
+    $file_svgz->setPermanent();
+    $file_svgz->save();
+    $url = $this->fileUrlGenerator->generateAbsoluteString($file_svgz->getFileUri());
+    $this->drupalGet($url);
+    $this->assertSession()->responseHeaderEquals('Content-Security-Policy', "default-src 'none'; img-src data:; style-src 'unsafe-inline'");
   }
 
   /**

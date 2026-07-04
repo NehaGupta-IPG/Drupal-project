@@ -83,10 +83,13 @@ SetHandler Drupal_Security_Do_Not_Remove_See_SA_2006_006
 </IfModule>
 
 <IfModule mod_headers.c>
-  <FilesMatch \.(?i:svg)$>
+  <FilesMatch \.(?i:svgz?)$>
     # Prevent script execution in SVG files.
     Header set Content-Security-Policy "{$header}"
   </FilesMatch>
+  # Also detect SVG MIME type
+  Header set Content-Security-Policy "{$header}" "expr=%{CONTENT_TYPE} == 'image/svg+xml'"
+  </IfModule>
 </IfModule>
 EOF;
   }
