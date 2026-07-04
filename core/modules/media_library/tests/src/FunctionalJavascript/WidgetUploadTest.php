@@ -834,6 +834,10 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $buttons->pressButton('Insert selected');
     $assert_session->waitForElementVisible('css', '#field_twin_media-media-library-wrapper .js-media-library-selection .js-media-library-item');
 
+    // Inserting from the library closes only the library modal; the outer
+    // modal that hosts the widget stays open.
+    $this->waitForElementsCount('css', '.media-library-widget-modal', 0);
+    $assert_session->elementExists('css', '#drupal-modal');
   }
 
   /**
