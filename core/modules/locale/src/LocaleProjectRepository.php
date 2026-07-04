@@ -7,6 +7,7 @@ namespace Drupal\locale;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Extension\ExtensionPathResolver;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeExtensionList;
@@ -27,6 +28,7 @@ readonly class LocaleProjectRepository {
     protected ModuleExtensionList $moduleExtensionList,
     protected ThemeExtensionList $themeExtensionList,
     protected ConfigFactoryInterface $configFactory,
+    protected ExtensionPathResolver $extensionPathResolver,
   ) {}
 
   /**
@@ -153,6 +155,21 @@ readonly class LocaleProjectRepository {
           // Example matches: "8.x-1.x-dev", "8.x-1.0-alpha1+5-dev => 8.x-1.x".
           $data['info']['version'] = $matches[1] . 'x';
         }
+      }
+
+      // Check for the `extension://` prefix in the translation server pattern and
+      // replace it to the current extension path.
+      if (
+        isset($data['info']['interface translation server pattern'])
+        && str_starts_with($data['info']['interface translation server pattern'], 'extension://')
+      ) {
+        $path = $this->extensionPathResolver->getPath($data['project_type'], $name);
+        $data['info']['interface translation server pattern'] =
+          str_replace(
+            'extension://',
+            $path . '/',
+            $data['info']['interface translation server pattern']
+          );
       }
 
       $refreshed_projects[$name] = new LocaleTranslatableProject(
