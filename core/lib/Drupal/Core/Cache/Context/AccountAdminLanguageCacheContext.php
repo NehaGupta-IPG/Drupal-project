@@ -49,9 +49,15 @@ class AccountAdminLanguageCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public function getCacheableMetadata(): CacheableMetadata {
+    $metadata = new CacheableMetadata();
     // The resolved value depends on which negotiation methods are enabled,
-    // which is stored in the language.types configuration.
-    return (new CacheableMetadata())->addCacheTags(['config:language.types']);
+    // which is stored in the language.types configuration. Without the
+    // language module there is no negotiation and the context is always
+    // empty, so the metadata must not depend on the configuration.
+    if ($this->languageManager instanceof ConfigurableLanguageManagerInterface) {
+      $metadata->addCacheTags(['config:language.types']);
+    }
+    return $metadata;
   }
 
 }
