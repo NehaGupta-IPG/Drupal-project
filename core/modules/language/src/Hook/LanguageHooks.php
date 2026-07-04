@@ -111,10 +111,6 @@ class LanguageHooks {
         $output = '<p>' . $this->t('Determine the language from a request/session parameter. Example: "http://example.com?language=de" sets language to German based on the use of "de" within the "language" parameter.') . '</p>';
         return $output;
 
-      case 'language.negotiation_admin_language':
-        $output = '<p>' . $this->t('Applies to administrative interfaces accessible to users with <em>Use the administration pages</em> or <em>View the administration theme</em> permission.') . '</p>';
-        return $output;
-
       case 'language.negotiation_browser':
         $output = '<p>' . $this->t('Browsers use different language codes to refer to the same languages. Internally, a best effort is made to determine the correct language based on the code that the browser sends. You can add and edit additional mappings from browser language codes to <a href=":configure-languages">site languages</a>.', [
           ':configure-languages' => Url::fromRoute('entity.configurable_language.collection')->toString(),

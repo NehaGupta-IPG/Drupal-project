@@ -31,35 +31,21 @@ class NegotiationAdminLanguageForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->config('language.negotiation');
-
     $form['default_langcode'] = [
       '#type' => 'language_select',
-      '#title' => $this->t('Default administration language'),
+      '#title' => $this->t("Site's administration language"),
       '#languages' => LanguageInterface::STATE_CONFIGURABLE | LanguageInterface::STATE_SITE_DEFAULT,
-      '#default_value' => $config->get('admin_language.default_langcode'),
-      '#description' => $this->t('The language to use for administration by default.'),
+      '#config_target' => 'language.negotiation:admin_language.default_langcode',
+      '#description' => $this->t('Unless there is a user-selected administration language, this will be used.'),
     ];
 
     $form['allow_user_change'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Allow users to set their own administration language'),
-      '#default_value' => $config->get('admin_language.allow_user_change') ?? FALSE,
+      '#config_target' => 'language.negotiation:admin_language.allow_user_change',
     ];
 
     return parent::buildForm($form, $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function submitForm(array &$form, FormStateInterface $form_state): void {
-    $this->config('language.negotiation')
-      ->set('admin_language.default_langcode', $form_state->getValue('default_langcode'))
-      ->set('admin_language.allow_user_change', $form_state->getValue('allow_user_change'))
-      ->save();
-
-    parent::submitForm($form, $form_state);
   }
 
 }
