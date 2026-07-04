@@ -222,9 +222,10 @@ class MediaLibraryState extends ParameterBag implements CacheableDependencyInter
    * selector.
    *
    * The selector is derived from the opener identity only, not ::getHash(),
-   * because the hash also covers the selected type and slot count. Those change
-   * as the user navigates inside the library, while the modal element is created
-   * once on open, so the selector must stay stable for the life of the modal.
+   * because the hash also covers the selected type and slot count. Those
+   * change as the user navigates inside the library, while the modal element
+   * is created once on open, so the selector must stay stable for the life of
+   * the modal.
    *
    * @return string
    *   The modal DOM selector, including the leading '#'.
