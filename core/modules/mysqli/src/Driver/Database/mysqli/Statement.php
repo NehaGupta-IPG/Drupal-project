@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\mysqli\Driver\Database\mysqli;
 
+use Doctrine\SqlFormatter\SqlFormatter;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Statement\PlaceholderType;
@@ -89,12 +90,12 @@ class Statement extends StatementBase {
       if (!$this->hasClientStatement()) {
         // Replace named placeholders with positional ones if needed.
         if ($this->placeholderType === PlaceholderType::Positional) {
-          // dump([$this->placeholderType->name, $this->queryString, $args]);.
-          assert(call_user_func(function () use ($args): bool {
+          assert(call_user_func(function () use ($args, &$formattedSql): bool {
+            $formattedSql = (new SqlFormatter())->format($this->queryString);
             $converter = new NamedPlaceholderConverter();
             $converter->parse($this->queryString, $args);
             return $converter->getConvertedSQL() === $this->queryString;
-          }), "Expected positional-placeholder-only query string '{$this->queryString}' has named placeholders in it.");
+          }), "Expected positional-placeholder-only query string\n-----\n{$formattedSql}\n-----\nhas named placeholders in it.");
           $convertedQueryString = $this->queryString;
         }
         else {

@@ -159,7 +159,7 @@ class Update extends Query implements ConditionInterface {
       $left_part = $this->connection->escapeField($field) . '=';
       $update_fields[] = match ($this->queryOptions['placeholder_format']) {
         PlaceholderType::Named => $left_part . $data['expression'],
-        PlaceholderType::Positional => $left_part . str_replace(array_keys($data['arguments']), '?', $data['expression']),
+        PlaceholderType::Positional => $left_part . str_replace(array_keys($data['arguments'] ?? []), '?', $data['expression']),
       };
       unset($fields[$field]);
     }

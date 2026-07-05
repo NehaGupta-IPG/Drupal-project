@@ -10,6 +10,7 @@
     },
     "require": {
         "composer/installers": "^2.3",
+        "doctrine/sql-formatter": "^1.5",
         "drupal/core": "self.version",
         "drupal/core-project-message": "self.version",
         "drupal/core-recipe-unpack": "self.version",
