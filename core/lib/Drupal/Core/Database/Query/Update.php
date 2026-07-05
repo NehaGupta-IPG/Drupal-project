@@ -156,7 +156,11 @@ class Update extends Query implements ConditionInterface {
         $data['expression']->compile($this->connection, $this);
         $data['expression'] = ' (' . $data['expression'] . ')';
       }
-      $update_fields[] = $this->connection->escapeField($field) . '=' . $data['expression'];
+      $left_part = $this->connection->escapeField($field) . '=';
+      $update_fields[] = match ($this->queryOptions['placeholder_format']) {
+        PlaceholderType::Named => $left_part . $data['expression'],
+        PlaceholderType::Positional => $left_part . str_replace(array_keys($data['arguments']), '?', $data['expression']),
+      };
       unset($fields[$field]);
     }
 
@@ -206,7 +210,10 @@ class Update extends Query implements ConditionInterface {
     $update_values = [];
     foreach ($this->expressionFields as $field => $data) {
       if (!empty($data['arguments'])) {
-        $update_values += $data['arguments'];
+        $update_values = match ($this->queryOptions['placeholder_format']) {
+          PlaceholderType::Named => array_merge($update_values, $data['arguments']),
+          PlaceholderType::Positional => array_merge($update_values, array_values($data['arguments'])),
+        };
       }
       if ($data['expression'] instanceof SelectInterface) {
         $data['expression']->compile($this->connection, $this);

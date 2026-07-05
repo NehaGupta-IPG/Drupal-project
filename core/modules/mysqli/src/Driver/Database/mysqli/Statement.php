@@ -90,6 +90,11 @@ class Statement extends StatementBase {
         // Replace named placeholders with positional ones if needed.
         if ($this->placeholderType === PlaceholderType::Positional) {
           // dump([$this->placeholderType->name, $this->queryString, $args]);.
+          assert(call_user_func(function() use($args): bool {
+            $converter = new NamedPlaceholderConverter();
+            $converter->parse($this->queryString, $args);
+            return $converter->getConvertedSQL() === $this->queryString;
+          }), "Expected positional-placeholder-only query string '{$this->queryString}' has named placeholders in it.");
           $convertedQueryString = $this->queryString;
         }
         else {
