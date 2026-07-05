@@ -188,7 +188,7 @@ class Update extends Query implements ConditionInterface {
    */
   public function arguments() {
     [$args] = $this->getQueryArguments();
-    return $this->condition->arguments() + $args;
+    return array_merge($args, $this->condition->arguments());
   }
 
   /**
