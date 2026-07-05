@@ -244,7 +244,11 @@ class Condition implements ConditionInterface, \Countable {
           // ConditionInterface::where() method. Put brackets around the snippet
           // and collect the arguments from the value part. Also ignore the
           // operator and value parts.
-          $field_fragment = '(' . $condition['field'] . ')';
+          $field_condition = match ($this->placeholderType) {
+            PlaceholderType::Named => $condition['field'],
+            PlaceholderType::Positional => str_replace(array_keys($condition['value']), '?', $condition['field']),
+          };
+          $field_fragment = '(' . $field_condition . ')';
           $arguments += $condition['value'];
           $ignore_operator = TRUE;
         }

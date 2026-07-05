@@ -3,6 +3,7 @@
 namespace Drupal\Core\Database\Query;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Statement\PlaceholderType;
 
 /**
  * General class for an abstracted UPDATE operation.
@@ -60,7 +61,7 @@ class Update extends Query implements ConditionInterface {
    *   Array of database options.
    */
   public function __construct(Connection $connection, $table, array $options = []) {
-    parent::__construct($connection, $options);
+    parent::__construct($connection, $options + ['placeholder_format' => $connection->placeholderFormat()]);
     $this->table = $table;
 
     $this->condition = $this->connection->condition('AND');
@@ -163,7 +164,12 @@ class Update extends Query implements ConditionInterface {
     [$args] = $this->getQueryArguments();
     $placeholders = array_keys($args);
     foreach ($fields as $field => $value) {
-      $update_fields[] = $this->connection->escapeField($field) . '=' . $placeholders[$max_placeholder++];
+      $left_part = $this->connection->escapeField($field) . '=';
+      $update_fields[] = match ($this->queryOptions['placeholder_format']) {
+        PlaceholderType::Named => $left_part . $placeholders[$max_placeholder],
+        PlaceholderType::Positional => $left_part . '?',
+      };
+      ++$max_placeholder;
     }
 
     $query = $comments . 'UPDATE {' . $this->connection->escapeTable($this->table) . '} SET ' . implode(', ', $update_fields);
@@ -214,7 +220,11 @@ class Update extends Query implements ConditionInterface {
     $max_placeholder = 0;
     $args = [];
     foreach ($fields as $value) {
-      $args[':db_update_placeholder_' . ($max_placeholder++)] = $value;
+      $placeholderKey = match ($this->queryOptions['placeholder_format']) {
+        PlaceholderType::Named => ':db_update_placeholder_' . $max_placeholder++,
+        PlaceholderType::Positional => $max_placeholder++,
+      };
+      $args[$placeholderKey] = $value;
     }
     return [$args, $update_values];
   }
