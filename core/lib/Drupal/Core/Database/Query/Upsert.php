@@ -27,9 +27,8 @@ abstract class Upsert extends Query implements \Countable {
     Connection $connection,
     string $table,
     array $options = [],
-    ?PlaceholderType $placeholderType = NULL,
   ) {
-    parent::__construct($connection, $options + ['placeholder_format' => $placeholderType ?? $connection->placeholderFormat()]);
+    parent::__construct($connection, $options + ['placeholder_format' => $connection->placeholderFormat()]);
     $this->table = $table;
   }
 
@@ -97,7 +96,11 @@ abstract class Upsert extends Query implements \Countable {
     $values = [];
     foreach ($this->insertValues as $insert_values) {
       foreach ($insert_values as $value) {
-        $values[':db_insert_placeholder_' . $max_placeholder++] = $value;
+        $placeholderKey = match ($this->queryOptions['placeholder_format']) {
+          PlaceholderType::Named => ':db_insert_placeholder_' . $max_placeholder++,
+          PlaceholderType::Positional => $max_placeholder++,
+        };
+        $values[$placeholderKey] = $value;
       }
     }
 

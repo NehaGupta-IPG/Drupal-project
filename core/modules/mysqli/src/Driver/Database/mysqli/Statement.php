@@ -89,6 +89,7 @@ class Statement extends StatementBase {
       if (!$this->hasClientStatement()) {
         // Replace named placeholders with positional ones if needed.
         if ($this->placeholderType === PlaceholderType::Positional) {
+          // dump([$this->placeholderType->name, $this->queryString, $args]);.
           $convertedQueryString = $this->queryString;
         }
         else {

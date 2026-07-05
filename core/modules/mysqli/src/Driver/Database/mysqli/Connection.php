@@ -9,13 +9,10 @@ use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseAccessDeniedException;
 use Drupal\Core\Database\DatabaseNotFoundException;
-use Drupal\Core\Database\Query\Condition;
-use Drupal\Core\Database\Query\Select;
 use Drupal\Core\Database\Statement\PlaceholderType;
 use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 use Drupal\mysql\Driver\Database\mysql\Connection as BaseMySqlConnection;
-use Drupal\mysql\Driver\Database\mysql\Insert;
 
 /**
  * MySQLi implementation of \Drupal\Core\Database\Connection.
@@ -164,7 +161,7 @@ class Connection extends BaseMySqlConnection {
    * {@inheritdoc}
    */
   public function placeholderFormat(): PlaceholderType {
-    return PlaceholderType::Named;
+    return PlaceholderType::Positional;
   }
 
   /**
@@ -189,6 +186,27 @@ class Connection extends BaseMySqlConnection {
   /**
    * {@inheritdoc}
    */
+  public function query($query, array $args = [], $options = []) {
+    // Use default values if not already set.
+    $options += $this->defaultOptions();
+    if (!isset($options['placeholder_format'])) {
+      $options['placeholder_format'] = PlaceholderType::Named;
+    }
+
+    try {
+      $this->expandArguments($query, $args);
+      $statement = $this->prepareStatement($query, $options);
+      $statement->execute($args, $options);
+      return $statement;
+    }
+    catch (\Exception $e) {
+      $this->exceptionHandler()->handleExecutionException($e, $statement, $args, $options);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function quote($string, $parameter_type = \PDO::PARAM_STR) {
     return "'" . $this->connection->escape_string((string) $string) . "'";
   }
@@ -205,27 +223,6 @@ class Connection extends BaseMySqlConnection {
    */
   public function exceptionHandler() {
     return new ExceptionHandler();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function condition($conjunction) {
-    return new Condition($this, $conjunction, PlaceholderType::Positional);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function select($table, $alias = NULL, array $options = []) {
-    return new Select($this, $table, $alias, $options, PlaceholderType::Positional);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function insert($table, array $options = []) {
-    return new Insert($this, $table, $options, PlaceholderType::Positional);
   }
 
   /**
