@@ -84,17 +84,20 @@ class Condition implements ConditionInterface, \Countable {
   /**
    * Constructs a Condition object.
    *
+   * @param \Drupal\Core\Database\Connection $connection
+   *   Database connection object.
    * @param string $conjunction
    *   The operator to use to combine conditions: 'AND' or 'OR'.
    * @param \Drupal\Core\Database\Statement\PlaceholderType|null $placeholderType
    *   The placeholder type, named or positional.
    */
   public function __construct(
-    $conjunction,
+    Connection $connection,
+    string $conjunction,
     ?PlaceholderType $placeholderType = NULL,
   ) {
     $this->conditions['#conjunction'] = $conjunction;
-    $this->placeholderType = $placeholderType ?? PlaceholderType::Named;
+    $this->placeholderType = $placeholderType ?? $connection->placeholderFormat();
   }
 
   /**

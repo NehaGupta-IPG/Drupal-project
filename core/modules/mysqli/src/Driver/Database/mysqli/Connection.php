@@ -9,6 +9,8 @@ use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseAccessDeniedException;
 use Drupal\Core\Database\DatabaseNotFoundException;
+use Drupal\Core\Database\Query\Condition;
+use Drupal\Core\Database\Query\Select;
 use Drupal\Core\Database\Statement\PlaceholderType;
 use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
@@ -170,13 +172,18 @@ class Connection extends BaseMySqlConnection {
    */
   public function prepareStatement(string $query, array $options, bool $allow_row_count = FALSE): StatementInterface {
     try {
-      $query = $this->preprocessStatement($query, $options);
-      $statement = new Statement($this, $this->connection, $query, $options['placeholder_format'] ?? $this->placeholderFormat(), [], $allow_row_count);
+      return new Statement(
+        $this,
+        $this->connection,
+        $this->preprocessStatement($query, $options),
+        $options['placeholder_format'] ?? $this->placeholderFormat(),
+        [],
+        $allow_row_count,
+      );
     }
     catch (\Exception $e) {
       $this->exceptionHandler()->handleStatementException($e, $query, $options);
     }
-    return $statement;
   }
 
   /**
@@ -198,6 +205,20 @@ class Connection extends BaseMySqlConnection {
    */
   public function exceptionHandler() {
     return new ExceptionHandler();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function condition($conjunction) {
+    return new Condition($this, $conjunction, PlaceholderType::Positional);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function select($table, $alias = NULL, array $options = []) {
+    return new Select($this, $table, $alias, $options, PlaceholderType::Positional);
   }
 
   /**

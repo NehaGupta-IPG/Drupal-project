@@ -3,6 +3,7 @@
 namespace Drupal\Core\Database\Query;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Statement\PlaceholderType;
 
 /**
  * Query builder for SELECT statements.
@@ -136,13 +137,21 @@ class Select extends Query implements SelectInterface {
    *   Database connection object.
    * @param string|\Drupal\Core\Database\Query\SelectInterface $table
    *   The table name or subquery that is being queried.
-   * @param string $alias
+   * @param ?string $alias
    *   The alias for the table.
    * @param array $options
    *   Array of query options.
+   * @param ?\Drupal\Core\Database\Statement\PlaceholderType $placeholderType
+   *   The type of placeholders in the query string.
    */
-  public function __construct(Connection $connection, $table, $alias = NULL, $options = []) {
-    parent::__construct($connection, $options);
+  public function __construct(
+    Connection $connection,
+    string|SelectInterface $table,
+    ?string $alias = NULL,
+    array $options = [],
+    ?PlaceholderType $placeholderType = NULL,
+  ) {
+    parent::__construct($connection, $options + ['placeholder_format' => $placeholderType ?? $connection->placeholderFormat()]);
     $conjunction = $options['conjunction'] ?? 'AND';
     $this->condition = $this->connection->condition($conjunction);
     $this->having = $this->connection->condition($conjunction);

@@ -975,7 +975,7 @@ abstract class Connection {
     // Creating an instance of the class Drupal\Core\Database\Query\Condition
     // should only be created from the database layer. This will allow database
     // drivers to override the default Condition class.
-    return new Condition($conjunction, $this->placeholderFormat());
+    return new Condition($this, $conjunction);
   }
 
   /**
