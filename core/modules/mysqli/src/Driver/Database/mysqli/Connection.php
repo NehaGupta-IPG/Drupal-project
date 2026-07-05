@@ -193,9 +193,9 @@ class Connection extends BaseMySqlConnection {
       $options['placeholder_format'] = PlaceholderType::Named;
     }
 
+    $this->expandArguments($query, $args);
+    $statement = $this->prepareStatement($query, $options);
     try {
-      $this->expandArguments($query, $args);
-      $statement = $this->prepareStatement($query, $options);
       $statement->execute($args, $options);
       return $statement;
     }

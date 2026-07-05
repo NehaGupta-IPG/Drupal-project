@@ -52,7 +52,7 @@ abstract class Insert extends Query implements \Countable {
    *   fields are specified, this method will do nothing and return NULL. That
    *   That makes it safe to use in multi-insert loops.
    */
-  public abstract function execute();
+  abstract public function execute();
 
   /**
    * Implements PHP magic __toString method to convert the query to a string.
