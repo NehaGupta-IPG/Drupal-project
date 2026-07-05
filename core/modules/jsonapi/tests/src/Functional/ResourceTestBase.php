@@ -815,6 +815,29 @@ abstract class ResourceTestBase extends BrowserTestBase {
   }
 
   /**
+   * Gets the expected error message for a request body that cannot be decoded.
+   *
+   * The wording of the decoder's error message is provided by PHP and can
+   * differ between PHP versions, so it is derived from the runtime here rather
+   * than being hard-coded.
+   *
+   * @param string $body
+   *   The request body that cannot be decoded.
+   *
+   * @return string
+   *   The expected error message.
+   */
+  protected function getExpectedNotParseableRequestBodyErrorMessage(string $body): string {
+    try {
+      $this->serializer->decode($body, 'api_json');
+    }
+    catch (\Exception $e) {
+      return $e->getMessage();
+    }
+    $this->fail('The request body was expected to be undecodable.');
+  }
+
+  /**
    * Asserts that a resource error response has the given message.
    *
    * Cache max-age is not yet considered when expected header is calculated.
@@ -2088,7 +2111,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
 
     // DX: 400 when un-parseable request body.
     $response = $this->request('POST', $url, $request_options);
-    $this->assertResourceErrorResponse(400, 'Syntax error', $url, $response, FALSE);
+    $this->assertResourceErrorResponse(400, $this->getExpectedNotParseableRequestBodyErrorMessage($not_parseable_request_body), $url, $response, FALSE);
 
     $request_options[RequestOptions::BODY] = $parseable_invalid_request_body_missing_type;
 
@@ -2316,7 +2339,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
 
     // DX: 400 when un-parseable request body.
     $response = $this->request('PATCH', $url, $request_options);
-    $this->assertResourceErrorResponse(400, 'Syntax error', $url, $response, FALSE);
+    $this->assertResourceErrorResponse(400, $this->getExpectedNotParseableRequestBodyErrorMessage($not_parseable_request_body), $url, $response, FALSE);
 
     // DX: 422 when invalid entity: multiple values sent for single-value field.
     if ($this->entity->getEntityType()->hasKey('label')) {
