@@ -1,0 +1,33 @@
+Patch-Source: https://github.com/phpspec/prophecy/issues/672
+From 4f50ebdc69c85c3bd34a055d8622720892eacc4a Mon Sep 17 00:00:00 2001
+From: Andy Postnikov <apostnikov@gmail.com>
+Date: Sun, 5 Jul 2026 14:48:53 +0200
+Subject: [PATCH] Avoid returning from doubled destructors
+
+---
+ src/Prophecy/Doubler/ClassPatch/ProphecySubjectPatch.php | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/Prophecy/Doubler/ClassPatch/ProphecySubjectPatch.php b/src/Prophecy/Doubler/ClassPatch/ProphecySubjectPatch.php
+index 46632fc..ff3e082 100644
+--- a/src/Prophecy/Doubler/ClassPatch/ProphecySubjectPatch.php
++++ b/src/Prophecy/Doubler/ClassPatch/ProphecySubjectPatch.php
+@@ -48,11 +48,13 @@ class ProphecySubjectPatch implements ClassPatchInterface
+         $node->addProperty('objectProphecyClosure', 'private');
+ 
+         foreach ($node->getMethods() as $name => $method) {
+-            if ('__construct' === strtolower($name)) {
++            $methodName = strtolower($name);
++
++            if ('__construct' === $methodName) {
+                 continue;
+             }
+ 
+-            if (!$method->getReturnTypeNode()->hasReturnStatement()) {
++            if ('__destruct' === $methodName || !$method->getReturnTypeNode()->hasReturnStatement()) {
+                 $method->setCode(
+                     '$this->getProphecy()->makeProphecyMethodCall(__FUNCTION__, func_get_args());'
+                 );
+-- 
+2.53.0
+

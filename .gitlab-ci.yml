@@ -123,6 +123,12 @@ default:
 # Templates #
 #############
 
+.patch-prophecy-php86: &patch-prophecy-php86
+  - |
+    if ! grep -q "'__destruct' === \$methodName" vendor/phpspec/prophecy/src/Prophecy/Doubler/ClassPatch/ProphecySubjectPatch.php; then
+      patch -p1 -d vendor/phpspec/prophecy < fix-prophecy-php86-destructor.patch
+    fi
+
 .with-composer: &with-composer
   needs:
     - job: '🧹 PHP Coding standards (PHPCS)'
@@ -158,6 +164,7 @@ default:
   - echo -e "\e[0Ksection_start:`date +%s`:composer_setup[collapsed=true]\r\e[0K\e[0;30;103m*** Composer setup ***\e[0m"
   - composer validate
   - composer install --optimize-autoloader
+  - *patch-prophecy-php86
   - composer run-script drupal-phpunit-upgrade-check
   - echo -e "\e[0Ksection_end:`date +%s`:composer_setup\r\e[0K"
 
@@ -274,6 +281,7 @@ default:
         composer update --optimize-autoloader;
         composer outdated;
       fi
+    - *patch-prophecy-php86
   artifacts:
     expire_in: 1 week
     paths:
@@ -428,6 +436,7 @@ default:
       [[ $_TARGET_DB == mariadb* ]] && export SIMPLETEST_DB=$_TARGET_DB_DRIVER://$MYSQL_USER:$MYSQL_PASSWORD@database/$MYSQL_DATABASE?module=$_TARGET_DB_DRIVER_MODULE
       [[ $_TARGET_DB == pgsql* ]] && export SIMPLETEST_DB=pgsql://$POSTGRES_USER:$POSTGRES_PASSWORD@database/$POSTGRES_DB?module=pgsql
     - composer install --optimize-autoloader
+    - *patch-prophecy-php86
     - export OTEL_COLLECTOR="$OPENTELEMETRY_COLLECTOR"
     - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
     - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
