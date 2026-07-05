@@ -9,6 +9,7 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Statement\PlaceholderType;
 use Drupal\Core\Database\Statement\StatementBase;
+use Drupal\Core\Database\Utility\CliHighlighter;
 
 /**
  * MySQLi implementation of \Drupal\Core\Database\Query\StatementInterface.
@@ -91,11 +92,14 @@ class Statement extends StatementBase {
         // Replace named placeholders with positional ones if needed.
         if ($this->placeholderType === PlaceholderType::Positional) {
           assert(call_user_func(function () use ($args, &$formattedSql): bool {
-            // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
-            $formattedSql = (new SqlFormatter())->format($this->queryString);
             $converter = new NamedPlaceholderConverter();
             $converter->parse($this->queryString, $args);
-            return $converter->getConvertedSQL() === $this->queryString;
+            $isDifferent = $converter->getConvertedSQL() !== $this->queryString;
+            if ($isDifferent) {
+              // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+              $formattedSql = (new SqlFormatter(new CliHighlighter()))->format($this->queryString);
+            }
+            return !$isDifferent;
           }), "Expected positional-placeholder-only query string\n-----\n{$formattedSql}\n-----\nhas named placeholders in it.");
           $convertedQueryString = $this->queryString;
         }
