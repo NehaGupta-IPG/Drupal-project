@@ -534,6 +534,16 @@ END;
    *   The command's output, optionally parsed as JSON.
    */
   protected function runComposer(string $command, ?string $working_dir = NULL, bool $json = FALSE) {
+    // Allow testing on development PHP versions before all dependencies have
+    // widened their upper PHP constraints.
+    if (PHP_VERSION_ID >= 80600 && preg_match('/^composer (install|update|require)\b/', $command)) {
+      $command = preg_replace(
+        '/^composer (install|update|require)\b/',
+        '$0 --ignore-platform-req=php+',
+        $command,
+        1,
+      ) ?? $command;
+    }
     $process = $this->executeCommand($command, $working_dir);
     $this->assertCommandSuccessful();
 

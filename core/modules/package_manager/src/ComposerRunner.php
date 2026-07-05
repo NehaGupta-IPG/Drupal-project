@@ -37,6 +37,16 @@ final class ComposerRunner implements ComposerProcessRunnerInterface {
    * {@inheritdoc}
    */
   public function run(array $command, ?PathInterface $cwd = NULL, array $env = [], ?OutputCallbackInterface $callback = NULL, int $timeout = ProcessInterface::DEFAULT_TIMEOUT): void {
+    // Allow testing on development PHP versions before all dependencies have
+    // widened their upper PHP constraints.
+    if (PHP_VERSION_ID >= 80600 && in_array($command[0] ?? '', [
+      'install',
+      'update',
+      'require',
+    ], TRUE)) {
+      array_splice($command, 1, 0, '--ignore-platform-req=php+');
+    }
+
     // Run Composer through the PHP interpreter so we don't have to rely on
     // PHP being in the PATH.
     array_unshift($command, (new PhpExecutableFinder())->find(), $this->executableFinder->find('composer'));
