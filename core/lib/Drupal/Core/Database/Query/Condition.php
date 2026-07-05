@@ -90,11 +90,11 @@ class Condition implements ConditionInterface, \Countable {
    *   The operator to use to combine conditions: 'AND' or 'OR'.
    */
   public function __construct(
-    Connection $connection,
+    $connection,
     string $conjunction,
   ) {
     $this->conditions['#conjunction'] = $conjunction;
-    $this->placeholderType = $connection->placeholderFormat();
+    $this->placeholderType = $connection instanceof Connection ? $connection->placeholderFormat() : PlaceholderType::Named;
   }
 
   /**
