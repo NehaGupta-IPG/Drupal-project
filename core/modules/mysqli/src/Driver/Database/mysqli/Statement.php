@@ -91,6 +91,7 @@ class Statement extends StatementBase {
         // Replace named placeholders with positional ones if needed.
         if ($this->placeholderType === PlaceholderType::Positional) {
           assert(call_user_func(function () use ($args, &$formattedSql): bool {
+            // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
             $formattedSql = (new SqlFormatter())->format($this->queryString);
             $converter = new NamedPlaceholderConverter();
             $converter->parse($this->queryString, $args);
