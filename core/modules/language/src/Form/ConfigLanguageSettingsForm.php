@@ -8,6 +8,7 @@ use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -25,13 +26,23 @@ class ConfigLanguageSettingsForm extends ConfigFormBase {
   protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
+   * The language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected LanguageManagerInterface $languageManager;
+
+  /**
    * Constructs a new ConfigLanguageSettingsForm.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager service.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager) {
     $this->entityTypeManager = $entity_type_manager;
+    $this->languageManager = $language_manager;
   }
 
   /**
@@ -39,7 +50,8 @@ class ConfigLanguageSettingsForm extends ConfigFormBase {
    */
   public static function create(ContainerInterface $container): static {
     return new static(
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('language_manager')
     );
   }
 
@@ -62,6 +74,7 @@ class ConfigLanguageSettingsForm extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state): array {
     $config = $this->config('language.config_type_settings');
+    $default_language_name = $this->languageManager->getDefaultLanguage()->getName();
 
     $langcode_configurable = [];
 
@@ -86,7 +99,7 @@ class ConfigLanguageSettingsForm extends ConfigFormBase {
 
     $form['show_langcode'] = [
       '#type' => 'checkboxes',
-      '#title' => $this->t('Allow creating configuration in languages other than the site default'),
+      '#title' => $this->t('Allow creating configuration in languages other than the site default (@language_name)', ['@language_name' => $default_language_name]),
       '#options' => $langcode_configurable,
       '#default_value' => $default_show_langcode,
       '#description' => $this->t('Items not listed will always be created in the site default language.'),
