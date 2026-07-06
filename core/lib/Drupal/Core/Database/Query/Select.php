@@ -211,7 +211,7 @@ class Select extends Query implements SelectInterface {
 
     foreach ($this->tables as $table) {
       if ($table['arguments']) {
-        $args += $table['arguments'];
+        $args = array_merge($args, $this->processConditionPlaceholders((string) $table['condition'], $table['arguments'])[1]);
       }
       // If this table is a subquery, grab its arguments recursively.
       if ($table['table'] instanceof SelectInterface) {
@@ -959,11 +959,29 @@ class Select extends Query implements SelectInterface {
     }
   }
 
+  /**
+   * Processes placeholders.
+   *
+   * @param string $condition
+   *   The condition to modify.
+   * @param array $arguments
+   *   The arguments for the condition.
+   *
+   * @return array{0: string, 1: array}
+   *   The processed condition string and the placeholders' values.
+   *
+   * @throws \InvalidArgumentException
+   *   This exception is thrown when:
+   *   - A placeholder that ends in [] is supplied, and the supplied value is
+   *     not an array.
+   *   - A placeholder that does not end in [] is supplied, and the supplied
+   *     value is an array.
+   */
   protected function processConditionPlaceholders(string $condition, array $arguments): array {
     $returnCondition = $condition;
     $returnArguments = [];
     foreach ($arguments as $placeholder => $value) {
-      // Deal with array argument
+      // Deal with array placeholder.
       if (str_ends_with($placeholder, '[]')) {
         if (!is_array($value)) {
           throw new \InvalidArgumentException('Placeholders with a trailing [] can only be expanded with an array of values.');
@@ -986,34 +1004,19 @@ class Select extends Query implements SelectInterface {
           $returnArguments = array_merge($returnArguments, $tmp);
         }
       }
-
-/*      $is_array_data = is_array($data);
-      if ($isBracketPlaceholder && !$is_array_data) {
-        throw new \InvalidArgumentException('Placeholders with a trailing [] can only be expanded with an array of values.');
-      }
-      elseif (!$isBracketPlaceholder) {
-        if ($is_array_data) {
+      // Deal with scalar placeholder.
+      else {
+        if (is_array($value)) {
           throw new \InvalidArgumentException('Placeholders must have a trailing [] if they are to be expanded with an array of values.');
         }
-        // Scalar placeholder - does not need to be expanded.
-        continue;
+        if ($this->queryOptions['placeholder_format'] === PlaceholderType::Named) {
+          $returnArguments[$placeholder] = $value;
+        }
+        else {
+          $returnCondition = str_replace($placeholder, '?', $returnCondition);
+          $returnArguments[] = $value;
+        }
       }
-      // Handle expansion of arrays.
-      $key_name = str_replace('[]', '__', $key);
-      $new_keys = [];
-      // We require placeholders to have trailing brackets if the developer
-      // intends them to be expanded to an array to make the intent explicit.
-      foreach (array_values($data) as $i => $value) {
-        // This assumes that there are no other placeholders that use the same
-        // name.  For example, if the array placeholder is defined as :example[]
-        // and there is already an :example_2 placeholder, this will generate
-        // a duplicate key.  We do not account for that as the calling code
-        // is already broken if that happens.
-        $new_keys[$key_name . $i] = $value;
-      }
-
-      // Update the query with the new placeholders.
-      $query = str_replace($key, implode(', ', array_keys($new_keys)), $query);*/
     }
     return [$returnCondition, $returnArguments];
   }
