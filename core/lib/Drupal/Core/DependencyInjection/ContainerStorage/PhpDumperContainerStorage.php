@@ -8,7 +8,6 @@ use Drupal\Component\PhpStorage\PhpStorageInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ContainerStorageInterface;
-use Drupal\Core\DependencyInjection\Dumper\FileLoaderStub;
 use Drupal\Core\DependencyInjection\PhpContainer;
 use Drupal\Core\DestructableInterface;
 use Drupal\Core\Site\Settings;
@@ -80,13 +79,6 @@ class PhpDumperContainerStorage implements ContainerStorageInterface, Destructab
    * {@inheritdoc}
    */
   public function dump(ContainerBuilder $container, string $suffix): ContainerInterface {
-    // Ensure FileLoader::ANONYMOUS_ID_REGEXP is available for PhpDumper.
-    // Check both the real dependency (symfony/config FileLoader) and the alias
-    // target to avoid "Cannot redeclare class" warnings on repeated dumps.
-    if (!class_exists('Symfony\Component\Config\Loader\FileLoader') && !class_exists('Symfony\Component\DependencyInjection\Loader\FileLoader', FALSE)) {
-      class_alias(FileLoaderStub::class, 'Symfony\Component\DependencyInjection\Loader\FileLoader');
-    }
-
     // Strip leading backslash so the generated PHP code produces a correct
     // fully qualified class name (the dumper prepends its own backslash).
     $baseClass = ltrim($this->settings->get('container_base_class', PhpContainer::class), '\\');
