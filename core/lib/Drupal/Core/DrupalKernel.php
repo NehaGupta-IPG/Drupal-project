@@ -66,7 +66,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *
    * @var string
    *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use the
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use the
    *   bootstrap_container_definition setting to set the class.
    *
    * @see https://www.drupal.org/node/3585642
@@ -565,7 +565,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // the default.
     // @phpstan-ignore property.deprecated
     if ($this->phpArrayDumperClass !== '\Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper') {
-      @trigger_error(__CLASS__ . '::$phpArrayDumperClass is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use the bootstrap_container_definition setting to set the class. See https://www.drupal.org/node/3585642', E_USER_DEPRECATED);
+      @trigger_error(__CLASS__ . '::$phpArrayDumperClass is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use the bootstrap_container_definition setting to set the class. See https://www.drupal.org/node/3585642', E_USER_DEPRECATED);
       // @phpstan-ignore property.deprecated
       $definition['services']['container_storage.cache']['arguments'][] = $this->phpArrayDumperClass;
     }
@@ -621,13 +621,13 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * {@inheritdoc}
    *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Container
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Container
    *   loading is now handled by ContainerStorageInterface::load().
    *
    * @see https://www.drupal.org/node/3585642
    */
   public function getCachedContainerDefinition() {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Container loading is now handled by ContainerStorageInterface::load(). See https://www.drupal.org/node/3585642', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Container loading is now handled by ContainerStorageInterface::load(). See https://www.drupal.org/node/3585642', E_USER_DEPRECATED);
     $cache = $this->bootstrapContainer->get('cache.container')->get($this->getContainerCacheKey());
 
     if ($cache) {
@@ -1008,14 +1008,14 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @return string
    *   The cache key used for the service container.
    *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
    *   getContainerCacheKeySuffix() instead. The cache key prefix is now
    *   managed by ContainerStorageInterface implementations.
    *
    * @see https://www.drupal.org/node/3585642
    */
   protected function getContainerCacheKey() {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use getContainerCacheKeySuffix() instead. The cache key prefix is now managed by ContainerStorageInterface implementations. See https://www.drupal.org/node/3585642', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use getContainerCacheKeySuffix() instead. The cache key prefix is now managed by ContainerStorageInterface implementations. See https://www.drupal.org/node/3585642', E_USER_DEPRECATED);
     return 'service_container:' . $this->getContainerCacheKeySuffix();
   }
 
@@ -1710,13 +1710,13 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @return bool
    *   TRUE if the container was successfully cached.
    *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Container
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Container
    *   dumping is now handled by ContainerStorageInterface::dump().
    *
    * @see https://www.drupal.org/node/3585642
    */
   protected function cacheDrupalContainer(array $container_definition) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Container dumping is now handled by ContainerStorageInterface::dump(). See https://www.drupal.org/node/3585642', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Container dumping is now handled by ContainerStorageInterface::dump(). See https://www.drupal.org/node/3585642', E_USER_DEPRECATED);
     $saved = TRUE;
     try {
       $this->bootstrapContainer->get('cache.container')->set($this->getContainerCacheKey(), $container_definition);
