@@ -79,6 +79,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @var array
    */
   protected $defaultBootstrapContainerDefinition = [
+    'parameters' => [],
     'services' => [
       'database' => [
         'class' => 'Drupal\Core\Database\Connection',
