@@ -3,6 +3,7 @@
 namespace Drupal\Core\Database\Query;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Statement\PlaceholderType;
 
 /**
  * Query builder for SELECT statements.
@@ -878,7 +879,7 @@ class Select extends Query implements SelectInterface {
       $query .= $table_string . ' ' . $this->connection->escapeAlias($table['alias']);
 
       if (!empty($table['condition'])) {
-        $query .= ' ON ' . (string) $table['condition'];
+        $query .= ' ON ' . $this->processConditionPlaceholders((string) $table['condition'], $table['arguments'])[0];
       }
     }
 
@@ -956,6 +957,65 @@ class Select extends Query implements SelectInterface {
         $this->tables[$alias]['table'] = clone $table['table'];
       }
     }
+  }
+
+  protected function processConditionPlaceholders(string $condition, array $arguments): array {
+    $returnCondition = $condition;
+    $returnArguments = [];
+    foreach ($arguments as $placeholder => $value) {
+      // Deal with array argument
+      if (str_ends_with($placeholder, '[]')) {
+        if (!is_array($value)) {
+          throw new \InvalidArgumentException('Placeholders with a trailing [] can only be expanded with an array of values.');
+        }
+        if ($this->queryOptions['placeholder_format'] === PlaceholderType::Named) {
+          $key = str_replace('[]', '__', $placeholder);
+          $tmp = [];
+          foreach (array_values($value) as $i => $v) {
+            $tmp[$key . $i] = $v;
+          }
+          $returnCondition = str_replace($placeholder, implode(', ', array_keys($tmp)), $returnCondition);
+          $returnArguments = array_merge($returnArguments, $tmp);
+        }
+        else {
+          $tmp = [];
+          foreach (array_values($value) as $i => $v) {
+            $tmp[$i] = $v;
+          }
+          $returnCondition = str_replace($placeholder, implode(', ', array_fill(0, $i + 1, '?')), $returnCondition);
+          $returnArguments = array_merge($returnArguments, $tmp);
+        }
+      }
+
+/*      $is_array_data = is_array($data);
+      if ($isBracketPlaceholder && !$is_array_data) {
+        throw new \InvalidArgumentException('Placeholders with a trailing [] can only be expanded with an array of values.');
+      }
+      elseif (!$isBracketPlaceholder) {
+        if ($is_array_data) {
+          throw new \InvalidArgumentException('Placeholders must have a trailing [] if they are to be expanded with an array of values.');
+        }
+        // Scalar placeholder - does not need to be expanded.
+        continue;
+      }
+      // Handle expansion of arrays.
+      $key_name = str_replace('[]', '__', $key);
+      $new_keys = [];
+      // We require placeholders to have trailing brackets if the developer
+      // intends them to be expanded to an array to make the intent explicit.
+      foreach (array_values($data) as $i => $value) {
+        // This assumes that there are no other placeholders that use the same
+        // name.  For example, if the array placeholder is defined as :example[]
+        // and there is already an :example_2 placeholder, this will generate
+        // a duplicate key.  We do not account for that as the calling code
+        // is already broken if that happens.
+        $new_keys[$key_name . $i] = $value;
+      }
+
+      // Update the query with the new placeholders.
+      $query = str_replace($key, implode(', ', array_keys($new_keys)), $query);*/
+    }
+    return [$returnCondition, $returnArguments];
   }
 
 }

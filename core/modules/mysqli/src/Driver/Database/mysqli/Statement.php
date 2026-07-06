@@ -92,9 +92,14 @@ class Statement extends StatementBase {
         // Replace named placeholders with positional ones if needed.
         if ($this->placeholderType === PlaceholderType::Positional) {
           assert(call_user_func(function () use ($args, &$formattedSql): bool {
-            $converter = new NamedPlaceholderConverter();
-            $converter->parse($this->queryString, $args);
-            $isDifferent = $converter->getConvertedSQL() !== $this->queryString;
+            try {
+              $converter = new NamedPlaceholderConverter();
+              $converter->parse($this->queryString, $args);
+              $isDifferent = $converter->getConvertedSQL() !== $this->queryString;
+            }
+            catch (\Exception) {
+              $isDifferent = FALSE;
+            }
             if ($isDifferent) {
               // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
               $formattedSql = (new SqlFormatter(new CliHighlighter()))->format($this->queryString);
