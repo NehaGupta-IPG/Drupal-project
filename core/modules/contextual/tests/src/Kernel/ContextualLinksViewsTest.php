@@ -73,6 +73,7 @@ class ContextualLinksViewsTest extends ViewsKernelTestBase {
     $this->assertNotNull($contextual_field);
 
     $row = $view->result[0];
+    $view->row_index = $row->index;
 
     // Use executeInRenderContext() to provide proper render context.
     $output = $renderer->executeInRenderContext(new RenderContext(), function () use ($view, $row) {
@@ -120,6 +121,7 @@ class ContextualLinksViewsTest extends ViewsKernelTestBase {
     $contextual_field = $view->field['contextual_links'];
 
     $row = $view->result[0];
+    $view->row_index = $row->index;
     // First render the name field so last_render is populated.
     $view->field['name']->advancedRender($row);
     $output = $contextual_field->render($row);
