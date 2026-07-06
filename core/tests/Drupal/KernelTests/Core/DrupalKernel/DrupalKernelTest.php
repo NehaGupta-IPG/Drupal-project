@@ -26,7 +26,6 @@ use PHPUnit\Framework\Attributes\TestWith;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 // cspell:ignore äöüßαβγδεζηθικλμνξοσὠ
 /**
@@ -532,9 +531,10 @@ class DrupalKernelTest extends KernelTestBase {
     $this->assertNotSame($container_file, $new_container_file);
     $this->assertFileExists($new_container_file);
 
-    $kernel->terminate($request, new Response());
-    // The old container file should be deleted.
+    $kernel->garbageCollection();
+    // Only the old container file should be deleted.
     $this->assertFileDoesNotExist($container_file);
+    $this->assertFileExists($new_container_file);
   }
 
   /**
@@ -563,20 +563,21 @@ class DrupalKernelTest extends KernelTestBase {
     // Same file path as the original system container (no re-save occurred).
     $this->assertSame($container_file_with_system, (new \ReflectionClass($container_no_save))->getFileName());
     $this->assertFileExists($container_file_with_system);
-    // terminate() deletes the system+user file (it was in this kernel's
-    // oldHashes) but leaves the system-only file intact.
-    $kernel_no_save->terminate($request, new Response());
+    // Garbage collection removes the superseded system+user file (the current
+    // container is system-only) but leaves the system-only file intact.
+    $kernel_no_save->garbageCollection();
     $this->assertFileDoesNotExist($container_file_with_system_and_user);
     $this->assertFileExists($container_file_with_system);
 
     $kernel->updateModules(['system' => 'system']);
     $container = $kernel->getContainer();
     $this->assertSame($container_file_with_system, (new \ReflectionClass($container))->getFileName());
-    // The system+user file was already removed by $kernel_no_save->terminate().
+    // The system+user file was already removed by $kernel_no_save's garbage
+    // collection.
     $this->assertFileDoesNotExist($container_file_with_system_and_user);
     $this->assertFileExists($container_file_with_system);
 
-    $kernel->terminate($request, new Response());
+    $kernel->garbageCollection();
     // System+user was already deleted; system-only file is kept as it is the
     // active container.
     $this->assertFileDoesNotExist($container_file_with_system_and_user);
@@ -600,14 +601,15 @@ class DrupalKernelTest extends KernelTestBase {
     // path. The class file path reported by reflection is therefore the
     // original one, not the newly saved mtime path.
     $this->assertSame($container_file_with_system_and_user, (new \ReflectionClass($container))->getFileName());
-    // The system+user file was previously deleted by $kernel_no_save->terminate().
-    // dump() re-saved it to a new mtime-based path. Use glob on the container
-    // class directory (stable across mtime changes) to confirm a file exists.
+    // The system+user file was previously deleted by $kernel_no_save's garbage
+    // collection. dump() re-saved it to a new mtime-based path. Use glob on the
+    // container class directory (stable across mtime changes) to confirm a file
+    // exists.
     $this->assertCount(1, glob(dirname($container_file_with_system_and_user) . '/*.php'));
     $this->assertFileDoesNotExist($container_file_with_system_and_user);
     $this->assertFileExists($container_file_with_system);
 
-    $kernel->terminate($request, new Response());
+    $kernel->garbageCollection();
     // The system+user container is the active one and must not be deleted.
     $this->assertCount(1, glob(dirname($container_file_with_system_and_user) . '/*.php'));
     $this->assertFileDoesNotExist($container_file_with_system);

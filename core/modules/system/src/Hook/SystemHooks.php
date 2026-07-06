@@ -288,6 +288,8 @@ class SystemHooks {
     if (\Drupal::service('keyvalue.expirable.database') instanceof KeyValueDatabaseExpirableFactory) {
       \Drupal::service('keyvalue.expirable.database')->garbageCollection();
     }
+    // Clean up superseded compiled service containers.
+    \Drupal::service('kernel')->garbageCollection();
     // Clean up any garbage in the queue service.
     $queue_worker_manager = \Drupal::service('plugin.manager.queue_worker');
     $queue_factory = \Drupal::service('queue');

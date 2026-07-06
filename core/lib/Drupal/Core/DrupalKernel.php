@@ -79,11 +79,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @var array
    */
   protected $defaultBootstrapContainerDefinition = [
-    'parameters' => [
-      'kernel.destructable_services' => [
-        'container_storage.php_dumper',
-      ],
-    ],
     'services' => [
       'database' => [
         'class' => 'Drupal\Core\Database\Connection',
@@ -556,7 +551,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     $definition = Settings::get('bootstrap_container_definition', []);
     $definition['services'] = array_merge($this->defaultBootstrapContainerDefinition['services'], $definition['services'] ?? []);
-    $definition['parameters'] = array_merge($this->defaultBootstrapContainerDefinition['parameters'], $definition['parameters'] ?? []);
     // Pass the site path to the php storage service container so the fallback
     // to \Drupal\Core\StreamWrapper\PublicStream::basePath() works.
     $definition['services']['php_storage.service_container']['arguments']['site_path'] = $this->sitePath;
@@ -779,12 +773,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       foreach ($this->container->getParameter('kernel.destructable_services') as $id) {
         if ($this->container->initialized($id)) {
           $service = $this->container->get($id);
-          $service->destruct();
-        }
-      }
-      foreach ($this->bootstrapContainer->getParameter('kernel.destructable_services') as $id) {
-        if ($this->bootstrapContainer->initialized($id)) {
-          $service = $this->bootstrapContainer->get($id);
           $service->destruct();
         }
       }
@@ -1519,6 +1507,13 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // invalidation must still clear the real stored container, e.g. when
     // update.php runs drupal_flush_all_caches().
     $this->bootstrapContainer->get('container_storage')->invalidate();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function garbageCollection(): void {
+    $this->getContainerStorage()->garbageCollection();
   }
 
   /**

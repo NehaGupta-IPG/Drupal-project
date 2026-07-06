@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\DependencyInjection\ContainerStorage;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\FileSystem\FileSystem;
 use Drupal\Component\PhpStorage\PhpStorageInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ContainerStorage\PhpDumperContainerStorage;
 use Drupal\Core\DependencyInjection\PhpContainer;
@@ -90,9 +92,25 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
         }
       });
 
+    // listAll() and delete() model MTimeProtectedFileStorage, which stores each
+    // file in a containing directory named after the virtual file name with the
+    // '.php' extension removed. Hence listAll() returns names without '.php',
+    // and delete() is tolerant of names with or without it.
+    $normalize = fn ($filename) => str_ends_with($filename, '.php') ? substr($filename, 0, -4) : $filename;
+
+    $phpStorage->method('listAll')
+      ->willReturnCallback(function () use (&$code, $normalize) {
+        return array_values(array_unique(array_map($normalize, array_keys($code))));
+      });
+
     $phpStorage->method('delete')
-      ->willReturnCallback(function ($filename) use (&$code, &$deletedFiles) {
-        unset($code[$filename]);
+      ->willReturnCallback(function ($filename) use (&$code, &$deletedFiles, $normalize) {
+        $target = $normalize($filename);
+        foreach (array_keys($code) as $stored) {
+          if ($normalize($stored) === $target) {
+            unset($code[$stored]);
+          }
+        }
         $deletedFiles[] = $filename;
         return TRUE;
       });
@@ -204,10 +222,10 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
   }
 
   /**
-   * Tests that dump() deletes old file when hash changes.
+   * Tests that garbageCollection() removes superseded containers.
    */
-  public function testDumpDeletesOldFileOnRebuild(): void {
-    $cache = $this->createStub(CacheBackendInterface::class);
+  public function testGarbageCollectionRemovesSupersededContainers(): void {
+    $cache = new MemoryBackend($this->createStub(TimeInterface::class));
     $savedFiles = [];
     $deletedFiles = [];
     $phpStorage = $this->createPhpStorage($savedFiles, $deletedFiles);
@@ -226,91 +244,56 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     $result1 = $storage->dump($container1, 'test_suffix');
     $result2 = $storage->dump($container2, 'test_suffix');
 
-    // Different containers produce different classes.
+    // Different containers produce different classes, and both files exist.
     $this->assertNotSame($result1::class, $result2::class);
-    $storage->destruct();
-    // The old container file should have been deleted.
-    $this->assertCount(1, $deletedFiles);
-    $this->assertSame($savedFiles[0], $deletedFiles[0]);
+    $this->assertCount(2, $savedFiles);
+    $this->assertCount(0, $deletedFiles);
+
+    $storage->garbageCollection();
+
+    // The superseded (first) container is removed; the current one is kept.
+    $this->assertSame([$result1::class], $deletedFiles);
   }
 
   /**
-   * Tests that cache hash is updated before old container file is deleted.
+   * Tests that garbageCollection() only touches the current suffix's files.
    *
-   * This ordering is critical: if the old file is deleted before the cache
-   * points to the new hash, a concurrent request could read the stale hash
-   * from cache and fail to load the (now deleted) old container file.
+   * Multiple sites can share one PhpStorage directory (for example, a multisite
+   * installation using the system temporary directory). Each site's cache is
+   * separate, so one site's garbage collection must never remove another site's
+   * container files.
    */
-  public function testDumpUpdatesCacheBeforeDeletingOldFile(): void {
-    $operations = [];
-    $code = [];
+  public function testGarbageCollectionLeavesOtherSuffixesUntouched(): void {
+    // A single, shared PhpStorage stands in for the shared storage directory.
+    $savedFiles = [];
+    $deletedFiles = [];
+    $phpStorage = $this->createPhpStorage($savedFiles, $deletedFiles);
 
-    // Build a cache mock that records set() calls.
-    $cache = $this->createStub(CacheBackendInterface::class);
-    $cache->method('get')->willReturn(FALSE);
-    $cache->method('set')
-      ->willReturnCallback(function ($key, $hash) use (&$operations) {
-        $operations[] = ['cache_set', $hash];
-      });
+    // Separate caches stand in for each site's own cache backend.
+    $storageA = new PhpDumperContainerStorage(new MemoryBackend($this->createStub(TimeInterface::class)), $phpStorage, Settings::getInstance());
+    $storageB = new PhpDumperContainerStorage(new MemoryBackend($this->createStub(TimeInterface::class)), $phpStorage, Settings::getInstance());
 
-    // Build a PhpStorage mock that records save/load/delete calls.
-    $phpStorage = $this->createStub(PhpStorageInterface::class);
-    $phpStorage->method('save')
-      ->willReturnCallback(function ($filename, $phpCode) use (&$code, &$operations) {
-        $code[$filename] = $phpCode;
-        $operations[] = ['save', $filename];
-        return TRUE;
-      });
-    $phpStorage->method('load')
-      ->willReturnCallback(function ($filename) use (&$code) {
-        if (isset($code[$filename])) {
-          $tempFile = tempnam(FileSystem::getOsTemporaryDirectory(), 'drupal_container_test_');
-          $this->tempFiles[] = $tempFile;
-          file_put_contents($tempFile, $code[$filename]);
-          include_once $tempFile;
-        }
-      });
-    $phpStorage->method('delete')
-      ->willReturnCallback(function ($filename) use (&$code, &$operations) {
-        unset($code[$filename]);
-        $operations[] = ['delete', $filename];
-        return TRUE;
-      });
-    $phpStorage->method('exists')
-      ->willReturnCallback(function ($filename) use (&$code) {
-        return isset($code[$filename]);
-      });
+    // Site A dumps two versions (one superseded); site B dumps one.
+    $a1 = new ContainerBuilder();
+    $a1->setParameter('test_param', 'a1');
+    $a1->compile();
+    $a2 = new ContainerBuilder();
+    $a2->setParameter('test_param', 'a2');
+    $a2->compile();
+    $b1 = new ContainerBuilder();
+    $b1->setParameter('test_param', 'b1');
+    $b1->compile();
 
-    // First dump.
-    $container1 = new ContainerBuilder();
-    $container1->setParameter('test_param', 'value1');
-    $container1->compile();
+    $resultA1 = $storageA->dump($a1, 'site_a');
+    $resultA2 = $storageA->dump($a2, 'site_a');
+    $resultB1 = $storageB->dump($b1, 'site_b');
 
-    $storage = new PhpDumperContainerStorage($cache, $phpStorage, Settings::getInstance());
-    $storage->dump($container1, 'test_suffix');
+    // Site A collects garbage: only its own superseded version is removed.
+    $storageA->garbageCollection();
 
-    // Reset operations log before the second dump.
-    $operations = [];
-
-    // Second dump with different content triggers delete of old file.
-    $container2 = new ContainerBuilder();
-    $container2->setParameter('test_param', 'value2');
-    $container2->compile();
-
-    $storage->dump($container2, 'test_suffix');
-    $storage->destruct();
-
-    // Extract operation types in order.
-    $opTypes = array_column($operations, 0);
-
-    // The cache_set (pointing to new hash) must come before the delete
-    // (removing the old file).
-    $cacheSetIndex = array_search('cache_set', $opTypes);
-    $deleteIndex = array_search('delete', $opTypes);
-
-    $this->assertNotFalse($cacheSetIndex, 'cache_set should have been called');
-    $this->assertNotFalse($deleteIndex, 'delete should have been called');
-    $this->assertLessThan($deleteIndex, $cacheSetIndex, 'Cache hash must be updated before old container file is deleted');
+    $this->assertSame([$resultA1::class], $deletedFiles);
+    $this->assertNotContains($resultA2::class, $deletedFiles);
+    $this->assertNotContains($resultB1::class, $deletedFiles);
   }
 
   /**
@@ -379,7 +362,6 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     // Third dump: container A again (same hash as first dump). The class
     // DrupalContainer_<hashA> still exists in memory from the first dump.
     $resultA2 = $storage->dump($containerA, 'test_suffix');
-    $storage->destruct();
 
     // The returned container must be the same class as the first dump.
     $this->assertSame($resultA1::class, $resultA2::class);
@@ -388,8 +370,6 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     // Also load() must NOT be called (class already exists, re-including would
     // cause "Cannot redeclare class").
     $this->assertCount(0, $loadedFiles);
-    // The old container B file should have been deleted.
-    $this->assertCount(1, $deletedFiles);
   }
 
   /**
@@ -456,8 +436,9 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     $this->assertCount(0, $savedFiles, 'save() must be skipped when class and file both already exist');
     $this->assertCount(0, $loadedFiles, 'load() must be skipped when class already exists in memory');
 
-    // Delete the file from storage to simulate destruct() having cleaned it up
-    // (e.g. because the active container changed). The class is still in memory.
+    // Delete the file from storage to simulate garbage collection having
+    // cleaned it up (e.g. because the active container changed). The class is
+    // still in memory.
     $containerAFilename = $result1::class . '.php';
     unset($code[$containerAFilename]);
 

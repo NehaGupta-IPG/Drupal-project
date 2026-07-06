@@ -52,4 +52,9 @@ interface ContainerStorageInterface {
    */
   public function invalidate(): void;
 
+  /**
+   * Removes stored containers that are no longer in use.
+   */
+  public function garbageCollection(): void;
+
 }

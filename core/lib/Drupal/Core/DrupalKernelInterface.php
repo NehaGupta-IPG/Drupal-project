@@ -153,6 +153,13 @@ interface DrupalKernelInterface extends HttpKernelInterface {
   public function invalidateContainer();
 
   /**
+   * Removes stored containers that are no longer in use.
+   *
+   * @see \Drupal\Core\DependencyInjection\ContainerStorageInterface::garbageCollection()
+   */
+  public function garbageCollection(): void;
+
+  /**
    * Helper method that does request related initialization.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request

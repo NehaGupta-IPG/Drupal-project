@@ -81,4 +81,11 @@ class CacheContainerStorage implements ContainerStorageInterface {
     $this->cache->deleteAll();
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function garbageCollection(): void {
+    // The cache backend manages expiry of stored container definitions.
+  }
+
 }

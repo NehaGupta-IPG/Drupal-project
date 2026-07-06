@@ -38,4 +38,11 @@ class NullContainerStorage implements ContainerStorageInterface {
     // No-op.
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function garbageCollection(): void {
+    // No-op.
+  }
+
 }
