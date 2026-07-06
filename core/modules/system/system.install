@@ -223,7 +223,7 @@ function system_update_11402(): string {
 /**
  * Set maximum length of menu_link_content menu_name field to 32.
  */
-function system_update_11301(): string {
+function system_update_11403(): string {
   $menus = \Drupal::entityTypeManager()->getStorage('menu')->loadMultiple();
   $max_length = max(array_map('strlen', array_map(function (Menu $menu) {
     return $menu->id();
