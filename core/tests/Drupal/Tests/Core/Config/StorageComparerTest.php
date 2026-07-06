@@ -293,9 +293,9 @@ class StorageComparerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::createChangelist
+   * @legacy-covers ::createChangelist
    */
-  public function testChangelistUuidMissMatch() {
+  public function testChangelistUuidMissMatch(): void {
     $target_data = $source_data = $this->getConfigData();
     unset($target_data['views.view.test_view']['uuid']);
     $target_data['field.storage.node.body']['uuid'] = (new Php())->generate();
