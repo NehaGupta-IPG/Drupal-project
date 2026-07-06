@@ -5,9 +5,32 @@
  * Update functions for Language module.
  */
 
+use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
+
 /**
  * Implements hook_update_last_removed().
  */
 function language_update_last_removed(): int {
   return 8001;
+}
+
+/**
+ * Enables config entity langcode selectors on existing sites.
+ */
+function language_update_11500(): void {
+  // Ensure update runs against current code definitions, not stale cached
+  // definitions from the pre-update site state.
+  \Drupal::entityTypeManager()->clearCachedDefinitions();
+
+  $show_langcode = [];
+  foreach (\Drupal::entityTypeManager()->getDefinitions() as $entity_type_id => $entity_type) {
+    if ($entity_type instanceof ConfigEntityTypeInterface && $entity_type->isLangcodeConfigurable()) {
+      $show_langcode[$entity_type_id] = TRUE;
+    }
+  }
+
+  \Drupal::configFactory()
+    ->getEditable('language.config_type_settings')
+    ->set('show_langcode', $show_langcode)
+    ->save();
 }

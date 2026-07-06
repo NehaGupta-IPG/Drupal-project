@@ -43,6 +43,10 @@ class MenuUiLanguageTest extends BrowserTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->config('language.config_type_settings')
+      ->set('show_langcode.menu', TRUE)
+      ->save();
+
     $this->drupalLogin($this->drupalCreateUser([
       'access administration pages',
       'administer menu',

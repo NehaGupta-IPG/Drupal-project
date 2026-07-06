@@ -44,6 +44,14 @@ class ConfigEntityType extends EntityType implements ConfigEntityTypeInterface {
   protected $config_export = [];
 
   /**
+   * Whether langcode can be configured on entity edit forms.
+   *
+   * @var bool
+   */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  protected $langcode_configurable = FALSE;
+
+  /**
    * The result of merging config_export annotation with the defaults.
    *
    * This is stored on the class so that it does not have to be recalculated.
@@ -185,6 +193,13 @@ class ConfigEntityType extends EntityType implements ConfigEntityTypeInterface {
    */
   public function getLookupKeys() {
     return $this->lookup_keys;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isLangcodeConfigurable() {
+    return $this->langcode_configurable;
   }
 
   /**

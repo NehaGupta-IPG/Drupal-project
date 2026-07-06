@@ -43,6 +43,7 @@ use Drupal\views\ViewEntityInterface;
     'base_field',
     'display',
   ],
+  langcode_configurable: TRUE,
 )]
 class View extends ConfigEntityBase implements ViewEntityInterface {
 

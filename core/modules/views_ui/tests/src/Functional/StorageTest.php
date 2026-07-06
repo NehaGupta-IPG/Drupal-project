@@ -41,6 +41,10 @@ class StorageTest extends UITestBase {
   public function testDetails(): void {
     $view_name = 'test_view';
 
+    $this->config('language.config_type_settings')
+      ->set('show_langcode.view', TRUE)
+      ->save();
+
     ConfigurableLanguage::createFromLangcode('fr')->save();
 
     $edit = [

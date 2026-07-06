@@ -9,3 +9,9 @@ language.content_settings_page:
   route_name: language.content_settings_page
   parent: system.admin_config_regional
   weight: 10
+language.config_settings_page:
+  title: 'Configuration language'
+  description: 'Configure language support for configuration itself.'
+  route_name: language.config_settings_page
+  parent: system.admin_config_regional
+  weight: 11
