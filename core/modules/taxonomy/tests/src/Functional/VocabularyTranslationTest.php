@@ -42,6 +42,10 @@ class VocabularyTranslationTest extends TaxonomyTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->config('language.config_type_settings')
+      ->set('show_langcode.taxonomy_vocabulary', TRUE)
+      ->save();
+
     // Create an administrative user.
     $this->drupalLogin($this->drupalCreateUser([
       'administer taxonomy',
