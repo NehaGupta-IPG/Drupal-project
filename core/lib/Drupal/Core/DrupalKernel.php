@@ -1515,7 +1515,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     }
 
     // Invalidate the stored container to force a recompile on next request.
-    $this->getContainerStorage()->invalidate();
+    // This uses the bootstrap container's storage service directly because
+    // invalidation must still clear the real stored container, e.g. when
+    // update.php runs drupal_flush_all_caches().
+    $this->bootstrapContainer->get('container_storage')->invalidate();
   }
 
   /**
