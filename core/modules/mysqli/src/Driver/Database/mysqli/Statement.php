@@ -138,7 +138,7 @@ class Statement extends StatementBase {
       );
       $this->markResultsetIterable($return);
     }
-    catch (\Exception|\ValueError $e) {
+    catch (\Exception | \ValueError $e) {
       if ($e instanceof \ValueError) {
         $e = new \Exception($e->getMessage(), $e->getCode(), $e);
       }
