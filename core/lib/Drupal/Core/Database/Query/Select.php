@@ -992,16 +992,20 @@ class Select extends Query implements SelectInterface {
           foreach (array_values($value) as $i => $v) {
             $tmp[$key . $i] = $v;
           }
-          $returnCondition = str_replace($placeholder, implode(', ', array_keys($tmp)), $returnCondition);
-          $returnArguments = array_merge($returnArguments, $tmp);
+          if (isset($i)) {
+            $returnCondition = str_replace($placeholder, implode(', ', array_keys($tmp)), $returnCondition);
+            $returnArguments = array_merge($returnArguments, $tmp);
+          }
         }
         else {
           $tmp = [];
           foreach (array_values($value) as $i => $v) {
             $tmp[$i] = $v;
           }
-          $returnCondition = str_replace($placeholder, implode(', ', array_fill(0, $i + 1, '?')), $returnCondition);
-          $returnArguments = array_merge($returnArguments, $tmp);
+          if (isset($i)) {
+            $returnCondition = str_replace($placeholder, implode(', ', array_fill(0, $i + 1, '?')), $returnCondition);
+            $returnArguments = array_merge($returnArguments, $tmp);
+          }
         }
       }
       // Deal with scalar placeholder.
