@@ -4,7 +4,6 @@ namespace Drupal\Core\Cache;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
-use Drupal\Core\Database\Query\Expression;
 use Drupal\Core\Database\Query\UpsertUpdateExpression;
 
 /**

@@ -6,7 +6,6 @@ namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
-use Drupal\Core\Database\Query\Expression;
 use Drupal\Core\Database\Query\UpsertUpdateExpression;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -87,7 +86,7 @@ class UpsertTest extends DatabaseTestBase {
         'job',
         'age' => new UpsertUpdateExpression('{test_people}.[age] + 5'),
         'name',
-        ]);
+      ]);
 
     // Insert a new row.
     $upsert->values([
@@ -100,7 +99,7 @@ class UpsertTest extends DatabaseTestBase {
     $upsert->values([
       'job' => 'Speaker',
       // The initial age was 30; the new age should be 35 given the
-      // UpsertUpdateExpression, and the value of 32 passed in discarted.
+      // UpsertUpdateExpression, and the value of 32 passed in discarded.
       'age' => 32,
       'name' => 'Meredith',
     ]);
