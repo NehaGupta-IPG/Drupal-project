@@ -28,6 +28,20 @@ class Upsert extends QueryUpsert {
     $values = $this->getInsertPlaceholderFragment($this->insertValues, $this->defaultFields);
     $query .= implode(', ', $values);
 
+    // The VALUES() function, used to refer to the new row in the ON DUPLICATE
+    // KEY UPDATE clause, was deprecated in MySQL 8.0.20 and emits a warning on
+    // every upsert. MySQL 8.0.19 introduced a row alias as the recommended
+    // replacement. MariaDB and MySQL versions before 8.0.19 do not support the
+    // alias syntax, so they continue to use VALUES(). Unlike PostgreSQL's
+    // EXCLUDED, the MySQL alias is a plain identifier that shares a namespace
+    // with the table's columns, so a deliberately unlikely name is used to
+    // avoid colliding with a real column.
+    // @see https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html
+    $use_alias = !$this->connection->isMariaDb() && version_compare($this->connection->version(), '8.0.19', '>=');
+    if ($use_alias) {
+      $query .= ' AS drupal_upsert_alias';
+    }
+
     // Updating the unique / primary key fields is not necessary.
     foreach ($this->key as $key) {
       unset($insert_fields[$key]);
@@ -35,7 +49,7 @@ class Upsert extends QueryUpsert {
 
     $update = [];
     foreach ($insert_fields as $field) {
-      $update[] = "$field = VALUES($field)";
+      $update[] = $use_alias ? "$field = drupal_upsert_alias.$field" : "$field = VALUES($field)";
     }
 
     $query .= ' ON DUPLICATE KEY UPDATE ' . implode(', ', $update);

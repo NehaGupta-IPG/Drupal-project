@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\standard\FunctionalJavascript;
 
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Database\Database;
 use Drupal\FunctionalJavascriptTests\PerformanceTestBase;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\PerformanceData;
@@ -65,6 +66,26 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->testLogin();
     $this->testLoginBlock();
     $this->testAdmin();
+  }
+
+  /**
+   * Returns the expected normalized SQL for the session write upsert.
+   *
+   * MySQL 8.0.19 and later reference the new row with a row alias, while
+   * MariaDB and older MySQL versions use the deprecated VALUES() function.
+   *
+   * @return string
+   *   The expected normalized session upsert query.
+   *
+   * @see \Drupal\mysql\Driver\Database\mysql\Upsert::__toString()
+   */
+  protected function getExpectedSessionUpsertQuery(): string {
+    $insert = 'INSERT INTO "sessions" ("sid", "uid", "hostname", "session", "timestamp") VALUES ("SESSION_ID", "2", "CLIENT_IP", "SESSION_DATA", "TIMESTAMP")';
+    $connection = Database::getConnection();
+    if (!$connection->isMariaDb() && version_compare($connection->version(), '8.0.19', '>=')) {
+      return $insert . ' AS drupal_upsert_alias ON DUPLICATE KEY UPDATE "uid" = drupal_upsert_alias."uid", "hostname" = drupal_upsert_alias."hostname", "session" = drupal_upsert_alias."session", "timestamp" = drupal_upsert_alias."timestamp"';
+    }
+    return $insert . ' ON DUPLICATE KEY UPDATE "uid" = VALUES("uid"), "hostname" = VALUES("hostname"), "session" = VALUES("session"), "timestamp" = VALUES("timestamp")';
   }
 
   /**
@@ -402,7 +423,11 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'INSERT INTO "watchdog" ("uid", "type", "message", "variables", "severity", "link", "location", "referer", "hostname", "timestamp") VALUES ("2", "user", "Session opened for %name.", "WATCHDOG_DATA", 6, "", "LOCATION", "REFERER", "CLIENT_IP", "TIMESTAMP")',
       'UPDATE "users_field_data" SET "login"="TIMESTAMP" WHERE "uid" = "2"',
       'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
-      'INSERT INTO "sessions" ("sid", "uid", "hostname", "session", "timestamp") VALUES ("SESSION_ID", "2", "CLIENT_IP", "SESSION_DATA", "TIMESTAMP") ON DUPLICATE KEY UPDATE "uid" = VALUES("uid"), "hostname" = VALUES("hostname"), "session" = VALUES("session"), "timestamp" = VALUES("timestamp")',
+      // The MySQL upsert performs a one-off SELECT VERSION() to determine
+      // whether the server supports the row alias syntax (MySQL 8.0.19+). This
+      // runs on both MySQL and MariaDB, regardless of the syntax chosen.
+      'SELECT VERSION()',
+      $this->getExpectedSessionUpsertQuery(),
       'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
       'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = "2" AND "u"."default_langcode" = 1',
       'SELECT "roles_target_id" FROM "user__roles" WHERE "entity_id" = "2"',
@@ -418,7 +443,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'ScriptCount' => 2,
       'StylesheetBytes' => 1429,
       'StylesheetCount' => 1,
-      'QueryCount' => 15,
+      'QueryCount' => 16,
       'CacheGetCount' => 71,
       'CacheSetCount' => 1,
       'CacheDeleteCount' => 1,
@@ -499,7 +524,9 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'INSERT INTO "watchdog" ("uid", "type", "message", "variables", "severity", "link", "location", "referer", "hostname", "timestamp") VALUES ("2", "user", "Session opened for %name.", "WATCHDOG_DATA", 6, "", "LOCATION", "REFERER", "CLIENT_IP", "TIMESTAMP")',
       'UPDATE "users_field_data" SET "login"="TIMESTAMP" WHERE "uid" = "2"',
       'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
-      'INSERT INTO "sessions" ("sid", "uid", "hostname", "session", "timestamp") VALUES ("SESSION_ID", "2", "CLIENT_IP", "SESSION_DATA", "TIMESTAMP") ON DUPLICATE KEY UPDATE "uid" = VALUES("uid"), "hostname" = VALUES("hostname"), "session" = VALUES("session"), "timestamp" = VALUES("timestamp")',
+      // No SELECT VERSION() here: the upsert syntax check runs once per request
+      // and the server version is already cached from the earlier testLogin().
+      $this->getExpectedSessionUpsertQuery(),
       'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
       'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = "2" AND "u"."default_langcode" = 1',
       'SELECT "roles_target_id" FROM "user__roles" WHERE "entity_id" = "2"',
