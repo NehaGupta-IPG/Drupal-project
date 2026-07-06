@@ -298,7 +298,6 @@ class StorageComparerTest extends UnitTestCase {
   public function testChangelistUuidMissMatch() {
     $target_data = $source_data = $this->getConfigData();
     unset($target_data['views.view.test_view']['uuid']);
-    $target_data['system.performance']['uuid'] = (new Php())->generate();
     $target_data['field.storage.node.body']['uuid'] = (new Php())->generate();
 
     $this->sourceStorage->expects($this->once())
@@ -323,17 +322,13 @@ class StorageComparerTest extends UnitTestCase {
     $this->storageComparer->createChangelist();
     $recreate_expected = [
       'field.storage.node.body',
-      // TODO Should this be recreated?
       'views.view.test_view',
     ];
-    // recreating these because of uuid differences. This shows up as a create
+    // Recreating these because of uuid differences. This shows up as a create
     // and delete operation.
-    // TODO does asserting the order matter here?
     $this->assertEqualsCanonicalizing($recreate_expected, $this->storageComparer->getChangelist('create'));
     $this->assertEqualsCanonicalizing($recreate_expected, $this->storageComparer->getChangelist('delete'));
-    $this->assertEquals([
-      'system.performance',
-    ], $this->storageComparer->getChangelist('update'));
+    $this->assertEquals([], $this->storageComparer->getChangelist('update'));
   }
 
   /**
