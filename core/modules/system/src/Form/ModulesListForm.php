@@ -44,8 +44,7 @@ use Symfony\Component\Routing\Attribute\Route;
     '_permission' => 'administer modules',
   ],
   defaults: [
-    '_title' => new TranslatableMarkup('Extend'),
-    '_title_context' => 'With components',
+    '_title' => new TranslatableMarkup('Extend', [], ['context' => 'With components']),
   ],
 )]
 class ModulesListForm extends FormBase {
