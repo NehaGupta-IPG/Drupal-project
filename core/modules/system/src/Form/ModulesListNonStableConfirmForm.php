@@ -11,12 +11,21 @@ use Drupal\Core\Link;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Builds a confirmation form for enabling experimental and deprecated modules.
  *
  * @internal
  */
+#[Route(
+  path: '/admin/modules/list/confirm-non-stable',
+  name: 'system.modules_list_non_stable_confirm',
+  requirements: [
+    '_permission' => 'administer modules',
+  ],
+  defaults: ['_title' => new TranslatableMarkup('Non-stable modules')],
+)]
 class ModulesListNonStableConfirmForm extends ModulesListConfirmForm {
 
   /**

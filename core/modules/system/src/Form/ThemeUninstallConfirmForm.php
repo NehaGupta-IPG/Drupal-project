@@ -17,12 +17,21 @@ use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Builds a confirmation form to uninstall a theme.
  *
  * @internal
  */
+#[Route(
+  path: '/admin/appearance/uninstall',
+  name: 'system.theme_uninstall',
+  requirements: [
+    '_permission' => 'administer themes',
+  ],
+  defaults: ['_title' => new TranslatableMarkup('Uninstall theme')],
+)]
 class ThemeUninstallConfirmForm extends ConfirmFormBase {
 
   use AutowireTrait;

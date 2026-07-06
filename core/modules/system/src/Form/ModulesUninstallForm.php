@@ -11,14 +11,24 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Update\UpdateHookRegistry;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Provides a form for uninstalling modules.
  *
  * @internal
  */
+#[Route(
+  path: '/admin/modules/uninstall',
+  name: 'system.modules_uninstall',
+  requirements: [
+    '_permission' => 'administer modules',
+  ],
+  defaults: ['_title' => new TranslatableMarkup('Uninstall')],
+)]
 class ModulesUninstallForm extends FormBase {
 
   /**

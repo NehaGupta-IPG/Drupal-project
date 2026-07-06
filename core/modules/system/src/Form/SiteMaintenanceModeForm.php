@@ -7,15 +7,25 @@ use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\user\PermissionHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Configure maintenance settings for this site.
  *
  * @internal
  */
+#[Route(
+  path: '/admin/config/development/maintenance',
+  name: 'system.site_maintenance_mode',
+  requirements: [
+    '_permission' => 'administer site configuration+administer software updates',
+  ],
+  defaults: ['_title' => new TranslatableMarkup('Maintenance mode')],
+)]
 class SiteMaintenanceModeForm extends ConfigFormBase {
 
   /**

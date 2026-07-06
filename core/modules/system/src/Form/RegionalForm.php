@@ -10,13 +10,23 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\RedundantEditableConfigNamesTrait;
 use Drupal\Core\Locale\CountryManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Configure regional settings for this site.
  *
  * @internal
  */
+#[Route(
+  path: '/admin/config/regional/settings',
+  name: 'system.regional_settings',
+  requirements: [
+    '_permission' => 'administer site configuration',
+  ],
+  defaults: ['_title' => new TranslatableMarkup('Regional settings')],
+)]
 class RegionalForm extends ConfigFormBase {
   use RedundantEditableConfigNamesTrait;
 

@@ -7,62 +7,6 @@ system.cron:
   requirements:
     _access_system_cron: 'TRUE'
 
-system.cron_settings:
-  path: '/admin/config/system/cron'
-  defaults:
-    _form: '\Drupal\system\Form\CronForm'
-    _title: 'Cron'
-  requirements:
-    _permission: 'administer site configuration'
-
-system.logging_settings:
-  path: '/admin/config/development/logging'
-  defaults:
-    _form: '\Drupal\system\Form\LoggingForm'
-    _title: 'Logging and errors'
-  requirements:
-    _permission: 'administer site configuration'
-
-system.development_settings:
-  path: '/admin/config/development/settings'
-  defaults:
-    _form: '\Drupal\system\Form\DevelopmentSettingsForm'
-    _title: 'Development settings'
-  requirements:
-    _permission: 'administer site configuration'
-
-system.file_system_settings:
-  path: '/admin/config/media/file-system'
-  defaults:
-    _form: '\Drupal\system\Form\FileSystemForm'
-    _title: 'File system'
-  requirements:
-    _permission: 'administer site configuration'
-
-system.regional_settings:
-  path: '/admin/config/regional/settings'
-  defaults:
-    _form: '\Drupal\system\Form\RegionalForm'
-    _title: 'Regional settings'
-  requirements:
-    _permission: 'administer site configuration'
-
-system.image_toolkit_settings:
-  path: '/admin/config/media/image-toolkit'
-  defaults:
-    _form: '\Drupal\system\Form\ImageToolkitForm'
-    _title: 'Image toolkit'
-  requirements:
-    _permission: 'administer site configuration'
-
-system.site_maintenance_mode:
-  path: '/admin/config/development/maintenance'
-  defaults:
-    _form: '\Drupal\system\Form\SiteMaintenanceModeForm'
-    _title: 'Maintenance mode'
-  requirements:
-    _permission: 'administer site configuration+administer software updates'
-
 system.run_cron:
   path: '/admin/reports/status/run-cron'
   defaults:
@@ -104,39 +48,6 @@ entity.date_format.delete_form:
     _title: 'Delete date format'
   requirements:
     _entity_access: 'date_format.delete'
-
-system.modules_list:
-  path: '/admin/modules'
-  defaults:
-    _title: 'Extend'
-    _title_context: 'With components'
-    _form: '\Drupal\system\Form\ModulesListForm'
-  requirements:
-    _permission: 'administer modules'
-
-system.modules_list_confirm:
-  path: '/admin/modules/list/confirm'
-  defaults:
-    _form: '\Drupal\system\Form\ModulesListConfirmForm'
-    _title: 'Some required modules must be installed'
-  requirements:
-    _permission: 'administer modules'
-
-system.modules_list_non_stable_confirm:
-  path: '/admin/modules/list/confirm-non-stable'
-  defaults:
-    _form: '\Drupal\system\Form\ModulesListNonStableConfirmForm'
-    _title: 'Non-stable modules'
-  requirements:
-    _permission: 'administer modules'
-
-system.theme_uninstall:
-  path: '/admin/appearance/uninstall'
-  defaults:
-    _form: '\Drupal\system\Form\ThemeUninstallConfirmForm'
-    _title: 'Uninstall theme'
-  requirements:
-    _permission: 'administer themes'
 
 system.files:
   path: '/system/files/{scheme}'
@@ -212,22 +123,6 @@ system.theme_settings_theme:
 '<current>':
   path: '<current>'
 
-system.modules_uninstall:
-  path: '/admin/modules/uninstall'
-  defaults:
-    _form: '\Drupal\system\Form\ModulesUninstallForm'
-    _title: 'Uninstall'
-  requirements:
-    _permission: 'administer modules'
-
-system.modules_uninstall_confirm:
-  path: '/admin/modules/uninstall/confirm'
-  defaults:
-    _form: '\Drupal\system\Form\ModulesUninstallConfirmForm'
-    _title: 'Confirm uninstall'
-  requirements:
-    _permission: 'administer modules'
-
 system.prepare_modules_entity_uninstall:
   path: '/admin/modules/uninstall/entity/{entity_type_id}'
   defaults:
@@ -283,7 +178,6 @@ system.db_update:
     default_url_options:
       path_processing: FALSE
 
-
 system.entity_autocomplete:
   path: '/entity_reference_autocomplete/{target_type}/{selection_handler}/{selection_settings_key}'
   defaults:
@@ -297,14 +191,6 @@ system.csrftoken:
     _controller: '\Drupal\system\Controller\CsrfTokenController::csrfToken'
   requirements:
     _access: 'TRUE'
-
-system.linkset_settings:
-  path: '/admin/config/services/linkset'
-  defaults:
-    _title: 'Menu Linkset Settings'
-    _form: 'Drupal\system\Form\MenuLinksetSettingsForm'
-  requirements:
-    _permission: 'administer site configuration'
 
 route_callbacks:
   - '\Drupal\system\Routing\AssetRoutes::routes'

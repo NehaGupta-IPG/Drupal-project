@@ -11,13 +11,23 @@ use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\RedundantEditableConfigNamesTrait;
 use Drupal\Core\State\StateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Configure cron settings for this site.
  *
  * @internal
  */
+#[Route(
+  path: '/admin/config/system/cron',
+  name: 'system.cron_settings',
+  requirements: [
+    '_permission' => 'administer site configuration',
+  ],
+  defaults: ['_title' => new TranslatableMarkup('Cron')],
+)]
 class CronForm extends ConfigFormBase {
   use RedundantEditableConfigNamesTrait;
 

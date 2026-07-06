@@ -14,13 +14,23 @@ use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Configure file system settings for this site.
  *
  * @internal
  */
+#[Route(
+  path: '/admin/config/media/file-system',
+  name: 'system.file_system_settings',
+  requirements: [
+    '_permission' => 'administer site configuration',
+  ],
+  defaults: ['_title' => new TranslatableMarkup('File system')],
+)]
 class FileSystemForm extends ConfigFormBase {
   use RedundantEditableConfigNamesTrait;
 
