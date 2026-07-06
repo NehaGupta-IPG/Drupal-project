@@ -76,22 +76,6 @@ system.temporary:
   requirements:
     _access: 'TRUE'
 
-system.theme_settings:
-  path: '/admin/appearance/settings'
-  defaults:
-    _form: '\Drupal\system\Form\ThemeSettingsForm'
-    _title: 'Appearance settings'
-  requirements:
-    _permission: 'administer themes'
-
-system.theme_settings_theme:
-  path: '/admin/appearance/settings/{theme}'
-  defaults:
-    _form: '\Drupal\system\Form\ThemeSettingsForm'
-    _title_callback: 'theme_handler:getName'
-  requirements:
-    _permission: 'administer themes'
-
 '<front>':
   path: '/'
   defaults:
@@ -122,15 +106,6 @@ system.theme_settings_theme:
 
 '<current>':
   path: '<current>'
-
-system.prepare_modules_entity_uninstall:
-  path: '/admin/modules/uninstall/entity/{entity_type_id}'
-  defaults:
-    _form: '\Drupal\system\Form\PrepareModulesEntityUninstallForm'
-    _title_callback: '\Drupal\system\Form\PrepareModulesEntityUninstallForm::formTitle'
-  requirements:
-    _permission: 'administer modules'
-    _custom_access: '\Drupal\system\Form\PrepareModulesEntityUninstallForm::checkAccess'
 
 system.timezone:
   path: '/system/timezone/{abbreviation}/{offset}/{is_daylight_saving_time}'
