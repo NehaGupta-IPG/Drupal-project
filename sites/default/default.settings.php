@@ -723,6 +723,19 @@ $settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
  * PhpStorage. The compiled container benefits from OPcache and can improve
  * performance. Existing sites default to the array-based container for
  * backward compatibility.
+ *
+ * The compiled container is stored by default in the public files directory.
+ * To store it elsewhere - for example, a local temporary directory on each web
+ * server to avoid a shared filesystem - override the 'service_container' PHP
+ * storage bin. The directory must resolve to a unique location per site: sites
+ * sharing one container storage directory will delete each other's compiled
+ * containers.
+ *
+ * @code
+ * $settings['php_storage']['service_container'] = [
+ *   'directory' => 'temporary://drupal-container/my-site-id',
+ * ];
+ * @endcode
  */
 $settings['container_base_class'] = \Drupal\Core\DependencyInjection\PhpContainer::class;
 

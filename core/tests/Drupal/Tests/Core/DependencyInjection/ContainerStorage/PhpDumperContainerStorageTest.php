@@ -222,7 +222,7 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
   }
 
   /**
-   * Tests that garbageCollection() removes superseded containers.
+   * Tests that garbageCollection() removes all containers except the current.
    */
   public function testGarbageCollectionRemovesSupersededContainers(): void {
     $cache = new MemoryBackend($this->createStub(TimeInterface::class));
@@ -230,70 +230,37 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     $deletedFiles = [];
     $phpStorage = $this->createPhpStorage($savedFiles, $deletedFiles);
 
-    // First container.
-    $container1 = new ContainerBuilder();
-    $container1->setParameter('test_param', 'value1');
-    $container1->compile();
-
-    // Second container with different content.
-    $container2 = new ContainerBuilder();
-    $container2->setParameter('test_param', 'value2');
-    $container2->compile();
-
     $storage = new PhpDumperContainerStorage($cache, $phpStorage, Settings::getInstance());
-    $result1 = $storage->dump($container1, 'test_suffix');
-    $result2 = $storage->dump($container2, 'test_suffix');
 
-    // Different containers produce different classes, and both files exist.
-    $this->assertNotSame($result1::class, $result2::class);
-    $this->assertCount(2, $savedFiles);
+    // A container left behind by a previous suffix (e.g. an earlier deployment).
+    $old = new ContainerBuilder();
+    $old->setParameter('test_param', 'old');
+    $old->compile();
+    $resultOld = $storage->dump($old, 'old_suffix');
+
+    // Two versions under the current suffix; the first is superseded by the
+    // second.
+    $superseded = new ContainerBuilder();
+    $superseded->setParameter('test_param', 'superseded');
+    $superseded->compile();
+    $resultSuperseded = $storage->dump($superseded, 'current_suffix');
+
+    $current = new ContainerBuilder();
+    $current->setParameter('test_param', 'current');
+    $current->compile();
+    $resultCurrent = $storage->dump($current, 'current_suffix');
+
+    $this->assertCount(3, $savedFiles);
     $this->assertCount(0, $deletedFiles);
 
     $storage->garbageCollection();
 
-    // The superseded (first) container is removed; the current one is kept.
-    $this->assertSame([$result1::class], $deletedFiles);
-  }
-
-  /**
-   * Tests that garbageCollection() only touches the current suffix's files.
-   *
-   * Multiple sites can share one PhpStorage directory (for example, a multisite
-   * installation using the system temporary directory). Each site's cache is
-   * separate, so one site's garbage collection must never remove another site's
-   * container files.
-   */
-  public function testGarbageCollectionLeavesOtherSuffixesUntouched(): void {
-    // A single, shared PhpStorage stands in for the shared storage directory.
-    $savedFiles = [];
-    $deletedFiles = [];
-    $phpStorage = $this->createPhpStorage($savedFiles, $deletedFiles);
-
-    // Separate caches stand in for each site's own cache backend.
-    $storageA = new PhpDumperContainerStorage(new MemoryBackend($this->createStub(TimeInterface::class)), $phpStorage, Settings::getInstance());
-    $storageB = new PhpDumperContainerStorage(new MemoryBackend($this->createStub(TimeInterface::class)), $phpStorage, Settings::getInstance());
-
-    // Site A dumps two versions (one superseded); site B dumps one.
-    $a1 = new ContainerBuilder();
-    $a1->setParameter('test_param', 'a1');
-    $a1->compile();
-    $a2 = new ContainerBuilder();
-    $a2->setParameter('test_param', 'a2');
-    $a2->compile();
-    $b1 = new ContainerBuilder();
-    $b1->setParameter('test_param', 'b1');
-    $b1->compile();
-
-    $resultA1 = $storageA->dump($a1, 'site_a');
-    $resultA2 = $storageA->dump($a2, 'site_a');
-    $resultB1 = $storageB->dump($b1, 'site_b');
-
-    // Site A collects garbage: only its own superseded version is removed.
-    $storageA->garbageCollection();
-
-    $this->assertSame([$resultA1::class], $deletedFiles);
-    $this->assertNotContains($resultA2::class, $deletedFiles);
-    $this->assertNotContains($resultB1::class, $deletedFiles);
+    // Only the current container is kept; the superseded and old-suffix
+    // containers are removed.
+    $this->assertContains($resultOld::class, $deletedFiles);
+    $this->assertContains($resultSuperseded::class, $deletedFiles);
+    $this->assertNotContains($resultCurrent::class, $deletedFiles);
+    $this->assertCount(2, $deletedFiles);
   }
 
   /**

@@ -59,7 +59,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
   public function load(string $suffix): ?ContainerInterface {
     $cache = $this->cache->get(static::CACHE_PREFIX . $suffix);
     if ($cache && $hash = $cache->data) {
-      $containerClass = $this->containerClassPrefix($suffix) . $hash;
+      $containerClass = 'DrupalContainer_' . $hash;
       if (!class_exists($containerClass, FALSE)) {
         $this->phpStorage->load($containerClass . '.php');
       }
@@ -93,7 +93,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
     // class name that can be loaded in the same request.
     $hash = hash('xxh128', $code);
 
-    $containerClass = $this->containerClassPrefix($suffix) . $hash;
+    $containerClass = 'DrupalContainer_' . $hash;
     $classExists = class_exists($containerClass, FALSE);
 
     // There is no change from the loaded container, so there is nothing to do.
@@ -164,33 +164,16 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
     }
     $cache = $this->cache->get(static::CACHE_PREFIX . $this->loadedSuffix);
     if ($cache && $hash = $cache->data) {
-      // Only files sharing this suffix's prefix belong to the current site and
-      // environment; files for other suffixes (e.g. other sites sharing the
-      // storage directory) must be left untouched.
-      $prefix = $this->containerClassPrefix($this->loadedSuffix);
-      $keep = $prefix . $hash;
       // Match the compiled container names only. This excludes sibling files
       // such as the '.php.lock' files created by locking storage backends.
-      $pattern = '/^' . preg_quote($prefix, '/') . '[0-9a-f]+$/';
+      $pattern = '/^DrupalContainer_[0-9a-f]+$/';
+      $keep = 'DrupalContainer_' . $hash;
       foreach ($this->phpStorage->listAll() as $name) {
         if ($name !== $keep && preg_match($pattern, $name) === 1) {
           $this->phpStorage->delete($name);
         }
       }
     }
-  }
-
-  /**
-   * Builds the compiled container class name prefix for a suffix.
-   *
-   * @param string $suffix
-   *   The cache key suffix identifying the site and environment.
-   *
-   * @return string
-   *   The container class name prefix, including a trailing separator.
-   */
-  protected function containerClassPrefix(string $suffix): string {
-    return 'DrupalContainer_' . hash('xxh128', $suffix) . '_';
   }
 
 }
