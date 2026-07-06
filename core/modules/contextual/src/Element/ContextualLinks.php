@@ -54,6 +54,22 @@ class ContextualLinks extends RenderElementBase {
    *       ],
    *     ]]
    *   @endcode
+   *   The 'contextual' group name is reserved for literal links. Its
+   *   'route_parameters' value is an array of links, each an array with
+   *   'title', 'path' and (optionally) 'options' keys:
+   *   @code
+   *     ['#contextual_links' => [
+   *       'contextual' => [
+   *         'route_parameters' => [
+   *           'some_unique_link_key' => [
+   *             'title' => 'Edit',
+   *             'path' => '/node/1/edit',
+   *             'options' => ['query' => ['destination' => '/some-view']],
+   *           ],
+   *         ],
+   *       ],
+   *     ]]
+   *   @endcode
    *
    * @return array
    *   A renderable array representing contextual links.
@@ -83,10 +99,20 @@ class ContextualLinks extends RenderElementBase {
     $links = [];
     $use_ajax = FALSE;
     foreach ($literal_links as $class => $literal_link) {
+      if (!isset($literal_link['title']) || !isset($literal_link['path'])) {
+        continue;
+      }
+      try {
+        $url = Url::fromUserInput($literal_link['path'], $literal_link['options'] ?? []);
+      }
+      catch (\InvalidArgumentException) {
+        // Skip links whose path is not a valid user-input path.
+        continue;
+      }
       $class = Html::getClass($class);
       $links[$class] = [
         'title' => $literal_link['title'],
-        'url' => Url::fromUserInput($literal_link['path'], $literal_link['options'] ?? []),
+        'url' => $url,
       ];
     }
     foreach ($items as $class => $item) {
