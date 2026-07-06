@@ -2,6 +2,7 @@
 
 namespace Drupal\mysql\Driver\Database\mysql;
 
+use Doctrine\SqlFormatter\SqlFormatter;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\ExceptionHandler as BaseExceptionHandler;
@@ -10,6 +11,7 @@ use Drupal\Core\Database\Exception\SchemaTableColumnSizeTooLargeException;
 use Drupal\Core\Database\Exception\SchemaTableKeyTooLargeException;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Database\StatementInterface;
+use Drupal\Core\Database\Utility\CliHighlighter;
 
 /**
  * MySql database exception handler class.
@@ -74,7 +76,9 @@ class ExceptionHandler extends BaseExceptionHandler {
       throw new DatabaseExceptionWrapper($message, $code, $exception);
     }
 
-    $message = $exception->getMessage() . ": " . $queryString . "; " . print_r($arguments, TRUE);
+    $formattedSql = (new SqlFormatter(new CliHighlighter()))->format($queryString);
+    $formattedArgs = var_export($arguments, TRUE);
+    $message = $exception->getMessage() . "\n-----\nSQL statement\n{$formattedSql}\n-----\nPlaceholders\n{$formattedArgs}\n-----";
 
     // SQLSTATE 23xxx errors indicate an integrity constraint violation. Also,
     // in case of attempted INSERT of a record with an undefined column and no

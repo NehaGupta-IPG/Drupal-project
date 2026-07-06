@@ -91,7 +91,7 @@ class Statement extends StatementBase {
       if (!$this->hasClientStatement()) {
         // Replace named placeholders with positional ones if needed.
         if ($this->placeholderType === PlaceholderType::Positional) {
-          assert(call_user_func(function () use ($args, &$formattedSql): bool {
+          assert(call_user_func(function () use ($args, &$formattedSql, &$formattedArgs): bool {
             try {
               $converter = new NamedPlaceholderConverter();
               $converter->parse($this->queryString, $args);
@@ -103,9 +103,11 @@ class Statement extends StatementBase {
             if ($isDifferent) {
               // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
               $formattedSql = (new SqlFormatter(new CliHighlighter()))->format($this->queryString);
+              // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+              $formattedArgs = var_export($args, TRUE);
             }
             return !$isDifferent;
-          }), "Expected positional-placeholder-only query string\n-----\n{$formattedSql}\n-----\nhas named placeholders in it.");
+          }), "Expected positional-placeholder-only query string has named placeholders in it.\n-----\nSQL statement\n{$formattedSql}\n-----\nPlaceholders\n{$formattedArgs}\n-----");
           $convertedQueryString = $this->queryString;
         }
         else {
@@ -136,7 +138,10 @@ class Statement extends StatementBase {
       );
       $this->markResultsetIterable($return);
     }
-    catch (\Exception $e) {
+    catch (\Exception|\ValueError $e) {
+      if ($e instanceof \ValueError) {
+        $e = new \Exception($e->getMessage(), $e->getCode(), $e);
+      }
       $this->dispatchStatementExecutionFailureEvent($startEvent, $e);
       throw $e;
     }
