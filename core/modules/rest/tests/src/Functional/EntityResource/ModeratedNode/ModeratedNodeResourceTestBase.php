@@ -81,7 +81,10 @@ abstract class ModeratedNodeResourceTestBase extends NodeResourceTestBase {
    * {@inheritdoc}
    */
   protected function getExpectedCacheTags() {
-    return Cache::mergeTags(parent::getExpectedCacheTags(), ['config:workflows.workflow.editorial']);
+    if (isset($this->account) && ($this->account->hasPermission('use editorial transition publish') || $this->account->hasPermission('use editorial transition create_new_draft'))) {
+      return Cache::mergeTags(parent::getExpectedCacheTags(), ['config:workflows.workflow.editorial']);
+    }
+    return parent::getExpectedCacheTags();
   }
 
 }
