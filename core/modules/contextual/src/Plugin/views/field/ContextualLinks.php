@@ -32,7 +32,7 @@ class ContextualLinks extends FieldPluginBase {
     array $configuration,
     $plugin_id,
     $plugin_definition,
-    ContextualLinksSerializer $contextual_links_serializer ,
+    ContextualLinksSerializer $contextual_links_serializer,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->contextualLinksSerializer = $contextual_links_serializer;
