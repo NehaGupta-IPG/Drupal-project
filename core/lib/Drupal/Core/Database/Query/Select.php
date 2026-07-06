@@ -207,8 +207,16 @@ class Select extends Query implements SelectInterface {
       return NULL;
     }
 
-    $args = $this->condition->arguments() + $this->having->arguments();
+    $args = [];
 
+    // These are the SELECT expressions.
+    foreach ($this->expressions as $expression) {
+      if ($expression['arguments']) {
+        $args = array_merge($args, $this->processExpressionPlaceholders($expression)[1]);
+      }
+    }
+
+    // These are the FROM parts.
     foreach ($this->tables as $table) {
       if ($table['arguments']) {
         $args = array_merge($args, $this->processConditionPlaceholders((string) $table['condition'], $table['arguments'])[1]);
@@ -223,11 +231,11 @@ class Select extends Query implements SelectInterface {
       }
     }
 
-    foreach ($this->expressions as $expression) {
-      if ($expression['arguments']) {
-        $args += $expression['arguments'];
-      }
-    }
+    // These are the WHERE conditions.
+    $args = array_merge($args, $this->condition->arguments());
+
+    // These are the HAVING expressions.
+    $args = array_merge($args, $this->having->arguments());
 
     // If there are any dependent queries to UNION,
     // incorporate their arguments recursively.
@@ -845,7 +853,7 @@ class Select extends Query implements SelectInterface {
       $fields[] = $this->connection->escapeField($table . $field['field']) . ' AS ' . $this->connection->escapeAlias($field['alias']);
     }
     foreach ($this->expressions as $expression) {
-      $fields[] = $expression['expression'] . ' AS ' . $this->connection->escapeAlias($expression['alias']);
+      $fields[] = $this->processExpressionPlaceholders($expression)[0] . ' AS ' . $this->connection->escapeAlias($expression['alias']);
     }
     $query .= implode(', ', $fields);
 
@@ -1023,6 +1031,30 @@ class Select extends Query implements SelectInterface {
       }
     }
     return [$returnCondition, $returnArguments];
+  }
+
+  /**
+   * Processes expression placeholders.
+   *
+   * @param array $expression
+   *   The expression.
+   *
+   * @return array{0: string, 1: array}
+   *   The processed expression string and the placeholders' values.
+   */
+  protected function processExpressionPlaceholders(array $expression): array {
+    $returnExpression = $expression['expression'];
+    $returnArguments = [];
+    foreach ($expression['arguments'] as $placeholder => $value) {
+      if ($this->queryOptions['placeholder_format'] === PlaceholderType::Named) {
+        $returnArguments[$placeholder] = $value;
+      }
+      else {
+        $returnExpression = str_replace($placeholder, '?', $returnExpression);
+        $returnArguments[] = $value;
+      }
+    }
+    return [$returnExpression, $returnArguments];
   }
 
 }

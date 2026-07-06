@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\StatementInterface;
+use Drupal\Core\Database\Statement\PlaceholderType;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -29,6 +30,7 @@ class StatementTest extends DatabaseTestBase {
     ];
     $options = [
       'allow_square_brackets' => FALSE,
+      'placeholder_format' => PlaceholderType::Named,
     ];
 
     $stmt = $this->connection->prepareStatement($sql, $options);
