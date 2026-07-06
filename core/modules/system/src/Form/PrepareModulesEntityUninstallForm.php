@@ -25,9 +25,9 @@ use Symfony\Component\Routing\Attribute\Route;
   name: 'system.prepare_modules_entity_uninstall',
   requirements: [
     '_permission' => 'administer modules',
-    '_custom_access' => '\Drupal\system\Form\PrepareModulesEntityUninstallForm::checkAccess',
+    '_custom_access' => self::class . '::checkAccess',
   ],
-  defaults: ['_title_callback' => '\Drupal\system\Form\PrepareModulesEntityUninstallForm::formTitle'],
+  defaults: ['_title_callback' => self::class . '::formTitle'],
 )]
 class PrepareModulesEntityUninstallForm extends ConfirmFormBase {
 
