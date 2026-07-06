@@ -3,8 +3,10 @@
 namespace Drupal\contextual\Plugin\views\field;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\contextual\ContextualLinksSerializer;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element\Checkboxes;
 use Drupal\Core\Routing\RedirectDestinationTrait;
 use Drupal\Core\Url;
 use Drupal\views\Attribute\ViewsField;
@@ -55,6 +57,7 @@ class ContextualLinks extends FieldPluginBase {
     $options = parent::defineOptions();
 
     $options['fields'] = ['default' => []];
+    $options['destination'] = ['default' => 1];
 
     return $options;
   }
@@ -74,21 +77,27 @@ class ContextualLinks extends FieldPluginBase {
       '#default_value' => $this->options['fields'],
       '#element_validate' => [[static::class, 'validateOptions']],
     ];
+    $form['destination'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Include destination'),
+      '#description' => $this->t('Include a "destination" parameter in the link to return the user to the original view upon completing the contextual action.'),
+      '#options' => [
+        '0' => $this->t('No'),
+        '1' => $this->t('Yes'),
+      ],
+      '#default_value' => $this->options['destination'],
+    ];
   }
 
   /**
-   * Form API #element_validate for options.
+   * Form API #element_validate callback for the fields checkboxes.
    *
-   * @todo Make this reusable (or replace with reusable method).
-   * @see \Drupal\Core\Render\Element\Checkboxes::getCheckedCheckboxes
-   *
-   * @return void
+   * Filters out unchecked checkboxes so only the selected field names are
+   * stored in the handler options.
    */
-  public static function validateOptions(&$element, FormStateInterface $form_state, &$complete_form) {
-    $value = array_filter($element['#value'], function ($value) {
-      return $value !== 0;
-    });
-    $form_state->setValueForElement($element, $value);
+  public static function validateOptions(&$element, FormStateInterface $form_state, &$complete_form): void {
+    $checked = Checkboxes::getCheckedCheckboxes($element['#value']);
+    $form_state->setValueForElement($element, array_combine($checked, $checked));
   }
 
   /**
@@ -113,8 +122,8 @@ class ContextualLinks extends FieldPluginBase {
    * @param \Drupal\views\ResultRow $values
    *   The values retrieved from a single row of a view's query result.
    *
-   * @see contextual_preprocess()
-   * @see contextual_contextual_links_view_alter()
+   * @see \Drupal\contextual\Hook\ContextualThemeHooks::preprocess()
+   * @see \Drupal\contextual\Element\ContextualLinks::preRenderLinks()
    */
   public function render(ResultRow $values) {
     $links = [];
@@ -136,6 +145,12 @@ class ContextualLinks extends FieldPluginBase {
         $tokens = $this->getRenderTokens([]);
         $path = strip_tags(Html::decodeEntities(strtr($path, $tokens)));
 
+        // Contextual links only support local paths.
+        if (UrlHelper::isExternal($path)) {
+          continue;
+        }
+        $path = '/' . ltrim($path, '/');
+
         $link_key = "{$this->view->id()}__{$this->view->current_display}__$field";
         $links[$link_key] = [
           'path' => $path,
@@ -148,9 +163,9 @@ class ContextualLinks extends FieldPluginBase {
     }
 
     // Renders a contextual links placeholder.
-    // Links must be a nested array of strings, so that _contextual_links_to_id
-    // can serialize them.
-    // @see \Drupal\contextual\Element\ContextualLinks::preRenderLinks
+    // Links must be a nested array of strings, so that they can be serialized
+    // by ContextualLinksSerializer::linksToId().
+    // @see \Drupal\contextual\Element\ContextualLinks::preRenderLinks()
     if (!empty($links)) {
       $contextual_links = [
         'contextual' => [

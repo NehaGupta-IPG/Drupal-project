@@ -79,10 +79,13 @@
         const $contextual1 = $contextuals.eq(i1);
         const $contextual2 = $contextuals.eq(i2);
 
-        if (overlapsTooMuch($contextual1, $contextual2, width / 2, height / 2)) {
+        if (
+          overlapsTooMuch($contextual1, $contextual2, width / 2, height / 2)
+        ) {
           // Adjust contextual2's position to be to the left of contextual1.
           const c2right = parseFloat($contextual2.css('right'));
-          const offset = $contextual2.offset().left - $contextual1.offset().left;
+          const offset =
+            $contextual2.offset().left - $contextual1.offset().left;
           // If c2 is on the right of c1, right offset must be higher, so it's +offset.
           $contextual2.css({ right: c2right + offset + width });
         }

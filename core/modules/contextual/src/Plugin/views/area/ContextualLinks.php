@@ -3,20 +3,27 @@
 namespace Drupal\contextual\Plugin\views\area;
 
 use Drupal\Component\Render\MarkupInterface;
+use Drupal\contextual\ContextualLinksSerializer;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Routing\RedirectDestinationTrait;
+use Drupal\views\Attribute\ViewsArea;
 use Drupal\views\Plugin\views\area\TokenizeAreaPluginBase;
 
 /**
- * Views area text handler.
+ * Views area handler for contextual links.
  *
  * @ingroup views_area_handlers
- *
- * @ViewsArea("contextual_links")
  */
+#[ViewsArea("contextual_links")]
 class ContextualLinks extends TokenizeAreaPluginBase {
 
-  use RedirectDestinationTrait;
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected ContextualLinksSerializer $contextualLinksSerializer,
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  }
 
   /**
    * {@inheritdoc}
@@ -45,15 +52,16 @@ class ContextualLinks extends TokenizeAreaPluginBase {
    * {@inheritdoc}
    */
   public function render($empty = FALSE) {
-    // @fixme Add a contextual-links css class to the view.
     if (!$empty || !empty($this->options['empty'])) {
       $markup = $this->renderTextarea($this->options['content']);
+      if ($markup === NULL) {
+        return [];
+      }
       $links = $this->extractLinks($markup);
 
-      // Renders a contextual links placeholder.
       // Links must be a nested array of strings, so that they can be
-      // serialized by _contextual_links_to_id.
-      // @see \Drupal\contextual\Element\ContextualLinks::preRenderLinks
+      // serialized by ContextualLinksSerializer::linksToId().
+      // @see \Drupal\contextual\Element\ContextualLinks::preRenderLinks()
       if (!empty($links)) {
         $contextual_links = [
           'contextual' => [
@@ -61,20 +69,17 @@ class ContextualLinks extends TokenizeAreaPluginBase {
           ],
         ];
 
-        // Add a placeholder, but no contextual-links region, as this would have
-        // no dimensions, and we can leverage the region of the view anyway.
-        $element = [
+        // Add a placeholder, but no contextual-links region, as this would
+        // have no dimensions, and we can leverage the region of the view
+        // anyway.
+        return [
           '#type' => 'contextual_links_placeholder',
-          '#id' => _contextual_links_to_id($contextual_links),
+          '#id' => $this->contextualLinksSerializer->linksToId($contextual_links),
         ];
-        return $element;
-      }
-      else {
-        return '';
       }
     }
 
-    return '';
+    return [];
   }
 
   /**
@@ -94,13 +99,14 @@ class ContextualLinks extends TokenizeAreaPluginBase {
   }
 
   /**
-   * Parses content markup to extra a tag links.
+   * Parses the content markup to extract anchor links.
    *
    * @param \Drupal\Component\Render\MarkupInterface $markup
    *   View area content to parse.
    *
    * @return array
-   *   Array of link data.
+   *   Array of link data, keyed by a unique link key. Each link is an array
+   *   with 'title', 'path' and 'options' keys.
    */
   protected function extractLinks(MarkupInterface $markup): array {
     $links = [];
@@ -115,9 +121,9 @@ class ContextualLinks extends TokenizeAreaPluginBase {
     $domLinks = $xpath->query('//a[@href]');
     $i = 0;
     foreach ($domLinks as $domLink) {
-      assert($domLink instanceof \DOMNode);
+      assert($domLink instanceof \DOMElement);
       $title = $domLink->textContent;
-      $href = $domLink->attributes['href']->value;
+      $href = $domLink->getAttribute('href');
       $link_key = "{$this->view->id()}__{$this->view->current_display}__$i";
       $i++;
       $links[$link_key] = [
