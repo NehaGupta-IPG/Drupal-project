@@ -7,7 +7,7 @@ namespace Drupal\KernelTests\Core\Database;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\Query\Expression;
-use Drupal\Core\Database\Query\UpsertValue;
+use Drupal\Core\Database\Query\UpsertUpdateExpression;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -75,28 +75,32 @@ class UpsertTest extends DatabaseTestBase {
   }
 
   /**
-   * Confirms that we can upsert using UpsertValue value objects.
+   * Confirms that we can upsert using UpsertUpdateExpression.
    */
-  public function testUpsertWithUpsertValue(): void {
+  public function testUpsertWithUpsertUpdateExpression(): void {
     $connection = Database::getConnection();
     $num_records_before = $connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();
 
-    // Insert a new row.
     $upsert = $connection->upsert('test_people')
       ->key('job')
       ->fields([
-        'job' => 'Presenter',
-        'age' => new UpsertValue(
-          insert: 31,
-          update: new Expression('{test_people}.[age] + 5'),
-        ),
-        'name' => 'Tiffany',
-      ]);
+        'job',
+        'age' => new UpsertUpdateExpression('{test_people}.[age] + 5'),
+        'name',
+        ]);
+
+    // Insert a new row.
+    $upsert->values([
+      'job' => 'Presenter',
+      'age' => 31,
+      'name' => 'Tiffany',
+    ]);
 
     // Update an existing row.
     $upsert->values([
       'job' => 'Speaker',
-      // The initial age was 30.
+      // The initial age was 30; the new age should be 35 given the
+      // UpsertUpdateExpression, and the value of 32 passed in discarted.
       'age' => 32,
       'name' => 'Meredith',
     ]);

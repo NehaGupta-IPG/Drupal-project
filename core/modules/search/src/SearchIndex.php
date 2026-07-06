@@ -6,8 +6,7 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\Query\Expression;
-use Drupal\Core\Database\Query\UpsertValue;
+use Drupal\Core\Database\Query\UpsertUpdateExpression;
 use Drupal\search\Exception\SearchIndexException;
 
 /**
@@ -173,14 +172,18 @@ class SearchIndex implements SearchIndexInterface {
         $this->connection->upsert('search_index')
           ->key(['word', 'sid', 'langcode', 'type'])
           ->fields([
+            'word',
+            'sid',
+            'langcode',
+            'type',
+            'score' => new UpsertUpdateExpression('{search_index}.[score] + :score', [':score' => $score]),
+          ])
+          ->values([
             'word' => $word,
             'sid' => $sid,
             'langcode' => $langcode,
             'type' => $type,
-            'score' => new UpsertValue(
-              insert: $score,
-              update: new Expression('{search_index}.[score] + :score', [':score' => $score]),
-            ),
+            'score' => $score,
           ])
           ->execute();
         $current_words[$word] = TRUE;
