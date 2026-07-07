@@ -36,7 +36,7 @@ class EntityQueryCacheabilityTest extends EntityKernelTestBase {
     $query->addCacheContexts(['entity_test_view_grants'])
       ->addCacheTags(['entity_test_list'])
       ->mergeCacheMaxAge(90);
-    
+
     $cacheable_metadata = new CacheableMetadata();
     $query->execute($cacheable_metadata);
     // Cache contexts added directly to the entity query should be merged with
