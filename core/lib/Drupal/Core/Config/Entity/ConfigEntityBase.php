@@ -4,6 +4,7 @@ namespace Drupal\Core\Config\Entity;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Action\Attribute\ActionMethod;
 use Drupal\Core\Config\Schema\SchemaIncompleteException;
 use Drupal\Core\Entity\EntityBase;
@@ -315,7 +316,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
     // of whether it's new or updated.
     $matching_entities = $storage->getQuery()
       ->condition('uuid', $this->uuid())
-      ->execute();
+      ->execute(new CacheableMetadata());
     $matched_entity = reset($matching_entities);
     if (!empty($matched_entity) && ($matched_entity != $this->id()) && $matched_entity != $this->getOriginalId()) {
       throw new ConfigDuplicateUUIDException("Attempt to save a configuration entity '{$this->id()}' with UUID '{$this->uuid()}' when this UUID is already used for '$matched_entity'");

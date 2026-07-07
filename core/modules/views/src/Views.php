@@ -2,6 +2,8 @@
 
 namespace Drupal\views;
 
+use Drupal\Core\Cache\CacheableMetadata;
+
 /**
  * Static service container wrapper for views.
  */
@@ -242,7 +244,7 @@ class Views {
     $entity_ids = \Drupal::entityQuery('view')
       ->condition('status', TRUE)
       ->condition("display.*.display_plugin", $plugin_ids, 'IN')
-      ->execute();
+      ->execute(new CacheableMetadata());
 
     $result = [];
     foreach (\Drupal::entityTypeManager()->getStorage('view')->loadMultiple($entity_ids) as $view) {
