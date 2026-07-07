@@ -17,7 +17,9 @@ function language_update_last_removed(): int {
  */
 function language_update_11001(): string {
   $config = \Drupal::configFactory()->getEditable('language.negotiation');
-  $config->set('admin_language.default_langcode', 'site_default');
+  // Set to NULL (no global preference) to retain the existing behavior where
+  // only per-user preferences determined the administration language.
+  $config->set('admin_language.default_langcode', NULL);
   $config->set('admin_language.allow_user_change', TRUE);
   $config->save();
 

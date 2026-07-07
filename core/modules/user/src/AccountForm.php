@@ -273,7 +273,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
         if ($admin_langcode_default === LanguageInterface::LANGCODE_SITE_DEFAULT) {
           $admin_language_name = $this->languageManager->getDefaultLanguage()->getName();
         }
-        else {
+        elseif (!empty($admin_langcode_default)) {
           $admin_language_name = $this->languageManager->getLanguage($admin_langcode_default)->getName();
         }
       }
@@ -284,7 +284,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       '#languages' => LanguageInterface::STATE_CONFIGURABLE,
       '#default_value' => $register ? '' : $account->getPreferredAdminLangcode(FALSE),
       '#access' => $show_admin_language,
-      '#empty_option' => $admin_language_name ? $this->t("Site's administration language (@language)", ['@language' => $admin_language_name]) : $this->t("Site's administration language"),
+      '#empty_option' => $admin_language_name ? $this->t("Site's administration language (@language)", ['@language' => $admin_language_name]) : $this->t("No preference"),
       '#empty_value' => '',
     ];
 
