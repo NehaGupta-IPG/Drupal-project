@@ -109,7 +109,7 @@ class InlineBlockTranslationTest extends InlineBlockTestBase {
     $this->addInlineBlockToLayout('Block en label', 'Block en body');
     $this->assertSaveLayout();
     $this->drupalGet('node/1/layout');
-    $this->updateInlineBlockNontranslatableField('', 'Block non-translatable text');
+    $this->updateInlineBlockNonTranslatableField('', 'Block non-translatable text');
     $this->assertSaveLayout();
     $this->drupalGet('node/1');
     $assert_session->pageTextContains('Block en label');
@@ -227,7 +227,7 @@ class InlineBlockTranslationTest extends InlineBlockTestBase {
     $this->configureInlineBlock('Block en body', 'Block updated en body');
     $this->assertSaveLayout();
     $this->drupalGet('node/1/layout');
-    $this->updateInlineBlockNontranslatableField('Block non-translatable text updated from translation language', 'Block non-translatable text updated from source language');
+    $this->updateInlineBlockNonTranslatableField('Block non-translatable text updated from translation language', 'Block non-translatable text updated from source language');
     $this->assertSaveLayout();
 
     $assert_session->addressEquals('node/1');
@@ -317,7 +317,7 @@ class InlineBlockTranslationTest extends InlineBlockTestBase {
    * @param string $new_value
    *   The field's new value.
    */
-  protected function updateInlineBlockNontranslatableField($old_value, $new_value) {
+  protected function updateInlineBlockNonTranslatableField($old_value, $new_value) {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $this->clickContextualLink(static::INLINE_BLOCK_LOCATOR, 'Configure');
