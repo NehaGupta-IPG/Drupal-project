@@ -4,6 +4,7 @@ namespace Drupal\layout_builder;
 
 use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\RevisionableInterface;
@@ -184,14 +185,62 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
           $translated_component_configuration = $section_storage->getTranslatedComponentConfiguration($component->getUuid());
           if (isset($translated_component_configuration['block_serialized'])) {
             $this->saveTranslatedInlineBlock($entity, $component->getUuid(), $translated_component_configuration, $new_revision);
+            if ($new_revision) {
+              $block_revision_id = $section_storage->getTranslatedComponentConfiguration($component->getUuid())['block_revision_id'];
+            }
           }
         }
         else {
           $this->saveInlineBlockComponent($entity, $component, $new_revision, $duplicate_blocks);
+          if ($new_revision) {
+            $block_revision_id = $component->get('configuration')['block_revision_id'];
+          }
         }
       }
     }
     $this->removeUnusedForEntityOnSave($entity);
+
+    // If a new block revision was created, update all translations of the
+    // layout to reference the new block revision ID. This ensures that if a
+    // non-translatable field is updated in one language, it will be visible in
+    // all translations.
+    if (!empty($block_revision_id) && $entity->isDefaultRevision()) {
+      $this->setBlockRevisionForAllTranslations($entity, $component, $block_revision_id);
+    }
+  }
+
+  /**
+   * Updates all layout translations to reference a given block revision ID.
+   *
+   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   *   The entity with the layout.
+   * @param SectionComponent $component
+   *   The section component with an inline block.
+   * @param int $block_revision_id
+   *   The new block revision ID.
+   */
+  protected function setBlockRevisionForAllTranslations(ContentEntityInterface $entity, SectionComponent $component, $block_revision_id) {
+    if ($entity->isTranslatable()) {
+      foreach ($entity->getTranslationLanguages() as $langcode => $language) {
+        $section_storage = $this->getSectionStorageForEntity($entity->getTranslation($langcode));
+        // Update each translation language.
+        if (static::isTranslation($section_storage)) {
+          /** @var \Drupal\layout_builder_st\TranslatableSectionStorageInterface $section_storage */
+          $configuration = $section_storage->getTranslatedComponentConfiguration($component->getUuid());
+          // Only update the block revision ID if there is already one present.
+          if (!empty($configuration)) {
+            $configuration['block_revision_id'] = $block_revision_id;
+            $section_storage->setTranslatedComponentConfiguration($component->getUuid(), $configuration);
+          }
+        }
+        // Update the source language.
+        else {
+          $configuration = $component->getPlugin()->getConfiguration();
+          $configuration['block_revision_id'] = $block_revision_id;
+          $component->setConfiguration($configuration);
+        }
+      }
+    }
   }
 
   /**

@@ -93,3 +93,81 @@ function _layout_builder_add_translation_field($entity_type_id, $bundle): void {
     $field->save();
   }
 }
+
+/**
+ * Adds the layout translation settings field.
+ */
+function layout_builder_post_update_update_block_revisions(array &$sandbox) {
+  if (!isset($sandbox['progress'])) {
+    // Count all nodes with layout translations.
+    $count = \Drupal::entityTypeManager()
+      ->getStorage('node')
+      ->getQuery()
+      ->condition(OverridesSectionStorage::TRANSLATED_CONFIGURATION_FIELD_NAME, NULL, 'IS NOT NULL')
+      ->accessCheck(FALSE)
+      ->count()
+      ->execute();
+    $sandbox['total_count'] = $count;
+    $sandbox['updated_count'] = 0;
+    $sandbox['progress'] = 0;
+
+    if (empty($sandbox['total_count'])) {
+      $sandbox['#finished'] = 1;
+      return;
+    }
+  }
+
+  $batch_size = 25;
+  $nids = \Drupal::entityTypeManager()
+    ->getStorage('node')
+    ->getQuery()
+    ->condition(OverridesSectionStorage::TRANSLATED_CONFIGURATION_FIELD_NAME, NULL, 'IS NOT NULL')
+    ->accessCheck(FALSE)
+    ->range($sandbox['progress'], $batch_size)
+    ->execute();
+  $node_storage = \Drupal::entityTypeManager()->getStorage('node');
+
+  $nodes = $node_storage->loadMultiple($nids);
+
+  /** @var \Drupal\node\NodeInterface $node */
+  foreach ($nodes as $node) {
+    $sections = $node->get(OverridesSectionStorage::FIELD_NAME)->getValue();
+
+    // Loop through the sections and update the referenced block revision id.
+    foreach ($sections as $section_array) {
+      /** @var \Drupal\layout_builder\Section $section */
+      $section = $section_array['section'];
+      foreach ($section->getComponents() as $component) {
+        $plugin_configuration = $component->getPlugin()->getConfiguration();
+        if (!isset($plugin_configuration['block_revision_id'])) {
+          continue;
+        }
+        $block = \Drupal::entityTypeManager()->getStorage('block_content')->loadRevision($plugin_configuration['block_revision_id']);
+        if (!$block) {
+          continue;
+        }
+        // Load the default revision of the block.
+        $default_revision = \Drupal::entityTypeManager()->getStorage('block_content')->load($block->id());
+
+        // Reference the default revision.
+        $plugin_configuration['block_revision_id'] = $default_revision->getRevisionId();
+        $component->setConfiguration($plugin_configuration);
+      }
+    }
+
+    $node->set(OverridesSectionStorage::FIELD_NAME, $sections);
+    // Saving the node will trigger InlineBlockEntityOperations::setBlockRevisionForAllTranslations(),
+    // causing all translations to be updated as well.
+    $node->save();
+    $sandbox['updated_count']++;
+
+    $sandbox['progress']++;
+  }
+  if ($sandbox['progress'] >= $sandbox['total_count']) {
+    $sandbox['#finished'] = 1;
+  }
+  else {
+    $sandbox['#finished'] = ($sandbox['total_count'] - $sandbox['progress']) / $sandbox['total_count'];
+  }
+  return t('@number nodes were updated', ['@number' => $sandbox['updated_count']]);
+}

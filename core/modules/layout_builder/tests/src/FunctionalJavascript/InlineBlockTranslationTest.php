@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 
-use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Core\Url;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\layout_builder\Functional\TranslationTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that inline blocks works with content translation.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class InlineBlockTranslationTest extends InlineBlockTestBase {
 
   use LayoutBuilderTestTrait;
@@ -43,6 +47,35 @@ class InlineBlockTranslationTest extends InlineBlockTestBase {
 
     // Enable translation for the node type 'bundle_with_section_field'.
     \Drupal::service('content_translation.manager')->setEnabled('node', 'bundle_with_section_field', TRUE);
+
+    // Add a non-translatable text field to the basic block bundle.
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => 'field_non_translatable_text',
+      'entity_type' => 'block_content',
+      'type' => 'string',
+    ]);
+    $field_storage->setTranslatable(FALSE);
+    $field_storage->save();
+    $field = FieldConfig::create([
+      'field_storage' => $field_storage,
+      'bundle' => 'basic',
+      'label' => 'Non-translatable text',
+    ]);
+    $field->save();
+    $display_repository = \Drupal::service('entity_display.repository');
+    // Assign widget settings for the default form mode.
+    $display_repository->getFormDisplay('block_content', 'basic')
+      ->setComponent('field_non_translatable_text', [
+        'type' => 'string_textfield',
+      ])
+      ->save();
+    // Assign display settings for default view mode.
+    $display_repository->getViewDisplay('block_content', 'basic')
+      ->setComponent('field_non_translatable_text', [
+        'label' => 'hidden',
+        'type' => 'string',
+      ])
+      ->save();
   }
 
   /**
@@ -75,9 +108,13 @@ class InlineBlockTranslationTest extends InlineBlockTestBase {
     $this->drupalGet('node/1/layout');
     $this->addInlineBlockToLayout('Block en label', 'Block en body');
     $this->assertSaveLayout();
+    $this->drupalGet('node/1/layout');
+    $this->updateInlineBlockNontranslatableField('', 'Block non-translatable text');
+    $this->assertSaveLayout();
     $this->drupalGet('node/1');
     $assert_session->pageTextContains('Block en label');
     $assert_session->pageTextContains('Block en body');
+    $assert_session->pageTextContains('Block non-translatable text');
     $block_id = $this->getLatestBlockEntityId();
 
     // Create a translation.
@@ -112,12 +149,19 @@ class InlineBlockTranslationTest extends InlineBlockTestBase {
     $this->assertFalse($block->hasTranslation('it'), 'A block translation was not created when only the label was translatable.');
 
     // Enable translation for block_content type 'bundle_with_section_field'.
-    \Drupal::service('content_translation.manager')->setEnabled('block_content', 'basic', TRUE);
+    /** @var \Drupal\content_translation\ContentTranslationManager $content_translation_manager */
+    $content_translation_manager = \Drupal::service('content_translation.manager');
+    $content_translation_manager->setEnabled('block_content', 'basic', TRUE);
+
+    // Disable translation for the 'field_non_translatable_text' field.
+    $fields = \Drupal::service('entity_field.manager')->getFieldDefinitions('block_content', 'basic');
+    $field_config = $fields['field_non_translatable_text']->getConfig('basic');
+    $field_config->setTranslatable(FALSE)->save();
 
     // Update the translate node's inline block.
     $this->drupalGet('it/node/1/layout');
     $this->assertNonTranslationActionsRemoved();
-    $this->updateTranslatedBlock('Block it label', 'Block en body', 'Block updated it label', 'Block it body');
+    $this->updateTranslatedBlock('Block it label', 'Block en body', 'Block non-translatable text', 'Block updated it label', 'Block it body', 'Block non-translatable text updated from translation language');
 
     $this->assertEquals($block_id, $this->getLatestBlockEntityId(), 'A new block was not created.');
     $this->blockStorage->resetCache([$block_id]);
@@ -131,25 +175,32 @@ class InlineBlockTranslationTest extends InlineBlockTestBase {
     /** @var \Drupal\block_content\BlockContentInterface $block */
     $block = $this->blockStorage->load($block_id);
     $this->assertTrue($block->hasTranslation('it'), 'A block translation was created when the layout was saved.');
+    $this->assertEquals('Block non-translatable text updated from translation language', $block->get('field_non_translatable_text')->getString(), 'The non-translatable field was updated when the layout was saved.');
     $block_translation = $block->getTranslation('it');
     $this->assertEquals('Block it body', $block_translation->get('body')->get(0)->getValue()['value'], 'The translated block body field was created correctly.');
+    $this->assertEquals('Block non-translatable text updated from translation language', $block_translation->get('field_non_translatable_text')->getString(), 'The non-translatable field was updated when the layout was saved.');
 
     $assert_session->addressEquals('it/node/1');
     $assert_session->pageTextContains('Block it body');
+    $assert_session->pageTextContains('Block non-translatable text updated from translation language');
     $assert_session->pageTextContains('Block updated it label');
     $assert_session->pageTextNotContains('Block en body');
     $assert_session->pageTextNotContains('Block en label');
 
-    // Confirm that the default translation was not effected.
+    // Confirm that the default translation was not affected.
     $this->drupalGet('node/1');
     $assert_session->pageTextNotContains('Block it body');
     $assert_session->pageTextNotContains('Block updated it label');
     $assert_session->pageTextContains('Block en body');
     $assert_session->pageTextContains('Block en label');
 
+    // Confirm that the non-translatable field has the correct value on the
+    // translated block.
+    $assert_session->pageTextContains('Block non-translatable text updated from translation language');
+
     // Update the translation inline block again.
     $this->drupalGet('it/node/1/layout');
-    $this->updateTranslatedBlock('Block updated it label', 'Block it body', 'Block newer updated it label', 'Block updated it body');
+    $this->updateTranslatedBlock('Block updated it label', 'Block it body', 'Block non-translatable text updated from translation language', 'Block newer updated it label', 'Block updated it body', 'Block non-translatable text updated from translation language');
     $this->assertSaveLayout();
 
     $this->assertEquals($block_id, $this->getLatestBlockEntityId(), 'A new block was not created.');
@@ -175,12 +226,16 @@ class InlineBlockTranslationTest extends InlineBlockTestBase {
     $this->drupalGet('node/1/layout');
     $this->configureInlineBlock('Block en body', 'Block updated en body');
     $this->assertSaveLayout();
+    $this->drupalGet('node/1/layout');
+    $this->updateInlineBlockNontranslatableField('Block non-translatable text updated from translation language', 'Block non-translatable text updated from source language');
+    $this->assertSaveLayout();
 
     $assert_session->addressEquals('node/1');
     $assert_session->pageTextNotContains('Block updated it body');
     $assert_session->pageTextNotContains('Block newer updated it label');
     $assert_session->pageTextContains('Block updated en body');
     $assert_session->pageTextContains('Block en label');
+    $assert_session->pageTextContains('Block non-translatable text updated from source language');
 
     // Confirm that the translation was not effected.
     $this->drupalGet('it/node/1');
@@ -189,19 +244,25 @@ class InlineBlockTranslationTest extends InlineBlockTestBase {
     $assert_session->pageTextNotContains('Block updated en body');
     $assert_session->pageTextNotContains('Block en label');
 
+    // Confirm that the non-translatable field has the correct value on the
+    // translated block.
+    $assert_session->pageTextContains('Block non-translatable text updated from source language');
+
     // Update the translation block after updating default translation block.
     $this->drupalGet('it/node/1/layout');
-    $this->updateTranslatedBlock('Block newer updated it label', 'Block updated it body', 'Block even newer updated it label', 'Block newer updated it body');
+    $this->updateTranslatedBlock('Block newer updated it label', 'Block updated it body', 'Block non-translatable text updated from source language', 'Block even newer updated it label', 'Block newer updated it body', 'Block non-translatable text updated from translation language newer');
     $this->assertSaveLayout();
 
     $assert_session->addressEquals('it/node/1');
     $assert_session->pageTextContains('Block newer updated it body');
+    $assert_session->pageTextContains('Block non-translatable text updated from translation language newer');
     $assert_session->pageTextContains('Block even newer updated it label');
     $assert_session->pageTextNotContains('Block updated en body');
     $assert_session->pageTextNotContains('Block en label');
 
     $this->drupalGet('node/1');
     $assert_session->pageTextNotContains('Block newer updated it body');
+    $assert_session->pageTextContains('Block non-translatable text updated from translation language newer');
     $assert_session->pageTextNotContains('Block even newer updated it label');
     $assert_session->pageTextContains('Block updated en body');
     $assert_session->pageTextContains('Block en label');
@@ -214,12 +275,14 @@ class InlineBlockTranslationTest extends InlineBlockTestBase {
    *   The inline block's existing label.
    * @param string $existing_body
    *   The inline block's existing body field value.
+   * @param string $existing_non_translatable_text
+   *   The inline block's existing field_non_translatable_text value.
    * @param string $new_label
    *   The new label.
    * @param string $new_body
    *   The new body field value.
    */
-  protected function updateTranslatedBlock($existing_label, $existing_body, $new_label, $new_body): void {
+  protected function updateTranslatedBlock($existing_label, $existing_body, $existing_non_translatable_text, $new_label, $new_body, $new_non_translatable_text) {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $this->clickContextualLink(static::INLINE_BLOCK_LOCATOR, 'Translate block');
@@ -227,6 +290,9 @@ class InlineBlockTranslationTest extends InlineBlockTestBase {
     $this->assertNotEmpty($textarea);
     $this->assertEquals($existing_body, $textarea->getValue());
     $textarea->setValue($new_body);
+    $non_translatable_input = $assert_session->elementExists('css', '[name="field_non_translatable_text[0][value]"]');
+    $this->assertEquals($existing_non_translatable_text, $non_translatable_input->getValue());
+    $non_translatable_input->setValue($new_non_translatable_text);
 
     $label_input = $assert_session->elementExists('css', '#drupal-off-canvas [name="info[0][value]"]');
     $this->assertNotEmpty($label_input);
@@ -241,6 +307,27 @@ class InlineBlockTranslationTest extends InlineBlockTestBase {
     $assert_session->pageTextContains($new_body);
     $assert_session->pageTextNotContains($existing_label);
     $assert_session->pageTextNotContains($existing_body);
+  }
+
+  /**
+   * Update the value of the field_non_translatable_text source field.
+   *
+   * @param string $old_value
+   *   The field's current value.
+   * @param string $new_value
+   *   The field's new value.
+   */
+  protected function updateInlineBlockNontranslatableField($old_value, $new_value) {
+    $assert_session = $this->assertSession();
+    $page = $this->getSession()->getPage();
+    $this->clickContextualLink(static::INLINE_BLOCK_LOCATOR, 'Configure');
+    $input = $assert_session->waitForElementVisible('css', '[name="settings[block_form][field_non_translatable_text][0][value]"]');
+    $this->assertSame($old_value, $input->getValue());
+    $input->setValue($new_value);
+    $page->pressButton('Update');
+    $assert_session->assertNoElementAfterWait('css', '#drupal-off-canvas');
+    $assert_session->assertWaitOnAjaxRequest();
+    $this->assertDialogClosedAndTextVisible($new_value);
   }
 
 }

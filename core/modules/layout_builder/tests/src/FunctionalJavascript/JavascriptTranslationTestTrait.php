@@ -39,8 +39,6 @@ trait JavascriptTranslationTestTrait {
     $translation_selector_prefix = $this->usingConfigTranslation ? '#drupal-off-canvas .translation-set ' : '#drupal-off-canvas ';
     $this->clickContextualLink($block_selector, 'Translate block');
     $label_input = $assert_session->waitForElementVisible('css', $translation_selector_prefix . '[name="translation[label]"]');
-    $label_display_input = $assert_session->waitForElementVisible('css', $translation_selector_prefix . '[name="translation[label_display]"]');
-    $label_display_input->setValue('1');
     $this->assertNotEmpty($label_input);
     $this->assertEquals($expected_label, $label_input->getValue());
     $assert_session->elementTextContains('css', $translation_selector_prefix . '.form-item-source-label', $untranslated_label);
