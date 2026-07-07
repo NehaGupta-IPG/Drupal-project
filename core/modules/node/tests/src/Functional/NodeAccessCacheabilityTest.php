@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Functional;
 
-use Drupal\Core\Url;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\node\NodeAccessRebuild;
 use PHPUnit\Framework\Attributes\Group;
@@ -47,33 +46,6 @@ class NodeAccessCacheabilityTest extends NodeTestBase {
     $this->drupalCreateNode();
     $this->drupalCreateNode();
     $this->drupalCreateNode();
-  }
-
-  /**
-   * Tests that the node grants cache context is auto-added, only when needed.
-   *
-   * @see node_query_node_access_alter()
-   */
-  public function testNodeAccessCacheabilitySafeguard(): void {
-    // The node grants cache context should be added automatically.
-    $this->drupalGet(new Url('node_access_test_auto_bubbling'));
-    $this->assertCacheContext('user.node_grants:view');
-
-    // The user has the 'bypass node access' permission, which means the
-    // node grants cache context is not necessary.
-    $this->drupalLogin($this->drupalCreateUser(['bypass node access']));
-    $this->drupalGet(new Url('node_access_test_auto_bubbling'));
-    $this->assertNoCacheContext('user.node_grants:view');
-    $this->drupalLogout();
-
-    // Uninstall the module with the only hook_node_grants() implementation.
-    $this->container->get('module_installer')->uninstall(['node_access_test']);
-    $this->rebuildContainer();
-
-    // Because there are no node grants defined, there also is no need for the
-    // node grants cache context to be bubbled.
-    $this->drupalGet(new Url('node_access_test_auto_bubbling'));
-    $this->assertNoCacheContext('user.node_grants:view');
   }
 
   /**

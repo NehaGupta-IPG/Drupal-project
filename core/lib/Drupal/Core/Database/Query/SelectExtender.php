@@ -2,12 +2,21 @@
 
 namespace Drupal\Core\Database\Query;
 
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Database\Connection;
 
 /**
  * The base extender class for Select queries.
  */
 class SelectExtender implements SelectInterface {
+
+  use RefinableCacheableDependencyTrait {
+    getCacheContexts as traitGetCacheContexts;
+    getCacheMaxAge as traitGetCacheMaxAge;
+    getCacheTags as traitGetCacheTags;
+  }
 
   /**
    * The Select query object we are extending/decorating.
@@ -325,7 +334,12 @@ class SelectExtender implements SelectInterface {
   /**
    * {@inheritdoc}
    */
-  public function execute() {
+  public function execute(?RefinableCacheableDependencyInterface $cacheableMetadata = NULL) {
+    if ($cacheableMetadata === NULL) {
+      // @todo Add correct CR number.
+      @trigger_error('Calling ' . __METHOD__ . '() without the $cacheableMetadata argument is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/1234567', E_USER_DEPRECATED);
+    }
+
     // By calling preExecute() here, we force it to preprocess the extender
     // object rather than just the base query object.  That means
     // hook_query_alter() gets access to the extended object.
@@ -333,7 +347,7 @@ class SelectExtender implements SelectInterface {
       return NULL;
     }
 
-    return $this->query->execute();
+    return $this->query->execute($cacheableMetadata);
   }
 
   /**
@@ -551,6 +565,27 @@ class SelectExtender implements SelectInterface {
    */
   public function orConditionGroup() {
     return $this->conditionGroupFactory('OR');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts(): array {
+    return Cache::mergeContexts($this->traitGetCacheContexts(), $this->query->getCacheContexts());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheMaxAge(): int {
+    return Cache::mergeMaxAges($this->traitGetCacheMaxAge(), $this->query->getCacheMaxAge());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags(): array {
+    return Cache::mergeTags($this->traitGetCacheTags(), $this->query->getCacheTags());
   }
 
 }

@@ -2,6 +2,7 @@
 
 namespace Drupal\pgsql\Driver\Database\pgsql;
 
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Database\Query\Select as QuerySelect;
 
 /**
@@ -142,7 +143,12 @@ class Select extends QuerySelect {
   /**
    * {@inheritdoc}
    */
-  public function execute() {
+  public function execute(?RefinableCacheableDependencyInterface $cacheableMetadata = NULL) {
+    if ($cacheableMetadata === NULL) {
+      // @todo Add correct CR number.
+      @trigger_error('Calling ' . __METHOD__ . '() without the $cacheableMetadata argument is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/1234567', E_USER_DEPRECATED);
+    }
+
     if ($this->connection->inTransaction()) {
       $savepoint = $this->connection->startTransaction('mimic_implicit_commit');
     }
@@ -158,6 +164,9 @@ class Select extends QuerySelect {
     if (isset($savepoint)) {
       $savepoint->commitOrRelease();
     }
+
+    // @todo Remove conditional call in Drupal 12.0.0.
+    $cacheableMetadata?->addCacheableDependency($this);
 
     return $result;
   }

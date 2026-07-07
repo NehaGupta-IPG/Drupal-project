@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Database\Query;
 
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Database\Connection;
 
 /**
@@ -9,7 +10,7 @@ use Drupal\Core\Database\Connection;
  *
  * @ingroup database
  */
-interface SelectInterface extends ConditionInterface, AlterableInterface, ExtendableInterface, PlaceholderInterface {
+interface SelectInterface extends ConditionInterface, AlterableInterface, ExtendableInterface, PlaceholderInterface, RefinableCacheableDependencyInterface {
 
   /* Alter accessors to expose the query data to alter hooks. */
 
@@ -507,10 +508,13 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
   /**
    * Runs the query against the database.
    *
+   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface|null $cacheableMetadata
+   *   The cacheable metadata to add the query's cacheability to.
+   *
    * @return \Drupal\Core\Database\StatementInterface|null
    *   A prepared statement, or NULL if the query is not valid.
    */
-  public function execute();
+  public function execute(?RefinableCacheableDependencyInterface $cacheableMetadata = NULL);
 
   /**
    * Helper function to build most common HAVING conditional clauses.

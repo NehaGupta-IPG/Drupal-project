@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Config\Entity\Query;
 
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Query\QueryBase;
@@ -77,7 +78,12 @@ class Query extends QueryBase implements QueryInterface {
   /**
    * {@inheritdoc}
    */
-  public function execute() {
+  public function execute(?RefinableCacheableDependencyInterface $cacheableMetadata = NULL) {
+    if ($cacheableMetadata === NULL) {
+      // @todo Add correct CR number.
+      @trigger_error('Calling ' . __METHOD__ . '() without the $cacheableMetadata argument is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/1234567', E_USER_DEPRECATED);
+    }
+
     // Invoke entity query alter hooks.
     $this->alter();
 
@@ -109,6 +115,10 @@ class Query extends QueryBase implements QueryInterface {
     if ($this->range) {
       $result = array_slice($result, $this->range['start'], $this->range['length'], TRUE);
     }
+
+    // @todo Remove conditional call in Drupal 12.0.0.
+    $cacheableMetadata?->addCacheableDependency($this);
+
     if ($this->count) {
       return count($result);
     }

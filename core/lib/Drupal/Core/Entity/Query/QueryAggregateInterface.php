@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Entity\Query;
 
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+
 /**
  * Defines an interface for aggregated entity queries.
  */
@@ -131,6 +133,9 @@ interface QueryAggregateInterface extends QueryInterface {
   /**
    * Executes the aggregate query.
    *
+   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface|null $cacheableMetadata
+   *   The cacheable metadata to add the query's cacheability to.
+   *
    * @return array
    *   A list of result row arrays. Each result row contains the aggregate
    *   results as keys and also the groupBy columns as keys:
@@ -148,6 +153,6 @@ interface QueryAggregateInterface extends QueryInterface {
    *     $result[1] = ['count_nid' => 4, 'type' => 'article'];
    *   @endcode
    */
-  public function execute();
+  public function execute(?RefinableCacheableDependencyInterface $cacheableMetadata = NULL);
 
 }

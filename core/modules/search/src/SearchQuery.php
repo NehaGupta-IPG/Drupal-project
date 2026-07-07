@@ -2,6 +2,7 @@
 
 namespace Drupal\search;
 
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Database\Query\SelectExtender;
 use Drupal\Core\Database\Query\SelectInterface;
 
@@ -546,7 +547,12 @@ class SearchQuery extends SelectExtender {
    * @return \Drupal\Core\Database\StatementInterface|null
    *   A query result set containing the results of the query.
    */
-  public function execute() {
+  public function execute(?RefinableCacheableDependencyInterface $cacheableMetadata = NULL) {
+    if ($cacheableMetadata === NULL) {
+      // @todo Add correct CR number.
+      @trigger_error('Calling ' . __METHOD__ . '() without the $cacheableMetadata argument is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/1234567', E_USER_DEPRECATED);
+    }
+
     if (!$this->preExecute($this)) {
       return NULL;
     }
@@ -591,7 +597,7 @@ class SearchQuery extends SelectExtender {
     $this
       ->addMetaData('normalize', $this->normalize)
       ->fields('i', ['type', 'sid']);
-    return $this->query->execute();
+    return $this->query->execute($cacheableMetadata);
   }
 
   /**

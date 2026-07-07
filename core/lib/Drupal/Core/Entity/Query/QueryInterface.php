@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Entity\Query;
 
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Database\Query\AlterableInterface;
 
 // cspell:ignore merhaba siema
@@ -14,7 +15,7 @@ use Drupal\Core\Database\Query\AlterableInterface;
  *
  * @ingroup database
  */
-interface QueryInterface extends AlterableInterface {
+interface QueryInterface extends AlterableInterface, RefinableCacheableDependencyInterface {
 
   /**
    * Gets the ID of the entity type for this query.
@@ -225,12 +226,15 @@ interface QueryInterface extends AlterableInterface {
   /**
    * Execute the query.
    *
+   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface|null $cacheableMetadata
+   *   The cacheable metadata to add the query's cacheability to.
+   *
    * @return int|array
    *   Returns an integer for count queries or an array of ids. The values of
    *   the array are always entity ids. The keys will be revision ids if the
    *   entity supports revision and entity ids if not.
    */
-  public function execute();
+  public function execute(?RefinableCacheableDependencyInterface $cacheableMetadata = NULL);
 
   /**
    * Creates a new group of conditions ANDed together.

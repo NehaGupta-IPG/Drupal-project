@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\node\Hook;
 
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -83,9 +84,14 @@ class NodeDatabaseHooks {
     \Drupal::service('node.grant_storage')->alterQuery($query, $tables, $op, $account, $base_table);
     // Bubble the 'user.node_grants:$op' cache context to the current render
     // context.
+    $contexts = ['user.node_grants:' . $op];
+    if ($query instanceof RefinableCacheableDependencyInterface) {
+      $query->addCacheContexts($contexts);
+    }
+
     $renderer = \Drupal::service('renderer');
     if ($renderer->hasRenderContext()) {
-      $build = ['#cache' => ['contexts' => ['user.node_grants:' . $op]]];
+      $build = ['#cache' => ['contexts' => $contexts]];
       $renderer->render($build);
     }
   }

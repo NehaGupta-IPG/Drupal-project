@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Entity\Query\Sql;
 
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -75,14 +77,24 @@ class Query extends QueryBase implements QueryInterface {
   /**
    * {@inheritdoc}
    */
-  public function execute() {
-    return $this
+  public function execute(?RefinableCacheableDependencyInterface $cacheableMetadata = NULL) {
+    if ($cacheableMetadata === NULL) {
+      // @todo Add correct CR number.
+      @trigger_error('Calling ' . __METHOD__ . '() without the $cacheableMetadata argument is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/1234567', E_USER_DEPRECATED);
+    }
+
+    $result = $this
       ->alter()
       ->prepare()
       ->compile()
       ->addSort()
       ->finish()
       ->result();
+
+    // @todo Remove conditional call in Drupal 12.0.0.
+    $cacheableMetadata?->addCacheableDependency($this);
+
+    return $result;
   }
 
   /**
@@ -406,6 +418,27 @@ class Query extends QueryBase implements QueryInterface {
     $sql = $clone->connection->quoteIdentifiers($sql);
 
     return strtr($sql, $quoted);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts(): array {
+    return Cache::mergeContexts(parent::getCacheContexts(), $this->sqlQuery->getCacheContexts());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheMaxAge(): int {
+    return Cache::mergeMaxAges(parent::getCacheMaxAge(), $this->sqlQuery->getCacheMaxAge());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags(): array {
+    return Cache::mergeTags(parent::getCacheTags(), $this->sqlQuery->getCacheTags());
   }
 
 }

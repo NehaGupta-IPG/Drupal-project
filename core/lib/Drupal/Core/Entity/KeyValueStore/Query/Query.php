@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Entity\KeyValueStore\Query;
 
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Query\QueryBase;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
@@ -39,7 +40,12 @@ class Query extends QueryBase {
   /**
    * {@inheritdoc}
    */
-  public function execute() {
+  public function execute(?RefinableCacheableDependencyInterface $cacheableMetadata = NULL) {
+    if ($cacheableMetadata === NULL) {
+      // @todo Add correct CR number.
+      @trigger_error('Calling ' . __METHOD__ . '() without the $cacheableMetadata argument is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/1234567', E_USER_DEPRECATED);
+    }
+
     // Load the relevant records.
     $records = $this->keyValueFactory->get('entity_storage__' . $this->entityTypeId)->getAll();
 
@@ -61,6 +67,10 @@ class Query extends QueryBase {
     if ($this->range) {
       $result = array_slice($result, $this->range['start'], $this->range['length'], TRUE);
     }
+
+    // @todo Remove conditional call in Drupal 12.0.0.
+    $cacheableMetadata?->addCacheableDependency($this);
+
     if ($this->count) {
       return count($result);
     }

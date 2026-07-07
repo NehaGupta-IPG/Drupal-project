@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Entity\Query\Sql;
 
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\Query\QueryAggregateInterface;
 
 /**
@@ -20,8 +21,13 @@ class QueryAggregate extends Query implements QueryAggregateInterface {
   /**
    * {@inheritdoc}
    */
-  public function execute() {
-    return $this
+  public function execute(?RefinableCacheableDependencyInterface $cacheableMetadata = NULL) {
+    if ($cacheableMetadata === NULL) {
+      // @todo Add correct CR number.
+      @trigger_error('Calling ' . __METHOD__ . '() without the $cacheableMetadata argument is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/1234567', E_USER_DEPRECATED);
+    }
+
+    $result = $this
       ->alter()
       ->prepare()
       ->addAggregate()
@@ -32,6 +38,11 @@ class QueryAggregate extends Query implements QueryAggregateInterface {
       ->addSortAggregate()
       ->finish()
       ->result();
+
+    // @todo Remove conditional call in Drupal 12.0.0.
+    $cacheableMetadata?->addCacheableDependency($this);
+
+    return $result;
   }
 
   /**
