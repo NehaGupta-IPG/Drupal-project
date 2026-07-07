@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\layout_builder\Unit;
 
+use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\SynchronizableInterface;
 use Drupal\layout_builder\InlineBlockEntityOperations;
@@ -29,6 +30,7 @@ class InlineBlockEntityOperationsTest extends UnitTestCase {
     $entity = $this->prophesize(SynchronizableInterface::class);
     $entity->isSyncing()->willReturn(TRUE);
 
+    $block_manager = $this->prophesize(BlockManagerInterface::class);
     $entity_type_manager = $this->prophesize(EntityTypeManagerInterface::class);
     $inline_block_usage = $this->prophesize(InlineBlockUsageInterface::class);
     $section_storage_manager = $this->prophesize(SectionStorageManagerInterface::class);
@@ -37,7 +39,8 @@ class InlineBlockEntityOperationsTest extends UnitTestCase {
     $inline_block_entity_operations = new InlineBlockEntityOperations(
       $entity_type_manager->reveal(),
       $inline_block_usage->reveal(),
-      $section_storage_manager->reveal()
+      $section_storage_manager->reveal(),
+      $block_manager->reveal(),
     );
     $inline_block_entity_operations->handlePreSave($entity->reveal());
   }

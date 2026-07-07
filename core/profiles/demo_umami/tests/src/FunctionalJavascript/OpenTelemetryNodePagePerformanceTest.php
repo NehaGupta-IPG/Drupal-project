@@ -308,7 +308,10 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
         ],
         ['node:1:revisions'],
         ['content_moderation_state:1:revisions'],
-        ['config:workflows.workflow.editorial'],
+        [
+          'config:field.field.node.recipe.layout_builder__layout',
+          'config:workflows.workflow.editorial',
+        ],
         ['config:user.role.anonymous'],
       ],
       'ScriptCount' => 1,

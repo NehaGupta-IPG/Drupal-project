@@ -8,6 +8,7 @@ use Drupal\Core\Plugin\Context\Context;
 use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Plugin\Context\EntityContext;
 use Drupal\entity_test\Entity\EntityTest;
+use Drupal\entity_test\Entity\EntityTestMul;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\layout_builder\DefaultsSectionStorageInterface;
@@ -42,6 +43,8 @@ class OverridesSectionStorageTest extends KernelTestBase {
     'system',
     'user',
     'language',
+    'content_translation',
+    'content_translation_test',
   ];
 
   /**
@@ -59,6 +62,8 @@ class OverridesSectionStorageTest extends KernelTestBase {
 
     $this->setUpCurrentUser();
     $this->installEntitySchema('entity_test');
+    $this->installEntitySchema('entity_test_mul');
+    $this->installEntitySchema('user');
 
     $definition = $this->container->get('plugin.manager.layout_builder.section_storage')->getDefinition('overrides');
     $this->plugin = OverridesSectionStorage::create($this->container, [], 'overrides', $definition);
@@ -78,9 +83,10 @@ class OverridesSectionStorageTest extends KernelTestBase {
    */
   #[DataProvider('providerTestAccess')]
   public function testAccess($expected, $is_enabled, array $section_data, array $permissions): void {
+    ConfigurableLanguage::createFromLangcode('es')->save();
     $display = LayoutBuilderEntityViewDisplay::create([
-      'targetEntityType' => 'entity_test',
-      'bundle' => 'entity_test',
+      'targetEntityType' => 'entity_test_mul',
+      'bundle' => 'entity_test_mul',
       'mode' => 'default',
       'status' => TRUE,
     ]);
@@ -91,7 +97,7 @@ class OverridesSectionStorageTest extends KernelTestBase {
       ->setOverridable()
       ->save();
 
-    $entity = EntityTest::create([OverridesSectionStorage::FIELD_NAME => $section_data]);
+    $entity = EntityTestMul::create([OverridesSectionStorage::FIELD_NAME => $section_data]);
     $entity->save();
 
     $account = $this->setUpCurrentUser([], $permissions);
@@ -106,18 +112,17 @@ class OverridesSectionStorageTest extends KernelTestBase {
     $this->assertSame($expected, $result);
 
     // Create a translation.
-    ConfigurableLanguage::createFromLangcode('es')->save();
-    $entity = EntityTest::load($entity->id());
     $translation = $entity->addTranslation('es');
     $translation->save();
     $this->plugin->setContext('entity', EntityContext::fromEntity($translation));
+    // Translation access should only be allowed when there is section data.
+    $translation_expected_access = $expected && !empty($section_data);
 
-    // Perform the same checks again but with a non default translation which
-    // should always deny access.
+    // Perform the same checks again but with a non default translation.
     $result = $this->plugin->access('view');
-    $this->assertFalse($result);
+    $this->assertSame($translation_expected_access, $result);
     $result = $this->plugin->access('view', $account);
-    $this->assertFalse($result);
+    $this->assertSame($translation_expected_access, $result);
   }
 
   /**
@@ -155,26 +160,32 @@ class OverridesSectionStorageTest extends KernelTestBase {
       TRUE, TRUE, $section_data, ['configure any layout'],
     ];
     $data['enabled, no data, bundle overrides'] = [
-      TRUE, TRUE, [], ['configure all entity_test entity_test layout overrides'],
+      TRUE, TRUE, [], ['configure all entity_test_mul entity_test_mul layout overrides'],
     ];
     $data['enabled, data, bundle overrides'] = [
-      TRUE, TRUE, $section_data, ['configure all entity_test entity_test layout overrides'],
+      TRUE, TRUE, $section_data, ['configure all entity_test_mul entity_test_mul layout overrides'],
     ];
     $data['enabled, no data, bundle edit overrides, no edit access'] = [
-      FALSE, TRUE, [], ['configure editable entity_test entity_test layout overrides'],
+      FALSE, TRUE, [], ['configure editable entity_test_mul entity_test_mul layout overrides'],
     ];
     $data['enabled, data, bundle edit overrides, no edit access'] = [
-      FALSE, TRUE, $section_data, ['configure editable entity_test entity_test layout overrides'],
+      FALSE, TRUE, $section_data, ['configure editable entity_test_mul entity_test_mul layout overrides'],
     ];
     $data['enabled, no data, bundle edit overrides, edit access'] = [
-      TRUE, TRUE, [], ['configure editable entity_test entity_test layout overrides', 'administer entity_test content'],
+      TRUE,
+      TRUE,
+      [],
+      [
+        'configure editable entity_test_mul entity_test_mul layout overrides',
+        'administer entity_test content',
+      ],
     ];
     $data['enabled, data, bundle edit overrides, edit access'] = [
       TRUE,
       TRUE,
       $section_data,
       [
-        'configure editable entity_test entity_test layout overrides',
+        'configure editable entity_test_mul entity_test_mul layout overrides',
         'administer entity_test content',
       ],
     ];

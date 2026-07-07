@@ -192,7 +192,13 @@ class ClaroHooks {
    */
   #[Hook('preprocess_block')]
   public function preprocessBlock(array &$variables): void {
-    if (isset($variables['title_suffix']['contextual_links']) && !isset($variables['elements']['#contextual_links']['layout_builder_block'])) {
+    $layout_builder_links = array_intersect(array_keys($variables['elements']['#contextual_links'] ?? []), [
+      'layout_builder_block',
+      'layout_builder_block_translation',
+      'layout_builder_inline_block_translation',
+    ]);
+
+    if (isset($variables['title_suffix']['contextual_links']) && !$layout_builder_links) {
       unset($variables['title_suffix']['contextual_links']);
       unset($variables['elements']['#contextual_links']);
       $variables['attributes']['class'] = array_diff($variables['attributes']['class'], [
