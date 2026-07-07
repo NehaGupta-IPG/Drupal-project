@@ -2,8 +2,6 @@
 
 namespace Drupal\Core\Update;
 
-use Drupal\Core\DependencyInjection\ContainerStorage\NullContainerStorage;
-use Drupal\Core\DependencyInjection\ContainerStorageInterface;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Site\Settings;
@@ -38,20 +36,14 @@ class UpdateKernel extends DrupalKernel {
    * {@inheritdoc}
    */
   protected function initializeContainer() {
+    // Ensure the UpdateKernel's container is not dumped.
+    $this->allowDumping = FALSE;
+
     // Always force a container rebuild, in order to be able to override some
     // services, see \Drupal\Core\Update\UpdateServiceProvider.
     $this->containerNeedsRebuild = TRUE;
-    $container = parent::initializeContainer();
-    return $container;
-  }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function getContainerStorage(): ContainerStorageInterface {
-    // Don't save this particular container to cache, so it does not leak into
-    // the main site at all.
-    return new NullContainerStorage();
+    return parent::initializeContainer();
   }
 
   /**
