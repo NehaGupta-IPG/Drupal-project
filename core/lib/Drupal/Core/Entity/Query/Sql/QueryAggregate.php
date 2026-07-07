@@ -183,7 +183,7 @@ class QueryAggregate extends Query implements QueryAggregateInterface {
       return parent::result();
     }
     $return = [];
-    foreach ($this->sqlQuery->execute() as $row) {
+    foreach ($this->sqlQuery->execute($this) as $row) {
       $return[] = (array) $row;
     }
     return $return;

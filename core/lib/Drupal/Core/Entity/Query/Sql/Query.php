@@ -293,12 +293,12 @@ class Query extends QueryBase implements QueryInterface {
    */
   protected function result() {
     if ($this->count) {
-      return (int) $this->sqlQuery->countQuery()->execute()->fetchField();
+      return (int) $this->sqlQuery->countQuery()->execute($this)->fetchField();
     }
     // Return a keyed array of results. The key is either the revision_id or
     // the entity_id depending on whether the entity type supports revisions.
     // The value is always the entity id.
-    return $this->sqlQuery->execute()->fetchAllKeyed();
+    return $this->sqlQuery->execute($this)->fetchAllKeyed();
   }
 
   /**

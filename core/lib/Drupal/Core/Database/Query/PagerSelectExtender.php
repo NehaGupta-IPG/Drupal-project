@@ -79,7 +79,7 @@ class PagerSelectExtender extends SelectExtender {
     }
     $this->ensureElement();
 
-    $total_items = $this->getCountQuery()->execute()->fetchField();
+    $total_items = $this->getCountQuery()->execute($cacheableMetadata)->fetchField();
     $pager = $this->connection->getPagerManager()->createPager($total_items, $this->limit, $this->element);
     $this->range($pager->getCurrentPage() * $this->limit, $this->limit);
 

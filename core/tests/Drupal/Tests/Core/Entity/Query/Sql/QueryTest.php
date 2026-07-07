@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Entity\Query\Sql;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityType;
 use Drupal\Core\Entity\Query\QueryException;
@@ -56,7 +57,7 @@ class QueryTest extends UnitTestCase {
   public function testNoBaseTable(): void {
     $this->expectException(QueryException::class);
     $this->expectExceptionMessage('No base table for example_entity_query, invalid query.');
-    $this->query->execute();
+    $this->query->execute(new CacheableMetadata());
   }
 
   /**
@@ -67,7 +68,7 @@ class QueryTest extends UnitTestCase {
   public function testNoRevisionTable(): void {
     $this->expectException(QueryException::class);
     $this->expectExceptionMessage('No revision table for example_entity_query, invalid query.');
-    $this->query->allRevisions()->execute();
+    $this->query->allRevisions()->execute(new CacheableMetadata());
   }
 
 }

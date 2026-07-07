@@ -1466,7 +1466,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       $query->fields($table, $table_mapping->getColumnNames($field_name));
     }
 
-    $results = $query->execute();
+    $results = $query->execute(new CacheableMetadata());
 
     $is_not_null = fn($value) => !is_null($value);
 

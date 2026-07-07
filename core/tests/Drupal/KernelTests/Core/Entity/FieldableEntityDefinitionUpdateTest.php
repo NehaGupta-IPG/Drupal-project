@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityDefinitionUpdateManager;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -139,7 +140,7 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
     // least three times.
     /** @var \Drupal\Core\Entity\TranslatableRevisionableStorageInterface|\Drupal\Core\Entity\EntityStorageInterface $storage */
     $storage = $this->entityTypeManager->getStorage($this->entityTypeId);
-    $next_id = $storage->getQuery()->accessCheck(FALSE)->count()->execute() + 1;
+    $next_id = $storage->getQuery()->accessCheck(FALSE)->count()->execute(new CacheableMetadata()) + 1;
 
     // Create test entities with two translations and two revisions.
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
@@ -261,7 +262,7 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
         ->getQuery()
         ->accessCheck(FALSE)
         ->allRevisions()
-        ->execute();
+        ->execute(new CacheableMetadata());
       $revisions = $this->entityTypeManager->getStorage($this->entityTypeId)->loadMultipleRevisions(array_keys($revisions_result));
       $this->assertCount(6, $revisions);
 
@@ -611,13 +612,13 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
 
       $base_table_count = $this->database->select('entity_test_update')
         ->countQuery()
-        ->execute()
+        ->execute(new CacheableMetadata())
         ->fetchField();
       $this->assertEquals(3, $base_table_count);
 
       $data_table_count = $this->database->select('entity_test_update_data')
         ->countQuery()
-        ->execute()
+        ->execute(new CacheableMetadata())
         ->fetchField();
       // There are two records for each entity, one for English and one for
       // Romanian.
@@ -627,7 +628,7 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
         ->fields('entity_test_update')
         ->condition('id', 1, '=')
         ->condition('langcode', 'en', '=')
-        ->execute()
+        ->execute(new CacheableMetadata())
         ->fetchAllAssoc('id');
       $this->assertEquals($this->testEntities[1]->uuid(), $base_table_row[1]->uuid);
 
@@ -635,7 +636,7 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
         ->fields('entity_test_update_data')
         ->condition('id', 1, '=')
         ->condition('langcode', 'en', '=')
-        ->execute()
+        ->execute(new CacheableMetadata())
         ->fetchAllAssoc('id');
       $this->assertEquals('test entity - 1 - en', $data_table_row[1]->name);
       $this->assertEquals('shared table - 1 - value 1 - en', $data_table_row[1]->test_multiple_properties__value1);
@@ -645,7 +646,7 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
         ->fields('entity_test_update_data')
         ->condition('id', 1, '=')
         ->condition('langcode', 'ro', '=')
-        ->execute()
+        ->execute(new CacheableMetadata())
         ->fetchAllAssoc('id');
       $this->assertEquals('test entity - 1 - ro', $data_table_row[1]->name);
       $this->assertEquals('shared table - 1 - value 1 - ro', $data_table_row[1]->test_multiple_properties__value1);
@@ -656,7 +657,7 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
         ->fields($dedicated_table_name)
         ->condition('entity_id', 1, '=')
         ->condition('langcode', 'en', '=')
-        ->execute()
+        ->execute(new CacheableMetadata())
         ->fetchAllAssoc('delta');
       $this->assertEquals('dedicated table - 1 - delta 0 - value 1 - en', $dedicated_table_row[0]->test_multiple_properties_multiple_values_value1);
       $this->assertEquals('dedicated table - 1 - delta 0 - value 2 - en', $dedicated_table_row[0]->test_multiple_properties_multiple_values_value2);
@@ -667,7 +668,7 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
         ->fields($dedicated_table_name)
         ->condition('entity_id', 1, '=')
         ->condition('langcode', 'ro', '=')
-        ->execute()
+        ->execute(new CacheableMetadata())
         ->fetchAllAssoc('delta');
       $this->assertEquals('dedicated table - 1 - delta 0 - value 1 - ro', $dedicated_table_row[0]->test_multiple_properties_multiple_values_value1);
       $this->assertEquals('dedicated table - 1 - delta 0 - value 2 - ro', $dedicated_table_row[0]->test_multiple_properties_multiple_values_value2);

@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\DynamicallyFieldableEntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -1422,7 +1423,7 @@ function hook_entity_predelete(\Drupal\Core\Entity\EntityInterface $entity): voi
     ->condition('type', $type)
     ->condition('id', $id)
     ->countQuery()
-    ->execute()
+    ->execute(new CacheableMetadata())
     ->fetchField();
 
   // Log the count in a table that records this statistic for deleted entities.
@@ -1451,7 +1452,7 @@ function hook_ENTITY_TYPE_predelete(\Drupal\Core\Entity\EntityInterface $entity)
     ->condition('type', $type)
     ->condition('id', $id)
     ->countQuery()
-    ->execute()
+    ->execute(new CacheableMetadata())
     ->fetchField();
 
   // Log the count in a table that records this statistic for deleted entities.
