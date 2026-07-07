@@ -33,11 +33,6 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
   protected ?string $loadedSuffix = NULL;
 
   /**
-   * The hash of the currently loaded container.
-   */
-  protected ?string $loadedContainerHash = NULL;
-
-  /**
    * Constructs a PhpDumperContainerStorage.
    *
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
@@ -65,7 +60,6 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
       }
       if (class_exists($containerClass, FALSE)) {
         $this->loadedSuffix = $suffix;
-        $this->loadedContainerHash = $hash;
         return new $containerClass();
       }
     }
@@ -76,7 +70,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function dump(ContainerBuilder $container, string $suffix): ContainerInterface {
+  public function dump(ContainerBuilder $container, string $suffix): void {
     $this->loadedSuffix = $suffix;
 
     // Strip leading backslash so the generated PHP code produces a correct
@@ -92,16 +86,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
     // ensures that changes in the container definition result in a different
     // class name that can be loaded in the same request.
     $hash = hash('xxh128', $code);
-
     $containerClass = 'DrupalContainer_' . $hash;
-    $classExists = class_exists($containerClass, FALSE);
-
-    // There is no change from the loaded container, so there is nothing to do.
-    if ($hash === $this->loadedContainerHash) {
-      return new $containerClass();
-    }
-
-    $filename = $containerClass . '.php';
 
     $replace_count = 0;
     $code = str_replace(
@@ -113,27 +98,14 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
     if ($replace_count !== 1) {
       throw new \RuntimeException(sprintf('Expected to replace 1 occurrence of "DrupalContainer" with "%s" in the dumped container code.', $containerClass));
     }
-    // Only write the container to disk if it does not already exist.
-    if (!$classExists || !$this->phpStorage->exists($filename)) {
-      if ($this->phpStorage->save($filename, $code) === FALSE) {
-        // Calling save() failed; another worker may already be writing this
-        // file.
-        return $container;
-      }
-    }
-    // Only include if the class is not already in memory. If it is, the
-    // class was defined in a prior kernel lifecycle (e.g. the kernel was
-    // booted, terminated, then booted again). MTimeProtectedFileStorage
-    // writes each save() to a new mtime-based directory, so include_once
-    // on that new path would trigger "Cannot redeclare class".
-    if (!$classExists) {
-      if ($this->phpStorage->load($filename) === FALSE) {
-        // If the file was not loaded, it is not yet in memory.
-        return $container;
-      }
-    }
 
-    $this->loadedContainerHash = $hash;
+    // Only write the container to disk if it does not already exist.
+    $filename = $containerClass . '.php';
+    if (!$this->phpStorage->exists($filename)) {
+      if (!$this->phpStorage->save($filename, $code)) {
+        return;
+      }
+    }
 
     // Publish the hash only after the file is written, so the cache never
     // points to a container that failed to save. Superseded files are removed
@@ -144,8 +116,6 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
     catch (\Exception) {
       // The cache table may not exist yet (e.g., during install).
     }
-
-    return new $containerClass();
   }
 
   /**

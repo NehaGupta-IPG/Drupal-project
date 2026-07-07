@@ -59,7 +59,7 @@ class CacheContainerStorage implements ContainerStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function dump(ContainerBuilder $container, string $suffix): ContainerInterface {
+  public function dump(ContainerBuilder $container, string $suffix): void {
     $dumper = new $this->dumperClass($container);
     $container_definition = $dumper->getArray();
 
@@ -69,9 +69,6 @@ class CacheContainerStorage implements ContainerStorageInterface {
     catch (\Exception) {
       // The cache table may not exist yet (e.g., during install).
     }
-
-    $class = $this->settings->get('container_base_class', Container::class);
-    return new $class($container_definition);
   }
 
   /**

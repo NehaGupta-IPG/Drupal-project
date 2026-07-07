@@ -1124,7 +1124,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // If no container was loaded, build a new one from scratch.
     if (!$container) {
       $container = $this->compileContainer();
-      $container = $this->getContainerStorage()->dump($container, $suffix);
+      $storage = $this->getContainerStorage();
+      $storage->dump($container, $suffix);
+      $container = $storage->load($suffix) ?? $container;
     }
 
     // The container was rebuilt successfully.

@@ -39,13 +39,8 @@ interface ContainerStorageInterface {
    *   The compiled container builder.
    * @param string $suffix
    *   A hash suffix identifying this container version.
-   *
-   * @return \Symfony\Component\DependencyInjection\ContainerInterface
-   *   The container instance to use at runtime. This may be a new container
-   *   instantiated from the dumped representation, or the original
-   *   ContainerBuilder if dumping is not possible.
    */
-  public function dump(ContainerBuilder $container, string $suffix): ContainerInterface;
+  public function dump(ContainerBuilder $container, string $suffix): void;
 
   /**
    * Invalidates all stored containers.

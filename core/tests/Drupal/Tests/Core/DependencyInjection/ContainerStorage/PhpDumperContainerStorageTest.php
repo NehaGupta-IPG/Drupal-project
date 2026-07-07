@@ -152,7 +152,7 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
   }
 
   /**
-   * Tests that dump() saves the compiled container and returns an instance.
+   * Tests that dump() saves the compiled container and sets the hash in cache.
    */
   public function testDumpCreatesFileAndSetsHashInCache(): void {
     $cache = $this->createMock(CacheBackendInterface::class);
@@ -170,9 +170,8 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
       });
 
     $storage = new PhpDumperContainerStorage($cache, $phpStorage, Settings::getInstance());
-    $result = $storage->dump($container, 'test_suffix');
+    $storage->dump($container, 'test_suffix');
 
-    $this->assertInstanceOf(PhpContainer::class, $result);
     $this->assertCount(1, $savedFiles);
     $this->assertStringStartsWith('DrupalContainer_', $savedFiles[0]);
     $this->assertStringEndsWith('.php', $savedFiles[0]);
@@ -193,17 +192,14 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
 
     $storage = new PhpDumperContainerStorage($cache, $this->createPhpStorage(), Settings::getInstance());
     // Should not throw despite cache exception.
-    $result = $storage->dump($container, 'test_suffix');
-    $this->assertInstanceOf(PhpContainer::class, $result);
+    $storage->dump($container, 'test_suffix');
   }
 
   /**
    * Tests that dump() with same hash skips file and cache rewrites.
    */
   public function testDumpSameHashSkipsRewrites(): void {
-    $cache = $this->createMock(CacheBackendInterface::class);
-    $cache->expects($this->once())->method('set');
-
+    $cache = new MemoryBackend($this->createStub(TimeInterface::class));
     $savedFiles = [];
     $phpStorage = $this->createPhpStorage($savedFiles);
 
@@ -211,13 +207,14 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     $container->compile();
 
     $storage = new PhpDumperContainerStorage($cache, $phpStorage, Settings::getInstance());
-    $result1 = $storage->dump($container, 'test_suffix');
-    $result2 = $storage->dump($container, 'test_suffix');
+    $storage->dump($container, 'test_suffix');
+    $this->assertCount(1, $savedFiles);
 
-    // Both should return a PhpContainer of the same class.
-    $this->assertInstanceOf(PhpContainer::class, $result1);
-    $this->assertSame($result1::class, $result2::class);
-    // save() should only have been called once.
+    $this->assertInstanceOf(PhpContainer::class, $storage->load('test_suffix'));
+
+    // Dumping the same container again produces the same hash and therefore the
+    // same filename, which already exists, so the file is not rewritten.
+    $storage->dump($container, 'test_suffix');
     $this->assertCount(1, $savedFiles);
   }
 
@@ -236,41 +233,46 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     $old = new ContainerBuilder();
     $old->setParameter('test_param', 'old');
     $old->compile();
-    $resultOld = $storage->dump($old, 'old_suffix');
+    $storage->dump($old, 'old_suffix');
 
     // Two versions under the current suffix; the first is superseded by the
     // second.
     $superseded = new ContainerBuilder();
     $superseded->setParameter('test_param', 'superseded');
     $superseded->compile();
-    $resultSuperseded = $storage->dump($superseded, 'current_suffix');
+    $storage->dump($superseded, 'current_suffix');
 
     $current = new ContainerBuilder();
     $current->setParameter('test_param', 'current');
     $current->compile();
-    $resultCurrent = $storage->dump($current, 'current_suffix');
+    $storage->dump($current, 'current_suffix');
 
     $this->assertCount(3, $savedFiles);
     $this->assertCount(0, $deletedFiles);
+
+    // The compiled class names are derived from the saved filenames, in dump
+    // order: old, superseded, current.
+    $oldClass = basename($savedFiles[0], '.php');
+    $supersededClass = basename($savedFiles[1], '.php');
+    $currentClass = basename($savedFiles[2], '.php');
 
     $storage->garbageCollection();
 
     // Only the current container is kept; the superseded and old-suffix
     // containers are removed.
-    $this->assertContains($resultOld::class, $deletedFiles);
-    $this->assertContains($resultSuperseded::class, $deletedFiles);
-    $this->assertNotContains($resultCurrent::class, $deletedFiles);
+    $this->assertContains($oldClass, $deletedFiles);
+    $this->assertContains($supersededClass, $deletedFiles);
+    $this->assertNotContains($currentClass, $deletedFiles);
     $this->assertCount(2, $deletedFiles);
   }
 
   /**
-   * Tests that dump() saves but skips load when class already exists in memory.
+   * Tests that load() skips including the file when the class is in memory.
    */
-  public function testDumpSavesButSkipsLoadWhenClassAlreadyExists(): void {
-    $cache = $this->createStub(CacheBackendInterface::class);
+  public function testLoadSkipsIncludeWhenClassInMemory(): void {
+    $cache = new MemoryBackend($this->createStub(TimeInterface::class));
     $savedFiles = [];
     $loadedFiles = [];
-    $deletedFiles = [];
     $code = [];
 
     $phpStorage = $this->createStub(PhpStorageInterface::class);
@@ -290,137 +292,31 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
           include_once $tempFile;
         }
       });
-    $phpStorage->method('delete')
-      ->willReturnCallback(function ($filename) use (&$code, &$deletedFiles) {
-        unset($code[$filename]);
-        $deletedFiles[] = $filename;
-        return TRUE;
-      });
     $phpStorage->method('exists')
       ->willReturnCallback(function ($filename) use (&$code) {
         return isset($code[$filename]);
       });
+
+    $container = new ContainerBuilder();
+    $container->compile();
 
     $storage = new PhpDumperContainerStorage($cache, $phpStorage, Settings::getInstance());
 
-    // First dump: container A.
-    $containerA = new ContainerBuilder();
-    $containerA->setParameter('test_param', 'value_a');
-    $containerA->compile();
-    $resultA1 = $storage->dump($containerA, 'test_suffix');
-
-    // Second dump: container B (different hash).
-    $containerB = new ContainerBuilder();
-    $containerB->setParameter('test_param', 'value_b');
-    $containerB->compile();
-    $resultB = $storage->dump($containerB, 'test_suffix');
-
-    $this->assertNotSame($resultA1::class, $resultB::class);
-
-    $this->assertCount(2, $savedFiles);
-    $this->assertCount(2, $loadedFiles);
-    $this->assertCount(0, $deletedFiles);
-
-    // Reset tracking before the critical third dump.
-    $savedFiles = [];
-    $loadedFiles = [];
-    $deletedFiles = [];
-
-    // Third dump: container A again (same hash as first dump). The class
-    // DrupalContainer_<hashA> still exists in memory from the first dump.
-    $resultA2 = $storage->dump($containerA, 'test_suffix');
-
-    // The returned container must be the same class as the first dump.
-    $this->assertSame($resultA1::class, $resultA2::class);
-    // The file has already been saved to disk so no need to re-save it.
-    $this->assertCount(0, $savedFiles);
-    // Also load() must NOT be called (class already exists, re-including would
-    // cause "Cannot redeclare class").
-    $this->assertCount(0, $loadedFiles);
-  }
-
-  /**
-   * Tests dump() elseif branch when the class already exists in memory.
-   *
-   * When a new PhpDumperContainerStorage instance encounters a container hash
-   * whose class is already defined in memory (e.g. the kernel was booted,
-   * terminated, and booted again), the behavior depends on whether the file
-   * still exists on disk:
-   *
-   * - Class exists AND file exists: skip both save() and load() — no disk I/O.
-   * - Class exists AND file missing: call save() to restore the file for future
-   *   requests, but still skip load() to avoid a "Cannot redeclare class" fatal
-   *   that MTimeProtectedFileStorage would trigger by including the class from a
-   *   new mtime-based path.
-   */
-  public function testDumpElseBranchSkipsLoadWhenClassExists(): void {
-    $cache = $this->createStub(CacheBackendInterface::class);
-    $savedFiles = [];
-    $loadedFiles = [];
-    $code = [];
-
-    $phpStorage = $this->createStub(PhpStorageInterface::class);
-    $phpStorage->method('save')
-      ->willReturnCallback(function ($filename, $phpCode) use (&$code, &$savedFiles) {
-        $code[$filename] = $phpCode;
-        $savedFiles[] = $filename;
-        return TRUE;
-      });
-    $phpStorage->method('load')
-      ->willReturnCallback(function ($filename) use (&$code, &$loadedFiles) {
-        $loadedFiles[] = $filename;
-        if (isset($code[$filename])) {
-          $tempFile = tempnam(FileSystem::getOsTemporaryDirectory(), 'drupal_container_test_');
-          $this->tempFiles[] = $tempFile;
-          file_put_contents($tempFile, $code[$filename]);
-          include_once $tempFile;
-        }
-      });
-    $phpStorage->method('exists')
-      ->willReturnCallback(function ($filename) use (&$code) {
-        return isset($code[$filename]);
-      });
-
-    $containerA = new ContainerBuilder();
-    $containerA->setParameter('test_param', 'value_a');
-    $containerA->compile();
-
-    // First storage instance: dump A to define the class and write the file.
-    $storage1 = new PhpDumperContainerStorage($cache, $phpStorage, Settings::getInstance());
-    $result1 = $storage1->dump($containerA, 'test_suffix');
+    // dump() writes the file but must not include it.
+    $storage->dump($container, 'test_suffix');
     $this->assertCount(1, $savedFiles);
+    $this->assertCount(0, $loadedFiles, 'dump() must not include the compiled container');
+
+    // The first load() includes the file to bring the class into memory.
+    $first = $storage->load('test_suffix');
+    $this->assertInstanceOf(PhpContainer::class, $first);
     $this->assertCount(1, $loadedFiles);
 
-    // Reset tracking before second instance.
-    $savedFiles = [];
-    $loadedFiles = [];
-
-    // Second storage instance: class A exists in memory AND file exists on disk.
-    // Neither save() nor load() should be called — no disk I/O needed.
-    $storage2 = new PhpDumperContainerStorage($cache, $phpStorage, Settings::getInstance());
-    $result2 = $storage2->dump($containerA, 'test_suffix');
-    $this->assertSame($result1::class, $result2::class);
-    $this->assertCount(0, $savedFiles, 'save() must be skipped when class and file both already exist');
-    $this->assertCount(0, $loadedFiles, 'load() must be skipped when class already exists in memory');
-
-    // Delete the file from storage to simulate garbage collection having
-    // cleaned it up (e.g. because the active container changed). The class is
-    // still in memory.
-    $containerAFilename = $result1::class . '.php';
-    unset($code[$containerAFilename]);
-
-    // Reset tracking before third instance.
-    $savedFiles = [];
-    $loadedFiles = [];
-
-    // Third storage instance: class A exists in memory BUT file no longer
-    // exists on disk. save() MUST be called to restore the file for future
-    // requests. load() must still be skipped.
-    $storage3 = new PhpDumperContainerStorage($cache, $phpStorage, Settings::getInstance());
-    $result3 = $storage3->dump($containerA, 'test_suffix');
-    $this->assertSame($result1::class, $result3::class);
-    $this->assertCount(1, $savedFiles, 'save() must be called when the file is missing even if the class exists');
-    $this->assertCount(0, $loadedFiles, 'load() must be skipped even when file had to be re-saved');
+    // The second load() must not include the file again: the class is already
+    // in memory, and re-including would cause "Cannot redeclare class".
+    $second = $storage->load('test_suffix');
+    $this->assertInstanceOf(PhpContainer::class, $second);
+    $this->assertCount(1, $loadedFiles, 'load() must not re-include when the class already exists in memory');
   }
 
   /**
@@ -436,9 +332,9 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
   }
 
   /**
-   * Tests that dump() returns the original container when save() fails.
+   * Tests that dump() does not publish the hash when save() fails.
    */
-  public function testDumpReturnsFallbackContainerWhenSaveFails(): void {
+  public function testDumpDoesNotPublishHashWhenSaveFails(): void {
     $cache = $this->createMock(CacheBackendInterface::class);
     // cache->set() must not be called: the hash must not be published when the
     // file was not successfully written.
@@ -447,20 +343,12 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     $phpStorage = $this->createStub(PhpStorageInterface::class);
     $phpStorage->method('save')->willReturn(FALSE);
     $phpStorage->method('exists')->willReturn(FALSE);
-    // load() must not be called when save() failed.
-    $phpStorage->method('load')->willReturnCallback(
-      fn() => $this->fail('load() must not be called when save() returns FALSE'),
-    );
 
     $container = new ContainerBuilder();
     $container->compile();
 
     $storage = new PhpDumperContainerStorage($cache, $phpStorage, Settings::getInstance());
-    $result = $storage->dump($container, 'test_suffix');
-
-    // The original ContainerBuilder must be returned so the current request
-    // can continue with an uncached container.
-    $this->assertSame($container, $result);
+    $storage->dump($container, 'test_suffix');
   }
 
 }

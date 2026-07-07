@@ -24,7 +24,6 @@ use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
 use Prophecy\Argument;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 // cspell:ignore äöüßαβγδεζηθικλμνξοσὠ
@@ -633,9 +632,8 @@ class DrupalKernelTest extends KernelTestBase {
       /**
        * {@inheritdoc}
        */
-      public function dump(ContainerBuilder $container, string $suffix): ContainerInterface {
+      public function dump(ContainerBuilder $container, string $suffix): void {
         static::$dumpCalled = TRUE;
-        return $container;
       }
 
     });

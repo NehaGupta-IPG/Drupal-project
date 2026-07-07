@@ -96,9 +96,10 @@ class CacheContainerStorageTest extends UnitTestCase {
       });
 
     $storage = $this->createStorage($cache);
-    $result = $storage->dump($container, 'test_suffix');
+    $storage->dump($container, 'test_suffix');
 
-    $this->assertInstanceOf(Container::class, $result);
+    $this->assertIsArray($cachedData);
+    $this->assertSame('value', $cachedData['parameters']['test']);
   }
 
   /**
@@ -116,8 +117,7 @@ class CacheContainerStorageTest extends UnitTestCase {
     $storage = $this->createStorage($cache);
 
     // Should not throw despite cache exception.
-    $result = $storage->dump($container, 'test_suffix');
-    $this->assertInstanceOf(Container::class, $result);
+    $storage->dump($container, 'test_suffix');
   }
 
   /**
@@ -156,13 +156,11 @@ class CacheContainerStorageTest extends UnitTestCase {
       Settings::getInstance(),
       $customDumperClass,
     );
-    $result = $storage->dump($container, 'test_suffix');
+    $storage->dump($container, 'test_suffix');
 
-    $this->assertInstanceOf(Container::class, $result);
     $this->assertIsArray($cachedData);
     // The marker proves the custom dumper class was used, not the default.
     $this->assertTrue($cachedData['parameters']['_custom_dumper_marker']);
-    $this->assertTrue($result->getParameter('_custom_dumper_marker'));
   }
 
   /**
