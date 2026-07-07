@@ -281,6 +281,8 @@ class InlineBlockTranslationTest extends InlineBlockTestBase {
    *   The new label.
    * @param string $new_body
    *   The new body field value.
+   * @param string $new_non_translatable_text
+   *   The new non translatable text value.
    */
   protected function updateTranslatedBlock($existing_label, $existing_body, $existing_non_translatable_text, $new_label, $new_body, $new_non_translatable_text) {
     $assert_session = $this->assertSession();

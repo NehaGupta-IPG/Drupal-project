@@ -156,7 +156,8 @@ function layout_builder_post_update_update_block_revisions(array &$sandbox) {
     }
 
     $node->set(OverridesSectionStorage::FIELD_NAME, $sections);
-    // Saving the node will trigger InlineBlockEntityOperations::setBlockRevisionForAllTranslations(),
+    // Saving the node will trigger
+    // InlineBlockEntityOperations::setBlockRevisionForAllTranslations(),
     // causing all translations to be updated as well.
     $node->save();
     $sandbox['updated_count']++;
