@@ -777,6 +777,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
           $service->destruct();
         }
       }
+
       // Pop the request added in \Drupal\Core\DrupalKernel::preHandle() from
       // request stack at the end of the execution cycle.
       if ($this->prepared === TRUE) {
