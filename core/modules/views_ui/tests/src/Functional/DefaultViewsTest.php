@@ -192,6 +192,25 @@ class DefaultViewsTest extends UITestBase {
   }
 
   /**
+   * Tests that disabled views have correct title and that  moves them to the correct table.
+   */
+  public function testStatusTitleOperation() {
+    $this->drupalLogin($this->adminUser);
+
+    // User first gets to 'test_view_status' view.  This view is disabled.
+    $this->drupalGet('admin/structure/views/view/test_view_status/edit/default');
+    $this->assertSession()->elementTextEquals('xpath', '//h1', 'test_view_status (Views test data) disabled');
+
+    // Enable the view.
+    $this->clickViewsOperationLink('Enable view', '/enable/test_view_status/');
+    $this->assertSession()->elementTextEquals('xpath', '//h1', 'test_view_status (Views test data)');
+
+    // Disable the view.
+    $this->clickViewsOperationLink('Disable view', '/disable/test_view_status/');
+    $this->assertSession()->elementTextEquals('xpath', '//h1', 'test_view_status (Views test data) disabled');
+  }
+
+  /**
    * Tests that page displays show the correct path.
    */
   public function testPathDestination(): void {

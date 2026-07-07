@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Tags;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
+use Drupal\views\Ajax\ReplaceTitleCommand;
 use Drupal\views\ViewExecutable;
 use Drupal\views\ViewEntityInterface;
 use Drupal\views\Views;
@@ -163,6 +164,39 @@ class ViewsUIController extends ControllerBase {
   }
 
   /**
+   * Calls a method on a view edit and reloads the form and title.
+   *
+   * @param \Drupal\views_ui\ViewUI $view
+   *   The view to be edited.
+   * @param string|null $display_id
+   *   (optional) The display ID being edited. Defaults to NULL, which will load
+   * @param string $op
+   *   The operation to perform, e.g., 'enable' or 'disable'.
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The current request.
+   *
+   * @return \Drupal\Core\Ajax\AjaxResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+   *   Either returns a rebuilt listing page as an AJAX response, or redirects
+   *   back to the listing page.
+   */
+  public function ajaxDisplayOperation(ViewEntityInterface $view, $display_id, $op, Request $request) {
+    // Perform the operation.
+    $view->$op()->save();
+
+    // If the request is via AJAX, return the rendered form and title as JSON.
+    if ($request->request->get('js')) {
+      $response = new AjaxResponse();
+      $response->addCommand(new ReplaceTitleCommand($this->pageTitle($view)));
+      $view_edit_form = $this->entityFormBuilder()->getForm($view, 'edit', ['display_id' => $display_id]);
+      $response->addCommand(new ReplaceCommand('.views-edit-view', $view_edit_form));
+      return $response;
+    }
+
+    // Otherwise, redirect back to the page.
+    return $this->redirect('entity.view.edit_display_form', ['view' => $view->id(), 'display_id' => $display_id]);
+  }
+
+  /**
    * Menu callback for Views tag autocompletion.
    *
    * Like other autocomplete functions, this function inspects the 'q' query
@@ -209,17 +243,32 @@ class ViewsUIController extends ControllerBase {
    *   An array containing the Views edit and preview forms.
    */
   public function edit(ViewUI $view, $display_id = NULL) {
-    $name = $view->label();
-    $data = $this->viewsData->get($view->get('base_table'));
-
-    if (isset($data['table']['base']['title'])) {
-      $name .= ' (' . $data['table']['base']['title'] . ')';
-    }
-    $build['#title'] = $name;
+    $build['#title'] = $this->pageTitle($view);
 
     $build['edit'] = $this->entityFormBuilder()->getForm($view, 'edit', ['display_id' => $display_id]);
     $build['preview'] = $this->entityFormBuilder()->getForm($view, 'preview', ['display_id' => $display_id]);
     return $build;
+  }
+
+  /**
+   * Returns the views Page Title.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view being acted upon.
+   *
+   * @return string
+   *   The view label with data source and indication that view is disabled.
+   */
+  private function pageTitle(ViewEntityInterface $view) {
+    $name = $view->label();
+    $data = $this->viewsData->get($view->get('base_table'));
+    if (isset($data['table']['base']['title'])) {
+      $name .= ' (' . $data['table']['base']['title'] . ')';
+    }
+    if (!$view->status()) {
+      $name .= ' ' . $this->t('disabled');
+    }
+    return $name;
   }
 
 }
