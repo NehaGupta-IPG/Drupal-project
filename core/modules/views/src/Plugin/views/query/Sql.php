@@ -4,6 +4,8 @@ namespace Drupal\views\Plugin\views\query;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -30,7 +32,9 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
   title: new TranslatableMarkup('SQL Query'),
   help: new TranslatableMarkup('Query will be generated and run using the Drupal database API.')
 )]
-class Sql extends QueryPluginBase {
+class Sql extends QueryPluginBase implements RefinableCacheableDependencyInterface {
+
+  use RefinableCacheableDependencyTrait;
 
   /**
    * A list of tables in the order they should be added, keyed by alias.
@@ -1567,7 +1571,7 @@ class Sql extends QueryPluginBase {
           $query->range($offset, $limit);
         }
 
-        $result = $query->execute();
+        $result = $query->execute($this);
         $result->setFetchMode(FetchAs::ClassObject, 'Drupal\views\ResultRow');
 
         // Setup the result row objects.
@@ -1720,7 +1724,7 @@ class Sql extends QueryPluginBase {
    * {@inheritdoc}
    */
   public function getCacheTags() {
-    $tags = [];
+    $tags = $this->cacheTags;
     // Add cache tags for each row, if there is an entity associated with it.
     if (!$this->hasAggregate) {
       foreach ($this->getAllEntities() as $entity) {
@@ -1735,7 +1739,7 @@ class Sql extends QueryPluginBase {
    * {@inheritdoc}
    */
   public function getCacheMaxAge() {
-    $max_age = parent::getCacheMaxAge();
+    $max_age = $this->cacheMaxAge;
     foreach ($this->getAllEntities() as $entity) {
       $max_age = Cache::mergeMaxAges($max_age, $entity->getCacheMaxAge());
     }
