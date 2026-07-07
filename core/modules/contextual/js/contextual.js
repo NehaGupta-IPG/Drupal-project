@@ -83,11 +83,13 @@
           overlapsTooMuch($contextual1, $contextual2, width / 2, height / 2)
         ) {
           // Adjust contextual2's position to be to the left of contextual1.
-          const c2right = parseFloat($contextual2.css('right'));
+          const c2right = parseFloat(
+            window.getComputedStyle($contextual2[0]).right,
+          );
           const offset =
             $contextual2.offset().left - $contextual1.offset().left;
           // If c2 is on the right of c1, right offset must be higher, so it's +offset.
-          $contextual2.css({ right: c2right + offset + width });
+          $contextual2[0].style.right = `${c2right + offset + width}px`;
         }
       }
     }
