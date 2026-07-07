@@ -162,20 +162,17 @@ class RoleAccessCheckTest extends UnitTestCase {
     $collection = $this->getTestRouteCollection();
 
     foreach ($grant_accounts as $account) {
-      $message = sprintf('Access granted for user with the roles %s on path: %s', implode(', ', $account->getRoles()), $path);
-      $this->assertEquals(AccessResult::allowed()->addCacheContexts(['user.roles']), $role_access_check->access($collection->get($path), $account), $message);
+      $this->assertEquals(AccessResult::allowed()->addCacheContexts(['user.roles']), $role_access_check->access($collection->get($path), $account));
     }
 
     // Check all users which don't have access.
     foreach ($deny_accounts as $account) {
-      $message = sprintf('Access denied for user %s with the roles %s on path: %s', $account->id(), implode(', ', $account->getRoles()), $path);
       $has_access = $role_access_check->access($collection->get($path), $account);
-      $this->assertEquals(AccessResult::neutral()->addCacheContexts(['user.roles']), $has_access, $message);
+      $this->assertEquals(AccessResult::neutral()->addCacheContexts(['user.roles']), $has_access);
     }
 
     foreach ($forbidden_accounts as $account) {
-      $message = sprintf('Access forbidden for user with no roles on path: %s', $path);
-      $this->assertEquals(AccessResult::forbidden('No user roles found.'), $role_access_check->access($collection->get($path), $account), $message);
+      $this->assertEquals(AccessResult::forbidden('No user roles found.'), $role_access_check->access($collection->get($path), $account));
     }
   }
 
