@@ -82,7 +82,7 @@ class CacheContainerStorage implements ContainerStorageInterface {
    * {@inheritdoc}
    */
   public function garbageCollection(): void {
-    // The cache backend manages expiry of stored container definitions.
+    $this->cache->garbageCollection();
   }
 
 }
