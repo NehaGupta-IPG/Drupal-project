@@ -2,6 +2,7 @@
 
 namespace Drupal\file;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 
 /**
@@ -19,7 +20,7 @@ class FileStorage extends SqlContentEntityStorage implements FileStorageInterfac
     if (isset($uid)) {
       $query->condition('f.uid', $uid);
     }
-    return $query->execute()->fetchField();
+    return $query->execute(new CacheableMetadata())->fetchField();
   }
 
 }

@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Entity\Entity;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\Entity\Entity\Access\EntityFormDisplayAccessControlHandler;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -114,7 +115,7 @@ class EntityFormDisplay extends EntityDisplayBase implements EntityFormDisplayIn
     $results = \Drupal::entityQuery('entity_form_display')
       ->condition('id', $candidate_ids)
       ->condition('status', TRUE)
-      ->execute();
+      ->execute(new CacheableMetadata());
 
     // Load the first valid candidate display, if any.
     $storage = \Drupal::entityTypeManager()->getStorage('entity_form_display');

@@ -3,6 +3,7 @@
 namespace Drupal\Core\Entity\Plugin\EntityReferenceSelection;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Entity\Attribute\EntityReferenceSelection;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
@@ -387,7 +388,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
       $query = $this->buildEntityQuery();
       $result = $query
         ->condition($entity_type->getKey('id'), $ids, 'IN')
-        ->execute();
+        ->execute(new CacheableMetadata());
     }
 
     return $result;

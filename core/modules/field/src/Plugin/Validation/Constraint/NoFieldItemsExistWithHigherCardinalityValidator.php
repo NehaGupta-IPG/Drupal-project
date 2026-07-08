@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\field\Plugin\Validation\Constraint;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Schema\TypeResolver;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -86,7 +87,7 @@ class NoFieldItemsExistWithHigherCardinalityValidator extends ConstraintValidato
       ->getAggregateQuery()
       ->aggregate($field_name . '.%delta', 'MAX', NULL, $max_delta_alias)
       ->accessCheck(FALSE);
-    $result = $query->execute();
+    $result = $query->execute(new CacheableMetadata());
 
     $max_delta = 0;
     if (is_array($result) && !empty($result)) {
