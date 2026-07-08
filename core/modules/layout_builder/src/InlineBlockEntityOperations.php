@@ -225,7 +225,7 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
    * @param int $block_revision_id
    *   The new block revision ID.
    */
-  protected function setBlockRevisionForAllTranslations(ContentEntityInterface $entity, SectionComponent $component, $block_revision_id) {
+  protected function setBlockRevisionForAllTranslations(ContentEntityInterface $entity, SectionComponent $component, $block_revision_id): void {
     if ($entity->isTranslatable()) {
       foreach ($entity->getTranslationLanguages() as $langcode => $language) {
         $section_storage = $this->getSectionStorageForEntity($entity->getTranslation($langcode));

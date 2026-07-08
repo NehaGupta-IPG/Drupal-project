@@ -9,13 +9,15 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Core\Url;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
 use Drupal\Tests\layout_builder\Functional\TranslationTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore blocknodebundle fieldbody
 /**
  * Tests that block settings can be translated.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class TranslationTest extends WebDriverTestBase {
 
   use LayoutBuilderTestTrait;
@@ -114,8 +116,6 @@ class TranslationTest extends WebDriverTestBase {
 
   /**
    * Tests that block labels can be translated.
-   *
-   * @dataProvider providerLabelTranslation
    */
   public function testLabelTranslation($install_config_translation): void {
     $page = $this->getSession()->getPage();

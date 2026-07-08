@@ -284,7 +284,7 @@ class InlineBlockTranslationTest extends InlineBlockTestBase {
    * @param string $new_non_translatable_text
    *   The new non translatable text value.
    */
-  protected function updateTranslatedBlock($existing_label, $existing_body, $existing_non_translatable_text, $new_label, $new_body, $new_non_translatable_text) {
+  protected function updateTranslatedBlock($existing_label, $existing_body, $existing_non_translatable_text, $new_label, $new_body, $new_non_translatable_text): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $this->clickContextualLink(static::INLINE_BLOCK_LOCATOR, 'Translate block');
@@ -319,7 +319,7 @@ class InlineBlockTranslationTest extends InlineBlockTestBase {
    * @param string $new_value
    *   The field's new value.
    */
-  protected function updateInlineBlockNonTranslatableField($old_value, $new_value) {
+  protected function updateInlineBlockNonTranslatableField($old_value, $new_value): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $this->clickContextualLink(static::INLINE_BLOCK_LOCATOR, 'Configure');

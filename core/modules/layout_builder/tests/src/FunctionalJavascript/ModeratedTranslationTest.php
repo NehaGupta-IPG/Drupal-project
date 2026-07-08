@@ -11,12 +11,14 @@ use Drupal\node\Entity\Node;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
 use Drupal\Tests\layout_builder\Functional\TranslationTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test moderated and translated layout overrides.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class ModeratedTranslationTest extends WebDriverTestBase {
 
   use LayoutBuilderTestTrait;
