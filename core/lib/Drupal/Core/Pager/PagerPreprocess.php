@@ -41,6 +41,8 @@ class PagerPreprocess {
    *       append to the pager links.
    *     - #route_parameters: An associative array of the route parameters.
    *     - #quantity: The number of pages in the list.
+   *     - #skip_modal_ajax: (optional) TRUE to skip the generic modal AJAX
+   *       link attributes, for pagers that handle their own AJAX.
    */
   public function preprocessPager(array &$variables): void {
     $element = $variables['pager']['#element'];
@@ -163,7 +165,7 @@ class PagerPreprocess {
       }
 
       $items['last'] = [];
-      $items['last']['attributes'] = new Attribute($link_attributes);
+      $items['last']['attributes'] = new Attribute();
       $options = [
         'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, $pager_max - 1),
       ];
