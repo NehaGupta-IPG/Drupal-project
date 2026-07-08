@@ -35,6 +35,10 @@ class FileNullSizeTest extends FieldKernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installEntitySchema('file');
+    $this->installSchema('file', ['file_usage']);
+
+    file_put_contents('public://example.txt', '');
     $this->file = File::create([
       'uri' => 'public://example.txt',
       'filesize' => NULL,
