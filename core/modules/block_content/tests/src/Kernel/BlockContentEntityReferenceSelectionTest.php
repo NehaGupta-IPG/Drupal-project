@@ -7,6 +7,7 @@ namespace Drupal\Tests\block_content\Kernel;
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\block_content_test\Plugin\EntityReferenceSelection\TestSelection;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -126,19 +127,19 @@ class BlockContentEntityReferenceSelectionTest extends KernelTestBase {
     $query = $this->entityTypeManager->getStorage('block_content')
       ->getQuery()
       ->accessCheck(FALSE);
-    $this->assertCount(2, $query->execute());
+    $this->assertCount(2, $query->execute(new CacheableMetadata()));
 
     $query = $this->entityTypeManager->getStorage('block_content')
       ->getQuery()
       ->accessCheck(FALSE);
     $query->addTag('block_content_access');
-    $this->assertCount(2, $query->execute());
+    $this->assertCount(2, $query->execute(new CacheableMetadata()));
 
     $query = $this->entityTypeManager->getStorage('block_content')
       ->getQuery()
       ->accessCheck(FALSE);
     $query->addTag('entity_query_block_content');
-    $this->assertCount(2, $query->execute());
+    $this->assertCount(2, $query->execute(new CacheableMetadata()));
   }
 
   /**

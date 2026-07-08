@@ -6,6 +6,7 @@ namespace Drupal\Tests\Core\Menu;
 
 use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -406,7 +407,7 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
     $query->accessCheck(TRUE)->shouldBeCalled();
     $query->condition('nid', [1, 2, 3, 4], 'IN')->shouldBeCalled();
     $query->condition('status', NodeInterface::PUBLISHED)->shouldBeCalled();
-    $query->execute()->willReturn([1, 2, 4]);
+    $query->execute(new CacheableMetadata())->willReturn([1, 2, 4]);
 
     $storage = $this->createMock(EntityStorageInterface::class);
     $storage->expects($this->once())

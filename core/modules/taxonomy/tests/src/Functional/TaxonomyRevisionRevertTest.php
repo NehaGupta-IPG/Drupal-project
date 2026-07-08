@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Functional;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\Form\RevisionRevertForm;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\VocabularyInterface;
@@ -100,7 +101,7 @@ class TaxonomyRevisionRevertTest extends BrowserTestBase {
         ->accessCheck(FALSE)
         ->allRevisions()
         ->count()
-        ->execute();
+        ->execute(new CacheableMetadata());
     };
 
     $count = $countRevisions();

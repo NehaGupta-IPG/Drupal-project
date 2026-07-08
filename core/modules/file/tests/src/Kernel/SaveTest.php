@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\Kernel;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\file\Entity\File;
 use Drupal\file_test\FileTestHelper;
 use Drupal\Tests\user\Traits\UserCreationTrait;
@@ -92,7 +93,7 @@ class SaveTest extends FileManagedUnitTestBase {
     $fids = \Drupal::entityQuery('file')
       ->accessCheck(FALSE)
       ->condition('uri', $uppercase_file->getFileUri())
-      ->execute();
+      ->execute(new CacheableMetadata());
 
     $this->assertCount(1, $fids);
     $this->assertEquals([$uppercase_file->id() => $uppercase_file->id()], $fids);

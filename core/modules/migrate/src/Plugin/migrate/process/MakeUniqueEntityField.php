@@ -2,6 +2,7 @@
 
 namespace Drupal\migrate\Plugin\migrate\process;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\Attribute\MigrateProcess;
@@ -131,7 +132,7 @@ class MakeUniqueEntityField extends MakeUniqueBase implements ContainerFactoryPl
     if (!empty($this->configuration['migrated'])) {
       // Check if each entity is in the ID map.
       $idMap = $this->migration->getIdMap();
-      foreach ($query->execute() as $id) {
+      foreach ($query->execute(new CacheableMetadata()) as $id) {
         $dest_id_values[$this->configuration['field']] = $id;
         if ($idMap->lookupSourceId($dest_id_values)) {
           return TRUE;
@@ -141,7 +142,7 @@ class MakeUniqueEntityField extends MakeUniqueBase implements ContainerFactoryPl
     }
     else {
       // Just check if any such entity exists.
-      return $query->count()->execute();
+      return $query->count()->execute(new CacheableMetadata());
     }
   }
 

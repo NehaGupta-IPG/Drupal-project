@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\TypedData\TranslationStatusInterface;
 use Drupal\entity_test\Entity\EntityTest;
@@ -295,7 +296,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
     $result = $query
       ->condition($group)
       ->condition('name', $properties[$langcode]['name'][0], '=', $langcode)
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result, "$entity_type: One entity loaded by name and uid using different language meta conditions.");
 
     // Test mixed property and field conditions.
@@ -315,7 +316,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
       ->condition($langcode_key, $default_langcode)
       ->condition($default_langcode_group)
       ->condition($langcode_group)
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result, "$entity_type: One entity loaded by name, uid and field value using different language meta conditions.");
   }
 

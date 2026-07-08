@@ -2,6 +2,7 @@
 
 namespace Drupal\taxonomy;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Entity\ConfigEntityStorage;
 
 /**
@@ -17,7 +18,7 @@ class VocabularyStorage extends ConfigEntityStorage implements VocabularyStorage
       ->accessCheck(TRUE)
       ->condition('vid', $vids, 'IN')
       ->condition('parent.target_id', 0)
-      ->execute();
+      ->execute(new CacheableMetadata());
 
     return array_values($tids);
   }

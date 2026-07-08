@@ -3,6 +3,7 @@
 namespace Drupal\content_moderation\EventSubscriber;
 
 use Drupal\content_moderation\ContentModerationState;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\workspaces\Event\WorkspacePrePublishEvent;
 use Drupal\workspaces\Event\WorkspacePublishEvent;
@@ -85,7 +86,7 @@ class WorkspaceSubscriber implements EventSubscriberInterface {
     }
     $query->condition($workflow_condition_group);
 
-    if ($count = $query->count()->execute()) {
+    if ($count = $query->count()->execute(new CacheableMetadata())) {
       $message = \Drupal::translation()->formatPlural($count, 'The @label workspace can not be published because it contains 1 item in an unpublished moderation state.', 'The @label workspace can not be published because it contains @count items in an unpublished moderation state.', [
         '@label' => $workspace->label(),
       ]);

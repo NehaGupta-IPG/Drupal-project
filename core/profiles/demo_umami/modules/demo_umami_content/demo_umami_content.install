@@ -5,6 +5,7 @@
  * Install, update and uninstall functions for the module.
  */
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\demo_umami_content\InstallHelper;
 
 /**
@@ -13,7 +14,7 @@ use Drupal\demo_umami_content\InstallHelper;
 function demo_umami_content_install($is_syncing): void {
   if (!$is_syncing) {
     $query = \Drupal::entityQuery('node')->accessCheck(TRUE);
-    $nids = $query->execute();
+    $nids = $query->execute(new CacheableMetadata());
 
     if (empty($nids)) {
       return;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Kernel;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -34,7 +35,7 @@ class UserInstallTest extends KernelTestBase {
    * Tests that the initial users have correct values.
    */
   public function testUserInstall(): void {
-    $user_ids = \Drupal::entityQuery('user')->sort('uid')->accessCheck(FALSE)->execute();
+    $user_ids = \Drupal::entityQuery('user')->sort('uid')->accessCheck(FALSE)->execute(new CacheableMetadata());
     $users = \Drupal::entityTypeManager()->getStorage('user')->loadMultiple($user_ids);
     $anon = $users[0];
     $admin = $users[1];

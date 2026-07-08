@@ -3,6 +3,7 @@
 namespace Drupal\migrate\Plugin\migrate\source;
 
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
@@ -148,7 +149,7 @@ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginIn
    *   A data generator for this source.
    */
   protected function initializeIterator(): \Generator {
-    $ids = $this->query()->execute();
+    $ids = $this->query()->execute(new CacheableMetadata());
     return $this->yieldEntities($ids);
   }
 
@@ -239,7 +240,7 @@ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginIn
    * {@inheritdoc}
    */
   protected function doCount(): int {
-    return $this->query()->count()->execute();
+    return $this->query()->count()->execute(new CacheableMetadata());
   }
 
   /**

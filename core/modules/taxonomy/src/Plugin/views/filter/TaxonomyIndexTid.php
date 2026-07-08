@@ -2,6 +2,7 @@
 
 namespace Drupal\taxonomy\Plugin\views\filter;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\Element\EntityAutocomplete;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -234,7 +235,7 @@ class TaxonomyIndexTid extends ManyToOne {
         if ($this->options['limit']) {
           $query->condition('vid', $vocabulary->id());
         }
-        $terms = Term::loadMultiple($query->execute());
+        $terms = Term::loadMultiple($query->execute(new CacheableMetadata()));
         foreach ($terms as $term) {
           $options[$term->id()] = \Drupal::service('entity.repository')->getTranslationFromContext($term)->label();
         }

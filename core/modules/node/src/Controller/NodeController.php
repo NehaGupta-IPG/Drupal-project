@@ -3,6 +3,7 @@
 namespace Drupal\node\Controller;
 
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
@@ -292,7 +293,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
       ->condition($entityType->getKey('id'), $node->id())
       ->sort($entityType->getKey('revision'), 'DESC')
       ->pager(50)
-      ->execute();
+      ->execute(new CacheableMetadata());
     return array_keys($result);
   }
 

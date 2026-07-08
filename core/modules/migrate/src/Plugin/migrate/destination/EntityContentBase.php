@@ -2,6 +2,7 @@
 
 namespace Drupal\migrate\Plugin\migrate\destination;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -409,7 +410,7 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
       ->accessCheck(FALSE)
       ->sort($this->getKey('id'), 'DESC')
       ->range(0, 1)
-      ->execute();
+      ->execute(new CacheableMetadata());
     return (int) current($values);
   }
 

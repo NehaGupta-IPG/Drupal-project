@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field\Kernel;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Site\Settings;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;
@@ -62,14 +63,14 @@ class FieldImportCreateTest extends FieldKernelTestBase {
     $ids = \Drupal::entityQuery('field_config')
       ->condition('entity_type', 'entity_test')
       ->condition('bundle', 'entity_test')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(2, $ids);
     $this->assertTrue(isset($ids['entity_test.entity_test.field_test_import']));
     $this->assertTrue(isset($ids['entity_test.entity_test.field_test_import_2']));
     $ids = \Drupal::entityQuery('field_config')
       ->condition('entity_type', 'entity_test')
       ->condition('bundle', 'test_bundle')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $ids);
     $this->assertTrue(isset($ids['entity_test.test_bundle.field_test_import_2']));
   }

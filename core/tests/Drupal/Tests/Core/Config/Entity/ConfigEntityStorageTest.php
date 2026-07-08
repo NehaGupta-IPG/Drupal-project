@@ -7,6 +7,7 @@ namespace Drupal\Tests\Core\Config\Entity;
 use Drupal\Component\Datetime\Time;
 use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Cache\MemoryCache\MemoryCache;
 use Drupal\Core\Config\Config;
@@ -293,7 +294,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
       ->shouldBeCalled();
 
     $this->entityQuery->condition('uuid', 'bar')->willReturn($this->entityQuery);
-    $this->entityQuery->execute()->willReturn([]);
+    $this->entityQuery->execute(new CacheableMetadata())->willReturn([]);
 
     $return = $this->entityStorage->save($entity);
     $this->assertSame(SAVED_NEW, $return);
@@ -361,7 +362,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
       ->shouldBeCalled();
 
     $this->entityQuery->condition('uuid', 'bar')->willReturn($this->entityQuery);
-    $this->entityQuery->execute()->willReturn([$entity->id()]);
+    $this->entityQuery->execute(new CacheableMetadata())->willReturn([$entity->id()]);
 
     $return = $this->entityStorage->save($entity);
     $this->assertSame(SAVED_UPDATED, $return);
@@ -417,7 +418,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
     $this->assertSame('foo', $entity->getOriginalId());
 
     $this->entityQuery->condition('uuid', 'bar')->willReturn($this->entityQuery);
-    $this->entityQuery->execute()->willReturn([$entity->id()]);
+    $this->entityQuery->execute(new CacheableMetadata())->willReturn([$entity->id()]);
 
     $return = $this->entityStorage->save($entity);
     $this->assertSame(SAVED_UPDATED, $return);
@@ -477,7 +478,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
       ->willReturn($config_object->reveal());
 
     $this->entityQuery->condition('uuid', NULL)->willReturn($this->entityQuery);
-    $this->entityQuery->execute()->willReturn(['baz']);
+    $this->entityQuery->execute(new CacheableMetadata())->willReturn(['baz']);
 
     $entity = new StubConfigEntity(['id' => 'foo'], 'test_entity_type');
     $this->expectException(ConfigDuplicateUUIDException::class);
@@ -527,7 +528,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
       ->shouldBeCalled();
 
     $this->entityQuery->condition('uuid', NULL)->willReturn($this->entityQuery);
-    $this->entityQuery->execute()->willReturn(['baz']);
+    $this->entityQuery->execute(new CacheableMetadata())->willReturn(['baz']);
 
     $entity = new StubConfigEntity(['id' => 'foo'], 'test_entity_type');
     $entity->setOriginalId('baz');
@@ -561,7 +562,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
     $this->configFactory->rename(Argument::cetera())->shouldNotBeCalled();
 
     $this->entityQuery->condition('uuid', 'baz')->willReturn($this->entityQuery);
-    $this->entityQuery->execute()->willReturn(['foo']);
+    $this->entityQuery->execute(new CacheableMetadata())->willReturn(['foo']);
 
     $entity = new StubConfigEntity(['id' => 'foo'], 'test_entity_type');
 

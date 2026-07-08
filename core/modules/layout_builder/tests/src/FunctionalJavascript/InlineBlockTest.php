@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\node\Entity\Node;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -288,7 +289,7 @@ class InlineBlockTest extends InlineBlockTestBase {
       ->condition('info', $block_title)
       ->allRevisions()
       ->count()
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertEquals($actual_revision_count, $expected_revision_count);
   }
 

@@ -2,6 +2,7 @@
 
 namespace Drupal\shortcut\Entity;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
@@ -105,7 +106,7 @@ class ShortcutSet extends ConfigEntityBundleBase implements ShortcutSetInterface
       $shortcut_ids = \Drupal::entityQuery('shortcut')
         ->accessCheck(FALSE)
         ->condition('shortcut_set', $entity->id(), '=')
-        ->execute();
+        ->execute(new CacheableMetadata());
 
       $controller = \Drupal::entityTypeManager()->getStorage('shortcut');
       $entities = $controller->loadMultiple($shortcut_ids);

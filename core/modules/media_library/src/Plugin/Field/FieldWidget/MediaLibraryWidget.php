@@ -10,6 +10,7 @@ use Drupal\Core\Ajax\AnnounceCommand;
 use Drupal\Core\Ajax\InvokeCommand;
 use Drupal\Core\Ajax\OpenModalDialogCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\Attribute\FieldWidget;
@@ -147,7 +148,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
 
     // When no target bundles are configured for the field, all are allowed.
     if ($allowed_media_type_ids === NULL) {
-      $allowed_media_type_ids = $this->entityTypeManager->getStorage('media_type')->getQuery()->execute();
+      $allowed_media_type_ids = $this->entityTypeManager->getStorage('media_type')->getQuery()->execute(new CacheableMetadata());
     }
 
     // When the user did not sort the media types, return the media type IDs

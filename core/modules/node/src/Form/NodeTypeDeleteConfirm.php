@@ -2,6 +2,7 @@
 
 namespace Drupal\node\Form;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -20,7 +21,7 @@ class NodeTypeDeleteConfirm extends EntityDeleteForm {
       ->accessCheck(FALSE)
       ->condition('type', $this->entity->id())
       ->count()
-      ->execute();
+      ->execute(new CacheableMetadata());
     if ($num_nodes) {
       $caption = '<p>' . $this->formatPlural($num_nodes, '%type is used by 1 piece of content on your site. You can not remove this content type until you have removed all of the %type content.', '%type is used by @count pieces of content on your site. You may not remove %type until you have removed all of the %type content.', ['%type' => $this->entity->label()]) . '</p>';
       $form['#title'] = $this->getQuestion();

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Traits\Core;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Language\LanguageInterface;
 
 /**
@@ -54,7 +55,7 @@ trait PathAliasTestTrait {
     foreach ($conditions as $field => $value) {
       $query->condition($field, $value);
     }
-    $entities = $storage->loadMultiple($query->execute());
+    $entities = $storage->loadMultiple($query->execute(new CacheableMetadata()));
 
     return $entities ? reset($entities) : NULL;
   }
@@ -85,7 +86,7 @@ trait PathAliasTestTrait {
     }
     $query->count();
 
-    $this->assertTrue((bool) $query->execute(), $message);
+    $this->assertTrue((bool) $query->execute(new CacheableMetadata()), $message);
   }
 
   /**
@@ -114,7 +115,7 @@ trait PathAliasTestTrait {
     }
     $query->count();
 
-    $this->assertFalse((bool) $query->execute(), $message);
+    $this->assertFalse((bool) $query->execute(new CacheableMetadata()), $message);
   }
 
 }

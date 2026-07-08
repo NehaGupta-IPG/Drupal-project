@@ -3,6 +3,7 @@
 namespace Drupal\migrate\Plugin\migrate\id_map;
 
 use Drupal\Component\Plugin\Attribute\PluginID;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\Exception\SchemaTableKeyTooLargeException;
@@ -756,7 +757,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
     if ($level) {
       $query->condition('msg.level', $level);
     }
-    return $query->execute();
+    return $query->execute(new CacheableMetadata());
   }
 
   /**

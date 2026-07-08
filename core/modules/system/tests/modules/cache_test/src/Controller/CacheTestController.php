@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\cache_test\Controller;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Url;
 
 /**
@@ -34,7 +35,7 @@ class CacheTestController {
    */
   public function bundleTags($entity_type_id, $bundle) {
     $storage = \Drupal::entityTypeManager()->getStorage($entity_type_id);
-    $entity_ids = $storage->getQuery()->accessCheck(TRUE)->condition('type', $bundle)->execute();
+    $entity_ids = $storage->getQuery()->accessCheck(TRUE)->condition('type', $bundle)->execute(new CacheableMetadata());
     $page = [];
 
     $entities = $storage->loadMultiple($entity_ids);

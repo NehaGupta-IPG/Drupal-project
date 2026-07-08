@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
 use Drupal\entity_test\Entity\EntityTestMulRev;
 use Drupal\entity_test\Entity\EntityTestRev;
@@ -114,7 +115,7 @@ class ContentEntityNonRevisionableFieldTest extends EntityKernelTestBase {
       ->accessCheck(FALSE)
       ->allRevisions()
       ->sort('revision_id', 'DESC')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertEquals($expected_revision_ids, $revision_ids, 'Revision ids found');
 
     $expected_non_rev_field_revision_ids = [
@@ -126,7 +127,7 @@ class ContentEntityNonRevisionableFieldTest extends EntityKernelTestBase {
       ->allRevisions()
       ->condition('non_rev_field', 'Huron')
       ->sort('revision_id', 'DESC')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertEquals($expected_non_rev_field_revision_ids, $non_rev_field_revision_ids, 'Revision ids found');
   }
 
@@ -175,7 +176,7 @@ class ContentEntityNonRevisionableFieldTest extends EntityKernelTestBase {
       ->accessCheck(FALSE)
       ->allRevisions()
       ->sort('revision_id', 'DESC')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertEquals($expected_revision_ids, $revision_ids, 'Revision ids found');
 
     $expected_non_rev_field_revision_ids = [
@@ -187,7 +188,7 @@ class ContentEntityNonRevisionableFieldTest extends EntityKernelTestBase {
       ->allRevisions()
       ->condition('non_rev_field', 'Superior')
       ->sort('revision_id', 'DESC')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertEquals($expected_non_rev_field_revision_ids, $non_rev_field_revision_ids, 'Revision ids found');
   }
 

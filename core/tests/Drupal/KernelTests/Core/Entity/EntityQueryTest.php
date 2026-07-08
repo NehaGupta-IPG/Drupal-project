@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\Query\QueryException;
 use Drupal\Core\Language\LanguageInterface;
@@ -986,21 +987,21 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('field_ci', $fixtures[0]['lowercase'] . $fixtures[1]['lowercase'])
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result, 'Case insensitive, lowercase');
 
     $result = $this->storage
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('field_ci', $fixtures[0]['uppercase'] . $fixtures[1]['uppercase'])
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result, 'Case insensitive, uppercase');
 
     $result = $this->storage
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('field_ci', $fixtures[0]['uppercase'] . $fixtures[1]['lowercase'])
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result, 'Case insensitive, mixed.');
 
     // Check the case sensitive field, = operator.
@@ -1008,21 +1009,21 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('field_cs', $fixtures[0]['lowercase'] . $fixtures[1]['lowercase'])
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(0, $result, 'Case sensitive, lowercase.');
 
     $result = $this->storage
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('field_cs', $fixtures[0]['uppercase'] . $fixtures[1]['uppercase'])
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(0, $result, 'Case sensitive, uppercase.');
 
     $result = $this->storage
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('field_cs', $fixtures[0]['uppercase'] . $fixtures[1]['lowercase'])
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result, 'Case sensitive, exact match.');
 
     // Check the case insensitive field, IN operator.
@@ -1030,20 +1031,20 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('field_ci', [$fixtures[0]['lowercase'] . $fixtures[1]['lowercase']], 'IN')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result, 'Case insensitive, lowercase');
 
     $result = $this->storage
       ->getQuery()
       ->accessCheck(FALSE)
-      ->condition('field_ci', [$fixtures[0]['uppercase'] . $fixtures[1]['uppercase']], 'IN')->execute();
+      ->condition('field_ci', [$fixtures[0]['uppercase'] . $fixtures[1]['uppercase']], 'IN')->execute(new CacheableMetadata());
     $this->assertCount(1, $result, 'Case insensitive, uppercase');
 
     $result = $this->storage
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('field_ci', [$fixtures[0]['uppercase'] . $fixtures[1]['lowercase']], 'IN')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result, 'Case insensitive, mixed');
 
     // Check the case sensitive field, IN operator.
@@ -1051,21 +1052,21 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('field_cs', [$fixtures[0]['lowercase'] . $fixtures[1]['lowercase']], 'IN')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(0, $result, 'Case sensitive, lowercase');
 
     $result = $this->storage
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('field_cs', [$fixtures[0]['uppercase'] . $fixtures[1]['uppercase']], 'IN')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(0, $result, 'Case sensitive, uppercase');
 
     $result = $this->storage
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('field_cs', [$fixtures[0]['uppercase'] . $fixtures[1]['lowercase']], 'IN')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result, 'Case sensitive, mixed');
 
     // Check the case insensitive field, STARTS_WITH operator.
@@ -1073,14 +1074,14 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('field_ci', $fixtures[0]['lowercase'], 'STARTS_WITH')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result, 'Case sensitive, lowercase.');
 
     $result = $this->storage
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('field_ci', $fixtures[0]['uppercase'], 'STARTS_WITH')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result, 'Case sensitive, exact match.');
 
     // Check the case sensitive field, STARTS_WITH operator.
@@ -1088,14 +1089,14 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('field_cs', $fixtures[0]['lowercase'], 'STARTS_WITH')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(0, $result, 'Case sensitive, lowercase.');
 
     $result = $this->storage
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('field_cs', $fixtures[0]['uppercase'], 'STARTS_WITH')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result, 'Case sensitive, exact match.');
 
     // Check the case insensitive field, ENDS_WITH operator.
@@ -1103,14 +1104,14 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('field_ci', $fixtures[1]['lowercase'], 'ENDS_WITH')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result, 'Case sensitive, lowercase.');
 
     $result = $this->storage
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('field_ci', $fixtures[1]['uppercase'], 'ENDS_WITH')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result, 'Case sensitive, exact match.');
 
     // Check the case sensitive field, ENDS_WITH operator.
@@ -1118,14 +1119,14 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('field_cs', $fixtures[1]['lowercase'], 'ENDS_WITH')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result, 'Case sensitive, lowercase.');
 
     $result = $this->storage
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('field_cs', $fixtures[1]['uppercase'], 'ENDS_WITH')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(0, $result, 'Case sensitive, exact match.');
 
     // Check the case insensitive field, CONTAINS operator, use the inner 8
@@ -1134,14 +1135,14 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('field_ci', mb_substr($fixtures[0]['uppercase'] . $fixtures[1]['lowercase'], 4, 8), 'CONTAINS')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result, 'Case sensitive, lowercase.');
 
     $result = $this->storage
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('field_ci', mb_strtolower(mb_substr($fixtures[0]['uppercase'] . $fixtures[1]['lowercase'], 4, 8)), 'CONTAINS')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result, 'Case sensitive, exact match.');
 
     // Check the case sensitive field, CONTAINS operator.
@@ -1149,14 +1150,14 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('field_cs', mb_substr($fixtures[0]['uppercase'] . $fixtures[1]['lowercase'], 4, 8), 'CONTAINS')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result, 'Case sensitive, lowercase.');
 
     $result = $this->storage
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('field_cs', mb_strtolower(mb_substr($fixtures[0]['uppercase'] . $fixtures[1]['lowercase'], 4, 8)), 'CONTAINS')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(0, $result, 'Case sensitive, exact match.');
 
   }
@@ -1196,7 +1197,7 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('description.value', 'description1')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $ids);
     $this->assertEquals($term1->id(), reset($ids));
 
@@ -1205,7 +1206,7 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('description.format', 'format1')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $ids);
     $this->assertEquals($term1->id(), reset($ids));
 
@@ -1215,7 +1216,7 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('description', 'description1')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $ids);
     $this->assertEquals($term1->id(), reset($ids));
   }
@@ -1229,7 +1230,7 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('id', [14], 'IN')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result);
 
     // Set a revision on entity 14 that isn't the current default.
@@ -1249,7 +1250,7 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('id', [14], 'IN')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result);
 
     // Verify that field conditions on the default and pending revision are
@@ -1259,7 +1260,7 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->accessCheck(FALSE)
       ->condition('id', [14], 'IN')
       ->condition("$this->figures.color", $current_values[0]['color'])
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertEquals([14 => '14'], $result);
     $result = $this->storage
       ->getQuery()
@@ -1267,7 +1268,7 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->condition('id', [14], 'IN')
       ->condition("$this->figures.color", 'red')
       ->allRevisions()
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertEquals([16 => '14'], $result);
 
     // Add another pending revision on the same entity and repeat the checks.
@@ -1284,7 +1285,7 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('id', [14], 'IN')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result);
     $this->assertSame([14 => '14'], $result);
 
@@ -1294,7 +1295,7 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->accessCheck(FALSE)
       ->condition('id', [14], 'IN')
       ->latestRevision()
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result);
     $this->assertSame([17 => '14'], $result);
 
@@ -1305,7 +1306,7 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->accessCheck(FALSE)
       ->condition('id', [14], 'IN')
       ->condition("$this->figures.color", $current_values[0]['color'])
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertSame([14 => '14'], $result);
 
     // Now there are two revisions with same value for the figure color.
@@ -1315,7 +1316,7 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->condition('id', [14], 'IN')
       ->condition("$this->figures.color", 'red')
       ->allRevisions()
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertSame([16 => '14', 17 => '14'], $result);
 
     // Check that querying for the latest revision returns the correct one.
@@ -1325,7 +1326,7 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->condition('id', [14], 'IN')
       ->condition("$this->figures.color", 'red')
       ->latestRevision()
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertSame([17 => '14'], $result);
   }
 
@@ -1341,7 +1342,7 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->accessCheck(FALSE)
       ->condition('1 ; -- ', [0, 1], 'IN')
       ->sort('id')
-      ->execute();
+      ->execute(new CacheableMetadata());
   }
 
   /**
@@ -1375,7 +1376,7 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->condition('type', 'entity_test')
       ->condition('ref1', $ref1->id())
       ->condition('ref2', $ref2->id())
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result);
     $this->assertEquals($entity->id(), reset($result));
 
@@ -1385,7 +1386,7 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->condition('type', 'entity_test')
       ->condition('ref1.target_id', $ref1->id())
       ->condition('ref2.target_id', $ref2->id())
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result);
     $this->assertEquals($entity->id(), reset($result));
 
@@ -1395,7 +1396,7 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->condition('type', 'entity_test')
       ->condition('ref1.entity.id', $ref1->id())
       ->condition('ref2.entity.id', $ref2->id())
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result);
     $this->assertEquals($entity->id(), reset($result));
   }
@@ -1416,7 +1417,7 @@ class EntityQueryTest extends EntityKernelTestBase {
 
     // Verify assumptions about the unaltered result.
     $query = clone $basicQuery;
-    $this->queryResults = $query->execute();
+    $this->queryResults = $query->execute(new CacheableMetadata());
     $this->assertResult(5, 7, 13, 15);
 
     // field_test_entity_query_alter() removes the entity with id '5'.
@@ -1424,7 +1425,7 @@ class EntityQueryTest extends EntityKernelTestBase {
     $this->queryResults = $query
       // Add a tag that no hook function matches.
       ->addTag('entity_query_alter_hook_test')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResult(7, 13, 15);
 
     // field_test_entity_query_entity_test_mulrev_alter() removes the
@@ -1433,7 +1434,7 @@ class EntityQueryTest extends EntityKernelTestBase {
     $this->queryResults = $query
       // Add a tag that no hook function matches.
       ->addTag('entity_query_entity_test_mulrev_alter_hook_test')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResult(5, 13, 15);
 
     // field_test_entity_query_tag__entity_query_alter_tag_test_alter() removes
@@ -1441,7 +1442,7 @@ class EntityQueryTest extends EntityKernelTestBase {
     $query = clone $basicQuery;
     $this->queryResults = $query
       ->addTag('entity_query_alter_tag_test')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResult(5, 7, 15);
 
     // field_test_entity_query_tag__entity_test_mulrev__entity_query_
@@ -1450,7 +1451,7 @@ class EntityQueryTest extends EntityKernelTestBase {
     $query = clone $basicQuery;
     $this->queryResults = $query
       ->addTag('entity_query_entity_test_mulrev_alter_tag_test')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResult(5, 7, 13);
   }
 
@@ -1480,7 +1481,7 @@ class EntityQueryTest extends EntityKernelTestBase {
     $result = $storage->getQuery()
       ->accessCheck(FALSE)
       ->condition($revision_created_field_name, $revision_created_timestamp)
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result);
     $this->assertEquals($entity->id(), reset($result));
 
@@ -1489,7 +1490,7 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->accessCheck(FALSE)
       ->condition($revision_created_field_name, $revision_created_timestamp)
       ->allRevisions()
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount(1, $result);
     $this->assertEquals($entity->id(), reset($result));
   }

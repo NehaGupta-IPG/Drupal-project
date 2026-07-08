@@ -2,6 +2,7 @@
 
 namespace Drupal\media\Form;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\Form\FormStateInterface;
@@ -48,7 +49,7 @@ class MediaTypeDeleteConfirmForm extends EntityDeleteForm {
       ->accessCheck(FALSE)
       ->condition('bundle', $this->entity->id())
       ->count()
-      ->execute();
+      ->execute(new CacheableMetadata());
     if ($num_entities) {
       $form['#title'] = $this->getQuestion();
       $form['description'] = [

@@ -165,7 +165,7 @@ class MenuForm extends EntityForm {
    */
   public function menuNameExists($value) {
     // Check first to see if a menu with this ID exists.
-    if ($this->entityTypeManager->getStorage('menu')->getQuery()->condition('id', $value)->range(0, 1)->count()->execute()) {
+    if ($this->entityTypeManager->getStorage('menu')->getQuery()->condition('id', $value)->range(0, 1)->count()->execute(new CacheableMetadata())) {
       return TRUE;
     }
 

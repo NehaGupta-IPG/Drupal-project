@@ -2,6 +2,7 @@
 
 namespace Drupal\user\Form;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\user\RoleInterface;
@@ -64,7 +65,7 @@ class RoleSettingsForm extends FormBase {
     $roles = array_map(fn(RoleInterface $role) => $role->label(), $roles);
     $admin_roles = $this->roleStorage->getQuery()
       ->condition('is_admin', TRUE)
-      ->execute();
+      ->execute(new CacheableMetadata());
     $default_value = reset($admin_roles);
     $form['admin_role']['user_admin_role'] = [
       '#type' => 'select',
@@ -94,7 +95,7 @@ class RoleSettingsForm extends FormBase {
     if ($form_state->hasValue('user_admin_role')) {
       $admin_roles = $this->roleStorage->getQuery()
         ->condition('is_admin', TRUE)
-        ->execute();
+        ->execute(new CacheableMetadata());
       foreach ($admin_roles as $rid) {
         $this->roleStorage->loadOverrideFree($rid)->setIsAdmin(FALSE)->save();
       }

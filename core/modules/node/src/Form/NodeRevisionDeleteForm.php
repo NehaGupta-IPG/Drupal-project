@@ -3,6 +3,7 @@
 namespace Drupal\node\Form;
 
 use Drupal\Core\Access\AccessManagerInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\ConfirmFormBase;
@@ -117,7 +118,7 @@ class NodeRevisionDeleteForm extends ConfirmFormBase implements WorkspaceSafeFor
     // If no revisions found, or the user does not have access to the revisions
     // page, then redirect to the canonical node page instead.
     $revision_count_query = $storage->getQuery()->allRevisions()->condition('nid', $this->revision->id())->accessCheck(FALSE)->count();
-    if (!$this->accessManager->checkNamedRoute($route_name, $parameters) || $revision_count_query->execute() === 1) {
+    if (!$this->accessManager->checkNamedRoute($route_name, $parameters) || $revision_count_query->execute(new CacheableMetadata()) === 1) {
       $route_name = 'entity.node.canonical';
     }
     $form_state->setRedirect($route_name, $parameters);

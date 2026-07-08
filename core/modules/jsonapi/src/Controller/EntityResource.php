@@ -407,7 +407,7 @@ class EntityResource {
   protected function executeQueryInRenderContext(QueryInterface $query, CacheableMetadata $query_cacheability) {
     $context = new RenderContext();
     $results = $this->renderer->executeInRenderContext($context, function () use ($query) {
-      return $query->execute();
+      return $query->execute(new CacheableMetadata());
     });
     if (!$context->isEmpty()) {
       $query_cacheability->addCacheableDependency($context->pop());

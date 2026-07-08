@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Kernel\Query;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
 use Drupal\jsonapi\Context\FieldResolver;
@@ -202,7 +203,7 @@ class FilterTest extends JsonapiKernelTestBase {
       $this->assertSame($expected_sql_query, $actual_sql_query);
 
       // Compare the results.
-      $this->assertEquals($expected_query->execute(), $query->execute());
+      $this->assertEquals($expected_query->execute(new CacheableMetadata()), $query->execute(new CacheableMetadata()));
     }
   }
 

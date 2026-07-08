@@ -3,6 +3,7 @@
 namespace Drupal\comment\Hook;
 
 use Drupal\comment\CommentingStatus;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Field\FieldTypeCategoryManagerInterface;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -153,7 +154,7 @@ class CommentHooks {
       $entity_query = \Drupal::entityQuery('comment')->accessCheck(FALSE);
       $entity_query->condition('entity_type', $field->getEntityTypeId());
       $entity_query->condition('field_name', $field->getName());
-      $cids = $entity_query->execute();
+      $cids = $entity_query->execute(new CacheableMetadata());
       $comment_storage = \Drupal::entityTypeManager()->getStorage('comment');
       $comments = $comment_storage->loadMultiple($cids);
       $comment_storage->delete($comments);
@@ -268,7 +269,7 @@ class CommentHooks {
       $entity_query = \Drupal::entityQuery('comment')->accessCheck(FALSE);
       $entity_query->condition('entity_id', (int) $entity->id());
       $entity_query->condition('entity_type', $entity->getEntityTypeId());
-      $cids = $entity_query->execute();
+      $cids = $entity_query->execute(new CacheableMetadata());
       $comment_storage = \Drupal::entityTypeManager()->getStorage('comment');
       $comments = $comment_storage->loadMultiple($cids);
       $comment_storage->delete($comments);
@@ -411,7 +412,7 @@ class CommentHooks {
   public function userPredelete($account): void {
     $entity_query = \Drupal::entityQuery('comment')->accessCheck(FALSE);
     $entity_query->condition('uid', $account->id());
-    $cids = $entity_query->execute();
+    $cids = $entity_query->execute(new CacheableMetadata());
     $comment_storage = \Drupal::entityTypeManager()->getStorage('comment');
     $comments = $comment_storage->loadMultiple($cids);
     $comment_storage->delete($comments);

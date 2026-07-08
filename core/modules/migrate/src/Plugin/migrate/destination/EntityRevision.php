@@ -2,6 +2,7 @@
 
 namespace Drupal\migrate\Plugin\migrate\destination;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -213,7 +214,7 @@ class EntityRevision extends EntityContentBase {
       ->allRevisions()
       ->sort($this->getKey('revision'), 'DESC')
       ->range(0, 1)
-      ->execute();
+      ->execute(new CacheableMetadata());
     // The array keys are the revision IDs.
     // The array contains only one entry, so we can use key().
     return (int) key($values);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\entity_test\Controller;
 
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
 
 /**
@@ -48,7 +49,7 @@ class EntityTestController extends ControllerBase {
       ->condition($entity_reference_field_name . '.target_id', $referenced_entity_id);
     $entities = $this->entityTypeManager()
       ->getStorage('entity_test')
-      ->loadMultiple($query->execute());
+      ->loadMultiple($query->execute(new CacheableMetadata()));
     return $this->entityTypeManager()
       ->getViewBuilder('entity_test')
       ->viewMultiple($entities, 'full');
@@ -74,7 +75,7 @@ class EntityTestController extends ControllerBase {
 
     $entities = $this->entityTypeManager()
       ->getStorage($entity_type_id)
-      ->loadMultiple($query->execute());
+      ->loadMultiple($query->execute(new CacheableMetadata()));
 
     $cache_tags = [];
     $labels = [];

@@ -3,6 +3,7 @@
 namespace Drupal\workspaces\Plugin\EntityReferenceSelection;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\Attribute\EntityReferenceSelection;
 use Drupal\Core\Entity\Plugin\EntityReferenceSelection\DefaultSelection;
 use Drupal\Core\Form\FormStateInterface;
@@ -77,7 +78,7 @@ class WorkspaceSelection extends DefaultSelection {
     $ids = $storage->getQuery()
       ->accessCheck(TRUE)
       ->condition('provider', $this->getConfiguration()['provider'])
-      ->execute();
+      ->execute(new CacheableMetadata());
     $loaded = $storage->loadMultiple($ids);
 
     $entities = array_replace(array_intersect_key($workspace_tree, $loaded), $loaded);

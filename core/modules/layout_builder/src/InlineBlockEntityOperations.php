@@ -2,6 +2,7 @@
 
 namespace Drupal\layout_builder;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -206,7 +207,7 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
     if ($revision_ids) {
       $query = $this->blockContentStorage->getQuery()->accessCheck(FALSE);
       $query->condition('revision_id', $revision_ids, 'IN');
-      $block_ids = $query->execute();
+      $block_ids = $query->execute(new CacheableMetadata());
       return $block_ids;
     }
     return [];

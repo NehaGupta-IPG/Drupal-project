@@ -3,6 +3,7 @@
 namespace Drupal\menu_link_content\Plugin\Deriver;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
@@ -61,7 +62,7 @@ class MenuLinkContentDeriver extends DeriverBase implements ContainerDeriverInte
     $entity_ids = $this->entityTypeManager->getStorage('menu_link_content')->getQuery()
       ->accessCheck(FALSE)
       ->condition('rediscover', TRUE)
-      ->execute();
+      ->execute(new CacheableMetadata());
     $plugin_definitions = [];
     $menu_link_content_entities = $this->entityTypeManager->getStorage('menu_link_content')->loadMultiple($entity_ids);
     /** @var \Drupal\menu_link_content\MenuLinkContentInterface $menu_link_content */

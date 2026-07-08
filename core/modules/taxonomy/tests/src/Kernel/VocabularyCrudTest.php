@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Kernel;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
@@ -50,7 +51,7 @@ class VocabularyCrudTest extends KernelTestBase {
     $query = \Drupal::entityQuery('taxonomy_term')->accessCheck(FALSE)->count();
 
     // Assert that there are no terms left.
-    $this->assertEquals(0, $query->execute());
+    $this->assertEquals(0, $query->execute(new CacheableMetadata()));
 
     $terms = [];
     for ($i = 0; $i < 5; $i++) {
@@ -64,12 +65,12 @@ class VocabularyCrudTest extends KernelTestBase {
     $terms[4]->save();
 
     // Assert that there are now 5 terms.
-    $this->assertEquals(5, $query->execute());
+    $this->assertEquals(5, $query->execute(new CacheableMetadata()));
 
     $vocabulary->delete();
 
     // Assert that there are no terms left.
-    $this->assertEquals(0, $query->execute());
+    $this->assertEquals(0, $query->execute(new CacheableMetadata()));
   }
 
   /**

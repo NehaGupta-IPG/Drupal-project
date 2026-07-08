@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media\Functional;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -156,7 +157,7 @@ class MediaUiFunctionalTest extends MediaFunctionalTestBase {
     $page->clickLink('Delete');
     $assert_session->pageTextContains('This action cannot be undone');
     $page->pressButton('Delete');
-    $media_id = \Drupal::entityQuery('media')->accessCheck(FALSE)->execute();
+    $media_id = \Drupal::entityQuery('media')->accessCheck(FALSE)->execute(new CacheableMetadata());
     $this->assertEmpty($media_id);
   }
 

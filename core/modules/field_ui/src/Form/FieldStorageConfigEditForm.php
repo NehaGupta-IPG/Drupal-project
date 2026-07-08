@@ -2,6 +2,7 @@
 
 namespace Drupal\field_ui\Form;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\ContentEntityStorageInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\Plugin\DataType\EntityAdapter;
@@ -236,7 +237,7 @@ class FieldStorageConfigEditForm extends EntityForm {
         ->accessCheck(FALSE)
         ->condition($this->entity->getName() . '.%delta', $cardinality_number)
         ->count()
-        ->execute();
+        ->execute(new CacheableMetadata());
       if ($entities_with_higher_delta) {
         $form_state->setError($element['cardinality_number'], $this->formatPlural(
           $entities_with_higher_delta,

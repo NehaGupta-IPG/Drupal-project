@@ -205,7 +205,7 @@ class LayoutBuilderEntityViewDisplay extends BaseEntityViewDisplay implements La
       ->condition('bundle', $this->getTargetBundle())
       ->condition('mode', $this->getMode(), '<>')
       ->condition('third_party_settings.layout_builder.allow_custom', TRUE);
-    $enabled = (bool) $query->count()->execute();
+    $enabled = (bool) $query->count()->execute(new CacheableMetadata());
     if (!$enabled && $field = FieldConfig::loadByName($entity_type_id, $bundle, $field_name)) {
       $field->delete();
     }

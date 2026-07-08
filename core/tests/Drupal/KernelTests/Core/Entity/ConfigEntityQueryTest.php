@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\config_test\Entity\ConfigQueryTest;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
 use Drupal\Core\Config\Entity\Query\QueryFactory;
 use Drupal\KernelTests\KernelTestBase;
@@ -141,84 +142,84 @@ class ConfigEntityQueryTest extends KernelTestBase {
   public function testConfigEntityQuery(): void {
     // Run a test without any condition.
     $this->queryResults = $this->entityStorage->getQuery()
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['1', '2', '3', '4', '5', '6', '7']);
     // No conditions, OR.
     $this->queryResults = $this->entityStorage->getQuery('OR')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['1', '2', '3', '4', '5', '6', '7']);
 
     // Filter by ID with equality.
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('id', '3')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['3']);
 
     // Filter by label with a known prefix.
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('label', 'test_prefix', 'STARTS_WITH')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['3']);
 
     // Filter by label with a known suffix.
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('label', 'test_suffix', 'ENDS_WITH')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['4']);
 
     // Filter by label with a known containing word.
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('label', 'test_contains', 'CONTAINS')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['5']);
 
     // Filter by ID with the IN operator.
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('id', ['2', '3'], 'IN')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['2', '3']);
 
     // Filter by ID with the implicit IN operator.
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('id', ['2', '3'])
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['2', '3']);
 
     // Filter by ID with the > operator.
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('id', '3', '>')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['4', '5', '6', '7']);
 
     // Filter by ID with the >= operator.
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('id', '3', '>=')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['3', '4', '5', '6', '7']);
 
     // Filter by ID with the <> operator.
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('id', '3', '<>')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['1', '2', '4', '5', '6', '7']);
 
     // Filter by ID with the < operator.
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('id', '3', '<')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['1', '2']);
 
     // Filter by ID with the <= operator.
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('id', '3', '<=')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['1', '2', '3']);
 
     // Filter by two conditions on the same field.
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('label', 'test_pref', 'STARTS_WITH')
       ->condition('label', 'test_prefix', 'STARTS_WITH')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['3']);
 
     // Filter by two conditions on different fields. The first query matches for
@@ -226,7 +227,7 @@ class ConfigEntityQueryTest extends KernelTestBase {
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('label', 'test_prefix', 'STARTS_WITH')
       ->condition('id', '5')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults([]);
 
     // Filter by two different conditions on different fields. This time the
@@ -234,7 +235,7 @@ class ConfigEntityQueryTest extends KernelTestBase {
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('label', 'test_prefix', 'STARTS_WITH')
       ->condition('id', '3')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['3']);
 
     // Filter by two different conditions, of which the first one matches for
@@ -244,37 +245,37 @@ class ConfigEntityQueryTest extends KernelTestBase {
       ->condition('id', '1', '>=')
       ->condition('number', 10, '>=')
       ->condition('number', 50, '>=')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['3', '5', '7']);
 
     // Filter with an OR condition group.
     $this->queryResults = $this->entityStorage->getQuery('OR')
       ->condition('id', 1)
       ->condition('id', '2')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['1', '2']);
 
     // Simplify it with IN.
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('id', ['1', '2'])
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['1', '2']);
     // Try explicit IN.
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('id', ['1', '2'], 'IN')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['1', '2']);
     // Try not IN.
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('id', ['1', '2'], 'NOT IN')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['3', '4', '5', '6', '7']);
 
     // Filter with an OR condition group on different fields.
     $this->queryResults = $this->entityStorage->getQuery('OR')
       ->condition('id', 1)
       ->condition('number', 41)
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['1', '2']);
 
     // Filter with an OR condition group on different fields but matching on the
@@ -282,7 +283,7 @@ class ConfigEntityQueryTest extends KernelTestBase {
     $this->queryResults = $this->entityStorage->getQuery('OR')
       ->condition('id', 1)
       ->condition('number', 31)
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['1']);
 
     // NO simple conditions, YES complex conditions, 'AND'.
@@ -296,7 +297,7 @@ class ConfigEntityQueryTest extends KernelTestBase {
     $this->queryResults = $query
       ->condition($and_condition_1)
       ->condition($and_condition_2)
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['1']);
 
     // NO simple conditions, YES complex conditions, 'OR'.
@@ -310,7 +311,7 @@ class ConfigEntityQueryTest extends KernelTestBase {
     $this->queryResults = $query
       ->condition($and_condition_1)
       ->condition($and_condition_2)
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['1', '2']);
 
     // YES simple conditions, YES complex conditions, 'AND'.
@@ -325,7 +326,7 @@ class ConfigEntityQueryTest extends KernelTestBase {
       ->condition('number', 31)
       ->condition($and_condition_1)
       ->condition($and_condition_2)
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['1']);
 
     // YES simple conditions, YES complex conditions, 'OR'.
@@ -340,28 +341,28 @@ class ConfigEntityQueryTest extends KernelTestBase {
       ->condition('number', 53)
       ->condition($and_condition_1)
       ->condition($and_condition_2)
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['1', '2', '4', '5']);
 
     // Test the exists and notExists conditions.
     $this->queryResults = $this->entityStorage->getQuery()
       ->exists('id')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['1', '2', '3', '4', '5', '6', '7']);
 
     $this->queryResults = $this->entityStorage->getQuery()
       ->exists('non-existent')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults([]);
 
     $this->queryResults = $this->entityStorage->getQuery()
       ->notExists('id')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults([]);
 
     $this->queryResults = $this->entityStorage->getQuery()
       ->notExists('non-existent')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['1', '2', '3', '4', '5', '6', '7']);
   }
 
@@ -381,43 +382,43 @@ class ConfigEntityQueryTest extends KernelTestBase {
     // Test 'STARTS_WITH' condition.
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('id', 'foo.bar', 'STARTS_WITH')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['foo.bar']);
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('id', 'f', 'STARTS_WITH')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['foo.bar']);
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('id', 'miss', 'STARTS_WITH')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults([]);
 
     // Test 'CONTAINS' condition.
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('id', 'foo.bar', 'CONTAINS')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['foo.bar']);
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('id', 'oo.ba', 'CONTAINS')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['foo.bar']);
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('id', 'miss', 'CONTAINS')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults([]);
 
     // Test 'ENDS_WITH' condition.
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('id', 'foo.bar', 'ENDS_WITH')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['foo.bar']);
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('id', 'r', 'ENDS_WITH')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['foo.bar']);
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('id', 'miss', 'ENDS_WITH')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults([]);
   }
 
@@ -428,7 +429,7 @@ class ConfigEntityQueryTest extends KernelTestBase {
     // Test count on no conditions.
     $count = $this->entityStorage->getQuery()
       ->count()
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertCount($count, $this->entities);
 
     // Test count on a complex query.
@@ -443,7 +444,7 @@ class ConfigEntityQueryTest extends KernelTestBase {
       ->condition($and_condition_1)
       ->condition($and_condition_2)
       ->count()
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertSame(2, $count);
   }
 
@@ -454,86 +455,86 @@ class ConfigEntityQueryTest extends KernelTestBase {
     // Sort by simple ascending/descending.
     $this->queryResults = $this->entityStorage->getQuery()
       ->sort('number', 'DESC')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertSame(['7', '3', '5', '2', '1', '4', '6'], array_values($this->queryResults));
 
     $this->queryResults = $this->entityStorage->getQuery()
       ->sort('number', 'ASC')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertSame(['6', '4', '1', '2', '5', '3', '7'], array_values($this->queryResults));
 
     // Apply some filters and sort.
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('id', '3', '>')
       ->sort('number', 'DESC')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertSame(['7', '5', '4', '6'], array_values($this->queryResults));
 
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('id', '3', '>')
       ->sort('number', 'ASC')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertSame(['6', '4', '5', '7'], array_values($this->queryResults));
 
     // Apply a pager and sort.
     $this->queryResults = $this->entityStorage->getQuery()
       ->sort('number', 'DESC')
       ->range('2', '2')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertSame(['5', '2'], array_values($this->queryResults));
 
     $this->queryResults = $this->entityStorage->getQuery()
       ->sort('number', 'ASC')
       ->range('2', '2')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertSame(['1', '2'], array_values($this->queryResults));
 
     // Add a range to a query without a start parameter.
     $this->queryResults = $this->entityStorage->getQuery()
       ->range(0, '3')
       ->sort('id', 'ASC')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertSame(['1', '2', '3'], array_values($this->queryResults));
 
     // Omit optional parameters for the range and sort.
     $this->queryResults = $this->entityStorage->getQuery()
       ->range()
       ->sort('id')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertSame(['1', '2', '3', '4', '5', '6', '7'], array_values($this->queryResults));
 
     // Explicitly pass NULL for the range and sort.
     $this->queryResults = $this->entityStorage->getQuery()
       ->range(NULL, NULL)
       ->sort('id')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertSame(['1', '2', '3', '4', '5', '6', '7'], array_values($this->queryResults));
 
     // Omit the optional start parameter for the range.
     $this->queryResults = $this->entityStorage->getQuery()
       ->range(NULL, 1)
       ->sort('id')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertSame(['1'], array_values($this->queryResults));
 
     // Omit the optional length parameter for the range.
     $this->queryResults = $this->entityStorage->getQuery()
       ->range(4)
       ->sort('id')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertSame(['5', '6', '7'], array_values($this->queryResults));
 
     // Request an empty range.
     $this->queryResults = $this->entityStorage->getQuery()
       ->range(0, 0)
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertEmpty($this->queryResults);
 
     // Apply a pager with limit 4.
     $this->queryResults = $this->entityStorage->getQuery()
       ->pager('4', 0)
       ->sort('id', 'ASC')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertSame(['1', '2', '3', '4'], array_values($this->queryResults));
   }
 
@@ -551,28 +552,28 @@ class ConfigEntityQueryTest extends KernelTestBase {
     $this->queryResults = $this->entityStorage->getQuery()
       ->tableSort($header)
       ->sort('id', 'DESC')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertSame(['7', '6', '5', '4', '3', '2', '1'], array_values($this->queryResults));
 
     // Sorting with 'ASC' upper case.
     $this->queryResults = $this->entityStorage->getQuery()
       ->tableSort($header)
       ->sort('id', 'ASC')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertSame(['1', '2', '3', '4', '5', '6', '7'], array_values($this->queryResults));
 
     // Sorting with 'desc' lower case.
     $this->queryResults = $this->entityStorage->getQuery()
       ->tableSort($header)
       ->sort('id', 'desc')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertSame(['7', '6', '5', '4', '3', '2', '1'], array_values($this->queryResults));
 
     // Sorting with 'asc' lower case.
     $this->queryResults = $this->entityStorage->getQuery()
       ->tableSort($header)
       ->sort('id', 'asc')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertSame(['1', '2', '3', '4', '5', '6', '7'], array_values($this->queryResults));
 
     // Sort key: number
@@ -580,28 +581,28 @@ class ConfigEntityQueryTest extends KernelTestBase {
     $this->queryResults = $this->entityStorage->getQuery()
       ->tableSort($header)
       ->sort('number', 'DeSc')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertSame(['7', '3', '5', '2', '1', '4', '6'], array_values($this->queryResults));
 
     // Sorting with 'AsC' mixed upper and lower case.
     $this->queryResults = $this->entityStorage->getQuery()
       ->tableSort($header)
       ->sort('number', 'AsC')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertSame(['6', '4', '1', '2', '5', '3', '7'], array_values($this->queryResults));
 
     // Sorting with 'dEsC' mixed upper and lower case.
     $this->queryResults = $this->entityStorage->getQuery()
       ->tableSort($header)
       ->sort('number', 'dEsC')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertSame(['7', '3', '5', '2', '1', '4', '6'], array_values($this->queryResults));
 
     // Sorting with 'aSc' mixed upper and lower case.
     $this->queryResults = $this->entityStorage->getQuery()
       ->tableSort($header)
       ->sort('number', 'aSc')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertSame(['6', '4', '1', '2', '5', '3', '7'], array_values($this->queryResults));
   }
 
@@ -611,71 +612,71 @@ class ConfigEntityQueryTest extends KernelTestBase {
   public function testDotted(): void {
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('array.level1.*', 1)
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['1', '3']);
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('*.level1.level2', 2)
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['2', '4']);
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('array.level1.*', 3)
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['5']);
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('array.level1.level2', 3)
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['5']);
     // Test dotted sorting.
     $this->queryResults = $this->entityStorage->getQuery()
       ->sort('array.level1.level2')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['6', '1', '3', '2', '4', '5', '7']);
     $this->queryResults = $this->entityStorage->getQuery()
       ->sort('array.level1.level2', 'DESC')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['7', '5', '2', '4', '1', '3', '6']);
     // Make sure that values on the wildcard level do not match if there are
     // sub-keys defined. This must not find anything even if entity 2 has a
     // top-level key number with value 41.
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('*.level1.level2', 41)
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults([]);
     // Make sure that "IS NULL" and "IS NOT NULL" work correctly with
     // array-valued fields/keys.
     $this->queryResults = $this->entityStorage->getQuery()
       ->exists('array.level1.level2')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['1', '2', '3', '4', '5', '7']);
     $this->queryResults = $this->entityStorage->getQuery()
       ->exists('array.level1')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['1', '2', '3', '4', '5', '6', '7']);
     $this->queryResults = $this->entityStorage->getQuery()
       ->exists('array')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['1', '2', '3', '4', '5', '6', '7']);
     $this->queryResults = $this->entityStorage->getQuery()
       ->notExists('array.level1.level2')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['6']);
     $this->queryResults = $this->entityStorage->getQuery()
       ->notExists('array.level1')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults([]);
     $this->queryResults = $this->entityStorage->getQuery()
       ->notExists('array')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults([]);
     // Make sure that "IS NULL" and "IS NOT NULL" work correctly when the dotted
     // path cannot be fully followed.
     $this->queryResults = $this->entityStorage->getQuery()
       ->exists('does.not.exist')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults([]);
     $this->queryResults = $this->entityStorage->getQuery()
       ->notExists('does.not.exist')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['1', '2', '3', '4', '5', '6', '7']);
   }
 
@@ -686,12 +687,12 @@ class ConfigEntityQueryTest extends KernelTestBase {
     // Filter by label with a known containing case-sensitive word.
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('label', 'TEST', 'CONTAINS')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['3', '4', '5']);
 
     $this->queryResults = $this->entityStorage->getQuery()
       ->condition('label', 'test', 'CONTAINS')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['3', '4', '5']);
   }
 
@@ -761,13 +762,13 @@ class ConfigEntityQueryTest extends KernelTestBase {
   public function testAlterHook(): void {
     // Run a test without any condition.
     $this->queryResults = $this->entityStorage->getQuery()
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['1', '2', '3', '4', '5', '6', '7']);
 
     // config_test alter hook removes the entity with id '7'.
     $this->queryResults = $this->entityStorage->getQuery()
       ->addTag('config_entity_query_alter_hook_test')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertResults(['1', '2', '3', '4', '5', '6']);
   }
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\block_content\Functional;
 
 use Drupal\block_content\Entity\BlockContent;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Tests\system\Functional\Menu\AssertBreadcrumbTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -52,7 +53,7 @@ class PageEditTest extends BlockContentTestBase {
     $blocks = \Drupal::entityQuery('block_content')
       ->accessCheck(FALSE)
       ->condition('info', $edit['info[0][value]'])
-      ->execute();
+      ->execute(new CacheableMetadata());
     $block = BlockContent::load(reset($blocks));
     $this->assertNotEmpty($block, 'Content block found in database.');
 

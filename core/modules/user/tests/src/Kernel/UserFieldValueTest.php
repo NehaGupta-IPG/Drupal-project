@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Kernel;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
@@ -107,7 +108,7 @@ class UserFieldValueTest extends KernelTestBase {
     $storage->resetCache();
     gc_collect_cycles();
 
-    $uids = array_values($storage->getQuery()->accessCheck(FALSE)->execute());
+    $uids = array_values($storage->getQuery()->accessCheck(FALSE)->execute(new CacheableMetadata()));
     $uid = $uids[1];
 
     // Measure single entity.

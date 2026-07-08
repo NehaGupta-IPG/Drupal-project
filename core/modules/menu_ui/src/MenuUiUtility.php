@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\menu_ui;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -118,7 +119,7 @@ class MenuUiUtility {
           ->condition('menu_name', $menu_name)
           ->sort('id')
           ->range(0, 1);
-        $result = $query->execute();
+        $result = $query->execute(new CacheableMetadata());
 
         $id = (!empty($result)) ? reset($result) : FALSE;
       }
@@ -131,7 +132,7 @@ class MenuUiUtility {
           ->condition('menu_name', array_values($type_menus), 'IN')
           ->sort('id')
           ->range(0, 1);
-        $result = $query->execute();
+        $result = $query->execute(new CacheableMetadata());
 
         $id = (!empty($result)) ? reset($result) : FALSE;
       }

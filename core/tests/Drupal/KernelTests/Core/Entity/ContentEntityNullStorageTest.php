@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\entity_test\Entity\EntityTestNoIdBundle;
 use Drupal\Core\Config\ConfigImporterFactory;
 use Drupal\Core\Config\StorageComparer;
@@ -32,10 +33,10 @@ class ContentEntityNullStorageTest extends KernelTestBase {
    * @see \Drupal\Core\Entity\Query\Null\Query
    */
   public function testEntityQuery(): void {
-    $this->assertSame(0, \Drupal::entityQuery('entity_test_no_id')->accessCheck(FALSE)->count()->execute(), 'Counting a null storage returns 0.');
-    $this->assertSame([], \Drupal::entityQuery('entity_test_no_id')->accessCheck(FALSE)->execute(), 'Querying a null storage returns an empty array.');
-    $this->assertSame([], \Drupal::entityQuery('entity_test_no_id')->accessCheck(FALSE)->condition('type', 'test')->execute(), 'Querying a null storage returns an empty array and conditions are ignored.');
-    $this->assertSame([], \Drupal::entityQueryAggregate('entity_test_no_id')->accessCheck(FALSE)->aggregate('name', 'AVG')->execute(), 'Aggregate querying a null storage returns an empty array');
+    $this->assertSame(0, \Drupal::entityQuery('entity_test_no_id')->accessCheck(FALSE)->count()->execute(new CacheableMetadata()), 'Counting a null storage returns 0.');
+    $this->assertSame([], \Drupal::entityQuery('entity_test_no_id')->accessCheck(FALSE)->execute(new CacheableMetadata()), 'Querying a null storage returns an empty array.');
+    $this->assertSame([], \Drupal::entityQuery('entity_test_no_id')->accessCheck(FALSE)->condition('type', 'test')->execute(new CacheableMetadata()), 'Querying a null storage returns an empty array and conditions are ignored.');
+    $this->assertSame([], \Drupal::entityQueryAggregate('entity_test_no_id')->accessCheck(FALSE)->aggregate('name', 'AVG')->execute(new CacheableMetadata()), 'Aggregate querying a null storage returns an empty array');
 
   }
 

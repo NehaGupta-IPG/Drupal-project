@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\content_moderation\Kernel;
 
 use Drupal\content_moderation\EntityOperations;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
@@ -109,7 +110,7 @@ class EntityOperationsTest extends KernelTestBase {
     // is a core bug that should get fixed.
     $storage = \Drupal::entityTypeManager()->getStorage('node');
     $query = $storage->getQuery()->allRevisions()->condition('nid', $page->id())->accessCheck(FALSE);
-    $revision_ids = array_keys($query->execute());
+    $revision_ids = array_keys($query->execute(new CacheableMetadata()));
     sort($revision_ids);
     $latest = end($revision_ids);
     $page = $storage->loadRevision($latest);

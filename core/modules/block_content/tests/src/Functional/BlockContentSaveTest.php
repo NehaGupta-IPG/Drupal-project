@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\block_content\Functional;
 
 use Drupal\block_content\Entity\BlockContent;
+use Drupal\Core\Cache\CacheableMetadata;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -42,7 +43,7 @@ class BlockContentSaveTest extends BlockContentTestBase {
     $max_id = (int) \Drupal::entityQueryAggregate('block_content')
       ->accessCheck(FALSE)
       ->aggregate('id', 'max')
-      ->execute()[0]['id_max'];
+      ->execute(new CacheableMetadata())[0]['id_max'];
     $test_id = $max_id + mt_rand(1000, 1000000);
     $info = $this->randomMachineName(8);
     $block_array = [

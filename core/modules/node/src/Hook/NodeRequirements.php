@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\node\Hook;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -63,7 +64,7 @@ class NodeRequirements {
       $query = $this->entityTypeManager->getStorage('view')->getQuery();
       $query->condition('status', TRUE);
       $query->accessCheck(FALSE);
-      $active_view_ids = $query->execute();
+      $active_view_ids = $query->execute(new CacheableMetadata());
 
       $views_storage = $this->entityTypeManager->getStorage('view');
       foreach ($views_storage->loadMultiple($active_view_ids) as $view) {

@@ -2,6 +2,7 @@
 
 namespace Drupal\block_content\Form;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -20,7 +21,7 @@ class BlockContentTypeDeleteForm extends EntityDeleteForm {
       ->accessCheck(FALSE)
       ->condition('type', $this->entity->id())
       ->count()
-      ->execute();
+      ->execute(new CacheableMetadata());
     if ($block_count) {
       $caption = '<p>' . $this->formatPlural($block_count, '%label is used by 1 content block on your site. You can not remove this block type until you have removed all of the %label blocks.', '%label is used by @count content blocks on your site. You may not remove %label until you have removed all of the %label content blocks.', ['%label' => $this->entity->label()]) . '</p>';
       $form['description'] = ['#markup' => $caption];

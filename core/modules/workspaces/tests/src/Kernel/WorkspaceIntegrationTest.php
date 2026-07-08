@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\workspaces\Kernel;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Session\AnonymousUserSession;
@@ -611,14 +612,14 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     $query = $this->entityTypeManager->getStorage('node')->getQuery()->accessCheck(FALSE);
     $query->sort('nid');
     $query->pager(1);
-    $result = $query->execute();
+    $result = $query->execute(new CacheableMetadata());
 
     $this->assertSame([1 => '1'], $result);
 
     $query = $this->entityTypeManager->getStorage('node')->getQuery()->accessCheck(FALSE);
     $query->sort('nid', 'DESC');
     $query->pager(10);
-    $result = $query->execute();
+    $result = $query->execute(new CacheableMetadata());
 
     $this->assertSame([3 => '2', 1 => '1'], $result);
   }
@@ -702,7 +703,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
       // Check a condition on the base table.
       ->condition('field_test_entity.entity.uuid', $entity_test->uuid());
 
-    $result = $query->execute();
+    $result = $query->execute(new CacheableMetadata());
     $this->assertSame([$node_2->getRevisionId() => $node_2->id()], $result);
   }
 
@@ -842,7 +843,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     $result = $storage->getQuery()
       ->accessCheck(FALSE)
       ->condition('title', 'live node 1')
-      ->execute();
+      ->execute(new CacheableMetadata());
     $this->assertEquals([$live_node->getRevisionId() => $node->id()], $result);
 
     // Try the same assertions in the context of the 'stage' workspace.
@@ -855,7 +856,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
       $result = $storage->getQuery()
         ->accessCheck(FALSE)
         ->condition('title', 'stage node 1')
-        ->execute();
+        ->execute(new CacheableMetadata());
       $this->assertEquals([$stage_node->getRevisionId() => $stage_node->id()], $result);
     });
 
@@ -1054,19 +1055,19 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     });
 
     // Check entity query counts.
-    $result = (int) $storage->getQuery()->accessCheck(FALSE)->count()->execute();
+    $result = (int) $storage->getQuery()->accessCheck(FALSE)->count()->execute(new CacheableMetadata());
     $this->assertSame(count($expected_default_revisions), $result);
 
-    $result = (int) $storage->getAggregateQuery()->accessCheck(FALSE)->count()->execute();
+    $result = (int) $storage->getAggregateQuery()->accessCheck(FALSE)->count()->execute(new CacheableMetadata());
     $this->assertSame(count($expected_default_revisions), $result);
 
     // Check entity queries with no conditions.
-    $result = $storage->getQuery()->accessCheck(FALSE)->execute();
+    $result = $storage->getQuery()->accessCheck(FALSE)->execute(new CacheableMetadata());
     $expected_result = array_combine(array_column($expected_default_revisions, $revision_key), array_column($expected_default_revisions, $id_key));
     $this->assertEquals($expected_result, $result);
 
     // Check latest revision queries.
-    $result = $storage->getQuery()->accessCheck(FALSE)->latestRevision()->execute();
+    $result = $storage->getQuery()->accessCheck(FALSE)->latestRevision()->execute(new CacheableMetadata());
     $this->assertEquals($expected_result, $result);
 
     // Check querying each revision individually.
@@ -1083,7 +1084,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
         $query->allRevisions();
       }
 
-      $result = $query->execute();
+      $result = $query->execute(new CacheableMetadata());
       $this->assertEquals([$expected_value[$revision_key] => $expected_value[$id_key]], $result);
     }
   }

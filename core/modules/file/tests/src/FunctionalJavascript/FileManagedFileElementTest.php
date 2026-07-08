@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\FunctionalJavascript;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -117,7 +118,7 @@ class FileManagedFileElementTest extends WebDriverTestBase {
     return (int) \Drupal::entityQueryAggregate('file')
       ->accessCheck(FALSE)
       ->aggregate('fid', 'max')
-      ->execute()[0]['fid_max'];
+      ->execute(new CacheableMetadata())[0]['fid_max'];
   }
 
 }

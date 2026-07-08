@@ -94,7 +94,7 @@ class BlockRepository implements BlockRepositoryInterface {
     $query = $this->blockStorage->getQuery();
     $query->accessCheck(FALSE);
     $query->condition('id', $suggestion, 'CONTAINS');
-    $block_ids = $query->execute();
+    $block_ids = $query->execute(new CacheableMetadata());
 
     $block_ids = array_map(function ($block_id) {
       $parts = explode('.', $block_id);

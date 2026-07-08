@@ -282,7 +282,7 @@ class Views {
   public static function getEnabledViews() {
     $query = \Drupal::entityQuery('view')
       ->condition('status', TRUE)
-      ->execute();
+      ->execute(new CacheableMetadata());
 
     return \Drupal::entityTypeManager()->getStorage('view')->loadMultiple($query);
   }
@@ -296,7 +296,7 @@ class Views {
   public static function getDisabledViews() {
     $query = \Drupal::entityQuery('view')
       ->condition('status', FALSE)
-      ->execute();
+      ->execute(new CacheableMetadata());
 
     return \Drupal::entityTypeManager()->getStorage('view')->loadMultiple($query);
   }

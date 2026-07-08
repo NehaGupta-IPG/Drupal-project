@@ -2,6 +2,7 @@
 
 namespace Drupal\media;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
@@ -156,7 +157,7 @@ class MediaListBuilder extends EntityListBuilder {
     if ($this->limit) {
       $query->pager($this->limit);
     }
-    return $query->execute();
+    return $query->execute(new CacheableMetadata());
   }
 
 }

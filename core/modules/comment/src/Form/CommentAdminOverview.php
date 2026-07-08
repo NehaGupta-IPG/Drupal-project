@@ -4,6 +4,7 @@ namespace Drupal\comment\Form;
 
 use Drupal\comment\CommentInterface;
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -166,7 +167,7 @@ class CommentAdminOverview extends FormBase {
       ->condition('status', $status)
       ->tableSort($header)
       ->pager(50)
-      ->execute();
+      ->execute(new CacheableMetadata());
 
     /** @var \Drupal\comment\CommentInterface[] $comments */
     $comments = $this->commentStorage->loadMultiple($cids);

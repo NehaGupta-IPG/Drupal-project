@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\Functional;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\file\Entity\File;
@@ -78,7 +79,7 @@ abstract class FileFieldTestBase extends BrowserTestBase {
     return (int) \Drupal::entityQueryAggregate('file')
       ->accessCheck(FALSE)
       ->aggregate('fid', 'max')
-      ->execute()[0]['fid_max'];
+      ->execute(new CacheableMetadata())[0]['fid_max'];
   }
 
   /**

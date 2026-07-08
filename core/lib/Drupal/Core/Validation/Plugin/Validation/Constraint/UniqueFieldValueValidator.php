@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -81,7 +82,7 @@ class UniqueFieldValueValidator extends ConstraintValidator implements Container
       $query->condition($or_group);
     }
 
-    $results = $query->execute();
+    $results = $query->execute(new CacheableMetadata());
 
     if (!empty($results)) {
       // The results array is a single-column multidimensional array. The

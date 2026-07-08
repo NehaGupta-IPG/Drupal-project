@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\block_content\Traits\BlockContentCreationTrait;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
@@ -108,7 +109,7 @@ abstract class InlineBlockTestBase extends WebDriverTestBase {
       ->accessCheck(FALSE)
       ->sort('id', 'DESC')
       ->range(0, 1)
-      ->execute();
+      ->execute(new CacheableMetadata());
     $block_id = array_pop($block_ids);
     $this->assertNotEmpty($this->blockStorage->load($block_id));
     return $block_id;

@@ -2,6 +2,7 @@
 
 namespace Drupal\path;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -108,7 +109,7 @@ class PathAliasListBuilder extends EntityListBuilder {
     $header = $this->buildHeader();
     $query->tableSort($header);
 
-    return $query->execute();
+    return $query->execute(new CacheableMetadata());
   }
 
   /**

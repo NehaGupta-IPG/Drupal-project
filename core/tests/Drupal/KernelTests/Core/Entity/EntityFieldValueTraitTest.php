@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
@@ -187,7 +188,7 @@ class EntityFieldValueTraitTest extends KernelTestBase {
     }
 
     $storage = \Drupal::entityTypeManager()->getStorage('user');
-    $uids = array_values($storage->getQuery()->accessCheck(FALSE)->execute());
+    $uids = array_values($storage->getQuery()->accessCheck(FALSE)->execute(new CacheableMetadata()));
 
     // Warmup: process first batch to stabilize one-time allocations
     // (autoloader, internal caches, buffers).

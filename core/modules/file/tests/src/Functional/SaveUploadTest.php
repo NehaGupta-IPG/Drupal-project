@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\file\Functional;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Database;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\Url;
@@ -91,7 +92,7 @@ class SaveUploadTest extends FileManagedTestBase {
     $this->maxFidBefore = (int) \Drupal::entityQueryAggregate('file')
       ->accessCheck(FALSE)
       ->aggregate('fid', 'max')
-      ->execute()[0]['fid_max'];
+      ->execute(new CacheableMetadata())[0]['fid_max'];
 
     // Upload with replace to guarantee there's something there.
     $edit = [
@@ -117,7 +118,7 @@ class SaveUploadTest extends FileManagedTestBase {
     $max_fid_after = (int) \Drupal::entityQueryAggregate('file')
       ->accessCheck(FALSE)
       ->aggregate('fid', 'max')
-      ->execute()[0]['fid_max'];
+      ->execute(new CacheableMetadata())[0]['fid_max'];
     // Verify that a new file was created.
     $this->assertGreaterThan($this->maxFidBefore, $max_fid_after);
     $file1 = File::load($max_fid_after);
@@ -138,7 +139,7 @@ class SaveUploadTest extends FileManagedTestBase {
     $max_fid_after = (int) \Drupal::entityQueryAggregate('file')
       ->accessCheck(FALSE)
       ->aggregate('fid', 'max')
-      ->execute()[0]['fid_max'];
+      ->execute(new CacheableMetadata())[0]['fid_max'];
 
     // Check that the correct hooks were called.
     $this->assertFileHooksCalled(['validate', 'insert']);
@@ -180,7 +181,7 @@ class SaveUploadTest extends FileManagedTestBase {
     $max_fid_after = (int) \Drupal::entityQueryAggregate('file')
       ->accessCheck(FALSE)
       ->aggregate('fid', 'max')
-      ->execute()[0]['fid_max'];
+      ->execute(new CacheableMetadata())[0]['fid_max'];
     $file1 = File::load($max_fid_after);
 
     // Simulate a race condition where two files are uploaded at almost the same
@@ -200,7 +201,7 @@ class SaveUploadTest extends FileManagedTestBase {
     $max_fid_after = (int) \Drupal::entityQueryAggregate('file')
       ->accessCheck(FALSE)
       ->aggregate('fid', 'max')
-      ->execute()[0]['fid_max'];
+      ->execute(new CacheableMetadata())[0]['fid_max'];
     $this->assertEquals($max_fid_before_duplicate, $max_fid_after, 'A new managed file was not created.');
   }
 

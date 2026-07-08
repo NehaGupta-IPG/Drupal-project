@@ -2,6 +2,7 @@
 
 namespace Drupal\field_ui\Form;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
@@ -166,7 +167,7 @@ abstract class EntityDisplayModeFormBase extends EntityForm {
     return (bool) $storage
       ->getQuery()
       ->condition('id', $element['#field_prefix'] . $entity_id)
-      ->execute();
+      ->execute(new CacheableMetadata());
   }
 
   /**

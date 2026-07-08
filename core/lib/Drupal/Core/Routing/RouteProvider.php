@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Routing;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Database\Statement\FetchAs;
@@ -450,7 +451,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
     $select = $this->connection->select($this->tableName, 'router')
       ->fields('router', ['name', 'route'])
       ->isNull('alias');
-    $routes = $select->execute()->fetchAllKeyed();
+    $routes = $select->execute(new CacheableMetadata())->fetchAllKeyed();
 
     $result = [];
     foreach ($routes as $name => $route) {
@@ -579,7 +580,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
     $alias_route_names = $this->connection->select($this->tableName, 'router')
       ->fields('router', ['name'])
       ->condition('alias', $route_name)
-      ->execute()->fetchCol();
+      ->execute(new CacheableMetadata())->fetchCol();
 
     return $this->getRoutesByNames($alias_route_names);
   }

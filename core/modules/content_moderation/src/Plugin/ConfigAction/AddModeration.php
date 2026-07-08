@@ -3,6 +3,7 @@
 namespace Drupal\content_moderation\Plugin\ConfigAction;
 
 use Drupal\content_moderation\Plugin\WorkflowType\ContentModerationInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Action\Attribute\ConfigAction;
 use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Config\Action\ConfigActionPluginInterface;
@@ -67,7 +68,7 @@ final class AddModeration implements ConfigActionPluginInterface, ContainerFacto
       $value = $this->entityTypeManager->getStorage($bundle_entity_type)
         ->getQuery()
         ->accessCheck(FALSE)
-        ->execute();
+        ->execute(new CacheableMetadata());
     }
     foreach ($value as $bundle) {
       $plugin->addEntityTypeAndBundle($this->targetEntityType, $bundle);

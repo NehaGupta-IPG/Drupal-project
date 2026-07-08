@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Core\DefaultContent;
 
 use Drupal\Core\Access\AccessException;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AccountSwitcherInterface;
@@ -38,7 +39,7 @@ final class AdminAccountSwitcher implements AccountSwitcherInterface {
     $admin_roles = $this->entityTypeManager->getStorage('user_role')
       ->getQuery()
       ->condition('is_admin', TRUE)
-      ->execute();
+      ->execute(new CacheableMetadata());
 
     $user_storage = $this->entityTypeManager->getStorage('user');
 
@@ -49,7 +50,7 @@ final class AdminAccountSwitcher implements AccountSwitcherInterface {
         ->condition('status', 1)
         ->sort('uid')
         ->range(0, 1)
-        ->execute();
+        ->execute(new CacheableMetadata());
     }
     else {
       $accounts = [];

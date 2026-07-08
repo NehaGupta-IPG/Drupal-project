@@ -5,6 +5,7 @@
  * Hooks provided by the User module.
  */
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\node\NodeBulkUpdate;
 use Drupal\user\UserInterface;
@@ -47,7 +48,7 @@ function hook_user_cancel($edit, UserInterface $account, $method): void {
       $nodes = \Drupal::entityQuery('node')
         ->accessCheck(FALSE)
         ->condition('uid', $account->id())
-        ->execute();
+        ->execute(new CacheableMetadata());
       \Drupal::service(NodeBulkUpdate::class)->process($nodes, ['status' => 0], NULL, TRUE);
       break;
 
@@ -56,7 +57,7 @@ function hook_user_cancel($edit, UserInterface $account, $method): void {
       $nodes = \Drupal::entityQuery('node')
         ->accessCheck(FALSE)
         ->condition('uid', $account->id())
-        ->execute();
+        ->execute(new CacheableMetadata());
       \Drupal::service(NodeBulkUpdate::class)->process($nodes, ['uid' => 0], NULL, TRUE);
       // Anonymize old revisions.
       \Drupal::database()->update('node_field_revision')

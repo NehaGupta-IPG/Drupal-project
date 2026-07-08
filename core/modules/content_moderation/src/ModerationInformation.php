@@ -2,6 +2,7 @@
 
 namespace Drupal\content_moderation;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
@@ -95,7 +96,7 @@ class ModerationInformation implements ModerationInformationInterface {
         // No access check is performed here since this is an API function and
         // should return the same ID regardless of the current user.
         ->accessCheck(FALSE)
-        ->execute();
+        ->execute(new CacheableMetadata());
       if ($result) {
         return key($result);
       }

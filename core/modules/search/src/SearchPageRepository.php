@@ -55,7 +55,7 @@ class SearchPageRepository implements SearchPageRepositoryInterface {
     return (bool) $this->getQuery()
       ->condition('status', TRUE)
       ->range(0, 1)
-      ->execute();
+      ->execute(new CacheableMetadata());
   }
 
   /**
