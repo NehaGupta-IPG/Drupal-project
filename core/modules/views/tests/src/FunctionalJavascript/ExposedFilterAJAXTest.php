@@ -140,6 +140,74 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
   }
 
   /**
+   * Tests if exposed filtering via AJAX works for the "Content" View with AJAX bookmarking disabled.
+   */
+  public function testExposedFilteringWithoutAjaxBookmarking(): void {
+    // Disable AJAX bookmarking on the /admin/content View.
+    \Drupal::configFactory()->getEditable('views.view.content')
+      ->set('display.default.display_options.disable_ajax_bookmarking', TRUE)
+      ->save();
+
+    // Create an account that can update the sticky flag.
+    $user = $this->drupalCreateUser([
+      'access content overview',
+      'administer nodes',
+      'edit any page content',
+    ]);
+    $this->drupalLogin($user);
+
+    // Visit the View page.
+    $this->drupalGet('admin/content');
+
+    $session = $this->getSession();
+
+    // Ensure that the Content we're testing for is present.
+    $html = $session->getPage()->getHtml();
+    $this->assertStringContainsString('Page One', $html);
+    $this->assertStringContainsString('Page Two', $html);
+    $this->assertSession()->addressEquals('admin/content');
+
+    // Search for "Page One".
+    $this->submitForm(['title' => 'Page One'], 'Filter');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+
+    // Verify that only the "Page One" Node is present.
+    $html = $session->getPage()->getHtml();
+    $this->assertStringContainsString('Page One', $html);
+    $this->assertStringNotContainsString('Page Two', $html);
+    $this->assertSession()->addressEquals('admin/content');
+
+    // Search for "Page Two".
+    $this->submitForm(['title' => 'Page Two'], 'Filter');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+
+    // Verify that only the "Page Two" Node is present.
+    $html = $session->getPage()->getHtml();
+    $this->assertStringContainsString('Page Two', $html);
+    $this->assertStringNotContainsString('Page One', $html);
+    $this->assertSession()->addressEquals('admin/content');
+
+    // Submit bulk actions form to ensure that the previous AJAX submit does not
+    // break it.
+    $this->submitForm([
+      'action' => 'node_make_sticky_action',
+      'node_bulk_form[0]' => TRUE,
+    ], 'Apply to selected items');
+
+    // Verify that the action was performed.
+    $this->assertSession()->pageTextContains('Make content sticky was applied to 1 item.');
+    $this->assertSession()->addressEquals('admin/content');
+
+    // Reset the form.
+    $this->submitForm([], 'Reset');
+
+    $this->assertSession()->pageTextContains('Page One');
+    $this->assertSession()->pageTextContains('Page Two');
+    $this->assertFalse($session->getPage()->hasButton('Reset'));
+    $this->assertSession()->addressEquals('admin/content');
+  }
+
+  /**
    * Tests if exposed filtering via AJAX theme negotiation works.
    */
   public function testExposedFilteringThemeNegotiation(): void {
