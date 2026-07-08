@@ -208,7 +208,7 @@ class FieldHooks {
         $fields = [];
         // Query by filtering on the ID as this is more efficient than filtering
         // on the entity_type property directly.
-        $ids = \Drupal::entityQuery('field_config')->condition('id', $entity_type->id() . '.', 'STARTS_WITH')->execute();
+        $ids = \Drupal::entityQuery('field_config')->condition('id', $entity_type->id() . '.', 'STARTS_WITH')->execute(new CacheableMetadata());
         // Fetch all fields and key them by field name.
         $field_configs = FieldConfig::loadMultiple($ids);
         foreach ($field_configs as $field_instance) {

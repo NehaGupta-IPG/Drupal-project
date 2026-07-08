@@ -2,6 +2,7 @@
 
 namespace Drupal\search;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Database\Query\SelectExtender;
 use Drupal\Core\Database\Query\SelectInterface;
@@ -444,7 +445,7 @@ class SearchQuery extends SelectExtender {
     $result = $normalize_query
       ->range(0, 1)
       ->orderBy('calculated_score', 'DESC')
-      ->execute()
+      ->execute(new CacheableMetadata())
       ->fetchObject();
     if (isset($result->calculated_score)) {
       $this->normalize = (float) $result->calculated_score;

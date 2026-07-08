@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Entity\Entity;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\Entity\Entity\Access\EntityViewDisplayAccessControlHandler;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -112,7 +113,7 @@ class EntityViewDisplay extends EntityDisplayBase implements EntityViewDisplayIn
     $results = \Drupal::entityQuery('entity_view_display')
       ->condition('id', NestedArray::mergeDeepArray($candidate_ids))
       ->condition('status', TRUE)
-      ->execute();
+      ->execute(new CacheableMetadata());
 
     // For each bundle, select the first valid candidate display, if any.
     $load_ids = [];
