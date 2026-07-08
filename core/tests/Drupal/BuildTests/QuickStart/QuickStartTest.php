@@ -218,6 +218,57 @@ class QuickStartTest extends BuildTestBase {
   }
 
   /**
+   * Tests installing when a database connection is already configured.
+   *
+   * Tooling such as ddev configures a database connection in settings.php
+   * before Drupal is installed. The install command must proceed in that case
+   * rather than reporting that Drupal is already installed.
+   */
+  public function testInstallWithConfiguredButUninstalledDatabase(): void {
+    $sqlite = (new \PDO('sqlite::memory:'))->query('select sqlite_version()')->fetch()[0];
+    if (version_compare($sqlite, Tasks::SQLITE_MINIMUM_VERSION) < 0) {
+      $this->markTestSkipped();
+    }
+
+    // Create the site directory with a settings.php that defines a database
+    // connection to an empty SQLite database. This mimics an environment where
+    // the database is configured but Drupal has not been installed yet.
+    $site_path = $this->testDb->getTestSitePath();
+    $site_directory = $this->root . DIRECTORY_SEPARATOR . $site_path;
+    mkdir($site_directory, 0775, TRUE);
+    $database_file = $site_directory . DIRECTORY_SEPARATOR . '.sqlite';
+    $settings = <<<PHP
+    <?php
+    \$databases['default']['default'] = [
+      'driver' => 'sqlite',
+      'namespace' => 'Drupal\\\\sqlite\\\\Driver\\\\Database\\\\sqlite',
+      'database' => '$database_file',
+    ];
+    \$settings['hash_salt'] = 'test';
+    PHP;
+    file_put_contents($site_directory . DIRECTORY_SEPARATOR . 'settings.php', $settings);
+    // Create the empty database file so the connection is valid.
+    touch($database_file);
+
+    $install_command = [
+      $this->php,
+      'core/scripts/dr',
+      'install',
+      'minimal',
+      "--password='secret'",
+      "--site-name='Test site {$this->testDb->getDatabasePrefix()}'",
+    ];
+    $install_process = new Process($install_command, NULL, ['DRUPAL_DEV_SITE_PATH' => $site_path]);
+    $install_process->setTimeout(500);
+    $result = $install_process->run();
+
+    $this->assertStringNotContainsString('Drupal is already installed.', $install_process->getOutput());
+    // The progress bar uses STDERR to write messages.
+    $this->assertStringContainsString('Congratulations, you installed Drupal!', $install_process->getErrorOutput());
+    $this->assertSame(0, $result);
+  }
+
+  /**
    * Tests the install command with an invalid profile.
    */
   public function testQuickStartCommandProfileValidation(): void {

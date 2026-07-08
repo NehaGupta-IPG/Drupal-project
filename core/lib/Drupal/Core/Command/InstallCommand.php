@@ -142,7 +142,23 @@ class InstallCommand extends Command {
     catch (ConnectionNotDefinedException) {
       return FALSE;
     }
-    return !empty(Database::getConnectionInfo());
+    // A defined database connection does not mean Drupal is installed. For
+    // example, ddev and other tooling configure a connection in settings.php
+    // before the site is installed, and a cancelled install leaves a defined
+    // connection behind. Mirror core's install_verify_database_ready(): the
+    // site is only installed if the key_value table exists.
+    if (empty(Database::getConnectionInfo())) {
+      return FALSE;
+    }
+    try {
+      return Database::getConnection()->schema()->tableExists('key_value');
+    }
+    catch (\Exception) {
+      // The connection is defined but the database is unreachable or empty
+      // (for example, it does not exist yet), so Drupal is not installed and
+      // the install can proceed.
+      return FALSE;
+    }
   }
 
   /**
