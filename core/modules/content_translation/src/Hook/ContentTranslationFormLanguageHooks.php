@@ -98,9 +98,9 @@ class ContentTranslationFormLanguageHooks {
         $base_field_definitions = $this->entityFieldManager->getBaseFieldDefinitions($entity_type_id);
         if ($fields) {
           foreach ($fields as $field_name => $definition) {
-            // Skip pure bundle fields — fields with no base field definition
-            // and no field storage definition, so cannot have field config
-            // overrides.
+            // Skip pure bundle fields (fields with no base field definition
+            // and no field storage definition) because they cannot have
+            // field config overrides.
             $is_bundle_field = !isset($base_field_definitions[$field_name]) && !isset($storage_definitions[$field_name]);
             if ($is_bundle_field) {
               continue;
