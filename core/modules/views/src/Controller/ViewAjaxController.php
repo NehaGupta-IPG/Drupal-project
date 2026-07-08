@@ -163,8 +163,13 @@ class ViewAjaxController implements ContainerInjectionInterface {
         $view->dom_id = $dom_id;
 
         $preview = $view->preview($display_id, $args);
+        $bookmarkingDisabled = FALSE;
         $display = $view->getDisplay();
-        if ($target_url && $display instanceof DisplayPluginBase && $display->getOption('disable_ajax_bookmarking') !== TRUE) {
+        if ($display instanceof DisplayPluginBase) {
+          $bookmarkingDisabled = $display->getOption('disable_ajax_bookmarking');
+        }
+
+        if ($target_url && $bookmarkingDisabled === FALSE) {
           $response->addCommand(new SetBrowserUrl($target_url->toString()));
         }
         $response->addCommand(new ReplaceCommand(".js-view-dom-id-$dom_id", $preview));
