@@ -282,4 +282,47 @@ class RegistryTest extends KernelTestBase {
     $this->assertEquals($expected, array_values($registry['theme_test_registered_by_module']['preprocess functions']));
   }
 
+  /**
+   * Tests that the runtime registry is rebuilt after being destructed.
+   *
+   * CacheCollector::destruct() resets each collector, emptying its storage.
+   * Registry::destruct() must drop the destructed runtime instances so that a
+   * subsequent getRuntime() call within the same request (for example, while
+   * rendering content during Search API post-request indexing that runs after
+   * the theme registry has already been destructed) rebuilds a complete
+   * registry instead of reusing an emptied one. Otherwise ThemeRegistry::has()
+   * returns FALSE for every hook, logging "Theme hook %hook not found" and
+   * rendering empty output.
+   *
+   * @see https://www.drupal.org/i/3609212
+   */
+  public function testRuntimeRegistryRebuiltAfterDestruct(): void {
+    // Use a POST request so the runtime registry is not persistable and thus
+    // not restored from the cache backend, matching the real-world scenario
+    // where post-request indexing rebuilds the registry after destruction.
+    \Drupal::request()->setMethod('POST');
+
+    $registry = \Drupal::service('theme.registry');
+    $registry->setThemeManager(\Drupal::theme());
+
+    // Populate the runtime registry, which the constructor fills with every
+    // theme hook key.
+    $runtime = $registry->getRuntime();
+    $this->assertTrue($runtime->has('theme_test_template_test'));
+
+    // Destruct the registry the way DrupalKernel::terminate() does at the end
+    // of a request. This empties the underlying storage of every runtime
+    // instance.
+    $registry->destruct();
+
+    // Anything rendered after destruction requests the runtime registry again.
+    // It must be a freshly constructed, fully populated instance.
+    $runtime_after = $registry->getRuntime();
+    $this->assertTrue($runtime_after->has('theme_test_template_test'));
+    $this->assertNotEmpty($runtime_after->get('theme_test_template_test'));
+    // getPreprocessInvokes() must not return NULL, which would trigger a
+    // TypeError; it reads from the same storage as has().
+    $this->assertIsArray($runtime_after->getPreprocessInvokes());
+  }
+
 }
