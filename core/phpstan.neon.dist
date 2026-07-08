@@ -10,6 +10,7 @@ parameters:
 
   level: 1
 
+  checkFunctionArgumentTypes: true
   checkInternalClassCaseSensitivity: true
 
   parallel:
@@ -17,10 +18,13 @@ parameters:
 
   fileExtensions:
     - sh
+    - ''
 
   paths:
     - .
     - ../composer
+    - scripts/dr
+    - scripts/drupal
 
   bootstrapFiles:
     # Load aliases.
@@ -50,6 +54,10 @@ parameters:
     - modules/system/tests/modules/plugin_test/src/Plugin/plugin_test/fruit/ExtendingNonInstalledClass.php
     - modules/system/tests/modules/plugin_test/src/Plugin/plugin_test/custom_annotation/UsingNonInstalledTraitClass.php
     - modules/system/tests/modules/plugin_test/src/Plugin/plugin_test/custom_annotation/ExtendingNonInstalledClass.php
+    - modules/system/tests/modules/router_test_directory/src/Controller/TestInvalidController.php
+    - modules/system/tests/modules/router_test_directory/src/Controller/TestMissingDependency.php
+    # The following class is only for PHPCS.
+    - tests/phpcs/PhpScriptFilter.php
 
   ignoreErrors:
     # new static() is a best practice in Drupal, so we cannot fix that.
@@ -61,13 +69,16 @@ parameters:
     - identifier: missingType.iterableValue
 
 rules:
+  # The rules below are Drupal custom ones.
   - Drupal\PHPStan\Rules\ComponentTestDoesNotExtendCoreTest
   - Drupal\PHPStan\Rules\TestClassClassMetadata
   - Drupal\PHPStan\Rules\TestClassMethodMetadata
-  - PHPStan\Rules\Functions\MissingFunctionReturnTypehintRule
-  - PHPStan\Rules\Methods\MissingMethodReturnTypehintRule
+  # ----------------------------------------------------------
   # The rule below can be removed when we increase level to 2.
   - PHPStan\Rules\Classes\AccessPrivateConstantThroughStaticRule
+  # The rules below can be removed when we increase level to 6.
+  - PHPStan\Rules\Functions\MissingFunctionReturnTypehintRule
+  - PHPStan\Rules\Methods\MissingMethodReturnTypehintRule
 
 services:
   errorFormatter.multiplex:

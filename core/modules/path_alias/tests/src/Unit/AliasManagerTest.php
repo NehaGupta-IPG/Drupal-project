@@ -58,20 +58,6 @@ class AliasManagerTest extends UnitTestCase {
   protected $cache;
 
   /**
-   * The internal cache key used by the alias manager.
-   *
-   * @var string
-   */
-  protected $cacheKey = 'preload-paths:key';
-
-  /**
-   * The cache key passed to the alias manager.
-   *
-   * @var string
-   */
-  protected $path = 'key';
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -163,7 +149,7 @@ class AliasManagerTest extends UnitTestCase {
   /**
    * Tests the getAliasByPath method for a path that is not in the prefix list.
    */
-  public function testGetAliasByPathPrefixList() {
+  public function testGetAliasByPathPrefixList(): void {
     $this->setUpMockAliasPrefixList();
 
     $path_part1 = $this->randomMachineName();
@@ -341,7 +327,7 @@ class AliasManagerTest extends UnitTestCase {
    * @return \Drupal\Core\Language\LanguageInterface
    *   The current language object.
    */
-  protected function setUpCurrentLanguage() {
+  protected function setUpCurrentLanguage(): Language {
     $language = new Language(['id' => 'en']);
 
     $this->languageManager

@@ -29,10 +29,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
    * {@inheritdoc}
    */
   protected function setDatabaseDumpFiles(): void {
-    $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz';
-    $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/uninstall-history.php';
-    $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/uninstall-ban.php';
-    $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/uninstall-contact.php';
+    $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/drupal-11.3.0.filled.standard.php.gz';
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/drupal-8.update-test-schema-enabled.php';
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/drupal-8.update-test-semver-update-n-enabled.php';
   }
@@ -88,7 +85,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->assertSession()->pageTextNotContains('Test 12');
     // Make sure all other field labels are there.
     for ($i = 1; $i <= 23; $i++) {
-      if (($i != 11) && ($i != 12)) {
+      if (($i != 11) && ($i != 12) && ($i != 7)) {
         $this->assertSession()->pageTextContains('Test ' . $i);
       }
     }
@@ -121,8 +118,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->assertSession()->responseContains('drupal.org');
     $this->assertSession()->pageTextContains('0.1');
     $this->assertSession()->pageTextContains('0.2');
-    $this->assertSession()->responseContains('+31612345678');
-    $this->assertSession()->responseContains('+31612345679');
     $this->assertSession()->pageTextContains('Test Article - New title');
     $this->assertSession()->pageTextContains('test.txt');
     $this->assertSession()->pageTextContains('druplicon.small');
@@ -234,7 +229,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $assert_session->elementContains('css', '#field-test-4', 'Email');
     $assert_session->elementContains('css', '#field-test-5', 'Link');
     $assert_session->elementContains('css', '#field-test-6', 'Float');
-    $assert_session->elementContains('css', '#field-test-7', 'Telephone number');
     $assert_session->elementContains('css', '#field-test-8', 'Entity reference');
     $assert_session->elementContains('css', '#field-test-9', 'File');
     $assert_session->elementContains('css', '#field-test-10', 'Image');
@@ -276,12 +270,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->drupalGet('admin/config/media/responsive-image-style/test');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains('Test');
-
-    // Make sure our custom shortcut exists.
-    $this->drupalGet('admin/config/user-interface/shortcut');
-    $this->assertSession()->pageTextContains('Test shortcut');
-    $this->drupalGet('admin/config/user-interface/shortcut/manage/test/customize');
-    $this->assertSession()->pageTextContains('All content');
 
     // Make sure our language detection settings are still correct.
     $this->drupalGet('admin/config/regional/language/detection');
@@ -352,13 +340,10 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
       'rest',
       'search',
       'serialization',
-      'shortcut',
       'syslog',
       'system',
       'taxonomy',
-      'telephone',
       'text',
-      'toolbar',
       'update',
       'user',
       'views_ui',

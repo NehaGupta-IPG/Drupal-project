@@ -6,11 +6,13 @@ namespace Drupal\Tests\menu_ui\Functional;
 
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
+use Drupal\menu_ui\MenuUiUtility;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\system\Entity\Menu;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
+use Drupal\node\NodeAccessRebuild;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -229,7 +231,7 @@ class MenuUiNodeTest extends BrowserTestBase {
     $this->assertSession()->responseMatches('/<input .* id="edit-menu-description" .* maxlength="' . $description_max_length . '" .* \/>/');
 
     // Disable the menu link, then edit the node--the link should stay disabled.
-    $link_id = menu_ui_get_menu_link_defaults($node)['entity_id'];
+    $link_id = \Drupal::service(MenuUiUtility::class)->getMenuLinkDefaults($node)['entity_id'];
     /** @var \Drupal\menu_link_content\Entity\MenuLinkContent $link */
     $link = MenuLinkContent::load($link_id);
     $link->set('enabled', FALSE);
@@ -391,7 +393,7 @@ class MenuUiNodeTest extends BrowserTestBase {
    */
   public function testMenuNodeWithGrantsFormWidget(): void {
     \Drupal::service('module_installer')->install(['node_access_test']);
-    node_access_rebuild();
+    \Drupal::service(NodeAccessRebuild::class)->rebuild();
     $this->assertTrue(\Drupal::moduleHandler()->hasImplementations('node_grants'));
 
     $admin_user = $this->drupalCreateUser([
@@ -417,7 +419,7 @@ class MenuUiNodeTest extends BrowserTestBase {
     $node = $this->drupalGetNodeByTitle($node_title);
     $this->assertTrue($node->access('view', $admin_user));
     $this->drupalGet('node/add/page');
-    $link_id = menu_ui_get_menu_link_defaults($node)['entity_id'];
+    $link_id = \Drupal::service(MenuUiUtility::class)->getMenuLinkDefaults($node)['entity_id'];
     /** @var \Drupal\menu_link_content\Entity\MenuLinkContent $link */
     $link = MenuLinkContent::load($link_id);
     $this->assertSession()->optionExists('edit-menu-menu-parent', 'main:' . $link->getPluginId());
@@ -441,7 +443,7 @@ class MenuUiNodeTest extends BrowserTestBase {
   /**
    * Tests main menu links are prioritized when editing nodes.
    *
-   * @see menu_ui_get_menu_link_defaults()
+   * @see \Drupal\menu_ui\MenuUiUtility::getMenuLinkDefaults()
    */
   public function testMainMenuIsPrioritized(): void {
     $this->drupalLogin($this->drupalCreateUser([
