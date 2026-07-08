@@ -69,7 +69,7 @@ class InstallCommand extends Command {
       ])
       ->addUsage('demo_umami --langcode fr --db-url pgsql://pg_user:pg_password@database_host:5432/database_name')
       ->addUsage('standard --site-name QuickInstall --db-url sqlite://sites/default/files/.sqlite')
-      ->addUsage('core/recipes/standard --site-name RecipeBuiltSite --db-url mysq://mysql_user:mysql_password@localhost/database_name')
+      ->addUsage('core/recipes/standard --site-name RecipeBuiltSite --db-url mysql://mysql_user:mysql_password@localhost/database_name')
       ->addUsage('standard --db-url mysql://db:db@db:3306/db --site-name "My Awesome Web Site"')
       ->addUsage('standard --site-name "My Preconfigured Database Site"');
 
