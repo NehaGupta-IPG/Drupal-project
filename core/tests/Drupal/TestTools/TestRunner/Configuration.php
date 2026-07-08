@@ -26,6 +26,7 @@ final class Configuration {
   protected function __construct(
     private array $options,
     private array $arguments,
+    private Logger $logger,
   ) {
   }
 
@@ -59,7 +60,7 @@ final class Configuration {
   /**
    * Builds the test runner configuration from command line arguments.
    */
-  public static function createFromCommandLine(array $arguments): self {
+  public static function createFromCommandLine(array $arguments, Logger $logger): self {
     if (self::$instance) {
       return self::$instance;
     }
@@ -69,6 +70,10 @@ final class Configuration {
     }
 
     $input = new ArgvInput($arguments, self::commandLineDefinition());
+
+    if ($input->getOption('php') && !$input->getOption('suppress-deprecations')) {
+      $logger->deprecation('The --php command line option is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. There is no need to specify the PHP executable.');
+    }
 
     if ($input->getOption('directory') && ($input->getOption('file') || $input->getOption('class'))) {
       throw new \RuntimeException("--directory cannot be specified together with the --class or --file options.");
@@ -93,7 +98,7 @@ final class Configuration {
       $input->setOption('types', []);
     }
 
-    self::$instance = new self($input->getOptions(), $input->getArguments());
+    self::$instance = new self($input->getOptions(), $input->getArguments(), $logger);
 
     return self::$instance;
   }
@@ -165,7 +170,7 @@ final class Configuration {
       'php',
       NULL,
       InputOption::VALUE_REQUIRED,
-      "(deprecated) Unused.",
+      "(deprecated in drupal:12.0.0 and removed from drupal:13.0.0) Unused. There is no need to specify the PHP executable.",
     ));
     $inputDefinition->addOption(new InputOption(
       'concurrency',

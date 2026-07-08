@@ -26,6 +26,7 @@ use Drupal\Core\Test\TestRun;
 use Drupal\Core\Test\TestRunnerKernel;
 use Drupal\Core\Test\TestRunResultsStorageInterface;
 use Drupal\TestTools\TestRunner\Configuration as Config;
+use Drupal\TestTools\TestRunner\Logger;
 use Drupal\TestTools\TestRunner\WorkAllocator;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Runner\Version;
@@ -68,10 +69,13 @@ $autoloader->addPsr4('Drupal\\TestTools\\', __DIR__ . '/../tests/Drupal/TestTool
 // Setup console output.
 $console_output = new ConsoleOutput();
 
+// Setup logger.
+$logger = new Logger($console_output);
+
 // Get the configuration from the command line.
 $script_basename = basename($_SERVER['argv'][0]);
 try {
-  Config::createFromCommandLine($_SERVER['argv']);
+  Config::createFromCommandLine($_SERVER['argv'], $logger);
 }
 catch (\RuntimeException $e) {
   simpletest_script_print_error($e->getMessage() . ' ' . "Use the --help option for the list and usage of the options available.\n");
@@ -271,8 +275,11 @@ if (!Config::get('keep-results')) {
   }
 }
 
+// Output log.
+$logger->print();
+
 // Test complete, exit.
-exit($status);
+exit(max($status, $logger->internalStatus()));
 
 /**
  * Print help text.
