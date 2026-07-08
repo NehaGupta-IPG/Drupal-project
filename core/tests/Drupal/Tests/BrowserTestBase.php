@@ -495,6 +495,48 @@ abstract class BrowserTestBase extends TestCase {
    * Installs Drupal into the test site.
    */
   public function installDrupal(): void {
+    if (getenv('BROWSERTEST_CACHE_DB')) {
+      $this->initDumpFile();
+      if (file_exists($this->dumpFile)) {
+        $this->installDrupalFromDump();
+      }
+      else {
+        $this->installDrupalFromProfile();
+        $this->dumpDatabase();
+      }
+    }
+    else {
+      $this->installDrupalFromProfile();
+    }
+  }
+
+  /**
+   * Determines a proper file name for SQL dump.
+   */
+  protected function initDumpFile(): void {
+    $class = get_class($this);
+    $modules = [];
+    while ($class) {
+      if (property_exists($class, 'modules')) {
+        $modules = array_merge($modules, $class::$modules);
+      }
+      $class = get_parent_class($class);
+    }
+    if (!empty($this->defaultTheme)) {
+      $modules[] = $this->defaultTheme;
+    }
+    $modules[] = $this->profile;
+    sort($modules);
+    array_unique($modules);
+    $cache_dir = getenv('BROWSERTEST_CACHE_DIR') ?: sys_get_temp_dir() . '/test_dumps/' . \Drupal::VERSION;
+    is_dir($cache_dir) || mkdir($cache_dir, 0777, TRUE);
+    $this->dumpFile = $cache_dir . '/_' . md5(implode('-', $modules)) . '.sql';
+  }
+
+  /**
+   * Installs Drupal using installation profile.
+   */
+  protected function installDrupalFromProfile(): void {
     $this->initUserSession();
     $this->prepareSettings();
     $this->doInstall();

@@ -37,6 +37,10 @@
      reachable from your host machine here. This will allow you to follow them
      directly and view the output. -->
     <env name="BROWSERTEST_OUTPUT_BASE_URL" value=""/>
+    <!-- Set BROWSERTEST_CACHE_DB to 1 to save the initial database, and install
+     from this cache for improved performance. The default 0 will install from
+     profile in every test. -->
+    <env name="BROWSERTEST_CACHE_DB" value="0"/>
     <!-- The environment variable SYMFONY_DEPRECATIONS_HELPER is used to configure
       the behavior of the deprecation tests.
       Drupal core's testing framework is setting this variable to its defaults.
