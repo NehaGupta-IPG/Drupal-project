@@ -12,6 +12,7 @@ display:
   default:
     display_options:
       use_ajax: true
+      disable_ajax_bookmarking: false
       fields:
         id:
           id: id

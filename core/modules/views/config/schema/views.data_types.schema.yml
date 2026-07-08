@@ -157,6 +157,9 @@ views_display:
         use_ajax:
           type: boolean
           label: 'Use AJAX'
+        disable_ajax_bookmarking:
+          type: boolean
+          label: 'Disable bookmarking for AJAX'
         hide_attachment_summary:
           type: boolean
           label: 'Hide attachments when displaying a contextual filter summary'
@@ -228,6 +231,9 @@ views_display:
     use_ajax:
       type: boolean
       label: 'Use AJAX'
+    disable_ajax_bookmarking:
+      type: boolean
+      label: 'Disable bookmarking for AJAX'
     group_by:
       type: boolean
       label: 'Aggregate'

@@ -15,6 +15,7 @@ display:
   default:
     display_options:
       use_ajax: true
+      disable_ajax_bookmarking: false
       access:
         type: perm
         options:

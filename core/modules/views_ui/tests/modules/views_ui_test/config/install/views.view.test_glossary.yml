@@ -370,6 +370,7 @@ display:
           plugin_id: standard
           required: false
       use_ajax: true
+      disable_ajax_bookmarking: false
       header: {  }
       footer: {  }
       display_extenders: {  }

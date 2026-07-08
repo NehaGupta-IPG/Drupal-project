@@ -399,6 +399,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       'title' => ['title'],
       'css_class' => ['css_class'],
       'use_ajax' => ['use_ajax'],
+      'disable_ajax_bookmarking' => ['disable_ajax_bookmarking'],
       'hide_attachment_summary' => ['hide_attachment_summary'],
       'show_admin_links' => ['show_admin_links'],
       'group_by' => ['group_by'],
@@ -462,6 +463,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
 
           'display_description' => FALSE,
           'use_ajax' => TRUE,
+          'disable_ajax_bookmarking' => FALSE,
           'hide_attachment_summary' => TRUE,
           'show_admin_links' => TRUE,
           'pager' => TRUE,
@@ -506,6 +508,9 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
         'default' => '',
       ],
       'use_ajax' => [
+        'default' => FALSE,
+      ],
+      'disable_ajax_bookmarking' => [
         'default' => FALSE,
       ],
       'hide_attachment_summary' => [
@@ -1186,6 +1191,12 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
         'value' => $this->getOption('use_ajax') ? $this->t('Yes') : $this->t('No'),
         'desc' => $this->t('Change whether or not this display will use AJAX.'),
       ];
+      $options['disable_ajax_bookmarking'] = [
+        'category' => 'other',
+        'title' => $this->t('Disable bookmarking for AJAX'),
+        'value' => $this->getOption('disable_ajax_bookmarking') ? $this->t('Yes') : $this->t('No'),
+        'desc' => $this->t('Change whether or not to disable bookmarking for AJAX.'),
+      ];
     }
     if ($this->usesAttachments()) {
       $options['hide_attachment_summary'] = [
@@ -1465,6 +1476,16 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
           '#type' => 'checkbox',
           '#title' => $this->t('Use AJAX'),
           '#default_value' => $this->getOption('use_ajax') ? 1 : 0,
+        ];
+        break;
+
+      case 'disable_ajax_bookmarking':
+        $form['#title'] .= $this->t('AJAX bookmarking');
+        $form['disable_ajax_bookmarking'] = [
+          '#description' => $this->t('Options such as paging, table sorting, and exposed filters will not initiate a page refresh.'),
+          '#type' => 'checkbox',
+          '#title' => $this->t('Disable bookmarking for AJAX'),
+          '#default_value' => $this->getOption('disable_ajax_bookmarking') ? 1 : 0,
         ];
         break;
 
@@ -1981,6 +2002,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
         break;
 
       case 'use_ajax':
+      case 'disable_ajax_bookmarking':
       case 'hide_attachment_summary':
       case 'show_admin_links':
       case 'exposed_block':

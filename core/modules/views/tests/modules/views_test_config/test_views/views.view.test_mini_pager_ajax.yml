@@ -19,6 +19,7 @@ display:
     position: null
     display_options:
       use_ajax: true
+      disable_ajax_bookmarking: false
       access:
         type: perm
       cache:
