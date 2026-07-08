@@ -2,6 +2,7 @@
 
 namespace Drupal\taxonomy;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 use Drupal\Core\Entity\Sql\TableMappingInterface;
 
@@ -138,7 +139,7 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
         ->accessCheck(TRUE)
         ->condition('tid', $ids, 'IN');
 
-      $loaded_parents = static::loadMultiple($query->execute());
+      $loaded_parents = static::loadMultiple($query->execute(new CacheableMetadata()));
     }
 
     return $parents + $loaded_parents;
@@ -199,7 +200,7 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
     $query = \Drupal::entityQuery('taxonomy_term')
       ->accessCheck(TRUE)
       ->condition('parent', $term->id());
-    return static::loadMultiple($query->execute());
+    return static::loadMultiple($query->execute(new CacheableMetadata()));
   }
 
   /**
@@ -224,7 +225,7 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
           ->condition('t.default_langcode', 1)
           ->orderBy('t.weight')
           ->orderBy('t.name')
-          ->execute();
+          ->execute(new CacheableMetadata());
         foreach ($result as $term) {
           $this->treeChildren[$vid][$term->parent][] = $term->tid;
           $this->treeParents[$vid][$term->tid][] = $term->parent;
@@ -311,7 +312,7 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
     $query->leftJoin($this->getBaseTable(), 'td', '[ti].[tid] = [td].[tid]');
     $query->condition('td.vid', $vid);
     $query->addTag('vocabulary_node_count');
-    return $query->execute()->fetchField();
+    return $query->execute(new CacheableMetadata())->fetchField();
   }
 
   /**
@@ -345,7 +346,7 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
 
     $results = [];
     $all_tids = [];
-    foreach ($query->execute() as $term_record) {
+    foreach ($query->execute(new CacheableMetadata()) as $term_record) {
       $results[$term_record->node_nid][] = $term_record->tid;
       $all_tids[] = $term_record->tid;
     }
@@ -389,7 +390,7 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
 
     $query->groupBy("tfr.$id_field");
 
-    return $query->execute()->fetchAllKeyed(1, 0);
+    return $query->execute(new CacheableMetadata())->fetchAllKeyed(1, 0);
   }
 
   /**
@@ -412,7 +413,7 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
     $query->addExpression("MAX([$delta_column])", 'max_delta');
     $query->condition('bundle', $vid);
 
-    $result = $query->execute()->fetchAll();
+    $result = $query->execute(new CacheableMetadata())->fetchAll();
 
     // If all the terms have the same parent, the parent can only be root (0).
     if ((int) $result[0]->max_parent_id === 0) {

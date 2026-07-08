@@ -3,6 +3,7 @@
 namespace Drupal\workspaces;
 
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\PagerSelectExtender;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -163,7 +164,7 @@ class WorkspaceTracker implements WorkspaceTrackerInterface, EventSubscriberInte
     }
 
     $tracked_revisions = [];
-    foreach ($query->execute() as $record) {
+    foreach ($query->execute(new CacheableMetadata()) as $record) {
       $target_id = $record->{static::getIdField($record->target_entity_type_id)};
       $tracked_revisions[$record->target_entity_type_id][$record->target_entity_revision_id] = $target_id;
     }
@@ -309,7 +310,7 @@ class WorkspaceTracker implements WorkspaceTrackerInterface, EventSubscriberInte
       $query->join($inner_select, 'waj', '[wa].[target_entity_revision_id] = [waj].[max_revision_id]');
     }
 
-    $result = $query->execute()->fetchCol();
+    $result = $query->execute(new CacheableMetadata())->fetchCol();
 
     // Return early if the entity is not tracked in any workspace.
     if (empty($result)) {

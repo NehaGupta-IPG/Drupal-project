@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Plugin\views\pager;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Plugin\views\PluginBase;
 
@@ -193,7 +194,7 @@ abstract class PagerPluginBase extends PluginBase {
    * This will be done just prior to the query itself being executed.
    */
   public function executeCountQuery(&$count_query) {
-    $this->total_items = $count_query->execute()->fetchField();
+    $this->total_items = $count_query->execute(new CacheableMetadata())->fetchField();
     if (!empty($this->options['offset'])) {
       $this->total_items -= $this->options['offset'];
     }
