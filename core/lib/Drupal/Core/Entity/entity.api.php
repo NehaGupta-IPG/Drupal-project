@@ -2106,7 +2106,7 @@ function hook_entity_field_storage_info(\Drupal\Core\Entity\EntityTypeInterface 
     // on the entity_type property directly.
     $ids = \Drupal::entityQuery('field_storage_config')
       ->condition('id', $entity_type->id() . '.', 'STARTS_WITH')
-      ->execute();
+      ->execute(new CacheableMetadata());
     // Fetch all fields and key them by field name.
     $field_storages = FieldStorageConfig::loadMultiple($ids);
     foreach ($field_storages as $field_storage) {

@@ -4,6 +4,7 @@ namespace Drupal\Core\Menu;
 
 use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -138,7 +139,7 @@ class DefaultMenuLinkTreeManipulators {
         }
       }
 
-      $nids = $query->execute();
+      $nids = $query->execute(new CacheableMetadata());
       foreach ($nids as $nid) {
         foreach ($node_links[$nid] as $key => $link) {
           $node_links[$nid][$key]->access = $access_result;

@@ -3,6 +3,7 @@
 namespace Drupal\Core\Flood;
 
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -126,7 +127,7 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
         ->condition('identifier', $identifier)
         ->condition('timestamp', $this->time->getRequestTime() - $window, '>')
         ->countQuery()
-        ->execute()
+        ->execute(new CacheableMetadata())
         ->fetchField();
       return ($number < $threshold);
     }

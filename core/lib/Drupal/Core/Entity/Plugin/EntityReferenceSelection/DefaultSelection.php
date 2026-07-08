@@ -351,7 +351,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
       $query->range(0, $limit);
     }
 
-    $result = $query->execute();
+    $result = $query->execute(new CacheableMetadata());
 
     if (empty($result)) {
       return [];
@@ -374,7 +374,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
     $query = $this->buildEntityQuery($match, $match_operator);
     return $query
       ->count()
-      ->execute();
+      ->execute(new CacheableMetadata());
   }
 
   /**

@@ -105,7 +105,7 @@ class EntityListBuilder extends EntityHandlerBase implements EntityListBuilderIn
    *   An array of entity IDs.
    */
   protected function getEntityIds() {
-    return $this->getEntityListQuery()->execute();
+    return $this->getEntityListQuery()->execute(new CacheableMetadata());
   }
 
   /**

@@ -394,7 +394,7 @@ class DatabaseBackend implements CacheBackendInterface {
           ->fields($this->bin, ['created'])
           ->orderBy("{$this->bin}.created", 'DESC')
           ->range($this->maxRows, 1)
-          ->execute()
+          ->execute(new CacheableMetadata())
           ->fetchField();
 
         if ($first_invalid_create_time) {

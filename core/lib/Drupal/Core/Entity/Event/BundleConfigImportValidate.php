@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Entity\Event;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigImporterEvent;
 use Drupal\Core\Config\ConfigImportValidateEventSubscriberBase;
 use Drupal\Core\Config\ConfigManagerInterface;
@@ -61,7 +62,7 @@ class BundleConfigImportValidate extends ConfigImportValidateEventSubscriberBase
           $entity_ids = $entity_query->condition($bundle_of_entity_type->getKey('bundle'), $bundle_id)
             ->accessCheck(FALSE)
             ->range(0, 1)
-            ->execute();
+            ->execute(new CacheableMetadata());
           if (!empty($entity_ids)) {
             $entity = $this->entityTypeManager->getStorage($entity_type_id)->load($bundle_id);
             $event->getConfigImporter()

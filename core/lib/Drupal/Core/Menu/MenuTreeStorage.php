@@ -792,7 +792,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
     //   https://www.drupal.org/node/2302043
     $subquery->fields($this->table, ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9']);
     $subquery->condition('id', $id);
-    $result = current($subquery->execute()->fetchAll(FetchAs::Associative));
+    $result = current($subquery->execute(new CacheableMetadata())->fetchAll(FetchAs::Associative));
     $ids = array_filter($result);
     if ($ids) {
       $query = $this->connection->select($this->table, NULL, $this->options);

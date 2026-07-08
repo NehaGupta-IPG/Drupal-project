@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Config\Entity;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -119,7 +120,7 @@ class ConfigEntityUpdater implements ContainerInjectionInterface {
         throw new \InvalidArgumentException("The provided entity type ID '$entity_type_id' is not a configuration entity type");
       }
       $sandbox[self::SANDBOX_KEY]['entity_type'] = $entity_type_id;
-      $sandbox[self::SANDBOX_KEY]['entities'] = $storage->getQuery()->accessCheck(FALSE)->execute();
+      $sandbox[self::SANDBOX_KEY]['entities'] = $storage->getQuery()->accessCheck(FALSE)->execute(new CacheableMetadata());
       $sandbox[self::SANDBOX_KEY]['count'] = count($sandbox[self::SANDBOX_KEY]['entities']);
       $sandbox[self::SANDBOX_KEY]['failed_entity_ids'] = [];
     }

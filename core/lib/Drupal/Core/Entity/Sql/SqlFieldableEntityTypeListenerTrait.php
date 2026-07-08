@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Entity\Sql;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Site\Settings;
@@ -171,7 +172,7 @@ trait SqlFieldableEntityTypeListenerTrait {
       ->fields('t', [$identifier_field])
       ->orderBy($identifier_field, 'ASC')
       ->range(0, $step_size)
-      ->execute()
+      ->execute(new CacheableMetadata())
       ->fetchCol();
 
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $entities */
@@ -233,7 +234,7 @@ trait SqlFieldableEntityTypeListenerTrait {
       ->condition("t.$identifier_field", $sandbox['current_id'], '>')
       ->orderBy($identifier_field, 'ASC')
       ->countQuery()
-      ->execute()
+      ->execute(new CacheableMetadata())
       ->fetchField();
     $sandbox['#finished'] = $missing ? $sandbox['progress'] / ($sandbox['progress'] + (int) $missing) : 1;
   }

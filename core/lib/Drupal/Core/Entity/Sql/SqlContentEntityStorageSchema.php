@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Entity\Sql;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
@@ -2041,7 +2042,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       ->fields('t', [$column_name])
       ->range(0, 1);
     $query->isNull('t.' . $column_name);
-    $result = $query->execute()->fetchAssoc();
+    $result = $query->execute(new CacheableMetadata())->fetchAssoc();
     return (bool) $result;
   }
 
@@ -2471,7 +2472,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       !$this->database->select($table_name)
         ->countQuery()
         ->range(0, 1)
-        ->execute()
+        ->execute(new CacheableMetadata())
         ->fetchField();
   }
 

@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Config\Entity;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigNameException;
 use Drupal\Core\Entity\EntityStorageInterface;
 
@@ -106,7 +107,7 @@ abstract class ConfigEntityBundleBase extends ConfigEntityBase {
     $storage = $this->entityTypeManager()->getStorage($entity_type_id);
     $ids = $storage->getQuery()
       ->condition('id', $this->getEntityType()->getBundleOf() . '.' . $this->getOriginalId() . '.', 'STARTS_WITH')
-      ->execute();
+      ->execute(new CacheableMetadata());
     if ($ids) {
       $storage = $this->entityTypeManager()->getStorage($entity_type_id);
       return $storage->loadMultiple($ids);

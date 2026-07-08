@@ -684,7 +684,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
     return (bool) $this->getQuery()
       ->accessCheck(FALSE)
       ->range(0, 1)
-      ->execute();
+      ->execute(new CacheableMetadata());
   }
 
   /**

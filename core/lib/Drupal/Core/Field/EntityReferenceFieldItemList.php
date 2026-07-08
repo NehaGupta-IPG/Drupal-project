@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Field;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -75,7 +76,7 @@ class EntityReferenceFieldItemList extends FieldItemList implements EntityRefere
         $entity_ids = \Drupal::entityQuery($target_type)
           ->accessCheck(TRUE)
           ->condition('uuid', $uuids, 'IN')
-          ->execute();
+          ->execute(new CacheableMetadata());
         $entities = \Drupal::entityTypeManager()
           ->getStorage($target_type)
           ->loadMultiple($entity_ids);

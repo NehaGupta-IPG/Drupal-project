@@ -4,6 +4,7 @@ namespace Drupal\Core\Batch;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Access\CsrfTokenGenerator;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -49,7 +50,7 @@ class BatchStorage implements BatchStorageInterface {
         ->fields('b', ['batch'])
         ->condition('bid', $id)
         ->condition('token', $this->csrfToken->get($id))
-        ->execute()
+        ->execute(new CacheableMetadata())
         ->fetchField();
     }
     catch (\Exception $e) {

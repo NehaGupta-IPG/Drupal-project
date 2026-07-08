@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Test;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\ConnectionNotDefinedException;
@@ -114,7 +115,7 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
       ->condition('test_id', $test_run->id())
       ->orderBy('test_class')
       ->orderBy('message_id')
-      ->execute()
+      ->execute(new CacheableMetadata())
       ->fetchAll();
   }
 
@@ -137,7 +138,7 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
     $select->addField('st_tid', 'last_prefix', 'db_prefix');
     $select->addField('st', 'test_class');
 
-    return $select->execute()->fetchAssoc();
+    return $select->execute(new CacheableMetadata())->fetchAssoc();
   }
 
   /**
