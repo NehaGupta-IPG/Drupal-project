@@ -134,12 +134,10 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
     }
     $cache = $this->cache->get(static::CACHE_PREFIX . $this->loadedSuffix);
     if ($cache && $hash = $cache->data) {
-      // Match the compiled container names only. This excludes sibling files
-      // such as the '.php.lock' files created by locking storage backends.
-      $pattern = '/^DrupalContainer_[0-9a-f]+$/';
+      // Delete every container except the one currently in use.
       $keep = 'DrupalContainer_' . $hash;
       foreach ($this->phpStorage->listAll() as $name) {
-        if ($name !== $keep && preg_match($pattern, $name) === 1) {
+        if ($name !== $keep) {
           $this->phpStorage->delete($name);
         }
       }
