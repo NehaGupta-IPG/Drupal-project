@@ -60,11 +60,18 @@ class InstallCommand extends Command {
       ->addOption('langcode', NULL, InputOption::VALUE_OPTIONAL, 'The language to install the site in.', 'en')
       ->addOption('password', NULL, InputOption::VALUE_OPTIONAL, 'The password to use for the site. Defaults to random password.')
       ->addOption('site-name', NULL, InputOption::VALUE_OPTIONAL, 'Set the site name.', 'Drupal')
-      ->addOption('db-url', NULL, InputOption::VALUE_REQUIRED, 'Sets the database URL.', 'sqlite://sites/default/files/.sqlite')
-      ->addUsage('demo_umami --langcode fr')
-      ->addUsage('standard --site-name QuickInstall')
-      ->addUsage('core/recipes/standard --site-name RecipeBuiltSite')
-      ->addUsage('standard --db-url mysql://db:db@db:3306/db --site-name "My Awesome Web Site"');
+      ->addOption('db-url', NULL, InputOption::VALUE_OPTIONAL, 'Sets the database URL. If not provided, Drupal will try to install via an existing settings.php file.', NULL, [
+        'mysql://database_user:database_password@database_host:3306/database_name',
+        'sqlite://sites/default/files/.sqlite',
+        'pgsql://database_user:database_password@database_host:5432/database_name',
+        // The database URL for the recommended local development environment.
+        'mysql://db:db@db/db',
+      ])
+      ->addUsage('demo_umami --langcode fr --db-url pgsql://pg_user:pg_password@database_host:5432/database_name')
+      ->addUsage('standard --site-name QuickInstall --db-url sqlite://sites/default/files/.sqlite')
+      ->addUsage('core/recipes/standard --site-name RecipeBuiltSite --db-url mysq://mysql_user:mysql_password@localhost/database_name')
+      ->addUsage('standard --db-url mysql://db:db@db:3306/db --site-name "My Awesome Web Site"')
+      ->addUsage('standard --site-name "My Preconfigured Database Site"');
 
     parent::configure();
   }
@@ -82,8 +89,16 @@ class InstallCommand extends Command {
     if ($this->isDrupalInstalled()) {
       // Do not fail if the site is already installed so this command can be
       // chained with ServerCommand.
-      $output->writeln('<info>Drupal is already installed.</info> If you want to reinstall, remove sites/default/files and sites/default/settings.php.');
-      return 0;
+      $output->writeln('<info>Drupal is already installed.</info> If you want to reinstall, you must empty your existing database, and remove sites/default/files and sites/default/settings.php.');
+      return Command::SUCCESS;
+    }
+
+    $existing_connections = Database::getConnectionInfo();
+    if ($existing_connections && $input->getOption('db-url')) {
+      // Fail if the site is already installed and the user has explicitly
+      // provided a database URL.
+      $io->error('A database connection has already been configured. If you want to install with this database URL, remove sites/default/files and sites/default/settings.php, or re-run this command without the db-url option.');
+      return Command::FAILURE;
     }
 
     $install_profile_or_recipe = $input->getArgument('install-profile-or-recipe');
@@ -122,7 +137,13 @@ class InstallCommand extends Command {
       return 1;
     }
 
-    $connection_info = Connection::createConnectionOptionsFromUrl($input->getOption('db-url'));
+    if ($input->getOption('db-url')) {
+      $connection_info = Connection::createConnectionOptionsFromUrl($input->getOption('db-url'));
+    }
+    else {
+      // Try the first existing connection.
+      $connection_info = $existing_connections['default'];
+    }
 
     return $this->install($this->classLoader, $io, $install_profile ?? '', $input->getOption('langcode'), $this->getSitePath(), $input->getOption('site-name'), $recipe ?? '', $input->getOption('password'), $connection_info);
   }
@@ -140,11 +161,13 @@ class InstallCommand extends Command {
       $kernel->setSitePath($this->getSitePath());
       Settings::initialize($kernel->getAppRoot(), $kernel->getSitePath(), $this->classLoader);
       $kernel->boot();
+
+      // Checks for an existing install.
+      return Database::getConnection()->schema()->tableExists('key_value');
     }
     catch (ConnectionNotDefinedException) {
       return FALSE;
     }
-    return !empty(Database::getConnectionInfo());
   }
 
   /**
@@ -178,17 +201,26 @@ class InstallCommand extends Command {
   protected function install($class_loader, SymfonyStyle $io, $profile, $langcode, $site_path, $site_name, string $recipe, #[\SensitiveParameter] ?string $password = NULL, array $connection_options = []) {
     $password ??= Crypt::randomBytesBase64(12);
 
-    $driver_name = $connection_options['driver'];
-    $namespace = NULL;
-    $databaseDriverList = new DatabaseDriverList(DRUPAL_ROOT, 'database_driver', new NullBackend('database_driver'));
-    foreach ($databaseDriverList->getInstallableList() as $driver) {
-      if ($driver->getDriverName() === $driver_name) {
-        $namespace = $driver->getNamespace();
+    if (!isset($connection_options['namespace']) || empty($connection_options['namespace'])) {
+      // A connection from database URL was passed in so the namespace must be
+      // derived from the available database drivers.
+      $driver_name = $connection_options['driver'];
+      $namespace = NULL;
+      $databaseDriverList = new DatabaseDriverList(DRUPAL_ROOT, 'database_driver', new NullBackend('database_driver'));
+      foreach ($databaseDriverList->getInstallableList() as $driver) {
+        if ($driver->getDriverName() === $driver_name) {
+          $namespace = $driver->getNamespace();
+        }
+      }
+
+      if (!$namespace) {
+        $io->error("The namespace for the specified database driver name '{$driver_name}' is not found");
+        return Command::FAILURE;
       }
     }
-
-    if (!$namespace) {
-      $io->error("The namespace for the specified database driver name '{$driver_name}' is not found");
+    else {
+      // Use the namespace from the provided database connection details.
+      $namespace = $connection_options['namespace'];
     }
 
     $parameters = [

@@ -72,7 +72,7 @@ class QuickStartCommand {
       '--langcode' => $langcode,
       '--password' => $password,
       '--site-name' => $site_name,
-      '--db-url' => 'sqlite://' . $this->getSitePath() . '/.sqlite',
+      '--db-url' => 'sqlite://sites/' . $this->getSitePath() . '/files/.sqlite',
     ];
 
     $installInput = new ArrayInput($arguments);
