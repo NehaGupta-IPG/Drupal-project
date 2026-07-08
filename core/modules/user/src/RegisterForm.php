@@ -3,6 +3,7 @@
 namespace Drupal\user;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Entity\EntityConstraintViolationListInterface;
 
 /**
  * Form handler for the user register forms.
@@ -46,6 +47,17 @@ class RegisterForm extends AccountForm {
     // Start with the default user account fields.
     $form = parent::form($form, $form_state);
 
+    if (\Drupal::config('user.settings')->get('user_register_two_step')) {
+      // Prepopulate and deactivate mail address.
+      $mail = $account->getEmail();
+      $form['account']['mail']['#default_value'] = $mail;
+      $form['account']['mail']['#disabled'] = TRUE;
+
+      // Prepopulate account name.
+      $username = $account->getAccountName();
+      $form['account']['name']['#default_value'] = $username;
+    }
+
     return $form;
   }
 
@@ -56,6 +68,51 @@ class RegisterForm extends AccountForm {
     $element = parent::actions($form, $form_state);
     $element['submit']['#value'] = $this->t('Create new account');
     return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function flagViolations(EntityConstraintViolationListInterface $violations, array $form, FormStateInterface $form_state): void {
+
+    if (\Drupal::config('user.settings')->get('user_register_silent_mode')) {
+      // Filter name & mail violation
+      // to prevent information disclosure #2346389.
+      $field_names = [
+        'name',
+        'mail',
+      ];
+
+      // Get offsets of violations in list.
+      $offsets = $violations->getFieldNames();
+
+      foreach ($violations->getByFields($field_names) as $violation) {
+        $propertyPath = $violation->getPropertyPath();
+        if (in_array($propertyPath, ['name', 'mail'])) {
+          // Remove violation.
+          $violations->remove(array_search($propertyPath, $offsets));
+        }
+      }
+
+      $count_violations = count($violations->getFieldNames());
+      if (!$form_state->hasAnyErrors() && $count_violations == 0) {
+
+        // Copied from RegisterForm.php#L111.
+        $this->messenger()->addStatus($this->t('A welcome message with further instructions has been sent to your email address.'));
+        $form_state->setRedirect('<front>');
+
+        // Log failed registration.
+        $this->logger('user')->warning('Failed registration for user: %name %email.', ['%name' => $form_state->getValue('name'), '%email' => '<' . $form_state->getValue('mail') . '>']);
+
+        // @todo Use _user_mail_notify() to inform about failed registration, consider flood prevention.
+        // _user_mail_notify();
+        $this->messenger()->addStatus($this->t('Proof of concept: Username or mail address exists - you should get a mail.'));
+        // Reset submit handlers to prevent saving.
+        $form_state->setSubmitHandlers([]);
+      }
+    }
+
+    parent::flagViolations($violations, $form, $form_state);
   }
 
   /**
@@ -111,12 +168,13 @@ class RegisterForm extends AccountForm {
           '%name' => $account->getAccountName(),
         ]));
     }
-    // No email verification required; log in user immediately.
-    elseif (!$admin && !\Drupal::config('user.settings')->get('verify_mail') && $account->isActive()) {
+    // No email verification required or two-step; log in user immediately.
+    elseif (!$admin && (!\Drupal::config('user.settings')->get('verify_mail') || \Drupal::config('user.settings')->get('user_register_two_step')) && $account->isActive()) {
       _user_mail_notify('register_no_approval_required', $account);
       user_login_finalize($account);
       $this->messenger()->addStatus($this->t('Registration successful. You are now logged in.'));
       $form_state->setRedirect('<front>');
+      // @todo Remove data from keyvalue store.
     }
     // No administrator approval required.
     elseif ($account->isActive() || $notify) {

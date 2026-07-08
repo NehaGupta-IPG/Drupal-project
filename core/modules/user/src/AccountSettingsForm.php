@@ -128,6 +128,56 @@ class AccountSettingsForm extends ConfigFormBase {
       '#config_target' => 'user.settings:verify_mail',
       '#description' => $this->t('New users will be required to validate their email address prior to logging into the site, and will be assigned a system-generated password. With this setting disabled, users will be logged in immediately upon registering, and may select their own passwords during registration.'),
     ];
+
+    $form['registration_cancellation']['infotext'] = [
+      '#markup' => '<p><strong>If self registration is enabled you should choose one of the following options or use 3rd party modules or custom code to prevent information disclosure.</strong></p>',
+    ];
+
+    // @todo The states are not working correct - click on and off to disable correctly.
+    $form['registration_cancellation']['user_register_silent_mode'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Show no information about existing mail addresses or usernames while registration.'),
+      '#default_value' => $config->get('user_register_silent_mode'),
+      '#description' => $this->t('If mail address or username are already taken no information will shown but send a mail.'),
+      '#states' => [
+        'enabled' => [
+          [
+            ':input[name="user_register"]' => [
+              ['value' => 'visitors'],
+              'or',
+              ['value' => 'visitors_admin_approval'],
+            ],
+          ],
+          'and',
+          [
+            ':input[name="user_email_verification"]' => ['checked' => FALSE],
+          ],
+        ],
+      ],
+    ];
+
+    $form['registration_cancellation']['user_register_two_step'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enable two step registration to avoid information disclosure.'),
+      '#default_value' => $config->get('user_register_two_step'),
+      '#description' => $this->t('In 1st step user will only enter mail address and consent privacy policy.'),
+      '#states' => [
+        'enabled' => [
+          [
+            ':input[name="user_register"]' => [
+              ['value' => 'visitors'],
+              'or',
+              ['value' => 'visitors_admin_approval'],
+            ],
+          ],
+          'and',
+          [
+            ':input[name="user_email_verification"]' => ['checked' => TRUE],
+          ],
+        ],
+      ],
+    ];
+
     $form['registration_cancellation']['user_password_strength'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Enable password strength indicator'),

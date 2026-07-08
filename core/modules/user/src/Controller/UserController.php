@@ -6,9 +6,11 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Flood\FloodInterface;
 use Drupal\Core\Url;
+use Drupal\user\Entity\User;
 use Drupal\user\Form\UserPasswordResetForm;
 use Drupal\user\OneTimeAuthentication;
 use Drupal\user\UserDataInterface;
@@ -19,6 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Controller routines for user routes.
@@ -171,6 +174,66 @@ class UserController extends ControllerBase {
       'user.reset.form',
       ['uid' => $uid]
     );
+  }
+
+  /**
+   * Controller for register user.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request.
+   * @param string $token
+   *   The token to get the data from keyvalue store..
+   * @param string $hash
+   *   Hash to decrypt the data from keyvalue store..
+   *
+   * @return Drupal\user\Form\PreregisterForm|Drupal\user\RegisterForme
+   *   Return preregister or register form.
+   *
+   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   *   If token not found.
+   */
+  public function registerUser(Request $request, $token = FALSE, $hash = FALSE) {
+
+    $verify_mail = \Drupal::config('user.settings')->get('verify_mail');
+    $register_two_step = \Drupal::config('user.settings')->get('user_register_two_step');
+
+    if ($verify_mail && $register_two_step) {
+
+      if (!$token && !$hash) {
+        $user_form = \Drupal::formBuilder()->getForm('Drupal\user\Form\PreregisterForm');
+      }
+      else {
+        // @todo Decrypt data with hash.
+        $data = \Drupal::service('keyvalue.expirable')->get('user')->get($token);
+        if (!$data) {
+          throw new NotFoundHttpException();
+        }
+
+        $lang = \Drupal::languageManager()->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
+        $mail = $data['mail'];
+        $username = substr($mail, 0, strrpos($mail, '@'));
+
+        /** @var Drupal\user\UserInterface $entity */
+        $entity = User::create();
+
+        $entity->setEmail($mail);
+        $entity->setUsername($username);
+        $entity->enforceIsNew();
+        $entity->set("init", $mail);
+        $entity->set("langcode", $lang);
+        $entity->set("preferred_langcode", $lang);
+        $entity->set("preferred_admin_langcode", $lang);
+        $entity->activate();
+
+        $user_form = \Drupal::service('entity.form_builder')->getForm($entity, 'register');
+      }
+    }
+    else {
+      $entity = User::create();
+      $user_form = \Drupal::service('entity.form_builder')->getForm($entity, 'register');
+    }
+
+    return $user_form;
   }
 
   /**
