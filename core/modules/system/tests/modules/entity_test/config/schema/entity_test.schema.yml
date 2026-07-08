@@ -49,6 +49,17 @@ entity_test.entity_test_no_id_bundle.*:
       type: string
       label: 'Machine-readable name'
 
+block.settings.entity_test_block:
+  type: block_settings
+  label: 'Entity test block'
+  mapping:
+    entity_type_id:
+      type: string
+      label: 'Entity type ID'
+    entity_id:
+      type: integer
+      label: 'Entity ID'
+
 entity_test.entity_test_bundle_plural_labels.*:
   type: bundle_entity_with_plural_labels
   mapping:

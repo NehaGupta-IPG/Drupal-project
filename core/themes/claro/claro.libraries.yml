@@ -1,10 +1,14 @@
 variables:
+  aggregate_target:
+    css: 'claro'
   version: VERSION
   css:
     base:
       css/base/variables.css: { }
 
 global-styling:
+  aggregate_target:
+    css: claro
   version: VERSION
   css:
     base:
@@ -212,16 +216,6 @@ autocomplete:
   dependencies:
     - core/once
     - claro/claro.jquery.ui
-
-drupal.shortcut:
-  version: VERSION
-  css:
-    # @todo move this to components after
-    #   https://www.drupal.org/project/drupal/issues/3045467 is in.
-    theme:
-      css/components/shortcut.css: {}
-  dependencies:
-    - claro/variables
 
 details-focus:
   js:
