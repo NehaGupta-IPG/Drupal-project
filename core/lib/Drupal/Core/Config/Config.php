@@ -209,11 +209,17 @@ class Config extends StorableConfigBase {
     // conform to the schema.
     if (!$has_trusted_data) {
       if ($this->typedConfigManager->hasConfigSchema($this->name)) {
-        // Ensure that the schema wrapper has the latest data.
-        $this->schemaWrapper = NULL;
-        $this->data = $this->castValue(NULL, $this->data);
-        // Reclaim the memory used by the schema wrapper.
-        $this->schemaWrapper = NULL;
+        if (!$this->typedConfigManager->checkSignature($this->data)) {
+          $schemas = [];
+          // Ensure that the schema wrapper has the latest data.
+          $this->schemaWrapper = NULL;
+          $this->data = $this->castValue(NULL, $this->data, $schemas);
+          // Reclaim the memory used by the schema wrapper.
+          $this->schemaWrapper = NULL;
+          $this->data['_core']['schemas'] = array_unique($schemas);
+          sort($this->data['_core']['schemas']);
+          $this->data['_core']['schema_signature'] = $this->typedConfigManager->signData($this->data);
+        }
       }
       else {
         foreach ($this->data as $key => $value) {

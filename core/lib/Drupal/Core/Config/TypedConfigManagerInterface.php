@@ -87,4 +87,26 @@ interface TypedConfigManagerInterface extends TypedDataManagerInterface {
    */
   public function createFromNameAndData($config_name, array $config_data);
 
+  /**
+   * Checks the schema signature of a config data array.
+   *
+   * @param array $data
+   *   The config data to check.
+   *
+   * @return bool
+   *   TRUE if the signature is valid, FALSE otherwise.
+   */
+  public function checkSignature(array $data): bool;
+
+  /**
+   * Creates a signature for a config data array based on its schema.
+   *
+   * @param array $data
+   *   The config data to sign.
+   *
+   * @return string
+   *   The signature.
+   */
+  public function signData(array $data): string;
+
 }

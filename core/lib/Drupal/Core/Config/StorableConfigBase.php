@@ -212,6 +212,9 @@ abstract class StorableConfigBase extends ConfigBase {
    *   top level mapping will be processed.
    * @param mixed $value
    *   Value to associate with the key.
+   * @param string[] $schemas
+   *   The list of mapping and sequence schemas used to validate and cast the
+   *   value.
    *
    * @return mixed
    *   The value cast to the type indicated in the schema.
@@ -219,7 +222,7 @@ abstract class StorableConfigBase extends ConfigBase {
    * @throws \Drupal\Core\Config\UnsupportedDataTypeConfigException
    *   If the value is unsupported in configuration.
    */
-  protected function castValue($key, $value) {
+  protected function castValue($key, $value, array &$schemas = []) {
     $element = $this->getSchemaWrapper();
     if ($key !== NULL) {
       $element = $element->get($key);
@@ -257,7 +260,12 @@ abstract class StorableConfigBase extends ConfigBase {
       // Recurse into any nested keys.
       foreach ($value as $nested_value_key => $nested_value) {
         $lookup_key = $key ? $key . '.' . $nested_value_key : $nested_value_key;
-        $value[$nested_value_key] = $this->castValue($lookup_key, $nested_value);
+        $value[$nested_value_key] = $this->castValue($lookup_key, $nested_value, $schemas);
+      }
+
+      $data_type = $element->getDataDefinition()->getDataType();
+      if ($data_type !== 'mapping' && $data_type !== 'sequence') {
+        $schemas[] = $data_type;
       }
 
       // Only sort maps when we have more than 1 element to sort.

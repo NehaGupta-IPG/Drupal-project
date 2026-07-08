@@ -431,4 +431,32 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     return $this->create($data_definition, $config_data, $config_name);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function checkSignature(array $data): bool {
+    if (!isset($data['_core']['schemas'], $data['_core']['schema_signature'])) {
+      return FALSE;
+    }
+    $signature = $data['_core']['schema_signature'];
+    return $signature === $this->signData($data);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function signData(array $data): string {
+    if (!isset($data['_core']['schemas'])) {
+      throw new \LogicException();
+    }
+    $key = '';
+    foreach ($data['_core']['schemas'] as $schema) {
+      // @todo we can create a signing key for each schema when we build rather
+      //   than at runtime.
+      $key = hash('xxh128', serialize($this->getDefinition($schema)) . $key);
+    }
+    unset($data['_core']['schema_signature']);
+    return hash('xxh128', serialize($data) . $key);
+  }
+
 }
