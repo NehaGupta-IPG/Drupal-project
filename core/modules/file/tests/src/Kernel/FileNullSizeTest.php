@@ -11,7 +11,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests various behaviours for null sized files.
+ * Tests various behaviors for null sized files.
  */
 #[Group('file')]
 #[RunTestsInSeparateProcesses]
@@ -43,7 +43,7 @@ class FileNullSizeTest extends FieldKernelTestBase {
   }
 
   /**
-   * Tests behaviour of null files in ByteSizeMarkup.
+   * Tests behavior of null files in ByteSizeMarkup.
    */
   public function testByteSizeMarkup(): void {
     $this->expectException(\TypeError::class);
