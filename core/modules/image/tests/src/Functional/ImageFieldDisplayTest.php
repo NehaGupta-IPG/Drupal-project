@@ -642,7 +642,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
           "fields[$field_name][region]" => 'content',
         ];
       }
-      $this->drupalGet("admin/structure/types/manage/{$type_name}/display");
+      $this->drupalGet("admin/structure/types/manage/{$type_name}/display/default");
       $this->submitForm($edit, 'Save');
       $this->drupalGet('node/' . $node->id());
       // Verify that the field label is hidden when no image is attached.
