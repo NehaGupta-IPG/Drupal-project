@@ -2,6 +2,7 @@
 
 namespace Drupal\field\Hook;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\field\EntityDisplayRebuilder;
@@ -181,7 +182,7 @@ class FieldHooks {
     if (\Drupal::entityTypeManager()->getStorage($entity_type->id()) instanceof DynamicallyFieldableEntityStorageInterface) {
       // Query by filtering on the ID as this is more efficient than filtering
       // on the entity_type property directly.
-      $ids = \Drupal::entityQuery('field_storage_config')->condition('id', $entity_type->id() . '.', 'STARTS_WITH')->execute();
+      $ids = \Drupal::entityQuery('field_storage_config')->condition('id', $entity_type->id() . '.', 'STARTS_WITH')->execute(new CacheableMetadata());
       // Fetch all fields and key them by field name.
       $field_storages = FieldStorageConfig::loadMultiple($ids);
       $result = [];
