@@ -220,9 +220,8 @@ class QuickStartTest extends BuildTestBase {
   /**
    * Tests installing when a database connection is already configured.
    *
-   * Tooling such as ddev configures a database connection in settings.php
-   * before Drupal is installed. The install command must proceed in that case
-   * rather than reporting that Drupal is already installed.
+   * The install command should proceed when a database connection is defined
+   * but the database does not contain a Drupal installation.
    */
   public function testInstallWithConfiguredButUninstalledDatabase(): void {
     $sqlite = (new \PDO('sqlite::memory:'))->query('select sqlite_version()')->fetch()[0];
