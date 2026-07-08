@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\content_translation\Functional;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\comment\CommentingStatus;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\content_translation\Hook\ContentTranslationFormLanguageHooks;
@@ -140,6 +141,7 @@ class ContentTranslationSettingsTest extends BrowserTestBase {
     ];
     $this->assertSettings('comment', 'comment_article', TRUE, $edit);
     $entity_field_manager = \Drupal::service('entity_field.manager');
+    $entity_field_manager->clearCachedFieldDefinitions();
     $definition = $entity_field_manager->getFieldDefinitions('comment', 'comment_article')['comment_body'];
     $this->assertTrue($definition->isTranslatable(), 'Article comment body is translatable.');
     $definition = $entity_field_manager->getFieldDefinitions('comment', 'comment_article')['subject'];
@@ -244,7 +246,7 @@ class ContentTranslationSettingsTest extends BrowserTestBase {
       'zxx',
     ];
     $options = $this->assertSession()->selectExists('edit-settings-node-article-settings-language-langcode')->findAll('css', 'option');
-    $options = array_map(function ($item) {
+    $options = array_map(function (NodeElement $item) {
       return $item->getValue();
     }, $options);
     $this->assertSame($expected_elements, $options);
