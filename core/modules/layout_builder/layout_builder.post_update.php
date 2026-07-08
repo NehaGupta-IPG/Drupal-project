@@ -5,6 +5,7 @@
  * Post update functions for Layout Builder.
  */
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
@@ -97,7 +98,7 @@ function _layout_builder_add_translation_field($entity_type_id, $bundle): void {
 /**
  * Adds the layout translation settings field.
  */
-function layout_builder_post_update_update_block_revisions(array &$sandbox) {
+function layout_builder_post_update_update_block_revisions(array &$sandbox): ?TranslatableMarkup {
   if (!isset($sandbox['progress'])) {
     // Count all nodes with layout translations.
     $count = \Drupal::entityTypeManager()
@@ -113,7 +114,7 @@ function layout_builder_post_update_update_block_revisions(array &$sandbox) {
 
     if (empty($sandbox['total_count'])) {
       $sandbox['#finished'] = 1;
-      return;
+      return NULL;
     }
   }
 

@@ -90,7 +90,7 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
   /**
    * Remove all unused inline blocks on save.
    *
-   * Entities that were used in prevision revisions will be removed if not
+   * Entities that were used in previous revisions will be removed if not
    * saving a new revision.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
@@ -169,6 +169,9 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
     }
 
     $duplicate_blocks = FALSE;
+    $block_revision_id = NULL;
+    $section_component = NULL;
+
     if ($sections = $this->getEntitySections($entity)) {
       if ($this->originalEntityUsesDefaultStorage($entity)) {
         // This is a new override from a default and the blocks need to be
@@ -186,6 +189,7 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
           if (isset($translated_component_configuration['block_serialized'])) {
             $this->saveTranslatedInlineBlock($entity, $component->getUuid(), $translated_component_configuration, $new_revision);
             if ($new_revision) {
+              $section_component = $component;
               $block_revision_id = $section_storage->getTranslatedComponentConfiguration($component->getUuid())['block_revision_id'];
             }
           }
@@ -193,19 +197,21 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
         else {
           $this->saveInlineBlockComponent($entity, $component, $new_revision, $duplicate_blocks);
           if ($new_revision) {
+            $section_component = $component;
             $block_revision_id = $component->get('configuration')['block_revision_id'];
           }
         }
       }
     }
+
     $this->removeUnusedForEntityOnSave($entity);
 
     // If a new block revision was created, update all translations of the
     // layout to reference the new block revision ID. This ensures that if a
-    // non-translatable field is updated in one language, it will be visible in
-    // all translations.
+    // non-translatable field is updated in one language, it will be
+    // visible in all translations.
     if (!empty($block_revision_id) && $entity->isDefaultRevision()) {
-      $this->setBlockRevisionForAllTranslations($entity, $component, $block_revision_id);
+      $this->setBlockRevisionForAllTranslations($entity, $section_component, $block_revision_id);
     }
   }
 
