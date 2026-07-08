@@ -1197,9 +1197,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    *   The sanitized list of entity key values.
    */
   protected function cleanIds(array $ids, $entity_key = 'id') {
-    $definitions = $this->entityFieldManager->getActiveFieldStorageDefinitions($this->entityTypeId);
-    $field_name = $this->entityType->getKey($entity_key);
-    if ($field_name && $definitions[$field_name]->getType() == 'integer') {
+    if ($entity_key === 'revision' || $this->entityType->hasIntegerId()) {
       $ids = array_filter($ids, function ($id) {
         return is_numeric($id) && $id == (int) $id;
       });
@@ -1308,17 +1306,18 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       return;
     }
     $items = [];
-    $cache_tags = ['entity_field_info'];
     foreach ($entities as $entity) {
       // When an entity is cleared from the entity cache via ::resetCache()
       // we must clear the related revisions from the revision cache, as well.
       // To make this possible, we add a tag with the entity's ID to the
       // revision's cache entry.
       // @see \Drupal\Core\Entity\ContentEntityStorageBase::resetCache()
-      $cache_tags[] = "{$this->entityTypeId}:{$entity->id()}:revisions";
       $items[$this->buildRevisionCacheId($entity->getRevisionId())] = [
         'data' => $entity,
-        'tags' => $cache_tags,
+        'tags' => [
+          'entity_field_info',
+          "{$this->entityTypeId}:{$entity->id()}:revisions",
+        ],
       ];
     }
     $this->cacheBackend->setMultiple($items);
@@ -1481,25 +1480,6 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
   }
 
   /**
-   * Warns about deprecated/removed properties.
-   *
-   * @param string $name
-   *   The property to get the value of.
-   *
-   * @return mixed
-   *   The value of the deprecated/removed $name property.
-   */
-  public function __get(string $name) {
-    if ($name === 'latestRevisionIds') {
-      @trigger_error('Getting the static cache of latest revision IDs is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. You can retrieve it from the \'entity.memory_cache\' service instead. See https://www.drupal.org/node/3535160', E_USER_DEPRECATED);
-      return [];
-    }
-
-    trigger_error('Undefined property ' . __CLASS__ . "::\${$name}", E_USER_WARNING);
-    return NULL;
-  }
-
-  /**
    * Resets the static and persistent revision caches.
    *
    * @param int[] $revision_ids
@@ -1517,6 +1497,34 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     if ($this->entityType->isPersistentlyCacheable()) {
       $this->cacheBackend->deleteMultiple($cache_ids);
     }
+  }
+
+  /**
+   * Assembles a partial entity structure with initial IDs.
+   *
+   * @param array{entity_id: int|string, revision_id?: int|string, bundle?: string} $entity_identifiers
+   *   Array with the following keys:
+   *   - entity_id (required),
+   *   - revision_id (optional),
+   *   - bundle (optional).
+   *
+   * @return \Drupal\Core\Entity\ContentEntityInterface
+   *   An entity object, initialized with the provided IDs.
+   *
+   * @internal
+   */
+  public function createEntityFromIds(array $entity_identifiers): ContentEntityInterface {
+    $id_properties = [];
+    if ($id_key = $this->entityType->getKey('id')) {
+      $id_properties[$id_key] = $entity_identifiers['entity_id'];
+    }
+    if (isset($entity_identifiers['revision_id']) && $revision_key = $this->entityType->getKey('revision')) {
+      $id_properties[$revision_key] = $entity_identifiers['revision_id'];
+    }
+    if (isset($entity_identifiers['bundle']) && $bundle_key = $this->entityType->getKey('bundle')) {
+      $id_properties[$bundle_key] = $entity_identifiers['bundle'];
+    }
+    return $this->create($id_properties);
   }
 
 }

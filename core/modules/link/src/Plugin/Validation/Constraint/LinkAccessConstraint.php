@@ -15,11 +15,13 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class LinkAccessConstraint extends SymfonyConstraint {
 
-  /**
-   * The error message.
-   *
-   * @var string
-   */
-  public $message = "The path '@uri' is inaccessible.";
+  public function __construct(
+    mixed $options = NULL,
+    public string $message = "The path '@uri' is inaccessible.",
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct($options, $groups, $payload);
+  }
 
 }

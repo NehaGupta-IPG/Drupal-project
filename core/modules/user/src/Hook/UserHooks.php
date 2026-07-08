@@ -264,7 +264,7 @@ class UserHooks {
         ],
         'plugin' => 'user_add_role_action',
       ]);
-      $action->trustData()->save();
+      $action->save();
     }
     $remove_id = 'user_remove_role_action.' . $role->id();
     if (!Action::load($remove_id)) {
@@ -279,7 +279,7 @@ class UserHooks {
         ],
         'plugin' => 'user_remove_role_action',
       ]);
-      $action->trustData()->save();
+      $action->save();
     }
   }
 
@@ -301,16 +301,6 @@ class UserHooks {
     $actions = Action::loadMultiple(['user_add_role_action.' . $role->id(), 'user_remove_role_action.' . $role->id()]);
     foreach ($actions as $action) {
       $action->delete();
-    }
-  }
-
-  /**
-   * Implements hook_element_info_alter().
-   */
-  #[Hook('element_info_alter')]
-  public function elementInfoAlter(array &$types): void {
-    if (isset($types['password_confirm'])) {
-      $types['password_confirm']['#process'][] = 'user_form_process_password_confirm';
     }
   }
 

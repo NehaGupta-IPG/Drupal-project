@@ -5,6 +5,8 @@ package: Core
 version: VERSION
 base theme: false
 hidden: true
+lifecycle: deprecated
+lifecycle_link: https://www.drupal.org/node/3223395#s-stable-9
 
 libraries-override:
   block/drupal.block.admin:
@@ -204,11 +206,6 @@ libraries-override:
       theme:
         css/menu_ui.admin.css: css/menu_ui/menu_ui.admin.css
 
-  migrate_drupal_ui/base:
-    css:
-      component:
-        css/components/upgrade-analysis-report-tables.css: css/migrate_drupal_ui/components/upgrade-analysis-report-tables.css
-
   navigation/admin-reset-styles:
     css:
       base:
@@ -224,18 +221,10 @@ libraries-override:
       base:
         css/base/layout-builder.css: css/navigation/layout-builder.css
 
-  node/drupal.node:
-    css:
-      layout:
-        css/node.module.css: css/node/node.module.css
   node/drupal.node.preview:
     css:
       theme:
         css/node.preview.css: css/node/node.preview.css
-  node/form:
-    css:
-      layout:
-        css/node.module.css: css/node/node.module.css
   node/drupal.node.admin:
     css:
       theme:

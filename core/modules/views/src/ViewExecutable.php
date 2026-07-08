@@ -505,21 +505,16 @@ class ViewExecutable {
    *   The views data.
    * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
    *   The route provider.
-   * @param \Drupal\views\Plugin\ViewsPluginManager|null $displayPluginManager
+   * @param \Drupal\views\Plugin\ViewsPluginManager $displayPluginManager
    *   The plugin manager for display.
    */
-  public function __construct(ViewEntityInterface $storage, AccountInterface $user, ViewsData $views_data, RouteProviderInterface $route_provider, protected ?ViewsPluginManager $displayPluginManager = NULL) {
+  public function __construct(ViewEntityInterface $storage, AccountInterface $user, ViewsData $views_data, RouteProviderInterface $route_provider, protected ViewsPluginManager $displayPluginManager) {
     // Reference the storage and the executable to each other.
     $this->storage = $storage;
     $this->storage->set('executable', $this);
     $this->user = $user;
     $this->viewsData = $views_data;
     $this->routeProvider = $route_provider;
-    if ($this->displayPluginManager === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $displayPluginManager argument is deprecated in drupal:10.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3410349', E_USER_DEPRECATED);
-      $this->displayPluginManager = \Drupal::service('plugin.manager.views.display');
-    }
-
   }
 
   /**
@@ -548,7 +543,7 @@ class ViewExecutable {
    */
   public function setArguments(array $args) {
     // The array keys of the arguments will be incorrect if set by
-    // views_embed_view() or \Drupal\views\ViewExecutable:preview().
+    // \Drupal\views\ViewExecutable:preview().
     $this->args = array_values($args);
   }
 
@@ -1472,7 +1467,7 @@ class ViewExecutable {
     // Check for already-cached results.
     /** @var \Drupal\views\Plugin\views\cache\CachePluginBase $cache */
     if (!empty($this->live_preview)) {
-      $cache = Views::pluginManager('cache')->createInstance('none');
+      $cache = \Drupal::service('plugin.manager.views.cache')->createInstance('none');
     }
     else {
       $cache = $this->display_handler->getPlugin('cache');
@@ -1537,7 +1532,7 @@ class ViewExecutable {
     // Check for already-cached output.
     /** @var \Drupal\views\Plugin\views\cache\CachePluginBase $cache */
     if (!empty($this->live_preview)) {
-      $cache = Views::pluginManager('cache')->createInstance('none');
+      $cache = \Drupal::service('plugin.manager.views.cache')->createInstance('none');
     }
     else {
       $cache = $this->display_handler->getPlugin('cache');
@@ -1699,7 +1694,7 @@ class ViewExecutable {
    * This function does not do any access checks on the view. It is the
    * responsibility of the caller to check $view->access() or implement other
    * access logic. To render the view normally with access checks, use
-   * views_embed_view() instead.
+   * '#type' => 'view' render elements instead.
    *
    * @return array|null
    *   A renderable array containing the view output or NULL if the display ID
@@ -1728,8 +1723,10 @@ class ViewExecutable {
    *   An array of arguments from the URL that can be used by the view.
    */
   public function preExecute($args = []) {
-    $this->old_view[] = views_get_current_view();
-    views_set_current_view($this);
+    // @todo remove when views_set|get_current_view is removed.
+    // https://www.drupal.org/project/drupal/issues/3572671
+    $this->old_view[] = $GLOBALS['_current_view'] ?? NULL;
+    $GLOBALS['_current_view'] = $this;
     $display_id = $this->current_display;
 
     // Prepare the view with the information we have, but only if we were
@@ -1759,7 +1756,9 @@ class ViewExecutable {
       $old_view = array_pop($this->old_view);
     }
 
-    views_set_current_view($old_view ?? FALSE);
+    // @todo remove when views_set|get_current_view is removed.
+    // https://www.drupal.org/project/drupal/issues/3572671
+    $GLOBALS['_current_view'] = $old_view ?? FALSE;
   }
 
   /**

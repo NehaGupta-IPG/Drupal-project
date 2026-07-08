@@ -431,6 +431,7 @@ slatkin
 smacss
 smalldatetime
 smtps
+spaze
 squaresmall
 squiz
 squizlabs

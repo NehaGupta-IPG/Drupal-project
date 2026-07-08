@@ -21,21 +21,13 @@ use PHPUnit\Framework\Attributes\Group;
 class ConfigEntityTypeTest extends UnitTestCase {
 
   /**
-   * The mocked typed config manager.
-   *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface|\PHPUnit\Framework\MockObject\MockObject
-   */
-  protected $typedConfigManager;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
 
-    $this->typedConfigManager = $this->createMock(TypedConfigManagerInterface::class);
     $container = new ContainerBuilder();
-    $container->set('config.typed', $this->typedConfigManager);
+    $container->set('config.typed', $this->createStub(TypedConfigManagerInterface::class));
     \Drupal::setContainer($container);
   }
 
@@ -48,7 +40,7 @@ class ConfigEntityTypeTest extends UnitTestCase {
    * @return \Drupal\Core\Config\Entity\ConfigEntityTypeInterface
    *   The ConfigEntityType object.
    */
-  protected function setUpConfigEntityType($definition): ConfigEntityType {
+  protected function setUpConfigEntityType(array $definition): ConfigEntityType {
     if (!isset($definition['id'])) {
       $definition += [
         'id' => 'example_config_entity_type',
@@ -138,7 +130,7 @@ class ConfigEntityTypeTest extends UnitTestCase {
    * Tests the getConfigPrefix() method.
    */
   #[DataProvider('providerTestGetConfigPrefix')]
-  public function testGetConfigPrefix($definition, $expected): void {
+  public function testGetConfigPrefix(array $definition, string $expected): void {
     $entity_type = $this->setUpConfigEntityType($definition);
     $this->assertSame($expected, $entity_type->getConfigPrefix());
   }
@@ -212,6 +204,18 @@ class ConfigEntityTypeTest extends UnitTestCase {
       'id' => 'example_config_entity_type',
     ]);
     $this->assertNull($config_entity_type->getPropertiesToExport());
+  }
+
+  /**
+   * Tests get ConfigEntityType::hasIntegerId() method.
+   *
+   * @legacy-covers ::hasIntegerId
+   */
+  public function testHasIntegerId(): void {
+    $config_entity_type = new ConfigEntityType([
+      'id' => 'example_config_entity_type',
+    ]);
+    $this->assertFalse($config_entity_type->hasIntegerId());
   }
 
 }

@@ -37,21 +37,24 @@ class AjaxPageStateTest extends UnitTestCase {
     $result_request = new Request();
     if ($query_expected) {
       $result_request->query->set('ajax_page_state', ['libraries' => $query_expected]);
+      $result_request->attributes->set('ajax_page_state', ['libraries' => $query_expected]);
     }
     if ($request_expected) {
       $result_request->request->set('ajax_page_state', ['libraries' => $request_expected]);
+      $result_request->attributes->set('ajax_page_state', ['libraries' => $request_expected]);
     }
 
     $kernel = $this->prophesize(HttpKernelInterface::class);
     $kernel->handle($result_request, HttpKernelInterface::MAIN_REQUEST, TRUE)
       ->shouldBeCalled()
-      ->willReturn($this->createMock(Response::class));
+      ->willReturn($this->createStub(Response::class));
     $middleware = new AjaxPageState($kernel->reveal());
     $middleware->handle($request);
 
     // Ensure the modified request matches the expected request.
     $this->assertEquals($request->request->all(), $result_request->request->all());
     $this->assertEquals($request->query->all(), $result_request->query->all());
+    $this->assertEquals($request->attributes->all(), $result_request->attributes->all());
   }
 
   /**

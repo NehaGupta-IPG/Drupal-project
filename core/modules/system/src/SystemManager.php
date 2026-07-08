@@ -47,43 +47,6 @@ class SystemManager {
   protected $menuActiveTrail;
 
   /**
-   * A static cache of menu items.
-   *
-   * @var array
-   */
-  protected $menuItems;
-
-  /**
-   * Requirement severity -- Requirement successfully met.
-   *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
-   *    \Drupal\Core\Extension\Requirement\RequirementSeverity::OK instead.
-   *
-   * @see https://www.drupal.org/node/3410939
-   */
-  const REQUIREMENT_OK = 0;
-
-  /**
-   * Requirement severity -- Warning condition; proceed but flag warning.
-   *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
-   *   \Drupal\Core\Extension\Requirement\RequirementSeverity::Warning instead.
-   *
-   * @see https://www.drupal.org/node/3410939
-   */
-  const REQUIREMENT_WARNING = 1;
-
-  /**
-   * Requirement severity -- Error condition; abort installation.
-   *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
-   *  \Drupal\Core\Extension\Requirement\RequirementSeverity::Error instead.
-   *
-   * @see https://www.drupal.org/node/3410939
-   */
-  const REQUIREMENT_ERROR = 2;
-
-  /**
    * Constructs a SystemManager object.
    *
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
@@ -142,27 +105,6 @@ class SystemManager {
     });
 
     return $requirements;
-  }
-
-  /**
-   * Extracts the highest severity from the requirements array.
-   *
-   * @param array $requirements
-   *   An array of requirements, in the same format as is returned by
-   *   hook_requirements().
-   *
-   * @return int
-   *   The highest severity in the array.
-   *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
-   *   \Drupal\Core\Extension\Requirement\RequirementSeverity::getMaxSeverity()
-   *   instead.
-   *
-   * @see https://www.drupal.org/node/3410939
-   */
-  public function getMaxSeverity(&$requirements) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use ' . RequirementSeverity::class . '::maxSeverityFromRequirements() instead. See https://www.drupal.org/node/3410939', \E_USER_DEPRECATED);
-    return RequirementSeverity::maxSeverityFromRequirements($requirements)->value;
   }
 
   /**

@@ -15,9 +15,11 @@ use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Component\Utility\Crypt;
-use Drupal\locale\Hook\LocaleThemeHooks;
+use Drupal\locale\LocaleDefaultOptions;
 use Drupal\locale\LocaleEvent;
 use Drupal\locale\LocaleEvents;
+use Drupal\locale\LocaleFetch;
+use Drupal\locale\LocaleSource;
 
 /**
  * Regular expression pattern used to localize JavaScript strings.
@@ -87,17 +89,6 @@ const LOCALE_TRANSLATION_USE_SOURCE_LOCAL = 'local';
  * will be checked.
  */
 const LOCALE_TRANSLATION_USE_SOURCE_REMOTE_AND_LOCAL = 'remote_and_local';
-
-/**
- * Default location of gettext file on the translation server.
- *
- * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
- *   \Drupal::TRANSLATION_DEFAULT_SERVER_PATTERN instead.
- *
- * @see https://www.drupal.org/node/3488133
- * @see locale_translation_default_translation_server()
- */
-const LOCALE_TRANSLATION_DEFAULT_SERVER_PATTERN = \Drupal::TRANSLATION_DEFAULT_SERVER_PATTERN;
 
 /**
  * The number of seconds the translations status entry should be considered.
@@ -242,8 +233,8 @@ function locale_system_update(array $components): void {
         $module_handler->loadInclude('locale', 'inc', 'locale.fetch');
         // Get translation status of the projects, download and update
         // translations.
-        $options = _locale_translation_default_update_options();
-        $batch = locale_translation_batch_update_build($list, [], $options);
+        $options = LocaleDefaultOptions::updateOptions();
+        $batch = \Drupal::service(LocaleFetch::class)->batchUpdateBuild($list, [], $options);
         batch_set($batch);
       }
     }
@@ -281,7 +272,7 @@ function locale_system_remove($components): void {
     // Only when projects are removed, the translation files and records will be
     // deleted. Not each disabled module will remove a project, e.g., sub
     // modules.
-    $projects = array_keys(locale_translation_get_projects());
+    $projects = array_keys(\Drupal::service('locale.project')->getProjects());
     if ($list = array_intersect($list, $projects)) {
       locale_translation_file_history_delete($list);
 
@@ -377,7 +368,7 @@ function locale_js_translate(array $files = [], $language_interface = NULL) {
  */
 function locale_form_language_admin_add_form_alter_submit($form, FormStateInterface $form_state): void {
   \Drupal::moduleHandler()->loadInclude('locale', 'fetch.inc');
-  $options = _locale_translation_default_update_options();
+  $options = LocaleDefaultOptions::updateOptions();
 
   if ($form_state->isValueEmpty('predefined_langcode') || $form_state->getValue('predefined_langcode') == 'custom') {
     $langcode = $form_state->getValue('langcode');
@@ -388,7 +379,7 @@ function locale_form_language_admin_add_form_alter_submit($form, FormStateInterf
 
   if (\Drupal::config('locale.settings')->get('translation.import_enabled')) {
     // Download and import translations for the newly added language.
-    $batch = locale_translation_batch_update_build([], [$langcode], $options);
+    $batch = \Drupal::service(LocaleFetch::class)->batchUpdateBuild([], [$langcode], $options);
     batch_set($batch);
   }
 
@@ -429,8 +420,14 @@ function locale_is_translatable($langcode) {
  * Clears the translation status when the Interface translations directory
  * changes. Without a translations directory local po files in the directory
  * should be ignored. The old translation status is no longer valid.
+ *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There is no
+ *   replacement.
+ *
+ * @see https://www.drupal.org/node/3571594
  */
 function locale_system_file_system_settings_submit(&$form, FormStateInterface $form_state): void {
+  @trigger_error(__FUNCTION__ . 'is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3571594', E_USER_DEPRECATED);
   if ($form['translation_path']['#default_value'] != $form_state->getValue('translation_path')) {
     locale_translation_clear_status();
   }
@@ -452,7 +449,7 @@ function locale_translation_get_file_history() {
   if (empty($history)) {
     // Get file history from the database.
     $result = \Drupal::database()->select('locale_file')
-      ->fields('locale_file', ['project', 'langcode', 'filename', 'version', 'uri', 'timestamp', 'last_checked'])
+      ->fields('locale_file', ['project', 'langcode', 'filename', 'version', 'uri', 'timestamp', 'hash', 'last_checked'])
       ->execute()
       ->fetchAll();
     foreach ($result as $file) {
@@ -481,6 +478,7 @@ function locale_translation_update_file_history($file) {
     ->fields([
       'version' => $file->version,
       'timestamp' => $file->timestamp,
+      'hash' => $file->hash ?? '',
       'last_checked' => $file->last_checked,
     ])
     ->execute();
@@ -518,8 +516,7 @@ function locale_translation_file_history_delete($projects = [], $langcodes = [])
 function locale_translation_get_status($projects = NULL, $langcodes = NULL): array {
   $result = [];
   $status = \Drupal::keyValue('locale.translation_status')->getAll();
-  \Drupal::moduleHandler()->loadInclude('locale', 'inc', 'locale.translation');
-  $projects = $projects ?: array_keys(locale_translation_get_projects());
+  $projects = $projects ?: array_keys(\Drupal::service('locale.project')->getProjects());
   $langcodes = $langcodes ?: array_keys(locale_translatable_language_list());
 
   // Get the translation status of each project-language combination. If no
@@ -530,7 +527,7 @@ function locale_translation_get_status($projects = NULL, $langcodes = NULL): arr
         $result[$project][$langcode] = $status[$project][$langcode];
       }
       else {
-        $sources = locale_translation_build_sources([$project], [$langcode]);
+        $sources = \Drupal::service(LocaleSource::class)->buildSources([$project], [$langcode]);
         if (isset($sources[$project][$langcode])) {
           $result[$project][$langcode] = $sources[$project][$langcode];
         }
@@ -554,12 +551,11 @@ function locale_translation_get_status($projects = NULL, $langcodes = NULL): arr
  */
 function locale_translation_status_save($project, $langcode, $type, $data): void {
   // Load the translation status or build it if not already available.
-  \Drupal::moduleHandler()->loadInclude('locale', 'inc', 'locale.translation');
   $status = locale_translation_get_status([$project]);
   if (empty($status)) {
-    $projects = locale_translation_get_projects([$project]);
+    $projects = \Drupal::service('locale.project')->getProjects([$project]);
     if (isset($projects[$project])) {
-      $status[$project][$langcode] = locale_translation_source_build($projects[$project], $langcode);
+      $status[$project][$langcode] = \Drupal::service(LocaleSource::class)->sourceBuild($projects[$project], $langcode);
     }
   }
 
@@ -568,7 +564,6 @@ function locale_translation_status_save($project, $langcode, $type, $data): void
     $request_time = \Drupal::time()->getRequestTime();
     switch ($type) {
       case LOCALE_TRANSLATION_REMOTE:
-      case LOCALE_TRANSLATION_LOCAL:
         // Add the source data to the status array.
         $status[$project][$langcode]->files[$type] = $data;
 
@@ -583,9 +578,38 @@ function locale_translation_status_save($project, $langcode, $type, $data): void
         }
         break;
 
+      case LOCALE_TRANSLATION_LOCAL:
+        // Add the source data to the status array.
+        $status[$project][$langcode]->files[$type] = $data;
+
+        // Determine if the translation source has changed by comparing by
+        // content hash (mtime is unreliable).
+        $current_hash = $status[$project][$langcode]->hash ?? '';
+        if (!empty($current_hash)) {
+          if ($data->hash !== $current_hash) {
+            $status[$project][$langcode]->timestamp = $data->timestamp;
+            $status[$project][$langcode]->last_checked = $request_time;
+            $status[$project][$langcode]->type = $type;
+            $status[$project][$langcode]->hash = $data->hash;
+          }
+        }
+        // For legacy rows (pre-hash column being added), fall back to timestamp
+        // comparison. This may trigger a one-time re-import, after which a hash
+        // is stored and used for all future comparisons.
+        elseif (isset($data->timestamp) && $data->timestamp) {
+          if ($data->timestamp > $status[$project][$langcode]->timestamp) {
+            $status[$project][$langcode]->timestamp = $data->timestamp;
+            $status[$project][$langcode]->last_checked = $request_time;
+            $status[$project][$langcode]->type = $type;
+            $status[$project][$langcode]->hash = $data->hash;
+          }
+        }
+        break;
+
       case LOCALE_TRANSLATION_CURRENT:
         $data->last_checked = $request_time;
         $status[$project][$langcode]->timestamp = $data->timestamp;
+        $status[$project][$langcode]->hash = $data->hash ?? '';
         $status[$project][$langcode]->last_checked = $data->last_checked;
         $status[$project][$langcode]->type = $type;
         locale_translation_update_file_history($data);
@@ -686,7 +710,60 @@ function locale_string_is_safe($string) {
   //   string. https://www.drupal.org/node/2372127
   $string = preg_replace('/\[[a-z0-9_-]+(:[a-z0-9_-]+)+\]/i', '', $string);
 
-  return Html::decodeEntities($string) == Html::decodeEntities(Xss::filter($string, ['a', 'abbr', 'acronym', 'address', 'b', 'bdo', 'big', 'blockquote', 'br', 'caption', 'cite', 'code', 'col', 'colgroup', 'dd', 'del', 'dfn', 'dl', 'dt', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'i', 'ins', 'kbd', 'li', 'ol', 'p', 'pre', 'q', 'samp', 'small', 'span', 'strong', 'sub', 'sup', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'tt', 'ul', 'var', 'wbr']));
+  return Html::decodeEntities($string) == Html::decodeEntities(Xss::filter($string, [
+    'a',
+    'abbr',
+    'acronym',
+    'address',
+    'b',
+    'bdo',
+    'big',
+    'blockquote',
+    'br',
+    'caption',
+    'cite',
+    'code',
+    'col',
+    'colgroup',
+    'dd',
+    'del',
+    'dfn',
+    'dl',
+    'dt',
+    'em',
+    'h1',
+    'h2',
+    'h3',
+    'h4',
+    'h5',
+    'h6',
+    'hr',
+    'i',
+    'ins',
+    'kbd',
+    'li',
+    'ol',
+    'p',
+    'pre',
+    'q',
+    'samp',
+    'small',
+    'span',
+    'strong',
+    'sub',
+    'sup',
+    'table',
+    'tbody',
+    'td',
+    'tfoot',
+    'th',
+    'thead',
+    'tr',
+    'tt',
+    'ul',
+    'var',
+    'wbr',
+  ]));
 }
 
 /**
@@ -1040,50 +1117,4 @@ function locale_translation_language_table($form_element) {
     }
   }
   return $form_element;
-}
-
-/**
- * Prepares variables for translation status information templates.
- *
- * Translation status information is displayed per language.
- *
- * Default template: locale-translate-edit-form-strings.html.twig.
- *
- * @param array $variables
- *   An associative array containing:
- *   - updates: The projects which have updates.
- *   - not_found: The projects which updates are not found.
- *
- * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial
- *   template_preprocess functions are registered directly in hook_theme().
- *
- * @see https://www.drupal.org/node/3504125
- */
-function template_preprocess_locale_translation_update_info(array &$variables): void {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
-  \Drupal::service(LocaleThemeHooks::class)->preprocessLocaleTranslationUpdateInfo($variables);
-}
-
-/**
- * Prepares variables for most recent translation update templates.
- *
- * Displays the last time we checked for locale update data. In addition to
- * properly formatting the given timestamp, this function also provides a "Check
- * manually" link that refreshes the available update and redirects back to the
- * same page.
- *
- * Default template: locale-translation-last-check.html.twig.
- *
- * @param array $variables
- *   An associative array containing:
- *   - last: The timestamp when the site last checked for available updates.
- *
- * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial
- *   template_preprocess functions are registered directly in hook_theme().
- *
- * @see https://www.drupal.org/node/3504125
- */
-function template_preprocess_locale_translation_last_check(array &$variables): void {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
-  \Drupal::service(LocaleThemeHooks::class)->preprocessLocaleTranslationLastCheck($variables);
 }

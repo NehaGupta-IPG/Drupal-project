@@ -38,13 +38,13 @@ class CssCollectionRendererUnitTest extends UnitTestCase {
     parent::setUp();
     $assetQueryString = $this->prophesize(AssetQueryStringInterface::class);
     $file_url_generator = $this->createMock(FileUrlGeneratorInterface::class);
-    $file_url_generator->expects($this->any())
+    $file_url_generator
       ->method('generateString')
       ->with($this->isString())
-      ->willReturnCallback(function ($uri) {
+      ->willReturnCallback(function (string $uri): string {
          return 'generated-relative-url:' . $uri;
       });
-    $assetQueryString->get()->shouldBeCalledOnce()->willReturn('');
+    $assetQueryString->get()->willReturn('');
     $this->renderer = new CssCollectionRenderer($assetQueryString->reveal(), $file_url_generator);
     $this->fileCssGroup = [
       'group' => -100,
@@ -80,7 +80,7 @@ class CssCollectionRendererUnitTest extends UnitTestCase {
    * @see testRender
    */
   public static function providerTestRender(): array {
-    $create_link_element = function ($href, $media = 'all', $custom_attributes = []) {
+    $create_link_element = function ($href, $media = 'all', $custom_attributes = []): array {
       $attributes = [
         'rel' => 'stylesheet',
         'media' => $media,
@@ -93,7 +93,7 @@ class CssCollectionRendererUnitTest extends UnitTestCase {
       ];
     };
 
-    $create_file_css_asset = function ($data, $media = 'all', $preprocess = TRUE) {
+    $create_file_css_asset = function ($data, $media = 'all', $preprocess = TRUE): array {
       return ['group' => 0, 'type' => 'file', 'media' => $media, 'preprocess' => $preprocess, 'data' => $data];
     };
 

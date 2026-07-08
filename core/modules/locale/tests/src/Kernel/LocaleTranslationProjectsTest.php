@@ -21,13 +21,6 @@ class LocaleTranslationProjectsTest extends KernelTestBase {
   protected static $modules = ['locale', 'locale_test', 'system'];
 
   /**
-   * The module handler used in this test.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
    * The locale project storage used in this test.
    *
    * @var \Drupal\locale\LocaleProjectStorageInterface
@@ -40,28 +33,25 @@ class LocaleTranslationProjectsTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->moduleHandler = $this->container->get('module_handler');
     $this->projectStorage = $this->container->get('locale.project');
     \Drupal::state()->set('locale.remove_core_project', TRUE);
   }
 
   /**
-   * Tests locale_translation_clear_cache_projects().
+   * Tests \Drupal\locale\LocaleProjectStorageInterface::resetCache().
    */
   public function testLocaleTranslationClearCacheProjects(): void {
-    $this->moduleHandler->loadInclude('locale', 'inc', 'locale.translation');
-
     $expected = [];
-    $this->assertSame($expected, locale_translation_get_projects());
+    $this->assertSame($expected, \Drupal::service('locale.project')->getProjects());
 
     $this->projectStorage->set('foo', []);
     $expected['foo'] = new \stdClass();
-    $this->assertEquals($expected, locale_translation_get_projects());
+    $this->assertEquals($expected, \Drupal::service('locale.project')->getProjects());
 
     $this->projectStorage->set('bar', []);
-    locale_translation_clear_cache_projects();
+    \Drupal::service('locale.project')->resetCache();
     $expected['bar'] = new \stdClass();
-    $this->assertEquals($expected, locale_translation_get_projects());
+    $this->assertEquals($expected, \Drupal::service('locale.project')->getProjects());
   }
 
 }

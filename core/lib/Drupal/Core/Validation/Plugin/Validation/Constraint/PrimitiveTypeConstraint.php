@@ -15,11 +15,13 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class PrimitiveTypeConstraint extends SymfonyConstraint {
 
-  /**
-   * The default violation message.
-   *
-   * @var string
-   */
-  public $message = 'This value should be of the correct primitive type.';
+  public function __construct(
+    mixed $options = NULL,
+    public $message = 'This value should be of the correct primitive type.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct($options, $groups, $payload);
+  }
 
 }

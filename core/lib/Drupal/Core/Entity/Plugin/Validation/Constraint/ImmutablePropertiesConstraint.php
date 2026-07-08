@@ -19,18 +19,22 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 class ImmutablePropertiesConstraint extends SymfonyConstraint {
 
   /**
-   * The error message if an immutable property has been changed.
-   *
-   * @var string
-   */
-  public string $message = "The '@name' property cannot be changed.";
-
-  /**
    * The names of the immutable properties.
    *
    * @var string[]
    */
   public array $properties = [];
+
+  public function __construct(
+    mixed $options = NULL,
+    ?array $properties = NULL,
+    public string $message = "The '@name' property cannot be changed.",
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct($options, $groups, $payload);
+    $this->properties = $properties ?? $this->properties;
+  }
 
   /**
    * {@inheritdoc}

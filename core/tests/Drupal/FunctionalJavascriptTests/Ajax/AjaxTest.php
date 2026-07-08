@@ -37,10 +37,10 @@ class AjaxTest extends WebDriverTestBase {
   }
 
   public function testAjaxWithAdminRoute(): void {
-    \Drupal::service('theme_installer')->install(['stable9', 'claro']);
+    \Drupal::service('theme_installer')->install(['stark', 'claro']);
     $theme_config = \Drupal::configFactory()->getEditable('system.theme');
     $theme_config->set('admin', 'claro');
-    $theme_config->set('default', 'stable9');
+    $theme_config->set('default', 'stark');
     $theme_config->save();
 
     $account = $this->drupalCreateUser(['view the administration theme']);
@@ -54,11 +54,11 @@ class AjaxTest extends WebDriverTestBase {
 
     // Now click the modal, which should use the front-end theme.
     $this->drupalGet('ajax-test/dialog');
-    $assert->pageTextNotContains('Current theme: stable9');
+    $assert->pageTextNotContains('Current theme: stark');
     $this->clickLink('Link 8 (ajax)');
     $assert->assertWaitOnAjaxRequest();
 
-    $assert->pageTextContains('Current theme: stable9');
+    $assert->pageTextContains('Current theme: stark');
     $assert->pageTextNotContains('Current theme: claro');
   }
 
@@ -268,7 +268,7 @@ JS;
    */
   protected function assertWaitPageContains(string $expected): void {
     $page = $this->getSession()->getPage();
-    $this->assertTrue($page->waitFor(10, function () use ($page, $expected) {
+    $this->assertTrue($page->waitFor(10, function () use ($page, $expected): bool {
       // Clear content from empty styles and "processed" classes after effect.
       $content = str_replace([' class="processed"', ' processed', ' style=""'], '', $page->getContent());
       return stripos($content, $expected) !== FALSE;

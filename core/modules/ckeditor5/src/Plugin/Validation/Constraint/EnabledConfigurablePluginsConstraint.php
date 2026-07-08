@@ -19,11 +19,13 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class EnabledConfigurablePluginsConstraint extends SymfonyConstraint {
 
-  /**
-   * The default violation message.
-   *
-   * @var string
-   */
-  public $message = 'Configuration for the enabled plugin "%plugin_label" (%plugin_id) is missing.';
+  public function __construct(
+    mixed $options = NULL,
+    public $message = 'Configuration for the enabled plugin "%plugin_label" (%plugin_id) is missing.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct($options, $groups, $payload);
+  }
 
 }

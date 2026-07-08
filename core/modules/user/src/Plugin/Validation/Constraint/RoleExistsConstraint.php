@@ -17,11 +17,13 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class RoleExistsConstraint extends SymfonyConstraint {
 
-  /**
-   * The error message if validation fails.
-   *
-   * @var string
-   */
-  public $message = "The role with id '@rid' does not exist.";
+  public function __construct(
+    mixed $options = NULL,
+    public $message = "The role with id '@rid' does not exist.",
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct($options, $groups, $payload);
+  }
 
 }

@@ -15,12 +15,14 @@ use Drupal\Core\Validation\Attribute\Constraint;
 )]
 class MenuTreeHierarchyConstraint extends CompositeConstraintBase {
 
-  /**
-   * The default violation message.
-   *
-   * @var string
-   */
-  public $message = 'You can only change the hierarchy for the <em>published</em> version of this menu link.';
+  public function __construct(
+    mixed $options = NULL,
+    public $message = 'You can only change the hierarchy for the <em>published</em> version of this menu link.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct($options, $groups, $payload);
+  }
 
   /**
    * {@inheritdoc}

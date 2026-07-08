@@ -14,7 +14,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests the theme UI.
  */
 #[Group('Theme')]
-#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class ThemeUiTest extends BrowserTestBase {
   use InfoWriterTrait;
@@ -205,6 +204,7 @@ class ThemeUiTest extends BrowserTestBase {
   protected function uninstallTheme($theme_name): void {
     $this->drupalGet('admin/appearance');
     $this->clickLink("Uninstall $theme_name theme");
+    $this->submitForm([], 'Uninstall');
     $this->assertSession()->pageTextContains("The $theme_name theme has been uninstalled.");
   }
 

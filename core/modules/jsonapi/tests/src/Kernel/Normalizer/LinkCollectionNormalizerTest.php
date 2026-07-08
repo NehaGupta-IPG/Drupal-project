@@ -40,13 +40,6 @@ class LinkCollectionNormalizerTest extends KernelTestBase {
   protected $serializer;
 
   /**
-   * The subject under test.
-   *
-   * @var \Drupal\jsonapi\Normalizer\LinkCollectionNormalizer
-   */
-  protected $normalizer;
-
-  /**
    * Test users.
    *
    * @var \Drupal\user\UserInterface[]
@@ -129,7 +122,7 @@ class LinkCollectionNormalizerTest extends KernelTestBase {
     assert(isset($edit_form_url));
 
     // Create a link collection to normalize.
-    $mock_resource_object = $this->createMock(ResourceObject::class);
+    $mock_resource_object = $this->createStub(ResourceObject::class);
     $link_collection = new LinkCollection([
       'edit-form' => new Link(new CacheableMetadata(), $edit_form_url, 'edit-form', ['title' => 'Edit']),
     ]);

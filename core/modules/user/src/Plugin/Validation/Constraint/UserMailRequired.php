@@ -29,4 +29,14 @@ class UserMailRequired extends SymfonyConstraint {
    */
   public $message = '@name field is required.';
 
+  public function __construct(
+    mixed $options = NULL,
+    ?string $message = NULL,
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct($options, $groups, $payload);
+    $this->message = $message ?? $this->message;
+  }
+
 }

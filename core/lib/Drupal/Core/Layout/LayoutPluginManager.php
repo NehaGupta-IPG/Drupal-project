@@ -95,7 +95,7 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
     }
 
     if (empty($definition->getLabel())) {
-      @trigger_error('A layout plugin not having a label is deprecated in drupal:11.4.0 and having a label will be enforced in drupal:12.0.0. See https://www.drupal.org/node/3464076', E_USER_DEPRECATED);
+      throw new InvalidPluginDefinitionException($plugin_id, sprintf('The "%s" layout definition must have a label.', $plugin_id));
     }
 
     // Ensure that every plugin has a category.
@@ -213,7 +213,7 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
    * @return \Drupal\Core\Layout\LayoutDefinition[]
    *   An array of plugin definitions, sorted by category and label.
    */
-  public function getSortedDefinitions(?array $definitions = NULL, $label_key = 'label') {
+  public function getSortedDefinitions(?array $definitions = NULL, string $label_key = 'label') {
     // Sort the plugins first by category, then by label.
     $definitions = $definitions ?? $this->getDefinitions();
     uasort($definitions, function (LayoutDefinition $a, LayoutDefinition $b) {
@@ -232,7 +232,7 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
    *   Keys are category names, and values are arrays of which the keys are
    *   plugin IDs and the values are plugin definitions.
    */
-  public function getGroupedDefinitions(?array $definitions = NULL, $label_key = 'label') {
+  public function getGroupedDefinitions(?array $definitions = NULL, string $label_key = 'label') {
     $definitions = $this->getSortedDefinitions($definitions ?? $this->getDefinitions(), $label_key);
     $grouped_definitions = [];
     foreach ($definitions as $id => $definition) {
