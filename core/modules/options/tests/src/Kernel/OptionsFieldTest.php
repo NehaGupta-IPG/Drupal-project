@@ -127,24 +127,19 @@ class OptionsFieldTest extends OptionsFieldUnitTestBase {
     $entity->{$this->fieldName}->value = 1;
     $entity->save();
 
-    // Switching to a function that omits key 1 must be rejected.
-    $this->fieldStorage->setSetting('allowed_values', []);
-    $this->fieldStorage->setSetting('allowed_values_function', OptionsAllowedValues::class . '::allowedValuesExcludingKey1');
-
-    try {
-      $this->fieldStorage->save();
-      $this->fail('Expected FieldStorageDefinitionUpdateForbiddenException was not thrown.');
-    }
-    catch (FieldStorageDefinitionUpdateForbiddenException $e) {
-      $this->assertStringContainsString("A list field 'test_options' with existing data cannot have its keys changed. The keys that would be removed are '1'.", $e->getMessage());
-    }
-
     // Switching to a function that retains key 1 must succeed.
     $this->fieldStorage->setSetting('allowed_values_function', OptionsAllowedValues::class . '::allowedValues');
     $this->fieldStorage->save();
 
     $saved = $this->fieldStorage->getSetting('allowed_values_function');
     $this->assertSame(OptionsAllowedValues::class . '::allowedValues', $saved);
+
+    // Switching to a function that omits key 1 must be rejected.
+    $this->expectException(FieldStorageDefinitionUpdateForbiddenException::class);
+    $this->expectExceptionMessage("A list field 'test_options' with existing data cannot have its keys changed. The keys that would be removed are '1'.");
+    $this->fieldStorage->setSetting('allowed_values', []);
+    $this->fieldStorage->setSetting('allowed_values_function', OptionsAllowedValues::class . '::allowedValuesExcludingKey1');
+    $this->fieldStorage->save();
   }
 
 }
