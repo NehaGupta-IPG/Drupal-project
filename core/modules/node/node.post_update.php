@@ -31,4 +31,3 @@ function node_post_update_plural_variants(array &$sandbox): void {
     return TRUE;
   });
 }
-
