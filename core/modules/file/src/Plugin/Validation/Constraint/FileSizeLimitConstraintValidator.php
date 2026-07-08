@@ -51,7 +51,7 @@ class FileSizeLimitConstraintValidator extends BaseFileConstraintValidator imple
 
     if ($file->isNew() && $fileLimit && $file->getSize() > $fileLimit) {
       $this->context->addViolation($constraint->maxFileSizeMessage, [
-        '%filesize' => ByteSizeMarkup::create($file->getSize()),
+        '%filesize' => $file->getSize() !== NULL ? ByteSizeMarkup::create($file->getSize()) : '',
         '%maxsize' => ByteSizeMarkup::create($fileLimit),
       ]);
     }
@@ -65,7 +65,7 @@ class FileSizeLimitConstraintValidator extends BaseFileConstraintValidator imple
       $spaceUsed = $fileStorage->spaceUsed($this->currentUser->id()) + $file->getSize();
       if ($spaceUsed > $userLimit) {
         $this->context->addViolation($constraint->diskQuotaMessage, [
-          '%filesize' => ByteSizeMarkup::create($file->getSize()),
+          '%filesize' => $file->getSize() !== NULL ? ByteSizeMarkup::create($file->getSize()) : '',
           '%quota' => ByteSizeMarkup::create($userLimit),
         ]);
       }
