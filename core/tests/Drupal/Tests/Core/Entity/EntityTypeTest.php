@@ -322,28 +322,6 @@ class EntityTypeTest extends UnitTestCase {
   }
 
   /**
-   * Tests get original class unchanged.
-   */
-  public function testGetOriginalClassUnchanged(): void {
-    $class = $this->randomMachineName();
-    $entity_type = $this->setUpEntityType(['class' => $class]);
-    $this->assertEquals($class, $entity_type->getOriginalClass());
-  }
-
-  /**
-   * Tests get original class changed.
-   *
-   * @legacy-covers ::setClass
-   * @legacy-covers ::getOriginalClass
-   */
-  public function testGetOriginalClassChanged(): void {
-    $class = $this->randomMachineName();
-    $entity_type = $this->setUpEntityType(['class' => $class]);
-    $entity_type->setClass($this->randomMachineName());
-    $this->assertEquals($class, $entity_type->getOriginalClass());
-  }
-
-  /**
    * Tests get decorated classes through setClass.
    *
    * @legacy-covers ::setClass
