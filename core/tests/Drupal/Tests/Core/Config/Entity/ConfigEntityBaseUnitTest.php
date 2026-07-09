@@ -1034,7 +1034,7 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::addConfigEntityDependency
+   * @legacy-covers ::addConfigEntityDependency
    */
   public function testAddConfigEntityDependency() {
     $values = [
@@ -1042,36 +1042,35 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
       'langcode' => 'en',
       'uuid' => 'c5b9ee60-bea5-4622-b89b-a63319d10b3d',
     ];
-    $foo = $this->getMockForAbstractClass('\Drupal\Core\Config\Entity\ConfigEntityBase', [$values, $this->entityTypeId]);
+    $foo = new SortTestConfigEntityWithWeight($values, $this->entityTypeId);
 
     $storage = $this->createMock(ConfigEntityStorageInterface::class);
-    $storage->expects($this->any())
+    $storage->expects($this->exactly(1))
       ->method('load')
       ->with('foo')
       ->willReturn($foo);
-    $this->entityTypeManager->expects($this->any())
+    $this->entityTypeManager
       ->method('getStorage')
       ->with($this->entityTypeId)
       ->willReturn($storage);
 
     $class = new \ReflectionClass($this->entity);
     $method = $class->getMethod('addConfigEntityDependency');
-    $method->setAccessible(TRUE);
     $method->invokeArgs($this->entity, [$this->entityTypeId, 'foo']);
     $this->assertEquals(['config' => ['test_provider.' . $this->entityTypeId . '.foo']], $this->entity->getDependencies());
   }
 
   /**
-   * @covers ::addConfigEntityDependency
+   * @legacy-covers ::addConfigEntityDependency
    */
   public function testAddConfigEntityDependencyException() {
     $storage = $this->createMock(ConfigEntityStorageInterface::class);
     // Behave as if the dependency does not exist.
-    $storage->expects($this->any())
+    $storage->expects($this->exactly(1))
       ->method('load')
       ->with('bar')
       ->willReturn(NULL);
-    $this->entityTypeManager->expects($this->any())
+    $this->entityTypeManager
       ->method('getStorage')
       ->with($this->entityTypeId)
       ->willReturn($storage);
@@ -1080,7 +1079,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
     $class = new \ReflectionClass($this->entity);
     $method = $class->getMethod('addConfigEntityDependency');
-    $method->setAccessible(TRUE);
     $method->invokeArgs($this->entity, [$this->entityTypeId, 'bar']);
   }
 
