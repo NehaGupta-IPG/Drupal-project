@@ -7,6 +7,7 @@ namespace Drupal\Tests\Core\Menu;
 use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\Context\CacheContextsManager;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -19,6 +20,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\Stub;
+use Prophecy\Argument;
 
 /**
  * Tests the default menu link tree manipulators.
@@ -406,7 +408,14 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
     $query->accessCheck(TRUE)->shouldBeCalled();
     $query->condition('nid', [1, 2, 3, 4], 'IN')->shouldBeCalled();
     $query->condition('status', NodeInterface::PUBLISHED)->shouldBeCalled();
-    $query->execute()->willReturn([1, 2, 4]);
+    $query->execute(Argument::that(function ($cacheability): bool {
+      return $cacheability instanceof RefinableCacheableDependencyInterface);
+    }))->will(function ($args) {
+      /** @var \Drupal\Core\Cache\RefinableCacheableDependencyInterface $cacheability */
+      $cacheability = $args[0];
+      $cacheability->addCacheContexts(['user.node_grants:view']);
+      return [1, 2, 4];
+    });
 
     $storage = $this->createMock(EntityStorageInterface::class);
     $storage->expects($this->once())
