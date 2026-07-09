@@ -161,14 +161,12 @@ class Select extends QuerySelect {
       $savepoint->commitOrRelease();
     }
 
-    if ($cacheableMetadata === NULL) {
-      if (!empty($this->getCacheContexts()) || !empty($this->getCacheTags()) || $this->getCacheMaxAge() !== Cache::PERMANENT) {
-        // @todo Add correct CR number.
-        @trigger_error('Calling ' . __METHOD__ . '() without the $cacheableMetadata argument when the query has cacheable metadata is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/1234567', E_USER_DEPRECATED);
-      }
-    }
-    else {
+    if ($cacheableMetadata !== NULL) {
       $cacheableMetadata->addCacheableDependency($this);
+    }
+    elseif (!empty($this->getCacheContexts()) || !empty($this->getCacheTags()) || $this->getCacheMaxAge() !== Cache::PERMANENT) {
+      // @todo Add correct CR number.
+      @trigger_error('Calling ' . __METHOD__ . '() without the $cacheableMetadata argument when the query has cacheable metadata is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/1234567', E_USER_DEPRECATED);
     }
 
     return $result;
