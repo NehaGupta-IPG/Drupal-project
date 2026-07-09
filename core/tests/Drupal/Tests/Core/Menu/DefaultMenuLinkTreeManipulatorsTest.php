@@ -409,7 +409,7 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
     $query->condition('nid', [1, 2, 3, 4], 'IN')->shouldBeCalled();
     $query->condition('status', NodeInterface::PUBLISHED)->shouldBeCalled();
     $query->execute(Argument::that(function ($cacheability): bool {
-      return $cacheability instanceof RefinableCacheableDependencyInterface);
+      return $cacheability instanceof RefinableCacheableDependencyInterface;
     }))->will(function ($args) {
       /** @var \Drupal\Core\Cache\RefinableCacheableDependencyInterface $cacheability */
       $cacheability = $args[0];
