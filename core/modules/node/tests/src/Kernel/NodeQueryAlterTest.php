@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Kernel;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Database;
 use Drupal\node\NodeAccessRebuild;
 use Drupal\user\UserInterface;
@@ -83,7 +84,7 @@ class NodeQueryAlterTest extends NodeAccessTestBase {
       $query->addMetaData('op', 'view');
       $query->addMetaData('account', $this->accessUser);
 
-      $result = $query->execute()->fetchAll();
+      $result = $query->execute(new CacheableMetadata())->fetchAll();
       $this->assertCount(4, $result, 'User with access can see correct nodes');
     }
     catch (\Exception) {
@@ -101,7 +102,7 @@ class NodeQueryAlterTest extends NodeAccessTestBase {
       $result = $query
         ->accessCheck(TRUE)
         ->allRevisions()
-        ->execute();
+        ->execute(new CacheableMetadata());
 
       $this->assertCount(4, $result, 'User with access can see correct nodes');
     }
@@ -125,7 +126,7 @@ class NodeQueryAlterTest extends NodeAccessTestBase {
       $query->addMetaData('op', 'view');
       $query->addMetaData('account', $this->noAccessUser);
 
-      $result = $query->execute()->fetchAll();
+      $result = $query->execute(new CacheableMetadata())->fetchAll();
       $this->assertCount(0, $result, 'User with no access cannot see nodes');
     }
     catch (\Exception) {
@@ -148,7 +149,7 @@ class NodeQueryAlterTest extends NodeAccessTestBase {
       $query->addMetaData('op', 'update');
       $query->addMetaData('account', $this->accessUser);
 
-      $result = $query->execute()->fetchAll();
+      $result = $query->execute(new CacheableMetadata())->fetchAll();
       $this->assertCount(0, $result, 'User with view-only access cannot edit nodes');
     }
     catch (\Exception $e) {
@@ -188,7 +189,7 @@ class NodeQueryAlterTest extends NodeAccessTestBase {
     $query->addMetaData('op', 'view');
     $query->addMetaData('account', $this->noAccessUser);
 
-    $result = $query->execute()->fetchAll();
+    $result = $query->execute(new CacheableMetadata())->fetchAll();
     $this->assertCount(0, $result, 'User view privileges are not overridden');
 
     // Have node_test_node_grants return a node_access_all privilege,
@@ -206,7 +207,7 @@ class NodeQueryAlterTest extends NodeAccessTestBase {
     $query->addMetaData('op', 'view');
     $query->addMetaData('account', $this->noAccessUser);
 
-    $result = $query->execute()->fetchAll();
+    $result = $query->execute(new CacheableMetadata())->fetchAll();
     $this->assertCount(4, $result, 'User view privileges are overridden');
     \Drupal::state()->delete('node_access_test.no_access_uid');
   }
