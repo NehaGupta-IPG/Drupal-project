@@ -63,7 +63,7 @@ class ConfigImportValidationTest extends KernelTestBase {
     // Overlay the fixture files, which introduce schema violations for both
     // the already-installed module (config_test) and the not-yet-installed
     // module (filter).
-    $fixture_storage = new FileStorage(__DIR__ . '/fixtures/config_import_validation');
+    $fixture_storage = new FileStorage(__DIR__ . '/../../../../fixtures/recipes/config_schema_violation/config');
     foreach ($fixture_storage->listAll() as $name) {
       $sync->write($name, $fixture_storage->read($name));
     }
