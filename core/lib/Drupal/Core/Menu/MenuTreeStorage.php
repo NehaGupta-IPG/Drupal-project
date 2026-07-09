@@ -139,9 +139,9 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       $this->preloadedOriginals = [];
     }
 
-    // Fetch the list of existing menus, in case some are not longer populated
-    // after the rebuild.
-    $before_menus = $this->getMenuNames();
+    // Track the menus actually modified by this rebuild so only their cache
+    // tags are invalidated.
+    $affected_menus = [];
     if ($definitions) {
       foreach ($definitions as $id => $link) {
         // Flag this link as discovered, i.e. saved via rebuild().
@@ -161,7 +161,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       }
     }
     foreach ($top_links as $id) {
-      $this->saveRecursive($id, $children, $links);
+      $affected_menus += $this->saveRecursive($id, $children, $links);
     }
     // Handle any children we didn't find starting from top-level links.
     foreach ($children as $orphan_links) {
@@ -178,20 +178,20 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
           // Force it to the top level.
           $links[$id]['parent'] = '';
         }
-        $this->saveRecursive($id, $children, $links);
+        $affected_menus += $this->saveRecursive($id, $children, $links);
       }
     }
     $result = $this->findNoLongerExistingLinks($definitions);
 
     // Remove all such items.
     if ($result) {
-      $this->purgeMultiple($result);
+      $affected_menus += $this->purgeMultiple($result);
     }
     $this->resetDefinitions();
-    $affected_menus = $this->getMenuNames() + $before_menus;
-    // Invalidate any cache tagged with any menu name.
-    $cache_tags = Cache::buildTags('config:system.menu', $affected_menus, '.');
-    $this->cacheTagsInvalidator->invalidateTags($cache_tags);
+    if ($affected_menus) {
+      $cache_tags = Cache::buildTags('config:system.menu', $affected_menus, '.');
+      $this->cacheTagsInvalidator->invalidateTags($cache_tags);
+    }
     $this->resetDefinitions();
     // Every item in the cache bin should have one of the menu cache tags but it
     // is not guaranteed, so delete everything in the bin.
@@ -206,19 +206,25 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    *
    * @param array $ids
    *   An array of menu link IDs.
+   *
+   * @return array
+   *   The names of the menus affected by the purge, keyed by menu name.
    */
   protected function purgeMultiple(array $ids) {
+    $affected_menus = [];
     $loaded = $this->loadFullMultiple($ids);
     foreach ($loaded as $id => $link) {
+      $affected_menus[$link['menu_name']] = $link['menu_name'];
       if ($link['has_children']) {
         $children = $this->loadByProperties(['parent' => $id]);
         foreach ($children as $child) {
           $child['parent'] = $link['parent'];
-          $this->save($child);
+          $affected_menus += $this->save($child);
         }
       }
     }
     $this->doDeleteMultiple($ids);
+    return $affected_menus;
   }
 
   /**
@@ -267,9 +273,9 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    *   \Drupal\Core\Menu\MenuLinkInterface plugin.
    *
    * @return array
-   *   The menu names affected by the save operation. This will be one menu
-   *   name if the link is saved to the sane menu, or two if it is saved to a
-   *   new menu.
+   *   The menu names affected by the save operation, keyed by menu name. This
+   *   is empty when the link is unchanged, one menu name when the link is saved
+   *   within the same menu, or two when the link is moved to a new menu.
    *
    * @throws \Exception
    *   Thrown if the storage back-end does not exist and could not be created.
@@ -303,14 +309,15 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       $affected_menus[$original['menu_name']] = $original['menu_name'];
       $fields = $this->preSave($link, $original);
       // If $link matches the $original data then exit early as there are no
-      // changes to make. Use array_diff_assoc() to check if they match because:
+      // changes to make, so no menu is affected. Use array_diff_assoc() to
+      // check if they match because:
       // - Some of the data types of the values are not the same. The values
       //   in $original are all strings because they have come from database but
       //   $fields contains typed values.
       // - MenuTreeStorage::preSave() removes the 'mlid' from $fields.
       // - The order of the keys in $original and $fields is different.
       if (array_diff_assoc($fields, $original) == [] && array_diff_assoc($original, $fields) == ['mlid' => $link['mlid']]) {
-        return $affected_menus;
+        return [];
       }
     }
 
@@ -835,21 +842,25 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    *   An array of IDs of child links collected by parent ID.
    * @param array $links
    *   An array of all definitions keyed by ID.
+   *
+   * @return array
+   *   The names of the menus affected by the saved links, keyed by menu name.
    */
   protected function saveRecursive($id, &$children, &$links) {
     if (!empty($links[$id]['parent']) && empty($links[$links[$id]['parent']])) {
       // Invalid parent ID, so remove it.
       $links[$id]['parent'] = '';
     }
-    $this->doSave($links[$id]);
+    $affected_menus = $this->doSave($links[$id]);
 
     if (!empty($children[$id])) {
       foreach ($children[$id] as $next_id) {
-        $this->saveRecursive($next_id, $children, $links);
+        $affected_menus += $this->saveRecursive($next_id, $children, $links);
       }
     }
     // Remove processed link names so we can find stragglers.
     unset($children[$id]);
+    return $affected_menus;
   }
 
   /**
