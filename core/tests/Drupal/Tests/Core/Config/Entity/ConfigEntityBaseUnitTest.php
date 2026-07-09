@@ -1051,7 +1051,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
       ->willReturn($foo);
     $this->entityTypeManager
       ->method('getStorage')
-      ->with($this->entityTypeId)
       ->willReturn($storage);
 
     $class = new \ReflectionClass($this->entity);
@@ -1072,7 +1071,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
       ->willReturn(NULL);
     $this->entityTypeManager
       ->method('getStorage')
-      ->with($this->entityTypeId)
       ->willReturn($storage);
     $this->expectException(ConfigEntityDependencyException::class);
     $this->expectExceptionMessage("Cannot add the config entity dependency with ID 'bar' of type '{$this->entityTypeId}' to test_provider.{$this->entityTypeId}.{$this->id} as it does not exist");
