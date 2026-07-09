@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Entity\Query\Null;
 
-use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\Query\QueryAggregateInterface;
 use Drupal\Core\Entity\Query\QueryBase;
