@@ -1724,27 +1724,34 @@ class Sql extends QueryPluginBase implements RefinableCacheableDependencyInterfa
    * {@inheritdoc}
    */
   public function getCacheTags() {
-    $tags = $this->cacheTags;
+    $tag_sets = [parent::getCacheTags(), $this->cacheTags];
+
     // Add cache tags for each row, if there is an entity associated with it.
     if (!$this->hasAggregate) {
       foreach ($this->getAllEntities() as $entity) {
-        $tags = Cache::mergeTags($entity->getCacheTags(), $tags);
+        $tag_sets[] = $entity->getCacheTags();
       }
     }
 
-    return $tags;
+    return Cache::mergeTags(...$tag_sets);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts() {
+    return Cache::mergeContexts(parent::getCacheContexts(), $this->cacheContexts);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCacheMaxAge() {
-    $max_age = $this->cacheMaxAge;
+    $max_ages = [parent::getCacheMaxAge(), $this->cacheMaxAge];
     foreach ($this->getAllEntities() as $entity) {
-      $max_age = Cache::mergeMaxAges($max_age, $entity->getCacheMaxAge());
+      $max_ages[] = $entity->getCacheMaxAge();
     }
-
-    return $max_age;
+    return Cache::mergeMaxAges(...$max_ages);
   }
 
   /**
