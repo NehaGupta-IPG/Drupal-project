@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Handler;
 
+use Drupal\Tests\filter\Traits\ProcessedTextTestTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the token in text area handler.
@@ -14,7 +16,10 @@ use PHPUnit\Framework\Attributes\Group;
  * @see \Drupal\views\Plugin\views\area\Text
  */
 #[Group('views')]
+#[RunTestsInSeparateProcesses]
 class AreaTextTokenTest extends ViewsKernelTestBase {
+
+  use ProcessedTextTestTrait;
 
   /**
    * {@inheritdoc}
@@ -67,7 +72,7 @@ class AreaTextTokenTest extends ViewsKernelTestBase {
     $build = $view->display_handler->handlers['header']['area']->render();
     $replaced_token = \Drupal::token()->replace('[site:url]');
     $desired_output = str_replace('[site:url]', $replaced_token, $string);
-    $this->assertEquals(check_markup($desired_output), $renderer->renderRoot($build), 'Global token assessed in href');
+    $this->assertEquals($this->processText($desired_output), $renderer->renderInIsolation($build), 'Global token assessed in href');
   }
 
 }

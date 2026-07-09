@@ -10,13 +10,16 @@ use Drupal\fixture_manipulator\ActiveFixtureManipulator;
 use Drupal\package_manager\EventSubscriber\ChangeLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Psr\Log\LogLevel;
 
 /**
  * Tests Change Logger.
  */
 #[Group('package_manager')]
+#[Group('#slow')]
 #[CoversClass(ChangeLogger::class)]
+#[RunTestsInSeparateProcesses]
 class ChangeLoggerTest extends PackageManagerKernelTestBase {
 
   /**

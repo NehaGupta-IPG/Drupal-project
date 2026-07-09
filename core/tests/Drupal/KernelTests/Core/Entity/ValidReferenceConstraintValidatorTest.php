@@ -15,11 +15,13 @@ use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests validation constraints for ValidReferenceConstraintValidator.
  */
 #[Group('Validation')]
+#[RunTestsInSeparateProcesses]
 class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
 
   use EntityReferenceFieldCreationTrait;
@@ -99,8 +101,10 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
     $role_without_access->grantPermission('access content');
     $role_without_access->save();
 
-    $user_with_access = User::create(['roles' => ['role_with_access']]);
-    $user_without_access = User::create(['roles' => ['role_without_access']]);
+    $user_with_access = User::create(['name' => $this->randomString(), 'roles' => ['role_with_access']]);
+    $user_with_access->save();
+    $user_without_access = User::create(['name' => $this->randomString(), 'roles' => ['role_without_access']]);
+    $user_without_access->save();
 
     // Add an entity reference field.
     $this->createEntityReferenceField(

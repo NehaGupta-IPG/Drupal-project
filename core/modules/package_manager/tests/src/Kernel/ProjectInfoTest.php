@@ -9,6 +9,7 @@ use Drupal\package_manager\ProjectInfo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\package_manager\ProjectInfo.
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\Group;
  */
 #[CoversClass(ProjectInfo::class)]
 #[Group('auto_updates')]
+#[RunTestsInSeparateProcesses]
 class ProjectInfoTest extends PackageManagerKernelTestBase {
 
   /**
@@ -28,8 +30,6 @@ class ProjectInfoTest extends PackageManagerKernelTestBase {
    *   The installed version core version to set.
    * @param string[] $expected_versions
    *   The expected versions.
-   *
-   * @legacy-covers ::getInstallableReleases
    */
   #[DataProvider('providerGetInstallableReleases')]
   public function testGetInstallableReleases(string $fixture, string $installed_version, array $expected_versions): void {
@@ -296,8 +296,6 @@ class ProjectInfoTest extends PackageManagerKernelTestBase {
    *   The path of the release metadata.
    * @param string[] $expected_supported_branches
    *   The expected supported branches.
-   *
-   * @legacy-covers ::getSupportedBranches
    */
   #[DataProvider('providerGetSupportedBranches')]
   public function testGetSupportedBranches(string $release_xml, array $expected_supported_branches): void {

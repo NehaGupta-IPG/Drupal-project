@@ -38,7 +38,7 @@
    */
   htmx.on('htmx:configRequest', ({ detail }) => {
     if (Drupal.url.isLocal(detail.path)) {
-      if (!detail.elt.hasAttribute('data-hx-drupal-full-page')) {
+      if (detail.elt.hasAttribute('data-hx-drupal-only-main-content')) {
         // Add _wrapper_format query parameter for all non full page requests.
         // Drupal expects this parameter to be in the query string, not the post
         // values.
@@ -62,7 +62,6 @@
       }
     }
   });
-
 
   // When saving to the browser history always remove wrapper format and ajax
   // page state from the query string.
@@ -138,8 +137,15 @@
   // @see https://htmx.org/events/#htmx:afterSettle
   htmx.on('htmx:afterSettle', ({ detail }) => {
     (requestAssetsLoaded.get(detail.xhr) || Promise.resolve()).then(() => {
+      let processTarget = detail.elt.parentElement;
       // Some HTMX swaps put the incoming element before or after detail.elt.
-      htmx.trigger(detail.elt.parentNode, 'htmx:drupal:load');
+      // We normally target the parent element so that we process the added
+      // elements. When there is no parent element or detail.elt is the body,
+      // we target the element itself.
+      if (detail.elt === document.body || processTarget === null) {
+        processTarget = detail.elt;
+      }
+      htmx.trigger(processTarget, 'htmx:drupal:load');
       // This should be automatic but don't wait for the garbage collector.
       requestAssetsLoaded.delete(detail.xhr);
     });

@@ -9,11 +9,13 @@ use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\Plugin\MigrationInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests process pipelines with scalar and multiple values handling.
  */
 #[Group('migrate')]
+#[RunTestsInSeparateProcesses]
 class HandleMultiplesTest extends KernelTestBase {
 
   /**
@@ -27,7 +29,7 @@ class HandleMultiplesTest extends KernelTestBase {
    * @return array
    *   The test migration definition.
    */
-  public function getDefinition() {
+  public function getDefinition(): array {
     return [
       'source' => [
         'plugin' => 'embedded_data',
@@ -140,7 +142,7 @@ class HandleMultiplesTest extends KernelTestBase {
    * @return array
    *   An array of test cases.
    */
-  public static function scalarAndMultipleValuesProviderSource() {
+  public static function scalarAndMultipleValuesProviderSource(): array {
     return [
       [
         'source_data' => [

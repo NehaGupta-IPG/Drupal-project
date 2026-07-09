@@ -15,14 +15,16 @@ use Drupal\migrate\Plugin\migrate\destination\EntityContentBase;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
-use Drupal\migrate_drupal\Tests\StubTestTrait;
 use Drupal\migrate_entity_test\Entity\StringIdEntityTest;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Drupal\Tests\migrate\StubTestTrait;
 
 /**
  * Tests the EntityContentBase destination.
  */
 #[Group('migrate')]
+#[RunTestsInSeparateProcesses]
 class MigrateEntityContentBaseTest extends KernelTestBase {
 
   use StubTestTrait;
@@ -106,7 +108,7 @@ class MigrateEntityContentBaseTest extends KernelTestBase {
       $configuration,
       'fake_plugin_id',
       [],
-      $this->createMock(MigrationInterface::class),
+      $this->createStub(MigrationInterface::class),
       $this->storage,
       [],
       $this->container->get('entity_field.manager'),

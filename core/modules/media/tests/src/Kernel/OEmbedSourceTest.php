@@ -20,6 +20,7 @@ use GuzzleHttp\Psr7\Utils;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Prophecy\Argument;
 
 /**
@@ -27,6 +28,7 @@ use Prophecy\Argument;
  */
 #[CoversClass(OEmbed::class)]
 #[Group('media')]
+#[RunTestsInSeparateProcesses]
 class OEmbedSourceTest extends MediaKernelTestBase {
 
   /**
@@ -36,8 +38,6 @@ class OEmbedSourceTest extends MediaKernelTestBase {
 
   /**
    * Tests get metadata.
-   *
-   * @legacy-covers ::getMetadata
    */
   public function testGetMetadata(): void {
     $configuration = [
@@ -132,7 +132,7 @@ class OEmbedSourceTest extends MediaKernelTestBase {
     // The source plugin will try to fetch the remote thumbnail, so mock the
     // HTTP client to ensure that request returns a response with some valid
     // image data.
-    $data = Utils::tryFopen($this->getDrupalRoot() . '/core/misc/druplicon.png', 'r');
+    $data = Utils::tryFopen($this->root . '/core/misc/druplicon.png', 'r');
     $response = new Response(200, $thumbnail_headers, Utils::streamFor($data));
     $handler = new MockHandler([$response]);
     $client = new Client([

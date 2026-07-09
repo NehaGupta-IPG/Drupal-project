@@ -8,12 +8,14 @@ use Drupal\Core\Entity\EntityBundleListener;
 use Drupal\entity_test\EntityTestHelper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\Core\Entity\EntityBundleListener.
  */
 #[CoversClass(EntityBundleListener::class)]
 #[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntityBundleListenerTest extends EntityKernelTestBase {
 
   /**
@@ -22,8 +24,6 @@ class EntityBundleListenerTest extends EntityKernelTestBase {
    * Note: Installing the entity_schema_test module will mask the bug this test
    * was written to cover, as the field map cache is cleared manually by
    * \Drupal\Core\Field\FieldDefinitionListener::onFieldDefinitionCreate().
-   *
-   * @legacy-covers ::onBundleCreate
    */
   public function testOnBundleCreate(): void {
     $field_map = $this->container->get('entity_field.manager')->getFieldMap();

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Functional;
 
-use Drupal\Core\Database\Database;
+use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\node\NodeInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -95,12 +95,12 @@ class NodeRevisionsAllTest extends NodeTestBase {
    * @return \Drupal\node\NodeInterface
    *   A node object with up to date revision information.
    */
-  protected function createNodeRevision(NodeInterface $node) {
+  protected function createNodeRevision(NodeInterface $node): NodeInterface {
     // Create revision with a random title and body and update variables.
     $node->title = $this->randomMachineName();
     $node->body = [
       'value' => $this->randomMachineName(32),
-      'format' => filter_default_format(),
+      'format' => \Drupal::service(FilterFormatRepositoryInterface::class)->getDefaultFormat()->id(),
     ];
     $node->setNewRevision();
     // Ensure the revision author is a different user.
@@ -184,12 +184,10 @@ class NodeRevisionsAllTest extends NodeTestBase {
     // Set the revision timestamp to an older date to make sure that the
     // confirmation message correctly displays the stored revision date.
     $old_revision_date = \Drupal::time()->getRequestTime() - 86400;
-    Database::getConnection()->update('node_revision')
-      ->condition('vid', $nodes[2]->getRevisionId())
-      ->fields([
-        'revision_timestamp' => $old_revision_date,
-      ])
-      ->execute();
+    $node_storage->loadRevision($nodes[2]->getRevisionId())
+      ->setRevisionCreationTime($old_revision_date)
+      ->save();
+
     $this->drupalGet("node/" . $node->id() . "/revisions/" . $nodes[2]->getRevisionId() . "/revert");
     $this->submitForm([], 'Revert');
     $this->assertSession()->pageTextContains("Basic page {$nodes[2]->getTitle()} has been reverted to the revision from {$this->container->get('date.formatter')->format($old_revision_date)}.");

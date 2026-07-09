@@ -12,12 +12,14 @@ use Drupal\update\Hook\UpdateThemeHooks;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests update report functionality.
  */
 #[CoversClass(UpdateThemeHooks::class)]
 #[Group('update')]
+#[RunTestsInSeparateProcesses]
 class UpdateReportTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -36,7 +38,7 @@ class UpdateReportTest extends KernelTestBase {
    * @legacy-covers ::preprocessUpdateReport
    */
   #[DataProvider('providerTemplatePreprocessUpdateReport')]
-  public function testTemplatePreprocessUpdateReport($variables): void {
+  public function testTemplatePreprocessUpdateReport(array $variables): void {
     // The function should run without an exception being thrown when the value
     // of $variables['data'] is not set or is not an array.
     \Drupal::service(UpdateThemeHooks::class)->preprocessUpdateReport($variables);
@@ -52,7 +54,7 @@ class UpdateReportTest extends KernelTestBase {
    *   Array of $variables for
    *   \Drupal\update\Hook\UpdateThemeHooks::preprocessUpdateReport().
    */
-  public static function providerTemplatePreprocessUpdateReport() {
+  public static function providerTemplatePreprocessUpdateReport(): array {
     return [
       '$variables with data not set' => [
         [],

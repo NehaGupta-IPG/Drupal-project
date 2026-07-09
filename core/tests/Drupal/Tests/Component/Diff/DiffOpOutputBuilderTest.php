@@ -93,8 +93,6 @@ class DiffOpOutputBuilderTest extends TestCase {
 
   /**
    * Tests whether op classes returned match expectations.
-   *
-   * @legacy-covers ::toOpsArray
    */
   #[DataProvider('provideTestDiff')]
   public function testToOpsArray(array $expected, array $from, array $to): void {
@@ -105,7 +103,7 @@ class DiffOpOutputBuilderTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::getDiff
+   * Tests get diff.
    */
   #[DataProvider('provideTestDiff')]
   public function testGetDiff(array $expected, array $from, array $to): void {
@@ -129,7 +127,10 @@ class DiffOpOutputBuilderTest extends TestCase {
     $this->assertCount(4, $diffOps);
     $this->assertEquals($diffOps[0], new DiffOpAdd(['    - image.style.max_325x325']));
     $this->assertEquals($diffOps[1], new DiffOpCopy(['    - image.style.max_650x650']));
-    $this->assertEquals($diffOps[2], new DiffOpChange(['    - image.style.max_325x325'], ['_core:', '  default_config_hash: random_hash_string_here']));
+    $this->assertEquals($diffOps[2], new DiffOpChange(
+      ['    - image.style.max_325x325'],
+      ['_core:', '  default_config_hash: random_hash_string_here'],
+    ));
     $this->assertEquals($diffOps[3], new DiffOpCopy(['fallback_image_style: max_325x325', '']));
   }
 

@@ -7,6 +7,7 @@ namespace Drupal\Tests\views\Kernel\Plugin;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the grid_responsive style plugin.
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @see \Drupal\views\Plugin\views\style\GridResponsive
  */
 #[Group('views')]
+#[RunTestsInSeparateProcesses]
 class StyleGridResponsiveTest extends PluginKernelTestBase {
 
   /**
@@ -70,7 +72,7 @@ class StyleGridResponsiveTest extends PluginKernelTestBase {
    * @return array
    *   Array containing options for the style plugin and expected values.
    */
-  public static function providerTestResponsiveGrid() {
+  public static function providerTestResponsiveGrid(): array {
     return [
       'horizontal' => [
         'options' => [

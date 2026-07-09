@@ -12,12 +12,14 @@ use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\content_moderation\EntityTypeInfo.
  */
 #[CoversClass(EntityTypeInfo::class)]
 #[Group('content_moderation')]
+#[RunTestsInSeparateProcesses]
 class EntityTypeInfoTest extends KernelTestBase {
 
   use ContentModerationTestTrait;
@@ -68,8 +70,6 @@ class EntityTypeInfoTest extends KernelTestBase {
 
   /**
    * Tests entity base field info.
-   *
-   * @legacy-covers ::entityBaseFieldInfo
    */
   public function testEntityBaseFieldInfo(): void {
     $definition = $this->entityTypeManager->getDefinition('entity_test');
@@ -85,8 +85,6 @@ class EntityTypeInfoTest extends KernelTestBase {
 
   /**
    * Tests the correct entity types have moderation added.
-   *
-   * @legacy-covers ::entityTypeAlter
    */
   #[DataProvider('providerTestEntityTypeAlter')]
   public function testEntityTypeAlter($entity_type_id, $moderatable): void {
@@ -103,7 +101,7 @@ class EntityTypeInfoTest extends KernelTestBase {
    *   - An entity type ID.
    *   - Whether the entity type is moderatable or not.
    */
-  public static function providerTestEntityTypeAlter() {
+  public static function providerTestEntityTypeAlter(): array {
     $tests = [];
     $tests['non_internal_non_revisionable'] = ['entity_test', FALSE];
     $tests['non_internal_revisionable'] = ['entity_test_rev', TRUE];

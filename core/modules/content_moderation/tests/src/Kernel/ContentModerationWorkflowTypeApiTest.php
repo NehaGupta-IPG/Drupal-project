@@ -9,12 +9,14 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\workflows\Entity\Workflow;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the API of the ContentModeration workflow type plugin.
  */
 #[CoversClass(ContentModeration::class)]
 #[Group('content_moderation')]
+#[RunTestsInSeparateProcesses]
 class ContentModerationWorkflowTypeApiTest extends KernelTestBase {
 
   /**
@@ -82,8 +84,6 @@ class ContentModerationWorkflowTypeApiTest extends KernelTestBase {
 
   /**
    * Tests add entity type and bundle.
-   *
-   * @legacy-covers ::addEntityTypeAndBundle
    */
   public function testAddEntityTypeAndBundle(): void {
     /** @var \Drupal\content_moderation\Plugin\WorkflowType\ContentModeration $workflow_plugin */

@@ -12,11 +12,13 @@ use Drupal\views\Entity\View;
 use Drupal\views\Tests\AssertViewsCacheTagsTrait;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the general integration between views and the render cache.
  */
 #[Group('views')]
+#[RunTestsInSeparateProcesses]
 class RenderCacheIntegrationTest extends ViewsKernelTestBase {
 
   use AssertViewsCacheTagsTrait;
@@ -159,7 +161,7 @@ class RenderCacheIntegrationTest extends ViewsKernelTestBase {
 
     // Setup arguments to ensure that render caching also varies by them.
     // Custom assert for a single result row.
-    $single_entity_assertions = function (array $build, EntityInterface $entity) {
+    $single_entity_assertions = function (array $build, EntityInterface $entity): void {
       $this->setRawContent($build['#markup']);
 
       $result = $this->cssSelect('div.views-row');

@@ -4,17 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\Entity\BaseFieldOverride;
 use Drupal\entity_test\Entity\EntityTestBundle;
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests validation of base_field_override entities.
  */
 #[Group('Entity')]
 #[Group('Validation')]
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class BaseFieldOverrideValidationTest extends ConfigEntityValidationTestBase {
 
   use ContentTypeCreationTrait;
@@ -41,6 +45,7 @@ class BaseFieldOverrideValidationTest extends ConfigEntityValidationTestBase {
     $fields = $this->container->get('entity_field.manager')
       ->getBaseFieldDefinitions('node');
 
+    assert($fields['uuid'] instanceof BaseFieldDefinition);
     $this->entity = BaseFieldOverride::createFromBaseFieldDefinition($fields['uuid'], 'one');
     $this->entity->save();
   }

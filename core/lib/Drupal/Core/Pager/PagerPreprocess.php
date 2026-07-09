@@ -51,7 +51,7 @@ class PagerPreprocess {
     $route_parameters = $variables['pager']['#route_parameters'] ?? [];
     $link_attributes = $variables['pager']['#attributes'] ?? [];
 
-    if ($this->requestStack->getCurrentRequest()?->get(MainContentViewSubscriber::WRAPPER_FORMAT) === 'drupal_modal') {
+    if ($this->requestStack->getCurrentRequest()?->query->get(MainContentViewSubscriber::WRAPPER_FORMAT) === 'drupal_modal') {
       $link_attributes = [
         'class' => ['use-ajax'],
         'data-dialog-type' => 'modal',

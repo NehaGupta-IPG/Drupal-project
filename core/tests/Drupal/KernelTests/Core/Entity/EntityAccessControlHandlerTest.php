@@ -20,12 +20,14 @@ use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the entity access control handler.
  */
 #[CoversClass(EntityAccessControlHandler::class)]
 #[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntityAccessControlHandlerTest extends EntityLanguageTestBase {
 
   /**
@@ -299,11 +301,9 @@ class EntityAccessControlHandlerTest extends EntityLanguageTestBase {
 
   /**
    * Tests the default access handling for the ID and UUID fields.
-   *
-   * @legacy-covers ::fieldAccess
    */
   #[DataProvider('providerTestFieldAccess')]
-  public function testFieldAccess($entity_class, array $entity_create_values, $expected_id_create_access): void {
+  public function testFieldAccess(string $entity_class, array $entity_create_values, bool $expected_id_create_access): void {
     // Set up a non-admin user that is allowed to create and update test
     // entities.
     \Drupal::currentUser()->setAccount($this->createUser(['administer entity_test content'], NULL, FALSE, ['uid' => 2]));
@@ -347,7 +347,7 @@ class EntityAccessControlHandlerTest extends EntityLanguageTestBase {
   /**
    * Provides entity data for testing access.
    */
-  public static function providerTestFieldAccess() {
+  public static function providerTestFieldAccess(): array {
     return [
       'serial ID entity' => [
         EntityTest::class,

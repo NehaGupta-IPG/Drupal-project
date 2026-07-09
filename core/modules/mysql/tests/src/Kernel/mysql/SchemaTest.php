@@ -12,12 +12,18 @@ use Drupal\Core\Database\SchemaException;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\SchemaObjectExistsException;
 use Drupal\KernelTests\Core\Database\DriverSpecificSchemaTestBase;
+use Drupal\mysql\Driver\Database\mysql\Schema;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests schema API for the MySQL driver.
  */
 #[Group('Database')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
+#[CoversClass(Schema::class)]
 class SchemaTest extends DriverSpecificSchemaTestBase {
 
   /**

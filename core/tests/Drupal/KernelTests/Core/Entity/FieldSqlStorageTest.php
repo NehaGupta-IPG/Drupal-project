@@ -10,6 +10,7 @@ use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore basefield
 /**
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\Group;
  * for the Field Storage API.
  */
 #[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class FieldSqlStorageTest extends EntityKernelTestBase {
 
   /**
@@ -34,6 +36,8 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
   protected $fieldName;
 
   /**
+   * The cardinality of the field.
+   *
    * @var int
    */
   protected $fieldCardinality;
@@ -112,7 +116,15 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = $this->container->get('entity_type.manager')->getStorage($entity_type);
 
-    $columns = ['bundle', 'deleted', 'entity_id', 'revision_id', 'delta', 'langcode', $this->tableMapping->getFieldColumnName($this->fieldStorage, 'value')];
+    $columns = [
+      'bundle',
+      'deleted',
+      'entity_id',
+      'revision_id',
+      'delta',
+      'langcode',
+      $this->tableMapping->getFieldColumnName($this->fieldStorage, 'value'),
+    ];
 
     // Create an entity with four revisions.
     $revision_ids = [];
@@ -407,7 +419,10 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
       'bundle' => $entity_type,
     ]);
     $field->save();
-    $tables = [$this->tableMapping->getDedicatedDataTableName($field_storage), $this->tableMapping->getDedicatedRevisionTableName($field_storage)];
+    $tables = [
+      $this->tableMapping->getDedicatedDataTableName($field_storage),
+      $this->tableMapping->getDedicatedRevisionTableName($field_storage),
+    ];
 
     // Verify the indexes we will create do not exist yet.
     foreach ($tables as $table) {

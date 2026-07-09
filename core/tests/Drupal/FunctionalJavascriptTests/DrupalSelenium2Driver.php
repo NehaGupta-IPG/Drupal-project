@@ -83,10 +83,10 @@ class DrupalSelenium2Driver extends Selenium2Driver {
   /**
    * {@inheritdoc}
    */
-  public function click($xpath) {
+  public function click(string $xpath): void {
     /** @var \Exception $not_clickable_exception */
     $not_clickable_exception = NULL;
-    $result = $this->waitFor(10, function () use (&$not_clickable_exception, $xpath) {
+    $result = $this->waitFor(10, function () use (&$not_clickable_exception, $xpath): ?true {
       try {
         parent::click($xpath);
         return TRUE;
@@ -108,10 +108,10 @@ class DrupalSelenium2Driver extends Selenium2Driver {
   /**
    * {@inheritdoc}
    */
-  public function setValue($xpath, $value) {
+  public function setValue(string $xpath, $value): void {
     /** @var \Exception $not_clickable_exception */
     $not_clickable_exception = NULL;
-    $result = $this->waitFor(10, function () use (&$not_clickable_exception, $xpath, $value) {
+    $result = $this->waitFor(10, function () use (&$not_clickable_exception, $xpath, $value): ?true {
       try {
         $element = $this->getWebDriverSession()->element('xpath', $xpath);
         // \Behat\Mink\Driver\Selenium2Driver::setValue() will call .blur() on
@@ -171,7 +171,7 @@ JS);
    * @return mixed
    *   The result of the callback.
    */
-  private function waitFor($timeout, callable $callback) {
+  private function waitFor(int $timeout, callable $callback) {
     $start = microtime(TRUE);
     $end = $start + $timeout;
 
@@ -191,7 +191,7 @@ JS);
   /**
    * {@inheritdoc}
    */
-  public function dragTo($sourceXpath, $destinationXpath) {
+  public function dragTo(string $sourceXpath, string $destinationXpath): void {
     // Ensure both the source and destination exist at this point.
     $this->getWebDriverSession()->element('xpath', $sourceXpath);
     $this->getWebDriverSession()->element('xpath', $destinationXpath);
@@ -228,6 +228,27 @@ JS);
     ];
 
     return $this->getWebDriverSession()->execute($options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function executeScript(string $script): void {
+    parent::executeScript($script);
+    $this->processJavascriptDeprecations();
+  }
+
+  /**
+   * Re-triggers within PHPUnit Javascript deprecations from the front-end.
+   */
+  public function processJavascriptDeprecations(): void {
+    $warnings = $this->evaluateScript("JSON.parse(sessionStorage.getItem('js_testing_log_test.warnings') || JSON.stringify([]))");
+    foreach ($warnings as $warning) {
+      if (str_contains($warning, '[Deprecation]')) {
+        // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+        @trigger_error('Javascript Deprecation:' . preg_replace('/.*\[Deprecation\]/', '', $warning), E_USER_DEPRECATED);
+      }
+    }
   }
 
 }

@@ -11,12 +11,13 @@ use Drupal\Core\Extension\ProfileExtensionList;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests ModuleHandler functionality.
  */
 #[Group('Extension')]
+#[RunTestsInSeparateProcesses]
 class ModuleHandlerTest extends KernelTestBase {
 
   /**
@@ -418,7 +419,7 @@ class ModuleHandlerTest extends KernelTestBase {
    * @return \Drupal\Core\Extension\ModuleHandlerInterface
    *   The module handler service.
    */
-  protected function moduleHandler() {
+  protected function moduleHandler(): ?object {
     return $this->container->get('module_handler');
   }
 
@@ -428,28 +429,8 @@ class ModuleHandlerTest extends KernelTestBase {
    * @return \Drupal\Core\Extension\ModuleInstallerInterface
    *   The module installer service.
    */
-  protected function moduleInstaller() {
+  protected function moduleInstaller(): ?object {
     return $this->container->get('module_installer');
-  }
-
-  /**
-   * Tests autoloading .token and .view files.
-   */
-  #[IgnoreDeprecations]
-  public function testAutoloadHookInfoFiles(): void {
-    $this->expectDeprecation('Autoloading hooks in the file (core/modules/system/tests/modules/module_test/module_test.tokens.inc) is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Move the functions in this file to either the .module file or other appropriate location. See https://www.drupal.org/node/3489765');
-    $this->moduleInstaller()->install(['module_test']);
-    $testToken = [];
-    $testToken['types']['token_info_invoked'] = [
-      'name' => 'tokens.inc test',
-      'description' => 'tokens.inc test',
-    ];
-    $testToken['tokens']['token_info_invoked']['token_test_1'] = [
-      'type' => 'text',
-      'name' => 'tokens.inc test 1',
-    ];
-    $this->assertTrue($this->moduleHandler()->hasImplementations('token_info', ['module_test']));
-    $this->assertEquals($testToken, $this->moduleHandler()->invoke('module_test', 'token_info', []));
   }
 
 }

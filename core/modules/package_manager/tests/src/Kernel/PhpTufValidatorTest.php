@@ -17,6 +17,7 @@ use Drupal\package_manager\Validator\PhpTufValidator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\package_manager\Validator\PhpTufValidator.
@@ -26,6 +27,7 @@ use PHPUnit\Framework\Attributes\Group;
 #[CoversClass(PhpTufValidator::class)]
 #[Group('package_manager')]
 #[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class PhpTufValidatorTest extends PackageManagerKernelTestBase {
 
   use StringTranslationTrait;
@@ -38,6 +40,16 @@ class PhpTufValidatorTest extends PackageManagerKernelTestBase {
 
     // PHP-TUF must be enabled for this test to run.
     $this->setSetting('package_manager_bypass_tuf', FALSE);
+
+    // audit.block-insecure is only available in Composer 2.9.2 onwards.
+    try {
+      (new ActiveFixtureManipulator())
+        ->addConfig(['audit.block-insecure' => FALSE])
+        ->commitChanges();
+    }
+    catch (\RuntimeException $e) {
+      $this->assertStringContainsString('Setting audit.block-insecure does not exist', $e->getMessage());
+    }
 
     (new ActiveFixtureManipulator())
       ->addConfig([

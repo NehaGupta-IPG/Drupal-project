@@ -7,11 +7,13 @@ namespace Drupal\Tests\system\Kernel\Theme;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests low-level theme functions.
  */
 #[Group('Theme')]
+#[RunTestsInSeparateProcesses]
 class ThemeTest extends KernelTestBase {
 
   /**
@@ -120,9 +122,6 @@ class ThemeTest extends KernelTestBase {
     $this->assertSame($base_theme_list, $themes['test_subtheme']->base_themes, 'Subtheme\'s object includes list of base themes.');
     // Check for theme engine in subtheme.
     $this->assertSame('twig', $themes['test_subtheme']->engine, 'Subtheme\'s object includes the theme engine.');
-    // Check for theme engine prefix.
-    $this->assertSame('twig', $themes['test_base_theme']->prefix, 'Base theme\'s object includes the theme engine prefix.');
-    $this->assertSame('twig', $themes['test_subtheme']->prefix, 'Subtheme\'s object includes the theme engine prefix.');
   }
 
   /**

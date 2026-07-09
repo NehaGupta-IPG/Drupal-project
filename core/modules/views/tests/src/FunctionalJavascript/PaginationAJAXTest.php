@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests the click sorting AJAX functionality of Views exposed forms.
  */
 #[Group('views')]
+#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class PaginationAJAXTest extends WebDriverTestBase {
 
@@ -115,7 +116,7 @@ class PaginationAJAXTest extends WebDriverTestBase {
     $this->assertNoDuplicateAssetsOnPage();
 
     // Test that no unwanted parameters are added to the URL.
-    $this->assertEquals('?status=All&type=All&title=&items_per_page=5&order=changed&sort=asc&page=2', $link->getAttribute('href'));
+    $this->assertEquals('?status=All&type=All&items_per_page=5&title=&order=changed&sort=asc&page=2', $link->getAttribute('href'));
 
     $this->clickLink('Go to page 3');
     $session_assert->assertWaitOnAjaxRequest();
@@ -199,7 +200,7 @@ class PaginationAJAXTest extends WebDriverTestBase {
     $this->assertNoDuplicateAssetsOnPage();
 
     // Test that no unwanted parameters are added to the URL.
-    $this->assertEquals('?status=All&type=All&title=default_value&items_per_page=5&order=changed&sort=asc&page=0', $link->getAttribute('href'));
+    $this->assertEquals('?status=All&type=All&items_per_page=5&title=default_value&order=changed&sort=asc&page=0', $link->getAttribute('href'));
 
     // Set the title filter to empty string using the exposed pager.
     $page->fillField('title', '');
@@ -219,7 +220,7 @@ class PaginationAJAXTest extends WebDriverTestBase {
     $this->assertNoDuplicateAssetsOnPage();
 
     // Test that no unwanted parameters are added to the URL.
-    $this->assertEquals('?status=All&type=All&title=&items_per_page=5&page=0', $link->getAttribute('href'));
+    $this->assertEquals('?status=All&type=All&items_per_page=5&title=&page=0', $link->getAttribute('href'));
 
     // Navigate back to the first page.
     $this->clickLink('Go to first page');

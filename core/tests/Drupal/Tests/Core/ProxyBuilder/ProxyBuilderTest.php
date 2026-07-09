@@ -74,7 +74,7 @@ EOS;
    * @return string
    *   The code of the entire proxy.
    */
-  protected function buildExpectedClass($class, $expected_methods_body, $interface_string = '') {
+  protected function buildExpectedClass($class, $expected_methods_body, $interface_string = ''): string {
     $reflection = new \ReflectionClass($class);
     $namespace = ProxyBuilder::buildProxyNamespace($class);
     $proxy_class = $reflection->getShortName();
@@ -148,7 +148,7 @@ namespace {{ namespace }} {
 
 EOS;
 
-    $expected_methods_body = implode("\n", array_map(function ($value) {
+    $expected_methods_body = implode("\n", array_map(function ($value): string {
       if ($value === '') {
         return $value;
       }

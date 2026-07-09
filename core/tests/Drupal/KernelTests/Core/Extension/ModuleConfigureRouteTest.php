@@ -8,13 +8,14 @@ use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\KernelTests\FileSystemModuleDiscoveryDataProviderTrait;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the configure route for core modules.
  */
 #[Group('Module')]
 #[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class ModuleConfigureRouteTest extends KernelTestBase {
 
   use FileSystemModuleDiscoveryDataProviderTrait;
@@ -25,6 +26,8 @@ class ModuleConfigureRouteTest extends KernelTestBase {
   protected static $modules = ['system', 'user', 'path_alias'];
 
   /**
+   * The route provider.
+   *
    * @var \Drupal\Core\Routing\RouteProviderInterface
    */
   protected $routeProvider;
@@ -41,6 +44,7 @@ class ModuleConfigureRouteTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->installConfig('system');
     $this->routeProvider = \Drupal::service('router.route_provider');
     $this->moduleInfo = \Drupal::service('extension.list.module')->getList();
     $this->installEntitySchema('path_alias');
@@ -64,7 +68,7 @@ class ModuleConfigureRouteTest extends KernelTestBase {
       return;
     }
     $module_lifecycle = $module_info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER];
-    if (isset($module_lifecycle) && $module_lifecycle === ExtensionLifecycle::DEPRECATED) {
+    if (isset($module_lifecycle) && ($module_lifecycle === ExtensionLifecycle::DEPRECATED || $module_lifecycle === ExtensionLifecycle::OBSOLETE)) {
       return;
     }
     $this->container->get('module_installer')->install([$module_name]);
@@ -73,11 +77,7 @@ class ModuleConfigureRouteTest extends KernelTestBase {
 
   /**
    * Tests if the module with lifecycle deprecated configure routes exists.
-   *
-   * Note: This test is part of group legacy, to make sure installing the
-   * deprecated module doesn't trigger a deprecation notice.
    */
-  #[IgnoreDeprecations]
   public function testDeprecatedModuleConfigureRoutes(): void {
     foreach (static::coreModuleListDataProvider() as $module_name => $info) {
       $this->doTestDeprecatedModuleConfigureRoutes($module_name);

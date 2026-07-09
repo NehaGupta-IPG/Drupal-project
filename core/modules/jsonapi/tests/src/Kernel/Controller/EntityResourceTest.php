@@ -18,6 +18,7 @@ use Drupal\user\Entity\User;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -28,6 +29,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 #[CoversClass(EntityResource::class)]
 #[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class EntityResourceTest extends JsonapiKernelTestBase {
 
   /**
@@ -48,7 +50,6 @@ class EntityResourceTest extends JsonapiKernelTestBase {
   protected static $modules = [
     'node',
     'field',
-    'jsonapi',
     'serialization',
     'system',
     'user',
@@ -88,13 +89,6 @@ class EntityResourceTest extends JsonapiKernelTestBase {
    * @var \Drupal\node\Entity\Node
    */
   protected Node $node4;
-
-  /**
-   * A fake request.
-   *
-   * @var \Symfony\Component\HttpFoundation\Request
-   */
-  protected $request;
 
   /**
    * The EntityResource under test.
@@ -172,7 +166,7 @@ class EntityResourceTest extends JsonapiKernelTestBase {
 
     // Give anonymous users permission to view user profiles, so that we can
     // verify the cache tags of cached versions of user profile pages.
-    array_map(function ($role_id) {
+    array_map(function (string $role_id): void {
       Role::create([
         'id' => $role_id,
         'permissions' => [
@@ -192,7 +186,7 @@ class EntityResourceTest extends JsonapiKernelTestBase {
    * @return \Drupal\jsonapi\Controller\EntityResource
    *   An EntityResource instance.
    */
-  protected function createEntityResource() {
+  protected function createEntityResource(): ?object {
     return $this->container->get('jsonapi.entity_resource');
   }
 
@@ -237,7 +231,7 @@ class EntityResourceTest extends JsonapiKernelTestBase {
     $request->query = new InputBag(['filter' => ['id' => 'invalid']]);
 
     // Get the response.
-    $resource_type = new ResourceType('node', 'article', NULL);
+    $resource_type = new ResourceType('node', 'article', Node::class);
     $response = $this->entityResource->getCollection($resource_type, $request);
 
     // Assertions.

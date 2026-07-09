@@ -9,28 +9,15 @@ use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\Core\StreamWrapper\StreamWrapperManager.
  */
 #[CoversClass(StreamWrapperManager::class)]
 #[Group('File')]
+#[RunTestsInSeparateProcesses]
 class StreamWrapperManagerTest extends KernelTestBase {
-
-  /**
-   * The stream wrapper manager.
-   *
-   * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface
-   */
-  protected $streamWrapperManager;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-    $this->streamWrapperManager = \Drupal::service('stream_wrapper_manager');
-  }
 
   /**
    * Tests uri scheme.
@@ -45,7 +32,7 @@ class StreamWrapperManagerTest extends KernelTestBase {
   /**
    * Data provider.
    */
-  public static function providerTestUriScheme() {
+  public static function providerTestUriScheme(): array {
     $data = [];
     $data[] = [
       'public://filename',

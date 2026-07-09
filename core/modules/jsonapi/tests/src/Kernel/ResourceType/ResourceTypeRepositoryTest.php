@@ -12,6 +12,7 @@ use Drupal\Tests\jsonapi\Kernel\JsonapiKernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\jsonapi\ResourceType\ResourceTypeRepository.
@@ -20,13 +21,13 @@ use PHPUnit\Framework\Attributes\Group;
  */
 #[CoversClass(ResourceTypeRepository::class)]
 #[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class ResourceTypeRepositoryTest extends JsonapiKernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'file',
     'field',
     'node',
     'serialization',
@@ -71,14 +72,12 @@ class ResourceTypeRepositoryTest extends JsonapiKernelTestBase {
 
   /**
    * Tests all.
-   *
-   * @legacy-covers ::all
    */
   public function testAll(): void {
     // Make sure that there are resources being created.
     $all = $this->resourceTypeRepository->all();
     $this->assertNotEmpty($all);
-    array_walk($all, function (ResourceType $resource_type) {
+    array_walk($all, function (ResourceType $resource_type): void {
       $this->assertNotEmpty($resource_type->getDeserializationTargetClass());
       $this->assertNotEmpty($resource_type->getEntityTypeId());
       $this->assertNotEmpty($resource_type->getTypeName());
@@ -87,11 +86,9 @@ class ResourceTypeRepositoryTest extends JsonapiKernelTestBase {
 
   /**
    * Tests get.
-   *
-   * @legacy-covers ::get
    */
   #[DataProvider('getProvider')]
-  public function testGet($entity_type_id, $bundle, $entity_class): void {
+  public function testGet(string $entity_type_id, string $bundle, string $entity_class): void {
     // Make sure that there are resources being created.
     $resource_type = $this->resourceTypeRepository->get($entity_type_id, $bundle);
     $this->assertInstanceOf(ResourceType::class, $resource_type);
@@ -107,7 +104,7 @@ class ResourceTypeRepositoryTest extends JsonapiKernelTestBase {
    * @return array
    *   The data for the test method.
    */
-  public static function getProvider() {
+  public static function getProvider(): array {
     return [
       ['node', 'article', 'Drupal\node\Entity\Node'],
       ['node', '42', 'Drupal\node\Entity\Node'],
@@ -136,7 +133,7 @@ class ResourceTypeRepositoryTest extends JsonapiKernelTestBase {
    * @legacy-covers ::getFields
    */
   #[DataProvider('getFieldsProvider')]
-  public function testMappingNameConflictCheck($field_name_list): void {
+  public function testMappingNameConflictCheck(array $field_name_list): void {
     $entity_type = \Drupal::entityTypeManager()->getDefinition('node');
     $bundle = 'article';
     $reflection_class = new \ReflectionClass($this->resourceTypeRepository);
@@ -157,7 +154,7 @@ class ResourceTypeRepositoryTest extends JsonapiKernelTestBase {
    * @return array
    *   The data for the test method.
    */
-  public static function getFieldsProvider() {
+  public static function getFieldsProvider(): array {
     return [
       [['type', 'node_type']],
       [['id', 'node_id']],

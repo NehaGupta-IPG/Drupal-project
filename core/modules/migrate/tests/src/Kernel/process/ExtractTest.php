@@ -9,11 +9,13 @@ use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\Plugin\MigrationInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the extract process plugin.
  */
 #[Group('migrate')]
+#[RunTestsInSeparateProcesses]
 class ExtractTest extends KernelTestBase {
 
   /**
@@ -27,7 +29,7 @@ class ExtractTest extends KernelTestBase {
    * @return array
    *   The test migration definition.
    */
-  public function getDefinition() {
+  public function getDefinition(): array {
     return [
       'source' => [
         'plugin' => 'embedded_data',
@@ -83,7 +85,7 @@ class ExtractTest extends KernelTestBase {
   /**
    * Provides multiple source data for "extract" process plugin test.
    */
-  public static function multipleValueProviderSource() {
+  public static function multipleValueProviderSource(): array {
     $tests = [
       [
         'source_data' => [

@@ -11,6 +11,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Test all attribute-related Htmx public methods.
@@ -27,7 +28,7 @@ class HtmxAttributesTest extends UnitTestCase {
   /**
    * Mocked Url object.
    */
-  protected Url $url;
+  protected Url&Stub $url;
 
   /**
    * {@inheritdoc}
@@ -37,11 +38,8 @@ class HtmxAttributesTest extends UnitTestCase {
     $this->htmx = new Htmx();
     $generated = new GeneratedUrl();
     $generated->setGeneratedUrl('https://www.example.test/common-test/destination');
-    $this->url = $this->getMockBuilder(Url::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['toString'])
-      ->getMock();
-    $this->url->expects($this->any())
+    $this->url = $this->createStub(Url::class);
+    $this->url
       ->method('toString')
       ->willReturn($generated);
   }
@@ -280,6 +278,7 @@ class HtmxAttributesTest extends UnitTestCase {
   public static function hxSimpleStringAttributesDataProvider(): array {
     return [
       ['select', '#info-details', 'data-hx-select', '#info-details'],
+      // phpcs:ignore Drupal.Arrays.Array.LongLineDeclaration
       ['select', 'info[data-drupal-selector="edit-select"]', 'data-hx-select', 'info[data-drupal-selector="edit-select"]'],
       ['selectOob', '#info-details', 'data-hx-select-oob', '#info-details'],
       ['selectOob', ['#info-details:afterbegin', '#alert'], 'data-hx-select-oob', '#info-details:afterbegin,#alert'],

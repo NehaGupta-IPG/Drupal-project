@@ -12,12 +12,15 @@ use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the media access control handler.
  */
 #[CoversClass(MediaAccessControlHandler::class)]
 #[Group('media')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class MediaAccessControlHandlerTest extends MediaKernelTestBase {
 
   use UserCreationTrait;
@@ -138,7 +141,7 @@ class MediaAccessControlHandlerTest extends MediaKernelTestBase {
    * @return array
    *   The data sets to test.
    */
-  public static function providerAccess() {
+  public static function providerAccess(): array {
     $test_data = [];
 
     // Check published / unpublished media access for a user owning the media
@@ -630,7 +633,7 @@ class MediaAccessControlHandlerTest extends MediaKernelTestBase {
    * @return array
    *   The data sets to test.
    */
-  public static function providerCreateAccess() {
+  public static function providerCreateAccess(): array {
     $test_data = [];
 
     // Check create access for a user without permissions.

@@ -11,6 +11,7 @@ use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Entity\View;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the generic entity area handler.
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @see \Drupal\views\Plugin\views\area\Entity
  */
 #[Group('views')]
+#[RunTestsInSeparateProcesses]
 class AreaEntityTest extends ViewsKernelTestBase {
 
   use BlockCreationTrait;
@@ -76,7 +78,7 @@ class AreaEntityTest extends ViewsKernelTestBase {
       $this->assertEquals($data['entity_' . $entity]['area']['entity_type'], $entity, "Correct entity_type set for $entity");
     }
 
-    $expected_entities = array_filter($entity_types, function (EntityTypeInterface $type) {
+    $expected_entities = array_filter($entity_types, function (EntityTypeInterface $type): bool {
       return !$type->hasViewBuilderClass();
     });
 
@@ -120,7 +122,7 @@ class AreaEntityTest extends ViewsKernelTestBase {
    * @param \Drupal\Core\Entity\EntityInterface[] $entities
    *   The entities.
    */
-  public function doTestRender($entities): void {
+  public function doTestRender(array $entities): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $view = Views::getView('test_entity_area');

@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\syslog\Kernel;
 
+use Drupal\Core\Session\AccountInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\syslog\Logger\SysLog;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
@@ -17,6 +19,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
  */
 #[CoversClass(SysLog::class)]
 #[Group('syslog')]
+#[RunTestsInSeparateProcesses]
 class SyslogTest extends KernelTestBase {
 
   /**
@@ -44,7 +47,7 @@ class SyslogTest extends KernelTestBase {
     $request->setSession(new Session(new MockArraySessionStorage()));
     \Drupal::requestStack()->push($request);
 
-    $user = $this->getMockBuilder('Drupal\Core\Session\AccountInterface')->getMock();
+    $user = $this->createStub(AccountInterface::class);
     $user->method('id')->willReturn(42);
     $this->container->set('current_user', $user);
 

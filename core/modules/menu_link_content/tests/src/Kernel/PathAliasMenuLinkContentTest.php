@@ -9,12 +9,14 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Ensures that the menu tree adapts to path alias changes.
  */
 #[Group('menu_link_content')]
 #[Group('path')]
+#[RunTestsInSeparateProcesses]
 class PathAliasMenuLinkContentTest extends KernelTestBase {
 
   use PathAliasTestTrait;
@@ -75,6 +77,18 @@ class PathAliasMenuLinkContentTest extends KernelTestBase {
     $this->assertEquals('', $tree[$menu_link_content->getPluginId()]->link->getRouteName());
     // Verify the plugin now references a path that does not match any route.
     $this->assertEquals('base:my-blog', $tree[$menu_link_content->getPluginId()]->link->getUrlObject()->getUri());
+
+    // An entity can exist while its definition is absent from the menu tree
+    // (e.g. during content import, or before the tree has been rebuilt). Saving
+    // an alias matching its internal path should not throw an exception, and
+    // must not re-add the missing definition.
+    $menu_link_manager = \Drupal::service('plugin.manager.menu.link');
+    $plugin_id = $menu_link_content->getPluginId();
+    $menu_link_manager->removeDefinition($plugin_id, FALSE);
+    $this->assertFalse($menu_link_manager->hasDefinition($plugin_id));
+    $path_alias = $this->createPathAlias('/test-page', '/my-blog');
+    $this->assertNotNull($path_alias->id());
+    $this->assertFalse($menu_link_manager->hasDefinition($plugin_id));
   }
 
 }

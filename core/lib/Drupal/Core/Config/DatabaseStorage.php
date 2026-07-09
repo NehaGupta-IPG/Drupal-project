@@ -164,9 +164,13 @@ class DatabaseStorage implements StorageInterface {
    *   TRUE when the write was successful, FALSE otherwise.
    */
   protected function doWrite($name, $data) {
-    return (bool) $this->connection->merge($this->table, $this->options)
-      ->keys(['collection', 'name'], [$this->collection, $name])
-      ->fields(['data' => $data])
+    return (bool) $this->connection->upsert($this->table, $this->options)
+      ->key(['collection', 'name'])
+      ->fields([
+        'collection' => $this->collection,
+        'name' => $name,
+        'data' => $data,
+      ])
       ->execute();
   }
 
@@ -265,11 +269,7 @@ class DatabaseStorage implements StorageInterface {
   }
 
   /**
-   * Implements Drupal\Core\Config\StorageInterface::decode().
-   *
-   * @throws \ErrorException
-   *   The unserialize() call will trigger E_NOTICE if the string cannot
-   *   be unserialized.
+   * {@inheritdoc}
    */
   public function decode($raw) {
     $data = @unserialize($raw, ['allowed_classes' => FALSE]);

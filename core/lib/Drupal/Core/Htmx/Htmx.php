@@ -177,7 +177,7 @@ class Htmx {
    *
    * @param string $id
    *   The HTMX attribute id.
-   * @param array{string, string} $value
+   * @param array<string, string|int|bool> $value
    *   The attribute values.
    */
   protected function createJsonAttribute(string $id, array $value): void {
@@ -199,15 +199,13 @@ class Htmx {
    * @param string $method
    *   The request method.
    * @param \Drupal\Core\Url|null $url
-   *   The URL for the request. If NULL is passed it will use the current URL
+   *   The URL for the request. If NULL, is passed it will use the current URL
    *   without any query parameter.
-   * @param bool $full_page
-   *   Toggle to use the full HTML response or just the main content.
    *
    * @return static
    *   returns self so that attribute methods may be chained.
    */
-  protected function buildRequestAttribute(string $method, ?Url $url = NULL, bool $full_page = FALSE): static {
+  protected function buildRequestAttribute(string $method, ?Url $url = NULL): static {
     if (is_null($url)) {
       $request_url = Url::fromRoute('<none>');
     }
@@ -215,8 +213,23 @@ class Htmx {
       // The Htmx helper should not modify the original URL object.
       $request_url = clone $url;
     }
-    $this->createBooleanAttribute('hx-drupal-full-page', $full_page);
     $this->createStringAttribute($method, $this->urlValue($request_url));
+    return $this;
+  }
+
+  /**
+   * Decides when to use the `drupal_htmx` wrapper format for Htmx requests.
+   *
+   * @param bool $toggle
+   *   Toggle to use the full HTML response or just the main content.
+   *
+   * @return static
+   *   returns self so that attribute methods may be chained.
+   *
+   * @see core/misc/htmx/htmx-assets.js
+   */
+  public function onlyMainContent(bool $toggle = TRUE) {
+    $this->createBooleanAttribute('hx-drupal-only-main-content', $toggle);
     return $this;
   }
 
@@ -523,18 +536,16 @@ class Htmx {
    * request to the current url. If parameters are used, both are required.
    *
    * @param \Drupal\Core\Url|null $url
-   *   The URL for the GET request. If NULL the current page is used without the
-   *   query parameters.
-   * @param bool $full_page
-   *   Toggle to use the full HTML response or just the main content.
+   *   The URL for the GET request. If NULL, the current page is used without
+   *   the query parameters.
    *
    * @return static
    *   returns self so that attribute methods may be chained.
    *
    * @see https://htmx.org/attributes/hx-get/
    */
-  public function get(?Url $url = NULL, bool $full_page = FALSE): static {
-    return $this->buildRequestAttribute('hx-get', $url, $full_page);
+  public function get(?Url $url = NULL): static {
+    return $this->buildRequestAttribute('hx-get', $url);
   }
 
   /**
@@ -546,18 +557,16 @@ class Htmx {
    *  request to the current url. If parameters are used, both are required.
    *
    * @param \Drupal\Core\Url|null $url
-   *   The URL for the GET request. If NULL the current page is used without the
-   *   query parameters.
-   * @param bool $full_page
-   *   Toggle to use the full HTML response or just the main content.
+   *   The URL for the GET request. If NULL, the current page is used without
+   *   the query parameters.
    *
    * @return static
    *   returns self so that attribute methods may be chained.
    *
    * @see https://htmx.org/attributes/hx-post/
    */
-  public function post(?Url $url = NULL, bool $full_page = FALSE): static {
-    return $this->buildRequestAttribute('hx-post', $url, $full_page);
+  public function post(?Url $url = NULL): static {
+    return $this->buildRequestAttribute('hx-post', $url);
   }
 
   /**
@@ -569,18 +578,16 @@ class Htmx {
    *  request to the current url. If parameters are used, both are required.
    *
    * @param \Drupal\Core\Url|null $url
-   *   The URL for the GET request. If NULL the current page is used without the
-   *   query parameters.
-   * @param bool $full_page
-   *   Toggle to use the full HTML response or just the main content.
+   *   The URL for the GET request. If NULL, the current page is used without
+   *   the query parameters.
    *
    * @return static
    *   returns self so that attribute methods may be chained.
    *
    * @see https://htmx.org/attributes/hx-put/
    */
-  public function put(?Url $url = NULL, bool $full_page = FALSE): static {
-    return $this->buildRequestAttribute('hx-put', $url, $full_page);
+  public function put(?Url $url = NULL): static {
+    return $this->buildRequestAttribute('hx-put', $url);
   }
 
   /**
@@ -592,18 +599,16 @@ class Htmx {
    *  request to the current url. If parameters are used, both are required.
    *
    * @param \Drupal\Core\Url|null $url
-   *   The URL for the GET request. If NULL the current page is used without the
-   *   query parameters.
-   * @param bool $full_page
-   *   Toggle to use the full HTML response or just the main content.
+   *   The URL for the GET request. If NULL, the current page is used without
+   *   the query parameters.
    *
    * @return static
    *   returns self so that attribute methods may be chained.
    *
    * @see https://htmx.org/attributes/hx-patch/
    */
-  public function patch(?Url $url = NULL, bool $full_page = FALSE): static {
-    return $this->buildRequestAttribute('hx-patch', $url, $full_page);
+  public function patch(?Url $url = NULL): static {
+    return $this->buildRequestAttribute('hx-patch', $url);
   }
 
   /**
@@ -616,18 +621,16 @@ class Htmx {
    *  request to the current url. If parameters are used, both are required.
    *
    * @param \Drupal\Core\Url|null $url
-   *   The URL for the GET request. If NULL the current page is used without the
-   *   query parameters.
-   * @param bool $full_page
-   *   Toggle to use the full HTML response or just the main content.
+   *   The URL for the GET request. If NULL, the current page is used without
+   *   the query parameters.
    *
    * @return static
    *   returns self so that attribute methods may be chained.
    *
    * @see https://htmx.org/attributes/hx-delete/
    */
-  public function delete(?Url $url = NULL, bool $full_page = FALSE): static {
-    return $this->buildRequestAttribute('hx-delete', $url, $full_page);
+  public function delete(?Url $url = NULL): static {
+    return $this->buildRequestAttribute('hx-delete', $url);
   }
 
   /**
@@ -869,19 +872,14 @@ class Htmx {
    *
    * @param bool $value
    *   Should the element and its descendants be "boosted"?
-   * @param bool $full_page
-   *   Toggle to use the full HTML response or just the main content.
    *
    * @return static
    *   Returns this object to allow chaining methods.
    *
    * @see https://htmx.org/attributes/hx-boost/
    */
-  public function boost(bool $value = TRUE, bool $full_page = FALSE): static {
+  public function boost(bool $value = TRUE): static {
     $this->createStringAttribute('hx-boost', $value ? 'true' : 'false');
-    // When boosting a full_page, nothing to do here. If it is not a full page
-    // add a special attribute that the JS will pick up for processing.
-    $this->createBooleanAttribute('hx-drupal-full-page', $full_page);
     return $this;
   }
 

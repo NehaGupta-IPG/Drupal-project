@@ -8,6 +8,7 @@ use Drupal\TestTools\Random;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests taxonomy term argument transformation.
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @see \Drupal\taxonomy\Plugin\views\argument_validator\TermName
  */
 #[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class ArgumentTransformTermTest extends TaxonomyTestBase {
 
   /**
@@ -29,7 +31,7 @@ class ArgumentTransformTermTest extends TaxonomyTestBase {
    *   The name of the taxonomy term to use for the test.
    */
   #[DataProvider('termArgumentTransformationProvider')]
-  public function testTermArgumentTransformation($name): void {
+  public function testTermArgumentTransformation(string $name): void {
     /** @var \Drupal\taxonomy\TermInterface $term */
     $term = $this->createTerm(['name' => $name]);
 
@@ -50,7 +52,7 @@ class ArgumentTransformTermTest extends TaxonomyTestBase {
    * @return array[]
    *   Test data.
    */
-  public static function termArgumentTransformationProvider() {
+  public static function termArgumentTransformationProvider(): array {
     return [
       'space in the middle' => [
         'name' => Random::machineName() . ' ' . Random::machineName(),

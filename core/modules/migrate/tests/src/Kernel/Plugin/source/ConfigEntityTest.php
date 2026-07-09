@@ -8,18 +8,20 @@ use Drupal\migrate\Plugin\migrate\source\ConfigEntity;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the config source plugin.
  */
 #[CoversClass(ConfigEntity::class)]
 #[Group('migrate')]
+#[RunTestsInSeparateProcesses]
 class ConfigEntityTest extends MigrateSqlSourceTestBase {
 
   /**
    * {@inheritdoc}
    */
-  public static function providerSource() {
+  public static function providerSource(): array {
     $data = [];
 
     // The source database tables.

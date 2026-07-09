@@ -7,11 +7,15 @@ namespace Drupal\Tests\responsive_image\Kernel;
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
 use Drupal\responsive_image\Entity\ResponsiveImageStyle;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests validation of responsive_image_style entities.
  */
 #[Group('responsive_image')]
+#[Group('config')]
+#[Group('Validation')]
+#[RunTestsInSeparateProcesses]
 class ResponsiveImageStyleValidationTest extends ConfigEntityValidationTestBase {
 
   /**

@@ -423,7 +423,7 @@ class PagerTest extends ViewTestBase {
     $view->display_handler->setOption('pager', $pager);
     $view->save();
 
-    $themes = ['stark', 'olivero', 'claro', 'starterkit_theme', 'stable9'];
+    $themes = ['stark', 'olivero', 'claro', 'starterkit_theme'];
     $this->container->get('theme_installer')->install($themes);
 
     foreach ($themes as $theme) {
@@ -556,7 +556,7 @@ class PagerTest extends ViewTestBase {
 
     // Go to the second page so we see both previous and next buttons.
     $this->drupalGet('nl/admin/content', ['query' => ['page' => 1]]);
-    // Translation mapping..
+    // Translation mapping.
     $labels = [
       '« First' => '« Eerste',
       '‹ Previous' => '‹ Vorige',

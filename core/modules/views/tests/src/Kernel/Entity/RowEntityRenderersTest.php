@@ -13,6 +13,7 @@ use Drupal\user\Entity\User;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the entity row renderers.
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @see \Drupal\views\Entity\Render\RendererBase
  */
 #[Group('views')]
+#[RunTestsInSeparateProcesses]
 class RowEntityRenderersTest extends ViewsKernelTestBase {
 
   /**
@@ -27,10 +29,7 @@ class RowEntityRenderersTest extends ViewsKernelTestBase {
    */
   protected static $modules = [
     'field',
-    'filter',
-    'text',
     'node',
-    'user',
     'language',
     'views_test_language',
   ];
@@ -53,25 +52,11 @@ class RowEntityRenderersTest extends ViewsKernelTestBase {
   protected $langcodes;
 
   /**
-   * An array of titles for each node per language.
-   *
-   * @var array
-   */
-  protected $expected;
-
-  /**
    * The author of the test content.
    *
    * @var \Drupal\user\UserInterface
    */
   protected $testAuthor;
-
-  /**
-   * An array of IDs of the test content.
-   *
-   * @var array[]
-   */
-  protected $testIds;
 
   /**
    * @var array
@@ -211,7 +196,7 @@ class RowEntityRenderersTest extends ViewsKernelTestBase {
    *   associated with language keys appropriate for the translation of that
    *   node.
    */
-  protected function checkLanguageRenderers($display, $values): void {
+  protected function checkLanguageRenderers(string $display, array $values): void {
     $expected = [
       $values[0]['en'],
       $values[0]['en'],
@@ -295,7 +280,7 @@ class RowEntityRenderersTest extends ViewsKernelTestBase {
    *   associated with language keys appropriate for the translation of that
    *   node.
    */
-  protected function checkLanguageRenderersRelationship($display, $values): void {
+  protected function checkLanguageRenderersRelationship(string $display, array $values): void {
     $expected = [
       $values[1]['en'],
       $values[1]['en'],

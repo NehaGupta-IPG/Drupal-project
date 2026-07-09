@@ -24,8 +24,6 @@ class ValidationResultTest extends UnitTestCase {
 
   /**
    * Tests create warning result.
-   *
-   * @legacy-covers ::createWarning
    */
   #[DataProvider('providerValidConstructorArguments')]
   public function testCreateWarningResult(array $messages, ?string $summary): void {
@@ -63,8 +61,6 @@ class ValidationResultTest extends UnitTestCase {
 
   /**
    * Tests create error result.
-   *
-   * @legacy-covers ::createError
    */
   #[DataProvider('providerValidConstructorArguments')]
   public function testCreateErrorResult(array $messages, ?string $summary): void {
@@ -77,12 +73,10 @@ class ValidationResultTest extends UnitTestCase {
   /**
    * Tests create warning result exception.
    *
-   * @param string[] $messages
+   * @param \Drupal\Core\StringTranslation\TranslatableMarkup[] $messages
    *   The warning messages of the validation result.
    * @param string $expected_exception_message
    *   The expected exception message.
-   *
-   * @legacy-covers ::createWarning
    */
   #[DataProvider('providerCreateExceptions')]
   public function testCreateWarningResultException(array $messages, string $expected_exception_message): void {
@@ -94,12 +88,10 @@ class ValidationResultTest extends UnitTestCase {
   /**
    * Tests create error result exception.
    *
-   * @param string[] $messages
+   * @param \Drupal\Core\StringTranslation\TranslatableMarkup[] $messages
    *   The error messages of the validation result.
    * @param string $expected_exception_message
    *   The expected exception message.
-   *
-   * @legacy-covers ::createError
    */
   #[DataProvider('providerCreateExceptions')]
   public function testCreateErrorResultException(array $messages, string $expected_exception_message): void {

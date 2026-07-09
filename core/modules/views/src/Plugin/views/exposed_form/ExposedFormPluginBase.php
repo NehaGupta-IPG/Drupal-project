@@ -266,6 +266,7 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
 
       (new Htmx())
         ->boost()
+        ->onlyMainContent()
         ->swapOob(TRUE)
         ->swap('none')
         ->params(array_merge(array_keys($all_exposed), ['op']))

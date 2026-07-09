@@ -10,16 +10,19 @@ use Drupal\Core\Language\Language;
 use Drupal\Core\Link;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Url;
+use Drupal\Core\Utility\LinkGenerator;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Url object.
- *
- * @legacy-covers \Drupal\Component\Utility\UrlHelper::filterQueryParameters
- * @legacy-covers \Drupal\Core\Utility\LinkGenerator::generate
  */
 #[Group('Common')]
+#[CoversMethod(UrlHelper::class, 'filterQueryParameters')]
+#[CoversMethod(LinkGenerator::class, 'generate')]
+#[RunTestsInSeparateProcesses]
 class UrlTest extends KernelTestBase {
 
   /**
@@ -195,7 +198,7 @@ class UrlTest extends KernelTestBase {
     $l = Link::fromTextAndUrl('foo', Url::fromUri('https://www.drupal.org'))->toString();
 
     // Test a renderable array passed to the link generator.
-    $renderer->executeInRenderContext(new RenderContext(), function () use ($l) {
+    $renderer->executeInRenderContext(new RenderContext(), function () use ($l): void {
       $renderable_text = ['#markup' => 'foo'];
       $l_renderable_text = \Drupal::service('link_generator')->generate($renderable_text, Url::fromUri('https://www.drupal.org'));
       $this->assertEquals($l, $l_renderable_text);
@@ -233,7 +236,7 @@ class UrlTest extends KernelTestBase {
    * @return bool
    *   TRUE if the class is found, FALSE otherwise.
    */
-  private function hasAttribute($attribute, $link, $class): bool {
+  private function hasAttribute(string $attribute, string $link, string $class): bool {
     return (bool) preg_match('|' . $attribute . '="([^\"\s]+\s+)*' . $class . '|', $link);
   }
 

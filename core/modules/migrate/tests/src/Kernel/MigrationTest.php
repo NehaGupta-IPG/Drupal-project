@@ -8,12 +8,14 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\migrate\Plugin\Migration;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the migration plugin.
  */
 #[CoversClass(Migration::class)]
 #[Group('migrate')]
+#[RunTestsInSeparateProcesses]
 class MigrationTest extends KernelTestBase {
 
   /**
@@ -25,8 +27,6 @@ class MigrationTest extends KernelTestBase {
 
   /**
    * Tests Migration::set().
-   *
-   * @legacy-covers ::set
    */
   public function testSetInvalidation(): void {
     $migration = \Drupal::service('plugin.manager.migration')->createStubMigration([

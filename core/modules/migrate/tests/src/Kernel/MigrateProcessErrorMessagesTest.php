@@ -13,6 +13,7 @@ use Drupal\migrate\Plugin\MigratePluginManagerInterface;
 use Drupal\migrate\Plugin\MigrateProcessInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 
@@ -20,6 +21,7 @@ use Prophecy\Prophecy\ObjectProphecy;
  * Tests the format of messages from process plugin exceptions.
  */
 #[Group('migrate')]
+#[RunTestsInSeparateProcesses]
 class MigrateProcessErrorMessagesTest extends MigrateTestBase {
 
   /**
@@ -27,7 +29,6 @@ class MigrateProcessErrorMessagesTest extends MigrateTestBase {
    */
   protected static $modules = [
     'migrate_events_test',
-    'migrate',
   ];
 
   /**
@@ -133,7 +134,7 @@ class MigrateProcessErrorMessagesTest extends MigrateTestBase {
     ];
 
     $this->processPluginManager->createInstance('sub_process', Argument::cetera())
-      ->will(fn($x) => new SubProcess($x[1], 'sub_process', ['handle_multiples' => TRUE]));
+      ->will(fn($x): SubProcess => new SubProcess($x[1], 'sub_process', ['handle_multiples' => TRUE]));
     $this->idMap->saveMessage(['id' => 1], "process_errors_migration:subprocess_error:sub_process: test_error: Process exception.", MigrationInterface::MESSAGE_ERROR)->shouldBeCalled();
     $this->setPluginManagers();
 
@@ -155,7 +156,7 @@ class MigrateProcessErrorMessagesTest extends MigrateTestBase {
     $error_plugin_prophecy->transform(Argument::cetera())->willThrow(new MigrateException('Process exception.'));
 
     $this->processPluginManager->createInstance('get', Argument::cetera())
-      ->will(fn($x) => new Get($x[1], 'get', ['handle_multiples' => TRUE]));
+      ->will(fn($x): Get => new Get($x[1], 'get', ['handle_multiples' => TRUE]));
     $this->processPluginManager->createInstance('test_error', Argument::cetera())->willReturn($error_plugin_prophecy->reveal());
 
     $this->idMap->setMessage(Argument::any())->willReturn();

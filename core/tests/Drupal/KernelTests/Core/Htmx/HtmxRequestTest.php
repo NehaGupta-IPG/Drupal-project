@@ -10,6 +10,7 @@ use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
@@ -18,6 +19,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 #[CoversClass(Htmx::class)]
 #[Group('Htmx')]
+#[RunTestsInSeparateProcesses]
 class HtmxRequestTest extends KernelTestBase {
 
   /**
@@ -27,11 +29,6 @@ class HtmxRequestTest extends KernelTestBase {
     'system',
     'test_htmx',
   ];
-
-  /**
-   * Class under test.
-   */
-  protected Htmx $htmx;
 
   /**
    * Injected kernel service.
@@ -49,18 +46,8 @@ class HtmxRequestTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->installConfig(['system']);
-    $this->htmx = new Htmx();
     $this->httpKernel = $this->container->get('http_kernel');
     $this->url = Url::fromRoute('test_htmx.attachments.page');
-  }
-
-  /**
-   * Applies the Htmx attributes to a render array.
-   */
-  protected function apply(): array {
-    $render = [];
-    $this->htmx->applyTo($render);
-    return $render;
   }
 
   /**
@@ -69,36 +56,38 @@ class HtmxRequestTest extends KernelTestBase {
   #[DataProvider('htmxRequestProvider')]
   public function testHxRequest(string $method): void {
     $attribute = "data-hx-$method";
-    $this->htmx->$method($this->url);
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes'][$attribute]));
+    $render = [];
+    (new Htmx())->$method($this->url)->applyTo($render);
+    $this->assertArrayHasKey($attribute, $render['#attributes']);
     $expected = '/htmx-test-attachments/page';
     // The paths in GitLabCI include a subfolder.
     $this->assertStringEndsWith($expected, $render['#attributes'][$attribute]);
-    $this->assertTrue(empty($render['#attributes']['data-hx-drupal-full-page']));
-    // Verify no wrapper format.
-    $this->htmx->$method($this->url, TRUE);
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes'][$attribute]));
+    $this->assertArrayNotHasKey('data-hx-drupal-only-main-content', $render['#attributes']);
+
+    // Verify wrapper format.
+    $render = [];
+    (new Htmx())->$method($this->url)->onlyMainContent()->applyTo($render);
+    $this->assertArrayHasKey($attribute, $render['#attributes']);
     $this->assertStringEndsWith('/htmx-test-attachments/page', $render['#attributes'][$attribute]);
-    $this->assertTrue($render['#attributes']['data-hx-drupal-full-page']);
-    // Verify no parameters.
+    $this->assertTrue($render['#attributes']['data-hx-drupal-only-main-content']);
+
+    // Verify no parameters with no wrapper format.
     $url = Url::fromRoute('test_htmx.attachments.replace');
     $request = Request::create($url->toString());
     $this->httpKernel->handle($request);
-    $this->htmx->$method();
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes'][$attribute]));
+    $render = [];
+    (new Htmx())->$method()->applyTo($render);
+    $this->assertArrayHasKey($attribute, $render['#attributes']);
     $expected = '';
-    $this->assertTrue($expected === $render['#attributes'][$attribute]);
-    $this->assertTrue(empty($render['#attributes']['data-hx-drupal-full-page']));
+    $this->assertSame($expected, $render['#attributes'][$attribute]);
+    $this->assertArrayNotHasKey('data-hx-drupal-only-main-content', $render['#attributes']);
 
-    // Verify no parameters with no wrapper format.
-    $this->htmx->$method(full_page: TRUE);
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes'][$attribute]));
-    $this->assertTrue('' === $render['#attributes'][$attribute]);
-    $this->assertTrue($render['#attributes']['data-hx-drupal-full-page']);
+    // Verify no parameters.
+    $render = [];
+    (new Htmx())->$method()->onlyMainContent()->applyTo($render);
+    $this->assertArrayHasKey($attribute, $render['#attributes']);
+    $this->assertSame('', $render['#attributes'][$attribute]);
+    $this->assertTrue($render['#attributes']['data-hx-drupal-only-main-content']);
   }
 
   /**

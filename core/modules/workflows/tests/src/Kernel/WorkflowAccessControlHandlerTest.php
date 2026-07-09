@@ -14,6 +14,7 @@ use Drupal\workflows\WorkflowAccessControlHandler;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Prophecy\Prophet;
 
 /**
@@ -21,7 +22,7 @@ use Prophecy\Prophet;
  */
 #[CoversClass(WorkflowAccessControlHandler::class)]
 #[Group('workflows')]
-#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class WorkflowAccessControlHandlerTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -76,8 +77,6 @@ class WorkflowAccessControlHandlerTest extends KernelTestBase {
 
   /**
    * Tests check create access.
-   *
-   * @legacy-covers ::checkCreateAccess
    */
   public function testCheckCreateAccess(): void {
     // A user must have the correct permission to create a workflow.
@@ -107,8 +106,6 @@ class WorkflowAccessControlHandlerTest extends KernelTestBase {
 
   /**
    * Tests check access.
-   *
-   * @legacy-covers ::checkAccess
    */
   #[DataProvider('checkAccessProvider')]
   public function testCheckAccess($user, $operation, $result, $states_to_create = []): void {
@@ -132,7 +129,7 @@ class WorkflowAccessControlHandlerTest extends KernelTestBase {
    * @return array
    *   An array of test data.
    */
-  public static function checkAccessProvider() {
+  public static function checkAccessProvider(): array {
     $originalContainer = \Drupal::hasContainer() ? \Drupal::getContainer() : NULL;
 
     $container = new ContainerBuilder();

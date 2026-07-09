@@ -33,6 +33,7 @@ use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -43,6 +44,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 #[CoversClass(JsonApiDocumentTopLevelNormalizer::class)]
 #[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
 
   use ImageFieldCreationTrait;
@@ -52,7 +54,6 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'jsonapi',
     'field',
     'node',
     'serialization',
@@ -61,7 +62,6 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
     'text',
     'filter',
     'user',
-    'file',
     'image',
     'jsonapi_test_normalizers_kernel',
     'jsonapi_test_resource_type_building',
@@ -131,9 +131,9 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
   protected $resourceTypeRepository;
 
   /**
-   * @var \Drupal\file\Entity\File
+   * The example image file.
    */
-  private $file;
+  private File $file;
 
   /**
    * {@inheritdoc}
@@ -314,8 +314,6 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
 
   /**
    * Tests normalize.
-   *
-   * @legacy-covers ::normalize
    */
   public function testNormalize(): void {
     [$resource_type, $resource_object, $includes] = $this->getTestContentEntityResource();
@@ -348,7 +346,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
       );
     $normalized = $jsonapi_doc_object->getNormalization();
 
-    // @see http://jsonapi.org/format/#document-jsonapi-object
+    // @see https://jsonapi.org/format/#document-jsonapi-object
     $this->assertEquals(JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION, $normalized['jsonapi']['version']);
     $this->assertEquals(JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK, $normalized['jsonapi']['meta']['links']['self']['href']);
 
@@ -413,8 +411,6 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
 
   /**
    * Tests normalize uuid.
-   *
-   * @legacy-covers ::normalize
    */
   public function testNormalizeUuid(): void {
     $resource_type = $this->container->get('jsonapi.resource_type.repository')->get('node', 'article');
@@ -456,8 +452,6 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
 
   /**
    * Tests normalize exception.
-   *
-   * @legacy-covers ::normalize
    */
   public function testNormalizeException(): void {
     $normalized = $this
@@ -546,8 +540,6 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
 
   /**
    * Tests normalize config.
-   *
-   * @legacy-covers ::normalize
    */
   public function testNormalizeConfig(): void {
     $resource_type = $this->container->get('jsonapi.resource_type.repository')->get('node_type', 'node_type');
@@ -577,8 +569,6 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
 
   /**
    * Try to POST a node and check if it exists afterwards.
-   *
-   * @legacy-covers ::denormalize
    */
   public function testDenormalize(): void {
     $payload = '{"data":{"type":"article","attributes":{"title":"Testing article"}}}';
@@ -595,8 +585,6 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
 
   /**
    * Try to POST a node and check if it exists afterwards.
-   *
-   * @legacy-covers ::denormalize
    */
   public function testDenormalizeUuid(): void {
     $configurations = [
@@ -762,7 +750,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
    * @return array
    *   The test data.
    */
-  protected function denormalizeUuidProviderBuilder(array $options) {
+  protected function denormalizeUuidProviderBuilder(array $options): array {
     [$input, $expected] = $options;
     [$input_tag_uuids, $input_user_uuid] = $input;
     [$expected_tag_ids, $expected_user_id] = $expected;
@@ -843,7 +831,6 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
     return [
       [
         $cacheable_metadata(['contexts' => ['languages:language_interface']]),
-        ['node--article' => 'body'],
       ],
     ];
   }

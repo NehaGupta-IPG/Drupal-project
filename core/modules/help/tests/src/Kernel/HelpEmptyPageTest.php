@@ -9,11 +9,13 @@ use Drupal\Core\Routing\RouteMatch;
 use Drupal\help_test\SupernovaGenerator;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the empty HTML page.
  */
 #[Group('help')]
+#[RunTestsInSeparateProcesses]
 class HelpEmptyPageTest extends KernelTestBase {
 
   /**
@@ -35,7 +37,7 @@ class HelpEmptyPageTest extends KernelTestBase {
    */
   public function testEmptyHookHelp(): void {
     $all_modules = \Drupal::service('extension.list.module')->getList();
-    $all_modules = array_filter($all_modules, function ($module) {
+    $all_modules = array_filter($all_modules, function ($module): bool {
       // Filter contrib, hidden, already enabled modules and modules in the
       // Testing package.
       if ($module->origin !== 'core' || !empty($module->info['hidden']) || $module->status == TRUE || $module->info['package'] == 'Testing') {

@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Controller;
 
+use Drupal\Core\Controller\ControllerResolverInterface;
 use Drupal\Core\Controller\TitleResolver;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -22,25 +26,19 @@ use Symfony\Component\Routing\Route;
 class TitleResolverTest extends UnitTestCase {
 
   /**
-   * The mocked controller resolver.
-   *
-   * @var \Drupal\Core\Controller\ControllerResolverInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The controller resolver stub.
    */
-  protected $controllerResolver;
+  protected ControllerResolverInterface&Stub $controllerResolver;
 
   /**
-   * The mocked translation manager.
-   *
-   * @var \Drupal\Core\StringTranslation\TranslationInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The translation manager stub.
    */
-  protected $translationManager;
+  protected TranslationInterface&Stub $translationManager;
 
   /**
-   * The mocked argument resolver.
-   *
-   * @var \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The argument resolver stub.
    */
-  protected $argumentResolver;
+  protected ArgumentResolverInterface&Stub $argumentResolver;
 
   /**
    * The actual tested title resolver.
@@ -55,9 +53,9 @@ class TitleResolverTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->controllerResolver = $this->createMock('\Drupal\Core\Controller\ControllerResolverInterface');
-    $this->translationManager = $this->createMock('\Drupal\Core\StringTranslation\TranslationInterface');
-    $this->argumentResolver = $this->createMock('\Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface');
+    $this->controllerResolver = $this->createStub(ControllerResolverInterface::class);
+    $this->translationManager = $this->createStub(TranslationInterface::class);
+    $this->argumentResolver = $this->createStub(ArgumentResolverInterface::class);
 
     $this->titleResolver = new TitleResolver($this->controllerResolver, $this->translationManager, $this->argumentResolver);
   }
@@ -128,10 +126,25 @@ class TitleResolverTest extends UnitTestCase {
     $request->attributes->set('_raw_variables', $raw_variables);
 
     $route = new Route('/test-route', ['_title' => 'static title @test']);
-    $this->assertEquals(new TranslatableMarkup('static title @test', ['@test' => 'value', '%test' => 'value', '@test2' => 'value2', '%test2' => 'value2'], [], $this->translationManager), $this->titleResolver->getTitle($request, $route));
+    $this->assertEquals(
+      new TranslatableMarkup(
+        'static title @test',
+        ['@test' => 'value', '%test' => 'value', '@test2' => 'value2', '%test2' => 'value2'],
+        [],
+        $this->translationManager
+      ),
+      $this->titleResolver->getTitle($request, $route)
+    );
 
     $route = new Route('/test-route', ['_title' => 'static title %test']);
-    $this->assertEquals(new TranslatableMarkup('static title %test', ['@test' => 'value', '%test' => 'value', '@test2' => 'value2', '%test2' => 'value2'], [], $this->translationManager), $this->titleResolver->getTitle($request, $route));
+    $this->assertEquals(
+      new TranslatableMarkup('static title %test',
+        ['@test' => 'value', '%test' => 'value', '@test2' => 'value2', '%test2' => 'value2'],
+        [],
+        $this->translationManager
+      ),
+      $this->titleResolver->getTitle($request, $route)
+    );
   }
 
   /**
@@ -148,24 +161,44 @@ class TitleResolverTest extends UnitTestCase {
     $cases = [
       // Case 1: No override, uses default arguments.
       [
-        'route_args' => ['_title' => 'static title @test', '_title_arguments' => ['@test' => 'value', '@test2' => 'value2']],
+        'route_args' => [
+          '_title' => 'static title @test',
+          '_title_arguments' => ['@test' => 'value', '@test2' => 'value2'],
+        ],
         'expected' => new TranslatableMarkup('static title @test', ['@test' => 'value', '@test2' => 'value2'], [], $this->translationManager),
         'override' => FALSE,
       ],
       [
-        'route_args' => ['_title' => 'static title %test', '_title_arguments' => ['%test' => 'value', '%test2' => 'value2']],
+        'route_args' => [
+          '_title' => 'static title %test',
+          '_title_arguments' => ['%test' => 'value', '%test2' => 'value2'],
+        ],
         'expected' => new TranslatableMarkup('static title %test', ['%test' => 'value', '%test2' => 'value2'], [], $this->translationManager),
         'override' => FALSE,
       ],
       // Case 2: Override arguments.
       [
-        'route_args' => ['_title' => 'static title @test @test2', '_title_arguments' => ['@test' => 'value', '@test2' => 'value2']],
-        'expected' => new TranslatableMarkup('static title @test @test2', ['@test' => 'override value', '%test' => 'override value', '@test2' => 'value2'], [], $this->translationManager),
+        'route_args' => [
+          '_title' => 'static title @test @test2',
+          '_title_arguments' => ['@test' => 'value', '@test2' => 'value2'],
+        ],
+        'expected' => new TranslatableMarkup(
+          'static title @test @test2',
+          ['@test' => 'override value', '%test' => 'override value', '@test2' => 'value2'],
+          [],
+          $this->translationManager),
         'override' => TRUE,
       ],
       [
-        'route_args' => ['_title' => 'static title %test %test2', '_title_arguments' => ['%test' => 'value', '%test2' => 'value2']],
-        'expected' => new TranslatableMarkup('static title %test %test2', ['@test' => 'override value', '%test' => 'override value', '%test2' => 'value2'], [], $this->translationManager),
+        'route_args' => [
+          '_title' => 'static title %test %test2',
+          '_title_arguments' => ['%test' => 'value', '%test2' => 'value2'],
+        ],
+        'expected' => new TranslatableMarkup(
+          'static title %test %test2',
+          ['@test' => 'override value', '%test' => 'override value', '%test2' => 'value2'],
+          [],
+          $this->translationManager),
         'override' => TRUE,
       ],
     ];
@@ -209,17 +242,25 @@ class TitleResolverTest extends UnitTestCase {
   #[DataProvider('providerTestDynamicTitle')]
   public function testDynamicTitle(\Stringable|string|array|null $title, \Stringable|string|array|null $expected): void {
     $request = new Request();
-    $route = new Route('/test-route', ['_title' => 'static title', '_title_callback' => 'Drupal\Tests\Core\Controller\TitleCallback::example']);
+    $route = new Route('/test-route', [
+      '_title' => 'static title',
+      '_title_callback' => 'Drupal\Tests\Core\Controller\TitleCallback::example',
+    ]);
 
+    // Override the controller resolver and argument resolver to set
+    // expectations.
     $callable = [new TitleCallback(), 'example'];
-    $this->controllerResolver->expects($this->once())
+    $controllerResolver = $this->createMock(ControllerResolverInterface::class);
+    $controllerResolver->expects($this->once())
       ->method('getControllerFromDefinition')
       ->with('Drupal\Tests\Core\Controller\TitleCallback::example')
       ->willReturn($callable);
-    $this->argumentResolver->expects($this->once())
+    $argumentResolver = $this->createMock(ArgumentResolverInterface::class);
+    $argumentResolver->expects($this->once())
       ->method('getArguments')
       ->with($request, $callable)
       ->willReturn([$title]);
+    $this->titleResolver = new TitleResolver($controllerResolver, $this->translationManager, $argumentResolver);
 
     $this->assertEquals($expected, $this->titleResolver->getTitle($request, $route));
   }
@@ -255,7 +296,7 @@ class TitleCallback {
    * @return string|array|null
    *   Returns the example value.
    */
-  public function example(\Stringable|string|array|null $value) {
+  public function example(\Stringable|string|array|NULL $value): \Stringable|string|array|NULL {
     return $value;
   }
 

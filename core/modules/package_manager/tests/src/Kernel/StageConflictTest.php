@@ -20,6 +20,7 @@ use PhpTuf\ComposerStager\API\Precondition\Service\PreconditionInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Psr\Log\LogLevel;
 
 /**
@@ -31,6 +32,7 @@ use Psr\Log\LogLevel;
 #[Group('package_manager')]
 #[Group('#slow')]
 #[CoversClass(PackageManagerUninstallValidator::class)]
+#[RunTestsInSeparateProcesses]
 class StageConflictTest extends PackageManagerKernelTestBase {
 
   /**
@@ -142,7 +144,7 @@ class StageConflictTest extends PackageManagerKernelTestBase {
       $event->sandboxManager->destroy($force);
       LoggingCommitter::setException(
         PreconditionException::class,
-        $this->createMock(PreconditionInterface::class),
+        $this->createStub(PreconditionInterface::class),
         $this->createComposeStagerMessage('Stage directory does not exist'),
       );
     };
@@ -240,7 +242,7 @@ class TestTime extends Time {
   /**
    * {@inheritdoc}
    */
-  public function getRequestTime() {
+  public function getRequestTime(): float|int|array {
     return parent::getRequestTime() + static::$offset;
   }
 

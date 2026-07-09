@@ -7,24 +7,19 @@ namespace Drupal\Tests\big_pipe\Kernel;
 use Drupal\block\Entity\Block;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the big pipe theme suggestions.
  */
 #[Group('big_pipe')]
+#[RunTestsInSeparateProcesses]
 class BigPipeInterfacePreviewThemeSuggestionsTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = ['block', 'big_pipe', 'system'];
-
-  /**
-   * The block being tested.
-   *
-   * @var \Drupal\block\Entity\BlockInterface
-   */
-  protected $block;
 
   /**
    * The block storage.

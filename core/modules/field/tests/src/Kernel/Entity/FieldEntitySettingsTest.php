@@ -9,12 +9,13 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the ways that field entities handle their settings.
  */
 #[Group('field')]
+#[RunTestsInSeparateProcesses]
 class FieldEntitySettingsTest extends KernelTestBase {
 
   /**
@@ -32,9 +33,8 @@ class FieldEntitySettingsTest extends KernelTestBase {
   }
 
   /**
- * Tests field entities carry default settings.
- */
-  #[IgnoreDeprecations]
+   * Tests field entities carry default settings.
+   */
   public function testFieldEntitiesCarryDefaultSettings(): void {
     /** @var \Drupal\field\FieldStorageConfigInterface $field_storage */
     $field_storage = FieldStorageConfig::create([

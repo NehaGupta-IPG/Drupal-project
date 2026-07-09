@@ -14,6 +14,7 @@ use PhpTuf\ComposerStager\API\Environment\Service\EnvironmentInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Prophecy\Argument;
 
 /**
@@ -23,6 +24,7 @@ use Prophecy\Argument;
  */
 #[Group('package_manager')]
 #[CoversClass(SymlinkValidator::class)]
+#[RunTestsInSeparateProcesses]
 class SymlinkValidatorTest extends PackageManagerKernelTestBase {
 
   use StringTranslationTrait;
@@ -44,7 +46,7 @@ class SymlinkValidatorTest extends PackageManagerKernelTestBase {
 
     // Switch back to the Drupal root to ensure that the check isn't affected
     // by which directory we happen to be in.
-    chdir($this->getDrupalRoot());
+    chdir($this->root);
     $this->assertStatusCheckResults([]);
   }
 
@@ -157,7 +159,7 @@ class SymlinkValidatorTest extends PackageManagerKernelTestBase {
 
     // Switch back to the Drupal root to ensure that the check isn't affected
     // by which directory we happen to be in.
-    chdir($this->getDrupalRoot());
+    chdir($this->root);
     $this->assertStatusCheckResults([]);
   }
 

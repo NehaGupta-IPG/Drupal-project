@@ -52,10 +52,11 @@ class UserNameConstraintValidator extends ConstraintValidator {
         '\x{0}-\x{1F}]/u',
         $name)
     ) {
-      $this->context->addViolation($constraint->illegalMessage);
+      $this->context->addViolation($constraint->invalidMessage);
     }
     if (mb_strlen($name) > UserInterface::USERNAME_MAX_LENGTH) {
-      $this->context->addViolation($constraint->tooLongMessage, ['%name' => $name, '%max' => UserInterface::USERNAME_MAX_LENGTH]);
+      $this->context->addViolation($constraint->tooLongMessage,
+        ['%name' => $name, '%max' => UserInterface::USERNAME_MAX_LENGTH]);
     }
   }
 

@@ -9,12 +9,14 @@ use Drupal\Core\File\FileSystem;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests for getTempDirectory on FileSystem.
  */
 #[CoversClass(\Drupal\Core\File\FileSystem::class)]
 #[Group('File')]
+#[RunTestsInSeparateProcesses]
 class FileSystemTempDirectoryTest extends KernelTestBase {
 
   /**
@@ -36,8 +38,6 @@ class FileSystemTempDirectoryTest extends KernelTestBase {
 
   /**
    * Tests 'file_temp_path' setting.
-   *
-   * @legacy-covers ::getTempDirectory
    */
   public function testGetTempDirectorySettings(): void {
     $tempDir = '/var/tmp/' . $this->randomMachineName();
@@ -47,8 +47,6 @@ class FileSystemTempDirectoryTest extends KernelTestBase {
 
   /**
    * Tests os default fallback.
-   *
-   * @legacy-covers ::getTempDirectory
    */
   public function testGetTempDirectoryOsDefault(): void {
     $tempDir = FileSystemComponent::getOsTemporaryDirectory();

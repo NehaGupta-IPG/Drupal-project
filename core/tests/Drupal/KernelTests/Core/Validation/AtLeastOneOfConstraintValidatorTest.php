@@ -6,19 +6,24 @@ namespace Drupal\KernelTests\Core\Validation;
 
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\AtLeastOneOfConstraint;
-use Drupal\Core\Validation\Plugin\Validation\Constraint\AtLeastOneOfConstraintValidator;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests AtLeastOneOf validation constraint with both valid and invalid values.
  */
 #[Group('Validation')]
 #[CoversClass(AtLeastOneOfConstraint::class)]
-#[CoversClass(AtLeastOneOfConstraintValidator::class)]
+#[RunTestsInSeparateProcesses]
 class AtLeastOneOfConstraintValidatorTest extends KernelTestBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static $modules = ['config_test'];
 
   /**
    * The typed data manager to use.
@@ -41,7 +46,7 @@ class AtLeastOneOfConstraintValidatorTest extends KernelTestBase {
    * For testing we define an integer with a set of allowed values.
    */
   #[DataProvider('dataProvider')]
-  public function testValidation($type, $value, $at_least_one_of_constraints, $expectedViolations, $extra_constraints = []): void {
+  public function testValidation(string $type, int|string $value, array $at_least_one_of_constraints, array $expectedViolations, array $extra_constraints = []): void {
     // Create a definition that specifies some AllowedValues.
     $definition = DataDefinition::create($type);
 
@@ -86,7 +91,7 @@ class AtLeastOneOfConstraintValidatorTest extends KernelTestBase {
         'integer',
         250,
         [
-          ['AllowedValues' => [500]],
+          ['AllowedValues' => ['choices' => [500]]],
           ['Range' => ['min' => 100]],
         ],
         [],
@@ -96,7 +101,7 @@ class AtLeastOneOfConstraintValidatorTest extends KernelTestBase {
         250,
         [
           ['Range' => ['min' => 100]],
-          ['AllowedValues' => [500]],
+          ['AllowedValues' => ['choices' => [500]]],
         ],
         [],
       ],
@@ -104,7 +109,7 @@ class AtLeastOneOfConstraintValidatorTest extends KernelTestBase {
         'string',
         'Green',
         [
-          ['AllowedValues' => ['test']],
+          ['AllowedValues' => ['choices' => ['test']]],
           ['Blank' => []],
         ],
         [
@@ -112,6 +117,31 @@ class AtLeastOneOfConstraintValidatorTest extends KernelTestBase {
         ],
       ],
     ];
+  }
+
+  /**
+   * Tests use of AtLeastOneOf validation constraint in config.
+   */
+  public function testConfigValidation(): void {
+    $this->installConfig('config_test');
+
+    $config = \Drupal::configFactory()->getEditable('config_test.validation');
+    /** @var \Drupal\Core\Config\TypedConfigManagerInterface $typed_config_manager */
+    $typed_config_manager = \Drupal::service('config.typed');
+
+    $config->set('composite.at_least_one_of', 6);
+    $result = $typed_config_manager->createFromNameAndData('config_test.validation', $config->get())->validate();
+    $this->assertCount(0, $result);
+
+    $config->set('composite.at_least_one_of', 25);
+    $result = $typed_config_manager->createFromNameAndData('config_test.validation', $config->get())->validate();
+    $this->assertCount(0, $result);
+
+    $config->set('composite.at_least_one_of', 15);
+    $result = $typed_config_manager->createFromNameAndData('config_test.validation', $config->get())->validate();
+    $this->assertCount(1, $result);
+    $this->assertEquals('This value should satisfy at least one of the following constraints: [1] This value should be between 0 and 10. [2] This value should be between 20 and 30.', $result->get(0)->getMessage());
+    $this->assertEquals('composite.at_least_one_of', $result->get(0)->getPropertyPath());
   }
 
 }

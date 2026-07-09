@@ -11,6 +11,7 @@ use Drupal\TestTools\Comparator\MarkupInterfaceComparator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use SebastianBergmann\Comparator\ComparisonFailure;
 use SebastianBergmann\Comparator\Factory;
 
@@ -22,15 +23,19 @@ use SebastianBergmann\Comparator\Factory;
  */
 #[CoversClass(MarkupInterfaceComparator::class)]
 #[Group('Test')]
-#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class MarkupInterfaceComparatorTest extends KernelTestBase {
 
   /**
+   * The markup comparator.
+   *
    * @var \Drupal\TestTools\Comparator\MarkupInterfaceComparator
    */
   protected $comparator;
 
   /**
+   * The comparator factory.
+   *
    * @var \SebastianBergmann\Comparator\Factory
    */
   protected $factory;
@@ -57,7 +62,7 @@ class MarkupInterfaceComparatorTest extends KernelTestBase {
    *     comparison should match, FALSE if error, or a class name of an object
    *     thrown.
    */
-  public static function dataSetProvider() {
+  public static function dataSetProvider(): array {
     return [
       'FormattableMarkup vs FormattableMarkup, equal' => [
         new FormattableMarkup('GoldFinger', []),
@@ -178,11 +183,9 @@ class MarkupInterfaceComparatorTest extends KernelTestBase {
 
   /**
    * Tests accepts.
-   *
-   * @legacy-covers ::accepts
    */
   #[DataProvider('dataSetProvider')]
-  public function testAccepts($expected, $actual, bool $accepts_result, $equals_result): void {
+  public function testAccepts(FormattableMarkup|string|int|\stdClass $expected, FormattableMarkup|string|int|array $actual, bool $accepts_result, bool|string $equals_result): void {
     if ($accepts_result) {
       $this->assertTrue($this->comparator->accepts($expected, $actual));
     }
@@ -193,11 +196,9 @@ class MarkupInterfaceComparatorTest extends KernelTestBase {
 
   /**
    * Tests assert equals.
-   *
-   * @legacy-covers ::assertEquals
    */
   #[DataProvider('dataSetProvider')]
-  public function testAssertEquals($expected, $actual, bool $accepts_result, $equals_result): void {
+  public function testAssertEquals(FormattableMarkup|string|int|\stdClass $expected, FormattableMarkup|string|int|array $actual, bool $accepts_result, bool|string $equals_result): void {
     try {
       $this->assertNull($this->comparator->assertEquals($expected, $actual));
       $this->assertTrue($equals_result);

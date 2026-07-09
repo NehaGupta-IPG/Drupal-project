@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\package_manager\Kernel;
 
 use Drupal\Core\Extension\Extension;
+use Drupal\Core\Extension\Theme;
 use Drupal\fixture_manipulator\ActiveFixtureManipulator;
 use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\PathLocator;
@@ -14,6 +15,7 @@ use Drupal\Tests\package_manager\Traits\ComposerInstallersTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Enabled Extensions Validator.
@@ -21,7 +23,9 @@ use PHPUnit\Framework\Attributes\Group;
  * @internal
  */
 #[Group('package_manager')]
+#[Group('#slow')]
 #[CoversClass(EnabledExtensionsValidator::class)]
+#[RunTestsInSeparateProcesses]
 class EnabledExtensionsValidatorTest extends PackageManagerKernelTestBase {
 
   use ComposerInstallersTrait;
@@ -123,7 +127,8 @@ class EnabledExtensionsValidatorTest extends PackageManagerKernelTestBase {
       if ($extension->getType() === 'theme') {
         /** @var \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler */
         $theme_handler = $this->container->get('theme_handler');
-        $theme_handler->addTheme($extension);
+        $theme = new Theme($project_root, $extension->getPathname(), ['base theme' => FALSE], $extension->getExtensionFilename());
+        $theme_handler->addTheme($theme);
         $this->assertArrayHasKey($extension_name, $theme_handler->listInfo());
       }
       else {

@@ -10,11 +10,13 @@ use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the core Drupal\file\Plugin\views\field\Extension handler.
  */
 #[Group('file')]
+#[RunTestsInSeparateProcesses]
 class ExtensionViewsFieldTest extends ViewsKernelTestBase {
 
   /**
@@ -75,7 +77,7 @@ class ExtensionViewsFieldTest extends ViewsKernelTestBase {
     $this->executeView($view);
 
     // Test without the tar option.
-    $renderer->executeInRenderContext(new RenderContext(), function () use ($view) {
+    $renderer->executeInRenderContext(new RenderContext(), function () use ($view): void {
       $this->assertEquals('png', $view->field['extension']->advancedRender($view->result[0]));
       $this->assertEquals('tar', $view->field['extension']->advancedRender($view->result[1]));
       $this->assertEquals('gz', $view->field['extension']->advancedRender($view->result[2]));
@@ -90,7 +92,7 @@ class ExtensionViewsFieldTest extends ViewsKernelTestBase {
     $view->field['extension']->options['settings']['extension_detect_tar'] = TRUE;
     $this->executeView($view);
 
-    $renderer->executeInRenderContext(new RenderContext(), function () use ($view) {
+    $renderer->executeInRenderContext(new RenderContext(), function () use ($view): void {
       $this->assertEquals('png', $view->field['extension']->advancedRender($view->result[0]));
       $this->assertEquals('tar', $view->field['extension']->advancedRender($view->result[1]));
       $this->assertEquals('tar.gz', $view->field['extension']->advancedRender($view->result[2]));

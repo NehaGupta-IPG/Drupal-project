@@ -10,6 +10,7 @@ use Drupal\package_manager\PathLocator;
 use Drupal\Tests\package_manager\Kernel\PackageManagerKernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Site Configuration Excluder.
@@ -17,7 +18,9 @@ use PHPUnit\Framework\Attributes\Group;
  * @internal
  */
 #[Group('package_manager')]
+#[Group('#slow')]
 #[CoversClass(SiteConfigurationExcluder::class)]
+#[RunTestsInSeparateProcesses]
 class SiteConfigurationExcluderTest extends PackageManagerKernelTestBase {
 
   /**

@@ -13,12 +13,14 @@ use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\content_moderation\ModerationInformation.
  */
 #[CoversClass(ModerationInformation::class)]
 #[Group('content_moderation')]
+#[RunTestsInSeparateProcesses]
 class ModerationInformationTest extends KernelTestBase {
 
   use ContentModerationTestTrait;
@@ -67,8 +69,6 @@ class ModerationInformationTest extends KernelTestBase {
 
   /**
    * Tests get default revision id.
-   *
-   * @legacy-covers ::getDefaultRevisionId
    */
   public function testGetDefaultRevisionId(): void {
     $entity_test_rev = EntityTestRev::create([
@@ -89,11 +89,9 @@ class ModerationInformationTest extends KernelTestBase {
 
   /**
    * Tests is default revision published.
-   *
-   * @legacy-covers ::isDefaultRevisionPublished
    */
   #[DataProvider('isDefaultRevisionPublishedTestCases')]
-  public function testIsDefaultRevisionPublished($initial_state, $final_state, $initial_is_default_published, $final_is_default_published): void {
+  public function testIsDefaultRevisionPublished(string $initial_state, string $final_state, bool $initial_is_default_published, bool $final_is_default_published): void {
     $entity = EntityTestMulRevPub::create([
       'moderation_state' => $initial_state,
     ]);
@@ -108,7 +106,7 @@ class ModerationInformationTest extends KernelTestBase {
   /**
    * Test cases for ::testIsDefaultRevisionPublished.
    */
-  public static function isDefaultRevisionPublishedTestCases() {
+  public static function isDefaultRevisionPublishedTestCases(): array {
     return [
       'Draft to draft' => [
         'draft',
@@ -139,8 +137,6 @@ class ModerationInformationTest extends KernelTestBase {
 
   /**
    * Tests is default revision published multilingual.
-   *
-   * @legacy-covers ::isDefaultRevisionPublished
    */
   public function testIsDefaultRevisionPublishedMultilingual(): void {
     $entity = EntityTestMulRevPub::create([
@@ -163,8 +159,6 @@ class ModerationInformationTest extends KernelTestBase {
 
   /**
    * Tests has pending revision.
-   *
-   * @legacy-covers ::hasPendingRevision
    */
   public function testHasPendingRevision(): void {
     $entity = EntityTestMulRevPub::create([
@@ -196,8 +190,6 @@ class ModerationInformationTest extends KernelTestBase {
 
   /**
    * Tests get original state.
-   *
-   * @legacy-covers ::getOriginalState
    */
   public function testGetOriginalState(): void {
     $entity = EntityTestMulRevPub::create([
@@ -210,8 +202,6 @@ class ModerationInformationTest extends KernelTestBase {
 
   /**
    * Tests get original state multilingual.
-   *
-   * @legacy-covers ::getOriginalState
    */
   public function testGetOriginalStateMultilingual(): void {
     $entity = EntityTestMulRevPub::create([

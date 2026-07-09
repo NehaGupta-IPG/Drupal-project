@@ -8,12 +8,14 @@ use Drupal\migrate\Plugin\MigrationPluginManager;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the migration plugin manager.
  */
 #[CoversClass(MigrationPluginManager::class)]
 #[Group('migrate')]
+#[RunTestsInSeparateProcesses]
 class MigrationPluginManagerTest extends MigrateTestBase {
 
   /**
@@ -38,11 +40,9 @@ class MigrationPluginManagerTest extends MigrateTestBase {
 
   /**
    * Tests Migration::createInstancesByTag().
-   *
-   * @legacy-covers ::createInstancesByTag
    */
   #[DataProvider('providerCreateInstanceByTag')]
-  public function testCreateInstancesByTag($tags, $expected): void {
+  public function testCreateInstancesByTag(string $tags, array $expected): void {
     // The test module includes a migration that does not use the migration_tags
     // property. It is there to confirm that it is not included in the results.
     // We create it to ensure it is a valid migration.
@@ -56,7 +56,7 @@ class MigrationPluginManagerTest extends MigrateTestBase {
   /**
    * Data provider for testCreateInstancesByTag.
    */
-  public static function providerCreateInstanceByTag() {
+  public static function providerCreateInstanceByTag(): array {
     return [
       'get test' => [
         'test',

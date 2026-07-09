@@ -9,12 +9,14 @@ use Drupal\Core\Database\Database;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
  * Test that the DbImportCommand works correctly.
  */
 #[Group('console')]
+#[RunTestsInSeparateProcesses]
 class DbImportCommandTest extends KernelTestBase {
 
   /**
@@ -57,7 +59,7 @@ class DbImportCommandTest extends KernelTestBase {
     $command = new DbImportCommand();
     $command_tester = new CommandTester($command);
     $command_tester->execute([
-      'script' => __DIR__ . '/../../../fixtures/update/drupal-10.3.0.bare.standard.php.gz',
+      'script' => __DIR__ . '/../../../fixtures/update/drupal-11.3.0.bare.standard.php.gz',
       '--database' => $this->databasePrefix,
     ]);
 

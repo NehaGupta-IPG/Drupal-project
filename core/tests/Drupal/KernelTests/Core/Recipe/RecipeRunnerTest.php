@@ -15,13 +15,14 @@ use Drupal\node\Entity\NodeType;
 use Drupal\views\Entity\View;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\Core\Recipe\RecipeRunner.
  */
 #[CoversClass(RecipeRunner::class)]
 #[Group('Recipe')]
+#[RunTestsInSeparateProcesses]
 class RecipeRunnerTest extends KernelTestBase {
 
   use RecipeTestTrait;
@@ -280,26 +281,6 @@ YAML;
   }
 
   /**
-   * Tests that renamed plugins are marked as deprecated.
-   */
-  #[IgnoreDeprecations]
-  public function testRenamedConfigActions(): void {
-    $recipe_data = <<<YAML
-name: Renamed config action
-install:
-  - config_test
-config:
-  actions:
-    config_test.dynamic.recipe:
-      ensure_exists:
-        label: 'Created by recipe'
-YAML;
-    $recipe = $this->createRecipe($recipe_data);
-    $this->expectDeprecation('The plugin ID "entity_create:ensure_exists" is deprecated in drupal:10.3.1 and will be removed in drupal:12.0.0. Use "entity_create:createIfNotExists" instead. See https://www.drupal.org/node/3458273.');
-    RecipeRunner::processRecipe($recipe);
-  }
-
-  /**
    * Tests recipes are distinguished by the file path.
    */
   public function testRecipesAreDisambiguatedByPath(): void {
@@ -321,17 +302,17 @@ YAML;
     $this->assertSame('Another test content type', NodeType::load('another_test')?->label());
 
     $operations = RecipeRunner::toBatchOperations($recipe);
+    $this->assertSame('triggerEvent', $operations[2][0][1]);
+    $this->assertSame('Install node with config', $operations[2][1][0]->name);
+    $this->assertStringEndsWith('core/tests/fixtures/recipes/install_node_with_config', $operations[2][1][0]->path);
+
+    $this->assertSame('triggerEvent', $operations[5][0][1]);
+    $this->assertSame('Recipe include', $operations[5][1][0]->name);
+    $this->assertStringEndsWith('core/tests/fixtures/recipes/recipe_include', $operations[5][1][0]->path);
+
     $this->assertSame('triggerEvent', $operations[7][0][1]);
-    $this->assertSame('Install node with config', $operations[7][1][0]->name);
-    $this->assertStringEndsWith('core/tests/fixtures/recipes/install_node_with_config', $operations[7][1][0]->path);
-
-    $this->assertSame('triggerEvent', $operations[10][0][1]);
-    $this->assertSame('Recipe include', $operations[10][1][0]->name);
-    $this->assertStringEndsWith('core/tests/fixtures/recipes/recipe_include', $operations[10][1][0]->path);
-
-    $this->assertSame('triggerEvent', $operations[12][0][1]);
-    $this->assertSame('Recipe include', $operations[12][1][0]->name);
-    $this->assertSame($this->siteDirectory . '/recipes/recipe_include', $operations[12][1][0]->path);
+    $this->assertSame('Recipe include', $operations[7][1][0]->name);
+    $this->assertSame($this->siteDirectory . '/recipes/recipe_include', $operations[7][1][0]->path);
   }
 
 }

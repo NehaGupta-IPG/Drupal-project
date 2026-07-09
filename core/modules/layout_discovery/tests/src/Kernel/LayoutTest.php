@@ -9,11 +9,13 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\layout_discovery\Hook\LayoutDiscoveryThemeHooks;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Layout functionality.
  */
 #[Group('Layout')]
+#[RunTestsInSeparateProcesses]
 class LayoutTest extends KernelTestBase {
 
   /**
@@ -52,7 +54,7 @@ class LayoutTest extends KernelTestBase {
    * Tests rendering a layout.
    */
   #[DataProvider('renderLayoutData')]
-  public function testRenderLayout($layout_id, $config, $regions, array $html): void {
+  public function testRenderLayout($layout_id, array $config, array $regions, array $html): void {
     $layout = $this->layoutPluginManager->createInstance($layout_id, $config);
     $built['layout'] = $layout->build($regions);
     $built['layout']['#prefix'] = 'Test prefix' . "\n";
@@ -69,7 +71,7 @@ class LayoutTest extends KernelTestBase {
 
     // Add in the wrapping form elements and prefix/suffix.
     array_unshift($html, 'Test prefix');
-    array_unshift($html, '<form data-drupal-selector="the-form-id" action="/" method="post" id="the-form-id" accept-charset="UTF-8">');
+    array_unshift($html, '<form data-drupal-selector="the-form-id" action="/" method="post" id="the-form-id" accept-charset="UTF-8" novalidate="">');
     // Retrieve the build ID from the rendered HTML since the string is random.
     $build_id_input = $this->cssSelect('input[name="form_build_id"]')[0]->asXML();
     $form_id_input = '<input data-drupal-selector="edit-the-form-id" type="hidden" name="form_id" value="the_form_id"/>';
@@ -83,7 +85,7 @@ class LayoutTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function render(array &$elements) {
+  protected function render(array &$elements): string {
     $content = parent::render($elements);
     // Strip leading whitespace from every line.
     $this->content = preg_replace('/^\s+/m', '', $content);
@@ -93,7 +95,7 @@ class LayoutTest extends KernelTestBase {
   /**
    * Data provider for testRenderLayout().
    */
-  public static function renderLayoutData() {
+  public static function renderLayoutData(): array {
     $html = [];
     $html[] = '<div data-drupal-selector="edit-layout" class="layout layout--onecol">';
     $html[] = '<div data-drupal-selector="edit-content" class="layout__region layout__region--content">';
@@ -232,7 +234,7 @@ class LayoutTest extends KernelTestBase {
   /**
    * Provides a test #process callback.
    */
-  public static function processCallback($element) {
+  public static function processCallback(array $element): array {
     $element['#markup'] = 'This string added by #process.';
     return $element;
   }

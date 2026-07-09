@@ -16,11 +16,13 @@ use Drupal\file\Plugin\Field\FieldType\FileItem;
 use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 use Drupal\user\Entity\Role;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests using entity fields of the file field type.
  */
 #[Group('file')]
+#[RunTestsInSeparateProcesses]
 class FileItemTest extends FieldKernelTestBase {
 
   /**
@@ -177,8 +179,8 @@ class FileItemTest extends FieldKernelTestBase {
    */
   private function validateFileUriForDirectory(string $file_directory, string $expected_start): void {
     // Mock the field definition with the specified file directory.
-    $definition = $this->createMock(FieldDefinitionInterface::class);
-    $definition->expects($this->any())
+    $definition = $this->createStub(FieldDefinitionInterface::class);
+    $definition
       ->method('getSettings')
       ->willReturn([
         'file_extensions' => 'txt',
@@ -199,6 +201,22 @@ class FileItemTest extends FieldKernelTestBase {
     // Verify the file URI starts with the expected protocol and structure.
     $this->assertStringStartsWith($expected_start, $fileUri);
     $this->assertMatchesRegularExpression('#^' . preg_quote($expected_start, '#') . '[^/]+#', $fileUri);
+  }
+
+  /**
+   * Tests sample value generation with actual allowed file extensions.
+   */
+  public function testGenerateSampleValue(): void {
+    /** @var \Drupal\field\Entity\FieldConfig $field_definition */
+    $field_definition = FieldConfig::loadByName('entity_test', 'entity_test', 'file_test');
+    $field_definition->setSetting('file_extensions', 'pdf');
+    $field_definition->save();
+
+    $class = $field_definition->getItemDefinition()->getClass();
+    $value = call_user_func("$class::generateSampleValue", $field_definition);
+    /** @var \Drupal\file\FileInterface $file */
+    $file = File::load($value['target_id']);
+    $this->assertStringEndsWith('.pdf', $file->getFileUri());
   }
 
 }

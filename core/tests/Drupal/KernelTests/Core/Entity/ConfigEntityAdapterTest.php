@@ -12,6 +12,7 @@ use Drupal\Core\TypedData\Plugin\DataType\StringData;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests entity adapter for configuration entities.
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\Group;
  */
 #[CoversClass(ConfigEntityAdapter::class)]
 #[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class ConfigEntityAdapterTest extends KernelTestBase {
 
   /**
@@ -62,8 +64,6 @@ class ConfigEntityAdapterTest extends KernelTestBase {
 
   /**
    * Tests validate.
-   *
-   * @legacy-covers ::validate
    */
   public function testValidate(): void {
     $adapter = ConfigEntityAdapter::createFromEntity($this->entity);
@@ -72,24 +72,19 @@ class ConfigEntityAdapterTest extends KernelTestBase {
     $this->entity = \Drupal::entityTypeManager()->getStorage('config_test')->create([
       'id' => 'system',
       'label' => 'foobar',
-      // Set weight to be a string which should not validate.
-      'weight' => 'very heavy',
+      // Set style to be an array which should not validate.
+      'style' => [],
     ]);
     $adapter = ConfigEntityAdapter::createFromEntity($this->entity);
     $violations = $adapter->validate();
-    $this->assertCount(2, $violations);
+    $this->assertCount(1, $violations);
     $violation = $violations->get(0);
-    $this->assertEquals('This value should be a valid number.', $violation->getMessage());
-    $this->assertEquals('weight', $violation->getPropertyPath());
-    $violation = $violations->get(1);
     $this->assertEquals('This value should be of the correct primitive type.', $violation->getMessage());
-    $this->assertEquals('weight', $violation->getPropertyPath());
+    $this->assertEquals('style', $violation->getPropertyPath());
   }
 
   /**
    * Tests get properties.
-   *
-   * @legacy-covers ::getProperties
    */
   public function testGetProperties(): void {
     $expected_properties = [
@@ -116,8 +111,6 @@ class ConfigEntityAdapterTest extends KernelTestBase {
 
   /**
    * Tests get value.
-   *
-   * @legacy-covers ::getValue
    */
   public function testGetValue(): void {
     $adapter = ConfigEntityAdapter::createFromEntity($this->entity);
@@ -128,8 +121,6 @@ class ConfigEntityAdapterTest extends KernelTestBase {
 
   /**
    * Tests set.
-   *
-   * @legacy-covers ::set
    */
   public function testSet(): void {
     $adapter = ConfigEntityAdapter::createFromEntity($this->entity);
@@ -146,8 +137,6 @@ class ConfigEntityAdapterTest extends KernelTestBase {
 
   /**
    * Tests get string.
-   *
-   * @legacy-covers ::getString
    */
   public function testGetString(): void {
     $adapter = ConfigEntityAdapter::createFromEntity($this->entity);
@@ -156,8 +145,6 @@ class ConfigEntityAdapterTest extends KernelTestBase {
 
   /**
    * Tests apply default value.
-   *
-   * @legacy-covers ::applyDefaultValue
    */
   public function testApplyDefaultValue(): void {
     $this->expectException(\BadMethodCallException::class);
@@ -168,8 +155,6 @@ class ConfigEntityAdapterTest extends KernelTestBase {
 
   /**
    * Tests get iterator.
-   *
-   * @legacy-covers ::getIterator
    */
   public function testGetIterator(): void {
     $adapter = ConfigEntityAdapter::createFromEntity($this->entity);

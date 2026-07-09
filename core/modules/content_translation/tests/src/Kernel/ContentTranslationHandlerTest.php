@@ -11,12 +11,14 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the content translation handler.
  */
 #[CoversClass(ContentTranslationHandler::class)]
 #[Group('content_translation')]
+#[RunTestsInSeparateProcesses]
 class ContentTranslationHandlerTest extends KernelTestBase {
 
   /**
@@ -51,13 +53,6 @@ class ContentTranslationHandlerTest extends KernelTestBase {
   protected $entityTypeManager;
 
   /**
-   * The messenger.
-   *
-   * @var \Drupal\Core\Messenger\MessengerInterface
-   */
-  protected $messenger;
-
-  /**
    * The ID of the entity type used in this test.
    *
    * @var string
@@ -80,7 +75,6 @@ class ContentTranslationHandlerTest extends KernelTestBase {
     $this->state = $this->container->get('state');
     $this->entityTypeBundleInfo = $this->container->get('entity_type.bundle.info');
     $this->entityTypeManager = $this->container->get('entity_type.manager');
-    $this->messenger = $this->container->get('messenger');
 
     $this->installEntitySchema($this->entityTypeId);
     ConfigurableLanguage::createFromLangcode($this->translationLangcode)->save();
@@ -137,7 +131,7 @@ class ContentTranslationHandlerTest extends KernelTestBase {
    *   An array of test cases, each one containing the element to alter, the
    *   form state, and the expected altered element.
    */
-  public static function providerTestEntityFormSharedElements() {
+  public static function providerTestEntityFormSharedElements(): array {
     $tests = [];
 
     $element = [];

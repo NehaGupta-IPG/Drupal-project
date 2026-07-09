@@ -6,15 +6,18 @@ namespace Drupal\Tests\block\Kernel;
 
 use Drupal\block\Entity\Block;
 use Drupal\block\Hook\BlockHooks;
+use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests block_rebuild().
  */
 #[Group('block')]
+#[RunTestsInSeparateProcesses]
 class BlockRebuildTest extends KernelTestBase {
 
   use BlockCreationTrait;
@@ -27,7 +30,7 @@ class BlockRebuildTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $configSchemaCheckerExclusions = [
+  protected static array $configSchemaCheckerExclusions = [
     // These blocks are intentionally put into invalid regions, so they will
     // violate config schema.
     // @see ::testRebuildInvalidBlocks()
@@ -51,7 +54,7 @@ class BlockRebuildTest extends KernelTestBase {
    * @legacy-covers \Drupal\block\Hook\BlockHooks::rebuild
    */
   public function testRebuildNoBlocks(): void {
-    $blockRebuild = new BlockHooks();
+    $blockRebuild = \Drupal::service(BlockHooks::class);
     $blockRebuild->rebuild();
     $messages = \Drupal::messenger()->all();
     \Drupal::messenger()->deleteAll();
@@ -66,7 +69,7 @@ class BlockRebuildTest extends KernelTestBase {
   public function testRebuildNoInvalidBlocks(): void {
     $this->placeBlock('system_powered_by_block', ['region' => 'content']);
 
-    $blockRebuild = new BlockHooks();
+    $blockRebuild = \Drupal::service(BlockHooks::class);
     $blockRebuild->rebuild();
     $messages = \Drupal::messenger()->all();
     \Drupal::messenger()->deleteAll();
@@ -100,7 +103,7 @@ class BlockRebuildTest extends KernelTestBase {
     $this->assertSame('INVALID', $block2->getRegion());
     $this->assertFalse($block2->status());
 
-    $blockRebuild = new BlockHooks();
+    $blockRebuild = \Drupal::service(BlockHooks::class);
     $blockRebuild->rebuild();
 
     // Reload block entities.
@@ -119,7 +122,7 @@ class BlockRebuildTest extends KernelTestBase {
     ];
     $this->assertEquals($expected, $messages);
 
-    $default_region = system_default_region('stark');
+    $default_region = \Drupal::service(ThemeHandlerInterface::class)->getTheme('stark')->getDefaultRegion();
     $this->assertSame($default_region, $block1->getRegion());
     $this->assertFalse($block1->status());
     $this->assertSame($default_region, $block2->getRegion());

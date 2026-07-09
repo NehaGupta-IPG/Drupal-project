@@ -6,11 +6,13 @@ namespace Drupal\Tests\mysql\Kernel\mysql;
 
 use Drupal\KernelTests\Core\Database\DriverSpecificDatabaseTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests compatibility of the MySQL driver with various sql_mode options.
  */
 #[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class SqlModeTest extends DriverSpecificDatabaseTestBase {
 
   /**
@@ -26,7 +28,7 @@ class SqlModeTest extends DriverSpecificDatabaseTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getDatabaseConnectionInfo() {
+  protected function getDatabaseConnectionInfo(): array {
     $info = parent::getDatabaseConnectionInfo();
 
     // This runs during setUp(), so is not yet skipped for non MySQL databases.

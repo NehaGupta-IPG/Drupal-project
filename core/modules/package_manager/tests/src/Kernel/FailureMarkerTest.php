@@ -12,6 +12,7 @@ use Drupal\package_manager\PathLocator;
 use PhpTuf\ComposerStager\API\Path\Factory\PathFactoryInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
 
 /**
@@ -21,14 +22,13 @@ use PHPUnit\Framework\Attributes\TestWith;
  */
 #[CoversClass(FailureMarker::class)]
 #[Group('package_manager')]
+#[RunTestsInSeparateProcesses]
 class FailureMarkerTest extends PackageManagerKernelTestBase {
 
   use StringTranslationTrait;
 
   /**
    * Tests get message without throwable.
-   *
-   * @legacy-covers ::getMessage
    */
   #[TestWith([TRUE])]
   #[TestWith([FALSE])]
@@ -41,8 +41,6 @@ class FailureMarkerTest extends PackageManagerKernelTestBase {
 
   /**
    * Tests get message with throwable.
-   *
-   * @legacy-covers ::getMessage
    */
   #[TestWith([TRUE])]
   #[TestWith([FALSE])]
@@ -83,8 +81,6 @@ REGEXP
 
   /**
    * Tests that the failure marker can contain an exception message.
-   *
-   * @legacy-covers ::assertNotExists
    */
   public function testAssertNotExists(): void {
     $failure_marker = $this->container->get(FailureMarker::class);

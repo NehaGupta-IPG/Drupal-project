@@ -12,11 +12,13 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the raw string formatter.
  */
 #[Group('field')]
+#[RunTestsInSeparateProcesses]
 class RawStringFormatterTest extends KernelTestBase {
 
   /**
@@ -26,7 +28,6 @@ class RawStringFormatterTest extends KernelTestBase {
     'field', 'text',
     'entity_test',
     'system',
-    'filter',
     'user',
   ];
 

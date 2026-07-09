@@ -24,6 +24,7 @@ use Drupal\views\ViewExecutableFactory;
 use Drupal\views\Views;
 use Drupal\views_test_data\Plugin\views\display\DisplayTest;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -32,7 +33,7 @@ use Symfony\Component\HttpFoundation\Response;
  * @see \Drupal\views\ViewExecutable
  */
 #[Group('views')]
-#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class ViewExecutableTest extends ViewsKernelTestBase {
 
   use CommentTestTrait;
@@ -43,7 +44,6 @@ class ViewExecutableTest extends ViewsKernelTestBase {
   protected static $modules = [
     'node',
     'comment',
-    'user',
     'filter',
     'field',
     'text',
@@ -55,22 +55,6 @@ class ViewExecutableTest extends ViewsKernelTestBase {
    * @var array
    */
   public static $testViews = ['test_destroy', 'test_executable_displays', 'test_argument_dependency'];
-
-  /**
-   * Properties that should be stored in the configuration.
-   *
-   * @var array
-   */
-  protected $configProperties = [
-    'disabled',
-    'name',
-    'description',
-    'tag',
-    'base_table',
-    'label',
-    'core',
-    'display',
-  ];
 
   /**
    * Properties that should be stored in the executable.
@@ -411,7 +395,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
    * @return mixed
    *   The instance property value.
    */
-  protected function getProtectedProperty($instance, $property) {
+  protected function getProtectedProperty($instance, $property): mixed {
     $reflection = new \ReflectionProperty($instance, $property);
     return $reflection->getValue($instance);
   }
@@ -462,7 +446,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
 
     $count = 0;
     foreach ($view->displayHandlers as $id => $display) {
-      $match = function ($value) use ($display) {
+      $match = function ($value) use ($display): bool {
         return str_contains((string) $value, $display->display['display_title']);
       };
       $this->assertNotEmpty(array_filter($validate[$id], $match), "Error message found for $id display");
@@ -489,7 +473,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
     $executable->newDisplay('display_test');
     $executable->newDisplay('display_test');
     $errors = $executable->validate();
-    $total_error_count = array_reduce($errors, function ($carry, $item) {
+    $total_error_count = array_reduce($errors, function (float|int|null $carry, $item): float|int {
       $carry += count($item);
 
       return $carry;

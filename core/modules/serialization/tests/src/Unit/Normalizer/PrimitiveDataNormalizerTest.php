@@ -47,8 +47,6 @@ class PrimitiveDataNormalizerTest extends UnitTestCase {
 
   /**
    * Tests supports normalization.
-   *
-   * @legacy-covers ::supportsNormalization
    */
   #[DataProvider('dataProviderPrimitiveData')]
   public function testSupportsNormalization($primitive_data, $expected): void {
@@ -57,8 +55,6 @@ class PrimitiveDataNormalizerTest extends UnitTestCase {
 
   /**
    * Tests supports normalization fail.
-   *
-   * @legacy-covers ::supportsNormalization
    */
   public function testSupportsNormalizationFail(): void {
     // Test that an object not implementing PrimitiveInterface fails.
@@ -67,8 +63,6 @@ class PrimitiveDataNormalizerTest extends UnitTestCase {
 
   /**
    * Tests normalize.
-   *
-   * @legacy-covers ::normalize
    */
   #[DataProvider('dataProviderPrimitiveData')]
   public function testNormalize($primitive_data, $expected): void {
@@ -78,7 +72,7 @@ class PrimitiveDataNormalizerTest extends UnitTestCase {
   /**
    * Data provider for testNormalize().
    */
-  public static function dataProviderPrimitiveData() {
+  public static function dataProviderPrimitiveData(): array {
     $data = [];
 
     $definition = DataDefinition::createFromDataType('string');
@@ -142,7 +136,7 @@ class PrimitiveDataNormalizerTest extends UnitTestCase {
       'uri' => [$uri],
       'decimal' => [$decimal],
       'duration' => [$duration],
-      ...array_map(fn ($value) => [$value[0]], static::dataProviderPrimitiveData()),
+      ...array_map(fn (array $value): array => [$value[0]], static::dataProviderPrimitiveData()),
     ];
   }
 

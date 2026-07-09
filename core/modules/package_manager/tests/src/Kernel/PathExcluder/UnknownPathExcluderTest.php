@@ -13,6 +13,7 @@ use Drupal\Tests\package_manager\Kernel\PackageManagerKernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -21,7 +22,9 @@ use Symfony\Component\Filesystem\Filesystem;
  * @internal
  */
 #[Group('package_manager')]
+#[Group('#slow')]
 #[CoversClass(UnknownPathExcluder::class)]
+#[RunTestsInSeparateProcesses]
 class UnknownPathExcluderTest extends PackageManagerKernelTestBase {
 
   /**
@@ -92,7 +95,7 @@ class UnknownPathExcluderTest extends PackageManagerKernelTestBase {
    * @return mixed[][]
    *   The test cases.
    */
-  public static function providerTestUnknownPath() {
+  public static function providerTestUnknownPath(): array {
     return [
       'unknown file where web and project root same' => [
         FALSE,

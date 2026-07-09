@@ -19,6 +19,7 @@ use Drupal\package_manager_bypass\NoOpStager;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Prophecy\Argument;
 
 /**
@@ -28,16 +29,15 @@ use Prophecy\Argument;
  */
 #[CoversClass(LockFileValidator::class)]
 #[Group('package_manager')]
+#[RunTestsInSeparateProcesses]
 class LockFileValidatorTest extends PackageManagerKernelTestBase {
 
   use StringTranslationTrait;
 
   /**
    * The path of the active directory in the test project.
-   *
-   * @var string
    */
-  private $activeDir;
+  private string $activeDir;
 
   /**
    * {@inheritdoc}
@@ -112,7 +112,7 @@ class LockFileValidatorTest extends PackageManagerKernelTestBase {
     // should raise the validation error. Because the validator uses the default
     // priority of 0, this listener changes lock file before the validator
     // runs.
-    $this->addEventTestListener(function () {
+    $this->addEventTestListener(function (): void {
       $lock = json_decode(file_get_contents($this->activeDir . '/composer.lock'), TRUE, flags: JSON_THROW_ON_ERROR);
       $lock['extra']['key'] = 'value';
       file_put_contents($this->activeDir . '/composer.lock', json_encode($lock, JSON_THROW_ON_ERROR));
@@ -135,7 +135,7 @@ class LockFileValidatorTest extends PackageManagerKernelTestBase {
     // should raise the validation error. Because the validator uses the default
     // priority of 0, this listener deletes lock file before the validator
     // runs.
-    $this->addEventTestListener(function () {
+    $this->addEventTestListener(function (): void {
       unlink($this->activeDir . '/composer.lock');
     }, $event_class);
     $result = ValidationResult::createError([
@@ -160,7 +160,7 @@ class LockFileValidatorTest extends PackageManagerKernelTestBase {
     // should throw an exception. Because the validator uses the default
     // priority of 0, this listener deletes stored hash before the validator
     // runs.
-    $this->addEventTestListener(function () use ($key) {
+    $this->addEventTestListener(function () use ($key): void {
       $this->container->get('keyvalue')
         ->get('package_manager')
         ->delete($key);

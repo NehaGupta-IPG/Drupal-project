@@ -12,11 +12,13 @@ use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the calculation of dependencies for views.
  */
 #[Group('views')]
+#[RunTestsInSeparateProcesses]
 class ViewEntityDependenciesTest extends ViewsKernelTestBase {
 
   use ContentTypeCreationTrait;
@@ -39,10 +41,8 @@ class ViewEntityDependenciesTest extends ViewsKernelTestBase {
   protected static $modules = [
     'node',
     'comment',
-    'user',
     'field',
     'text',
-    'search',
   ];
 
   /**
@@ -129,8 +129,6 @@ class ViewEntityDependenciesTest extends ViewsKernelTestBase {
       ],
       'module' => [
         'node',
-        // The argument handler is provided by the search module.
-        'search',
         'text',
         'user',
       ],
@@ -157,7 +155,6 @@ class ViewEntityDependenciesTest extends ViewsKernelTestBase {
       'module' => [
         'core',
         'node',
-        'search',
         'user',
         'views',
       ],

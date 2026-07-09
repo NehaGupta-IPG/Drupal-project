@@ -6,10 +6,12 @@ namespace Drupal\Tests\field\Kernel;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
+use Drupal\Core\Field\FieldPurger;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the count of field data records.
@@ -18,6 +20,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @see \Drupal\field\Entity\FieldStorageConfig::hasData()
  */
 #[Group('field')]
+#[RunTestsInSeparateProcesses]
 class FieldDataCountTest extends FieldKernelTestBase {
 
   /**
@@ -106,7 +109,7 @@ class FieldDataCountTest extends FieldKernelTestBase {
     $this->assertTrue($field_storage->hasData(), 'There are entities with deleted field data.');
     $this->assertEquals(12, $this->storage->countFieldData($field_storage), 'There are 12 entities with deleted field data.');
 
-    field_purge_batch(6);
+    \Drupal::service(FieldPurger::class)->purgeBatch(6);
     $this->assertTrue($field_storage->hasData(), 'There are entities with deleted field data.');
     $this->assertEquals(6, $this->storage->countFieldData($field_storage), 'There are 6 entities with deleted field data.');
 

@@ -47,8 +47,6 @@ class PluginBaseTest extends UnitTestCase {
    *   The expected array after unpacking.
    * @param bool $all
    *   Whether to unpack all options.
-   *
-   * @legacy-covers ::unpackOptions
    */
   #[DataProvider('providerTestUnpackOptions')]
   public function testUnpackOptions($storage, $options, $definition, $expected, $all = FALSE): void {
@@ -80,7 +78,7 @@ class PluginBaseTest extends UnitTestCase {
    * @return array
    *   An array of test data.
    */
-  public static function providerTestUnpackOptions() {
+  public static function providerTestUnpackOptions(): array {
     $test_parameters = [];
     // Set a storage but no value, so the storage value should be kept.
     $test_parameters[] = [
@@ -229,7 +227,7 @@ class PluginBaseTest extends UnitTestCase {
    * @return array
    *   An array of test data.
    */
-  public static function providerTestSetOptionDefault() {
+  public static function providerTestSetOptionDefault(): array {
     $test_parameters = [];
     // No definition should change anything on the storage.
     $test_parameters[] = [
@@ -287,8 +285,6 @@ class PluginBaseTest extends UnitTestCase {
 
   /**
    * Tests filter by defined options.
-   *
-   * @legacy-covers ::filterByDefinedOptions
    */
   #[DataProvider('providerTestFilterByDefinedOptions')]
   public function testFilterByDefinedOptions($storage, $options, $expected_storage): void {
@@ -300,7 +296,7 @@ class PluginBaseTest extends UnitTestCase {
   /**
    * Provides data to testFilterByDefinedOptions().
    */
-  public static function providerTestFilterByDefinedOptions() {
+  public static function providerTestFilterByDefinedOptions(): array {
     $data = [];
 
     // A simple defined option.

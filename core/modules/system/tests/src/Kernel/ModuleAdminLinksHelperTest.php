@@ -9,12 +9,14 @@ use Drupal\system\ModuleAdminLinksHelper;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the ModuleAdminLinksHelper.
  */
 #[CoversClass(ModuleAdminLinksHelper::class)]
 #[Group('system')]
+#[RunTestsInSeparateProcesses]
 class ModuleAdminLinksHelperTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -44,8 +46,6 @@ class ModuleAdminLinksHelperTest extends KernelTestBase {
 
   /**
    * Tests get module admin links.
-   *
-   * @legacy-covers ::getModuleAdminLinks
    */
   public function testGetModuleAdminLinks(): void {
     // Rebuild the menu links.

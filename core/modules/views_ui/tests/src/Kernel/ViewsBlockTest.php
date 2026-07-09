@@ -11,11 +11,13 @@ use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views_ui\Hook\ViewsUiHooks;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests ViewsBlock.
  */
 #[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class ViewsBlockTest extends ViewsKernelTestBase {
 
   use UserCreationTrait;
@@ -27,7 +29,6 @@ class ViewsBlockTest extends ViewsKernelTestBase {
     'block',
     'block_test_views',
     'views_ui',
-    'user',
   ];
 
   /**

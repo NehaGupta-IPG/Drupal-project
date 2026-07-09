@@ -11,12 +11,15 @@ use Drupal\file\Entity\File;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that files referenced in file and image fields are always validated.
- *
- * @group file
  */
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class FileItemValidationTest extends KernelTestBase {
 
   /**
@@ -57,11 +60,13 @@ class FileItemValidationTest extends KernelTestBase {
   }
 
   /**
-   * @covers \Drupal\file\Plugin\Validation\Constraint\FileValidationConstraint
-   * @covers \Drupal\file\Plugin\Validation\Constraint\FileValidationConstraintValidator
-   * @dataProvider getFileTypes
+   * Tests file validation constraint.
+   *
+   * @legacy-covers \Drupal\file\Plugin\Validation\Constraint\FileValidationConstraint
+   * @legacy-covers \Drupal\file\Plugin\Validation\Constraint\FileValidationConstraintValidator
    */
-  public function testFileValidationConstraint($file_type): void {
+  #[DataProvider('getFileTypes')]
+  public function testFileValidationConstraint(string $file_type): void {
     $field_storage = FieldStorageConfig::create([
       'field_name' => 'field_test_file',
       'entity_type' => 'entity_test',
@@ -138,7 +143,7 @@ class FileItemValidationTest extends KernelTestBase {
   /**
    * Provides a list of file types to test.
    */
-  public static function getFileTypes() {
+  public static function getFileTypes(): array {
     return [['file'], ['image']];
   }
 

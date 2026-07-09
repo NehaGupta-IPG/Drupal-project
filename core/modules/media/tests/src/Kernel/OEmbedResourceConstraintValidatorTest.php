@@ -14,6 +14,7 @@ use Drupal\media\Plugin\Validation\Constraint\OEmbedResourceConstraintValidator;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Prophecy\Argument;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -22,6 +23,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
  */
 #[CoversClass(OEmbedResourceConstraintValidator::class)]
 #[Group('media')]
+#[RunTestsInSeparateProcesses]
 class OEmbedResourceConstraintValidatorTest extends KernelTestBase {
 
   use MediaTypeCreationTrait;
@@ -43,8 +45,6 @@ class OEmbedResourceConstraintValidatorTest extends KernelTestBase {
 
   /**
    * Tests validate empty source.
-   *
-   * @legacy-covers ::validate
    */
   public function testValidateEmptySource(): void {
     $media = Media::create([
@@ -72,8 +72,6 @@ class OEmbedResourceConstraintValidatorTest extends KernelTestBase {
 
   /**
    * Tests validate url resolver invoked.
-   *
-   * @legacy-covers ::validate
    */
   public function testValidateUrlResolverInvoked(): void {
     $media = Media::create([
@@ -110,7 +108,7 @@ class OEmbedResourceConstraintValidatorTest extends KernelTestBase {
    * @return object
    *   The mock field value to validate.
    */
-  protected function getValue(Media $media) {
+  protected function getValue(Media $media): object {
     return new class ($media) {
 
       /**

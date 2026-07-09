@@ -16,11 +16,13 @@ use Drupal\migrate\Plugin\migrate\source\SqlBase;
 use Drupal\migrate\Plugin\MigrationInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the functionality of SqlBase.
  */
 #[Group('migrate')]
+#[RunTestsInSeparateProcesses]
 class SqlBaseTest extends MigrateTestBase {
 
   /**
@@ -36,7 +38,7 @@ class SqlBaseTest extends MigrateTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->migration = $this->createMock(MigrationInterface::class);
+    $this->migration = $this->createStub(MigrationInterface::class);
     $this->migration->method('id')->willReturn('foo');
   }
 
@@ -163,7 +165,7 @@ class SqlBaseTest extends MigrateTestBase {
    *   (optional) The expected query results.
    */
   #[DataProvider('highWaterDataProvider')]
-  public function testHighWater($high_water = NULL, array $query_result = []): void {
+  public function testHighWater(?int $high_water = NULL, array $query_result = []): void {
     $configuration = [
       'high_water_property' => [
         'name' => 'order',
@@ -181,7 +183,7 @@ class SqlBaseTest extends MigrateTestBase {
     $query->method('execute')->willReturn($statement);
     $query->expects($this->atLeastOnce())->method('orderBy')->with('order', 'ASC');
 
-    $condition_group = $this->createMock(ConditionInterface::class);
+    $condition_group = $this->createStub(ConditionInterface::class);
     $query->method('orConditionGroup')->willReturn($condition_group);
 
     $source->setQuery($query);
@@ -194,7 +196,7 @@ class SqlBaseTest extends MigrateTestBase {
    * @return array
    *   The scenarios to test.
    */
-  public static function highWaterDataProvider() {
+  public static function highWaterDataProvider(): array {
     return [
       'no high-water value set' => [],
       'high-water value set' => [33],
@@ -296,14 +298,14 @@ class TestSqlBase extends SqlBase {
   /**
    * {@inheritdoc}
    */
-  public function getIds() {
+  public function getIds(): array {
     return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function fields() {
+  public function fields(): never {
     throw new \RuntimeException(__METHOD__ . " not implemented for " . __CLASS__);
   }
 

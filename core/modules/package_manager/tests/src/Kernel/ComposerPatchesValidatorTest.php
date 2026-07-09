@@ -14,6 +14,7 @@ use Drupal\package_manager\Validator\ComposerPatchesValidator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Composer Patches Validator.
@@ -23,6 +24,7 @@ use PHPUnit\Framework\Attributes\Group;
 #[Group('package_manager')]
 #[Group('#slow')]
 #[CoversClass(ComposerPatchesValidator::class)]
+#[RunTestsInSeparateProcesses]
 class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
 
   use StringTranslationTrait;
@@ -70,10 +72,6 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
           ValidationResult::createError([
             t('It must be a root dependency.'),
           ], $summary),
-        ],
-        [
-          'package-manager-faq-composer-patches-not-a-root-dependency',
-          NULL,
         ],
       ],
       'VALID: present' => [
@@ -210,9 +208,13 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
    *   Whether patcher is installed in stage.
    * @param \Drupal\package_manager\ValidationResult[] $expected_results
    *   The expected validation results.
+   * @param string[] $help_page_sections
+   *   An associative array of fragments (anchors) in the online help. The keys
+   *   should be the numeric indices of the validation result messages which
+   *   should link to those fragments.
    */
   #[DataProvider('providerErrorDuringPreApply')]
-  public function testErrorDuringPreApply(int $in_active, int $in_stage, array $expected_results): void {
+  public function testErrorDuringPreApply(int $in_active, int $in_stage, array $expected_results, array $help_page_sections): void {
     // Simulate in active.
     $active_manipulator = new ActiveFixtureManipulator();
     if ($in_active & static::CONFIG_ALLOWED_PLUGIN) {
@@ -313,7 +315,7 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
       }
       $expected_results[$result_index] = ValidationResult::createError($messages, $result->summary);
     }
-    $this->testErrorDuringPreApply($in_active, $in_stage, $expected_results);
+    $this->testErrorDuringPreApply($in_active, $in_stage, $expected_results, $help_page_sections);
   }
 
 }

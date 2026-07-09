@@ -12,6 +12,7 @@ use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -20,6 +21,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  */
 #[CoversClass(MediaLibraryState::class)]
 #[Group('media_library')]
+#[RunTestsInSeparateProcesses]
 class MediaLibraryStateTest extends KernelTestBase {
 
   use MediaTypeCreationTrait;
@@ -97,8 +99,6 @@ class MediaLibraryStateTest extends KernelTestBase {
    *   library.
    * @param string $exception_message
    *   The expected exception message.
-   *
-   * @legacy-covers ::create
    */
   #[DataProvider('providerCreate')]
   public function testCreate($opener_id, array $allowed_media_type_ids, $selected_type_id, $remaining_slots, $exception_message = ''): void {
@@ -121,7 +121,7 @@ class MediaLibraryStateTest extends KernelTestBase {
    * @return array
    *   The data sets to test.
    */
-  public static function providerCreate() {
+  public static function providerCreate(): array {
     $test_data = [];
 
     // Assert no exception is thrown when we add the parameters as expected.
@@ -275,8 +275,6 @@ class MediaLibraryStateTest extends KernelTestBase {
    *   The query parameters to override.
    * @param bool $exception_expected
    *   Whether an AccessDeniedHttpException is expected or not.
-   *
-   * @legacy-covers ::fromRequest
    */
   #[DataProvider('providerFromRequest')]
   public function testFromRequest(array $query_overrides, $exception_expected): void {
@@ -295,8 +293,6 @@ class MediaLibraryStateTest extends KernelTestBase {
 
   /**
    * Tests from request query less.
-   *
-   * @legacy-covers ::fromRequest
    */
   public function testFromRequestQueryLess(): void {
     $this->expectException(\InvalidArgumentException::class);
@@ -311,7 +307,7 @@ class MediaLibraryStateTest extends KernelTestBase {
    * @return array
    *   The data sets to test.
    */
-  public static function providerFromRequest() {
+  public static function providerFromRequest(): array {
     $test_data = [];
 
     // Assert no exception is thrown when we use valid state parameters.

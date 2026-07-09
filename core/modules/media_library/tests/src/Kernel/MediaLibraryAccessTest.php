@@ -17,11 +17,13 @@ use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the media library access.
  */
 #[Group('media_library')]
+#[RunTestsInSeparateProcesses]
 class MediaLibraryAccessTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -142,7 +144,7 @@ class MediaLibraryAccessTest extends KernelTestBase {
    * @legacy-covers \Drupal\media_library\MediaLibraryEditorOpener::checkAccess
    */
   #[DataProvider('editorOpenerAccessProvider')]
-  public function testEditorOpenerAccess($media_embed_enabled, $can_use_format): void {
+  public function testEditorOpenerAccess(bool $media_embed_enabled, bool $can_use_format): void {
     $format = $this->container
       ->get('entity_type.manager')
       ->getStorage('filter_format')->create([
@@ -185,7 +187,7 @@ class MediaLibraryAccessTest extends KernelTestBase {
   /**
    * Data provider for ::testEditorOpenerAccess.
    */
-  public static function editorOpenerAccessProvider() {
+  public static function editorOpenerAccessProvider(): array {
     return [
       'media_embed filter enabled' => [
         TRUE,

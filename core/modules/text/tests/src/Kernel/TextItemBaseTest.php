@@ -13,12 +13,14 @@ use Drupal\text\Plugin\Field\FieldType\TextItemBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests TextItemBase.
  */
 #[CoversClass(TextItemBase::class)]
 #[Group('text')]
+#[RunTestsInSeparateProcesses]
 class TextItemBaseTest extends KernelTestBase {
 
   /**
@@ -32,7 +34,7 @@ class TextItemBaseTest extends KernelTestBase {
    * @legacy-covers ::generateSampleValue
    */
   #[DataProvider('providerTextFieldSampleValue')]
-  public function testTextFieldSampleValue($max_length): void {
+  public function testTextFieldSampleValue(int $max_length): void {
     // Create a text field.
     $field_definition = BaseFieldDefinition::create('text')
       ->setTargetEntityTypeId('foo');
@@ -48,7 +50,7 @@ class TextItemBaseTest extends KernelTestBase {
   /**
    * Data provider for testTextFieldSampleValue.
    */
-  public static function providerTextFieldSampleValue() {
+  public static function providerTextFieldSampleValue(): array {
     return [
       [
         1,
@@ -67,8 +69,6 @@ class TextItemBaseTest extends KernelTestBase {
 
   /**
    * Tests calculate dependencies.
-   *
-   * @legacy-covers ::calculateDependencies
    */
   public function testCalculateDependencies(): void {
     $this->installEntitySchema('user');

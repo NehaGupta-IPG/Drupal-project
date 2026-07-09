@@ -13,12 +13,14 @@ use Drupal\Core\File\FileSystem;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\Core\File\FileSystem.
  */
 #[CoversClass(FileSystem::class)]
 #[Group('File')]
+#[RunTestsInSeparateProcesses]
 class FileSystemTest extends KernelTestBase {
 
   /**
@@ -67,8 +69,6 @@ class FileSystemTest extends KernelTestBase {
 
   /**
    * Tests copy failure if file already exists.
-   *
-   * @legacy-covers ::copy
    */
   public function testCopyFailureIfFileAlreadyExists(): void {
     $this->expectException(FileExistsException::class);
@@ -80,8 +80,6 @@ class FileSystemTest extends KernelTestBase {
 
   /**
    * Tests copy failure if self overwrite.
-   *
-   * @legacy-covers ::copy
    */
   public function testCopyFailureIfSelfOverwrite(): void {
     $this->expectException(FileException::class);
@@ -93,8 +91,6 @@ class FileSystemTest extends KernelTestBase {
 
   /**
    * Tests copy self rename.
-   *
-   * @legacy-covers ::copy
    */
   public function testCopySelfRename(): void {
     $uri = 'public://test.txt';

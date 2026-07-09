@@ -9,13 +9,14 @@ use Drupal\views\Plugin\views\filter\Combine;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the combine filter handler.
  */
 #[CoversClass(Combine::class)]
 #[Group('views')]
-#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class FilterCombineTest extends ViewsKernelTestBase {
 
   /**

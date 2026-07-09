@@ -26,6 +26,7 @@ use PhpTuf\ComposerStager\API\Core\StagerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\package_manager\SandboxManagerBase.
@@ -35,6 +36,7 @@ use PHPUnit\Framework\Attributes\Group;
 #[CoversClass(SandboxManagerBase::class)]
 #[Group('package_manager')]
 #[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class SandboxManagerBaseTest extends PackageManagerKernelTestBase {
 
   use StringTranslationTrait;
@@ -98,8 +100,6 @@ class SandboxManagerBaseTest extends PackageManagerKernelTestBase {
 
   /**
    * Tests get sandbox directory.
-   *
-   * @legacy-covers ::getSandboxDirectory
    */
   public function testGetSandboxDirectory(): void {
     // In this test, we're working with paths that (probably) don't exist in

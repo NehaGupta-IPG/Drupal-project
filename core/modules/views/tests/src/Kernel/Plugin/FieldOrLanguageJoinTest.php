@@ -8,6 +8,7 @@ use Drupal\views\Plugin\views\join\FieldOrLanguageJoin;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the "field OR language" join plugin.
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @see \Drupal\views\Plugin\views\join\FieldOrLanguageJoin
  */
 #[Group('views')]
+#[RunTestsInSeparateProcesses]
 class FieldOrLanguageJoinTest extends RelationshipJoinTestBase {
 
   /**
@@ -198,7 +200,7 @@ class FieldOrLanguageJoinTest extends RelationshipJoinTestBase {
    *   \Drupal\Core\Database\Query\Select::$tables for more information on the
    *   structure of the array.
    */
-  protected function buildJoin(ViewExecutable $view, $configuration, $table_alias) {
+  protected function buildJoin(ViewExecutable $view, array $configuration, $table_alias) {
     // Build the actual join values and read them back from the query object.
     $query = \Drupal::database()->select('node');
 

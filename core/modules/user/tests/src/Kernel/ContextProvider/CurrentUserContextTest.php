@@ -10,12 +10,14 @@ use Drupal\user\ContextProvider\CurrentUserContext;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\user\ContextProvider\CurrentUserContext.
  */
 #[CoversClass(CurrentUserContext::class)]
 #[Group('user')]
+#[RunTestsInSeparateProcesses]
 class CurrentUserContextTest extends KernelTestBase {
 
   /**
@@ -34,8 +36,6 @@ class CurrentUserContextTest extends KernelTestBase {
 
   /**
    * Tests get available contexts.
-   *
-   * @legacy-covers ::getAvailableContexts
    */
   public function testGetAvailableContexts(): void {
     $context_repository = $this->container->get('context.repository');

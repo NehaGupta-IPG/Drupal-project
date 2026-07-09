@@ -13,6 +13,7 @@ use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore nzdt
 /**
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\Group;
  */
 #[CoversClass(Route::class)]
 #[Group('migrate')]
+#[RunTestsInSeparateProcesses]
 class RouteTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -38,7 +40,7 @@ class RouteTest extends KernelTestBase {
    *   The expected results from the Route transform process.
    */
   #[DataProvider('providerTestRoute')]
-  public function testRoute($value, $expected): void {
+  public function testRoute(string|array $value, array $expected): void {
     $actual = $this->doTransform($value);
     $this->assertSame($expected, $actual);
   }
@@ -50,7 +52,7 @@ class RouteTest extends KernelTestBase {
    *   An array of arrays, where the first element is the input to the Route
    *   process plugin, and the second is the expected results.
    */
-  public static function providerTestRoute() {
+  public static function providerTestRoute(): array {
     // Internal link tests.
     // Valid link path and options.
     $values[0] = [
@@ -198,7 +200,7 @@ class RouteTest extends KernelTestBase {
    *   The expected results from the Route transform process.
    */
   #[DataProvider('providerTestRouteWithParamQuery')]
-  public function testRouteWithParamQuery($value, $expected): void {
+  public function testRouteWithParamQuery(array $value, array $expected): void {
     // Create a user so that user/1/edit is a valid path.
     $this->setUpCurrentUser();
     $this->installConfig(['user']);
@@ -214,7 +216,7 @@ class RouteTest extends KernelTestBase {
    *   An array of arrays, where the first element is the input to the Route
    *   process plugin, and the second is the expected results.
    */
-  public static function providerTestRouteWithParamQuery() {
+  public static function providerTestRouteWithParamQuery(): array {
     $values = [];
     $expected = [];
     // Valid link path with query options and parameters.

@@ -8,11 +8,13 @@ use Drupal\comment\Entity\CommentType;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that comment fields cannot be added to entities with non-integer IDs.
  */
 #[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentStringIdEntitiesTest extends KernelTestBase {
 
   /**
@@ -22,9 +24,7 @@ class CommentStringIdEntitiesTest extends KernelTestBase {
     'comment',
     'user',
     'field',
-    'field_ui',
     'entity_test',
-    'text',
   ];
 
   /**

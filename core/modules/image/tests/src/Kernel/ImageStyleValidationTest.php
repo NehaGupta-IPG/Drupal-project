@@ -7,11 +7,15 @@ namespace Drupal\Tests\image\Kernel;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests validation of image_style entities.
  */
 #[Group('image')]
+#[Group('config')]
+#[Group('Validation')]
+#[RunTestsInSeparateProcesses]
 class ImageStyleValidationTest extends ConfigEntityValidationTestBase {
 
   /**

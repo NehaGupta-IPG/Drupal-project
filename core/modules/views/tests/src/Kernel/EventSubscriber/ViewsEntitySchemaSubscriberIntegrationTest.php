@@ -10,12 +10,14 @@ use Drupal\Core\Entity\EntityTypeEvents;
 use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests \Drupal\views\EventSubscriber\ViewsEntitySchemaSubscriber.
  */
 #[Group('Views')]
 #[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
 
   use EntityDefinitionTestTrait;
@@ -33,7 +35,6 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
   protected static $modules = [
     'entity_test',
     'entity_test_update',
-    'user',
     'text',
   ];
 
@@ -57,13 +58,6 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
   protected $eventDispatcher;
 
   /**
-   * The tested event subscriber of views.
-   *
-   * @var \Drupal\views\EventSubscriber\ViewsEntitySchemaSubscriber
-   */
-  protected $eventSubscriber;
-
-  /**
    * The entity type manager service.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
@@ -84,7 +78,6 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
     parent::setUp();
 
     $this->eventDispatcher = $this->container->get('event_dispatcher');
-    $this->eventSubscriber = $this->container->get('views.entity_schema_subscriber');
     $this->entityDefinitionUpdateManager = $this->container->get('entity.definition_update_manager');
     $this->entityTypeManager = $this->container->get('entity_type.manager');
     $this->state = $this->container->get('state');

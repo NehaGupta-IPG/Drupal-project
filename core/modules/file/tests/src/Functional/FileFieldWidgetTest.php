@@ -57,7 +57,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
    * @return \Drupal\file\FileInterface
    *   A file object, or FALSE on error.
    */
-  protected function createTemporaryFile($data, ?UserInterface $user = NULL) {
+  protected function createTemporaryFile(string $data, ?UserInterface $user = NULL) {
     /** @var \Drupal\file\FileRepositoryInterface $file_repository */
     $file_repository = \Drupal::service('file.repository');
     $file = $file_repository->writeData($data, "public://");
@@ -481,7 +481,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
     $type_name = 'article';
     $field_name = $this->randomMachineName();
     $this->createFileField($field_name, 'node', $type_name);
-    /** @var \Drupal\Field\FieldConfigInterface $field */
+    /** @var \Drupal\field\FieldConfigInterface $field */
     $field = FieldConfig::loadByName('node', $type_name, $field_name);
     $field_id = $field->id();
     $this->drupalGet("admin/structure/types/manage/$type_name/fields/$field_id");
@@ -492,7 +492,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
     $this->assertSession()->pageTextContains('Saved ' . $field_name . ' configuration.');
 
     // Reload the field config to check for the saved value.
-    /** @var \Drupal\Field\FieldConfigInterface $field */
+    /** @var \Drupal\field\FieldConfigInterface $field */
     $field = FieldConfig::loadByName('node', $type_name, $field_name);
     $settings = $field->getSettings();
     $this->assertEquals('5.1 megabytes', $settings['max_filesize'], 'The max filesize value had been trimmed on save.');
@@ -584,7 +584,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
 
     // Attach a file to a node.
     $edit['files[' . $field_name . '_0]'] = $this->container->get('file_system')->realpath($test_file->getFileUri());
-    $this->drupalGet(Url::fromRoute('node.add', ['node_type' => $type_name]));
+    $this->drupalGet(Url::fromRoute('entity.node.add_form', ['node_type' => $type_name]));
     $this->submitForm($edit, 'Save');
     $node = $this->drupalGetNodeByTitle($edit['title[0][value]']);
 
