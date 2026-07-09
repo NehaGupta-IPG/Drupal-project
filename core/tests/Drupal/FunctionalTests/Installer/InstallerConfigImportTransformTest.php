@@ -78,7 +78,7 @@ class InstallerConfigImportTransformTest extends InstallerConfigDirectoryTestBas
     // - system.site is changed by config_transformer_test's import transform,
     //   which appends " Arrr" to the site name. It differs from the raw sync
     //   storage precisely because the install-time config import runs the
-    //   transformation pipeline, which is the behaviour under test.
+    //   transformation pipeline, which is the behavior under test.
     $change_list = $this->configImporter()->getStorageComparer()->getChangelist();
     $expected = [
       'create' => [],
