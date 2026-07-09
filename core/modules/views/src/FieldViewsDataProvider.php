@@ -327,6 +327,11 @@ class FieldViewsDataProvider {
         'element type' => 'div',
         'is revision' => $type == EntityStorageInterface::FIELD_LOAD_REVISION,
       ];
+      // Flag decimal values so that the numeric field handler, used when
+      // aggregation is enabled, offers precision and decimal point settings.
+      if (in_array($field_columns[$real_field]['type'], ['float', 'double', 'decimal', 'numeric'], TRUE)) {
+        $data[$table_alias][$field_alias]['field']['float'] = TRUE;
+      }
     }
 
     // Expose data for each field property individually.
