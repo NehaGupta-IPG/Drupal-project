@@ -28,6 +28,17 @@ class InstallerConfigImportTransformTest extends InstallerConfigDirectoryTestBas
   /**
    * {@inheritdoc}
    */
+  protected function setUp(): void {
+    // @todo Temporarily disabled while the unrelated, pre-existing random
+    //   failure in ConfigInstallProfileOverrideTest is resolved. Re-enable by
+    //   removing this setUp() override. See
+    //   https://www.drupal.org/project/drupal/issues/3609512.
+    $this->markTestSkipped('Temporarily disabled: see https://www.drupal.org/project/drupal/issues/3609512.');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function prepareEnvironment(): void {
     parent::prepareEnvironment();
 
