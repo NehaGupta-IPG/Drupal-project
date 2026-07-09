@@ -144,7 +144,7 @@ function node_update_12001(): void {
   foreach ($config_factory->listAll('node.type.') as $name) {
     $config = $config_factory->getEditable($name);
     if ($config->get('display_submitted') !== NULL) {
-      $config->clear('display_submitted')->save(TRUE);
+      $config->clear('display_submitted')->save();
     }
   }
 }
