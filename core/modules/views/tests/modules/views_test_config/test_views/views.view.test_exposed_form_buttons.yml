@@ -28,6 +28,7 @@ display:
             label: 'Content: Type'
             operator_id: type_op
             reduce: false
+            limit: false
             description: 'Exposed description'
           exposed: true
           field: type

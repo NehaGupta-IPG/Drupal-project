@@ -58,6 +58,7 @@ display:
             label: 'Content: Type'
             operator_id: type_op
             reduce: false
+            limit: false
             use_operator: false
           exposed: true
           field: type
