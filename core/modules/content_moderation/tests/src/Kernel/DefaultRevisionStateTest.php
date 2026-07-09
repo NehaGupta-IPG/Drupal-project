@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\content_moderation\Kernel;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
@@ -137,7 +136,7 @@ class DefaultRevisionStateTest extends KernelTestBase {
     $results = $query->allRevisions()
       ->condition('content_entity_revision_id', $revision_id)
       ->condition('langcode', $langcode)
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertCount(1, $results);
 
     $moderation_state = $moderation_state_storage

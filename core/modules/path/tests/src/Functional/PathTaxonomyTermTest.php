@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\path\Functional;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\taxonomy\Entity\Vocabulary;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -66,7 +65,7 @@ class PathTaxonomyTermTest extends PathTestBase {
       ->accessCheck(FALSE)
       ->condition('name', $edit['name[0][value]'])
       ->condition('default_langcode', 1)
-      ->execute(new CacheableMetadata());
+      ->execute();
     $tid = reset($tids);
 
     // Confirm that the alias works.

@@ -2,7 +2,6 @@
 
 namespace Drupal\layout_builder\Form;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -151,7 +150,7 @@ class LayoutBuilderEntityViewDisplayForm extends EntityViewDisplayEditForm {
         ->condition('bundle', $this->entity->getTargetBundle())
         ->condition('status', TRUE)
         ->condition('mode', $canonical_mode);
-      return !$query->count()->execute(new CacheableMetadata());
+      return !$query->count()->execute();
     }
 
     return FALSE;
@@ -178,7 +177,7 @@ class LayoutBuilderEntityViewDisplayForm extends EntityViewDisplayEditForm {
     if ($bundle_key = $entity_type->getKey('bundle')) {
       $query->condition($bundle_key, $display->getTargetBundle());
     }
-    return (bool) $query->count()->execute(new CacheableMetadata());
+    return (bool) $query->count()->execute();
   }
 
   /**

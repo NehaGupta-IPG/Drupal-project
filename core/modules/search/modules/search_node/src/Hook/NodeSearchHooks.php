@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\search_node\Hook;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\State\StateInterface;
@@ -35,7 +34,7 @@ class NodeSearchHooks {
     // reference.)
     $min_alias = 'min_created';
     $max_alias = 'max_created';
-    $result = $this->entityTypeManager->getStorage('node')->getAggregateQuery()->accessCheck(FALSE)->aggregate('created', 'MIN', NULL, $min_alias)->aggregate('created', 'MAX', NULL, $max_alias)->execute(new CacheableMetadata());
+    $result = $this->entityTypeManager->getStorage('node')->getAggregateQuery()->accessCheck(FALSE)->aggregate('created', 'MIN', NULL, $min_alias)->aggregate('created', 'MAX', NULL, $max_alias)->execute();
     if (isset($result[0])) {
       // Make an array with definite keys and store it in the state system.
       $array = ['min_created' => $result[0][$min_alias], 'max_created' => $result[0][$max_alias]];

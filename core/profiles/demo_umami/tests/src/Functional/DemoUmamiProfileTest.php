@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\demo_umami\Functional;
 
 use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Config\StorageInterface;
@@ -153,7 +152,7 @@ class DemoUmamiProfileTest extends BrowserTestBase {
     $ids = \Drupal::entityQuery('user')
       ->accessCheck(FALSE)
       ->condition('roles', ['author', 'editor'], 'IN')
-      ->execute(new CacheableMetadata());
+      ->execute();
 
     $users = \Drupal::entityTypeManager()->getStorage('user')->loadMultiple($ids);
 

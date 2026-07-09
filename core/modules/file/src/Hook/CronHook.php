@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\file\Hook;
 
 use Drupal\Component\Datetime\TimeInterface;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -40,7 +39,7 @@ class CronHook {
     // Only delete temporary files if older than $age. Note that automatic
     // cleanup is disabled if $age set to 0.
     if ($age) {
-      $fids = $fileStorage->getQuery()->accessCheck(FALSE)->condition('status', FileInterface::STATUS_PERMANENT, '<>')->condition('changed', $this->time->getRequestTime() - $age, '<')->range(0, 100)->execute(new CacheableMetadata());
+      $fids = $fileStorage->getQuery()->accessCheck(FALSE)->condition('status', FileInterface::STATUS_PERMANENT, '<>')->condition('changed', $this->time->getRequestTime() - $age, '<')->range(0, 100)->execute();
       /** @var \Drupal\file\FileInterface[] $files */
       $files = $fileStorage->loadMultiple($fids);
       foreach ($files as $file) {

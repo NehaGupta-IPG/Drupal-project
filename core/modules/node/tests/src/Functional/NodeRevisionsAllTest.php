@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Functional;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\node\NodeInterface;
 use PHPUnit\Framework\Attributes\Group;
@@ -179,7 +178,7 @@ class NodeRevisionsAllTest extends NodeTestBase {
       ->accessCheck(FALSE)
       ->condition('nid', $node->id())
       ->condition('vid', $nodes[1]->getRevisionId())
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertCount(0, $nids);
 
     // Set the revision timestamp to an older date to make sure that the

@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Path\Plugin\Validation\Constraint;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -62,7 +61,7 @@ class UniquePathAliasConstraintValidator extends ConstraintValidator implements 
       $query->condition('path', $path, '<>');
     }
 
-    if ($result = $query->range(0, 1)->execute(new CacheableMetadata())) {
+    if ($result = $query->range(0, 1)->execute()) {
       $existing_alias_id = reset($result);
       $existing_alias = $storage->load($existing_alias_id);
 

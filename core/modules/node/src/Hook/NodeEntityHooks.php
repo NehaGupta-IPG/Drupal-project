@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\node\Hook;
 
 use Drupal\Core\Access\AccessResultInterface;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\language\ConfigurableLanguageInterface;
 use Drupal\Core\Access\AccessResult;
@@ -46,7 +45,7 @@ class NodeEntityHooks {
   public function userPredelete($account): void {
     // Delete nodes (current revisions).
     // @todo Introduce node_mass_delete() or make NodeBulkUpdate::process() more flexible.
-    $nids = \Drupal::entityQuery('node')->condition('uid', $account->id())->accessCheck(FALSE)->execute(new CacheableMetadata());
+    $nids = \Drupal::entityQuery('node')->condition('uid', $account->id())->accessCheck(FALSE)->execute();
     // Delete old revisions.
     $storage_controller = \Drupal::entityTypeManager()->getStorage('node');
     $nodes = $storage_controller->loadMultiple($nids);
@@ -55,7 +54,7 @@ class NodeEntityHooks {
       ->allRevisions()
       ->accessCheck(FALSE)
       ->condition('uid', $account->id());
-    $revisions = array_keys($query->execute(new CacheableMetadata()));
+    $revisions = array_keys($query->execute());
     foreach ($revisions as $revision) {
       $storage_controller->deleteRevision($revision);
     }

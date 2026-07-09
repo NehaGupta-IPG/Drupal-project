@@ -2,7 +2,6 @@
 
 namespace Drupal\search;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
@@ -44,7 +43,7 @@ class SearchPageRepository implements SearchPageRepositoryInterface {
   public function getActiveSearchPages() {
     $ids = $this->getQuery()
       ->condition('status', TRUE)
-      ->execute(new CacheableMetadata());
+      ->execute();
     return $this->storage->loadMultiple($ids);
   }
 
@@ -55,7 +54,7 @@ class SearchPageRepository implements SearchPageRepositoryInterface {
     return (bool) $this->getQuery()
       ->condition('status', TRUE)
       ->range(0, 1)
-      ->execute(new CacheableMetadata());
+      ->execute();
   }
 
   /**
@@ -74,7 +73,7 @@ class SearchPageRepository implements SearchPageRepositoryInterface {
     // Find all active search pages (without loading them).
     $search_pages = $this->getQuery()
       ->condition('status', TRUE)
-      ->execute(new CacheableMetadata());
+      ->execute();
 
     // If the default page is active, return it.
     $default = $this->configFactory->get('search.settings')->get('default_page');

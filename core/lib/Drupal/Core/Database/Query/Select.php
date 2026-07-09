@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Database\Query;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Database\Connection;
@@ -521,19 +522,21 @@ class Select extends Query implements SelectInterface {
    * {@inheritdoc}
    */
   public function execute(?RefinableCacheableDependencyInterface $cacheableMetadata = NULL) {
-    if ($cacheableMetadata === NULL) {
-      // @todo Add correct CR number.
-      @trigger_error('Calling ' . __METHOD__ . '() without the $cacheableMetadata argument is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/1234567', E_USER_DEPRECATED);
-    }
-
     // If validation fails, simply return NULL. Note that validation routines in
     // preExecute() may throw exceptions instead.
     if (!$this->preExecute()) {
       return NULL;
     }
 
-    // @todo Remove conditional call in Drupal 12.0.0.
-    $cacheableMetadata?->addCacheableDependency($this);
+    if ($cacheableMetadata === NULL) {
+      if (!empty($this->getCacheContexts()) || !empty($this->getCacheTags()) || $this->getCacheMaxAge() !== Cache::PERMANENT) {
+        // @todo Add correct CR number.
+        @trigger_error('Calling ' . __METHOD__ . '() without the $cacheableMetadata argument when the query has cacheable metadata is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/1234567', E_USER_DEPRECATED);
+      }
+    }
+    else {
+      $cacheableMetadata->addCacheableDependency($this);
+    }
 
     $args = $this->getArguments();
     return $this->connection->query((string) $this, $args, $this->queryOptions);

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\node\Hook;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\node\NodeBulkUpdate;
@@ -35,7 +34,7 @@ class NodeUserHooks {
       $nids = $this->entityTypeManager->getStorage('node')->getQuery()
         ->accessCheck(FALSE)
         ->condition('uid', $account->id())
-        ->execute(new CacheableMetadata());
+        ->execute();
       $this->nodeBulkUpdate->process($nids, ['status' => 0], NULL, TRUE);
     }
   }
@@ -52,7 +51,7 @@ class NodeUserHooks {
         ->allRevisions()
         ->accessCheck(FALSE)
         ->condition('uid', $account->id());
-      $vids = array_keys($query->execute(new CacheableMetadata()));
+      $vids = array_keys($query->execute());
       $this->nodeBulkUpdate->process($vids, ['uid' => 0, 'revision_uid' => 0], NULL, TRUE, TRUE);
     }
   }

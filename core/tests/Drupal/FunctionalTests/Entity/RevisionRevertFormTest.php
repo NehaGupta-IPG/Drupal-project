@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Entity;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\Form\RevisionRevertForm;
 use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\entity_test\Entity\EntityTestRev;
@@ -389,7 +388,7 @@ class RevisionRevertFormTest extends BrowserTestBase {
       ->accessCheck(FALSE)
       ->allRevisions()
       ->count()
-      ->execute(new CacheableMetadata());
+      ->execute();
   }
 
 }

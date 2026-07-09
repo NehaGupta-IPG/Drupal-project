@@ -224,7 +224,7 @@ class VersionHistoryController extends ControllerBase {
         ->condition($entityType->getKey('revision_translation_affected'), '1');
     }
 
-    $result = $query->execute(new CacheableMetadata());
+    $result = $query->execute();
 
     $currentLangcode = $this->languageManager
       ->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)

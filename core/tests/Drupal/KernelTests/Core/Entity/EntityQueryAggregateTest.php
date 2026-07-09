@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use PHPUnit\Framework\Attributes\Group;
@@ -122,7 +121,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
     $this->queryResult = $this->entityStorage->getAggregateQuery()
       ->accessCheck(FALSE)
       ->groupBy('user_id')
-      ->execute(new CacheableMetadata());
+      ->execute();
 
     $this->assertResults([
       ['user_id' => 1],
@@ -142,7 +141,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       $query = $this->entityStorage->getAggregateQuery()
         ->accessCheck(FALSE)
         ->aggregate('id', $aggregation_function);
-      $this->queryResult = $query->execute(new CacheableMetadata());
+      $this->queryResult = $query->execute();
       // We need to check that a character exists before and after the table,
       // column and alias identifiers. These would be the quote characters
       // specific for each database system.
@@ -155,7 +154,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->accessCheck(FALSE)
       ->aggregate('id', 'COUNT')
       ->groupBy('user_id')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertResults([
       ['user_id' => 1, 'id_count' => 1],
       ['user_id' => 2, 'id_count' => 3],
@@ -168,7 +167,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->aggregate('id', 'COUNT')
       ->groupBy('id')
       ->conditionAggregate('id', 'COUNT', 8)
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertResults([]);
 
     // Don't call aggregate to test the implicit aggregate call.
@@ -176,7 +175,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->accessCheck(FALSE)
       ->groupBy('id')
       ->conditionAggregate('id', 'COUNT', 8)
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertResults([]);
 
     // Apply aggregation and a condition which matches.
@@ -185,7 +184,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->aggregate('id', 'count')
       ->groupBy('id')
       ->conditionAggregate('id', 'COUNT', 6)
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertResults([['id_count' => 6]]);
 
     // Apply aggregation, a group by and a condition which matches partially via
@@ -195,7 +194,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->aggregate('id', 'count')
       ->conditionAggregate('id', 'count', 2)
       ->groupBy('user_id')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertResults([['id_count' => 2, 'user_id' => 3]]);
 
     // Apply aggregation, a group by and a condition which matches partially via
@@ -205,7 +204,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->aggregate('id', 'count')
       ->conditionAggregate('id', 'COUNT', 1, '>')
       ->groupBy('user_id')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertResults([
       ['id_count' => 2, 'user_id' => 3],
       ['id_count' => 3, 'user_id' => 2],
@@ -217,14 +216,14 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->accessCheck(FALSE)
       ->aggregate('id', 'COUNT')
       ->sortAggregate('id', 'COUNT')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertSortedResults([['id_count' => 6]]);
 
     // Don't call aggregate to test the implicit aggregate call.
     $this->queryResult = $this->entityStorage->getAggregateQuery()
       ->accessCheck(FALSE)
       ->sortAggregate('id', 'COUNT')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertSortedResults([['id_count' => 6]]);
 
     // Apply aggregation, group by and a sort descending.
@@ -233,7 +232,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->aggregate('id', 'COUNT')
       ->groupBy('user_id')
       ->sortAggregate('id', 'COUNT', 'DESC')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertSortedResults([
       ['user_id' => 2, 'id_count' => 3],
       ['user_id' => 3, 'id_count' => 2],
@@ -246,7 +245,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->aggregate('id', 'COUNT')
       ->groupBy('user_id')
       ->sortAggregate('id', 'COUNT', 'ASC')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertSortedResults([
       ['user_id' => 1, 'id_count' => 1],
       ['user_id' => 3, 'id_count' => 2],
@@ -261,7 +260,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->groupBy('user_id')
       ->sortAggregate('id', 'COUNT')
       ->conditionAggregate('id', 'COUNT', 2)
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertSortedResults([['id_count' => 2, 'user_id' => 3]]);
 
     // Apply aggregation, group by, an aggregation condition and a sort with the
@@ -272,7 +271,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->groupBy('user_id')
       ->sortAggregate('id', 'COUNT', 'ASC')
       ->conditionAggregate('id', 'COUNT', 3, '<')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertSortedResults([
       ['id_count' => 1, 'user_id' => 1],
       ['id_count' => 2, 'user_id' => 3],
@@ -286,7 +285,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->groupBy('user_id')
       ->sortAggregate('id', 'COUNT', 'DESC')
       ->conditionAggregate('id', 'COUNT', 3, '<')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertSortedResults([
       ['id_count' => 2, 'user_id' => 3],
       ['id_count' => 1, 'user_id' => 1],
@@ -298,7 +297,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
     $this->queryResult = $this->entityStorage->getAggregateQuery()
       ->accessCheck(FALSE)
       ->groupBy('field_test_1')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertResults([
       ['field_test_1' => 1],
       ['field_test_1' => 2],
@@ -310,7 +309,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->accessCheck(FALSE)
       ->aggregate('user_id', 'COUNT')
       ->groupBy('field_test_1')
-      ->execute(new CacheableMetadata());
+      ->execute();
 
     $this->assertResults([
       ['field_test_1' => 1, 'user_id_count' => 2],
@@ -323,7 +322,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->accessCheck(FALSE)
       ->aggregate('field_test_1', 'COUNT')
       ->groupBy('user_id')
-      ->execute(new CacheableMetadata());
+      ->execute();
 
     $this->assertResults([
       ['user_id' => 1, 'field_test_1_count' => 1],
@@ -335,7 +334,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->accessCheck(FALSE)
       ->aggregate('field_test_1', 'SUM')
       ->groupBy('user_id')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertResults([
       ['user_id' => 1, 'field_test_1_sum' => 1],
       ['user_id' => 2, 'field_test_1_sum' => 5],
@@ -348,7 +347,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->aggregate('field_test_1', 'SUM')
       ->aggregate('field_test_2', 'SUM')
       ->groupBy('user_id')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertResults([
       ['user_id' => 1, 'field_test_1_sum' => 1, 'field_test_2_sum' => 2],
       ['user_id' => 2, 'field_test_1_sum' => 5, 'field_test_2_sum' => 16],
@@ -361,7 +360,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->aggregate('field_test_1', 'SUM')
       ->aggregate('field_test_1', 'COUNT')
       ->groupBy('user_id')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertResults([
       ['user_id' => 1, 'field_test_1_sum' => 1, 'field_test_1_count' => 1],
       ['user_id' => 2, 'field_test_1_sum' => 5, 'field_test_1_count' => 3],
@@ -373,7 +372,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->accessCheck(FALSE)
       ->groupBy('field_test_1')
       ->aggregate('field_test_2', 'COUNT')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertResults([
       ['field_test_1' => 1, 'field_test_2_count' => 2],
       ['field_test_1' => 2, 'field_test_2_count' => 3],
@@ -387,7 +386,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->groupBy('field_test_1')
       ->aggregate('field_test_2', 'COUNT')
       ->aggregate('field_test_2', 'SUM')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertResults([
       ['field_test_1' => 1, 'field_test_2_count' => 2, 'field_test_2_sum' => 9],
       ['field_test_1' => 2, 'field_test_2_count' => 3, 'field_test_2_sum' => 11],
@@ -400,7 +399,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->accessCheck(FALSE)
       ->conditionAggregate('field_test_1', 'COUNT', 3)
       ->groupBy('user_id')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertResults([
       ['user_id' => 2, 'field_test_1_count' => 3],
       ['user_id' => 3, 'field_test_1_count' => 2],
@@ -411,7 +410,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->aggregate('field_test_1', 'SUM')
       ->conditionAggregate('field_test_1', 'COUNT', 2, '>')
       ->groupBy('user_id')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertResults([
       ['user_id' => 2, 'field_test_1_sum' => 5, 'field_test_1_count' => 3],
       ['user_id' => 3, 'field_test_1_sum' => 5, 'field_test_1_count' => 2],
@@ -423,7 +422,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->accessCheck(FALSE)
       ->conditionAggregate('user_id', 'COUNT', 2)
       ->groupBy('field_test_1')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertResults([
       ['field_test_1' => 1, 'user_id_count' => 2],
     ]);
@@ -432,7 +431,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->accessCheck(FALSE)
       ->conditionAggregate('user_id', 'COUNT', 2, '>')
       ->groupBy('field_test_1')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertResults([
       ['field_test_1' => 1, 'user_id_count' => 2],
       ['field_test_1' => 2, 'user_id_count' => 3],
@@ -443,7 +442,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->accessCheck(FALSE)
       ->groupBy('field_test_1')
       ->conditionAggregate('field_test_2', 'COUNT', 2)
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertResults([
       ['field_test_1' => 1, 'field_test_2_count' => 2],
     ]);
@@ -451,7 +450,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->accessCheck(FALSE)
       ->groupBy('field_test_1')
       ->conditionAggregate('field_test_2', 'COUNT', 2, '>')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertResults([
       ['field_test_1' => 1, 'field_test_2_count' => 2],
       ['field_test_1' => 2, 'field_test_2_count' => 3],
@@ -464,7 +463,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->groupBy('field_test_1')
       ->conditionAggregate('field_test_2', 'COUNT', 2)
       ->conditionAggregate('field_test_2', 'SUM', 8)
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertResults([]);
 
     // Apply an aggregate condition and a group by fieldapi fields with multiple
@@ -474,7 +473,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->groupBy('field_test_1')
       ->conditionAggregate('field_test_2', 'COUNT', 2)
       ->conditionAggregate('field_test_2', 'SUM', 8)
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertResults([
       ['field_test_1' => 1, 'field_test_2_count' => 2, 'field_test_2_sum' => 9],
       ['field_test_1' => 3, 'field_test_2_count' => 1, 'field_test_2_sum' => 8],
@@ -487,7 +486,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->aggregate('field_test_1', 'COUNT')
       ->groupBy('user_id')
       ->sort('user_id', 'DESC')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertSortedResults([
       ['user_id' => 3, 'field_test_1_count' => 2],
       ['user_id' => 2, 'field_test_1_count' => 3],
@@ -499,7 +498,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->aggregate('field_test_1', 'COUNT')
       ->groupBy('user_id')
       ->sort('user_id', 'ASC')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertSortedResults([
       ['user_id' => 1, 'field_test_1_count' => 1],
       ['user_id' => 2, 'field_test_1_count' => 3],
@@ -511,7 +510,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->conditionAggregate('field_test_1', 'COUNT', 2, '>')
       ->groupBy('user_id')
       ->sort('user_id', 'ASC')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertSortedResults([
       ['user_id' => 2, 'field_test_1_count' => 3],
       ['user_id' => 3, 'field_test_1_count' => 2],
@@ -523,7 +522,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->accessCheck(FALSE)
       ->sortAggregate('field_test_1', 'COUNT', 'DESC')
       ->groupBy('user_id')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertSortedResults([
       ['user_id' => 2, 'field_test_1_count' => 3],
       ['user_id' => 3, 'field_test_1_count' => 2],
@@ -534,7 +533,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->accessCheck(FALSE)
       ->sortAggregate('field_test_1', 'COUNT', 'ASC')
       ->groupBy('user_id')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertSortedResults([
       ['user_id' => 1, 'field_test_1_count' => 1],
       ['user_id' => 3, 'field_test_1_count' => 2],
@@ -547,7 +546,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->groupBy('field_test_1')
       ->aggregate('field_test_2', 'COUNT')
       ->sort('field_test_1', 'ASC')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertSortedResults([
       ['field_test_1' => 1, 'field_test_2_count' => 2],
       ['field_test_1' => 2, 'field_test_2_count' => 3],
@@ -559,7 +558,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->groupBy('field_test_1')
       ->aggregate('field_test_2', 'COUNT')
       ->sort('field_test_1', 'DESC')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertSortedResults([
       ['field_test_1' => 3, 'field_test_2_count' => 1],
       ['field_test_1' => 2, 'field_test_2_count' => 3],
@@ -572,7 +571,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->accessCheck(FALSE)
       ->groupBy('field_test_1')
       ->sortAggregate('field_test_2', 'COUNT', 'DESC')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertSortedResults([
       ['field_test_1' => 2, 'field_test_2_count' => 3],
       ['field_test_1' => 1, 'field_test_2_count' => 2],
@@ -583,7 +582,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->accessCheck(FALSE)
       ->groupBy('field_test_1')
       ->sortAggregate('field_test_2', 'COUNT', 'ASC')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertSortedResults([
       ['field_test_1' => 3, 'field_test_2_count' => 1],
       ['field_test_1' => 1, 'field_test_2_count' => 2],
@@ -600,7 +599,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
       ->accessCheck(FALSE)
       ->groupBy('user_id');
 
-    $this->queryResult = $query->execute(new CacheableMetadata());
+    $this->queryResult = $query->execute();
     $this->assertResults([
       ['user_id' => 1],
       ['user_id' => 2],
@@ -616,7 +615,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
     $entity->enforceIsNew();
     $entity->save();
 
-    $this->queryResult = $query->execute(new CacheableMetadata());
+    $this->queryResult = $query->execute();
     $this->assertResults([
       ['user_id' => 1],
       ['user_id' => 2],
@@ -638,7 +637,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
 
     // Verify assumptions about the unaltered result.
     $query = clone $basicQuery;
-    $this->queryResult = $query->execute(new CacheableMetadata());
+    $this->queryResult = $query->execute();
     $this->assertResults([
       ['id' => 1],
       ['id' => 2],
@@ -653,7 +652,7 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
     $this->queryResult = $query
       // Add a tag that no hook function matches.
       ->addTag('entity_query_alter_hook_test')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertResults([
       ['id' => 1],
       ['id' => 2],
@@ -679,14 +678,14 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
     // Tightening the clone must not affect the original's conditions.
     $clone->conditionAggregate('id', 'count', 2, '>');
 
-    $this->queryResult = $original->execute(new CacheableMetadata());
+    $this->queryResult = $original->execute();
     $this->assertCount(2, $this->queryResult);
     $this->assertResults([
       ['user_id' => 2, 'id_count' => 3],
       ['user_id' => 3, 'id_count' => 2],
     ]);
 
-    $this->queryResult = $clone->execute(new CacheableMetadata());
+    $this->queryResult = $clone->execute();
     $this->assertCount(1, $this->queryResult);
     $this->assertResults([
       ['user_id' => 2, 'id_count' => 3],

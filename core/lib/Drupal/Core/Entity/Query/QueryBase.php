@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Entity\Query;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Utility\TableSort;
@@ -317,7 +316,7 @@ abstract class QueryBase implements QueryInterface {
     if ($this->pager && !empty($this->pager['limit']) && !$this->count) {
       $page = \Drupal::service('pager.parameters')->findPage($this->pager['element']);
       $count_query = clone $this;
-      $this->pager['total'] = $count_query->count()->execute(new CacheableMetadata());
+      $this->pager['total'] = $count_query->count()->execute();
       $this->pager['start'] = $page * $this->pager['limit'];
       \Drupal::service('pager.manager')->createPager($this->pager['total'], $this->pager['limit'], $this->pager['element']);
       $this->range($this->pager['start'], $this->pager['limit']);

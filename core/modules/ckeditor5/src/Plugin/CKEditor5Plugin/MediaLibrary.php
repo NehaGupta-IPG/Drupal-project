@@ -6,7 +6,6 @@ namespace Drupal\ckeditor5\Plugin\CKEditor5Plugin;
 
 use Drupal\ckeditor5\Plugin\CKEditor5PluginDefault;
 use Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
@@ -54,7 +53,7 @@ class MediaLibrary extends CKEditor5PluginDefault implements ContainerFactoryPlu
    * {@inheritdoc}
    */
   public function getDynamicPluginConfig(array $static_plugin_config, EditorInterface $editor): array {
-    $media_type_ids = $this->mediaTypeStorage->getQuery()->execute(new CacheableMetadata());
+    $media_type_ids = $this->mediaTypeStorage->getQuery()->execute();
 
     // Making the title for editor drupal media embed translatable.
     $static_plugin_config['drupalMedia']['dialogSettings']['title'] = $this->t('Add or select media');

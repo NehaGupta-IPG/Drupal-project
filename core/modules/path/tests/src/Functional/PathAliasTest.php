@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\path\Functional;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Url;
 use Drupal\Tests\WaitTerminateTestTrait;
@@ -387,7 +386,7 @@ class PathAliasTest extends PathTestBase {
     $result = \Drupal::entityTypeManager()->getStorage('path_alias')->getQuery()
       ->condition('alias', $alias, '=')
       ->accessCheck(FALSE)
-      ->execute(new CacheableMetadata());
+      ->execute();
     return reset($result);
   }
 

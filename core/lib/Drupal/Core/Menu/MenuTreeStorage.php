@@ -5,7 +5,6 @@ namespace Drupal\Core\Menu;
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Database\Connection;
@@ -237,12 +236,12 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    */
   protected function safeExecuteSelect(SelectInterface $query) {
     try {
-      return $query->execute(new CacheableMetadata());
+      return $query->execute();
     }
     catch (\Exception $e) {
       // If there was an exception, try to create the table.
       if ($this->ensureTableExists()) {
-        return $query->execute(new CacheableMetadata());
+        return $query->execute();
       }
       // Some other failure that we can not recover from.
       throw new PluginException($e->getMessage(), 0, $e);
@@ -634,7 +633,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
         ->condition('parent', $link['parent'])
         ->condition('enabled', 1);
 
-      $parent_has_children = ((bool) $query->execute(new CacheableMetadata())->fetchField()) ? 1 : 0;
+      $parent_has_children = ((bool) $query->execute()->fetchField()) ? 1 : 0;
       $this->connection->update($this->table, $this->options)
         ->fields(['has_children' => $parent_has_children])
         ->condition('id', $link['parent'])
@@ -792,7 +791,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
     //   https://www.drupal.org/node/2302043
     $subquery->fields($this->table, ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9']);
     $subquery->condition('id', $id);
-    $result = current($subquery->execute(new CacheableMetadata())->fetchAll(FetchAs::Associative));
+    $result = current($subquery->execute()->fetchAll(FetchAs::Associative));
     $ids = array_filter($result);
     if ($ids) {
       $query = $this->connection->select($this->table, NULL, $this->options);
@@ -1497,7 +1496,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       // Starting from links with the greatest depth will minimize the amount
       // of re-parenting done by the menu storage.
       $query->orderBy('depth', 'DESC');
-      $result = $query->execute(new CacheableMetadata())->fetchCol();
+      $result = $query->execute()->fetchCol();
     }
     else {
       $result = [];

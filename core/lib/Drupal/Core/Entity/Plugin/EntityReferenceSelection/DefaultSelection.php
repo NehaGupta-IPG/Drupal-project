@@ -3,7 +3,6 @@
 namespace Drupal\Core\Entity\Plugin\EntityReferenceSelection;
 
 use Drupal\Component\Utility\Html;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Entity\Attribute\EntityReferenceSelection;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
@@ -351,7 +350,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
       $query->range(0, $limit);
     }
 
-    $result = $query->execute(new CacheableMetadata());
+    $result = $query->execute();
 
     if (empty($result)) {
       return [];
@@ -374,7 +373,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
     $query = $this->buildEntityQuery($match, $match_operator);
     return $query
       ->count()
-      ->execute(new CacheableMetadata());
+      ->execute();
   }
 
   /**
@@ -388,7 +387,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
       $query = $this->buildEntityQuery();
       $result = $query
         ->condition($entity_type->getKey('id'), $ids, 'IN')
-        ->execute(new CacheableMetadata());
+        ->execute();
     }
 
     return $result;

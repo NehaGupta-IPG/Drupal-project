@@ -3,7 +3,6 @@
 namespace Drupal\Core\Entity;
 
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Entity\Exception\AmbiguousBundleClassException;
@@ -350,7 +349,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       $query->allRevisions();
     }
 
-    $result = $query->execute(new CacheableMetadata());
+    $result = $query->execute();
     return !empty($result);
   }
 
@@ -495,7 +494,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
         ->latestRevision()
         ->condition($this->entityType->getKey('id'), $entity_id)
         ->accessCheck(FALSE)
-        ->execute(new CacheableMetadata());
+        ->execute();
 
       $latest_revision_ids[LanguageInterface::LANGCODE_DEFAULT] = key($result);
       $this->memoryCache->set("latest_revision_id:{$this->entityTypeId}:$entity_id", $latest_revision_ids, MemoryCacheInterface::CACHE_PERMANENT, [$this->memoryCacheTag]);
@@ -528,7 +527,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
         ->accessCheck(FALSE)
         ->addMetaData('entity_id', $entity_id)
         ->addTag('latest_translated_affected_revision')
-        ->execute(new CacheableMetadata());
+        ->execute();
 
       $latest_revision_ids[$langcode] = key($result);
       $this->memoryCache->set("latest_revision_id:{$this->entityTypeId}:$entity_id", $latest_revision_ids, MemoryCacheInterface::CACHE_PERMANENT, [$this->memoryCacheTag]);
@@ -636,7 +635,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
         $result = $this->getQuery()
           ->accessCheck(FALSE)
           ->condition($this->entityType->getKey('id'), array_keys($entities), 'NOT IN')
-          ->execute(new CacheableMetadata());
+          ->execute();
         $ids = array_values($result);
       }
     }

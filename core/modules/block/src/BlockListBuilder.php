@@ -351,7 +351,7 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
     return $this->getStorage()->getQuery()
       ->condition('theme', $this->getThemeName())
       ->sort($this->entityType->getKey('id'))
-      ->execute(new CacheableMetadata());
+      ->execute();
   }
 
   /**

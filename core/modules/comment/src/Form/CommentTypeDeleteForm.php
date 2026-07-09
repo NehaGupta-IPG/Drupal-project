@@ -3,7 +3,6 @@
 namespace Drupal\comment\Form;
 
 use Drupal\comment\CommentManagerInterface;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -69,7 +68,7 @@ class CommentTypeDeleteForm extends EntityDeleteForm {
       ->accessCheck(FALSE)
       ->condition('comment_type', $this->entity->id())
       ->count()
-      ->execute(new CacheableMetadata());
+      ->execute();
     $entity_type = $this->entity->getTargetEntityTypeId();
     $caption = '';
     foreach (array_keys($this->commentManager->getFields($entity_type)) as $field_name) {

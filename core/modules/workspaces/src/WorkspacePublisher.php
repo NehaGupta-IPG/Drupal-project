@@ -3,7 +3,6 @@
 namespace Drupal\workspaces;
 
 use Drupal\Component\Datetime\TimeInterface;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -156,7 +155,7 @@ class WorkspacePublisher implements WorkspacePublisherInterface {
         ->accessCheck(FALSE)
         ->condition($entity_type->getKey('id'), $tracked_revisions, 'IN')
         ->latestRevision();
-      $result = $query->execute(new CacheableMetadata());
+      $result = $query->execute();
 
       // Now we compare the revision IDs which are tracked by the source
       // workspace to the latest revision IDs of those entities and the

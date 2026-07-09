@@ -4,7 +4,6 @@
  * @file
  */
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 
@@ -73,7 +72,7 @@ function _options_values_in_use($entity_type, $field_name, $values) {
       ->count()
       ->accessCheck(FALSE)
       ->range(0, 1)
-      ->execute(new CacheableMetadata());
+      ->execute();
     if ($result) {
       return TRUE;
     }

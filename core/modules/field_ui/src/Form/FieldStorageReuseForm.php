@@ -2,7 +2,6 @@
 
 namespace Drupal\field_ui\Form;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
@@ -251,7 +250,7 @@ class FieldStorageReuseForm extends FormBase {
       ->accessCheck()
       ->condition('entity_type', $this->entityTypeId)
       ->condition('field_name', $field_name)
-      ->execute(new CacheableMetadata());
+      ->execute();
     $field = $fields ? $this->entityTypeManager->getStorage('field_config')->load(reset($fields)) : NULL;
     // Have a default label in case a field storage doesn't have any fields.
     $existing_storage_label = $field ? $field->label() : $field_name;

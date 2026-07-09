@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Database\Query;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
 
@@ -364,7 +363,7 @@ class Merge extends Query implements ConditionInterface {
       ->condition($this->condition);
     $select->addExpression('1');
 
-    if (!$select->execute(new CacheableMetadata())->fetchField()) {
+    if (!$select->execute()->fetchField()) {
       try {
         $insert = $this->connection->insert($this->table)->fields($this->insertFields);
         if ($this->defaultFields) {
@@ -378,7 +377,7 @@ class Merge extends Query implements ConditionInterface {
         // beat us in inserting the same row. Retry the select query, if it
         // returns a row, ignore the error and continue with the update
         // query below.
-        if (!$select->execute(new CacheableMetadata())->fetchField()) {
+        if (!$select->execute()->fetchField()) {
           throw $e;
         }
       }

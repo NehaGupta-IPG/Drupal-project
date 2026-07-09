@@ -8,7 +8,6 @@ use Drupal\block\Entity\Block;
 use Drupal\block\Plugin\ConfigAction\PlaceBlock;
 use Drupal\block\Plugin\ConfigAction\PlaceBlockDeriver;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Config\Action\ConfigActionManager;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -219,7 +218,7 @@ class ConfigActionsTest extends KernelTestBase {
       ->count()
       ->condition('theme', 'olivero')
       ->condition('region', 'footer_top');
-    $this->assertSame(0, $query->execute(new CacheableMetadata()));
+    $this->assertSame(0, $query->execute());
 
     // Place a block in that region.
     $this->configActionManager->applyAction('placeBlockInDefaultTheme', 'block.block.test', [
@@ -229,7 +228,7 @@ class ConfigActionsTest extends KernelTestBase {
       ],
       'position' => 'first',
     ]);
-    $this->assertSame(1, $query->execute(new CacheableMetadata()));
+    $this->assertSame(1, $query->execute());
   }
 
 }

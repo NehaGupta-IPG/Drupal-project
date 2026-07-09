@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\field\Plugin\ConfigAction;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Action\Attribute\ConfigAction;
 use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Config\Action\ConfigActionPluginInterface;
@@ -64,7 +63,7 @@ final class AddToAllBundles implements ConfigActionPluginInterface, ContainerFac
     $existing_fields = $storage->getQuery()
       ->condition('entity_type', $entity_type_id)
       ->condition('field_name', $field_name)
-      ->execute(new CacheableMetadata());
+      ->execute();
 
     // Get all bundles of the target entity type.
     $bundles = array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type_id));

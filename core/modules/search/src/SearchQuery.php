@@ -2,7 +2,7 @@
 
 namespace Drupal\search;
 
-use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Database\Query\SelectExtender;
 use Drupal\Core\Database\Query\SelectInterface;
@@ -445,7 +445,7 @@ class SearchQuery extends SelectExtender {
     $result = $normalize_query
       ->range(0, 1)
       ->orderBy('calculated_score', 'DESC')
-      ->execute(new CacheableMetadata())
+      ->execute()
       ->fetchObject();
     if (isset($result->calculated_score)) {
       $this->normalize = (float) $result->calculated_score;
@@ -549,11 +549,6 @@ class SearchQuery extends SelectExtender {
    *   A query result set containing the results of the query.
    */
   public function execute(?RefinableCacheableDependencyInterface $cacheableMetadata = NULL) {
-    if ($cacheableMetadata === NULL) {
-      // @todo Add correct CR number.
-      @trigger_error('Calling ' . __METHOD__ . '() without the $cacheableMetadata argument is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/1234567', E_USER_DEPRECATED);
-    }
-
     if (!$this->preExecute($this)) {
       return NULL;
     }

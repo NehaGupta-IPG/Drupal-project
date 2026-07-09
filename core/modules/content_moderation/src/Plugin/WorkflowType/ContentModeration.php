@@ -3,7 +3,6 @@
 namespace Drupal\content_moderation\Plugin\WorkflowType;
 
 use Drupal\content_moderation\ModerationInformationInterface;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -105,7 +104,7 @@ class ContentModeration extends WorkflowTypeBase implements ContentModerationInt
       ->count()
       ->accessCheck(FALSE)
       ->range(0, 1)
-      ->execute(new CacheableMetadata());
+      ->execute();
   }
 
   /**
@@ -120,7 +119,7 @@ class ContentModeration extends WorkflowTypeBase implements ContentModerationInt
       ->count()
       ->accessCheck(FALSE)
       ->range(0, 1)
-      ->execute(new CacheableMetadata());
+      ->execute();
   }
 
   /**

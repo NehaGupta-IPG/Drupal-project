@@ -2,7 +2,6 @@
 
 namespace Drupal\content_moderation\Plugin\Field;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Field\FieldItemList;
@@ -86,7 +85,7 @@ class ModerationStateFieldItemList extends FieldItemList {
       ->condition('langcode', $entity->language()->getId())
       ->allRevisions()
       ->sort('revision_id', 'DESC')
-      ->execute(new CacheableMetadata());
+      ->execute();
     if (empty($revisions)) {
       return NULL;
     }

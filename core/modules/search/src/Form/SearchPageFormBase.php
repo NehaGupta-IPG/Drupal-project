@@ -2,7 +2,6 @@
 
 namespace Drupal\search\Form;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
@@ -122,7 +121,7 @@ abstract class SearchPageFormBase extends EntityForm {
   public function exists($id) {
     $entity = $this->entityTypeManager->getStorage('search_page')->getQuery()
       ->condition('id', $id)
-      ->execute(new CacheableMetadata());
+      ->execute();
     return (bool) $entity;
   }
 
@@ -136,7 +135,7 @@ abstract class SearchPageFormBase extends EntityForm {
     $path = $this->entityTypeManager->getStorage('search_page')->getQuery()
       ->condition('path', $form_state->getValue('path'))
       ->condition('id', $form_state->getValue('id'), '<>')
-      ->execute(new CacheableMetadata());
+      ->execute();
     if ($path) {
       $form_state->setErrorByName('path', $this->t('The search page path must be unique.'));
     }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\node;
 
 use Drupal\Core\Batch\BatchBuilder;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Messenger\MessengerInterface;
@@ -127,7 +126,7 @@ class NodeAccessRebuild {
           // has the bypass node access permission, no nodes are accessible
           // since the grants have just been deleted.
           ->accessCheck(FALSE)
-          ->execute(new CacheableMetadata());
+          ->execute();
 
         foreach ($nids as $nid) {
           $node_storage->resetCache([$nid]);
@@ -173,7 +172,7 @@ class NodeAccessRebuild {
       $context['sandbox']['max'] = $node_storage->getQuery()
         ->accessCheck(FALSE)
         ->count()
-        ->execute(new CacheableMetadata());
+        ->execute();
     }
 
     $limit = 20;
@@ -186,7 +185,7 @@ class NodeAccessRebuild {
       // just been deleted.
       ->accessCheck(FALSE)
       ->range(0, $limit)
-      ->execute(new CacheableMetadata());
+      ->execute();
 
     $node_storage->resetCache($nids);
     $nodes = $node_storage->loadMultiple($nids);

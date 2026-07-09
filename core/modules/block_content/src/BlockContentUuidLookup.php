@@ -2,7 +2,6 @@
 
 namespace Drupal\block_content;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheCollector;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -39,7 +38,7 @@ class BlockContentUuidLookup extends CacheCollector {
     $ids = $this->entityTypeManager->getStorage('block_content')->getQuery()
       ->accessCheck(FALSE)
       ->condition('uuid', $key)
-      ->execute(new CacheableMetadata());
+      ->execute();
 
     // Only cache if there is a match, otherwise creating new entities would
     // require to invalidate the cache.

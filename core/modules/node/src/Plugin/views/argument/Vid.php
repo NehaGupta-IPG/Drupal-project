@@ -2,7 +2,6 @@
 
 namespace Drupal\node\Plugin\views\argument;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\views\Attribute\ViewsArgument;
 use Drupal\views\Plugin\views\argument\NumericArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -63,7 +62,7 @@ class Vid extends NumericArgument {
       ->allRevisions()
       ->groupBy('title')
       ->condition('vid', $this->value, 'IN')
-      ->execute(new CacheableMetadata());
+      ->execute();
 
     foreach ($results as $result) {
       $titles[] = $result['title'];

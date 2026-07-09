@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Kernel;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
 use PHPUnit\Framework\Attributes\Group;
@@ -42,7 +41,7 @@ class TermEntityQueryTest extends KernelTestBase {
       $term = $this->createTerm($vocabulary);
       $terms[$term->id()] = $term;
     }
-    $result = \Drupal::entityQuery('taxonomy_term')->accessCheck(FALSE)->execute(new CacheableMetadata());
+    $result = \Drupal::entityQuery('taxonomy_term')->accessCheck(FALSE)->execute();
     sort($result);
     $this->assertEquals(array_keys($terms), $result);
 
@@ -57,7 +56,7 @@ class TermEntityQueryTest extends KernelTestBase {
     $result = \Drupal::entityQuery('taxonomy_term')
       ->accessCheck(FALSE)
       ->condition('vid', $vocabulary2->id())
-      ->execute(new CacheableMetadata());
+      ->execute();
     sort($result);
     $this->assertEquals(array_keys($terms2), $result);
   }

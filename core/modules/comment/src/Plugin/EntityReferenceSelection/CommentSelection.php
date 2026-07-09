@@ -3,7 +3,6 @@
 namespace Drupal\comment\Plugin\EntityReferenceSelection;
 
 use Drupal\Component\Utility\Html;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\Attribute\EntityReferenceSelection;
 use Drupal\Core\Entity\Plugin\EntityReferenceSelection\DefaultSelection;
@@ -80,7 +79,7 @@ class CommentSelection extends DefaultSelection {
       }
       $result = $query
         ->condition($entity_type->getKey('id'), $ids, 'IN')
-        ->execute(new CacheableMetadata());
+        ->execute();
     }
 
     return $result;
@@ -150,7 +149,7 @@ class CommentSelection extends DefaultSelection {
       $query->range(0, $limit);
     }
 
-    $result = $query->execute(new CacheableMetadata());
+    $result = $query->execute();
 
     if (empty($result)) {
       return [];

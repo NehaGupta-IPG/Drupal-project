@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Functional;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\node\Entity\NodeType;
@@ -174,13 +173,13 @@ class NodeAccessBaseTableTest extends NodeTestBase {
       ->accessCheck(FALSE)
       ->condition('name', 'public')
       ->condition('default_langcode', 1)
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->publicTid = reset($public_tids);
     $private_tids = \Drupal::entityQuery('taxonomy_term')
       ->accessCheck(FALSE)
       ->condition('name', 'private')
       ->condition('default_langcode', 1)
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->privateTid = reset($private_tids);
 
     $this->assertNotEmpty($this->publicTid, 'Public tid was found');

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\demo_umami_content\Functional;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -40,7 +39,7 @@ class UninstallDefaultContentTest extends BrowserTestBase {
       ->accessCheck(FALSE)
       ->condition('type', 'article')
       ->count()
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertGreaterThan(0, $count);
 
     // Uninstall the module.
@@ -54,7 +53,7 @@ class UninstallDefaultContentTest extends BrowserTestBase {
         ->accessCheck(FALSE)
         ->condition('type', $block_info['type'])
         ->count()
-        ->execute(new CacheableMetadata());
+        ->execute();
       $this->assertEquals(0, $count);
       $block = $block_storage->loadByProperties(['uuid' => $block_info['uuid']]);
       $this->assertCount(0, $block);
@@ -65,14 +64,14 @@ class UninstallDefaultContentTest extends BrowserTestBase {
       ->accessCheck(FALSE)
       ->condition('type', 'article')
       ->count()
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertEquals(0, $count);
 
     $count = $node_storage->getQuery()
       ->accessCheck(FALSE)
       ->condition('type', 'recipe')
       ->count()
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertEquals(0, $count);
 
     // Re-install and assert imported content.
@@ -95,7 +94,7 @@ class UninstallDefaultContentTest extends BrowserTestBase {
       ->accessCheck(FALSE)
       ->condition('type', 'recipe')
       ->count()
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertGreaterThan(0, $count);
     $nodes = $node_storage->loadByProperties(['title' => 'Gluten free pizza']);
     $this->assertCount(1, $nodes);
@@ -114,7 +113,7 @@ class UninstallDefaultContentTest extends BrowserTestBase {
       ->accessCheck(FALSE)
       ->condition('type', 'article')
       ->count()
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertGreaterThan(0, $count);
     $nodes = $node_storage->loadByProperties(['title' => 'The umami guide to our favorite mushrooms']);
     $this->assertCount(1, $nodes);
@@ -148,7 +147,7 @@ class UninstallDefaultContentTest extends BrowserTestBase {
         ->accessCheck(FALSE)
         ->condition('type', $block_info['type'])
         ->count()
-        ->execute(new CacheableMetadata());
+        ->execute();
       $this->assertGreaterThan(0, $count);
       $block = $block_storage->loadByProperties(['uuid' => $block_info['uuid']]);
       $this->assertCount(1, $block);

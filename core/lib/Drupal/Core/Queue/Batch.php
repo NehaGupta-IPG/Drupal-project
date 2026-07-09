@@ -2,8 +2,6 @@
 
 namespace Drupal\Core\Queue;
 
-use Drupal\Core\Cache\CacheableMetadata;
-
 /**
  * Defines a batch queue handler used by the Batch API.
  *
@@ -56,7 +54,7 @@ class Batch extends DatabaseQueue {
         ->fields('q', ['data'])
         ->condition('name', $this->name)
         ->orderBy('item_id', 'ASC')
-        ->execute(new CacheableMetadata())
+        ->execute()
         ->fetchAll();
 
       foreach ($items as $item) {

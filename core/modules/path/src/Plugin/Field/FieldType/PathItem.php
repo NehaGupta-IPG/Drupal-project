@@ -3,7 +3,6 @@
 namespace Drupal\path\Plugin\Field\FieldType;
 
 use Drupal\Component\Utility\Random;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
@@ -100,7 +99,7 @@ class PathItem extends FieldItemBase {
         foreach ($properties as $field => $value) {
           $query->condition($field, $value);
         }
-        $ids = $query->execute(new CacheableMetadata());
+        $ids = $query->execute();
         $pid = $ids ? reset($ids) : $pid;
       }
 

@@ -3,7 +3,6 @@
 namespace Drupal\filter;
 
 use Drupal\Component\Utility\Html;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\filter\Plugin\Filter\FilterNull;
@@ -183,7 +182,7 @@ abstract class FilterFormatFormBase extends EntityForm {
       ->getStorage('filter_format')
       ->getQuery()
       ->condition('format', $format_id)
-      ->execute(new CacheableMetadata());
+      ->execute();
   }
 
   /**
@@ -205,7 +204,7 @@ abstract class FilterFormatFormBase extends EntityForm {
       ->getQuery()
       ->condition('format', $format_format, '<>')
       ->condition('name', $format_name)
-      ->execute(new CacheableMetadata());
+      ->execute();
     if ($format_exists) {
       $form_state->setErrorByName('name', $this->t('Text format names must be unique. A format named %name already exists.', ['%name' => $format_name]));
     }

@@ -238,7 +238,7 @@ class FileReferenceResolver {
       ->condition($fields_condition)
       ->sort($entity_type->getKey('revision'), 'DESC')
       ->range(0, 1)
-      ->execute(new CacheableMetadata());
+      ->execute();
 
     if ($results) {
       return $storage->loadRevision(key($results));

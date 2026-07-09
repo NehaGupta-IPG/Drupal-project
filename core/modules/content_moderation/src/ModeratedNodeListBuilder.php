@@ -2,7 +2,6 @@
 
 namespace Drupal\content_moderation;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -93,7 +92,7 @@ class ModeratedNodeListBuilder extends NodeListBuilder {
       $query->pager($this->limit);
     }
 
-    $result = $query->execute(new CacheableMetadata());
+    $result = $query->execute();
 
     return $result ? array_column($result, 'content_entity_revision_id') : [];
   }

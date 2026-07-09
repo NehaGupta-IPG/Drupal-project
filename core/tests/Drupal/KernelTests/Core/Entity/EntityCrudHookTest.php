@@ -8,7 +8,6 @@ use Drupal\block\Entity\Block;
 use Drupal\comment\CommentingStatus;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Tests\CommentTestTrait;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Language\LanguageInterface;
@@ -567,7 +566,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
     $ids = \Drupal::entityQuery('entity_test')
       ->accessCheck(FALSE)
       ->condition('name', 'fail_insert')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertEmpty($ids);
   }
 

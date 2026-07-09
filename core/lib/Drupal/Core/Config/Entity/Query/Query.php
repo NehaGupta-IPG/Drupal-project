@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Config\Entity\Query;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -79,11 +80,6 @@ class Query extends QueryBase implements QueryInterface {
    * {@inheritdoc}
    */
   public function execute(?RefinableCacheableDependencyInterface $cacheableMetadata = NULL) {
-    if ($cacheableMetadata === NULL) {
-      // @todo Add correct CR number.
-      @trigger_error('Calling ' . __METHOD__ . '() without the $cacheableMetadata argument is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/1234567', E_USER_DEPRECATED);
-    }
-
     // Invoke entity query alter hooks.
     $this->alter();
 
@@ -116,8 +112,15 @@ class Query extends QueryBase implements QueryInterface {
       $result = array_slice($result, $this->range['start'], $this->range['length'], TRUE);
     }
 
-    // @todo Remove conditional call in Drupal 12.0.0.
-    $cacheableMetadata?->addCacheableDependency($this);
+    if ($cacheableMetadata === NULL) {
+      if (!empty($this->getCacheContexts()) || !empty($this->getCacheTags()) || $this->getCacheMaxAge() !== Cache::PERMANENT) {
+        // @todo Add correct CR number.
+        @trigger_error('Calling ' . __METHOD__ . '() without the $cacheableMetadata argument when the query has cacheable metadata is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/1234567', E_USER_DEPRECATED);
+      }
+    }
+    else {
+      $cacheableMetadata->addCacheableDependency($this);
+    }
 
     if ($this->count) {
       return count($result);

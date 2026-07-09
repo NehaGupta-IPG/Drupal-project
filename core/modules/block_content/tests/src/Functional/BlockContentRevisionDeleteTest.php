@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block_content\Functional;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\Form\RevisionDeleteForm;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -87,7 +86,7 @@ class BlockContentRevisionDeleteTest extends BlockContentTestBase {
         ->accessCheck(FALSE)
         ->allRevisions()
         ->count()
-        ->execute(new CacheableMetadata());
+        ->execute();
     };
 
     $count = $countRevisions();

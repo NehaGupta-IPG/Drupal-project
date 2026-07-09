@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Unit\process;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
@@ -204,7 +203,7 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
       $query = $this->prophesize(QueryInterface::class);
       $query->willBeConstructedWith([]);
       $query->accessCheck()->willReturn($query);
-      $query->execute(new CacheableMetadata())->willReturn($id === 'test_vocab1' ? [] : [$id]);
+      $query->execute()->willReturn($id === 'test_vocab1' ? [] : [$id]);
       $map[] = ['test_field', $id, NULL, NULL, $query->reveal()];
     }
     $this->entityQuery

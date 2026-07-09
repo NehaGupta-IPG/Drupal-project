@@ -2,7 +2,6 @@
 
 namespace Drupal\comment;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Database\Connection;
@@ -87,7 +86,7 @@ class CommentStorage extends SqlContentEntityStorage implements CommentStorageIn
       ->condition('entity_type', $comment->getCommentedEntityTypeId())
       ->condition('default_langcode', 1);
     $query->addExpression('MAX([thread])', 'thread');
-    return $query->execute(new CacheableMetadata())
+    return $query->execute()
       ->fetchField();
   }
 
@@ -102,7 +101,7 @@ class CommentStorage extends SqlContentEntityStorage implements CommentStorageIn
       ->condition('thread', $comment->getParentComment()->getThread() . '.%', 'LIKE')
       ->condition('default_langcode', 1);
     $query->addExpression('MAX([thread])', 'thread');
-    return $query->execute(new CacheableMetadata())
+    return $query->execute()
       ->fetchField();
   }
 
@@ -137,7 +136,7 @@ class CommentStorage extends SqlContentEntityStorage implements CommentStorageIn
     $query->condition('c1.default_langcode', 1);
     $query->condition('c2.default_langcode', 1);
 
-    $ordinal = $query->execute(new CacheableMetadata())->fetchField();
+    $ordinal = $query->execute()->fetchField();
 
     return ($divisor > 1) ? floor($ordinal / $divisor) : $ordinal;
   }
@@ -180,7 +179,7 @@ class CommentStorage extends SqlContentEntityStorage implements CommentStorageIn
         ->fields('thread', ['thread'])
         ->orderBy('thread_order')
         ->range(0, 1)
-        ->execute(new CacheableMetadata())
+        ->execute()
         ->fetchField();
 
       // Remove the final '/'.
@@ -213,7 +212,7 @@ class CommentStorage extends SqlContentEntityStorage implements CommentStorageIn
       ->fields('c', ['cid'])
       ->condition('pid', array_keys($comments), 'IN')
       ->condition('default_langcode', 1)
-      ->execute(new CacheableMetadata())
+      ->execute()
       ->fetchCol();
   }
 
@@ -327,7 +326,7 @@ class CommentStorage extends SqlContentEntityStorage implements CommentStorageIn
       $query->orderBy('thread_order', 'ASC');
     }
 
-    $cids = $query->execute(new CacheableMetadata())->fetchCol();
+    $cids = $query->execute()->fetchCol();
 
     $comments = [];
     if ($cids) {
@@ -345,7 +344,7 @@ class CommentStorage extends SqlContentEntityStorage implements CommentStorageIn
       ->condition('status', CommentInterface::NOT_PUBLISHED, '=')
       ->condition('default_langcode', 1)
       ->countQuery()
-      ->execute(new CacheableMetadata())
+      ->execute()
       ->fetchField();
   }
 

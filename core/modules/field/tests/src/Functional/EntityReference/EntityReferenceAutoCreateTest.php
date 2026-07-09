@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field\Functional\EntityReference;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -128,7 +127,7 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
       ->condition('title', $new_title);
 
     $query = clone $base_query;
-    $result = $query->execute(new CacheableMetadata());
+    $result = $query->execute();
     $this->assertEmpty($result, 'Referenced node does not exist yet.');
 
     $edit = [
@@ -140,7 +139,7 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
 
     // Assert referenced node was created.
     $query = clone $base_query;
-    $result = $query->execute(new CacheableMetadata());
+    $result = $query->execute();
     $this->assertNotEmpty($result, 'Referenced node was created.');
     $referenced_nid = key($result);
     $referenced_node = Node::load($referenced_nid);
@@ -149,7 +148,7 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
     $result = \Drupal::entityQuery('node')
       ->accessCheck(FALSE)
       ->condition('type', $this->referencingType)
-      ->execute(new CacheableMetadata());
+      ->execute();
 
     $referencing_nid = key($result);
     $referencing_node = Node::load($referencing_nid);
@@ -293,7 +292,7 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
     $result = \Drupal::entityQuery('entity_test_no_bundle_with_label')
       ->accessCheck(FALSE)
       ->condition('name', $name)
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertNotEmpty($result, 'Referenced entity was created.');
     $referenced_id = key($result);
 
@@ -301,7 +300,7 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
     $result = \Drupal::entityQuery('node')
       ->accessCheck(FALSE)
       ->condition('type', $this->referencingType)
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertCount(1, $result);
     $referencing_nid = key($result);
     $referencing_node = Node::load($referencing_nid);
@@ -342,7 +341,7 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
       ->accessCheck(FALSE)
       ->condition('type', $this->referencedType)
       ->condition('title', $referenced_title)
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertEmpty($result, 'Referenced node does not exist yet.');
 
     // Preview a new referencing node from the node add form.

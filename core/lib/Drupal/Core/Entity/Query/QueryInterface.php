@@ -35,7 +35,7 @@ interface QueryInterface extends AlterableInterface, RefinableCacheableDependenc
    *     ->accessCheck(FALSE)
    *     ->condition('greetings', 'merhaba', '=', 'tr')
    *     ->condition('greetings.value', 'siema', '=', 'pl')
-   *     ->execute(new CacheableMetadata());
+   *     ->execute();
    * @endcode
    *
    * @param string|\Drupal\Core\Entity\Query\ConditionInterface $field

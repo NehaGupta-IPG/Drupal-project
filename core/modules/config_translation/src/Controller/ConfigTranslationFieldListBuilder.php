@@ -2,7 +2,6 @@
 
 namespace Drupal\config_translation\Controller;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
@@ -100,7 +99,7 @@ class ConfigTranslationFieldListBuilder extends ConfigTranslationEntityListBuild
     // all field entities only for the given baseEntityType.
     $ids = \Drupal::entityQuery('field_config')
       ->condition('id', $this->baseEntityType . '.', 'STARTS_WITH')
-      ->execute(new CacheableMetadata());
+      ->execute();
     return $this->storage->loadMultiple($ids);
   }
 

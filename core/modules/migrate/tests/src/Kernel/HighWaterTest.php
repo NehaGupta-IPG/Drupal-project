@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Kernel;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -302,7 +301,7 @@ class HighWaterTest extends MigrateTestBase {
     $result = $query
       ->condition('title', $title)
       ->range(0, 1)
-      ->execute(new CacheableMetadata());
+      ->execute();
 
     return !empty($result);
   }

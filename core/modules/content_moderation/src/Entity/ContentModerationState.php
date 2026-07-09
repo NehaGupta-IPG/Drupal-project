@@ -4,7 +4,6 @@ namespace Drupal\content_moderation\Entity;
 
 use Drupal\content_moderation\ContentModerationStateAccessControlHandler;
 use Drupal\content_moderation\ContentModerationStateStorageSchema;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\ContentEntityBase;
@@ -151,7 +150,7 @@ class ContentModerationState extends ContentEntityBase implements ContentModerat
         ->condition('workflow', $moderation_info->getWorkflowForEntity($entity)->id())
         ->condition('content_entity_revision_id', $revision_id)
         ->allRevisions()
-        ->execute(new CacheableMetadata());
+        ->execute();
 
       if ($ids) {
         /** @var \Drupal\content_moderation\Entity\ContentModerationStateInterface $content_moderation_state */

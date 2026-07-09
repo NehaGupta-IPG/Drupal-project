@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\field\Functional\EntityReference;
 
 use Behat\Mink\Element\NodeElement;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\field\Entity\FieldConfig;
@@ -234,7 +233,7 @@ class EntityReferenceAdminTest extends BrowserTestBase {
       ->condition('name', $term_name)
       ->condition('vid', 'tags')
       ->accessCheck(FALSE)
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertCount(0, $result, "No taxonomy terms exist with the name '$term_name'.");
     $edit = [
       'settings[handler_settings][target_bundles][tags]' => TRUE,
@@ -256,7 +255,7 @@ class EntityReferenceAdminTest extends BrowserTestBase {
       ->condition('name', $term_name)
       ->condition('vid', 'tags')
       ->accessCheck(FALSE)
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertCount(1, $result, 'Taxonomy term was auto created when set as field default.');
   }
 

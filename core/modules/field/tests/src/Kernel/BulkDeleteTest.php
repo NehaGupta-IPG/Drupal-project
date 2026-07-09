@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field\Kernel;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldPurger;
@@ -184,7 +183,7 @@ class BulkDeleteTest extends FieldKernelTestBase {
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('type', $bundle)
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertCount(10, $found, 'Correct number of entities found before deleting');
 
     // Delete the field.
@@ -221,7 +220,7 @@ class BulkDeleteTest extends FieldKernelTestBase {
       ->accessCheck(FALSE)
       ->condition('type', $bundle)
       ->condition("$field_name.deleted", 0)
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertEmpty($found, 'No entities found after deleting');
 
     // There are 10 entities of this bundle when deleted fields are allowed, and
@@ -232,7 +231,7 @@ class BulkDeleteTest extends FieldKernelTestBase {
       ->condition('type', $bundle)
       ->condition("$field_name.deleted", 1)
       ->sort('id')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertCount(10, $found, 'Correct number of entities found after deleting');
     $this->assertEmpty(array_diff($found, array_keys($this->entities)));
   }

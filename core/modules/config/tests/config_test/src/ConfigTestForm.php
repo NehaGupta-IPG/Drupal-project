@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\config_test;
 
 use Drupal\Component\Render\FormattableMarkup;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
@@ -174,7 +173,7 @@ class ConfigTestForm extends EntityForm {
     return (bool) $storage
       ->getQuery()
       ->condition($entity->getEntityType()->getKey('id'), $entity_id)
-      ->execute(new CacheableMetadata());
+      ->execute();
   }
 
 }

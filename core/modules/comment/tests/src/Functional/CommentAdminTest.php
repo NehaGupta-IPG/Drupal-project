@@ -7,7 +7,6 @@ namespace Drupal\Tests\comment\Functional;
 use Drupal\comment\AnonymousContact;
 use Drupal\comment\Entity\Comment;
 use Drupal\Component\Utility\Html;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
@@ -269,7 +268,7 @@ class CommentAdminTest extends CommentTestBase {
       ->getQuery()
       ->accessCheck(FALSE)
       ->count();
-    $before_count = $count_query->execute(new CacheableMetadata());
+    $before_count = $count_query->execute();
     // Post 2 anonymous comments without contact info.
     $comment1 = $this->postComment($this->node, $this->randomMachineName(), $this->randomMachineName(), TRUE);
     $comment2 = $this->postComment($this->node, $this->randomMachineName(), $this->randomMachineName(), TRUE);
@@ -293,7 +292,7 @@ class CommentAdminTest extends CommentTestBase {
     $this->assertSession()->pageTextContains('English');
     $this->assertSession()->pageTextContains('Urdu');
     $this->submitForm([], 'Delete');
-    $after_count = $count_query->execute(new CacheableMetadata());
+    $after_count = $count_query->execute();
     $this->assertEquals($before_count, $after_count, 'No comment or translation found.');
   }
 

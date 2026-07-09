@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Functional;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
@@ -201,7 +200,7 @@ class NodeRevisionsTest extends NodeTestBase {
       ->allRevisions()
       ->condition('nid', $node->id())
       ->condition('vid', $nodes[1]->getRevisionId())
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertCount(0, $nids);
 
     // Set the revision timestamp to an older date to make sure that the
@@ -217,7 +216,7 @@ class NodeRevisionsTest extends NodeTestBase {
     // Confirm user is redirected depending on the remaining revisions,
     // when a revision is deleted.
     $query = \Drupal::entityQuery('node')->allRevisions()->condition('nid', $node->id())->accessCheck(FALSE);
-    $existing_revision_ids = array_keys($query->execute(new CacheableMetadata()));
+    $existing_revision_ids = array_keys($query->execute());
     // Delete all revision except last 3.
     $remaining_revision_ids = array_slice($existing_revision_ids, -3, 3);
     foreach ($existing_revision_ids as $revision_id) {

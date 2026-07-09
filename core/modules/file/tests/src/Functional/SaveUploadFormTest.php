@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\Functional;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\File\FileExists;
 use Drupal\file\Entity\File;
 use Drupal\file_test\FileTestHelper;
@@ -83,7 +82,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->maxFidBefore = (int) \Drupal::entityQueryAggregate('file')
       ->accessCheck(FALSE)
       ->aggregate('fid', 'max')
-      ->execute(new CacheableMetadata())[0]['fid_max'];
+      ->execute()[0]['fid_max'];
 
     /** @var \Drupal\Core\File\FileSystemInterface $file_system */
     $file_system = \Drupal::service('file_system');
@@ -110,7 +109,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $max_fid_after = (int) \Drupal::entityQueryAggregate('file')
       ->accessCheck(FALSE)
       ->aggregate('fid', 'max')
-      ->execute(new CacheableMetadata())[0]['fid_max'];
+      ->execute()[0]['fid_max'];
     // Verify that a new file was created.
     $this->assertGreaterThan($this->maxFidBefore, $max_fid_after);
     $file1 = File::load($max_fid_after);
@@ -133,7 +132,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $max_fid_after = (int) \Drupal::entityQueryAggregate('file')
       ->accessCheck(FALSE)
       ->aggregate('fid', 'max')
-      ->execute(new CacheableMetadata())[0]['fid_max'];
+      ->execute()[0]['fid_max'];
 
     // Check that the correct hooks were called.
     $this->assertFileHooksCalled(['validate', 'insert']);

@@ -42,7 +42,7 @@ class BlockContentListBuilder extends EntityListBuilder {
     if ($this->limit) {
       $query->pager($this->limit);
     }
-    return $query->execute(new CacheableMetadata());
+    return $query->execute();
   }
 
   /**

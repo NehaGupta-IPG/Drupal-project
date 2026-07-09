@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\content_moderation\Kernel;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\entity_test\Entity\EntityTestMulRevPub;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
@@ -204,7 +203,7 @@ class ContentModerationSyncingTest extends KernelTestBase {
       ->allRevisions()
       ->condition('id', $entity->id())
       ->sort('revision_id', 'ASC')
-      ->execute(new CacheableMetadata()))
+      ->execute())
     );
   }
 

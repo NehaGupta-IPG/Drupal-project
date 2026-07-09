@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Functional;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\node\Entity\Node;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -60,7 +59,7 @@ class NodeSaveTest extends NodeTestBase {
       ->accessCheck(FALSE)
       ->sort('nid', 'DESC')
       ->range(0, 1)
-      ->execute(new CacheableMetadata());
+      ->execute();
     $max_nid = reset($nids);
     $test_nid = $max_nid + mt_rand(1000, 1000000);
     $title = $this->randomMachineName(8);

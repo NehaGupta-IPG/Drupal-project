@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\comment\Tests\CommentTestTrait;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\LanguageInterface;
@@ -303,7 +302,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
       ->condition('type', $this->bundle)
       ->conditionAggregate('nid', 'COUNT', 2, '>=')
       ->groupBy('nid')
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertCount(0, $nids);
 
     // Ensure the translation tab is not accessible.

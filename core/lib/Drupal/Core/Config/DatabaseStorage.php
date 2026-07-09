@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Config;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
@@ -287,7 +286,7 @@ class DatabaseStorage implements StorageInterface {
       $query->condition('collection', $this->collection, '=');
       $query->condition('name', $prefix . '%', 'LIKE');
       $query->orderBy('collection')->orderBy('name');
-      return $query->execute(new CacheableMetadata())->fetchCol();
+      return $query->execute()->fetchCol();
     }
     catch (\Exception $e) {
       if ($this->connection->schema()->tableExists($this->table)) {

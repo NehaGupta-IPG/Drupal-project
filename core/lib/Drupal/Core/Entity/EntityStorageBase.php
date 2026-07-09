@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Entity;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Utility\FiberResumeType;
@@ -668,7 +667,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
     $entity_query = $this->getQuery();
     $entity_query->accessCheck(FALSE);
     $this->buildPropertyQuery($entity_query, $values);
-    $result = $entity_query->execute(new CacheableMetadata());
+    $result = $entity_query->execute();
 
     if ($cid !== NULL) {
       // Store the result of the UUID query to avoid repeating the same query.
@@ -684,7 +683,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
     return (bool) $this->getQuery()
       ->accessCheck(FALSE)
       ->range(0, 1)
-      ->execute(new CacheableMetadata());
+      ->execute();
   }
 
   /**

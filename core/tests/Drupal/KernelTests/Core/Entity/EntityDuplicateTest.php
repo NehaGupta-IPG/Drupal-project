@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\entity_test\Entity\EntityTestRev;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -69,7 +68,7 @@ class EntityDuplicateTest extends EntityKernelTestBase {
     $results = \Drupal::entityQuery('entity_test_rev')
       ->condition('name', 'Updated name')
       ->accessCheck(FALSE)
-      ->execute(new CacheableMetadata());
+      ->execute();
     $this->assertEquals([$duplicate_first_revision->getRevisionId() => $duplicate_first_revision->id()], $results);
   }
 

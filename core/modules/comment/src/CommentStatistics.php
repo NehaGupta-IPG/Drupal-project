@@ -3,7 +3,6 @@
 namespace Drupal\comment;
 
 use Drupal\Component\Datetime\TimeInterface;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
@@ -96,7 +95,7 @@ class CommentStatistics implements CommentStatisticsInterface {
       ->fields('ces')
       ->condition('ces.entity_id', array_keys($entities), 'IN')
       ->condition('ces.entity_type', $entity_type)
-      ->execute(new CacheableMetadata());
+      ->execute();
 
     $statistics_records = [];
     while ($entry = $stats->fetchObject()) {
@@ -218,7 +217,7 @@ class CommentStatistics implements CommentStatisticsInterface {
       ->condition('c.field_name', $comment->getFieldName())
       ->condition('c.status', CommentInterface::PUBLISHED)
       ->condition('default_langcode', 1)
-      ->execute(new CacheableMetadata())
+      ->execute()
       ->fetchField();
 
     if ($count > 0) {
@@ -232,7 +231,7 @@ class CommentStatistics implements CommentStatisticsInterface {
         ->condition('default_langcode', 1)
         ->orderBy('c.created', 'DESC')
         ->range(0, 1)
-        ->execute(new CacheableMetadata())
+        ->execute()
         ->fetchObject();
       // Use upsert here because entity could be created before comment field.
       $this->database->upsert('comment_entity_statistics')

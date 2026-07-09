@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Entity\Sql;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Database\Connection;
@@ -437,9 +436,8 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     }
 
     if ($ids === NULL || $ids) {
-      // Build and execute the query. We are merely retrieving entities, not
-      // building a list, so we can discard the query cacheability.
-      $query_result = $this->buildQuery($ids)->execute(new CacheableMetadata());
+      // Build and execute the query.
+      $query_result = $this->buildQuery($ids)->execute();
       $records = $query_result->fetchAllAssoc($this->idKey);
 
       // Map the loaded records into entity objects and according fields.
@@ -606,7 +604,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         $all_fields = $table_mapping->getFieldNames($this->dataTable);
       }
 
-      $result = $query->execute(new CacheableMetadata());
+      $result = $query->execute();
 
       $field_definition_columns = [];
       $field_columns = [];
@@ -656,9 +654,8 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     $revision_ids = $this->cleanIds($revision_ids, 'revision');
 
     if (!empty($revision_ids)) {
-      // Build and execute the query. We are merely retrieving entities, not
-      // building a list, so we can discard the query cacheability.
-      $query_result = $this->buildQuery(NULL, $revision_ids)->execute(new CacheableMetadata());
+      // Build and execute the query.
+      $query_result = $this->buildQuery(NULL, $revision_ids)->execute();
       $records = $query_result->fetchAllAssoc($this->revisionKey);
 
       // Map the loaded records into entity objects and according fields.
@@ -1466,7 +1463,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       $query->fields($table, $table_mapping->getColumnNames($field_name));
     }
 
-    $results = $query->execute(new CacheableMetadata());
+    $results = $query->execute();
 
     $is_not_null = fn($value) => !is_null($value);
 
@@ -1595,8 +1592,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       $delta_keys[$field_name] = $query->addField($table, 'delta', $field_name . '_delta');
     }
 
-    // We are retrieving raw data, so no need for cacheability.
-    $results = $query->execute(new CacheableMetadata());
+    $results = $query->execute();
 
     foreach ($results as $row) {
       $row = (array) $row;
@@ -2033,14 +2029,14 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
 
     $entities = [];
     $items_by_entity = [];
-    foreach ($entity_query->execute(new CacheableMetadata()) as $row) {
+    foreach ($entity_query->execute() as $row) {
       $item_query = $this->database->select($table_name, 't', ['fetch' => FetchAs::Associative])
         ->fields('t')
         ->condition('entity_id', $row['entity_id'])
         ->condition('deleted', 1)
         ->orderBy('delta');
 
-      foreach ($item_query->execute(new CacheableMetadata()) as $item_row) {
+      foreach ($item_query->execute() as $item_row) {
         if (!isset($entities[$item_row['revision_id']])) {
           // Create entity with the right revision id and entity id combination.
           $item_row['entity_type'] = $this->entityTypeId;
@@ -2155,7 +2151,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         // Otherwise count the number of rows.
         $query = $query->countQuery();
       }
-      $count = $query->execute(new CacheableMetadata())->fetchField();
+      $count = $query->execute()->fetchField();
     }
     return $as_bool ? (bool) $count : (int) $count;
   }

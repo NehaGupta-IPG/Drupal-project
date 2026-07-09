@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\image\Functional;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\image\Kernel\ImageFieldCreationTrait;
 
@@ -129,7 +128,7 @@ abstract class ImageFieldTestBase extends BrowserTestBase {
     return (int) \Drupal::entityQueryAggregate('file')
       ->accessCheck(FALSE)
       ->aggregate('fid', 'max')
-      ->execute(new CacheableMetadata())[0]['fid_max'];
+      ->execute()[0]['fid_max'];
   }
 
 }

@@ -2,7 +2,6 @@
 
 namespace Drupal\system\Form;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -67,7 +66,7 @@ abstract class DateFormatFormBase extends EntityForm {
     return (bool) $this->dateFormatStorage
       ->getQuery()
       ->condition('id', $element['#field_prefix'] . $entity_id)
-      ->execute(new CacheableMetadata());
+      ->execute();
   }
 
   /**

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\views_ui\Functional;
 
 use Behat\Mink\Element\NodeElement;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\Tests\SchemaCheckTestTrait;
@@ -238,7 +237,7 @@ class DisplayPathTest extends UITestBase {
       ->accessCheck(FALSE)
       ->sort('id', 'DESC')
       ->pager(1)
-      ->execute(new CacheableMetadata());
+      ->execute();
     $menu_item = end($menu_items);
     /** @var \Drupal\menu_link_content\MenuLinkContentInterface $menu_link_content */
     $menu_link_content = MenuLinkContent::load($menu_item);

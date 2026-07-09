@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Entity\Query\Sql;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\Query\QueryAggregateInterface;
 
@@ -22,11 +23,6 @@ class QueryAggregate extends Query implements QueryAggregateInterface {
    * {@inheritdoc}
    */
   public function execute(?RefinableCacheableDependencyInterface $cacheableMetadata = NULL) {
-    if ($cacheableMetadata === NULL) {
-      // @todo Add correct CR number.
-      @trigger_error('Calling ' . __METHOD__ . '() without the $cacheableMetadata argument is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/1234567', E_USER_DEPRECATED);
-    }
-
     $result = $this
       ->alter()
       ->prepare()
@@ -39,8 +35,15 @@ class QueryAggregate extends Query implements QueryAggregateInterface {
       ->finish()
       ->result();
 
-    // @todo Remove conditional call in Drupal 12.0.0.
-    $cacheableMetadata?->addCacheableDependency($this);
+    if ($cacheableMetadata === NULL) {
+      if (!empty($this->getCacheContexts()) || !empty($this->getCacheTags()) || $this->getCacheMaxAge() !== Cache::PERMANENT) {
+        // @todo Add correct CR number.
+        @trigger_error('Calling ' . __METHOD__ . '() without the $cacheableMetadata argument when the query has cacheable metadata is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/1234567', E_USER_DEPRECATED);
+      }
+    }
+    else {
+      $cacheableMetadata->addCacheableDependency($this);
+    }
 
     return $result;
   }

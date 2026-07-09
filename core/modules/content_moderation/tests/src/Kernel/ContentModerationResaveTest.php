@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\content_moderation\Kernel;
 
 use Drupal\content_moderation\Entity\ContentModerationState;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use PHPUnit\Framework\Attributes\Group;
@@ -80,13 +79,13 @@ class ContentModerationResaveTest extends KernelTestBase {
       ->getQuery()
       ->accessCheck(FALSE)
       ->count();
-    $this->assertSame(0, (int) $content_moderation_state_query->execute(new CacheableMetadata()));
+    $this->assertSame(0, (int) $content_moderation_state_query->execute());
     $content_moderation_state_revision_query = $this->contentModerationStateStorage
       ->getQuery()
       ->accessCheck(FALSE)
       ->allRevisions()
       ->count();
-    $this->assertSame(0, (int) $content_moderation_state_revision_query->execute(new CacheableMetadata()));
+    $this->assertSame(0, (int) $content_moderation_state_revision_query->execute());
 
     // The test module will re-save the entity in its hook_insert()
     // implementation creating the content moderation state entity before
@@ -97,8 +96,8 @@ class ContentModerationResaveTest extends KernelTestBase {
     $this->assertTrue(\Drupal::state()->get('content_moderation_test_resave'));
     $content_moderation_state = ContentModerationState::loadFromModeratedEntity($entity);
     $this->assertInstanceOf(ContentModerationState::class, $content_moderation_state);
-    $this->assertSame(1, (int) $content_moderation_state_query->execute(new CacheableMetadata()));
-    $this->assertSame(1, (int) $content_moderation_state_revision_query->execute(new CacheableMetadata()));
+    $this->assertSame(1, (int) $content_moderation_state_query->execute());
+    $this->assertSame(1, (int) $content_moderation_state_revision_query->execute());
   }
 
 }

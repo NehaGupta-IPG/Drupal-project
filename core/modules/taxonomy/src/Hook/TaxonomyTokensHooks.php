@@ -2,7 +2,6 @@
 
 namespace Drupal\taxonomy\Hook;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\taxonomy\Entity\Vocabulary;
@@ -192,7 +191,7 @@ class TaxonomyTokensHooks {
             break;
 
           case 'term-count':
-            $replacements[$original] = \Drupal::entityQuery('taxonomy_term')->accessCheck(TRUE)->condition('vid', $vocabulary->id())->addTag('vocabulary_term_count')->count()->execute(new CacheableMetadata());
+            $replacements[$original] = \Drupal::entityQuery('taxonomy_term')->accessCheck(TRUE)->condition('vid', $vocabulary->id())->addTag('vocabulary_term_count')->count()->execute();
             break;
 
           case 'node-count':

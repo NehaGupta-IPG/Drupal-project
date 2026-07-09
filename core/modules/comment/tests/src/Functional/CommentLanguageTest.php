@@ -7,7 +7,6 @@ namespace Drupal\Tests\comment\Functional;
 use Drupal\comment\CommentingStatus;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Tests\CommentTestTrait;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -151,7 +150,7 @@ class CommentLanguageTest extends BrowserTestBase {
           ->condition('field_name', 'comment')
           ->sort('cid', 'DESC')
           ->range(0, 1)
-          ->execute(new CacheableMetadata());
+          ->execute();
         $comment = Comment::load(reset($cids));
         $this->assertEquals($langcode, $comment->langcode->value, "The comment posted with content language $langcode and belonging to the node with language $node_langcode has language {$comment->langcode->value}");
         $this->assertEquals($comment_values[$node_langcode][$langcode], $comment->comment_body->value, 'Comment body correctly stored.');

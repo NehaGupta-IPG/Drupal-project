@@ -2,7 +2,6 @@
 
 namespace Drupal\path_alias;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Database\Statement\FetchAs;
@@ -107,7 +106,7 @@ class AliasRepository implements AliasRepositoryInterface {
 
     $select->orderBy('base_table.id', 'DESC');
 
-    return $select->execute(new CacheableMetadata())->fetchAssoc() ?: NULL;
+    return $select->execute()->fetchAssoc() ?: NULL;
   }
 
   /**
@@ -120,7 +119,7 @@ class AliasRepository implements AliasRepositoryInterface {
     return (bool) $query
       ->condition('base_table.path', $this->connection->escapeLike($initial_substring) . '%', 'LIKE')
       ->range(0, 1)
-      ->execute(new CacheableMetadata())
+      ->execute()
       ->fetchField();
   }
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Kernel;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Database;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
@@ -103,7 +102,7 @@ class TaxonomyQueryAlterTest extends KernelTestBase {
     $this->setupQueryTagTestHooks();
     $query = \Drupal::entityQuery('taxonomy_term')->accessCheck(FALSE);
     $query->addTag('taxonomy_term_access');
-    $result = $query->execute(new CacheableMetadata());
+    $result = $query->execute();
     // All term IDs were retrieved.
     $this->assertCount(5, $result);
     // Custom entity query with taxonomy_term_access tag (preferred).
@@ -112,7 +111,7 @@ class TaxonomyQueryAlterTest extends KernelTestBase {
     $this->setupQueryTagTestHooks();
     $query = \Drupal::entityQuery('taxonomy_term')->accessCheck(FALSE);
     $query->addTag('term_access');
-    $result = $query->execute(new CacheableMetadata());
+    $result = $query->execute();
     // All term IDs were retrieved.
     $this->assertCount(5, $result);
     // Custom entity query with taxonomy_term_access tag (preferred).

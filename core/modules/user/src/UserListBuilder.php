@@ -73,7 +73,7 @@ class UserListBuilder extends EntityListBuilder {
     $entity_query->pager(50);
     $header = $this->buildHeader();
     $entity_query->tableSort($header);
-    $uids = $entity_query->execute(new CacheableMetadata());
+    $uids = $entity_query->execute();
     return $this->storage->loadMultiple($uids);
   }
 

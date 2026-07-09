@@ -2062,7 +2062,6 @@
  * @addtogroup hooks
  * @{
  */
-use Drupal\Core\Cache\CacheableMetadata;
 
 /**
  * Perform periodic actions.
@@ -2108,7 +2107,7 @@ function hook_cron() {
   $ids = \Drupal::entityQuery('my_module_feed')
     ->accessCheck(FALSE)
     ->condition('queued', $request_time - (3600 * 6), '<')
-    ->execute(new CacheableMetadata());
+    ->execute();
   if ($ids) {
     $feeds = Feed::loadMultiple($ids);
     foreach ($feeds as $feed) {

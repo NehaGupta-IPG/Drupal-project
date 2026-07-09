@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Kernel;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Database;
 use Drupal\node\NodeAccessRebuild;
 use Drupal\user\UserInterface;
@@ -102,7 +101,7 @@ class NodeQueryAlterTest extends NodeAccessTestBase {
       $result = $query
         ->accessCheck(TRUE)
         ->allRevisions()
-        ->execute(new CacheableMetadata());
+        ->execute();
 
       $this->assertCount(4, $result, 'User with access can see correct nodes');
     }

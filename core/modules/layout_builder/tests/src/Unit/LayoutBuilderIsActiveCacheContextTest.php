@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\layout_builder\Unit;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -78,7 +77,7 @@ class LayoutBuilderIsActiveCacheContextTest extends UnitTestCase {
     // of that method are mocked in the next code block.
     $entity_query = $this->prophesize(QueryInterface::class);
     $entity_query->condition(Argument::cetera())->willReturn($entity_query);
-    $entity_query->execute(new CacheableMetadata())->willReturn([
+    $entity_query->execute()->willReturn([
       'a_fieldable_entity_type.the_bundle_id.full' => 'a_fieldable_entity_type.the_bundle_id.full',
     ]);
     $entity_storage = $this->prophesize(EntityStorageInterface::class);

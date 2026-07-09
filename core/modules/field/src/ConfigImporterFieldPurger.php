@@ -2,7 +2,6 @@
 
 namespace Drupal\field;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\Entity\ConfigEntityStorage;
 use Drupal\Core\Field\FieldPurger;
@@ -134,7 +133,7 @@ class ConfigImporterFieldPurger {
       $field_storages = \Drupal::entityQuery('field_storage_config')
         ->condition('id', $field_storage_ids, 'IN')
         ->condition('module', $providers, 'NOT IN')
-        ->execute(new CacheableMetadata());
+        ->execute();
       if (!empty($field_storages)) {
         $storages_to_delete = FieldStorageConfig::loadMultiple($field_storages);
       }

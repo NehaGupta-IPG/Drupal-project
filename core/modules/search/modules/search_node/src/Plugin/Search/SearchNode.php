@@ -244,7 +244,7 @@ class SearchNode extends ConfigurableSearchPluginBase implements AccessibleInter
       // GROUP BY. In this case, we want GROUP BY.
       ->groupBy('i.langcode')
       ->limit(10)
-      ->execute(new CacheableMetadata());
+      ->execute();
 
     // Check query status and set messages if needed.
     $status = $query->getStatus();
@@ -403,7 +403,7 @@ class SearchNode extends ConfigurableSearchPluginBase implements AccessibleInter
       ->groupBy('n.nid')
       ->range(0, $limit);
 
-    $nids = $query->execute(new CacheableMetadata())->fetchCol();
+    $nids = $query->execute()->fetchCol();
     if (!$nids) {
       return;
     }

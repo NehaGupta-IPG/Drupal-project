@@ -2,7 +2,6 @@
 
 namespace Drupal\shortcut\Form;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -153,7 +152,7 @@ class SwitchShortcutSet extends FormBase {
   public function exists($id) {
     return (bool) $this->shortcutSetStorage->getQuery()
       ->condition('id', $id)
-      ->execute(new CacheableMetadata());
+      ->execute();
   }
 
   /**

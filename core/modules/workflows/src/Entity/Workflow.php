@@ -2,7 +2,6 @@
 
 namespace Drupal\workflows\Entity;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\Entity\Routing\AdminHtmlRouteProvider;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -166,7 +165,7 @@ class Workflow extends ConfigEntityBase implements WorkflowInterface, EntityWith
    *  @see \Drupal\workflows\Annotation\WorkflowType
    */
   public static function loadMultipleByType($type) {
-    return self::loadMultiple(\Drupal::entityQuery('workflow')->condition('type', $type)->execute(new CacheableMetadata()));
+    return self::loadMultiple(\Drupal::entityQuery('workflow')->condition('type', $type)->execute());
   }
 
   /**

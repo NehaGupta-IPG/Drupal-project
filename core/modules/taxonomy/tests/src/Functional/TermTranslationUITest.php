@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Functional;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\content_translation\Functional\ContentTranslationUITestBase;
@@ -119,7 +118,7 @@ class TermTranslationUITest extends ContentTranslationUITestBase {
       ->aggregate('tid', 'COUNT')
       ->condition('vid', $this->bundle, '<>')
       ->groupBy('tid')
-      ->execute(new CacheableMetadata());
+      ->execute();
 
     foreach ($tids as $tid) {
       $this->assertTrue($tid['tid_count'] < 2, 'Term does have translations.');

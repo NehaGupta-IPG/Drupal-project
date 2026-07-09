@@ -3,7 +3,6 @@
 namespace Drupal\Core\Entity\Form;
 
 use Drupal\Component\Datetime\TimeInterface;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityFormInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -173,7 +172,7 @@ class RevisionDeleteForm extends ConfirmFormBase implements EntityFormInterface 
         ->allRevisions()
         ->condition($this->revision->getEntityType()->getKey('id'), $this->revision->id())
         ->count()
-        ->execute(new CacheableMetadata());
+        ->execute();
       $versionHistoryUrl = $this->revision->toUrl('version-history');
       if ($remainingRevisions && $versionHistoryUrl->access($this->currentUser())) {
         $form_state->setRedirectUrl($versionHistoryUrl);

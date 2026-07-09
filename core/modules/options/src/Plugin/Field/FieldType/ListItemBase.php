@@ -7,7 +7,6 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\FocusFirstCommand;
 use Drupal\Core\Ajax\InsertCommand;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -202,7 +201,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
         $query = \Drupal::entityQuery($entity_type_id)
           ->accessCheck(FALSE)
           ->condition($field_name, $current_keys[$delta]);
-        $entity_ids = $query->execute(new CacheableMetadata());
+        $entity_ids = $query->execute();
         if (!empty($entity_ids)) {
           $element['allowed_values']['table'][$delta]['item']['key']['#attributes']['disabled'] = 'disabled';
           $element['allowed_values']['table'][$delta]['delete']['#attributes']['disabled'] = 'disabled';

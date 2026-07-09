@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\workspaces\Kernel;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\workspaces\Entity\Handler\IgnoredWorkspaceHandler;
 use Drupal\workspaces\Entity\Workspace;
@@ -149,7 +148,7 @@ trait WorkspaceTestTrait {
       $query->condition($entity_type->getKey('id'), $entity_ids, 'IN');
     }
 
-    return $query->execute(new CacheableMetadata());
+    return $query->execute();
   }
 
   /**

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\user\Hook;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
@@ -34,7 +33,7 @@ class UserRequirements {
       ->accessCheck(FALSE)
       ->condition('uid', 0)
       ->range(0, 1)
-      ->execute(new CacheableMetadata());
+      ->execute();
 
     if ($result === FALSE) {
       $requirements['anonymous user'] = [

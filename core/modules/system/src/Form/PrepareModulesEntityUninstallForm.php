@@ -5,7 +5,6 @@ namespace Drupal\system\Form;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Batch\BatchBuilder;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -135,8 +134,8 @@ class PrepareModulesEntityUninstallForm extends ConfirmFormBase {
     $form = parent::buildForm($form, $form_state);
 
     $storage = $this->entityTypeManager->getStorage($entity_type_id);
-    $count = $storage->getQuery()->accessCheck(FALSE)->count()->execute(new CacheableMetadata());
-    $accessible_count = $storage->getQuery()->accessCheck(TRUE)->count()->execute(new CacheableMetadata());
+    $count = $storage->getQuery()->accessCheck(FALSE)->count()->execute();
+    $accessible_count = $storage->getQuery()->accessCheck(TRUE)->count()->execute();
 
     $form['entity_type_id'] = [
       '#type' => 'value',
@@ -158,7 +157,7 @@ class PrepareModulesEntityUninstallForm extends ConfirmFormBase {
         ->accessCheck(TRUE)
         ->sort($entity_type->getKey('id'), 'DESC')
         ->pager(10)
-        ->execute(new CacheableMetadata());
+        ->execute();
       $recent_entities = $storage->loadMultiple($recent_entity_ids);
 
       $labels = [];
@@ -245,7 +244,7 @@ class PrepareModulesEntityUninstallForm extends ConfirmFormBase {
 
     if (!isset($context['sandbox']['progress'])) {
       $context['sandbox']['progress'] = 0;
-      $context['sandbox']['max'] = $storage->getQuery()->accessCheck(FALSE)->count()->execute(new CacheableMetadata());
+      $context['sandbox']['max'] = $storage->getQuery()->accessCheck(FALSE)->count()->execute();
     }
 
     $entity_type = \Drupal::entityTypeManager()->getDefinition($entity_type_id);
@@ -253,13 +252,13 @@ class PrepareModulesEntityUninstallForm extends ConfirmFormBase {
       ->accessCheck(FALSE)
       ->sort($entity_type->getKey('id'), 'ASC')
       ->range(0, 10)
-      ->execute(new CacheableMetadata());
+      ->execute();
     if ($entities = $storage->loadMultiple($entity_ids)) {
       $storage->delete($entities);
     }
     // Sometimes deletes cause secondary deletes. For example, deleting a
     // taxonomy term can cause its children to be deleted too.
-    $context['sandbox']['progress'] = $context['sandbox']['max'] - $storage->getQuery()->accessCheck(FALSE)->count()->execute(new CacheableMetadata());
+    $context['sandbox']['progress'] = $context['sandbox']['max'] - $storage->getQuery()->accessCheck(FALSE)->count()->execute();
 
     // Inform the batch engine that we are not finished and provide an
     // estimation of the completion level we reached.

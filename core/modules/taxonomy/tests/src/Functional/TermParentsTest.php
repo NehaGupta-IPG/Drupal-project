@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Functional;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\TermInterface;
 use Drupal\Tests\BrowserTestBase;
@@ -128,7 +127,7 @@ class TermParentsTest extends BrowserTestBase {
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('name', $name)
-      ->execute(new CacheableMetadata());
+      ->execute();
     /** @var \Drupal\taxonomy\TermInterface $term_1 */
     $term_1 = $this->termStorage->load(reset($result));
     $this->assertInstanceOf(TermInterface::class, $term_1);

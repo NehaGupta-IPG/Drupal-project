@@ -2,8 +2,6 @@
 
 namespace Drupal\views;
 
-use Drupal\Core\Cache\CacheableMetadata;
-
 /**
  * Static service container wrapper for views.
  */
@@ -244,7 +242,7 @@ class Views {
     $entity_ids = \Drupal::entityQuery('view')
       ->condition('status', TRUE)
       ->condition("display.*.display_plugin", $plugin_ids, 'IN')
-      ->execute(new CacheableMetadata());
+      ->execute();
 
     $result = [];
     foreach (\Drupal::entityTypeManager()->getStorage('view')->loadMultiple($entity_ids) as $view) {
@@ -282,7 +280,7 @@ class Views {
   public static function getEnabledViews() {
     $query = \Drupal::entityQuery('view')
       ->condition('status', TRUE)
-      ->execute(new CacheableMetadata());
+      ->execute();
 
     return \Drupal::entityTypeManager()->getStorage('view')->loadMultiple($query);
   }
@@ -296,7 +294,7 @@ class Views {
   public static function getDisabledViews() {
     $query = \Drupal::entityQuery('view')
       ->condition('status', FALSE)
-      ->execute(new CacheableMetadata());
+      ->execute();
 
     return \Drupal::entityTypeManager()->getStorage('view')->loadMultiple($query);
   }
