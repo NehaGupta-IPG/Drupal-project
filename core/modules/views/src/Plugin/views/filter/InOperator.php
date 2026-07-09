@@ -92,6 +92,7 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
   public function defaultExposeOptions() {
     parent::defaultExposeOptions();
     $this->options['expose']['reduce'] = FALSE;
+    $this->options['expose']['limit'] = FALSE;
   }
 
   /**
@@ -129,6 +130,7 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
     $options['operator']['default'] = 'in';
     $options['value']['default'] = [];
     $options['expose']['contains']['reduce'] = ['default' => FALSE];
+    $options['expose']['contains']['limit'] = ['default' => FALSE];
 
     return $options;
   }
