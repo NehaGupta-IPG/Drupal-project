@@ -132,13 +132,12 @@ class DefaultMenuLinkTreeManipulators {
         $query->accessCheck(FALSE);
       }
       else {
-        $access_result->addCacheContexts(['user.node_grants:view']);
         if (!$this->moduleHandler->hasImplementations('node_grants') && !$this->account->hasPermission('view any unpublished content')) {
           $query->condition('status', NodeInterface::PUBLISHED);
         }
       }
 
-      $nids = $query->execute();
+      $nids = $query->execute($access_result);
       foreach ($nids as $nid) {
         foreach ($node_links[$nid] as $key => $link) {
           $node_links[$nid][$key]->access = $access_result;
