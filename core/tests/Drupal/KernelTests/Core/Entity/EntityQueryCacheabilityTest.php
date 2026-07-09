@@ -62,7 +62,7 @@ class EntityQueryCacheabilityTest extends EntityKernelTestBase {
     $query->addCacheContexts(['user.permissions']);
     /** @var \Drupal\Core\Database\Query\Select|\Drupal\Core\Database\Query\AlterableInterface $query */
     if (!\Drupal::currentUser()->hasPermission('administer entity_test content')) {
-      $query->condition('entity_test.name', 'published entity');
+      $query->condition('name', 'published entity');
     }
 
     // Add cache metadata for cacheability test assertions.

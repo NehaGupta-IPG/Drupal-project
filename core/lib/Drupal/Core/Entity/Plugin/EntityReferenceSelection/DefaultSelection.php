@@ -3,6 +3,7 @@
 namespace Drupal\Core\Entity\Plugin\EntityReferenceSelection;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Entity\Attribute\EntityReferenceSelection;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
@@ -350,7 +351,8 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
       $query->range(0, $limit);
     }
 
-    $result = $query->execute();
+    // @todo Do not discard query cacheable metadata, create follow-up.
+    $result = $query->execute(new CacheableMetadata());
 
     if (empty($result)) {
       return [];
@@ -371,9 +373,10 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
    */
   public function countReferenceableEntities($match = NULL, $match_operator = 'CONTAINS') {
     $query = $this->buildEntityQuery($match, $match_operator);
+    // @todo Do not discard query cacheable metadata, create follow-up.
     return $query
       ->count()
-      ->execute();
+      ->execute(new CacheableMetadata());
   }
 
   /**
@@ -385,9 +388,10 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
       $target_type = $this->configuration['target_type'];
       $entity_type = $this->entityTypeManager->getDefinition($target_type);
       $query = $this->buildEntityQuery();
+      // @todo Do not discard query cacheable metadata, create follow-up.
       $result = $query
         ->condition($entity_type->getKey('id'), $ids, 'IN')
-        ->execute();
+        ->execute(new CacheableMetadata());
     }
 
     return $result;

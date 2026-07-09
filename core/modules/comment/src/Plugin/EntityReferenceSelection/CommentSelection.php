@@ -3,6 +3,7 @@
 namespace Drupal\comment\Plugin\EntityReferenceSelection;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\Attribute\EntityReferenceSelection;
 use Drupal\Core\Entity\Plugin\EntityReferenceSelection\DefaultSelection;
@@ -77,9 +78,10 @@ class CommentSelection extends DefaultSelection {
       if (!$this->currentUser->hasPermission('administer comments')) {
         $query->condition('status', 1);
       }
+      // @todo Do not discard query cacheable metadata, create follow-up.
       $result = $query
         ->condition($entity_type->getKey('id'), $ids, 'IN')
-        ->execute();
+        ->execute(new CacheableMetadata());
     }
 
     return $result;
