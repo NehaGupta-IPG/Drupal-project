@@ -907,7 +907,7 @@ class RendererPlaceholdersTest extends RendererTestBase {
     ];
 
     $this->expectException(\AssertionError::class);
-    $this->expectExceptionMessage("A #lazy_builder callback's context may only contain scalar values or NULL.");
+    $this->expectExceptionMessage("A #lazy_builder callback's context may only contain scalar values or NULL. Problem with parameter at array key: array");
     $this->renderer->renderRoot($element);
   }
 
