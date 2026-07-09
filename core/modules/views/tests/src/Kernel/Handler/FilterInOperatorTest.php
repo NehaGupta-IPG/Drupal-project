@@ -253,6 +253,77 @@ class FilterInOperatorTest extends ViewsKernelTestBase {
   }
 
   /**
+   * Tests exposed filter with reduce and limit as TRUE.
+   */
+  public function testFilterExposedReduceAndLimit(): void {
+    $view = Views::getView('test_view');
+    $view->setDisplay();
+
+    $view->displayHandlers->get('default')->overrideOption('filters', [
+      'age' => [
+        'id' => 'age',
+        'field' => 'age',
+        'table' => 'views_test_data',
+        'value' => [25 => 25, 27 => 27],
+        'operator' => 'in',
+        'exposed' => TRUE,
+        'expose' => [
+          'operator' => 'age_op',
+          'label' => 'age',
+          'identifier' => 'age',
+          'reduce' => TRUE,
+          'limit' => TRUE,
+        ],
+      ],
+    ]);
+
+    $this->executeView($view);
+
+    $expected_result = [
+      [
+        'name' => 'John',
+        'age' => 25,
+      ],
+      [
+        'name' => 'George',
+        'age' => 27,
+      ],
+    ];
+
+    $this->assertCount(2, $view->result);
+    $this->assertIdenticalResultset($view, $expected_result, $this->columnMap);
+  }
+
+  /**
+   * Tests exposed filter with reduce TRUE and limit as FALSE.
+   */
+  public function testFilterExposedReduceAndLimitFalse(): void {
+    $view = Views::getView('test_view');
+    $view->setDisplay();
+
+    $view->displayHandlers->get('default')->overrideOption('filters', [
+      'age' => [
+        'id' => 'age',
+        'field' => 'age',
+        'table' => 'views_test_data',
+        'value' => [25 => 25, 27 => 27],
+        'operator' => 'in',
+        'exposed' => TRUE,
+        'expose' => [
+          'operator' => 'age_op',
+          'label' => 'age',
+          'identifier' => 'age',
+          'reduce' => TRUE,
+          'limit' => FALSE,
+        ],
+      ],
+    ]);
+
+    $this->executeView($view);
+    $this->assertCount(5, $view->result);
+  }
+
+  /**
    * Tests that the InOperator filter can handle TranslatableMarkup.
    */
   public function testFilterOptionAsMarkup(): void {

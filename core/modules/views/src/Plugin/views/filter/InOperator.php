@@ -106,6 +106,18 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
       // Safety.
       '#default_value' => !empty($this->options['expose']['reduce']),
     ];
+    $form['expose']['limit'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Filter by selected items'),
+      '#description' => $this->t('If checked, this view will be automatically filtered by the selected items by default.'),
+      '#default_value' => !empty($this->options['expose']['limit']),
+      '#states' => [
+        // Only show this field when the 'reduce' checkbox is enabled.
+        'visible' => [
+          ':input[name="options[expose][reduce]"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
   }
 
   /**
@@ -320,8 +332,9 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
 
     // The "All" state for this type of filter could have a default value. If
     // this is a non-multiple and non-required option, then this filter will
-    // participate by using the default settings *if* 'limit' is true.
-    if (empty($this->options['expose']['multiple']) && empty($this->options['expose']['required']) && !empty($this->options['expose']['limit'])) {
+    // participate by using the default settings if 'reduce' and 'limit'
+    // are enabled.
+    if (empty($this->options['expose']['multiple']) && empty($this->options['expose']['required']) && !empty($this->options['expose']['reduce']) && !empty($this->options['expose']['limit'])) {
       $identifier = $this->options['expose']['identifier'];
       if ($input[$identifier] == 'All') {
         return TRUE;
