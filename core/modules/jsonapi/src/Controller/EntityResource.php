@@ -405,14 +405,8 @@ class EntityResource {
    * @todo Remove this after https://www.drupal.org/project/drupal/issues/3028976 is fixed.
    */
   protected function executeQueryInRenderContext(QueryInterface $query, CacheableMetadata $query_cacheability) {
-    $context = new RenderContext();
-    $results = $this->renderer->executeInRenderContext($context, function () use ($query) {
-      return $query->execute();
-    });
-    if (!$context->isEmpty()) {
-      $query_cacheability->addCacheableDependency($context->pop());
-    }
-    return $results;
+    // @todo Remove this now that it is no longer necessary, create follow-up.
+    return $query->execute($query_cacheability);
   }
 
   /**
