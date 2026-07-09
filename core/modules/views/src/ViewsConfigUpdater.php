@@ -163,7 +163,7 @@ class ViewsConfigUpdater {
    *   Whether the handler was updated.
    */
   public function processExposedFilterLimitUpdate(array &$handler, string $handler_type): bool {
-    if ($handler_type === 'filter' && !empty($handler['expose']) && isset($handler['expose']['reduce'])) {
+    if ($handler_type === 'filter' && !empty($handler['expose']) && isset($handler['expose']['reduce']) && !isset($handler['expose']['limit'])) {
       $handler['expose']['limit'] = FALSE;
       return TRUE;
     }
