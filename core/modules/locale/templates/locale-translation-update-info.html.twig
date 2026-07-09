@@ -15,45 +15,53 @@
  * @ingroup themeable
  */
 #}
-<div class="locale-translation-update__wrapper" tabindex="0" role="button">
-  <span class="locale-translation-update__prefix visually-hidden">Show description</span>
-  {% if modules %}
-    {% set module_list = modules|safe_join(', ') %}
-    <span class="locale-translation-update__message">{% trans %}Updates for: {{ module_list }}{% endtrans %}</span>
-  {% elseif not_found %}
-    <span class="locale-translation-update__message">
-      {%- trans -%}
-        Missing translations for one project
-      {%- plural not_found|length -%}
-        Missing translations for @count projects
-      {%- endtrans -%}
-    </span>
-  {% endif %}
-  {% if updates or not_found %}
-    <div class="locale-translation-update__details">
-      {% if updates %}
-        <ul>
-          {% for update in updates %}
-            <li>{{ update.name }} ({{ update.timestamp|format_date('html_date') }})</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-      {% if not_found %}
-        {#
-          Prefix the missing updates list if there is an available updates lists
-          before it.
-        #}
+{{ attach_library('claro/details-focus') }}
+{{ attach_library('core/drupal.collapse') }}
+<details class="js-form-wrapper form-wrapper module-list__module-details claro-details" id="description">
+  <summary aria-controls="description" role="button" aria-expanded="false" class="claro-details__summary module-list__module-summary"><span class="text module-description">
+    {% if modules %}
+      {% set module_list = modules|safe_join(', ') %}
+      <span class="locale-translation-update__message">{% trans %}Updates for: {{ module_list }}{% endtrans %}</span>
+    {% elseif not_found %}
+      <span class="locale-translation-update__message">
+        {%- trans -%}
+          Missing translations for one project
+        {%- plural not_found|length -%}
+          Missing translations for @count projects
+        {%- endtrans -%}
+      </span>
+    {% endif %}
+  </span></summary>
+
+  <div class="claro-details__wrapper module-details__wrapper">
+    <div class="module-details__description">
+    {% if updates or not_found %}
+      <div class="locale-translation-update__details">
         {% if updates %}
-          {{ 'Missing translations for:'|t }}
-        {% endif %}
-        {% if not_found %}
           <ul>
-            {% for update in not_found %}
-              <li>{{ update.name }} ({{ update.version|default('no version'|t) }}). {{ update.info }}</li>
+            {% for update in updates %}
+              <li>{{ update.name }} ({{ update.timestamp|format_date('html_date') }})</li>
             {% endfor %}
           </ul>
         {% endif %}
-      {% endif %}
+        {% if not_found %}
+          {#
+            Prefix the missing updates list if there is an available updates lists
+            before it.
+          #}
+          {% if updates %}
+            {{ 'Missing translations for:'|t }}
+          {% endif %}
+          {% if not_found %}
+            <ul>
+              {% for update in not_found %}
+                <li>{{ update.name }} ({{ update.version|default('no version'|t) }}). {{ update.info }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endif %}
+      </div>
+    {% endif %}
     </div>
-  {% endif %}
-</div>
+  </div>
+</details>

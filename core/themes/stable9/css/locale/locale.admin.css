@@ -69,7 +69,7 @@
   width: 25%;
 }
 #locale-translation-status-form td {
-  vertical-align: top;
+  vertical-align: middle;
 }
 .locale-translation-update__wrapper {
   margin-inline-start: -12px;
