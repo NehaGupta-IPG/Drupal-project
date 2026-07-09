@@ -139,7 +139,7 @@ function node_update_last_removed(): int {
  * configuration. This update removes the now-obsolete key from all
  * existing node type config entities.
  */
-function node_update_12001() {
+function node_update_12001(): void {
   $config_factory = \Drupal::configFactory();
   foreach ($config_factory->listAll('node.type.') as $name) {
     $config = $config_factory->getEditable($name);
