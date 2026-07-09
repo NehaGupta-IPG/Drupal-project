@@ -2320,6 +2320,13 @@ function install_config_import_batch() {
 
   // Get the sync storage.
   $sync = \Drupal::service('config.storage.sync');
+  // Transform the sync storage through the import transformation pipeline so
+  // that install-time config import runs the same storage transformers as a
+  // normal configuration import. Without this, subscribers to the config
+  // import transform event (for example the one honouring
+  // config_exclude_modules) do not run during installation and the raw
+  // committed configuration is imported verbatim.
+  $sync = \Drupal::service('config.import_transformer')->transform($sync);
   // Match up the site UUIDs, the install_base_system install task will have
   // installed the system module and created a new UUID.
   $system_site = $sync->read('system.site');
@@ -2393,7 +2400,13 @@ function install_config_download_translations(&$install_state) {
 function install_config_revert_install_changes(): void {
   global $install_state;
 
-  $storage_comparer = new StorageComparer(\Drupal::service('config.storage.sync'), \Drupal::service('config.storage'));
+  // Transform the sync storage through the import transformation pipeline, as
+  // in install_config_import_batch(), so the same storage transformers run for
+  // this post-hook_install revert (for example the one honouring
+  // config_exclude_modules) instead of comparing against the raw committed
+  // configuration.
+  $sync = \Drupal::service('config.import_transformer')->transform(\Drupal::service('config.storage.sync'));
+  $storage_comparer = new StorageComparer($sync, \Drupal::service('config.storage'));
   $storage_comparer->createChangelist();
   if ($storage_comparer->hasChanges()) {
     $config_importer = \Drupal::service(ConfigImporterFactory::class)->get($storage_comparer);
