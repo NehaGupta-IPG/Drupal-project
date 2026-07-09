@@ -534,10 +534,21 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
           case 'smallint':
           case 'tinyint':
           case 'mediumint':
+            $views_field['field']['id'] = 'field';
+            $views_field['argument']['id'] = 'numeric';
+            $views_field['filter']['id'] = 'numeric';
+            $views_field['sort']['id'] = 'standard';
+            break;
+
           case 'float':
           case 'double':
           case 'decimal':
+          case 'numeric':
             $views_field['field']['id'] = 'field';
+            // Flag decimal values so that the numeric field handler, used
+            // when aggregation is enabled, offers precision and decimal point
+            // settings.
+            $views_field['field']['float'] = TRUE;
             $views_field['argument']['id'] = 'numeric';
             $views_field['filter']['id'] = 'numeric';
             $views_field['sort']['id'] = 'standard';
