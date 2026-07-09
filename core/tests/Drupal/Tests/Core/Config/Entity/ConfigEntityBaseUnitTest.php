@@ -1036,7 +1036,7 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
   /**
    * @legacy-covers ::addConfigEntityDependency
    */
-  public function testAddConfigEntityDependency() {
+  public function testAddConfigEntityDependency(): void {
     $values = [
       'id' => 'foo',
       'langcode' => 'en',
@@ -1063,7 +1063,7 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
   /**
    * @legacy-covers ::addConfigEntityDependency
    */
-  public function testAddConfigEntityDependencyException() {
+  public function testAddConfigEntityDependencyException(): void {
     $storage = $this->createMock(ConfigEntityStorageInterface::class);
     // Behave as if the dependency does not exist.
     $storage->expects($this->exactly(1))

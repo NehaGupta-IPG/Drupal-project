@@ -703,7 +703,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    * @throws \Drupal\Core\Config\Entity\Exception\ConfigEntityDependencyException
    *   Thrown if the entity does not exist.
    */
-  protected function addConfigEntityDependency($entity_type_id, $id) {
+  protected function addConfigEntityDependency(string $entity_type_id, string $id): static {
     $entity = $this->entityTypeManager()->getStorage($entity_type_id)->load($id);
     if (!$entity) {
       throw new ConfigEntityDependencyException("Cannot add the config entity dependency with ID '{$id}' of type '{$entity_type_id}' to {$this->getConfigDependencyName()} as it does not exist");
