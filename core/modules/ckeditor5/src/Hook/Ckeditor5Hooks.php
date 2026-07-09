@@ -672,7 +672,17 @@ class Ckeditor5Hooks {
         }
       }
       if (isset($info['base theme'])) {
-        $css = array_merge($this->themeCss($info['base theme']), $css);
+        $skip = FALSE;
+        if (isset($info['libraries-override'])) {
+          foreach ($info['libraries-override'] as $library => $override) {
+            if ($library === $info['base theme'] . '/ckeditor5-stylesheets' && $override == FALSE) {
+              $skip = TRUE;
+            }
+          }
+        }
+        if (!$skip) {
+          $css = array_merge(_ckeditor5_theme_css($info['base theme']), $css);
+        }
       }
     }
 
