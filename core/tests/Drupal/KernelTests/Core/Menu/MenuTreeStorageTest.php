@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Menu;
 
 use Drupal\Component\Plugin\Exception\PluginException;
-use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Menu\MenuTreeStorage;
@@ -394,18 +393,18 @@ class MenuTreeStorageTest extends KernelTestBase {
     // 0), as content menu links are.
     $this->treeStorage->save(['id' => 'content_link', 'menu_name' => 'content_menu'] + $link);
 
-    // Prime a cache item tagged with each menu's cache tag, so the tags
-    // invalidated by a rebuild can be observed through the real cache backend.
-    $cache = \Drupal::cache();
-    $cache->set('content', TRUE, Cache::PERMANENT, ['config:system.menu.content_menu']);
-    $cache->set('rebuilt', TRUE, Cache::PERMANENT, ['config:system.menu.rebuilt_menu']);
+    // Record each menu's cache tag checksum so the invalidations caused by the
+    // rebuild can be observed directly.
+    $checksum = \Drupal::service('cache_tags.invalidator.checksum');
+    $content_before = $checksum->getCurrentChecksum(['config:system.menu.content_menu']);
+    $rebuilt_before = $checksum->getCurrentChecksum(['config:system.menu.rebuilt_menu']);
 
-    // Rebuild a second, separate menu. Only that menu's cache tag should be
+    // Rebuild a second, separate menu. Only that menu's cache tag is
     // invalidated; the content-only menu is left untouched.
     $this->treeStorage->rebuild(['rebuilt_link' => ['id' => 'rebuilt_link', 'menu_name' => 'rebuilt_menu'] + $link]);
 
-    $this->assertFalse($cache->get('rebuilt'));
-    $this->assertNotEmpty($cache->get('content'));
+    $this->assertNotEquals($rebuilt_before, $checksum->getCurrentChecksum(['config:system.menu.rebuilt_menu']));
+    $this->assertEquals($content_before, $checksum->getCurrentChecksum(['config:system.menu.content_menu']));
   }
 
   /**

@@ -139,9 +139,6 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       $this->preloadedOriginals = [];
     }
 
-    // Fetch the list of existing menus that contain discovered links, in case
-    // some are no longer populated after the rebuild.
-    $before_menus = $this->getDiscoveredMenuNames();
     if ($definitions) {
       foreach ($definitions as $id => $link) {
         // Flag this link as discovered, i.e. saved via rebuild().
@@ -185,13 +182,18 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
 
     // Remove all such items.
     if ($result) {
-      $this->purgeMultiple($result);
+      $this->purgeMultiple(array_keys($result));
     }
     $this->resetDefinitions();
-    $affected_menus = $this->getDiscoveredMenuNames() + $before_menus;
-    // Invalidate any cache tagged with any affected menu name.
-    $cache_tags = Cache::buildTags('config:system.menu', $affected_menus, '.');
-    $this->cacheTagsInvalidator->invalidateTags($cache_tags);
+    // The rebuild can only affect the menus of the discovered links and of the
+    // links that no longer exist, so only invalidate those menus' cache tags.
+    $discovered_menus = array_column($definitions, 'menu_name');
+    $purged_menus = array_values($result);
+    $affected_menus = array_unique(array_merge($discovered_menus, $purged_menus));
+    if ($affected_menus) {
+      $cache_tags = Cache::buildTags('config:system.menu', $affected_menus, '.');
+      $this->cacheTagsInvalidator->invalidateTags($cache_tags);
+    }
     $this->resetDefinitions();
     // Every item in the cache bin should have one of the menu cache tags but it
     // is not guaranteed, so delete everything in the bin.
@@ -1079,20 +1081,6 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
   }
 
   /**
-   * Gets the names of the menus that contain discovered (rebuilt) links.
-   *
-   * @return array
-   *   An array of menu names, keyed by menu name.
-   */
-  protected function getDiscoveredMenuNames(): array {
-    $query = $this->connection->select($this->table, NULL, $this->options);
-    $query->addField($this->table, 'menu_name');
-    $query->condition('discovered', 1);
-    $query->distinct();
-    return $this->safeExecuteSelect($query)->fetchAllKeyed(0, 0);
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function countMenuLinks($menu_name = NULL) {
@@ -1499,18 +1487,19 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    *   The new menu link definitions.
    *
    * @return array
-   *   A list of menu link IDs that no longer exist.
+   *   The menu names of the menu links that no longer exist, keyed by link ID.
    */
   protected function findNoLongerExistingLinks(array $definitions) {
     if ($definitions) {
       $query = $this->connection->select($this->table, NULL, $this->options);
       $query->addField($this->table, 'id');
+      $query->addField($this->table, 'menu_name');
       $query->condition('discovered', 1);
       $query->condition('id', array_keys($definitions), 'NOT IN');
       // Starting from links with the greatest depth will minimize the amount
       // of re-parenting done by the menu storage.
       $query->orderBy('depth', 'DESC');
-      $result = $query->execute()->fetchCol();
+      $result = $query->execute()->fetchAllKeyed();
     }
     else {
       $result = [];
