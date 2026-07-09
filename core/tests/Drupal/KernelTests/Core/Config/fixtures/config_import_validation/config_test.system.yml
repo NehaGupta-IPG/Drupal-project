@@ -1,0 +1,4 @@
+langcode: en
+# Schema violation: 'foo' must be a string, not an integer.
+foo: 123
+404: herp
