@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\system\Functional\Form;
+namespace Drupal\Tests\system\Kernel\Form;
 
 use Drupal\Component\Serialization\Json;
-use Drupal\Tests\BrowserTestBase;
+use Drupal\Core\Form\FormState;
+use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\HttpKernelFormHelperTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,17 +16,14 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Form')]
 #[RunTestsInSeparateProcesses]
-class EmailTest extends BrowserTestBase {
+class EmailTest extends KernelTestBase {
+
+  use HttpKernelFormHelperTrait;
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['form_test'];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $defaultTheme = 'stark';
+  protected static $modules = ['form_test', 'system'];
 
   /**
    * Tests that #type 'email' fields are properly validated.
@@ -38,6 +37,10 @@ class EmailTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains("The email address invalid is not valid.");
     $this->assertSession()->pageTextContains("Address field is required.");
 
+    // Clear the static form error flag set by the validation failure above.
+    // In BrowserTestBase each request is a fresh process; in kernel tests all
+    // requests share the same process, so the flag must be reset manually.
+    (new FormState())->clearErrors();
     $edit = [];
     $edit['email_required'] = '  foo.bar@example.com ';
     $this->drupalGet('form-test/email');
