@@ -3,6 +3,7 @@
 namespace Drupal\Core\Entity;
 
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Component\Utility\IntegerLike;
 use Drupal\Core\Entity\Plugin\DataType\EntityReference;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Language\Language;
@@ -567,7 +568,8 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    * {@inheritdoc}
    */
   public function id() {
-    return $this->getEntityKey('id');
+    $id = $this->getEntityKey('id');
+    return IntegerLike::randomize($id);
   }
 
   /**

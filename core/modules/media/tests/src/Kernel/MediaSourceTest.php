@@ -9,6 +9,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\media\Entity\Media;
 use Drupal\media\Entity\MediaType;
+use Drupal\TestTools\IntegerLikeAssert;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -378,7 +379,7 @@ class MediaSourceTest extends MediaKernelTestBase {
     $this->assertSame(1, $queue->numberOfItems(), 'Item was not added to the queue.');
 
     $item = $queue->claimItem();
-    $this->assertSame($media->id(), $item->data['id'], 'Queue item that was created does not belong to the correct entity.');
+    IntegerLikeAssert::same($media->id(), $item->data['id'], 'Queue item that was created does not belong to the correct entity.');
 
     $queue_worker->processItem($item->data);
     $queue->deleteItem($item);

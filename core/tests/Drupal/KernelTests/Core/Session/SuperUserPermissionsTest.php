@@ -44,7 +44,7 @@ class SuperUserPermissionsTest extends KernelTestBase {
    */
   public function testPermissionChange(): void {
     $account = $this->createUser();
-    $this->assertSame('1', $account->id());
+    $this->assertSame('1', (string) $account->id());
     $this->assertTrue($account->hasPermission('administer modules'));
     $this->assertTrue($account->hasPermission('non-existent permission'));
 

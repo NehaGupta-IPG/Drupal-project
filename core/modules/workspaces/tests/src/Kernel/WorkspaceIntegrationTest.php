@@ -703,7 +703,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
       ->condition('field_test_entity.entity.uuid', $entity_test->uuid());
 
     $result = $query->execute();
-    $this->assertSame([$node_2->getRevisionId() => $node_2->id()], $result);
+    $this->assertSame([$node_2->getRevisionId() => (string) $node_2->id()], $result);
   }
 
   /**

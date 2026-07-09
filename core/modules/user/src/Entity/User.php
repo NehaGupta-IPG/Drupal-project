@@ -401,7 +401,7 @@ class User extends ContentEntityBase implements UserInterface {
    * {@inheritdoc}
    */
   public function isAnonymous() {
-    return $this->id() === 0 || $this->id() === '0';
+    return (string) $this->id() === '0';
   }
 
   /**

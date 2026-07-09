@@ -2,6 +2,7 @@
 
 namespace Drupal\file\Plugin\EntityReferenceSelection;
 
+use Drupal\Component\Utility\IntegerLike;
 use Drupal\Core\Entity\Attribute\EntityReferenceSelection;
 use Drupal\Core\Entity\Plugin\EntityReferenceSelection\DefaultSelection;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -56,7 +57,7 @@ class FileSelection extends DefaultSelection {
     $entities = parent::validateReferenceableNewEntities($entities);
     $entities = array_filter($entities, function ($file) {
       /** @var \Drupal\file\FileInterface $file */
-      return $file->isPermanent() || $file->getOwnerId() === $this->currentUser->id();
+      return $file->isPermanent() || IntegerLike::same($file->getOwnerId(), $this->currentUser->id());
     });
     return $entities;
   }

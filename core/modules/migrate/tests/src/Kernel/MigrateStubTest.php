@@ -65,7 +65,7 @@ class MigrateStubTest extends MigrateTestBase {
   public function testCreateStub(): void {
     $this->assertSame([], $this->migrateLookup->lookup('sample_stubbing_migration', [17]));
     $ids = $this->migrateStub->createStub('sample_stubbing_migration', [17]);
-    $this->assertSame([$ids], $this->migrateLookup->lookup('sample_stubbing_migration', [17]));
+    $this->assertEquals([$ids], $this->migrateLookup->lookup('sample_stubbing_migration', [17]));
     $this->assertNotNull(\Drupal::entityTypeManager()->getStorage('node')->load($ids['nid']));
   }
 
@@ -75,7 +75,7 @@ class MigrateStubTest extends MigrateTestBase {
   public function testCreateStubRawReturn(): void {
     $this->assertSame([], $this->migrateLookup->lookup('sample_stubbing_migration', [17]));
     $ids = $this->migrateStub->createStub('sample_stubbing_migration', [17], [], FALSE);
-    $this->assertSame($ids, [$this->migrateLookup->lookup('sample_stubbing_migration', [17])[0]['nid']]);
+    $this->assertEquals($ids, [$this->migrateLookup->lookup('sample_stubbing_migration', [17])[0]['nid']]);
     $this->assertNotNull(\Drupal::entityTypeManager()->getStorage('node')->load($ids[0]));
   }
 
@@ -85,7 +85,7 @@ class MigrateStubTest extends MigrateTestBase {
   public function testStubWithDefaultValues(): void {
     $this->assertSame([], $this->migrateLookup->lookup('sample_stubbing_migration', [17]));
     $ids = $this->migrateStub->createStub('sample_stubbing_migration', [17], ['title' => "Placeholder for source id 17"]);
-    $this->assertSame([$ids], $this->migrateLookup->lookup('sample_stubbing_migration', [17]));
+    $this->assertEquals([$ids], $this->migrateLookup->lookup('sample_stubbing_migration', [17]));
     $node = \Drupal::entityTypeManager()->getStorage('node')->load($ids['nid']);
     $this->assertNotNull($node);
     // Test that our default value was set as the node title.
@@ -108,7 +108,7 @@ class MigrateStubTest extends MigrateTestBase {
 
     $this->assertSame([], $this->migrateLookup->lookup('sample_stubbing_migration', [33]));
     $ids = $this->migrateStub->createStub('sample_stubbing_migration', [33], []);
-    $this->assertSame([$ids], $this->migrateLookup->lookup('sample_stubbing_migration', [33]));
+    $this->assertEquals([$ids], $this->migrateLookup->lookup('sample_stubbing_migration', [33]));
     $node = \Drupal::entityTypeManager()->getStorage('node')->load($ids['nid']);
     $this->assertNotNull($node);
     // Make sure the "Body" field value was populated.

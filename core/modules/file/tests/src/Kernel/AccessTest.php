@@ -152,7 +152,7 @@ class AccessTest extends KernelTestBase {
       'delete own files',
     ]);
 
-    $this->assertSame('1', $user1->id());
+    $this->assertSame('1', (string) $user1->id());
 
     $file = File::create([
       'uid' => $user1->id(),

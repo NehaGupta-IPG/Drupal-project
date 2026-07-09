@@ -2,6 +2,7 @@
 
 namespace Drupal\media;
 
+use Drupal\Component\Utility\IntegerLike;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityHandlerInterface;
@@ -57,7 +58,7 @@ class MediaAccessControlHandler extends EntityAccessControlHandler implements En
     }
 
     $type = $entity->bundle();
-    $is_owner = ($account->id() && $account->id() === $entity->getOwnerId());
+    $is_owner = $account->id() && IntegerLike::same($account->id(), $entity->getOwnerId());
     switch ($operation) {
       case 'view':
         if ($entity->isPublished()) {
