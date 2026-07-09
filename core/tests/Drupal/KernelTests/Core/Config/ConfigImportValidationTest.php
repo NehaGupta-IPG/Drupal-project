@@ -31,6 +31,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class ConfigImportValidationTest extends KernelTestBase {
 
   /**
+   * {@inheritdoc}
+   *
    * Disable the test-level schema checker so only the importer's own
    * validation is under test.
    */
