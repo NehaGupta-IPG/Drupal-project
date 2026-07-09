@@ -681,7 +681,7 @@ class Ckeditor5Hooks {
           }
         }
         if (!$skip) {
-          $css = array_merge(_ckeditor5_theme_css($info['base theme']), $css);
+          $css = array_merge($this->themeCss($info['base theme']), $css);
         }
       }
     }
