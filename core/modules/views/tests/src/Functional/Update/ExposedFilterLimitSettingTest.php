@@ -46,5 +46,4 @@ class ExposedFilterLimitSettingTest extends UpdatePathTestBase {
     $this->assertArrayNotHasKey('limit', $display['default']['display_options']['filters']['status']['expose']);
   }
 
-
 }

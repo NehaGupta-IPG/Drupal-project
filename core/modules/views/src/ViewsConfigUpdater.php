@@ -170,5 +170,4 @@ class ViewsConfigUpdater {
     return FALSE;
   }
 
-
 }
