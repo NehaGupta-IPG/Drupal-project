@@ -61,26 +61,36 @@ abstract class SqlDumper {
     $formattedSql = (new SqlFormatter($highlighter))->format($sqlString);
 
     // Format the placeholders.
-    $cloner = new VarCloner();
-    $dumper = $html ? new HtmlDumper() : new CliDumper();
-    $dumper->setColors($color);
-    $dump = [];
-    $dumper->dump(
-      $cloner->cloneVar($placeholders),
-      function (string $line, int $depth, string $indent_pad) use (&$dump): void {
-        // A negative depth means "end of dump".
-        if ($depth >= 0) {
-          // Adds a two spaces indentation to the line.
-          $dump[] = str_repeat($indent_pad, $depth) . $line;
-        }
+    if (!empty($placeholders)) {
+      $cloner = new VarCloner();
+      $dumper = $html ? new HtmlDumper() : new CliDumper();
+      if ($html) {
+        $dumper->setTheme('light');
       }
-    );
-    $formattedArgs = $html ? implode("", $dump) : implode("\n", $dump);
+      else {
+        $dumper->setColors($color);
+      }
+      $dump = [];
+      $dumper->dump(
+        $cloner->cloneVar($placeholders),
+        function (string $line, int $depth, string $indent_pad) use (&$dump): void {
+          // A negative depth means "end of dump".
+          if ($depth >= 0) {
+            // Adds a two spaces indentation to the line.
+            $dump[] = str_repeat($indent_pad, $depth) . $line;
+          }
+        }
+      );
+      $formattedArgs = $html ? implode("", $dump) : implode("\n", $dump);
+    }
+    else {
+      $formattedArgs = NULL;
+    }
 
     return static::output(
       $formattedSql,
       $formattedArgs,
-      $html ? "<hr>" : "--------------------------------------------------------------------",
+      $html ? "<hr>" : "----------------------------------------",
       $html ? "" : "\n",
       !$html && $color,
     );
@@ -91,8 +101,8 @@ abstract class SqlDumper {
    *
    * @param string $sqlDump
    *   The processed SQL statement dump string.
-   * @param string $placeholderDump
-   *   The processed placeholders values dump string.
+   * @param ?string $placeholderDump
+   *   The processed placeholders values dump string. NULL for no placeholders.
    * @param string $delimiter
    *   A string to be used for vertical breaks.
    * @param string $newLine
@@ -103,15 +113,17 @@ abstract class SqlDumper {
    * @return string
    *   The output for printing.
    */
-  private static function output(string $sqlDump, string $placeholderDump, string $delimiter, string $newLine, bool $resetColor): string {
+  private static function output(string $sqlDump, ?string $placeholderDump, string $delimiter, string $newLine, bool $resetColor): string {
     $output = static::stringOutput($delimiter . $newLine, $resetColor);
     $output .= static::stringOutput("SQL statement" . $newLine, $resetColor);
     $output .= static::stringOutput($delimiter . $newLine, $resetColor);
     $output .= static::stringOutput($sqlDump . $newLine, $resetColor);
-    $output .= static::stringOutput($delimiter . $newLine, $resetColor);
-    $output .= static::stringOutput("Placeholders" . $newLine, $resetColor);
-    $output .= static::stringOutput($delimiter . $newLine, $resetColor);
-    $output .= static::stringOutput($placeholderDump . $newLine, $resetColor);
+    if ($placeholderDump !== NULL) {
+      $output .= static::stringOutput($delimiter . $newLine, $resetColor);
+      $output .= static::stringOutput("Placeholders" . $newLine, $resetColor);
+      $output .= static::stringOutput($delimiter . $newLine, $resetColor);
+      $output .= static::stringOutput($placeholderDump . $newLine, $resetColor);
+    }
     $output .= static::stringOutput($delimiter . $newLine, $resetColor);
 
     return $output;
