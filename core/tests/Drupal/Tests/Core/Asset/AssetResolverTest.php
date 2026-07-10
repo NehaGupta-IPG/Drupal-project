@@ -11,6 +11,7 @@ use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Asset\JsCollectionGrouper;
 use Drupal\Core\Asset\LibraryDependencyResolver;
 use Drupal\Core\Asset\LibraryDiscoveryCollector;
+use Drupal\Core\Asset\LibraryDiscoveryInterface;
 use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
@@ -22,6 +23,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Tests Drupal\Core\Asset\AssetResolver.
@@ -38,63 +40,53 @@ class AssetResolverTest extends UnitTestCase {
   protected $assetResolver;
 
   /**
-   * The mocked library discovery service.
-   *
-   * @var \Drupal\Core\Asset\LibraryDiscoveryInterface|\PHPUnit\Framework\MockObject\Stub
+   * The library discovery service.
    */
-  protected $libraryDiscovery;
+  protected LibraryDiscoveryInterface&Stub $libraryDiscovery;
 
   /**
-   * The mocked library dependency resolver.
+   * The library dependency resolver.
    *
-   * @var \Drupal\Core\Asset\LibraryDependencyResolverInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Asset\LibraryDependencyResolverInterface
    */
   protected $libraryDependencyResolver;
 
   /**
-   * The mocked module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\Stub
+   * The module handler.
    */
-  protected $moduleHandler;
+  protected ModuleHandlerInterface&Stub $moduleHandler;
 
   /**
-   * The mocked theme manager.
-   *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface|\PHPUnit\Framework\MockObject\Stub
+   * The theme manager.
    */
-  protected $themeManager;
+  protected ThemeManagerInterface&Stub $themeManager;
 
   /**
-   * The mocked language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\Stub
+   * The language manager.
    */
-  protected $languageManager;
+  protected LanguageManagerInterface&Stub $languageManager;
 
   /**
    * The cache backend to use.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Cache\CacheBackendInterface
    */
   protected $cache;
 
   /**
-   * The mocked theme handler.
-   *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface|\PHPUnit\Framework\MockObject\Stub
+   * The theme handler.
    */
-  protected $themeHandler;
+  protected ThemeHandlerInterface&Stub $themeHandler;
 
   /**
-   * A mocked English language object.
+   * A English language object.
    */
-  protected LanguageInterface $english;
+  protected LanguageInterface&Stub $english;
 
   /**
-   * A mocked Japanese language object.
+   * A Japanese language object.
    */
-  protected LanguageInterface $japanese;
+  protected LanguageInterface&Stub $japanese;
   /**
    * An array of library definitions.
    */
@@ -115,6 +107,7 @@ class AssetResolverTest extends UnitTestCase {
     $this->libraries = [
       'core/drupal' => [
         'version' => '1.0.0',
+        'aggregate_target' => ['css' => FALSE, 'js' => FALSE],
         'css' => [],
         'js' =>
           [
@@ -124,6 +117,7 @@ class AssetResolverTest extends UnitTestCase {
       ],
       'core/jquery' => [
         'version' => '1.0.0',
+        'aggregate_target' => ['css' => FALSE, 'js' => FALSE],
         'css' => [],
         'js' =>
           [
@@ -133,29 +127,39 @@ class AssetResolverTest extends UnitTestCase {
       ],
       'llama/css' => [
         'version' => '1.0.0',
+        'aggregate_target' => ['css' => FALSE, 'js' => FALSE],
         'css' =>
           [
             'core/misc/llama.css' => ['data' => 'core/misc/llama.css'],
           ],
         'js' => [],
+        'fonts' => [],
         'license' => '',
       ],
       'piggy/css' => [
         'version' => '1.0.0',
+        'aggregate_target' => ['css' => FALSE, 'js' => FALSE],
         'css' =>
           [
             'core/misc/piggy.css' => ['data' => 'core/misc/piggy.css'],
           ],
         'js' => [],
+        'fonts' => [
+          'fonts/font.woff2' => [
+            'data' => 'fonts/font.woff2',
+            'preload' => TRUE,
+          ],
+        ],
         'license' => '',
       ],
       'core/ckeditor5' => [
         'remote' => 'https://github.com/ckeditor/ckeditor5',
         'version' => '1.0.0',
         'license' => '',
+        'aggregate_target' => ['css' => FALSE, 'js' => FALSE],
         'js' => [
-          'assets/vendor/ckeditor5/ckeditor5-dll/ckeditor5-dll.js' => [
-            'data' => 'assets/vendor/ckeditor5/ckeditor5-dll/ckeditor5-dll.js',
+          'assets/vendor/ckeditor5/ckeditor5.umd.js' => [
+            'data' => 'assets/vendor/ckeditor5/ckeditor5.umd.js',
             'preprocess' => FALSE,
             'minified' => TRUE,
           ],
@@ -265,6 +269,34 @@ class AssetResolverTest extends UnitTestCase {
         (new AttachedAssets())->setAlreadyLoadedLibraries([])->setLibraries(['core/drupal', 'core/jquery'])->setSettings(['currentTime' => $time]),
         2,
         4,
+      ],
+    ];
+  }
+
+  /**
+   * Tests get font assets.
+   */
+  #[DataProvider('providerAttachedFontAssets')]
+  public function testGetFontAssets($libraries, $expected): void {
+    $assets = new AttachedAssets()->setAlreadyLoadedLibraries([])->setLibraries($libraries);
+    $fonts = $this->assetResolver->getFontAssets($assets, $this->english);
+    $this->assertSame($expected, $fonts);
+  }
+
+  public static function providerAttachedFontAssets(): array {
+    return [
+      [
+        ['piggy/css'],
+        [
+          [
+            'data' => 'fonts/font.woff2',
+            'preload' => TRUE,
+          ],
+        ],
+      ],
+      [
+        ['llama/css'],
+        [],
       ],
     ];
   }

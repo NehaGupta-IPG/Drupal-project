@@ -79,12 +79,14 @@ class HelpHooks {
         $output .= '<dt>' . $this->t('Translating help topics') . '</dt>';
         $output .= '<dd>' . $this->t('The title and body text of help topics provided by contributed modules and themes are translatable using the <a href=":locale_help">Interface Translation module</a>. Topics provided by custom modules and themes are also translatable if they have been viewed at least once in a non-English language, which triggers putting their translatable text into the translation database.', [':locale_help' => $locale_help]) . '</dd>';
         $output .= '<dt>' . $this->t('Configuring help search') . '</dt>';
-        $output .= '<dd>' . $this->t('To search help, you will need to install the core Search module, configure a search page, and add a search block to the Help page or another administrative page. (A search page is provided automatically, and if you use the core Claro administrative theme, a help search block is shown on the main Help page.) Then users with search permissions, and permission to view help, will be able to search help. See the <a href=":search_help">Search module help page</a> for more information.', [':search_help' => $search_help]) . '</dd>';
+        $output .= '<dd>' . $this->t('To search help, you will need to install the core Search module, configure a search page, and add a search block to the Help page or another administrative page. (A search page is provided automatically, and if you use the core Administrative theme, a help search block is shown on the main Help page.) Then users with search permissions, and permission to view help, will be able to search help. See the <a href=":search_help">Search module help page</a> for more information.', [':search_help' => $search_help]) . '</dd>';
         $output .= '</dl>';
         return ['#markup' => $output];
 
       case 'help.help_topic':
-        $help_home = Url::fromRoute('help.main')->toString();
+        $help_home = Url::fromRoute('help.main')
+          ->setOption('fragment', 'help-topics')
+          ->toString();
         return '<p>' . $this->t('See the <a href=":help_page">Help page</a> for more topics.', [':help_page' => $help_home]) . '</p>';
     }
     return NULL;
@@ -98,6 +100,7 @@ class HelpHooks {
     return [
       'help_section' => [
         'variables' => [
+          'plugin_id' => NULL,
           'title' => NULL,
           'description' => NULL,
           'links' => NULL,
@@ -121,59 +124,6 @@ class HelpHooks {
     // Assume that most users do not need or want to perform contextual actions
     // on the help block, so don't needlessly draw attention to it.
     unset($build['#contextual_links']);
-  }
-
-  /**
-   * Implements hook_modules_uninstalled().
-   */
-  #[Hook('modules_uninstalled')]
-  public function modulesUninstalled(array $modules): void {
-    $this->searchUpdate($modules);
-  }
-
-  /**
-   * Implements hook_modules_installed().
-   */
-  #[Hook('modules_installed')]
-  public function modulesInstalled(array $modules, $is_syncing): void {
-    $this->searchUpdate();
-  }
-
-  /**
-   * Implements hook_themes_installed().
-   *
-   * Implements hook_themes_uninstalled().
-   */
-  #[Hook('themes_installed')]
-  #[Hook('themes_uninstalled')]
-  public function themesInstallOrUninstall(array $themes): void {
-    \Drupal::service('plugin.cache_clearer')->clearCachedDefinitions();
-    $this->searchUpdate();
-  }
-
-  /**
-   * Ensure that search is updated when extensions are installed or uninstalled.
-   *
-   * @param string[] $extensions
-   *   (optional) If modules are being uninstalled, the names of the modules
-   *   being uninstalled. For themes being installed/uninstalled, or modules
-   *   being installed, omit this parameter.
-   */
-  protected function searchUpdate(array $extensions = []): void {
-    // Early return if search is not installed or if we're uninstalling this
-    // module.
-    if (
-      !\Drupal::hasService('plugin.manager.search') ||
-      in_array('help', $extensions)
-    ) {
-      return;
-    }
-
-    // Ensure that topics for extensions that have been uninstalled are removed
-    // and that the index state variable is updated.
-    $help_search = \Drupal::service('plugin.manager.search')->createInstance('help_search');
-    $help_search->updateTopicList();
-    $help_search->updateIndexState();
   }
 
 }

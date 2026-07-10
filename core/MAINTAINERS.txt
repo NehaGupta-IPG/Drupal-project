@@ -61,6 +61,7 @@ Initiative facilitators
 General core committers
 - Drew Webber 'mcdruid' https://www.drupal.org/u/mcdruid
 - Juraj Nemec 'poker10' https://www.drupal.org/u/poker10
+- (provisional) Andrei Mateescu 'amateescu' https://www.drupal.org/u/amateescu
 
 Subsystem maintainers
 ---------------------
@@ -127,6 +128,10 @@ Claro
 - Cristina Chumillas 'ckrina' https://www.drupal.org/u/ckrina
 - Sascha Eggenberger 'saschaeggi' https://www.drupal.org/u/saschaeggi
 - Ben Mullins 'bnjmnm' https://www.drupal.org/u/bnjmnm
+
+Command Line Interface (CLI) - `dr`
+- Moshe Weitzman 'moshe weitzman' https://www.drupal.org/u/moshe-weitzman
+- Derek Wright 'dww' https://www.drupal.org/u/dww
 
 Comment
 - Lee Rowlands 'larowlan' https://www.drupal.org/u/larowlan
@@ -387,9 +392,6 @@ System (module)
 Taxonomy
 - Jess Myrbo 'xjm' https://www.drupal.org/u/xjm
 
-Telephone
-- Stephen Mustgrave 'smustgrave' https://www.drupal.org/u/smustgrave
-
 Text Field
 - Stephen Mustgrave 'smustgrave' https://www.drupal.org/u/smustgrave
 
@@ -450,6 +452,7 @@ provides more information on their responsibilities.
 Accessibility
 - Mike Gifford 'mgifford' https://www.drupal.org/u/mgifford
 - Ben Mullins 'bnjmnm' https://www.drupal.org/u/bnjmnm
+- Kent Richards 'kentr' https://www.drupal.org/u/kentr
 
 Documentation
 - ?
@@ -505,7 +508,6 @@ get involved. They organize communications and logistics, and actively
 participate in mentoring.
 
 - Chris Darke 'chrisdarke' https://www.drupal.org/u/chrisdarke
-- Brian Gilbert 'realityloop' https://www.drupal.org/u/realityloop
 - Lucas Hedding 'heddn' https://www.drupal.org/u/heddn
 - Rachel Lawson 'rachel_norfolk' https://www.drupal.org/u/rachel_norfolk
 - Elli Ludwigson 'ekl1773' https://www.drupal.org/u/ekl1773
