@@ -20,7 +20,7 @@ use Drupal\Core\DependencyInjection\Compiler\RegisterAccessChecksPass;
 use Drupal\Core\DependencyInjection\Compiler\RegisterEventSubscribersPass;
 use Drupal\Core\DependencyInjection\Compiler\RegisterServicesForDestructionPass;
 use Drupal\Core\DependencyInjection\Compiler\StackedKernelPass;
-use Symfony\Component\DependencyInjection\Compiler\ResettableServicePass;
+use Symfony\Component\HttpKernel\DependencyInjection\ResettableServicePass;
 use Drupal\Core\DependencyInjection\Compiler\StackedSessionHandlerPass;
 use Drupal\Core\DependencyInjection\Compiler\SuperUserAccessPolicyPass;
 use Drupal\Core\DependencyInjection\Compiler\TaggedHandlersPass;

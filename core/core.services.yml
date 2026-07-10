@@ -2064,6 +2064,5 @@ services:
   Drupal\Core\Extension\ThemeSettingsProvider:
     autowire: true
   services_resetter:
-    class: Symfony\Component\DependencyInjection\ServicesResetter
+    class: Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter
     arguments: [!iterator {}, []]
-  Symfony\Component\DependencyInjection\ServicesResetterInterface: '@services_resetter'
