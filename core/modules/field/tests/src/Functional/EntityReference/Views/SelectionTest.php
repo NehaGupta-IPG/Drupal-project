@@ -95,11 +95,11 @@ class SelectionTest extends BrowserTestBase {
       ],
     ];
     $this->handlerSettings = $handler_settings;
-    $this->createEntityReferenceField('entity_test', 'entity_test', 'test_field', 'Reference', 'node', 'views', $handler_settings, FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
+    $this->createEntityReferenceField('entity_test', 'test_bundle', 'test_field', 'Reference', 'node', 'views', $handler_settings, FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
 
     /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
     $display_repository = \Drupal::service('entity_display.repository');
-    $display_repository->getFormDisplay('entity_test', 'entity_test')
+    $display_repository->getFormDisplay('entity_test', 'test_bundle')
       ->setComponent('test_field', [
         'type' => 'entity_reference_autocomplete_tags',
         'weight' => -4,
@@ -178,7 +178,7 @@ class SelectionTest extends BrowserTestBase {
       $this->nodes[1]->label(),
       $this->nodes[1]->id());
 
-    $this->drupalGet('entity_test/add');
+    $this->drupalGet('entity_test/add/test_bundle');
     $edit = [
       'test_field[target_id]' => sprintf('node (%d)', $this->nodes[1]->id()),
     ];
@@ -207,7 +207,7 @@ class SelectionTest extends BrowserTestBase {
       $this->nodes[4]->label(),
       $this->nodes[4]->id());
 
-    $this->drupalGet('entity_test/add');
+    $this->drupalGet('entity_test/add/test_bundle');
     $edit = [
       'test_field[target_id]' => sprintf(
         'node (%d), node (%d), "I\'m in your demo, making you smile (%d)"',
