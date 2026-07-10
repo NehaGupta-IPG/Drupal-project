@@ -121,6 +121,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
   public static function defaultSettings() {
     return [
       'media_types' => [],
+      'collapsible' => FALSE,
     ] + parent::defaultSettings();
   }
 
@@ -175,6 +176,13 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $elements = [];
+    $elements['collapsible'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Collapsible'),
+      '#default_value' => $this->getSetting('collapsible'),
+      '#description' => $this->t('Display the widget in a collapsible details element instead of a fieldset.'),
+    ];
+
     $media_type_ids = $this->getAllowedMediaTypeIdsSorted();
 
     if (count($media_type_ids) <= 1) {
@@ -261,6 +269,9 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    */
   public function settingsSummary() {
     $summary = [];
+    if ($this->getSetting('collapsible')) {
+      $summary[] = $this->t('Collapsible: @status', ['@status' => $this->getSetting('collapsible') ? $this->t('Yes') : $this->t('No')]);
+    }
     $media_type_labels = [];
     $media_types = $this->entityTypeManager->getStorage('media_type')->loadMultiple($this->getAllowedMediaTypeIdsSorted());
     if (count($media_types) !== 1) {
@@ -318,8 +329,9 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     $limit_validation_errors = [array_merge($parents, [$field_name])];
 
     $settings = $this->getFieldSetting('handler_settings');
+    $collapsible = $this->getSetting('collapsible');
     $element += [
-      '#type' => 'fieldset',
+      '#type' => $collapsible ? 'details' : 'fieldset',
       '#cardinality' => $this->fieldDefinition->getFieldStorageDefinition()->getCardinality(),
       // If no target bundles are specified, all target bundles are allowed.
       '#target_bundles' => $settings['target_bundles'] ?? [],
@@ -333,10 +345,18 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       '#attached' => [
         'library' => ['media_library/widget'],
       ],
-      '#theme_wrappers' => [
-        'fieldset__media_library_widget',
-      ],
     ];
+    if ($collapsible) {
+      $element['#open'] = FALSE;
+      $element['#theme_wrappers'] = [
+        'details__media_library_widget',
+      ];
+    }
+    else {
+      $element['#theme_wrappers'] = [
+        'fieldset__media_library_widget',
+      ];
+    }
 
     if ($this->fieldDefinition->isRequired()) {
       $element['#element_validate'][] = [static::class, 'validateRequired'];
@@ -615,6 +635,25 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       $element['#field_suffix']['open_button'] = $element['open_button'];
       unset($element['open_button']);
     }
+
+    // Details elements do not support #field_prefix and #field_suffix.
+    if (($element['#type'] ?? '') === 'details') {
+      if (!empty($element['#field_prefix'])) {
+        $element['prefix'] = [
+          '#type' => 'container',
+          '#weight' => -100,
+        ] + $element['#field_prefix'];
+        unset($element['#field_prefix']);
+      }
+      if (!empty($element['#field_suffix'])) {
+        $element['suffix'] = [
+          '#type' => 'container',
+          '#weight' => 100,
+        ] + $element['#field_suffix'];
+        unset($element['#field_suffix']);
+      }
+    }
+
     return $element;
   }
 

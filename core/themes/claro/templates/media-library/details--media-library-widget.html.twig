@@ -1,0 +1,14 @@
+{% extends 'details.html.twig' %}
+{#
+/**
+ * @file
+ * Theme override for the collapsible media library widget.
+ *
+ * @see claro_preprocess_details__media_library_widget()
+ * @see claro_preprocess_details()
+ * @see \Drupal\Core\Form\FormPreprocess::preprocessDetails()
+ */
+#}
+{%
+  set attributes = attributes.addClass('media-library-widget')
+%}

@@ -1,0 +1,14 @@
+{% extends 'details.html.twig' %}
+{#
+/**
+ * @file
+ * Theme override for the collapsible media library widget.
+ *
+ * @see \Drupal\default_admin\Hook\PreprocessHooks::preprocessDetailsMediaLibraryWidget()
+ * @see \Drupal\default_admin\Hook\PreprocessHooks::preprocessDetails()
+ * @see \Drupal\Core\Form\FormPreprocess::preprocessDetails()
+ */
+#}
+{%
+  set attributes = attributes.addClass('media-library-widget')
+%}
