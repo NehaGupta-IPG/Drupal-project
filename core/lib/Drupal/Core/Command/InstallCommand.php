@@ -83,7 +83,7 @@ class InstallCommand extends Command {
     if ($this->isDrupalInstalled()) {
       // Do not fail if the site is already installed so this command can be
       // chained with ServerCommand.
-      $output->writeln('<info>Drupal is already installed.</info> If you want to reinstall, remove sites/default/files and sites/default/settings.php.');
+      $output->writeln('<info>Drupal is already installed.</info> If you want to reinstall, you must empty the database defined in settings.php.');
       return 0;
     }
 
