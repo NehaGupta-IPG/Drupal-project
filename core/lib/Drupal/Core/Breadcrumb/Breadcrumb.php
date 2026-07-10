@@ -38,15 +38,8 @@ class Breadcrumb implements RenderableInterface, RefinableCacheableDependencyInt
    *   The breadcrumb links.
    *
    * @return $this
-   *
-   * @throws \LogicException
-   *   Thrown when setting breadcrumb links after they've already been set.
    */
   public function setLinks(array $links) {
-    if (!empty($this->links)) {
-      throw new \LogicException('Once breadcrumb links are set, only additional breadcrumb links can be added.');
-    }
-
     $this->links = $links;
 
     return $this;
@@ -62,6 +55,24 @@ class Breadcrumb implements RenderableInterface, RefinableCacheableDependencyInt
    */
   public function addLink(Link $link) {
     $this->links[] = $link;
+
+    return $this;
+  }
+
+  /**
+   * Removes a link by route name from the ordered list of breadcrumb links.
+   *
+   * @param \Drupal\Core\Link $link
+   *   The link removed from the breadcrumb.
+   *
+   * @return $this
+   */
+  public function removeLink(Link $link) {
+    foreach ($this->links as $key => $value) {
+      if ($value->getUrl()->getRouteName() == $link->getUrl()->getRouteName() && $value->getUrl()->getRouteParameters() === $link->getUrl()->getRouteParameters()) {
+        unset($this->links[$key]);
+      }
+    }
 
     return $this;
   }
