@@ -217,21 +217,6 @@ abstract class Connection {
   }
 
   /**
-   * Commits all the open transactions.
-   *
-   * @internal
-   *   This method exists only to work around a bug caused by Drupal incorrectly
-   *   relying on object destruction order to commit transactions. Xdebug 3.3.0
-   *   changes the order of object destruction when the develop mode is enabled.
-   */
-  public function commitAll() {
-    $manager = $this->transactionManager();
-    if ($manager->inTransaction() && method_exists($manager, 'commitAll')) {
-      $this->transactionManager()->commitAll();
-    }
-  }
-
-  /**
    * Returns the client-level database connection object.
    *
    * This method should normally be used only within database driver code. Not

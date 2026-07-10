@@ -75,27 +75,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   protected $identifierQuotes = ['"', '"'];
 
   /**
-   * An array of transaction savepoints.
-   *
-   * The main use for this array is to store information about transaction
-   * savepoints opened to to mimic MySql's InnoDB functionality, which provides
-   * an inherent savepoint before any query in a transaction.
-   *
-   * @var array<string,Transaction>
-   *
-   * @see ::addSavepoint()
-   * @see ::releaseSavepoint()
-   * @see ::rollbackSavepoint()
-   *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
-   *   TransactionManager to start a transaction then call ::commitOrRelease()
-   *   or ::rollback() on it.
-   *
-   * @see https://www.drupal.org/node/3524461
-   */
-  protected array $savepoints = [];
-
-  /**
    * Constructs a connection object.
    */
   public function __construct(Pgsql $connection, array $connection_options) {
@@ -374,70 +353,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // The fully qualified table name in PostgreSQL is in the form of
     // <database>.<schema>.<table>.
     return $options['database'] . '.' . $schema . '.' . $this->getPrefix() . $table;
-  }
-
-  /**
-   * Add a new savepoint with a unique name.
-   *
-   * The main use for this method is to mimic InnoDB functionality, which
-   * provides an inherent savepoint before any query in a transaction.
-   *
-   * @param string $savepoint_name
-   *   A string representing the savepoint name. By default,
-   *   "mimic_implicit_commit" is used.
-   *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
-   *   TransactionManager to start a transaction then call ::commitOrRelease()
-   *   or ::rollback() on it.
-   *
-   * @see https://www.drupal.org/node/3524461
-   */
-  public function addSavepoint($savepoint_name = 'mimic_implicit_commit') {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use TransactionManager to start a transaction then call ::commitOrRelease() or ::rollback() on it. See https://www.drupal.org/node/3524461', E_USER_DEPRECATED);
-    if ($this->inTransaction()) {
-      $this->savepoints[$savepoint_name] = $this->startTransaction($savepoint_name);
-    }
-  }
-
-  /**
-   * Release a savepoint by name.
-   *
-   * @param string $savepoint_name
-   *   A string representing the savepoint name. By default,
-   *   "mimic_implicit_commit" is used.
-   *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
-   *   TransactionManager to start a transaction then call ::commitOrRelease()
-   *   or ::rollback() on it.
-   *
-   * @see https://www.drupal.org/node/3524461
-   */
-  public function releaseSavepoint($savepoint_name = 'mimic_implicit_commit') {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use TransactionManager to start a transaction then call ::commitOrRelease() or ::rollback() on it. See https://www.drupal.org/node/3524461', E_USER_DEPRECATED);
-    if ($this->inTransaction() && $this->transactionManager()->has($savepoint_name)) {
-      unset($this->savepoints[$savepoint_name]);
-    }
-  }
-
-  /**
-   * Rollback a savepoint by name if it exists.
-   *
-   * @param string $savepoint_name
-   *   A string representing the savepoint name. By default,
-   *   "mimic_implicit_commit" is used.
-   *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
-   *   TransactionManager to start a transaction then call ::commitOrRelease()
-   *   or ::rollback() on it.
-   *
-   * @see https://www.drupal.org/node/3524461
-   */
-  public function rollbackSavepoint($savepoint_name = 'mimic_implicit_commit') {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use TransactionManager to start a transaction then call ::commitOrRelease() or ::rollback() on it. See https://www.drupal.org/node/3524461', E_USER_DEPRECATED);
-    if ($this->inTransaction() && $this->transactionManager()->has($savepoint_name)) {
-      $this->savepoints[$savepoint_name]->rollBack();
-      unset($this->savepoints[$savepoint_name]);
-    }
   }
 
   /**

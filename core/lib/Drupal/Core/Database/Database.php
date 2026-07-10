@@ -450,17 +450,9 @@ abstract class Database {
       $key = self::$activeKey;
     }
     if (isset($target) && isset(self::$connections[$key][$target])) {
-      if (self::$connections[$key][$target] instanceof Connection) {
-        self::$connections[$key][$target]->commitAll();
-      }
       unset(self::$connections[$key][$target]);
     }
     elseif (isset(self::$connections[$key])) {
-      foreach (self::$connections[$key] as $connection) {
-        if ($connection instanceof Connection) {
-          $connection->commitAll();
-        }
-      }
       unset(self::$connections[$key]);
     }
 
@@ -610,45 +602,6 @@ abstract class Database {
     $db_info['default']['module'] = explode('\\', $namespace)[1];
     $connection_class = $namespace . '\\Connection';
     return $connection_class::createUrlFromConnectionOptions($db_info['default']);
-  }
-
-  /**
-   * Calls commitAll() on all the open connections.
-   *
-   * If drupal_register_shutdown_function() exists the commit will occur during
-   * shutdown so that it occurs at the latest possible moment.
-   *
-   * @param bool $shutdown
-   *   Internal param to denote that the method is being called by
-   *   _drupal_shutdown_function().
-   *
-   * @internal
-   *   This method exists only to work around a bug caused by Drupal incorrectly
-   *   relying on object destruction order to commit transactions. Xdebug 3.3.0
-   *   changes the order of object destruction when the develop mode is enabled.
-   */
-  public static function commitAllOnShutdown(bool $shutdown = FALSE): void {
-    static $registered = FALSE;
-
-    if ($shutdown) {
-      foreach (self::$connections as $targets) {
-        foreach ($targets as $connection) {
-          if ($connection instanceof Connection) {
-            $connection->commitAll();
-          }
-        }
-      }
-      return;
-    }
-
-    if (!function_exists('drupal_register_shutdown_function')) {
-      return;
-    }
-
-    if (!$registered) {
-      $registered = TRUE;
-      drupal_register_shutdown_function('\Drupal\Core\Database\Database::commitAllOnShutdown', TRUE);
-    }
   }
 
 }

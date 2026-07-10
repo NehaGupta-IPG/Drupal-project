@@ -1295,6 +1295,17 @@ class TransactionTest extends DatabaseTestBase {
   }
 
   /**
+   * Tests failure of implicit commit.
+   */
+  public function testFailureOfImplicitCommit(): void {
+    $this->expectException(\AssertionError::class);
+    $this->expectExceptionMessage("Database commit or release savepoint by letting a Transaction object go out of scope is not supported");
+    $transaction = $this->createRootTransaction();
+    unset($transaction);
+    $this->assertRowPresent('David');
+  }
+
+  /**
    * Tests that mocking transactions works fine.
    */
   public function testMockTransaction(): void {
