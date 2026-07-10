@@ -168,7 +168,7 @@ function locale_translation_build_sources(array $projects = [], array $langcodes
  * hook_locale_translation_projects_alter().
  *
  * @param object $source
- *   Translation source object.if ($files = \Drupal::service('file_system')->scanDirectory($directory, $filename, ['key' => 'name'])) {
+ *   Translation source object.
  *
  * @return object
  *   Source file object of the po file, updated with:
