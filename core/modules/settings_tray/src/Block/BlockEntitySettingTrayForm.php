@@ -168,7 +168,9 @@ class BlockEntitySettingTrayForm extends BlockForm {
     // because it will use <current> if 'destination' is not in the query
     // string.
     if ($this->getRequest()->query->has('destination') && $destination = $this->getRedirectDestination()->get()) {
-      return Url::fromUserInput('/' . $destination);
+      // Normalize the destination to ensure it has a single leading slash.
+      $destination = (strpos($destination, '/') === 0) ? $destination : '/' . $destination;
+      return Url::fromUserInput($destination);
     }
   }
 
