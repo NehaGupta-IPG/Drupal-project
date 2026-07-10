@@ -43,10 +43,6 @@ class TermDisplayConfigurableTest extends TaxonomyTestBase {
     // Enable helper module to make base fields' displays configurable.
     \Drupal::service('module_installer')->install(['taxonomy_term_display_configurable_test']);
 
-    // Need to reload these after installing the module.
-    $this->initMink();
-    $assert = $this->assertSession();
-
     // Configure display.
     $display = \Drupal::service('entity_display.repository')->getViewDisplay('taxonomy_term', $this->vocabulary->id(), 'default');
     $display->setComponent('name', [
