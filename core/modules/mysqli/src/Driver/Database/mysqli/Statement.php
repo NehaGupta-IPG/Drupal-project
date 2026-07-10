@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\mysqli\Driver\Database\mysqli;
 
-use Doctrine\SqlFormatter\SqlFormatter;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Statement\PlaceholderType;
 use Drupal\Core\Database\Statement\StatementBase;
-use Drupal\Core\Database\Utility\CliHighlighter;
+use Drupal\Core\Database\Utility\SqlDumper;
 
 /**
  * MySQLi implementation of \Drupal\Core\Database\Query\StatementInterface.
@@ -91,7 +90,7 @@ class Statement extends StatementBase {
       if (!$this->hasClientStatement()) {
         // Replace named placeholders with positional ones if needed.
         if ($this->placeholderType === PlaceholderType::Positional) {
-          assert(call_user_func(function () use ($args, &$formattedSql, &$formattedArgs): bool {
+          assert(call_user_func(function () use ($args, &$sqlDump): bool {
             try {
               $converter = new NamedPlaceholderConverter();
               $converter->parse($this->queryString, $args);
@@ -102,12 +101,10 @@ class Statement extends StatementBase {
             }
             if ($isDifferent) {
               // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
-              $formattedSql = (new SqlFormatter(new CliHighlighter()))->format($this->queryString);
-              // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
-              $formattedArgs = var_export($args, TRUE);
+              $sqlDump = SqlDumper::export($this->queryString, $args);
             }
             return !$isDifferent;
-          }), "Expected positional-placeholder-only query string has named placeholders in it.\n-----\nSQL statement\n{$formattedSql}\n-----\nPlaceholders\n{$formattedArgs}\n-----");
+          }), "Expected positional-placeholder-only query string has named placeholders in it.\n{$sqlDump}");
           $convertedQueryString = $this->queryString;
         }
         else {

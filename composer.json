@@ -10,7 +10,6 @@
     },
     "require": {
         "composer/installers": "^2.3",
-        "doctrine/sql-formatter": "^1.5",
         "drupal/core": "self.version",
         "drupal/core-project-message": "self.version",
         "drupal/core-recipe-unpack": "self.version",
@@ -24,6 +23,7 @@
         "behat/mink-browserkit-driver": "^2.2",
         "colinodell/psr-testlogger": "^1.2",
         "composer/composer": "^2.8.1",
+        "doctrine/sql-formatter": "^1.5",
         "drupal/coder": "^8.3.30",
         "lullabot/mink-selenium2-driver": "^1.7.3",
         "lullabot/php-webdriver": "^2.0.7",
