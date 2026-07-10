@@ -11,7 +11,7 @@ use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\file\Entity\File;
 use Drupal\Tests\BrowserTestBase;
 
-// cspell:ignore februar januar juni marz
+// cspell:ignore februar januar juni juli marz
 
 /**
  * Base class for testing updates to string translations.
