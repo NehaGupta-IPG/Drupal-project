@@ -51,14 +51,15 @@ class ConfigInstallProfileOverrideTest extends BrowserTestBase {
       'logging' => TRUE,
     ];
     // The expected active configuration altered by the install profile.
-    $expected_profile_data = [
+    $expected_profile_hash_data = [
       'threshold' => [
         'requirements_warning' => 259200,
         'requirements_error' => 1209600,
       ],
       'logging' => TRUE,
     ];
-    $expected_profile_data = ['_core' => ['default_config_hash' => Crypt::hashBase64(serialize($expected_profile_data))]] + $expected_profile_data;
+    $expected_profile_data = $expected_profile_hash_data + ['langcode' => 'en'];
+    $expected_profile_data = ['_core' => ['default_config_hash' => Crypt::hashBase64(serialize($expected_profile_hash_data))]] + $expected_profile_data;
 
     // Verify that the original data matches. We have to read the module config
     // file directly, because the install profile default system.cron.yml
