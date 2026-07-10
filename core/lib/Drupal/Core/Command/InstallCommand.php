@@ -54,7 +54,7 @@ class InstallCommand extends Command {
   protected function configure(): void {
     $this->setName('install')
       ->setDescription('Install Drupal using an install profile or recipe.')
-      ->setHelp('If a connection to a database is defined, it will be used. If no connection is defined a SQLite database will be created and used which is not meant for production and might be too simple for custom development.')
+      ->setHelp('This will install Drupal using an existing database connection or fallback to using a SQLite database not mean for production.')
       ->addArgument('install-profile-or-recipe', InputArgument::OPTIONAL, 'Install profile or recipe directory from which to install the site.')
       ->addOption('langcode', NULL, InputOption::VALUE_OPTIONAL, 'The language to install the site in.', 'en')
       ->addOption('password', NULL, InputOption::VALUE_OPTIONAL, 'The password to use for the site. Defaults to random password.')
