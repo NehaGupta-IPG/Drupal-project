@@ -147,7 +147,6 @@ class LocaleUpdateTest extends LocaleUpdateBase {
 
     // Check the status on the Available translation status page.
     $this->assertSession()->responseContains('<label for="edit-langcodes-de" class="visually-hidden">Update German</label>');
-    $this->assertSession()->pageTextContains('Updates for: Contributed module one, Contributed module two, Custom module one, Locale test');
     $this->assertSession()->pageTextContains('Updates for: Contributed module four, Contributed module one, Contributed module two, Custom module one, Locale test');
     /** @var \Drupal\Core\Datetime\DateFormatterInterface $date_formatter */
     $date_formatter = $this->container->get('date.formatter');
