@@ -18,6 +18,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Installs a Drupal site for local testing/development.
@@ -245,6 +246,8 @@ class InstallCommand extends Command {
 
     require_once 'core/includes/install.core.inc';
 
+    $this->setRequestHost();
+
     $progress_bar = $io->createProgressBar();
     install_drupal($class_loader, $parameters, function ($install_state) use ($progress_bar) {
       static $started = FALSE;
@@ -275,6 +278,33 @@ class InstallCommand extends Command {
     $io->writeln("<info>Password:</info> $password");
 
     return 0;
+  }
+
+  /**
+   * Seeds the request host used by the installer.
+   *
+   * The installer creates its request with Request::createFromGlobals(), which
+   * relies on the HTTP host being present in $_SERVER. On the command line that
+   * host is empty, so any absolute URL generated during installation is
+   * invalid. Populate the superglobals from the base URL that the application
+   * resolved (from the --url option, the DRUPAL_URI environment variable, or
+   * the default) so the installer builds a request with a valid host.
+   */
+  protected function setRequestHost(): void {
+    $application = $this->getApplication();
+    $uri = $application instanceof DrupalApplication ? $application->getUri() : 'http://localhost';
+    $request = Request::create($uri);
+    // Only add the host if the request does not already have one, so an
+    // explicitly configured environment is left untouched.
+    if (empty($_SERVER['HTTP_HOST'])) {
+      $_SERVER['HTTP_HOST'] = $request->getHttpHost();
+    }
+    if (empty($_SERVER['SERVER_NAME'])) {
+      $_SERVER['SERVER_NAME'] = $request->getHost();
+    }
+    if ($request->isSecure() && empty($_SERVER['HTTPS'])) {
+      $_SERVER['HTTPS'] = 'on';
+    }
   }
 
   /**
