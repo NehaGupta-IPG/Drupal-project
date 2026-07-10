@@ -12,6 +12,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\StringTranslation\FixedPluralIndex;
 use Drupal\Core\StringTranslation\PluralIndexInterface;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -127,7 +128,6 @@ abstract class UnitTestCase extends TestCase {
    *   A stub translation object.
    */
   public function getStringTranslationStub() {
-    $plural_index = $this->createStub(PluralIndexInterface::class);
     $translation = $this->createStub('Drupal\Core\StringTranslation\TranslationInterface');
     $translation
       ->method('translate')
@@ -142,13 +142,10 @@ abstract class UnitTestCase extends TestCase {
       });
     $translation
       ->method('formatPlural')
-      ->willReturnCallback(function ($count, $singular, $plural, array $args = [], array $options = []) use ($translation, $plural_index): PluralTranslatableMarkup {
-        $wrapper = new PluralTranslatableMarkup($count, $singular, $plural, $args, $options, $translation, $plural_index);
+      ->willReturnCallback(function ($count, $singular, $plural, array $args = [], array $options = []) use ($translation): PluralTranslatableMarkup {
+        $wrapper = new PluralTranslatableMarkup($count, $singular, $plural, $args, $options, $translation, new FixedPluralIndex());
         return $wrapper;
       });
-    $plural_index
-      ->method('getPluralIndex')
-      ->willReturn(-1);
     return $translation;
   }
 
