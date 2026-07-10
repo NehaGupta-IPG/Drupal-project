@@ -2066,3 +2066,4 @@ services:
   services_resetter:
     class: Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter
     arguments: [!iterator {}, []]
+  Symfony\Component\HttpKernel\DependencyInjection\ServicesResetterInterface: '@services_resetter'
