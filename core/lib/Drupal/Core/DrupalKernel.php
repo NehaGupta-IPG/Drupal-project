@@ -730,6 +730,12 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         }
       }
 
+      // Reset resettable services so per-request state does not persist into
+      // subsequent requests on persistent PHP runtimes.
+      if ($this->container->has('services_resetter')) {
+        $this->container->get('services_resetter')->reset();
+      }
+
       // Pop the request added in \Drupal\Core\DrupalKernel::preHandle() from
       // request stack at the end of the execution cycle.
       if ($this->prepared === TRUE) {

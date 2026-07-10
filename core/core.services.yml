@@ -1987,6 +1987,8 @@ services:
   pager.manager:
     class: Drupal\Core\Pager\PagerManager
     arguments: ['@pager.parameters']
+    tags:
+      - { name: kernel.reset, method: reset }
   Drupal\Core\Pager\PagerManagerInterface: '@pager.manager'
   pager.parameters:
     class: Drupal\Core\Pager\PagerParameters
@@ -2061,3 +2063,7 @@ services:
       - { name: needs_destruction }
   Drupal\Core\Extension\ThemeSettingsProvider:
     autowire: true
+  services_resetter:
+    class: Symfony\Component\DependencyInjection\ServicesResetter
+    arguments: [!iterator {}, []]
+  Symfony\Component\DependencyInjection\ServicesResetterInterface: '@services_resetter'
