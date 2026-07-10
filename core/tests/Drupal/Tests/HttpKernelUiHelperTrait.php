@@ -10,8 +10,6 @@ use Behat\Mink\Mink;
 use Behat\Mink\Selector\SelectorsHandler;
 use Behat\Mink\Session;
 use Drupal\Core\Url;
-use Drupal\Tests\HttpKernelTestBrowser;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * Provides UI helper methods using the HTTP kernel to make requests.
