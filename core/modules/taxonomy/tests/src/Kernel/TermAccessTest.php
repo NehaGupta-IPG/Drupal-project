@@ -91,19 +91,6 @@ class TermAccessTest extends TaxonomyTestBase {
 
     // Install the Views module and repeat the checks for the 'view' permission.
     \Drupal::service('module_installer')->install(['views'], TRUE);
-    \Drupal::service('router.builder')->rebuild();
-    $this->rebuildContainer();
-    // After rebuildContainer() $this->container points to the new container,
-    // but the Mink session still holds a BrowserKitDriver wrapping the old
-    // http_kernel service (from the pre-rebuild container). Reset it so the
-    // next drupalGet() reinitialises Mink against the new kernel which has the
-    // Views route subscriber registered.
-    $this->mink = NULL;
-    // Re-apply the current user; the new Mink session starts anonymous.
-    $this->setCurrentUser($access_content_user);
-    // Rebind $assert_session: it was captured before the Mink reset and still
-    // references the old Session object whose last response is stale.
-    $assert_session = $this->assertSession();
 
     $this->drupalGet('taxonomy/term/' . $published_term->id());
     $assert_session->statusCodeEquals(200);
