@@ -284,26 +284,42 @@ class InstallCommand extends Command {
 
     require_once 'core/includes/install.core.inc';
 
-    $this->setRequestHost();
+    // Seed the request host for the installer, remembering the previous values
+    // so they can be restored afterwards. The superglobals are process-global
+    // state; leaving them changed would pollute any command chained after this
+    // one in the same process, such as the server command run by 'quick-start'.
+    $original_server = $this->setRequestHost();
 
     $progress_bar = $io->createProgressBar();
-    install_drupal($class_loader, $parameters, function ($install_state) use ($progress_bar) {
-      static $started = FALSE;
-      if (!$started) {
-        $started = TRUE;
-        // We've already done 1.
-        $progress_bar->setFormat("%current%/%max% [%bar%]\n%message%\n");
-        $progress_bar->setMessage((string) $this->t('Installing @drupal', ['@drupal' => drupal_install_profile_distribution_name()]));
-        $tasks = install_tasks($install_state);
-        $progress_bar->start(count($tasks) + 1);
+    try {
+      install_drupal($class_loader, $parameters, function ($install_state) use ($progress_bar) {
+        static $started = FALSE;
+        if (!$started) {
+          $started = TRUE;
+          // We've already done 1.
+          $progress_bar->setFormat("%current%/%max% [%bar%]\n%message%\n");
+          $progress_bar->setMessage((string) $this->t('Installing @drupal', ['@drupal' => drupal_install_profile_distribution_name()]));
+          $tasks = install_tasks($install_state);
+          $progress_bar->start(count($tasks) + 1);
+        }
+        $tasks_to_perform = install_tasks_to_perform($install_state);
+        $task = current($tasks_to_perform);
+        if (isset($task['display_name'])) {
+          $progress_bar->setMessage((string) $task['display_name']);
+        }
+        $progress_bar->advance();
+      });
+    }
+    finally {
+      foreach ($original_server as $key => $value) {
+        if ($value === NULL) {
+          unset($_SERVER[$key]);
+        }
+        else {
+          $_SERVER[$key] = $value;
+        }
       }
-      $tasks_to_perform = install_tasks_to_perform($install_state);
-      $task = current($tasks_to_perform);
-      if (isset($task['display_name'])) {
-        $progress_bar->setMessage((string) $task['display_name']);
-      }
-      $progress_bar->advance();
-    });
+    }
     $success_message = $this->t('Congratulations, you installed @drupal!', [
       '@drupal' => drupal_install_profile_distribution_name(),
       '@name' => 'admin',
@@ -327,22 +343,32 @@ class InstallCommand extends Command {
    * invalid. Populate the superglobals from the base URL that the application
    * resolved (from the --url option, the DRUPAL_URI environment variable, or
    * the default) so the installer builds a request with a valid host.
+   *
+   * @return array
+   *   The original values of any $_SERVER keys that were changed, keyed by key
+   *   name. A value of NULL indicates the key was not previously set. Pass this
+   *   to restore the superglobals once the installer has run.
    */
-  protected function setRequestHost(): void {
+  protected function setRequestHost(): array {
     $application = $this->getApplication();
     $uri = $application instanceof DrupalApplication ? $application->getUri() : 'http://localhost';
     $request = Request::create($uri);
+    $original = [];
     // Only add the host if the request does not already have one, so an
     // explicitly configured environment is left untouched.
     if (empty($_SERVER['HTTP_HOST'])) {
+      $original['HTTP_HOST'] = $_SERVER['HTTP_HOST'] ?? NULL;
       $_SERVER['HTTP_HOST'] = $request->getHttpHost();
     }
     if (empty($_SERVER['SERVER_NAME'])) {
+      $original['SERVER_NAME'] = $_SERVER['SERVER_NAME'] ?? NULL;
       $_SERVER['SERVER_NAME'] = $request->getHost();
     }
     if ($request->isSecure() && empty($_SERVER['HTTPS'])) {
+      $original['HTTPS'] = $_SERVER['HTTPS'] ?? NULL;
       $_SERVER['HTTPS'] = 'on';
     }
+    return $original;
   }
 
   /**
