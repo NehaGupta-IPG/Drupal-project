@@ -70,6 +70,10 @@ parameters:
 
   disallowedFunctionCalls:
     -
+       function: 'uniqid()'
+       message: 'use bin2hex(random_bytes()) instead'
+       errorTip: 'See https://www.drupal.org/node/3609791'
+    -
        function: 'crc32()'
        message: 'use hash() with an xxHash algorithm instead'
        errorTip: 'See https://www.drupal.org/node/3581605'
