@@ -18,7 +18,7 @@ use function assert;
 use function is_string;
 
 /**
- * Validates that the bundle exists of an entity reference field with auto creation option enabled.
+ * Validates that the given bundle exists on the entity type.
  */
 class AutoCreateEntityBundleExistsConstraintValidator extends ConstraintValidator implements ContainerInjectionInterface {
 
@@ -42,7 +42,8 @@ class AutoCreateEntityBundleExistsConstraintValidator extends ConstraintValidato
     if (!is_string($value)) {
       throw new UnexpectedTypeException($value, 'string');
     }
-    // The host entity type which has entity reference field with views selection and auto creation.
+    // The host entity type which has an entity reference field with views 
+    // selection and auto creation.
     $entity_type_id = TypeResolver::resolveDynamicTypeName("[$constraint->entityTypeId]", $this->context->getObject());
     $field_name = TypeResolver::resolveDynamicTypeName("[$constraint->fieldName]", $this->context->getObject());
 
