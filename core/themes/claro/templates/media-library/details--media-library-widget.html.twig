@@ -2,13 +2,24 @@
 {#
 /**
  * @file
- * Theme override for the collapsible media library widget.
+ * Theme override for the media library widget.
  *
+ * @see claro_preprocess_fieldset__media_library_widget()
  * @see claro_preprocess_details__media_library_widget()
  * @see claro_preprocess_details()
  * @see \Drupal\Core\Form\FormPreprocess::preprocessDetails()
  */
 #}
+{% macro media_library_prefix(prefix) %}
+  {% if prefix.empty_selection %}
+    <p class="media-library-widget-empty-text">{{ prefix }}</p>
+  {% else %}
+    {{ prefix }}
+  {% endif %}
+{% endmacro %}
 {%
   set attributes = attributes.addClass('media-library-widget')
+%}
+{%
+  set prefix = _self.media_library_prefix(prefix)
 %}

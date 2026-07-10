@@ -1317,27 +1317,7 @@ class ClaroHooks {
    */
   #[Hook('preprocess_details__media_library_widget')]
   public function preprocessDetailsMediaLibraryWidget(array &$variables): void {
-    $element = &$variables['element'];
-    if (isset($element['prefix']['empty_selection'])) {
-      $element['prefix']['empty_selection'] = [
-        '#type' => 'html_tag',
-        '#tag' => 'p',
-        '#attributes' => [
-          'class' => ['media-library-widget-empty-text'],
-        ],
-        '#value' => $element['prefix']['empty_selection']['#markup'],
-        '#weight' => $element['prefix']['empty_selection']['#weight'] ?? 0,
-      ];
-    }
-    if (isset($element['prefix']['weight_toggle'])) {
-      $element['prefix']['weight_toggle']['#attributes']['class'][] = 'action-link';
-      $element['prefix']['weight_toggle']['#attributes']['class'][] = 'action-link--extrasmall';
-      $element['prefix']['weight_toggle']['#attributes']['class'][] = 'action-link--icon-show';
-      $element['prefix']['weight_toggle']['#attributes']['class'][] = 'media-library-widget__toggle-weight';
-    }
-    if (isset($element['suffix']['open_button'])) {
-      $element['suffix']['open_button']['#attributes']['class'][] = 'media-library-open-button';
-    }
+    $this->preprocessFieldsetMediaLibraryWidget($variables);
   }
 
   /**

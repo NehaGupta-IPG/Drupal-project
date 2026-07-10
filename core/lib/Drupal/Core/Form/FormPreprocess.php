@@ -343,13 +343,15 @@ class FormPreprocess {
    * @param array $variables
    *   An associative array containing:
    *   - element: An associative array containing the properties of the element.
-   *     Properties used: #attributes, #children, #description, #required,
-   *     #summary_attributes, #title, #value.
+   *     Properties used: #attributes, #children, #description, #field_prefix,
+   *     #field_suffix, #required, #summary_attributes, #title, #value.
    */
   public function preprocessDetails(array &$variables): void {
     $element = $variables['element'];
     $variables['attributes'] = $element['#attributes'];
     $variables['summary_attributes'] = new Attribute($element['#summary_attributes']);
+    $variables['prefix'] = $element['#field_prefix'] ?? NULL;
+    $variables['suffix'] = $element['#field_suffix'] ?? NULL;
     if (!empty($element['#title'])) {
       $variables['summary_attributes']['role'] = 'button';
       if (!empty($element['#attributes']['id'])) {

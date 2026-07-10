@@ -627,22 +627,6 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       unset($element['open_button']);
     }
 
-    // Details elements do not support #field_prefix and #field_suffix.
-    if (!empty($element['#field_prefix'])) {
-      $element['prefix'] = [
-        '#type' => 'container',
-        '#weight' => -100,
-      ] + $element['#field_prefix'];
-      unset($element['#field_prefix']);
-    }
-    if (!empty($element['#field_suffix'])) {
-      $element['suffix'] = [
-        '#type' => 'container',
-        '#weight' => 100,
-      ] + $element['#field_suffix'];
-      unset($element['#field_suffix']);
-    }
-
     return $element;
   }
 
