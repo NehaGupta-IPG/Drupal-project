@@ -254,7 +254,6 @@ class ThemeInstaller implements ThemeInstallerInterface {
     $this->themeRegistry = $container->get('theme.registry');
     $this->themeExtensionList = $container->get('extension.list.theme');
 
-    $container->get('stream_wrapper_manager')->register();
     // Clear all plugin caches.
     $container->get('plugin.cache_clearer')->clearCachedDefinitions();
     $this->routeBuilder->setRebuildNeeded();

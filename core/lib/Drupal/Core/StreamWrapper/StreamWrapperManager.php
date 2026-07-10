@@ -22,7 +22,12 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
   public function __construct(
     #[AutowireLocator('stream_wrapper', indexAttribute: 'scheme')]
     protected readonly ServiceLocator $container,
-  ) {}
+  ) {
+    foreach (array_keys($this->container->getProvidedServices()) as $scheme) {
+      $class = $this->getClass($scheme);
+      $this->registerWrapper($scheme, $class, $class::getType());
+    }
+  }
 
   /**
    * Contains collected stream wrappers.
@@ -136,9 +141,13 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
   /**
    * Registers the tagged stream wrappers.
    *
-   * Internal use only.
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Stream
+   *   wrappers are registered automatically in the constructor.
+   *
+   * @see https://www.drupal.org/node/3585389
    */
   public function register() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Stream wrappers are registered automatically in the constructor. See https://www.drupal.org/node/3585389', E_USER_DEPRECATED);
     foreach (array_keys($this->container->getProvidedServices()) as $scheme) {
       $class = $this->getClass($scheme);
       $this->registerWrapper($scheme, $class, $class::getType());

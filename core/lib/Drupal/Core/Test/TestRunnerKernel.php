@@ -71,7 +71,7 @@ class TestRunnerKernel extends DrupalKernel {
     $test_discovery->registerTestNamespaces();
 
     // Register stream wrappers.
-    $this->getContainer()->get('stream_wrapper_manager')->register();
+    $this->getContainer()->get('stream_wrapper_manager');
 
     // Create the build/artifacts directory if necessary.
     if (!is_dir('public://simpletest') && !@mkdir('public://simpletest', 0777, TRUE) && !is_dir('public://simpletest')) {
