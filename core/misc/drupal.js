@@ -50,6 +50,15 @@ window.Drupal = { behaviors: {}, locale: {} };
   Proxy,
   Reflect,
 ) {
+  // Shortcut alt + n will go to next Views page, alt + p to previous
+  document.addEventListener('keydown', function (event) {
+    if (event.altKey && event.code === 'KeyN') {
+      document.getElementById('next').click();
+    }
+    if (event.altKey && event.code === 'KeyP') {
+      document.getElementById('previous').click();
+    }
+  });
   /**
    * Helper to rethrow errors asynchronously.
    *
