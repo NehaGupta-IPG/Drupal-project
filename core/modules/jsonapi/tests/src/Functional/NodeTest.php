@@ -19,6 +19,7 @@ use Drupal\Tests\jsonapi\Traits\CommonCollectionFilterAccessTestPatternsTrait;
 use Drupal\Tests\WaitTerminateTestTrait;
 use Drupal\user\Entity\User;
 use GuzzleHttp\RequestOptions;
+use Drupal\node\NodeAccessRebuild;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -412,7 +413,7 @@ class NodeTest extends ResourceTestBase {
       ->get(['node--camelids', $this->entity->uuid(), $this->entity->language()->getId()], new CacheableMetadata());
     $cached_fields = $cache->data['fields'];
     $this->assertSameSize($field_names, $cached_fields);
-    array_walk($field_names, function ($field_name) use ($cached_fields) {
+    array_walk($field_names, function (string $field_name) use ($cached_fields): void {
       $this->assertInstanceOf(
         CacheableNormalization::class,
         $cached_fields[$field_name]
@@ -532,7 +533,7 @@ class NodeTest extends ResourceTestBase {
 
     // Assert bubbling of cacheability from query alter hook.
     $this->assertTrue($this->container->get('module_installer')->install(['node_access_test'], TRUE), 'Installed modules.');
-    node_access_rebuild();
+    \Drupal::service(NodeAccessRebuild::class)->rebuild();
     $this->rebuildAll();
     $response = $this->request('GET', $collection_filter_url, $request_options);
     $this->assertContains('user.node_grants:view', explode(' ', $response->getHeader('X-Drupal-Cache-Contexts')[0]));

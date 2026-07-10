@@ -493,7 +493,7 @@ class TermTest extends ResourceTestBase {
   /**
    * Data provider for ::testGetIndividualTermWithParent().
    */
-  public static function providerTestGetIndividualTermWithParent() {
+  public static function providerTestGetIndividualTermWithParent(): array {
     return [
       'root parent: [0] (= no parent)' => [
         [0],

@@ -25,6 +25,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 use Prophecy\Prophet;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
@@ -41,31 +42,23 @@ class TwigExtensionTest extends UnitTestCase {
 
   /**
    * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
    */
-  protected $renderer;
+  protected RendererInterface&Stub $renderer;
 
   /**
    * The URL generator.
-   *
-   * @var \Drupal\Core\Routing\UrlGeneratorInterface|\PHPUnit\Framework\MockObject\Stub
    */
-  protected $urlGenerator;
+  protected UrlGeneratorInterface&Stub $urlGenerator;
 
   /**
    * The theme manager.
-   *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface
    */
-  protected $themeManager;
+  protected ThemeManagerInterface&Stub $themeManager;
 
   /**
    * The date formatter.
-   *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
    */
-  protected $dateFormatter;
+  protected DateFormatterInterface&Stub $dateFormatter;
 
   /**
    * The system under test.
@@ -75,11 +68,9 @@ class TwigExtensionTest extends UnitTestCase {
   protected $systemUnderTest;
 
   /**
-   * The file URL generator mock.
-   *
-   * @var \Drupal\Core\File\FileUrlGeneratorInterface
+   * The file URL generator.
    */
-  protected $fileUrlGenerator;
+  protected FileUrlGeneratorInterface&Stub $fileUrlGenerator;
 
   /**
    * {@inheritdoc}
@@ -302,7 +293,7 @@ class TwigExtensionTest extends UnitTestCase {
   public function testSafeJoin(): void {
     $this->setUpMockRenderer();
 
-    $this->renderer
+    $this->renderer->expects($this->exactly(2))
       ->method('render')
       ->with(['#markup' => '<strong>will be rendered</strong>', '#printed' => FALSE])
       ->willReturn('<strong>will be rendered</strong>');
@@ -346,7 +337,7 @@ class TwigExtensionTest extends UnitTestCase {
   public function testRenderVar($result, $input): void {
     $this->setUpMockRenderer();
 
-    $this->renderer
+    $this->renderer->expects($this->once())
       ->method('render')
       ->with($result += ['#printed' => FALSE])
       ->willReturn('Rendered output');
