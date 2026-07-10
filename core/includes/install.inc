@@ -240,6 +240,18 @@ function drupal_install_system($install_state): void {
       $kernel->getContainer()->get('module_installer')->install([$provider], TRUE);
     }
   }
+
+  // Install System module.
+  $kernel->getContainer()->get('module_installer')->install(['system'], FALSE);
+
+  // Ensure default language is saved.
+  if (isset($install_state['parameters']['langcode'])) {
+    \Drupal::configFactory()->getEditable('system.site')
+      ->set('langcode', (string) $install_state['parameters']['langcode'])
+      ->set('default_langcode', (string) $install_state['parameters']['langcode'])
+      ->set('default_config_langcode', (string) $install_state['parameters']['langcode'])
+      ->save();
+  }
 }
 
 /**
