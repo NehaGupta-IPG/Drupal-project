@@ -75,7 +75,7 @@ class ExceptionHandler extends BaseExceptionHandler {
       throw new DatabaseExceptionWrapper($message, $code, $exception);
     }
 
-    $message = $exception->getMessage() . ": " . SqlDumper::export($queryString, $arguments);
+    $message = $exception->getMessage() . "\n" . SqlDumper::export($queryString, $arguments);
 
     // SQLSTATE 23xxx errors indicate an integrity constraint violation. Also,
     // in case of attempted INSERT of a record with an undefined column and no

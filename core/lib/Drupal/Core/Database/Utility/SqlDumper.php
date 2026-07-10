@@ -18,7 +18,7 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 abstract class SqlDumper {
 
   /**
-   * Exports the pair SQL statment string + its placeholder to a string.
+   * Exports the pair SQL statement string + its placeholder to a string.
    *
    * This is used to make database exceptions more readable both on site pages
    * and in CLI (tests or dr). The method detects whether we are in a CLI or
