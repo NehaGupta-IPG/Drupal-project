@@ -366,6 +366,9 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
       'port' => NULL,
       'options' => [],
     ];
+    // Ensure config langcode defaulting has a stable value in kernel tests,
+    // even before system.site is installed.
+    $GLOBALS['config']['system.site']['default_config_langcode'] = 'en';
     // Manually configure the default file scheme so that modules that use file
     // functions don't have to install system and its configuration.
     // @see file_default_scheme()
