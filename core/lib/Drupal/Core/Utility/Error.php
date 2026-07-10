@@ -7,6 +7,7 @@ use Drupal\Component\Utility\Xss;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
+use Drupal\Core\Render\Markup;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
@@ -50,14 +51,12 @@ class Error {
     // Add the line throwing the exception to the backtrace.
     array_unshift($backtrace, ['line' => $exception->getLine(), 'file' => $exception->getFile()]);
 
-    // For PDOException errors, we try to return the initial caller,
+    // For database exceptions, we try to return the initial caller,
     // skipping internal functions of the database layer.
-    if ($exception instanceof \PDOException || $exception instanceof DatabaseExceptionWrapper) {
+    if ($exception instanceof DatabaseExceptionWrapper) {
       $driver_namespace = Database::getConnectionInfo()['default']['namespace'];
       $backtrace = Connection::removeDatabaseEntriesFromDebugBacktrace($backtrace, $driver_namespace);
-      if (isset($exception->query_string, $exception->args)) {
-        $message .= ": " . $exception->query_string . "; " . print_r($exception->args, TRUE);
-      }
+      $message = Markup::create($message);
     }
 
     $caller = static::getLastCaller($backtrace);

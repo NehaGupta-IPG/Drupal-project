@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Database;
 
+use Drupal\Core\Database\Utility\SqlDumper;
+
 /**
  * Base Database exception handler class.
  *
@@ -30,7 +32,7 @@ class ExceptionHandler {
       // Wrap the exception in another exception, because PHP does not allow
       // overriding Exception::getMessage(). Its message is the extra database
       // debug information.
-      $message = $exception->getMessage() . ": " . $sql . "; ";
+      $message = $exception->getMessage() . "\n" . SqlDumper::export($sql, []);
       throw new DatabaseExceptionWrapper($message, 0, $exception);
     }
 
@@ -58,7 +60,7 @@ class ExceptionHandler {
       // Wrap the exception in another exception, because PHP does not allow
       // overriding Exception::getMessage(). Its message is the extra database
       // debug information.
-      $message = $exception->getMessage() . ": " . $statement->getQueryString() . "; " . print_r($arguments, TRUE);
+      $message = $exception->getMessage() . "\n" . SqlDumper::export($statement->getQueryString(), $arguments);
       // Match all SQLSTATE 23xxx errors.
       if (substr($exception->getCode(), -6, -3) == '23') {
         throw new IntegrityConstraintViolationException($message, $exception->getCode(), $exception);
