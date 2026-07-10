@@ -20,8 +20,14 @@ use Twig\NodeVisitor\NodeVisitorInterface;
  */
 final class TestNodeVisitor implements NodeVisitorInterface {
 
+  /**
+   * The name of the extension.
+   */
   private string $extensionName;
 
+  /**
+   * The variable name.
+   */
   private string $varName;
 
   /**
@@ -32,7 +38,7 @@ final class TestNodeVisitor implements NodeVisitorInterface {
    */
   public function __construct(string $extensionName) {
     $this->extensionName = $extensionName;
-    $this->varName = sprintf('__internal_%s', hash(\PHP_VERSION_ID < 80100 ? 'sha256' : 'xxh128', $extensionName));
+    $this->varName = sprintf('__internal_%s', hash('xxh128', $extensionName));
   }
 
   /**

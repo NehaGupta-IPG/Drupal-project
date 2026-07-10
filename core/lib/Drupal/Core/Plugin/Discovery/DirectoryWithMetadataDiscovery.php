@@ -3,12 +3,24 @@
 namespace Drupal\Core\Plugin\Discovery;
 
 use Drupal\Component\Discovery\YamlDirectoryDiscovery;
+use Drupal\Core\DependencyInjection\DeprecatedServicePropertyTrait;
 use Drupal\Core\File\FileSystemInterface;
 
 /**
  * Does the actual finding of the directories with metadata files.
  */
 class DirectoryWithMetadataDiscovery extends YamlDirectoryDiscovery {
+
+  use DeprecatedServicePropertyTrait;
+
+  /**
+   * The deprecated properties.
+   *
+   * @see https://www.drupal.org/node/3530869
+   */
+  protected array $deprecatedProperties = [
+    'fileSystem' => FileSystemInterface::class,
+  ];
 
   /**
    * Constructs a DirectoryWithMetadataDiscovery object.
@@ -20,10 +32,8 @@ class DirectoryWithMetadataDiscovery extends YamlDirectoryDiscovery {
    * @param string $file_cache_key_suffix
    *   The file cache key suffix. This should be unique for each type of
    *   discovery.
-   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
-   *   The file system service.
    */
-  public function __construct(array $directories, string $file_cache_key_suffix, protected FileSystemInterface $fileSystem) {
+  public function __construct(array $directories, string $file_cache_key_suffix) {
     parent::__construct($directories, $file_cache_key_suffix);
   }
 
@@ -37,7 +47,7 @@ class DirectoryWithMetadataDiscovery extends YamlDirectoryDiscovery {
    * @param string $directory
    *   The directory to scan.
    *
-   * @return \RecursiveIteratorIterator
+   * @return \RecursiveIteratorIterator<\SplFileInfo>
    *   A \RecursiveIteratorIterator object or array where the values are
    *   \SplFileInfo objects.
    */
@@ -62,7 +72,7 @@ class DirectoryWithMetadataDiscovery extends YamlDirectoryDiscovery {
    * 2. Because the same component exists in different themes.
    */
   protected function getIdentifier($file, array $data): string {
-    $id = $this->fileSystem->basename($file, '.component.yml');
+    $id = basename($file, '.component.yml');
     $provider_paths = array_flip($this->directories);
     $provider = $this->findProvider($file, $provider_paths);
     // We use the provider to dedupe components because it does not make sense

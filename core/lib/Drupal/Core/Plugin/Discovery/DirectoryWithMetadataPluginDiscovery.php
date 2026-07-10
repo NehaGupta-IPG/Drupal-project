@@ -2,8 +2,6 @@
 
 namespace Drupal\Core\Plugin\Discovery;
 
-use Drupal\Core\File\FileSystemInterface;
-
 /**
  * Discover directories that contain a specific metadata file.
  */
@@ -19,13 +17,11 @@ class DirectoryWithMetadataPluginDiscovery extends YamlDiscovery {
    * @param string $file_cache_key_suffix
    *   The file cache key suffix. This should be unique for each type of
    *   discovery.
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
-   *   The file system service.
    */
-  public function __construct(array $directories, $file_cache_key_suffix, FileSystemInterface $file_system) {
+  public function __construct(array $directories, $file_cache_key_suffix) {
     // Intentionally does not call parent constructor as this class uses a
     // different YAML discovery.
-    $this->discovery = new DirectoryWithMetadataDiscovery($directories, $file_cache_key_suffix, $file_system);
+    $this->discovery = new DirectoryWithMetadataDiscovery($directories, $file_cache_key_suffix);
   }
 
 }

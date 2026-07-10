@@ -15,12 +15,14 @@ use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\KernelTests\FileSystemModuleDiscoveryDataProviderTrait;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests auto-wiring services.
- *
- * @group DependencyInjection
  */
+#[Group('DependencyInjection')]
+#[RunTestsInSeparateProcesses]
 class AutowireTest extends KernelTestBase {
 
   use FileSystemModuleDiscoveryDataProviderTrait;
@@ -54,14 +56,18 @@ class AutowireTest extends KernelTestBase {
     $services = [];
     $aliases = [];
 
-    $filenames = array_map(fn($module) => "core/modules/{$module[0]}/{$module[0]}.services.yml", $this->coreModuleListDataProvider());
-    $filenames[] = 'core/core.services.yml';
-    foreach (array_filter($filenames, 'file_exists') as $filename) {
-      foreach (Yaml::decode(file_get_contents($filename))['services'] as $id => $service) {
+    foreach ($this->getCoreServiceFiles() as $filename) {
+      foreach ((Yaml::decode(file_get_contents($filename))['services'] ?? []) as $id => $service) {
         if (is_string($service)) {
           $aliases[$id] = substr($service, 1);
         }
         elseif (isset($service['class']) && class_exists($service['class'])) {
+          // Check that the number of arguments matches the constructor.
+          if (isset($service['arguments'])) {
+            $constructor = new \ReflectionMethod($service['class'], '__construct');
+            $this->assertLessThanOrEqual($constructor->getNumberOfParameters(), count($service['arguments']), sprintf('%s (%s): %d arguments defined, but constructor only accepts %d', $id, $service['class'], count($service['arguments']), $constructor->getNumberOfParameters()));
+          }
+
           // Ignore services named by their own class.
           if ($id === $service['class']) {
             continue;
@@ -129,21 +135,57 @@ class AutowireTest extends KernelTestBase {
     }
 
     $missing = array_diff($expected, $aliases);
-    $formatted = Yaml::encode(array_map(fn ($alias) => sprintf('@%s', $alias), $missing));
+    $formatted = Yaml::encode(array_map(fn (int|string $alias): string => sprintf('@%s', $alias), $missing));
     $this->assertSame($expected, array_intersect($expected, $aliases), sprintf('The following core services do not have map the class name to an alias. Add the following to core.services.yml in the appropriate place: %s%s%s', \PHP_EOL, \PHP_EOL, $formatted));
+  }
+
+  /**
+   * Tests that core service aliases match the interfaces they map to.
+   */
+  public function testCoreServiceAliasInterfaces(): void {
+    $services = [];
+    $aliases = [];
+
+    foreach ($this->getCoreServiceFiles() as $filename) {
+      foreach ((Yaml::decode(file_get_contents($filename))['services'] ?? []) as $id => $service) {
+        if (is_string($service)) {
+          $aliases[$id] = substr($service, 1);
+        }
+        else {
+          $services[$id] = $service['class'] ?? $id;
+        }
+      }
+    }
+
+    $mismatched = [];
+    foreach ($aliases as $alias => $service) {
+      $this->assertArrayHasKey($service, $services);
+
+      if (interface_exists($alias)) {
+        // The service class must implement the aliased interface.
+        if (!is_subclass_of($services[$service], $alias)) {
+          $mismatched[] = sprintf('%s aliases to @%s (class %s) which does not implement %s', $alias, $service, $services[$service], $alias);
+        }
+      }
+      else {
+        // The service class must be the aliased class or a subclass of it.
+        if ($services[$service] !== $alias) {
+          $mismatched[] = sprintf('%s aliases to @%s (class %s) which is not an instance of %s', $alias, $service, $services[$service], $alias);
+        }
+      }
+    }
+
+    $this->assertEmpty($mismatched, 'The following core service aliases do not match their interfaces:' . PHP_EOL . implode(PHP_EOL, $mismatched));
   }
 
   /**
    * Tests that core controllers are autowired where possible.
    */
   public function testCoreControllerAutowiring(): void {
-    $services = [];
     $aliases = [];
 
-    $filenames = array_map(fn($module) => "core/modules/{$module[0]}/{$module[0]}.services.yml", $this->coreModuleListDataProvider());
-    $filenames[] = 'core/core.services.yml';
-    foreach (array_filter($filenames, 'file_exists') as $filename) {
-      foreach (Yaml::decode(file_get_contents($filename))['services'] as $id => $service) {
+    foreach ($this->getCoreServiceFiles() as $filename) {
+      foreach ((Yaml::decode(file_get_contents($filename))['services'] ?? []) as $id => $service) {
         if (is_string($service)) {
           $aliases[$id] = substr($service, 1);
         }
@@ -151,8 +193,7 @@ class AutowireTest extends KernelTestBase {
     }
 
     $controllers = [];
-    $filenames = array_map(fn($module) => "core/modules/{$module[0]}/{$module[0]}.routing.yml", $this->coreModuleListDataProvider());
-    foreach (array_filter($filenames, 'file_exists') as $filename) {
+    foreach ($this->getCoreServiceFiles() as $filename) {
       foreach (Yaml::decode(file_get_contents($filename)) as $route) {
         if (isset($route['defaults']['_controller'])) {
           [$class] = explode('::', $route['defaults']['_controller'], 2);
@@ -173,7 +214,7 @@ class AutowireTest extends KernelTestBase {
         continue;
       }
       $constructor = new \ReflectionMethod($controller, '__construct');
-      foreach ($constructor->getParameters() as $pos => $parameter) {
+      foreach ($constructor->getParameters() as $parameter) {
         $interface = (string) $parameter->getType();
         if (!isset($aliases[$interface])) {
           continue 2;
@@ -183,6 +224,63 @@ class AutowireTest extends KernelTestBase {
     }
 
     $this->assertEmpty($autowire, 'The following core controllers can be autowired. Remove the create() method:' . PHP_EOL . implode(PHP_EOL, $autowire));
+  }
+
+  /**
+   * Tests that core services have aliases correctly defined where possible.
+   */
+  public function testCoreAutowiring(): void {
+    $services = [];
+    $aliases = [];
+    foreach ($this->getCoreServiceFiles() as $filename) {
+      foreach ((Yaml::decode(file_get_contents($filename))['services'] ?? []) as $id => $service) {
+        if (is_string($service)) {
+          $aliases[$id] = substr($service, 1);
+        }
+        elseif (isset($service['class']) && isset($service['arguments'])) {
+          if ($filename === 'core/core.services.yml') {
+            // @todo Remove this skip in https://www.drupal.org/i/3295751
+            continue;
+          }
+          $services[$id] = $service;
+        }
+      }
+    }
+
+    $autowire = [];
+    foreach ($services as $id => $service) {
+      if (!method_exists($service['class'], '__construct')) {
+        continue;
+      }
+
+      $constructor = new \ReflectionMethod($service['class'], '__construct');
+      foreach ($constructor->getParameters() as $pos => $parameter) {
+        $interface = (string) $parameter->getType();
+        if (!isset($aliases[$interface])) {
+          // There is no service to autowire.
+          continue 2;
+        }
+        if ($aliases[$interface] !== substr($service['arguments'][$pos], 1)) {
+          // The service is different.
+          continue 2;
+        }
+      }
+      $autowire[] = $id;
+    }
+
+    $this->assertEmpty($autowire, 'The following core services can be autowired. Remove their arguments from the services.yml file:' . PHP_EOL . implode(PHP_EOL, $autowire));
+  }
+
+  /**
+   * Return a list of core service YAML files.
+   *
+   * @return string[]
+   *   An array of filenames.
+   */
+  private function getCoreServiceFiles(): array {
+    $filenames = array_map(fn(array $module): string => "core/modules/{$module[0]}/{$module[0]}.services.yml", $this->coreModuleListDataProvider());
+    $filenames[] = 'core/core.services.yml';
+    return array_filter($filenames, 'file_exists');
   }
 
 }

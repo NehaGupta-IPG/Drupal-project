@@ -13,13 +13,16 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\views\EntityViewsData;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests entity views data.
- *
- * @coversDefaultClass \Drupal\views\EntityViewsData
- * @group views
  */
+#[CoversClass(EntityViewsData::class)]
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class EntityViewsDataTest extends KernelTestBase {
 
   /**
@@ -50,10 +53,7 @@ class EntityViewsDataTest extends KernelTestBase {
    */
   protected static $modules = [
     'user',
-    'system',
-    'field',
     'text',
-    'filter',
   ];
 
   /**
@@ -123,7 +123,7 @@ class EntityViewsDataTest extends KernelTestBase {
       ->setTranslatable(TRUE)
       ->setSetting('max_length', 255);
 
-    // A base field with cardinality > 1
+    // A base field with cardinality > 1.
     $this->commonBaseFields['string'] = BaseFieldDefinition::create('string')
       ->setLabel('Strong')
       ->setTranslatable(TRUE)
@@ -145,7 +145,7 @@ class EntityViewsDataTest extends KernelTestBase {
    * @param \Drupal\Core\Entity\EntityTypeInterface $definition
    *   An entity type definition to add to the entity type manager.
    * @param \Drupal\Core\Field\BaseFieldDefinition[] $base_fields
-   *   An array of base field definitions
+   *   An array of base field definitions.
    */
   protected function setUpEntityType(EntityTypeInterface $definition, array $base_fields = []): void {
     // Replace the cache backend in the entity type manager so it returns
@@ -154,7 +154,7 @@ class EntityViewsDataTest extends KernelTestBase {
     $definitions[$definition->id()] = $definition;
 
     $cache_backend = $this->prophesize(CacheBackendInterface::class);
-    $cache_data = new \StdClass();
+    $cache_data = new \stdClass();
     $cache_data->data = $definitions;
     $cache_backend->get('entity_type')->willReturn($cache_data);
     $this->entityTypeManager->setCacheBackend($cache_backend->reveal(), 'entity_type', ['entity_types']);
@@ -428,6 +428,14 @@ class EntityViewsDataTest extends KernelTestBase {
         ],
       ],
     ], $data['entity_test__string']['table']['join']['entity_test']);
+
+    // Check the "allow empty" option for non-required fields.
+    $this->assertArrayHasKey('allow empty', $data['entity_test']['name']['filter']);
+    $this->assertTrue($data['entity_test']['name']['filter']['allow empty']);
+    // Reconfigure the field to be required.
+    $this->commonBaseFields['name']->setRequired(TRUE);
+    $data = $this->entityTypeManager->getHandler('entity_test', 'views_data')->getViewsData();
+    $this->assertArrayNotHasKey('allow empty', $data['entity_test']['name']['filter']);
   }
 
   /**
@@ -575,7 +583,8 @@ class EntityViewsDataTest extends KernelTestBase {
     // table.
     $this->assertFalse(isset($data['entity_test_mulrev_revision']['revision_id']));
 
-    // Also ensure that field_data only fields don't appear on the revision table.
+    // Also ensure that field_data only fields don't appear on the revision
+    // table.
     $this->assertFalse(isset($data['entity_test_mulrev_revision']['id']));
     $this->assertFalse(isset($data['entity_test_mulrev_revision']['name']));
     $this->assertFalse(isset($data['entity_test_mulrev_revision']['description']));
@@ -819,7 +828,7 @@ class TestEntityType extends ContentEntityType {
    *
    * @return $this
    */
-  public function setKey($key, $value) {
+  public function setKey($key, $value): static {
     $this->entity_keys[$key] = $value;
     return $this;
   }

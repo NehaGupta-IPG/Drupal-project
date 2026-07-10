@@ -20,6 +20,9 @@ use Symfony\Component\Routing\Route;
 )]
 class StaticTest extends AccessPluginBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
     $options['access'] = ['default' => FALSE];
@@ -37,7 +40,7 @@ class StaticTest extends AccessPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function alterRouteDefinition(Route $route) {
+  public function alterRouteDefinition(Route $route): void {
     if (!empty($this->options['access'])) {
       $route->setRequirement('_access', 'TRUE');
     }

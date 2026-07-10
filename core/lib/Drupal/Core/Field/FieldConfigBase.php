@@ -472,6 +472,7 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
    *
    * Using the Serialize interface and serialize() / unserialize() methods
    * breaks entity forms in PHP 5.4.
+   *
    * @todo Investigate in https://www.drupal.org/node/1977206.
    */
   public function __sleep(): array {
@@ -556,7 +557,7 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
         ->setSettings($this->getSettings());
 
       // Add any custom property constraints, overwriting as required.
-      $item_constraints = $this->itemDefinition->getConstraint('ComplexData') ?: [];
+      $item_constraints = $this->getItemDefinition()->getConstraint('ComplexData')['properties'] ?? [];
       foreach ($this->propertyConstraints as $name => $constraints) {
         if (isset($item_constraints[$name])) {
           $item_constraints[$name] = $constraints + $item_constraints[$name];
@@ -564,7 +565,7 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
         else {
           $item_constraints[$name] = $constraints;
         }
-        $this->itemDefinition->addConstraint('ComplexData', $item_constraints);
+        $this->itemDefinition->addConstraint('ComplexData', ['properties' => $item_constraints]);
       }
     }
 
@@ -589,7 +590,7 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
   /**
    * {@inheritdoc}
    */
-  public function addConstraint($constraint_name, $options = NULL) {
+  public function addConstraint(string $constraint_name, ?array $options = NULL): static {
     $this->constraints[$constraint_name] = $options;
     return $this;
   }
