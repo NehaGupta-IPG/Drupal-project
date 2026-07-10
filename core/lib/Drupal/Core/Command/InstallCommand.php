@@ -71,13 +71,20 @@ class InstallCommand extends Command {
    */
   protected function execute(InputInterface $input, OutputInterface $output): int {
     $io = new SymfonyStyle($input, $output);
-    if (!extension_loaded('pdo_sqlite')) {
-      $io->getErrorStyle()->error('You must have the pdo_sqlite PHP extension installed. See core/INSTALL.sqlite.txt for instructions.');
-      return 1;
-    }
 
     // Change the directory to the Drupal root.
     chdir(dirname(__DIR__, 5));
+
+    // The pdo_sqlite extension is only required when the installation will
+    // actually use SQLite: either because no database connection is configured
+    // (the command then falls back to creating a SQLite database) or because
+    // the configured connection is itself a SQLite connection. When another
+    // database driver is configured, pdo_sqlite is not needed and may
+    // legitimately be absent.
+    if ($this->willUseSqlite() && !extension_loaded('pdo_sqlite')) {
+      $io->getErrorStyle()->error('You must have the pdo_sqlite PHP extension installed. See core/INSTALL.sqlite.txt for instructions.');
+      return 1;
+    }
 
     // Check whether there is already an installation.
     if ($this->isDrupalInstalled()) {
@@ -157,6 +164,37 @@ class InstallCommand extends Command {
       // the install can proceed.
       return FALSE;
     }
+  }
+
+  /**
+   * Returns whether the installation will use a SQLite database.
+   *
+   * This is the case when no database connection is configured, because the
+   * command then falls back to creating a SQLite database, or when the
+   * configured connection is itself a SQLite connection.
+   *
+   * @return bool
+   *   TRUE if the installation will use SQLite, FALSE otherwise.
+   */
+  protected function willUseSqlite(): bool {
+    try {
+      $kernel = new DrupalKernel('prod', $this->classLoader, FALSE);
+      $kernel::bootEnvironment();
+      $kernel->setSitePath($this->getSitePath());
+      Settings::initialize($kernel->getAppRoot(), $kernel->getSitePath(), $this->classLoader);
+    }
+    catch (\Exception) {
+      // Settings could not be read, so the SQLite fallback will be used.
+      return TRUE;
+    }
+    $connection_info = Database::getConnectionInfo();
+    if (empty($connection_info['default'])) {
+      // No connection is configured, so the SQLite fallback will be used.
+      return TRUE;
+    }
+    $default = $connection_info['default'];
+    return strtolower($default['driver'] ?? '') === 'sqlite'
+      || str_contains($default['namespace'] ?? '', '\\sqlite\\');
   }
 
   /**
