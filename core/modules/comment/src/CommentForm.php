@@ -3,6 +3,7 @@
 namespace Drupal\comment;
 
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -57,7 +58,8 @@ class CommentForm extends ContentEntityForm {
       $container->get('renderer'),
       $container->get('entity_type.bundle.info'),
       $container->get('datetime.time'),
-      $container->get('entity_field.manager')
+      $container->get('entity_field.manager'),
+      $container->get('plugin.manager.field.widget')
     );
   }
 
@@ -74,18 +76,11 @@ class CommentForm extends ContentEntityForm {
    *   The entity type bundle service.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface|null $entity_field_manager
-   *   (optional) The entity field manager service.
+   * @param \Drupal\Component\Plugin\PluginManagerInterface $widget_plugin_manager
+   *   The widget plugin manager.
    */
-  public function __construct(
-    EntityRepositoryInterface $entity_repository,
-    AccountInterface $current_user,
-    RendererInterface $renderer,
-    EntityTypeBundleInfoInterface $entity_type_bundle_info,
-    TimeInterface $time,
-    ?EntityFieldManagerInterface $entity_field_manager = NULL,
-  ) {
-    parent::__construct($entity_repository, $entity_type_bundle_info, $time);
+  public function __construct(EntityRepositoryInterface $entity_repository, AccountInterface $current_user, RendererInterface $renderer, EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, TimeInterface $time = NULL, EntityFieldManagerInterface $entity_field_manager = NULL, PluginManagerInterface $widget_plugin_manager = NULL) {
+    parent::__construct($entity_repository, $entity_type_bundle_info, $time, $widget_plugin_manager);
     $this->currentUser = $current_user;
     $this->renderer = $renderer;
     $this->entityFieldManager = $entity_field_manager ?: \Drupal::service('entity_field.manager');

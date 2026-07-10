@@ -3,6 +3,7 @@
 namespace Drupal\menu_link_content\Form;
 
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
@@ -39,15 +40,13 @@ class MenuLinkContentForm extends ContentEntityForm {
    *   The entity type bundle service.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
+   * @param \Drupal\Component\Plugin\PluginManagerInterface $widget_plugin_manager
+   *   The widget plugin manager.
    */
-  public function __construct(
-    EntityRepositoryInterface $entity_repository,
-    protected MenuParentFormSelectorInterface $menuParentSelector,
-    protected PathValidatorInterface $pathValidator,
-    EntityTypeBundleInfoInterface $entity_type_bundle_info,
-    TimeInterface $time,
-  ) {
-    parent::__construct($entity_repository, $entity_type_bundle_info, $time);
+  public function __construct(EntityRepositoryInterface $entity_repository, MenuParentFormSelectorInterface $menu_parent_selector, LanguageManagerInterface $language_manager, PathValidatorInterface $path_validator, EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, TimeInterface $time = NULL, PluginManagerInterface $widget_plugin_manager = NULL) {
+    parent::__construct($entity_repository, $entity_type_bundle_info, $time, $widget_plugin_manager);
+    $this->menuParentSelector = $menu_parent_selector;
+    $this->pathValidator = $path_validator;
   }
 
   /**
@@ -59,7 +58,8 @@ class MenuLinkContentForm extends ContentEntityForm {
       $container->get('menu.parent_form_selector'),
       $container->get('path.validator'),
       $container->get('entity_type.bundle.info'),
-      $container->get('datetime.time')
+      $container->get('datetime.time'),
+      $container->get('plugin.manager.field.widget')
     );
   }
 

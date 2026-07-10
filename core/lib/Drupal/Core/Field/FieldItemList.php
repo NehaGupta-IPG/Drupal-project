@@ -114,6 +114,13 @@ class FieldItemList extends ItemList implements FieldItemListInterface {
   /**
    * {@inheritdoc}
    */
+  public function getSerializationValue($deep_serialization) {
+    return $this->getValue();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function __get($property_name) {
     // For empty fields, $entity->field->property is NULL.
     if ($item = $this->first()) {

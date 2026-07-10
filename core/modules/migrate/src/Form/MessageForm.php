@@ -2,7 +2,13 @@
 
 namespace Drupal\migrate\Form;
 
-use Drupal\Core\Form\FormBase;
+use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Component\Plugin\PluginManagerInterface;
+use Drupal\Core\Datetime\DateFormatterInterface;
+use Drupal\Core\Entity\ContentEntityForm;
+use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Drupal\Core\Flood\FloodInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -12,15 +18,85 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @internal
  */
-class MessageForm extends FormBase {
+class MessageForm extends ContentEntityForm {
+
+  /**
+   * The message being used by this form.
+   *
+   * @var \Drupal\contact\MessageInterface
+   */
+  protected $entity;
+
+  /**
+   * The flood control mechanism.
+   *
+   * @var \Drupal\Core\Flood\FloodInterface
+   */
+  protected $flood;
+
+  /**
+   * The language manager service.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
+   * The contact mail handler service.
+   *
+   * @var \Drupal\contact\MailHandlerInterface
+   */
+  protected $mailHandler;
+
+  /**
+   * The date formatter service.
+   *
+   * @var \Drupal\Core\Datetime\DateFormatterInterface
+   */
+  protected $dateFormatter;
+
+  /**
+   * Constructs a MessageForm object.
+   *
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   *   The entity repository.
+   * @param \Drupal\Core\Flood\FloodInterface $flood
+   *   The flood control mechanism.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager service.
+   * @param \Drupal\contact\MailHandlerInterface $mail_handler
+   *   The contact mail handler service.
+   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   *   The date service.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   *   The entity type bundle service.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The time service.
+   * @param \Drupal\Component\Plugin\PluginManagerInterface $widget_plugin_manager
+   *   The widget plugin manager.
+   */
+  public function __construct(EntityRepositoryInterface $entity_repository, FloodInterface $flood, LanguageManagerInterface $language_manager, MailHandlerInterface $mail_handler, DateFormatterInterface $date_formatter, EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, TimeInterface $time = NULL, PluginManagerInterface $widget_plugin_manager = NULL) {
+    parent::__construct($entity_repository, $entity_type_bundle_info, $time, $widget_plugin_manager);
+    $this->flood = $flood;
+    $this->languageManager = $language_manager;
+    $this->mailHandler = $mail_handler;
+    $this->dateFormatter = $date_formatter;
+  }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    $form = new static();
-    $form->setStringTranslation($container->get('string_translation'));
-    return $form;
+    return new static(
+      $container->get('entity.repository'),
+      $container->get('flood'),
+      $container->get('language_manager'),
+      $container->get('contact.mail_handler'),
+      $container->get('date.formatter'),
+      $container->get('entity_type.bundle.info'),
+      $container->get('datetime.time'),
+      $container->get('plugin.manager.field.widget')
+    );
   }
 
   /**

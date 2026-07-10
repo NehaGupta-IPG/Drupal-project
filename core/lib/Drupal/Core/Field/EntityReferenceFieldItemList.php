@@ -13,6 +13,27 @@ class EntityReferenceFieldItemList extends FieldItemList implements EntityRefere
   /**
    * {@inheritdoc}
    */
+  public function getSerializationValue($deep_serialization) {
+    // When performing a deep serialization we have to include the referenced
+    // entities and flag them for deep serialization as well in order to
+    // serialize the whole structure.
+    $values = parent::getSerializationValue($deep_serialization);
+    if ($deep_serialization) {
+      foreach ($this->list as $delta => $item) {
+        if ($entity = $item->entity) {
+          if ($entity instanceof FieldableEntityInterface) {
+            $entity->setDeepSerialization(TRUE);
+          }
+          $values[$delta]['entity'] = $entity;
+        }
+      }
+    }
+    return $values;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getConstraints() {
     $constraints = parent::getConstraints();
     $constraint_manager = $this->getTypedDataManager()->getValidationConstraintManager();
