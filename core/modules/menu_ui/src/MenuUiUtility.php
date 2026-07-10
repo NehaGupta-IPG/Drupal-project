@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\menu_ui;
 
+use Drupal\Component\Utility\IntegerLike;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -78,7 +79,7 @@ class MenuUiUtility {
       if (!$entity->isDefaultRevision()) {
         $entity->setNewRevision();
       }
-      elseif ($entity->get('link')->uri !== 'entity:node/' . $node->id()) {
+      elseif (!IntegerLike::same($entity->get('link')->uri, 'entity:node/' . $node->id())) {
         $entity->get('link')->uri = 'entity:node/' . $node->id();
       }
     }

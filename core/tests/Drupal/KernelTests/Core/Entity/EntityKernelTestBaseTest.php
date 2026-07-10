@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\TestTools\IntegerLikeAssert;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -30,7 +31,7 @@ class EntityKernelTestBaseTest extends EntityKernelTestBase {
   public function testSetUpCurrentUser(): void {
     $account = $this->setUpCurrentUser();
     $current_user = \Drupal::currentUser();
-    $this->assertSame($account->id(), $current_user->id());
+    IntegerLikeAssert::same($account->id(), $current_user->id());
   }
 
 }

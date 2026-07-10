@@ -9,6 +9,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\config\Traits\AssertConfigEntityImportTrait;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
+use Drupal\TestTools\IntegerLikeAssert;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -224,9 +225,9 @@ class EntityReferenceIntegrationTest extends BrowserTestBase {
     else {
       $ids = [$referenced_entities[0]->id(), $referenced_entities[1]->id()];
       $labels = [$referenced_entities[0]->label(), $referenced_entities[1]->label()];
-      $this->assertContains($entity->{$this->fieldName}->target_id, $ids);
+      IntegerLikeAssert::inArray($entity->{$this->fieldName}->target_id, $ids);
       $this->assertContains($entity->{$this->fieldName}->entity->label(), $labels);
-      $this->assertContains($entity->{$this->fieldName}[1]->target_id, $ids);
+      IntegerLikeAssert::inArray($entity->{$this->fieldName}[1]->target_id, $ids);
       $this->assertContains($entity->{$this->fieldName}[1]->entity->label(), $labels);
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\workspaces\Provider;
 
+use Drupal\Component\Utility\IntegerLike;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -71,7 +72,7 @@ abstract class WorkspaceProviderBase implements WorkspaceProviderInterface {
 
     // Check if it's their own workspace, and they have permission to access
     // their own workspace.
-    if ($access_result->isNeutral() && $account->isAuthenticated() && $account->id() === $workspace->getOwnerId()) {
+    if ($access_result->isNeutral() && $account->isAuthenticated() && IntegerLike::same($account->id(), $workspace->getOwnerId())) {
       $access_result = AccessResult::allowedIfHasPermission($account, $permission_operation . ' own workspace')
         ->cachePerUser()
         ->addCacheableDependency($workspace);

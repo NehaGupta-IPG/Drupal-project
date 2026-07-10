@@ -2,6 +2,7 @@
 
 namespace Drupal\workspaces\Plugin\Validation\Constraint;
 
+use Drupal\Component\Utility\IntegerLike;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\workspaces\WorkspaceTrackerInterface;
@@ -45,7 +46,7 @@ class EntityWorkspaceConflictConstraintValidator extends ConstraintValidator imp
       // If the entity is tracked in a workspace, it can only be edited in
       // that workspace or one of its descendants.
       if ($tracking_workspace_ids = $this->workspaceTracker->getEntityTrackingWorkspaceIds($entity, TRUE)) {
-        if (!$active_workspace || !in_array($active_workspace->id(), $tracking_workspace_ids, TRUE)) {
+        if (!$active_workspace || !IntegerLike::inArray($active_workspace->id(), $tracking_workspace_ids)) {
           $first_tracking_workspace_id = reset($tracking_workspace_ids);
           $workspace = $this->entityTypeManager->getStorage('workspace')
             ->load($first_tracking_workspace_id);
