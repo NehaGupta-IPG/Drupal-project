@@ -87,8 +87,14 @@ class LocaleConfigBatch {
    *
    * @param array|\ArrayAccess $context
    *   The batch context.
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0.
+   *   There is no replacement.
+   *
+   * @see https://www.drupal.org/node/3337864
    */
   public function batchUpdateDefaultConfigLangcodes(array|\ArrayAccess &$context): void {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3337864', E_USER_DEPRECATED);
     $this->localeConfigManager->updateDefaultConfigLangcodes();
     $context['finished'] = 1;
     $context['message'] = $this->t('Updated default configuration to %langcode', ['%langcode' => $this->languageManager->getDefaultLanguage()->getId()]);

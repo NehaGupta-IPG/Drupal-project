@@ -198,8 +198,8 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
    * {@inheritdoc}
    */
   protected function doCreate(array $values) {
-    // Set default language to current language if not provided.
-    $values += [$this->langcodeKey => $this->languageManager->getCurrentLanguage()->getId()];
+    // Set default language for configuration entities if not provided.
+    $values += [$this->langcodeKey => $this->configFactory->get('system.site')->get('default_config_langcode')];
     $entity_class = $this->getEntityClass();
     $entity = new $entity_class($values, $this->entityTypeId);
 

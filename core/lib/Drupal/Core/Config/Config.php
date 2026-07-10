@@ -4,6 +4,7 @@ namespace Drupal\Core\Config;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Config\Schema\Mapping;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -205,6 +206,8 @@ class Config extends StorableConfigBase {
     // Validate the configuration object name before saving.
     static::validateName($this->name);
 
+    $this->applyDefaultLangcodeIfMissing();
+
     // If there is a schema for this configuration object, cast all values to
     // conform to the schema.
     if (!$has_trusted_data) {
@@ -235,6 +238,27 @@ class Config extends StorableConfigBase {
     $this->eventDispatcher->dispatch(new ConfigCrudEvent($this), $event_name);
     $this->originalData = $this->data;
     return $this;
+  }
+
+  /**
+   * Applies the site's configuration default langcode when required.
+   */
+  protected function applyDefaultLangcodeIfMissing(): void {
+    // Only update the langcode if the configuration object is in the default
+    // collection, has a schema, and has a langcode key.
+    if ($this->getStorage()->getCollectionName() !== StorageInterface::DEFAULT_COLLECTION) {
+      return;
+    }
+    if (array_key_exists('langcode', $this->data) || !$this->typedConfigManager->hasConfigSchema($this->name)) {
+      return;
+    }
+    $typed_config = $this->typedConfigManager->createFromNameAndData($this->name, $this->data);
+    if (!$typed_config instanceof Mapping || !in_array('langcode', $typed_config->getValidKeys(), TRUE)) {
+      return;
+    }
+
+    $system_site = $this->storage->read('system.site');
+    $this->set('langcode', $system_site['default_config_langcode']);
   }
 
   /**
