@@ -2067,3 +2067,7 @@ services:
     class: Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter
     arguments: [!iterator {}, []]
   Symfony\Component\HttpKernel\DependencyInjection\ServicesResetterInterface: '@services_resetter'
+  Drupal\Core\EventSubscriber\ServiceResetTerminateSubscriber:
+    arguments: ['@services_resetter']
+    tags:
+      - { name: event_subscriber }
