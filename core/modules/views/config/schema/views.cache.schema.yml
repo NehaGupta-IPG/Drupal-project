@@ -27,12 +27,6 @@ views.cache.time:
         results_lifespan:
           type: integer
           label: 'The length of time raw query results should be cached.'
-        results_lifespan_custom:
-          type: integer
-          label: 'Length of time in seconds raw query results should be cached.'
         output_lifespan:
           type: integer
           label: 'The length of time rendered HTML output should be cached.'
-        output_lifespan_custom:
-          type: integer
-          label: 'Length of time in seconds rendered HTML output should be cached.'
