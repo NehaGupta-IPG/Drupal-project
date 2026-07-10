@@ -100,7 +100,8 @@ class FilterCaption extends FilterBase implements ContainerFactoryPluginInterfac
         // bubble up the value of the class attribute of the captioned element,
         // this allows it to collaborate with e.g. the filter_align filter.
         $tag = $node->tagName;
-        $classes = $node->getAttribute('class');
+        $viewmode = ($node->getAttribute('data-view-mode')) ? $node->getAttribute('data-view-mode') : 'default';
+        $classes = $node->getAttribute('class') . ' view-mode--' . $viewmode;
         $node->removeAttribute('class');
         $node = ($node->parentNode->tagName === 'a') ? $node->parentNode : $node;
         $filter_caption = [
