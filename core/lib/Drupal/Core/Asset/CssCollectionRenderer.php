@@ -2,7 +2,7 @@
 
 namespace Drupal\Core\Asset;
 
-use Drupal\Core\State\StateInterface;
+use Drupal\Core\File\FileUrlGeneratorInterface;
 
 /**
  * Renders CSS assets.
@@ -10,20 +10,17 @@ use Drupal\Core\State\StateInterface;
 class CssCollectionRenderer implements AssetCollectionRendererInterface {
 
   /**
-   * The state key/value store.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
-
-  /**
    * Constructs a CssCollectionRenderer.
    *
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state key/value store.
+   * @param \Drupal\Core\Asset\AssetQueryStringInterface $assetQueryString
+   *   The asset query string.
+   * @param \Drupal\Core\File\FileUrlGeneratorInterface $fileUrlGenerator
+   *   The file URL generator.
    */
-  public function __construct(StateInterface $state) {
-    $this->state = $state;
+  public function __construct(
+    protected AssetQueryStringInterface $assetQueryString,
+    protected FileUrlGeneratorInterface $fileUrlGenerator,
+  ) {
   }
 
   /**
@@ -31,12 +28,6 @@ class CssCollectionRenderer implements AssetCollectionRendererInterface {
    */
   public function render(array $css_assets) {
     $elements = [];
-
-    // A dummy query-string is added to filenames, to gain control over
-    // browser-caching. The string changes on every update or full cache
-    // flush, forcing browsers to load a new copy of the files, as the
-    // URL changed.
-    $query_string = $this->state->get('system.css_js_query_string', '0');
 
     // Defaults for LINK and STYLE elements.
     $link_element_defaults = [
@@ -50,17 +41,17 @@ class CssCollectionRenderer implements AssetCollectionRendererInterface {
     foreach ($css_assets as $css_asset) {
       $element = $link_element_defaults;
       $element['#attributes']['media'] = $css_asset['media'];
-      $element['#browsers'] = $css_asset['browsers'];
 
       switch ($css_asset['type']) {
         // For file items, output a LINK tag for file CSS assets.
         case 'file':
-          $element['#attributes']['href'] = file_url_transform_relative(file_create_url($css_asset['data']));
-          // Only add the cache-busting query string if this isn't an aggregate
-          // file.
+          $element['#attributes']['href'] = $this->fileUrlGenerator->generateString($css_asset['data']);
+          // For unaggregated assets, add a query string to force edge/browser
+          // cache invalidation. This query string is updated after each full
+          // cache clear.
           if (!isset($css_asset['preprocessed'])) {
-            $query_string_separator = (strpos($css_asset['data'], '?') !== FALSE) ? '&' : '?';
-            $element['#attributes']['href'] .= $query_string_separator . $query_string;
+            $query_string_separator = str_contains($css_asset['data'], '?') ? '&' : '?';
+            $element['#attributes']['href'] .= $query_string_separator . $this->assetQueryString->get();
           }
           break;
 

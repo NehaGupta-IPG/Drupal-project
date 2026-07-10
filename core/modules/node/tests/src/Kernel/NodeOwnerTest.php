@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel;
 
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
@@ -7,21 +9,24 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests node owner functionality.
- *
- * @group Entity
  */
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class NodeOwnerTest extends EntityKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'language'];
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -42,7 +47,7 @@ class NodeOwnerTest extends EntityKernelTestBase {
   /**
    * Tests node owner functionality.
    */
-  public function testOwner() {
+  public function testOwner(): void {
     $user = $this->createUser();
 
     $container = \Drupal::getContainer();
@@ -68,7 +73,7 @@ class NodeOwnerTest extends EntityKernelTestBase {
     $german->set('uid', ['target_id' => NULL]);
     $italian->set('uid', ['target_id' => NULL]);
 
-    // Entity::save() saves all translations!
+    // This saves all translations!
     $italian->save();
 
     $this->assertEquals(0, $english->getOwnerId());
@@ -79,7 +84,7 @@ class NodeOwnerTest extends EntityKernelTestBase {
   /**
    * Tests an unsaved node owner.
    */
-  public function testUnsavedNodeOwner() {
+  public function testUnsavedNodeOwner(): void {
     $user = User::create([
       'name' => 'foo',
     ]);

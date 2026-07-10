@@ -25,14 +25,14 @@ class ResponseGeneratorSubscriber implements EventSubscriberInterface {
     $response = $event->getResponse();
 
     // Set the generator in the HTTP header.
-    list($version) = explode('.', \Drupal::VERSION, 2);
+    [$version] = explode('.', \Drupal::VERSION, 2);
     $response->headers->set('X-Generator', 'Drupal ' . $version . ' (https://www.drupal.org)');
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     $events[KernelEvents::RESPONSE][] = ['onRespond'];
     return $events;
   }

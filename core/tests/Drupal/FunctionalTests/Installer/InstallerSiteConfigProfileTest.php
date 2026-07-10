@@ -1,13 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Installer;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
 /**
- * Verifies that the installer defaults to the existing site email address and
- * timezone, if they were provided by the install profile.
- *
- * @group Installer
+ * Verifies that the installer uses the profile's site configuration.
  */
+#[Group('Installer')]
+#[RunTestsInSeparateProcesses]
 class InstallerSiteConfigProfileTest extends InstallerTestBase {
 
   /**
@@ -37,32 +41,37 @@ class InstallerSiteConfigProfileTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function installParameters() {
+  protected function installParameters(): array {
     $parameters = parent::installParameters();
 
     // Don't override the site email address, allowing it to default to the one
     // from our install profile.
     unset($parameters['forms']['install_configure_form']['site_mail']);
 
+    // Set 'enable_update_status_module' flag to test that
+    // SiteConfigureForm::submit() handles the container rebuild correctly after
+    // the Update Status module is installed.
+    $parameters['forms']['install_configure_form']['enable_update_status_module'] = TRUE;
     return $parameters;
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function setUpSite() {
+  protected function setUpSite(): void {
     $this->assertSession()->fieldValueEquals('site_mail', self::EXPECTED_SITE_MAIL);
     $this->assertSession()->fieldValueEquals('date_default_timezone', self::EXPECTED_TIMEZONE);
 
-    return parent::setUpSite();
+    parent::setUpSite();
   }
 
   /**
    * Verify the correct site config was set.
    */
-  public function testInstaller() {
+  public function testInstaller(): void {
     $this->assertEquals(self::EXPECTED_SITE_MAIL, $this->config('system.site')->get('mail'));
     $this->assertEquals(self::EXPECTED_TIMEZONE, $this->config('system.date')->get('timezone.default'));
+    $this->assertTrue(\Drupal::moduleHandler()->moduleExists('update'));
   }
 
 }

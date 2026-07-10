@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views_ui\Functional;
 
 use Drupal\views\Entity\View;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests exposed forms UI functionality.
- *
- * @group views_ui
  */
+#[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class ExposedFormUITest extends UITestBase {
 
   /**
@@ -44,8 +48,11 @@ class ExposedFormUITest extends UITestBase {
    */
   protected $groupFormUiErrors = [];
 
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp($import_test_views);
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp($import_test_views = TRUE, $modules = ['views_test_config']): void {
+    parent::setUp($import_test_views, $modules);
 
     $this->drupalCreateContentType(['type' => 'article']);
     $this->drupalCreateContentType(['type' => 'page']);
@@ -64,7 +71,7 @@ class ExposedFormUITest extends UITestBase {
   /**
    * Tests the admin interface of exposed filter and sort items.
    */
-  public function testExposedAdminUi() {
+  public function testExposedAdminUi(): void {
     $edit = [];
 
     $this->drupalGet('admin/structure/views/nojs/handler/test_exposed_admin_ui/default/filter/type');
@@ -105,6 +112,7 @@ class ExposedFormUITest extends UITestBase {
     $this->drupalGet('admin/structure/views/nojs/handler/test_exposed_admin_ui/default/sort/created');
     $this->helperButtonHasLabel('edit-options-expose-button-button', 'Expose sort');
     $this->assertSession()->fieldNotExists('edit-options-expose-label');
+    $this->assertSession()->fieldNotExists('Sort field identifier');
 
     // Un-expose the filter.
     $this->drupalGet('admin/structure/views/nojs/handler/test_exposed_admin_ui/default/filter/type');
@@ -123,6 +131,7 @@ class ExposedFormUITest extends UITestBase {
     // Check the label of the expose button.
     $this->helperButtonHasLabel('edit-options-expose-button-button', 'Hide sort');
     $this->assertSession()->fieldValueEquals('edit-options-expose-label', 'Authored on');
+    $this->assertSession()->fieldValueEquals('Sort field identifier', 'created');
 
     // Test adding a new exposed sort criteria.
     $view_id = $this->randomView()['id'];
@@ -135,21 +144,51 @@ class ExposedFormUITest extends UITestBase {
     $this->submitForm([], 'Expose sort');
     $this->assertSession()->fieldValueEquals('options[order]', 'DESC');
     $this->assertSession()->fieldValueEquals('options[expose][label]', 'Authored on');
-    // Change the label and save the view.
-    $edit = ['options[expose][label]' => $this->randomString()];
+    $this->assertSession()->fieldValueEquals('Sort field identifier', 'created');
+
+    // Change the label and try with an empty identifier.
+    $edit = [
+      'options[expose][label]' => $this->randomString(),
+      'options[expose][field_identifier]' => '',
+    ];
+    $this->submitForm($edit, 'Apply');
+    $this->assertSession()->pageTextContains('Sort field identifier field is required.');
+
+    // Try with an invalid identifiers.
+    $edit['options[expose][field_identifier]'] = 'abc&! ###08.';
+    $this->submitForm($edit, 'Apply');
+    $this->assertSession()->pageTextContains('This identifier has invalid characters.');
+    $edit['options[expose][field_identifier]'] = '^abcde';
+    $this->submitForm($edit, 'Apply');
+    $this->assertSession()->pageTextContains('This identifier has invalid characters.');
+
+    // Use a valid identifier.
+    $edit['options[expose][field_identifier]'] = $this->randomMachineName() . '_-~.';
     $this->submitForm($edit, 'Apply');
     $this->submitForm([], 'Save');
+
     // Check that the values were saved.
     $display = View::load($view_id)->getDisplay('default');
     $this->assertTrue($display['display_options']['sorts']['created']['exposed']);
-    $this->assertEquals(['label' => $edit['options[expose][label]']], $display['display_options']['sorts']['created']['expose']);
-    $this->assertEquals('DESC', $display['display_options']['sorts']['created']['order']);
+    $this->assertSame([
+      'label' => $edit['options[expose][label]'],
+      'field_identifier' => $edit['options[expose][field_identifier]'],
+    ], $display['display_options']['sorts']['created']['expose']);
+    $this->assertSame('DESC', $display['display_options']['sorts']['created']['order']);
+
+    // Test the identifier uniqueness.
+    $this->drupalGet("admin/structure/views/nojs/handler/{$view_id}/default/sort/created_1");
+    $this->submitForm([], 'Expose sort');
+    $this->submitForm([
+      'options[expose][field_identifier]' => $edit['options[expose][field_identifier]'],
+    ], 'Apply');
+    $this->assertSession()->pageTextContains('This identifier is already used by Content: Authored on sort handler.');
   }
 
   /**
    * Tests the admin interface of exposed grouped filters.
    */
-  public function testGroupedFilterAdminUi() {
+  public function testGroupedFilterAdminUi(): void {
     $edit = [];
 
     $this->drupalGet('admin/structure/views/nojs/handler/test_exposed_admin_ui/default/filter/type');
@@ -231,7 +270,10 @@ class ExposedFormUITest extends UITestBase {
     $this->assertNoGroupedFilterErrors();
   }
 
-  public function testGroupedFilterAdminUiErrors() {
+  /**
+   * Tests the error messages used in the grouped filter form.
+   */
+  public function testGroupedFilterAdminUiErrors(): void {
     // Select the empty operator without a title specified.
     $this->drupalGet('admin/structure/views/nojs/handler/test_exposed_admin_ui/default/filter/body_value');
     $edit = [];
@@ -265,25 +307,21 @@ class ExposedFormUITest extends UITestBase {
    *
    * @param string $message
    *   The assert message.
-   * @param string $group
-   *   The assertion group.
    *
-   * @return bool
-   *   Result of the assertion.
+   * @internal
    */
-  protected function assertNoGroupedFilterErrors($message = '', $group = 'Other') {
+  protected function assertNoGroupedFilterErrors(string $message = ''): void {
     foreach ($this->groupFormUiErrors as $error) {
       if (empty($message)) {
-        return $this->assertNoRaw($error);
+        $this->assertSession()->responseNotContains($error);
       }
     }
-    return TRUE;
   }
 
   /**
    * Tests the configuration of grouped exposed filters.
    */
-  public function testExposedGroupedFilter() {
+  public function testExposedGroupedFilter(): void {
     // Click the Expose filter button.
     $this->drupalGet('admin/structure/views/nojs/handler/test_exposed_admin_ui/default/filter/type');
     $this->submitForm([], 'Expose filter');
@@ -299,12 +337,27 @@ class ExposedFormUITest extends UITestBase {
       'options[group_info][group_items][2][value][article]' => 'article',
       'options[group_info][group_items][3][title]' => '3rd',
       'options[group_info][group_items][3][value][page]' => 'page',
+      'options[group_info][default_group]' => '3',
     ];
     // Apply the filter settings.
     $this->submitForm($edit, 'Apply');
     // Check that the view is saved without errors.
     $this->submitForm([], 'Save');
     $this->assertSession()->statusCodeEquals(200);
+    // Check the default filter value.
+    $this->drupalGet('test_exposed_admin_ui');
+    $this->assertSession()->fieldValueEquals('type', '3');
+    // Enable "Allow multiple selections" option and set a default group.
+    $this->drupalGet('admin/structure/views/nojs/handler/test_exposed_admin_ui/default/filter/type');
+    $edit['options[group_info][multiple]'] = 1;
+    $edit['options[group_info][default_group_multiple][1]'] = 1;
+    $this->submitForm($edit, 'Apply');
+    $this->submitForm([], 'Save');
+    // Check the default filter values again.
+    $this->drupalGet('test_exposed_admin_ui');
+    $this->assertSession()->checkboxChecked('type[1]');
+    $this->assertSession()->checkboxNotChecked('type[2]');
+    $this->assertSession()->checkboxNotChecked('type[3]');
 
     // Click the Expose filter button.
     $this->drupalGet('admin/structure/views/nojs/add-handler/test_exposed_admin_ui/default/filter');
@@ -323,18 +376,33 @@ class ExposedFormUITest extends UITestBase {
       'options[group_info][group_items][2][value]' => 1,
       'options[group_info][group_items][3][title]' => 'Unpublished',
       'options[group_info][group_items][3][value]' => 0,
+      'options[group_info][default_group]' => 2,
     ];
     // Apply the filter settings.
     $this->submitForm($edit, 'Apply');
     // Check that the view is saved without errors.
     $this->submitForm([], 'Save');
     $this->assertSession()->statusCodeEquals(200);
-
     $this->drupalGet('admin/structure/views/nojs/handler/test_exposed_admin_ui/default/filter/status');
     // Assert the same settings defined before still are there.
     $this->assertSession()->checkboxChecked('edit-options-group-info-group-items-1-value-all');
     $this->assertSession()->checkboxChecked('edit-options-group-info-group-items-2-value-1');
     $this->assertSession()->checkboxChecked('edit-options-group-info-group-items-3-value-0');
+
+    // Check the default filter value.
+    $this->drupalGet('test_exposed_admin_ui');
+    $this->assertSession()->fieldValueEquals('status', '2');
+    // Enable "Allow multiple selections" option and set a default group.
+    $this->drupalGet('admin/structure/views/nojs/handler/test_exposed_admin_ui/default/filter/status');
+    $edit['options[group_info][multiple]'] = 1;
+    $edit['options[group_info][default_group_multiple][3]'] = 1;
+    $this->submitForm($edit, 'Apply');
+    $this->submitForm([], 'Save');
+    // Check the default filter value again.
+    $this->drupalGet('test_exposed_admin_ui');
+    $this->assertSession()->checkboxNotChecked('status[1]');
+    $this->assertSession()->checkboxNotChecked('status[2]');
+    $this->assertSession()->checkboxChecked('status[3]');
   }
 
 }

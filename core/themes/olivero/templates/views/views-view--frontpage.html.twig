@@ -27,7 +27,7 @@
  * - dom_id: Unique id for every view being printed to give unique class for
  *   Javascript.
  *
- * @see template_preprocess_views_view()
+ * @see \Drupal\views\Hook\ViewsThemeHooks::preprocessViewsView()
  *
  * @ingroup themeable
  */
@@ -41,7 +41,7 @@
     'view-display-id-' ~ display_id,
     'grid-full',
     'layout--pass--content-narrow',
-    'ie11-autorow',
+    dom_id ? 'js-view-dom-id-' ~ dom_id,
   ]
 %}
 <div{{ attributes.addClass(classes) }}>

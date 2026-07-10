@@ -1,26 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests you can configure a language for individual URL aliases.
- *
- * @group locale
- * @group path
  */
+#[Group('locale')]
+#[Group('path')]
+#[RunTestsInSeparateProcesses]
 class LocalePathTest extends BrowserTestBase {
 
   use PathAliasTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'locale', 'path', 'views'];
 
@@ -42,7 +44,7 @@ class LocalePathTest extends BrowserTestBase {
   /**
    * Tests if a language can be associated with a path alias.
    */
-  public function testPathLanguageConfiguration() {
+  public function testPathLanguageConfiguration(): void {
     // User to add and remove language.
     $admin_user = $this->drupalCreateUser([
       'administer languages',
@@ -78,7 +80,7 @@ class LocalePathTest extends BrowserTestBase {
     // Check that the "xx" front page is readily available because path prefix
     // negotiation is pre-configured.
     $this->drupalGet($prefix);
-    $this->assertSession()->pageTextContains('Welcome to Drupal');
+    $this->assertSession()->pageTextContains('Welcome!');
 
     // Create a node.
     $node = $this->drupalCreateNode(['type' => 'page']);
@@ -126,7 +128,11 @@ class LocalePathTest extends BrowserTestBase {
 
     // Create language nodes to check priority of aliases.
     $first_node = $this->drupalCreateNode(['type' => 'page', 'promote' => 1, 'langcode' => 'en']);
-    $second_node = $this->drupalCreateNode(['type' => 'page', 'promote' => 1, 'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED]);
+    $second_node = $this->drupalCreateNode([
+      'type' => 'page',
+      'promote' => 1,
+      'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
+    ]);
 
     // Assign a custom path alias to the first node with the English language.
     $this->createPathAlias('/node/' . $first_node->id(), '/' . $custom_path, $first_node->language()->getId());
@@ -138,10 +144,14 @@ class LocalePathTest extends BrowserTestBase {
     // Test that both node titles link to our path alias.
     $this->drupalGet('admin/content');
     $custom_path_url = Url::fromUserInput('/' . $custom_path)->toString();
-    $elements = $this->xpath('//a[@href=:href and normalize-space(text())=:title]', [':href' => $custom_path_url, ':title' => $first_node->label()]);
-    $this->assertTrue(!empty($elements), 'First node links to the path alias.');
-    $elements = $this->xpath('//a[@href=:href and normalize-space(text())=:title]', [':href' => $custom_path_url, ':title' => $second_node->label()]);
-    $this->assertTrue(!empty($elements), 'Second node links to the path alias.');
+    $this->assertSession()->elementExists('xpath', $this->assertSession()->buildXPathQuery('//a[@href=:href and normalize-space(text())=:title]', [
+      ':href' => $custom_path_url,
+      ':title' => $first_node->label(),
+    ]));
+    $this->assertSession()->elementExists('xpath', $this->assertSession()->buildXPathQuery('//a[@href=:href and normalize-space(text())=:title]', [
+      ':href' => $custom_path_url,
+      ':title' => $second_node->label(),
+    ]));
 
     // Confirm that the custom path leads to the first node.
     $this->drupalGet($custom_path);

@@ -1,17 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Functional;
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the language functionality for the taxonomy terms.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class TermLanguageTest extends TaxonomyTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['language'];
 
   /**
@@ -26,6 +33,9 @@ class TermLanguageTest extends TaxonomyTestBase {
    */
   protected $vocabulary;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -44,7 +54,10 @@ class TermLanguageTest extends TaxonomyTestBase {
     }
   }
 
-  public function testTermLanguage() {
+  /**
+   * Tests the language of a term.
+   */
+  public function testTermLanguage(): void {
     // Configure the vocabulary to not hide the language selector.
     $edit = [
       'default_language[language_alterable]' => TRUE,
@@ -62,7 +75,9 @@ class TermLanguageTest extends TaxonomyTestBase {
       'langcode[0][value]' => 'aa',
     ];
     $this->submitForm($edit, 'Save');
-    $terms = taxonomy_term_load_multiple_by_name($edit['name[0][value]']);
+    $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties([
+      'name' => $edit['name[0][value]'],
+    ]);
     $term = reset($terms);
     $this->assertEquals($edit['langcode[0][value]'], $term->language()->getId(), 'The term contains the correct langcode.');
 
@@ -80,7 +95,10 @@ class TermLanguageTest extends TaxonomyTestBase {
     $this->assertTrue($this->assertSession()->optionExists('edit-langcode-0-value', $edit['langcode[0][value]'])->isSelected());
   }
 
-  public function testDefaultTermLanguage() {
+  /**
+   * Tests the default language selection for taxonomy terms.
+   */
+  public function testDefaultTermLanguage(): void {
     // Configure the vocabulary to not hide the language selector, and make the
     // default language of the terms fixed.
     $edit = [
@@ -120,7 +138,7 @@ class TermLanguageTest extends TaxonomyTestBase {
   /**
    * Tests that translated terms are displayed correctly on the term overview.
    */
-  public function testTermTranslatedOnOverviewPage() {
+  public function testTermTranslatedOnOverviewPage(): void {
     // Configure the vocabulary to not hide the language selector.
     $edit = [
       'default_language[language_alterable]' => TRUE,
@@ -136,7 +154,9 @@ class TermLanguageTest extends TaxonomyTestBase {
       'langcode[0][value]' => 'aa',
     ];
     $this->submitForm($edit, 'Save');
-    $terms = taxonomy_term_load_multiple_by_name($edit['name[0][value]']);
+    $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties([
+      'name' => $edit['name[0][value]'],
+    ]);
     $term = reset($terms);
 
     // Add a translation for that term.
@@ -146,7 +166,7 @@ class TermLanguageTest extends TaxonomyTestBase {
     ]);
     $term->save();
 
-    // Overview page in the other language shows the translated term
+    // Overview page in the other language shows the translated term.
     $this->drupalGet('bb/admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/overview');
     $this->assertSession()->responseMatches('|<a[^>]*>' . $translated_title . '</a>|');
   }

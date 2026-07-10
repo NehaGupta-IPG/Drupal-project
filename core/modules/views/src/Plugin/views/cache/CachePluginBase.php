@@ -5,7 +5,7 @@ namespace Drupal\views\Plugin\views\cache;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\views\Plugin\views\PluginBase;
-use Drupal\Core\Database\Query\Select;
+use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\views\ResultRow;
 
 /**
@@ -30,6 +30,8 @@ abstract class CachePluginBase extends PluginBase {
 
   /**
    * Contains all data that should be written/read from cache.
+   *
+   * @var array
    */
   public $storage = [];
 
@@ -62,8 +64,7 @@ abstract class CachePluginBase extends PluginBase {
   }
 
   /**
-   * Return a string to display as the clickable title for the
-   * access control.
+   * Returns a string to display as the clickable title for the access control.
    */
   public function summaryTitle() {
     return $this->t('Unknown');
@@ -74,20 +75,30 @@ abstract class CachePluginBase extends PluginBase {
    *
    * Plugins must override this to implement expiration.
    *
-   * @param $type
+   * @param string $type
    *   The cache type, either 'query', 'result'.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. No
+   *   replacement is provided.
+   *
+   * @see https://www.drupal.org/node/3576855
    */
   protected function cacheExpire($type) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3576855', E_USER_DEPRECATED);
   }
 
   /**
-   * Determine expiration time in the cache table of the cache type
-   * or CACHE_PERMANENT if item shouldn't be removed automatically from cache.
+   * Determines cache expiration time based on its type.
    *
    * Plugins must override this to implement expiration in the cache table.
    *
-   * @param $type
-   *   The cache type, either 'query', 'result'.
+   * @param string $type
+   *   The cache type.
+   *
+   * @return int
+   *   Either an offset from the request time to indicate when the cache
+   *   expires, or \Drupal\Core\Cache\Cache::PERMANENT to indicate that the
+   *   cache does not expire. Defaults to \Drupal\Core\Cache\Cache::PERMANENT.
    */
   protected function cacheSetMaxAge($type) {
     return Cache::PERMANENT;
@@ -98,7 +109,7 @@ abstract class CachePluginBase extends PluginBase {
    *
    * A plugin should override this to provide specialized caching behavior.
    *
-   * @param $type
+   * @param string $type
    *   The cache type, either 'query', 'result'.
    */
   public function cacheSet($type) {
@@ -110,7 +121,7 @@ abstract class CachePluginBase extends PluginBase {
       case 'results':
         $data = [
           'result' => $this->prepareViewResult($this->view->result),
-          'total_rows' => isset($this->view->total_rows) ? $this->view->total_rows : 0,
+          'total_rows' => $this->view->total_rows ?? 0,
           'current_page' => $this->view->getCurrentPage(),
         ];
         $expire = ($this->cacheSetMaxAge($type) === Cache::PERMANENT) ? Cache::PERMANENT : (int) $this->view->getRequest()->server->get('REQUEST_TIME') + $this->cacheSetMaxAge($type);
@@ -124,14 +135,13 @@ abstract class CachePluginBase extends PluginBase {
    *
    * A plugin should override this to provide specialized caching behavior.
    *
-   * @param $type
+   * @param string $type
    *   The cache type, either 'query', 'result'.
    *
    * @return bool
    *   TRUE if data has been taken from the cache, otherwise FALSE.
    */
   public function cacheGet($type) {
-    $cutoff = $this->cacheExpire($type);
     switch ($type) {
       case 'query':
         // Not supported currently, but this is certainly where we'd put it.
@@ -141,15 +151,13 @@ abstract class CachePluginBase extends PluginBase {
         // Values to set: $view->result, $view->total_rows, $view->execute_time,
         // $view->current_page.
         if ($cache = \Drupal::cache($this->resultsBin)->get($this->generateResultsKey())) {
-          if (!$cutoff || $cache->created > $cutoff) {
-            $this->view->result = $cache->data['result'];
-            // Load entities for each result.
-            $this->view->query->loadEntities($this->view->result);
-            $this->view->total_rows = $cache->data['total_rows'];
-            $this->view->setCurrentPage($cache->data['current_page'], TRUE);
-            $this->view->execute_time = 0;
-            return TRUE;
-          }
+          $this->view->result = $cache->data['result'];
+          // Load entities for each result.
+          $this->view->query->loadEntities($this->view->result);
+          $this->view->total_rows = $cache->data['total_rows'];
+          $this->view->setCurrentPage($cache->data['current_page']);
+          $this->view->execute_time = 0;
+          return TRUE;
         }
         return FALSE;
     }
@@ -179,7 +187,7 @@ abstract class CachePluginBase extends PluginBase {
    * go there:
    *
    * @code
-   *   strtr($output, array('<!--post-FIELD-1-->', 'output for FIELD of nid 1');
+   *   strtr($output, ['<!--post-FIELD-1-->', 'output for FIELD of nid 1']);
    * @endcode
    *
    * All of the cached result data will be available in $view->result, as well,
@@ -200,7 +208,7 @@ abstract class CachePluginBase extends PluginBase {
       foreach (['query', 'count_query'] as $index) {
         // If the default query back-end is used generate SQL query strings from
         // the query objects.
-        if ($build_info[$index] instanceof Select) {
+        if ($build_info[$index] instanceof SelectInterface) {
           $query = clone $build_info[$index];
           $query->preExecute();
           $build_info[$index] = [
@@ -214,7 +222,7 @@ abstract class CachePluginBase extends PluginBase {
         'build_info' => $build_info,
       ];
       // @todo https://www.drupal.org/node/2433591 might solve it to not require
-      //    the pager information here.
+      //   the pager information here.
       $key_data['pager'] = [
         'page' => $this->view->getCurrentPage(),
         'items_per_page' => $this->view->getItemsPerPage(),
@@ -242,7 +250,7 @@ abstract class CachePluginBase extends PluginBase {
 
     if (!empty($entity_information)) {
       // Add the list cache tags for each entity type used by this view.
-      foreach ($entity_information as $table => $metadata) {
+      foreach ($entity_information as $metadata) {
         $tags = Cache::mergeTags($tags, \Drupal::entityTypeManager()->getDefinition($metadata['entity_type'])->getListCacheTags());
       }
     }
@@ -256,6 +264,7 @@ abstract class CachePluginBase extends PluginBase {
    * Gets the max age for the current view.
    *
    * @return int
+   *   The maximum age for the current view's cache.
    */
   public function getCacheMaxAge() {
     $max_age = $this->getDefaultCacheMaxAge();
@@ -332,8 +341,13 @@ abstract class CachePluginBase extends PluginBase {
    *
    * @return string[]
    *   The row cache keys.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There
+   * is no replacement.
+   * @see https://www.drupal.org/node/3564958
    */
   public function getRowCacheKeys(ResultRow $row) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3564958', E_USER_DEPRECATED);
     return [
       'views',
       'fields',
@@ -351,8 +365,13 @@ abstract class CachePluginBase extends PluginBase {
    *
    * @return string
    *   The row identifier.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There
+   * is no replacement.
+   * @see https://www.drupal.org/node/3564958
    */
   public function getRowId(ResultRow $row) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3564958', E_USER_DEPRECATED);
     // Here we compute a unique identifier for the row by computing the hash of
     // its data. We exclude the current index, since the same row could have a
     // different result index depending on the user permissions. We exclude also

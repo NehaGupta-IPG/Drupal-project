@@ -3,8 +3,10 @@
 namespace Drupal\block_content;
 
 use Drupal\Core\Entity\BundleEntityFormBase;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\language\Element\LanguageConfiguration;
 use Drupal\language\Entity\ContentLanguageSettings;
 
 /**
@@ -24,10 +26,10 @@ class BlockContentTypeForm extends BundleEntityFormBase {
     $block_type = $this->entity;
 
     if ($this->operation == 'add') {
-      $form['#title'] = $this->t('Add custom block type');
+      $form['#title'] = $this->t('Add block type');
     }
     else {
-      $form['#title'] = $this->t('Edit %label custom block type', ['%label' => $block_type->label()]);
+      $form['#title'] = $this->t('Edit %label block type', ['%label' => $block_type->label()]);
     }
 
     $form['label'] = [
@@ -35,7 +37,7 @@ class BlockContentTypeForm extends BundleEntityFormBase {
       '#title' => $this->t('Label'),
       '#maxlength' => 255,
       '#default_value' => $block_type->label(),
-      '#description' => $this->t("Provide a label for this block type to help identify it in the administration pages."),
+      '#description' => $this->t("The human-readable name for this block type, displayed on the <em>Block types</em> page."),
       '#required' => TRUE,
     ];
     $form['id'] = [
@@ -44,13 +46,14 @@ class BlockContentTypeForm extends BundleEntityFormBase {
       '#machine_name' => [
         'exists' => '\Drupal\block_content\Entity\BlockContentType::load',
       ],
+      '#description' => $this->t("Unique machine-readable name: lowercase letters, numbers, and underscores only."),
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
     ];
 
     $form['description'] = [
       '#type' => 'textarea',
       '#default_value' => $block_type->getDescription(),
-      '#description' => $this->t('Enter a description for this block type.'),
+      '#description' => $this->t('Displays on the <em>Block types</em> page.'),
       '#title' => $this->t('Description'),
     ];
 
@@ -78,7 +81,7 @@ class BlockContentTypeForm extends BundleEntityFormBase {
         '#default_value' => $language_configuration,
       ];
 
-      $form['#submit'][] = 'language_configuration_element_submit';
+      $form['#submit'][] = LanguageConfiguration::class . '::submit';
     }
 
     $form['actions'] = ['#type' => 'actions'];
@@ -93,6 +96,17 @@ class BlockContentTypeForm extends BundleEntityFormBase {
   /**
    * {@inheritdoc}
    */
+  protected function copyFormValuesToEntity(EntityInterface $entity, array $form, FormStateInterface $form_state) {
+    // An empty description violates config schema.
+    if (trim($form_state->getValue('description', '')) === '') {
+      $form_state->unsetValue('description');
+    }
+    parent::copyFormValuesToEntity($entity, $form, $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function save(array $form, FormStateInterface $form_state) {
     $block_type = $this->entity;
     $status = $block_type->save();
@@ -100,13 +114,12 @@ class BlockContentTypeForm extends BundleEntityFormBase {
     $edit_link = $this->entity->toLink($this->t('Edit'), 'edit-form')->toString();
     $logger = $this->logger('block_content');
     if ($status == SAVED_UPDATED) {
-      $this->messenger()->addStatus($this->t('Custom block type %label has been updated.', ['%label' => $block_type->label()]));
-      $logger->notice('Custom block type %label has been updated.', ['%label' => $block_type->label(), 'link' => $edit_link]);
+      $this->messenger()->addStatus($this->t('Block type %label has been updated.', ['%label' => $block_type->label()]));
+      $logger->notice('Block type %label has been updated.', ['%label' => $block_type->label(), 'link' => $edit_link]);
     }
     else {
-      block_content_add_body_field($block_type->id());
-      $this->messenger()->addStatus($this->t('Custom block type %label has been added.', ['%label' => $block_type->label()]));
-      $logger->notice('Custom block type %label has been added.', ['%label' => $block_type->label(), 'link' => $edit_link]);
+      $this->messenger()->addStatus($this->t('Block type %label has been added.', ['%label' => $block_type->label()]));
+      $logger->notice('Block type %label has been added.', ['%label' => $block_type->label(), 'link' => $edit_link]);
     }
 
     $form_state->setRedirectUrl($this->entity->toUrl('collection'));

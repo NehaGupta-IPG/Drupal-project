@@ -1,16 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the mini pager plugin.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\pager\Mini
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class MiniPagerTest extends ViewTestBase {
 
   /**
@@ -21,9 +26,7 @@ class MiniPagerTest extends ViewTestBase {
   public static $testViews = ['test_mini_pager'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node'];
 
@@ -39,8 +42,11 @@ class MiniPagerTest extends ViewTestBase {
    */
   protected $nodes;
 
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp($import_test_views);
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp($import_test_views = TRUE, $modules = ['views_test_config']): void {
+    parent::setUp($import_test_views, $modules);
 
     $this->drupalCreateContentType(['type' => 'page']);
     // Create a bunch of test nodes.
@@ -52,13 +58,13 @@ class MiniPagerTest extends ViewTestBase {
   /**
    * Tests the rendering of mini pagers.
    */
-  public function testMiniPagerRender() {
+  public function testMiniPagerRender(): void {
     // On first page, current page and next page link appear, previous page link
     // does not.
     $this->drupalGet('test_mini_pager');
     $this->assertSession()->pageTextContains('›› test');
     $this->assertSession()->pageTextContains('Page 1');
-    $this->assertNoText('‹‹ test');
+    $this->assertSession()->pageTextNotContains('‹‹ test');
     $this->assertSession()->pageTextContains($this->nodes[0]->label());
     $this->assertSession()->pageTextContains($this->nodes[1]->label());
     $this->assertSession()->pageTextContains($this->nodes[2]->label());
@@ -75,13 +81,13 @@ class MiniPagerTest extends ViewTestBase {
     // On last page, current page and previous page link appear, next page link
     // does not.
     $this->drupalGet('test_mini_pager', ['query' => ['page' => 6]]);
-    $this->assertNoText('›› test');
+    $this->assertSession()->pageTextNotContains('›› test');
     $this->assertSession()->pageTextContains('Page 7');
     $this->assertSession()->pageTextContains('‹‹ test');
     $this->assertSession()->pageTextContains($this->nodes[18]->label());
     $this->assertSession()->pageTextContains($this->nodes[19]->label());
 
-    // Test @total value in result summary
+    // Test @total value in result summary.
     $view = Views::getView('test_mini_pager');
     $view->setDisplay('page_4');
     $this->executeView($view);
@@ -106,16 +112,16 @@ class MiniPagerTest extends ViewTestBase {
     $this->assertSession()->pageTextContains($this->nodes[1]->label());
 
     $this->drupalGet('test_mini_pager_one', ['query' => ['page' => 19]]);
-    $this->assertNoText('››');
+    $this->assertSession()->pageTextNotContains('››');
     $this->assertSession()->pageTextContains('Page 20');
     $this->assertSession()->pageTextContains('‹‹');
     $this->assertSession()->pageTextContains($this->nodes[19]->label());
 
     // Test a mini pager with all items on the page. No pager should display.
     $this->drupalGet('test_mini_pager_all');
-    $this->assertNoText('‹‹ test');
-    $this->assertNoText('Page 1');
-    $this->assertNoText('test ››');
+    $this->assertSession()->pageTextNotContains('‹‹ test');
+    $this->assertSession()->pageTextNotContains('Page 1');
+    $this->assertSession()->pageTextNotContains('test ››');
     // Verify that all rows appear on the page.
     $this->assertSession()->elementsCount('xpath', "//div[contains(@class, 'views-row')]", count($this->nodes));
 
@@ -125,9 +131,9 @@ class MiniPagerTest extends ViewTestBase {
     }
 
     $this->drupalGet('test_mini_pager');
-    $this->assertNoText('‹‹ test');
-    $this->assertNoText('Page 1');
-    $this->assertNoText('‹‹ test');
+    $this->assertSession()->pageTextNotContains('‹‹ test');
+    $this->assertSession()->pageTextNotContains('Page 1');
+    $this->assertSession()->pageTextNotContains('‹‹ test');
     $this->assertSession()->pageTextContains($this->nodes[19]->label());
 
     $view = Views::getView('test_mini_pager');
@@ -138,9 +144,47 @@ class MiniPagerTest extends ViewTestBase {
     // Remove the last node as well and ensure that no "Page 1" is shown.
     $this->nodes[19]->delete();
     $this->drupalGet('test_mini_pager');
-    $this->assertNoText('‹‹ test');
-    $this->assertNoText('Page 1');
-    $this->assertNoText('‹‹ test');
+    $this->assertSession()->pageTextNotContains('‹‹ test');
+    $this->assertSession()->pageTextNotContains('Page 1');
+    $this->assertSession()->pageTextNotContains('‹‹ test');
+  }
+
+  /**
+   * Tests changing the heading level.
+   */
+  public function testPagerHeadingLevel(): void {
+    // Set "Pager Heading" to h3 and check that it is correct.
+    $view = Views::getView('test_mini_pager');
+    $view->setDisplay();
+    $pager = [
+      'type' => 'mini',
+      'options' => [
+        'pagination_heading_level' => 'h3',
+        'items_per_page' => 5,
+      ],
+    ];
+    $view->display_handler->setOption('pager', $pager);
+    $view->save();
+
+    // Stark and test_base_theme are handled below.
+    $themes = ['olivero', 'claro', 'starterkit_theme'];
+    $this->container->get('theme_installer')->install($themes);
+
+    foreach ($themes as $theme) {
+      $this->config('system.theme')->set('default', $theme)->save();
+      $this->drupalGet('test_mini_pager');
+      $this->assertEquals('h3', $this->assertSession()->elementExists('css', ".pager .visually-hidden")->getTagName());
+    }
+
+    // The core views template and test_base_theme use a different class
+    // structure than other core themes.
+    $themes = ['stark', 'test_base_theme'];
+    $this->container->get('theme_installer')->install($themes);
+    foreach ($themes as $theme) {
+      $this->config('system.theme')->set('default', $theme)->save();
+      $this->drupalGet('test_mini_pager');
+      $this->assertEquals('h3', $this->assertSession()->elementExists('css', "#pagination-heading")->getTagName());
+    }
   }
 
 }

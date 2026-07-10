@@ -1,12 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block\Functional\Rest;
 
 use Drupal\block\Entity\Block;
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase;
+use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
 
-abstract class BlockResourceTestBase extends EntityResourceTestBase {
+/**
+ * Resource test base for the block entity.
+ */
+abstract class BlockResourceTestBase extends ConfigEntityResourceTestBase {
 
   /**
    * {@inheritdoc}
@@ -50,7 +55,7 @@ abstract class BlockResourceTestBase extends EntityResourceTestBase {
       'plugin' => 'llama_block',
       'region' => 'header',
       'id' => 'llama',
-      'theme' => 'classy',
+      'theme' => 'stark',
     ]);
     // All blocks can be viewed by the anonymous user by default. An interesting
     // side effect of this is that any anonymous user is also able to read the
@@ -80,15 +85,15 @@ abstract class BlockResourceTestBase extends EntityResourceTestBase {
     $normalization = [
       'uuid' => $this->entity->uuid(),
       'id' => 'llama',
-      'weight' => NULL,
+      'weight' => 0,
       'langcode' => 'en',
       'status' => TRUE,
       'dependencies' => [
         'theme' => [
-          'classy',
+          'stark',
         ],
       ],
-      'theme' => 'classy',
+      'theme' => 'stark',
       'region' => 'header',
       'provider' => NULL,
       'plugin' => 'llama_block',
@@ -109,6 +114,7 @@ abstract class BlockResourceTestBase extends EntityResourceTestBase {
    */
   protected function getNormalizedPostEntity() {
     // @todo Update in https://www.drupal.org/node/2300677.
+    return [];
   }
 
   /**
@@ -116,7 +122,9 @@ abstract class BlockResourceTestBase extends EntityResourceTestBase {
    */
   protected function getExpectedCacheContexts() {
     // @see ::createEntity()
-    return ['url.site'];
+    // 'session' is bubbled by URL generation for CSRF-protected routes
+    // referenced in the response normalization.
+    return ['session', 'url.site'];
   }
 
   /**
@@ -158,8 +166,8 @@ abstract class BlockResourceTestBase extends EntityResourceTestBase {
   protected function getExpectedUnauthorizedEntityAccessCacheability($is_authenticated) {
     // @see \Drupal\block\BlockAccessControlHandler::checkAccess()
     return parent::getExpectedUnauthorizedEntityAccessCacheability($is_authenticated)
+      ->addCacheTags($this->entity->getCacheTags())
       ->addCacheTags([
-        'config:block.block.llama',
         $is_authenticated ? 'user:2' : 'user:0',
       ]);
   }

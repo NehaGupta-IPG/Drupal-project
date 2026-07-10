@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Config\Storage;
 
 use Drupal\KernelTests\KernelTestBase;
@@ -19,11 +21,15 @@ use Drupal\KernelTests\KernelTestBase;
 abstract class ConfigStorageTestBase extends KernelTestBase {
 
   /**
+   * The configuration storage.
+   *
    * @var \Drupal\Core\Config\StorageInterface
    */
   protected $storage;
 
   /**
+   * An invalid configuration storage.
+   *
    * @var \Drupal\Core\Config\StorageInterface
    */
   protected $invalidStorage;
@@ -33,11 +39,17 @@ abstract class ConfigStorageTestBase extends KernelTestBase {
    *
    * @todo Coverage: Trigger PDOExceptions / Database exceptions.
    */
-  public function testCRUD() {
+  public function testCRUD(): void {
     $name = 'config_test.storage';
 
     // Checking whether a non-existing name exists returns FALSE.
     $this->assertFalse($this->storage->exists($name));
+
+    // Checking whether readMultiple() works with empty storage.
+    $this->assertEmpty($this->storage->readMultiple([$name]));
+
+    // readMultiple() accepts an empty array.
+    $this->assertSame([], $this->storage->readMultiple([]), 'Empty query should return empty array');
 
     // Reading a non-existing name returns FALSE.
     $data = $this->storage->read($name);
@@ -54,11 +66,12 @@ abstract class ConfigStorageTestBase extends KernelTestBase {
     // Checking whether an existing name exists returns TRUE.
     $this->assertTrue($this->storage->exists($name));
 
-    // Writing the identical data again still returns TRUE.
-    $result = $this->storage->write($name, $data);
-    $this->assertTrue($result);
+    // Writing and re-reading the identical data again still returns it.
+    $this->storage->write($name, $data);
+    $this->assertSame($data, $this->read($name));
 
     // Listing all names returns all.
+    $this->storage->write('system.performance', []);
     $names = $this->storage->listAll();
     $this->assertContains('system.performance', $names);
     $this->assertContains($name, $names);
@@ -116,7 +129,7 @@ abstract class ConfigStorageTestBase extends KernelTestBase {
   /**
    * Tests an invalid storage.
    */
-  public function testInvalidStorage() {
+  public function testInvalidStorage(): void {
     $name = 'config_test.storage';
 
     // Write something to the valid storage to prove that the storages do not
@@ -137,7 +150,7 @@ abstract class ConfigStorageTestBase extends KernelTestBase {
       $this->invalidStorage->delete($name);
       $this->fail('Exception not thrown upon deleting from a non-existing storage bin.');
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       // An exception occurred as expected; just continue.
     }
 
@@ -158,7 +171,7 @@ abstract class ConfigStorageTestBase extends KernelTestBase {
   /**
    * Tests storage writing and reading data preserving data type.
    */
-  public function testDataTypes() {
+  public function testDataTypes(): void {
     $name = 'config_test.types';
     $data = [
       'array' => [],
@@ -182,7 +195,7 @@ abstract class ConfigStorageTestBase extends KernelTestBase {
   /**
    * Tests that the storage supports collections.
    */
-  public function testCollection() {
+  public function testCollection(): void {
     $name = 'config_test.storage';
     $data = ['foo' => 'bar'];
     $result = $this->storage->write($name, $data);
@@ -213,7 +226,7 @@ abstract class ConfigStorageTestBase extends KernelTestBase {
     $this->assertEquals([], $another_storage->listAll());
     $another_storage->write($name, $new_data);
     $this->assertTrue($result);
-    $this->assertSame($new_data, $another_storage->read($name));
+    $this->assertEquals($new_data, $another_storage->read($name));
     $this->assertEquals([$name], $another_storage->listAll());
     $this->assertTrue($another_storage->exists($name));
 
@@ -221,7 +234,7 @@ abstract class ConfigStorageTestBase extends KernelTestBase {
     $alt_storage = $this->storage->createCollection('alternate');
     $alt_storage->write($name, $new_data);
     $this->assertTrue($result);
-    $this->assertSame($new_data, $alt_storage->read($name));
+    $this->assertEquals($new_data, $alt_storage->read($name));
 
     // Switch back to the collection-less mode and check the data still exists
     // add has not been touched.
@@ -242,7 +255,7 @@ abstract class ConfigStorageTestBase extends KernelTestBase {
     $this->assertEquals([], $parent_storage->listAll());
     $parent_storage->write($name, $new_data);
     $this->assertTrue($result);
-    $this->assertSame($new_data, $parent_storage->read($name));
+    $this->assertEquals($new_data, $parent_storage->read($name));
     $this->assertEquals([$name], $parent_storage->listAll());
     $this->assertTrue($parent_storage->exists($name));
     $this->assertSame(['collection', 'collection.sub.another', 'collection.sub.new'], $this->storage->getAllCollectionNames());
@@ -265,12 +278,24 @@ abstract class ConfigStorageTestBase extends KernelTestBase {
     $this->assertSame(['collection.sub.another', 'collection.sub.new'], $this->storage->getAllCollectionNames());
   }
 
-  abstract protected function read($name);
+  /**
+   * Reads configuration data from the storage.
+   */
+  abstract protected function read($name): array|object;
 
-  abstract protected function insert($name, $data);
+  /**
+   * Inserts configuration data in the storage.
+   */
+  abstract protected function insert($name, $data): void;
 
-  abstract protected function update($name, $data);
+  /**
+   * Updates configuration data in the storage.
+   */
+  abstract protected function update($name, $data): void;
 
-  abstract protected function delete($name);
+  /**
+   * Deletes configuration data from the storage.
+   */
+  abstract protected function delete($name): void;
 
 }

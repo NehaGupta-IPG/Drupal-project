@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Plugin\Context;
 
-use Drupal\Component\Plugin\ConfigurableInterface;
 use Drupal\Component\Plugin\Context\ContextInterface as ComponentContextInterface;
 use Drupal\Component\Plugin\Definition\ContextAwarePluginDefinitionInterface;
 use Drupal\Component\Plugin\Definition\ContextAwarePluginDefinitionTrait;
@@ -17,53 +18,45 @@ use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\Plugin\DataType\StringData;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\Tests\Traits\ExpectDeprecationTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore sisko
 /**
- * @coversDefaultClass \Drupal\Core\Plugin\ContextAwarePluginTrait
- *
- * @group Plugin
+ * Tests Drupal\Core\Plugin\ContextAwarePluginTrait.
  */
+#[CoversClass(ContextAwarePluginTrait::class)]
+#[Group('Plugin')]
+#[RunTestsInSeparateProcesses]
 class ContextAwarePluginTraitTest extends KernelTestBase {
-
-  use ExpectDeprecationTrait;
 
   /**
    * The plugin instance under test.
-   *
-   * @var \Drupal\Core\Plugin\ContextAwarePluginTrait
    */
-  private $plugin;
-
-  /**
-   * The configurable plugin instance under test.
-   *
-   * @var \Drupal\Core\Plugin\ContextAwarePluginTrait
-   */
-  private $configurablePlugin;
+  private TestContextAwarePlugin $plugin;
 
   /**
    * {@inheritdoc}
    */
-  public function setUp(): void {
+  protected function setUp(): void {
     parent::setUp();
     $plugin_definition = new TestContextAwarePluginDefinition();
     $plugin_definition->addContextDefinition('nato_letter', ContextDefinition::create('string'));
     $this->plugin = new TestContextAwarePlugin([], 'the_sisko', $plugin_definition);
-    $this->configurablePlugin = new TestConfigurableContextAwarePlugin([], 'the_sisko', $plugin_definition);
   }
 
   /**
-   * @covers ::getContextDefinitions
+   * Tests get context definitions.
    */
-  public function testGetContextDefinitions() {
+  public function testGetContextDefinitions(): void {
     $this->assertIsArray($this->plugin->getContextDefinitions());
   }
 
   /**
-   * @covers ::getContextDefinition
+   * Tests get context definition.
    */
-  public function testGetContextDefinition() {
+  public function testGetContextDefinition(): void {
     // The context is not defined, so an exception will be thrown.
     $this->expectException(ContextException::class);
     $this->expectExceptionMessage('The person context is not a valid context.');
@@ -71,45 +64,17 @@ class ContextAwarePluginTraitTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::getContextValue
+   * Tests get context value.
    */
-  public function testGetContextValue() {
+  public function testGetContextValue(): void {
     $this->plugin->setContextValue('nato_letter', 'Alpha');
     $this->assertSame('Alpha', $this->plugin->getContextValue('nato_letter'));
   }
 
   /**
-   * @covers ::getContextValue
-   * @group legacy
+   * Tests set context value.
    */
-  public function testGetContextValueFromConfiguration() {
-    $this->expectDeprecation('Passing context values to plugins via configuration is deprecated in drupal:9.1.0 and will be removed before drupal:10.0.0. Instead, call ::setContextValue() on the plugin itself. See https://www.drupal.org/node/3120980');
-    $configuration = [
-      'context' => [
-        'nato_letter' => 'Alpha',
-      ],
-    ];
-    $this->plugin = new TestContextAwarePlugin($configuration, 'the_sisko', $this->plugin->getPluginDefinition());
-    // Assert that the context value passed in the plugin configuration is
-    // available.
-    $this->assertSame('Alpha', $this->plugin->getContextValue('nato_letter'));
-  }
-
-  /**
-   * @covers ::getContextValue
-   * @group legacy
-   */
-  public function testConfigurableGetContextValueFromConfiguration() {
-    $this->expectDeprecation('Passing context values to plugins via configuration is deprecated in drupal:9.1.0 and will be removed before drupal:10.0.0. Instead, call ::setContextValue() on the plugin itself. See https://www.drupal.org/node/3120980');
-    // Assert that the context value passed in the plugin configuration is
-    // available.
-    $this->assertSame('Alpha', $this->configurablePlugin->getContextValue('nato_letter'));
-  }
-
-  /**
-   * @covers ::setContextValue
-   */
-  public function testSetContextValue() {
+  public function testSetContextValue(): void {
     $typed_data_manager = $this->prophesize(TypedDataManagerInterface::class);
     $container = new ContainerBuilder();
     $container->set('typed_data_manager', $typed_data_manager->reveal());
@@ -124,12 +89,18 @@ class ContextAwarePluginTraitTest extends KernelTestBase {
 
 }
 
+/**
+ * A plugin definition test class.
+ */
 class TestContextAwarePluginDefinition extends PluginDefinition implements ContextAwarePluginDefinitionInterface {
 
   use ContextAwarePluginDefinitionTrait;
 
 }
 
+/**
+ * Context aware plugin test class.
+ */
 class TestContextAwarePlugin extends PluginBase implements ContextAwarePluginInterface {
 
   use ContextAwarePluginTrait {
@@ -146,39 +117,9 @@ class TestContextAwarePlugin extends PluginBase implements ContextAwarePluginInt
   /**
    * {@inheritdoc}
    */
-  public function setContext($name, ComponentContextInterface $context) {
+  public function setContext($name, ComponentContextInterface $context): void {
     $this->setContextTrait($name, $context);
     $this->setContextCalled = TRUE;
-  }
-
-}
-
-class TestConfigurableContextAwarePlugin extends PluginBase implements ConfigurableInterface, ContextAwarePluginInterface {
-
-  use ContextAwarePluginTrait;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function defaultConfiguration() {
-    return [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getConfiguration() {
-    return [
-      'context' => [
-        'nato_letter' => 'Alpha',
-      ],
-    ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setConfiguration(array $configuration) {
   }
 
 }

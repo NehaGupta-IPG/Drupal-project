@@ -1,20 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\language\Functional;
 
+use Drupal\language\Form\ContentLanguageSettingsForm;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\language\Traits\LanguageTestTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the content translation settings language selector options.
- *
- * @group language
  */
+#[Group('language')]
+#[CoversClass(ContentLanguageSettingsForm::class)]
+#[RunTestsInSeparateProcesses]
 class LanguageSelectorTranslatableTest extends BrowserTestBase {
 
+  use LanguageTestTrait;
+
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'language',
@@ -52,7 +60,7 @@ class LanguageSelectorTranslatableTest extends BrowserTestBase {
   /**
    * Returns an array of permissions needed for the translator.
    */
-  protected function getAdministratorPermissions() {
+  protected function getAdministratorPermissions(): array {
     return array_filter(
       ['translate interface',
         'administer content translation',
@@ -67,11 +75,9 @@ class LanguageSelectorTranslatableTest extends BrowserTestBase {
   /**
    * Tests content translation language selectors are correctly translated.
    */
-  public function testLanguageStringSelector() {
+  public function testLanguageStringSelector(): void {
     // Add another language.
-    $edit = ['predefined_langcode' => 'es'];
-    $this->drupalGet('admin/config/regional/language/add');
-    $this->submitForm($edit, 'Add language');
+    static::createLanguageFromLangcode('es');
 
     // Translate the string English in Spanish (Inglés). Override config entity.
     $name_translation = 'Inglés';
@@ -89,6 +95,20 @@ class LanguageSelectorTranslatableTest extends BrowserTestBase {
 
     // Check that the language text is translated.
     $this->assertSame($name_translation, $option->getText());
+  }
+
+  /**
+   * Tests that correct title is displayed for content translation page.
+   */
+  public function testContentTranslationPageTitle(): void {
+    $this->drupalGet('admin/config/regional/content-language');
+    $this->assertSession()->pageTextContains('Content language and translation');
+    $this->assertSession()->pageTextNotMatches('#Content language$#');
+
+    \Drupal::service('module_installer')->uninstall(['content_translation']);
+    $this->drupalGet('admin/config/regional/content-language');
+    $this->assertSession()->pageTextContains('Content language');
+    $this->assertSession()->pageTextNotContains('Content language and translation');
   }
 
 }

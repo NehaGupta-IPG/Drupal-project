@@ -33,7 +33,14 @@ abstract class StorageBase implements KeyValueStoreInterface {
    */
   public function get($key, $default = NULL) {
     $values = $this->getMultiple([$key]);
-    return isset($values[$key]) ? $values[$key] : $default;
+    return $values[$key] ?? $default;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAllKeys(): iterable {
+    return array_keys($this->getAll());
   }
 
   /**

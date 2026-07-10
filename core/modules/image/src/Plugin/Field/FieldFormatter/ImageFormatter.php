@@ -3,72 +3,46 @@
 namespace Drupal\image\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\image\Entity\ImageStyle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Cache\Cache;
+use Drupal\image\ImageDerivativeUtilities;
 
 /**
  * Plugin implementation of the 'image' formatter.
- *
- * @FieldFormatter(
- *   id = "image",
- *   label = @Translation("Image"),
- *   field_types = {
- *     "image"
- *   },
- *   quickedit = {
- *     "editor" = "image"
- *   }
- * )
  */
+#[FieldFormatter(
+  id: 'image',
+  label: new TranslatableMarkup('Image'),
+  field_types: [
+    'image',
+  ],
+)]
 class ImageFormatter extends ImageFormatterBase {
 
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $currentUser;
-
-  /**
-   * The image style entity storage.
-   *
-   * @var \Drupal\image\ImageStyleStorageInterface
-   */
-  protected $imageStyleStorage;
-
-  /**
-   * Constructs an ImageFormatter object.
-   *
-   * @param string $plugin_id
-   *   The plugin_id for the formatter.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
-   *   The definition of the field to which the formatter is associated.
-   * @param array $settings
-   *   The formatter settings.
-   * @param string $label
-   *   The formatter label display setting.
-   * @param string $view_mode
-   *   The view mode.
-   * @param array $third_party_settings
-   *   Any third party settings settings.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $image_style_storage
-   *   The image style storage.
-   */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, AccountInterface $current_user, EntityStorageInterface $image_style_storage) {
+  public function __construct(
+    $plugin_id,
+    $plugin_definition,
+    FieldDefinitionInterface $field_definition,
+    array $settings,
+    $label,
+    $view_mode,
+    array $third_party_settings,
+    protected AccountInterface $currentUser,
+    protected EntityStorageInterface $imageStyleStorage,
+    protected FileUrlGeneratorInterface $fileUrlGenerator,
+    protected ImageDerivativeUtilities $imageDerivativeUtilities,
+  ) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
-    $this->currentUser = $current_user;
-    $this->imageStyleStorage = $image_style_storage;
   }
 
   /**
@@ -84,7 +58,9 @@ class ImageFormatter extends ImageFormatterBase {
       $configuration['view_mode'],
       $configuration['third_party_settings'],
       $container->get('current_user'),
-      $container->get('entity_type.manager')->getStorage('image_style')
+      $container->get('entity_type.manager')->getStorage('image_style'),
+      $container->get('file_url_generator'),
+      $container->get(ImageDerivativeUtilities::class)
     );
   }
 
@@ -95,6 +71,9 @@ class ImageFormatter extends ImageFormatterBase {
     return [
       'image_style' => '',
       'image_link' => '',
+      'image_loading' => [
+        'attribute' => 'lazy',
+      ],
     ] + parent::defaultSettings();
   }
 
@@ -102,32 +81,57 @@ class ImageFormatter extends ImageFormatterBase {
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
-    $image_styles = image_style_options(FALSE);
+    $element = parent::settingsForm($form, $form_state);
+
+    $image_styles = $this->imageDerivativeUtilities->styleOptions(FALSE);
     $description_link = Link::fromTextAndUrl(
       $this->t('Configure Image Styles'),
       Url::fromRoute('entity.image_style.collection')
     );
     $element['image_style'] = [
-      '#title' => t('Image style'),
+      '#title' => $this->t('Image style'),
       '#type' => 'select',
       '#default_value' => $this->getSetting('image_style'),
-      '#empty_option' => t('None (original image)'),
+      '#empty_option' => $this->t('None (original image)'),
       '#options' => $image_styles,
       '#description' => $description_link->toRenderable() + [
         '#access' => $this->currentUser->hasPermission('administer image styles'),
       ],
     ];
     $link_types = [
-      'content' => t('Content'),
-      'file' => t('File'),
+      'content' => $this->t('Content'),
+      'file' => $this->t('File'),
     ];
     $element['image_link'] = [
-      '#title' => t('Link image to'),
+      '#title' => $this->t('Link image to'),
       '#type' => 'select',
       '#default_value' => $this->getSetting('image_link'),
-      '#empty_option' => t('Nothing'),
+      '#empty_option' => $this->t('Nothing'),
       '#options' => $link_types,
     ];
+
+    $image_loading = $this->getSetting('image_loading');
+    $element['image_loading'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Image loading'),
+      '#weight' => 10,
+      '#description' => $this->t('Lazy render images with native image loading attribute (<em>loading="lazy"</em>). This improves performance by allowing browsers to lazily load images.'),
+    ];
+    $loading_attribute_options = [
+      'lazy' => $this->t('Lazy (<em>loading="lazy"</em>)'),
+      'eager' => $this->t('Eager (<em>loading="eager"</em>)'),
+    ];
+    $element['image_loading']['attribute'] = [
+      '#title' => $this->t('Image loading attribute'),
+      '#type' => 'radios',
+      '#default_value' => $image_loading['attribute'],
+      '#options' => $loading_attribute_options,
+      '#description' => $this->t('Select the loading attribute for images. <a href=":link">Learn more about the loading attribute for images.</a>', [
+        ':link' => 'https://html.spec.whatwg.org/multipage/urls-and-fetching.html#lazy-loading-attributes',
+      ]),
+    ];
+    $element['image_loading']['attribute']['lazy']['#description'] = $this->t('Delays loading the image until that section of the page is visible in the browser. When in doubt, lazy loading is recommended.');
+    $element['image_loading']['attribute']['eager']['#description'] = $this->t('Force browsers to download an image as soon as possible. This is the browser default for legacy reasons. Only use this option when the image is always expected to render.');
 
     return $element;
   }
@@ -138,22 +142,22 @@ class ImageFormatter extends ImageFormatterBase {
   public function settingsSummary() {
     $summary = [];
 
-    $image_styles = image_style_options(FALSE);
+    $image_styles = $this->imageDerivativeUtilities->styleOptions(FALSE);
     // Unset possible 'No defined styles' option.
     unset($image_styles['']);
     // Styles could be lost because of enabled/disabled modules that defines
     // their styles in code.
     $image_style_setting = $this->getSetting('image_style');
     if (isset($image_styles[$image_style_setting])) {
-      $summary[] = t('Image style: @style', ['@style' => $image_styles[$image_style_setting]]);
+      $summary[] = $this->t('Image style: @style', ['@style' => $image_styles[$image_style_setting]]);
     }
     else {
-      $summary[] = t('Original image');
+      $summary[] = $this->t('Original image');
     }
 
     $link_types = [
-      'content' => t('Linked to content'),
-      'file' => t('Linked to file'),
+      'content' => $this->t('Linked to content'),
+      'file' => $this->t('Linked to file'),
     ];
     // Display this setting only if image is linked.
     $image_link_setting = $this->getSetting('image_link');
@@ -161,7 +165,12 @@ class ImageFormatter extends ImageFormatterBase {
       $summary[] = $link_types[$image_link_setting];
     }
 
-    return $summary;
+    $image_loading = $this->getSetting('image_loading');
+    $summary[] = $this->t('Image loading: @attribute', [
+      '@attribute' => $image_loading['attribute'],
+    ]);
+
+    return array_merge($summary, parent::settingsSummary());
   }
 
   /**
@@ -199,34 +208,29 @@ class ImageFormatter extends ImageFormatterBase {
     }
 
     foreach ($files as $delta => $file) {
-      $cache_contexts = [];
       if (isset($link_file)) {
         $image_uri = $file->getFileUri();
-        // @todo Wrap in file_url_transform_relative(). This is currently
-        // impossible. As a work-around, we currently add the 'url.site' cache
-        // context to ensure different file URLs are generated for different
-        // sites in a multisite setup, including HTTP and HTTPS versions of the
-        // same site. Fix in https://www.drupal.org/node/2646744.
-        $url = Url::fromUri(file_create_url($image_uri));
-        $cache_contexts[] = 'url.site';
+        $url = $this->fileUrlGenerator->generate($image_uri);
       }
       $cache_tags = Cache::mergeTags($base_cache_tags, $file->getCacheTags());
 
       // Extract field item attributes for the theme function, and unset them
       // from the $item so that the field template does not re-render them.
       $item = $file->_referringItem;
-      $item_attributes = $item->_attributes;
+      $attributes = $item->_attributes;
       unset($item->_attributes);
+
+      $image_loading_settings = $this->getSetting('image_loading');
+      $attributes['loading'] = $image_loading_settings['attribute'];
 
       $elements[$delta] = [
         '#theme' => 'image_formatter',
         '#item' => $item,
-        '#item_attributes' => $item_attributes,
+        '#attributes' => $attributes,
         '#image_style' => $image_style_setting,
         '#url' => $url,
         '#cache' => [
           'tags' => $cache_tags,
-          'contexts' => $cache_contexts,
         ],
       ];
     }

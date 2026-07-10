@@ -1,19 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Functional;
 
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
-use Drupal\Core\Language\LanguageInterface;
+use Drupal\comment\CommentingStatus;
 use Drupal\comment\CommentInterface;
 use Drupal\comment\CommentManagerInterface;
-use Drupal\user\RoleInterface;
 use Drupal\comment\Entity\Comment;
+use Drupal\comment\FormLocation;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Basic comment links tests to ensure markup present.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentLinksTest extends CommentTestBase {
 
   /**
@@ -47,13 +52,7 @@ class CommentLinksTest extends CommentTestBase {
   /**
    * Tests that comment links are output and can be hidden.
    */
-  public function testCommentLinks() {
-    // Bartik theme alters comment links, so use a different theme.
-    \Drupal::service('theme_installer')->install(['stark']);
-    $this->config('system.theme')
-      ->set('default', 'stark')
-      ->save();
-
+  public function testCommentLinks(): void {
     // Remove additional user permissions from $this->webUser added by setUp(),
     // since this test is limited to anonymous and authenticated roles only.
     $roles = $this->webUser->getRoles();
@@ -88,9 +87,8 @@ class CommentLinksTest extends CommentTestBase {
     $this->assertSession()->linkExists('Reply');
 
     // Change comment settings.
-    $this->setCommentSettings('form_location', CommentItemInterface::FORM_BELOW, 'Set comment form location');
-    $this->setCommentAnonymous(TRUE);
-    $this->node->comment = CommentItemInterface::OPEN;
+    $this->setCommentSettings('form_location', FormLocation::Below->value, 'Set comment form location');
+    $this->node->comment = CommentingStatus::Open->value;
     $this->node->save();
 
     // Change user permissions.

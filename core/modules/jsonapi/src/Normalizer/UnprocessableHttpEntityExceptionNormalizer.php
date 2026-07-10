@@ -19,16 +19,9 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  * @see https://www.drupal.org/project/drupal/issues/3032787
  * @see jsonapi.api.php
  *
- * @see http://jsonapi.org/format/#error-objects
+ * @see https://jsonapi.org/format/#error-objects
  */
 class UnprocessableHttpEntityExceptionNormalizer extends HttpExceptionNormalizer {
-
-  /**
-   * The interface or class that this Normalizer supports.
-   *
-   * @var string
-   */
-  protected $supportedInterfaceOrClass = UnprocessableHttpEntityException::class;
 
   /**
    * {@inheritdoc}
@@ -76,6 +69,15 @@ class UnprocessableHttpEntityExceptionNormalizer extends HttpExceptionNormalizer
     }
 
     return $errors;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSupportedTypes(?string $format): array {
+    return [
+      UnprocessableHttpEntityException::class => TRUE,
+    ];
   }
 
 }

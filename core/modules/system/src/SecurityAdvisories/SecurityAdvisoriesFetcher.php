@@ -9,12 +9,14 @@ use Drupal\Core\Extension\ProfileExtensionList;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\Utility\Error;
 use Drupal\Core\Utility\ProjectInfo;
 use Drupal\Core\Extension\ExtensionVersion;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\TransferException;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\RequestOptions;
+use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Defines a service to get security advisories.
@@ -34,13 +36,6 @@ final class SecurityAdvisoriesFetcher {
   protected $config;
 
   /**
-   * The HTTP client.
-   *
-   * @var \GuzzleHttp\Client
-   */
-  protected $httpClient;
-
-  /**
    * The expirable key/value store for the advisories JSON response.
    *
    * @var \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface
@@ -55,47 +50,29 @@ final class SecurityAdvisoriesFetcher {
   protected $extensionLists = [];
 
   /**
-   * The logger.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
    * Whether to fall back to HTTP if the HTTPS request fails.
    *
    * @var bool
    */
   protected $withHttpFallback;
 
-  /**
-   * Constructs a new SecurityAdvisoriesFetcher object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface $key_value_factory
-   *   The expirable key/value factory.
-   * @param \GuzzleHttp\Client $client
-   *   The HTTP client.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $module_list
-   *   The module extension list.
-   * @param \Drupal\Core\Extension\ThemeExtensionList $theme_list
-   *   The theme extension list.
-   * @param \Drupal\Core\Extension\ProfileExtensionList $profile_list
-   *   The profile extension list.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   The logger.
-   * @param \Drupal\Core\Site\Settings $settings
-   *   The settings instance.
-   */
-  public function __construct(ConfigFactoryInterface $config_factory, KeyValueExpirableFactoryInterface $key_value_factory, Client $client, ModuleExtensionList $module_list, ThemeExtensionList $theme_list, ProfileExtensionList $profile_list, LoggerInterface $logger, Settings $settings) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    #[Autowire(service: 'keyvalue.expirable')]
+    KeyValueExpirableFactoryInterface $key_value_factory,
+    protected ClientInterface $httpClient,
+    ModuleExtensionList $module_list,
+    ThemeExtensionList $theme_list,
+    ProfileExtensionList $profile_list,
+    #[Autowire(service: 'logger.channel.system')]
+    protected LoggerInterface $logger,
+    Settings $settings,
+  ) {
     $this->config = $config_factory->get('system.advisories');
     $this->keyValueExpirable = $key_value_factory->get('system');
-    $this->httpClient = $client;
     $this->extensionLists['module'] = $module_list;
     $this->extensionLists['theme'] = $theme_list;
     $this->extensionLists['profile'] = $profile_list;
-    $this->logger = $logger;
     $this->withHttpFallback = $settings->get('update_fetch_with_http_fallback', FALSE);
   }
 
@@ -114,7 +91,7 @@ final class SecurityAdvisoriesFetcher {
    *   retrieving the JSON feed, or if there was no stored response and
    *   $allow_outgoing_request was set to FALSE.
    *
-   * @throws \GuzzleHttp\Exception\TransferException
+   * @throws \Psr\Http\Client\ClientExceptionInterface
    *   Thrown if an error occurs while retrieving security advisories.
    */
   public function getSecurityAdvisories(bool $allow_outgoing_request = TRUE, int $timeout = 0): ?array {
@@ -152,7 +129,7 @@ final class SecurityAdvisoriesFetcher {
         // Ignore items in the feed that are in an invalid format. Although
         // this is highly unlikely we should still display the items that are
         // in the correct format.
-        watchdog_exception('system', $unexpected_value_exception, 'Invalid security advisory format: ' . Json::encode($advisory_data));
+        Error::logException($this->logger, $unexpected_value_exception, 'Invalid security advisory format: @advisory', ['@advisory' => Json::encode($advisory_data)]);
         continue;
       }
 
@@ -197,7 +174,7 @@ final class SecurityAdvisoriesFetcher {
           try {
             $insecure_project_version = ExtensionVersion::createFromVersionString($insecure_version);
           }
-          catch (\UnexpectedValueException $exception) {
+          catch (\UnexpectedValueException) {
             // An invalid version string should not halt the evaluation of valid
             // versions in $insecure_versions. Version numbers that start with
             // core prefix besides '8.x-' are allowed in $insecure_versions,
@@ -320,8 +297,8 @@ final class SecurityAdvisoriesFetcher {
       try {
         $response = $this->httpClient->get('https://updates.drupal.org/psa.json', $options);
       }
-      catch (TransferException $exception) {
-        watchdog_exception('system', $exception);
+      catch (ClientExceptionInterface $exception) {
+        Error::logException($this->logger, $exception);
         $response = $this->httpClient->get('http://updates.drupal.org/psa.json', $options);
       }
     }

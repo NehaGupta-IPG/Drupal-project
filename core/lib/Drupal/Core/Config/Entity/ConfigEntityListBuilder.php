@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Config\Entity;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
 
@@ -11,6 +12,13 @@ use Drupal\Core\Entity\EntityListBuilder;
  * @ingroup entity_api
  */
 class ConfigEntityListBuilder extends EntityListBuilder {
+
+  /**
+   * The config entity storage class.
+   *
+   * @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface
+   */
+  protected $storage;
 
   /**
    * {@inheritdoc}
@@ -28,21 +36,21 @@ class ConfigEntityListBuilder extends EntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  public function getDefaultOperations(EntityInterface $entity) {
+  protected function getDefaultOperations(EntityInterface $entity, CacheableMetadata $cacheability) {
     /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
-    $operations = parent::getDefaultOperations($entity);
+    $operations = parent::getDefaultOperations($entity, $cacheability);
 
     if ($this->entityType->hasKey('status')) {
       if (!$entity->status() && $entity->hasLinkTemplate('enable')) {
         $operations['enable'] = [
-          'title' => t('Enable'),
+          'title' => $this->t('Enable'),
           'weight' => -10,
           'url' => $this->ensureDestination($entity->toUrl('enable')),
         ];
       }
       elseif ($entity->hasLinkTemplate('disable')) {
         $operations['disable'] = [
-          'title' => t('Disable'),
+          'title' => $this->t('Disable'),
           'weight' => 40,
           'url' => $this->ensureDestination($entity->toUrl('disable')),
         ];
@@ -50,6 +58,16 @@ class ConfigEntityListBuilder extends EntityListBuilder {
     }
 
     return $operations;
+  }
+
+  /**
+   * Gets the config entity storage.
+   *
+   * @return \Drupal\Core\Config\Entity\ConfigEntityStorageInterface
+   *   The config storage used by this list builder.
+   */
+  public function getStorage(): ConfigEntityStorageInterface {
+    return $this->storage;
   }
 
 }

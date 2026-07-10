@@ -1,34 +1,39 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Block;
 
 use Drupal\block_test\Plugin\Block\TestBlockInstantiation;
+use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Transliteration\PhpTransliteration;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
+// cspell:ignore adminlabel
 /**
- * @coversDefaultClass \Drupal\Core\Block\BlockBase
- * @group block
+ * Tests Drupal\Core\Block\BlockBase.
  */
+#[CoversClass(BlockBase::class)]
+#[Group('block')]
 class BlockBaseTest extends UnitTestCase {
 
   /**
    * Tests the machine name suggestion.
-   *
-   * @see \Drupal\Core\Block\BlockBase::getMachineNameSuggestion()
    *
    * @param string $label
    *   The block label.
    * @param string $expected
    *   The expected machine name.
    *
-   * @dataProvider providerTestGetMachineNameSuggestion()
+   * @see \Drupal\Core\Block\BlockBase::getMachineNameSuggestion()
    */
-  public function testGetMachineNameSuggestion($label, $expected) {
-    $module_handler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
-    $transliteration = $this->getMockBuilder('Drupal\Core\Transliteration\PhpTransliteration')
-      ->setConstructorArgs([NULL, $module_handler])
-      ->setMethods(['readLanguageOverrides'])
-      ->getMock();
+  #[DataProvider('providerTestGetMachineNameSuggestion')]
+  public function testGetMachineNameSuggestion(string $label, string $expected): void {
+    $transliteration = new PhpTransliteration(NULL, $this->createStub(ModuleHandlerInterface::class));
 
     $config = [];
     $definition = [
@@ -43,9 +48,10 @@ class BlockBaseTest extends UnitTestCase {
   /**
    * Provides data for testGetMachineNameSuggestion().
    */
-  public function providerTestGetMachineNameSuggestion() {
+  public static function providerTestGetMachineNameSuggestion(): array {
     return [
       ['Admin label', 'adminlabel'],
+      // cspell:disable-next-line
       ['über åwesome', 'uberawesome'],
     ];
   }

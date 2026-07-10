@@ -1,20 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\search\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Indexes content and tests the advanced search form.
- *
- * @group search
  */
+#[Group('search')]
+#[RunTestsInSeparateProcesses]
 class SearchAdvancedSearchFormTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'search', 'dblog'];
+  protected static $modules = ['node', 'search', 'search_node', 'dblog'];
 
   /**
    * {@inheritdoc}
@@ -28,6 +32,9 @@ class SearchAdvancedSearchFormTest extends BrowserTestBase {
    */
   protected $node;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -53,7 +60,7 @@ class SearchAdvancedSearchFormTest extends BrowserTestBase {
   /**
    * Tests advanced search by node type.
    */
-  public function testNodeType() {
+  public function testNodeType(): void {
     // Verify some properties of the node that was created.
     $this->assertSame('page', $this->node->getType(), 'Node type is Basic page.');
     $dummy_title = 'Lorem ipsum';
@@ -61,7 +68,7 @@ class SearchAdvancedSearchFormTest extends BrowserTestBase {
 
     // Search for the dummy title with a GET query.
     $this->drupalGet('search/node', ['query' => ['keys' => $dummy_title]]);
-    $this->assertNoText($this->node->label());
+    $this->assertSession()->pageTextNotContains($this->node->label());
 
     // Search for the title of the node with a GET query.
     $this->drupalGet('search/node', ['query' => ['keys' => $this->node->label()]]);
@@ -86,7 +93,7 @@ class SearchAdvancedSearchFormTest extends BrowserTestBase {
   /**
    * Tests that after submitting the advanced search form, the form is refilled.
    */
-  public function testFormRefill() {
+  public function testFormRefill(): void {
     $edit = [
       'keys' => 'cat',
       'or' => 'dog gerbil',

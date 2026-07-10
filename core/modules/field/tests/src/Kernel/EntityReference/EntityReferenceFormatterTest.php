@@ -1,29 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel\EntityReference;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
+use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\Core\Field\Plugin\Field\FieldFormatter\EntityReferenceEntityFormatter;
+use Drupal\entity_test\Entity\EntityTest;
+use Drupal\entity_test\Entity\EntityTestLabel;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
-use Drupal\entity_test\Entity\EntityTestLabel;
-use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the formatters functionality.
- *
- * @group entity_reference
  */
+#[Group('entity_reference')]
+#[RunTestsInSeparateProcesses]
 class EntityReferenceFormatterTest extends EntityKernelTestBase {
 
-  use EntityReferenceTestTrait;
+  use EntityReferenceFieldCreationTrait;
 
   /**
    * The entity type used in this test.
@@ -47,6 +52,11 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
   protected $fieldName = 'field_test';
 
   /**
+   * The non cacheable view mode.
+   */
+  protected string $nonCacheableViewMode = 'no_cache';
+
+  /**
    * The entity to be referenced in this test.
    *
    * @var \Drupal\Core\Entity\EntityInterface
@@ -54,19 +64,21 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
   protected $referencedEntity;
 
   /**
-   * The entity that is not yet saved to its persistent storage to be referenced
-   * in this test.
+   * An entity that is not yet saved to its persistent storage.
    *
    * @var \Drupal\Core\Entity\EntityInterface
    */
   protected $unsavedReferencedEntity;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
-    // Use Classy theme for testing markup output.
-    \Drupal::service('theme_installer')->install(['classy']);
-    $this->config('system.theme')->set('default', 'classy')->save();
+    // Use Stark theme for testing markup output.
+    \Drupal::service('theme_installer')->install(['stark']);
+    $this->config('system.theme')->set('default', 'stark')->save();
     $this->installEntitySchema('entity_test');
     // Grant the 'view test entity' permission.
     $this->installConfig(['user']);
@@ -126,7 +138,7 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
   /**
    * Assert inaccessible items don't change the data of the fields.
    */
-  public function testAccess() {
+  public function testAccess(): void {
     // Revoke the 'view test entity' permission for this test.
     Role::load(RoleInterface::ANONYMOUS_ID)
       ->revokePermission('view test entity')
@@ -161,14 +173,14 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
         ->view($referencing_entity, 'default');
 
       // Verify the un-accessible item still exists.
-      $this->assertEquals($this->referencedEntity->id(), $referencing_entity->{$field_name}->target_id, new FormattableMarkup('The un-accessible item still exists after @name formatter was executed.', ['@name' => $name]));
+      $this->assertEquals($this->referencedEntity->id(), $referencing_entity->{$field_name}->target_id, "The un-accessible item still exists after $name formatter was executed.");
     }
   }
 
   /**
    * Tests the merging of cache metadata.
    */
-  public function testCustomCacheTagFormatter() {
+  public function testCustomCacheTagFormatter(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $formatter = 'entity_reference_custom_cache_tag';
@@ -181,7 +193,7 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
   /**
    * Tests the ID formatter.
    */
-  public function testIdFormatter() {
+  public function testIdFormatter(): void {
     $formatter = 'entity_reference_entity_id';
     $build = $this->buildRenderArray([$this->referencedEntity, $this->unsavedReferencedEntity], $formatter);
 
@@ -193,7 +205,7 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
   /**
    * Tests the entity formatter.
    */
-  public function testEntityFormatter() {
+  public function testEntityFormatter(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $formatter = 'entity_reference_entity_view';
@@ -201,50 +213,86 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
 
     // Test the first field item.
     $expected_rendered_name_field_1 = '
-            <div class="field field--name-name field--type-string field--label-hidden field__item">' . $this->referencedEntity->label() . '</div>
+            <div>' . $this->referencedEntity->label() . '</div>
       ';
     $expected_rendered_body_field_1 = '
-  <div class="clearfix text-formatted field field--name-body field--type-text field--label-above">
-    <div class="field__label">Body</div>
-              <div class="field__item"><p>Hello, world!</p></div>
+  <div>
+    <div>Body</div>
+              <div><p>Hello, world!</p></div>
           </div>
 ';
     $renderer->renderRoot($build[0]);
-    $this->assertEquals('default | ' . $this->referencedEntity->label() . $expected_rendered_name_field_1 . $expected_rendered_body_field_1, $build[0]['#markup'], sprintf('The markup returned by the %s formatter is correct for an item with a saved entity.', $formatter));
+    $this->assertSame('default | ' . $this->referencedEntity->label() . $expected_rendered_name_field_1 . $expected_rendered_body_field_1, (string) $build[0]['#markup'], sprintf('The markup returned by the %s formatter is correct for an item with a saved entity.', $formatter));
     $expected_cache_tags = Cache::mergeTags(\Drupal::entityTypeManager()->getViewBuilder($this->entityType)->getCacheTags(), $this->referencedEntity->getCacheTags());
     $expected_cache_tags = Cache::mergeTags($expected_cache_tags, FilterFormat::load('full_html')->getCacheTags());
-    $this->assertEquals($expected_cache_tags, $build[0]['#cache']['tags'], new FormattableMarkup('The @formatter formatter has the expected cache tags.', ['@formatter' => $formatter]));
+    $this->assertEquals($expected_cache_tags, $build[0]['#cache']['tags'], "The $formatter formatter has the expected cache tags.");
 
     // Test the second field item.
     $expected_rendered_name_field_2 = '
-            <div class="field field--name-name field--type-string field--label-hidden field__item">' . $this->unsavedReferencedEntity->label() . '</div>
+            <div>' . $this->unsavedReferencedEntity->label() . '</div>
       ';
     $expected_rendered_body_field_2 = '
-  <div class="clearfix text-formatted field field--name-body field--type-text field--label-above">
-    <div class="field__label">Body</div>
-              <div class="field__item"><p>Hello, unsaved world!</p></div>
+  <div>
+    <div>Body</div>
+              <div><p>Hello, unsaved world!</p></div>
           </div>
 ';
 
     $renderer->renderRoot($build[1]);
-    $this->assertEquals('default | ' . $this->unsavedReferencedEntity->label() . $expected_rendered_name_field_2 . $expected_rendered_body_field_2, $build[1]['#markup'], sprintf('The markup returned by the %s formatter is correct for an item with a unsaved entity.', $formatter));
+    $this->assertSame('default | ' . $this->unsavedReferencedEntity->label() . $expected_rendered_name_field_2 . $expected_rendered_body_field_2, (string) $build[1]['#markup'], sprintf('The markup returned by the %s formatter is correct for an item with a unsaved entity.', $formatter));
+  }
+
+  /**
+   * Tests that iterative rendering is allowed by recursive render protection.
+   */
+  public function testEntityFormatterIterativeRendering(): void {
+    /** @var \Drupal\Core\Render\RendererInterface $renderer */
+    $renderer = $this->container->get('renderer');
+    $view_builder = $this->entityTypeManager->getViewBuilder($this->entityType);
+
+    $this->createNonCacheableViewMode();
+
+    $storage = \Drupal::entityTypeManager()->getStorage($this->entityType);
+    $entity = $storage->create(['name' => $this->randomMachineName()]);
+    $entity->save();
+    $referencing_entity = $storage->create([
+      'name' => $this->randomMachineName(),
+      $this->fieldName => $entity->id(),
+    ]);
+    $referencing_entity->save();
+
+    // Set count to higher than the previous render protection limit of 20.
+    $count = 21;
+    // Render the same entity multiple times to check that iterative rendering
+    // is allowed as long as the entity is not being recursively rendered.
+    $build = $view_builder->viewMultiple(array_fill(0, $count, $referencing_entity), $this->nonCacheableViewMode);
+    $output = (string) $renderer->renderRoot($build);
+    // The title of entity_test entities is printed twice by default, so we have
+    // to multiply our count by 2.
+    $this->assertSame($count * 2, substr_count($output, $entity->label()));
   }
 
   /**
    * Tests the recursive rendering protection of the entity formatter.
    */
-  public function testEntityFormatterRecursiveRendering() {
+  public function testEntityFormatterRecursiveRendering(): void {
+    // Intercept our specific warning and suppress it.
+    set_error_handler(function (int $errno, string $errstr): bool {
+      return $errno === E_USER_WARNING && str_starts_with($errstr, 'Recursive rendering attempt aborted');
+    });
+
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
-    $formatter = 'entity_reference_entity_view';
     $view_builder = $this->entityTypeManager->getViewBuilder($this->entityType);
+
+    $this->createNonCacheableViewMode();
 
     // Set the default view mode to use the 'entity_reference_entity_view'
     // formatter.
     \Drupal::service('entity_display.repository')
       ->getViewDisplay($this->entityType, $this->bundle)
       ->setComponent($this->fieldName, [
-        'type' => $formatter,
+        'type' => 'entity_reference_entity_view',
       ])
       ->save();
 
@@ -255,60 +303,82 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
     // Create a self-reference.
     $referencing_entity_1->{$this->fieldName}->entity = $referencing_entity_1;
     $referencing_entity_1->save();
+    $referencing_entity_1_label = $referencing_entity_1->label();
 
-    // Check that the recursive rendering stops after it reaches the specified
-    // limit.
-    $build = $view_builder->view($referencing_entity_1, 'default');
-    $output = $renderer->renderRoot($build);
+    // Using a different view mode is not recursion.
+    $build = $view_builder->view($referencing_entity_1, 'teaser');
+    $output = (string) $renderer->renderRoot($build);
+    // 2 occurrences of the entity title per entity.
+    $expected_occurrences = 4;
 
-    // The title of entity_test entities is printed twice by default, so we have
-    // to multiply the formatter's recursive rendering protection limit by 2.
-    // Additionally, we have to take into account 2 additional occurrences of
-    // the entity title because we're rendering the full entity, not just the
-    // reference field.
-    $expected_occurrences = EntityReferenceEntityFormatter::RECURSIVE_RENDER_LIMIT * 2 + 2;
-    $actual_occurrences = substr_count($output, $referencing_entity_1->name->value);
+    $actual_occurrences = substr_count($output, $referencing_entity_1_label);
     $this->assertEquals($expected_occurrences, $actual_occurrences);
 
-    // Repeat the process with another entity in order to check that the
-    // 'recursive_render_id' counter is generated properly.
+    // Self-references should not be rendered.
+    // entity_1 -> entity_1
+    $build = $view_builder->view($referencing_entity_1, $this->nonCacheableViewMode);
+    $output = (string) $renderer->renderRoot($build);
+    $expected_occurrences = 2;
+    $actual_occurrences = substr_count($output, $referencing_entity_1_label);
+    $this->assertEquals($expected_occurrences, $actual_occurrences);
+    $build = $view_builder->view($referencing_entity_1, $this->nonCacheableViewMode);
+
+    // Repetition is not wrongly detected as recursion.
+    // entity_1 -> entity_1
+    $output = (string) $renderer->renderRoot($build);
+    $actual_occurrences = substr_count($output, $referencing_entity_1_label);
+    $this->assertEquals($expected_occurrences, $actual_occurrences);
+
+    // Referencing from another entity works fine.
+    // entity_2 -> entity_1
     $referencing_entity_2 = $storage->create(['name' => $this->randomMachineName()]);
     $referencing_entity_2->save();
-    $referencing_entity_2->{$this->fieldName}->entity = $referencing_entity_2;
+    $referencing_entity_2_label = $referencing_entity_2->label();
+    $referencing_entity_2->{$this->fieldName}->entity = $referencing_entity_1;
     $referencing_entity_2->save();
+    $build = $view_builder->view($referencing_entity_2, $this->nonCacheableViewMode);
+    $output = (string) $renderer->renderRoot($build);
 
-    $build = $view_builder->view($referencing_entity_2, 'default');
-    $output = $renderer->renderRoot($build);
-
-    $actual_occurrences = substr_count($output, $referencing_entity_2->name->value);
+    $actual_occurrences = substr_count($output, $referencing_entity_1_label);
     $this->assertEquals($expected_occurrences, $actual_occurrences);
 
-    // Now render both entities at the same time and check again.
-    $build = $view_builder->viewMultiple([$referencing_entity_1, $referencing_entity_2], 'default');
-    $output = $renderer->renderRoot($build);
-
-    $actual_occurrences = substr_count($output, $referencing_entity_1->name->value);
+    // Referencing from multiple is fine.
+    // entity_1 -> entity_1
+    // entity_2 -> entity_1
+    $build = $view_builder->viewMultiple([$referencing_entity_1, $referencing_entity_2], $this->nonCacheableViewMode);
+    $output = (string) $renderer->renderRoot($build);
+    // entity_1 should be seen once as a parent and once as a child of entity_2.
+    $expected_occurrences = 4;
+    $actual_occurrences = substr_count($output, $referencing_entity_1_label);
+    $this->assertEquals($expected_occurrences, $actual_occurrences);
+    // entity_2 is seen only once, as a parent.
+    $expected_occurrences = 2;
+    $actual_occurrences = substr_count($output, $referencing_entity_2_label);
+    $this->assertEquals($expected_occurrences, $actual_occurrences);
+    // Indirect recursion is not ok.
+    // entity_2 -> entity_1 -> entity_2
+    $referencing_entity_1->{$this->fieldName}->entity = $referencing_entity_2;
+    $referencing_entity_1->save();
+    $build = $view_builder->view($referencing_entity_2, $this->nonCacheableViewMode);
+    $output = (string) $renderer->renderRoot($build);
+    // Each entity should be seen once.
+    $expected_occurrences = 2;
+    $actual_occurrences = substr_count($output, $referencing_entity_1_label);
+    $this->assertEquals($expected_occurrences, $actual_occurrences);
+    $expected_occurrences = 2;
+    $actual_occurrences = substr_count($output, $referencing_entity_2_label);
     $this->assertEquals($expected_occurrences, $actual_occurrences);
 
-    $actual_occurrences = substr_count($output, $referencing_entity_2->name->value);
-    $this->assertEquals($expected_occurrences, $actual_occurrences);
+    restore_error_handler();
   }
 
   /**
    * Renders the same entity referenced from different places.
    */
-  public function testEntityReferenceRecursiveProtectionWithManyRenderedEntities() {
-    $formatter = 'entity_reference_entity_view';
+  public function testEntityReferenceRecursiveProtectionWithManyRenderedEntities(): void {
     $view_builder = $this->entityTypeManager->getViewBuilder($this->entityType);
 
-    // Set the default view mode to use the 'entity_reference_entity_view'
-    // formatter.
-    \Drupal::service('entity_display.repository')
-      ->getViewDisplay($this->entityType, $this->bundle)
-      ->setComponent($this->fieldName, [
-        'type' => $formatter,
-      ])
-      ->save();
+    $this->createNonCacheableViewMode();
 
     $storage = $this->entityTypeManager->getStorage($this->entityType);
     /** @var \Drupal\Core\Entity\ContentEntityInterface $referenced_entity */
@@ -324,7 +394,7 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
       return $referencing_entity;
     }, $range);
 
-    $build = $view_builder->viewMultiple($referencing_entities, 'default');
+    $build = $view_builder->viewMultiple($referencing_entities, $this->nonCacheableViewMode);
     $output = $this->render($build);
 
     // The title of entity_test entities is printed twice by default, so we have
@@ -333,18 +403,61 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
     // the entity title because we're rendering the full entity, not just the
     // reference field.
     $expected_occurrences = 30 * 2 + 2;
-    $actual_occurrences = substr_count($output, $referenced_entity->get('name')->value);
+    $actual_occurrences = substr_count($output, $referenced_entity->label());
     $this->assertEquals($expected_occurrences, $actual_occurrences);
+  }
+
+  /**
+   * Tests multiple renderings of an entity that references another.
+   */
+  public function testEntityReferenceRecursionProtectionWithRepeatedReferencingEntity(): void {
+    /** @var \Drupal\Core\Render\RendererInterface $renderer */
+    $renderer = $this->container->get('renderer');
+    $view_builder = $this->entityTypeManager->getViewBuilder($this->entityType);
+
+    $this->createNonCacheableViewMode();
+
+    $storage = \Drupal::entityTypeManager()->getStorage($this->entityType);
+    $entity = $storage->create(['name' => $this->randomMachineName()]);
+    $entity->save();
+    $referencing_entity = $storage->create([
+      'name' => $this->randomMachineName(),
+      $this->fieldName => $entity->id(),
+    ]);
+    $referencing_entity->save();
+
+    // Large-scale repetition within a single render root is not recursion.
+    $count = 30;
+    $build = $view_builder->viewMultiple(array_fill(0, $count, $referencing_entity), $this->nonCacheableViewMode);
+    $output = (string) $renderer->renderRoot($build);
+    // The title of entity_test entities is printed twice by default, so we have
+    // to multiply our count by 2.
+    $this->assertSame($count * 2, substr_count($output, $entity->label()));
+
+    // Large-scale repetition across render roots is not recursion.
+    for ($i = 0; $i < $count; $i++) {
+      $build = $view_builder->view($referencing_entity, $this->nonCacheableViewMode);
+      $output = (string) $renderer->renderRoot($build);
+      // The title of entity_test entities is printed twice by default.
+      $this->assertSame(2, substr_count($output, $entity->label()));
+    }
   }
 
   /**
    * Tests the label formatter.
    */
-  public function testLabelFormatter() {
+  public function testLabelFormatter(): void {
     $this->installEntitySchema('entity_test_label');
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $formatter = 'entity_reference_label';
+
+    // We need to create an anonymous user for access checks in the formatter.
+    $this->createUser(values: [
+      'uid' => 0,
+      'status' => 0,
+      'name' => '',
+    ]);
 
     // The 'link' settings is TRUE by default.
     $build = $this->buildRenderArray([$this->referencedEntity, $this->unsavedReferencedEntity], $formatter);
@@ -374,6 +487,7 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
     // lacking any URL info.
     $expected_item_2 = [
       '#plain_text' => $this->unsavedReferencedEntity->label(),
+      '#entity' => $this->unsavedReferencedEntity,
       '#cache' => [
         'contexts' => [
           'user.permissions',
@@ -389,9 +503,7 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
     $this->assertEquals($this->referencedEntity->label(), $build[0]['#plain_text'], sprintf('The markup returned by the %s formatter is correct for an item with a saved entity.', $formatter));
     $this->assertEquals($this->unsavedReferencedEntity->label(), $build[1]['#plain_text'], sprintf('The markup returned by the %s formatter is correct for an item with a unsaved entity.', $formatter));
 
-    // Test an entity type that doesn't have any link templates, which means
-    // \Drupal\Core\Entity\EntityInterface::urlInfo() will throw an exception
-    // and the label formatter will output only the label instead of a link.
+    // Test an entity type that doesn't have any link templates.
     $field_storage_config = FieldStorageConfig::loadByName($this->entityType, $this->fieldName);
     $field_storage_config->setSetting('target_type', 'entity_test_label');
     $field_storage_config->save();
@@ -403,10 +515,59 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
 
     $build = $this->buildRenderArray([$referenced_entity_with_no_link_template], $formatter, ['link' => TRUE]);
     $this->assertEquals($referenced_entity_with_no_link_template->label(), $build[0]['#plain_text'], sprintf('The markup returned by the %s formatter is correct for an entity type with no valid link template.', $formatter));
+
+    // Test link visibility if the URL is not accessible.
+    $entity_with_user = EntityTest::create([
+      'name' => $this->randomMachineName(),
+      'user_id' => $this->createUser(),
+    ]);
+    $entity_with_user->save();
+    $build = $entity_with_user->get('user_id')->view(['type' => $formatter, 'settings' => ['link' => TRUE]]);
+    $this->assertEquals($build[0]['#plain_text'], $entity_with_user->get('user_id')->entity->label(), 'For inaccessible links, the label should be displayed in plain text.');
   }
 
   /**
-   * Sets field values and returns a render array as built by
+   * Tests formatters set the correct _referringItem on referenced entities.
+   */
+  public function testFormatterReferencingItem(): void {
+    $storage = \Drupal::entityTypeManager()->getStorage($this->entityType);
+    // Create a referencing entity and confirm that the _referringItem property
+    // on the referenced entity in the built render array's items is set to the
+    // field item on the referencing entity.
+    $referencing_entity_1 = $storage->create([
+      'name' => $this->randomMachineName(),
+      $this->fieldName => $this->referencedEntity,
+    ]);
+    $referencing_entity_1->save();
+    $build_1 = $referencing_entity_1->get($this->fieldName)->view(['type' => 'entity_reference_entity_view']);
+    $this->assertEquals($this->referencedEntity->id(), $build_1['#items'][0]->entity->id());
+    $this->assertEquals($referencing_entity_1->id(), $build_1['#items'][0]->entity->_referringItem->getEntity()->id());
+    $this->assertEquals($referencing_entity_1->id(), $build_1[0]['#' . $this->entityType]->_referringItem->getEntity()->id());
+    // Create a second referencing entity and confirm that the _referringItem
+    // property on the referenced entity in the built render array's items is
+    // set to the field item on the second referencing entity.
+    $referencing_entity_2 = $storage->create([
+      'name' => $this->randomMachineName(),
+      $this->fieldName => $this->referencedEntity,
+    ]);
+    $referencing_entity_2->save();
+    $build_2 = $referencing_entity_2->get($this->fieldName)->view(['type' => 'entity_reference_entity_view']);
+    $this->assertEquals($this->referencedEntity->id(), $build_2['#items'][0]->entity->id());
+    $this->assertEquals($referencing_entity_2->id(), $build_2['#items'][0]->entity->_referringItem->getEntity()->id());
+    $this->assertEquals($referencing_entity_2->id(), $build_2[0]['#' . $this->entityType]->_referringItem->getEntity()->id());
+    // Confirm that the _referringItem property for the entity referenced by the
+    // first referencing entity is still set to the field item on the first
+    // referencing entity.
+    $this->assertEquals($referencing_entity_1->id(), $build_1['#items'][0]->entity->_referringItem->getEntity()->id());
+    // Confirm that the _referringItem property is not the same for the two
+    // render arrays.
+    $this->assertNotEquals($build_1['#items'][0]->entity->_referringItem->getEntity()->id(), $build_2['#items'][0]->entity->_referringItem->getEntity()->id());
+  }
+
+  /**
+   * Sets field values and returns a render array.
+   *
+   * The render array structure is as built by
    * \Drupal\Core\Field\FieldItemListInterface::view().
    *
    * @param \Drupal\Core\Entity\EntityInterface[] $referenced_entities
@@ -435,6 +596,35 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
 
     // Build the renderable array for the field.
     return $items->view(['type' => $formatter, 'settings' => $formatter_options]);
+  }
+
+  /**
+   * Creates a non cacheable view mode.
+   */
+  protected function createNonCacheableViewMode(): void {
+    EntityViewMode::create([
+      'id' => $this->entityType . '.' . $this->nonCacheableViewMode,
+      'label' => 'No cache view mode',
+      'targetEntityType' => $this->entityType,
+      'cache' => FALSE,
+    ])
+      ->save();
+
+    // Set the new view mode to use the 'entity_reference_entity_view'
+    // formatter displaying entities in non cacheable view mode as well.
+    EntityViewDisplay::create([
+      'targetEntityType' => $this->entityType,
+      'bundle' => $this->bundle,
+      'mode' => $this->nonCacheableViewMode,
+      'status' => TRUE,
+    ])
+      ->setComponent($this->fieldName, [
+        'type' => 'entity_reference_entity_view',
+        'settings' => [
+          'view_mode' => $this->nonCacheableViewMode,
+        ],
+      ])
+      ->save();
   }
 
 }

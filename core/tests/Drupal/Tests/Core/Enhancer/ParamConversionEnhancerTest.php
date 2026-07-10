@@ -1,18 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Enhancer;
 
+use Drupal\Core\ParamConverter\ParamConverterManagerInterface;
 use Drupal\Core\Routing\Enhancer\ParamConversionEnhancer;
-use Drupal\Tests\UnitTestCase;
 use Drupal\Core\Routing\RouteObjectInterface;
-use Symfony\Component\HttpFoundation\ParameterBag;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
 /**
- * @coversDefaultClass \Drupal\Core\Routing\Enhancer\ParamConversionEnhancer
- * @group Enhancer
+ * Tests Drupal\Core\Routing\Enhancer\ParamConversionEnhancer.
  */
+#[CoversClass(ParamConversionEnhancer::class)]
+#[Group('Enhancer')]
 class ParamConversionEnhancerTest extends UnitTestCase {
 
   /**
@@ -21,9 +28,9 @@ class ParamConversionEnhancerTest extends UnitTestCase {
   protected $paramConversionEnhancer;
 
   /**
-   * @var \Drupal\Core\ParamConverter\ParamConverterManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The mocked converter manager.
    */
-  protected $paramConverterManager;
+  protected ParamConverterManagerInterface&MockObject $paramConverterManager;
 
   /**
    * {@inheritdoc}
@@ -36,9 +43,9 @@ class ParamConversionEnhancerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::enhance
+   * Tests enhance.
    */
-  public function testEnhance() {
+  public function testEnhance(): void {
     $route = new Route('/test/{id}/{literal}/{null}');
 
     $raw_variables = [
@@ -52,12 +59,12 @@ class ParamConversionEnhancerTest extends UnitTestCase {
 
     $expected = $defaults;
     $expected['id'] = 'something_better!';
-    $expected['_raw_variables'] = new ParameterBag($raw_variables);
+    $expected['_raw_variables'] = new InputBag($raw_variables);
 
     $this->paramConverterManager->expects($this->once())
       ->method('convert')
-      ->with($this->isType('array'))
-      ->will($this->returnValue($expected));
+      ->with($this->isArray())
+      ->willReturn($expected);
 
     $result = $this->paramConversionEnhancer->enhance($defaults, new Request());
 
@@ -71,25 +78,30 @@ class ParamConversionEnhancerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::copyRawVariables
+   * Tests copy raw variables.
    */
-  public function testCopyRawVariables() {
+  public function testCopyRawVariables(): void {
     $route = new Route('/test/{id}');
+    $route->setDefault('node_type', 'page');
     $defaults = [
       RouteObjectInterface::ROUTE_OBJECT => $route,
       'id' => '1',
     ];
     // Set one default to mirror another by reference.
     $defaults['bar'] = &$defaults['id'];
-    $this->paramConverterManager->expects($this->any())
+    $this->paramConverterManager->expects($this->once())
       ->method('convert')
-      ->with($this->isType('array'))
-      ->will($this->returnCallback(function ($defaults) {
+      ->with($this->isArray())
+      ->willReturnCallback(function (array $defaults): array {
         // Convert the mirrored default to another value.
         $defaults['bar'] = '2';
+
         return $defaults;
-      }));
-    $expected = new ParameterBag(['id' => 1]);
+      });
+    $expected = new InputBag([
+      'id' => '1',
+      'node_type' => 'page',
+    ]);
     $result = $this->paramConversionEnhancer->enhance($defaults, new Request());
     $this->assertEquals($result['_raw_variables'], $expected);
   }

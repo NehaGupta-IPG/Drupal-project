@@ -20,20 +20,21 @@ interface TypedConfigManagerInterface extends TypedDataManagerInterface {
    * @param string $name
    *   Configuration object name.
    *
-   * @return \Drupal\Core\TypedData\TraversableTypedDataInterface
+   * @return \Drupal\Core\TypedData\TraversableTypedDataInterface<int|string, \Drupal\Core\TypedData\TypedDataInterface>
    *   Typed configuration element.
    */
   public function get($name);
 
   /**
-   * Creates a new data definition object from a type definition array and
-   * actual configuration data. Since type definitions may contain variables
-   * to be replaced, we need the configuration value to create it.
+   * Creates a new data definition object.
+   *
+   * Since type definitions may contain variables to be replaced, we need the
+   * configuration value to create it.
    *
    * @param array $definition
    *   The base type definition array, for which a data definition should be
    *   created.
-   * @param $value
+   * @param mixed $value
    *   Optional value of the configuration element.
    * @param string $name
    *   Optional name of the configuration element.
@@ -81,7 +82,7 @@ interface TypedConfigManagerInterface extends TypedDataManagerInterface {
    *   The data associated with the configuration. Note: This configuration
    *   doesn't yet have to be stored.
    *
-   * @return \Drupal\Core\TypedData\TraversableTypedDataInterface
+   * @return \Drupal\Core\TypedData\TraversableTypedDataInterface<int|string, \Drupal\Core\TypedData\TypedDataInterface>
    *   The typed configuration element.
    */
   public function createFromNameAndData($config_name, array $config_data);

@@ -1,16 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\locale\Kernel;
 
 use Drupal\block\Entity\Block;
-use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that the locale config manager operates correctly.
- *
- * @group locale
  */
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocaleConfigManagerTest extends KernelTestBase {
 
   /**
@@ -28,15 +32,13 @@ class LocaleConfigManagerTest extends KernelTestBase {
 
   /**
    * This test creates simple config on the fly breaking schema checking.
-   *
-   * @var bool
    */
-  protected $strictConfigSchema = FALSE;
+  protected bool $strictConfigSchema = FALSE;
 
   /**
    * Tests hasTranslation().
    */
-  public function testHasTranslation() {
+  public function testHasTranslation(): void {
     $this->installSchema('locale', ['locales_location', 'locales_source', 'locales_target']);
     $this->installConfig(['locale_test']);
     $locale_config_manager = \Drupal::service('locale.config_manager');
@@ -53,7 +55,7 @@ class LocaleConfigManagerTest extends KernelTestBase {
   /**
    * Tests getStringTranslation().
    */
-  public function testGetStringTranslation() {
+  public function testGetStringTranslation(): void {
     $this->installSchema('locale', ['locales_location', 'locales_source', 'locales_target']);
     $this->installConfig(['locale_test']);
 
@@ -74,7 +76,7 @@ class LocaleConfigManagerTest extends KernelTestBase {
   /**
    * Tests getDefaultConfigLangcode().
    */
-  public function testGetDefaultConfigLangcode() {
+  public function testGetDefaultConfigLangcode(): void {
     // Install the Language module's configuration so we can use the
     // module_installer service.
     $this->installConfig(['language']);
@@ -88,7 +90,7 @@ class LocaleConfigManagerTest extends KernelTestBase {
 
     $block = Block::create([
       'id' => 'test_default_config',
-      'theme' => 'classy',
+      'theme' => 'stark',
       'status' => TRUE,
       'region' => 'content',
       'plugin' => 'local_tasks_block',
@@ -96,7 +98,7 @@ class LocaleConfigManagerTest extends KernelTestBase {
         'id' => 'local_tasks_block',
         'label' => $this->randomMachineName(),
         'provider' => 'core',
-        'label_display' => FALSE,
+        'label_display' => '0',
         'primary' => TRUE,
         'secondary' => TRUE,
       ],
@@ -105,7 +107,7 @@ class LocaleConfigManagerTest extends KernelTestBase {
 
     // Install the theme after creating the block as installing the theme will
     // install the block provided by the locale_test module.
-    \Drupal::service('theme_installer')->install(['classy']);
+    \Drupal::service('theme_installer')->install(['stark']);
 
     // The test_default_config block provided by the locale_test module will not
     // be installed because a block with the same ID already exists.

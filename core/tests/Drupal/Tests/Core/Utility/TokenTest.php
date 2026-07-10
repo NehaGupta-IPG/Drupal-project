@@ -1,49 +1,53 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Utility;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Utility\Token;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
- * @coversDefaultClass \Drupal\Core\Utility\Token
- * @group Utility
+ * Tests Drupal\Core\Utility\Token.
  */
+#[CoversClass(Token::class)]
+#[Group('Utility')]
 class TokenTest extends UnitTestCase {
 
   /**
    * The cache used for testing.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $cache;
+  protected CacheBackendInterface&Stub $cache;
 
   /**
    * The language manager used for testing.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $languageManager;
+  protected LanguageManagerInterface&Stub $languageManager;
 
   /**
    * The module handler service used for testing.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $moduleHandler;
+  protected ModuleHandlerInterface&Stub $moduleHandler;
 
   /**
    * The language interface used for testing.
-   *
-   * @var \Drupal\Core\Language\LanguageInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $language;
+  protected LanguageInterface&Stub $language;
 
   /**
    * The token service under test.
@@ -54,10 +58,8 @@ class TokenTest extends UnitTestCase {
 
   /**
    * The cache tags invalidator.
-   *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $cacheTagsInvalidator;
+  protected CacheTagsInvalidatorInterface&Stub $cacheTagsInvalidator;
 
   /**
    * The cache contexts manager.
@@ -67,29 +69,22 @@ class TokenTest extends UnitTestCase {
   protected $cacheContextManager;
 
   /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface|\PHPUnit\Framework\MockObject\MockObject
-   */
-  protected $renderer;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
-    $this->cache = $this->createMock('\Drupal\Core\Cache\CacheBackendInterface');
+    parent::setUp();
 
-    $this->languageManager = $this->createMock('Drupal\Core\Language\LanguageManagerInterface');
+    $this->cache = $this->createStub(CacheBackendInterface::class);
 
-    $this->moduleHandler = $this->createMock('\Drupal\Core\Extension\ModuleHandlerInterface');
+    $this->languageManager = $this->createStub(LanguageManagerInterface::class);
 
-    $this->language = $this->createMock('\Drupal\Core\Language\LanguageInterface');
+    $this->moduleHandler = $this->createStub(ModuleHandlerInterface::class);
 
-    $this->cacheTagsInvalidator = $this->createMock('\Drupal\Core\Cache\CacheTagsInvalidatorInterface');
+    $this->language = $this->createStub(LanguageInterface::class);
 
-    $this->renderer = $this->createMock('Drupal\Core\Render\RendererInterface');
+    $this->cacheTagsInvalidator = $this->createStub(CacheTagsInvalidatorInterface::class);
 
-    $this->token = new Token($this->moduleHandler, $this->cache, $this->languageManager, $this->cacheTagsInvalidator, $this->renderer);
+    $this->token = new Token($this->moduleHandler, $this->cache, $this->languageManager, $this->cacheTagsInvalidator, $this->createStub(RendererInterface::class));
 
     $container = new ContainerBuilder();
     $this->cacheContextManager = new CacheContextsManager($container, [
@@ -101,9 +96,49 @@ class TokenTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getInfo
+   * Reinitializes the cache as a mock object.
    */
-  public function testGetInfo() {
+  protected function setUpMockCache(): void {
+    $this->cache = $this->createMock(CacheBackendInterface::class);
+    $reflection = new \ReflectionProperty($this->token, 'cache');
+    $reflection->setValue($this->token, $this->cache);
+  }
+
+  /**
+   * Reinitializes the cache tags invalidator as a mock object.
+   */
+  protected function setUpMockCacheTagsInvalidator(): void {
+    $this->cacheTagsInvalidator = $this->createMock(CacheTagsInvalidatorInterface::class);
+    $reflection = new \ReflectionProperty($this->token, 'cacheTagsInvalidator');
+    $reflection->setValue($this->token, $this->cacheTagsInvalidator);
+  }
+
+  /**
+   * Reinitializes the language manager as a mock object.
+   */
+  protected function setUpMockLanguageManager(): void {
+    $this->languageManager = $this->createMock(LanguageManagerInterface::class);
+    $reflection = new \ReflectionProperty($this->token, 'languageManager');
+    $reflection->setValue($this->token, $this->languageManager);
+  }
+
+  /**
+   * Reinitializes the module handler as a mock object.
+   */
+  protected function setUpMockModuleHandler(): void {
+    $this->moduleHandler = $this->createMock(ModuleHandlerInterface::class);
+    $reflection = new \ReflectionProperty($this->token, 'moduleHandler');
+    $reflection->setValue($this->token, $this->moduleHandler);
+  }
+
+  /**
+   * Tests get info.
+   */
+  public function testGetInfo(): void {
+    $this->setUpMockCache();
+    $this->setUpMockLanguageManager();
+    $this->setUpMockModuleHandler();
+
     $token_info = [
       'types' => [
         'foo' => [
@@ -112,14 +147,15 @@ class TokenTest extends UnitTestCase {
       ],
     ];
 
+    $this->language = $this->createMock(LanguageInterface::class);
     $this->language->expects($this->atLeastOnce())
       ->method('getId')
-      ->will($this->returnValue($this->randomMachineName()));
+      ->willReturn($this->randomMachineName());
 
     $this->languageManager->expects($this->once())
       ->method('getCurrentLanguage')
       ->with(LanguageInterface::TYPE_CONTENT)
-      ->will($this->returnValue($this->language));
+      ->willReturn($this->language);
 
     // The persistent cache must only be hit once, after which the info is
     // cached statically.
@@ -132,7 +168,7 @@ class TokenTest extends UnitTestCase {
     $this->moduleHandler->expects($this->once())
       ->method('invokeAll')
       ->with('token_info')
-      ->will($this->returnValue($token_info));
+      ->willReturn($token_info);
     $this->moduleHandler->expects($this->once())
       ->method('alter')
       ->with('token_info', $token_info);
@@ -147,10 +183,10 @@ class TokenTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::replace
+   * Tests replace with bubbleable metadata object.
    */
-  public function testReplaceWithBubbleableMetadataObject() {
-    $this->moduleHandler->expects($this->any())
+  public function testReplaceWithBubbleableMetadataObject(): void {
+    $this->moduleHandler
       ->method('invokeAll')
       ->willReturn(['[node:title]' => 'hello world']);
 
@@ -176,12 +212,12 @@ class TokenTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::replace
+   * Tests replace with hook tokens with bubbleable metadata.
    */
-  public function testReplaceWithHookTokensWithBubbleableMetadata() {
-    $this->moduleHandler->expects($this->any())
+  public function testReplaceWithHookTokensWithBubbleableMetadata(): void {
+    $this->moduleHandler
       ->method('invokeAll')
-      ->willReturnCallback(function ($hook_name, $args) {
+      ->willReturnCallback(function ($hook_name, $args): array {
         $cacheable_metadata = $args[4];
         $cacheable_metadata->addCacheContexts(['custom_context']);
         $cacheable_metadata->addCacheTags(['node:1']);
@@ -211,17 +247,19 @@ class TokenTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::replace
-   * @covers ::replace
+   * Tests replace with hook tokens alter with bubbleable metadata.
+   *
+   * @legacy-covers ::replace
+   * @legacy-covers ::replace
    */
-  public function testReplaceWithHookTokensAlterWithBubbleableMetadata() {
-    $this->moduleHandler->expects($this->any())
+  public function testReplaceWithHookTokensAlterWithBubbleableMetadata(): void {
+    $this->moduleHandler
       ->method('invokeAll')
       ->willReturn([]);
 
-    $this->moduleHandler->expects($this->any())
+    $this->moduleHandler
       ->method('alter')
-      ->willReturnCallback(function ($hook_name, array &$replacements, array $context, BubbleableMetadata $bubbleable_metadata) {
+      ->willReturnCallback(function ($hook_name, array &$replacements, array $context, BubbleableMetadata $bubbleable_metadata): void {
         $replacements['[node:title]'] = 'hello world';
         $bubbleable_metadata->addCacheContexts(['custom_context']);
         $bubbleable_metadata->addCacheTags(['node:1']);
@@ -249,9 +287,11 @@ class TokenTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::resetInfo
+   * Tests reset info.
    */
-  public function testResetInfo() {
+  public function testResetInfo(): void {
+    $this->setUpMockCacheTagsInvalidator();
+
     $this->cacheTagsInvalidator->expects($this->once())
       ->method('invalidateTags')
       ->with(['token_info']);
@@ -260,11 +300,11 @@ class TokenTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::replace
-   * @dataProvider providerTestReplaceEscaping
+   * Tests replace escaping.
    */
-  public function testReplaceEscaping($string, array $tokens, $expected) {
-    $this->moduleHandler->expects($this->any())
+  #[DataProvider('providerTestReplaceEscaping')]
+  public function testReplaceEscaping($string, array $tokens, $expected): void {
+    $this->moduleHandler
       ->method('invokeAll')
       ->willReturnCallback(function ($type, $args) {
         return $args[2]['tokens'];
@@ -275,7 +315,7 @@ class TokenTest extends UnitTestCase {
     $this->assertEquals($expected, $result);
   }
 
-  public function providerTestReplaceEscaping() {
+  public static function providerTestReplaceEscaping(): array {
     $data = [];
 
     // No tokens. The first argument to Token::replace() should not be escaped.
@@ -283,7 +323,11 @@ class TokenTest extends UnitTestCase {
     $data['html-in-string'] = ['<h1>Giraffe</h1>', [], '<h1>Giraffe</h1>'];
     $data['html-in-string-quote'] = ['<h1>Giraffe"</h1>', [], '<h1>Giraffe"</h1>'];
 
-    $data['simple-placeholder-with-plain-text'] = ['<h1>[token:meh]</h1>', ['[token:meh]' => 'Giraffe"'], '<h1>' . Html::escape('Giraffe"') . '</h1>'];
+    $data['simple-placeholder-with-plain-text'] = [
+      '<h1>[token:meh]</h1>',
+      ['[token:meh]' => 'Giraffe"'],
+      '<h1>' . Html::escape('Giraffe"') . '</h1>',
+    ];
 
     $data['simple-placeholder-with-safe-html'] = [
       '<h1>[token:meh]</h1>',
@@ -292,6 +336,54 @@ class TokenTest extends UnitTestCase {
     ];
 
     return $data;
+  }
+
+  /**
+   * Tests replace plain.
+   */
+  public function testReplacePlain(): void {
+    $this->setupSiteTokens();
+    $base = 'Wow, great "[site:name]" has a slogan "[site:slogan]"';
+    $plain = $this->token->replacePlain($base);
+    $this->assertEquals($plain, 'Wow, great "Your <best> buys" has a slogan "We are best"');
+  }
+
+  /**
+   * Scans dummy text, then tests the output.
+   */
+  public function testScan(): void {
+    // Define text with valid and not valid, fake and existing token-like
+    // strings.
+    $text = 'First a [valid:simple], but dummy token, and a dummy [valid:token with: spaces].';
+    $text .= 'Then a [not valid:token].';
+    $text .= 'Then an [:empty token type].';
+    $text .= 'Then an [empty token:].';
+    $text .= 'Then a totally empty token: [:].';
+    $text .= 'Last an existing token: [node:author:name].';
+    $token_wannabes = $this->token->scan($text);
+
+    $this->assertTrue(isset($token_wannabes['valid']['simple']), 'A simple valid token has been matched.');
+    $this->assertTrue(isset($token_wannabes['valid']['token with: spaces']), 'A valid token with space characters in the token name has been matched.');
+    $this->assertFalse(isset($token_wannabes['not valid']), 'An invalid token with spaces in the token type has not been matched.');
+    $this->assertFalse(isset($token_wannabes['empty token']), 'An empty token has not been matched.');
+    $this->assertFalse(isset($token_wannabes['']['empty token type']), 'An empty token type has not been matched.');
+    $this->assertFalse(isset($token_wannabes['']['']), 'An empty token and type has not been matched.');
+    $this->assertTrue(isset($token_wannabes['node']), 'An existing valid token has been matched.');
+  }
+
+  /**
+   * Sets up the token library to return site tokens.
+   */
+  protected function setupSiteTokens(): void {
+    // The site name is plain text, but the slogan is markup.
+    $tokens = [
+      '[site:name]' => 'Your <best> buys',
+      '[site:slogan]' => Markup::create('We are <b>best</b>'),
+    ];
+
+    $this->moduleHandler
+      ->method('invokeAll')
+      ->willReturn($tokens);
   }
 
 }

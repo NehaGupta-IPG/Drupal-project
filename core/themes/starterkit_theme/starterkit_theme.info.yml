@@ -1,7 +1,8 @@
-name: starterkit_theme
+name: Starterkit theme
 type: theme
-'base theme': stable9
+'base theme': false
 hidden: true
+version: VERSION
 libraries:
   - starterkit_theme/base
   - starterkit_theme/messages
@@ -15,13 +16,9 @@ libraries-extend:
     - starterkit_theme/dialog
   file/drupal.file:
     - starterkit_theme/file
+  core/drupal.item-list:
+    - starterkit_theme/item-list
   core/drupal.progress:
     - starterkit_theme/progress
-  media/media_embed_ckeditor_theme:
-    - starterkit_theme/media_embed_ckeditor_theme
-  media_library/view:
-    - starterkit_theme/media_library
-  media_library/widget:
-    - starterkit_theme/media_library
-ckeditor_stylesheets:
-  - css/components/media-embed-error.css
+  core/drupal.tablesort:
+    - starterkit_theme/drupal.tablesort

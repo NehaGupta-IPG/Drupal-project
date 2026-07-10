@@ -11,19 +11,13 @@
  */
 
 .layout {
-  margin-bottom: 1.125rem
-}
+  margin-block-end: var(--sp);
 
-@media (min-width: 43.75rem) {
-
-.layout {
-    margin-bottom: 2.25rem
-}
+  @media (min-width: 43.75rem) {
+    margin-block-end: var(--sp2);
   }
 
-@media (min-width: 62.5rem) {
-
-.layout {
-    margin-bottom: 3.375rem
-}
+  @media (min-width: 62.5rem) {
+    margin-block-end: var(--sp3);
   }
+}

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media\FunctionalJavascript;
 
 use Drupal\field\Entity\FieldConfig;
@@ -14,7 +16,7 @@ abstract class MediaSourceTestBase extends MediaJavascriptTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Let's set the canonical flag in the base class of the source tests,
@@ -22,7 +24,7 @@ abstract class MediaSourceTestBase extends MediaJavascriptTestBase {
     \Drupal::configFactory()
       ->getEditable('media.settings')
       ->set('standalone_url', TRUE)
-      ->save(TRUE);
+      ->save();
 
     $this->container->get('router.builder')->rebuild();
   }
@@ -120,7 +122,7 @@ abstract class MediaSourceTestBase extends MediaJavascriptTestBase {
    * @return \Drupal\media\MediaTypeInterface
    *   The created media type.
    */
-  public function doTestCreateMediaType($media_type_id, $source_id, array $provided_fields = [], $source_label_visibility = 'visually_hidden') {
+  public function doTestCreateMediaType(string $media_type_id, string|int|float|bool $source_id, array $provided_fields = [], string|int|float|bool $source_label_visibility = 'visually_hidden') {
     $session = $this->getSession();
     $page = $session->getPage();
     $assert_session = $this->assertSession();
@@ -145,6 +147,7 @@ abstract class MediaSourceTestBase extends MediaJavascriptTestBase {
 
     // Save the form to create the type.
     $page->pressButton('Save');
+    $assert_session->waitForElement('css', '.messages--status');
     $assert_session->pageTextContains('The media type ' . $media_type_id . ' has been added.');
     $this->drupalGet('admin/structure/media');
     $assert_session->pageTextContains($media_type_id);
@@ -153,7 +156,7 @@ abstract class MediaSourceTestBase extends MediaJavascriptTestBase {
 
     // Assert that the default display of the media type only shows the source
     // field.
-    $this->drupalGet("/admin/structure/media/manage/$media_type_id/display");
+    $this->drupalGet("/admin/structure/media/manage/$media_type_id/display/default");
     // There should be only one field with editable settings, and it should be
     // the source field.
     $assert_session->elementsCount('css', 'input[name$="_settings_edit"]', 1);

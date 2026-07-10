@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Unit;
 
-use Drupal\Core\Database\Driver\sqlite\Connection;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
+use Drupal\sqlite\Driver\Database\sqlite\Connection;
 use Drupal\Tests\UnitTestCase;
 
 /**
@@ -22,7 +26,7 @@ abstract class MigrateTestCase extends UnitTestCase {
   /**
    * The migration ID map.
    *
-   * @var \Drupal\migrate\Plugin\MigrateIdMapInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\migrate\Plugin\MigrateIdMapInterface
    */
   protected $idMap;
 
@@ -36,20 +40,24 @@ abstract class MigrateTestCase extends UnitTestCase {
   /**
    * Retrieves a mocked migration.
    *
-   * @return \Drupal\migrate\Plugin\MigrationInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @param \Drupal\migrate\Plugin\MigrateIdMapInterface|\PHPUnit\Framework\MockObject\MockObject|null $id_map
+   *   An ID map plugin to use, or NULL for using a mocked one. Optional,
+   *   defaults to NULL.
+   *
+   * @return \Drupal\migrate\Plugin\MigrationInterface|\PHPUnit\Framework\MockObject\Stub
    *   The mocked migration.
    */
-  protected function getMigration() {
+  protected function getMigration($id_map = NULL) {
     $this->migrationConfiguration += ['migrationClass' => 'Drupal\migrate\Plugin\Migration'];
-    $this->idMap = $this->createMock('Drupal\migrate\Plugin\MigrateIdMapInterface');
+    $this->idMap = $id_map;
+    if (is_null($id_map)) {
+      $this->idMap = $this->createStub(MigrateIdMapInterface::class);
+      $this->idMap
+        ->method('getQualifiedMapTableName')
+        ->willReturn('test_map');
+    }
 
-    $this->idMap
-      ->method('getQualifiedMapTableName')
-      ->willReturn('test_map');
-
-    $migration = $this->getMockBuilder($this->migrationConfiguration['migrationClass'])
-      ->disableOriginalConstructor()
-      ->getMock();
+    $migration = $this->createStub($this->migrationConfiguration['migrationClass']);
 
     $migration->method('checkRequirements')
       ->willReturn(TRUE);
@@ -59,14 +67,14 @@ abstract class MigrateTestCase extends UnitTestCase {
 
     // We need the state to be toggled throughout the test so we store the value
     // on the test class and use a return callback.
-    $migration->expects($this->any())
+    $migration
       ->method('getStatus')
       ->willReturnCallback(function () {
         return $this->migrationStatus;
       });
-    $migration->expects($this->any())
+    $migration
       ->method('setStatus')
-      ->willReturnCallback(function ($status) {
+      ->willReturnCallback(function ($status): void {
         $this->migrationStatus = $status;
       });
 
@@ -79,7 +87,7 @@ abstract class MigrateTestCase extends UnitTestCase {
     $configuration = &$this->migrationConfiguration;
 
     $migration->method('set')
-      ->willReturnCallback(function ($argument, $value) use (&$configuration) {
+      ->willReturnCallback(function ($argument, $value) use (&$configuration): void {
         $configuration[$argument] = $value;
       });
 
@@ -99,10 +107,10 @@ abstract class MigrateTestCase extends UnitTestCase {
    *   (optional) Options for the database connection. Defaults to an empty
    *   array.
    *
-   * @return \Drupal\Core\Database\Driver\sqlite\Connection
+   * @return \Drupal\sqlite\Driver\Database\sqlite\Connection
    *   The database connection.
    */
-  protected function getDatabase(array $database_contents, $connection_options = []) {
+  protected function getDatabase(array $database_contents, array $connection_options = []) {
     if (extension_loaded('pdo_sqlite')) {
       $connection_options['database'] = ':memory:';
       $pdo = Connection::open($connection_options);
@@ -114,7 +122,7 @@ abstract class MigrateTestCase extends UnitTestCase {
 
     // Initialize the DIC with a fake module handler for alterable queries.
     $container = new ContainerBuilder();
-    $container->set('module_handler', $this->createMock('\Drupal\Core\Extension\ModuleHandlerInterface'));
+    $container->set('module_handler', $this->createStub(ModuleHandlerInterface::class));
     \Drupal::setContainer($container);
 
     // Create the tables and load them up with data, skipping empty ones.
@@ -142,7 +150,7 @@ abstract class MigrateTestCase extends UnitTestCase {
   protected function createSchemaFromRow(array $row) {
     // SQLite uses loose ("affinity") typing, so it is OK for every column to be
     // a text field.
-    $fields = array_map(function () {
+    $fields = array_map(function (): array {
       return ['type' => 'text'];
     }, $row);
     return ['fields' => $fields];
@@ -156,8 +164,8 @@ abstract class MigrateTestCase extends UnitTestCase {
    * @param array $expected_results
    *   An array of expected results.
    */
-  public function queryResultTest($iter, $expected_results) {
-    $this->assertSame(count($expected_results), count($iter), 'Number of results match');
+  public function queryResultTest(\Countable|iterable $iter, \Countable|iterable $expected_results): void {
+    $this->assertSameSize($expected_results, $iter, 'Number of results match');
     $count = 0;
     foreach ($iter as $data_row) {
       $expected_row = $expected_results[$count];
@@ -180,7 +188,7 @@ abstract class MigrateTestCase extends UnitTestCase {
    * @return mixed
    *   The value on a row for a given key.
    */
-  protected function getValue($row, $key) {
+  protected function getValue(array $row, $key) {
     return $row[$key];
   }
 
@@ -194,7 +202,7 @@ abstract class MigrateTestCase extends UnitTestCase {
    * @param string $message
    *   The tested result as a formatted string.
    */
-  protected function retrievalAssertHelper($expected_value, $actual_value, $message) {
+  protected function retrievalAssertHelper($expected_value, $actual_value, string $message) {
     if (is_array($expected_value)) {
       // If the expected and actual values are empty, no need to array compare.
       if (empty($expected_value && $actual_value)) {

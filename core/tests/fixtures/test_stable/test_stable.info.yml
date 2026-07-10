@@ -1,4 +1,5 @@
 name: Test Stable
 type: theme
-description: A theme to test that stable is set as the default.
+base theme: false
+description: A theme fixture used for theme registry tests.
 version: VERSION

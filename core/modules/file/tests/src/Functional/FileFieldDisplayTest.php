@@ -1,17 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Functional;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\file\Entity\File;
 use Drupal\node\Entity\Node;
+use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the display of file fields in node and views.
- *
- * @group file
  */
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class FileFieldDisplayTest extends FileFieldTestBase {
+
+  use FieldUiTestTrait;
 
   /**
    * {@inheritdoc}
@@ -21,8 +29,8 @@ class FileFieldDisplayTest extends FileFieldTestBase {
   /**
    * Tests normal formatter display on node display.
    */
-  public function testNodeDisplay() {
-    $field_name = strtolower($this->randomMachineName());
+  public function testNodeDisplay(): void {
+    $field_name = $this->randomMachineName();
     $type_name = 'article';
     $field_storage_settings = [
       'display_field' => '1',
@@ -53,11 +61,11 @@ class FileFieldDisplayTest extends FileFieldTestBase {
           "fields[$field_name][region]" => 'content',
         ];
       }
-      $this->drupalGet("admin/structure/types/manage/{$type_name}/display");
+      $this->drupalGet("admin/structure/types/manage/{$type_name}/display/default");
       $this->submitForm($edit, 'Save');
       $this->drupalGet('node/' . $node->id());
       // Verify that the field label is hidden when no file is attached.
-      $this->assertNoText($field_name);
+      $this->assertSession()->pageTextNotContains($field_name);
     }
 
     $this->generateFile('escaped-&-text', 64, 10, 'text');
@@ -72,7 +80,6 @@ class FileFieldDisplayTest extends FileFieldTestBase {
 
     // Check that the default formatter is displaying with the file name.
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
-    $node_storage->resetCache([$nid]);
     $node = $node_storage->load($nid);
     $node_file = File::load($node->{$field_name}->target_id);
     $file_link = [
@@ -80,14 +87,15 @@ class FileFieldDisplayTest extends FileFieldTestBase {
       '#file' => $node_file,
     ];
     $default_output = \Drupal::service('renderer')->renderRoot($file_link);
-    $this->assertRaw($default_output);
+    $this->assertSession()->responseContains($default_output);
 
-    // Turn the "display" option off and check that the file is no longer displayed.
+    // Turn the "display" option off and check that the file is no longer
+    // displayed.
     $edit = [$field_name . '[0][display]' => FALSE];
     $this->drupalGet('node/' . $nid . '/edit');
     $this->submitForm($edit, 'Save');
 
-    $this->assertNoRaw($default_output);
+    $this->assertSession()->responseNotContains($default_output);
 
     // Add a description and make sure that it is displayed.
     $description = $this->randomMachineName();
@@ -100,7 +108,7 @@ class FileFieldDisplayTest extends FileFieldTestBase {
     $this->assertSession()->pageTextContains($description);
 
     // Ensure the filename in the link's title attribute is escaped.
-    $this->assertRaw('title="escaped-&amp;-text.txt"');
+    $this->assertSession()->responseContains('title="escaped-&amp;-text.txt"');
 
     // Test that fields appear as expected after during the preview.
     // Add a second file.
@@ -113,11 +121,11 @@ class FileFieldDisplayTest extends FileFieldTestBase {
     $edit[$field_name . '[0][display]'] = FALSE;
     $edit[$field_name . '[1][display]'] = FALSE;
     $this->submitForm($edit, 'Preview');
-    $this->clickLink(t('Back to content editing'));
+    $this->clickLink('Back to content editing');
     // First file.
-    $this->assertRaw($field_name . '[0][display]');
+    $this->assertSession()->responseContains($field_name . '[0][display]');
     // Second file.
-    $this->assertRaw($field_name . '[1][display]');
+    $this->assertSession()->responseContains($field_name . '[1][display]');
     $this->assertSession()->responseContains($field_name . '[1][description]');
 
     // Check that the file fields don't contain duplicate HTML IDs.
@@ -127,8 +135,8 @@ class FileFieldDisplayTest extends FileFieldTestBase {
   /**
    * Tests default display of File Field.
    */
-  public function testDefaultFileFieldDisplay() {
-    $field_name = strtolower($this->randomMachineName());
+  public function testDefaultFileFieldDisplay(): void {
+    $field_name = $this->randomMachineName();
     $type_name = 'article';
     $field_storage_settings = [
       'display_field' => '1',
@@ -154,10 +162,10 @@ class FileFieldDisplayTest extends FileFieldTestBase {
   /**
    * Tests description toggle for field instance configuration.
    */
-  public function testDescToggle() {
+  public function testDescToggle(): void {
     $type_name = 'test';
     $field_type = 'file';
-    $field_name = strtolower($this->randomMachineName());
+    $field_name = $this->randomMachineName();
     // Use the UI to add a new content type that also contains a file field.
     $edit = [
       'name' => $type_name,
@@ -165,20 +173,10 @@ class FileFieldDisplayTest extends FileFieldTestBase {
     ];
     $this->drupalGet('admin/structure/types/add');
     $this->submitForm($edit, 'Save and manage fields');
-    $edit = [
-      'new_storage_type' => $field_type,
-      'field_name' => $field_name,
-      'label' => $this->randomString(),
-    ];
-    $this->drupalGet('/admin/structure/types/manage/' . $type_name . '/fields/add-field');
-    $this->submitForm($edit, 'Save and continue');
-    $this->submitForm([], 'Save field settings');
-    // Ensure the description field is selected on the field instance settings
-    // form. That's what this test is all about.
-    $edit = [
+    $field_edit = [
       'settings[description_field]' => TRUE,
     ];
-    $this->submitForm($edit, 'Save settings');
+    $this->fieldUIAddNewField('/admin/structure/types/manage/' . $type_name, $field_name, $this->randomString(), $field_type, [], $field_edit);
     // Add a node of our new type and upload a file to it.
     $file = current($this->drupalGetTestFiles('text'));
     $title = $this->randomString();
@@ -196,8 +194,8 @@ class FileFieldDisplayTest extends FileFieldTestBase {
   /**
    * Tests description display of File Field.
    */
-  public function testDescriptionDefaultFileFieldDisplay() {
-    $field_name = strtolower($this->randomMachineName());
+  public function testDescriptionDefaultFileFieldDisplay(): void {
+    $field_name = $this->randomMachineName();
     $type_name = 'article';
     $field_storage_settings = [
       'display_field' => '1',
@@ -228,7 +226,7 @@ class FileFieldDisplayTest extends FileFieldTestBase {
 
     // Test default formatter.
     $this->drupalGet('node/' . $nid);
-    $this->assertSession()->elementTextContains('xpath', '//a[@href="' . $node->{$field_name}->entity->createFileUrl(FALSE) . '"]', $description);
+    $this->assertSession()->elementTextContains('xpath', '//a[@href="' . $node->{$field_name}->entity->createFileUrl() . '"]', $description);
 
     // Change formatter to "Table of files".
     $display = \Drupal::entityTypeManager()->getStorage('entity_view_display')->load('node.' . $type_name . '.default');
@@ -238,7 +236,20 @@ class FileFieldDisplayTest extends FileFieldTestBase {
     ])->save();
 
     $this->drupalGet('node/' . $nid);
-    $this->assertSession()->elementTextContains('xpath', '//a[@href="' . $node->{$field_name}->entity->createFileUrl(FALSE) . '"]', $description);
+    $this->assertSession()->elementTextContains('xpath', '//a[@href="' . $node->{$field_name}->entity->createFileUrl() . '"]', $description);
+    // Test that setting '#with_size' to FALSE prevents the size from being
+    // displayed as part of the file link.
+    $this->assertSession()->pageTextContainsOnce((string) ByteSizeMarkup::create($test_file->getSize()));
+
+    // Test that null file size is rendered as "Unknown".
+    $nonexistent_file = File::create([
+      'uri' => 'temporary://' . $this->randomMachineName() . '.txt',
+    ]);
+    $nonexistent_file->save();
+    $node->set($field_name, $nonexistent_file->id());
+    $node->save();
+    $this->drupalGet('node/' . $nid);
+    $this->assertSession()->elementTextEquals('xpath', '//a[@href="' . $node->{$field_name}->entity->createFileUrl() . '"]/../../../td[2]', 'Unknown');
   }
 
 }

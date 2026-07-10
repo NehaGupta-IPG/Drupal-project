@@ -1,25 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Core\Plugin\Context\ContextDefinitionInterface;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Tests\ViewTestData;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * A test for contextual filters exposed as block context.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class ContextualFiltersBlockContextTest extends ViewTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'block',
@@ -31,7 +33,7 @@ class ContextualFiltersBlockContextTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'classy';
+  protected $defaultTheme = 'stark';
 
   /**
    * Views used by this test.
@@ -57,8 +59,8 @@ class ContextualFiltersBlockContextTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp($import_test_views);
+  protected function setUp($import_test_views = TRUE, $modules = []): void {
+    parent::setUp($import_test_views, $modules);
 
     ViewTestData::createTestViews(static::class, ['block_test_views']);
     $this->enableViewsTestModule();
@@ -85,7 +87,7 @@ class ContextualFiltersBlockContextTest extends ViewTestBase {
   /**
    * Tests exposed context.
    */
-  public function testBlockContext() {
+  public function testBlockContext(): void {
     $this->drupalLogin($this->drupalCreateUser([
       'administer views',
       'administer blocks',
@@ -103,7 +105,7 @@ class ContextualFiltersBlockContextTest extends ViewTestBase {
 
     // Place test block via block UI to check if contexts are correctly exposed.
     $this->drupalGet(
-      'admin/structure/block/add/views_block:test_view_block_with_context-block_1/classy',
+      'admin/structure/block/add/views_block:test_view_block_with_context-block_1/stark',
       ['query' => ['region' => 'content']]
     );
     $edit = [
@@ -115,14 +117,14 @@ class ContextualFiltersBlockContextTest extends ViewTestBase {
     /** @var \Drupal\block\BlockInterface $block */
     $block = $this->container->get('entity_type.manager')
       ->getStorage('block')
-      ->load('views_block__test_view_block_with_context_block_1');
+      ->load('stark_views_block__test_view_block_with_context_block_1');
     $expected_settings = [
       'id' => 'views_block:test_view_block_with_context-block_1',
       'label' => '',
       'provider' => 'views',
       'label_display' => 'visible',
       'views_label' => '',
-      'items_per_page' => 'none',
+      'items_per_page' => NULL,
       'context_mapping' => ['nid' => '@node.node_route_context:node'],
     ];
     $this->assertEquals($expected_settings, $block->getPlugin()->getConfiguration(), 'Block settings are correct.');

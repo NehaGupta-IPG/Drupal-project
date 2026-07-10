@@ -1,21 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Verifies that the password reset behaves as expected with form elements.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserAccountFormPasswordResetTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'user'];
 
@@ -33,7 +35,6 @@ class UserAccountFormPasswordResetTest extends KernelTestBase {
     parent::setUp();
     // Install default configuration; required for AccountFormController.
     $this->installConfig(['user']);
-    $this->installSchema('system', ['sequences']);
     $this->installEntitySchema('user');
 
     // Create an user to login.
@@ -41,7 +42,7 @@ class UserAccountFormPasswordResetTest extends KernelTestBase {
     $this->user->save();
 
     // Set current user.
-    $this->container->set('current_user', $this->user);
+    $this->container->get('current_user')->setAccount($this->user);
     // Install the router table and then rebuild.
     \Drupal::service('router.builder')->rebuild();
   }
@@ -49,11 +50,12 @@ class UserAccountFormPasswordResetTest extends KernelTestBase {
   /**
    * Tests the reset token used only from query string.
    */
-  public function testPasswordResetToken() {
-    $token = 'VALID_TOKEN';
-    $_SESSION['pass_reset_1'] = $token;
+  public function testPasswordResetToken(): void {
     /** @var \Symfony\Component\HttpFoundation\Request $request */
     $request = $this->container->get('request_stack')->getCurrentRequest();
+
+    $token = 'VALID_TOKEN';
+    $request->getSession()->set('pass_reset_1', $token);
 
     // Set token in query string.
     $request->query->set('pass-reset-token', $token);
@@ -79,13 +81,14 @@ class UserAccountFormPasswordResetTest extends KernelTestBase {
   protected function buildAccountForm($operation) {
     // @see HtmlEntityFormController::getFormObject()
     $entity_type = 'user';
-    $fields = [];
     if ($operation != 'register') {
-      $fields['uid'] = $this->user->id();
+      $entity = $this->user;
     }
-    $entity = $this->container->get('entity_type.manager')
-      ->getStorage($entity_type)
-      ->create($fields);
+    else {
+      $entity = $this->container->get('entity_type.manager')
+        ->getStorage($entity_type)
+        ->create();
+    }
 
     // @see EntityFormBuilder::getForm()
     return $this->container->get('entity.form_builder')->getForm($entity, $operation);

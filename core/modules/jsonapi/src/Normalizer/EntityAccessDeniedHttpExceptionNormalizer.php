@@ -19,14 +19,9 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  * @see https://www.drupal.org/project/drupal/issues/3032787
  * @see jsonapi.api.php
  *
- * @see http://jsonapi.org/format/#error-objects
+ * @see https://jsonapi.org/format/#error-objects
  */
 class EntityAccessDeniedHttpExceptionNormalizer extends HttpExceptionNormalizer {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $supportedInterfaceOrClass = EntityAccessDeniedHttpException::class;
 
   /**
    * {@inheritdoc}
@@ -40,9 +35,8 @@ class EntityAccessDeniedHttpExceptionNormalizer extends HttpExceptionNormalizer 
       $entity = $error['entity'];
       $pointer = $error['pointer'];
       $reason = $error['reason'];
-      $relationship_field = isset($error['relationship_field'])
-        ? $error['relationship_field']
-        : NULL;
+      $relationship_field = $error['relationship_field']
+        ?? NULL;
 
       if (isset($entity)) {
         $entity_type_id = $entity->getEntityTypeId();
@@ -64,6 +58,15 @@ class EntityAccessDeniedHttpExceptionNormalizer extends HttpExceptionNormalizer 
     }
 
     return $errors;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSupportedTypes(?string $format): array {
+    return [
+      EntityAccessDeniedHttpException::class => TRUE,
+    ];
   }
 
 }

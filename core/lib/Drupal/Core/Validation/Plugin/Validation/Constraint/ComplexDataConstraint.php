@@ -2,19 +2,20 @@
 
 namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 
-use Symfony\Component\Validator\Constraint;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Validation\Attribute\Constraint;
+use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 
 /**
  * Complex data constraint.
  *
  * Validates properties of complex data structures.
- *
- * @Constraint(
- *   id = "ComplexData",
- *   label = @Translation("Complex data", context = "Validation")
- * )
  */
-class ComplexDataConstraint extends Constraint {
+#[Constraint(
+  id: 'ComplexData',
+  label: new TranslatableMarkup('Complex data', [], ['context' => 'Validation'])
+)]
+class ComplexDataConstraint extends SymfonyConstraint {
 
   /**
    * An array of constraints for contained properties, keyed by property name.
@@ -23,15 +24,22 @@ class ComplexDataConstraint extends Constraint {
    */
   public $properties;
 
-  /**
-   * {@inheritdoc}
-   */
-  public function __construct($options = NULL) {
-    // Allow skipping the 'properties' key in the options.
-    if (is_array($options) && !array_key_exists('properties', $options)) {
-      $options = ['properties' => $options];
+  public function __construct(
+    ?array $properties = NULL,
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+    ...$otherProperties,
+  ) {
+    if ($properties === NULL) {
+      if (!empty($otherProperties)) {
+        $properties = $otherProperties;
+      }
+      else {
+        throw new \InvalidArgumentException('Properties must be passed to ComplexData constraint');
+      }
     }
-    parent::__construct($options);
+    parent::__construct(groups: $groups, payload: $payload);
+    $this->properties = $properties;
     $constraint_manager = \Drupal::service('validation.constraint');
 
     // Instantiate constraint objects for array definitions.
@@ -42,20 +50,6 @@ class ComplexDataConstraint extends Constraint {
         }
       }
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getDefaultOption() {
-    return 'properties';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getRequiredOptions() {
-    return ['properties'];
   }
 
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\serialization\Unit\Normalizer;
 
 use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
@@ -9,19 +11,20 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityTypeRepositoryInterface;
 use Drupal\serialization\Normalizer\ConfigEntityNormalizer;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\serialization\Normalizer\ConfigEntityNormalizer
- * @group serialization
+ * Tests Drupal\serialization\Normalizer\ConfigEntityNormalizer.
  */
+#[CoversClass(ConfigEntityNormalizer::class)]
+#[Group('serialization')]
 class ConfigEntityNormalizerTest extends UnitTestCase {
 
   /**
    * Tests the normalize() method.
-   *
-   * @covers ::normalize
    */
-  public function testNormalize() {
+  public function testNormalize(): void {
     $test_export_properties = [
       'test' => 'test',
       '_core' => [
@@ -30,9 +33,9 @@ class ConfigEntityNormalizerTest extends UnitTestCase {
       ],
     ];
 
-    $entity_field_manager = $this->createMock(EntityFieldManagerInterface::class);
-    $entity_type_manager = $this->createMock(EntityTypeManagerInterface::class);
-    $entity_type_repository = $this->createMock(EntityTypeRepositoryInterface::class);
+    $entity_field_manager = $this->createStub(EntityFieldManagerInterface::class);
+    $entity_type_manager = $this->createStub(EntityTypeManagerInterface::class);
+    $entity_type_repository = $this->createStub(EntityTypeRepositoryInterface::class);
     $normalizer = new ConfigEntityNormalizer(
       $entity_type_manager,
       $entity_type_repository,
@@ -42,15 +45,15 @@ class ConfigEntityNormalizerTest extends UnitTestCase {
     $config_entity = $this->createMock('Drupal\Core\Config\Entity\ConfigEntityInterface');
     $config_entity->expects($this->once())
       ->method('toArray')
-      ->will($this->returnValue($test_export_properties));
+      ->willReturn($test_export_properties);
 
     $this->assertSame(['test' => 'test'], $normalizer->normalize($config_entity));
   }
 
   /**
-   * @covers ::denormalize
+   * Tests denormalize.
    */
-  public function testDenormalize() {
+  public function testDenormalize(): void {
     $test_value = $this->randomMachineName();
     $data = [
       'test' => $test_value,
@@ -69,7 +72,7 @@ class ConfigEntityNormalizerTest extends UnitTestCase {
     $entity_storage = $this->prophesize(EntityStorageInterface::class);
     $entity_storage->create($expected_storage_data)
       ->shouldBeCalled()
-      ->will(function ($args) {
+      ->will(function ($args): \stdClass {
         $entity = new \stdClass();
         $entity->received_data = $args[0];
         return $entity;

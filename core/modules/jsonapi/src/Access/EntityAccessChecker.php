@@ -15,10 +15,7 @@ use Drupal\jsonapi\JsonApiResource\LabelOnlyResourceObject;
 use Drupal\jsonapi\JsonApiResource\ResourceObject;
 use Drupal\jsonapi\JsonApiSpec;
 use Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface;
-use Drupal\media\Access\MediaRevisionAccessCheck;
-use Drupal\media\MediaInterface;
-use Drupal\node\Access\NodeRevisionAccessCheck;
-use Drupal\node\NodeInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -37,52 +34,6 @@ use Symfony\Component\Routing\RouterInterface;
 class EntityAccessChecker {
 
   /**
-   * The JSON:API resource type repository.
-   *
-   * @var \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface
-   */
-  protected $resourceTypeRepository;
-
-  /**
-   * The router.
-   *
-   * @var \Symfony\Component\Routing\RouterInterface
-   */
-  protected $router;
-
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $currentUser;
-
-  /**
-   * The entity repository.
-   *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
-   */
-  protected $entityRepository;
-
-  /**
-   * The node revision access check service.
-   *
-   * This will be NULL unless the node module is installed.
-   *
-   * @var \Drupal\node\Access\NodeRevisionAccessCheck|null
-   */
-  protected $nodeRevisionAccessCheck = NULL;
-
-  /**
-   * The media revision access check service.
-   *
-   * This will be NULL unless the media module is installed.
-   *
-   * @var \Drupal\media\Access\MediaRevisionAccessCheck|null
-   */
-  protected $mediaRevisionAccessCheck = NULL;
-
-  /**
    * The latest revision check service.
    *
    * This will be NULL unless the content_moderation module is installed. This
@@ -93,47 +44,13 @@ class EntityAccessChecker {
    */
   protected $latestRevisionCheck = NULL;
 
-  /**
-   * EntityAccessChecker constructor.
-   *
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resource_type_repository
-   *   The JSON:API resource type repository.
-   * @param \Symfony\Component\Routing\RouterInterface $router
-   *   The router.
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   The current user.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
-   *   The entity repository.
-   */
-  public function __construct(ResourceTypeRepositoryInterface $resource_type_repository, RouterInterface $router, AccountInterface $account, EntityRepositoryInterface $entity_repository) {
-    $this->resourceTypeRepository = $resource_type_repository;
-    $this->router = $router;
-    $this->currentUser = $account;
-    $this->entityRepository = $entity_repository;
-  }
-
-  /**
-   * Sets the node revision access check service.
-   *
-   * This is only called when node module is installed.
-   *
-   * @param \Drupal\node\Access\NodeRevisionAccessCheck $node_revision_access_check
-   *   The node revision access check service.
-   */
-  public function setNodeRevisionAccessCheck(NodeRevisionAccessCheck $node_revision_access_check) {
-    $this->nodeRevisionAccessCheck = $node_revision_access_check;
-  }
-
-  /**
-   * Sets the media revision access check service.
-   *
-   * This is only called when media module is installed.
-   *
-   * @param \Drupal\media\Access\MediaRevisionAccessCheck $media_revision_access_check
-   *   The media revision access check service.
-   */
-  public function setMediaRevisionAccessCheck(MediaRevisionAccessCheck $media_revision_access_check) {
-    $this->mediaRevisionAccessCheck = $media_revision_access_check;
+  public function __construct(
+    protected ResourceTypeRepositoryInterface $resourceTypeRepository,
+    #[Autowire(service: 'router.no_access_checks')]
+    protected RouterInterface $router,
+    protected AccountInterface $currentUser,
+    protected EntityRepositoryInterface $entityRepository,
+  ) {
   }
 
   /**
@@ -165,7 +82,7 @@ class EntityAccessChecker {
    *   EntityAccessDeniedHttpException object if neither is accessible. All
    *   three possible return values carry the access result cacheability.
    */
-  public function getAccessCheckedResourceObject(EntityInterface $entity, AccountInterface $account = NULL) {
+  public function getAccessCheckedResourceObject(EntityInterface $entity, ?AccountInterface $account = NULL) {
     $account = $account ?: $this->currentUser;
     $resource_type = $this->resourceTypeRepository->get($entity->getEntityTypeId(), $entity->bundle());
     $entity = $this->entityRepository->getTranslationFromContext($entity, NULL, ['operation' => 'entity_upcast']);
@@ -235,32 +152,12 @@ class EntityAccessChecker {
    *
    * @return \Drupal\Core\Access\AccessResultInterface|\Drupal\Core\Access\AccessResultReasonInterface
    *   The access check result.
-   *
-   * @todo: remove when a generic revision access API exists in Drupal core, and
-   * also remove the injected "node" and "media" services.
-   * @see https://www.drupal.org/project/drupal/issues/2992833#comment-12818386
    */
   protected function checkRevisionViewAccess(EntityInterface $entity, AccountInterface $account) {
     assert($entity instanceof RevisionableInterface);
     assert(!$entity->isDefaultRevision(), 'It is not necessary to check revision access when the entity is the default revision.');
     $entity_type = $entity->getEntityType();
-    switch ($entity_type->id()) {
-      case 'node':
-        assert($entity instanceof NodeInterface);
-        $access = AccessResult::allowedIf($this->nodeRevisionAccessCheck->checkAccess($entity, $account, 'view'))->cachePerPermissions()->addCacheableDependency($entity);
-        break;
-
-      case 'media':
-        assert($entity instanceof MediaInterface);
-        $access = AccessResult::allowedIf($this->mediaRevisionAccessCheck->checkAccess($entity, $account, 'view'))->cachePerPermissions()->addCacheableDependency($entity);
-        break;
-
-      default:
-        $reason = 'Only node and media revisions are supported by JSON:API.';
-        $reason .= ' For context, see https://www.drupal.org/project/drupal/issues/2992833#comment-12818258.';
-        $reason .= ' To contribute, see https://www.drupal.org/project/drupal/issues/2350939 and https://www.drupal.org/project/drupal/issues/2809177.';
-        $access = AccessResult::neutral($reason);
-    }
+    $access = $entity->access('view all revisions', $account, TRUE);
     // Apply content_moderation's additional access logic.
     // @see \Drupal\content_moderation\Access\LatestRevisionCheck::access()
     if ($entity_type->getLinkTemplate('latest-version') && $entity->isLatestRevision() && isset($this->latestRevisionCheck)) {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views_ui\Functional;
 
 use Drupal\Tests\views\Functional\ViewTestBase;
@@ -24,17 +26,15 @@ abstract class UITestBase extends ViewTestBase {
   protected $fullAdminUser;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'views_ui', 'block', 'taxonomy'];
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp($import_test_views = TRUE) {
-    parent::setUp($import_test_views);
+  protected function setUp($import_test_views = TRUE, $modules = ['views_test_config']): void {
+    parent::setUp($import_test_views, $modules);
 
     $this->enableViewsTestModule();
 
@@ -57,7 +57,7 @@ abstract class UITestBase extends ViewTestBase {
     // Create a new view in the UI.
     $default = [];
     $default['label'] = $this->randomMachineName(16);
-    $default['id'] = strtolower($this->randomMachineName(16));
+    $default['id'] = $this->randomMachineName(16);
     $default['description'] = $this->randomMachineName(16);
     $default['page[create]'] = TRUE;
     $default['page[path]'] = $default['id'];
@@ -73,11 +73,11 @@ abstract class UITestBase extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function drupalGet($path, array $options = [], array $headers = []) {
+  protected function drupalGet($path, array $options = [], array $headers = []): string {
     $url = $this->buildUrl($path, $options);
 
     // Ensure that each nojs page is accessible via ajax as well.
-    if (strpos($url, '/nojs/') !== FALSE) {
+    if (str_contains($url, '/nojs/')) {
       $url = preg_replace('|/nojs/|', '/ajax/', $url, 1);
       $result = $this->drupalGet($url, $options);
       $this->assertSession()->statusCodeEquals(200);

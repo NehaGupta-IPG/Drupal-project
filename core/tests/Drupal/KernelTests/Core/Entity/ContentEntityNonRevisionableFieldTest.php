@@ -1,25 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
 use Drupal\entity_test\Entity\EntityTestMulRev;
 use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests non-revisionable fields on revisionable (and translatable) entities.
- *
- * @group Entity
  */
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class ContentEntityNonRevisionableFieldTest extends EntityKernelTestBase {
 
   use EntityDefinitionTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['language'];
 
@@ -36,6 +39,13 @@ class ContentEntityNonRevisionableFieldTest extends EntityKernelTestBase {
    * @var \Drupal\Core\Entity\EntityStorageInterface
    */
   protected $rev;
+
+  /**
+   * The entity definition update manager.
+   *
+   * @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
+   */
+  protected EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager;
 
   /**
    * {@inheritdoc}
@@ -55,7 +65,7 @@ class ContentEntityNonRevisionableFieldTest extends EntityKernelTestBase {
   /**
    * Tests non-revisionable fields on revisionable and translatable entities.
    */
-  public function testMulNonRevisionableField() {
+  public function testMulNonRevisionableField(): void {
     $user1 = $this->createUser();
     $user2 = $this->createUser();
 
@@ -123,7 +133,7 @@ class ContentEntityNonRevisionableFieldTest extends EntityKernelTestBase {
   /**
    * Tests non-revisionable fields on revisionable entities.
    */
-  public function testNonRevisionableField() {
+  public function testNonRevisionableField(): void {
     $user1 = $this->createUser();
     $user2 = $this->createUser();
 
@@ -184,7 +194,7 @@ class ContentEntityNonRevisionableFieldTest extends EntityKernelTestBase {
   /**
    * Tests multi column non revisionable base field for revisionable entity.
    */
-  public function testMultiColumnNonRevisionableBaseField() {
+  public function testMultiColumnNonRevisionableBaseField(): void {
     \Drupal::state()->set('entity_test.multi_column', TRUE);
     $this->applyEntityUpdates('entity_test_mulrev');
     // Refresh the storage.

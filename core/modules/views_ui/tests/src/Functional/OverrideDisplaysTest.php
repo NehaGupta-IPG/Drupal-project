@@ -1,12 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views_ui\Functional;
+
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that displays can be correctly overridden via the user interface.
- *
- * @group views_ui
  */
+#[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class OverrideDisplaysTest extends UITestBase {
 
   /**
@@ -14,8 +19,11 @@ class OverrideDisplaysTest extends UITestBase {
    */
   protected $defaultTheme = 'stark';
 
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp($import_test_views);
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp($import_test_views = TRUE, $modules = ['views_test_config']): void {
+    parent::setUp($import_test_views, $modules);
 
     $this->drupalPlaceBlock('page_title_block');
   }
@@ -23,11 +31,11 @@ class OverrideDisplaysTest extends UITestBase {
   /**
    * Tests that displays can be overridden via the UI.
    */
-  public function testOverrideDisplays() {
+  public function testOverrideDisplays(): void {
     // Create a basic view that shows all content, with a page and a block
     // display.
     $view['label'] = $this->randomMachineName(16);
-    $view['id'] = strtolower($this->randomMachineName(16));
+    $view['id'] = $this->randomMachineName(16);
     $view['page[create]'] = 1;
     $view['page[path]'] = $this->randomMachineName(16);
     $view['block[create]'] = 1;
@@ -63,6 +71,7 @@ class OverrideDisplaysTest extends UITestBase {
     $this->assertSession()->pageTextContains($view['label']);
 
     // Place the block.
+    $this->container->get('plugin.manager.block')->clearCachedDefinitions();
     $this->drupalPlaceBlock("views_block:{$view['id']}-block_1");
 
     // Make sure the title appears in the block.
@@ -87,13 +96,13 @@ class OverrideDisplaysTest extends UITestBase {
   /**
    * Tests that the wizard correctly sets up default and overridden displays.
    */
-  public function testWizardMixedDefaultOverriddenDisplays() {
+  public function testWizardMixedDefaultOverriddenDisplays(): void {
     // Create a basic view with a page, block, and feed. Give the page and feed
     // identical titles, but give the block a different one, so we expect the
     // page and feed to inherit their titles from the default display, but the
     // block to override it.
     $view['label'] = $this->randomMachineName(16);
-    $view['id'] = strtolower($this->randomMachineName(16));
+    $view['id'] = $this->randomMachineName(16);
     $view['page[create]'] = 1;
     $view['page[title]'] = $this->randomMachineName(16);
     $view['page[path]'] = $this->randomMachineName(16);
@@ -114,11 +123,11 @@ class OverrideDisplaysTest extends UITestBase {
     $this->drupalGet($view['page[path]']);
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains($view['page[title]']);
-    $this->assertNoText($view['block[title]']);
+    $this->assertSession()->pageTextNotContains($view['block[title]']);
     $this->drupalGet($view['page[feed_properties][path]']);
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->responseContains($view['page[title]']);
-    $this->assertNoText($view['block[title]']);
+    $this->assertSession()->responseNotContains($view['block[title]']);
 
     // Confirm that the block is available in the block administration UI.
     $this->drupalGet('admin/structure/block/list/' . $this->config('system.theme')->get('default'));
@@ -128,6 +137,7 @@ class OverrideDisplaysTest extends UITestBase {
     // Put the block into the first sidebar region, and make sure it will not
     // display on the view's page display (since we will be searching for the
     // presence/absence of the view's title in both the page and the block).
+    $this->container->get('plugin.manager.block')->clearCachedDefinitions();
     $this->drupalPlaceBlock("views_block:{$view['id']}-block_1", [
       'visibility' => [
         'request_path' => [
@@ -139,7 +149,7 @@ class OverrideDisplaysTest extends UITestBase {
 
     $this->drupalGet('');
     $this->assertSession()->pageTextContains($view['block[title]']);
-    $this->assertNoText($view['page[title]']);
+    $this->assertSession()->pageTextNotContains($view['page[title]']);
 
     // Edit the page and change the title. This should automatically change
     // the feed's title also, but not the block.
@@ -152,16 +162,16 @@ class OverrideDisplaysTest extends UITestBase {
     $this->drupalGet($view['page[path]']);
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains($new_default_title);
-    $this->assertNoText($view['page[title]']);
-    $this->assertNoText($view['block[title]']);
+    $this->assertSession()->pageTextNotContains($view['page[title]']);
+    $this->assertSession()->pageTextNotContains($view['block[title]']);
     $this->drupalGet($view['page[feed_properties][path]']);
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->responseContains($new_default_title);
-    $this->assertNoText($view['page[title]']);
-    $this->assertNoText($view['block[title]']);
+    $this->assertSession()->responseNotContains($view['page[title]']);
+    $this->assertSession()->responseNotContains($view['block[title]']);
     $this->drupalGet('');
-    $this->assertNoText($new_default_title);
-    $this->assertNoText($view['page[title]']);
+    $this->assertSession()->pageTextNotContains($new_default_title);
+    $this->assertSession()->pageTextNotContains($view['page[title]']);
     $this->assertSession()->pageTextContains($view['block[title]']);
 
     // Edit the block and change the title. This should automatically change
@@ -178,21 +188,21 @@ class OverrideDisplaysTest extends UITestBase {
     $this->drupalGet($view['page[feed_properties][path]']);
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->responseContains($new_default_title);
-    $this->assertNoText($new_block_title);
+    $this->assertSession()->responseNotContains($new_block_title);
     $this->drupalGet('');
     $this->assertSession()->pageTextContains($new_block_title);
-    $this->assertNoText($view['block[title]']);
+    $this->assertSession()->pageTextNotContains($view['block[title]']);
   }
 
   /**
    * Tests that the revert to all displays select-option works as expected.
    */
-  public function testRevertAllDisplays() {
+  public function testRevertAllDisplays(): void {
     // Create a basic view with a page, block.
     // Because there is both a title on page and block we expect the title on
     // the block be overridden.
     $view['label'] = $this->randomMachineName(16);
-    $view['id'] = strtolower($this->randomMachineName(16));
+    $view['id'] = $this->randomMachineName(16);
     $view['page[create]'] = 1;
     $view['page[title]'] = $this->randomMachineName(16);
     $view['page[path]'] = $this->randomMachineName(16);

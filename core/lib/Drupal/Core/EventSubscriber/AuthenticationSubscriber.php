@@ -125,6 +125,7 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
    * Detect disallowed authentication methods on access denied exceptions.
    *
    * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   *   The event.
    */
   public function onExceptionAccessDenied(ExceptionEvent $event) {
     if (isset($this->filter) && $event->isMainRequest()) {
@@ -139,7 +140,7 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     // The priority for authentication must be higher than the highest event
     // subscriber accessing the current user. Especially it must be higher than
     // LanguageRequestSubscriber as LanguageManager accesses the current user if

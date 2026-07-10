@@ -1,50 +1,47 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Unit;
 
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Tests\UnitTestCase;
-use Drupal\views\ViewsData;
 use Drupal\views\Tests\ViewTestData;
+use Drupal\views\ViewsData;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
- * @coversDefaultClass \Drupal\views\ViewsData
- * @group views
+ * Tests Drupal\views\ViewsData.
  */
+#[CoversClass(ViewsData::class)]
+#[Group('views')]
 class ViewsDataTest extends UnitTestCase {
 
   /**
    * The mocked cache backend.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Cache\CacheBackendInterface
    */
   protected $cacheBackend;
 
   /**
-   * The mocked cache tags invalidator.
-   *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface|\PHPUnit\Framework\MockObject\MockObject
-   */
-  protected $cacheTagsInvalidator;
-
-  /**
    * The mocked module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
-   * The mocked config factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
-   */
-  protected $configFactory;
-
-  /**
    * The mocked language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $languageManager;
 
@@ -59,20 +56,35 @@ class ViewsDataTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
-    $this->cacheTagsInvalidator = $this->createMock('Drupal\Core\Cache\CacheTagsInvalidatorInterface');
-    $this->cacheBackend = $this->createMock('Drupal\Core\Cache\CacheBackendInterface');
-    $this->getContainerWithCacheTagsInvalidator($this->cacheTagsInvalidator);
+    parent::setUp();
 
-    $configs = [];
-    $configs['views.settings']['skip_cache'] = FALSE;
-    $this->configFactory = $this->getConfigFactoryStub($configs);
-    $this->moduleHandler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
-    $this->languageManager = $this->createMock('Drupal\Core\Language\LanguageManagerInterface');
-    $this->languageManager->expects($this->any())
+    $this->cacheBackend = $this->createStub(CacheBackendInterface::class);
+
+    $this->moduleHandler = $this->createStub(ModuleHandlerInterface::class);
+    $this->languageManager = $this->createStub(LanguageManagerInterface::class);
+    $this->languageManager
       ->method('getCurrentLanguage')
-      ->will($this->returnValue(new Language(['id' => 'en'])));
+      ->willReturn(new Language(['id' => 'en']));
 
-    $this->viewsData = new ViewsData($this->cacheBackend, $this->configFactory, $this->moduleHandler, $this->languageManager);
+    $this->viewsData = new ViewsData($this->cacheBackend, $this->moduleHandler, $this->languageManager);
+  }
+
+  /**
+   * Reinitializes the cache backend as a mock object.
+   */
+  protected function setUpMockCacheBackend(): void {
+    $this->cacheBackend = $this->createMock(CacheBackendInterface::class);
+    $reflection = new \ReflectionProperty($this->viewsData, 'cacheBackend');
+    $reflection->setValue($this->viewsData, $this->cacheBackend);
+  }
+
+  /**
+   * Reinitializes the module handler as a mock object.
+   */
+  protected function setUpMockModuleHandler(): void {
+    $this->moduleHandler = $this->createMock(ModuleHandlerInterface::class);
+    $reflection = new \ReflectionProperty($this->viewsData, 'moduleHandler');
+    $reflection->setValue($this->viewsData, $this->moduleHandler);
   }
 
   /**
@@ -115,6 +127,7 @@ class ViewsDataTest extends UnitTestCase {
    * Returns the views data definition with the provider key.
    *
    * @return array
+   *   The views data definition.
    *
    * @see static::viewsData()
    */
@@ -127,27 +140,23 @@ class ViewsDataTest extends UnitTestCase {
   }
 
   /**
-   * Mocks the basic module handler used for the test.
-   *
-   * @return \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * Reinitializes the module handler as a mock object with an expectation.
    */
-  protected function setupMockedModuleHandler() {
-    $views_data = $this->viewsData();
-    $this->moduleHandler->expects($this->at(0))
-      ->method('getImplementations')
+  protected function setUpMockModuleHandlerWithExpectation(): void {
+    $this->setUpMockModuleHandler();
+    $this->moduleHandler->expects($this->atLeastOnce())
+      ->method('invokeAllWith')
       ->with('views_data')
-      ->willReturn(['views_test_data']);
-    $this->moduleHandler->expects($this->at(1))
-      ->method('invoke')
-      ->with('views_test_data', 'views_data')
-      ->willReturn($views_data);
+      ->willReturnCallback(function (string $hook, callable $callback): void {
+        $callback(\Closure::fromCallable([$this, 'viewsData']), 'views_test_data');
+      });
   }
 
   /**
    * Tests the fetchBaseTables() method.
    */
-  public function testFetchBaseTables() {
-    $this->setupMockedModuleHandler();
+  public function testFetchBaseTables(): void {
+    $this->setUpMockModuleHandlerWithExpectation();
     $data = $this->viewsData->getAll();
 
     $base_tables = $this->viewsData->fetchBaseTables();
@@ -184,18 +193,19 @@ class ViewsDataTest extends UnitTestCase {
   /**
    * Tests fetching all the views data without a static cache.
    */
-  public function testGetOnFirstCall() {
+  public function testGetOnFirstCall(): void {
+    $this->setUpMockCacheBackend();
     // Ensure that the hooks are just invoked once.
-    $this->setupMockedModuleHandler();
+    $this->setUpMockModuleHandlerWithExpectation();
 
-    $this->moduleHandler->expects($this->at(2))
+    $this->moduleHandler->expects($this->once())
       ->method('alter')
       ->with('views_data', $this->viewsDataWithProvider());
 
     $this->cacheBackend->expects($this->once())
       ->method('get')
       ->with("views_data:en")
-      ->will($this->returnValue(FALSE));
+      ->willReturn(FALSE);
 
     $expected_views_data = $this->viewsDataWithProvider();
     $views_data = $this->viewsData->getAll();
@@ -205,70 +215,59 @@ class ViewsDataTest extends UnitTestCase {
   /**
    * Tests the cache of the full and single table data.
    */
-  public function testFullAndTableGetCache() {
+  public function testFullAndTableGetCache(): void {
+    $this->setUpMockCacheBackend();
+    $this->setUpMockModuleHandler();
     $expected_views_data = $this->viewsDataWithProvider();
     $table_name = 'views_test_data';
     $table_name_2 = 'views_test_data_2';
     $random_table_name = $this->randomMachineName();
 
     // Views data should be invoked twice due to the clear call.
-    $this->moduleHandler->expects($this->at(0))
-      ->method('getImplementations')
+    $this->moduleHandler->expects($this->exactly(2))
+      ->method('invokeAllWith')
       ->with('views_data')
-      ->willReturn(['views_test_data']);
-    $this->moduleHandler->expects($this->at(1))
-      ->method('invoke')
-      ->with('views_test_data', 'views_data')
-      ->willReturn($this->viewsData());
-    $this->moduleHandler->expects($this->at(2))
-      ->method('alter')
-      ->with('views_data', $expected_views_data);
-
-    $this->moduleHandler->expects($this->at(3))
-      ->method('getImplementations')
-      ->with('views_data')
-      ->willReturn(['views_test_data']);
-    $this->moduleHandler->expects($this->at(4))
-      ->method('invoke')
-      ->with('views_test_data', 'views_data')
-      ->willReturn($this->viewsData());
-    $this->moduleHandler->expects($this->at(5))
+      ->willReturnCallback(function ($hook, $callback): void {
+        $callback(\Closure::fromCallable([$this, 'viewsData']), 'views_test_data');
+      });
+    $this->moduleHandler->expects($this->exactly(2))
       ->method('alter')
       ->with('views_data', $expected_views_data);
 
     // The cache should only be called once (before the clear() call) as get
     // will get all table data in the first get().
-    $this->cacheBackend->expects($this->at(0))
+    $gets = [
+      'views_data:en',
+      "views_data:$random_table_name:en",
+      'views_data:en',
+      "views_data:$random_table_name:en",
+    ];
+    $this->cacheBackend->expects($this->exactly(count($gets)))
       ->method('get')
-      ->with("views_data:en")
-      ->will($this->returnValue(FALSE));
-    $this->cacheBackend->expects($this->at(1))
+      ->with($this->callback(function (string $key) use (&$gets): bool {
+        return $key === array_shift($gets);
+      }))
+      ->willReturn(FALSE);
+
+    $sets = [
+      'views_data:en', $expected_views_data,
+      "views_data:$random_table_name:en", [],
+      'views_data:en', $expected_views_data,
+      "views_data:$random_table_name:en", [],
+    ];
+    $this->cacheBackend->expects($this->exactly(count($sets) / 2))
       ->method('set')
-      ->with("views_data:en", $expected_views_data);
-    $this->cacheBackend->expects($this->at(2))
-      ->method('get')
-      ->with("views_data:$random_table_name:en")
-      ->will($this->returnValue(FALSE));
-    $this->cacheBackend->expects($this->at(3))
-      ->method('set')
-      ->with("views_data:$random_table_name:en", []);
-    $this->cacheTagsInvalidator->expects($this->once())
+      ->with($this->callback(function (string $key) use (&$sets): bool {
+        return $key === array_shift($sets);
+      }), $this->callback(function (array $data) use (&$sets): bool {
+        return $data === array_shift($sets);
+      }));
+
+    $cacheTagsInvalidator = $this->createMock(CacheTagsInvalidatorInterface::class);
+    $cacheTagsInvalidator->expects($this->once())
       ->method('invalidateTags')
       ->with(['views_data']);
-    $this->cacheBackend->expects($this->at(4))
-      ->method('get')
-      ->with("views_data:en")
-      ->will($this->returnValue(FALSE));
-    $this->cacheBackend->expects($this->at(5))
-      ->method('set')
-      ->with("views_data:en", $expected_views_data);
-    $this->cacheBackend->expects($this->at(6))
-      ->method('get')
-      ->with("views_data:$random_table_name:en")
-      ->will($this->returnValue(FALSE));
-    $this->cacheBackend->expects($this->at(7))
-      ->method('set')
-      ->with("views_data:$random_table_name:en", []);
+    $this->getContainerWithCacheTagsInvalidator($cacheTagsInvalidator);
 
     $views_data = $this->viewsData->getAll();
     $this->assertSame($expected_views_data, $views_data);
@@ -296,11 +295,12 @@ class ViewsDataTest extends UnitTestCase {
   /**
    * Tests the caching of the full views data.
    */
-  public function testFullGetCache() {
+  public function testFullGetCache(): void {
     $expected_views_data = $this->viewsDataWithProvider();
 
+    $this->setUpMockCacheBackend();
     // Views data should be invoked once.
-    $this->setupMockedModuleHandler();
+    $this->setUpMockModuleHandlerWithExpectation();
 
     $this->moduleHandler->expects($this->once())
       ->method('alter')
@@ -309,7 +309,7 @@ class ViewsDataTest extends UnitTestCase {
     $this->cacheBackend->expects($this->once())
       ->method('get')
       ->with("views_data:en")
-      ->will($this->returnValue(FALSE));
+      ->willReturn(FALSE);
 
     $views_data = $this->viewsData->getAll();
     $this->assertSame($expected_views_data, $views_data);
@@ -321,25 +321,25 @@ class ViewsDataTest extends UnitTestCase {
   /**
    * Tests the caching of the views data for a specific table.
    */
-  public function testSingleTableGetCache() {
+  public function testSingleTableGetCache(): void {
     $table_name = 'views_test_data';
     $expected_views_data = $this->viewsDataWithProvider();
 
+    $this->setUpMockCacheBackend();
     // Views data should be invoked once.
-    $this->setupMockedModuleHandler();
+    $this->setUpMockModuleHandlerWithExpectation();
 
     $this->moduleHandler->expects($this->once())
       ->method('alter')
       ->with('views_data', $this->viewsDataWithProvider());
 
-    $this->cacheBackend->expects($this->at(0))
+    $gets = ["views_data:$table_name:en", 'views_data:en'];
+    $this->cacheBackend->expects($this->exactly(count($gets)))
       ->method('get')
-      ->with("views_data:$table_name:en")
-      ->will($this->returnValue(FALSE));
-    $this->cacheBackend->expects($this->at(1))
-      ->method('get')
-      ->with("views_data:en")
-      ->will($this->returnValue(FALSE));
+      ->with($this->callback(function (string $key) use (&$gets): bool {
+        return $key === array_shift($gets);
+      }))
+      ->willReturn(FALSE);
 
     $views_data = $this->viewsData->get($table_name);
     $this->assertSame($expected_views_data[$table_name], $views_data, 'Make sure fetching views data by table works as expected.');
@@ -357,24 +357,24 @@ class ViewsDataTest extends UnitTestCase {
   /**
    * Tests building the views data with a non existing table.
    */
-  public function testNonExistingTableGetCache() {
+  public function testNonExistingTableGetCache(): void {
     $random_table_name = $this->randomMachineName();
 
+    $this->setUpMockCacheBackend();
     // Views data should be invoked once.
-    $this->setupMockedModuleHandler();
+    $this->setUpMockModuleHandlerWithExpectation();
 
     $this->moduleHandler->expects($this->once())
       ->method('alter')
       ->with('views_data', $this->viewsDataWithProvider());
 
-    $this->cacheBackend->expects($this->at(0))
+    $gets = ["views_data:$random_table_name:en", 'views_data:en'];
+    $this->cacheBackend->expects($this->exactly(count($gets)))
       ->method('get')
-      ->with("views_data:$random_table_name:en")
-      ->will($this->returnValue(FALSE));
-    $this->cacheBackend->expects($this->at(1))
-      ->method('get')
-      ->with("views_data:en")
-      ->will($this->returnValue(FALSE));
+      ->with($this->callback(function (string $key) use (&$gets): bool {
+        return $key === array_shift($gets);
+      }))
+      ->willReturn(FALSE);
 
     // All views data should be requested on the first try.
     $views_data = $this->viewsData->get($random_table_name);
@@ -388,23 +388,30 @@ class ViewsDataTest extends UnitTestCase {
   /**
    * Tests the cache backend behavior with requesting the same table multiple.
    */
-  public function testCacheCallsWithSameTableMultipleTimes() {
+  public function testCacheCallsWithSameTableMultipleTimes(): void {
     $expected_views_data = $this->viewsDataWithProvider();
 
-    $this->setupMockedModuleHandler();
+    $this->setUpMockCacheBackend();
+    $this->setUpMockModuleHandlerWithExpectation();
 
-    $this->cacheBackend->expects($this->at(0))
+    $gets = ['views_data:views_test_data:en', 'views_data:en'];
+    $this->cacheBackend->expects($this->exactly(count($gets)))
       ->method('get')
-      ->with('views_data:views_test_data:en');
-    $this->cacheBackend->expects($this->at(1))
-      ->method('get')
-      ->with('views_data:en');
-    $this->cacheBackend->expects($this->at(2))
+      ->with($this->callback(function (string $key) use (&$gets): bool {
+        return $key === array_shift($gets);
+      }));
+
+    $sets = [
+      'views_data:en', $expected_views_data,
+      'views_data:views_test_data:en', $expected_views_data['views_test_data'],
+    ];
+    $this->cacheBackend->expects($this->exactly(count($sets) / 2))
       ->method('set')
-      ->with('views_data:en', $expected_views_data);
-    $this->cacheBackend->expects($this->at(3))
-      ->method('set')
-      ->with('views_data:views_test_data:en', $expected_views_data['views_test_data']);
+      ->with($this->callback(function (string $key) use (&$sets): bool {
+        return $key === array_shift($sets);
+      }), $this->callback(function (array $data) use (&$sets): bool {
+        return $data === array_shift($sets);
+      }));
 
     // Request the same table 5 times. The caches are empty at this point, so
     // what will happen is that it will first check for a cache entry for the
@@ -423,18 +430,20 @@ class ViewsDataTest extends UnitTestCase {
    *
    * Warm cache:
    *   - all tables
-   *   - views_test_data
+   *   - views_test_data.
    */
-  public function testCacheCallsWithSameTableMultipleTimesAndWarmCache() {
+  public function testCacheCallsWithSameTableMultipleTimesAndWarmCache(): void {
+    $this->setUpMockCacheBackend();
+    $this->setUpMockModuleHandler();
     $expected_views_data = $this->viewsDataWithProvider();
     $this->moduleHandler->expects($this->never())
-      ->method('getImplementations');
+      ->method('invokeAllWith');
 
     // Setup a warm cache backend for a single table.
     $this->cacheBackend->expects($this->once())
       ->method('get')
       ->with('views_data:views_test_data:en')
-      ->will($this->returnValue((object) ['data' => $expected_views_data['views_test_data']]));
+      ->willReturn((object) ['data' => $expected_views_data['views_test_data']]);
     $this->cacheBackend->expects($this->never())
       ->method('set');
 
@@ -455,20 +464,25 @@ class ViewsDataTest extends UnitTestCase {
    * Not warm cache:
    *   - views_test_data_2
    */
-  public function testCacheCallsWithWarmCacheAndDifferentTable() {
+  public function testCacheCallsWithWarmCacheAndDifferentTable(): void {
+    $this->setUpMockCacheBackend();
+    $this->setUpMockModuleHandler();
     $expected_views_data = $this->viewsDataWithProvider();
     $this->moduleHandler->expects($this->never())
-      ->method('getImplementations');
+      ->method('invokeAllWith');
 
     // Setup a warm cache backend for a single table.
-    $this->cacheBackend->expects($this->at(0))
+    $gets = ['views_data:views_test_data_2:en', 'views_data:en'];
+    $this->cacheBackend->expects($this->exactly(count($gets)))
       ->method('get')
-      ->with('views_data:views_test_data_2:en');
-    $this->cacheBackend->expects($this->at(1))
-      ->method('get')
-      ->with('views_data:en')
-      ->will($this->returnValue((object) ['data' => $expected_views_data]));
-    $this->cacheBackend->expects($this->at(2))
+      ->with($this->callback(function (string $key) use (&$gets): bool {
+        return $key === array_shift($gets);
+      }))
+      ->willReturnOnConsecutiveCalls(
+        FALSE,
+        (object) ['data' => $expected_views_data],
+      );
+    $this->cacheBackend->expects($this->once())
       ->method('set')
       ->with('views_data:views_test_data_2:en', $expected_views_data['views_test_data_2']);
 
@@ -488,23 +502,28 @@ class ViewsDataTest extends UnitTestCase {
    *   - all tables
    *   - views_test_data
    * Not warm cache:
-   *   - $non_existing_table
+   *   - $non_existing_table.
    */
-  public function testCacheCallsWithWarmCacheAndInvalidTable() {
+  public function testCacheCallsWithWarmCacheAndInvalidTable(): void {
+    $this->setUpMockCacheBackend();
+    $this->setUpMockModuleHandler();
     $expected_views_data = $this->viewsDataWithProvider();
     $non_existing_table = $this->randomMachineName();
     $this->moduleHandler->expects($this->never())
-      ->method('getImplementations');
+      ->method('invokeAllWith');
 
     // Setup a warm cache backend for a single table.
-    $this->cacheBackend->expects($this->at(0))
+    $gets = ["views_data:$non_existing_table:en", 'views_data:en'];
+    $this->cacheBackend->expects($this->exactly(count($gets)))
       ->method('get')
-      ->with("views_data:$non_existing_table:en");
-    $this->cacheBackend->expects($this->at(1))
-      ->method('get')
-      ->with('views_data:en')
-      ->will($this->returnValue((object) ['data' => $expected_views_data]));
-    $this->cacheBackend->expects($this->at(2))
+      ->with($this->callback(function (string $key) use (&$gets): bool {
+        return $key === array_shift($gets);
+      }))
+      ->willReturnOnConsecutiveCalls(
+        FALSE,
+        (object) ['data' => $expected_views_data],
+      );
+    $this->cacheBackend->expects($this->once())
       ->method('set')
       ->with("views_data:$non_existing_table:en", []);
 
@@ -525,18 +544,20 @@ class ViewsDataTest extends UnitTestCase {
    * Warm cache:
    *   - all tables
    *   - views_test_data
-   *   - $non_existing_table
+   *   - $non_existing_table.
    */
-  public function testCacheCallsWithWarmCacheForInvalidTable() {
+  public function testCacheCallsWithWarmCacheForInvalidTable(): void {
+    $this->setUpMockCacheBackend();
+    $this->setUpMockModuleHandler();
     $non_existing_table = $this->randomMachineName();
     $this->moduleHandler->expects($this->never())
-      ->method('getImplementations');
+      ->method('invokeAllWith');
 
     // Setup a warm cache backend for a single table.
     $this->cacheBackend->expects($this->once())
       ->method('get')
       ->with("views_data:$non_existing_table:en")
-      ->will($this->returnValue((object) ['data' => []]));
+      ->willReturn((object) ['data' => []]);
     $this->cacheBackend->expects($this->never())
       ->method('set');
 
@@ -554,9 +575,10 @@ class ViewsDataTest extends UnitTestCase {
   /**
    * Tests the cache calls for all views data without a warm cache.
    */
-  public function testCacheCallsWithoutWarmCacheAndGetAllTables() {
+  public function testCacheCallsWithoutWarmCacheAndGetAllTables(): void {
     $expected_views_data = $this->viewsDataWithProvider();
-    $this->setupMockedModuleHandler();
+    $this->setUpMockCacheBackend();
+    $this->setUpMockModuleHandlerWithExpectation();
 
     // Setup a warm cache backend for a single table.
     $this->cacheBackend->expects($this->once())
@@ -578,18 +600,20 @@ class ViewsDataTest extends UnitTestCase {
    * Tests the cache calls for all views data.
    *
    * Warm cache:
-   *   - all tables
+   *   - all tables.
    */
-  public function testCacheCallsWithWarmCacheAndGetAllTables() {
+  public function testCacheCallsWithWarmCacheAndGetAllTables(): void {
+    $this->setUpMockCacheBackend();
+    $this->setUpMockModuleHandler();
     $expected_views_data = $this->viewsDataWithProvider();
     $this->moduleHandler->expects($this->never())
-      ->method('getImplementations');
+      ->method('invokeAllWith');
 
     // Setup a warm cache backend for a single table.
     $this->cacheBackend->expects($this->once())
       ->method('get')
       ->with("views_data:en")
-      ->will($this->returnValue((object) ['data' => $expected_views_data]));
+      ->willReturn((object) ['data' => $expected_views_data]);
     $this->cacheBackend->expects($this->never())
       ->method('set');
 
@@ -604,32 +628,39 @@ class ViewsDataTest extends UnitTestCase {
   /**
    * Tests the cache calls for multiple tables without warm caches.
    *
-   * @covers ::get
+   * @legacy-covers ::get
    */
-  public function testCacheCallsWithoutWarmCacheAndGetMultipleTables() {
+  public function testCacheCallsWithoutWarmCacheAndGetMultipleTables(): void {
+    $this->setUpMockCacheBackend();
+
     $expected_views_data = $this->viewsDataWithProvider();
     $table_name = 'views_test_data';
     $table_name_2 = 'views_test_data_2';
 
     // Setup a warm cache backend for all table data, but not single tables.
-    $this->cacheBackend->expects($this->at(0))
+    $gets = ["views_data:$table_name:en", 'views_data:en', "views_data:$table_name_2:en"];
+    $this->cacheBackend->expects($this->exactly(count($gets)))
       ->method('get')
-      ->with("views_data:$table_name:en")
-      ->will($this->returnValue(FALSE));
-    $this->cacheBackend->expects($this->at(1))
-      ->method('get')
-      ->with('views_data:en')
-      ->will($this->returnValue((object) ['data' => $expected_views_data]));
-    $this->cacheBackend->expects($this->at(2))
+      ->with($this->callback(function (string $key) use (&$gets): bool {
+        return $key === array_shift($gets);
+      }))
+      ->willReturnOnConsecutiveCalls(
+        FALSE,
+        (object) ['data' => $expected_views_data],
+        FALSE,
+      );
+
+    $sets = [
+      "views_data:$table_name:en", $expected_views_data[$table_name],
+      "views_data:$table_name_2:en", $expected_views_data[$table_name_2],
+    ];
+    $this->cacheBackend->expects($this->exactly(count($sets) / 2))
       ->method('set')
-      ->with("views_data:$table_name:en", $expected_views_data[$table_name]);
-    $this->cacheBackend->expects($this->at(3))
-      ->method('get')
-      ->with("views_data:$table_name_2:en")
-      ->will($this->returnValue(FALSE));
-    $this->cacheBackend->expects($this->at(4))
-      ->method('set')
-      ->with("views_data:$table_name_2:en", $expected_views_data[$table_name_2]);
+      ->with($this->callback(function (string $key) use (&$sets): bool {
+        return $key === array_shift($sets);
+      }), $this->callback(function (array $data) use (&$sets): bool {
+        return $data === array_shift($sets);
+      }));
 
     $this->assertSame($expected_views_data[$table_name], $this->viewsData->get($table_name));
     $this->assertSame($expected_views_data[$table_name_2], $this->viewsData->get($table_name_2));
@@ -641,23 +672,345 @@ class ViewsDataTest extends UnitTestCase {
 
   /**
    * Tests that getting data with an empty key throws an exception.
-   *
-   * @covers ::get
-   * @dataProvider providerTestGetEmptyKey
    */
-  public function testGetEmptyKey($key) {
+  #[DataProvider('providerTestGetEmptyKey')]
+  public function testGetEmptyKey(string|int|null $key): void {
     $this->expectException(\InvalidArgumentException::class);
     $this->expectExceptionMessage('A valid cache entry key is required. Use getAll() to get all table data.');
 
     $this->viewsData->get($key);
   }
 
-  public function providerTestGetEmptyKey() {
+  /**
+   * Provides data to testGetEmptyKey().
+   */
+  public static function providerTestGetEmptyKey(): array {
     return [
       [NULL],
       [''],
       [0],
     ];
+  }
+
+  /**
+   * Tests that fullyLoaded is only set to TRUE after data is completely loaded.
+   *
+   * This test ensures that the fullyLoaded property is not set prematurely.
+   */
+  public function testFullyLoadedPropertySetAfterDataLoad(): void {
+    $expected_views_data = $this->viewsDataWithProvider();
+
+    $this->setUpMockCacheBackend();
+
+    // Use reflection to access the protected fullyLoaded property.
+    $reflection = new \ReflectionClass($this->viewsData);
+    $fullyLoaded_property = $reflection->getProperty('fullyLoaded');
+
+    // Verify fullyLoaded starts as FALSE.
+    $this->assertFalse($fullyLoaded_property->getValue($this->viewsData));
+
+    $this->setUpMockModuleHandlerWithExpectation();
+
+    $this->moduleHandler->expects($this->once())
+      ->method('alter')
+      ->with('views_data', $expected_views_data);
+
+    $this->cacheBackend->expects($this->once())
+      ->method('get')
+      ->with("views_data:en")
+      ->willReturn(FALSE);
+
+    // Request all views data.
+    $views_data = $this->viewsData->getAll();
+
+    // After getAll() completes, fullyLoaded should be TRUE.
+    $this->assertTrue($fullyLoaded_property->getValue($this->viewsData));
+    $this->assertSame($expected_views_data, $views_data);
+  }
+
+  /**
+   * Tests that fullyLoaded is TRUE when data is loaded from cache.
+   *
+   * When views data is retrieved from cache, fullyLoaded should still be
+   * set to TRUE after the data retrieval is complete.
+   */
+  public function testFullyLoadedPropertySetAfterCacheLoad(): void {
+    $expected_views_data = $this->viewsDataWithProvider();
+
+    $this->setUpMockCacheBackend();
+    $this->setUpMockModuleHandler();
+
+    // Use reflection to access the protected fullyLoaded property.
+    $reflection = new \ReflectionClass($this->viewsData);
+    $fullyLoaded_property = $reflection->getProperty('fullyLoaded');
+
+    // Verify fullyLoaded starts as FALSE.
+    $this->assertFalse($fullyLoaded_property->getValue($this->viewsData));
+
+    // Mock that data is already cached.
+    $this->cacheBackend->expects($this->once())
+      ->method('get')
+      ->with("views_data:en")
+      ->willReturn((object) ['data' => $expected_views_data]);
+
+    // No module hooks should be invoked since data comes from cache.
+    $this->moduleHandler->expects($this->never())
+      ->method('invokeAllWith');
+
+    // Request all views data from cache.
+    $views_data = $this->viewsData->getAll();
+
+    // After getAll() completes with cached data, fullyLoaded should be TRUE.
+    $this->assertTrue($fullyLoaded_property->getValue($this->viewsData));
+    $this->assertSame($expected_views_data, $views_data);
+  }
+
+  /**
+   * Tests that fullyLoaded prevents redundant data loading.
+   *
+   * Once fullyLoaded is TRUE, the subsequent calls to getAll() should not
+   * trigger data rebuilding or cache lookups.
+   */
+  public function testFullyLoadedPreventsRedundantLoading(): void {
+    $expected_views_data = $this->viewsDataWithProvider();
+
+    $this->setUpMockCacheBackend();
+    $this->setUpMockModuleHandlerWithExpectation();
+
+    $this->moduleHandler->expects($this->once())
+      ->method('alter')
+      ->with('views_data', $expected_views_data);
+
+    // Cache should only be checked once.
+    $this->cacheBackend->expects($this->once())
+      ->method('get')
+      ->with("views_data:en")
+      ->willReturn(FALSE);
+
+    // First call loads the data.
+    $views_data = $this->viewsData->getAll();
+    $this->assertSame($expected_views_data, $views_data);
+
+    // Use reflection to verify fullyLoaded is now TRUE.
+    $reflection = new \ReflectionClass($this->viewsData);
+    $fullyLoaded_property = $reflection->getProperty('fullyLoaded');
+    $this->assertTrue($fullyLoaded_property->getValue($this->viewsData));
+
+    // The Second call should use stored data without cache checks.
+    $views_data = $this->viewsData->getAll();
+    $this->assertSame($expected_views_data, $views_data);
+
+    // Third call to verify consistency.
+    $views_data = $this->viewsData->getAll();
+    $this->assertSame($expected_views_data, $views_data);
+  }
+
+  /**
+   * Tests that clear() resets the fullyLoaded property.
+   *
+   * After calling clear(), fullyLoaded should be reset to FALSE so that
+   * data can be reloaded on the next request.
+   */
+  public function testClearResetsFullyLoaded(): void {
+    $expected_views_data = $this->viewsDataWithProvider();
+
+    $this->setUpMockCacheBackend();
+    $this->setUpMockModuleHandlerWithExpectation();
+
+    $this->moduleHandler->expects($this->exactly(2))
+      ->method('alter')
+      ->with('views_data', $expected_views_data);
+
+    // Cache will be checked twice (before and after clear).
+    $this->cacheBackend->expects($this->exactly(2))
+      ->method('get')
+      ->with("views_data:en")
+      ->willReturn(FALSE);
+
+    $cacheTagsInvalidator = $this->createMock(CacheTagsInvalidatorInterface::class);
+    $cacheTagsInvalidator->expects($this->once())
+      ->method('invalidateTags')
+      ->with(['views_data']);
+    $this->getContainerWithCacheTagsInvalidator($cacheTagsInvalidator);
+
+    // Use reflection to access the protected fullyLoaded property.
+    $reflection = new \ReflectionClass($this->viewsData);
+    $fullyLoaded_property = $reflection->getProperty('fullyLoaded');
+
+    // Load data initially.
+    $this->viewsData->getAll();
+    $this->assertTrue($fullyLoaded_property->getValue($this->viewsData));
+
+    // Clear the data.
+    $this->viewsData->clear();
+
+    // After clear, fullyLoaded should be FALSE again.
+    $this->assertFalse($fullyLoaded_property->getValue($this->viewsData));
+
+    // Load data again to verify it works after clear.
+    $views_data = $this->viewsData->getAll();
+    $this->assertSame($expected_views_data, $views_data);
+    $this->assertTrue($fullyLoaded_property->getValue($this->viewsData));
+  }
+
+  /**
+   * Tests fullyLoaded with get() method triggering full data load.
+   *
+   * When get() is called for a specific table and no cache exists,
+   * it triggers getData() which should set fullyLoaded to TRUE.
+   */
+  public function testFullyLoadedSetByGetMethod(): void {
+    $table_name = 'views_test_data';
+    $expected_views_data = $this->viewsDataWithProvider();
+
+    $this->setUpMockCacheBackend();
+
+    // Use reflection to access the protected fullyLoaded property.
+    $reflection = new \ReflectionClass($this->viewsData);
+    $fullyLoaded_property = $reflection->getProperty('fullyLoaded');
+
+    $this->assertFalse($fullyLoaded_property->getValue($this->viewsData));
+
+    $this->setUpMockModuleHandlerWithExpectation();
+
+    $this->moduleHandler->expects($this->once())
+      ->method('alter')
+      ->with('views_data', $expected_views_data);
+
+    // No table-specific or full cache exists.
+    $gets = ["views_data:$table_name:en", 'views_data:en'];
+    $this->cacheBackend->expects($this->exactly(count($gets)))
+      ->method('get')
+      ->with($this->callback(function (string $key) use (&$gets): bool {
+        return $key === array_shift($gets);
+      }))
+      ->willReturn(FALSE);
+
+    // Get specific table data, which triggers full data load.
+    $views_data = $this->viewsData->get($table_name);
+
+    // After get() triggers getData(), fullyLoaded should be TRUE.
+    $this->assertTrue($fullyLoaded_property->getValue($this->viewsData));
+    $this->assertSame($expected_views_data[$table_name], $views_data);
+  }
+
+  /**
+   * Tests that concurrent fibers retrieving views data cache entries correctly.
+   *
+   * This tests the fix for the fiber race condition where:
+   * 1. Fiber A calls get($table) or getAll(), which triggers getData()
+   * 2. getData() invokes module hooks which may suspend the fiber
+   * 3. Fiber B calls get($table) or getAll(), sees fullyLoaded is FALSE
+   * 4. Fiber B correctly calls getData() again (not skipping it)
+   * 5. Both fibers get correct data, no empty cache entries written.
+   *
+   * The fix ensures fullyLoaded is set to TRUE only AFTER data is obtained,
+   * not at the start of getData().
+   *
+   * This test also covers combinations of get() and getAll() in the two
+   * fibers.
+   */
+  #[TestWith(['get', 'get', 2, 2])]
+  #[TestWith(['getAll', 'getAll', 1, 1])]
+  #[TestWith(['get', 'getAll', 2, 2])]
+  #[TestWith(['getAll', 'get', 1, 1])]
+  public function testConcurrentFiberAccess(
+    string $first_fiber_method,
+    string $second_fiber_method,
+    int $expected_cache_get_count,
+    int $expected_cache_set_count,
+  ): void {
+    $this->setUpMockCacheBackend();
+    $this->setUpMockModuleHandler();
+
+    $expected_views_data = $this->viewsDataWithProvider();
+    $table_name = 'views_test_data';
+
+    // In getData(), the module handler will suspend the fiber during hook
+    // invocation. This should happen only once, because the 'loading' property
+    // being TRUE will suspend the second fiber before it can enter getData().
+    $cache_sets = [];
+    $this->moduleHandler->expects($this->once())
+      ->method('invokeAllWith')
+      ->with('views_data')
+      ->willReturnCallback(function ($hook, $callback): void {
+        // Suspend the fiber to simulate async operation during hook.
+        if (\Fiber::getCurrent() !== NULL) {
+          \Fiber::suspend();
+        }
+        $callback(\Closure::fromCallable([$this, 'viewsData']), 'views_test_data');
+      });
+
+    $this->moduleHandler->expects($this->once())
+      ->method('alter')
+      ->with('views_data', $this->anything());
+
+    // Cache operation counts for fiber method combinations (first, second):
+    // (get, get): First fiber calls cacheGet() once in get(), once in
+    // getData(), and cacheSet() once in get(), once in getData().
+    // (getAll, getAll): First fiber calls cacheGet() once in getData() and
+    // cacheSet() once in getData().
+    // (get, getAll): First fiber calls cacheGet once in get(), once in
+    // getData(), and cacheSet() once in get(), once in getData().
+    // (getAll, get): First fiber calls cacheGet() once in getData() and
+    // cacheSet once in getData().
+    // For all combinations, the second fiber does not make any cache operation
+    // calls, because views data has been loaded into the allStorage and storage
+    // properties.
+    $this->cacheBackend->expects($this->exactly($expected_cache_get_count))
+      ->method('get')
+      ->willReturnCallback(function (string $cid) use (&$cache_sets): null {
+        return $cache_sets[$cid] ?? NULL;
+      });
+
+    $this->cacheBackend->expects($this->exactly($expected_cache_set_count))
+      ->method('set')
+      ->willReturnCallback(function ($cid, $data) use (&$cache_sets): void {
+        $cache_sets[$cid] = (object) ['data' => $data];
+      });
+
+    // Create two fibers simulating concurrent requests to get views data.
+    $first_fiber = new \Fiber(fn () => $this->viewsData->$first_fiber_method($table_name));
+    $second_fiber = new \Fiber(fn () => $this->viewsData->$second_fiber_method($table_name));
+
+    $fibers = [$first_fiber, $second_fiber];
+    $suspended = FALSE;
+
+    // Process fibers until all complete.
+    do {
+      foreach ($fibers as $key => $fiber) {
+        if (!$fiber->isStarted()) {
+          $fiber->start();
+        }
+        elseif ($fiber->isSuspended()) {
+          $suspended = TRUE;
+          $fiber->resume();
+        }
+        elseif ($fiber->isTerminated()) {
+          unset($fibers[$key]);
+        }
+      }
+    } while (!empty($fibers));
+
+    // Ensure fibers were actually suspended to validate the test scenario.
+    $this->assertTrue($suspended);
+
+    // Both fibers should return the correct data. If get() is running in the
+    // fiber, the expected data is for one table. If getAll() is running in
+    // the fiber, the expected data is for all tables.
+    foreach ([$first_fiber_method, $second_fiber_method] as $method) {
+      $expected_results[] = $method === 'get' ? $expected_views_data[$table_name] : $expected_views_data;
+    }
+
+    $this->assertSame($expected_results[0], $first_fiber->getReturn());
+    $this->assertSame($expected_results[1], $second_fiber->getReturn());
+
+    // Verify no empty cache entries were written.
+    foreach ($cache_sets as $cid => $data) {
+      if (str_contains($cid, $table_name)) {
+        $this->assertNotEmpty($data);
+      }
+    }
   }
 
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_moderation\Functional;
 
 use Drupal\Core\Session\AccountInterface;
@@ -47,6 +49,7 @@ abstract class ModerationStateTestBase extends BrowserTestBase {
     'use editorial transition archive',
     'use editorial transition archived_draft',
     'use editorial transition archived_published',
+    'administer taxonomy',
   ];
 
   /**
@@ -57,9 +60,7 @@ abstract class ModerationStateTestBase extends BrowserTestBase {
   protected $workflow;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'content_moderation',
@@ -67,12 +68,13 @@ abstract class ModerationStateTestBase extends BrowserTestBase {
     'block_content',
     'node',
     'entity_test',
+    'taxonomy',
   ];
 
   /**
    * Sets the test up.
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->workflow = $this->createEditorialWorkflow();
     $this->adminUser = $this->drupalCreateUser($this->permissions);
@@ -92,7 +94,7 @@ abstract class ModerationStateTestBase extends BrowserTestBase {
    * @return string
    *   The permission machine name for a transition.
    */
-  protected function getWorkflowTransitionPermission($workflow_id, $transition_id) {
+  protected function getWorkflowTransitionPermission(string $workflow_id, string $transition_id) {
     return 'use ' . $workflow_id . ' transition ' . $transition_id;
   }
 
@@ -116,7 +118,7 @@ abstract class ModerationStateTestBase extends BrowserTestBase {
       'name' => $content_type_name,
       'type' => $content_type_id,
     ];
-    $this->submitForm($edit, 'Save content type');
+    $this->submitForm($edit, 'Save');
 
     // Check the content type has been set to create new revisions.
     $this->assertTrue(NodeType::load($content_type_id)->shouldCreateNewRevision());
@@ -134,7 +136,7 @@ abstract class ModerationStateTestBase extends BrowserTestBase {
    * @param string $workflow_id
    *   The workflow to attach to the bundle.
    */
-  public function enableModerationThroughUi($content_type_id, $workflow_id = 'editorial') {
+  public function enableModerationThroughUi(string $content_type_id, string $workflow_id = 'editorial'): void {
     $this->drupalGet('/admin/config/workflow/workflows');
     $this->assertSession()->linkByHrefExists('admin/config/workflow/workflows/manage/' . $workflow_id);
     $edit['bundles[' . $content_type_id . ']'] = TRUE;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\jsonapi_test_resource_type_building\EventSubscriber;
 
 use Drupal\jsonapi\ResourceType\ResourceTypeBuildEvents;
@@ -16,12 +18,13 @@ class ResourceTypeBuildEventSubscriber implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       ResourceTypeBuildEvents::BUILD => [
         ['disableResourceType'],
         ['aliasResourceTypeFields'],
         ['disableResourceTypeFields'],
+        ['renameResourceType'],
       ],
     ];
   }
@@ -32,7 +35,7 @@ class ResourceTypeBuildEventSubscriber implements EventSubscriberInterface {
    * @param \Drupal\jsonapi\ResourceType\ResourceTypeBuildEvent $event
    *   The build event.
    */
-  public function disableResourceType(ResourceTypeBuildEvent $event) {
+  public function disableResourceType(ResourceTypeBuildEvent $event): void {
     $disabled_resource_types = \Drupal::state()->get('jsonapi_test_resource_type_builder.disabled_resource_types', []);
     if (in_array($event->getResourceTypeName(), $disabled_resource_types, TRUE)) {
       $event->disableResourceType();
@@ -45,7 +48,7 @@ class ResourceTypeBuildEventSubscriber implements EventSubscriberInterface {
    * @param \Drupal\jsonapi\ResourceType\ResourceTypeBuildEvent $event
    *   The build event.
    */
-  public function aliasResourceTypeFields(ResourceTypeBuildEvent $event) {
+  public function aliasResourceTypeFields(ResourceTypeBuildEvent $event): void {
     $aliases = \Drupal::state()->get('jsonapi_test_resource_type_builder.resource_type_field_aliases', []);
     $resource_type_name = $event->getResourceTypeName();
     if (in_array($resource_type_name, array_keys($aliases), TRUE)) {
@@ -63,7 +66,7 @@ class ResourceTypeBuildEventSubscriber implements EventSubscriberInterface {
    * @param \Drupal\jsonapi\ResourceType\ResourceTypeBuildEvent $event
    *   The build event.
    */
-  public function disableResourceTypeFields(ResourceTypeBuildEvent $event) {
+  public function disableResourceTypeFields(ResourceTypeBuildEvent $event): void {
     $aliases = \Drupal::state()->get('jsonapi_test_resource_type_builder.disabled_resource_type_fields', []);
     $resource_type_name = $event->getResourceTypeName();
     if (in_array($resource_type_name, array_keys($aliases), TRUE)) {
@@ -72,6 +75,20 @@ class ResourceTypeBuildEventSubscriber implements EventSubscriberInterface {
           $event->disableField($field);
         }
       }
+    }
+  }
+
+  /**
+   * Renames any resource types that have been renamed by a test.
+   *
+   * @param \Drupal\jsonapi\ResourceType\ResourceTypeBuildEvent $event
+   *   The build event.
+   */
+  public function renameResourceType(ResourceTypeBuildEvent $event): void {
+    $names = \Drupal::state()->get('jsonapi_test_resource_type_builder.renamed_resource_types', []);
+    $resource_type_name = $event->getResourceTypeName();
+    if (isset($names[$resource_type_name])) {
+      $event->setResourceTypeName($names[$resource_type_name]);
     }
   }
 

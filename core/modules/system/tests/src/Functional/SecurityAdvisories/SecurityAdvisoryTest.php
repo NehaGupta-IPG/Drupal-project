@@ -1,17 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\SecurityAdvisories;
 
+use Drupal\advisory_feed_test\AdvisoryTestClientMiddleware;
+use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\Traits\Core\CronRunTrait;
-use Drupal\advisory_feed_test\AdvisoriesTestHttpClient;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests of security advisories functionality.
- *
- * @group system
  */
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class SecurityAdvisoryTest extends BrowserTestBase {
 
   use CronRunTrait;
@@ -116,7 +121,7 @@ class SecurityAdvisoryTest extends BrowserTestBase {
   public function testPsa(): void {
     $assert = $this->assertSession();
     // Setup test PSA endpoint.
-    AdvisoriesTestHttpClient::setTestEndpoint($this->workingEndpointMixed);
+    AdvisoryTestClientMiddleware::setTestEndpoint($this->workingEndpointMixed, TRUE);
     $mixed_advisory_links = [
       'Critical Release - SA-2019-02-19',
       'Critical Release - PSA-Really Old',
@@ -138,24 +143,27 @@ class SecurityAdvisoryTest extends BrowserTestBase {
 
     // If both PSA and non-PSA advisories are displayed they should be displayed
     // as errors.
-    $this->assertStatusReportLinks($mixed_advisory_links, REQUIREMENT_ERROR);
+    $this->assertStatusReportLinks($mixed_advisory_links, RequirementSeverity::Error);
     // The advisories will be displayed on admin pages if the response was
     // stored from the status report request.
-    $this->assertAdminPageLinks($mixed_advisory_links, REQUIREMENT_ERROR);
+    $this->assertAdminPageLinks($mixed_advisory_links, RequirementSeverity::Error);
 
     // Confirm that a user without the correct permission will not see the
     // advisories on admin pages.
     $this->drupalLogin($this->drupalCreateUser([
       'access administration pages',
+      // We have nothing under admin, so we need access to a child route to
+      // access the parent.
+      'administer modules',
     ]));
     $this->assertAdvisoriesNotDisplayed($mixed_advisory_links, ['system.admin']);
 
     // Log back in with user with permission to see the advisories.
     $this->drupalLogin($this->user);
     // Test cache.
-    AdvisoriesTestHttpClient::setTestEndpoint($this->nonWorkingEndpoint);
-    $this->assertAdminPageLinks($mixed_advisory_links, REQUIREMENT_ERROR);
-    $this->assertStatusReportLinks($mixed_advisory_links, REQUIREMENT_ERROR);
+    AdvisoryTestClientMiddleware::setTestEndpoint($this->nonWorkingEndpoint);
+    $this->assertAdminPageLinks($mixed_advisory_links, RequirementSeverity::Error);
+    $this->assertStatusReportLinks($mixed_advisory_links, RequirementSeverity::Error);
 
     // Tests transmit errors with a JSON endpoint.
     $this->tempStore->delete('advisories_response');
@@ -166,7 +174,7 @@ class SecurityAdvisoryTest extends BrowserTestBase {
     $assert->pageTextContains('Failed to fetch security advisory data:');
 
     // Test a PSA endpoint that returns invalid JSON.
-    AdvisoriesTestHttpClient::setTestEndpoint($this->invalidJsonEndpoint, TRUE);
+    AdvisoryTestClientMiddleware::setTestEndpoint($this->invalidJsonEndpoint, TRUE);
     // Assert that are no logged error messages before attempting to fetch the
     // invalid endpoint.
     $this->assertServiceAdvisoryLoggedErrors([]);
@@ -180,7 +188,7 @@ class SecurityAdvisoryTest extends BrowserTestBase {
     // Assert the error was logged again.
     $this->assertServiceAdvisoryLoggedErrors(['The security advisory JSON feed from Drupal.org could not be decoded.']);
 
-    AdvisoriesTestHttpClient::setTestEndpoint($this->workingEndpointPsaOnly, TRUE);
+    AdvisoryTestClientMiddleware::setTestEndpoint($this->workingEndpointPsaOnly, TRUE);
     $psa_advisory_links = [
       'Critical Release - PSA-Really Old',
       'Generic Module2 project - Moderately critical - Access bypass - SA-CONTRIB-2019-02-02',
@@ -190,18 +198,18 @@ class SecurityAdvisoryTest extends BrowserTestBase {
     $this->assertAdvisoriesNotDisplayed($psa_advisory_links, ['system.admin']);
     // If only PSA advisories are displayed they should be displayed as
     // warnings.
-    $this->assertStatusReportLinks($psa_advisory_links, REQUIREMENT_WARNING);
-    $this->assertAdminPageLinks($psa_advisory_links, REQUIREMENT_WARNING);
+    $this->assertStatusReportLinks($psa_advisory_links, RequirementSeverity::Warning);
+    $this->assertAdminPageLinks($psa_advisory_links, RequirementSeverity::Warning);
 
-    AdvisoriesTestHttpClient::setTestEndpoint($this->workingEndpointNonPsaOnly, TRUE);
+    AdvisoryTestClientMiddleware::setTestEndpoint($this->workingEndpointNonPsaOnly, TRUE);
     $non_psa_advisory_links = [
       'Critical Release - SA-2019-02-19',
       'Generic Module1 Project - Moderately critical - Access bypass - SA-CONTRIB-2019-02-02',
     ];
     // If only non-PSA advisories are displayed they should be displayed as
     // errors.
-    $this->assertStatusReportLinks($non_psa_advisory_links, REQUIREMENT_ERROR);
-    $this->assertAdminPageLinks($non_psa_advisory_links, REQUIREMENT_ERROR);
+    $this->assertStatusReportLinks($non_psa_advisory_links, RequirementSeverity::Error);
+    $this->assertAdminPageLinks($non_psa_advisory_links, RequirementSeverity::Error);
 
     // Confirm that advisory fetching can be disabled after enabled.
     $this->config('system.advisories')->set('enabled', FALSE)->save();
@@ -215,13 +223,15 @@ class SecurityAdvisoryTest extends BrowserTestBase {
    *
    * @param string[] $expected_link_texts
    *   The expected links' text.
-   * @param int $error_or_warning
-   *   Whether the links are a warning or an error. Should be one of the REQUIREMENT_* constants.
+   * @param \Drupal\Core\Extension\Requirement\RequirementSeverity $error_or_warning
+   *   Whether the links are a warning or an error.
+   *
+   * @internal
    */
-  private function assertAdminPageLinks(array $expected_link_texts, int $error_or_warning): void {
+  private function assertAdminPageLinks(array $expected_link_texts, RequirementSeverity $error_or_warning): void {
     $assert = $this->assertSession();
     $this->drupalGet(Url::fromRoute('system.admin'));
-    if ($error_or_warning === REQUIREMENT_ERROR) {
+    if ($error_or_warning === RequirementSeverity::Error) {
       $assert->pageTextContainsOnce('Error message');
       $assert->pageTextNotContains('Warning message');
     }
@@ -239,13 +249,15 @@ class SecurityAdvisoryTest extends BrowserTestBase {
    *
    * @param string[] $expected_link_texts
    *   The expected links' text.
-   * @param int $error_or_warning
-   *   Whether the links are a warning or an error. Should be one of the REQUIREMENT_* constants.
+   * @param \Drupal\Core\Extension\Requirement\RequirementSeverity::Error|\Drupal\Core\Extension\Requirement\RequirementSeverity::Warning $error_or_warning
+   *   Whether the links are a warning or an error.
+   *
+   * @internal
    */
-  private function assertStatusReportLinks(array $expected_link_texts, int $error_or_warning): void {
+  private function assertStatusReportLinks(array $expected_link_texts, RequirementSeverity $error_or_warning): void {
     $this->drupalGet(Url::fromRoute('system.status'));
     $assert = $this->assertSession();
-    $selector = 'h3#' . ($error_or_warning === REQUIREMENT_ERROR ? 'error' : 'warning')
+    $selector = 'h3#' . $error_or_warning->status()
       . ' ~ details.system-status-report__entry:contains("Critical security announcements")';
     $assert->elementExists('css', $selector);
     foreach ($expected_link_texts as $expected_link_text) {
@@ -260,6 +272,8 @@ class SecurityAdvisoryTest extends BrowserTestBase {
    *   The advisory links.
    * @param array $routes
    *   The routes to test.
+   *
+   * @internal
    */
   private function assertAdvisoriesNotDisplayed(array $links, array $routes = ['system.status', 'system.admin']): void {
     foreach ($routes as $route) {
@@ -281,6 +295,8 @@ class SecurityAdvisoryTest extends BrowserTestBase {
    *   The expected error messages.
    *
    * @see \Drupal\advisory_feed_test\TestSystemLoggerChannel::log()
+   *
+   * @internal
    */
   protected function assertServiceAdvisoryLoggedErrors(array $expected_messages): void {
     $state = $this->container->get('state');

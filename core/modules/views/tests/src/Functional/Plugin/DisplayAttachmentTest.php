@@ -1,16 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the attachment display plugin.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\display\Attachment
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class DisplayAttachmentTest extends ViewTestBase {
 
   /**
@@ -21,19 +26,20 @@ class DisplayAttachmentTest extends ViewTestBase {
   public static $testViews = ['test_display_attachment', 'test_attached_disabled'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'views'];
 
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'classy';
+  protected $defaultTheme = 'starterkit_theme';
 
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp($import_test_views);
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp($import_test_views = TRUE, $modules = ['views_test_config']): void {
+    parent::setUp($import_test_views, $modules);
 
     $this->enableViewsTestModule();
 
@@ -44,7 +50,7 @@ class DisplayAttachmentTest extends ViewTestBase {
   /**
    * Tests the attachment plugin.
    */
-  public function testAttachment() {
+  public function testAttachment(): void {
     $this->drupalGet('test-display-attachment');
     // Verify that both actual view and the attachment are rendered.
     $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "view-content")]', 2);
@@ -57,7 +63,7 @@ class DisplayAttachmentTest extends ViewTestBase {
   /**
    * Tests that nothing is output when the attachment displays are disabled.
    */
-  public function testDisabledAttachments() {
+  public function testDisabledAttachments(): void {
     $this->drupalCreateContentType(['type' => 'page']);
     $this->drupalCreateNode();
 

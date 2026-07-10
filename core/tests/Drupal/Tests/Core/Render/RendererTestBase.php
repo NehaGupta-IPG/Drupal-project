@@ -1,29 +1,42 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\Core\Render\RendererTestBase.
- */
+declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Render;
 
+use Drupal\Component\Datetime\Time;
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Cache\Context\ContextCacheKeys;
 use Drupal\Core\Cache\MemoryBackend;
-use Drupal\Core\Http\RequestStack;
-use Drupal\Core\Security\TrustedCallbackInterface;
+use Drupal\Core\Cache\VariationCache;
+use Drupal\Core\Cache\VariationCacheFactoryInterface;
+use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Render\PlaceholderGenerator;
 use Drupal\Core\Render\PlaceholderingRenderCache;
 use Drupal\Core\Render\Renderer;
+use Drupal\Core\Security\TrustedCallbackInterface;
+use Drupal\Core\Theme\ThemeManagerInterface;
+use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Base class for the actual unit tests testing \Drupal\Core\Render\Renderer.
  */
 abstract class RendererTestBase extends UnitTestCase {
+
+  /**
+   * System time service.
+   *
+   * @var \Drupal\Component\Datetime\TimeInterface
+   */
+  protected TimeInterface $datetimeTime;
 
   /**
    * The tested renderer.
@@ -52,38 +65,32 @@ abstract class RendererTestBase extends UnitTestCase {
   protected $requestStack;
 
   /**
-   * @var \Drupal\Core\Cache\CacheFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The variation cache factory.
    */
-  protected $cacheFactory;
+  protected VariationCacheFactoryInterface&Stub $cacheFactory;
 
   /**
-   * @var \Drupal\Core\Cache\Context\CacheContextsManager|\PHPUnit\Framework\MockObject\MockObject
+   * The cache contexts manager.
    */
-  protected $cacheContexts;
+  protected CacheContextsManager&Stub $cacheContextsManager;
 
   /**
-   * The mocked controller resolver.
-   *
-   * @var \Drupal\Core\Controller\ControllerResolverInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The controller resolver.
    */
-  protected $controllerResolver;
+  protected CallableResolver&Stub $callableResolver;
 
   /**
-   * The mocked theme manager.
-   *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The theme manager.
    */
-  protected $themeManager;
+  protected ThemeManagerInterface&Stub $themeManager;
 
   /**
-   * The mocked element info.
-   *
-   * @var \Drupal\Core\Render\ElementInfoManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The element info.
    */
-  protected $elementInfo;
+  protected ElementInfoManagerInterface&Stub $elementInfo;
 
   /**
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var \Drupal\Core\Cache\VariationCacheInterface
    */
   protected $memoryCache;
 
@@ -109,20 +116,24 @@ abstract class RendererTestBase extends UnitTestCase {
       'contexts' => ['session', 'user'],
       'tags' => ['current-temperature'],
     ],
+    'debug' => FALSE,
   ];
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
-    $this->controllerResolver = $this->createMock('Drupal\Core\Controller\ControllerResolverInterface');
-    $this->themeManager = $this->createMock('Drupal\Core\Theme\ThemeManagerInterface');
-    $this->elementInfo = $this->createMock('Drupal\Core\Render\ElementInfoManagerInterface');
-    $this->elementInfo->expects($this->any())
+    $this->callableResolver = $this->createStub(CallableResolver::class);
+    $this->callableResolver
+      ->method('getCallableFromDefinition')
+      ->willReturnArgument(0);
+    $this->themeManager = $this->createStub(ThemeManagerInterface::class);
+    $this->elementInfo = $this->createStub(ElementInfoManagerInterface::class);
+    $this->elementInfo
       ->method('getInfo')
-      ->willReturnCallback(function ($type) {
+      ->willReturnCallback(function ($type): array {
         switch ($type) {
           case 'details':
             $info = ['#theme_wrappers' => ['details']];
@@ -142,15 +153,18 @@ abstract class RendererTestBase extends UnitTestCase {
     $request = new Request();
     $request->server->set('REQUEST_TIME', $_SERVER['REQUEST_TIME']);
     $this->requestStack->push($request);
-    $this->cacheFactory = $this->createMock('Drupal\Core\Cache\CacheFactoryInterface');
-    $this->cacheContextsManager = $this->getMockBuilder('Drupal\Core\Cache\Context\CacheContextsManager')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $this->cacheFactory = $this->createStub(VariationCacheFactoryInterface::class);
+    $this->cacheContextsManager = $this->createStub(CacheContextsManager::class);
     $this->cacheContextsManager->method('assertValidTokens')->willReturn(TRUE);
+    $this->cacheContextsManager
+      ->method('optimizeTokens')
+      ->willReturnCallback(function ($context_tokens) {
+        return $context_tokens;
+      });
     $current_user_role = &$this->currentUserRole;
-    $this->cacheContextsManager->expects($this->any())
+    $this->cacheContextsManager
       ->method('convertTokensToKeys')
-      ->willReturnCallback(function ($context_tokens) use (&$current_user_role) {
+      ->willReturnCallback(function ($context_tokens) use (&$current_user_role): ContextCacheKeys {
         $keys = [];
         foreach ($context_tokens as $context_id) {
           switch ($context_id) {
@@ -170,17 +184,58 @@ abstract class RendererTestBase extends UnitTestCase {
               $keys[] = $context_id;
           }
         }
-        return new ContextCacheKeys($keys, new CacheableMetadata());
+        return new ContextCacheKeys($keys);
       });
-    $this->placeholderGenerator = new PlaceholderGenerator($this->rendererConfig);
+    $this->placeholderGenerator = new PlaceholderGenerator($this->cacheContextsManager, $this->rendererConfig);
     $this->renderCache = new PlaceholderingRenderCache($this->requestStack, $this->cacheFactory, $this->cacheContextsManager, $this->placeholderGenerator);
-    $this->renderer = new Renderer($this->controllerResolver, $this->themeManager, $this->elementInfo, $this->placeholderGenerator, $this->renderCache, $this->requestStack, $this->rendererConfig);
+    $this->renderer = new Renderer($this->callableResolver, $this->themeManager, $this->elementInfo, $this->placeholderGenerator, $this->renderCache, $this->requestStack, $this->rendererConfig);
+    $this->datetimeTime = new Time($this->requestStack);
 
     $container = new ContainerBuilder();
     $container->set('cache_contexts_manager', $this->cacheContextsManager);
     $container->set('render_cache', $this->renderCache);
     $container->set('renderer', $this->renderer);
+    $container->set('datetime.time', $this->datetimeTime);
     \Drupal::setContainer($container);
+  }
+
+  /**
+   * Reinitializes the route processor manager as a mock object.
+   */
+  protected function setUpMockCallableResolver(): void {
+    $this->callableResolver = $this->createMock(CallableResolver::class);
+    $this->callableResolver
+      ->method('getCallableFromDefinition')
+      ->willReturnArgument(0);
+    $reflection = new \ReflectionProperty($this->renderer, 'callableResolver');
+    $reflection->setValue($this->renderer, $this->callableResolver);
+  }
+
+  /**
+   * Reinitializes the theme manager as a mock object.
+   */
+  protected function setUpMockThemeManager(): void {
+    $this->themeManager = $this->createMock(ThemeManagerInterface::class);
+    $reflection = new \ReflectionProperty($this->renderer, 'theme');
+    $reflection->setValue($this->renderer, $this->themeManager);
+  }
+
+  /**
+   * Reinitializes the variation cache factory as a mock object.
+   */
+  protected function setUpMockVariationCacheFactory(): void {
+    $this->cacheFactory = $this->createMock(VariationCacheFactoryInterface::class);
+    $reflection = new \ReflectionProperty($this->renderCache, 'cacheFactory');
+    $reflection->setValue($this->renderCache, $this->cacheFactory);
+  }
+
+  /**
+   * Reinitializes the cache contexts manager as a mock object.
+   */
+  protected function setUpMockCacheContextsManager(): void {
+    $this->cacheContextsManager = $this->createMock(CacheContextsManager::class);
+    $reflection = new \ReflectionProperty($this->renderCache, 'cacheContextsManager');
+    $reflection->setValue($this->renderCache, $this->cacheContextsManager);
   }
 
   /**
@@ -191,13 +246,13 @@ abstract class RendererTestBase extends UnitTestCase {
    * paths, etc. for JavaScript replacement of content or assets. In this test,
    * the #lazy_builder callback PlaceholdersTest::callback() renders the context
    * inside test HTML, so using any random string would sometimes cause random
-   * test failures because the test output would be unparseable. Instead, we
+   * test failures because the test output would not be parseable. Instead, we
    * provide random tokens for replacement.
    *
    * @see PlaceholdersTest::callback()
    * @see https://www.drupal.org/node/2151609
    */
-  protected function randomContextValue() {
+  protected static function randomContextValue(): string {
     $tokens = ['llama', 'alpaca', 'camel', 'moose', 'elk'];
     return $tokens[mt_rand(0, 4)];
   }
@@ -206,6 +261,8 @@ abstract class RendererTestBase extends UnitTestCase {
    * Sets up a render cache back-end that is asserted to be never used.
    */
   protected function setUpUnusedCache() {
+    $this->setUpMockVariationCacheFactory();
+
     $this->cacheFactory->expects($this->never())
       ->method('get');
   }
@@ -213,8 +270,10 @@ abstract class RendererTestBase extends UnitTestCase {
   /**
    * Sets up a memory-based render cache back-end.
    */
-  protected function setupMemoryCache() {
-    $this->memoryCache = $this->memoryCache ?: new MemoryBackend();
+  protected function setUpMemoryCache() {
+    $this->setUpMockVariationCacheFactory();
+
+    $this->memoryCache = $this->memoryCache ?: new VariationCache($this->requestStack, new MemoryBackend(new Time($this->requestStack)), $this->cacheContextsManager);
 
     $this->cacheFactory->expects($this->atLeastOnce())
       ->method('get')
@@ -228,7 +287,7 @@ abstract class RendererTestBase extends UnitTestCase {
    * @param string $method
    *   The HTTP method to use for the request. Defaults to 'GET'.
    */
-  protected function setUpRequest($method = 'GET') {
+  protected function setUpRequest(string $method = 'GET') {
     $request = Request::create('/', $method);
     // Ensure that the request time is set as expected.
     $request->server->set('REQUEST_TIME', (int) $_SERVER['REQUEST_TIME']);
@@ -238,30 +297,44 @@ abstract class RendererTestBase extends UnitTestCase {
   /**
    * Asserts a render cache item.
    *
-   * @param string $cid
-   *   The expected cache ID.
+   * @param string[] $keys
+   *   The expected cache keys.
    * @param mixed $data
    *   The expected data for that cache ID.
    * @param string $bin
    *   The expected cache bin.
    */
-  protected function assertRenderCacheItem($cid, $data, $bin = 'render') {
+  protected function assertRenderCacheItem(array $keys, array $data, $bin = 'render') {
     $cache_backend = $this->cacheFactory->get($bin);
-    $cached = $cache_backend->get($cid);
-    $this->assertNotFalse($cached, sprintf('Expected cache item "%s" exists.', $cid));
+    $cached = $cache_backend->get($keys, CacheableMetadata::createFromRenderArray($data));
+    $this->assertNotFalse($cached, sprintf('Expected cache item "%s" exists.', implode(':', $keys)));
     if ($cached !== FALSE) {
-      $this->assertEquals($data, $cached->data, sprintf('Cache item "%s" has the expected data.', $cid));
-      $this->assertSame(Cache::mergeTags($data['#cache']['tags'], ['rendered']), $cached->tags, "The cache item's cache tags also has the 'rendered' cache tag.");
+      $this->assertEqualsCanonicalizing(array_keys($data), array_keys($cached->data), 'The cache item contains the same parent array keys.');
+      foreach ($data as $key => $value) {
+        // We do not want to assert on the order of cacheability information.
+        // @see https://www.drupal.org/project/drupal/issues/3225328
+        if ($key === '#cache') {
+          $this->assertEqualsCanonicalizing($value, $cached->data[$key], sprintf('Cache item "%s" has the expected data.', implode(':', $keys)));
+        }
+        else {
+          $this->assertEquals($value, $cached->data[$key], sprintf('Cache item "%s" has the expected data.', implode(':', $keys)));
+        }
+      }
+      $this->assertEqualsCanonicalizing(Cache::mergeTags($data['#cache']['tags'], ['rendered']), $cached->tags, "The cache item's cache tags also has the 'rendered' cache tag.");
     }
   }
 
 }
 
-
+/**
+ * Placeholders test class with implemented trusted callbacks.
+ */
 class PlaceholdersTest implements TrustedCallbackInterface {
 
   /**
-   * #lazy_builder callback; attaches setting, generates markup.
+   * Render API callback: Attaches setting and generates markup.
+   *
+   * This function is assigned as an #lazy_builder callback.
    *
    * @param string $animal
    *   An animal.
@@ -272,7 +345,7 @@ class PlaceholdersTest implements TrustedCallbackInterface {
    * @return array
    *   A renderable array.
    */
-  public static function callback($animal, $use_animal_as_array_key = FALSE) {
+  public static function callback($animal, $use_animal_as_array_key = FALSE): array {
     $value = $animal;
     if ($use_animal_as_array_key) {
       $value = [$animal => TRUE];
@@ -288,7 +361,7 @@ class PlaceholdersTest implements TrustedCallbackInterface {
   }
 
   /**
-   * #lazy_builder callback; attaches setting, generates markup, user-specific.
+   * The #lazy_builder callback; attaches setting, generates markup, user-specific.
    *
    * @param string $animal
    *   An animal.
@@ -296,14 +369,19 @@ class PlaceholdersTest implements TrustedCallbackInterface {
    * @return array
    *   A renderable array.
    */
-  public static function callbackPerUser($animal) {
+  public static function callbackPerUser($animal): array {
+    // As well as adding the user cache context, additionally suspend the
+    // current Fiber if there is one.
+    if ($fiber = \Fiber::getCurrent()) {
+      $fiber->suspend();
+    }
     $build = static::callback($animal);
     $build['#cache']['contexts'][] = 'user';
     return $build;
   }
 
   /**
-   * #lazy_builder callback; attaches setting, generates markup, cache tag.
+   * The #lazy_builder callback; attaches setting, generates markup, cache tag.
    *
    * @param string $animal
    *   An animal.
@@ -311,7 +389,7 @@ class PlaceholdersTest implements TrustedCallbackInterface {
    * @return array
    *   A renderable array.
    */
-  public static function callbackTagCurrentTemperature($animal) {
+  public static function callbackTagCurrentTemperature($animal): array {
     $build = static::callback($animal);
     $build['#cache']['tags'][] = 'current-temperature';
     return $build;
@@ -323,14 +401,14 @@ class PlaceholdersTest implements TrustedCallbackInterface {
    * @return bool
    *   TRUE, which is not a valid return value for a lazy builder.
    */
-  public static function callbackNonArrayReturn() {
+  public static function callbackNonArrayReturn(): bool {
     return TRUE;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function trustedCallbacks() {
+  public static function trustedCallbacks(): array {
     return ['callbackTagCurrentTemperature', 'callbackPerUser', 'callback', 'callbackNonArrayReturn'];
   }
 

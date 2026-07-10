@@ -8,13 +8,14 @@
 /**
  * Implements hook_schema().
  */
-function dblog_schema() {
+function dblog_schema(): array {
   $schema['watchdog'] = [
     'description' => 'Table that contains logs of all system events.',
     'fields' => [
       'wid' => [
         'type' => 'serial',
         'not null' => TRUE,
+        'size' => 'big',
         'description' => 'Primary Key: Unique watchdog event ID.',
       ],
       'uid' => [
@@ -78,6 +79,7 @@ function dblog_schema() {
         'not null' => TRUE,
         'default' => 0,
         'description' => 'Unix timestamp of when event occurred.',
+        'size' => 'big',
       ],
     ],
     'primary key' => ['wid'],
@@ -94,6 +96,6 @@ function dblog_schema() {
 /**
  * Implements hook_update_last_removed().
  */
-function dblog_update_last_removed() {
-  return 8600;
+function dblog_update_last_removed(): int {
+  return 10101;
 }

@@ -1,14 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\config\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore arrr
 /**
  * Tests the user interface for importing/exporting transformed configuration.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class TransformedConfigExportImportUITest extends BrowserTestBase {
 
   /**
@@ -35,8 +40,7 @@ class TransformedConfigExportImportUITest extends BrowserTestBase {
       'import configuration',
       'synchronize configuration',
     ];
-    $this->webUser = $this->drupalCreateUser($permissions);
-    $this->drupalLogin($this->webUser);
+    $this->drupalLogin($this->drupalCreateUser($permissions));
 
     // Start off with the sync storage being the same as the active storage.
     $this->copyConfig($this->container->get('config.storage'), $this->container->get('config.storage.sync'));
@@ -45,11 +49,11 @@ class TransformedConfigExportImportUITest extends BrowserTestBase {
   /**
    * Tests a simple site export import case.
    */
-  public function testTransformedExportImport() {
+  public function testTransformedExportImport(): void {
     // After installation there is no snapshot but a new site name.
     $this->drupalGet('admin/config/development/configuration');
-    $this->assertNoText('Warning message');
-    $this->assertNoText('There are no configuration changes to import.');
+    $this->assertSession()->pageTextNotContains('Warning message');
+    $this->assertSession()->pageTextNotContains('There are no configuration changes to import.');
 
     // Tests changes of system.site.
     $this->drupalGet('admin/config/development/configuration/sync/diff/system.site');

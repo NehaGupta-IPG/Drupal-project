@@ -1,17 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Functional\Views;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests the UI of the field field handler.
+ * Tests the UI of the field handler.
  *
- * @group field
  * @see \Drupal\field\Plugin\views\field\Field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class FieldUITest extends FieldTestBase {
 
   /**
@@ -22,9 +28,7 @@ class FieldUITest extends FieldTestBase {
   public static $testViews = ['test_view_fieldapi'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['views_ui'];
 
@@ -43,8 +47,8 @@ class FieldUITest extends FieldTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp($import_test_views);
+  protected function setUp($import_test_views = TRUE, $modules = ['field_test_views']): void {
+    parent::setUp($import_test_views, $modules);
 
     $this->account = $this->drupalCreateUser(['administer views']);
     $this->drupalLogin($this->account);
@@ -56,13 +60,13 @@ class FieldUITest extends FieldTestBase {
   /**
    * Tests basic field handler settings in the UI.
    */
-  public function testHandlerUI() {
+  public function testHandlerUI(): void {
     $url = "admin/structure/views/nojs/handler/test_view_fieldapi/default/field/field_name_0";
     $this->drupalGet($url);
 
     // Tests the available formatter options.
     $options = $this->assertSession()->selectExists('edit-options-type')->findAll('css', 'option');
-    $options = array_map(function ($item) {
+    $options = array_map(function (NodeElement $item) {
       return $item->getValue();
     }, $options);
     $this->assertEqualsCanonicalizing(['text_default', 'text_trimmed'], $options);
@@ -98,14 +102,14 @@ class FieldUITest extends FieldTestBase {
     $this->assertEquals([], $view->field['field_name_0']->options['settings']);
 
     // Ensure that the view depends on the field storage.
-    $dependencies = \Drupal::service('config.manager')->findConfigEntityDependents('config', [$this->fieldStorages[0]->getConfigDependencyName()]);
+    $dependencies = \Drupal::service('config.manager')->findConfigEntityDependencies('config', [$this->fieldStorages[0]->getConfigDependencyName()]);
     $this->assertTrue(isset($dependencies['views.view.test_view_fieldapi']), 'The view is dependent on the field storage.');
   }
 
   /**
    * Tests the basic field handler form when aggregation is enabled.
    */
-  public function testHandlerUIAggregation() {
+  public function testHandlerUIAggregation(): void {
     // Enable aggregation.
     $edit = ['group_by' => '1'];
     $this->drupalGet('admin/structure/views/nojs/display/test_view_fieldapi/default/group_by');
@@ -118,7 +122,7 @@ class FieldUITest extends FieldTestBase {
     // Test the click sort column options.
     // Tests the available formatter options.
     $options = $this->assertSession()->selectExists('edit-options-click-sort-column')->findAll('css', 'option');
-    $options = array_map(function ($item) {
+    $options = array_map(function (NodeElement $item) {
       return $item->getValue();
     }, $options);
     $this->assertEqualsCanonicalizing(['format', 'value'], $options);
@@ -127,7 +131,7 @@ class FieldUITest extends FieldTestBase {
   /**
    * Tests adding a boolean field filter handler.
    */
-  public function testBooleanFilterHandler() {
+  public function testBooleanFilterHandler(): void {
     // Create a boolean field.
     $field_name = 'field_boolean';
     $field_storage = FieldStorageConfig::create([
@@ -150,16 +154,13 @@ class FieldUITest extends FieldTestBase {
     $this->assertSession()->statusCodeEquals(200);
     // Verify that using a boolean field as a filter also results in using the
     // boolean plugin.
-    $option = $this->xpath('//label[@for="edit-options-value-1"]');
-    $this->assertEquals(t('True'), $option[0]->getText());
-    $option = $this->xpath('//label[@for="edit-options-value-0"]');
-    $this->assertEquals(t('False'), $option[0]->getText());
+    $this->assertSession()->elementTextEquals('xpath', '//label[@for="edit-options-value-1"]', 'True');
+    $this->assertSession()->elementTextEquals('xpath', '//label[@for="edit-options-value-0"]', 'False');
 
     // Expose the filter and see if the 'Any' option is added and if we can save
     // it.
     $this->submitForm([], 'Expose filter');
-    $option = $this->xpath('//label[@for="edit-options-value-all"]');
-    $this->assertEquals(t('- Any -'), $option[0]->getText());
+    $this->assertSession()->elementTextEquals('xpath', '//label[@for="edit-options-value-all"]', '- Any -');
     $this->submitForm(['options[value]' => 'All', 'options[expose][required]' => FALSE], 'Apply');
     $this->submitForm([], 'Save');
     $this->drupalGet('/admin/structure/views/nojs/handler/test_view_fieldapi/default/filter/field_boolean_value');

@@ -41,7 +41,8 @@ class PsrResponseSubscriber implements EventSubscriberInterface {
     $controller_result = $event->getControllerResult();
 
     if ($controller_result instanceof ResponseInterface) {
-      $event->setResponse($this->httpFoundationFactory->createResponse($controller_result));
+      $streamed = !$controller_result->getBody()->isSeekable();
+      $event->setResponse($this->httpFoundationFactory->createResponse($controller_result, $streamed));
     }
 
   }
@@ -49,7 +50,7 @@ class PsrResponseSubscriber implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     $events[KernelEvents::VIEW][] = ['onKernelView'];
     return $events;
   }

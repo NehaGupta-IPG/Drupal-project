@@ -10,21 +10,26 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 class ConfigEntityNormalizer extends EntityNormalizer {
 
   /**
-   * {@inheritdoc}
+   * Normalizes data into a set of arrays/scalars.
+   *
+   * @param object $object
+   *   Data to normalize.
+   * @param string|null $format
+   *   Format the normalization result will be encoded as.
+   * @param array<string, mixed> $context
+   *   Context options for the normalizer.
+   *
+   * @return array
+   *   The normalized data.
    */
-  protected $supportedInterfaceOrClass = ConfigEntityInterface::class;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function normalize($object, $format = NULL, array $context = []) {
+  public function normalize($object, $format = NULL, array $context = []): array {
     return static::getDataWithoutInternals($object->toArray());
   }
 
   /**
    * {@inheritdoc}
    */
-  public function denormalize($data, $class, $format = NULL, array $context = []) {
+  public function denormalize($data, $class, $format = NULL, array $context = []): mixed {
     return parent::denormalize(static::getDataWithoutInternals($data), $class, $format, $context);
   }
 
@@ -45,6 +50,15 @@ class ConfigEntityNormalizer extends EntityNormalizer {
    */
   protected static function getDataWithoutInternals(array $data) {
     return array_diff_key($data, ['_core' => TRUE]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSupportedTypes(?string $format): array {
+    return [
+      ConfigEntityInterface::class => TRUE,
+    ];
   }
 
 }

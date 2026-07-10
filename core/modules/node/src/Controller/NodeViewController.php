@@ -12,6 +12,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines a controller to render a single node.
+ *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\Core\Entity\Controller\EntityViewController instead.
+ *
+ * @see https://www.drupal.org/node/3589636
  */
 class NodeViewController extends EntityViewController {
 
@@ -42,6 +47,7 @@ class NodeViewController extends EntityViewController {
    *   The entity repository.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, RendererInterface $renderer, AccountInterface $current_user, EntityRepositoryInterface $entity_repository) {
+    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Entity\Controller\EntityViewController instead. See https://www.drupal.org/node/3589636', E_USER_DEPRECATED);
     parent::__construct($entity_type_manager, $renderer);
     $this->currentUser = $current_user;
     $this->entityRepository = $entity_repository;
@@ -63,51 +69,7 @@ class NodeViewController extends EntityViewController {
    * {@inheritdoc}
    */
   public function view(EntityInterface $node, $view_mode = 'full', $langcode = NULL) {
-    $build = parent::view($node, $view_mode, $langcode);
-
-    foreach ($node->uriRelationships() as $rel) {
-      $url = $node->toUrl($rel)->setAbsolute(TRUE);
-      // Add link relationships if the user is authenticated or if the anonymous
-      // user has access. Access checking must be done for anonymous users to
-      // avoid traffic to inaccessible pages from web crawlers. For
-      // authenticated users, showing the links in HTML head does not impact
-      // user experience or security, since the routes are access checked when
-      // visited and only visible via view source. This prevents doing
-      // potentially expensive and hard to cache access checks on every request.
-      // This means that the page will vary by user.permissions. We also rely on
-      // the access checking fallback to ensure the correct cacheability
-      // metadata if we have to check access.
-      if ($this->currentUser->isAuthenticated() || $url->access($this->currentUser)) {
-        // Set the node path as the canonical URL to prevent duplicate content.
-        $build['#attached']['html_head_link'][] = [
-          [
-            'rel' => $rel,
-            'href' => $url->toString(),
-          ],
-          TRUE,
-        ];
-      }
-
-      if ($rel == 'canonical') {
-        // Set the non-aliased canonical path as a default shortlink.
-        $build['#attached']['html_head_link'][] = [
-          [
-            'rel' => 'shortlink',
-            'href' => $url->setOption('alias', TRUE)->toString(),
-          ],
-          TRUE,
-        ];
-      }
-    }
-
-    // Since this generates absolute URLs, it can only be cached "per site".
-    $build['#cache']['contexts'][] = 'url.site';
-
-    // Given this varies by $this->currentUser->isAuthenticated(), add a cache
-    // context based on the anonymous role.
-    $build['#cache']['contexts'][] = 'user.roles:anonymous';
-
-    return $build;
+    return parent::view($node, $view_mode);
   }
 
   /**

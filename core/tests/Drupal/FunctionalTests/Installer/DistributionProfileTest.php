@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Core\Serialization\Yaml;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests distribution profile support.
- *
- * @group Installer
  */
+#[Group('Installer')]
+#[RunTestsInSeparateProcesses]
 class DistributionProfileTest extends InstallerTestBase {
 
   /**
@@ -23,7 +27,12 @@ class DistributionProfileTest extends InstallerTestBase {
    */
   protected $defaultTheme = 'stark';
 
-  protected function prepareEnvironment() {
+  /**
+   * {@inheritdoc}
+   */
+  protected $profile = NULL;
+
+  protected function prepareEnvironment(): void {
     parent::prepareEnvironment();
     $this->info = [
       'type' => 'profile',
@@ -32,53 +41,50 @@ class DistributionProfileTest extends InstallerTestBase {
       'distribution' => [
         'name' => 'My Distribution',
         'install' => [
-          'theme' => 'bartik',
-          'finish_url' => '/root-user',
+          'theme' => 'test_installer_theme',
+          'finish_url' => 'root-user',
         ],
       ],
     ];
     // File API functions are not available yet.
-    $path = $this->siteDirectory . '/profiles/my_distro';
+    $path = $this->siteDirectory . '/profiles/my_distribution';
     mkdir($path, 0777, TRUE);
-    file_put_contents("$path/my_distro.info.yml", Yaml::encode($this->info));
-    file_put_contents("$path/my_distro.install", "<?php function my_distro_install() {\Drupal::entityTypeManager()->getStorage('path_alias')->create(['path' => '/user/1', 'alias' => '/root-user'])->save();}");
+    file_put_contents("$path/my_distribution.info.yml", Yaml::encode($this->info));
+    file_put_contents("$path/my_distribution.install", "<?php function my_distribution_install() {\Drupal::entityTypeManager()->getStorage('path_alias')->create(['path' => '/user/1', 'alias' => '/root-user'])->save();}");
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function setUpLanguage() {
+  protected function setUpLanguage(): void {
     // Verify that the distribution name appears.
-    $this->assertRaw($this->info['distribution']['name']);
+    $this->assertSession()->pageTextContains($this->info['distribution']['name']);
     // Verify that the distribution name is used in the site title.
     $this->assertSession()->titleEquals('Choose language | ' . $this->info['distribution']['name']);
-    // Verify that the requested theme is used.
-    $this->assertRaw($this->info['distribution']['install']['theme']);
+    // Verify that the requested theme is used -- its modifications to this form
+    // should be visible.
+    $this->assertSession()->pageTextContains('Added by custom installer theme.');
+    // Verify the base theme CSS is loaded.
+    $this->assertSession()->responseContains("claro/css/theme/install-page.css");
+
     // Verify that the "Choose profile" step does not appear.
-    $this->assertNoText('profile');
+    $this->assertSession()->pageTextNotContains('profile');
 
     parent::setUpLanguage();
   }
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUpProfile() {
-    // This step is skipped, because there is a distribution profile.
-  }
-
-  /**
    * Confirms that the installation succeeded.
    */
-  public function testInstalled() {
+  public function testInstalled(): void {
     $this->assertSession()->addressEquals('root-user');
     $this->assertSession()->statusCodeEquals(200);
     // Confirm that we are logged-in after installation.
     $this->assertSession()->pageTextContains($this->rootUser->getAccountName());
 
     // Confirm that Drupal recognizes this distribution as the current profile.
-    $this->assertEquals('my_distro', \Drupal::installProfile());
-    $this->assertEquals('my_distro', $this->config('core.extension')->get('profile'), 'The install profile has been written to core.extension configuration.');
+    $this->assertEquals('my_distribution', \Drupal::installProfile());
+    $this->assertEquals('my_distribution', $this->config('core.extension')->get('profile'), 'The install profile has been written to core.extension configuration.');
   }
 
 }

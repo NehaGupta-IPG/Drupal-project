@@ -15,13 +15,14 @@ class FormRouteEnhancer implements EnhancerInterface {
   /**
    * Returns whether the enhancer runs on the current route.
    *
-   * @param \Drupal\Core\Routing\Enhancer\Route $route
+   * @param \Symfony\Component\Routing\Route $route
    *   The current route.
    *
    * @return bool
+   *   TRUE when the enhancer runs on the current route, FALSE otherwise.
    */
   protected function applies(Route $route) {
-    return $route->hasDefault('_form') && !$route->hasDefault('_controller');
+    return $route->hasDefault('_form') && !$route->hasDefault(RouteObjectInterface::CONTROLLER_NAME);
   }
 
   /**
@@ -33,7 +34,7 @@ class FormRouteEnhancer implements EnhancerInterface {
       return $defaults;
     }
 
-    $defaults['_controller'] = 'controller.form:getContentResult';
+    $defaults[RouteObjectInterface::CONTROLLER_NAME] = 'controller.form:getContentResult';
     return $defaults;
   }
 

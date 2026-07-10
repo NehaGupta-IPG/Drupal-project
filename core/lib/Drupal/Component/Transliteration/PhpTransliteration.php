@@ -2,6 +2,8 @@
 
 namespace Drupal\Component\Transliteration;
 
+// cspell:ignore Brion Vibber
+
 /**
  * Implements transliteration without using the PECL extensions.
  *
@@ -14,7 +16,7 @@ namespace Drupal\Component\Transliteration;
  * there is no language-specific override for a character, the generic
  * transliteration character tables are searched (see
  * PhpTransliteration::readGenericData()). If looking up the character in the
- * generic table results in a NULL value, or an illegal character is
+ * generic table results in a NULL value, or an invalid character is
  * encountered, then a substitute character is returned.
  *
  * Some parts of this code were derived from the MediaWiki project's UtfNormal
@@ -65,6 +67,8 @@ class PhpTransliteration implements TransliterationInterface {
    * transliterates to more than one ASCII character require special
    * treatment: we want to remove their accent and use the un-
    * transliterated base character.
+   *
+   * @var string[]
    */
   protected $fixTransliterateForRemoveDiacritics = [
     'AE' => 'Æ',
@@ -76,7 +80,7 @@ class PhpTransliteration implements TransliterationInterface {
   /**
    * Constructs a transliteration object.
    *
-   * @param string $data_directory
+   * @param string|null $data_directory
    *   (optional) The directory where data files reside. If omitted, defaults
    *   to subdirectory 'data' underneath the directory where the class's PHP
    *   file resides.
@@ -130,7 +134,7 @@ class PhpTransliteration implements TransliterationInterface {
     // Replace question marks with a unique hash if necessary. This because
     // mb_convert_encoding() replaces all invalid characters with a question
     // mark.
-    if ($unknown_character != '?' && strpos($string, '?') !== FALSE) {
+    if ($unknown_character != '?' && str_contains($string, '?')) {
       $hash = hash('sha256', $string);
       $string = str_replace('?', $hash, $string);
     }
@@ -180,7 +184,7 @@ class PhpTransliteration implements TransliterationInterface {
    *   A single UTF-8 character.
    *
    * @return int
-   *   The character code, or -1 if an illegal character is found.
+   *   The character code, or -1 if an invalid character is found.
    */
   protected static function ordUTF8($character) {
     $first_byte = ord($character[0]);
@@ -242,7 +246,7 @@ class PhpTransliteration implements TransliterationInterface {
   /**
    * Look up the generic replacement for a UTF-8 character code.
    *
-   * @param $code
+   * @param int $code
    *   The UTF-8 character code.
    * @param string $unknown_character
    *   (optional) The character to substitute for characters without entries in
@@ -260,7 +264,7 @@ class PhpTransliteration implements TransliterationInterface {
       $this->readGenericData($bank);
     }
     $code = $code & 0xff;
-    return isset($this->genericMap[$bank][$code]) ? $this->genericMap[$bank][$code] : $unknown_character;
+    return $this->genericMap[$bank][$code] ?? $unknown_character;
   }
 
   /**
@@ -273,7 +277,7 @@ class PhpTransliteration implements TransliterationInterface {
    * transliterations in this language. The character codes can be for any valid
    * Unicode character, independent of the number of bytes.
    *
-   * @param $langcode
+   * @param string $langcode
    *   Code for the language to read.
    */
   protected function readLanguageOverrides($langcode) {
@@ -283,11 +287,9 @@ class PhpTransliteration implements TransliterationInterface {
 
     // Read in this file, which should set up a variable called $overrides,
     // which will be local to this function.
+    $overrides[$langcode] = [];
     if (is_file($file)) {
       include $file;
-    }
-    if (!isset($overrides) || !is_array($overrides)) {
-      $overrides = [$langcode => []];
     }
     $this->languageOverrides[$langcode] = $overrides[$langcode];
   }
@@ -302,7 +304,7 @@ class PhpTransliteration implements TransliterationInterface {
    * transliterations of these characters into US-ASCII. Note that the maximum
    * Unicode character that can be encoded in this way is 4 bytes.
    *
-   * @param $bank
+   * @param int $bank
    *   First two bytes of the Unicode character, or 0 for the ASCII range.
    */
   protected function readGenericData($bank) {
@@ -311,14 +313,10 @@ class PhpTransliteration implements TransliterationInterface {
 
     // Read in this file, which should set up a variable called $base, which
     // will be local to this function.
+    $base = [];
     if (is_file($file)) {
       include $file;
     }
-    if (!isset($base) || !is_array($base)) {
-      $base = [];
-    }
-
-    // Save this data.
     $this->genericMap[$bank] = $base;
   }
 

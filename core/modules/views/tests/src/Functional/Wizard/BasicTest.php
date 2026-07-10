@@ -1,17 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Wizard;
 
 use Drupal\Component\Serialization\Json;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Url;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests creating views with the wizard and viewing them on the listing page.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class BasicTest extends WizardTestBase {
 
   /**
@@ -19,13 +22,19 @@ class BasicTest extends WizardTestBase {
    */
   protected $defaultTheme = 'stark';
 
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp($import_test_views);
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp($import_test_views = TRUE, $modules = []): void {
+    parent::setUp($import_test_views, $modules);
 
     $this->drupalPlaceBlock('page_title_block');
   }
 
-  public function testViewsWizardAndListing() {
+  /**
+   * Tests the Views wizard and listing.
+   */
+  public function testViewsWizardAndListing(): void {
     $this->drupalCreateContentType(['type' => 'article']);
     $this->drupalCreateContentType(['type' => 'page']);
 
@@ -36,7 +45,7 @@ class BasicTest extends WizardTestBase {
     // Create a simple and not at all useful view.
     $view1 = [];
     $view1['label'] = $this->randomMachineName(16);
-    $view1['id'] = strtolower($this->randomMachineName(16));
+    $view1['id'] = $this->randomMachineName(16);
     $view1['description'] = $this->randomMachineName(16);
     $view1['page[create]'] = FALSE;
     $this->drupalGet('admin/structure/views/add');
@@ -50,11 +59,11 @@ class BasicTest extends WizardTestBase {
     $this->assertSession()->linkByHrefExists(Url::fromRoute('entity.view.duplicate_form', ['view' => $view1['id']])->toString());
 
     // The view should not have a REST export display.
-    $this->assertNoText('REST export');
+    $this->assertSession()->pageTextNotContains('REST export');
 
     // This view should not have a block.
     $this->drupalGet('admin/structure/block');
-    $this->assertNoText($view1['label']);
+    $this->assertSession()->pageTextNotContains($view1['label']);
 
     // Create two nodes.
     $node1 = $this->drupalCreateNode(['type' => 'page']);
@@ -63,7 +72,7 @@ class BasicTest extends WizardTestBase {
     // Now create a page with simple node listing and an attached feed.
     $view2 = [];
     $view2['label'] = $this->randomMachineName(16);
-    $view2['id'] = strtolower($this->randomMachineName(16));
+    $view2['id'] = $this->randomMachineName(16);
     $view2['description'] = $this->randomMachineName(16);
     $view2['page[create]'] = 1;
     $view2['page[title]'] = $this->randomMachineName(16);
@@ -92,9 +101,9 @@ class BasicTest extends WizardTestBase {
     $this->assertEquals('2.0', $this->getSession()->getDriver()->getAttribute('//rss', 'version'));
     // The feed should have the same title and nodes as the page.
     $this->assertSession()->responseContains($view2['page[title]']);
-    $this->assertRaw($node1->toUrl('canonical', ['absolute' => TRUE])->toString());
+    $this->assertSession()->responseContains($node1->toUrl('canonical', ['absolute' => TRUE])->toString());
     $this->assertSession()->responseContains($node1->label());
-    $this->assertRaw($node2->toUrl('canonical', ['absolute' => TRUE])->toString());
+    $this->assertSession()->responseContains($node2->toUrl('canonical', ['absolute' => TRUE])->toString());
     $this->assertSession()->responseContains($node2->label());
 
     // Go back to the views page and check if this view is there.
@@ -104,16 +113,16 @@ class BasicTest extends WizardTestBase {
     $this->assertSession()->linkByHrefExists(Url::fromRoute('view.' . $view2['id'] . '.page_1')->toString());
 
     // The view should not have a REST export display.
-    $this->assertNoText('REST export');
+    $this->assertSession()->pageTextNotContains('REST export');
 
     // This view should not have a block.
     $this->drupalGet('admin/structure/block');
-    $this->assertNoText('View: ' . $view2['label']);
+    $this->assertSession()->pageTextNotContains('View: ' . $view2['label']);
 
     // Create a view with a page and a block, and filter the listing.
     $view3 = [];
     $view3['label'] = $this->randomMachineName(16);
-    $view3['id'] = strtolower($this->randomMachineName(16));
+    $view3['id'] = $this->randomMachineName(16);
     $view3['description'] = $this->randomMachineName(16);
     $view3['show[wizard_key]'] = 'node';
     $view3['show[type]'] = 'page';
@@ -131,7 +140,7 @@ class BasicTest extends WizardTestBase {
     $this->assertSession()->addressEquals($view3['page[path]']);
     $this->assertSession()->pageTextContains($view3['page[title]']);
     $this->assertSession()->pageTextContains($node1->label());
-    $this->assertNoText($node2->label());
+    $this->assertSession()->pageTextNotContains($node2->label());
 
     // Go back to the views page and check if this view is there.
     $this->drupalGet('admin/structure/views');
@@ -140,7 +149,7 @@ class BasicTest extends WizardTestBase {
     $this->assertSession()->linkByHrefExists(Url::fromRoute('view.' . $view3['id'] . '.page_1')->toString());
 
     // The view should not have a REST export display.
-    $this->assertNoText('REST export');
+    $this->assertSession()->pageTextNotContains('REST export');
 
     // Confirm that the block is available in the block administration UI.
     $this->drupalGet('admin/structure/block/list/' . $this->config('system.theme')->get('default'));
@@ -154,15 +163,12 @@ class BasicTest extends WizardTestBase {
     // for the expected node title in the block.
     $this->drupalGet('user');
     $this->assertSession()->pageTextContains($node1->label());
-    $this->assertNoText($node2->label());
-
-    // Make sure the listing page doesn't show disabled default views.
-    $this->assertNoText('tracker');
+    $this->assertSession()->pageTextNotContains($node2->label());
 
     // Create a view with only a REST export.
     $view4 = [];
     $view4['label'] = $this->randomMachineName(16);
-    $view4['id'] = strtolower($this->randomMachineName(16));
+    $view4['id'] = $this->randomMachineName(16);
     $view4['description'] = $this->randomMachineName(16);
     $view4['show[wizard_key]'] = 'node';
     $view4['show[type]'] = 'page';
@@ -170,7 +176,7 @@ class BasicTest extends WizardTestBase {
     $view4['rest_export[path]'] = $this->randomMachineName(16);
     $this->drupalGet('admin/structure/views/add');
     $this->submitForm($view4, 'Save and edit');
-    $this->assertRaw(t('The view %view has been saved.', ['%view' => $view4['label']]));
+    $this->assertSession()->pageTextContains("The view {$view4['label']} has been saved.");
 
     // Check that the REST export path works. JSON will work, as all core
     // formats will be allowed. JSON and XML by default.
@@ -185,7 +191,7 @@ class BasicTest extends WizardTestBase {
     // set.
     $leading_slash_view = [];
     $leading_slash_view['label'] = $this->randomMachineName(16);
-    $leading_slash_view['id'] = strtolower($this->randomMachineName(16));
+    $leading_slash_view['id'] = $this->randomMachineName(16);
     $leading_slash_view['description'] = $this->randomMachineName(16);
     $leading_slash_view['show[wizard_key]'] = 'node';
     $leading_slash_view['show[type]'] = 'page';
@@ -202,8 +208,8 @@ class BasicTest extends WizardTestBase {
    *
    * @see \Drupal\views\Plugin\views\display\DisplayPluginBase::mergeDefaults()
    */
-  public function testWizardDefaultValues() {
-    $random_id = strtolower($this->randomMachineName(16));
+  public function testWizardDefaultValues(): void {
+    $random_id = $this->randomMachineName(16);
     // Create a basic view.
     $view = [];
     $view['label'] = $this->randomMachineName(16);
@@ -221,7 +227,7 @@ class BasicTest extends WizardTestBase {
 
     foreach ($displays as $display) {
       foreach (['query', 'exposed_form', 'pager', 'style', 'row'] as $type) {
-        $this->assertFalse(empty($display['display_options'][$type]['options']), new FormattableMarkup('Default options found for @plugin.', ['@plugin' => $type]));
+        $this->assertNotEmpty($display['display_options'][$type]['options'], "There should be default options available for '$type'.");
       }
     }
   }

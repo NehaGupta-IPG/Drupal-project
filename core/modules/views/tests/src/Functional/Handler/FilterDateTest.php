@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Handler;
 
 use Drupal\field\Entity\FieldConfig;
@@ -8,12 +10,14 @@ use Drupal\node\Entity\NodeType;
 use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the core Drupal\views\Plugin\views\filter\Date handler.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class FilterDateTest extends ViewTestBase {
   use SchemaCheckTestTrait;
 
@@ -25,16 +29,14 @@ class FilterDateTest extends ViewTestBase {
   public static $testViews = ['test_filter_date_between'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'views_ui', 'datetime'];
 
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'classy';
+  protected $defaultTheme = 'starterkit_theme';
 
   /**
    * The date formatter.
@@ -43,8 +45,21 @@ class FilterDateTest extends ViewTestBase {
    */
   public $dateFormatter;
 
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp($import_test_views);
+  /**
+   * @var array
+   */
+  protected array $nodes;
+
+  /**
+   * @var array
+   */
+  protected array $map;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp($import_test_views = TRUE, $modules = ['views_test_config']): void {
+    parent::setUp($import_test_views, $modules);
     $this->dateFormatter = $this->container->get('date.formatter');
 
     // Add a date field so we can test datetime handling.
@@ -84,7 +99,7 @@ class FilterDateTest extends ViewTestBase {
   /**
    * Runs other test methods.
    */
-  public function testDateFilter() {
+  public function testDateFilter(): void {
     $this->_testOffset();
     $this->_testBetween();
     $this->_testUiValidation();
@@ -95,7 +110,7 @@ class FilterDateTest extends ViewTestBase {
   /**
    * Tests the general offset functionality.
    */
-  protected function _testOffset() {
+  protected function _testOffset(): void {
     $view = Views::getView('test_filter_date_between');
 
     // Test offset for simple operator.
@@ -126,7 +141,7 @@ class FilterDateTest extends ViewTestBase {
   /**
    * Tests the filter operator between/not between.
    */
-  protected function _testBetween() {
+  protected function _testBetween(): void {
     $view = Views::getView('test_filter_date_between');
 
     // Test between with min and max.
@@ -182,7 +197,7 @@ class FilterDateTest extends ViewTestBase {
   /**
    * Make sure the validation callbacks works.
    */
-  protected function _testUiValidation() {
+  protected function _testUiValidation(): void {
 
     $this->drupalLogin($this->drupalCreateUser([
       'administer views',
@@ -202,7 +217,7 @@ class FilterDateTest extends ViewTestBase {
   /**
    * Tests date filter UI.
    */
-  protected function _testFilterDateUI() {
+  protected function _testFilterDateUI(): void {
     $this->drupalLogin($this->drupalCreateUser(['administer views']));
     $this->drupalGet('admin/structure/views/nojs/handler/test_filter_date_between/default/filter/created');
     $this->submitForm([], 'Expose filter');
@@ -293,7 +308,7 @@ class FilterDateTest extends ViewTestBase {
   /**
    * Tests datetime grouped filter UI.
    */
-  protected function _testFilterDatetimeUI() {
+  protected function _testFilterDatetimeUI(): void {
     $this->drupalLogin($this->drupalCreateUser(['administer views']));
     $this->drupalGet('admin/structure/views/nojs/add-handler/test_filter_date_between/default/filter');
     $this->submitForm([
@@ -328,7 +343,7 @@ class FilterDateTest extends ViewTestBase {
   /**
    * Tests that the exposed date filter is displayed without errors.
    */
-  public function testExposedFilter() {
+  public function testExposedFilter(): void {
     $this->drupalLogin($this->drupalCreateUser(['administer views']));
     $this->drupalGet('admin/structure/views/nojs/handler/test_filter_date_between/default/filter/created');
     $this->submitForm([], 'Expose filter');
@@ -344,6 +359,77 @@ class FilterDateTest extends ViewTestBase {
 
     $this->drupalGet('exposed-date-filter');
     $this->assertSession()->fieldExists('created');
+  }
+
+  /**
+   * Tests an exposed date filter with an offset default value.
+   *
+   * Verify that results are filtered on page load without requiring form
+   * submission.
+   */
+  public function testExposedOffsetDefaultAppliedOnPageLoad(): void {
+    $this->drupalLogin($this->drupalCreateUser(['administer views']));
+
+    // Expose the filter with operator > and default offset "now".
+    $this->drupalGet('admin/structure/views/nojs/handler/test_filter_date_between/default/filter/created');
+    $this->submitForm([], 'Expose filter');
+    $edit = [
+      'options[operator]' => '>',
+      'options[value][type]' => 'offset',
+      'options[value][value]' => 'now',
+    ];
+    $this->submitForm($edit, 'Apply');
+
+    // Add a page display and save.
+    $this->drupalGet('admin/structure/views/view/test_filter_date_between/edit');
+    $this->submitForm([], 'Add Page');
+    $this->drupalGet('admin/structure/views/nojs/display/test_filter_date_between/page_1/path');
+    $this->submitForm(['path' => 'exposed-offset-default'], 'Apply');
+    $this->submitForm([], 'Save');
+
+    // On page load (no form submission), only the future node should appear.
+    $this->drupalGet('exposed-offset-default');
+    $results = $this->cssSelect('.view-content .field-content');
+    $this->assertCount(1, $results);
+    $this->assertEquals($this->nodes[3]->id(), $results[0]->getText());
+  }
+
+  /**
+   * Tests an exposed date filter with offset default value (between operator).
+   *
+   * Verify that results are filtered on page load without requiring form
+   * submission.
+   */
+  public function testExposedOffsetBetweenDefaultAppliedOnPageLoad(): void {
+    $this->drupalLogin($this->drupalCreateUser(['administer views']));
+
+    // Expose the filter with operator "between" and offset defaults.
+    $this->drupalGet('admin/structure/views/nojs/handler/test_filter_date_between/default/filter/created');
+    $this->submitForm([], 'Expose filter');
+    $edit = [
+      'options[operator]' => 'between',
+      'options[value][type]' => 'offset',
+      'options[value][min]' => 'now',
+      'options[value][max]' => '+2 days',
+    ];
+    $this->submitForm($edit, 'Apply');
+
+    // Add a page display and save.
+    $this->drupalGet('admin/structure/views/view/test_filter_date_between/edit');
+    $this->submitForm([], 'Add Page');
+    $this->drupalGet('admin/structure/views/nojs/display/test_filter_date_between/page_1/path');
+    $this->submitForm(['path' => 'exposed-offset-between-default'], 'Apply');
+    $this->submitForm([], 'Save');
+
+    // Add a node beyond the max offset (+2 days) to verify it is excluded.
+    $this->nodes[] = $this->drupalCreateNode(['created' => time() + (86400 * 3)]);
+
+    // On page load (no form submission), only the node within [now, +2 days]
+    // should appear; the node beyond +2 days must be excluded.
+    $this->drupalGet('exposed-offset-between-default');
+    $results = $this->cssSelect('.view-content .field-content');
+    $this->assertCount(1, $results);
+    $this->assertEquals($this->nodes[3]->id(), $results[0]->getText());
   }
 
 }

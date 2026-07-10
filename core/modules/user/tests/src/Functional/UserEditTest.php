@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Functional;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests user edit page.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserEditTest extends BrowserTestBase {
 
   /**
@@ -20,21 +24,22 @@ class UserEditTest extends BrowserTestBase {
   /**
    * Tests user edit page.
    */
-  public function testUserEdit() {
+  public function testUserEdit(): void {
     // Test user edit functionality.
     $user1 = $this->drupalCreateUser(['change own username']);
     $user2 = $this->drupalCreateUser([]);
     $this->drupalLogin($user1);
 
-    // Test that error message appears when attempting to use a non-unique user name.
+    // Test that error message appears when attempting to use a non-unique user
+    // name.
     $edit['name'] = $user2->getAccountName();
     $this->drupalGet("user/" . $user1->id() . "/edit");
     $this->submitForm($edit, 'Save');
-    $this->assertRaw(t('The username %name is already taken.', ['%name' => $edit['name']]));
+    $this->assertSession()->pageTextContains("The username {$edit['name']} is already taken.");
 
     // Check that the default value in user name field
     // is the raw value and not a formatted one.
-    \Drupal::state()->set('user_hooks_test_user_format_name_alter', TRUE);
+    \Drupal::keyValue('user_hooks_test')->set('user_format_name_alter', TRUE);
     \Drupal::service('module_installer')->install(['user_hooks_test']);
     Cache::invalidateTags(['rendered']);
     $this->drupalGet('user/' . $user1->id() . '/edit');
@@ -65,12 +70,12 @@ class UserEditTest extends BrowserTestBase {
     $edit['mail'] = $this->randomMachineName() . '@new.example.com';
     $this->drupalGet("user/" . $user1->id() . "/edit");
     $this->submitForm($edit, 'Save');
-    $this->assertRaw(t("Your current password is missing or incorrect; it's required to change the %name.", ['%name' => t('Email')]));
+    $this->assertSession()->pageTextContains("Your current password is missing or incorrect; it's required to change the Email.");
 
     $edit['current_pass'] = $user1->passRaw;
     $this->drupalGet("user/" . $user1->id() . "/edit");
     $this->submitForm($edit, 'Save');
-    $this->assertRaw(t("The changes have been saved."));
+    $this->assertSession()->pageTextContains("The changes have been saved.");
 
     // Test that the user must enter current password before changing passwords.
     $edit = [];
@@ -78,13 +83,13 @@ class UserEditTest extends BrowserTestBase {
     $edit['pass[pass2]'] = $new_pass;
     $this->drupalGet("user/" . $user1->id() . "/edit");
     $this->submitForm($edit, 'Save');
-    $this->assertRaw(t("Your current password is missing or incorrect; it's required to change the %name.", ['%name' => t('Password')]));
+    $this->assertSession()->pageTextContains("Your current password is missing or incorrect; it's required to change the Password.");
 
     // Try again with the current password.
     $edit['current_pass'] = $user1->passRaw;
     $this->drupalGet("user/" . $user1->id() . "/edit");
     $this->submitForm($edit, 'Save');
-    $this->assertRaw(t("The changes have been saved."));
+    $this->assertSession()->pageTextContains("The changes have been saved.");
 
     // Confirm there's only one session in the database as the existing session
     // has been migrated when the password is changed.
@@ -92,7 +97,7 @@ class UserEditTest extends BrowserTestBase {
     $this->assertSame(1, (int) \Drupal::database()->select('sessions', 's')->countQuery()->execute()->fetchField());
 
     // Make sure the changed timestamp is updated.
-    $this->assertEquals(REQUEST_TIME, $user1->getChangedTime(), 'Changing a user sets "changed" timestamp.');
+    $this->assertEquals(\Drupal::time()->getRequestTime(), $user1->getChangedTime(), 'Changing a user sets "changed" timestamp.');
 
     // Make sure the user can log in with their new password.
     $this->drupalLogout();
@@ -107,12 +112,12 @@ class UserEditTest extends BrowserTestBase {
     $config->set('password_strength', TRUE)->save();
     $this->drupalGet("user/" . $user1->id() . "/edit");
     $this->submitForm($edit, 'Save');
-    $this->assertRaw(t('Password strength:'));
+    $this->assertSession()->responseContains("Password strength:");
 
     $config->set('password_strength', FALSE)->save();
     $this->drupalGet("user/" . $user1->id() . "/edit");
     $this->submitForm($edit, 'Save');
-    $this->assertNoRaw(t('Password strength:'));
+    $this->assertSession()->responseNotContains("Password strength:");
 
     // Check that the user status field has the correct value and that it is
     // properly displayed.
@@ -145,7 +150,7 @@ class UserEditTest extends BrowserTestBase {
    * password that is literally "0" was not possible. This test ensures that
    * this regression can't happen again.
    */
-  public function testUserWith0Password() {
+  public function testUserWith0Password(): void {
     $admin = $this->drupalCreateUser(['administer users']);
     $this->drupalLogin($admin);
     // Create a regular user.
@@ -154,13 +159,13 @@ class UserEditTest extends BrowserTestBase {
     $edit = ['pass[pass1]' => '0', 'pass[pass2]' => '0'];
     $this->drupalGet("user/" . $user1->id() . "/edit");
     $this->submitForm($edit, 'Save');
-    $this->assertRaw(t("The changes have been saved."));
+    $this->assertSession()->pageTextContains("The changes have been saved.");
   }
 
   /**
    * Tests editing of a user account without an email address.
    */
-  public function testUserWithoutEmailEdit() {
+  public function testUserWithoutEmailEdit(): void {
     // Test that an admin can edit users without an email address.
     $admin = $this->drupalCreateUser(['administer users']);
     $this->drupalLogin($admin);
@@ -171,13 +176,13 @@ class UserEditTest extends BrowserTestBase {
     $user1->save();
     $this->drupalGet("user/" . $user1->id() . "/edit");
     $this->submitForm(['mail' => ''], 'Save');
-    $this->assertRaw(t("The changes have been saved."));
+    $this->assertSession()->pageTextContains("The changes have been saved.");
   }
 
   /**
    * Tests well known change password route redirects to user edit form.
    */
-  public function testUserWellKnownChangePasswordAuth() {
+  public function testUserWellKnownChangePasswordAuth(): void {
     $account = $this->drupalCreateUser([]);
     $this->drupalLogin($account);
     $this->drupalGet('.well-known/change-password');
@@ -187,7 +192,7 @@ class UserEditTest extends BrowserTestBase {
   /**
    * Tests well known change password route returns 403 to anonymous user.
    */
-  public function testUserWellKnownChangePasswordAnon() {
+  public function testUserWellKnownChangePasswordAnon(): void {
     $this->drupalGet('.well-known/change-password');
     $this->assertSession()->statusCodeEquals(403);
   }
@@ -195,7 +200,7 @@ class UserEditTest extends BrowserTestBase {
   /**
    * Tests that a user is able to change site language.
    */
-  public function testUserChangeSiteLanguage() {
+  public function testUserChangeSiteLanguage(): void {
     // Install these modules here as these aren't needed for other test methods.
     \Drupal::service('module_installer')->install([
       'content_translation',
@@ -243,6 +248,58 @@ class UserEditTest extends BrowserTestBase {
     $this->drupalGet('user/' . $webUser->id() . '/edit');
     $this->submitForm($edit, 'Save');
     $this->assertSession()->statusCodeEquals(200);
+  }
+
+  /**
+   * Tests the account form implements entity field access for mail.
+   */
+  public function testUserMailFieldAccess(): void {
+    \Drupal::state()->set('user_access_test_forbid_mail_edit', TRUE);
+    \Drupal::service('module_installer')->install(['user_access_test']);
+    $user = $this->drupalCreateUser();
+    $this->drupalLogin($user);
+    $this->drupalGet("user/" . $user->id() . "/edit");
+    $this->assertFalse($this->getSession()->getPage()->hasField('mail'));
+  }
+
+  /**
+   * Tests that an admin cannot edit their own account status.
+   */
+  public function testAdminSelfBlocking(): void {
+    // Create an admin user with permission to manage other users.
+    $admin = $this->drupalCreateUser(['administer users']);
+    $user = $this->drupalCreateUser();
+
+    // Log in as the admin and attempt to edit their own profile.
+    $this->drupalLogin($admin);
+    $this->drupalGet("user/" . $admin->id() . "/edit");
+
+    // Ensure the status field is not rendered.
+    $this->assertSession()->fieldNotExists('edit-status-0');
+    $this->assertSession()->fieldNotExists('edit-status-1');
+
+    // Test editing another user to ensure the status field is rendered.
+    $this->drupalGet("user/" . $user->id() . "/edit");
+    $this->assertSession()->fieldExists('edit-status-0');
+    $this->assertSession()->fieldEnabled('edit-status-0');
+    $this->assertSession()->fieldEnabled('edit-status-1');
+  }
+
+  /**
+   * Tests constraint violations are triggered on the user account form.
+   */
+  public function testRolesValidation(): void {
+    $admin_user = $this->drupalCreateUser(['administer users']);
+    $this->drupalLogin($admin_user);
+    $this->drupalGet("user/" . $admin_user->id() . "/edit");
+    $this->submitForm([], 'Save');
+    $this->assertSession()->pageTextContains('The changes have been saved.');
+    \Drupal::keyvalue('user_form_test')->set('user_form_test_constraint_roles_edit', TRUE);
+    \Drupal::service('module_installer')->install(['entity_test', 'user_form_test']);
+    $this->drupalGet("user/" . $admin_user->id() . "/edit");
+    $this->submitForm([], 'Save');
+    $this->assertSession()->pageTextContains('Widget constraint has failed.');
+    $this->assertSession()->pageTextNotContains('The changes have been saved.');
   }
 
 }

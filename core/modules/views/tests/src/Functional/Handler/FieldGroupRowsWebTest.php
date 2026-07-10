@@ -1,17 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Handler;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\views\Functional\ViewTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the "Display all values in the same row" setting.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class FieldGroupRowsWebTest extends ViewTestBase {
 
   /**
@@ -22,9 +26,7 @@ class FieldGroupRowsWebTest extends ViewTestBase {
   public static $testViews = ['test_group_rows', 'test_ungroup_rows'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node'];
 
@@ -64,8 +66,8 @@ class FieldGroupRowsWebTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp($import_test_views);
+  protected function setUp($import_test_views = TRUE, $modules = ['views_test_config']): void {
+    parent::setUp($import_test_views, $modules);
 
     // Create content type with unlimited text field.
     $this->nodeType = $this->drupalCreateContentType(['type' => 'page', 'name' => 'Basic page']);
@@ -97,7 +99,7 @@ class FieldGroupRowsWebTest extends ViewTestBase {
   /**
    * Testing when "Display all values in the same row" is checked.
    */
-  public function testGroupRows() {
+  public function testGroupRows(): void {
     $this->drupalGet('test-group-rows');
     $result = $this->cssSelect('div.views-field-field-views-testing-group- div');
 
@@ -111,7 +113,7 @@ class FieldGroupRowsWebTest extends ViewTestBase {
   /**
    * Testing when "Display all values in the same row" is unchecked.
    */
-  public function testUngroupedRows() {
+  public function testUngroupedRows(): void {
     $this->drupalGet('test-ungroup-rows');
     $result = $this->cssSelect('div.views-field-field-views-testing-group- div');
     $rendered_value = [];

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Kernel;
 
 use Drupal\Core\Database\Database;
@@ -58,15 +60,21 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
    */
   protected $logger;
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['migrate'];
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->createMigrationConnection();
     $this->sourceDatabase = Database::getConnection('default', 'migrate');
+    // Attach the original test prefix as a database, for SQLite to attach its
+    // database file.
+    $this->sourceDatabase->attachDatabase(substr($this->sourceDatabase->getConnectionOptions()['prefix'], 0, -1));
   }
 
   /**
@@ -74,7 +82,7 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
    *
    * @todo Remove when we don't use global. https://www.drupal.org/node/2552791
    */
-  private function createMigrationConnection() {
+  private function createMigrationConnection(): void {
     // If the backup already exists, something went terribly wrong.
     // This case is possible, because database connection info is a static
     // global state construct on the Database class, which at least persists
@@ -90,14 +98,9 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
     }
     $connection_info = Database::getConnectionInfo('default');
     foreach ($connection_info as $target => $value) {
-      $prefix = is_array($value['prefix']) ? $value['prefix']['default'] : $value['prefix'];
-      // Simpletest uses 7 character prefixes at most so this can't cause
-      // collisions.
-      $connection_info[$target]['prefix']['default'] = $prefix . '0';
-
-      // Add the original simpletest prefix so SQLite can attach its database.
-      // @see \Drupal\Core\Database\Driver\sqlite\Connection::init()
-      $connection_info[$target]['prefix'][$value['prefix']['default']] = $value['prefix']['default'];
+      $prefix = $value['prefix'];
+      // Tests use 7 character prefixes at most so this can't cause collisions.
+      $connection_info[$target]['prefix'] = $prefix . '0';
     }
     Database::addConnectionInfo('migrate', 'default', $connection_info['default']);
   }
@@ -105,10 +108,9 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
   /**
    * {@inheritdoc}
    */
-  protected function tearDown() {
+  protected function tearDown(): void {
     $this->cleanupMigrateConnection();
     parent::tearDown();
-    $this->databaseDumpFiles = [];
     $this->collectMessages = FALSE;
     unset($this->migration, $this->migrateMessages);
   }
@@ -118,7 +120,7 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
    *
    * @todo Remove when we don't use global. https://www.drupal.org/node/2552791
    */
-  private function cleanupMigrateConnection() {
+  private function cleanupMigrateConnection(): void {
     Database::removeConnection('migrate');
     $original_connection_info = Database::getConnectionInfo('simpletest_original_migrate');
     if ($original_connection_info) {
@@ -173,7 +175,7 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
       $this->migration = $migration;
     }
     if ($this instanceof MigrateDumpAlterInterface) {
-      static::migrateDumpAlter($this);
+      $this->migrateDumpAlter($this);
     }
 
     $this->prepareMigration($this->migration);
@@ -189,30 +191,26 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
    */
   protected function executeMigrations(array $ids) {
     $manager = $this->container->get('plugin.manager.migration');
-    array_walk($ids, function ($id) use ($manager) {
-      // This is possibly a base plugin ID and we want to run all derivatives.
-      $instances = $manager->createInstances($id);
-      $this->assertNotEmpty($instances, sprintf("No migrations created for id '%s'.", $id));
-      array_walk($instances, [$this, 'executeMigration']);
-    });
+    $instances = $manager->createInstances($ids);
+    array_walk($instances, [$this, 'executeMigration']);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function display($message, $type = 'status') {
+  public function display($message, $type = 'status'): void {
     if ($this->collectMessages) {
       $this->migrateMessages[$type][] = $message;
     }
     else {
-      $this->assertEquals('status', $type, $message);
+      $this->assertEquals('status', $type, (string) $message);
     }
   }
 
   /**
    * Start collecting messages and erase previous messages.
    */
-  public function startCollectingMessages() {
+  public function startCollectingMessages(): void {
     $this->collectMessages = TRUE;
     $this->migrateMessages = [];
   }
@@ -220,7 +218,7 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
   /**
    * Stop collecting messages.
    */
-  public function stopCollectingMessages() {
+  public function stopCollectingMessages(): void {
     $this->collectMessages = FALSE;
   }
 
@@ -243,7 +241,7 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
       $migration = $this->getMigration($migration);
     }
     /** @var \Drupal\migrate\Plugin\MigrationInterface $migration */
-    $destination = array_map(function () {
+    $destination = array_map(function (): null {
       return NULL;
     }, $migration->getDestinationPlugin()->getIds());
     $row = new Row($row, $migration->getSourcePlugin()->getIds());
@@ -253,7 +251,7 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
   /**
    * Gets the migration plugin.
    *
-   * @param $plugin_id
+   * @param string $plugin_id
    *   The plugin ID of the migration to get.
    *
    * @return \Drupal\migrate\Plugin\Migration

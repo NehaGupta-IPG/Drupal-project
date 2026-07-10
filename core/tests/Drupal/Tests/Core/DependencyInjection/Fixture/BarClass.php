@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\DependencyInjection\Fixture;
 
 /**
@@ -13,7 +15,7 @@ class BarClass {
   /**
    * Storage for a protected BazClass object.
    *
-   * @var Drupal\Tests\Core\DependencyInjection\Fixture\BazClass
+   * @var \Drupal\Tests\Core\DependencyInjection\Fixture\BazClass
    */
   protected $baz;
 
@@ -25,7 +27,7 @@ class BarClass {
    * @param \Drupal\Tests\Core\DependencyInjection\Fixture\BazClass $baz
    *   A BazClass object to store.
    */
-  public function setBaz(BazClass $baz) {
+  public function setBaz(BazClass $baz): void {
     $this->baz = $baz;
   }
 

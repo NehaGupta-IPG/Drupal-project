@@ -3,14 +3,19 @@
 namespace Drupal\Core\Database\Install;
 
 use Drupal\Core\Database\Database;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Database installer structure.
  *
- * Defines basic Drupal requirements for databases.
+ * Defines basic Drupal requirements for databases connecting via PDO.
+ * Every database driver implementation must provide a concrete implementation
+ * of it to support special handling required by that database.
  */
 abstract class Tasks {
+
+  use StringTranslationTrait;
 
   /**
    * The name of the PDO driver this database type requires.
@@ -68,6 +73,10 @@ abstract class Tasks {
         'Failed to <strong>DROP</strong> a test table from your database server. We tried dropping a table with the command %query and the server reported the following error %error.',
       ],
     ],
+    [
+      'function'    => 'checkJsonSupport',
+      'arguments'   => [],
+    ],
   ];
 
   /**
@@ -82,41 +91,50 @@ abstract class Tasks {
 
   /**
    * Ensure the PDO driver is supported by the version of PHP in use.
+   *
+   * @return bool
+   *   TRUE if the PDO driver is supported, otherwise FALSE.
    */
   protected function hasPdoDriver() {
     return in_array($this->pdoDriver, \PDO::getAvailableDrivers());
   }
 
   /**
-   * Assert test as failed.
+   * Asserts test as failed.
    */
   protected function fail($message) {
     $this->results['fail'][] = $message;
   }
 
   /**
-   * Assert test as a pass.
+   * Asserts test as a pass.
    */
   protected function pass($message) {
     $this->results['pass'][] = $message;
   }
 
   /**
-   * Check whether Drupal is installable on the database.
+   * Checks whether Drupal is installable on the database.
+   *
+   * @return bool
+   *   TRUE if Drupal can be installed on the database, otherwise FALSE.
    */
   public function installable() {
     return $this->hasPdoDriver() && empty($this->error);
   }
 
   /**
-   * Return the human-readable name of the driver.
+   * Returns the human-readable name of the driver.
+   *
+   * @return string
+   *   The human-readable name of the driver.
    */
   abstract public function name();
 
   /**
-   * Return the minimum required version of the engine.
+   * Returns the minimum required version of the engine.
    *
-   * @return
+   * @return string|null
    *   A version string. If not NULL, it will be checked against the version
    *   reported by the Database engine using version_compare().
    */
@@ -125,9 +143,9 @@ abstract class Tasks {
   }
 
   /**
-   * Run database tasks and tests to see if Drupal can run on the database.
+   * Runs database tasks and tests to see if Drupal can run on the database.
    *
-   * @return array
+   * @return string[]
    *   A list of error messages.
    */
   public function runTasks() {
@@ -144,7 +162,7 @@ abstract class Tasks {
           }
         }
         else {
-          $this->fail(t("Failed to run all tasks against the database server. The task %task wasn't found.", ['%task' => $task['function']]));
+          $this->fail($this->t("Failed to run all tasks against the database server. The task %task wasn't found.", ['%task' => $task['function']]));
         }
       }
     }
@@ -165,7 +183,10 @@ abstract class Tasks {
   }
 
   /**
-   * Check if we can connect to the database.
+   * Checks if we can connect to the database.
+   *
+   * @return bool
+   *   TRUE if we can connect to the database, otherwise FALSE.
    */
   protected function connect() {
     try {
@@ -176,28 +197,30 @@ abstract class Tasks {
       $this->pass('Drupal can CONNECT to the database ok.');
     }
     catch (\Exception $e) {
-      $this->fail(t('Failed to connect to your database server. The server reports the following message: %error.<ul><li>Is the database server running?</li><li>Does the database exist, and have you entered the correct database name?</li><li>Have you entered the correct username and password?</li><li>Have you entered the correct database hostname and port number?</li></ul>', ['%error' => $e->getMessage()]));
+      $this->fail($this->t('Failed to connect to your database server. The server reports the following message: %error.<ul><li>Is the database server running?</li><li>Does the database exist, and have you entered the correct database name?</li><li>Have you entered the correct username and password?</li><li>Have you entered the correct database hostname and port number?</li></ul>', ['%error' => $e->getMessage()]));
       return FALSE;
     }
     return TRUE;
   }
 
   /**
-   * Run SQL tests to ensure the database can execute commands with the current user.
+   * Ensures the database can execute commands with the current user.
    */
   protected function runTestQuery($query, $pass, $fail, $fatal = FALSE) {
     try {
       Database::getConnection()->query($query);
-      $this->pass(t($pass));
+      // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
+      $this->pass($this->t($pass));
     }
     catch (\Exception $e) {
-      $this->fail(t($fail, ['%query' => $query, '%error' => $e->getMessage(), '%name' => $this->name()]));
+      // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
+      $this->fail($this->t($fail, ['%query' => $query, '%error' => $e->getMessage(), '%name' => $this->name()]));
       return !$fatal;
     }
   }
 
   /**
-   * Check the engine version.
+   * Checks the engine version.
    */
   protected function checkEngineVersion() {
     // Ensure that the database server has the right version.
@@ -217,17 +240,21 @@ abstract class Tasks {
     // them or not.
     // @see https://www.php.net/manual/en/function.version-compare.php
     if ($this->minimumVersion() && version_compare(Database::getConnection()->version(), $this->minimumVersion() . '-AnyName', '<')) {
-      $this->fail(t("The database server version %version is less than the minimum required version %minimum_version.", ['%version' => Database::getConnection()->version(), '%minimum_version' => $this->minimumVersion()]));
+      $this->fail($this->t("The database server version %version is less than the minimum required version %minimum_version.", [
+        '%version' => Database::getConnection()
+          ->version(),
+        '%minimum_version' => $this->minimumVersion(),
+      ]));
     }
   }
 
   /**
-   * Return driver specific configuration options.
+   * Returns driver specific configuration options.
    *
-   * @param $database
+   * @param string[] $database
    *   An array of driver specific configuration options.
    *
-   * @return
+   * @return array
    *   The options form array.
    */
   public function getFormOptions(array $database) {
@@ -240,7 +267,7 @@ abstract class Tasks {
 
     $form['database'] = [
       '#type' => 'textfield',
-      '#title' => t('Database name'),
+      '#title' => $this->t('Database name'),
       '#default_value' => empty($database['database']) ? '' : $database['database'],
       '#size' => 45,
       '#required' => TRUE,
@@ -253,7 +280,7 @@ abstract class Tasks {
 
     $form['username'] = [
       '#type' => 'textfield',
-      '#title' => t('Database username'),
+      '#title' => $this->t('Database username'),
       '#default_value' => empty($database['username']) ? '' : $database['username'],
       '#size' => 45,
       '#required' => TRUE,
@@ -266,7 +293,7 @@ abstract class Tasks {
 
     $form['password'] = [
       '#type' => 'password',
-      '#title' => t('Database password'),
+      '#title' => $this->t('Database password'),
       '#default_value' => empty($database['password']) ? '' : $database['password'],
       '#required' => FALSE,
       '#size' => 45,
@@ -274,37 +301,35 @@ abstract class Tasks {
 
     $form['advanced_options'] = [
       '#type' => 'details',
-      '#title' => t('Advanced options'),
+      '#title' => $this->t('Advanced options'),
       '#weight' => 10,
     ];
 
     global $install_state;
-    // @todo https://www.drupal.org/project/drupal/issues/3110839 remove PHP 7.4
-    //   work around and add a better message for the migrate UI.
     $profile = $install_state['parameters']['profile'] ?? NULL;
     $db_prefix = ($profile == 'standard') ? 'drupal_' : $profile . '_';
     $form['advanced_options']['prefix'] = [
       '#type' => 'textfield',
-      '#title' => t('Table name prefix'),
+      '#title' => $this->t('Table name prefix'),
       '#default_value' => empty($database['prefix']) ? '' : $database['prefix'],
       '#size' => 45,
-      '#description' => t('If more than one application will be sharing this database, a unique table name prefix – such as %prefix – will prevent collisions.', ['%prefix' => $db_prefix]),
+      '#description' => $this->t('If more than one application will be sharing this database, a unique table name prefix – such as %prefix – will prevent collisions.', ['%prefix' => $db_prefix]),
       '#weight' => 10,
     ];
 
     $form['advanced_options']['host'] = [
       '#type' => 'textfield',
-      '#title' => t('Host'),
+      '#title' => $this->t('Host'),
       '#default_value' => empty($database['host']) ? 'localhost' : $database['host'],
       '#size' => 45,
-      // Hostnames can be 255 characters long.
+      // Host names can be 255 characters long.
       '#maxlength' => 255,
       '#required' => TRUE,
     ];
 
     $form['advanced_options']['port'] = [
       '#type' => 'number',
-      '#title' => t('Port number'),
+      '#title' => $this->t('Port number'),
       '#default_value' => empty($database['port']) ? '' : $database['port'],
       '#min' => 0,
       '#max' => 65535,
@@ -319,18 +344,18 @@ abstract class Tasks {
    * Checks to ensure correct basic database settings and that a proper
    * connection to the database can be established.
    *
-   * @param $database
+   * @param string[] $database
    *   An array of driver specific configuration options.
    *
-   * @return
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup[]
    *   An array of driver configuration errors, keyed by form element name.
    */
-  public function validateDatabaseSettings($database) {
+  public function validateDatabaseSettings(array $database) {
     $errors = [];
 
     // Verify the table prefix.
     if (!empty($database['prefix']) && is_string($database['prefix']) && !preg_match('/^[A-Za-z0-9_.]+$/', $database['prefix'])) {
-      $errors[$database['driver'] . '][prefix'] = t('The database table prefix you have entered, %prefix, is invalid. The table prefix can only contain alphanumeric characters, periods, or underscores.', ['%prefix' => $database['prefix']]);
+      $errors[$database['driver'] . '][prefix'] = $this->t('The database table prefix you have entered, %prefix, is invalid. The table prefix can only contain alphanumeric characters, periods, or underscores.', ['%prefix' => $database['prefix']]);
     }
 
     return $errors;
@@ -339,9 +364,20 @@ abstract class Tasks {
   /**
    * Translates a string to the current language or to a given language.
    *
+   * @param string $string
+   *   The string literal to translate.
+   * @param array $args
+   *   Placeholder arguments to use inside the translated string (if any).
+   * @param array $options
+   *   Options for the translation.
+   *
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   *   An object representing the translatable markup for the given string.
+   *
    * @see \Drupal\Core\StringTranslation\TranslatableMarkup::__construct()
    */
   protected function t($string, array $args = [], array $options = []) {
+    // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
     return new TranslatableMarkup($string, $args, $options);
   }
 
@@ -364,6 +400,18 @@ abstract class Tasks {
    */
   protected function getConnection() {
     return Database::getConnection();
+  }
+
+  /**
+   * Checks the database json support.
+   */
+  protected function checkJsonSupport() {
+    if ($this->getConnection()->hasJson()) {
+      $this->pass($this->t('Database connection supports the JSON type.'));
+    }
+    else {
+      $this->fail($this->t('<a href="https://www.drupal.org/docs/system-requirements">Database connection does not support JSON.</a>'));
+    }
   }
 
 }

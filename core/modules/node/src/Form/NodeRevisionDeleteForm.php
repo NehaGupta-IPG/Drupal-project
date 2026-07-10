@@ -2,11 +2,12 @@
 
 namespace Drupal\node\Form;
 
-use Drupal\Core\Database\Connection;
+use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -16,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @internal
  */
-class NodeRevisionDeleteForm extends ConfirmFormBase {
+class NodeRevisionDeleteForm extends ConfirmFormBase implements WorkspaceSafeFormInterface {
 
   /**
    * The node revision.
@@ -26,50 +27,14 @@ class NodeRevisionDeleteForm extends ConfirmFormBase {
   protected $revision;
 
   /**
-   * The node storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $nodeStorage;
-
-  /**
-   * The node type storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $nodeTypeStorage;
-
-  /**
-   * The database connection.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $connection;
-
-  /**
-   * The date formatter service.
-   *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
-   */
-  protected $dateFormatter;
-
-  /**
    * Constructs a new NodeRevisionDeleteForm.
-   *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $node_storage
-   *   The node storage.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $node_type_storage
-   *   The node type storage.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
-   *   The date formatter service.
    */
-  public function __construct(EntityStorageInterface $node_storage, EntityStorageInterface $node_type_storage, Connection $connection, DateFormatterInterface $date_formatter) {
-    $this->nodeStorage = $node_storage;
-    $this->nodeTypeStorage = $node_type_storage;
-    $this->connection = $connection;
-    $this->dateFormatter = $date_formatter;
+  public function __construct(
+    protected EntityStorageInterface $nodeStorage,
+    protected EntityStorageInterface $nodeTypeStorage,
+    protected AccessManagerInterface $accessManager,
+    protected DateFormatterInterface $dateFormatter,
+  ) {
   }
 
   /**
@@ -80,8 +45,8 @@ class NodeRevisionDeleteForm extends ConfirmFormBase {
     return new static(
       $entity_type_manager->getStorage('node'),
       $entity_type_manager->getStorage('node_type'),
-      $container->get('database'),
-      $container->get('date.formatter')
+      $container->get('access_manager'),
+      $container->get('date.formatter'),
     );
   }
 
@@ -118,7 +83,7 @@ class NodeRevisionDeleteForm extends ConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, NodeInterface $node_revision = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, ?NodeInterface $node_revision = NULL) {
     $this->revision = $node_revision;
     $form = parent::buildForm($form, $form_state);
 
@@ -129,9 +94,16 @@ class NodeRevisionDeleteForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $this->nodeStorage->deleteRevision($this->revision->getRevisionId());
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+    $storage = $this->nodeStorage;
+    $storage->deleteRevision($this->revision->getRevisionId());
 
-    $this->logger('content')->notice('@type: deleted %title revision %revision.', ['@type' => $this->revision->bundle(), '%title' => $this->revision->label(), '%revision' => $this->revision->getRevisionId()]);
+    $this->logger('content')
+      ->info('@type: deleted %title revision %revision.', [
+        '@type' => $this->revision->bundle(),
+        '%title' => $this->revision->label(),
+        '%revision' => $this->revision->getRevisionId(),
+      ]);
     $node_type = $this->nodeTypeStorage->load($this->revision->bundle())->label();
     $this->messenger()
       ->addStatus($this->t('Revision from %revision-date of @type %title has been deleted.', [
@@ -139,16 +111,16 @@ class NodeRevisionDeleteForm extends ConfirmFormBase {
         '@type' => $node_type,
         '%title' => $this->revision->label(),
       ]));
-    $form_state->setRedirect(
-      'entity.node.canonical',
-      ['node' => $this->revision->id()]
-    );
-    if ($this->connection->query('SELECT COUNT(DISTINCT [vid]) FROM {node_field_revision} WHERE [nid] = :nid', [':nid' => $this->revision->id()])->fetchField() > 1) {
-      $form_state->setRedirect(
-        'entity.node.version_history',
-        ['node' => $this->revision->id()]
-      );
+    // Set redirect to the revisions history page.
+    $route_name = 'entity.node.version_history';
+    $parameters = ['node' => $this->revision->id()];
+    // If no revisions found, or the user does not have access to the revisions
+    // page, then redirect to the canonical node page instead.
+    $revision_count_query = $storage->getQuery()->allRevisions()->condition('nid', $this->revision->id())->accessCheck(FALSE)->count();
+    if (!$this->accessManager->checkNamedRoute($route_name, $parameters) || $revision_count_query->execute() === 1) {
+      $route_name = 'entity.node.canonical';
     }
+    $form_state->setRedirect($route_name, $parameters);
   }
 
 }

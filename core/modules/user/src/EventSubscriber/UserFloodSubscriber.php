@@ -5,6 +5,7 @@ namespace Drupal\user\EventSubscriber;
 use Drupal\user\Event\UserEvents;
 use Drupal\user\Event\UserFloodEvent;
 use Drupal\Core\Site\Settings;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Psr\Log\LoggerInterface;
 
@@ -20,20 +21,17 @@ class UserFloodSubscriber implements EventSubscriberInterface {
    */
   protected $logger;
 
-  /**
-   * Constructs a UserFloodSubscriber.
-   *
-   * @param \Psr\Log\LoggerInterface $logger
-   *   A logger instance.
-   */
-  public function __construct(LoggerInterface $logger = NULL) {
+  public function __construct(
+    #[Autowire(service: 'logger.channel.user')]
+    ?LoggerInterface $logger = NULL,
+  ) {
     $this->logger = $logger;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     $events[UserEvents::FLOOD_BLOCKED_USER][] = ['blockedUser'];
     $events[UserEvents::FLOOD_BLOCKED_IP][] = ['blockedIp'];
     return $events;
@@ -50,7 +48,10 @@ class UserFloodSubscriber implements EventSubscriberInterface {
       $uid = $floodEvent->getUid();
       if ($floodEvent->hasIp()) {
         $ip = $floodEvent->getIp();
-        $this->logger->notice('Flood control blocked login attempt for uid %uid from %ip', ['%uid' => $uid, '%ip' => $ip]);
+        $this->logger->notice('Flood control blocked login attempt for uid %uid from %ip', [
+          '%uid' => $uid,
+          '%ip' => $ip,
+        ]);
         return;
       }
       $this->logger->notice('Flood control blocked login attempt for uid %uid', ['%uid' => $uid]);

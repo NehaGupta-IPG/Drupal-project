@@ -1,21 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\node\NodeAccessRebuild;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the interaction of the node access system with fields.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeAccessFieldTest extends NodeTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node_access_test', 'field_ui'];
 
@@ -45,10 +48,13 @@ class NodeAccessFieldTest extends NodeTestBase {
    */
   protected $fieldName;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
-    node_access_rebuild();
+    \Drupal::service(NodeAccessRebuild::class)->rebuild();
 
     // Create some users.
     $this->adminUser = $this->drupalCreateUser([
@@ -62,7 +68,7 @@ class NodeAccessFieldTest extends NodeTestBase {
     ]);
 
     // Add a custom field to the page content type.
-    $this->fieldName = mb_strtolower($this->randomMachineName() . '_field_name');
+    $this->fieldName = $this->randomMachineName() . '_field_name';
     FieldStorageConfig::create([
       'field_name' => $this->fieldName,
       'entity_type' => 'node',
@@ -86,7 +92,7 @@ class NodeAccessFieldTest extends NodeTestBase {
   /**
    * Tests administering fields when node access is restricted.
    */
-  public function testNodeAccessAdministerField() {
+  public function testNodeAccessAdministerField(): void {
     // Create a page node.
     $fieldData = [];
     $value = $fieldData[0]['value'] = $this->randomMachineName();
@@ -103,7 +109,9 @@ class NodeAccessFieldTest extends NodeTestBase {
     $this->assertSession()->pageTextContains('Access denied');
 
     // Modify the field default as the content admin.
-    $edit = [];
+    $edit = [
+      'set_default_value' => '1',
+    ];
     $default = 'Sometimes words have two meanings';
     $edit["default_value_input[{$this->fieldName}][0][value]"] = $default;
     $this->drupalGet("admin/structure/types/manage/page/fields/node.page.{$this->fieldName}");
@@ -118,7 +126,7 @@ class NodeAccessFieldTest extends NodeTestBase {
 
     // Confirm that the new default value appears when creating a new node.
     $this->drupalGet('node/add/page');
-    $this->assertRaw($default);
+    $this->assertSession()->responseContains($default);
   }
 
 }

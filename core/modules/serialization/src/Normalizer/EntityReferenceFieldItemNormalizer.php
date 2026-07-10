@@ -4,6 +4,7 @@ namespace Drupal\serialization\Normalizer;
 
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
+use Drupal\file\FileInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
@@ -13,11 +14,6 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 class EntityReferenceFieldItemNormalizer extends FieldItemNormalizer {
 
   use EntityReferenceFieldItemNormalizerTrait;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $supportedInterfaceOrClass = EntityReferenceItem::class;
 
   /**
    * The entity repository.
@@ -37,9 +33,19 @@ class EntityReferenceFieldItemNormalizer extends FieldItemNormalizer {
   }
 
   /**
-   * {@inheritdoc}
+   * Normalizes data into a set of arrays/scalars.
+   *
+   * @param object $field_item
+   *   Data to normalize.
+   * @param string|null $format
+   *   Format the normalization result will be encoded as.
+   * @param array<string, mixed> $context
+   *   Context options for the normalizer.
+   *
+   * @return array
+   *   The normalized data.
    */
-  public function normalize($field_item, $format = NULL, array $context = []) {
+  public function normalize($field_item, $format = NULL, array $context = []): array {
     $values = parent::normalize($field_item, $format, $context);
 
     $this->normalizeRootReferenceValue($values, $field_item);
@@ -58,9 +64,8 @@ class EntityReferenceFieldItemNormalizer extends FieldItemNormalizer {
         $values['url'] = $url->getGeneratedUrl();
       }
       // @todo Remove in https://www.drupal.org/project/drupal/issues/2925520
-      // @see \Drupal\hal\Normalizer\FileEntityNormalizer
-      elseif ($entity->getEntityTypeId() === 'file') {
-        $values['url'] = file_create_url($entity->getFileUri());
+      elseif ($entity instanceof FileInterface) {
+        $values['url'] = $entity->createFileUrl(FALSE);
       }
     }
 
@@ -90,6 +95,15 @@ class EntityReferenceFieldItemNormalizer extends FieldItemNormalizer {
       }
     }
     return parent::constructValue($data, $context);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSupportedTypes(?string $format): array {
+    return [
+      EntityReferenceItem::class => TRUE,
+    ];
   }
 
 }

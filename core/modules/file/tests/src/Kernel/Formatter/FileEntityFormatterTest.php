@@ -1,23 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Kernel\Formatter;
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
-use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the default file formatter.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class FileEntityFormatterTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['file', 'user'];
+  protected static $modules = ['file', 'user', 'file_test'];
 
   /**
    * The files.
@@ -27,11 +30,18 @@ class FileEntityFormatterTest extends KernelTestBase {
   protected $files;
 
   /**
+   * The file URL generator.
+   *
+   * @var \Drupal\Core\File\FileUrlGeneratorInterface
+   */
+  protected $fileUrlGenerator;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-
+    $this->fileUrlGenerator = $this->container->get('file_url_generator');
     $this->installEntitySchema('file');
 
     $this->files = [];
@@ -71,7 +81,7 @@ class FileEntityFormatterTest extends KernelTestBase {
   /**
    * Tests the file_link field formatter.
    */
-  public function testFormatterFileLink() {
+  public function testFormatterFileLink(): void {
     $entity_display = EntityViewDisplay::create([
       'targetEntityType' => 'file',
       'bundle' => 'file',
@@ -80,13 +90,13 @@ class FileEntityFormatterTest extends KernelTestBase {
 
     $build = $entity_display->buildMultiple($this->files)[0]['filename'][0];
     $this->assertEquals('file.png', $build['#title']);
-    $this->assertEquals(Url::fromUri(file_create_url('public://file.png')), $build['#url']);
+    $this->assertEquals($this->fileUrlGenerator->generate('public://file.png'), $build['#url']);
   }
 
   /**
    * Tests the file_link field formatter.
    */
-  public function testFormatterFileUri() {
+  public function testFormatterFileUri(): void {
     $entity_display = EntityViewDisplay::create([
       'targetEntityType' => 'file',
       'bundle' => 'file',
@@ -98,18 +108,24 @@ class FileEntityFormatterTest extends KernelTestBase {
 
     $entity_display->setComponent('uri', ['type' => 'file_uri', 'settings' => ['file_download_path' => TRUE]]);
     $build = $entity_display->buildMultiple($this->files)[0]['uri'][0];
-    $this->assertEquals(file_create_url('public://file.png'), $build['#markup']);
+    $this->assertEquals($this->fileUrlGenerator->generateAbsoluteString('public://file.png'), $build['#markup']);
 
-    $entity_display->setComponent('uri', ['type' => 'file_uri', 'settings' => ['file_download_path' => TRUE, 'link_to_file' => TRUE]]);
+    $entity_display->setComponent(
+      'uri',
+      [
+        'type' => 'file_uri',
+        'settings' => ['file_download_path' => TRUE, 'link_to_file' => TRUE],
+      ]
+    );
     $build = $entity_display->buildMultiple($this->files)[0]['uri'][0];
-    $this->assertEquals(file_create_url('public://file.png'), $build['#title']);
-    $this->assertEquals(Url::fromUri(file_create_url('public://file.png')), $build['#url']);
+    $this->assertEquals($this->fileUrlGenerator->generateAbsoluteString('public://file.png'), $build['#title']);
+    $this->assertEquals($this->fileUrlGenerator->generate('public://file.png'), $build['#url']);
   }
 
   /**
    * Tests the file_extension field formatter.
    */
-  public function testFormatterFileExtension() {
+  public function testFormatterFileExtension(): void {
     $entity_display = EntityViewDisplay::create([
       'targetEntityType' => 'file',
       'bundle' => 'file',
@@ -122,7 +138,12 @@ class FileEntityFormatterTest extends KernelTestBase {
       $this->assertEquals($expected[$i], $build['filename'][0]['#markup']);
     }
 
-    $entity_display->setComponent('filename', ['type' => 'file_extension', 'settings' => ['extension_detect_tar' => TRUE]]);
+    $entity_display->setComponent(
+      'filename',
+      [
+        'type' => 'file_extension',
+        'settings' => ['extension_detect_tar' => TRUE],
+      ]);
 
     $expected = ['png', 'tar', 'tar.gz', ''];
     foreach (array_values($this->files) as $i => $file) {
@@ -134,14 +155,14 @@ class FileEntityFormatterTest extends KernelTestBase {
   /**
    * Tests the file_extension field formatter.
    */
-  public function testFormatterFileMime() {
+  public function testFormatterFileMime(): void {
     $entity_display = EntityViewDisplay::create([
       'targetEntityType' => 'file',
       'bundle' => 'file',
     ]);
     $entity_display->setComponent('filemime', ['type' => 'file_filemime', 'settings' => ['filemime_image' => TRUE]]);
 
-    foreach (array_values($this->files) as $i => $file) {
+    foreach (array_values($this->files) as $file) {
       $build = $entity_display->build($file);
       $this->assertEquals('image__file_icon', $build['filemime'][0]['#theme']);
       $this->assertEquals(spl_object_hash($file), spl_object_hash($build['filemime'][0]['#file']));
@@ -151,7 +172,7 @@ class FileEntityFormatterTest extends KernelTestBase {
   /**
    * Tests the file_size field formatter.
    */
-  public function testFormatterFileSize() {
+  public function testFormatterFileSize(): void {
     $entity_display = EntityViewDisplay::create([
       'targetEntityType' => 'file',
       'bundle' => 'file',
@@ -163,6 +184,24 @@ class FileEntityFormatterTest extends KernelTestBase {
       $build = $entity_display->build($file);
       $this->assertEquals($expected[$i], $build['filesize'][0]['#markup']);
     }
+  }
+
+  /**
+   * Tests the file_link field formatter using a query string.
+   */
+  public function testFormatterFileLinkWithQueryString(): void {
+    $file = File::create([
+      'uri' => 'dummy-external-readonly://file-query-string?foo=bar',
+      'filename' => 'file-query-string',
+    ]);
+    $file->save();
+    $file_link = [
+      '#theme' => 'file_link',
+      '#file' => $file,
+    ];
+
+    $output = (string) \Drupal::service('renderer')->renderRoot($file_link);
+    $this->assertStringContainsString($this->fileUrlGenerator->generate('dummy-external-readonly://file-query-string?foo=bar')->toUriString(), $output);
   }
 
 }

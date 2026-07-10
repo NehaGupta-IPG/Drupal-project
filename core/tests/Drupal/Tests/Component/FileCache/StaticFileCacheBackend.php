@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\FileCache;
 
 use Drupal\Component\FileCache\FileCacheBackendInterface;
@@ -29,14 +31,14 @@ class StaticFileCacheBackend implements FileCacheBackendInterface {
    * @param array $configuration
    *   (optional) Configuration used to configure this object.
    */
-  public function __construct($configuration) {
-    $this->bin = isset($configuration['bin']) ? $configuration['bin'] : 'file_cache';
+  public function __construct(array $configuration) {
+    $this->bin = $configuration['bin'] ?? 'file_cache';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function fetch(array $cids) {
+  public function fetch(array $cids): array {
     $result = [];
     foreach ($cids as $cid) {
       if (isset(static::$cache[$this->bin][$cid])) {
@@ -50,21 +52,21 @@ class StaticFileCacheBackend implements FileCacheBackendInterface {
   /**
    * {@inheritdoc}
    */
-  public function store($cid, $data) {
+  public function store($cid, $data): void {
     static::$cache[$this->bin][$cid] = $data;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function delete($cid) {
+  public function delete($cid): void {
     unset(static::$cache[$this->bin][$cid]);
   }
 
   /**
    * Allows tests to reset the static cache to avoid side effects.
    */
-  public static function reset() {
+  public static function reset(): void {
     static::$cache = [];
   }
 

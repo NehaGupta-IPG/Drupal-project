@@ -1,22 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\editor\Unit;
 
+use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\editor\Entity\Editor;
+use Drupal\editor\Plugin\EditorManager;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\editor\Entity\Editor
- * @group editor
+ * Tests Drupal\editor\Entity\Editor.
  */
+#[CoversClass(Editor::class)]
+#[Group('editor')]
 class EditorConfigEntityUnitTest extends UnitTestCase {
 
   /**
    * The entity type used for testing.
    *
-   * @var \Drupal\Core\Entity\EntityTypeInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityTypeInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $entityType;
 
@@ -37,7 +45,7 @@ class EditorConfigEntityUnitTest extends UnitTestCase {
   /**
    * The UUID generator used for testing.
    *
-   * @var \Drupal\Component\Uuid\UuidInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Component\Uuid\UuidInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $uuid;
 
@@ -59,25 +67,25 @@ class EditorConfigEntityUnitTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
+
     $this->editorId = $this->randomMachineName();
     $this->entityTypeId = $this->randomMachineName();
 
-    $this->entityType = $this->createMock('\Drupal\Core\Entity\EntityTypeInterface');
-    $this->entityType->expects($this->any())
+    $this->entityType = $this->createStub(EntityTypeInterface::class);
+    $this->entityType
       ->method('getProvider')
-      ->will($this->returnValue('editor'));
+      ->willReturn('editor');
 
     $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
-    $this->entityTypeManager->expects($this->any())
+    $this->entityTypeManager
       ->method('getDefinition')
       ->with($this->entityTypeId)
-      ->will($this->returnValue($this->entityType));
+      ->willReturn($this->entityType);
 
-    $this->uuid = $this->createMock('\Drupal\Component\Uuid\UuidInterface');
+    $this->uuid = $this->createStub(UuidInterface::class);
 
-    $this->editorPluginManager = $this->getMockBuilder('Drupal\editor\Plugin\EditorManager')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $this->editorPluginManager = $this->createMock(EditorManager::class);
 
     $container = new ContainerBuilder();
     $container->set('entity_type.manager', $this->entityTypeManager);
@@ -87,9 +95,9 @@ class EditorConfigEntityUnitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::calculateDependencies
+   * Tests calculate dependencies.
    */
-  public function testCalculateDependencies() {
+  public function testCalculateDependencies(): void {
     $format_id = 'filter.format.test';
     $values = ['editor' => $this->editorId, 'format' => $format_id];
 
@@ -98,33 +106,33 @@ class EditorConfigEntityUnitTest extends UnitTestCase {
       ->getMock();
     $plugin->expects($this->once())
       ->method('getPluginDefinition')
-      ->will($this->returnValue(['provider' => 'test_module']));
+      ->willReturn(['provider' => 'test_module']);
     $plugin->expects($this->once())
       ->method('getDefaultSettings')
-      ->will($this->returnValue([]));
+      ->willReturn([]);
 
-    $this->editorPluginManager->expects($this->any())
+    $this->editorPluginManager->expects($this->atLeastOnce())
       ->method('createInstance')
       ->with($this->editorId)
-      ->will($this->returnValue($plugin));
+      ->willReturn($plugin);
 
     $entity = new Editor($values, $this->entityTypeId);
 
     $filter_format = $this->createMock('Drupal\Core\Config\Entity\ConfigEntityInterface');
     $filter_format->expects($this->once())
       ->method('getConfigDependencyName')
-      ->will($this->returnValue('filter.format.test'));
+      ->willReturn('filter.format.test');
 
     $storage = $this->createMock('Drupal\Core\Entity\EntityStorageInterface');
     $storage->expects($this->once())
       ->method('load')
       ->with($format_id)
-      ->will($this->returnValue($filter_format));
+      ->willReturn($filter_format);
 
     $this->entityTypeManager->expects($this->once())
       ->method('getStorage')
       ->with('filter_format')
-      ->will($this->returnValue($storage));
+      ->willReturn($storage);
 
     $dependencies = $entity->calculateDependencies()->getDependencies();
     $this->assertContains('test_module', $dependencies['module']);

@@ -31,7 +31,7 @@ class DateRangeFieldItemList extends DateTimeFieldItemList {
         '#type' => 'select',
         '#title' => $this->t('Default end date'),
         '#description' => $this->t('Set a default value for the end date.'),
-        '#default_value' => isset($default_value[0]['default_end_date_type']) ? $default_value[0]['default_end_date_type'] : '',
+        '#default_value' => $default_value[0]['default_end_date_type'] ?? '',
         '#options' => [
           static::DEFAULT_VALUE_NOW => $this->t('Current date'),
           static::DEFAULT_VALUE_CUSTOM => $this->t('Relative date'),
@@ -78,7 +78,8 @@ class DateRangeFieldItemList extends DateTimeFieldItemList {
    * {@inheritdoc}
    */
   public function defaultValuesFormSubmit(array $element, array &$form, FormStateInterface $form_state) {
-    if ($form_state->getValue(['default_value_input', 'default_date_type']) || $form_state->getValue(['default_value_input', 'default_end_date_type'])) {
+    if ($form_state->getValue(['default_value_input', 'default_date_type'])
+      || $form_state->getValue(['default_value_input', 'default_end_date_type'])) {
       if ($form_state->getValue(['default_value_input', 'default_date_type']) == static::DEFAULT_VALUE_NOW) {
         $form_state->setValueForElement($element['default_date'], static::DEFAULT_VALUE_NOW);
       }

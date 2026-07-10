@@ -1,23 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\menu_ui\Functional;
 
+use Drupal\menu_link_content\Entity\MenuLinkContent;
+use Drupal\menu_ui\MenuUiUtility;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Menu UI and Content Moderation integration.
- *
- * @group menu_ui
  */
+#[Group('menu_ui')]
+#[RunTestsInSeparateProcesses]
 class MenuUiContentModerationTest extends BrowserTestBase {
 
   use ContentModerationTestTrait;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'block',
@@ -55,7 +59,7 @@ class MenuUiContentModerationTest extends BrowserTestBase {
   /**
    * Tests that node drafts can not modify the menu settings.
    */
-  public function testMenuUiWithPendingRevisions() {
+  public function testMenuUiWithPendingRevisions(): void {
     $editor = $this->drupalCreateUser([
       'administer nodes',
       'administer menu',
@@ -74,13 +78,13 @@ class MenuUiContentModerationTest extends BrowserTestBase {
     // Publish the node with no changes.
     $this->drupalGet('node/' . $node->id() . '/edit');
     $this->submitForm([], 'Save');
-    $this->assertSession()->responseContains(t('Page %label has been updated.', ['%label' => $node->toLink($node->label())->toString()]));
+    $this->assertSession()->pageTextContains("Page {$node->label()} has been updated.");
 
     // Create a pending revision with no changes.
     $edit = ['moderation_state[0][state]' => 'draft'];
     $this->drupalGet('node/' . $node->id() . '/edit');
     $this->submitForm($edit, 'Save');
-    $this->assertSession()->responseContains(t('Page %label has been updated.', ['%label' => $node->toLink($node->label())->toString()]));
+    $this->assertSession()->pageTextContains("Page {$node->label()} has been updated.");
 
     // Add a menu link and save a new default (published) revision.
     $edit = [
@@ -138,7 +142,7 @@ class MenuUiContentModerationTest extends BrowserTestBase {
     ];
     $this->drupalGet('node/' . $node->id() . '/edit');
     $this->submitForm($edit, 'Save');
-    $this->assertSession()->responseContains(t('Page %label has been updated.', ['%label' => $node->toLink($node->label())->toString()]));
+    $this->assertSession()->pageTextContains("Page {$node->label()} has been updated.");
 
     // Ensure the content was not immediately published.
     $this->assertSession()->linkExists('Test menu link');
@@ -164,7 +168,7 @@ class MenuUiContentModerationTest extends BrowserTestBase {
     $edit = ['moderation_state[0][state]' => 'published'];
     $this->drupalGet('node/' . $node->id() . '/edit');
     $this->submitForm($edit, 'Save');
-    $this->assertSession()->responseContains(t('Page %label has been updated.', ['%label' => $node->toLink($node->label())->toString()]));
+    $this->assertSession()->pageTextContains("Page {$node->label()} has been updated.");
 
     // Add a menu link and save and create a new non-default (draft) revision
     // and ensure it's not immediately published.
@@ -175,17 +179,72 @@ class MenuUiContentModerationTest extends BrowserTestBase {
     ];
     $this->drupalGet('node/' . $node->id() . '/edit');
     $this->submitForm($edit, 'Save');
-    $this->assertSession()->responseContains(t('Page %label has been updated.', ['%label' => $node->toLink($node->label())->toString()]));
+    $this->assertSession()->pageTextContains("Page {$node->label()} has been updated.");
+
+    // The link is created to the latest page, which the editor is allowed
+    // see, but an anonymous visitor not.
+    $this->assertSession()->linkExists('Second test menu link');
+    $this->drupalLogout();
     $this->assertSession()->linkNotExists('Second test menu link');
 
+    $this->drupalLogin($editor);
     // Publish the content and ensure the new menu link shows up.
     $edit = [
       'moderation_state[0][state]' => 'published',
     ];
     $this->drupalGet('node/' . $node->id() . '/edit');
     $this->submitForm($edit, 'Save');
-    $this->assertSession()->responseContains(t('Page %label has been updated.', ['%label' => $node->toLink($node->label())->toString()]));
+    $this->assertSession()->pageTextContains("Page {$node->label()} has been updated.");
     $this->assertSession()->linkExists('Second test menu link');
+  }
+
+  /**
+   * Tests that unpublished content can be selected through the menu UI.
+   */
+  public function testMenuUiWithUnpublishedContent(): void {
+    $editor_with_unpublished_content_access = $this->drupalCreateUser([
+      'administer nodes',
+      'administer menu',
+      'create page content',
+      'use editorial transition create_new_draft',
+      'view any unpublished content',
+    ]);
+    $this->drupalLogin($editor_with_unpublished_content_access);
+
+    // Create a node.
+    $node_title = $this->randomMachineName();
+    $edit = [
+      'title[0][value]' => $node_title,
+      'menu[enabled]' => 1,
+      'menu[title]' => $node_title,
+      'moderation_state[0][state]' => 'draft',
+    ];
+    $this->drupalGet('node/add/page');
+    $this->submitForm($edit, 'Save');
+
+    // Assert that the unpublished node can be selected as a parent menu link
+    // for users with access to the node.
+    $node = $this->drupalGetNodeByTitle($node_title);
+    $this->assertTrue($node->access('view', $editor_with_unpublished_content_access));
+    $this->assertEquals($edit['title[0][value]'], $node->getTitle());
+    $this->drupalGet('node/add/page');
+    $link_id = \Drupal::service(MenuUiUtility::class)->getMenuLinkDefaults($node)['entity_id'];
+    /** @var \Drupal\menu_link_content\Entity\MenuLinkContent $link */
+    $link = MenuLinkContent::load($link_id);
+    $this->assertSession()->optionExists('edit-menu-menu-parent', 'main:' . $link->getPluginId());
+
+    // Assert that the unpublished node cannot be selected as a parent menu link
+    // for users without access to the node.
+    $editor_without_unpublished_content_access = $this->drupalCreateUser([
+      'administer nodes',
+      'administer menu',
+      'create page content',
+      'use editorial transition create_new_draft',
+    ]);
+    $this->drupalLogin($editor_without_unpublished_content_access);
+    $this->assertFalse($node->access('view', $editor_without_unpublished_content_access));
+    $this->drupalGet('node/add/page');
+    $this->assertSession()->optionNotExists('edit-menu-menu-parent', 'main:' . $link->getPluginId());
   }
 
 }

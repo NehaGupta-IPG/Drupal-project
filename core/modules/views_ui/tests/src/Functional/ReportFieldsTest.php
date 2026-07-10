@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views_ui\Functional;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Views fields report page.
- *
- * @group views_ui
  */
+#[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class ReportFieldsTest extends UITestBase {
 
   /**
@@ -30,10 +34,10 @@ class ReportFieldsTest extends UITestBase {
   /**
    * Tests the Views fields report page.
    */
-  public function testReportFields() {
+  public function testReportFields(): void {
     $this->drupalGet('admin/reports/fields/views-fields');
-    $this->assertRaw('Used in views');
-    $this->assertRaw('No fields have been used in views yet.');
+    $this->assertSession()->pageTextContains('Used in views');
+    $this->assertSession()->pageTextContains('No fields have been used in views yet.');
 
     // Set up the field_test field.
     $field_storage = FieldStorageConfig::create([
@@ -52,9 +56,9 @@ class ReportFieldsTest extends UITestBase {
 
     // Assert that the newly created field appears in the overview.
     $this->drupalGet('admin/reports/fields/views-fields');
-    $this->assertRaw('<td>field_test</td>');
-    $this->assertRaw('>test_field_field_test</a>');
-    $this->assertRaw('Used in views');
+    $this->assertSession()->responseContains('<td>field_test</td>');
+    $this->assertSession()->responseContains('>test_field_field_test</a>');
+    $this->assertSession()->pageTextContains('Used in views');
   }
 
 }

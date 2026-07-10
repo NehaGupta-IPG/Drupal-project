@@ -17,11 +17,6 @@ class EntityNormalizer extends ComplexDataNormalizer implements DenormalizerInte
   use FieldableEntityNormalizerTrait;
 
   /**
-   * {@inheritdoc}
-   */
-  protected $supportedInterfaceOrClass = EntityInterface::class;
-
-  /**
    * Constructs an EntityNormalizer object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -40,15 +35,15 @@ class EntityNormalizer extends ComplexDataNormalizer implements DenormalizerInte
   /**
    * {@inheritdoc}
    */
-  public function denormalize($data, $class, $format = NULL, array $context = []) {
+  public function denormalize($data, $class, $format = NULL, array $context = []): mixed {
     $entity_type_id = $this->determineEntityTypeId($class, $context);
     $entity_type_definition = $this->getEntityTypeDefinition($entity_type_id);
 
     // The bundle property will be required to denormalize a bundleable
     // fieldable entity.
     if ($entity_type_definition->entityClassImplements(FieldableEntityInterface::class)) {
-      // Extract bundle data to pass into entity creation if the entity type uses
-      // bundles.
+      // Extract bundle data to pass into entity creation if the entity type
+      // uses bundles.
       if ($entity_type_definition->hasKey('bundle')) {
         // Get an array containing the bundle only. This also remove the bundle
         // key from the $data array.
@@ -59,6 +54,7 @@ class EntityNormalizer extends ComplexDataNormalizer implements DenormalizerInte
       }
 
       // Create the entity from bundle data only, then apply field values after.
+      /** @var \Drupal\Core\Entity\FieldableEntityInterface $entity */
       $entity = $this->entityTypeManager->getStorage($entity_type_id)->create($create_params);
 
       $this->denormalizeFieldData($data, $entity, $format, $context);
@@ -73,6 +69,15 @@ class EntityNormalizer extends ComplexDataNormalizer implements DenormalizerInte
     $entity->_restSubmittedFields = array_keys($data);
 
     return $entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSupportedTypes(?string $format): array {
+    return [
+      EntityInterface::class => TRUE,
+    ];
   }
 
 }

@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\image\Functional;
 
-use Drupal\Tests\image\Kernel\ImageFieldCreationTrait;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\image\Kernel\ImageFieldCreationTrait;
 
 /**
- * TODO: Test the following functions.
+ * @todo Test the following functions.
  *
  * In file:
  * - image.effects.inc:
@@ -14,9 +16,8 @@ use Drupal\Tests\BrowserTestBase;
  *   \Drupal\image\ImageStyleInterface::createDerivative()
  *
  * - image.module:
- *   image_style_options()
+ *   \Drupal::service(ImageDerivativeUtilities::class)->styleOptions()
  *   \Drupal\image\ImageStyleInterface::flush()
- *   image_filter_keyword()
  */
 
 /**
@@ -27,9 +28,7 @@ abstract class ImageFieldTestBase extends BrowserTestBase {
   use ImageFieldCreationTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'node',
@@ -45,7 +44,10 @@ abstract class ImageFieldTestBase extends BrowserTestBase {
    */
   protected $adminUser;
 
-  protected function setUp() {
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
     parent::setUp();
 
     // Create Basic page and Article node types.
@@ -80,7 +82,7 @@ abstract class ImageFieldTestBase extends BrowserTestBase {
    * @param string $type
    *   The type of node to create.
    */
-  public function previewNodeImage($image, $field_name, $type) {
+  public function previewNodeImage($image, string $field_name, string $type): void {
     $edit = [
       'title[0][value]' => $this->randomMachineName(),
     ];
@@ -92,16 +94,16 @@ abstract class ImageFieldTestBase extends BrowserTestBase {
   /**
    * Upload an image to a node.
    *
-   * @param $image
+   * @param \stdClass $image
    *   A file object representing the image to upload.
-   * @param $field_name
+   * @param string $field_name
    *   Name of the image field the image should be attached to.
-   * @param $type
+   * @param string $type
    *   The type of node to create.
-   * @param $alt
+   * @param string $alt
    *   The alt text for the image. Use if the field settings require alt text.
    */
-  public function uploadNodeImage($image, $field_name, $type, $alt = '') {
+  public function uploadNodeImage($image, string $field_name, string $type, $alt = '') {
     $edit = [
       'title[0][value]' => $this->randomMachineName(),
     ];
@@ -116,7 +118,7 @@ abstract class ImageFieldTestBase extends BrowserTestBase {
     // Retrieve ID of the newly created node from the current URL.
     $matches = [];
     preg_match('/node\/([0-9]+)/', $this->getUrl(), $matches);
-    return isset($matches[1]) ? $matches[1] : FALSE;
+    return $matches[1] ?? FALSE;
   }
 
   /**

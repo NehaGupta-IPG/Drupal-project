@@ -1,15 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views_ui\Functional;
 
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the UI for the attachment display plugin.
  *
- * @group views_ui
  * @see \Drupal\views\Plugin\views\display\Attachment
  */
+#[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class DisplayAttachmentTest extends UITestBase {
 
   /**
@@ -28,7 +33,7 @@ class DisplayAttachmentTest extends UITestBase {
   /**
    * Tests the attachment UI.
    */
-  public function testAttachmentUI() {
+  public function testAttachmentUI(): void {
     $this->drupalGet('admin/structure/views/view/test_attachment_ui/edit/attachment_1');
     $this->assertSession()->pageTextContains('Not defined');
 
@@ -45,9 +50,8 @@ class DisplayAttachmentTest extends UITestBase {
     $this->submitForm(['displays[page_1]' => 1], 'Apply');
     // Options summary should be escaped.
     $this->assertSession()->assertEscaped('<em>Page</em>');
-    $this->assertNoRaw('<em>Page</em>');
-    $result = $this->xpath('//a[@id = :id]', [':id' => 'views-attachment-1-displays']);
-    $this->assertEquals(t('Page'), $result[0]->getAttribute('title'));
+    $this->assertSession()->responseNotContains('<em>Page</em>');
+    $this->assertSession()->elementAttributeContains('xpath', '//a[@id = "views-attachment-1-displays"]', 'title', 'Page');
     $this->submitForm([], 'Save');
 
     $view = Views::getView('test_attachment_ui');
@@ -59,8 +63,7 @@ class DisplayAttachmentTest extends UITestBase {
       'displays[default]' => 1,
       'displays[page_1]' => 1,
     ], 'Apply');
-    $result = $this->xpath('//a[@id = :id]', [':id' => 'views-attachment-1-displays']);
-    $this->assertEquals(t('Multiple displays'), $result[0]->getAttribute('title'));
+    $this->assertSession()->elementAttributeContains('xpath', '//a[@id = "views-attachment-1-displays"]', 'title', 'Multiple displays');
     $this->submitForm([], 'Save');
 
     $view = Views::getView('test_attachment_ui');
@@ -71,7 +74,7 @@ class DisplayAttachmentTest extends UITestBase {
   /**
    * Tests the attachment working after the attached page was deleted.
    */
-  public function testRemoveAttachedDisplay() {
+  public function testRemoveAttachedDisplay(): void {
     // Create a view.
     $view = $this->randomView();
     $path_prefix = 'admin/structure/views/view/' . $view['id'] . '/edit';
@@ -98,10 +101,41 @@ class DisplayAttachmentTest extends UITestBase {
     $this->submitForm([], 'Save');
 
     // Check that there is no warning for the removed page display.
-    $this->assertNoText("Plugin ID &#039;page_1&#039; was not found.");
+    $this->assertSession()->pageTextNotContains("Plugin ID 'page_1' was not found.");
 
     // Check that the attachment is no longer linked to the removed display.
     $this->assertSession()->pageTextContains('Not defined');
+
+  }
+
+  /**
+   * Tests the attachment after changing machine name.
+   */
+  public function testAttachmentOnAttachedMachineNameChange(): void {
+
+    $view = $this->randomView();
+    $path_prefix = 'admin/structure/views/view/' . $view['id'] . '/edit';
+    $attachment_display_url = 'admin/structure/views/nojs/display/' . $view['id'] . '/attachment_1/displays';
+
+    // Open the Page display and create the attachment display.
+    $this->drupalGet($path_prefix . '/page_1');
+    $this->submitForm([], 'Add Attachment');
+    $this->assertSession()->pageTextContains('Not defined');
+
+    // Attach the Attachment to the Default and   Page display.
+    $this->drupalGet($attachment_display_url);
+    $this->submitForm(['displays[default]' => 1, 'displays[page_1]' => 1], 'Apply');
+    $this->submitForm([], 'Save');
+
+    // Change the machine name of the page.
+    $this->drupalGet('admin/structure/views/nojs/display/' . $view['id'] . '/page_1/display_id');
+    $this->submitForm(['display_id' => 'page_new_id'], 'Apply');
+    $this->submitForm([], 'Save');
+
+    // Check that the attachment is still attached to the page.
+    $this->drupalGet($attachment_display_url);
+    $this->assertSession()->checkboxChecked("edit-displays-default");
+    $this->assertSession()->checkboxChecked("edit-displays-page-new-id");
 
   }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
@@ -15,9 +17,7 @@ abstract class MediaJavascriptTestBase extends WebDriverTestBase {
   use MediaTypeCreationTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'system',
@@ -38,7 +38,7 @@ abstract class MediaJavascriptTestBase extends WebDriverTestBase {
    * @param string $message
    *   (Optional) Message to pass to assertJsCondition().
    */
-  protected function waitUntilVisible($selector, $timeout = 1000, $message = '') {
+  protected function waitUntilVisible(string $selector, int $timeout = 1000, $message = '') {
     $condition = "jQuery('" . $selector . ":visible').length > 0";
     $this->assertJsCondition($condition, $timeout, $message);
   }
@@ -51,7 +51,7 @@ abstract class MediaJavascriptTestBase extends WebDriverTestBase {
    */
   protected function assertLinkToCreatedMedia() {
     $assert_session = $this->assertSession();
-    $selector = '.messages a';
+    $selector = 'div[aria-label="Status message"] a';
 
     // Get the canonical media entity URL from the creation message.
     $link = $assert_session->elementExists('css', $selector);

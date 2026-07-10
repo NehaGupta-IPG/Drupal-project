@@ -1,25 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Kernel;
 
 use Drupal\file\Entity\File;
+use Drupal\file_test\FileTestHelper;
+use Drupal\Tests\user\Traits\UserCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * File saving tests.
- *
- * @group file
  */
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class SaveTest extends FileManagedUnitTestBase {
 
-  public function testFileSave() {
+  use UserCreationTrait;
+
+  /**
+   * Tests the saving process of file entities.
+   */
+  public function testFileSave(): void {
+    $account = $this->createUser();
     // Create a new file entity.
     $file = File::create([
-      'uid' => 1,
+      'uid' => $account->id(),
       'filename' => 'druplicon.txt',
       'uri' => 'public://druplicon.txt',
       'filemime' => 'text/plain',
-      'status' => FILE_STATUS_PERMANENT,
     ]);
+    $file->setPermanent();
     file_put_contents($file->getFileUri(), 'hello world');
 
     // Save it, inserting a new record.
@@ -39,7 +51,7 @@ class SaveTest extends FileManagedUnitTestBase {
     $this->assertEquals('en', $loaded_file->langcode->value, 'Langcode was defaulted correctly.');
 
     // Resave the file, updating the existing record.
-    file_test_reset();
+    FileTestHelper::reset();
     $file->status->value = 7;
     $file->save();
 
@@ -50,19 +62,20 @@ class SaveTest extends FileManagedUnitTestBase {
     $loaded_file = File::load($file->id());
     // Verify that the timestamp didn't go backwards.
     $this->assertGreaterThanOrEqual($file->getChangedTime(), $loaded_file->getChangedTime());
-    $this->assertNotNull($loaded_file, 'Record still exists in the database.', 'File');
+    $this->assertNotNull($loaded_file, 'Record still exists in the database.');
     $this->assertEquals($file->isPermanent(), $loaded_file->isPermanent(), 'Status was saved correctly.');
     $this->assertEquals('en', $loaded_file->langcode->value, 'Langcode was saved correctly.');
 
-    // Try to insert a second file with the same name apart from case insensitivity
-    // to ensure the 'uri' index allows for filenames with different cases.
+    // Try to insert a second file with the same name apart from case
+    // insensitivity to ensure the 'uri' index allows for filenames with
+    // different cases.
     $uppercase_values = [
-      'uid' => 1,
+      'uid' => $account->id(),
       'filename' => 'DRUPLICON.txt',
       'uri' => 'public://DRUPLICON.txt',
       'filemime' => 'text/plain',
-      'status' => FILE_STATUS_PERMANENT,
     ];
+    $file->setPermanent();
     $uppercase_file = File::create($uppercase_values);
     file_put_contents($uppercase_file->getFileUri(), 'hello world');
     $violations = $uppercase_file->validate();
@@ -74,7 +87,7 @@ class SaveTest extends FileManagedUnitTestBase {
     file_put_contents($uppercase_file_duplicate->getFileUri(), 'hello world');
     $violations = $uppercase_file_duplicate->validate();
     $this->assertCount(1, $violations);
-    $this->assertEquals(t('The file %value already exists. Enter a unique file URI.', ['%value' => $uppercase_file_duplicate->getFileUri()]), $violations[0]->getMessage());
+    $this->assertEquals(sprintf('The file %s already exists. Enter a unique file URI.', $uppercase_file_duplicate->getFileUri()), $violations[0]->getMessage());
     // Ensure that file URI entity queries are case sensitive.
     $fids = \Drupal::entityQuery('file')
       ->accessCheck(FALSE)
@@ -86,12 +99,12 @@ class SaveTest extends FileManagedUnitTestBase {
 
     // Save a file with zero bytes.
     $file = File::create([
-      'uid' => 1,
+      'uid' => $account->id(),
       'filename' => 'no-druplicon.txt',
       'uri' => 'public://no-druplicon.txt',
       'filemime' => 'text/plain',
-      'status' => FILE_STATUS_PERMANENT,
     ]);
+    $file->setPermanent();
 
     file_put_contents($file->getFileUri(), '');
 

@@ -2,52 +2,21 @@
 
 namespace Drupal\language;
 
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Logger\LoggerChannelTrait;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUI;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class responsible for performing language negotiation.
  */
 class LanguageNegotiator implements LanguageNegotiatorInterface {
-
-  /**
-   * The language negotiation method plugin manager.
-   *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
-   */
-  protected $negotiatorManager;
-
-  /**
-   * The language manager.
-   *
-   * @var \Drupal\language\ConfigurableLanguageManagerInterface
-   */
-  protected $languageManager;
-
-  /**
-   * The configuration factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
-   * The settings instance.
-   *
-   * @var \Drupal\Core\Site\Settings
-   */
-  protected $settings;
-
-  /**
-   * The request stack object.
-   *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
-   */
-  protected $requestStack;
+  use LoggerChannelTrait;
 
   /**
    * The current active user.
@@ -70,27 +39,15 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
    */
   protected $negotiatedLanguages = [];
 
-  /**
-   * Constructs a new LanguageNegotiator object.
-   *
-   * @param \Drupal\language\ConfigurableLanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $negotiator_manager
-   *   The language negotiation methods plugin manager
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The configuration factory.
-   * @param \Drupal\Core\Site\Settings $settings
-   *   The settings instance.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
-   *   The request stack service.
-   */
-  public function __construct(ConfigurableLanguageManagerInterface $language_manager, PluginManagerInterface $negotiator_manager, ConfigFactoryInterface $config_factory, Settings $settings, RequestStack $requestStack) {
-    $this->languageManager = $language_manager;
-    $this->negotiatorManager = $negotiator_manager;
-    $this->configFactory = $config_factory;
-    $this->settings = $settings;
-    $this->requestStack = $requestStack;
-  }
+  public function __construct(
+    #[Autowire(service: 'language_manager')]
+    protected ConfigurableLanguageManagerInterface $languageManager,
+    #[Autowire(service: 'plugin.manager.language_negotiation_method')]
+    protected PluginManagerInterface $negotiatorManager,
+    protected ConfigFactoryInterface $configFactory,
+    protected Settings $settings,
+    protected RequestStack $requestStack,
+  ) {}
 
   /**
    * Initializes the injected language manager with the negotiator.
@@ -130,7 +87,13 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
       // and return the first valid language found.
       foreach ($this->getEnabledNegotiators($type) as $method_id => $info) {
         if (!isset($this->negotiatedLanguages[$method_id])) {
-          $this->negotiatedLanguages[$method_id] = $this->negotiateLanguage($type, $method_id);
+          try {
+            $this->negotiatedLanguages[$method_id] = $this->negotiateLanguage($type, $method_id);
+          }
+          catch (PluginNotFoundException $e) {
+            // If a plugin is not found, log the error so user can handle it.
+            $this->getLogger('language')->error($e->getMessage());
+          }
         }
 
         // Since objects are references, we need to return a clone to prevent
@@ -178,7 +141,7 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
    *   language.
    *
    * @return \Drupal\Core\Language\LanguageInterface|null
-   *   Negotiated language object for given type and method, FALSE otherwise.
+   *   Negotiated language object for given type and method, NULL otherwise.
    */
   protected function negotiateLanguage($type, $method_id) {
     $langcode = NULL;
@@ -188,8 +151,12 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
       $langcode = $this->getNegotiationMethodInstance($method_id)->getLangcode($this->requestStack->getCurrentRequest());
     }
 
-    $languages = $this->languageManager->getLanguages();
-    return isset($languages[$langcode]) ? $languages[$langcode] : NULL;
+    if ($langcode !== NULL) {
+      $languages = $this->languageManager->getLanguages();
+      return $languages[$langcode] ?? NULL;
+    }
+
+    return NULL;
   }
 
   /**
@@ -273,7 +240,7 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
         unset($enabled_methods[$method_id]);
       }
     }
-    $this->configFactory->getEditable('language.types')->set('negotiation.' . $type . '.enabled', $enabled_methods)->save(TRUE);
+    $this->configFactory->getEditable('language.types')->set('negotiation.' . $type . '.enabled', $enabled_methods)->save();
   }
 
   /**

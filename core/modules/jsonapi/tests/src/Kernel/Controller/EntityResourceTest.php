@@ -1,27 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Kernel\Controller;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\jsonapi\CacheableResourceResponse;
-use Drupal\jsonapi\ResourceType\ResourceType;
+use Drupal\jsonapi\Controller\EntityResource;
 use Drupal\jsonapi\JsonApiResource\Data;
 use Drupal\jsonapi\JsonApiResource\JsonApiDocumentTopLevel;
+use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\jsonapi\Kernel\JsonapiKernelTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use Drupal\user\RoleInterface;
-use Symfony\Component\HttpFoundation\ParameterBag;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @coversDefaultClass \Drupal\jsonapi\Controller\EntityResource
- * @group jsonapi
+ * Tests Drupal\jsonapi\Controller\EntityResource.
  *
  * @internal
  */
+#[CoversClass(EntityResource::class)]
+#[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class EntityResourceTest extends JsonapiKernelTestBase {
 
   /**
@@ -42,7 +50,6 @@ class EntityResourceTest extends JsonapiKernelTestBase {
   protected static $modules = [
     'node',
     'field',
-    'jsonapi',
     'serialization',
     'system',
     'user',
@@ -77,11 +84,11 @@ class EntityResourceTest extends JsonapiKernelTestBase {
   protected $node3;
 
   /**
-   * A fake request.
+   * A node with related nodes.
    *
-   * @var \Symfony\Component\HttpFoundation\Request
+   * @var \Drupal\node\Entity\Node
    */
-  protected $request;
+  protected Node $node4;
 
   /**
    * The EntityResource under test.
@@ -99,14 +106,15 @@ class EntityResourceTest extends JsonapiKernelTestBase {
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');
     // Add the additional table schemas.
-    $this->installSchema('system', ['sequences']);
     $this->installSchema('node', ['node_access']);
     $this->installSchema('user', ['users_data']);
     NodeType::create([
       'type' => 'lorem',
+      'name' => 'Lorem',
     ])->save();
     $type = NodeType::create([
       'type' => 'article',
+      'name' => 'Article',
     ]);
     $type->save();
     $this->user = User::create([
@@ -158,13 +166,14 @@ class EntityResourceTest extends JsonapiKernelTestBase {
 
     // Give anonymous users permission to view user profiles, so that we can
     // verify the cache tags of cached versions of user profile pages.
-    array_map(function ($role_id) {
+    array_map(function (string $role_id): void {
       Role::create([
         'id' => $role_id,
         'permissions' => [
           'access user profiles',
           'access content',
         ],
+        'label' => $role_id,
       ])->save();
     }, [RoleInterface::ANONYMOUS_ID, 'test_role_one', 'test_role_two']);
 
@@ -177,16 +186,18 @@ class EntityResourceTest extends JsonapiKernelTestBase {
    * @return \Drupal\jsonapi\Controller\EntityResource
    *   An EntityResource instance.
    */
-  protected function createEntityResource() {
+  protected function createEntityResource(): ?object {
     return $this->container->get('jsonapi.entity_resource');
   }
 
   /**
-   * @covers ::getCollection
+   * Tests get paged collection.
+   *
+   * @legacy-covers ::getCollection
    */
-  public function testGetPagedCollection() {
+  public function testGetPagedCollection(): void {
     $request = Request::create('/jsonapi/node/article');
-    $request->query = new ParameterBag([
+    $request->query = new InputBag([
       'sort' => 'nid',
       'page' => [
         'offset' => 1,
@@ -207,18 +218,20 @@ class EntityResourceTest extends JsonapiKernelTestBase {
     $data = $response->getResponseData()->getData();
     $this->assertCount(1, $data);
     $this->assertEquals($this->node2->uuid(), $data->toArray()[0]->getId());
-    $this->assertEquals(['node:2', 'node_list'], $response->getCacheableMetadata()->getCacheTags());
+    $this->assertEqualsCanonicalizing(['node:2', 'node_list'], $response->getCacheableMetadata()->getCacheTags());
   }
 
   /**
-   * @covers ::getCollection
+   * Tests get empty collection.
+   *
+   * @legacy-covers ::getCollection
    */
-  public function testGetEmptyCollection() {
+  public function testGetEmptyCollection(): void {
     $request = Request::create('/jsonapi/node/article');
-    $request->query = new ParameterBag(['filter' => ['id' => 'invalid']]);
+    $request->query = new InputBag(['filter' => ['id' => 'invalid']]);
 
     // Get the response.
-    $resource_type = new ResourceType('node', 'article', NULL);
+    $resource_type = new ResourceType('node', 'article', Node::class);
     $response = $this->entityResource->getCollection($resource_type, $request);
 
     // Assertions.

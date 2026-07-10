@@ -8,6 +8,7 @@ use Drupal\Core\Routing\RoutingEvents;
 use Drupal\rest\Plugin\Type\ResourcePluginManager;
 use Drupal\rest\RestResourceConfigInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -17,40 +18,20 @@ use Symfony\Component\Routing\RouteCollection;
 class ResourceRoutes implements EventSubscriberInterface {
 
   /**
-   * The plugin manager for REST plugins.
-   *
-   * @var \Drupal\rest\Plugin\Type\ResourcePluginManager
-   */
-  protected $manager;
-
-  /**
    * The REST resource config storage.
    *
    * @var \Drupal\Core\Entity\EntityStorageInterface
    */
   protected $resourceConfigStorage;
 
-  /**
-   * A logger instance.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
-   * Constructs a RouteSubscriber object.
-   *
-   * @param \Drupal\rest\Plugin\Type\ResourcePluginManager $manager
-   *   The resource plugin manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager
-   * @param \Psr\Log\LoggerInterface $logger
-   *   A logger instance.
-   */
-  public function __construct(ResourcePluginManager $manager, EntityTypeManagerInterface $entity_type_manager, LoggerInterface $logger) {
-    $this->manager = $manager;
+  public function __construct(
+    #[Autowire(service: 'plugin.manager.rest')]
+    protected ResourcePluginManager $manager,
+    EntityTypeManagerInterface $entity_type_manager,
+    #[Autowire(service: 'logger.channel.rest')]
+    protected LoggerInterface $logger,
+  ) {
     $this->resourceConfigStorage = $entity_type_manager->getStorage('rest_resource_config');
-    $this->logger = $logger;
   }
 
   /**
@@ -58,8 +39,6 @@ class ResourceRoutes implements EventSubscriberInterface {
    *
    * @param \Drupal\Core\Routing\RouteBuildEvent $event
    *   The route build event.
-   *
-   * @return array
    */
   public function onDynamicRouteEvent(RouteBuildEvent $event) {
     // Iterate over all enabled REST resource config entities.
@@ -91,7 +70,7 @@ class ResourceRoutes implements EventSubscriberInterface {
 
     foreach ($plugin->routes() as $name => $route) {
       /** @var \Symfony\Component\Routing\Route $route */
-      // @todo: Are multiple methods possible here?
+      // @todo Are multiple methods possible here?
       $methods = $route->getMethods();
       // Only expose routes that have an explicit method and allow >=1 format
       // for that method.
@@ -116,7 +95,7 @@ class ResourceRoutes implements EventSubscriberInterface {
         // - set the allowed request body content types/formats for methods that
         //   allow request bodies to be sent (unless hardcoded by the plugin)
         // - set the allowed authentication providers
-        if (in_array($method, ['GET', 'HEAD', 'POST', 'PUT', 'PATCH'], TRUE) && !$route->hasRequirement('_format')) {
+        if (in_array($method, ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'], TRUE) && !$route->hasRequirement('_format')) {
           $route->addRequirements(['_format' => implode('|', $rest_resource_config->getFormats($method))]);
         }
         if (in_array($method, ['POST', 'PATCH', 'PUT'], TRUE) && !$route->hasRequirement('_content_type_format')) {
@@ -140,7 +119,7 @@ class ResourceRoutes implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     $events[RoutingEvents::DYNAMIC] = 'onDynamicRouteEvent';
     return $events;
   }

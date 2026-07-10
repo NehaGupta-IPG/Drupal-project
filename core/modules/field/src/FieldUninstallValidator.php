@@ -2,8 +2,9 @@
 
 namespace Drupal\field;
 
+use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Extension\ModuleUninstallValidatorInterface;
+use Drupal\Core\Extension\ConfigImportModuleUninstallValidatorInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
@@ -11,7 +12,7 @@ use Drupal\Core\StringTranslation\TranslationInterface;
 /**
  * Prevents uninstallation of modules providing active field storage.
  */
-class FieldUninstallValidator implements ModuleUninstallValidatorInterface {
+class FieldUninstallValidator implements ConfigImportModuleUninstallValidatorInterface {
 
   use StringTranslationTrait;
 
@@ -62,7 +63,15 @@ class FieldUninstallValidator implements ModuleUninstallValidatorInterface {
       if (!empty($fields_in_use)) {
         foreach ($fields_in_use as $field_type => $field_storages) {
           $field_type_label = $this->getFieldTypeLabel($field_type);
-          $reasons[] = $this->formatPlural(count($fields_in_use[$field_type]), 'The %field_type_label field type is used in the following field: @fields', 'The %field_type_label field type is used in the following fields: @fields', ['%field_type_label' => $field_type_label, '@fields' => implode(', ', $field_storages)]);
+          $reasons[] = $this->formatPlural(
+            count($fields_in_use[$field_type]),
+            'The %field_type_label field type is used in the following field: @fields',
+            'The %field_type_label field type is used in the following fields: @fields',
+            [
+              '%field_type_label' => $field_type_label,
+              '@fields' => implode(', ', $field_storages),
+            ],
+          );
         }
       }
       else {
@@ -70,6 +79,16 @@ class FieldUninstallValidator implements ModuleUninstallValidatorInterface {
       }
     }
     return $reasons;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateConfigImport(string $module, StorageInterface $source_storage): array {
+    // The \Drupal\field\Hook\FieldHooks::configImportStepsAlter() method
+    // removes the field data prior to the configuration import, so the checks
+    // in :validate() are unnecessary.
+    return [];
   }
 
   /**
@@ -82,7 +101,10 @@ class FieldUninstallValidator implements ModuleUninstallValidatorInterface {
    *   An array of field storages for a specified module.
    */
   protected function getFieldStoragesByModule($module) {
-    return $this->fieldStorageConfigStorage->loadByProperties(['module' => $module, 'include_deleted' => TRUE]);
+    return $this->fieldStorageConfigStorage->loadByProperties([
+      'module' => $module,
+      'include_deleted' => TRUE,
+    ]);
   }
 
   /**

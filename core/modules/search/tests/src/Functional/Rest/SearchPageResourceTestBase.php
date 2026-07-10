@@ -1,16 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\search\Functional\Rest;
 
 use Drupal\search\Entity\SearchPage;
-use Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase;
+use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
 
-abstract class SearchPageResourceTestBase extends EntityResourceTestBase {
+// cspell:ignore hinode
+
+/**
+ * Base class for Search page tests.
+ */
+abstract class SearchPageResourceTestBase extends ConfigEntityResourceTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'search'];
+  protected static $modules = ['node', 'search', 'search_node'];
 
   /**
    * {@inheritdoc}
@@ -62,7 +69,7 @@ abstract class SearchPageResourceTestBase extends EntityResourceTestBase {
         'rankings' => [],
       ],
       'dependencies' => [
-        'module' => ['node'],
+        'module' => ['search_node'],
       ],
       'id' => 'hinode_search',
       'label' => 'Search of magnetic activity of the Sun',
@@ -80,6 +87,16 @@ abstract class SearchPageResourceTestBase extends EntityResourceTestBase {
    */
   protected function getNormalizedPostEntity() {
     // @todo Update in https://www.drupal.org/node/2300677.
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getExpectedCacheContexts() {
+    // 'session' is bubbled by URL generation for CSRF-protected routes
+    // referenced in the response normalization.
+    return array_merge(['session'], parent::getExpectedCacheContexts());
   }
 
   /**

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\jsonapi_test_data_type\Normalizer;
 
 use Drupal\Core\TypedData\Plugin\DataType\StringData;
@@ -12,22 +14,34 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 class StringNormalizer extends NormalizerBase implements DenormalizerInterface {
 
   /**
-   * {@inheritdoc}
+   * Normalizes data into a set of arrays/scalars.
+   *
+   * @param object $object
+   *   Data to normalize.
+   * @param string|null $format
+   *   Format the normalization result will be encoded as.
+   * @param array<string, mixed> $context
+   *   Context options for the normalizer.
+   *
+   * @return array|string
+   *   A string or an array with the replaced values.
    */
-  protected $supportedInterfaceOrClass = StringData::class;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function normalize($object, $format = NULL, array $context = []) {
+  public function normalize($object, $format = NULL, array $context = []): array|string {
     return str_replace('super', 'NOT', $object->getValue());
   }
 
   /**
    * {@inheritdoc}
    */
-  public function denormalize($data, $class, $format = NULL, array $context = []) {
+  public function denormalize($data, $class, $format = NULL, array $context = []): mixed {
     return str_replace('NOT', 'super', $data);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSupportedTypes(?string $format): array {
+    return [StringData::class => TRUE];
   }
 
 }

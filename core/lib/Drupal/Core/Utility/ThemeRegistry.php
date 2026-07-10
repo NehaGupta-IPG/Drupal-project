@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Utility;
 
-use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheCollector;
 use Drupal\Core\DestructableInterface;
@@ -31,6 +30,8 @@ class ThemeRegistry extends CacheCollector implements DestructableInterface {
 
   /**
    * The complete theme registry array.
+   *
+   * @var array
    */
   protected $completeRegistry;
 
@@ -55,13 +56,9 @@ class ThemeRegistry extends CacheCollector implements DestructableInterface {
     $this->tags = $tags;
     $this->persistable = $modules_loaded && \Drupal::hasRequest() && \Drupal::request()->isMethod('GET');
 
-    // @todo: Implement lazyload.
-    $this->cacheLoaded = TRUE;
+    $this->lazyLoadCache();
 
-    if ($this->persistable && $cached = $this->cache->get($this->cid)) {
-      $this->storage = $cached->data;
-    }
-    else {
+    if (empty($this->storage)) {
       // If there is no runtime cache stored, fetch the full theme registry,
       // but then initialize each value to NULL. This allows offsetExists()
       // to function correctly on non-registered theme hooks without triggering
@@ -70,16 +67,13 @@ class ThemeRegistry extends CacheCollector implements DestructableInterface {
       foreach (array_keys($this->storage) as $key) {
         $this->persist($key);
       }
-      // RegistryTest::testRaceCondition() ensures that the cache entry is
-      // written on the initial construction of the theme registry.
-      $this->updateCache();
     }
   }
 
   /**
    * Initializes the full theme registry.
    *
-   * @return
+   * @return array
    *   An array with the keys of the full theme registry, but the values
    *   initialized to NULL.
    */
@@ -98,7 +92,7 @@ class ThemeRegistry extends CacheCollector implements DestructableInterface {
     // are not registered, just check the existence of the key in the registry.
     // Use array_key_exists() here since a NULL value indicates that the theme
     // hook exists but has not yet been requested.
-    return isset($this->storage[$key]) || array_key_exists($key, $this->storage);
+    return \array_key_exists($key, $this->storage);
   }
 
   /**
@@ -137,33 +131,32 @@ class ThemeRegistry extends CacheCollector implements DestructableInterface {
     if (!$this->persistable) {
       return;
     }
-    // @todo: Is the custom implementation necessary?
-    $data = [];
-    foreach ($this->keysToPersist as $offset => $persist) {
-      if ($persist) {
-        $data[$offset] = $this->storage[$offset];
-      }
-    }
-    if (empty($data)) {
-      return;
-    }
+    parent::updateCache($lock);
+  }
 
-    $lock_name = $this->cid . ':' . __CLASS__;
-    if (!$lock || $this->lock->acquire($lock_name)) {
-      if ($cached = $this->cache->get($this->cid)) {
-        // Use array merge instead of union so that filled in values in $data
-        // overwrite empty values in the current cache.
-        $data = array_merge($cached->data, $data);
-      }
-      else {
-        $registry = $this->initializeRegistry();
-        $data = array_merge($registry, $data);
-      }
-      $this->cache->set($this->cid, $data, Cache::PERMANENT, $this->tags);
-      if ($lock) {
-        $this->lock->release($lock_name);
-      }
-    }
+  /**
+   * Gets preprocess invoke map.
+   *
+   * @return array
+   *   An array of preprocess invokes for preprocess functions in modules.
+   *
+   * @internal
+   */
+  public function getPreprocessInvokes(): array {
+    return $this->get('preprocess invokes');
+  }
+
+  /**
+   * Gets global preprocess callbacks.
+   *
+   * @return array
+   *   An array of preprocess callbacks that should be called for every theme
+   *   hook.
+   *
+   * @internal
+   */
+  public function getGlobalPreprocess(): array {
+    return $this->get('global preprocess') ?? [];
   }
 
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\session_test\Session;
 
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
@@ -41,7 +43,7 @@ class TestSessionBag implements SessionBagInterface {
   /**
    * Sets the test flag.
    */
-  public function setFlag() {
+  public function setFlag(): void {
     $this->attributes['test_flag'] = TRUE;
   }
 
@@ -58,35 +60,35 @@ class TestSessionBag implements SessionBagInterface {
   /**
    * Clears the test flag.
    */
-  public function clearFlag() {
+  public function clearFlag(): void {
     unset($this->attributes['test_flag']);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getName() {
+  public function getName(): string {
     return self::BAG_NAME;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function initialize(array &$attributes) {
+  public function initialize(array &$attributes): void {
     $this->attributes = &$attributes;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getStorageKey() {
+  public function getStorageKey(): string {
     return $this->storageKey;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function clear() {
+  public function clear(): mixed {
     $return = $this->attributes;
     $this->attributes = [];
 

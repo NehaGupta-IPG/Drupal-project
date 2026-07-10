@@ -1,7 +1,7 @@
 drupal.menu_ui:
   version: VERSION
   js:
-    menu_ui.js: {}
+    js/menu_ui.js: {}
   dependencies:
     - core/jquery
     - core/drupal
@@ -10,7 +10,7 @@ drupal.menu_ui:
 drupal.menu_ui.admin:
   version: VERSION
   js:
-    menu_ui.admin.js: {}
+    js/menu_ui.admin.js: {}
   dependencies:
     - core/jquery
     - core/drupal

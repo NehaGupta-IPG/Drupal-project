@@ -9,6 +9,7 @@ use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\rest\ResourceResponseInterface;
 use Drupal\serialization\Normalizer\CacheableNormalizerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -21,42 +22,13 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class ResourceResponseSubscriber implements EventSubscriberInterface {
 
-  /**
-   * The serializer.
-   *
-   * @var \Symfony\Component\Serializer\SerializerInterface
-   */
-  protected $serializer;
-
-  /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
-   * The current route match.
-   *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
-   */
-  protected $routeMatch;
-
-  /**
-   * Constructs a ResourceResponseSubscriber object.
-   *
-   * @param \Symfony\Component\Serializer\SerializerInterface $serializer
-   *   The serializer.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The current route match.
-   */
-  public function __construct(SerializerInterface $serializer, RendererInterface $renderer, RouteMatchInterface $route_match) {
-    $this->serializer = $serializer;
-    $this->renderer = $renderer;
-    $this->routeMatch = $route_match;
-  }
+  public function __construct(
+    #[Autowire(service: 'serializer')]
+    protected SerializerInterface $serializer,
+    protected RendererInterface $renderer,
+    #[Autowire(service: 'current_route_match')]
+    protected RouteMatchInterface $routeMatch,
+  ) {}
 
   /**
    * Serializes ResourceResponse responses' data, and removes that data.
@@ -100,7 +72,7 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
     $acceptable_formats = $request->isMethodCacheable() ? $acceptable_response_formats : $acceptable_request_formats;
 
     $requested_format = $request->getRequestFormat();
-    $content_type_format = $request->getContentType();
+    $content_type_format = $request->getContentTypeFormat();
 
     // If an acceptable response format is requested, then use that. Otherwise,
     // including and particularly when the client forgot to specify a response
@@ -122,7 +94,7 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
       return $acceptable_formats[0];
     }
 
-    // Sometimes, there are no acceptable formats, e.g. DELETE routes.
+    // Sometimes, there are no acceptable formats.
     return NULL;
   }
 
@@ -141,8 +113,7 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
    * @param \Symfony\Component\Serializer\SerializerInterface $serializer
    *   The serializer to use.
    * @param string|null $format
-   *   The response format, or NULL in case the response does not need a format,
-   *   for example for the response to a DELETE request.
+   *   The response format, or NULL in case the response does not need a format.
    *
    * @todo Add test coverage for language negotiation contexts in
    *   https://www.drupal.org/node/2135829.
@@ -200,9 +171,10 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
-    // Run before \Drupal\dynamic_page_cache\EventSubscriber\DynamicPageCacheSubscriber
-    // (priority 100), so that Dynamic Page Cache can cache flattened responses.
+  public static function getSubscribedEvents(): array {
+    // Run before
+    // \Drupal\dynamic_page_cache\EventSubscriber\DynamicPageCacheSubscriber
+    // (priority 7), so that Dynamic Page Cache can cache flattened responses.
     $events[KernelEvents::RESPONSE][] = ['onResponse', 128];
     return $events;
   }

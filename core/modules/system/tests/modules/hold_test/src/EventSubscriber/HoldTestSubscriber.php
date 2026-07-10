@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\hold_test\EventSubscriber;
 
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -40,14 +42,14 @@ class HoldTestSubscriber implements EventSubscriberInterface {
   /**
    * Request hold.
    */
-  public function onRequest() {
+  public function onRequest(): void {
     $this->hold(static::HOLD_REQUEST);
   }
 
   /**
    * Response hold.
    */
-  public function onRespond() {
+  public function onRespond(): void {
     $this->hold(static::HOLD_RESPONSE);
   }
 
@@ -59,15 +61,15 @@ class HoldTestSubscriber implements EventSubscriberInterface {
    */
   protected function hold($type) {
     $path = "{$this->sitePath}/hold_test_$type.txt";
-    do {
-      $status = (bool) file_get_contents($path);
-    } while ($status && (NULL === usleep(static::WAIT)));
+    while ((bool) file_get_contents($path)) {
+      usleep(static::WAIT);
+    }
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     $events[KernelEvents::REQUEST][] = ['onRequest'];
     $events[KernelEvents::RESPONSE][] = ['onRespond'];
     return $events;

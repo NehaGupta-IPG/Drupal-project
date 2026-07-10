@@ -3,7 +3,7 @@
  * Button which expands the navigation at wide viewport widths.
  */
 
-@import "../../base/variables.pcss.css";
+@import "../../base/media-queries.pcss.css";
 
 .wide-nav-expand {
   display: none;
@@ -20,7 +20,7 @@
     pointer-events: auto;
     color: var(--color--white);
     border: 0;
-    background-color: var(--color--blue-50);
+    background-color: var(--color--primary-50);
 
     &:focus {
       outline: solid 2px currentColor;
@@ -29,7 +29,7 @@
   }
 }
 
-body:not(.is-always-mobile-nav) .js-fixed .wide-nav-expand {
+body:not(.is-always-mobile-nav) .is-fixed .wide-nav-expand {
   @media (--nav) {
     visibility: visible;
   }
@@ -88,7 +88,7 @@ body.is-always-mobile-nav .wide-nav-expand {
   }
 }
 
-.js-fixed .wide-nav-expand__icon {
+.is-fixed .wide-nav-expand__icon {
   opacity: 1;
 }
 

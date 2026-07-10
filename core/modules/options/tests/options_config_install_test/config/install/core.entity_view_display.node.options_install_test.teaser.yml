@@ -3,11 +3,11 @@ status: true
 dependencies:
   config:
     - core.entity_view_mode.node.teaser
-    - field.field.node.options_install_test.body
     - node.type.options_install_test
   module:
     - text
     - user
+third_party_settings: {  }
 id: node.options_install_test.teaser
 targetEntityType: node
 bundle: options_install_test
@@ -16,14 +16,5 @@ content:
   links:
     weight: 100
     region: content
-  body:
-    label: hidden
-    type: text_summary_or_trimmed
-    weight: 101
-    region: content
-    settings:
-      trim_length: 600
-    third_party_settings: {  }
 hidden:
   langcode: true
-third_party_settings: {  }

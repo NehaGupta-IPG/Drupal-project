@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\Tests\views\Functional\ViewTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the summary style plugin.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class StyleSummaryTest extends ViewTestBase {
 
   /**
@@ -20,7 +24,7 @@ class StyleSummaryTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'classy';
+  protected $defaultTheme = 'starterkit_theme';
 
   /**
    * {@inheritdoc}
@@ -35,8 +39,8 @@ class StyleSummaryTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp($import_test_views);
+  protected function setUp($import_test_views = TRUE, $modules = ['views_test_config']): void {
+    parent::setUp($import_test_views, $modules);
 
     // Create 5 entities per bundle, to allow a summary overview per bundle.
     for ($i = 0; $i < 5; $i++) {
@@ -56,11 +60,11 @@ class StyleSummaryTest extends ViewTestBase {
   /**
    * Tests a summary view.
    */
-  public function testSummaryView() {
+  public function testSummaryView(): void {
     $this->drupalGet('test-summary');
 
     // Ensure styles are properly added for summary views.
-    $this->assertRaw('stable/css/views/views.module.css');
+    $this->assertSession()->responseContains('views.module.css');
 
     $summary_list = $this->cssSelect('ul.views-summary li');
     $this->assertCount(4, $summary_list);

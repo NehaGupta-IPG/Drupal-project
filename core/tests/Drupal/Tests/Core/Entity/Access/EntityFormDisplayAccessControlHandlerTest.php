@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Entity\Access;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
@@ -19,11 +21,15 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
- * @coversDefaultClass \Drupal\Core\Entity\Entity\Access\EntityFormDisplayAccessControlHandler
- * @group Entity
+ * Tests Drupal\Core\Entity\Entity\Access\EntityFormDisplayAccessControlHandler.
  */
+#[CoversClass(EntityFormDisplayAccessControlHandler::class)]
+#[Group('Entity')]
 class EntityFormDisplayAccessControlHandlerTest extends UnitTestCase {
 
   /**
@@ -35,31 +41,23 @@ class EntityFormDisplayAccessControlHandlerTest extends UnitTestCase {
 
   /**
    * The mock module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
-  protected $moduleHandler;
+  protected ModuleHandlerInterface&Stub $moduleHandler;
 
   /**
    * The mock account without field storage config access.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
    */
-  protected $anon;
+  protected AccountInterface&Stub $anon;
 
   /**
    * The mock account with EntityFormDisplay access.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
    */
-  protected $member;
+  protected AccountInterface&Stub $member;
 
   /**
    * The mock account with EntityFormDisplay access via parent access check.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
    */
-  protected $parent_member;
+  protected AccountInterface&Stub $parentMember;
 
   /**
    * The EntityFormDisplay entity used for testing.
@@ -85,110 +83,98 @@ class EntityFormDisplayAccessControlHandlerTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->anon = $this->createMock(AccountInterface::class);
+    $this->anon = $this->createStub(AccountInterface::class);
     $this->anon
-      ->expects($this->any())
       ->method('hasPermission')
-      ->will($this->returnValue(FALSE));
+      ->willReturn(FALSE);
     $this->anon
-      ->expects($this->any())
       ->method('id')
-      ->will($this->returnValue(0));
+      ->willReturn(0);
 
-    $this->member = $this->createMock(AccountInterface::class);
+    $this->member = $this->createStub(AccountInterface::class);
     $this->member
-      ->expects($this->any())
       ->method('hasPermission')
-      ->will($this->returnValueMap([
+      ->willReturnMap([
         ['administer foobar form display', TRUE],
-      ]));
+        ['Llama', FALSE],
+      ]);
     $this->member
-      ->expects($this->any())
       ->method('id')
-      ->will($this->returnValue(2));
+      ->willReturn(2);
 
-    $this->parent_member = $this->createMock(AccountInterface::class);
-    $this->parent_member
-      ->expects($this->any())
+    $this->parentMember = $this->createStub(AccountInterface::class);
+    $this->parentMember
       ->method('hasPermission')
-      ->will($this->returnValueMap([
+      ->willReturnMap([
         ['Llama', TRUE],
-      ]));
-    $this->parent_member
-      ->expects($this->any())
+        ['administer foobar form display', FALSE],
+        ['administer foobar display', FALSE],
+      ]);
+    $this->parentMember
       ->method('id')
-      ->will($this->returnValue(3));
+      ->willReturn(3);
 
-    $entity_form_display_entity_type = $this->createMock(ConfigEntityTypeInterface::class);
-    $entity_form_display_entity_type->expects($this->any())
-      ->method('getAdminPermission')
-      ->will($this->returnValue('Llama'));
+    $entity_form_display_entity_type = $this->createStub(ConfigEntityTypeInterface::class);
     $entity_form_display_entity_type
-      ->expects($this->any())
+      ->method('getAdminPermission')
+      ->willReturn('Llama');
+    $entity_form_display_entity_type
       ->method('getKey')
-      ->will($this->returnValueMap([
+      ->willReturnMap([
         ['langcode', 'langcode'],
-      ]));
-    $entity_form_display_entity_type->expects($this->any())
+      ]);
+    $entity_form_display_entity_type
       ->method('entityClassImplements')
-      ->will($this->returnValue(TRUE));
-    $entity_form_display_entity_type->expects($this->any())
+      ->willReturn(TRUE);
+    $entity_form_display_entity_type
       ->method('getConfigPrefix')
       ->willReturn('');
 
-    $this->moduleHandler = $this->createMock(ModuleHandlerInterface::class);
+    $this->moduleHandler = $this->createStub(ModuleHandlerInterface::class);
     $this->moduleHandler
-      ->expects($this->any())
-      ->method('getImplementations')
-      ->will($this->returnValue([]));
-    $this->moduleHandler
-      ->expects($this->any())
       ->method('invokeAll')
-      ->will($this->returnValue([]));
+      ->willReturn([]);
 
     $storage_access_control_handler = new EntityFormDisplayAccessControlHandler($entity_form_display_entity_type);
     $storage_access_control_handler->setModuleHandler($this->moduleHandler);
 
-    $entity_type_manager = $this->createMock(EntityTypeManagerInterface::class);
+    $entity_type_manager = $this->createStub(EntityTypeManagerInterface::class);
     $entity_type_manager
-      ->expects($this->any())
       ->method('getStorage')
       ->willReturnMap([
-        ['entity_display', $this->createMock(EntityStorageInterface::class)],
+        ['entity_display', $this->createStub(EntityStorageInterface::class)],
       ]);
     $entity_type_manager
-      ->expects($this->any())
       ->method('getAccessControlHandler')
       ->willReturnMap([
         ['entity_display', $storage_access_control_handler],
       ]);
     $entity_type_manager
-      ->expects($this->any())
       ->method('getDefinition')
-      ->will($this->returnValue($entity_form_display_entity_type));
+      ->willReturn($entity_form_display_entity_type);
 
-    $entity_field_manager = $this->createMock(EntityFieldManagerInterface::class);
-    $entity_field_manager->expects($this->any())
+    $entity_field_manager = $this->createStub(EntityFieldManagerInterface::class);
+    $entity_field_manager
       ->method('getFieldDefinitions')
-      ->will($this->returnValue([]));
+      ->willReturn([]);
 
     $container = new Container();
     $container->set('entity_type.manager', $entity_type_manager);
     $container->set('entity_field.manager', $entity_field_manager);
-    $container->set('language_manager', $this->createMock(LanguageManagerInterface::class));
+    $container->set('language_manager', $this->createStub(LanguageManagerInterface::class));
     $container->set('plugin.manager.field.widget', $this->prophesize(PluginManagerInterface::class));
-    $container->set('plugin.manager.field.field_type', $this->createMock(FieldTypePluginManagerInterface::class));
+    $container->set('plugin.manager.field.field_type', $this->createStub(FieldTypePluginManagerInterface::class));
     $container->set('plugin.manager.field.formatter', $this->prophesize(FormatterPluginManager::class));
-    $container->set('uuid', $this->createMock(UuidInterface::class));
-    $container->set('renderer', $this->createMock(RendererInterface::class));
+    $container->set('uuid', $this->createStub(UuidInterface::class));
+    $container->set('renderer', $this->createStub(RendererInterface::class));
     $container->set('cache_contexts_manager', $this->prophesize(CacheContextsManager::class));
     \Drupal::setContainer($container);
 
     $this->entity = new EntityFormDisplay([
       'targetEntityType' => 'foobar',
-      'bundle' => 'bazqux',
+      'bundle' => 'new_bundle',
       'mode' => 'default',
-      'id' => 'foobar.bazqux.default',
+      'id' => 'foobar.new_bundle.default',
       'uuid' => '6f2f259a-f3c7-42ea-bdd5-111ad1f85ed1',
     ], 'entity_display');
 
@@ -202,8 +188,10 @@ class EntityFormDisplayAccessControlHandlerTest extends UnitTestCase {
    *   A list of allowed operations.
    * @param \Drupal\Core\Session\AccountInterface $user
    *   The account to use for get access.
+   *
+   * @internal
    */
-  public function assertAllowOperations(array $allow_operations, AccountInterface $user) {
+  public function assertAllowOperations(array $allow_operations, AccountInterface $user): void {
     foreach (['view', 'update', 'delete'] as $operation) {
       $expected = in_array($operation, $allow_operations);
       $actual = $this->accessControlHandler->access($this->entity, $operation, $user);
@@ -212,13 +200,15 @@ class EntityFormDisplayAccessControlHandlerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::access
-   * @covers ::checkAccess
+   * Tests access.
+   *
+   * @legacy-covers ::access
+   * @legacy-covers ::checkAccess
    */
-  public function testAccess() {
+  public function testAccess(): void {
     $this->assertAllowOperations([], $this->anon);
     $this->assertAllowOperations(['view', 'update', 'delete'], $this->member);
-    $this->assertAllowOperations(['view', 'update', 'delete'], $this->parent_member);
+    $this->assertAllowOperations(['view', 'update', 'delete'], $this->parentMember);
 
     $this->entity->enforceIsNew(TRUE)->save();
     // Unfortunately, EntityAccessControlHandler has a static cache, which we
@@ -227,7 +217,7 @@ class EntityFormDisplayAccessControlHandlerTest extends UnitTestCase {
 
     $this->assertAllowOperations([], $this->anon);
     $this->assertAllowOperations(['view', 'update'], $this->member);
-    $this->assertAllowOperations(['view', 'update'], $this->parent_member);
+    $this->assertAllowOperations(['view', 'update'], $this->parentMember);
   }
 
 }

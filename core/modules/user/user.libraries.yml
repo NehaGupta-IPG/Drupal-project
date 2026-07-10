@@ -1,15 +1,15 @@
 drupal.user:
   version: VERSION
   js:
-    user.js: {}
-    user.theme.js: {}
+    js/user.js: {}
+    js/user.theme.js: {}
   css:
     component:
       css/user.module.css: {}
   dependencies:
     - core/jquery
     - core/drupal
-    - core/jquery.once
+    - core/once
 
 drupal.user.admin:
   version: VERSION
@@ -20,13 +20,16 @@ drupal.user.admin:
 drupal.user.permissions:
   version: VERSION
   js:
-    user.permissions.js: {}
+    js/user.permissions.js: {}
   dependencies:
     - core/jquery
-    - core/jquery.once
+    - core/once
     - core/drupal
     - core/drupalSettings
     - user/drupal.user.admin
+    - core/drupal.checkbox
+    - core/drupal.debounce
+    - core/drupal.announce
 
 drupal.user.icons:
   version: VERSION

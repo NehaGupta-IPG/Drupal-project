@@ -1,12 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Functional\Rest;
 
 use Drupal\Tests\rest\Functional\AnonResourceTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @group rest
+ * Tests Vocabulary Json Anon.
  */
+#[Group('rest')]
+#[RunTestsInSeparateProcesses]
 class VocabularyJsonAnonTest extends VocabularyResourceTestBase {
 
   use AnonResourceTestTrait;
@@ -25,13 +31,5 @@ class VocabularyJsonAnonTest extends VocabularyResourceTestBase {
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
-
-  /**
-   * Disable the GET test coverage due to bug in taxonomy module.
-   * @todo Fix in https://www.drupal.org/node/2805281: remove this override.
-   */
-  public function testGet() {
-    $this->markTestSkipped();
-  }
 
 }

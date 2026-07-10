@@ -2,28 +2,27 @@
 
 namespace Drupal\Core\StreamWrapper;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Drupal\Core\Site\Settings;
+use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
  * Provides a StreamWrapper manager.
  *
  * @see \Drupal\Core\StreamWrapper\StreamWrapperInterface
  */
-class StreamWrapperManager implements ContainerAwareInterface, StreamWrapperManagerInterface {
-
-  use ContainerAwareTrait;
+class StreamWrapperManager implements StreamWrapperManagerInterface {
 
   /**
-   * Contains stream wrapper info.
+   * Constructs a StreamWrapperManager object.
    *
-   * An associative array where keys are scheme names and values are themselves
-   * associative arrays with the keys class, type and (optionally) service_id,
-   * and string values.
-   *
-   * @var array
+   * @param \Symfony\Component\DependencyInjection\ServiceLocator $container
+   *   A service locator containing stream wrapper services, keyed by scheme.
    */
-  protected $info = [];
+  public function __construct(
+    #[AutowireLocator('stream_wrapper', indexAttribute: 'scheme')]
+    protected readonly ServiceLocator $container,
+  ) {}
 
   /**
    * Contains collected stream wrappers.
@@ -34,7 +33,6 @@ class StreamWrapperManager implements ContainerAwareInterface, StreamWrapperMana
    *   - class: stream wrapper class name
    *   - type: a bitmask corresponding to the type constants in
    *     StreamWrapperInterface
-   *   - service_id: name of service
    *
    * The array on key StreamWrapperInterface::ALL contains representations of
    * all schemes and corresponding wrappers.
@@ -108,10 +106,9 @@ class StreamWrapperManager implements ContainerAwareInterface, StreamWrapperMana
    * {@inheritdoc}
    */
   public function getClass($scheme) {
-    if (isset($this->info[$scheme])) {
-      return $this->info[$scheme]['class'];
+    if ($this->container->has($scheme)) {
+      return get_class($this->container->get($scheme));
     }
-
     return FALSE;
   }
 
@@ -123,12 +120,12 @@ class StreamWrapperManager implements ContainerAwareInterface, StreamWrapperMana
    * @param string $uri
    *   The URI of the stream.
    *
-   * @return \Drupal\Core\StreamWrapper\StreamWrapperInterface|bool
+   * @return \Drupal\Core\StreamWrapper\StreamWrapperInterface|false
    *   A stream wrapper object, or false if the scheme is not available.
    */
   protected function getWrapper($scheme, $uri) {
-    if (isset($this->info[$scheme]['service_id'])) {
-      $instance = $this->container->get($this->info[$scheme]['service_id']);
+    if ($this->container->has($scheme)) {
+      $instance = $this->container->get($scheme);
       $instance->setUri($uri);
       return $instance;
     }
@@ -137,38 +134,19 @@ class StreamWrapperManager implements ContainerAwareInterface, StreamWrapperMana
   }
 
   /**
-   * Adds a stream wrapper.
-   *
-   * Internal use only.
-   *
-   * @param string $service_id
-   *   The service id.
-   * @param string $class
-   *   The stream wrapper class.
-   * @param string $scheme
-   *   The scheme for which the wrapper should be registered.
-   */
-  public function addStreamWrapper($service_id, $class, $scheme) {
-    $this->info[$scheme] = [
-      'class' => $class,
-      'type' => $class::getType(),
-      'service_id' => $service_id,
-    ];
-  }
-
-  /**
    * Registers the tagged stream wrappers.
    *
    * Internal use only.
    */
   public function register() {
-    foreach ($this->info as $scheme => $info) {
-      $this->registerWrapper($scheme, $info['class'], $info['type']);
+    foreach (array_keys($this->container->getProvidedServices()) as $scheme) {
+      $class = $this->getClass($scheme);
+      $this->registerWrapper($scheme, $class, $class::getType());
     }
   }
 
   /**
-   * Unregisters the tagged stream wrappers.
+   * Deregisters the tagged stream wrappers.
    *
    * Internal use only.
    */
@@ -242,6 +220,36 @@ class StreamWrapperManager implements ContainerAwareInterface, StreamWrapperMana
       $target = $this->getTarget($uri);
 
       if ($target !== FALSE) {
+
+        if (!in_array($scheme, Settings::get('file_sa_core_2023_005_schemes', []))) {
+          $class = $this->getClass($scheme);
+          $is_local = is_subclass_of($class, LocalStream::class);
+          if ($is_local) {
+            $target = str_replace(DIRECTORY_SEPARATOR, '/', $target);
+          }
+
+          $parts = explode('/', $target);
+          $normalized_parts = [];
+          while ($parts) {
+            $part = array_shift($parts);
+            if ($part === '' || $part === '.') {
+              continue;
+            }
+            elseif ($part === '..' && $is_local && $normalized_parts === []) {
+              $normalized_parts[] = $part;
+              break;
+            }
+            elseif ($part === '..') {
+              array_pop($normalized_parts);
+            }
+            else {
+              $normalized_parts[] = $part;
+            }
+          }
+
+          $target = implode('/', array_merge($normalized_parts, $parts));
+        }
+
         $uri = $scheme . '://' . $target;
       }
     }

@@ -10,9 +10,9 @@ trait EntityChangedTrait {
   /**
    * Returns the timestamp of the last entity change across all translations.
    *
-   * @return int
-   *   The timestamp of the last entity save operation across all
-   *   translations.
+   * @return int|null
+   *   The timestamp of the last entity save operation across all translations.
+   *   Some entities allow a NULL value indicating the changed time is unknown.
    */
   public function getChangedTimeAcrossTranslations() {
     $changed = $this->getUntranslated()->getChangedTime();
@@ -26,11 +26,13 @@ trait EntityChangedTrait {
   /**
    * Gets the timestamp of the last entity change for the current translation.
    *
-   * @return int
-   *   The timestamp of the last entity save operation.
+   * @return int|null
+   *   The timestamp of the last entity save operation. Some entities allow a
+   *   NULL value indicating the changed time is unknown.
    */
   public function getChangedTime() {
-    return $this->get('changed')->value;
+    $value = $this->get('changed')->value;
+    return isset($value) ? (int) $value : NULL;
   }
 
   /**

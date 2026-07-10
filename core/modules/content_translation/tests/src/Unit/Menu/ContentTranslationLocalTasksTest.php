@@ -1,16 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_translation\Unit\Menu;
 
+use Drupal\content_translation\ContentTranslationManagerInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Tests\Core\Menu\LocalTaskIntegrationTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests content translation local tasks.
- *
- * @group content_translation
  */
+#[Group('content_translation')]
 class ContentTranslationLocalTasksTest extends LocalTaskIntegrationTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     $this->directoryList = [
       'content_translation' => 'core/modules/content_translation',
@@ -18,36 +26,38 @@ class ContentTranslationLocalTasksTest extends LocalTaskIntegrationTestBase {
     ];
     parent::setUp();
 
-    $entity_type = $this->createMock('Drupal\Core\Entity\EntityTypeInterface');
-    $entity_type->expects($this->any())
+    $entity_type = $this->createStub(EntityTypeInterface::class);
+    $entity_type
       ->method('getLinkTemplate')
-      ->will($this->returnValueMap([
+      ->willReturnMap([
         ['canonical', 'entity.node.canonical'],
-        ['drupal:content-translation-overview', 'entity.node.content_translation_overview'],
-      ]));
-    $content_translation_manager = $this->createMock('Drupal\content_translation\ContentTranslationManagerInterface');
-    $content_translation_manager->expects($this->any())
+        [
+          'drupal:content-translation-overview',
+          'entity.node.content_translation_overview',
+        ],
+      ]);
+    $content_translation_manager = $this->createStub(ContentTranslationManagerInterface::class);
+    $content_translation_manager
       ->method('getSupportedEntityTypes')
-      ->will($this->returnValue([
+      ->willReturn([
         'node' => $entity_type,
-      ]));
+      ]);
     \Drupal::getContainer()->set('content_translation.manager', $content_translation_manager);
     \Drupal::getContainer()->set('string_translation', $this->getStringTranslationStub());
   }
 
   /**
    * Tests the block admin display local tasks.
-   *
-   * @dataProvider providerTestBlockAdminDisplay
    */
-  public function testBlockAdminDisplay($route, $expected) {
+  #[DataProvider('providerTestBlockAdminDisplay')]
+  public function testBlockAdminDisplay(string $route, array $expected): void {
     $this->assertLocalTasks($route, $expected);
   }
 
   /**
    * Provides a list of routes to test.
    */
-  public function providerTestBlockAdminDisplay() {
+  public static function providerTestBlockAdminDisplay(): array {
     return [
       [
         'entity.node.canonical',

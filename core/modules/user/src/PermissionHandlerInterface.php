@@ -4,13 +4,23 @@ namespace Drupal\user;
 
 /**
  * Defines an interface to list available permissions.
+ *
+ * @phpstan-type PermissionInfo array {
+ *   title: string,
+ *   description?: string|\Stringable,
+ *   "restrict access"?: bool,
+ *   warning?: string|\Stringable,
+ *   dependencies?: array,
+ *   provider: string,
+ * }
+ * @phpstan-type PermissionInfoList array<string, PermissionInfo>
  */
 interface PermissionHandlerInterface {
 
   /**
    * Gets all available permissions.
    *
-   * @return array
+   * @return PermissionInfoList
    *   An array whose keys are permission names and whose corresponding values
    *   are arrays containing the following key-value pairs:
    *   - title: The human-readable name of the permission, to be shown on the
@@ -34,7 +44,21 @@ interface PermissionHandlerInterface {
    *     permissions to have a clear, consistent security warning that is the
    *     same across the site. Use the 'description' key instead to provide any
    *     information that is specific to the permission you are defining.
-   *   - provider: (optional) The provider name of the permission.
+   *   - dependencies: (optional) An array of dependency entities used when
+   *     building this permission, structured in the same way as the return
+   *     of ConfigEntityInterface::calculateDependencies(). For example, if this
+   *     permission was generated as effect of the existence of node type
+   *     'article', then value of the dependency key is:
+   *     @code
+   *     'dependencies' => ['config' => ['node.type.article']]
+   *     @endcode
+   *     The module providing this permission doesn't have to be added as a
+   *     dependency. It is automatically parsed, stored and retrieved from the
+   *     'provider' key.
+   *   - provider: The provider name of the permission. This is set
+   *     automatically to the module that provides the permission.yml file.
+   *
+   * @see \Drupal\Core\Config\Entity\ConfigDependencyManager
    */
   public function getPermissions();
 

@@ -2,7 +2,6 @@
 
 namespace Drupal\taxonomy;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 use Drupal\Core\Entity\Sql\TableMappingInterface;
 
@@ -40,8 +39,7 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
   protected $trees = [];
 
   /**
-   * Array of all loaded term ancestry keyed by ancestor term ID, keyed by term
-   * ID.
+   * Term ancestry keyed by ancestor term ID, keyed by term ID.
    *
    * @var \Drupal\taxonomy\TermInterface[][]
    */
@@ -79,8 +77,7 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
   /**
    * {@inheritdoc}
    */
-  public function resetCache(array $ids = NULL) {
-    drupal_static_reset('taxonomy_term_count_nodes');
+  public function resetCache(?array $ids = NULL) {
     $this->ancestors = [];
     $this->treeChildren = [];
     $this->treeParents = [];
@@ -93,19 +90,8 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
   /**
    * {@inheritdoc}
    */
-  public function deleteTermHierarchy($tids) {}
-
-  /**
-   * {@inheritdoc}
-   */
-  public function updateTermHierarchy(EntityInterface $term) {}
-
-  /**
-   * {@inheritdoc}
-   */
   public function loadParents($tid) {
     $terms = [];
-    /** @var \Drupal\taxonomy\TermInterface $term */
     if ($tid && $term = $this->load($tid)) {
       foreach ($this->getParents($term) as $id => $parent) {
         // This method currently doesn't return the <root> parent.
@@ -341,7 +327,7 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
   /**
    * {@inheritdoc}
    */
-  public function getNodeTerms(array $nids, array $vocabs = [], $langcode = NULL) {
+  public function getNodeTerms(array $nids, array $vids = [], $langcode = NULL) {
     $query = $this->database->select($this->getDataTable(), 'td');
     $query->innerJoin('taxonomy_index', 'tn', '[td].[tid] = [tn].[tid]');
     $query->fields('td', ['tid']);
@@ -350,8 +336,8 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
     $query->orderby('td.name');
     $query->condition('tn.nid', $nids, 'IN');
     $query->addTag('taxonomy_term_access');
-    if (!empty($vocabs)) {
-      $query->condition('td.vid', $vocabs, 'IN');
+    if (!empty($vids)) {
+      $query->condition('td.vid', $vids, 'IN');
     }
     if (!empty($langcode)) {
       $query->condition('td.langcode', $langcode);
@@ -446,7 +432,8 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
   /**
    * {@inheritdoc}
    */
-  public function __sleep() {
+  public function __sleep(): array {
+    /** @var string[] $vars */
     $vars = parent::__sleep();
     // Do not serialize static cache.
     unset($vars['ancestors'], $vars['treeChildren'], $vars['treeParents'], $vars['treeTerms'], $vars['trees'], $vars['vocabularyHierarchyType']);
@@ -456,7 +443,7 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
   /**
    * {@inheritdoc}
    */
-  public function __wakeup() {
+  public function __wakeup(): void {
     parent::__wakeup();
     // Initialize static caches.
     $this->ancestors = [];

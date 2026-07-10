@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\render_attached_test\Controller;
 
 /**
@@ -46,7 +48,7 @@ class RenderAttachedTestController {
       [
         '#tag' => 'meta',
         '#attributes' => [
-          'test-attribute' => 'testvalue',
+          'test-attribute' => 'test_value',
         ],
       ],
       'test_head_attribute',
@@ -80,6 +82,7 @@ class RenderAttachedTestController {
     $render['#attached']['html_head_link'][] = [['href' => '/foo?bar=<baz>&baz=false', 'rel' => 'alternate'], TRUE];
     $render['#attached']['html_head_link'][] = [['href' => '/not-added-to-http-headers', 'rel' => 'alternate'], FALSE];
     $render['#attached']['html_head_link'][] = [['href' => '/foo/bar', 'hreflang' => 'nl', 'rel' => 'alternate'], TRUE];
+    $render['#attached']['html_head_link'][] = [['href' => '/foo/bar', 'hreflang' => 'de', 'rel' => 'alternate'], TRUE];
     return $render;
   }
 

@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\menu_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Theme\ThemeNegotiatorInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Controller routines for menu_test routes.
@@ -37,28 +38,17 @@ class MenuTestController extends ControllerBase {
   /**
    * Constructs the MenuTestController object.
    *
-   * @param \Drupal\menu_test\Controller\ThemeManagerInterface $theme_manager
+   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
    *   The theme manager.
-   * @param \Drupal\menu_test\Controller\ThemeNegotiatorInterface $theme_negotiator
+   * @param \Drupal\Core\Theme\ThemeNegotiatorInterface $theme_negotiator
    *   The theme negotiator.
-   * @param \Drupal\menu_test\Controller\RouteMatchInterface $route_match
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The current route match.
    */
   public function __construct(ThemeManagerInterface $theme_manager, ThemeNegotiatorInterface $theme_negotiator, RouteMatchInterface $route_match) {
     $this->themeManager = $theme_manager;
     $this->themeNegotiator = $theme_negotiator;
     $this->routeMatch = $route_match;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('theme.manager'),
-      $container->get('theme.negotiator'),
-      $container->get('current_route_match')
-    );
   }
 
   /**
@@ -84,7 +74,8 @@ class MenuTestController extends ControllerBase {
    */
   public function titleCallback(array $_title_arguments = [], $_title = '') {
     $_title_arguments += ['case_number' => '2', 'title' => $_title];
-    return t($_title_arguments['title']) . ' - Case ' . $_title_arguments['case_number'];
+    // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
+    return $this->t($_title_arguments['title']) . ' - Case ' . $_title_arguments['case_number'];
   }
 
   /**
@@ -115,6 +106,7 @@ class MenuTestController extends ControllerBase {
    * A title callback for XSS breadcrumb check.
    *
    * @return string
+   *   A string that can be used for comparison.
    */
   public function breadcrumbTitleCallback() {
     return '<script>alert(123);</script>';

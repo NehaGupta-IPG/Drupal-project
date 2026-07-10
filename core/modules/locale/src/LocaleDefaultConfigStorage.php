@@ -4,7 +4,7 @@ namespace Drupal\locale;
 
 use Drupal\Core\Config\ExtensionInstallStorage;
 use Drupal\Core\Config\StorageInterface;
-use Drupal\language\ConfigurableLanguageManagerInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 
 /**
  * Provides access to default configuration for locale integration.
@@ -31,7 +31,7 @@ class LocaleDefaultConfigStorage {
   /**
    * The language manager.
    *
-   * @var \Drupal\language\ConfigurableLanguageManagerInterface
+   * @var \Drupal\Core\Language\LanguageManagerInterface
    */
   protected $languageManager;
 
@@ -54,12 +54,12 @@ class LocaleDefaultConfigStorage {
    *
    * @param \Drupal\Core\Config\StorageInterface $config_storage
    *   The storage object to use for reading configuration data.
-   * @param \Drupal\language\ConfigurableLanguageManagerInterface $language_manager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
    * @param string $install_profile
    *   The current installation profile.
    */
-  public function __construct(StorageInterface $config_storage, ConfigurableLanguageManagerInterface $language_manager, $install_profile) {
+  public function __construct(StorageInterface $config_storage, LanguageManagerInterface $language_manager, $install_profile) {
     $this->configStorage = $config_storage;
     $this->languageManager = $language_manager;
 
@@ -83,7 +83,7 @@ class LocaleDefaultConfigStorage {
     elseif ($this->optionalInstallStorage->exists($name)) {
       return $this->optionalInstallStorage->read($name);
     }
-    elseif (strpos($name, 'language.entity.') === 0) {
+    elseif (str_starts_with($name, 'language.entity.')) {
       // Simulate default languages as if they were shipped as default
       // configuration.
       $langcode = str_replace('language.entity.', '', $name);
@@ -117,7 +117,7 @@ class LocaleDefaultConfigStorage {
    * Get all configuration names and folders for a list of modules or themes.
    *
    * @param string $type
-   *   Type of components: 'module' | 'theme' | 'profile'
+   *   Type of components: 'module' | 'theme' | 'profile'.
    * @param array $list
    *   Array of theme or module names.
    *
@@ -129,8 +129,8 @@ class LocaleDefaultConfigStorage {
   public function getComponentNames($type, array $list) {
     $names = array_unique(
       array_merge(
-        array_keys($this->requiredInstallStorage->getComponentNames($type, $list)),
-        array_keys($this->optionalInstallStorage->getComponentNames($type, $list))
+        array_keys($this->requiredInstallStorage->getComponentNames($list)),
+        array_keys($this->optionalInstallStorage->getComponentNames($list))
       )
     );
     if ($type == 'module' && in_array('language', $list)) {

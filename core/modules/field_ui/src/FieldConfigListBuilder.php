@@ -2,14 +2,15 @@
 
 namespace Drupal\field_ui;
 
+use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
-use Drupal\Core\Url;
 use Drupal\field\FieldConfigInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -95,6 +96,7 @@ class FieldConfigListBuilder extends ConfigEntityListBuilder {
     $build = parent::render();
     $build['table']['#attributes']['id'] = 'field-overview';
     $build['table']['#empty'] = $this->t('No fields are present yet.');
+    $build['#attached']['library'][] = 'field_ui/drupal.field_ui';
 
     return $build;
   }
@@ -118,12 +120,8 @@ class FieldConfigListBuilder extends ConfigEntityListBuilder {
    */
   public function buildHeader() {
     $header = [
-      'label' => $this->t('Label'),
-      'field_name' => [
-        'data' => $this->t('Machine name'),
-        'class' => [RESPONSIVE_PRIORITY_MEDIUM],
-      ],
-      'field_type' => $this->t('Field type'),
+      'label' => $this->t('Field'),
+      'settings_summary' => $this->t('Field type'),
     ];
     return $header + parent::buildHeader();
   }
@@ -134,23 +132,108 @@ class FieldConfigListBuilder extends ConfigEntityListBuilder {
   public function buildRow(EntityInterface $field_config) {
     /** @var \Drupal\field\FieldConfigInterface $field_config */
     $field_storage = $field_config->getFieldStorageDefinition();
-    $route_parameters = [
-      'field_config' => $field_config->id(),
-    ] + FieldUI::getRouteBundleParameter($this->entityTypeManager->getDefinition($this->targetEntityTypeId), $this->targetBundle);
+
+    $storage_summary = $this->fieldTypeManager->getStorageSettingsSummary($field_storage);
+    $instance_summary = $this->fieldTypeManager->getFieldSettingsSummary($field_config);
+    $summary_list = [...$storage_summary, ...$instance_summary];
+
+    $secondary_summary_items = [];
+    foreach ($summary_list as $item) {
+      $secondary_summary_items[] = [
+        '#type' => 'html_tag',
+        '#tag' => 'div',
+        '#value' => $item,
+        '#attributes' => [
+          'class' => ['field-ui-secondary-text'],
+        ],
+      ];
+    }
+
+    $settings_summary = [
+      'data' => [
+        '#type' => 'container',
+        '#attributes' => ['class' => ['field-settings-summary-container']],
+        'field_type' => [
+          '#type' => 'html_tag',
+          '#tag' => 'div',
+          '#value' => $this->fieldTypeManager->getDefinitions()[$field_storage->getType()]['label'],
+          '#attributes' => [
+            'class' => ['field-type-label'],
+          ],
+        ],
+        'summary_items' => [
+          '#type' => 'container',
+          '#attributes' => ['class' => ['field-settings-summary-items']],
+          ...$secondary_summary_items,
+        ],
+      ],
+      'class' => ['field-settings-summary-cell'],
+    ];
+
+    $cardinality = $field_storage->getCardinality();
+    if ($cardinality === -1) {
+      $cardinality_text = $this->t('Unlimited');
+    }
+    else {
+      $cardinality_text = $this->formatPlural($cardinality, 'Single', 'Limited to @count');
+    }
+
+    $label_data = [
+      'data' => [
+        '#type' => 'container',
+        '#attributes' => ['class' => ['field-label-container']],
+        'label_wrapper' => [
+          '#type' => 'container',
+          '#attributes' => ['class' => ['field-label-wrapper']],
+          'label' => [
+            '#type' => 'html_tag',
+            '#tag' => 'span',
+            '#plain_text' => $field_config->getLabel(),
+            '#attributes' => [
+              'class' => ['field-label-text'],
+            ],
+          ],
+          'machine_name' => [
+            '#type' => 'html_tag',
+            '#tag' => 'span',
+            '#plain_text' => ' ' . $field_config->getName(),
+            '#attributes' => [
+              'class' => ['field-ui-secondary-text', 'field-machine-name'],
+            ],
+          ],
+        ],
+        'details' => [
+          '#type' => 'container',
+          '#attributes' => ['class' => ['field-details-container']],
+          'cardinality_pill' => [
+            '#type' => 'html_tag',
+            '#tag' => 'span',
+            '#value' => $cardinality_text,
+            '#attributes' => [
+              'class' => ['field-ui-pill'],
+            ],
+          ],
+        ],
+      ],
+    ];
+
+    // Add required pill if field is required.
+    if ($field_config->isRequired()) {
+      $label_data['data']['details']['required_pill'] = [
+        '#type' => 'html_tag',
+        '#tag' => 'span',
+        '#value' => $this->t('Required'),
+        '#attributes' => [
+          'class' => ['field-ui-pill'],
+        ],
+      ];
+    }
 
     $row = [
       'id' => Html::getClass($field_config->getName()),
       'data' => [
-        'label' => $field_config->getLabel(),
-        'field_name' => $field_config->getName(),
-        'field_type' => [
-          'data' => [
-            '#type' => 'link',
-            '#title' => $this->fieldTypeManager->getDefinitions()[$field_storage->getType()]['label'],
-            '#url' => Url::fromRoute("entity.field_config.{$this->targetEntityTypeId}_storage_edit_form", $route_parameters),
-            '#options' => ['attributes' => ['title' => $this->t('Edit field settings.')]],
-          ],
-        ],
+        'label' => $label_data,
+        'settings_summary' => $settings_summary,
       ],
     ];
 
@@ -168,37 +251,44 @@ class FieldConfigListBuilder extends ConfigEntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  public function getDefaultOperations(EntityInterface $entity) {
+  protected function getDefaultOperations(EntityInterface $entity, CacheableMetadata $cacheability) {
     /** @var \Drupal\field\FieldConfigInterface $entity */
-    $operations = parent::getDefaultOperations($entity);
+    $operations = parent::getDefaultOperations($entity, $cacheability);
 
-    if ($entity->access('update') && $entity->hasLinkTemplate("{$entity->getTargetEntityTypeId()}-field-edit-form")) {
+    $update_access = $entity->access('update', return_as_object: TRUE);
+    $cacheability->addCacheableDependency($update_access);
+    if ($update_access->isAllowed() && $entity->hasLinkTemplate("{$entity->getTargetEntityTypeId()}-field-edit-form")) {
       $operations['edit'] = [
         'title' => $this->t('Edit'),
         'weight' => 10,
         'url' => $entity->toUrl("{$entity->getTargetEntityTypeId()}-field-edit-form"),
         'attributes' => [
           'title' => $this->t('Edit field settings.'),
+          'class' => ['use-ajax'],
+          'data-dialog-type' => 'modal',
+          'data-dialog-options' => Json::encode([
+            'width' => 1100,
+          ]),
         ],
       ];
     }
-    if ($entity->access('delete') && $entity->hasLinkTemplate("{$entity->getTargetEntityTypeId()}-field-delete-form")) {
+    $delete_access = $entity->access('delete', return_as_object: TRUE);
+    $cacheability->addCacheableDependency($delete_access);
+    if ($delete_access->isAllowed() && $entity->hasLinkTemplate("{$entity->getTargetEntityTypeId()}-field-delete-form")) {
       $operations['delete'] = [
         'title' => $this->t('Delete'),
         'weight' => 100,
         'url' => $entity->toUrl("{$entity->getTargetEntityTypeId()}-field-delete-form"),
         'attributes' => [
           'title' => $this->t('Delete field.'),
+          'class' => ['use-ajax'],
+          'data-dialog-type' => 'modal',
+          'data-dialog-options' => Json::encode([
+            'width' => 880,
+          ]),
         ],
       ];
     }
-
-    $operations['storage-settings'] = [
-      'title' => $this->t('Storage settings'),
-      'weight' => 20,
-      'attributes' => ['title' => $this->t('Edit storage settings.')],
-      'url' => $entity->toUrl("{$entity->getTargetEntityTypeId()}-storage-edit-form"),
-    ];
 
     return $operations;
   }

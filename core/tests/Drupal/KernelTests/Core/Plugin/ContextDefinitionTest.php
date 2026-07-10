@@ -1,17 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Plugin;
 
+use Drupal\Core\Plugin\Context\Context;
 use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Plugin\Context\EntityContext;
 use Drupal\Core\Plugin\Context\EntityContextDefinition;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\Core\Plugin\Context\ContextDefinition
- * @group Plugin
+ * Tests Drupal\Core\Plugin\Context\ContextDefinition.
  */
+#[CoversClass(ContextDefinition::class)]
+#[Group('Plugin')]
+#[RunTestsInSeparateProcesses]
 class ContextDefinitionTest extends KernelTestBase {
 
   /**
@@ -20,9 +28,9 @@ class ContextDefinitionTest extends KernelTestBase {
   protected static $modules = ['entity_test', 'user'];
 
   /**
-   * @covers ::isSatisfiedBy
+   * Tests is satisfied by.
    */
-  public function testIsSatisfiedBy() {
+  public function testIsSatisfiedBy(): void {
     $this->installEntitySchema('user');
 
     $value = EntityTest::create([]);
@@ -33,21 +41,33 @@ class ContextDefinitionTest extends KernelTestBase {
     $requirement = new ContextDefinition('any');
     $context = EntityContext::fromEntity($value);
     $this->assertTrue($requirement->isSatisfiedBy($context));
+
+    // Test with multiple values.
+    $definition = EntityContextDefinition::create('entity_test');
+    $definition->setMultiple();
+    $entities = [
+      EntityTest::create([]),
+      EntityTest::create([]),
+    ];
+    $context = new Context($definition, $entities);
+    $this->assertTrue($definition->isSatisfiedBy($context));
   }
 
   /**
-   * @covers ::__construct
+   * Tests entity context definition assert.
+   *
+   * @legacy-covers ::__construct
    */
-  public function testEntityContextDefinitionAssert() {
+  public function testEntityContextDefinitionAssert(): void {
     $this->expectException(\AssertionError::class);
-    $this->expectExceptionMessage('assert(strpos($data_type, \'entity:\') !== 0 || $this instanceof EntityContextDefinition)');
+    $this->expectExceptionMessage('assert(!str_starts_with($data_type, \'entity:\') || $this instanceof EntityContextDefinition)');
     new ContextDefinition('entity:entity_test');
   }
 
   /**
-   * @covers ::create
+   * Tests create with entity data type.
    */
-  public function testCreateWithEntityDataType() {
+  public function testCreateWithEntityDataType(): void {
     $this->assertInstanceOf(EntityContextDefinition::class, ContextDefinition::create('entity:user'));
   }
 

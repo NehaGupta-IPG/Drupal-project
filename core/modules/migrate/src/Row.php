@@ -157,10 +157,11 @@ class Row {
   }
 
   /**
-   * Returns the whole source array.
+   * Retrieves all source properties.
    *
    * @return array
-   *   An array of source plugins.
+   *   An array containing all source property values, keyed by the property
+   *   name.
    */
   public function getSource() {
     return $this->source;
@@ -263,6 +264,32 @@ class Row {
    */
   public function getEmptyDestinationProperties() {
     return $this->emptyDestinationProperties;
+  }
+
+  /**
+   * Tests if a property is an empty destination.
+   *
+   * @param string $property
+   *   The name of the property.
+   *
+   * @return bool
+   *   TRUE if the property is an empty destination.
+   */
+  public function hasEmptyDestinationProperty(string $property): bool {
+    return in_array($property, $this->emptyDestinationProperties);
+  }
+
+  /**
+   * Removes an empty destination property.
+   *
+   * @param string $property
+   *   The name of the empty destination property.
+   */
+  public function removeEmptyDestinationProperty(string $property): void {
+    $this->emptyDestinationProperties = array_diff(
+      $this->emptyDestinationProperties,
+      [$property],
+    );
   }
 
   /**
@@ -412,7 +439,7 @@ class Row {
   }
 
   /**
-   * Returns the hash for the source values..
+   * Returns the hash for the source values.
    *
    * @return mixed
    *   The hash of the source values.

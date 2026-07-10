@@ -1,13 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Installer;
+
+use Drupal\Core\Logger\RfcLogLevel;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Verifies that installing from existing configuration works.
- *
- * @group Installer
  */
-class InstallerExistingConfigMultilingualTest extends InstallerExistingConfigTestBase {
+#[Group('Installer')]
+#[RunTestsInSeparateProcesses]
+class InstallerExistingConfigMultilingualTest extends InstallerConfigDirectoryTestBase {
 
   /**
    * {@inheritdoc}
@@ -17,8 +23,34 @@ class InstallerExistingConfigMultilingualTest extends InstallerExistingConfigTes
   /**
    * {@inheritdoc}
    */
-  protected function getConfigTarball() {
-    return __DIR__ . '/../../../fixtures/config_install/multilingual.tar.gz';
+  protected function getConfigLocation(): string {
+    return __DIR__ . '/../../../fixtures/config_install/multilingual';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function testConfigSync(): void {
+    parent::testConfigSync();
+
+    // Ensure no warning, error, critical, alert or emergency messages have been
+    // logged.
+    $count = (int) \Drupal::database()->select('watchdog', 'w')->fields('w')->condition('severity', RfcLogLevel::WARNING, '<=')->countQuery()->execute()->fetchField();
+    $this->assertSame(0, $count);
+
+    // Ensure the correct message is logged from \Drupal\locale\LocaleConfigBatch::batchFinished().
+    $count = (int) \Drupal::database()->select('watchdog', 'w')->fields('w')->condition('message', 'The configuration was successfully updated. %number configuration objects updated.')->countQuery()->execute()->fetchField();
+    $this->assertSame(1, $count);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpLanguage(): void {
+    // This step is skipped because of an incredibly fiddly logic chain. In
+    // install_load_profile(), the language is automatically detected from the
+    // config sync directory included in the profile that was generated for this
+    // test (see ::prepareEnvironment() and its parents).
   }
 
 }

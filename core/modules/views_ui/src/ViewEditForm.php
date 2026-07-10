@@ -15,9 +15,12 @@ use Drupal\Core\TempStore\SharedTempStoreFactory;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Url;
 use Drupal\views\Views;
+use Drupal\views\ViewsFormHelperTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
  * Form controller for the Views edit form.
@@ -25,6 +28,8 @@ use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
  * @internal
  */
 class ViewEditForm extends ViewFormBase {
+
+  use ViewsFormHelperTrait;
 
   /**
    * The views temp store.
@@ -62,6 +67,13 @@ class ViewEditForm extends ViewFormBase {
   protected $themeManager;
 
   /**
+   * The module handler service.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
    * Constructs a new ViewEditForm object.
    *
    * @param \Drupal\Core\TempStore\SharedTempStoreFactory $temp_store_factory
@@ -74,17 +86,16 @@ class ViewEditForm extends ViewFormBase {
    *   The element info manager.
    * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
    *   The theme manager.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler service.
    */
-  public function __construct(SharedTempStoreFactory $temp_store_factory, RequestStack $requestStack, DateFormatterInterface $date_formatter, ElementInfoManagerInterface $element_info, ThemeManagerInterface $theme_manager = NULL) {
+  public function __construct(SharedTempStoreFactory $temp_store_factory, RequestStack $requestStack, DateFormatterInterface $date_formatter, ElementInfoManagerInterface $element_info, ThemeManagerInterface $theme_manager, ModuleHandlerInterface $module_handler) {
     $this->tempStore = $temp_store_factory->get('views');
     $this->requestStack = $requestStack;
     $this->dateFormatter = $date_formatter;
     $this->elementInfo = $element_info;
-    if ($theme_manager === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $theme_manager argument is deprecated in drupal:9.1.0 and will be required in drupal:10.0.0. See https://www.drupal.org/node/3159506', E_USER_DEPRECATED);
-      $theme_manager = \Drupal::service('theme.manager');
-    }
     $this->themeManager = $theme_manager;
+    $this->moduleHandler = $module_handler;
   }
 
   /**
@@ -96,7 +107,8 @@ class ViewEditForm extends ViewFormBase {
       $container->get('request_stack'),
       $container->get('date.formatter'),
       $container->get('element_info'),
-      $container->get('theme.manager')
+      $container->get('theme.manager'),
+      $container->get('module_handler')
     );
   }
 
@@ -107,13 +119,14 @@ class ViewEditForm extends ViewFormBase {
     /** @var \Drupal\views_ui\ViewUI $view */
     $view = $this->entity;
     $display_id = $this->displayID;
-    // Do not allow the form to be cached, because $form_state->get('view') can become
-    // stale between page requests.
+    // Do not allow the form to be cached, because $form_state->get('view') can
+    // become stale between page requests.
     // See views_ui_ajax_get_form() for how this affects #ajax.
     // @todo To remove this and allow the form to be cacheable:
-    //   - Change $form_state->get('view') to $form_state->getTemporary()['view'].
-    //   - Add a #process function to initialize $form_state->getTemporary()['view']
-    //     on cached form submissions.
+    //   - Change $form_state->get('view') to
+    //     $form_state->getTemporary()['view'].
+    //   - Add a #process function to initialize
+    //     $form_state->getTemporary()['view'] on cached form submissions.
     //   - Use \Drupal\Core\Form\FormStateInterface::loadInclude().
     $form_state->disableCache();
 
@@ -200,7 +213,7 @@ class ViewEditForm extends ViewFormBase {
         }
       }
 
-      // Add the edit display content
+      // Add the edit display content.
       $tab_content = $this->getDisplayTab($view);
       $tab_content['#theme_wrappers'] = ['container'];
       $tab_content['#attributes'] = ['class' => ['views-display-tab']];
@@ -292,6 +305,8 @@ class ViewEditForm extends ViewFormBase {
     foreach ($executable->displayHandlers as $id => $display) {
       if (!empty($display->display['new_id']) && $display->display['new_id'] !== $display->display['id'] && empty($display->display['deleted'])) {
         $new_id = $display->display['new_id'];
+        $attachments = $display->getAttachedDisplays();
+        $old_id = $display->display['id'];
         $display->display['id'] = $new_id;
         unset($display->display['new_id']);
         $executable->displayHandlers->set($new_id, $display);
@@ -299,11 +314,23 @@ class ViewEditForm extends ViewFormBase {
         $displays[$new_id] = $displays[$id];
         unset($displays[$id]);
 
-        // Redirect the user to the renamed display to be sure that the page itself exists and doesn't throw errors.
+        // Redirect the user to the renamed display to be sure that the page
+        // itself exists and doesn't throw errors.
         $form_state->setRedirect('entity.view.edit_display_form', [
           'view' => $view->id(),
           'display_id' => $new_id,
         ]);
+
+        // Find attachments attached to old display id and attach them with new
+        // id.
+        if ($attachments) {
+          foreach ($attachments as $attachment) {
+            $attached_options = $executable->displayHandlers->get($attachment)->getOption('displays');
+            unset($attached_options[$old_id]);
+            $attached_options[$new_id] = $new_id;
+            $executable->displayHandlers->get($attachment)->setOption('displays', $attached_options);
+          }
+        }
       }
       elseif (isset($display->display['new_id'])) {
         unset($display->display['new_id']);
@@ -311,12 +338,13 @@ class ViewEditForm extends ViewFormBase {
     }
     $view->set('display', $displays);
 
-    // @todo: Revisit this when https://www.drupal.org/node/1668866 is in.
+    // @todo Revisit this when https://www.drupal.org/node/1668866 is in.
     $query = $this->requestStack->getCurrentRequest()->query;
     $destination = $query->get('destination');
 
     if (!empty($destination)) {
-      // Find out the first display which has a changed path and redirect to this url.
+      // Find out the first display which has a changed path and redirect to
+      // this URL.
       $old_view = Views::getView($view->id());
       $old_view->initDisplay();
       foreach ($old_view->displayHandlers as $id => $display) {
@@ -367,8 +395,11 @@ class ViewEditForm extends ViewFormBase {
     // If the plugin doesn't exist, display an error message instead of an edit
     // page.
     if (empty($display)) {
-      // @TODO: Improved UX for the case where a plugin is missing.
-      $build['#markup'] = $this->t("Error: Display @display refers to a plugin named '@plugin', but that plugin is not available.", ['@display' => $display->display['id'], '@plugin' => $display->display['display_plugin']]);
+      // @todo Improved UX for the case where a plugin is missing.
+      $build['#markup'] = $this->t("Error: Display @display refers to a plugin named '@plugin', but that plugin is not available.", [
+        '@display' => $display->display['id'],
+        '@plugin' => $display->display['display_plugin'],
+      ]);
     }
     // Build the content of the edit page.
     else {
@@ -378,7 +409,7 @@ class ViewEditForm extends ViewFormBase {
     // context, so hook_form_view_edit_form_alter() is insufficient.
     // @todo remove this after
     //   https://www.drupal.org/project/drupal/issues/3087455 has been resolved.
-    \Drupal::moduleHandler()->alter('views_ui_display_tab', $build, $view, $display_id);
+    $this->moduleHandler->alter('views_ui_display_tab', $build, $view, $display_id);
     // Because themes can implement hook_form_FORM_ID_alter() and because this
     // is a workaround for hook_form_view_edit_form_alter() being insufficient,
     // also invoke this on themes.
@@ -394,6 +425,7 @@ class ViewEditForm extends ViewFormBase {
    * @param \Drupal\views_ui\ViewUI $view
    *   The ViewUI entity.
    * @param array $display
+   *   The display.
    *
    * @return array
    *   A renderable page build array.
@@ -408,13 +440,18 @@ class ViewEditForm extends ViewFormBase {
     $is_display_deleted = !empty($display['deleted']);
     // The default display cannot be duplicated.
     $is_default = $display['id'] == 'default';
-    // @todo: Figure out why getOption doesn't work here.
+    // @todo Figure out why getOption doesn't work here.
     $is_enabled = $view->getExecutable()->displayHandlers->get($display['id'])->isEnabled();
 
     if ($display['id'] != 'default') {
       $build['top']['#theme_wrappers'] = ['container'];
       $build['top']['#attributes']['id'] = 'edit-display-settings-top';
-      $build['top']['#attributes']['class'] = ['views-ui-display-tab-actions', 'edit-display-settings-top', 'views-ui-display-tab-bucket', 'clearfix'];
+      $build['top']['#attributes']['class'] = [
+        'views-ui-display-tab-actions',
+        'edit-display-settings-top',
+        'views-ui-display-tab-bucket',
+        'clearfix',
+      ];
 
       // The Delete, Duplicate and Undo Delete buttons.
       $build['top']['actions'] = [
@@ -441,9 +478,9 @@ class ViewEditForm extends ViewFormBase {
         elseif ($view->status() && $view->getExecutable()->displayHandlers->get($display['id'])->hasPath()) {
           $path = $view->getExecutable()->displayHandlers->get($display['id'])->getPath();
 
-          if ($path && (strpos($path, '%') === FALSE)) {
+          if ($path && (!str_contains($path, '%'))) {
             // Wrap this in a try/catch as trying to generate links to some
-            // routes may throw a NotAcceptableHttpException if they do not
+            // routes may throw an exception, for example if they do not
             // respond to HTML, such as RESTExports.
             try {
               if (!parse_url($path, PHP_URL_SCHEME)) {
@@ -455,7 +492,7 @@ class ViewEditForm extends ViewFormBase {
                 $url = Url::fromUri("base:$path");
               }
             }
-            catch (NotAcceptableHttpException $e) {
+            catch (BadRequestException | NotAcceptableHttpException) {
               $url = '/' . $path;
             }
 
@@ -536,7 +573,10 @@ class ViewEditForm extends ViewFormBase {
 
     $build['columns'] = [];
     $build['columns']['#theme_wrappers'] = ['container'];
-    $build['columns']['#attributes'] = ['id' => 'edit-display-settings-main', 'class' => ['clearfix', 'views-display-columns']];
+    $build['columns']['#attributes'] = [
+      'id' => 'edit-display-settings-main',
+      'class' => ['clearfix', 'views-display-columns'],
+    ];
 
     $build['columns']['first']['#theme_wrappers'] = ['container'];
     $build['columns']['first']['#attributes'] = ['class' => ['views-display-column', 'first']];
@@ -550,11 +590,8 @@ class ViewEditForm extends ViewFormBase {
     $build['columns']['second']['empty'] = [];
     $build['columns']['second']['pager'] = [];
 
-    // The third column buckets are wrapped in details.
     $build['columns']['third'] = [
-      '#type' => 'details',
-      '#title' => $this->t('Advanced'),
-      '#theme_wrappers' => ['details'],
+      '#theme_wrappers' => ['container'],
       '#attributes' => [
         'class' => [
           'views-display-column',
@@ -562,14 +599,13 @@ class ViewEditForm extends ViewFormBase {
         ],
       ],
     ];
-    // Collapse the details by default.
-    $build['columns']['third']['#open'] = \Drupal::config('views.settings')->get('ui.show.advanced_column');
 
-    // Each option (e.g. title, access, display as grid/table/list) fits into one
-    // of several "buckets," or boxes (Format, Fields, Sort, and so on).
+    // Each option (e.g. title, access, display as grid/table/list) fits into
+    // one of several "buckets," or boxes (Format, Fields, Sort, and so on).
     $buckets = [];
 
-    // Fetch options from the display plugin, with a list of buckets they go into.
+    // Fetch options from the display plugin, with a list of buckets they go
+    // into.
     $options = [];
     $view->getExecutable()->displayHandlers->get($display['id'])->optionsSummary($buckets, $options);
 
@@ -585,8 +621,8 @@ class ViewEditForm extends ViewFormBase {
       if (isset($bucket['column']) && isset($build['columns'][$bucket['column']])) {
         $column = $bucket['column'];
       }
-      // If a bucket doesn't pick one of our predefined columns to belong to, put
-      // it in the last one.
+      // If a bucket doesn't pick one of our predefined columns to belong to,
+      // put it in the last one.
       else {
         $column = 'third';
       }
@@ -604,9 +640,14 @@ class ViewEditForm extends ViewFormBase {
     $build['columns']['second']['header'] = $this->getFormBucket($view, 'header', $display);
     $build['columns']['second']['footer'] = $this->getFormBucket($view, 'footer', $display);
     $build['columns']['second']['empty'] = $this->getFormBucket($view, 'empty', $display);
-    $build['columns']['third']['arguments'] = $this->getFormBucket($view, 'argument', $display);
     $build['columns']['third']['relationships'] = $this->getFormBucket($view, 'relationship', $display);
+    $build['columns']['third']['arguments'] = $this->getFormBucket($view, 'argument', $display);
 
+    // If there is a contextual filter or a relationship set, expand the
+    // Advanced column to display these values to the user.
+    if (!empty($build['columns']['third']['relationships']['fields']) || !empty($build['columns']['third']['arguments']['fields'])) {
+      $build['columns']['third']['#open'] = TRUE;
+    }
     return $build;
   }
 
@@ -615,13 +656,13 @@ class ViewEditForm extends ViewFormBase {
    */
   public function submitDisplayUndoDelete($form, FormStateInterface $form_state) {
     $view = $this->entity;
-    // Create the new display
+    // Create the new display.
     $id = $form_state->get('display_id');
     $displays = $view->get('display');
     $displays[$id]['deleted'] = FALSE;
     $view->set('display', $displays);
 
-    // Store in cache
+    // Store in cache.
     $view->cacheSet();
 
     // Redirect to the top-level edit page.
@@ -637,10 +678,10 @@ class ViewEditForm extends ViewFormBase {
   public function submitDisplayEnable($form, FormStateInterface $form_state) {
     $view = $this->entity;
     $id = $form_state->get('display_id');
-    // setOption doesn't work because this would might affect upper displays
+    // setOption doesn't work because this would might affect upper displays.
     $view->getExecutable()->displayHandlers->get($id)->setOption('enabled', TRUE);
 
-    // Store in cache
+    // Store in cache.
     $view->cacheSet();
 
     // Redirect to the top-level edit page.
@@ -658,7 +699,7 @@ class ViewEditForm extends ViewFormBase {
     $id = $form_state->get('display_id');
     $view->getExecutable()->displayHandlers->get($id)->setOption('enabled', FALSE);
 
-    // Store in cache
+    // Store in cache.
     $view->cacheSet();
 
     // Redirect to the top-level edit page.
@@ -706,7 +747,8 @@ class ViewEditForm extends ViewFormBase {
     $build = $this->getDisplayTab($view);
     $response->addCommand(new HtmlCommand('#views-tab-' . $display_id, $build));
 
-    // Regenerate the top area so changes to display names and order will appear.
+    // Regenerate the top area so changes to display names and order will
+    // appear.
     $build = $this->renderDisplayTop($view);
     $response->addCommand(new ReplaceCommand('#views-display-top', $build));
   }
@@ -720,7 +762,7 @@ class ViewEditForm extends ViewFormBase {
     $element['#attributes']['class'] = ['views-display-top', 'clearfix'];
     $element['#attributes']['id'] = ['views-display-top'];
 
-    // Extra actions for the display
+    // Extra actions for the display.
     $element['extra_actions'] = [
       '#type' => 'dropbutton',
       '#attributes' => [
@@ -729,12 +771,20 @@ class ViewEditForm extends ViewFormBase {
       '#links' => [
         'edit-details' => [
           'title' => $this->t('Edit view name/description'),
-          'url' => Url::fromRoute('views_ui.form_edit_details', ['js' => 'nojs', 'view' => $view->id(), 'display_id' => $display_id]),
+          'url' => Url::fromRoute('views_ui.form_edit_details', [
+            'js' => 'nojs',
+            'view' => $view->id(),
+            'display_id' => $display_id,
+          ]),
           'attributes' => ['class' => ['views-ajax-link']],
         ],
         'analyze' => [
           'title' => $this->t('Analyze view'),
-          'url' => Url::fromRoute('views_ui.form_analyze', ['js' => 'nojs', 'view' => $view->id(), 'display_id' => $display_id]),
+          'url' => Url::fromRoute('views_ui.form_analyze', [
+            'js' => 'nojs',
+            'view' => $view->id(),
+            'display_id' => $display_id,
+          ]),
           'attributes' => ['class' => ['views-ajax-link']],
         ],
         'duplicate' => [
@@ -743,7 +793,11 @@ class ViewEditForm extends ViewFormBase {
         ],
         'reorder' => [
           'title' => $this->t('Reorder displays'),
-          'url' => Url::fromRoute('views_ui.form_reorder_displays', ['js' => 'nojs', 'view' => $view->id(), 'display_id' => $display_id]),
+          'url' => Url::fromRoute('views_ui.form_reorder_displays', [
+            'js' => 'nojs',
+            'view' => $view->id(),
+            'display_id' => $display_id,
+          ]),
           'attributes' => ['class' => ['views-ajax-link']],
         ],
       ],
@@ -757,7 +811,7 @@ class ViewEditForm extends ViewFormBase {
     }
 
     // Let other modules add additional links here.
-    \Drupal::moduleHandler()->alter('views_ui_display_top_links', $element['extra_actions']['#links'], $view, $display_id);
+    $this->moduleHandler->alter('views_ui_display_top_links', $element['extra_actions']['#links'], $view, $display_id);
 
     if (isset($view->type) && $view->type != $this->t('Default')) {
       if ($view->type == $this->t('Overridden')) {
@@ -792,10 +846,16 @@ class ViewEditForm extends ViewFormBase {
         '#value' => $this->t('Add @display', ['@display' => $label]),
         '#limit_validation_errors' => [],
         '#submit' => ['::submitDisplayAdd', '::submitDelayDestination'],
-        '#attributes' => ['class' => ['add-display']],
-        // Allow JavaScript to remove the 'Add ' prefix from the button label when
-        // placing the button in an "Add" dropdown menu.
-        '#process' => array_merge(['views_ui_form_button_was_clicked'], $this->elementInfo->getInfoProperty('submit', '#process', [])),
+        '#attributes' => [
+          'class' => ['add-display'],
+          'data-drupal-dropdown-label' => $label,
+        ],
+        // Allow JavaScript to remove the 'Add ' prefix from the button label
+        // when placing the button in an "Add" dropdown menu.
+        '#process' => [
+          [static::class, 'formButtonWasClicked'],
+          ...$this->elementInfo->getInfoProperty('submit', '#process', []),
+        ],
         '#values' => [$this->t('Add @display', ['@display' => $label]), $label],
       ];
     }
@@ -804,7 +864,7 @@ class ViewEditForm extends ViewFormBase {
     // context, so hook_form_view_edit_form_alter() is insufficient.
     // @todo remove this after
     //   https://www.drupal.org/project/drupal/issues/3087455 has been resolved.
-    \Drupal::moduleHandler()->alter('views_ui_display_top', $element, $view, $display_id);
+    $this->moduleHandler->alter('views_ui_display_top', $element, $view, $display_id);
     // Because themes can implement hook_form_FORM_ID_alter() and because this
     // is a workaround for hook_form_view_edit_form_alter() being insufficient,
     // also invoke this on themes.
@@ -822,8 +882,8 @@ class ViewEditForm extends ViewFormBase {
    * the SharedTempStore rather than $form_state->setRebuild(). Without this
    * submit handler, buttons that add or remove displays would redirect to the
    * destination parameter (e.g., when the Edit View form is linked to from a
-   * contextual link). This handler can be added to buttons whose form submission
-   * should not yet redirect to the destination.
+   * contextual link). This handler can be added to buttons whose form
+   * submission should not yet redirect to the destination.
    */
   public function submitDelayDestination($form, FormStateInterface $form_state) {
     $request = $this->requestStack->getCurrentRequest();
@@ -983,7 +1043,12 @@ class ViewEditForm extends ViewFormBase {
     $build['#name'] = $type;
     $build['#title'] = $types[$type]['title'];
 
-    $rearrange_url = Url::fromRoute('views_ui.form_rearrange', ['js' => 'nojs', 'view' => $view->id(), 'display_id' => $display['id'], 'type' => $type]);
+    $rearrange_url = Url::fromRoute('views_ui.form_rearrange', [
+      'js' => 'nojs',
+      'view' => $view->id(),
+      'display_id' => $display['id'],
+      'type' => $type,
+    ]);
     $class = 'icon compact rearrange';
 
     // Different types now have different rearrange forms, so we use this switch
@@ -992,8 +1057,12 @@ class ViewEditForm extends ViewFormBase {
       case 'filter':
         // The rearrange form for filters contains the and/or UI, so override
         // the used path.
-        $rearrange_url = Url::fromRoute('views_ui.form_rearrange_filter', ['js' => 'nojs', 'view' => $view->id(), 'display_id' => $display['id']]);
-        // TODO: Add another class to have another symbol for filter rearrange.
+        $rearrange_url = Url::fromRoute('views_ui.form_rearrange_filter', [
+          'js' => 'nojs',
+          'view' => $view->id(),
+          'display_id' => $display['id'],
+        ]);
+        // @todo Add another class to have another symbol for filter rearrange.
         $class = 'icon compact rearrange';
         break;
 
@@ -1034,7 +1103,12 @@ class ViewEditForm extends ViewFormBase {
 
     $actions['add'] = [
       'title' => $add_text,
-      'url' => Url::fromRoute('views_ui.form_add_handler', ['js' => 'nojs', 'view' => $view->id(), 'display_id' => $display['id'], 'type' => $type]),
+      'url' => Url::fromRoute('views_ui.form_add_handler', [
+        'js' => 'nojs',
+        'view' => $view->id(),
+        'display_id' => $display['id'],
+        'type' => $type,
+      ]),
       'attributes' => ['class' => ['icon compact add', 'views-ajax-link'], 'id' => 'views-add-' . $type],
     ];
     if ($count_handlers > 0) {
@@ -1048,7 +1122,7 @@ class ViewEditForm extends ViewFormBase {
       ];
     }
 
-    // Render the array of links
+    // Render the array of links.
     $build['#actions'] = [
       '#type' => 'dropbutton',
       '#links' => $actions,
@@ -1139,7 +1213,13 @@ class ViewEditForm extends ViewFormBase {
           'display_id' => $display['id'],
           'type' => $type,
           'id' => $id,
-        ], ['attributes' => ['class' => ['views-button-configure', 'views-ajax-link'], 'title' => $this->t('Aggregation settings')]]))->toString();
+        ],
+          [
+            'attributes' => [
+              'class' => ['views-button-configure', 'views-ajax-link'],
+              'title' => $this->t('Aggregation settings'),
+            ],
+          ]))->toString();
       }
 
       if ($handler->hasExtraOptions()) {
@@ -1163,7 +1243,8 @@ class ViewEditForm extends ViewFormBase {
       }
     }
 
-    // If using grouping, re-order fields so that they show up properly in the list.
+    // If using grouping, re-order fields so that they show up properly in the
+    // list.
     if ($type == 'filter' && $grouping) {
       $store = $build['fields'];
       $build['fields'] = [];
@@ -1182,7 +1263,10 @@ class ViewEditForm extends ViewFormBase {
         foreach ($contents as $key => $pid) {
           if ($key != $last) {
             $operator = $group_info['groups'][$gid] == 'OR' ? $this->t('OR') : $this->t('AND');
-            $store[$pid]['#link'] = new FormattableMarkup('@link <span>@operator</span>', ['@link' => $store[$pid]['#link'], '@operator' => $operator]);
+            $store[$pid]['#link'] = new FormattableMarkup('@link <span>@operator</span>', [
+              '@link' => $store[$pid]['#link'],
+              '@operator' => $operator,
+            ]);
           }
           $build['fields'][$pid] = $store[$pid];
         }

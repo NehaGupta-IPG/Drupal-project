@@ -13,6 +13,7 @@
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Site\Settings;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,6 +30,17 @@ DrupalKernel::bootEnvironment();
 
 try {
   Settings::initialize(dirname(__DIR__), DrupalKernel::findSitePath($request), $autoloader);
+  // Initialize our list of trusted HTTP Host headers to protect against
+  // header attacks.
+  $host_patterns = Settings::get('trusted_host_patterns', []);
+  if (PHP_SAPI !== 'cli' && !empty($host_patterns)) {
+    \Closure::bind(static function () use ($host_patterns, $request) {
+      if (DrupalKernel::setupTrustedHosts($request, $host_patterns) === FALSE) {
+        throw new BadRequestHttpException('The provided host name is not valid for this server.');
+      }
+    }, NULL, DrupalKernel::class)();
+
+  }
 }
 catch (HttpExceptionInterface $e) {
   $response = new Response('', $e->getStatusCode());
@@ -38,7 +50,7 @@ catch (HttpExceptionInterface $e) {
 
 if (Settings::get('rebuild_access', FALSE) ||
   ($request->query->get('token') && $request->query->get('timestamp') &&
-    ((REQUEST_TIME - $request->query->get('timestamp')) < 300) &&
+    (($request->server->getInt('REQUEST_TIME') - $request->query->get('timestamp')) < 300) &&
     hash_equals(Crypt::hmacBase64($request->query->get('timestamp'), Settings::get('hash_salt')), $request->query->get('token'))
   )) {
   // Clear user cache for all major platforms.

@@ -3,7 +3,6 @@
 namespace Drupal\Core\Cache;
 
 use Drupal\Component\Assertion\Inspector;
-use Drupal\Component\Utility\Crypt;
 use Drupal\Core\DestructableInterface;
 use Drupal\Core\Lock\LockBackendInterface;
 
@@ -74,14 +73,14 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
   protected $storage = [];
 
   /**
-   * Stores the cache creation time.
+   * The cache item's data as loaded during this request, or NULL if none.
    *
-   * This is used to check if an invalidated cache item has been overwritten in
-   * the meantime.
-   *
-   * @var int
+   * Retained so that ::updateCache() can fingerprint it to detect a concurrent
+   * change. The fingerprint is computed lazily there, and only when there is
+   * data to write back, so that requests that only read from the collector do
+   * not pay for hashing.
    */
-  protected $cacheCreated;
+  protected ?array $loadedData = NULL;
 
   /**
    * Flag that indicates of the cache has been invalidated.
@@ -123,6 +122,7 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
    * Gets the cache ID.
    *
    * @return string
+   *   The cache ID.
    */
   protected function getCid() {
     return $this->cid;
@@ -134,7 +134,7 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
   public function has($key) {
     // Make sure the value is loaded.
     $this->get($key);
-    return isset($this->storage[$key]) || array_key_exists($key, $this->storage);
+    return \array_key_exists($key, $this->storage);
   }
 
   /**
@@ -142,7 +142,7 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
    */
   public function get($key) {
     $this->lazyLoadCache();
-    if (isset($this->storage[$key]) || array_key_exists($key, $this->storage)) {
+    if (\array_key_exists($key, $this->storage)) {
       return $this->storage[$key];
     }
     else {
@@ -157,7 +157,11 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
    * value will only apply while the object is in scope and will not be written
    * back to the persistent cache. This follows a similar pattern to static vs.
    * persistent caching in procedural code. Extending classes may wish to alter
-   * this behavior, for example by adding a call to persist().
+   * this behavior, for example by adding a call to persist(). If you are
+   * writing data to somewhere in addition to the cache item in ::set(), you
+   * should invalidate the cache item within a lock to ensure that another
+   * request that starts with an empty cache item does not overwrite with the
+   * previous value. For example: Drupal\Core\State\State.
    */
   public function set($key, $value) {
     $this->lazyLoadCache();
@@ -165,7 +169,6 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
     // The key might have been marked for deletion.
     unset($this->keysToRemove[$key]);
     $this->invalidateCache();
-
   }
 
   /**
@@ -187,7 +190,7 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
    *   The key that was requested.
    * @param bool $persist
    *   (optional) Whether the offset should be persisted or not, defaults to
-   *   TRUE. When called with $persist = FALSE the offset will be unflagged so
+   *   TRUE. When called with $persist = FALSE the offset will be un-flagged so
    *   that it will not be written at the end of the request.
    */
   protected function persist($key, $persist = TRUE) {
@@ -227,46 +230,50 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
       return;
     }
 
-    // Lock cache writes to help avoid stampedes.
+    // Lock cache writes to help avoid stampedes. Try to acquire the lock, but
+    // continue even if it cannot be acquired: a ::set() or ::delete() during
+    // this request may have invalidated the cache item, and that invalidation
+    // must be propagated whether or not the lock is held. Only the cache write
+    // itself depends on the lock.
     $cid = $this->getCid();
-    $lock_name = $this->normalizeLockName($cid . ':' . __CLASS__);
-    if (!$lock || $this->lock->acquire($lock_name)) {
-      // Set and delete operations invalidate the cache item. Try to also load
-      // an eventually invalidated cache entry, only update an invalidated cache
-      // entry if the creation date did not change as this could result in an
-      // inconsistent cache.
-      if ($cache = $this->cache->get($cid, $this->cacheInvalidated)) {
-        if ($this->cacheInvalidated && $cache->created != $this->cacheCreated) {
-          // We have invalidated the cache in this request and got a different
-          // cache entry. Do not attempt to overwrite data that might have been
-          // changed in a different request. We'll let the cache rebuild in
-          // later requests.
-          $this->cache->delete($cid);
-          $this->lock->release($lock_name);
-          return;
-        }
+    $lock_name = $cid . ':' . __CLASS__;
+    $lock_acquired = FALSE;
+    if ($lock) {
+      $lock_acquired = $this->lock->acquire($lock_name);
+    }
+
+    // Set and delete operations invalidate the cache item, so load an
+    // invalidated cache entry too if this request invalidated it. Comparing
+    // the content detects changes to the content; if it changed, another
+    // request is responsible for it and this request must not overwrite that
+    // work.
+    $cache = $this->cache->get($cid, $this->cacheInvalidated);
+    $fingerprint = $cache ? $this->fingerprint($cache->data) : NULL;
+    $loaded_fingerprint = $this->loadedData === NULL ? NULL : $this->fingerprint($this->loadedData);
+    $unchanged = $fingerprint === $loaded_fingerprint;
+
+    if ($cache && $this->cacheInvalidated) {
+      // This request invalidated the cache item via ::set() or ::delete() and a
+      // cache item still exists. Delete it so that a later request rebuilds it
+      // cleanly; the up-to-date value is written within a lock by the caller
+      // (see ::set()). This happens whether or not the lock was acquired.
+      $this->cache->delete($cid);
+    }
+    elseif ($unchanged && (!$lock || $lock_acquired)) {
+      // The cache item is in the same state as when it was loaded, so it is
+      // safe to write back the data collected during this request, merged with
+      // any existing cache data and with deleted keys removed.
+      if ($cache) {
         $data = array_merge($cache->data, $data);
       }
-      elseif ($this->cacheCreated) {
-        // Getting here indicates that there was a cache entry at the
-        // beginning of the request, but now it's gone (some other process
-        // must have cleared it). We back out to prevent corrupting the cache
-        // with incomplete data, since we won't be able to properly merge
-        // the existing cache data from earlier with the new data.
-        // A future request will properly hydrate the cache from scratch.
-        if ($lock) {
-          $this->lock->release($lock_name);
-        }
-        return;
-      }
-      // Remove keys marked for deletion.
       foreach ($this->keysToRemove as $delete_key) {
         unset($data[$delete_key]);
       }
       $this->cache->set($cid, $data, Cache::PERMANENT, $this->tags);
-      if ($lock) {
-        $this->lock->release($lock_name);
-      }
+    }
+
+    if ($lock_acquired) {
+      $this->lock->release($lock_name);
     }
 
     $this->keysToPersist = [];
@@ -274,27 +281,17 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
   }
 
   /**
-   * Normalizes a cache ID in order to comply with database limitations.
+   * Computes a fingerprint of cache item data for change detection.
    *
-   * @param string $cid
-   *   The passed in cache ID.
+   * @param array $data
+   *   The cache item data.
    *
    * @return string
-   *   An ASCII-encoded cache ID that is at most 255 characters long.
+   *   A hash of the data. A concurrent write that changes the data produces a
+   *   different fingerprint, even when it happens within the same millisecond.
    */
-  protected function normalizeLockName($cid) {
-    // Nothing to do if the ID is a US ASCII string of 255 characters or less.
-    $cid_is_ascii = mb_check_encoding($cid, 'ASCII');
-    if (strlen($cid) <= 255 && $cid_is_ascii) {
-      return $cid;
-    }
-    // Return a string that uses as much as possible of the original cache ID
-    // with the hash appended.
-    $hash = Crypt::hashBase64($cid);
-    if (!$cid_is_ascii) {
-      return $hash;
-    }
-    return substr($cid, 0, 255 - strlen($hash)) . $hash;
+  protected function fingerprint(array $data): string {
+    return hash('xxh128', serialize($data));
   }
 
   /**
@@ -305,6 +302,7 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
     $this->keysToPersist = [];
     $this->keysToRemove = [];
     $this->cacheLoaded = FALSE;
+    $this->loadedData = NULL;
   }
 
   /**
@@ -325,6 +323,7 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
    */
   public function destruct() {
     $this->updateCache();
+    $this->reset();
   }
 
   /**
@@ -338,8 +337,12 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
     $this->cacheLoaded = TRUE;
 
     if ($cache = $this->cache->get($this->getCid())) {
-      $this->cacheCreated = $cache->created;
       $this->storage = $cache->data;
+      // Retain the loaded data so that ::updateCache() can detect whether the
+      // cache item changed during the request. The fingerprint is computed
+      // lazily there, and only when there is data to write back, so that
+      // requests that only read from the collector do not pay for hashing.
+      $this->loadedData = $cache->data;
     }
   }
 

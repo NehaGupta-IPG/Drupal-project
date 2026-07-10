@@ -1,21 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Form;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the form API email element.
- *
- * @group Form
  */
+#[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class EmailTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['form_test'];
 
@@ -27,14 +29,14 @@ class EmailTest extends BrowserTestBase {
   /**
    * Tests that #type 'email' fields are properly validated.
    */
-  public function testFormEmail() {
+  public function testFormEmail(): void {
     $edit = [];
     $edit['email'] = 'invalid';
     $edit['email_required'] = ' ';
     $this->drupalGet('form-test/email');
     $this->submitForm($edit, 'Submit');
-    $this->assertRaw(t('The email address %mail is not valid.', ['%mail' => 'invalid']));
-    $this->assertRaw(t('@name field is required.', ['@name' => 'Address']));
+    $this->assertSession()->pageTextContains("The email address invalid is not valid.");
+    $this->assertSession()->pageTextContains("Address field is required.");
 
     $edit = [];
     $edit['email_required'] = '  foo.bar@example.com ';

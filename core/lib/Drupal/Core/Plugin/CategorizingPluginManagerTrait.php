@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Plugin;
 
+use Drupal\Core\Extension\Exception\UnknownExtensionException;
+use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
@@ -46,35 +48,34 @@ trait CategorizingPluginManagerTrait {
    *   machine-readable name passed.
    */
   protected function getProviderName($provider) {
-    $list = $this->getModuleHandler()->getModuleList();
-    // If the module exists, return its human-readable name.
-    if (isset($list[$provider])) {
-      return $this->getModuleHandler()->getName($provider);
+    try {
+      return $this->getModuleExtensionList()->getName($provider);
     }
-    // Otherwise, return the machine name.
-    return $provider;
+    catch (UnknownExtensionException) {
+      // Otherwise, return the machine name.
+      return $provider;
+    }
   }
 
   /**
-   * Returns the module handler used.
+   * Returns the module extension list used.
    *
-   * @return \Drupal\Core\Extension\ModuleHandlerInterface
-   *   The module handler.
+   * @return \Drupal\Core\Extension\ModuleExtensionList
+   *   The module extension list.
    */
-  public function getModuleHandler() {
-    // If the class has an injected module handler, use it. Otherwise fall back
-    // to fetch it from the service container.
-    if (isset($this->moduleHandler)) {
-      return $this->moduleHandler;
+  protected function getModuleExtensionList(): ModuleExtensionList {
+    // If the class has an injected module extension list, use it. Otherwise
+    // fall back to fetch it from the service container.
+    if (isset($this->moduleExtensionList)) {
+      return $this->moduleExtensionList;
     }
-    return \Drupal::moduleHandler();
+    return \Drupal::service('extension.list.module');
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCategories() {
-    /** @var \Drupal\Core\Plugin\CategorizingPluginManagerTrait|\Drupal\Component\Plugin\PluginManagerInterface $this */
     // Fetch all categories from definitions and remove duplicates.
     $categories = array_unique(array_values(array_map(function ($definition) {
       return $definition['category'];
@@ -86,12 +87,11 @@ trait CategorizingPluginManagerTrait {
   /**
    * {@inheritdoc}
    */
-  public function getSortedDefinitions(array $definitions = NULL, $label_key = 'label') {
+  public function getSortedDefinitions(?array $definitions = NULL, string $label_key = 'label') {
     // Sort the plugins first by category, then by label.
-    /** @var \Drupal\Core\Plugin\CategorizingPluginManagerTrait|\Drupal\Component\Plugin\PluginManagerInterface $this */
-    $definitions = isset($definitions) ? $definitions : $this->getDefinitions();
+    $definitions = $definitions ?? $this->getDefinitions();
     uasort($definitions, function ($a, $b) use ($label_key) {
-      if ($a['category'] != $b['category']) {
+      if ((string) $a['category'] != (string) $b['category']) {
         return strnatcasecmp($a['category'], $b['category']);
       }
       return strnatcasecmp($a[$label_key], $b[$label_key]);
@@ -102,14 +102,19 @@ trait CategorizingPluginManagerTrait {
   /**
    * {@inheritdoc}
    */
-  public function getGroupedDefinitions(array $definitions = NULL, $label_key = 'label') {
-    /** @var \Drupal\Core\Plugin\CategorizingPluginManagerTrait|\Drupal\Component\Plugin\PluginManagerInterface $this */
-    $definitions = $this->getSortedDefinitions(isset($definitions) ? $definitions : $this->getDefinitions(), $label_key);
+  public function getGroupedDefinitions(?array $definitions = NULL, string $label_key = 'label') {
+    // @phpstan-ignore arguments.count
+    $definitions = $this->getSortedDefinitions($definitions ?? $this->getDefinitions(), $label_key);
     $grouped_definitions = [];
     foreach ($definitions as $id => $definition) {
       $grouped_definitions[(string) $definition['category']][$id] = $definition;
     }
     return $grouped_definitions;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  abstract public function getDefinitions();
 
 }

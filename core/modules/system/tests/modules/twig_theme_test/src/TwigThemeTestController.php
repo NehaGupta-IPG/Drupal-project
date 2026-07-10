@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\twig_theme_test;
 
 use Drupal\Core\Template\Attribute;
@@ -109,6 +111,13 @@ class TwigThemeTestController {
    */
   public function embedTagRender() {
     return ['#theme' => 'twig_theme_test_embed_tag'];
+  }
+
+  /**
+   * Renders for testing drupal_dump function.
+   */
+  public function dump() {
+    return ['#theme' => 'twig_theme_test_dump'];
   }
 
 }

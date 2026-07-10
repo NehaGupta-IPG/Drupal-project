@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\theme_test;
 
 use Drupal\Core\Controller\ControllerBase;
@@ -47,7 +49,7 @@ class ThemeTestController extends ControllerBase {
     $element['test'] = [
       '#type' => 'inline_template',
       '#template' => 'test-with-context {{ llama }}',
-      '#context' => ['llama' => 'muuh'],
+      '#context' => ['llama' => 'social'],
     ];
     return $element;
   }
@@ -133,12 +135,11 @@ class ThemeTestController extends ControllerBase {
   }
 
   /**
-   * Controller for testing a namespaced class in a theme.
+   * Controller for testing callable preprocess functions.
    */
-  public function testThemeClass() {
+  public function preprocessCallback() {
     return [
-      '#theme' => 'theme_test_theme_class',
-      '#title' => 'Testing loading a class from a .theme file',
+      '#theme' => 'theme_test_preprocess_callback',
     ];
   }
 

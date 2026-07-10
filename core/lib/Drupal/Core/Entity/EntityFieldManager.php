@@ -7,9 +7,11 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\UseCacheBackendTrait;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Field\FieldConfigInterface;
 use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\PreWarm\PreWarmableInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 
@@ -19,17 +21,20 @@ use Drupal\Core\TypedData\TypedDataManagerInterface;
  * This includes field definitions, base field definitions, and field storage
  * definitions.
  */
-class EntityFieldManager implements EntityFieldManagerInterface {
+class EntityFieldManager implements EntityFieldManagerInterface, PreWarmableInterface {
 
   use UseCacheBackendTrait;
   use StringTranslationTrait;
 
   /**
-   * Extra fields by bundle.
+   * Extra fields info, if initialized.
    *
-   * @var array
+   * The fields are keyed by entity type, bundle, type ('form' or 'display'),
+   * and the extra field name.
+   *
+   * @var array[][][][]|null
    */
-  protected $extraFields = [];
+  protected ?array $extraFields = NULL;
 
   /**
    * Static cache of base field definitions.
@@ -63,8 +68,17 @@ class EntityFieldManager implements EntityFieldManagerInterface {
   protected $activeFieldStorageDefinitions;
 
   /**
-   * An array keyed by entity type. Each value is an array whose keys are
-   * field names and whose value is an array with two entries:
+   * Static cache of base field overrides per entity type and bundle.
+   *
+   * @var array
+   */
+  protected $baseFieldOverrides;
+
+  /**
+   * An array of lightweight maps of fields, keyed by entity type.
+   *
+   * Each value is an array whose keys are field names and whose value is an
+   * array with two entries:
    *   - type: The field type.
    *   - bundles: The bundles in which the field appears.
    *
@@ -73,10 +87,11 @@ class EntityFieldManager implements EntityFieldManagerInterface {
   protected $fieldMap = [];
 
   /**
-   * An array keyed by field type. Each value is an array whose key are entity
-   * types including arrays in the same form that $fieldMap.
+   * An array of lightweight maps of fields, keyed by field type.
    *
-   * It helps access the mapping between types and fields by the field type.
+   * Each value is an array whose key are entity types including arrays in the
+   * same form as $fieldMap. It helps access the mapping between types and
+   * fields by the field type.
    *
    * @var array
    */
@@ -160,7 +175,7 @@ class EntityFieldManager implements EntityFieldManagerInterface {
    * @param \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository
    *   The entity last installed schema repository.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, EntityDisplayRepositoryInterface $entity_display_repository, TypedDataManagerInterface $typed_data_manager, LanguageManagerInterface $language_manager, KeyValueFactoryInterface $key_value_factory, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository = NULL) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, EntityDisplayRepositoryInterface $entity_display_repository, TypedDataManagerInterface $typed_data_manager, LanguageManagerInterface $language_manager, KeyValueFactoryInterface $key_value_factory, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
     $this->entityDisplayRepository = $entity_display_repository;
@@ -170,10 +185,6 @@ class EntityFieldManager implements EntityFieldManagerInterface {
     $this->keyValueFactory = $key_value_factory;
     $this->moduleHandler = $module_handler;
     $this->cacheBackend = $cache_backend;
-    if (!$entity_last_installed_schema_repository) {
-      @trigger_error('The entity.last_installed_schema.repository service must be passed to EntityFieldManager::__construct(), it is required before drupal:10.0.0.', E_USER_DEPRECATED);
-      $entity_last_installed_schema_repository = \Drupal::service('entity.last_installed_schema.repository');
-    }
     $this->entityLastInstalledSchemaRepository = $entity_last_installed_schema_repository;
   }
 
@@ -191,7 +202,10 @@ class EntityFieldManager implements EntityFieldManagerInterface {
       else {
         // Rebuild the definitions and put it into the cache.
         $this->baseFieldDefinitions[$entity_type_id] = $this->buildBaseFieldDefinitions($entity_type_id);
-        $this->cacheSet($cid, $this->baseFieldDefinitions[$entity_type_id], Cache::PERMANENT, ['entity_types', 'entity_field_info']);
+        $this->cacheSet($cid, $this->baseFieldDefinitions[$entity_type_id], Cache::PERMANENT, [
+          'entity_types',
+          'entity_field_info',
+        ]);
       }
     }
     return $this->baseFieldDefinitions[$entity_type_id];
@@ -275,28 +289,29 @@ class EntityFieldManager implements EntityFieldManagerInterface {
     $provider = $entity_type->getProvider();
     foreach ($base_field_definitions as $definition) {
       // @todo Remove this check once FieldDefinitionInterface exposes a proper
-      //  provider setter. See https://www.drupal.org/node/2225961.
+      //   provider setter. See https://www.drupal.org/node/2346329.
       if ($definition instanceof BaseFieldDefinition) {
         $definition->setProvider($provider);
       }
     }
 
     // Retrieve base field definitions from modules.
-    foreach ($this->moduleHandler->getImplementations('entity_base_field_info') as $module) {
-      $module_definitions = $this->moduleHandler->invoke($module, 'entity_base_field_info', [$entity_type]);
-      if (!empty($module_definitions)) {
+    $this->moduleHandler->invokeAllWith(
+      'entity_base_field_info',
+      function (callable $hook, string $module) use (&$base_field_definitions, $entity_type) {
+        $module_definitions = $hook($entity_type) ?? [];
         // Ensure the provider key actually matches the name of the provider
         // defining the field.
         foreach ($module_definitions as $field_name => $definition) {
           // @todo Remove this check once FieldDefinitionInterface exposes a
-          //  proper provider setter. See https://www.drupal.org/node/2225961.
+          //   proper provider setter. See https://www.drupal.org/node/2346329.
           if ($definition instanceof BaseFieldDefinition && $definition->getProvider() == NULL) {
             $definition->setProvider($module);
           }
           $base_field_definitions[$field_name] = $definition;
         }
       }
-    }
+    );
 
     // Automatically set the field name, target entity type and bundle
     // for non-configurable fields.
@@ -344,17 +359,43 @@ class EntityFieldManager implements EntityFieldManagerInterface {
       $cid = 'entity_bundle_field_definitions:' . $entity_type_id . ':' . $bundle . ':' . $langcode;
       if ($cache = $this->cacheGet($cid)) {
         $bundle_field_definitions = $cache->data;
+        // Field definitions consist of the bundle specific overrides and the
+        // base fields, merge them together. Use array_replace() to replace base
+        // fields with by bundle overrides and keep them in order, append
+        // additional by bundle fields.
+        $this->fieldDefinitions[$entity_type_id][$bundle][$langcode] = array_replace($base_field_definitions, $bundle_field_definitions);
       }
       else {
-        // Rebuild the definitions and put it into the cache.
+        // In some cases, entity types can have dozens or hundreds of bundles,
+        // so attempt to rebuild all of the bundle data in one go. We assume
+        // that if field data is being requested for one bundle, that it will
+        // also be requested for other bundles of the same entity later in the
+        // request. For example when views field data is built.
+        $bundles = $this->entityTypeBundleInfo->getBundleInfo($entity_type_id);
+        unset($bundles[$bundle]);
+        $cache_data = [];
+
+        // Always generate field data for the bundle that is passed in, even if
+        // the bundle does not exist.
+        // @todo remove support for non-existing bundles.
+        // @see https://www.drupal.org/project/drupal/issues/3565232
+        $cid = 'entity_bundle_field_definitions:' . $entity_type_id . ':' . $bundle . ':' . $langcode;
         $bundle_field_definitions = $this->buildBundleFieldDefinitions($entity_type_id, $bundle, $base_field_definitions);
-        $this->cacheSet($cid, $bundle_field_definitions, Cache::PERMANENT, ['entity_types', 'entity_field_info']);
+        $cache_data[$cid] = ['data' => $bundle_field_definitions, 'tags' => ['entity_types', 'entity_field_info']];
+        $this->fieldDefinitions[$entity_type_id][$bundle][$langcode] = array_replace($base_field_definitions, $bundle_field_definitions);
+
+        foreach ($bundles as $bundle_name => $bundle_info) {
+          $cid = 'entity_bundle_field_definitions:' . $entity_type_id . ':' . $bundle_name . ':' . $langcode;
+          // Rebuild the definitions and put it into the cache.
+          $bundle_field_definitions = $this->buildBundleFieldDefinitions($entity_type_id, $bundle_name, $base_field_definitions);
+          $cache_data[$cid] = ['data' => $bundle_field_definitions, 'tags' => ['entity_types', 'entity_field_info']];
+          $this->fieldDefinitions[$entity_type_id][$bundle_name][$langcode] = array_replace($base_field_definitions, $bundle_field_definitions);
+        }
+
+        if ($cache_data && $this->useCaches) {
+          $this->cacheBackend->setMultiple($cache_data);
+        }
       }
-      // Field definitions consist of the bundle specific overrides and the
-      // base fields, merge them together. Use array_replace() to replace base
-      // fields with by bundle overrides and keep them in order, append
-      // additional by bundle fields.
-      $this->fieldDefinitions[$entity_type_id][$bundle][$langcode] = array_replace($base_field_definitions, $bundle_field_definitions);
     }
     return $this->fieldDefinitions[$entity_type_id][$bundle][$langcode];
   }
@@ -376,49 +417,57 @@ class EntityFieldManager implements EntityFieldManagerInterface {
    */
   protected function buildBundleFieldDefinitions($entity_type_id, $bundle, array $base_field_definitions) {
     $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
-    $class = $entity_type->getClass();
+
+    // Use a bundle specific class if one is defined.
+    $class = $this->entityTypeManager->getStorage($entity_type_id)->getEntityClass($bundle);
 
     // Allow the entity class to provide bundle fields and bundle-specific
     // overrides of base fields.
     $bundle_field_definitions = $class::bundleFieldDefinitions($entity_type, $bundle, $base_field_definitions);
 
-    // Load base field overrides from configuration. These take precedence over
-    // base field overrides returned above.
-    $base_field_override_ids = array_map(function ($field_name) use ($entity_type_id, $bundle) {
-      return $entity_type_id . '.' . $bundle . '.' . $field_name;
-    }, array_keys($base_field_definitions));
-    $base_field_overrides = $this->entityTypeManager->getStorage('base_field_override')->loadMultiple($base_field_override_ids);
-    foreach ($base_field_overrides as $base_field_override) {
+    if (!isset($this->baseFieldOverrides)) {
+      $this->baseFieldOverrides = [];
+      $base_field_overrides = $this->entityTypeManager->getStorage('base_field_override')->loadMultiple();
+      foreach ($base_field_overrides as $override) {
+        $this->baseFieldOverrides[$override->getTargetEntityTypeId()][$override->getTargetBundle()][] = $override;
+      }
+    }
+
+    foreach ($this->baseFieldOverrides[$entity_type_id][$bundle] ?? [] as $base_field_override) {
       /** @var \Drupal\Core\Field\Entity\BaseFieldOverride $base_field_override */
-      $field_name = $base_field_override->getName();
-      $bundle_field_definitions[$field_name] = $base_field_override;
+      // Base field definitions can be removed.
+      if (isset($base_field_definitions[$base_field_override->getName()])) {
+        $field_name = $base_field_override->getName();
+        $bundle_field_definitions[$field_name] = $base_field_override;
+      }
     }
 
     $provider = $entity_type->getProvider();
     foreach ($bundle_field_definitions as $definition) {
       // @todo Remove this check once FieldDefinitionInterface exposes a proper
-      //  provider setter. See https://www.drupal.org/node/2225961.
+      //   provider setter. See https://www.drupal.org/node/2346329.
       if ($definition instanceof BaseFieldDefinition) {
         $definition->setProvider($provider);
       }
     }
 
-    // Retrieve base field definitions from modules.
-    foreach ($this->moduleHandler->getImplementations('entity_bundle_field_info') as $module) {
-      $module_definitions = $this->moduleHandler->invoke($module, 'entity_bundle_field_info', [$entity_type, $bundle, $base_field_definitions]);
-      if (!empty($module_definitions)) {
+    // Retrieve bundle field definitions from modules.
+    $this->moduleHandler->invokeAllWith(
+      'entity_bundle_field_info',
+      function (callable $hook, string $module) use (&$bundle_field_definitions, $entity_type, $bundle, $base_field_definitions) {
+        $module_definitions = $hook($entity_type, $bundle, $base_field_definitions) ?? [];
         // Ensure the provider key actually matches the name of the provider
         // defining the field.
         foreach ($module_definitions as $field_name => $definition) {
           // @todo Remove this check once FieldDefinitionInterface exposes a
-          //  proper provider setter. See https://www.drupal.org/node/2225961.
+          //   proper provider setter. See https://www.drupal.org/node/2346329.
           if ($definition instanceof BaseFieldDefinition) {
             $definition->setProvider($module);
           }
           $bundle_field_definitions[$field_name] = $definition;
         }
       }
-    }
+    );
 
     // Automatically set the field name, target entity type and bundle
     // for non-configurable fields.
@@ -516,30 +565,15 @@ class EntityFieldManager implements EntityFieldManagerInterface {
                 'bundles' => array_combine($bundles, $bundles),
               ];
             }
-          }
-        }
-
-        // In the second step, the per-bundle fields are added, based on the
-        // persistent bundle field map stored in a key value collection. This
-        // data is managed in the
-        // FieldDefinitionListener::onFieldDefinitionCreate() and
-        // FieldDefinitionListener::onFieldDefinitionDelete() methods.
-        // Rebuilding this information in the same way as base fields would not
-        // scale, as the time to query would grow exponentially with more fields
-        // and bundles. A cache would be deleted during cache clears, which is
-        // the only time it is needed, so a key value collection is used.
-        $bundle_field_maps = $this->keyValueFactory->get('entity.definitions.bundle_field_map')->getAll();
-        foreach ($bundle_field_maps as $entity_type_id => $bundle_field_map) {
-          foreach ($bundle_field_map as $field_name => $map_entry) {
-            if (!isset($this->fieldMap[$entity_type_id][$field_name])) {
-              $this->fieldMap[$entity_type_id][$field_name] = $map_entry;
-            }
-            else {
-              $this->fieldMap[$entity_type_id][$field_name]['bundles'] += $map_entry['bundles'];
+            foreach ($bundles as $bundle) {
+              $fields = $this->getFieldDefinitions($entity_type_id, $bundle);
+              foreach ($fields as $field_name => $field_definition) {
+                $this->fieldMap[$entity_type_id][$field_name]['type'] = $field_definition->getType();
+                $this->fieldMap[$entity_type_id][$field_name]['bundles'][$bundle] = $bundle;
+              }
             }
           }
         }
-
         $this->cacheSet($cid, $this->fieldMap, Cache::PERMANENT, ['entity_types', 'entity_field_info']);
       }
     }
@@ -570,7 +604,7 @@ class EntityFieldManager implements EntityFieldManagerInterface {
    *
    * @param string $entity_type_id
    *   The entity type ID. Only entity types that implement
-   *   \Drupal\Core\Entity\FieldableEntityInterface are supported
+   *   \Drupal\Core\Entity\FieldableEntityInterface are supported.
    *
    * @return \Drupal\Core\Field\FieldStorageDefinitionInterface[]
    *   An array of field storage definitions, keyed by field name.
@@ -580,14 +614,15 @@ class EntityFieldManager implements EntityFieldManagerInterface {
     $field_definitions = [];
 
     // Retrieve base field definitions from modules.
-    foreach ($this->moduleHandler->getImplementations('entity_field_storage_info') as $module) {
-      $module_definitions = $this->moduleHandler->invoke($module, 'entity_field_storage_info', [$entity_type]);
-      if (!empty($module_definitions)) {
+    $this->moduleHandler->invokeAllWith(
+      'entity_field_storage_info',
+      function (callable $hook, string $module) use (&$field_definitions, $entity_type, $entity_type_id) {
+        $module_definitions = $hook($entity_type) ?? [];
         // Ensure the provider key actually matches the name of the provider
         // defining the field.
         foreach ($module_definitions as $field_name => $definition) {
           // @todo Remove this check once FieldDefinitionInterface exposes a
-          //  proper provider setter. See https://www.drupal.org/node/2225961.
+          //   proper provider setter. See https://www.drupal.org/node/2346329.
           if ($definition instanceof BaseFieldDefinition) {
             $definition->setProvider($module);
             $definition->setName($field_name);
@@ -596,7 +631,7 @@ class EntityFieldManager implements EntityFieldManagerInterface {
           $field_definitions[$field_name] = $definition;
         }
       }
-    }
+    );
 
     // Invoke alter hook.
     $this->moduleHandler->alter('entity_field_storage_info', $field_definitions, $entity_type);
@@ -615,7 +650,8 @@ class EntityFieldManager implements EntityFieldManagerInterface {
     $this->fieldMap = [];
     $this->fieldMapByFieldType = [];
     $this->entityDisplayRepository->clearDisplayModeInfo();
-    $this->extraFields = [];
+    $this->extraFields = NULL;
+    $this->baseFieldOverrides = NULL;
     Cache::invalidateTags(['entity_field_info']);
     // The typed data manager statically caches prototype objects with injected
     // definitions, clear those as well.
@@ -632,6 +668,7 @@ class EntityFieldManager implements EntityFieldManagerInterface {
       $this->baseFieldDefinitions = [];
       $this->fieldStorageDefinitions = [];
       $this->activeFieldStorageDefinitions = [];
+      $this->baseFieldOverrides = NULL;
     }
   }
 
@@ -639,36 +676,93 @@ class EntityFieldManager implements EntityFieldManagerInterface {
    * {@inheritdoc}
    */
   public function getExtraFields($entity_type_id, $bundle) {
-    // Read from the "static" cache.
-    if (isset($this->extraFields[$entity_type_id][$bundle])) {
-      return $this->extraFields[$entity_type_id][$bundle];
-    }
+    $this->extraFields ??= $this->loadExtraFields();
 
+    // Read from the "static" cache.
+    // Return an empty fallback if the bundle has no extra fields.
+    return $this->extraFields[$entity_type_id][$bundle] ?? [
+      'form' => [],
+      'display' => [],
+    ];
+  }
+
+  /**
+   * Loads extra fields from cache, or rebuilds them.
+   *
+   * @return array[][][][]
+   *   Extra fields by entity type, bundle name, type (form/display) and
+   *   extra field name.
+   */
+  protected function loadExtraFields(): array {
     // Read from the persistent cache. Since hook_entity_extra_field_info() and
     // hook_entity_extra_field_info_alter() might contain t() calls, we cache
     // per language.
-    $cache_id = 'entity_bundle_extra_fields:' . $entity_type_id . ':' . $bundle . ':' . $this->languageManager->getCurrentLanguage()->getId();
+    $cache_id = 'entity_extra_field_info:' . $this->languageManager->getCurrentLanguage()->getId();
     $cached = $this->cacheGet($cache_id);
     if ($cached) {
-      $this->extraFields[$entity_type_id][$bundle] = $cached->data;
-      return $this->extraFields[$entity_type_id][$bundle];
+      return $cached->data;
     }
 
     $extra = $this->moduleHandler->invokeAll('entity_extra_field_info');
     $this->moduleHandler->alter('entity_extra_field_info', $extra);
-    $info = isset($extra[$entity_type_id][$bundle]) ? $extra[$entity_type_id][$bundle] : [];
-    $info += [
-      'form' => [],
-      'display' => [],
-    ];
 
-    // Store in the 'static' and persistent caches.
-    $this->extraFields[$entity_type_id][$bundle] = $info;
-    $this->cacheSet($cache_id, $info, Cache::PERMANENT, [
+    // Apply default values to each bundle.
+    foreach ($extra as $entity_type_id => $extra_fields_by_bundle) {
+      foreach ($extra_fields_by_bundle as $bundle => $bundle_extra_fields) {
+        $extra[$entity_type_id][$bundle] += [
+          'form' => [],
+          'display' => [],
+        ];
+      }
+    }
+
+    $this->cacheSet($cache_id, $extra, Cache::PERMANENT, [
       'entity_field_info',
     ]);
 
-    return $this->extraFields[$entity_type_id][$bundle];
+    return $extra;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preWarm(): void {
+    $this->getFieldMap();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFieldLabels(string $entity_type, string $field_name): array {
+    $label_counter = [];
+    $all_labels = [];
+    // Count the number of fields per label per field storage.
+    foreach (array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type)) as $bundle) {
+      $bundle_fields = array_filter($this->getFieldDefinitions($entity_type, $bundle), function ($field_definition) {
+        return $field_definition instanceof FieldConfigInterface;
+      });
+      if (isset($bundle_fields[$field_name])) {
+        $field = $bundle_fields[$field_name];
+        $label = $field->getLabel();
+        $label_counter[$label] = isset($label_counter[$label]) ? ++$label_counter[$label] : 1;
+        $all_labels[$label] = TRUE;
+      }
+    }
+    if (empty($label_counter)) {
+      return [$field_name, $all_labels];
+    }
+    // Sort the field labels by the most used label and return the most used
+    // one. If the counts are equal, sort by the label to ensure the result is
+    // deterministic.
+    uksort($label_counter, function ($a, $b) use ($label_counter) {
+      if ($label_counter[$a] === $label_counter[$b]) {
+        return strcmp($a, $b);
+      }
+      return $label_counter[$b] <=> $label_counter[$a];
+    });
+    $label_counter = array_keys($label_counter);
+
+    return [$label_counter[0], $all_labels];
   }
 
 }

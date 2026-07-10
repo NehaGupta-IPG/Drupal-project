@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\path\Functional;
 
 use Drupal\media\Entity\MediaType;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the path media form UI.
- *
- * @group path
  */
+#[Group('path')]
+#[RunTestsInSeparateProcesses]
 class PathMediaFormTest extends PathTestBase {
 
   /**
@@ -19,7 +23,7 @@ class PathMediaFormTest extends PathTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'classy';
+  protected $defaultTheme = 'stark';
 
   /**
    * {@inheritdoc}
@@ -35,7 +39,7 @@ class PathMediaFormTest extends PathTestBase {
   /**
    * Tests the media form UI.
    */
-  public function testMediaForm() {
+  public function testMediaForm(): void {
     $assert_session = $this->assertSession();
 
     // Create media type.
@@ -53,7 +57,7 @@ class PathMediaFormTest extends PathTestBase {
     $this->drupalGet('media/add/' . $media_type_id);
 
     // Make sure we have a vertical tab fieldset and 'Path' field.
-    $assert_session->elementContains('css', '.form-type-vertical-tabs #edit-path-0 summary', 'URL alias');
+    $assert_session->elementContains('css', '.js-form-type-vertical-tabs #edit-path-0 summary', 'URL alias');
     $assert_session->fieldExists('path[0][alias]');
 
     // Disable the 'Path' field for this content type.
@@ -64,7 +68,7 @@ class PathMediaFormTest extends PathTestBase {
     $this->drupalGet('media/add/' . $media_type_id);
 
     // See if the whole fieldset is gone now.
-    $assert_session->elementNotExists('css', '.form-type-vertical-tabs #edit-path-0');
+    $assert_session->elementNotExists('css', '.js-form-type-vertical-tabs #edit-path-0');
     $assert_session->fieldNotExists('path[0][alias]');
   }
 

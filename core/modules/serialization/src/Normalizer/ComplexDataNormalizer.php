@@ -18,16 +18,21 @@ use Drupal\Core\TypedData\TypedDataInternalPropertiesHelper;
 class ComplexDataNormalizer extends NormalizerBase {
 
   /**
-   * {@inheritdoc}
+   * Normalizes data into a set of arrays/scalars.
+   *
+   * @param mixed $object
+   *   Data to normalize.
+   * @param string|null $format
+   *   Format the normalization result will be encoded as.
+   * @param array<string, mixed> $context
+   *   Context options for the normalizer.
+   *
+   * @return array
+   *   The normalized data.
    */
-  protected $supportedInterfaceOrClass = ComplexDataInterface::class;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function normalize($object, $format = NULL, array $context = []) {
+  public function normalize($object, $format = NULL, array $context = []): array {
     $attributes = [];
-    // $object will not always match $supportedInterfaceOrClass.
+    // $object will not always match getSupportedTypes().
     // @see \Drupal\serialization\Normalizer\EntityNormalizer
     // Other normalizers that extend this class may only provide $object that
     // implements \Traversable.
@@ -42,6 +47,15 @@ class ComplexDataNormalizer extends NormalizerBase {
       $attributes[$name] = $this->serializer->normalize($property, $format, $context);
     }
     return $attributes;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSupportedTypes(?string $format): array {
+    return [
+      ComplexDataInterface::class => TRUE,
+    ];
   }
 
 }

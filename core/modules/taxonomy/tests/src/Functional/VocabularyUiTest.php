@@ -1,15 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Functional;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Url;
 use Drupal\taxonomy\Entity\Vocabulary;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the taxonomy vocabulary interface.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class VocabularyUiTest extends TaxonomyTestBase {
 
   /**
@@ -24,6 +29,9 @@ class VocabularyUiTest extends TaxonomyTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
     $this->drupalLogin($this->drupalCreateUser(['administer taxonomy']));
@@ -35,26 +43,26 @@ class VocabularyUiTest extends TaxonomyTestBase {
   /**
    * Create, edit and delete a vocabulary via the user interface.
    */
-  public function testVocabularyInterface() {
+  public function testVocabularyInterface(): void {
     // Visit the main taxonomy administration page.
     $this->drupalGet('admin/structure/taxonomy');
 
     // Create a new vocabulary.
-    $this->clickLink(t('Add vocabulary'));
+    $this->clickLink('Add vocabulary');
     $edit = [];
-    $vid = mb_strtolower($this->randomMachineName());
+    $vid = $this->randomMachineName();
     $edit['name'] = $this->randomMachineName();
     $edit['description'] = $this->randomMachineName();
     $edit['vid'] = $vid;
     $this->submitForm($edit, 'Save');
-    $this->assertRaw(t('Created new vocabulary %name.', ['%name' => $edit['name']]));
+    $this->assertSession()->pageTextContains("Created new vocabulary {$edit['name']}.");
 
     // Edit the vocabulary.
     $this->drupalGet('admin/structure/taxonomy');
     $this->assertSession()->pageTextContains($edit['name']);
     $this->assertSession()->pageTextContains($edit['description']);
     $this->assertSession()->linkByHrefExists(Url::fromRoute('entity.taxonomy_term.add_form', ['taxonomy_vocabulary' => $edit['vid']])->toString());
-    $this->clickLink(t('Edit vocabulary'));
+    $this->clickLink('Edit vocabulary');
     $edit = [];
     $edit['name'] = $this->randomMachineName();
     $edit['description'] = $this->randomMachineName();
@@ -85,12 +93,28 @@ class VocabularyUiTest extends TaxonomyTestBase {
 
     $site_name = $this->config('system.site')->get('name');
     $this->assertSession()->titleEquals("Don't Panic | $site_name");
+
+    // Delete the vocabulary.
+    $this->drupalGet('admin/structure/taxonomy');
+    $href = Url::fromRoute('entity.taxonomy_vocabulary.delete_form', ['taxonomy_vocabulary' => $edit['vid']])->toString();
+    $xpath = $this->assertSession()->buildXPathQuery('//a[contains(@href, :href)]', [':href' => $href]);
+    $link = $this->assertSession()->elementExists('xpath', $xpath);
+    $this->assertEquals('Delete vocabulary', $link->getText());
+    $link->click();
+
+    // Confirm deletion.
+    $name = Html::escape($edit['name']);
+    $this->assertSession()->responseContains("Are you sure you want to delete the vocabulary <em class=\"placeholder\">$name</em>?");
+    $this->submitForm([], 'Delete');
+    $this->assertSession()->responseContains("Deleted vocabulary <em class=\"placeholder\">$name</em>.");
+    $this->container->get('entity_type.manager')->getStorage('taxonomy_vocabulary')->resetCache();
+    $this->assertNull(Vocabulary::load($edit['vid']), 'Vocabulary not found.');
   }
 
   /**
    * Changing weights on the vocabulary overview with two or more vocabularies.
    */
-  public function testTaxonomyAdminChangingWeights() {
+  public function testTaxonomyAdminChangingWeights(): void {
     // Create some vocabularies.
     for ($i = 0; $i < 10; $i++) {
       $this->createVocabulary();
@@ -120,10 +144,10 @@ class VocabularyUiTest extends TaxonomyTestBase {
   /**
    * Tests the vocabulary overview with no vocabularies.
    */
-  public function testTaxonomyAdminNoVocabularies() {
+  public function testTaxonomyAdminNoVocabularies(): void {
     // Delete all vocabularies.
     $vocabularies = Vocabulary::loadMultiple();
-    foreach ($vocabularies as $key => $vocabulary) {
+    foreach ($vocabularies as $vocabulary) {
       $vocabulary->delete();
     }
     // Confirm that no vocabularies are found in the database.
@@ -136,9 +160,9 @@ class VocabularyUiTest extends TaxonomyTestBase {
   /**
    * Deleting a vocabulary.
    */
-  public function testTaxonomyAdminDeletingVocabulary() {
+  public function testTaxonomyAdminDeletingVocabulary(): void {
     // Create a vocabulary.
-    $vid = mb_strtolower($this->randomMachineName());
+    $vid = $this->randomMachineName();
     $edit = [
       'name' => $this->randomMachineName(),
       'vid' => $vid,
@@ -154,15 +178,24 @@ class VocabularyUiTest extends TaxonomyTestBase {
 
     // Delete the vocabulary.
     $this->drupalGet('admin/structure/taxonomy/manage/' . $vocabulary->id());
-    $this->clickLink(t('Delete'));
-    $this->assertRaw(t('Are you sure you want to delete the vocabulary %name?', ['%name' => $vocabulary->label()]));
+    $this->clickLink('Delete');
+    $this->assertSession()->pageTextContains("Are you sure you want to delete the vocabulary {$vocabulary->label()}?");
     $this->assertSession()->pageTextContains('Deleting a vocabulary will delete all the terms in it. This action cannot be undone.');
 
     // Confirm deletion.
     $this->submitForm([], 'Delete');
-    $this->assertRaw(t('Deleted vocabulary %name.', ['%name' => $vocabulary->label()]));
+    $this->assertSession()->pageTextContains("Deleted vocabulary {$vocabulary->label()}.");
     $this->container->get('entity_type.manager')->getStorage('taxonomy_vocabulary')->resetCache();
     $this->assertNull(Vocabulary::load($vid), 'Vocabulary not found.');
+  }
+
+  /**
+   * Tests that the overview form is overridable in hook_entity_type_alter().
+   */
+  public function testOverviewOverride(): void {
+    \Drupal::service('module_installer')->install(['taxonomy_overview_override_test']);
+    $this->drupalGet($this->vocabulary->toUrl('overview-form'));
+    $this->assertSession()->pageTextContains('No unicorns here, only llamas');
   }
 
 }

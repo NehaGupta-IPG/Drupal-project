@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests;
 
 use GuzzleHttp\Client;
@@ -15,7 +17,7 @@ use Symfony\Component\BrowserKit\Response;
  *
  * This code is heavily based on the following projects:
  * - https://github.com/FriendsOfPHP/Goutte
- * - https://github.com/minkphp/MinkGoutteDriver
+ * - https://github.com/minkphp/MinkGoutteDriver.
  */
 class DrupalTestBrowser extends AbstractBrowser {
 
@@ -34,7 +36,7 @@ class DrupalTestBrowser extends AbstractBrowser {
    *
    * @return $this
    */
-  public function setClient(ClientInterface $client) {
+  public function setClient(ClientInterface $client): static {
     $this->client = $client;
 
     if ($this->getServerParameter('HTTP_HOST', NULL) !== NULL || $base_uri = $client->getConfig('base_uri') === NULL) {
@@ -80,7 +82,7 @@ class DrupalTestBrowser extends AbstractBrowser {
   /**
    * {@inheritdoc}
    */
-  protected function doRequest($request) {
+  protected function doRequest($request): object {
     $headers = [];
     foreach ($request->getServer() as $key => $val) {
       $key = strtolower(str_replace('_', '-', $key));
@@ -89,10 +91,10 @@ class DrupalTestBrowser extends AbstractBrowser {
         'content-md5' => TRUE,
         'content-type' => TRUE,
       ];
-      if (strpos($key, 'http-') === 0) {
+      if (str_starts_with($key, 'http-')) {
         $headers[substr($key, 5)] = $val;
       }
-      // CONTENT_* are not prefixed with HTTP_
+      // "CONTENT_*" are not prefixed with "HTTP_".
       elseif (isset($content_headers[$key])) {
         $headers[$key] = $val;
       }
@@ -132,12 +134,12 @@ class DrupalTestBrowser extends AbstractBrowser {
     $method = $request->getMethod();
     $uri = $request->getUri();
 
-    // Let BrowserKit handle redirects
+    // Let BrowserKit handle redirects.
     try {
       $response = $this->getClient()->request($method, $uri, $request_options);
     }
-    // Catch RequestException rather than TransferException because we want
-    // to re-throw the exception whenever the response is NULL, and
+    // Catch RequestException rather than ClientExceptionInterface because we
+    // want to re-throw the exception whenever the response is NULL, and
     // ConnectException always has a NULL response.
     catch (RequestException $e) {
       if (!$e->hasResponse()) {
@@ -159,7 +161,7 @@ class DrupalTestBrowser extends AbstractBrowser {
    * @param string $array_name
    *   Internal parameter used by recursive calls.
    */
-  protected function addPostFiles(array $files, array &$multipart, $array_name = '') {
+  protected function addPostFiles(array $files, array &$multipart, ?string $array_name = '') {
     if (empty($files)) {
       return;
     }
@@ -208,7 +210,7 @@ class DrupalTestBrowser extends AbstractBrowser {
    * @param string $array_name
    *   Internal parameter used by recursive calls.
    */
-  public function addPostFields(array $formParams, array &$multipart, $array_name = '') {
+  public function addPostFields(array $formParams, array &$multipart, ?string $array_name = ''): void {
     foreach ($formParams as $name => $value) {
       if (!empty($array_name)) {
         $name = $array_name . '[' . $name . ']';
@@ -235,32 +237,8 @@ class DrupalTestBrowser extends AbstractBrowser {
    * @return \Symfony\Component\BrowserKit\Response
    *   A BrowserKit Response instance.
    */
-  protected function createResponse(ResponseInterface $response) {
+  protected function createResponse(ResponseInterface $response): Response {
     return new Response((string) $response->getBody(), $response->getStatusCode(), $response->getHeaders());
-  }
-
-  /**
-   * Reads response meta tags to guess content-type charset.
-   *
-   * @param \Symfony\Component\BrowserKit\Response $response
-   *   The origin response to filter.
-   *
-   * @return \Symfony\Component\BrowserKit\Response
-   *   A BrowserKit Response instance.
-   */
-  protected function filterResponse($response) {
-    $content_type = $response->getHeader('Content-Type');
-
-    if (!$content_type || strpos($content_type, 'charset=') === FALSE) {
-      if (preg_match('/\<meta[^\>]+charset *= *["\']?([a-zA-Z\-0-9]+)/i', $response->getContent(), $matches)) {
-        $headers = $response->getHeaders();
-        $headers['Content-Type'] = $content_type . ';charset=' . $matches[1];
-
-        $response = new Response($response->getContent(), $response->getStatus(), $headers);
-      }
-    }
-
-    return parent::filterResponse($response);
   }
 
 }

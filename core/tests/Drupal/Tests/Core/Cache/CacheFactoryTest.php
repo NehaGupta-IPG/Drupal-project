@@ -1,25 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Cache;
 
-use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheFactory;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Cache\CacheFactory
- * @group Cache
+ * Tests Drupal\Core\Cache\CacheFactory.
  */
+#[CoversClass(CacheFactory::class)]
+#[Group('Cache')]
 class CacheFactoryTest extends UnitTestCase {
 
   /**
    * Tests that the cache factory falls back to the built-in default service.
    *
-   * @covers ::__construct
-   * @covers ::get
+   * @legacy-covers ::__construct
+   * @legacy-covers ::get
    */
-  public function testCacheFactoryWithDefaultSettings() {
+  public function testCacheFactoryWithDefaultSettings(): void {
     $settings = new Settings([]);
     $cache_factory = new CacheFactory($settings);
 
@@ -29,11 +35,11 @@ class CacheFactoryTest extends UnitTestCase {
     $builtin_default_backend_factory = $this->createMock('\Drupal\Core\Cache\CacheFactoryInterface');
     $container->set('cache.backend.database', $builtin_default_backend_factory);
 
-    $render_bin = $this->createMock('\Drupal\Core\Cache\CacheBackendInterface');
+    $render_bin = $this->createStub(CacheBackendInterface::class);
     $builtin_default_backend_factory->expects($this->once())
       ->method('get')
       ->with('render')
-      ->will($this->returnValue($render_bin));
+      ->willReturn($render_bin);
 
     $actual_bin = $cache_factory->get('render');
     $this->assertSame($render_bin, $actual_bin);
@@ -42,10 +48,10 @@ class CacheFactoryTest extends UnitTestCase {
   /**
    * Tests that the cache factory falls back to customized default service.
    *
-   * @covers ::__construct
-   * @covers ::get
+   * @legacy-covers ::__construct
+   * @legacy-covers ::get
    */
-  public function testCacheFactoryWithCustomizedDefaultBackend() {
+  public function testCacheFactoryWithCustomizedDefaultBackend(): void {
     $settings = new Settings([
       'cache' => [
         'default' => 'cache.backend.custom',
@@ -59,11 +65,11 @@ class CacheFactoryTest extends UnitTestCase {
     $custom_default_backend_factory = $this->createMock('\Drupal\Core\Cache\CacheFactoryInterface');
     $container->set('cache.backend.custom', $custom_default_backend_factory);
 
-    $render_bin = $this->createMock('\Drupal\Core\Cache\CacheBackendInterface');
+    $render_bin = $this->createStub(CacheBackendInterface::class);
     $custom_default_backend_factory->expects($this->once())
       ->method('get')
       ->with('render')
-      ->will($this->returnValue($render_bin));
+      ->willReturn($render_bin);
 
     $actual_bin = $cache_factory->get('render');
     $this->assertSame($render_bin, $actual_bin);
@@ -72,10 +78,10 @@ class CacheFactoryTest extends UnitTestCase {
   /**
    * Tests that the cache factory uses the correct default bin backend.
    *
-   * @covers ::__construct
-   * @covers ::get
+   * @legacy-covers ::__construct
+   * @legacy-covers ::get
    */
-  public function testCacheFactoryWithDefaultBinBackend() {
+  public function testCacheFactoryWithDefaultBinBackend(): void {
     // Ensure the default bin backends are used before the configured default.
     $settings = new Settings([
       'cache' => [
@@ -95,11 +101,11 @@ class CacheFactoryTest extends UnitTestCase {
     $custom_default_backend_factory = $this->createMock('\Drupal\Core\Cache\CacheFactoryInterface');
     $container->set('cache.backend.custom', $custom_default_backend_factory);
 
-    $render_bin = $this->createMock('\Drupal\Core\Cache\CacheBackendInterface');
+    $render_bin = $this->createStub(CacheBackendInterface::class);
     $custom_default_backend_factory->expects($this->once())
       ->method('get')
       ->with('render')
-      ->will($this->returnValue($render_bin));
+      ->willReturn($render_bin);
 
     $actual_bin = $cache_factory->get('render');
     $this->assertSame($render_bin, $actual_bin);
@@ -108,10 +114,10 @@ class CacheFactoryTest extends UnitTestCase {
   /**
    * Tests that the cache factory picks the correct per-bin service.
    *
-   * @covers ::__construct
-   * @covers ::get
+   * @legacy-covers ::__construct
+   * @legacy-covers ::get
    */
-  public function testCacheFactoryWithSpecifiedPerBinBackend() {
+  public function testCacheFactoryWithSpecifiedPerBinBackend(): void {
     // Ensure the per-bin configuration is used before the configured default
     // and per-bin defaults.
     $settings = new Settings([
@@ -135,11 +141,11 @@ class CacheFactoryTest extends UnitTestCase {
     $custom_render_backend_factory = $this->createMock('\Drupal\Core\Cache\CacheFactoryInterface');
     $container->set('cache.backend.custom', $custom_render_backend_factory);
 
-    $render_bin = $this->createMock('\Drupal\Core\Cache\CacheBackendInterface');
+    $render_bin = $this->createStub(CacheBackendInterface::class);
     $custom_render_backend_factory->expects($this->once())
       ->method('get')
       ->with('render')
-      ->will($this->returnValue($render_bin));
+      ->willReturn($render_bin);
 
     $actual_bin = $cache_factory->get('render');
     $this->assertSame($render_bin, $actual_bin);

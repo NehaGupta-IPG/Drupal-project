@@ -1,21 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\config\Functional;
 
 use Drupal\Core\Serialization\Yaml;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the user interface for importing/exporting a single configuration.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ConfigSingleImportExportTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'block',
@@ -31,6 +33,9 @@ class ConfigSingleImportExportTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -40,7 +45,7 @@ class ConfigSingleImportExportTest extends BrowserTestBase {
   /**
    * Tests importing a single configuration file.
    */
-  public function testImport() {
+  public function testImport(): void {
     $storage = \Drupal::entityTypeManager()->getStorage('config_test');
     $uuid = \Drupal::service('uuid');
 
@@ -54,7 +59,8 @@ class ConfigSingleImportExportTest extends BrowserTestBase {
 
     $this->drupalGet('admin/config/development/configuration/single/import');
     $this->submitForm($edit, 'Import');
-    // Assert the static portion of the error since different parsers could give different text in their error.
+    // Assert the static portion of the error since different parsers could give
+    // different text in their error.
     $this->assertSession()->pageTextContains('The import failed with the following message: ');
 
     $import = <<<EOD
@@ -77,13 +83,13 @@ EOD;
     $edit['import'] = "id: first\n" . $edit['import'];
     $this->drupalGet('admin/config/development/configuration/single/import');
     $this->submitForm($edit, 'Import');
-    $this->assertRaw(t('Are you sure you want to create a new %name @type?', ['%name' => 'first', '@type' => 'test configuration']));
+    $this->assertSession()->pageTextContains('Are you sure you want to create a new first test configuration?');
     $this->submitForm([], 'Confirm');
     $entity = $storage->load('first');
     $this->assertSame('First', $entity->label());
     $this->assertSame('first', $entity->id());
     $this->assertTrue($entity->status());
-    $this->assertRaw(t('The configuration was imported successfully.'));
+    $this->assertSession()->pageTextContains('The configuration was imported successfully.');
 
     // Attempt an import with an existing ID but missing UUID.
     $this->drupalGet('admin/config/development/configuration/single/import');
@@ -100,9 +106,9 @@ EOD;
     $edit['custom_entity_id'] = 'custom_id';
     $this->drupalGet('admin/config/development/configuration/single/import');
     $this->submitForm($edit, 'Import');
-    $this->assertRaw(t('Are you sure you want to create a new %name @type?', ['%name' => 'custom_id', '@type' => 'test configuration']));
+    $this->assertSession()->pageTextContains('Are you sure you want to create a new custom_id test configuration?');
     $this->submitForm([], 'Confirm');
-    $this->assertRaw(t('The configuration was imported successfully.'));
+    $this->assertSession()->pageTextContains('The configuration was imported successfully.');
 
     // Perform an import with a unique ID and UUID.
     $import = <<<EOD
@@ -120,10 +126,10 @@ EOD;
     $edit['import'] .= "\nuuid: " . $second_uuid;
     $this->drupalGet('admin/config/development/configuration/single/import');
     $this->submitForm($edit, 'Import');
-    $this->assertRaw(t('Are you sure you want to create a new %name @type?', ['%name' => 'second', '@type' => 'test configuration']));
+    $this->assertSession()->pageTextContains('Are you sure you want to create a new second test configuration?');
     $this->submitForm([], 'Confirm');
     $entity = $storage->load('second');
-    $this->assertRaw(t('The configuration was imported successfully.'));
+    $this->assertSession()->pageTextContains('The configuration was imported successfully.');
     $this->assertSame('Second', $entity->label());
     $this->assertSame('second', $entity->id());
     $this->assertFalse($entity->status());
@@ -144,10 +150,10 @@ EOD;
     ];
     $this->drupalGet('admin/config/development/configuration/single/import');
     $this->submitForm($edit, 'Import');
-    $this->assertRaw(t('Are you sure you want to update the %name @type?', ['%name' => 'second', '@type' => 'test configuration']));
+    $this->assertSession()->pageTextContains('Are you sure you want to update the second test configuration?');
     $this->submitForm([], 'Confirm');
     $entity = $storage->load('second');
-    $this->assertRaw(t('The configuration was imported successfully.'));
+    $this->assertSession()->pageTextContains('The configuration was imported successfully.');
     $this->assertSame('Second updated', $entity->label());
 
     // Try to perform an update which adds missing dependencies.
@@ -168,7 +174,7 @@ EOD;
     ];
     $this->drupalGet('admin/config/development/configuration/single/import');
     $this->submitForm($edit, 'Import');
-    $this->assertRaw(t('Configuration %name depends on the %owner module that will not be installed after import.', ['%name' => 'config_test.dynamic.second', '%owner' => 'does_not_exist']));
+    $this->assertSession()->pageTextContains('Configuration config_test.dynamic.second depends on the does_not_exist module that will not be installed after import.');
 
     // Try to preform an update which would create a PHP object if Yaml parsing
     // not securely set up.
@@ -187,30 +193,15 @@ EOD;
     ];
     $this->drupalGet('admin/config/development/configuration/single/import');
     $this->submitForm($edit, 'Import');
-    if (extension_loaded('yaml')) {
-      // If the yaml extension is loaded it will work but not create the PHP
-      // object.
-      $this->assertRaw(t('Are you sure you want to update the %name @type?', [
-        '%name' => 'second',
-        '@type' => 'test configuration',
-      ]));
-      $this->submitForm([], 'Confirm');
-      $entity = $storage->load('second');
-      $this->assertRaw(t('The configuration was imported successfully.'));
-      $this->assertIsString($entity->label());
-      $this->assertStringContainsString('ObjectSerialization', $entity->label(), 'Label contains serialized object');
-    }
-    else {
-      // If the Symfony parser is used there will be an error.
-      $this->assertSession()->responseContains('The import failed with the following message:');
-      $this->assertSession()->responseContains('Object support when parsing a YAML file has been disabled');
-    }
+    // @see \Drupal\Tests\Component\Serialization\YamlSymfonyTest:: testDecodeObjectSupportDisabled()
+    $this->assertSession()->responseContains('The import failed with the following message:');
+    $this->assertSession()->responseContains('Object support when parsing a YAML file has been disabled');
   }
 
   /**
    * Tests importing a simple configuration file.
    */
-  public function testImportSimpleConfiguration() {
+  public function testImportSimpleConfiguration(): void {
     $this->drupalLogin($this->drupalCreateUser(['import configuration']));
     $config = $this->config('system.site')->set('name', 'Test simple import');
 
@@ -224,7 +215,7 @@ EOD;
     ];
     $this->drupalGet('admin/config/development/configuration/single/import');
     $this->submitForm($edit, 'Import');
-    $this->assertRaw(t('Are you sure you want to update the %name @type?', ['%name' => $config->getName(), '@type' => 'simple configuration']));
+    $this->assertSession()->pageTextContains('Are you sure you want to update the ' . $config->getName() . ' simple configuration?');
     $this->submitForm([], 'Confirm');
     $this->drupalGet('');
     $this->assertSession()->pageTextContains('Test simple import');
@@ -253,7 +244,7 @@ EOD;
   /**
    * Tests exporting a single configuration file.
    */
-  public function testExport() {
+  public function testExport(): void {
     $this->drupalLogin($this->drupalCreateUser(['export configuration']));
 
     // Verify that the simple configuration option is selected when specified
@@ -266,7 +257,8 @@ EOD;
     $this->assertSession()->optionExists('config_name', 'user.settings');
 
     $this->drupalGet('admin/config/development/configuration/single/export/system.simple/system.image');
-    $this->assertSession()->fieldValueEquals('export', "toolkit: gd\n_core:\n  default_config_hash: durWHaKeBaq4d9Wpi4RqwADj1OufDepcnJuhVLmKN24\n");
+    // cspell:disable-next-line
+    $this->assertSession()->fieldValueEquals('export', "_core:\n  default_config_hash: durWHaKeBaq4d9Wpi4RqwADj1OufDepcnJuhVLmKN24\ntoolkit: gd\n");
 
     // Verify that the date format entity type is selected when specified in
     // the URL.
@@ -277,7 +269,7 @@ EOD;
     // Verify that the fallback date format config entity is selected when
     // specified in the URL.
     $this->drupalGet('admin/config/development/configuration/single/export/date_format/fallback');
-    $option_node = $this->assertSession()->optionExists("config_name", 'Fallback date format (fallback)');
+    $option_node = $this->assertSession()->optionExists("config_name", 'fallback (Fallback date format)');
     $this->assertTrue($option_node->isSelected());
     $fallback_date = \Drupal::entityTypeManager()->getStorage('date_format')->load('fallback');
     $yaml_text = $this->assertSession()->fieldExists('export')->getValue();

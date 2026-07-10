@@ -31,6 +31,10 @@ views.field.comment_last_timestamp:
 views.field.comment_link_approve:
   type: views.field.comment_link
   label: 'Comment approve link'
+  mapping:
+    text:
+      type: label
+      label: 'Text to display'
 
 views.field.comment_link_reply:
   type: views.field.comment_link
@@ -49,7 +53,7 @@ views.field.comment_ces_last_comment_name:
   label: 'Name of last comment poster'
 
 views.field.comment_ces_last_updated:
-  type: views_field
+  type: views.field.date
   label: 'Newer of last comment / node updated'
 
 views.filter.node_comment:

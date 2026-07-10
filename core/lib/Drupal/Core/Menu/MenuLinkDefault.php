@@ -3,7 +3,7 @@
 namespace Drupal\Core\Menu;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Url;
 
 /**
  * Provides a default implementation for menu link plugins.
@@ -34,7 +34,7 @@ class MenuLinkDefault extends MenuLinkBase implements ContainerFactoryPluginInte
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Menu\StaticMenuLinkOverridesInterface $static_override
@@ -44,18 +44,6 @@ class MenuLinkDefault extends MenuLinkBase implements ContainerFactoryPluginInte
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->staticOverride = $static_override;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('menu_link.static.overrides')
-    );
   }
 
   /**
@@ -78,6 +66,13 @@ class MenuLinkDefault extends MenuLinkBase implements ContainerFactoryPluginInte
   public function isResettable() {
     // The link can be reset if it has an override.
     return (bool) $this->staticOverride->loadOverride($this->getPluginId());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getResetRoute(): Url {
+    return Url::fromRoute('menu_ui.link_reset', ['menu_link_plugin' => $this->getPluginId()]);
   }
 
   /**

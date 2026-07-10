@@ -1,15 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 
 use Behat\Mink\Element\NodeElement;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the JavaScript functionality of the block add filter.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class BlockFilterTest extends WebDriverTestBase {
 
   /**
@@ -33,39 +40,36 @@ class BlockFilterTest extends WebDriverTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $user = $this->drupalCreateUser([
+
+    $this->drupalLogin($this->drupalCreateUser([
       'configure any layout',
-      'administer node display',
-      'administer node fields',
-    ]);
-    $this->drupalLogin($user);
+    ]));
     $this->createContentType(['type' => 'bundle_with_section_field']);
+    LayoutBuilderEntityViewDisplay::load('node.bundle_with_section_field.default')
+      ->enableLayoutBuilder()
+      ->setOverridable()
+      ->save();
+    $this->createNode(['type' => 'bundle_with_section_field']);
   }
 
   /**
    * Tests block filter.
    */
-  public function testBlockFilter() {
+  public function testBlockFilter(): void {
+    // @todo skipped due to random test failures, re-enable in https://www.drupal.org/project/drupal/issues/3028968.
+    $this->markTestSkipped();
     $assert_session = $this->assertSession();
     $session = $this->getSession();
     $page = $session->getPage();
 
-    // From the manage display page, go to manage the layout.
-    $field_ui_prefix = 'admin/structure/types/manage/bundle_with_section_field';
-    $this->drupalGet("{$field_ui_prefix}/display/default");
-    $this->submitForm(['layout[enabled]' => TRUE], 'Save');
-    $assert_session->linkExists('Manage layout');
-    $this->clickLink('Manage layout');
-    $assert_session->addressEquals("$field_ui_prefix/display/default/layout");
-
     // Open the block listing.
+    $this->drupalGet('node/1/layout');
     $assert_session->linkExists('Add block');
     $this->clickLink('Add block');
     $assert_session->assertWaitOnAjaxRequest();
 
     // Get all blocks, for assertions later.
-    $blocks = $page->findAll('css', '.js-layout-builder-block-link');
-    $blocks_count = count($blocks);
+    $blocks = $page->findAll('css', '.js-layout-builder-categories li');
     $categories = $page->findAll('css', '.js-layout-builder-category');
 
     $filter = $assert_session->elementExists('css', '.js-layout-builder-filter');
@@ -77,31 +81,47 @@ class BlockFilterTest extends WebDriverTestBase {
     $filter->setValue('a');
     $this->assertAnnounceContains($init_message);
     $visible_rows = $this->filterVisibleElements($blocks);
-    $this->assertCount($blocks_count, $visible_rows);
+    $this->assertSameSize($blocks, $visible_rows);
 
     // Get the Content Fields category, which will be closed before filtering.
     $contentFieldsCategory = $page->find('named', ['content', 'Content fields']);
     // Link that belongs to the Content Fields category, to verify collapse.
-    $promoteToFrontPageLink = $page->find('named', ['content', 'Promoted to front page']);
-    // Test that front page link is visible until Content Fields collapsed.
-    $this->assertTrue($promoteToFrontPageLink->isVisible());
+    $promotedLink = $page->find('named', ['content', 'Promoted']);
+    // Test that promoted link is visible until Content Fields collapsed.
+    $this->assertTrue($promotedLink->isVisible());
     $contentFieldsCategory->click();
-    $this->assertFalse($promoteToFrontPageLink->isVisible());
+    $this->assertFalse($promotedLink->isVisible());
 
     // Test block filter reduces the number of visible rows.
     $filter->setValue('ad');
     $fewer_blocks_message = ' blocks are available in the modified list';
     $this->assertAnnounceContains($fewer_blocks_message);
     $visible_rows = $this->filterVisibleElements($blocks);
-    $this->assertGreaterThan(0, count($blocks));
-    $this->assertLessThan(count($blocks), count($visible_rows));
+    $this->assertCount(3, $visible_rows);
     $visible_categories = $this->filterVisibleElements($categories);
-    $this->assertGreaterThan(0, count($visible_categories));
-    $this->assertLessThan(count($categories), count($visible_categories));
+    $this->assertCount(3, $visible_categories);
 
     // Test Drupal.announce() message when multiple matches are present.
     $expected_message = count($visible_rows) . $fewer_blocks_message;
     $this->assertAnnounceContains($expected_message);
+
+    // Test 3 letter search.
+    $filter->setValue('adm');
+    $visible_rows = $this->filterVisibleElements($blocks);
+    $this->assertCount(2, $visible_rows);
+    $visible_categories = $this->filterVisibleElements($categories);
+    $this->assertCount(2, $visible_categories);
+
+    // Retest that blocks appear when reducing letters.
+    $filter->setValue('ad');
+    $visible_rows = $this->filterVisibleElements($blocks);
+    $this->assertCount(3, $visible_rows);
+    $visible_categories = $this->filterVisibleElements($categories);
+    $this->assertCount(3, $visible_categories);
+
+    // Test blocks reappear after being filtered by repeating search for "a".
+    $filter->setValue('a');
+    $this->assertAnnounceContains('All available blocks are listed.');
 
     // Test Drupal.announce() message when only one match is present.
     $filter->setValue('Powered by');
@@ -119,15 +139,15 @@ class BlockFilterTest extends WebDriverTestBase {
     $visible_categories = $this->filterVisibleElements($categories);
     $this->assertCount(0, $visible_categories);
     $announce_element = $page->find('css', '#drupal-live-announce');
-    $page->waitFor(2, function () use ($announce_element) {
-      return strpos($announce_element->getText(), '0 blocks are available') === 0;
+    $page->waitFor(2, function () use ($announce_element): bool {
+      return str_starts_with($announce_element->getText(), '0 blocks are available');
     });
 
     // Test Drupal.announce() message when all blocks are listed.
     $filter->setValue('');
     $this->assertAnnounceContains('All available blocks are listed.');
     // Confirm the Content Fields category remains collapsed after filtering.
-    $this->assertFalse($promoteToFrontPageLink->isVisible());
+    $this->assertFalse($promotedLink->isVisible());
   }
 
   /**
@@ -139,7 +159,7 @@ class BlockFilterTest extends WebDriverTestBase {
    * @return \Behat\Mink\Element\NodeElement[]
    *   An array of visible node elements.
    */
-  protected function filterVisibleElements(array $elements) {
+  protected function filterVisibleElements(array $elements): array {
     return array_filter($elements, function (NodeElement $element) {
       return $element->isVisible();
     });
@@ -150,8 +170,10 @@ class BlockFilterTest extends WebDriverTestBase {
    *
    * @param string $expected_message
    *   The text expected to be present in #drupal-live-announce.
+   *
+   * @internal
    */
-  protected function assertAnnounceContains($expected_message) {
+  protected function assertAnnounceContains(string $expected_message): void {
     $assert_session = $this->assertSession();
     $this->assertNotEmpty($assert_session->waitForElement('css', "#drupal-live-announce:contains('$expected_message')"));
   }

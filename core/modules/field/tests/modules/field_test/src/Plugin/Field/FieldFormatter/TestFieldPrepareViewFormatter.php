@@ -1,24 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\field_test\Plugin\Field\FieldFormatter;
 
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Plugin implementation of the 'field_test_with_prepare_view' formatter.
- *
- * @FieldFormatter(
- *   id = "field_test_with_prepare_view",
- *   label = @Translation("With prepare step"),
- *   description = @Translation("Tests prepareView() method"),
- *   field_types = {
- *     "test_field"
- *   },
- *   weight = 10
- * )
  */
+#[FieldFormatter(
+  id: 'field_test_with_prepare_view',
+  label: new TranslatableMarkup('With prepare step'),
+  description: new TranslatableMarkup('Tests prepareView() method'),
+  field_types: [
+    'test_field',
+  ],
+  weight: 10,
+)]
 class TestFieldPrepareViewFormatter extends FormatterBase {
 
   /**
@@ -35,7 +38,7 @@ class TestFieldPrepareViewFormatter extends FormatterBase {
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $element['test_formatter_setting_additional'] = [
-      '#title' => t('Setting'),
+      '#title' => $this->t('Setting'),
       '#type' => 'textfield',
       '#size' => 20,
       '#default_value' => $this->getSetting('test_formatter_setting_additional'),
@@ -49,14 +52,17 @@ class TestFieldPrepareViewFormatter extends FormatterBase {
    */
   public function settingsSummary() {
     $summary = [];
-    $summary[] = t('@setting: @value', ['@setting' => 'test_formatter_setting_additional', '@value' => $this->getSetting('test_formatter_setting_additional')]);
+    $summary[] = $this->t('@setting: @value', [
+      '@setting' => 'test_formatter_setting_additional',
+      '@value' => $this->getSetting('test_formatter_setting_additional'),
+    ]);
     return $summary;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function prepareView(array $entities_items) {
+  public function prepareView(array $entities_items): void {
     foreach ($entities_items as $items) {
       foreach ($items as $item) {
         // Don't add anything on empty values.

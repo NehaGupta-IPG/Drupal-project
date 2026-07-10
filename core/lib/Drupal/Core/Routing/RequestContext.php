@@ -12,7 +12,7 @@ use Symfony\Component\Routing\RequestContext as SymfonyRequestContext;
 class RequestContext extends SymfonyRequestContext {
 
   /**
-   * The scheme, host and base path, for example "http://example.com/d8".
+   * The scheme, host and base path, for example "https://example.com/d8".
    *
    * @var string
    */
@@ -31,14 +31,14 @@ class RequestContext extends SymfonyRequestContext {
   /**
    * {@inheritdoc}
    */
-  public function fromRequest(Request $request) {
-    parent::fromRequest($request);
-
+  public function fromRequest(Request $request): static {
     // @todo Extract the code in DrupalKernel::initializeRequestGlobals.
     //   See https://www.drupal.org/node/2404601
     if (isset($GLOBALS['base_url'])) {
       $this->setCompleteBaseUrl($GLOBALS['base_url']);
     }
+
+    return parent::fromRequest($request);
   }
 
   /**

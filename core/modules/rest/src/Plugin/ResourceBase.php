@@ -46,7 +46,7 @@ abstract class ResourceBase extends PluginBase implements ContainerFactoryPlugin
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param array $serializer_formats
@@ -86,7 +86,10 @@ abstract class ResourceBase extends PluginBase implements ContainerFactoryPlugin
     foreach ($this->availableMethods() as $method) {
       $lowered_method = strtolower($method);
       $permissions["restful $lowered_method $this->pluginId"] = [
-        'title' => $this->t('Access @method on %label resource', ['@method' => $method, '%label' => $definition['label']]),
+        'title' => $this->t('Access @method on %label resource', [
+          '@method' => $method,
+          '%label' => $definition['label'],
+        ]),
       ];
     }
     return $permissions;
@@ -99,8 +102,8 @@ abstract class ResourceBase extends PluginBase implements ContainerFactoryPlugin
     $collection = new RouteCollection();
 
     $definition = $this->getPluginDefinition();
-    $canonical_path = isset($definition['uri_paths']['canonical']) ? $definition['uri_paths']['canonical'] : '/' . strtr($this->pluginId, ':', '/') . '/{id}';
-    $create_path = isset($definition['uri_paths']['create']) ? $definition['uri_paths']['create'] : '/' . strtr($this->pluginId, ':', '/');
+    $canonical_path = $definition['uri_paths']['canonical'] ?? '/' . strtr($this->pluginId, ':', '/') . '/{id}';
+    $create_path = $definition['uri_paths']['create'] ?? '/' . strtr($this->pluginId, ':', '/');
 
     $route_name = strtr($this->pluginId, ':', '.');
 
@@ -184,7 +187,7 @@ abstract class ResourceBase extends PluginBase implements ContainerFactoryPlugin
   /**
    * Gets the base route requirements for a particular method.
    *
-   * @param $method
+   * @param string $method
    *   The HTTP method to be used for the route.
    *
    * @return array

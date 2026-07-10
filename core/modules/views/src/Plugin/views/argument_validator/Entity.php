@@ -7,19 +7,17 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\Context\EntityContextDefinition;
+use Drupal\views\Attribute\ViewsArgumentValidator;
+use Drupal\views\Plugin\Derivative\ViewsEntityArgumentValidator;
 use Drupal\views\Plugin\views\argument\ArgumentPluginBase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines an argument validator plugin for each entity type.
- *
- * @ViewsArgumentValidator(
- *   id = "entity",
- *   deriver = "Drupal\views\Plugin\Derivative\ViewsEntityArgumentValidator"
- * )
- *
- * @see \Drupal\views\Plugin\Derivative\ViewsEntityArgumentValidator
  */
+#[ViewsArgumentValidator(
+  id: 'entity',
+  deriver: ViewsEntityArgumentValidator::class
+)]
 class Entity extends ArgumentValidatorPluginBase {
 
   /**
@@ -49,7 +47,7 @@ class Entity extends ArgumentValidatorPluginBase {
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -62,19 +60,6 @@ class Entity extends ArgumentValidatorPluginBase {
 
     $this->entityTypeManager = $entity_type_manager;
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('entity_type.manager'),
-      $container->get('entity_type.bundle.info')
-    );
   }
 
   /**
@@ -177,7 +162,7 @@ class Entity extends ArgumentValidatorPluginBase {
   public function validateArgument($argument) {
     $entity_type = $this->definition['entity_type'];
 
-    if ($this->multipleCapable && $this->options['multiple']) {
+    if ($this->multipleCapable && $this->options['multiple'] && isset($argument)) {
       // At this point only interested in individual IDs no matter what type,
       // just splitting by the allowed delimiters.
       $ids = array_filter(preg_split('/[,+ ]/', $argument));
@@ -209,6 +194,7 @@ class Entity extends ArgumentValidatorPluginBase {
    * Validates an individual entity against class access settings.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity.
    *
    * @return bool
    *   True if validated.
@@ -238,7 +224,7 @@ class Entity extends ArgumentValidatorPluginBase {
 
     // The bundle entity type might not exist. For example, users do not have
     // bundles.
-    if ($this->entityTypeManager->hasHandler($bundle_entity_type, 'storage')) {
+    if ($bundle_entity_type && $this->entityTypeManager->hasHandler($bundle_entity_type, 'storage')) {
       $bundle_entity_storage = $this->entityTypeManager->getStorage($bundle_entity_type);
 
       foreach ($bundle_entity_storage->loadMultiple(array_keys($this->options['bundles'])) as $bundle_entity) {

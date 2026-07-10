@@ -1,22 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\search\Functional;
 
-use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the search help text and search page text.
- *
- * @group search
  */
+#[Group('search')]
+#[RunTestsInSeparateProcesses]
 class SearchPageTextTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'node', 'search'];
+  protected static $modules = ['block', 'node', 'search', 'search_node'];
 
   /**
    * {@inheritdoc}
@@ -53,7 +56,7 @@ class SearchPageTextTest extends BrowserTestBase {
    *
    * This is a regression test for https://www.drupal.org/node/2338081
    */
-  public function testSearchLabelXSS() {
+  public function testSearchLabelXSS(): void {
     $this->drupalLogin($this->drupalCreateUser(['administer search']));
 
     $keys['label'] = '<script>alert("Don\'t Panic");</script>';
@@ -68,7 +71,7 @@ class SearchPageTextTest extends BrowserTestBase {
   /**
    * Tests the failed search text, and various other text on the search page.
    */
-  public function testSearchText() {
+  public function testSearchText(): void {
     $this->drupalLogin($this->searchingUser);
     $this->drupalGet('search/node');
     $this->assertSession()->pageTextContains('Enter your keywords');
@@ -82,10 +85,9 @@ class SearchPageTextTest extends BrowserTestBase {
     $this->submitForm($edit, 'Search');
     $this->assertSession()->pageTextContains('search yielded no results');
     $this->assertSession()->pageTextContains('Search');
-    $title_source = 'Search for @keywords | Drupal';
     $this->assertSession()->titleEquals('Search for ' . Unicode::truncate($search_terms, 60, TRUE, TRUE) . ' | Drupal');
-    $this->assertNoText('Node');
-    $this->assertNoText('Node');
+    $this->assertSession()->pageTextNotContains('Node');
+    $this->assertSession()->pageTextNotContains('Node');
     $this->assertSession()->pageTextContains('Content');
 
     $this->clickLink('About searching');
@@ -105,8 +107,7 @@ class SearchPageTextTest extends BrowserTestBase {
     $edit['keys'] = $search_terms;
     $this->drupalGet('search/node');
     $this->submitForm($edit, 'Search');
-    $actual_title = $this->xpath('//title')[0]->getText();
-    $this->assertEquals(Html::decodeEntities(t($title_source, ['@keywords' => Unicode::truncate($search_terms, 60, TRUE, TRUE)])), $actual_title, 'Search page title is correct');
+    $this->assertSession()->titleEquals('Search for ' . Unicode::truncate($search_terms, 60, TRUE, TRUE) . ' | Drupal');
 
     $edit['keys'] = $this->searchingUser->getAccountName();
     $this->drupalGet('search/user');
@@ -138,39 +139,39 @@ class SearchPageTextTest extends BrowserTestBase {
     $edit['keys'] = implode(' ', $keys);
     $this->drupalGet('search/node');
     $this->submitForm($edit, 'Search');
-    $this->assertRaw(t('Your search used too many AND/OR expressions. Only the first @count terms were included in this search.', ['@count' => $limit]));
+    $this->assertSession()->statusMessageContains("Your search used too many AND/OR expressions. Only the first {$limit} terms were included in this search.", 'warning');
 
     // Test that a search on Node or User with no keywords entered generates
-    // the "Please enter some keywords" message.
+    // the "Enter some keywords" message.
     $this->drupalGet('search/node');
     $this->submitForm([], 'Search');
-    $this->assertSession()->pageTextContains('Please enter some keywords');
+    $this->assertSession()->statusMessageContains('Enter some keywords', 'error');
     $this->drupalGet('search/user');
     $this->submitForm([], 'Search');
-    $this->assertSession()->pageTextContains('Please enter some keywords');
+    $this->assertSession()->statusMessageContains('Enter some keywords', 'error');
 
-    // Make sure the "Please enter some keywords" message is NOT displayed if
-    // you use "or" words or phrases in Advanced Search.
+    // Make sure the "Enter some keywords" message is NOT displayed if you use
+    // "or" words or phrases in Advanced Search.
     $this->drupalGet('search/node');
     $this->submitForm([
       'or' => $this->randomMachineName() . ' ' . $this->randomMachineName(),
     ], 'edit-submit--2');
-    $this->assertNoText('Please enter some keywords');
+    $this->assertSession()->statusMessageNotContains('Enter some keywords');
     $this->drupalGet('search/node');
     $this->submitForm([
       'phrase' => '"' . $this->randomMachineName() . '" "' . $this->randomMachineName() . '"',
     ], 'edit-submit--2');
-    $this->assertNoText('Please enter some keywords');
+    $this->assertSession()->statusMessageNotContains('Enter some keywords');
 
     // Verify that if you search for a too-short keyword, you get the right
     // message, and that if after that you search for a longer keyword, you
     // do not still see the message.
     $this->drupalGet('search/node');
     $this->submitForm(['keys' => $this->randomMachineName(1)], 'Search');
-    $this->assertSession()->pageTextContains('You must include at least one keyword');
-    $this->assertNoText('Please enter some keywords');
+    $this->assertSession()->statusMessageContains('You must include at least one keyword', 'warning');
+    $this->assertSession()->statusMessageNotContains('Enter some keywords');
     $this->submitForm(['keys' => $this->randomMachineName()], 'Search');
-    $this->assertNoText('You must include at least one keyword');
+    $this->assertSession()->statusMessageNotContains('You must include at least one keyword');
 
     // Test that if you search for a URL with .. in it, you still end up at
     // the search page. See issue https://www.drupal.org/node/890058.

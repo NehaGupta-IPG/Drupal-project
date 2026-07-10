@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Functional\Views;
 
 use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\views\Functional\ViewTestBase;
-use Drupal\views\Tests\ViewTestData;
-use Drupal\field\Entity\FieldStorageConfig;
 
 /**
  * Provides some helper methods for testing fieldapi integration into views.
@@ -21,9 +22,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 abstract class FieldTestBase extends ViewTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'field_test_views'];
 
@@ -35,25 +34,28 @@ abstract class FieldTestBase extends ViewTestBase {
   public $fieldStorages;
 
   /**
-   * Stores the fields of the field storage. They have the same keys as the
-   * field storages.
+   * Stores the fields of the field storage.
    *
    * @var array
    */
   public $fields;
 
-  protected function setUp($import_test_views = TRUE) {
-    parent::setUp($import_test_views);
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp($import_test_views = TRUE, $modules = ['field_test_views']): void {
+    parent::setUp($import_test_views, $modules);
 
     // Ensure the page node type exists.
     NodeType::create([
       'type' => 'page',
       'name' => 'page',
     ])->save();
-
-    ViewTestData::createTestViews(static::class, ['field_test_views']);
   }
 
+  /**
+   * Sets up field storages for testing.
+   */
   public function setUpFieldStorages($amount = 3, $type = 'string') {
     // Create three fields.
     $field_names = [];
@@ -69,7 +71,10 @@ abstract class FieldTestBase extends ViewTestBase {
     return $field_names;
   }
 
-  public function setUpFields($bundle = 'page') {
+  /**
+   * Sets up fields for a given bundle.
+   */
+  public function setUpFields($bundle = 'page'): void {
     foreach ($this->fieldStorages as $key => $field_storage) {
       $this->fields[$key] = FieldConfig::create([
         'field_storage' => $field_storage,

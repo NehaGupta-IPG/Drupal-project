@@ -1,20 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block_content\Unit\Menu;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Tests\Core\Menu\LocalTaskIntegrationTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Tests existence of block_content local tasks.
- *
- * @group block_content
  */
+#[Group('block_content')]
 class BlockContentLocalTasksTest extends LocalTaskIntegrationTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     $this->directoryList = [
-      'block' => 'core/modules/block',
+      'system' => 'core/modules/system',
       'block_content' => 'core/modules/block_content',
     ];
     parent::setUp();
@@ -39,31 +47,33 @@ class BlockContentLocalTasksTest extends LocalTaskIntegrationTestBase {
         'name' => 'test_c',
       ],
     ];
-    $theme_handler = $this->createMock('Drupal\Core\Extension\ThemeHandlerInterface');
-    $theme_handler->expects($this->any())
+    $theme_handler = $this->createStub(ThemeHandlerInterface::class);
+    $theme_handler
       ->method('listInfo')
-      ->will($this->returnValue($themes));
+      ->willReturn($themes);
+
+    // Add services required for block local tasks.
+    $entity_type_manager = $this->createStub(EntityTypeManagerInterface::class);
+    $entity_type_manager
+      ->method('getDefinitions')
+      ->willReturn([]);
 
     $container = new ContainerBuilder();
     $container->set('config.factory', $config_factory);
     $container->set('theme_handler', $theme_handler);
+    $container->set('entity_type.manager', $entity_type_manager);
     \Drupal::setContainer($container);
   }
 
   /**
    * Checks block_content listing local tasks.
-   *
-   * @dataProvider getBlockContentListingRoutes
    */
-  public function testBlockContentListLocalTasks($route) {
+  #[DataProvider('getBlockContentListingRoutes')]
+  public function testBlockContentListLocalTasks(string $route): void {
     $this->assertLocalTasks($route, [
       0 => [
-        'block.admin_display',
+        'system.admin_content',
         'entity.block_content.collection',
-      ],
-      1 => [
-        'block_content.list_sub',
-        'entity.block_content_type.collection',
       ],
     ]);
   }
@@ -71,9 +81,10 @@ class BlockContentLocalTasksTest extends LocalTaskIntegrationTestBase {
   /**
    * Provides a list of routes to test.
    */
-  public function getBlockContentListingRoutes() {
+  public static function getBlockContentListingRoutes(): array {
     return [
-      ['entity.block_content.collection', 'entity.block_content_type.collection'],
+      ['entity.block_content.collection'],
+      ['system.admin_content'],
     ];
   }
 

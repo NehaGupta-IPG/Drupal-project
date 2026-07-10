@@ -1,40 +1,67 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Kernel;
 
-use Drupal\Component\Render\FormattableMarkup;
-use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\Entity\EntityStorageException;
+use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\File\Exception\FileExistsException;
+use Drupal\Core\File\Exception\InvalidStreamWrapperException;
+use Drupal\Core\File\FileExists;
 use Drupal\file\Entity\File;
+use Drupal\file\FileRepository;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the file move function.
- *
- * @group file
  */
+#[CoversClass(FileRepository::class)]
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class MoveTest extends FileManagedUnitTestBase {
 
   /**
-   * Move a normal file.
+   * The file repository service under test.
+   *
+   * @var \Drupal\file\FileRepository
    */
-  public function testNormal() {
+  protected $fileRepository;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+    $this->fileRepository = $this->container->get('file.repository');
+  }
+
+  /**
+   * Move a normal file.
+   *
+   * @legacy-covers ::move
+   */
+  public function testNormal(): void {
     $contents = $this->randomMachineName(10);
     $source = $this->createFile(NULL, $contents);
     $desired_filepath = 'public://' . $this->randomMachineName();
 
     // Clone the object so we don't have to worry about the function changing
     // our reference copy.
-    $result = file_move(clone $source, $desired_filepath, FileSystemInterface::EXISTS_ERROR);
+    $result = $this->fileRepository->move(clone $source, $desired_filepath, FileExists::Error);
 
     // Check the return status and that the contents changed.
     $this->assertNotFalse($result, 'File moved successfully.');
-    $this->assertFileNotExists($source->getFileUri());
+    $this->assertFileDoesNotExist($source->getFileUri());
     $this->assertEquals($contents, file_get_contents($result->getFileUri()), 'Contents of file correctly written.');
 
     // Check that the correct hooks were called.
     $this->assertFileHooksCalled(['move', 'load', 'update']);
 
     // Make sure we got the same file back.
-    $this->assertEquals($source->id(), $result->id(), new FormattableMarkup("Source file id's' %fid is unchanged after move.", ['%fid' => $source->id()]));
+    $this->assertEquals($source->id(), $result->id(), "Source file ID {$source->id()} should be unchanged after move.");
 
     // Reload the file from the database and check that the changes were
     // actually saved.
@@ -45,8 +72,10 @@ class MoveTest extends FileManagedUnitTestBase {
 
   /**
    * Tests renaming when moving onto a file that already exists.
+   *
+   * @legacy-covers ::move
    */
-  public function testExistingRename() {
+  public function testExistingRename(): void {
     // Setup a file to overwrite.
     $contents = $this->randomMachineName(10);
     $source = $this->createFile(NULL, $contents);
@@ -55,11 +84,11 @@ class MoveTest extends FileManagedUnitTestBase {
 
     // Clone the object so we don't have to worry about the function changing
     // our reference copy.
-    $result = file_move(clone $source, $target->getFileUri(), FileSystemInterface::EXISTS_RENAME);
+    $result = $this->fileRepository->move(clone $source, $target->getFileUri());
 
     // Check the return status and that the contents changed.
     $this->assertNotFalse($result, 'File moved successfully.');
-    $this->assertFileNotExists($source->getFileUri());
+    $this->assertFileDoesNotExist($source->getFileUri());
     $this->assertEquals($contents, file_get_contents($result->getFileUri()), 'Contents of file correctly written.');
 
     // Check that the correct hooks were called.
@@ -80,8 +109,10 @@ class MoveTest extends FileManagedUnitTestBase {
 
   /**
    * Tests replacement when moving onto a file that already exists.
+   *
+   * @legacy-covers ::move
    */
-  public function testExistingReplace() {
+  public function testExistingReplace(): void {
     // Setup a file to overwrite.
     $contents = $this->randomMachineName(10);
     $source = $this->createFile(NULL, $contents);
@@ -90,11 +121,11 @@ class MoveTest extends FileManagedUnitTestBase {
 
     // Clone the object so we don't have to worry about the function changing
     // our reference copy.
-    $result = file_move(clone $source, $target->getFileUri(), FileSystemInterface::EXISTS_REPLACE);
+    $result = $this->fileRepository->move(clone $source, $target->getFileUri(), FileExists::Replace);
 
     // Look at the results.
     $this->assertEquals($contents, file_get_contents($result->getFileUri()), 'Contents of file were overwritten.');
-    $this->assertFileNotExists($source->getFileUri());
+    $this->assertFileDoesNotExist($source->getFileUri());
     $this->assertNotEmpty($result, 'File moved successfully.');
 
     // Check that the correct hooks were called.
@@ -112,16 +143,23 @@ class MoveTest extends FileManagedUnitTestBase {
 
   /**
    * Tests replacement when moving onto itself.
+   *
+   * @legacy-covers ::move
    */
-  public function testExistingReplaceSelf() {
+  public function testExistingReplaceSelf(): void {
     // Setup a file to overwrite.
     $contents = $this->randomMachineName(10);
     $source = $this->createFile(NULL, $contents);
 
     // Copy the file over itself. Clone the object so we don't have to worry
     // about the function changing our reference copy.
-    $result = file_move(clone $source, $source->getFileUri(), FileSystemInterface::EXISTS_REPLACE);
-    $this->assertFalse($result, 'File move failed.');
+    try {
+      $this->fileRepository->move(clone $source, $source->getFileUri(), FileExists::Error);
+      $this->fail('expected FileExistsException');
+    }
+    catch (FileExistsException $e) {
+      $this->assertStringContainsString("could not be copied because a file by that name already exists in the destination directory", $e->getMessage());
+    }
     $this->assertEquals($contents, file_get_contents($source->getFileUri()), 'Contents of file were not altered.');
 
     // Check that no hooks were called while failing.
@@ -134,8 +172,10 @@ class MoveTest extends FileManagedUnitTestBase {
 
   /**
    * Tests that moving onto an existing file fails when instructed to do so.
+   *
+   * @legacy-covers ::move
    */
-  public function testExistingError() {
+  public function testExistingError(): void {
     $contents = $this->randomMachineName(10);
     $source = $this->createFile();
     $target = $this->createFile(NULL, $contents);
@@ -143,10 +183,15 @@ class MoveTest extends FileManagedUnitTestBase {
 
     // Clone the object so we don't have to worry about the function changing
     // our reference copy.
-    $result = file_move(clone $source, $target->getFileUri(), FileSystemInterface::EXISTS_ERROR);
-
+    try {
+      $this->fileRepository->move(clone $source, $target->getFileUri(), FileExists::Error);
+      $this->fail('expected FileExistsException');
+    }
+    // FileExistsException is a subclass of FileException.
+    catch (FileExistsException $e) {
+      $this->assertStringContainsString("could not be copied because a file by that name already exists in the destination directory", $e->getMessage());
+    }
     // Check the return status and that the contents did not change.
-    $this->assertFalse($result, 'File move failed.');
     $this->assertFileExists($source->getFileUri());
     $this->assertEquals($contents, file_get_contents($target->getFileUri()), 'Contents of file were not altered.');
 
@@ -157,6 +202,45 @@ class MoveTest extends FileManagedUnitTestBase {
     // was returned.
     $this->assertFileUnchanged($source, File::load($source->id()));
     $this->assertFileUnchanged($target, File::load($target->id()));
+  }
+
+  /**
+   * Tests for an invalid stream wrapper.
+   *
+   * @legacy-covers ::move
+   */
+  public function testInvalidStreamWrapper(): void {
+    $this->expectException(InvalidStreamWrapperException::class);
+    $this->expectExceptionMessage('Invalid stream wrapper: foo://');
+    $source = $this->createFile();
+    $this->fileRepository->move($source, 'foo://');
+  }
+
+  /**
+   * Tests for entity storage exception.
+   *
+   * @legacy-covers ::move
+   */
+  public function testEntityStorageException(): void {
+    /** @var \Drupal\Core\Entity\EntityTypeManager $entityTypeManager */
+    $entityTypeManager = $this->prophesize(EntityTypeManager::class);
+    $entityTypeManager->getStorage('file')
+      ->willThrow(EntityStorageException::class);
+
+    $fileRepository = new FileRepository(
+      $this->container->get('file_system'),
+      $this->container->get('stream_wrapper_manager'),
+      $entityTypeManager->reveal(),
+      $this->container->get('module_handler'),
+      $this->container->get('file.usage'),
+      $this->container->get('current_user')
+    );
+
+    $this->expectException(EntityStorageException::class);
+    $source = $this->createFile();
+    $target = $this->createFile();
+    $fileRepository->move($source, $target->getFileUri(), FileExists::Replace);
+
   }
 
 }

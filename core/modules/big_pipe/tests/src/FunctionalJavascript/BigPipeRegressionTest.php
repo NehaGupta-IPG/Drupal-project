@@ -1,122 +1,47 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\big_pipe\FunctionalJavascript;
 
 use Drupal\big_pipe\Render\BigPipe;
 use Drupal\big_pipe_regression_test\BigPipeRegressionTestController;
-use Drupal\comment\CommentInterface;
-use Drupal\comment\Entity\Comment;
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
-use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Core\Url;
-use Drupal\editor\Entity\Editor;
-use Drupal\filter\Entity\FilterFormat;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
-use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
-use Drupal\Tests\node\Traits\NodeCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * BigPipe regression tests.
- *
- * @group big_pipe
  */
+#[Group('big_pipe')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class BigPipeRegressionTest extends WebDriverTestBase {
-
-  use CommentTestTrait;
-  use ContentTypeCreationTrait;
-  use NodeCreationTrait;
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
     'big_pipe',
+    'big_pipe_messages_test',
     'big_pipe_regression_test',
   ];
 
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'stark';
+  protected $defaultTheme = 'big_pipe_test_theme';
 
   /**
-   * {@inheritdoc}
+   * Tests edge cases with placeholder HTML.
    */
-  public function setUp(): void {
-    parent::setUp();
-
-    // Use the big_pipe_test_theme theme.
-    $this->container->get('theme_installer')->install(['big_pipe_test_theme']);
-    $this->container->get('config.factory')->getEditable('system.theme')->set('default', 'big_pipe_test_theme')->save();
-  }
-
-  /**
-   * Ensure comment form works with history and big_pipe modules.
-   *
-   * @see https://www.drupal.org/node/2698811
-   */
-  public function testCommentForm_2698811() {
-    $this->assertTrue($this->container->get('module_installer')->install(['comment', 'history', 'ckeditor'], TRUE), 'Installed modules.');
-
-    // Ensure an `article` node type exists.
-    $this->createContentType(['type' => 'article']);
-    $this->addDefaultCommentField('node', 'article');
-
-    // Enable CKEditor.
-    $format = $this->randomMachineName();
-    FilterFormat::create([
-      'format' => $format,
-      'name' => $this->randomString(),
-      'weight' => 1,
-      'filters' => [],
-    ])->save();
-    $settings['toolbar']['rows'] = [
-      [
-        [
-          'name' => 'Links',
-          'items' => [
-            'DrupalLink',
-            'DrupalUnlink',
-          ],
-        ],
-      ],
-    ];
-    $editor = Editor::create([
-      'format' => $format,
-      'editor' => 'ckeditor',
-    ]);
-    $editor->setSettings($settings);
-    $editor->save();
-
-    $admin_user = $this->drupalCreateUser([
-      'access comments',
-      'post comments',
-      'use text format ' . $format,
-    ]);
-    $this->drupalLogin($admin_user);
-
-    $node = $this->createNode([
-      'type' => 'article',
-      'comment' => CommentItemInterface::OPEN,
-    ]);
-    // Create some comments.
-    foreach (range(1, 5) as $i) {
-      $comment = Comment::create([
-        'status' => CommentInterface::PUBLISHED,
-        'field_name' => 'comment',
-        'entity_type' => 'node',
-        'entity_id' => $node->id(),
-      ]);
-      $comment->save();
-    }
-    $this->drupalGet($node->toUrl()->toString());
-    // Confirm that CKEditor loaded.
-    $javascript = <<<JS
-    (function(){
-      return Object.keys(CKEDITOR.instances).length > 0;
-    }())
-JS;
-    $this->assertJsCondition($javascript);
+  public function testPlaceholderHtmlEdgeCases(): void {
+    $this->drupalLogin($this->drupalCreateUser());
+    $this->doTestMultipleClosingBodies_2678662();
+    $this->doTestPlaceholderInParagraph_2802923();
+    $this->doTestBigPipeLargeContent();
+    $this->doInlineScriptTest();
   }
 
   /**
@@ -124,17 +49,13 @@ JS;
    *
    * @see https://www.drupal.org/node/2678662
    */
-  public function testMultipleClosingBodies_2678662() {
-    $this->assertTrue($this->container->get('module_installer')->install(['render_placeholder_message_test'], TRUE), 'Installed modules.');
-
-    $this->drupalLogin($this->drupalCreateUser());
+  protected function doTestMultipleClosingBodies_2678662(): void {
     $this->drupalGet(Url::fromRoute('big_pipe_regression_test.2678662'));
 
-    // Confirm that AJAX behaviors were instantiated, if not, this points to a
-    // JavaScript syntax error.
+    // Confirm that the JS variable has the appropriate content.
     $javascript = <<<JS
     (function(){
-      return Object.keys(Drupal.ajax.instances).length > 0;
+      return hitsTheFloor === "</body>";
     }())
 JS;
     $this->assertJsCondition($javascript);
@@ -150,47 +71,9 @@ JS;
     // in an inline script.
     $this->assertSession()
       ->responseNotContains($js_code_until_closing_body_tag . "\n" . BigPipe::START_SIGNAL);
-  }
-
-  /**
-   * Ensure messages set in placeholders always appear.
-   *
-   * @see https://www.drupal.org/node/2712935
-   */
-  public function testMessages_2712935() {
-    $this->assertTrue($this->container->get('module_installer')->install(['render_placeholder_message_test'], TRUE), 'Installed modules.');
-
-    $this->drupalLogin($this->drupalCreateUser());
-    $messages_markup = '<div role="contentinfo" aria-label="Status message"';
-
-    $test_routes = [
-      // Messages placeholder rendered first.
-      'render_placeholder_message_test.first',
-      // Messages placeholder rendered after one, before another.
-      'render_placeholder_message_test.middle',
-      // Messages placeholder rendered last.
-      'render_placeholder_message_test.last',
-    ];
-
-    $assert = $this->assertSession();
-    foreach ($test_routes as $route) {
-      // Verify that we start off with zero messages queued.
-      $this->drupalGet(Url::fromRoute('render_placeholder_message_test.queued'));
-      $assert->responseNotContains($messages_markup);
-
-      // Verify the test case at this route behaves as expected.
-      $this->drupalGet(Url::fromRoute($route));
-      $assert->elementContains('css', 'p.logged-message:nth-of-type(1)', 'Message: P1');
-      $assert->elementContains('css', 'p.logged-message:nth-of-type(2)', 'Message: P2');
-      $assert->responseContains($messages_markup);
-      $assert->elementExists('css', 'div[aria-label="Status message"] ul');
-      $assert->elementContains('css', 'div[aria-label="Status message"] ul li:nth-of-type(1)', 'P1');
-      $assert->elementContains('css', 'div[aria-label="Status message"] ul li:nth-of-type(2)', 'P2');
-
-      // Verify that we end with all messages printed, hence again zero queued.
-      $this->drupalGet(Url::fromRoute('render_placeholder_message_test.queued'));
-      $assert->responseNotContains($messages_markup);
-    }
+    // But the inline script itself should not be altered.
+    $this->assertSession()
+      ->responseContains(BigPipeRegressionTestController::MARKER_2678662);
   }
 
   /**
@@ -198,11 +81,75 @@ JS;
    *
    * @see https://www.drupal.org/node/2802923
    */
-  public function testPlaceholderInParagraph_2802923() {
-    $this->drupalLogin($this->drupalCreateUser());
+  protected function doTestPlaceholderInParagraph_2802923(): void {
     $this->drupalGet(Url::fromRoute('big_pipe_regression_test.2802923'));
 
     $this->assertJsCondition('document.querySelectorAll(\'p\').length === 1');
+  }
+
+  /**
+   * Tests BigPipe large content.
+   *
+   * Repeat loading of same page for two times, after second time the page is
+   * cached and the bug consistently reproducible.
+   */
+  protected function doTestBigPipeLargeContent(): void {
+    $assert_session = $this->assertSession();
+
+    $this->drupalGet(Url::fromRoute('big_pipe_test_large_content'));
+    $this->assertNotNull($assert_session->waitForElement('css', 'script[data-big-pipe-event="stop"]'));
+    $this->assertCount(0, $this->getDrupalSettings()['bigPipePlaceholderIds']);
+    $this->assertCount(2, $this->getSession()->getPage()->findAll('css', 'script[data-big-pipe-replacement-for-placeholder-with-id]'));
+    $assert_session->elementExists('css', '#big-pipe-large-content');
+
+    $this->drupalGet(Url::fromRoute('big_pipe_test_large_content'));
+    $this->assertNotNull($assert_session->waitForElement('css', 'script[data-big-pipe-event="stop"]'));
+    $this->assertCount(0, $this->getDrupalSettings()['bigPipePlaceholderIds']);
+    $this->assertCount(2, $this->getSession()->getPage()->findAll('css', 'script[data-big-pipe-replacement-for-placeholder-with-id]'));
+    $assert_session->elementExists('css', '#big-pipe-large-content');
+  }
+
+  /**
+   * Test BigPipe replacement of multiple complex replacements.
+   *
+   * In some situations with either a large number of replacements or multiple
+   * replacements involving complex operations, some replacements were not
+   * completed. This is a simulation of such a situation by rendering a lot of
+   * placeholders on a page.
+   *
+   * @see https://www.drupal.org/node/3390178
+   */
+  public function testMultipleReplacements(): void {
+    // @todo re-enable this test in https://www.drupal.org/project/drupal/issues/3590200
+    $this->markTestSkipped();
+    $assert_session = $this->assertSession();
+
+    $this->drupalGet(Url::fromRoute('big_pipe_test_multiple_replacements'));
+    $this->assertNotNull($assert_session->waitForElement('css', 'script[data-big-pipe-event="stop"]'));
+    $this->assertCount(0, $this->getDrupalSettings()['bigPipePlaceholderIds']);
+    $this->assertCount(0, $this->getSession()->getPage()->findAll('css', 'span[data-big-pipe-placeholder-id]'));
+    $this->assertCount(BigPipeRegressionTestController::PLACEHOLDER_COUNT + 1, $this->getSession()->getPage()->findAll('css', 'script[data-big-pipe-replacement-for-placeholder-with-id]'));
+  }
+
+  /**
+   * Tests for the correct replacement of a chunk with inline javascript.
+   *
+   * Parsing a <script> tag causes a mutation to be reported because it
+   * triggers a micro task checkpoint.  Watching for template tags directly
+   * results in early mutation reporting, and the trailing markup is not yet
+   * parsed when the template is processed.
+   *
+   * Also, chunk markup needs to not be double escaped.  We encountered both
+   * regressions in https://www.drupal.org/project/drupal/issues/3526267.
+   */
+  protected function doInlineScriptTest(): void {
+    $assert_session = $this->assertSession();
+
+    $this->drupalGet(Url::fromRoute('big_pipe_regression_test.inline_script'));
+    $this->assertNotNull($assert_session->waitForElement('css', 'script[data-big-pipe-event="stop"]'));
+    $assert_session->elementExists('css', 'div.container-before');
+    $assert_session->elementExists('css', 'body.inline-script-fires');
+    $assert_session->elementExists('css', 'div.container-after');
   }
 
 }

@@ -1,31 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views_ui\Functional;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
+use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the UI of generic display path plugin.
  *
- * @group views_ui
  * @see \Drupal\views\Plugin\views\display\PathPluginBase
  */
+#[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class DisplayPathTest extends UITestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
-
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp($import_test_views);
-
-    $this->placeBlock('page_title_block');
-  }
+  use SchemaCheckTestTrait;
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['menu_ui'];
+  protected function setUp($import_test_views = TRUE, $modules = ['views_test_config']): void {
+    parent::setUp($import_test_views, $modules);
+
+    $this->placeBlock('page_title_block');
+  }
 
   /**
    * {@inheritdoc}
@@ -42,7 +48,7 @@ class DisplayPathTest extends UITestBase {
   /**
    * Runs the tests.
    */
-  public function testPathUI() {
+  public function testPathUI(): void {
     $this->doBasicPathUITest();
     $this->doAdvancedPathsValidationTest();
     $this->doPathXssFilterTest();
@@ -51,7 +57,7 @@ class DisplayPathTest extends UITestBase {
   /**
    * Tests basic functionality in configuring a view.
    */
-  protected function doBasicPathUITest() {
+  protected function doBasicPathUITest(): void {
     $this->drupalGet('admin/structure/views/view/test_view');
 
     // Add a new page display and check the appearing text.
@@ -68,16 +74,14 @@ class DisplayPathTest extends UITestBase {
     $this->drupalGet('admin/structure/views/nojs/display/test_view/page_1/path');
     $this->submitForm(['path' => $random_path], 'Apply');
     $this->assertSession()->pageTextContains('/' . $random_path);
-    $display_link_text = t('View @display', ['@display' => 'Page']);
-    $this->assertSession()->linkExists($display_link_text, 0, 'view page link found on the page.');
-    $this->clickLink($display_link_text);
+    $this->clickLink('View Page');
     $this->assertSession()->addressEquals($random_path);
   }
 
   /**
    * Tests that View paths are properly filtered for XSS.
    */
-  public function doPathXssFilterTest() {
+  public function doPathXssFilterTest(): void {
     $this->drupalGet('admin/structure/views/view/test_view');
     $this->submitForm([], 'Add Page');
     $this->drupalGet('admin/structure/views/nojs/display/test_view/page_2/path');
@@ -95,43 +99,43 @@ class DisplayPathTest extends UITestBase {
     $this->assertSession()->assertEscaped('/<object>malformed_path</object>');
     $this->assertSession()->assertEscaped('/<script>alert("hello");</script>');
     $this->assertSession()->assertEscaped('/<script>alert("hello I have placeholders %");</script>');
-    // Links should be url-encoded.
-    $this->assertRaw('/%3Cobject%3Emalformed_path%3C/object%3E');
-    $this->assertRaw('/%3Cscript%3Ealert%28%22hello%22%29%3B%3C/script%3E');
+    // Links should be URL-encoded.
+    $this->assertSession()->responseContains('/%3Cobject%3Emalformed_path%3C/object%3E');
+    $this->assertSession()->responseContains('/%3Cscript%3Ealert%28%22hello%22%29%3B%3C/script%3E');
   }
 
   /**
    * Tests a couple of invalid path patterns.
    */
-  protected function doAdvancedPathsValidationTest() {
+  protected function doAdvancedPathsValidationTest(): void {
     $url = 'admin/structure/views/nojs/display/test_view/page_1/path';
 
     $this->drupalGet($url);
-    $this->submitForm(['path' => '%/magrathea'], 'Apply');
+    $this->submitForm(['path' => '%/foo'], 'Apply');
     $this->assertSession()->addressEquals($url);
     $this->assertSession()->pageTextContains('"%" may not be used for the first segment of a path.');
 
     $this->drupalGet($url);
     $this->submitForm(['path' => 'user/%1/example'], 'Apply');
     $this->assertSession()->addressEquals($url);
-    $this->assertSession()->pageTextContains("Numeric placeholders may not be used. Please use plain placeholders (%).");
+    $this->assertSession()->pageTextContains("Numeric placeholders may not be used. Use plain placeholders (%).");
   }
 
   /**
    * Tests deleting a page display that has no path.
    */
-  public function testDeleteWithNoPath() {
+  public function testDeleteWithNoPath(): void {
     $this->drupalGet('admin/structure/views/view/test_view');
     $this->submitForm([], 'Add Page');
     $this->submitForm([], 'Delete Page');
     $this->submitForm([], 'Save');
-    $this->assertRaw(t('The view %view has been saved.', ['%view' => 'Test view']));
+    $this->assertSession()->pageTextContains("The view Test view has been saved.");
   }
 
   /**
    * Tests the menu and tab option form.
    */
-  public function testMenuOptions() {
+  public function testMenuOptions(): void {
     $this->drupalGet('admin/structure/views/view/test_view');
 
     // Add a new page display.
@@ -181,7 +185,7 @@ class DisplayPathTest extends UITestBase {
     $this->drupalGet('admin/structure/views/nojs/display/test_page_display_menu/page_5/menu');
     $this->assertSession()->statusCodeEquals(200);
     $menu_options = $this->assertSession()->selectExists('edit-menu-parent')->findAll('css', 'option');
-    $menu_options = array_map(function ($element) {
+    $menu_options = array_map(function (NodeElement $element) {
       return $element->getText();
     }, $menu_options);
 
@@ -193,7 +197,6 @@ class DisplayPathTest extends UITestBase {
       '<Footer>',
       '<Main navigation>',
       '<Tools>',
-      '-- Compose tips (disabled)',
       '-- Test menu link',
     ], $menu_options);
 
@@ -205,7 +208,7 @@ class DisplayPathTest extends UITestBase {
   /**
    * Tests the regression in https://www.drupal.org/node/2532490.
    */
-  public function testDefaultMenuTabRegression() {
+  public function testDefaultMenuTabRegression(): void {
     $this->container->get('module_installer')->install(['menu_link_content', 'toolbar', 'system']);
     $this->resetAll();
     $admin_user = $this->drupalCreateUser([
@@ -218,6 +221,7 @@ class DisplayPathTest extends UITestBase {
       'administer menu',
       'link to any page',
       'access toolbar',
+      'access administration pages',
     ]);
     $this->drupalLogin($admin_user);
 
@@ -240,7 +244,7 @@ class DisplayPathTest extends UITestBase {
 
     $edit = [];
     $edit['label'] = $this->randomMachineName(16);
-    $view_id = $edit['id'] = strtolower($this->randomMachineName(16));
+    $view_id = $edit['id'] = $this->randomMachineName(16);
     $edit['description'] = $this->randomMachineName(16);
     $edit['page[create]'] = TRUE;
     $edit['page[path]'] = 'admin/foo';
@@ -254,7 +258,7 @@ class DisplayPathTest extends UITestBase {
     $plugin_definition = end($result)->link->getPluginDefinition();
     $this->assertEquals('view.' . $view_id . '.page_1', $plugin_definition['route_name']);
 
-    $this->clickLink(t('No menu'));
+    $this->clickLink('No menu');
 
     $this->submitForm([
       'menu[type]' => 'default tab',
@@ -268,9 +272,78 @@ class DisplayPathTest extends UITestBase {
       'tab_options[title]' => 'Parent title',
     ], 'Apply');
 
+    // Open the menu options again.
+    $this->clickLink('Tab: Menu title');
+
+    // Assert a menu can be selected as a parent.
+    $this->assertSession()->optionExists('menu[parent]', 'admin:');
+
+    // Assert a parent menu item can be selected from within a menu.
+    $this->assertSession()->optionExists('menu[parent]', 'admin:system.admin');
+
+    // Check that parent menu item can now be
+    // added without the menu_ui module being enabled.
+    $this->submitForm([
+      'menu[type]' => 'normal',
+      'menu[parent]' => 'admin:system.admin',
+      'menu[title]' => 'Menu title',
+    ], 'Apply');
+
     $this->submitForm([], 'Save');
     // Assert that saving the view will not cause an exception.
     $this->assertSession()->statusCodeEquals(200);
+  }
+
+  /**
+   * Tests the "Use the administration theme" configuration.
+   *
+   * @see \Drupal\Tests\views\Functional\Plugin\DisplayPageWebTest::testAdminTheme
+   */
+  public function testUseAdminTheme(): void {
+    $this->drupalGet('admin/structure/views/view/test_view');
+
+    // Add a new page display.
+    $this->submitForm([], 'Add Page');
+    $this->assertSession()->pageTextContains('No path is set');
+    $this->assertSession()->pageTextContains('Administration theme: No');
+
+    // Test with a path starting with "/admin".
+    $admin_path = 'admin/test_admin_path';
+    $this->drupalGet('admin/structure/views/nojs/display/test_view/page_1/path');
+    $this->submitForm(['path' => $admin_path], 'Apply');
+    $this->assertSession()->pageTextContains('/' . $admin_path);
+    $this->assertSession()->pageTextContains('Administration theme: Yes (admin path)');
+    $this->submitForm([], 'Save');
+
+    $this->assertConfigSchemaByName('views.view.test_view');
+    $display_options = $this->config('views.view.test_view')->get('display.page_1.display_options');
+    $this->assertArrayNotHasKey('use_admin_theme', $display_options);
+
+    $this->drupalGet('admin/structure/views/nojs/display/test_view/page_1/use_admin_theme');
+    $this->assertSession()->elementExists('css', 'input[name="use_admin_theme"][disabled="disabled"][checked="checked"]');
+
+    // Test with a non-administration path.
+    $non_admin_path = 'kittens';
+    $this->drupalGet('admin/structure/views/nojs/display/test_view/page_1/path');
+    $this->submitForm(['path' => $non_admin_path], 'Apply');
+    $this->assertSession()->pageTextContains('/' . $non_admin_path);
+    $this->assertSession()->pageTextContains('Administration theme: No');
+    $this->submitForm([], 'Save');
+
+    $this->assertConfigSchemaByName('views.view.test_view');
+    $display_options = $this->config('views.view.test_view')->get('display.page_1.display_options');
+    $this->assertArrayNotHasKey('use_admin_theme', $display_options);
+
+    // Enable administration theme.
+    $this->drupalGet('admin/structure/views/nojs/display/test_view/page_1/use_admin_theme');
+    $this->submitForm(['use_admin_theme' => TRUE], 'Apply');
+    $this->assertSession()->pageTextContains('Administration theme: Yes');
+    $this->submitForm([], 'Save');
+
+    $this->assertConfigSchemaByName('views.view.test_view');
+    $display_options = $this->config('views.view.test_view')->get('display.page_1.display_options');
+    $this->assertArrayHasKey('use_admin_theme', $display_options);
+    $this->assertTrue($display_options['use_admin_theme']);
   }
 
 }

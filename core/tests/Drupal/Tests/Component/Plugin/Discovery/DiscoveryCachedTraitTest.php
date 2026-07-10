@@ -1,14 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\Plugin\Discovery;
 
+use Drupal\Component\Plugin\Discovery\DiscoveryCachedTrait;
+use Drupal\Component\Plugin\Discovery\DiscoveryTrait;
+use PHPUnit\Framework\Attributes\CoversTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\UsesTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass \Drupal\Component\Plugin\Discovery\DiscoveryCachedTrait
- * @uses \Drupal\Component\Plugin\Discovery\DiscoveryTrait
- * @group Plugin
+ * Tests Drupal\Component\Plugin\Discovery\DiscoveryCachedTrait.
  */
+#[CoversTrait(DiscoveryCachedTrait::class)]
+#[Group('Plugin')]
+#[UsesTrait(DiscoveryTrait::class)]
 class DiscoveryCachedTraitTest extends TestCase {
 
   /**
@@ -20,7 +29,7 @@ class DiscoveryCachedTraitTest extends TestCase {
    *   - Definitions to be returned by getDefinitions().
    *   - Plugin name to query for.
    */
-  public function providerGetDefinition() {
+  public static function providerGetDefinition(): array {
     return [
       ['definition', [], ['plugin_name' => 'definition'], 'plugin_name'],
       ['definition', ['plugin_name' => 'definition'], [], 'plugin_name'],
@@ -29,14 +38,14 @@ class DiscoveryCachedTraitTest extends TestCase {
   }
 
   /**
-   * @covers ::getDefinition
-   * @dataProvider providerGetDefinition
+   * Tests get definition.
    */
-  public function testGetDefinition($expected, $cached_definitions, $get_definitions, $plugin_id) {
-    // Mock a DiscoveryCachedTrait.
-    $trait = $this->getMockForTrait('Drupal\Component\Plugin\Discovery\DiscoveryCachedTrait');
+  #[DataProvider('providerGetDefinition')]
+  public function testGetDefinition(?string $expected, array $cached_definitions, array $get_definitions, string $plugin_id): void {
+    $trait = $this->getMockBuilder(DiscoveryCachedTraitMockableClass::class)
+      ->onlyMethods(['getDefinitions'])
+      ->getMock();
     $reflection_definitions = new \ReflectionProperty($trait, 'definitions');
-    $reflection_definitions->setAccessible(TRUE);
     // getDefinition() needs the ::$definitions property to be set in one of two
     // ways: 1) As existing cached data, or 2) as a side-effect of calling
     // getDefinitions().
@@ -46,12 +55,14 @@ class DiscoveryCachedTraitTest extends TestCase {
       $trait->expects($this->once())
         ->method('getDefinitions')
         // Use a callback method, so we can perform the side-effects.
-        ->willReturnCallback(function () use ($reflection_definitions, $trait, $get_definitions) {
+        ->willReturnCallback(function () use ($reflection_definitions, $trait, $get_definitions): array {
           $reflection_definitions->setValue($trait, $get_definitions);
           return $get_definitions;
         });
     }
     else {
+      $trait->expects($this->never())
+        ->method('getDefinitions');
       // Put $cached_definitions into our mocked ::$definitions.
       $reflection_definitions->setValue($trait, $cached_definitions);
     }
@@ -60,6 +71,19 @@ class DiscoveryCachedTraitTest extends TestCase {
       $expected,
       $trait->getDefinition($plugin_id, FALSE)
     );
+  }
+
+}
+
+/**
+ * A class using the DiscoveryCachedTrait for mocking purposes.
+ */
+class DiscoveryCachedTraitMockableClass {
+
+  use DiscoveryCachedTrait;
+
+  public function getDefinitions(): array {
+    return [];
   }
 
 }

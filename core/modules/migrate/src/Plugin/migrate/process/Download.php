@@ -4,11 +4,11 @@ namespace Drupal\migrate\Plugin\migrate\process;
 
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\Row;
-use GuzzleHttp\Client;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use GuzzleHttp\ClientInterface;
 
 /**
  * Downloads a file from a HTTP(S) remote location into the local file system.
@@ -31,31 +31,34 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @code
  * process:
- *   plugin: download
- *   source:
- *     - source_url
- *     - destination_uri
+ *   path_to_file:
+ *     plugin: download
+ *     source:
+ *       - source_url
+ *       - destination_uri
  * @endcode
  *
  * This will download source_url to destination_uri.
  *
  * @code
  * process:
- *   plugin: download
- *   source:
- *     - source_url
- *     - destination_uri
- *   file_exists: rename
+ *   uri:
+ *     plugin: download
+ *     source:
+ *       - source_url
+ *       - destination_uri
+ *     file_exists: rename
+ *   # other fields ...
+ * destination:
+ *   plugin: entity:file
  * @endcode
  *
  * This will download source_url to destination_uri and ensure that the
  * destination URI is unique. If a file with the same name exists at the
  * destination, a numbered suffix like '_0' will be appended to make it unique.
- *
- * @MigrateProcessPlugin(
- *   id = "download"
- * )
+ * The destination URI is saved in a file entity.
  */
+#[MigrateProcess('download')]
 class Download extends FileProcessBase implements ContainerFactoryPluginInterface {
 
   /**
@@ -83,10 +86,10 @@ class Download extends FileProcessBase implements ContainerFactoryPluginInterfac
    *   The plugin definition.
    * @param \Drupal\Core\File\FileSystemInterface $file_system
    *   The file system service.
-   * @param \GuzzleHttp\Client $http_client
+   * @param \GuzzleHttp\ClientInterface $http_client
    *   The HTTP client.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, FileSystemInterface $file_system, Client $http_client) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, FileSystemInterface $file_system, ClientInterface $http_client) {
     $configuration += [
       'guzzle_options' => [],
     ];
@@ -98,26 +101,13 @@ class Download extends FileProcessBase implements ContainerFactoryPluginInterfac
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('file_system'),
-      $container->get('http_client')
-    );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
     // If we're stubbing a file entity, return a uri of NULL so it will get
     // stubbed by the general process.
     if ($row->isStub()) {
       return NULL;
     }
-    list($source, $destination) = $value;
+    [$source, $destination] = $value;
 
     // Modify the destination filename if necessary.
     $final_destination = $this->fileSystem->getDestinationFilename($destination, $this->configuration['file_exists']);
@@ -152,7 +142,17 @@ class Download extends FileProcessBase implements ContainerFactoryPluginInterfac
       $this->httpClient->get($source, $this->configuration['guzzle_options']);
     }
     catch (\Exception $e) {
+      // Since the destination file stream was used as the sink for the Guzzle
+      // request, invalid file content from the failed request may be stored in
+      // a newly created file. Clean up the file if it exists since the request
+      // failed.
+      $this->fileSystem->delete($final_destination);
+
       throw new MigrateException("{$e->getMessage()} ($source)");
+    }
+
+    if (is_resource($destination_stream)) {
+      fclose($destination_stream);
     }
 
     return $final_destination;

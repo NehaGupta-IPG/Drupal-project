@@ -1,24 +1,34 @@
+parameters:
+  workspaces.skip_procedural_hook_scan: true
+
 services:
+  _defaults:
+    autoconfigure: true
+    autowire: true
   workspaces.manager:
     class: Drupal\workspaces\WorkspaceManager
-    arguments: ['@request_stack', '@entity_type.manager', '@entity.memory_cache', '@current_user', '@state', '@logger.channel.workspaces', '@class_resolver', '@workspaces.association']
-    tags:
-      - { name: service_id_collector, tag: workspace_negotiator }
+  Drupal\workspaces\WorkspaceManagerInterface: '@workspaces.manager'
+  workspaces.information:
+    class: Drupal\workspaces\WorkspaceInformation
+  Drupal\workspaces\WorkspaceInformationInterface: '@workspaces.information'
   workspaces.operation_factory:
     class: Drupal\workspaces\WorkspaceOperationFactory
-    arguments: ['@entity_type.manager', '@database', '@workspaces.manager', '@workspaces.association', '@cache_tags.invalidator']
-  workspaces.association:
-    class: Drupal\workspaces\WorkspaceAssociation
-    arguments: ['@database', '@entity_type.manager', '@workspaces.repository']
+  Drupal\workspaces\WorkspaceOperationFactory: '@workspaces.operation_factory'
+  workspaces.tracker:
+    class: Drupal\workspaces\WorkspaceTracker
     tags:
       - { name: backend_overridable }
+  Drupal\workspaces\WorkspaceTrackerInterface: '@workspaces.tracker'
   workspaces.repository:
     class: Drupal\workspaces\WorkspaceRepository
     arguments: ['@entity_type.manager', '@cache.default']
+  Drupal\workspaces\WorkspaceRepositoryInterface: '@workspaces.repository'
+
+  Drupal\workspaces\Provider\WorkspaceProviderCollector: ~
+  Drupal\workspaces\Provider\DefaultWorkspaceProvider: ~
 
   workspaces.negotiator.session:
     class: Drupal\workspaces\Negotiator\SessionWorkspaceNegotiator
-    arguments: ['@current_user', '@session', '@entity_type.manager']
     tags:
       - { name: workspace_negotiator, priority: 50 }
   workspaces.negotiator.query_parameter:
@@ -29,41 +39,56 @@ services:
 
   access_check.workspaces.active_workspace:
     class: Drupal\workspaces\Access\ActiveWorkspaceCheck
-    arguments: ['@workspaces.manager']
     tags:
       - { name: access_check, applies_to: _has_active_workspace }
 
   workspaces.entity_schema_listener:
     class: Drupal\workspaces\EventSubscriber\EntitySchemaSubscriber
-    arguments: ['@entity.definition_update_manager', '@entity.last_installed_schema.repository', '@workspaces.manager']
-    tags:
-      - { name: 'event_subscriber' }
   workspaces.workspace_subscriber:
     class: Drupal\workspaces\EventSubscriber\WorkspaceRequestSubscriber
-    arguments: ['@path_alias.manager', '@path.current', '@router.route_provider', '@workspaces.manager']
-    tags:
-      - { name: event_subscriber }
+  Drupal\workspaces\EventSubscriber\WorkspaceSwitchSubscriber: ~
 
   cache_context.workspace:
     class: Drupal\workspaces\WorkspaceCacheContext
-    arguments: ['@workspaces.manager']
     tags:
       - { name: cache.context }
   logger.channel.workspaces:
     parent: logger.channel_base
     arguments: ['workspaces']
 
+  workspaces.entity.repository:
+    decorates: entity.repository
+    class: Drupal\workspaces\WorkspacesEntityRepository
+    arguments: ['@.inner', '@workspaces.manager']
+    public: false
+
   workspaces.entity.query.sql:
     decorates: entity.query.sql
     class: Drupal\workspaces\EntityQuery\QueryFactory
-    arguments: ['@database', '@workspaces.manager']
     public: false
     decoration_priority: 50
     tags:
       - { name: backend_overridable }
-  pgsql.workspaces.entity.query.sql:
-    decorates: pgsql.entity.query.sql
-    class: Drupal\workspaces\EntityQuery\PgsqlQueryFactory
-    arguments: ['@database', '@workspaces.manager']
+
+  workspaces.menu.tree_storage:
+    decorates: menu.tree_storage
+    class: Drupal\workspaces\WorkspacesMenuTreeStorage
+    arguments: ['@workspaces.manager', '@workspaces.tracker', '@entity_type.manager', '@database', '@cache.menu', '@cache_tags.invalidator', 'menu_tree']
     public: false
     decoration_priority: 50
+    tags:
+      - { name: backend_overridable }
+
+  workspaces.controller.entity_form:
+    # Decorate the entity form controller to handle entity operations inside a
+    # workspace.
+    decorates: controller.entity_form
+    class: Drupal\workspaces\Controller\WorkspacesHtmlEntityFormController
+    public: false
+    arguments: ['@.inner', '@workspaces.manager', '@workspaces.information', '@typed_data_manager']
+  Drupal\workspaces\Controller\WorkspacesHtmlEntityFormController: '@workspaces.controller.entity_form'
+
+  Drupal\workspaces\WorkspacesCron:
+    decorates: cron
+    decoration_priority: -100
+    public: false

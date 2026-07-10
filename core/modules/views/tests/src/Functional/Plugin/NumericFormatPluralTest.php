@@ -1,23 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Component\Gettext\PoHeader;
 use Drupal\Component\Gettext\PoItem;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\file\Entity\File;
 use Drupal\Tests\views\Functional\ViewTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the creation of numeric fields.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class NumericFormatPluralTest extends ViewTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['views_ui', 'file', 'language', 'locale'];
 
@@ -33,20 +36,25 @@ class NumericFormatPluralTest extends ViewTestBase {
    */
   public static $testViews = ['numeric_test'];
 
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp($import_test_views);
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp($import_test_views = TRUE, $modules = ['views_test_config']): void {
+    parent::setUp($import_test_views, $modules);
 
     $web_user = $this->drupalCreateUser([
       'administer views',
       'administer languages',
     ]);
     $this->drupalLogin($web_user);
+    $config = $this->config('locale.settings');
+    $config->set('translate_english', TRUE)->save();
   }
 
   /**
    * Tests plural formatting setting on a numeric views handler.
    */
-  public function testNumericFormatPlural() {
+  public function testNumericFormatPlural(): void {
     // Create a file.
     $file = $this->createFile();
 
@@ -58,7 +66,7 @@ class NumericFormatPluralTest extends ViewTestBase {
 
     // Assert that the value is displayed.
     $this->drupalGet('numeric-test');
-    $this->assertRaw('<span class="field-content">0</span>');
+    $this->assertSession()->responseContains('<span class="field-content">0</span>');
 
     // Assert that the user interface has controls to change it.
     $this->drupalGet('admin/structure/views/nojs/handler/numeric_test/page_1/field/count');
@@ -82,7 +90,7 @@ class NumericFormatPluralTest extends ViewTestBase {
     }
     $this->drupalGet('numeric-test');
     foreach ($numbers as $i => $number) {
-      $this->assertRaw('<span class="field-content">' . $number . ($number == 1 ? ' time' : ' times') . '</span>');
+      $this->assertSession()->responseContains('<span class="field-content">' . $number . ($number == 1 ? ' time' : ' times') . '</span>');
     }
 
     // Add Slovenian and set its plural formula to test multiple plural forms.
@@ -91,7 +99,7 @@ class NumericFormatPluralTest extends ViewTestBase {
     $this->submitForm($edit, 'Add language');
     $formula = 'nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);';
     $header = new PoHeader();
-    list($nplurals, $formula) = $header->parsePluralForms($formula);
+    [$nplurals, $formula] = $header->parsePluralForms($formula);
     \Drupal::service('locale.plural.formula')->setPluralFormula('sl', $nplurals, $formula);
 
     // Change the view to Slovenian.
@@ -121,12 +129,12 @@ class NumericFormatPluralTest extends ViewTestBase {
 
     // The view should now use the new plural configuration.
     $this->drupalGet('sl/numeric-test');
-    $this->assertRaw('<span class="field-content">0 time3</span>');
-    $this->assertRaw('<span class="field-content">1 time0</span>');
-    $this->assertRaw('<span class="field-content">2 time1</span>');
-    $this->assertRaw('<span class="field-content">3 time2</span>');
-    $this->assertRaw('<span class="field-content">4 time2</span>');
-    $this->assertRaw('<span class="field-content">42 time3</span>');
+    $this->assertSession()->responseContains('<span class="field-content">0 time3</span>');
+    $this->assertSession()->responseContains('<span class="field-content">1 time0</span>');
+    $this->assertSession()->responseContains('<span class="field-content">2 time1</span>');
+    $this->assertSession()->responseContains('<span class="field-content">3 time2</span>');
+    $this->assertSession()->responseContains('<span class="field-content">4 time2</span>');
+    $this->assertSession()->responseContains('<span class="field-content">42 time3</span>');
 
     // Add an English configuration translation with English plurals.
     $english = \Drupal::languageManager()->getLanguageConfigOverride('en', 'views.view.numeric_test');
@@ -134,12 +142,12 @@ class NumericFormatPluralTest extends ViewTestBase {
 
     // The view displayed in English should use the English translation.
     $this->drupalGet('numeric-test');
-    $this->assertRaw('<span class="field-content">0 times</span>');
-    $this->assertRaw('<span class="field-content">1 time</span>');
-    $this->assertRaw('<span class="field-content">2 times</span>');
-    $this->assertRaw('<span class="field-content">3 times</span>');
-    $this->assertRaw('<span class="field-content">4 times</span>');
-    $this->assertRaw('<span class="field-content">42 times</span>');
+    $this->assertSession()->responseContains('<span class="field-content">0 times</span>');
+    $this->assertSession()->responseContains('<span class="field-content">1 time</span>');
+    $this->assertSession()->responseContains('<span class="field-content">2 times</span>');
+    $this->assertSession()->responseContains('<span class="field-content">3 times</span>');
+    $this->assertSession()->responseContains('<span class="field-content">4 times</span>');
+    $this->assertSession()->responseContains('<span class="field-content">42 times</span>');
   }
 
   /**
@@ -148,7 +156,7 @@ class NumericFormatPluralTest extends ViewTestBase {
    * @return \Drupal\Core\Entity\EntityInterface
    *   A file entity.
    */
-  protected function createFile() {
+  protected function createFile(): EntityInterface {
     // Create a new file entity.
     $file = File::create([
       'uid' => 1,
@@ -157,8 +165,8 @@ class NumericFormatPluralTest extends ViewTestBase {
       'filemime' => 'text/plain',
       'created' => 1,
       'changed' => 1,
-      'status' => FILE_STATUS_PERMANENT,
     ]);
+    $file->setPermanent();
     file_put_contents($file->getFileUri(), 'hello world');
 
     // Save it, inserting a new record.

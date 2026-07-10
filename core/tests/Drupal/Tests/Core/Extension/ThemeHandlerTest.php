@@ -1,22 +1,23 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\Core\Extension\ThemeHandlerTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Extension;
 
 use Composer\Autoload\ClassLoader;
-use Drupal\Core\Extension\Extension;
+use Drupal\Core\Extension\Theme;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Extension\ThemeHandler;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
- * @coversDefaultClass \Drupal\Core\Extension\ThemeHandler
- * @group Extension
+ * Tests Drupal\Core\Extension\ThemeHandler.
  */
+#[CoversClass(ThemeHandler::class)]
+#[Group('Extension')]
 class ThemeHandlerTest extends UnitTestCase {
 
   /**
@@ -28,10 +29,8 @@ class ThemeHandlerTest extends UnitTestCase {
 
   /**
    * The theme listing service.
-   *
-   * @var \Drupal\Core\Extension\ThemeExtensionList|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $themeList;
+  protected ThemeExtensionList&Stub $themeList;
 
   /**
    * The tested theme handler.
@@ -49,64 +48,45 @@ class ThemeHandlerTest extends UnitTestCase {
     $this->configFactory = $this->getConfigFactoryStub([
       'core.extension' => [
         'module' => [],
-        'theme' => [],
+        'theme' => ['stark' => 'stark'],
         'disabled' => [
           'theme' => [],
         ],
       ],
     ]);
-    $this->themeList = $this->getMockBuilder(ThemeExtensionList::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+    $this->themeList = $this->createStub(ThemeExtensionList::class);
     $this->themeHandler = new StubThemeHandler($this->root, $this->configFactory, $this->themeList);
 
     $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
-    $container->expects($this->any())
+    $container
       ->method('get')
       ->with('class_loader')
-      ->will($this->returnValue($this->createMock(ClassLoader::class)));
+      ->willReturn($this->createStub(ClassLoader::class));
     \Drupal::setContainer($container);
-  }
-
-  /**
-   * Tests rebuilding the theme data.
-   *
-   * @see \Drupal\Core\Extension\ThemeHandler::rebuildThemeData()
-   */
-  public function testRebuildThemeData() {
-    $this->themeList->expects($this->at(0))
-      ->method('reset')
-      ->willReturnSelf();
-    $this->themeList->expects($this->at(1))
-      ->method('getList')
-      ->will($this->returnValue([
-        'seven' => new Extension($this->root, 'theme', 'core/themes/seven/seven.info.yml', 'seven.theme'),
-      ]));
-
-    $theme_data = $this->themeHandler->rebuildThemeData();
-    $this->assertCount(1, $theme_data);
-    $info = $theme_data['seven'];
-
-    // Ensure some basic properties.
-    $this->assertInstanceOf('Drupal\Core\Extension\Extension', $info);
-    $this->assertEquals('seven', $info->getName());
-    $this->assertEquals('core/themes/seven/seven.info.yml', $info->getPathname());
-    $this->assertEquals('core/themes/seven/seven.theme', $info->getExtensionPathname());
-
   }
 
   /**
    * Tests empty libraries in theme.info.yml file.
    */
-  public function testThemeLibrariesEmpty() {
-    $theme = new Extension($this->root, 'theme', 'core/modules/system/tests/themes/test_theme_libraries_empty', 'test_theme_libraries_empty.info.yml');
+  public function testThemeLibrariesEmpty(): void {
+    $theme = new Theme($this->root, 'core/modules/system/tests/themes/test_theme_libraries_empty', [], 'test_theme_libraries_empty.info.yml');
     try {
       $this->themeHandler->addTheme($theme);
       $this->assertTrue(TRUE, 'Empty libraries key in theme.info.yml does not cause PHP warning');
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       $this->fail('Empty libraries key in theme.info.yml causes PHP warning.');
     }
+  }
+
+  /**
+   * Test that a missing theme doesn't break ThemeHandler::listInfo().
+   *
+   * @legacy-covers ::listInfo
+   */
+  public function testMissingTheme(): void {
+    $themes = $this->themeHandler->listInfo();
+    $this->assertSame([], $themes);
   }
 
 }
@@ -133,14 +113,14 @@ class StubThemeHandler extends ThemeHandler {
   /**
    * {@inheritdoc}
    */
-  protected function clearCssCache() {
+  protected function clearCssCache(): void {
     $this->clearedCssCache = TRUE;
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function themeRegistryRebuild() {
+  protected function themeRegistryRebuild(): void {
     $this->registryRebuild = TRUE;
   }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Plugin;
 
 use Drupal\Component\Plugin\Definition\PluginDefinition;
@@ -7,16 +9,19 @@ use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\PluginFormInterface;
+use Drupal\plugin_test\Plugin\plugin_test\fruit\FruitInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the DefaultPluginManager.
- *
- * @group Plugin
- *
- * @coversDefaultClass \Drupal\Core\Plugin\DefaultPluginManager
  */
+#[CoversClass(DefaultPluginManager::class)]
+#[Group('Plugin')]
 class DefaultPluginManagerTest extends UnitTestCase {
 
   /**
@@ -37,6 +42,8 @@ class DefaultPluginManagerTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
+
     $this->expectedDefinitions = [
       'apple' => [
         'id' => 'apple',
@@ -66,7 +73,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
   /**
    * Tests the plugin manager with a plugin that extends a non-installed class.
    */
-  public function testDefaultPluginManagerWithPluginExtendingNonInstalledClass() {
+  public function testDefaultPluginManagerWithPluginExtendingNonInstalledClass(): void {
     $definitions = [];
     $definitions['extending_non_installed_class'] = [
       'id' => 'extending_non_installed_class',
@@ -76,8 +83,8 @@ class DefaultPluginManagerTest extends UnitTestCase {
       'provider' => 'plugin_test',
     ];
 
-    $module_handler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
-    $plugin_manager = new TestPluginManager($this->namespaces, $definitions, $module_handler, 'test_alter_hook', '\Drupal\plugin_test\Plugin\plugin_test\fruit\FruitInterface');
+    $module_handler = $this->createStub(ModuleHandlerInterface::class);
+    $plugin_manager = new TestPluginManager($this->namespaces, $definitions, $module_handler, 'test_alter_hook', FruitInterface::class);
     $plugin_manager->getDefinition('plugin_test', FALSE);
     $this->assertTrue(TRUE, 'No PHP fatal error occurred when retrieving the definitions of a module with plugins that depend on a non-installed module class should not cause a PHP fatal.');
   }
@@ -85,7 +92,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
   /**
    * Tests the plugin manager with a disabled module.
    */
-  public function testDefaultPluginManagerWithDisabledModule() {
+  public function testDefaultPluginManagerWithDisabledModule(): void {
     $definitions = $this->expectedDefinitions;
     $definitions['cherry'] = [
       'id' => 'cherry',
@@ -100,9 +107,9 @@ class DefaultPluginManagerTest extends UnitTestCase {
     $module_handler->expects($this->once())
       ->method('moduleExists')
       ->with('disabled_module')
-      ->will($this->returnValue(FALSE));
+      ->willReturn(FALSE);
 
-    $plugin_manager = new TestPluginManager($this->namespaces, $definitions, $module_handler, 'test_alter_hook', '\Drupal\plugin_test\Plugin\plugin_test\fruit\FruitInterface');
+    $plugin_manager = new TestPluginManager($this->namespaces, $definitions, $module_handler, 'test_alter_hook', FruitInterface::class);
 
     $this->assertEmpty($plugin_manager->getDefinition('cherry', FALSE), 'Plugin information of a disabled module is not available');
   }
@@ -110,7 +117,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
   /**
    * Tests the plugin manager and object plugin definitions.
    */
-  public function testDefaultPluginManagerWithObjects() {
+  public function testDefaultPluginManagerWithObjects(): void {
     $definitions = $this->expectedDefinitions;
     $definitions['cherry'] = (object) [
       'id' => 'cherry',
@@ -125,9 +132,9 @@ class DefaultPluginManagerTest extends UnitTestCase {
     $module_handler->expects($this->once())
       ->method('moduleExists')
       ->with('disabled_module')
-      ->will($this->returnValue(FALSE));
+      ->willReturn(FALSE);
 
-    $plugin_manager = new TestPluginManager($this->namespaces, $definitions, $module_handler, 'test_alter_hook', '\Drupal\plugin_test\Plugin\plugin_test\fruit\FruitInterface');
+    $plugin_manager = new TestPluginManager($this->namespaces, $definitions, $module_handler, 'test_alter_hook', FruitInterface::class);
 
     $this->assertEmpty($plugin_manager->getDefinition('cherry', FALSE), 'Plugin information is available');
   }
@@ -135,7 +142,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
   /**
    * Tests the plugin manager behavior for a missing plugin ID.
    */
-  public function testGetDefinitionPluginNotFoundException() {
+  public function testGetDefinitionPluginNotFoundException(): void {
     $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions);
 
     $this->expectException(PluginNotFoundException::class);
@@ -146,8 +153,8 @@ class DefaultPluginManagerTest extends UnitTestCase {
   /**
    * Tests the plugin manager with no cache and altering.
    */
-  public function testDefaultPluginManager() {
-    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, NULL, NULL, '\Drupal\plugin_test\Plugin\plugin_test\fruit\FruitInterface');
+  public function testDefaultPluginManager(): void {
+    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, NULL, NULL, FruitInterface::class);
     $this->assertEquals($this->expectedDefinitions, $plugin_manager->getDefinitions());
     $this->assertEquals($this->expectedDefinitions['banana'], $plugin_manager->getDefinition('banana'));
   }
@@ -155,7 +162,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
   /**
    * Tests the plugin manager with no cache and altering.
    */
-  public function testDefaultPluginManagerWithAlter() {
+  public function testDefaultPluginManagerWithAlter(): void {
     $module_handler = $this->getMockBuilder('Drupal\Core\Extension\ModuleHandler')
       ->disableOriginalConstructor()
       ->getMock();
@@ -166,7 +173,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
       ->method('alter')
       ->with($this->equalTo($alter_hook_name), $this->equalTo($this->expectedDefinitions));
 
-    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, $module_handler, $alter_hook_name, '\Drupal\plugin_test\Plugin\plugin_test\fruit\FruitInterface');
+    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, $module_handler, $alter_hook_name, FruitInterface::class);
 
     $this->assertEquals($this->expectedDefinitions, $plugin_manager->getDefinitions());
     $this->assertEquals($this->expectedDefinitions['banana'], $plugin_manager->getDefinition('banana'));
@@ -175,7 +182,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
   /**
    * Tests the plugin manager with caching and altering.
    */
-  public function testDefaultPluginManagerWithEmptyCache() {
+  public function testDefaultPluginManagerWithEmptyCache(): void {
     $cid = $this->randomMachineName();
     $cache_backend = $this->getMockBuilder('Drupal\Core\Cache\MemoryBackend')
       ->disableOriginalConstructor()
@@ -184,13 +191,13 @@ class DefaultPluginManagerTest extends UnitTestCase {
       ->expects($this->once())
       ->method('get')
       ->with($cid)
-      ->will($this->returnValue(FALSE));
+      ->willReturn(FALSE);
     $cache_backend
       ->expects($this->once())
       ->method('set')
       ->with($cid, $this->expectedDefinitions);
 
-    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, NULL, NULL, '\Drupal\plugin_test\Plugin\plugin_test\fruit\FruitInterface');
+    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, NULL, NULL, FruitInterface::class);
     $plugin_manager->setCacheBackend($cache_backend, $cid);
 
     $this->assertEquals($this->expectedDefinitions, $plugin_manager->getDefinitions());
@@ -200,7 +207,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
   /**
    * Tests the plugin manager with caching and altering.
    */
-  public function testDefaultPluginManagerWithFilledCache() {
+  public function testDefaultPluginManagerWithFilledCache(): void {
     $cid = $this->randomMachineName();
     $cache_backend = $this->getMockBuilder('Drupal\Core\Cache\MemoryBackend')
       ->disableOriginalConstructor()
@@ -209,12 +216,12 @@ class DefaultPluginManagerTest extends UnitTestCase {
       ->expects($this->once())
       ->method('get')
       ->with($cid)
-      ->will($this->returnValue((object) ['data' => $this->expectedDefinitions]));
+      ->willReturn((object) ['data' => $this->expectedDefinitions]);
     $cache_backend
       ->expects($this->never())
       ->method('set');
 
-    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, NULL, NULL, '\Drupal\plugin_test\Plugin\plugin_test\fruit\FruitInterface');
+    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, NULL, NULL, FruitInterface::class);
     $plugin_manager->setCacheBackend($cache_backend, $cid);
 
     $this->assertEquals($this->expectedDefinitions, $plugin_manager->getDefinitions());
@@ -223,8 +230,8 @@ class DefaultPluginManagerTest extends UnitTestCase {
   /**
    * Tests the plugin manager with caching disabled.
    */
-  public function testDefaultPluginManagerNoCache() {
-    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, NULL, NULL, '\Drupal\plugin_test\Plugin\plugin_test\fruit\FruitInterface');
+  public function testDefaultPluginManagerNoCache(): void {
+    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, NULL, NULL, FruitInterface::class);
 
     $cid = $this->randomMachineName();
     $cache_backend = $this->getMockBuilder('Drupal\Core\Cache\MemoryBackend')
@@ -247,7 +254,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
   /**
    * Tests the plugin manager cache clear with tags.
    */
-  public function testCacheClearWithTags() {
+  public function testCacheClearWithTags(): void {
     $cid = $this->randomMachineName();
     $cache_backend = $this->createMock('Drupal\Core\Cache\CacheBackendInterface');
     $cache_tags_invalidator = $this->createMock('Drupal\Core\Cache\CacheTagsInvalidatorInterface');
@@ -261,7 +268,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
 
     $this->getContainerWithCacheTagsInvalidator($cache_tags_invalidator);
 
-    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, NULL, NULL, '\Drupal\plugin_test\Plugin\plugin_test\fruit\FruitInterface');
+    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, NULL, NULL, FruitInterface::class);
     $plugin_manager->setCacheBackend($cache_backend, $cid, ['tag']);
 
     $plugin_manager->clearCachedDefinitions();
@@ -269,11 +276,9 @@ class DefaultPluginManagerTest extends UnitTestCase {
 
   /**
    * Tests plugins with the proper interface.
-   *
-   * @covers ::createInstance
    */
-  public function testCreateInstanceWithJustValidInterfaces() {
-    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, NULL, NULL, '\Drupal\plugin_test\Plugin\plugin_test\fruit\FruitInterface');
+  public function testCreateInstanceWithJustValidInterfaces(): void {
+    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, NULL, NULL, FruitInterface::class);
 
     foreach ($this->expectedDefinitions as $plugin_id => $definition) {
       $this->assertNotNull($plugin_manager->createInstance($plugin_id));
@@ -282,13 +287,11 @@ class DefaultPluginManagerTest extends UnitTestCase {
 
   /**
    * Tests plugins without the proper interface.
-   *
-   * @covers ::createInstance
    */
-  public function testCreateInstanceWithInvalidInterfaces() {
+  public function testCreateInstanceWithInvalidInterfaces(): void {
     $module_handler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
 
-    $module_handler->expects($this->any())
+    $module_handler->expects($this->never())
       ->method('moduleExists')
       ->with('plugin_test')
       ->willReturn(TRUE);
@@ -303,21 +306,19 @@ class DefaultPluginManagerTest extends UnitTestCase {
     $this->expectedDefinitions['apple']['provider'] = 'plugin_test';
     $this->expectedDefinitions['banana']['provider'] = 'plugin_test';
 
-    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, $module_handler, NULL, '\Drupal\plugin_test\Plugin\plugin_test\fruit\FruitInterface');
+    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, $module_handler, NULL, FruitInterface::class);
     $this->expectException(PluginException::class);
-    $this->expectExceptionMessage('Plugin "kale" (Drupal\plugin_test\Plugin\plugin_test\fruit\Kale) must implement interface \Drupal\plugin_test\Plugin\plugin_test\fruit\FruitInterface');
+    $this->expectExceptionMessage('Plugin "kale" (Drupal\plugin_test\Plugin\plugin_test\fruit\Kale) must implement interface Drupal\plugin_test\Plugin\plugin_test\fruit\FruitInterface');
     $plugin_manager->createInstance('kale');
   }
 
   /**
    * Tests plugins without a required interface.
-   *
-   * @covers ::getDefinitions
    */
-  public function testGetDefinitionsWithoutRequiredInterface() {
+  public function testGetDefinitionsWithoutRequiredInterface(): void {
     $module_handler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
 
-    $module_handler->expects($this->any())
+    $module_handler->expects($this->exactly(3))
       ->method('moduleExists')
       ->with('plugin_test')
       ->willReturn(FALSE);
@@ -337,35 +338,35 @@ class DefaultPluginManagerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getCacheContexts
+   * Tests get cache contexts.
    */
-  public function testGetCacheContexts() {
+  public function testGetCacheContexts(): void {
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
     $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, $module_handler->reveal(), NULL);
     $cache_contexts = $plugin_manager->getCacheContexts();
     $this->assertIsArray($cache_contexts);
-    array_map(function ($cache_context) {
+    array_map(function (string $cache_context): void {
       $this->assertIsString($cache_context);
     }, $cache_contexts);
   }
 
   /**
-   * @covers ::getCacheTags
+   * Tests get cache tags.
    */
-  public function testGetCacheTags() {
+  public function testGetCacheTags(): void {
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
     $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, $module_handler->reveal(), NULL);
     $cache_tags = $plugin_manager->getCacheTags();
     $this->assertIsArray($cache_tags);
-    array_map(function ($cache_tag) {
+    array_map(function (string $cache_tag): void {
       $this->assertIsString($cache_tag);
     }, $cache_tags);
   }
 
   /**
-   * @covers ::getCacheMaxAge
+   * Tests get cache max age.
    */
-  public function testGetCacheMaxAge() {
+  public function testGetCacheMaxAge(): void {
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
     $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, $module_handler->reveal(), NULL);
     $cache_max_age = $plugin_manager->getCacheMaxAge();
@@ -373,21 +374,23 @@ class DefaultPluginManagerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::findDefinitions
-   * @covers ::extractProviderFromDefinition
+   * Tests provider exists.
+   *
+   * @legacy-covers ::findDefinitions
+   * @legacy-covers ::extractProviderFromDefinition
    */
-  public function testProviderExists() {
+  public function testProviderExists(): void {
     $definitions = [];
     $definitions['array_based_found'] = ['provider' => 'module_found'];
     $definitions['array_based_missing'] = ['provider' => 'module_missing'];
-    $definitions['stdclass_based_found'] = (object) ['provider' => 'module_found'];
-    $definitions['stdclass_based_missing'] = (object) ['provider' => 'module_missing'];
+    $definitions['stdClass_based_found'] = (object) ['provider' => 'module_found'];
+    $definitions['stdClass_based_missing'] = (object) ['provider' => 'module_missing'];
     $definitions['classed_object_found'] = new ObjectDefinition(['provider' => 'module_found']);
     $definitions['classed_object_missing'] = new ObjectDefinition(['provider' => 'module_missing']);
 
     $expected = [];
     $expected['array_based_found'] = $definitions['array_based_found'];
-    $expected['stdclass_based_found'] = $definitions['stdclass_based_found'];
+    $expected['stdClass_based_found'] = $definitions['stdClass_based_found'];
     $expected['classed_object_found'] = $definitions['classed_object_found'];
 
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
@@ -399,10 +402,10 @@ class DefaultPluginManagerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::processDefinition
-   * @dataProvider providerTestProcessDefinition
+   * Tests process definition.
    */
-  public function testProcessDefinition($definition, $expected) {
+  #[DataProvider('providerTestProcessDefinition')]
+  public function testProcessDefinition($definition, $expected): void {
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
     $plugin_manager = new TestPluginManagerWithDefaults($this->namespaces, $this->expectedDefinitions, $module_handler->reveal(), NULL);
 
@@ -410,7 +413,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
     $this->assertEquals($expected, $definition);
   }
 
-  public function providerTestProcessDefinition() {
+  public static function providerTestProcessDefinition(): array {
     $data = [];
 
     $data['merge'][] = [
@@ -466,6 +469,9 @@ class DefaultPluginManagerTest extends UnitTestCase {
 
 }
 
+/**
+ * Plugin manager test class with defaults assigned.
+ */
 class TestPluginManagerWithDefaults extends TestPluginManager {
 
   /**
@@ -481,12 +487,15 @@ class TestPluginManagerWithDefaults extends TestPluginManager {
 
 }
 
+/**
+ * Plugin form test class.
+ */
 class TestPluginForm implements PluginFormInterface {
 
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
     return [];
   }
 
@@ -503,14 +512,21 @@ class TestPluginForm implements PluginFormInterface {
   }
 
 }
+
+/**
+ * Stub class for plugin definition.
+ */
 class ObjectDefinition extends PluginDefinition {
 
   /**
    * ObjectDefinition constructor.
    *
    * @param array $definition
+   *   An associative array defining the plugin.
    */
   public function __construct(array $definition) {
+    // This class does not exist but plugin definitions must provide a class.
+    $this->class = 'PluginObject';
     foreach ($definition as $property => $value) {
       $this->{$property} = $value;
     }

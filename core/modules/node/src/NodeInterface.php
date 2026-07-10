@@ -24,12 +24,12 @@ interface NodeInterface extends ContentEntityInterface, EntityChangedInterface, 
   const PUBLISHED = 1;
 
   /**
-   * Denotes that the node is not promoted to the front page.
+   * Denotes that the node is not promoted.
    */
   const NOT_PROMOTED = 0;
 
   /**
-   * Denotes that the node is promoted to the front page.
+   * Denotes that the node is promoted.
    */
   const PROMOTED = 1;
 
@@ -54,8 +54,9 @@ interface NodeInterface extends ContentEntityInterface, EntityChangedInterface, 
   /**
    * Gets the node title.
    *
-   * @return string
-   *   Title of the node.
+   * @return string|null
+   *   Title of the node, or NULL if the node doesn't yet have a title (for
+   *   example, if a new node is being previewed).
    */
   public function getTitle();
 

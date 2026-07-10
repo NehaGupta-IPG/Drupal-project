@@ -2,7 +2,6 @@
 
 namespace Drupal\comment;
 
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
@@ -112,7 +111,7 @@ class CommentManager implements CommentManagerInterface {
     }
 
     $map = $this->entityFieldManager->getFieldMapByFieldType('comment');
-    return isset($map[$entity_type_id]) ? $map[$entity_type_id] : [];
+    return $map[$entity_type_id] ?? [];
   }
 
   /**
@@ -163,7 +162,7 @@ class CommentManager implements CommentManagerInterface {
     if ($this->authenticatedCanPostComments) {
       // We cannot use the redirect.destination service here because these links
       // sometimes appear on /node and taxonomy listing pages.
-      if ($entity->get($field_name)->getFieldDefinition()->getSetting('form_location') == CommentItemInterface::FORM_SEPARATE_PAGE) {
+      if ($entity->get($field_name)->getFieldDefinition()->getSetting('form_location') == FormLocation::SeparatePage->value) {
         $comment_reply_parameters = [
           'entity_type' => $entity->getEntityTypeId(),
           'entity' => $entity->id(),
@@ -190,49 +189,6 @@ class CommentManager implements CommentManagerInterface {
       }
     }
     return '';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCountNewComments(EntityInterface $entity, $field_name = NULL, $timestamp = 0) {
-    // @todo Replace module handler with optional history service injection
-    //   after https://www.drupal.org/node/2081585.
-    if ($this->currentUser->isAuthenticated() && $this->moduleHandler->moduleExists('history')) {
-      // Retrieve the timestamp at which the current user last viewed this entity.
-      if (!$timestamp) {
-        if ($entity->getEntityTypeId() == 'node') {
-          $timestamp = history_read($entity->id());
-        }
-        else {
-          $function = $entity->getEntityTypeId() . '_last_viewed';
-          if (function_exists($function)) {
-            $timestamp = $function($entity->id());
-          }
-          else {
-            // Default to 30 days ago.
-            // @todo Remove once https://www.drupal.org/node/1029708 lands.
-            $timestamp = COMMENT_NEW_LIMIT;
-          }
-        }
-      }
-      $timestamp = ($timestamp > HISTORY_READ_LIMIT ? $timestamp : HISTORY_READ_LIMIT);
-
-      // Use the timestamp to retrieve the number of new comments.
-      $query = $this->entityTypeManager->getStorage('comment')->getQuery()
-        ->accessCheck(TRUE)
-        ->condition('entity_type', $entity->getEntityTypeId())
-        ->condition('entity_id', $entity->id())
-        ->condition('created', $timestamp, '>')
-        ->condition('status', CommentInterface::PUBLISHED);
-      if ($field_name) {
-        // Limit to a particular field.
-        $query->condition('field_name', $field_name);
-      }
-
-      return $query->count()->execute();
-    }
-    return FALSE;
   }
 
 }

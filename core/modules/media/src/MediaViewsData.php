@@ -18,12 +18,11 @@ class MediaViewsData extends EntityViewsData {
     $data['media_field_data']['table']['wizard_id'] = 'media';
     $data['media_field_revision']['table']['wizard_id'] = 'media_revision';
 
-    $data['media_revision']['revision_user']['help'] = $this->t('The user who created the revision.');
-    $data['media_revision']['revision_user']['relationship']['label'] = $this->t('revision user');
-    $data['media_revision']['revision_user']['filter']['id'] = 'user_name';
-
-    $data['media_revision']['table']['join']['media_field_data']['left_field'] = 'vid';
-    $data['media_revision']['table']['join']['media_field_data']['field'] = 'vid';
+    $data['media_field_data']['user_name']['filter'] = $data['media_field_data']['uid']['filter'];
+    $data['media_field_data']['user_name']['filter']['title'] = $this->t('Authored by');
+    $data['media_field_data']['user_name']['filter']['help'] = $this->t('The username of the content author.');
+    $data['media_field_data']['user_name']['filter']['id'] = 'user_name';
+    $data['media_field_data']['user_name']['filter']['real field'] = 'uid';
 
     $data['media_field_data']['status_extra'] = [
       'title' => $this->t('Published status or admin user'),

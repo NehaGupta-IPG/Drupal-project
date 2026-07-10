@@ -5,45 +5,18 @@ namespace Drupal\media\OEmbed;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Cache\UseCacheBackendTrait;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Site\Settings;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\TransferException;
+use Psr\Http\Client\ClientExceptionInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+
+// cspell:ignore omitscript
 
 /**
  * Converts oEmbed media URLs into endpoint-specific resource URLs.
  */
 class UrlResolver implements UrlResolverInterface {
-
-  use UseCacheBackendTrait;
-
-  /**
-   * The HTTP client.
-   *
-   * @var \GuzzleHttp\Client
-   */
-  protected $httpClient;
-
-  /**
-   * The OEmbed provider repository service.
-   *
-   * @var \Drupal\media\OEmbed\ProviderRepositoryInterface
-   */
-  protected $providers;
-
-  /**
-   * The OEmbed resource fetcher service.
-   *
-   * @var \Drupal\media\OEmbed\ResourceFetcherInterface
-   */
-  protected $resourceFetcher;
-
-  /**
-   * The module handler service.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
 
   /**
    * Static cache of discovered oEmbed resource URLs, keyed by canonical URL.
@@ -55,28 +28,14 @@ class UrlResolver implements UrlResolverInterface {
    */
   protected $urlCache = [];
 
-  /**
-   * Constructs a UrlResolver object.
-   *
-   * @param \Drupal\media\OEmbed\ProviderRepositoryInterface $providers
-   *   The oEmbed provider repository service.
-   * @param \Drupal\media\OEmbed\ResourceFetcherInterface $resource_fetcher
-   *   The OEmbed resource fetcher service.
-   * @param \GuzzleHttp\ClientInterface $http_client
-   *   The HTTP client.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler service.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
-   *   (optional) The cache backend.
-   */
-  public function __construct(ProviderRepositoryInterface $providers, ResourceFetcherInterface $resource_fetcher, ClientInterface $http_client, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend = NULL) {
-    $this->providers = $providers;
-    $this->resourceFetcher = $resource_fetcher;
-    $this->httpClient = $http_client;
-    $this->moduleHandler = $module_handler;
-    $this->cacheBackend = $cache_backend;
-    $this->useCaches = isset($cache_backend);
-  }
+  public function __construct(
+    protected ProviderRepositoryInterface $providers,
+    protected ResourceFetcherInterface $resourceFetcher,
+    protected ClientInterface $httpClient,
+    protected ModuleHandlerInterface $moduleHandler,
+    #[Autowire(service: 'cache.default')]
+    protected CacheBackendInterface $cacheBackend,
+  ) {}
 
   /**
    * Runs oEmbed discovery and returns the endpoint URL if successful.
@@ -84,19 +43,41 @@ class UrlResolver implements UrlResolverInterface {
    * @param string $url
    *   The resource's URL.
    *
-   * @return string|bool
+   * @return string|false
    *   URL of the oEmbed endpoint, or FALSE if the discovery was unsuccessful.
    */
   protected function discoverResourceUrl($url) {
+    $patterns = \array_map(static fn ($hostPattern) => \sprintf('{%s}i', $hostPattern), Settings::get('media_oembed_discovery_trusted_host_patterns', []));
+    $host = \parse_url($url, \PHP_URL_HOST);
+    if (!$host) {
+      return FALSE;
+    }
+    $allowed = FALSE;
+    foreach ($patterns as $pattern) {
+      if (\preg_match($pattern, $host)) {
+        $allowed = TRUE;
+        break;
+      }
+    }
+    if (!$allowed) {
+      return FALSE;
+    }
+
     try {
       $response = $this->httpClient->get($url);
     }
-    catch (TransferException $e) {
+    catch (ClientExceptionInterface) {
+      return FALSE;
+    }
+
+    // Only care about HTML responses.
+    $response_type = strtolower($response->getHeaderLine('Content-Type'));
+    if (!str_contains($response_type, 'text/html')) {
       return FALSE;
     }
 
     $document = Html::load((string) $response->getBody());
-    $xpath = new \DOMXpath($document);
+    $xpath = new \DOMXPath($document);
 
     return $this->findUrl($xpath, 'json') ?: $this->findUrl($xpath, 'xml');
   }
@@ -123,7 +104,7 @@ class UrlResolver implements UrlResolverInterface {
   public function getProviderByUrl($url) {
     // Check the URL against every scheme of every endpoint of every provider
     // until we find a match.
-    foreach ($this->providers->getAll() as $provider_name => $provider_info) {
+    foreach ($this->providers->getAll() as $provider_info) {
       foreach ($provider_info->getEndpoints() as $endpoint) {
         if ($endpoint->matchUrl($url)) {
           return $provider_info;
@@ -136,7 +117,7 @@ class UrlResolver implements UrlResolverInterface {
       return $this->resourceFetcher->fetchResource($resource_url)->getProvider();
     }
 
-    throw new ResourceException('No matching provider found.', $url);
+    throw new ResourceException("No matching oEmbed provider found for resource: \"{$url}\"", $url);
   }
 
   /**
@@ -151,7 +132,7 @@ class UrlResolver implements UrlResolverInterface {
     // Try to get the resource URL from the persistent cache.
     $cache_id = "media:oembed_resource_url:$url:$max_width:$max_height";
 
-    $cached = $this->cacheGet($cache_id);
+    $cached = $this->cacheBackend->get($cache_id);
     if ($cached) {
       $this->urlCache[$url] = $cached->data;
       return $this->urlCache[$url];
@@ -171,10 +152,10 @@ class UrlResolver implements UrlResolverInterface {
     // provide extra parameters in the query string. For example, Instagram also
     // supports the 'omitscript' parameter.
     $this->moduleHandler->alter('oembed_resource_url', $parsed_url, $provider);
-    $resource_url = $parsed_url['path'] . '?' . rawurldecode(UrlHelper::buildQuery($parsed_url['query']));
+    $resource_url = $parsed_url['path'] . '?' . UrlHelper::buildQuery($parsed_url['query']);
 
     $this->urlCache[$url] = $resource_url;
-    $this->cacheSet($cache_id, $resource_url);
+    $this->cacheBackend->set($cache_id, $resource_url);
 
     return $resource_url;
   }
@@ -188,7 +169,7 @@ class UrlResolver implements UrlResolverInterface {
    *   The oEmbed provider for the asset.
    *
    * @return string
-   *   The resource url.
+   *   The resource URL.
    */
   protected function getEndpointMatchingUrl($url, Provider $provider) {
     $endpoints = $provider->getEndpoints();

@@ -6,14 +6,16 @@ use Composer\Composer as ComposerApp;
 use Composer\Script\Event;
 use Composer\Semver\Comparator;
 use Composer\Semver\VersionParser;
+use Drupal\Composer\Generator\ComponentGenerator;
 use Drupal\Composer\Generator\PackageGenerator;
 use Symfony\Component\Finder\Finder;
 
 /**
- * Provides static functions for composer script events. See also
- * core/lib/Drupal/Composer/Composer.php, which contains similar
- * scripts needed by projects that include drupal/core. Scripts that
- * are only needed by drupal/drupal go here.
+ * Provides static functions for composer script events.
+ *
+ * See also core/lib/Drupal/Composer/Composer.php, which contains similar
+ * scripts needed by projects that include drupal/core. Scripts that are only
+ * needed by drupal/drupal go here.
  *
  * @see https://getcomposer.org/doc/articles/scripts.md
  */
@@ -31,15 +33,23 @@ class Composer {
   }
 
   /**
+   * Update component packages whenever composer.lock is updated.
+   *
+   * @param \Composer\Script\Event $event
+   *   The Composer event.
+   */
+  public static function generateComponentPackages(Event $event): void {
+    $generator = new ComponentGenerator();
+    $generator->generate($event, getcwd());
+  }
+
+  /**
    * Set the version of Drupal; used in release process and by the test suite.
    *
    * @param string $root
    *   Path to root of drupal/drupal repository.
    * @param string $version
    *   Semver version to set Drupal's version to.
-   *
-   * @return string
-   *   Stability level of the provided version (stable, RC, alpha, etc.)
    *
    * @throws \UnexpectedValueException
    */
@@ -66,9 +76,6 @@ class Composer {
    *   Path to root of drupal/drupal repository.
    * @param string $version
    *   Semver version that Drupal was set to.
-   *
-   * @return string
-   *   Stability level of the provided version (stable, RC, alpha, etc.)
    */
   protected static function setTemplateProjectStability(string $root, string $version): void {
     $stability = VersionParser::parseStability($version);
@@ -85,13 +92,14 @@ class Composer {
 
   /**
    * Ensure that the minimum required version of Composer is running.
+   *
    * Throw an exception if Composer is too old.
    */
   public static function ensureComposerVersion(): void {
     $composerVersion = method_exists(ComposerApp::class, 'getVersion') ?
       ComposerApp::getVersion() : ComposerApp::VERSION;
-    if (Comparator::lessThan($composerVersion, '1.9.0')) {
-      throw new \RuntimeException("Drupal core development requires Composer 1.9.0, but Composer $composerVersion is installed. Please run 'composer self-update'.");
+    if (Comparator::lessThan($composerVersion, '2.3.6')) {
+      throw new \RuntimeException("Drupal core development requires Composer 2.3.6, but Composer $composerVersion is installed. Run 'composer self-update'.");
     }
   }
 
@@ -111,9 +119,10 @@ class Composer {
    * @param string $root
    *   Path to root of drupal/drupal repository.
    * @param string $subprojectType
-   *   Type of subproject - one of Metapackage, Plugin, or Template
+   *   Type of subproject - one of Metapackage, Plugin, or Template.
    *
    * @return \Symfony\Component\Finder\Finder
+   *   A Finder object.
    */
   public static function composerSubprojectPaths(string $root, string $subprojectType): Finder {
     return Finder::create()

@@ -1,22 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\config\Functional;
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests language overrides applied through the website.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ConfigLanguageOverrideWebTest extends BrowserTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'block',
@@ -30,16 +32,9 @@ class ConfigLanguageOverrideWebTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-  }
-
-  /**
    * Tests translating the site name.
    */
-  public function testSiteNameTranslation() {
+  public function testSiteNameTranslation(): void {
     $adminUser = $this->drupalCreateUser([
       'administer site configuration',
       'administer languages',
@@ -69,7 +64,7 @@ class ConfigLanguageOverrideWebTest extends BrowserTestBase {
 
     // The home page in English should not have the override.
     $this->drupalGet('');
-    $this->assertNoText('XX site name');
+    $this->assertSession()->pageTextNotContains('XX site name');
 
     // During path resolution the system.site configuration object is used to
     // determine the front page. This occurs before language negotiation causing

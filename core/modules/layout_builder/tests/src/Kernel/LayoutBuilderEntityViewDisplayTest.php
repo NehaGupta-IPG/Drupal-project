@@ -1,21 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\Kernel;
 
 use Drupal\Core\Config\Schema\SchemaIncompleteException;
+use Drupal\entity_test\Entity\EntityTest;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay
- *
- * @group layout_builder
+ * Tests Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay.
  */
-class LayoutBuilderEntityViewDisplayTest extends SectionStorageTestBase {
+#[CoversClass(LayoutBuilderEntityViewDisplay::class)]
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
+class LayoutBuilderEntityViewDisplayTest extends SectionListTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected function getSectionStorage(array $section_data) {
+  protected function getSectionList(array $section_data) {
     $display = LayoutBuilderEntityViewDisplay::create([
       'targetEntityType' => 'entity_test',
       'bundle' => 'entity_test',
@@ -35,16 +45,19 @@ class LayoutBuilderEntityViewDisplayTest extends SectionStorageTestBase {
   /**
    * Tests that configuration schema enforces valid values.
    */
-  public function testInvalidConfiguration() {
+  public function testInvalidConfiguration(): void {
     $this->expectException(SchemaIncompleteException::class);
-    $this->sectionStorage->getSection(0)->getComponent('first-uuid')->setConfiguration(['id' => 'foo', 'bar' => 'baz']);
-    $this->sectionStorage->save();
+    $this->sectionList->getSection(0)
+      ->getComponent('10000000-0000-1000-a000-000000000000')
+      ->setConfiguration(['id' => 'foo', 'bar' => 'baz']);
+    $this->sectionList->save();
   }
 
   /**
-   * @dataProvider providerTestIsLayoutBuilderEnabled
-   */
-  public function testIsLayoutBuilderEnabled($expected, $view_mode, $enabled) {
+ * Tests is layout builder enabled.
+ */
+  #[DataProvider('providerTestIsLayoutBuilderEnabled')]
+  public function testIsLayoutBuilderEnabled($expected, $view_mode, $enabled): void {
     $display = LayoutBuilderEntityViewDisplay::create([
       'targetEntityType' => 'entity_test',
       'bundle' => 'entity_test',
@@ -63,7 +76,7 @@ class LayoutBuilderEntityViewDisplayTest extends SectionStorageTestBase {
   /**
    * Provides test data for ::testIsLayoutBuilderEnabled().
    */
-  public function providerTestIsLayoutBuilderEnabled() {
+  public static function providerTestIsLayoutBuilderEnabled(): array {
     $data = [];
     $data['default enabled'] = [TRUE, 'default', TRUE];
     $data['default disabled'] = [FALSE, 'default', FALSE];
@@ -77,17 +90,64 @@ class LayoutBuilderEntityViewDisplayTest extends SectionStorageTestBase {
   /**
    * Tests that setting overridable enables Layout Builder only when TRUE.
    */
-  public function testSetOverridable() {
+  public function testSetOverridable(): void {
     // Disable Layout Builder.
-    $this->sectionStorage->disableLayoutBuilder();
+    $this->sectionList->disableLayoutBuilder();
 
     // Set Overridable to TRUE and ensure Layout Builder is enabled.
-    $this->sectionStorage->setOverridable();
-    $this->assertEquals($this->sectionStorage->isLayoutBuilderEnabled(), TRUE);
+    $this->sectionList->setOverridable();
+    $this->assertTrue($this->sectionList->isLayoutBuilderEnabled());
 
-    // Ensure Layout Builder is still enabled after setting Overridable to FALSE.
-    $this->sectionStorage->setOverridable(FALSE);
-    $this->assertEquals($this->sectionStorage->isLayoutBuilderEnabled(), TRUE);
+    // Ensure Layout Builder is still enabled after setting Overridable to
+    // FALSE.
+    $this->sectionList->setOverridable(FALSE);
+    $this->assertTrue($this->sectionList->isLayoutBuilderEnabled());
+  }
+
+  /**
+   * Tests that enabling Layout Builder moves fields to hidden.
+   */
+  public function testFieldsMovedToHiddenOnEnable(): void {
+    // Add a display-configurable field so we can verify it gets moved to
+    // hidden when Layout Builder is enabled.
+    FieldStorageConfig::create([
+      'field_name' => 'field_test',
+      'entity_type' => 'entity_test',
+      'type' => 'string',
+    ])->save();
+    FieldConfig::create([
+      'field_name' => 'field_test',
+      'entity_type' => 'entity_test',
+      'bundle' => 'entity_test',
+      'label' => 'Test field',
+    ])->save();
+
+    $display = LayoutBuilderEntityViewDisplay::load('entity_test.entity_test.default');
+    $display->setComponent('field_test', ['type' => 'string', 'region' => 'content']);
+    $display->disableLayoutBuilder()->save();
+    $this->assertArrayHasKey('field_test', $display->get('content'));
+    $this->assertArrayNotHasKey('field_test', $display->get('hidden'));
+
+    $display->enableLayoutBuilder()->save();
+    $this->assertArrayNotHasKey('field_test', $display->get('content'));
+    $this->assertArrayHasKey('field_test', $display->get('hidden'));
+  }
+
+  /**
+   * Tests that buildMultiple doesn't build sections if storage isn't supported.
+   */
+  public function testBuildOnlyWhenSupported(): void {
+    $display = LayoutBuilderEntityViewDisplay::load('entity_test.entity_test.default');
+    $entity = EntityTest::create(['type' => 'entity_test', 'name' => 'test']);
+    $entity->save();
+    $buildList = $display->buildMultiple([$entity->id() => $entity]);
+    $this->assertArrayHasKey('_layout_builder', $buildList[$entity->id()]);
+
+    // Disable layout_builder for this display and check sections aren't
+    // built.
+    $display->disableLayoutBuilder()->save();
+    $buildList = $display->buildMultiple([$entity->id() => $entity]);
+    $this->assertArrayNotHasKey('_layout_builder', $buildList[$entity->id()]);
   }
 
 }

@@ -1,12 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\config_collection_install_test;
 
+use Drupal\Core\Config\ConfigCollectionEvents;
 use Drupal\Core\Config\ConfigCollectionInfo;
-use Drupal\Core\Config\ConfigEvents;
 use Drupal\Core\State\StateInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Event subscriber for testing configuration collection.
+ */
 class EventSubscriber implements EventSubscriberInterface {
 
   /**
@@ -27,12 +32,12 @@ class EventSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Reacts to the ConfigEvents::COLLECTION_INFO event.
+   * Reacts to the ConfigCollectionEvents::COLLECTION_INFO event.
    *
    * @param \Drupal\Core\Config\ConfigCollectionInfo $collection_info
    *   The configuration collection info event.
    */
-  public function addCollections(ConfigCollectionInfo $collection_info) {
+  public function addCollections(ConfigCollectionInfo $collection_info): void {
     $collections = $this->state->get('config_collection_install_test.collection_names', []);
     foreach ($collections as $collection) {
       $collection_info->addCollection($collection);
@@ -42,8 +47,8 @@ class EventSubscriber implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
-    $events[ConfigEvents::COLLECTION_INFO][] = ['addCollections'];
+  public static function getSubscribedEvents(): array {
+    $events[ConfigCollectionEvents::COLLECTION_INFO][] = ['addCollections'];
     return $events;
   }
 

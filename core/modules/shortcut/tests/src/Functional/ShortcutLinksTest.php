@@ -1,32 +1,38 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\shortcut\Functional;
 
 use Drupal\block_content\Entity\BlockContentType;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Url;
 use Drupal\shortcut\Entity\Shortcut;
 use Drupal\shortcut\Entity\ShortcutSet;
 use Drupal\Tests\block\Functional\AssertBlockAppearsTrait;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
 use Drupal\views\Entity\View;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Create, view, edit, delete, and change shortcut links.
- *
- * @group shortcut
  */
+#[Group('shortcut')]
+#[RunTestsInSeparateProcesses]
 class ShortcutLinksTest extends ShortcutTestBase {
 
   use AssertBlockAppearsTrait;
   use PathAliasTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['router_test', 'views', 'block'];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $adminUser;
 
   /**
    * {@inheritdoc}
@@ -39,13 +45,29 @@ class ShortcutLinksTest extends ShortcutTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->adminUser = $this->drupalCreateUser([
+      'access toolbar',
+      'administer shortcuts',
+      'view the administration theme',
+      'access content overview',
+      'administer users',
+      'administer site configuration',
+      'administer content types',
+      'create article content',
+      'create page content',
+      'edit any article content',
+      'edit any page content',
+      'administer blocks',
+      'access shortcuts',
+    ]);
+
     $this->drupalPlaceBlock('page_title_block');
   }
 
   /**
    * Tests that creating a shortcut works properly.
    */
-  public function testShortcutLinkAdd() {
+  public function testShortcutLinkAdd(): void {
     $set = $this->set;
 
     // Create an alias for the node so we can test aliases.
@@ -70,7 +92,7 @@ class ShortcutLinksTest extends ShortcutTestBase {
     // Test the add shortcut form UI. Test that the base field description is
     // there.
     $this->drupalGet('admin/config/user-interface/shortcut/manage/' . $set->id() . '/add-link');
-    $this->assertRaw('The location this shortcut points to.');
+    $this->assertSession()->pageTextContains('The location this shortcut points to.');
 
     // Check that each new shortcut links where it should.
     foreach ($test_cases as $test_path) {
@@ -88,10 +110,10 @@ class ShortcutLinksTest extends ShortcutTestBase {
       $this->assertContains('internal:' . $test_path, $paths, 'Shortcut created: ' . $test_path);
 
       if (in_array($test_path, $test_cases_non_access)) {
-        $this->assertSession()->linkNotExists($title, new FormattableMarkup('Shortcut link %url not accessible on the page.', ['%url' => $test_path]));
+        $this->assertSession()->linkNotExists($title, "Shortcut link $test_path not accessible on the page.");
       }
       else {
-        $this->assertSession()->linkExists($title, 0, new FormattableMarkup('Shortcut link %url found on the page.', ['%url' => $test_path]));
+        $this->assertSession()->linkExists($title, 0, "Shortcut link $test_path found on the page.");
       }
     }
     $saved_set = ShortcutSet::load($set->id());
@@ -116,7 +138,7 @@ class ShortcutLinksTest extends ShortcutTestBase {
     $this->drupalGet('admin/config/user-interface/shortcut/manage/' . $set->id() . '/add-link');
     $this->submitForm($form_data, 'Save');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertRaw(t("The path '@link_path' is inaccessible.", ['@link_path' => '/admin']));
+    $this->assertSession()->pageTextContains("The path '/admin' is inaccessible.");
 
     $form_data = [
       'title[0][value]' => $title,
@@ -130,7 +152,7 @@ class ShortcutLinksTest extends ShortcutTestBase {
     $this->drupalLogin($this->adminUser);
     $edit = [
       'label' => $this->randomMachineName(),
-      'id' => strtolower($this->randomMachineName()),
+      'id' => $this->randomMachineName(),
     ];
     $this->drupalGet('admin/config/user-interface/shortcut/add-set');
     $this->submitForm($edit, 'Save');
@@ -147,13 +169,11 @@ class ShortcutLinksTest extends ShortcutTestBase {
   /**
    * Tests that the "add to shortcut" and "remove from shortcut" links work.
    */
-  public function testShortcutQuickLink() {
-    \Drupal::service('theme_installer')->install(['seven']);
-    $this->config('system.theme')->set('admin', 'seven')->save();
-    $this->config('node.settings')->set('use_admin_theme', '1')->save();
-    $this->container->get('router.builder')->rebuild();
+  public function testShortcutQuickLink(): void {
+    \Drupal::service('theme_installer')->install(['claro']);
+    $this->config('system.theme')->set('admin', 'claro')->save();
 
-    $this->drupalLogin($this->rootUser);
+    $this->drupalLogin($this->adminUser);
     $this->drupalGet('admin/config/system/cron');
 
     // Test the "Add to shortcuts" link.
@@ -192,13 +212,12 @@ class ShortcutLinksTest extends ShortcutTestBase {
     $this->assertSession()->pageTextContains('Added a shortcut for Create Basic page.');
     // Assure that Article does not have its shortcut indicated as set.
     $this->drupalGet('node/add/article');
-    $link = $this->xpath('//a[normalize-space()=:label]', [':label' => 'Remove from Default shortcuts']);
-    $this->assertTrue(empty($link), 'Link Remove to Default shortcuts not found for Create Article page.');
+    $this->assertSession()->elementNotExists('xpath', "//a[normalize-space()='Remove from Default shortcuts']");
     // Add Shortcut for Article.
     $this->clickLink('Add to Default shortcuts');
     $this->assertSession()->pageTextContains('Added a shortcut for Create Article.');
 
-    $this->config('system.theme')->set('default', 'seven')->save();
+    $this->config('system.theme')->set('default', 'claro')->save();
     $this->drupalGet('node/' . $this->node->id());
     $title = $this->node->getTitle();
 
@@ -211,29 +230,28 @@ class ShortcutLinksTest extends ShortcutTestBase {
     $this->clickLink('Remove from Default shortcuts');
     $this->assertSession()->pageTextContains("The shortcut $title has been deleted.");
     $this->assertShortcutQuickLink('Add to Default shortcuts');
-
     \Drupal::service('module_installer')->install(['block_content']);
+    $this->adminUser
+      ->addRole($this->drupalCreateRole(['administer block types']))
+      ->save();
     BlockContentType::create([
       'id' => 'basic',
       'label' => 'Basic block',
       'revision' => FALSE,
     ])->save();
     // Test page with HTML tags in title.
-    $this->drupalGet('admin/structure/block/block-content/manage/basic');
-    $page_title = new FormattableMarkup('Edit %label custom block type', ['%label' => 'Basic block']);
-    $this->assertRaw($page_title);
+    $this->drupalGet('admin/structure/block-content/manage/basic');
+    $page_title = "Edit Basic block block type";
+    $this->assertSession()->pageTextContains($page_title);
     // Add shortcut to this page.
     $this->clickLink('Add to Default shortcuts');
-    $this->assertRaw(new FormattableMarkup('Added a shortcut for %title.', [
-      '%title' => trim(strip_tags($page_title)),
-    ]));
-
+    $this->assertSession()->pageTextContains("Added a shortcut for {$page_title}.");
   }
 
   /**
    * Tests that shortcut links can be renamed.
    */
-  public function testShortcutLinkRename() {
+  public function testShortcutLinkRename(): void {
     $set = $this->set;
 
     // Attempt to rename shortcut link.
@@ -253,7 +271,7 @@ class ShortcutLinksTest extends ShortcutTestBase {
   /**
    * Tests that changing the path of a shortcut link works.
    */
-  public function testShortcutLinkChangePath() {
+  public function testShortcutLinkChangePath(): void {
     $set = $this->set;
 
     // Tests changing a shortcut path.
@@ -276,8 +294,8 @@ class ShortcutLinksTest extends ShortcutTestBase {
   /**
    * Tests that changing the route of a shortcut link works.
    */
-  public function testShortcutLinkChangeRoute() {
-    $this->drupalLogin($this->rootUser);
+  public function testShortcutLinkChangeRoute(): void {
+    $this->drupalLogin($this->adminUser);
     $this->drupalGet('admin/content');
     $this->assertSession()->statusCodeEquals(200);
     // Disable the view.
@@ -292,7 +310,7 @@ class ShortcutLinksTest extends ShortcutTestBase {
   /**
    * Tests deleting a shortcut link.
    */
-  public function testShortcutLinkDelete() {
+  public function testShortcutLinkDelete(): void {
     $set = $this->set;
 
     $shortcuts = $set->getShortcuts();
@@ -317,46 +335,43 @@ class ShortcutLinksTest extends ShortcutTestBase {
    * Tests that the "Add to shortcuts" link is not displayed on a page not
    * found or a page the user does not have access to.
    */
-  public function testNoShortcutLink() {
+  public function testNoShortcutLink(): void {
     // Change to a theme that displays shortcuts.
-    \Drupal::service('theme_installer')->install(['seven']);
+    \Drupal::service('theme_installer')->install(['claro']);
     $this->config('system.theme')
-      ->set('default', 'seven')
+      ->set('default', 'claro')
       ->save();
 
     $this->drupalGet('page-that-does-not-exist');
-    $result = $this->xpath('//a[contains(@class, "shortcut-action--add")]');
-    $this->assertTrue(empty($result), 'Add to shortcuts link was not shown on a page not found.');
+    // Test that add to shortcuts link is not shown on a page not found.
+    $this->assertSession()->elementNotExists('xpath', '//a[contains(@class, "shortcut-action--add")]');
 
     // The user does not have access to this path.
     $this->drupalGet('admin/modules');
-    $result = $this->xpath('//a[contains(@class, "shortcut-action--add")]');
-    $this->assertTrue(empty($result), 'Add to shortcuts link was not shown on a page the user does not have access to.');
+    $this->assertSession()->elementNotExists('xpath', '//a[contains(@class, "shortcut-action--add")]');
 
     // Verify that the testing mechanism works by verifying the shortcut link
     // appears on admin/content.
     $this->drupalGet('admin/content');
-    $result = $this->xpath('//a[contains(@class, "shortcut-action--remove")]');
-    $this->assertTrue(!empty($result), 'Remove from shortcuts link was shown on a page the user does have access to.');
+    $this->assertSession()->elementExists('xpath', '//a[contains(@class, "shortcut-action--remove")]');
 
     // Verify that the shortcut link appears on routing only pages.
     $this->drupalGet('router_test/test2');
-    $result = $this->xpath('//a[contains(@class, "shortcut-action--add")]');
-    $this->assertTrue(!empty($result), 'Add to shortcuts link was shown on a page the user does have access to.');
+    $this->assertSession()->elementExists('xpath', '//a[contains(@class, "shortcut-action--add")]');
   }
 
   /**
    * Tests that the 'access shortcuts' permissions works properly.
    */
-  public function testAccessShortcutsPermission() {
+  public function testAccessShortcutsPermission(): void {
     // Change to a theme that displays shortcuts.
-    \Drupal::service('theme_installer')->install(['seven']);
+    \Drupal::service('theme_installer')->install(['claro']);
     $this->config('system.theme')
-      ->set('default', 'seven')
+      ->set('default', 'claro')
       ->save();
 
     // Add cron to the default shortcut set.
-    $this->drupalLogin($this->rootUser);
+    $this->drupalLogin($this->adminUser);
     $this->drupalGet('admin/config/system/cron');
     $this->clickLink('Add to Default shortcuts');
 
@@ -379,7 +394,7 @@ class ShortcutLinksTest extends ShortcutTestBase {
     $this->drupalLogin($this->drupalCreateUser([
       'access toolbar', 'access shortcuts', 'administer site configuration',
     ]));
-    $this->clickLink('Shortcuts', 0, 'Shortcut link found on page.');
+    $this->clickLink('Shortcuts');
     $this->assertSession()->linkExists('Cron', 0, 'Cron shortcut link found on page.');
 
     $this->verifyAccessShortcutsPermissionForEditPages();
@@ -388,7 +403,7 @@ class ShortcutLinksTest extends ShortcutTestBase {
   /**
    * Tests the shortcuts are correctly ordered by weight in the toolbar.
    */
-  public function testShortcutLinkOrder() {
+  public function testShortcutLinkOrder(): void {
     // Ensure to give permissions to access the shortcuts.
     $this->drupalLogin($this->drupalCreateUser([
       'access toolbar',
@@ -410,18 +425,17 @@ class ShortcutLinksTest extends ShortcutTestBase {
   }
 
   /**
-   * Tests that the 'access shortcuts' permission is required for shortcut set
-   * administration page access.
+   * Tests the 'access shortcuts' permission for shortcut set administration.
    */
-  private function verifyAccessShortcutsPermissionForEditPages() {
+  private function verifyAccessShortcutsPermissionForEditPages(): void {
     // Create a user with customize links and switch sets permissions  but
     // without the 'access shortcuts' permission.
     $test_permissions = [
       'customize shortcut links',
       'switch shortcut sets',
     ];
-    $noaccess_user = $this->drupalCreateUser($test_permissions);
-    $this->drupalLogin($noaccess_user);
+    $no_access_user = $this->drupalCreateUser($test_permissions);
+    $this->drupalLogin($no_access_user);
 
     // Verify that set administration pages are inaccessible without the
     // 'access shortcuts' permission.
@@ -429,15 +443,14 @@ class ShortcutLinksTest extends ShortcutTestBase {
     $this->assertSession()->statusCodeEquals(403);
     $this->drupalGet('admin/config/user-interface/shortcut/manage/default');
     $this->assertSession()->statusCodeEquals(403);
-    $this->drupalGet('user/' . $noaccess_user->id() . '/shortcuts');
+    $this->drupalGet('user/' . $no_access_user->id() . '/shortcuts');
     $this->assertSession()->statusCodeEquals(403);
   }
 
   /**
-   * Tests that the 'access shortcuts' permission is required to access the
-   * shortcut block.
+   * Tests the 'access shortcuts' permission with the shortcut block.
    */
-  public function testShortcutBlockAccess() {
+  public function testShortcutBlockAccess(): void {
     // Creates a block instance and place in a region through api.
     $block = $this->drupalPlaceBlock('shortcuts');
 
@@ -467,22 +480,15 @@ class ShortcutLinksTest extends ShortcutTestBase {
    *   Link position counting from zero.
    * @param string $message
    *   (optional) A message to display with the assertion. Do not translate
-   *   messages: use new FormattableMarkup() to embed variables in the message text, not
-   *   t(). If left blank, a default message will be displayed.
-   * @param string $group
-   *   (optional) The group this message is in, which is displayed in a column
-   *   in test output. Use 'Debug' to indicate this is debugging output. Do not
-   *   translate this string. Defaults to 'Other'; most tests do not override
-   *   this default.
+   *   messages: use new FormattableMarkup() to embed variables in the message
+   *   text, not t(). If left blank, a default message will be displayed.
    *
-   * @return bool
-   *   TRUE if the assertion succeeded.
+   * @internal
    */
-  protected function assertShortcutQuickLink($label, $index = 0, $message = '', $group = 'Other') {
+  protected function assertShortcutQuickLink(string $label, int $index = 0, string $message = ''): void {
     $links = $this->xpath('//a[normalize-space()=:label]', [':label' => $label]);
-    $message = ($message ? $message : new FormattableMarkup('Shortcut quick link with label %label found.', ['%label' => $label]));
+    $message = ($message ?: "Shortcut quick link with label $label found.");
     $this->assertArrayHasKey($index, $links, $message);
-    return TRUE;
   }
 
 }

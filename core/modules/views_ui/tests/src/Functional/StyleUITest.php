@@ -1,15 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views_ui\Functional;
 
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the UI of style plugins.
  *
- * @group views_ui
  * @see \Drupal\views_test_data\Plugin\views\style\StyleTest.
  */
+#[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class StyleUITest extends UITestBase {
 
   /**
@@ -27,7 +32,7 @@ class StyleUITest extends UITestBase {
   /**
    * Tests changing the style plugin and changing some options of a style.
    */
-  public function testStyleUI() {
+  public function testStyleUI(): void {
     $view_name = 'test_view';
     $view_edit_url = "admin/structure/views/view/$view_name/edit";
 
@@ -67,7 +72,7 @@ class StyleUITest extends UITestBase {
     $this->drupalGet("admin/structure/views/nojs/display/{$view_name}/page_1/row");
     $this->submitForm(['row[type]' => 'fields'], 'Apply');
     // If fields are being used this text will not be shown.
-    $this->assertNoText('The selected style or row format does not use fields.');
+    $this->assertSession()->pageTextNotContains('The selected style or row format does not use fields.');
   }
 
 }

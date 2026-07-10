@@ -27,9 +27,14 @@ interface ConditionInterface {
    * Adds a condition.
    *
    * @param string|\Drupal\Core\Entity\Query\ConditionInterface $field
+   *   The field.
    * @param mixed $value
+   *   (optional) The value.
    * @param string $operator
+   *   (optional) The operator.
    * @param string $langcode
+   *   (optional) For which language the entity should be prepared, defaults to
+   *   the current content language.
    *
    * @return $this
    *
@@ -41,7 +46,10 @@ interface ConditionInterface {
    * Queries for the existence of a field.
    *
    * @param string $field
+   *   The field to query for existence.
    * @param string $langcode
+   *   (optional) For which language the entity should be prepared, defaults to
+   *   the current content language.
    *
    * @return $this
    *
@@ -53,6 +61,7 @@ interface ConditionInterface {
    * Queries for the nonexistence of a field.
    *
    * @param string $field
+   *   The field to query for nonexistence.
    * @param string $langcode
    *   (optional) For which language the entity should be prepared, defaults to
    *   the current content language.
@@ -70,15 +79,34 @@ interface ConditionInterface {
    * data structure directly and manipulate it before it gets compiled.
    *
    * @return array
+   *   An array of all conditions in this conditional clause.
    */
   public function &conditions();
 
   /**
    * Compiles this conditional clause.
    *
-   * @param $query
+   * @param \Drupal\Core\Entity\Query\QueryInterface $query
    *   The query object this conditional clause belongs to.
    */
   public function compile($query);
+
+  /**
+   * Sets query that is holding this condition.
+   *
+   * @param \Drupal\Core\Entity\Query\QueryInterface $query
+   *   New query to use.
+   *
+   * @return static
+   */
+  public function setQuery(QueryInterface $query): static;
+
+  /**
+   * Gets the query that is holding this condition.
+   *
+   * @return \Drupal\Core\Entity\Query\QueryInterface
+   *   The query object.
+   */
+  public function getQuery(): QueryInterface;
 
 }

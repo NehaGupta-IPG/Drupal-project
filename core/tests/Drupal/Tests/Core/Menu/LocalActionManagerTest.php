@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\Core\Menu\LocalActionManagerTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Menu;
 
@@ -16,85 +13,75 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Menu\LocalActionDefault;
 use Drupal\Core\Menu\LocalActionManager;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Prophecy\Argument;
+use Prophecy\Prophet;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 
 /**
- * @coversDefaultClass \Drupal\Core\Menu\LocalActionManager
- * @group Menu
+ * Tests Drupal\Core\Menu\LocalActionManager.
  */
+#[CoversClass(LocalActionManager::class)]
+#[Group('Menu')]
 class LocalActionManagerTest extends UnitTestCase {
 
   /**
    * The mocked argument resolver.
-   *
-   * @var \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $argumentResolver;
+  protected ArgumentResolverInterface&MockObject $argumentResolver;
 
   /**
-   * The mocked request.
-   *
-   * @var \Symfony\Component\HttpFoundation\Request|\PHPUnit\Framework\MockObject\MockObject
+   * The request.
    */
-  protected $request;
+  protected Request&Stub $request;
 
   /**
-   * The mocked module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The module handler.
    */
-  protected $moduleHandler;
+  protected ModuleHandlerInterface&Stub $moduleHandler;
 
   /**
-   * The mocked router provider.
-   *
-   * @var \Drupal\Core\Routing\RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The router provider.
    */
-  protected $routeProvider;
+  protected RouteProviderInterface&Stub $routeProvider;
 
   /**
-   * The mocked cache backend.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The cache backend.
    */
-  protected $cacheBackend;
+  protected CacheBackendInterface&Stub $cacheBackend;
 
   /**
-   * The mocked access manager.
-   *
-   * @var \Drupal\Core\Access\AccessManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The access manager.
    */
-  protected $accessManager;
+  protected AccessManagerInterface&Stub $accessManager;
 
   /**
-   * The mocked account.
-   *
-   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The account.
    */
-  protected $account;
+  protected AccountInterface&Stub $account;
 
   /**
-   * The mocked factory.
-   *
-   * @var \Drupal\Component\Plugin\Factory\FactoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The factory.
    */
-  protected $factory;
+  protected FactoryInterface&Stub $factory;
 
   /**
-   * The mocked plugin discovery.
-   *
-   * @var \Drupal\Component\Plugin\Discovery\DiscoveryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The plugin discovery.
    */
-  protected $discovery;
+  protected DiscoveryInterface&Stub $discovery;
 
   /**
    * The tested local action manager.
@@ -107,11 +94,13 @@ class LocalActionManagerTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
+
     $this->argumentResolver = $this->createMock('\Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface');
-    $this->request = $this->createMock('Symfony\Component\HttpFoundation\Request');
-    $this->routeProvider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
-    $this->moduleHandler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
-    $this->cacheBackend = $this->createMock('Drupal\Core\Cache\CacheBackendInterface');
+    $this->request = $this->createStub(Request::class);
+    $this->routeProvider = $this->createStub(RouteProviderInterface::class);
+    $this->moduleHandler = $this->createStub(ModuleHandlerInterface::class);
+    $this->cacheBackend = $this->createStub(CacheBackendInterface::class);
 
     $cache_contexts_manager = $this->prophesize(CacheContextsManager::class);
     $cache_contexts_manager->assertValidTokens(Argument::any())
@@ -122,22 +111,22 @@ class LocalActionManagerTest extends UnitTestCase {
     \Drupal::setContainer($container);
 
     $access_result = (new AccessResultForbidden())->cachePerPermissions();
-    $this->accessManager = $this->createMock('Drupal\Core\Access\AccessManagerInterface');
-    $this->accessManager->expects($this->any())
+    $this->accessManager = $this->createStub(AccessManagerInterface::class);
+    $this->accessManager
       ->method('checkNamedRoute')
       ->willReturn($access_result);
-    $this->account = $this->createMock('Drupal\Core\Session\AccountInterface');
-    $this->discovery = $this->createMock('Drupal\Component\Plugin\Discovery\DiscoveryInterface');
-    $this->factory = $this->createMock('Drupal\Component\Plugin\Factory\FactoryInterface');
-    $route_match = $this->createMock('Drupal\Core\Routing\RouteMatchInterface');
+    $this->account = $this->createStub(AccountInterface::class);
+    $this->discovery = $this->createStub(DiscoveryInterface::class);
+    $this->factory = $this->createStub(FactoryInterface::class);
+    $route_match = $this->createStub(RouteMatchInterface::class);
 
     $this->localActionManager = new TestLocalActionManager($this->argumentResolver, $this->request, $route_match, $this->routeProvider, $this->moduleHandler, $this->cacheBackend, $this->accessManager, $this->account, $this->discovery, $this->factory);
   }
 
   /**
-   * @covers ::getTitle
+   * Tests get title.
    */
-  public function testGetTitle() {
+  public function testGetTitle(): void {
     $local_action = $this->createMock('Drupal\Core\Menu\LocalActionInterface');
     $local_action->expects($this->once())
       ->method('getTitle')
@@ -146,55 +135,65 @@ class LocalActionManagerTest extends UnitTestCase {
     $this->argumentResolver->expects($this->once())
       ->method('getArguments')
       ->with($this->request, [$local_action, 'getTitle'])
-      ->will($this->returnValue(['test']));
+      ->willReturn(['test']);
 
     $this->localActionManager->getTitle($local_action);
   }
 
   /**
-   * @covers ::getActionsForRoute
-   *
-   * @dataProvider getActionsForRouteProvider
+   * Tests get actions for route.
    */
-  public function testGetActionsForRoute($route_appears, array $plugin_definitions, array $expected_actions) {
-    $this->discovery->expects($this->any())
+  #[DataProvider('getActionsForRouteProvider')]
+  public function testGetActionsForRoute($route_appears, array $plugin_definitions, array $expected_actions): void {
+    $this->discovery
       ->method('getDefinitions')
-      ->will($this->returnValue($plugin_definitions));
+      ->willReturn($plugin_definitions);
     $map = [];
     foreach ($plugin_definitions as $plugin_id => $plugin_definition) {
-      $plugin = $this->createMock('Drupal\Core\Menu\LocalActionInterface');
-      $plugin->expects($this->any())
+      $plugin = $this->createStub(LocalActionDefault::class);
+      $plugin
+        ->method('getCacheContexts')
+        ->willReturn([]);
+      $plugin
+        ->method('getCacheTags')
+        ->willReturn([]);
+      $plugin
+        ->method('getCacheMaxAge')
+        ->willReturn(0);
+      $plugin
         ->method('getRouteName')
-        ->will($this->returnValue($plugin_definition['route_name']));
-      $plugin->expects($this->any())
+        ->willReturn($plugin_definition['route_name']);
+      $plugin
         ->method('getRouteParameters')
-        ->will($this->returnValue(isset($plugin_definition['route_parameters']) ? $plugin_definition['route_parameters'] : []));
-      $plugin->expects($this->any())
+        ->willReturn($plugin_definition['route_parameters'] ?? []);
+      $plugin
         ->method('getTitle')
-        ->will($this->returnValue($plugin_definition['title']));
-      $this->argumentResolver->expects($this->any())
+        ->willReturn($plugin_definition['title']);
+      $this->argumentResolver
         ->method('getArguments')
         ->with($this->request, [$plugin, 'getTitle'])
-        ->will($this->returnValue([]));
+        ->willReturn([]);
 
-      $plugin->expects($this->any())
+      $plugin
         ->method('getWeight')
-        ->will($this->returnValue($plugin_definition['weight']));
-      $this->argumentResolver->expects($this->any())
+        ->willReturn($plugin_definition['weight']);
+      $this->argumentResolver
         ->method('getArguments')
         ->with($this->request, [$plugin, 'getTitle'])
-        ->will($this->returnValue([]));
+        ->willReturn([]);
       $map[] = [$plugin_id, [], $plugin];
     }
-    $this->factory->expects($this->any())
+    $this->factory
       ->method('createInstance')
-      ->will($this->returnValueMap($map));
+      ->willReturnMap($map);
 
     $this->assertEquals($expected_actions, $this->localActionManager->getActionsForRoute($route_appears));
   }
 
-  public function getActionsForRouteProvider() {
-    $cache_contexts_manager = $this->prophesize(CacheContextsManager::class);
+  public static function getActionsForRouteProvider(): array {
+    $originalContainer = \Drupal::hasContainer() ? \Drupal::getContainer() : NULL;
+
+    $cache_contexts_manager = (new Prophet())->prophesize(CacheContextsManager::class);
     $cache_contexts_manager->assertValidTokens(Argument::any())
       ->willReturn(TRUE);
 
@@ -375,11 +374,19 @@ class LocalActionManagerTest extends UnitTestCase {
       ],
     ];
 
+    // Restore the original container if needed.
+    if ($originalContainer) {
+      \Drupal::setContainer($originalContainer);
+    }
+
     return $data;
   }
 
 }
 
+/**
+ * Stub class for testing LocalActionManager.
+ */
 class TestLocalActionManager extends LocalActionManager {
 
   public function __construct(ArgumentResolverInterface $argument_resolver, Request $request, RouteMatchInterface $route_match, RouteProviderInterface $route_provider, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend, AccessManagerInterface $access_manager, AccountInterface $account, DiscoveryInterface $discovery, FactoryInterface $factory) {
@@ -394,7 +401,7 @@ class TestLocalActionManager extends LocalActionManager {
     $this->routeMatch = $route_match;
     $this->moduleHandler = $module_handler;
     $this->alterInfo('menu_local_actions');
-    $this->setCacheBackend($cache_backend, 'local_action_plugins', ['local_action']);
+    $this->setCacheBackend($cache_backend, 'local_action_plugins');
   }
 
 }

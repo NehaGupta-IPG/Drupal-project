@@ -30,11 +30,11 @@ use Drupal\migrate\Row;
  *     \Drupal\migrate\Plugin\MigrateIdMapInterface::STATUS_NEEDS_UPDATE.
  * - The row needs an update.
  *   - Rows can be marked by custom or contrib modules using the
- *     \Drupal\migrate\Plugin\MigrateIdMapInterface::prepareUpdate() os
+ *     \Drupal\migrate\Plugin\MigrateIdMapInterface::prepareUpdate() or
  *     \Drupal\migrate\Plugin\MigrateIdMapInterface::setUpdate()
  *     methods.
- * - The row is above the highwater mark.
- *   - The highwater mark is the highest encountered value of the property
+ * - The row is above the high-water mark.
+ *   - The high-water mark is the highest encountered value of the property
  *     defined by the configuration key high_water_property.
  * - The source row has changed.
  *   - A row is considered changed only if the track_changes property is set on
@@ -43,7 +43,7 @@ use Drupal\migrate\Row;
  *
  * When set to be processed, the row is also marked frozen and no further
  * changes to the row source properties are allowed. The last step is to set the
- * highwater value, if highwater is in use.
+ * high-water value, if high water is in use.
  *
  * Available configuration keys:
  * - cache_counts: (optional) If set, cache the source count.
@@ -85,10 +85,11 @@ use Drupal\migrate\Row;
  * @endcode
  *
  * In this example, skip_count is true which means count() will not attempt to
- * count the available source records, but just always return -1 instead. The
- * high_water_property defines which field marks the last imported row of the
- * migration. This will get converted into a SQL condition that looks like
- * 'n.changed' or 'changed' if no alias.
+ * count the available source records, but just always return
+ * MigrateSourceInterface::NOT_COUNTABLE instead. The high_water_property
+ * defines which field marks the last imported row of the migration. This will
+ * get converted into a SQL condition that looks like 'n.changed' or 'changed'
+ * if no alias.
  *
  * Example:
  *
@@ -96,15 +97,15 @@ use Drupal\migrate\Row;
  * source:
  *   plugin: some_source_plugin_name
  *   constants:
- *     - foo: bar
+ *     foo: bar
  * process:
- *   baz: constants/bar
+ *   baz: constants/foo
  * @endcode
  *
  * In this example, the constant 'foo' is defined with a value of 'bar'. It is
  * later used in the process pipeline to set the value of the field baz.
  *
- * @see \Drupal\migrate\Annotation\MigrateSource
+ * @see \Drupal\migrate\Attribute\MigrateSource
  * @see \Drupal\migrate\Plugin\MigrateIdMapInterface
  * @see \Drupal\migrate\Plugin\MigratePluginManager
  * @see \Drupal\migrate\Plugin\MigrateSourceInterface
@@ -132,14 +133,14 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
   /**
    * The current row from the query.
    *
-   * @var \Drupal\migrate\Row
+   * @var \Drupal\migrate\Row|null
    */
   protected $currentRow;
 
   /**
    * The primary key of the current row.
    *
-   * @var array
+   * @var array|null
    */
   protected $currentSourceIds;
 
@@ -253,14 +254,14 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
     $this->idMap = $this->migration->getIdMap();
     $this->highWaterProperty = !empty($configuration['high_water_property']) ? $configuration['high_water_property'] : FALSE;
 
-    // Pull out the current highwater mark if we have a highwater property.
+    // Pull out the current high-water mark if we have a high-water property.
     if ($this->highWaterProperty) {
       $this->originalHighWater = $this->getHighWater();
     }
 
-    // Don't allow the use of both highwater and track changes together.
+    // Don't allow the use of both high water and track changes together.
     if ($this->highWaterProperty && $this->trackChanges) {
-      throw new MigrateException('You should either use a highwater mark or track changes not both. They are both designed to solve the same problem');
+      throw new MigrateException('You should either use a high-water mark or track changes not both. They are both designed to solve the same problem');
     }
   }
 
@@ -292,7 +293,12 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
     $result = TRUE;
     try {
       $result_hook = $this->getModuleHandler()->invokeAll('migrate_prepare_row', [$row, $this, $this->migration]);
-      $result_named_hook = $this->getModuleHandler()->invokeAll('migrate_' . $this->migration->id() . '_prepare_row', [$row, $this, $this->migration]);
+      $result_named_hook = $this->getModuleHandler()
+        ->invokeAll('migrate_' . $this->migration->id() . '_prepare_row', [
+          $row,
+          $this,
+          $this->migration,
+        ]);
       // We will skip if any hook returned FALSE.
       $skip = ($result_hook && in_array(FALSE, $result_hook)) || ($result_named_hook && in_array(FALSE, $result_named_hook));
       $save_to_map = TRUE;
@@ -342,7 +348,7 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
   /**
    * {@inheritdoc}
    */
-  public function current() {
+  public function current(): mixed {
     return $this->currentRow;
   }
 
@@ -354,7 +360,7 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
    * serialize to fulfill the requirement, but using getCurrentIds() is
    * preferable.
    */
-  public function key() {
+  public function key(): mixed {
     return serialize($this->currentSourceIds);
   }
 
@@ -364,7 +370,7 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
    * Implementation of \Iterator::valid() - called at the top of the loop,
    * returning TRUE to process the loop and FALSE to terminate it.
    */
-  public function valid() {
+  public function valid(): bool {
     return isset($this->currentRow);
   }
 
@@ -375,7 +381,7 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
    * should implement initializeIterator() to do any class-specific setup for
    * iterating source records.
    */
-  public function rewind() {
+  public function rewind(): void {
     $this->getIterator()->rewind();
     $this->next();
   }
@@ -383,7 +389,7 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
   /**
    * {@inheritdoc}
    */
-  public function next() {
+  public function next(): void {
     $this->currentSourceIds = NULL;
     $this->currentRow = NULL;
 
@@ -417,9 +423,9 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
       // Check whether the row needs processing.
       // 1. This row has not been imported yet.
       // 2. Explicitly set to update.
-      // 3. The row is newer than the current highwater mark.
+      // 3. The row is newer than the current high-water mark.
       // 4. If no such property exists then try by checking the hash of the row.
-      if (!$row->getIdMap() || $row->needsUpdate() || $this->aboveHighwater($row) || $this->rowChanged($row)) {
+      if (!$row->getIdMap() || $row->needsUpdate() || $this->aboveHighWater($row) || $this->rowChanged($row)) {
         $this->currentRow = $row->freezeSource();
       }
 
@@ -443,9 +449,10 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
    *   The row we're importing.
    *
    * @return bool
-   *   TRUE if the highwater value in the row is greater than our current value.
+   *   TRUE if the high-water value in the row is greater than our current
+   *   value.
    */
-  protected function aboveHighwater(Row $row) {
+  protected function aboveHighWater(Row $row) {
     return $this->getHighWaterProperty() && $row->getSourceProperty($this->highWaterProperty['name']) > $this->originalHighWater;
   }
 
@@ -473,7 +480,8 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
    * Gets the source count.
    *
    * Return a count of available source records, from the cache if appropriate.
-   * Returns -1 if the source is not countable.
+   * Returns MigrateSourceInterface::NOT_COUNTABLE if the source is not
+   * countable.
    *
    * @param bool $refresh
    *   (optional) Whether or not to refresh the count. Defaults to FALSE. Not
@@ -484,9 +492,9 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
    * @return int
    *   The count.
    */
-  public function count($refresh = FALSE) {
+  public function count($refresh = FALSE): int {
     if ($this->skipCount) {
-      return -1;
+      return MigrateSourceInterface::NOT_COUNTABLE;
     }
 
     // Return the cached count if we are caching counts and a refresh is not
@@ -519,10 +527,12 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
   }
 
   /**
-   * Gets the source count checking if the source is countable or using the
-   * iterator_count function.
+   * Gets the source count.
+   *
+   * Checks if the source is countable or using the iterator_count function.
    *
    * @return int
+   *   The count of available source records.
    */
   protected function doCount() {
     $iterator = $this->getIterator();
@@ -545,8 +555,8 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
   /**
    * The current value of the high water mark.
    *
-   * The high water mark defines a timestamp stating the time the import was last
-   * run. If the mark is set, only content with a higher timestamp will be
+   * The high water mark defines a timestamp stating the time the import was
+   * last run. If the mark is set, only content with a higher timestamp will be
    * imported.
    *
    * @return int|null
@@ -560,7 +570,7 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
   /**
    * Save the new high water mark.
    *
-   * @param int $high_water
+   * @param int|null $high_water
    *   The high water timestamp.
    */
   protected function saveHighWater($high_water) {
@@ -604,15 +614,15 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
    * {@inheritdoc}
    */
   public function preRollback(MigrateRollbackEvent $event) {
-    // Nothing to do in this implementation.
+    // Reset the high-water mark.
+    $this->saveHighWater(NULL);
   }
 
   /**
    * {@inheritdoc}
    */
   public function postRollback(MigrateRollbackEvent $event) {
-    // Reset the high-water mark.
-    $this->saveHighWater(NULL);
+    // Nothing to do in this implementation.
   }
 
   /**
@@ -621,9 +631,6 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
   public function getSourceModule() {
     if (!empty($this->configuration['source_module'])) {
       return $this->configuration['source_module'];
-    }
-    elseif (!empty($this->pluginDefinition['source_module'])) {
-      return $this->pluginDefinition['source_module'];
     }
     return NULL;
   }

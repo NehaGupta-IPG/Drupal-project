@@ -33,6 +33,9 @@ class UrlMatcher extends BaseUrlMatcher {
     $this->currentPath = $current_path;
   }
 
+  /**
+   * Tries to match the request URL with a route collection.
+   */
   public function finalMatch(RouteCollection $collection, Request $request) {
     $this->routes = $collection;
     $context = new RequestContext();
@@ -45,7 +48,7 @@ class UrlMatcher extends BaseUrlMatcher {
   /**
    * {@inheritdoc}
    */
-  protected function getAttributes(Route $route, $name, array $attributes) {
+  protected function getAttributes(Route $route, $name, array $attributes): array {
     if ($route instanceof RouteObjectInterface && is_string($route->getRouteKey())) {
       $name = $route->getRouteKey();
     }

@@ -8,6 +8,7 @@ use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Drupal\Core\Plugin\ContextAwarePluginTrait;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\Core\Plugin\PluginWithFormsInterface;
+use Drupal\Core\Plugin\PreviewAwarePluginInterface;
 use Drupal\Core\Render\PreviewFallbackInterface;
 
 /**
@@ -19,10 +20,11 @@ use Drupal\Core\Render\PreviewFallbackInterface;
  *
  * @ingroup block_api
  */
-abstract class BlockBase extends PluginBase implements BlockPluginInterface, PluginWithFormsInterface, PreviewFallbackInterface, ContextAwarePluginInterface {
+abstract class BlockBase extends PluginBase implements BlockPluginInterface, PluginWithFormsInterface, PreviewAwarePluginInterface, PreviewFallbackInterface, ContextAwarePluginInterface {
 
   use BlockPluginTrait {
     buildConfigurationForm as traitBuildConfigurationForm;
+    submitConfigurationForm as traitSubmitConfigurationForm;
   }
   use ContextAwarePluginTrait;
   use ContextAwarePluginAssignmentTrait;
@@ -38,6 +40,16 @@ abstract class BlockBase extends PluginBase implements BlockPluginInterface, Plu
     $form['context_mapping'] = $this->addContextAssignmentElement($this, $contexts);
 
     return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+    if (!$form_state->getErrors() && $form_state->getValue('context_mapping')) {
+      $this->configuration['context_mapping'] = $form_state->getValue('context_mapping');
+    }
+    $this->traitSubmitConfigurationForm($form, $form_state);
   }
 
 }

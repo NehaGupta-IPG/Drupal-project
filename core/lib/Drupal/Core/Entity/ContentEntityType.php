@@ -12,6 +12,7 @@ class ContentEntityType extends EntityType implements ContentEntityTypeInterface
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $revision_metadata_keys = [];
 
   /**
@@ -65,7 +66,7 @@ class ContentEntityType extends EntityType implements ContentEntityTypeInterface
    */
   public function getRevisionMetadataKey($key) {
     $keys = $this->getRevisionMetadataKeys();
-    return isset($keys[$key]) ? $keys[$key] : FALSE;
+    return $keys[$key] ?? FALSE;
   }
 
   /**
@@ -87,6 +88,17 @@ class ContentEntityType extends EntityType implements ContentEntityTypeInterface
       unset($this->revision_metadata_keys[$key]);
     }
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasIntegerId(): ?bool {
+    if ($this->hasKey('id') && $this->entityClassImplements(FieldableEntityInterface::class)) {
+      $definitions = \Drupal::service('entity_field.manager')->getBaseFieldDefinitions($this->id());
+      return $definitions[$this->getKey('id')]->getType() === 'integer';
+    }
+    return NULL;
   }
 
 }

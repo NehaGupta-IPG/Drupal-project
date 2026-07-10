@@ -1,21 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\locale\Functional;
 
-use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\File\FileExists;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore janvier lundi
 /**
  * Tests the exportation of locale files.
- *
- * @group locale
  */
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocaleExportTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['locale'];
 
@@ -26,6 +29,8 @@ class LocaleExportTest extends BrowserTestBase {
 
   /**
    * A user able to create languages and export translations.
+   *
+   * @var \Drupal\user\Entity\User|false
    */
   protected $adminUser = NULL;
 
@@ -43,14 +48,14 @@ class LocaleExportTest extends BrowserTestBase {
     $this->drupalLogin($this->adminUser);
 
     // Copy test po files to the translations directory.
-    \Drupal::service('file_system')->copy(__DIR__ . '/../../../tests/test.de.po', 'translations://', FileSystemInterface::EXISTS_REPLACE);
-    \Drupal::service('file_system')->copy(__DIR__ . '/../../../tests/test.xx.po', 'translations://', FileSystemInterface::EXISTS_REPLACE);
+    \Drupal::service('file_system')->copy(__DIR__ . '/../../../tests/test.de.po', 'translations://', FileExists::Replace);
+    \Drupal::service('file_system')->copy(__DIR__ . '/../../../tests/test.xx.po', 'translations://', FileExists::Replace);
   }
 
   /**
    * Tests exportation of translations.
    */
-  public function testExportTranslation() {
+  public function testExportTranslation(): void {
     $file_system = \Drupal::service('file_system');
     // First import some known translations.
     // This will also automatically add the 'fr' language.
@@ -68,9 +73,9 @@ class LocaleExportTest extends BrowserTestBase {
     $this->submitForm(['langcode' => 'fr'], 'Export');
 
     // Ensure we have a translation file.
-    $this->assertRaw('# French translation of Drupal');
+    $this->assertSession()->pageTextContains('# French translation of Drupal');
     // Ensure our imported translations exist in the file.
-    $this->assertRaw('msgstr "lundi"');
+    $this->assertSession()->pageTextContains('msgstr "lundi"');
 
     // Import some more French translations which will be marked as customized.
     $name = $file_system->tempnam('temporary://', "po2_") . '.po';
@@ -100,11 +105,11 @@ class LocaleExportTest extends BrowserTestBase {
     ], 'Export');
 
     // Ensure we have a translation file.
-    $this->assertRaw('# French translation of Drupal');
+    $this->assertSession()->pageTextContains('# French translation of Drupal');
     // Ensure the customized translations exist in the file.
-    $this->assertRaw('msgstr "janvier"');
+    $this->assertSession()->pageTextContains('msgstr "janvier"');
     // Ensure no untranslated strings exist in the file.
-    $this->assertNoRaw('msgid "February"');
+    $this->assertSession()->responseNotContains('msgid "February"');
 
     // Export only untranslated French translations.
     $this->drupalGet('admin/config/regional/translate/export');
@@ -116,17 +121,17 @@ class LocaleExportTest extends BrowserTestBase {
     ], 'Export');
 
     // Ensure we have a translation file.
-    $this->assertRaw('# French translation of Drupal');
+    $this->assertSession()->pageTextContains('# French translation of Drupal');
     // Ensure no customized translations exist in the file.
-    $this->assertNoRaw('msgstr "janvier"');
+    $this->assertSession()->responseNotContains('msgstr "janvier"');
     // Ensure the untranslated strings exist in the file, and with right quotes.
-    $this->assertRaw($this->getUntranslatedString());
+    $this->assertSession()->responseContains($this->getUntranslatedString());
   }
 
   /**
    * Tests exportation of translation template file.
    */
-  public function testExportTranslationTemplateFile() {
+  public function testExportTranslationTemplateFile(): void {
     // Load an admin page with JavaScript so _drupal_add_library() fires at
     // least once and _locale_parse_js_file() gets to run at least once so that
     // the locales_source table gets populated with something.
@@ -135,19 +140,19 @@ class LocaleExportTest extends BrowserTestBase {
     $this->drupalGet('admin/config/regional/translate/export');
     $this->submitForm([], 'Export');
     // Ensure we have a translation file.
-    $this->assertRaw('# LANGUAGE translation of PROJECT');
+    $this->assertSession()->pageTextContains('# LANGUAGE translation of PROJECT');
   }
 
   /**
    * Helper function that returns a proper .po file.
    */
-  public function getPoFile() {
+  public function getPoFile(): string {
     return <<< EOF
 msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Type: text/plain; charset=utf-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\\n"
 
@@ -157,16 +162,15 @@ EOF;
   }
 
   /**
-   * Helper function that returns a .po file which strings will be marked
-   * as customized.
+   * Returns a .po file that will be marked as customized.
    */
-  public function getCustomPoFile() {
+  public function getCustomPoFile(): string {
     return <<< EOF
 msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Type: text/plain; charset=utf-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\\n"
 
@@ -181,7 +185,7 @@ EOF;
    * @return string
    *   A .po file fragment with an untranslated string.
    */
-  public function getUntranslatedString() {
+  public function getUntranslatedString(): string {
     return <<< EOF
 msgid "February"
 msgstr ""

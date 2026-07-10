@@ -1,7 +1,7 @@
 drupal.path:
   version: VERSION
   js:
-    path.js: {}
+    js/path.js: {}
   dependencies:
     - core/jquery
     - core/drupal

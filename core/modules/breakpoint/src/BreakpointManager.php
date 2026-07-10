@@ -4,6 +4,7 @@ namespace Drupal\breakpoint;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
@@ -12,6 +13,7 @@ use Drupal\Core\Plugin\Discovery\YamlDiscovery;
 use Drupal\Core\Plugin\Factory\ContainerFactory;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Defines a breakpoint plugin manager to deal with breakpoints.
@@ -29,13 +31,12 @@ use Drupal\Core\StringTranslation\TranslationInterface;
  * @endcode
  * For example:
  * @code
- * bartik.mobile:
- *   label: mobile
- *   mediaQuery: '(min-width: 0px)'
- *   weight: 0
+ * olivero.lg:
+ *   label: Large
+ *   mediaQuery: 'all and (min-width: 1000px)'
+ *   weight: 2
  *   multipliers:
  *     - 1x
- *     - 2x
  * @endcode
  * Optionally a breakpoint can provide a group key. By default an extensions
  * breakpoints will be placed in a group labelled with the extension name.
@@ -68,13 +69,6 @@ class BreakpointManager extends DefaultPluginManager implements BreakpointManage
   ];
 
   /**
-   * The theme handler.
-   *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
-   */
-  protected $themeHandler;
-
-  /**
    * Static cache of breakpoints keyed by group.
    *
    * @var array
@@ -88,22 +82,17 @@ class BreakpointManager extends DefaultPluginManager implements BreakpointManage
    */
   protected $instances = [];
 
-  /**
-   * Constructs a new BreakpointManager instance.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
-   *   The cache backend.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
-   *   The string translation service.
-   */
-  public function __construct(ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, CacheBackendInterface $cache_backend, TranslationInterface $string_translation) {
+  public function __construct(
+    ModuleHandlerInterface $module_handler,
+    protected ThemeHandlerInterface $themeHandler,
+    #[Autowire(service: 'cache.discovery')]
+    CacheBackendInterface $cache_backend,
+    TranslationInterface $string_translation,
+    ModuleExtensionList $module_extension_list,
+  ) {
     $this->factory = new ContainerFactory($this);
     $this->moduleHandler = $module_handler;
-    $this->themeHandler = $theme_handler;
+    $this->moduleExtensionList = $module_extension_list;
     $this->setStringTranslation($string_translation);
     $this->alterInfo('breakpoints');
     $this->setCacheBackend($cache_backend, 'breakpoints', ['breakpoints']);
@@ -133,8 +122,9 @@ class BreakpointManager extends DefaultPluginManager implements BreakpointManage
     if (!in_array('1x', $definition['multipliers'])) {
       $definition['multipliers'][] = '1x';
     }
-    // Ensure that multipliers are sorted correctly.
-    sort($definition['multipliers']);
+    // Ensure that multipliers are sorted numerically so 1x, 1.5x and 2x
+    // come out in that order instead of 1.5x, 1x, 2x.
+    sort($definition['multipliers'], SORT_NUMERIC);
   }
 
   /**
@@ -244,13 +234,14 @@ class BreakpointManager extends DefaultPluginManager implements BreakpointManage
   protected function getGroupLabel($group) {
     // Extension names are not translatable.
     if ($this->moduleHandler->moduleExists($group)) {
-      $label = $this->moduleHandler->getName($group);
+      $label = $this->moduleExtensionList->getName($group);
     }
     elseif ($this->themeHandler->themeExists($group)) {
       $label = $this->themeHandler->getName($group);
     }
     else {
       // Custom group label that should be translatable.
+      // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
       $label = $this->t($group, [], ['context' => 'breakpoint']);
     }
     return $label;

@@ -1,21 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\responsive_image\Functional;
 
+use Drupal\image\ImageDerivativeUtilities;
 use Drupal\responsive_image\ResponsiveImageStyleInterface;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore modulenarrow
 /**
  * Thoroughly test the administrative interface of the Responsive Image module.
- *
- * @group responsive_image
  */
+#[Group('responsive_image')]
+#[RunTestsInSeparateProcesses]
 class ResponsiveImageAdminUITest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'responsive_image',
@@ -41,7 +45,7 @@ class ResponsiveImageAdminUITest extends BrowserTestBase {
   /**
    * Tests responsive image administration functionality.
    */
-  public function testResponsiveImageAdmin() {
+  public function testResponsiveImageAdmin(): void {
     // We start without any default styles.
     $this->drupalGet('admin/config/media/responsive-image-style');
     $this->assertSession()->pageTextContains('There are no responsive image styles yet.');
@@ -55,7 +59,7 @@ class ResponsiveImageAdminUITest extends BrowserTestBase {
     $edit = [
       'label' => 'Style One',
       'id' => 'style_one',
-      'breakpoint_group' => 'responsive_image_test_module',
+      'breakpoint_group' => 'responsive_image',
       'fallback_image_style' => 'thumbnail',
     ];
     $this->drupalGet('admin/config/media/responsive-image-style/add');
@@ -64,8 +68,17 @@ class ResponsiveImageAdminUITest extends BrowserTestBase {
     // Check if the new group is created.
     $this->assertSession()->statusCodeEquals(200);
     $this->drupalGet('admin/config/media/responsive-image-style');
-    $this->assertNoText('There are no responsive image styles yet.');
+    $this->assertSession()->pageTextNotContains('There are no responsive image styles yet.');
     $this->assertSession()->pageTextContains('Style One');
+
+    // Edit the breakpoint_group.
+    $this->drupalGet('admin/config/media/responsive-image-style/style_one');
+    $this->assertSession()->fieldValueEquals('label', 'Style One');
+    $this->assertSession()->fieldValueEquals('breakpoint_group', 'responsive_image');
+    $edit = [
+      'breakpoint_group' => 'responsive_image_test_module',
+    ];
+    $this->submitForm($edit, 'Save');
 
     // Edit the group.
     $this->drupalGet('admin/config/media/responsive-image-style/style_one');
@@ -83,7 +96,7 @@ class ResponsiveImageAdminUITest extends BrowserTestBase {
     ];
     $image_styles = array_merge(
       [ResponsiveImageStyleInterface::EMPTY_IMAGE, ResponsiveImageStyleInterface::ORIGINAL_IMAGE],
-      array_keys(image_style_options(FALSE))
+      array_keys(\Drupal::service(ImageDerivativeUtilities::class)->styleOptions(FALSE))
     );
     foreach ($cases as $case) {
       // Check if the radio buttons are present.

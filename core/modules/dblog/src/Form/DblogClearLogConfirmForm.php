@@ -3,6 +3,7 @@
 namespace Drupal\dblog\Form;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Form\ConfirmFormBase;
@@ -13,7 +14,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @internal
  */
-class DblogClearLogConfirmForm extends ConfirmFormBase {
+class DblogClearLogConfirmForm extends ConfirmFormBase implements WorkspaceSafeFormInterface {
 
   /**
    * The database connection.
@@ -66,7 +67,7 @@ class DblogClearLogConfirmForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $_SESSION['dblog_overview_filter'] = [];
+    $this->getRequest()->getSession()->remove('dblog_overview_filter');
     $this->connection->truncate('watchdog')->execute();
     $this->messenger()->addStatus($this->t('Database log cleared.'));
     $form_state->setRedirectUrl($this->getCancelUrl());

@@ -1,28 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Unit\Entity;
 
+use Drupal\comment\CommentStatisticsInterface;
+use Drupal\comment\CommentStorageInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\CacheTagsInvalidator;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Tests comment acquires and releases the right lock.
- *
- * @group comment
  */
+#[Group('comment')]
 class CommentLockTest extends UnitTestCase {
 
   /**
    * Tests the lock behavior.
    */
-  public function testLocks() {
+  public function testLocks(): void {
     $container = new ContainerBuilder();
-    $container->set('module_handler', $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface'));
-    $container->set('current_user', $this->createMock('Drupal\Core\Session\AccountInterface'));
-    $container->set('cache.test', $this->createMock('Drupal\Core\Cache\CacheBackendInterface'));
-    $container->set('comment.statistics', $this->createMock('Drupal\comment\CommentStatisticsInterface'));
+    $container->set('module_handler', $this->createStub(ModuleHandlerInterface::class));
+    $container->set('current_user', $this->createStub(AccountInterface::class));
+    $container->set('cache.test', $this->createStub(CacheBackendInterface::class));
+    $container->set('comment.statistics', $this->createStub(CommentStatisticsInterface::class));
     $request_stack = new RequestStack();
     $request_stack->push(Request::create('/'));
     $container->set('request_stack', $request_stack);
@@ -30,19 +39,18 @@ class CommentLockTest extends UnitTestCase {
     $lock = $this->createMock('Drupal\Core\Lock\LockBackendInterface');
     $cid = 2;
     $lock_name = "comment:$cid:.00/";
-    $lock->expects($this->at(0))
+    $lock->expects($this->once())
       ->method('acquire')
       ->with($lock_name, 30)
-      ->will($this->returnValue(TRUE));
-    $lock->expects($this->at(1))
+      ->willReturn(TRUE);
+    $lock->expects($this->once())
       ->method('release')
       ->with($lock_name);
     $lock->expects($this->exactly(2))
       ->method($this->anything());
     $container->set('lock', $lock);
 
-    $cache_tag_invalidator = $this->createMock('Drupal\Core\Cache\CacheTagsInvalidator');
-    $container->set('cache_tags.invalidator', $cache_tag_invalidator);
+    $container->set('cache_tags.invalidator', $this->createStub(CacheTagsInvalidator::class));
 
     \Drupal::setContainer($container);
     $methods = get_class_methods('Drupal\comment\Entity\Comment');
@@ -51,31 +59,31 @@ class CommentLockTest extends UnitTestCase {
     $methods[] = 'invalidateTagsOnSave';
     $comment = $this->getMockBuilder('Drupal\comment\Entity\Comment')
       ->disableOriginalConstructor()
-      ->setMethods($methods)
+      ->onlyMethods($methods)
       ->getMock();
     $comment->expects($this->once())
       ->method('isNew')
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
     $comment->expects($this->once())
       ->method('hasParentComment')
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
     $comment->expects($this->once())
       ->method('getParentComment')
-      ->will($this->returnValue($comment));
+      ->willReturn($comment);
     $comment->expects($this->once())
       ->method('getCommentedEntityId')
-      ->will($this->returnValue($cid));
-    $comment->expects($this->any())
+      ->willReturn($cid);
+    $comment
       ->method('getThread')
-      ->will($this->returnValue(''));
+      ->willReturn('');
 
-    $anon_user = $this->createMock('Drupal\Core\Session\AccountInterface');
-    $anon_user->expects($this->any())
+    $anon_user = $this->createStub(AccountInterface::class);
+    $anon_user
       ->method('isAnonymous')
-      ->will($this->returnValue(TRUE));
-    $comment->expects($this->any())
+      ->willReturn(TRUE);
+    $comment
       ->method('getOwner')
-      ->will($this->returnValue($anon_user));
+      ->willReturn($anon_user);
 
     $parent_entity = $this->createMock('\Drupal\Core\Entity\ContentEntityInterface');
     $parent_entity->expects($this->atLeastOnce())
@@ -85,11 +93,10 @@ class CommentLockTest extends UnitTestCase {
       ->method('getCommentedEntity')
       ->willReturn($parent_entity);
 
-    $entity_type = $this->createMock('\Drupal\Core\Entity\EntityTypeInterface');
-    $comment->expects($this->any())
+    $comment
       ->method('getEntityType')
-      ->will($this->returnValue($entity_type));
-    $storage = $this->createMock('Drupal\comment\CommentStorageInterface');
+      ->willReturn($this->createStub(EntityTypeInterface::class));
+    $storage = $this->createStub(CommentStorageInterface::class);
 
     // preSave() should acquire the lock. (This is what's really being tested.)
     $comment->preSave($storage);

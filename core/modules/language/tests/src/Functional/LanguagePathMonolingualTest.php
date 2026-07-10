@@ -1,20 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\language\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Confirm that paths are not changed on monolingual non-English sites.
- *
- * @group language
  */
+#[Group('language')]
+#[RunTestsInSeparateProcesses]
 class LanguagePathMonolingualTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'language', 'path'];
 
@@ -23,6 +25,9 @@ class LanguagePathMonolingualTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -70,7 +75,7 @@ class LanguagePathMonolingualTest extends BrowserTestBase {
   /**
    * Verifies that links do not have language prefixes in them.
    */
-  public function testPageLinks() {
+  public function testPageLinks(): void {
     // Navigate to 'admin/config' path.
     $this->drupalGet('admin/config');
 
@@ -78,7 +83,7 @@ class LanguagePathMonolingualTest extends BrowserTestBase {
     $this->assertSession()->linkByHrefNotExists('/fr/', 'Links do not contain language prefix');
 
     // Verify that links in this page can be followed and work.
-    $this->clickLink(t('Languages'));
+    $this->clickLink('Languages');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains('Add language');
   }

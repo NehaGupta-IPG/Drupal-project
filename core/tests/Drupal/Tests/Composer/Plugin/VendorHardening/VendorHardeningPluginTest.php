@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Composer\Plugin\VendorHardening;
 
 use Composer\Composer;
@@ -8,21 +10,26 @@ use Composer\Package\PackageInterface;
 use Composer\Package\RootPackageInterface;
 use Drupal\Composer\Plugin\VendorHardening\Config;
 use Drupal\Composer\Plugin\VendorHardening\VendorHardeningPlugin;
-use Drupal\Tests\PhpUnitCompatibilityTrait;
-use Drupal\Tests\Traits\PhpUnitWarnings;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
- * @coversDefaultClass \Drupal\Composer\Plugin\VendorHardening\VendorHardeningPlugin
- * @group VendorHardening
+ * Tests Drupal\Composer\Plugin\VendorHardening\VendorHardeningPlugin.
  */
+#[CoversClass(VendorHardeningPlugin::class)]
+#[Group('VendorHardening')]
 class VendorHardeningPluginTest extends TestCase {
 
-  use PhpUnitWarnings;
-  use PhpUnitCompatibilityTrait;
+  use ProphecyTrait;
 
-  public function setUp(): void {
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
     parent::setUp();
     vfsStream::setup('vendor', NULL, [
       'drupal' => [
@@ -30,15 +37,16 @@ class VendorHardeningPluginTest extends TestCase {
           'tests' => [
             'SomeTest.php' => '<?php',
           ],
+          'SomeFile.php' => '<?php',
         ],
       ],
     ]);
   }
 
   /**
-   * @covers ::cleanPackage
+   * Tests clean package.
    */
-  public function testCleanPackage() {
+  public function testCleanPackage(): void {
 
     $config = $this->getMockBuilder(Config::class)
       ->disableOriginalConstructor()
@@ -48,19 +56,17 @@ class VendorHardeningPluginTest extends TestCase {
       ->willReturn(['tests']);
 
     $plugin = $this->getMockBuilder(VendorHardeningPlugin::class)
-      ->setMethods(['getInstallPathForPackage'])
+      ->onlyMethods(['getInstallPathForPackage'])
       ->getMock();
     $plugin->expects($this->once())
       ->method('getInstallPathForPackage')
       ->willReturn(vfsStream::url('vendor/drupal/package'));
 
     $ref_config = new \ReflectionProperty($plugin, 'config');
-    $ref_config->setAccessible(TRUE);
     $ref_config->setValue($plugin, $config);
 
     $io = $this->prophesize(IOInterface::class);
     $ref_io = new \ReflectionProperty($plugin, 'io');
-    $ref_io->setAccessible(TRUE);
     $ref_io->setValue($plugin, $io->reveal());
 
     $this->assertFileExists(vfsStream::url('vendor/drupal/package/tests/SomeTest.php'));
@@ -70,15 +76,15 @@ class VendorHardeningPluginTest extends TestCase {
 
     $plugin->cleanPackage($package->reveal());
 
-    $this->assertFileNotExists(vfsStream::url('vendor/drupal/package/tests'));
+    $this->assertFileDoesNotExist(vfsStream::url('vendor/drupal/package/tests'));
   }
 
   /**
-   * @covers ::cleanPathsForPackage
+   * Tests clean paths for package.
    */
-  public function testCleanPathsForPackage() {
+  public function testCleanPathsForPackage(): void {
     $plugin = $this->getMockBuilder(VendorHardeningPlugin::class)
-      ->setMethods(['getInstallPathForPackage'])
+      ->onlyMethods(['getInstallPathForPackage'])
       ->getMock();
     $plugin->expects($this->once())
       ->method('getInstallPathForPackage')
@@ -86,25 +92,25 @@ class VendorHardeningPluginTest extends TestCase {
 
     $io = $this->prophesize(IOInterface::class);
     $ref_io = new \ReflectionProperty($plugin, 'io');
-    $ref_io->setAccessible(TRUE);
     $ref_io->setValue($plugin, $io->reveal());
 
     $this->assertFileExists(vfsStream::url('vendor/drupal/package/tests/SomeTest.php'));
+    $this->assertFileExists(vfsStream::url('vendor/drupal/package/SomeFile.php'));
 
     $package = $this->prophesize(PackageInterface::class);
     $package->getName()->willReturn('drupal/package');
 
     $ref_clean = new \ReflectionMethod($plugin, 'cleanPathsForPackage');
-    $ref_clean->setAccessible(TRUE);
-    $ref_clean->invokeArgs($plugin, [$package->reveal(), ['tests']]);
+    $ref_clean->invokeArgs($plugin, [$package->reveal(), ['tests', 'SomeFile.php']]);
 
-    $this->assertFileNotExists(vfsStream::url('vendor/drupal/package/tests'));
+    $this->assertFileDoesNotExist(vfsStream::url('vendor/drupal/package/tests'));
+    $this->assertFileDoesNotExist(vfsStream::url('vendor/drupal/package/SomeFile.php'));
   }
 
   /**
-   * @covers ::cleanAllPackages
+   * Tests clean all packages.
    */
-  public function testCleanAllPackages() {
+  public function testCleanAllPackages(): void {
     $config = $this->getMockBuilder(Config::class)
       ->disableOriginalConstructor()
       ->getMock();
@@ -112,14 +118,13 @@ class VendorHardeningPluginTest extends TestCase {
       ->method('getAllCleanupPaths')
       ->willReturn(['drupal/package' => ['tests']]);
 
-    $package = $this->getMockBuilder(PackageInterface::class)
-      ->getMockForAbstractClass();
-    $package->expects($this->any())
+    $package = $this->createStub(PackageInterface::class);
+    $package
       ->method('getName')
       ->willReturn('drupal/package');
 
     $plugin = $this->getMockBuilder(VendorHardeningPlugin::class)
-      ->setMethods(['getInstalledPackages', 'getInstallPathForPackage'])
+      ->onlyMethods(['getInstalledPackages', 'getInstallPathForPackage'])
       ->getMock();
     $plugin->expects($this->once())
       ->method('getInstalledPackages')
@@ -130,30 +135,28 @@ class VendorHardeningPluginTest extends TestCase {
 
     $io = $this->prophesize(IOInterface::class);
     $ref_io = new \ReflectionProperty($plugin, 'io');
-    $ref_io->setAccessible(TRUE);
     $ref_io->setValue($plugin, $io->reveal());
 
     $ref_config = new \ReflectionProperty($plugin, 'config');
-    $ref_config->setAccessible(TRUE);
     $ref_config->setValue($plugin, $config);
 
     $this->assertFileExists(vfsStream::url('vendor/drupal/package/tests/SomeTest.php'));
 
     $plugin->cleanAllPackages();
 
-    $this->assertFileNotExists(vfsStream::url('vendor/drupal/package/tests'));
+    $this->assertFileDoesNotExist(vfsStream::url('vendor/drupal/package/tests'));
   }
 
   /**
-   * @covers ::writeAccessRestrictionFiles
+   * Tests write access restriction files.
    */
-  public function testWriteAccessRestrictionFiles() {
+  public function testWriteAccessRestrictionFiles(): void {
     $dir = vfsStream::url('vendor');
 
     // Set up mocks so that writeAccessRestrictionFiles() can eventually use
     // the IOInterface object.
     $composer = $this->getMockBuilder(Composer::class)
-      ->setMethods(['getPackage'])
+      ->onlyMethods(['getPackage'])
       ->getMock();
     $composer->expects($this->once())
       ->method('getPackage')
@@ -164,16 +167,14 @@ class VendorHardeningPluginTest extends TestCase {
 
     $this->assertDirectoryExists($dir);
 
-    $this->assertFileNotExists($dir . '/.htaccess');
-    $this->assertFileNotExists($dir . '/web.config');
+    $this->assertFileDoesNotExist($dir . '/.htaccess');
 
     $plugin->writeAccessRestrictionFiles($dir);
 
     $this->assertFileExists($dir . '/.htaccess');
-    $this->assertFileExists($dir . '/web.config');
   }
 
-  public function providerFindBinOverlap() {
+  public static function providerFindBinOverlap(): array {
     return [
       [
         [],
@@ -219,16 +220,13 @@ class VendorHardeningPluginTest extends TestCase {
   }
 
   /**
-   * @covers ::findBinOverlap
-   * @dataProvider providerFindBinOverlap
+   * Tests find bin overlap.
    */
-  public function testFindBinOverlap($expected, $binaries, $clean_paths) {
-    $plugin = $this->getMockBuilder(VendorHardeningPlugin::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+  #[DataProvider('providerFindBinOverlap')]
+  public function testFindBinOverlap(array $expected, array $binaries, array $clean_paths): void {
+    $plugin = $this->createStub(VendorHardeningPlugin::class);
 
     $ref_find_bin_overlap = new \ReflectionMethod($plugin, 'findBinOverlap');
-    $ref_find_bin_overlap->setAccessible(TRUE);
 
     $this->assertSame($expected, $ref_find_bin_overlap->invokeArgs($plugin, [$binaries, $clean_paths]));
   }

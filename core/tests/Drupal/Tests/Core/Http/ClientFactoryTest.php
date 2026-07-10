@@ -1,15 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Http;
 
 use Drupal\Core\Http\ClientFactory;
 use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
+use GuzzleHttp\HandlerStack;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Http\ClientFactory
- * @group Http
+ * Tests Drupal\Core\Http\ClientFactory.
  */
+#[CoversClass(ClientFactory::class)]
+#[Group('Http')]
 class ClientFactoryTest extends UnitTestCase {
 
   /**
@@ -23,21 +30,25 @@ class ClientFactoryTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
-    $stack = $this->getMockBuilder('GuzzleHttp\HandlerStack')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->factory = new ClientFactory($stack);
+    parent::setUp();
+
+    $this->factory = new ClientFactory($this->createStub(HandlerStack::class));
   }
 
   /**
-   * @covers ::fromOptions
-   * @dataProvider providerTestCreateFromOptions
+   * Tests create from options.
    *
    * @param array $settings_config
+   *   The settings configuration.
    * @param array $parameter_config
+   *   The parameter configuration.
    * @param array $expected_config_keys
+   *   The expected config keys.
+   *
+   * @legacy-covers ::fromOptions
    */
-  public function testCreateFromOptions($settings_config, $parameter_config, $expected_config_keys) {
+  #[DataProvider('providerTestCreateFromOptions')]
+  public function testCreateFromOptions(array $settings_config, array $parameter_config, array $expected_config_keys): void {
     if ($settings_config) {
       new Settings(['http_client_config' => $settings_config]);
     }
@@ -56,8 +67,9 @@ class ClientFactoryTest extends UnitTestCase {
    * Data provider for testCreateFromOptions.
    *
    * @return array
+   *   An array of test data for testCreateFromOptions.
    */
-  public function providerTestCreateFromOptions() {
+  public static function providerTestCreateFromOptions(): array {
     return [
       [[], [], ['verify' => TRUE, 'timeout' => 30]],
       [['timeout' => 40], [], ['verify' => TRUE, 'timeout' => 40]],

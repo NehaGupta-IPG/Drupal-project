@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\media_test_embed\Controller;
 
 use Drupal\filter\FilterFormatInterface;
@@ -8,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Controller to allow testing of error handling in drupalmedia plugin.js.
+ * Controller to allow testing of error handling of Media Embed in text editors.
  */
 class TestMediaFilterController extends MediaFilterController {
 

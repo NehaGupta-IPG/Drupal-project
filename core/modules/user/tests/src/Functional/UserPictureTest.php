@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Functional;
 
+use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
@@ -9,32 +12,34 @@ use Drupal\file\Entity\File;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests user picture functionality.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserPictureTest extends BrowserTestBase {
 
   use TestFileCreationTrait {
     getTestFiles as drupalGetTestFiles;
   }
-
-  /**
-   * The profile to install as a basis for testing.
-   *
-   * Using the standard profile to test user picture config provided by the
-   * standard profile.
-   *
-   * @var string
-   */
-  protected $profile = 'standard';
+  use CommentTestTrait;
 
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'classy';
+  protected static $modules = [
+    'test_user_config',
+    'node',
+    'comment',
+  ];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'stark';
 
   /**
    * A regular user.
@@ -43,6 +48,9 @@ class UserPictureTest extends BrowserTestBase {
    */
   protected $webUser;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -63,7 +71,7 @@ class UserPictureTest extends BrowserTestBase {
   /**
    * Tests creation, display, and deletion of user pictures.
    */
-  public function testCreateDeletePicture() {
+  public function testCreateDeletePicture(): void {
     $this->drupalLogin($this->webUser);
 
     // Save a new picture.
@@ -72,7 +80,7 @@ class UserPictureTest extends BrowserTestBase {
 
     // Verify that the image is displayed on the user account page.
     $this->drupalGet('user');
-    $this->assertRaw(StreamWrapperManager::getTarget($file->getFileUri()));
+    $this->assertSession()->responseContains(StreamWrapperManager::getTarget($file->getFileUri()));
 
     // Delete the picture.
     $edit = [];
@@ -86,7 +94,7 @@ class UserPictureTest extends BrowserTestBase {
     // would set the timestamp.
     Database::getConnection()->update('file_managed')
       ->fields([
-        'changed' => REQUEST_TIME - ($this->config('system.file')->get('temporary_maximum_age') + 1),
+        'changed' => \Drupal::time()->getRequestTime() - ($this->config('system.file')->get('temporary_maximum_age') + 1),
       ])
       ->condition('fid', $file->id())
       ->execute();
@@ -96,14 +104,17 @@ class UserPictureTest extends BrowserTestBase {
     $this->assertNull(File::load($file->id()), 'File was removed from the database.');
     // Clear out PHP's file stat cache so we see the current value.
     clearstatcache(TRUE, $file->getFileUri());
-    $this->assertFileNotExists($file->getFileUri());
+    $this->assertFileDoesNotExist($file->getFileUri());
   }
 
   /**
    * Tests embedded users on node pages.
    */
-  public function testPictureOnNodeComment() {
+  public function testPictureOnNodeComment(): void {
     $this->drupalLogin($this->webUser);
+
+    $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
+    $this->addDefaultCommentField('node', 'article');
 
     // Save a new picture.
     $image = current($this->drupalGetTestFiles('image'));
@@ -116,12 +127,12 @@ class UserPictureTest extends BrowserTestBase {
 
     $image_style_id = $this->config('core.entity_view_display.user.user.compact')->get('content.user_picture.settings.image_style');
     $style = ImageStyle::load($image_style_id);
-    $image_url = file_url_transform_relative($style->buildUrl($file->getfileUri()));
+    $image_url = \Drupal::service('file_url_generator')->transformRelative($style->buildUrl($file->getFileUri()));
     $alt_text = 'Profile picture for user ' . $this->webUser->getAccountName();
 
     // Verify that the image is displayed on the node page.
     $this->drupalGet('node/' . $node->id());
-    $elements = $this->cssSelect('.node__meta .field--name-user-picture img[alt="' . $alt_text . '"][src="' . $image_url . '"]');
+    $elements = $this->cssSelect('article > footer img[alt="' . $alt_text . '"][src="' . $image_url . '"]');
     $this->assertCount(1, $elements, 'User picture with alt text found on node page.');
 
     // Enable user pictures on comments, instead of nodes.
@@ -135,7 +146,7 @@ class UserPictureTest extends BrowserTestBase {
     ];
     $this->drupalGet('comment/reply/node/' . $node->id() . '/comment');
     $this->submitForm($edit, 'Save');
-    $elements = $this->cssSelect('.comment__meta .field--name-user-picture img[alt="' . $alt_text . '"][src="' . $image_url . '"]');
+    $elements = $this->cssSelect('#comment-1 img[alt="' . $alt_text . '"][src="' . $image_url . '"]');
     $this->assertCount(1, $elements, 'User picture with alt text found on the comment.');
 
     // Disable user pictures on comments and nodes.
@@ -145,7 +156,7 @@ class UserPictureTest extends BrowserTestBase {
       ->save();
 
     $this->drupalGet('node/' . $node->id());
-    $this->assertNoRaw(StreamWrapperManager::getTarget($file->getFileUri()));
+    $this->assertSession()->responseNotContains(StreamWrapperManager::getTarget($file->getFileUri()));
   }
 
   /**
@@ -158,7 +169,6 @@ class UserPictureTest extends BrowserTestBase {
 
     // Load actual user data from database.
     $user_storage = $this->container->get('entity_type.manager')->getStorage('user');
-    $user_storage->resetCache([$this->webUser->id()]);
     $account = $user_storage->load($this->webUser->id());
     return File::load($account->user_picture->target_id);
   }
@@ -168,7 +178,7 @@ class UserPictureTest extends BrowserTestBase {
    *
    * @see user_user_view_alter()
    */
-  public function testUserViewAlter() {
+  public function testUserViewAlter(): void {
     \Drupal::service('module_installer')->install(['image_module_test']);
     // Set dummy_image_formatter to the default view mode of user entity.
     EntityViewDisplay::load('user.user.default')->setComponent('user_picture', [

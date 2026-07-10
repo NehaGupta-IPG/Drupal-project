@@ -1,11 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Functional\Rest;
 
 use Drupal\file\Entity\File;
 use Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase;
 use Drupal\user\Entity\User;
 
+/**
+ * Resource test base for file entity.
+ */
 abstract class FileResourceTestBase extends EntityResourceTestBase {
 
   /**
@@ -42,6 +47,18 @@ abstract class FileResourceTestBase extends EntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
+  protected function doTestPost(): void {
+    // Drupal does not allow creating file entities independently. It allows
+    // you to create file entities that are referenced from another entity
+    // (e.g. an image for a node's image field).
+    // For that purpose, there is the "file_upload" REST resource plugin.
+    // @see \Drupal\file\FileAccessControlHandler::checkCreateAccess()
+    // @see \Drupal\file\Plugin\rest\resource\FileUploadResource
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUpAuthorization($method) {
     switch ($method) {
       case 'GET':
@@ -49,12 +66,15 @@ abstract class FileResourceTestBase extends EntityResourceTestBase {
         break;
 
       case 'PATCH':
-      case 'DELETE':
         // \Drupal\file\FileAccessControlHandler::checkAccess() grants 'update'
-        // and 'delete' access only to the user that owns the file. So there is
-        // no permission to grant: instead, the file owner must be changed from
-        // its default (user 1) to the current user.
+        // access only to the user that owns the file. So there is no permission
+        // to grant: instead, the file owner must be changed from its default
+        // (user 1) to the current user.
         $this->makeCurrentUserFileOwner();
+        return;
+
+      case 'DELETE':
+        $this->grantPermissionsToTestedRole(['delete any file']);
         break;
     }
   }
@@ -80,7 +100,7 @@ abstract class FileResourceTestBase extends EntityResourceTestBase {
     $file->setFilename('drupal.txt');
     $file->setMimeType('text/plain');
     $file->setFileUri('public://drupal.txt');
-    $file->set('status', FILE_STATUS_PERMANENT);
+    $file->setPermanent();
     $file->save();
 
     file_put_contents($file->getFileUri(), 'Drupal');
@@ -187,6 +207,7 @@ abstract class FileResourceTestBase extends EntityResourceTestBase {
    */
   protected function getExpectedCacheContexts() {
     return [
+      'url.site',
       'user.permissions',
     ];
   }
@@ -194,27 +215,13 @@ abstract class FileResourceTestBase extends EntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  public function testPost() {
-    // Drupal does not allow creating file entities independently. It allows you
-    // to create file entities that are referenced from another entity (e.g. an
-    // image for a node's image field).
-    // For that purpose, there is the "file_upload" REST resource plugin.
-    // @see \Drupal\file\FileAccessControlHandler::checkCreateAccess()
-    // @see \Drupal\file\Plugin\rest\resource\FileUploadResource
-    $this->markTestSkipped();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function getExpectedUnauthorizedAccessMessage($method) {
-    if ($method === 'GET') {
-      return "The 'access content' permission is required.";
-    }
-    if ($method === 'PATCH' || $method === 'DELETE') {
-      return 'Only the file owner can update or delete the file entity.';
-    }
-    return parent::getExpectedUnauthorizedAccessMessage($method);
+    return match($method) {
+      'GET' => "The 'access content' permission is required.",
+      'PATCH' => "Only the file owner can update the file entity.",
+      'DELETE' => "The 'delete any file' permission is required.",
+      default =>  parent::getExpectedUnauthorizedAccessMessage($method),
+    };
   }
 
 }

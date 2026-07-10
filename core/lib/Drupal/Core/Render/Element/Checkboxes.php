@@ -3,6 +3,7 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Attribute\FormElement;
 
 /**
  * Provides a form element for a set of checkboxes.
@@ -15,20 +16,25 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * Usage example:
  * @code
- * $form['high_school']['tests_taken'] = array(
+ * $form['favorites']['colors'] = [
  *   '#type' => 'checkboxes',
- *   '#options' => array('SAT' => $this->t('SAT'), 'ACT' => $this->t('ACT')),
- *   '#title' => $this->t('What standardized tests did you take?'),
+ *   '#options' => ['blue' => $this->t('Blue'), 'red' => $this->t('Red')],
+ *   '#title' => $this->t('Which colors do you like?'),
  *   ...
- * );
+ * ];
+ * @endcode
+ *
+ * Element properties may be set on single option items as follows.
+ *
+ * @code
+ * $form['favorites']['colors']['blue']['#description'] = $this->t('The color of the sky.');
  * @endcode
  *
  * @see \Drupal\Core\Render\Element\Radios
  * @see \Drupal\Core\Render\Element\Checkbox
- *
- * @FormElement("checkboxes")
  */
-class Checkboxes extends FormElement {
+#[FormElement('checkboxes')]
+class Checkboxes extends FormElementBase {
 
   use CompositeFormElementTrait;
 
@@ -36,14 +42,13 @@ class Checkboxes extends FormElement {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#input' => TRUE,
       '#process' => [
-        [$class, 'processCheckboxes'],
+        [static::class, 'processCheckboxes'],
       ],
       '#pre_render' => [
-        [$class, 'preRenderCompositeFormElement'],
+        [static::class, 'preRenderCompositeFormElement'],
       ],
       '#theme_wrappers' => ['checkboxes'],
     ];
@@ -60,11 +65,19 @@ class Checkboxes extends FormElement {
         $element['#default_value'] = [];
       }
       $weight = 0;
+      $child_attributes = $element['#attributes'];
+      // Prevent child elements from inheriting an aria-describedby attribute.
+      // The individual children won't have descriptions and the attribute will
+      // be invalid.
+      if (isset($child_attributes['aria-describedby'])) {
+        unset($child_attributes['aria-describedby']);
+      }
       foreach ($element['#options'] as $key => $choice) {
         // Integer 0 is not a valid #return_value, so use '0' instead.
         // @see \Drupal\Core\Render\Element\Checkbox::valueCallback().
-        // @todo For Drupal 8, cast all integer keys to strings for consistency
-        //   with \Drupal\Core\Render\Element\Radios::processRadios().
+        // @todo Cast all integer keys to strings for consistency
+        //   with \Drupal\Core\Render\Element\Radios::processRadios()
+        //   in https://www.drupal.org/node/3293550.
         if ($key === 0) {
           $key = '0';
         }
@@ -73,14 +86,21 @@ class Checkboxes extends FormElement {
         // sub-elements.
         $weight += 0.001;
 
+        // Only enabled checkboxes receive their values from the form
+        // submission, the disabled checkboxes use their default value.
+        $default_value = NULL;
+        if (isset($value[$key]) || (!empty($element[$key]['#disabled']) && in_array($key, $element['#default_value'], TRUE))) {
+          $default_value = $key;
+        }
+
         $element += [$key => []];
         $element[$key] += [
           '#type' => 'checkbox',
           '#title' => $choice,
           '#return_value' => $key,
-          '#default_value' => isset($value[$key]) ? $key : NULL,
-          '#attributes' => $element['#attributes'],
-          '#ajax' => isset($element['#ajax']) ? $element['#ajax'] : NULL,
+          '#default_value' => $default_value,
+          '#attributes' => $child_attributes,
+          '#ajax' => $element['#ajax'] ?? NULL,
           // Errors should only be shown on the parent checkboxes element.
           '#error_no_message' => TRUE,
           '#weight' => $weight,
@@ -115,6 +135,17 @@ class Checkboxes extends FormElement {
           unset($input[$key]);
         }
       }
+
+      // Because the disabled checkboxes don't receive their input from the
+      // form submission, we use their default value.
+      if (!empty($element['#default_value'])) {
+        foreach ($element['#default_value'] as $key) {
+          if (!empty($element[$key]['#disabled'])) {
+            $input[$key] = $key;
+          }
+        }
+      }
+
       return array_combine($input, $input);
     }
     else {

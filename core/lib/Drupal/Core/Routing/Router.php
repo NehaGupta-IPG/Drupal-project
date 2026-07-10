@@ -2,11 +2,14 @@
 
 namespace Drupal\Core\Routing;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Path\CurrentPathStack;
+use Drupal\Core\DependencyInjection\DeprecatedServicePropertyTrait;
+use Drupal\Core\Routing\Exception\CacheableResourceNotFoundException;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface as BaseUrlGeneratorInterface;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
@@ -29,6 +32,12 @@ use Symfony\Component\Routing\RouterInterface;
  *    See ::applyRouteEnhancers().
  */
 class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterface {
+  use DeprecatedServicePropertyTrait;
+
+  /**
+   * The service properties that should raise a deprecation error.
+   */
+  private array $deprecatedProperties = ['urlGenerator' => 'url_generator'];
 
   /**
    * The route provider responsible for the first-pass match.
@@ -52,26 +61,16 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
   protected $filters = [];
 
   /**
-   * The URL generator.
-   *
-   * @var \Symfony\Component\Routing\Generator\UrlGeneratorInterface
-   */
-  protected $urlGenerator;
-
-  /**
    * Constructs a new Router.
    *
    * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
    *   The route provider.
    * @param \Drupal\Core\Path\CurrentPathStack $current_path
    *   The current path stack.
-   * @param \Symfony\Component\Routing\Generator\UrlGeneratorInterface $url_generator
-   *   The URL generator.
    */
-  public function __construct(RouteProviderInterface $route_provider, CurrentPathStack $current_path, BaseUrlGeneratorInterface $url_generator) {
+  public function __construct(RouteProviderInterface $route_provider, CurrentPathStack $current_path) {
     parent::__construct($current_path);
     $this->routeProvider = $route_provider;
-    $this->urlGenerator = $url_generator;
   }
 
   /**
@@ -97,8 +96,13 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
   /**
    * {@inheritdoc}
    */
-  public function match($pathinfo) {
-    $request = Request::create($pathinfo);
+  public function match($pathinfo): array {
+    try {
+      $request = Request::create($pathinfo);
+    }
+    catch (BadRequestException $e) {
+      throw new ResourceNotFoundException($e->getMessage(), $e->getCode(), $e);
+    }
 
     return $this->matchRequest($request);
   }
@@ -106,52 +110,41 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
   /**
    * {@inheritdoc}
    */
-  public function matchRequest(Request $request) {
-    try {
-      $collection = $this->getInitialRouteCollection($request);
-    }
-    // PHP 7.4 introduces changes to its serialization format, which mean that
-    // older versions of PHP are unable to unserialize data that is serialized
-    // in PHP 7.4. If the site's version of PHP has been downgraded, then
-    // attempting to unserialize routes from the database will fail, and so the
-    // router needs to be rebuilt on the current PHP version.
-    // See https://www.php.net/manual/en/migration74.incompatible.php.
-    catch (\TypeError $e) {
-      \Drupal::service('router.builder')->rebuild();
-      $collection = $this->getInitialRouteCollection($request);
-    }
+  public function matchRequest(Request $request): array {
+    $collection = $this->getInitialRouteCollection($request);
     if ($collection->count() === 0) {
-      throw new ResourceNotFoundException(sprintf('No routes found for "%s".', $this->currentPath->getPath()));
+      // Allow caching the empty route lookup. Note that even though this result
+      // inherently depends on the path we do not bubble any cache contexts
+      // because:
+      // 1. This is outside the scope of Dynamic Page Cache since we have not
+      //    actually resolved a route
+      // 2. Page Cache does not use cache contexts (and caches per URL anyway)
+      throw new CacheableResourceNotFoundException(
+        new CacheableMetadata(),
+        sprintf('No routes found for "%s".', $this->currentPath->getPath()),
+      );
     }
     $collection = $this->applyRouteFilters($collection, $request);
     $collection = $this->applyFitOrder($collection);
 
-    if ($ret = $this->matchCollection(rawurldecode($this->currentPath->getPath($request)), $collection)) {
-      return $this->applyRouteEnhancers($ret, $request);
-    }
-
-    throw 0 < count($this->allow)
-      ? new MethodNotAllowedException(array_unique($this->allow))
-      : new ResourceNotFoundException(sprintf('No routes found for "%s".', $this->currentPath->getPath()));
+    $ret = $this->matchCollection(rawurldecode($this->currentPath->getPath($request)), $collection);
+    return $this->applyRouteEnhancers($ret, $request);
   }
 
   /**
-   * Tries to match a URL with a set of routes.
-   *
-   * @param string $pathinfo
-   *   The path info to be parsed
-   * @param \Symfony\Component\Routing\RouteCollection $routes
-   *   The set of routes.
-   *
-   * @return array|null
-   *   An array of parameters. NULL when there is no match.
+   * {@inheritdoc}
    */
-  protected function matchCollection($pathinfo, RouteCollection $routes) {
+  protected function matchCollection($pathinfo, RouteCollection $routes): array {
     // Try a case-sensitive match.
     $match = $this->doMatchCollection($pathinfo, $routes, TRUE);
     // Try a case-insensitive match.
     if ($match === NULL && $routes->count() > 0) {
       $match = $this->doMatchCollection($pathinfo, $routes, FALSE);
+    }
+    if ($match === NULL) {
+      throw 0 < count($this->allow)
+        ? new MethodNotAllowedException(array_unique($this->allow))
+        : new ResourceNotFoundException(sprintf('No routes found for "%s".', $this->currentPath->getPath()));
     }
     return $match;
   }
@@ -165,7 +158,7 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
    * RouteProvider::getRoutesByPath().
    *
    * @param string $pathinfo
-   *   The path info to be parsed
+   *   The path info to be parsed.
    * @param \Symfony\Component\Routing\RouteCollection $routes
    *   The set of routes.
    * @param bool $case_sensitive
@@ -210,7 +203,9 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
         }
       }
 
-      $status = $this->handleRouteRequirements($pathinfo, $name, $route);
+      $attributes = $this->getAttributes($route, $name, array_replace($matches, $hostMatches));
+
+      $status = $this->handleRouteRequirements($pathinfo, $name, $route, $attributes);
 
       if (self::ROUTE_MATCH === $status[0]) {
         return $status[1];
@@ -221,7 +216,7 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
         continue;
       }
 
-      return $this->getAttributes($route, $name, array_replace($matches, $hostMatches));
+      return $attributes;
     }
   }
 
@@ -324,16 +319,21 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
   /**
    * {@inheritdoc}
    */
-  public function getRouteCollection() {
+  public function getRouteCollection(): RouteCollection {
     return new LazyRouteCollection($this->routeProvider);
   }
 
   /**
-   * {@inheritdoc}
+   * This method is intentionally not implemented.
+   *
+   * Use Drupal\Core\Url instead.
+   *
+   * @see https://www.drupal.org/node/2820197
+   *
+   * @throws \BadMethodCallException
    */
-  public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:8.3.0 and will throw an exception from drupal:10.0.0. Use the \Drupal\Core\Url object instead. See https://www.drupal.org/node/2820197', E_USER_DEPRECATED);
-    return $this->urlGenerator->generate($name, $parameters, $referenceType);
+  public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH): string {
+    throw new \BadMethodCallException(__METHOD__ . '() is not supported. Use the \Drupal\Core\Url object instead. See https://www.drupal.org/node/2820197');
   }
 
 }

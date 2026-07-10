@@ -2,11 +2,12 @@
 
 namespace Drupal\block_content;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
 
 /**
- * Defines a class to build a listing of custom block entities.
+ * Defines a class to build a listing of content block entities.
  *
  * @see \Drupal\block_content\Entity\BlockContent
  */
@@ -42,6 +43,16 @@ class BlockContentListBuilder extends EntityListBuilder {
       $query->pager($this->limit);
     }
     return $query->execute();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOperations(EntityInterface $entity, ?CacheableMetadata $cacheability = NULL) {
+    $operations = parent::getOperations($entity, $cacheability);
+    // The 'View' operation doesn't make sense for content blocks.
+    unset($operations['view']);
+    return $operations;
   }
 
 }

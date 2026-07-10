@@ -1,22 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\datetime\Kernel;
 
-use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldItemInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItem;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
-use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the new entity API for the date field type.
- *
- * @group datetime
  */
+#[Group('datetime')]
+#[RunTestsInSeparateProcesses]
 class DateTimeItemTest extends FieldKernelTestBase {
 
   /**
@@ -34,12 +39,13 @@ class DateTimeItemTest extends FieldKernelTestBase {
   protected $field;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['datetime'];
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -64,7 +70,7 @@ class DateTimeItemTest extends FieldKernelTestBase {
   /**
    * Tests using entity fields of the datetime field type.
    */
-  public function testDateTime() {
+  public function testDateTime(): void {
     $this->fieldStorage->setSetting('datetime_type', DateTimeItem::DATETIME_TYPE_DATETIME);
     $this->fieldStorage->save();
 
@@ -108,7 +114,7 @@ class DateTimeItemTest extends FieldKernelTestBase {
   /**
    * Tests using entity fields of the date field type.
    */
-  public function testDateOnly() {
+  public function testDateOnly(): void {
     $this->fieldStorage->setSetting('datetime_type', DateTimeItem::DATETIME_TYPE_DATE);
     $this->fieldStorage->save();
 
@@ -161,7 +167,7 @@ class DateTimeItemTest extends FieldKernelTestBase {
   /**
    * Tests DateTimeItem::setValue().
    */
-  public function testSetValue() {
+  public function testSetValue(): void {
     // Test a date+time field.
     $this->fieldStorage->setSetting('datetime_type', DateTimeItem::DATETIME_TYPE_DATETIME);
     $this->fieldStorage->save();
@@ -218,7 +224,7 @@ class DateTimeItemTest extends FieldKernelTestBase {
   /**
    * Tests setting the value of the DateTimeItem directly.
    */
-  public function testSetValueProperty() {
+  public function testSetValueProperty(): void {
     // Test Date::setValue() with a date+time field.
     // Test a date+time field.
     $this->fieldStorage->setSetting('datetime_type', DateTimeItem::DATETIME_TYPE_DATETIME);
@@ -252,10 +258,9 @@ class DateTimeItemTest extends FieldKernelTestBase {
 
   /**
    * Tests the constraint validations for fields with date and time.
-   *
-   * @dataProvider datetimeValidationProvider
    */
-  public function testDatetimeValidation($value) {
+  #[DataProvider('datetimeValidationProvider')]
+  public function testDatetimeValidation(string|array $value): void {
     $this->expectException(AssertionFailedError::class);
 
     $this->fieldStorage->setSetting('datetime_type', DateTimeItem::DATETIME_TYPE_DATETIME);
@@ -269,7 +274,7 @@ class DateTimeItemTest extends FieldKernelTestBase {
   /**
    * Provider for testDatetimeValidation().
    */
-  public function datetimeValidationProvider() {
+  public static function datetimeValidationProvider(): array {
     return [
       // Valid ISO 8601 dates, but unsupported by DateTimeItem.
       ['2014-01-01T20:00:00Z'],
@@ -312,10 +317,9 @@ class DateTimeItemTest extends FieldKernelTestBase {
 
   /**
    * Tests the constraint validations for fields with date only.
-   *
-   * @dataProvider dateonlyValidationProvider
    */
-  public function testDateonlyValidation($value) {
+  #[DataProvider('dateOnlyValidationProvider')]
+  public function testDateOnlyValidation(string|array $value): void {
     $this->expectException(AssertionFailedError::class);
 
     $this->fieldStorage->setSetting('datetime_type', DateTimeItem::DATETIME_TYPE_DATE);
@@ -329,7 +333,7 @@ class DateTimeItemTest extends FieldKernelTestBase {
   /**
    * Provider for testDatetimeValidation().
    */
-  public function dateonlyValidationProvider() {
+  public static function dateOnlyValidationProvider(): array {
     return [
       // Valid date strings, but unsupported by DateTimeItem.
       ['Thu, 03 Nov 2014'],

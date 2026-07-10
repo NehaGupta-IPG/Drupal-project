@@ -3,14 +3,14 @@
 namespace Drupal\field_ui\Element;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Element\Table;
 
 /**
  * Provides a field_ui table element.
- *
- * @RenderElement("field_ui_table")
  */
+#[RenderElement('field_ui_table')]
 class FieldUiTable extends Table {
 
   /**
@@ -31,6 +31,8 @@ class FieldUiTable extends Table {
    * @param array $elements
    *   A structured array containing two sub-levels of elements. Properties
    *   used:
+   *   - #region_callback: A callback that provides the region of the table to
+   *     place the row in.
    *   - #tabledrag: The value is a list of $options arrays that are passed to
    *     drupal_attach_tabledrag(). The HTML ID of the table is added to each
    *     $options array.
@@ -70,6 +72,7 @@ class FieldUiTable extends Table {
           $region_name = call_user_func_array($row['#region_callback'], [&$row]);
 
           // Add the element in the tree.
+          // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
           $target = &$trees[$region_name][''];
           foreach ($parents[$name] as $key) {
             $target = &$target['children'][$key];
@@ -83,7 +86,7 @@ class FieldUiTable extends Table {
             $indentation = [
               '#theme' => 'indentation',
               '#size' => $depth,
-              '#suffix' => isset($row[$cell]['#prefix']) ? $row[$cell]['#prefix'] : '',
+              '#suffix' => $row[$cell]['#prefix'] ?? '',
             ];
             $row[$cell]['#prefix'] = \Drupal::service('renderer')->render($indentation);
           }
@@ -105,7 +108,10 @@ class FieldUiTable extends Table {
 
     // Determine rendering order from the tree structure.
     foreach ($regions as $region_name => $region) {
-      $elements['#regions'][$region_name]['rows_order'] = array_reduce($trees[$region_name], [static::class, 'reduceOrder']);
+      $elements['#regions'][$region_name]['rows_order'] = array_reduce(
+        $trees[$region_name],
+        [static::class, 'reduceOrder'],
+      );
     }
 
     $elements['#attached']['drupalSettings']['fieldUIRowsData'] = $js_settings;
@@ -224,8 +230,8 @@ class FieldUiTable extends Table {
    *   Array where rendering order has been determined.
    */
   public static function reduceOrder($array, $a) {
-    $array = !$array ? [] : $array;
-    if ($a['name']) {
+    $array = $array ?: [];
+    if (!empty($a['name'])) {
       $array[] = $a['name'];
     }
     if (!empty($a['children'])) {

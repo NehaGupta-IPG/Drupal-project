@@ -1,25 +1,29 @@
+parameters:
+  path_alias.skip_procedural_hook_scan: true
+
 services:
-  path_alias.subscriber:
-    class: Drupal\path_alias\EventSubscriber\PathAliasSubscriber
-    tags:
-      - { name: event_subscriber }
-    arguments: ['@path_alias.manager', '@path.current']
+  _defaults:
+    autoconfigure: true
+    autowire: true
   path_alias.path_processor:
     class: Drupal\path_alias\PathProcessor\AliasPathProcessor
     tags:
       - { name: path_processor_inbound, priority: 100 }
       - { name: path_processor_outbound, priority: 300 }
-    arguments: ['@path_alias.manager']
   path_alias.manager:
     class: Drupal\path_alias\AliasManager
-    arguments: ['@path_alias.repository', '@path_alias.whitelist', '@language_manager', '@cache.data']
+  Drupal\path_alias\AliasManagerInterface: '@path_alias.manager'
   path_alias.repository:
     class: Drupal\path_alias\AliasRepository
-    arguments: ['@database']
     tags:
       - { name: backend_overridable }
-  path_alias.whitelist:
-    class: Drupal\path_alias\AliasWhitelist
+  Drupal\path_alias\AliasRepositoryInterface: '@path_alias.repository'
+  path_alias.prefix_list:
+    class: Drupal\path_alias\AliasPrefixList
     tags:
       - { name: needs_destruction }
-    arguments: [path_alias_whitelist, '@cache.bootstrap', '@lock', '@state', '@path_alias.repository']
+    arguments: [path_alias_prefix_list, '@cache.bootstrap', '@lock', '@state', '@path_alias.repository']
+  Drupal\path_alias\AliasPrefixListInterface: '@path_alias.prefix_list'
+  Drupal\path_alias\AliasPathMatcher:
+    public: false
+    decorates: path.matcher

@@ -1,22 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\DependencyInjection;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Tests\UnitTestCase;
 use Drupal\Tests\Core\DependencyInjection\Fixture\BarClass;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**
- * @coversDefaultClass \Drupal\Core\DependencyInjection\ContainerBuilder
- * @group DependencyInjection
+ * Tests Drupal\Core\DependencyInjection\ContainerBuilder.
  */
+#[CoversClass(ContainerBuilder::class)]
+#[Group('DependencyInjection')]
 class ContainerBuilderTest extends UnitTestCase {
 
   /**
-   * @covers ::get
+   * Tests get.
    */
-  public function testGet() {
+  public function testGet(): void {
     $container = new ContainerBuilder();
     $container->register('bar', 'Drupal\Tests\Core\DependencyInjection\Fixture\BarClass');
 
@@ -25,30 +32,9 @@ class ContainerBuilderTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::set
+   * Tests set parameter exception.
    */
-  public function testSet() {
-    $container = new ContainerBuilder();
-    $class = new BarClass();
-    $container->set('bar', $class);
-    $this->assertEquals('bar', $class->_serviceId);
-  }
-
-  /**
-   * @covers ::set
-   */
-  public function testSetException() {
-    $container = new ContainerBuilder();
-    $class = new BarClass();
-    $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage('Service ID names must be lowercase: Bar');
-    $container->set('Bar', $class);
-  }
-
-  /**
-   * @covers ::setParameter
-   */
-  public function testSetParameterException() {
+  public function testSetParameterException(): void {
     $container = new ContainerBuilder();
     $this->expectException(\InvalidArgumentException::class);
     $this->expectExceptionMessage('Parameter names must be lowercase: Buzz');
@@ -56,28 +42,18 @@ class ContainerBuilderTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::register
+   * Tests register.
    */
-  public function testRegisterException() {
-    $container = new ContainerBuilder();
-    $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage('Service ID names must be lowercase: Bar');
-    $container->register('Bar');
-  }
-
-  /**
-   * @covers ::register
-   */
-  public function testRegister() {
+  public function testRegister(): void {
     $container = new ContainerBuilder();
     $service = $container->register('bar');
     $this->assertTrue($service->isPublic());
   }
 
   /**
-   * @covers ::setDefinition
+   * Tests set definition.
    */
-  public function testSetDefinition() {
+  public function testSetDefinition(): void {
     // Test a service with public set to true.
     $container = new ContainerBuilder();
     $definition = new Definition();
@@ -93,23 +69,9 @@ class ContainerBuilderTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::setDefinition
-   *
-   * @group legacy
+   * Tests set alias.
    */
-  public function testLegacySetDefinition() {
-    // Test a service with public set to default.
-    $container = new ContainerBuilder();
-    $definition = new Definition();
-    $this->expectDeprecation('Not marking service definitions as public is deprecated in drupal:9.2.0 and is required in drupal:10.0.0. Call $definition->setPublic(TRUE) before calling ::setDefinition(). See https://www.drupal.org/node/3194517');
-    $service = $container->setDefinition('foo', $definition);
-    $this->assertTrue($service->isPublic());
-  }
-
-  /**
-   * @covers ::setAlias
-   */
-  public function testSetAlias() {
+  public function testSetAlias(): void {
     $container = new ContainerBuilder();
     $container->register('bar');
     $alias = $container->setAlias('foo', 'bar');
@@ -119,7 +81,7 @@ class ContainerBuilderTest extends UnitTestCase {
   /**
    * Tests serialization.
    */
-  public function testSerialize() {
+  public function testSerialize(): void {
     $container = new ContainerBuilder();
     $this->expectException(\AssertionError::class);
     serialize($container);
@@ -130,11 +92,10 @@ class ContainerBuilderTest extends UnitTestCase {
    *
    * This test runs in a separate process to ensure the aliased class does not
    * affect any other tests.
-   *
-   * @runInSeparateProcess
-   * @preserveGlobalState disabled
    */
-  public function testConstructor() {
+  #[PreserveGlobalState(FALSE)]
+  #[RunInSeparateProcess]
+  public function testConstructor(): void {
     class_alias(TestInterface::class, 'Symfony\Component\Config\Resource\ResourceInterface');
     $container = new ContainerBuilder();
     $this->assertFalse($container->isTrackingResources());

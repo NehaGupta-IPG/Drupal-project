@@ -2,23 +2,22 @@
 
 namespace Drupal\comment\Plugin\Field\FieldWidget;
 
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
+use Drupal\comment\CommentingStatus;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Provides a default comment widget.
- *
- * @FieldWidget(
- *   id = "comment_default",
- *   label = @Translation("Comment"),
- *   field_types = {
- *     "comment"
- *   }
- * )
  */
+#[FieldWidget(
+  id: 'comment_default',
+  label: new TranslatableMarkup('Comment'),
+  field_types: ['comment'],
+)]
 class CommentWidget extends WidgetBase {
 
   /**
@@ -29,31 +28,31 @@ class CommentWidget extends WidgetBase {
 
     $element['status'] = [
       '#type' => 'radios',
-      '#title' => t('Comments'),
+      '#title' => $this->t('Comments'),
       '#title_display' => 'invisible',
       '#default_value' => $items->status,
-      '#options' => [
-        CommentItemInterface::OPEN => t('Open'),
-        CommentItemInterface::CLOSED => t('Closed'),
-        CommentItemInterface::HIDDEN => t('Hidden'),
+      '#required ' => TRUE,
+      '#options' => CommentingStatus::asOptions(),
+      CommentingStatus::Open->value => [
+        '#description' => $this->t('Users with the "Post comments" permission can post comments.'),
       ],
-      CommentItemInterface::OPEN => [
-        '#description' => t('Users with the "Post comments" permission can post comments.'),
+      CommentingStatus::Closed->value => [
+        '#description' => $this->t('Users cannot post comments, but existing comments will be displayed.'),
       ],
-      CommentItemInterface::CLOSED => [
-        '#description' => t('Users cannot post comments, but existing comments will be displayed.'),
-      ],
-      CommentItemInterface::HIDDEN => [
-        '#description' => t('Comments are hidden from view.'),
+      CommentingStatus::Hidden->value => [
+        '#description' => $this->t('Comments and the comment form are hidden from view.'),
       ],
     ];
-    // If the entity doesn't have any comments, the "hidden" option makes no
+
+    // If the entity doesn't have any comments, the "Closed" option makes no
     // sense, so don't even bother presenting it to the user unless this is the
     // default value widget on the field settings form.
     if (!$this->isDefaultValueWidget($form_state) && !$items->comment_count) {
-      $element['status'][CommentItemInterface::HIDDEN]['#access'] = FALSE;
-      // Also adjust the description of the "closed" option.
-      $element['status'][CommentItemInterface::CLOSED]['#description'] = t('Users cannot post comments.');
+      // Only hide the option when it's not the currently selected option.
+      if ($element['status']['#default_value'] !== CommentingStatus::Closed->value) {
+        $element['status'][CommentingStatus::Closed->value]['#access'] = FALSE;
+
+      }
     }
     // If the advanced settings tabs-set is available (normally rendered in the
     // second column on wide-resolutions), place the field as a details element

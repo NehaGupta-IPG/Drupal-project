@@ -15,8 +15,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * The container is built by the kernel and passed in to this class which stores
  * it statically. The container always contains the services from
- * \Drupal\Core\CoreServiceProvider, the service providers of enabled modules and any other
- * service providers defined in $GLOBALS['conf']['container_service_providers'].
+ * \Drupal\Core\CoreServiceProvider, the service providers of enabled modules
+ * and any other service providers defined in
+ * $GLOBALS['conf']['container_service_providers'].
  *
  * This class exists only to support legacy code that cannot be dependency
  * injected. If your code needs it, consider refactoring it to be object
@@ -75,10 +76,20 @@ class Drupal {
   /**
    * The current system version.
    */
-  const VERSION = '9.3.0-dev';
+  const VERSION = '12.0-dev';
 
   /**
    * Core API compatibility.
+   *
+   * This constant is set to '8.x' to provide legacy compatibility with
+   * extensions that use the '8.x-' prefix to denote Drupal core major version
+   * compatibility, for example '8.x-1.0'. These extensions can specify
+   * compatibility with multiple major versions of Drupal core by setting the
+   * version constraint in 'core_version_requirement'. Drupal does not support
+   * using this core major version number prefix with versions greater than 8.
+   * For example '9.x-' prefixed extensions are not supported.
+   *
+   * @todo Remove or rename this constant in https://www.drupal.org/i/3085662
    */
   const CORE_COMPATIBILITY = '8.x';
 
@@ -86,17 +97,6 @@ class Drupal {
    * Core minimum schema version.
    */
   const CORE_MINIMUM_SCHEMA_VERSION = 8000;
-
-  /**
-   * Minimum supported version of PHP.
-   *
-   * Below this version:
-   * - New sites cannot be installed, except from within tests.
-   * - Updates from previous Drupal versions can be run, but users are warned
-   *   that Drupal no longer supports that PHP version.
-   * - An error is shown in the status report that the PHP version is too old.
-   */
-  const MINIMUM_SUPPORTED_PHP = '7.3.0';
 
   /**
    * Minimum allowed version of PHP for Drupal to be bootstrapped.
@@ -114,7 +114,7 @@ class Drupal {
    * - Once in the error message printed to the user immediately after.
    * Remember to update both whenever this constant is updated.
    */
-  const MINIMUM_PHP = '7.3.0';
+  const MINIMUM_PHP = '8.5.0';
 
   /**
    * Minimum recommended value of PHP memory_limit.
@@ -132,12 +132,17 @@ class Drupal {
    * message, but Drupal can still be installed. Used for (e.g.) PHP versions
    * that have reached their EOL or will in the near future.
    */
-  const RECOMMENDED_PHP = '7.4';
+  const RECOMMENDED_PHP = '8.5';
+
+  /**
+   * Default location of gettext file on the translation server.
+   */
+  const TRANSLATION_DEFAULT_SERVER_PATTERN = 'https://ftp.drupal.org/files/translations/%core/%project/%project-%version.%language.po';
 
   /**
    * The currently active container object, or NULL if not initialized yet.
    *
-   * @var \Symfony\Component\DependencyInjection\ContainerInterface|null
+   * @var \Drupal\Component\DependencyInjection\ContainerInterface|null
    */
   protected static $container;
 
@@ -161,7 +166,8 @@ class Drupal {
   /**
    * Returns the currently active global container.
    *
-   * @return \Symfony\Component\DependencyInjection\ContainerInterface
+   * @return \Drupal\Component\DependencyInjection\ContainerInterface
+   *   The currently active global container.
    *
    * @throws \Drupal\Core\DependencyInjection\ContainerNotInitializedException
    */
@@ -176,6 +182,7 @@ class Drupal {
    * Returns TRUE if the container has been initialized, FALSE otherwise.
    *
    * @return bool
+   *   TRUE if the container is initialized, FALSE otherwise.
    */
   public static function hasContainer() {
     return static::$container !== NULL;
@@ -184,17 +191,15 @@ class Drupal {
   /**
    * Retrieves a service from the container.
    *
-   * Use this method if the desired service is not one of those with a dedicated
-   * accessor method below. If it is listed below, those methods are preferred
-   * as they can return useful type hints.
-   *
-   * @param string $id
+   * @param class-string<T>|string $id
    *   The ID of the service to retrieve.
    *
-   * @return mixed
+   * @template T of object
+   *
+   * @return ($id is class-string<T> ? T : object)
    *   The specified service.
    */
-  public static function service($id) {
+  public static function service(string $id): object {
     return static::getContainer()->get($id);
   }
 
@@ -216,6 +221,7 @@ class Drupal {
    * Gets the app root.
    *
    * @return string
+   *   The app root directory path.
    */
   public static function root() {
     return static::getContainer()->getParameter('app.root');
@@ -224,8 +230,10 @@ class Drupal {
   /**
    * Gets the active install profile.
    *
-   * @return string|null
-   *   The name of the active install profile.
+   * @return string|false|null
+   *   The name of the active install profile. FALSE indicates that the site is
+   *   not using an install profile. NULL indicates that the site has not yet
+   *   been installed.
    */
   public static function installProfile() {
     return static::getContainer()->getParameter('install_profile');
@@ -299,6 +307,7 @@ class Drupal {
    * @endcode
    *
    * @return \Drupal\Core\Session\AccountProxyInterface
+   *   The current user account proxy.
    */
   public static function currentUser() {
     return static::getContainer()->get('current_user');
@@ -347,7 +356,7 @@ class Drupal {
    * an object of a class that implements
    * \Drupal\Core\DependencyInjection\ContainerInjectionInterface.
    *
-   * One common usecase is to provide a class which contains the actual code
+   * One common use case is to provide a class which contains the actual code
    * of a hook implementation, without having to create a service.
    *
    * @param string $class
@@ -384,6 +393,7 @@ class Drupal {
    * Returns the locking layer instance.
    *
    * @return \Drupal\Core\Lock\LockBackendInterface
+   *   The locking layer instance.
    *
    * @ingroup lock
    */
@@ -395,15 +405,14 @@ class Drupal {
    * Retrieves a configuration object.
    *
    * This is the main entry point to the configuration API. Calling
-   * @code \Drupal::config('book.admin') @endcode will return a configuration
-   * object the Book module can use to read its administrative settings.
+   * \Drupal::config('my_module.admin') will return a configuration object the
+   * my_module module can use to read its administrative settings.
    *
    * @param string $name
    *   The name of the configuration object to retrieve, which typically
    *   corresponds to a configuration file. For
-   *   @code \Drupal::config('book.admin') @endcode, the configuration
-   *   object returned will contain the content of the book.admin
-   *   configuration file.
+   *   \Drupal::config('my_module.admin'), the configuration object returned
+   *   will contain the content of the my_module.admin configuration file.
    *
    * @return \Drupal\Core\Config\ImmutableConfig
    *   An immutable configuration object.
@@ -459,6 +468,7 @@ class Drupal {
    *   Name of the key/value collection to return.
    *
    * @return \Drupal\Core\KeyValueStore\KeyValueStoreInterface
+   *   The key/value storage collection for the specified name.
    */
   public static function keyValue($collection) {
     return static::getContainer()->get('keyvalue')->get($collection);
@@ -470,10 +480,12 @@ class Drupal {
    * Use this to store machine-generated data, local to a specific environment
    * that does not need deploying and does not need human editing; for example,
    * the last time cron was run. Data which needs to be edited by humans and
-   * needs to be the same across development, production, etc. environments
-   * (for example, the system maintenance message) should use \Drupal::config() instead.
+   * needs to be the same across development, production, etc. environments (for
+   * example, the system maintenance message) should use \Drupal::config()
+   * instead.
    *
    * @return \Drupal\Core\State\StateInterface
+   *   The state storage service.
    */
   public static function state() {
     return static::getContainer()->get('state');
@@ -527,6 +539,7 @@ class Drupal {
    * Returns the flood instance.
    *
    * @return \Drupal\Core\Flood\FloodInterface
+   *   The flood instance.
    */
   public static function flood() {
     return static::getContainer()->get('flood');
@@ -536,6 +549,7 @@ class Drupal {
    * Returns the module handler.
    *
    * @return \Drupal\Core\Extension\ModuleHandlerInterface
+   *   The module handler interface.
    */
   public static function moduleHandler() {
     return static::getContainer()->get('module_handler');
@@ -566,10 +580,10 @@ class Drupal {
   }
 
   /**
-   * Returns the url generator service.
+   * Returns the URL generator service.
    *
    * @return \Drupal\Core\Routing\UrlGeneratorInterface
-   *   The url generator service.
+   *   The URL generator service.
    */
   public static function urlGenerator() {
     return static::getContainer()->get('url_generator');
@@ -579,6 +593,7 @@ class Drupal {
    * Returns the link generator service.
    *
    * @return \Drupal\Core\Utility\LinkGeneratorInterface
+   *   The link generator service.
    */
   public static function linkGenerator() {
     return static::getContainer()->get('link_generator');
@@ -607,10 +622,10 @@ class Drupal {
   /**
    * Returns the CSRF token manager service.
    *
-   * The generated token is based on the session ID of the current user. Normally,
-   * anonymous users do not have a session, so the generated token will be
-   * different on every page request. To generate a token for users without a
-   * session, manually start a session prior to calling this function.
+   * The generated token is based on the session ID of the current user.
+   * Normally, anonymous users do not have a session, so the generated token
+   * will be different on every page request. To generate a token for users
+   * without a session, manually start a session prior to calling this function.
    *
    * @return \Drupal\Core\Access\CsrfTokenGenerator
    *   The CSRF token manager.
@@ -645,6 +660,7 @@ class Drupal {
    * Gets the theme service.
    *
    * @return \Drupal\Core\Theme\ThemeManagerInterface
+   *   The theme manager service.
    */
   public static function theme() {
     return static::getContainer()->get('theme.manager');
@@ -688,6 +704,7 @@ class Drupal {
    * Returns the path validator.
    *
    * @return \Drupal\Core\Path\PathValidatorInterface
+   *   The path validator service.
    */
   public static function pathValidator() {
     return static::getContainer()->get('path.validator');

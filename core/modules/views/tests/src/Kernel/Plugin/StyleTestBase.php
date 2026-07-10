@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Plugin;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
-use Masterminds\HTML5;
 
 /**
  * Tests some general style plugin related functionality.
@@ -11,18 +13,10 @@ use Masterminds\HTML5;
 abstract class StyleTestBase extends ViewsKernelTestBase {
 
   /**
-   * Stores the SimpleXML representation of the output.
-   *
-   * @var \SimpleXMLElement
-   */
-  protected $elements;
-
-  /**
    * Stores a view output in the elements.
    */
-  public function storeViewPreview($output) {
-    $html5 = new HTML5();
-    $htmlDom = $html5->loadHTML('<html><body>' . $output . '</body></html>');
+  public function storeViewPreview($output): void {
+    $htmlDom = Html::load($output);
     if ($htmlDom) {
       // It's much easier to work with simplexml than DOM, luckily enough
       // we can just simply import our DOM tree.

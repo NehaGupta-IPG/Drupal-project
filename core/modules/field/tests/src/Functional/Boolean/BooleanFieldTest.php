@@ -1,23 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Functional\Boolean;
 
 use Drupal\entity_test\Entity\EntityTest;
-use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests boolean field functionality.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class BooleanFieldTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'entity_test',
@@ -29,7 +31,7 @@ class BooleanFieldTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'classy';
+  protected $defaultTheme = 'stark';
 
   /**
    * A field to use in this test class.
@@ -62,13 +64,13 @@ class BooleanFieldTest extends BrowserTestBase {
   /**
    * Tests boolean field.
    */
-  public function testBooleanField() {
+  public function testBooleanField(): void {
     $on = $this->randomMachineName();
     $off = $this->randomMachineName();
     $label = $this->randomMachineName();
 
     // Create a field with settings to validate.
-    $field_name = mb_strtolower($this->randomMachineName());
+    $field_name = $this->randomMachineName();
     $this->fieldStorage = FieldStorageConfig::create([
       'field_name' => $field_name,
       'entity_type' => 'entity_test',
@@ -108,7 +110,7 @@ class BooleanFieldTest extends BrowserTestBase {
     $this->drupalGet('entity_test/add');
     $this->assertSession()->fieldValueEquals("{$field_name}[value]", '');
     $this->assertSession()->pageTextContains($this->field->label());
-    $this->assertNoRaw($on);
+    $this->assertSession()->responseNotContains($on);
 
     // Submit and ensure it is accepted.
     $edit = [
@@ -122,7 +124,7 @@ class BooleanFieldTest extends BrowserTestBase {
     // Verify that boolean value is displayed.
     $entity = EntityTest::load($id);
     $this->drupalGet($entity->toUrl());
-    $this->assertRaw('<div class="field__item">' . $on . '</div>');
+    $this->assertSession()->pageTextContains($on);
 
     // Test with "On" label option.
     $display_repository->getFormDisplay('entity_test', 'entity_test')
@@ -136,8 +138,8 @@ class BooleanFieldTest extends BrowserTestBase {
 
     $this->drupalGet('entity_test/add');
     $this->assertSession()->fieldValueEquals("{$field_name}[value]", '');
-    $this->assertRaw($on);
-    $this->assertNoText($this->field->label());
+    $this->assertSession()->pageTextContains($on);
+    $this->assertSession()->pageTextNotContains($this->field->label());
 
     // Test if we can change the on label.
     $on = $this->randomMachineName();
@@ -148,7 +150,7 @@ class BooleanFieldTest extends BrowserTestBase {
     $this->submitForm($edit, 'Save settings');
     // Check if we see the updated labels in the creation form.
     $this->drupalGet('entity_test/add');
-    $this->assertRaw($on);
+    $this->assertSession()->pageTextContains($on);
 
     // Go to the form display page and check if the default settings works as
     // expected.
@@ -183,7 +185,7 @@ class BooleanFieldTest extends BrowserTestBase {
   /**
    * Tests field access.
    */
-  public function testFormAccess() {
+  public function testFormAccess(): void {
     $on = 'boolean_on';
     $off = 'boolean_off';
     $label = 'boolean_label';

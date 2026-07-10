@@ -48,11 +48,6 @@ class LinkCollectionNormalizer extends NormalizerBase {
   const LINK_CONTEXT = 'jsonapi_links_object_context';
 
   /**
-   * {@inheritdoc}
-   */
-  protected $supportedInterfaceOrClass = LinkCollection::class;
-
-  /**
    * A random string to use when hashing links.
    *
    * This string is unique per instance of a link collection, but always the
@@ -79,18 +74,25 @@ class LinkCollectionNormalizer extends NormalizerBase {
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
    */
-  public function __construct(AccountInterface $current_user = NULL) {
-    if (is_null($current_user)) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $current_user argument is deprecated in drupal:9.2.0 and will be required in drupal:10.0.0.', E_USER_DEPRECATED);
-      $current_user = \Drupal::currentUser();
-    }
+  public function __construct(AccountInterface $current_user) {
     $this->currentUser = $current_user;
   }
 
   /**
-   * {@inheritdoc}
+   * Normalizes data into a set of arrays/scalars.
+   *
+   * @param \Drupal\jsonapi\JsonApiResource\LinkCollection $object
+   *   Data to normalize.
+   * @param string|null $format
+   *   Format the normalization result will be encoded as.
+   * @param array<string, mixed> $context
+   *   Context options for the normalizer.
+   *
+   * @return array|string|int|float|bool|\ArrayObject<mixed, mixed>|null
+   *   \ArrayObject is used to make sure an empty object is encoded as an
+   *   object not an array.
    */
-  public function normalize($object, $format = NULL, array $context = []) {
+  public function normalize($object, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
     assert($object instanceof LinkCollection);
     $normalized = [];
     /** @var \Drupal\jsonapi\JsonApiResource\Link $link */
@@ -152,6 +154,15 @@ class LinkCollectionNormalizer extends NormalizerBase {
     // Remove any dashes and underscores from the base64 hash and then return
     // the first 7 characters.
     return substr(str_replace(['-', '_'], '', $b64_hash), 0, 7);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSupportedTypes(?string $format): array {
+    return [
+      LinkCollection::class => TRUE,
+    ];
   }
 
 }

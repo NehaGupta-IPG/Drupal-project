@@ -161,7 +161,11 @@ class LocaleLookup extends CacheCollector {
     // If there is no translation available for the current language then use
     // language fallback to try other translations.
     if ($value === TRUE) {
-      $fallbacks = $this->languageManager->getFallbackCandidates(['langcode' => $this->langcode, 'operation' => 'locale_lookup', 'data' => $offset]);
+      $fallbacks = $this->languageManager->getFallbackCandidates([
+        'langcode' => $this->langcode,
+        'operation' => 'locale_lookup',
+        'data' => $offset,
+      ]);
       if (!empty($fallbacks)) {
         foreach ($fallbacks as $langcode) {
           $translation = $this->stringStorage->findTranslation([
@@ -178,7 +182,7 @@ class LocaleLookup extends CacheCollector {
       }
     }
 
-    if (is_string($value) && strpos($value, PoItem::DELIMITER) !== FALSE) {
+    if (is_string($value) && str_contains($value, PoItem::DELIMITER)) {
       // Community translations imported from localize.drupal.org as well as
       // migrated translations may contain @count[number].
       $value = preg_replace('!@count\[\d+\]!', '@count', $value);

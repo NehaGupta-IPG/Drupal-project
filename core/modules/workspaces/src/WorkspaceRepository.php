@@ -2,6 +2,7 @@
 
 namespace Drupal\workspaces;
 
+use Drupal\Component\Assertion\Inspector;
 use Drupal\Component\Graph\Graph;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -62,18 +63,21 @@ class WorkspaceRepository implements WorkspaceRepositoryInterface {
 
       // First, sort everything alphabetically.
       uasort($workspaces, function (WorkspaceInterface $a, WorkspaceInterface $b) {
+        assert(Inspector::assertStringable($a->label()) && Inspector::assertStringable($b->label()), 'Workspace labels are expected to be a string.');
         return strnatcasecmp($a->label(), $b->label());
       });
 
       $tree_children = [];
       foreach ($workspaces as $workspace_id => $workspace) {
-        $tree_children[$workspace->parent->target_id][] = $workspace_id;
+        $key = $workspace->hasParent() ? $workspace->parent->target_id : '';
+        $tree_children[$key][] = $workspace_id;
       }
 
       // Keeps track of the parents we have to process, the last entry is used
-      // for the next processing step. Top-level (root) workspace use NULL as
-      // the parent, so we need to initialize the list with that value.
-      $process_parents[] = NULL;
+      // for the next processing step. Top-level (root) workspace use an empty
+      // string as the parent, so we need to initialize the list with that
+      // value.
+      $process_parents[] = '';
 
       // Loops over the parent entities and adds its children to the tree array.
       // Uses a loop instead of a recursion, because it's more efficient.
@@ -114,6 +118,7 @@ class WorkspaceRepository implements WorkspaceRepositoryInterface {
       }
       $graph = (new Graph($graph))->searchAndSort();
 
+      $this->tree = [];
       foreach (array_keys($tree) as $workspace_id) {
         $this->tree[$workspace_id] = [
           'depth' => count($graph[$workspace_id]['paths']),
@@ -142,6 +147,7 @@ class WorkspaceRepository implements WorkspaceRepositoryInterface {
    * {@inheritdoc}
    */
   public function resetCache() {
+    $this->cache->invalidate('workspace_tree');
     $this->tree = NULL;
 
     return $this;

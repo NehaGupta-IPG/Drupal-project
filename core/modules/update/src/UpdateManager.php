@@ -6,11 +6,13 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Utility\ProjectInfo;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Default implementation of UpdateManagerInterface.
@@ -27,21 +29,7 @@ class UpdateManager implements UpdateManagerInterface {
   protected $updateSettings;
 
   /**
-   * Module Handler Service.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * Update Processor Service.
-   *
-   * @var \Drupal\update\UpdateProcessorInterface
-   */
-  protected $updateProcessor;
-
-  /**
-   * An array of installed and enabled projects.
+   * An array of installed projects.
    *
    * @var array
    */
@@ -61,48 +49,22 @@ class UpdateManager implements UpdateManagerInterface {
    */
   protected $availableReleasesTempStore;
 
-  /**
-   * The theme handler.
-   *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
-   */
-  protected $themeHandler;
-
-  /**
-   * The module extension list.
-   *
-   * @var \Drupal\Core\Extension\ModuleExtensionList
-   */
-  protected $moduleExtensionList;
-
-  /**
-   * Constructs an UpdateManager.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The Module Handler service
-   * @param \Drupal\update\UpdateProcessorInterface $update_processor
-   *   The Update Processor service.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
-   *   The translation service.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_expirable_factory
-   *   The expirable key/value factory.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler.
-   * @param \Drupal\Core\Extension\ModuleExtensionList|null $extension_list_module
-   *   The module extension list.
-   */
-  public function __construct(ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, UpdateProcessorInterface $update_processor, TranslationInterface $translation, KeyValueFactoryInterface $key_value_expirable_factory, ThemeHandlerInterface $theme_handler, ModuleExtensionList $extension_list_module) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected UpdateProcessorInterface $updateProcessor,
+    TranslationInterface $translation,
+    #[Autowire(service: 'keyvalue.expirable')]
+    KeyValueFactoryInterface $key_value_expirable_factory,
+    protected ThemeHandlerInterface $themeHandler,
+    protected ModuleExtensionList $moduleExtensionList,
+    protected ThemeExtensionList $themeExtensionList,
+  ) {
     $this->updateSettings = $config_factory->get('update.settings');
-    $this->moduleHandler = $module_handler;
-    $this->updateProcessor = $update_processor;
     $this->stringTranslation = $translation;
     $this->keyValueStore = $key_value_expirable_factory->get('update');
-    $this->themeHandler = $theme_handler;
     $this->availableReleasesTempStore = $key_value_expirable_factory->get('update_available_releases');
     $this->projects = [];
-    $this->moduleExtensionList = $extension_list_module;
   }
 
   /**
@@ -141,7 +103,7 @@ class UpdateManager implements UpdateManagerInterface {
       if (empty($this->projects)) {
         // Still empty, so we have to rebuild.
         $module_data = $this->moduleExtensionList->reset()->getList();
-        $theme_data = $this->themeHandler->rebuildThemeData();
+        $theme_data = $this->themeExtensionList->reset()->getList();
         $project_info = new ProjectInfo();
         $project_info->processInfoList($this->projects, $module_data, 'module', TRUE);
         $project_info->processInfoList($this->projects, $theme_data, 'theme', TRUE);
@@ -167,18 +129,12 @@ class UpdateManager implements UpdateManagerInterface {
     // On certain paths, we should clear the data and recompute the projects for
     // update status of the site to avoid presenting stale information.
     $route_names = [
-      'update.theme_update',
       'system.modules_list',
       'system.theme_install',
-      'update.module_update',
-      'update.module_install',
       'update.status',
-      'update.report_update',
-      'update.report_install',
       'update.settings',
       'system.status',
       'update.manual_status',
-      'update.confirmation_page',
       'system.themes_page',
     ];
     if (in_array(\Drupal::routeMatch()->getRouteName(), $route_names)) {

@@ -126,18 +126,18 @@ class EntityRepository implements EntityRepositoryInterface {
   /**
    * {@inheritdoc}
    */
-  public function getActive($entity_type_id, $entity_id, array $contexts = NULL) {
+  public function getActive($entity_type_id, $entity_id, ?array $contexts = NULL) {
     return current($this->getActiveMultiple($entity_type_id, [$entity_id], $contexts)) ?: NULL;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getActiveMultiple($entity_type_id, array $entity_ids, array $contexts = NULL) {
+  public function getActiveMultiple($entity_type_id, array $entity_ids, ?array $contexts = NULL) {
     $active = [];
 
     if (!isset($contexts)) {
-      $contexts = $this->contextRepository->getAvailableContexts();
+      $contexts = [];
     }
 
     // @todo Consider implementing a more performant version of this logic fully
@@ -170,14 +170,14 @@ class EntityRepository implements EntityRepositoryInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCanonical($entity_type_id, $entity_id, array $contexts = NULL) {
+  public function getCanonical($entity_type_id, $entity_id, ?array $contexts = NULL) {
     return current($this->getCanonicalMultiple($entity_type_id, [$entity_id], $contexts)) ?: NULL;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCanonicalMultiple($entity_type_id, array $entity_ids, array $contexts = NULL) {
+  public function getCanonicalMultiple($entity_type_id, array $entity_ids, ?array $contexts = NULL) {
     $entities = $this->entityTypeManager->getStorage($entity_type_id)
       ->loadMultiple($entity_ids);
 
@@ -186,21 +186,13 @@ class EntityRepository implements EntityRepositoryInterface {
     }
 
     if (!isset($contexts)) {
-      $contexts = $this->contextRepository->getAvailableContexts();
-    }
-
-    // @todo Consider deprecating the legacy context operation altogether in
-    //   https://www.drupal.org/node/3031124.
-    $legacy_context = [];
-    $key = static::CONTEXT_ID_LEGACY_CONTEXT_OPERATION;
-    if (isset($contexts[$key])) {
-      $legacy_context['operation'] = $contexts[$key]->getContextValue();
+      $contexts = [];
     }
 
     $canonical = [];
     $langcode = $this->getContentLanguageFromContexts($contexts);
     foreach ($entities as $id => $entity) {
-      $canonical[$id] = $this->getTranslationFromContext($entity, $langcode, $legacy_context);
+      $canonical[$id] = $this->getTranslationFromContext($entity, $langcode, $contexts);
     }
 
     return $canonical;
@@ -209,22 +201,24 @@ class EntityRepository implements EntityRepositoryInterface {
   /**
    * Retrieves the current content language from the specified contexts.
    *
-   * @param \Drupal\Core\Plugin\Context\ContextInterface[] $contexts
+   * This is a BC layer to support plugin context system identifiers, the
+   * langcode key should be used instead and is preferred when given.
+   *
+   * @param string[] $contexts
    *   An array of context items.
    *
    * @return string|null
    *   A language code or NULL if no language context was provided.
+   *
+   * @internal
    */
   protected function getContentLanguageFromContexts(array $contexts) {
-    // Content language might not be configurable, in which case we need to fall
-    // back to a configurable language type.
-    foreach ([LanguageInterface::TYPE_CONTENT, LanguageInterface::TYPE_INTERFACE] as $language_type) {
-      $context_id = '@language.current_language_context:' . $language_type;
-      if (isset($contexts[$context_id])) {
-        return $contexts[$context_id]->getContextValue()->getId();
-      }
+
+    if (isset($contexts['langcode'])) {
+      return $contexts['langcode'];
     }
-    return $this->languageManager->getDefaultLanguage()->getId();
+
+    return $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
   }
 
   /**

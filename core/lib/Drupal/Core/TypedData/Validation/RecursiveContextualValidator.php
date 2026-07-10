@@ -7,8 +7,11 @@ use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\TypedData\ListInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
+use Drupal\Core\Validation\ExecutionContext;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\Composite;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Util\PropertyPath;
@@ -52,6 +55,11 @@ class RecursiveContextualValidator implements ContextualValidatorInterface {
   protected $constraintValidatorFactory;
 
   /**
+   * The typed data manager.
+   */
+  protected TypedDataManagerInterface $typedDataManager;
+
+  /**
    * Creates a validator for the given context.
    *
    * @param \Symfony\Component\Validator\Context\ExecutionContextInterface $context
@@ -73,7 +81,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface {
   /**
    * {@inheritdoc}
    */
-  public function atPath($path) {
+  public function atPath($path): static {
     // @todo This method is not used at the moment, see
     //   https://www.drupal.org/node/2482527
     return $this;
@@ -82,13 +90,24 @@ class RecursiveContextualValidator implements ContextualValidatorInterface {
   /**
    * {@inheritdoc}
    */
-  public function validate($data, $constraints = NULL, $groups = NULL, $is_root_call = TRUE) {
-    if (isset($groups)) {
+  public function validate($data, $constraints = NULL, $groups = NULL, $is_root_call = TRUE): static {
+    if (isset($groups) && $groups !== Constraint::DEFAULT_GROUP) {
       throw new \LogicException('Passing custom groups is not supported.');
     }
 
+    if ($this->context instanceof ExecutionContext && $this->context->getConstraint() instanceof Composite) {
+      $is_root_call = FALSE;
+    }
+    // Convert to TypedDataInterface if it matches the context object's value
     if (!$data instanceof TypedDataInterface) {
-      throw new \InvalidArgumentException('The passed value must be a typed data object.');
+      $context_object = $this->context->getObject();
+
+      if ($context_object instanceof TypedDataInterface && $data === $context_object->getValue()) {
+        $data = $context_object;
+      }
+      else {
+        throw new \InvalidArgumentException('The passed value must be a typed data object.');
+      }
     }
 
     // You can pass a single constraint or an array of constraints.
@@ -123,10 +142,15 @@ class RecursiveContextualValidator implements ContextualValidatorInterface {
     $previous_object = $this->context->getObject();
     $previous_metadata = $this->context->getMetadata();
     $previous_path = $this->context->getPropertyPath();
+    $previous_constraint = $this->context instanceof ExecutionContext ? $this->context->getConstraint() : NULL;
 
     $metadata = $this->metadataFactory->getMetadataFor($data);
     $cache_key = spl_object_hash($data);
-    $property_path = $is_root_call ? '' : PropertyPath::append($previous_path, $data->getName());
+    $property_path = match(TRUE) {
+      $is_root_call => '',
+      $previous_constraint instanceof Composite => $previous_path,
+      default => PropertyPath::append($previous_path, $data->getName())
+    };
 
     // Prefer a specific instance of the typed data manager stored by the data
     // if it is available. This is necessary for specialized typed data objects,
@@ -148,18 +172,29 @@ class RecursiveContextualValidator implements ContextualValidatorInterface {
       $this->validateConstraints($value, $cache_key, $constraints);
     }
 
-    // If the data is a list or complex data, validate the contained list items
-    // or properties. However, do not recurse if the data is empty.
-    // Next, we do not recurse if given constraints are validated against an
-    // entity, since we should determine whether the entity matches the
-    // constraints and not whether the entity validates.
-    if (($data instanceof ListInterface || $data instanceof ComplexDataInterface) && !$data->isEmpty() && !($data instanceof EntityAdapter && $constraints_given)) {
-      foreach ($data as $name => $property) {
+    if (
+      // If the call is the root call or there are no constraints are given, we
+      // recurse. These are calls that should go into the values and find the
+      // relevant constraints per value.
+      ($is_root_call === TRUE || $constraints_given === FALSE) &&
+
+      // If the data is a list or complex data, validate the contained list
+      // items or properties. However, do not recurse if the data is empty.
+      ($data instanceof ListInterface || $data instanceof ComplexDataInterface) && !$data->isEmpty() &&
+
+      // Next, we do not recurse if given constraints are validated against an
+      // entity, since we should determine whether the entity matches the
+      // constraints and not whether the entity validates.
+      !($data instanceof EntityAdapter && $constraints_given)) {
+      foreach ($data as $property) {
         $this->validateNode($property);
       }
     }
 
     $this->context->setNode($previous_value, $previous_object, $previous_metadata, $previous_path);
+    if ($previous_constraint) {
+      $this->context->setConstraint($previous_constraint);
+    }
 
     return $this;
   }
@@ -178,7 +213,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface {
   protected function validateConstraints($value, $cache_key, $constraints) {
     foreach ($constraints as $constraint) {
       // Prevent duplicate validation of constraints, in the case
-      // that constraints belong to multiple validated groups
+      // that constraints belong to multiple validated groups.
       if (isset($cache_key)) {
         $constraint_hash = spl_object_hash($constraint);
 
@@ -200,14 +235,14 @@ class RecursiveContextualValidator implements ContextualValidatorInterface {
   /**
    * {@inheritdoc}
    */
-  public function getViolations() {
+  public function getViolations(): ConstraintViolationListInterface {
     return $this->context->getViolations();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function validateProperty($object, $propertyName, $groups = NULL) {
+  public function validateProperty($object, $propertyName, $groups = NULL): static {
     if (isset($groups)) {
       throw new \LogicException('Passing custom groups is not supported.');
     }
@@ -226,7 +261,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface {
   /**
    * {@inheritdoc}
    */
-  public function validatePropertyValue($object, $property_name, $value, $groups = NULL) {
+  public function validatePropertyValue($object, $property_name, $value, $groups = NULL): static {
     if (!is_object($object)) {
       throw new \InvalidArgumentException('Passing class name is not supported.');
     }

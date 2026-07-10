@@ -1,32 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\config\Functional;
 
-use Drupal\Core\Routing\RedirectDestinationTrait;
+use Drupal\Component\Serialization\Json;
 use Drupal\config_test\Entity\ConfigTest;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Routing\RedirectDestinationTrait;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the listing of configuration entities.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ConfigEntityListTest extends BrowserTestBase {
 
   use RedirectDestinationTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'config_test'];
 
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'classy';
+  protected $defaultTheme = 'stark';
 
   /**
    * {@inheritdoc}
@@ -42,7 +45,7 @@ class ConfigEntityListTest extends BrowserTestBase {
   /**
    * Tests entity list builder methods.
    */
-  public function testList() {
+  public function testList(): void {
     $controller = \Drupal::entityTypeManager()->getListBuilder('config_test');
 
     // Test getStorage() method.
@@ -57,21 +60,34 @@ class ConfigEntityListTest extends BrowserTestBase {
     $this->assertInstanceOf(ConfigTest::class, $entity);
 
     // Test getOperations() method.
+    $edit_url = $entity->toUrl()->setOption('query', $this->getRedirectDestination()->getAsArray());
+    $edit_url->setOption('attributes', ['aria-label' => 'Edit ' . $entity->label()]);
+
+    $delete_url = $entity->toUrl('delete-form')->setOption('query', $this->getRedirectDestination()->getAsArray());
+    $delete_url->setOption('attributes', ['aria-label' => 'Delete ' . $entity->label()]);
+
     $expected_operations = [
       'edit' => [
-        'title' => t('Edit'),
+        'title' => 'Edit',
         'weight' => 10,
-        'url' => $entity->toUrl()->setOption('query', $this->getRedirectDestination()->getAsArray()),
+        'url' => $edit_url,
       ],
       'disable' => [
-        'title' => t('Disable'),
+        'title' => 'Disable',
         'weight' => 40,
         'url' => $entity->toUrl('disable')->setOption('query', $this->getRedirectDestination()->getAsArray()),
       ],
       'delete' => [
-        'title' => t('Delete'),
+        'title' => 'Delete',
         'weight' => 100,
-        'url' => $entity->toUrl('delete-form')->setOption('query', $this->getRedirectDestination()->getAsArray()),
+        'attributes' => [
+          'class' => ['use-ajax'],
+          'data-dialog-type' => 'modal',
+          'data-dialog-options' => Json::encode([
+            'width' => 880,
+          ]),
+        ],
+        'url' => $delete_url,
       ],
     ];
 
@@ -132,16 +148,62 @@ class ConfigEntityListTest extends BrowserTestBase {
     $entity = $list['default'];
 
     // Test getOperations() method.
+    $edit_url = $entity->toUrl()->setOption('query', $this->getRedirectDestination()->getAsArray());
+    $edit_url->setOption('attributes', ['aria-label' => 'Edit ' . $entity->label()]);
+
+    $delete_url = $entity->toUrl('delete-form')->setOption('query', $this->getRedirectDestination()->getAsArray());
+    $delete_url->setOption('attributes', ['aria-label' => 'Delete ' . $entity->label()]);
     $expected_operations = [
       'edit' => [
-        'title' => t('Edit'),
+        'title' => 'Edit',
         'weight' => 10,
-        'url' => $entity->toUrl()->setOption('query', $this->getRedirectDestination()->getAsArray()),
+        'url' => $edit_url,
       ],
       'delete' => [
-        'title' => t('Delete'),
+        'title' => 'Delete',
         'weight' => 100,
-        'url' => $entity->toUrl('delete-form')->setOption('query', $this->getRedirectDestination()->getAsArray()),
+        'attributes' => [
+          'class' => ['use-ajax'],
+          'data-dialog-type' => 'modal',
+          'data-dialog-options' => Json::encode([
+            'width' => 880,
+          ]),
+        ],
+        'url' => $delete_url,
+      ],
+    ];
+
+    $actual_operations = $controller->getOperations($entity);
+    // Sort the operations to normalize link order.
+    uasort($actual_operations, ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
+    $this->assertEquals($expected_operations, $actual_operations, 'The operations are identical.');
+
+    // Test getOperations when label doesn't exist.
+    $entity->set('label', '');
+    $entity->save();
+
+    $edit_url = $entity->toUrl()->setOption('query', $this->getRedirectDestination()->getAsArray());
+    $edit_url->setOption('attributes', ['aria-label' => 'Edit ' . $entity->bundle() . ' ' . $entity->id()]);
+
+    $delete_url = $entity->toUrl('delete-form')->setOption('query', $this->getRedirectDestination()->getAsArray());
+    $delete_url->setOption('attributes', ['aria-label' => 'Delete ' . $entity->bundle() . ' ' . $entity->id()]);
+    $expected_operations = [
+      'edit' => [
+        'title' => 'Edit',
+        'weight' => 10,
+        'url' => $edit_url,
+      ],
+      'delete' => [
+        'title' => 'Delete',
+        'weight' => 100,
+        'attributes' => [
+          'class' => ['use-ajax'],
+          'data-dialog-type' => 'modal',
+          'data-dialog-options' => Json::encode([
+            'width' => 880,
+          ]),
+        ],
+        'url' => $delete_url,
       ],
     ];
 
@@ -154,7 +216,7 @@ class ConfigEntityListTest extends BrowserTestBase {
   /**
    * Tests the listing UI.
    */
-  public function testListUI() {
+  public function testListUI(): void {
     // Log in as an administrative user to access the full menu trail.
     $this->drupalLogin($this->drupalCreateUser([
       'access administration pages',
@@ -179,14 +241,14 @@ class ConfigEntityListTest extends BrowserTestBase {
     $this->assertSession()->elementTextEquals('xpath', '//div[@class="layout-content"]//table/thead/tr/th[3]', 'Operations');
 
     // Check the number of table row cells.
-    $this->assertSession()->elementsCount('xpath', '//div[@class="layout-content"]//table/tbody/tr[@class="odd"]/td', 3);
+    $this->assertSession()->elementsCount('xpath', '//div[@class="layout-content"]//table/tbody/tr[1]/td', 3);
 
     // Check the contents of each row cell. The first cell contains the label,
     // the second contains the machine name, and the third contains the
     // operations list.
-    $this->assertSession()->elementTextEquals('xpath', '//div[@class="layout-content"]//table/tbody/tr[@class="odd"]/td[1]', 'Default');
-    $this->assertSession()->elementTextEquals('xpath', '//div[@class="layout-content"]//table/tbody/tr[@class="odd"]/td[2]', 'dotted.default');
-    $this->assertSession()->elementExists('xpath', '//div[@class="layout-content"]//table/tbody/tr[@class="odd"]/td[3]//ul');
+    $this->assertSession()->elementTextEquals('xpath', '//div[@class="layout-content"]//table/tbody/tr[1]/td[1]', 'Default');
+    $this->assertSession()->elementTextEquals('xpath', '//div[@class="layout-content"]//table/tbody/tr[1]/td[2]', 'dotted.default');
+    $this->assertSession()->elementExists('xpath', '//div[@class="layout-content"]//table/tbody/tr[1]/td[3]//ul');
 
     // Add a new entity using the operations link.
     $this->assertSession()->linkExists('Add test configuration');
@@ -252,7 +314,7 @@ class ConfigEntityListTest extends BrowserTestBase {
   /**
    * Tests paging.
    */
-  public function testPager() {
+  public function testPager(): void {
     $this->drupalLogin($this->drupalCreateUser([
       'administer site configuration',
     ]));
@@ -262,7 +324,7 @@ class ConfigEntityListTest extends BrowserTestBase {
     // Create 51 test entities.
     for ($i = 1; $i < 52; $i++) {
       $storage->create([
-        'id' => str_pad($i, 2, '0', STR_PAD_LEFT),
+        'id' => str_pad((string) $i, 2, '0', STR_PAD_LEFT),
         'label' => 'Test config entity ' . $i,
         'weight' => $i,
         'protected_property' => $i,
@@ -273,14 +335,14 @@ class ConfigEntityListTest extends BrowserTestBase {
     $this->drupalGet('admin/structure/config_test');
 
     // Item 51 should not be present.
-    $this->assertRaw('Test config entity 50');
-    $this->assertNoRaw('Test config entity 51');
+    $this->assertSession()->pageTextContains('Test config entity 50');
+    $this->assertSession()->responseNotContains('Test config entity 51');
 
     // Browse to the next page, test config entity 51 is on page 2.
-    $this->clickLink(t('Page 2'));
-    $this->assertNoRaw('Test config entity 50');
-    $this->assertRaw('dotted.default');
-    $this->assertRaw('Test config entity 51');
+    $this->clickLink('Page 2');
+    $this->assertSession()->responseNotContains('Test config entity 50');
+    $this->assertSession()->responseContains('dotted.default');
+    $this->assertSession()->pageTextContains('Test config entity 51');
   }
 
 }

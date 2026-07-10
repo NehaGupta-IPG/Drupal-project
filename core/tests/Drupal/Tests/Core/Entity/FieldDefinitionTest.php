@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Entity;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -7,16 +9,19 @@ use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
+use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\TypedDataManager;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Unit test for the FieldDefinition class.
- *
- * @group Entity
- * @group field
- * @coversDefaultClass \Drupal\Core\Field\FieldDefinition
  */
+#[CoversClass(FieldDefinition::class)]
+#[Group('Entity')]
+#[Group('field')]
 class FieldDefinitionTest extends UnitTestCase {
 
   /**
@@ -51,6 +56,8 @@ class FieldDefinitionTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
+
     $this->fieldType = $this->randomMachineName();
     $this->fieldTypeDefinition = [
       'id' => $this->fieldType,
@@ -72,7 +79,7 @@ class FieldDefinitionTest extends UnitTestCase {
     $storage_definition->getType()->willReturn($this->fieldType);
     $storage_definition->getName()->willReturn('test_field_name');
     $storage_supports_translation = &$this->storageSupportsTranslation;
-    $storage_definition->isTranslatable()->will(function () use (&$storage_supports_translation) {
+    $storage_definition->isTranslatable()->will(function () use (&$storage_supports_translation): bool {
       return $storage_supports_translation;
     });
     $storage_definition->getSettings()->willReturn($this->fieldTypeDefinition['storage_settings']);
@@ -95,19 +102,23 @@ class FieldDefinitionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getName
-   * @dataProvider factoryTypeProvider
+   * Tests field name.
+   *
+   * @legacy-covers ::getName
    */
-  public function testFieldName($factory_name) {
+  #[DataProvider('factoryTypeProvider')]
+  public function testFieldName(string $factory_name): void {
     $definition = $this->initializeFieldUsingFactory($factory_name);
     $this->assertEquals($this->storageDefinition->getName(), $definition->getName());
   }
 
   /**
-   * @covers ::getLabel
-   * @dataProvider factoryTypeProvider
+   * Tests field label.
+   *
+   * @legacy-covers ::getLabel
    */
-  public function testFieldLabel($factory_name) {
+  #[DataProvider('factoryTypeProvider')]
+  public function testFieldLabel(string $factory_name): void {
     $definition = $this->initializeFieldUsingFactory($factory_name);
     $label = $this->randomMachineName();
     $definition->setLabel($label);
@@ -115,11 +126,13 @@ class FieldDefinitionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::setTargetBundle
-   * @covers ::getTargetBundle
-   * @dataProvider factoryTypeProvider
+   * Tests bundle.
+   *
+   * @legacy-covers ::setTargetBundle
+   * @legacy-covers ::getTargetBundle
    */
-  public function testBundle($factory_name) {
+  #[DataProvider('factoryTypeProvider')]
+  public function testBundle(string $factory_name): void {
     $definition = $this->initializeFieldUsingFactory($factory_name);
     $bundle = $this->randomMachineName();
     $definition->setTargetBundle($bundle);
@@ -127,10 +140,12 @@ class FieldDefinitionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getDescription
-   * @dataProvider factoryTypeProvider
+   * Tests field description.
+   *
+   * @legacy-covers ::getDescription
    */
-  public function testFieldDescription($factory_name) {
+  #[DataProvider('factoryTypeProvider')]
+  public function testFieldDescription(string $factory_name): void {
     $definition = $this->initializeFieldUsingFactory($factory_name);
     $description = $this->randomMachineName();
     $definition->setDescription($description);
@@ -138,21 +153,25 @@ class FieldDefinitionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getType
-   * @dataProvider factoryTypeProvider
+   * Tests field type.
+   *
+   * @legacy-covers ::getType
    */
-  public function testFieldType($factory_name) {
+  #[DataProvider('factoryTypeProvider')]
+  public function testFieldType(string $factory_name): void {
     $definition = $this->initializeFieldUsingFactory($factory_name);
     $this->assertEquals($this->fieldType, $definition->getType());
   }
 
   /**
-   * @covers ::getSetting
-   * @covers ::setSetting
-   * @covers ::getSettings
-   * @dataProvider factoryTypeProvider
+   * Tests field settings.
+   *
+   * @legacy-covers ::getSetting
+   * @legacy-covers ::setSetting
+   * @legacy-covers ::getSettings
    */
-  public function testFieldSettings($factory_name) {
+  #[DataProvider('factoryTypeProvider')]
+  public function testFieldSettings(string $factory_name): void {
     $definition = $this->initializeFieldUsingFactory($factory_name);
     $setting = $this->randomMachineName();
     $value = $this->randomMachineName();
@@ -163,12 +182,14 @@ class FieldDefinitionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getSetting
-   * @covers ::setSetting
-   * @covers ::getSettings
-   * @dataProvider factoryTypeProvider
+   * Tests default field settings.
+   *
+   * @legacy-covers ::getSetting
+   * @legacy-covers ::setSetting
+   * @legacy-covers ::getSettings
    */
-  public function testDefaultFieldSettings($factory_name) {
+  #[DataProvider('factoryTypeProvider')]
+  public function testDefaultFieldSettings(string $factory_name): void {
     $definition = $this->initializeFieldUsingFactory($factory_name);
     $expected_settings = $this->fieldTypeDefinition['field_settings'] + $this->fieldTypeDefinition['storage_settings'];
     $this->assertEquals($expected_settings, $definition->getSettings());
@@ -178,11 +199,13 @@ class FieldDefinitionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getDefaultValue
-   * @covers ::setDefaultValue
-   * @dataProvider factoryTypeProvider
+   * Tests field default value.
+   *
+   * @legacy-covers ::getDefaultValue
+   * @legacy-covers ::setDefaultValue
    */
-  public function testFieldDefaultValue($factory_name) {
+  #[DataProvider('factoryTypeProvider')]
+  public function testFieldDefaultValue(string $factory_name): void {
     $definition = $this->initializeFieldUsingFactory($factory_name);
 
     $this->assertEquals([], $definition->getDefaultValueLiteral());
@@ -192,20 +215,16 @@ class FieldDefinitionTest extends UnitTestCase {
     ];
     $expected_default_value = [$default_value];
     $definition->setDefaultValue($default_value);
-    $entity = $this->getMockBuilder('Drupal\Core\Entity\ContentEntityBase')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $entity = $this->createStub(ContentEntityBaseMockableClass::class);
     // Set the field item list class to be used to avoid requiring the typed
     // data manager to retrieve it.
     $definition->setClass('Drupal\Core\Field\FieldItemList');
     $this->assertEquals($expected_default_value, $definition->getDefaultValue($entity));
 
-    $data_definition = $this->getMockBuilder('Drupal\Core\TypedData\DataDefinition')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $data_definition->expects($this->any())
+    $data_definition = $this->createStub(DataDefinition::class);
+    $data_definition
       ->method('getClass')
-      ->will($this->returnValue('Drupal\Core\Field\FieldItemBase'));
+      ->willReturn('Drupal\Core\Field\FieldItemBase');
     $definition->setItemDefinition($data_definition);
 
     // Set default value only with a literal.
@@ -228,11 +247,11 @@ class FieldDefinitionTest extends UnitTestCase {
   /**
    * Tests field translatable methods.
    *
-   * @covers ::isTranslatable
-   * @covers ::setTranslatable
-   * @dataProvider factoryTypeProvider
+   * @legacy-covers ::isTranslatable
+   * @legacy-covers ::setTranslatable
    */
-  public function testFieldTranslatable($factory_name) {
+  #[DataProvider('factoryTypeProvider')]
+  public function testFieldTranslatable(string $factory_name): void {
     $definition = $this->initializeFieldUsingFactory($factory_name);
     $this->assertFalse($definition->isTranslatable());
     $definition->setTranslatable(TRUE);
@@ -249,11 +268,11 @@ class FieldDefinitionTest extends UnitTestCase {
   /**
    * Tests required.
    *
-   * @covers ::isRequired
-   * @covers ::setRequired
-   * @dataProvider factoryTypeProvider
+   * @legacy-covers ::isRequired
+   * @legacy-covers ::setRequired
    */
-  public function testFieldRequired($factory_name) {
+  #[DataProvider('factoryTypeProvider')]
+  public function testFieldRequired(string $factory_name): void {
     $definition = $this->initializeFieldUsingFactory($factory_name);
     $this->assertFalse($definition->isRequired());
     $definition->setRequired(TRUE);
@@ -265,10 +284,10 @@ class FieldDefinitionTest extends UnitTestCase {
   /**
    * Tests default value callbacks.
    *
-   * @covers ::setDefaultValueCallback
-   * @dataProvider factoryTypeProvider
+   * @legacy-covers ::setDefaultValueCallback
    */
-  public function testDefaultValueCallback($factory_name) {
+  #[DataProvider('factoryTypeProvider')]
+  public function testDefaultValueCallback(string $factory_name): void {
     $definition = $this->initializeFieldUsingFactory($factory_name);
     $callback = static::class . '::mockDefaultValueCallback';
     // setDefaultValueCallback returns $this.
@@ -279,10 +298,10 @@ class FieldDefinitionTest extends UnitTestCase {
   /**
    * Tests invalid default value callbacks.
    *
-   * @covers ::setDefaultValueCallback
-   * @dataProvider factoryTypeProvider
+   * @legacy-covers ::setDefaultValueCallback
    */
-  public function testInvalidDefaultValueCallback($factory_name) {
+  #[DataProvider('factoryTypeProvider')]
+  public function testInvalidDefaultValueCallback(string $factory_name): void {
     $definition = $this->initializeFieldUsingFactory($factory_name);
     // setDefaultValueCallback returns $this.
     $this->expectException(\InvalidArgumentException::class);
@@ -292,24 +311,24 @@ class FieldDefinitionTest extends UnitTestCase {
   /**
    * Tests NULL default value callbacks.
    *
-   * @covers ::setDefaultValueCallback
-   * @dataProvider factoryTypeProvider
+   * @legacy-covers ::setDefaultValueCallback
    */
-  public function testNullDefaultValueCallback($factory_name) {
+  #[DataProvider('factoryTypeProvider')]
+  public function testNullDefaultValueCallback(string $factory_name): void {
     $definition = $this->initializeFieldUsingFactory($factory_name);
     // setDefaultValueCallback returns $this.
     $this->assertSame($definition, $definition->setDefaultValueCallback(NULL));
-    $this->assertSame(NULL, $definition->getDefaultValueCallback());
+    $this->assertNull($definition->getDefaultValueCallback());
   }
 
   /**
    * Tests the display configuration settings.
    *
-   * @covers ::isDisplayConfigurable
-   * @covers ::getDisplayOptions
-   * @dataProvider factoryTypeProvider
+   * @legacy-covers ::isDisplayConfigurable
+   * @legacy-covers ::getDisplayOptions
    */
-  public function testDisplayConfigurationSettings($factory_name) {
+  #[DataProvider('factoryTypeProvider')]
+  public function testDisplayConfigurationSettings(string $factory_name): void {
     $definition = $this->initializeFieldUsingFactory($factory_name);
     $this->assertEquals(FALSE, $definition->isDisplayConfigurable('foo'));
     $this->assertEquals(NULL, $definition->getDisplayOptions('foo'));
@@ -333,14 +352,14 @@ class FieldDefinitionTest extends UnitTestCase {
    * @return string
    *   Default value.
    */
-  public static function mockDefaultValueCallback($entity, $definition) {
+  public static function mockDefaultValueCallback($entity, $definition): string {
     return 'a default value';
   }
 
   /**
    * A data provider for all the types of factories that can create definitions.
    */
-  public function factoryTypeProvider() {
+  public static function factoryTypeProvider(): array {
     return [
       '::createFromFieldStorageDefinition factory' => [
         'createFromFieldStorageDefinition',
@@ -364,6 +383,7 @@ class FieldDefinitionTest extends UnitTestCase {
    *   The factory name to use.
    *
    * @return \Drupal\Core\Field\FieldDefinition
+   *   A field definition instance created using the specified factory.
    */
   protected function initializeFieldUsingFactory($factory_name) {
     switch ($factory_name) {
@@ -385,6 +405,7 @@ class FieldDefinitionTest extends UnitTestCase {
         $definition->setFieldStorageDefinition($this->storageDefinition);
         return $definition;
     }
+    throw new \InvalidArgumentException("Invalid factory name '$factory_name' passed to " . __METHOD__);
   }
 
 }

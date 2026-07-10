@@ -2,23 +2,30 @@
 
 namespace Drupal\Core\Field\Plugin\Field\FieldType;
 
+use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
 
 /**
  * Defines the 'float' field type.
- *
- * @FieldType(
- *   id = "float",
- *   label = @Translation("Number (float)"),
- *   description = @Translation("This field stores a number in the database in a floating point format."),
- *   category = @Translation("Number"),
- *   default_widget = "number",
- *   default_formatter = "number_decimal"
- * )
  */
+#[FieldType(
+  id: "float",
+  label: new TranslatableMarkup("Float"),
+  description: [
+    new TranslatableMarkup("Numbers with decimal parts and exponents"),
+    new TranslatableMarkup("Accuracy depends on limits from database and/or PHP"),
+    new TranslatableMarkup("Examples: 1.23, -1.23, 0.00e1, 1e100, 6.02214076e23"),
+  ],
+  category: "number",
+  weight: -10,
+  no_ui: TRUE,
+  default_widget: "number",
+  default_formatter: "number_decimal"
+)]
 class FloatItem extends NumericItemBase {
 
   /**
@@ -64,8 +71,8 @@ class FloatItem extends NumericItemBase {
     $settings = $field_definition->getSettings();
     $precision = rand(10, 32);
     $scale = rand(0, 2);
-    $max = is_numeric($settings['max']) ?: pow(10, ($precision - $scale)) - 1;
-    $min = is_numeric($settings['min']) ?: -pow(10, ($precision - $scale)) + 1;
+    $max = is_numeric($settings['max']) ? $settings['max'] : pow(10, ($precision - $scale)) - 1;
+    $min = is_numeric($settings['min']) ? $settings['min'] : -pow(10, ($precision - $scale)) + 1;
     // @see "Example #1 Calculate a random floating-point number" in
     // http://php.net/manual/function.mt-getrandmax.php
     $random_decimal = $min + mt_rand() / mt_getrandmax() * ($max - $min);

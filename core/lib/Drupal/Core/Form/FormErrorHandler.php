@@ -18,7 +18,7 @@ class FormErrorHandler implements FormErrorHandlerInterface {
    */
   public function handleFormErrors(array &$form, FormStateInterface $form_state) {
     // After validation check if there are errors.
-    if ($errors = $form_state->getErrors()) {
+    if ($form_state->getErrors()) {
       // Display error messages for each element.
       $this->displayErrorMessages($form, $form_state);
 
@@ -49,7 +49,7 @@ class FormErrorHandler implements FormErrorHandlerInterface {
   /**
    * Stores errors and a list of child element errors directly on each element.
    *
-   * Grouping elements like containers, details, fieldgroups and fieldsets may
+   * Grouping elements like containers, details and fieldsets may
    * need error info from their child elements to be able to accessibly show
    * form error messages to a user. For example, a details element should be
    * opened when child elements have errors.
@@ -110,6 +110,8 @@ class FormErrorHandler implements FormErrorHandlerInterface {
     // modify the original form. When processing grouped elements a reference to
     // the complete form is needed.
     if (empty($elements)) {
+      // cspell:disable-next-line
+      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.VariableRedeclaration
       $elements = &$form;
     }
 

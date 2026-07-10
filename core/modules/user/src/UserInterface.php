@@ -51,21 +51,12 @@ interface UserInterface extends ContentEntityInterface, EntityChangedInterface, 
   const TIMEZONE_SELECT = 2;
 
   /**
-   * Whether a user has a certain role.
-   *
-   * @param string $rid
-   *   The role ID to check.
-   *
-   * @return bool
-   *   Returns TRUE if the user has the role, otherwise FALSE.
-   */
-  public function hasRole($rid);
-
-  /**
    * Add a role to a user.
    *
    * @param string $rid
    *   The role ID to add.
+   *
+   * @return $this
    */
   public function addRole($rid);
 
@@ -74,6 +65,8 @@ interface UserInterface extends ContentEntityInterface, EntityChangedInterface, 
    *
    * @param string $rid
    *   The role ID to remove.
+   *
+   * @return $this
    */
   public function removeRole($rid);
 
@@ -91,8 +84,8 @@ interface UserInterface extends ContentEntityInterface, EntityChangedInterface, 
   /**
    * Returns the hashed password.
    *
-   * @return string
-   *   The hashed password.
+   * @return string|null
+   *   The hashed password, or NULL if a password is not set.
    */
   public function getPassword();
 
@@ -100,12 +93,12 @@ interface UserInterface extends ContentEntityInterface, EntityChangedInterface, 
    * Sets the user password.
    *
    * @param string $password
-   *   The new unhashed password.
+   *   The new un-hashed password.
    *
    * @return $this
    *   The called user entity.
    */
-  public function setPassword($password);
+  public function setPassword(#[\SensitiveParameter] $password);
 
   /**
    * Sets the email address of the user.
@@ -127,7 +120,7 @@ interface UserInterface extends ContentEntityInterface, EntityChangedInterface, 
   public function getCreatedTime();
 
   /**
-   * Sets the UNIX timestamp when the user last accessed the site..
+   * Sets the UNIX timestamp when the user last accessed the site.
    *
    * @param int $timestamp
    *   Timestamp of the last access.
@@ -206,7 +199,7 @@ interface UserInterface extends ContentEntityInterface, EntityChangedInterface, 
    *
    * @return $this
    */
-  public function setExistingPassword($password);
+  public function setExistingPassword(#[\SensitiveParameter] $password);
 
   /**
    * Checks the existing password if set.

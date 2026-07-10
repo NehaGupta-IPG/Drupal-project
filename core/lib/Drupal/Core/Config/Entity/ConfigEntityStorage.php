@@ -119,20 +119,6 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public function loadRevision($revision_id) {
-    return NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function deleteRevision($revision_id) {
-    return NULL;
-  }
-
-  /**
    * Returns the prefix used to create the configuration name.
    *
    * The prefix consists of the config prefix from the entity type plus a dot
@@ -155,7 +141,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
   /**
    * {@inheritdoc}
    */
-  protected function doLoadMultiple(array $ids = NULL) {
+  protected function doLoadMultiple(?array $ids = NULL) {
     $prefix = $this->getPrefix();
 
     // Get the names of the configuration entities we are going to load.
@@ -214,7 +200,8 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
   protected function doCreate(array $values) {
     // Set default language to current language if not provided.
     $values += [$this->langcodeKey => $this->languageManager->getCurrentLanguage()->getId()];
-    $entity = new $this->entityClass($values, $this->entityTypeId);
+    $entity_class = $this->getEntityClass();
+    $entity = new $entity_class($values, $this->entityTypeId);
 
     return $entity;
   }
@@ -245,8 +232,8 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
     // @see \Drupal\Core\Config\Entity\ConfigEntityStorage::MAX_ID_LENGTH
     // @todo Consider moving this to a protected method on the parent class, and
     //   abstracting it for all entity types.
-    if (strlen($entity->get($this->idKey)) > static::MAX_ID_LENGTH) {
-      throw new ConfigEntityIdLengthException("Configuration entity ID {$entity->get($this->idKey)} exceeds maximum allowed length of " . static::MAX_ID_LENGTH . " characters.");
+    if (strlen($id) > static::MAX_ID_LENGTH) {
+      throw new ConfigEntityIdLengthException("Configuration entity ID {$id} exceeds maximum allowed length of " . static::MAX_ID_LENGTH . " characters.");
     }
 
     return parent::save($entity);
@@ -270,18 +257,26 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
 
     // Retrieve the desired properties and set them in config.
     $config->setData($this->mapToStorageRecord($entity));
-    $config->save($entity->hasTrustedData());
+
+    // Trusted data is deprecated in Drupal 11.4.0 and removed in Drupal 13.0.
+    // This code preserves the existing behavior and will be removed when the
+    // \Drupal\Core\Config\Entity\ConfigEntityInterface::hasTrustedData() is
+    // removed.
+    if ($entity->hasTrustedData()) {
+      $config->save(TRUE);
+    }
+    else {
+      $config->save();
+    }
 
     // Update the entity with the values stored in configuration. It is possible
     // that configuration schema has casted some of the values.
-    if (!$entity->hasTrustedData()) {
-      $data = $this->mapFromStorageRecords([$config->get()]);
-      $updated_entity = current($data);
+    $data = $this->mapFromStorageRecords([$config->get()]);
+    $updated_entity = current($data);
 
-      foreach (array_keys($config->get()) as $property) {
-        $value = $updated_entity->get($property);
-        $entity->set($property, $value);
-      }
+    foreach (array_keys($config->get()) as $property) {
+      $value = $updated_entity->get($property);
+      $entity->set($property, $value);
     }
 
     return $is_new ? SAVED_NEW : SAVED_UPDATED;
@@ -324,11 +319,22 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function resetCache(?array $ids = NULL) {
+    if ($this->entityType->isStaticallyCacheable()) {
+      // Always invalidate through the cache tag, since config entities may
+      // be cached under different cache keys depending on the override flag.
+      $this->memoryCache->invalidateTags([$this->memoryCacheTag]);
+    }
+  }
+
+  /**
    * Invokes a hook on behalf of the entity.
    *
-   * @param $hook
+   * @param string $hook
    *   One of 'presave', 'insert', 'update', 'predelete', or 'delete'.
-   * @param $entity
+   * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity object.
    */
   protected function invokeHook($hook, EntityInterface $entity) {
@@ -405,7 +411,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
    * @param bool $is_syncing
    *   Is the configuration entity being created as part of a config sync.
    *
-   * @return \Drupal\Core\Config\ConfigEntityInterface
+   * @return \Drupal\Core\Config\Entity\ConfigEntityInterface
    *   The configuration entity.
    *
    * @see \Drupal\Core\Config\Entity\ConfigEntityStorageInterface::createFromStorageRecord()
@@ -417,8 +423,9 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
       $values[$this->uuidKey] = $this->uuidService->generate();
     }
     $data = $this->mapFromStorageRecords([$values]);
+    /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
     $entity = current($data);
-    $entity->original = clone $entity;
+    $entity->setOriginal(clone $entity);
     $entity->setSyncing($is_syncing);
     $entity->enforceIsNew();
     $entity->postCreate($this);
@@ -434,7 +441,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
    * {@inheritdoc}
    */
   public function updateFromStorageRecord(ConfigEntityInterface $entity, array $values) {
-    $entity->original = clone $entity;
+    $entity->setOriginal(clone $entity);
 
     $data = $this->mapFromStorageRecords([$values]);
     $updated_entity = current($data);
@@ -470,13 +477,13 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
    */
   public function loadOverrideFree($id) {
     $entities = $this->loadMultipleOverrideFree([$id]);
-    return isset($entities[$id]) ? $entities[$id] : NULL;
+    return $entities[$id] ?? NULL;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function loadMultipleOverrideFree(array $ids = NULL) {
+  public function loadMultipleOverrideFree(?array $ids = NULL) {
     $this->overrideFree = TRUE;
     $entities = $this->loadMultiple($ids);
     $this->overrideFree = FALSE;

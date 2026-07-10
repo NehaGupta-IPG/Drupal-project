@@ -1,23 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\serialization\Unit\CompilerPass;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\serialization\RegisterSerializationClassesCompilerPass;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Serializer\Serializer;
 
 /**
- * @coversDefaultClass \Drupal\serialization\RegisterSerializationClassesCompilerPass
- * @group serialization
+ * Tests Drupal\serialization\RegisterSerializationClassesCompilerPass.
  */
+#[CoversClass(RegisterSerializationClassesCompilerPass::class)]
+#[Group('serialization')]
 class RegisterSerializationClassesCompilerPassTest extends UnitTestCase {
 
   /**
-   * @covers ::process
+   * Tests encoders.
+   *
+   * @legacy-covers ::process
    */
-  public function testEncoders() {
+  public function testEncoders(): void {
     $container = new ContainerBuilder();
 
     $serializer_definition = new Definition(Serializer::class, [[], []]);
@@ -36,12 +43,6 @@ class RegisterSerializationClassesCompilerPassTest extends UnitTestCase {
     $encoder_2_definition->setPublic(TRUE);
     $container->setDefinition('encoder_2', $encoder_2_definition);
 
-    $encoder_3_definition = new Definition('TestClass');
-    $encoder_3_definition->addTag('encoder', ['format' => 'hal_json']);
-    $encoder_3_definition->addTag('_provider', ['provider' => 'test_provider_b']);
-    $encoder_3_definition->setPublic(TRUE);
-    $container->setDefinition('encoder_3', $encoder_3_definition);
-
     $normalizer_1_definition = new Definition('TestClass');
     $normalizer_1_definition->addTag('normalizer');
     $normalizer_1_definition->setPublic(TRUE);
@@ -51,13 +52,12 @@ class RegisterSerializationClassesCompilerPassTest extends UnitTestCase {
     $compiler_pass->process($container);
 
     // Check registration of formats and providers.
-    $this->assertEquals(['xml', 'json', 'hal_json'], $container->getParameter('serializer.formats'));
-    $this->assertEquals(['xml' => 'test_provider_a', 'json' => 'test_provider_a', 'hal_json' => 'test_provider_b'], $container->getParameter('serializer.format_providers'));
+    $this->assertEquals(['xml', 'json'], $container->getParameter('serializer.formats'));
+    $this->assertEquals(['xml' => 'test_provider_a', 'json' => 'test_provider_a'], $container->getParameter('serializer.format_providers'));
 
     // Check all encoder and normalizer service definitions are marked private.
     $this->assertFalse($encoder_1_definition->isPublic());
     $this->assertFalse($encoder_2_definition->isPublic());
-    $this->assertFalse($encoder_3_definition->isPublic());
 
     $this->assertFalse($normalizer_1_definition->isPublic());
   }

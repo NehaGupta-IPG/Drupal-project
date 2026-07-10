@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\comment\Tests\CommentTestTrait;
@@ -9,20 +11,23 @@ use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\NodeType;
+use Drupal\node\NodePreviewMode;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
-use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
+use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the node entity preview functionality.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class PagePreviewTest extends NodeTestBase {
 
-  use EntityReferenceTestTrait;
+  use EntityReferenceFieldCreationTrait;
   use CommentTestTrait;
   use TestFileCreationTrait {
     getTestFiles as drupalGetTestFiles;
@@ -45,9 +50,11 @@ class PagePreviewTest extends NodeTestBase {
   ];
 
   /**
-   * {@inheritdoc}
+   * The theme to install as the default for testing.
+   *
+   * @var string
    */
-  protected $defaultTheme = 'classy';
+  protected $defaultTheme = 'starterkit_theme';
 
   /**
    * The name of the created field.
@@ -56,6 +63,16 @@ class PagePreviewTest extends NodeTestBase {
    */
   protected $fieldName;
 
+  /**
+   * A term.
+   *
+   * @var \Drupal\taxonomy\Entity\Term
+   */
+  protected Term $term;
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
     $this->addDefaultCommentField('node', 'page');
@@ -77,13 +94,11 @@ class PagePreviewTest extends NodeTestBase {
     ]);
     $vocabulary->save();
 
-    $this->vocabulary = $vocabulary;
-
     // Add a term to the vocabulary.
     $term = Term::create([
       'name' => $this->randomMachineName(),
       'description' => $this->randomMachineName(),
-      'vid' => $this->vocabulary->id(),
+      'vid' => $vocabulary->id(),
       'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
     ]);
     $term->save();
@@ -110,10 +125,10 @@ class PagePreviewTest extends NodeTestBase {
     $field_config->save();
 
     // Create a field.
-    $this->fieldName = mb_strtolower($this->randomMachineName());
+    $this->fieldName = $this->randomMachineName();
     $handler_settings = [
       'target_bundles' => [
-        $this->vocabulary->id() => $this->vocabulary->id(),
+        $vocabulary->id() => $vocabulary->id(),
       ],
       'auto_create' => TRUE,
     ];
@@ -183,7 +198,7 @@ class PagePreviewTest extends NodeTestBase {
   /**
    * Checks the node preview functionality.
    */
-  public function testPagePreview() {
+  public function testPagePreview(): void {
     $title_key = 'title[0][value]';
     $body_key = 'body[0][value]';
     $term_key = $this->fieldName . '[target_id]';
@@ -212,13 +227,12 @@ class PagePreviewTest extends NodeTestBase {
     $this->assertSession()->linkExists('Back to content editing');
 
     // Check that we see the class of the node type on the body element.
-    $body_class_element = $this->xpath("//body[contains(@class, 'page-node-type-page')]");
-    $this->assertTrue(!empty($body_class_element), 'Node type body class found.');
+    $this->assertSession()->elementExists('xpath', "//body[contains(@class, 'page-node-type-page')]");
 
     // Get the UUID.
     $url = parse_url($this->getUrl());
     $paths = explode('/', $url['path']);
-    $view_mode = array_pop($paths);
+    array_pop($paths);
     $uuid = array_pop($paths);
 
     // Switch view mode. We'll remove the body from the teaser view mode.
@@ -230,12 +244,12 @@ class PagePreviewTest extends NodeTestBase {
     $view_mode_edit = ['view_mode' => 'teaser'];
     $this->drupalGet('node/preview/' . $uuid . '/full');
     $this->submitForm($view_mode_edit, 'Switch');
-    $this->assertRaw('view-mode-teaser');
-    $this->assertNoText($edit[$body_key]);
+    $this->assertSession()->responseContains('view-mode-teaser');
+    $this->assertSession()->pageTextNotContains($edit[$body_key]);
 
     // Check that the title, body and term fields are displayed with the
     // values after going back to the content edit page.
-    $this->clickLink(t('Back to content editing'));
+    $this->clickLink('Back to content editing');
     $this->assertSession()->fieldValueEquals($title_key, $edit[$title_key]);
     $this->assertSession()->fieldValueEquals($body_key, $edit[$body_key]);
     $this->assertSession()->fieldValueEquals($term_key, $edit[$term_key]);
@@ -275,17 +289,17 @@ class PagePreviewTest extends NodeTestBase {
     // Check with two new terms on the edit form, additionally to the existing
     // one.
     $edit = [];
-    $newterm1 = $this->randomMachineName(8);
-    $newterm2 = $this->randomMachineName(8);
-    $edit[$term_key] = $this->term->getName() . ', ' . $newterm1 . ', ' . $newterm2;
+    $new_term1 = $this->randomMachineName(8);
+    $new_term2 = $this->randomMachineName(8);
+    $edit[$term_key] = $this->term->getName() . ', ' . $new_term1 . ', ' . $new_term2;
     $this->drupalGet('node/' . $node->id() . '/edit');
     $this->submitForm($edit, 'Preview');
-    $this->assertRaw('>' . $newterm1 . '<');
-    $this->assertRaw('>' . $newterm2 . '<');
+    $this->assertSession()->responseContains('>' . $new_term1 . '<');
+    $this->assertSession()->responseContains('>' . $new_term2 . '<');
     // The first term should be displayed as link, the others not.
     $this->assertSession()->linkExists($this->term->getName());
-    $this->assertSession()->linkNotExists($newterm1);
-    $this->assertSession()->linkNotExists($newterm2);
+    $this->assertSession()->linkNotExists($new_term1);
+    $this->assertSession()->linkNotExists($new_term2);
 
     $this->drupalGet('node/' . $node->id() . '/edit');
     $this->submitForm($edit, 'Save');
@@ -293,17 +307,17 @@ class PagePreviewTest extends NodeTestBase {
     // Check with one more new term, keeping old terms, removing the existing
     // one.
     $edit = [];
-    $newterm3 = $this->randomMachineName(8);
-    $edit[$term_key] = $newterm1 . ', ' . $newterm3 . ', ' . $newterm2;
+    $new_term3 = $this->randomMachineName(8);
+    $edit[$term_key] = $new_term1 . ', ' . $new_term3 . ', ' . $new_term2;
     $this->drupalGet('node/' . $node->id() . '/edit');
     $this->submitForm($edit, 'Preview');
-    $this->assertRaw('>' . $newterm1 . '<');
-    $this->assertRaw('>' . $newterm2 . '<');
-    $this->assertRaw('>' . $newterm3 . '<');
-    $this->assertNoText($this->term->getName());
-    $this->assertSession()->linkExists($newterm1);
-    $this->assertSession()->linkExists($newterm2);
-    $this->assertSession()->linkNotExists($newterm3);
+    $this->assertSession()->responseContains('>' . $new_term1 . '<');
+    $this->assertSession()->responseContains('>' . $new_term2 . '<');
+    $this->assertSession()->responseContains('>' . $new_term3 . '<');
+    $this->assertSession()->pageTextNotContains($this->term->getName());
+    $this->assertSession()->linkExists($new_term1);
+    $this->assertSession()->linkExists($new_term2);
+    $this->assertSession()->linkNotExists($new_term3);
 
     // Check that editing an existing node after it has been previewed and not
     // saved doesn't remember the previous changes.
@@ -313,7 +327,7 @@ class PagePreviewTest extends NodeTestBase {
     $this->drupalGet('node/' . $node->id() . '/edit');
     $this->submitForm($edit, 'Preview');
     $this->assertSession()->pageTextContains($edit[$title_key]);
-    $this->clickLink(t('Back to content editing'));
+    $this->clickLink('Back to content editing');
     $this->assertSession()->fieldValueEquals($title_key, $edit[$title_key]);
     // Navigate away from the node without saving.
     $this->drupalGet('<front>');
@@ -323,14 +337,14 @@ class PagePreviewTest extends NodeTestBase {
 
     // Check with required preview.
     $node_type = NodeType::load('page');
-    $node_type->setPreviewMode(DRUPAL_REQUIRED);
+    $node_type->setPreviewMode(NodePreviewMode::Required);
     $node_type->save();
     $this->drupalGet('node/add/page');
-    $this->assertNoRaw('edit-submit');
+    $this->assertSession()->responseNotContains('edit-submit');
     $this->drupalGet('node/add/page');
     $this->submitForm([$title_key => 'Preview'], 'Preview');
-    $this->clickLink(t('Back to content editing'));
-    $this->assertRaw('edit-submit');
+    $this->clickLink('Back to content editing');
+    $this->assertSession()->responseContains('edit-submit');
 
     // Check that destination is remembered when clicking on preview. When going
     // back to the edit form and clicking save, we should go back to the
@@ -342,7 +356,7 @@ class PagePreviewTest extends NodeTestBase {
     $options = ['absolute' => TRUE, 'query' => ['destination' => $destination]];
     $this->assertSession()->addressEquals(Url::fromRoute('entity.node.preview', $parameters, $options));
     $this->submitForm(['view_mode' => 'teaser'], 'Switch');
-    $this->clickLink(t('Back to content editing'));
+    $this->clickLink('Back to content editing');
     $this->submitForm([], 'Save');
     $this->assertSession()->addressEquals($destination);
 
@@ -352,7 +366,7 @@ class PagePreviewTest extends NodeTestBase {
     $parameters = ['node_preview' => $node->uuid(), 'view_mode_id' => 'full'];
     $this->assertSession()->addressEquals(Url::fromRoute('entity.node.preview', $parameters));
     $this->submitForm(['view_mode' => 'teaser'], 'Switch');
-    $this->clickLink(t('Back to content editing'));
+    $this->clickLink('Back to content editing');
     $this->submitForm([], 'Save');
     $this->assertSession()->addressEquals($node->toUrl());
     $this->assertSession()->statusCodeEquals(200);
@@ -369,7 +383,7 @@ class PagePreviewTest extends NodeTestBase {
     $this->drupalGet('node/add/page');
     $this->submitForm($edit_image_1, 'Upload');
     $this->submitForm($edit, 'Preview');
-    $this->clickLink(t('Back to content editing'));
+    $this->clickLink('Back to content editing');
     $this->assertSession()->fieldExists('files[field_image_1][]');
     $this->submitForm($edit_image_2, 'Upload');
     $this->assertSession()->fieldNotExists('files[field_image_1][]');
@@ -383,10 +397,10 @@ class PagePreviewTest extends NodeTestBase {
       'title[0][value]' => $title,
       'field_test_multi[0][value]' => $example_text_1,
     ];
-    $this->assertRaw('Storage is not set');
+    $this->assertSession()->pageTextContains('Storage is not set');
     $this->submitForm($edit, 'Preview');
-    $this->clickLink(t('Back to content editing'));
-    $this->assertRaw('Storage is set');
+    $this->clickLink('Back to content editing');
+    $this->assertSession()->pageTextContains('Storage is set');
     $this->assertSession()->fieldExists('field_test_multi[0][value]');
     $this->submitForm([], 'Save');
     $this->assertSession()->pageTextContains('Basic page ' . $title . ' has been created.');
@@ -399,9 +413,9 @@ class PagePreviewTest extends NodeTestBase {
       'field_test_multi[2][value]' => $example_text_3,
     ];
     $this->submitForm($edit, 'Preview');
-    $this->clickLink(t('Back to content editing'));
+    $this->clickLink('Back to content editing');
     $this->submitForm($edit, 'Preview');
-    $this->clickLink(t('Back to content editing'));
+    $this->clickLink('Back to content editing');
     $this->assertSession()->fieldValueEquals('field_test_multi[0][value]', $example_text_1);
     $this->assertSession()->fieldValueEquals('field_test_multi[1][value]', $example_text_2);
     $this->assertSession()->fieldValueEquals('field_test_multi[2][value]', $example_text_3);
@@ -419,7 +433,7 @@ class PagePreviewTest extends NodeTestBase {
       'menu[title]' => 'Changed title',
     ];
     $this->submitForm($edit, 'Preview');
-    $this->clickLink(t('Back to content editing'));
+    $this->clickLink('Back to content editing');
     $this->assertSession()->checkboxChecked('edit-menu-enabled');
     $this->assertSession()->fieldValueEquals('menu[title]', 'Changed title');
 
@@ -438,7 +452,7 @@ class PagePreviewTest extends NodeTestBase {
   /**
    * Checks the node preview functionality, when using revisions.
    */
-  public function testPagePreviewWithRevisions() {
+  public function testPagePreviewWithRevisions(): void {
     $title_key = 'title[0][value]';
     $body_key = 'body[0][value]';
     $term_key = $this->fieldName . '[target_id]';
@@ -464,7 +478,7 @@ class PagePreviewTest extends NodeTestBase {
 
     // Check that the title and body fields are displayed with the correct
     // values after going back to the content edit page.
-    $this->clickLink(t('Back to content editing'));
+    $this->clickLink('Back to content editing');
     $this->assertSession()->fieldValueEquals($title_key, $edit[$title_key]);
     $this->assertSession()->fieldValueEquals($body_key, $edit[$body_key]);
     $this->assertSession()->fieldValueEquals($term_key, $edit[$term_key]);
@@ -494,7 +508,7 @@ class PagePreviewTest extends NodeTestBase {
   /**
    * Checks the node preview accessible for simultaneous node editing.
    */
-  public function testSimultaneousPreview() {
+  public function testSimultaneousPreview(): void {
     $title_key = 'title[0][value]';
     $node = $this->drupalCreateNode([]);
 
@@ -511,14 +525,17 @@ class PagePreviewTest extends NodeTestBase {
     $edit2 = [$title_key => 'Another page title'];
     $this->drupalGet('node/' . $node->id() . '/edit');
     $this->submitForm($edit2, 'Preview');
-    $this->assertSession()->addressEquals(Url::fromRoute('entity.node.preview', ['node_preview' => $node->uuid(), 'view_mode_id' => 'full']));
+    $this->assertSession()->addressEquals(Url::fromRoute('entity.node.preview', [
+      'node_preview' => $node->uuid(),
+      'view_mode_id' => 'full',
+    ]));
     $this->assertSession()->pageTextContains($edit2[$title_key]);
   }
 
   /**
    * Tests node preview with dynamic_page_cache and anonymous users.
    */
-  public function testPagePreviewCache() {
+  public function testPagePreviewCache(): void {
     \Drupal::service('module_installer')->uninstall(['node_test']);
     $this->drupalLogout();
     $title_key = 'title[0][value]';
@@ -529,7 +546,7 @@ class PagePreviewTest extends NodeTestBase {
     $this->drupalGet('/node/add/page');
     $this->submitForm($edit, 'Preview');
     $this->assertSession()->pageTextContains($edit[$title_key]);
-    $this->clickLink(t('Back to content editing'));
+    $this->clickLink('Back to content editing');
 
     $edit = [
       $title_key => $this->randomMachineName(8),

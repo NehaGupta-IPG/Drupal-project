@@ -1,21 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_moderation\Functional;
 
-use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Url;
+use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the moderation form, specifically on nodes.
- *
- * @group content_moderation
  */
+#[Group('content_moderation')]
+#[RunTestsInSeparateProcesses]
 class ModerationFormTest extends ModerationStateTestBase {
 
+  use ContentTranslationTestTrait;
+
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'node',
@@ -28,6 +32,18 @@ class ModerationFormTest extends ModerationStateTestBase {
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getAdministratorPermissions(): array {
+    return array_merge($this->permissions, [
+      'administer entity_test content',
+      'view test entity',
+      'translate any entity',
+      'bypass node access',
+    ]);
+  }
 
   /**
    * {@inheritdoc}
@@ -47,7 +63,7 @@ class ModerationFormTest extends ModerationStateTestBase {
    * @see \Drupal\content_moderation\EntityOperations
    * @see \Drupal\Tests\content_moderation\Functional\ModerationStateBlockTest::testCustomBlockModeration
    */
-  public function testModerationForm() {
+  public function testModerationForm(): void {
     // Test the states that appear by default when creating a new item of
     // content.
     $this->drupalGet('node/add/moderated_content');
@@ -58,7 +74,6 @@ class ModerationFormTest extends ModerationStateTestBase {
     $this->submitForm([
       'moderation_state[0][state]' => 'published',
       'title[0][value]' => 'Some moderated content',
-      'body[0][value]' => 'First version of the content.',
     ], 'Preview');
     $this->clickLink('Back to content editing');
     $this->assertSession()->optionExists('moderation_state[0][state]', 'draft');
@@ -89,7 +104,6 @@ class ModerationFormTest extends ModerationStateTestBase {
     // Update the draft.
     $this->drupalGet($edit_path);
     $this->submitForm([
-      'body[0][value]' => 'Second version of the content.',
       'moderation_state[0][state]' => 'draft',
     ], 'Save');
 
@@ -102,7 +116,6 @@ class ModerationFormTest extends ModerationStateTestBase {
     // Preview the draft.
     $this->drupalGet($edit_path);
     $this->submitForm([
-      'body[0][value]' => 'Second version of the content.',
       'moderation_state[0][state]' => 'draft',
     ], 'Preview');
 
@@ -123,7 +136,6 @@ class ModerationFormTest extends ModerationStateTestBase {
     // Publish the draft.
     $this->drupalGet($edit_path);
     $this->submitForm([
-      'body[0][value]' => 'Third version of the content.',
       'moderation_state[0][state]' => 'published',
     ], 'Save');
 
@@ -154,7 +166,6 @@ class ModerationFormTest extends ModerationStateTestBase {
     // Make a pending revision.
     $this->drupalGet($edit_path);
     $this->submitForm([
-      'body[0][value]' => 'Fourth version of the content.',
       'moderation_state[0][state]' => 'draft',
     ], 'Save');
 
@@ -184,8 +195,9 @@ class ModerationFormTest extends ModerationStateTestBase {
   /**
    * Tests moderation non-bundle entity type.
    */
-  public function testNonBundleModerationForm() {
-    $this->drupalLogin($this->rootUser);
+  public function testNonBundleModerationForm(): void {
+    $this->adminUser = $this->drupalCreateUser($this->getAdministratorPermissions());
+    $this->drupalLogin($this->adminUser);
     $this->workflow->getTypePlugin()->addEntityTypeAndBundle('entity_test_mulrevpub', 'entity_test_mulrevpub');
     $this->workflow->save();
 
@@ -215,7 +227,7 @@ class ModerationFormTest extends ModerationStateTestBase {
     // default revision.
     $this->drupalGet('entity_test_mulrevpub/manage/1');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertNoText('Status');
+    $this->assertSession()->pageTextNotContains('Status');
 
     // The latest version page should not show, because there is still no
     // pending revision.
@@ -230,7 +242,7 @@ class ModerationFormTest extends ModerationStateTestBase {
     // default revision.
     $this->drupalGet('entity_test_mulrevpub/manage/1');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertNoText('Status');
+    $this->assertSession()->pageTextNotContains('Status');
 
     // The latest version page should show the moderation form and have "Draft"
     // status, because the pending revision is in "Draft".
@@ -252,7 +264,7 @@ class ModerationFormTest extends ModerationStateTestBase {
   /**
    * Tests the revision author is updated when the moderation form is used.
    */
-  public function testModerationFormSetsRevisionAuthor() {
+  public function testModerationFormSetsRevisionAuthor(): void {
     // Create new moderated content in published.
     $node = $this->createNode(['type' => 'moderated_content', 'moderation_state' => 'published']);
     // Make a pending revision.
@@ -278,24 +290,15 @@ class ModerationFormTest extends ModerationStateTestBase {
   /**
    * Tests translated and moderated nodes.
    */
-  public function testContentTranslationNodeForm() {
-    $this->drupalLogin($this->rootUser);
+  public function testContentTranslationNodeForm(): void {
+    $this->adminUser = $this->drupalCreateUser($this->getAdministratorPermissions());
+    $this->drupalLogin($this->adminUser);
 
     // Add French language.
-    $edit = [
-      'predefined_langcode' => 'fr',
-    ];
-    $this->drupalGet('admin/config/regional/language/add');
-    $this->submitForm($edit, 'Add language');
+    static::createLanguageFromLangcode('fr');
 
-    // Enable content translation on articles.
-    $this->drupalGet('admin/config/regional/content-language');
-    $edit = [
-      'entity_types[node]' => TRUE,
-      'settings[node][moderated_content][translatable]' => TRUE,
-      'settings[node][moderated_content][settings][language][language_alterable]' => TRUE,
-    ];
-    $this->submitForm($edit, 'Save configuration');
+    // Enable content translation on moderated_content.
+    $this->enableContentTranslation('node', 'moderated_content');
 
     // Adding languages requires a container rebuild in the test running
     // environment so that multilingual services are used.
@@ -305,10 +308,9 @@ class ModerationFormTest extends ModerationStateTestBase {
     $this->drupalGet('node/add/moderated_content');
     $this->submitForm([
       'title[0][value]' => 'Some moderated content',
-      'body[0][value]' => 'First version of the content.',
       'moderation_state[0][state]' => 'draft',
     ], 'Save');
-    $this->assertNotEmpty($this->xpath('//ul[@class="entity-moderation-form"]'));
+    $this->assertSession()->elementExists('xpath', '//ul[@class="entity-moderation-form"]');
 
     $node = $this->drupalGetNodeByTitle('Some moderated content');
     $this->assertNotEmpty($node->language(), 'en');
@@ -318,8 +320,8 @@ class ModerationFormTest extends ModerationStateTestBase {
     $french = \Drupal::languageManager()->getLanguage('fr');
 
     $this->drupalGet($latest_version_path);
-    $this->assertSession()->statusCodeEquals('403');
-    $this->assertEmpty($this->xpath('//ul[@class="entity-moderation-form"]'));
+    $this->assertSession()->statusCodeEquals(403);
+    $this->assertSession()->elementNotExists('xpath', '//ul[@class="entity-moderation-form"]');
 
     // Add french translation (revision 2).
     $this->drupalGet($translate_path);
@@ -327,13 +329,12 @@ class ModerationFormTest extends ModerationStateTestBase {
     $this->assertSession()->optionExists('moderation_state[0][state]', 'published');
     $this->assertSession()->optionNotExists('moderation_state[0][state]', 'archived');
     $this->submitForm([
-      'body[0][value]' => 'Second version of the content.',
       'moderation_state[0][state]' => 'published',
     ], 'Save (this translation)');
 
     $this->drupalGet($latest_version_path, ['language' => $french]);
-    $this->assertSession()->statusCodeEquals('403');
-    $this->assertEmpty($this->xpath('//ul[@class="entity-moderation-form"]'));
+    $this->assertSession()->statusCodeEquals(403);
+    $this->assertSession()->elementNotExists('xpath', '//ul[@class="entity-moderation-form"]');
 
     // Add french pending revision (revision 3).
     $this->drupalGet($edit_path, ['language' => $french]);
@@ -351,19 +352,18 @@ class ModerationFormTest extends ModerationStateTestBase {
     $this->assertSession()->optionExists('moderation_state[0][state]', 'archived');
 
     $this->submitForm([
-      'body[0][value]' => 'Third version of the content.',
       'moderation_state[0][state]' => 'draft',
     ], 'Save (this translation)');
 
     $this->drupalGet($latest_version_path, ['language' => $french]);
-    $this->assertNotEmpty($this->xpath('//ul[@class="entity-moderation-form"]'));
+    $this->assertSession()->elementExists('xpath', '//ul[@class="entity-moderation-form"]');
 
     $this->drupalGet($edit_path);
     $this->clickLink('Delete');
     $this->assertSession()->buttonExists('Delete');
 
     $this->drupalGet($latest_version_path);
-    $this->assertEmpty($this->xpath('//ul[@class="entity-moderation-form"]'));
+    $this->assertSession()->elementNotExists('xpath', '//ul[@class="entity-moderation-form"]');
 
     // Publish the french pending revision (revision 4).
     $this->drupalGet($edit_path, ['language' => $french]);
@@ -371,12 +371,11 @@ class ModerationFormTest extends ModerationStateTestBase {
     $this->assertSession()->optionExists('moderation_state[0][state]', 'published');
     $this->assertSession()->optionNotExists('moderation_state[0][state]', 'archived');
     $this->submitForm([
-      'body[0][value]' => 'Fifth version of the content.',
       'moderation_state[0][state]' => 'published',
     ], 'Save (this translation)');
 
     $this->drupalGet($latest_version_path, ['language' => $french]);
-    $this->assertEmpty($this->xpath('//ul[@class="entity-moderation-form"]'));
+    $this->assertSession()->elementNotExists('xpath', '//ul[@class="entity-moderation-form"]');
 
     // Publish the English pending revision (revision 5).
     $this->drupalGet($edit_path);
@@ -384,12 +383,11 @@ class ModerationFormTest extends ModerationStateTestBase {
     $this->assertSession()->optionExists('moderation_state[0][state]', 'published');
     $this->assertSession()->optionNotExists('moderation_state[0][state]', 'archived');
     $this->submitForm([
-      'body[0][value]' => 'Sixth version of the content.',
       'moderation_state[0][state]' => 'published',
     ], 'Save (this translation)');
 
     $this->drupalGet($latest_version_path);
-    $this->assertEmpty($this->xpath('//ul[@class="entity-moderation-form"]'));
+    $this->assertSession()->elementNotExists('xpath', '//ul[@class="entity-moderation-form"]');
 
     // Make sure we are allowed to create a pending French revision.
     $this->drupalGet($edit_path, ['language' => $french]);
@@ -403,14 +401,13 @@ class ModerationFormTest extends ModerationStateTestBase {
     $this->assertSession()->optionExists('moderation_state[0][state]', 'published');
     $this->assertSession()->optionExists('moderation_state[0][state]', 'archived');
     $this->submitForm([
-      'body[0][value]' => 'Seventh version of the content.',
       'moderation_state[0][state]' => 'draft',
     ], 'Save (this translation)');
 
     $this->drupalGet($latest_version_path);
-    $this->assertNotEmpty($this->xpath('//ul[@class="entity-moderation-form"]'));
+    $this->assertSession()->elementExists('xpath', '//ul[@class="entity-moderation-form"]');
     $this->drupalGet($latest_version_path, ['language' => $french]);
-    $this->assertEmpty($this->xpath('//ul[@class="entity-moderation-form"]'));
+    $this->assertSession()->elementNotExists('xpath', '//ul[@class="entity-moderation-form"]');
 
     // Publish the English pending revision (revision 7)
     $this->drupalGet($edit_path);
@@ -418,12 +415,11 @@ class ModerationFormTest extends ModerationStateTestBase {
     $this->assertSession()->optionExists('moderation_state[0][state]', 'published');
     $this->assertSession()->optionNotExists('moderation_state[0][state]', 'archived');
     $this->submitForm([
-      'body[0][value]' => 'Eighth version of the content.',
       'moderation_state[0][state]' => 'published',
     ], 'Save (this translation)');
 
     $this->drupalGet($latest_version_path);
-    $this->assertEmpty($this->xpath('//ul[@class="entity-moderation-form"]'));
+    $this->assertSession()->elementNotExists('xpath', '//ul[@class="entity-moderation-form"]');
 
     // Make sure we are allowed to create a pending French revision.
     $this->drupalGet($edit_path, ['language' => $french]);
@@ -489,13 +485,13 @@ class ModerationFormTest extends ModerationStateTestBase {
   /**
    * Tests the moderation_state field when an alternative widget is set.
    */
-  public function testAlternativeModerationStateWidget() {
-    $entity_form_display = EntityFormDisplay::load('node.moderated_content.default');
-    $entity_form_display->setComponent('moderation_state', [
-      'type' => 'string_textfield',
-      'region' => 'content',
-    ]);
-    $entity_form_display->save();
+  public function testAlternativeModerationStateWidget(): void {
+    \Drupal::service('entity_display.repository')->getFormDisplay('node', 'moderated_content')
+      ->setComponent('moderation_state', [
+        'type' => 'string_textfield',
+        'region' => 'content',
+      ])
+      ->save();
     $this->drupalGet('node/add/moderated_content');
     $this->submitForm([
       'title[0][value]' => 'Test content',
@@ -507,10 +503,10 @@ class ModerationFormTest extends ModerationStateTestBase {
   /**
    * Tests that workflows and states can not be deleted if they are in use.
    *
-   * @covers \Drupal\content_moderation\Plugin\WorkflowType\ContentModeration::workflowHasData
-   * @covers \Drupal\content_moderation\Plugin\WorkflowType\ContentModeration::workflowStateHasData
+   * @legacy-covers \Drupal\content_moderation\Plugin\WorkflowType\ContentModeration::workflowHasData
+   * @legacy-covers \Drupal\content_moderation\Plugin\WorkflowType\ContentModeration::workflowStateHasData
    */
-  public function testWorkflowInUse() {
+  public function testWorkflowInUse(): void {
     $user = $this->createUser([
       'administer workflows',
       'create moderated_content content',
@@ -536,7 +532,6 @@ class ModerationFormTest extends ModerationStateTestBase {
     $this->drupalGet('node/add/moderated_content');
     $this->submitForm([
       'title[0][value]' => 'Some moderated content',
-      'body[0][value]' => 'First version of the content.',
       'moderation_state[0][state]' => 'draft',
     ], 'Save');
 

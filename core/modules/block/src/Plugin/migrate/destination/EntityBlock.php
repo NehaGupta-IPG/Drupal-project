@@ -2,14 +2,14 @@
 
 namespace Drupal\block\Plugin\migrate\destination;
 
+use Drupal\migrate\Attribute\MigrateDestination;
 use Drupal\migrate\Plugin\migrate\destination\EntityConfigBase;
 use Drupal\migrate\Row;
 
 /**
- * @MigrateDestination(
- *   id = "entity:block"
- * )
+ * Migrate destination for block entity.
  */
+#[MigrateDestination('entity:block')]
 class EntityBlock extends EntityConfigBase {
 
   /**

@@ -1,18 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Entity;
 
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
+use Drupal\views\ResultRow;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the 'Latest revision' filter.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class LatestRevisionFilterTest extends ViewsKernelTestBase {
 
   /**
@@ -28,11 +33,14 @@ class LatestRevisionFilterTest extends ViewsKernelTestBase {
   /**
    * Tests the 'Latest revision' filter.
    */
-  public function testLatestRevisionFilter() {
+  public function testLatestRevisionFilter(): void {
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
     $this->installSchema('node', ['node_access']);
-    NodeType::create(['type' => 'article'])->save();
+    NodeType::create([
+      'type' => 'article',
+      'name' => 'Article',
+    ])->save();
 
     // Create a node that goes through various default/pending revision stages.
     $node = Node::create([
@@ -100,7 +108,7 @@ class LatestRevisionFilterTest extends ViewsKernelTestBase {
     $this->executeView($view);
 
     // Check that we have all the results.
-    $this->assertCount(count($latest_revisions), $view->result);
+    $this->assertSameSize($latest_revisions, $view->result);
 
     $expected = $not_expected = [];
     foreach ($all_revisions as $revision_id => $revision) {
@@ -126,9 +134,11 @@ class LatestRevisionFilterTest extends ViewsKernelTestBase {
    *   An executed View.
    * @param array $not_expected_revision_ids
    *   An array of revision IDs which should not be part of the result set.
+   *
+   * @internal
    */
-  protected function assertNotInResultSet(ViewExecutable $view, array $not_expected_revision_ids) {
-    $found_revision_ids = array_filter($view->result, function ($row) use ($not_expected_revision_ids) {
+  protected function assertNotInResultSet(ViewExecutable $view, array $not_expected_revision_ids): void {
+    $found_revision_ids = array_filter($view->result, function (ResultRow $row) use ($not_expected_revision_ids): bool {
       return in_array($row->vid, $not_expected_revision_ids);
     });
     $this->assertEmpty($found_revision_ids);

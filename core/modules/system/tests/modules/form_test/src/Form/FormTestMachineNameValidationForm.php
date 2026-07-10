@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\form_test\Form;
 
 use Drupal\Core\Form\FormBase;
@@ -77,7 +79,7 @@ class FormTestMachineNameValidationForm extends FormBase {
       '#ajax' => [
         'callback' => '::buildAjaxSnackConfigureForm',
         'wrapper' => 'snack-config-form',
-        'method' => 'replace',
+        'method' => 'replaceWith',
         'effect' => 'fade',
       ],
     ];
@@ -99,14 +101,14 @@ class FormTestMachineNameValidationForm extends FormBase {
   /**
    * Validate callback that forces a form rebuild.
    */
-  public function buildAjaxSnackConfigureFormValidate(array $form, FormStateInterface $form_state) {
+  public function buildAjaxSnackConfigureFormValidate(array $form, FormStateInterface $form_state): void {
     $form_state->set('id', $form_state->getValue('id'));
   }
 
   /**
    * Submit callback that forces a form rebuild.
    */
-  public function buildAjaxSnackConfigureFormSubmit(array $form, FormStateInterface $form_state) {
+  public function buildAjaxSnackConfigureFormSubmit(array $form, FormStateInterface $form_state): void {
     $form_state->setRebuild();
   }
 
@@ -120,12 +122,14 @@ class FormTestMachineNameValidationForm extends FormBase {
   /**
    * Loading stub for machine name.
    *
-   * @param $machine_name
+   * @param string $machine_name
+   *   The machine name.
    *
    * @return bool
+   *   TRUE if the machine name is a duplicate, FALSE otherwise.
    */
   public function load($machine_name) {
-    if (strpos($machine_name, 'duplicate') !== FALSE) {
+    if (str_contains($machine_name, 'duplicate')) {
       return TRUE;
     }
 
@@ -135,7 +139,7 @@ class FormTestMachineNameValidationForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->messenger()->addStatus('The form_test_machine_name_validation_form form has been submitted successfully.');
   }
 

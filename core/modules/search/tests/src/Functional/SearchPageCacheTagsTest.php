@@ -1,34 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\search\Functional;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the search_page entity cache tags on the search results pages.
- *
- * @group search
  */
+#[Group('search')]
+#[RunTestsInSeparateProcesses]
 class SearchPageCacheTagsTest extends BrowserTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
+  use FieldUiTestTrait;
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'search'];
+  protected static $modules = ['node', 'search', 'search_node'];
 
   /**
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $dumpHeaders = TRUE;
 
   /**
    * A user with permission to search content.
@@ -68,7 +69,7 @@ class SearchPageCacheTagsTest extends BrowserTestBase {
   /**
    * Tests the presence of the expected cache tag in various situations.
    */
-  public function testSearchText() {
+  public function testSearchText(): void {
     $this->drupalLogin($this->searchingUser);
 
     // Initial page for searching nodes.
@@ -138,10 +139,10 @@ class SearchPageCacheTagsTest extends BrowserTestBase {
   /**
    * Tests the presence of expected cache tags with referenced entities.
    */
-  public function testSearchTagsBubbling() {
+  public function testSearchTagsBubbling(): void {
 
-    // Install field UI and entity reference modules.
-    $this->container->get('module_installer')->install(['field_ui', 'entity_reference']);
+    // Install field UI module.
+    $this->container->get('module_installer')->install(['field_ui']);
     $this->resetAll();
 
     // Creates a new content type that will have an entity reference.
@@ -160,17 +161,7 @@ class SearchPageCacheTagsTest extends BrowserTestBase {
     ]);
     $this->drupalLogin($admin_user);
 
-    // First step: 'Add new field' on the 'Manage fields' page.
-    $this->drupalGet($bundle_path . '/fields/add-field');
-    $this->submitForm([
-      'label' => 'Test label',
-      'field_name' => 'test__ref',
-      'new_storage_type' => 'entity_reference',
-    ], 'Save and continue');
-
-    // Second step: 'Field settings' form.
-    $this->submitForm([], 'Save field settings');
-
+    $this->fieldUIAddNewField($bundle_path, 'test__ref', 'Test label', 'entity_reference', [], ['settings[handler_settings][target_bundles][page]' => TRUE]);
     // Create a new node of our newly created node type and fill in the entity
     // reference field.
     $edit = [
@@ -196,6 +187,7 @@ class SearchPageCacheTagsTest extends BrowserTestBase {
       'search_index',
       'search_index:node_search',
       'http_response',
+      'CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form',
       'rendered',
       'node_list',
     ];

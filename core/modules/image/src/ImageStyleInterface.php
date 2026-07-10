@@ -10,6 +10,11 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 interface ImageStyleInterface extends ConfigEntityInterface {
 
   /**
+   * The name of the query parameter for image derivative tokens.
+   */
+  const TOKEN = 'itok';
+
+  /**
    * Returns the image style.
    *
    * @return string
@@ -56,7 +61,7 @@ interface ImageStyleInterface extends ConfigEntityInterface {
    *   in an <img> tag. Requesting the URL will cause the image to be created.
    *
    * @see \Drupal\image\Controller\ImageStyleDownloadController::deliver()
-   * @see file_url_transform_relative()
+   * @see \Drupal\Core\File\FileUrlGeneratorInterface::transformRelative()
    */
   public function buildUrl($path, $clean_urls = NULL);
 

@@ -4,11 +4,12 @@ namespace Drupal\taxonomy\Plugin\views\argument_default;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\taxonomy\TermInterface;
-use Drupal\views\ViewExecutable;
-use Drupal\views\Plugin\views\display\DisplayPluginBase;
+use Drupal\views\Attribute\ViewsArgumentDefault;
 use Drupal\views\Plugin\views\argument_default\ArgumentDefaultPluginBase;
 use Drupal\node\NodeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -16,12 +17,11 @@ use Drupal\taxonomy\VocabularyStorageInterface;
 
 /**
  * Taxonomy tid default argument.
- *
- * @ViewsArgumentDefault(
- *   id = "taxonomy_tid",
- *   title = @Translation("Taxonomy term ID from URL")
- * )
  */
+#[ViewsArgumentDefault(
+  id: 'taxonomy_tid',
+  title: new TranslatableMarkup('Taxonomy term ID from URL'),
+)]
 class Tid extends ArgumentDefaultPluginBase implements CacheableDependencyInterface {
 
   /**
@@ -44,9 +44,9 @@ class Tid extends ArgumentDefaultPluginBase implements CacheableDependencyInterf
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
-   *   The plugin implementation definition.   *
+   *   The plugin implementation definition.
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The route match.
    * @param \Drupal\taxonomy\VocabularyStorageInterface $vocabulary_storage
@@ -70,24 +70,6 @@ class Tid extends ArgumentDefaultPluginBase implements CacheableDependencyInterf
       $container->get('current_route_match'),
       $container->get('entity_type.manager')->getStorage('taxonomy_vocabulary')
     );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
-    parent::init($view, $display, $options);
-
-    // @todo Remove the legacy code.
-    // Convert legacy vids option to machine name vocabularies.
-    if (!empty($this->options['vids'])) {
-      $vocabularies = taxonomy_vocabulary_get_names();
-      foreach ($this->options['vids'] as $vid) {
-        if (isset($vocabularies[$vid], $vocabularies[$vid]->machine_name)) {
-          $this->options['vocabularies'][$vocabularies[$vid]->machine_name] = $vocabularies[$vid]->machine_name;
-        }
-      }
-    }
   }
 
   /**
@@ -188,6 +170,9 @@ class Tid extends ArgumentDefaultPluginBase implements CacheableDependencyInterf
     if (!empty($this->options['node'])) {
       // Just check, if a node could be detected.
       if (($node = $this->routeMatch->getParameter('node')) && $node instanceof NodeInterface) {
+        CacheableMetadata::createFromRenderArray($this->view->element)
+          ->merge(CacheableMetadata::createFromObject($node))
+          ->applyTo($this->view->element);
         $taxonomy = [];
         foreach ($node->getFieldDefinitions() as $field) {
           if ($field->getType() == 'entity_reference' && $field->getSetting('target_type') == 'taxonomy_term') {
@@ -200,7 +185,7 @@ class Tid extends ArgumentDefaultPluginBase implements CacheableDependencyInterf
         }
         if (!empty($this->options['limit'])) {
           $tids = [];
-          // filter by vocabulary
+          // Filter by vocabulary.
           foreach ($taxonomy as $tid => $vocab) {
             if (!empty($this->options['vids'][$vocab])) {
               $tids[] = $tid;

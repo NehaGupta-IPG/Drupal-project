@@ -3,7 +3,14 @@
 
 /**
  * @file
- * A command line application to generate proxy classes.
+ * A script to generate proxy classes for lazy services.
+ *
+ * For help, type this command from the root directory of an installed Drupal
+ * site: php core/scripts/generate-proxy-class.php -h generate-proxy-class
+ *
+ * @ingroup container
+ *
+ * @see lazy_services
  */
 
 use Drupal\Core\Command\GenerateProxyClassApplication;
@@ -16,12 +23,16 @@ if (PHP_SAPI !== 'cli') {
   return;
 }
 
-// Bootstrap.
-$autoloader = require __DIR__ . '/../../autoload.php';
-$request = Request::createFromGlobals();
-Settings::initialize(dirname(__DIR__, 2), DrupalKernel::findSitePath($request), $autoloader);
-$kernel = DrupalKernel::createFromRequest($request, $autoloader, 'prod')->boot();
+require_once __DIR__ . '/../../autoload_runtime.php';
 
-// Run the database dump command.
-$application = new GenerateProxyClassApplication(new ProxyBuilder());
-$application->run();
+return static function () {
+  // Bootstrap.
+  // @todo Move from front-controller into runtime on request.
+  $autoloader = require __DIR__ . '/../../autoload.php';
+  $request = Request::createFromGlobals();
+  Settings::initialize(dirname(__DIR__, 2), DrupalKernel::findSitePath($request), $autoloader);
+  DrupalKernel::createFromRequest($request, $autoloader, 'prod')->boot();
+
+  // Run the database dump command.
+  return new GenerateProxyClassApplication(new ProxyBuilder());
+};

@@ -24,7 +24,7 @@ interface CacheableDependencyInterface {
    * request context (the current URL, language, and so on). They're converted
    * before storing an object in cache.
    *
-   * @return string[]
+   * @return list<string>
    *   An array of cache context tokens, used to generate a cache ID.
    *
    * @see \Drupal\Core\Cache\Context\CacheContextsManager::convertTokensToKeys()
@@ -36,7 +36,7 @@ interface CacheableDependencyInterface {
    *
    * When this object is modified, these cache tags will be invalidated.
    *
-   * @return string[]
+   * @return list<string>
    *   A set of cache tags.
    */
   public function getCacheTags();
@@ -46,6 +46,8 @@ interface CacheableDependencyInterface {
    *
    * @return int
    *   The maximum time in seconds that this object may be cached.
+   *   An object may be cached permanently by returning
+   *   \Drupal\Core\Cache\Cache::PERMANENT.
    */
   public function getCacheMaxAge();
 

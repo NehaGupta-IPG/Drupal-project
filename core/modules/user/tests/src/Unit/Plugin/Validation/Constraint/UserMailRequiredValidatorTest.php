@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Unit\Plugin\Validation\Constraint;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -12,12 +14,17 @@ use Drupal\user\Plugin\Validation\Constraint\UserMailRequired;
 use Drupal\user\Plugin\Validation\Constraint\UserMailRequiredValidator;
 use Drupal\user\UserInterface;
 use Drupal\user\UserStorageInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use Prophecy\Prophet;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
- * @coversDefaultClass \Drupal\user\Plugin\Validation\Constraint\UserMailRequiredValidator
- * @group user
+ * Tests Drupal\user\Plugin\Validation\Constraint\UserMailRequiredValidator.
  */
+#[CoversClass(UserMailRequiredValidator::class)]
+#[Group('user')]
 class UserMailRequiredValidatorTest extends UnitTestCase {
 
   /**
@@ -29,7 +36,7 @@ class UserMailRequiredValidatorTest extends UnitTestCase {
    * @return \Drupal\user\Plugin\Validation\Constraint\UserMailRequiredValidator
    *   The validator instance.
    */
-  protected function createValidator($is_admin) {
+  protected function createValidator($is_admin): UserMailRequiredValidator {
     // Setup mocks that don't need to change.
     $unchanged_account = $this->prophesize(UserInterface::class);
     $unchanged_account->getEmail()->willReturn(NULL);
@@ -51,11 +58,10 @@ class UserMailRequiredValidatorTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::validate
-   *
-   * @dataProvider providerTestValidate
+   * Tests validate.
    */
-  public function testValidate($items, $expected_violation, $is_admin = FALSE) {
+  #[DataProvider('providerTestValidate')]
+  public function testValidate($items, $expected_violation, $is_admin = FALSE): void {
     $constraint = new UserMailRequired();
 
     // If a violation is expected, then the context's addViolation method will
@@ -77,20 +83,21 @@ class UserMailRequiredValidatorTest extends UnitTestCase {
   /**
    * Data provider for ::testValidate().
    */
-  public function providerTestValidate() {
+  public static function providerTestValidate(): array {
+    $prophet = new Prophet();
     $cases = [];
 
     // Case 1: Empty user should be ignored.
-    $items = $this->prophesize(FieldItemListInterface::class);
+    $items = $prophet->prophesize(FieldItemListInterface::class);
     $items->getEntity()->willReturn(NULL)->shouldBeCalledTimes(1);
     $cases['Empty user should be ignored'] = [$items->reveal(), FALSE];
 
     // Case 2: New users without an email should add a violation.
-    $items = $this->prophesize(FieldItemListInterface::class);
-    $account = $this->prophesize(UserInterface::class);
+    $items = $prophet->prophesize(FieldItemListInterface::class);
+    $account = $prophet->prophesize(UserInterface::class);
     $account->isNew()->willReturn(TRUE);
     $account->id()->shouldNotBeCalled();
-    $field_definition = $this->prophesize(FieldDefinitionInterface::class);
+    $field_definition = $prophet->prophesize(FieldDefinitionInterface::class);
     $field_definition->getLabel()->willReturn('Email');
     $account->getFieldDefinition("mail")->willReturn($field_definition->reveal())->shouldBeCalledTimes(1);
     $items->getEntity()->willReturn($account->reveal())->shouldBeCalledTimes(1);
@@ -98,35 +105,35 @@ class UserMailRequiredValidatorTest extends UnitTestCase {
     $cases['New users without an email should add a violation'] = [$items->reveal(), TRUE];
 
     // Case 3: Existing users without an email should add a violation.
-    $items = $this->prophesize(FieldItemListInterface::class);
-    $account = $this->prophesize(UserInterface::class);
+    $items = $prophet->prophesize(FieldItemListInterface::class);
+    $account = $prophet->prophesize(UserInterface::class);
     $account->isNew()->willReturn(FALSE);
     $account->id()->willReturn(3);
-    $field_definition = $this->prophesize(FieldDefinitionInterface::class);
+    $field_definition = $prophet->prophesize(FieldDefinitionInterface::class);
     $field_definition->getLabel()->willReturn('Email');
     $account->getFieldDefinition("mail")->willReturn($field_definition->reveal())->shouldBeCalledTimes(1);
     $items->getEntity()->willReturn($account->reveal())->shouldBeCalledTimes(1);
     $items->isEmpty()->willReturn(TRUE);
     $cases['Existing users without an email should add a violation'] = [$items->reveal(), TRUE];
 
-    // Case 4: New user with an e-mail is valid.
-    $items = $this->prophesize(FieldItemListInterface::class);
-    $account = $this->prophesize(UserInterface::class);
+    // Case 4: New user with an email is valid.
+    $items = $prophet->prophesize(FieldItemListInterface::class);
+    $account = $prophet->prophesize(UserInterface::class);
     $account->isNew()->willReturn(TRUE);
     $account->id()->shouldNotBeCalled();
-    $field_definition = $this->prophesize(FieldDefinitionInterface::class);
+    $field_definition = $prophet->prophesize(FieldDefinitionInterface::class);
     $field_definition->getLabel()->willReturn('Email');
     $account->getFieldDefinition("mail")->willReturn($field_definition->reveal())->shouldBeCalledTimes(1);
     $items->getEntity()->willReturn($account->reveal())->shouldBeCalledTimes(1);
     $items->isEmpty()->willReturn(FALSE);
-    $cases['New user with an e-mail is valid'] = [$items->reveal(), FALSE];
+    $cases['New user with an email is valid'] = [$items->reveal(), FALSE];
 
     // Case 5: Existing users with an email should be ignored.
-    $items = $this->prophesize(FieldItemListInterface::class);
-    $account = $this->prophesize(UserInterface::class);
+    $items = $prophet->prophesize(FieldItemListInterface::class);
+    $account = $prophet->prophesize(UserInterface::class);
     $account->isNew()->willReturn(FALSE);
     $account->id()->willReturn(3);
-    $field_definition = $this->prophesize(FieldDefinitionInterface::class);
+    $field_definition = $prophet->prophesize(FieldDefinitionInterface::class);
     $field_definition->getLabel()->willReturn('Email');
     $account->getFieldDefinition("mail")->willReturn($field_definition->reveal())->shouldBeCalledTimes(1);
     $items->getEntity()->willReturn($account->reveal())->shouldBeCalledTimes(1);
@@ -135,16 +142,20 @@ class UserMailRequiredValidatorTest extends UnitTestCase {
 
     // Case 6: Existing users without an email should be ignored if the current
     // user is an administrator.
-    $items = $this->prophesize(FieldItemListInterface::class);
-    $account = $this->prophesize(UserInterface::class);
+    $items = $prophet->prophesize(FieldItemListInterface::class);
+    $account = $prophet->prophesize(UserInterface::class);
     $account->isNew()->willReturn(FALSE);
     $account->id()->willReturn(3);
-    $field_definition = $this->prophesize(FieldDefinitionInterface::class);
+    $field_definition = $prophet->prophesize(FieldDefinitionInterface::class);
     $field_definition->getLabel()->willReturn('Email');
     $account->getFieldDefinition("mail")->willReturn($field_definition->reveal())->shouldBeCalledTimes(1);
     $items->getEntity()->willReturn($account->reveal())->shouldBeCalledTimes(1);
     $items->isEmpty()->willReturn(TRUE);
-    $cases['Existing users without an email should be ignored if the current user is an administrator.'] = [$items->reveal(), FALSE, TRUE];
+    $cases['Existing users without an email should be ignored if the current user is an administrator.'] = [
+      $items->reveal(),
+      FALSE,
+      TRUE,
+    ];
 
     return $cases;
   }

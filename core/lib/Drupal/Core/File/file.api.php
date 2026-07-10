@@ -20,10 +20,10 @@ use Drupal\Core\StreamWrapper\StreamWrapperManager;
  * Drupal and returning the file from a public directory. Modules can also
  * provide headers to specify information like the file's name or MIME type.
  *
- * @param $uri
+ * @param string $uri
  *   The URI of the file.
  *
- * @return
+ * @return string[]|int|null
  *   If the user does not have permission to access the file, return -1. If the
  *   user has permission, return an array with the appropriate headers. If the
  *   file is not controlled by the current module, the return value should be
@@ -31,7 +31,7 @@ use Drupal\Core\StreamWrapper\StreamWrapperManager;
  *
  * @see \Drupal\system\FileDownloadController::download()
  */
-function hook_file_download($uri) {
+function hook_file_download($uri): array|int|null {
   // Check to see if this is a config download.
   $scheme = StreamWrapperManager::getScheme($uri);
   $target = StreamWrapperManager::getTarget($uri);
@@ -40,20 +40,21 @@ function hook_file_download($uri) {
       'Content-disposition' => 'attachment; filename="config.tar.gz"',
     ];
   }
+  return NULL;
 }
 
 /**
  * Alter the URL to a file.
  *
- * This hook is called from file_create_url(), and  is called fairly
- * frequently (10+ times per page), depending on how many files there are in a
- * given page.
+ * This hook is called from \Drupal\Core\File\FileUrlGenerator::generate(),
+ * and is called fairly frequently (10+ times per page), depending on how many
+ * files there are in a given page.
  * If CSS and JS aggregation are disabled, this can become very frequently
  * (50+ times per page) so performance is critical.
  *
  * This function should alter the URI, if it wants to rewrite the file URL.
  *
- * @param $uri
+ * @param string $uri
  *   The URI to a file for which we need an external URL, or the path to a
  *   shipped file.
  */
@@ -103,98 +104,6 @@ function hook_file_url_alter(&$uri) {
       $uri = $cdn2 . '/' . $path;
     }
   }
-}
-
-/**
- * Alter MIME type mappings used to determine MIME type from a file extension.
- *
- * Invoked by
- * \Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser::guessMimeType(). It is
- * used to allow modules to add to or modify the default mapping from
- * \Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser::$defaultMapping.
- *
- * @param $mapping
- *   An array of mimetypes correlated to the extensions that relate to them.
- *   The array has 'mimetypes' and 'extensions' elements, each of which is an
- *   array.
- *
- * @see \Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser::guessMimeType()
- * @see \Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser::$defaultMapping
- */
-function hook_file_mimetype_mapping_alter(&$mapping) {
-  // Add new MIME type 'drupal/info'.
-  $mapping['mimetypes']['example_info'] = 'drupal/info';
-  // Add new extension '.info.yml' and map it to the 'drupal/info' MIME type.
-  $mapping['extensions']['info'] = 'example_info';
-  // Override existing extension mapping for '.ogg' files.
-  $mapping['extensions']['ogg'] = 189;
-}
-
-/**
- * Alter archiver information declared by other modules.
- *
- * See hook_archiver_info() for a description of archivers and the archiver
- * information structure.
- *
- * @param $info
- *   Archiver information to alter (return values from hook_archiver_info()).
- */
-function hook_archiver_info_alter(&$info) {
-  $info['tar']['extensions'][] = 'tgz';
-}
-
-/**
- * Register information about FileTransfer classes provided by a module.
- *
- * The FileTransfer class allows transferring files over a specific type of
- * connection. Core provides classes for FTP and SSH. Contributed modules are
- * free to extend the FileTransfer base class to add other connection types,
- * and if these classes are registered via hook_filetransfer_info(), those
- * connection types will be available to site administrators using the Update
- * manager when they are redirected to the authorize.php script to authorize
- * the file operations.
- *
- * @return array
- *   Nested array of information about FileTransfer classes. Each key is a
- *   FileTransfer type (not human readable, used for form elements and
- *   variable names, etc), and the values are subarrays that define properties
- *   of that type. The keys in each subarray are:
- *   - 'title': Required. The human-readable name of the connection type.
- *   - 'class': Required. The name of the FileTransfer class. The constructor
- *     will always be passed the full path to the root of the site that should
- *     be used to restrict where file transfer operations can occur (the $jail)
- *     and an array of settings values returned by the settings form.
- *   - 'weight': Optional. Integer weight used for sorting connection types on
- *     the authorize.php form.
- *
- * @see \Drupal\Core\FileTransfer\FileTransfer
- * @see authorize.php
- * @see hook_filetransfer_info_alter()
- * @see drupal_get_filetransfer_info()
- */
-function hook_filetransfer_info() {
-  $info['sftp'] = [
-    'title' => t('SFTP (Secure FTP)'),
-    'class' => 'Drupal\Core\FileTransfer\SFTP',
-    'weight' => 10,
-  ];
-  return $info;
-}
-
-/**
- * Alter the FileTransfer class registry.
- *
- * @param array $filetransfer_info
- *   Reference to a nested array containing information about the FileTransfer
- *   class registry.
- *
- * @see hook_filetransfer_info()
- */
-function hook_filetransfer_info_alter(&$filetransfer_info) {
-  // Remove the FTP option entirely.
-  unset($filetransfer_info['ftp']);
-  // Make sure the SSH option is listed first.
-  $filetransfer_info['ssh']['weight'] = -10;
 }
 
 /**

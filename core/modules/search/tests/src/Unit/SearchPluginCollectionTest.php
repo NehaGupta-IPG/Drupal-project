@@ -1,14 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\search\Unit;
 
+use Drupal\search\Plugin\SearchInterface;
 use Drupal\search\Plugin\SearchPluginCollection;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\search\Plugin\SearchPluginCollection
- * @group search
+ * Tests Drupal\search\Plugin\SearchPluginCollection.
  */
+#[CoversClass(SearchPluginCollection::class)]
+#[Group('search')]
 class SearchPluginCollectionTest extends UnitTestCase {
 
   /**
@@ -26,44 +32,43 @@ class SearchPluginCollectionTest extends UnitTestCase {
   protected $searchPluginCollection;
 
   /**
-   * Stores all setup plugin instances.
-   *
-   * @var \Drupal\search\Plugin\SearchInterface[]
-   */
-  protected $pluginInstances;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
+
     $this->pluginManager = $this->createMock('Drupal\Component\Plugin\PluginManagerInterface');
-    $this->searchPluginCollection = new SearchPluginCollection($this->pluginManager, 'banana', ['id' => 'banana', 'color' => 'yellow'], 'fruit_stand');
+    $this->searchPluginCollection = new SearchPluginCollection(
+      $this->pluginManager,
+      'banana',
+      ['id' => 'banana', 'color' => 'yellow'],
+      'fruit_stand');
   }
 
   /**
    * Tests the get() method.
    */
-  public function testGet() {
-    $plugin = $this->createMock('Drupal\search\Plugin\SearchInterface');
+  public function testGet(): void {
+    $plugin = $this->createStub(SearchInterface::class);
     $this->pluginManager->expects($this->once())
       ->method('createInstance')
-      ->will($this->returnValue($plugin));
+      ->willReturn($plugin);
     $this->assertSame($plugin, $this->searchPluginCollection->get('banana'));
   }
 
   /**
    * Tests the get() method with a configurable plugin.
    */
-  public function testGetWithConfigurablePlugin() {
+  public function testGetWithConfigurablePlugin(): void {
     $plugin = $this->createMock('Drupal\search\Plugin\ConfigurableSearchPluginInterface');
     $plugin->expects($this->once())
       ->method('setSearchPageId')
       ->with('fruit_stand')
-      ->will($this->returnValue($plugin));
+      ->willReturn($plugin);
 
     $this->pluginManager->expects($this->once())
       ->method('createInstance')
-      ->will($this->returnValue($plugin));
+      ->willReturn($plugin);
 
     $this->assertSame($plugin, $this->searchPluginCollection->get('banana'));
   }

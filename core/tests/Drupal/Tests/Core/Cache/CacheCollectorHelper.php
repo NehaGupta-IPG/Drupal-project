@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Cache;
 
 use Drupal\Core\Cache\CacheCollector;
@@ -11,6 +13,7 @@ class CacheCollectorHelper extends CacheCollector {
 
   /**
    * Contains data to return on a cache miss.
+   *
    * @var array
    */
   protected $cacheMissData = [];
@@ -25,7 +28,7 @@ class CacheCollectorHelper extends CacheCollector {
   /**
    * {@inheritdoc}
    */
-  public function set($key, $value) {
+  public function set($key, $value): void {
     parent::set($key, $value);
     $this->persist($key);
   }
@@ -50,7 +53,7 @@ class CacheCollectorHelper extends CacheCollector {
    * @param mixed $value
    *   The value to return.
    */
-  public function setCacheMissData($key, $value) {
+  public function setCacheMissData($key, $value): void {
     $this->cacheMissData[$key] = $value;
   }
 
@@ -62,6 +65,19 @@ class CacheCollectorHelper extends CacheCollector {
    */
   public function getCacheMisses() {
     return $this->cacheMisses;
+  }
+
+  /**
+   * Simulates having loaded a cache item with the given data, for unit tests.
+   *
+   * Records the loaded data that ::updateCache() fingerprints and compares
+   * against to detect a concurrent change.
+   *
+   * @param array $data
+   *   The data the cache item would have contained when loaded.
+   */
+  public function setLoadedData(array $data): void {
+    $this->loadedData = $data;
   }
 
 }

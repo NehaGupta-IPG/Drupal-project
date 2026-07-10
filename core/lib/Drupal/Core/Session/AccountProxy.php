@@ -99,6 +99,19 @@ class AccountProxy implements AccountProxyInterface {
   }
 
   /**
+   * Whether a user has a certain role.
+   *
+   * @param string $rid
+   *   The role ID to check.
+   *
+   * @return bool
+   *   Returns TRUE if the user has the role, otherwise FALSE.
+   */
+  public function hasRole(string $rid): bool {
+    return $this->getAccount()->hasRole($rid);
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function hasPermission($permission) {
@@ -189,8 +202,6 @@ class AccountProxy implements AccountProxyInterface {
    * Because of serialization issues it is currently not possible to inject the
    * container into the AccountProxy. Thus it is necessary to retrieve the
    * entity type manager statically.
-   *
-   * @see https://www.drupal.org/node/2430447
    *
    * @param int $account_id
    *   The id of an account to load.

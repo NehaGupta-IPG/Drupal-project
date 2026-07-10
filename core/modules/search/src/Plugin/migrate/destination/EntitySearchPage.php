@@ -7,8 +7,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\migrate\MigrateException;
-use Drupal\migrate\Plugin\MigrateIdMapInterface;
+use Drupal\migrate\Attribute\MigrateDestination;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\migrate\destination\EntityConfigBase;
 use Drupal\migrate\Row;
@@ -17,11 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Migrate destination for search page.
- *
- * @MigrateDestination(
- *   id = "entity:search_page"
- * )
  */
+#[MigrateDestination('entity:search_page')]
 class EntitySearchPage extends EntityConfigBase {
 
   /**
@@ -37,7 +33,7 @@ class EntitySearchPage extends EntityConfigBase {
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\migrate\plugin\MigrationInterface $migration
@@ -61,7 +57,7 @@ class EntitySearchPage extends EntityConfigBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL) {
     $entity_type_id = static::getEntityTypeId($plugin_id);
     return new static(
       $configuration,
@@ -79,24 +75,6 @@ class EntitySearchPage extends EntityConfigBase {
   /**
    * {@inheritdoc}
    */
-  public function import(Row $row, array $old_destination_id_values = []) {
-    // The search page settings may be for a module not enabled on the
-    // destination so make sure it is enabled for updating search page settings.
-    if ($this->moduleHandler->moduleExists($row->getDestinationProperty('module'))) {
-      return parent::import($row, $old_destination_id_values);
-    }
-    $msg = sprintf("Search module '%s' is not enabled on this site.", $row->getDestinationProperty('module'));
-    throw new MigrateException($msg, 0, NULL, MigrationInterface::MESSAGE_INFORMATIONAL, MigrateIdMapInterface::STATUS_IGNORED);
-  }
-
-  /**
-   * Updates the entity with the contents of a row.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The search page entity.
-   * @param \Drupal\migrate\Row $row
-   *   The row object to update from.
-   */
   protected function updateEntity(EntityInterface $entity, Row $row) {
     parent::updateEntity($entity, $row);
     $entity->setPlugin($row->getDestinationProperty('plugin'));
@@ -105,6 +83,7 @@ class EntitySearchPage extends EntityConfigBase {
     if ($plugin instanceof ConfigurableSearchPluginBase) {
       $plugin->setConfiguration($row->getDestinationProperty('configuration'));
     }
+    return $entity;
   }
 
 }

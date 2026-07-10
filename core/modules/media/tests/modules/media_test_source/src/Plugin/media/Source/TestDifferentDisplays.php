@@ -1,27 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\media_test_source\Plugin\media\Source;
 
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\media\Attribute\MediaSource;
 use Drupal\media\MediaTypeInterface;
 
 /**
  * Provides test media source.
- *
- * @MediaSource(
- *   id = "test_different_displays",
- *   label = @Translation("Test source with different displays"),
- *   description = @Translation("Test source with different displays."),
- *   allowed_field_types = {"entity_reference"},
- * )
  */
+#[MediaSource(
+  id: "test_different_displays",
+  label: new TranslatableMarkup("Test source with different displays"),
+  description: new TranslatableMarkup("Test source with different displays."),
+  allowed_field_types: ["entity_reference"]
+)]
 class TestDifferentDisplays extends Test {
 
   /**
    * {@inheritdoc}
    */
-  public function prepareViewDisplay(MediaTypeInterface $type, EntityViewDisplayInterface $display) {
+  public function prepareViewDisplay(MediaTypeInterface $type, EntityViewDisplayInterface $display): void {
     parent::prepareViewDisplay($type, $display);
     $source_name = $this->getSourceFieldDefinition($type)->getName();
     $source_component = $display->getComponent($source_name) ?: [];
@@ -32,7 +35,7 @@ class TestDifferentDisplays extends Test {
   /**
    * {@inheritdoc}
    */
-  public function prepareFormDisplay(MediaTypeInterface $type, EntityFormDisplayInterface $display) {
+  public function prepareFormDisplay(MediaTypeInterface $type, EntityFormDisplayInterface $display): void {
     parent::prepareFormDisplay($type, $display);
     $source_name = $this->getSourceFieldDefinition($type)->getName();
     $source_component = $display->getComponent($source_name) ?: [];

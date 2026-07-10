@@ -41,6 +41,9 @@ interface ModuleInstallerInterface {
    *   Thrown when the extension's name is longer than
    *   DRUPAL_EXTENSION_NAME_MAX_LENGTH.
    *
+   * @throws \Drupal\Core\Extension\ExtensionNameReservedException
+   *   Thrown when a module's name is already used by an installed theme.
+   *
    * @see hook_module_preinstall()
    * @see hook_install()
    * @see hook_modules_installed()
@@ -70,20 +73,12 @@ interface ModuleInstallerInterface {
   public function uninstall(array $module_list, $uninstall_dependents = TRUE);
 
   /**
-   * Adds module a uninstall validator.
-   *
-   * @param \Drupal\Core\Extension\ModuleUninstallValidatorInterface $uninstall_validator
-   *   The uninstall validator to add.
-   */
-  public function addUninstallValidator(ModuleUninstallValidatorInterface $uninstall_validator);
-
-  /**
    * Determines whether a list of modules can be uninstalled.
    *
    * @param string[] $module_list
    *   An array of module names.
    *
-   * @return string[]
+   * @return string[][]
    *   An array of reasons the module can not be uninstalled, empty if it can.
    */
   public function validateUninstall(array $module_list);

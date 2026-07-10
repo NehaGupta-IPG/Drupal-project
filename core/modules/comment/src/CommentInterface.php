@@ -24,16 +24,31 @@ interface CommentInterface extends ContentEntityInterface, EntityChangedInterfac
 
   /**
    * Anonymous posters cannot enter their contact information.
-   */
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0.
+   *   Use \Drupal\comment\AnonymousContact::Forbidden instead.
+   *
+   * @see https://www.drupal.org/node/3547352
+ */
   const ANONYMOUS_MAYNOT_CONTACT = 0;
 
   /**
    * Anonymous posters may leave their contact information.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0.
+   *   Use \Drupal\comment\AnonymousContact::Allowed instead.
+   *
+   * @see https://www.drupal.org/node/3547352
    */
   const ANONYMOUS_MAY_CONTACT = 1;
 
   /**
    * Anonymous posters are required to leave their contact information.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0.
+   *   Use \Drupal\comment\AnonymousContact::Required instead.
+   *
+   * @see https://www.drupal.org/node/3547352
    */
   const ANONYMOUS_MUST_CONTACT = 2;
 
@@ -211,8 +226,9 @@ interface CommentInterface extends ContentEntityInterface, EntityChangedInterfac
   /**
    * Returns the alphadecimal representation of the comment's place in a thread.
    *
-   * @return string
-   *   The alphadecimal representation of the comment's place in a thread.
+   * @return string|null
+   *   The alphadecimal representation of the comment's place in a thread. NULL
+   *   is returned before a comment is saved.
    */
   public function getThread();
 
@@ -231,6 +247,7 @@ interface CommentInterface extends ContentEntityInterface, EntityChangedInterfac
    * Returns the permalink URL for this comment.
    *
    * @return \Drupal\Core\Url
+   *   The permalink URL for this comment.
    */
   public function permalink();
 

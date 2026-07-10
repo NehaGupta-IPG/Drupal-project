@@ -49,19 +49,7 @@ class CsrfRequestHeaderAccessCheck implements AccessCheckInterface {
    */
   public function applies(Route $route) {
     $requirements = $route->getRequirements();
-    // Check for current requirement _csrf_request_header_token and deprecated
-    // REST requirement.
-    $applicable_requirements = [
-      '_csrf_request_header_token',
-      // @todo Remove _access_rest_csrf in Drupal 10.0.0 https://www.drupal.org/node/3115308
-      '_access_rest_csrf',
-    ];
-    if ($route->hasRequirement('_access_rest_csrf')) {
-      @trigger_error('Route requirement _access_rest_csrf is deprecated in drupal:8.2.0 and is removed in drupal:10.0.0. Use _csrf_request_header_token instead. See https://www.drupal.org/node/2772399', E_USER_DEPRECATED);
-    }
-    $requirement_keys = array_keys($requirements);
-
-    if (array_intersect($applicable_requirements, $requirement_keys)) {
+    if (array_key_exists('_csrf_request_header_token', $requirements)) {
       if (isset($requirements['_method'])) {
         // There could be more than one method requirement separated with '|'.
         $methods = explode('|', $requirements['_method']);
@@ -107,11 +95,13 @@ class CsrfRequestHeaderAccessCheck implements AccessCheckInterface {
         return AccessResult::forbidden()->setReason('X-CSRF-Token request header is missing')->setCacheMaxAge(0);
       }
       $csrf_token = $request->headers->get('X-CSRF-Token');
-      // @todo Remove validate call using 'rest' in 8.3.
-      //   Kept here for sessions active during update.
-      if (!$this->csrfToken->validate($csrf_token, self::TOKEN_KEY)
-        && !$this->csrfToken->validate($csrf_token, 'rest')) {
-        return AccessResult::forbidden()->setReason('X-CSRF-Token request header is invalid')->setCacheMaxAge(0);
+      if (!$this->csrfToken->validate($csrf_token, self::TOKEN_KEY)) {
+        if ($this->csrfToken->validate($csrf_token, 'rest')) {
+          @trigger_error("Validating CSRF tokens with the 'rest' key is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Sessions created before the upgrade to Drupal 9 are no longer supported. See https://www.drupal.org/node/3591939", E_USER_DEPRECATED);
+        }
+        else {
+          return AccessResult::forbidden()->setReason('X-CSRF-Token request header is invalid')->setCacheMaxAge(0);
+        }
       }
     }
     // Let other access checkers decide if the request is legit.

@@ -11,13 +11,16 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Plugin\Context\EntityContext;
+use Drupal\Core\Plugin\Context\EntityContextDefinition;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
-use Drupal\field_ui\FieldUI;
+use Drupal\layout_builder\Attribute\SectionStorage;
 use Drupal\layout_builder\DefaultsSectionStorageInterface;
 use Drupal\layout_builder\Entity\SampleEntityGeneratorInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\layout_builder\LayoutBuilderEnabledInterface;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -29,18 +32,20 @@ use Symfony\Component\Routing\RouteCollection;
  * - The default weight is 0, so other custom implementations will also take
  *   precedence unless otherwise specified.
  *
- * @SectionStorage(
- *   id = "defaults",
- *   weight = 20,
- *   context_definitions = {
- *     "display" = @ContextDefinition("entity:entity_view_display"),
- *     "view_mode" = @ContextDefinition("string", default_value = "default"),
- *   },
- * )
- *
  * @internal
  *   Plugin classes are internal.
  */
+#[SectionStorage(id: "defaults", weight: 20, context_definitions: [
+  "display" => new EntityContextDefinition(
+    data_type: "entity_view_display",
+    label: new TranslatableMarkup("Entity view display"),
+  ),
+  'view_mode' => new ContextDefinition(
+    data_type: 'string',
+    label: new TranslatableMarkup("View mode"),
+    default_value: "default",
+  ),
+])]
 class DefaultsSectionStorage extends SectionStorageBase implements ContainerFactoryPluginInterface, DefaultsSectionStorageInterface {
 
   /**
@@ -73,20 +78,6 @@ class DefaultsSectionStorage extends SectionStorageBase implements ContainerFact
     $this->entityTypeManager = $entity_type_manager;
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
     $this->sampleEntityGenerator = $sample_entity_generator;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('entity_type.manager'),
-      $container->get('entity_type.bundle.info'),
-      $container->get('layout_builder.sample_entity_generator')
-    );
   }
 
   /**
@@ -136,15 +127,21 @@ class DefaultsSectionStorage extends SectionStorageBase implements ContainerFact
   protected function getRouteParameters() {
     $display = $this->getDisplay();
     $entity_type = $this->entityTypeManager->getDefinition($display->getTargetEntityTypeId());
-    $route_parameters = FieldUI::getRouteBundleParameter($entity_type, $display->getTargetBundle());
-    $route_parameters['view_mode_name'] = $display->getMode();
-    return $route_parameters;
+    $bundle_parameter_key = $entity_type->getBundleEntityType() ?: 'bundle';
+    return [
+      $bundle_parameter_key => $display->getTargetBundle(),
+      'view_mode_name' => $display->getMode(),
+    ];
   }
 
   /**
    * {@inheritdoc}
    */
   public function buildRoutes(RouteCollection $collection) {
+    if (!\Drupal::moduleHandler()->moduleExists('field_ui')) {
+      return;
+    }
+
     foreach ($this->getEntityTypes() as $entity_type_id => $entity_type) {
       // Try to get the route from the current collection.
       if (!$entity_route = $collection->get($entity_type->get('field_ui_base_route'))) {
@@ -157,7 +154,7 @@ class DefaultsSectionStorage extends SectionStorageBase implements ContainerFact
       $defaults['entity_type_id'] = $entity_type_id;
       // If the entity type has no bundles and it doesn't use {bundle} in its
       // admin path, use the entity type.
-      if (strpos($path, '{bundle}') === FALSE) {
+      if (!str_contains($path, '{bundle}')) {
         if (!$entity_type->hasKey('bundle')) {
           $defaults['bundle'] = $entity_type_id;
         }
@@ -260,8 +257,8 @@ class DefaultsSectionStorage extends SectionStorageBase implements ContainerFact
       $defaults['bundle'] = $defaults[$defaults['bundle_key']];
     }
 
-    if (is_string($value) && strpos($value, '.') !== FALSE) {
-      list($entity_type_id, $bundle, $view_mode) = explode('.', $value, 3);
+    if (is_string($value) && str_contains($value, '.')) {
+      [$entity_type_id, $bundle, $view_mode] = explode('.', $value, 3);
     }
     elseif (!empty($defaults['entity_type_id']) && !empty($defaults['bundle']) && !empty($defaults['view_mode_name'])) {
       $entity_type_id = $defaults['entity_type_id'];
@@ -378,7 +375,7 @@ class DefaultsSectionStorage extends SectionStorageBase implements ContainerFact
   /**
    * {@inheritdoc}
    */
-  public function access($operation, AccountInterface $account = NULL, $return_as_object = FALSE) {
+  public function access($operation, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
     $result = AccessResult::allowedIf($this->isLayoutBuilderEnabled())->addCacheableDependency($this);
     return $return_as_object ? $result : $result->isAllowed();
   }
@@ -400,6 +397,17 @@ class DefaultsSectionStorage extends SectionStorageBase implements ContainerFact
       $this->setContextValue('view_mode', $context->getContextValue()->getMode());
     }
     parent::setContext($name, $context);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isSupported(string $entity_type_id, string $bundle, string $view_mode): bool {
+    $id = "$entity_type_id.$bundle.$view_mode";
+
+    $storage = $this->entityTypeManager->getStorage('entity_view_display');
+    $display = $storage->load($id) ?? $storage->load("$entity_type_id.$bundle.default");
+    return $display instanceof LayoutBuilderEnabledInterface && $display->isLayoutBuilderEnabled();
   }
 
 }

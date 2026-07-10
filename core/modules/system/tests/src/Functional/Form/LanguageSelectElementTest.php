@@ -1,24 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Form;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests that the language select form element prints and submits the right
- * options.
- *
- * @group Form
+ * Tests the language selection form element.
  */
+#[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class LanguageSelectElementTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['form_test', 'language'];
 
@@ -30,7 +32,7 @@ class LanguageSelectElementTest extends BrowserTestBase {
   /**
    * Tests that the options printed by the language select element are correct.
    */
-  public function testLanguageSelectElementOptions() {
+  public function testLanguageSelectElementOptions(): void {
     // Add some languages.
     ConfigurableLanguage::create([
       'id' => 'aaa',
@@ -47,10 +49,10 @@ class LanguageSelectElementTest extends BrowserTestBase {
     $this->drupalGet('form-test/language_select');
     // Check that the language fields were rendered on the page.
     $ids = [
-        'edit-languages-all' => LanguageInterface::STATE_ALL,
-        'edit-languages-configurable' => LanguageInterface::STATE_CONFIGURABLE,
-        'edit-languages-locked' => LanguageInterface::STATE_LOCKED,
-        'edit-languages-config-and-locked' => LanguageInterface::STATE_CONFIGURABLE | LanguageInterface::STATE_LOCKED,
+      'edit-languages-all' => LanguageInterface::STATE_ALL,
+      'edit-languages-configurable' => LanguageInterface::STATE_CONFIGURABLE,
+      'edit-languages-locked' => LanguageInterface::STATE_LOCKED,
+      'edit-languages-config-and-locked' => LanguageInterface::STATE_CONFIGURABLE | LanguageInterface::STATE_LOCKED,
     ];
     foreach ($ids as $id => $flags) {
       $this->assertSession()->fieldExists($id);
@@ -58,14 +60,17 @@ class LanguageSelectElementTest extends BrowserTestBase {
       /** @var \Drupal\Core\Language\LanguageManagerInterface $language_manager */
       $language_manager = $this->container->get('language_manager');
       foreach ($language_manager->getLanguages($flags) as $langcode => $language) {
-        $options[$langcode] = $language->isLocked() ? t('- @name -', ['@name' => $language->getName()]) : $language->getName();
+        $options[$langcode] = $language->isLocked() ? "- {$language->getName()} -" : $language->getName();
       }
       $this->_testLanguageSelectElementOptions($id, $options);
     }
 
     // Test that the #options were not altered by #languages.
     $this->assertSession()->fieldExists('edit-language-custom-options');
-    $this->_testLanguageSelectElementOptions('edit-language-custom-options', ['opt1' => 'First option', 'opt2' => 'Second option', 'opt3' => 'Third option']);
+    $this->_testLanguageSelectElementOptions(
+      'edit-language-custom-options',
+      ['opt1' => 'First option', 'opt2' => 'Second option', 'opt3' => 'Third option'],
+    );
   }
 
   /**
@@ -73,13 +78,18 @@ class LanguageSelectElementTest extends BrowserTestBase {
    *
    * This happens when the language module is disabled.
    */
-  public function testHiddenLanguageSelectElement() {
+  public function testHiddenLanguageSelectElement(): void {
     // Disable the language module, so that the language select field will not
     // be rendered.
     $this->container->get('module_installer')->uninstall(['language']);
     $this->drupalGet('form-test/language_select');
     // Check that the language fields were rendered on the page.
-    $ids = ['edit-languages-all', 'edit-languages-configurable', 'edit-languages-locked', 'edit-languages-config-and-locked'];
+    $ids = [
+      'edit-languages-all',
+      'edit-languages-configurable',
+      'edit-languages-locked',
+      'edit-languages-config-and-locked',
+    ];
     foreach ($ids as $id) {
       $this->assertSession()->fieldNotExists($id);
     }
@@ -104,11 +114,11 @@ class LanguageSelectElementTest extends BrowserTestBase {
    * @param array $options
    *   An array with options to compare with.
    */
-  protected function _testLanguageSelectElementOptions($id, $options) {
+  protected function _testLanguageSelectElementOptions($id, $options): void {
     // Check that the options in the language field are exactly the same,
     // including the order, as the languages sent as a parameter.
     $found_options = $this->assertSession()->selectExists($id)->findAll('css', 'option');
-    $found_options = array_map(function ($item) {
+    $found_options = array_map(function (NodeElement $item) {
       return $item->getText();
     }, $found_options);
     $this->assertEquals(array_values($options), $found_options);

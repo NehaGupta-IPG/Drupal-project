@@ -1,22 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Functional\Views;
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
-use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\taxonomy\Entity\Vocabulary;
-use Drupal\taxonomy\Entity\Term;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests taxonomy field filters with translations.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class TaxonomyFieldFilterTest extends ViewTestBase {
 
   /**
@@ -57,8 +62,11 @@ class TaxonomyFieldFilterTest extends ViewTestBase {
    */
   public $termNames = [];
 
-  public function setUp($import_test_views = TRUE): void {
-    parent::setUp($import_test_views);
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp($import_test_views = TRUE, $modules = []): void {
+    parent::setUp($import_test_views, $modules);
 
     // Add two new languages.
     ConfigurableLanguage::createFromLangcode('fr')->save();
@@ -93,7 +101,12 @@ class TaxonomyFieldFilterTest extends ViewTestBase {
     ])->save();
 
     // Create term with translations.
-    $taxonomy = $this->createTermWithProperties(['name' => $this->termNames['en'], 'langcode' => 'en', 'description' => $this->termNames['en'], 'field_foo' => $this->termNames['en']]);
+    $taxonomy = $this->createTermWithProperties([
+      'name' => $this->termNames['en'],
+      'langcode' => 'en',
+      'description' => $this->termNames['en'],
+      'field_foo' => $this->termNames['en'],
+    ]);
     foreach (['es', 'fr'] as $langcode) {
       $translation = $taxonomy->addTranslation($langcode, ['name' => $this->termNames[$langcode]]);
       $translation->description->value = $this->termNames[$langcode];
@@ -109,7 +122,7 @@ class TaxonomyFieldFilterTest extends ViewTestBase {
   /**
    * Tests description and term name filters.
    */
-  public function testFilters() {
+  public function testFilters(): void {
     // Test the name filter page, which filters for name contains 'Comida'.
     // Should show just the Spanish translation, once.
     $this->assertPageCounts('test-name-filter', ['es' => 1, 'fr' => 0, 'en' => 0], 'Comida name filter');
@@ -146,8 +159,10 @@ class TaxonomyFieldFilterTest extends ViewTestBase {
    *   that translation should be shown on the given page.
    * @param string $message
    *   Message suffix to display.
+   *
+   * @internal
    */
-  protected function assertPageCounts($path, $counts, $message) {
+  protected function assertPageCounts(string $path, array $counts, string $message): void {
     // Get the text of the page.
     $this->drupalGet($path);
     $text = $this->getTextContent();
@@ -169,9 +184,9 @@ class TaxonomyFieldFilterTest extends ViewTestBase {
    * @return \Drupal\taxonomy\TermInterface
    *   The created taxonomy term.
    */
-  protected function createTermWithProperties($properties) {
+  protected function createTermWithProperties(array $properties) {
     // Use the first available text format.
-    $filter_formats = filter_formats();
+    $filter_formats = \Drupal::service(FilterFormatRepositoryInterface::class)->getAllFormats();
     $format = array_pop($filter_formats);
 
     $properties += [

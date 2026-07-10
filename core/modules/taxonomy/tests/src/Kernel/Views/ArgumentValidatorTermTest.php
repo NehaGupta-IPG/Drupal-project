@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Kernel\Views;
 
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the plugin of the taxonomy: term argument validator.
- *
- * @group taxonomy
- *
- * @see \Drupal\taxonomy\Plugin\views\argument_validator\Term
  */
+#[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class ArgumentValidatorTermTest extends TaxonomyTestBase {
 
   /**
@@ -56,7 +58,7 @@ class ArgumentValidatorTermTest extends TaxonomyTestBase {
   /**
    * Tests the term argument validator plugin.
    */
-  public function testArgumentValidatorTerm() {
+  public function testArgumentValidatorTerm(): void {
     $view = Views::getView('test_argument_validator_term');
     $view->initHandlers();
 
