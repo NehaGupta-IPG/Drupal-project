@@ -128,7 +128,7 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
    *   not have a plural formula.
    */
   protected function getPluralIndex(): int {
-    return $this->getStringTranslation()->getPluralIndex()->get($this->count, $this->getOption('langcode'));
+    return $this->getStringTranslation()->getPluralIndex($this->count, $this->getOption('langcode'));
   }
 
   /**

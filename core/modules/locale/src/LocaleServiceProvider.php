@@ -5,7 +5,6 @@ namespace Drupal\locale;
 use Drupal\Core\Config\BootstrapConfigStorageFactory;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderBase;
-use Drupal\Core\StringTranslation\PluralIndexInterface;
 
 /**
  * Overrides the language_manager service to point to language's module one.
@@ -24,9 +23,8 @@ class LocaleServiceProvider extends ServiceProviderBase {
       }
     }
 
-    $definition = $container->getDefinition(PluralIndexInterface::class);
-    $definition->setClass(LocalePluralIndex::class);
-    $definition->setAutowired(TRUE);
+    $definition = $container->getDefinition('string_translation');
+    $definition->setClass(TranslationManager::class);
   }
 
 }

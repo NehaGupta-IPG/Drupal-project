@@ -1080,8 +1080,6 @@ services:
     tags:
       - { name: service_collector, tag: string_translator, call: addTranslator }
   Drupal\Core\StringTranslation\TranslationInterface: '@string_translation'
-  Drupal\Core\StringTranslation\PluralIndexInterface:
-    class: Drupal\Core\StringTranslation\FixedPluralIndex
   typed_data_manager:
     class: Drupal\Core\TypedData\TypedDataManager
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@class_resolver']

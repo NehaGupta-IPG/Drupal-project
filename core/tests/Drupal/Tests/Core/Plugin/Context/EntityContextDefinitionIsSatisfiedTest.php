@@ -18,7 +18,6 @@ use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Plugin\Context\EntityContext;
 use Drupal\Core\Plugin\Context\EntityContextDefinition;
-use Drupal\Core\StringTranslation\FixedPluralIndex;
 use Drupal\Core\StringTranslation\TranslationManager;
 use Drupal\Core\TypedData\TypedDataManager;
 use Drupal\Core\Validation\ConstraintManager;
@@ -76,7 +75,7 @@ class EntityContextDefinitionIsSatisfiedTest extends UnitTestCase {
     $this->entityTypeManager = $this->prophesize(EntityTypeManagerInterface::class);
     $this->entityTypeBundleInfo = $this->prophesize(EntityTypeBundleInfoInterface::class);
 
-    $string_translation = new TranslationManager(new LanguageDefault([]), new FixedPluralIndex());
+    $string_translation = new TranslationManager(new LanguageDefault([]));
 
     $container = new ContainerBuilder();
     $container->set('typed_data_manager', $type_data_manager);

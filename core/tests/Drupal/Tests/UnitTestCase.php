@@ -12,7 +12,6 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Core\StringTranslation\FixedPluralIndex;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use PHPUnit\Framework\MockObject\Stub;
@@ -147,7 +146,7 @@ abstract class UnitTestCase extends TestCase {
       });
     $translation
       ->method('getPluralIndex')
-      ->willReturn(new FixedPluralIndex());
+      ->willReturn(-1);
     return $translation;
   }
 

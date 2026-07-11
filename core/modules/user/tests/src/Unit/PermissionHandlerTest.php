@@ -6,8 +6,6 @@ namespace Drupal\Tests\user\Unit;
 
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ModuleExtensionList;
-use Drupal\Core\StringTranslation\FixedPluralIndex;
-use Drupal\Core\StringTranslation\PluralIndexInterface;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslationInterface;
@@ -442,8 +440,8 @@ class TestTranslationManager implements TranslationInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPluralIndex(): PluralIndexInterface {
-    return new FixedPluralIndex();
+  public function getPluralIndex(int $count, ?string $langcode = NULL): int {
+    return -1;
   }
 
 }

@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\StringTranslation;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Core\StringTranslation\FixedPluralIndex;
-use Drupal\Core\StringTranslation\PluralIndexInterface;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -28,7 +26,6 @@ class PluralTranslatableMarkupTest extends UnitTestCase {
     // Add a mock string translation service to the container.
     $container = new ContainerBuilder();
     $container->set('string_translation', $this->getStringTranslationStub());
-    $container->register(PluralIndexInterface::class, FixedPluralIndex::class);
     \Drupal::setContainer($container);
 
     // Create an object to serialize and unserialize.
@@ -54,7 +51,6 @@ class PluralTranslatableMarkupTest extends UnitTestCase {
     // Add a mock string translation service to the container.
     $container = new ContainerBuilder();
     $container->set('string_translation', $this->getStringTranslationStub());
-    $container->register(PluralIndexInterface::class, FixedPluralIndex::class);
     \Drupal::setContainer($container);
 
     $markup = PluralTranslatableMarkup::createFromTranslatedString(2, 'There is no plural delimiter @count');

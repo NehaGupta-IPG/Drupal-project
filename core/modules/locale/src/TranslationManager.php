@@ -3,23 +3,25 @@
 namespace Drupal\locale;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
-use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\StringTranslation\PluralIndexInterface;
+use Drupal\Core\Language\LanguageDefault;
+use Drupal\Core\StringTranslation\TranslationManager as CoreTranslationManager;
 
 /**
  * Plural index implementation.
  */
-class LocalePluralIndex implements PluralIndexInterface {
+class TranslationManager extends CoreTranslationManager {
 
   use DependencySerializationTrait;
 
-  public function __construct(protected PluralFormulaInterface $pluralFormula, protected LanguageManagerInterface $languageManager) {}
+  public function __construct(LanguageDefault $default_language, protected PluralFormulaInterface $pluralFormula) {
+    parent::__construct($default_language);
+  }
 
   /**
    * {@inheritdoc}
    */
-  public function get(int $count, ?string $langcode = NULL): int {
-    $langcode = $langcode ?: $this->languageManager->getCurrentLanguage()->getId();
+  public function getPluralIndex(int $count, ?string $langcode = NULL): int {
+    $langcode = $langcode ?: $this->defaultLangcode;
 
     // Retrieve and statically cache the plural formulas for all languages.
     $plural_formulas = $this->pluralFormula->getFormula($langcode);

@@ -30,8 +30,6 @@ use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\Recipe\Recipe;
 use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\Core\Site\Settings;
-use Drupal\Core\StringTranslation\FixedPluralIndex;
-use Drupal\Core\StringTranslation\PluralIndexInterface;
 use Drupal\Core\StringTranslation\Translator\FileTranslation;
 use Drupal\Core\StackMiddleware\ReverseProxyMiddleware;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -367,11 +365,8 @@ function install_begin_request($class_loader, &$install_state): void {
     ->register('language.default', 'Drupal\Core\Language\LanguageDefault')
     ->addArgument('%language.default_values%');
   $container
-    ->register(PluralIndexInterface::class, FixedPluralIndex::class);
-  $container
     ->register('string_translation', 'Drupal\Core\StringTranslation\TranslationManager')
-    ->addArgument(new Reference('language.default'))
-    ->addArgument(new Reference(PluralIndexInterface::class));
+    ->addArgument(new Reference('language.default'));
 
   // Register the database driver extension list provider.
   $container
