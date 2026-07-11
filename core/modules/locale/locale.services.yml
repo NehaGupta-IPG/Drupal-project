@@ -25,6 +25,7 @@ services:
   Drupal\locale\LocaleProjectStorageInterface: '@locale.project'
   locale.plural.formula:
     class: Drupal\locale\PluralFormula
+  Drupal\locale\PluralFormulaInterface: '@locale.plural.formula'
   string_translator.locale.lookup:
     class: Drupal\locale\LocaleTranslation
     tags:
