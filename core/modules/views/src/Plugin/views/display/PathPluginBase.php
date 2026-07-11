@@ -179,7 +179,7 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
 
     $route_path = '/' . implode('/', $bits);
 
-    $route = new Route($route_path, $defaults);
+    $route = new Route($route_path, $defaults, ['_csrf_token' => 'FALSE']);
 
     // Add access check parameters to the route.
     $access_plugin = $this->getPlugin('access');

@@ -5,6 +5,7 @@ help.main:
     _title: 'Help'
   requirements:
     _permission: 'access help pages'
+    _csrf_token: 'FALSE'
 
 help.page:
   path: '/admin/help/{name}'
@@ -13,6 +14,7 @@ help.page:
     _title: 'Help'
   requirements:
     _permission: 'access help pages'
+    _csrf_token: 'FALSE'
 
 help.help_topic:
   path: '/admin/help/topic/{id}'
@@ -20,3 +22,4 @@ help.help_topic:
     _controller: '\Drupal\help\Controller\HelpTopicPluginController::viewHelpTopic'
   requirements:
     _permission: 'access help pages'
+    _csrf_token: 'FALSE'

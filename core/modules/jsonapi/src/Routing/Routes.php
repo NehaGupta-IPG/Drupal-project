@@ -344,6 +344,7 @@ class Routes implements ContainerInjectionInterface {
         $related_route->addDefaults([RouteObjectInterface::CONTROLLER_NAME => static::CONTROLLER_SERVICE_NAME . ':getRelated']);
         $related_route->addDefaults(['related' => $relationship_field_name]);
         $related_route->setRequirement(RelationshipRouteAccessCheck::ROUTE_REQUIREMENT_KEY, "$relationship_field_name.view");
+        $related_route->setRequirement('_csrf_token', 'FALSE');
         $routes->add(static::getRouteName($resource_type, "$relationship_field_name.related"), $related_route);
       }
     }

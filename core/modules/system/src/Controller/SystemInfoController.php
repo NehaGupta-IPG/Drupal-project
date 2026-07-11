@@ -54,7 +54,7 @@ class SystemInfoController implements ContainerInjectionInterface {
   #[Route(
     path: '/admin/reports/status',
     name: 'system.status',
-    requirements: ['_permission' => 'administer site configuration'],
+    requirements: ['_permission' => 'administer site configuration', '_csrf_token' => 'FALSE'],
     defaults: ['_title' => new TranslatableMarkup('Status report')],
   )]
   public function status() {

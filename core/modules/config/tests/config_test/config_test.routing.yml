@@ -36,6 +36,7 @@ entity.config_test.enable:
     entity_type: 'config_test'
   requirements:
     _permission: 'administer site configuration'
+    _csrf_token: 'FALSE'
 
 entity.config_test.disable:
   path: '/admin/structure/config_test/manage/{config_test}/disable'
@@ -44,6 +45,7 @@ entity.config_test.disable:
     entity_type: 'config_test'
   requirements:
     _permission: 'administer site configuration'
+    _csrf_token: 'FALSE'
 
 entity.config_test.delete_form:
   path: '/admin/structure/config_test/manage/{config_test}/delete'
@@ -65,3 +67,4 @@ config_test.schema_listener:
     _controller: '\Drupal\config_test\SchemaListenerController::test'
   requirements:
     _permission: 'administer site configuration'
+    _csrf_token: 'FALSE'

@@ -33,7 +33,7 @@ class AdminController extends ControllerBase {
   #[Route(
     path: '/admin/index',
     name: 'system.admin_index',
-    requirements: ['_permission' => 'access administration pages'],
+    requirements: ['_permission' => 'access administration pages', '_csrf_token' => 'FALSE'],
     defaults: ['_title' => new TranslatableMarkup('Administration')],
   )]
   public function index() {

@@ -53,6 +53,7 @@ shortcut.link_add:
     _title: 'Add link'
   requirements:
     _entity_create_access: 'shortcut:{shortcut_set}'
+    _csrf_token: 'FALSE'
 
 entity.shortcut.canonical:
   path: '/admin/config/user-interface/shortcut/link/{shortcut}'

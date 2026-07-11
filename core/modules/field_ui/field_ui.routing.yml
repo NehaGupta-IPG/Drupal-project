@@ -13,6 +13,7 @@ field_ui.display_mode:
     _title: 'Display modes'
   requirements:
     _permission: 'administer display modes'
+    _csrf_token: 'FALSE'
 
 entity.entity_view_mode.collection:
   path: '/admin/structure/display-modes/view'
@@ -29,6 +30,7 @@ field_ui.entity_view_mode_add:
     _title: 'Choose view mode entity type'
   requirements:
     _permission: 'administer display modes'
+    _csrf_token: 'FALSE'
 
 entity.entity_view_mode.add_form:
   path: '/admin/structure/display-modes/view/add/{entity_type_id}'
@@ -69,6 +71,7 @@ field_ui.entity_form_mode_add:
     _title: 'Choose form mode entity type'
   requirements:
     _permission: 'administer display modes'
+    _csrf_token: 'FALSE'
 
 entity.entity_form_mode.add_form:
   path: '/admin/structure/display-modes/form/add/{entity_type_id}'

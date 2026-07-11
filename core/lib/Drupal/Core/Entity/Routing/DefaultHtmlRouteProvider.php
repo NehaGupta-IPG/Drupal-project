@@ -124,6 +124,7 @@ class DefaultHtmlRouteProvider implements EntityRouteProviderInterface, EntityHa
       $route->setDefault('_title_callback', EntityController::class . '::addTitle');
       $route->setDefault('entity_type_id', $entity_type->id());
       $route->setRequirement('_entity_create_any_access', $entity_type->id());
+      $route->setRequirement('_csrf_token', 'FALSE');
 
       return $route;
     }

@@ -30,6 +30,7 @@ user.admin_index:
     _title: 'People'
   requirements:
     _permission: 'access administration pages'
+    _csrf_token: 'FALSE'
 
 entity.user.admin_form:
   path: '/admin/config/people/accounts'
@@ -155,6 +156,7 @@ user.page:
     _title: 'My account'
   requirements:
     _user_is_logged_in: 'TRUE'
+    _csrf_token: 'FALSE'
 
 user.edit:
   path: '/user/edit'
@@ -163,6 +165,7 @@ user.edit:
     _title: 'Edit account'
   requirements:
     _user_is_logged_in: 'TRUE'
+    _csrf_token: 'FALSE'
 
 user.login:
   path: '/user/login'
@@ -212,6 +215,7 @@ user.cancel_confirm:
   requirements:
     _entity_access: 'user.delete'
     user: \d+
+    _csrf_token: 'FALSE'
 
 user.reset.login:
   path: '/user/reset/{uid}/{timestamp}/{hash}/login'
@@ -252,3 +256,4 @@ user.well-known.change_password:
     _controller: '\Drupal\user\Controller\UserController::userEditPage'
   requirements:
     _user_is_logged_in: 'TRUE'
+    _csrf_token: 'FALSE'

@@ -1439,7 +1439,7 @@ services:
   access_check.csrf:
     class: Drupal\Core\Access\CsrfAccessCheck
     tags:
-      - { name: access_check, applies_to: _csrf_token, needs_incoming_request: TRUE }
+      - { name: access_check, needs_incoming_request: TRUE }
     arguments: ['@csrf_token']
   access_check.header.csrf:
     class: Drupal\Core\Access\CsrfRequestHeaderAccessCheck

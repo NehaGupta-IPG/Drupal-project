@@ -12,3 +12,4 @@ container_rebuild_test.container_reset:
     _controller: '\Drupal\container_rebuild_test\TestController::containerReset'
   requirements:
     _user_is_logged_in: 'TRUE'
+    _csrf_token: 'FALSE'

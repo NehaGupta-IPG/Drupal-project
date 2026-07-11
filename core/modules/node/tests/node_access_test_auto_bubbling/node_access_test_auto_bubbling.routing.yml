@@ -12,6 +12,7 @@ node_access_test_auto_bubbling.node_access:
     # Access checking intentionally happens in the controller instead of here.
     _access: 'TRUE'
     node: \d+
+    _csrf_token: 'FALSE'
   options:
     parameters:
       node:

@@ -60,6 +60,7 @@ form_test.autocomplete_1:
     _controller: '\Drupal\form_test\AutocompleteController::delayed_autocomplete'
   requirements:
     _permission: 'access autocomplete test'
+    _csrf_token: 'FALSE'
 
 form_test.autocomplete_2:
   path: '/form-test/autocomplete-2/{param}'
@@ -67,6 +68,7 @@ form_test.autocomplete_2:
     _controller: '\Drupal\form_test\AutocompleteController::delayed_autocomplete'
   requirements:
     _permission: 'access autocomplete test'
+    _csrf_token: 'FALSE'
 
 form_test.alter_form:
   path: '/form-test/alter'
@@ -508,6 +510,7 @@ form_test.two_instances:
   requirements:
     _module_dependencies: 'node'
     _permission: 'create page content'
+    _csrf_token: 'FALSE'
 
 form_test.storage_legacy_handler:
   path: '/form-test/form-storage-legacy/{form_build_id}'

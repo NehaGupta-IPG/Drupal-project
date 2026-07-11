@@ -95,6 +95,7 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
       'entity_type_id' => 'the_entity_type_id',
     ]);
     $route->setRequirement('_entity_create_any_access', 'the_entity_type_id');
+    $route->setRequirement('_csrf_token', 'FALSE');
     $data['add_page'] = [clone $route, $entity_type3->reveal()];
 
     return $data;

@@ -4,3 +4,4 @@ toolbar.subtrees:
     _controller: '\Drupal\toolbar\Controller\ToolbarController::subtreesAjax'
   requirements:
     _custom_access: '\Drupal\toolbar\Controller\ToolbarController::checkSubTreeAccess'
+    _csrf_token: 'FALSE'

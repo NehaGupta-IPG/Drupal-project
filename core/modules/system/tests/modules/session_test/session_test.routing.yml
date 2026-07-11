@@ -81,6 +81,7 @@ session_test.is_logged_in:
     _controller: '\Drupal\session_test\Controller\SessionTestController::isLoggedIn'
   requirements:
     _user_is_logged_in: 'TRUE'
+    _csrf_token: 'FALSE'
 
 session_test.form:
   path: '/session-test/form'
@@ -116,6 +117,7 @@ session_test.get_session_basic_auth:
     _auth: ['basic_auth']
   requirements:
     _permission: 'administer site configuration'
+    _csrf_token: 'FALSE'
 
 session_test.get_session_no_auth:
   path: '/session-test/get-session-no-auth'
@@ -139,6 +141,7 @@ session_test.set_session:
       test_value: '\s+'
   requirements:
     _permission: 'administer site configuration'
+    _csrf_token: 'FALSE'
 
 session_test.set_bag_flag:
   path: '/session-test/set-bag-flag'

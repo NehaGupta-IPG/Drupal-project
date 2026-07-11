@@ -5,6 +5,7 @@ batch_test.redirect:
     _title: 'Redirect'
   requirements:
     _access:  'TRUE'
+    _csrf_token: 'FALSE'
 
 batch_test.large_percentage:
   path: '/batch-test/large-percentage'
@@ -13,6 +14,7 @@ batch_test.large_percentage:
     _title: 'Simple page with batch over 100% complete'
   requirements:
     _access:  'TRUE'
+    _csrf_token: 'FALSE'
 
 batch_test.nested_programmatic:
   path: '/batch-test/nested-programmatic/{value}'

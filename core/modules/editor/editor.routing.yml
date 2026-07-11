@@ -4,3 +4,4 @@ editor.filter_xss:
     _controller: '\Drupal\editor\EditorController::filterXss'
   requirements:
     _entity_access: 'filter_format.use'
+    _csrf_token: 'FALSE'

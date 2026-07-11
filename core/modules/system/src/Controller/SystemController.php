@@ -58,7 +58,7 @@ class SystemController extends ControllerBase {
   #[Route(
     path: '/admin/config',
     name: 'system.admin_config',
-    requirements: ['_permission' => 'access administration pages'],
+    requirements: ['_permission' => 'access administration pages', '_csrf_token' => 'FALSE'],
     defaults: [
       'link_id' => 'system.admin_config',
       '_title' => new TranslatableMarkup('Configuration'),
@@ -131,7 +131,7 @@ class SystemController extends ControllerBase {
   #[Route(
     path: '/admin/compact/{mode}',
     name: 'system.admin_compact_page',
-    requirements: ['_permission' => 'access administration pages'],
+    requirements: ['_permission' => 'access administration pages', '_csrf_token' => 'FALSE'],
     defaults: ['mode' => 'off'],
   )]
   public function compactPage($mode) {
@@ -151,79 +151,79 @@ class SystemController extends ControllerBase {
   #[Route(
     path: '/admin',
     name: 'system.admin',
-    requirements: ['_permission' => 'access administration pages'],
+    requirements: ['_permission' => 'access administration pages', '_csrf_token' => 'FALSE'],
     defaults: ['_title' => new TranslatableMarkup('Administration')],
   )]
   #[Route(
     path: '/admin/structure',
     name: 'system.admin_structure',
-    requirements: ['_permission' => 'access administration pages'],
+    requirements: ['_permission' => 'access administration pages', '_csrf_token' => 'FALSE'],
     defaults: ['_title' => new TranslatableMarkup('Structure')],
   )]
   #[Route(
     path: '/admin/reports',
     name: 'system.admin_reports',
-    requirements: ['_permission' => 'access site reports'],
+    requirements: ['_permission' => 'access site reports', '_csrf_token' => 'FALSE'],
     defaults: ['_title' => new TranslatableMarkup('Reports')],
   )]
   #[Route(
     path: '/admin/config/media',
     name: 'system.admin_config_media',
-    requirements: ['_permission' => 'access administration pages'],
+    requirements: ['_permission' => 'access administration pages', '_csrf_token' => 'FALSE'],
     defaults: ['_title' => new TranslatableMarkup('Media')],
   )]
   #[Route(
     path: '/admin/config/services',
     name: 'system.admin_config_services',
-    requirements: ['_permission' => 'access administration pages'],
+    requirements: ['_permission' => 'access administration pages', '_csrf_token' => 'FALSE'],
     defaults: ['_title' => new TranslatableMarkup('Web services')],
   )]
   #[Route(
     path: '/admin/config/development',
     name: 'system.admin_config_development',
-    requirements: ['_permission' => 'access administration pages'],
+    requirements: ['_permission' => 'access administration pages', '_csrf_token' => 'FALSE'],
     defaults: ['_title' => new TranslatableMarkup('Development')],
   )]
   #[Route(
     path: '/admin/config/regional',
     name: 'system.admin_config_regional',
-    requirements: ['_permission' => 'access administration pages'],
+    requirements: ['_permission' => 'access administration pages', '_csrf_token' => 'FALSE'],
     defaults: ['_title' => new TranslatableMarkup('Region and language')],
   )]
   #[Route(
     path: '/admin/config/search',
     name: 'system.admin_config_search',
-    requirements: ['_permission' => 'access administration pages'],
+    requirements: ['_permission' => 'access administration pages', '_csrf_token' => 'FALSE'],
     defaults: ['_title' => new TranslatableMarkup('Search and metadata')],
   )]
   #[Route(
     path: '/admin/config/system',
     name: 'system.admin_config_system',
-    requirements: ['_permission' => 'access administration pages'],
+    requirements: ['_permission' => 'access administration pages', '_csrf_token' => 'FALSE'],
     defaults: ['_title' => new TranslatableMarkup('System')],
   )]
   #[Route(
     path: '/admin/config/user-interface',
     name: 'system.admin_config_ui',
-    requirements: ['_permission' => 'access administration pages'],
+    requirements: ['_permission' => 'access administration pages', '_csrf_token' => 'FALSE'],
     defaults: ['_title' => new TranslatableMarkup('User interface')],
   )]
   #[Route(
     path: '/admin/config/workflow',
     name: 'system.admin_config_workflow',
-    requirements: ['_permission' => 'access administration pages'],
+    requirements: ['_permission' => 'access administration pages', '_csrf_token' => 'FALSE'],
     defaults: ['_title' => new TranslatableMarkup('Workflow')],
   )]
   #[Route(
     path: '/admin/config/content',
     name: 'system.admin_config_content',
-    requirements: ['_permission' => 'access administration pages'],
+    requirements: ['_permission' => 'access administration pages', '_csrf_token' => 'FALSE'],
     defaults: ['_title' => new TranslatableMarkup('Content authoring')],
   )]
   #[Route(
     path: '/admin/content',
     name: 'system.admin_content',
-    requirements: ['_permission' => 'access administration pages'],
+    requirements: ['_permission' => 'access administration pages', '_csrf_token' => 'FALSE'],
     defaults: ['_title' => new TranslatableMarkup('Content')],
   )]
   public function systemAdminMenuBlockPage() {
@@ -241,7 +241,7 @@ class SystemController extends ControllerBase {
   #[Route(
     path: '/admin/appearance',
     name: 'system.themes_page',
-    requirements: ['_permission' => 'administer themes'],
+    requirements: ['_permission' => 'administer themes', '_csrf_token' => 'FALSE'],
     defaults: ['_title' => new TranslatableMarkup('Appearance')],
   )]
   public function themesPage() {

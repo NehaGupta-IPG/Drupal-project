@@ -40,11 +40,14 @@ router_test.7:
     _controller: '\Drupal\router_test\TestControllers::test7'
   requirements:
     _permission: 'access test7'
+    _csrf_token: 'FALSE'
 
 router_test.8:
   path: '/router_test/test8'
   defaults:
     _controller: '\Drupal\router_test\TestControllers::test8'
+  requirements:
+    _csrf_token: 'FALSE'
 
 router_test.10:
   path: '/router_test/test10'
@@ -61,6 +64,7 @@ router_test.11:
     _auth: [ 'basic_auth' ]
   requirements:
     _user_is_logged_in: 'TRUE'
+    _csrf_token: 'FALSE'
   defaults:
     _controller: '\Drupal\router_test\TestContent::test11'
 
@@ -91,6 +95,7 @@ router_test.15:
     _controller: '\Drupal\router_test\TestControllers::test1'
   requirements:
     _access: 'FALSE'
+    _csrf_token: 'FALSE'
 
 router_test.16:
   path: '/router_test/test16'
@@ -98,6 +103,7 @@ router_test.16:
     _controller: '\Drupal\router_test\TestControllers::test1'
   requirements:
     _permission: 'administer users'
+    _csrf_token: 'FALSE'
 
 router_test.17:
   path: '/router_test/test17'
@@ -119,6 +125,7 @@ router_test.19:
     _controller: '\Drupal\router_test\TestControllers::test18'
   requirements:
     _role: 'anonymous'
+    _csrf_token: 'FALSE'
 
 router_test.20:
   path: '/router_test/test20'
@@ -126,6 +133,7 @@ router_test.20:
     _controller: '\Drupal\router_test\TestControllers::test1'
   requirements:
     _role: 'anonymous'
+    _csrf_token: 'FALSE'
 
 router_test.21:
   path: '/router_test/test21'
@@ -140,6 +148,7 @@ router_test.22:
     _controller: '\Drupal\router_test\TestControllers::test21'
   requirements:
     _role: 'anonymous'
+    _csrf_token: 'FALSE'
 
 router_test.23:
   path: '/router_test/test23'

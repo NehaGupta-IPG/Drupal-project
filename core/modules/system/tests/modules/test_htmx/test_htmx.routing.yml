@@ -5,6 +5,7 @@ test_htmx.attachments.page:
     _controller: '\Drupal\test_htmx\Controller\HtmxTestAttachmentsController::page'
   requirements:
     _permission: 'access content'
+    _csrf_token: 'FALSE'
 
 test_htmx.attachments.before:
   path: '/htmx-test-attachments/before'
@@ -13,6 +14,7 @@ test_htmx.attachments.before:
     _controller: '\Drupal\test_htmx\Controller\HtmxTestAttachmentsController::before'
   requirements:
     _permission: 'access content'
+    _csrf_token: 'FALSE'
 
 test_htmx.attachments.after:
   path: '/htmx-test-attachments/after'
@@ -21,6 +23,7 @@ test_htmx.attachments.after:
     _controller: '\Drupal\test_htmx\Controller\HtmxTestAttachmentsController::after'
   requirements:
     _permission: 'access content'
+    _csrf_token: 'FALSE'
 
 test_htmx.attachments.wrapper:
   path: '/htmx-test-attachments/wrapper'
@@ -29,6 +32,7 @@ test_htmx.attachments.wrapper:
     _controller: '\Drupal\test_htmx\Controller\HtmxTestAttachmentsController::withWrapperFormat'
   requirements:
     _permission: 'access content'
+    _csrf_token: 'FALSE'
 
 test_htmx.attachments.body:
   path: '/htmx-test-attachments/body'
@@ -45,6 +49,7 @@ test_htmx.attachments.replace:
     _controller: '\Drupal\test_htmx\Controller\HtmxTestAttachmentsController::replace'
   requirements:
     _permission: 'access content'
+    _csrf_token: 'FALSE'
 
 test_htmx.attachments.route_option:
   path: '/htmx-test-attachments/route-option'
@@ -53,6 +58,7 @@ test_htmx.attachments.route_option:
     _controller: '\Drupal\test_htmx\Controller\HtmxTestAttachmentsController::replace'
   requirements:
     _permission: 'access content'
+    _csrf_token: 'FALSE'
   options:
     _htmx_route: TRUE
 

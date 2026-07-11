@@ -5,6 +5,7 @@ layout_builder.choose_section:
     _title: 'Choose a layout for this section'
   requirements:
     _layout_builder_access: 'view'
+    _csrf_token: 'FALSE'
   options:
     _admin_route: TRUE
     parameters:
@@ -17,6 +18,7 @@ layout_builder.add_section:
     _controller: '\Drupal\layout_builder\Controller\AddSectionController::build'
   requirements:
     _layout_builder_access: 'view'
+    _csrf_token: 'FALSE'
   options:
     _admin_route: TRUE
     parameters:
@@ -58,6 +60,7 @@ layout_builder.choose_block:
     _title: 'Choose a block'
   requirements:
     _layout_builder_access: 'view'
+    _csrf_token: 'FALSE'
   options:
     _admin_route: TRUE
     parameters:
@@ -84,6 +87,7 @@ layout_builder.choose_inline_block:
     _title: 'Add a new content block'
   requirements:
     _layout_builder_access: 'add_block'
+    _csrf_token: 'FALSE'
   options:
     _admin_route: TRUE
     parameters:
@@ -140,6 +144,7 @@ layout_builder.move_block:
     preceding_block_uuid: null
   requirements:
     _layout_builder_access: 'view'
+    _csrf_token: 'FALSE'
   options:
     _admin_route: TRUE
     parameters:

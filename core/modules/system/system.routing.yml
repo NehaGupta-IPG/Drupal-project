@@ -6,6 +6,7 @@ system.cron:
     no_cache: TRUE
   requirements:
     _access_system_cron: 'TRUE'
+    _csrf_token: 'FALSE'
 
 system.cron_settings:
   path: '/admin/config/system/cron'
@@ -211,6 +212,8 @@ system.theme_settings_theme:
 
 '<current>':
   path: '<current>'
+  requirements:
+    _csrf_token: 'FALSE'
 
 system.modules_uninstall:
   path: '/admin/modules/uninstall'
@@ -268,6 +271,7 @@ system.batch_page.json:
   requirements:
     _access: 'TRUE'
     _format: 'json'
+    _csrf_token: 'FALSE'
   options:
     _admin_route: TRUE
 
@@ -279,6 +283,7 @@ system.db_update:
     op: 'info'
   requirements:
     _access_system_update: 'TRUE'
+    _csrf_token: 'FALSE'
   options:
     default_url_options:
       path_processing: FALSE
@@ -305,6 +310,7 @@ system.linkset_settings:
     _form: 'Drupal\system\Form\MenuLinksetSettingsForm'
   requirements:
     _permission: 'administer site configuration'
+    _csrf_token: 'FALSE'
 
 route_callbacks:
   - '\Drupal\system\Routing\AssetRoutes::routes'

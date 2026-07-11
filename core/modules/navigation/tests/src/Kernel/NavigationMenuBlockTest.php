@@ -103,7 +103,7 @@ class NavigationMenuBlockTest extends KernelTestBase {
     $routes->add('example16', new Route('/example16', [], $requirements, $options));
     $routes->add('example17', new Route('/example17', [], $requirements, $options));
     $routes->add('example18', new Route('/example18', [], $requirements, $options));
-    $routes->add('example19', new Route('/example19', [], ['_access' => 'FALSE'], $options));
+    $routes->add('example19', new Route('/example19', [], ['_access' => 'FALSE', '_csrf_token' => 'FALSE'], $options));
 
     // Mock special routes defined in system.routing.yml.
     $routes->add('<nolink>', new Route('', [], $requirements, $special_options));

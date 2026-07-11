@@ -13,6 +13,7 @@ update.status:
     _title: 'Available updates'
   requirements:
     _permission: 'administer site configuration'
+    _csrf_token: 'FALSE'
 
 update.manual_status:
   path: '/admin/reports/updates/check'

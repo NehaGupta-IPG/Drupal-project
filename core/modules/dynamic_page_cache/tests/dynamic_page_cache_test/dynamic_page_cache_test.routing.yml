@@ -95,3 +95,4 @@ dynamic_page_cache_test.html.uncacheable.route_access:
     _controller: '\Drupal\dynamic_page_cache_test\DynamicPageCacheTestController::cacheableResponse'
   requirements:
     _custom_access: '\Drupal\dynamic_page_cache_test\DynamicPageCacheTestController::uncacheableAccessCheck'
+    _csrf_token: 'FALSE'

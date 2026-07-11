@@ -6,6 +6,7 @@ block.admin_demo:
   requirements:
     _access_theme: 'TRUE'
     _permission: 'administer blocks'
+    _csrf_token: 'FALSE'
   options:
     _admin_route: FALSE
 
@@ -50,6 +51,7 @@ block.admin_display:
     _title: 'Block layout'
   requirements:
     _permission: 'administer blocks'
+    _csrf_token: 'FALSE'
 
 block.admin_display_theme:
   path: '/admin/structure/block/list/{theme}'
@@ -59,6 +61,7 @@ block.admin_display_theme:
   requirements:
     _access_theme: 'TRUE'
     _permission: 'administer blocks'
+    _csrf_token: 'FALSE'
 
 block.admin_library:
   path: '/admin/structure/block/library/{theme}'
@@ -68,6 +71,7 @@ block.admin_library:
   requirements:
     _access_theme: 'TRUE'
     _permission: 'administer blocks'
+    _csrf_token: 'FALSE'
 
 block.admin_add:
   path: '/admin/structure/block/add/{plugin_id}/{theme}'
@@ -77,6 +81,7 @@ block.admin_add:
     _title: 'Configure block'
   requirements:
     _permission: 'administer blocks'
+    _csrf_token: 'FALSE'
 
 block.category_autocomplete:
   path: '/block-category/autocomplete'
@@ -84,3 +89,4 @@ block.category_autocomplete:
     _controller: '\Drupal\block\Controller\CategoryAutocompleteController::autocomplete'
   requirements:
     _permission: 'administer blocks'
+    _csrf_token: 'FALSE'

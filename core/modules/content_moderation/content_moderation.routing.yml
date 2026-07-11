@@ -6,6 +6,7 @@ content_moderation.admin_moderated_content:
   requirements:
     _module_dependencies: 'node'
     _permission: 'view any unpublished content'
+    _csrf_token: 'FALSE'
 
 content_moderation.workflow_type_edit_form:
   path: '/admin/config/workflow/workflows/manage/{workflow}/type/{entity_type_id}'

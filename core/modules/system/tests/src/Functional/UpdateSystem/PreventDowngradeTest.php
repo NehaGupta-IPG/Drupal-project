@@ -30,6 +30,7 @@ class PreventDowngradeTest extends UpdatePathTestBase {
    */
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/drupal-11.3.0.filled.standard.php.gz';
+    $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/csrf-db-update-route.php';
   }
 
   /**

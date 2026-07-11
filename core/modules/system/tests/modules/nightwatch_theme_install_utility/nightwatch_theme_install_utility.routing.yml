@@ -4,6 +4,7 @@ nightwatch_utility.theme_install_default:
     _controller: '\Drupal\nightwatch_theme_install_utility\Controller\ThemeInstallController::installDefault'
   requirements:
     _permission: 'administer themes'
+    _csrf_token: 'FALSE'
 
 nightwatch_utility.theme_install_admin:
   path: '/admin/theme/install_admin/{theme}'
@@ -11,3 +12,4 @@ nightwatch_utility.theme_install_admin:
     _controller: '\Drupal\nightwatch_theme_install_utility\Controller\ThemeInstallController::installAdmin'
   requirements:
     _permission: 'administer themes'
+    _csrf_token: 'FALSE'

@@ -87,7 +87,10 @@ class RouteSubscriber extends RouteSubscriberBase {
             '_controller' => '\Drupal\field_ui\Controller\FieldConfigListController::listing',
             '_title' => 'Manage fields',
           ] + $defaults,
-          ['_permission' => 'administer ' . $entity_type_id . ' fields'],
+          [
+            '_permission' => 'administer ' . $entity_type_id . ' fields',
+            '_csrf_token' => 'FALSE',
+          ],
           $options
         );
         $collection->add("entity.{$entity_type_id}.field_ui_fields", $route);
@@ -112,7 +115,10 @@ class RouteSubscriber extends RouteSubscriberBase {
             '_controller' => FieldStorageAddController::class . '::getFieldSelectionLinks',
             '_title' => 'Add field',
           ] + $defaults,
-          ['_permission' => 'administer ' . $entity_type_id . ' fields'],
+          [
+            '_permission' => 'administer ' . $entity_type_id . ' fields',
+            '_csrf_token' => 'FALSE',
+          ],
           $options
         );
         $collection->add("field_ui.field_storage_config_add_$entity_type_id", $route);
@@ -134,7 +140,10 @@ class RouteSubscriber extends RouteSubscriberBase {
             '_controller' => FieldConfigAddController::class . '::fieldConfigAddConfigureForm',
             '_title' => 'Add field',
           ] + $defaults,
-          ['_permission' => 'administer ' . $entity_type_id . ' fields'],
+          [
+            '_permission' => 'administer ' . $entity_type_id . ' fields',
+            '_csrf_token' => 'FALSE',
+          ],
           $options
         );
         $collection->add("field_ui.field_add_$entity_type_id", $route);
@@ -180,7 +189,10 @@ class RouteSubscriber extends RouteSubscriberBase {
             '_controller' => '\Drupal\field_ui\Controller\EntityViewDisplayOverviewController::overview',
             '_title' => 'Manage display',
           ] + $defaults,
-          ['_field_ui_view_mode_access' => 'administer ' . $entity_type_id . ' display'],
+          [
+            '_field_ui_view_mode_access' => 'administer ' . $entity_type_id . ' display',
+            '_csrf_token' => 'FALSE',
+          ],
           $options
         );
         $collection->add("entity.entity_view_display_overview.{$entity_type_id}", $route);

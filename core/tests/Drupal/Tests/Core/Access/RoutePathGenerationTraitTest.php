@@ -73,9 +73,9 @@ class RoutePathGenerationTraitTest extends UnitTestCase {
       ->method('getPath')
       ->willReturn('test/example/{param}');
     $route->expects($this->atLeastOnce())
-      ->method('hasRequirement')
+      ->method('getRequirement')
       ->with('_csrf_token')
-      ->willReturn(TRUE);
+      ->willReturn('TRUE');
 
     // Process the route so the "token" param is generated.
     $routeParams = $params;

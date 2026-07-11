@@ -23,7 +23,7 @@ class PerformanceController extends ControllerBase {
   #[Route(
     path: '/admin/config/development/performance',
     name: 'system.performance_settings',
-    requirements: ['_permission' => 'administer site configuration'],
+    requirements: ['_permission' => 'administer site configuration', '_csrf_token' => 'FALSE'],
     defaults: ['_title' => new TranslatableMarkup('Performance')],
   )]
   public function build(): array {

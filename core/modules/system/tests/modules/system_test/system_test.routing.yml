@@ -139,6 +139,7 @@ system_test.permission_dependent_route_access:
     _controller: '\Drupal\system_test\Controller\SystemTestController::mainContentFallback'
   requirements:
     _permission: 'pet llamas'
+    _csrf_token: 'FALSE'
 
 system_test.respond_response:
   path: '/system-test/respond-response'
@@ -177,6 +178,7 @@ system_test.custom_4xx_with_limited_access:
     _controller: '\Drupal\system_test\Controller\SystemTestController::mainContentFallback'
   requirements:
     _role: 'administrator'
+    _csrf_token: 'FALSE'
 
 system_test.always_denied:
   path: '/system-test/always-denied'
@@ -185,6 +187,7 @@ system_test.always_denied:
     _controller: 'chop'
   requirements:
     _access: 'FALSE'
+    _csrf_token: 'FALSE'
 
 system_test.header:
   path: '/system-test/header'
