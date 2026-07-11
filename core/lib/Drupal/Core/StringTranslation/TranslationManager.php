@@ -43,11 +43,6 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
    */
   protected $defaultLangcode;
 
-  /**
-   * The plural index service.
-   */
-  protected PluralIndexInterface $pluralIndex;
-
   public function __construct(LanguageDefault $default_language) {
     $this->defaultLangcode = $default_language->get()->getId();
   }

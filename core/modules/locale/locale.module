@@ -16,7 +16,6 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Component\Utility\Crypt;
 use Drupal\locale\CurrentImport;
-use Drupal\Core\StringTranslation\PluralIndexInterface;
 use Drupal\locale\LocaleDefaultOptions;
 use Drupal\locale\LocaleEvent;
 use Drupal\locale\LocaleEvents;
@@ -168,13 +167,13 @@ function locale_translatable_language_list() {
  *   plural formula.
  *
  * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
- *   \Drupal::service(PluralIndexInterface::class)->get() instead.
+ *   \Drupal::service('string_translation')->getPluralIndex() instead.
  *
  * @see https://www.drupal.org/node/3590542
  */
 function locale_get_plural($count, $langcode = NULL) {
-  @trigger_error(__FUNCTION__ . 'is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal::service(PluralIndexInterface::class)->get() instead. See https://www.drupal.org/node/3590542', E_USER_DEPRECATED);
-  return \Drupal::service(PluralIndexInterface::class)->get($count, $langcode);
+  @trigger_error(__FUNCTION__ . 'is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal::service(\'string_translation\')->getPluralIndex() instead. See https://www.drupal.org/node/3590542', E_USER_DEPRECATED);
+  return \Drupal::service('string_translation')->getPluralIndex($count, $langcode);
 }
 
 /**
