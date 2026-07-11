@@ -51,7 +51,13 @@ class PluralTranslatableMarkupTest extends UnitTestCase {
    * Tests when the plural translation is missing.
    */
   public function testMissingPluralTranslation(): void {
-    $markup = PluralTranslatableMarkup::createFromTranslatedString(2, 'There is no plural delimiter @count', plural_index: new FixedPluralIndex());
+    // Add a mock string translation service to the container.
+    $container = new ContainerBuilder();
+    $container->set('string_translation', $this->getStringTranslationStub());
+    $container->register(PluralIndexInterface::class, FixedPluralIndex::class);
+    \Drupal::setContainer($container);
+
+    $markup = PluralTranslatableMarkup::createFromTranslatedString(2, 'There is no plural delimiter @count');
     $this->assertEquals('There is no plural delimiter 2', $markup->render());
   }
 
