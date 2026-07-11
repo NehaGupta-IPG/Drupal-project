@@ -142,9 +142,12 @@ abstract class UnitTestCase extends TestCase {
     $translation
       ->method('formatPlural')
       ->willReturnCallback(function ($count, $singular, $plural, array $args = [], array $options = []) use ($translation): PluralTranslatableMarkup {
-        $wrapper = new PluralTranslatableMarkup($count, $singular, $plural, $args, $options, $translation, new FixedPluralIndex());
+        $wrapper = new PluralTranslatableMarkup($count, $singular, $plural, $args, $options, $translation);
         return $wrapper;
       });
+    $translation
+      ->method('getPluralIndex')
+      ->willReturn(new FixedPluralIndex());
     return $translation;
   }
 

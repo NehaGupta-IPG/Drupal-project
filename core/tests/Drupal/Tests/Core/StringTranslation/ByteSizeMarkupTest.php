@@ -6,7 +6,6 @@ namespace Drupal\Tests\Core\StringTranslation;
 
 use Drupal\Component\Utility\Bytes;
 use Drupal\Core\StringTranslation\ByteSizeMarkup;
-use Drupal\Core\StringTranslation\FixedPluralIndex;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Tests\UnitTestCase;
@@ -28,7 +27,7 @@ class ByteSizeMarkupTest extends UnitTestCase {
    */
   #[DataProvider('providerTestCommonFormatSize')]
   public function testCommonFormatSize(string $expected, int|float $input): void {
-    $size = ByteSizeMarkup::create($input, NULL, $this->getStringTranslationStub(), new FixedPluralIndex());
+    $size = ByteSizeMarkup::create($input, NULL, $this->getStringTranslationStub());
     $this->assertInstanceOf(TranslatableMarkup::class, $size);
     $this->assertEquals($expected, $size);
   }

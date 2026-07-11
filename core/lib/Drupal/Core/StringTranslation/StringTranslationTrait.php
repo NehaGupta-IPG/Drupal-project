@@ -81,7 +81,7 @@ trait StringTranslationTrait {
    *   An object that, when cast to a string, returns the translated string.
    */
   protected function formatPlural($count, $singular, $plural, array $args = [], array $options = []) {
-    return $this->getStringTranslation()->formatPlural($count, $singular, $plural, $args, $options);
+    return new PluralTranslatableMarkup($count, $singular, $plural, $args, $options, $this->getStringTranslation());
   }
 
   /**
