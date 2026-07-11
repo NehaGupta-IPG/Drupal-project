@@ -18,7 +18,7 @@ class LocalePluralIndex implements PluralIndexInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPluralIndex(int $count, ?string $langcode = NULL): int {
+  public function get(int $count, ?string $langcode = NULL): int {
     $langcode = $langcode ?: $this->languageManager->getCurrentLanguage()->getId();
 
     // Retrieve and statically cache the plural formulas for all languages.

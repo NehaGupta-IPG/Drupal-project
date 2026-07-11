@@ -39,6 +39,6 @@ interface PluralIndexInterface {
    *   $count combination or -1 if the language was not found or does not have a
    *   plural formula.
    */
-  public function getPluralIndex(int $count, ?string $langcode = NULL): int;
+  public function get(int $count, ?string $langcode = NULL): int;
 
 }

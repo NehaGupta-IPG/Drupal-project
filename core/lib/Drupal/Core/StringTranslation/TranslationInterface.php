@@ -109,4 +109,12 @@ interface TranslationInterface {
    */
   public function formatPlural($count, $singular, $plural, array $args = [], array $options = []);
 
+  /**
+   * Gets the plural index service.
+   *
+   * @return \Drupal\Core\StringTranslation\PluralIndexInterface
+   *   The plural index service.
+   */
+  public function getPluralIndex(): PluralIndexInterface;
+
 }

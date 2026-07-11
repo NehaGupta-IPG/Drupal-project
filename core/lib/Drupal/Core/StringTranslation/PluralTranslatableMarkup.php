@@ -50,12 +50,10 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
    *   allowed keys.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   (optional) The string translation service.
-   * @param \Drupal\Core\StringTranslation\PluralIndexInterface|null $pluralIndex
-   *   The plural index service.
    *
    * @see \Drupal\Component\Render\FormattableMarkup::placeholderFormat()
    */
-  public function __construct($count, $singular, $plural, array $args = [], array $options = [], ?TranslationInterface $string_translation = NULL, protected ?PluralIndexInterface $pluralIndex = NULL) {
+  public function __construct($count, $singular, $plural, array $args = [], array $options = [], ?TranslationInterface $string_translation = NULL) {
     $this->count = $count;
     $translatable_string = implode(PoItem::DELIMITER, [$singular, $plural]);
     parent::__construct($translatable_string, $args, $options, $string_translation);
@@ -81,14 +79,12 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
    *   automatically for the plural cases.
    * @param array $options
    *   An associative array of additional options. See t() for allowed keys.
-   * @param \Drupal\Core\StringTranslation\PluralIndexInterface|null $plural_index
-   *   The plural index service.
    *
    * @return static
    *   A PluralTranslatableMarkup object.
    */
-  public static function createFromTranslatedString($count, $translated_string, array $args = [], array $options = [], ?PluralIndexInterface $plural_index = NULL) {
-    $plural = new static($count, '', '', $args, $options, NULL, $plural_index);
+  public static function createFromTranslatedString($count, $translated_string, array $args = [], array $options = []) {
+    $plural = new static($count, '', '', $args, $options, NULL);
     $plural->translatedString = $translated_string;
     return $plural;
   }
@@ -132,10 +128,7 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
    *   not have a plural formula.
    */
   protected function getPluralIndex(): int {
-    if (isset($this->pluralIndex)) {
-      return $this->pluralIndex->getPluralIndex($this->count, $this->getOption('langcode'));
-    }
-    return \Drupal::service(PluralIndexInterface::class)->getPluralIndex($this->count, $this->getOption('langcode'));
+    return $this->getStringTranslation()->getPluralIndex()->get($this->count, $this->getOption('langcode'));
   }
 
   /**

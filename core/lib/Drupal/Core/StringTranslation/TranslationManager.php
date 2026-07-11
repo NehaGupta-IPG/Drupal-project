@@ -150,7 +150,7 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
    * {@inheritdoc}
    */
   public function formatPlural($count, $singular, $plural, array $args = [], array $options = []) {
-    return new PluralTranslatableMarkup($count, $singular, $plural, $args, $options, $this, $this->pluralIndex);
+    return new PluralTranslatableMarkup($count, $singular, $plural, $args, $options, $this);
   }
 
   /**
@@ -173,6 +173,13 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
     foreach ($this->sortedTranslators as $translator) {
       $translator->reset();
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPluralIndex(): PluralIndexInterface {
+    return $this->pluralIndex;
   }
 
 }

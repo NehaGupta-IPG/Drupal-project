@@ -10,7 +10,7 @@ class FixedPluralIndex implements PluralIndexInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPluralIndex(int $count, ?string $langcode = NULL): int {
+  public function get(int $count, ?string $langcode = NULL): int {
     return -1;
   }
 

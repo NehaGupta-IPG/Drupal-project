@@ -137,7 +137,7 @@ class LocalePluralFormatTest extends BrowserTestBase {
     foreach ($plural_tests as $langcode => $tests) {
       foreach ($tests as $count => $expected_plural_index) {
         // Assert that the we get the right plural index.
-        $this->assertSame($expected_plural_index, \Drupal::service(PluralIndexInterface::class)->getPluralIndex($count, $langcode), 'Computed plural index for ' . $langcode . ' for count ' . $count . ' is ' . $expected_plural_index);
+        $this->assertSame($expected_plural_index, \Drupal::service(PluralIndexInterface::class)->get($count, $langcode), 'Computed plural index for ' . $langcode . ' for count ' . $count . ' is ' . $expected_plural_index);
         // Assert that the we get the right translation for that. Change the
         // expected index as per the logic for translation lookups.
         $expected_plural_index = ($count == 1) ? 0 : $expected_plural_index;
