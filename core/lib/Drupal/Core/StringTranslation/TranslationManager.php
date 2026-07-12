@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\StringTranslation;
 
+use Drupal\Component\Gettext\PoItem;
 use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\StringTranslation\Translator\TranslatorInterface;
 
@@ -104,7 +105,19 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
    * {@inheritdoc}
    */
   public function translateString(TranslatableMarkup $translated_string) {
-    return $this->doTranslate($translated_string->getUntranslatedString(), $translated_string->getOptions());
+    $string = $this->doTranslate($translated_string->getUntranslatedString(), $translated_string->getOptions());
+    if ($translated_string instanceof PluralTranslatableMarkup) {
+      $count = $translated_string->getCount();
+
+      $translated_array = explode(PoItem::DELIMITER, $translated_string);
+      if ($count == 1 || count($translated_array) == 1) {
+        // Singular form.
+        return $translated_array[0];
+      }
+      // Fallback to second plural form.
+      return $translated_array[1];
+    }
+    return $string;
   }
 
   /**
@@ -163,13 +176,6 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
     foreach ($this->sortedTranslators as $translator) {
       $translator->reset();
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getPluralIndex(int $count, ?string $langcode = NULL): int {
-    return -1;
   }
 
 }

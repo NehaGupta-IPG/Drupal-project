@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests;
 
 use Drupal\Component\FileCache\FileCacheFactory;
+use Drupal\Component\Gettext\PoItem;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Config\Config;
@@ -13,6 +14,7 @@ use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
+use Drupal\Core\StringTranslation\PreTranslatedPluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
@@ -136,7 +138,27 @@ abstract class UnitTestCase extends TestCase {
     $translation
       ->method('translateString')
       ->willReturnCallback(function (TranslatableMarkup $wrapper) {
-        return $wrapper->getUntranslatedString();
+        // Copy of logic in
+        // \Drupal\Core\StringTranslation\TranslationManager::translateString().
+        if ($wrapper instanceof PreTranslatedPluralTranslatableMarkup) {
+          $translated_string = $wrapper->translatedString;
+        }
+        else {
+          $translated_string = $wrapper->getUntranslatedString();
+        }
+        if ($wrapper instanceof PluralTranslatableMarkup) {
+          $count = $wrapper->getCount();
+
+          $translated_array = explode(PoItem::DELIMITER, $translated_string);
+          if ($count == 1 || count($translated_array) == 1) {
+            // Singular form.
+            return $translated_array[0];
+          }
+
+          // Fallback to second plural form.
+          return $translated_array[1];
+        }
+        return $translated_string;
       });
     $translation
       ->method('formatPlural')
@@ -144,9 +166,6 @@ abstract class UnitTestCase extends TestCase {
         $wrapper = new PluralTranslatableMarkup($count, $singular, $plural, $args, $options, $translation);
         return $wrapper;
       });
-    $translation
-      ->method('getPluralIndex')
-      ->willReturn(-1);
     return $translation;
   }
 

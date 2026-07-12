@@ -17,13 +17,6 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
   protected $count;
 
   /**
-   * The already translated string.
-   *
-   * @var string
-   */
-  protected $translatedString;
-
-  /**
    * Constructs a new PluralTranslatableMarkup object.
    *
    * Parses values passed into this class through the format_plural() function
@@ -84,51 +77,23 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
    *   A PluralTranslatableMarkup object.
    */
   public static function createFromTranslatedString($count, $translated_string, array $args = [], array $options = []) {
-    $plural = new static($count, '', '', $args, $options);
-    $plural->translatedString = $translated_string;
-    return $plural;
+    return new PreTranslatedPluralTranslatableMarkup($count, $translated_string, $args, $options);
   }
 
   /**
-   * Renders the object as a string.
-   *
-   * @return string
-   *   The translated string.
+   * Gets the item count.
    */
-  public function render() {
-    if (!$this->translatedString) {
-      $this->translatedString = $this->getStringTranslation()->translateString($this);
-    }
-    if ($this->translatedString === '') {
-      return '';
-    }
+  public function getCount(): int {
+    return $this->count;
+  }
 
-    $arguments = $this->getArguments();
+  /**
+   * {@inheritdoc}
+   */
+  public function getArguments(): array {
+    $arguments = parent::getArguments();
     $arguments['@count'] = $this->count;
-    $translated_array = explode(PoItem::DELIMITER, $this->translatedString);
-
-    $index = $this->getPluralIndex();
-    if ($this->count == 1 || $index == 0 || count($translated_array) == 1) {
-      // Singular form.
-      $return = $translated_array[0];
-    }
-    else {
-      // Nth plural form, fallback to second plural form.
-      $return = $translated_array[$index] ?? $translated_array[1];
-    }
-    return $this->placeholderFormat($return, $arguments);
-  }
-
-  /**
-   * Gets the plural index through the gettext formula.
-   *
-   * @return int
-   *   The numeric index of the plural variant to use for this language and
-   *   count combination. Defaults to -1 when the language was not found or does
-   *   not have a plural formula.
-   */
-  protected function getPluralIndex(): int {
-    return $this->getStringTranslation()->getPluralIndex($this->count, $this->getOption('langcode'));
+    return $arguments;
   }
 
   /**
