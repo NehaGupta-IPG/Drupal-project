@@ -18,7 +18,7 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 abstract class SqlDumper {
 
   /**
-   * Exports the pair SQL statement string + its placeholder to a string.
+   * Exports the SQL statement information to a string.
    *
    * This is used to make database exceptions more readable both on site pages
    * and in CLI (tests or dr). The method detects whether we are in a CLI or
@@ -30,6 +30,9 @@ abstract class SqlDumper {
    *   The placeholder values, keyed by placeholder name for a string
    *   containing named placeholders, 0-indexed for a string containing
    *   positional placeholders.
+   * @param array<string,mixed> $options
+   *   An associative array of options to control how the database operation is
+   *   run.
    * @param ?bool $color
    *   (optional) whether output should be colored. If not specified, it will
    *   be TRUE for CLI output, irrelevant for HTML output.
@@ -40,7 +43,13 @@ abstract class SqlDumper {
    * @return string
    *   The output for printing.
    */
-  public static function export(string $sqlString, array $placeholders, ?bool $color = NULL, ?bool $html = NULL): string {
+  public static function export(
+    string $sqlString,
+    array $placeholders,
+    array $options,
+    ?bool $color = NULL,
+    ?bool $html = NULL,
+  ): string {
 
     if (PHP_SAPI === 'cli') {
       $color ??= TRUE;
@@ -61,36 +70,16 @@ abstract class SqlDumper {
     $formattedSql = (new SqlFormatter($highlighter))->format($sqlString);
 
     // Format the placeholders.
-    if (!empty($placeholders)) {
-      $cloner = new VarCloner();
-      $dumper = $html ? new HtmlDumper() : new CliDumper();
-      if ($html) {
-        $dumper->setTheme('light');
-      }
-      else {
-        $dumper->setColors($color);
-      }
-      $dump = [];
-      $dumper->dump(
-        $cloner->cloneVar($placeholders),
-        function (string $line, int $depth, string $indent_pad) use (&$dump): void {
-          // A negative depth means "end of dump".
-          if ($depth >= 0) {
-            // Adds a two spaces indentation to the line.
-            $dump[] = str_repeat($indent_pad, $depth) . $line;
-          }
-        }
-      );
-      $formattedArgs = $html ? implode("", $dump) : implode("\n", $dump);
-    }
-    else {
-      $formattedArgs = NULL;
-    }
+    $formattedArgs = !empty($placeholders) ? static::dumpVariable($placeholders, $color, $html) : NULL;
+
+    // Format the options.
+    $formattedOptions = !empty($options) ? static::dumpVariable($options, $color, $html) : NULL;
 
     return static::output(
       $formattedSql,
       $formattedArgs,
-      $html ? "<hr>" : "----------------------------------------",
+      $formattedOptions,
+      $html ? "<hr>" : "------------------------------------------------------------",
       $html ? "" : "\n",
       !$html && $color,
     );
@@ -103,6 +92,8 @@ abstract class SqlDumper {
    *   The processed SQL statement dump string.
    * @param ?string $placeholderDump
    *   The processed placeholders values dump string. NULL for no placeholders.
+   * @param ?string $optionDump
+   *   The processed options values dump string. NULL for no options.
    * @param string $delimiter
    *   A string to be used for vertical breaks.
    * @param string $newLine
@@ -113,7 +104,14 @@ abstract class SqlDumper {
    * @return string
    *   The output for printing.
    */
-  private static function output(string $sqlDump, ?string $placeholderDump, string $delimiter, string $newLine, bool $resetColor): string {
+  protected static function output(
+    string $sqlDump,
+    ?string $placeholderDump,
+    ?string $optionDump,
+    string $delimiter,
+    string $newLine,
+    bool $resetColor,
+  ): string {
     $output = static::stringOutput($delimiter . $newLine, $resetColor);
     $output .= static::stringOutput("SQL statement" . $newLine, $resetColor);
     $output .= static::stringOutput($delimiter . $newLine, $resetColor);
@@ -123,6 +121,12 @@ abstract class SqlDumper {
       $output .= static::stringOutput("Placeholders" . $newLine, $resetColor);
       $output .= static::stringOutput($delimiter . $newLine, $resetColor);
       $output .= static::stringOutput($placeholderDump . $newLine, $resetColor);
+    }
+    if ($optionDump !== NULL) {
+      $output .= static::stringOutput($delimiter . $newLine, $resetColor);
+      $output .= static::stringOutput("Options" . $newLine, $resetColor);
+      $output .= static::stringOutput($delimiter . $newLine, $resetColor);
+      $output .= static::stringOutput($optionDump . $newLine, $resetColor);
     }
     $output .= static::stringOutput($delimiter . $newLine, $resetColor);
 
@@ -149,6 +153,42 @@ abstract class SqlDumper {
       return implode("\n", $tmp);
     }
     return $string;
+  }
+
+  /**
+   * Dumps a variable using Symfony variable dumper library.
+   *
+   * @param mixed $variable
+   *   The variable.
+   * @param bool $color
+   *   Whether output should be colored.
+   * @param bool $html
+   *   Whether output should be in HTML format.
+   *
+   * @return string
+   *   The output for printing.
+   */
+  private static function dumpVariable(mixed $variable, bool $color, bool $html): string {
+    $cloner = new VarCloner();
+    $dumper = $html ? new HtmlDumper() : new CliDumper();
+    if ($html) {
+      $dumper->setTheme('light');
+    }
+    else {
+      $dumper->setColors($color);
+    }
+    $dump = [];
+    $dumper->dump(
+      $cloner->cloneVar($variable),
+      function (string $line, int $depth, string $indent_pad) use (&$dump): void {
+        // A negative depth means "end of dump".
+        if ($depth >= 0) {
+          // Adds a two spaces indentation to the line.
+          $dump[] = str_repeat($indent_pad, $depth) . $line;
+        }
+      }
+    );
+    return $html ? implode("", $dump) : implode("\n", $dump);
   }
 
 }

@@ -3,6 +3,7 @@
 namespace Drupal\mysql\Driver\Database\mysql;
 
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Database\DatabaseExceptionInfo;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\ExceptionHandler as BaseExceptionHandler;
 use Drupal\Core\Database\Exception\SchemaPrimaryKeyMustBeDroppedException;
@@ -10,7 +11,6 @@ use Drupal\Core\Database\Exception\SchemaTableColumnSizeTooLargeException;
 use Drupal\Core\Database\Exception\SchemaTableKeyTooLargeException;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Database\StatementInterface;
-use Drupal\Core\Database\Utility\SqlDumper;
 
 /**
  * MySql database exception handler class.
@@ -24,7 +24,7 @@ class ExceptionHandler extends BaseExceptionHandler {
     if (!$exception instanceof \PDOException) {
       throw $exception;
     }
-    $this->rethrowNormalizedException($exception, $exception->getCode(), $exception->errorInfo[1] ?? NULL, $statement->getQueryString(), $arguments);
+    $this->rethrowNormalizedException($exception, $exception->getCode(), $exception->errorInfo[1] ?? NULL, $statement->getQueryString(), $arguments, $options);
   }
 
   /**
@@ -44,6 +44,9 @@ class ExceptionHandler extends BaseExceptionHandler {
    *   The SQL statement string.
    * @param array $arguments
    *   An array of arguments for the prepared statement.
+   * @param array $options
+   *   An associative array of options to control how the database operation is
+   *   run.
    *
    * @throws \Drupal\Core\Database\DatabaseExceptionWrapper
    * @throws \Drupal\Core\Database\IntegrityConstraintViolationException
@@ -57,6 +60,7 @@ class ExceptionHandler extends BaseExceptionHandler {
     ?int $errorCode,
     string $queryString,
     array $arguments,
+    array $options,
   ): void {
 
     // SQLState could be 'HY000' which cannot be used as a $code argument for
@@ -67,34 +71,36 @@ class ExceptionHandler extends BaseExceptionHandler {
     // @see https://www.php.net/manual/en/class.pdoexception.php
     $code = (int) $sqlState;
 
+    $info = new DatabaseExceptionInfo($queryString, $arguments, $options);
+
     // If a max_allowed_packet error occurs the message length is truncated.
     // This should prevent the error from recurring if the exception is logged
     // to the database using dblog or the like.
     if ($errorCode === 1153) {
       $message = Unicode::truncateBytes($exception->getMessage(), Connection::MIN_MAX_ALLOWED_PACKET);
-      throw new DatabaseExceptionWrapper($message, $code, $exception);
+      throw new DatabaseExceptionWrapper($message, $code, $exception, $info);
     }
 
-    $message = $exception->getMessage() . "\n" . SqlDumper::export($queryString, $arguments);
+    $message = $exception->getMessage();
 
     // SQLSTATE 23xxx errors indicate an integrity constraint violation. Also,
     // in case of attempted INSERT of a record with an undefined column and no
     // default value indicated in schema, MySql returns a 1364 error code.
     if (substr($sqlState, -6, -3) == '23' || $errorCode === 1364) {
-      throw new IntegrityConstraintViolationException($message, $code, $exception);
+      throw new IntegrityConstraintViolationException($message, $code, $exception, $info);
     }
 
     match ($sqlState) {
       'HY000' =>  match ($errorCode) {
-        4111 => throw new SchemaPrimaryKeyMustBeDroppedException($message, 0, $exception),
-        default => throw new DatabaseExceptionWrapper($message, 0, $exception),
+        4111 => throw new SchemaPrimaryKeyMustBeDroppedException($message, 0, $exception, $info),
+        default => throw new DatabaseExceptionWrapper($message, 0, $exception, $info),
       },
       '42000' =>  match ($errorCode) {
-        1071 => throw new SchemaTableKeyTooLargeException($message, $code, $exception),
-        1074 => throw new SchemaTableColumnSizeTooLargeException($message, $code, $exception),
-        default => throw new DatabaseExceptionWrapper($message, 0, $exception),
+        1071 => throw new SchemaTableKeyTooLargeException($message, $code, $exception, $info),
+        1074 => throw new SchemaTableColumnSizeTooLargeException($message, $code, $exception, $info),
+        default => throw new DatabaseExceptionWrapper($message, 0, $exception, $info),
       },
-      default => throw new DatabaseExceptionWrapper($message, 0, $exception),
+      default => throw new DatabaseExceptionWrapper($message, 0, $exception, $info),
     };
   }
 

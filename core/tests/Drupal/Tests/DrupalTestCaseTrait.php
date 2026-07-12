@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests;
 
+use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\Utility\SqlDumper;
 use Drupal\TestTools\ErrorHandler\BootstrapErrorHandler;
 use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
 use Drupal\TestTools\Extension\Dump\DebugDump;
@@ -77,6 +79,29 @@ trait DrupalTestCaseTrait {
     if (DeprecationHandler::isEnabled() && !get_error_handler() instanceof BootstrapErrorHandler) {
       throw new \RuntimeException(sprintf('%s registered its own error handler without restoring the previous one before or during tear down. This can cause unpredictable test results. Ensure the test cleans up after itself.', $this->name()));
     }
+  }
+
+  /**
+   * Implements PHPUnit hook to alter a throwable before reporting.
+   *
+   * Database exceptions carry the information of the executed input, that can
+   * be exported to a more readable dump.
+   *
+   * @param \Throwable $t
+   *   The throwable to be transformed.
+   *
+   * @return \Throwable
+   *   A transformed throwable.
+   */
+  protected function transformException(\Throwable $t): \Throwable {
+    if ($t instanceof DatabaseException) {
+      $exceptionClass = get_class($t);
+      if (property_exists($t, 'info')) {
+        $infoDump = SqlDumper::export($t->info->sqlString, $t->info->placeholders, $t->info->options);
+        $t = new $exceptionClass($t->getMessage() . "\n" . $infoDump, $t->getCode(), $t->getPrevious(), $t->info);
+      }
+    }
+    return $t;
   }
 
 }

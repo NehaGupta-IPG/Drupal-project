@@ -8,6 +8,6 @@ namespace Drupal\Core\Database;
  * This class will always wrap a client connection exception, for example
  * \PDOException or \mysqli_sql_exception.
  */
-class DatabaseExceptionWrapper extends \RuntimeException implements DatabaseException {
+class DatabaseExceptionWrapper extends DatabaseExceptionBase {
 
 }
