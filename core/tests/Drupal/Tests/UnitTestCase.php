@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests;
 
 use Drupal\Component\FileCache\FileCacheFactory;
-use Drupal\Component\Gettext\PoItem;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Config\Config;
@@ -13,9 +12,8 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
-use Drupal\Core\StringTranslation\PreTranslatedPluralTranslatableMarkup;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Language\LanguageDefault;
+use Drupal\Core\StringTranslation\TranslationManager;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -124,49 +122,16 @@ abstract class UnitTestCase extends TestCase {
   /**
    * Returns a stub translation manager that just returns the passed string.
    *
-   * @return \Drupal\Core\StringTranslation\TranslationInterface|\PHPUnit\Framework\MockObject\Stub
+   * @return \Drupal\Core\StringTranslation\TranslationManager
    *   A stub translation object.
    */
   public function getStringTranslationStub() {
-    $translation = $this->createStub('Drupal\Core\StringTranslation\TranslationInterface');
-    $translation
-      ->method('translate')
-      ->willReturnCallback(function ($string, array $args = [], array $options = []) use ($translation): TranslatableMarkup {
-        // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
-        return new TranslatableMarkup($string, $args, $options, $translation);
-      });
-    $translation
-      ->method('translateString')
-      ->willReturnCallback(function (TranslatableMarkup $wrapper) {
-        // Copy of logic in
-        // \Drupal\Core\StringTranslation\TranslationManager::translateString().
-        if ($wrapper instanceof PreTranslatedPluralTranslatableMarkup) {
-          $translated_string = $wrapper->translatedString;
-        }
-        else {
-          $translated_string = $wrapper->getUntranslatedString();
-        }
-        if ($wrapper instanceof PluralTranslatableMarkup) {
-          $count = $wrapper->getCount();
-
-          $translated_array = explode(PoItem::DELIMITER, $translated_string);
-          if ($count == 1 || count($translated_array) == 1) {
-            // Singular form.
-            return $translated_array[0];
-          }
-
-          // Fallback to second plural form.
-          return $translated_array[1];
-        }
-        return $translated_string;
-      });
-    $translation
-      ->method('formatPlural')
-      ->willReturnCallback(function ($count, $singular, $plural, array $args = [], array $options = []) use ($translation): PluralTranslatableMarkup {
-        $wrapper = new PluralTranslatableMarkup($count, $singular, $plural, $args, $options, $translation);
-        return $wrapper;
-      });
-    return $translation;
+    // A TranslationManager without any translators added behaves as an
+    // identity translator: \Drupal\Core\StringTranslation\TranslationManager::doTranslate()
+    // falls back to the untranslated string whenever no translator supplies
+    // a translation, so this reuses the real plural/translation logic
+    // instead of duplicating it here.
+    return new TranslationManager(new LanguageDefault([]));
   }
 
   /**
