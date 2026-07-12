@@ -47,6 +47,19 @@ class TaxonomyViewsHooks {
         'id' => 'taxonomy_index_tid_depth',
       ],
     ];
+    $data['node_field_data']['term_node_tid_depth_join'] = [
+      'help' => t('Display content if it has the selected taxonomy terms, or children of the selected terms. Due to additional complexity, this has fewer options than the versions without depth.'),
+      'real field' => 'nid',
+      'argument' => [
+        'title' => t('Has taxonomy term ID with depth (using joins)'),
+        'id' => 'taxonomy_index_tid_depth_join',
+        'accept depth modifier' => TRUE,
+      ],
+      'filter' => [
+        'title' => t('Has taxonomy terms with depth (using joins)'),
+        'id' => 'taxonomy_index_tid_depth_join',
+      ],
+    ];
     $data['node_field_data']['term_node_tid_depth_modifier'] = [
       'title' => $this->t('Has taxonomy term ID depth modifier'),
       'help' => $this->t('Allows the "depth" for Taxonomy: Term ID (with depth) to be modified via an additional contextual filter value.'),
