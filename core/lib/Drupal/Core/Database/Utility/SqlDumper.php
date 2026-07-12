@@ -62,7 +62,7 @@ abstract class SqlDumper {
 
     // In prod environments, keep using a minimal output.
     if (!class_exists(SqlFormatter::class) || !class_exists(VarCloner::class)) {
-      return $sqlString . "; " . print_r($placeholders, TRUE);
+      return ": " . $sqlString . "; " . print_r($placeholders, TRUE);
     }
 
     // Format the SQL statement string.

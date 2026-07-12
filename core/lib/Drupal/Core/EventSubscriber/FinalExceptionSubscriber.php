@@ -7,6 +7,9 @@ use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableResponse;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\Utility\SqlDumper;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Utility\Error;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -97,6 +100,12 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
       $error = $this->simplifyFileInError($error);
 
       unset($error['backtrace'], $error['exception'], $error['severity_level']);
+
+      // For DatabaseException, we dump the information if available.
+      if ($exception instanceof DatabaseException && property_exists($exception, 'info')) {
+        $dump = SqlDumper::export($exception->info->sqlString, $exception->info->placeholders, $exception->info->options);
+        $error['@message'] = Markup::create($error['@message'] . $dump);
+      }
 
       if (!$this->isErrorLevelVerbose()) {
         // Without verbose logging, use a simple message.

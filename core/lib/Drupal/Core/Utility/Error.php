@@ -7,8 +7,6 @@ use Drupal\Component\Utility\Xss;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseException;
-use Drupal\Core\Render\Markup;
-use Drupal\Core\Database\Utility\SqlDumper;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
@@ -57,10 +55,6 @@ class Error {
     if ($exception instanceof DatabaseException) {
       $driver_namespace = Database::getConnectionInfo()['default']['namespace'];
       $backtrace = Connection::removeDatabaseEntriesFromDebugBacktrace($backtrace, $driver_namespace);
-      if (property_exists($exception, 'info')) {
-        $message .= SqlDumper::export($exception->info->sqlString, $exception->info->placeholders, $exception->info->options);
-      }
-      $message = Markup::create($message);
     }
 
     $caller = static::getLastCaller($backtrace);
