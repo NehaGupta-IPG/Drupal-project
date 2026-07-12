@@ -48,15 +48,15 @@ class TaxonomyViewsHooks {
       ],
     ];
     $data['node_field_data']['term_node_tid_depth_join'] = [
-      'help' => t('Display content if it has the selected taxonomy terms, or children of the selected terms. Due to additional complexity, this has fewer options than the versions without depth.'),
+      'help' => $this->t('Display content if it has the selected taxonomy terms, or children of the selected terms. Due to additional complexity, this has fewer options than the versions without depth.'),
       'real field' => 'nid',
       'argument' => [
-        'title' => t('Has taxonomy term ID with depth (using joins)'),
+        'title' => $this->t('Has taxonomy term ID with depth (using joins)'),
         'id' => 'taxonomy_index_tid_depth_join',
         'accept depth modifier' => TRUE,
       ],
       'filter' => [
-        'title' => t('Has taxonomy terms with depth (using joins)'),
+        'title' => $this->t('Has taxonomy terms with depth (using joins)'),
         'id' => 'taxonomy_index_tid_depth_join',
       ],
     ];
