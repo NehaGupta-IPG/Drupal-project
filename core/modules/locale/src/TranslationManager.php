@@ -2,12 +2,8 @@
 
 namespace Drupal\locale;
 
-use Drupal\Component\Gettext\PoItem;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Language\LanguageDefault;
-use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
-use Drupal\Core\StringTranslation\PreTranslatedPluralTranslatableMarkup;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslationManager as CoreTranslationManager;
 
 /**
@@ -19,33 +15,6 @@ class TranslationManager extends CoreTranslationManager {
 
   public function __construct(LanguageDefault $default_language, protected PluralFormulaInterface $pluralFormula) {
     parent::__construct($default_language);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function translateString(TranslatableMarkup $translated_string) {
-    if ($translated_string instanceof PreTranslatedPluralTranslatableMarkup) {
-      $string = $translated_string->translatedString;
-    }
-    else {
-      $string = $this->doTranslate($translated_string->getUntranslatedString(), $translated_string->getOptions());
-    }
-    if ($translated_string instanceof PluralTranslatableMarkup) {
-      $count = $translated_string->getCount();
-
-      $translated_array = explode(PoItem::DELIMITER, $translated_string);
-      if ($count == 1 || count($translated_array) == 1) {
-        // Singular form.
-        return $translated_array[0];
-      }
-
-      $index = $this->getPluralIndex($translated_string->getCount(), $translated_string->getOptions()['langcode'] ?? NULL);
-
-      // Fallback to second plural form.
-      return $translated_array[$index] ?? $translated_array[1];
-    }
-    return $string;
   }
 
   /**

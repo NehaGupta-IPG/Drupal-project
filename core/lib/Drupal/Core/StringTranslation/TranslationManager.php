@@ -114,15 +114,39 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
     if ($translated_string instanceof PluralTranslatableMarkup) {
       $count = $translated_string->getCount();
 
-      $translated_array = explode(PoItem::DELIMITER, $translated_string);
+      $translated_array = explode(PoItem::DELIMITER, $string);
       if ($count == 1 || count($translated_array) == 1) {
         // Singular form.
         return $translated_array[0];
       }
+
+      $index = $this->getPluralIndex($count, $translated_string->getOptions()['langcode'] ?? NULL);
+
       // Fallback to second plural form.
-      return $translated_array[1];
+      return $translated_array[$index] ?? $translated_array[1];
     }
     return $string;
+  }
+
+  /**
+   * Returns plural form index for a specific number.
+   *
+   * The base implementation only distinguishes between singular and plural,
+   * so it always returns the second (index 1) plural form. Subclasses that
+   * know a language's full plural rules should override this method.
+   *
+   * @param int $count
+   *   Number to return plural for.
+   * @param string|null $langcode
+   *   Optional language code to translate to a language other than what is
+   *   used to display the page.
+   *
+   * @return int
+   *   The numeric index of the plural variant to use for this $langcode and
+   *   $count combination.
+   */
+  protected function getPluralIndex(int $count, ?string $langcode = NULL): int {
+    return 1;
   }
 
   /**
