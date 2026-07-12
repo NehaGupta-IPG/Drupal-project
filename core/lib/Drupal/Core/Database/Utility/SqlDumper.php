@@ -69,11 +69,20 @@ abstract class SqlDumper {
     $highlighter = $html ? new HtmlHighlighter() : ($color ? new CliHighlighter() : new NullHighlighter());
     $formattedSql = (new SqlFormatter($highlighter))->format($sqlString);
 
+    $cloner = new VarCloner();
+    $dumper = $html ? new HtmlDumper() : new CliDumper();
+    if ($html) {
+      $dumper->setTheme('light');
+    }
+    else {
+      $dumper->setColors($color);
+    }
+
     // Format the placeholders.
-    $formattedArgs = !empty($placeholders) ? static::dumpVariable($placeholders, $color, $html) : NULL;
+    $formattedArgs = !empty($placeholders) ? $dumper->dump($cloner->cloneVar($placeholders), TRUE) : NULL;
 
     // Format the options.
-    $formattedOptions = !empty($options) ? static::dumpVariable($options, $color, $html) : NULL;
+    $formattedOptions = !empty($options) ? $dumper->dump($cloner->cloneVar($options), TRUE) : NULL;
 
     return static::output(
       $formattedSql,
@@ -116,19 +125,19 @@ abstract class SqlDumper {
     $output .= static::stringOutput("SQL statement" . $newLine, $resetColor);
     $output .= static::stringOutput($delimiter . $newLine, $resetColor);
     $output .= static::stringOutput($sqlDump . $newLine, $resetColor);
+    $output .= static::stringOutput($delimiter . $newLine, $resetColor);
     if ($placeholderDump !== NULL) {
-      $output .= static::stringOutput($delimiter . $newLine, $resetColor);
       $output .= static::stringOutput("Placeholders" . $newLine, $resetColor);
       $output .= static::stringOutput($delimiter . $newLine, $resetColor);
       $output .= static::stringOutput($placeholderDump . $newLine, $resetColor);
+      $output .= static::stringOutput($delimiter . $newLine, $resetColor);
     }
     if ($optionDump !== NULL) {
-      $output .= static::stringOutput($delimiter . $newLine, $resetColor);
       $output .= static::stringOutput("Options" . $newLine, $resetColor);
       $output .= static::stringOutput($delimiter . $newLine, $resetColor);
       $output .= static::stringOutput($optionDump . $newLine, $resetColor);
+      $output .= static::stringOutput($delimiter . $newLine, $resetColor);
     }
-    $output .= static::stringOutput($delimiter . $newLine, $resetColor);
 
     return $output;
   }
@@ -153,42 +162,6 @@ abstract class SqlDumper {
       return implode("\n", $tmp);
     }
     return $string;
-  }
-
-  /**
-   * Dumps a variable using Symfony variable dumper library.
-   *
-   * @param mixed $variable
-   *   The variable.
-   * @param bool $color
-   *   Whether output should be colored.
-   * @param bool $html
-   *   Whether output should be in HTML format.
-   *
-   * @return string
-   *   The output for printing.
-   */
-  private static function dumpVariable(mixed $variable, bool $color, bool $html): string {
-    $cloner = new VarCloner();
-    $dumper = $html ? new HtmlDumper() : new CliDumper();
-    if ($html) {
-      $dumper->setTheme('light');
-    }
-    else {
-      $dumper->setColors($color);
-    }
-    $dump = [];
-    $dumper->dump(
-      $cloner->cloneVar($variable),
-      function (string $line, int $depth, string $indent_pad) use (&$dump): void {
-        // A negative depth means "end of dump".
-        if ($depth >= 0) {
-          // Adds a two spaces indentation to the line.
-          $dump[] = str_repeat($indent_pad, $depth) . $line;
-        }
-      }
-    );
-    return $html ? implode("", $dump) : implode("\n", $dump);
   }
 
 }

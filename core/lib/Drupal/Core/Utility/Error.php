@@ -6,8 +6,9 @@ use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Database\DatabaseExceptionWrapper;
+use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Database\Utility\SqlDumper;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
@@ -53,9 +54,12 @@ class Error {
 
     // For database exceptions, we try to return the initial caller,
     // skipping internal functions of the database layer.
-    if ($exception instanceof DatabaseExceptionWrapper) {
+    if ($exception instanceof DatabaseException) {
       $driver_namespace = Database::getConnectionInfo()['default']['namespace'];
       $backtrace = Connection::removeDatabaseEntriesFromDebugBacktrace($backtrace, $driver_namespace);
+      if (property_exists($exception, 'info')) {
+        $message .= SqlDumper::export($exception->info->sqlString, $exception->info->placeholders, $exception->info->options);
+      }
       $message = Markup::create($message);
     }
 
