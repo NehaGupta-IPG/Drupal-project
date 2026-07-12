@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Core\Command;
 
 use Composer\Autoload\ClassLoader;
+use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\Utility\SqlDumper;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Site\Settings;
 use Symfony\Component\Console\Application;
@@ -15,6 +17,7 @@ use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -159,6 +162,22 @@ class DrupalApplication extends Application {
     if ($container->hasParameter('console.command.ids')) {
       foreach ($container->getParameter('console.command.ids') as $id) {
         $this->addCommand($container->get($id));
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function doRenderThrowable(\Throwable $e, OutputInterface $output): void {
+    parent::doRenderThrowable($e, $output);
+
+    // Database exceptions may carry the information of the executed statement,
+    // that can be exported to a more readable dump.
+    if ($e instanceof DatabaseException) {
+      if (property_exists($e, 'info')) {
+        $infoDump = SqlDumper::export($e->info->sqlString, $e->info->placeholders, $e->info->options, $output->isDecorated());
+        $output->writeln($infoDump);
       }
     }
   }

@@ -84,8 +84,8 @@ trait DrupalTestCaseTrait {
   /**
    * Implements PHPUnit hook to alter a throwable before reporting.
    *
-   * Database exceptions carry the information of the executed input, that can
-   * be exported to a more readable dump.
+   * Database exceptions may carry the information of the executed statement,
+   * that can be exported to a more readable dump.
    *
    * @param \Throwable $t
    *   The throwable to be transformed.
