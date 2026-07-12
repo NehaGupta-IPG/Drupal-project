@@ -3,19 +3,19 @@
 namespace Drupal\help\Plugin\HelpSection;
 
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Environment\EnvironmentManagerInterface;
+use Drupal\Core\Environment\EnvironmentParameter;
+use Drupal\Core\Environment\LanguageSubstitution;
+use Drupal\Core\Environment\RenderContextSubstitution;
 use Drupal\help\Attribute\HelpSection;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\help\SearchableHelpInterface;
 use Drupal\help\HelpTopicPluginInterface;
 use Drupal\help\HelpTopicPluginManagerInterface;
-use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Render\RenderContext;
-use Drupal\Core\StringTranslation\TranslationManager;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Provides the help topics list section for the help page.
@@ -45,37 +45,13 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
    */
   protected $cacheableMetadata;
 
-  /**
-   * Constructs a HelpTopicSection object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\help\HelpTopicPluginManagerInterface $pluginManager
-   *   The help topic plugin manager service.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   * @param \Drupal\Core\Language\LanguageDefault $defaultLanguage
-   *   The default language object.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
-   *   The language manager.
-   * @param \Drupal\Core\StringTranslation\TranslationManager $translationManager
-   *   The translation manager. We are using a method that doesn't exist on an
-   *   interface, so require this class.
-   */
   public function __construct(
     array $configuration,
     $plugin_id,
     $plugin_definition,
     protected HelpTopicPluginManagerInterface $pluginManager,
     protected RendererInterface $renderer,
-    protected LanguageDefault $defaultLanguage,
-    protected LanguageManagerInterface $languageManager,
-    #[Autowire(service: 'string_translation')]
-    protected TranslationManager $translationManager,
+    protected readonly EnvironmentManagerInterface $environmentManager,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
@@ -165,15 +141,12 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
     // title and body come from translatable things in the Twig template, so we
     // need to set the default language to the desired language, render them,
     // then restore the default language so we do not affect other cron
-    // processes. Also, just in case there is an exception, wrap the whole
-    // thing in a try/finally block, and reset the language in the finally part.
-    $old_language = $this->defaultLanguage->get();
-    try {
-      if ($old_language->getId() !== $language->getId()) {
-        $this->defaultLanguage->set($language);
-        $this->translationManager->setDefaultLangcode($language->getId());
-        $this->languageManager->reset();
-      }
+    // processes.
+    $environmentParams = [
+      new EnvironmentParameter(RenderContextSubstitution::class),
+      new EnvironmentParameter(LanguageSubstitution::class, $language->getId()),
+    ];
+    return $this->environmentManager->executeInEnvironments($environmentParams, function () use ($plugin) {
       $topic = [];
 
       // Render the title in this language.
@@ -203,17 +176,9 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
       // Add the other information.
       $topic['url'] = $plugin->toUrl();
       $topic['cacheable_metadata'] = $cacheable_metadata;
-    }
-    finally {
-      // Restore the original language.
-      if ($old_language->getId() !== $language->getId()) {
-        $this->defaultLanguage->set($old_language);
-        $this->translationManager->setDefaultLangcode($old_language->getId());
-        $this->languageManager->reset();
-      }
-    }
 
-    return $topic;
+      return $topic;
+    });
   }
 
   /**

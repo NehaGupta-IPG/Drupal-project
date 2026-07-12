@@ -26,3 +26,6 @@ services:
     class: Drupal\language\LanguageConverter
     tags:
       - { name: paramconverter }
+  Drupal\language\Environment\MultilingualSubstitutionDecorator:
+    decorates: Drupal\Core\Environment\LanguageSubstitution
+    autowire: true

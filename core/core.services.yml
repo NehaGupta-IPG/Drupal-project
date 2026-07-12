@@ -2061,3 +2061,26 @@ services:
       - { name: needs_destruction }
   Drupal\Core\Extension\ThemeSettingsProvider:
     autowire: true
+  Drupal\Core\Environment\EnvironmentManager:
+    autowire: true
+  Drupal\Core\Environment\EnvironmentManagerInterface: '@Drupal\Core\Environment\EnvironmentManager'
+  Drupal\Core\Environment\ActiveThemeSubstitution:
+    autowire: true
+    public: false
+    tags:
+      - { name: environment_substitution }
+  Drupal\Core\Environment\CurrentUserSubstitution:
+    autowire: true
+    public: false
+    tags:
+      - { name: environment_substitution }
+  Drupal\Core\Environment\LanguageSubstitution:
+    autowire: true
+    public: false
+    tags:
+      - { name: environment_substitution }
+  Drupal\Core\Environment\RenderContextSubstitution:
+    autowire: true
+    public: false
+    tags:
+      - { name: environment_substitution }
