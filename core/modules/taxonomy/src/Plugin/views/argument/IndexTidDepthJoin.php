@@ -2,106 +2,60 @@
 
 namespace Drupal\taxonomy\Plugin\views\argument;
 
-use Drupal\views\Views;
+use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\taxonomy\TaxonomyIndexDepthJoinQueryTrait;
+use Drupal\taxonomy\TermStorageInterface;
+use Drupal\views\Attribute\ViewsArgument;
 
 /**
- * Argument handler for taxonomy terms with depth using joins.
+ * Argument handler for taxonomy terms with depth using a term list join.
  *
- * This handler can be more performant than the normal one due to the fact that
- * it uses joins instead of subqueries.
+ * This handler expands the term hierarchy in PHP using the term storage and
+ * joins the taxonomy index on the resulting flat list of term IDs. This can
+ * be more performant than the subquery used by the base handler on sites
+ * with a fast entity cache.
  *
  * @ingroup views_argument_handlers
- *
- * @ViewsArgument("taxonomy_index_tid_depth_join")
  */
+#[ViewsArgument(
+  id: 'taxonomy_index_tid_depth_join',
+)]
 class IndexTidDepthJoin extends IndexTidDepth {
+
+  use TaxonomyIndexDepthJoinQueryTrait;
+
+  /**
+   * The term storage.
+   */
+  protected TermStorageInterface $termStorage;
 
   /**
    * {@inheritdoc}
    */
-  public function query($group_by = FALSE) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityRepositoryInterface $entityRepository, EntityTypeManagerInterface $entity_type_manager) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $entityRepository);
+    $this->termStorage = $entity_type_manager->getStorage('taxonomy_term');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function query($group_by = FALSE): void {
     $this->ensureMyTable();
 
     if (!empty($this->options['break_phrase'])) {
       $break = static::breakString($this->argument);
       if ($break->value === [-1]) {
-        return FALSE;
+        return;
       }
-
-      $operator = (count($break->value) > 1) ? 'IN' : '=';
       $tids = $break->value;
     }
     else {
-      $operator = "=";
       $tids = $this->argument;
     }
 
-    // The tids variable can be an integer or an array of integers.
-    $tids = is_array($tids) ? $tids : [$tids];
-
-    if ($this->options['depth'] > 0) {
-      // When the depth is positive search the children.
-      foreach ($tids as $tid) {
-        // The term must be loaded to get vid for use in taxonomy_get_tree().
-        if ($term = $this->termStorage->load($tid)) {
-          // For every tid argument find all the children down to the depth set
-          // in the options and save the tids for the condition.
-          $tree = $this->termStorage->loadTree($term->bundle(), $term->id(), (int) $this->options['depth']);
-          $tids_from_tree = [];
-          foreach ($tree as $item) {
-            $tids_from_tree[] = $item->tid;
-          }
-          $tids = array_merge($tids, $tids_from_tree);
-        }
-      }
-    }
-    elseif ($this->options['depth'] < 0) {
-      // When the depth is negative search the parents.
-      foreach ($tids as $tid) {
-        // For every tid argument find all the parents up to the depth set
-        // in the options and add the tids into the array. Since there is
-        // no taxonomy function to get all parents with a depth limit it
-        // is done here building a multidimensional array.
-        if ($term = $this->termStorage->load($tid)) {
-          // A variable is needed to track the current depth level.
-          $n = 0;
-          // Initialize our depth based parents array with the leaf term.
-          $parents[$n--][] = $term;
-          while ($n >= $this->options['depth']) {
-            // At each depth find the parents of the current terms.
-            // It is important to note that it is possible for a term to have
-            // multiple parents so get the parents of every parent and so on.
-            $parents[$n] = [];
-            foreach ($parents[$n + 1] as $term) {
-              $parents[$n] += $this->termStorage->loadParents($term->id());
-            }
-            // Save all the tids for the condition.
-            $tids = array_merge($tids, array_map(function ($term) {
-              return $term->id();
-            }, $parents[$n]));
-            $n--;
-          }
-        }
-      }
-    }
-
-    // Join on taxonomy index table.
-    $configuration = [
-      'type' => 'INNER',
-      'table' => 'taxonomy_index',
-      'field' => 'nid',
-      'left_table' => $this->tableAlias,
-      'left_field' => $this->realField,
-      'operator' => $operator,
-      'extra' => [
-        0 => [
-          'field' => 'tid',
-          'value' => $tids,
-        ],
-      ],
-    ];
-    $join = Views::pluginManager('join')->createInstance('standard', $configuration);
-    $this->query->addRelationship('taxonomy_index', $join, 'node');
+    $this->addDepthJoinToQuery($tids);
   }
 
 }
