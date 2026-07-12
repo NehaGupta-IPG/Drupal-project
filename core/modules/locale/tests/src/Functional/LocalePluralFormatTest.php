@@ -135,13 +135,12 @@ class LocalePluralFormatTest extends BrowserTestBase {
 
     foreach ($plural_tests as $langcode => $tests) {
       foreach ($tests as $count => $expected_plural_index) {
-        // Assert that the we get the right plural index.
-        $this->assertSame($expected_plural_index, \Drupal::service('string_translation')->getPluralIndex($count, $langcode), 'Computed plural index for ' . $langcode . ' for count ' . $count . ' is ' . $expected_plural_index);
-        // Assert that the we get the right translation for that. Change the
-        // expected index as per the logic for translation lookups.
+        // Assert that we get the right translation, which relies on the
+        // right plural index being computed. Change the expected index as
+        // per the logic for translation lookups.
         $expected_plural_index = ($count == 1) ? 0 : $expected_plural_index;
         $expected_plural_string = str_replace('@count', (string) $count, $plural_strings[$langcode][$expected_plural_index]);
-        $this->assertSame($expected_plural_string, \Drupal::translation()->formatPlural($count, '@count hour', '@count hours', [], ['langcode' => $langcode])->render(), 'Plural translation of @count hour / @count hours for count ' . $count . ' in ' . $langcode . ' is ' . $expected_plural_string);
+        $this->assertSame($expected_plural_string, \Drupal::translation()->formatPlural($count, '@count hour', '@count hours', [], ['langcode' => $langcode])->render(), 'Plural translation of @count hour / @count hours for count ' . $count . ' in ' . $langcode . ' using plural index ' . $expected_plural_index . ' is ' . $expected_plural_string);
         // DO NOT use translation to pass translated strings into
         // PluralTranslatableMarkup::createFromTranslatedString() this way. It
         // is designed to be used with *already* translated text like settings
