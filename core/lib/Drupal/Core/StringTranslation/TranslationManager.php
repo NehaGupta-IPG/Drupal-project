@@ -105,7 +105,12 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
    * {@inheritdoc}
    */
   public function translateString(TranslatableMarkup $translated_string) {
-    $string = $this->doTranslate($translated_string->getUntranslatedString(), $translated_string->getOptions());
+    if ($translated_string instanceof PreTranslatedPluralTranslatableMarkup) {
+      $string = $translated_string->translatedString;
+    }
+    else {
+      $string = $this->doTranslate($translated_string->getUntranslatedString(), $translated_string->getOptions());
+    }
     if ($translated_string instanceof PluralTranslatableMarkup) {
       $count = $translated_string->getCount();
 
