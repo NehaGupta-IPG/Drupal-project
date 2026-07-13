@@ -42,7 +42,7 @@ class AutoCreateEntityBundleExistsConstraintValidator extends ConstraintValidato
     if (!is_string($value)) {
       throw new UnexpectedTypeException($value, 'string');
     }
-    // The host entity type which has an entity reference field with views 
+    // The host entity type which has an entity reference field with views
     // selection and auto creation.
     $entity_type_id = TypeResolver::resolveDynamicTypeName("[$constraint->entityTypeId]", $this->context->getObject());
     $field_name = TypeResolver::resolveDynamicTypeName("[$constraint->fieldName]", $this->context->getObject());
