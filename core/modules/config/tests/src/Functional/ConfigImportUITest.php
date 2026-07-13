@@ -97,7 +97,9 @@ class ConfigImportUITest extends BrowserTestBase {
     $core_extension['theme']['olivero'] = 0;
     $sync->write('core.extension', $core_extension);
     // Olivero ships with configuration.
-    $sync->write('olivero.settings', Yaml::decode(file_get_contents('core/themes/olivero/config/install/olivero.settings.yml')));
+    $sync->write('olivero.settings', [
+      'langcode' => $this->config('system.site')->get('default_config_langcode'),
+    ] + Yaml::decode(file_get_contents('core/themes/olivero/config/install/olivero.settings.yml')));
 
     // Use the install storage so that we can read configuration from modules
     // and themes that are not installed.
@@ -111,6 +113,10 @@ class ConfigImportUITest extends BrowserTestBase {
     // Read the automated_cron config from module default config folder.
     $settings = $install_storage->read('automated_cron.settings');
     $settings['interval'] = 10000;
+    $settings = [
+      'langcode' => $this->config('system.site')->get('default_config_langcode'),
+      'interval' => $settings['interval'],
+    ];
     $sync->write('automated_cron.settings', $settings);
 
     // Uninstall the Options and Text modules to ensure that dependencies are
@@ -192,6 +198,7 @@ class ConfigImportUITest extends BrowserTestBase {
     $system_theme = $this->config('system.theme')->get();
     $system_theme = [
       '_core' => $system_theme['_core'],
+      'langcode' => $this->config('system.site')->get('default_config_langcode'),
       'admin' => 'stark',
       'default' => 'stark',
     ];

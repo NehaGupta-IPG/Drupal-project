@@ -258,7 +258,7 @@ EOD;
 
     $this->drupalGet('admin/config/development/configuration/single/export/system.simple/system.image');
     // cspell:disable-next-line
-    $this->assertSession()->fieldValueEquals('export', "_core:\n  default_config_hash: durWHaKeBaq4d9Wpi4RqwADj1OufDepcnJuhVLmKN24\ntoolkit: gd\n");
+    $this->assertSession()->fieldValueEquals('export', "_core:\n  default_config_hash: durWHaKeBaq4d9Wpi4RqwADj1OufDepcnJuhVLmKN24\nlangcode: en\ntoolkit: gd\n");
 
     // Verify that the date format entity type is selected when specified in
     // the URL.
