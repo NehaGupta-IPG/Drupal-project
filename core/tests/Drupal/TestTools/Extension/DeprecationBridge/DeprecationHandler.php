@@ -76,9 +76,15 @@ final class DeprecationHandler implements Extension {
   private static ?array $currentTest = NULL;
 
   /**
-   * Remove.
+   * Load configuration and setup.
    *
-   * @todo remove.
+   * This needs to execute before PHPUnit's extension bootstrap phase, since
+   * there is the need to set early both the error handler and the debug class
+   * loader. This static method is called by the bootstrap.php code, that is
+   * executed first before the extensions bootstrap.
+   *
+   * @param \PHPUnit\TextUI\Configuration\Configuration $configuration
+   *   The PHPUnit configuration.
    */
   public static function preBootstrap(PhpUnitConfiguration $configuration): void {
     $config = Configuration::instance();
@@ -95,7 +101,7 @@ final class DeprecationHandler implements Extension {
     $config->load($parameters);
 
     // Get the overridden configuration provided via env variable.
-    $environmentVariable = getenv('DEPRECATION_HANDLER_CONFIG');
+    $environmentVariable = getenv('DRUPAL_DEPRECATION_FILTER_CONFIG');
     if ($environmentVariable !== FALSE) {
       $overrideConfig = (array) json_decode($environmentVariable);
       $config->load($overrideConfig);
@@ -109,7 +115,7 @@ final class DeprecationHandler implements Extension {
     // to Drupal\TestTools\ErrorHandler\BootstrapErrorHandler. This allows to
     // capture deprecations triggered by PHP or by the DebugClassLoader, that
     // can occur before tests' ::setUp() methods are called.
-    if ($config->projectIgnoresEnabled()) {
+    if ($config->projectIgnoresEnabled) {
       $config->loadDeprecationIgnorePatterns();
       // We pass an instance of the PHPUnit error handler to redirect any error
       // not managed by our layer back to PHPUnit.
@@ -118,7 +124,7 @@ final class DeprecationHandler implements Extension {
 
     // Enable the DebugClassLoader to get deprecations for methods' signature
     // changes.
-    if ($config->debugClassLoaderEnabled()) {
+    if ($config->debugClassLoaderEnabled) {
       DrupalDebugClassLoader::enable();
     }
   }
@@ -183,12 +189,48 @@ final class DeprecationHandler implements Extension {
   }
 
   /**
+   * Handles a deprecation error.
+   *
+   * This method is invoked by BootstrapErrorHandler.
+   *
+   * @param int $errorNumber
+   *   The level of the error raised.
+   * @param string $errorString
+   *   The error message.
+   * @param string $errorFile
+   *   The filename that the error was raised in.
+   * @param int $errorLine
+   *   The line number the error was raised at.
+   *
+   * @return bool
+   *   TRUE to stop error handling, FALSE to let the normal error handler
+   *   continue.
+   *
+   * @see \Drupal\TestTools\ErrorHandler\BootstrapErrorHandler
+   */
+  public static function handle(int $errorNumber, string $errorString, string $errorFile, int $errorLine): bool {
+    assert(Configuration::instance()->projectIgnoresEnabled, __METHOD__ . '() must not be called if the deprecation handler is not enabled.');
+
+    if (self::isIgnoredByProject(self::$currentTest['testId'] ?? NULL, $errorString)) {
+      if (self::$currentTest) {
+        self::$currentTest['ignored_by_project'][] = $errorString;
+      }
+      return TRUE;
+    }
+    if (self::$currentTest) {
+      self::$currentTest['relayed_to_phpunit'][] = $errorString;
+    }
+
+    return FALSE;
+  }
+
+  /**
    * Returns the legacy configuration provided via Symfony env variable.
    *
-   * For historical reasons, the configuration is stored in the
+   * For historical reasons, the configuration can be stored in the
    * SYMFONY_DEPRECATIONS_HELPER environment variable.
    *
-   * @return array|false
+   * @return array
    *   An array of configuration variables.
    */
   private static function legacySymfonyConfiguration(): array {
@@ -294,8 +336,11 @@ final class DeprecationHandler implements Extension {
    *   The test case being executed.
    * @param string $deprecationMessage
    *   The actual deprecation message triggered via trigger_error().
+   *
+   * @return bool
+   *   TRUE if the deprecation is ignored at project level.
    */
-  public static function isIgnoredByProject(?string $testMethod, string $deprecationMessage): bool {
+  private static function isIgnoredByProject(?string $testMethod, string $deprecationMessage): bool {
     if (!Configuration::projectIgnoresEnabled()) {
       return FALSE;
     }
@@ -403,21 +448,6 @@ final class DeprecationHandler implements Extension {
     }
     $this->writeStatisticEntry('test_stats', $stat);
     self::$currentTest = [];
-  }
-
-  public static function handle(int $errorNumber, string $errorString, string $errorFile, int $errorLine): bool {
-    assert(Configuration::projectIgnoresEnabled(), __METHOD__ . '() must not be called if the deprecation handler is not enabled.');
-
-    if (self::isIgnoredByProject(self::$currentTest['testId'] ?? NULL, $errorString)) {
-      if (self::$currentTest) {
-        self::$currentTest['ignored_by_project'][] = $errorString;
-      }
-      return TRUE;
-    }
-    if (self::$currentTest) {
-      self::$currentTest['relayed_to_phpunit'][] = $errorString;
-    }
-    return FALSE;
   }
 
 }

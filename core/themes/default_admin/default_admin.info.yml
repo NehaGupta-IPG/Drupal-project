@@ -13,12 +13,7 @@ libraries:
   - default_admin/global-styling
 
 libraries-override:
-  core/drupal.tabledrag:
-    css:
-      component:
-        misc/components/tabledrag.module.css: css/components/tabledrag.css
-    js:
-      misc/tabledrag.js: migration/js/tabledrag.js
+  core/drupal.tabledrag: default_admin/admin.tabledrag
 
   core/drupal.ajax:
     css:
@@ -28,7 +23,7 @@ libraries-override:
   core/drupal.autocomplete:
     css:
       component:
-        misc/components/autocomplete-loading.module.css: css/components/autocomplete-loading.module.css
+        misc/components/autocomplete-loading.module.css: false
 
   system/status.report: default_admin/status.report
 
@@ -36,6 +31,11 @@ libraries-override:
     css:
       theme:
         css/system.admin.css: false
+
+  contextual/drupal.contextual-links:
+    css:
+      theme:
+        css/contextual.icons.theme.css: false
 
   core/drupal.dropbutton:
     css:
@@ -93,9 +93,9 @@ libraries-override:
   views_ui/admin.styling:
     css:
       component:
-        css/views_ui.admin.css: css/components/views_ui.admin.css
+        css/views_ui.admin.css: false
       theme:
-        css/views_ui.admin.theme.css: css/theme/views_ui.admin.theme.css
+        css/views_ui.admin.theme.css: false
 
   # Admin overrides: replace
   media_library/view:
@@ -105,20 +105,6 @@ libraries-override:
   core/drupal.tableselect:
     js:
       misc/tableselect.js: migration/js/tableselect.js
-
-  # Admin overrides: disable
-  # needed override to overcome dialog styling issues
-  default_admin/admin.drupal.dialog:
-    css:
-      theme:
-        css/components/dialog.css: false
-
-  core/drupal.dialog.off_canvas:
-    css:
-      base:
-        misc/dialog/off-canvas.base.css: false
-        misc/dialog/off-canvas.css: false
-        misc/dialog/off-canvas.theme.css: false
 
   default_admin/global-styling:
     css:
@@ -140,7 +126,6 @@ libraries-extend:
     - default_admin/details-focus
   core/drupal.dialog:
     - default_admin/admin.drupal.dialog
-    - default_admin/dialog
   core/drupal.dropbutton:
     - default_admin/dropbutton
   core/drupal.checkbox:
@@ -151,8 +136,6 @@ libraries-extend:
     - default_admin/progress
   core/drupal.tabbingmanager:
     - default_admin/tabbingmanager
-  core/drupal.tabledrag:
-    - default_admin/admin.tabledrag
   core/drupal.tableselect:
     - default_admin/tableselect
   core/drupal.tablesort:
@@ -165,16 +148,20 @@ libraries-extend:
     - default_admin/filter
   filter/drupal.filter:
     - default_admin/filter
+  dblog/drupal.dblog:
+    - default_admin/drupal.dblog
   system/admin:
     - default_admin/system.admin
   core/drupal.autocomplete:
     - default_admin/autocomplete
-  shortcut/drupal.shortcut:
-    - default_admin/drupal.shortcut
   core/drupal.ajax:
     - default_admin/ajax
+  update/drupal.update.admin:
+    - default_admin/drupal.update.admin
   user/drupal.user:
     - default_admin/form.password-confirm
+  user/drupal.user.admin:
+    - default_admin/drupal.user.admin
   node/drupal.node.preview:
     - default_admin/drupal.node.preview
   system/status.report:
@@ -186,19 +173,15 @@ libraries-extend:
   media/media_embed_ckeditor_theme:
     - default_admin/media_embed_ckeditor_theme
   media_library/ui:
-    - default_admin/media_library.ui
+    - default_admin/media_library
   media_library/view:
-    - default_admin/media_library.theme
     - default_admin/media_library
   media_library/widget:
-    - default_admin/media_library.theme
     - default_admin/media_library
   image/admin:
     - default_admin/image.admin
   core/drupal.tableheader:
     - default_admin/tableheader
-  core/ckeditor5:
-    - default_admin/ckeditor5
   contextual/drupal.contextual-links:
     - default_admin/contextual_links
 

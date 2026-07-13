@@ -47,13 +47,14 @@
   <extensions>
     <!-- Deprecation handler.
       This extension allows to ignore some deprecations on the project overall,
-      to enable the Symfony debug classloader to trigger deprecations checking
-      class parameters and return types at class loading time, and to collect
-      statistics on deprecations triggered during testing.
+      to enable the Symfony debug classloader to trigger deprecations while
+      checking class parameters and return types at class loading time, and to
+      collect statistics on deprecations triggered during testing.
       The configuration defined here can be overridden by defining the
-      environment variable DEPRECATION_HANDLER_CONFIG whose value must be a
-      JSON string containing an array with the same parameter names as keys.
-      For example, DEPRECATION_HANDLER_CONFIG='{"enableCollectStats":true}'
+      environment variable DRUPAL_DEPRECATION_FILTER_CONFIG whose value must be
+      a JSON string containing an array with the same parameter names as keys.
+      For example,
+      DRUPAL_DEPRECATION_FILTER_CONFIG='{"enableCollectStats":true}'
     -->
     <bootstrap class="Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler">
       <!-- Set to true to enable project level deprecation ignore patterns.

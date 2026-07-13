@@ -45,9 +45,9 @@ trait HttpKernelUiHelperTrait {
    *
    * @param \Drupal\Core\Url|string $path
    *   The Drupal path to load into Mink controlled browser, as a string or a
-   *   Url object. (Note that the Symfony browser's functionality of paths
-   *   relative to the previous request is not available, because an initial '/'
-   *   is assumed if not present.)
+   *   Url object. Relative paths (without a leading '/') are made absolute by
+   *   prepending '/'. Query strings starting with '?' are resolved relative to
+   *   the current page URL.
    * @param array $options
    *   (optional) Options to be forwarded to the URL generator. The 'absolute'
    *   option is not supported.
@@ -67,7 +67,10 @@ trait HttpKernelUiHelperTrait {
   protected function drupalGet($path, array $options = [], array $headers = []): string {
     $session = $this->getSession();
 
-    if (is_string($path) && !str_starts_with($path, '/')) {
+    // Ensure relative paths are made absolute by prepending '/'. Query strings
+    // (starting with '?') are left as-is so they resolve relative to the
+    // current page URL.
+    if (is_string($path) && !str_starts_with($path, '?') && !str_starts_with($path, '/')) {
       $path = '/' . $path;
     }
 
@@ -90,6 +93,12 @@ trait HttpKernelUiHelperTrait {
       $html_output .= '<hr />' . $out;
       $html_output .= $this->getHtmlOutputHeaders();
       $this->htmlOutput($html_output);
+    }
+
+    // If $this->content exists, set it for the benefit of all the methods in
+    // \Drupal\KernelTests\AssertContentTrait.
+    if (property_exists($this, 'content')) {
+      $this->content = $out;
     }
 
     return $out;
@@ -216,6 +225,53 @@ trait HttpKernelUiHelperTrait {
   public function assertSession($name = NULL): WebAssert {
     $this->addToAssertionCount(1);
     return new WebAssert($this->getSession($name));
+  }
+
+  /**
+   * Performs an xpath search on the contents of the internal browser.
+   *
+   * The search is relative to the root element (HTML tag normally) of the page.
+   *
+   * This method is identical to \Drupal\Tests\BrowserTestBase::xpath() and
+   * should be used when converting Browser tests to Kernel tests, as
+   * \Drupal\KernelTests\AssertContentTrait::xpath() which Kernel tests use does
+   * not have the same return type.
+   *
+   * @param string $xpath
+   *   The xpath string to use in the search.
+   * @param array $arguments
+   *   An array of arguments with keys in the form ':name' matching the
+   *   placeholders in the query. The values may be either strings or numeric
+   *   values.
+   *
+   * @return \Behat\Mink\Element\NodeElement[]
+   *   The list of elements matching the xpath expression.
+   */
+  protected function getNodeElementsByXpath($xpath, array $arguments = []): array {
+    $xpath = $this->assertSession()->buildXPathQuery($xpath, $arguments);
+    return $this->getSession()->getPage()->findAll('xpath', $xpath);
+  }
+
+  /**
+   * Gets the current URL from the browser.
+   *
+   * @see \Drupal\Tests\UiHelperTrait::getUrl
+   */
+  protected function getUrl(): string {
+    return $this->getSession()->getCurrentUrl();
+  }
+
+  /**
+   * Rebuilds the container.
+   *
+   * Provided for compatibility with traits that call $this->rebuildContainer(),
+   * such as those shared with functional tests.
+   *
+   * @see \Drupal\Core\Test\FunctionalTestSetupTrait::rebuildContainer
+   */
+  protected function rebuildContainer(): void {
+    \Drupal::service('kernel')->rebuildContainer();
+    $this->container = \Drupal::getContainer();
   }
 
 }

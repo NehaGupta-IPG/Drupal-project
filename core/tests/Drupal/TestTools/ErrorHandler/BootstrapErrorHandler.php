@@ -25,8 +25,8 @@ final class BootstrapErrorHandler {
 
   /**
    * @param \PHPUnit\Runner\ErrorHandler $phpUnitErrorHandler
-   *   An instance of PHPUnit's runner own error handler. Any error not
-   *   managed here will be relayed to it.
+   *   An instance of PHPUnit's runner own error handler, to which errors
+   *   will be relayed.
    */
   public function __construct(
     private readonly PhpUnitErrorHandler $phpUnitErrorHandler,
@@ -50,7 +50,7 @@ final class BootstrapErrorHandler {
    *   continue.
    */
   public function __invoke(int $errorNumber, string $errorString, string $errorFile, int $errorLine): bool {
-    assert(DeprecationHandlerConfiguration::projectIgnoresEnabled(), __METHOD__ . '() must not be called if the deprecation handler is not enabled.');
+    assert(DeprecationHandlerConfiguration::instance()->projectIgnoresEnabled, __METHOD__ . '() must not be called if the deprecation handler is not enabled.');
 
     // Stop processing the deprecation if it is one of those in the ignore
     // list.

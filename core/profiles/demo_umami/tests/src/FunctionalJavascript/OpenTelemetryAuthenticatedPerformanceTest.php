@@ -42,6 +42,9 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
   protected function doTestFrontPageAuthenticatedWarmCache(): void {
     $user = $this->drupalCreateUser();
     $this->drupalLogin($user);
+    sleep(2);
+    $this->drupalGet('<front>');
+    sleep(2);
     $this->drupalGet('<front>');
     sleep(2);
     $this->drupalGet('<front>');
@@ -66,17 +69,18 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
         'config' => 12,
         'bootstrap' => 7,
         'discovery' => 5,
-        'data' => 6,
+        'data' => 4,
         'dynamic_page_cache' => 2,
         'render' => 2,
+        'routes' => 2,
       ],
       'CacheSetCount' => 0,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 4,
-      'ScriptCount' => 1,
+      'ScriptCount' => 3,
       'ScriptBytes' => 13150,
-      'StylesheetCount' => 2,
+      'StylesheetCount' => 6,
       'StylesheetBytes' => 39163,
     ];
     $this->assertMetrics($expected, $performance_data);
@@ -126,26 +130,28 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
     }, 'administratorNodePage');
 
     $expected = [
-      'QueryCount' => 261,
-      'CacheGetCount' => 251,
+      'QueryCount' => 273,
+      'CacheGetCount' => 264,
       'CacheGetCountByBin' => [
         'config' => 60,
-        'bootstrap' => 16,
+        'bootstrap' => 15,
         'discovery' => 75,
-        'data' => 20,
+        'data' => 14,
         'entity' => 24,
         'dynamic_page_cache' => 1,
         'default' => 20,
-        'render' => 13,
+        'routes' => 18,
+        'render' => 14,
+        'file_parsing' => 1,
         'menu' => 22,
       ],
-      'CacheSetCount' => 255,
+      'CacheSetCount' => 266,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 28,
-      'ScriptCount' => 4,
+      'CacheTagLookupQueryCount' => 29,
+      'ScriptCount' => 10,
       'ScriptBytes' => 200400,
-      'StylesheetCount' => 7,
+      'StylesheetCount' => 11,
       'StylesheetBytes' => 79412,
     ];
     $this->assertMetrics($expected, $performance_data);

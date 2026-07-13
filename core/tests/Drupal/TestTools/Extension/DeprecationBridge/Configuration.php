@@ -1,4 +1,6 @@
 <?php
+// @todo remove the ignore directive once PHPCS will support hooked properties.
+// phpcs:ignoreFile
 
 declare(strict_types=1);
 
@@ -13,37 +15,35 @@ final class Configuration {
 
   /**
    * The class singleton.
-   *
-   * phpcs:ignore Drupal.Commenting.VariableComment.MissingVar
    */
   private static self $instance;
 
   /**
    * Indicates if the project deprecation ignores are enabled.
    */
-  private bool $projectIgnores = FALSE;
+  public private(set) bool $projectIgnoresEnabled = FALSE;
 
   /**
    * Path to the deprecation ignore file.
    */
-  private string $ignoreFilePath;
+  public private(set) string $projectIgnoreFile;
 
   /**
    * Indicates if the debug class loader is enabled.
    */
-  private bool $debugClassLoader = FALSE;
+  public private(set) bool $debugClassLoaderEnabled = FALSE;
+
+  /**
+   * The list of deprecation message patterns that should be ignored.
+   *
+   * @var list<string>
+   */
+  public private(set) array $deprecationIgnorePatterns = [];
 
   /**
    * Indicates if the deprecation stats collection is enabled.
    */
-  private bool $collectStats = FALSE;
-
-  /**
-   * A list of deprecation message patterns that should be ignored.
-   *
-   * @var list<string>
-   */
-  private array $deprecationIgnorePatterns = [];
+  public private(set) bool $enableCollectStats = FALSE;
 
   /**
    * Returns the singleton.
@@ -63,53 +63,22 @@ final class Configuration {
    *
    * Overwrites each configuration key that is already existing.
    *
-   * @param array<string, mixed> $parameters
+   * @param array<string,bool|string|list<string>> $parameters
    *   An array of configuration elements.
    */
   public function load(array $parameters): void {
     if (array_key_exists('enableProjectIgnores', $parameters)) {
-      $this->projectIgnores = filter_var($parameters['enableProjectIgnores'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
-    }
-    if (array_key_exists('enableDebugClassLoader', $parameters)) {
-      $this->debugClassLoader = filter_var($parameters['enableDebugClassLoader'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
-    }
-    if (array_key_exists('enableCollectStats', $parameters)) {
-      $this->collectStats = filter_var($parameters['enableCollectStats'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
+      $this->projectIgnoresEnabled = filter_var($parameters['enableProjectIgnores'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
     }
     if (array_key_exists('projectIgnoreFile', $parameters)) {
-      assert(!empty($parameters['projectIgnoreFile']), 'projectIgnoreFile must be not empty');
-      $this->ignoreFilePath = $parameters['projectIgnoreFile'];
+      $this->projectIgnoreFile = $parameters['projectIgnoreFile'];
     }
-  }
-
-  /**
-   * Determines if the project ignores are enabled.
-   *
-   * @return bool
-   *   TRUE if enabled, FALSE if disabled.
-   */
-  public static function projectIgnoresEnabled(): bool {
-    return self::instance()->projectIgnores;
-  }
-
-  /**
-   * Determines if the debug class loader is enabled.
-   *
-   * @return bool
-   *   TRUE if enabled, FALSE if disabled.
-   */
-  public static function debugClassLoaderEnabled(): bool {
-    return self::instance()->debugClassLoader;
-  }
-
-  /**
-   * Determines if collection of deprecation statistics is enabled.
-   *
-   * @return bool
-   *   TRUE if enabled, FALSE if disabled.
-   */
-  public static function collectStatsEnabled(): bool {
-    return self::instance()->collectStats;
+    if (array_key_exists('enableDebugClassLoader', $parameters)) {
+      $this->debugClassLoaderEnabled = filter_var($parameters['enableDebugClassLoader'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
+    }
+    if (array_key_exists('enableCollectStats', $parameters)) {
+      $this->enableCollectStats = filter_var($parameters['enableCollectStats'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
+    }
   }
 
   /**
@@ -119,7 +88,7 @@ final class Configuration {
     assert(empty($this->deprecationIgnorePatterns), 'deprecationIgnorePatterns can only be loaded once');
 
     // Load the deprecation ignore patterns from the specified file.
-    $path = $this->absoluteAndExistingPath($this->ignoreFilePath);
+    $path = $this->absoluteAndExistingPath($this->projectIgnoreFile);
     set_error_handler(static function () use ($path, &$line): never {
       throw new \RuntimeException(sprintf('Invalid pattern found in "%s" on line %d', $path, 1 + $line));
     });
@@ -134,16 +103,6 @@ final class Configuration {
     finally {
       restore_error_handler();
     }
-  }
-
-  /**
-   * Returns the list of deprecation message patterns that should be ignored.
-   *
-   * @return list<string>
-   *   The list of deprecation message patterns.
-   */
-  public static function deprecationIgnorePatterns(): array {
-    return self::instance()->deprecationIgnorePatterns;
   }
 
   /**
