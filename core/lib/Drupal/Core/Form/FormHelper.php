@@ -204,7 +204,14 @@ class FormHelper {
    */
   public static function processStates(array &$elements) {
     $elements['#attached']['library'][] = 'core/drupal.states';
-    $key = $elements['#states_attributes_target_key'] ?? '#attributes';
+    $key = '#attributes';
+    if (isset($elements['#states_attributes_target_key'])) {
+      $key = $elements['#states_attributes_target_key'];
+    }
+    elseif (($elements['#markup'] ?? FALSE) === '' && ($elements['#input'] ?? FALSE) === TRUE) {
+      $key = '#wrapper_attributes';
+      @trigger_error('Automatic detection of the #states attribute target is deprecated in drupal:11.5.0 and removed in drupal:13.0.0. Set the #states_attributes_target_key explicitly. See https://www.drupal.org/node/3572685', E_USER_DEPRECATED);
+    }
     $elements[$key]['data-drupal-states'] = Json::encode($elements['#states']);
   }
 
