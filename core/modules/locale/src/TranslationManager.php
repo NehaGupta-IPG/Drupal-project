@@ -33,7 +33,7 @@ class TranslationManager extends CoreTranslationManager {
    *   $count combination or -1 if the language was not found or does not have a
    *   plural formula.
    */
-  protected function getPluralIndex(int $count, ?string $langcode = NULL): int {
+  protected function getPluralIndex(int $count, ?string $langcode): int {
     $langcode = $langcode ?: $this->defaultLangcode;
 
     // Retrieve and statically cache the plural formulas for all languages.

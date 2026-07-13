@@ -111,21 +111,23 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
     else {
       $string = $this->doTranslate($translated_string->getUntranslatedString(), $translated_string->getOptions());
     }
-    if ($translated_string instanceof PluralTranslatableMarkup) {
-      $count = $translated_string->getCount();
-
-      $translated_array = explode(PoItem::DELIMITER, $string);
-      if ($count == 1 || count($translated_array) == 1) {
-        // Singular form.
-        return $translated_array[0];
-      }
-
-      $index = $this->getPluralIndex($count, $translated_string->getOptions()['langcode'] ?? NULL);
-
-      // Fallback to second plural form.
-      return $translated_array[$index] ?? $translated_array[1];
-    }
     return $string;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function selectPluralForm(int $count, ?string $langcode, string $string): string {
+    $translated_array = explode(PoItem::DELIMITER, $string);
+    if ($count == 1 || count($translated_array) == 1) {
+      // Singular form.
+      return $translated_array[0];
+    }
+
+    $index = $this->getPluralIndex($count, $langcode);
+
+    // Fallback to second plural form.
+    return $translated_array[$index] ?? $translated_array[1];
   }
 
   /**
@@ -145,7 +147,7 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
    *   The numeric index of the plural variant to use for this $langcode and
    *   $count combination.
    */
-  protected function getPluralIndex(int $count, ?string $langcode = NULL): int {
+  protected function getPluralIndex(int $count, ?string $langcode): int {
     return 1;
   }
 

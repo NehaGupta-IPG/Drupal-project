@@ -81,10 +81,11 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
   }
 
   /**
-   * Gets the item count.
+   * {@inheritdoc}
    */
-  public function getCount(): int {
-    return $this->count;
+  protected function translateString(): string {
+    $string = parent::translateString();
+    return $this->getStringTranslation()->selectPluralForm($this->count, $this->getOptions()['langcode'] ?? NULL, $string);
   }
 
   /**
