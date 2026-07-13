@@ -482,6 +482,7 @@ class ConfigImporterTest extends KernelTestBase {
     // Replace the file content of the existing configuration objects in the
     // sync directory.
     $original_name_data = [
+      'langcode' => 'en',
       'foo' => 'beer',
     ];
     $sync->write($name, $original_name_data);
@@ -1016,9 +1017,9 @@ class ConfigImporterTest extends KernelTestBase {
     $this->configImporter()->import();
     $event = \Drupal::state()->get('config_events_test.event', []);
     $this->assertSame(ConfigEvents::SAVE, $event['event_name']);
-    $this->assertSame(['key' => 'bar'], $event['current_config_data']);
-    $this->assertSame(['key' => 'bar'], $event['raw_config_data']);
-    $this->assertSame(['key' => 'foo'], $event['original_config_data']);
+    $this->assertSame(['langcode' => 'en', 'key' => 'bar'], $event['current_config_data']);
+    $this->assertSame(['langcode' => 'en', 'key' => 'bar'], $event['raw_config_data']);
+    $this->assertSame(['langcode' => 'en', 'key' => 'foo'], $event['original_config_data']);
 
     // Import the configuration that deletes 'config_events_test.test'.
     $this->container->get('config.storage.sync')->delete('config_events_test.test');
@@ -1028,7 +1029,7 @@ class ConfigImporterTest extends KernelTestBase {
     $this->assertSame(ConfigEvents::DELETE, $event['event_name']);
     $this->assertSame([], $event['current_config_data']);
     $this->assertSame([], $event['raw_config_data']);
-    $this->assertSame(['key' => 'bar'], $event['original_config_data']);
+    $this->assertSame(['langcode' => 'en', 'key' => 'bar'], $event['original_config_data']);
   }
 
   /**

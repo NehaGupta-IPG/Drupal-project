@@ -155,7 +155,7 @@ class ConfigInstallTest extends KernelTestBase {
     $this->assertEquals($collections, $active_storage->getAllCollectionNames());
     $collection_storage = $active_storage->createCollection('entity');
     $data = $collection_storage->read('config_test.dynamic.dotted.default');
-    $this->assertSame(['label' => 'entity'], $data);
+    $this->assertSame(['langcode' => 'en', 'label' => 'entity'], $data);
 
     // Test that the config manager uninstalls configuration from collections
     // as expected.
@@ -209,7 +209,7 @@ class ConfigInstallTest extends KernelTestBase {
     $data = $active_storage->read($name);
     $this->assertTrue(isset($data['uuid']));
     $data = $collection_storage->read($name);
-    $this->assertSame(['label' => 'entity'], $data);
+    $this->assertSame(['langcode' => 'en', 'label' => 'entity'], $data);
   }
 
   /**

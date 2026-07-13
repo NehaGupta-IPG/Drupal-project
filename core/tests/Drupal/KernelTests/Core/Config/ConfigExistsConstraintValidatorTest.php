@@ -26,14 +26,14 @@ class ConfigExistsConstraintValidatorTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['system'];
+  protected static $modules = ['config_test'];
 
   /**
    * Tests the ConfigExists constraint validator.
    */
-  #[TestWith([[], "system.site", "system.site"])]
-  #[TestWith([["prefix" => "system."], "site", "system.site"])]
-  #[TestWith([["prefix" => "system.[%parent.reference]."], "admin", "system.menu.admin"])]
+  #[TestWith([[], "config_test.system", "config_test.system"])]
+  #[TestWith([["prefix" => "config_test."], "system", "config_test.system"])]
+  #[TestWith([["prefix" => "config_test.dynamic.[%parent.reference]."], "default", "config_test.dynamic.dotted.default"])]
   public function testValidation(array $constraint_options, string $value, string $expected_config_name): void {
     // Create a data definition that specifies the value must be a string with
     // the name of an existing piece of config.
@@ -45,14 +45,14 @@ class ConfigExistsConstraintValidatorTest extends KernelTestBase {
 
     // Create a data definition for the parent data.
     $parent_data_definition = $typed_data->createDataDefinition('map');
-    $parent_data = $typed_data->create($parent_data_definition, ['reference' => 'menu']);
+    $parent_data = $typed_data->create($parent_data_definition, ['reference' => 'dotted']);
     $data = $typed_data->create($definition, $value, 'data_name', $parent_data);
 
     $violations = $data->validate();
     $this->assertCount(1, $violations);
     $this->assertSame("The '$expected_config_name' config does not exist.", (string) $violations->get(0)->getMessage());
 
-    $this->installConfig('system');
+    $this->installConfig('config_test');
     $this->assertCount(0, $data->validate());
 
     // NULL should not trigger a validation error: a value may be nullable.

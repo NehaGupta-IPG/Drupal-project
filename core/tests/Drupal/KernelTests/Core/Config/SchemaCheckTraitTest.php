@@ -113,7 +113,9 @@ class SchemaCheckTraitTest extends KernelTestBase {
       'config_test.types, with validation' => [
         'config_test.types',
         TRUE,
-        $expected_storage_null_check_errors,
+        $expected_storage_null_check_errors + [
+          '[langcode] This value should not be null.',
+        ],
         TRUE,
         $expected_storage_type_check_errors + $expected_validation_errors,
       ],
@@ -155,6 +157,7 @@ class SchemaCheckTraitTest extends KernelTestBase {
         TRUE,
         $expected_storage_null_check_errors + [
           '[_core] This value should not be null.',
+          '[langcode] This value should not be null.',
           '[array] This value should not be null.',
           '[boolean] This value should not be null.',
           '[exp] This value should not be null.',
