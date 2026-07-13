@@ -256,10 +256,16 @@ class Config extends StorableConfigBase {
     }
 
     $system_site = $this->storage->read('system.site');
-    if (!is_array($system_site) || !array_key_exists('default_config_langcode', $system_site)) {
-      throw new \LogicException('The system.site configuration must define default_config_langcode before configuration langcode defaults can be applied.');
+    if (!is_array($system_site)) {
+      throw new \LogicException('The system.site configuration is missing so configuration langcode defaults cannot be applied.');
     }
-    $this->set('langcode', $system_site['default_config_langcode']);
+
+    // Unfortunately we need to rely fallbacks too because on existing sites
+    // when this code was added configuration operations may run before the
+    // update that adds the default_config_langcode key to system.site. 
+    $default_config_langcode = $system_site['default_config_langcode']
+      ?? $system_site['default_langcode'];
+    $this->set('langcode', (string) $default_config_langcode);
   }
 
   /**
