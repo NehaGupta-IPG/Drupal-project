@@ -440,6 +440,7 @@ class ConfigSchemaTest extends KernelTestBase {
     $untyped_to_typed = $untyped_values;
 
     $typed_values = [
+      'langcode' => 'en',
       'config_schema_test_integer' => 1,
       'config_schema_test_integer_empty_string' => NULL,
       'integer' => 100,
@@ -498,7 +499,7 @@ class ConfigSchemaTest extends KernelTestBase {
     $this->config('config_schema_test.schema_mapping_sort')
       ->setData($data)
       ->save();
-    $this->assertSame(['bar' => '2', 'foo' => '1'], $this->config('config_schema_test.schema_mapping_sort')->get());
+    $this->assertSame(['langcode' => 'en', 'bar' => '2', 'foo' => '1'], $this->config('config_schema_test.schema_mapping_sort')->get());
     $this->config('config_schema_test.schema_mapping_sort')->set('map', ['sub_bar' => '2', 'sub_foo' => '1'])->save();
     $this->assertSame(['sub_foo' => '1', 'sub_bar' => '2'], $this->config('config_schema_test.schema_mapping_sort')->get('map'));
   }
@@ -698,6 +699,7 @@ class ConfigSchemaTest extends KernelTestBase {
     ];
 
     $typed_values = [
+      'langcode' => 'en',
       'tests' => [
         [
           'plugin_id' => 'wrapper:foo',
@@ -732,6 +734,7 @@ class ConfigSchemaTest extends KernelTestBase {
     ];
 
     $typed_values = [
+      'langcode' => 'en',
       'tests' => [
         [
           'another_key' => 100,
@@ -771,6 +774,7 @@ class ConfigSchemaTest extends KernelTestBase {
     ];
 
     $typed_values = [
+      'langcode' => 'en',
       'tests' => [
         [
           'another_key' => '100',

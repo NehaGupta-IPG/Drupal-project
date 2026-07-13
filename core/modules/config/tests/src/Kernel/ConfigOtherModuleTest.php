@@ -17,6 +17,11 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class ConfigOtherModuleTest extends KernelTestBase {
 
   /**
+   * {@inheritdoc}
+   */
+  protected static $modules = ['system'];
+
+  /**
    * Tests enabling the provider of the default configuration first.
    */
   public function testInstallOtherModuleFirst(): void {

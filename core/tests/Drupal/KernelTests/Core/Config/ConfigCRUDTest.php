@@ -294,7 +294,10 @@ class ConfigCRUDTest extends KernelTestBase {
       'mapping_with_some_required_keys' => [],
       'mapping_with_only_optional_keys' => [],
     ];
-    $data = ['_core' => ['default_config_hash' => Crypt::hashBase64(serialize($data))]] + $data;
+    $data = [
+      '_core' => ['default_config_hash' => Crypt::hashBase64(serialize($data))],
+      'langcode' => $this->config('system.site')->get('default_config_langcode'),
+    ] + $data;
     $this->assertSame($data, $config->get());
 
     // Re-set each key using Config::set().

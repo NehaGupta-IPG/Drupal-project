@@ -102,6 +102,7 @@ class TypedConfigTest extends KernelTestBase {
     $this->assertInstanceOf(TypedConfigInterface::class, $typed_config);
     $this->assertEquals([
       '_core',
+      'langcode',
       'llama',
       'cat',
       'giraffe',

@@ -135,6 +135,9 @@ class ConfigEntityStorageTest extends UnitTestCase {
     $this->languageManager->getCurrentLanguage()->willReturn(new Language(['id' => 'hu']));
 
     $this->configFactory = $this->prophesize(ConfigFactoryInterface::class);
+    $site_config = $this->prophesize(ImmutableConfig::class);
+    $site_config->get('default_config_langcode')->willReturn('hu');
+    $this->configFactory->get('system.site')->willReturn($site_config->reveal());
 
     $this->entityQuery = $this->prophesize(QueryInterface::class);
     $entity_query_factory = $this->prophesize(QueryFactoryInterface::class);

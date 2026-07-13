@@ -28,7 +28,7 @@ class UrlTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['common_test', 'url_alter_test'];
+  protected static $modules = ['system', 'common_test', 'url_alter_test'];
 
   /**
    * Confirms that invalid URLs are filtered in link generating functions.
