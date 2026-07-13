@@ -46,7 +46,7 @@ class DateTest extends UnitTestCase {
   /**
    * The string translation.
    */
-  protected TranslationInterface&Stub $stringTranslation;
+  protected TranslationInterface $stringTranslation;
 
   /**
    * The string translation.
@@ -114,13 +114,6 @@ class DateTest extends UnitTestCase {
    */
   #[DataProvider('providerTestFormatInterval')]
   public function testFormatInterval($interval, $granularity, $expected, $langcode = NULL): void {
-    // Mocks a simple formatPlural implementation.
-    $this->stringTranslation
-      ->method('translateString')
-      ->willReturnCallback(function (TranslatableMarkup $arg) {
-        return $arg->getUntranslatedString();
-      });
-
     // Check if the granularity is specified.
     if ($granularity) {
       $result = $this->dateFormatter->formatInterval($interval, $granularity, $langcode);
