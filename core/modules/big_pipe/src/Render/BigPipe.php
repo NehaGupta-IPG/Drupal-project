@@ -524,8 +524,21 @@ class BigPipe {
             }
             continue;
           }
-          $elements = $fiber->getReturn();
-          unset($fibers[$placeholder_id]);
+          try {
+            $elements = $fiber->getReturn();
+          }
+          catch (\FiberError $e) {
+            // If the Fiber terminated with an uncaught exception, skip sending
+            // a replacement for this placeholder — the finally block still
+            // removes the Fiber from the queue so it is not retried, and the
+            // original placeholder markup remains in the page. This ensures a
+            // single failed placeholder does not break the rest of the BigPipe
+            // response.
+            continue;
+          }
+          finally {
+            unset($fibers[$placeholder_id]);
+          }
 
           if ($this->debugCacheabilityHeaders) {
             $cacheable_metadata->addCacheableDependency(CacheableMetadata::createFromRenderArray($elements));

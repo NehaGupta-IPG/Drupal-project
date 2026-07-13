@@ -10,6 +10,7 @@ use Drupal\Component\Utility\Xss;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Test\TestErrorLogger;
 use Drupal\Core\Utility\Error;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -79,20 +80,20 @@ function _drupal_error_handler_real($error_level, $message, $filename, $line): v
   }
   // If the site is a test site then fail for user deprecations so they can be
   // caught by the deprecation error handler.
-  elseif (defined('DRUPAL_TEST_IN_CHILD_SITE') && DRUPAL_TEST_IN_CHILD_SITE && $error_level === E_USER_DEPRECATED) {
+  elseif (defined('DRUPAL_TEST_IN_CHILD_SITE') && DRUPAL_TEST_IN_CHILD_SITE && $error_level === E_USER_DEPRECATED && (!defined('SIMPLETEST_COLLECT_ERRORS') || SIMPLETEST_COLLECT_ERRORS)) {
     static $seen = [];
     if (array_search($message, $seen, TRUE) === FALSE) {
-      // Only report each deprecation once. Too many headers can break some
-      // Chrome and web driver testing.
+      // Only report each deprecation once.
       $seen[] = $message;
       $backtrace = debug_backtrace();
       $caller = Error::getLastCaller($backtrace);
-      _drupal_error_header(
+      TestErrorLogger::writeError(
         Markup::create(Xss::filterAdmin($message)),
         'User deprecated function',
         $caller['function'],
         $caller['file'],
-        $caller['line']
+        $caller['line'],
+        NULL,
       );
     }
   }
@@ -152,9 +153,9 @@ function _drupal_log_error($error, $fatal = FALSE): void {
   unset($error['backtrace'], $error['exception'], $error['severity_level']);
 
   // When running inside the testing framework, we relay the errors
-  // to the tested site by the way of HTTP headers.
-  if (defined('DRUPAL_TEST_IN_CHILD_SITE') && DRUPAL_TEST_IN_CHILD_SITE && !headers_sent() && (!defined('SIMPLETEST_COLLECT_ERRORS') || SIMPLETEST_COLLECT_ERRORS)) {
-    _drupal_error_header($error['@message'], $error['%type'], $error['%function'], $error['%file'], $error['%line']);
+  // to the test runner via files stored in the logs directory.
+  if (defined('DRUPAL_TEST_IN_CHILD_SITE') && DRUPAL_TEST_IN_CHILD_SITE && (!defined('SIMPLETEST_COLLECT_ERRORS') || SIMPLETEST_COLLECT_ERRORS)) {
+    TestErrorLogger::writeError($error['@message'], $error['%type'], $error['%function'], $error['%file'], $error['%line'], $exception);
   }
 
   $response = new Response();
@@ -283,7 +284,8 @@ function _drupal_log_error($error, $fatal = FALSE): void {
       $response->setContent($message);
       $response->setStatusCode(500, '500 Service unavailable (with message)');
 
-      $response->send();
+      // Disable further error reporting as this is part of reporting the error.
+      @$response->send();
       // An exception must halt script execution.
       exit;
     }
@@ -353,6 +355,11 @@ function _drupal_get_error_level() {
  *   The file that emitted the error.
  * @param int $line
  *   The line number in file that emitted the error.
+ *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Call
+ *   \Drupal\Core\Test\TestErrorLogger::writeError() instead
+ *
+ * @see https://www.drupal.org/node/3581815
  */
 function _drupal_error_header($message, $type, $function, $file, $line): void {
   // $number does not use drupal_static as it should not be reset

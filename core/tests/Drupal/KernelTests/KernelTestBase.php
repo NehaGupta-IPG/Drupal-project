@@ -246,6 +246,10 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
       Database::removeConnection($key);
     }
     Database::addConnectionInfo('default', 'default', $this->getDatabaseConnectionInfo()['default']);
+
+    // Kernel tests should not collect errors in the file as this is only
+    // required for the system under test in browser and javascript tests.
+    define('SIMPLETEST_COLLECT_ERRORS', FALSE);
   }
 
   /**

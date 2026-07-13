@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Test\HttpClientMiddleware;
 
+use Drupal\Core\Test\TestErrorLogger;
 use Drupal\Core\Utility\Error;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -24,7 +25,10 @@ class TestHttpClientMiddleware {
     return function ($handler) {
       return function (RequestInterface $request, array $options) use ($handler) {
         if ($user_agent = drupal_generate_test_ua(drupal_valid_test_ua())) {
-          $request = $request->withHeader('User-Agent', $user_agent);
+          $request = $request
+            ->withHeader('User-Agent', $user_agent)
+            ->withHeader('X-Drupal-Test-Request-From-Runner', TRUE);
+
         }
         return $handler($request, $options)
           ->then(function (ResponseInterface $response) {
@@ -41,6 +45,7 @@ class TestHttpClientMiddleware {
             $headers = $response->getHeaders();
             foreach ($headers as $header_name => $header_values) {
               if (preg_match('/^X-Drupal-Assertion-[0-9]+$/', $header_name, $matches)) {
+                trigger_error('Using headers to communicate errors in the system under test is deprecated in drupal:11.4.0 and removed from drupal:13.0.0. Use \Drupal\Core\Test\TestErrorLogger instead. See https://www.drupal.org/node/3581815', E_USER_DEPRECATED);
                 foreach ($header_values as $header_value) {
                   $parameters = unserialize(urldecode($header_value));
                   if (count($parameters) === 3) {
@@ -60,6 +65,8 @@ class TestHttpClientMiddleware {
                 }
               }
             }
+
+            TestErrorLogger::reTriggerErrors();
             return $response;
           });
       };

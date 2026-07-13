@@ -298,11 +298,12 @@ class TestSiteInstallCommand extends Command {
   /**
    * Generates a database prefix for the site installation.
    */
-  protected function prepareDatabasePrefix(): void {
+  protected function prepareDatabasePrefix(): TestDatabase {
     // Override this method so that we can force a lock to be created.
     $test_db = new TestDatabase(NULL, TRUE);
     $this->siteDirectory = $test_db->getTestSitePath();
     $this->databasePrefix = $test_db->getDatabasePrefix();
+    return $test_db;
   }
 
 }

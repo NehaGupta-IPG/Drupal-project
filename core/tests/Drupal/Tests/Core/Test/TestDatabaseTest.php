@@ -72,6 +72,7 @@ class TestDatabaseTest extends UnitTestCase {
     $this->assertEquals('test23', $test_db->getDatabasePrefix());
     $this->assertEquals('sites/simpletest/23', $test_db->getTestSitePath());
     $this->assertEquals('sites/simpletest/23/error.log', $test_db->getPhpErrorLogPath());
+    $this->assertEquals('sites/simpletest/23/logs', $test_db->getLogDirectory());
   }
 
 }

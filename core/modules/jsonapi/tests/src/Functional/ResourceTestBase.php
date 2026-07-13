@@ -1060,6 +1060,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
     ];
     $header_cleaner = function (array $headers) use ($ignored_headers): array {
       foreach ($headers as $header => $value) {
+        // @todo Remove 'X-Drupal-Assertion-' when _drupal_error_header() is
+        //   removed.
         if (str_starts_with($header, 'X-Drupal-Assertion-') || in_array($header, $ignored_headers)) {
           unset($headers[$header]);
         }

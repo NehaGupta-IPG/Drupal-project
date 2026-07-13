@@ -127,13 +127,17 @@ trait TestSetupTrait {
    * database queries use the database table prefix that has been generated
    * here.
    *
+   * @return \Drupal\Component\FileSystem\FileSystem\TestDatabase
+   *   An object with information about the test Drupal instance.
+   *
    * @see \Drupal\Tests\BrowserTestBase::prepareEnvironment()
    * @see drupal_valid_test_ua()
    */
-  protected function prepareDatabasePrefix(): void {
+  protected function prepareDatabasePrefix(): TestDatabase {
     $test_db = new TestDatabase();
     $this->siteDirectory = $test_db->getTestSitePath();
     $this->databasePrefix = $test_db->getDatabasePrefix();
+    return $test_db;
   }
 
   /**

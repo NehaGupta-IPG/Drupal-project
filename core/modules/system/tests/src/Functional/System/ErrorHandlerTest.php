@@ -126,7 +126,7 @@ class ErrorHandlerTest extends BrowserTestBase {
       '%type' => 'Exception',
       '@message' => 'Drupal & awesome',
       '%function' => 'Drupal\error_test\Controller\ErrorTestController->triggerException()',
-      '%line' => 56,
+      '%line' => 57,
       '%file' => $this->getModulePath('error_test') . '/error_test.module',
     ];
     $select = \Drupal::database()->select('bananas_are_awesome', 'b')->fields('b');
@@ -136,14 +136,14 @@ class ErrorHandlerTest extends BrowserTestBase {
       '%type' => 'DatabaseExceptionWrapper',
       '@message' => $message,
       '%function' => 'Drupal\error_test\Controller\ErrorTestController->triggerPDOException()',
-      '%line' => 64,
+      '%line' => 65,
       '%file' => $this->getModulePath('error_test') . '/error_test.module',
     ];
     $error_renderer_exception = [
       '%type' => 'Exception',
       '@message' => 'This is an exception that occurs during rendering',
-      '%function' => 'Drupal\error_test\Controller\ErrorTestController->{closure:Drupal\error_test\Controller\ErrorTestController::triggerRendererException():104}()',
-      '%line' => 82,
+      '%function' => 'Drupal\error_test\Controller\ErrorTestController->{closure:Drupal\error_test\Controller\ErrorTestController::triggerRendererException():105}()',
+      '%line' => 83,
       '%file' => $this->getModulePath('error_test') . '/error_test.module',
     ];
 
