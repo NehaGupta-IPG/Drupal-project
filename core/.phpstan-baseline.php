@@ -25330,6 +25330,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/src/Plugin/Block/ViewsBlockBase.php',
 ];
 $ignoreErrors[] = [
+  'message' => '#^Parameter \\#2 \\$data of static method Drupal\\\\Core\\\\Config\\\\Schema\\\\TypeResolver\\:\\:resolveDynamicTypeName\\(\\) expects array, object\\|null given\\.$#',
+  'identifier' => 'argument.type',
+  'count' => 2,
+  'path' => __DIR__ . '/modules/views/src/Plugin/Validation/Constraint/AutoCreateEntityBundleExistsConstraintValidator.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Variable \\$display in isset\\(\\) always exists and is not nullable\\.$#',
 	'identifier' => 'isset.variable',
 	'count' => 1,
