@@ -6,8 +6,6 @@ namespace Drupal\Tests\user\Unit;
 
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ModuleExtensionList;
-use Drupal\Core\Language\LanguageDefault;
-use Drupal\Core\StringTranslation\TranslationManager;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\PermissionHandler;
 use org\bovigo\vfs\vfsStream;
@@ -40,13 +38,6 @@ class PermissionHandlerTest extends UnitTestCase {
   protected $moduleHandler;
 
   /**
-   * The string translation manager.
-   *
-   * @var \Drupal\Core\StringTranslation\TranslationManager
-   */
-  protected $stringTranslation;
-
-  /**
    * The mocked callable resolver.
    *
    * @var \Drupal\Core\Utility\CallableResolver|\PHPUnit\Framework\MockObject\MockObject
@@ -59,7 +50,6 @@ class PermissionHandlerTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->stringTranslation = new TranslationManager(new LanguageDefault([]));
     $this->callableResolver = $this->createMock('Drupal\Core\Utility\CallableResolver');
   }
 
@@ -134,7 +124,7 @@ EOF
 
     $module_extension_list = $this->createStub(ModuleExtensionList::class);
 
-    $this->permissionHandler = new PermissionHandler($this->moduleHandler, $this->stringTranslation, $this->callableResolver, $module_extension_list);
+    $this->permissionHandler = new PermissionHandler($this->moduleHandler, $this->getStringTranslationStub(), $this->callableResolver, $module_extension_list);
 
     $actual_permissions = $this->permissionHandler->getPermissions();
     $this->assertPermissions($actual_permissions);
@@ -199,7 +189,7 @@ EOF
       ->method('getModuleList')
       ->willReturn(array_flip($modules));
 
-    $permissionHandler = new PermissionHandler($this->moduleHandler, $this->stringTranslation, $this->callableResolver, $module_extension_list);
+    $permissionHandler = new PermissionHandler($this->moduleHandler, $this->getStringTranslationStub(), $this->callableResolver, $module_extension_list);
     $actual_permissions = $permissionHandler->getPermissions();
     $this->assertEquals(['access_module_a4', 'access_module_a1', 'access_module_a2', 'access_module_a3'],
       array_keys($actual_permissions));
@@ -276,7 +266,7 @@ EOF
 
     $module_extension_list = $this->createStub(ModuleExtensionList::class);
 
-    $this->permissionHandler = new PermissionHandler($this->moduleHandler, $this->stringTranslation, $this->callableResolver, $module_extension_list);
+    $this->permissionHandler = new PermissionHandler($this->moduleHandler, $this->getStringTranslationStub(), $this->callableResolver, $module_extension_list);
 
     $actual_permissions = $this->permissionHandler->getPermissions();
     $this->assertPermissions($actual_permissions);
@@ -321,7 +311,7 @@ EOF
 
     $module_extension_list = $this->createStub(ModuleExtensionList::class);
 
-    $this->permissionHandler = new PermissionHandler($this->moduleHandler, $this->stringTranslation, $this->callableResolver, $module_extension_list);
+    $this->permissionHandler = new PermissionHandler($this->moduleHandler, $this->getStringTranslationStub(), $this->callableResolver, $module_extension_list);
 
     $actual_permissions = $this->permissionHandler->getPermissions();
 
