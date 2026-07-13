@@ -146,17 +146,17 @@ class SelectionTest extends BrowserTestBase {
 
     $this->handlerSettings['auto_create'] = TRUE;
     $this->handlerSettings['auto_create_bundle'] = $type3;
-    $this->createEntityReferenceField('entity_test', 'entity_test', 'test_field', $this->randomString(), 'node', 'views_auto_create', $this->handlerSettings);
+    $this->createEntityReferenceField('entity_test', 'test_bundle', 'test_field', $this->randomString(), 'node', 'views_auto_create', $this->handlerSettings);
 
     /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository */
     $entity_display_repository = \Drupal::service('entity_display.repository');
-    $entity_display_repository->getFormDisplay('entity_test', 'entity_test', 'default')
+    $entity_display_repository->getFormDisplay('entity_test', 'test_bundle', 'default')
       ->setComponent('test_field', [
         'type' => 'entity_reference_autocomplete',
       ])
       ->save();
 
-    $this->drupalGet('/entity_test/add');
+    $this->drupalGet('/entity_test/add/test_bundle');
 
     $this->assertSession()->elementExists('xpath', '//input[@id="edit-test-field-0-target-id" and contains(@class, "form-autocomplete")]');
 
@@ -169,7 +169,6 @@ class SelectionTest extends BrowserTestBase {
       'name[0][value]' => $this->randomMachineName(),
       'test_field[0][target_id]' => $new_title,
     ];
-    $this->drupalGet("/entity_test/add");
     $this->submitForm($edit, 'Save');
 
     // Assert referenced node was created.
@@ -177,8 +176,10 @@ class SelectionTest extends BrowserTestBase {
     $this->assertNotEmpty($referenced_node, 'Referenced node was created.');
     $this->assertSame($type3, $referenced_node->getType());
 
-    // Assert the referenced node is associated with referencing node.
-    $result = \Drupal::entityQuery('entity_test')->execute();
+    // Assert the referenced node is associated with the referencing node.
+    $result = \Drupal::entityQuery('entity_test')
+      ->accessCheck(FALSE)
+      ->execute();
 
     $referencing_nid = key($result);
     $referencing_node = EntityTest::load($referencing_nid);

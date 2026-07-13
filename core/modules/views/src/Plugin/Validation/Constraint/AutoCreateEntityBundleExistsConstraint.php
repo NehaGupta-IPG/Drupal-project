@@ -13,46 +13,37 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
  */
 #[Constraint(
   id: 'AutoCreateEntityBundleExists',
-  label: new TranslatableMarkup('Entity bundle exists', [], ['context' => 'Validation']),
+  label: new TranslatableMarkup('Auto create entity bundle exists', [], ['context' => 'Validation']),
   type: 'entity'
 )]
 class AutoCreateEntityBundleExistsConstraint extends SymfonyConstraint {
 
   /**
-   * The error message if validation fails.
-   */
-  public string $message = "The '@bundle' bundle does not exist on the '@entity_type_id' entity type.";
-
-  /**
-   * The host entity type ID.
+   * Constructs an AutoCreateEntityBundleExistsConstraint.
    *
-   * This can contain variable values (e.g., `%parent`) that will be replaced.
-   *
-   * @see \Drupal\Core\Config\Schema\TypeResolver::replaceVariable()
+   * @param string $entityTypeId
+   *   The entity type ID which should have the given bundle. This can contain
+   *   variable values (e.g., `%parent`) that will be replaced.
+   *   @see \Drupal\Core\Config\Schema\TypeResolver::replaceVariable()
+   * @param string $fieldName
+   *   The field name which has auto creation enabled. This can contain
+   *   variable values (e.g., `%parent`) that will be replaced.
+   *   @see \Drupal\Core\Config\Schema\TypeResolver::replaceVariable()
+   * @param string $message
+   *   The error message if validation fails.
+   * @param array|null $groups
+   *   The groups that the constraint belongs to.
+   * @param mixed|null $payload
+   *   Domain-specific data attached to a constraint.
    */
-  public string $entityTypeId;
-
-  /**
-   * The field name which has auto creation enabled.
-   *
-   * This can contain variable values (e.g., `%parent`) that will be replaced.
-   *
-   * @see \Drupal\Core\Config\Schema\TypeResolver::replaceVariable()
-   */
-  public string $fieldName;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getDefaultOption(): ?string {
-    return 'entityTypeId';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getRequiredOptions(): array {
-    return ['entityTypeId', 'fieldName'];
+  public function __construct(
+    public string $entityTypeId,
+    public string $fieldName,
+    public string $message = "The '@bundle' bundle does not exist on the '@entity_type_id' entity type.",
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct(groups: $groups, payload: $payload);
   }
 
 }
