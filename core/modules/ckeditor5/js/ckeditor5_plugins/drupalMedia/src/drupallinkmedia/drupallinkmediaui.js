@@ -1,8 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 // cspell:ignore linkui
-import { Plugin } from 'ckeditor5/src/core';
-import { LINK_KEYSTROKE } from '@ckeditor/ckeditor5-link/src/utils';
-import { ButtonView } from 'ckeditor5/src/ui';
+import {
+  Plugin,
+  _LINK_KEYSTROKE as LINK_KEYSTROKE,
+  ButtonView,
+} from 'ckeditor5';
 import linkIcon from '../../../../../icons/link.svg';
 
 /**
@@ -83,7 +85,7 @@ export default class DrupalLinkMediaUI extends Plugin {
       // depending on whether the media is already linked.
       this.listenTo(button, 'execute', () => {
         if (this._isSelectedLinkedMedia(editor.model.document.selection)) {
-          plugin._addActionsView();
+          plugin._addToolbarView();
         } else {
           plugin._showUI(true);
         }
@@ -103,8 +105,7 @@ export default class DrupalLinkMediaUI extends Plugin {
   _isSelectedLinkedMedia(selection) {
     const selectedModelElement = selection.getSelectedElement();
     return (
-      !!selectedModelElement &&
-      selectedModelElement.is('element', 'drupalMedia') &&
+      selectedModelElement?.is('element', 'drupalMedia') &&
       selectedModelElement.hasAttribute('linkHref')
     );
   }

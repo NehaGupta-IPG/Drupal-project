@@ -97,23 +97,13 @@ class ModuleInstaller implements ModuleInstallerInterface {
     #[Autowire(service: 'logger.channel.default')]
     protected LoggerInterface $logger,
     #[AutowireIterator(tag: 'module_install.uninstall_validator')]
-    protected ?\Traversable $uninstallValidators = NULL,
+    protected \Traversable $uninstallValidators,
   ) {
     $this->root = $root;
     $this->moduleHandler = $module_handler;
     $this->kernel = $kernel;
     $this->connection = $connection;
     $this->updateRegistry = $update_registry;
-    if ($this->uninstallValidators === NULL) {
-      $this->uninstallValidators = \Drupal::service('module_installer.uninstall_validators');
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function addUninstallValidator(ModuleUninstallValidatorInterface $uninstall_validator) {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Inject the uninstall validators into the constructor instead. See https://www.drupal.org/node/3432595', E_USER_DEPRECATED);
   }
 
   /**
@@ -150,7 +140,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       }
     }
     if ($enable_dependencies) {
-      $module_list = $module_list ? array_combine($module_list, $module_list) : [];
+      $module_list = array_combine($module_list, $module_list);
       if ($missing_modules = array_diff_key($module_list, $module_data)) {
         // One or more of the given modules doesn't exist.
         throw new MissingDependencyException(sprintf('Unable to install modules %s due to missing modules %s.', implode(', ', $module_list), implode(', ', $missing_modules)));
@@ -278,7 +268,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
         array_fill_keys($module_list, 0),
         $installed_modules
       )))
-      ->save(TRUE);
+      ->save();
 
     // Prepare the new module list, sorted by weight, including filenames.
     // This list is used for both the ModuleHandler and DrupalKernel. It
@@ -354,14 +344,6 @@ class ModuleInstaller implements ModuleInstallerInterface {
 
     $entity_type_providers_to_install = $module_list;
     foreach ($module_list as $module) {
-      // Set the schema version to the number of the last update provided by
-      // the module, or the minimum core schema version.
-      $version = \Drupal::CORE_MINIMUM_SCHEMA_VERSION;
-      $versions = $this->updateRegistry->getAvailableUpdates($module);
-      if ($versions) {
-        $version = max(max($versions), $version);
-      }
-
       // Remove the module from the list of possible entity type providers to
       // install.
       array_shift($entity_type_providers_to_install);
@@ -405,10 +387,20 @@ class ModuleInstaller implements ModuleInstallerInterface {
           }
         }
       }
+    }
 
+    foreach ($module_list as $module) {
       // Install default configuration of the module.
       $config_installer = \Drupal::service('config.installer');
       $config_installer->installDefaultConfig('module', $module, DefaultConfigMode::InstallSimple);
+
+      // Set the schema version to the number of the last update provided by
+      // the module, or the minimum core schema version.
+      $version = \Drupal::CORE_MINIMUM_SCHEMA_VERSION;
+      $versions = $this->updateRegistry->getAvailableUpdates($module);
+      if ($versions) {
+        $version = max(max($versions), $version);
+      }
 
       // If the module has no current updates, but has some that were
       // previously removed, set the version to the value of
@@ -612,7 +604,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       if ($core_extension->get('profile') === $module) {
         $core_extension->clear('profile');
       }
-      $core_extension->save(TRUE);
+      $core_extension->save();
 
       // Update the module handler to remove the module.
       // The current ModuleHandler instance is obsolete with the kernel rebuild
@@ -712,18 +704,11 @@ class ModuleInstaller implements ModuleInstallerInterface {
    *   The list of installed modules.
    */
   protected function updateKernel($module_filenames) {
-    // Save current state of config installer, so it can be restored after the
-    // container is rebuilt.
-    /** @var \Drupal\Core\Config\ConfigInstallerInterface $config_installer */
-    $config_installer = $this->kernel->getContainer()->get('config.installer');
-    $sync_status = $config_installer->isSyncing();
-    $source_storage = $config_installer->getSourceStorage();
-
     if (!empty($module_filenames)) {
-      // This reboots the kernel to register the module's bundle and its services
-      // in the service container. The $module_filenames argument is taken over as
-      // %container.modules% parameter, which is passed to a fresh ModuleHandler
-      // instance upon first retrieval.
+      // This reboots the kernel to register the module's bundle and its
+      // services in the service container. The $module_filenames argument is
+      // taken over as %container.modules% parameter, which is passed to a fresh
+      // ModuleHandler instance upon first retrieval.
       $this->kernel->updateModules($module_filenames, $module_filenames);
       $container = $this->kernel->getContainer();
     }
@@ -736,13 +721,6 @@ class ModuleInstaller implements ModuleInstallerInterface {
     $this->moduleHandler = $container->get('module_handler');
     $this->connection = $container->get('database');
     $this->updateRegistry = $container->get('update.update_hook_registry');
-
-    // Restore state of config installer.
-    if ($sync_status) {
-      $container->get('config.installer')
-        ->setSyncing(TRUE)
-        ->setSourceStorage($source_storage);
-    }
   }
 
   /**

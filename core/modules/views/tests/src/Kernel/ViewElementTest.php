@@ -6,12 +6,14 @@ namespace Drupal\Tests\views\Kernel;
 
 use Drupal\views\Exception\ViewRenderElementException;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the view render element.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class ViewElementTest extends ViewsKernelTestBase {
 
   /**
@@ -142,7 +144,7 @@ class ViewElementTest extends ViewsKernelTestBase {
       '#embed' => FALSE,
     ];
     $this->expectException(ViewRenderElementException::class);
-    $this->expectExceptionMessage("Invalid View name ({$render_element['#name']}) given.");
+    $this->expectExceptionMessageIs("Invalid View name ({$render_element['#name']}) given.");
     $renderer->renderRoot($render_element);
   }
 

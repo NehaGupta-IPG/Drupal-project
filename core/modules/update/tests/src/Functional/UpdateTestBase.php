@@ -74,8 +74,8 @@ abstract class UpdateTestBase extends BrowserTestBase {
    *
    * @see \Drupal\update_test\Controller\UpdateTestController::updateTest()
    */
-  protected function refreshUpdateStatus($xml_map, $url = 'update-test') {
-    // Tell the Update Manager module to fetch from the URL provided by
+  protected function refreshUpdateStatus(array $xml_map, string $url = 'update-test') {
+    // Tell the Update Status module to fetch from the URL provided by
     // update_test module.
     $this->config('update.settings')->set('fetch.url', Url::fromUri('base:' . $url, ['absolute' => TRUE])->toString())->save();
     // Save the map for UpdateTestController::updateTest() to use.
@@ -93,7 +93,7 @@ abstract class UpdateTestBase extends BrowserTestBase {
     $this->assertSession()->responseContains('<h3>Drupal core</h3>');
     // Verify that the link to the Drupal project appears.
     $this->assertSession()->linkExists('Drupal');
-    $this->assertSession()->linkByHrefExists('http://example.com/project/drupal');
+    $this->assertSession()->linkByHrefExists('https://example.com/project/drupal');
     $this->assertSession()->pageTextNotContains('No available releases found');
     $this->assertSession()->pageTextContains('Last checked:');
     // No download URLs should be present.
@@ -112,12 +112,12 @@ abstract class UpdateTestBase extends BrowserTestBase {
    * @param string $update_element_css_locator
    *   The CSS locator for the page element that contains the security updates.
    */
-  protected function assertSecurityUpdates($project_path_part, array $expected_security_releases, $expected_update_message_type, $update_element_css_locator) {
+  protected function assertSecurityUpdates($project_path_part, array $expected_security_releases, string $expected_update_message_type, $update_element_css_locator) {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $this->standardTests();
     $assert_session->elementTextNotContains('css', $update_element_css_locator, 'Not supported');
-    $all_security_release_urls = array_map(function ($link) {
+    $all_security_release_urls = array_map(function (NodeElement $link) {
       return $link->getAttribute('href');
     }, $page->findAll('css', "$update_element_css_locator .version-security a[href$='-release']"));
     if ($expected_security_releases) {
@@ -135,8 +135,8 @@ abstract class UpdateTestBase extends BrowserTestBase {
       $assert_session->elementTextNotContains('css', $update_element_css_locator, 'Up to date');
       foreach ($expected_security_releases as $expected_security_release) {
         $expected_url_version = str_replace('.', '-', $expected_security_release);
-        $release_url = "http://example.com/$project_path_part-$expected_url_version-release";
-        $assert_session->responseNotContains("http://example.com/$project_path_part-$expected_url_version.tar.gz");
+        $release_url = "https://example.com/$project_path_part-$expected_url_version-release";
+        $assert_session->responseNotContains("https://example.com/$project_path_part-$expected_url_version.tar.gz");
         $expected_release_urls[] = $release_url;
         // Ensure the expected links are security links.
         $this->assertContains($release_url, $all_security_release_urls, "Release $release_url is a security release link.");
@@ -173,14 +173,14 @@ abstract class UpdateTestBase extends BrowserTestBase {
    * @param int $index
    *   (optional) The index of the link.
    */
-  protected function assertVersionUpdateLinks($label, $version, int $index = 0) {
+  protected function assertVersionUpdateLinks($label, string $version, int $index = 0) {
     $update_element = $this->findUpdateElementByLabel($label, $index);
     // In the release notes URL the periods are replaced with dashes.
     $url_version = str_replace('.', '-', $version);
 
-    $this->assertEquals($update_element->findLink($version)->getAttribute('href'), "http://example.com/{$this->updateProject}-$url_version-release");
-    $this->assertStringNotContainsString("http://example.com/{$this->updateProject}-$version.tar.gz", $update_element->getOuterHtml());
-    $this->assertEquals($update_element->findLink('Release notes')->getAttribute('href'), "http://example.com/{$this->updateProject}-$url_version-release");
+    $this->assertEquals($update_element->findLink($version)->getAttribute('href'), "https://example.com/{$this->updateProject}-$url_version-release");
+    $this->assertStringNotContainsString("https://example.com/{$this->updateProject}-$version.tar.gz", $update_element->getOuterHtml());
+    $this->assertEquals($update_element->findLink('Release notes')->getAttribute('href'), "https://example.com/{$this->updateProject}-$url_version-release");
   }
 
   /**
@@ -242,7 +242,7 @@ abstract class UpdateTestBase extends BrowserTestBase {
    *
    * @see \Behat\Mink\WebAssert::elementTextContains()
    */
-  protected function assertUpdateTableTextContains($text) {
+  protected function assertUpdateTableTextContains(string $text) {
     $this->assertSession()
       ->elementTextContains('css', $this->updateTableLocator, $text);
   }
@@ -253,7 +253,7 @@ abstract class UpdateTestBase extends BrowserTestBase {
    * @param string $text
    *   The expected text.
    */
-  protected function assertUpdateTableTextNotContains($text) {
+  protected function assertUpdateTableTextNotContains(string $text) {
     $this->assertSession()->elementTextNotContains('css', $this->updateTableLocator, $text);
   }
 
@@ -265,7 +265,7 @@ abstract class UpdateTestBase extends BrowserTestBase {
    *
    * @see \Behat\Mink\WebAssert::elementContains()
    */
-  protected function assertUpdateTableElementContains($text) {
+  protected function assertUpdateTableElementContains(string $text) {
     $this->assertSession()
       ->elementContains('css', $this->updateTableLocator, $text);
   }
@@ -278,7 +278,7 @@ abstract class UpdateTestBase extends BrowserTestBase {
    *
    * @see \Behat\Mink\WebAssert::elementNotContains()
    */
-  protected function assertUpdateTableElementNotContains($text) {
+  protected function assertUpdateTableElementNotContains(string $text) {
     $this->assertSession()
       ->elementNotContains('css', $this->updateTableLocator, $text);
   }

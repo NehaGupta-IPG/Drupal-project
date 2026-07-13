@@ -224,15 +224,6 @@ class PhpBackend implements CacheBackendInterface {
   /**
    * {@inheritdoc}
    */
-  public function invalidateAll() {
-    foreach ($this->storage()->listAll() as $cidhash) {
-      $this->invalidateByHash($cidhash);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function garbageCollection() {
   }
 

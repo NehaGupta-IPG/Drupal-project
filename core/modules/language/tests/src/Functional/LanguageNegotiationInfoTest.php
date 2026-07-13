@@ -7,12 +7,14 @@ namespace Drupal\Tests\language\Functional;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUI;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests alterations to language types/negotiation info.
- *
- * @group language
  */
+#[Group('language')]
+#[RunTestsInSeparateProcesses]
 class LanguageNegotiationInfoTest extends BrowserTestBase {
 
   /**
@@ -45,8 +47,9 @@ class LanguageNegotiationInfoTest extends BrowserTestBase {
    * Returns the configurable language manager.
    *
    * @return \Drupal\language\ConfigurableLanguageManager
+   *   The language manager.
    */
-  protected function languageManager() {
+  protected function languageManager(): ?object {
     return $this->container->get('language_manager');
   }
 

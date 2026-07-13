@@ -165,12 +165,12 @@ class ProjectInfo {
    * @param array $info
    *   Array of .info.yml file data as returned by
    *   \Drupal\Core\Extension\InfoParser.
-   * @param $additional_elements
+   * @param array $additional_elements
    *   (optional) Array of additional elements to be collected from the
    *   .info.yml file. Defaults to [].
    *
    * @return array
-   *   Array of .info.yml file data we need for the update manager.
+   *   Array of .info.yml file data we need for Update Status.
    *
    * @see \Drupal\Core\Utility\ProjectInfo::processInfoList()
    */

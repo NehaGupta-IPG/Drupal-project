@@ -11,12 +11,14 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests file usage functions.
- *
- * @group file
  */
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class UsageTest extends FileManagedUnitTestBase {
 
   /**
@@ -154,7 +156,7 @@ class UsageTest extends FileManagedUnitTestBase {
    * We are using UPDATE statements because using the API would set the
    * timestamp.
    */
-  public function createTempFiles() {
+  public function createTempFiles(): array {
     /** @var \Drupal\file\FileRepositoryInterface $fileRepository */
     $fileRepository = \Drupal::service('file.repository');
 

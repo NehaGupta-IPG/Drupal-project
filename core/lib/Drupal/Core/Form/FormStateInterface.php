@@ -45,8 +45,8 @@ interface FormStateInterface {
    *
    * Example:
    * @code
-   *   // Load node.admin.inc from Node module.
-   *   $form_state->loadInclude('node', 'inc', 'node.admin');
+   *   // Load system.post_update.php from System module.
+   *   $form_state->loadInclude('system', 'php', 'post_update');
    * @endcode
    *
    * Use this function instead of \Drupal::moduleHandler()->loadInclude()
@@ -117,7 +117,7 @@ interface FormStateInterface {
    * Sets the redirect for the form.
    *
    * @param string $route_name
-   *   The name of the route
+   *   The name of the route.
    * @param array $route_parameters
    *   (optional) An associative array of parameter names and values.
    * @param array $options

@@ -6,12 +6,14 @@ namespace Drupal\Tests\locale\Functional;
 
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests translation update's effects on configuration translations.
- *
- * @group locale
  */
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocaleConfigTranslationImportTest extends BrowserTestBase {
 
   /**
@@ -23,13 +25,6 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-  }
 
   /**
    * Tests update changes configuration translations if enabled after language.
@@ -70,12 +65,6 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
     // translations of locale_test_translate module.
     $this->drupalGet('admin/reports/translations/check');
 
-    // Override the Drupal core translation status to be up to date.
-    // Drupal core should not be a subject in this test.
-    $status = locale_translation_get_status();
-    $status['drupal']['af']->type = 'current';
-    \Drupal::state()->set('locale.translation_status', $status);
-
     $this->drupalGet('admin/reports/translations');
     $this->submitForm([], 'Update translations');
 
@@ -104,9 +93,6 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
     $this->configImporter()->import();
 
     $this->drupalGet('admin/reports/translations/check');
-    $status = locale_translation_get_status();
-    $status['drupal']['af']->type = 'current';
-    \Drupal::state()->set('locale.translation_status', $status);
     $this->drupalGet('admin/reports/translations');
     $this->submitForm([], 'Update translations');
 

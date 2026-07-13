@@ -44,10 +44,11 @@ class FormTestRebuildPreserveValuesForm extends FormBase {
         '#default_value' => 'DEFAULT 1',
       ],
     ];
-    // Provide an 'add more' button that rebuilds the form with an additional two
-    // checkboxes and a textfield. The test is to make sure that the rebuild
+    // Provide an 'add more' button that rebuilds the form with an additional
+    // two checkboxes and a textfield. The test is to make sure that the rebuild
     // triggered by this button preserves the user input values for the initial
-    // elements and initializes the new elements with the correct default values.
+    // elements and initializes the new elements with the correct default
+    // values.
     if (!$form_state->has('add_more')) {
       $form['add_more'] = [
         '#type' => 'submit',
@@ -85,7 +86,7 @@ class FormTestRebuildPreserveValuesForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function addMoreSubmitForm(array &$form, FormStateInterface $form_state) {
+  public function addMoreSubmitForm(array &$form, FormStateInterface $form_state): void {
     // Rebuild, to test preservation of input values.
     $form_state->set('add_more', TRUE);
     $form_state->setRebuild();
@@ -94,7 +95,7 @@ class FormTestRebuildPreserveValuesForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     // Finish the workflow. Do not rebuild.
     $this->messenger()->addStatus($this->t('Form values: %values', ['%values' => var_export($form_state->getValues(), TRUE)]));
   }

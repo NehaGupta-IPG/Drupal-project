@@ -10,6 +10,7 @@
 
 use Drupal\Component\Graph\Graph;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
+use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Utility\Error;
 use Drupal\Core\Update\EquivalentUpdate;
 
@@ -19,7 +20,7 @@ use Drupal\Core\Update\EquivalentUpdate;
  * @return array
  *   A requirements info array.
  */
-function update_system_schema_requirements() {
+function update_system_schema_requirements(): array {
   $requirements = [];
 
   $system_schema = \Drupal::service('update.update_hook_registry')->getInstalledVersion('system');
@@ -34,8 +35,8 @@ function update_system_schema_requirements() {
   else {
     $requirements['minimum schema'] += [
       'value' => 'The installed schema version does not meet the minimum.',
-      'severity' => REQUIREMENT_ERROR,
-      'description' => 'Your system schema version is ' . $system_schema . '. Updating directly from a schema version prior to 8000 is not supported. You must upgrade your site to Drupal 8 first, see https://www.drupal.org/docs/8/upgrade.',
+      'severity' => RequirementSeverity::Error,
+      'description' => 'Your system schema version is ' . $system_schema . '. Updating directly from a schema version prior to 8000 is not supported. You must upgrade your site to Drupal 8 (or later), see https://www.drupal.org/docs/upgrading-drupal.',
     ];
   }
 
@@ -52,8 +53,12 @@ function update_check_requirements() {
   _update_fix_missing_schema();
 
   // Check requirements of all loaded modules.
-  $requirements = \Drupal::moduleHandler()->invokeAll('requirements', ['update']);
+  $requirements = array_merge(
+    \Drupal::moduleHandler()->invokeAll('requirements', ['update']),
+    \Drupal::moduleHandler()->invokeAll('update_requirements')
+  );
   \Drupal::moduleHandler()->alter('requirements', $requirements);
+  \Drupal::moduleHandler()->alter('update_requirements', $requirements);
   $requirements += update_system_schema_requirements();
   return $requirements;
 }
@@ -69,7 +74,7 @@ function update_check_requirements() {
  * @todo remove in a major version after
  * https://www.drupal.org/project/drupal/issues/3130037 has been fixed.
  */
-function _update_fix_missing_schema() {
+function _update_fix_missing_schema(): void {
   /** @var \Drupal\Core\Update\UpdateHookRegistry $update_registry */
   $update_registry = \Drupal::service('update.update_hook_registry');
   $versions = $update_registry->getAllInstalledVersions();
@@ -158,7 +163,7 @@ function _update_fix_missing_schema() {
  *
  * @see update_resolve_dependencies()
  */
-function update_do_one($module, $number, $dependency_map, &$context) {
+function update_do_one($module, $number, $dependency_map, &$context): void {
   $function = $module . '_update_' . $number;
 
   // If this update was aborted in a previous step, or has a dependency that
@@ -227,7 +232,7 @@ function update_do_one($module, $number, $dependency_map, &$context) {
  * @param array $context
  *   The batch context array.
  */
-function update_invoke_post_update($function, &$context) {
+function update_invoke_post_update($function, &$context): void {
   $ret = [];
 
   // If this update was aborted in a previous step, or has a dependency that was
@@ -300,7 +305,7 @@ function update_invoke_post_update($function, &$context) {
  *       the update number and the description from source code comment for
  *       each update function. This array is keyed by the update number.
  */
-function update_get_update_list() {
+function update_get_update_list(): array {
   // Make sure that the system module is first in the list of updates.
   $ret = ['system' => []];
 
@@ -478,7 +483,7 @@ function update_resolve_dependencies($starting_updates) {
  *
  * @see update_resolve_dependencies()
  */
-function update_get_update_function_list($starting_updates) {
+function update_get_update_function_list($starting_updates): array {
   // Go through each module and find all updates that we need (including the
   // first update that was requested and any updates that run after it).
   $update_functions = [];
@@ -544,10 +549,15 @@ function update_get_update_function_list($starting_updates) {
  * @see \Drupal\Component\Graph\Graph::searchAndSort()
  * @see update_resolve_dependencies()
  */
-function update_build_dependency_graph($update_functions) {
+function update_build_dependency_graph($update_functions): array {
   // Initialize an array that will define a directed graph representing the
   // dependencies between update functions.
   $graph = [];
+
+  // Helper variables used to to manipulate the graph so that system updates run
+  // as early as possible.
+  $max_system_update = 0;
+  $min_non_system_updates = [];
 
   // Go through each update function and build an initial list of dependencies.
   foreach ($update_functions as $module => $functions) {
@@ -564,13 +574,25 @@ function update_build_dependency_graph($update_functions) {
       // Define the module and update number associated with this function.
       $graph[$function]['module'] = $module;
       $graph[$function]['number'] = $number;
+      if ($module == 'system') {
+        // Save the maximum system update number so independent update functions
+        // can be run after all system updates.
+        $max_system_update = max($max_system_update, $number);
+      }
+      else {
+        $min_non_system_updates[$module] = min($min_non_system_updates[$module] ?? \PHP_INT_MAX, $number);
+      }
     }
   }
 
+  $has_non_system_updates_that_must_run_before_system_updates = FALSE;
   // Now add any explicit update dependencies declared by modules.
   $update_dependencies = update_retrieve_dependencies();
   foreach ($graph as $function => $data) {
     if (!empty($update_dependencies[$data['module']][$data['number']])) {
+      if ($data['module'] === 'system') {
+        $has_non_system_updates_that_must_run_before_system_updates = TRUE;
+      }
       foreach ($update_dependencies[$data['module']][$data['number']] as $module => $number) {
         $dependency = $module . '_update_' . $number;
         $graph[$dependency]['edges'][$function] = TRUE;
@@ -580,6 +602,51 @@ function update_build_dependency_graph($update_functions) {
     }
   }
 
+  if ($max_system_update === 0) {
+    // There are no system updates, so there is nothing else to do.
+    return $graph;
+  }
+
+  if (!$has_non_system_updates_that_must_run_before_system_updates) {
+    // This is the simple case where all non-system updates run after all
+    // system updates.
+    foreach ($min_non_system_updates as $module => $min_number) {
+      $function = $module . '_update_' . $min_number;
+      $graph['system_update_' . $max_system_update]['edges'][$function] = TRUE;
+    }
+    return $graph;
+  }
+
+  // In this case, there are non-system updates that must run before a system
+  // update. These updates must run after any system updates that are not
+  // dependent on them. Build the current graph to work this out.
+  $processed_graph = (new Graph($graph))->searchAndSort();
+  foreach ($processed_graph as $function => $data) {
+    if ($data['module'] !== 'system') {
+      $min_system_update = NULL;
+      // The paths key contains the full list of update functions that must run
+      // after.
+      foreach (array_keys($data['paths']) as $dependent) {
+        if (str_starts_with($dependent, 'system_update_')) {
+          $system_update_number = (int) substr($dependent, 14);
+          $min_system_update = $min_system_update !== NULL ? min($min_system_update, $system_update_number) : $system_update_number;
+        }
+      }
+      if ($min_system_update === NULL) {
+        // If there are no system updates in the paths key, then ensure this
+        // update function runs after all system updates.
+        $graph['system_update_' . $max_system_update]['edges'][$function] = TRUE;
+      }
+      else {
+        // If there are system updates in the paths key, then ensure this update
+        // runs after the previous system update.
+        $previous_system_update = 'system_update_' . ($min_system_update - 1);
+        if (isset($graph[$previous_system_update])) {
+          $graph[$previous_system_update]['edges'][$function] = TRUE;
+        }
+      }
+    }
+  }
   return $graph;
 }
 
@@ -634,7 +701,7 @@ function update_already_performed($module, $number) {
  * @see \Drupal\Core\Extension\ModuleHandlerInterface::invokeAll()
  * @see hook_update_dependencies()
  */
-function update_retrieve_dependencies() {
+function update_retrieve_dependencies(): array {
   $return = [];
   /** @var \Drupal\Core\Extension\ModuleExtensionList */
   $extension_list = \Drupal::service('extension.list.module');

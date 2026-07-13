@@ -4,19 +4,27 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Installer;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
 /**
  * Verifies that profiles with hook_install() can't be installed from config.
- *
- * @group Installer
  */
+#[Group('Installer')]
+#[RunTestsInSeparateProcesses]
 class InstallerExistingConfigProfileHookInstallTest extends InstallerConfigDirectoryTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected $profile = 'config_profile_with_hook_install';
 
   /**
    * {@inheritdoc}
    */
-  protected function visitInstaller(): void {
+  protected function prepareEnvironment(): void {
+    parent::prepareEnvironment();
+
     // Create an .install file with a hook_install() implementation.
     $path = $this->siteDirectory . '/profiles/' . $this->profile;
     $contents = <<<EOF
@@ -26,7 +34,6 @@ function config_profile_with_hook_install_install() {
 }
 EOF;
     file_put_contents("$path/{$this->profile}.install", $contents);
-    parent::visitInstaller();
   }
 
   /**
