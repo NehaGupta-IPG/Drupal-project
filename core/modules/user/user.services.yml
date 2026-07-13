@@ -61,7 +61,7 @@ services:
       - { name: 'context_provider' }
   user.toolbar_link_builder:
     class: Drupal\user\ToolbarLinkBuilder
-    arguments: ['@current_user']
+    arguments: ['@current_user', '@module_handler']
   Drupal\user\ToolbarLinkBuilder: '@user.toolbar_link_builder'
   user.flood_control:
     class: Drupal\user\UserFloodControl

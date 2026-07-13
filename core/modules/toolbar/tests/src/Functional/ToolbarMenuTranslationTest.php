@@ -72,40 +72,12 @@ class ToolbarMenuTranslationTest extends BrowserTestBase {
     // Visit a page that has the string on it so it can be translated.
     $this->drupalGet($langcode . '/admin/structure');
 
-    // Search for the menu item.
-    $search = [
-      'string' => $menu_item,
-      'langcode' => $langcode,
-      'translation' => 'untranslated',
-    ];
-    $this->drupalGet('admin/config/regional/translate');
-    $this->submitForm($search, 'Filter');
-    // Make sure will be able to translate the menu item.
-    $this->assertSession()->pageTextNotContains('No strings available.');
-
     // Check that the class is on the item before we translate it.
     $this->assertSession()->elementsCount('xpath', '//a[contains(@class, "icon-system-admin-structure")]', 1);
 
     // Translate the menu item.
     $menu_item_translated = $this->randomMachineName();
-    $textarea = $this->assertSession()->elementExists('xpath', '//textarea');
-    $lid = (string) $textarea->getAttribute('name');
-    $edit = [
-      $lid => $menu_item_translated,
-    ];
-    $this->drupalGet('admin/config/regional/translate');
-    $this->submitForm($edit, 'Save translations');
-
-    // Search for the translated menu item.
-    $search = [
-      'string' => $menu_item,
-      'langcode' => $langcode,
-      'translation' => 'translated',
-    ];
-    $this->drupalGet('admin/config/regional/translate');
-    $this->submitForm($search, 'Filter');
-    // Make sure the menu item string was translated.
-    $this->assertSession()->pageTextContains($menu_item_translated);
+    $this->addLocalizedString($langcode, $menu_item, $menu_item_translated);
 
     // Go to another page in the custom language and make sure the menu item
     // was translated.
@@ -114,7 +86,94 @@ class ToolbarMenuTranslationTest extends BrowserTestBase {
 
     // Toolbar icons are included based on the presence of a specific class on
     // the menu item. Ensure that class also exists for a translated menu item.
-    $this->assertSession()->elementsCount('xpath', '//a[contains(@class, "icon-system-admin-structure")]', 1);
+    $xpath = $this->xpath('//a[contains(@class, "icon-system-admin-structure")]');
+    $this->assertCount(1, $xpath, 'The menu item class is the same.');
+  }
+
+  /**
+   * Tests that the toolbar is shown in the preferred admin language.
+   */
+  public function testToolbarRenderedInPreferredAdminLanguage(): void {
+    // Enable the 'Account administration pages' language detection.
+    $this->drupalGet('admin/config/regional/language/detection');
+    $this->submitForm(['language_interface[enabled][language-user-admin]' => TRUE], 'Save settings');
+
+    $langcode = 'es';
+
+    // Add Spanish.
+    $this->drupalGet('admin/config/regional/language/add');
+    $this->submitForm(['predefined_langcode' => $langcode], 'Add language');
+
+    // The menu item 'Structure' and 'View profile' in the toolbar will be
+    // translated.
+    $menu_item_structure = 'Structure';
+    $menu_item_view_profile = 'View profile';
+
+    // Visit a page that has the string on it so it can be translated.
+    $this->drupalGet($langcode . '/admin/structure');
+    $menu_item_structure_translated = $this->randomMachineName();
+    $this->addLocalizedString($langcode, $menu_item_structure, $menu_item_structure_translated);
+
+    // Add a translation for a menu item added using user_toolbar().
+    $menu_item_view_profile_translated = $this->randomMachineName();
+    $this->addLocalizedString($langcode, $menu_item_view_profile, $menu_item_view_profile_translated);
+
+    // Go to another page in the custom language and make sure the menu item
+    // was translated.
+    $this->drupalGet($langcode . '/user');
+    $this->assertSession()->elementContains('css', '#toolbar-link-system-admin_structure', $menu_item_structure_translated);
+    $this->assertSession()->elementContains('css', '#toolbar-item-user-tray a[title="User account"]', $menu_item_view_profile_translated);
+
+    // Configure a preferred admin language.
+    $this->adminUser->set('preferred_admin_langcode', 'en');
+    $this->adminUser->save();
+
+    drupal_flush_all_caches();
+
+    // Go to another page in the custom language and make sure the menu item
+    // is shown in the preferred admin language.
+    $this->drupalGet($langcode . '/user');
+    $this->assertSession()->elementContains('css', '#toolbar-link-system-admin_structure', $menu_item_structure);
+    $this->assertSession()->elementContains('css', '#toolbar-item-user-tray a[title="User account"]', $menu_item_view_profile);
+  }
+
+  /**
+   * Add a localized string.
+   *
+   * @param string $langcode
+   *   The langcode.
+   * @param string $string
+   *   The string to translate.
+   * @param string $translation
+   *   The string translation.
+   */
+  protected function addLocalizedString(string $langcode, string $string, string $translation): void {
+    // Search for the label.
+    $search = [
+      'string' => $string,
+      'langcode' => $langcode,
+      'translation' => 'untranslated',
+    ];
+    $this->drupalGet('admin/config/regional/translate');
+    $this->submitForm($search, 'Filter');
+    // Make sure will be able to translate the label.
+    $this->assertSession()->pageTextNotContains('No strings available.');
+
+    $textarea = current($this->xpath('//textarea'));
+
+    $lid = (string) $textarea->getAttribute('name');
+    $this->submitForm([$lid => $translation], 'Save translations');
+
+    // Search for the translated menu item.
+    $search = [
+      'string' => $string,
+      'langcode' => $langcode,
+      'translation' => 'translated',
+    ];
+    $this->drupalGet('admin/config/regional/translate');
+    $this->submitForm($search, 'Filter');
+    // Make sure the menu item string was translated.
+    $this->assertSession()->pageTextContains($translation);
   }
 
 }

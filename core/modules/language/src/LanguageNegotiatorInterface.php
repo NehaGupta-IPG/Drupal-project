@@ -180,6 +180,19 @@ interface LanguageNegotiatorInterface {
   public function isNegotiationMethodEnabled($method_id, $type = NULL);
 
   /**
+   * Gets the langcode the current user administers the site in.
+   *
+   * The enabled interface language negotiation methods implementing
+   * \Drupal\language\AdminLanguageNegotiationInterface are asked in order of
+   * their priority, mirroring interface language negotiation.
+   *
+   * @return string
+   *   The administration langcode, or an empty string when no enabled
+   *   negotiation method provides one for the current user.
+   */
+  public function getAdminLangcode(): string;
+
+  /**
    * Saves a list of language negotiation methods for a language type.
    *
    * @param string $type

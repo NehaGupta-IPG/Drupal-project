@@ -12,6 +12,7 @@ use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Security\Attribute\TrustedCallback;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\language\AdminLanguageRender;
 use Drupal\user\Entity\User;
 
 /**
@@ -45,6 +46,25 @@ final class NavigationUserBlock extends BlockBase {
    */
   #[TrustedCallback]
   public static function buildLinks(string $label): array {
+    // Render the links in the user's preferred admin language. The switch added
+    // here runs (and is restored) around ::renderLinks() so that the menu link
+    // titles it builds are translated in the admin language even on non-admin
+    // pages.
+    $build = [
+      '#pre_render' => [static::class . '::renderLinks'],
+      '#navigation_user_label' => $label,
+    ];
+    if (\Drupal::moduleHandler()->moduleExists('language')) {
+      $build = AdminLanguageRender::applyTo($build);
+    }
+    return $build;
+  }
+
+  /**
+   * Pre-render callback that builds the user links.
+   */
+  #[TrustedCallback]
+  public static function renderLinks(array $element): array {
     $parameters = new MenuTreeParameters();
     $parameters
       ->setMinDepth(0)
@@ -60,11 +80,8 @@ final class NavigationUserBlock extends BlockBase {
     if (!$account) {
       // In certain edge case, the user load may fail, such as a late lazy
       // builder in tests when it was already deleted.
-      return [
-        '#cache' => [
-          'contexts' => ['user'],
-        ],
-      ];
+      $element['#cache']['contexts'][] = 'user';
+      return $element;
     }
 
     $menu_definition = [
@@ -88,14 +105,22 @@ final class NavigationUserBlock extends BlockBase {
       ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
     ];
     $tree = $menu_tree->transform([$tree], $manipulators);
-    $build = $menu_tree->build($tree);
-    $build['#title'] = $label;
-    $build['#cache']['contexts'][] = 'user';
-    $cacheable_metadata = CacheableMetadata::createFromRenderArray($build);
-    $cacheable_metadata->addCacheableDependency($account);
-    $cacheable_metadata->applyTo($build);
+    $links = $menu_tree->build($tree);
 
-    return $build;
+    // Merge the built links into the element, preserving the admin-language
+    // switch metadata (#pre_render/#post_render and cache contexts) already on
+    // it.
+    $cacheable_metadata = CacheableMetadata::createFromRenderArray($element)
+      ->merge(CacheableMetadata::createFromRenderArray($links))
+      ->addCacheableDependency($account);
+    $cacheable_metadata->addCacheContexts(['user']);
+    unset($links['#cache']);
+    $element += $links;
+    $element['#title'] = $element['#navigation_user_label'];
+    unset($element['#navigation_user_label']);
+    $cacheable_metadata->applyTo($element);
+
+    return $element;
   }
 
 }

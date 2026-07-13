@@ -29,3 +29,4 @@ services:
     arguments: ['@language_manager']
     tags:
       - { name: paramconverter }
+  Drupal\language\AdminLanguageRender: ~

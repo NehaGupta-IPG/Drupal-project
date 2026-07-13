@@ -203,6 +203,11 @@ services:
     arguments: ['@current_user']
     tags:
       - { name: cache.context}
+  cache_context.user.admin_language:
+    class: Drupal\Core\Cache\Context\AccountAdminLanguageCacheContext
+    arguments: [ '@language_manager' ]
+    tags:
+      - { name: cache.context }
   cache_context.user.permissions:
     class: Drupal\Core\Cache\Context\AccountPermissionsCacheContext
     arguments: ['@current_user', '@user_permissions_hash_generator']

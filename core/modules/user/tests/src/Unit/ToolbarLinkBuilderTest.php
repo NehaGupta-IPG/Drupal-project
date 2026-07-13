@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Unit;
 
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\ToolbarLinkBuilder;
@@ -24,7 +25,8 @@ class ToolbarLinkBuilderTest extends UnitTestCase {
     $account = $this->prophesize(AccountProxyInterface::class);
     $display_name = 'Something suspicious that should be #plain_text, not #markup';
     $account->getDisplayName()->willReturn($display_name);
-    $toolbar_link_builder = new ToolbarLinkBuilder($account->reveal());
+    $module_handler = $this->prophesize(ModuleHandlerInterface::class);
+    $toolbar_link_builder = new ToolbarLinkBuilder($account->reveal(), $module_handler->reveal());
     $expected = ['#plain_text' => $display_name];
     $this->assertSame($expected, $toolbar_link_builder->renderDisplayName());
   }

@@ -17,6 +17,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Installer\InstallerKernel;
+use Drupal\language\AdminLanguageRender;
 use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
@@ -169,6 +170,14 @@ class LanguageHooks {
       $type['language_select']['#theme_wrappers'] = array_merge($type['language_select']['#theme_wrappers'], ['form_element']);
       $type['language_select']['#languages'] = LanguageInterface::STATE_CONFIGURABLE;
       $type['language_select']['#multiple'] = FALSE;
+      // Support rendering the links in the user's preferred admin language.
+      if (isset($type['toolbar'])) {
+        $type['toolbar'] = AdminLanguageRender::applyTo($type['toolbar']);
+      }
+      if (isset($type['contextual_links'])) {
+        $type['contextual_links'] = AdminLanguageRender::applyTo($type['contextual_links']);
+      }
+
     }
   }
 

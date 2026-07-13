@@ -146,7 +146,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
         'menu' => 3,
         'file_parsing' => 1,
       ],
-      'CacheSetCount' => 45,
+      'CacheSetCount' => 50,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 9,
@@ -167,11 +167,8 @@ class StandardPerformanceTest extends PerformanceTestBase {
         ['config:views.view.frontpage', 'node:1', 'node_list'],
         ['rendered', 'user:0', 'user_view'],
         ['config:filter.format.restricted_html', 'node_view'],
-        [
-          'config:block_list',
-          'config:system.site',
-        ],
-        ['config:system.menu.account'],
+        ['config:block_list', 'config:system.site'],
+        ['config:system.menu.account', 'config:system.site'],
         ['config:system.menu.main'],
         ['config:user.role.anonymous'],
       ],
@@ -208,11 +205,11 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 8,
-      'CacheGetCount' => 69,
-      'CacheSetCount' => 17,
+      'CacheGetCount' => 70,
+      'CacheSetCount' => 18,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 7,
+      'CacheTagLookupQueryCount' => 6,
       'CacheTagGroupedLookups' => [
         [
           'route_match',
@@ -229,11 +226,10 @@ class StandardPerformanceTest extends PerformanceTestBase {
         ['rendered', 'user:0', 'user_view'],
         ['config:filter.format.restricted_html', 'node:1', 'node_view'],
         [
-          'config:block_list',
+          'config:system.menu.account',
+          'config:system.menu.main',
           'config:system.site',
         ],
-        ['config:system.menu.main'],
-        ['config:system.menu.account'],
         ['config:user.role.anonymous'],
       ],
       'StylesheetCount' => 1,
@@ -265,10 +261,10 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $expected = [
       'QueryCount' => 10,
       'CacheGetCount' => 58,
-      'CacheSetCount' => 17,
+      'CacheSetCount' => 19,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 6,
+      'CacheTagLookupQueryCount' => 5,
       'StylesheetCount' => 1,
       'StylesheetBytes' => 1150,
     ];
@@ -421,7 +417,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'StylesheetBytes' => 1429,
       'StylesheetCount' => 1,
       'QueryCount' => 15,
-      'CacheGetCount' => 73,
+      'CacheGetCount' => 74,
       'CacheSetCount' => 1,
       'CacheDeleteCount' => 1,
       'CacheTagInvalidationCount' => 0,
@@ -511,7 +507,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 15,
-      'CacheGetCount' => 100,
+      'CacheGetCount' => 103,
       'CacheSetCount' => 1,
       'CacheDeleteCount' => 1,
       'CacheTagInvalidationCount' => 0,
@@ -577,8 +573,8 @@ class StandardPerformanceTest extends PerformanceTestBase {
       ],
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 6,
-      'ScriptCount' => 3,
+      'CacheTagLookupQueryCount' => 7,
+      'ScriptCount' => 9,
       'ScriptBytes' => 141352,
       'StylesheetCount' => 2,
       'StylesheetBytes' => 42533,

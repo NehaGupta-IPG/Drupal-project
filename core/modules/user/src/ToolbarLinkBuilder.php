@@ -2,10 +2,12 @@
 
 namespace Drupal\user;
 
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
+use Drupal\language\AdminLanguageRender;
 
 /**
  * ToolbarLinkBuilder fills out the placeholders generated in user_toolbar().
@@ -15,21 +17,17 @@ class ToolbarLinkBuilder implements TrustedCallbackInterface {
   use StringTranslationTrait;
 
   /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountProxyInterface
-   */
-  protected $account;
-
-  /**
    * ToolbarHandler constructor.
    *
    * @param \Drupal\Core\Session\AccountProxyInterface $account
    *   The current user.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   *   The module handler.
    */
-  public function __construct(AccountProxyInterface $account) {
-    $this->account = $account;
-  }
+  public function __construct(
+    protected AccountProxyInterface $account,
+    protected ModuleHandlerInterface $moduleHandler,
+  ) {}
 
   /**
    * Lazy builder callback for rendering toolbar links.
@@ -68,6 +66,11 @@ class ToolbarLinkBuilder implements TrustedCallbackInterface {
         'contexts' => ['user'],
       ],
     ];
+
+    // Support rendering the links in the user's preferred admin language.
+    if ($this->moduleHandler->moduleExists('language')) {
+      $build = AdminLanguageRender::applyTo($build);
+    }
 
     return $build;
   }
