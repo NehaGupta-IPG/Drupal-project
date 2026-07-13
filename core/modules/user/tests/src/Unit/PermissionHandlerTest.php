@@ -40,7 +40,7 @@ class PermissionHandlerTest extends UnitTestCase {
   protected $moduleHandler;
 
   /**
-   * The mocked string translation.
+   * The string translation manager.
    *
    * @var \Drupal\Core\StringTranslation\TranslationManager
    */
