@@ -260,6 +260,9 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
             if (empty($child)) {
               break;
             }
+            if ($load_entities && !isset($term_entities[$child])) {
+              continue;
+            }
             $term = $load_entities ? $term_entities[$child] : $this->treeTerms[$vid][$child];
             if (isset($this->treeParents[$vid][$load_entities ? $term->id() : $term->tid])) {
               // Clone the term so that the depth attribute remains correct
