@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\TestTools\Extension\DeprecationBridge;
 
-use Drupal\TestTools\ErrorHandler\BootstrapErrorHandler;
 use Drupal\TestTools\ErrorHandler\DrupalDebugClassLoader;
 use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
 use PHPUnit\Runner\Extension\Extension;
@@ -60,15 +59,11 @@ final class DeprecationHandler implements Extension {
     $config->load(self::legacySymfonyConfiguration());
 
     // Determine if project ignores are enabled. If so, loads the deprecation
-    // patterns to be ignored from the ignore file and sets the error handler
-    // to Drupal\TestTools\ErrorHandler\BootstrapErrorHandler. This allows to
-    // capture deprecations triggered by PHP or by the DebugClassLoader, that
-    // can occur before tests' ::setUp() methods are called.
+    // patterns to be ignored from the ignore file to allows capturing
+    // deprecations triggered by PHP or by the DebugClassLoader, that can occur
+    // before tests' ::setUp() methods are called.
     if ($config->projectIgnoresEnabled) {
       $config->loadDeprecationIgnorePatterns();
-      // We pass an instance of the PHPUnit error handler to redirect any error
-      // not managed by our layer back to PHPUnit.
-      set_error_handler(new BootstrapErrorHandler(PhpUnitErrorHandler::instance()));
     }
 
     // Enable the DebugClassLoader to get deprecations for methods' signature

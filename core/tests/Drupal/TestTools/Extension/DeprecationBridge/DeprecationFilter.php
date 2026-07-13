@@ -18,7 +18,7 @@ final class DeprecationFilter implements DeprecationFilterInterface {
    * {@inheritdoc}
    */
   public function ignores(string $message, string $file, int $line, IssueTrigger $trigger): bool {
-    if (DeprecationHandler::isIgnoredDeprecation($message)) {
+    if (DeprecationHandler::isIgnoredByProject($message)) {
       return TRUE;
     }
     return FALSE;

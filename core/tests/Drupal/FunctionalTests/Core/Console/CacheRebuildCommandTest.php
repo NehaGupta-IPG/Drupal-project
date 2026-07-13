@@ -42,12 +42,6 @@ class CacheRebuildCommandTest extends BrowserTestBase {
     $code = $tester->execute([]);
     $this->assertStringContainsString('All caches have been rebuilt.', $tester->getDisplay());
     $this->assertEquals(Command::SUCCESS, $code);
-
-    // Cache rebuild includes utility.inc, which sets an error handler. This
-    // sets the error handler to the test bootstrap handler avoid a risky test
-    // warning: "Test code or tested code removed error handlers other than its
-    // own".
-    set_error_handler(new BootstrapErrorHandler(PhpUnitErrorHandler::instance()));
   }
 
 }
