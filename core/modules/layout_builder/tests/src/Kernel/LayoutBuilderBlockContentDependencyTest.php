@@ -16,6 +16,11 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class LayoutBuilderBlockContentDependencyTest extends KernelTestBase {
 
   /**
+   * {@inheritdoc}
+   */
+  protected static $modules = ['system'];
+
+  /**
    * Test that block_content can be successfully installed after layout_builder.
    *
    * The InlineBlock plugin class in layout_builder uses

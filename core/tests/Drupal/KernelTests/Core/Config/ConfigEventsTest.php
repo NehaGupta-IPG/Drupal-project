@@ -35,23 +35,23 @@ class ConfigEventsTest extends KernelTestBase {
 
     $event = \Drupal::state()->get('config_events_test.event', []);
     $this->assertSame(ConfigEvents::SAVE, $event['event_name']);
-    $this->assertSame(['key' => 'initial'], $event['current_config_data']);
-    $this->assertSame(['key' => 'initial'], $event['raw_config_data']);
+    $this->assertSame(['langcode' => 'en', 'key' => 'initial'], $event['current_config_data']);
+    $this->assertSame(['langcode' => 'en', 'key' => 'initial'], $event['raw_config_data']);
     $this->assertSame([], $event['original_config_data']);
 
     $config->set('key', 'updated')->save();
     $event = \Drupal::state()->get('config_events_test.event', []);
     $this->assertSame(ConfigEvents::SAVE, $event['event_name']);
-    $this->assertSame(['key' => 'updated'], $event['current_config_data']);
-    $this->assertSame(['key' => 'updated'], $event['raw_config_data']);
-    $this->assertSame(['key' => 'initial'], $event['original_config_data']);
+    $this->assertSame(['langcode' => 'en', 'key' => 'updated'], $event['current_config_data']);
+    $this->assertSame(['langcode' => 'en', 'key' => 'updated'], $event['raw_config_data']);
+    $this->assertSame(['langcode' => 'en', 'key' => 'initial'], $event['original_config_data']);
 
     $config->delete();
     $event = \Drupal::state()->get('config_events_test.event', []);
     $this->assertSame(ConfigEvents::DELETE, $event['event_name']);
     $this->assertSame([], $event['current_config_data']);
     $this->assertSame([], $event['raw_config_data']);
-    $this->assertSame(['key' => 'updated'], $event['original_config_data']);
+    $this->assertSame(['langcode' => 'en', 'key' => 'updated'], $event['original_config_data']);
   }
 
   /**
@@ -67,17 +67,17 @@ class ConfigEventsTest extends KernelTestBase {
     $config->set('key', 'initial')->save();
     $event = \Drupal::state()->get('config_events_test.event', []);
     $this->assertSame(ConfigEvents::SAVE, $event['event_name']);
-    $this->assertSame(['key' => 'initial'], $event['current_config_data']);
+    $this->assertSame(['langcode' => 'en', 'key' => 'initial'], $event['current_config_data']);
 
     // Override applies when getting runtime config.
-    $this->assertEquals($GLOBALS['config'][$name], \Drupal::config($name)->get());
+    $this->assertEquals($GLOBALS['config'][$name] + ['langcode' => 'en'], \Drupal::config($name)->get());
 
     \Drupal::configFactory()->rename($name, $new_name);
     $event = \Drupal::state()->get('config_events_test.event', []);
     $this->assertSame(ConfigEvents::RENAME, $event['event_name']);
-    $this->assertSame(['key' => 'new overridden'], $event['current_config_data']);
-    $this->assertSame(['key' => 'initial'], $event['raw_config_data']);
-    $this->assertSame(['key' => 'new overridden'], $event['original_config_data']);
+    $this->assertSame(['langcode' => 'en', 'key' => 'new overridden'], $event['current_config_data']);
+    $this->assertSame(['langcode' => 'en', 'key' => 'initial'], $event['raw_config_data']);
+    $this->assertSame(['langcode' => 'en', 'key' => 'new overridden'], $event['original_config_data']);
   }
 
 }

@@ -64,6 +64,7 @@ class ConfigEntityImportTest extends KernelTestBase {
     $name = 'system.action.apple';
     $entity = Action::create([
       'id' => 'apple',
+      'langcode' => 'en',
       'plugin' => 'action_message_action',
     ]);
     $entity->save();
@@ -88,6 +89,7 @@ class ConfigEntityImportTest extends KernelTestBase {
       'label' => 'Red Delicious',
       'theme' => 'olivero',
     ]);
+    $block->set('langcode', 'en')->save();
 
     $this->checkSinglePluginConfigSync($block, 'settings', 'label', 'Red Delicious');
 
@@ -174,6 +176,7 @@ class ConfigEntityImportTest extends KernelTestBase {
     $name = 'search.page.apple';
     $entity = SearchPage::create([
       'id' => 'apple',
+      'langcode' => 'en',
       'label' => 'Apple search',
       'path' => 'apple',
       'plugin' => 'search_extra_type_search',
@@ -198,6 +201,7 @@ class ConfigEntityImportTest extends KernelTestBase {
     /** @var \Drupal\config_test\Entity\ConfigTest $entity */
     $entity = Action::create([
       'id' => 'third_party_settings_test',
+      'langcode' => 'en',
       'plugin' => 'action_message_action',
     ]);
     $entity->save();

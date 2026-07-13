@@ -19,6 +19,11 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class InstallTest extends KernelTestBase {
 
   /**
+   * {@inheritdoc}
+   */
+  protected static $modules = ['system'];
+
+  /**
    * The module installer service.
    */
   protected ModuleInstallerInterface $moduleInstaller;
@@ -32,7 +37,6 @@ class InstallTest extends KernelTestBase {
     $this->moduleInstaller = $this->container->get('module_installer');
     $this->moduleInstaller->install([
       'module_test',
-      'system',
       'user',
     ]);
   }
@@ -74,7 +78,7 @@ class InstallTest extends KernelTestBase {
     /** @var \Drupal\Core\Update\UpdateHookRegistry $update_registry */
     $update_registry = \Drupal::service('update.update_hook_registry');
     $version = $update_registry->getInstalledVersion('system');
-    $this->assertGreaterThan(0, $version);
+    $this->assertSame(-1, $version);
     $version = $update_registry->getInstalledVersion('user');
     $this->assertGreaterThan(0, $version);
 
