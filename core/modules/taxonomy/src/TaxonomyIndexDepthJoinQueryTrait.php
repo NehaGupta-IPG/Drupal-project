@@ -8,9 +8,11 @@ namespace Drupal\taxonomy;
  * This is an alternative strategy to
  * \Drupal\taxonomy\TaxonomyIndexDepthQueryTrait. Instead of traversing the
  * term hierarchy in SQL with a union of joins on taxonomy_term__parent, the
- * hierarchy is traversed in PHP using the term storage. The resulting flat
- * list of term IDs is used in a single subquery on taxonomy_index which is
- * joined to the main views query using an INNER JOIN.
+ * hierarchy is expanded first with one small query on taxonomy_term__parent
+ * per hierarchy level, each only touching the terms in the subtree. The
+ * resulting flat list of term IDs is used in a single subquery on
+ * taxonomy_index which is joined to the main views query using an INNER
+ * JOIN.
  *
  * For example, if the $tids value is '718' and depth is configured to 2, the
  * resulting JOIN to node_field_data will be:
@@ -33,34 +35,41 @@ trait TaxonomyIndexDepthJoinQueryTrait {
   protected function addDepthJoinToQuery($tids): void {
     $tids = array_map('intval', (array) $tids);
     $depth = (int) $this->options['depth'];
+    $connection = $this->query->getConnection();
 
-    if ($depth > 0) {
-      // When the depth is positive search the children.
-      foreach ($tids as $tid) {
-        if ($term = $this->termStorage->load($tid)) {
-          // For every term find all the children down to the configured
-          // depth and add their IDs to the condition.
-          foreach ($this->termStorage->loadTree($term->bundle(), $term->id(), $depth) as $item) {
-            $tids[] = (int) $item->tid;
-          }
-        }
+    if ($depth !== 0) {
+      // Select the source or the target of the parent reference depending on
+      // whether we are traversing down or up the hierarchy.
+      if ($depth > 0) {
+        $field = 'entity_id';
+        $condition = 'parent_target_id';
       }
-    }
-    elseif ($depth < 0) {
-      // When the depth is negative search the parents. A term can have
-      // multiple parents, so collect the parents of every parent at each
-      // level.
-      foreach ($tids as $tid) {
-        if ($term = $this->termStorage->load($tid)) {
-          $parents = [[$term]];
-          foreach (range(1, -$depth) as $level) {
-            $parents[$level] = [];
-            foreach ($parents[$level - 1] as $parent) {
-              $parents[$level] += $this->termStorage->loadParents($parent->id());
-            }
-            foreach ($parents[$level] as $parent) {
-              $tids[] = (int) $parent->id();
-            }
+      else {
+        $field = 'parent_target_id';
+        $condition = 'entity_id';
+      }
+      // Traverse the hierarchy one level per query. Terms can have multiple
+      // parents, so track the terms already seen to only walk shared
+      // subtrees once.
+      $seen = array_flip($tids);
+      $current = $tids;
+      foreach (range(1, abs($depth)) as $level) {
+        if (!$current) {
+          break;
+        }
+        $found = $connection->select('taxonomy_term__parent', 'p')
+          ->fields('p', [$field])
+          ->condition("p.$condition", $current, 'IN')
+          ->condition("p.$field", 0, '<>')
+          ->execute()
+          ->fetchCol();
+        $current = [];
+        foreach ($found as $tid) {
+          $tid = (int) $tid;
+          if (!isset($seen[$tid])) {
+            $seen[$tid] = TRUE;
+            $current[] = $tid;
+            $tids[] = $tid;
           }
         }
       }
@@ -68,11 +77,10 @@ trait TaxonomyIndexDepthJoinQueryTrait {
 
     // Build a subquery on the taxonomy index. DISTINCT ensures nodes tagged
     // with multiple terms in the hierarchy are not duplicated in the result.
-    $connection = $this->query->getConnection();
     $subquery = $connection->select('taxonomy_index', 'tn');
     $subquery->addField('tn', 'nid');
     $subquery->distinct();
-    $subquery->condition('tn.tid', array_unique($tids), 'IN');
+    $subquery->condition('tn.tid', $tids, 'IN');
 
     // Add the subquery as a join.
     $definition['left_table'] = $this->tableAlias;

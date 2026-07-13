@@ -8,10 +8,9 @@ use Drupal\views\Attribute\ViewsFilter;
 /**
  * Filter handler for taxonomy terms with depth using a term list join.
  *
- * This handler expands the term hierarchy in PHP using the term storage and
- * joins the taxonomy index on the resulting flat list of term IDs. This can
- * be more performant than the subquery used by the base handler on sites
- * with a fast entity cache.
+ * This handler expands the term hierarchy with one query per level and joins
+ * the taxonomy index on the resulting flat list of term IDs. This can be
+ * more performant than the union subquery used by the base handler.
  *
  * @ingroup views_filter_handlers
  */

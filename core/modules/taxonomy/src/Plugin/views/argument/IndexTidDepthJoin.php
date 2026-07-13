@@ -2,19 +2,15 @@
 
 namespace Drupal\taxonomy\Plugin\views\argument;
 
-use Drupal\Core\Entity\EntityRepositoryInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\taxonomy\TaxonomyIndexDepthJoinQueryTrait;
-use Drupal\taxonomy\TermStorageInterface;
 use Drupal\views\Attribute\ViewsArgument;
 
 /**
  * Argument handler for taxonomy terms with depth using a term list join.
  *
- * This handler expands the term hierarchy in PHP using the term storage and
- * joins the taxonomy index on the resulting flat list of term IDs. This can
- * be more performant than the subquery used by the base handler on sites
- * with a fast entity cache.
+ * This handler expands the term hierarchy with one query per level and joins
+ * the taxonomy index on the resulting flat list of term IDs. This can be
+ * more performant than the union subquery used by the base handler.
  *
  * @ingroup views_argument_handlers
  */
@@ -24,19 +20,6 @@ use Drupal\views\Attribute\ViewsArgument;
 class IndexTidDepthJoin extends IndexTidDepth {
 
   use TaxonomyIndexDepthJoinQueryTrait;
-
-  /**
-   * The term storage.
-   */
-  protected TermStorageInterface $termStorage;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityRepositoryInterface $entityRepository, EntityTypeManagerInterface $entity_type_manager) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $entityRepository);
-    $this->termStorage = $entity_type_manager->getStorage('taxonomy_term');
-  }
 
   /**
    * {@inheritdoc}
