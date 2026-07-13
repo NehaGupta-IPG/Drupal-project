@@ -151,7 +151,7 @@ class LanguageConfigurationTest extends BrowserTestBase {
     $this->drupalGet('admin/config/regional/language/add');
     $this->submitForm($edit, 'Add language');
     $language = $this->config('language.entity.de')->get();
-    // @todo revisit, although this is the new expected behaviour, check if
+    // @todo revisit, although this is the new expected behavior, check if
     // we want to modify this test or expand it.
     $this->assertEquals('en', $language['langcode']);
 
