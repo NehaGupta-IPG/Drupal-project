@@ -38,6 +38,9 @@ system.site:
     weight_select_max:
       type: integer
       label: 'Weight element maximum value'
+    langcode:
+      type: langcode
+      label: 'Site default language code'
     default_langcode:
       type: langcode
       label: 'Site default language code'

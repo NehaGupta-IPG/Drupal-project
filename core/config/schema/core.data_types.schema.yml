@@ -99,6 +99,7 @@ plural_label:
 path:
   type: string
   label: 'Path'
+  translatable: true
 
 # Human readable string that can contain multiple lines of text or HTML.
 text:

@@ -24,13 +24,15 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
     $site_name = 'Name of the site for testing configuration translation';
     $site_slogan = 'Site slogan for testing configuration translation';
     $site_name_label = 'Site name';
+    $site_frontpage = '/node/add';
     $fr_site_name = 'Nom du site pour tester la configuration traduction';
     $fr_site_slogan = 'Slogan du site pour tester la traduction de configuration';
     $fr_site_name_label = 'Libellé du champ "Nom du site"';
+    $fr_site_frontpage = '/filter-test/text-format';
     $translation_base_url = 'admin/config/system/site-information/translate';
 
     // Set site name and slogan for default language.
-    $this->setSiteInformation($site_name, $site_slogan);
+    $this->setSiteInformation($site_name, $site_slogan, $site_frontpage);
 
     $this->drupalGet('admin/config/system/site-information');
     // Check translation tab exist.
@@ -52,11 +54,13 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
     // Make sure original text is present on this page.
     $this->assertSession()->pageTextContains($site_name);
     $this->assertSession()->pageTextContains($site_slogan);
+    $this->assertSession()->pageTextContains($site_frontpage);
 
     // Update site name and slogan for French.
     $edit = [
       'translation[config_names][system.site][name]' => $fr_site_name,
       'translation[config_names][system.site][slogan]' => $fr_site_slogan,
+      'translation[config_names][system.site][page][front]' => $fr_site_frontpage,
     ];
 
     $this->drupalGet("{$translation_base_url}/fr/add");
@@ -72,12 +76,14 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
     $this->drupalGet("$translation_base_url/fr/edit");
     $this->assertSession()->fieldValueEquals('translation[config_names][system.site][name]', $fr_site_name);
     $this->assertSession()->fieldValueEquals('translation[config_names][system.site][slogan]', $fr_site_slogan);
+    $this->assertSession()->fieldValueEquals('translation[config_names][system.site][page][front]', $fr_site_frontpage);
 
     // Place branding block with site name and slogan into header region.
     $this->drupalPlaceBlock('system_branding_block', ['region' => 'header']);
 
-    // Check French translation of site name and slogan are in place.
+    // Check French translation of site name, slogan and headline are in place.
     $this->drupalGet('fr');
+    $this->assertSession()->pageTextContains('Text format test forms');
     $this->assertSession()->pageTextContains($fr_site_name);
     $this->assertSession()->pageTextContains($fr_site_slogan);
 
@@ -85,6 +91,7 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
     $this->drupalGet("fr/$translation_base_url/fr/edit");
     $this->assertSession()->pageTextContains($site_name);
     $this->assertSession()->pageTextContains($site_slogan);
+    $this->assertSession()->pageTextContains($site_frontpage);
 
     // Translate 'Site name' label in French.
     $search = [
@@ -128,8 +135,10 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
 
     $site_name = 'Site name for testing configuration translation';
     $site_slogan = 'Site slogan for testing configuration translation';
+    $site_frontpage = '/node';
+    $fr_site_frontpage = '/entity_test/list';
     $translation_base_url = 'admin/config/system/site-information/translate';
-    $this->setSiteInformation($site_name, $site_slogan);
+    $this->setSiteInformation($site_name, $site_slogan, $site_frontpage);
 
     $this->drupalGet($translation_base_url);
 
@@ -137,6 +146,7 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
     $edit = [
       'translation[config_names][system.site][name]' => 'FR ' . $site_name,
       'translation[config_names][system.site][slogan]' => 'FR ' . $site_slogan,
+      'translation[config_names][system.site][page][front]' => $fr_site_frontpage,
     ];
     // First time, no overrides, so just Add link.
     $this->drupalGet("{$translation_base_url}/fr/add");
@@ -149,6 +159,9 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
     $expected = [
       'name' => 'FR ' . $site_name,
       'slogan' => 'FR ' . $site_slogan,
+      'page' => [
+        'front' => $fr_site_frontpage,
+      ],
     ];
     $this->assertEquals($expected, $override->get());
 
@@ -158,9 +171,11 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
     // translation form into the actual site name and slogan.
     $this->assertSession()->pageTextNotContains('FR ' . $site_name);
     $this->assertSession()->pageTextNotContains('FR ' . $site_slogan);
+    $this->assertSession()->pageTextNotContains($fr_site_frontpage);
     $edit = [
       'translation[config_names][system.site][name]' => $site_name,
       'translation[config_names][system.site][slogan]' => 'FR ' . $site_slogan,
+      'translation[config_names][system.site][page][front]' => $site_frontpage,
     ];
     $this->submitForm($edit, 'Save translation');
     $this->assertSession()->pageTextContains('Successfully updated French translation.');
@@ -176,6 +191,7 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
     $edit = [
       'translation[config_names][system.site][name]' => $site_name,
       'translation[config_names][system.site][slogan]' => $site_slogan,
+      'translation[config_names][system.site][page][front]' => $site_frontpage,
     ];
     $this->submitForm($edit, 'Save translation');
     $override = \Drupal::languageManager()->getLanguageConfigOverride('fr', 'system.site');

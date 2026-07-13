@@ -62,6 +62,7 @@ config:
     system.site:
       simpleConfigUpdate:
         page.front: /node
+        langcode: en
     user.role.anonymous:
       grantPermission: 'access content'
     user.role.authenticated:

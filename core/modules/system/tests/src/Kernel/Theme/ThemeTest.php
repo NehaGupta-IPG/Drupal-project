@@ -81,7 +81,7 @@ class ThemeTest extends KernelTestBase {
   public function testThemeSuggestions(): void {
     // Set the front page as something random otherwise the CLI
     // test runner fails.
-    $this->config('system.site')->set('page.front', '/nobody-home')->save();
+    $this->config('system.site')->set('page.front', '/nobody-home')->set('langcode', 'en')->save();
     $args = ['node', '1', 'edit'];
     $suggestions = theme_get_suggestions($args, 'page');
     $this->assertEquals(['page__node', 'page__node__%', 'page__node__1', 'page__node__edit'], $suggestions, 'Found expected node edit page suggestions');

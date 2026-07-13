@@ -28,6 +28,7 @@ class RedirectOnExceptionTest extends KernelTestBase {
   public function testRedirectOn404(): void {
     \Drupal::configFactory()->getEditable('system.site')
       ->set('page.404', '/test-http-response-exception/' . Response::HTTP_PERMANENTLY_REDIRECT)
+      ->set('langcode', 'en')
       ->save();
 
     /** @var \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel */

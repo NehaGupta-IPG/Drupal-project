@@ -1,3 +1,4 @@
+langcode: en
 description:
   type: 'textfield'
   length: 128
