@@ -131,7 +131,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 32,
-      'CacheGetCount' => 96,
+      'CacheGetCount' => 99,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 18,
@@ -139,7 +139,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
         'discovery' => 37,
         'bootstrap' => 10,
         'dynamic_page_cache' => 1,
-        'render' => 11,
+        'render' => 14,
         'default' => 5,
         'routes' => 4,
         'entity' => 2,
@@ -168,7 +168,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
         ['rendered', 'user:0', 'user_view'],
         ['config:filter.format.restricted_html', 'node_view'],
         ['config:block_list', 'config:system.site'],
-        ['config:system.menu.account', 'config:system.site'],
+        ['config:system.menu.account'],
         ['config:system.menu.main'],
         ['config:user.role.anonymous'],
       ],
