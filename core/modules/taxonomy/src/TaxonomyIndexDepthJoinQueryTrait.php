@@ -53,10 +53,7 @@ trait TaxonomyIndexDepthJoinQueryTrait {
       // subtrees once.
       $seen = array_flip($tids);
       $current = $tids;
-      foreach (range(1, abs($depth)) as $level) {
-        if (!$current) {
-          break;
-        }
+      for ($level = abs($depth); $level > 0 && $current; $level--) {
         $found = $connection->select('taxonomy_term__parent', 'p')
           ->fields('p', [$field])
           ->condition("p.$condition", $current, 'IN')
