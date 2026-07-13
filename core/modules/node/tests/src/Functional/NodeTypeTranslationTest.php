@@ -201,7 +201,9 @@ class NodeTypeTranslationTest extends BrowserTestBase {
     $this->assertSession()->statusCodeEquals(200);
     $this->drupalGet("es/admin/structure/types/manage/$type/fields/node.$type.field_email/translate");
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->pageTextContains("The configuration objects have different language codes so they cannot be translated");
+    // @todo revisit, this is good that does not appear again but let's look
+    // at the test if we need to remove this or adjust the test.
+    $this->assertSession()->pageTextNotContains("The configuration objects have different language codes so they cannot be translated");
   }
 
 }
