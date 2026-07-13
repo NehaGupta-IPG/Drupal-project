@@ -12,7 +12,7 @@ use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\Url;
-use Drupal\system\FileDownloadController;
+use Drupal\system\Controller\FileDownloadController;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -62,7 +62,7 @@ class ConfigController implements ContainerInjectionInterface {
   /**
    * The file download controller.
    *
-   * @var \Drupal\system\FileDownloadController
+   * @var \Drupal\system\Controller\FileDownloadController
    */
   protected $fileDownloadController;
 
@@ -105,7 +105,7 @@ class ConfigController implements ContainerInjectionInterface {
    *   The sync storage.
    * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
    *   The config manager.
-   * @param \Drupal\system\FileDownloadController $file_download_controller
+   * @param \Drupal\system\Controller\FileDownloadController $file_download_controller
    *   The file download controller.
    * @param \Drupal\Core\Diff\DiffFormatter $diff_formatter
    *   The diff formatter.

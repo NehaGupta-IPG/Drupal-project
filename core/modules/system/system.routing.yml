@@ -1,7 +1,7 @@
 system.cron:
   path: '/cron/{key}'
   defaults:
-    _controller: '\Drupal\system\CronController::run'
+    _controller: '\Drupal\system\Controller\CronController::run'
   options:
     no_cache: TRUE
   requirements:
@@ -66,7 +66,7 @@ system.site_maintenance_mode:
 system.run_cron:
   path: '/admin/reports/status/run-cron'
   defaults:
-    _controller: '\Drupal\system\CronController::runManually'
+    _controller: '\Drupal\system\Controller\CronController::runManually'
   options:
     no_cache: TRUE
   requirements:
@@ -141,7 +141,7 @@ system.theme_uninstall:
 system.files:
   path: '/system/files/{scheme}'
   defaults:
-    _controller: '\Drupal\system\FileDownloadController::download'
+    _controller: '\Drupal\system\Controller\FileDownloadController::download'
     scheme: private
   requirements:
     _access: 'TRUE'
@@ -150,7 +150,7 @@ system.files:
 system.private_file_download:
   path: '/system/files/{filepath}'
   defaults:
-    _controller: '\Drupal\system\FileDownloadController::download'
+    _controller: '\Drupal\system\Controller\FileDownloadController::download'
   requirements:
     # Permissive regex to allow slashes in filepath see
     # http://symfony.com/doc/current/cookbook/routing/slash_in_parameter.html
@@ -160,7 +160,7 @@ system.private_file_download:
 system.temporary:
   path: '/system/temporary'
   defaults:
-    _controller: '\Drupal\system\FileDownloadController::download'
+    _controller: '\Drupal\system\Controller\FileDownloadController::download'
     scheme: temporary
   requirements:
     _access: 'TRUE'
