@@ -21,7 +21,7 @@ class ConfigActionsTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['media'];
+  protected static $modules = ['system', 'media'];
 
   /**
    * The configuration action manager.
