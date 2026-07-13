@@ -89,7 +89,7 @@ class NodeDatabaseHooks {
       $query->addCacheContexts($contexts);
     }
 
-    // @todo Remove in https://www.drupal.org/project/drupal/issues/1234567.
+    // @todo Remove in https://www.drupal.org/project/drupal/issues/3610599.
     // Bubble the 'user.node_grants:$op' cache context to the current render
     // context.
     $renderer = \Drupal::service('renderer');

@@ -351,7 +351,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
       $query->range(0, $limit);
     }
 
-    // @todo Do not discard query cacheable metadata, create follow-up.
+    // @todo Review in https://www.drupal.org/project/drupal/issues/3610593.
     $result = $query->execute(new CacheableMetadata());
 
     if (empty($result)) {
@@ -373,7 +373,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
    */
   public function countReferenceableEntities($match = NULL, $match_operator = 'CONTAINS') {
     $query = $this->buildEntityQuery($match, $match_operator);
-    // @todo Do not discard query cacheable metadata, create follow-up.
+    // @todo Review in https://www.drupal.org/project/drupal/issues/3610593.
     return $query
       ->count()
       ->execute(new CacheableMetadata());
@@ -388,7 +388,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
       $target_type = $this->configuration['target_type'];
       $entity_type = $this->entityTypeManager->getDefinition($target_type);
       $query = $this->buildEntityQuery();
-      // @todo Do not discard query cacheable metadata, create follow-up.
+      // @todo Review in https://www.drupal.org/project/drupal/issues/3610593.
       $result = $query
         ->condition($entity_type->getKey('id'), $ids, 'IN')
         ->execute(new CacheableMetadata());

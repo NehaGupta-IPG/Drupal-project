@@ -78,7 +78,7 @@ class CommentSelection extends DefaultSelection {
       if (!$this->currentUser->hasPermission('administer comments')) {
         $query->condition('status', 1);
       }
-      // @todo Do not discard query cacheable metadata, create follow-up.
+      // @todo Review in https://www.drupal.org/project/drupal/issues/3610593.
       $result = $query
         ->condition($entity_type->getKey('id'), $ids, 'IN')
         ->execute(new CacheableMetadata());
