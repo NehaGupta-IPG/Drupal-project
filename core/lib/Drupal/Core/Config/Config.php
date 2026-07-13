@@ -264,7 +264,7 @@ class Config extends StorableConfigBase {
 
     // Unfortunately we need to rely fallbacks too because on existing sites
     // when this code was added configuration operations may run before the
-    // update that adds the default_config_langcode key to system.site. 
+    // update that adds the default_config_langcode key to system.site.
     $default_config_langcode = $system_site['default_config_langcode']
       ?? $system_site['default_langcode'];
     $this->set('langcode', (string) $default_config_langcode);
