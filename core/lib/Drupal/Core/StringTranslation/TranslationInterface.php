@@ -109,4 +109,19 @@ interface TranslationInterface {
    */
   public function formatPlural($count, $singular, $plural, array $args = [], array $options = []);
 
+  /**
+   * Selects the plural form for a given count.
+   *
+   * @param int $count
+   *   The item count to display.
+   * @param string|null $langcode
+   *   The language code to translate to.
+   * @param string $string
+   *   The translated string with plural forms delimited by PoItem::DELIMITER.
+   *
+   * @return string
+   *   The plural form to use.
+   */
+  public function selectPluralForm(int $count, ?string $langcode, string $string): string;
+
 }

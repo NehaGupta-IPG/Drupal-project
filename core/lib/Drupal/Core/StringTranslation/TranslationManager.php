@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\StringTranslation;
 
+use Drupal\Component\Gettext\PoItem;
 use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\StringTranslation\Translator\TranslatorInterface;
 
@@ -43,12 +44,6 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
    */
   protected $defaultLangcode;
 
-  /**
-   * Constructs a TranslationManager object.
-   *
-   * @param \Drupal\Core\Language\LanguageDefault $default_language
-   *   The default language.
-   */
   public function __construct(LanguageDefault $default_language) {
     $this->defaultLangcode = $default_language->get()->getId();
   }
@@ -110,7 +105,48 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
    * {@inheritdoc}
    */
   public function translateString(TranslatableMarkup $translated_string) {
+    if ($translated_string instanceof PreTranslatedPluralTranslatableMarkup) {
+      return $translated_string->translatedString;
+    }
+
     return $this->doTranslate($translated_string->getUntranslatedString(), $translated_string->getOptions());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function selectPluralForm(int $count, ?string $langcode, string $string): string {
+    $translated_array = explode(PoItem::DELIMITER, $string);
+    if ($count == 1 || count($translated_array) == 1) {
+      // Singular form.
+      return $translated_array[0];
+    }
+
+    $index = $this->getPluralIndex($count, $langcode);
+
+    // Fallback to second plural form.
+    return $translated_array[$index] ?? $translated_array[1];
+  }
+
+  /**
+   * Returns plural form index for a specific number.
+   *
+   * The base implementation only distinguishes between singular and plural,
+   * so it always returns the second (index 1) plural form. Subclasses that
+   * know a language's full plural rules should override this method.
+   *
+   * @param int $count
+   *   Number to return plural for.
+   * @param string|null $langcode
+   *   Optional language code to translate to a language other than what is
+   *   used to display the page.
+   *
+   * @return int
+   *   The numeric index of the plural variant to use for this $langcode and
+   *   $count combination.
+   */
+  protected function getPluralIndex(int $count, ?string $langcode): int {
+    return 1;
   }
 
   /**

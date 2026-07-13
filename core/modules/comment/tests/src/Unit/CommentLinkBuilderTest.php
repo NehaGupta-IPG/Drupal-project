@@ -80,9 +80,6 @@ class CommentLinkBuilderTest extends UnitTestCase {
     $this->commentManager
       ->method('forbiddenMessage')
       ->willReturn("Can't let you do that Dave.");
-    $this->stringTranslation
-      ->method('formatPlural')
-      ->willReturnArgument(1);
   }
 
   /**

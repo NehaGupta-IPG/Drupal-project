@@ -17,13 +17,6 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
   protected $count;
 
   /**
-   * The already translated string.
-   *
-   * @var string
-   */
-  protected $translatedString;
-
-  /**
    * Constructs a new PluralTranslatableMarkup object.
    *
    * Parses values passed into this class through the format_plural() function
@@ -84,60 +77,24 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
    *   A PluralTranslatableMarkup object.
    */
   public static function createFromTranslatedString($count, $translated_string, array $args = [], array $options = []) {
-    $plural = new static($count, '', '', $args, $options);
-    $plural->translatedString = $translated_string;
-    return $plural;
+    return new PreTranslatedPluralTranslatableMarkup($count, $translated_string, $args, $options);
   }
 
   /**
-   * Renders the object as a string.
-   *
-   * @return string
-   *   The translated string.
+   * {@inheritdoc}
    */
-  public function render() {
-    if (!$this->translatedString) {
-      $this->translatedString = $this->getStringTranslation()->translateString($this);
-    }
-    if ($this->translatedString === '') {
-      return '';
-    }
+  protected function translateString(): string {
+    $string = parent::translateString();
+    return $this->getStringTranslation()->selectPluralForm($this->count, $this->getOptions()['langcode'] ?? NULL, $string);
+  }
 
-    $arguments = $this->getArguments();
+  /**
+   * {@inheritdoc}
+   */
+  public function getArguments(): array {
+    $arguments = parent::getArguments();
     $arguments['@count'] = $this->count;
-    $translated_array = explode(PoItem::DELIMITER, $this->translatedString);
-
-    $index = $this->getPluralIndex();
-    if ($this->count == 1 || $index == 0 || count($translated_array) == 1) {
-      // Singular form.
-      $return = $translated_array[0];
-    }
-    else {
-      // Nth plural form, fallback to second plural form.
-      $return = $translated_array[$index] ?? $translated_array[1];
-    }
-    return $this->placeholderFormat($return, $arguments);
-  }
-
-  /**
-   * Gets the plural index through the gettext formula.
-   *
-   * @return int
-   *   The numeric index of the plural variant to use for this language and
-   *   count combination. Defaults to -1 when the language was not found or does
-   *   not have a plural formula.
-   */
-  protected function getPluralIndex() {
-    // We have to test both if the function and the service exist since in
-    // certain situations it is possible that locale code might be loaded but
-    // the service does not exist. For example, where the parent test site has
-    // locale installed but the child site does not.
-    // @todo Refactor in https://www.drupal.org/node/2660338 so this code does
-    // not depend on knowing that the Locale module exists.
-    if (function_exists('locale_get_plural') && \Drupal::hasService('locale.plural.formula')) {
-      return locale_get_plural($this->count, $this->getOption('langcode'));
-    }
-    return -1;
+    return $arguments;
   }
 
   /**

@@ -39,10 +39,8 @@ class ByteSizeMarkupTest extends UnitTestCase {
     $kb = Bytes::KILOBYTE;
     return [
       ['0 bytes', 0],
-      // @todo https://www.drupal.org/node/3161118 Prevent display of fractional
-      //   bytes for size less then 1KB.
-      ['0.1 bytes', 0.1],
-      ['0.6 bytes', 0.6],
+      ['0 bytes', 0.1],
+      ['0 bytes', 0.6],
       ['1 byte', 1],
       ['-1 bytes', -1],
       ['2 bytes', 2],

@@ -46,7 +46,7 @@ class DateTest extends UnitTestCase {
   /**
    * The string translation.
    */
-  protected TranslationInterface&Stub $stringTranslation;
+  protected TranslationInterface $stringTranslation;
 
   /**
    * The string translation.
@@ -80,13 +80,13 @@ class DateTest extends UnitTestCase {
     $this->languageManager
       ->method('getCurrentLanguage')
       ->willReturn(new Language(['id' => $this->randomMachineName(2)]));
-    $this->stringTranslation = $this->createStub(TranslationInterface::class);
+    $this->stringTranslation = $this->getStringTranslationStub();
     $this->requestStack = $this->createStub(RequestStack::class);
 
     $config_factory = $this->getConfigFactoryStub(['system.date' => ['country' => ['default' => 'GB']]]);
     $container = new ContainerBuilder();
     $container->set('config.factory', $config_factory);
-    $container->set('string_translation', $this->getStringTranslationStub());
+    $container->set('string_translation', $this->stringTranslation);
     $container->set('language_manager', $this->languageManager);
     \Drupal::setContainer($container);
 
@@ -114,13 +114,6 @@ class DateTest extends UnitTestCase {
    */
   #[DataProvider('providerTestFormatInterval')]
   public function testFormatInterval($interval, $granularity, $expected, $langcode = NULL): void {
-    // Mocks a simple formatPlural implementation.
-    $this->stringTranslation
-      ->method('translateString')
-      ->willReturnCallback(function (TranslatableMarkup $arg) {
-        return $arg->getUntranslatedString();
-      });
-
     // Check if the granularity is specified.
     if ($granularity) {
       $result = $this->dateFormatter->formatInterval($interval, $granularity, $langcode);
@@ -264,13 +257,6 @@ class DateTest extends UnitTestCase {
    */
   #[DataProvider('providerTestFormatDiff')]
   public function testFormatDiff(string $expected, int $max_age, int $timestamp1, int $timestamp2, array $options = []): void {
-    // Mocks a simple translateString implementation.
-    $this->stringTranslation
-      ->method('translateString')
-      ->willReturnCallback(function (TranslatableMarkup $arg) {
-        return $arg->getUntranslatedString();
-      });
-
     if (isset($options['langcode'])) {
       // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
       $expected_markup = new TranslatableMarkup($expected, [], ['langcode' => $options['langcode']], $this->stringTranslation);
