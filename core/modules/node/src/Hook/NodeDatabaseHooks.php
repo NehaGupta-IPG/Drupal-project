@@ -82,13 +82,16 @@ class NodeDatabaseHooks {
     }
     // Update the query for the given storage method.
     \Drupal::service('node.grant_storage')->alterQuery($query, $tables, $op, $account, $base_table);
-    // Bubble the 'user.node_grants:$op' cache context to the current render
-    // context.
+
+    // Add the grants cache context to the query.
     $contexts = ['user.node_grants:' . $op];
     if ($query instanceof RefinableCacheableDependencyInterface) {
       $query->addCacheContexts($contexts);
     }
 
+    // @todo Remove in https://www.drupal.org/project/drupal/issues/1234567.
+    // Bubble the 'user.node_grants:$op' cache context to the current render
+    // context.
     $renderer = \Drupal::service('renderer');
     if ($renderer->hasRenderContext()) {
       $build = ['#cache' => ['contexts' => $contexts]];
