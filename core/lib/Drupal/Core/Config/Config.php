@@ -4,6 +4,7 @@ namespace Drupal\Core\Config;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Utility\Error;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -207,19 +208,27 @@ class Config extends StorableConfigBase {
 
     // If there is a schema for this configuration object, cast all values to
     // conform to the schema.
-    if (!$has_trusted_data) {
-      if ($this->typedConfigManager->hasConfigSchema($this->name)) {
-        // Ensure that the schema wrapper has the latest data.
-        $this->schemaWrapper = NULL;
-        $this->data = $this->castValue(NULL, $this->data);
-        // Reclaim the memory used by the schema wrapper.
-        $this->schemaWrapper = NULL;
-      }
-      else {
-        foreach ($this->data as $key => $value) {
-          $this->validateValue($key, $value);
+    try {
+      if (!$has_trusted_data) {
+        if ($this->typedConfigManager->hasConfigSchema($this->name)) {
+          // Ensure that the schema wrapper has the latest data.
+          $this->schemaWrapper = NULL;
+          foreach ($this->data as $key => $value) {
+            $this->data[$key] = $this->castValue($key, $value);
+          }
+          // Reclaim the memory used by the schema wrapper.
+          $this->schemaWrapper = NULL;
+        }
+        else {
+          foreach ($this->data as $key => $value) {
+            $this->validateValue($key, $value);
+          }
         }
       }
+    }
+    catch (\Exception $e) {
+      // Log and ignore exceptions caused by invalid config structures.
+      Error::logException(\Drupal::logger('config'), $e);
     }
 
     // Potentially configuration schema could have changed the underlying data's

@@ -491,8 +491,8 @@ class ConfigSchemaTest extends KernelTestBase {
   public function testConfigSaveMappingSort(): void {
     // Top level map sorting.
     $data = [
-      'foo' => '1',
       'bar' => '2',
+      'foo' => '1',
     ];
     // Save config which has a schema that enforces types.
     $this->config('config_schema_test.schema_mapping_sort')
