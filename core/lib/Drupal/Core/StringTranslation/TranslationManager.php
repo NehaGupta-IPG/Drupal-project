@@ -106,12 +106,10 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
    */
   public function translateString(TranslatableMarkup $translated_string) {
     if ($translated_string instanceof PreTranslatedPluralTranslatableMarkup) {
-      $string = $translated_string->translatedString;
+      return $translated_string->translatedString;
     }
-    else {
-      $string = $this->doTranslate($translated_string->getUntranslatedString(), $translated_string->getOptions());
-    }
-    return $string;
+
+    return $this->doTranslate($translated_string->getUntranslatedString(), $translated_string->getOptions());
   }
 
   /**
