@@ -257,13 +257,6 @@ class DateTest extends UnitTestCase {
    */
   #[DataProvider('providerTestFormatDiff')]
   public function testFormatDiff(string $expected, int $max_age, int $timestamp1, int $timestamp2, array $options = []): void {
-    // Mocks a simple translateString implementation.
-    $this->stringTranslation
-      ->method('translateString')
-      ->willReturnCallback(function (TranslatableMarkup $arg) {
-        return $arg->getUntranslatedString();
-      });
-
     if (isset($options['langcode'])) {
       // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
       $expected_markup = new TranslatableMarkup($expected, [], ['langcode' => $options['langcode']], $this->stringTranslation);
