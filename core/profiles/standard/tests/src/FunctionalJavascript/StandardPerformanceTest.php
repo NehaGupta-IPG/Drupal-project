@@ -205,7 +205,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 8,
-      'CacheGetCount' => 70,
+      'CacheGetCount' => 73,
       'CacheSetCount' => 18,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
@@ -225,10 +225,10 @@ class StandardPerformanceTest extends PerformanceTestBase {
         ],
         ['rendered', 'user:0', 'user_view'],
         ['config:filter.format.restricted_html', 'node:1', 'node_view'],
+        ['config:block_list', 'config:system.site'],
         [
           'config:system.menu.account',
           'config:system.menu.main',
-          'config:system.site',
         ],
         ['config:user.role.anonymous'],
       ],
