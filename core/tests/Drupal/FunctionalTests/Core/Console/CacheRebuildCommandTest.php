@@ -35,11 +35,13 @@ class CacheRebuildCommandTest extends BrowserTestBase {
    * Tests the cache:rebuild command.
    */
   public function testConsoleCommand(): void {
+    $errorHandler = get_error_handler();
     $command = new CacheRebuildCommand(new ClassLoader());
     $tester = new CommandTester($command);
     $code = $tester->execute([]);
     $this->assertStringContainsString('All caches have been rebuilt.', $tester->getDisplay());
     $this->assertEquals(Command::SUCCESS, $code);
+    set_error_handler($errorHandler);
   }
 
 }

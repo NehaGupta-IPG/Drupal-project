@@ -93,7 +93,7 @@ class AddModerationConfigActionTest extends KernelTestBase {
   public function testActionOnlyTargetsWorkflows(): void {
     $recipe = $this->createRecipe('user.role.anonymous');
     $this->expectException(PluginNotFoundException::class);
-    $this->expectExceptionMessageIs('The "user_role" entity does not support the "addNodeTypes" config action.');
+    $this->expectExceptionMessageIs('The "user_role" entity does not support the "addNodeTypes" config action. Valid config actions for user_role are: setProperties, grantPermissionsForEachNodeType, grantPermissionsForEachTaxonomyVocabulary, grantPermission, grantPermissions, set, setMultiple, enable, disable, setStatus, setThirdPartySetting, setThirdPartySettings, createIfNotExists, create, cloneAs');
     RecipeRunner::processRecipe($recipe);
   }
 

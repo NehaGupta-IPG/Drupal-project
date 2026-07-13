@@ -198,7 +198,7 @@ class WebAssertTest extends UnitTestCase {
   public function testInvalidLinkExistsExact(): void {
     $this->visit('', '<a href="http://example.com">foo|bar|baz</a>');
     $this->expectException(ExpectationException::class);
-    $this->expectExceptionMessageIs('Link with label foo|bar not found');
+    $this->expectExceptionMessageIs('Link with label foo|bar not found.');
     $this->assertSession()->linkExistsExact('foo|bar');
   }
 
@@ -219,7 +219,7 @@ class WebAssertTest extends UnitTestCase {
   public function testInvalidLinkNotExistsExact(): void {
     $this->visit('', '<a href="http://example.com">foo|bar|baz</a>');
     $this->expectException(ExpectationException::class);
-    $this->expectExceptionMessageIs('Link with label foo|bar|baz found');
+    $this->expectExceptionMessageIs('Link with label foo|bar|baz found.');
     $this->assertSession()->linkNotExistsExact('foo|bar|baz');
     $this->addToAssertionCount(1);
   }
