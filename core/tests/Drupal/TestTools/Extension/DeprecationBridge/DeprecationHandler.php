@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\TestTools\Extension\DeprecationBridge;
 
 use Drupal\TestTools\ErrorHandler\DrupalDebugClassLoader;
-use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
 use PHPUnit\Runner\Extension\Extension;
 use PHPUnit\Runner\Extension\Facade;
 use PHPUnit\Runner\Extension\ParameterCollection;
@@ -84,31 +83,6 @@ final class DeprecationHandler implements Extension {
   }
 
   /**
-   * Handles a deprecation error.
-   *
-   * This method is invoked by BootstrapErrorHandler.
-   *
-   * @param int $errorNumber
-   *   The level of the error raised.
-   * @param string $errorString
-   *   The error message.
-   * @param string $errorFile
-   *   The filename that the error was raised in.
-   * @param int $errorLine
-   *   The line number the error was raised at.
-   *
-   * @return bool
-   *   TRUE to stop error handling, FALSE to let the normal error handler
-   *   continue.
-   *
-   * @see \Drupal\TestTools\ErrorHandler\BootstrapErrorHandler
-   */
-  public static function handle(int $errorNumber, string $errorString, string $errorFile, int $errorLine): bool {
-    assert(Configuration::instance()->projectIgnoresEnabled, __METHOD__ . '() must not be called if the deprecation handler is not enabled.');
-    return self::isIgnoredByProject($errorString);
-  }
-
-  /**
    * Returns the legacy configuration provided via Symfony env variable.
    *
    * For historical reasons, the configuration can be stored in the
@@ -151,7 +125,7 @@ final class DeprecationHandler implements Extension {
    * @return bool
    *   TRUE if the deprecation is ignored at project level.
    */
-  private static function isIgnoredByProject(string $deprecationMessage): bool {
+  public static function isIgnoredByProject(string $deprecationMessage): bool {
     foreach (Configuration::instance()->deprecationIgnorePatterns as $pattern) {
       $result = @preg_filter($pattern, '$0', $deprecationMessage);
       if (preg_last_error() !== \PREG_NO_ERROR) {

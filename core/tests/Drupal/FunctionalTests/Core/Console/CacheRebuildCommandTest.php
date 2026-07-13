@@ -7,11 +7,9 @@ namespace Drupal\FunctionalTests\Core\Console;
 use Composer\Autoload\ClassLoader;
 use Drupal\Core\Command\CacheRebuildCommand;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\TestTools\ErrorHandler\BootstrapErrorHandler;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 
