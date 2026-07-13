@@ -455,6 +455,8 @@ class ConfigInstaller implements ConfigInstallerInterface {
   protected function applyDefaultConfigLangcode(string $name, array $data): array {
     if (!array_key_exists('langcode', $data)) {
       if (!$this->typedConfig->hasConfigSchema($name)) {
+        // @todo Revisit whether config without schema should skip default
+        //   config langcode normalization here.
         return $data;
       }
       $typed_config = $this->typedConfig->createFromNameAndData($name, $data);
