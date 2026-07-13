@@ -33,6 +33,11 @@ class ConfigActionsTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    // Ensure image toolkit resolution has a configured default in this
+    // minimal kernel setup.
+    $this->config('system.image')
+      ->set('toolkit', 'gd')
+      ->save();
     $this->container->get(ModuleInstallerInterface::class)->install([
       'media_test_type',
     ]);

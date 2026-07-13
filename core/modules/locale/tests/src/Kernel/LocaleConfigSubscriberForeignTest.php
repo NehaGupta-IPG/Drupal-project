@@ -40,6 +40,20 @@ class LocaleConfigSubscriberForeignTest extends LocaleConfigSubscriberTest {
   /**
    * {@inheritdoc}
    */
+  protected function setUpDefaultLanguage(): void {
+    // @todo Revisit this test as the default config langcdoe will not
+    // change now in locale, so part of what it asserts for subscribers
+    // is now default core behaviour and part is not automated either.
+    parent::setUpDefaultLanguage();
+    \Drupal::configFactory()->getEditable('system.site')
+      ->set('default_langcode', 'hu')
+      ->set('default_config_langcode', 'hu')
+      ->save();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUpLocale(): void {
     parent::setUpLocale();
     $this->setUpTranslation('locale_test.translation', 'test', 'English test', 'Hungarian test', 'hu', TRUE);
