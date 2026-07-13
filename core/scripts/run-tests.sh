@@ -251,6 +251,7 @@ $tests_to_run = [];
 for ($i = 0; $i < Config::get('repeat'); $i++) {
   $tests_to_run = array_merge($tests_to_run, $test_list);
 }
+// phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
 $end_discovery = Timer::stop('run-tests:discovery');
 
 simpletest_script_reporter_init();
@@ -863,7 +864,7 @@ function dump_bin_tests_sequence(int $bin, array $allTests, array $tests): void 
  * Initialize the reporter.
  */
 function simpletest_script_reporter_init(): void {
-  global $test_list, $results_map;
+  global $results_map;
 
   $results_map = [
     'pass' => 'Pass',
