@@ -19,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[CoversClass(FixtureManipulator::class)]
 #[Group('package_manager')]
+#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class FixtureManipulatorTest extends PackageManagerKernelTestBase {
 
@@ -211,7 +212,7 @@ class FixtureManipulatorTest extends PackageManagerKernelTestBase {
    */
   public function testActiveManipulatorNoCommitError(): void {
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('commitChanges() must be called.');
+    $this->expectExceptionMessageIs('commitChanges() must be called.');
     (new ActiveFixtureManipulator())
       ->setVersion('drupal/core', '1.2.3');
   }

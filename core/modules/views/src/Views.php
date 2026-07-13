@@ -367,10 +367,16 @@ class Views {
         foreach ($view->get('display') as $display_id => $display) {
           if (!($id == $exclude_view_name && $display_id == $exclude_view_display)) {
             if ($optgroup) {
-              $options[$id][$id . ':' . $display['id']] = t('@view : @display', ['@view' => $id, '@display' => $display['id']]);
+              $options[$id][$id . ':' . $display['id']] = t('@view : @display', [
+                '@view' => $id,
+                '@display' => $display['id'],
+              ]);
             }
             else {
-              $options[$id . ':' . $display['id']] = t('View: @view - Display: @display', ['@view' => $id, '@display' => $display['id']]);
+              $options[$id . ':' . $display['id']] = t('View: @view - Display: @display', [
+                '@view' => $id,
+                '@display' => $display['id'],
+              ]);
             }
           }
         }
@@ -557,6 +563,44 @@ class Views {
     }
 
     return static::$translationManager->translate($string, $args, $options);
+  }
+
+  /**
+   * Get the result of a view.
+   *
+   * @param string $name
+   *   The name of the view to retrieve the data from.
+   * @param string|null $display_id
+   *   The display ID. On the edit page for the view in question, you'll find a
+   *   list of displays at the left side of the control area. "Default" will be
+   *   at the top of that list. Hover your cursor over the name of the display
+   *   you want to use. A URL will appear in the status bar of your browser.
+   *   This is usually at the bottom of the window, in the chrome. Everything
+   *   after #views-tab- is the display ID, e.g. page_1.
+   * @param mixed ...$args
+   *   Any additional parameters will be passed as arguments.
+   *
+   * @return array
+   *   An array containing an object for each view item.
+   */
+  public static function getViewResult(string $name, string|null $display_id = NULL, mixed ...$args): array {
+    $view = static::getView($name);
+    if (is_object($view)) {
+      if (is_array($args)) {
+        $view->setArguments($args);
+      }
+      if (is_string($display_id)) {
+        $view->setDisplay($display_id);
+      }
+      else {
+        $view->initDisplay();
+      }
+      $view->preExecute();
+      $view->execute();
+      return $view->result;
+    }
+
+    return [];
   }
 
 }

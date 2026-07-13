@@ -48,25 +48,11 @@ class SystemMenuBlockTest extends KernelTestBase {
   ];
 
   /**
-   * The block under test.
-   *
-   * @var \Drupal\system\Plugin\Block\SystemMenuBlock
-   */
-  protected $block;
-
-  /**
    * The menu for testing.
    *
    * @var \Drupal\system\MenuInterface
    */
   protected $menu;
-
-  /**
-   * The menu link tree service.
-   *
-   * @var \Drupal\Core\Menu\MenuLinkTree
-   */
-  protected $linkTree;
 
   /**
    * The menu link plugin manager service.
@@ -98,7 +84,6 @@ class SystemMenuBlockTest extends KernelTestBase {
     $this->container->get('current_user')->setAccount($account);
 
     $this->menuLinkManager = $this->container->get('plugin.manager.menu.link');
-    $this->linkTree = $this->container->get('menu.link_tree');
     $this->blockManager = $this->container->get('plugin.manager.block');
 
     $routes = new RouteCollection();
@@ -397,7 +382,7 @@ class SystemMenuBlockTest extends KernelTestBase {
    * @return array
    *   An array of test cases for the config expanded option.
    */
-  public static function configExpandedTestCases() {
+  public static function configExpandedTestCases(): array {
     return [
       'All levels' => [
         'example5',
@@ -467,7 +452,7 @@ class SystemMenuBlockTest extends KernelTestBase {
   public function testIgnoreActiveTrailConstraint(int $level, int $depth, bool $expand_all_items, ?bool $ignore_active_trail, bool $expect_exception): void {
     if ($expect_exception) {
       $this->expectException(SchemaIncompleteException::class);
-      $this->expectExceptionMessage('Schema errors for block.block.machine_name with the following errors: 0 [settings] The &quot;ignore_active_trail&quot; setting on a system menu block cannot be enabled if &quot;level&quot; is greater than 1 or &quot;expand_all_items&quot; is not enabled and &quot;depth&quot; is greater than 1.');
+      $this->expectExceptionMessageIs('Schema errors for block.block.machine_name with the following errors: 0 [settings] The &quot;ignore_active_trail&quot; setting on a system menu block cannot be enabled if &quot;level&quot; is greater than 1 or &quot;expand_all_items&quot; is not enabled and &quot;depth&quot; is greater than 1.');
     }
     \Drupal::service('theme_installer')->install(['stark']);
     $settings = [
@@ -547,7 +532,7 @@ class SystemMenuBlockTest extends KernelTestBase {
    * @return array
    *   The "menu link ID tree" representation of the given render array.
    */
-  protected function convertBuiltMenuToIdTree(array $build) {
+  protected function convertBuiltMenuToIdTree(array $build): array {
     $level = [];
     foreach (Element::children($build) as $id) {
       $level[$id] = [];

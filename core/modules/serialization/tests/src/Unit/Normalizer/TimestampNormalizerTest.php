@@ -106,7 +106,7 @@ class TimestampNormalizerTest extends UnitTestCase {
    * @return array
    *   An array of test data.
    */
-  public static function providerTestDenormalizeValidFormats() {
+  public static function providerTestDenormalizeValidFormats(): array {
     $expected_stamp = 1478422920;
 
     $data = [];
@@ -128,7 +128,7 @@ class TimestampNormalizerTest extends UnitTestCase {
    */
   public function testDenormalizeException(): void {
     $this->expectException(UnexpectedValueException::class);
-    $this->expectExceptionMessage('The specified date "2016/11/06 09:02am GMT" is not in an accepted format: "U" (UNIX timestamp), "Y-m-d\TH:i:sO" (ISO 8601), "Y-m-d\TH:i:sP" (RFC 3339).');
+    $this->expectExceptionMessageIs('The specified date "2016/11/06 09:02am GMT" is not in an accepted format: "U" (UNIX timestamp), "Y-m-d\TH:i:sO" (ISO 8601), "Y-m-d\TH:i:sP" (RFC 3339).');
 
     $normalized = '2016/11/06 09:02am GMT';
 

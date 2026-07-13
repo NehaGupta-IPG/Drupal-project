@@ -343,12 +343,7 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
    * @see \Drupal\Core\Field\BaseFieldDefinition::addConstraint()
    */
   public function addPropertyConstraints($name, array $constraints) {
-    $complex_data_constraint = $this->getItemDefinition()->getConstraint('ComplexData') ?: [];
-    $item_constraints = $complex_data_constraint['properties'] ?? NULL;
-    if ($item_constraints === NULL) {
-      @trigger_error('Adding the "ComplexData" constraint with options missing the "properties" key is deprecated in drupal:11.4.0 and will not be supported in drupal:12.0.0. See https://www.drupal.org/node/3554746');
-      $item_constraints = $complex_data_constraint;
-    }
+    $item_constraints = $this->getItemDefinition()->getConstraint('ComplexData')['properties'] ?? [];
     if (isset($item_constraints[$name])) {
       // Add the new property constraints, overwriting as required.
       $item_constraints[$name] = $constraints + $item_constraints[$name];
@@ -456,7 +451,24 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
   }
 
   /**
-   * {@inheritdoc}
+   * Sets a default value for the field.
+   *
+   * If a default value callback is set, it will take precedence over any value
+   * set here.
+   *
+   * @param mixed $value
+   *   The default value for the field. This can be either:
+   *   - a literal, in which case it will be assigned to the first property of
+   *     the first item.
+   *   - a numerically indexed array of items, each item being a property/value
+   *     array.
+   *   - a non-numerically indexed array, in which case the array is assumed to
+   *     be a property/value array and used as the first item
+   *   - NULL or [] for no default value.
+   *
+   * @return $this
+   *
+   * @see \Drupal\Core\Field\BaseFieldDefinition::setDefaultValueCallback()
    */
   public function setDefaultValue($value) {
     if ($value === NULL) {
@@ -476,7 +488,24 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
   }
 
   /**
-   * {@inheritdoc}
+   * Sets the default value callback for the field.
+   *
+   * If set, the callback overrides any set default value.
+   *
+   * @param callable|null $callback
+   *   The callback to invoke for getting the default value. The callback will
+   *   be invoked with the
+   *   following arguments:
+   *   - \Drupal\Core\Entity\FieldableEntityInterface $entity
+   *     The entity being created.
+   *   - \Drupal\Core\Field\FieldDefinitionInterface $definition
+   *     The field definition.
+   *   It should return the default value in the format accepted by the
+   *   static::setDefaultValue() method.
+   *
+   *   Pass NULL to unset a callback that was set previously.
+   *
+   * @return $this
    */
   public function setDefaultValueCallback($callback) {
     if (isset($callback) && !is_string($callback)) {
@@ -578,10 +607,7 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
   /**
    * {@inheritdoc}
    */
-  public function getPropertyDefinition(/* string */ $name) {
-    if (!is_string($name)) {
-      @trigger_error('Calling ' . __CLASS__ . '::getPropertyDefinition() with a non-string $name is deprecated in drupal:11.3.0 and throws an exception in drupal:12.0.0. See https://www.drupal.org/node/3557373', E_USER_DEPRECATED);
-    }
+  public function getPropertyDefinition(string $name) {
     if (!isset($this->propertyDefinitions)) {
       $this->getPropertyDefinitions();
     }

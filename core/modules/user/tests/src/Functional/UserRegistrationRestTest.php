@@ -159,7 +159,7 @@ class UserRegistrationRestTest extends ResourceTestBase {
    * @return array
    *   Return the request body.
    */
-  protected function createRequestBody($name, $include_password = TRUE, $include_email = TRUE): array {
+  protected function createRequestBody(string $name, $include_password = TRUE, $include_email = TRUE): array {
     $request_body = [
       'langcode' => [['value' => 'en']],
       'name' => [['value' => $name]],
@@ -210,7 +210,11 @@ class UserRegistrationRestTest extends ResourceTestBase {
     // Verify that an anonymous user can register.
     $response = $this->registerRequest($name, $include_password, $include_email);
     $this->assertResourceResponse(200, FALSE, $response);
-    $user = user_load_by_name($name);
+    $users = \Drupal::entityTypeManager()
+      ->getStorage('user')
+      ->loadByProperties(['name' => $name]);
+    $user = reset($users);
+
     $this->assertNotEmpty($user, 'User was create as expected');
     return $user;
   }
@@ -268,7 +272,7 @@ class UserRegistrationRestTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedUnauthorizedAccessCacheability() {
+  protected function getExpectedUnauthorizedAccessCacheability(): CacheableMetadata {
     return new CacheableMetadata();
   }
 

@@ -126,7 +126,7 @@ class DateTimeNormalizerTest extends UnitTestCase {
    * @return array
    *   An array of test data.
    */
-  public static function providerTestDenormalizeValidFormats() {
+  public static function providerTestDenormalizeValidFormats(): array {
     $data = [];
 
     $data['RFC3339'] = ['2016-11-06T09:02:00+00:00', new \DateTimeImmutable('2016-11-06T09:02:00+00:00')];
@@ -156,7 +156,7 @@ class DateTimeNormalizerTest extends UnitTestCase {
    * @return array
    *   An array of test data.
    */
-  public static function providerTestDenormalizeUserFormats() {
+  public static function providerTestDenormalizeUserFormats(): array {
     $data = [];
 
     $data['Y/m/d H:i:s P'] = [
@@ -183,7 +183,7 @@ class DateTimeNormalizerTest extends UnitTestCase {
    */
   public function testDenormalizeException(): void {
     $this->expectException(UnexpectedValueException::class);
-    $this->expectExceptionMessage('The specified date "2016/11/06 09:02am GMT" is not in an accepted format: "Y-m-d\TH:i:sP" (RFC 3339), "Y-m-d\TH:i:sO" (ISO 8601).');
+    $this->expectExceptionMessageIs('The specified date "2016/11/06 09:02am GMT" is not in an accepted format: "Y-m-d\TH:i:sP" (RFC 3339), "Y-m-d\TH:i:sO" (ISO 8601).');
 
     $normalized = '2016/11/06 09:02am GMT';
 
@@ -210,7 +210,7 @@ class DateTimeNormalizerTest extends UnitTestCase {
       return $data->reveal();
     };
     return [
-      'RFC 3339' => [fn (UnitTestCase $test) => $case($test)],
+      'RFC 3339' => [fn (UnitTestCase $test): DateTimeInterface => $case($test)],
     ];
   }
 
