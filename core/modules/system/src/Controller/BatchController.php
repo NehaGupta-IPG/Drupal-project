@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Controller routines for batch routes.
@@ -48,6 +49,31 @@ class BatchController implements ContainerInjectionInterface {
    *
    * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
    */
+  #[Route(
+    path: '/batch',
+    name: 'system.batch_page.html',
+    requirements: [
+      '_access' => 'TRUE',
+      '_format' => 'html',
+    ],
+    options: [
+      '_admin_route' => TRUE,
+    ],
+    defaults: [
+      '_title_callback' => __CLASS__ . '::batchPageTitle',
+    ]
+  )]
+  #[Route(
+    path: '/batch',
+    name: 'system.batch_page.json',
+    requirements: [
+      '_access' => 'TRUE',
+      '_format' => 'json',
+    ],
+    options: [
+      '_admin_route' => TRUE,
+    ]
+  )]
   public function batchPage(Request $request) {
     $output = _batch_page($request);
 

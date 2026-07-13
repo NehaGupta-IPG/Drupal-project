@@ -12,6 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Defines a route controller for entity autocomplete form elements.
@@ -75,6 +76,13 @@ class EntityAutocompleteController extends ControllerBase {
    *   Thrown if the selection settings key is not found in the key/value store
    *   or if it does not match the stored data.
    */
+  #[Route(
+    path: '/entity_reference_autocomplete/{target_type}/{selection_handler}/{selection_settings_key}',
+    name: 'system.entity_autocomplete',
+    requirements: [
+      '_access' => 'TRUE',
+    ],
+  )]
   public function handleAutocomplete(Request $request, $target_type, $selection_handler, $selection_settings_key) {
     $matches = [];
 

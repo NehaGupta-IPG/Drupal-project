@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * System file controller.
@@ -57,6 +58,37 @@ class FileDownloadController extends ControllerBase {
    *
    * @see hook_file_download()
    */
+  #[Route(
+    path: '/system/files/{scheme}',
+    name: 'system.files',
+    requirements: [
+      '_access' => 'TRUE',
+      'scheme' => '^(?!(module|theme)).*',
+    ],
+    defaults: [
+      'scheme' => 'private',
+    ],
+  )]
+  #[Route(
+    path: '/system/files/{filepath}',
+    name: 'system.private_file_download',
+    requirements: [
+      // Permissive regex to allow slashes in filepath see
+      // http://symfony.com/doc/current/cookbook/routing/slash_in_parameter.html
+      'filepath' => '.+',
+      '_access' => 'TRUE',
+    ],
+  )]
+  #[Route(
+    path: '/system/temporary',
+    name: 'system.temporary',
+    requirements: [
+      '_access' => 'TRUE',
+    ],
+    defaults: [
+      'scheme' => 'temporary',
+    ],
+  )]
   public function download(Request $request, $scheme = 'private') {
     $target = $request->query->get('file');
     // Merge remaining path arguments into relative file path.

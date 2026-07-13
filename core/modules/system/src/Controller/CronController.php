@@ -5,6 +5,7 @@ namespace Drupal\system\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\CronInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Controller for Cron handling.
@@ -34,6 +35,16 @@ class CronController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\Response
    *   A Symfony response object.
    */
+  #[Route(
+    path: '/cron/{key}',
+    name: 'system.cron',
+    requirements: [
+      '_access_system_cron' => 'TRUE',
+    ],
+    options: [
+      'no_cache' => TRUE,
+    ],
+  )]
   public function run() {
     $this->cron->run();
 
@@ -47,6 +58,17 @@ class CronController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    *   A Symfony direct response object.
    */
+  #[Route(
+    path: '/admin/reports/status/run-cron',
+    name: 'system.run_cron',
+    requirements: [
+      '_permission' => 'administer site configuration',
+      '_csrf_token' => 'TRUE',
+    ],
+    options: [
+      'no_cache' => TRUE,
+    ],
+  )]
   public function runManually() {
     if ($this->cron->run()) {
       $this->messenger()->addStatus($this->t('Cron ran successfully.'));
