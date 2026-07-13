@@ -6,9 +6,8 @@ namespace Drupal\Tests\user\Unit;
 
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ModuleExtensionList;
-use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\StringTranslation\TranslationInterface;
+use Drupal\Core\Language\LanguageDefault;
+use Drupal\Core\StringTranslation\TranslationManager;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\PermissionHandler;
 use org\bovigo\vfs\vfsStream;
@@ -43,7 +42,7 @@ class PermissionHandlerTest extends UnitTestCase {
   /**
    * The mocked string translation.
    *
-   * @var \Drupal\Tests\user\Unit\TestTranslationManager
+   * @var \Drupal\Core\StringTranslation\TranslationManager
    */
   protected $stringTranslation;
 
@@ -60,7 +59,7 @@ class PermissionHandlerTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->stringTranslation = new TestTranslationManager();
+    $this->stringTranslation = new TranslationManager(new LanguageDefault([]));
     $this->callableResolver = $this->createMock('Drupal\Core\Utility\CallableResolver');
   }
 
@@ -406,35 +405,6 @@ class TestPermissionCallbacks {
         'provider' => 'module_a',
       ],
     ];
-  }
-
-}
-
-/**
- * Implements a translation manager in tests.
- */
-class TestTranslationManager implements TranslationInterface {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function translate($string, array $args = [], array $options = []): TranslatableMarkup {
-    // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
-    return new TranslatableMarkup($string, $args, $options, $this);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function translateString(TranslatableMarkup $translated_string) {
-    return $translated_string->getUntranslatedString();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function formatPlural($count, $singular, $plural, array $args = [], array $options = []): PluralTranslatableMarkup {
-    return new PluralTranslatableMarkup($count, $singular, $plural, $args, $options, $this);
   }
 
 }
