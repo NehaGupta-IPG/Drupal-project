@@ -43,6 +43,17 @@ readonly class ContextualLinksSerializer {
 
     $langcode = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_URL)->getId();
     foreach ($contextualLinks as $group => $args) {
+      if (!isset($args['route_parameters'])) {
+        if (isset($contextualLinks['layout_builder_block_translation']['route_parameters'])) {
+          $args['route_parameters'] = $contextualLinks['layout_builder_block_translation']['route_parameters'];
+        }
+        elseif (isset($contextualLinks['layout_builder_inline_block_translation']['route_parameters'])) {
+          $args['route_parameters'] = $contextualLinks['layout_builder_inline_block_translation']['route_parameters'];
+        }
+        else {
+          $args['route_parameters'] = [];
+        }
+      }
       $routeParameters = UrlHelper::buildQuery($args['route_parameters']);
       $args += ['metadata' => []];
       // Add the current URL language to metadata so a different ID will be
