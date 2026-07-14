@@ -115,6 +115,13 @@ class LanguageSwitchingTest extends BrowserTestBase {
     $this->DrupalGet('<front>');
     // The language switcher block should display.
     $this->assertSession()->pageTextContains($block_label);
+
+    $language_switcher_nav = $this->xpath('//div[@id=:id and @role="navigation" and @aria-label=:label]', [
+      ':id' => 'block-test-language-block',
+      ':label' => (string) $block_label,
+    ]);
+    $this->assertNotEmpty($language_switcher_nav, 'Language switcher block navigation landmark has accessible name.'); 
+
     // Assert that each list item and anchor element has the appropriate data-
     // attributes.
     $language_switchers = $this->xpath('//div[@id=:id]/ul/li', [':id' => 'block-test-language-block']);
