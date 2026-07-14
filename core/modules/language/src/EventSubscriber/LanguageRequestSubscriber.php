@@ -54,7 +54,7 @@ class LanguageRequestSubscriber implements EventSubscriberInterface {
     $this->negotiator = $negotiator;
     $this->translation = $translation;
     if ($current_user) {
-      @trigger_error('Calling ' . __CLASS__ . ' constructor with the $current_user argument is deprecated in drupal:11.4.0 and it will be removed in drupal:12.0.0. See https://www.drupal.org/node/3544400', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __CLASS__ . ' constructor with the $current_user argument is deprecated in drupal:11.5.0 and it will be removed in drupal:13.0.0. See https://www.drupal.org/node/3544400', E_USER_DEPRECATED);
     }
   }
 

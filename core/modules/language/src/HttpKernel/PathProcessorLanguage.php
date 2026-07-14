@@ -77,7 +77,7 @@ class PathProcessorLanguage implements InboundPathProcessorInterface, OutboundPa
     $this->languageManager = $language_manager;
     $this->negotiator = $negotiator;
     if ($config_subscriber instanceof AccountInterface) {
-      @trigger_error('Calling ' . __CLASS__ . ' constructor with the $current_user argument is deprecated in drupal:11.4.0 and it will be removed in drupal:12.0.0. See https://www.drupal.org/node/3544400', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __CLASS__ . ' constructor with the $current_user argument is deprecated in drupal:11.5.0 and it will be removed in drupal:13.0.0. See https://www.drupal.org/node/3544400', E_USER_DEPRECATED);
       $config_subscriber = \Drupal::service('language.config_subscriber');
     }
     $this->configSubscriber = $config_subscriber;
