@@ -379,7 +379,7 @@ class ModulesListForm extends FormBase {
       }
 
       $name = $modules[$dependency]->info['name'];
-      $row['#requires'][$dependency] = $modules[$dependency]->status ? $this->t('@module', ['@module' => $name]) : $this->t('@module (<span class="admin-disabled">disabled</span>)', ['@module' => $name]);
+      $row['#requires'][$dependency] = $modules[$dependency]->status ? $this->t('@module', ['@module' => $name]) : $this->t('@module (<span class="admin-disabled">uninstalled</span>)', ['@module' => $name]);
     }
 
     // If this module is required by other modules, list those, and then make it
@@ -391,7 +391,7 @@ class ModulesListForm extends FormBase {
           $row['enable']['#disabled'] = TRUE;
         }
         else {
-          $row['#required_by'][$dependent] = $this->t('@module (<span class="admin-disabled">disabled</span>)', ['@module' => $modules[$dependent]->info['name']]);
+          $row['#required_by'][$dependent] = $this->t('@module (<span class="admin-disabled">uninstalled</span>)', ['@module' => $modules[$dependent]->info['name']]);
         }
       }
     }
