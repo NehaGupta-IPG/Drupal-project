@@ -3,13 +3,14 @@
 namespace Drupal\Core\Pager;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Provides a manager for pagers.
  *
  * Pagers are cached, and can be retrieved when rendering.
  */
-class PagerManager implements PagerManagerInterface {
+class PagerManager implements PagerManagerInterface, ResetInterface {
 
   use DependencySerializationTrait;
 
@@ -121,6 +122,14 @@ class PagerManager implements PagerManagerInterface {
   protected function setPager(Pager $pager, $element = 0) {
     $this->maxPagerElementId = max($element, $this->maxPagerElementId);
     $this->pagers[$element] = $pager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function reset(): void {
+    $this->pagers = [];
+    $this->maxPagerElementId = -1;
   }
 
 }

@@ -20,6 +20,7 @@ use Drupal\Core\DependencyInjection\Compiler\RegisterAccessChecksPass;
 use Drupal\Core\DependencyInjection\Compiler\RegisterEventSubscribersPass;
 use Drupal\Core\DependencyInjection\Compiler\RegisterServicesForDestructionPass;
 use Drupal\Core\DependencyInjection\Compiler\StackedKernelPass;
+use Symfony\Component\HttpKernel\DependencyInjection\ResettableServicePass;
 use Drupal\Core\DependencyInjection\Compiler\StackedSessionHandlerPass;
 use Drupal\Core\DependencyInjection\Compiler\StreamWrapperClassesPass;
 use Drupal\Core\DependencyInjection\Compiler\SuperUserAccessPolicyPass;
@@ -111,6 +112,9 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
 
     // Add a compiler pass for registering services needing destruction.
     $container->addCompilerPass(new RegisterServicesForDestructionPass());
+
+    // Add a compiler pass for registering resettable services.
+    $container->addCompilerPass(new ResettableServicePass());
 
     // Add the compiler pass that will process the tagged services.
     $container->addCompilerPass(new ListCacheBinsPass());
