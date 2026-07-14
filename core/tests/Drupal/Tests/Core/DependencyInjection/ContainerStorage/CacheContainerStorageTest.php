@@ -116,8 +116,8 @@ class CacheContainerStorageTest extends UnitTestCase {
 
     $storage = $this->createStorage($cache);
 
-    // Should not throw despite cache exception, but should report failure.
-    $this->assertFalse($storage->dump($container, 'test_suffix'));
+    // Should not throw despite cache exception.
+    $storage->dump($container, 'test_suffix');
   }
 
   /**

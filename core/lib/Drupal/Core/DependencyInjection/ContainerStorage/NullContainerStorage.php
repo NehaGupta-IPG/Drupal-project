@@ -27,9 +27,8 @@ class NullContainerStorage implements ContainerStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function dump(ContainerBuilder $container, string $suffix): bool {
+  public function dump(ContainerBuilder $container, string $suffix): void {
     // No-op.
-    return TRUE;
   }
 
   /**

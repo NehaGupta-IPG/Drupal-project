@@ -632,9 +632,8 @@ class DrupalKernelTest extends KernelTestBase {
       /**
        * {@inheritdoc}
        */
-      public function dump(ContainerBuilder $container, string $suffix): bool {
+      public function dump(ContainerBuilder $container, string $suffix): void {
         static::$dumpCalled = TRUE;
-        return TRUE;
       }
 
     });

@@ -1126,9 +1126,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if (!$container) {
       $container = $this->compileContainer();
       $storage = $this->getContainerStorage();
-      if (!$storage->dump($container, $suffix)) {
-        error_log('Container cannot be saved to cache.');
-      }
+      $storage->dump($container, $suffix);
       $container = $storage->load($suffix) ?? $container;
     }
 

@@ -70,7 +70,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function dump(ContainerBuilder $container, string $suffix): bool {
+  public function dump(ContainerBuilder $container, string $suffix): void {
     $this->loadedSuffix = $suffix;
 
     // Strip leading backslash so the generated PHP code produces a correct
@@ -101,8 +101,10 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
 
     // Only write the container to disk if it does not already exist.
     $filename = $containerClass . '.php';
-    if (!$this->phpStorage->exists($filename) && !$this->phpStorage->save($filename, $code)) {
-      return FALSE;
+    if (!$this->phpStorage->exists($filename)) {
+      if (!$this->phpStorage->save($filename, $code)) {
+        return;
+      }
     }
 
     // Publish the hash only after the file is written, so the cache never
@@ -113,10 +115,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
     }
     catch (\Exception) {
       // The cache table may not exist yet (e.g., during install).
-      return FALSE;
     }
-
-    return TRUE;
   }
 
   /**
