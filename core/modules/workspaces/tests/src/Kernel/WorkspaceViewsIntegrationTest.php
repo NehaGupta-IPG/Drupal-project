@@ -14,6 +14,8 @@ use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
+use Drupal\views\Entity\View;
+use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
 use Drupal\views_ui\ViewUI;
 use Drupal\workspaces\Entity\Workspace;
@@ -97,6 +99,9 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
       'bundle' => 'page',
       'field_name' => 'field_reference',
     ])->save();
+
+    // Create a workspace to run the views integration tests in.
+    Workspace::create(['id' => 'stage', 'label' => 'Stage'])->save();
   }
 
   /**
@@ -125,8 +130,6 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
       'promote' => TRUE,
     ]);
 
-    // Create a new workspace and activate it.
-    Workspace::create(['id' => 'stage', 'label' => 'Stage'])->save();
     $this->switchToWorkspace('stage');
 
     $view = Views::getView('frontpage');
@@ -178,6 +181,276 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
       ['nid' => $node_1->id()],
     ];
     $this->assertIdenticalResultset($view, $expected, ['nid' => 'nid']);
+  }
+
+  /**
+   * Tests sorting a view by a revisionable field in a workspace.
+   */
+  public function testViewsSortByField(): void {
+    $nodes = $this->createNodesEditedInWorkspace();
+
+    $view = Views::getView('frontpage');
+    $view->setDisplay('page_1');
+    $display = $view->displayHandlers->get('page_1');
+    $display->overrideOption('filters', []);
+    // A standard sort selects the field, so the ORDER BY follows the same
+    // rewrite as fields and filters.
+    $display->overrideOption('sorts', [
+      'title' => [
+        'id' => 'title',
+        'table' => 'node_field_data',
+        'field' => 'title',
+        'entity_type' => 'node',
+        'entity_field' => 'title',
+        'plugin_id' => 'standard',
+        'order' => 'ASC',
+      ],
+    ]);
+    $view->execute();
+
+    // In the workspace node A's title is 'Z', so ascending order is B, C, A.
+    $this->assertIdenticalResultset($view, [
+      ['nid' => $nodes['b']->id()],
+      ['nid' => $nodes['c']->id()],
+      ['nid' => $nodes['a']->id()],
+    ], ['nid' => 'nid']);
+  }
+
+  /**
+   * Tests sorting a view by a formula in a workspace.
+   */
+  public function testViewsSortByFormula(): void {
+    $nodes = $this->createNodesEditedInWorkspace();
+
+    $view = Views::getView('frontpage');
+    $view->setDisplay('page_1');
+    $display = $view->displayHandlers->get('page_1');
+    $display->overrideOption('filters', []);
+    // A date sort with a granularity coarser than 'second' sorts by a formula
+    // that references the column directly, so the reference is rewritten inside
+    // the formula.
+    $display->overrideOption('sorts', [
+      'created' => [
+        'id' => 'created',
+        'table' => 'node_field_data',
+        'field' => 'created',
+        'entity_type' => 'node',
+        'entity_field' => 'created',
+        'plugin_id' => 'date',
+        'granularity' => 'day',
+        'order' => 'ASC',
+      ],
+    ]);
+    $view->execute();
+
+    // In the workspace node A has the earliest creation date, so ascending
+    // order by day is A, C, B.
+    $this->assertIdenticalResultset($view, [
+      ['nid' => $nodes['a']->id()],
+      ['nid' => $nodes['c']->id()],
+      ['nid' => $nodes['b']->id()],
+    ], ['nid' => 'nid']);
+  }
+
+  /**
+   * Tests grouping and counting by a revisionable field in a workspace.
+   */
+  public function testViewsGroupByAndCount(): void {
+    $this->createNodesEditedInWorkspace();
+
+    // The GROUP BY clause is derived from the selected fields, so grouping by a
+    // revisionable field follows the field rewrite to the revision table.
+    $view = $this->buildNodeAggregateView('workspace_group_by_count', [
+      'sticky' => $this->nodeHandlerConfig('sticky', 'boolean', 'group'),
+      'nid' => $this->nodeHandlerConfig('nid', 'numeric', 'count'),
+    ]);
+    $view->execute();
+
+    $counts = [];
+    foreach ($view->result as $row) {
+      $counts[(int) $view->field['sticky']->getValue($row)] = (int) $view->field['nid']->getValue($row);
+    }
+    ksort($counts);
+
+    // In the workspace node A is sticky, so there is 1 non-sticky node (B) and
+    // 2 sticky nodes (A and C).
+    $this->assertSame([0 => 1, 1 => 2], $counts);
+  }
+
+  /**
+   * Tests a HAVING clause on a counted base field in a workspace.
+   */
+  public function testViewsHavingOnCount(): void {
+    $this->createNodesEditedInWorkspace();
+
+    $view = $this->buildNodeAggregateView('workspace_having_count', [
+      'sticky' => $this->nodeHandlerConfig('sticky', 'boolean', 'group'),
+      'nid' => $this->nodeHandlerConfig('nid', 'numeric', 'count'),
+    ], [
+      'nid' => $this->nodeHandlerConfig('nid', 'numeric', 'count') + [
+        'operator' => '>=',
+        'value' => ['value' => 2],
+      ],
+    ]);
+    $view->execute();
+
+    // Only the sticky group has 2 nodes in the workspace (A and C).
+    $this->assertCount(1, $view->result);
+    $row = reset($view->result);
+    $this->assertSame(1, (int) $view->field['sticky']->getValue($row));
+    $this->assertSame(2, (int) $view->field['nid']->getValue($row));
+  }
+
+  /**
+   * Tests a HAVING clause on an aggregated revisionable field in a workspace.
+   */
+  public function testViewsHavingOnAggregatedField(): void {
+    $this->createNodesEditedInWorkspace();
+
+    // Group by the content type, which is not revisionable, so the nodes stay
+    // in a single group and the HAVING condition (which wraps the column in an
+    // aggregate, e.g. SUM(sticky)) is the only thing that depends on
+    // revisionable values.
+    $view = $this->buildNodeAggregateView('workspace_having_sum', [
+      'type' => $this->nodeHandlerConfig('type', 'field', 'group'),
+    ], [
+      'sticky' => $this->nodeHandlerConfig('sticky', 'numeric', 'sum') + [
+        'operator' => '>=',
+        'value' => ['value' => 2],
+      ],
+    ]);
+    $view->execute();
+
+    // In the workspace 2 of the 3 nodes are sticky, so SUM(sticky) is 2 and the
+    // 'page' group passes the HAVING condition. With live values SUM(sticky) is
+    // 1 and the group would be filtered out.
+    $this->assertCount(1, $view->result);
+  }
+
+  /**
+   * Tests the pager count query filtering on a revisionable field.
+   */
+  public function testViewsCountQuery(): void {
+    $this->createNodesEditedInWorkspace();
+
+    $view = Views::getView('frontpage');
+    $view->setDisplay('page_1');
+    $display = $view->displayHandlers->get('page_1');
+    $display->overrideOption('pager', [
+      'type' => 'full',
+      'options' => ['items_per_page' => 1],
+    ]);
+    $display->overrideOption('filters', [
+      'sticky' => [
+        'id' => 'sticky',
+        'table' => 'node_field_data',
+        'field' => 'sticky',
+        'entity_type' => 'node',
+        'entity_field' => 'sticky',
+        'plugin_id' => 'boolean',
+        'operator' => '=',
+        'value' => '1',
+      ],
+    ]);
+    $view->execute();
+
+    // In the workspace nodes A and C are sticky, so the total is 2.
+    $this->assertEquals(2, $view->total_rows);
+  }
+
+  /**
+   * Creates three nodes and edits one of them in the 'stage' workspace.
+   *
+   * @return \Drupal\node\NodeInterface[]
+   *   The three nodes, keyed by 'a', 'b' and 'c'.
+   */
+  protected function createNodesEditedInWorkspace(): array {
+    $day = 86400;
+    $nodes = [];
+    $nodes['a'] = $this->createNode(['title' => 'A', 'created' => 3 * $day, 'sticky' => FALSE, 'promote' => TRUE]);
+    $nodes['b'] = $this->createNode(['title' => 'B', 'created' => 2 * $day, 'sticky' => FALSE, 'promote' => TRUE]);
+    $nodes['c'] = $this->createNode(['title' => 'C', 'created' => 1 * $day, 'sticky' => TRUE, 'promote' => TRUE]);
+
+    $this->switchToWorkspace('stage');
+
+    $nodes['a']->setTitle('Z');
+    $nodes['a']->setSticky(TRUE);
+    $nodes['a']->setCreatedTime(0);
+    $nodes['a']->save();
+
+    return $nodes;
+  }
+
+  /**
+   * Builds a views handler configuration for a 'node_field_data' field.
+   *
+   * @param string $field
+   *   The field name.
+   * @param string $plugin_id
+   *   The views handler plugin ID.
+   * @param string $group_type
+   *   The aggregation type, e.g. 'group', 'count' or 'sum'.
+   *
+   * @return array
+   *   The handler configuration.
+   */
+  protected function nodeHandlerConfig(string $field, string $plugin_id, string $group_type): array {
+    return [
+      'id' => $field,
+      'table' => 'node_field_data',
+      'field' => $field,
+      'entity_type' => 'node',
+      'entity_field' => $field,
+      'plugin_id' => $plugin_id,
+      'group_type' => $group_type,
+    ];
+  }
+
+  /**
+   * Builds and saves an aggregated view on the 'node_field_data' table.
+   *
+   * @param string $id
+   *   The ID of the view to create.
+   * @param array $fields
+   *   The 'fields' handler configuration.
+   * @param array $filters
+   *   (optional) The 'filters' handler configuration.
+   *
+   * @return \Drupal\views\ViewExecutable
+   *   The executable view.
+   */
+  protected function buildNodeAggregateView(string $id, array $fields, array $filters = []): ViewExecutable {
+    $display_options = [
+      'access' => ['type' => 'none'],
+      'pager' => ['type' => 'none'],
+      'style' => ['type' => 'default'],
+      'row' => ['type' => 'fields'],
+      'group_by' => TRUE,
+      'fields' => $fields,
+    ];
+    if ($filters) {
+      $display_options['filters'] = $filters;
+    }
+
+    \Drupal::service('workspaces.manager')->executeOutsideWorkspace(function () use ($id, $display_options) {
+      View::create([
+        'id' => $id,
+        'label' => $id,
+        'base_table' => 'node_field_data',
+        'base_field' => 'nid',
+        'display' => [
+          'default' => [
+            'display_plugin' => 'default',
+            'id' => 'default',
+            'display_title' => 'Default',
+            'position' => 0,
+            'display_options' => $display_options,
+          ],
+        ],
+      ])->save();
+    });
+
+    return Views::getView($id);
   }
 
   /**
