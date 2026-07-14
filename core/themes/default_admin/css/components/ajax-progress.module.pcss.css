@@ -47,7 +47,6 @@
 }
 
 .ajax-progress__throbber {
-  box-sizing: border-box;
   width: 1.125rem;
   height: 1.125rem;
   animation: claro-throbber 0.75s linear infinite;
@@ -71,7 +70,6 @@
   z-index: 1261;
   inset-block-start: 50%;
   inset-inline-start: 50%;
-  box-sizing: border-box;
   width: 3.5rem; /* 56px */
   height: 3.5rem;
   margin: -1.75rem;

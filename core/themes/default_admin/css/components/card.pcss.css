@@ -80,7 +80,6 @@
   flex-direction: column;
   flex-grow: 1;
   flex-shrink: 0;
-  box-sizing: border-box;
   padding: var(--admin-space-l);
   border-radius: 0 0 var(--admin-radius-xs) var(--admin-radius-xs);
   background-color: var(--admin-color-bg-surface);
