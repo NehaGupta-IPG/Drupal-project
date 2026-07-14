@@ -70,6 +70,13 @@ class DrupalKernelDeprecationTest extends KernelTestBase {
 
     $kernel->shutdown();
     $kernel->boot();
+
+    // Confirm the custom class was actually wired into the storage service,
+    // not just that the deprecation notice fired.
+    $bootstrapContainer = (new \ReflectionProperty($kernel, 'bootstrapContainer'))->getValue($kernel);
+    $storage = $bootstrapContainer->get('container_storage.cache');
+    $dumperClass = (new \ReflectionProperty($storage, 'dumperClass'))->getValue($storage);
+    $this->assertSame($customDumperClass, $dumperClass);
   }
 
 }

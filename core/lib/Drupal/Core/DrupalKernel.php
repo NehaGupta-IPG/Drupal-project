@@ -123,8 +123,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       'container_storage.cache' => [
         'class' => CacheContainerStorage::class,
         'arguments' => [
-          '@cache.container',
-          '@settings',
+          'cache' => '@cache.container',
+          'settings' => '@settings',
         ],
       ],
       'container_storage.php_dumper' => [
@@ -562,7 +562,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if ($this->phpArrayDumperClass !== '\Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper') {
       @trigger_error(__CLASS__ . '::$phpArrayDumperClass is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use the bootstrap_container_definition setting to set the class. See https://www.drupal.org/node/3585642', E_USER_DEPRECATED);
       // @phpstan-ignore property.deprecated
-      $definition['services']['container_storage.cache']['arguments'][] = $this->phpArrayDumperClass;
+      $definition['services']['container_storage.cache']['arguments']['dumperClass'] = $this->phpArrayDumperClass;
     }
     $this->bootstrapContainer = new $this->bootstrapContainerClass($definition);
 
