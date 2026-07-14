@@ -120,7 +120,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
       ':id' => 'block-test-language-block',
       ':label' => (string) $block_label,
     ]);
-    $this->assertNotEmpty($language_switcher_nav, 'Language switcher block navigation landmark has accessible name.'); 
+    $this->assertNotEmpty($language_switcher_nav, 'Language switcher block navigation landmark has accessible name.');
 
     // Assert that each list item and anchor element has the appropriate data-
     // attributes.
