@@ -70,13 +70,39 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
    */
   protected function createPhpStorage(array &$savedFiles = [], array &$deletedFiles = []): PhpStorageInterface {
     $code = [];
+    // Real files backing getFullPath(), keyed by normalized (no '.php') name,
+    // so garbageCollection() can compare their mtimes.
+    $paths = [];
+    $sequence = 0;
     $phpStorage = $this->createStub(PhpStorageInterface::class);
 
+    // listAll() and delete() model MTimeProtectedFileStorage, which stores each
+    // file in a containing directory named after the virtual file name with the
+    // '.php' extension removed. Hence listAll() returns names without '.php',
+    // and delete() is tolerant of names with or without it.
+    $normalize = fn ($filename) => str_ends_with($filename, '.php') ? substr($filename, 0, -4) : $filename;
+
     $phpStorage->method('save')
-      ->willReturnCallback(function ($filename, $phpCode) use (&$code, &$savedFiles) {
+      ->willReturnCallback(function ($filename, $phpCode) use (&$code, &$savedFiles, &$paths, &$sequence, $normalize) {
         $code[$filename] = $phpCode;
         $savedFiles[] = $filename;
+
+        // Back this virtual file with a real temp file so getFullPath() and
+        // filemtime() behave as they would for a real PhpStorage backend.
+        // Sequence numbers (rather than the real clock) give deterministic,
+        // strictly increasing mtimes regardless of the filesystem's 1-second
+        // mtime granularity or how fast the test executes.
+        $path = tempnam(FileSystem::getOsTemporaryDirectory(), 'drupal_container_test_');
+        $this->tempFiles[] = $path;
+        touch($path, 1700000000 + $sequence++);
+        $paths[$normalize($filename)] = $path;
+
         return TRUE;
+      });
+
+    $phpStorage->method('getFullPath')
+      ->willReturnCallback(function ($filename) use (&$paths, $normalize) {
+        return $paths[$normalize($filename)] ?? FALSE;
       });
 
     $phpStorage->method('load')
@@ -91,12 +117,6 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
           include_once $tempFile;
         }
       });
-
-    // listAll() and delete() model MTimeProtectedFileStorage, which stores each
-    // file in a containing directory named after the virtual file name with the
-    // '.php' extension removed. Hence listAll() returns names without '.php',
-    // and delete() is tolerant of names with or without it.
-    $normalize = fn ($filename) => str_ends_with($filename, '.php') ? substr($filename, 0, -4) : $filename;
 
     $phpStorage->method('listAll')
       ->willReturnCallback(function () use (&$code, $normalize) {
@@ -264,6 +284,51 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     $this->assertContains($supersededClass, $deletedFiles);
     $this->assertNotContains($currentClass, $deletedFiles);
     $this->assertCount(2, $deletedFiles);
+  }
+
+  /**
+   * Tests that garbageCollection() keeps a file newer than the cached hash.
+   */
+  public function testGarbageCollectionKeepsFileNewerThanCachedHash(): void {
+    $cache = new MemoryBackend($this->createStub(TimeInterface::class));
+    $savedFiles = [];
+    $deletedFiles = [];
+    $phpStorage = $this->createPhpStorage($savedFiles, $deletedFiles);
+
+    $storage = new PhpDumperContainerStorage($cache, $phpStorage, Settings::getInstance());
+
+    // A genuinely old container that should still be removed.
+    $old = new ContainerBuilder();
+    $old->setParameter('test_param', 'old');
+    $old->compile();
+    $storage->dump($old, 'old_suffix');
+
+    // The container the cache currently points to for 'current_suffix'.
+    $current = new ContainerBuilder();
+    $current->setParameter('test_param', 'current');
+    $current->compile();
+    $storage->dump($current, 'current_suffix');
+    $cachedHash = $cache->get('container_hash:current_suffix')->data;
+
+    // Simulate a concurrent dump() for the same suffix that has written its
+    // (newer) file, but whose cache write has not landed yet: dump the new
+    // container, then roll the cache back to the hash it held before.
+    $newer = new ContainerBuilder();
+    $newer->setParameter('test_param', 'newer');
+    $newer->compile();
+    $storage->dump($newer, 'current_suffix');
+    $cache->set('container_hash:current_suffix', $cachedHash);
+
+    $oldClass = basename($savedFiles[0], '.php');
+    $newerClass = basename($savedFiles[2], '.php');
+
+    $storage->garbageCollection();
+
+    // The old-suffix container is removed, but the newer, not-yet-cached
+    // file survives this run rather than being deleted outright.
+    $this->assertContains($oldClass, $deletedFiles);
+    $this->assertNotContains($newerClass, $deletedFiles);
+    $this->assertCount(1, $deletedFiles);
   }
 
   /**

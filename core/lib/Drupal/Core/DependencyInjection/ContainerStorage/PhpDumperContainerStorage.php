@@ -134,13 +134,35 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
       return;
     }
     $cache = $this->cache->get(static::CACHE_PREFIX . $this->loadedSuffix);
-    if ($cache && $hash = $cache->data) {
-      // Delete every container except the one currently in use.
-      $keep = 'DrupalContainer_' . $hash;
-      foreach ($this->phpStorage->listAll() as $name) {
-        if ($name !== $keep) {
-          $this->phpStorage->delete($name);
-        }
+    if (!$cache || !($hash = $cache->data)) {
+      return;
+    }
+
+    // Delete every container older than the one currently in use.
+    //
+    // PhpDumperContainerStorage::dump() always writes its file before
+    // publishing its hash to the cache, so a file at least as new as the one
+    // being kept may belong to a PhpDumperContainerStorage::dump() call still
+    // in progress on another request, whose cache write has not landed yet.
+    // Comparing ages (rather than deleting everything that does not match the
+    // current hash) avoids deleting that file without needing a lock.
+    $keep = 'DrupalContainer_' . $hash;
+    $keepPath = $this->phpStorage->getFullPath($keep);
+    $keepMtime = $keepPath ? @filemtime($keepPath) : FALSE;
+    if ($keepMtime === FALSE) {
+      // The current container's age cannot be determined; skip this run
+      // rather than risk deleting a file that is actually newer.
+      return;
+    }
+
+    foreach ($this->phpStorage->listAll() as $name) {
+      if ($name === $keep) {
+        continue;
+      }
+      $path = $this->phpStorage->getFullPath($name);
+      $mtime = $path ? @filemtime($path) : FALSE;
+      if ($mtime !== FALSE && $mtime < $keepMtime) {
+        $this->phpStorage->delete($name);
       }
     }
   }
