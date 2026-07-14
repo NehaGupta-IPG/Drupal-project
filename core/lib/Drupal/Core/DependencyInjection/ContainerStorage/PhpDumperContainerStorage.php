@@ -28,6 +28,11 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
   protected const string CACHE_PREFIX = 'container_hash:';
 
   /**
+   * Suffix appended to a container's confirmation marker file.
+   */
+  protected const string CONFIRMED_SUFFIX = '.confirmed';
+
+  /**
    * The cache key suffix of the currently loaded container.
    */
   protected ?string $loadedSuffix = NULL;
@@ -108,9 +113,14 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
     }
 
     // Publish the hash only after the file is written, so the cache never
-    // points to a container that failed to save. Superseded files are removed
-    // later by ::garbageCollection().
+    // points to a container that failed to save.
     $this->cache->set(static::CACHE_PREFIX . $suffix, $hash);
+
+    // Mark the container confirmed only now that its hash has been
+    // published. This marker is used by garbage collection to tell a fully
+    // committed container that has since been superseded apart from one whose
+    // dump() call has not finished publishing its hash yet.
+    $this->phpStorage->save($containerClass . static::CONFIRMED_SUFFIX, '1');
   }
 
   /**
@@ -132,32 +142,19 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
       return;
     }
 
-    // Delete every container older than the one currently in use.
-    //
-    // PhpDumperContainerStorage::dump() always writes its file before
-    // publishing its hash to the cache, so a file at least as new as the one
-    // being kept may belong to a PhpDumperContainerStorage::dump() call still
-    // in progress on another request, whose cache write has not landed yet.
-    // Comparing ages (rather than deleting everything that does not match the
-    // current hash) avoids deleting that file without needing a lock.
+    // Delete every confirmed container except the one currently in use. A
+    // container without a confirmation marker may belong to a dump() call
+    // still in progress on another request; see dump().
     $keep = 'DrupalContainer_' . $hash;
-    $keepPath = $this->phpStorage->getFullPath($keep);
-    $keepMtime = $keepPath ? @filemtime($keepPath) : FALSE;
-    if ($keepMtime === FALSE) {
-      // The current container's age cannot be determined; skip this run
-      // rather than risk deleting a file that is actually newer.
-      return;
-    }
-
     foreach ($this->phpStorage->listAll() as $name) {
-      if ($name === $keep) {
+      if ($name === $keep || str_ends_with($name, static::CONFIRMED_SUFFIX)) {
         continue;
       }
-      $path = $this->phpStorage->getFullPath($name);
-      $mtime = $path ? @filemtime($path) : FALSE;
-      if ($mtime !== FALSE && $mtime < $keepMtime) {
-        $this->phpStorage->delete($name);
+      if (!$this->phpStorage->exists($name . static::CONFIRMED_SUFFIX)) {
+        continue;
       }
+      $this->phpStorage->delete($name);
+      $this->phpStorage->delete($name . static::CONFIRMED_SUFFIX);
     }
   }
 
