@@ -11,7 +11,7 @@ use Drupal\Composer\Generator\Util\DrupalCoreComposer;
  * called by the PackageGenerator in order to produce a derived metapackage from
  * the provided source package.
  *
- * See the README.txt file in composer/Metapackage for a description of what
+ * See the README.md file in composer/Metapackage for a description of what
  * a metapackage is, and an explanation of the metapackages produced by the
  * generator.
  */
