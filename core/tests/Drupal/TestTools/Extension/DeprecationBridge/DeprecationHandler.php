@@ -10,7 +10,7 @@ use PHPUnit\Runner\Extension\Facade;
 use PHPUnit\Runner\Extension\ParameterCollection;
 use PHPUnit\TextUI\Configuration\Configuration as PhpUnitConfiguration;
 
-// cspell:ignore depsta bootstrapper bootstrappers
+// cspell:ignore bootstrapper bootstrappers
 
 /**
  * Drupal's PHPUnit extension to manage code deprecation.
@@ -54,9 +54,6 @@ final class DeprecationHandler implements Extension {
       $config->load($overrideConfig);
     }
 
-    // Get the legacy configuration provided via Symfony env variable.
-    $config->load(self::legacySymfonyConfiguration());
-
     // Determine if project ignores are enabled. If so, loads the deprecation
     // patterns to be ignored from the ignore file to allows capturing
     // deprecations triggered by PHP or by the DebugClassLoader, that can occur
@@ -80,62 +77,6 @@ final class DeprecationHandler implements Extension {
     Facade $facade,
     ParameterCollection $parameters,
   ): void {
-  }
-
-  /**
-   * Returns the legacy configuration provided via Symfony env variable.
-   *
-   * For historical reasons, the configuration can be stored in the
-   * SYMFONY_DEPRECATIONS_HELPER environment variable.
-   *
-   * @return array
-   *   An array of configuration variables.
-   */
-  private static function legacySymfonyConfiguration(): array {
-    $environmentVariable = getenv('SYMFONY_DEPRECATIONS_HELPER');
-    if ($environmentVariable === FALSE) {
-      return [];
-    }
-    if ($environmentVariable === 'disabled') {
-      return [
-        'enableProjectIgnores' => FALSE,
-        'enableDebugClassLoader' => FALSE,
-      ];
-    }
-    parse_str($environmentVariable, $configuration);
-    $ret = [
-      'enableProjectIgnores' => TRUE,
-      'enableDebugClassLoader' => TRUE,
-    ];
-    if (isset($configuration['ignoreFile'])) {
-      $ret['projectIgnoreFile'] = $configuration['ignoreFile'];
-    }
-    return $ret;
-  }
-
-  /**
-   * Determines if an actual deprecation is ignored by the project.
-   *
-   * Deprecations that match the patterns included in the ignore file should
-   * be ignored.
-   *
-   * @param string $deprecationMessage
-   *   The actual deprecation message triggered via trigger_error().
-   *
-   * @return bool
-   *   TRUE if the deprecation is ignored at project level.
-   */
-  public static function isIgnoredByProject(string $deprecationMessage): bool {
-    foreach (Configuration::instance()->deprecationIgnorePatterns as $pattern) {
-      $result = @preg_filter($pattern, '$0', $deprecationMessage);
-      if (preg_last_error() !== \PREG_NO_ERROR) {
-        throw new \RuntimeException(preg_last_error_msg());
-      }
-      if ((bool) $result) {
-        return TRUE;
-      }
-    }
-    return FALSE;
   }
 
 }
