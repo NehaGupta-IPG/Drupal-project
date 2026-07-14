@@ -80,7 +80,7 @@ class Role extends ConfigEntityBase implements RoleInterface {
    *
    * @var string
    */
-  protected string $description;
+  protected string $description = '';
 
   /**
    * The weight of this role in administrative listings.
@@ -117,9 +117,6 @@ class Role extends ConfigEntityBase implements RoleInterface {
    * {@inheritdoc}
    */
   public function getDescription(): string {
-    if (!isset($this->description)) {
-      return '';
-    }
     return $this->description;
   }
 
