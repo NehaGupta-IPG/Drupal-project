@@ -231,7 +231,7 @@
         return;
       }
       this.displaceProcessed = true;
-      $(window).on('resize.drupalDisplace', debounce(displace, 200));
+      $(window).on('resize.drupalDisplace', debounce(displace, 200)).trigger('resize');
     },
   };
 
