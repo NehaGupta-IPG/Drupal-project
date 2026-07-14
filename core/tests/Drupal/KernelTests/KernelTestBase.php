@@ -17,7 +17,6 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Exception\SchemaDefinitionException;
 use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Core\DependencyInjection\PhpContainer;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
@@ -270,8 +269,9 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
       'file_public_path' => $this->siteDirectory . '/files',
       // Disable Twig template caching/dumping.
       'twig_cache' => FALSE,
-      // Use the Symfony PhpDumper-based container by default.
-      'container_base_class' => PhpContainer::class,
+      // By default KernelTestBase does not allow dumping and the container will
+      // be a \Drupal\Core\DependencyInjection\ContainerBuilder instance.
+      'container_base_class' => ContainerBuilder::class,
       // @see \Drupal\KernelTests\KernelTestBase::register()
     ];
     new Settings($settings);
