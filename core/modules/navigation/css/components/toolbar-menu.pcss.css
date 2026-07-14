@@ -23,6 +23,13 @@
     display: grid;
   }
 
+  @media (scripting: none) {
+    [class*="toolbar-menu--level-"]:hover,
+    [data-toolbar-menu-trigger]:focus-within + [class*="toolbar-menu--level-"] {
+      display: grid;
+    }
+  }
+
   .toolbar-menu__item {
     display: grid;
   }

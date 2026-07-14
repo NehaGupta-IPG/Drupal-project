@@ -74,6 +74,27 @@
     }
   }
 
+  @media (scripting: none) {
+    [data-toolbar-popover-wrapper] {
+      visibility: hidden;
+    }
+
+    [data-toolbar-popover-control]:focus-within + [data-toolbar-popover-wrapper],
+    [data-toolbar-popover-wrapper]:hover {
+      visibility: visible;
+      transform: translateX(0);
+      opacity: 1;
+
+      @media (--admin-toolbar-desktop) {
+        transform: translateX(var(--admin-toolbar-sidebar-width));
+
+        &:dir(rtl) {
+          transform: translateX(calc(var(--admin-toolbar-sidebar-width) * -1));
+        }
+      }
+    }
+  }
+
   [data-admin-toolbar="collapsed"] & [data-toolbar-popover-wrapper] {
     transform: translateX(calc((16 * var(--admin-toolbar-rem) * -1) + var(--drupal-displace-offset-left, var(--admin-toolbar-space-72))));
 
