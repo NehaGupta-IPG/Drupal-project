@@ -173,6 +173,29 @@ class PrivateTempStoreTest extends UnitTestCase {
   }
 
   /**
+   * Tests optional expiry in set() call.
+   */
+  public function testSetExpire(): void {
+    $this->setUpMockLock();
+
+    $this->lock->expects($this->once())
+      ->method('acquire')
+      ->with('1:test')
+      ->willReturn(TRUE);
+    $this->lock->expects($this->never())
+      ->method('wait');
+    $this->lock->expects($this->once())
+      ->method('release')
+      ->with('1:test');
+
+    $this->keyValue->expects($this->once())
+      ->method('setWithExpire')
+      ->with('1:test', $this->ownObject, 1);
+
+    $this->tempStore->set('test', 'test_data', 1);
+  }
+
+  /**
    * Tests the getMetadata() method.
    */
   public function testGetMetadata(): void {

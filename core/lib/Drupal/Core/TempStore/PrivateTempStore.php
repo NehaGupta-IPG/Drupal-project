@@ -115,11 +115,14 @@ class PrivateTempStore {
    *   The key of the data to store.
    * @param mixed $value
    *   The data to store.
+   * @param mixed $expire
+   *   The expiration of this pair in seconds, if omitted the value from the
+   *   store will be used instead.
    *
    * @throws \Drupal\Core\TempStore\TempStoreException
    *   Thrown when a lock for the backend storage could not be acquired.
    */
-  public function set($key, $value) {
+  public function set($key, $value, $expire = NULL) {
     if ($this->currentUser->isAnonymous()) {
       $session = $this->requestStack->getSession();
       if (!$session->has('core.tempstore.private.owner')) {
@@ -140,7 +143,7 @@ class PrivateTempStore {
       'data' => $value,
       'updated' => (int) $this->requestStack->getMainRequest()->server->get('REQUEST_TIME'),
     ];
-    $this->storage->setWithExpire($key, $value, $this->expire);
+    $this->storage->setWithExpire($key, $value, $expire ? $expire : $this->expire);
     $this->lockBackend->release($key);
   }
 
