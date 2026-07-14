@@ -71,7 +71,7 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
   protected function createPhpStorage(array &$savedFiles = [], array &$deletedFiles = []): PhpStorageInterface {
     $code = [];
     // Real files backing getFullPath(), keyed by normalized (no '.php') name,
-    // so garbageCollection() can compare their mtimes.
+    // so garbageCollection() can compare their modified times.
     $paths = [];
     $sequence = 0;
     $phpStorage = $this->createStub(PhpStorageInterface::class);
@@ -90,8 +90,8 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
         // Back this virtual file with a real temp file so getFullPath() and
         // filemtime() behave as they would for a real PhpStorage backend.
         // Sequence numbers (rather than the real clock) give deterministic,
-        // strictly increasing mtimes regardless of the filesystem's 1-second
-        // mtime granularity or how fast the test executes.
+        // strictly increasing modified times regardless of the filesystem's
+        // 1-second mtime granularity or how fast the test executes.
         $path = tempnam(FileSystem::getOsTemporaryDirectory(), 'drupal_container_test_');
         $this->tempFiles[] = $path;
         touch($path, 1700000000 + $sequence++);
