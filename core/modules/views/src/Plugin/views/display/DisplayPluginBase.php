@@ -463,7 +463,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
 
           'display_description' => FALSE,
           'use_ajax' => TRUE,
-          'disable_ajax_bookmarking' => FALSE,
+          'disable_ajax_bookmarking' => TRUE,
           'hide_attachment_summary' => TRUE,
           'show_admin_links' => TRUE,
           'pager' => TRUE,
