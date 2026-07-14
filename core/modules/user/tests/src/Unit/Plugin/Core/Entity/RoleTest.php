@@ -2,21 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\user\Unit\Entity;
+namespace Drupal\Tests\user\Unit\Plugin\Core\Entity;
 
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\Entity\Role;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @group user
- * @coversDefaultClass \Drupal\user\Entity\Role
+ * Tests\Drupal\user\Entity\Role.
  */
+#[CoversClass(Role::class)]
+#[Group('user')]
 class RoleTest extends UnitTestCase {
 
   /**
    * Tests getting the role's description.
-   *
-   * @covers ::getDescription
    */
   public function testGetDescription(): void {
     $role = new Role([
@@ -28,8 +29,6 @@ class RoleTest extends UnitTestCase {
 
   /**
    * Tests getting the role's description when it is not set.
-   *
-   * @covers ::getDescription
    */
   public function testGetEmptyDescription(): void {
     $role = new Role([
@@ -40,9 +39,6 @@ class RoleTest extends UnitTestCase {
 
   /**
    * Tests setting and getting the role's description.
-   *
-   * @covers ::getDescription
-   * @covers ::setDescription
    */
   public function testSetDescription(): void {
     $role = new Role([
