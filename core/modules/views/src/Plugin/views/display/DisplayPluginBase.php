@@ -1191,12 +1191,14 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
         'value' => $this->getOption('use_ajax') ? $this->t('Yes') : $this->t('No'),
         'desc' => $this->t('Change whether or not this display will use AJAX.'),
       ];
-      $options['disable_ajax_bookmarking'] = [
-        'category' => 'other',
-        'title' => $this->t('Disable bookmarking for AJAX'),
-        'value' => $this->getOption('disable_ajax_bookmarking') ? $this->t('Yes') : $this->t('No'),
-        'desc' => $this->t('Change whether or not to disable bookmarking for AJAX.'),
-      ];
+      if ($this->getOption('use_ajax')) {
+        $options['disable_ajax_bookmarking'] = [
+          'category' => 'other',
+          'title' => $this->t('Disable bookmarking for AJAX'),
+          'value' => $this->getOption('disable_ajax_bookmarking') ? $this->t('Yes') : $this->t('No'),
+          'desc' => $this->t('Change whether or not to disable bookmarking for AJAX.'),
+        ];
+      }
     }
     if ($this->usesAttachments()) {
       $options['hide_attachment_summary'] = [
