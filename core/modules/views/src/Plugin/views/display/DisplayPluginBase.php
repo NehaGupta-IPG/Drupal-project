@@ -1482,7 +1482,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       case 'disable_ajax_bookmarking':
         $form['#title'] .= $this->t('AJAX bookmarking');
         $form['disable_ajax_bookmarking'] = [
-          '#description' => $this->t('Options such as paging, table sorting, and exposed filters will not initiate a page refresh.'),
+          '#description' => $this->t('Will prevent AJAX requests from updating the page URL.'),
           '#type' => 'checkbox',
           '#title' => $this->t('Disable bookmarking for AJAX'),
           '#default_value' => $this->getOption('disable_ajax_bookmarking') ? 1 : 0,
