@@ -550,7 +550,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    * @see https://www.drupal.org/node/3586362
    */
   protected function loadFromSharedTables(array &$values, array &$translations, $load_from_revision) {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3586362');
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3586362');
     $record_key = !$load_from_revision ? $this->idKey : $this->revisionKey;
     if ($this->dataTable) {
       // If a revision table is available, we need all the properties of the
@@ -1314,13 +1314,17 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     // combine the last two chunks. This means that 26 fields end up in a single
     // chunk of 26, instead of chunks of 25 and 1.
     $load_shared_table_fields = TRUE;
+    $chunks = [];
     if (count($single_cardinality_fields) > static::FIELD_MINIMUM_CHUNK_SIZE) {
       $chunks = array_chunk($single_cardinality_fields, static::FIELD_MINIMUM_CHUNK_SIZE, TRUE);
       $last_chunk = array_pop($chunks);
       $last_key = array_key_last($chunks);
       $chunks[$last_key] = array_merge($chunks[$last_key], $last_chunk);
     }
-    else {
+    // If there are no fields, no data table and no revision tables, there
+    // is nothing additional to load, the empty chunks array will skip the loop
+    // below.
+    elseif ($single_cardinality_fields || $this->dataTable || $this->revisionTable || $this->revisionDataTable) {
       $chunks = [$single_cardinality_fields];
     }
     foreach ($chunks as $fields) {
@@ -1329,16 +1333,8 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     }
 
     if ($multiple_cardinality_fields) {
-      if (count($multiple_cardinality_fields) > static::FIELD_MINIMUM_CHUNK_SIZE) {
-        $chunks = array_chunk($multiple_cardinality_fields, static::FIELD_MINIMUM_CHUNK_SIZE, TRUE);
-        $last_chunk = array_pop($chunks);
-        $last_key = array_key_last($chunks);
-        $chunks[$last_key] = array_merge($chunks[$last_key], $last_chunk);
-      }
-      else {
-        $chunks = [$multiple_cardinality_fields];
-      }
-      foreach ($chunks as $fields) {
+      foreach ($multiple_cardinality_fields as $field_name => $storage_definition) {
+        $fields = [$field_name => $storage_definition];
         $this->loadMultipleCardinalityFields($values, $base_query, $base_table, $id_key, $base_id_key, $base_langcode_alias, $load_from_revision, $fields, $definitions, $field_columns, $field_definition_columns, $default_langcodes);
       }
       // Ensure that all of the deltas from all of the multiple cardinality
@@ -1587,10 +1583,10 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       // If the entity is translatable, add the langcode to the join and
       // a condition on valid langcodes.
       if ($this->langcodeKey) {
-        $query->leftJoin($table, $table, "[$table].[$id_key] = [$base_table].[$base_id_key] AND [$table].[langcode] = [$base_table].[$this->langcodeKey] AND [$table].[deleted] = 0");
+        $query->join($table, $table, "[$table].[$id_key] = [$base_table].[$base_id_key] AND [$table].[langcode] = [$base_table].[$this->langcodeKey] AND [$table].[deleted] = 0");
       }
       else {
-        $query->leftJoin($table, $table, "[$table].[$id_key] = [$base_table].[$base_id_key] AND [$table].[deleted] = 0");
+        $query->join($table, $table, "[$table].[$id_key] = [$base_table].[$base_id_key] AND [$table].[deleted] = 0");
       }
       $query->fields($table, $field_columns[$field_name]);
       $delta_keys[$field_name] = $query->addField($table, 'delta', $field_name . '_delta');
@@ -1673,17 +1669,6 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       $definitions = array_intersect_key($definitions, array_flip($names));
     }
 
-    $save_to_base_table = $entity->isDefaultRevision();
-
-    // When changing a pending revision to be the default one, or when rolling
-    // back the default revision to a past revision, we need to ensure that the
-    // base field table is updated.
-    $enforce_save_to_base_table = $original && $entity->isDefaultRevision() !== $original->isDefaultRevision();
-
-    // When we're not creating a new revision, or when updating only the field's
-    // base table, we can skip writing to the field's revision table.
-    $save_to_revision_table = $this->entityType->isRevisionable() && ($entity->isNewRevision() || !$enforce_save_to_base_table);
-
     foreach ($definitions as $field_name => $field_definition) {
       $storage_definition = $field_definition->getFieldStorageDefinition();
       if (!$table_mapping->requiresDedicatedTableStorage($storage_definition)) {
@@ -1693,9 +1678,9 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       // When updating an existing revision, keep the existing records if the
       // field values did not change or if we're not re-saving a pending
       // revision as the default one.
-      if (!$enforce_save_to_base_table
-        && !$entity->isNewRevision()
+      if (!$entity->isNewRevision()
         && $original
+        && $entity->isDefaultRevision() === $original->isDefaultRevision()
         && !$this->hasFieldValueChanged($field_definition, $entity, $original)
       ) {
         continue;
@@ -1708,12 +1693,12 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       if ($update) {
         // Only overwrite the field's base table if saving the default revision
         // of an entity.
-        if ($save_to_base_table) {
+        if ($entity->isDefaultRevision()) {
           $this->database->delete($table_name)
             ->condition('entity_id', $id)
             ->execute();
         }
-        if ($save_to_revision_table) {
+        if ($this->entityType->isRevisionable()) {
           $this->database->delete($revision_name)
             ->condition('entity_id', $id)
             ->condition('revision_id', $vid)
@@ -1727,10 +1712,8 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       foreach ($storage_definition->getColumns() as $column => $attributes) {
         $columns[] = $table_mapping->getFieldColumnName($storage_definition, $column);
       }
-      if ($save_to_base_table) {
-        $query = $this->database->insert($table_name)->fields($columns);
-      }
-      if ($save_to_revision_table) {
+      $query = $this->database->insert($table_name)->fields($columns);
+      if ($this->entityType->isRevisionable()) {
         $revision_query = $this->database->insert($revision_name)->fields($columns);
       }
 
@@ -1758,10 +1741,8 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
             }
             $record[$column_name] = SqlContentEntityStorageSchema::castValue($attributes, $value);
           }
-          if (isset($query)) {
-            $query->values($record);
-          }
-          if (isset($revision_query)) {
+          $query->values($record);
+          if ($this->entityType->isRevisionable()) {
             $revision_query->values($record);
           }
 
@@ -1775,10 +1756,10 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       if ($do_insert) {
         // Only overwrite the field's base table if saving the default revision
         // of an entity.
-        if (isset($query)) {
+        if ($entity->isDefaultRevision()) {
           $query->execute();
         }
-        if (isset($revision_query)) {
+        if ($this->entityType->isRevisionable()) {
           $revision_query->execute();
         }
       }

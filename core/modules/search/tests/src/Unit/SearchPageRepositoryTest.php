@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Drupal\Tests\search\Unit;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Language\Language;
 use Drupal\search\Entity\SearchPage;
 use Drupal\search\SearchPageInterface;
@@ -15,6 +17,7 @@ use Drupal\search\SearchPageRepository;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests Drupal\search\SearchPageRepository.
@@ -32,24 +35,18 @@ class SearchPageRepositoryTest extends UnitTestCase {
 
   /**
    * The entity query object.
-   *
-   * @var \Drupal\Core\Entity\Query\QueryInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $query;
+  protected QueryInterface&MockObject $query;
 
   /**
    * The search page storage.
-   *
-   * @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $storage;
+  protected ConfigEntityStorageInterface&MockObject $storage;
 
   /**
    * The config factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $configFactory;
+  protected ConfigFactoryInterface&MockObject $configFactory;
 
   /**
    * {@inheritdoc}

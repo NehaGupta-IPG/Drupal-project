@@ -6,6 +6,7 @@ namespace Drupal\Tests\block\Unit;
 
 use Drupal\block\BlockRepository;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Language\Language;
@@ -14,6 +15,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests Drupal\block\BlockRepository.
@@ -31,10 +33,8 @@ class BlockRepositoryTest extends UnitTestCase {
 
   /**
    * The block storage or a mock.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $blockStorage;
+  protected EntityStorageInterface&MockObject $blockStorage;
 
   /**
    * The theme for the test.
