@@ -43,7 +43,7 @@ final class Configuration {
   /**
    * Indicates if the deprecation stats collection is enabled.
    */
-  public private(set) bool $enableCollectStats = FALSE;
+  public private(set) bool $collectStatsEnabled = FALSE;
 
   /**
    * Returns the singleton.
@@ -77,7 +77,7 @@ final class Configuration {
       $this->debugClassLoaderEnabled = filter_var($parameters['enableDebugClassLoader'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
     }
     if (array_key_exists('enableCollectStats', $parameters)) {
-      $this->enableCollectStats = filter_var($parameters['enableCollectStats'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
+      $this->collectStatsEnabled = filter_var($parameters['enableCollectStats'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
     }
   }
 

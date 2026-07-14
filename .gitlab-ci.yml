@@ -89,7 +89,7 @@ variables:
   # Use local cache for yarn, see .yarn-install-from-cache.
   YARN_ENABLE_GLOBAL_CACHE: false
   YARN_ENABLE_MIRROR: false
-  DEPRECATION_HANDLER_CONFIG: '{"enableCollectStats":true}'
+  DRUPAL_DEPRECATION_FILTER_CONFIG: '{"enableCollectStats":true}'
 
 #############
 # Stages    #

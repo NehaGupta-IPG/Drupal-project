@@ -35,6 +35,11 @@ use PHPUnit\Util\Filesystem;
 final class DeprecationHandler implements Extension {
 
   /**
+   * The extension configuration.
+   */
+  private Configuration $config;
+
+  /**
    * The path to the statistics staging file.
    */
   private string $statisticsStagingFilePath;
@@ -137,14 +142,14 @@ final class DeprecationHandler implements Extension {
     Facade $facade,
     ParameterCollection $parameters,
   ): void {
-    $config = Configuration::instance();
+    // Use the extension configuration loaded in ::preBootstrap().
+    $this->config = Configuration::instance();
 
-    // Bail out if the project ignores were disabled in ::preBootstrap().
-    if (!$config->projectIgnoresEnabled()) {
+    if (!$this->config->projectIgnoresEnabled) {
       return;
     }
 
-    if (!$config->collectStatsEnabled()) {
+    if (!$this->config->collectStatsEnabled) {
       return;
     }
 
@@ -259,7 +264,7 @@ final class DeprecationHandler implements Extension {
    * Dump statistics after test runner end.
    */
   public function processStatisticsArtifact(): void {
-    assert(Configuration::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+    assert($this->config->collectStatsEnabled, __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
 
     $content = @file_get_contents($this->statisticsStagingFilePath);
     $statisticsArtifactDirectory = $this->directory . \DIRECTORY_SEPARATOR . 'deprecation-handler';
@@ -307,7 +312,8 @@ final class DeprecationHandler implements Extension {
    * Write a statistic entry.
    */
   private static function writeStatisticEntry(string $status, array $stat): void {
-    assert(Configuration::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+    $config = Configuration::instance();
+    assert($config->collectStatsEnabled, __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
 
     $stat['status'] = $status;
 
@@ -341,16 +347,17 @@ final class DeprecationHandler implements Extension {
    *   TRUE if the deprecation is ignored at project level.
    */
   private static function isIgnoredByProject(?string $testMethod, string $deprecationMessage): bool {
-    if (!Configuration::projectIgnoresEnabled()) {
+    $config = Configuration::instance();
+    if (!$config->projectIgnoresEnabled) {
       return FALSE;
     }
-    foreach (Configuration::deprecationIgnorePatterns() as $pattern) {
+    foreach ($config->deprecationIgnorePatterns as $pattern) {
       $result = @preg_filter($pattern, '$0', $deprecationMessage);
       if (preg_last_error() !== \PREG_NO_ERROR) {
         throw new \RuntimeException(preg_last_error_msg());
       }
       if ((bool) $result) {
-        if (Configuration::collectStatsEnabled()) {
+        if ($config->collectStatsEnabled) {
           $stat = [];
           if ($testMethod !== NULL) {
             $stat['testId'] = $testMethod;
@@ -411,7 +418,7 @@ final class DeprecationHandler implements Extension {
   }
 
   public function setCurrentTest(TestMethod $test): void {
-    assert(Configuration::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+    assert($this->config->collectStatsEnabled, __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
 
     self::$currentTest['testId'] = $test->id();
     if ($test->metadata()->isIgnoreDeprecations()) {
@@ -423,7 +430,7 @@ final class DeprecationHandler implements Extension {
   }
 
   public function deprecationTriggered(DeprecationTriggered|PhpDeprecationTriggered $deprecation): void {
-    assert(Configuration::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+    assert($this->config->collectStatsEnabled, __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
 
     if ($deprecation->ignoredByTest() || $deprecation->ignoredByBaseline()) {
       self::$currentTest['ignored_by_phpunit'][] = $deprecation->message();
@@ -433,7 +440,7 @@ final class DeprecationHandler implements Extension {
   }
 
   public function testFinished(): void {
-    assert(Configuration::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+    assert($this->config->collectStatsEnabled, __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
     $stat = [];
     $stat['testId'] = self::$currentTest['testId'];
     $stat['ignoreDeprecations'] = self::$currentTest['testIgnoresDeprecations'];
