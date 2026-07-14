@@ -3,7 +3,6 @@
 namespace Drupal\language\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
-use Drupal\Core\Form\ConfigTarget;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 
@@ -36,17 +35,8 @@ class NegotiationAdminLanguageForm extends ConfigFormBase {
       '#type' => 'language_select',
       '#title' => $this->t("Site's administration language"),
       '#languages' => LanguageInterface::STATE_CONFIGURABLE | LanguageInterface::STATE_SITE_DEFAULT,
-      '#config_target' => new ConfigTarget(
-        'language.negotiation',
-        'admin_language.default_langcode',
-        // Convert NULL from config to empty string for the form element.
-        fromConfig: fn($value) => $value ?? '',
-        // Convert empty string from the form element to NULL in config.
-        toConfig: fn($value) => $value === '' ? NULL : $value,
-      ),
-      '#description' => $this->t('Unless there is a user-selected administration language, this will be used. If set to "No global preference" and there was no user preference, language will be determined by other negotiation methods.'),
-      '#empty_option' => $this->t('No global preference'),
-      '#empty_value' => '',
+      '#config_target' => 'language.negotiation:admin_language.default_langcode',
+      '#description' => $this->t('Unless there is a user-selected administration language, this will be used.'),
     ];
 
     $form['allow_user_change'] = [

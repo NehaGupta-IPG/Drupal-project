@@ -985,7 +985,7 @@ field.value.language:
   label: 'Language value'
   mapping:
     value:
-      # Not using type: langcode because that doesn't allow null values.
+      # Not this doesn't make use of type: langcode because that doesn't allow null values.
       type: string
       label: 'Language value'
       constraints:

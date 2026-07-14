@@ -78,12 +78,8 @@ language.negotiation:
       label: 'Administration language'
       mapping:
         default_langcode:
-          # Not using type: langcode because that doesn't allow null values.
-          type: string
+          type: langcode
           label: 'Default administration language'
-          constraints:
-            Choice:
-              callback: 'Drupal\Core\TypedData\Plugin\DataType\LanguageReference::getAllValidLangcodes'
         allow_user_change:
           type: boolean
           label: 'Allow users to change administration language'

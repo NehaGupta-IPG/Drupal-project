@@ -8,5 +8,5 @@ url:
     en: ''
 selected_langcode: site_default
 admin_language:
-  default_langcode: ~
+  default_langcode: site_default
   allow_user_change: false

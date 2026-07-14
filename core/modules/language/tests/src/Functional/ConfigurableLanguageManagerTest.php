@@ -133,10 +133,6 @@ class ConfigurableLanguageManagerTest extends BrowserTestBase {
       'language-url' => 4,
       'language-selected' => 5,
     ]);
-    // Enable per-user administration language customization.
-    \Drupal::configFactory()->getEditable('language.negotiation')
-      ->set('admin_language.allow_user_change', TRUE)
-      ->save();
 
     // See if the full view of the node in english is present and the
     // string in the Powered By Block is in English.

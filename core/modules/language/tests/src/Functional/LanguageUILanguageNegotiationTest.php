@@ -353,9 +353,7 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
     $account->preferred_admin_langcode = NULL;
     $account->save();
 
-    // Enable per-user administration language customization. Without a global
-    // admin language default, the method falls through when there is no user
-    // preference.
+    // Enable per-user administration language customization.
     $this->config('language.negotiation')
       ->set('admin_language.allow_user_change', TRUE)
       ->save();
@@ -364,13 +362,13 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
       'language_negotiation' => [LanguageNegotiationUserAdmin::METHOD_ID, LanguageNegotiationSelected::METHOD_ID],
       'path' => 'admin/config',
       'expect' => $default_string,
-      'expected_method_id' => LanguageNegotiatorInterface::METHOD_ID,
+      'expected_method_id' => LanguageNegotiationUserAdmin::METHOD_ID,
       'http_header' => [],
-      'message' => 'USER ADMIN > DEFAULT: no preferred user admin language setting, the UI language is default',
+      'message' => 'USER ADMIN > DEFAULT: no preferred user admin language setting, the global admin language is default',
     ];
     $this->doRunTest($test);
 
-    // Set preferred admin langcode for user to unknown language.
+    // Set preferred admin langcode for user to an unknown language.
     $account->preferred_admin_langcode = $langcode_unknown;
     $account->save();
 
@@ -378,9 +376,9 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
       'language_negotiation' => [LanguageNegotiationUserAdmin::METHOD_ID, LanguageNegotiationSelected::METHOD_ID],
       'path' => 'admin/config',
       'expect' => $default_string,
-      'expected_method_id' => LanguageNegotiatorInterface::METHOD_ID,
+      'expected_method_id' => LanguageNegotiationUserAdmin::METHOD_ID,
       'http_header' => [],
-      'message' => 'USER ADMIN > DEFAULT: invalid preferred user admin language setting, the UI language is default',
+      'message' => 'USER ADMIN > DEFAULT: invalid preferred user admin language setting, the global admin language is default',
     ];
     $this->doRunTest($test);
 
@@ -397,45 +395,6 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
       'message' => 'USER ADMIN > DEFAULT: defined preferred user admin language setting, the UI language is based on user setting',
     ];
     $this->doRunTest($test);
-
-    // With a global admin language default set, the method uses it when the
-    // user has no preference or an invalid preference.
-    $this->config('language.negotiation')
-      ->set('admin_language.default_langcode', 'site_default')
-      ->save();
-
-    $account->preferred_admin_langcode = NULL;
-    $account->save();
-
-    $test = [
-      'language_negotiation' => [LanguageNegotiationUserAdmin::METHOD_ID, LanguageNegotiationSelected::METHOD_ID],
-      'path' => 'admin/config',
-      'expect' => $default_string,
-      'expected_method_id' => LanguageNegotiationUserAdmin::METHOD_ID,
-      'http_header' => [],
-      'message' => 'USER ADMIN > DEFAULT: no preferred user admin language setting, the global admin language is the default',
-    ];
-    $this->doRunTest($test);
-
-    $account->preferred_admin_langcode = $langcode_unknown;
-    $account->save();
-
-    $test = [
-      'language_negotiation' => [LanguageNegotiationUserAdmin::METHOD_ID, LanguageNegotiationSelected::METHOD_ID],
-      'path' => 'admin/config',
-      'expect' => $default_string,
-      'expected_method_id' => LanguageNegotiationUserAdmin::METHOD_ID,
-      'http_header' => [],
-      'message' => 'USER ADMIN > DEFAULT: invalid preferred user admin language setting, the global admin language is the default',
-    ];
-    $this->doRunTest($test);
-
-    // Reset global admin language default to NULL for subsequent tests.
-    $this->config('language.negotiation')
-      ->set('admin_language.default_langcode', NULL)
-      ->save();
-    $account->preferred_admin_langcode = NULL;
-    $account->save();
 
     // Go by session preference.
     $language_negotiation_session_param = $this->randomMachineName();
