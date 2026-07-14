@@ -53,8 +53,8 @@ class InlineBlockTranslationTest extends InlineBlockTestBase {
       'field_name' => 'field_non_translatable_text',
       'entity_type' => 'block_content',
       'type' => 'string',
+      'translatable' => 0,
     ]);
-    $field_storage->setTranslatable(FALSE);
     $field_storage->save();
     $field = FieldConfig::create([
       'field_storage' => $field_storage,
@@ -152,11 +152,6 @@ class InlineBlockTranslationTest extends InlineBlockTestBase {
     /** @var \Drupal\content_translation\ContentTranslationManager $content_translation_manager */
     $content_translation_manager = \Drupal::service('content_translation.manager');
     $content_translation_manager->setEnabled('block_content', 'basic', TRUE);
-
-    // Disable translation for the 'field_non_translatable_text' field.
-    $fields = \Drupal::service('entity_field.manager')->getFieldDefinitions('block_content', 'basic');
-    $field_config = $fields['field_non_translatable_text']->getConfig('basic');
-    $field_config->setTranslatable(FALSE)->save();
 
     // Update the translate node's inline block.
     $this->drupalGet('it/node/1/layout');

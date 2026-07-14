@@ -125,8 +125,13 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
   public function blockForm($form, FormStateInterface $form_state) {
     $block = $this->getEntity();
     if (!$this->isNew && !$block->isNew() && empty($this->configuration['block_serialized'])) {
-      // Get the active block for editing purposes.
-      $block = $this->entityRepository->getActive('block_content', $block->id());
+      // Get the latest block revision for editing purposes.
+      $storage = $this->entityTypeManager->getStorage('block_content');
+      $latest_vid = $storage->getLatestRevisionId($block->id());
+
+      if ($latest_vid) {
+        $block = $storage->loadRevision($latest_vid);
+      }
     }
 
     // Add the entity form display in a process callback so that #parents can
