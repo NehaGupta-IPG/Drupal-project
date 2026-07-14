@@ -6,13 +6,14 @@ namespace Drupal\Tests\user\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\Role;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests for the RolesListBuilder.
- *
- * @group user
- * @see \Drupal\user\RoleListBuilder
+ * Tests \Drupal\user\RoleListBuilder.
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class RoleListBuilderTest extends BrowserTestBase {
 
   /**
@@ -32,7 +33,6 @@ class RoleListBuilderTest extends BrowserTestBase {
    */
   public function testListBuilder(): void {
     // Create a role to view.
-    /** @var \Drupal\user\RoleInterface $role */
     $role = Role::create([
       'id' => 'role_1',
       'label' => 'My Role',
@@ -52,7 +52,6 @@ class RoleListBuilderTest extends BrowserTestBase {
     // Check that the role values are displayed correctly.
     $this->assertSession()->pageTextContains('My Role');
     $this->assertSession()->pageTextContains('Lorem ipsum');
-
   }
 
 }
