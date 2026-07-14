@@ -70,10 +70,6 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
    */
   protected function createPhpStorage(array &$savedFiles = [], array &$deletedFiles = []): PhpStorageInterface {
     $code = [];
-    // Real files backing getFullPath(), keyed by normalized (no '.php') name,
-    // so garbageCollection() can compare their modified times.
-    $paths = [];
-    $sequence = 0;
     $phpStorage = $this->createStub(PhpStorageInterface::class);
 
     // listAll() and delete() model MTimeProtectedFileStorage, which stores each
@@ -83,26 +79,10 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     $normalize = fn ($filename) => str_ends_with($filename, '.php') ? substr($filename, 0, -4) : $filename;
 
     $phpStorage->method('save')
-      ->willReturnCallback(function ($filename, $phpCode) use (&$code, &$savedFiles, &$paths, &$sequence, $normalize) {
+      ->willReturnCallback(function ($filename, $phpCode) use (&$code, &$savedFiles) {
         $code[$filename] = $phpCode;
         $savedFiles[] = $filename;
-
-        // Back this virtual file with a real temp file so getFullPath() and
-        // filemtime() behave as they would for a real PhpStorage backend.
-        // Sequence numbers (rather than the real clock) give deterministic,
-        // strictly increasing modified times regardless of the filesystem's
-        // 1-second mtime granularity or how fast the test executes.
-        $path = tempnam(FileSystem::getOsTemporaryDirectory(), 'drupal_container_test_');
-        $this->tempFiles[] = $path;
-        touch($path, 1700000000 + $sequence++);
-        $paths[$normalize($filename)] = $path;
-
         return TRUE;
-      });
-
-    $phpStorage->method('getFullPath')
-      ->willReturnCallback(function ($filename) use (&$paths, $normalize) {
-        return $paths[$normalize($filename)] ?? FALSE;
       });
 
     $phpStorage->method('load')
@@ -192,15 +172,17 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     $storage = new PhpDumperContainerStorage($cache, $phpStorage, Settings::getInstance());
     $storage->dump($container, 'test_suffix');
 
-    $this->assertCount(1, $savedFiles);
+    // The compiled container and its confirmation marker are both saved.
+    $this->assertCount(2, $savedFiles);
     $this->assertStringStartsWith('DrupalContainer_', $savedFiles[0]);
     $this->assertStringEndsWith('.php', $savedFiles[0]);
+    $this->assertSame(basename($savedFiles[0], '.php') . '.confirmed', $savedFiles[1]);
   }
 
   /**
-   * Tests that dump() handles cache exceptions gracefully (install scenario).
+   * Tests that dump() propagates cache exceptions (e.g. a broken database).
    */
-  public function testDumpHandlesCacheException(): void {
+  public function testDumpPropagatesCacheException(): void {
     $cache = $this->createMock(CacheBackendInterface::class);
 
     $container = new ContainerBuilder();
@@ -208,10 +190,11 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
 
     $cache->expects($this->once())
       ->method('set')
-      ->willThrowException(new \Exception('Cache table does not exist'));
+      ->willThrowException(new \Exception('An error occurred while writing to the cache'));
 
     $storage = new PhpDumperContainerStorage($cache, $this->createPhpStorage(), Settings::getInstance());
-    // Should not throw despite cache exception.
+    $this->expectException(\Exception::class);
+    $this->expectExceptionMessage('An error occurred while writing to the cache');
     $storage->dump($container, 'test_suffix');
   }
 
@@ -228,14 +211,18 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
 
     $storage = new PhpDumperContainerStorage($cache, $phpStorage, Settings::getInstance());
     $storage->dump($container, 'test_suffix');
-    $this->assertCount(1, $savedFiles);
+    // The compiled container and its confirmation marker are both saved.
+    $this->assertCount(2, $savedFiles);
 
     $this->assertInstanceOf(PhpContainer::class, $storage->load('test_suffix'));
 
-    // Dumping the same container again produces the same hash and therefore the
-    // same filename, which already exists, so the file is not rewritten.
+    // Dumping the same container again produces the same hash and therefore
+    // the same filename, which already exists, so the container file is not
+    // rewritten. The marker is rewritten (harmless, same content) since it is
+    // not guarded by an exists() check.
     $storage->dump($container, 'test_suffix');
-    $this->assertCount(1, $savedFiles);
+    $containerSaves = array_filter($savedFiles, fn ($name) => !str_ends_with($name, '.confirmed'));
+    $this->assertCount(1, $containerSaves);
   }
 
   /**
@@ -267,29 +254,34 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     $current->compile();
     $storage->dump($current, 'current_suffix');
 
-    $this->assertCount(3, $savedFiles);
+    // Each dump() saves the compiled container and its confirmation marker.
+    $this->assertCount(6, $savedFiles);
     $this->assertCount(0, $deletedFiles);
 
     // The compiled class names are derived from the saved filenames, in dump
-    // order: old, superseded, current.
+    // order: old (container, marker), superseded (container, marker),
+    // current (container, marker).
     $oldClass = basename($savedFiles[0], '.php');
-    $supersededClass = basename($savedFiles[1], '.php');
-    $currentClass = basename($savedFiles[2], '.php');
+    $supersededClass = basename($savedFiles[2], '.php');
+    $currentClass = basename($savedFiles[4], '.php');
 
     $storage->garbageCollection();
 
     // Only the current container is kept; the superseded and old-suffix
-    // containers are removed.
+    // containers (and their markers) are removed.
     $this->assertContains($oldClass, $deletedFiles);
+    $this->assertContains($oldClass . '.confirmed', $deletedFiles);
     $this->assertContains($supersededClass, $deletedFiles);
+    $this->assertContains($supersededClass . '.confirmed', $deletedFiles);
     $this->assertNotContains($currentClass, $deletedFiles);
-    $this->assertCount(2, $deletedFiles);
+    $this->assertNotContains($currentClass . '.confirmed', $deletedFiles);
+    $this->assertCount(4, $deletedFiles);
   }
 
   /**
-   * Tests that garbageCollection() keeps a file newer than the cached hash.
+   * Tests that garbageCollection() keeps an unconfirmed container.
    */
-  public function testGarbageCollectionKeepsFileNewerThanCachedHash(): void {
+  public function testGarbageCollectionKeepsUnconfirmedContainer(): void {
     $cache = new MemoryBackend($this->createStub(TimeInterface::class));
     $savedFiles = [];
     $deletedFiles = [];
@@ -297,38 +289,63 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
 
     $storage = new PhpDumperContainerStorage($cache, $phpStorage, Settings::getInstance());
 
-    // A genuinely old container that should still be removed.
+    // A genuinely old, fully confirmed container that should be removed.
     $old = new ContainerBuilder();
     $old->setParameter('test_param', 'old');
     $old->compile();
     $storage->dump($old, 'old_suffix');
+    $oldClass = basename($savedFiles[0], '.php');
 
     // The container the cache currently points to for 'current_suffix'.
     $current = new ContainerBuilder();
     $current->setParameter('test_param', 'current');
     $current->compile();
     $storage->dump($current, 'current_suffix');
-    $cachedHash = $cache->get('container_hash:current_suffix')->data;
 
     // Simulate a concurrent dump() for the same suffix that has written its
-    // (newer) file, but whose cache write has not landed yet: dump the new
-    // container, then roll the cache back to the hash it held before.
-    $newer = new ContainerBuilder();
-    $newer->setParameter('test_param', 'newer');
-    $newer->compile();
-    $storage->dump($newer, 'current_suffix');
-    $cache->set('container_hash:current_suffix', $cachedHash);
-
-    $oldClass = basename($savedFiles[0], '.php');
-    $newerClass = basename($savedFiles[2], '.php');
+    // file but has not yet published its hash to the cache or written its
+    // confirmation marker.
+    $phpStorage->save('DrupalContainer_unconfirmed.php', '<?php class DrupalContainer_unconfirmed {}');
 
     $storage->garbageCollection();
 
-    // The old-suffix container is removed, but the newer, not-yet-cached
-    // file survives this run rather than being deleted outright.
+    // The old, confirmed container (and its marker) are removed; the
+    // unconfirmed container survives this run rather than being deleted
+    // outright.
     $this->assertContains($oldClass, $deletedFiles);
-    $this->assertNotContains($newerClass, $deletedFiles);
-    $this->assertCount(1, $deletedFiles);
+    $this->assertContains($oldClass . '.confirmed', $deletedFiles);
+    $this->assertNotContains('DrupalContainer_unconfirmed', $deletedFiles);
+    $this->assertCount(2, $deletedFiles);
+  }
+
+  /**
+   * Tests that garbageCollection() still works after cache invalidation.
+   */
+  public function testGarbageCollectionWorksAfterInvalidate(): void {
+    $cache = new MemoryBackend($this->createStub(TimeInterface::class));
+    $savedFiles = [];
+    $deletedFiles = [];
+    $phpStorage = $this->createPhpStorage($savedFiles, $deletedFiles);
+
+    $storage = new PhpDumperContainerStorage($cache, $phpStorage, Settings::getInstance());
+
+    $old = new ContainerBuilder();
+    $old->setParameter('test_param', 'old');
+    $old->compile();
+    $storage->dump($old, 'test_suffix');
+    $oldClass = basename($savedFiles[0], '.php');
+
+    $storage->invalidate();
+
+    $current = new ContainerBuilder();
+    $current->setParameter('test_param', 'current');
+    $current->compile();
+    $storage->dump($current, 'test_suffix');
+
+    $storage->garbageCollection();
+
+    $this->assertContains($oldClass, $deletedFiles);
+    $this->assertContains($oldClass . '.confirmed', $deletedFiles);
   }
 
   /**
@@ -367,9 +384,10 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
 
     $storage = new PhpDumperContainerStorage($cache, $phpStorage, Settings::getInstance());
 
-    // dump() writes the file but must not include it.
+    // dump() writes the file (and its confirmation marker) but must not
+    // include it.
     $storage->dump($container, 'test_suffix');
-    $this->assertCount(1, $savedFiles);
+    $this->assertCount(2, $savedFiles);
     $this->assertCount(0, $loadedFiles, 'dump() must not include the compiled container');
 
     // The first load() includes the file to bring the class into memory.

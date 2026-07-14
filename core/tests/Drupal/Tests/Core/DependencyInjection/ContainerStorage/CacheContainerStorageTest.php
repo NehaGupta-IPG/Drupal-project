@@ -103,20 +103,21 @@ class CacheContainerStorageTest extends UnitTestCase {
   }
 
   /**
-   * Tests that dump() handles cache exceptions gracefully.
+   * Tests that dump() propagates cache exceptions (e.g. a broken database).
    */
-  public function testDumpHandlesCacheException(): void {
+  public function testDumpPropagatesCacheException(): void {
     $container = new ContainerBuilder();
     $container->compile();
 
     $cache = $this->createMock(CacheBackendInterface::class);
     $cache->expects($this->once())
       ->method('set')
-      ->willThrowException(new \Exception('Cache table does not exist'));
+      ->willThrowException(new \Exception('An error occurred while writing to the cache'));
 
     $storage = $this->createStorage($cache);
 
-    // Should not throw despite cache exception.
+    $this->expectException(\Exception::class);
+    $this->expectExceptionMessage('An error occurred while writing to the cache');
     $storage->dump($container, 'test_suffix');
   }
 
