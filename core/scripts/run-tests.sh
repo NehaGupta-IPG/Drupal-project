@@ -1294,7 +1294,7 @@ function dump_deprecation_ignore_stats(array $stats): void {
   echo "-----------+----------------------------------------------------------------------\n";
   echo "    Skips# | Line\n";
   echo "-----------+----------------------------------------------------------------------\n";
-  foreach (file(\Drupal::root() . \DIRECTORY_SEPARATOR . 'core' . \DIRECTORY_SEPARATOR . '.deprecation-ignore.txt') as $line => $pattern) {
+  foreach (file(\Drupal::root() . \DIRECTORY_SEPARATOR . 'core' . \DIRECTORY_SEPARATOR . '.deprecation-ignore.txt') as $pattern) {
     if ((trim($pattern)[0] ?? '#') !== '#') {
       echo sprintf("%10d | %s\n", $stats[$pattern] ?? 0, trim_with_ellipsis(rtrim($pattern, "\n"), 80, \STR_PAD_RIGHT));
     }
