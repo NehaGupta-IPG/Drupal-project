@@ -443,6 +443,8 @@ class LinkWidget extends WidgetBase {
     foreach ($values as &$value) {
       $value['uri'] = static::getUserEnteredStringAsUri($value['uri']);
 
+      // 'attributes' is a top-level element in the widget form, but it must be
+      // nested in the saved field value's options.
       $options = [];
       if ($value['attributes']) {
         $options['attributes'] = $value['attributes'];

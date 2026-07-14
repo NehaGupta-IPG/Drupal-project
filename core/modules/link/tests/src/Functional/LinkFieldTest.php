@@ -573,15 +573,15 @@ class LinkFieldTest extends BrowserTestBase {
    */
   public function testAttributesOnLink(): void {
     $field_name = mb_strtolower($this->randomMachineName());
-    $this->fieldStorage = FieldStorageConfig::create([
+    $field_storage = FieldStorageConfig::create([
       'field_name' => $field_name,
       'entity_type' => 'entity_test',
       'type' => 'link',
       'cardinality' => 1,
     ]);
-    $this->fieldStorage->save();
+    $field_storage->save();
     FieldConfig::create([
-      'field_storage' => $this->fieldStorage,
+      'field_storage' => $field_storage,
       'label' => 'Read more about this entity',
       'bundle' => 'entity_test',
       'settings' => [
@@ -590,7 +590,7 @@ class LinkFieldTest extends BrowserTestBase {
       ],
     ])->save();
 
-    $this->container->get('entity_type.manager')
+    \Drupal::entityTypeManager()
       ->getStorage('entity_form_display')
       ->load('entity_test.entity_test.default')
       ->setComponent($field_name, [
