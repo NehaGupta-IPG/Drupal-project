@@ -348,7 +348,7 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     $container->compile();
 
     $storage = new PhpDumperContainerStorage($cache, $phpStorage, Settings::getInstance());
-    $storage->dump($container, 'test_suffix');
+    $this->assertFalse($storage->dump($container, 'test_suffix'));
   }
 
 }

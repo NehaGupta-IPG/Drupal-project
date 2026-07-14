@@ -39,8 +39,12 @@ interface ContainerStorageInterface {
    *   The compiled container builder.
    * @param string $suffix
    *   A hash suffix identifying this container version.
+   *
+   * @return bool
+   *   TRUE if the container was persisted, or the storage intentionally does
+   *   not persist containers. FALSE if persisting the container failed.
    */
-  public function dump(ContainerBuilder $container, string $suffix): void;
+  public function dump(ContainerBuilder $container, string $suffix): bool;
 
   /**
    * Invalidates all stored containers.
