@@ -63,12 +63,7 @@ class CacheContainerStorage implements ContainerStorageInterface {
     $dumper = new $this->dumperClass($container);
     $container_definition = $dumper->getArray();
 
-    try {
-      $this->cache->set(static::CACHE_PREFIX . $suffix, $container_definition);
-    }
-    catch (\Exception) {
-      // The cache table may not exist yet (e.g., during install).
-    }
+    $this->cache->set(static::CACHE_PREFIX . $suffix, $container_definition);
   }
 
   /**

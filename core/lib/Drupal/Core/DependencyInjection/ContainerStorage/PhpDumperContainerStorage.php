@@ -110,12 +110,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
     // Publish the hash only after the file is written, so the cache never
     // points to a container that failed to save. Superseded files are removed
     // later by ::garbageCollection().
-    try {
-      $this->cache->set(static::CACHE_PREFIX . $suffix, $hash);
-    }
-    catch (\Exception) {
-      // The cache table may not exist yet (e.g., during install).
-    }
+    $this->cache->set(static::CACHE_PREFIX . $suffix, $hash);
   }
 
   /**
