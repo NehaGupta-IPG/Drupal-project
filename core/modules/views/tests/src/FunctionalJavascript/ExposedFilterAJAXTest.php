@@ -175,7 +175,10 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
     $html = $session->getPage()->getHtml();
     $this->assertStringContainsString('Page One', $html);
     $this->assertStringNotContainsString('Page Two', $html);
+    // The AJAX request should not have altered the URL.
     $this->assertSession()->addressEquals('admin/content');
+    $url = $session->getCurrentUrl();
+    $this->assertNull(parse_url($url, PHP_URL_QUERY), 'Expected no query parameters in the URL.');
 
     // Search for "Page Two".
     $this->submitForm(['title' => 'Page Two'], 'Filter');
@@ -185,7 +188,10 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
     $html = $session->getPage()->getHtml();
     $this->assertStringContainsString('Page Two', $html);
     $this->assertStringNotContainsString('Page One', $html);
+    // The AJAX request should not have altered the URL.
     $this->assertSession()->addressEquals('admin/content');
+    $url = $session->getCurrentUrl();
+    $this->assertNull(parse_url($url, PHP_URL_QUERY), 'Expected no query parameters in the URL.');
 
     // Submit bulk actions form to ensure that the previous AJAX submit does not
     // break it.
@@ -196,7 +202,7 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
 
     // Verify that the action was performed.
     $this->assertSession()->pageTextContains('Make content sticky was applied to 1 item.');
-    $this->assertSession()->addressEquals('admin/content');
+    $this->assertSession()->addressEquals('admin/content?title=Page%20Two&type=All&status=All');
 
     // Reset the form.
     $this->submitForm([], 'Reset');
@@ -205,6 +211,8 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
     $this->assertSession()->pageTextContains('Page Two');
     $this->assertFalse($session->getPage()->hasButton('Reset'));
     $this->assertSession()->addressEquals('admin/content');
+    $url = $session->getCurrentUrl();
+    $this->assertNull(parse_url($url, PHP_URL_QUERY), 'Expected no query parameters in the URL.');
   }
 
   /**
