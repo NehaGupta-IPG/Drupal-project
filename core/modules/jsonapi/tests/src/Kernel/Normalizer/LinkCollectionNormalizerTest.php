@@ -15,13 +15,19 @@ use Drupal\jsonapi\Normalizer\Value\CacheableNormalization;
 use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\jsonapi\Normalizer\LinkCollectionNormalizer
- * @group jsonapi
+ * Tests Drupal\jsonapi\Normalizer\LinkCollectionNormalizer.
  *
  * @internal
  */
+#[CoversClass(LinkCollectionNormalizer::class)]
+#[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class LinkCollectionNormalizerTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -32,13 +38,6 @@ class LinkCollectionNormalizerTest extends KernelTestBase {
    * @var \Symfony\Component\Serializer\SerializerInterface
    */
   protected $serializer;
-
-  /**
-   * The subject under test.
-   *
-   * @var \Drupal\jsonapi\Normalizer\LinkCollectionNormalizer
-   */
-  protected $normalizer;
 
   /**
    * Test users.
@@ -54,7 +53,6 @@ class LinkCollectionNormalizerTest extends KernelTestBase {
     'file',
     'jsonapi',
     'serialization',
-    'system',
     'user',
   ];
 
@@ -77,7 +75,7 @@ class LinkCollectionNormalizerTest extends KernelTestBase {
   /**
    * Tests the link collection normalizer.
    */
-  public function testNormalize() {
+  public function testNormalize(): void {
     $link_context = new ResourceObject(new CacheableMetadata(), new ResourceType('n/a', 'n/a', 'n/a'), 'n/a', NULL, [], new LinkCollection([]));
     $link_collection = (new LinkCollection([]))
       ->withLink('related', new Link(new CacheableMetadata(), Url::fromUri('http://example.com/post/42'), 'related', ['title' => 'Most viewed']))
@@ -107,10 +105,9 @@ class LinkCollectionNormalizerTest extends KernelTestBase {
 
   /**
    * Tests the link collection normalizer.
-   *
-   * @dataProvider linkAccessTestData
    */
-  public function testLinkAccess($current_user_id, $edit_form_uid, $expected_link_keys, $expected_cache_contexts) {
+  #[DataProvider('linkAccessTestData')]
+  public function testLinkAccess(int $current_user_id, int $edit_form_uid, array $expected_link_keys, array $expected_cache_contexts): void {
     // Get the current user and an edit-form URL.
     foreach ($this->testUsers as $user) {
       $uid = (int) $user->id();
@@ -125,7 +122,7 @@ class LinkCollectionNormalizerTest extends KernelTestBase {
     assert(isset($edit_form_url));
 
     // Create a link collection to normalize.
-    $mock_resource_object = $this->createMock(ResourceObject::class);
+    $mock_resource_object = $this->createStub(ResourceObject::class);
     $link_collection = new LinkCollection([
       'edit-form' => new Link(new CacheableMetadata(), $edit_form_url, 'edit-form', ['title' => 'Edit']),
     ]);
@@ -169,8 +166,9 @@ class LinkCollectionNormalizerTest extends KernelTestBase {
    * Provides test cases for testing link access checking.
    *
    * @return array[]
+   *   An array of test cases for testLinkAccess().
    */
-  public static function linkAccessTestData() {
+  public static function linkAccessTestData(): array {
     return [
       'the edit-form link is present because uid 2 has access to the targeted resource (its own edit form)' => [
         'current_user_id' => 2,
@@ -190,7 +188,7 @@ class LinkCollectionNormalizerTest extends KernelTestBase {
   /**
    * Get an instance of the normalizer to test.
    */
-  protected function getNormalizer(?AccountInterface $current_user = NULL) {
+  protected function getNormalizer(?AccountInterface $current_user = NULL): LinkCollectionNormalizer {
     if (is_null($current_user)) {
       $current_user = $this->setUpCurrentUser();
     }

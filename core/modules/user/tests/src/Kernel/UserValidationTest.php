@@ -10,19 +10,18 @@ use Drupal\Core\Render\Element\Email;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
-use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Verify that user validity checks behave as designed.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserValidationTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['field', 'user', 'system'];
 
@@ -39,50 +38,9 @@ class UserValidationTest extends KernelTestBase {
   }
 
   /**
-   * Tests user name validation.
-   *
-   * @group legacy
-   */
-  public function testUsernames() {
-    // cSpell:disable
-    $test_cases = [
-      // '<username>' => ['<description>', 'assert<testName>'].
-      'foo'                    => ['Valid username', 'assertNull'],
-      'FOO'                    => ['Valid username', 'assertNull'],
-      'Foo O\'Bar'             => ['Valid username', 'assertNull'],
-      'foo@bar'                => ['Valid username', 'assertNull'],
-      'foo@example.com'        => ['Valid username', 'assertNull'],
-      // invalid domains are allowed in usernames.
-      'foo@-example.com'       => ['Valid username', 'assertNull'],
-      'þòøÇßªř€'               => ['Valid username', 'assertNull'],
-      // '+' symbol is allowed.
-      'foo+bar'                => ['Valid username', 'assertNull'],
-      // runes.
-      'ᚠᛇᚻ᛫ᛒᛦᚦ'                => ['Valid UTF8 username', 'assertNull'],
-      ' foo'                   => ['Invalid username that starts with a space', 'assertNotNull'],
-      'foo '                   => ['Invalid username that ends with a space', 'assertNotNull'],
-      'foo  bar'               => ['Invalid username that contains 2 spaces \'&nbsp;&nbsp;\'', 'assertNotNull'],
-      ''                       => ['Invalid empty username', 'assertNotNull'],
-      'foo/'                   => ['Invalid username containing invalid chars', 'assertNotNull'],
-      // NULL.
-      'foo' . chr(0) . 'bar'   => ['Invalid username containing chr(0)', 'assertNotNull'],
-      // CR.
-      'foo' . chr(13) . 'bar'  => ['Invalid username containing chr(13)', 'assertNotNull'],
-      str_repeat('x', UserInterface::USERNAME_MAX_LENGTH + 1) => ['Invalid excessively long username', 'assertNotNull'],
-    ];
-    $this->expectDeprecation('user_validate_name() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use \Drupal\user\UserValidator::validateName() instead. See https://www.drupal.org/node/3431205');
-    // cSpell:enable
-    foreach ($test_cases as $name => $test_case) {
-      [$description, $test] = $test_case;
-      $result = user_validate_name($name);
-      $this->$test($result, $description . ' (' . $name . ')');
-    }
-  }
-
-  /**
    * Runs entity validation checks.
    */
-  public function testValidation() {
+  public function testValidation(): void {
     $user = User::create([
       'name' => 'test',
       'mail' => 'test@example.com',
@@ -139,6 +97,14 @@ class UserValidationTest extends KernelTestBase {
     $this->assertCount(1, $violations, 'Violation found when email already exists.');
     $this->assertEquals('mail', $violations[0]->getPropertyPath());
     $this->assertEquals('The email address existing@example.com is already taken.', $violations[0]->getMessage());
+
+    // Ensure case-insensitive uniqueness of email.
+    $user->set('mail', 'EXISTING@example.com');
+    $violations = $user->validate();
+    $this->assertCount(1, $violations, 'Violation found when email already exists.');
+    $this->assertEquals('mail', $violations[0]->getPropertyPath());
+    $this->assertEquals('The email address EXISTING@example.com is already taken.', $violations[0]->getMessage());
+
     $user->set('mail', NULL);
     $violations = $user->validate();
     $this->assertCount(1, $violations, 'Email addresses may not be removed');

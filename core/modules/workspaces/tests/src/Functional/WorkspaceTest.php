@@ -8,13 +8,15 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
+use Drupal\workspaces\Entity\Workspace;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test the workspace entity.
- *
- * @group workspaces
- * @group #slow
  */
+#[Group('workspaces')]
+#[RunTestsInSeparateProcesses]
 class WorkspaceTest extends BrowserTestBase {
 
   use WorkspaceTestUtilities;
@@ -33,6 +35,8 @@ class WorkspaceTest extends BrowserTestBase {
     'toolbar',
     'user',
     'workspaces',
+    'workspaces_ui',
+    'workspaces_test',
   ];
 
   /**
@@ -65,6 +69,7 @@ class WorkspaceTest extends BrowserTestBase {
       'create workspace',
       'edit own workspace',
       'edit any workspace',
+      'view any workspace',
       'view own workspace',
       'access toolbar',
     ];
@@ -78,7 +83,7 @@ class WorkspaceTest extends BrowserTestBase {
   /**
    * Tests creating a workspace with special characters.
    */
-  public function testSpecialCharacters() {
+  public function testSpecialCharacters(): void {
     $this->drupalLogin($this->editor1);
     $page = $this->getSession()->getPage();
 
@@ -99,7 +104,7 @@ class WorkspaceTest extends BrowserTestBase {
   /**
    * Tests that the toolbar correctly shows the active workspace.
    */
-  public function testWorkspaceToolbar() {
+  public function testWorkspaceToolbar(): void {
     $this->drupalLogin($this->editor1);
 
     $this->drupalGet('/admin/config/workflow/workspaces/add');
@@ -130,7 +135,7 @@ class WorkspaceTest extends BrowserTestBase {
   /**
    * Tests changing the owner of a workspace.
    */
-  public function testWorkspaceOwner() {
+  public function testWorkspaceOwner(): void {
     $this->drupalLogin($this->editor1);
 
     $this->drupalGet('/admin/config/workflow/workspaces/add');
@@ -153,9 +158,10 @@ class WorkspaceTest extends BrowserTestBase {
   /**
    * Tests that editing a workspace creates a new revision.
    */
-  public function testWorkspaceFormRevisions() {
+  public function testWorkspaceFormRevisions(): void {
     $this->drupalLogin($this->editor1);
     $storage = \Drupal::entityTypeManager()->getStorage('workspace');
+    $this->createWorkspaceThroughUi('Stage', 'stage');
 
     // The current 'stage' workspace entity should be revision 1.
     $stage_workspace = $storage->load('stage');
@@ -171,7 +177,7 @@ class WorkspaceTest extends BrowserTestBase {
   /**
    * Tests the manage workspace page.
    */
-  public function testWorkspaceManagePage() {
+  public function testWorkspaceManagePage(): void {
     $this->drupalCreateContentType(['type' => 'test', 'label' => 'Test']);
 
     $permissions = [
@@ -237,7 +243,7 @@ class WorkspaceTest extends BrowserTestBase {
   /**
    * Tests adding new fields to workspace entities.
    */
-  public function testWorkspaceFieldUi() {
+  public function testWorkspaceFieldUi(): void {
     $user = $this->drupalCreateUser([
       'administer workspaces',
       'access administration pages',
@@ -261,14 +267,14 @@ class WorkspaceTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains($field_label);
 
     // Check that the field is displayed on the manage display page.
-    $this->drupalGet('admin/config/workflow/workspaces/display');
+    $this->drupalGet('admin/config/workflow/workspaces/display/default');
     $this->assertSession()->pageTextContains($field_label);
   }
 
   /**
    * Verifies that a workspace with existing content may be deleted.
    */
-  public function testDeleteWorkspaceWithExistingContent() {
+  public function testDeleteWorkspaceWithExistingContent(): void {
     $this->createContentType(['type' => 'test', 'label' => 'Test']);
 
     // Login and create a workspace.
@@ -294,7 +300,7 @@ class WorkspaceTest extends BrowserTestBase {
   /**
    * Tests the Workspaces listing UI.
    */
-  public function testWorkspaceList() {
+  public function testWorkspaceList(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
@@ -302,9 +308,19 @@ class WorkspaceTest extends BrowserTestBase {
     $this->drupalLogin($this->editor1);
     $this->createWorkspaceThroughUi('Summer event', 'summer_event');
 
+    // Create a workspace with the test provider.
+    Workspace::create([
+      'id' => 'test_provider_workspace',
+      'label' => 'Test Provider Workspace',
+      'provider' => 'test',
+    ])->save();
+
     // Check that Live is the current active workspace.
     $this->drupalGet('/admin/config/workflow/workspaces');
     $this->assertSession()->statusCodeEquals(200);
+
+    // Verify that workspaces using non-default providers are not listed.
+    $assert_session->pageTextNotContains('Test Provider Workspace');
 
     $active_workspace_row = $page->find('css', '.active-workspace');
     $this->assertTrue($active_workspace_row->hasClass('active-workspace--default'));
@@ -333,14 +349,14 @@ class WorkspaceTest extends BrowserTestBase {
     $user->delete();
     $this->drupalGet('/admin/config/workflow/workspaces');
     $this->assertSession()->pageTextContains('Summer event');
-    $summer_event_workspace_row = $page->find('css', 'table tbody tr:nth-of-type(3)');
+    $summer_event_workspace_row = $page->find('css', 'table tbody tr:nth-of-type(2)');
     $this->assertEquals('N/A', $summer_event_workspace_row->find('css', 'td:nth-of-type(2)')->getText());
   }
 
   /**
    * Verifies that a workspace can be published.
    */
-  public function testPublishWorkspace() {
+  public function testPublishWorkspace(): void {
     $this->createContentType(['type' => 'test', 'label' => 'Test']);
     $permissions = [
       'administer workspaces',
@@ -363,7 +379,9 @@ class WorkspaceTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('There are no changes that can be published from Test workspace to Live.');
 
     // Create a node in the workspace.
-    $this->createNodeThroughUi('Test node', 'test');
+    $this->drupalGet('/node/add/test');
+    $this->assertEquals(1, \Drupal::keyValue('ws_test')->get('node.hook_entity_create.count'));
+    $this->submitForm(['title[0][value]' => 'Test node'], 'Save');
 
     $this->drupalGet('/admin/config/workflow/workspaces/manage/test_workspace/publish');
     $this->assertSession()->statusCodeEquals(200);

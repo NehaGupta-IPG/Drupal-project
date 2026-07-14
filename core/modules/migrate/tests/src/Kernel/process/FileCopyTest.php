@@ -7,19 +7,22 @@ namespace Drupal\Tests\migrate\Kernel\process;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\KernelTests\Core\File\FileTestBase;
 use Drupal\migrate\MigrateException;
-use Drupal\migrate\Plugin\migrate\process\FileCopy;
 use Drupal\migrate\MigrateExecutableInterface;
+use Drupal\migrate\Plugin\migrate\process\FileCopy;
 use Drupal\migrate\Plugin\MigrateProcessInterface;
 use Drupal\migrate\Row;
 use GuzzleHttp\Client;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the file_copy process plugin.
- *
- * @coversDefaultClass \Drupal\migrate\Plugin\migrate\process\FileCopy
- *
- * @group migrate
  */
+#[CoversClass(FileCopy::class)]
+#[Group('migrate')]
+#[RunTestsInSeparateProcesses]
 class FileCopyTest extends FileTestBase {
 
   /**
@@ -46,7 +49,7 @@ class FileCopyTest extends FileTestBase {
   /**
    * Tests successful imports/copies.
    */
-  public function testSuccessfulCopies() {
+  public function testSuccessfulCopies(): void {
     $file = $this->createUri(NULL, NULL, 'temporary');
     $file_absolute = $this->fileSystem->realpath($file);
     $data_sets = [
@@ -79,14 +82,15 @@ class FileCopyTest extends FileTestBase {
   /**
    * Tests successful file reuse.
    *
-   * @dataProvider providerSuccessfulReuse
-   *
    * @param string $source_path
    *   Source path to copy from.
    * @param string $destination_path
    *   The destination path to copy to.
    */
-  public function testSuccessfulReuse($source_path, $destination_path) {
+  #[DataProvider('providerSuccessfulReuse')]
+  public function testSuccessfulReuse(string $source_path, string $destination_path): void {
+    $source_path = str_replace('{%root%}', $this->root, $source_path);
+
     $file_reuse = $this->doTransform($source_path, $destination_path);
     clearstatcache(TRUE, $destination_path);
 
@@ -111,10 +115,10 @@ class FileCopyTest extends FileTestBase {
   /**
    * Provides the source and destination path files.
    */
-  public static function providerSuccessfulReuse() {
+  public static function providerSuccessfulReuse(): array {
     return [
       [
-        'source_path' => static::getDrupalRoot() . '/core/tests/fixtures/files/image-test.jpg',
+        'source_path' => '{%root%}/core/tests/fixtures/files/image-test.jpg',
         'destination_path' => 'public://file1.jpg',
       ],
       [
@@ -127,7 +131,7 @@ class FileCopyTest extends FileTestBase {
   /**
    * Tests successful moves.
    */
-  public function testSuccessfulMoves() {
+  public function testSuccessfulMoves(): void {
     $file_1 = $this->createUri(NULL, NULL, 'temporary');
     $file_1_absolute = $this->fileSystem->realpath($file_1);
     $file_2 = $this->createUri(NULL, NULL, 'temporary');
@@ -162,19 +166,19 @@ class FileCopyTest extends FileTestBase {
   /**
    * Tests that non-existent files throw an exception.
    */
-  public function testNonExistentSourceFile() {
+  public function testNonExistentSourceFile(): void {
     $source = '/non/existent/file';
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessage("File '/non/existent/file' does not exist");
+    $this->expectExceptionMessageIs("File '/non/existent/file' does not exist");
     $this->doTransform($source, 'public://foo.jpg');
   }
 
   /**
    * Tests that non-writable destination throw an exception.
    *
-   * @covers ::transform
+   * @legacy-covers ::transform
    */
-  public function testNonWritableDestination() {
+  public function testNonWritableDestination(): void {
     $source = $this->createUri('file.txt', NULL, 'temporary');
 
     // Create the parent location.
@@ -192,14 +196,14 @@ class FileCopyTest extends FileTestBase {
 
     // Check that the proper exception is raised.
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessage("Could not create or write to directory 'public://dir/subdir2'");
+    $this->expectExceptionMessageIs("Could not create or write to directory 'public://dir/subdir2'");
     $this->doTransform($source, 'public://dir/subdir2/file.txt');
   }
 
   /**
    * Tests the 'rename' overwrite mode.
    */
-  public function testRenameFile() {
+  public function testRenameFile(): void {
     $source = $this->createUri(NULL, NULL, 'temporary');
     $destination = $this->createUri('foo.txt', NULL, 'public');
     $expected_destination = 'public://foo_0.txt';
@@ -211,7 +215,7 @@ class FileCopyTest extends FileTestBase {
   /**
    * Tests that remote URIs are delegated to the download plugin.
    */
-  public function testDownloadRemoteUri() {
+  public function testDownloadRemoteUri(): void {
     $download_plugin = $this->createMock(MigrateProcessInterface::class);
     $download_plugin->expects($this->once())->method('transform');
 
@@ -226,7 +230,7 @@ class FileCopyTest extends FileTestBase {
 
     $plugin->transform(
       ['http://drupal.org/favicon.ico', '/destination/path'],
-      $this->createMock(MigrateExecutableInterface::class),
+      $this->createStub(MigrateExecutableInterface::class),
       new Row([], []),
       $this->randomMachineName()
     );
@@ -245,9 +249,9 @@ class FileCopyTest extends FileTestBase {
    * @return string
    *   The URI of the copied file.
    */
-  protected function doTransform($source_path, $destination_path, $configuration = []) {
+  protected function doTransform($source_path, $destination_path, array $configuration = []) {
     // Prepare a mock HTTP client.
-    $this->container->set('http_client', $this->createMock(Client::class));
+    $this->container->set('http_client', $this->createStub(Client::class));
 
     $plugin = FileCopy::create($this->container, $configuration, 'file_copy', []);
     $executable = $this->prophesize(MigrateExecutableInterface::class)->reveal();

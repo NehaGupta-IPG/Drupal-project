@@ -8,20 +8,28 @@ use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\filter\Entity\FilterFormat;
 use Drupal\filter\Render\FilteredMarkup;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\text\TextSummary;
+use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests text_summary() with different strings and lengths.
- *
- * @group text
+ * Tests TextSummary::generate() with different strings and lengths.
  */
+#[Group('text')]
+#[RunTestsInSeparateProcesses]
+#[CoversMethod(TextSummary::class, 'generate')]
 class TextSummaryTest extends KernelTestBase {
 
   use UserCreationTrait;
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = [
     'system',
     'user',
@@ -43,7 +51,7 @@ class TextSummaryTest extends KernelTestBase {
   /**
    * Tests text summaries for a question followed by a sentence.
    */
-  public function testFirstSentenceQuestion() {
+  public function testFirstSentenceQuestion(): void {
     $text = 'A question? A sentence. Another sentence.';
     $expected = 'A question? A sentence.';
     $this->assertTextSummary($text, $expected, NULL, 30);
@@ -52,7 +60,7 @@ class TextSummaryTest extends KernelTestBase {
   /**
    * Tests summary with long example.
    */
-  public function testLongSentence() {
+  public function testLongSentence(): void {
     // 125.
     // cSpell:disable
     $text =
@@ -67,14 +75,15 @@ class TextSummaryTest extends KernelTestBase {
                 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ' .
                 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.';
     // cSpell:enable
-    // First three sentences add up to: 336, so add one for space and then 3 to get half-way into next word.
+    // First three sentences add up to: 336, so add one for space and then 3 to
+    // get half-way into next word.
     $this->assertTextSummary($text, $expected, NULL, 340);
   }
 
   /**
    * Tests various summary length edge cases.
    */
-  public function testLength() {
+  public function testLength(): void {
     FilterFormat::create([
       'format' => 'autop',
       'name' => 'Autop',
@@ -100,8 +109,8 @@ class TextSummaryTest extends KernelTestBase {
     // This string tests a number of edge cases.
     $text = "<p>\nHi\n</p>\n<p>\nfolks\n<br />\n!\n</p>";
 
-    // The summaries we expect text_summary() to return when $size is the index
-    // of each array item.
+    // The summaries we expect TextSummary::generate() to return when
+    // $size is the index of each array item.
     // Using no text format:
     $format = NULL;
     $i = 0;
@@ -231,28 +240,27 @@ class TextSummaryTest extends KernelTestBase {
 
   /**
    * Tests text summaries with an invalid filter format.
-   *
-   * @see text_summary()
    */
-  public function testInvalidFilterFormat() {
+  public function testInvalidFilterFormat(): void {
 
     $this->assertTextSummary($this->randomString(100), '', 'non_existent_format');
   }
 
   /**
-   * Calls text_summary() and asserts that the expected teaser is returned.
+   * Calls TextSummary::generate() and asserts that the expected teaser is returned.
    *
    * @internal
    */
-  public function assertTextSummary(string $text, string $expected, ?string $format = NULL, ?int $size = NULL): void {
-    $summary = text_summary($text, $format, $size);
+  public function assertTextSummary(string $text, string $expected, ?string $format = NULL, int $size = 600): void {
+    $summary = \Drupal::service(TextSummary::class)->generate($text, $format, $size);
     $this->assertSame($expected, $summary, '<pre style="white-space: pre-wrap">' . $summary . '</pre> is identical to <pre style="white-space: pre-wrap">' . $expected . '</pre>');
   }
 
   /**
    * Tests required summary.
    */
-  public function testRequiredSummary() {
+  public function testRequiredSummary(): void {
+    $this->installEntitySchema('user');
     $this->installEntitySchema('entity_test');
     $this->setUpCurrentUser();
     $field_definition = FieldStorageConfig::create([
@@ -314,7 +322,7 @@ class TextSummaryTest extends KernelTestBase {
   /**
    * Test text normalization when filter_html or filter_htmlcorrector enabled.
    */
-  public function testNormalization() {
+  public function testNormalization(): void {
     FilterFormat::create([
       'format' => 'filter_html_enabled',
       'name' => 'Filter HTML enabled',
@@ -343,16 +351,16 @@ class TextSummaryTest extends KernelTestBase {
     ])->save();
 
     $filtered_markup = FilteredMarkup::create('<div><strong><span>Hello World</span></strong></div>');
-    // With either HTML filter enabled, text_summary() will normalize the text
-    // using HTML::normalize().
-    $summary = text_summary($filtered_markup, 'filter_html_enabled', 30);
+    // With either HTML filter enabled, TextSummary::generate() will
+    // normalize the text using HTML::normalize().
+    $summary = \Drupal::service(TextSummary::class)->generate($filtered_markup, 'filter_html_enabled', 30);
     $this->assertStringContainsString('<div><strong><span>', $summary);
     $this->assertStringContainsString('</span></strong></div>', $summary);
-    $summary = text_summary($filtered_markup, 'filter_htmlcorrector_enabled', 30);
+    $summary = \Drupal::service(TextSummary::class)->generate($filtered_markup, 'filter_htmlcorrector_enabled', 30);
     $this->assertStringContainsString('<div><strong><span>', $summary);
     $this->assertStringContainsString('</span></strong></div>', $summary);
     // If neither filter is enabled, the text will not be normalized.
-    $summary = text_summary($filtered_markup, 'neither_filter_enabled', 30);
+    $summary = \Drupal::service(TextSummary::class)->generate($filtered_markup, 'neither_filter_enabled', 30);
     $this->assertStringContainsString('<div><strong><span>', $summary);
     $this->assertStringNotContainsString('</span></strong></div>', $summary);
   }

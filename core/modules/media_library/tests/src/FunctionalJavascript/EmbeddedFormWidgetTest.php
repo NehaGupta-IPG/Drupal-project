@@ -9,12 +9,15 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\media\Entity\Media;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests media widget nested inside another widget.
- *
- * @group media_library
  */
+#[Group('media_library')]
+#[RunTestsInSeparateProcesses]
 class EmbeddedFormWidgetTest extends WebDriverTestBase {
 
   use TestFileCreationTrait;
@@ -94,10 +97,9 @@ class EmbeddedFormWidgetTest extends WebDriverTestBase {
 
   /**
    * Tests media inside another widget that validates too enthusiastically.
-   *
-   * @dataProvider insertionReselectionProvider
    */
-  public function testInsertionAndReselection($widget) {
+  #[DataProvider('insertionReselectionProvider')]
+  public function testInsertionAndReselection(string $widget): void {
     $this->container
       ->get('entity_display.repository')
       ->getFormDisplay('node', 'basic_page')
@@ -154,7 +156,7 @@ class EmbeddedFormWidgetTest extends WebDriverTestBase {
    * @return array
    *   Test data.
    */
-  public static function insertionReselectionProvider() {
+  public static function insertionReselectionProvider(): array {
     return [
       'using media_library_widget' => [
         'widget' => 'media_library_widget',

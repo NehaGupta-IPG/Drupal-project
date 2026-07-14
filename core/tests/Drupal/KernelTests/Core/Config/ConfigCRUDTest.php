@@ -11,34 +11,28 @@ use Drupal\Core\Config\ConfigValueException;
 use Drupal\Core\Config\DatabaseStorage;
 use Drupal\Core\Config\UnsupportedDataTypeConfigException;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests CRUD operations on configuration objects.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ConfigCRUDTest extends KernelTestBase {
 
   /**
    * Exempt from strict schema checking.
    *
    * @see \Drupal\Core\Config\Development\ConfigSchemaChecker
-   *
-   * @var bool
    */
-  protected $strictConfigSchema = FALSE;
-
-  /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  protected static $modules = ['system'];
+  protected bool $strictConfigSchema = FALSE;
 
   /**
    * Tests CRUD operations.
    */
-  public function testCRUD() {
+  public function testCRUD(): void {
     $event_dispatcher = $this->container->get('event_dispatcher');
     $typed_config_manager = $this->container->get('config.typed');
 
@@ -190,7 +184,7 @@ class ConfigCRUDTest extends KernelTestBase {
   /**
    * Tests the validation of configuration object names.
    */
-  public function testNameValidation() {
+  public function testNameValidation(): void {
     // Verify that an object name without namespace causes an exception.
     $name = 'no_namespace';
     try {
@@ -219,7 +213,7 @@ class ConfigCRUDTest extends KernelTestBase {
         $config = $this->config($name);
         $config->save();
       }
-      catch (ConfigNameException $e) {
+      catch (ConfigNameException) {
         unset($test_characters[$i]);
       }
     }
@@ -231,7 +225,7 @@ class ConfigCRUDTest extends KernelTestBase {
       $config = $this->config($name);
       $config->save();
     }
-    catch (ConfigNameException $e) {
+    catch (ConfigNameException) {
       $this->fail('ConfigNameException was not thrown for a valid object name.');
     }
 
@@ -240,7 +234,7 @@ class ConfigCRUDTest extends KernelTestBase {
   /**
    * Tests the validation of configuration object values.
    */
-  public function testValueValidation() {
+  public function testValueValidation(): void {
     // Verify that setData() will catch dotted keys.
     try {
       $this->config('namespace.object')->setData(['key.value' => 12])->save();
@@ -263,7 +257,7 @@ class ConfigCRUDTest extends KernelTestBase {
   /**
    * Tests data type handling.
    */
-  public function testDataTypes() {
+  public function testDataTypes(): void {
     \Drupal::service('module_installer')->install(['config_test']);
     $storage = new DatabaseStorage($this->container->get('database'), 'config');
     $name = 'config_test.types';
@@ -317,21 +311,13 @@ class ConfigCRUDTest extends KernelTestBase {
     $this->assertSame($data, $config->get());
     $this->assertSame($data, $storage->read($name));
 
-    // Test that schema type enforcement can be overridden by trusting the data.
-    $this->assertSame(99, $config->get('int'));
-    $config->set('int', '99')->save(TRUE);
-    $this->assertSame('99', $config->get('int'));
-    // Test that re-saving without testing the data enforces the schema type.
-    $config->save();
-    $this->assertSame($data, $config->get());
-
     // Test that setting an unsupported type for a config object with a schema
     // fails.
     try {
       $config->set('stream', fopen(__FILE__, 'r'))->save();
       $this->fail('No Exception thrown upon saving invalid data type.');
     }
-    catch (UnsupportedDataTypeConfigException $e) {
+    catch (UnsupportedDataTypeConfigException) {
       // Expected exception; just continue testing.
     }
 
@@ -346,9 +332,49 @@ class ConfigCRUDTest extends KernelTestBase {
       $config->set('stream', fopen(__FILE__, 'r'))->save();
       $this->fail('No Exception thrown upon saving invalid data type.');
     }
-    catch (UnsupportedDataTypeConfigException $e) {
+    catch (UnsupportedDataTypeConfigException) {
       // Expected exception; just continue testing.
     }
+  }
+
+  /**
+   * Tests deprecation of trusted data.
+   *
+   * @legacy-covers \Drupal\Core\Config\Config::save()
+   */
+  #[IgnoreDeprecations]
+  public function testTrustedDataDeprecation(): void {
+    $this->expectUserDeprecationMessage('Calling Drupal\\Core\\Config\\Config::save() with the $has_trusted_data argument is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3348180');
+    \Drupal::service('module_installer')->install(['config_test']);
+    $typed_config_manager = \Drupal::service('config.typed');
+
+    $name = 'config_test.types';
+    $config = $this->config($name);
+    $this->assertTrue($typed_config_manager->hasConfigSchema($name));
+
+    // Test that schema type enforcement can be overridden by trusting the data.
+    $this->assertSame(99, $config->get('int'));
+    $config->set('int', '99')->save(TRUE);
+    $this->assertSame('99', $config->get('int'));
+    // Test that re-saving without testing the data enforces the schema type.
+    $config->save();
+    $this->assertSame(99, $config->get('int'));
+
+    // Test that setting an unsupported type for a config object with a schema
+    // fails.
+    $this->expectException(UnsupportedDataTypeConfigException::class);
+    $config->set('stream', fopen(__FILE__, 'r'))->save(TRUE);
+
+    // Test that setting an unsupported type for a config object with no schema
+    // also fails.
+    $config_name = 'config_test.no_schema';
+    $config = $this->config($config_name);
+    $this->assertFalse($typed_config_manager->hasConfigSchema($config_name));
+
+    // Verify that an exception is thrown when saving unsupported data types.
+    $this->expectException(UnsupportedDataTypeConfigException::class);
+    $config->set('stream', fopen(__FILE__, 'r'))->save(TRUE);
+
   }
 
 }

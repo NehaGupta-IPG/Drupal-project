@@ -16,6 +16,7 @@ use Drupal\Core\Theme\ThemeInitializationInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\system\FileDownloadController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -128,14 +129,16 @@ abstract class AssetControllerBase extends FileDownloadController {
     if (!$request->query->has('theme')) {
       throw new BadRequestHttpException('The theme must be passed as a query argument');
     }
-    if (!$request->query->has('delta') || !is_numeric($request->query->get('delta'))) {
-      throw new BadRequestHttpException('The numeric delta must be passed as a query argument');
+    if (!$request->query->has('libraries')) {
+      if (!$request->query->has('delta') || !is_numeric($request->query->get('delta'))) {
+        throw new BadRequestHttpException('The numeric delta must be passed as a query argument');
+      }
+      if (!$request->query->has('include')) {
+        throw new BadRequestHttpException('The libraries to include must be passed as a query argument');
+      }
     }
     if (!$request->query->has('language')) {
       throw new BadRequestHttpException('The language must be passed as a query argument');
-    }
-    if (!$request->query->has('include')) {
-      throw new BadRequestHttpException('The libraries to include must be passed as a query argument');
     }
     $file_parts = explode('_', basename($file_name, '.' . $this->fileExtension), 2);
     // Ensure the filename is correctly prefixed.
@@ -157,7 +160,13 @@ abstract class AssetControllerBase extends FileDownloadController {
     $this->themeManager->setActiveTheme($active_theme);
 
     $attached_assets = new AttachedAssets();
-    $include_libraries = explode(',', UrlHelper::uncompressQueryParameter($request->query->get('include')));
+
+    if ($request->query->has('include')) {
+      $include_libraries = explode(',', UrlHelper::uncompressQueryParameter($request->query->get('include')));
+    }
+    else {
+      $include_libraries = explode(',', UrlHelper::uncompressQueryParameter($request->query->get('libraries')));
+    }
 
     // Check that library names are in the correct format.
     $validate = function ($libraries_to_check) {
@@ -175,13 +184,14 @@ abstract class AssetControllerBase extends FileDownloadController {
       $validate($exclude_libraries);
       $attached_assets->setAlreadyLoadedLibraries($exclude_libraries);
     }
+
     $groups = $this->getGroups($attached_assets, $request);
 
-    $group = $this->getGroup($groups, $request->query->get('delta'));
+    // If the request is for a single library, there is only ever one group.
+    $group = $this->getGroup($groups, $request->query->has('libraries') ? 0 : (int) $request->query->get('delta'));
     // Generate a hash based on the asset group, this uses the same method as
     // the collection optimizer does to create the filename, so it should match.
     $generated_hash = $this->generateHash($group);
-    $data = $this->optimizer->optimizeGroup($group);
 
     // However, the hash from the library definitions in code may not match the
     // hash from the URL. This can be for three reasons:
@@ -196,12 +206,22 @@ abstract class AssetControllerBase extends FileDownloadController {
     // from filling the disk, while still serving aggregates that may be
     // referenced in cached HTML.
     if (hash_equals($generated_hash, $received_hash)) {
+      $data = $this->optimizer->optimizeGroup($group);
       $this->dumper->dumpToUri($data, $this->assetType, $uri);
+      $response = new Response($data, 200, [
+        'Cache-control' => static::CACHE_CONTROL,
+        'Content-Type' => $this->contentType,
+      ]);
     }
-    return new Response($data, 200, [
-      'Cache-control' => static::CACHE_CONTROL,
-      'Content-Type' => $this->contentType,
-    ]);
+    else {
+      $expected_filename = $this->fileExtension . '_' . $generated_hash . '.' . $this->fileExtension;
+      $response = new RedirectResponse(
+        str_replace($file_name, $expected_filename, $request->getRequestUri()),
+        301,
+        ['Cache-Control' => 'public, max-age=3600, must-revalidate'],
+      );
+    }
+    return $response;
   }
 
   /**

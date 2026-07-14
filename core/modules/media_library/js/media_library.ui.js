@@ -311,8 +311,19 @@
 
       function checkEnabled() {
         updateSelectionCount(settings.media_library.selection_remaining);
+        // Clear any error messages when the selection is within the allowed
+        // limit. A negative remaining value means unlimited selection.
         if (
-          currentSelection.length === settings.media_library.selection_remaining
+          settings.media_library.selection_remaining < 0 ||
+          currentSelection.length <= settings.media_library.selection_remaining
+        ) {
+          $('#media-library-messages').empty();
+        }
+        // Use >= instead of === to also disable items when selection EXCEEDS the limit
+        // (e.g., after uploading multiple images consecutively).
+        if (
+          settings.media_library.selection_remaining > 0 &&
+          currentSelection.length >= settings.media_library.selection_remaining
         ) {
           disableItems($mediaItems.not(':checked'));
           enableItems($mediaItems.filter(':checked'));
@@ -326,15 +337,14 @@
         const id = e.currentTarget.value;
 
         // Update the selection.
-        const position = currentSelection.indexOf(id);
         if (e.currentTarget.checked) {
           // Check if the ID is not already in the selection and add if needed.
-          if (position === -1) {
+          if (!currentSelection.includes(id)) {
             currentSelection.push(id);
           }
-        } else if (position !== -1) {
+        } else if (currentSelection.includes(id)) {
           // Remove the ID when it is in the current selection.
-          currentSelection.splice(position, 1);
+          currentSelection.splice(currentSelection.indexOf(id), 1);
         }
 
         const mediaLibraryModalSelection = document.querySelector(
@@ -411,7 +421,9 @@
         return;
       }
       window.addEventListener('dialog:afterclose', () => {
-        Drupal.MediaLibrary.currentSelection = [];
+        // This empty the array while keeping the existing array reference,
+        // to keep event listeners working.
+        Drupal.MediaLibrary.currentSelection.length = 0;
       });
     },
   };

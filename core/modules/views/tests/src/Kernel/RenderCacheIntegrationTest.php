@@ -8,16 +8,17 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\entity_test\Entity\EntityTest;
+use Drupal\views\Entity\View;
 use Drupal\views\Tests\AssertViewsCacheTagsTrait;
 use Drupal\views\Views;
-use Drupal\views\Entity\View;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the general integration between views and the render cache.
- *
- * @group views
- * @group #slow
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class RenderCacheIntegrationTest extends ViewsKernelTestBase {
 
   use AssertViewsCacheTagsTrait;
@@ -45,7 +46,7 @@ class RenderCacheIntegrationTest extends ViewsKernelTestBase {
   /**
    * Tests a field-based view's cache tags when using the "none" cache plugin.
    */
-  public function testFieldBasedViewCacheTagsWithCachePluginNone() {
+  public function testFieldBasedViewCacheTagsWithCachePluginNone(): void {
     $view = Views::getView('entity_test_fields');
     $view->getDisplay()->overrideOption('cache', [
       'type' => 'none',
@@ -58,7 +59,7 @@ class RenderCacheIntegrationTest extends ViewsKernelTestBase {
   /**
    * Tests a field-based view's cache tags when using the "tag" cache plugin.
    */
-  public function testFieldBasedViewCacheTagsWithCachePluginTag() {
+  public function testFieldBasedViewCacheTagsWithCachePluginTag(): void {
     $view = Views::getView('entity_test_fields');
     $view->getDisplay()->overrideOption('cache', [
       'type' => 'tag',
@@ -71,7 +72,7 @@ class RenderCacheIntegrationTest extends ViewsKernelTestBase {
   /**
    * Tests a field-based view's cache tags when using the "time" cache plugin.
    */
-  public function testFieldBasedViewCacheTagsWithCachePluginTime() {
+  public function testFieldBasedViewCacheTagsWithCachePluginTime(): void {
     $view = Views::getView('entity_test_fields');
     $view->getDisplay()->overrideOption('cache', [
       'type' => 'time',
@@ -143,6 +144,7 @@ class RenderCacheIntegrationTest extends ViewsKernelTestBase {
     $build = $this->assertViewsCacheTags($view, $tags_page_2, $do_assert_views_caches, $tags_page_2);
     // @todo Static render arrays don't support different pages yet, see
     //   https://www.drupal.org/node/2500701.
+    // phpcs:ignore
     // $this->assertViewsCacheTagsFromStaticRenderArray($view, $tags_page_2, $do_assert_views_caches);
     $this->assertStringContainsString($random_name, (string) $build['#markup']);
     $view->destroy();
@@ -159,7 +161,7 @@ class RenderCacheIntegrationTest extends ViewsKernelTestBase {
 
     // Setup arguments to ensure that render caching also varies by them.
     // Custom assert for a single result row.
-    $single_entity_assertions = function (array $build, EntityInterface $entity) {
+    $single_entity_assertions = function (array $build, EntityInterface $entity): void {
       $this->setRawContent($build['#markup']);
 
       $result = $this->cssSelect('div.views-row');
@@ -192,7 +194,7 @@ class RenderCacheIntegrationTest extends ViewsKernelTestBase {
   /**
    * Tests an entity-based view's cache tags when using the "none" cache plugin.
    */
-  public function testEntityBasedViewCacheTagsWithCachePluginNone() {
+  public function testEntityBasedViewCacheTagsWithCachePluginNone(): void {
     $view = Views::getView('entity_test_row');
     $view->getDisplay()->overrideOption('cache', [
       'type' => 'none',
@@ -205,7 +207,7 @@ class RenderCacheIntegrationTest extends ViewsKernelTestBase {
   /**
    * Tests an entity-based view's cache tags when using the "tag" cache plugin.
    */
-  public function testEntityBasedViewCacheTagsWithCachePluginTag() {
+  public function testEntityBasedViewCacheTagsWithCachePluginTag(): void {
     $view = Views::getView('entity_test_row');
     $view->getDisplay()->overrideOption('cache', [
       'type' => 'tag',
@@ -218,7 +220,7 @@ class RenderCacheIntegrationTest extends ViewsKernelTestBase {
   /**
    * Tests an entity-based view's cache tags when using the "time" cache plugin.
    */
-  public function testEntityBasedViewCacheTagsWithCachePluginTime() {
+  public function testEntityBasedViewCacheTagsWithCachePluginTime(): void {
     $view = Views::getView('entity_test_row');
     $view->getDisplay()->overrideOption('cache', [
       'type' => 'time',
@@ -275,7 +277,7 @@ class RenderCacheIntegrationTest extends ViewsKernelTestBase {
   /**
    * Ensure that the view renderable contains the cache contexts.
    */
-  public function testBuildRenderableWithCacheContexts() {
+  public function testBuildRenderableWithCacheContexts(): void {
     $view = View::load('test_view');
     $display =& $view->getDisplay('default');
     $display['cache_metadata']['contexts'] = ['views_test_cache_context'];
@@ -288,11 +290,20 @@ class RenderCacheIntegrationTest extends ViewsKernelTestBase {
   /**
    * Ensures that saving a view calculates the cache contexts.
    */
-  public function testViewAddCacheMetadata() {
+  public function testViewAddCacheMetadata(): void {
     $view = View::load('test_display');
     $view->save();
 
-    $this->assertEqualsCanonicalizing(['languages:' . LanguageInterface::TYPE_CONTENT, 'languages:' . LanguageInterface::TYPE_INTERFACE, 'url.query_args', 'user.node_grants:view', 'user.permissions'], $view->getDisplay('default')['cache_metadata']['contexts']);
+    $this->assertEqualsCanonicalizing(
+      [
+        'languages:' . LanguageInterface::TYPE_CONTENT,
+        'languages:' . LanguageInterface::TYPE_INTERFACE,
+        'url.query_args',
+        'user.node_grants:view',
+        'user.permissions',
+      ],
+      $view->getDisplay('default')['cache_metadata']['contexts']
+    );
   }
 
 }

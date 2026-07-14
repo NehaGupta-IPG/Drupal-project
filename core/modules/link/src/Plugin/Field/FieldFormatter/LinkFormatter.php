@@ -11,8 +11,8 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Drupal\link\AttributeXss;
 use Drupal\link\LinkItemInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'link' formatter.
@@ -34,26 +34,10 @@ class LinkFormatter extends FormatterBase {
   protected $pathValidator;
 
   /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $plugin_id,
-      $plugin_definition,
-      $configuration['field_definition'],
-      $configuration['settings'],
-      $configuration['label'],
-      $configuration['view_mode'],
-      $configuration['third_party_settings'],
-      $container->get('path.validator')
-    );
-  }
-
-  /**
    * Constructs a new LinkFormatter.
    *
    * @param string $plugin_id
-   *   The plugin_id for the formatter.
+   *   The plugin ID for the formatter.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
@@ -168,6 +152,8 @@ class LinkFormatter extends FormatterBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @phpstan-param \Drupal\Core\Field\FieldItemListInterface<\Drupal\link\LinkItemInterface> $items
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $element = [];
@@ -238,13 +224,13 @@ class LinkFormatter extends FormatterBase {
     try {
       $url = $item->getUrl();
     }
-    catch (\InvalidArgumentException $e) {
+    catch (\InvalidArgumentException) {
       // @todo Add logging here in https://www.drupal.org/project/drupal/issues/3348020
       $url = Url::fromRoute('<none>');
     }
 
     $settings = $this->getSettings();
-    $options = $item->options;
+    $options = $item->options ?? [];
     $options += $url->getOptions();
 
     // Add optional 'rel' attribute to link options.
@@ -255,8 +241,12 @@ class LinkFormatter extends FormatterBase {
     if (!empty($settings['target'])) {
       $options['attributes']['target'] = $settings['target'];
     }
-    $url->setOptions($options);
 
+    if (!empty($options['attributes'])) {
+      $options['attributes'] = AttributeXss::sanitizeAttributes($options['attributes']);
+    }
+
+    $url->setOptions($options);
     return $url;
   }
 

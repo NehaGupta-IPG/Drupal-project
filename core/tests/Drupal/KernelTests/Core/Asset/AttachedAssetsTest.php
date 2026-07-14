@@ -7,6 +7,8 @@ namespace Drupal\KernelTests\Core\Asset;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests #attached assets: attached asset libraries and JavaScript settings.
@@ -17,10 +19,10 @@ use Drupal\KernelTests\KernelTestBase;
  * $build['#attached']['library'] = …
  * $build['#attached']['drupalSettings'] = …
  * @endcode
- *
- * @group Common
- * @group Asset
  */
+#[Group('Common')]
+#[Group('Asset')]
+#[RunTestsInSeparateProcesses]
 class AttachedAssetsTest extends KernelTestBase {
 
   /**
@@ -63,7 +65,7 @@ class AttachedAssetsTest extends KernelTestBase {
   /**
    * Tests that default CSS and JavaScript is empty.
    */
-  public function testDefault() {
+  public function testDefault(): void {
     $assets = new AttachedAssets();
     $this->assertEquals([], $this->assetResolver->getCssAssets($assets, FALSE, \Drupal::languageManager()->getCurrentLanguage()), 'Default CSS is empty.');
     [$js_assets_header, $js_assets_footer] = $this->assetResolver->getJsAssets($assets, FALSE, \Drupal::languageManager()->getCurrentLanguage());
@@ -74,7 +76,7 @@ class AttachedAssetsTest extends KernelTestBase {
   /**
    * Tests non-existing libraries.
    */
-  public function testLibraryUnknown() {
+  public function testLibraryUnknown(): void {
     $build['#attached']['library'][] = 'core/unknown';
     $assets = AttachedAssets::createFromRenderArray($build);
 
@@ -84,7 +86,7 @@ class AttachedAssetsTest extends KernelTestBase {
   /**
    * Tests adding a CSS and a JavaScript file.
    */
-  public function testAddFiles() {
+  public function testAddFiles(): void {
     $build['#attached']['library'][] = 'common_test/files';
     $assets = AttachedAssets::createFromRenderArray($build);
 
@@ -105,7 +107,7 @@ class AttachedAssetsTest extends KernelTestBase {
   /**
    * Tests adding JavaScript settings.
    */
-  public function testAddJsSettings() {
+  public function testAddJsSettings(): void {
     // Add a file in order to test default settings.
     $build['#attached']['library'][] = 'core/drupalSettings';
     $assets = AttachedAssets::createFromRenderArray($build);
@@ -124,7 +126,7 @@ class AttachedAssetsTest extends KernelTestBase {
   /**
    * Tests adding external CSS and JavaScript files.
    */
-  public function testAddExternalFiles() {
+  public function testAddExternalFiles(): void {
     $build['#attached']['library'][] = 'common_test/external';
     $assets = AttachedAssets::createFromRenderArray($build);
 
@@ -144,7 +146,7 @@ class AttachedAssetsTest extends KernelTestBase {
   /**
    * Tests adding JavaScript files with additional attributes.
    */
-  public function testAttributes() {
+  public function testAttributes(): void {
     $build['#attached']['library'][] = 'common_test/js-attributes';
     $assets = AttachedAssets::createFromRenderArray($build);
 
@@ -160,7 +162,7 @@ class AttachedAssetsTest extends KernelTestBase {
   /**
    * Tests that attributes are maintained when JS aggregation is enabled.
    */
-  public function testAggregatedAttributes() {
+  public function testAggregatedAttributes(): void {
     $build['#attached']['library'][] = 'common_test/js-attributes';
     $assets = AttachedAssets::createFromRenderArray($build);
 
@@ -176,7 +178,7 @@ class AttachedAssetsTest extends KernelTestBase {
   /**
    * Integration test for CSS/JS aggregation.
    */
-  public function testAggregation() {
+  public function testAggregation(): void {
     $build['#attached']['library'][] = 'core/drupal.timezone';
     $build['#attached']['library'][] = 'core/drupal.vertical-tabs';
     $assets = AttachedAssets::createFromRenderArray($build);
@@ -186,15 +188,18 @@ class AttachedAssetsTest extends KernelTestBase {
     [$header_js, $footer_js] = $this->assetResolver->getJsAssets($assets, TRUE, \Drupal::languageManager()->getCurrentLanguage());
     $this->assertEquals([], \Drupal::service('asset.js.collection_renderer')->render($header_js), 'There are 0 JavaScript assets in the header.');
     $rendered_footer_js = \Drupal::service('asset.js.collection_renderer')->render($footer_js);
-    $this->assertCount(2, $rendered_footer_js, 'There are 2 JavaScript assets in the footer.');
-    $this->assertEquals('drupal-settings-json', $rendered_footer_js[0]['#attributes']['data-drupal-selector'], 'The first of the two JavaScript assets in the footer has drupal settings.');
-    $this->assertStringStartsWith(base_path(), $rendered_footer_js[1]['#attributes']['src'], 'The second of the two JavaScript assets in the footer has the sole aggregated JavaScript asset.');
+    $this->assertCount(5, $rendered_footer_js, 'There are 5 JavaScript assets in the footer.');
+    $this->assertEquals('drupal-settings-json', $rendered_footer_js[0]['#attributes']['data-drupal-selector'], 'The first of the five JavaScript assets in the footer has drupal settings.');
+    $this->assertStringContainsString('jquery.min.js', $rendered_footer_js[1]['#attributes']['src'], 'The second of the five JavaScript assets in the footer is jquery.min.js.');
+    $this->assertStringContainsString('once.min.js', $rendered_footer_js[2]['#attributes']['src'], 'The third of the five JavaScript assets in the footer is once.min.js.');
+    $this->assertStringStartsWith(base_path(), $rendered_footer_js[3]['#attributes']['src'], 'The fourth of the five JavaScript assets in the footer has an aggregated JavaScript asset.');
+    $this->assertStringStartsWith(base_path(), $rendered_footer_js[4]['#attributes']['src']);
   }
 
   /**
    * Tests JavaScript settings.
    */
-  public function testSettings() {
+  public function testSettings(): void {
     $build = [];
     $build['#attached']['library'][] = 'core/drupalSettings';
     // Nonsensical value to verify if it's possible to override path settings.
@@ -234,7 +239,7 @@ class AttachedAssetsTest extends KernelTestBase {
   /**
    * Tests JS assets depending on the 'core/<head>' virtual library.
    */
-  public function testHeaderHTML() {
+  public function testHeaderHTML(): void {
     $build['#attached']['library'][] = 'common_test/js-header';
     $assets = AttachedAssets::createFromRenderArray($build);
 
@@ -250,18 +255,18 @@ class AttachedAssetsTest extends KernelTestBase {
   /**
    * Tests that for assets with cache = FALSE, Drupal sets preprocess = FALSE.
    */
-  public function testNoCache() {
+  public function testNoCache(): void {
     $build['#attached']['library'][] = 'common_test/no-cache';
     $assets = AttachedAssets::createFromRenderArray($build);
 
     $js = $this->assetResolver->getJsAssets($assets, FALSE, \Drupal::languageManager()->getCurrentLanguage())[1];
-    $this->assertFalse($js['core/modules/system/tests/modules/common_test/nocache.js']['preprocess'], 'Setting cache to FALSE sets preprocess to FALSE when adding JavaScript.');
+    $this->assertFalse($js['core/modules/system/tests/modules/common_test/no_cache.js']['preprocess'], 'Setting cache to FALSE sets preprocess to FALSE when adding JavaScript.');
   }
 
   /**
    * Tests JavaScript versioning.
    */
-  public function testVersionQueryString() {
+  public function testVersionQueryString(): void {
     $build['#attached']['library'][] = 'core/once';
     $assets = AttachedAssets::createFromRenderArray($build);
 
@@ -275,7 +280,7 @@ class AttachedAssetsTest extends KernelTestBase {
   /**
    * Tests JavaScript and CSS asset ordering.
    */
-  public function testRenderOrder() {
+  public function testRenderOrder(): void {
     $build['#attached']['library'][] = 'common_test/order';
     $assets = AttachedAssets::createFromRenderArray($build);
 
@@ -353,7 +358,7 @@ class AttachedAssetsTest extends KernelTestBase {
   /**
    * Tests rendering the JavaScript with a file's weight above jQuery's.
    */
-  public function testRenderDifferentWeight() {
+  public function testRenderDifferentWeight(): void {
     // If a library contains assets A and B, and A is listed first, then B can
     // still make itself appear first by defining a lower weight.
     $build['#attached']['library'][] = 'core/jquery';
@@ -376,7 +381,7 @@ class AttachedAssetsTest extends KernelTestBase {
    *
    * @see common_test_js_alter()
    */
-  public function testAlter() {
+  public function testAlter(): void {
     // Add both tableselect.js and alter.js.
     $build['#attached']['library'][] = 'core/drupal.tableselect';
     $build['#attached']['library'][] = 'common_test/hook_js_alter';
@@ -397,7 +402,7 @@ class AttachedAssetsTest extends KernelTestBase {
    *
    * @see common_test_library_info_alter()
    */
-  public function testLibraryAlter() {
+  public function testLibraryAlter(): void {
     // Verify that common_test altered the title of loadjs.
     /** @var \Drupal\Core\Asset\LibraryDiscoveryInterface $library_discovery */
     $library_discovery = \Drupal::service('library.discovery');
@@ -416,13 +421,13 @@ class AttachedAssetsTest extends KernelTestBase {
   /**
    * Dynamically defines an asset library and alters it.
    */
-  public function testDynamicLibrary() {
+  public function testDynamicLibrary(): void {
     /** @var \Drupal\Core\Asset\LibraryDiscoveryInterface $library_discovery */
     $library_discovery = \Drupal::service('library.discovery');
     // Retrieve a dynamic library definition.
     // @see common_test_library_info_build()
     \Drupal::state()->set('common_test.library_info_build_test', TRUE);
-    $library_discovery->clearCachedDefinitions();
+    $library_discovery->clear();
     $dynamic_library = $library_discovery->getLibraryByName('common_test', 'dynamic_library');
     $this->assertIsArray($dynamic_library);
     $this->assertArrayHasKey('version', $dynamic_library);
@@ -438,7 +443,7 @@ class AttachedAssetsTest extends KernelTestBase {
    *
    * @see common_test.library.yml
    */
-  public function testLibraryNameConflicts() {
+  public function testLibraryNameConflicts(): void {
     /** @var \Drupal\Core\Asset\LibraryDiscoveryInterface $library_discovery */
     $library_discovery = \Drupal::service('library.discovery');
     $loadjs = $library_discovery->getLibraryByName('common_test', 'loadjs');
@@ -448,7 +453,7 @@ class AttachedAssetsTest extends KernelTestBase {
   /**
    * Tests JavaScript files that have query strings attached get added right.
    */
-  public function testAddJsFileWithQueryString() {
+  public function testAddJsFileWithQueryString(): void {
     $build['#attached']['library'][] = 'common_test/querystring';
     $assets = AttachedAssets::createFromRenderArray($build);
 
@@ -464,6 +469,28 @@ class AttachedAssetsTest extends KernelTestBase {
     $query_string = $this->container->get('asset.query_string')->get();
     $this->assertStringContainsString('<link rel="stylesheet" media="all" href="' . str_replace('&', '&amp;', $this->fileUrlGenerator->generateString('core/modules/system/tests/modules/common_test/querystring.css?arg1=value1&arg2=value2')) . '&amp;' . $query_string . '" />', $rendered_css, 'CSS file with query string gets version query string correctly appended..');
     $this->assertStringContainsString('<script src="' . str_replace('&', '&amp;', $this->fileUrlGenerator->generateString('core/modules/system/tests/modules/common_test/querystring.js?arg1=value1&arg2=value2')) . '&amp;' . $query_string . '"></script>', $rendered_js, 'JavaScript file with query string gets version query string correctly appended.');
+  }
+
+  /**
+   * Test settings can be loaded even when libraries are not.
+   */
+  public function testAttachedSettingsWithoutLibraries(): void {
+    $assets = new AttachedAssets();
+
+    // First test with no libraries will return no settings.
+    $assets->setSettings(['test' => 'foo']);
+    $js = $this->assetResolver->getJsAssets($assets, TRUE, \Drupal::languageManager()->getCurrentLanguage())[1];
+    $this->assertArrayNotHasKey('drupalSettings', $js);
+
+    // Second test with a warm cache.
+    $js = $this->assetResolver->getJsAssets($assets, TRUE, \Drupal::languageManager()->getCurrentLanguage())[1];
+    $this->assertArrayNotHasKey('drupalSettings', $js);
+
+    // Now test with different settings when drupalSettings is already loaded.
+    $assets->setSettings(['test' => 'bar']);
+    $assets->setAlreadyLoadedLibraries(['core/drupalSettings']);
+    $js = $this->assetResolver->getJsAssets($assets, TRUE, \Drupal::languageManager()->getCurrentLanguage())[1];
+    $this->assertSame('bar', $js['drupalSettings']['data']['test']);
   }
 
 }

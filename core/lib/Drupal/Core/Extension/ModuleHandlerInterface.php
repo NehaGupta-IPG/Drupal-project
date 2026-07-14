@@ -46,7 +46,7 @@ interface ModuleHandlerInterface {
   /**
    * Returns the list of currently active modules.
    *
-   * @return \Drupal\Core\Extension\Extension[]
+   * @return array<string, \Drupal\Core\Extension\Extension>
    *   An associative array whose keys are the names of the modules and whose
    *   values are Extension objects.
    */
@@ -69,46 +69,26 @@ interface ModuleHandlerInterface {
   /**
    * Sets an explicit list of currently active modules.
    *
-   * @param \Drupal\Core\Extension\Extension[] $module_list
+   * @param array<string, \Drupal\Core\Extension\Extension> $module_list
    *   An associative array whose keys are the names of the modules and whose
    *   values are Extension objects.
    */
   public function setModuleList(array $module_list = []);
 
   /**
-   * Adds a module to the list of currently active modules.
-   *
-   * @param string $name
-   *   The module name; e.g., 'node'.
-   * @param string $path
-   *   The module path; e.g., 'core/modules/node'.
-   */
-  public function addModule($name, $path);
-
-  /**
-   * Adds an installation profile to the list of currently active modules.
-   *
-   * @param string $name
-   *   The profile name; e.g., 'standard'.
-   * @param string $path
-   *   The profile path; e.g., 'core/profiles/standard'.
-   */
-  public function addProfile($name, $path);
-
-  /**
    * Determines which modules require and are required by each module.
    *
-   * @param array $modules
+   * @param array<string, \Drupal\Core\Extension\Extension> $modules
    *   An array of module objects keyed by module name. Each object contains
    *   information discovered during a Drupal\Core\Extension\ExtensionDiscovery
    *   scan.
    *
-   * @return array
+   * @return array<string, \Drupal\Core\Extension\Extension>
    *   The same array with the new keys for each module:
    *   - requires: An array with the keys being the modules that this module
    *     requires.
-   *   - required_by: An array with the keys being the modules that will not work
-   *     without this module.
+   *   - required_by: An array with the keys being the modules that will not
+   *     work without this module.
    *
    * @see \Drupal\Core\Extension\ExtensionDiscovery
    */
@@ -133,6 +113,11 @@ interface ModuleHandlerInterface {
    * @param string $name
    *   (optional) The base file name (without the $type extension). If omitted,
    *   each module's name is used; i.e., "$module.$type" by default.
+   *
+   * @deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no
+   *   replacement.
+   *
+   * @see https://www.drupal.org/node/3536432
    */
   public function loadAllIncludes($type, $name = NULL);
 
@@ -141,10 +126,8 @@ interface ModuleHandlerInterface {
    *
    * Examples:
    * @code
-   *   // Load node.admin.inc from the node module.
-   *   $this->loadInclude('node', 'inc', 'node.admin');
-   *   // Load content_types.inc from the node module.
-   *   $this->loadInclude('node', 'inc', 'content_types');
+   *   // Load system.post_update.php from the System module.
+   *   $this->loadInclude('system', 'php', 'post_update');
    * @endcode
    *
    * @param string $module
@@ -159,23 +142,6 @@ interface ModuleHandlerInterface {
    *   The name of the included file, if successful; FALSE otherwise.
    */
   public function loadInclude($module, $type, $name = NULL);
-
-  /**
-   * Retrieves a list of hooks that are declared through hook_hook_info().
-   *
-   * @return array
-   *   An associative array whose keys are hook names and whose values are an
-   *   associative array containing a group name. The structure of the array
-   *   is the same as the return value of hook_hook_info().
-   *
-   * @see hook_hook_info()
-   */
-  public function getHookInfo();
-
-  /**
-   * Write the hook implementation info to the cache.
-   */
-  public function writeCache();
 
   /**
    * Resets the cached list of hook implementations.
@@ -207,7 +173,7 @@ interface ModuleHandlerInterface {
    *
    * @param string $hook
    *   The name of the hook to invoke.
-   * @param callable $callback
+   * @param callable(callable, string): mixed $callback
    *   A callable that invokes a hook implementation. Such that
    *   $callback is callable(callable, string): mixed.
    *   Arguments:
@@ -307,11 +273,11 @@ interface ModuleHandlerInterface {
    * hook_TYPE_alter() implementations in modules. It ensures a consistent
    * interface for all altering operations.
    *
-   * A maximum of 2 alterable arguments is supported. In case more arguments need
-   * to be passed and alterable, modules provide additional variables assigned by
-   * reference in the last $context argument:
+   * A maximum of 2 alterable arguments is supported. In case more arguments
+   * need to be passed and alterable, modules provide additional variables
+   * assigned by reference in the last $context argument:
    * @code
-   *   $context = array(
+   *   $context = [
    *     'alterable' => &$alterable,
    *     'unalterable' => $unalterable,
    *     'foo' => 'bar',
@@ -323,7 +289,7 @@ interface ModuleHandlerInterface {
    * required that no implementation alters a passed object in $context, then an
    * object needs to be cloned:
    * @code
-   *   $context = array(
+   *   $context = [
    *     'unalterable_object' => clone $object,
    *   );
    *   $this->alter('my_module_data', $data, $context);
@@ -336,10 +302,10 @@ interface ModuleHandlerInterface {
    *   array, ordered first by module, and then for each module, in the order of
    *   values in $type. For example, when Form API is using $this->alter() to
    *   execute both hook_form_alter() and hook_form_FORM_ID_alter()
-   *   implementations, it passes array('form', 'form_' . $form_id) for $type.
+   *   implementations, it passes ['form', 'form_' . $form_id] for $type.
    * @param mixed $data
-   *   The variable that will be passed to hook_TYPE_alter() implementations to be
-   *   altered. The type of this variable depends on the value of the $type
+   *   The variable that will be passed to hook_TYPE_alter() implementations to
+   *   be altered. The type of this variable depends on the value of the $type
    *   argument. For example, when altering a 'form', $data will be a structured
    *   array. When altering a 'profile', $data will be an object.
    * @param mixed $context1
@@ -369,10 +335,10 @@ interface ModuleHandlerInterface {
    *   array, ordered first by module, and then for each module, in the order of
    *   values in $type. For example, when Form API is using $this->alter() to
    *   execute both hook_form_alter() and hook_form_FORM_ID_alter()
-   *   implementations, it passes array('form', 'form_' . $form_id) for $type.
+   *   implementations, it passes ['form', 'form_' . $form_id] for $type.
    * @param mixed $data
-   *   The variable that will be passed to hook_TYPE_alter() implementations to be
-   *   altered. The type of this variable depends on the value of the $type
+   *   The variable that will be passed to hook_TYPE_alter() implementations to
+   *   be altered. The type of this variable depends on the value of the $type
    *   argument. For example, when altering a 'form', $data will be a structured
    *   array. When altering a 'profile', $data will be an object.
    * @param mixed $context1
@@ -393,25 +359,10 @@ interface ModuleHandlerInterface {
    * This is useful for tasks such as finding a file that exists in all module
    * directories.
    *
-   * @return array
+   * @return array<string, string>
+   *   An associative array of the directories for all enabled modules, keyed by
+   *   the extension machine name.
    */
   public function getModuleDirectories();
-
-  /**
-   * Gets the human readable name of a given module.
-   *
-   * @param string $module
-   *   The machine name of the module which title should be shown.
-   *
-   * @return string
-   *   Returns the human readable name of the module or the machine name passed
-   *   in if no matching module is found.
-   *
-   * @deprecated in drupal:10.3.0 and is removed from drupal:12.0.0.
-   *   Use \Drupal::service('extension.list.module')->getName($module) instead.
-   *
-   * @see https://www.drupal.org/node/3310017
-   */
-  public function getName($module);
 
 }

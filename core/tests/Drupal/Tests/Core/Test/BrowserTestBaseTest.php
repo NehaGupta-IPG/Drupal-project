@@ -4,32 +4,30 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Test;
 
-use Drupal\Tests\DrupalTestBrowser;
-use Drupal\Tests\UnitTestCase;
-use Drupal\Tests\BrowserTestBase;
 use Behat\Mink\Driver\BrowserKitDriver;
 use Behat\Mink\Session;
+use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\DrupalTestBrowser;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
- * @coversDefaultClass \Drupal\Tests\BrowserTestBase
- * @group Test
+ * Tests Drupal\Tests\BrowserTestBase.
  */
+#[CoversClass(BrowserTestBase::class)]
+#[Group('Test')]
 class BrowserTestBaseTest extends UnitTestCase {
 
-  protected function mockBrowserTestBaseWithDriver($driver) {
-    $session = $this->getMockBuilder(Session::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['getDriver'])
-      ->getMock();
-    $session->expects($this->any())
+  protected function mockBrowserTestBaseWithDriver($driver): Stub {
+    $session = $this->createStub(Session::class);
+    $session
       ->method('getDriver')
       ->willReturn($driver);
 
-    $btb = $this->getMockBuilder(BrowserTestBaseMockableClass::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['getSession'])
-      ->getMock();
-    $btb->expects($this->any())
+    $btb = $this->createStub(BrowserTestBaseMockableClassTest::class);
+    $btb
       ->method('getSession')
       ->willReturn($session);
 
@@ -37,9 +35,9 @@ class BrowserTestBaseTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getHttpClient
+   * Tests get http client.
    */
-  public function testGetHttpClient() {
+  public function testGetHttpClient(): void {
     // Our stand-in for the Guzzle client object.
     $expected = new \stdClass();
 
@@ -60,9 +58,9 @@ class BrowserTestBaseTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getHttpClient
+   * Tests get http client exception.
    */
-  public function testGetHttpClientException() {
+  public function testGetHttpClientException(): void {
     // A driver type that isn't BrowserKitDriver. This should cause a
     // RuntimeException.
     $btb = $this->mockBrowserTestBaseWithDriver(new \stdClass());
@@ -70,19 +68,17 @@ class BrowserTestBaseTest extends UnitTestCase {
     $reflected_get_http_client = new \ReflectionMethod($btb, 'getHttpClient');
 
     $this->expectException(\RuntimeException::class);
-    $this->expectExceptionMessage('The Mink client type stdClass does not support getHttpClient().');
+    $this->expectExceptionMessageIs('The Mink client type stdClass does not support getHttpClient().');
     $reflected_get_http_client->invoke($btb);
   }
 
   /**
    * Tests that tearDown doesn't call cleanupEnvironment if setUp is not called.
-   *
-   * @covers ::tearDown
    */
-  public function testTearDownWithoutSetUp() {
+  public function testTearDownWithoutSetUp(): void {
     $method = 'cleanupEnvironment';
     $this->assertTrue(method_exists(BrowserTestBase::class, $method));
-    $btb = $this->getMockBuilder(BrowserTestBaseMockableClass::class)
+    $btb = $this->getMockBuilder(BrowserTestBaseMockableClassTest::class)
       ->disableOriginalConstructor()
       ->onlyMethods([$method])
       ->getMock();
@@ -95,7 +91,9 @@ class BrowserTestBaseTest extends UnitTestCase {
 
 /**
  * A class extending BrowserTestBase for testing purposes.
+ *
+ * @phpstan-ignore testClass.missingAttribute.Group, testClass.missingAttribute.RunInSeparateProcesses
  */
-class BrowserTestBaseMockableClass extends BrowserTestBase {
+class BrowserTestBaseMockableClassTest extends BrowserTestBase {
 
 }

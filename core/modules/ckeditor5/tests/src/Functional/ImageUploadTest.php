@@ -13,13 +13,17 @@ use Drupal\Tests\jsonapi\Functional\JsonApiRequestTestTrait;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\user\RoleInterface;
 use GuzzleHttp\RequestOptions;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Test image upload.
  *
- * @group ckeditor5
  * @internal
  */
+#[Group('ckeditor5')]
+#[RunTestsInSeparateProcesses]
 class ImageUploadTest extends BrowserTestBase {
 
   use JsonApiRequestTestTrait;
@@ -60,7 +64,7 @@ class ImageUploadTest extends BrowserTestBase {
   /**
    * Tests using the file upload route with a disallowed extension.
    */
-  public function testUploadFileExtension() {
+  public function testUploadFileExtension(): void {
     $this->createBasicFormat();
     $this->createEditorWithUpload([
       'status' => TRUE,
@@ -86,7 +90,7 @@ class ImageUploadTest extends BrowserTestBase {
   /**
    * Tests using the file upload route with a file size larger than allowed.
    */
-  public function testFileUploadLargerFileSize() {
+  public function testFileUploadLargerFileSize(): void {
     $this->createBasicFormat();
     $this->createEditorWithUpload([
       'status' => TRUE,
@@ -101,10 +105,10 @@ class ImageUploadTest extends BrowserTestBase {
 
     $url = $this->getUploadUrl();
     $images = $this->getTestFiles('image');
-    $large_image = $this->getTestImageByStat($images, 'size', function ($size) {
+    $large_image = $this->getTestImageByStat($images, 'size', function ($size): bool {
       return $size > 30000;
     });
-    $small_image = $this->getTestImageByStat($images, 'size', function ($size) {
+    $small_image = $this->getTestImageByStat($images, 'size', function ($size): bool {
       return $size < 30000;
     });
 
@@ -120,7 +124,7 @@ class ImageUploadTest extends BrowserTestBase {
    *
    * @see https://www.drupal.org/project/drupal/issues/3184974
    */
-  public function testLockAfterFailedValidation() {
+  public function testLockAfterFailedValidation(): void {
     $this->createBasicFormat();
     $this->createEditorWithUpload([
       'status' => TRUE,
@@ -135,10 +139,10 @@ class ImageUploadTest extends BrowserTestBase {
 
     $url = $this->getUploadUrl();
     $images = $this->getTestFiles('image');
-    $large_image = $this->getTestImageByStat($images, 'size', function ($size) {
+    $large_image = $this->getTestImageByStat($images, 'size', function ($size): bool {
       return $size > 30000;
     });
-    $small_image = $this->getTestImageByStat($images, 'size', function ($size) {
+    $small_image = $this->getTestImageByStat($images, 'size', function ($size): bool {
       return $size < 30000;
     });
     $response = $this->uploadRequest($url, file_get_contents($large_image->uri), 'same.jpg');
@@ -161,7 +165,7 @@ class ImageUploadTest extends BrowserTestBase {
    * @return \Psr\Http\Message\ResponseInterface
    *   The response.
    */
-  protected function uploadRequest(Url $url, string $file_contents, string $file_name) {
+  protected function uploadRequest(Url $url, string $file_contents, string $file_name): ResponseInterface {
     $request_options[RequestOptions::HEADERS] = [
       'Accept' => 'application/json',
     ];
@@ -192,7 +196,7 @@ class ImageUploadTest extends BrowserTestBase {
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  protected function createBasicFormat() {
+  protected function createBasicFormat(): void {
     $basic_html_format = FilterFormat::create([
       'format' => 'basic_html',
       'name' => 'Basic HTML',
@@ -252,7 +256,7 @@ class ImageUploadTest extends BrowserTestBase {
    * @return object|bool
    *   Objects with 'uri', 'filename', and 'name' properties.
    */
-  protected function getTestImageByStat(array $images, string $stat, callable $condition) {
+  protected function getTestImageByStat(array $images, string $stat, callable $condition): mixed {
     return current(array_filter($images, function ($image) use ($condition, $stat) {
       $stats = stat($image->uri);
       return $condition($stats[$stat]);

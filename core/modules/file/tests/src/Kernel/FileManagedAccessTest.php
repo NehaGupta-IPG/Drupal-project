@@ -10,12 +10,14 @@ use Drupal\file\FileInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests access to managed files.
- *
- * @group file
  */
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class FileManagedAccessTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -32,7 +34,7 @@ class FileManagedAccessTest extends KernelTestBase {
   /**
    * Tests if public file is always accessible.
    */
-  public function testFileAccess() {
+  public function testFileAccess(): void {
     $this->installEntitySchema('user');
     $this->installEntitySchema('file');
     $this->installSchema('file', ['file_usage']);

@@ -6,13 +6,16 @@ namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the core date argument handlers.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\argument\Date
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class ArgumentDateTest extends ViewsKernelTestBase {
 
   /**
@@ -58,7 +61,7 @@ class ArgumentDateTest extends ViewsKernelTestBase {
    *
    * @see \Drupal\node\Plugin\views\argument\CreatedFullDate
    */
-  public function testCreatedFullDateHandler() {
+  public function testCreatedFullDateHandler(): void {
     $view = Views::getView('test_argument_date');
     $view->setDisplay('default');
     $this->executeView($view, ['20000102']);
@@ -89,7 +92,7 @@ class ArgumentDateTest extends ViewsKernelTestBase {
    *
    * @see \Drupal\node\Plugin\views\argument\CreatedDay
    */
-  public function testDayHandler() {
+  public function testDayHandler(): void {
     $view = Views::getView('test_argument_date');
     $view->setDisplay('embed_1');
     $this->executeView($view, ['02']);
@@ -119,7 +122,7 @@ class ArgumentDateTest extends ViewsKernelTestBase {
    *
    * @see \Drupal\node\Plugin\views\argument\CreatedMonth
    */
-  public function testMonthHandler() {
+  public function testMonthHandler(): void {
     $view = Views::getView('test_argument_date');
     $view->setDisplay('embed_2');
     $this->executeView($view, ['01']);
@@ -143,7 +146,7 @@ class ArgumentDateTest extends ViewsKernelTestBase {
    *
    * @see \Drupal\node\Plugin\views\argument\CreatedWeek
    */
-  public function testWeekHandler() {
+  public function testWeekHandler(): void {
     $this->container->get('database')->update('views_test_data')
       ->fields(['created' => gmmktime(0, 0, 0, 9, 26, 2008)])
       ->condition('id', 1)
@@ -221,7 +224,7 @@ class ArgumentDateTest extends ViewsKernelTestBase {
    *
    * @see \Drupal\node\Plugin\views\argument\CreatedYear
    */
-  public function testYearHandler() {
+  public function testYearHandler(): void {
     $this->container->get('database')->update('views_test_data')
       ->fields(['created' => gmmktime(0, 0, 0, 1, 1, 2001)])
       ->condition('id', 3)
@@ -272,7 +275,7 @@ class ArgumentDateTest extends ViewsKernelTestBase {
    *
    * @see \Drupal\node\Plugin\views\argument\CreatedYearMonth
    */
-  public function testYearMonthHandler() {
+  public function testYearMonthHandler(): void {
     $this->container->get('database')->update('views_test_data')
       ->fields(['created' => gmmktime(0, 0, 0, 1, 1, 2001)])
       ->condition('id', 3)

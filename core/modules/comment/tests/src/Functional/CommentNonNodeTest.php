@@ -4,29 +4,37 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
+use Drupal\comment\AnonymousContact;
+use Drupal\comment\CommentingStatus;
 use Drupal\comment\CommentInterface;
+use Drupal\comment\CommentPreviewMode;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Entity\CommentType;
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\comment\Tests\CommentTestTrait;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\entity_test\Entity\EntityTest;
+use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests commenting on a test entity.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentNonNodeTest extends BrowserTestBase {
 
   use FieldUiTestTrait;
   use CommentTestTrait;
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = [
     'comment',
     'user',
@@ -63,7 +71,7 @@ class CommentNonNodeTest extends BrowserTestBase {
     $this->drupalPlaceBlock('page_title_block');
 
     // Create a bundle for entity_test.
-    entity_test_create_bundle('entity_test', 'Entity Test', 'entity_test');
+    EntityTestHelper::createBundle('entity_test', 'Entity Test', 'entity_test');
     CommentType::create([
       'id' => 'comment',
       'label' => 'Comment settings',
@@ -122,12 +130,12 @@ class CommentNonNodeTest extends BrowserTestBase {
    * @return \Drupal\comment\CommentInterface
    *   The new comment entity.
    */
-  public function postComment(?EntityInterface $entity, $comment, $subject = '', $contact = NULL) {
+  public function postComment(?EntityInterface $entity, string|int|float|bool $comment, $subject = '', $contact = NULL) {
     $edit = [];
     $edit['comment_body[0][value]'] = $comment;
 
     $field = FieldConfig::loadByName('entity_test', 'entity_test', 'comment');
-    $preview_mode = $field->getSetting('preview');
+    $preview_mode = CommentPreviewMode::from($field->getSetting('preview'));
 
     // Must get the page before we test for fields.
     if ($entity !== NULL) {
@@ -148,26 +156,26 @@ class CommentNonNodeTest extends BrowserTestBase {
       $edit += $contact;
     }
     switch ($preview_mode) {
-      case DRUPAL_REQUIRED:
+      case CommentPreviewMode::Required:
         // Preview required so no save button should be found.
         $this->assertSession()->buttonNotExists('Save');
         $this->submitForm($edit, 'Preview');
         // Don't break here so that we can test post-preview field presence and
         // function below.
-      case DRUPAL_OPTIONAL:
+      case CommentPreviewMode::Optional:
         $this->assertSession()->buttonExists('Preview');
         $this->assertSession()->buttonExists('Save');
         $this->submitForm($edit, 'Save');
         break;
 
-      case DRUPAL_DISABLED:
+      case CommentPreviewMode::Disabled:
         $this->assertSession()->buttonNotExists('Preview');
         $this->assertSession()->buttonExists('Save');
         $this->submitForm($edit, 'Save');
         break;
     }
     $match = [];
-    // Get comment ID
+    // Get comment ID.
     preg_match('/#comment-([0-9]+)/', $this->getURL(), $match);
 
     // Get comment.
@@ -203,7 +211,7 @@ class CommentNonNodeTest extends BrowserTestBase {
       $regex .= $comment->comment_body->value . '(.*?)';
       $regex .= '/s';
 
-      return (boolean) preg_match($regex, $this->getSession()->getPage()->getContent());
+      return (bool) preg_match($regex, $this->getSession()->getPage()->getContent());
     }
     else {
       return FALSE;
@@ -216,7 +224,7 @@ class CommentNonNodeTest extends BrowserTestBase {
    * @return bool
    *   Contact info is available.
    */
-  public function commentContactInfoAvailable() {
+  public function commentContactInfoAvailable(): bool {
     return (bool) preg_match('/(input).*?(name="name").*?(input).*?(name="mail").*?(input).*?(name="homepage")/s', $this->getSession()->getPage()->getContent());
   }
 
@@ -230,7 +238,7 @@ class CommentNonNodeTest extends BrowserTestBase {
    * @param bool $approval
    *   Operation is found on approval page.
    */
-  public function performCommentOperation($comment, $operation, $approval = FALSE) {
+  public function performCommentOperation($comment, $operation, $approval = FALSE): void {
     $edit = [];
     $edit['operation'] = $operation;
     $edit['comments[' . $comment->id() . ']'] = TRUE;
@@ -255,7 +263,7 @@ class CommentNonNodeTest extends BrowserTestBase {
    * @return int
    *   Comment ID.
    */
-  public function getUnapprovedComment($subject) {
+  public function getUnapprovedComment(string $subject): string {
     $this->drupalGet('admin/content/comment/approval');
     preg_match('/href="(.*?)#comment-([^"]+)"(.*?)>(' . $subject . ')/', $this->getSession()->getPage()->getContent(), $match);
 
@@ -265,7 +273,7 @@ class CommentNonNodeTest extends BrowserTestBase {
   /**
    * Tests anonymous comment functionality.
    */
-  public function testCommentFunctionality() {
+  public function testCommentFunctionality(): void {
     $limited_user = $this->drupalCreateUser([
       'administer entity_test fields',
     ]);
@@ -418,15 +426,15 @@ class CommentNonNodeTest extends BrowserTestBase {
     $this->assertSession()->checkboxChecked('edit-default-value-input-comment-0-status-2');
     // Test comment option change in field settings.
     $edit = [
-      'default_value_input[comment][0][status]' => CommentItemInterface::CLOSED,
-      'settings[anonymous]' => CommentInterface::ANONYMOUS_MAY_CONTACT,
+      'default_value_input[comment][0][status]' => CommentingStatus::Closed->value,
+      'settings[anonymous]' => AnonymousContact::Allowed->value,
     ];
     $this->submitForm($edit, 'Save settings');
     $this->drupalGet('entity_test/structure/entity_test/fields/entity_test.entity_test.comment');
     $this->assertSession()->checkboxNotChecked('edit-default-value-input-comment-0-status-0');
     $this->assertSession()->checkboxChecked('edit-default-value-input-comment-0-status-1');
     $this->assertSession()->checkboxNotChecked('edit-default-value-input-comment-0-status-2');
-    $this->assertSession()->fieldValueEquals('settings[anonymous]', CommentInterface::ANONYMOUS_MAY_CONTACT);
+    $this->assertSession()->fieldValueEquals('settings[anonymous]', AnonymousContact::Allowed->value);
 
     // Add a new comment-type.
     $bundle = CommentType::create([
@@ -490,9 +498,9 @@ class CommentNonNodeTest extends BrowserTestBase {
   /**
    * Tests comment fields cannot be added to entity types without integer IDs.
    */
-  public function testsNonIntegerIdEntities() {
+  public function testsNonIntegerIdEntities(): void {
     // Create a bundle for entity_test_string_id.
-    entity_test_create_bundle('entity_test', 'Entity Test', 'entity_test_string_id');
+    EntityTestHelper::createBundle('entity_test', 'Entity Test', 'entity_test_string_id');
     $limited_user = $this->drupalCreateUser([
       'administer entity_test_string_id fields',
       'administer comment types',
@@ -501,9 +509,9 @@ class CommentNonNodeTest extends BrowserTestBase {
     // Visit the Field UI field add page.
     $this->drupalGet('entity_test_string_id/structure/entity_test/fields/add-field');
     // Ensure field isn't shown for string IDs.
-    $this->assertSession()->elementNotExists('css', "[name='new_storage_type'][value='comment']");
+    $this->assertSession()->elementNotExists('xpath', "//a//span[text()='Comments']");
     // Ensure a core field type shown.
-    $this->assertSession()->elementExists('css', "[name='new_storage_type'][value='boolean']");
+    $this->assertSession()->elementExists('xpath', "//a//span[text()='Boolean']");
 
     // Attempt to add a comment-type referencing this entity-type.
     $this->drupalGet('admin/structure/comment/types/add');
@@ -511,22 +519,22 @@ class CommentNonNodeTest extends BrowserTestBase {
     $this->assertSession()->responseNotContains('Test entity with string_id');
 
     // Create a bundle for entity_test_no_id.
-    entity_test_create_bundle('entity_test', 'Entity Test', 'entity_test_no_id');
+    EntityTestHelper::createBundle('entity_test', 'Entity Test', 'entity_test_no_id');
     $this->drupalLogin($this->drupalCreateUser([
       'administer entity_test_no_id fields',
     ]));
     // Visit the Field UI field add page.
     $this->drupalGet('entity_test_no_id/structure/entity_test/fields/add-field');
     // Ensure field isn't shown for empty IDs.
-    $this->assertSession()->elementNotExists('css', "[name='new_storage_type'][value='comment']");
+    $this->assertSession()->elementNotExists('xpath', "//a//span[text()='Comments']");
     // Ensure a core field type shown.
-    $this->assertSession()->elementExists('css', "[name='new_storage_type'][value='boolean']");
+    $this->assertSession()->elementExists('xpath', "//a//span[text()='Boolean']");
   }
 
   /**
    * Ensures that comment settings are not required.
    */
-  public function testCommentSettingsNotRequired() {
+  public function testCommentSettingsNotRequired(): void {
     $limited_user = $this->drupalCreateUser([
       'administer entity_test fields',
     ]);
@@ -535,8 +543,8 @@ class CommentNonNodeTest extends BrowserTestBase {
 
     // Change the comments to be displayed as hidden by default.
     $edit = [
-      'default_value_input[comment][0][status]' => CommentItemInterface::HIDDEN,
-      'settings[anonymous]' => CommentInterface::ANONYMOUS_MAY_CONTACT,
+      'default_value_input[comment][0][status]' => CommentingStatus::Hidden->value,
+      'settings[anonymous]' => AnonymousContact::Allowed->value,
     ];
     $this->submitForm($edit, 'Save settings');
 

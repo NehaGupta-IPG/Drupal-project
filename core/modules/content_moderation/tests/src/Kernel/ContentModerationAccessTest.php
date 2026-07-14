@@ -12,12 +12,14 @@ use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\user\Entity\Role;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests content moderation access.
- *
- * @group content_moderation
  */
+#[Group('content_moderation')]
+#[RunTestsInSeparateProcesses]
 class ContentModerationAccessTest extends KernelTestBase {
 
   use NodeCreationTrait;
@@ -62,7 +64,7 @@ class ContentModerationAccessTest extends KernelTestBase {
   /**
    * Tests access cacheability.
    */
-  public function testAccessCacheability() {
+  public function testAccessCacheability(): void {
     $node = $this->createNode(['type' => 'page']);
 
     /** @var \Drupal\user\RoleInterface $authenticated */

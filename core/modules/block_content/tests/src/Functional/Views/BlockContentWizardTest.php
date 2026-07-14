@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\block_content\Functional\Views;
 
 use Drupal\Tests\block_content\Functional\BlockContentTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests block_content wizard and generic entity integration.
- *
- * @group block_content
  */
+#[Group('block_content')]
+#[RunTestsInSeparateProcesses]
 class BlockContentWizardTest extends BlockContentTestBase {
 
   /**
@@ -34,7 +36,7 @@ class BlockContentWizardTest extends BlockContentTestBase {
   /**
    * Tests creating a 'block_content' entity view.
    */
-  public function testViewAddBlockContent() {
+  public function testViewAddBlockContent(): void {
     $view = [];
     $view['label'] = $this->randomMachineName(16);
     $view['id'] = $this->randomMachineName(16);

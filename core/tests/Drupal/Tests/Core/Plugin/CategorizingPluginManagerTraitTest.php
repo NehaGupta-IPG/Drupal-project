@@ -11,12 +11,16 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\CategorizingPluginManagerTrait;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\Core\Plugin\CategorizingPluginManagerTrait
- * @group Plugin
- * @runTestsInSeparateProcesses
+ * Tests Drupal\Core\Plugin\CategorizingPluginManagerTrait.
  */
+#[CoversClass(CategorizingPluginManagerTrait::class)]
+#[Group('Plugin')]
+#[RunTestsInSeparateProcesses]
 class CategorizingPluginManagerTraitTest extends UnitTestCase {
 
   /**
@@ -32,14 +36,14 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $module_handler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
-    $module_handler->expects($this->any())
+    $module_handler = $this->createStub(ModuleHandlerInterface::class);
+    $module_handler
       ->method('getModuleList')
       ->willReturn(['node' => []]);
-    $module_extension_list = $this->createMock(ModuleExtensionList::class);
-    $module_extension_list->expects($this->any())
+    $module_extension_list = $this->createStub(ModuleExtensionList::class);
+    $module_extension_list
       ->method('getName')
-      ->willReturnCallback(function ($argument) {
+      ->willReturnCallback(function ($argument): string {
         if ($argument == 'node') {
           return 'Node';
         }
@@ -50,9 +54,9 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getCategories
+   * Tests get categories.
    */
-  public function testGetCategories() {
+  public function testGetCategories(): void {
     $this->assertSame([
       'fruits',
       'vegetables',
@@ -60,17 +64,17 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getSortedDefinitions
+   * Tests get sorted definitions.
    */
-  public function testGetSortedDefinitions() {
+  public function testGetSortedDefinitions(): void {
     $sorted = $this->pluginManager->getSortedDefinitions();
     $this->assertSame(['apple', 'mango', 'cucumber'], array_keys($sorted));
   }
 
   /**
-   * @covers ::getGroupedDefinitions
+   * Tests get grouped definitions.
    */
-  public function testGetGroupedDefinitions() {
+  public function testGetGroupedDefinitions(): void {
     $grouped = $this->pluginManager->getGroupedDefinitions();
     $this->assertSame(['fruits', 'vegetables'], array_keys($grouped));
     $this->assertSame(['apple', 'mango'], array_keys($grouped['fruits']));
@@ -78,9 +82,9 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::processDefinitionCategory
+   * Tests process definition category.
    */
-  public function testProcessDefinitionCategory() {
+  public function testProcessDefinitionCategory(): void {
     // Existing category.
     $definition = [
       'label' => 'some',
@@ -134,7 +138,7 @@ class CategorizingPluginManager extends DefaultPluginManager implements Categori
    *
    * Provides some test definitions to the trait.
    */
-  public function getDefinitions() {
+  public function getDefinitions(): array {
     return [
       'cucumber' => [
         'label' => 'cucumber',
@@ -154,7 +158,7 @@ class CategorizingPluginManager extends DefaultPluginManager implements Categori
   /**
    * {@inheritdoc}
    */
-  public function processDefinition(&$definition, $plugin_id) {
+  public function processDefinition(&$definition, $plugin_id): void {
     parent::processDefinition($definition, $plugin_id);
     $this->processDefinitionCategory($definition);
   }

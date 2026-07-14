@@ -5,22 +5,23 @@ declare(strict_types=1);
 namespace Drupal\Tests\update\Functional;
 
 use Drupal\Core\Url;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests edge cases of the Available Updates report UI.
  *
  * For example, manually checking for updates, recovering from problems
  * connecting to the release history server, clearing the disk cache, and more.
- *
- * @group update
- * @group #slow
  */
+#[Group('update')]
+#[RunTestsInSeparateProcesses]
 class UpdateSemverCoreTest extends UpdateSemverCoreTestBase {
 
   /**
    * Ensures proper results where there are date mismatches among modules.
    */
-  public function testDatestampMismatch() {
+  public function testDatestampMismatch(): void {
     $this->mockInstalledExtensionsInfo([
       'block' => [
         // This is 2001-09-09 01:46:40 GMT, so test for "2001-Sep-".
@@ -40,9 +41,9 @@ class UpdateSemverCoreTest extends UpdateSemverCoreTestBase {
   }
 
   /**
-   * Tests the Update Manager module when the update server returns 503 errors.
+   * Tests the Update Status module when the update server returns 503 errors.
    */
-  public function testServiceUnavailable() {
+  public function testServiceUnavailable(): void {
     $this->refreshUpdateStatus([], '503-error');
     // Ensure that no "Warning: SimpleXMLElement..." parse errors are found.
     $this->assertSession()->pageTextNotContains('SimpleXMLElement');
@@ -52,7 +53,7 @@ class UpdateSemverCoreTest extends UpdateSemverCoreTestBase {
   /**
    * Tests that exactly one fetch task per project is created and not more.
    */
-  public function testFetchTasks() {
+  public function testFetchTasks(): void {
     $project_a = [
       'name' => 'aaa_update_test',
     ];
@@ -83,7 +84,7 @@ class UpdateSemverCoreTest extends UpdateSemverCoreTestBase {
    *  - drupal.sec.8.0.2.xml
    *     'supported_branches' is '8.0.,8.1.'.
    */
-  public function testBrokenThenFixedUpdates() {
+  public function testBrokenThenFixedUpdates(): void {
     $this->drupalLogin($this->drupalCreateUser([
       'administer site configuration',
       'view update notifications',
@@ -115,9 +116,56 @@ class UpdateSemverCoreTest extends UpdateSemverCoreTestBase {
   }
 
   /**
+   * Tests the available link appears to users with the right permissions.
+   */
+  public function testAvailableUpdateLink(): void {
+    // Test that a user with the correct permissions is shown the available
+    // updates link.
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer site configuration',
+      'view update notifications',
+      'administer themes',
+      'access administration pages',
+    ]));
+
+    $this->setProjectInstalledVersion('8.0.0');
+    // Instead of using refreshUpdateStatus(), set these manually.
+    $this->config('update.settings')
+      ->set('fetch.url', Url::fromRoute('update_test.update_test')
+        ->setAbsolute()
+        ->toString())
+      ->save();
+    // Use update XML that has no information to simulate a broken response from
+    // the update server.
+    $this->config('update_test.settings')
+      ->set('xml_map', ['drupal' => 'broken'])
+      ->save();
+
+    // This will retrieve broken updates.
+    $this->cronRun();
+
+    $this->drupalGet('admin/appearance');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->linkExists('available updates');
+
+    // Test that a user without the correct permissions is not shown the
+    // available updates link.
+    $this->drupalLogin($this->drupalCreateUser([
+      'view update notifications',
+      'administer themes',
+      'access administration pages',
+    ]));
+
+    $this->drupalGet('admin/appearance');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->linkNotExists('available updates');
+    $this->assertSession()->pageTextContains('available updates');
+  }
+
+  /**
    * Tests when a dev release does not have a date.
    */
-  public function testDevNoReleaseDate() {
+  public function testDevNoReleaseDate(): void {
     $this->setProjectInstalledVersion('8.0.x-dev');
     $this->refreshUpdateStatus([$this->updateProject => 'dev-no-date']);
   }

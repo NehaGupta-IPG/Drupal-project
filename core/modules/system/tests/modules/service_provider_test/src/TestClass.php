@@ -1,15 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\service_provider_test;
 
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\DestructableInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
+/**
+ * Handles kernel events for request and response.
+ */
 class TestClass implements EventSubscriberInterface, DestructableInterface {
+
+  use StringTranslationTrait;
 
   /**
    * The state keyvalue collection.
@@ -31,14 +39,14 @@ class TestClass implements EventSubscriberInterface, DestructableInterface {
   /**
    * A simple kernel listener method.
    */
-  public function onKernelRequestTest(RequestEvent $event) {
-    \Drupal::messenger()->addStatus(t('The service_provider_test event subscriber fired!'));
+  public function onKernelRequestTest(RequestEvent $event): void {
+    \Drupal::messenger()->addStatus($this->t('The service_provider_test event subscriber fired!'));
   }
 
   /**
    * Flags the response in case a rebuild indicator is used.
    */
-  public function onKernelResponseTest(ResponseEvent $event) {
+  public function onKernelResponseTest(ResponseEvent $event): void {
     $container = \Drupal::getContainer();
     if ($container->hasParameter('container_rebuild_indicator')) {
       $event->getResponse()->headers->set('container_rebuild_indicator', $container->getParameter('container_rebuild_indicator'));
@@ -63,7 +71,7 @@ class TestClass implements EventSubscriberInterface, DestructableInterface {
   /**
    * {@inheritdoc}
    */
-  public function destruct() {
+  public function destruct(): void {
     $this->state->set('service_provider_test.destructed', TRUE);
   }
 

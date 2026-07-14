@@ -2,6 +2,7 @@
 
 namespace Drupal\menu_ui;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Url;
@@ -17,26 +18,15 @@ class MenuListBuilder extends ConfigEntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  protected function getEntityIds() {
-    $query = $this
-      ->getStorage()
-      ->getQuery()
-      ->sort('label', 'ASC');
-
-    // Only add the pager if a limit is specified.
-    if ($this->limit) {
-      $query->pager($this->limit);
-    }
-    return $query->execute();
-  }
+  protected const SORT_KEY = 'label';
 
   /**
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header['title'] = t('Title');
+    $header['title'] = $this->t('Title');
     $header['description'] = [
-      'data' => t('Description'),
+      'data' => $this->t('Description'),
       'class' => [RESPONSIVE_PRIORITY_MEDIUM],
     ];
     return $header + parent::buildHeader();
@@ -57,13 +47,13 @@ class MenuListBuilder extends ConfigEntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  public function getDefaultOperations(EntityInterface $entity) {
-    $operations = parent::getDefaultOperations($entity);
+  protected function getDefaultOperations(EntityInterface $entity, CacheableMetadata $cacheability) {
+    $operations = parent::getDefaultOperations($entity, $cacheability);
 
     if (isset($operations['edit'])) {
-      $operations['edit']['title'] = t('Edit menu');
+      $operations['edit']['title'] = $this->t('Edit menu');
       $operations['add'] = [
-        'title' => t('Add link'),
+        'title' => $this->t('Add link'),
         'weight' => 20,
         'url' => $entity->toUrl('add-link-form'),
         'query' => [
@@ -72,7 +62,7 @@ class MenuListBuilder extends ConfigEntityListBuilder {
       ];
     }
     if (isset($operations['delete'])) {
-      $operations['delete']['title'] = t('Delete menu');
+      $operations['delete']['title'] = $this->t('Delete menu');
     }
     return $operations;
   }

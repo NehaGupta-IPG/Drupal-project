@@ -6,22 +6,26 @@ namespace Drupal\Tests\Core\Plugin\Context;
 
 use Drupal\Component\Plugin\Context\ContextDefinitionInterface;
 use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\TypedData\ListDataDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\UsesClass;
 
 /**
  * Tests the ContextDefinition class.
- *
- * @group Plugin
- *
- * @coversDefaultClass \Drupal\Core\Plugin\Context\ContextDefinition
  */
+#[CoversClass(ContextDefinition::class)]
+#[Group('Plugin')]
+#[UsesClass(\Drupal::class)]
 class ContextDefinitionTest extends UnitTestCase {
 
   /**
    * Very simple data provider.
    */
-  public static function providerGetDataDefinition() {
+  public static function providerGetDataDefinition(): array {
     return [
       [TRUE],
       [FALSE],
@@ -29,11 +33,10 @@ class ContextDefinitionTest extends UnitTestCase {
   }
 
   /**
-   * @dataProvider providerGetDataDefinition
-   * @covers ::getDataDefinition
-   * @uses \Drupal
+   * Tests get data definition.
    */
-  public function testGetDataDefinition($is_multiple) {
+  #[DataProvider('providerGetDataDefinition')]
+  public function testGetDataDefinition(bool $is_multiple): void {
     $data_type = 'valid';
     $mock_data_definition = $this->createMock(ContextDefinitionInterface::class);
     $mock_data_definition->expects($this->once())
@@ -102,15 +105,13 @@ class ContextDefinitionTest extends UnitTestCase {
   }
 
   /**
-   * @dataProvider providerGetDataDefinition
-   * @covers ::getDataDefinition
-   * @uses \Drupal
+   * Tests get data definition invalid type.
    */
-  public function testGetDataDefinitionInvalidType($is_multiple) {
+  #[DataProvider('providerGetDataDefinition')]
+  public function testGetDataDefinitionInvalidType(bool $is_multiple): void {
     // Since we're trying to make getDataDefinition() throw an exception in
     // isolation, we use a data type which is not valid.
     $data_type = 'not_valid';
-    $mock_data_definition = $this->createMock('\Drupal\Core\TypedData\ListDataDefinitionInterface');
 
     // Follow code paths for both multiple and non-multiple definitions.
     $create_definition_method = 'createDataDefinition';
@@ -124,7 +125,7 @@ class ContextDefinitionTest extends UnitTestCase {
       ->method($create_definition_method)
       ->willReturnMap([
         ['not_valid', NULL],
-        ['valid', $mock_data_definition],
+        ['valid', $this->createStub(ListDataDefinitionInterface::class)],
       ]);
 
     // Mock a ContextDefinition object with expectations for only the methods
@@ -154,7 +155,7 @@ class ContextDefinitionTest extends UnitTestCase {
   /**
    * Data provider for testGetConstraint.
    */
-  public static function providerGetConstraint() {
+  public static function providerGetConstraint(): array {
     return [
       [NULL, [], 'nonexistent_constraint_name'],
       [
@@ -168,11 +169,10 @@ class ContextDefinitionTest extends UnitTestCase {
   }
 
   /**
-   * @dataProvider providerGetConstraint
-   * @covers ::getConstraint
-   * @uses \Drupal
+   * Tests get constraint.
    */
-  public function testGetConstraint($expected, $constraint_array, $constraint) {
+  #[DataProvider('providerGetConstraint')]
+  public function testGetConstraint(?string $expected, array $constraint_array, string $constraint): void {
     $mock_context_definition = $this->getMockBuilder('Drupal\Core\Plugin\Context\ContextDefinition')
       ->disableOriginalConstructor()
       ->onlyMethods([
@@ -187,10 +187,12 @@ class ContextDefinitionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getDefaultValue
-   * @covers ::setDefaultValue
+   * Tests default value.
+   *
+   * @legacy-covers ::getDefaultValue
+   * @legacy-covers ::setDefaultValue
    */
-  public function testDefaultValue() {
+  public function testDefaultValue(): void {
     $context_definition = new ContextDefinition();
     $this->assertNull($context_definition->getDefaultValue());
     $context_definition->setDefaultValue('test');

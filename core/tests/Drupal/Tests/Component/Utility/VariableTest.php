@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\Utility;
 
 use Drupal\Component\Utility\Variable;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Test variable export functionality in Variable component.
- *
- * @group Variable
- * @group Utility
- *
- * @coversDefaultClass \Drupal\Component\Utility\Variable
  */
+#[CoversClass(Variable::class)]
+#[Group('Variable')]
+#[Group('Utility')]
 class VariableTest extends TestCase {
 
   /**
@@ -35,7 +36,7 @@ class VariableTest extends TestCase {
         "$mock::fake",
       ],
       'closure' => [
-        function () {
+        function (): null {
           return NULL;
         },
         '[closure]',
@@ -74,12 +75,9 @@ class VariableTest extends TestCase {
    *   A callable.
    * @param string $expected_name
    *   The expected human-readable name of the callable.
-   *
-   * @dataProvider providerCallableToString
-   *
-   * @covers ::callableToString
    */
-  public function testCallableToString($callable, string $expected_name): void {
+  #[DataProvider('providerCallableToString')]
+  public function testCallableToString(string|\Closure|\stdClass|bool|array $callable, string $expected_name): void {
     $this->assertSame($expected_name, Variable::callableToString($callable));
   }
 
@@ -91,21 +89,21 @@ class VariableTest extends TestCase {
    *     - The expected export string.
    *     - The variable to export.
    */
-  public static function providerTestExport() {
+  public static function providerTestExport(): array {
     return [
       // Array.
       [
-        'array()',
+        '[]',
         [],
       ],
       [
         // non-associative.
-        "array(\n  1,\n  2,\n  3,\n  4,\n)",
+        "[\n  1,\n  2,\n  3,\n  4,\n]",
         [1, 2, 3, 4],
       ],
       [
         // associative.
-        "array(\n  'a' => 1,\n)",
+        "[\n  'a' => 1,\n]",
         ['a' => 1],
       ],
       // Bool.
@@ -132,12 +130,12 @@ class VariableTest extends TestCase {
         '\\',
       ],
       [
-        // Double-quote "
+        // Double-quote ".
         "'\"'",
         "\"",
       ],
       [
-        // Single-quote '
+        // Single-quote '.
         '"\'"',
         "'",
       ],
@@ -149,15 +147,11 @@ class VariableTest extends TestCase {
       // Object.
       [
         // A stdClass object.
-        '(object) array()',
+        '(object) []',
         new \stdClass(),
       ],
       [
-        // A not-stdClass object. Since PHP 8.2 exported namespace is prefixed,
-        // see https://github.com/php/php-src/pull/8233 for reasons.
-        PHP_VERSION_ID >= 80200 ?
-        "\Drupal\Tests\Component\Utility\StubVariableTestClass::__set_state(array(\n))" :
-        "Drupal\Tests\Component\Utility\StubVariableTestClass::__set_state(array(\n))",
+        "\Drupal\Tests\Component\Utility\StubVariableTestClass::__set_state(array(\n))",
         new StubVariableTestClass(),
       ],
     ];
@@ -166,20 +160,21 @@ class VariableTest extends TestCase {
   /**
    * Tests exporting variables.
    *
-   * @dataProvider providerTestExport
-   * @covers ::export
-   *
    * @param string $expected
    *   The expected exported variable.
    * @param mixed $variable
    *   The variable to be exported.
    */
-  public function testExport($expected, $variable) {
+  #[DataProvider('providerTestExport')]
+  public function testExport(string $expected, bool|string|\stdClass|StubVariableTestClass|array $variable): void {
     $this->assertEquals($expected, Variable::export($variable));
   }
 
 }
 
+/**
+ * A class for testing Variable::callableToString().
+ */
 class VariableTestMock {
 
   /**

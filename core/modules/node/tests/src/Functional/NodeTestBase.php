@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Functional;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\BrowserTestBase;
@@ -15,9 +14,7 @@ use Drupal\Tests\BrowserTestBase;
 abstract class NodeTestBase extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'datetime'];
 
@@ -61,7 +58,7 @@ abstract class NodeTestBase extends BrowserTestBase {
    *
    * @internal
    */
-  public function assertNodeAccess(array $ops, NodeInterface $node, AccountInterface $account) {
+  public function assertNodeAccess(array $ops, NodeInterface $node, AccountInterface $account): void {
     foreach ($ops as $op => $result) {
       $this->assertEquals($this->accessHandler->access($node, $op, $account), $result, $this->nodeAccessAssertMessage($op, $result, $node->language()->getId()));
     }
@@ -82,7 +79,7 @@ abstract class NodeTestBase extends BrowserTestBase {
    *
    * @internal
    */
-  public function assertNodeCreateAccess(string $bundle, bool $result, AccountInterface $account, ?string $langcode = NULL) {
+  public function assertNodeCreateAccess(string $bundle, bool $result, AccountInterface $account, ?string $langcode = NULL): void {
     $this->assertEquals($this->accessHandler->createAccess($bundle, $account, ['langcode' => $langcode]), $result, $this->nodeAccessAssertMessage('create', $result, $langcode));
   }
 
@@ -102,14 +99,9 @@ abstract class NodeTestBase extends BrowserTestBase {
    *   about the node access permission test that was performed.
    */
   public function nodeAccessAssertMessage($operation, $result, $langcode = NULL) {
-    return new FormattableMarkup(
-      'Node access returns @result with operation %op, language code %langcode.',
-      [
-        '@result' => $result ? 'true' : 'false',
-        '%op' => $operation,
-        '%langcode' => !empty($langcode) ? $langcode : 'empty',
-      ]
-    );
+    $result = $result ? 'true' : 'false';
+    $langcode = !empty($langcode) ? $langcode : 'empty';
+    return "Node access returns $result with operation $operation, language code $langcode.";
   }
 
 }

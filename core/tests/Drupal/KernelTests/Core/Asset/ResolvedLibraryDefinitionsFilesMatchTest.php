@@ -6,6 +6,9 @@ namespace Drupal\KernelTests\Core\Asset;
 
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that the asset files for all core libraries exist.
@@ -13,9 +16,9 @@ use Drupal\KernelTests\KernelTestBase;
  * This test also changes the active theme to each core theme to verify
  * the libraries after theme-level libraries-override and libraries-extend are
  * applied.
- *
- * @group Asset
  */
+#[Group('Asset')]
+#[RunTestsInSeparateProcesses]
 class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
 
   /**
@@ -64,7 +67,6 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
   protected $allThemes = [
     'claro',
     'olivero',
-    'stable9',
     'stark',
   ];
 
@@ -98,9 +100,25 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installConfig('system');
+
+    // Install all core themes.
+    sort($this->allThemes);
+    $this->container->get('theme_installer')->install($this->allThemes);
+
+    $this->themeHandler = $this->container->get('theme_handler');
+    $this->themeInitialization = $this->container->get('theme.initialization');
+    $this->themeManager = $this->container->get('theme.manager');
+    $this->libraryDiscovery = $this->container->get('library.discovery');
+  }
+
+  /**
+   * Ensures that all core module and theme library files exist.
+   */
+  public function testCoreLibraryCompleteness(): void {
     // Enable all core modules.
     $all_modules = $this->container->get('extension.list.module')->getList();
-    $all_modules = array_filter($all_modules, function ($module) {
+    $all_modules = array_filter($all_modules, function ($module): bool {
       // Filter contrib, hidden, already enabled modules and modules in the
       // Testing package.
       if ($module->origin !== 'core'
@@ -108,7 +126,8 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
         || $module->status == TRUE
         || $module->info['package'] == 'Testing'
         || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::EXPERIMENTAL
-        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED) {
+        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED
+        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::OBSOLETE) {
         return FALSE;
       }
       return TRUE;
@@ -140,21 +159,36 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
     }
     sort($this->allModules);
     $this->container->get('module_installer')->install($this->allModules);
-
-    // Install all core themes.
-    sort($this->allThemes);
-    $this->container->get('theme_installer')->install($this->allThemes);
-
-    $this->themeHandler = $this->container->get('theme_handler');
-    $this->themeInitialization = $this->container->get('theme.initialization');
-    $this->themeManager = $this->container->get('theme.manager');
+    // Get a library discovery from the new container.
     $this->libraryDiscovery = $this->container->get('library.discovery');
+
+    $this->assertLibraries();
   }
 
   /**
-   * Ensures that all core module and theme library files exist.
+   * Ensures that module and theme library files exist for a deprecated modules.
    */
-  public function testCoreLibraryCompleteness() {
+  #[IgnoreDeprecations]
+  public function testCoreLibraryCompletenessDeprecated(): void {
+    // Find and install deprecated modules to test.
+    $all_modules = $this->container->get('extension.list.module')->getList();
+    $deprecated_modules_to_test = array_filter($all_modules, function ($module) {
+      if ($module->origin == 'core'
+        && $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED) {
+        return TRUE;
+      }
+    });
+    $this->container->get('module_installer')->install(array_keys($deprecated_modules_to_test));
+    $this->libraryDiscovery = $this->container->get('library.discovery');
+    $this->allModules = array_keys(\Drupal::moduleHandler()->getModuleList());
+
+    $this->assertLibraries();
+  }
+
+  /**
+   * Asserts the libraries for modules and themes exist.
+   */
+  public function assertLibraries(): void {
     // First verify all libraries with no active theme.
     $this->verifyLibraryFilesExist($this->getAllLibraries());
 
@@ -163,7 +197,7 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
     // and these changes are only applied for the active theme.
     foreach ($this->allThemes as $theme) {
       $this->themeManager->setActiveTheme($this->themeInitialization->getActiveThemeByName($theme));
-      $this->libraryDiscovery->clearCachedDefinitions();
+      $this->libraryDiscovery->clear();
 
       $this->verifyLibraryFilesExist($this->getAllLibraries());
     }
@@ -172,11 +206,11 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
   /**
    * Checks that all the library files exist.
    *
-   * @param array[] $library_definitions
+   * @param array<\Drupal\Core\Extension\Extension> $library_definitions
    *   An array of library definitions, keyed by extension, then by library, and
    *   so on.
    */
-  protected function verifyLibraryFilesExist($library_definitions) {
+  protected function verifyLibraryFilesExist($library_definitions): void {
     foreach ($library_definitions as $extension => $libraries) {
       foreach ($libraries as $library_name => $library) {
         if (in_array("$extension/$library_name", $this->librariesToSkip)) {
@@ -203,6 +237,7 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
    * Gets all libraries for core and all installed modules.
    *
    * @return \Drupal\Core\Extension\Extension[]
+   *   An array of discovered libraries keyed by extension name.
    */
   protected function getAllLibraries() {
     $modules = \Drupal::moduleHandler()->getModuleList();

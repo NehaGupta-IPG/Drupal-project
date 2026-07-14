@@ -8,12 +8,14 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\user\Entity\Role;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the user reference field functionality.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserEntityReferenceTest extends EntityKernelTestBase {
 
   use EntityReferenceFieldCreationTrait;
@@ -56,7 +58,7 @@ class UserEntityReferenceTest extends EntityKernelTestBase {
   /**
    * Tests user selection by roles.
    */
-  public function testUserSelectionByRole() {
+  public function testUserSelectionByRole(): void {
     $field_definition = FieldConfig::loadByName('user', 'user', 'user_reference');
     $handler_settings = $field_definition->getSetting('handler_settings');
     $handler_settings['filter']['role'] = [

@@ -7,17 +7,19 @@ namespace Drupal\Tests\media_library\Functional;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\image\Entity\ImageStyle;
+use Drupal\media\Entity\MediaType;
 use Drupal\media\Plugin\media\Source\File;
 use Drupal\media\Plugin\media\Source\Image;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
-use Drupal\media\Entity\MediaType;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that the Media Library automatically configures form/view modes.
- *
- * @group media_library
  */
+#[Group('media_library')]
+#[RunTestsInSeparateProcesses]
 class MediaLibraryDisplayModeTest extends BrowserTestBase {
 
   use MediaTypeCreationTrait;
@@ -55,7 +57,7 @@ class MediaLibraryDisplayModeTest extends BrowserTestBase {
   /**
    * Tests that the Media Library can automatically configure display modes.
    */
-  public function testDisplayModes() {
+  public function testDisplayModes(): void {
     $this->createMediaType('file', [
       'id' => 'type_one',
     ]);

@@ -8,6 +8,8 @@ use Drupal\Core\Command\DbCommandBase;
 use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Database\Database;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -17,15 +19,15 @@ use Symfony\Component\Console\Tester\CommandTester;
  *
  * The way console application's run it is impossible to test. For now we only
  * test that we are registering the correct commands.
- *
- * @group console
  */
+#[Group('console')]
+#[RunTestsInSeparateProcesses]
 class DbCommandBaseTest extends KernelTestBase {
 
   /**
    * Tests specifying a database key.
    */
-  public function testSpecifyDatabaseKey() {
+  public function testSpecifyDatabaseKey(): void {
     $command = new DbCommandBaseTester();
     $command_tester = new CommandTester($command);
 
@@ -41,7 +43,7 @@ class DbCommandBaseTest extends KernelTestBase {
   /**
    * Invalid database names will throw a useful exception.
    */
-  public function testSpecifyDatabaseDoesNotExist() {
+  public function testSpecifyDatabaseDoesNotExist(): void {
     $command = new DbCommandBaseTester();
     $command_tester = new CommandTester($command);
     $command_tester->execute([
@@ -54,7 +56,7 @@ class DbCommandBaseTest extends KernelTestBase {
   /**
    * Tests supplying database connection as a URL.
    */
-  public function testSpecifyDbUrl() {
+  public function testSpecifyDbUrl(): void {
     $command = new DbCommandBaseTester();
     $command_tester = new CommandTester($command);
     $command_tester->execute([
@@ -72,7 +74,7 @@ class DbCommandBaseTest extends KernelTestBase {
   /**
    * Tests specifying a prefix for different connections.
    */
-  public function testPrefix() {
+  public function testPrefix(): void {
     if (Database::getConnection()->driver() == 'sqlite') {
       $this->markTestSkipped('SQLITE modifies the prefixes so we cannot effectively test it');
     }

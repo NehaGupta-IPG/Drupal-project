@@ -6,19 +6,15 @@ namespace Drupal\Tests\views\Unit\Plugin\area;
 
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\Plugin\views\area\Messages;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\views\Plugin\views\area\Messages
- * @group views
+ * Tests Drupal\views\Plugin\views\area\Messages.
  */
+#[CoversClass(Messages::class)]
+#[Group('views')]
 class MessagesTest extends UnitTestCase {
-
-  /**
-   * The view executable object.
-   *
-   * @var \Drupal\views\ViewExecutable
-   */
-  protected $view;
 
   /**
    * The message handler.
@@ -39,10 +35,10 @@ class MessagesTest extends UnitTestCase {
   /**
    * Tests the render method.
    *
-   * @covers ::defineOptions
-   * @covers ::render
+   * @legacy-covers ::defineOptions
+   * @legacy-covers ::render
    */
-  public function testRender() {
+  public function testRender(): void {
     // The handler is configured to show with empty views by default, so should
     // appear.
     $this->assertSame(['#type' => 'status_messages'], $this->messagesHandler->render());

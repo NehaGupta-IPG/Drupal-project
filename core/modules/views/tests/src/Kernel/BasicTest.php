@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Kernel;
 
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * A basic query test for Views.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class BasicTest extends ViewsKernelTestBase {
 
   /**
@@ -23,7 +25,7 @@ class BasicTest extends ViewsKernelTestBase {
   /**
    * Tests a trivial result set.
    */
-  public function testSimpleResultSet() {
+  public function testSimpleResultSet(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
 
@@ -41,7 +43,7 @@ class BasicTest extends ViewsKernelTestBase {
   /**
    * Tests filtering of the result set.
    */
-  public function testSimpleFiltering() {
+  public function testSimpleFiltering(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
 
@@ -100,8 +102,8 @@ class BasicTest extends ViewsKernelTestBase {
   /**
    * Tests simple argument.
    */
-  public function testSimpleArgument() {
-    // Execute with a view
+  public function testSimpleArgument(): void {
+    // Execute with a view.
     $view = Views::getView('test_simple_argument');
     $view->setArguments([27]);
     $this->executeView($view);

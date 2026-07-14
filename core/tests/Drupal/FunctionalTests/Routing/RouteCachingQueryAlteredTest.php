@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests\Routing;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -12,9 +14,9 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * This happens either in the normal course of operations or due to an
  * exception.
- *
- * @group routing
  */
+#[Group('routing')]
+#[RunTestsInSeparateProcesses]
 class RouteCachingQueryAlteredTest extends BrowserTestBase {
 
   /**
@@ -47,7 +49,7 @@ class RouteCachingQueryAlteredTest extends BrowserTestBase {
   /**
    * Tests route collection cache after an exception.
    */
-  public function testRouteCollectionCacheAfterException() {
+  public function testRouteCollectionCacheAfterException(): void {
     // Force an exception early in the Kernel middleware on a cold cache by
     // simulating bad Bearer authentication.
     $this->drupalGet('/router-test/rejects-query-strings', [], [

@@ -10,12 +10,15 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Tests contextual link display on the front page based on permissions.
- *
- * @group contextual
  */
+#[Group('contextual')]
+#[RunTestsInSeparateProcesses]
 class ContextualDynamicContextTest extends BrowserTestBase {
 
   /**
@@ -45,9 +48,7 @@ class ContextualDynamicContextTest extends BrowserTestBase {
   protected $anonymousUser;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'contextual',
@@ -88,7 +89,7 @@ class ContextualDynamicContextTest extends BrowserTestBase {
    * Ensures that contextual link placeholders always exist, even if the user is
    * not allowed to use contextual links.
    */
-  public function testDifferentPermissions() {
+  public function testDifferentPermissions(): void {
     $this->drupalLogin($this->editorUser);
 
     // Create three nodes in the following order:
@@ -125,7 +126,10 @@ class ContextualDynamicContextTest extends BrowserTestBase {
     $this->assertSame('', $json[$ids[3]]);
 
     // Verify that link language is properly handled.
-    $node3->addTranslation('it')->set('title', $this->randomString())->save();
+    $node3->addTranslation('it', [
+      'title' => $this->randomString(),
+      'promote' => TRUE,
+    ])->save();
     $id = 'node:node=' . $node3->id() . ':changed=' . $node3->getChangedTime() . '&langcode=it';
     $this->drupalGet('node', ['language' => ConfigurableLanguage::createFromLangcode('it')]);
     $this->assertContextualLinkPlaceHolder($id);
@@ -172,7 +176,7 @@ class ContextualDynamicContextTest extends BrowserTestBase {
   /**
    * Tests the contextual placeholder content is protected by a token.
    */
-  public function testTokenProtection() {
+  public function testTokenProtection(): void {
     $this->drupalLogin($this->editorUser);
 
     // Create a node that will have a contextual link.
@@ -244,7 +248,7 @@ class ContextualDynamicContextTest extends BrowserTestBase {
   }
 
   /**
-   * Asserts that a contextual link placeholder with the given id does not exist.
+   * Asserts that a contextual link placeholder with a given id does not exist.
    *
    * @param string $id
    *   A contextual link id.
@@ -266,7 +270,7 @@ class ContextualDynamicContextTest extends BrowserTestBase {
    * @return \Psr\Http\Message\ResponseInterface
    *   The response object.
    */
-  protected function renderContextualLinks($ids, $current_path) {
+  protected function renderContextualLinks($ids, $current_path): ResponseInterface {
     $tokens = array_map([$this, 'createContextualIdToken'], $ids);
     $http_client = $this->getHttpClient();
     $url = Url::fromRoute('contextual.render', [], [

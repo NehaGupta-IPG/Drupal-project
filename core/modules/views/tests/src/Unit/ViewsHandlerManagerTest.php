@@ -4,59 +4,65 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Unit;
 
+use Drupal\Component\Plugin\Factory\FactoryInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Tests\UnitTestCase;
+use Drupal\views\Plugin\views\ViewsHandlerInterface;
 use Drupal\views\Plugin\ViewsHandlerManager;
+use Drupal\views\ViewsData;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests the ViewsHandlerManager class.
- *
- * @group views
- *
- * @coversDefaultClass \Drupal\views\Plugin\ViewsHandlerManager
  */
+#[CoversClass(ViewsHandlerManager::class)]
+#[Group('views')]
 class ViewsHandlerManagerTest extends UnitTestCase {
 
   /**
+   * The views handler manager.
+   *
    * @var \Drupal\views\Plugin\ViewsHandlerManager
    */
   protected $handlerManager;
 
   /**
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The module handler service.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The mocked views data.
    *
-   * @var \Drupal\views\ViewsData|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\ViewsData
    */
   protected $viewsData;
 
   /**
    * The mocked factory.
-   *
-   * @var \Drupal\Component\Plugin\Factory\FactoryInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $factory;
+  protected FactoryInterface&MockObject $factory;
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->viewsData = $this->getMockBuilder('Drupal\views\ViewsData')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $cache_backend = $this->createMock('Drupal\Core\Cache\CacheBackendInterface');
-    $this->moduleHandler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
+    $this->viewsData = $this->createStub(ViewsData::class);
+    $cache_backend = $this->createStub(CacheBackendInterface::class);
+    $this->moduleHandler = $this->createStub(ModuleHandlerInterface::class);
     $this->handlerManager = new ViewsHandlerManager('test', new \ArrayObject([]), $this->viewsData, $cache_backend, $this->moduleHandler);
   }
 
   /**
    * Setups of the plugin factory.
    */
-  protected function setupMockedFactory() {
+  protected function setupMockedFactory(): void {
     $this->factory = $this->createMock('Drupal\Component\Plugin\Factory\FactoryInterface');
 
     $reflection = new \ReflectionClass($this->handlerManager);
@@ -65,12 +71,32 @@ class ViewsHandlerManagerTest extends UnitTestCase {
   }
 
   /**
+   * Reinitializes the module handler as a mock object.
+   */
+  protected function setUpMockModuleHandler(): void {
+    $this->moduleHandler = $this->createMock(ModuleHandlerInterface::class);
+    $reflection = new \ReflectionProperty($this->handlerManager, 'moduleHandler');
+    $reflection->setValue($this->handlerManager, $this->moduleHandler);
+  }
+
+  /**
+   * Reinitializes the views data as a mock object.
+   */
+  protected function setUpMockViewsData(): void {
+    $this->viewsData = $this->createMock(ViewsData::class);
+    $reflection = new \ReflectionProperty($this->handlerManager, 'viewsData');
+    $reflection->setValue($this->handlerManager, $this->viewsData);
+  }
+
+  /**
    * Tests that hook_views_plugins_TYPE_alter() is invoked for a handler type.
    *
-   * @covers ::__construct
-   * @covers ::getDefinitions
+   * @legacy-covers ::__construct
+   * @legacy-covers ::getDefinitions
    */
-  public function testAlterHookInvocation() {
+  public function testAlterHookInvocation(): void {
+    $this->setUpMockModuleHandler();
+
     $this->moduleHandler->expects($this->once())
       ->method('alter')
       ->with('views_plugins_test', []);
@@ -81,8 +107,9 @@ class ViewsHandlerManagerTest extends UnitTestCase {
   /**
    * Tests getHandler() and its base information propagation.
    */
-  public function testGetHandlerBaseInformationPropagation() {
+  public function testGetHandlerBaseInformationPropagation(): void {
     $this->setupMockedFactory();
+    $this->setUpMockViewsData();
 
     $item = [];
     $item['table'] = 'test_table';
@@ -111,7 +138,7 @@ class ViewsHandlerManagerTest extends UnitTestCase {
       'real table' => 'test real table',
       'entity field' => 'test entity field',
     ];
-    $plugin = $this->createMock('Drupal\views\Plugin\views\ViewsHandlerInterface');
+    $plugin = $this->createStub(ViewsHandlerInterface::class);
     $this->factory->expects($this->once())
       ->method('createInstance')
       ->with('test_id', $expected_definition)
@@ -124,8 +151,9 @@ class ViewsHandlerManagerTest extends UnitTestCase {
   /**
    * Tests getHandler() with an override.
    */
-  public function testGetHandlerOverride() {
+  public function testGetHandlerOverride(): void {
     $this->setupMockedFactory();
+    $this->setUpMockViewsData();
 
     $item = [];
     $item['table'] = 'test_table';
@@ -139,7 +167,7 @@ class ViewsHandlerManagerTest extends UnitTestCase {
       ->with('test_table')
       ->willReturn($views_data);
 
-    $plugin = $this->createMock('Drupal\views\Plugin\views\ViewsHandlerInterface');
+    $plugin = $this->createStub(ViewsHandlerInterface::class);
     $this->factory->expects($this->once())
       ->method('createInstance')
       ->with('test_override')
@@ -152,8 +180,9 @@ class ViewsHandlerManagerTest extends UnitTestCase {
   /**
    * Tests getHandler() without an override.
    */
-  public function testGetHandlerNoOverride() {
+  public function testGetHandlerNoOverride(): void {
     $this->setupMockedFactory();
+    $this->setUpMockViewsData();
 
     $item = [];
     $item['table'] = 'test_table';
@@ -167,7 +196,7 @@ class ViewsHandlerManagerTest extends UnitTestCase {
       ->with('test_table')
       ->willReturn($views_data);
 
-    $plugin = $this->createMock('Drupal\views\Plugin\views\ViewsHandlerInterface');
+    $plugin = $this->createStub(ViewsHandlerInterface::class);
     $this->factory->expects($this->once())
       ->method('createInstance')
       ->with('test_id')

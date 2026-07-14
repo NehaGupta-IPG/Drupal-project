@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\navigation;
 
-use Drupal\Core\Security\TrustedCallbackInterface;
+use Drupal\Core\Security\Attribute\TrustedCallback;
 use Drupal\shortcut\ShortcutLazyBuilders;
 
 /**
  * Lazy Builders for Navigation shortcuts links.
  *
- * @internal The navigation module is experimental.
+ * @internal
  * @see \Drupal\shortcut\ShortcutLazyBuilders
  */
-final class ShortcutLazyBuilder implements TrustedCallbackInterface {
+final class ShortcutLazyBuilder {
 
   /**
    * Constructs a ShortcutLazyBuilders object.
@@ -26,13 +26,6 @@ final class ShortcutLazyBuilder implements TrustedCallbackInterface {
   ) {}
 
   /**
-   * {@inheritdoc}
-   */
-  public static function trustedCallbacks() {
-    return ['lazyLinks'];
-  }
-
-  /**
    * The #lazy_builder callback; builds shortcut navigation links.
    *
    * @param string $label
@@ -41,6 +34,7 @@ final class ShortcutLazyBuilder implements TrustedCallbackInterface {
    * @return array
    *   A renderable array of shortcut links.
    */
+  #[TrustedCallback]
   public function lazyLinks(string $label = 'Shortcuts') {
     $shortcut_links = $this->shortcutLazyBuilder->lazyLinks();
 
@@ -53,14 +47,17 @@ final class ShortcutLazyBuilder implements TrustedCallbackInterface {
       [
         'title' => $label,
         'class' => 'shortcuts',
+        'icon' => [
+          'icon_id' => 'shortcuts',
+        ],
         'below' => $shortcut_links['shortcuts']['#links'],
       ],
     ];
 
     return [
-      '#title' => $label,
       '#theme' => 'navigation_menu',
       '#menu_name' => 'shortcuts',
+      '#title' => $label,
       '#items' => $shortcuts_items,
       '#cache' => $shortcut_links['#cache'],
     ];

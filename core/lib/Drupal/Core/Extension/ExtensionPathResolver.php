@@ -17,23 +17,14 @@ class ExtensionPathResolver {
    */
   protected $extensionLists;
 
-  /**
-   * ExtensionPathResolver constructor.
-   *
-   * @param \Drupal\Core\Extension\ModuleExtensionList $module_extension_list
-   *   The module extension list.
-   * @param \Drupal\Core\Extension\ProfileExtensionList $profile_extension_list
-   *   The profile extension list.
-   * @param \Drupal\Core\Extension\ThemeExtensionList $theme_extension_list
-   *   The theme extension list.
-   * @param \Drupal\Core\Extension\ThemeEngineExtensionList $theme_engine_extension_list
-   *   The theme engine extension list.
-   */
-  public function __construct(ModuleExtensionList $module_extension_list, ProfileExtensionList $profile_extension_list, ThemeExtensionList $theme_extension_list, ThemeEngineExtensionList $theme_engine_extension_list) {
+  public function __construct(
+    ModuleExtensionList $module_extension_list,
+    ProfileExtensionList $profile_extension_list,
+    ThemeExtensionList $theme_extension_list,
+  ) {
     $this->extensionLists['module'] = $module_extension_list;
     $this->extensionLists['profile'] = $profile_extension_list;
     $this->extensionLists['theme'] = $theme_extension_list;
-    $this->extensionLists['theme_engine'] = $theme_engine_extension_list;
   }
 
   /**
@@ -57,7 +48,7 @@ class ExtensionPathResolver {
     try {
       return $this->extensionLists[$type]->getPathname($name);
     }
-    catch (UnknownExtensionException $e) {
+    catch (UnknownExtensionException) {
       // Catch the exception. This will result in triggering an error.
       // If the filename is still unknown, create a user-level error message.
       trigger_error(sprintf('The following %s is missing from the file system: %s', $type, $name), E_USER_WARNING);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\block_test\PluginForm;
 
 use Drupal\Core\Form\FormStateInterface;
@@ -25,7 +27,7 @@ class EmptyBlockForm extends PluginFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
     // Intentionally empty.
   }
 

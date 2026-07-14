@@ -7,13 +7,15 @@ namespace Drupal\FunctionalTests\Routing;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests URL generation and routing for route paths with encoded characters.
- *
- * @group path
- * @group routing
  */
+#[Group('path')]
+#[Group('routing')]
+#[RunTestsInSeparateProcesses]
 class PathEncodedTest extends BrowserTestBase {
 
   use PathAliasTestTrait;
@@ -28,7 +30,7 @@ class PathEncodedTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
-  public function testGetEncoded() {
+  public function testGetEncoded(): void {
     $route_paths = [
       'path_encoded_test.colon' => '/hi/llama:party',
       'path_encoded_test.at_sign' => '/blog/@Dries',
@@ -40,7 +42,7 @@ class PathEncodedTest extends BrowserTestBase {
     }
   }
 
-  public function testAliasToEncoded() {
+  public function testAliasToEncoded(): void {
     $route_paths = [
       'path_encoded_test.colon' => '/hi/llama:party',
       'path_encoded_test.at_sign' => '/blog/@Dries',

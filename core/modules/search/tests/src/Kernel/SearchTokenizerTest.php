@@ -6,14 +6,15 @@ namespace Drupal\Tests\search\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\search\SearchTextProcessorInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore bopomofo jamo lisu
-
 /**
  * Tests that CJK tokenizer works as intended.
- *
- * @group search
  */
+#[Group('search')]
+#[RunTestsInSeparateProcesses]
 class SearchTokenizerTest extends KernelTestBase {
 
   /**
@@ -37,7 +38,7 @@ class SearchTokenizerTest extends KernelTestBase {
    * character classes are tokenized properly. See PREG_CLASS_CKJ for more
    * information.
    */
-  public function testTokenizer() {
+  public function testTokenizer(): void {
     // Set the minimum word size to 1 (to split all CJK characters) and make
     // sure CJK tokenizing is turned on.
     $this->config('search.settings')
@@ -122,7 +123,7 @@ class SearchTokenizerTest extends KernelTestBase {
    * This is just a sanity check - it verifies that strings of letters are
    * not tokenized.
    */
-  public function testNoTokenizer() {
+  public function testNoTokenizer(): void {
     // Set the minimum word size to 1 (to split all CJK characters) and make
     // sure CJK tokenizing is turned on.
     $this->config('search.settings')
@@ -145,7 +146,7 @@ class SearchTokenizerTest extends KernelTestBase {
    * function converts a number to the corresponding unicode character. Adapted
    * from functions supplied in comments on several functions on php.net.
    */
-  public function code2utf($num) {
+  public function code2utf($num): string {
     if ($num < 128) {
       return chr($num);
     }

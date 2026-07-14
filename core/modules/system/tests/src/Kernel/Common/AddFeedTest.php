@@ -6,12 +6,14 @@ namespace Drupal\Tests\system\Kernel\Common;
 
 use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Make sure that attaching feeds works correctly with various constructs.
- *
- * @group Common
  */
+#[Group('Common')]
+#[RunTestsInSeparateProcesses]
 class AddFeedTest extends KernelTestBase {
 
   /**
@@ -22,7 +24,7 @@ class AddFeedTest extends KernelTestBase {
   /**
    * Tests attaching feeds with paths, URLs, and titles.
    */
-  public function testBasicFeedAddNoTitle() {
+  public function testBasicFeedAddNoTitle(): void {
     $path = $this->randomMachineName(12);
     $external_url = 'http://' . $this->randomMachineName(12) . '/' . $this->randomMachineName(12);
     $fully_qualified_local_url = Url::fromUri('base:' . $this->randomMachineName(12), ['absolute' => TRUE])->toString();
@@ -69,7 +71,7 @@ class AddFeedTest extends KernelTestBase {
     // Glean the content from the response object.
     $this->setRawContent($response->getContent());
     // Assert that the content contains the RSS links we specified.
-    foreach ($urls as $description => $feed_info) {
+    foreach ($urls as $feed_info) {
       $this->assertPattern($this->urlToRSSLinkPattern($feed_info['url'], $feed_info['title']));
     }
   }
@@ -77,7 +79,7 @@ class AddFeedTest extends KernelTestBase {
   /**
    * Creates a pattern representing the RSS feed in the page.
    */
-  public function urlToRSSLinkPattern($url, $title = '') {
+  public function urlToRSSLinkPattern($url, string $title = ''): string {
     // Escape any regular expression characters in the URL ('?' is the worst).
     $url = preg_replace('/([+?.*])/', '[$0]', $url);
     $generated_pattern = '%<link +href="' . $url . '" +rel="alternate" +title="' . $title . '" +type="application/rss.xml" */>%';
@@ -89,7 +91,7 @@ class AddFeedTest extends KernelTestBase {
    *
    * @see https://www.drupal.org/node/1211668
    */
-  public function testFeedIconEscaping() {
+  public function testFeedIconEscaping(): void {
     $variables = [
       '#theme' => 'feed_icon',
       '#url' => 'node',

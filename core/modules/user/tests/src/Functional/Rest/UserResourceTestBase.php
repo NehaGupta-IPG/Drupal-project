@@ -9,6 +9,9 @@ use Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase;
 use Drupal\user\Entity\User;
 use GuzzleHttp\RequestOptions;
 
+/**
+ * Resource test base for the user entity.
+ */
 abstract class UserResourceTestBase extends EntityResourceTestBase {
 
   /**
@@ -47,6 +50,21 @@ abstract class UserResourceTestBase extends EntityResourceTestBase {
    * {@inheritdoc}
    */
   protected static $secondCreatedEntityId = 5;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    if (in_array($this->name(), ['testPatchDxForSecuritySensitiveBaseFields', 'testPatchSecurityOtherUser'], TRUE)) {
+      if (static::$format === 'xml') {
+        $this->markTestSkipped('Deserialization of the XML format is not supported.');
+      }
+      if (static::$auth === FALSE) {
+        $this->markTestSkipped('The anonymous user is never allowed to modify itself.');
+      }
+    }
+    parent::setUp();
+  }
 
   /**
    * {@inheritdoc}
@@ -147,19 +165,17 @@ abstract class UserResourceTestBase extends EntityResourceTestBase {
   /**
    * Tests PATCHing security-sensitive base fields of the logged in account.
    */
-  public function testPatchDxForSecuritySensitiveBaseFields() {
-    // The anonymous user is never allowed to modify itself.
-    if (!static::$auth) {
-      $this->markTestSkipped();
-    }
-
+  public function testPatchDxForSecuritySensitiveBaseFields(): void {
     $this->initAuthentication();
     $this->provisionEntityResource();
 
     /** @var \Drupal\user\UserInterface $user */
     $user = static::$auth ? $this->account : User::load(0);
     // @todo Remove the array_diff_key() call in https://www.drupal.org/node/2821077.
-    $original_normalization = array_diff_key($this->serializer->normalize($user, static::$format), ['created' => TRUE, 'changed' => TRUE, 'name' => TRUE]);
+    $original_normalization = array_diff_key(
+      $this->serializer->normalize($user, static::$format),
+      ['created' => TRUE, 'changed' => TRUE, 'name' => TRUE],
+    );
 
     // Since this test must be performed by the user that is being modified,
     // we cannot use $this->getUrl().
@@ -263,12 +279,7 @@ abstract class UserResourceTestBase extends EntityResourceTestBase {
   /**
    * Tests PATCHing security-sensitive base fields to change other users.
    */
-  public function testPatchSecurityOtherUser() {
-    // The anonymous user is never allowed to modify other users.
-    if (!static::$auth) {
-      $this->markTestSkipped();
-    }
-
+  public function testPatchSecurityOtherUser(): void {
     $this->initAuthentication();
     $this->provisionEntityResource();
 

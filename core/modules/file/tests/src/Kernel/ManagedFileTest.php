@@ -7,27 +7,29 @@ namespace Drupal\Tests\file\Kernel;
 use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Managed file element test.
  *
- * @group file
- *
  * @see \Drupal\file\Element\ManagedFile
  */
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class ManagedFileTest extends FileManagedUnitTestBase implements FormInterface {
 
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'form_test_managed_file';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['managed_file'] = [
       '#type' => 'managed_file',
     ];
@@ -47,7 +49,7 @@ class ManagedFileTest extends FileManagedUnitTestBase implements FormInterface {
   /**
    * Tests that managed file elements can be programmatically submitted.
    */
-  public function testManagedFileElement() {
+  public function testManagedFileElement(): void {
     $form_state = new FormState();
     $values['managed_file'] = NULL;
     $form_state->setValues($values);

@@ -6,12 +6,14 @@ namespace Drupal\Tests\system\Functional\Module;
 
 use Drupal\module_autoload_test\SomeClass;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests class loading for modules.
- *
- * @group Module
  */
+#[Group('Module')]
+#[RunTestsInSeparateProcesses]
 class ClassLoaderTest extends BrowserTestBase {
 
   /**
@@ -36,7 +38,7 @@ class ClassLoaderTest extends BrowserTestBase {
    *
    * @see \Drupal\module_autoload_test\SomeClass
    */
-  public function testClassLoading() {
+  public function testClassLoading(): void {
     // Enable the module_test and module_autoload_test modules.
     \Drupal::service('module_installer')->install(['module_test', 'module_autoload_test'], FALSE);
     $this->resetAll();
@@ -53,7 +55,7 @@ class ClassLoaderTest extends BrowserTestBase {
    *
    * @see \Drupal\module_autoload_test\SomeClass
    */
-  public function testClassLoadingNotInstalledModules() {
+  public function testClassLoadingNotInstalledModules(): void {
     // Enable the module_test module.
     \Drupal::service('module_installer')->install(['module_test'], FALSE);
     $this->resetAll();
@@ -70,7 +72,7 @@ class ClassLoaderTest extends BrowserTestBase {
    *
    * @see \Drupal\module_autoload_test\SomeClass
    */
-  public function testClassLoadingDisabledModules() {
+  public function testClassLoadingDisabledModules(): void {
     // Enable the module_test and module_autoload_test modules.
     \Drupal::service('module_installer')->install(['module_test', 'module_autoload_test'], FALSE);
     $this->resetAll();
@@ -88,7 +90,7 @@ class ClassLoaderTest extends BrowserTestBase {
   /**
    * Ensures the negative caches in the class loader don't result in crashes.
    */
-  public function testMultipleModules() {
+  public function testMultipleModules(): void {
     $this->drupalLogin($this->drupalCreateUser(['administer modules']));
 
     $edit = [
@@ -104,7 +106,7 @@ class ClassLoaderTest extends BrowserTestBase {
   /**
    * Tests that .module files can use class constants in main section.
    */
-  public function testAutoloadFromModuleFile() {
+  public function testAutoloadFromModuleFile(): void {
     $this->assertFalse(defined('MODULE_AUTOLOAD_TEST_CONSTANT'));
     // Create use with required permissions.
     $this->drupalLogin($this->drupalCreateUser(['administer modules']));
