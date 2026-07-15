@@ -28,7 +28,7 @@ class ConfigTranslationLocalTask extends LocalTaskDefault {
     // storing the title on the plugin definition for the link) because
     // it contains translated parts that we need in the runtime language.
     $type_name = mb_strtolower($this->mapperManager()->createInstance($this->pluginDefinition['config_translation_plugin_id'])->getTypeLabel());
-    return $this->t('Translate @type_name', ['@type_name' => $type_name]);
+    return mb_ucfirst($this->t('Translate @type_name', ['@type_name' => $type_name]));
   }
 
   /**
