@@ -245,6 +245,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->uuidKey = $entity_type_manager->getDefinition(static::$entityTypeId)
       ->getKey('uuid');
     $this->entity = $this->setUpFields($this->createEntity(), $this->account);
+    // Refresh entity storage as new fields have been created.
+    $this->entityStorage = $entity_type_manager->getStorage(static::$entityTypeId);
 
     $this->resourceType = $this->container->get('jsonapi.resource_type.repository')->getByTypeName(static::$resourceTypeName);
   }
@@ -411,7 +413,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  protected function createAnotherEntity($key) {
+  protected function createAnotherEntity(string $key) {
     $duplicate = $this->getEntityDuplicate($this->entity, $key);
     // Some entity types are not stored, hence they cannot be reloaded.
     if (get_class($this->entityStorage) !== ContentEntityNullStorage::class) {
