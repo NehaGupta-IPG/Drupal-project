@@ -999,20 +999,20 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *   The cache key used for the service container.
    *
    * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
-   *   getContainerCacheKeySuffix() instead. The cache key prefix is now
+   *   getContainerIdentifier() instead. The cache key prefix is now
    *   managed by ContainerStorageInterface implementations.
    *
    * @see https://www.drupal.org/node/3585642
    */
   protected function getContainerCacheKey() {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use getContainerCacheKeySuffix() instead. The cache key prefix is now managed by ContainerStorageInterface implementations. See https://www.drupal.org/node/3585642', E_USER_DEPRECATED);
-    return 'service_container:' . $this->getContainerCacheKeySuffix();
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use getContainerIdentifier() instead. The cache key prefix is now managed by ContainerStorageInterface implementations. See https://www.drupal.org/node/3585642', E_USER_DEPRECATED);
+    return 'service_container:' . $this->getContainerIdentifier();
   }
 
   /**
-   * Returns a cache key suffix that uniquely identifies the container version.
+   * Returns a string that uniquely identifies the container version.
    *
-   * The suffix is a hash derived from:
+   * The identifier is a hash derived from:
    * - The kernel environment string.
    * - A hash based on all the installed package versions.
    * - The deployment identifier from settings.php.
@@ -1020,13 +1020,13 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * - The application root and site path.
    * - The paths to any additional container YAMLs from settings.php.
    *
-   * Container storage implementations use this suffix to construct their own
-   * cache keys or class names.
+   * Container storage implementations use this identifier to construct their
+   * own cache keys or class names.
    *
    * @return string
-   *   A unique suffix for the current container version.
+   *   A unique identifier for the current container version.
    */
-  protected function getContainerCacheKeySuffix(): string {
+  protected function getContainerIdentifier(): string {
     $parts = [
       $this->environment,
       class_exists(DrupalInstalled::class) ? DrupalInstalled::VERSIONS_HASH : \Drupal::VERSION,
@@ -1113,21 +1113,21 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $source_storage = $this->container->get('config.installer')->getSourceStorage();
     }
 
-    $suffix = $this->getContainerCacheKeySuffix();
+    $container_id = $this->getContainerIdentifier();
 
     // If the module list hasn't already been set in updateModules and we are
     // not forcing a rebuild, then try and load the container from storage.
     $container = NULL;
     if (empty($this->moduleList) && !$this->containerNeedsRebuild) {
-      $container = $this->getContainerStorage()->load($suffix);
+      $container = $this->getContainerStorage()->load($container_id);
     }
 
     // If no container was loaded, build a new one from scratch.
     if (!$container) {
       $container = $this->compileContainer();
       $storage = $this->getContainerStorage();
-      $storage->dump($container, $suffix);
-      $container = $storage->load($suffix) ?? $container;
+      $storage->dump($container, $container_id);
+      $container = $storage->load($container_id) ?? $container;
     }
 
     // The container was rebuilt successfully.
@@ -1519,7 +1519,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   public function garbageCollection(): void {
     // This uses the bootstrap container's storage service directly because
     // garbage collection must still clean up the real stored container.
-    $this->bootstrapContainer->get('container_storage')->garbageCollection($this->getContainerCacheKeySuffix());
+    $this->bootstrapContainer->get('container_storage')->garbageCollection($this->getContainerIdentifier());
   }
 
   /**

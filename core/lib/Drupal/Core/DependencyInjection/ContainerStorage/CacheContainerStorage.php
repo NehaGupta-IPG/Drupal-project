@@ -45,8 +45,8 @@ class CacheContainerStorage implements ContainerStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function load(string $suffix): ?ContainerInterface {
-    $cache = $this->cache->get(static::CACHE_PREFIX . $suffix);
+  public function load(string $identifier): ?ContainerInterface {
+    $cache = $this->cache->get(static::CACHE_PREFIX . $identifier);
     if ($cache) {
       $container_definition = $cache->data;
       $class = $this->settings->get('container_base_class', Container::class);
@@ -59,11 +59,11 @@ class CacheContainerStorage implements ContainerStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function dump(ContainerBuilder $container, string $suffix): void {
+  public function dump(ContainerBuilder $container, string $identifier): void {
     $dumper = new $this->dumperClass($container);
     $container_definition = $dumper->getArray();
 
-    $this->cache->set(static::CACHE_PREFIX . $suffix, $container_definition);
+    $this->cache->set(static::CACHE_PREFIX . $identifier, $container_definition);
   }
 
   /**
@@ -76,7 +76,7 @@ class CacheContainerStorage implements ContainerStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function garbageCollection(string $suffix): void {
+  public function garbageCollection(string $identifier): void {
     $this->cache->garbageCollection();
   }
 

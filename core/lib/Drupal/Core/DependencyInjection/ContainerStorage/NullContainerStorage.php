@@ -20,14 +20,14 @@ class NullContainerStorage implements ContainerStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function load(string $suffix): ?ContainerInterface {
+  public function load(string $identifier): ?ContainerInterface {
     return NULL;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function dump(ContainerBuilder $container, string $suffix): void {
+  public function dump(ContainerBuilder $container, string $identifier): void {
     // No-op.
   }
 
@@ -41,7 +41,7 @@ class NullContainerStorage implements ContainerStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function garbageCollection(string $suffix): void {
+  public function garbageCollection(string $identifier): void {
     // No-op.
   }
 

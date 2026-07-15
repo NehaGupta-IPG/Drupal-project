@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
  *
  * Compiles the container into a PHP class that benefits from opcache. The
  * compiled file is stored via PhpStorage and a hash is kept in the cache
- * backend to map the cache key suffix to the correct container class.
+ * backend to map the container identifier to the correct container class.
  */
 class PhpDumperContainerStorage implements ContainerStorageInterface {
 
@@ -51,8 +51,8 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function load(string $suffix): ?ContainerInterface {
-    $cache = $this->cache->get(static::CACHE_PREFIX . $suffix);
+  public function load(string $identifier): ?ContainerInterface {
+    $cache = $this->cache->get(static::CACHE_PREFIX . $identifier);
     if ($cache && $hash = $cache->data) {
       $containerClass = 'DrupalContainer_' . $hash;
       if (!class_exists($containerClass, FALSE)) {
@@ -69,7 +69,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function dump(ContainerBuilder $container, string $suffix): void {
+  public function dump(ContainerBuilder $container, string $identifier): void {
     // Strip leading backslash so the generated PHP code produces a correct
     // fully qualified class name (the dumper prepends its own backslash).
     $baseClass = ltrim($this->settings->get('container_base_class', PhpContainer::class), '\\');
@@ -106,7 +106,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
 
     // Publish the hash only after the file is written, so the cache never
     // points to a container that failed to save.
-    $this->cache->set(static::CACHE_PREFIX . $suffix, $hash);
+    $this->cache->set(static::CACHE_PREFIX . $identifier, $hash);
 
     // Mark the container confirmed only now that its hash has been
     // published. This marker is used by garbage collection to tell a fully
@@ -125,8 +125,8 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function garbageCollection(string $suffix): void {
-    $cache = $this->cache->get(static::CACHE_PREFIX . $suffix);
+  public function garbageCollection(string $identifier): void {
+    $cache = $this->cache->get(static::CACHE_PREFIX . $identifier);
     if (!$cache || !($hash = $cache->data)) {
       return;
     }
