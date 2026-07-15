@@ -174,7 +174,6 @@
 }
 
 /**
- * @todo remove in https://www.drupal.org/project/drupal/issues/3042127
  *   This rule ensures the row weight dropdowns in the Move Block dialog
  *   maintain the background color of their container when they are hovered
  *   over or are inside the active row.
