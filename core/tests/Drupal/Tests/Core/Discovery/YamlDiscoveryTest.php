@@ -40,7 +40,7 @@ class YamlDiscoveryTest extends TestCase {
     file_put_contents($url . '/test_broken/test_broken.test.yml', "broken:\n:");
 
     $this->expectException(InvalidDataTypeException::class);
-    $this->expectExceptionMessage('vfs://modules/test_broken/test_broken.test.yml');
+    $this->expectExceptionMessageIs('vfs://modules/test_broken/test_broken.test.yml: Unable to parse at line 2 (near ":").');
 
     $directories = ['test_broken' => $url . '/test_broken'];
     $discovery = new YamlDiscovery('test', $directories);
