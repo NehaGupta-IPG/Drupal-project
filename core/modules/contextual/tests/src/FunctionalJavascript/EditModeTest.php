@@ -117,6 +117,41 @@ class EditModeTest extends WebDriverTestBase {
   }
 
   /**
+   * Tests the edit mode toggle stays visible when contextual links are cached.
+   *
+   * Contextual links are cached in the browser's sessionStorage after the first
+   * request. On subsequent requests they are restored from that cache, which
+   * populates the contextual links collection before the edit mode toggle's
+   * model and views are constructed. Regression test to ensure the toggle still
+   * counts those already-present links and remains visible.
+   */
+  public function testEditModeToggleVisibleAfterReload(): void {
+    $web_assert = $this->assertSession();
+    $page = $this->getSession()->getPage();
+    $toggle_selector = '#toolbar-bar div.contextual-toolbar-tab';
+
+    // First request: contextual links are fetched over Ajax and cached in
+    // sessionStorage. The toggle is visible.
+    $this->drupalGet('user');
+    $web_assert->assertWaitOnAjaxRequest();
+    $web_assert->waitForElementVisible('css', $toggle_selector);
+    $this->assertGreaterThan(0, count($page->findAll('css', '[data-contextual-id]')));
+
+    // Second request: contextual links are restored from the sessionStorage
+    // cache. The toggle must remain visible.
+    $this->drupalGet('user');
+    $this->assertNotNull(
+      $web_assert->waitForElementVisible('css', $toggle_selector),
+      'The edit mode toggle is visible after a cached page reload.',
+    );
+    $this->assertGreaterThan(0, count($page->findAll('css', '[data-contextual-id]')));
+    $this->assertFalse(
+      $page->find('css', $toggle_selector)->hasClass('hidden'),
+      'The edit mode toggle does not have the "hidden" class after a cached page reload.',
+    );
+  }
+
+  /**
    * Presses the toolbar edit mode.
    */
   protected function pressToolbarEditButton() {
