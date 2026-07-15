@@ -45,11 +45,11 @@ class CacheContainerStorageTest extends UnitTestCase {
     $cache = $this->createMock(CacheBackendInterface::class);
     $cache->expects($this->once())
       ->method('get')
-      ->with('service_container:test_suffix')
+      ->with('service_container:test_identifier')
       ->willReturn(FALSE);
 
     $storage = $this->createStorage($cache);
-    $this->assertNull($storage->load('test_suffix'));
+    $this->assertNull($storage->load('test_identifier'));
   }
 
   /**
@@ -68,11 +68,11 @@ class CacheContainerStorageTest extends UnitTestCase {
     $cacheItem = (object) ['data' => $definition];
     $cache->expects($this->once())
       ->method('get')
-      ->with('service_container:test_suffix')
+      ->with('service_container:test_identifier')
       ->willReturn($cacheItem);
 
     $storage = $this->createStorage($cache);
-    $container = $storage->load('test_suffix');
+    $container = $storage->load('test_identifier');
 
     $this->assertInstanceOf(Container::class, $container);
     $this->assertSame('value', $container->getParameter('some_param'));
@@ -91,12 +91,12 @@ class CacheContainerStorageTest extends UnitTestCase {
     $cache->expects($this->once())
       ->method('set')
       ->willReturnCallback(function ($key, $data) use (&$cachedData) {
-        $this->assertSame('service_container:test_suffix', $key);
+        $this->assertSame('service_container:test_identifier', $key);
         $cachedData = $data;
       });
 
     $storage = $this->createStorage($cache);
-    $storage->dump($container, 'test_suffix');
+    $storage->dump($container, 'test_identifier');
 
     $this->assertIsArray($cachedData);
     $this->assertSame('value', $cachedData['parameters']['test']);
@@ -118,7 +118,7 @@ class CacheContainerStorageTest extends UnitTestCase {
 
     $this->expectException(\Exception::class);
     $this->expectExceptionMessage('An error occurred while writing to the cache');
-    $storage->dump($container, 'test_suffix');
+    $storage->dump($container, 'test_identifier');
   }
 
   /**
@@ -157,7 +157,7 @@ class CacheContainerStorageTest extends UnitTestCase {
       Settings::getInstance(),
       $customDumperClass,
     );
-    $storage->dump($container, 'test_suffix');
+    $storage->dump($container, 'test_identifier');
 
     $this->assertIsArray($cachedData);
     // The marker proves the custom dumper class was used, not the default.

@@ -552,11 +552,7 @@ class DrupalKernelTest extends KernelTestBase {
     $this->assertFileExists($new_container_file);
 
     // Simulate a kernel that is no longer allowed to dump or load the
-    // container, such as \Drupal\Core\Update\UpdateKernel. The bootstrap
-    // container's container_storage service already tracks the currently
-    // loaded suffix from the updateModules() call above, so garbage
-    // collection should still use it to clean up the real, stored
-    // containers.
+    // container, such as \Drupal\Core\Update\UpdateKernel.
     (new \ReflectionProperty($kernel, 'allowDumping'))->setValue($kernel, FALSE);
 
     $kernel->garbageCollection();
@@ -662,7 +658,7 @@ class DrupalKernelTest extends KernelTestBase {
       /**
        * {@inheritdoc}
        */
-      public function dump(ContainerBuilder $container, string $suffix): void {
+      public function dump(ContainerBuilder $container, string $identifier): void {
         static::$dumpCalled = TRUE;
       }
 
