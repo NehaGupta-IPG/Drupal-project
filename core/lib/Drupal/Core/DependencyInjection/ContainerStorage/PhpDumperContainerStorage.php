@@ -111,8 +111,13 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
     // Mark the container confirmed only now that its hash has been
     // published. This marker is used by garbage collection to tell a fully
     // committed container that has since been superseded apart from one whose
-    // dump() call has not finished publishing its hash yet.
-    $this->phpStorage->save($containerClass . static::CONFIRMED_SUFFIX, '1');
+    // dump() call has not finished publishing its hash yet. Skip the write if
+    // the marker is already there (e.g. dump() recompiled to the same hash
+    // after invalidateContainer()).
+    $confirmedFilename = $containerClass . static::CONFIRMED_SUFFIX;
+    if (!$this->phpStorage->exists($confirmedFilename)) {
+      $this->phpStorage->save($confirmedFilename, '1');
+    }
   }
 
   /**
