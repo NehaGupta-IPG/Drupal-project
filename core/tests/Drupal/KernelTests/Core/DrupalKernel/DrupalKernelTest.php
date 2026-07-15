@@ -647,44 +647,7 @@ class DrupalKernelTest extends KernelTestBase {
   public function testBootstrapContainerDefinitionMissingServices(): void {
     $kernel = $this->getTestKernel(Request::createFromGlobals(), ['system' => 'system']);
 
-    // Create a custom container storage that records dump() calls via a static
-    // property, proving the custom storage is used by the kernel.
-    $customStorageClass = get_class(new class () implements ContainerStorageInterface {
-
-      /**
-       * Determines whether the container has been dumped.
-       */
-      public static bool $dumpCalled = FALSE;
-
-      /**
-       * {@inheritdoc}
-       */
-      public function load(string $identifier): ?ContainerInterface {
-        return NULL;
-      }
-
-      /**
-       * {@inheritdoc}
-       */
-      public function dump(ContainerBuilder $container, string $identifier): void {
-        static::$dumpCalled = TRUE;
-      }
-
-      /**
-       * {@inheritdoc}
-       */
-      public function invalidate(): void {
-        // No-op.
-      }
-
-      /**
-       * {@inheritdoc}
-       */
-      public function garbageCollection(string $identifier): void {
-        // No-op.
-      }
-
-    });
+    $customStorageClass = $this->createCustomStorageClass();
 
     // Set a custom bootstrap_container_definition that only has the legacy
     // services (missing all new container storage services) plus our custom
@@ -735,10 +698,89 @@ class DrupalKernelTest extends KernelTestBase {
     $kernel->shutdown();
     // Preserve the module list.
     $kernel->updateModules(['system' => 'system']);
+    $this->assertFalse($customStorageClass::$loadCalled, 'Custom container storage load() should not have been called yet');
     $this->assertFalse($customStorageClass::$dumpCalled, 'Custom container storage dump() should not have been called yet');
     $kernel->boot();
 
+    $this->assertTrue($customStorageClass::$loadCalled, 'Custom container storage load() should have been called');
     $this->assertTrue($customStorageClass::$dumpCalled, 'Custom container storage dump() should have been called');
+  }
+
+  /**
+   * Tests container loading when dumping is disabled.
+   */
+  public function testLoadIsCalledWhenDumpingIsNotAllowed(): void {
+    $class_loader = require $this->root . '/autoload.php';
+    $kernel = DrupalKernel::createFromRequest(Request::createFromGlobals(), $class_loader, 'testing', FALSE);
+
+    $customStorageClass = $this->createCustomStorageClass();
+
+    // Set a custom bootstrap_container_definition that uses our custom
+    // container_storage override.
+    $settings = Settings::getAll();
+    $settings['bootstrap_container_definition'] = [
+      'services' => [
+        'container_storage' => [
+          'class' => $customStorageClass,
+        ],
+      ],
+    ];
+    new Settings($settings);
+    $kernel->boot();
+
+    $this->assertTrue($customStorageClass::$loadCalled, 'Custom container storage load() should been called');
+    $this->assertFalse($customStorageClass::$dumpCalled, 'Custom container storage dump() should not have been called');
+  }
+
+  /**
+   * Creates a custom container storage that records load() and dump() calls.
+   *
+   * @return string
+   *   The class name of the custom container storage.
+   */
+  private function createCustomStorageClass(): string {
+    return get_class(new class () implements ContainerStorageInterface {
+
+      /**
+       * Determines whether the container has been loaded.
+       */
+      public static bool $loadCalled = FALSE;
+
+      /**
+       * Determines whether the container has been dumped.
+       */
+      public static bool $dumpCalled = FALSE;
+
+      /**
+       * {@inheritdoc}
+       */
+      public function load(string $identifier): ?ContainerInterface {
+        static::$loadCalled = TRUE;
+        return NULL;
+      }
+
+      /**
+       * {@inheritdoc}
+       */
+      public function dump(ContainerBuilder $container, string $identifier): void {
+        static::$dumpCalled = TRUE;
+      }
+
+      /**
+       * {@inheritdoc}
+       */
+      public function invalidate(): void {
+        // No-op.
+      }
+
+      /**
+       * {@inheritdoc}
+       */
+      public function garbageCollection(string $identifier): void {
+        // No-op.
+      }
+
+    });
   }
 
 }
