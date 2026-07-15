@@ -7,17 +7,17 @@ namespace Drupal\Tests\Core\Discovery;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Core\Discovery\YamlDiscovery;
+use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use org\bovigo\vfs\vfsStreamWrapper;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\TestCase;
 
 /**
  * YamlDiscovery component unit tests.
  */
 #[Group('Discovery')]
-class YamlDiscoveryTest extends TestCase {
+class YamlDiscoveryTest extends UnitTestCase {
 
   /**
    * {@inheritdoc}
