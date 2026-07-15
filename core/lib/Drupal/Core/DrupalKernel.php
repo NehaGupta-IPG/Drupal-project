@@ -16,7 +16,6 @@ use Drupal\Core\Config\NullStorage;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ContainerStorage\CacheContainerStorage;
 use Drupal\Core\DependencyInjection\ContainerStorage\ContainerStorageFactory;
-use Drupal\Core\DependencyInjection\ContainerStorage\NullContainerStorage;
 use Drupal\Core\DependencyInjection\ContainerStorage\PhpDumperContainerStorage;
 use Drupal\Core\DependencyInjection\ContainerStorageInterface;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
@@ -1040,24 +1039,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   }
 
   /**
-   * Returns the container storage service.
-   *
-   * The container storage is responsible for loading, dumping, and invalidating
-   * compiled service containers. Override this method in subclasses to provide
-   * a different storage strategy (e.g., NullContainerStorage for UpdateKernel).
-   *
-   * @return \Drupal\Core\DependencyInjection\ContainerStorageInterface
-   *   The container storage service.
-   */
-  protected function getContainerStorage(): ContainerStorageInterface {
-    if (!$this->allowDumping) {
-      return new NullContainerStorage();
-    }
-
-    return $this->bootstrapContainer->get('container_storage');
-  }
-
-  /**
    * Returns the kernel parameters.
    *
    * @return array
@@ -1118,16 +1099,18 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // If the module list hasn't already been set in updateModules and we are
     // not forcing a rebuild, then try and load the container from storage.
     $container = NULL;
+    $storage = $this->bootstrapContainer->get('container_storage');
     if (empty($this->moduleList) && !$this->containerNeedsRebuild) {
-      $container = $this->getContainerStorage()->load($container_id);
+      $container = $storage->load($container_id);
     }
 
     // If no container was loaded, build a new one from scratch.
     if (!$container) {
       $container = $this->compileContainer();
-      $storage = $this->getContainerStorage();
-      $storage->dump($container, $container_id);
-      $container = $storage->load($container_id) ?? $container;
+      if ($this->allowDumping) {
+        $storage->dump($container, $container_id);
+        $container = $storage->load($container_id) ?? $container;
+      }
     }
 
     // The container was rebuilt successfully.
