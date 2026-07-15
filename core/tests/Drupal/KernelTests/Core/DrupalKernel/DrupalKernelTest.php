@@ -537,6 +537,36 @@ class DrupalKernelTest extends KernelTestBase {
   }
 
   /**
+   * Tests garbage collection cleans up the real storage even if not dumping.
+   */
+  public function testGarbageCollectionIgnoresAllowDumping(): void {
+    $request = Request::createFromGlobals();
+    $kernel = $this->getTestKernel($request, ['system' => 'system']);
+    $container_file = (new \ReflectionClass($kernel->getContainer()))->getFileName();
+
+    // Switch modules so a second, superseded container file exists on disk.
+    $kernel->updateModules(['system' => 'system', 'user' => 'user']);
+    $new_container_file = (new \ReflectionClass($kernel->getContainer()))->getFileName();
+    $this->assertNotSame($container_file, $new_container_file);
+    $this->assertFileExists($container_file);
+    $this->assertFileExists($new_container_file);
+
+    // Simulate a kernel that is no longer allowed to dump or load the
+    // container, such as \Drupal\Core\Update\UpdateKernel. The bootstrap
+    // container's container_storage service already tracks the currently
+    // loaded suffix from the updateModules() call above, so garbage
+    // collection should still use it to clean up the real, stored
+    // containers.
+    (new \ReflectionProperty($kernel, 'allowDumping'))->setValue($kernel, FALSE);
+
+    $kernel->garbageCollection();
+    // The superseded container file should still be deleted, even though
+    // dumping and loading are disallowed.
+    $this->assertFileDoesNotExist($container_file);
+    $this->assertFileExists($new_container_file);
+  }
+
+  /**
    * Tests that a container is reused when the container hash is matched.
    */
   public function testContainerReuse(): void {
