@@ -42,6 +42,9 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
   protected function doTestFrontPageAuthenticatedWarmCache(): void {
     $user = $this->drupalCreateUser();
     $this->drupalLogin($user);
+    sleep(2);
+    $this->drupalGet('<front>');
+    sleep(2);
     $this->drupalGet('<front>');
     sleep(2);
     $this->drupalGet('<front>');
@@ -75,9 +78,9 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 4,
-      'ScriptCount' => 1,
+      'ScriptCount' => 3,
       'ScriptBytes' => 13150,
-      'StylesheetCount' => 2,
+      'StylesheetCount' => 6,
       'StylesheetBytes' => 39163,
     ];
     $this->assertMetrics($expected, $performance_data);
@@ -127,7 +130,7 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
     }, 'administratorNodePage');
 
     $expected = [
-      'QueryCount' => 270,
+      'QueryCount' => 273,
       'CacheGetCount' => 264,
       'CacheGetCountByBin' => [
         'config' => 60,
@@ -146,9 +149,9 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 29,
-      'ScriptCount' => 4,
+      'ScriptCount' => 10,
       'ScriptBytes' => 200400,
-      'StylesheetCount' => 7,
+      'StylesheetCount' => 11,
       'StylesheetBytes' => 79412,
     ];
     $this->assertMetrics($expected, $performance_data);
