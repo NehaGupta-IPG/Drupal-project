@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\DrupalKernel;
 
 use Composer\Autoload\ClassLoader;
+use Drupal\Component\PhpStorage\FileStorage;
 use Drupal\Core\Cache\DatabaseBackend;
 use Drupal\Core\Config\ConfigInstallerInterface;
 use Drupal\Core\DependencyInjection\Container;
@@ -559,6 +560,51 @@ class DrupalKernelTest extends KernelTestBase {
     $kernel->garbageCollection();
     // The superseded container file should still be deleted, even though
     // dumping and loading are disallowed.
+    $this->assertFileDoesNotExist($container_file);
+    $this->assertFileExists($new_container_file);
+  }
+
+  /**
+   * Tests garbage collection with a PhpStorage backend other than the default.
+   *
+   * PhpDumperContainerStorage::garbageCollection() assumes listAll() and
+   * delete() operate on names without the '.php' extension, which holds for
+   * the default MTimeProtectedFileStorage but not for the plain FileStorage
+   * backend. FileStorage is a shipped, documented PhpStorageInterface
+   * implementation that a site can select via
+   * $settings['php_storage']['service_container']['class'], so garbage
+   * collection must clean up superseded containers with it too.
+   *
+   * @see \Drupal\Core\DependencyInjection\ContainerStorage\PhpDumperContainerStorage::garbageCollection()
+   */
+  public function testGarbageCollectionWithFileStorage(): void {
+    $request = Request::createFromGlobals();
+    $class_loader = require $this->root . '/autoload.php';
+
+    // Build a kernel using the plain FileStorage PhpStorage backend.
+    $kernel = DrupalKernel::createFromRequest($request, $class_loader, 'testing');
+    $this->setSetting('container_yamls', []);
+    $this->setSetting('hash_salt', $this->databasePrefix);
+    $this->setSetting('container_base_class', PhpContainer::class);
+    $this->setSetting('php_storage', [
+      'service_container' => [
+        'class' => FileStorage::class,
+      ],
+    ]);
+    $kernel->updateModules(['system' => 'system']);
+    $kernel->boot();
+    $container_file = (new \ReflectionClass($kernel->getContainer()))->getFileName();
+    $this->assertFileExists($container_file);
+
+    // Switch modules so a second, superseded container file exists on disk.
+    $kernel->updateModules(['system' => 'system', 'user' => 'user']);
+    $new_container_file = (new \ReflectionClass($kernel->getContainer()))->getFileName();
+    $this->assertNotSame($container_file, $new_container_file);
+    $this->assertFileExists($container_file);
+    $this->assertFileExists($new_container_file);
+
+    $kernel->garbageCollection();
+    // Only the old, superseded container file should be deleted.
     $this->assertFileDoesNotExist($container_file);
     $this->assertFileExists($new_container_file);
   }

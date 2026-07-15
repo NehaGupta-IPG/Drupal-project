@@ -136,14 +136,22 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
     // still in progress on another request; see dump().
     $keep = 'DrupalContainer_' . $hash;
     foreach ($this->phpStorage->listAll() as $name) {
-      if ($name === $keep || str_ends_with($name, static::CONFIRMED_SUFFIX)) {
+      // PhpStorageInterface implementations disagree on whether listAll()
+      // strips the '.php' extension: MTimeProtectedFileStorage does (it
+      // stores each file in a directory named after the virtual name minus
+      // '.php'), but FileStorage does not. Normalize to the bare class name
+      // for comparisons, but keep deleting the container file by its
+      // original $name so FileStorage, which requires an exact filename
+      // match, still finds it.
+      $class_name = str_ends_with($name, '.php') ? substr($name, 0, -4) : $name;
+      if ($class_name === $keep || str_ends_with($class_name, static::CONFIRMED_SUFFIX)) {
         continue;
       }
-      if (!$this->phpStorage->exists($name . static::CONFIRMED_SUFFIX)) {
+      if (!$this->phpStorage->exists($class_name . static::CONFIRMED_SUFFIX)) {
         continue;
       }
       $this->phpStorage->delete($name);
-      $this->phpStorage->delete($name . static::CONFIRMED_SUFFIX);
+      $this->phpStorage->delete($class_name . static::CONFIRMED_SUFFIX);
     }
   }
 
