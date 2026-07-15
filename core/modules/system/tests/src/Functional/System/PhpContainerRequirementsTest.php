@@ -10,7 +10,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests cron runs.
+ * Tests PHP container requirements.
  */
 #[Group('system')]
 #[RunTestsInSeparateProcesses]
@@ -21,7 +21,7 @@ class PhpContainerRequirementsTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * Ensure that the manual cron run is working.
+   * Tests PHP container requirements.
    */
   public function testPhpContainerRequirements(): void {
     $admin_user = $this->drupalCreateUser(['administer site configuration']);
