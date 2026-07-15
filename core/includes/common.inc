@@ -300,6 +300,7 @@ function drupal_flush_all_caches($kernel = NULL): void {
     $kernel->invalidateContainer();
     $kernel->rebuildContainer();
   }
+  $kernel->garbageCollection();
 
   // Rebuild module data that is stored in state.
   \Drupal::service('extension.list.module')->reset();
