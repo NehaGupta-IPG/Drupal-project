@@ -23,6 +23,7 @@ class YamlDiscoveryTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
     // Ensure that FileCacheFactory has a prefix.
     FileCacheFactory::setPrefix('prefix');
   }
