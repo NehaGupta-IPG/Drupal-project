@@ -1099,8 +1099,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // If the module list hasn't already been set in updateModules and we are
     // not forcing a rebuild, then try and load the container from storage.
     $container = NULL;
-    $storage = $this->bootstrapContainer->get('container_storage');
     if (empty($this->moduleList) && !$this->containerNeedsRebuild) {
+      $storage = $this->bootstrapContainer->get('container_storage');
       $container = $storage->load($container_id);
     }
 
@@ -1108,6 +1108,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if (!$container) {
       $container = $this->compileContainer();
       if ($this->allowDumping) {
+        $storage = $this->bootstrapContainer->get('container_storage');
         $storage->dump($container, $container_id);
         $container = $storage->load($container_id) ?? $container;
       }
