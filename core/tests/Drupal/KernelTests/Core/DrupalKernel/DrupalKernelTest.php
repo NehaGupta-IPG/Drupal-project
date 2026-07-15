@@ -9,7 +9,7 @@ use Drupal\Core\Cache\DatabaseBackend;
 use Drupal\Core\Config\ConfigInstallerInterface;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Core\DependencyInjection\ContainerStorage\NullContainerStorage;
+use Drupal\Core\DependencyInjection\ContainerStorageInterface;
 use Drupal\Core\DependencyInjection\PhpContainer;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\DrupalKernelInterface;
@@ -24,6 +24,7 @@ use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
 use Prophecy\Argument;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 // cspell:ignore äöüßαβγδεζηθικλμνξοσὠ
@@ -648,7 +649,7 @@ class DrupalKernelTest extends KernelTestBase {
 
     // Create a custom container storage that records dump() calls via a static
     // property, proving the custom storage is used by the kernel.
-    $customStorageClass = get_class(new class () extends NullContainerStorage {
+    $customStorageClass = get_class(new class () implements ContainerStorageInterface {
 
       /**
        * Determines whether the container has been dumped.
@@ -658,8 +659,29 @@ class DrupalKernelTest extends KernelTestBase {
       /**
        * {@inheritdoc}
        */
+      public function load(string $identifier): ?ContainerInterface {
+        return NULL;
+      }
+
+      /**
+       * {@inheritdoc}
+       */
       public function dump(ContainerBuilder $container, string $identifier): void {
         static::$dumpCalled = TRUE;
+      }
+
+      /**
+       * {@inheritdoc}
+       */
+      public function invalidate(): void {
+        // No-op.
+      }
+
+      /**
+       * {@inheritdoc}
+       */
+      public function garbageCollection(string $identifier): void {
+        // No-op.
       }
 
     });

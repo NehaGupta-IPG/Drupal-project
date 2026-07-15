@@ -16,7 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @see \Drupal\Core\DependencyInjection\ContainerStorage\PhpDumperContainerStorage
  * @see \Drupal\Core\DependencyInjection\ContainerStorage\CacheContainerStorage
- * @see \Drupal\Core\DependencyInjection\ContainerStorage\NullContainerStorage
  */
 interface ContainerStorageInterface {
 
