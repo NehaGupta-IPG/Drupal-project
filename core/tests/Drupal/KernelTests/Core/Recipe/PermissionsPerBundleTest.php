@@ -223,7 +223,7 @@ config:
       grantPermissionsForEachMediaType: $value
 YAML;
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessageMatches("/The permissions provided array .* must be an array of strings that contain '%bundle'\./");
+    $this->expectExceptionMessageMatches("/The permissions provided .* must be an array of strings that contain '%bundle'\./s");
     $this->applyRecipeFromString($recipe_data);
   }
 
