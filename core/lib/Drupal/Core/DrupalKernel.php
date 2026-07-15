@@ -1519,7 +1519,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   public function garbageCollection(): void {
     // This uses the bootstrap container's storage service directly because
     // garbage collection must still clean up the real stored container.
-    $this->bootstrapContainer->get('container_storage')->garbageCollection();
+    $this->bootstrapContainer->get('container_storage')->garbageCollection($this->getContainerCacheKeySuffix());
   }
 
   /**

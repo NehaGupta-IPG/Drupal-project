@@ -41,7 +41,7 @@ class NullContainerStorage implements ContainerStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function garbageCollection(): void {
+  public function garbageCollection(string $suffix): void {
     // No-op.
   }
 

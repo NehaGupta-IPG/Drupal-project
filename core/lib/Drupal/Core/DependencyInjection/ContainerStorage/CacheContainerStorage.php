@@ -76,7 +76,7 @@ class CacheContainerStorage implements ContainerStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function garbageCollection(): void {
+  public function garbageCollection(string $suffix): void {
     $this->cache->garbageCollection();
   }
 

@@ -33,11 +33,6 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
   protected const string CONFIRMED_SUFFIX = '.confirmed';
 
   /**
-   * The cache key suffix of the currently loaded container.
-   */
-  protected ?string $loadedSuffix = NULL;
-
-  /**
    * Constructs a PhpDumperContainerStorage.
    *
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
@@ -64,7 +59,6 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
         $this->phpStorage->load($containerClass . '.php');
       }
       if (class_exists($containerClass, FALSE)) {
-        $this->loadedSuffix = $suffix;
         return new $containerClass();
       }
     }
@@ -76,8 +70,6 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
    * {@inheritdoc}
    */
   public function dump(ContainerBuilder $container, string $suffix): void {
-    $this->loadedSuffix = $suffix;
-
     // Strip leading backslash so the generated PHP code produces a correct
     // fully qualified class name (the dumper prepends its own backslash).
     $baseClass = ltrim($this->settings->get('container_base_class', PhpContainer::class), '\\');
@@ -133,11 +125,8 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function garbageCollection(): void {
-    if ($this->loadedSuffix === NULL) {
-      return;
-    }
-    $cache = $this->cache->get(static::CACHE_PREFIX . $this->loadedSuffix);
+  public function garbageCollection(string $suffix): void {
+    $cache = $this->cache->get(static::CACHE_PREFIX . $suffix);
     if (!$cache || !($hash = $cache->data)) {
       return;
     }

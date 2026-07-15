@@ -265,7 +265,7 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     $supersededClass = basename($savedFiles[2], '.php');
     $currentClass = basename($savedFiles[4], '.php');
 
-    $storage->garbageCollection();
+    $storage->garbageCollection('current_suffix');
 
     // Only the current container is kept; the superseded and old-suffix
     // containers (and their markers) are removed.
@@ -307,7 +307,7 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     // confirmation marker.
     $phpStorage->save('DrupalContainer_unconfirmed.php', '<?php class DrupalContainer_unconfirmed {}');
 
-    $storage->garbageCollection();
+    $storage->garbageCollection('current_suffix');
 
     // The old, confirmed container (and its marker) are removed; the
     // unconfirmed container survives this run rather than being deleted
@@ -342,7 +342,7 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     $current->compile();
     $storage->dump($current, 'test_suffix');
 
-    $storage->garbageCollection();
+    $storage->garbageCollection('test_suffix');
 
     $this->assertContains($oldClass, $deletedFiles);
     $this->assertContains($oldClass . '.confirmed', $deletedFiles);

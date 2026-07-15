@@ -49,7 +49,10 @@ interface ContainerStorageInterface {
 
   /**
    * Removes stored containers that are no longer in use.
+   *
+   * @param string $suffix
+   *   A hash suffix identifying the current container version.
    */
-  public function garbageCollection(): void;
+  public function garbageCollection(string $suffix): void;
 
 }
