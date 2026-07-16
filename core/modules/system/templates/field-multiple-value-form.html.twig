@@ -14,6 +14,10 @@
  * - description: The description element containing the following properties:
  *   - content: The description content of the form element.
  *   - attributes: HTML attributes to apply to the description container.
+ * - description_display: Description display setting. It can have these values:
+ *   - before: The description is output before the element.
+ *   - after: The description is output after the element.
+ *   - invisible: The description is output after the element, hidden visually.
  * - button: "Add another item" button.
  *
  * @see \Drupal\Core\Field\FieldPreprocess::preprocessFieldMultipleValueForm()
@@ -29,8 +33,11 @@
     ]
   %}
   <div{{ attributes.addClass(classes) }}>
+    {% if description.content and description_display == 'before' %}
+      <div{{ description.attributes.addClass('description') }} >{{ description.content }}</div>
+    {% endif %}
     {{ table }}
-    {% if description.content %}
+    {% if description.content and description_display != 'before' %}
       <div{{ description.attributes.addClass('description') }} >{{ description.content }}</div>
     {% endif %}
     {% if button %}
