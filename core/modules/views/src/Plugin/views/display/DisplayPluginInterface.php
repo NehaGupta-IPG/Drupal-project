@@ -111,9 +111,10 @@ interface DisplayPluginInterface {
   public function isPagerEnabled();
 
   /**
-   * Retrieve ajax options
+   * Retrieves what ajax options will the display uses.
    *
    * @return array
+   *   Options array of ajax settings.
    */
   public function getAjaxOptions() : array;
 
