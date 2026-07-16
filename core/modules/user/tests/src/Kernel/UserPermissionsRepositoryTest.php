@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\user\Functional;
+namespace Drupal\Tests\user\Kernel;
 
 use Drupal\Component\Utility\DiffArray;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Tests\BrowserTestBase;
+use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -17,7 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('user')]
 #[RunTestsInSeparateProcesses]
-class UserPermissionsRepositoryTest extends BrowserTestBase {
+class UserPermissionsRepositoryTest extends KernelTestBase {
 
   /**
    * The modules we require.
@@ -71,7 +71,10 @@ class UserPermissionsRepositoryTest extends BrowserTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    // Create an admin user.
+    // Create a user with required permissions. Ensure that we don't use user 1
+    // because that user is treated in special ways by access control handlers.
+    // (Via media module)
+    $this->drupalCreateUser([]);
     $this->adminUser = $this->drupalCreateUser([
       'administer site configuration',
       'access administration pages',
@@ -79,8 +82,8 @@ class UserPermissionsRepositoryTest extends BrowserTestBase {
       'access content',
       'access content overview',
     ]);
+    $this->container->get('current_user')->setAccount($this->adminUser);
 
-    $this->drupalLogin($this->adminUser);
     $this->installModulesFromClassProperty($this->container);
 
     $this->legacyPermissionHandler = $this->container->get('user.legacy_permissions');

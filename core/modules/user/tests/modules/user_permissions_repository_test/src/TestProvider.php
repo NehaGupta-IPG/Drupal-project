@@ -20,7 +20,7 @@ class TestProvider implements ProvidesPermissionsInterface, ProvidesSectionsInte
   /**
    * {@inheritdoc}
    */
-  public function getPerms(): array {
+  public function getPermissions(): array {
     return [
       'perm_from_testprovider' => [
         'title' => 'Permission from TestProvider',
