@@ -111,6 +111,13 @@ interface DisplayPluginInterface {
   public function isPagerEnabled();
 
   /**
+   * Retrieve ajax options
+   *
+   * @return array
+   */
+  public function getAjaxOptions() : array;
+
+  /**
    * Whether the display allows the use of a 'more' link or not.
    *
    * @return bool

@@ -310,7 +310,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
   /**
    * {@inheritdoc}
    */
-  public function getAjaxOptions() {
+  public function getAjaxOptions(): array {
     if ($this->usesAJAX()) {
       $options = $this->defineOptions();
       return $this->getOption('use_ajax_options') ?? $options['ajax_options']['default'];

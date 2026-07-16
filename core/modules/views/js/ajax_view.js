@@ -165,7 +165,7 @@
         )}-${settings.view_display_id.replace(/_/g, '-')}`,
       );
     }
-   once('exposed-form', this.$exposed_form).forEach(
+    once('exposed-form', this.$exposed_form).forEach(
       this.attachExposedFormAjax.bind(this),
     );
 
