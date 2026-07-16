@@ -18,8 +18,8 @@ class UpdateSemverCoreSecurityCoverageTest extends UpdateSemverCoreTestBase {
    * Tests the security coverage messages for Drupal core versions.
    */
   public function testSecurityCoverageMessage(): void {
-    foreach (static::securityCoverageMessageProvider() as $case) {
-      $this->doTestSecurityCoverageMessage($case['installed_version'], $case['fixture'], $case['requirements_section_heading'], $case['message'], $case['mock_date']);
+    foreach (static::securityCoverageMessageProvider() as $test_label => $case) {
+      $this->doTestSecurityCoverageMessage($case['installed_version'], $case['fixture'], $case['requirements_section_heading'], $case['message'], $case['mock_date'], $test_label);
     }
   }
 
@@ -37,8 +37,10 @@ class UpdateSemverCoreSecurityCoverageTest extends UpdateSemverCoreTestBase {
    * @param string $mock_date
    *   The mock date to use if needed in the format CCYY-MM-DD. If an empty
    *   string is provided, no mock date will be used.
+   * @param string $test_label
+   *   The test case label.
    */
-  protected function doTestSecurityCoverageMessage($installed_version, $fixture, $requirements_section_heading, $message, $mock_date): void {
+  protected function doTestSecurityCoverageMessage($installed_version, $fixture, $requirements_section_heading, $message, $mock_date, string $test_label): void {
     \Drupal::state()->set('update_test.mock_date', $mock_date);
     $this->setProjectInstalledVersion($installed_version);
     $this->refreshUpdateStatus(['drupal' => $fixture]);
@@ -54,15 +56,15 @@ class UpdateSemverCoreSecurityCoverageTest extends UpdateSemverCoreTestBase {
       'details.system-status-report__entry:contains("Drupal core security coverage")'
     );
     // Ensure we only have 1 security message section.
-    $this->assertCount(1, $all_requirements_details);
+    $this->assertCount(1, $all_requirements_details, $test_label);
     $requirements_details = $all_requirements_details[0];
     // Ensure that messages are under the correct heading which could be
     // 'Checked', 'Warnings found', or 'Errors found'.
     $requirements_section_element = $requirements_details->getParent();
-    $this->assertCount(1, $requirements_section_element->findAll('css', "h3:contains('$requirements_section_heading')"));
+    $this->assertCount(1, $requirements_section_element->findAll('css', "h3:contains('$requirements_section_heading')"), $test_label);
     $actual_message = $requirements_details->find('css', 'div.system-status-report__entry__value')->getText();
-    $this->assertNotEmpty($actual_message);
-    $this->assertEquals($message, $actual_message);
+    $this->assertNotEmpty($actual_message, $test_label);
+    $this->assertEquals($message, $actual_message, $test_label);
   }
 
   /**
